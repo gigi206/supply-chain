@@ -1,0 +1,8 @@
+# bench.sh, 2026-10-28T23:09:12Z, syft 1.38.0, grype 0.104.1 (nixpkgs 25.11), base localhost:5000/vulndb/grype@sha256:fdcaeb2eca9324c3ad87f1b8cae2ed07705bd4503b88f3b423d7fa274aee91b2, conforma ec v0.10.42, kyverno 1.19.2, cosign v3.1.4
+base importée hors réseau en 167 s : Schema: v6.1.10 Built: 2026-10-28T06:23:30Z
+SBOM fusionné : pkg:golang/None/tmp/claude-0/-home-user-supply-chain/04dcd89c-0cbd-59d9-b4f4-e017a6299821/scratchpad/b03/canon/source.origin@v1.0.0, pkg:golang/github.com/go-chi/chi/v5@v5.2.3, pkg:golang/stdlib@1.26.10, pkg:npm/marked@16.4.1, pkg:npm/sample-app-web@1.0.0
+scan ok en 977 ms : 5 vulnérabilités dont 0 KEV : -
+scan kev en 1063 ms : 13 vulnérabilités dont 2 KEV : CVE-2021-44228, CVE-2021-45046
+OK   porte, cas ok : attendu PASS ; Conforma PASS ; Kyverno PASS
+OK   porte, cas kev : attendu FAIL ; Conforma FAIL ; Kyverno FAIL ; motif : KEV sans VEX valide : GHSA-7rjr-3q55-vv33; KEV sans VEX valide : GHSA-jfh8-c2jp-5v3q
+exit=0
