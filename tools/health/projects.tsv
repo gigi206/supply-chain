@@ -1,0 +1,60 @@
+# nom	dépôt GitHub (owner/repo, "-" si hors GitHub)	domaine	chemin_critique (oui/non)
+Tekton Pipelines	tektoncd/pipeline	orchestration	oui
+Tekton Chains	tektoncd/chains	provenance	oui
+Tekton Triggers	tektoncd/triggers	orchestration	oui
+Conforma	conforma/cli	politique	oui
+Kyverno	kyverno/kyverno	politique	oui
+Hermeto	hermetoproject/hermeto	dépendances	oui
+mock	rpm-software-management/mock	packaging	oui
+BuildKit	moby/buildkit	construction	oui
+Buildah	containers/buildah	construction	non
+Syft	anchore/syft	sbom	oui
+Grype	anchore/grype	vulnérabilités	oui
+vunnel	anchore/vunnel	vulnérabilités	non
+grype-db	anchore/grype-db	vulnérabilités	non
+Dependency-Track	DependencyTrack/dependency-track	vulnérabilités	non
+OSV-Scanner	google/osv-scanner	vulnérabilités	non
+Trustify	guacsec/trustify	vulnérabilités	non
+Zot	project-zot/zot	stockage	oui
+ORAS	oras-project/oras	stockage	oui
+Harbor	goharbor/harbor	stockage	non
+Pulp (pulpcore)	pulp/pulpcore	stockage	non
+aptly	aptly-dev/aptly	stockage	non
+Verdaccio	verdaccio/verdaccio	stockage	non
+Athens	gomods/athens	stockage	non
+Rook	rook/rook	stockage	non
+Ceph	ceph/ceph	stockage	non
+cosign	sigstore/cosign	signature	oui
+timestamp-authority	sigstore/timestamp-authority	signature	oui
+OpenBao	openbao/openbao	signature	oui
+python-tuf	theupdateframework/python-tuf	signature	non
+go-tuf	theupdateframework/go-tuf	signature	non
+Kata Containers	kata-containers/kata-containers	isolation	non
+gVisor	google/gvisor	isolation	non
+Tetragon	cilium/tetragon	isolation	non
+Witness	in-toto/witness	provenance	non
+gittuf	gittuf/gittuf	sources	non
+Chainloop	chainloop-dev/chainloop	provenance	non
+Renovate	renovatebot/renovate	maintenance	non
+ORT	oss-review-toolkit/ort	licences	non
+ScanCode toolkit	aboutcode-org/scancode-toolkit	licences	non
+REUSE	fsfe/reuse-tool	licences	non
+Grant	anchore/grant	licences	non
+sbomqs	interlynk-io/sbomqs	sbom	non
+GuardDog	DataDog/guarddog	vulnérabilités	non
+malicious-packages	ossf/malicious-packages	vulnérabilités	non
+Scorecard	ossf/scorecard	santé	non
+OBS	openSUSE/open-build-service	packaging	non
+Konflux	konflux-ci/konflux-ci	socle	non
+Argo CD	argoproj/argo-cd	déploiement	non
+Prometheus	prometheus/prometheus	observabilité	non
+Alertmanager	prometheus/alertmanager	observabilité	non
+Grafana	grafana/grafana	observabilité	non
+Loki	grafana/loki	observabilité	non
+zizmor	zizmorcore/zizmor	posture-ci	non
+poutine	boostsecurityio/poutine	posture-ci	non
+tekton-lint	IBM/tekton-lint	posture-ci	oui
+Forgejo	-	sources	oui
+sbuild	-	packaging	oui
+mmdebstrap	-	packaging	oui
+StageX	-	construction	non
