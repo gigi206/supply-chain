@@ -1,0 +1,18 @@
+# bench.sh, 2026-10-28T22:48:42Z, hermeto 0.64.0, oras 1.3.6, zot v2.1.22 (dedupe), go version go1.26.10 linux/amd64, node v22.22.0
+v1.3.6 : 155 couches, 6416917 octets ; partagées avec v1.3.5 : 149 couches, 5964280 octets (92.9 %)
+  nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/list
+  nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.info
+  nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.zip
+  nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.ziphash
+  nouvelle : deps/gomod/pkg/mod/cache/download/sumdb/sum.golang.org/tile/8/0/x274/706.p/202
+  nouvelle : deps/gomod/pkg/mod/cache/download/sumdb/sum.golang.org/tile/8/1/x001/073.p/18
+Registre : +7653315 octets pour v1.3.5, +679943 octets pour v1.3.6
+OK   même fermeture repoussée : même digest (localhost:5000/deps/oras@sha256:2cab9804a30432976a6946f1f30f1f3a7e422d3daed26ee92545f856fd0d60ac)
+OK   arbre restauré identique (155 fichiers)
+OK   oras construit depuis la fermeture restaurée : identique (cc397d5e5614dc84455a885de769326d839aa7c5ea0b5fc7eb6a42a2eafddac3)
+OK   sample-app sample-app identique après restauration (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
+OK   sample-app web/dist/index.html identique après restauration (4edbd0c5062a0ca56bf30317e0a21df520e156682e104a95d220d453abe097d9)
+OK   sample-app web/dist/marked.umd.js identique après restauration (aced561246e2cf95f6a7007310a73c2edfc86e2ee136ae0c11a59f9ac8fee097)
+OK   pull par tag refusé
+OK   blob altéré dans le registre refusé (mismatched digest)
+exit=0 durée=112 s

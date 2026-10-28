@@ -11,7 +11,7 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 - produire des **rpm et deb** multi-distro (Debian, Ubuntu, Rocky, Alma, CentOS Stream) ;
 - atteindre **SLSA Build L3**.
 
-> **Statut : phase 1, étude.** Aucune brique n'est encore déployée.
+> **Statut : phase 2a (benchmarks) et validation locale des briques.** Aucune brique n'est encore déployée sur un cluster ; l'avancement est suivi dans [`docs/03-validation-briques.md`](docs/03-validation-briques.md).
 
 ## Existe-t-il un projet open source qui fait tout ça ?
 
@@ -34,6 +34,7 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | [`docs/00-etude-existant.md`](docs/00-etude-existant.md) | Étude des alternatives par domaine, avec pour, contre et sources |
 | [`docs/01-exigences.md`](docs/01-exigences.md) | Besoins et critères vérifiables, modèle de menace, exigences SLSA L3 → contrôles → **tests négatifs** |
 | [`docs/02-architecture.md`](docs/02-architecture.md) | Architecture cible, flux de build, modèle de provenance, stockage, porte et score, clés, observabilité |
+| [`docs/03-validation-briques.md`](docs/03-validation-briques.md) | Résultats des bancs et des briques, et liste de ce qui reste à valider sur l'infra du PoC |
 | [`docs/04-sante-projets.md`](docs/04-sante-projets.md) | Audit de santé des projets (Scorecard, activité, signatures), plans de sortie |
 | [`docs/adr/`](docs/adr/README.md) | Décisions d'architecture (ADR 0001 provisoire) |
 | [`tools/health/`](tools/health/) | Script de ré-audit trimestriel (`scorecard.sh`, `projects.tsv`) |
