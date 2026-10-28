@@ -1,0 +1,7 @@
+version = 1
+
+# sample-app : application de banc de la plateforme (Go + interface npm embarquée).
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 Contributeurs de gigi206/supply-chain"
+SPDX-License-Identifier = "Apache-2.0"
