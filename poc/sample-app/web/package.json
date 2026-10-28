@@ -1,0 +1,13 @@
+{
+  "name": "sample-app-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interface web de sample-app (construite sans bundler natif pour rester hermétique).",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "marked": "16.4.1"
+  }
+}

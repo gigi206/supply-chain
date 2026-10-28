@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>sample-app</title>
+  <script src="marked.umd.js"></script>
+</head>
+<body>
+  <main id="content"></main>
+  <script>
+    document.getElementById("content").innerHTML = marked.parse(__README__);
+  </script>
+</body>
+</html>
