@@ -1,0 +1,14 @@
+# bench.sh, 2026-10-28T23:19:57Z, syft 1.38.0, reuse 6.2.0, liste SPDX 3.27.0 (nixpkgs 25.11), go 1.26.10
+OK   oras v1.3.6 : 23 composants, erreurs 0, avertissements 4, NOASSERTION 0, invalides 0
+OK   négatif, licences non recherchées : refusé (23 composants, erreurs 23, avertissements 0, NOASSERTION 23, invalides 0)
+OK   sample-app : 3 composants, erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     error    pkg:golang/example.com/gpl-demo@v1.0.0 : deny : GPL-3.0-or-later; source à fournir introuvable dans la fermeture
+     error    pkg:npm/invalide@1.0.0 : expression invalide : parenthèse non fermée : « MIT AND (Apache-2.0 »
+     ok       pkg:npm/sans-licence@1.0.0 : MIT
+     warning  pkg:golang/example.com/lgpl-demo@v1.0.0 : warn : LGPL-2.1-only
+     error    pkg:golang/example.com/lgpl-absent@v1.0.0 : warn : LGPL-2.1-only; source à fournir introuvable dans la fermeture
+OK   cas synthétiques : verdicts attendus
+OK   bundle de sources attaché en referrer à localhost:5000/porte13a/app@sha256:4a2e7ef82acba87eebf6a42dc6093a36509d89476336cda4143e3aaa2f7b4e1f (rétention P10Y)
+OK   REUSE : sample-app conforme
+OK   négatif REUSE : fichier sous GPL-3.0-only sans texte de licence refusé (Missing licenses: GPL-3.0-only)
+exit=0

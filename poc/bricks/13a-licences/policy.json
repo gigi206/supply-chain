@@ -1,0 +1,10 @@
+{
+  "version": "2026-10-28",
+  "description": "Application distribuée en binaire sous licence permissive. Les paquets rpm/deb de logiciels GPL relèvent d'une autre politique (obligations de sources, pas de refus).",
+  "excludePurlTypes": ["github"],
+  "allow": ["Apache-2.0", "MIT", "MIT-0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD", "Unlicense", "Zlib", "CC0-1.0", "BlueOak-1.0.0", "Python-2.0", "PSF-2.0"],
+  "warn": ["MPL-2.0", "LGPL-2.1-only", "LGPL-2.1-or-later", "LGPL-3.0-only", "LGPL-3.0-or-later", "EPL-2.0", "CC-BY-4.0", "CC-BY-SA-4.0"],
+  "deny": ["GPL-*", "AGPL-*", "SSPL-*", "BUSL-*", "CC-BY-NC-*"],
+  "sourceObligation": ["GPL-*", "LGPL-*", "AGPL-*", "MPL-*", "EPL-*", "CDDL-*"],
+  "licenseRefs": []
+}
