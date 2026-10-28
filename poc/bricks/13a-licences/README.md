@@ -12,7 +12,7 @@ Seuil (README, brique 13a) : 0 `NOASSERTION` ; 100 % d'expressions SPDX valides 
    - Classement allow / warn / deny : OR retient la branche la plus favorable, AND la plus défavorable.
    - **ERROR** pour NOASSERTION, une expression invalide ou une licence absente de la politique.
 4. **Obligations de sources** (GPL, LGPL, MPL…) : le fichier source de la dépendance (zip de module Go, archive npm) doit être dans la fermeture, sinon ERROR. Les fichiers trouvés sont attachés à l'artefact en **referrer** `application/vnd.supply-chain.source-bundle.v1` (annotation `retention=P10Y`).
-5. **REUSE** sur nos dépôts : `poc/sample-app` porte désormais un `REUSE.toml` (Apache-2.0) et le texte de sa licence.
+5. **REUSE** sur nos dépôts : le dépôt et `poc/sample-app` portent chacun un `REUSE.toml` (Apache-2.0) et le texte de la licence.
 
 La sortie est le prédicat `https://supply-chain.example/licences/v1`. La porte du banc C le lit (`violations.error`) et refuse dès qu'il y a une erreur (cas `c8-licence`).
 
@@ -31,6 +31,7 @@ La politique fournie vise une **application distribuée en binaire sous licence 
 | LGPL-2.1-only, source présente dans la fermeture | Avertissement ; **source attachée en referrer** à l'image (rétention P10Y) |
 | LGPL-2.1-only, source absente | ERROR (obligation impossible à tenir) |
 | REUSE sur sample-app | **Conforme** (REUSE 3.3, 10 fichiers sur 10) |
+| REUSE sur le dépôt entier | **Conforme** (REUSE 3.3, 76 fichiers sur 76) |
 | Négatif REUSE : fichier sous GPL-3.0-only sans texte de licence | **Non conforme** (« Missing licenses: GPL-3.0-only ») |
 
 Tests unitaires ([`test_licences.py`](test_licences.py)) : 9 tests réussis. Ils couvrent la grammaire SPDX et la normalisation, les expressions invalides, NOASSERTION et curation, les PURL écrits autrement, OR et AND, les licences hors politique, les `LicenseRef`, les entrées non SPDX, les exclusions et les obligations de sources.
@@ -40,7 +41,7 @@ Tests unitaires ([`test_licences.py`](test_licences.py)) : 9 tests réussis. Ils
 - **Les 4 avertissements d'oras ne sont pas cosmétiques.** Trois viennent de fichiers de licence que Syft ne reconnaît pas (empreinte au lieu d'un identifiant). Pour `go.yaml.in/yaml/v4`, le fichier ignoré contient probablement la part MIT d'une licence double, que la déclaration « Apache-2.0 » omet. C'est le rôle de **ScanCode** (brique 13b) de trancher ces cas.
 - `opencontainers/go-digest` est sous **Apache-2.0 AND CC-BY-SA-4.0** (licence de la documentation) : avertissement à faire valider par le référent juridique.
 - La **curation** reste le dernier recours. Elle est versionnée (dépôt `ort-config`), porte une preuve (fichier LICENSE vérifié, hash `go.sum`) et passe par une revue.
-- Le **dépôt `supply-chain` lui-même** n'est pas encore conforme REUSE : il faut d'abord **choisir sa licence** (décision du propriétaire).
+- Le **dépôt `supply-chain`** est sous **Apache-2.0** (décision du propriétaire du 28/10/2026) et conforme REUSE 3.3 : `REUSE.toml` à la racine, texte dans `LICENSES/`, contrôle par `make reuse`.
 
 ## Reproduction
 

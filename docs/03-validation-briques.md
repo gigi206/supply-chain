@@ -21,11 +21,11 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 | 03 | deps-closure | **Validé (local)**, à compléter | oras v1.3.5 → v1.3.6 : **92,9 % des octets partagés** (seuil 50 %), registre +0,68 Mo pour 6,4 Mo ; restauration par digest et build hors réseau identiques (oras, sample-app gomod + npm) ; blob altéré et pull par tag refusés | [README](../poc/bricks/03-deps-closure/README.md) |
 | 04 | hermetic-repro | **Validé (local)**, à compléter | BuildKit éphémère sans Docker : image de build et **image sample-app identiques sur 2 builds sans cache et 2 chemins** ; binaire identique à celui compilé hors BuildKit ; négatifs refusés (sans fermeture, sortie réseau en `--network=none`) | [README](../poc/bricks/04-hermetic-repro/README.md) |
 | 07a | sbom-grype | **Validé (local)**, à compléter | Base Grype officielle archivée dans Zot (empreinte vérifiée), restaurée par digest et importée **sans réseau** ; SBOM Hermeto + Syft fusionné ; **porte : cas ok PASS, cas KEV (log4j 2.14.1) FAIL** dans Conforma et Kyverno | [README](../poc/bricks/07a-sbom-grype/README.md) |
-| 13a | licences déclarées + REUSE | **Validé (local)**, à compléter | oras v1.3.6 et sample-app : **0 ERROR, 0 NOASSERTION, 100 % d'expressions SPDX valides** ; négatifs refusés (GPL, expression invalide, licences non recherchées, source manquante) ; **bundle de sources en referrer** (rétention P10Y) ; sample-app conforme REUSE ; 9 tests unitaires | [README](../poc/bricks/13a-licences/README.md) |
+| 13a | licences déclarées + REUSE | **Validé (local)**, à compléter | oras v1.3.6 et sample-app : **0 ERROR, 0 NOASSERTION, 100 % d'expressions SPDX valides** ; négatifs refusés (GPL, expression invalide, licences non recherchées, source manquante) ; **bundle de sources en referrer** (rétention P10Y) ; dépôt et sample-app conformes REUSE ; 9 tests unitaires | [README](../poc/bricks/13a-licences/README.md) |
 
 ## À faire sur le laptop (infra du PoC)
 
-Prérequis : décider l'infra du PoC (ADR 0001) et nommer le deuxième administrateur du domaine de replay. **Décision également attendue : la licence du dépôt `supply-chain`**, préalable à sa conformité REUSE.
+Prérequis : décider l'infra du PoC (ADR 0001) et nommer le deuxième administrateur du domaine de replay. La licence du dépôt est décidée : **Apache-2.0** (dépôt conforme REUSE 3.3).
 
 | Sujet | Ce qui reste | Brique ou banc |
 |---|---|---|

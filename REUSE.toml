@@ -1,0 +1,10 @@
+version = 1
+
+# Dépôt supply-chain : tout le contenu est sous Apache-2.0.
+# Les fichiers qui portent leur propre en-tête SPDX, ou qu'un REUSE.toml plus
+# proche couvre (poc/sample-app), gardent leurs informations.
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 Contributeurs de gigi206/supply-chain"
+SPDX-License-Identifier = "Apache-2.0"

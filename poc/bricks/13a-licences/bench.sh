@@ -123,7 +123,9 @@ n=$("$ORAS" discover "${oras_opts[@]}" --format json --artifact-type application
 git -C "$repo" archive HEAD poc/sample-app | tar -x --strip-components=2 --one-top-level=reuse-ok
 "$REUSE" --root reuse-ok lint > reuse-ok.log 2>&1 && ok "REUSE : sample-app conforme" || ko "REUSE : sample-app non conforme"
 cp -a reuse-ok reuse-ko
+# REUSE-IgnoreStart : en-tête du fichier de test, pas la licence de ce script.
 printf '// SPDX-License-Identifier: GPL-3.0-only\npackage main\n' > reuse-ko/vendored.go
+# REUSE-IgnoreEnd
 "$REUSE" --root reuse-ko lint > reuse-ko.log 2>&1 && ko "REUSE : fichier GPL sans texte accepté" \
   || ok "négatif REUSE : fichier sous GPL-3.0-only sans texte de licence refusé ($(grep -m1 -o 'Missing licenses: .*' reuse-ko.log))"
 

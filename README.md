@@ -27,6 +27,10 @@ La plateforme s'assemble donc autour de Tekton + Chains, avec des briques compl�
 
 Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-existant.md).
 
+## Licence
+
+[Apache-2.0](LICENSE). Le dépôt est conforme à la [spécification REUSE](https://reuse.software/) 3.3 (`REUSE.toml`, textes dans `LICENSES/`), ce que vérifie `make reuse`.
+
 ## Documents
 
 | Document | Contenu |
