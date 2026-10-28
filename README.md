@@ -88,7 +88,7 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 | 13a | licences déclarées + REUSE | 2b-2 | 1 | 0 `NOASSERTION`, 0 violation ERROR, sources GPL attachées |
 | 07b | DT v5 + VEX + OSV + score | 2c | 3 | Ré-ingest testé ; test négatif sur la correspondance des PURL dans les VEX |
 | 13b | ORT + ScanCode | 2c | 3 | 0 egress hors plateforme ; précision et rappel ≥ 95 % (avec un référent juridique) |
-| 11 | builder-bootstrap | 2c | 1,5 | Toolchain Go StageX reproduite ; images mock et sbuild reconstruites |
+| 11 | builder-bootstrap | 2c | 1,5 | Toolchain Go StageX reproduite ; images mock et sbuild reconstruites ; **images Tekton, Conforma et Zot reconstruites depuis les sources** (leurs signatures amont ne sont pas vérifiables, voir doc 04 §5) |
 | 14 | snapshots-distro | 2c | 2 | Rebuild offline depuis un snapshot ; ADR 0002 |
 | 15 | archive-worm | 2c | 2 | Suppression refusée ; ADR 0006 |
 | 16 | matrice complète | 2c | 4 | debian-12, ubuntu-24.04, alma-9, centos-stream-10 ; EL8 documenté |
