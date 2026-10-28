@@ -1,0 +1,7 @@
+# bench.sh, 2026-10-28T23:25:12Z, buildkit 0.25.2 + runc 1.3.3 (nixpkgs 25.11, démon éphémère root, oci worker, snapshotter native, sans Docker), go 1.26.10, busybox 1.36.1 statique
+OK   image de build identique sur 2 builds (sha256:bdd56babd8af27efebd3940fb4679962a5e7f835cc06250caec1674bd45fe545)
+OK   image sample-app identique sur 2 builds sans cache, 2 chemins (sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
+OK   binaire dans l'image = binaire de la brique 03, compilé hors BuildKit (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
+OK   négatif : build sans fermeture refusé (github.com/go-chi/chi/v5@v5.2.3: reading file:///deps/deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2)
+OK   négatif : sortie réseau refusée dans l'étape --network=none (wget: bad address 'proxy.golang.org')
+exit=0 durée=113 s
