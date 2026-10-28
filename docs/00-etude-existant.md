@@ -97,8 +97,8 @@ Sources : [gestion des clés cosign](https://docs.sigstore.dev/cosign/key_manage
 
 | Option | Pour | Contre | Verdict |
 |---|---|---|---|
-| **Conforma** (`ec`, ex-Enterprise Contract) | Bibliothèque de règles SLSA et Tekton (`trusted_task`, `step_images`…). Lit les bundles et referrers depuis la v0.8.122 environ | 0.x (tags « snapshot » rolling ; utiliser les tags stables). Sponsor : Red Hat de fait. **`ec --vsa` est DÉPRÉCIÉ** | **Retenu** comme porte de release. **Challenger 2a** : Kyverno seul |
-| **Kyverno** ≥ 1.19.2 | `ImageValidatingPolicy` (v1, **GA depuis la 1.17**) : cosign v3, bundles, referrers, in-toto, TSA. CNCF Incubating, Scorecard 7,8 | Avis Critical en 10/2026 (corrigés en 1.19.2). `ClusterPolicy verifyImages` ne fonctionne pas en mode bundle | **Retenu** (admission). Candidat moteur unique |
+| **Conforma** (`ec`, ex-Enterprise Contract) | Bibliothèque de règles : collection `slsa3` (« policy rules required to meet SLSA Level 3 »), `trusted_task`, `signing_identities`. Builtin `ec.oci.image_referrers` (OCI Referrers) et lecture des bundles dans le code depuis la v0.8.122 environ (**non documentée** sur conforma.dev) | 0.x (release à chaque merge ; utiliser des tags figés). Sponsor : Red Hat de fait. **`--vsa` déprécié** (sans date de retrait). **Aucune méthode documentée pour vérifier ses propres images** | **Retenu** comme porte de release. **Challenger 2a** : Kyverno seul |
+| **Kyverno** ≥ 1.19.2 | `ImageValidatingPolicy` (`policies.kyverno.io/v1`, annoncée GA en 1.17, doc « FEATURE STATE: Stable • Kyverno v1.19 » ; version de stockage v1beta1 jusqu'en 1.20) : cosign v3, referrers, in-toto, chaîne TSA (`ctlog.tsaCertChain`) pour l'horodatage **intégré au bundle**. Vérification d'un jeton RFC 3161 séparé : **NV**. CNCF Incubating, Scorecard 7,8 | Avis Critical en 10/2026 (corrigés en 1.19.2). `ClusterPolicy verifyImages` ne fonctionne pas en mode bundle | **Retenu** (admission). Candidat moteur unique |
 | OPA Gatekeeper + Ratify | Générique | Plus complexe ; provider cosign « not for production » | Écarté |
 | sigstore policy-controller | Alternative à Kyverno | CVE de contournement en 2026 (NV) | Écarté |
 | slsa-verifier | Référence | Ne gère que les builders GitHub et GCB | Hors sujet |
@@ -135,7 +135,7 @@ Sources : [releases Forgejo](https://codeberg.org/forgejo/forgejo/releases), [po
 | ko | Images Go sans privilèges | Activité faible | Option |
 | apko | Bit à bit | APK seulement | Hors sujet |
 | kaniko, repro-get | — | **Archivés** | Exclus |
-| **StageX** | Bootstrap complet depuis les sources, reproductible, multi-signature PGP (≥ 2), utilisé par Talos. ISC, 8 mainteneurs déclarés | **Seulement 2 signataires sur sx2026.09.0** (le minimum), un contributeur fait environ 63 % des commits, pas de SECURITY.md, correctifs irréguliers. musl ; pas de SBOM ni de provenance | **Retenu, limité à la toolchain Go**, avec reproduction interne et notre propre signature |
+| **StageX** | Bootstrap complet depuis les sources, reproductible sur 2 marques de CPU, multi-signature PGP (≥ 2, clés sur carte à puce), utilisé par Talos. ISC, 8 mainteneurs | **Seulement 2 signataires sur sx2026.09.0** (le minimum), un contributeur fait environ 63 % des commits, pas de politique de sécurité formalisée, correctifs irréguliers. musl ; **pas de SBOM** (issue ouverte depuis 2024), provenance NV, **pas d'arm64**. Vérification par signatures *lookaside* : Podman OK, Skopeo KO, Kubernetes inconnu | **Retenu, limité à la toolchain Go**, avec reproduction interne et notre propre signature |
 | Docker Hardened Images | Gratuites (Apache-2.0 depuis 12/2025), SBOM, VEX, Build L3 | Pas de bit à bit revendiqué ; un seul fournisseur | Repli pour les images d'exécution glibc |
 | distroless, Ubuntu chisel, debuerreotype | Images minimales, rootfs Debian reproductibles | Un seul fournisseur, ou un seul mainteneur (debuerreotype) | Options |
 | **Nix** (`dockerTools`, `nix2container`, `buildGoModule`, `buildNpmPackage`) | Closures complètes, `--check`, images reproductibles | Écosystème à apprendre ; sandbox exigeant les user namespaces ; cache privé obligatoire ; provenance via Chains seulement | **Challenger 2a** (3 jours) face à Hermeto + BuildKit |
@@ -355,6 +355,7 @@ Tableau de bord :
 - Compatibilité de `hashivault://` de Chains avec OpenBao.
 - mock et sbuild sous gVisor et en user namespace (brique 05).
 - Qualificatif `distro=` produit par Syft et Hermeto, et consommé par DT.
-- Vérification cryptographique des images amont (Tekton, Conforma, Renovate). Elle exige des hôtes encore bloqués : Sigstore TUF/Rekor, blobs GHCR, quay.io. Voir le doc 04.
+- Vérification des images amont : **faite** (doc 04 §5). Renovate, OpenBao et Kyverno sont vérifiés. **Tekton** (clé documentée non concordante), **Conforma** (méthode non documentée) et **Zot** (non signé) ne sont pas vérifiables : il faut les reconstruire, ou les épingler après revue.
+- Vérification par Kyverno d'un jeton RFC 3161 séparé (non documentée), et support des bundles Sigstore par Conforma (présent dans le code, absent de la doc) : à tester en brique 08.
 - Scores Scorecard de Hermeto, Pulp, Trustify, ScanCode, vunnel, Tetragon, Konflux, Grant et zizmor : il faut le CLI Scorecard et un jeton GitHub.
 - Licence actuelle de FOSSA CLI (sans impact : écarté).
