@@ -1,3 +1,4 @@
-result*
+/result
+/result-*
 http_cache.sqlite
-sbom.*
+/sbom.*
