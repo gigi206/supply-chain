@@ -1,0 +1,94 @@
+# Contrôles de release du banc « Kyverno seul » (ADR 0000 §4), version Kyverno.
+# Les clés publiques (marqueurs CHAINS_PUB et VSA_PUB) sont injectées par run.sh.
+# extractPayload() renvoie l'énoncé in-toto complet (d'où .predicate) et exige
+# que verifyAttestationSignatures() ait été appelé avant, dans la même politique.
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: bench-release
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  matchImageReferences:
+    - glob: "localhost:5000/*"
+  credentials:
+    allowInsecureRegistry: true
+  attestors:
+    - name: chains
+      cosign:
+        key:
+          data: |
+__CHAINS_PUB__
+        ctlog:
+          insecureIgnoreTlog: true
+    - name: vsa
+      cosign:
+        key:
+          data: |
+__VSA_PUB__
+        ctlog:
+          insecureIgnoreTlog: true
+  attestations:
+    # Avec les bundles cosign v3, la signature d'image est un DSSE de ce type ;
+    # verifyImageSignatures() accepte aussi n'importe quelle attestation signée.
+    - name: sig
+      intoto:
+        type: https://sigstore.dev/cosign/sign/v1
+    - name: prov
+      intoto:
+        type: https://slsa.dev/provenance/v1
+    - name: vsa
+      intoto:
+        type: https://slsa.dev/verification_summary/v1
+    - name: scan
+      intoto:
+        type: https://supply-chain.example/scan/v1
+    - name: lic
+      intoto:
+        type: https://supply-chain.example/licences/v1
+  variables:
+    - name: builderId
+      expression: "'https://supply-chain.example/builders/tekton-chains@v1'"
+    - name: trustedTasks
+      expression: "['1111111111111111111111111111111111111111111111111111111111111111']"
+  validations:
+    - expression: >-
+        images.containers.map(i, verifyImageSignatures(i, [attestors.chains])).all(e, e > 0)
+        && images.containers.map(i, verifyAttestationSignatures(i, attestations.sig, [attestors.chains])).all(e, e > 0)
+      message: "C1 : signature de l'image absente ou invalide"
+    - expression: >-
+        images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e > 0)
+        && images.containers.all(i, extractPayload(i, attestations.prov).predicate.runDetails.builder.id == variables.builderId)
+      message: "C2 : provenance absente, mal signée ou builder inattendu"
+    - expression: >-
+        images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.externalParameters.git.url.startsWith('forgejo.example/workspace/'))
+      message: "C3 : source non autorisée"
+    - expression: >-
+        images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,
+          has(d.digest) && size(d.digest) > 0
+          && (d.uri.startsWith('oci://zot.example/') || d.uri.startsWith('git+forgejo.example/workspace/'))))
+      message: "C4 : dépendance non épinglée ou d'origine non autorisée"
+    - expression: >-
+        images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,
+          !d.uri.startsWith('oci://zot.example/tekton/tasks/') || d.digest.sha256 in variables.trustedTasks))
+      message: "C5 : tâche Tekton non autorisée"
+    - expression: >-
+        images.containers.map(i, verifyAttestationSignatures(i, attestations.vsa, [attestors.vsa])).all(e, e > 0)
+        && images.containers.all(i, extractPayload(i, attestations.vsa).predicate.verificationResult == 'PASSED'
+          && extractPayload(i, attestations.vsa).predicate.verifier.id == 'https://supply-chain.example/replay')
+      message: "C6 : VSA de replay absente, mal signée ou en échec"
+    - expression: >-
+        images.containers.map(i, verifyAttestationSignatures(i, attestations.scan, [attestors.chains])).all(e, e > 0)
+        && images.containers.all(i, size(extractPayload(i, attestations.scan).predicate.malicious) == 0
+          && extractPayload(i, attestations.scan).predicate.vulnerabilities.all(v, !v.kev
+            || (has(v.vex) && v.vex.status in ['not_affected', 'fixed'] && timestamp(v.vex.expires) > time.now())))
+      message: "C7/C10 : KEV sans VEX valide, VEX expiré ou paquet malveillant"
+    - expression: >-
+        images.containers.map(i, verifyAttestationSignatures(i, attestations.lic, [attestors.chains])).all(e, e > 0)
+        && images.containers.all(i, extractPayload(i, attestations.lic).predicate.violations.error == 0)
+      message: "C8 : violation de licence ERROR"

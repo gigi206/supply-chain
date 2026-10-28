@@ -111,13 +111,15 @@ Jeu de règles de référence : les **10 contrôles de release** qui doivent êt
 ## 5. Décision
 
 > À compléter après les benchmarks : notes, preuves, scores, décision et plan de sortie. **La grille ci-dessus ne doit pas être modifiée** ; tout ajustement passe par un nouvel ADR.
+>
+> **Constat de sécurité du banc C** : avec les bundles cosign v3, `cosign verify`, Conforma et Kyverno acceptent une image **sans signature** dès qu'elle porte une attestation signée par la clé de confiance. Il faut un contrôle strict du type `https://sigstore.dev/cosign/sign/v1` et des clés séparées par usage (voir les résultats du banc C).
 
 | Évaluation | Score candidat | Score référence | Éliminé ? | Décision |
 |---|---|---|---|---|
 | A1. Konflux | — | 57 | — | — |
 | A2. OBS (packaging) | — | — | — | — |
 | B. Nix | — | — | — | — |
-| C. Kyverno seul | — | — | — | — |
+| C. Kyverno seul | **76 (provisoire)** | **63 (provisoire)** | Non | **Suspendue** : 9/9 contrôles testés réussis (17/17 cas) ; contrôle 9 (TSA) et parité à l'admission à mesurer en brique 08 ([résultats](../../poc/benchmarks/kyverno-seul/resultats/README.md)) |
 
 ## 6. Préalables d'exécution
 

@@ -1,0 +1,14 @@
+# Données de référence des 10 contrôles (communes à Conforma et Kyverno).
+bench:
+  expected_builder_id: https://supply-chain.example/builders/tekton-chains@v1
+  allowed_source_prefix: forgejo.example/workspace/
+  allowed_dependency_prefixes:
+    - oci://zot.example/
+    - git+forgejo.example/workspace/
+  trusted_task_prefix: oci://zot.example/tekton/tasks/
+  trusted_task_digests:
+    - "1111111111111111111111111111111111111111111111111111111111111111"
+  vsa_verifier_id: https://supply-chain.example/replay
+  vex_accepted_status:
+    - not_affected
+    - fixed

@@ -66,7 +66,7 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 | **2b-2. Packaging** (`make slice-2`) | Briques 05, 06, 09, 13a | ~7 pw |
 | **3. ADR** | ADR 0001 (définitif), 0003, 0004, 0005, puis **point de décision « go 2c »** | ~1 pw |
 | **2c. Élargissement** | Briques 07b, 13b, 11, 14, 15, 16, 17, 20 ; ADR 0002 et 0006 | ~18,5 pw |
-| **4. E2E** | Projet réel mirroré, matrice complète, sauvegarde/restauration (12) | ~4 pw |
+| **4. E2E** | Projet réel mirroré : **Traefik** (Go + interface web yarn 4 embarquée), avec branche custom de packaging ; matrice complète ; sauvegarde/restauration (12) | ~4 pw |
 | Option O8 | Radar amont et tableau de bord (18) | ~3 pw |
 | **Total** | | **≈ 49 pw (≈ 52 avec O8)** |
 

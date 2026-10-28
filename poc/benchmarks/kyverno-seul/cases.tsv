@@ -1,0 +1,18 @@
+# cas	attendu	contrôle (ADR 0000 §4)	description
+ok	PASS	-	Artefact conforme : signatures, provenance, VSA, scan et licences valides
+c1-unsigned	FAIL	1	Image sans signature (attestations présentes)
+c1-rogue	FAIL	1,2	Image et attestations signées par une clé inconnue
+c2-no-prov	FAIL	2	Pas de provenance SLSA
+c2-bad-builder	FAIL	2	builder.id inattendu
+c3-bad-source	FAIL	3	Source hors de forgejo.example/workspace/
+c4-unpinned	FAIL	4	Dépendance résolue sans digest
+c4-external-dep	FAIL	4	Dépendance hors du registre interne
+c5-untrusted-task	FAIL	5	Bundle de tâche Tekton hors liste autorisée
+c6-no-vsa	FAIL	6	Pas de VSA de replay
+c6-vsa-failed	FAIL	6	VSA avec verificationResult FAILED
+c6-vsa-wrong-key	FAIL	6	VSA signée par la clé de provenance au lieu de la clé du domaine de replay
+c7-kev	FAIL	7	Vulnérabilité KEV sans VEX
+c7-kev-vex-ok	PASS	7,10	KEV couverte par un VEX not_affected non expiré
+c7-mal	FAIL	7	Paquet malveillant (MAL-)
+c8-licence	FAIL	8	Violation de licence ERROR
+c10-vex-expired	FAIL	10	KEV couverte par un VEX expiré

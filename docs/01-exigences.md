@@ -90,7 +90,7 @@ Chacun **doit échouer** et produire une trace :
 4. Lancer un pod privilégié hors Kata, ou monter un `hostPath`.
 5. Envoyer un webhook Forgejo non signé, ou rejouer un webhook valide.
 6. Ouvrir une connexion réseau sortante pendant l'étape de build.
-7. Publier ou admettre un artefact non signé.
+7. Publier ou admettre un artefact non signé, **y compris un artefact qui ne porte que des attestations signées**. Avec les bundles cosign v3, `cosign verify`, Conforma et Kyverno l'acceptent par défaut : exiger le type `https://sigstore.dev/cosign/sign/v1` (banc C).
 8. Présenter une attestation avec un jeton d'horodatage absent ou falsifié.
 
 ## 4. Autres propriétés (distinctes de L3)
