@@ -17,6 +17,7 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 | # | Brique | Statut | Résultat local | Détail |
 |---|---|---|---|---|
 | 01 | forgejo-sync | **Validé (local)**, à compléter | Force-push et tag déplacé détectés (code 2) et archivés sous `refs/archive/<horodatage>` ; bundles incrémentaux exportés, rattrapage après échec ; restauration identique ; 10 tests unitaires réussis | [README](../poc/bricks/01-forgejo-sync/README.md) |
+| 02 | artefact-store + index | **Validé (local)**, à compléter | `tools/index` sur 10 000 artefacts + 17 images cosign (referrers et tags `.att`) : **`built-with` en 1 ms, `attestations` d'un fichier brut en < 1 ms** (seuil 1 min), résultats exacts ; reconstruction complète en 58 s ; 5 tests unitaires | [README](../poc/bricks/02-artefact-index/README.md) |
 | 03 | deps-closure | **Validé (local)**, à compléter | oras v1.3.5 → v1.3.6 : **92,9 % des octets partagés** (seuil 50 %), registre +0,68 Mo pour 6,4 Mo ; restauration par digest et build hors réseau identiques (oras, sample-app gomod + npm) ; blob altéré et pull par tag refusés | [README](../poc/bricks/03-deps-closure/README.md) |
 
 ## À faire sur le laptop (infra du PoC)
