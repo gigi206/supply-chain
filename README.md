@@ -78,7 +78,7 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 | 08 | trust-plane (k3s) | 2b-1 | 5,5 | Tekton + HMAC, Chains (stockage prouvé), OpenBao, job TSA (chemin de vérification choisi), Trusted Resources, Kyverno, Conforma, RBAC, nœuds dédiés, posture des pipelines ; **8 tests négatifs** échouent comme attendu |
 | 19 | observabilité exploitation | 2b-1 | 0,5 | Les 5 alertes critiques se déclenchent sur incident simulé |
 | 03 | deps-closure | 2b-1 | 1 | Fermetures restaurables par digest ; déduplication ≥ 50 % |
-| 04 | hermetic-repro | 2b-1 | 1,5 | 0 connexion sortante ; 2 builds → même sha256 (binaire, image) |
+| 04 | hermetic-repro | 2b-1 | 1,5 | 0 connexion sortante ; 2 builds → même sha256 (binaire, image) ; fermeture altérée → build refusé, pour chaque gestionnaire |
 | 02 | artefact-store + index | 2b-1 | 1,5 | Attestations récupérables ; `tools/index` répond en moins d'une minute |
 | 07a | sbom-grype | 2b-1 | 1 | Sans egress ; la porte bloque un cas KEV |
 | 10 | independent-replay | 2b-1 | 2 | Domaine distinct, clé de VSA séparée, ≥ 24 h : bit-identique + VSA |

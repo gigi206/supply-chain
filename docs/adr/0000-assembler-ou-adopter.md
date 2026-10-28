@@ -118,7 +118,7 @@ Jeu de règles de référence : les **10 contrôles de release** qui doivent êt
 |---|---|---|---|---|
 | A1. Konflux | — | 57 | — | — |
 | A2. OBS (packaging) | — | — | — | — |
-| B. Nix | **74 (provisoire, critères mesurés)** | **74 (provisoire)** | Non | **Veille (provisoire)** : égalité, alors que la règle exige +15. Nix gagne sur l'offline complet (toolchains, image) mais perd sur le SBOM (`pkg:nix`) ; B-1 multi-hôtes et B-5 restent à mesurer ([résultats](../../poc/benchmarks/nix/resultats/README.md)) |
+| B. Nix | **74 (provisoire, critères mesurés)** | **74 (provisoire, Hermeto 0.64.0 mesuré)** | Non | **Veille (provisoire)** : égalité, alors que la règle exige +15. Nix gagne sur l'offline complet (toolchains, image) mais perd sur le SBOM (`pkg:nix`) ; B-1 multi-hôtes, B-5 et l'image BuildKit restent à mesurer. Constat : l'environnement de `hermeto generate-env` laisse passer un zip Go altéré ; la fermeture doit être servie en `GOPROXY` ([résultats](../../poc/benchmarks/nix/resultats/README.md)) |
 | C. Kyverno seul | **76 (provisoire)** | **63 (provisoire)** | Non | **Suspendue** : 9/9 contrôles testés réussis (17/17 cas) ; contrôle 9 (TSA) et parité à l'admission à mesurer en brique 08 ([résultats](../../poc/benchmarks/kyverno-seul/resultats/README.md)) |
 
 ## 6. Préalables d'exécution

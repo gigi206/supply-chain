@@ -6,7 +6,7 @@
 
 **Référence (Hermeto + BuildKit)** :
 1. Prefetch Hermeto (gomod, npm), puis fermeture archivée (OCI, fichier par fichier) et SBOM Hermeto.
-2. Build du binaire Go (`-trimpath`, `CGO_ENABLED=0`, `GOFLAGS=-mod=vendor`, `GOTOOLCHAIN=local`) et de l'image (BuildKit, `SOURCE_DATE_EPOCH`, `rewrite-timestamp`), sans réseau.
+2. Build du binaire Go (`-trimpath`, `CGO_ENABLED=0`, `GOFLAGS=-mod=readonly`, `GOTOOLCHAIN=local`, fermeture servie en `GOPROXY`) et de l'image (BuildKit, `SOURCE_DATE_EPOCH`, `rewrite-timestamp`), sans réseau. Script : [`reference/hermeto.sh`](reference/hermeto.sh) (prefetch, 2 builds hors réseau, 3 tests d'altération de la fermeture).
 
 **Candidat (Nix)** :
 1. `flake.nix` épinglé (nixpkgs par révision) : `buildGoModule` (`vendorHash`), `buildNpmPackage` (`npmDepsHash`), image `dockerTools.buildLayeredImage` ou `nix2container`.

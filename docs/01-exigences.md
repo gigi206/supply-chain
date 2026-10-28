@@ -64,6 +64,7 @@
 | **G**. Canal de distribution | Registre ou dépôt altéré | Digests partout, `oras cp -r`, WORM, TUF pour les clés publiques, OpenPGP sur les dépôts | Digest modifié détecté par `tools/index` et la vérification |
 | **H**. Sélection du paquet | Mauvais paquet ou typosquatting | Lockfiles et fermetures, PURL, malicious-packages, GuardDog | Paquet typosquatté signalé |
 | **I**. Usage | Artefact consommé sans vérification | Kyverno `ImageValidatingPolicy` côté déploiement ; documentation de vérification pour les consommateurs | Image non vérifiée refusée à l'admission |
+| **Fermeture archivée** (transverse) | Fermeture de dépendances altérée entre le prefetch et le build, ou dans l'archive avant un replay | Fermeture tirée de Zot par digest (inscrit dans `resolvedDependencies`), montée en lecture seule ; Go : fermeture servie en `GOPROXY` avec `GOMODCACHE` vierge, jamais l'environnement de `hermeto generate-env` tel quel, plus `go mod verify` ; npm : intégrité sha512 du lockfile | **Zip Go et archive npm altérés : build refusé** (banc B, [`hermeto.sh`](../poc/benchmarks/nix/reference/hermeto.sh)) |
 | **Dépendances** (transverse) | Dépendance vulnérable ou compromise | Grype, OSV, DT, VEX, base datée, score | Cas KEV bloqué par la porte |
 
 ## 3. Exigences SLSA Build L3 → contrôles

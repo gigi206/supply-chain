@@ -198,7 +198,7 @@ Sources : [builds hermétiques mock](https://github.com/rpm-software-management/
 **Pratiques retenues :**
 - `SOURCE_DATE_EPOCH` ;
 - images épinglées par digest ;
-- Go : `-trimpath`, `CGO_ENABLED=0`, `GOFLAGS=-mod=vendor` ou `-mod=readonly`, `GOTOOLCHAIN=local` (jamais `-mod=mod`) ;
+- Go : `-trimpath`, `CGO_ENABLED=0`, `GOFLAGS=-mod=vendor` ou `-mod=readonly`, `GOTOOLCHAIN=local` (jamais `-mod=mod`). Avec Hermeto, la fermeture est servie en `GOPROXY=file://…` avec un `GOMODCACHE` vierge : l'environnement de `generate-env` (fermeture = `GOMODCACHE`) laisse passer un zip altéré (mesuré au banc B). Le mode (module ou vendor) change le binaire et s'inscrit dans la provenance ;
 - npm : `npm ci` avec lockfile v2/v3 ;
 - pip : `--require-hashes` ;
 - comparaison des sha256 hors signature OpenPGP ;
