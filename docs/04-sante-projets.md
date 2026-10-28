@@ -120,19 +120,21 @@ Relevé du 2026-10-28 via https://api.securityscorecards.dev
 | **debusine** | 0.16.2 (28/10/2026), 0.x, une seule entreprise (Freexian), pas de politique de sécurité | À surveiller (option) |
 | **diffoscope / reprotest / strip-nondeterminism** | Un mainteneur dominant. strip-nondeterminism : 0 commit sur 90 jours | À surveiller (vérificateurs secondaires) |
 
-## 5. Signatures des images amont (vérification de phase 1)
+## 5. Signatures des images amont (vérifiées le 28/10/2026)
 
-Relevé avec `cosign v3.1.4` (checksum vérifié) le 28/10/2026 :
+Outil : `cosign v3.1.4` (checksum vérifié), avec la racine de confiance Sigstore (TUF) et Rekor accessibles.
 
-| Image | Constat | Statut |
-|---|---|---|
-| Tekton Pipelines v1.17.1 (`ghcr.io/tektoncd/pipeline/controller-…@sha256:086cdd16…`) | `cosign tree` trouve une **signature `.sig`, une attestation `.att` et un SBOM `.sbom`** (schéma par tags). Clé publique Tekton : `tektoncd/chains/tekton.pub` | Signature **présente**. Vérification cryptographique **bloquée par le réseau** (TUF et Rekor de Sigstore, blobs `pkg-containers.githubusercontent.com`) |
-| Renovate 44.192.2 (`ghcr.io/renovatebot/renovate`) | Signature cosign en **OCI referrer** (`sigstore.dev/cosign/sign/v1`) | Signature **présente** ; vérification sans clé **bloquée** (racine TUF Sigstore) |
-| Zot v2.1.22 (`ghcr.io/project-zot/zot*`) | **Aucune signature ni attestation** trouvée | **Non signée** : reconstruire ou épingler après revue |
-| Conforma (`quay.io/conforma/cli`) | `quay.io` bloqué | **Non vérifié** |
-| Chains v0.29.9 | Pas d'image trouvée dans `release.yaml` (téléchargement GitHub) | **À refaire** |
+| Image | Méthode de signature constatée | Résultat | Conséquence |
+|---|---|---|---|
+| **Renovate** 44.192.2 (`ghcr.io/renovatebot/renovate`) | Sans clé (GitHub OIDC), bundle en OCI referrer, journal de transparence | **Vérifiée** : identité `https://github.com/renovatebot/…`, émetteur `token.actions.githubusercontent.com`, présence dans le journal vérifiée | Exiger cette identité dans Kyverno et Conforma |
+| **OpenBao** 2.7.2 (`ghcr.io/openbao/openbao`) | Sans clé (GitHub OIDC) | **Vérifiée** : identité `https://github.com/openbao/openbao/…` | Idem |
+| **Kyverno** v1.19.2 (`ghcr.io/kyverno/kyverno`) | Sans clé (GitHub OIDC), signatures stockées **dans un dépôt séparé** `ghcr.io/kyverno/signatures` | **Vérifiée** avec `COSIGN_REPOSITORY=ghcr.io/kyverno/signatures` | Utiliser ce dépôt pour la vérification et le mirroring (`oras cp -r` ne suffit pas) |
+| **Tekton Pipelines** v1.17.1 (`ghcr.io/tektoncd/pipeline/controller-…@sha256:086cdd16…`) | Signature **par clé** (`.sig`, `.att`, `.sbom` en tags), **sans entrée Rekor, sans certificat, sans horodatage** | **Non vérifiable** : la clé publique documentée (`tektoncd/chains/tekton.pub`, citée dans `tektoncd/plumbing/docs/signing.md`) **ne correspond pas** à la signature, et l'attestation est refusée pour la même raison. La v1.6.0 n'a aucune signature | **Reconstruire les images Tekton** nous-mêmes (ko, depuis le tag source) ou les **épingler par digest après revue**. Signaler l'écart de documentation à Tekton |
+| **Conforma** (`quay.io/conforma/cli:latest`, construit par Konflux) | Signature, attestation et SBOM présents (tags `.sig`, `.att`, `.sbom`) | **En cours** : clé ou identité de vérification à confirmer dans la doc Conforma | Selon le résultat : exiger la clé Konflux, ou reconstruire |
+| **Zot** v2.1.22 (`ghcr.io/project-zot/zot*`) | **Aucune signature** (ni cosign ni Notation) sur les images ; la release ne fournit qu'un `checksums.sha256.txt` **non signé** | **Non signée** | **Reconstruire Zot** depuis le tag source (Go), ou épingler par digest après revue |
+| Tekton Chains v0.29.9 | `release.yaml` hébergé sur `infra.tekton.dev`, qui redirige vers `objectstorage.us-ashburn-1.oraclecloud.com` | **Non vérifié** : ce dernier hôte est bloqué | À refaire (ouvrir ce domaine) |
 
-À refaire dès que ces hôtes sont ouverts : `tuf-repo-cdn.sigstore.dev`, `rekor.sigstore.dev`, `pkg-containers.githubusercontent.com`, `quay.io` (+ CDN), `infra.tekton.dev`.
+**Enseignement.** Un score « Sain » ne garantit pas des artefacts vérifiables. Tekton (Scorecard 6,7, très actif) publie des images dont la signature ne se vérifie pas avec la clé documentée, et Zot (8,1) ne signe pas ses images. La règle reste donc : **on reconstruit les images d'outils du chemin critique, ou on les épingle par digest après revue**. Ce n'est pas une option.
 
 ## 6. Plans de sortie (chemin critique)
 
