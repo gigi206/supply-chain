@@ -43,7 +43,7 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | Domaine | Brique |
 |---|---|
 | Sources | Forgejo (miroir + fork `workspace/` à branches custom) + job de sync (pas de prune, détection des force-push, `git bundle`) |
-| Orchestration et provenance | Tekton Pipelines LTS + Triggers (intercepteur HMAC Forgejo) + **Chains ≥ 0.29** (SLSA v1, `sigstore-bundle` en OCI referrers) |
+| Orchestration et provenance | Tekton Pipelines LTS + Triggers (intercepteur HMAC Forgejo) + **Chains ≥ 0.29** (SLSA v1 ; mode **`dsse`** tant que [chains#2096](https://github.com/tektoncd/chains/pull/2096) n'est pas publiée, puis `sigstore-bundle` en OCI referrers) ; contrôle strict de la signature d'image (`cosign/sign/v1`) |
 | Dépendances | Hermeto (prefetch + SBOM), verrou natif mock, `.buildinfo` Debian ; snapshots Pulp en 2c |
 | Construction | BuildKit avec démon éphémère par build (repli : Buildah), mock 6.x hermétique, sbuild unshare ; isolation Kata, gVisor ou user namespace |
 | Stockage | Zot + ORAS (artefacts, fermetures, attestations) ; archive WORM en 2c |

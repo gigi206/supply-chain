@@ -59,7 +59,7 @@ L'exception autorise le build à déclarer **les noms et digests des sujets** (a
 
 | Option | Niveau SLSA réel | Pour | Contre | Verdict |
 |---|---|---|---|---|
-| **Tekton Pipelines + Chains + Triggers** | **L3** : le contrôleur Chains, séparé des tâches, signe via un KMS | Pipelines v1.17.1 (LTS 1.15/1.12). Chains v0.29.9 : formats `slsa/v2alpha4` (= SLSA v1.0), stockage OCI (`sigstore-bundle` = **OCI 1.1 Referrers**, depuis la v0.29.0), Archivista, KMS `hashivault://`. Incubation CNCF depuis le 24/03/2026. Adopté par Konflux et OpenShift Pipelines | Chains, Triggers et Trusted Resources en 0.x ou alpha. Chains signe ce que les tâches **déclarent** (d'où les tâches de confiance). **Pas de TSA native** (seulement Rekor). Pas d'intercepteur Forgejo. CVE-2026-33211 (git resolver) et CVE-2026-25542 (Trusted Resources) à corriger | **Retenu** |
+| **Tekton Pipelines + Chains + Triggers** | **L3** : le contrôleur Chains, séparé des tâches, signe via un KMS | Pipelines v1.17.1 (LTS 1.15/1.12). Chains v0.29.9 : formats `slsa/v2alpha4` (= SLSA v1.0), stockage OCI (`sigstore-bundle` = **OCI 1.1 Referrers**, depuis la v0.29.0 ; **mais signatures d'image invalides en v0.29.x**, correctif [chains#2096](https://github.com/tektoncd/chains/pull/2096) non publié au 28/10/2026, d'où le mode `dsse` en attendant), Archivista, KMS `hashivault://`. Incubation CNCF depuis le 24/03/2026. Adopté par Konflux et OpenShift Pipelines | Chains, Triggers et Trusted Resources en 0.x ou alpha. Chains signe ce que les tâches **déclarent** (d'où les tâches de confiance). **Pas de TSA native** (seulement Rekor). Pas d'intercepteur Forgejo. CVE-2026-33211 (git resolver) et CVE-2026-25542 (Trusted Resources) à corriger | **Retenu** |
 | Argo Workflows | **L1** sans ajout ; **L2** avec Witness ; L3 seulement avec un contrôleur maison (2 à 4 personnes-mois) | CNCF Graduated, très bonne UI, vrais DAG | Aucune provenance native. Aucun équivalent de Trusted Resources. CVE de contournement de templates en 2026 (CVE-2026-31892, CVE-2026-42296). Pods en root par défaut | Écarté pour les builds |
 | GitLab CI (self-managed) | **L2**. L3 en **« Experiment », GitLab.com, Ultimate** ; self-managed non supporté directement | Intégré à la forge | Pull mirror payant. L3 pas disponible en auto-hébergé | Écarté |
 | GitHub Actions + slsa-github-generator / artifact attestations | L3, **hébergé** | Référence de l'écosystème | SaaS GitHub uniquement | Hors sujet |
@@ -352,6 +352,7 @@ Tableau de bord :
 ## 18. Points non vérifiés (à lever en phase 2)
 
 - Sujet non-image dans Chains (rpm poussé via ORAS, `isBuildArtifact: true`) : déduit du code, **à tester** (brique 08).
+- **Confusion signature / attestation** avec les bundles cosign v3 : confirmée par le banc C et par des rapports publics. En conséquence : contrôle strict `cosign/sign/v1`, Chains en mode `dsse` jusqu'à la publication de chains#2096, et clés séparées par usage.
 - Compatibilité de `hashivault://` de Chains avec OpenBao.
 - mock et sbuild sous gVisor et en user namespace (brique 05).
 - Qualificatif `distro=` produit par Syft et Hermeto, et consommé par DT.

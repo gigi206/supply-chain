@@ -41,6 +41,10 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
 | Conforma v0.10.42 | `signatures: 0`, mais « Image signature check passed » |
 | Kyverno 1.19.2 | `verifyImageSignatures(...) > 0` |
 
+**Vérification approfondie (pas d'erreur de manipulation).** Le code de cosign v3.1.4 confirme le comportement. Dans `cmd/cosign/cli/verify/verify.go`, avec le commentaire `// OCI bundle always contains attestation`, `cosign verify` appelle `VerifyImageAttestations`. Celui-ci récupère **tous** les referrers (`GetBundles` → `Referrers(digest, "")`), et le vérificateur de claims ne contrôle que le sujet, jamais le `predicateType`. Le même problème a été reproduit indépendamment dans [juburr/cosign-orb#47](https://github.com/juburr/cosign-orb/pull/47) (cosign 3.1.3 et 2.6.5 ; le mode historique `.sig` n'est pas affecté) et corrigé dans Zot par [project-zot/zot#4492](https://github.com/project-zot/zot/pull/4492). **Au 28/10/2026, aucune issue ni aucun avis n'existe chez sigstore/cosign.**
+
+**Implication pour Tekton Chains** : selon [tektoncd/chains#2096](https://github.com/tektoncd/chains/pull/2096) (**ouverte**, non fusionnée au 28/10/2026), Chains v0.29.x en mode `sigstore-bundle` écrit des **signatures d'image invalides** : un payload simplesigning dans un DSSE, journalisé en `hashedrekord`. Cosign masque l'échec dès qu'une attestation SLSA est présente. **Il faut donc rester en mode `dsse` (tags) tant que ce correctif n'est pas publié.**
+
 **Conséquence.** Tout composant qui atteste une image avec une clé de confiance (scanner, licences) la rend « signée » aux yeux de ces contrôles. C'est un contournement possible de la porte si les clés sont partagées entre usages.
 
 **Correctifs appliqués au banc et à retenir pour la plateforme :**
@@ -50,7 +54,8 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
 
    Avec ce contrôle, `c1-unsigned` est rejeté par les deux moteurs.
 2. **Séparation des clés par usage** (ADR 0003) : la clé qui signe les images et la provenance (Chains) n'est jamais utilisée par les scanners ni par l'analyse de licences.
-3. **Signalement amont** (sigstore/cosign, Conforma, Kyverno) par leurs canaux de sécurité privés : **à décider par le propriétaire du projet**. Aucune action publique n'a été faite.
+3. **Signalement amont** : le problème est déjà public (PR citées), mais aucune issue n'existe chez sigstore/cosign, ni chez Conforma (contrôle « Image signature check passed » avec 0 signature) ou Kyverno. Ouvrir ces issues est **à décider par le propriétaire du projet** ; aucune action n'a été faite.
+4. **Chains en mode `dsse`** (tags `.sig`/`.att`) tant que tektoncd/chains#2096 n'est pas publiée ; le contrôle strict reste actif dans les deux modes.
 
 ## Autres constats
 
