@@ -21,7 +21,11 @@
 - Journaux des tests négatifs, provenance obtenue, sortie Conforma.
 - sha256 des artefacts des deux builds.
 
-## Préparation sur le laptop (29/10/2026) : à valider avant tout téléchargement
+## Résultats (29/10/2026)
+
+**17/100 contre 57 pour la référence : Konflux n'est pas adopté** ; élimination proposée au titre du critère 1. Détail, preuves et notation : [`resultats/README.md`](resultats/README.md). Rejeu : `mise run konflux:preparer`, puis `deployer`, `forgejo`, `onboarder`, `parametrer`, `verifier`, `tests-negatifs`, `t6-hermetique` et `preuves` ; démontage : `mise run konflux:demonter` et `mise run konflux:forgejo -- stop`.
+
+## Préparation sur le laptop (29/10/2026) : validée par le propriétaire et exécutée
 
 ### Version et installation
 
@@ -91,7 +95,7 @@ Forgejo **15.0.11 LTS** (Codeberg) sera installé par `mise.toml`, en binaire, c
 | Disque | 25 à 40 Go d'images dans `/var/lib/docker` (sur `/`, 88 Go libres) |
 | Ports | 9443, 8180, 5001 et 8888 sur 127.0.0.1, tous libres ; 8443 non utilisé |
 
-### Règles de comptage, fixées avant de mesurer (à valider par le propriétaire)
+### Règles de comptage, fixées avant de mesurer (validées par le propriétaire le 29/10/2026)
 
 - **A-2, tests négatifs.** Chaque test du doc 01 est transposé à son équivalent Konflux. Si le contrôle n'existe pas, le test compte « non bloqué » : il n'y a pas de catégorie « non applicable ».
   1. Lecture de la clé de signature de Chains (secret Kubernetes) depuis une tâche de build.

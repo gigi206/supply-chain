@@ -1,0 +1,32 @@
+apiVersion: v1
+data:
+  artifacts.oci.format: simplesigning
+  artifacts.oci.storage: oci
+  artifacts.pipelinerun.enable-deep-inspection: "true"
+  artifacts.pipelinerun.format: in-toto
+  artifacts.pipelinerun.storage: oci
+  artifacts.taskrun.format: in-toto
+  artifacts.taskrun.storage: ""
+  performance: |
+    disable-ha: false
+  transparency.enabled: "false"
+kind: ConfigMap
+metadata:
+  annotations:
+    operator.tekton.dev/last-applied-hash: 0176ed34ce9147955d646ad276d93b76a80758fa0912703ffbed0baaa1200c3f
+  creationTimestamp: "2026-10-29T11:08:40Z"
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-chains
+    operator.tekton.dev/operand-name: tektoncd-chains
+  name: chains-config
+  namespace: tekton-pipelines
+  ownerReferences:
+  - apiVersion: operator.tekton.dev/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: TektonInstallerSet
+    name: chain-config-c5lx6
+    uid: bf1a2302-e3d8-48ae-8e72-59b3eb2e5361
+  resourceVersion: "3122"
+  uid: 7bf977cb-6996-4f9d-ac93-91481da8db09

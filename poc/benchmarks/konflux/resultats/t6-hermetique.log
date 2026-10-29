@@ -1,0 +1,5 @@
+# t6-hermetique.sh, 2026-10-29T13:20:39Z
+PR n° 3, commit 3de6d7a1ea5c, hermetic="true"
+sample-app-on-pull-request-ctv2d-build-container : StepFailed
+time="2026-10-29T13:23:42Z" level=info msg="buildah [stderr] bash: line 1: /dev/tcp/172.19.0.1/3000: Network is unreachable"
+time="2026-10-29T13:23:42Z" level=info msg="buildah [stdout] T6 : connexion TCP impossible pendant le build"

@@ -119,6 +119,10 @@ run = "poc/benchmarks/konflux/verifier.sh"
 description = "Banc A1 : preuves archivées (écarts d'intégration, sorties vers des tiers, rpm/deb, santé)"
 run = "poc/benchmarks/konflux/preuves.sh"
 
+[tasks."konflux:t6-hermetique"]
+description = "Banc A1 : test négatif T6 (connexion réseau pendant un build hermétique)"
+run = "poc/benchmarks/konflux/t6-hermetique.sh"
+
 [tasks."konflux:demonter"]
 description = "Banc A1 : supprime le cluster kind et son KUBECONFIG dédié"
 run = '''

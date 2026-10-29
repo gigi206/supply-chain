@@ -1,0 +1,1 @@
+état « repos-30min » : 66 pods (1 ni Running ni Completed), 30 composants (A-5), 52 images hors kube-system dont 7 sans digest, mémoire du nœud 4.139GiB / 20GiB
