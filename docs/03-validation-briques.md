@@ -1,6 +1,6 @@
 # Validation des briques
 
-Résultats des briques et des bancs de l'ADR 0000, puis liste de ce qui reste à valider **sur l'infra du PoC (laptop)**. L'environnement de développement actuel n'a ni KVM, ni Docker, ni cluster (4 CPU, 15 Gi) : on y valide la logique, les formats et les tests négatifs qui n'ont pas besoin de Kubernetes.
+Résultats des briques et des bancs de l'ADR 0000, puis liste de ce qui reste à valider **sur l'infra du PoC (laptop)**. Les parties locales ont été validées dans un environnement cloud sans KVM, ni Docker, ni cluster (4 CPU, 15 Gi) : la logique, les formats et les tests négatifs qui n'ont pas besoin de Kubernetes. L'infra du PoC est un laptop bare metal avec KVM et virtualisation imbriquée ([inventaire et dimensionnement proposé](../poc/infra/README.md)).
 
 Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **À compléter** = le reste du seuil demande l'infra du PoC.
 
@@ -25,7 +25,10 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 
 ## À faire sur le laptop (infra du PoC)
 
-Prérequis : décider l'infra du PoC (ADR 0001) et nommer le deuxième administrateur du domaine de replay. La licence du dépôt est décidée : **Apache-2.0** (dépôt conforme REUSE 3.3).
+Prérequis :
+- infra du PoC : **ce laptop**, bare metal vérifié le 29/10/2026 (ADR 0001) ; dimensionnement **proposé**, à valider ([`poc/infra`](../poc/infra/README.md)) ;
+- deuxième administrateur du domaine de replay : **à nommer** ;
+- licence du dépôt : décidée, **Apache-2.0** (dépôt conforme REUSE 3.3).
 
 | Sujet | Ce qui reste | Brique ou banc |
 |---|---|---|

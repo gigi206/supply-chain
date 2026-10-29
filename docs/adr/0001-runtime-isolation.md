@@ -1,7 +1,7 @@
 # ADR 0001 : runtime, isolation des builds et infrastructure du PoC
 
 - **Statut** : **Proposé (provisoire)**. Version définitive en phase 3, après les briques 05, 06 et 08.
-- **Date** : 2026-10-28
+- **Date** : 2026-10-28 ; infra du PoC inventoriée le 2026-10-29
 - **Décideurs** : propriétaire du projet (à valider) et administrateur du domaine de replay (**à nommer**)
 
 ## Contexte
@@ -12,7 +12,7 @@ SLSA Build L3 (v1.2) exige :
 - aucun accès des étapes utilisateur aux secrets de la plateforme ;
 - aucun empoisonnement de cache entre builds.
 
-Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) demandent des privilèges ou des user namespaces. Un pod privilégié sur un nœud partagé casse l'isolation. L'infrastructure des nœuds de build n'est pas encore choisie, ce qui bloque la brique 08 (nœuds dédiés, modèle CPU x86-64-v3).
+Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) demandent des privilèges ou des user namespaces. Un pod privilégié sur un nœud partagé casse l'isolation. L'infrastructure du PoC est maintenant connue : un laptop bare metal avec KVM ([inventaire](../../poc/infra/README.md)). Restent à fixer la topologie des nœuds dédiés et le modèle CPU x86-64-v3 des VM.
 
 ## Options
 
@@ -37,7 +37,13 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 ## Décision provisoire
 
 1. **Runtime** : **k3s** pour le plan de build et de confiance, ce qui donne L3. Les services de stockage pourront sortir du cluster en compose (décision définitive en phase 3).
-2. **Infrastructure du PoC** (à confirmer par le propriétaire) : **une VM ou un serveur avec KVM** (bare metal, ou virtualisation imbriquée activée), **CPU x86-64-v3** exposé, au minimum :
+2. **Infrastructure du PoC** : **un laptop bare metal avec KVM** (inventaire du 29/10/2026, [`poc/infra`](../../poc/infra/README.md)) :
+   - **bare metal vérifié** (`systemd-detect-virt` : `none`) ; Intel i7-11800H, 8 cœurs et 16 threads, x86-64-v4 (AVX-512), 61 Gi de RAM sans swap, NVMe 1 To ; Ubuntu 26.04.1, noyau 7.0, cgroup v2 ;
+   - **prérequis de Kata présents** : `/dev/kvm` accessible, `vhost_vsock` chargé, **virtualisation imbriquée active** (`kvm_intel.nested=Y`). Kata n'est pas installé ;
+   - user namespaces non privilégiés disponibles, sans restriction AppArmor ;
+   - contraintes : environ 21 Gi de RAM et 90 Go de disque réellement disponibles au relevé, car l'hôte sert aussi de poste de travail.
+
+   Dimensionnement minimal estimé en phase 1, pour un serveur ou une VM avec KVM et un CPU **x86-64-v3** exposé :
 
    | Rôle | vCPU | RAM | Disque |
    |---|---|---|---|
@@ -46,8 +52,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
    | Stockage (Forgejo, Zot) | 4 | 8 Gi | 300 Go |
    | **Domaine de replay** (hôte distinct, autre administrateur) | 8 | 16 Gi | 150 Go |
 
-   Ce dimensionnement est estimé à **réviser après les benchmarks 2a** (Konflux demande au moins 12 Gi pour sa seule démo sur Kind).
-3. **Isolation** : Kata si KVM est disponible ; sinon gVisor ou user namespace, selon les résultats de la brique 05.
+   Ce dimensionnement est estimé à **réviser après les benchmarks 2a** (Konflux demande au moins 12 Gi pour sa seule démo sur Kind). **Révision proposée pour le laptop, en attente de validation par le propriétaire** : voir [`poc/infra/README.md`](../../poc/infra/README.md). Elle prévoit une phase à la fois, trois VM k3s (confiance, build avec Kata imbriqué, stockage) et un modèle CPU nommé sans AVX-512.
+3. **Isolation** : Kata si KVM est disponible, ce qui est le cas sur le laptop (à installer et à mesurer, y compris en virtualisation imbriquée) ; sinon gVisor ou user namespace, selon les résultats de la brique 05.
 4. **Domaine de replay** : hôte ou cluster distinct, **administré par une autre personne** (à nommer), avec sa propre clé de VSA. En 2b-1, ses images de build sont « indépendantes minimales » : toolchain Go officielle à checksum vérifié, image reconstruite dans ce domaine.
 
 ## Conséquences
@@ -58,6 +64,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 ## Questions ouvertes (propriétaire)
 
-- [ ] Infrastructure disponible : bare metal, VM avec virtualisation imbriquée, ou VM sans ?
+- [x] Infrastructure disponible : **bare metal** (laptop, KVM, virtualisation imbriquée active), vérifié le 29/10/2026.
+- [ ] Dimensionnement et topologie sur le laptop ([proposition](../../poc/infra/README.md)) : à valider.
 - [ ] Nom de l'administrateur du domaine de replay.
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
