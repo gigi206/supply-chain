@@ -1,0 +1,386 @@
+diff --git a/a1/konflux.yaml b/a1/konflux.yaml
+new file mode 100644
+index 0000000..dd608fc
+--- /dev/null
++++ b/a1/konflux.yaml
+@@ -0,0 +1,229 @@
++# Title: Konflux Configuration
++# Description: Complete Konflux configuration with all components (UI, Build Service, Integration Service, Release Service, etc.)
++#
++# This sample is used in CI tests and local development. It includes demo users with static passwords
++# for testing purposes. For production deployments, remove the staticPasswords section and configure
++# OIDC authentication (GitHub, Google, LDAP, etc.) instead.
++#
++# Usage:
++#   CI: Used automatically by .github/workflows/operator-test-e2e.yaml
++#   Local: ./scripts/deploy-local.sh (uses this file by default)
++apiVersion: konflux.konflux-ci.dev/v1alpha1
++kind: Konflux
++metadata:
++  labels:
++    app.kubernetes.io/name: konflux-operator
++    app.kubernetes.io/managed-by: kustomize
++  name: konflux
++spec:
++  ui:
++    spec:
++      # NodePort exposes the UI on the host for Kind clusters.
++      # Kind maps container port 30011 to host port 9443 (see kind-config.yaml).
++      # Access the UI at https://localhost:9443 (HTTPS required).
++      # For non-Kind clusters, use Ingress instead (see konflux_v1alpha1_konfluxui.yaml).
++      ingress:
++        nodePortService:
++          httpsPort: 30011
++      proxy:
++        replicas: 1
++        reverseProxy:
++          resources:
++            requests:
++              cpu: 30m
++              memory: 128Mi
++            limits:
++              cpu: 30m
++              memory: 128Mi
++      # runtimeConfig:
++      #   chatBot:
++      #     enabled: false
++      #   monitoring:
++      #     enabled: true
++      #     dsn: "https://example@sentry.io/123456"
++      #     environment: "staging"
++      #     cluster: "my-cluster"
++      #     sampleRateErrors: "1.0"
++      dex:
++        config:
++          enablePasswordDB: true
++          passwordConnector: local
++          # WARNING: Demo users for CI and local development ONLY
++          # For production, remove staticPasswords and configure OIDC connectors
++          # See docs/operator-deployment.md for production authentication examples
++          staticPasswords:
++          - email: "user1@konflux.dev"
++            # bcrypt hash of the string "password": $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
++            hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W" # notsecret
++            username: "user1"
++            userID: "7138d2fe-724e-4e86-af8a-db7c4b080e20"
++            groups:
++              - "konflux-users"
++              - "team-alpha"
++          - email: "user2@konflux.dev"
++            # bcrypt hash of the string "password": $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
++            hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W" # notsecret
++            username: "user2"
++            userID: "ea8e8ee1-2283-4e03-83d4-b00f8b821b64"
++            groups:
++              - "konflux-users"
++              - "team-beta"
++  integrationService:
++    spec:
++      integrationControllerManager:
++        replicas: 1
++        manager:
++          resources:
++            requests:
++              cpu: 30m
++              memory: 128Mi
++            limits:
++              cpu: 30m
++              memory: 128Mi
++      # snapshotGarbageCollector.resources: lower the GC container requests for resource-constrained
++      # clusters (e.g. local Kind).
++      snapshotGarbageCollector:
++        resources:
++          requests:
++            cpu: 50m
++            memory: 64Mi
++  releaseService:
++    spec:
++      releaseControllerManager:
++        replicas: 1
++        manager:
++          resources:
++            requests:
++              cpu: 30m
++              memory: 128Mi
++            limits:
++              cpu: 30m
++              memory: 128Mi
++  buildService:
++    spec:
++      # logEncoder: console  # Use human-readable logs (default: json)
++      buildControllerManager:
++        replicas: 1
++        manager:
++          resources:
++            requests:
++              cpu: 30m
++              memory: 128Mi
++            limits:
++              cpu: 30m
++              memory: 128Mi
++      # pipelineConfig:
++      #   # removeDefaults: true  # Discard all operator-provided default pipelines
++      #   pipelines:
++      #     - name: fbc-builder
++      #       removed: true  # Remove this specific default pipeline
++      #     - name: my-custom-pipeline
++      #       bundle: quay.io/myorg/pipeline:latest
++      #   # defaultPipelineName: fbc-builder  # Use existing default pipeline as default
++      #   # defaultPipelineName: my-custom-pipeline  # Use custom pipeline as default
++  namespaceLister:
++    spec:
++      cacheResyncPeriod: "10m"
++      logLevel: info
++      namespaceLister:
++        replicas: 1
++        namespaceLister:
++          resources:
++            requests:
++              cpu: 100m
++              memory: 128Mi
++            limits:
++              cpu: 500m
++              memory: 256Mi
++  info:
++    spec:
++      publicInfo:
++        environment: development
++        visibility: public
++      banner:
++        items:
++          # Display a banner at the top of the Konflux UI to all users.
++          - summary: "Welcome to Konflux-CI! This development and testing environment has been deployed with default insecure passwords!"
++            type: danger
++      # clusterConfig:
++      #   data:
++      #     # Proxy configuration for builds (stored in "cluster-config" ConfigMap).
++      #     # These values are read by PipelineRuns to configure caching behavior.
++      #     # allowCacheProxy: true
++      #     # httpProxy: "squid.caching.svc.cluster.local:3128"
++      #     # noProxy: ""
++      #     # allowPackageRegistryProxy: true
++      #     # packageRegistryProxyNpmUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/npm-proxy"
++      #     # # Yarn and pnpm use the same npm-compatible registry endpoint in most deployments.
++      #     # packageRegistryProxyYarnUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/npm-proxy"
++      #     # packageRegistryProxyGomodUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/go-proxy"
++      #     # packageRegistryProxyPipUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/pypi-proxy/simple"
++      #     # packageRegistryProxyPnpmUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/npm-proxy"
++      #     # packageRegistryProxyBundlerUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/rubygems-proxy"
++      #     # packageRegistryProxyCargoUrl: "https://artifact-registry-proxy.caching.svc.cluster.local/repository/cargo-proxy"
++  # enterpriseContract:
++  #   # skipPolicies disables deployment of EnterpriseContractPolicy resources.
++  #   # When true, only CRDs, namespace, RBAC, and ConfigMap are deployed;
++  #   # users are expected to manage policies externally.
++  #   # When omitted or false, policies are deployed (the default behavior).
++  #   skipPolicies: true
++  certManager:
++    # CreateClusterIssuer controls whether cluster issuer resources are created
++    # Defaults to true if not specified
++    createClusterIssuer: true
++  internalRegistry:
++    # Enabled controls whether internal registry resources are deployed
++    # Defaults to false if not specified
++    # For local development on Kind, this provides an OCI registry at localhost:5001
++    enabled: true
++  # Default tenant creates a shared namespace ("default-tenant") accessible by all authenticated users.
++  # All authenticated users get maintainer permissions in this namespace.
++  # Appropriate for local development and testing. For production multi-tenant environments where
++  # you need strict namespace isolation, set enabled: false and create per-team tenant namespaces.
++  # Defaults to true if not specified.
++  defaultTenant:
++    enabled: true
++  # telemetry:
++  #   # Enabled controls whether segment-bridge telemetry resources are deployed.
++  #   # Defaults to false if not specified.
++  #   enabled: true
++  #   spec:
++  #     # segmentKey is the Segment write key (required for telemetry to send data).
++  #     # Intended for local/self-deployed Konflux instances. Takes precedence over
++  #     # segmentKeySecretRef when both are set.
++  #     # segmentKey: "your-write-key"
++  #
++  #     # segmentKeySecretRef reads the write key from a Secret instead of storing it
++  #     # inline. Intended for Vault-backed (or otherwise externally-managed) staging/
++  #     # production environments. The referenced Secret must exist in the
++  #     # segment-bridge namespace.
++  #     # segmentKeySecretRef:
++  #     #   name: vault-segment-key
++  #     #   key: writeKey
++  #
++  #     # segmentAPIURL is the base URL without "/batch". The operator appends "/batch".
++  #     # Defaults to "https://api.segment.io/v1" if not specified.
++  #     # segmentAPIURL: "https://console.redhat.com/connections/api/v1"
++  #
++  #     # tektonLimit: max PipelineRun records fetched per CronJob run.
++  #     # Defaults to 1000 (~4.7h coverage at avg production throughput).
++  #     # tektonLimit: 2000
++  #
++  #     # cronJob customizes the segment-bridge CronJob container's resources and env.
++  #     # Env vars are applied as overrides on top of the container's existing env and
++  #     # do not replace the envFrom Secret providing SEGMENT_WRITE_KEY, SEGMENT_BATCH_API,
++  #     # TEKTON_RESULTS_API_ADDR, and TEKTON_LIMIT.
++  #     # cronJob:
++  #     #   resources:
++  #     #     limits:
++  #     #       cpu: 500m
++  #     #       memory: 512Mi
++  #     #     requests:
++  #     #       cpu: 100m
++  #     #       memory: 128Mi
++  #     #   env:
++  #     #     - name: HTTP_PROXY
++  #     #       value: "http://proxy.example.com:3128"
++  # Banc A1 : télémétrie Segment désactivée explicitement (défaut : désactivée).
++  telemetry:
++    enabled: false
+diff --git a/dependencies/cert-manager/cert-manager.yaml b/dependencies/cert-manager/cert-manager.yaml
+index 85a4960..6cf924c 100644
+--- a/dependencies/cert-manager/cert-manager.yaml
++++ b/dependencies/cert-manager/cert-manager.yaml
+@@ -13729,7 +13729,7 @@ spec:
+           type: RuntimeDefault
+       containers:
+         - name: cert-manager-cainjector
+-          image: "quay.io/jetstack/cert-manager-cainjector:v1.21.1"
++          image: "quay.io/jetstack/cert-manager-cainjector:v1.21.1@sha256:ccf6b919ec0500745a47a910118f834f9636d0aac1ff221245cd2557ed8c7c98"
+           imagePullPolicy: IfNotPresent
+           args:
+           - --v=2
+@@ -13803,13 +13803,13 @@ spec:
+           type: RuntimeDefault
+       containers:
+         - name: cert-manager-controller
+-          image: "quay.io/jetstack/cert-manager-controller:v1.21.1"
++          image: "quay.io/jetstack/cert-manager-controller:v1.21.1@sha256:416a2d76870d996460e62bd7f521bf14fa017be9e3e904aab92163a331fcb61a"
+           imagePullPolicy: IfNotPresent
+           args:
+           - --v=2
+           - --cluster-resource-namespace=$(POD_NAMESPACE)
+           - --leader-election-namespace=kube-system
+-          - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.21.1
++          - --acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.21.1@sha256:dbc7cc1354f603918e7c5af7f55a0a620537394452c93a565bde75c6f48e8837
+           - --max-concurrent-challenges=60
+           ports:
+           - containerPort: 9402
+@@ -13896,7 +13896,7 @@ spec:
+           type: RuntimeDefault
+       containers:
+         - name: cert-manager-webhook
+-          image: "quay.io/jetstack/cert-manager-webhook:v1.21.1"
++          image: "quay.io/jetstack/cert-manager-webhook:v1.21.1@sha256:d8b3961b51c8c7320633f8208dc46bf88aa13804d0f7cbe48a096b2c523cee42"
+           imagePullPolicy: IfNotPresent
+           args:
+           - --v=2
+@@ -14157,7 +14157,7 @@ spec:
+           type: RuntimeDefault
+       containers:
+         - name: cert-manager-startupapicheck
+-          image: "quay.io/jetstack/cert-manager-startupapicheck:v1.21.1"
++          image: "quay.io/jetstack/cert-manager-startupapicheck:v1.21.1@sha256:d8ab6416e6e7303a86fa0a8daa82c94a8001f21c9d78eb2e7db20534e5d07ae8"
+           imagePullPolicy: IfNotPresent
+           args:
+           - check
+diff --git a/dependencies/pre-deployment-pvc-binding/pre-deployment-pvc-binding.yaml b/dependencies/pre-deployment-pvc-binding/pre-deployment-pvc-binding.yaml
+index d713a51..42602e8 100644
+--- a/dependencies/pre-deployment-pvc-binding/pre-deployment-pvc-binding.yaml
++++ b/dependencies/pre-deployment-pvc-binding/pre-deployment-pvc-binding.yaml
+@@ -24,7 +24,7 @@ metadata:
+ spec:
+   containers:
+   - name: test-pvc-consumer
+-    image: registry:2
++    image: registry:2@sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373
+     resources:
+       requests:
+         cpu: 10m
+diff --git a/dependencies/tekton-operator/kustomization.yml b/dependencies/tekton-operator/kustomization.yml
+index 585c9c1..2fb0437 100644
+--- a/dependencies/tekton-operator/kustomization.yml
++++ b/dependencies/tekton-operator/kustomization.yml
+@@ -4,7 +4,7 @@ kind: Kustomization
+ resources:
+   # Install Tekton pipelines, triggers and and Chains
+   # renovate: datasource=git-refs depName=https://github.com/tektoncd/operator versioning=semver
+-  - https://infra.tekton.dev/tekton-releases/operator/previous/v0.81.1/release.yaml
++  - release-v0.81.1.yaml
+ patches:
+   - patch: |
+       - op: add
+diff --git a/dependencies/trust-manager/trust-manager.yaml b/dependencies/trust-manager/trust-manager.yaml
+index 0688862..00d4cec 100644
+--- a/dependencies/trust-manager/trust-manager.yaml
++++ b/dependencies/trust-manager/trust-manager.yaml
+@@ -789,7 +789,7 @@ spec:
+       automountServiceAccountToken: true
+       initContainers:
+       - name: cert-manager-package-debian
+-        image: "quay.io/jetstack/trust-pkg-debian-trixie:20250419.1"
++        image: "quay.io/jetstack/trust-pkg-debian-trixie:20250419.1@sha256:17084a794d1e75065c9047438e2a6167907771fe78d7e4b5d4373a4b1d4e0494"
+         imagePullPolicy: IfNotPresent
+         args:
+           - "/copyandmaybepause"
+@@ -817,7 +817,7 @@ spec:
+             memory: 50Mi
+       containers:
+       - name: trust-manager
+-        image: "quay.io/jetstack/trust-manager:v0.24.0"
++        image: "quay.io/jetstack/trust-manager:v0.24.0@sha256:a7c1d71cad37b404738192213e3801dbf89fe797e72664b0ff0d498db35cea74"
+         imagePullPolicy: IfNotPresent
+         ports:
+         - containerPort: 6443
+diff --git a/kind-config.yaml b/kind-config.yaml
+index 4431e82..ac7f893 100644
+--- a/kind-config.yaml
++++ b/kind-config.yaml
+@@ -3,6 +3,7 @@ kind: Cluster
+ apiVersion: kind.x-k8s.io/v1alpha4
+ nodes:
+ - role: control-plane
++  image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
+   kubeadmConfigPatches:
+   - |
+     kind: InitConfiguration
+@@ -28,20 +29,20 @@ nodes:
+   extraPortMappings:
+   - containerPort: 30010
+     hostPort: 8888
++    listenAddress: "127.0.0.1"
+     protocol: TCP
+     # UI
+   - containerPort: 30011
+     hostPort: 9443
++    listenAddress: "127.0.0.1"
+     protocol: TCP
+     # PaC (for GitLab webhook delivery in e2e tests)
+   - containerPort: 30012
+     hostPort: 8180
++    listenAddress: "127.0.0.1"
+     protocol: TCP
+     # Registry (port 5001 to avoid macOS port 5000 conflict)
+   - containerPort: 30001
+     hostPort: 5001
+-    protocol: TCP
+-    # Quay
+-  - containerPort: 30002
+-    hostPort: 8443
++    listenAddress: "127.0.0.1"
+     protocol: TCP
+diff --git a/scripts/deploy-local.sh b/scripts/deploy-local.sh
+index 42e7efb..b18a8b2 100755
+--- a/scripts/deploy-local.sh
++++ b/scripts/deploy-local.sh
+@@ -387,8 +387,8 @@ case "${INSTALL_METHOD}" in
+     release)
+         RELEASE_URL="$(release_asset_url "${OPERATOR_RELEASE}" "install.yaml")"
+         echo "Installing from GitHub release (${OPERATOR_RELEASE})..."
+-        echo "Downloading: ${RELEASE_URL}"
+-        kubectl apply -f "${RELEASE_URL}"
++        echo "Applying: ${INSTALL_YAML:-${RELEASE_URL}}"
++        kubectl apply -f "${INSTALL_YAML:-${RELEASE_URL}}"
+         ;;
+ 
+     none)
+11745c11745
+<         image: quay.io/konflux-ci/konflux-operator:release-sha-be0e6ca
+---
+>         image: quay.io/konflux-ci/konflux-operator:release-sha-be0e6ca@sha256:36493a95f2b7b0c18b610df5ec519d5725b94845524ecfaa66f3142f9696f1d0

@@ -1,0 +1,41 @@
+# preparer.sh, 2026-10-29T11:04:02Z, konflux v0.2.2, kind v0.33.0, kubectl v1.37.2, cosign v3.0.6 (nixpkgs)
+warning: refs/tags/v0.2.2 01d88f9249568e2a1ad368a94c6500ce5138534a is not a commit!
+OK   konflux-ci v0.2.2 = commit be0e6cac273fe90ff6ef8e388a50c67be1308d52 (tag annoté, non signé)
+OK   install.yaml : sha256 68fbb841e8c83a6c2b4181dd6c7fad5a0d570869d3556753f92eced3b6805ff3 = relevé du 29/10/2026 (https://github.com/konflux-ci/konflux-ci/releases/download/v0.2.2/install.yaml)
+OK   tekton-operator-v0.81.1.yaml : sha256 3b7d798ed9f7e1fb6e4f271a0171ba3389d50226244223db30da0840624b03f6 = relevé du 29/10/2026 (https://infra.tekton.dev/tekton-releases/operator/previous/v0.81.1/release.yaml)
+OK   cert-manager.pem : sha256 62151ffda7bb5350367480750ff1cb75d53f0f83baca524044e5274aa83b63a6 = relevé du 29/10/2026 (https://cert-manager.io/public-keys/cert-manager-pubkey-2021-09-20.pem)
+OK   tekton-operator-v0.81.1.yaml : 4 références d'images, toutes par digest (non signées : doc 04 §5)
+OK   quay.io/konflux-ci/konflux-operator:release-sha-be0e6ca : digest sha256:36493a95f2b7b0c18b610df5ec519d5725b94845524ecfaa66f3142f9696f1d0 = relevé du 29/10/2026
+--   quay.io/konflux-ci/konflux-operator:release-sha-be0e6ca : signature par clé sans clé publique publiée, non vérifiable (doc 04 §5)
+OK   quay.io/konflux-ci/konflux-operator:release-sha-be0e6ca : épinglé par digest dans assets/install-epingle.yaml
+OK   quay.io/jetstack/cert-manager-controller:v1.21.1 : digest sha256:416a2d76870d996460e62bd7f521bf14fa017be9e3e904aab92163a331fcb61a = relevé du 29/10/2026
+OK   quay.io/jetstack/cert-manager-controller:v1.21.1 : signature cosign, clé de cert-manager.io
+OK   quay.io/jetstack/cert-manager-controller:v1.21.1 : épinglé par digest dans konflux-ci/dependencies/cert-manager/cert-manager.yaml
+OK   quay.io/jetstack/cert-manager-webhook:v1.21.1 : digest sha256:d8b3961b51c8c7320633f8208dc46bf88aa13804d0f7cbe48a096b2c523cee42 = relevé du 29/10/2026
+OK   quay.io/jetstack/cert-manager-webhook:v1.21.1 : signature cosign, clé de cert-manager.io
+OK   quay.io/jetstack/cert-manager-webhook:v1.21.1 : épinglé par digest dans konflux-ci/dependencies/cert-manager/cert-manager.yaml
+OK   quay.io/jetstack/cert-manager-cainjector:v1.21.1 : digest sha256:ccf6b919ec0500745a47a910118f834f9636d0aac1ff221245cd2557ed8c7c98 = relevé du 29/10/2026
+OK   quay.io/jetstack/cert-manager-cainjector:v1.21.1 : signature cosign, clé de cert-manager.io
+OK   quay.io/jetstack/cert-manager-cainjector:v1.21.1 : épinglé par digest dans konflux-ci/dependencies/cert-manager/cert-manager.yaml
+OK   quay.io/jetstack/cert-manager-startupapicheck:v1.21.1 : digest sha256:d8ab6416e6e7303a86fa0a8daa82c94a8001f21c9d78eb2e7db20534e5d07ae8 = relevé du 29/10/2026
+OK   quay.io/jetstack/cert-manager-startupapicheck:v1.21.1 : signature cosign, clé de cert-manager.io
+OK   quay.io/jetstack/cert-manager-startupapicheck:v1.21.1 : épinglé par digest dans konflux-ci/dependencies/cert-manager/cert-manager.yaml
+OK   quay.io/jetstack/cert-manager-acmesolver:v1.21.1 : digest sha256:dbc7cc1354f603918e7c5af7f55a0a620537394452c93a565bde75c6f48e8837 = relevé du 29/10/2026
+OK   quay.io/jetstack/cert-manager-acmesolver:v1.21.1 : signature cosign, clé de cert-manager.io
+OK   quay.io/jetstack/cert-manager-acmesolver:v1.21.1 : épinglé par digest dans konflux-ci/dependencies/cert-manager/cert-manager.yaml
+OK   quay.io/jetstack/trust-manager:v0.24.0 : digest sha256:a7c1d71cad37b404738192213e3801dbf89fe797e72664b0ff0d498db35cea74 = relevé du 29/10/2026
+OK   quay.io/jetstack/trust-manager:v0.24.0 : signature sigstore (https://github.com/cert-manager/trust-manager/.github/workflows/release.yaml@refs/tags/v0.24.0)
+OK   quay.io/jetstack/trust-manager:v0.24.0 : épinglé par digest dans konflux-ci/dependencies/trust-manager/trust-manager.yaml
+OK   quay.io/jetstack/trust-pkg-debian-trixie:20250419.1 : digest sha256:17084a794d1e75065c9047438e2a6167907771fe78d7e4b5d4373a4b1d4e0494 = relevé du 29/10/2026
+OK   quay.io/jetstack/trust-pkg-debian-trixie:20250419.1 : signature sigstore (https://github.com/cert-manager/trust-manager/.github/workflows/trust-package-release-debian-trixie.yaml@refs/heads/main)
+OK   quay.io/jetstack/trust-pkg-debian-trixie:20250419.1 : épinglé par digest dans konflux-ci/dependencies/trust-manager/trust-manager.yaml
+OK   registry:2 : digest sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373 = relevé du 29/10/2026
+--   registry:2 : aucune signature publiée
+OK   registry:2 : épinglé par digest dans konflux-ci/dependencies/pre-deployment-pvc-binding/pre-deployment-pvc-binding.yaml
+--   quay.io/konflux-ci/task-runner (job de clé de Chains) : digest sha256:9f4151ff21f4c14b9151582c91a5542140bbbb6dca7861cd42081006840bec05 fixé par la kustomization, non vérifiable (Konflux)
+OK   kind-config.yaml : nœud par digest, 4 ports sur 127.0.0.1, port 8443 (Quay) retiré
+OK   tekton-operator : release.yaml local
+OK   deploy-local.sh : install.yaml appliqué depuis INSTALL_YAML
+OK   a1/konflux.yaml : CR d'exemple de v0.2.2, télémétrie désactivée explicitement
+OK   adaptations commitées (0af514c) ; diff archivé : resultats/adaptations-v0.2.2.diff
+install-epingle.yaml : sha256 7e20b88221332b92d7fe06237df9ab95138b1930a2b55dcc4311f86dca5c9fea

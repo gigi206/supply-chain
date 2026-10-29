@@ -83,6 +83,25 @@ description = "Empreintes et signatures de tous les outils (cosign du nixpkgs é
 depends = ["outils"]
 run = "poc/infra/verifier-outils.sh | sed \"s#$HOME#~#g\" | tee poc/infra/resultats/outils.txt"
 
+[tasks."konflux:preparer"]
+description = "Banc A1 : copie de Konflux v0.2.2, entrées vérifiées et épinglées, adaptations au laptop commitées"
+run = "poc/benchmarks/konflux/preparer.sh"
+
+[tasks."konflux:deployer"]
+description = "Banc A1 : cluster kind (20 Gi, ports sur 127.0.0.1) et Konflux v0.2.2 depuis la copie préparée ; chronomètre"
+run = "poc/benchmarks/konflux/deployer.sh"
+
+[tasks."konflux:etat"]
+description = "Banc A1 : archive pods, images, composants et mémoire (resultats/etat-<libellé>/)"
+run = "poc/benchmarks/konflux/etat.sh"
+
+[tasks."konflux:demonter"]
+description = "Banc A1 : supprime le cluster kind et son KUBECONFIG dédié"
+run = '''
+KUBECONFIG="$HOME/.kube/supply-chain-poc-konflux.yaml" kind delete cluster --name konflux
+rm -f "$HOME/.kube/supply-chain-poc-konflux.yaml"
+'''
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]
