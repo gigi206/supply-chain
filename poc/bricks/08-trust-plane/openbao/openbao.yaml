@@ -1,0 +1,153 @@
+# Brique 08, jalon J3 : OpenBao sur le nœud de confiance. @IMAGE@ : index signé, copié dans Zot (openbao.sh image).
+# Pod non root, sans capability, racine en lecture seule, Pod Security « restricted » ; aucun jeton Kubernetes monté
+# (la clé publique des comptes de service est fournie à la méthode JWT) ; entrée réservée à tekton-chains, aucune sortie.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openbao
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openbao
+  namespace: openbao
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openbao
+  namespace: openbao
+spec:
+  selector:
+    app: openbao
+  ports:
+  - name: https
+    port: 8200
+    targetPort: 8200
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openbao
+  namespace: openbao
+spec:
+  serviceName: openbao
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openbao
+  template:
+    metadata:
+      labels:
+        app: openbao
+    spec:
+      serviceAccountName: openbao
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      nodeSelector:
+        zone: confiance
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: openbao
+        image: @IMAGE@
+        command: [/usr/bin/bao, server, -config=/openbao/config/config.hcl]
+        env:
+        - name: BAO_ADDR
+          value: https://127.0.0.1:8200
+        - name: BAO_CACERT
+          value: /openbao/tls/ca.crt
+        - name: BAO_TLS_SERVER_NAME
+          value: openbao.openbao.svc.cluster.local
+        ports:
+        - name: https
+          containerPort: 8200
+        # Prêt seulement descellé (bao status : 0 descellé, 2 scellé) ; pas de sonde de vie : un OpenBao scellé
+        # ne doit pas être redémarré en boucle.
+        readinessProbe:
+          exec:
+            command: [/usr/bin/bao, status]
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: config
+          mountPath: /openbao/config
+          readOnly: true
+        - name: tls
+          mountPath: /openbao/tls
+          readOnly: true
+        - name: data
+          mountPath: /openbao/data
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: config
+        configMap:
+          name: openbao-config
+      - name: tls
+        secret:
+          secretName: openbao-tls
+      - name: tmp
+        emptyDir:
+          medium: Memory
+          sizeLimit: 16Mi
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ReadWriteOnce]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: openbao
+  namespace: openbao
+spec:
+  podSelector:
+    matchLabels:
+      app: openbao
+  policyTypes: [Ingress, Egress]
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: tekton-chains
+    ports:
+    - protocol: TCP
+      port: 8200
+  egress: []
+---
+# Compte de service de Chains, créé avant Chains (J4) pour lier le rôle JWT ; Chains l'adoptera.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tekton-chains
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-chains-controller
+  namespace: tekton-chains

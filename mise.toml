@@ -206,3 +206,11 @@ run = "poc/bricks/08-trust-plane/stockage.sh"
 [tasks."confiance:fuites"]
 description = "Brique 08 : aucun secret de l'hôte dans les journaux des VM (journal systemd, /var/log, audit de l'API) ; journal resultats/fuites-<libellé>.log"
 run = "poc/bricks/08-trust-plane/fuites.sh"
+
+[tasks."confiance:openbao"]
+description = "Brique 08, J3 : OpenBao 2.7.2 sur sc-confiance, Transit non exportable, JWT réservé au compte de service de Chains (étapes : image deployer initialiser configurer essais deverrouiller)"
+run = "poc/bricks/08-trust-plane/openbao.sh"
+
+[tasks."confiance:rejeu"]
+description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J3), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
+run = "poc/bricks/08-trust-plane/rejeu.sh"

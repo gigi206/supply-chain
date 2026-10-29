@@ -1,0 +1,21 @@
+# openbao.sh deployer, 2026-10-29T18:02:37Z
+openbao : certificat existant
+/home/gigi/.cache/supply-chain-poc/08/pki/openbao.crt: OK
+subject=O=supply-chain PoC, CN=openbao.openbao.svc.cluster.local notAfter=Apr 27 17:55:01 2027 GMT X509v3 Subject Alternative Name: DNS:openbao.openbao.svc.cluster.local
+namespace/openbao serverside-applied
+serviceaccount/openbao serverside-applied
+service/openbao serverside-applied
+statefulset.apps/openbao serverside-applied
+networkpolicy.networking.k8s.io/openbao serverside-applied
+namespace/tekton-chains serverside-applied
+serviceaccount/tekton-chains-controller serverside-applied
+configmap/openbao-config serverside-applied
+secret openbao-tls appliqué (clé lue sur l'entrée standard de kubectl, sans annotation last-applied)
+NAME        READY   STATUS    RESTARTS   AGE   IP          NODE           NOMINATED NODE   READINESS GATES
+openbao-0   0/1     Running   0          8s    10.42.0.6   sc-confiance   <none>           <none>
+sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+NAME             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+data-openbao-0   Bound    pvc-2705c64a-c1a2-4f94-8a91-0aada5096da4   1Gi        RWO            local-path     <unset>                 8s
+uid=100(openbao) gid=1000(openbao) groups=1000(openbao)
+drwxrwsrwx    3 root     openbao       4096 Oct 29 18:02 /openbao/data
+OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z

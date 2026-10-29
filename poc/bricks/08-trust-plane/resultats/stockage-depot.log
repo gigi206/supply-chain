@@ -1,7 +1,7 @@
-# stockage.sh depot, 2026-10-29T17:09:35Z
+# stockage.sh depot, 2026-10-29T18:01:52Z
 OK   création d'organisation sans jeton : HTTP 401
 OK   push sans jeton : refusé (could not read Username)
-OK   arbre 30e808ffa327288c656ddda7b6fafe4005234b77 = poc/sample-app à HEAD (ea20653)
+OK   arbre 30e808ffa327288c656ddda7b6fafe4005234b77 = poc/sample-app à HEAD (c39200f)
 OK   https://sc-stockage.poc.test:3000/workspace/sample-app : main = 6391fd437f26696847041be3226bbbf633f55a2f (lecture anonyme)
 ## journal de Forgejo (requêtes de cet essai)
 router: completed POST /api/v1/orgs, 401 Unauthorized

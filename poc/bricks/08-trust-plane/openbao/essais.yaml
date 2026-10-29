@@ -1,0 +1,53 @@
+# Brique 08, jalon J3 : objets fixes des essais de l'authentification JWT et de la politique (openbao.sh essais ;
+# les pods sont produits par pod_essai). Les jetons OpenBao ne sont jamais affichés : les réponses sont filtrées
+# avant d'être écrites dans les journaux.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: autre
+  namespace: tekton-chains
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: j3-essais
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: j3-script
+  namespace: tekton-chains
+data:
+  essai.sh: |
+    set -u
+    jeton=${JETON:-/var/run/secrets/openbao/token}
+    # kube-router n'autorise l'IP d'un pod neuf qu'après sa synchronisation (REJECT pendant environ 1 s).
+    n=1; until bao status >/dev/null 2>&1 || [ $n -ge 30 ]; do n=$((n+1)); sleep 1; done
+    echo "JOINT_AU_ESSAI|$n"
+    refus() { l=$1; shift; if o=$("$@" 2>&1); then echo "ACCEPTE|$l"; else echo "REFUSE|$l|$(echo "$o" | grep -E 'Code:|\* ' | tr '\n\t' '  ' | sed 's/  */ /g')"; fi; }
+    if ! r=$(bao write -format=json auth/jwt/login role=tekton-chains jwt=@"$jeton" 2>&1); then
+      echo "CONNEXION_REFUSEE|$(echo "$r" | grep -E 'Code:|\* ' | tr '\n\t' '  ' | sed 's/  */ /g')"; exit 0
+    fi
+    echo "CONNEXION_ACCEPTEE"
+    echo "$r" | grep -E '"(policies|token_policies|token_type|lease_duration|renewable|display_name|entity_id)"' -A2 | grep -v -E 'client_token|accessor'
+    BAO_TOKEN=$(echo "$r" | sed -n 's/.*"client_token": "\([^"]*\)".*/\1/p'); export BAO_TOKEN
+    echo "SIGNATURE|$(bao write -field=signature transit/sign/chains/sha2-256 input="$H_B64" prehashed=true signature_algorithm=pkcs1v15)"
+    echo "CLE_DEBUT"; bao read -format=json transit/keys/chains; echo "CLE_FIN"
+    refus "export de la clé" bao read transit/export/signing-key/chains
+    refus "clé rendue exportable" bao write transit/keys/chains/config exportable=true
+    refus "sauvegarde en clair" bao read transit/backup/chains
+    refus "nouvelle clé Transit" bao write -f transit/keys/autre
+    refus "liste des moteurs" bao read sys/mounts
+    refus "lecture de son propre jeton" bao token lookup
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: j3-script
+  namespace: j3-essais
+data:
+  essai.sh: |
+    set -u
+    # 15 essais à 1 s d'intervalle : le délai de synchronisation de kube-router ne doit pas ouvrir de fenêtre.
+    n=0; until o=$(bao status 2>&1) || [ $n -ge 15 ]; do n=$((n+1)); sleep 1; done
+    if [ $n -lt 15 ]; then echo "JOINT|essai $n"; else echo "INJOIGNABLE|15 essais sur 15 s|$(echo "$o" | tail -1)"; fi

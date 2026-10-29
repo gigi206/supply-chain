@@ -20,17 +20,10 @@ set -euo pipefail
 export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
-repo=$(git -C "$here" rev-parse --show-toplevel)
-R=$here/resultats
-O=${CONFIANCE_DIR:-$HOME/.cache/supply-chain-poc/08}
-S=$O/secrets
-P=$O/pki
-W=$O/travail
+. "$here/commun.sh"
 ZOT_SHA=33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e   # mise.lock, zot-linux-amd64 v2.1.22
 APP_LAYOUT=${APP_LAYOUT:-$HOME/.cache/supply-chain-poc/w/b04/app-layout}   # image sample-app de la brique 04
 APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-REG_HOTE=192.168.161.13:5000          # depuis l'hôte (pas de résolution de poc.test) : SAN IP du certificat
-REG=sc-stockage.poc.test:5000         # depuis les nœuds et les pods
 DEPOT=workspace/sample-app
 BUSYBOX=docker.io/rancher/mirrored-library-busybox:1.37.0   # images système de k3s (airgap vérifié en J1)
 FORGEJO_SHA=17b59b5f8a8f968126b7a6fcc1d45d9531228dbf293f172cf5565d2e72e999a3   # mise.lock, forgejo-15.0.11-linux-amd64
@@ -41,41 +34,7 @@ GIT_PAQUETS="git=1:2.47.3-0+deb13u1 git-man=1:2.47.3-0+deb13u1 liberror-perl=0.1
   libperl5.40=5.40.1-6+deb13u1 perl-modules-5.40=5.40.1-6+deb13u1 libgdbm-compat4t64=1.24-2
   libcurl3t64-gnutls=8.14.1-2+deb13u7 libngtcp2-16=1.11.0-1+deb13u1 libngtcp2-crypto-gnutls8=1.11.0-1+deb13u1"
 FG="runuser -u forgejo -- env HOME=/var/lib/forgejo USER=forgejo /usr/local/bin/forgejo -c /etc/forgejo/app.ini -w /var/lib/forgejo"
-export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
-declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stockage]=192.168.161.13)
-SSH_OPTS=(-i "$O/ssh/id_ed25519" -o UserKnownHostsFile="$O/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
-mkdir -p "$R" "$P" "$W"
-(umask 077 && mkdir -p "$S")
 trap 'rm -rf "$W/zot" "$W/registre" "$W/forgejo" "$W/depot" "$W/refus.out"' EXIT   # copies de secrets, même en cas d'échec
-chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
-sur() { local vm=$1; shift; ssh "${SSH_OPTS[@]}" "poc@${IP[$vm]}" "$@"; }
-copier() { # vm répertoire-distant fichiers…
-  local vm=$1 d=$2; shift 2
-  sur "$vm" "rm -rf $d && mkdir -m 0700 $d"
-  scp -q "${SSH_OPTS[@]}" "$@" "poc@${IP[$vm]}:$d/"
-}
-refus() { # libellé motif commande… : la commande doit échouer, avec le motif dans sa sortie
-  local l=$1 m=$2; shift 2
-  if "$@" > "$W/refus.out" 2>&1; then echo "KO   $l : accepté" >&2; exit 1; fi
-  if grep -qiE "$m" "$W/refus.out"; then
-    echo "OK   $l : refusé ($(grep -oiE "$m" "$W/refus.out" | head -1))"
-  else
-    echo "KO   $l : refusé pour une autre raison" >&2; cat "$W/refus.out" >&2; exit 1
-  fi
-}
-
-certificat() { # nom SAN
-  local n=$1 cn=${2%%,*}
-  if [ -s "$S/$n.key" ] && [ -s "$P/$n.crt" ]; then echo "$n : certificat existant"; else
-    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/$n.key")
-    SAN=$2 openssl req -new -config "$here/stockage/pki.cnf" -key "$S/$n.key" -subj "/O=supply-chain PoC/CN=${cn#DNS:}" -out "$W/$n.csr"
-    SAN=$2 openssl x509 -req -in "$W/$n.csr" -CA "$P/ca-poc.crt" -CAkey "$S/ca-poc.key" -set_serial "0x$(openssl rand -hex 16)" \
-      -days 180 -sha256 -extfile "$here/stockage/pki.cnf" -extensions serveur_poc -out "$P/$n.crt" 2>/dev/null
-    rm -f "$W/$n.csr"
-  fi
-  openssl verify -CAfile "$P/ca-poc.crt" -purpose sslserver "$P/$n.crt"
-  openssl x509 -in "$P/$n.crt" -noout -subject -enddate -ext subjectAltName | paste -sd' ' | sed 's/  */ /g'
-}
 
 etape_pki() {
   if [ ! -s "$S/ca-poc.key" ]; then
@@ -143,9 +102,10 @@ etape_registre() {
   debut=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
   # Fichiers d'authentification (format docker) : bon compte, mauvais mot de passe, aucun compte.
   (umask 077
-   printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-ecriture:%s' "$(cat "$S/zot-poc-ecriture.password")" | base64 -w0)" > "$A/ecriture.json"
-   printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-ecriture:%s' "$(openssl rand -hex 24)" | base64 -w0)" > "$A/faux.json"
+   openssl rand -hex 24 | tr -d '\n' > "$A/faux.password"
    echo '{}' > "$A/anonyme.json")
+  auth_zot "$A/ecriture.json"
+  auth_zot "$A/faux.json" "$A/faux.password"
   local src="$APP_LAYOUT@$APP_DIGEST" ca=(--to-ca-file "$P/ca-poc.crt")
   local code
   code=$(curl -s -o /dev/null -w '%{http_code}' -X POST --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/workspace/essai/blobs/uploads/")
@@ -353,12 +313,4 @@ etape_depot() {
   rm -rf "$A"
 }
 
-[ $# -gt 0 ] || { echo "usage : $0 pki|zot|registre|containerd|forgejo|depot…" >&2; exit 2; }
-for e in "$@"; do
-  declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
-done
-for e in "$@"; do
-  chrono "J2 $e"
-  { echo "# stockage.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | tee "$R/stockage-$e.log"
-  chrono "J2 $e fait"
-done
+lancer stockage J2 "$@"

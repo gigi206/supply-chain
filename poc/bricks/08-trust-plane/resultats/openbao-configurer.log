@@ -1,0 +1,43 @@
+# openbao.sh configurer, 2026-10-29T18:03:02Z
+OK   clé publique de service.key : kid ZCpHYkRi_8rHZgysdwxzpl-y03FhWYMS9Dn1xjfB_v0 = celui du JWKS (émetteur https://kubernetes.default.svc.cluster.local)
+Success! Enabled the transit secrets engine at: transit/
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-10-29T18:03:03.486307374Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEy8rVUkvb3sgKnQbt0SR4mK12Jv7Z
+o2QqDn1Gusm66++DgzrHR0y8fs5lz6NfuYus4Elkp/fyDwWGir7wMoKoEA==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      chains
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: chains-signature
+Success! Enabled jwt auth method at: jwt/
+Success! Data written to: auth/jwt/config
+Success! Data written to: auth/jwt/role/tekton-chains
+{"name":"chains","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:tekton-chains:tekton-chains-controller","user_claim":"sub","token_policies":["chains-signature"],"token_no_default_policy":true,"token_type":"batch","token_ttl":300,"token_max_ttl":300}
+{"bound_issuer":"https://kubernetes.default.svc.cluster.local","cles":1}
+path "transit/keys/chains" {
+  capabilities = ["read"]
+}
+path "transit/sign/chains" {
+  capabilities = ["update"]
+}
+path "transit/sign/chains/*" {
+  capabilities = ["update"]
+}

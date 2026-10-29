@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Brique 08 : aucun secret de l'hôte ne doit apparaître dans les journaux des VM (fuite du jeton k3s
 # dans le journal sudo en J1). Pour chaque VM : journal systemd complet (sudo compris), fichiers *.log
-# de /var/log et journal d'audit de l'API, rapatriés sur l'hôte (0600), puis cherchés avec chaque secret
+# de /var/log (journaux des pods compris), journal d'audit de l'API et volumes local-path (audit d'OpenBao), rapatriés sur l'hôte (0600), puis cherchés avec chaque secret
 # de ~/.cache/supply-chain-poc/08/secrets comme motif (grep -F -f : jamais en argument de commande).
 # Clés PEM : chaque ligne du corps base64 est un motif. Attendu : 0 partout. Témoin positif : une valeur
 # aléatoire non secrète, écrite dans le journal de chaque VM (logger), doit être retrouvée.
@@ -32,7 +32,7 @@ printf '%s\n' "$temoin" > "$W/temoin"
 ko=0
 for vm in sc-confiance sc-build sc-stockage; do
   "$here/ssh.sh" "$vm" "logger -t fuites-temoin $temoin" < /dev/null
-  (umask 077 && "$here/ssh.sh" "$vm" 'sudo journalctl -o cat --no-pager; sudo find /var/log /var/lib/rancher/k3s/server/logs -type f -name "*.log" -exec cat {} + 2>/dev/null' \
+  (umask 077 && "$here/ssh.sh" "$vm" 'sudo journalctl -o cat --no-pager; sudo find /var/log /var/lib/rancher/k3s/server/logs /var/lib/rancher/k3s/storage -type f -name "*.log" -exec cat {} + 2>/dev/null' \
     < /dev/null > "$W/$vm.txt" || true)
   echo "## $vm : $(wc -l < "$W/$vm.txt") lignes de journaux"
   n=$(grep -c -F -f "$W/temoin" "$W/$vm.txt" || true)
