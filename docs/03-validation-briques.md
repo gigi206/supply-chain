@@ -26,7 +26,7 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 ## À faire sur le laptop (infra du PoC)
 
 Prérequis :
-- infra du PoC : **ce laptop**, bare metal vérifié le 29/10/2026 (ADR 0001) ; dimensionnement **proposé**, à valider ([`poc/infra`](../poc/infra/README.md)) ;
+- infra du PoC : **ce laptop**, bare metal vérifié le 29/10/2026 (ADR 0001) ; dimensionnement **validé** le 29/10/2026 : kind jetable pour A1, trois VM libvirt + k3s pour 08 ([`poc/infra`](../poc/infra/README.md)) ;
 - deuxième administrateur du domaine de replay : **à nommer** ;
 - licence du dépôt : décidée, **Apache-2.0** (dépôt conforme REUSE 3.3).
 

@@ -52,7 +52,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
    | Stockage (Forgejo, Zot) | 4 | 8 Gi | 300 Go |
    | **Domaine de replay** (hôte distinct, autre administrateur) | 8 | 16 Gi | 150 Go |
 
-   Ce dimensionnement est estimé à **réviser après les benchmarks 2a** (Konflux demande au moins 12 Gi pour sa seule démo sur Kind). **Révision proposée pour le laptop, en attente de validation par le propriétaire** : voir [`poc/infra/README.md`](../../poc/infra/README.md). Elle prévoit une phase à la fois, trois VM k3s (confiance, build avec Kata imbriqué, stockage) et un modèle CPU nommé sans AVX-512.
+   Ce dimensionnement est estimé à **réviser après les benchmarks 2a** (Konflux demande au moins 12 Gi pour sa seule démo sur Kind). **Révision pour le laptop, validée par le propriétaire le 29/10/2026** ([`poc/infra/README.md`](../../poc/infra/README.md)) : une phase à la fois ; kind jetable pour le banc A1 ; pour la brique 08 et la suite, **trois VM libvirt avec k3s** (confiance 4 vCPU / 8 Gi, build 6 vCPU / 10 Gi avec Kata imbriqué, stockage 2 vCPU / 6 Gi ; 70 Go) et un modèle CPU nommé sans AVX-512 (`Haswell-v4`, proposé, à confirmer au premier démarrage). kind est écarté pour la brique 08 : ses nœuds sont des conteneurs privilégiés qui partagent le noyau de l'hôte.
 3. **Isolation** : Kata si KVM est disponible, ce qui est le cas sur le laptop (à installer et à mesurer, y compris en virtualisation imbriquée) ; sinon gVisor ou user namespace, selon les résultats de la brique 05.
 4. **Domaine de replay** : hôte ou cluster distinct, **administré par une autre personne** (à nommer), avec sa propre clé de VSA. En 2b-1, ses images de build sont « indépendantes minimales » : toolchain Go officielle à checksum vérifié, image reconstruite dans ce domaine.
 
@@ -65,6 +65,6 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 ## Questions ouvertes (propriétaire)
 
 - [x] Infrastructure disponible : **bare metal** (laptop, KVM, virtualisation imbriquée active), vérifié le 29/10/2026.
-- [ ] Dimensionnement et topologie sur le laptop ([proposition](../../poc/infra/README.md)) : à valider.
+- [x] Dimensionnement et topologie sur le laptop : **validés le 29/10/2026** (kind pour A1, trois VM libvirt + k3s pour 08 ; [`poc/infra`](../../poc/infra/README.md)).
 - [ ] Nom de l'administrateur du domaine de replay.
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?

@@ -21,7 +21,11 @@ Hôte de toutes les mesures qui demandent KVM, un cluster ou des VM ([ADR 0001](
 | Alimentation | Secteur branché, profil de plateforme `performance` (intel_pstate, EPP `performance`) | Mesures de temps à faire sur secteur |
 | Outils des bancs | Présents : python3 3.15.2, git, make, Node 26.12.1, jq, curl, gpg, runc 1.2.5. **Absents** : Go, Hermeto, oras, crane, cosign, Zot, BuildKit, Syft, Grype, Conforma (`ec`), Kyverno, reuse, diffoscope | Liste d'installation de 4b, soumise à part. Pour retrouver les empreintes du cloud, il faut les **mêmes versions** : Node 22.22.0 et pas le 26 de l'hôte, Go 1.24.7 et 1.26.10, BuildKit 0.25.2 et runc 1.3.3 du nixpkgs épinglé |
 
-## Proposition de dimensionnement (en attente de validation)
+## Dimensionnement
+
+**Validé par le propriétaire le 29/10/2026** : pas de cluster pour 4b, **kind jetable pour A1**, **VM libvirt + k3s (topologie T2, profil nominal) pour la brique 08 et la suite**. Les changements sur l'hôte (pool, réseau, téléchargements) restent confirmés un par un au moment de les faire.
+
+Après libération de mémoire le même jour (répertoires inutilisés de `/tmp`, en tmpfs), **31 Gi sont disponibles** : le profil nominal (24 Gi) laisse environ 7 Gi à la session de bureau.
 
 ### Principes
 
