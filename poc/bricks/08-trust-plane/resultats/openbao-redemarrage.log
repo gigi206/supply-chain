@@ -1,10 +1,10 @@
-# openbao.sh redemarrage, 2026-10-29T18:13:38Z
-témoin : message signé par la clé chains ; empreinte de la clé publique 775b3b8545072f1f… ; {"latest_version":1,"exportable":false}
+# openbao.sh redemarrage, 2026-10-29T19:30:12Z
+témoin : message signé par la clé chains ; empreinte de la clé publique 89fedc5670b2c3b6… ; {"latest_version":1,"exportable":false}
 après suppression du pod : {"initialized":true,"sealed":true}, Ready=False, endpoints prêts du Service : 0
 OK   OpenBao redémarre scellé, non prêt, retiré du Service
 {"sealed":false,"t":1,"n":1,"progress":0}
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
 endpoints prêts du Service : 1
-OK   clé publique identique (empreinte 775b3b8545072f1f…)
+OK   clé publique identique (empreinte 89fedc5670b2c3b6…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée

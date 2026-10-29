@@ -146,8 +146,11 @@ etape_installer() {
   kubectl apply --server-side --force-conflicts -f "$T/pipeline/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines-resolvers --timeout=300s
+  # Triggers et ses intercepteurs ensemble : le contrôleur de Triggers s'arrête au démarrage sans la ConfigMap
+  # config-triggers-core-interceptors, définie dans interceptors.yaml.
   kubectl apply --server-side --force-conflicts -f "$T/triggers/rendu.yaml" >/dev/null
-  kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
+  for _ in $(seq 30); do kubectl get crd clusterinterceptors.triggers.tekton.dev >/dev/null 2>&1 && break; sleep 2; done
+  kubectl wait --for=condition=Established crd/clusterinterceptors.triggers.tekton.dev --timeout=60s >/dev/null
   kubectl apply --server-side --force-conflicts -f "$T/interceptors/rendu.yaml" >/dev/null
   kubectl apply --server-side --force-conflicts -f "$T/chains/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
@@ -259,6 +262,17 @@ envoyer() { # libellé fichier-corps signature|"" : livraison vers l'EventListen
     -H "X-GitHub-Delivery: $(cat /proc/sys/kernel/random/uuid)" "${h[@]}" --data-binary @"$2" "$(el_url)")
   echo "$1 : HTTP $code $(jq -c '{eventID}' "$T/webhook/reponse" 2>/dev/null)"
 }
+signe_attendre() { # commit : attend que Chains ait signé le TaskRun et le PipelineRun de ce commit. Les écritures du tag
+  # .att d'un même digest ne sont pas atomiques (lecture puis réécriture) : deux envois simultanés perdent une enveloppe
+  # (constat-att-ecrasee.log). Les essais sérialisent donc les exécutions qui visent la même image.
+  local o
+  for o in "taskrun/sample-app-$1-publier" "pipelinerun/sample-app-$1"; do
+    for _ in $(seq 60); do
+      [ "$(kubectl get -n builds "$o" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}' 2>/dev/null)" = true ] && break
+      sleep 2
+    done
+  done
+}
 nb_pr() { kubectl get pipelinerun -n builds -o name | grep -c "sample-app-$1" || true; }
 
 etape_essais_webhook() {
@@ -274,6 +288,7 @@ etape_essais_webhook() {
   echo "## A. livraison réelle de Forgejo (test du webhook : dernier commit de main)"
   echo "Forgejo, POST hooks/…/tests : HTTP $(forgejo_test)"
   pr_attendre "$reel"
+  signe_attendre "$reel"
   echo "OK   PipelineRun sample-app-$reel terminé ($(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.status.conditions[0].reason}'))"
 
   echo "## B. corps non signé (commit $faux)"
@@ -290,6 +305,7 @@ etape_essais_webhook() {
   sig_e=$(hmac_corps "$T/webhook/e.json")
   envoyer "valide" "$T/webhook/e.json" "$sig_e"
   pr_attendre "$neuf"
+  signe_attendre "$neuf"
   echo "OK   PipelineRun sample-app-$neuf créé et terminé : la signature calculée ici est acceptée"
   echo "## F. rejeu à l'identique de E (même corps, même signature)"
   envoyer "rejeu de E" "$T/webhook/e.json" "$sig_e"
@@ -319,6 +335,15 @@ etape_essais_webhook() {
       | {buildType: .buildDefinition.buildType, pipeline: .buildDefinition.externalParameters.runSpec.pipelineRef.name,
          params: (.buildDefinition.externalParameters.runSpec.params | map({(.name): .value}) | add), builder: .runDetails.builder.id}' \
     | grep "$reel" | head -1
+  echo "## une enveloppe par exécution signée de cet essai (startedOn ≥ $debut)"
+  cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
+    "$REG_HOTE/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" 2>/dev/null \
+    | jq -r --arg d "$debut" '.payload | @base64d | fromjson | .predicate | select(.runDetails.metadata.startedOn >= $d)
+      | "\(if .buildDefinition.externalParameters.runSpec.pipelineRef then "PipelineRun" else "TaskRun" end) \(.buildDefinition.externalParameters.runSpec.params[] | select(.name == "commit") | .value)"' \
+    | sort > "$T/webhook/enveloppes"
+  cat "$T/webhook/enveloppes"
+  printf '%s\n' "PipelineRun $neuf" "PipelineRun $reel" "TaskRun $neuf" "TaskRun $reel" | sort | cmp -s - "$T/webhook/enveloppes" \
+    && echo "OK   4 exécutions signées, 4 enveloppes dans Zot" || { echo "KO   enveloppe manquante ou en trop" >&2; exit 1; }
 }
 
 lancer tekton J4 "$@"

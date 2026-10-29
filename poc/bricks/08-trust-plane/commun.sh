@@ -30,6 +30,11 @@ refus() { # libellé motif commande… : la commande doit échouer, avec le moti
   fi
 }
 
+attendre_sa() { # espace : le compte de service default d'un espace neuf est créé de façon asynchrone par le contrôleur
+  for _ in $(seq 60); do kubectl get serviceaccount default -n "$1" >/dev/null 2>&1 && return 0; sleep 1; done
+  echo "KO   compte de service default absent de $1" >&2; return 1
+}
+
 auth_zot() { # fichier [mot-de-passe-fichier] [compte] [registre] : authentification Zot au format docker (0600)
   local compte=${3:-poc-ecriture}
   (umask 077 && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "${4:-$REG_HOTE}" \

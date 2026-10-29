@@ -1,0 +1,17 @@
+# Constat J4 : écriture perdue sur le tag .att (rejeu j1-j4 du 29/10/2026, 19:21 UTC)
+## Chains (envois d'attestations vers builds/essai-webhook@sha256:3a7ca1b1…)
+{"ts":"19:21:36.694","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:","objet":"builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier"}
+{"ts":"19:21:38.722","msg":"Successfully uploaded attestation using legacy format for sc","objet":"builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier"}
+{"ts":"19:21:40.670","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:","objet":"builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f"}
+{"ts":"19:21:41.717","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:","objet":"builds/sample-app-2222222222222222222222222222222222222222-publier"}
+{"ts":"19:21:43.389","msg":"Successfully uploaded attestation using legacy format for sc","objet":"builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f"}
+{"ts":"19:21:44.690","msg":"Successfully uploaded attestation using legacy format for sc","objet":"builds/sample-app-2222222222222222222222222222222222222222-publier"}
+{"ts":"19:21:45.133","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:","objet":"builds/sample-app-2222222222222222222222222222222222222222"}
+{"ts":"19:21:47.453","msg":"Successfully uploaded attestation using legacy format for sc","objet":"builds/sample-app-2222222222222222222222222222222222222222"}
+## Zot (audit : écritures du tag .att de essai-webhook)
+{"t":"19:21:38.710","subject":"poc-build","action":"PUT","status":201}
+{"t":"19:21:43.377","subject":"poc-build","action":"PUT","status":201}
+{"t":"19:21:44.678","subject":"poc-build","action":"PUT","status":201}
+{"t":"19:21:47.441","subject":"poc-build","action":"PUT","status":201}
+## Zot : enveloppes présentes sous le tag .att à la fin
+3

@@ -229,6 +229,7 @@ etape_essais() {
   sur sc-confiance "sudo timeout 40 tcpdump -i nflog:100 -nn -l 2>&1" > "$B/nflog.txt" &
   tcpdump=$!
   sleep 2
+  attendre_sa j3-essais
   pod_essai reseau j3-essais default build aucun | grep -v '^$' | kubectl apply -f - >/dev/null
   kubectl wait -n j3-essais --for=jsonpath='{.status.phase}'=Succeeded pod/reseau --timeout=120s >/dev/null
   kubectl logs -n j3-essais reseau > "$B/reseau.log"

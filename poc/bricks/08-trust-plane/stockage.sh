@@ -170,6 +170,7 @@ EOF
     echo "$vm : $unite redémarré, nœud Ready ; $(sur "$vm" "sudo cat /var/lib/rancher/k3s/agent/etc/containerd/certs.d/$REG/hosts.toml" | grep -E 'ca|server' | paste -sd' ')"
   done
   kubectl get ns j2-essais >/dev/null 2>&1 || kubectl create ns j2-essais
+  attendre_sa j2-essais
   kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Pod
