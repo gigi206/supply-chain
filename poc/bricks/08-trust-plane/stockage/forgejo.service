@@ -1,0 +1,41 @@
+# Brique 08, jalon J2 : Forgejo 15.0.11 (binaire GPG vérifié de mise.toml) en service durci sur sc-stockage.
+[Unit]
+Description=Forgejo, forge du PoC
+Documentation=https://forgejo.org/docs/
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=forgejo
+Group=forgejo
+WorkingDirectory=/var/lib/forgejo
+Environment=USER=forgejo HOME=/var/lib/forgejo GITEA_WORK_DIR=/var/lib/forgejo
+ExecStart=/usr/local/bin/forgejo web --config /etc/forgejo/app.ini --work-path /var/lib/forgejo
+Restart=on-failure
+RestartSec=5s
+StateDirectory=forgejo
+StateDirectoryMode=0750
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

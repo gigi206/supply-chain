@@ -61,6 +61,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).
 - Un test négatif vérifie qu'**aucun pod privilégié ne tourne sur l'hôte** (Kyverno + brique 05).
 - Le modèle CPU et le mode d'isolation sont inscrits dans la provenance (`internalParameters`).
+- **Services de stockage hors des pods** (brique 08, J2, choix du propriétaire du 29/10/2026) : Forgejo et Zot tournent en services systemd durcis sur le nœud de stockage, à partir des binaires vérifiés de `mise.toml` (GPG pour Forgejo, sha256 pour Zot). Les images Forgejo et Zot ne sont pas signées. TLS par une CA du PoC à contraintes de nom, déclarée à containerd ([résultats](../../poc/bricks/08-trust-plane/README.md#jalon-j2--stockage-29102026)).
 
 ## Questions ouvertes (propriétaire)
 

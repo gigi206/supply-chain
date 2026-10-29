@@ -1,0 +1,40 @@
+{
+  "distSpecVersion": "1.1.1",
+  "storage": {
+    "rootDirectory": "/var/lib/zot",
+    "dedupe": true,
+    "gc": false
+  },
+  "http": {
+    "address": "192.168.161.13",
+    "port": "5000",
+    "realm": "zot (PoC supply-chain)",
+    "tls": {
+      "cert": "/etc/zot/tls/zot.crt",
+      "key": "/etc/zot/tls/zot.key"
+    },
+    "auth": {
+      "htpasswd": {
+        "path": "/etc/zot/htpasswd"
+      },
+      "failDelay": 1
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "anonymousPolicy": ["read"],
+          "policies": [
+            {
+              "users": ["poc-ecriture"],
+              "actions": ["read", "create", "update"]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "log": {
+    "level": "info",
+    "audit": "/var/log/zot/audit.log"
+  }
+}

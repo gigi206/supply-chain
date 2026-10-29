@@ -1,0 +1,38 @@
+# stockage.sh pki, 2026-10-29T17:08:53Z
+subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
+notAfter=Oct 29 16:39:08 2027 GMT
+sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
+X509v3 Basic Constraints: critical
+    CA:TRUE, pathlen:0
+X509v3 Key Usage: critical
+    Certificate Sign, CRL Sign
+X509v3 Name Constraints: critical
+    Permitted:
+      DNS:poc.test
+      DNS:svc.cluster.local
+      IP:192.168.161.0/255.255.255.0
+      IP:10.43.0.0/255.255.0.0
+zot : certificat existant
+/home/gigi/.cache/supply-chain-poc/08/pki/zot.crt: OK
+subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
+forgejo : certificat existant
+/home/gigi/.cache/supply-chain-poc/08/pki/forgejo.crt: OK
+subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
+OK   certificat registre.exemple.org signé par la CA : refusé (permitted subtree violation)
+~/.cache/supply-chain-poc/08/pki:
+total 12
+-rw-rw-r-- 1 gigi gigi 765 Oct 29 17:39 ca-poc.crt
+-rw-rw-r-- 1 gigi gigi 778 Oct 29 17:39 forgejo.crt
+-rw-rw-r-- 1 gigi gigi 778 Oct 29 17:39 zot.crt
+
+~/.cache/supply-chain-poc/08/secrets:
+total 36
+-rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
+-rw------- 1 gigi gigi  33 Oct 29 18:07 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Oct 29 18:07 forgejo-admin.token
+-rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
+-rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
+-rw------- 1 gigi gigi 139 Oct 29 18:08 k3s-jeton-agent-securise
+-rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-serveur
+-rw------- 1 gigi gigi  48 Oct 29 17:39 zot-poc-ecriture.password
+-rw------- 1 gigi gigi 241 Oct 29 17:39 zot.key

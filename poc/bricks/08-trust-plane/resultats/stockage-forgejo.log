@@ -1,0 +1,56 @@
+# stockage.sh forgejo, 2026-10-29T17:09:24Z
+~/.local/share/mise/installs/forgejo-forgejo-forgejo/15.0.11/forgejo: OK
+Get:1 file:/etc/apt/mirrors/debian.list Mirrorlist [30 B]
+Get:2 file:/etc/apt/mirrors/debian-security.list Mirrorlist [39 B]
+Get:3 https://deb.debian.org/debian trixie/main amd64 perl-modules-5.40 all 5.40.1-6+deb13u1 [3014 kB]
+Get:4 https://deb.debian.org/debian trixie/main amd64 libgdbm-compat4t64 amd64 1.24-2 [50.3 kB]
+Get:5 https://deb.debian.org/debian trixie/main amd64 libperl5.40 amd64 5.40.1-6+deb13u1 [4326 kB]
+Get:6 https://deb.debian.org/debian trixie/main amd64 perl amd64 5.40.1-6+deb13u1 [268 kB]
+Get:7 https://deb.debian.org/debian trixie/main amd64 libngtcp2-16 amd64 1.11.0-1+deb13u1 [132 kB]
+Get:8 https://deb.debian.org/debian trixie/main amd64 libngtcp2-crypto-gnutls8 amd64 1.11.0-1+deb13u1 [29.5 kB]
+Get:9 https://deb.debian.org/debian trixie/main amd64 liberror-perl all 0.17030-1 [26.9 kB]
+Get:10 https://deb.debian.org/debian trixie/main amd64 git-man all 1:2.47.3-0+deb13u1 [2205 kB]
+Get:11 https://deb.debian.org/debian trixie/main amd64 git amd64 1:2.47.3-0+deb13u1 [8862 kB]
+Get:12 https://deb.debian.org/debian-security trixie-security/main amd64 libcurl3t64-gnutls amd64 8.14.1-2+deb13u7 [385 kB]
+Setting up libgdbm-compat4t64:amd64 (1.24-2) ...
+Setting up perl-modules-5.40 (5.40.1-6+deb13u1) ...
+Setting up git-man (1:2.47.3-0+deb13u1) ...
+Setting up libngtcp2-16:amd64 (1.11.0-1+deb13u1) ...
+Setting up libngtcp2-crypto-gnutls8:amd64 (1.11.0-1+deb13u1) ...
+Setting up libcurl3t64-gnutls:amd64 (8.14.1-2+deb13u7) ...
+Setting up libperl5.40:amd64 (5.40.1-6+deb13u1) ...
+Setting up perl (5.40.1-6+deb13u1) ...
+Setting up liberror-perl (0.17030-1) ...
+Setting up git (1:2.47.3-0+deb13u1) ...
+git 1:2.47.3-0+deb13u1 perl 5.40.1-6+deb13u1
+git version 2.47.3
+forgejo: OK
+secret SECRET_KEY généré
+secret INTERNAL_TOKEN généré
+secret JWT_SECRET généré
+Created symlink '/etc/systemd/system/multi-user.target.wants/forgejo.service' -> '/etc/systemd/system/forgejo.service'.
+administrateur poc-admin créé, mot de passe en 0600 sur l'hôte
+jeton j2-depots (write:organization, write:repository) en 0600 sur l'hôte
+https://192.168.161.13:3000/api/healthz (CA du PoC) : HTTP 200 ; version 15.0.11+gitea-1.22.0
+active
+LISTEN 0      4096   192.168.161.13:3000       0.0.0.0:*    users:(("forgejo",pid=2506,fd=16))       
+/etc/forgejo:
+total 12
+-rw-r----- 1 root forgejo 1379 Oct 29 17:09 app.ini
+drwxr-x--- 2 root forgejo 4096 Oct 29 17:09 secrets
+drwxr-x--- 2 root forgejo 4096 Oct 29 17:09 tls
+
+/etc/forgejo/secrets:
+total 12
+-rw-r----- 1 root forgejo 105 Oct 29 17:09 internal_token
+-rw-r----- 1 root forgejo  43 Oct 29 17:09 jwt_secret
+-rw-r----- 1 root forgejo  43 Oct 29 17:09 secret_key
+
+/etc/forgejo/tls:
+total 8
+-rw-r--r-- 1 root root    778 Oct 29 17:09 forgejo.crt
+-rw-r----- 1 root forgejo 241 Oct 29 17:09 forgejo.key
+drwxr-x--- 3 forgejo forgejo 4096 Oct 29 17:09 /var/lib/forgejo
+OK   app.ini inchangé par Forgejo (identique à stockage/forgejo.ini, sans secret)
+OK   inscription désactivée (/user/sign_up : « Registration is disabled »)
+-> Overall exposure level for forgejo.service: 3.0 OK :-)

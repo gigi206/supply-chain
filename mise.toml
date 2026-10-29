@@ -198,3 +198,7 @@ run = "poc/bricks/08-trust-plane/k3s.sh"
 [tasks."confiance:controles"]
 description = "Brique 08 : contrôles des nœuds (x86-64-v3, KVM, NAT) et du cluster ; journal resultats/controles-<libellé>.log"
 run = "poc/bricks/08-trust-plane/controles.sh"
+
+[tasks."confiance:stockage"]
+description = "Brique 08, J2 : CA du PoC, Zot et Forgejo en services systemd sur sc-stockage, CA déclarée à containerd (étapes : pki zot registre containerd forgejo depot)"
+run = "poc/bricks/08-trust-plane/stockage.sh"

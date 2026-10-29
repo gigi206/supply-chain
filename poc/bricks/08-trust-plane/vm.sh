@@ -28,8 +28,8 @@ S=$O/ssh
 W=$O/travail
 v() { virsh -c qemu:///system "$@"; }
 liste() { case $1 in net) v net-list --name "${@:2}" ;; pool) v pool-list --name "${@:2}" ;; dom) v list --name "${@:2}" ;; esac; }
-existe() { liste "$1" --all | grep -qxF "$2"; }
-actif() { liste "$1" | grep -qxF "$2"; }
+existe() { liste "$1" --all | grep -xF "$2" >/dev/null; }
+actif() { liste "$1" | grep -xF "$2" >/dev/null; }
 chrono() { mkdir -p "$R"; printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
 televerser() { # fichier volume format
   local taille

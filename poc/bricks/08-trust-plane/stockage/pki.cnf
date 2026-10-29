@@ -1,0 +1,22 @@
+# Brique 08, jalon J2 : CA du PoC et certificats de service (stockage.sh pki).
+# La CA ne peut signer que des noms du PoC : poc.test, services du cluster (svc.cluster.local),
+# réseau des nœuds et plage des Services de k3s. SAN est passé par l'environnement.
+[req]
+distinguished_name = dn
+prompt = no
+
+[dn]
+
+[ca_poc]
+basicConstraints = critical, CA:TRUE, pathlen:0
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+nameConstraints = critical, permitted;DNS:poc.test, permitted;DNS:svc.cluster.local, permitted;IP:192.168.161.0/255.255.255.0, permitted;IP:10.43.0.0/255.255.0.0
+
+[serveur_poc]
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature
+extendedKeyUsage = serverAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+subjectAltName = $ENV::SAN

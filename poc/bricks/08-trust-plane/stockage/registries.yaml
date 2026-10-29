@@ -1,0 +1,6 @@
+# Brique 08, jalon J2 : containerd (k3s) fait confiance à la CA du PoC pour Zot.
+# Lecture anonyme : aucun identifiant ici, ceux d'écriture n'arrivent jamais sur les nœuds.
+configs:
+  "sc-stockage.poc.test:5000":
+    tls:
+      ca_file: /etc/rancher/k3s/ca-poc.crt

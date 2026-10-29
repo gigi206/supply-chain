@@ -1,0 +1,17 @@
+# stockage.sh depot, 2026-10-29T17:09:35Z
+OK   création d'organisation sans jeton : HTTP 401
+OK   push sans jeton : refusé (could not read Username)
+OK   arbre 30e808ffa327288c656ddda7b6fafe4005234b77 = poc/sample-app à HEAD (ea20653)
+OK   https://sc-stockage.poc.test:3000/workspace/sample-app : main = 6391fd437f26696847041be3226bbbf633f55a2f (lecture anonyme)
+## journal de Forgejo (requêtes de cet essai)
+router: completed POST /api/v1/orgs, 401 Unauthorized
+router: completed GET /api/v1/orgs/workspace, 404 Not Found
+router: completed POST /api/v1/orgs, 201 Created
+router: completed POST /api/v1/orgs/workspace/repos, 201 Created
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 401 Unauthorized
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app.git/git-receive-pack, 200 OK
+## depuis sc-build (CA déclarée aux nœuds, résolution par le DNS du réseau)
+branche lue au bout de 3 essai(s)
+{"branche":"main","commit":"6391fd437f26696847041be3226bbbf633f55a2f","auteur":"PoC brique 08","date":"2026-10-29T00:00:00Z"}
+OK   même commit vu depuis la zone build

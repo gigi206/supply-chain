@@ -67,7 +67,7 @@ install -m 0644 $unite.service /etc/systemd/system/$unite.service
 systemctl daemon-reload
 systemctl enable --now $unite
 cd / && rm -rf $d
-/usr/local/bin/k3s --version | head -1
+/usr/local/bin/k3s --version | sed -n 1p   # sed lit tout : pas de SIGPIPE sous pipefail
 EOF
   rm -rf "$O/travail/$unite.service" "$j"
   echo "$vm : k3s $role installé"
@@ -77,7 +77,7 @@ pret() { # nœuds attendus…
   for _ in $(seq 90); do
     local ok=0
     for n in "$@"; do
-      if sur sc-confiance "sudo k3s kubectl get node $n -o jsonpath='{.status.conditions[?(@.type==\"Ready\")].status}'" 2>/dev/null | grep -qx True; then
+      if sur sc-confiance "sudo k3s kubectl get node $n -o jsonpath='{.status.conditions[?(@.type==\"Ready\")].status}'" 2>/dev/null | grep -x True >/dev/null; then
         ok=$((ok + 1))
       fi
     done

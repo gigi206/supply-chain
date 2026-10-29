@@ -1,0 +1,43 @@
+# Brique 08, jalon J2 : Zot 2.1.22 (binaire vérifié de mise.toml) en service durci sur sc-stockage.
+[Unit]
+Description=Zot, registre OCI du PoC
+Documentation=https://zotregistry.dev
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=zot
+Group=zot
+ExecStartPre=/usr/local/bin/zot verify /etc/zot/config.json
+ExecStart=/usr/local/bin/zot serve /etc/zot/config.json
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=65536
+StateDirectory=zot
+StateDirectoryMode=0750
+LogsDirectory=zot
+LogsDirectoryMode=0750
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

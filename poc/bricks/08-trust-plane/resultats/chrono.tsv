@@ -20,3 +20,64 @@ J1 VM joignables en SSH	2026-10-29T16:19:58Z
 J1 installation de k3s	2026-10-29T16:19:59Z	
 J1 server prêt	2026-10-29T16:20:13Z	
 J1 trois nœuds prêts	2026-10-29T16:20:36Z	
+J2 pki	2026-10-29T16:39:08Z	
+J2 pki fait	2026-10-29T16:39:08Z	
+J2 pki	2026-10-29T16:39:15Z	
+J2 pki fait	2026-10-29T16:39:15Z	
+J2 zot	2026-10-29T16:39:18Z	
+J2 zot fait	2026-10-29T16:39:22Z	
+J2 registre	2026-10-29T16:39:25Z	
+J2 registre	2026-10-29T16:39:34Z	
+J2 registre fait	2026-10-29T16:39:42Z	
+J2 registre	2026-10-29T16:39:52Z	
+J2 registre	2026-10-29T16:40:04Z	
+J2 registre fait	2026-10-29T16:40:12Z	
+J2 registre	2026-10-29T16:40:22Z	
+J2 registre fait	2026-10-29T16:40:30Z	
+J2 containerd	2026-10-29T16:40:33Z	
+J2 containerd fait	2026-10-29T16:40:50Z	
+J2 forgejo	2026-10-29T17:02:52Z	
+J2 forgejo fait	2026-10-29T17:03:00Z	
+J2 depot	2026-10-29T17:03:12Z	
+J2 depot	2026-10-29T17:03:27Z	
+J2 depot fait	2026-10-29T17:03:28Z	
+VM, pool et réseau détruits	2026-10-29T17:04:01Z	
+J1 VM définies	2026-10-29T17:04:07Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T17:04:19Z	
+J1 installation de k3s	2026-10-29T17:04:19Z	
+J1 server prêt	2026-10-29T17:04:33Z	
+VM, pool et réseau détruits	2026-10-29T17:05:42Z	
+J1 VM définies	2026-10-29T17:05:51Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T17:06:04Z	
+J1 installation de k3s	2026-10-29T17:06:04Z	
+J1 server prêt	2026-10-29T17:06:17Z	
+J1 trois nœuds prêts	2026-10-29T17:06:41Z	
+J2 pki	2026-10-29T17:06:41Z	
+J2 pki fait	2026-10-29T17:06:41Z	
+J2 zot	2026-10-29T17:06:41Z	
+J2 zot fait	2026-10-29T17:06:46Z	
+J2 registre	2026-10-29T17:06:46Z	
+J2 registre fait	2026-10-29T17:06:55Z	
+J2 containerd	2026-10-29T17:06:55Z	
+J2 containerd fait	2026-10-29T17:07:14Z	
+J2 forgejo	2026-10-29T17:07:14Z	
+J2 forgejo fait	2026-10-29T17:07:25Z	
+J2 depot	2026-10-29T17:07:25Z	
+VM, pool et réseau détruits	2026-10-29T17:07:51Z	
+J1 VM définies	2026-10-29T17:08:02Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T17:08:14Z	
+J1 installation de k3s	2026-10-29T17:08:14Z	
+J1 server prêt	2026-10-29T17:08:28Z	
+J1 trois nœuds prêts	2026-10-29T17:08:53Z	
+J2 pki	2026-10-29T17:08:53Z	
+J2 pki fait	2026-10-29T17:08:53Z	
+J2 zot	2026-10-29T17:08:53Z	
+J2 zot fait	2026-10-29T17:08:58Z	
+J2 registre	2026-10-29T17:08:58Z	
+J2 registre fait	2026-10-29T17:09:06Z	
+J2 containerd	2026-10-29T17:09:06Z	
+J2 containerd fait	2026-10-29T17:09:24Z	
+J2 forgejo	2026-10-29T17:09:24Z	
+J2 forgejo fait	2026-10-29T17:09:35Z	
+J2 depot	2026-10-29T17:09:35Z	
+J2 depot fait	2026-10-29T17:09:39Z	
