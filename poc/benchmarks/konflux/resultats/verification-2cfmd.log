@@ -1,0 +1,33 @@
+# verifier.sh sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819, 2026-10-29T12:30:03Z, cosign v3.0.6 (nixpkgs), ec v0.10.42
+OK   signature cosign (clé de Chains) : cosign container image signature, 1 signature(s)
+OK   attestation cosign (clé de Chains) vérifiée
+provenance : https://slsa.dev/provenance/v0.2, builder https://tekton.dev/chains/v2, buildType tekton.dev/v1/PipelineRun
+  sujets : registry-service.kind-registry/default-tenant/sample-app@3aa51998d84c
+  matériaux : 27 (build-trusted-artifacts, clamav-db, hermeto, konflux-build-cli, konflux-test, mobster, oras, sample-app.git, task-build-image-index-min, task-buildah-oci-ta-min, task-clamav-scan-min, task-deprecated-)
+  paramètres : hermetic=true, source-date-epoch=0
+transparence : false ; référents OCI : 3 tag(s) .sig/.att
+Conforma (image) : code 1, succès=false, violations 12, avertissements 2
+      1      violation : base_image_registries.base_image_info_found : Base images information is missing
+      1      violation : cve.cve_blockers : Found "CVE-2025-69720" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-0861" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-102010" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-103111" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-54369" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-86145" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-86805" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-89161" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-95619" vulnerability of high security level
+      1      violation : cve.cve_blockers : Found "CVE-2026-95818" vulnerability of high security level
+      1      violation : slsa_source_correlated.source_code_reference_provided : Expected source code reference was not provided for verification
+OK   T7 t7a : cosign verify refuse (error during command execution: no signatures found)
+Conforma (t7a) : code 1, succès=false, violations 2, avertissements 0
+      1      violation : builtin.attestation.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matc
+      1      violation : builtin.image.signature_check : Image signature check failed: no signatures found
+OK   T7 t7a : Conforma refuse l'image
+OK   T7 t7b : cosign verify refuse (error during command execution: no signatures found)
+Conforma (t7b) : code 1, succès=false, violations 4, avertissements 2
+      1      violation : base_image_registries.base_image_info_found : Base images information is missing
+      1      violation : builtin.image.signature_check : Image signature check failed: no signatures found
+      1      violation : cve.cve_results_found : CVE scan results were not found
+      1      violation : slsa_source_correlated.source_code_reference_provided : Expected source code reference was not provided for verification
+OK   T7 t7b : Conforma refuse l'image

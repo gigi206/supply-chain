@@ -141,3 +141,8 @@ spec:
       dockerfileUrl: Containerfile
       context: ./
 EOF
+# Secret de push du registre interne (Zot authentifié) relié au compte de build : étape de la
+# doc Konflux « Build pipeline push secret » ; l'image-controller (Quay) n'est pas déployé.
+for _ in $(seq 1 30); do kubectl get sa -n "$TENANT" build-pipeline-sample-app >/dev/null 2>&1 && break; sleep 2; done
+kubectl patch -n "$TENANT" serviceaccount build-pipeline-sample-app -p '{"secrets": [{"name": "regcred-internal-registry"}]}' >/dev/null
+ok "secret de push regcred-internal-registry relié à build-pipeline-sample-app"

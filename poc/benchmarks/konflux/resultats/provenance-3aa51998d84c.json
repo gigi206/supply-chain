@@ -1,0 +1,2072 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [
+    {
+      "name": "registry-service.kind-registry/default-tenant/sample-app",
+      "digest": {
+        "sha256": "3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "predicate": {
+    "buildConfig": {
+      "tasks": [
+        {
+          "finishedOn": "2026-10-29T12:17:15Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "421003a5c077ecb820460e71637125ec9093d2101c749a32ede28e190283e9db"
+              },
+              "entryPoint": "init",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-init"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/c3323a50-2aa8-4fea-84f0-aa00201c7e3c",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "init",
+                "tekton.dev/task": "init",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "enable-cache-proxy": "false"
+            }
+          },
+          "name": "init",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "init"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-init:0.4.2@sha256:421003a5c077ecb820460e71637125ec9093d2101c749a32ede28e190283e9db"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "http-proxy",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "no-proxy",
+              "type": "string",
+              "value": ""
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:17:11Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": [
+                "--enable",
+                "false"
+              ],
+              "entryPoint": "konflux-build-cli config cache-proxy",
+              "environment": {
+                "container": "init",
+                "image": "oci://quay.io/konflux-ci/konflux-build-cli@sha256:b296232c9b0d478c0bd1f48911ead97cd786eebdc737b877797564567fda8eae"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "init"
+          ],
+          "finishedOn": "2026-10-29T12:17:26Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "f90deac0d63b43c7cb3f0b2d83ee56aa7fa18bb493f084286c6a953bbf479d8d"
+              },
+              "entryPoint": "git-clone-oci-ta-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/fb7de5a0-bc03-4e31-b8e8-1d4a1d49a43d",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/categories": "Git",
+                "tekton.dev/displayName": "git clone oci trusted artifacts",
+                "tekton.dev/pipelines.minVersion": "0.21.0",
+                "tekton.dev/platforms": "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64",
+                "tekton.dev/tags": "git",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "clone-repository",
+                "tekton.dev/task": "git-clone-oci-ta-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca",
+              "depth": "1",
+              "enableSymlinkCheck": "true",
+              "fetchTags": "false",
+              "httpProxy": "",
+              "httpsProxy": "",
+              "logLevel": "info",
+              "mergeSourceDepth": "",
+              "mergeSourceRepoUrl": "",
+              "mergeTargetBranch": "false",
+              "noProxy": "",
+              "ociArtifactExpiresAfter": "5d",
+              "ociStorage": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38.git",
+              "refspec": "",
+              "revision": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "shortCommitLength": "7",
+              "sparseCheckoutDirectories": "",
+              "sslVerify": "true",
+              "submodulePaths": "",
+              "submodules": "true",
+              "symlinkCheckIgnorePattern": "",
+              "targetBranch": "main",
+              "url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app"
+            }
+          },
+          "name": "clone-repository",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "git-clone-oci-ta-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta-min:0.2.4@sha256:f90deac0d63b43c7cb3f0b2d83ee56aa7fa18bb493f084286c6a953bbf479d8d"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "CHAINS-GIT_COMMIT",
+              "type": "string",
+              "value": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            },
+            {
+              "name": "CHAINS-GIT_URL",
+              "type": "string",
+              "value": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app"
+            },
+            {
+              "name": "commit",
+              "type": "string",
+              "value": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            },
+            {
+              "name": "commit-timestamp",
+              "type": "string",
+              "value": "1793275133"
+            },
+            {
+              "name": "short-commit",
+              "type": "string",
+              "value": "ad8ccc3"
+            },
+            {
+              "name": "url",
+              "type": "string",
+              "value": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app"
+            },
+            {
+              "name": "SOURCE_ARTIFACT",
+              "type": "string",
+              "value": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:41c4bffb1b74e0768b60ea7710ae74f6049a356ad83bda159ef9c842f9184aa3"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:17:16Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -euo pipefail\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf \"$ca_bundle\" /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\ntest -z \"${PARAM_HTTP_PROXY}\" || export HTTP_PROXY=\"${PARAM_HTTP_PROXY}\"\ntest -z \"${PARAM_HTTPS_PROXY}\" || export HTTPS_PROXY=\"${PARAM_HTTPS_PROXY}\"\ntest -z \"${PARAM_NO_PROXY}\" || export NO_PROXY=\"${PARAM_NO_PROXY}\"\n\nRESULT_FILE=\"$(mktemp)\"\nkonflux-build-cli git-clone >\"${RESULT_FILE}\"\n\nprintf \"%s\" \"$(jq -r '.commit' \"${RESULT_FILE}\")\" >\"/tekton/results/commit\"\nprintf \"%s\" \"$(jq -r '.shortCommit' \"${RESULT_FILE}\")\" >\"/tekton/results/short-commit\"\nprintf \"%s\" \"$(jq -r '.url' \"${RESULT_FILE}\")\" >\"/tekton/results/url\"\nprintf \"%s\" \"$(jq -r '.commitTimestamp' \"${RESULT_FILE}\")\" >\"/tekton/results/commit-timestamp\"\nprintf \"%s\" \"$(jq -r '.\"CHAINS-GIT_URL\"' \"${RESULT_FILE}\")\" >\"/tekton/results/CHAINS-GIT_URL\"\nprintf \"%s\" \"$(jq -r '.\"CHAINS-GIT_COMMIT\"' \"${RESULT_FILE}\")\" >\"/tekton/results/CHAINS-GIT_COMMIT\"\n\nMERGED_SHA=$(jq -r '.mergedSha // empty' \"${RESULT_FILE}\")\nif [ -n \"${MERGED_SHA}\" ]; then\n  printf \"%s\" \"${MERGED_SHA}\" >\"/tekton/results/merged_sha\"\nfi\n",
+              "environment": {
+                "container": "clone",
+                "image": "oci://quay.io/konflux-ci/konflux-build-cli@sha256:fddbb4c2edb01a3f0065321f84cf2e4d8e483b4149e3d6f78dd0c46e85e35aef"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": [
+                "create",
+                "--store",
+                "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38.git",
+                "/tekton/results/SOURCE_ARTIFACT=/var/workdir/source"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "create-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:7c51a3530f239323442e28ea7dace8b88a14638d823d5eaa8514843c33b03c02"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "clone-repository"
+          ],
+          "finishedOn": "2026-10-29T12:19:54Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "d1bf4160ad55028365a84e613811790d6839ffa734bc4a352d6a7ab9e3febb8f"
+              },
+              "entryPoint": "prefetch-dependencies-oci-ta-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/4f13238d-598a-4e24-a405-e3469167a863",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "image-build, konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "prefetch-dependencies",
+                "tekton.dev/task": "prefetch-dependencies-oci-ta-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ACTIVATION_KEY": "activation-key",
+              "SERVICE_CA_TRUST_CONFIG_MAP_KEY": "service-ca.crt",
+              "SERVICE_CA_TRUST_CONFIG_MAP_NAME": "openshift-service-ca.crt",
+              "SOURCE_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:41c4bffb1b74e0768b60ea7710ae74f6049a356ad83bda159ef9c842f9184aa3",
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca",
+              "config-file-content": "",
+              "enable-package-registry-proxy": "true",
+              "input": "[{\"type\": \"gomod\", \"path\": \".\"}, {\"type\": \"npm\", \"path\": \"web\"}]",
+              "log-level": "debug",
+              "mode": "strict",
+              "ociArtifactExpiresAfter": "5d",
+              "ociStorage": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38.prefetch",
+              "pip-index-url": "",
+              "sbom-type": "spdx"
+            }
+          },
+          "name": "prefetch-dependencies",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "prefetch-dependencies-oci-ta-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta-min:0.10.1@sha256:d1bf4160ad55028365a84e613811790d6839ffa734bc4a352d6a7ab9e3febb8f"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "CACHI2_ARTIFACT",
+              "type": "string",
+              "value": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb"
+            },
+            {
+              "name": "SOURCE_ARTIFACT",
+              "type": "string",
+              "value": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:17:26Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\n\necho -n \"${SOURCE_ARTIFACT}\" >\"/tekton/results/SOURCE_ARTIFACT\"\necho -n \"\" >\"/tekton/results/CACHI2_ARTIFACT\"\n",
+              "environment": {
+                "container": "skip-ta",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:4b01fbf98fa7155f5c21443c285f88853864ae7cc66981cf6b543fc6ba16b81b"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": [
+                "use",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:41c4bffb1b74e0768b60ea7710ae74f6049a356ad83bda159ef9c842f9184aa3=/var/workdir/source"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "use-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:a61ef5dfee9a8720f7bc2d1d52001057ca6a22d2ddbae0db175b11d9ab95105a"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\n\nif [ -n \"${WORKSPACE_NETRC_PATH}\" ]; then\n  export NETRC=\"${WORKSPACE_NETRC_PATH}/.netrc\"\nfi\n\nCA_BUNDLE_PATH=/mnt/trusted-ca/ca-bundle.crt\nSERVICE_CA_BUNDLE_PATH=/mnt/service-ca/ca-bundle.crt\nUPDATE_CA_TRUST=false\n\nif [ -f \"$CA_BUNDLE_PATH\" ]; then\n  echo \"Using mounted CA bundle: $CA_BUNDLE_PATH\"\n  cp -vf \"$CA_BUNDLE_PATH\" /etc/pki/ca-trust/source/anchors/ca-bundle.crt\n  UPDATE_CA_TRUST=true\nfi\n\nif [ -f \"$SERVICE_CA_BUNDLE_PATH\" ]; then\n  echo \"Using mounted service CA bundle: $SERVICE_CA_BUNDLE_PATH\"\n  cp -vf \"$SERVICE_CA_BUNDLE_PATH\" /etc/pki/ca-trust/source/anchors/service-ca.crt\n  UPDATE_CA_TRUST=true\nfi\n\nif [ \"$UPDATE_CA_TRUST\" = \"true\" ]; then\n  update-ca-trust\n  # requests ignores the system CA store. Set REQUESTS_CA_BUNDLE explicitly.\n  export REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem\nfi\n\nif [ -e /activation-key/org ] && [ -e /activation-key/activationkey ]; then\n  export KBC_PD_RHSM_ORG=/activation-key/org\n  export KBC_PD_RHSM_ACTIVATION_KEY=/activation-key/activationkey\nfi\n\nif [ -n \"${CONFIG_FILE_CONTENT}\" ]; then\n  echo \"${CONFIG_FILE_CONTENT}\" >/mnt/config/config.yaml\n  export KBC_PD_CONFIG_FILE=/mnt/config/config.yaml\nfi\n\nif [ -z \"${PIP_INDEX_URL}\" ]; then\n  unset PIP_INDEX_URL\nfi\n\nkonflux-build-cli prefetch-dependencies\n",
+              "environment": {
+                "container": "prefetch-dependencies",
+                "image": "oci://quay.io/konflux-ci/hermeto@sha256:43596c6351cdf7188b09fd4dcf5c6b3bb8b57ea557e84a1aa624f60e74c624ce"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": [
+                "create",
+                "--store",
+                "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38.prefetch",
+                "/tekton/results/SOURCE_ARTIFACT=/var/workdir/source",
+                "/tekton/results/CACHI2_ARTIFACT=/var/workdir/cachi2"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "create-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:a61ef5dfee9a8720f7bc2d1d52001057ca6a22d2ddbae0db175b11d9ab95105a"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "prefetch-dependencies",
+            "clone-repository",
+            "init"
+          ],
+          "finishedOn": "2026-10-29T12:24:41Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "de644e1dee81463bd47e4e5a33688d4ef40cd963f0a17fccc9cf11ca92eea471"
+              },
+              "entryPoint": "buildah-oci-ta-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/e21b11a3-d964-43ea-b001-12c5c726bb2d",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "image-build, konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "build.appstudio.redhat.com/build_type": "docker",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "build-container",
+                "tekton.dev/task": "buildah-oci-ta-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ACTIVATION_KEY": "activation-key",
+              "ADDITIONAL_BASE_IMAGES": [],
+              "ADDITIONAL_SECRET": "does-not-exist",
+              "ADD_CAPABILITIES": "",
+              "ALLOW_CROSS_PLATFORM_IMAGES": "false",
+              "ANNOTATIONS": [],
+              "ANNOTATIONS_FILE": "",
+              "BUILDAH_FORMAT": "docker",
+              "BUILD_ARGS": [],
+              "BUILD_ARGS_FILE": "",
+              "BUILD_TIMESTAMP": "",
+              "CACHI2_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb",
+              "COMMIT_SHA": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "CONTEXT": ".",
+              "CONTEXTUALIZE_SBOM": "true",
+              "DOCKERFILE": "Containerfile",
+              "ENTITLEMENT_SECRET": "etc-pki-entitlement",
+              "ENV_VARS": [],
+              "HERMETIC": "true",
+              "HTTP_PROXY": "",
+              "ICM_KEEP_COMPAT_LOCATION": "true",
+              "IMAGE": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "IMAGE_EXPIRES_AFTER": "5d",
+              "INHERIT_BASE_IMAGE_LABELS": "true",
+              "LABELS": [],
+              "LOG_LEVEL": "info",
+              "NO_PROXY": "",
+              "OMIT_HISTORY": "false",
+              "PREFETCH_INPUT": "[{\"type\": \"gomod\", \"path\": \".\"}, {\"type\": \"npm\", \"path\": \"web\"}]",
+              "PRIVILEGED_NESTED": "false",
+              "PROXY_CA_TRUST_CONFIG_MAP_KEY": "ca-bundle.crt",
+              "PROXY_CA_TRUST_CONFIG_MAP_NAME": "caching-ca-bundle",
+              "REWRITE_TIMESTAMP": "true",
+              "RHSM_MOUNT_CA_CERTS": "auto",
+              "SBOM_SKIP_VALIDATION": "true",
+              "SBOM_SOURCE_SCAN_ENABLED": "true",
+              "SBOM_SYFT_SELECT_CATALOGERS": "",
+              "SBOM_TYPE": "spdx",
+              "SKIP_INJECTIONS": "false",
+              "SKIP_SBOM_GENERATION": "false",
+              "SKIP_UNUSED_STAGES": "true",
+              "SOURCE_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388",
+              "SOURCE_DATE_EPOCH": "0",
+              "SOURCE_URL": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+              "SQUASH": "false",
+              "STORAGE_DRIVER": "overlay",
+              "TARGET_STAGE": "",
+              "TLSVERIFY": "true",
+              "WORKINGDIR_MOUNT": "",
+              "YUM_REPOS_D_FETCHED": "fetched.repos.d",
+              "YUM_REPOS_D_SRC": "repos.d",
+              "YUM_REPOS_D_TARGET": "/etc/yum.repos.d",
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca"
+            }
+          },
+          "name": "build-container",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "buildah-oci-ta-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta-min:0.10.5@sha256:de644e1dee81463bd47e4e5a33688d4ef40cd963f0a17fccc9cf11ca92eea471"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGE_DIGEST",
+              "type": "string",
+              "value": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+            },
+            {
+              "name": "IMAGE_REF",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38@sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+            },
+            {
+              "name": "IMAGE_URL",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            },
+            {
+              "name": "SBOM_BLOB_URL",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app@sha256:a58c792de97c514435bd948c9865c79305406d5361d348199bfc2c0c4af887fa"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:19:55Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": [
+                "use",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388=/var/workdir/source",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb=/var/workdir/cachi2"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "use-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:7c51a3530f239323442e28ea7dace8b88a14638d823d5eaa8514843c33b03c02"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": [
+                "--build-args",
+                "--envs",
+                "--labels",
+                "--annotations"
+              ],
+              "entryPoint": "#!/bin/bash\nset -euo pipefail\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nproxy_ca_bundle=/mnt/proxy-ca-bundle/ca-bundle.crt\nupdate_ca_trust=false\n\nif [ -f \"$ca_bundle\" ]; then\n  echo \"[$(date --utc -Ins)] Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors/ca-bundle.crt\n  update_ca_trust=true\nfi\n\nif [ -f \"$proxy_ca_bundle\" ] && [ -n \"${BUILDAH_HTTP_PROXY}\" ]; then\n  echo \"[$(date --utc -Ins)] Using mounted proxy CA bundle: $proxy_ca_bundle\"\n  cp -vf $proxy_ca_bundle /etc/pki/ca-trust/source/anchors/proxy-ca-bundle.crt\n  update_ca_trust=true\nfi\n\nif [ \"$update_ca_trust\" = \"true\" ]; then\n  echo \"[$(date --utc -Ins)] Update CA trust\"\n  update-ca-trust\nfi\n\necho \"[$(date --utc -Ins)] Prepare system (architecture: $(uname -m))\"\n\n# Fixing group permission on /var/lib/containers\nchown root:root /var/lib/containers\n\nsed -i 's/^\\s*short-name-mode\\s*=\\s*.*/short-name-mode = \"disabled\"/' /etc/containers/registries.conf\n\n# Delete policy settings for Red Hat registries to disable signature verification.\n# TODO: don't do this?\ncontainer_policy=$(\n  jq '.transports |= (\n        del(.docker.[\"registry.access.redhat.com\"]) |\n        del(.docker.[\"registry.redhat.io\"]) |\n        if (.docker == {}) then del(.docker) else . end\n      )' /etc/containers/policy.json\n)\necho \"Effective container policy:\"\nprintf '%s\\n' \"$container_policy\" | tee /etc/containers/policy.json\n\n# Setting new namespace to run buildah - 2^32-2\necho 'root:1:4294967294' | tee -a /etc/subuid >>/etc/subgid\n\necho \"[$(date --utc -Ins)] Run the build\"\n\nif [ -e \"$SOURCE_CODE_DIR/$CONTEXT/$DOCKERFILE\" ]; then\n  dockerfile_path=\"$(pwd)/$SOURCE_CODE_DIR/$CONTEXT/$DOCKERFILE\"\nelif [ -e \"$SOURCE_CODE_DIR/$DOCKERFILE\" ]; then\n  dockerfile_path=\"$(pwd)/$SOURCE_CODE_DIR/$DOCKERFILE\"\nelse\n  echo \"Cannot find Dockerfile $DOCKERFILE\"\n  exit 1\nfi\n\nif [ -n \"${ANNOTATIONS_FILE}\" ] && [ -f \"${SOURCE_CODE_DIR}/${ANNOTATIONS_FILE}\" ]; then\n  ANNOTATIONS_FILE=$(realpath \"${SOURCE_CODE_DIR}/${ANNOTATIONS_FILE}\")\nfi\n\nif [ -n \"${BUILD_ARGS_FILE}\" ]; then\n  BUILD_ARGS_FILE=$(realpath \"${SOURCE_CODE_DIR}/${BUILD_ARGS_FILE}\")\nfi\n\n# Necessary for newer version of buildah if the host system does not contain up to date version of container-selinux\n# TODO remove the option once all hosts were updated\nsecurity_args=(--security-opts unmask=/proc/interrupts)\n\nif [ \"${PRIVILEGED_NESTED}\" == \"true\" ]; then\n  security_args+=(--security-opts label=disable)\n  security_args+=(--cap-add all)\n  security_args+=(--devices /dev/fuse)\nfi\nif [ -n \"${ADD_CAPABILITIES}\" ]; then\n  security_args+=(--cap-add \"${ADD_CAPABILITIES}\")\nfi\n\nif [ -f \"/var/workdir/cachi2/cachi2.env\" ]; then\n  prefetch_dir=\"/var/workdir/cachi2\"\n  # KBC defaults to ${prefetch_dir}/copy-*\n  # Copy to a sibling dir instead in case we don't have write permissions to the prefetch_dir.\n  # It's still on the same filesystem, so copying via reflinks should be possible.\n  prefetch_dir_copy=\"/var/workdir/prefetch-copy\"\nelse\n  prefetch_dir=\"\"\n  prefetch_dir_copy=\"\"\nfi\n\nyum_repos_d_sources=()\nif [ -d \"${YUM_REPOS_D_FETCHED}\" ]; then\n  yum_repos_d_sources+=(\"${YUM_REPOS_D_FETCHED}\")\nfi\nif [ -d \"${SOURCE_CODE_DIR}/${YUM_REPOS_D_SRC}\" ]; then\n  yum_repos_d_sources+=(\"${SOURCE_CODE_DIR}/${YUM_REPOS_D_SRC}\")\nfi\n\n# 0. if hermetic=true, skip all subscription related stuff\n# 1. do not enable activation key and entitlement at same time. If both are provided, prefer activation key.\n# 2. Activation-keys will be used when the key 'org' exists in the activation key secret.\n# 3. try to pre-register and mount files to the correct location so that users do no need to modify Dockerfiles.\n# 4. If the Dockerfile contains the string \"subcription-manager register\", add the activation-keys volume\n#    to buildah but don't pre-register for backwards compatibility. Mount an empty directory on\n#    to \"/etc/pki/entitlement\" to prevent certificates from being included\nrhsm_args=()\nif [ \"${HERMETIC}\" != \"true\" ]; then\n  if [ -e /activation-key/org ]; then\n    rhsm_args+=(--rhsm-activation-key=/activation-key/activationkey\n      --rhsm-org=/activation-key/org\n      --rhsm-activation-mount=/activation-key)\n\n    if ! grep -E \"^[^#]*subscription-manager.[^#]*register\" \"$dockerfile_path\"; then\n      # user is not running registration in the Containerfile: pre-register.\n      rhsm_args+=(--rhsm-activation-preregister)\n    fi\n  elif find /entitlement -name \"*.pem\" >/dev/null; then\n    rhsm_args+=(--rhsm-entitlements=/entitlement)\n  fi\nfi\nif [ \"${RHSM_MOUNT_CA_CERTS}\" != \"auto\" ]; then\n  rhsm_args+=(--rhsm-mount-ca-certs=\"$RHSM_MOUNT_CA_CERTS\")\nfi\n\n# Prevent ShellCheck from giving a warning because 'image' is defined and 'IMAGE' is not.\ndeclare IMAGE\n\ncmd=(\n  konflux-build-cli image build\n  -f \"$dockerfile_path\" -t \"$IMAGE\" --source \"$SOURCE_CODE_DIR\" --context \"$CONTEXT\"\n  --secret-dirs \"src=/additional-secret,name=$ADDITIONAL_SECRET,optional=true\"\n  --workdir-mount \"$WORKINGDIR_MOUNT\"\n  --target \"$TARGET_STAGE\"\n  --inherit-labels=\"$INHERIT_BASE_IMAGE_LABELS\"\n  --source-date-epoch \"$BUILDAH_SOURCE_DATE_EPOCH\"\n  --rewrite-timestamp=\"$BUILDAH_REWRITE_TIMESTAMP\"\n  --squash=\"$SQUASH\"\n  --omit-history=\"$BUILDAH_OMIT_HISTORY\"\n  --image-source \"$SOURCE_URL\"\n  --image-revision \"$COMMIT_SHA\"\n  --quay-image-expires-after \"$IMAGE_EXPIRES_AFTER\"\n  --build-args-file \"$BUILD_ARGS_FILE\"\n  --annotations-file \"$ANNOTATIONS_FILE\"\n  --legacy-build-timestamp \"$BUILD_TIMESTAMP\"\n  --add-legacy-labels\n  --include-legacy-buildinfo-path=\"$ICM_KEEP_COMPAT_LOCATION\"\n  --skip-injections=\"$SKIP_INJECTIONS\"\n  --skip-unused-stages=\"$SKIP_UNUSED_STAGES\"\n  --hermetic=\"$HERMETIC\"\n  --image-pull-proxy \"$BUILDAH_HTTP_PROXY\"\n  --image-pull-noproxy \"$BUILDAH_NO_PROXY\"\n  --yum-repos-d-sources \"${yum_repos_d_sources[@]}\"\n  --yum-repos-d-target \"$YUM_REPOS_D_TARGET\"\n  --prefetch-dir \"$prefetch_dir\"\n  --prefetch-dir-copy \"$prefetch_dir_copy\"\n  --prefetch-env-mount /cachi2/cachi2.env\n  --prefetch-output-mount /cachi2/output\n  \"${security_args[@]}\"\n  \"${rhsm_args[@]}\"\n  --containerfile-json-output /shared/parsed_dockerfile.json\n  --resolved-base-images-output /shared/base_images_digests\n  --no-cache\n  --ulimits nofile=4096:4096\n  --src-tls-verify=\"$TLSVERIFY\"\n  --dest-tls-verify=\"$TLSVERIFY\"\n  --allow-cross-platform-images=\"$ALLOW_CROSS_PLATFORM_IMAGES\"\n  \"$@\" # --annotations, --labels, --envs, --build-args\n)\n\necho \"[$(date --utc -Ins)] $(printf '%q ' \"${cmd[@]}\")\"\n\n\"${cmd[@]}\"\n\necho \"[$(date --utc -Ins)] Add metadata\"\n\n# Save the SBOM produced in prefetch so it can be merged into the final SBOM later\nif [ -f \"${prefetch_dir}/output/bom.json\" ]; then\n  echo \"Making copy of sbom-prefetch.json\"\n  cp \"${prefetch_dir}/output/bom.json\" ./sbom-prefetch.json\nfi\n\nimage_name=$(echo \"${IMAGE##*/}\" | tr ':' '-')\nbuildah push \"$IMAGE\" oci:\"/shared/$image_name.oci:$IMAGE\"\necho \"/shared/$image_name.oci\" >/shared/container_path\n\necho \"[$(date --utc -Ins)] End build\"\n",
+              "environment": {
+                "container": "build",
+                "image": "oci://quay.io/konflux-ci/konflux-build-cli@sha256:0415613f955ef8f7c6fc821a6738dcf062d9a3582441042b87a2391c375d7f54"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -euo pipefail\n\necho \"[$(date --utc -Ins)] Update CA trust\"\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\necho \"[$(date --utc -Ins)] Convert image\"\n\n# While we can build images with the desired format, we will simplify any local\n# and remote build differences by just performing any necessary conversions at\n# push time.\npush_format=oci\nif [ \"${BUILDAH_FORMAT}\" == \"docker\" ]; then\n  push_format=docker\nfi\n\necho \"[$(date --utc -Ins)] Push image with unique tag\"\n\nbuildah_retries=3\n\n# Push to a unique tag based on the TaskRun name to avoid race conditions\necho \"Pushing to ${IMAGE%:*}:${TASKRUN_NAME}\"\nif ! retry buildah push \\\n  --format=\"$push_format\" \\\n  --retry \"$buildah_retries\" \\\n  --tls-verify=\"$TLSVERIFY\" \\\n  \"$IMAGE\" \\\n  \"docker://${IMAGE%:*}:${TASKRUN_NAME}\"; then\n  echo \"Failed to push image to ${IMAGE%:*}:${TASKRUN_NAME}\"\n  exit 1\nfi\n\necho \"[$(date --utc -Ins)] Push image with git revision\"\n\n# Push to a tag based on the git revision\necho \"Pushing to ${IMAGE}\"\nif ! retry buildah push \\\n  --format=\"$push_format\" \\\n  --retry \"$buildah_retries\" \\\n  --tls-verify=\"$TLSVERIFY\" \\\n  --digestfile \"/var/workdir/image-digest\" \"$IMAGE\" \\\n  \"docker://$IMAGE\"; then\n  echo \"Failed to push image to $IMAGE\"\n  exit 1\nfi\n\ntee \"/tekton/results/IMAGE_DIGEST\" <\"/var/workdir\"/image-digest\necho -n \"$IMAGE\" | tee \"/tekton/results/IMAGE_URL\"\n{\n  echo -n \"${IMAGE}@\"\n  cat \"/var/workdir/image-digest\"\n} >\"/tekton/results/IMAGE_REF\"\necho\n\n# detect if keyless signing is required\nSIGNING_CONFIG='{}'\nKFLX_CONFIG_PATH='/tmp/konflux_config.json'\nif ! RETRY_STOP_IF_STDERR_MATCHES='configmaps \"cluster-config\" not found' retry kubectl get configmap cluster-config -n konflux-info -o json >\"${KFLX_CONFIG_PATH}\"; then\n  echo \"Failed to fetch konflux cluster-config, default values will be used\" >&2\nelse\n  SIGNING_CONFIG=\"$(cat ${KFLX_CONFIG_PATH})\"\nfi\n\n# configmap key -> variable name mapping\ndeclare -A SIGNING_KEY_MAP=(\n   [defaultOIDCIssuer]=SIGSTORE_OIDC_ISSUER\n   [rekorInternalUrl]=REKOR_URL\n   [fulcioInternalUrl]=SIGSTORE_FULCIO_URL\n   [tufInternalUrl]=TUF_URL\n)\n\n# fallback keys when internal URL is not available\ndeclare -A SIGNING_FALLBACK_MAP=(\n   [rekorInternalUrl]=rekorExternalUrl\n   [fulcioInternalUrl]=fulcioExternalUrl\n   [tufInternalUrl]=tufExternalUrl\n)\n\nmissing=\"\"\nconfigured=0\nfor key in \"${!SIGNING_KEY_MAP[@]}\"; do\n  val=$(echo \"${SIGNING_CONFIG}\" | jq -r \".data.${key} // empty\")\n  if [ -z \"${val}\" ] && [ -n \"${SIGNING_FALLBACK_MAP[$key]+x}\" ]; then\n    fallback_key=\"${SIGNING_FALLBACK_MAP[$key]}\"\n    val=$(echo \"${SIGNING_CONFIG}\" | jq -r \".data.${fallback_key} // empty\")\n    if [ -n \"${val}\" ]; then\n      echo \"Using fallback ${fallback_key} instead of ${key}\"\n    fi\n  fi\n  if [ -z \"${val}\" ]; then\n    missing=\"${missing:+${missing}, }${key}\"\n  else\n    declare \"${SIGNING_KEY_MAP[$key]}=${val}\"\n    configured=$((configured + 1))\n  fi\ndone\n\nif [ \"${configured}\" -eq \"${#SIGNING_KEY_MAP[@]}\" ]; then\n  echo \"Keyless signing is enabled\"\n\n  # Save signing config for upload-sbom step\n  for key in \"${!SIGNING_KEY_MAP[@]}\"; do\n    envvar=\"${SIGNING_KEY_MAP[$key]}\"\n    printf '%s=%q\\n' \"${envvar}\" \"${!envvar}\"\n  done >/shared/signing-config.env\n\n  echo \"Using Rekor URL: ${REKOR_URL}\"\n  echo \"Using Fulcio URL: ${SIGSTORE_FULCIO_URL}\"\n  echo \"Using OIDC issuer: ${SIGSTORE_OIDC_ISSUER}\"\n\n  echo \"Initializing TUF root from ${TUF_URL}\"\n  if ! retry cosign initialize --root \"${TUF_URL}/root.json\" --mirror \"${TUF_URL}\"; then\n    echo \"Failed to initialize TUF root\" >&2\n    exit 1\n  fi\n\n  # env var consumed by cosign\n  SIGSTORE_ID_TOKEN=\"$(cat /var/run/sigstore/cosign/oidc-token)\"\n  export SIGSTORE_ID_TOKEN\n\n  IMAGE_REF=\"$(cat \"/tekton/results/IMAGE_REF\")\"\n\n  # Pre-select the correct credentials to work around cosign not supporting the containers-auth.json spec\n  mkdir -p /tmp/auth && select-oci-auth \"${IMAGE_REF}\" >/tmp/auth/config.json\n  export DOCKER_CONFIG=/tmp/auth\n\n  echo \"[$(date --utc -Ins)] Sign image\"\n  echo \"Signing image ${IMAGE_REF} using keyless signing\"\n  if ! retry cosign sign -y \\\n    --rekor-url=\"${REKOR_URL}\" \\\n    --fulcio-url=\"${SIGSTORE_FULCIO_URL}\" \\\n    --oidc-issuer=\"${SIGSTORE_OIDC_ISSUER}\" \\\n    \"${IMAGE_REF}\"; then\n    echo \"Failed to sign image\" >&2\n    exit 1\n  fi\nelif [ \"${configured}\" -eq 0 ]; then\n  echo \"Keyless signing is disabled (none of ${missing} are configured in the konflux-info/cluster-config configmap)\"\nelse\n  echo \"ERROR: Incomplete keyless signing configuration in konflux-info/cluster-config configmap. Missing: ${missing}\" >&2\n  exit 1\nfi\n\necho \"[$(date --utc -Ins)] End push\"\n",
+              "environment": {
+                "container": "push",
+                "image": "oci://quay.io/konflux-ci/konflux-build-cli@sha256:0415613f955ef8f7c6fc821a6738dcf062d9a3582441042b87a2391c375d7f54"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -euo pipefail\necho \"[$(date --utc -Ins)] Generate SBOM\"\n\nif [ \"${SKIP_SBOM_GENERATION}\" = \"true\" ]; then\n  echo \"Skipping SBOM generation\"\n  exit 0\nfi\n\ncase $SBOM_TYPE in\ncyclonedx)\n  syft_sbom_type=cyclonedx-json@1.5\n  ;;\nspdx)\n  syft_sbom_type=spdx-json@2.3\n  ;;\n*)\n  echo \"Invalid SBOM type: $SBOM_TYPE. Valid: cyclonedx, spdx\" >&2\n  exit 1\n  ;;\nesac\n\nOCI_DIR=\"$(cat /shared/container_path)\"\n\nsyft_oci_args=(\n  oci-dir:\"${OCI_DIR}\"\n  --output \"$syft_sbom_type=/var/workdir/sbom-image.json\"\n)\nsyft_source_args=(\n  dir:\"/var/workdir/$SOURCE_CODE_DIR/$CONTEXT\"\n  --output \"$syft_sbom_type=/var/workdir/sbom-source.json\"\n)\n\nif [ \"${SBOM_SYFT_SELECT_CATALOGERS}\" != \"\" ]; then\n  syft_oci_args+=(--select-catalogers \"${SBOM_SYFT_SELECT_CATALOGERS}\")\n  syft_source_args+=(--select-catalogers \"${SBOM_SYFT_SELECT_CATALOGERS}\")\nfi\n\necho \"Running syft on the image\"\nsyft \"${syft_oci_args[@]}\"\nif [[ \"${HERMETIC}\" == \"false\" && \"${SBOM_SOURCE_SCAN_ENABLED}\" == \"true\" ]]; then\n  echo \"Running syft on the source code\"\n  syft \"${syft_source_args[@]}\"\nelse\n  echo \"Skipping syft on source code.\"\nfi\n\necho \"[$(date --utc -Ins)] End sbom-syft-generate\"\n",
+              "environment": {
+                "container": "sbom-syft-generate",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:4b01fbf98fa7155f5c21443c285f88853864ae7cc66981cf6b543fc6ba16b81b"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": [
+                "--additional-base-images"
+              ],
+              "entryPoint": "#!/bin/bash\nset -euo pipefail\n\necho \"[$(date --utc -Ins)] Prepare SBOM\"\n\nif [ \"${SKIP_SBOM_GENERATION}\" = \"true\" ]; then\n  echo \"Skipping SBOM generation\"\n  exit 0\nfi\n\n# Convert Tekton array params into Mobster params\nADDITIONAL_BASE_IMAGES=()\nwhile [[ $# -gt 0 ]]; do\n  case $1 in\n  --additional-base-images)\n    shift\n    while [[ $# -gt 0 && $1 != --* ]]; do\n      ADDITIONAL_BASE_IMAGES+=(\"$1\")\n      shift\n    done\n    ;;\n  *)\n    echo \"unexpected argument: $1\" >&2\n    exit 2\n    ;;\n  esac\ndone\n\nIMAGE_URL=\"$(cat \"/tekton/results/IMAGE_URL\")\"\nIMAGE_DIGEST=\"$(cat \"/tekton/results/IMAGE_DIGEST\")\"\n\necho \"[$(date --utc -Ins)] Generate SBOM with mobster\"\n\nmobster_args=(\n  generate\n  --output sbom.json\n)\n\n# Validation is a flag for `generate`, not `oci-image`, so we need to\n# handle it before the oci-image arguments\nif [ \"${SBOM_SKIP_VALIDATION}\" == \"true\" ]; then\n  echo \"Skipping SBOM validation\"\n  mobster_args+=(--skip-validation)\nfi\n\nmobster_args+=(\n  oci-image\n  --from-syft \"/var/workdir/sbom-image.json\"\n  --image-pullspec \"$IMAGE_URL\"\n  --image-digest \"$IMAGE_DIGEST\"\n  --parsed-dockerfile-path \"/shared/parsed_dockerfile.json\"\n  --base-image-digest-file \"/shared/base_images_digests\"\n)\n\nif [ -f \"/var/workdir/sbom-source.json\" ]; then\n  mobster_args+=(--from-syft \"/var/workdir/sbom-source.json\")\nfi\n\nif [ -f \"/var/workdir/sbom-prefetch.json\" ]; then\n  mobster_args+=(--from-hermeto \"/var/workdir/sbom-prefetch.json\")\nfi\n\nif [ -n \"${TARGET_STAGE}\" ]; then\n  mobster_args+=(--dockerfile-target \"${TARGET_STAGE}\")\nfi\n\nfor ADDITIONAL_BASE_IMAGE in \"${ADDITIONAL_BASE_IMAGES[@]}\"; do\n  mobster_args+=(--additional-base-image \"$ADDITIONAL_BASE_IMAGE\")\ndone\n\nif [ \"${CONTEXTUALIZE_SBOM}\" == \"true\" ] && [ \"${HERMETIC}\" == \"false\" ]; then\n  mobster_args+=(--contextualize)\nfi\n\nif [ -f \"/shared/prefetch-arch\" ]; then\n  mobster_args+=(--arch \"$(cat /shared/prefetch-arch)\")\nfi\n\nmobster \"${mobster_args[@]}\"\n\necho \"[$(date --utc -Ins)] End prepare-sboms\"\n",
+              "environment": {
+                "container": "prepare-sboms",
+                "image": "oci://quay.io/konflux-ci/mobster@sha256:1374bc35c71781987cce00ef5efe2be42923f83def19b60a570e947189b90d15"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -euo pipefail\n\necho \"[$(date --utc -Ins)] Upload SBOM\"\n\nif [ \"${SKIP_SBOM_GENERATION}\" = \"true\" ]; then\n  echo \"Skipping SBOM generation\"\n  exit 0\nfi\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\n# Pre-select the correct credentials to work around cosign not supporting the containers-auth.json spec\nmkdir -p /tmp/auth && select-oci-auth \"$(cat \"/tekton/results/IMAGE_REF\")\" >/tmp/auth/config.json\nexport DOCKER_CONFIG=/tmp/auth\necho \"Pushing sbom to registry\"\nif ! retry cosign attach sbom --sbom sbom.json --type \"$SBOM_TYPE\" \"$(cat \"/tekton/results/IMAGE_REF\")\"; then\n  echo \"Failed to push sbom to registry\"\n  exit 1\nfi\n\n# Remove tag from IMAGE while allowing registry to contain a port number.\nsbom_repo=\"${IMAGE%:*}\"\nsbom_digest=\"$(sha256sum sbom.json | cut -d' ' -f1)\"\n# The SBOM_BLOB_URL is created by `cosign attach sbom`.\necho -n \"${sbom_repo}@sha256:${sbom_digest}\" | tee \"/tekton/results/SBOM_BLOB_URL\"\n\nif [ -f \"/shared/signing-config.env\" ]; then\n  # shellcheck source=/dev/null\n  source /shared/signing-config.env\n\n  echo \"Initializing TUF root from ${TUF_URL}\"\n  if ! retry cosign initialize --root \"${TUF_URL}/root.json\" --mirror \"${TUF_URL}\"; then\n    echo \"Failed to initialize TUF root\" >&2\n    exit 1\n  fi\n\n  # env var consumed by cosign\n  SIGSTORE_ID_TOKEN=\"$(cat /var/run/sigstore/cosign/oidc-token)\"\n  export SIGSTORE_ID_TOKEN\n\n  IMAGE_REF=\"$(cat \"/tekton/results/IMAGE_REF\")\"\n\n  ATT_SBOM_TYPE=\"${SBOM_TYPE}\"\n  if [ \"${ATT_SBOM_TYPE}\" = \"spdx\" ]; then\n    # for format cossistency with cyclonedx format, we want to use spdxjson instad of spdx\n    # spdx export data as rawstring, we want structured json as cyclonedx\n    ATT_SBOM_TYPE=\"spdxjson\"\n  fi\n\n  echo \"[$(date --utc -Ins)] Sign SBOM\"\n  echo \"Signing and attaching SBOM to ${IMAGE_REF} using keyless signing\"\n  if ! retry cosign attest -y --type \"${ATT_SBOM_TYPE}\" --predicate sbom.json \\\n    --rekor-url=\"${REKOR_URL}\" \\\n    --fulcio-url=\"${SIGSTORE_FULCIO_URL}\" \\\n    --oidc-issuer=\"${SIGSTORE_OIDC_ISSUER}\" \\\n    \"${IMAGE_REF}\"; then\n    echo \"Failed to sign SBOM\" >&2\n    exit 1\n  fi\nfi\n\necho\necho \"[$(date --utc -Ins)] End upload-sbom\"\n",
+              "environment": {
+                "container": "upload-sbom",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:4b01fbf98fa7155f5c21443c285f88853864ae7cc66981cf6b543fc6ba16b81b"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-container"
+          ],
+          "finishedOn": "2026-10-29T12:24:50Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "70679b88f57130e9a939a6765aacd976a9d66bfa5d1733fcee185dc07be39042"
+              },
+              "entryPoint": "build-image-index-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-build-image-index-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/d01e276f-91cf-4aac-a862-602b40c702e3",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "image-build, konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "build-image-index",
+                "tekton.dev/task": "build-image-index-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ALWAYS_BUILD_INDEX": "false",
+              "BUILDAH_FORMAT": "docker",
+              "IMAGE": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "IMAGES": [
+                "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38@sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+              ],
+              "SBOM_SKIP_VALIDATION": "false",
+              "STORAGE_DRIVER": "vfs",
+              "TLSVERIFY": "true",
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca"
+            }
+          },
+          "name": "build-image-index",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "build-image-index-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-build-image-index-min:0.3.1@sha256:70679b88f57130e9a939a6765aacd976a9d66bfa5d1733fcee185dc07be39042"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGES",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app@sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+            },
+            {
+              "name": "IMAGE_DIGEST",
+              "type": "string",
+              "value": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+            },
+            {
+              "name": "IMAGE_REF",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app@sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+            },
+            {
+              "name": "IMAGE_URL",
+              "type": "string",
+              "value": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:41Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": [
+                "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38@sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819"
+              ],
+              "entryPoint": "#!/bin/bash\n# Fixing group permission on /var/lib/containers\nset -eu\nset -o pipefail\nchown root:root /var/lib/containers\n\nsed -i 's/^\\s*short-name-mode\\s*=\\s*.*/short-name-mode = \"disabled\"/' /etc/containers/registries.conf\n\necho \"[$(date --utc -Ins)] Update CA trust\"\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\nMANIFEST_DATA_FILE=\"/index-build-data/manifest_data.json\"\n\necho \"Running konflux-build-cli\"\nif ! konflux-build-cli image build-image-index \\\n  --image \"$IMAGE\" \\\n  --tls-verify=\"$TLSVERIFY\" \\\n  --buildah-format \"$BUILDAH_FORMAT\" \\\n  --always-build-index=\"$ALWAYS_BUILD_INDEX\" \\\n  --additional-tags \"sample-app-on-pull-request-2cfmd-build-image-index\" \\\n  --output-manifest-path \"$MANIFEST_DATA_FILE\" \\\n  --result-path-image-digest \"/tekton/results/IMAGE_DIGEST\" \\\n  --result-path-image-url \"/tekton/results/IMAGE_URL\" \\\n  --result-path-image-ref \"/tekton/results/IMAGE_REF\" \\\n  --result-path-images \"/tekton/results/IMAGES\" \\\n  --images \"$@\"; then\n  echo \"Failed to build image index\"\n  exit 1\nfi\n",
+              "environment": {
+                "container": "build",
+                "image": "oci://quay.io/konflux-ci/konflux-build-cli@sha256:0415613f955ef8f7c6fc821a6738dcf062d9a3582441042b87a2391c375d7f54"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -e\n\nMANIFEST_DATA_FILE=\"/index-build-data/manifest_data.json\"\nif [ ! -f \"$MANIFEST_DATA_FILE\" ]; then\n  echo \"The manifest_data.json file does not exist. Skipping the SBOM creation...\"\n  exit 0\nfi\n\nIMAGE_URL=\"$(cat \"/tekton/results/IMAGE_URL\")\"\nIMAGE_DIGEST=\"$(cat \"/tekton/results/IMAGE_DIGEST\")\"\necho \"Creating SBOM result file...\"\nmobster_args=(generate --output /index-build-data/index.spdx.json)\n\nif [ \"${SBOM_SKIP_VALIDATION}\" == \"true\" ]; then\n  echo \"Skipping SBOM validation\"\n  mobster_args+=(--skip-validation)\nfi\n\nmobster_args+=(\n  oci-index\n  --index-image-pullspec \"$IMAGE_URL\"\n  --index-image-digest \"$IMAGE_DIGEST\"\n  --index-manifest-path \"$MANIFEST_DATA_FILE\"\n)\nmobster \"${mobster_args[@]}\"\n",
+              "environment": {
+                "container": "create-sbom",
+                "image": "oci://quay.io/konflux-ci/mobster@sha256:1374bc35c71781987cce00ef5efe2be42923f83def19b60a570e947189b90d15"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -e\n\necho \"[$(date --utc -Ins)] Update CA trust\"\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\nSBOM_RESULT_FILE=\"/index-build-data/index.spdx.json\"\nif [ ! -f \"$SBOM_RESULT_FILE\" ]; then\n  echo \"The index.spdx.json file does not exists. Skipping the SBOM upload...\"\n  exit 0\nfi\n\n# Pre-select the correct credentials to work around cosign not supporting the containers-auth.json spec\nmkdir -p /tmp/auth && select-oci-auth \"$(cat \"/tekton/results/IMAGE_REF\")\" > /tmp/auth/config.json\nexport DOCKER_CONFIG=/tmp/auth\n\necho \"Pushing sbom to registry\"\nif ! retry cosign attach sbom --sbom \"$SBOM_RESULT_FILE\" --type spdx \"$(cat \"/tekton/results/IMAGE_REF\")\"\nthen\n    echo \"Failed to push sbom to registry\"\n    exit 1\nfi\n\n# Remove tag from IMAGE while allowing registry to contain a port number.\nsbom_repo=\"${IMAGE%:*}\"\nsbom_digest=\"$(sha256sum \"$SBOM_RESULT_FILE\" | cut -d' ' -f1)\"\n# The SBOM_BLOB_URL is created by `cosign attach sbom`.\necho -n \"${sbom_repo}@sha256:${sbom_digest}\" | tee \"/tekton/results/SBOM_BLOB_URL\"\n",
+              "environment": {
+                "container": "upload-sbom",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:4b01fbf98fa7155f5c21443c285f88853864ae7cc66981cf6b543fc6ba16b81b"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index"
+          ],
+          "finishedOn": "2026-10-29T12:27:17Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "0ccc688a77e9b7b0b8973c132a1e840844137e77f887be4a0bec8893b0776872"
+              },
+              "entryPoint": "deprecated-image-check",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/e5567ca8-8d46-4709-9ab3-dc0f154c28df",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "deprecated-base-image-check",
+                "tekton.dev/task": "deprecated-image-check",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "BASE_IMAGES_DIGESTS": "",
+              "CA_TRUST_CONFIG_MAP_KEY": "ca-bundle.crt",
+              "CA_TRUST_CONFIG_MAP_NAME": "trusted-ca",
+              "IMAGE_DIGEST": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "IMAGE_URL": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "POLICY_DIR": "/project/repository/",
+              "POLICY_NAMESPACE": "required_checks"
+            }
+          },
+          "name": "deprecated-base-image-check",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "deprecated-image-check"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.5@sha256:0ccc688a77e9b7b0b8973c132a1e840844137e77f887be4a0bec8893b0776872"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGES_PROCESSED",
+              "type": "string",
+              "value": "{\"image\": {\"pullspec\": \"registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38\", \"digests\": [\"sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819\"]}}\n"
+            },
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"result\":\"SUCCESS\",\"timestamp\":\"2026-10-29T12:27:17+00:00\",\"note\":\"Task deprecated-image-check completed: Check result for task result.\",\"namespace\":\"required_checks\",\"successes\":3,\"failures\":0,\"warnings\":0}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:50Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -euo pipefail\n# shellcheck disable=SC1091 # /utils.sh is only available in the container image at runtime\nsource /utils.sh\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\nIMAGES_TO_BE_PROCESSED_PATH=\"/tmp/images_to_be_processed.txt\"\ntouch /tmp/images_to_be_processed.txt\n\nsuccess_counter=0\nfailure_counter=0\nerror_counter=0\nwarnings_counter=0\n\nimages_processed_template='{\"image\": {\"pullspec\": \"'\"$IMAGE_URL\"'\", \"digests\": [%s]}}'\ndigests_processed=()\n\nimagewithouttag=$(echo -n \"$IMAGE_URL\" | sed \"s/\\(.*\\):.*/\\1/\")\n# strip new-line escape symbol from parameter and save it to variable\nimageanddigest=\"${imagewithouttag}@${IMAGE_DIGEST}\"\n\n# Get the arch and image manifests by inspecting the image. This is mainly for identifying image indexes\nimage_manifests=$(get_image_manifests -i \"${imageanddigest}\")\nif [ -n \"$image_manifests\" ]; then\n  while read -r arch arch_sha; do\n    SBOM_FILE_PATH=\"/tmp/sbom-${arch}.json\"\n    arch_imageanddigest=\"${imagewithouttag}@${arch_sha}\"\n\n    # Pre-select the correct credentials to work around cosign not supporting the containers-auth.json spec\n    mkdir -p /tmp/auth && select-oci-auth \"${arch_imageanddigest}\" >/tmp/auth/config.json\n    export DOCKER_CONFIG=/tmp/auth\n\n    # Get base images from SBOM\n    if ! cosign download sbom \"$arch_imageanddigest\" > \"${SBOM_FILE_PATH}\"; then\n      echo \"Unable to download sbom for arch $arch.\"\n      continue\n    fi\n\n    < \"${SBOM_FILE_PATH}\" jq -r '\n        if .bomFormat == \"CycloneDX\" then\n            .formulation[]?\n            | .components[]?\n            | select(any(.properties[]?; .name | test(\"^konflux:container:is_(base|builder)_image\")))\n            | (\n                .purl\n                | capture(\"^pkg:oci/.*?@(?<digest>[a-z0-9]+:[a-f0-9]+)(?:\\\\?[^#]*repository_url=(?<repository_url>[^&#]*))?\")\n              ) as $matched\n            | $matched.repository_url\n        else\n            .packages[]\n            | select(any(.annotations[]?.comment; (fromjson?).name? | test(\"^konflux:container:is_(base|builder)_image\")?))\n            | [.externalRefs[]? | select(.referenceType == \"purl\").referenceLocator] as $purls\n            | (\n                $purls | first\n                | capture(\"^pkg:oci/.*?@(?<digest>[a-z0-9]+:[a-f0-9]+)(?:\\\\?[^#]*repository_url=(?<repository_url>[^&#]*))?\")\n              ) as $matched\n            | $matched.repository_url\n        end\n    ' >> \"${IMAGES_TO_BE_PROCESSED_PATH}\"\n    echo \"Detected base images from $arch SBOM:\"\n    cat \"${IMAGES_TO_BE_PROCESSED_PATH}\"\n    echo \"\"\n\n    digests_processed+=(\"\\\"$arch_sha\\\"\")\n  done < <(echo \"$image_manifests\" | jq -r 'to_entries[] | \"\\(.key) \\(.value)\"')\nelse\n  echo \"Failed to get image manifests from image \\\"$imageanddigest\\\"\"\n  note=\"Task deprecated-image-check failed: Failed to get image manifests from image \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 0\nfi\n\n# If the image is an Image Index, also add the Image Index digest to the list.\nif [[ \"${digests_processed[*]}\" != *\"$IMAGE_DIGEST\"* ]]; then\n  digests_processed+=(\"\\\"$IMAGE_DIGEST\\\"\")\nfi\n\ndigests_processed_string=$(IFS=,; echo \"${digests_processed[*]}\")\n\nif [ -n \"${BASE_IMAGES_DIGESTS}\" ];\nthen\n  echo \"Base images passed by param BASE_IMAGES_DIGESTS: $BASE_IMAGES_DIGESTS\"\n  # Get images from the parameter\n  for IMAGE_WITH_TAG in $(echo -n \"$BASE_IMAGES_DIGESTS\" | sed 's/\\\\n/\\'$'\\n''/g' );\n  do\n    echo \"$IMAGE_WITH_TAG\" | cut -d \":\" -f1 >> \"${IMAGES_TO_BE_PROCESSED_PATH}\"\n  done\nfi\n\n# we want to remove duplicated entries\nBASE_IMAGES=$(sort -u \"${IMAGES_TO_BE_PROCESSED_PATH}\")\n\necho \"Images to be checked:\"\necho \"$BASE_IMAGES\"\necho \"\"\n\nfor BASE_IMAGE in ${BASE_IMAGES};\ndo\n  IFS=:'/' read -r IMAGE_REGISTRY IMAGE_REPOSITORY<<< \"$BASE_IMAGE\"\n\n  # Red Hat Catalog hack: registry.redhat.io must be queried as registry.access.redhat.com in Red Hat catalog\n  IMAGE_REGISTRY_CATALOG=$(echo \"${IMAGE_REGISTRY}\" | sed 's/^registry.redhat.io$/registry.access.redhat.com/')\n\n  export IMAGE_REPO_PATH=\"/tmp/${IMAGE_REPOSITORY}\"\n  mkdir -p \"${IMAGE_REPO_PATH}\"\n  echo \"Querying Red Hat Catalog for $BASE_IMAGE.\"\n  http_code=$(curl -s -o \"${IMAGE_REPO_PATH}/repository_data.json\" -w '%{http_code}' \"https://catalog.redhat.com/api/containers/v1/repositories/registry/${IMAGE_REGISTRY_CATALOG}/repository/${IMAGE_REPOSITORY}\")\n\n  if [ \"$http_code\" == \"200\" ];\n  then\n    echo \"Running conftest using $POLICY_DIR policy, $POLICY_NAMESPACE namespace.\"\n    /usr/bin/conftest test --no-fail \"${IMAGE_REPO_PATH}/repository_data.json\" \\\n    --policy \"$POLICY_DIR\" --namespace \"$POLICY_NAMESPACE\" \\\n    --output=json | tee \"${IMAGE_REPO_PATH}/deprecated_image_check_output.json\"\n\n    failures_num=$(jq -r '.[].failures|length' \"${IMAGE_REPO_PATH}/deprecated_image_check_output.json\")\n    if [[ \"${failures_num}\" -gt 0 ]]; then\n      echo \"[FAILURE] Image ${IMAGE_REGISTRY}/${IMAGE_REPOSITORY} has been deprecated\"\n    fi\n    failure_counter=$((failure_counter+failures_num))\n\n    successes_num=$(jq -r '.[].successes' \"${IMAGE_REPO_PATH}/deprecated_image_check_output.json\")\n    if [[ \"${successes_num}\" -gt 0 ]]; then\n      echo \"[SUCCESS] Image ${IMAGE_REGISTRY}/${IMAGE_REPOSITORY} is valid\"\n    fi\n    success_counter=$((success_counter+successes_num))\n\n  elif [ \"$http_code\" == \"404\" ];\n  then\n    echo \"[WARNING] Registry/image ${IMAGE_REGISTRY}/${IMAGE_REPOSITORY} not found in Red Hat Catalog. Task cannot provide results if image is deprecated.\"\n    warnings_counter=$((warnings_counter+1))\n  else\n    echo \"[ERROR] Unexpected error (HTTP code: ${http_code}) occurred for registry/image ${IMAGE_REGISTRY}/${IMAGE_REPOSITORY}.\"\n    error_counter=$((error_counter+1))\n  fi\ndone\n\nnote=\"Task deprecated-image-check failed: Command conftest failed. For details, check Tekton task log.\"\nERROR_OUTPUT=$(make_result_json -r ERROR -n \"$POLICY_NAMESPACE\" -t \"$note\")\n\nnote=\"Task deprecated-image-check completed: Check result for task result.\"\nif [[ \"$error_counter\" == 0 ]];\nthen\n  if [[ \"${failure_counter}\" -gt 0 ]]; then\n    RES=\"FAILURE\"\n  elif [[ \"${warnings_counter}\" -gt 0 ]]; then\n    RES=\"WARNING\"\n  elif [[ \"${success_counter}\" -eq 0 ]]; then\n    # when all counters are 0, there are no base images to check\n    note=\"Task deprecated-image-check success: No base images to check.\"\n    RES=\"SUCCESS\"\n  else\n    RES=\"SUCCESS\"\n  fi\n  TEST_OUTPUT=$(make_result_json \\\n    -r \"${RES}\" -n \"$POLICY_NAMESPACE\" \\\n    -s \"${success_counter}\" -f \"${failure_counter}\" -w \"${warnings_counter}\" -t \"$note\")\nfi\necho \"${TEST_OUTPUT:-${ERROR_OUTPUT}}\" | tee \"/tekton/results/TEST_OUTPUT\"\n\necho \"${images_processed_template/\\[%s]/[$digests_processed_string]}\" | tee \"/tekton/results/IMAGES_PROCESSED\"\n",
+              "environment": {
+                "container": "check-images",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index"
+          ],
+          "finishedOn": "2026-10-29T12:26:58Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "9f7f5ca49400455e48ab2a1cce4759c7aab43c9a09e2a81714c8039efea5c811"
+              },
+              "entryPoint": "clamav-scan-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-clamav-scan-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/cefc1d9f-a92a-46bd-b0e2-f2c76c46b0f8",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "virus, konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "clamav-scan",
+                "tekton.dev/task": "clamav-scan-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ca-trust-config-map-key": "ca-bundle.crt",
+              "ca-trust-config-map-name": "trusted-ca",
+              "clamd-max-threads": "8",
+              "docker-auth": "",
+              "image-arch": "",
+              "image-digest": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "image-url": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "skip-upload": "false"
+            }
+          },
+          "name": "clamav-scan",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "clamav-scan-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-clamav-scan-min:0.3@sha256:9f7f5ca49400455e48ab2a1cce4759c7aab43c9a09e2a81714c8039efea5c811"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGES_PROCESSED",
+              "type": "string",
+              "value": "{\"image\": {\"pullspec\": \"registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38\", \"digests\": [\"sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819\"]}}\n"
+            },
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"timestamp\":\"1793276805\",\"namespace\":\"required_checks\",\"successes\":2,\"failures\":0,\"warnings\":0,\"result\":\"SUCCESS\",\"note\":\"All checks passed successfully\"}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:50Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -euo pipefail\n# shellcheck disable=SC1091 # /utils.sh is only available in the container image at runtime\n. /utils.sh\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\n# Start clamd in background\n/start-clamd.sh\n\n# Bootstrap .docker config in overridden HOME.\n# This prevents 'oc' CLI failures in clean environments where ~/.docker does not exist.\nif [ ! -d ~/.docker ]; then\n    mkdir -p ~/.docker\n    echo '{}' > ~/.docker/config.json\nfi\n\nimagewithouttag=$(echo \"$IMAGE_URL\" | sed \"s/\\(.*\\):.*/\\1/\" | tr -d '\\n')\n\n# strip new-line escape symbol from parameter and save it to variable\nimageanddigest=\"${imagewithouttag}@${IMAGE_DIGEST}\"\n\n# check if image is attestation one, skip the clamav scan in such case\nif [[ $imageanddigest == *.att ]]\nthen\n    echo \"$imageanddigest is an attestation image. Skipping ClamAV scan.\"\n    exit 0\nfi\n\nimages_processed_template='{\"image\": {\"pullspec\": \"'\"$IMAGE_URL\"'\", \"digests\": [%s]}}'\ndigests_processed=()\nmkdir logs\nmkdir content\ncd content\necho \"Detecting artifact type for ${imageanddigest}.\"\necho '{\"artifact\":{\"pullspec\":\"'\"${imageanddigest}\"'\",\"type\":\"unknown\",\"mediaType\":\"\"}}' > /work/logs/artifact-meta.json\n\n# Function to scan content and process results with ClamAV and EC\n# Parameters:\n#   $1: destination - path to the content to scan\n#   $2: suffix - suffix for log file names (e.g., \"oci\", \"amd64\")\n#   $3: digest - digest to add to digests_processed array\n#   $4: scan_message - optional message describing what is being scanned\nscan_and_process() {\n  local destination=\"$1\"\n  local suffix=\"$2\"\n  local digest=\"$3\"\n  local scan_message=\"${4:-Scanning content}\"\n\n  db_version=$(clamdscan --version | sed 's|.*/\\(.*\\)/.*|\\1|')\n\n  echo \"$scan_message. This operation may take a while.\"\n  clamdscan \"${destination}\" -vi --multiscan --fdpass \\\n    | tee \"/work/logs/clamscan-result-${suffix}.log\" || true\n\n  echo \"Executed-on: Scan was executed on clamsdcan version - $(clamdscan --version) Database version: $db_version\" | tee -a \"/work/logs/clamscan-result-${suffix}.log\"\n\n  digests_processed+=(\"\\\"$digest\\\"\")\n\n  if [[ -e \"/work/logs/clamscan-result-${suffix}.log\" ]]; then\n    # OPA/EC requires structured data input, add clamAV log into json\n    jq -Rs '{ output: . }' \"/work/logs/clamscan-result-${suffix}.log\" > \"/work/logs/clamscan-result-log-${suffix}.json\"\n\n    EC_EXPERIMENTAL=1 ec test \\\n      --namespace required_checks \\\n      --policy /project/clamav/virus-check.rego \\\n      -o json \\\n      \"/work/logs/clamscan-result-log-${suffix}.json\" || true\n\n    # workaround: due to a bug in ec-cli, we cannot generate json and appstudio output at the same time, running it again\n    EC_EXPERIMENTAL=1 ec test \\\n      --namespace required_checks \\\n      --policy /project/clamav/virus-check.rego \\\n      -o appstudio \\\n      \"/work/logs/clamscan-result-log-${suffix}.json\" | tee \"/work/logs/clamscan-ec-test-${suffix}.json\" || true\n\n    cat \"/work/logs/clamscan-ec-test-${suffix}.json\"\n  fi\n}\n\n# Detect artifact type: container image vs OCI artifact\n# First, try to get image manifests (works for container images)\n# Use subshell to prevent get_image_manifests() from exiting the main script if it fails\n# (get_image_manifests uses exit 1 when Architecture field is missing, which happens for OCI artifacts)\nimage_manifests=$(bash -c '. /utils.sh; get_image_manifests -i \"'\"${imageanddigest}\"'\"' 2>/dev/null || echo \"\")\n\n# If get_image_manifests failed, check if it's an OCI artifact by inspecting manifest media type\nif [ -z \"$image_manifests\" ]; then\n  echo \"get_image_manifests returned empty, checking if this is an OCI artifact...\"\n  raw_manifest=$(skopeo inspect --raw --authfile ~/.docker/config.json \"docker://${imageanddigest}\" 2>/dev/null || true)\n  if [ -s /work/logs/artifact-meta.json ]; then\n    tmp=$(mktemp)\n    if jq '.artifact.type = \"inspected\"' /work/logs/artifact-meta.json > \"$tmp\"; then\n      mv \"$tmp\" /work/logs/artifact-meta.json || true\n    fi\n  fi\n\n  if [ -n \"$raw_manifest\" ]; then\n    media_type=$(echo \"$raw_manifest\" | jq -r '.mediaType // .config.mediaType // empty' 2>/dev/null || echo \"\")\n    artifact_type=$(echo \"$raw_manifest\" | jq -r '.artifactType // empty' 2>/dev/null || echo \"\")\n    config_media_type=$(echo \"$raw_manifest\" | jq -r '.config.mediaType // empty' 2>/dev/null || echo \"\")\n\n    # Determine if this is an OCI artifact (not a container image)\n    # OCI artifacts typically have:\n    # - An empty/scratch config (config.mediaType contains \"empty\" or \"scratch\")\n    # - An explicit artifactType field that is not a container image type\n    is_oci_artifact=false\n\n    # Check if config is empty/scratch (typical for OCI artifacts like python wheels, helm charts, etc.)\n    if echo \"$config_media_type\" | grep -qiE \"(empty|scratch)\"; then\n      is_oci_artifact=true\n    fi\n\n    # Check if artifactType is set and is not a container image type\n    if [ -n \"$artifact_type\" ] && ! echo \"$artifact_type\" | grep -qE \"application/vnd\\.(oci|docker)\\.(image|container)\"; then\n      is_oci_artifact=true\n    fi\n\n    if [ \"$is_oci_artifact\" = true ]; then\n      # This is an OCI artifact (e.g., python wheels, helm charts, etc.)\n      echo \"Detected OCI artifact (artifactType: ${artifact_type:-unset}, config.mediaType: ${config_media_type:-unset}). Downloading for scanning...\"\n      if [ -s /work/logs/artifact-meta.json ]; then\n        tmp=$(mktemp)\n        if jq '.artifact.mediaType = '\"\\\"${media_type:-unknown}\\\"\"' | .artifact.artifactType = '\"\\\"${artifact_type:-unknown}\\\"\"' | .artifact.type = \"oci\"' /work/logs/artifact-meta.json > \"$tmp\"; then\n          mv \"$tmp\" /work/logs/artifact-meta.json || true\n        fi\n      fi\n      destination=\"content-oci\"\n      mkdir -p \"$destination\"\n\n      # Download OCI artifact using skopeo copy\n      echo \"Downloading OCI artifact using skopeo copy\"\n      if ! retry skopeo copy --authfile ~/.docker/config.json \"docker://${imageanddigest}\" \"dir:${destination}\" 2>&1; then\n        echo \"Failed to download OCI artifact \\\"$imageanddigest\\\". Skipping ClamAV scan!\"\n        note=\"Task clamav-scan-min failed: Failed to download OCI artifact \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n        ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n        echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n        exit 0\n      fi\n\n      # Scan and process OCI artifact\n      scan_and_process \"${destination}\" \"oci\" \"$IMAGE_DIGEST\" \"Scanning OCI artifact\"\n\n      # Skip the container image processing path\n      image_manifests=\"\"\n    elif echo \"$media_type\" | grep -qE \"(application/vnd\\.(docker|oci)\\.(distribution|image)\\.manifest|application/vnd\\.docker\\.distribution\\.manifest)\"; then\n      # This looks like a container image manifest, but get_image_manifests failed\n      echo \"Detected container image manifest type: $media_type, but get_image_manifests failed. This may indicate an error.\"\n      if [ -s /work/logs/artifact-meta.json ]; then\n        tmp=$(mktemp)\n        if jq '.artifact.mediaType = '\"\\\"$media_type\\\"\"' | .artifact.type = \"image\"' /work/logs/artifact-meta.json > \"$tmp\"; then\n          mv \"$tmp\" /work/logs/artifact-meta.json || true\n        fi\n      fi\n      note=\"Task clamav-scan-min failed: Failed to get image manifests from image \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n      ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n      echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n      exit 0\n    else\n      # Likely an OCI artifact with non-standard media type\n      echo \"Detected OCI artifact (media type: ${media_type:-unknown}). Downloading for scanning...\"\n      if [ -s /work/logs/artifact-meta.json ]; then\n        tmp=$(mktemp)\n        if jq '.artifact.mediaType = '\"\\\"${media_type:-unknown}\\\"\"' | .artifact.type = \"oci\"' /work/logs/artifact-meta.json > \"$tmp\"; then\n          mv \"$tmp\" /work/logs/artifact-meta.json || true\n        fi\n      fi\n      destination=\"content-oci\"\n      mkdir -p \"$destination\"\n\n      # Download OCI artifact using skopeo copy\n      echo \"Downloading OCI artifact using skopeo copy\"\n      if ! retry skopeo copy --authfile ~/.docker/config.json \"docker://${imageanddigest}\" \"dir:${destination}\" 2>&1; then\n        echo \"Failed to download OCI artifact \\\"$imageanddigest\\\". Skipping ClamAV scan!\"\n        note=\"Task clamav-scan-min failed: Failed to download OCI artifact \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n        ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n        echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n        exit 0\n      fi\n\n      # Scan and process OCI artifact\n      scan_and_process \"${destination}\" \"oci\" \"$IMAGE_DIGEST\" \"Scanning OCI artifact\"\n\n      # Skip the container image processing path\n      image_manifests=\"\"\n    fi\n  else\n    echo \"Failed to inspect artifact \\\"$imageanddigest\\\". Unable to determine type.\"\n    note=\"Task clamav-scan-min failed: Failed to inspect artifact \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n    ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n    echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n    exit 0\n  fi\nfi\n\n# Process container images (existing logic)\nif [ -n \"$image_manifests\" ]; then\n  echo \"Detected container image. Processing image manifests.\"\n  if [ -s /work/logs/artifact-meta.json ]; then\n    tmp=$(mktemp)\n    if jq '.artifact.type = \"image\"' /work/logs/artifact-meta.json > \"$tmp\"; then\n      mv \"$tmp\" /work/logs/artifact-meta.json || true\n    fi\n  fi\n  # Proceed only if a specific arch is provided.\n  # This typically occurs when using Tekton Matrix to launch multiple TaskRuns to scan all architectures of a multi-arch image in parallel.\n  if [ -n \"$IMAGE_ARCH\" ]; then\n    arch=\"${IMAGE_ARCH#*/}\"\n    if [ \"${arch}\" = \"x86_64\" ]; then\n      arch=\"amd64\"\n    fi\n\n    # Check if arch is supported; if not (e.g., it's 'local', see link below), default to amd64.\n    # https://github.com/redhat-appstudio/infra-deployments/blob/main/components/multi-platform-controller/production/stone-prd-rh01/host-config.yaml#L9-L14\n    case \"$arch\" in\n      amd64|ppc64le|arm64|s390x)\n        ;;\n      *)\n        arch=\"amd64\"\n        ;;\n    esac\n\n    image_manifests=$(echo \"$image_manifests\" | jq -c --arg arch \"$arch\" '{($arch): .[$arch]}')\n  fi\n\n  while read -r arch arch_sha; do\n    destination=\"content-${arch}\"\n    mkdir -p \"$destination\"\n    arch_imageanddigest=\"${imagewithouttag}@${arch_sha}\"\n\n    echo \"Running \\\"oc image extract\\\" on image of arch $arch\"\n    if ! retry oc image extract --confirm --only-files=true --registry-config ~/.docker/config.json \"$arch_imageanddigest\" --path=\"/:${destination}\" --filter-by-os=\"linux/${arch}\"; then\n      echo \"Unable to extract image for arch $arch. Skipping ClamAV scan!\"\n      exit 0\n    fi\n\n    # Scan and process container image for this architecture\n    scan_and_process \"${destination}\" \"$arch\" \"$arch_sha\" \"Scanning image for arch $arch\"\n  done < <(echo \"$image_manifests\" | jq -r 'to_entries[] | \"\\(.key) \\(.value)\"')\nfi\n\njq -s -rce '\n  reduce .[] as $item ({\"timestamp\":\"0\",\"namespace\":\"\",\"successes\":0,\"failures\":0,\"warnings\":0,\"result\":\"\",\"note\":\"\"};\n    {\n    \"timestamp\" : (if .timestamp < $item.timestamp then $item.timestamp else .timestamp end),\n    \"namespace\" : $item.namespace,\n    \"successes\" : (.successes + $item.successes),\n    \"failures\" : (.failures + $item.failures),\n    \"warnings\" : (.warnings + $item.warnings),\n    \"result\" : (if .result == \"\" or ($item.result == \"SKIPPED\" and .result == \"SUCCESS\") or ($item.result == \"WARNING\" and (.result == \"SUCCESS\" or .result == \"SKIPPED\")) or ($item.result == \"FAILURE\" and .result != \"ERROR\") or $item.result == \"ERROR\" then $item.result else .result end),\n    \"note\" : (if .result == \"\" or ($item.result == \"SKIPPED\" and .result == \"SUCCESS\") or ($item.result == \"WARNING\" and (.result == \"SUCCESS\" or .result == \"SKIPPED\")) or ($item.result == \"FAILURE\" and .result != \"ERROR\") or $item.result == \"ERROR\" then $item.note else .note end)\n    })' /work/logs/clamscan-ec-test-*.json | tee \"/tekton/results/TEST_OUTPUT\"\n\n# If the image is an Image Index, also add the Image Index digest to the list.\nif [[ \"${digests_processed[*]}\" != *\"$IMAGE_DIGEST\"* ]]; then\n  digests_processed+=(\"\\\"$IMAGE_DIGEST\\\"\")\nfi\n\ndigests_processed_string=$(IFS=,; echo \"${digests_processed[*]}\")\necho \"${images_processed_template/\\[%s]/[$digests_processed_string]}\" | tee \"/tekton/results/IMAGES_PROCESSED\"\n",
+              "environment": {
+                "container": "extract-and-scan-image",
+                "image": "oci://quay.io/konflux-ci/clamav-db@sha256:580b5b7850e5c11c3a4f4ef6b0bacef4cbbf5250480d4e2390713f453657c1bc"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -e\n\n# Skip upload if requested e.g. read-only CI tests where push access is denied\nif [ \"$SKIP_UPLOAD\" == \"true\" ]; then\n  echo \"Upload skipped by parameter.\"\n  exit 0\nfi\n\n# Don't return a glob expression when no matches are found\nshopt -s nullglob\n\ncd logs\n\nfor UPLOAD_FILE in clamscan-result*.log; do\n  MEDIA_TYPE=text/vnd.clamav\n  args+=(\"${UPLOAD_FILE}:${MEDIA_TYPE}\")\ndone\nfor UPLOAD_FILE in clamscan-ec-test*.json; do\n  MEDIA_TYPE=application/vnd.konflux.test_output+json\n  args+=(\"${UPLOAD_FILE}:${MEDIA_TYPE}\")\ndone\n\nif [ ${#args[@]} -eq 0 ]; then\n  echo \"No files found. Skipping upload.\"\n  exit 0;\nfi\n\necho \"Selecting auth\"\nselect-oci-auth \"$IMAGE_URL\" > \"$HOME/auth.json\"\necho \"Attaching to ${IMAGE_URL}\"\n retry oras attach --no-tty --registry-config \"$HOME/auth.json\" --artifact-type application/vnd.clamav \"${IMAGE_URL}@${IMAGE_DIGEST}\" \"${args[@]}\"\n",
+              "environment": {
+                "container": "upload",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:c34c933c269e2401bb042fe69e2999cf288331b6586d4f4eca9c845270d9b1f9"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index",
+            "prefetch-dependencies"
+          ],
+          "finishedOn": "2026-10-29T12:27:23Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "b25a46b20e09eacec4e177cdd8d18a31fea38e9e346b49215e6e5044a00b8d85"
+              },
+              "entryPoint": "sast-shell-check-oci-ta-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-sast-shell-check-oci-ta-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/ed3dd1fc-6aec-489b-8a49-daa1fd61e7cf",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "sast-shell-check",
+                "tekton.dev/task": "sast-shell-check-oci-ta-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "CACHI2_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb",
+              "IMP_FINDINGS_ONLY": "true",
+              "KFP_GIT_URL": "SITE_DEFAULT",
+              "PROJECT_NAME": "",
+              "RECORD_EXCLUDED": "false",
+              "SKIP_JINJA": "true",
+              "SOURCE_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388",
+              "TARGET_DIRS": ".",
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca",
+              "image-digest": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "image-url": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            }
+          },
+          "name": "sast-shell-check",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "sast-shell-check-oci-ta-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-sast-shell-check-oci-ta-min:0.1@sha256:b25a46b20e09eacec4e177cdd8d18a31fea38e9e346b49215e6e5044a00b8d85"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"result\":\"SUCCESS\",\"timestamp\":\"2026-10-29T12:27:18+00:00\",\"note\":\"For details, check Tekton task log.\",\"namespace\":\"default\",\"successes\":0,\"failures\":0,\"warnings\":0}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:50Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": [
+                "use",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388=/var/workdir/source",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb=/var/workdir/cachi2"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "use-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:254989d35310c0998eb2ae60aa4703da842d99d82ed434fd5208cc9639d32969"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -x\n# shellcheck source=/dev/null\nsource /utils.sh\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\nif [[ -z \"${PROJECT_NAME}\" ]]; then\n  PROJECT_NAME=${COMPONENT_LABEL}\nfi\n\necho \"INFO: The PROJECT_NAME used is: ${PROJECT_NAME}\"\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\nPACKAGE_VERSION=$(rpm -q --queryformat '%{NAME}-%{VERSION}-%{RELEASE}\\n' ShellCheck)\n\nOUTPUT_FILE=\"shellcheck-results.json\"\nSOURCE_CODE_DIR=/var/workdir/source\n\n# generate full path for each dirname separated by comma\ndeclare -a ALL_TARGETS\nIFS=\",\" read -ra TARGET_ARRAY <<<\"$TARGET_DIRS\"\nfor d in \"${TARGET_ARRAY[@]}\"; do\n  potential_path=\"${SOURCE_CODE_DIR}/${d}\"\n\n  resolved_path=$(realpath -m \"$potential_path\")\n\n  # ensure resolved path is still within SOURCE_CODE_DIR\n  if [[ \"$resolved_path\" == \"$SOURCE_CODE_DIR\"* ]]; then\n    ALL_TARGETS+=(\"$resolved_path\")\n  else\n    echo \"Error: path traversal attempt, '$potential_path' is outside '$SOURCE_CODE_DIR'\"\n    exit 1\n  fi\ndone\n\n# determine number of available CPU cores for shellcheck based on container cgroup v2 CPU limits\n# this calculates the ceiling, so if the cpu limit is 0.5, the number of jobs will be 1.\nif [ -z \"$SC_JOBS\" ] && [ -r \"/sys/fs/cgroup/cpu.max\" ]; then\n  read -r quota period </sys/fs/cgroup/cpu.max\n  if [ \"$quota\" != \"max\" ] && [ -n \"$period\" ] && [ \"$period\" -gt 0 ]; then\n    export SC_JOBS=$(((quota + period - 1) / period))\n    echo \"INFO: Setting SC_JOBS=${SC_JOBS} based on cgroups v2 max for run-shellcheck.sh\"\n  fi\nfi\n\nif [[ \"${SKIP_JINJA}\" == \"true\" ]]; then\n  export SC_SKIP_JINJA=1\nfi\n\n# generate all shellcheck result JSON files to $SC_RESULTS_DIR, which defaults to ./shellcheck-results/\n/usr/share/csmock/scripts/run-shellcheck.sh \"${ALL_TARGETS[@]}\"\n\nCSGREP_OPTS=(\n  --mode=json\n  --strip-path-prefix=\"$SOURCE_CODE_DIR\"/\n  --remove-duplicates\n  --embed-context=3\n  --set-scan-prop=\"ShellCheck:${PACKAGE_VERSION}\"\n)\nif [[ \"$IMP_FINDINGS_ONLY\" == \"true\" ]]; then\n  # predefined list of shellcheck important findings\n  CSGREP_EVENT_FILTER='\\[SC(1020|1035|1054|1066|1068|1073|1080|1083|1099|1113|1115|1127|1128|1143|2043|2050|'\n  CSGREP_EVENT_FILTER+='2055|2057|2066|2069|2071|2077|2078|2091|2092|2157|2171|2193|2194|2195|2215|2216|'\n  CSGREP_EVENT_FILTER+='2218|2224|2225|2242|2256|2258|2261)\\]$'\n  CSGREP_OPTS+=(\n    --event=\"$CSGREP_EVENT_FILTER\"\n  )\nelse\n  CSGREP_OPTS+=(\n    --event=\"error|warning\"\n  )\nfi\n\nif ! csgrep \"${CSGREP_OPTS[@]}\" ./shellcheck-results/*.json >\"$OUTPUT_FILE\"; then\n  echo \"Error occurred while running 'run-shellcheck.sh'\"\n  note=\"Task sast-shell-check-oci-ta-min failed: For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r ERROR -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 1\nfi\n\nif [[ \"${KFP_GIT_URL}\" == \"SITE_DEFAULT\" ]]; then\n  KFP_GIT_URL=\"https://gitlab.cee.redhat.com/osh/known-false-positives.git\"\nfi\nPROBE_URL=\"${KFP_GIT_URL%.git}\" # trims '.git' suffix\n\n# create the KFP clone directory regardless\nKFP_DIR=\"known-false-positives\"\nKFP_CLONED=\"0\"\nmkdir \"${KFP_DIR}\"\n\n# We check if the KFP_GIT_URL variable is set to clone and apply the filters or not\nif [[ -n \"${KFP_GIT_URL}\" ]]; then\n  # Default location only reachable from internal Konflux instances, check reachable first\n  echo -n \"INFO: Probing ${PROBE_URL}... \"\n  if curl --fail --head --max-time 60 --no-progress-meter \"${PROBE_URL}\" > >(head -1); then\n    echo \"INFO: Trying to clone known-false-positives..\"\n    git clone \"${KFP_GIT_URL}\" \"${KFP_DIR}\" && KFP_CLONED=\"1\"\n  fi\nfi\n\nif [[ \"${KFP_CLONED}\" -eq \"0\" ]]; then\n  echo \"WARN: Failed to clone known-false-positives at ${KFP_GIT_URL}, scan results will not be filtered\"\nelse\n  echo \"INFO: Filtering false positives in results files using csfilter-kfp...\"\n\n  # build initial csfilter-kfp command\n  csfilter_kfp_cmd=(\n    csfilter-kfp\n    --verbose\n    --kfp-dir=\"${KFP_DIR}\"\n    --project-nvr=\"${PROJECT_NAME}\"\n  )\n\n  if [[ \"${RECORD_EXCLUDED}\" == \"true\" ]]; then\n    csfilter_kfp_cmd+=(--record-excluded=\"excluded-findings.json\")\n  fi\n\n  # Execute the command and capture any errors\n  set +e\n  \"${csfilter_kfp_cmd[@]}\" \"${OUTPUT_FILE}\" >\"${OUTPUT_FILE}.filtered\" 2>\"${OUTPUT_FILE}.error\"\n  status=$?\n  set -e\n  if [ \"$status\" -ne 0 ]; then\n    echo \"WARN: failed to filter known false positives\" >&2\n  else\n    mv \"${OUTPUT_FILE}.filtered\" \"$OUTPUT_FILE\"\n    echo \"INFO: Succeeded filtering known false positives\" >&2\n  fi\nfi\n\necho \"ShellCheck results have been saved to $OUTPUT_FILE\"\n\ncsgrep --mode=evtstat \"$OUTPUT_FILE\"\ncsgrep --mode=sarif \"$OUTPUT_FILE\" >shellcheck-results.sarif\n\nTEST_OUTPUT=\nparse_test_output \"sast-shell-check-oci-ta-min\" sarif shellcheck-results.sarif || true\necho \"${TEST_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n",
+              "environment": {
+                "container": "sast-shell-check",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -e\n\nif [ -z \"${IMAGE_URL}\" ] || [ -z \"${IMAGE_DIGEST}\" ]; then\n  echo 'No image-url or image-digest param provided. Skipping upload.'\n  exit 0\nfi\n\nUPLOAD_FILES=\"shellcheck-results.sarif excluded-findings.json\"\n\nfor UPLOAD_FILE in ${UPLOAD_FILES}; do\n  if [ ! -f \"${UPLOAD_FILE}\" ]; then\n    echo \"No ${UPLOAD_FILE} exists. Skipping upload.\"\n    continue\n  fi\n\n  # Determine the media type based on the file extension\n  if [[ \"${UPLOAD_FILE}\" == *.json ]]; then\n    MEDIA_TYPE=\"application/json\"\n  else\n    MEDIA_TYPE=\"application/sarif+json\"\n  fi\n\n  echo \"Selecting auth\"\n  select-oci-auth \"$IMAGE_URL\" >\"$HOME/auth.json\"\n  echo \"Attaching to ${IMAGE_URL}\"\n  if ! retry oras attach --no-tty --registry-config \"$HOME/auth.json\" --artifact-type \"${MEDIA_TYPE}\" \"${IMAGE_URL}@${IMAGE_DIGEST}\" \"${UPLOAD_FILE}:${MEDIA_TYPE}\"; then\n    echo \"Failed to attach ${UPLOAD_FILE} to ${IMAGE_URL}\"\n    exit 1\n  fi\ndone\n",
+              "environment": {
+                "container": "upload",
+                "image": "oci://quay.io/konflux-ci/oras@sha256:561847430299db122ba499a3c1a4e28d850c191c9da6048a23361963eda49cac"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index",
+            "prefetch-dependencies"
+          ],
+          "finishedOn": "2026-10-29T12:27:14Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "80bf85aebf99a9d26c2d3fae3d90ee6bfe28246e3b0bbd950934ceba764bc067"
+              },
+              "entryPoint": "sast-unicode-check-oci-ta-min",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check-oci-ta-min"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/66cbe37c-ec8e-4ea3-a298-ecf5548609b3",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "sast-unicode-check",
+                "tekton.dev/task": "sast-unicode-check-oci-ta-min",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "CACHI2_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb",
+              "FIND_UNICODE_CONTROL_ARGS": "-p bidi -v -d -t",
+              "KFP_GIT_URL": "SITE_DEFAULT",
+              "PROJECT_NAME": "",
+              "RECORD_EXCLUDED": "false",
+              "SOURCE_ARTIFACT": "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388",
+              "TARGET_DIRS": ".",
+              "caTrustConfigMapKey": "ca-bundle.crt",
+              "caTrustConfigMapName": "trusted-ca",
+              "image-digest": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "image-url": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+            }
+          },
+          "name": "sast-unicode-check",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "sast-unicode-check-oci-ta-min"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check-oci-ta-min:0.4@sha256:80bf85aebf99a9d26c2d3fae3d90ee6bfe28246e3b0bbd950934ceba764bc067"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"result\":\"SUCCESS\",\"timestamp\":\"2026-10-29T12:27:10+00:00\",\"note\":\"Task sast-unicode-check-oci-ta-min success: No finding was detected\",\"namespace\":\"default\",\"successes\":0,\"failures\":0,\"warnings\":0}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:50Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": [
+                "use",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:c80cd45608a6c67908d2350221998be4469e1cf5b1b548608e3f35852eaf8388=/var/workdir/source",
+                "oci:registry-service.kind-registry/default-tenant/sample-app@sha256:f6155c8b3e70c5a1dd66b8e3200022a2a5b6c18eac03db5ff3aa45effcc77cfb=/var/workdir/cachi2"
+              ],
+              "entryPoint": "",
+              "environment": {
+                "container": "use-trusted-artifact",
+                "image": "oci://quay.io/konflux-ci/build-trusted-artifacts@sha256:254989d35310c0998eb2ae60aa4703da842d99d82ed434fd5208cc9639d32969"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -exuo pipefail\n\n# shellcheck source=/dev/null\n. /utils.sh\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\nif [[ -z \"${PROJECT_NAME}\" ]]; then\n  PROJECT_NAME=${COMPONENT_LABEL}\nfi\n\necho \"INFO: The PROJECT_NAME used is: ${PROJECT_NAME}\"\n\nca_bundle=/mnt/trusted-ca/ca-bundle.crt\nif [ -f \"$ca_bundle\" ]; then\n  echo \"INFO: Using mounted CA bundle: $ca_bundle\"\n  cp -vf $ca_bundle /etc/pki/ca-trust/source/anchors\n  update-ca-trust\nfi\n\nSCAN_PROP=\"https://github.com/siddhesh/find-unicode-control.git#c2accbfbba7553a8bc1ebd97089ae08ad8347e58\"\nFUC_EXIT_CODE=0\n\n# generate full path for each dirname separated by comma\ndeclare -a ALL_TARGETS\nOLD_IFS=\"$IFS\"\nIFS=\",\"\nfor d in $TARGET_DIRS; do\n  ALL_TARGETS+=(\"${SOURCE_CODE_DIR}/source/${d}\")\ndone\nIFS=\"$OLD_IFS\"\n\n# shellcheck disable=SC2086\nLANG=en_US.utf8 find_unicode_control.py ${FIND_UNICODE_CONTROL_ARGS} \"${ALL_TARGETS[@]}\" \\\n  >raw_sast_unicode_check_out.txt \\\n  2>raw_sast_unicode_check_out.log ||\n  FUC_EXIT_CODE=$?\nif [[ \"${FUC_EXIT_CODE}\" -ne 0 ]] && [[ \"${FUC_EXIT_CODE}\" -ne 1 ]]; then\n  echo \"Failed to run find-unicode-control command\" >&2\n  cat raw_sast_unicode_check_out.log\n  note=\"Task sast-unicode-check-oci-ta-min failed: For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r ERROR -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 1\nfi\n\n# Translate the output format\nif ! sed -i raw_sast_unicode_check_out.txt -E -e 's|(.*:[0-9]+)(.*)|\\1: warning:\\2|' -e 's|^|Error: UNICONTROL_WARNING:\\n|'; then\n  echo \"Error: failed to translate the unicontrol output format\" >&2\n  note=\"Task sast-unicode-check-oci-ta-min failed: For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r ERROR -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 1\nfi\n\n# Process all results as configured with CSGERP_OPTS\nCSGERP_OPTS=(\n  --mode=json\n  --remove-duplicates\n  --embed-context=3\n  --set-scan-prop=\"${SCAN_PROP}\"\n  --strip-path-prefix=\"${SOURCE_CODE_DIR}\"/source/\n)\n# In order to generate csdiff/v1, we need to add the whole path of the source code as\n# sast-unicode-check only provides an URI to embed the context\nif ! csgrep \"${CSGERP_OPTS[@]}\" raw_sast_unicode_check_out.txt >processed_sast_unicode_check_out.json 2>processed_sast_unicode_check_out.err; then\n  echo \"Error occurred while running csgrep with CSGERP_OPTS:\"\n  cat processed_sast_unicode_check_out.err\n  note=\"Task sast-unicode-check-oci-ta-min failed: For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r ERROR -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 1\nfi\n\ncsgrep --mode=evtstat processed_sast_unicode_check_out.json\n\nif [[ \"${KFP_GIT_URL}\" == \"SITE_DEFAULT\" ]]; then\n  KFP_GIT_URL=\"https://gitlab.cee.redhat.com/osh/known-false-positives.git\"\nfi\nPROBE_URL=\"${KFP_GIT_URL%.git}\" # trims '.git' suffix\n\n# create the KFP clone directory regardless\nKFP_DIR=\"known-false-positives\"\nKFP_CLONED=\"0\"\nmkdir \"${KFP_DIR}\"\n\n# We check if the KFP_GIT_URL variable is set to clone and apply the filters or not\nif [[ -n \"${KFP_GIT_URL}\" ]]; then\n  # Default location only reachable from internal Konflux instances, check reachable first\n  echo -n \"INFO: Probing ${PROBE_URL}... \"\n  if curl --fail --head --max-time 60 --no-progress-meter \"${PROBE_URL}\" > >(head -1); then\n    echo \"INFO: Trying to clone known-false-positives..\"\n    git clone \"${KFP_GIT_URL}\" \"${KFP_DIR}\" && KFP_CLONED=\"1\"\n  fi\nfi\n\n# If KFP clone failed, use the unfiltered results\nif [[ \"${KFP_CLONED}\" -eq \"0\" ]]; then\n  echo \"WARN: Failed to clone known-false-positives at ${KFP_GIT_URL}, scan results will not be filtered\"\n  mv processed_sast_unicode_check_out.json sast_unicode_check_out.json\nelse\n  echo \"INFO: Filtering false positives in results files using csfilter-kfp...\"\n\n  # Build initial csfilter-kfp command\n  csfilter_kfp_cmd=(\n    csfilter-kfp\n    --verbose\n    --kfp-dir=\"${KFP_DIR}\"\n    --project-nvr=\"${PROJECT_NAME}\"\n  )\n\n  # Append --record-excluded option if RECORD_EXCLUDED is true\n  if [[ \"${RECORD_EXCLUDED}\" == \"true\" ]]; then\n    csfilter_kfp_cmd+=(--record-excluded=\"excluded-findings.json\")\n  fi\n\n  # Execute the command and capture any errors\n  set +e\n  \"${csfilter_kfp_cmd[@]}\" processed_sast_unicode_check_out.json >sast_unicode_check_out.json 2>sast_unicode_check_out.error\n  status=$?\n  set -e\n  if [ \"$status\" -ne 0 ]; then\n    echo \"WARN: failed to filter known false positives\" >&2\n    mv processed_sast_unicode_check_out.json sast_unicode_check_out.json\n  else\n    echo \"INFO: Succeeded filtering known false positives\" >&2\n  fi\nfi\n\n# Generate sarif report\ncsgrep --mode=sarif sast_unicode_check_out.json >sast_unicode_check_out.sarif\nif [[ \"${FUC_EXIT_CODE}\" -eq 0 ]]; then\n  note=\"Task sast-unicode-check-oci-ta-min success: No finding was detected\"\n  ERROR_OUTPUT=$(make_result_json -r SUCCESS -t \"$note\")\nelif [[ \"${FUC_EXIT_CODE}\" -eq 1 ]] && [[ ! -s sast_unicode_check_out.sarif ]]; then\n  note=\"Task sast-unicode-check-oci-ta-min success: Some findings were detected, but filtered by known false positive\"\n  ERROR_OUTPUT=$(make_result_json -r SUCCESS -t \"$note\")\nelse\n  echo \"sast-unicode-check test failed because of the following issues:\"\n  cat sast_unicode_check_out.json\n  TEST_OUTPUT=\n  parse_test_output \"sast-unicode-check-oci-ta-min\" sarif sast_unicode_check_out.sarif || true\n  note=\"Task sast-unicode-check-oci-ta-min failed: For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r ERROR -t \"$note\")\nfi\necho \"${TEST_OUTPUT:-${ERROR_OUTPUT}}\" | tee \"/tekton/results/TEST_OUTPUT\"\n",
+              "environment": {
+                "container": "sast-unicode-check",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\n\nif [ -z \"${IMAGE_URL}\" ]; then\n  echo 'No image-url param provided. Skipping upload.'\n  exit 0\nfi\n\nUPLOAD_FILES=\"sast_unicode_check_out.sarif excluded-findings.json\"\nfor UPLOAD_FILE in ${UPLOAD_FILES}; do\n  if [ ! -f \"${UPLOAD_FILE}\" ]; then\n    echo \"No ${UPLOAD_FILE} exists. Skipping upload.\"\n    continue\n  fi\n\n  if [ \"${UPLOAD_FILE}\" == \"excluded-findings.json\" ]; then\n    MEDIA_TYPE=application/json\n  else\n    MEDIA_TYPE=application/sarif+json\n  fi\n\n  echo \"Selecting auth\"\n  select-oci-auth \"${IMAGE_URL}\" >\"${HOME}/auth.json\"\n  echo \"Attaching to ${IMAGE_URL}\"\n  retry oras attach --no-tty --registry-config \"$HOME/auth.json\" --artifact-type \"${MEDIA_TYPE}\" \"${IMAGE_URL}@${IMAGE_DIGEST}\" \"${UPLOAD_FILE}:${MEDIA_TYPE}\"\ndone\n",
+              "environment": {
+                "container": "upload",
+                "image": "oci://quay.io/konflux-ci/oras@sha256:561847430299db122ba499a3c1a4e28d850c191c9da6048a23361963eda49cac"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index"
+          ],
+          "finishedOn": "2026-10-29T12:28:03Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "f110c53fd58cab7ac6e47d472bb801d49e2f584eb31837db9d611e11b3862a3d"
+              },
+              "entryPoint": "rpms-signature-scan",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/f9e68022-40d2-4868-8ab0-bd0e189dea48",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "false",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "rpms-signature-scan",
+                "tekton.dev/task": "rpms-signature-scan",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ca-trust-config-map-key": "ca-bundle.crt",
+              "ca-trust-config-map-name": "trusted-ca",
+              "image-digest": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "image-url": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "workdir": "/tmp"
+            }
+          },
+          "name": "rpms-signature-scan",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "rpms-signature-scan"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan:0.2@sha256:f110c53fd58cab7ac6e47d472bb801d49e2f584eb31837db9d611e11b3862a3d"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGES_PROCESSED",
+              "type": "string",
+              "value": "{\"image\": {\"pullspec\": \"registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38\", \"digests\": [\"sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819\"]}}\n"
+            },
+            {
+              "name": "RPMS_DATA",
+              "type": "string",
+              "value": "{\"keys\": {\"199e2f91fd431d51\": 20, \"unsigned\": 0}}\n"
+            },
+            {
+              "name": "SCAN_LOG",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"result\":\"SUCCESS\",\"timestamp\":\"2026-10-29T12:28:02+00:00\",\"note\":\"Task rpms-signature-scan completed successfully\",\"namespace\":\"default\",\"successes\":0,\"failures\":0,\"warnings\":0}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:53Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -ex\nset -o pipefail\n\nrpm_verifier \\\n  --image-url \"${IMAGE_URL}\" \\\n  --image-digest \"${IMAGE_DIGEST}\" \\\n  --workdir \"${WORKDIR}\" \\\n  2> >(tee \"${WORKDIR}/stderr\" >&2)\n",
+              "environment": {
+                "container": "rpms-signature-scan",
+                "image": "oci://quay.io/konflux-ci/tools@sha256:9ff6728800cea9a03ce5449a2ec7afb75a8d292a043adab0afa3c7cfa91a99d8"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/bin/bash\nset -ex\n\nsource /utils.sh\nstatus=$(cat \"${WORKDIR}\"/status)\nrpms_data=$(cat \"${WORKDIR}\"/results)\nimages_processed=$(cat \"${WORKDIR}\"/images_processed)\n\nif [ \"$status\" == \"ERROR\" ]; then\n  note=\"Task rpms-signature-scan failed to scan images. Refer to Tekton task output for details\"\nelse\n  note=\"Task rpms-signature-scan completed successfully\"\nfi\n\nTEST_OUTPUT=$(make_result_json -r \"$status\" -t \"$note\")\n\necho \"${TEST_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\necho \"${rpms_data}\" | tee \"/tekton/results/RPMS_DATA\"\necho \"${images_processed}\" | tee \"/tekton/results/IMAGES_PROCESSED\"\n\nif [ -f \"${WORKDIR}/stderr\" ]; then\n  head -c 4000 \"${WORKDIR}/stderr\" | tee \"/tekton/results/SCAN_LOG\"\nelse\n  echo \"\" > \"/tekton/results/SCAN_LOG\"\nfi\n",
+              "environment": {
+                "container": "output-results",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:365b172d2a8a145406f028d0a94a77b489fbdf9d84e5bd9529b1c3ad72f077b1"
+              }
+            }
+          ]
+        },
+        {
+          "after": [
+            "build-image-index"
+          ],
+          "finishedOn": "2026-10-29T12:27:44Z",
+          "invocation": {
+            "configSource": {
+              "digest": {
+                "sha256": "6a204cecc1a1091bf928b3db5a4082735c2111f90befdb5b043c498833c02bcf"
+              },
+              "entryPoint": "tpa-scan",
+              "uri": "quay.io/konflux-ci/tekton-catalog/task-tpa-scan"
+            },
+            "environment": {
+              "annotations": {
+                "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "build.appstudio.redhat.com/pull_request_number": "1",
+                "build.appstudio.redhat.com/target_branch": "main",
+                "pipeline.tekton.dev/release": "70f7308",
+                "pipelinesascode.tekton.dev/branch": "main",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+                "pipelinesascode.tekton.dev/git-provider": "gitea",
+                "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+                "pipelinesascode.tekton.dev/max-keep-runs": "3",
+                "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+                "pipelinesascode.tekton.dev/secret-created": "true",
+                "pipelinesascode.tekton.dev/sender": "banc",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+                "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+                "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "results.tekton.dev/childReadyForDeletion": "true",
+                "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/fe3e9936-0820-4ebf-81d9-4eb750d05bcb",
+                "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+                "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "results.tekton.dev/stored": "true",
+                "tekton.dev/pipelines.minVersion": "0.12.1",
+                "tekton.dev/tags": "konflux",
+                "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+              },
+              "labels": {
+                "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+                "app.kubernetes.io/version": "v0.50.0",
+                "appstudio.openshift.io/application": "sample-app",
+                "appstudio.openshift.io/component": "sample-app",
+                "pipelines.appstudio.openshift.io/type": "build",
+                "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+                "pipelinesascode.tekton.dev/event-type": "retest-comment",
+                "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+                "pipelinesascode.tekton.dev/pull-request": "1",
+                "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+                "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+                "pipelinesascode.tekton.dev/state": "started",
+                "pipelinesascode.tekton.dev/url-org": "banc",
+                "pipelinesascode.tekton.dev/url-repository": "sample-app",
+                "tekton.dev/memberOf": "tasks",
+                "tekton.dev/pipeline": "sample-app-on-pull-request",
+                "tekton.dev/pipelineRun": "sample-app-on-pull-request-2cfmd",
+                "tekton.dev/pipelineRunUID": "2b785e4e-4e18-4cb1-8038-34e3759659db",
+                "tekton.dev/pipelineTask": "tpa-scan",
+                "tekton.dev/task": "tpa-scan",
+                "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+              }
+            },
+            "parameters": {
+              "ca-trust-config-map-key": "ca-bundle.crt",
+              "ca-trust-config-map-name": "trusted-ca",
+              "image-digest": "sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819",
+              "image-platform": "",
+              "image-url": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+              "skip-oci-attach-report": "false",
+              "tpa-url": "https://exhort.stage.devshift.net/api/v5/analysis"
+            }
+          },
+          "name": "tpa-scan",
+          "ref": {
+            "params": [
+              {
+                "name": "name",
+                "value": "tpa-scan"
+              },
+              {
+                "name": "bundle",
+                "value": "quay.io/konflux-ci/tekton-catalog/task-tpa-scan:0.1@sha256:6a204cecc1a1091bf928b3db5a4082735c2111f90befdb5b043c498833c02bcf"
+              },
+              {
+                "name": "kind",
+                "value": "task"
+              }
+            ],
+            "resolver": "bundles"
+          },
+          "results": [
+            {
+              "name": "IMAGES_PROCESSED",
+              "type": "string",
+              "value": "{\"image\": {\"pullspec\": \"registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38\", \"digests\": [\"sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819\"]}}\n"
+            },
+            {
+              "name": "REPORTS",
+              "type": "string",
+              "value": "{\"sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819\":\"sha256:3d91a843e946b5a865771a0fd72d20b713847416223d04e4ea52562b82bc0af1\"}\n"
+            },
+            {
+              "name": "SCAN_OUTPUT",
+              "type": "string",
+              "value": "{\"vulnerabilities\":{\"critical\":0,\"high\":10,\"medium\":29,\"low\":3,\"unknown\":0},\"unpatched_vulnerabilities\":{\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"unknown\":0}}\n"
+            },
+            {
+              "name": "TEST_OUTPUT",
+              "type": "string",
+              "value": "{\"result\":\"SUCCESS\",\"timestamp\":\"2026-10-29T12:27:43+00:00\",\"note\":\"Task tpa-scan completed: Refer to Tekton task result SCAN_OUTPUT for vulnerabilities scanned by TPA.\",\"namespace\":\"default\",\"successes\":0,\"failures\":0,\"warnings\":0}\n"
+            }
+          ],
+          "serviceAccountName": "build-pipeline-sample-app",
+          "startedOn": "2026-10-29T12:24:53Z",
+          "status": "Succeeded",
+          "steps": [
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\n\nset -o nounset\nset -o pipefail\n# shellcheck source=/utils.sh\n. /utils.sh\n\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\nimagewithouttag=$(echo -n $IMAGE_URL | sed \"s/\\(.*\\):.*/\\1/\")\n# strip new-line escape symbol from parameter and save it to variable\nimageanddigest=$(echo $imagewithouttag@$IMAGE_DIGEST)\nimages_processed_template='{\"image\": {\"pullspec\": \"'\"$IMAGE_URL\"'\", \"digests\": [%s]}}'\ndigests_processed=()\n\necho \"Inspecting raw image manifest $imageanddigest.\"\n# Get the arch and image manifests by inspecting the image. This is mainly for identifying image indexes\necho \"Selecting auth\"\nmkdir -p /tmp/auth && select-oci-auth \"${imageanddigest}\" >/tmp/auth/config.json\nexport DOCKER_CONFIG=/tmp/auth\nimage_manifests=$(get_image_manifests -i \"${imageanddigest}\")\nif [ -n \"$image_manifests\" ]; then\n  echo \"$image_manifests\" | jq -r 'to_entries[] | \"\\(.key) \\(.value)\"' | while read -r arch arch_sha; do\n    echo \"$arch_sha\" > /tekton/home/image-manifest-$arch.sha\n  done\nelse\n  echo \"Failed to get image manifests from image \\\"$imageanddigest\\\"\"\n  note=\"Task tpa-scan failed: Failed to get image manifests from image \\\"$imageanddigest\\\". For details, check Tekton task log.\"\n  ERROR_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n  echo \"${ERROR_OUTPUT}\" | tee \"/tekton/results/TEST_OUTPUT\"\n  exit 0\nfi\n\n\ntpa_scan() {\n  local sbom_file=${1}\n  local arch=${2}\n  local sbom_format\n\n  sbom_format=$(jq -r 'if .bomFormat == \"CycloneDX\" then \"cyclonedx\" else \"spdx\" end' < \"${sbom_file}\")\n  retry curl -f --show-error -L -X POST -T \"${sbom_file}\" -H \"Content-Type:application/vnd.${sbom_format}+json\" \"${TPA_URL}\" | tee  \"tpa-report-${arch}.json\";\n}\n\nrun_tpa_on_arch() {\n  local arch=\"$1\"\n  local sha_file=\"image-manifest-${arch}.sha\"\n  local sbom_file_path=\"/tmp/sbom-${arch}.json\"\n  local arch_sha=\"\"\n\n  if [ -e \"${sha_file}\" ]; then\n    arch_sha=$(<\"${sha_file}\")\n    arch_imageanddigest=$(echo -n \"${imagewithouttag}@${arch_sha}\")\n  else\n    echo \"Couldn't find the SHA file for the requested architecture.\"\n    exit 1\n  fi\n\n  echo \"Selecting auth\"\n  mkdir -p /tmp/auth && select-oci-auth \"${arch_imageanddigest}\" >/tmp/auth/config.json\n  export DOCKER_CONFIG=/tmp/auth\n\n  # Attempt to download the SBOM file via cosign\n\n  if ! retry cosign download sbom \"${arch_imageanddigest}\" > \"${sbom_file_path}\"; then\n    echo \"Unable to download SBOM for the architecture ${arch}.\"\n    exit 1\n  fi\n\n  if [ -e \"${sbom_file_path}\" ]; then\n    local arch_sha\n    arch_sha=$(<\"$sha_file\")\n\n    echo \"Running TPA scan on $arch image manifest...\"\n    tpa_scan \"${sbom_file_path}\" \"$arch\" || true\n\n    digests_processed+=(\"\\\"$arch_sha\\\"\")\n  else\n    echo \"Couldn't find the SBOM file for the requested ${arch} architecture.\"\n    exit 1\n  fi\n}\n\nplatform=\"${IMAGE_PLATFORM}\"\n\n# If a platform is specified, extract the architecture and run the tpa scan on the corresponding image manifest\nif [ -n \"$platform\" ]; then\n  arch=\"${platform#*/}\"\n  if [ \"$arch\" = \"x86_64\" ] || [ \"$arch\" = \"local\" ] || [ \"$arch\" = \"localhost\" ]; then\n    arch=\"amd64\"\n  fi\n  # Validate against supported arch list. If it's not a known arch, fallback to amd64\n  case \"$arch\" in\n    amd64|ppc64le|arm64|s390x)\n      ;;\n    *)\n      echo \"Error: Unsupported or malformed architecture: '$arch' (parsed from platform: '$platform')\"\n      exit 1\n      ;;\n  esac\n\n  run_tpa_on_arch \"$arch\"\n\n# If no platform is specified, run TPA scan on all available image manifests\nelse\n  for sha_file in image-manifest-*.sha; do\n    if [ -e \"$sha_file\" ]; then\n      arch=$(basename \"$sha_file\" | sed 's/image-manifest-//;s/.sha//')\n      run_tpa_on_arch \"$arch\"\n    fi\n  done\nfi\n\n# If the image is an Image Index, also add the Image Index digest to the list.\nif [[ \"${digests_processed[*]}\" != *\"$IMAGE_DIGEST\"* ]]; then\n  digests_processed+=(\"\\\"$IMAGE_DIGEST\\\"\")\nfi\ndigests_processed_string=$(IFS=,; echo \"${digests_processed[*]}\")\n\nimages_processed=$(echo \"${images_processed_template/\\[%s]/[$digests_processed_string]}\")\necho \"$images_processed\" > images-processed.json\n",
+              "environment": {
+                "container": "get-vulnerabilities",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\n\nset -o errexit\nset -o nounset\nset -o pipefail\n\nif [ \"$SKIP_OCI_ATTACH_REPORT\" = \"true\" ]; then\n  echo 'OCI attach report skipped by parameter.'\n  echo '{}' > reports.json\n  exit 0\nfi\n\nif ! compgen -G \"tpa-report-*.json\" > /dev/null; then\n  echo 'No TPA reports generated. Skipping upload.'\n  echo '{}' > reports.json\n  exit 0\nfi\n\nrepository=\"${IMAGE_URL/:*/}\"\n\narch() {\n  report_file=\"$1\"\n  arch=\"${report_file/*-}\"\n  echo \"${arch/.json/}\"\n}\n\nMEDIA_TYPE='application/vnd.redhat.tpa-report+json'\n\nreports_json=\"{}\"\nfor f in tpa-report-*.json; do\n  digest=$(cat \"image-manifest-$(arch \"$f\").sha\")\n  image_ref=\"${repository}@${digest}\"\n  mkdir -p /tmp/auth && select-oci-auth \"${image_ref}\" >/tmp/auth/config.json\n  export DOCKER_CONFIG=/tmp/auth\n  echo \"Attaching $f to ${image_ref}\"\n  if ! report_digest=\"$(retry oras attach --no-tty --format go-template='{{.digest}}' --registry-config \\\n    \"/tmp/auth/config.json\" --artifact-type \"${MEDIA_TYPE}\" \"${image_ref}\" \"$f:${MEDIA_TYPE}\")\"\n  then\n    echo \"Failed to attach ${f} to ${image_ref}\"\n    exit 1\n  fi\n  # shellcheck disable=SC2016\n  reports_json=\"$(yq --output-format json --indent=0 eval-all '. as $i ireduce ({}; . * $i)' <(echo \"${reports_json}\") <(echo \"${digest}: ${report_digest}\"))\"\ndone\necho \"${reports_json}\" > reports.json\n",
+              "environment": {
+                "container": "oci-attach-report",
+                "image": "oci://quay.io/konflux-ci/task-runner@sha256:c34c933c269e2401bb042fe69e2999cf288331b6586d4f4eca9c845270d9b1f9"
+              }
+            },
+            {
+              "annotations": null,
+              "arguments": null,
+              "entryPoint": "#!/usr/bin/env bash\nset -euo pipefail\n. /utils.sh\ntrap 'handle_error /tekton/results/TEST_OUTPUT' EXIT\n\ntpa_result_files=$(ls /tekton/home/tpa-report-*.json 2>/dev/null || true)\nif [ -z \"$tpa_result_files\" ]; then\n  echo \"Previous step [get-vulnerabilities] failed: No tpa-report files found in /tekton/home.\"\n  exit 1\nfi\n\nmissing_vulnerabilities_files=\"\"\nfor file in $tpa_result_files; do\n  file_suffix=$(basename \"$file\" | sed 's/tpa-report-//;s/.json//')\n  if [ ! -s \"$file\" ]; then\n    echo \"Previous step [get-vulnerabilities] failed: $file is empty.\"\n  else\n    /usr/bin/conftest test --no-fail $file \\\n    --policy /project/rhtpa/vulnerabilities-check.rego --namespace required_checks \\\n    --output=json | tee /tekton/home/tpa-vulnerabilities-\"${file_suffix}\".json || true\n  fi\n\n  #check for missing \"tpa-vulnerabilities-<arch>/image-index\" file and create a string\n  if [ ! -f \"/tekton/home/tpa-vulnerabilities-$file_suffix.json\" ]; then\n    missing_vulnerabilities_files+=\"${missing_vulnerabilities_files:+, }/tekton/home/tpa-vulnerabilities-$file_suffix.json\"\n  fi\ndone\n\nif [ -n \"$missing_vulnerabilities_files\" ]; then\n  note=\"Task tpa-scan failed: $missing_vulnerabilities_files did not generate. For details, check Tekton task log.\"\n  TEST_OUTPUT=$(make_result_json -r \"ERROR\" -t \"$note\")\n  echo \"$missing_vulnerabilities_files did not generate correctly. For details, check conftest command in Tekton task log.\"\n  echo \"${TEST_OUTPUT}\" | tee /tekton/results/TEST_OUTPUT\n  exit 0\nfi\n\nscan_result='{\"vulnerabilities\":{\"critical\":0, \"high\":0, \"medium\":0, \"low\":0, \"unknown\":0}, \"unpatched_vulnerabilities\":{\"critical\":0, \"high\":0, \"medium\":0, \"low\":0, \"unknown\":0}}'\nfor file in /tekton/home/tpa-vulnerabilities-*.json; do\n    result=$(jq -rce \\\n        '{\n            vulnerabilities:{\n              critical: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_critical_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              high: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_high_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              medium: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_medium_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              low: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_low_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              unknown: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unknown_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0)\n            },\n            unpatched_vulnerabilities:{\n              critical: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unpatched_critical_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              high: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unpatched_high_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              medium: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unpatched_medium_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              low: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unpatched_low_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0),\n              unknown: (.[] | .warnings? // [] | map(select(.metadata.details.name==\"rhtpa_unpatched_unknown_vulnerabilities\").metadata.\"vulnerabilities_number\" // 0)| add // 0)\n            }\n        }' \"$file\")\n\n    scan_result=$(jq -s -rce \\\n          '.[0].vulnerabilities.critical += .[1].vulnerabilities.critical |\n          .[0].vulnerabilities.high += .[1].vulnerabilities.high |\n          .[0].vulnerabilities.medium += .[1].vulnerabilities.medium |\n          .[0].vulnerabilities.low += .[1].vulnerabilities.low |\n          .[0].vulnerabilities.unknown += .[1].vulnerabilities.unknown |\n          .[0].unpatched_vulnerabilities.critical += .[1].unpatched_vulnerabilities.critical |\n          .[0].unpatched_vulnerabilities.high += .[1].unpatched_vulnerabilities.high |\n          .[0].unpatched_vulnerabilities.medium += .[1].unpatched_vulnerabilities.medium |\n          .[0].unpatched_vulnerabilities.low += .[1].unpatched_vulnerabilities.low |\n          .[0].unpatched_vulnerabilities.unknown += .[1].unpatched_vulnerabilities.unknown |\n          .[0]' <<<\"$scan_result $result\")\ndone\n\necho \"$scan_result\" | tee \"/tekton/results/SCAN_OUTPUT\"\n\ncat /tekton/home/images-processed.json | tee /tekton/results/IMAGES_PROCESSED\n# shellcheck disable=SC2154\ncat /tekton/home/reports.json > \"/tekton/results/REPORTS\"\n\nnote=\"Task tpa-scan completed: Refer to Tekton task result SCAN_OUTPUT for vulnerabilities scanned by TPA.\"\nTEST_OUTPUT=$(make_result_json -r \"SUCCESS\" -t \"$note\")\necho \"${TEST_OUTPUT}\" | tee /tekton/results/TEST_OUTPUT\n",
+              "environment": {
+                "container": "conftest-vulnerabilities",
+                "image": "oci://quay.io/konflux-ci/konflux-test@sha256:dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "buildType": "tekton.dev/v1/PipelineRun",
+    "builder": {
+      "id": "https://tekton.dev/chains/v2"
+    },
+    "invocation": {
+      "configSource": {},
+      "environment": {
+        "annotations": {
+          "build.appstudio.openshift.io/repo": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+          "build.appstudio.redhat.com/commit_sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+          "build.appstudio.redhat.com/pull_request_number": "1",
+          "build.appstudio.redhat.com/target_branch": "main",
+          "pipelinesascode.tekton.dev/branch": "main",
+          "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+          "pipelinesascode.tekton.dev/controller-info": "{\"name\":\"default\",\"configmap\":\"pipelines-as-code\",\"secret\":\"pipelines-as-code-secret\", \"gRepo\": \"pipelines-as-code\"}",
+          "pipelinesascode.tekton.dev/event-type": "retest-comment",
+          "pipelinesascode.tekton.dev/git-auth-secret": "pac-gitauth-smcqlk",
+          "pipelinesascode.tekton.dev/git-provider": "gitea",
+          "pipelinesascode.tekton.dev/log-url": "https://dashboard.is.not.configured",
+          "pipelinesascode.tekton.dev/max-keep-runs": "3",
+          "pipelinesascode.tekton.dev/on-cel-expression": "event == \"pull_request\" && target_branch == \"main\"",
+          "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+          "pipelinesascode.tekton.dev/pull-request": "1",
+          "pipelinesascode.tekton.dev/repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+          "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+          "pipelinesascode.tekton.dev/scm-reporting-plr-started": "true",
+          "pipelinesascode.tekton.dev/secret-created": "true",
+          "pipelinesascode.tekton.dev/sender": "banc",
+          "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+          "pipelinesascode.tekton.dev/sha-title": "Banc A1 : build hermétique, prefetch gomod et npm, SOURCE_DATE_EPOCH=0\n",
+          "pipelinesascode.tekton.dev/sha-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app/commit/ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+          "pipelinesascode.tekton.dev/source-branch": "konflux-sample-app",
+          "pipelinesascode.tekton.dev/source-repo-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+          "pipelinesascode.tekton.dev/state": "started",
+          "pipelinesascode.tekton.dev/url-org": "banc",
+          "pipelinesascode.tekton.dev/url-repository": "sample-app",
+          "results.tekton.dev/record": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db/records/2b785e4e-4e18-4cb1-8038-34e3759659db",
+          "results.tekton.dev/recordSummaryAnnotations": "{\"repo\":\"sample-app\",\"commit\":\"ad8ccc3760a7c3e54c4c6719ecd84144093ada38\",\"eventType\":\"retest-comment\",\"pull_request-id\":1}",
+          "results.tekton.dev/result": "default-tenant/results/2b785e4e-4e18-4cb1-8038-34e3759659db",
+          "results.tekton.dev/stored": "false",
+          "test.appstudio.openshift.io/pr-group": "konflux-sample-app"
+        },
+        "labels": {
+          "app.kubernetes.io/managed-by": "pipelinesascode.tekton.dev",
+          "app.kubernetes.io/version": "v0.50.0",
+          "appstudio.openshift.io/application": "sample-app",
+          "appstudio.openshift.io/component": "sample-app",
+          "pipelines.appstudio.openshift.io/type": "build",
+          "pipelinesascode.tekton.dev/cancel-in-progress": "true",
+          "pipelinesascode.tekton.dev/event-type": "retest-comment",
+          "pipelinesascode.tekton.dev/original-prname": "sample-app-on-pull-request",
+          "pipelinesascode.tekton.dev/pull-request": "1",
+          "pipelinesascode.tekton.dev/repository": "forgejo-banc-a1-svc-cluster-local-banc-sample-app",
+          "pipelinesascode.tekton.dev/sha": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+          "pipelinesascode.tekton.dev/state": "started",
+          "pipelinesascode.tekton.dev/url-org": "banc",
+          "pipelinesascode.tekton.dev/url-repository": "sample-app",
+          "tekton.dev/pipeline": "sample-app-on-pull-request",
+          "test.appstudio.openshift.io/pr-group-sha": "2a906c75840b49d8cbed077a365652716f1b6f0f9f50c4fbafb5b9339f5dc4"
+        }
+      },
+      "parameters": {
+        "build-args": [],
+        "build-args-file": "",
+        "build-image-index": "false",
+        "buildah-format": "docker",
+        "dockerfile": "Containerfile",
+        "enable-cache-proxy": "false",
+        "enable-package-registry-proxy": "true",
+        "git-url": "https://forgejo.banc-a1.svc.cluster.local/banc/sample-app",
+        "hermetic": "true",
+        "image-expires-after": "5d",
+        "omit-history": "false",
+        "output-image": "registry-service.kind-registry/default-tenant/sample-app:on-pr-ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+        "path-context": ".",
+        "prefetch-input": "[{\"type\": \"gomod\", \"path\": \".\"}, {\"type\": \"npm\", \"path\": \"web\"}]",
+        "privileged-nested": "false",
+        "revision": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38",
+        "rewrite-timestamp": "true",
+        "sast-target-dirs": ".",
+        "skip-checks": "false",
+        "source-date-epoch": "0"
+      }
+    },
+    "materials": [
+      {
+        "digest": {
+          "sha256": "b296232c9b0d478c0bd1f48911ead97cd786eebdc737b877797564567fda8eae"
+        },
+        "uri": "oci://quay.io/konflux-ci/konflux-build-cli"
+      },
+      {
+        "digest": {
+          "sha256": "421003a5c077ecb820460e71637125ec9093d2101c749a32ede28e190283e9db"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-init"
+      },
+      {
+        "digest": {
+          "sha256": "fddbb4c2edb01a3f0065321f84cf2e4d8e483b4149e3d6f78dd0c46e85e35aef"
+        },
+        "uri": "oci://quay.io/konflux-ci/konflux-build-cli"
+      },
+      {
+        "digest": {
+          "sha256": "7c51a3530f239323442e28ea7dace8b88a14638d823d5eaa8514843c33b03c02"
+        },
+        "uri": "oci://quay.io/konflux-ci/build-trusted-artifacts"
+      },
+      {
+        "digest": {
+          "sha256": "f90deac0d63b43c7cb3f0b2d83ee56aa7fa18bb493f084286c6a953bbf479d8d"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta-min"
+      },
+      {
+        "digest": {
+          "sha256": "4b01fbf98fa7155f5c21443c285f88853864ae7cc66981cf6b543fc6ba16b81b"
+        },
+        "uri": "oci://quay.io/konflux-ci/task-runner"
+      },
+      {
+        "digest": {
+          "sha256": "a61ef5dfee9a8720f7bc2d1d52001057ca6a22d2ddbae0db175b11d9ab95105a"
+        },
+        "uri": "oci://quay.io/konflux-ci/build-trusted-artifacts"
+      },
+      {
+        "digest": {
+          "sha256": "43596c6351cdf7188b09fd4dcf5c6b3bb8b57ea557e84a1aa624f60e74c624ce"
+        },
+        "uri": "oci://quay.io/konflux-ci/hermeto"
+      },
+      {
+        "digest": {
+          "sha256": "d1bf4160ad55028365a84e613811790d6839ffa734bc4a352d6a7ab9e3febb8f"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta-min"
+      },
+      {
+        "digest": {
+          "sha256": "0415613f955ef8f7c6fc821a6738dcf062d9a3582441042b87a2391c375d7f54"
+        },
+        "uri": "oci://quay.io/konflux-ci/konflux-build-cli"
+      },
+      {
+        "digest": {
+          "sha256": "1374bc35c71781987cce00ef5efe2be42923f83def19b60a570e947189b90d15"
+        },
+        "uri": "oci://quay.io/konflux-ci/mobster"
+      },
+      {
+        "digest": {
+          "sha256": "de644e1dee81463bd47e4e5a33688d4ef40cd963f0a17fccc9cf11ca92eea471"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta-min"
+      },
+      {
+        "digest": {
+          "sha256": "70679b88f57130e9a939a6765aacd976a9d66bfa5d1733fcee185dc07be39042"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-build-image-index-min"
+      },
+      {
+        "digest": {
+          "sha256": "dae74bf0d6fc349d3ae140d9e3a921ad5009fdf8dade3186bfd9b65fbe3a365b"
+        },
+        "uri": "oci://quay.io/konflux-ci/konflux-test"
+      },
+      {
+        "digest": {
+          "sha256": "0ccc688a77e9b7b0b8973c132a1e840844137e77f887be4a0bec8893b0776872"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check"
+      },
+      {
+        "digest": {
+          "sha256": "580b5b7850e5c11c3a4f4ef6b0bacef4cbbf5250480d4e2390713f453657c1bc"
+        },
+        "uri": "oci://quay.io/konflux-ci/clamav-db"
+      },
+      {
+        "digest": {
+          "sha256": "c34c933c269e2401bb042fe69e2999cf288331b6586d4f4eca9c845270d9b1f9"
+        },
+        "uri": "oci://quay.io/konflux-ci/task-runner"
+      },
+      {
+        "digest": {
+          "sha256": "9f7f5ca49400455e48ab2a1cce4759c7aab43c9a09e2a81714c8039efea5c811"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-clamav-scan-min"
+      },
+      {
+        "digest": {
+          "sha256": "254989d35310c0998eb2ae60aa4703da842d99d82ed434fd5208cc9639d32969"
+        },
+        "uri": "oci://quay.io/konflux-ci/build-trusted-artifacts"
+      },
+      {
+        "digest": {
+          "sha256": "561847430299db122ba499a3c1a4e28d850c191c9da6048a23361963eda49cac"
+        },
+        "uri": "oci://quay.io/konflux-ci/oras"
+      },
+      {
+        "digest": {
+          "sha256": "b25a46b20e09eacec4e177cdd8d18a31fea38e9e346b49215e6e5044a00b8d85"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-sast-shell-check-oci-ta-min"
+      },
+      {
+        "digest": {
+          "sha256": "80bf85aebf99a9d26c2d3fae3d90ee6bfe28246e3b0bbd950934ceba764bc067"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check-oci-ta-min"
+      },
+      {
+        "digest": {
+          "sha256": "9ff6728800cea9a03ce5449a2ec7afb75a8d292a043adab0afa3c7cfa91a99d8"
+        },
+        "uri": "oci://quay.io/konflux-ci/tools"
+      },
+      {
+        "digest": {
+          "sha256": "365b172d2a8a145406f028d0a94a77b489fbdf9d84e5bd9529b1c3ad72f077b1"
+        },
+        "uri": "oci://quay.io/konflux-ci/konflux-test"
+      },
+      {
+        "digest": {
+          "sha256": "f110c53fd58cab7ac6e47d472bb801d49e2f584eb31837db9d611e11b3862a3d"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-rpms-signature-scan"
+      },
+      {
+        "digest": {
+          "sha256": "6a204cecc1a1091bf928b3db5a4082735c2111f90befdb5b043c498833c02bcf"
+        },
+        "uri": "quay.io/konflux-ci/tekton-catalog/task-tpa-scan"
+      },
+      {
+        "digest": {
+          "sha1": "ad8ccc3760a7c3e54c4c6719ecd84144093ada38"
+        },
+        "uri": "git+https://forgejo.banc-a1.svc.cluster.local/banc/sample-app.git"
+      }
+    ],
+    "metadata": {
+      "buildFinishedOn": "2026-10-29T12:28:03Z",
+      "buildStartedOn": "2026-10-29T12:17:03Z",
+      "completeness": {
+        "environment": false,
+        "materials": false,
+        "parameters": false
+      },
+      "reproducible": false
+    }
+  }
+}

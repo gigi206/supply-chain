@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+  name: tpa-scan-sans-sortie
+  namespace: default-tenant
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/pipelineTask: tpa-scan
+  policyTypes:
+  - Egress
