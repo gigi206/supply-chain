@@ -2,6 +2,7 @@
 # Banc A2 : configuration de l'appliance après le premier accès (tout se passe dans la VM).
 # - mot de passe du compte Admin remplacé (POST /person/Admin?cmd=change_password), ancien refusé ;
 # - osc de l'appliance configuré pour root (oscrc en 0600) ;
+# - initrd des VM de build (/boot/initrd.obs.guest), celui de kiwi ne monte pas leur disque ;
 # - worker : 1 instance de 4 jobs et 3 Gi (6 instances par défaut, une par vCPU, ne tiennent
 #   pas dans 8 Gi), type de VM « kvm » imposé (pas de repli silencieux en chroot) ;
 # - provenance SLSA activée pour le projet poc ($slsaprovenance, désactivée par défaut) ;
@@ -39,6 +40,19 @@ s 'sed -i -e "s/^OBS_WORKER_INSTANCES=.*/OBS_WORKER_INSTANCES=\"1\"/" \
    systemctl restart obsworker
    journalctl -u obsworker --no-pager -n 20 | grep -E "Run [0-9]+ obsworker|Type of obsworker"
    sleep 5; ls /srv/obs/workers/idle 2>/dev/null | sed "s/^/worker inactif : /"'
+
+echo "## Initrd des VM de build (/boot/initrd.obs.guest)"
+# L'initrd de l'appliance (kiwi) n'a ni pilote de disque IDE ni ext4 : la VM de build s'arrête sur
+# « dracut: FATAL: Storage device did not appear ». build-vm-kvm préfère /boot/initrd.obs.guest
+# (disque virtio) : on le génère avec le dracut de l'appliance, sans les modules kiwi ni obs
+# (configuration de l'appliance elle-même), ni rdma (il réclame lspci, absent).
+s 'k=$(readlink /boot/vmlinuz | sed "s/^vmlinuz-//")
+   dracut --no-hostonly --no-hostonly-cmdline --reproducible --force --quiet \
+     --omit "kiwi-repart kiwi-lib kiwi-dump kiwi-live kiwi-dump-reboot obs plymouth rdma" \
+     --add-drivers "ext4 binfmt_misc virtio_blk virtio_rng" --kver "$k" /boot/initrd.obs.guest
+   echo "noyau $k ; initrd $(stat -c %s /boot/initrd.obs.guest) octets, sha256 $(sha256sum /boot/initrd.obs.guest | cut -c1-16)…"
+   lsinitrd -m /boot/initrd.obs.guest | sed -n "/^dracut modules:/,/^=/p" | grep -v "^=" | paste -sd" "
+   lsinitrd /boot/initrd.obs.guest | grep -o -E "(virtio_blk|ext4|binfmt_misc)\.ko[^ ]*" | sort -u | paste -sd" "'
 
 echo "## Provenance SLSA du projet poc (\$slsaprovenance, préfixe « projet/dépôt » : BSSched/BuildJob.pm)"
 s 'f=/usr/lib/obs/server/BSConfig.pm

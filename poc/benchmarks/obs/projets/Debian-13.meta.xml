@@ -1,7 +1,10 @@
-<!-- Banc A2 : Debian 13 figée (instantané snapshot.debian.org), téléchargée à la demande.
-     Release.gpg vérifié par bs_dodup avec les clés archive et stable de trixie (insérées par depots.sh). -->
+<!-- Banc A2 : Debian 13 téléchargée à la demande depuis deb.debian.org, figée par épinglage : depots.sh
+     exige que son InRelease soit identique (sha256) à celui de l'instantané snapshot.debian.org
+     20261029T000000Z. L'instantané lui-même est inutilisable en DoD : il redirige chaque .deb vers une
+     URL relative, que le repserver d'OBS rejette (BSWatcher::rpc_redirect, « bad uri »).
+     Release.gpg vérifié par bs_dodup avec les clés de trixie et l'archive de Debian 12 (depots.sh). -->
 <project name="Debian:13">
-  <title>Debian 13 (instantané 20261029T000000Z)</title>
+  <title>Debian 13 (InRelease de l'instantané 20261029T000000Z)</title>
   <description>Dépôt téléchargé à la demande, figé ; base des builds deb du banc A2.</description>
   <person userid="Admin" role="maintainer"/>
   <build>
@@ -11,7 +14,7 @@
     <disable/>
   </publish>
   <repository name="standard">
-    <download arch="x86_64" repotype="deb" url="https://snapshot.debian.org/archive/debian/20261029T000000Z?dist=trixie">
+    <download arch="x86_64" repotype="deb" url="https://deb.debian.org/debian?dist=trixie">
       <pubkey>@CLES@</pubkey>
     </download>
     <arch>x86_64</arch>

@@ -1,4 +1,4 @@
-# configurer.sh, 2026-10-29T14:02:14Z
+# configurer.sh, 2026-10-29T14:36:40Z
 ## Compte Admin
 ancien mot de passe sur /person/Admin : HTTP 401
 nouveau mot de passe sur /person/Admin : HTTP 200
@@ -10,11 +10,15 @@ OBS_WORKER_JOBS="4"
 OBS_VM_TYPE="kvm"
 OBS_VM_DISK_AUTOSETUP_ROOT_FILESIZE="16384"
 OBS_INSTANCE_MEMORY="3072"
-Oct 29 13:56:35 sc-obs obsworker[3536]: Run 1 obsworker using /var/cache/obs/worker
-Oct 29 13:56:35 sc-obs obsworker[3536]: Type of obsworker is KVM virtual machine
-Oct 29 14:02:21 sc-obs obsworker[4210]: Run 1 obsworker using /var/cache/obs/worker
-Oct 29 14:02:21 sc-obs obsworker[4210]: Type of obsworker is KVM virtual machine
+Oct 29 14:36:30 sc-obs obsworker[63401]: Run 1 obsworker using /var/cache/obs/worker
+Oct 29 14:36:30 sc-obs obsworker[63401]: Type of obsworker is KVM virtual machine
+Oct 29 14:36:54 sc-obs obsworker[63660]: Run 1 obsworker using /var/cache/obs/worker
+Oct 29 14:36:54 sc-obs obsworker[63660]: Type of obsworker is KVM virtual machine
 worker inactif : x86_64:sc-obs:1
+## Initrd des VM de build (/boot/initrd.obs.guest)
+noyau 6.12.0-160000.40-default ; initrd 49112531 octets, sha256 b21c6b00f6fa187b…
+dracut modules: systemd systemd-initrd i18n btrfs crypt dm kernel-modules kernel-modules-extra lvm mdraid nvdimm qemu qemu-net lunmask resume rootfs-block suse-btrfs suse-xfs terminfo udev-rules virtfs virtiofs dracut-systemd haveged usrmount base fs-lib shutdown suse suse-initrd
+binfmt_misc.ko.zst ext4.ko.zst virtio_blk.ko.zst
 ## Provenance SLSA du projet poc ($slsaprovenance, préfixe « projet/dépôt » : BSSched/BuildJob.pm)
 377:our $slsaprovenance = [ "poc/" ];
 /usr/lib/obs/server/BSConfig.pm syntax OK
@@ -29,10 +33,10 @@ services OBS actifs : apache2.service memcached.service obs-clockwork.service ob
 RPM installés : 554
 clé OBS dans la base rpm : gpg-pubkey-c5c219e7-51236685, copie de 2013 expirée le 30/04/2015 (embarquée dans config.sh de l appliance)
                total        used        free      shared  buff/cache   available
-Mem:            7939        3330        4422           3         429        4609
-/dev/vda3        28G  3.4G   23G  13% /
+Mem:            7939        3726        2319           3        2167        4213
+/dev/vda3        28G   22G  4.9G  82% /
 /dev/vda2        10G  228M  9.8G   3% /srv/obs/service
-RAM de la VM vue par l'hôte (RSS de qemu) : 4.3 Gi
+RAM de la VM vue par l'hôte (RSS de qemu) : 7.0 Gi
 ## Paquets rpm de la VM comparés au SBOM de la qcow2 (même build)
 composants du SBOM : pkg:golang 434, pkg:rpm 554, sans purl 1
 écarts : 1 lignes (code diff 1)

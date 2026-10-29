@@ -55,5 +55,27 @@ La grille n'est pas modifiée ; ce qui suit précise seulement comment l'appliqu
 Premier accès : l'appliance n'a ni cloud-init ni combustion. Un script se connecte donc sur la console série avec le mot de passe root par défaut, qui est public. Il le remplace aussitôt par un mot de passe aléatoire, installe une clé SSH dédiée et fait de même pour le compte `Admin` de l'interface. Les secrets sont stockés en 0600 dans `~/.cache/supply-chain-poc/obs`. `osc` est fourni par l'appliance : rien n'est installé sur l'hôte.
 
 Dépôts figés :
-- Debian 13 : `snapshot.debian.org`, instantané `20261029T000000Z` ;
+- Debian 13 : instantané `20261029T000000Z` de `snapshot.debian.org`, servi par `deb.debian.org` et épinglé par le sha256 de son `InRelease` (voir les constats plus bas) ;
 - Rocky 9.7 : vault, figé depuis la sortie de la 9.8.
+
+## Constats d'installation (29/10/2026)
+
+- **Installation en 9 min 25 s** depuis l'accord. Ce temps couvre le téléchargement vérifié de l'appliance, la VM, le premier accès, puis le compte Admin, `osc` et le worker. Le premier démarrage arrive à l'invite de connexion en 15 s.
+- **Paquets** : les 554 rpm de la VM correspondent exactement au SBOM CycloneDX publié pour la qcow2 du même build (ce SBOM recense aussi 434 modules Go, ceux d'`obs-gitea-bridge`).
+- **Clé OBS dans la base rpm de l'appliance** : c'est une copie de 2013 de la clé `660F…19E7`, **expirée le 30/04/2015**. Elle est embarquée dans `config.sh` du kiwi, d'où une erreur à chaque `rpm -q`. La clé publiée sur download.opensuse.org et build.opensuse.org a la même empreinte et vaut jusqu'en 2028.
+- **Worker** : par défaut, une instance par vCPU (6 ici), ce qui ne tient pas dans 8 Gi. Il est réglé à 1 instance de 4 jobs et 3 Gi, en type `kvm` imposé. Faute de paquet `kernel-obs-build`, la VM de build démarre sur le noyau de l'appliance (`build-vm-kvm`) ; ce paquet est fourni sur build.opensuse.org par `OBS:DefaultKernel`, absent de l'instance.
+- **L'appliance ne construit pas telle quelle pour des cibles non SUSE.** L'initrd que kiwi a construit pour l'appliance ne contient ni pilote IDE ni ext4. La VM de build s'arrête donc sur `dracut: FATAL: Storage device did not appear`, le watchdog la tue au bout de 5 minutes et le job repart en boucle. Après plusieurs échecs, le dispatcher marque le worker « bad » (`waiting for 1 compliant workers (1 of them bad)`). Correctif :
+  - générer `/boot/initrd.obs.guest` avec le dracut de l'appliance (`configurer.sh`), que `build-vm-kvm` préfère et associe à un disque virtio ;
+  - puis vider l'état du dispatcher avec `bs_admin --drop-badhosts`.
+
+  On perd environ 15 minutes.
+- **VM de build** (journal de build) : `qemu-kvm -cpu host -net none -sandbox on -run-with user=qemu`. Elle n'a **aucune interface réseau**, et son CPU est celui de sc-obs, donc Haswell-v4.
+- **Libvirt** : avec `check='full'`, QEMU refuse le modèle Haswell-v4, parce qu'il y ajoute des fonctions (f16c, rdrand, xsaveopt, sous-fonctions vmx). Le banc passe donc en `check='partial'`. Dans la VM, x86-64-v3 est supporté, x86-64-v4 ne l'est pas, AVX-512 est absent, et `/dev/kvm` est présent.
+- **Réseau** : la VM sort par le NAT libvirt malgré la politique `FORWARD` de Docker sur l'hôte.
+
+## Constats sur les dépôts téléchargés à la demande
+
+- **Signatures vérifiées** : `bs_dodup` vérifie `Release.gpg` (deb) et `repomd.xml.asc` (rpm) avec les clés déclarées dans `<pubkey>`. `gpgv` exige que **toutes** les signatures soient vérifiables. Or le `Release` de trixie porte aussi la signature de la clé d'archive de Debian 12 : il faut donc la déclarer, comme le fait build.opensuse.org.
+- **snapshot.debian.org inutilisable en DoD (bug d'OBS)** : l'instantané redirige chaque `.deb` vers une URL relative (`/file/<hash>/…`). Le téléchargement asynchrone du repserver (`BSWatcher::rpc_redirect`) transmet cet en-tête `Location` tel quel et le rejette (« bad uri »). Pourtant, `BSRPC`, qu'utilise `bs_dodup` pour les métadonnées, résout bien les URL relatives.
+- **Contournement retenu** : le DoD pointe sur `deb.debian.org`, figé par épinglage. Son `InRelease` doit être identique, au sha256 près, à celui de l'instantané du 29/10/2026 (point release du 12/09/2026). Il est vérifié à l'installation et le sera de nouveau en fin de banc.
+- **Volume téléchargé** pour le premier build : 466 rpm (Rocky) et 202 deb (Debian). Le vault Rocky est lent, environ 30 paquets par minute.

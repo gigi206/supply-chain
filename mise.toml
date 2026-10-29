@@ -154,6 +154,18 @@ run = "poc/benchmarks/obs/depots.sh"
 description = "Sources reproductibles de sample-app (vendor Go, marked vérifié) : archive, paquet source Debian, spec"
 run = "poc/packaging/sources.sh"
 
+[tasks."obs:construire"]
+description = "Banc A2 : build de sample-app dans OBS (envoyer|reconstruire <libellé>), collecte des binaires, journaux et provenance"
+run = "poc/benchmarks/obs/construire.sh"
+
+[tasks."obs:tests"]
+description = "Banc A2 : spec hostile (réseau, signd, clé, fausse provenance), signature DSSE des provenances, matériaux par digest"
+run = "poc/benchmarks/obs/tests.sh"
+
+[tasks."obs:etat"]
+description = "Banc A2 : poids opérationnel de l'appliance (RAM au repos, services, disque) dans resultats/etat-<libellé>.log"
+run = "poc/benchmarks/obs/etat.sh"
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]

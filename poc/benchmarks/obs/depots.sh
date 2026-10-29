@@ -4,7 +4,8 @@
 #    Debian 13 (archive, stable) et archive Debian 12 (elle signe aussi Release.gpg de trixie) :
 #    ftp-master.debian.org et le dépôt debian-archive-keyring (salsa) ;
 #    Rocky 9 : dl.rockylinux.org et le projet RockyLinux:9 de build.opensuse.org.
-# 2. Métadonnées figées vérifiées sur l'hôte : InRelease de l'instantané Debian, repomd.xml.asc du vault.
+# 2. Métadonnées figées vérifiées sur l'hôte : InRelease de l'instantané Debian (signatures, et même
+#    sha256 sur deb.debian.org, source réelle du DoD), repomd.xml.asc du vault.
 # 3. prjconf de référence (Debian:13, RockyLinux:9 de build.opensuse.org) archivés une fois et
 #    épinglés par sha256 ; seule modification : retrait de « VMInstall: kernel-obs-build » (Debian),
 #    que fournit OBS:DefaultKernel, absent de l'instance ; la VM de build démarre alors sur le noyau
@@ -21,6 +22,8 @@ P=$here/projets
 O=${OBS_DIR:-$HOME/.cache/supply-chain-poc/obs}
 A=$O/entrees
 SNAP=https://snapshot.debian.org/archive/debian/20261029T000000Z
+DEB=https://deb.debian.org/debian   # source du DoD, épinglée sur l'InRelease de SNAP (voir projets/Debian-13.meta.xml)
+SHA_INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675   # trixie, 12/09/2026
 VAULT=https://dl.rockylinux.org/vault/rocky/9.7
 FPR_DEB_ARCHIVE=04B54C3CDCA79751B16BC6B5225629DF75B188BD   # Debian Archive Automatic Signing Key (13/trixie)
 FPR_DEB_STABLE=41587F7DB8C774BCCF131416762F67A0B2C39DE4    # Debian Stable Release Key (13/trixie)
@@ -72,6 +75,11 @@ GNUPGHOME=$G gpg --batch --status-fd 1 --verify "$G/InRelease" 2>/dev/null > "$G
 awk '$2 == "VALIDSIG" {print "  VALIDSIG", $3, $4, "clé principale", $NF} $2 == "NO_PUBKEY" {print "  NO_PUBKEY", $3, "(non importée)"}' "$G/statut"
 for f in "$FPR_DEB_ARCHIVE" "$FPR_DEB_STABLE" "$FPR_DEB_ARCHIVE_12"; do
   grep -q "^\[GNUPG:\] VALIDSIG .* $f$" "$G/statut" || { echo "ÉCHEC : InRelease non signé par $f"; exit 1; }
+done
+for u in "$SNAP" "$DEB"; do
+  h=$(curl -fsSL "$u/dists/trixie/InRelease" | sha256sum | cut -d' ' -f1)
+  echo "InRelease de $u : $h"
+  [[ $h == "$SHA_INRELEASE" ]] || { echo "ÉCHEC : InRelease différent de l'instantané épinglé"; exit 1; }
 done
 for r in BaseOS AppStream; do
   curl -fsSL "$VAULT/$r/x86_64/os/repodata/repomd.xml" -o "$G/repomd.xml"
