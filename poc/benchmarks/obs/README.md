@@ -30,6 +30,8 @@ Rejeu :
 
 Démontage : `mise run obs:vm -- detruire`.
 
+**Le rejeu à l'identique n'est plus possible.** L'appliance Build53.24 a été supprimée après le banc, sur décision du propriétaire, et elle n'est plus téléchargeable en amont, puisque le fichier est écrasé à chaque build. `obs:preparer` échouera sur le sha256 épinglé ; un rejeu demanderait une nouvelle appliance, à épingler de nouveau.
+
 ## Décisions du propriétaire (29/10/2026)
 
 ### Version évaluée : appliance « Unstable », épinglée

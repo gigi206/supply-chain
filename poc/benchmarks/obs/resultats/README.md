@@ -169,7 +169,7 @@ Les règles d'interpolation et d'arrondi sont celles du banc A1. **Pour A-1, un 
 ## Constats
 
 1. **La provenance SLSA n'existe que sur master**, et **master n'a pas de release depuis 2019**. Aucune version publiée d'OBS ne produit de provenance.
-2. **Bug d'OBS : snapshot.debian.org inutilisable en DoD.** Le téléchargement asynchrone du repserver (`BSWatcher::rpc_redirect`) ne résout pas les redirections relatives (« bad uri »). `BSRPC`, que `bs_dodup` utilise pour les métadonnées, les résout bien. Contournement : `deb.debian.org`, épinglé par l'`InRelease` de l'instantané. Le bug n'a pas été signalé en amont, ce qui demande l'accord du propriétaire.
+2. **Bug d'OBS : snapshot.debian.org inutilisable en DoD.** Le téléchargement asynchrone du repserver (`BSWatcher::rpc_redirect`) ne résout pas les redirections relatives (« bad uri »). `BSRPC`, que `bs_dodup` utilise pour les métadonnées, les résout bien. Contournement : `deb.debian.org`, épinglé par l'`InRelease` de l'instantané. Décision du propriétaire : le bug n'est pas signalé en amont.
 3. **L'appliance ne construit pas telle quelle pour des cibles non SUSE.** L'initrd de kiwi n'a ni pilote de disque ni ext4 : la VM de build s'arrête, puis le dispatcher marque le worker « bad ». Il faut un `/boot/initrd.obs.guest` dédié, puis `bs_admin --drop-badhosts`.
 4. **Release** : par défaut `<CI_CNT>.<B_CNT>`, donc changeante à chaque rebuild ; il faut `Release: <CI_CNT>` pour comparer.
 5. **`gpgv` exige toutes les signatures** du `Release.gpg` de Debian : la clé d'archive de Debian 12 est donc nécessaire pour trixie.

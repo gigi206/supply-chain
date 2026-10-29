@@ -123,5 +123,5 @@ Il faut **`check='partial'`** : avec `check='full'`, libvirt refuse de démarrer
 |---|---|
 | Pool libvirt dédié au PoC sur `/` (répertoire à créer) | A2 : validé, créé puis supprimé le 29/10/2026 (`supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc`) ; 08 : à confirmer |
 | Réseau libvirt NAT dédié au PoC (pont et sous-réseau propres, séparés des VM personnelles) | A2 : validé, créé puis supprimé le 29/10/2026 (`virbr-scpoc`, 192.168.161.0/24) ; 08 : à confirmer |
-| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2 : fait (appliance conservée dans `~/.cache/supply-chain-poc/obs`) ; 08 : images cloud à confirmer |
+| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2 : fait (appliance supprimée après le banc, sur décision du propriétaire) ; 08 : images cloud à confirmer |
 | Installation des outils de 4b | 4b |
