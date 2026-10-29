@@ -1,0 +1,8 @@
+jalon	horodatage UTC	note
+J1 accord du propriétaire	2026-10-29T16:00:34Z	k3s v1.35.9, Debian 13, verrou de l ADR 0001 levé
+J1 VM définies	2026-10-29T16:01:17Z	pool, réseau, 3 volumes et 3 graines
+J1 VM définies	2026-10-29T16:13:22Z	redéfinies avec une carte VGA après diagnostic de la boucle de démarrage (16:01 → 16:13), volumes conservés
+J1 VM joignables en SSH	2026-10-29T16:13:32Z	
+J1 installation de k3s	2026-10-29T16:13:40Z	
+J1 server prêt	2026-10-29T16:13:54Z	
+J1 trois nœuds prêts	2026-10-29T16:14:16Z	

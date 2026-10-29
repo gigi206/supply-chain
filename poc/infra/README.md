@@ -115,13 +115,15 @@ Il faut **`check='partial'`** : avec `check='full'`, libvirt refuse de démarrer
 - les VM sortent sur le réseau par le NAT libvirt, malgré la politique `FORWARD` de Docker sur l'hôte ;
 - à l'installation de Kata : les invités héritent bien du modèle de CPU de la VM `build`. Au banc A2, les VM imbriquées lancées en `-cpu host` héritaient de Haswell-v4.
 
-**Images des VM** : image cloud officielle (Debian ou Ubuntu, à choisir en brique 08), dont on vérifie l'empreinte et la signature, et graine cloud-init NoCloud construite avec `genisoimage`.
+Ces contrôles ont été **refaits sur les trois VM de la brique 08** le 29/10/2026 ([`controles-j1.log`](../bricks/08-trust-plane/resultats/controles-j1.log)) : x86-64-v3 sans v4 ni AVX-512, `/dev/kvm` dans `sc-build`, sortie par le NAT.
+
+**Images des VM** : image cloud officielle et graine cloud-init NoCloud construite avec `genisoimage`. Choix du propriétaire en brique 08 (29/10/2026) : **Debian 13 generic**, qui ne publie pas de signature ; son SHA512 est vérifié sur deux documents de cloud.debian.org. Elle exige une carte VGA (sans affichage) pour démarrer ([brique 08](../bricks/08-trust-plane/README.md#jalon-j1--infra-et-k3s-29102026)).
 
 ### Changements sur l'hôte à valider par le propriétaire
 
 | Changement | Phase |
 |---|---|
-| Pool libvirt dédié au PoC sur `/` (répertoire à créer) | A2 : validé, créé puis supprimé le 29/10/2026 (`supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc`) ; 08 : à confirmer |
-| Réseau libvirt NAT dédié au PoC (pont et sous-réseau propres, séparés des VM personnelles) | A2 : validé, créé puis supprimé le 29/10/2026 (`virbr-scpoc`, 192.168.161.0/24) ; 08 : à confirmer |
-| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2 : fait (appliance supprimée après le banc, sur décision du propriétaire) ; 08 : images cloud à confirmer |
+| Pool libvirt dédié au PoC sur `/` (répertoire à créer) | A2 : validé, créé puis supprimé le 29/10/2026 (`supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc`) ; 08 : validé et recréé le 29/10/2026 (65 Go provisionnés) |
+| Réseau libvirt NAT dédié au PoC (pont et sous-réseau propres, séparés des VM personnelles) | A2 : validé, créé puis supprimé le 29/10/2026 (`virbr-scpoc`, 192.168.161.0/24) ; 08 : validé et recréé le 29/10/2026 (192.168.161.11 à .13) |
+| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2 : fait (appliance supprimée après le banc, sur décision du propriétaire) ; 08 : Debian 13 generic `20261026-2643` (choix du propriétaire ; SHA512 vérifié sur 2 documents, aucune signature publiée) et k3s v1.35.9+k3s1 (sha256 sur 2 sources), le 29/10/2026 |
 | Installation des outils de 4b | 4b |

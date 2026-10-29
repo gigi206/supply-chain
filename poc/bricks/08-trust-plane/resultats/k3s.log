@@ -1,0 +1,21 @@
+# k3s.sh, 2026-10-29T16:13:40Z
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/k3s.service' -> '/etc/systemd/system/k3s.service'.
+k3s version v1.35.9+k3s1 (58877f27)
+sc-confiance : k3s server installé
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/k3s-agent.service' -> '/etc/systemd/system/k3s-agent.service'.
+k3s version v1.35.9+k3s1 (58877f27)
+sc-build : k3s agent installé
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/k3s-agent.service' -> '/etc/systemd/system/k3s-agent.service'.
+k3s version v1.35.9+k3s1 (58877f27)
+sc-stockage : k3s agent installé
+kubeconfig : /home/gigi/.kube/supply-chain-poc.yaml (600)
+NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>          13s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   26s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          3s    v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage

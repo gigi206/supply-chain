@@ -1,0 +1,19 @@
+# Brique 08 : nœud de confiance, k3s server. Jeton dans /etc/rancher/k3s/jeton (0600).
+token-file: /etc/rancher/k3s/jeton
+node-ip: 192.168.161.11
+tls-san:
+  - 192.168.161.11
+  - sc-confiance.poc.test
+node-label:
+  - zone=confiance
+disable:
+  - traefik
+  - servicelb
+secrets-encryption: true
+write-kubeconfig-mode: "0600"
+kube-apiserver-arg:
+  - audit-policy-file=/etc/rancher/k3s/audit-policy.yaml
+  - audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log
+  - audit-log-maxage=30
+  - audit-log-maxbackup=10
+  - audit-log-maxsize=100

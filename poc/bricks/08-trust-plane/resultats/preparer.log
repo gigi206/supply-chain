@@ -1,0 +1,17 @@
+# preparer.sh, 2026-10-29T16:00:38Z
+## Debian 13 generic
+debian-13-generic-amd64-20261026-2643.qcow2: OK
+apparmor 4.1.0-1
+cloud-init 25.1.4-1+deb13u1
+iptables 1.8.11-2
+linux-image-amd64 6.12.113-1
+openssh-server 1:10.0p1-7+deb13u4
+systemd 257.13-1~deb13u1
+tcpdump 4.99.5-2
+-rw-rw-r-- 1 gigi gigi 438894592 Oct 29 17:00 debian-13-generic-amd64-20261026-2643.qcow2
+## k3s v1.35.9+k3s1
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+-rw-rw-r-- 1 gigi gigi  78237858 Oct 29 17:00 k3s
+-rw-rw-r-- 1 gigi gigi 194444185 Oct 29 17:01 k3s-airgap-images-amd64.tar.zst
+## Signatures : aucune publiée pour ces deux téléchargements (constaté le 29/10/2026)

@@ -1,0 +1,6 @@
+# Brique 08 : nœud de stockage, k3s agent (Forgejo, Zot).
+server: https://192.168.161.11:6443
+token-file: /etc/rancher/k3s/jeton
+node-ip: 192.168.161.13
+node-label:
+  - zone=stockage

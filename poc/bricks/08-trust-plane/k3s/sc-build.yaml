@@ -1,0 +1,9 @@
+# Brique 08 : nœud de build, k3s agent. Le taint écarte tout pod qui ne le tolère pas explicitement
+# (les TaskRuns le tolèrent ; Chains, OpenBao et Kyverno ne tournent jamais ici).
+server: https://192.168.161.11:6443
+token-file: /etc/rancher/k3s/jeton
+node-ip: 192.168.161.12
+node-label:
+  - zone=build
+node-taint:
+  - zone=build:NoSchedule

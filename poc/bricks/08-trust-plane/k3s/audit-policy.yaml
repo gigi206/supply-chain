@@ -1,0 +1,14 @@
+# Brique 08 : journal d'audit de l'API (trace du test négatif 3, modification d'un status).
+# Lectures exclues ; toute écriture journalisée avec son code de réponse (refus compris).
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - RequestReceived
+rules:
+  - level: None
+    verbs: ["get", "list", "watch"]
+  - level: None
+    resources:
+      - group: "coordination.k8s.io"
+        resources: ["leases"]
+  - level: Metadata

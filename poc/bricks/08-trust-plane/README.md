@@ -6,7 +6,14 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : protocole proposé, en attente de l'accord du propriétaire.** Rien n'est créé ni téléchargé.
+**Statut (29/10/2026) : J1 fait** (3 VM et k3s v1.35.9, contrôles réussis, voir plus bas). J2 attend l'accord du propriétaire.
+
+## Décisions du propriétaire (29/10/2026)
+
+- **k3s v1.35.9+k3s1**, dans la plage testée par Kyverno 1.19 (voir plus bas).
+- **Debian 13 generic** (`20261026-2643`) pour les VM, plutôt qu'Ubuntu 24.04. Debian ne publie **aucune signature** pour ses images cloud : le SHA512 est vérifié contre `SHA512SUMS` et contre le manifeste JSON de l'image, deux documents de cloud.debian.org, puis épinglé dans les scripts. C'est une limite assumée.
+- **Verrou de l'ADR 0001 levé** : la brique 08 ne dépend pas de l'administrateur du replay, qui doit être nommé avant la brique 10.
+- **Feu vert pour J1 seulement** : chaque jalon suivant est soumis à accord.
 
 ## Topologie
 
@@ -29,12 +36,12 @@ Trois VM libvirt avec k3s (topologie T2, profil nominal, [`poc/infra`](../../inf
 
 ## Versions proposées et vérification
 
-Relevé du 29/10/2026. Le choix de la version de k3s et celui de l'image des VM sont soumis au propriétaire.
+Relevé du 29/10/2026. Versions de k3s et image des VM : décidées par le propriétaire (plus haut).
 
 | Composant | Version | Où | Vérification disponible |
 |---|---|---|---|
-| Image des VM | **Ubuntu 24.04 LTS**, `release-20261017` (recommandée) | 3 VM | `SHA256SUMS` signé (`SHA256SUMS.gpg`) par la clé `D2EB 4462 6FDD C30B 513D 5BB7 1A5D 6C4C 7DB8 7C81` ; cette clé figure aussi dans `/usr/share/keyrings/ubuntu-cloudimage-keyring.gpg` sur l'hôte, ce qui fait un 2e canal |
-| (alternative) | Debian 13, `20261026-2643` | 3 VM | `SHA512SUMS` **sans signature** (ni `.sign` ni `.asc` dans le répertoire daté). Or `poc/infra` exige « empreinte et signature » |
+| Image des VM (non retenue) | Ubuntu 24.04 LTS, `release-20261017` | 3 VM | `SHA256SUMS` signé (`SHA256SUMS.gpg`) par la clé `D2EB 4462 6FDD C30B 513D 5BB7 1A5D 6C4C 7DB8 7C81` ; cette clé figure aussi dans `/usr/share/keyrings/ubuntu-cloudimage-keyring.gpg` sur l'hôte, ce qui fait un 2e canal |
+| **Image des VM (retenue)** | **Debian 13 generic, `20261026-2643`** (noyau 6.12.113, cloud-init 25.1.4) | 3 VM | `SHA512SUMS` **sans signature** (ni `.sign` ni `.asc` dans le répertoire daté) ; SHA512 `5bd891c6…` identique dans `SHA512SUMS` et dans le manifeste JSON |
 | k3s | **v1.35.9+k3s1** (recommandée) | 3 VM | **sha256 seulement** : `sha256sum-amd64.txt` ; ni `.sig`, ni `.pem`, ni bundle, ni attestation GitHub, ni attestation de release. Binaire `897acb21…`. Images système via `k3s-airgap-images-amd64.tar.zst`, sur la même somme |
 | Tekton Pipelines | v1.15.5 (LTS, fin de vie 31/07/2027) | confiance | **Non vérifiable** (doc 04 §5) : `release.yaml` non signé ; images signées par une clé qui ne correspond pas à la clé documentée |
 | Tekton Chains | v0.29.9, mode **`dsse`** (chains#2096 toujours ouverte au 29/10/2026) | confiance | Non vérifiable (doc 04 §5) |
@@ -98,14 +105,46 @@ Chaque jalon se termine par un point de contrôle : mesures archivées, `docs/03
 - **Vérification d'un jeton RFC 3161 séparé par Kyverno** (non documentée) et support des bundles Sigstore par Conforma (doc 00).
 - Visibilité des pods Kata pour la NetworkPolicy et pour la trace NFLOG (Kata imbriqué).
 
-## Changements sur l'hôte à valider
+## Changements sur l'hôte
+
+J1 validé et fait le 29/10/2026 (téléchargements, pool, réseau, VM, k3s). Les jalons suivants restent soumis à accord.
 
 | Changement | Détail |
 |---|---|
-| Téléchargements | Image cloud (≈ 600 Mo), sommes et signature ; k3s et ses images airgap ; puis, jalon par jalon, les manifestes et images listés plus haut. Tout va dans `~/.cache/supply-chain-poc/08/` |
+| Téléchargements | Image Debian (439 Mo), `SHA512SUMS` et manifeste ; k3s et ses images airgap (272 Mo) ; puis, jalon par jalon, les manifestes et images listés plus haut. Tout va dans `~/.cache/supply-chain-poc/08/` |
 | Pool libvirt | `supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc` (sur `/`) |
 | Réseau libvirt | NAT `supply-chain-poc`, `virbr-scpoc`, 192.168.161.0/24, sans démarrage automatique |
 | VM | `sc-confiance`, `sc-build`, `sc-stockage` (12 vCPU, 24 Gi, 65 Go), sans démarrage automatique |
 | Dans les VM | k3s, puis les composants des jalons J2 à J7. Kata (J7) est soumis à un accord séparé |
 
 Démontage complet en fin de phase, comme au banc A2. Le cluster sert aussi aux étapes 4e (briques 01, 03 et 19, puis 2b-2) : on ne démonte qu'à la fin de 4e, sauf avis contraire.
+
+## Jalon J1 : infra et k3s (29/10/2026)
+
+Rejeu : `mise run confiance:preparer`, puis `confiance:vm -- creer`, `confiance:k3s` et `confiance:controles -- j1`. Démontage : `mise run confiance:vm -- detruire`. Accès : `poc/bricks/08-trust-plane/ssh.sh <vm>`. Journaux : [`preparer.log`](resultats/preparer.log), [`k3s.log`](resultats/k3s.log), [`controles-j1.log`](resultats/controles-j1.log) ; temps : [`chrono.tsv`](resultats/chrono.tsv).
+
+| Étape | Durée | Résultat |
+|---|---|---|
+| Téléchargements vérifiés | 28 s | Image Debian (439 Mo), k3s (78 Mo) et images système (194 Mo) ; toutes les empreintes concordent sur leurs deux sources |
+| Pool, réseau, 3 VM | 10 s jusqu'à SSH (après correctif, voir plus bas) | cloud-init `done` sans erreur ; partition agrandie (15, 30 et 20 Go) ; **clés d'hôte SSH générées sur l'hôte** et injectées par la graine : `known_hosts` écrit d'avance, vérification stricte dès le premier contact |
+| k3s (server puis 2 agents) | 36 s | 3 nœuds `Ready`, v1.35.9+k3s1, containerd 2.2.7 ; binaire et images système vérifiés par sha256 **dans chaque VM** ; unité systemd versionnée, sans `install.sh` |
+
+**Contrôles** ([`controles.sh`](controles.sh)) :
+- **x86-64-v3 supporté, x86-64-v4 non supporté, aucun drapeau AVX-512** dans les trois VM (`ld.so --help`) ;
+- `vmx` sur les 6 vCPU de `sc-build`, absent de `sc-confiance` et `sc-stockage` ; **`/dev/kvm` présent et `kvm_intel` chargé dans `sc-build`** ;
+- sortie par le NAT libvirt dans les trois VM (`deb.debian.org` répond 200) ;
+- zones : labels `zone=confiance|build|stockage`, **taint `zone=build:NoSchedule`** sur `sc-build` ;
+- contrôleur de NetworkPolicy de k3s (kube-router) actif : 33 règles `KUBE-ROUTER` ;
+- journal d'audit de l'API activé (politique [`audit-policy.yaml`](k3s/audit-policy.yaml)), secrets chiffrés au repos (`secrets-encryption`) ;
+- composants k3s (CoreDNS, local-path, metrics-server) placés sur `sc-confiance`, qui n'a pas de taint ; Traefik et ServiceLB désactivés ;
+- RAM juste après l'installation : 2,5, 2,0 et 1,7 Go de RSS QEMU sur l'hôte (6,3 Go au total) ; 25 Gi restent disponibles sur l'hôte.
+
+**Constat : sans carte vidéo, l'image Debian 13 ne démarre pas.** GRUB affiche « Booting `Debian GNU/Linux' » puis la VM redémarre aussitôt, environ trois fois par seconde, sans aucun message du noyau. Diagnostic, chaque fois avec un seul changement :
+- CPU `host-model` au lieu de Haswell-v4 : même boucle ;
+- image d'origine lancée avec QEMU (q35, Haswell-v4) : démarre, y compris avec 6 Go de RAM ou avec un CD-ROM SATA ;
+- volume du pool comparé à une copie qui démarre (`qemu-img compare`) : identique ;
+- même copie avec **`-vga none`** : boucle reproduite.
+
+Correctif : une carte VGA sans affichage (ni VNC ni SPICE) dans les trois définitions libvirt. L'appliance OBS du banc A2 démarrait sans carte vidéo ; le défaut est donc propre au GRUB de cette image Debian. Temps perdu : environ 10 minutes.
+
+**Point ouvert pour J2 : kubectl.** Le kubectl de `mise.toml` (1.37.2) sort de la tolérance de version de Kubernetes face à un serveur 1.35 (une version mineure d'écart au plus). En attendant, les commandes passent par `k3s kubectl` dans `sc-confiance`. Il faudra ajouter un kubectl 1.35 à `mise.toml`, ce qui demande un accord.

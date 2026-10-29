@@ -182,3 +182,19 @@ run = "poc/benchmarks/obs/preuves.sh"
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]
 run = "poc/infra/bancs-laptop.sh"
+
+[tasks."confiance:preparer"]
+description = "Brique 08 : image Debian 13 generic (SHA512 sur 2 documents) et k3s v1.35.9+k3s1 (sha256 sur 2 sources) téléchargés et vérifiés"
+run = "poc/bricks/08-trust-plane/preparer.sh"
+
+[tasks."confiance:vm"]
+description = "Brique 08 : pool, réseau NAT et VM sc-confiance, sc-build, sc-stockage (creer|demarrer|arreter|detruire), sans démarrage automatique"
+run = "poc/bricks/08-trust-plane/vm.sh"
+
+[tasks."confiance:k3s"]
+description = "Brique 08 : k3s (server sur sc-confiance, agents sur sc-build et sc-stockage), sans install.sh ; kubeconfig dédié"
+run = "poc/bricks/08-trust-plane/k3s.sh"
+
+[tasks."confiance:controles"]
+description = "Brique 08 : contrôles des nœuds (x86-64-v3, KVM, NAT) et du cluster ; journal resultats/controles-<libellé>.log"
+run = "poc/bricks/08-trust-plane/controles.sh"

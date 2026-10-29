@@ -1,0 +1,28 @@
+#cloud-config
+# Brique 08 : graine NoCloud d'un nœud k3s. Les @…@ sont remplacés par vm.sh.
+# Clé d'hôte SSH générée sur l'hôte (known_hosts écrit d'avance, sans confiance au premier contact),
+# compte « poc » à clé seule, aucune mise à jour de paquets : l'image reste celle épinglée.
+hostname: @HOTE@
+fqdn: @HOTE@.poc.test
+manage_etc_hosts: true
+ssh_pwauth: false
+disable_root: true
+ssh_deletekeys: true
+ssh_genkeytypes: []
+ssh_keys:
+  ed25519_private: |
+@CLE_HOTE_PRIVEE@
+  ed25519_public: @CLE_HOTE_PUBLIQUE@
+users:
+  - name: poc
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - @CLE_POC@
+package_update: false
+package_upgrade: false
+growpart:
+  mode: auto
+  devices: ["/"]

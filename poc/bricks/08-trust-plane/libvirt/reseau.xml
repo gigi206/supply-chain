@@ -1,0 +1,15 @@
+<!-- Brique 08 : réseau NAT dédié au PoC (repris du banc A2), adresses fixes des trois nœuds k3s. -->
+<network>
+  <name>supply-chain-poc</name>
+  <forward mode='nat'/>
+  <bridge name='virbr-scpoc' stp='on' delay='0'/>
+  <domain name='poc.test' localOnly='yes'/>
+  <ip address='192.168.161.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.161.100' end='192.168.161.199'/>
+      <host mac='52:54:00:5c:08:11' name='sc-confiance' ip='192.168.161.11'/>
+      <host mac='52:54:00:5c:08:12' name='sc-build' ip='192.168.161.12'/>
+      <host mac='52:54:00:5c:08:13' name='sc-stockage' ip='192.168.161.13'/>
+    </dhcp>
+  </ip>
+</network>

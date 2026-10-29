@@ -58,7 +58,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 ## Conséquences
 
-- La brique 08 ne démarre qu'une fois l'infrastructure et l'administrateur du replay fixés.
+- La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).
 - Un test négatif vérifie qu'**aucun pod privilégié ne tourne sur l'hôte** (Kyverno + brique 05).
 - Le modèle CPU et le mode d'isolation sont inscrits dans la provenance (`internalParameters`).
 
@@ -66,5 +66,5 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 - [x] Infrastructure disponible : **bare metal** (laptop, KVM, virtualisation imbriquée active), vérifié le 29/10/2026.
 - [x] Dimensionnement et topologie sur le laptop : **validés le 29/10/2026** (kind pour A1, trois VM libvirt + k3s pour 08 ; [`poc/infra`](../../poc/infra/README.md)).
-- [ ] Nom de l'administrateur du domaine de replay.
+- [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
