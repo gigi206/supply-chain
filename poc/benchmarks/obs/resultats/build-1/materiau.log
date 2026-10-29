@@ -1,0 +1,11 @@
+# tests.sh materiau build-1, 2026-10-29T14:40:10Z
+rocky_9 : http://sc-obs.poc.test:5352/slsa/Rocky:9.7/appstream/x86_64/SDL2.rpm/b7a51b24aa7cd7c369c09c7669a5ae759e34bf1f5171ddc953d1d092eeba09dc
+  récupéré par digest, sha256 conforme
+rocky_9 : http://sc-obs.poc.test:5352/slsa/Rocky:9.7/baseos/x86_64/acl.rpm/6e3673a879e19461e2404f18a999725f7b796344885150dc6e2c81502419867b
+  récupéré par digest, sha256 conforme
+rocky_9 : http://sc-obs.poc.test:5352/slsa/poc/rocky_9/noarch/_config/4a394a69ba0be77864a198fcfb7f457cc8514076429f3e82299f85bbaa80211b
+  récupéré par digest, sha256 conforme
+debian_13 : http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/adduser.deb/e50984d2e1ef6300e3fd51303839842189a077b10cb5cadff1923df10c61c493
+  récupéré par digest, sha256 conforme
+debian_13 : http://sc-obs.poc.test:5352/slsa/poc/debian_13/noarch/_config/450e1b6ca68f85fa7dd7f0fc6465dda116ebb506f3f2c979152ca7d63b0e73ff
+  récupéré par digest, sha256 conforme

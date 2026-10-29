@@ -166,6 +166,10 @@ run = "poc/benchmarks/obs/tests.sh"
 description = "Banc A2 : poids opérationnel de l'appliance (RAM au repos, services, disque) dans resultats/etat-<libellé>.log"
 run = "poc/benchmarks/obs/etat.sh"
 
+[tasks."obs:comparer"]
+description = "Banc A2 : compare deux builds collectés (NEVRA, rpm hors signature, deb) dans resultats/comparaison-<A>-<B>.txt"
+run = "poc/benchmarks/obs/comparer.sh"
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]

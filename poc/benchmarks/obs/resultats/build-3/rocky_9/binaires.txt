@@ -1,0 +1,6 @@
+   114089 Oct 29 14:44 _buildenv                               
+    36949 Oct 29 14:44 _slsa_provenance.config                 
+   203117 Oct 29 14:44 _slsa_provenance.json                   
+     1457 Oct 29 14:44 _statistics                             
+   148053 Oct 29 14:44 sample-app-1.0.0-1.src.rpm              
+  2171651 Oct 29 14:44 sample-app-1.0.0-1.x86_64.rpm           

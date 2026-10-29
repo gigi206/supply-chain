@@ -1,0 +1,12 @@
+# tests.sh dsse build-1, 2026-10-29T14:39:45Z
+clé du projet poc : E8B41B97868AFF2CAC28C5C11623E6E2967FFC39
+rocky_9/_slsa_provenance.json : signature DSSE valide ; https://slsa.dev/provenance/v0.2 ; builder obs://private ; 472 matériaux
+  sujet sample-app-1.0.0-1.1.x86_64.rpm : sha256 conforme
+  sujet sample-app-1.0.0-1.1.src.rpm : fichier absent de la collecte
+debian_13/_slsa_provenance.json : signature DSSE valide ; https://slsa.dev/provenance/v0.2 ; builder obs://private ; 208 matériaux
+  sujet sample-app_1.0.0-1.debian.tar.xz : sha256 conforme
+  sujet sample-app_1.0.0-1.dsc : sha256 conforme
+  sujet sample-app_1.0.0-1_amd64.buildinfo : sha256 conforme
+  sujet sample-app_1.0.0-1_amd64.changes : sha256 conforme
+  sujet sample-app_1.0.0-1_amd64.deb : sha256 conforme
+  sujet sample-app_1.0.0.orig.tar.gz : sha256 conforme

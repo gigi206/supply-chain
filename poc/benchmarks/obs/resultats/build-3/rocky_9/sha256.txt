@@ -1,0 +1,2 @@
+10f4912c6a6306b8fbdb7a2dddde3673924ee8269ff72ad3e71bf4850f09a248  sample-app-1.0.0-1.src.rpm
+f30dcf0fbe75e3f1c370d3dd3eb3d78cde6ba5380f6d825792be9213f2b5837f  sample-app-1.0.0-1.x86_64.rpm

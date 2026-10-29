@@ -1,0 +1,476 @@
+<buildinfo project="poc" repository="rocky_9" package="sample-app">
+  <arch>x86_64</arch>
+  <srcmd5>85347ea794c63a5435416b2374025c50</srcmd5>
+  <verifymd5>85347ea794c63a5435416b2374025c50</verifymd5>
+  <versrel>1.0.0-1</versrel>
+  <bcnt>1</bcnt>
+  <release>1.1</release>
+  <config>retiré : configuration de build (prjconf de build.opensuse.org, non versionné), sha256 cc517415014af29b1156e192649596f3c17bce5ab72dfb31a7ab8f45f85a99b8</config>
+  <bdep name="SDL2" version="2.26.0" release="1.el9" arch="x86_64" hdrmd5="7c47bf8c1791aea9a3be1ba367554183" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="annobin" version="12.98" release="1.el9" arch="x86_64" hdrmd5="cac6ac6096eeaa85df3bbca0b97b627d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="autoconf" version="2.69" release="41.el9" arch="noarch" hdrmd5="2fdba6d8d2f13b105e31c07eb43fa139" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="automake" version="1.16.2" release="8.el9" arch="noarch" hdrmd5="d2d0421f0665e8ed998c377f53e8343b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="bind-libs" epoch="32" version="9.16.23" release="34.el9_7.2" arch="x86_64" hdrmd5="59a7b2e0e9ff34fd7f6844beb003fd54" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="bind-license" epoch="32" version="9.16.23" release="34.el9_7.2" arch="noarch" hdrmd5="e4ee1c338ceae70e3f08b69fb116f5fd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="bind-utils" epoch="32" version="9.16.23" release="34.el9_7.2" arch="x86_64" hdrmd5="7a0adb804011d807e94e1869856497e4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="bison" version="3.7.4" release="5.el9" arch="x86_64" hdrmd5="b69d32d051adb79368af40882fbce091" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="boost-regex" version="1.75.0" release="13.el9_7" arch="x86_64" hdrmd5="189e8478968d371bbf56d7cf0d9a273d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="bzip2-devel" version="1.0.8" release="10.el9_5" arch="x86_64" hdrmd5="7653ac155bf91071642183c55c15ea60" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="cpp" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="8c2641b1830d9fc7321db4a789be17a5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="debugedit" version="5.0" release="11.el9" arch="x86_64" hdrmd5="952c172e9aa1ed92551b65f98d2c9505" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="dwz" version="0.16" release="1.el9" arch="x86_64" hdrmd5="b7291dfbbbba4fd7c877eb4a00357f70" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="efi-srpm-macros" version="6" release="4.el9" arch="noarch" hdrmd5="fbb5241da61a9803c97c5faebdca409c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="emacs-filesystem" epoch="1" version="27.2" release="18.el9" arch="noarch" hdrmd5="d27b7af6118989745d29f1736cfb944a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="flex" version="2.6.4" release="9.el9" arch="x86_64" hdrmd5="b18024ce7bfdef3002b7abfe2cba4f6f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="fonts-srpm-macros" epoch="1" version="2.0.5" release="7.el9.1" arch="noarch" hdrmd5="356003bd30cda7187d766cba0c547d8c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="fstrm" version="0.6.1" release="3.el9" arch="x86_64" hdrmd5="474ec0b156438eca780b4ac43cd31e4c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gcc" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="315068cb65b0d618978ce2dd8eab236d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gcc-c++" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="a8598a6eb6631d740c3c08f0681a3218" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gcc-plugin-annobin" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="0d6d4f306e8e095f4d107d93460d7be4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gdb-headless" version="16.3" release="2.el9" arch="x86_64" hdrmd5="d8a3987396410edeb8fc5bd43fcc4085" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gettext-common-devel" version="0.21" release="8.el9" arch="noarch" hdrmd5="24090c16947fc2cbf91aadd8d7b56b06" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gettext-devel" version="0.21" release="8.el9" arch="x86_64" hdrmd5="6321e2f033820cf9c3b7892e9dbbfdab" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="ghc-srpm-macros" version="1.5.0" release="6.el9" arch="noarch" hdrmd5="71fed58726c9a4e11b4ca5eeec6adfe4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="glibc-devel" version="2.34" release="231.el9_7.10" arch="x86_64" hdrmd5="43f4916d4ed4e4612743b3c8f11be646" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="glibc-headers" version="2.34" release="231.el9_7.10" arch="x86_64" hdrmd5="d2a4edd9f429305558fe39e19f0c1579" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="go-srpm-macros" version="3.6.0" release="14.el9_7" arch="noarch" hdrmd5="680bd12fbd7818af6650851fe73b38ea" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="golang" version="1.25.9" release="1.el9_7" arch="x86_64" hdrmd5="f84394fc92164b6ac446f586e61c57cd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="golang-bin" version="1.25.9" release="1.el9_7" arch="x86_64" hdrmd5="cca579810673e59c3d7f4e189b00bcd3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="golang-race" version="1.25.9" release="1.el9_7" arch="x86_64" hdrmd5="4eaa03223ee025015770b6a576f90fe0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="golang-src" version="1.25.9" release="1.el9_7" arch="noarch" hdrmd5="b3b272e933a863bc889510d5305a3902" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gpm" version="1.20.7" release="29.el9" arch="x86_64" hdrmd5="a526c238d1194eeca54e794b28d1b0f7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="gpm-libs" version="1.20.7" release="29.el9" arch="x86_64" hdrmd5="7a46df620d62d16d07503b65ab82917a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="kernel-headers" version="5.14.0" release="611.55.1.el9_7" arch="x86_64" hdrmd5="4399912cb6acfd18c84cc79f2755e25e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="kernel-srpm-macros" version="1.0" release="14.el9" arch="noarch" hdrmd5="247198282ea72b12664b7f5c5acfe2c6" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libbabeltrace" version="1.5.8" release="10.el9" arch="x86_64" hdrmd5="bdb07d20061019d656555e779eccf5c2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libipt" version="2.0.4" release="5.el9" arch="x86_64" hdrmd5="f96e8a65609e6e02047c140b258420a5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libmaxminddb" version="1.5.2" release="4.el9" arch="x86_64" hdrmd5="32d31fe9b033a57d3fbe88cb1c4f1d3d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libmpc" version="1.2.1" release="4.el9" arch="x86_64" hdrmd5="9d370c48a81c56b99bdb7c4d0aae607e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libstdc++-devel" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="fbd3a038311e65bdceaef31428675506" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libtool" version="2.4.6" release="46.el9" arch="x86_64" hdrmd5="9f4621d8d1f700c60f4b97d46572ce3d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libuv" epoch="1" version="1.42.0" release="2.el9_4" arch="x86_64" hdrmd5="6f867a758c48a3c43b801484682932f4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="libxcrypt-devel" version="4.4.18" release="3.el9" arch="x86_64" hdrmd5="fda458b53a75fcd4b21c7f7e2b02e461" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="linuxconsoletools" version="1.7.1" release="3.el9" arch="x86_64" hdrmd5="fcaf7e8a073199ed36e081d2e6f42277" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="llvm-filesystem" version="20.1.8" release="3.el9" arch="x86_64" hdrmd5="8a73100e6104985835d17af870ac7a86" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="llvm-libs" version="20.1.8" release="3.el9" arch="x86_64" hdrmd5="4f2eb7f6460186452c52fc4e54d30fa8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="lua-srpm-macros" version="1" release="6.el9" arch="noarch" hdrmd5="870f5bd7a9f316ac2a42d6cda3bc6d41" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="m4" version="1.4.19" release="1.el9" arch="x86_64" hdrmd5="e82bae38249f859e6913abb11426b6b6" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="ncurses-c++-libs" version="6.2" release="12.20210508.el9" arch="x86_64" hdrmd5="a3fb5471f9ca7ca105d6ec44041f9ce7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="ncurses-devel" version="6.2" release="12.20210508.el9" arch="x86_64" hdrmd5="b59f11b96122ff2e7db09b61d90fefc5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="nodejs" epoch="1" version="16.20.2" release="8.el9_4" arch="x86_64" hdrmd5="66696738ae249f7e4689f5e62b442b5c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="nodejs-libs" epoch="1" version="16.20.2" release="8.el9_4" arch="x86_64" hdrmd5="2c904777174aeb242bf4795addf0b756" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="ocaml-srpm-macros" version="6" release="6.el9" arch="noarch" hdrmd5="73be47bd06ff2934c420576ab4426d56" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="openblas-srpm-macros" version="2" release="11.el9" arch="noarch" hdrmd5="d4f8d1073512b1b0c44f95a04285ce97" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="openssl-devel" epoch="1" version="3.5.1" release="7.el9_7" arch="x86_64" hdrmd5="861c691d500ba8fb4b89eb1a6dd57376" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="patch" version="2.7.6" release="16.el9" arch="x86_64" hdrmd5="bdfc6d2c361a1fc7c381fea53c0a76ac" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl" epoch="4" version="5.32.1" release="481.1.el9_6" arch="x86_64" hdrmd5="c40fb89d76a31ae73b7285abd323630c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Algorithm-Diff" version="1.2010" release="4.el9.0.1" arch="noarch" hdrmd5="4bc9ec3cf1c52cd185a7e13d62df5ac4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Archive-Tar" version="2.38" release="6.el9.0.1" arch="noarch" hdrmd5="a83fc21111051b84c9c2b94f2704a8bd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Archive-Zip" version="1.68" release="6.el9" arch="noarch" hdrmd5="c6d98aeee8afdb3d25eecf1ba09c9ddd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Attribute-Handlers" version="1.01" release="481.1.el9_6" arch="noarch" hdrmd5="3ecc038dcda1f76eb7799d2f74222ce0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-AutoLoader" version="5.74" release="481.1.el9_6" arch="noarch" hdrmd5="9f58c103fadd4368a4dd443b16843642" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-AutoSplit" version="5.74" release="481.1.el9_6" arch="noarch" hdrmd5="28e659e18e5b5c68281104033a60a1fd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-B" version="1.80" release="481.1.el9_6" arch="x86_64" hdrmd5="1f57a1daef3fb85121f91964a3bc994d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Benchmark" version="1.23" release="481.1.el9_6" arch="noarch" hdrmd5="8b2638a1c0c6fa80ca1d371142805eeb" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-CPAN" version="2.29" release="5.el9_6" arch="noarch" hdrmd5="05398b4c7b4d39ec0514ea0f307c482e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-CPAN-Meta" version="2.150010" release="460.el9.0.1" arch="noarch" hdrmd5="ecc0e7a568ee4e24eca6186b8fdf591c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-CPAN-Meta-Requirements" version="2.140" release="461.el9.0.1" arch="noarch" hdrmd5="b5d610e74a4585fc28b4d46196a93168" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-CPAN-Meta-YAML" version="0.018" release="461.el9" arch="noarch" hdrmd5="933bc4eb280bbfa071ebf18327ffd5c4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Carp" version="1.50" release="460.el9.0.1" arch="noarch" hdrmd5="abfd0a7186623c8c3ade066b63d9df5a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Class-Struct" version="0.66" release="481.1.el9_6" arch="noarch" hdrmd5="3202ccab5e6c6b0db803a7842e6b83f5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Compress-Bzip2" version="2.28" release="5.el9" arch="x86_64" hdrmd5="9bf49b55a76fb233c86b9fe98f1aeb87" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Compress-Raw-Bzip2" version="2.101" release="5.el9" arch="x86_64" hdrmd5="53460d8707b7dc341440c623ca0d7339" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Compress-Raw-Lzma" version="2.101" release="3.el9" arch="x86_64" hdrmd5="498338075bccd839301ec6161e9284e0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Compress-Raw-Zlib" version="2.101" release="5.el9" arch="x86_64" hdrmd5="456c847f24f6c47f5e72bf094469b16a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Config-Extensions" version="0.03" release="481.1.el9_6" arch="noarch" hdrmd5="35b7bf5f274187474638f7cea4603eaa" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Config-Perl-V" version="0.33" release="4.el9" arch="noarch" hdrmd5="c876d0e7fada8d5aee0e98e120598103" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-DBM_Filter" version="0.06" release="481.1.el9_6" arch="noarch" hdrmd5="587495813e127aee6e242add5ed15f28" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-DB_File" version="1.855" release="4.el9" arch="x86_64" hdrmd5="88c5965d04bfdede5e25ba025b42a5df" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Data-Dumper" version="2.174" release="462.el9" arch="x86_64" hdrmd5="3aa2e656fe92cf1ed66d60f77aea3fce" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Data-OptList" version="0.110" release="17.el9.0.1" arch="noarch" hdrmd5="3672ead6c83d50282febff35490e66c3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Data-Section" version="0.200007" release="14.el9.0.1" arch="noarch" hdrmd5="32cb4ea3ab3336d6fe06c3b2ac8acad2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Devel-PPPort" version="3.62" release="4.el9" arch="x86_64" hdrmd5="70d5748ed48d68ae77070aaed529b691" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Devel-Peek" version="1.28" release="481.1.el9_6" arch="x86_64" hdrmd5="7f92f22ca2fcfae07801c90debad5555" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Devel-SelfStubber" version="1.06" release="481.1.el9_6" arch="noarch" hdrmd5="4969fce37831cc451ba9472f39f5ee1f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Devel-Size" version="0.83" release="10.el9" arch="x86_64" hdrmd5="a8b37d954aac865be70e3935ce18b29d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Digest" version="1.19" release="4.el9.0.1" arch="noarch" hdrmd5="a11113316fe662654b12ec84df6d6b27" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Digest-MD5" version="2.58" release="4.el9" arch="x86_64" hdrmd5="12bfc64ff312fa435f1de2e068508db2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Digest-SHA" epoch="1" version="6.02" release="461.el9" arch="x86_64" hdrmd5="9bcb76a0a78a33727a8ce7d7240f3c87" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Digest-SHA1" version="2.13" release="34.el9" arch="x86_64" hdrmd5="5f6fa7248f08979a152ac68d6213ec8e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-DirHandle" version="1.05" release="481.1.el9_6" arch="noarch" hdrmd5="49cb97ef6945b30920786d6297160858" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Dumpvalue" version="2.27" release="481.1.el9_6" arch="noarch" hdrmd5="0ff7b79bc69ecbbd821649680724ce60" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-DynaLoader" version="1.47" release="481.1.el9_6" arch="x86_64" hdrmd5="f883a1ab6d13e5bfaf68eaf4418740a7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Encode" epoch="4" version="3.08" release="462.el9" arch="x86_64" hdrmd5="cf3cbbaf60be22194fd1dae2a20da92a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Encode-devel" epoch="4" version="3.08" release="462.el9" arch="x86_64" hdrmd5="15d073c7cee79be875a5ac10380b2dc4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-English" version="1.11" release="481.1.el9_6" arch="noarch" hdrmd5="1d5d1044847bb65d66ec1ac0ffb3cb3d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Env" version="1.04" release="460.el9.0.1" arch="noarch" hdrmd5="2401c61b03d7675e4684c1dccec8929a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Errno" version="1.30" release="481.1.el9_6" arch="x86_64" hdrmd5="5a282c90f78631504f5802de659b98cd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Exporter" version="5.74" release="461.el9" arch="noarch" hdrmd5="c01c2a31a2561b748052cc0463c35215" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-CBuilder" epoch="1" version="0.280236" release="4.el9.0.1" arch="noarch" hdrmd5="4294e9f47017d3b44f552f0ff0f88821" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Command" epoch="2" version="7.60" release="3.el9.0.1" arch="noarch" hdrmd5="ac4b0aa877851d019fc2f9827aa307cb" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Constant" version="0.25" release="481.1.el9_6" arch="noarch" hdrmd5="cb81a10ab3e913d78908caeaaa950b0b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Embed" version="1.35" release="481.1.el9_6" arch="noarch" hdrmd5="dcfba7b4375956eb3934606e19b65946" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Install" version="2.20" release="4.el9.0.1" arch="noarch" hdrmd5="056870ca1ee1d2756d6f05d51132e658" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-MM-Utils" epoch="2" version="7.60" release="3.el9.0.1" arch="noarch" hdrmd5="69fcc13e77a1d897c1a6d71811847bcd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-MakeMaker" epoch="2" version="7.60" release="3.el9.0.1" arch="noarch" hdrmd5="f5de7144770d2098a78fb02e56a4e2ea" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Manifest" epoch="1" version="1.73" release="4.el9.0.1" arch="noarch" hdrmd5="5dc62dd2053091b18a3ab5afcd399e63" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-Miniperl" version="1.09" release="481.1.el9_6" arch="noarch" hdrmd5="6191015af97b8f62e1bf13b7480be866" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ExtUtils-ParseXS" epoch="1" version="3.40" release="460.el9" arch="noarch" hdrmd5="21185db4daa582e7eef35b1b94a88292" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Fcntl" version="1.13" release="481.1.el9_6" arch="x86_64" hdrmd5="b71b4e94c5b6d4773921aac73a7bbbde" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Basename" version="2.85" release="481.1.el9_6" arch="noarch" hdrmd5="6057464999c6d7b6b1a8d893d76bd38b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Compare" version="1.100.600" release="481.1.el9_6" arch="noarch" hdrmd5="dc9e4c1f0d2b67d7d88eeb29baacc2cf" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Copy" version="2.34" release="481.1.el9_6" arch="noarch" hdrmd5="9af1e6d4a699ae73cc0e7fd7b6681a32" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-DosGlob" version="1.12" release="481.1.el9_6" arch="x86_64" hdrmd5="029317b69a0f0181caa54cfcf106b028" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Fetch" version="1.00" release="4.el9" arch="noarch" hdrmd5="237d3100a93b1cd43dff27cbe39c00a3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Find" version="1.37" release="481.1.el9_6" arch="noarch" hdrmd5="579da6e2590f13c80741c1d80222ad74" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-HomeDir" version="1.006" release="4.el9" arch="noarch" hdrmd5="e99c0eb457df680d0c16b0a3668fb0a4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Path" version="2.18" release="4.el9" arch="noarch" hdrmd5="0913f114ee7544e2c36b3c1306b3cacd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Temp" epoch="1" version="0.231.100" release="4.el9" arch="noarch" hdrmd5="f59e524679a0053d68e5543e8e7e314f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-Which" version="1.23" release="10.el9" arch="noarch" hdrmd5="cb400f321f10919346d4984148c73b49" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-File-stat" version="1.09" release="481.1.el9_6" arch="noarch" hdrmd5="5b79bd7181b0a897d60b6e38b47ee79d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-FileCache" version="1.10" release="481.1.el9_6" arch="noarch" hdrmd5="7355f34e7b203f9cbe4cc5edd8e1cde5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-FileHandle" version="2.03" release="481.1.el9_6" arch="noarch" hdrmd5="fd3dc680472d27cf02d7494179784cb3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Filter" epoch="2" version="1.60" release="4.el9" arch="x86_64" hdrmd5="f5d752dbaa112a8c3d6e385f145e9b72" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Filter-Simple" version="0.96" release="460.el9" arch="noarch" hdrmd5="820643db52e31c45dd902d1cbd32d88a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-FindBin" version="1.51" release="481.1.el9_6" arch="noarch" hdrmd5="30546c7991e68a35d2cdac633cf55718" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-GDBM_File" version="1.18" release="481.1.el9_6" arch="x86_64" hdrmd5="9a5278d266ad47df06849e54bc759e18" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Getopt-Long" epoch="1" version="2.52" release="4.el9" arch="noarch" hdrmd5="d27908b132dda891df7dc6951fa2c34b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Getopt-Std" version="1.12" release="481.1.el9_6" arch="noarch" hdrmd5="60128235c0831ee80bcc79541665872d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-HTTP-Tiny" version="0.076" release="462.el9" arch="noarch" hdrmd5="c0d71e59cd5878a35fb4e106c7f2a7b7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Hash-Util" version="0.23" release="481.1.el9_6" arch="x86_64" hdrmd5="0136728698ad986774ee1027d69b3264" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Hash-Util-FieldHash" version="1.20" release="481.1.el9_6" arch="x86_64" hdrmd5="07b69c2778f1adbd0aa4983321ffaaff" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-I18N-Collate" version="1.02" release="481.1.el9_6" arch="noarch" hdrmd5="ec38ee2aac960b790921a6c00d9aff96" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-I18N-LangTags" version="0.44" release="481.1.el9_6" arch="noarch" hdrmd5="c6deca0c2c696771a040f6257cf7f477" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-I18N-Langinfo" version="0.19" release="481.1.el9_6" arch="x86_64" hdrmd5="69c74905ceb7b7bdb9dfca1f27d2d4d1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO" version="1.43" release="481.1.el9_6" arch="x86_64" hdrmd5="8cace3ce9b7aefd379cec1acd8a7e2a7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO-Compress" version="2.102" release="4.el9" arch="noarch" hdrmd5="e45781697531ccf50975ac21516280cd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO-Compress-Lzma" version="2.101" release="4.el9.0.1" arch="noarch" hdrmd5="46aaedb48884d5063c4bd5815aaf7976" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO-Socket-IP" version="0.41" release="5.el9" arch="noarch" hdrmd5="e15309272bc8233c371974031d4038f4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO-Socket-SSL" version="2.073" release="2.el9" arch="noarch" hdrmd5="cb9d5e58fbe6d47b52744c67b088b98c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IO-Zlib" epoch="1" version="1.11" release="4.el9.0.1" arch="noarch" hdrmd5="e4276fae097f469ad4c630f57f3b1f5c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IPC-Cmd" epoch="2" version="1.04" release="461.el9" arch="noarch" hdrmd5="d1d9d521836d3b63ef41b3e0c92f3ad1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IPC-Open3" version="1.21" release="481.1.el9_6" arch="noarch" hdrmd5="bf64fe9fd2a4ef3945b15240d570bfd3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IPC-SysV" version="2.09" release="4.el9" arch="x86_64" hdrmd5="589e1b775dd56210e4bc507973b1abf1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-IPC-System-Simple" version="1.30" release="6.el9" arch="noarch" hdrmd5="1898e016e3379f390659cfb343c7cbb8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Importer" version="0.026" release="4.el9" arch="noarch" hdrmd5="5b8d024505df5006f1d658859f937a0a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-JSON-PP" epoch="1" version="4.06" release="4.el9" arch="noarch" hdrmd5="6785bb8c2f30d77d21689f001acbb498" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Locale-Maketext" version="1.29" release="461.el9" arch="noarch" hdrmd5="3ff8bd434dfaedaf5573d646af847eb8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Locale-Maketext-Simple" epoch="1" version="0.21" release="481.1.el9_6" arch="noarch" hdrmd5="6a903d07899804860cb04b83205aa552" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-MIME-Base64" version="3.16" release="4.el9" arch="x86_64" hdrmd5="79131d65e200b0c6e64dc18850ff8a06" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-MRO-Compat" version="0.13" release="15.el9.0.1" arch="noarch" hdrmd5="bdc426a828e2910fbd4546973ef3f826" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Math-BigInt" epoch="1" version="1.9998.18" release="460.el9" arch="noarch" hdrmd5="ac0a65b65005c72d36b332f6f68449c8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Math-BigInt-FastCalc" version="0.500.900" release="460.el9" arch="x86_64" hdrmd5="afeb19a8b882abc549966f26cac511bf" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Math-BigRat" version="0.2614" release="460.el9" arch="noarch" hdrmd5="3ca3f13122f267374a1d469567861734" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Math-Complex" version="1.59" release="481.1.el9_6" arch="noarch" hdrmd5="ea15d5e37dba27426ff9412f06b93b26" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Memoize" version="1.03" release="481.1.el9_6" arch="noarch" hdrmd5="2d892935dbc94fa8f62c7c0045e15714" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Build" epoch="2" version="0.42.31" release="9.el9" arch="noarch" hdrmd5="e4081e8752ee77b68167c1d443f4e087" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-CoreList" epoch="1" version="5.20240609" release="1.el9" arch="noarch" hdrmd5="c46447eaaef7f998d26713ddbd8ddbc1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-CoreList-tools" epoch="1" version="5.20240609" release="1.el9" arch="noarch" hdrmd5="431cae719f36a338e19dc68276e6dcdb" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Load" epoch="1" version="0.36" release="4.el9" arch="noarch" hdrmd5="8e8d853639e0b941aa370bacafaafd53" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Load-Conditional" version="0.74" release="4.el9.0.1" arch="noarch" hdrmd5="b96c0c931df69b289bed5891d92557ab" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Loaded" epoch="1" version="0.08" release="481.1.el9_6" arch="noarch" hdrmd5="70e6d84115386de79891ec7e15777ed7" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Metadata" version="1.000037" release="460.el9" arch="noarch" hdrmd5="6e38ee87f0ba7a7302db0194d063b297" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Module-Signature" version="0.88" release="1.el9.0.1" arch="noarch" hdrmd5="adf97d842dc3edf020e116686dc0bcbc" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Mozilla-CA" version="20200520" release="6.el9" arch="noarch" hdrmd5="379218f96763af378c71e840443183f8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-NDBM_File" version="1.15" release="481.1.el9_6" arch="x86_64" hdrmd5="914009c9ed77fc5f6d46d8c5a7335c2e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-NEXT" version="0.67" release="481.1.el9_6" arch="noarch" hdrmd5="d241458db327daa06b9f601719b6b185" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Net" version="1.02" release="481.1.el9_6" arch="noarch" hdrmd5="ccfced054e78635dedd1d0923667a319" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Net-Ping" version="2.74" release="5.el9.0.1" arch="noarch" hdrmd5="adb1a2e5b04bfd2b717059aaed09443d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Net-SSLeay" version="1.94" release="3.el9" arch="x86_64" hdrmd5="001848fd9f8a8c4f66d831638949cbff" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ODBM_File" version="1.16" release="481.1.el9_6" arch="x86_64" hdrmd5="7bae2ac96af8016df3f8ad1cbe6e1d56" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Object-HashBase" version="0.009" release="7.el9" arch="noarch" hdrmd5="f45c1a45393c939008e1a4ac94bb1ff1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Opcode" version="1.48" release="481.1.el9_6" arch="x86_64" hdrmd5="20a0073e752e9fd1d4730a296d7676e9" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-POSIX" version="1.94" release="481.1.el9_6" arch="x86_64" hdrmd5="b0ff90ba4108a40c7242242b8e60daf8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Package-Generator" version="1.106" release="23.el9" arch="noarch" hdrmd5="52b5d34d677ab262b272df7773caa8c8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Params-Check" epoch="1" version="0.38" release="461.el9.0.1" arch="noarch" hdrmd5="ef705c266409462bd561bf5fd1339916" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Params-Util" version="1.102" release="5.el9" arch="x86_64" hdrmd5="c1f2d020b3ff85fd112ef6e36a5964ae" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-PathTools" version="3.78" release="461.el9" arch="x86_64" hdrmd5="835426614e155f37f1ffa650efe6de40" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Perl-OSType" version="1.010" release="461.el9.0.1" arch="noarch" hdrmd5="2e35ada711f61a4747edb13f5d10869f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-PerlIO-via-QuotedPrint" version="0.09" release="4.el9" arch="noarch" hdrmd5="752a0de1ace4b7c67f8c3cad3ab23d81" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Checker" epoch="4" version="1.74" release="4.el9" arch="noarch" hdrmd5="958636cdd5ce860b80d7b539d29d0360" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Escapes" epoch="1" version="1.07" release="460.el9.0.1" arch="noarch" hdrmd5="c6c94dde8b8c16ea0d9ae66e0ef4a4cb" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Functions" version="1.13" release="481.1.el9_6" arch="noarch" hdrmd5="6d8a2dcc42096db541bf1ddb839df6cd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Html" version="1.25" release="481.1.el9_6" arch="noarch" hdrmd5="821fca5f9bd523a66f5df19e30d348f5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Perldoc" version="3.28.01" release="461.el9" arch="noarch" hdrmd5="83cda205537bd2ad32547af109e20f11" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Simple" epoch="1" version="3.42" release="4.el9" arch="noarch" hdrmd5="82d3854aa1de3ebb86a9312a6340e90f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Pod-Usage" epoch="4" version="2.01" release="4.el9" arch="noarch" hdrmd5="98f6af2a3d64753ac904d5d9407e878e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Safe" version="2.41" release="481.1.el9_6" arch="noarch" hdrmd5="72d270da227367fdbe4135bf1932a472" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Scalar-List-Utils" epoch="4" version="1.56" release="462.el9" arch="x86_64" hdrmd5="25431cd814537699d04a6bd116464a28" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Search-Dict" version="1.07" release="481.1.el9_6" arch="noarch" hdrmd5="9897ed3520d686e3b2ba97a05e2f7266" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-SelectSaver" version="1.02" release="481.1.el9_6" arch="noarch" hdrmd5="a98d550fd36618409ba5dd24196a1527" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-SelfLoader" version="1.26" release="481.1.el9_6" arch="noarch" hdrmd5="71293708f35fa2b85d6f327bc8cd8ec4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Socket" epoch="4" version="2.031" release="4.el9" arch="x86_64" hdrmd5="249702354e9054c64a9e9e44c213ec96" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Software-License" version="0.103014" release="12.el9.0.1" arch="noarch" hdrmd5="07dcbeee199b2b5d879ebbb6d751b1f1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Storable" epoch="1" version="3.21" release="460.el9" arch="x86_64" hdrmd5="f562f7fa711e68402776f692f3add570" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Sub-Exporter" version="0.987" release="27.el9.0.1" arch="noarch" hdrmd5="f00e3cd8a19de7e7cf135a8128eb34c5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Sub-Install" version="0.928" release="28.el9.0.1" arch="noarch" hdrmd5="868cbddc20f8ef8747e8fc089230cc51" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Symbol" version="1.08" release="481.1.el9_6" arch="noarch" hdrmd5="a945d62472a270e999af3dc901779584" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Sys-Hostname" version="1.23" release="481.1.el9_6" arch="x86_64" hdrmd5="7c95ceb7a467962b4d97d80e4089b589" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Sys-Syslog" version="0.36" release="461.el9" arch="x86_64" hdrmd5="dc776436b9149745c1ff350b5c577639" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Term-ANSIColor" version="5.01" release="461.el9.0.1" arch="noarch" hdrmd5="a1860327f42a070371b2cd671cd980be" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Term-Cap" version="1.17" release="460.el9.0.1" arch="noarch" hdrmd5="a02eda5eb74278d88ac2f9fc1abd326f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Term-Complete" version="1.403" release="481.1.el9_6" arch="noarch" hdrmd5="b26135b941645d9978b0fdcf83034e0c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Term-ReadLine" version="1.17" release="481.1.el9_6" arch="noarch" hdrmd5="ebdad3547e5d3abda4c2217f869d5824" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Term-Table" version="0.015" release="8.el9.0.1" arch="noarch" hdrmd5="d4df666705f3619632bd6a6a4f172eda" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Test" version="1.31" release="481.1.el9_6" arch="noarch" hdrmd5="2a03a98953980d7bca2c26811eca4dd2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Test-Harness" epoch="1" version="3.42" release="461.el9" arch="noarch" hdrmd5="69580514ee1fe7c0cd91db0ba69a07cc" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Test-Simple" epoch="3" version="1.302183" release="4.el9" arch="noarch" hdrmd5="e7d77769e1869f0ef4d79720769a8a6b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Abbrev" version="1.02" release="481.1.el9_6" arch="noarch" hdrmd5="b3b78f5b56a3e06dccab22706f97682b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Balanced" version="2.04" release="4.el9" arch="noarch" hdrmd5="c4024daf4047ed0193e57f70ebf075a0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Diff" version="1.45" release="13.el9" arch="noarch" hdrmd5="2721447687b40036f9a5ca286937a4c6" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Glob" version="0.11" release="15.el9" arch="noarch" hdrmd5="1d5e99eb012f9042832e0bbc992ed18c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-ParseWords" version="3.30" release="460.el9" arch="noarch" hdrmd5="f0cff9642d107f0207c44c00e68af130" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Tabs+Wrap" version="2013.0523" release="460.el9.0.1" arch="noarch" hdrmd5="76fdb8715ee5a07495562548bbf66d63" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Text-Template" version="1.59" release="5.el9.0.1" arch="noarch" hdrmd5="75ca2110ae2b67793563c5e5df37b860" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Thread" version="3.05" release="481.1.el9_6" arch="noarch" hdrmd5="bf860dc47fc1861e41991fc19017740f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Thread-Queue" version="3.14" release="460.el9.0.1" arch="noarch" hdrmd5="6959c4de92b24fb036b8e9fd4a50f816" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Thread-Semaphore" version="2.13" release="481.1.el9_6" arch="noarch" hdrmd5="f7bcfe3448ff75278c46cddb0807b70f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Tie" version="4.6" release="481.1.el9_6" arch="noarch" hdrmd5="5b8c16109964cacbe8e87dcfcc602df0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Tie-File" version="1.06" release="481.1.el9_6" arch="noarch" hdrmd5="330e3886437134ca75c9404607957acf" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Tie-Memoize" version="1.1" release="481.1.el9_6" arch="noarch" hdrmd5="9bafb1cd42e7e23b9b0f062c1dfd501a" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Tie-RefHash" version="1.40" release="4.el9.0.1" arch="noarch" hdrmd5="3cb80cf421e673aa1a367c1d20e1e74f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Time" version="1.03" release="481.1.el9_6" arch="noarch" hdrmd5="3cd233a6e796eb773950a22121931d4f" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Time-HiRes" epoch="4" version="1.9764" release="462.el9" arch="x86_64" hdrmd5="8cbf6545de07b964356f4e8864b91aff" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Time-Local" epoch="2" version="1.300" release="7.el9" arch="noarch" hdrmd5="1ceb12a5fab9494f14aeeae4f98974f8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Time-Piece" version="1.3401" release="481.1.el9_6" arch="x86_64" hdrmd5="e787f9f7f2a1f4243333aa5ce4ee8611" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-URI" version="5.09" release="3.el9.0.1" arch="noarch" hdrmd5="458c5584e97d3af7b786ad3f38566d40" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Unicode-Collate" version="1.29" release="4.el9" arch="x86_64" hdrmd5="23a7ca7778ef1f31666d6468b7f9b2ba" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Unicode-Normalize" version="1.27" release="461.el9" arch="x86_64" hdrmd5="3e1cc23c00367d4344316adee5552cca" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-Unicode-UCD" version="0.75" release="481.1.el9_6" arch="noarch" hdrmd5="38f8d2eb6beff29915fc19b2ed4ecf13" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-User-pwent" version="1.03" release="481.1.el9_6" arch="noarch" hdrmd5="fcc6ecfeb19ea31c0a4bf4b18b2b1308" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-autodie" version="2.34" release="4.el9.0.1" arch="noarch" hdrmd5="cafa0da198d283819435c6bf70e7dc66" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-autouse" version="1.11" release="481.1.el9_6" arch="noarch" hdrmd5="7f8f0c8e7f072a08246fa1872da5ceed" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-base" version="2.27" release="481.1.el9_6" arch="noarch" hdrmd5="1d86694e12c93a8738a175f1c779e6f6" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-bignum" version="0.51" release="460.el9" arch="noarch" hdrmd5="ff3bf005434d679b9fd608bb879c14cd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-blib" version="1.07" release="481.1.el9_6" arch="noarch" hdrmd5="29b7fc9e22fe0ded6d11bac7714794d8" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-constant" version="1.33" release="461.el9.0.1" arch="noarch" hdrmd5="f35cd6a19158668ed3856b33884d936d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-debugger" version="1.56" release="481.1.el9_6" arch="noarch" hdrmd5="0f223b9521939a357e9b07c9860e4456" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-deprecate" version="0.04" release="481.1.el9_6" arch="noarch" hdrmd5="cf155777f7caa2636e660335e660e9c3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-devel" epoch="4" version="5.32.1" release="481.1.el9_6" arch="x86_64" hdrmd5="cffed743e9cf5bd7f397b7154603e84c" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-diagnostics" version="1.37" release="481.1.el9_6" arch="noarch" hdrmd5="f6d9885d3f54135a821557d55e369713" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-doc" version="5.32.1" release="481.1.el9_6" arch="noarch" hdrmd5="78e4fdc87c6b9468023e66cd5bbe2b3b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-encoding" epoch="4" version="3.00" release="462.el9" arch="x86_64" hdrmd5="989a97cab88d188634880899c934b2e2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-encoding-warnings" version="0.13" release="481.1.el9_6" arch="noarch" hdrmd5="0882b621b47cb1fb0afb1e09a1131f41" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-experimental" version="0.022" release="6.el9" arch="noarch" hdrmd5="ee707a738335e56d4c59432c3fb897f1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-fields" version="2.27" release="481.1.el9_6" arch="noarch" hdrmd5="6982732186f865f57237bc9a4090d418" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-filetest" version="1.03" release="481.1.el9_6" arch="noarch" hdrmd5="901eb55d86e702e243b1f0a6e856c907" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-if" version="0.60.800" release="481.1.el9_6" arch="noarch" hdrmd5="38aef3b2cf57f279e2a6661c03b656a1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-inc-latest" epoch="2" version="0.500" release="20.el9" arch="noarch" hdrmd5="f46a69f71373850a37d82d91102cde69" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-interpreter" epoch="4" version="5.32.1" release="481.1.el9_6" arch="x86_64" hdrmd5="776fe5177ff52565dc20c394dfd94415" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-less" version="0.03" release="481.1.el9_6" arch="noarch" hdrmd5="09e4b5193161d5435b64a112c58e0c69" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-lib" version="0.65" release="481.1.el9_6" arch="x86_64" hdrmd5="5d95a95b5fd200e5aa9945a2ae5bf6ad" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-libnet" version="3.13" release="4.el9" arch="noarch" hdrmd5="5cad22704f22db0d115e4f8d698810a0" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-libnetcfg" epoch="4" version="5.32.1" release="481.1.el9_6" arch="noarch" hdrmd5="55d2bde7f1ab708a3697a5e2779816dd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-libs" epoch="4" version="5.32.1" release="481.1.el9_6" arch="x86_64" hdrmd5="c071ac9e460132c8752cd07c836ab126" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-local-lib" version="2.000024" release="13.el9" arch="noarch" hdrmd5="683eb139c4c6deacb0367e3217c65a47" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-locale" version="1.09" release="481.1.el9_6" arch="noarch" hdrmd5="2857be2441745f6cc530e2f446c3a118" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-macros" epoch="4" version="5.32.1" release="481.1.el9_6" arch="noarch" hdrmd5="30c2cec88f44df805d180744922631d2" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-meta-notation" version="5.32.1" release="481.1.el9_6" arch="noarch" hdrmd5="fb167b2886d4c2523942ede25bf104d1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-mro" version="1.23" release="481.1.el9_6" arch="x86_64" hdrmd5="159cfe5bc49c6df0dc698f2c6e2ca03e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-open" version="1.12" release="481.1.el9_6" arch="noarch" hdrmd5="82e1e1fc8f3538192cd3c0beada9c7b4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-overload" version="1.31" release="481.1.el9_6" arch="noarch" hdrmd5="91186cacedc81dfe85381da01627ee4d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-overloading" version="0.02" release="481.1.el9_6" arch="noarch" hdrmd5="4b9f641f5e1352cdc8ddaafa21439118" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-parent" epoch="1" version="0.238" release="460.el9" arch="noarch" hdrmd5="cd964be73bdf6940a87b3d0fe0476847" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-perlfaq" version="5.20210520" release="1.el9" arch="noarch" hdrmd5="5c1d3235e92bbd4fa23c1923241298d6" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-ph" version="5.32.1" release="481.1.el9_6" arch="x86_64" hdrmd5="084a4d1db8f613b0b814d0b194880cf3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-podlators" epoch="1" version="4.14" release="460.el9.0.1" arch="noarch" hdrmd5="8635014cbb4597f185f7124e77ecdb1b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-sigtrap" version="1.09" release="481.1.el9_6" arch="noarch" hdrmd5="ba4e57e676d29ed8344da3a84f4c123e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-sort" version="2.04" release="481.1.el9_6" arch="noarch" hdrmd5="eb225901f8622a4d232b881ee92de9f1" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-srpm-macros" version="1" release="41.el9" arch="noarch" hdrmd5="52f1bf91c8b58cea8094d6e3be4c7f0e" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-subs" version="1.03" release="481.1.el9_6" arch="noarch" hdrmd5="977f2c5a42f9f04cf7b0c0959df94842" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-threads" epoch="1" version="2.25" release="460.el9" arch="x86_64" hdrmd5="608341cc1b5509d2d376fbb72eff15ec" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-threads-shared" version="1.61" release="460.el9.0.1" arch="x86_64" hdrmd5="eab95a098af3d5fcb4e1f5fb0bf047e5" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-utils" version="5.32.1" release="481.1.el9_6" arch="noarch" hdrmd5="9b1ac56d8de11a6f4e024346aa0b9b03" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-vars" version="1.05" release="481.1.el9_6" arch="noarch" hdrmd5="48d8ec93b2b169381b601ee9504284e3" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-version" epoch="7" version="0.99.28" release="4.el9" arch="x86_64" hdrmd5="296c70ac460bb341a261e39ff267d7dd" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="perl-vmsish" version="1.04" release="481.1.el9_6" arch="noarch" hdrmd5="3a3f7413146001b8c5d3244dd7cc700b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="pyproject-srpm-macros" version="1.16.2" release="1.el9" arch="noarch" hdrmd5="96c50e62d638304e39b582e0e3516e5d" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="python-srpm-macros" version="3.9" release="54.el9" arch="noarch" hdrmd5="69d130ef9a21da361859ceeacf238881" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="qt5-srpm-macros" version="5.15.9" release="1.el9" arch="noarch" hdrmd5="f878432102092d87bbdbb2e936f8378b" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="redhat-rpm-config" version="210" release="1.el9" arch="noarch" hdrmd5="979b3e97c1d85b8552cbd4f6f89cf9bc" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="rpm-build" version="4.16.1.3" release="39.el9" arch="x86_64" hdrmd5="fd6be0e485cdb453a7ba5d907f57dee4" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="rust-srpm-macros" version="17" release="4.el9" arch="noarch" hdrmd5="f473eb960de326eea8285ce84d1e7972" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="source-highlight" version="3.1.9" release="12.el9" arch="x86_64" hdrmd5="9d7007619025ed55a63dc35d948c28ba" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="systemtap-sdt-devel" version="5.3" release="3.el9.0.1" arch="x86_64" hdrmd5="cd9833976c67955b3abfe682eced3126" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="systemtap-sdt-dtrace" version="5.3" release="3.el9.0.1" arch="x86_64" hdrmd5="352f3a22f413a2ea35ad4653ec45ce77" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="vim-common" epoch="2" version="8.2.2637" release="23.el9_7.3" arch="x86_64" hdrmd5="13e0d551bdf5af831ce9f479dc04e0fa" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="vim-enhanced" epoch="2" version="8.2.2637" release="23.el9_7.3" arch="x86_64" hdrmd5="edc3cf1cabb2a4cd4595a54cc14336ee" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="zlib-devel" version="1.2.11" release="40.el9" arch="x86_64" hdrmd5="9325f0685121d840e7b36ece07cf7b42" project="Rocky:9.7" repository="appstream"/>
+  <bdep name="acl" version="2.3.1" release="4.el9" arch="x86_64" hdrmd5="e5ffc526800fc1ddd4b3e61c9a3f3048" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="alternatives" version="1.24" release="2.el9" arch="x86_64" hdrmd5="5832caf6730301817da8e513d9fca84f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="audit-libs" version="3.1.5" release="7.el9" arch="x86_64" hdrmd5="8a5c6cb18a1287886c1985a4b598f94b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="basesystem" version="11" release="13.el9.0.1" arch="noarch" hdrmd5="f879a2f8e19c7d73507d01111e899ca0" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="bash" version="5.1.8" release="9.el9" arch="x86_64" hdrmd5="5d975b56a64ca3b035f8191eba908139" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="binutils" version="2.35.2" release="67.el9_7.1" arch="x86_64" hdrmd5="cda5e16ee9e27ba339192f6bfd71e8b7" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="binutils-gold" version="2.35.2" release="67.el9_7.1" arch="x86_64" hdrmd5="023a79a841f39d90b74c84d09a6311dc" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="bzip2" version="1.0.8" release="10.el9_5" arch="x86_64" hdrmd5="61ee3f020508b2ba1c2c910d786365b9" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="bzip2-libs" version="1.0.8" release="10.el9_5" arch="x86_64" hdrmd5="105251a34ba7200503c7b1719488abca" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="ca-certificates" version="2025.2.80_v9.0.305" release="91.el9" arch="noarch" hdrmd5="d83ff6a833abe330f77c2b4586421c66" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="chkconfig" version="1.24" release="2.el9" arch="x86_64" hdrmd5="78cb130ba42b7dc647df96d6edae6ca8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="coreutils" version="8.32" release="39.el9" arch="x86_64" hdrmd5="0a42e50672f4f3aba4d9820e05b8ca43" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="coreutils-common" version="8.32" release="39.el9" arch="x86_64" hdrmd5="ecbe915007226780e3481fb1423dd4f6" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="cpio" version="2.13" release="16.el9" arch="x86_64" hdrmd5="92b5a0e69a90cb4cdd561954ef2f92e6" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="cracklib" version="2.9.6" release="27.el9" arch="x86_64" hdrmd5="9e558ac1727da7b9f6ecabf18a83daa1" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="cracklib-dicts" version="2.9.6" release="27.el9" arch="x86_64" hdrmd5="12acec65b7f9b7b688070dc47712c208" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="crypto-policies" version="20250905" release="1.git377cc42.el9" arch="noarch" hdrmd5="0d58514c6853e073ad29a2148f73001f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="curl" version="7.76.1" release="35.el9_7.3" arch="x86_64" hdrmd5="782d9fa38fe5344c533327540a318b31" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="cyrus-sasl-lib" version="2.1.27" release="22.el9_7" arch="x86_64" hdrmd5="1d56d8b7ada6e30bf727e13a7f5d1c18" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="dbus" epoch="1" version="1.12.20" release="8.el9" arch="x86_64" hdrmd5="947c1e48cfc869c3dd317e3713324e4d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="dbus-broker" version="28" release="7.el9" arch="x86_64" hdrmd5="4fae4c80fdf61bf748ad9d76baa31ea6" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="dbus-common" epoch="1" version="1.12.20" release="8.el9" arch="noarch" hdrmd5="d786da87871c5a3b8c947939d0753e4a" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="device-mapper" epoch="9" version="1.02.206" release="2.el9_7.2" arch="x86_64" hdrmd5="aa46856bd47c4711fbfb39c8cb8da0bb" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="device-mapper-libs" epoch="9" version="1.02.206" release="2.el9_7.2" arch="x86_64" hdrmd5="58c6622dd48369252642dfd350f23cca" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="diffutils" version="3.7" release="12.el9" arch="x86_64" hdrmd5="3fbd27f737957ccf8bc68713319471db" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="e2fsprogs" version="1.46.5" release="8.el9" arch="x86_64" hdrmd5="ade4530aa5e97b4bd29fe759f6849bd1" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="e2fsprogs-libs" version="1.46.5" release="8.el9" arch="x86_64" hdrmd5="dfdd2c4ea0100a0011b8f97a68dd9816" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="ed" version="1.14.2" release="12.el9" arch="x86_64" hdrmd5="19769aef4345277f58192dedc6418bfc" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="elfutils" version="0.193" release="1.el9.rocky.0.1" arch="x86_64" hdrmd5="859c7303d411818876e971ad1a5a6f29" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="elfutils-debuginfod-client" version="0.193" release="1.el9.rocky.0.1" arch="x86_64" hdrmd5="b7e37afbef8453481b3b571f00ffe461" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="elfutils-default-yama-scope" version="0.193" release="1.el9.rocky.0.1" arch="noarch" hdrmd5="95cb14c993bb8afe8c46134c654233de" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="elfutils-libelf" version="0.193" release="1.el9.rocky.0.1" arch="x86_64" hdrmd5="e721de4b9f6e5384897cf9433e71d8f2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="elfutils-libs" version="0.193" release="1.el9.rocky.0.1" arch="x86_64" hdrmd5="3ee02fd9a5584f9373fd9faed6632a3a" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="expat" version="2.5.0" release="5.el9_7.1" arch="x86_64" hdrmd5="ab2a84a1a0b96c16d7bc19493a20a25c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="file" version="5.39" release="16.el9" arch="x86_64" hdrmd5="4a8b0de2bef2340189fb3e64f8cfe0e8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="file-libs" version="5.39" release="16.el9" arch="x86_64" hdrmd5="8a6abd7e8541ba109fc0feec729f6280" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="filesystem" version="3.16" release="5.el9" arch="x86_64" hdrmd5="7306685389960cd7154aa097b83c47ce" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="findutils" epoch="1" version="4.8.0" release="7.el9" arch="x86_64" hdrmd5="ef5887254f0c0875fa3f2490f8a4f859" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="fuse-libs" version="2.9.9" release="17.el9" arch="x86_64" hdrmd5="45636811639df518dd86809ef92bc7a0" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gawk" version="5.1.0" release="6.el9" arch="x86_64" hdrmd5="6a721f681e66961ab13ef1288f028e22" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gdbm-libs" epoch="1" version="1.23" release="1.el9" arch="x86_64" hdrmd5="2e41ba837321388b4083b00cf1b13c2d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gettext" version="0.21" release="8.el9" arch="x86_64" hdrmd5="75cf8d3eaa0982bcc21cbbce4b2369fb" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gettext-libs" version="0.21" release="8.el9" arch="x86_64" hdrmd5="f423204517c7b4e9e36aae30256c382a" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="glib2" version="2.68.4" release="18.el9_7.2" arch="x86_64" hdrmd5="8b2d9eb45dffd77a02571b6559b3d3b2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="glibc" version="2.34" release="231.el9_7.10" arch="x86_64" hdrmd5="9e441cde951d662f12771959a6d8c181" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="glibc-common" version="2.34" release="231.el9_7.10" arch="x86_64" hdrmd5="c034d86a9a1553f622792108109c2df2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="glibc-gconv-extra" version="2.34" release="231.el9_7.10" arch="x86_64" hdrmd5="e1306dfc8a0df47b5bf1a6df64ea8744" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gmp" epoch="1" version="6.2.0" release="13.el9" arch="x86_64" hdrmd5="774609cd79716dc0d9b8d99d2db05d5b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gnupg2" version="2.3.3" release="5.el9_7" arch="x86_64" hdrmd5="4699c0fb02b82a9dade0a2e5d94c2db0" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gnutls" version="3.8.3" release="10.el9_7" arch="x86_64" hdrmd5="b023230b087d805f5fcdc90c04f45991" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="grep" version="3.6" release="5.el9" arch="x86_64" hdrmd5="98d808fd3d09606215d7de3258c9f1a9" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="groff-base" version="1.22.4" release="10.el9.0.1" arch="x86_64" hdrmd5="07cc850c55c40771cf66526d8e05c4e8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="gzip" version="1.12" release="1.el9" arch="x86_64" hdrmd5="c3b6a711959934acd5bde6ee77091d4f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="info" version="6.7" release="15.el9" arch="x86_64" hdrmd5="9065cd2c5f7bf7c4203969e66fe0f4fe" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="initscripts" version="10.11.8" release="4.el9" arch="x86_64" hdrmd5="4a8e6d291196affad1065146cf3f3d44" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="initscripts-rename-device" version="10.11.8" release="4.el9" arch="x86_64" hdrmd5="abbad0f1709353e8008c9bbbe7cafed9" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="initscripts-service" version="10.11.8" release="4.el9" arch="noarch" hdrmd5="f250f24aaa6e7defab5ce3bf38ea36d6" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="iptables-libs" version="1.8.10" release="11.el9_5" arch="x86_64" hdrmd5="daefd47dc91970a64d951d7b644da1d3" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="json-c" version="0.14" release="11.el9" arch="x86_64" hdrmd5="da1e9eaa62fe800979c80a5c7b8a8d95" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="keyutils-libs" version="1.6.3" release="1.el9" arch="x86_64" hdrmd5="b280a8e5cca83fc5e3df0704a38e180f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="kmod" version="28" release="11.el9" arch="x86_64" hdrmd5="80463c1a6cdca8ef5e26b0af749a7b61" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="kmod-libs" version="28" release="11.el9" arch="x86_64" hdrmd5="6b252c6a9a7e1abb65519550ab281d8f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="krb5-libs" version="1.21.1" release="9.el9_7" arch="x86_64" hdrmd5="f60314a39e7cad5e3e49968f0f73a77d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="less" version="590" release="6.el9" arch="x86_64" hdrmd5="b3d2bdfd18d176e53ae2d630afbe4d93" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libacl" version="2.3.1" release="4.el9" arch="x86_64" hdrmd5="5fde7da3b371015dd2e8ff6378b3e9fb" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libarchive" version="3.5.3" release="9.el9_7" arch="x86_64" hdrmd5="947320589e4a4e7dc59fc2194afb392d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libassuan" version="2.5.5" release="3.el9" arch="x86_64" hdrmd5="6e86fcb3b1dd280f56f5d35b53a97984" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libattr" version="2.5.1" release="3.el9" arch="x86_64" hdrmd5="1592052a48688a467ac8c10809b4c1e9" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libblkid" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="703a89a33267cba03a5db4620ea5821f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libbrotli" version="1.0.9" release="9.el9_7" arch="x86_64" hdrmd5="747dc29aaa5a740fca5fbe9cdd421467" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libcap" version="2.48" release="10.el9_7.1" arch="x86_64" hdrmd5="0fd590799898e4b080d217bf8ea753e2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libcap-ng" version="0.8.2" release="7.el9" arch="x86_64" hdrmd5="45dc2b2ff774e4f4e94f7c354dd56e74" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libcom_err" version="1.46.5" release="8.el9" arch="x86_64" hdrmd5="65cc0a856d04980a81d0ec59fcab3a3c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libcurl" version="7.76.1" release="35.el9_7.3" arch="x86_64" hdrmd5="cedfb44fde8998e3f72220d9960fe398" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libdb" version="5.3.28" release="57.el9_6" arch="x86_64" hdrmd5="3a7bfed326794eaffd65145bbb761c53" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libeconf" version="0.4.1" release="4.el9" arch="x86_64" hdrmd5="dde72fce8cab774393607423627cf75c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libedit" version="3.1" release="38.20210216cvs.el9" arch="x86_64" hdrmd5="82d03f76417695578b5140e36da31fb2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libevent" version="2.1.12" release="8.el9_4" arch="x86_64" hdrmd5="d9405087fd87d67381a1f397a7e25664" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libfdisk" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="7f08853c1bf8551874f2a17f54400f7d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libffi" version="3.4.2" release="8.el9" arch="x86_64" hdrmd5="67a9fdf44690673ca2034843b2459a18" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libgcc" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="77803b11ecf93bf5ba7024ced80ff0b4" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libgcrypt" version="1.10.0" release="11.el9" arch="x86_64" hdrmd5="ffb8d9ceca3acfe65d9a6b63bec43c7d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libgomp" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="dc3faeb12a4e9343b0326e9f8983b22b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libgpg-error" version="1.42" release="5.el9" arch="x86_64" hdrmd5="99c44f4fadc8f9a9103d47e9b21d2620" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libicu" version="67.1" release="10.el9_6" arch="x86_64" hdrmd5="3c8bf5f7d9c12984f0a612b4db7683b4" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libidn2" version="2.3.0" release="7.el9" arch="x86_64" hdrmd5="b212886c674f27c872317e6ee6855977" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libksba" version="1.5.1" release="7.el9" arch="x86_64" hdrmd5="abb43e645efa873ccd0849caaab47692" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libmnl" version="1.0.4" release="16.el9_4" arch="x86_64" hdrmd5="0939018aa6fd5b9775ac3ffec5949d12" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libmount" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="b0928fed766df7fc502d111efa189dd5" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libnetfilter_conntrack" version="1.0.9" release="1.el9" arch="x86_64" hdrmd5="9a89ca145f06aa4bb0169f1cd184b5ec" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libnfnetlink" version="1.0.1" release="23.el9_5" arch="x86_64" hdrmd5="ee0e9bc6569d25ee8c8e4058859b194d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libnghttp2" version="1.43.0" release="6.el9_7.1" arch="x86_64" hdrmd5="4ae7db347d48959859a62b5e6d7efccf" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libpipeline" version="1.5.3" release="4.el9" arch="x86_64" hdrmd5="24b661de9eabfb5df4ba90b4abf97d13" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libpkgconf" version="1.7.3" release="10.el9" arch="x86_64" hdrmd5="5d8bf5d30b338e5cddf9ac38db81428b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libpsl" version="0.21.1" release="5.el9" arch="x86_64" hdrmd5="cc480e6508a7637917397ee92fede3a0" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libpwquality" version="1.4.4" release="8.el9" arch="x86_64" hdrmd5="fca0191f7104f50acf34e27c0fb604a8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libseccomp" version="2.5.2" release="2.el9" arch="x86_64" hdrmd5="85b2a8fcac27032ba8ddd3e068a3a687" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libselinux" version="3.6" release="3.el9" arch="x86_64" hdrmd5="15b7329babbe9bf9e9b4c4c8a0f7fd8c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libsemanage" version="3.6" release="5.el9_6" arch="x86_64" hdrmd5="31d26d29f5b1c9ba079fb35c73aa1615" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libsepol" version="3.6" release="3.el9" arch="x86_64" hdrmd5="ec24197b536785f1603339aba9201d6b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libsigsegv" version="2.13" release="4.el9" arch="x86_64" hdrmd5="06625e6afe8f42ae91ba0e98dfa9e222" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libsmartcols" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="de1c13be5c9c60425840890d71a344d9" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libss" version="1.46.5" release="8.el9" arch="x86_64" hdrmd5="eecc29c0312b0af8f12c32333e03bbfe" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libssh" version="0.10.4" release="17.el9_7" arch="x86_64" hdrmd5="2dd1df963df3816e81d0fb6c75f7b522" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libssh-config" version="0.10.4" release="17.el9_7" arch="noarch" hdrmd5="ee713a2ae09a8c25f3f7208edf90487b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libstdc++" version="11.5.0" release="11.el9" arch="x86_64" hdrmd5="2dc10f13bb6f3ef23dc1b9add1d4ce5c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libtasn1" version="4.16.0" release="9.el9" arch="x86_64" hdrmd5="8e066650d1ba8c35354d80f422fbb9d4" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libtool-ltdl" version="2.4.6" release="46.el9" arch="x86_64" hdrmd5="4333a6ae7619c1298d558871703f1d5b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libunistring" version="0.9.10" release="15.el9" arch="x86_64" hdrmd5="354dedb80398de4afb10e8e3806bc5da" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libutempter" version="1.2.1" release="6.el9" arch="x86_64" hdrmd5="c8a01f5605facb680c8781954f73e338" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libuuid" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="92f43195adcdab4ae50cdb860097f446" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libverto" version="0.3.2" release="3.el9" arch="x86_64" hdrmd5="ab20fd3e76a7e65cda2205582d56669d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libxcrypt" version="4.4.18" release="3.el9" arch="x86_64" hdrmd5="009b94ca2e493d96aa69f2cf33ea75bc" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libxml2" version="2.9.13" release="14.el9_7" arch="x86_64" hdrmd5="da8f3e5f1351d764468c4c41bdbeb711" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="libzstd" version="1.5.5" release="1.el9" arch="x86_64" hdrmd5="83f03d9173837806c24c1debe0c19430" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="lmdb-libs" version="0.9.29" release="3.el9" arch="x86_64" hdrmd5="b2e2551379f49537574237050b68cc90" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="lua-libs" version="5.4.4" release="4.el9" arch="x86_64" hdrmd5="32deba31381adab09c4376aa86a7f2f5" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="lz4-libs" version="1.9.3" release="5.el9" arch="x86_64" hdrmd5="cfdb2734e4e037ef811fa970b2a41ddd" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="make" epoch="1" version="4.3" release="8.el9" arch="x86_64" hdrmd5="8cb0facf22181efda18b2ad4f29ce8a2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="man-db" version="2.9.3" release="9.el9" arch="x86_64" hdrmd5="b4c427121d2710c20de0f595c040d705" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="mpfr" version="4.1.0" release="7.el9" arch="x86_64" hdrmd5="74619be075ab6bbc6f6f3eb27869ac7e" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="ncurses" version="6.2" release="12.20210508.el9" arch="x86_64" hdrmd5="888a2ed8bed7b53e1851b1de0d370b4d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="ncurses-base" version="6.2" release="12.20210508.el9" arch="noarch" hdrmd5="7b155cc38964315829a723729faf39da" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="ncurses-libs" version="6.2" release="12.20210508.el9" arch="x86_64" hdrmd5="72f688c695e13a539523baa4859b6079" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="net-tools" version="2.0" release="0.64.20160912git.el9" arch="x86_64" hdrmd5="ac519c655eeebb7ee75e9674463d3f01" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="nettle" version="3.10.1" release="1.el9" arch="x86_64" hdrmd5="6c541f10cb01f5eedfa81a98e882c75f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="npth" version="1.6" release="8.el9" arch="x86_64" hdrmd5="c3a66e554217e8a656d633f723b0116d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="openldap" version="2.6.8" release="4.el9.0.1" arch="x86_64" hdrmd5="d6eeb39b5a1a6617fb438717dc519ecb" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="openssl" epoch="1" version="3.5.1" release="7.el9_7" arch="x86_64" hdrmd5="1437ffe3f226c79f0e9ced2b371b6ac2" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="openssl-fips-provider" epoch="1" version="3.5.1" release="7.el9_7" arch="x86_64" hdrmd5="61638f3dd0821d0744a66362beb483ad" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="openssl-libs" epoch="1" version="3.5.1" release="7.el9_7" arch="x86_64" hdrmd5="b7f35fe7d58cc855bff73e967c3f6c1f" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="p11-kit" version="0.25.3" release="3.el9_5" arch="x86_64" hdrmd5="bd2aaa574f26d49d8699711ca9befc0a" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="p11-kit-trust" version="0.25.3" release="3.el9_5" arch="x86_64" hdrmd5="2dfd361825d159f907ba4294ea187ee8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pam" version="1.5.1" release="26.el9_6" arch="x86_64" hdrmd5="b395ec5681ea90955b0d1a5e3a49de05" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pcre" version="8.44" release="4.el9" arch="x86_64" hdrmd5="765a3e0316de46e3db520b432fa941ac" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pcre2" version="10.40" release="6.el9" arch="x86_64" hdrmd5="c8398a0fca8168e4647c255f832ee865" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pcre2-syntax" version="10.40" release="6.el9" arch="noarch" hdrmd5="10212dbd923fec1f2151d4ef16754dc3" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pkgconf" version="1.7.3" release="10.el9" arch="x86_64" hdrmd5="6d4afc2fa1090836b5e24e8ab21be4a6" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pkgconf-m4" version="1.7.3" release="10.el9" arch="noarch" hdrmd5="12b061c94e3a733e9c1e8921ea590501" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="pkgconf-pkg-config" version="1.7.3" release="10.el9" arch="x86_64" hdrmd5="22a1213f2869406a12ca4174b5dd103e" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="popt" version="1.18" release="8.el9" arch="x86_64" hdrmd5="c6ee753abf2608135eef84c6543c4713" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="procps-ng" version="3.3.17" release="14.el9" arch="x86_64" hdrmd5="7bb59aa4001c6d2b98789612daa22e10" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="protobuf-c" version="1.3.3" release="13.el9" arch="x86_64" hdrmd5="86479b14977a20c892c9290cad3f1b81" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="psmisc" version="23.4" release="3.el9" arch="x86_64" hdrmd5="fb35d9de45f8a82d77fac6da67615bf5" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="publicsuffix-list-dafsa" version="20210518" release="3.el9" arch="noarch" hdrmd5="d1ed826a6c010597e8edb6dc130b0901" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="python3" version="3.9.25" release="3.el9_7.3" arch="x86_64" hdrmd5="a72682fc67faa890e22fd1ffd9c5c10b" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="python3-libs" version="3.9.25" release="3.el9_7.3" arch="x86_64" hdrmd5="081a7972327cf8c6755381384067da77" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="python3-pip-wheel" version="21.3.1" release="1.el9" arch="noarch" hdrmd5="a3d61a41cd4b76c13e2b6b2c6df65455" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="python3-pyparsing" version="2.4.7" release="9.el9.0.1" arch="noarch" hdrmd5="c912c1393a5f32d6336dc61e517b00b8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="python3-setuptools-wheel" version="53.0.0" release="15.el9" arch="noarch" hdrmd5="ec6c2f8358b4ef5df1a59df1d488a13d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="readline" version="8.1" release="4.el9" arch="x86_64" hdrmd5="66ec97b30c4ebb8b6e3cd340d919dcd3" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="rocky-release" version="9.7" release="1.7.el9" arch="noarch" hdrmd5="4c18420f2f7449fac4df7f785834be84" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="rpm" version="4.16.1.3" release="39.el9" arch="x86_64" hdrmd5="f3931592da0e928b9daf2c251ef7eee7" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="rpm-build-libs" version="4.16.1.3" release="39.el9" arch="x86_64" hdrmd5="ba01d44123a6ecf8826896f1e6d3e2ba" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="rpm-libs" version="4.16.1.3" release="39.el9" arch="x86_64" hdrmd5="768f539586b50b309e5116b32cfb8c98" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="sed" version="4.8" release="9.el9" arch="x86_64" hdrmd5="415f8fb73ee020b229344cba9cfc297d" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="setup" version="2.13.7" release="10.el9" arch="noarch" hdrmd5="69bddb22c48ee24373556f12566c97fe" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="shadow-utils" epoch="2" version="4.9" release="15.el9" arch="x86_64" hdrmd5="d645442718019cb73c4516800a321387" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="sqlite-libs" version="3.34.1" release="9.el9_7" arch="x86_64" hdrmd5="c9024e11e64e8157a1a194f12afe6473" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="strace" version="6.12" release="1.el9" arch="x86_64" hdrmd5="36b3d0b4d5ba262115d47b40cc1653f0" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="systemd" version="252" release="55.el9_7.9.rocky.0.1" arch="x86_64" hdrmd5="84a683a3b653f3dbc7922fe96b4a2414" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="systemd-libs" version="252" release="55.el9_7.9.rocky.0.1" arch="x86_64" hdrmd5="dd913c1aebb7b01448ce03bbba87834e" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="systemd-pam" version="252" release="55.el9_7.9.rocky.0.1" arch="x86_64" hdrmd5="9af490eb5d8e3b6d3dc9e51f92bba5f7" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="systemd-rpm-macros" version="252" release="55.el9_7.9.rocky.0.1" arch="noarch" hdrmd5="815ec88e083ca4b7b5cf6b18a43eff46" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="tar" epoch="2" version="1.34" release="9.el9_7" arch="x86_64" hdrmd5="258307fe6d1c4f5a6da60cf787fc0b2a" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="tzdata" version="2026a" release="1.el9_7" arch="noarch" hdrmd5="13852f5f796366f1331d50d47ed3bc8c" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="unzip" version="6.0" release="59.el9" arch="x86_64" hdrmd5="f8c184c5c9b7c3cef6bb2b8bc0884481" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="util-linux" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="7302edfdbd843cdb6f5a1a8dee3491be" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="util-linux-core" version="2.37.4" release="21.el9_7" arch="x86_64" hdrmd5="7561ef94b8c1ab71dbbee1f743e25726" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="vim-filesystem" epoch="2" version="8.2.2637" release="23.el9_7.3" arch="noarch" hdrmd5="476793b2abb82c7f57a87f9dc4453a03" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="which" version="2.21" release="30.el9_6" arch="x86_64" hdrmd5="0e055838636b786507f4a6c791bd7bb8" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="xz" version="5.2.5" release="8.el9_0" arch="x86_64" hdrmd5="32384d0037322e70b1394d34df5d71ab" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="xz-libs" version="5.2.5" release="8.el9_0" arch="x86_64" hdrmd5="078cdcb6e241d5bae897e8ffbe5abc12" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="zip" version="3.0" release="35.el9" arch="x86_64" hdrmd5="12a2063a23942b9626bc54af762d1769" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="zlib" version="1.2.11" release="40.el9" arch="x86_64" hdrmd5="769b855a81f624aff2c4d5d5f7b85874" project="Rocky:9.7" repository="baseos"/>
+  <bdep name="zstd" version="1.5.5" release="1.el9" arch="x86_64" hdrmd5="9bf8ac4e16254ef48a77dcaf3af5ff8d" project="Rocky:9.7" repository="baseos"/>
+  <module>common</module>
+</buildinfo>

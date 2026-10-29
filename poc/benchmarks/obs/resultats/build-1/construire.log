@@ -63,3 +63,16 @@ srcmd5 : srcmd5="85347ea794c63a5435416b2374025c50"
 14:36:38 debian_13=scheduled rocky_9=scheduled
 14:37:13 debian_13=scheduled rocky_9=scheduled
 14:37:44 debian_13=scheduled rocky_9=building
+14:38:15 debian_13=scheduled rocky_9=building
+14:38:46 debian_13=building rocky_9=succeeded
+14:39:17 debian_13=succeeded rocky_9=succeeded
+## Collecte
+rocky_9 : 1 fichiers ; type de VM : Using BUILD_ROOT=/var/cache/obs/worker/root_1/.mount
+  c6a3ee41944a9afe2a5e19459ecc69cbbc0805d4964c286f6cdd52bb5b7348ad  sample-app-1.0.0-1.1.x86_64.rpm
+debian_13 : 6 fichiers ; type de VM : Using BUILD_ROOT=/var/cache/obs/worker/root_1/.mount
+  863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f  sample-app_1.0.0-1.debian.tar.xz
+  9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6  sample-app_1.0.0-1.dsc
+  991fce334f35b916863bc74301abb396f26258c1076be06c9030e510c41d222f  sample-app_1.0.0-1_amd64.buildinfo
+  2de4a99863923eb98b508a0c8b1f306b2ab2ae64fd43c8c8db21b78c1df1554f  sample-app_1.0.0-1_amd64.changes
+  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5  sample-app_1.0.0-1_amd64.deb
+  07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz

@@ -67,7 +67,7 @@ for d in "${DEPOTS[@]}"; do
   B=$O/builds/$lib/$d
   rm -rf "$B"; mkdir -p "$B" "$R/$lib/$d"
   s "osc remotebuildlog poc sample-app $d x86_64" > "$R/$lib/$d/build.log" 2>&1 || true
-  s "rm -rf /root/banc-a2/bin/$d && mkdir -p /root/banc-a2/bin/$d && cd /root/banc-a2/bin/$d && osc getbinaries -q poc sample-app $d x86_64 -d . && osc ls -b -l poc sample-app -r $d -a x86_64" \
+  s "rm -rf /root/banc-a2/bin/$d && mkdir -p /root/banc-a2/bin/$d && cd /root/banc-a2/bin/$d && osc getbinaries -q --sources poc sample-app $d x86_64 -d . && osc ls -b -l poc sample-app -r $d -a x86_64" \
     > "$R/$lib/$d/binaires.txt" 2>&1 || true
   for f in _buildenv _statistics _slsa_provenance.json; do
     s "osc api /build/poc/$d/x86_64/sample-app/$f" > "$B/$f" 2>/dev/null || rm -f "$B/$f"
@@ -75,6 +75,6 @@ for d in "${DEPOTS[@]}"; do
   SSH_OBS_SCP=1 "$here/ssh-obs.sh" -r "root@192.168.161.10:/root/banc-a2/bin/$d/." "$B/" 2>/dev/null || true
   (cd "$B" && find . -type f ! -name '_*' -printf '%P\n' | sort | xargs -r sha256sum) > "$R/$lib/$d/sha256.txt"
   for f in _buildenv _statistics _slsa_provenance.json; do [[ -s $B/$f ]] && cp "$B/$f" "$R/$lib/$d/"; done
-  echo "$d : $(wc -l < "$R/$lib/$d/sha256.txt") fichiers ; type de VM : $(grep -m1 -o -E 'booting (kvm|qemu|chroot)|Using BUILD_ROOT=[^ ]*|VM_TYPE=[a-z]*' "$R/$lib/$d/build.log" | paste -sd' ')"
+  echo "$d : $(wc -l < "$R/$lib/$d/sha256.txt") fichiers ; type de VM : $(grep -m1 -o -E 'Doing (kvm|qemu|chroot|[a-z]+) build' "$R/$lib/$d/build.log" | paste -sd' ')"
   sed 's/^/  /' "$R/$lib/$d/sha256.txt"
 done

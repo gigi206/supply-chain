@@ -88,9 +88,10 @@ materiau() {
   for d in rocky_9 debian_13; do
     st=$(ls "$R/$lib/$d"/*.statement.json 2>/dev/null | head -1) || true
     [[ -n $st ]] || { echo "$d : pas de provenance"; continue; }
-    jq -r '(.predicate.materials // .predicate.buildDefinition.resolvedDependencies)[] | select(.uri | test("/_?slsa/")) | "\(.uri) \(.digest.sha256)"' "$st" | head -2 | while read -r u h; do
-      chemin=${u#*://*/}
-      got=$(s "osc api '/$chemin' | sha256sum" | cut -d' ' -f1)
+    # URI du srcserver (port interne 5352), interrogée depuis l'appliance ; un binaire par dépôt d'origine
+    jq -r '(.predicate.materials // .predicate.buildDefinition.resolvedDependencies)[] | select(.uri | test("/_?slsa/")) | "\(.uri) \(.digest.sha256)"' "$st" \
+      | awk '{split($1, a, "/"); k = a[5] "/" a[6]; if (!(k in vu)) {vu[k] = 1; print}}' | while read -r u h; do
+      got=$(s "curl -fsS '$u' | sha256sum" < /dev/null | cut -d' ' -f1)
       echo "$d : $u"
       [[ $got == "$h" ]] && echo "  récupéré par digest, sha256 conforme" || echo "  ÉCHEC : sha256 $got"
     done

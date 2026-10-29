@@ -1,0 +1,64 @@
+<buildstatistics>
+  <disk>
+    <usage>
+      <size unit="M">1096</size>
+      <io_requests>48971</io_requests>
+      <io_sectors>2946418</io_sectors>
+    </usage>
+  </disk>
+  <memory>
+    <usage>
+      <size unit="M">499</size>
+    </usage>
+  </memory>
+  <times>
+    <total>
+      <time unit="s">45</time>
+    </total>
+    <preinstall>
+      <time unit="s">4</time>
+    </preinstall>
+    <install>
+      <time unit="s">19</time>
+    </install>
+    <main>
+      <time unit="s">15</time>
+    </main>
+    <postchecks>
+      <time unit="s">0</time>
+    </postchecks>
+    <rpmlint>
+      <time unit="s">0</time>
+    </rpmlint>
+    <buildcmp>
+      <time unit="s">0</time>
+    </buildcmp>
+    <deltarpms>
+      <time unit="s">0</time>
+    </deltarpms>
+    <download>
+      <time unit="s">1</time>
+    </download>
+    <cpusteal>
+      <time unit="s">0</time>
+    </cpusteal>
+  </times>
+  <download>
+    <size unit="k">2191</size>
+    <binaries>10</binaries>
+    <cachehits>202</cachehits>
+  </download>
+  <info>
+    <workerid>sc-obs:1</workerid>
+    <hostarch>x86_64</hostarch>
+    <srcmd5>85347ea794c63a5435416b2374025c50</srcmd5>
+    <verifymd5>85347ea794c63a5435416b2374025c50</verifymd5>
+    <rev>1</rev>
+    <file>sample-app_1.0.0-1.dsc</file>
+    <buildtype>dsc</buildtype>
+    <readytime>1793285117</readytime>
+    <starttime>1793285117</starttime>
+    <endtime>1793285162</endtime>
+    <jobid>e79a603fe776b56fa5d4f9ef707e93d0</jobid>
+  </info>
+</buildstatistics>

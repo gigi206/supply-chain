@@ -1,0 +1,9 @@
+# comparer.sh build-1 build-2, 2026-10-29T14:42:38Z
+debian_13/sample-app_1.0.0-1_amd64.deb
+  nevra                    = sample-app_1.0.0-1_amd64
+  sha256                   = 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+  => IDENTIQUE (fichier entier)
+rocky_9/sample-app-1.0.0-1.1.x86_64.rpm : présent dans un seul build
+rocky_9/sample-app-1.0.0-1.2.src.rpm : présent dans un seul build
+rocky_9/sample-app-1.0.0-1.2.x86_64.rpm : présent dans un seul build
+RÉSULTAT : au moins un paquet différent
