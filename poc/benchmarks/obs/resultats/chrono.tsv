@@ -3,8 +3,9 @@
 2. VM sc-obs démarrée (pool, réseau, disque de 40G)	2026-10-29T13:51:17Z	0h03m49s
 3. premier accès : root et clé SSH remplacés	2026-10-29T13:54:12Z	0h06m44s
 4. appliance configurée : Admin, osc, worker KVM (1 instance), contrôles	2026-10-29T13:56:53Z	0h09m25s
-5. build-1 : succeeded succeeded	2026-10-29T14:39:18Z	
-6. build-2 : succeeded succeeded	2026-10-29T14:42:18Z	
-7. build-3 : succeeded succeeded	2026-10-29T14:44:53Z	
-8. build-4 : succeeded succeeded	2026-10-29T14:47:12Z	
-9. build-5 : succeeded succeeded	2026-10-29T15:15:19Z	
+5. build-1 : succeeded succeeded	2026-10-29T14:39:18Z	0h51m50s
+6. build-2 : succeeded succeeded	2026-10-29T14:42:18Z	0h54m50s
+7. build-3 : succeeded succeeded	2026-10-29T14:44:53Z	0h57m25s
+8. build-4 : succeeded succeeded	2026-10-29T14:47:12Z	0h59m44s
+9. build-5 : succeeded succeeded	2026-10-29T15:15:19Z	1h27m51s
+10. build-v1 : succeeded succeeded	2026-10-29T15:24:47Z	1h37m19s

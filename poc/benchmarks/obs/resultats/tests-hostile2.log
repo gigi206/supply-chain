@@ -1,0 +1,54 @@
+# tests.sh hostile2, 2026-10-29T15:20:41Z
+Sending meta data...
+Done.
+A    poc/hostile2
+At revision None.
+A    _slsa_provenance.json
+A    hostile2.spec
+A    _slsa_provenance.config
+Sending    _slsa_provenance.json
+Sending    hostile2.spec
+Sending    _slsa_provenance.config
+Transmitting file data ...
+Committed revision 1.
+_slsa_provenance.config
+_slsa_provenance.json
+hostile2.spec
+15:21:19 rocky_9 : building
+15:21:50 rocky_9 : building
+15:22:21 rocky_9 : succeeded
+## Journal de build (lignes des tests)
+-rw-r--r-- 1 abuild abuild    9 Oct 29 15:20 _slsa_provenance.config
+-rw-r--r-- 1 abuild abuild  484 Oct 29 15:20 _slsa_provenance.json
+-rw-r--r-- 1 abuild abuild 1482 Oct 29 15:20 hostile2.spec
+-rw-r--r-- 1 abuild abuild  484 Oct 29 15:21 _slsa_provenance.json
+-rw-r--r-- 1 abuild abuild 1170 Oct 29 15:21 hostile2.followup.spec
+-rw-r--r-- 1 abuild abuild 112921 Oct 29 15:21 _buildenv
+-rw-r--r-- 1 abuild abuild   1944 Oct 29 15:21 _projectcert.crt
+-rw-r--r-- 1 abuild abuild  36949 Oct 29 15:21 _slsa_provenance.config
+-rw-r--r-- 1 abuild abuild 199577 Oct 29 15:21 _slsa_provenance.json
+-rw-r--r-- 1 abuild abuild   1395 Oct 29 15:21 _statistics
+-rw-r--r-- 1 abuild abuild   7535 Oct 29 15:21 hostile2-1-1.src.rpm
+-rw-r--r-- 1 abuild abuild   6955 Oct 29 15:21 hostile2-1-1.x86_64.rpm
+-rw-r--r-- 1 abuild abuild   1170 Oct 29 15:21 hostile2.followup.spec
+-rw-r--r-- 1 abuild abuild  51854 Oct 29 15:21 logfile
+-rw-r--r-- 1 abuild abuild  12694 Oct 29 15:20 meta
+        2 Doing kvm build
+        2 SUIVI
+       13 hostile2.followup.spec
+## Historique des jobs
+time                 package                                            reason           code              build time      worker
+2026-10-29 15:21:52  hostile2                                           new build        succeeded                0m 31s   sc-obs:1        
+## Binaires publiés
+   112921 Oct 29 15:21 _buildenv                               
+    36949 Oct 29 15:21 _slsa_provenance.config                 
+   199577 Oct 29 15:21 _slsa_provenance.json                   
+     1395 Oct 29 15:21 _statistics                             
+    68109 Oct 29 15:21 hostile2-1-1.src.rpm                    
+     6955 Oct 29 15:21 hostile2-1-1.x86_64.rpm                 
+## Provenances publiées
+_slsa_provenance.json : DSSE ; sujets : hostile2-1-1.x86_64.rpm=8c209bd1633d2138…, hostile2-1-1.src.rpm=3a6f9b11b20880ad…, hostile2.followup.spec=050209a826358972… ; builder : obs://private ; buildType : https://open-build-service.org/worker
+hostile2-1-1.x86_64.slsa_provenance.json : absent
+Creating directory "hostile2-bin"
+8c209bd1633d2138f767a05af82fdfb3f75e47d43820dd3e143c956e722b1008  hostile2-bin/hostile2-1-1.x86_64.rpm
+_slsa_provenance.json (hostile2) : signature DSSE valide, clé E8B41B97868AFF2CAC28C5C11623E6E2967FFC39

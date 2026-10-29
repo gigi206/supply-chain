@@ -1,0 +1,24 @@
+# comparer.sh build-3 build-v1, 2026-10-29T15:25:14Z
+debian_13/sample-app_1.0.0-1_amd64.deb
+  nevra                    = sample-app_1.0.0-1_amd64
+  sha256                   = 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+  => IDENTIQUE (fichier entier)
+rocky_9/sample-app-1.0.0-1.src.rpm
+  nevra                    = sample-app-1.0.0-1.x86_64
+  buildtime                = 1793145600
+  buildhost                = reproducible
+  disturl                  = obs://private/poc/rocky_9/85347ea794c63a5435416b2374025c50-sample-app
+  signature                = PGP,RSA
+  sha256_hors_signature    = e5cbf401e1066b5484488266520b6de3b71288805dcc96156055cc7551066814
+  sha256                   ≠ 10f4912c6a6306b8fbdb7a2dddde3673924ee8269ff72ad3e71bf4850f09a248  |  ccc62d7791d585a950204b44fd59ff40eb61b6acf186b7e2e2b025ed7da5210c
+  => IDENTIQUE (hors signature)
+rocky_9/sample-app-1.0.0-1.x86_64.rpm
+  nevra                    = sample-app-1.0.0-1.x86_64
+  buildtime                = 1793145600
+  buildhost                = reproducible
+  disturl                  = obs://private/poc/rocky_9/85347ea794c63a5435416b2374025c50-sample-app
+  signature                = PGP,RSA
+  sha256_hors_signature    = 57343ca678561e135f8e0e7c17b4ae48221bbe8c1798113e8e9ad99dc0ff77e2
+  sha256                   ≠ f30dcf0fbe75e3f1c370d3dd3eb3d78cde6ba5380f6d825792be9213f2b5837f  |  1d0b6b273c8e1522448f885931d15c1bebb9b2ddce4336d8627853158df2c9f6
+  => IDENTIQUE (hors signature)
+RÉSULTAT : tous les paquets identiques (rpm hors signature, deb entiers)

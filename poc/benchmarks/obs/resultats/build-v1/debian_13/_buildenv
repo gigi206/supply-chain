@@ -1,0 +1,211 @@
+<buildinfo project="poc" repository="debian_13" package="sample-app">
+  <arch>x86_64</arch>
+  <srcmd5>85347ea794c63a5435416b2374025c50</srcmd5>
+  <verifymd5>85347ea794c63a5435416b2374025c50</verifymd5>
+  <versrel>1.0.0-1</versrel>
+  <bcnt>6</bcnt>
+  <release>1.6</release>
+  <config>retiré : configuration de build (prjconf de build.opensuse.org, non versionné), sha256 8ee0fe7e16fcd541ee489df794d4400ca67bc32f6e7612e510f963db471560d2</config>
+  <bdep name="adduser" version="3.152" arch="all" hdrmd5="2835161c2a98a536c0d19c85c7bc2dd3" project="Debian:13" repository="standard"/>
+  <bdep name="autoconf" version="2.72" release="3.1" arch="all" hdrmd5="76d36fe6bcba2c0c0a5b1de074608066" project="Debian:13" repository="standard"/>
+  <bdep name="automake" epoch="1" version="1.17" release="4" arch="all" hdrmd5="34e320964686716fe03e434477ac123b" project="Debian:13" repository="standard"/>
+  <bdep name="autopoint" version="0.23.1" release="2" arch="all" hdrmd5="376ed4b038f86bcdded6cbb046ecd6bf" project="Debian:13" repository="standard"/>
+  <bdep name="autotools-dev" version="20240727.1" arch="all" hdrmd5="a201d589a3d0fdaa5ae1c96011df50ee" project="Debian:13" repository="standard"/>
+  <bdep name="base-files" version="13.8+deb13u7" arch="amd64" hdrmd5="098a1ff5c0ac1d9403af8f15be57c248" project="Debian:13" repository="standard"/>
+  <bdep name="base-passwd" version="3.6.7" arch="amd64" hdrmd5="2aebf93663716a2e43b4c3c06d666ee3" project="Debian:13" repository="standard"/>
+  <bdep name="bash" version="5.2.37" release="2+b10" arch="amd64" hdrmd5="f62ae198724073d5b9af25ff3eade8ee" project="Debian:13" repository="standard"/>
+  <bdep name="binutils" version="2.44" release="3" arch="amd64" hdrmd5="1cf8dd67908649da153e4b4ee47a736d" project="Debian:13" repository="standard"/>
+  <bdep name="binutils-common" version="2.44" release="3" arch="amd64" hdrmd5="cab4decdd8783f9a1aa4da7ae435eeeb" project="Debian:13" repository="standard"/>
+  <bdep name="binutils-x86-64-linux-gnu" version="2.44" release="3" arch="amd64" hdrmd5="aae6838d87a0a017b4db4fc7396b2478" project="Debian:13" repository="standard"/>
+  <bdep name="bsdextrautils" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="d408b44cc2977ea365eea2e74d3d71f8" project="Debian:13" repository="standard"/>
+  <bdep name="bsdutils" epoch="1" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="9715b72a0df43bf13e045cc2473b1e96" project="Debian:13" repository="standard"/>
+  <bdep name="build-essential" version="12.12" arch="amd64" hdrmd5="32fc70473a984b7107d581e223685191" project="Debian:13" repository="standard"/>
+  <bdep name="bzip2" version="1.0.8" release="6" arch="amd64" hdrmd5="576cc8637f850d7da76804bf228e33b0" project="Debian:13" repository="standard"/>
+  <bdep name="coreutils" version="9.7" release="3" arch="amd64" hdrmd5="d6c19c6fc999aa20b6d237ce0c98c193" project="Debian:13" repository="standard"/>
+  <bdep name="cpio" version="2.15+dfsg" release="2" arch="amd64" hdrmd5="80b063f92951d25b280271ad88bba979" project="Debian:13" repository="standard"/>
+  <bdep name="cpp" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="58df01b71f07ee1f822ed40da39f6a8c" project="Debian:13" repository="standard"/>
+  <bdep name="cpp-14" version="14.2.0" release="19" arch="amd64" hdrmd5="30dc2097c2feb8e1b75333494a04e7aa" project="Debian:13" repository="standard"/>
+  <bdep name="cpp-14-x86-64-linux-gnu" version="14.2.0" release="19" arch="amd64" hdrmd5="2e8b861f272853dcc0c423dddf1f7046" project="Debian:13" repository="standard"/>
+  <bdep name="cpp-x86-64-linux-gnu" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="a713f398ca7456219c6a6254992dfa7e" project="Debian:13" repository="standard"/>
+  <bdep name="dash" version="0.5.12" release="12" arch="amd64" hdrmd5="dd816a033762f63465575a1fa0a2b12d" project="Debian:13" repository="standard"/>
+  <bdep name="debconf" version="1.5.91" arch="all" hdrmd5="6e11c0c361c848f5fe7ceacd3496cb64" project="Debian:13" repository="standard"/>
+  <bdep name="debhelper" version="13.24.2" arch="all" hdrmd5="76db324ceb9f004ef232e7cfd4c97935" project="Debian:13" repository="standard"/>
+  <bdep name="debianutils" version="5.23.2" arch="amd64" hdrmd5="a558de4a28ecd676fc40412de039d81c" project="Debian:13" repository="standard"/>
+  <bdep name="dh-autoreconf" version="20" arch="all" hdrmd5="8d61e4dfcbbdc8a2733a55251cef1cb7" project="Debian:13" repository="standard"/>
+  <bdep name="dh-strip-nondeterminism" version="1.14.1" release="2" arch="all" hdrmd5="00c5f4c3d96c488994f21cd04d114506" project="Debian:13" repository="standard"/>
+  <bdep name="diffutils" epoch="1" version="3.10" release="4" arch="amd64" hdrmd5="d3039a7eb8c85a801125114d46901dc6" project="Debian:13" repository="standard"/>
+  <bdep name="dpkg" version="1.22.22" arch="amd64" hdrmd5="3676ee0f627806c06d2f042785474ac1" project="Debian:13" repository="standard"/>
+  <bdep name="dpkg-dev" version="1.22.22" arch="all" hdrmd5="1b9947a43426a205359e67f3c9771997" project="Debian:13" repository="standard"/>
+  <bdep name="dwz" version="0.15" release="1+b1" arch="amd64" hdrmd5="268ec640b525baea1cb06b7230740f42" project="Debian:13" repository="standard"/>
+  <bdep name="e2fsprogs" version="1.47.2" release="3+b12" arch="amd64" hdrmd5="dc6e882af3969d686ef56d7f944b2c36" project="Debian:13" repository="standard"/>
+  <bdep name="fakeroot" version="1.37.1.1" release="1" arch="amd64" hdrmd5="acfc774a998535d176a24bdb6c00d2a9" project="Debian:13" repository="standard"/>
+  <bdep name="file" epoch="1" version="5.46" release="5" arch="amd64" hdrmd5="496a84921363d8c1d515d3ced37d5cdd" project="Debian:13" repository="standard"/>
+  <bdep name="findutils" version="4.10.0" release="3" arch="amd64" hdrmd5="34f0b7eae1f8af8a2017df51f004332c" project="Debian:13" repository="standard"/>
+  <bdep name="g++" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="95df460ce76fb8a58957b1256cd0f1d0" project="Debian:13" repository="standard"/>
+  <bdep name="g++-14" version="14.2.0" release="19" arch="amd64" hdrmd5="c724bdc1e232c31d528395e60f0282c3" project="Debian:13" repository="standard"/>
+  <bdep name="g++-14-x86-64-linux-gnu" version="14.2.0" release="19" arch="amd64" hdrmd5="515dd37b99acac281226bcad166fa425" project="Debian:13" repository="standard"/>
+  <bdep name="g++-x86-64-linux-gnu" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="0e6d7120f68a88ae4acb4cef63e563dc" project="Debian:13" repository="standard"/>
+  <bdep name="gawk" epoch="1" version="5.2.1" release="2+b1" arch="amd64" hdrmd5="0dd7596effe03ddf6ad9e29e550ba228" project="Debian:13" repository="standard"/>
+  <bdep name="gcc" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="ee77e175854291c68ff3f03e3ed94081" project="Debian:13" repository="standard"/>
+  <bdep name="gcc-14" version="14.2.0" release="19" arch="amd64" hdrmd5="752eabc35e763b911e96be947e4fcedb" project="Debian:13" repository="standard"/>
+  <bdep name="gcc-14-base" version="14.2.0" release="19" arch="amd64" hdrmd5="773f679e294de41e73f1d05bb2298256" project="Debian:13" repository="standard"/>
+  <bdep name="gcc-14-x86-64-linux-gnu" version="14.2.0" release="19" arch="amd64" hdrmd5="27d7db2a8e3eab0677b3a959b258345b" project="Debian:13" repository="standard"/>
+  <bdep name="gcc-x86-64-linux-gnu" epoch="4" version="14.2.0" release="1" arch="amd64" hdrmd5="7ddc3c57ea08866ffc03383da13d081c" project="Debian:13" repository="standard"/>
+  <bdep name="gettext" version="0.23.1" release="2" arch="amd64" hdrmd5="791ace5b9e13b0b0cfd962e1ba286b2e" project="Debian:13" repository="standard"/>
+  <bdep name="gettext-base" version="0.23.1" release="2" arch="amd64" hdrmd5="6cc1b650efbda0aecf3765725f58a0f2" project="Debian:13" repository="standard"/>
+  <bdep name="golang-1.24-go" version="1.24.4" release="1" arch="amd64" hdrmd5="f71b17f44677673cc155c32a89b6fc91" project="Debian:13" repository="standard"/>
+  <bdep name="golang-1.24-src" version="1.24.4" release="1" arch="all" hdrmd5="6298dee3750d7c0d0429c3b2a0ae69cd" project="Debian:13" repository="standard"/>
+  <bdep name="golang-go" epoch="2" version="1.24~2" arch="amd64" hdrmd5="cf667630b258d3fff5b493ccc8c6d9bc" project="Debian:13" repository="standard"/>
+  <bdep name="golang-src" epoch="2" version="1.24~2" arch="all" hdrmd5="9369b9a8c04719b2fe964ca7fc7f2ad1" project="Debian:13" repository="standard"/>
+  <bdep name="grep" version="3.11" release="4" arch="amd64" hdrmd5="bced8e46a93648c3dec435c30c952af1" project="Debian:13" repository="standard"/>
+  <bdep name="groff-base" version="1.23.0" release="9" arch="amd64" hdrmd5="9c24ccfdbd79d79bca26546201a17b1d" project="Debian:13" repository="standard"/>
+  <bdep name="gzip" version="1.13" release="1+deb13u1" arch="amd64" hdrmd5="9abff929d228f76e086eeae7e23acee3" project="Debian:13" repository="standard"/>
+  <bdep name="hostname" version="3.25" arch="amd64" hdrmd5="e5caa9934243ce99d4879da6892e9898" project="Debian:13" repository="standard"/>
+  <bdep name="init-system-helpers" version="1.69~deb13u1" arch="all" hdrmd5="1a6719a10fd1323aa25e20b05df8255e" project="Debian:13" repository="standard"/>
+  <bdep name="intltool-debian" version="0.35.0+20060710.6" arch="all" hdrmd5="e7181639f3b2bf559bc0232e40d48e05" project="Debian:13" repository="standard"/>
+  <bdep name="kmod" version="34.2" release="2" arch="amd64" hdrmd5="e0d2096365b26292117a14e65094d58e" project="Debian:13" repository="standard"/>
+  <bdep name="less" version="668" release="1" arch="amd64" hdrmd5="dafc41b7936e9970101c5a269aae28ae" project="Debian:13" repository="standard"/>
+  <bdep name="libacl1" version="2.3.2" release="2+b1" arch="amd64" hdrmd5="efabfafb473aec9f6439c0ef5bacd8b5" project="Debian:13" repository="standard"/>
+  <bdep name="libarchive-zip-perl" version="1.68" release="1" arch="all" hdrmd5="31a030538332abb66ba90de37b4262af" project="Debian:13" repository="standard"/>
+  <bdep name="libasan8" version="14.2.0" release="19" arch="amd64" hdrmd5="f6b3a0892480c927419e628008273f92" project="Debian:13" repository="standard"/>
+  <bdep name="libatomic1" version="14.2.0" release="19" arch="amd64" hdrmd5="c1fa6a36cbd77107230ee3293c2563c3" project="Debian:13" repository="standard"/>
+  <bdep name="libattr1" epoch="1" version="2.5.2" release="3" arch="amd64" hdrmd5="1659fe20060738014f2a390b88eccef2" project="Debian:13" repository="standard"/>
+  <bdep name="libaudit-common" epoch="1" version="4.0.2" release="2+deb13u1" arch="all" hdrmd5="8dab4f867ab1d1babb89652267145e23" project="Debian:13" repository="standard"/>
+  <bdep name="libaudit1" epoch="1" version="4.0.2" release="2+deb13u1" arch="amd64" hdrmd5="3a30412eaf6b0f7afe1705ee64e5969d" project="Debian:13" repository="standard"/>
+  <bdep name="libbinutils" version="2.44" release="3" arch="amd64" hdrmd5="6b156bcf026acb1625b085f0ccc31589" project="Debian:13" repository="standard"/>
+  <bdep name="libblkid1" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="d6387ae53114b9951316a73e0f5db253" project="Debian:13" repository="standard"/>
+  <bdep name="libbrotli1" version="1.1.0" release="2+b7" arch="amd64" hdrmd5="345efde4cdc5ce61eb245fc50d06463e" project="Debian:13" repository="standard"/>
+  <bdep name="libbsd0" version="0.12.2" release="2" arch="amd64" hdrmd5="54906acc605138c63eed145a56e53358" project="Debian:13" repository="standard"/>
+  <bdep name="libbz2-1.0" version="1.0.8" release="6" arch="amd64" hdrmd5="a52dc50395e69921cd7be14de2f23e28" project="Debian:13" repository="standard"/>
+  <bdep name="libc-bin" version="2.41" release="12+deb13u4" arch="amd64" hdrmd5="ff407bc68d033150c6be294750ed00c9" project="Debian:13" repository="standard"/>
+  <bdep name="libc-dev-bin" version="2.41" release="12+deb13u4" arch="amd64" hdrmd5="b38e121cd3dbd7c34760be33ca9d4653" project="Debian:13" repository="standard"/>
+  <bdep name="libc6" version="2.41" release="12+deb13u4" arch="amd64" hdrmd5="82c82944139c6147038354973a53f25d" project="Debian:13" repository="standard"/>
+  <bdep name="libc6-dev" version="2.41" release="12+deb13u4" arch="amd64" hdrmd5="32dda7742c43ca2ee52cc056add9a069" project="Debian:13" repository="standard"/>
+  <bdep name="libcap-ng0" version="0.8.5" release="4+b1" arch="amd64" hdrmd5="ef510ad715628b546ca744b2b4f8c24f" project="Debian:13" repository="standard"/>
+  <bdep name="libcap2" epoch="1" version="2.75" release="10+deb13u1+b3" arch="amd64" hdrmd5="3e2a074280fb84d3d5ccf23d06d77a64" project="Debian:13" repository="standard"/>
+  <bdep name="libcares2" version="1.34.5" release="1+deb13u1" arch="amd64" hdrmd5="5d974c9eced86864672c5381f187084d" project="Debian:13" repository="standard"/>
+  <bdep name="libcc1-0" version="14.2.0" release="19" arch="amd64" hdrmd5="e7454cdd0bc058a9c5fc846a1cb3163d" project="Debian:13" repository="standard"/>
+  <bdep name="libcom-err2" version="1.47.2" release="3+b12" arch="amd64" hdrmd5="b5158711f4340f5ac0ae272b6a6bf5c0" project="Debian:13" repository="standard"/>
+  <bdep name="libcrypt-dev" epoch="1" version="4.4.38" release="1" arch="amd64" hdrmd5="56bca111c0bdbcc8b1a79f00c037fc33" project="Debian:13" repository="standard"/>
+  <bdep name="libcrypt1" epoch="1" version="4.4.38" release="1" arch="amd64" hdrmd5="52cba7269356de90304c426322aa3036" project="Debian:13" repository="standard"/>
+  <bdep name="libctf-nobfd0" version="2.44" release="3" arch="amd64" hdrmd5="ba2d969ad57563e9d1eb3a5dc9739d5f" project="Debian:13" repository="standard"/>
+  <bdep name="libctf0" version="2.44" release="3" arch="amd64" hdrmd5="9bb5daddc481d69f7b570db887bc12b2" project="Debian:13" repository="standard"/>
+  <bdep name="libdb5.3t64" version="5.3.28+dfsg2" release="9" arch="amd64" hdrmd5="c01a4d64cbe89e84382963d9a3ffb5d8" project="Debian:13" repository="standard"/>
+  <bdep name="libdebconfclient0" version="0.280" arch="amd64" hdrmd5="3d1882cacd791a45f71b6091714cf4b5" project="Debian:13" repository="standard"/>
+  <bdep name="libdebhelper-perl" version="13.24.2" arch="all" hdrmd5="033e56eb7dfc7e083217321f435abd54" project="Debian:13" repository="standard"/>
+  <bdep name="libdpkg-perl" version="1.22.22" arch="all" hdrmd5="3e916b35af5e54b66016703933945b2a" project="Debian:13" repository="standard"/>
+  <bdep name="libelf1t64" version="0.192" release="4" arch="amd64" hdrmd5="7e49ea885b9171252c6d7e8b60c56a6b" project="Debian:13" repository="standard"/>
+  <bdep name="libext2fs2t64" version="1.47.2" release="3+b12" arch="amd64" hdrmd5="8fc79e619ece32cbac6c5482ba8fda92" project="Debian:13" repository="standard"/>
+  <bdep name="libfakeroot" version="1.37.1.1" release="1" arch="amd64" hdrmd5="446c2f666fe8c547330e52eb41059d26" project="Debian:13" repository="standard"/>
+  <bdep name="libfile-find-rule-perl" version="0.34" release="4" arch="all" hdrmd5="04dda36bbcb3cd6703c32511a9755b68" project="Debian:13" repository="standard"/>
+  <bdep name="libfile-stripnondeterminism-perl" version="1.14.1" release="2" arch="all" hdrmd5="8875e8dc2e69280ad0da375b19301a84" project="Debian:13" repository="standard"/>
+  <bdep name="libgcc-14-dev" version="14.2.0" release="19" arch="amd64" hdrmd5="83a6726a635923de4f84993bd7c92cfc" project="Debian:13" repository="standard"/>
+  <bdep name="libgcc-s1" version="14.2.0" release="19" arch="amd64" hdrmd5="1d3d63665592adcde275ee108816f457" project="Debian:13" repository="standard"/>
+  <bdep name="libgdbm-compat4t64" version="1.24" release="2" arch="amd64" hdrmd5="7e2108aeab88859d307869484f64c6a2" project="Debian:13" repository="standard"/>
+  <bdep name="libgdbm6t64" version="1.24" release="2" arch="amd64" hdrmd5="47a1a8e9d0564cda96e7e45af2a5a9ed" project="Debian:13" repository="standard"/>
+  <bdep name="libgmp10" epoch="2" version="6.3.0+dfsg" release="3" arch="amd64" hdrmd5="25b2427aecedef6fa3fb002fadf2116f" project="Debian:13" repository="standard"/>
+  <bdep name="libgomp1" version="14.2.0" release="19" arch="amd64" hdrmd5="2ab83ce0a54ef6af3389e66e3a872956" project="Debian:13" repository="standard"/>
+  <bdep name="libgpm2" version="1.20.7" release="11+b2" arch="amd64" hdrmd5="76391454f606c056e0a4ab3de22e93bd" project="Debian:13" repository="standard"/>
+  <bdep name="libgprofng0" version="2.44" release="3" arch="amd64" hdrmd5="f406e090d2c6b931fc7f49f8c2e33af4" project="Debian:13" repository="standard"/>
+  <bdep name="libhwasan0" version="14.2.0" release="19" arch="amd64" hdrmd5="099332d40559d806a15d82655d80ec56" project="Debian:13" repository="standard"/>
+  <bdep name="libicu76" version="76.1" release="4" arch="amd64" hdrmd5="94e997e700f0ddf56c776c40c078b7c9" project="Debian:13" repository="standard"/>
+  <bdep name="libisl23" version="0.27" release="1" arch="amd64" hdrmd5="268942a5ca25d5f6dd75d8d3e90f802f" project="Debian:13" repository="standard"/>
+  <bdep name="libitm1" version="14.2.0" release="19" arch="amd64" hdrmd5="d23945f72d0544d049135ca414143251" project="Debian:13" repository="standard"/>
+  <bdep name="libjansson4" version="2.14" release="2+b3" arch="amd64" hdrmd5="b9c02a48f1aa7d051d1c8dd83e6853e6" project="Debian:13" repository="standard"/>
+  <bdep name="libkmod2" version="34.2" release="2" arch="amd64" hdrmd5="bb50d520e34744b8f3f6972daaab8376" project="Debian:13" repository="standard"/>
+  <bdep name="liblastlog2-2" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="84cd2f60254415f8554221d3904591ef" project="Debian:13" repository="standard"/>
+  <bdep name="liblsan0" version="14.2.0" release="19" arch="amd64" hdrmd5="a5d90f9e8283aca793d1b053f495d5eb" project="Debian:13" repository="standard"/>
+  <bdep name="liblzma5" version="5.8.1" release="1+deb13u1" arch="amd64" hdrmd5="d0fff064e8e67612e38382a7e03c1216" project="Debian:13" repository="standard"/>
+  <bdep name="libmagic-mgc" epoch="1" version="5.46" release="5" arch="amd64" hdrmd5="0ccf1e234ee2d63f51a14cebf44b2ed2" project="Debian:13" repository="standard"/>
+  <bdep name="libmagic1t64" epoch="1" version="5.46" release="5" arch="amd64" hdrmd5="75a9ffde241c810528f9b04303cccce9" project="Debian:13" repository="standard"/>
+  <bdep name="libmd0" version="1.1.0" release="2+b1" arch="amd64" hdrmd5="b99f3e5aff1319fbde353c5a815ffc0d" project="Debian:13" repository="standard"/>
+  <bdep name="libmount1" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="9ac63cc5aee9665f4fbc9397085e162f" project="Debian:13" repository="standard"/>
+  <bdep name="libmpc3" version="1.3.1" release="1+b3" arch="amd64" hdrmd5="8b98c96fdd6ef1a872cfe2c275a059d8" project="Debian:13" repository="standard"/>
+  <bdep name="libmpfr6" version="4.2.2" release="1" arch="amd64" hdrmd5="6945e701494d351589fd7b47d72dfc82" project="Debian:13" repository="standard"/>
+  <bdep name="libncursesw6" version="6.5+20250216" release="2" arch="amd64" hdrmd5="526d1dde0273a6cd1b38a78f84b89766" project="Debian:13" repository="standard"/>
+  <bdep name="libnghttp2-14" version="1.64.0" release="1.1+deb13u1" arch="amd64" hdrmd5="1abdcfc442739adb17a3e8335f29a25c" project="Debian:13" repository="standard"/>
+  <bdep name="libnode115" version="20.19.2+dfsg" release="1+deb13u2" arch="amd64" hdrmd5="1fcc61bf800fd63ad111194e9c5fac80" project="Debian:13" repository="standard"/>
+  <bdep name="libnumber-compare-perl" version="0.03" release="3" arch="all" hdrmd5="6275ed631fbd1d96805b5ee06fd2a23f" project="Debian:13" repository="standard"/>
+  <bdep name="libpam-modules" version="1.7.0" release="5" arch="amd64" hdrmd5="425f8fa24996bc0393c48c2286a71770" project="Debian:13" repository="standard"/>
+  <bdep name="libpam-modules-bin" version="1.7.0" release="5" arch="amd64" hdrmd5="f2b38d2e155f42df0a81d92736c8e6fd" project="Debian:13" repository="standard"/>
+  <bdep name="libpam-runtime" version="1.7.0" release="5" arch="all" hdrmd5="75a07d22b5a03ad50017235d73a41c3f" project="Debian:13" repository="standard"/>
+  <bdep name="libpam0g" version="1.7.0" release="5" arch="amd64" hdrmd5="ace4ba2959d3ed2234af83003447d108" project="Debian:13" repository="standard"/>
+  <bdep name="libpcre2-8-0" version="10.46" release="1~deb13u2" arch="amd64" hdrmd5="78a0ae5b0312db723bca24bf8f20652a" project="Debian:13" repository="standard"/>
+  <bdep name="libperl5.40" version="5.40.1" release="6+deb13u1" arch="amd64" hdrmd5="2f26bfa57d84eb935e58cbc25ef03b0c" project="Debian:13" repository="standard"/>
+  <bdep name="libpipeline1" version="1.5.8" release="1" arch="amd64" hdrmd5="b510e0940f5afddc2e6e9ff57c452c0b" project="Debian:13" repository="standard"/>
+  <bdep name="libproc2-0" epoch="2" version="4.0.4" release="9" arch="amd64" hdrmd5="a29a21303c031fc8a6526febf1626318" project="Debian:13" repository="standard"/>
+  <bdep name="libquadmath0" version="14.2.0" release="19" arch="amd64" hdrmd5="7eea590c825e48c35a5670b7c6f64c37" project="Debian:13" repository="standard"/>
+  <bdep name="libreadline8t64" version="8.2" release="6" arch="amd64" hdrmd5="14fb8d5b79cd45f8a4821391a7c7880f" project="Debian:13" repository="standard"/>
+  <bdep name="libseccomp2" version="2.6.0" release="2" arch="amd64" hdrmd5="e2a2c9f854fc556d31c510a3a6def366" project="Debian:13" repository="standard"/>
+  <bdep name="libselinux1" version="3.8.1" release="1" arch="amd64" hdrmd5="53f40ada0874aa1a2d559e0e96935460" project="Debian:13" repository="standard"/>
+  <bdep name="libsemanage-common" version="3.8.1" release="1" arch="all" hdrmd5="9e4525ff534239c0f14411206c343a7e" project="Debian:13" repository="standard"/>
+  <bdep name="libsemanage2" version="3.8.1" release="1" arch="amd64" hdrmd5="09ad19f935d149eff9995fe4eb15c07c" project="Debian:13" repository="standard"/>
+  <bdep name="libsepol2" version="3.8.1" release="1" arch="amd64" hdrmd5="025c812ac39e35339e41f3a0c01ac67a" project="Debian:13" repository="standard"/>
+  <bdep name="libsframe1" version="2.44" release="3" arch="amd64" hdrmd5="232e594bb3ec9d369742b5aa2fce0d5b" project="Debian:13" repository="standard"/>
+  <bdep name="libsigsegv2" version="2.14" release="1+b2" arch="amd64" hdrmd5="a6fcf841e59a780ea2d6d14d77fd3da5" project="Debian:13" repository="standard"/>
+  <bdep name="libsmartcols1" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="fbcc994f896bf3a24e25c60bbf5309b6" project="Debian:13" repository="standard"/>
+  <bdep name="libsodium23" version="1.0.18" release="1+deb13u1" arch="amd64" hdrmd5="095c73c9f93d027eeff44ddbcb2dcc6c" project="Debian:13" repository="standard"/>
+  <bdep name="libsqlite3-0" version="3.46.1" release="7+deb13u2" arch="amd64" hdrmd5="3df96f492ca393728ef8704dc74fce35" project="Debian:13" repository="standard"/>
+  <bdep name="libss2" version="1.47.2" release="3+b12" arch="amd64" hdrmd5="be44724734a8310c56c01c09cba22335" project="Debian:13" repository="standard"/>
+  <bdep name="libssl3t64" version="3.5.7" release="1~deb13u2" arch="amd64" hdrmd5="957eb29ffb636547748d6cc3c4b347a6" project="Debian:13" repository="standard"/>
+  <bdep name="libstdc++-14-dev" version="14.2.0" release="19" arch="amd64" hdrmd5="e86bf258258daa6e1cdbd34220b710ae" project="Debian:13" repository="standard"/>
+  <bdep name="libstdc++6" version="14.2.0" release="19" arch="amd64" hdrmd5="0094431b91a692638c88b3ccd96101d3" project="Debian:13" repository="standard"/>
+  <bdep name="libsystemd0" version="257.13" release="1~deb13u1" arch="amd64" hdrmd5="7aafde581ac1723f6bfa00a0ca7025c7" project="Debian:13" repository="standard"/>
+  <bdep name="libtext-glob-perl" version="0.11" release="3" arch="all" hdrmd5="725ddab04a4c6617f021ecdd20288997" project="Debian:13" repository="standard"/>
+  <bdep name="libtinfo6" version="6.5+20250216" release="2" arch="amd64" hdrmd5="c489666207d51ec333ccfe89ef8588da" project="Debian:13" repository="standard"/>
+  <bdep name="libtool" version="2.5.4" release="4" arch="all" hdrmd5="2af3ba3e05fa584b1e5f1778cf33f456" project="Debian:13" repository="standard"/>
+  <bdep name="libtsan2" version="14.2.0" release="19" arch="amd64" hdrmd5="ad45102d46edd7f3ff59ee498cb5ab2b" project="Debian:13" repository="standard"/>
+  <bdep name="libubsan1" version="14.2.0" release="19" arch="amd64" hdrmd5="2dd44c7a6ddf95c7166a398b54b130a4" project="Debian:13" repository="standard"/>
+  <bdep name="libuchardet0" version="0.0.8" release="1+b2" arch="amd64" hdrmd5="15ed6c11207f4f645f6fb39629803aee" project="Debian:13" repository="standard"/>
+  <bdep name="libudev1" version="257.13" release="1~deb13u1" arch="amd64" hdrmd5="f5f9734ec68c37e0365693fd5ee9692f" project="Debian:13" repository="standard"/>
+  <bdep name="libunistring5" version="1.3" release="2" arch="amd64" hdrmd5="cba903051cc4810bae00275589b7659b" project="Debian:13" repository="standard"/>
+  <bdep name="libunwind8" version="1.8.1" release="0.1" arch="amd64" hdrmd5="34c2eb7987b0b35d77d13838710daddf" project="Debian:13" repository="standard"/>
+  <bdep name="libuuid1" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="0fe06ecfa0a5e3da909e3d66ffb43903" project="Debian:13" repository="standard"/>
+  <bdep name="libuv1t64" version="1.50.0" release="2" arch="amd64" hdrmd5="1cd88690d2ad74aa928b2ce24f7b0df2" project="Debian:13" repository="standard"/>
+  <bdep name="libxml2" version="2.12.7+dfsg+really2.9.14" release="2.1+deb13u3" arch="amd64" hdrmd5="0f917dfb3a72a09708420e050630c11b" project="Debian:13" repository="standard"/>
+  <bdep name="libzstd1" version="1.5.7+dfsg" release="1" arch="amd64" hdrmd5="e34fd53e0f46069675f820428d6274ec" project="Debian:13" repository="standard"/>
+  <bdep name="linux-libc-dev" version="6.12.107" release="1" arch="all" hdrmd5="0227c2ca3c610eb1b85745cbd8f5ce85" project="Debian:13" repository="standard"/>
+  <bdep name="login" epoch="1" version="4.16.0-2+really2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="f0782f253d673fbf417d6bea944a5218" project="Debian:13" repository="standard"/>
+  <bdep name="login.defs" epoch="1" version="4.17.4" release="2" arch="all" hdrmd5="60e6caa1caea070b1cbe5381441ee7f6" project="Debian:13" repository="standard"/>
+  <bdep name="logsave" version="1.47.2" release="3+b12" arch="amd64" hdrmd5="d59e23c41e2d9a7e535552179a6f1aff" project="Debian:13" repository="standard"/>
+  <bdep name="m4" version="1.4.19" release="8" arch="amd64" hdrmd5="a42908c334eabec9211772cd9f4dcfad" project="Debian:13" repository="standard"/>
+  <bdep name="make" version="4.4.1" release="2" arch="amd64" hdrmd5="48f63525dc9e333950e71989ccbab907" project="Debian:13" repository="standard"/>
+  <bdep name="man-db" version="2.13.1" release="1" arch="amd64" hdrmd5="376f9dce1338f8e29fb3c868d879fb87" project="Debian:13" repository="standard"/>
+  <bdep name="mount" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="e9006586cc69bc087db4a4fae5f36f34" project="Debian:13" repository="standard"/>
+  <bdep name="ncurses-base" version="6.5+20250216" release="2" arch="all" hdrmd5="b3ae55a4ff093c88ab66be087d7c8c13" project="Debian:13" repository="standard"/>
+  <bdep name="ncurses-bin" version="6.5+20250216" release="2" arch="amd64" hdrmd5="cb49f3be9887a6f059156e7c99f7cfed" project="Debian:13" repository="standard"/>
+  <bdep name="net-tools" version="2.10" release="1.3" arch="amd64" hdrmd5="b0d0b8bc81236d27703521c4cbbc386b" project="Debian:13" repository="standard"/>
+  <bdep name="node-acorn" version="8.8.1+ds+~cs25.17.7" release="2" arch="all" hdrmd5="43215630428005c47cabfb3a1542061e" project="Debian:13" repository="standard"/>
+  <bdep name="node-balanced-match" version="2.0.0" release="1" arch="all" hdrmd5="fb5dea59e7c35c83b9530097157c4114" project="Debian:13" repository="standard"/>
+  <bdep name="node-brace-expansion" version="2.0.1+~1.1.0" release="2" arch="all" hdrmd5="6031b733b5e5232e3f6ab7809fbde896" project="Debian:13" repository="standard"/>
+  <bdep name="node-cjs-module-lexer" version="1.2.3+dfsg" release="1" arch="all" hdrmd5="39bea388d37fd1a6d6ffeb74e1348291" project="Debian:13" repository="standard"/>
+  <bdep name="node-corepack" version="0.24.0" release="5" arch="all" hdrmd5="610d628a4977949489c7d962ae36be95" project="Debian:13" repository="standard"/>
+  <bdep name="node-minimatch" version="9.0.3" release="6" arch="all" hdrmd5="5622c55a3f7a364e3079e0c86d1562ff" project="Debian:13" repository="standard"/>
+  <bdep name="node-undici" version="7.3.0+dfsg1+~cs24.12.11" release="1" arch="all" hdrmd5="535f657213f38adee2e141d27c9f8334" project="Debian:13" repository="standard"/>
+  <bdep name="node-xtend" version="4.0.2" release="3" arch="all" hdrmd5="bfcb40817dad73716f1ede7cc3075957" project="Debian:13" repository="standard"/>
+  <bdep name="nodejs" version="20.19.2+dfsg" release="1+deb13u2" arch="amd64" hdrmd5="0d6df25967ceb3fefbca9866485b6dea" project="Debian:13" repository="standard"/>
+  <bdep name="openssl-provider-legacy" version="3.5.7" release="1~deb13u2" arch="amd64" hdrmd5="7779d2e8afacbb6a797bad09b8cfc1c1" project="Debian:13" repository="standard"/>
+  <bdep name="passwd" epoch="1" version="4.17.4" release="2" arch="amd64" hdrmd5="22d261186679934d5a7b53aba36adc0a" project="Debian:13" repository="standard"/>
+  <bdep name="patch" version="2.8" release="2" arch="amd64" hdrmd5="8c6c87a13905071b48a668ec0a193643" project="Debian:13" repository="standard"/>
+  <bdep name="perl" version="5.40.1" release="6+deb13u1" arch="amd64" hdrmd5="a92e8f8ad7af1e48389421ac3c54e3b2" project="Debian:13" repository="standard"/>
+  <bdep name="perl-base" version="5.40.1" release="6+deb13u1" arch="amd64" hdrmd5="f246524ad67a1837bc5970a1e3200172" project="Debian:13" repository="standard"/>
+  <bdep name="perl-modules-5.40" version="5.40.1" release="6+deb13u1" arch="all" hdrmd5="5f1979a6e3cfb95013156b23e156e05b" project="Debian:13" repository="standard"/>
+  <bdep name="po-debconf" version="1.0.21+nmu1" arch="all" hdrmd5="a6e9515281a648372f1d7226c1a2810e" project="Debian:13" repository="standard"/>
+  <bdep name="procps" epoch="2" version="4.0.4" release="9" arch="amd64" hdrmd5="82ba72da80377bdda76e55125d0e7b0f" project="Debian:13" repository="standard"/>
+  <bdep name="psmisc" version="23.7" release="2" arch="amd64" hdrmd5="47d0fa789c6785483d1e66638ac05ac3" project="Debian:13" repository="standard"/>
+  <bdep name="readline-common" version="8.2" release="6" arch="all" hdrmd5="a23baea1419cba22f0d091fb42d4cf2e" project="Debian:13" repository="standard"/>
+  <bdep name="rpcsvc-proto" version="1.4.3" release="1" arch="amd64" hdrmd5="42ff7f233d048bfc216bc459d295cc6f" project="Debian:13" repository="standard"/>
+  <bdep name="sed" version="4.9" release="2+deb13u1" arch="amd64" hdrmd5="e5b731eff51d98e7c55eb7f935a3a2d5" project="Debian:13" repository="standard"/>
+  <bdep name="sensible-utils" version="0.0.25" arch="all" hdrmd5="920dd5340dc1463088f3e73710026c42" project="Debian:13" repository="standard"/>
+  <bdep name="strace" version="6.13+ds" release="1" arch="amd64" hdrmd5="97abcca9e4ab41839b08b688920c4f8a" project="Debian:13" repository="standard"/>
+  <bdep name="sysvinit-utils" version="3.14" release="4" arch="amd64" hdrmd5="85e1991978825cea78568699f56f87b4" project="Debian:13" repository="standard"/>
+  <bdep name="tar" version="1.35+dfsg" release="3.1" arch="amd64" hdrmd5="9a88fb3e85c885504db99b4b2454c3cf" project="Debian:13" repository="standard"/>
+  <bdep name="user-setup" version="1.107" arch="all" hdrmd5="4a1ee765f918aab5d6e33c2c8cabe379" project="Debian:13" repository="standard"/>
+  <bdep name="usrmerge" version="39+nmu2" arch="all" hdrmd5="56eb7509d48245cfa20e1817bd3e037a" project="Debian:13" repository="standard"/>
+  <bdep name="util-linux" version="2.41.5" release="0+deb13u1" arch="amd64" hdrmd5="a360dc950973523a156aacc8e1b609f1" project="Debian:13" repository="standard"/>
+  <bdep name="vim" epoch="2" version="9.1.1230" release="2" arch="amd64" hdrmd5="12cd1566e10fbcbc3045eebab1aee4b8" project="Debian:13" repository="standard"/>
+  <bdep name="vim-common" epoch="2" version="9.1.1230" release="2" arch="all" hdrmd5="4d0269def48d943b438bf31ae3df6391" project="Debian:13" repository="standard"/>
+  <bdep name="vim-runtime" epoch="2" version="9.1.1230" release="2" arch="all" hdrmd5="c0abe7ab092296cfa5a472d40d61d25b" project="Debian:13" repository="standard"/>
+  <bdep name="xz-utils" version="5.8.1" release="1+deb13u1" arch="amd64" hdrmd5="3afe98d28d46d928c4d1cb2fa943c1a6" project="Debian:13" repository="standard"/>
+  <bdep name="zlib1g" epoch="1" version="1.3.dfsg+really1.3.1" release="1+b1" arch="amd64" hdrmd5="fe6477e495fe1a21723fe96d3a0559bb" project="Debian:13" repository="standard"/>
+</buildinfo>

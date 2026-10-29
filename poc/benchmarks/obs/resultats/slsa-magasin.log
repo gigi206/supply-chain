@@ -1,0 +1,6 @@
+/srv/obs/slsa/Debian:13/standard/x86_64 : 203 fichiers, 203M
+/srv/obs/slsa/poc/debian_13/noarch : 4 fichiers, 68K
+/srv/obs/slsa/poc/rocky_9/noarch : 4 fichiers, 148K
+/srv/obs/slsa/Rocky:9.7/appstream/x86_64 : 291 fichiers, 205M
+/srv/obs/slsa/Rocky:9.7/baseos/x86_64 : 177 fichiers, 92M
+liens physiques multiples : 668 sur 679

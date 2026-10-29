@@ -1,0 +1,2221 @@
+{
+   "_type" : "https://in-toto.io/Statement/v0.1",
+   "subject" : [
+      {
+         "name" : "sample-app_1.0.0-1.debian.tar.xz",
+         "digest" : {
+            "sha256" : "863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f"
+         }
+      },
+      {
+         "name" : "sample-app_1.0.0-1.dsc",
+         "digest" : {
+            "sha256" : "9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6"
+         }
+      },
+      {
+         "name" : "sample-app_1.0.0-1_amd64.buildinfo",
+         "digest" : {
+            "sha256" : "46ffc6255db15ce0393953acfe8cf3cfb30755bc9a7f143203338a66090c77ea"
+         }
+      },
+      {
+         "name" : "sample-app_1.0.0-1_amd64.changes",
+         "digest" : {
+            "sha256" : "53e1d3b29309a8b0d2899082eba36ee7bb5b31b43249debb15b6d7dd721101df"
+         }
+      },
+      {
+         "name" : "sample-app_1.0.0-1_amd64.deb",
+         "digest" : {
+            "sha256" : "0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5"
+         }
+      },
+      {
+         "name" : "sample-app_1.0.0.orig.tar.gz",
+         "digest" : {
+            "sha256" : "07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb"
+         }
+      }
+   ],
+   "predicateType" : "https://slsa.dev/provenance/v1",
+   "predicate" : {
+      "buildDefinition" : {
+         "buildType" : "https://open-build-service.org/worker",
+         "externalParameters" : {
+            "disturl" : "obs://private/poc/debian_13/85347ea794c63a5435416b2374025c50-sample-app",
+            "recipeFile" : "sample-app_1.0.0-1.dsc",
+            "release" : "1.6",
+            "source" : "http://sc-obs.poc.test:5352/source/poc/sample-app?rev=85347ea794c63a5435416b2374025c50"
+         },
+         "resolvedDependencies" : [
+            {
+               "name" : "sample-app-1.0.0.tar.gz",
+               "uri" : "http://sc-obs.poc.test:5352/source/poc/sample-app/sample-app-1.0.0.tar.gz?rev=85347ea794c63a5435416b2374025c50",
+               "digest" : {
+                  "sha256" : "07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb"
+               },
+               "annotations" : {
+                  "intent" : "source"
+               }
+            },
+            {
+               "name" : "sample-app.spec",
+               "uri" : "http://sc-obs.poc.test:5352/source/poc/sample-app/sample-app.spec?rev=85347ea794c63a5435416b2374025c50",
+               "digest" : {
+                  "sha256" : "e1281b3d796db7211865de8fe3602488bfefa7bb47b9bccbbd98d6ef058fcb80"
+               },
+               "annotations" : {
+                  "intent" : "source"
+               }
+            },
+            {
+               "name" : "sample-app_1.0.0-1.debian.tar.xz",
+               "uri" : "http://sc-obs.poc.test:5352/source/poc/sample-app/sample-app_1.0.0-1.debian.tar.xz?rev=85347ea794c63a5435416b2374025c50",
+               "digest" : {
+                  "sha256" : "863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f"
+               },
+               "annotations" : {
+                  "intent" : "source"
+               }
+            },
+            {
+               "name" : "sample-app_1.0.0.orig.tar.gz",
+               "uri" : "http://sc-obs.poc.test:5352/source/poc/sample-app/sample-app_1.0.0.orig.tar.gz?rev=85347ea794c63a5435416b2374025c50",
+               "digest" : {
+                  "sha256" : "07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb"
+               },
+               "annotations" : {
+                  "intent" : "source"
+               }
+            },
+            {
+               "name" : "sample-app_1.0.0-1.dsc",
+               "uri" : "http://sc-obs.poc.test:5352/source/poc/sample-app/sample-app_1.0.0-1.dsc?rev=85347ea794c63a5435416b2374025c50",
+               "digest" : {
+                  "sha256" : "9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6"
+               },
+               "annotations" : {
+                  "intent" : "source"
+               }
+            },
+            {
+               "name" : "adduser.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/adduser.deb/e50984d2e1ef6300e3fd51303839842189a077b10cb5cadff1923df10c61c493",
+               "digest" : {
+                  "sha256" : "e50984d2e1ef6300e3fd51303839842189a077b10cb5cadff1923df10c61c493"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "autoconf.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/autoconf.deb/0de76b647b0afb6c7934999aaefeb463656c147672464a367df1019969e77af3",
+               "digest" : {
+                  "sha256" : "0de76b647b0afb6c7934999aaefeb463656c147672464a367df1019969e77af3"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "automake.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/automake.deb/8d4b172d4ff8070789c54b48a95585b53e4c65faeb07a2ae52da16cb364df635",
+               "digest" : {
+                  "sha256" : "8d4b172d4ff8070789c54b48a95585b53e4c65faeb07a2ae52da16cb364df635"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "autopoint.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/autopoint.deb/18696c3e02f2be55be0096ea510b2d82e602a47fc746ae41c91bbe680b06a569",
+               "digest" : {
+                  "sha256" : "18696c3e02f2be55be0096ea510b2d82e602a47fc746ae41c91bbe680b06a569"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "autotools-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/autotools-dev.deb/d07d476c1fcd713ed04695f25ac290c3ae2317e6fd974ad6b2168e3be1c795c3",
+               "digest" : {
+                  "sha256" : "d07d476c1fcd713ed04695f25ac290c3ae2317e6fd974ad6b2168e3be1c795c3"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "base-files.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/base-files.deb/fcd42bb5cb63f7bfc4326a92541247872206d60a192fdff65ca14eb83ed408b9",
+               "digest" : {
+                  "sha256" : "fcd42bb5cb63f7bfc4326a92541247872206d60a192fdff65ca14eb83ed408b9"
+               },
+               "annotations" : {
+                  "flags" : "preinstall,runscripts",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "base-passwd.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/base-passwd.deb/cf31c6956ab5f65815d9d9ea1615c4f78ecd2893c31119658248a4756cee83e7",
+               "digest" : {
+                  "sha256" : "cf31c6956ab5f65815d9d9ea1615c4f78ecd2893c31119658248a4756cee83e7"
+               },
+               "annotations" : {
+                  "flags" : "preinstall,runscripts",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "bash.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/bash.deb/2fd7b04f1b7caa29c4e683f5216e6af354a41e3cdcf6e75394d7cda680f9ab82",
+               "digest" : {
+                  "sha256" : "2fd7b04f1b7caa29c4e683f5216e6af354a41e3cdcf6e75394d7cda680f9ab82"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "binutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/binutils.deb/6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb",
+               "digest" : {
+                  "sha256" : "6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "binutils-common.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/binutils-common.deb/002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9",
+               "digest" : {
+                  "sha256" : "002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "binutils-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/binutils-x86-64-linux-gnu.deb/e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53",
+               "digest" : {
+                  "sha256" : "e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "bsdextrautils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/bsdextrautils.deb/bf9888552d2f5dac61a3d434252af30a7619bfad1152d2a3c73bcf4b3be74526",
+               "digest" : {
+                  "sha256" : "bf9888552d2f5dac61a3d434252af30a7619bfad1152d2a3c73bcf4b3be74526"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "bsdutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/bsdutils.deb/d935a5102752a1108bdf1e815c89a84ac88d1949bf049a784178f946a09b14da",
+               "digest" : {
+                  "sha256" : "d935a5102752a1108bdf1e815c89a84ac88d1949bf049a784178f946a09b14da"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "build-essential.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/build-essential.deb/a45159aebea0d98d6652ac5a56b7fff164a7733a7dc736b9f8715ca504519d3a",
+               "digest" : {
+                  "sha256" : "a45159aebea0d98d6652ac5a56b7fff164a7733a7dc736b9f8715ca504519d3a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "bzip2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/bzip2.deb/6b5fbe71f0fc41e85919bc4b3c514e6c47577c5005dbf1f5af6e4a49cc221aab",
+               "digest" : {
+                  "sha256" : "6b5fbe71f0fc41e85919bc4b3c514e6c47577c5005dbf1f5af6e4a49cc221aab"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "coreutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/coreutils.deb/1299ab6f9389a288eb2f5f3dd222c26cc777b9a2d5ecb6ee4cbd340cebcdada2",
+               "digest" : {
+                  "sha256" : "1299ab6f9389a288eb2f5f3dd222c26cc777b9a2d5ecb6ee4cbd340cebcdada2"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "cpio.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/cpio.deb/d8faece250bcf72e91ac15a5fef198be173af18c9f48bae257e7ee937fbc6cdc",
+               "digest" : {
+                  "sha256" : "d8faece250bcf72e91ac15a5fef198be173af18c9f48bae257e7ee937fbc6cdc"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "cpp.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/cpp.deb/a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544",
+               "digest" : {
+                  "sha256" : "a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "cpp-14.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/cpp-14.deb/3bae5fe03c56c6d021900ab4fb79e35c6f75eee72a73fccc6f28a39db559d6a0",
+               "digest" : {
+                  "sha256" : "3bae5fe03c56c6d021900ab4fb79e35c6f75eee72a73fccc6f28a39db559d6a0"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "cpp-14-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/cpp-14-x86-64-linux-gnu.deb/ef274b5379f5f97fc71619d39ecc84d039d3e184570d207b909c90afaa5d79e0",
+               "digest" : {
+                  "sha256" : "ef274b5379f5f97fc71619d39ecc84d039d3e184570d207b909c90afaa5d79e0"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "cpp-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/cpp-x86-64-linux-gnu.deb/d902f484e38bce59e82efc0df2fe20139a0932ca759ecafdfe6e5b6c72238eb8",
+               "digest" : {
+                  "sha256" : "d902f484e38bce59e82efc0df2fe20139a0932ca759ecafdfe6e5b6c72238eb8"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dash.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dash.deb/a8902cb6d8650134764a25fb80aec8589d858ef71ece1680a62e84816c37bb04",
+               "digest" : {
+                  "sha256" : "a8902cb6d8650134764a25fb80aec8589d858ef71ece1680a62e84816c37bb04"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "debconf.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/debconf.deb/1ddc7e6c5925f748eefb7ca811d98e049f18c158bb21fbc7e122262ce6011e49",
+               "digest" : {
+                  "sha256" : "1ddc7e6c5925f748eefb7ca811d98e049f18c158bb21fbc7e122262ce6011e49"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "debhelper.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/debhelper.deb/04ba78ad4363df4f47cac2667dcca7a4bfe520625af5799ec1ede3cb6551f6fc",
+               "digest" : {
+                  "sha256" : "04ba78ad4363df4f47cac2667dcca7a4bfe520625af5799ec1ede3cb6551f6fc"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "debianutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/debianutils.deb/720e43fda316676076498b4224ad3318049deafe60cc7c601011048de03ee97d",
+               "digest" : {
+                  "sha256" : "720e43fda316676076498b4224ad3318049deafe60cc7c601011048de03ee97d"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dh-autoreconf.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dh-autoreconf.deb/9527d06ee13195c48718a2580d7262883344a5ecc7a77b48c3b7aa70086a0125",
+               "digest" : {
+                  "sha256" : "9527d06ee13195c48718a2580d7262883344a5ecc7a77b48c3b7aa70086a0125"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dh-strip-nondeterminism.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dh-strip-nondeterminism.deb/caadb7094d10f933619f1261fe1e31c86460992b7d2685d2596f15f848d1a174",
+               "digest" : {
+                  "sha256" : "caadb7094d10f933619f1261fe1e31c86460992b7d2685d2596f15f848d1a174"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "diffutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/diffutils.deb/d3412669f7ae53ba895c3a509620ea7494ec1a36faa204c5215442ced381a479",
+               "digest" : {
+                  "sha256" : "d3412669f7ae53ba895c3a509620ea7494ec1a36faa204c5215442ced381a479"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dpkg.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dpkg.deb/3e800c6d75e8e709007ed1c356e5fa8509a75c1694fb0a1183709abc9cfdc1f3",
+               "digest" : {
+                  "sha256" : "3e800c6d75e8e709007ed1c356e5fa8509a75c1694fb0a1183709abc9cfdc1f3"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dpkg-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dpkg-dev.deb/6d4020421740a70e1fb9c41b07f8bb8306d93aef6fea1a8ce11a1f839921f414",
+               "digest" : {
+                  "sha256" : "6d4020421740a70e1fb9c41b07f8bb8306d93aef6fea1a8ce11a1f839921f414"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "dwz.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/dwz.deb/ad9f7205d8b951a7456511b9c8ed24b4a3571c403ef4e328400c96b31784dd15",
+               "digest" : {
+                  "sha256" : "ad9f7205d8b951a7456511b9c8ed24b4a3571c403ef4e328400c96b31784dd15"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "e2fsprogs.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/e2fsprogs.deb/e9e638eb3e22b5f14d01ce0b28aa512a5a22fcc0e70d1c733444579b67ea236b",
+               "digest" : {
+                  "sha256" : "e9e638eb3e22b5f14d01ce0b28aa512a5a22fcc0e70d1c733444579b67ea236b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "fakeroot.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/fakeroot.deb/df17a351eaac7168ac56c197abf0d015ae34fc9dbba0c1d507a76409034311de",
+               "digest" : {
+                  "sha256" : "df17a351eaac7168ac56c197abf0d015ae34fc9dbba0c1d507a76409034311de"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "file.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/file.deb/5b980b02a7d91aab9cb50c65ac7e059678a36d36ed626ec52506442f4501a1a7",
+               "digest" : {
+                  "sha256" : "5b980b02a7d91aab9cb50c65ac7e059678a36d36ed626ec52506442f4501a1a7"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "findutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/findutils.deb/3edf02b016456b6a98cefdbab99c5ce6f829b786f63affe970badea221aecfc7",
+               "digest" : {
+                  "sha256" : "3edf02b016456b6a98cefdbab99c5ce6f829b786f63affe970badea221aecfc7"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "g++.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/g%2B%2B.deb/f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c",
+               "digest" : {
+                  "sha256" : "f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "g++-14.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/g%2B%2B-14.deb/4706ab29eab3d81e93582b45b229fdedc71f1eec3071996a448cf2c8beb83f3a",
+               "digest" : {
+                  "sha256" : "4706ab29eab3d81e93582b45b229fdedc71f1eec3071996a448cf2c8beb83f3a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "g++-14-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/g%2B%2B-14-x86-64-linux-gnu.deb/c66b009fedd340520279d1af2f91d0668e9f64f0c08fe62179ca1c75e556be58",
+               "digest" : {
+                  "sha256" : "c66b009fedd340520279d1af2f91d0668e9f64f0c08fe62179ca1c75e556be58"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "g++-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/g%2B%2B-x86-64-linux-gnu.deb/15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583",
+               "digest" : {
+                  "sha256" : "15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gawk.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gawk.deb/0e3b376e74cadfa5049bc8248c563efe89fd45e31466f8891c094c65c0879f5c",
+               "digest" : {
+                  "sha256" : "0e3b376e74cadfa5049bc8248c563efe89fd45e31466f8891c094c65c0879f5c"
+               },
+               "annotations" : {
+                  "flags" : "preinstall,runscripts",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gcc.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gcc.deb/eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d",
+               "digest" : {
+                  "sha256" : "eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gcc-14.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gcc-14.deb/21500408b5019d8d29f70ce58488e2eea469a1adb4b5fd7db45e819b5efcac4e",
+               "digest" : {
+                  "sha256" : "21500408b5019d8d29f70ce58488e2eea469a1adb4b5fd7db45e819b5efcac4e"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gcc-14-base.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gcc-14-base.deb/5b6825de4263824b78c4c51f6476414f3b4e89c2ab63e81dc8b9b5501e867cf6",
+               "digest" : {
+                  "sha256" : "5b6825de4263824b78c4c51f6476414f3b4e89c2ab63e81dc8b9b5501e867cf6"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gcc-14-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gcc-14-x86-64-linux-gnu.deb/a17ef039f1ba482051c3efb5c2c24070002e60dd0bd09fd456ec31481a11b725",
+               "digest" : {
+                  "sha256" : "a17ef039f1ba482051c3efb5c2c24070002e60dd0bd09fd456ec31481a11b725"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gcc-x86-64-linux-gnu.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gcc-x86-64-linux-gnu.deb/04c28c2760b0094b3d7758154ac095303dd00599b63ebad4086a325b607308b7",
+               "digest" : {
+                  "sha256" : "04c28c2760b0094b3d7758154ac095303dd00599b63ebad4086a325b607308b7"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gettext.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gettext.deb/25293e75989db79a1d4a6b942674b0e7243da54a0985f8d9df1b345d255d262b",
+               "digest" : {
+                  "sha256" : "25293e75989db79a1d4a6b942674b0e7243da54a0985f8d9df1b345d255d262b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gettext-base.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gettext-base.deb/1a3dfadd661520ff01d379fd89cd0d49972a5a775d490609f1712134ee3d62ca",
+               "digest" : {
+                  "sha256" : "1a3dfadd661520ff01d379fd89cd0d49972a5a775d490609f1712134ee3d62ca"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "golang-1.24-go.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/golang-1.24-go.deb/93c6c109bbc0f1d55523282a16739d10634499c04f6d066a6aa58b67b687a44f",
+               "digest" : {
+                  "sha256" : "93c6c109bbc0f1d55523282a16739d10634499c04f6d066a6aa58b67b687a44f"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "golang-1.24-src.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/golang-1.24-src.deb/c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1",
+               "digest" : {
+                  "sha256" : "c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "golang-go.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/golang-go.deb/884c2158ecd8ed3205bdaf70bbb3a3afe03c48298c6cd527d86a6ddf2c7e8f5a",
+               "digest" : {
+                  "sha256" : "884c2158ecd8ed3205bdaf70bbb3a3afe03c48298c6cd527d86a6ddf2c7e8f5a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "golang-src.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/golang-src.deb/e1cc08319df53c17b7468d1136bc39154d06734601b144a07dba81181fae8016",
+               "digest" : {
+                  "sha256" : "e1cc08319df53c17b7468d1136bc39154d06734601b144a07dba81181fae8016"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "grep.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/grep.deb/2d78ed07d86a530ebf538f05cb2415f37c8daf908596bc32fc2563cc7e88c55a",
+               "digest" : {
+                  "sha256" : "2d78ed07d86a530ebf538f05cb2415f37c8daf908596bc32fc2563cc7e88c55a"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "groff-base.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/groff-base.deb/cb13bd856be0837d683377d618f2c0cc9b56b4abb2a821aafe33baf2b8ac215c",
+               "digest" : {
+                  "sha256" : "cb13bd856be0837d683377d618f2c0cc9b56b4abb2a821aafe33baf2b8ac215c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "gzip.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/gzip.deb/74cf12212beee4ab8d473bdc0107abf9e8cef737492198e2f4944a19f142b0ac",
+               "digest" : {
+                  "sha256" : "74cf12212beee4ab8d473bdc0107abf9e8cef737492198e2f4944a19f142b0ac"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "hostname.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/hostname.deb/9c2a27e5d4d87137211fe46631b05b2ee8892ec76aae926304e4485ba02e1015",
+               "digest" : {
+                  "sha256" : "9c2a27e5d4d87137211fe46631b05b2ee8892ec76aae926304e4485ba02e1015"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "init-system-helpers.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/init-system-helpers.deb/addf78073e1cbc5a5508937e11d2571055e29835e00ee8fab52a66775649378f",
+               "digest" : {
+                  "sha256" : "addf78073e1cbc5a5508937e11d2571055e29835e00ee8fab52a66775649378f"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "intltool-debian.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/intltool-debian.deb/058900c66cbc0d8b60139bdecc9a06cb9c3b479a03117354a78e5fa72aecd90c",
+               "digest" : {
+                  "sha256" : "058900c66cbc0d8b60139bdecc9a06cb9c3b479a03117354a78e5fa72aecd90c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "kmod.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/kmod.deb/d56f9311beb17cd15447d11d91fd4de94d23a47d4619e8806b1b807b40c72e53",
+               "digest" : {
+                  "sha256" : "d56f9311beb17cd15447d11d91fd4de94d23a47d4619e8806b1b807b40c72e53"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "less.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/less.deb/ba3c216e68298a2d375d4e386baa935e245f0f23ddb74502b12582f8de061d4f",
+               "digest" : {
+                  "sha256" : "ba3c216e68298a2d375d4e386baa935e245f0f23ddb74502b12582f8de061d4f"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libacl1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libacl1.deb/08074f01e384bc07c0c2d79a58cf4a6523f71cf75d1808101c79617656c9a39d",
+               "digest" : {
+                  "sha256" : "08074f01e384bc07c0c2d79a58cf4a6523f71cf75d1808101c79617656c9a39d"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libarchive-zip-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libarchive-zip-perl.deb/d1006344c2b897e2ffd1a60c5423f60e9d5c15f701e72c3d60b08b684608cff8",
+               "digest" : {
+                  "sha256" : "d1006344c2b897e2ffd1a60c5423f60e9d5c15f701e72c3d60b08b684608cff8"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libasan8.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libasan8.deb/771899ade7310fe31aa538a509354c33d62bbe4e408b4e5fc1e513988dc42645",
+               "digest" : {
+                  "sha256" : "771899ade7310fe31aa538a509354c33d62bbe4e408b4e5fc1e513988dc42645"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libatomic1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libatomic1.deb/212b399aae2f7299203d261a57e49372e09565a9a5ea971905f94a3960366c05",
+               "digest" : {
+                  "sha256" : "212b399aae2f7299203d261a57e49372e09565a9a5ea971905f94a3960366c05"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libattr1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libattr1.deb/606b5ee12ea2786be607a17f40c1fb5e65c76ceaff66665bdf8f8c6c1b71d1fb",
+               "digest" : {
+                  "sha256" : "606b5ee12ea2786be607a17f40c1fb5e65c76ceaff66665bdf8f8c6c1b71d1fb"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libaudit-common.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libaudit-common.deb/b9d32e5ff04fd747aacb7d6b3ebbbbf734ddefb2f1695f0b1b2a4b5e51b1052e",
+               "digest" : {
+                  "sha256" : "b9d32e5ff04fd747aacb7d6b3ebbbbf734ddefb2f1695f0b1b2a4b5e51b1052e"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libaudit1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libaudit1.deb/3d1dd3f031a56f01b747e2acc0e14575212580e6fa63d800c44cb0a31f1edfd7",
+               "digest" : {
+                  "sha256" : "3d1dd3f031a56f01b747e2acc0e14575212580e6fa63d800c44cb0a31f1edfd7"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libbinutils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libbinutils.deb/4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679",
+               "digest" : {
+                  "sha256" : "4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libblkid1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libblkid1.deb/81535f3c2c0efc732965907c8749103a0a26377c761622c9ce39b4c92dcde52f",
+               "digest" : {
+                  "sha256" : "81535f3c2c0efc732965907c8749103a0a26377c761622c9ce39b4c92dcde52f"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libbrotli1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libbrotli1.deb/0fb79f88db210afbd69282ab9649e525f393ec6950ca34da1a6b359250b8d7db",
+               "digest" : {
+                  "sha256" : "0fb79f88db210afbd69282ab9649e525f393ec6950ca34da1a6b359250b8d7db"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libbsd0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libbsd0.deb/e5a85986fa6bec3307ab1bc860736b478b331882bc45e17675a7bdf88eecb43a",
+               "digest" : {
+                  "sha256" : "e5a85986fa6bec3307ab1bc860736b478b331882bc45e17675a7bdf88eecb43a"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libbz2-1.0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libbz2-1.0.deb/cba4cda04244b5e481bb15524bc3c983a7d1b6f330013b9b381706a2fcb65310",
+               "digest" : {
+                  "sha256" : "cba4cda04244b5e481bb15524bc3c983a7d1b6f330013b9b381706a2fcb65310"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libc-bin.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libc-bin.deb/dc8c79647fe3a5f37f72a400414f70263d0212f010ff2c09f990e30d91e38d1c",
+               "digest" : {
+                  "sha256" : "dc8c79647fe3a5f37f72a400414f70263d0212f010ff2c09f990e30d91e38d1c"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libc-dev-bin.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libc-dev-bin.deb/2c21175d6a8283ed566d154c0c0bc06f60836e53b0b9e1f74c14eac586b68c24",
+               "digest" : {
+                  "sha256" : "2c21175d6a8283ed566d154c0c0bc06f60836e53b0b9e1f74c14eac586b68c24"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libc6.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libc6.deb/967aa62605721081c3eb2a17650611a792aa802d76a6511d1840242623d204c9",
+               "digest" : {
+                  "sha256" : "967aa62605721081c3eb2a17650611a792aa802d76a6511d1840242623d204c9"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libc6-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libc6-dev.deb/1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2",
+               "digest" : {
+                  "sha256" : "1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcap-ng0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcap-ng0.deb/20a9e4b0619a3eb2566338223bed135dde5a601eaa2f8fdd5f20b94506addcac",
+               "digest" : {
+                  "sha256" : "20a9e4b0619a3eb2566338223bed135dde5a601eaa2f8fdd5f20b94506addcac"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcap2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcap2.deb/89fc4d34fc7a28ad6f0fcd0c561ab253b9dedf6f77f5a000b47c276c8295bf67",
+               "digest" : {
+                  "sha256" : "89fc4d34fc7a28ad6f0fcd0c561ab253b9dedf6f77f5a000b47c276c8295bf67"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcares2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcares2.deb/5034a2c34ea4730797df1a5f6a0ec142d7d09ce6923c06e167f08ad2e69a4218",
+               "digest" : {
+                  "sha256" : "5034a2c34ea4730797df1a5f6a0ec142d7d09ce6923c06e167f08ad2e69a4218"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcc1-0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcc1-0.deb/2d587e3bfba4aec701946b7ba0c1640b97b6d8dd0a34ba1c70ae85261ecedefa",
+               "digest" : {
+                  "sha256" : "2d587e3bfba4aec701946b7ba0c1640b97b6d8dd0a34ba1c70ae85261ecedefa"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcom-err2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcom-err2.deb/bd43e020b8fed399db3eebf098111f10fba4c436fff99ccad72cc7e27c9764ec",
+               "digest" : {
+                  "sha256" : "bd43e020b8fed399db3eebf098111f10fba4c436fff99ccad72cc7e27c9764ec"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcrypt-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcrypt-dev.deb/98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09",
+               "digest" : {
+                  "sha256" : "98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libcrypt1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libcrypt1.deb/0ebc144d662e3197982d1bf3a7b8b35ca845e54c68811de0328b1f0d7c67585c",
+               "digest" : {
+                  "sha256" : "0ebc144d662e3197982d1bf3a7b8b35ca845e54c68811de0328b1f0d7c67585c"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libctf-nobfd0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libctf-nobfd0.deb/e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657",
+               "digest" : {
+                  "sha256" : "e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libctf0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libctf0.deb/120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5",
+               "digest" : {
+                  "sha256" : "120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libdb5.3t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libdb5.3t64.deb/18d02510ee78b67e4504ba050176797a200ff24214a7cd318082ab60ad7bf3fc",
+               "digest" : {
+                  "sha256" : "18d02510ee78b67e4504ba050176797a200ff24214a7cd318082ab60ad7bf3fc"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libdebconfclient0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libdebconfclient0.deb/25acadc8b394bc86d05df16e70975e523f8f839a7d8d6d5e22c1cafdcef741aa",
+               "digest" : {
+                  "sha256" : "25acadc8b394bc86d05df16e70975e523f8f839a7d8d6d5e22c1cafdcef741aa"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libdebhelper-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libdebhelper-perl.deb/1e1ab830223bcfe92ce61dd7e4d5a7db9cd439275a2c0ed7bf714a99813b8a7f",
+               "digest" : {
+                  "sha256" : "1e1ab830223bcfe92ce61dd7e4d5a7db9cd439275a2c0ed7bf714a99813b8a7f"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libdpkg-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libdpkg-perl.deb/b41eaeb4879091023f8c1a058510844a244d3d0bd0f437e0e05d58213e36fd9f",
+               "digest" : {
+                  "sha256" : "b41eaeb4879091023f8c1a058510844a244d3d0bd0f437e0e05d58213e36fd9f"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libelf1t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libelf1t64.deb/94497b7e17b6f574a0605b380d454e20d3f01a9c63b70c2a2263f679d30053e1",
+               "digest" : {
+                  "sha256" : "94497b7e17b6f574a0605b380d454e20d3f01a9c63b70c2a2263f679d30053e1"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libext2fs2t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libext2fs2t64.deb/9f5783fa48239e42260d41846fbc6c8b19c233251063524456096195660eaa09",
+               "digest" : {
+                  "sha256" : "9f5783fa48239e42260d41846fbc6c8b19c233251063524456096195660eaa09"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libfakeroot.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libfakeroot.deb/9fe004890f90884c23c24c4fb7eaf5afd55b0b79f3bc05c498a9f54191098a81",
+               "digest" : {
+                  "sha256" : "9fe004890f90884c23c24c4fb7eaf5afd55b0b79f3bc05c498a9f54191098a81"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libfile-find-rule-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libfile-find-rule-perl.deb/6dee2d8a23a8a31fca3f49bc60becf09a36ecb13505d238c9246686b30239ed9",
+               "digest" : {
+                  "sha256" : "6dee2d8a23a8a31fca3f49bc60becf09a36ecb13505d238c9246686b30239ed9"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libfile-stripnondeterminism-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libfile-stripnondeterminism-perl.deb/d03b28625a443b749e449d146bf99ef5419eb05ecbff256a71069a25de1549cf",
+               "digest" : {
+                  "sha256" : "d03b28625a443b749e449d146bf99ef5419eb05ecbff256a71069a25de1549cf"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgcc-14-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgcc-14-dev.deb/ca6f2d36d96b19b3eb71405b0b80134d8c89380b02204a2512e5c58ceb090628",
+               "digest" : {
+                  "sha256" : "ca6f2d36d96b19b3eb71405b0b80134d8c89380b02204a2512e5c58ceb090628"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgcc-s1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgcc-s1.deb/3c71917b490d1a17aed43196a2787a256ecf060526cdb20216a74bedc061b150",
+               "digest" : {
+                  "sha256" : "3c71917b490d1a17aed43196a2787a256ecf060526cdb20216a74bedc061b150"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgdbm-compat4t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgdbm-compat4t64.deb/2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01",
+               "digest" : {
+                  "sha256" : "2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgdbm6t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgdbm6t64.deb/e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc",
+               "digest" : {
+                  "sha256" : "e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgmp10.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgmp10.deb/d0d0265eb01770f17afd0f7c8c0622f80479dcfbbe13653a0debeec61464e622",
+               "digest" : {
+                  "sha256" : "d0d0265eb01770f17afd0f7c8c0622f80479dcfbbe13653a0debeec61464e622"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgomp1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgomp1.deb/72b7a1a33c48f3195efeb044111b34ae684b1e640bb6495c832443b798601cd5",
+               "digest" : {
+                  "sha256" : "72b7a1a33c48f3195efeb044111b34ae684b1e640bb6495c832443b798601cd5"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgpm2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgpm2.deb/c8779444e5bb8df39c8bce3ef7dd3d662686a9ab770dcc96bb0f4aeb2077a67c",
+               "digest" : {
+                  "sha256" : "c8779444e5bb8df39c8bce3ef7dd3d662686a9ab770dcc96bb0f4aeb2077a67c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libgprofng0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libgprofng0.deb/0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648",
+               "digest" : {
+                  "sha256" : "0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libhwasan0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libhwasan0.deb/2cdaf797cad8ac30a964ab081370682dd065ae1b0305a0be9d8e0e14cd0657d7",
+               "digest" : {
+                  "sha256" : "2cdaf797cad8ac30a964ab081370682dd065ae1b0305a0be9d8e0e14cd0657d7"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libicu76.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libicu76.deb/c1bf762996de9ecba9b9d871e4928a8090f023a3e9e7fa3240b3d90f892a01dc",
+               "digest" : {
+                  "sha256" : "c1bf762996de9ecba9b9d871e4928a8090f023a3e9e7fa3240b3d90f892a01dc"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libisl23.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libisl23.deb/ac8518042e81c00de1effb72bba7e88ac4ecd488f7ea8b9e3ebc63159cb53b35",
+               "digest" : {
+                  "sha256" : "ac8518042e81c00de1effb72bba7e88ac4ecd488f7ea8b9e3ebc63159cb53b35"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libitm1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libitm1.deb/febdb3c528cde1a3abe952e17a1d3cfa7ccaca5b6f506d983d34385dad199490",
+               "digest" : {
+                  "sha256" : "febdb3c528cde1a3abe952e17a1d3cfa7ccaca5b6f506d983d34385dad199490"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libjansson4.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libjansson4.deb/60707a62fe6c1228c3389b12a13ca4efd76defc5532473e547a29e99cf7d2a6e",
+               "digest" : {
+                  "sha256" : "60707a62fe6c1228c3389b12a13ca4efd76defc5532473e547a29e99cf7d2a6e"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libkmod2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libkmod2.deb/ee6c50ebac79aa9795e8bf9aa01d94c99984d09d22598c66be0f8ba917b62179",
+               "digest" : {
+                  "sha256" : "ee6c50ebac79aa9795e8bf9aa01d94c99984d09d22598c66be0f8ba917b62179"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "liblastlog2-2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/liblastlog2-2.deb/abb76aecbf51479e6e193873dfddaa1b88667dc0b1db82a11286a67550ba1557",
+               "digest" : {
+                  "sha256" : "abb76aecbf51479e6e193873dfddaa1b88667dc0b1db82a11286a67550ba1557"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "liblsan0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/liblsan0.deb/a0df07da76287a45e665d584363dc2a6a1c4e240aee41b8bbc0f67cdff97cd68",
+               "digest" : {
+                  "sha256" : "a0df07da76287a45e665d584363dc2a6a1c4e240aee41b8bbc0f67cdff97cd68"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "liblzma5.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/liblzma5.deb/1cfcc6e0dc36f438a79b6e2189facdb9d150b08f57d190a60e01c98075c7f896",
+               "digest" : {
+                  "sha256" : "1cfcc6e0dc36f438a79b6e2189facdb9d150b08f57d190a60e01c98075c7f896"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmagic-mgc.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmagic-mgc.deb/1368da7c4c7dd10fb2f9ee3ed8a70801650c0c1d249a4076af15e2ddfbb14b46",
+               "digest" : {
+                  "sha256" : "1368da7c4c7dd10fb2f9ee3ed8a70801650c0c1d249a4076af15e2ddfbb14b46"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmagic1t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmagic1t64.deb/53f653873216b135570b42c423ea93825c008ac464780b4578e80ee424237a4e",
+               "digest" : {
+                  "sha256" : "53f653873216b135570b42c423ea93825c008ac464780b4578e80ee424237a4e"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmd0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmd0.deb/7244ec3839b61fac0c1884fe08aaa040f26e8f1f35f1f5d3482eacefd30d1b44",
+               "digest" : {
+                  "sha256" : "7244ec3839b61fac0c1884fe08aaa040f26e8f1f35f1f5d3482eacefd30d1b44"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmount1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmount1.deb/6d00f45f2e80e078e906e3eedecd3ba6913e39fef49bff361ee583f17f00ec05",
+               "digest" : {
+                  "sha256" : "6d00f45f2e80e078e906e3eedecd3ba6913e39fef49bff361ee583f17f00ec05"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmpc3.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmpc3.deb/2af0a5c128e03694a41c0b011bd8a958b7297436cdb3a15ddad7866dae8c300b",
+               "digest" : {
+                  "sha256" : "2af0a5c128e03694a41c0b011bd8a958b7297436cdb3a15ddad7866dae8c300b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libmpfr6.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libmpfr6.deb/75dddce11dabc7fc543712c33dc27b7f2ee66a111763eb5eac654d010b42cd92",
+               "digest" : {
+                  "sha256" : "75dddce11dabc7fc543712c33dc27b7f2ee66a111763eb5eac654d010b42cd92"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libncursesw6.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libncursesw6.deb/47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7",
+               "digest" : {
+                  "sha256" : "47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libnghttp2-14.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libnghttp2-14.deb/896cb217537c09251fb909b8541349010ac279d802d871e98c06a62a2c67ce2c",
+               "digest" : {
+                  "sha256" : "896cb217537c09251fb909b8541349010ac279d802d871e98c06a62a2c67ce2c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libnode115.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libnode115.deb/76e19950d6f79d4a3fcba700573fad26df377169ea3fad6a3cefa2ba6a629911",
+               "digest" : {
+                  "sha256" : "76e19950d6f79d4a3fcba700573fad26df377169ea3fad6a3cefa2ba6a629911"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libnumber-compare-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libnumber-compare-perl.deb/cf95662e27037d92c582647400bb1ca7a6dfd2eb26eee5b968b23263cd4976dc",
+               "digest" : {
+                  "sha256" : "cf95662e27037d92c582647400bb1ca7a6dfd2eb26eee5b968b23263cd4976dc"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpam-modules.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpam-modules.deb/9679ade117f8775ac0471f48a92652ab8e8dcda4e2ff06de75158cded9cfd83c",
+               "digest" : {
+                  "sha256" : "9679ade117f8775ac0471f48a92652ab8e8dcda4e2ff06de75158cded9cfd83c"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpam-modules-bin.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpam-modules-bin.deb/cc72066d008444317738e8e931d6131b301466b4e2dd5ef5baa75fb1a45d61a7",
+               "digest" : {
+                  "sha256" : "cc72066d008444317738e8e931d6131b301466b4e2dd5ef5baa75fb1a45d61a7"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpam-runtime.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpam-runtime.deb/b02792c9ed6174db695a653b95ef3629fdac3a73ba1eff1754ab161b5711bfbf",
+               "digest" : {
+                  "sha256" : "b02792c9ed6174db695a653b95ef3629fdac3a73ba1eff1754ab161b5711bfbf"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpam0g.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpam0g.deb/4f5bde27d8df2de6ea8990319b42d9974f56a3ba9907ce7296fd0f8964fc9fb1",
+               "digest" : {
+                  "sha256" : "4f5bde27d8df2de6ea8990319b42d9974f56a3ba9907ce7296fd0f8964fc9fb1"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpcre2-8-0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpcre2-8-0.deb/1252b96a5bc44bb5db982bef8eb18e54f5047cede2aff641bce4f8e1edb91c3e",
+               "digest" : {
+                  "sha256" : "1252b96a5bc44bb5db982bef8eb18e54f5047cede2aff641bce4f8e1edb91c3e"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libperl5.40.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libperl5.40.deb/e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273",
+               "digest" : {
+                  "sha256" : "e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libpipeline1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libpipeline1.deb/edf2aadc18f204a3ebbda0ca2797bf0d1fe8f6534ac1b2c23195561eec87a796",
+               "digest" : {
+                  "sha256" : "edf2aadc18f204a3ebbda0ca2797bf0d1fe8f6534ac1b2c23195561eec87a796"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libproc2-0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libproc2-0.deb/c9d61caab1b2ddfc3f17edb95be31b9809fcb2daf27d853dff615bc4ebd08b4b",
+               "digest" : {
+                  "sha256" : "c9d61caab1b2ddfc3f17edb95be31b9809fcb2daf27d853dff615bc4ebd08b4b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libquadmath0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libquadmath0.deb/f5b51cf0ece3ec3bb7494d0cdbff3ce715ae00cfb2b6ed787f7db91319d64a7b",
+               "digest" : {
+                  "sha256" : "f5b51cf0ece3ec3bb7494d0cdbff3ce715ae00cfb2b6ed787f7db91319d64a7b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libreadline8t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libreadline8t64.deb/eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967",
+               "digest" : {
+                  "sha256" : "eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libseccomp2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libseccomp2.deb/89d5138e05fb6a86b9afd8b54dc0fb4b14f4c27c05e6c5f767c2132bdf808531",
+               "digest" : {
+                  "sha256" : "89d5138e05fb6a86b9afd8b54dc0fb4b14f4c27c05e6c5f767c2132bdf808531"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libselinux1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libselinux1.deb/68bb8d32bd8d6d7d2f5952a169db03d1484b46ae1e52abccdec42a19dccea5d5",
+               "digest" : {
+                  "sha256" : "68bb8d32bd8d6d7d2f5952a169db03d1484b46ae1e52abccdec42a19dccea5d5"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsemanage-common.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsemanage-common.deb/65375d886749c236bd1da4d9990b7c2469d2fe66019a28e5614f6814376d3dcb",
+               "digest" : {
+                  "sha256" : "65375d886749c236bd1da4d9990b7c2469d2fe66019a28e5614f6814376d3dcb"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsemanage2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsemanage2.deb/f97da7505d17ad3bdd8fc56302256df7e158e5e0d8b02cb766654199cbc406a9",
+               "digest" : {
+                  "sha256" : "f97da7505d17ad3bdd8fc56302256df7e158e5e0d8b02cb766654199cbc406a9"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsepol2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsepol2.deb/3595d2d3a6d24695e7953f4f00cdfe6974c9242d9a8dfee8998e77fbf7b2ba09",
+               "digest" : {
+                  "sha256" : "3595d2d3a6d24695e7953f4f00cdfe6974c9242d9a8dfee8998e77fbf7b2ba09"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsframe1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsframe1.deb/38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f",
+               "digest" : {
+                  "sha256" : "38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsigsegv2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsigsegv2.deb/bac603b965f303ea88dc39cd723b3d88cd86e3be9c948783f0d5e0d00e971302",
+               "digest" : {
+                  "sha256" : "bac603b965f303ea88dc39cd723b3d88cd86e3be9c948783f0d5e0d00e971302"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsmartcols1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsmartcols1.deb/d96bac9c8805685f2734885098a214b82950da6ebb182c27a6b7a124a0323392",
+               "digest" : {
+                  "sha256" : "d96bac9c8805685f2734885098a214b82950da6ebb182c27a6b7a124a0323392"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsodium23.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsodium23.deb/9ff9d97bb7ce3aee7f6e6ec3a785cdbe237454a7b9fd84728121bc4ef2bebebe",
+               "digest" : {
+                  "sha256" : "9ff9d97bb7ce3aee7f6e6ec3a785cdbe237454a7b9fd84728121bc4ef2bebebe"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsqlite3-0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsqlite3-0.deb/0a459adaffd901109f7811ab65f58e7a957b4907d05539cf3d1184efdcde0468",
+               "digest" : {
+                  "sha256" : "0a459adaffd901109f7811ab65f58e7a957b4907d05539cf3d1184efdcde0468"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libss2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libss2.deb/c5d38d71984c1bf774c1254238636e605fc4e0dc24d853f709921eb740327f4a",
+               "digest" : {
+                  "sha256" : "c5d38d71984c1bf774c1254238636e605fc4e0dc24d853f709921eb740327f4a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libssl3t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libssl3t64.deb/916f7f40b34a06e6ebfaefcdab331bff458328411da672598f126a760472467d",
+               "digest" : {
+                  "sha256" : "916f7f40b34a06e6ebfaefcdab331bff458328411da672598f126a760472467d"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libstdc++-14-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libstdc%2B%2B-14-dev.deb/4b962fac5f1af0bd8b1b3f97e0f47b9d8e9a79e88802143f00ebfbd78ad87a7b",
+               "digest" : {
+                  "sha256" : "4b962fac5f1af0bd8b1b3f97e0f47b9d8e9a79e88802143f00ebfbd78ad87a7b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libstdc++6.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libstdc%2B%2B6.deb/ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0",
+               "digest" : {
+                  "sha256" : "ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libsystemd0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libsystemd0.deb/ab0d4127b5e46e6f8c015a1db15a62ba9ae274cdefa150083adf90ada0600ea1",
+               "digest" : {
+                  "sha256" : "ab0d4127b5e46e6f8c015a1db15a62ba9ae274cdefa150083adf90ada0600ea1"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libtext-glob-perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libtext-glob-perl.deb/b0f1a40c5b26f4e4c83a4f8e1768fcf50ae9aac84b7f807ccb38123b50396f64",
+               "digest" : {
+                  "sha256" : "b0f1a40c5b26f4e4c83a4f8e1768fcf50ae9aac84b7f807ccb38123b50396f64"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libtinfo6.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libtinfo6.deb/8b9f6a7983e9418564e48a627518de4c03917b56efe68d7f3e93bd8fffa1cc10",
+               "digest" : {
+                  "sha256" : "8b9f6a7983e9418564e48a627518de4c03917b56efe68d7f3e93bd8fffa1cc10"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libtool.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libtool.deb/be5361a8c1fce2758c3e19608bf97393d5f3afdb7e926aeb83e2818355bd885f",
+               "digest" : {
+                  "sha256" : "be5361a8c1fce2758c3e19608bf97393d5f3afdb7e926aeb83e2818355bd885f"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libtsan2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libtsan2.deb/529d7f68227d16975076c5f842e8b687faea1b5df8e0dcf62e436d5402844ca5",
+               "digest" : {
+                  "sha256" : "529d7f68227d16975076c5f842e8b687faea1b5df8e0dcf62e436d5402844ca5"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libubsan1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libubsan1.deb/9205a1bef7d6a52ffc06548e0cde169ff303e688c12d9be3a98f734449077e22",
+               "digest" : {
+                  "sha256" : "9205a1bef7d6a52ffc06548e0cde169ff303e688c12d9be3a98f734449077e22"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libuchardet0.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libuchardet0.deb/eb772a1649d900ac46ffeab61a8b911e81d571f88ef5dcd0eed9aad5b45b003e",
+               "digest" : {
+                  "sha256" : "eb772a1649d900ac46ffeab61a8b911e81d571f88ef5dcd0eed9aad5b45b003e"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libudev1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libudev1.deb/5d41c284f5a93b05bc7d648b61a02dd2bb9ff05b2261ad1a8b7d96044a0cfa88",
+               "digest" : {
+                  "sha256" : "5d41c284f5a93b05bc7d648b61a02dd2bb9ff05b2261ad1a8b7d96044a0cfa88"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libunistring5.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libunistring5.deb/6dd3490bef06ea1096f32d10766b7e016cf579bfae8451d1b7df15ce05b8aa46",
+               "digest" : {
+                  "sha256" : "6dd3490bef06ea1096f32d10766b7e016cf579bfae8451d1b7df15ce05b8aa46"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libunwind8.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libunwind8.deb/db21a86dd05c93413f0ef36282a9c64d32410d240f332273a53be1408bec1f62",
+               "digest" : {
+                  "sha256" : "db21a86dd05c93413f0ef36282a9c64d32410d240f332273a53be1408bec1f62"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libuuid1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libuuid1.deb/c1bf4c4c3ff48c57fabf93307dfb56996b60cfa33927afc4158b5db36fb2721e",
+               "digest" : {
+                  "sha256" : "c1bf4c4c3ff48c57fabf93307dfb56996b60cfa33927afc4158b5db36fb2721e"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libuv1t64.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libuv1t64.deb/5fec8035002e0c745b64d1c5b3e1dc42790d1a77574315b976cf3e4aab9ddc0a",
+               "digest" : {
+                  "sha256" : "5fec8035002e0c745b64d1c5b3e1dc42790d1a77574315b976cf3e4aab9ddc0a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libxml2.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libxml2.deb/e0c6b63ce4602a036a526f60fe5e6c1586710688058d98fc1001b9b3147b7efd",
+               "digest" : {
+                  "sha256" : "e0c6b63ce4602a036a526f60fe5e6c1586710688058d98fc1001b9b3147b7efd"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "libzstd1.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/libzstd1.deb/2f6a2aeacfc925eba8b00ac9139bc4bfccf8cacb09eb93de067074b26948eef9",
+               "digest" : {
+                  "sha256" : "2f6a2aeacfc925eba8b00ac9139bc4bfccf8cacb09eb93de067074b26948eef9"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "linux-libc-dev.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/linux-libc-dev.deb/dc68dd53c7356598d005866da0d19d7bd33af2a62971aced624cdf04492902b4",
+               "digest" : {
+                  "sha256" : "dc68dd53c7356598d005866da0d19d7bd33af2a62971aced624cdf04492902b4"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "login.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/login.deb/8fc5869532a73d577c4abb5ed917e048bbd72148702ea1dcadd3817064f3e887",
+               "digest" : {
+                  "sha256" : "8fc5869532a73d577c4abb5ed917e048bbd72148702ea1dcadd3817064f3e887"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "login.defs.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/login.defs.deb/b4bbb8242cbf5588de7aafeb9d578a3dee1db2891f444ab454fd30bd80ccf2b4",
+               "digest" : {
+                  "sha256" : "b4bbb8242cbf5588de7aafeb9d578a3dee1db2891f444ab454fd30bd80ccf2b4"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "logsave.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/logsave.deb/aa028720743b79bd054749af34c501c093f0ab5e044e4dc44273765be5e95de5",
+               "digest" : {
+                  "sha256" : "aa028720743b79bd054749af34c501c093f0ab5e044e4dc44273765be5e95de5"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "m4.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/m4.deb/221b3e224708c1da2a1a88b6824380593579b2254ae7d914afa14cbd5d343334",
+               "digest" : {
+                  "sha256" : "221b3e224708c1da2a1a88b6824380593579b2254ae7d914afa14cbd5d343334"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "make.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/make.deb/70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6",
+               "digest" : {
+                  "sha256" : "70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "man-db.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/man-db.deb/d5a407221a0d59845484b5343a37ec6374102e949353e4b158eaa2cbaf27aa5a",
+               "digest" : {
+                  "sha256" : "d5a407221a0d59845484b5343a37ec6374102e949353e4b158eaa2cbaf27aa5a"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "mount.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/mount.deb/eb70a615114ac40123768beb20e302554d5cb7edb33290be7e418ebe1075c878",
+               "digest" : {
+                  "sha256" : "eb70a615114ac40123768beb20e302554d5cb7edb33290be7e418ebe1075c878"
+               },
+               "annotations" : {
+                  "flags" : "vminstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "ncurses-base.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/ncurses-base.deb/190e775260a38973c415a36ae99f33ad1b37ea6ca99929d7c5d53843fc23e914",
+               "digest" : {
+                  "sha256" : "190e775260a38973c415a36ae99f33ad1b37ea6ca99929d7c5d53843fc23e914"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "ncurses-bin.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/ncurses-bin.deb/40a525f4761e9ed4b8adcd1783cb9a6467ff8008215ae99b3597825bdefc61e4",
+               "digest" : {
+                  "sha256" : "40a525f4761e9ed4b8adcd1783cb9a6467ff8008215ae99b3597825bdefc61e4"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "net-tools.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/net-tools.deb/e136d38b98f14c2aa1e8fc1c6d2846de6be665a2abebf227fc31984e34d93139",
+               "digest" : {
+                  "sha256" : "e136d38b98f14c2aa1e8fc1c6d2846de6be665a2abebf227fc31984e34d93139"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-acorn.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-acorn.deb/5c6814cf6536892b3a93cc72a0a3792beb0d3f6be3d69f499ca7d764583479a9",
+               "digest" : {
+                  "sha256" : "5c6814cf6536892b3a93cc72a0a3792beb0d3f6be3d69f499ca7d764583479a9"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-balanced-match.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-balanced-match.deb/98a1c466bff6baf6780c4b765ec665e684424bf7907439939b5fb1160ede039c",
+               "digest" : {
+                  "sha256" : "98a1c466bff6baf6780c4b765ec665e684424bf7907439939b5fb1160ede039c"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-brace-expansion.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-brace-expansion.deb/c06d940bf95617cfd5c5ccbf0bf2ea864f41f36f317f21b4c8b21a3bf9668821",
+               "digest" : {
+                  "sha256" : "c06d940bf95617cfd5c5ccbf0bf2ea864f41f36f317f21b4c8b21a3bf9668821"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-cjs-module-lexer.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-cjs-module-lexer.deb/db5edbd534306c633cd8c0639adb9fc723ec5c6961eee9f9721475db74474959",
+               "digest" : {
+                  "sha256" : "db5edbd534306c633cd8c0639adb9fc723ec5c6961eee9f9721475db74474959"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-corepack.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-corepack.deb/76fc252799fe76c1dcd63d95cc556e11d5ac226902cf41c1963a2a45f830efa0",
+               "digest" : {
+                  "sha256" : "76fc252799fe76c1dcd63d95cc556e11d5ac226902cf41c1963a2a45f830efa0"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-minimatch.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-minimatch.deb/732998416eadffcdbf4e7e697200eb28d42963d1540fff2a3b485b5499805db6",
+               "digest" : {
+                  "sha256" : "732998416eadffcdbf4e7e697200eb28d42963d1540fff2a3b485b5499805db6"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-undici.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-undici.deb/7f10cf9c79cf4dae6c1117ca1c8181d2d4d184b82bbd59dd0eeec554994161c4",
+               "digest" : {
+                  "sha256" : "7f10cf9c79cf4dae6c1117ca1c8181d2d4d184b82bbd59dd0eeec554994161c4"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "node-xtend.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/node-xtend.deb/c64e37fbea40de012b59adbfa61e703b52c12713f34cbfd2d4049ebcc549f270",
+               "digest" : {
+                  "sha256" : "c64e37fbea40de012b59adbfa61e703b52c12713f34cbfd2d4049ebcc549f270"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "nodejs.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/nodejs.deb/3e2d151f46ae1f1ab644fa6d11d85e7cf30d9aa182935bc16b99bf9888be8a85",
+               "digest" : {
+                  "sha256" : "3e2d151f46ae1f1ab644fa6d11d85e7cf30d9aa182935bc16b99bf9888be8a85"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "openssl-provider-legacy.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/openssl-provider-legacy.deb/f155c8191ae6d41da73d792f4182680aeafeb85c3dd223934ee9fdd115c4f1fa",
+               "digest" : {
+                  "sha256" : "f155c8191ae6d41da73d792f4182680aeafeb85c3dd223934ee9fdd115c4f1fa"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "passwd.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/passwd.deb/c5eaef41c6947d2888fa3462f787a7e02158b997bd0119154283f425ba57b8b8",
+               "digest" : {
+                  "sha256" : "c5eaef41c6947d2888fa3462f787a7e02158b997bd0119154283f425ba57b8b8"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "patch.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/patch.deb/80c46a0085b33acc74bf451fddb6a70cb43d4ebcc4a873aec04d8d0a63ffc630",
+               "digest" : {
+                  "sha256" : "80c46a0085b33acc74bf451fddb6a70cb43d4ebcc4a873aec04d8d0a63ffc630"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "perl.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/perl.deb/ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd",
+               "digest" : {
+                  "sha256" : "ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "perl-base.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/perl-base.deb/b795464137a0f4d443fc9284f4b93e883fb83883cb533adf300ac660807a352a",
+               "digest" : {
+                  "sha256" : "b795464137a0f4d443fc9284f4b93e883fb83883cb533adf300ac660807a352a"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "perl-modules-5.40.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/perl-modules-5.40.deb/4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce",
+               "digest" : {
+                  "sha256" : "4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "po-debconf.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/po-debconf.deb/613e31942c17b582e8c76db1077240f177f2f67bad22e5f4f8e5bee523d6f54b",
+               "digest" : {
+                  "sha256" : "613e31942c17b582e8c76db1077240f177f2f67bad22e5f4f8e5bee523d6f54b"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "procps.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/procps.deb/4db90bb6776772fc52585d6b1fbfc52ec2a85480e1b4363b743fbb2ffa2a5375",
+               "digest" : {
+                  "sha256" : "4db90bb6776772fc52585d6b1fbfc52ec2a85480e1b4363b743fbb2ffa2a5375"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "psmisc.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/psmisc.deb/19e772bca5ad0b28620229fe4f91383044c5c6322c7c50ae46da1c60d73d9960",
+               "digest" : {
+                  "sha256" : "19e772bca5ad0b28620229fe4f91383044c5c6322c7c50ae46da1c60d73d9960"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "readline-common.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/readline-common.deb/f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9",
+               "digest" : {
+                  "sha256" : "f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "rpcsvc-proto.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/rpcsvc-proto.deb/32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3",
+               "digest" : {
+                  "sha256" : "32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "sed.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/sed.deb/7071270ed4f6adda55bc4f926347fb847bacaffbdee3dff917bc6006ed7e3775",
+               "digest" : {
+                  "sha256" : "7071270ed4f6adda55bc4f926347fb847bacaffbdee3dff917bc6006ed7e3775"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "sensible-utils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/sensible-utils.deb/873a9b73c3478cc3148cdbf5cc2084949a0a8e4fa16131d1cbc895d2f1f3470e",
+               "digest" : {
+                  "sha256" : "873a9b73c3478cc3148cdbf5cc2084949a0a8e4fa16131d1cbc895d2f1f3470e"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "strace.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/strace.deb/cae290b67cf835350a2cde58ca332256fba475784b3e02a9a8677d73eaf47511",
+               "digest" : {
+                  "sha256" : "cae290b67cf835350a2cde58ca332256fba475784b3e02a9a8677d73eaf47511"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "sysvinit-utils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/sysvinit-utils.deb/c7e957360dff89675b491e501b00047cf750695178cabab167c92fc260d358ec",
+               "digest" : {
+                  "sha256" : "c7e957360dff89675b491e501b00047cf750695178cabab167c92fc260d358ec"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "tar.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/tar.deb/214c02e1aa291076a3147b8a4c4cae02fadf4c67df629186e3e313726faef1de",
+               "digest" : {
+                  "sha256" : "214c02e1aa291076a3147b8a4c4cae02fadf4c67df629186e3e313726faef1de"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "user-setup.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/user-setup.deb/f186b97bbd7846cfdfaf6b170dddd5c585e0119562f0e7b17171e432e5951647",
+               "digest" : {
+                  "sha256" : "f186b97bbd7846cfdfaf6b170dddd5c585e0119562f0e7b17171e432e5951647"
+               },
+               "annotations" : {
+                  "flags" : "preinstall,runscripts",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "usrmerge.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/usrmerge.deb/250a1c1c19d70d0aa8b013528ccb7dfd20ada052d3367e8e4509da756e8aa3a6",
+               "digest" : {
+                  "sha256" : "250a1c1c19d70d0aa8b013528ccb7dfd20ada052d3367e8e4509da756e8aa3a6"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "util-linux.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/util-linux.deb/7d5b1176cc3d8cc6b290b3ec17af458f362d9200845f30da22057a8198744430",
+               "digest" : {
+                  "sha256" : "7d5b1176cc3d8cc6b290b3ec17af458f362d9200845f30da22057a8198744430"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "vim.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/vim.deb/7050d710bbcd5dee68865d90fd95a9aa865bf16d9a3874c5bb6a4f1d69231cfe",
+               "digest" : {
+                  "sha256" : "7050d710bbcd5dee68865d90fd95a9aa865bf16d9a3874c5bb6a4f1d69231cfe"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "vim-common.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/vim-common.deb/bcf7e3e675cbc4eed1f444ea3a6dfbf420eae141615b0d35cee24cf23e18aa18",
+               "digest" : {
+                  "sha256" : "bcf7e3e675cbc4eed1f444ea3a6dfbf420eae141615b0d35cee24cf23e18aa18"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "vim-runtime.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/vim-runtime.deb/5addd2e7d3aae7d1907aba6c0c16c525e78ccfc0f6ee9ef9651c139a80c97058",
+               "digest" : {
+                  "sha256" : "5addd2e7d3aae7d1907aba6c0c16c525e78ccfc0f6ee9ef9651c139a80c97058"
+               },
+               "annotations" : {
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "xz-utils.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/xz-utils.deb/9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217",
+               "digest" : {
+                  "sha256" : "9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "zlib1g.deb",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/Debian:13/standard/x86_64/zlib1g.deb/015be740d6236ad114582dea500c1d907f29e16d6db00566ca32fb68d71ac90d",
+               "digest" : {
+                  "sha256" : "015be740d6236ad114582dea500c1d907f29e16d6db00566ca32fb68d71ac90d"
+               },
+               "annotations" : {
+                  "flags" : "preinstall",
+                  "intent" : "buildenv"
+               }
+            },
+            {
+               "name" : "_config",
+               "uri" : "http://sc-obs.poc.test:5352/slsa/poc/debian_13/noarch/_config/763f11b99edf087bd37a230e67dc352a49801915e9d55f6f8daad1fb6f3903f3",
+               "digest" : {
+                  "sha256" : "763f11b99edf087bd37a230e67dc352a49801915e9d55f6f8daad1fb6f3903f3"
+               },
+               "annotations" : {
+                  "intent" : "buildconfig"
+               }
+            }
+         ]
+      },
+      "runDetails" : {
+         "id" : "obs://private"
+      }
+   }
+}

@@ -1,0 +1,19 @@
+# construire.sh reconstruire build-v1, 2026-10-29T15:22:49Z
+état avant : succeeded succeeded
+ok
+## Attente des résultats
+15:23:12 debian_13=building rocky_9=scheduled
+15:23:43 debian_13=succeeded rocky_9=building
+15:24:15 debian_13=succeeded rocky_9=building
+15:24:46 debian_13=succeeded rocky_9=succeeded
+## Collecte
+rocky_9 : 2 fichiers ; type de VM : Doing kvm build
+  ccc62d7791d585a950204b44fd59ff40eb61b6acf186b7e2e2b025ed7da5210c  sample-app-1.0.0-1.src.rpm
+  1d0b6b273c8e1522448f885931d15c1bebb9b2ddce4336d8627853158df2c9f6  sample-app-1.0.0-1.x86_64.rpm
+debian_13 : 6 fichiers ; type de VM : Doing kvm build
+  863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f  sample-app_1.0.0-1.debian.tar.xz
+  9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6  sample-app_1.0.0-1.dsc
+  46ffc6255db15ce0393953acfe8cf3cfb30755bc9a7f143203338a66090c77ea  sample-app_1.0.0-1_amd64.buildinfo
+  53e1d3b29309a8b0d2899082eba36ee7bb5b31b43249debb15b6d7dd721101df  sample-app_1.0.0-1_amd64.changes
+  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5  sample-app_1.0.0-1_amd64.deb
+  07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz

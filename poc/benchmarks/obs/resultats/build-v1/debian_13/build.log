@@ -1,0 +1,482 @@
+[    0s] Using BUILD_ROOT=/var/cache/obs/worker/root_1/.mount
+[    0s] Using BUILD_ARCH=x86_64:i686:i586:i486:i386
+[    0s] Doing kvm build in /var/cache/obs/worker/root_1/root
+[    0s] 
+[    1s] 
+[    1s] sc-obs started "build sample-app_1.0.0-1.dsc" at Thu Oct 29 15:22:54 UTC 2026.
+[    1s] 
+[    1s] Building sample-app for project 'poc' repository 'debian_13' arch 'x86_64' srcmd5 '85347ea794c63a5435416b2374025c50'
+[    1s] 
+[    1s] processing recipe /var/cache/obs/worker/root_1/.build-srcdir/sample-app_1.0.0-1.dsc ...
+[    1s] running changelog2spec --target debian --file /var/cache/obs/worker/root_1/.build-srcdir/sample-app_1.0.0-1.dsc
+[    1s] init_buildsystem --configdir /srv/obs/run/worker/1/build/configs --cachedir /var/cache/build --prepare --clean --rpmlist /var/cache/obs/worker/root_1/.build.rpmlist /var/cache/obs/worker/root_1/.build-srcdir/sample-app_1.0.0-1.dsc build ...
+[    1s] cycle: libc6 -> libgcc-s1
+[    1s]   breaking dependency libgcc-s1 -> libc6
+[    1s] cycle: openssl-provider-legacy -> libssl3t64
+[    1s]   breaking dependency libssl3t64 -> openssl-provider-legacy
+[    1s] [1/72] preinstalling debconf...
+[    1s] [2/72] preinstalling gcc-14-base...
+[    1s] [3/72] preinstalling init-system-helpers...
+[    1s] [4/72] preinstalling libaudit-common...
+[    1s] [5/72] preinstalling libsemanage-common...
+[    1s] [6/72] preinstalling login.defs...
+[    1s] [7/72] preinstalling readline-common...
+[    1s] [8/72] preinstalling libgcc-s1...
+[    1s] [9/72] preinstalling libc6...
+[    1s] [10/72] preinstalling debianutils...
+[    1s] [11/72] preinstalling diffutils...
+[    1s] [12/72] preinstalling gzip...
+[    1s] [13/72] preinstalling libacl1...
+[    1s] [14/72] preinstalling libattr1...
+[    1s] [15/72] preinstalling libblkid1...
+[    1s] [16/72] preinstalling libbz2-1.0...
+[    1s] [17/72] preinstalling libc-bin...
+[    2s] [18/72] preinstalling libcap-ng0...
+[    2s] [19/72] preinstalling libcap2...
+[    2s] [20/72] preinstalling libcrypt1...
+[    2s] [21/72] preinstalling libdb5.3t64...
+[    2s] [22/72] preinstalling libdebconfclient0...
+[    2s] [23/72] preinstalling libgdbm6t64...
+[    2s] [24/72] preinstalling libgmp10...
+[    2s] [25/72] preinstalling liblzma5...
+[    2s] [26/72] preinstalling libmd0...
+[    2s] [27/72] preinstalling libpcre2-8-0...
+[    2s] [28/72] preinstalling libsepol2...
+[    2s] [29/72] preinstalling libsigsegv2...
+[    2s] [30/72] preinstalling libsmartcols1...
+[    2s] [31/72] preinstalling libsqlite3-0...
+[    2s] [32/72] preinstalling libtinfo6...
+[    2s] [33/72] preinstalling libuuid1...
+[    2s] [34/72] preinstalling libzstd1...
+[    2s] [35/72] preinstalling zlib1g...
+[    2s] [36/72] preinstalling dash...
+[    2s] [37/72] preinstalling grep...
+[    2s] [38/72] preinstalling libbsd0...
+[    2s] [39/72] preinstalling libgdbm-compat4t64...
+[    2s] [40/72] preinstalling liblastlog2-2...
+[    2s] [41/72] preinstalling libmpfr6...
+[    2s] [42/72] preinstalling libselinux1...
+[    2s] [43/72] preinstalling libsystemd0...
+[    2s] [44/72] preinstalling libudev1...
+[    2s] [45/72] preinstalling perl-base...
+[    2s] [46/72] preinstalling xz-utils...
+[    2s] [47/72] preinstalling libaudit1...
+[    2s] [48/72] preinstalling libreadline8t64...
+[    2s] [49/72] preinstalling libssl3t64...
+[    2s] [50/72] preinstalling perl-modules-5.40...
+[    2s] [51/72] preinstalling findutils...
+[    2s] [52/72] preinstalling openssl-provider-legacy...
+[    3s] [53/72] preinstalling base-passwd...
+[    3s] [54/72] preinstalling libmount1...
+[    3s] [55/72] preinstalling libpam0g...
+[    3s] [56/72] preinstalling sed...
+[    3s] [57/72] preinstalling tar...
+[    3s] [58/72] preinstalling gawk...
+[    3s] [59/72] preinstalling libsemanage2...
+[    3s] [60/72] preinstalling coreutils...
+[    3s] [61/72] preinstalling libpam-modules-bin...
+[    3s] [62/72] preinstalling dpkg...
+[    3s] [63/72] preinstalling libperl5.40...
+[    3s] [64/72] preinstalling perl...
+[    3s] [65/72] preinstalling libpam-modules...
+[    3s] [66/72] preinstalling libpam-runtime...
+[    3s] [67/72] preinstalling passwd...
+[    3s] [68/72] preinstalling adduser...
+[    3s] [69/72] preinstalling util-linux...
+[    3s] [70/72] preinstalling user-setup...
+[    3s] [71/72] preinstalling base-files...
+[    3s] [72/72] preinstalling bash...
+[    3s] 
+[    3s] [1/11] preinstalling binutils-common...
+[    3s] [2/11] preinstalling libctf-nobfd0...
+[    4s] [3/11] preinstalling libjansson4...
+[    4s] [4/11] preinstalling libsframe1...
+[    4s] [5/11] preinstalling libstdc++6...
+[    4s] [6/11] preinstalling mount...
+[    4s] [7/11] preinstalling libbinutils...
+[    4s] [8/11] preinstalling libctf0...
+[    4s] [9/11] preinstalling libgprofng0...
+[    4s] [10/11] preinstalling binutils-x86-64-linux-gnu...
+[    4s] [11/11] preinstalling binutils...
+[    4s] copying packages...
+[    4s] reordering...cycle: libc6 -> libgcc-s1
+[    4s]   breaking dependency libgcc-s1 -> libc6
+[    4s] cycle: libssl3t64 -> openssl-provider-legacy
+[    4s]   breaking dependency libssl3t64 -> openssl-provider-legacy
+[    4s] cycle: nodejs -> libnode115 -> node-acorn
+[    4s]   breaking dependency libnode115 -> node-acorn
+[    4s] cycle: node-corepack -> nodejs
+[    4s]   breaking dependency nodejs -> node-corepack
+[    4s] done
+[    5s] booting kvm...
+[    5s] ### VM INTERACTION START ###
+[    5s] Using UART console
+[    5s] /usr/bin/qemu-kvm -nodefaults -no-reboot -nographic -vga none -cpu host -M pc,accel=kvm,usb=off,dump-guest-core=off,vmport=off -sandbox on -object rng-random,filename=/dev/hwrng,id=rng0 -device virtio-rng-pci,rng=rng0 -object iothread,id=io0 -run-with user=qemu -net none -kernel /boot/vmlinuz -initrd /boot/initrd.obs.guest -append root=/dev/disk/by-id/virtio-0 rootfstype=ext3 rootflags=data=writeback,nobarrier,commit=150,noatime kvmclock mitigations=off elevator=noop nmi_watchdog=0 rw rd.driver.pre=binfmt_misc oops=panic panic=1 quiet console=ttyS0 init=/.build/build -m 3072 -drive file=/var/cache/obs/worker/root_1/root,format=raw,if=none,id=disk,cache=unsafe,aio=io_uring -device virtio-blk-pci,iothread=io0,drive=disk,serial=0 -drive file=/var/cache/obs/worker/root_1/swap,format=raw,if=none,id=swap,cache=unsafe,aio=io_uring -device virtio-blk-pci,iothread=io0,drive=swap,serial=1 -serial stdio -chardev socket,id=monitor,server=on,wait=off,path=/var/cache/obs/worker/root_1/root.qemu/monitor -mon chardev=monitor,mode=readline -smp 4
+[    5s] [0mSeaBIOS (version rel-1.16.3-2-gc13ff2cd-prebuilt.qemu.org)
+[    7s] Booting from ROM..104104### VM INTERACTION END ###
+[    7s] 2nd stage started in virtual machine
+[    7s] ^[[1;1R^[[24;80Rmachine type: x86_64
+[    7s] Linux version: 6.12.0-160000.40-default #1 SMP PREEMPT_DYNAMIC Thu Oct 22 09:10:19 UTC 2026 (3fd31e5)
+[    7s] Time: Thu Oct 29 15:23:00 UTC 2026
+[    7s] Increasing log level from now on...
+[    7s] [    2.380317][  T679] sysrq: Changing Loglevel
+[    7s] [    2.382920][  T679] sysrq: Loglevel set to 4
+[    7s] Enable sysrq operations
+[    8s] Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+[    8s] no label, UUID=7b37ed6a-d49a-47a3-acdc-a085f5edf494
+[    8s] logging output to //.build.log...
+[    8s] processing recipe //.build-srcdir/sample-app_1.0.0-1.dsc ...
+[    8s] init_buildsystem --configdir /.build/configs --cachedir /var/cache/build //.build-srcdir/sample-app_1.0.0-1.dsc build ...
+[    8s] running base-files preinstall script
+[    8s] running base-files postinstall script
+[    8s] chown: invalid user: 'root:root'
+[    8s] running base-passwd preinstall script
+[    8s] running base-passwd postinstall script
+[    8s] running gawk postinstall script
+[    8s] running user-setup postinstall script
+[    8s] querying package ids...
+[    9s] [1/202] installing autotools-dev-20240727.1
+[    9s] [2/202] installing binutils-common-2.44-3
+[    9s] Obsolete conffile '/etc/gprofng.rc' has been modified by you.
+[    9s] Saving as /etc/gprofng.rc.dpkg-old ...
+[    9s] [3/202] installing debconf-1.5.91
+[    9s] [4/202] installing gcc-14-base-14.2.0-19
+[    9s] [5/202] installing golang-1.24-src-1.24.4-1
+[   11s] [6/202] installing init-system-helpers-1.69~deb13u1
+[   11s] [7/202] installing libaudit-common-1:4.0.2-2+deb13u1
+[   11s] [8/202] installing libmagic-mgc-1:5.46-5
+[   11s] [9/202] installing libnumber-compare-perl-0.03-3
+[   11s] [10/202] installing libsemanage-common-3.8.1-1
+[   11s] [11/202] installing libtext-glob-perl-0.11-3
+[   11s] [12/202] installing linux-libc-dev-6.12.107-1
+[   11s] [13/202] installing login.defs-1:4.17.4-2
+[   11s] [14/202] installing ncurses-base-6.5+20250216-2
+[   11s] [15/202] installing node-balanced-match-2.0.0-1
+[   11s] [16/202] installing node-cjs-module-lexer-1.2.3+dfsg-1
+[   12s] [17/202] installing node-undici-7.3.0+dfsg1+~cs24.12.11-1
+[   12s] [18/202] installing node-xtend-4.0.2-3
+[   12s] [19/202] installing readline-common-8.2-6
+[   12s] [20/202] installing sensible-utils-0.0.25
+[   12s] [21/202] installing vim-common-2:9.1.1230-2
+[   12s] [22/202] installing vim-runtime-2:9.1.1230-2
+[   12s] Adding 'diversion of /usr/share/vim/vim91/doc/help.txt to /usr/share/vim/vim91/doc/help.txt.vim-tiny by vim-runtime'
+[   12s] Adding 'diversion of /usr/share/vim/vim91/doc/tags to /usr/share/vim/vim91/doc/tags.vim-tiny by vim-runtime'
+[   12s] [23/202] installing golang-1.24-go-1.24.4-1
+[   13s] [24/202] installing golang-src-2:1.24~2
+[   13s] [25/202] installing node-brace-expansion-2.0.1+~1.1.0-2
+[   13s] [26/202] installing node-minimatch-9.0.3-6
+[   13s] [27/202] installing golang-go-2:1.24~2
+[   13s] [28/202] installing libgcc-s1-14.2.0-19
+[   13s] dpkg: libgcc-s1:amd64: dependency problems, but configuring anyway as you requested:
+[   13s]  libgcc-s1:amd64 depends on libc6 (>= 2.35); however:
+[   13s]   Package libc6 is not installed.
+[   13s] [29/202] installing libc6-2.41-12+deb13u4
+[   13s] dpkg-query: no packages found matching base-files
+[   13s] [30/202] installing debianutils-5.23.2
+[   13s] update-alternatives: using /usr/bin/which.debianutils to provide /usr/bin/which (which) in auto mode
+[   13s] [31/202] installing diffutils-1:3.10-4
+[   13s] [32/202] installing gettext-base-0.23.1-2
+[   13s] [33/202] installing gzip-1.13-1+deb13u1
+[   13s] [34/202] installing hostname-3.25
+[   13s] [35/202] installing libacl1-2.3.2-2+b1
+[   13s] [36/202] installing libattr1-1:2.5.2-3
+[   13s] [37/202] installing libblkid1-2.41.5-0+deb13u1
+[   13s] [38/202] installing libbrotli1-1.1.0-2+b7
+[   13s] [39/202] installing libbz2-1.0-1.0.8-6
+[   13s] [40/202] installing libc-bin-2.41-12+deb13u4
+[   14s] [41/202] installing libc-dev-bin-2.41-12+deb13u4
+[   14s] [42/202] installing libcap-ng0-0.8.5-4+b1
+[   14s] [43/202] installing libcap2-1:2.75-10+deb13u1+b3
+[   14s] [44/202] installing libcares2-1.34.5-1+deb13u1
+[   14s] [45/202] installing libcom-err2-1.47.2-3+b12
+[   14s] [46/202] installing libcrypt1-1:4.4.38-1
+[   14s] [47/202] installing libdb5.3t64-5.3.28+dfsg2-9
+[   14s] [48/202] installing libdebconfclient0-0.280
+[   14s] [49/202] installing libext2fs2t64-1.47.2-3+b12
+[   14s] Adding 'diversion of /lib/x86_64-linux-gnu/libe2p.so.2 to /lib/x86_64-linux-gnu/libe2p.so.2.usr-is-merged by libext2fs2t64'
+[   14s] Adding 'diversion of /lib/x86_64-linux-gnu/libe2p.so.2.3 to /lib/x86_64-linux-gnu/libe2p.so.2.3.usr-is-merged by libext2fs2t64'
+[   14s] Adding 'diversion of /lib/x86_64-linux-gnu/libext2fs.so.2 to /lib/x86_64-linux-gnu/libext2fs.so.2.usr-is-merged by libext2fs2t64'
+[   14s] Adding 'diversion of /lib/x86_64-linux-gnu/libext2fs.so.2.4 to /lib/x86_64-linux-gnu/libext2fs.so.2.4.usr-is-merged by libext2fs2t64'
+[   14s] [50/202] installing libfakeroot-1.37.1.1-1
+[   14s] [51/202] installing libgdbm6t64-1.24-2
+[   14s] [52/202] installing libgmp10-2:6.3.0+dfsg-3
+[   14s] [53/202] installing libgpm2-1.20.7-11+b2
+[   14s] [54/202] installing libjansson4-2.14-2+b3
+[   14s] [55/202] installing liblzma5-5.8.1-1+deb13u1
+[   14s] [56/202] installing libmd0-1.1.0-2+b1
+[   14s] [57/202] installing libnghttp2-14-1.64.0-1.1+deb13u1
+[   14s] [58/202] installing libpcre2-8-0-10.46-1~deb13u2
+[   14s] [59/202] installing libpipeline1-1.5.8-1
+[   14s] [60/202] installing libseccomp2-2.6.0-2
+[   14s] [61/202] installing libsepol2-3.8.1-1
+[   14s] [62/202] installing libsframe1-2.44-3
+[   14s] [63/202] installing libsigsegv2-2.14-1+b2
+[   14s] [64/202] installing libsmartcols1-2.41.5-0+deb13u1
+[   14s] [65/202] installing libsodium23-1.0.18-1+deb13u1
+[   15s] [66/202] installing libsqlite3-0-3.46.1-7+deb13u2
+[   15s] [67/202] installing libtinfo6-6.5+20250216-2
+[   15s] [68/202] installing libunistring5-1.3-2
+[   15s] [69/202] installing libuuid1-2.41.5-0+deb13u1
+[   15s] [70/202] installing libuv1t64-1.50.0-2
+[   15s] [71/202] installing libzstd1-1.5.7+dfsg-1
+[   15s] [72/202] installing logsave-1.47.2-3+b12
+[   15s] [73/202] installing m4-1.4.19-8
+[   15s] [74/202] installing make-4.4.1-2
+[   15s] [75/202] installing patch-2.8-2
+[   15s] [76/202] installing rpcsvc-proto-1.4.3-1
+[   15s] [77/202] installing sysvinit-utils-3.14-4
+[   15s] [78/202] installing zlib1g-1:1.3.dfsg+really1.3.1-1+b1
+[   15s] [79/202] installing libatomic1-14.2.0-19
+[   15s] [80/202] installing libgomp1-14.2.0-19
+[   15s] [81/202] installing libitm1-14.2.0-19
+[   15s] [82/202] installing libquadmath0-14.2.0-19
+[   15s] [83/202] installing libasan8-14.2.0-19
+[   15s] [84/202] installing libhwasan0-14.2.0-19
+[   15s] [85/202] installing liblsan0-14.2.0-19
+[   16s] [86/202] installing libstdc++6-14.2.0-19
+[   16s] [87/202] installing libtsan2-14.2.0-19
+[   16s] [88/202] installing libcrypt-dev-1:4.4.38-1
+[   16s] [89/202] installing bzip2-1.0.8-6
+[   16s] [90/202] installing dash-0.5.12-12
+[   16s] [91/202] installing fakeroot-1.37.1.1-1
+[   16s] update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
+[   16s] [92/202] installing grep-3.11-4
+[   16s] [93/202] installing less-668-1
+[   16s] [94/202] installing libbsd0-0.12.2-2
+[   16s] [95/202] installing libctf-nobfd0-2.44-3
+[   16s] [96/202] installing libgdbm-compat4t64-1.24-2
+[   16s] [97/202] installing libisl23-0.27-1
+[   16s] [98/202] installing liblastlog2-2-2.41.5-0+deb13u1
+[   16s] [99/202] installing libmpfr6-4.2.2-1
+[   16s] [100/202] installing libncursesw6-6.5+20250216-2
+[   16s] [101/202] installing libselinux1-3.8.1-1
+[   16s] [102/202] installing libss2-1.47.2-3+b12
+[   16s] [103/202] installing libsystemd0-257.13-1~deb13u1
+[   16s] [104/202] installing libudev1-257.13-1~deb13u1
+[   16s] [105/202] installing libunwind8-1.8.1-0.1
+[   16s] [106/202] installing ncurses-bin-6.5+20250216-2
+[   16s] [107/202] installing perl-base-5.40.1-6+deb13u1
+[   17s] [108/202] installing psmisc-23.7-2
+[   17s] [109/202] installing xz-utils-5.8.1-1+deb13u1
+[   17s] update-alternatives: using /usr/bin/xz to provide /usr/bin/lzma (lzma) in auto mode
+[   17s] [110/202] installing bsdextrautils-2.41.5-0+deb13u1
+[   17s] [111/202] installing libaudit1-1:4.0.2-2+deb13u1
+[   17s] [112/202] installing libelf1t64-0.192-4
+[   17s] [113/202] installing libicu76-76.1-4
+[   17s] [114/202] installing libreadline8t64-8.2-6
+[   17s] Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8 to /lib/x86_64-linux-gnu/libhistory.so.8.usr-is-merged by libreadline8t64'
+[   17s] Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8.2 to /lib/x86_64-linux-gnu/libhistory.so.8.2.usr-is-merged by libreadline8t64'
+[   17s] Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8 to /lib/x86_64-linux-gnu/libreadline.so.8.usr-is-merged by libreadline8t64'
+[   17s] Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8.2 to /lib/x86_64-linux-gnu/libreadline.so.8.2.usr-is-merged by libreadline8t64'
+[   17s] [115/202] installing libuchardet0-0.0.8-1+b2
+[   17s] [116/202] installing libxml2-2.12.7+dfsg+really2.9.14-2.1+deb13u3
+[   17s] [117/202] installing libcc1-0-14.2.0-19
+[   17s] [118/202] installing libssl3t64-3.5.7-1~deb13u2
+[   17s] dpkg: libssl3t64:amd64: dependency problems, but configuring anyway as you requested:
+[   17s]  libssl3t64:amd64 depends on openssl-provider-legacy; however:
+[   17s]   Package openssl-provider-legacy is not installed.
+[   17s] [119/202] installing libubsan1-14.2.0-19
+[   18s] [120/202] installing libbinutils-2.44-3
+[   18s] [121/202] installing libmagic1t64-1:5.46-5
+[   18s] [122/202] installing autopoint-0.23.1-2
+[   18s] [123/202] installing perl-modules-5.40-5.40.1-6+deb13u1
+[   18s] [124/202] installing bsdutils-1:2.41.5-0+deb13u1
+[   18s] [125/202] installing dwz-0.15-1+b1
+[   18s] [126/202] installing file-1:5.46-5
+[   18s] [127/202] installing findutils-4.10.0-3
+[   18s] [128/202] installing libkmod2-34.2-2
+[   18s] [129/202] installing libproc2-0-2:4.0.4-9
+[   18s] [130/202] installing net-tools-2.10-1.3
+[   18s] [131/202] installing openssl-provider-legacy-3.5.7-1~deb13u2
+[   18s] [132/202] installing strace-6.13+ds-1
+[   18s] [133/202] installing base-passwd-3.6.7
+[   18s] [134/202] installing libctf0-2.44-3
+[   18s] [135/202] installing libmount1-2.41.5-0+deb13u1
+[   19s] [136/202] installing libmpc3-1.3.1-1+b3
+[   19s] [137/202] installing libpam0g-1.7.0-5
+[   19s] [138/202] installing sed-4.9-2+deb13u1
+[   19s] [139/202] installing tar-1.35+dfsg-3.1
+[   19s] update-alternatives: using /usr/sbin/rmt-tar to provide /usr/sbin/rmt (rmt) in auto mode
+[   19s] [140/202] installing groff-base-1.23.0-9
+[   19s] [141/202] installing gawk-1:5.2.1-2+b1
+[   19s] [142/202] installing libc6-dev-2.41-12+deb13u4
+[   19s] [143/202] installing libgprofng0-2.44-3
+[   19s] [144/202] installing libsemanage2-3.8.1-1
+[   19s] [145/202] installing e2fsprogs-1.47.2-3+b12
+[   19s] [146/202] installing coreutils-9.7-3
+[   20s] [147/202] installing gettext-0.23.1-2
+[   20s] [148/202] installing vim-2:9.1.1230-2
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/editor (editor) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/ex (ex) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rview (rview) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/rvim (rvim) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vi (vi) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/view (view) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vim (vim) in auto mode
+[   20s] update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/vimdiff (vimdiff) in auto mode
+[   20s] [149/202] installing libgcc-14-dev-14.2.0-19
+[   20s] [150/202] installing libnode115-20.19.2+dfsg-1+deb13u2
+[   20s] dpkg: libnode115:amd64: dependency problems, but configuring anyway as you requested:
+[   20s]  libnode115:amd64 depends on node-acorn (>= 6.2.1~); however:
+[   20s]   Package node-acorn is not installed.
+[   20s] [151/202] installing kmod-34.2-2
+[   20s] [152/202] installing nodejs-20.19.2+dfsg-1+deb13u2
+[   20s] dpkg: nodejs: dependency problems, but configuring anyway as you requested:
+[   20s]  nodejs depends on node-corepack; however:
+[   20s]   Package node-corepack is not installed.
+[   20s] update-alternatives: using /usr/bin/nodejs to provide /usr/bin/js (js) in auto mode
+[   20s] [153/202] installing libstdc++-14-dev-14.2.0-19
+[   21s] [154/202] installing mount-2.41.5-0+deb13u1
+[   21s] [155/202] installing libpam-modules-bin-1.7.0-5
+[   21s] [156/202] installing procps-2:4.0.4-9
+[   21s] [157/202] installing cpp-14-x86-64-linux-gnu-14.2.0-19
+[   21s] [158/202] keeping dpkg-1.22.22
+[   21s] [159/202] installing libperl5.40-5.40.1-6+deb13u1
+[   21s] [160/202] installing man-db-2.13.1-1
+[   22s] Not building database; man-db/auto-update is not 'true'.
+[   22s] [161/202] installing binutils-x86-64-linux-gnu-2.44-3
+[   22s] [162/202] installing cpp-x86-64-linux-gnu-4:14.2.0-1
+[   22s] [163/202] installing node-corepack-0.24.0-5
+[   22s] [164/202] installing cpp-14-14.2.0-19
+[   22s] [165/202] installing node-acorn-8.8.1+ds+~cs25.17.7-2
+[   22s] [166/202] installing perl-5.40.1-6+deb13u1
+[   22s] [167/202] installing binutils-2.44-3
+[   22s] [168/202] installing libpam-modules-1.7.0-5
+[   22s] [169/202] installing gcc-14-x86-64-linux-gnu-14.2.0-19
+[   23s] [170/202] installing libarchive-zip-perl-1.68-1
+[   23s] [171/202] installing libdebhelper-perl-13.24.2
+[   23s] [172/202] installing cpp-4:14.2.0-1
+[   23s] [173/202] installing gcc-x86-64-linux-gnu-4:14.2.0-1
+[   23s] [174/202] installing intltool-debian-0.35.0+20060710.6
+[   23s] [175/202] installing libdpkg-perl-1.22.22
+[   23s] [176/202] installing libpam-runtime-1.7.0-5
+[   24s] [177/202] installing autoconf-2.72-3.1
+[   24s] [178/202] installing libfile-find-rule-perl-0.34-4
+[   24s] [179/202] installing gcc-14-14.2.0-19
+[   24s] [180/202] installing g++-14-x86-64-linux-gnu-14.2.0-19
+[   24s] [181/202] installing passwd-1:4.17.4-2
+[   24s] Shadow passwords are now on.
+[   24s] [182/202] installing adduser-3.152
+[   24s] [183/202] installing automake-1:1.17-4
+[   24s] update-alternatives: using /usr/bin/automake-1.17 to provide /usr/bin/automake (automake) in auto mode
+[   24s] [184/202] installing usrmerge-39+nmu2
+[   25s] [185/202] installing g++-14-14.2.0-19
+[   25s] [186/202] installing g++-x86-64-linux-gnu-4:14.2.0-1
+[   25s] [187/202] installing libfile-stripnondeterminism-perl-1.14.1-2
+[   25s] [188/202] installing gcc-4:14.2.0-1
+[   25s] [189/202] installing po-debconf-1.0.21+nmu1
+[   25s] [190/202] installing login-1:4.16.0-2+really2.41.5-0+deb13u1
+[   25s] [191/202] installing dpkg-dev-1.22.22
+[   25s] [192/202] installing util-linux-2.41.5-0+deb13u1
+[   25s] [193/202] installing cpio-2.15+dfsg-2
+[   25s] update-alternatives: using /usr/bin/mt-gnu to provide /usr/bin/mt (mt) in auto mode
+[   25s] [194/202] installing dh-strip-nondeterminism-1.14.1-2
+[   25s] [195/202] installing user-setup-1.107
+[   25s] [196/202] installing g++-4:14.2.0-1
+[   25s] update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+[   25s] [197/202] installing libtool-2.5.4-4
+[   25s] [198/202] installing base-files-13.8+deb13u7
+[   25s] [199/202] installing build-essential-12.12
+[   25s] [200/202] installing dh-autoreconf-20
+[   26s] [201/202] installing bash-5.2.37-2+b10
+[   26s] update-alternatives: using /usr/share/man/man7/bash-builtins.7.gz to provide /usr/share/man/man7/builtins.7.gz (builtins.7.gz) in auto mode
+[   26s] [202/202] installing debhelper-13.24.2
+[   26s] configuring all installed packages...
+[   26s] Processing triggers for man-db (2.13.1-1) ...
+[   26s] Not building database; man-db/auto-update is not 'true'.
+[   26s] Processing triggers for debianutils (5.23.2) ...
+[   26s] Processing triggers for libc-bin (2.41-12+deb13u4) ...
+[   26s] now finalizing build dir...
+[   26s] SIOCSIFADDR: File exists
+[   26s] /.build/build-recipe-dsc: line 127: //usr/src/packages/BUILD/debian/control: No such file or directory
+[   26s] dpkg-source: warning: extracting unsigned source package (/usr/src/packages/SOURCES/sample-app_1.0.0-1.dsc)
+[   26s] dpkg-source: info: extracting sample-app in /usr/src/packages/BUILD
+[   26s] dpkg-source: info: unpacking sample-app_1.0.0.orig.tar.gz
+[   26s] dpkg-source: info: unpacking sample-app_1.0.0-1.debian.tar.xz
+[   26s] -----------------------------------------------------------------
+[   26s] ----- building sample-app_1.0.0-1.dsc (user abuild)
+[   26s] -----------------------------------------------------------------
+[   26s] -----------------------------------------------------------------
+[   27s] Recipe file 'sample-app_1.0.0-1.dsc' is being checked for 'DEBTRANSFORM-FILES'... not found
+[   27s] dpkg-buildpackage: info: source package sample-app
+[   27s] dpkg-buildpackage: info: source version 1.0.0-1
+[   27s] dpkg-buildpackage: info: source distribution trixie
+[   27s] dpkg-buildpackage: info: source changed by Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+[   27s]  dpkg-source --before-build .
+[   27s] dpkg-buildpackage: info: host architecture amd64
+[   27s]  debian/rules clean
+[   27s] dh clean
+[   27s]    debian/rules override_dh_auto_clean
+[   27s] make[1]: Entering directory '/usr/src/packages/BUILD'
+[   27s] rm -rf web/dist sample-app .gocache .gopath
+[   27s] make[1]: Leaving directory '/usr/src/packages/BUILD'
+[   27s]    dh_clean
+[   27s]  dpkg-source -b .
+[   27s] dpkg-source: info: using source format '3.0 (quilt)'
+[   27s] dpkg-source: info: building sample-app using existing ./sample-app_1.0.0.orig.tar.gz
+[   27s] dpkg-source: info: building sample-app in sample-app_1.0.0-1.debian.tar.xz
+[   27s] dpkg-source: info: building sample-app in sample-app_1.0.0-1.dsc
+[   27s]  debian/rules binary
+[   27s] dh binary
+[   28s]    dh_update_autotools_config
+[   28s]    dh_autoreconf
+[   28s]    debian/rules override_dh_auto_build
+[   28s] make[1]: Entering directory '/usr/src/packages/BUILD'
+[   28s] cd web && node build.mjs
+[   28s] go build -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o sample-app .
+[   37s] make[1]: Leaving directory '/usr/src/packages/BUILD'
+[   37s]    create-stamp debian/debhelper-build-stamp
+[   37s]    dh_prep
+[   37s]    debian/rules override_dh_auto_install
+[   37s] make[1]: Entering directory '/usr/src/packages/BUILD'
+[   38s] install -Dm0755 sample-app debian/sample-app/usr/bin/sample-app
+[   38s] make[1]: Leaving directory '/usr/src/packages/BUILD'
+[   38s]    dh_installdocs
+[   38s]    dh_installchangelogs
+[   38s]    dh_perl
+[   38s]    dh_link
+[   38s]    dh_strip_nondeterminism
+[   38s]    dh_compress
+[   38s]    dh_fixperms
+[   38s]    dh_missing
+[   38s]    dh_strip -a
+[   38s]    dh_makeshlibs -a
+[   38s]    dh_shlibdeps -a
+[   38s]    dh_installdeb
+[   38s]    dh_gencontrol
+[   38s]    dh_md5sums
+[   38s]    dh_builddeb
+[   38s] dpkg-deb: building package 'sample-app' in '../sample-app_1.0.0-1_amd64.deb'.
+[   40s]  dpkg-genbuildinfo -O../sample-app_1.0.0-1_amd64.buildinfo
+[   40s]  dpkg-genchanges -O../sample-app_1.0.0-1_amd64.changes
+[   40s] dpkg-genchanges: info: including full source code in upload
+[   40s]  dpkg-source --after-build .
+[   40s] dpkg-buildpackage: info: full upload (original source is included)
+[   40s] ln: failed to create hard link '///usr/src/packages/DEBS/sample-app_1.0.0-1.dsc': File exists
+[   40s] ln: failed to create hard link '///usr/src/packages/DEBS/sample-app_1.0.0.orig.tar.gz': File exists
+[   40s] ln: failed to create hard link '///usr/src/packages/DEBS/sample-app_1.0.0-1.debian.tar.xz': File exists
+[   40s] Warning: mkbaselibs missing in build root, skipping baselibs
+[   40s] ... saving statistics
+[   40s] ... saving built packages
+[   40s] DEBS/sample-app_1.0.0-1_amd64.changes
+[   40s] DEBS/sample-app_1.0.0-1.dsc
+[   40s] DEBS/sample-app_1.0.0-1_amd64.buildinfo
+[   40s] DEBS/sample-app_1.0.0-1_amd64.deb
+[   40s] DEBS/sample-app_1.0.0-1.debian.tar.xz
+[   40s] DEBS/sample-app_1.0.0.orig.tar.gz
+[   40s] OTHER/_statistics
+[   40s] 
+[   40s] sc-obs finished "build sample-app_1.0.0-1.dsc" at Thu Oct 29 15:23:33 UTC 2026.
+[   40s] 
+[   40s] ### VM INTERACTION START ###
+[   40s] [   35.397870][    T1] sysrq: Power Off
+[   40s] [   35.403035][   T10] reboot: Power down
+[   41s] ### VM INTERACTION END ###
+[   41s] build: extracting built packages...
+[   41s] DEBS/sample-app_1.0.0-1_amd64.changes
+[   41s] DEBS/sample-app_1.0.0-1.dsc
+[   41s] DEBS/sample-app_1.0.0-1_amd64.buildinfo
+[   41s] DEBS/sample-app_1.0.0-1_amd64.deb
+[   41s] DEBS/sample-app_1.0.0-1.debian.tar.xz
+[   41s] DEBS/sample-app_1.0.0.orig.tar.gz
+[   41s] OTHER/_statistics
