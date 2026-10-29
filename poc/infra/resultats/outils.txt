@@ -1,4 +1,4 @@
-# verifier-outils.sh, 2026-10-29T09:56:04Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
+# verifier-outils.sh, 2026-10-29T09:59:52Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
 OK   aqua:anchore/grype 0.104.1 : sha256 = mise.lock (2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f)
 OK   aqua:anchore/grype : signature sigstore (workflows de github.com/anchore/grype)
 OK   aqua:anchore/grype : sha256 présent dans grype_0.104.1_checksums.txt signé
@@ -34,3 +34,5 @@ OK   nix md5ikacq7vzcr3xxx58i2miy4iz0dipj-busybox-static-x86_64-unknown-linux-mu
 OK   nix cv0fsvzbdjrbjn8j6i52lfg49shvf9bg-spdx-license-list-data-3.27.0-json : signature cache.nixos.org-1
 OK   nix maqnymxaw4gp1lqfg6623iy6vhf1zir6-python3.13-reuse-6.2.0 : signature cache.nixos.org-1
 OK   nix fmn3qnmkxyyq6wg1vj14zvn53pz3jzvw-cosign-3.0.6 : signature cache.nixos.org-1
+OK   nix kfnw87zb78z6y08307px2ncgix7xdgfk-buildkit-0.25.2 : signature cache.nixos.org-1
+OK   nix mh853mhr2zp7mac5x91d189vc6ffjka0-runc-1.3.3 : signature cache.nixos.org-1

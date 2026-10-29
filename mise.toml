@@ -12,8 +12,8 @@ lockfile_platforms = ["linux-x64"]   # amd64 uniquement (docs/01)
 [tools]
 go = "1.24.7"                                   # banc B ; Go 1.26.10 : tâche outils:go-toolchain
 python = "3.13.12"                              # venv de Hermeto
-"aqua:moby/buildkit" = "0.25.2"                 # brique 04 (buildctl, buildkitd)
-"aqua:opencontainers/runc" = "1.3.3"
+"aqua:moby/buildkit" = "0.25.2"                 # brique 04 : release amont (mesure en plus) ;
+"aqua:opencontainers/runc" = "1.3.3"            # la référence est celle du nixpkgs (tâche outils:nix)
 "aqua:rootless-containers/rootlesskit" = "2.3.5" # BuildKit sans root
 "aqua:project-zot/zot" = "2.1.22"               # registre local (localhost:5000)
 "aqua:oras-project/oras" = "1.3.6"
@@ -63,10 +63,10 @@ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.26.10 GOPROXY=https://proxy.
 '''
 
 [tasks."outils:nix"]
-description = "busybox statique, liste SPDX et reuse du nixpkgs épinglé du banc B (mêmes binaires que dans le cloud, dépendances figées) ; cosign de vérification"
+description = "busybox statique, liste SPDX, reuse, BuildKit et runc du nixpkgs épinglé du banc B (mêmes binaires que dans le cloud) ; cosign de vérification"
 run = '''
 set -eu
-for p in pkgsStatic.busybox:busybox spdx-license-list-data.json:spdx reuse:reuse cosign:cosign-nix; do
+for p in pkgsStatic.busybox:busybox spdx-license-list-data.json:spdx reuse:reuse cosign:cosign-nix buildkit:buildkit-nix runc:runc-nix; do
   nix build --inputs-from ./poc/benchmarks/nix "nixpkgs#${p%%:*}" --out-link "$POC_OUTILS/${p##*:}"
 done
 "$BUSYBOX" | head -1

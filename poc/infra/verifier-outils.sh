@@ -122,7 +122,7 @@ m=golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64
 s=$(cat "$POC_OUTILS/gomodcache/cache/download/golang.org/toolchain/@v/v0.0.1-go1.26.10.linux-amd64.ziphash" 2>/dev/null)
 db=$(curl -fsS --max-time 30 "https://sum.golang.org/lookup/$m" | awk '$2 == "v0.0.1-go1.26.10.linux-amd64" {print $3}')
 [ -n "$s" ] && [ "$s" = "$db" ] && ok "go 1.26.10 : module $m, $s = sum.golang.org" || ko "go 1.26.10 : $s ≠ sum.golang.org $db"
-for l in busybox spdx-json reuse cosign-nix; do
+for l in busybox spdx-json reuse cosign-nix buildkit-nix runc-nix; do
   p=$(readlink -f "$POC_OUTILS/$l")
   nix path-info --sigs "$p" 2>/dev/null | grep -q 'cache.nixos.org-1:' \
     && ok "nix $(basename "$p") : signature cache.nixos.org-1" || ko "nix $p : signature absente"

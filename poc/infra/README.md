@@ -29,12 +29,12 @@ Les outils sont déclarés dans [`mise.toml`](../../mise.toml), à la racine du 
 mise install && mise run outils:verifier
 ```
 
-- **Backends mise** : Go 1.24.7, Python 3.13.12, BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, Zot 2.1.22, oras 1.3.6, crane 0.20.6, cosign 3.1.4, Kyverno 1.19.2, Syft 1.38.0, Grype 0.104.1 et Conforma `ec` 0.10.42.
+- **Backends mise** : Go 1.24.7 (attention : il exporte `GOROOT`, à retirer avec `env -u GOROOT -u GOBIN` pour utiliser Go 1.26.10), Python 3.13.12, BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, Zot 2.1.22, oras 1.3.6, crane 0.20.6, cosign 3.1.4, Kyverno 1.19.2, Syft 1.38.0, Grype 0.104.1 et Conforma `ec` 0.10.42.
 - **Tâches `outils:*`**, pour ce qu'aucun backend ne fournit :
   - Hermeto 0.64.0, absent de PyPI : tag source vérifié, dépendances installées avec `--require-hashes` ;
   - Go 1.26.10 comme module `golang.org/toolchain`, comme dans le cloud ;
-  - busybox statique, liste SPDX 3.27.0 et reuse 6.2.0, tirés du nixpkgs épinglé du banc B pour obtenir les mêmes binaires que dans le cloud.
-- **Vérification** ([`verifier-outils.sh`](verifier-outils.sh), résultat : [`resultats/outils.txt`](resultats/outils.txt)) : **31 contrôles réussis, aucun échec**.
+  - busybox statique, liste SPDX 3.27.0, reuse 6.2.0, **BuildKit 0.25.2 et runc 1.3.3**, tirés du nixpkgs épinglé du banc B pour obtenir les mêmes binaires que dans le cloud. Les binaires de référence de la brique 04 sont donc ceux du nixpkgs ; la release amont de BuildKit (mise) sert de mesure en plus.
+- **Vérification** ([`verifier-outils.sh`](verifier-outils.sh), résultat : [`resultats/outils.txt`](resultats/outils.txt)) : **33 contrôles réussis, aucun échec**.
   - Les sha256 de `mise.lock` viennent du service tiers `mise-versions`. Ils ont été recoupés avec les fichiers de sommes publiés par chaque projet.
   - Les signatures sont vérifiées partout où elles existent :
     - sigstore (cosign, Kyverno, Syft, Grype), avec le cosign du nixpkgs épinglé, indépendant de mise ;
