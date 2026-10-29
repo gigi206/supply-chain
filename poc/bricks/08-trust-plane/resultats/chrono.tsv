@@ -6,3 +6,17 @@ J1 VM joignables en SSH	2026-10-29T16:13:32Z
 J1 installation de k3s	2026-10-29T16:13:40Z	
 J1 server prêt	2026-10-29T16:13:54Z	
 J1 trois nœuds prêts	2026-10-29T16:14:16Z	
+VM, pool et réseau détruits	2026-10-29T16:17:54Z	
+J1 rejeu complet (jeton agent sécurisé)	2026-10-29T16:17:59Z	détruit puis recréé de zéro ; téléchargements en cache
+J1 VM définies	2026-10-29T16:18:08Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T16:18:18Z	
+J1 installation de k3s	2026-10-29T16:18:19Z	
+J1 server prêt	2026-10-29T16:18:33Z	
+J1 trois nœuds prêts	2026-10-29T16:18:56Z	
+VM, pool et réseau détruits	2026-10-29T16:19:33Z	
+J1 rejeu complet (jetons neufs)	2026-10-29T16:19:33Z	le jeton du server avait fuité dans le journal sudo des agents lors d une vérification ; tout recréé
+J1 VM définies	2026-10-29T16:19:46Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T16:19:58Z	
+J1 installation de k3s	2026-10-29T16:19:59Z	
+J1 server prêt	2026-10-29T16:20:13Z	
+J1 trois nœuds prêts	2026-10-29T16:20:36Z	

@@ -1,5 +1,8 @@
-# Brique 08 : nœud de confiance, k3s server. Jeton dans /etc/rancher/k3s/jeton (0600).
+# Brique 08 : nœud de confiance, k3s server. Jeton du server (joint des servers : ne quitte jamais ce nœud)
+# et jeton agent distinct (ne joint que des agents), tous deux en 0600 ; les agents reçoivent le jeton agent
+# au format sécurisé K10<empreinte de la CA>::…, lu dans /var/lib/rancher/k3s/server/agent-token.
 token-file: /etc/rancher/k3s/jeton
+agent-token-file: /etc/rancher/k3s/jeton-agent
 node-ip: 192.168.161.11
 tls-san:
   - 192.168.161.11

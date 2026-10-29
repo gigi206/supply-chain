@@ -1,4 +1,4 @@
-# controles.sh j1, 2026-10-29T16:14:44Z
+# controles.sh j1, 2026-10-29T16:20:43Z
 ## sc-confiance
 noyau : 6.12.113+deb13-amd64 ; vCPU : 4 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
   x86-64-v4
@@ -8,7 +8,7 @@ drapeaux avx512 : 0
 vmx : 0 vCPU sur 4
 /dev/kvm absent
                total        used        free      shared  buff/cache   available
-Mem:            7947         971        6130           1        1090        6976
+Mem:            7947        1053        6049           1        1088        6893
 /dev/vda1        15G  1.6G   13G  12% /
 sortie NAT (deb.debian.org) : 200
 active inactive
@@ -19,11 +19,11 @@ noyau : 6.12.113+deb13-amd64 ; vCPU : 6 ; modèle :  Intel Core Processor (Haswe
   x86-64-v2 (supported, searched)
 drapeaux avx512 : 0
 vmx : 6 vCPU sur 6
-crw-rw---- 1 root kvm 10, 232 Oct 29 16:13 /dev/kvm
+crw-rw---- 1 root kvm 10, 232 Oct 29 16:19 /dev/kvm
 kvm_intel             417792  0
 kvm                  1396736  1 kvm_intel
                total        used        free      shared  buff/cache   available
-Mem:            9950         573        8765           0         857        9376
+Mem:            9950         565        8778           0         853        9385
 /dev/vda1        30G  1.4G   27G   5% /
 sortie NAT (deb.debian.org) : 200
 inactive active
@@ -36,29 +36,29 @@ drapeaux avx512 : 0
 vmx : 0 vCPU sur 2
 /dev/kvm absent
                total        used        free      shared  buff/cache   available
-Mem:            5931         508        4798           0         853        5422
+Mem:            5931         495        4815           0         850        5436
 /dev/vda1        20G  1.4G   18G   8% /
 sortie NAT (deb.debian.org) : 200
 inactive active
 ## cluster
 k3s version v1.35.9+k3s1 (58877f27)
 NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>          42s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane   55s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>          32s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+sc-build       Ready    <none>          21s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   35s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          10s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
 NŒUD           TAINTS
 sc-build       [map[effect:NoSchedule key:zone value:build]]
 sc-confiance   <none>
 sc-stockage    <none>
 NAMESPACE     NAME                                     READY   STATUS    RESTARTS   AGE   IP          NODE           NOMINATED NODE   READINESS GATES
-kube-system   coredns-b644fd95b-tc9tt                  1/1     Running   0          50s   10.42.0.3   sc-confiance   <none>           <none>
-kube-system   local-path-provisioner-d9d8769b6-zhtlp   1/1     Running   0          50s   10.42.0.4   sc-confiance   <none>           <none>
-kube-system   metrics-server-7f4b6d9bd7-kvplr          1/1     Running   0          50s   10.42.0.2   sc-confiance   <none>           <none>
+kube-system   coredns-b644fd95b-7xqrr                  1/1     Running   0          31s   10.42.0.2   sc-confiance   <none>           <none>
+kube-system   local-path-provisioner-d9d8769b6-gkvfv   1/1     Running   0          31s   10.42.0.4   sc-confiance   <none>           <none>
+kube-system   metrics-server-7f4b6d9bd7-z2clt          1/1     Running   0          31s   10.42.0.3   sc-confiance   <none>           <none>
 contrôleur de NetworkPolicy (kube-router) : 33 règles KUBE-ROUTER
-NAME           CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
-sc-build       22m          0%       266Mi           2%          
-sc-confiance   81m          2%       686Mi           8%          
-sc-stockage    25m          1%       245Mi           4%          
+NAME           CPU(cores)   CPU(%)      MEMORY(bytes)   MEMORY(%)   
+sc-confiance   504m         12%         638Mi           8%          
+sc-build       <unknown>    <unknown>   <unknown>       <unknown>   
+sc-stockage    <unknown>    <unknown>   <unknown>       <unknown>   
 ## images système sur sc-confiance
 docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
 docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
@@ -87,8 +87,8 @@ docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
 docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
 docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
 ## hôte : RSS des processus QEMU
-sc-confiance : 2510 Mo
-sc-build : 2022 Mo
-sc-stockage : 1728 Mo
+sc-confiance : 2509 Mo
+sc-build : 1804 Mo
+sc-stockage : 1642 Mo
                total        used        free      shared  buff/cache   available
-Mem:           62742       37514       19902        7467       13526       25227
+Mem:           62742       37270       22561        7462       11244       25471
