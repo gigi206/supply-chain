@@ -40,7 +40,7 @@ Journal : [`resultats/bench-laptop.log`](resultats/bench-laptop.log). Outils de 
 
 | Mesure | Cloud (root) | Laptop (rootless) |
 |---|---|---|
-| **Image sample-app** | `sha256:3a7ca1b1…` | **identique**, 10 h 45 plus tard, sur un autre hôte |
+| **Image sample-app** | `sha256:3a7ca1b1…` | **identique**, 11 h 09 plus tard, sur un autre hôte (et sur deux passages complets) |
 | Binaire dans l'image | `e3749c68…` | **identique** |
 | Image de build, 2 builds | identique (`bdd56bab…`) | identique (`509f03bb…`), mais **différente du cloud** |
 | Négatifs (sans fermeture, sortie réseau) | refusés | refusés |

@@ -45,6 +45,18 @@ mise install && mise run outils:verifier
   - **Sans signature publiée** : Zot et Conforma (constat du doc 04), BuildKit (provenance amont non signée), crane (provenance SLSA non vérifiée : il faudrait slsa-verifier). Pour ces quatre outils, seul le sha256 est contrôlé, contre le fichier de sommes amont.
   - mise ne vérifie aucune signature à l'installation quand `mise.lock` contient déjà les sommes (« skipping provenance detection »). D'où ce script, à relancer à chaque changement de version.
 
+## Rejeu des bancs (4b)
+
+```bash
+mise run bancs
+```
+
+[`bancs-laptop.sh`](bancs-laptop.sh) rejoue les bancs dans l'ordre B, C, 02, 03, 04 (BuildKit du nixpkgs puis release amont), 07a et 13a, en environ 9 minutes. Le registre Zot et les démons BuildKit rootless sont éphémères, et les journaux vont dans `*/resultats/*-laptop.*`. Le script règle deux pièges propres au laptop :
+- les shims de mise sont retirés du `PATH`, car Hermeto sonde chaque `go` qu'il y trouve ;
+- `GOROOT` est retiré de l'environnement, car le Go 1.24.7 de mise l'exporte et Go 1.26.10 prendrait sinon sa bibliothèque standard.
+
+Deux passages complets ont donné les mêmes empreintes. Les résultats sont dans [`docs/03`](../../docs/03-validation-briques.md#rejeu-sur-le-laptop-29102026).
+
 ## Dimensionnement
 
 **Validé par le propriétaire le 29/10/2026** : pas de cluster pour 4b, **kind jetable pour A1**, **VM libvirt + k3s (topologie T2, profil nominal) pour la brique 08 et la suite**. Les changements sur l'hôte (pool, réseau, téléchargements) restent confirmés un par un au moment de les faire.

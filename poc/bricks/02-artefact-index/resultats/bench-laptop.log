@@ -1,11 +1,11 @@
-# bench.sh (laptop), 2026-10-29T10:06:41Z, zot v2.1.22 local, Python 3.13.12, COUNT=10000 + banc C (17 images cosign)
+# bench.sh (laptop), 2026-10-29T10:29:51Z, zot v2.1.22 local, Python 3.13.12, COUNT=10000 + banc C (17 images cosign)
 10000 artefacts et provenances poussés
-génération : 104 s
-67 dépôts parcourus en 19.2 s ; {'artifacts': 10017, 'statements': 10066, 'subjects': 10066, 'deps': 200084, 'signatures': 16}
-67 dépôts parcourus en 14.6 s ; {'artifacts': 10017, 'statements': 10066, 'subjects': 10066, 'deps': 200084, 'signatures': 16}
+génération : 172 s
+67 dépôts parcourus en 22.8 s ; {'artifacts': 10017, 'statements': 10066, 'subjects': 10066, 'deps': 200084, 'signatures': 16}
+67 dépôts parcourus en 15.7 s ; {'artifacts': 10017, 'statements': 10066, 'subjects': 10066, 'deps': 200084, 'signatures': 16}
 taille de l'index : 120M
 20 résultat(s) en 0 ms
 built-with (dépendance canari) : exact (20 artefacts)
 1 résultat(s) en 0 ms
 synth/projet-07	sha256:4704d67a3b31efb784fa9238a49367084d3265e7792aca22154b61f2173e3cd2	https://slsa.dev/provenance/v1	referrer-bundle	sha256:5ae1578761e2494de6f2c3323721ab6be0dd7772d2ba711ec7629fbc51d677c5#0	couche de sha256:4704d67a3b31efb784fa9238a49367084d3265e7792aca22154b61f2173e3cd2
-exit=0 durée=138 s
+exit=0 durée=211 s

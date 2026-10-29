@@ -1,4 +1,4 @@
-# bench.sh (laptop), 2026-10-29T10:17:05Z, syft 1.38.0 (mise/aqua, PATH réduit à syft), reuse, version 6.2.0 et liste SPDX 3.27.0 (nixpkgs b6018f87da91), go1.26.10
+# bench.sh (laptop), 2026-10-29T10:37:33Z, syft 1.38.0 (mise/aqua, PATH réduit à syft), reuse, version 6.2.0 et liste SPDX 3.27.0 (nixpkgs b6018f87da91), go1.26.10
 OK   oras v1.3.6 : 23 composants, erreurs 0, avertissements 4, NOASSERTION 0, invalides 0
 OK   négatif, licences non recherchées : refusé (23 composants, erreurs 23, avertissements 0, NOASSERTION 23, invalides 0)
 OK   sample-app : 3 composants, erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
@@ -8,7 +8,7 @@ OK   sample-app : 3 composants, erreurs 0, avertissements 0, NOASSERTION 0, inva
      warning  pkg:golang/example.com/lgpl-demo@v1.0.0 : warn : LGPL-2.1-only
      error    pkg:golang/example.com/lgpl-absent@v1.0.0 : warn : LGPL-2.1-only; source à fournir introuvable dans la fermeture
 OK   cas synthétiques : verdicts attendus
-OK   bundle de sources attaché en referrer à localhost:5000/porte13a/app@sha256:d2455cadada489c6f9c335dc898afa8bedb2c98d9f68ce7030e5b02d0139bfbd (rétention P10Y)
+OK   bundle de sources attaché en referrer à localhost:5000/porte13a/app@sha256:aa1e4eb9a9d550dc27ddbe1a29a0bd1172ced0857ee7c81b55a2fe564059e283 (rétention P10Y)
 OK   REUSE : sample-app conforme
 OK   négatif REUSE : fichier sous GPL-3.0-only sans texte de licence refusé (Missing licenses: GPL-3.0-only)
 exit=0 durée=3 s

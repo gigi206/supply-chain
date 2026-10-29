@@ -13,7 +13,7 @@ Grille : [ADR 0000 §3](../../../../docs/adr/0000-assembler-ou-adopter.md) (fig�
 
 ## Rejeu sur le laptop (29/10/2026) : B-1 sur deux hôtes
 
-Second hôte : le laptop de l'[infra du PoC](../../../infra/README.md) (Intel i7-11800H, Ubuntu 26.04, noyau 7.0), outils épinglés par [`mise.toml`](../../../../mise.toml), mêmes versions qu'ici. Écart avec les mesures du cloud : **11 h 31** pour le binaire, **10 h 45** pour l'image.
+Second hôte : le laptop de l'[infra du PoC](../../../infra/README.md) (Intel i7-11800H, Ubuntu 26.04, noyau 7.0), outils épinglés par [`mise.toml`](../../../../mise.toml), mêmes versions qu'ici. Écart avec les mesures du cloud : **11 h 56** pour le binaire, **11 h 09** pour l'image (passage final ; deux passages complets ont donné les mêmes empreintes).
 
 | Empreinte | Cloud (28/10) | Laptop (29/10) |
 |---|---|---|

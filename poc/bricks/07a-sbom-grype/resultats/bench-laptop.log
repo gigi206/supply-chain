@@ -1,8 +1,8 @@
-# bench.sh (laptop), 2026-10-29T10:13:54Z, syft 1.38.0, grype 0.104.1 (mise/aqua), base localhost:5000/vulndb/grype@sha256:a2605478740f995e6de1287e7ec22cc1fc94a1e4ece22c27afba3e46627c2db6, conforma ec v0.10.42, kyverno 1.19.2, cosign v3.1.4
-base importée hors réseau en 71 s : Schema: v6.1.10 Built: 2026-10-29T06:23:34Z
+# bench.sh (laptop), 2026-10-29T10:36:14Z, syft 1.38.0, grype 0.104.1 (mise/aqua), base localhost:5000/vulndb/grype@sha256:a2605478740f995e6de1287e7ec22cc1fc94a1e4ece22c27afba3e46627c2db6, conforma ec v0.10.42, kyverno 1.19.2, cosign v3.1.4
+base importée hors réseau en 70 s : Schema: v6.1.10 Built: 2026-10-29T06:23:34Z
 SBOM fusionné : pkg:golang/None~/.cache/supply-chain-poc/w/b03/canon/source.origin@v1.0.0, pkg:golang/github.com/go-chi/chi/v5@v5.2.3, pkg:golang/stdlib@1.26.10, pkg:npm/marked@16.4.1, pkg:npm/sample-app-web@1.0.0
-scan ok en 640 ms : 5 vulnérabilités dont 0 KEV : -
-scan kev en 630 ms : 13 vulnérabilités dont 2 KEV : CVE-2021-44228, CVE-2021-45046
+scan ok en 660 ms : 5 vulnérabilités dont 0 KEV : -
+scan kev en 680 ms : 13 vulnérabilités dont 2 KEV : CVE-2021-44228, CVE-2021-45046
 OK   porte, cas ok : attendu PASS ; Conforma PASS ; Kyverno PASS
 OK   porte, cas kev : attendu FAIL ; Conforma FAIL ; Kyverno FAIL ; motif : KEV sans VEX valide : GHSA-7rjr-3q55-vv33; KEV sans VEX valide : GHSA-jfh8-c2jp-5v3q
-exit=0 durée=80 s
+exit=0 durée=79 s

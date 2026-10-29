@@ -33,7 +33,7 @@ Le détail par cas est dans [`resultats.md`](resultats.md).
 
 ### Rejeu sur le laptop (29/10/2026)
 
-Mêmes versions (outils de [`mise.toml`](../../../../mise.toml), sommes et signatures vérifiées), même registre Zot v2.1.22 : **17 cas sur 17 avec les mêmes verdicts et les mêmes motifs** pour les deux moteurs ([`resultats-laptop.md`](resultats-laptop.md)). Temps médian : Conforma **750 ms** (max 4 350 ms), Kyverno **330 ms** (max 370 ms). C-6 ne change pas (≤ 5 s pour les deux).
+Mêmes versions (outils de [`mise.toml`](../../../../mise.toml), sommes et signatures vérifiées), même registre Zot v2.1.22 : **17 cas sur 17 avec les mêmes verdicts et les mêmes motifs** pour les deux moteurs ([`resultats-laptop.md`](resultats-laptop.md)). Temps médian : Conforma **1 030 ms** (max 2 040 ms ; 750 ms au premier passage), Kyverno **330 ms** (max 350 ms). C-6 ne change pas (≤ 5 s pour les deux).
 
 Le premier passage a affiché une durée **négative** (−59 ms). `run.sh` mesurait avec `date +%s%3N`, une horloge murale qui peut reculer. Il utilise désormais `/proc/uptime`, une horloge monotone au centième de seconde, comme le banc de la brique 07a.
 

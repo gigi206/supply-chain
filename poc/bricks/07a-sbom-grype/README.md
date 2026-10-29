@@ -29,7 +29,7 @@ Syft 1.38.0 et Grype 0.104.1 viennent du nixpkgs 25.11 épinglé (binaires de ca
 
 La donnée KEV vient de la base Grype v6 elle-même (`knownExploited`, catalogue CISA). Aucun flux externe n'est consulté au moment du scan.
 
-**Rejeu sur le laptop (29/10/2026)** ([`resultats/bench-laptop.log`](resultats/bench-laptop.log)) : base du 29/10 (v6.1.10) importée hors réseau en **71 s** ; mêmes résultats que dans le cloud, soit 5 vulnérabilités et 0 KEV pour sample-app, 13 dont 2 KEV pour le cas log4j, et une porte PASS / FAIL dans les deux moteurs.
+**Rejeu sur le laptop (29/10/2026)** ([`resultats/bench-laptop.log`](resultats/bench-laptop.log)) : base du 29/10 (v6.1.10) importée hors réseau en **70 s** ; mêmes résultats que dans le cloud, soit 5 vulnérabilités et 0 KEV pour sample-app, 13 dont 2 KEV pour le cas log4j, et une porte PASS / FAIL dans les deux moteurs.
 
 ## Constats
 

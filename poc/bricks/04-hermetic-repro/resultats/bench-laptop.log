@@ -1,4 +1,4 @@
-# bench.sh (laptop), 2026-10-29T10:10:42Z, buildkit 0.25.2 + runc 1.3.3 (nixpkgs b6018f87da91, démon éphémère ROOTLESS via rootlesskit 2.3.5 --net=host, oci worker, snapshotter native, sans Docker), go 1.26.10 (module golang.org/toolchain), busybox v1.36.1 statique (nixpkgs)
+# bench.sh (laptop), 2026-10-29T10:34:28Z, buildkit 0.25.2 + runc 1.3.3 (nixpkgs b6018f87da91, démon éphémère ROOTLESS via rootlesskit 2.3.5 --net=host, oci worker, snapshotter native, sans Docker), go 1.26.10 (module golang.org/toolchain), busybox v1.36.1 statique (nixpkgs)
 OK   image de build identique sur 2 builds (sha256:509f03bb8f98616e9ffd374bb8167b3f52f476bc763a840353b66e18f9560a13)
 OK   image sample-app identique sur 2 builds sans cache, 2 chemins (sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
 OK   binaire dans l'image = binaire de la brique 03, compilé hors BuildKit (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
@@ -6,10 +6,10 @@ OK   négatif : build sans fermeture refusé (github.com/go-chi/chi/v5@v5.2.3: r
 OK   négatif : sortie réseau refusée dans l'étape --network=none (wget: bad address 'proxy.golang.org')
 exit=0 durée=51 s
 
-# passage supplémentaire, 2026-10-29T10:12:19Z : release AMONT buildkit 0.25.2 + runc 1.3.3 (mise / aqua, sha256 vérifiés), rootless, mêmes entrées
+# passage supplémentaire, 2026-10-29T10:35:20Z : release AMONT buildkit v0.25.2 + runc 1.3.3 (mise / aqua, sha256 vérifiés), rootless, mêmes entrées
 OK   image de build identique sur 2 builds (sha256:509f03bb8f98616e9ffd374bb8167b3f52f476bc763a840353b66e18f9560a13)
 OK   image sample-app identique sur 2 builds sans cache, 2 chemins (sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
 OK   binaire dans l'image = binaire de la brique 03, compilé hors BuildKit (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
 OK   négatif : build sans fermeture refusé (github.com/go-chi/chi/v5@v5.2.3: reading file:///deps/deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2)
 OK   négatif : sortie réseau refusée dans l'étape --network=none (wget: bad address 'proxy.golang.org')
-exit=0 durée=51 s
+exit=0 durée=53 s

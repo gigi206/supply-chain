@@ -1,12 +1,13 @@
-# bench.sh (laptop), 2026-10-29T10:09:13Z, hermeto 0.64.0, oras 1.3.6, zot v2.1.22 (dedupe), go version go1.26.10 linux/amd64, GOROOT toolchain@v0.0.1-go1.26.10.linux-amd64, node v22.22.0
-v1.3.6 : 155 couches, 6422389 octets ; partagées avec v1.3.5 : 150 couches, 5971736 octets (93.0 %)
+# bench.sh (laptop), 2026-10-29T10:33:22Z, hermeto 0.64.0, oras 1.3.6, zot v2.1.22 (dedupe), go version go1.26.10 linux/amd64, GOROOT toolchain@v0.0.1-go1.26.10.linux-amd64, node v22.22.0
+v1.3.6 : 155 couches, 6420437 octets ; partagées avec v1.3.5 : 149 couches, 5964280 octets (92.9 %)
   nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/list
   nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.info
   nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.zip
   nouvelle : deps/gomod/pkg/mod/cache/download/oras.land/oras-go/v2/@v/v2.7.0.ziphash
-  nouvelle : deps/gomod/pkg/mod/cache/download/sumdb/sum.golang.org/tile/8/0/x274/921.p/158
-Registre : +6624763 octets pour v1.3.5, +663555 octets pour v1.3.6
-OK   même fermeture repoussée : même digest (localhost:5000/deps/oras@sha256:625d0f7c9cc48e2a6ceb6b34fcc1b00356a71b0f35dd9fd081147f43a5054224)
+  nouvelle : deps/gomod/pkg/mod/cache/download/sumdb/sum.golang.org/tile/8/0/x274/927.p/91
+  nouvelle : deps/gomod/pkg/mod/cache/download/sumdb/sum.golang.org/tile/8/1/x001/073.p/239
+Registre : +6627548 octets pour v1.3.5, +669058 octets pour v1.3.6
+OK   même fermeture repoussée : même digest (localhost:5000/deps/oras@sha256:123a2c860f23ec7555ab7f0755068f834d6df44079f2cfebbf7c08c37046ff7d)
 OK   arbre restauré identique (155 fichiers)
 OK   oras construit depuis la fermeture restaurée : identique (cc397d5e5614dc84455a885de769326d839aa7c5ea0b5fc7eb6a42a2eafddac3)
 OK   sample-app sample-app identique après restauration (e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11)
@@ -14,4 +15,4 @@ OK   sample-app web/dist/index.html identique après restauration (4edbd0c5062a0
 OK   sample-app web/dist/marked.umd.js identique après restauration (aced561246e2cf95f6a7007310a73c2edfc86e2ee136ae0c11a59f9ac8fee097)
 OK   pull par tag refusé
 OK   blob altéré dans le registre refusé (mismatched digest)
-exit=0 durée=55 s
+exit=0 durée=64 s

@@ -9,7 +9,7 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 | Banc | Statut | Résultat | Détail |
 |---|---|---|---|
 | **B. Nix ou Hermeto** | Partie locale faite ; **B-1 de la référence mesuré sur 2 hôtes** | **Nix 74, référence 91** (provisoire) : binaire `99ddc97c` et image `3a7ca1b1` retrouvés sur le laptop, > 10 h après le cloud. Nix reste en veille. Constat : l'environnement de `hermeto generate-env` laisse passer un zip Go altéré | [résultats](../poc/benchmarks/nix/resultats/README.md) |
-| **C. Kyverno seul ou Conforma + Kyverno** | Partie locale faite, **rejouée sur le laptop** (17/17, médianes 750 et 330 ms) | **76 / 63** (provisoire), décision suspendue (TSA, parité à l'admission). Constat : confusion signature / attestation de cosign v3 | [résultats](../poc/benchmarks/kyverno-seul/resultats/README.md) |
+| **C. Kyverno seul ou Conforma + Kyverno** | Partie locale faite, **rejouée sur le laptop** (17/17, médianes 1 030 et 330 ms) | **76 / 63** (provisoire), décision suspendue (TSA, parité à l'admission). Constat : confusion signature / attestation de cosign v3 | [résultats](../poc/benchmarks/kyverno-seul/resultats/README.md) |
 | A1. Konflux, A2. OBS | **Laptop** | — | [protocoles](../poc/benchmarks/README.md) |
 
 ## Briques
@@ -31,9 +31,10 @@ Outils déclarés dans [`mise.toml`](../mise.toml) aux versions du cloud, sommes
 |---|---|---|
 | `make test` | 24 tests sur 24 | **Corrigé** : `sync.py` (brique 01) lisait les messages de git, traduits sous `fr_FR.UTF-8` → git lancé avec `LC_ALL=C` |
 | B (`hermeto.sh`) | Binaire `99ddc97c` et `web/dist` identiques ; T1 à T3 comme attendu | Aucun |
+| Rejeu complet (`mise run bancs`) | Deux passages successifs : mêmes empreintes | Seuls varient le digest de la fermeture 03 (tuiles `sumdb`) et l'image de test de 13a |
 | C | 17/17, mêmes motifs | Temps mesurés désormais avec une horloge monotone |
-| 02 | Requêtes exactes, reconstruction en 19 s | Aucun sur les résultats |
-| 03 | sample-app `e3749c68`, oras `cc397d5e` identiques ; dédup 93,0 % | Digest de fermeture différent (tuiles `sumdb` datées), attendu |
+| 02 | Requêtes exactes, reconstruction en 23 s | Aucun sur les résultats |
+| 03 | sample-app `e3749c68`, oras `cc397d5e` identiques ; dédup 92,9 % | Digest de fermeture différent (tuiles `sumdb` datées), attendu |
 | 04 | **Image `3a7ca1b1` identique**, en rootless, avec le BuildKit du nixpkgs comme avec la release amont | Image **de build** différente : entrées non archivées par digest dans le cloud (enseignement pour la brique 11) |
 | 07a | Mêmes vulnérabilités, porte PASS / FAIL | Base du jour |
 | 13a | Sortie identique | **Corrigé** : le SBOM de Syft dépendait d'un `go` dans le `PATH` (module principal ajouté sans licence) |
@@ -58,7 +59,7 @@ Prérequis :
 | Fermetures | Tâches prefetch et build Tekton (chemins fixes, fermeture en lecture seule, digest dans `resolvedDependencies`) ; Traefik (gomod + yarn berry) et tests d'altération yarn | 03, 04 |
 | Scan | Import quotidien de la base Grype (CronJob) vers un volume en lecture seule ; scan en tâche de confiance signé par la clé du scanner ; images et rpm/deb (`distro=`) | 07a |
 | Licences | Tâche de confiance signée ; rpm/deb : licences des métadonnées de distro en SPDX, SRPM et `.dsc` en referrer | 13a, 05, 06 |
-| Images | BuildKit **en pod** (rootless avec seccomp/AppArmor, ou Kata), push en tâche séparée, NetworkPolicy deny-all ; 2 hôtes à ≥ 1 h d'écart | 04, B |
+| Images | BuildKit **en pod** (rootless avec seccomp/AppArmor, ou Kata), push en tâche séparée, NetworkPolicy deny-all ; ~~2 hôtes à ≥ 1 h d'écart~~ (fait le 29/10/2026, BuildKit rootless hors pod) ; entrées de l'image de build archivées par digest (brique 11) | 04, B |
 | Packaging | mock (rocky-9) et sbuild (debian-13) bit-identiques, isolation user namespace, gVisor ou Kata | 05, 06 |
 | Replay | Domaine d'administration distinct, clé de VSA séparée, ≥ 24 h d'écart | 10 |
 | Observabilité | Prometheus, Alertmanager, Grafana ; 5 alertes critiques sur incident simulé | 19 |

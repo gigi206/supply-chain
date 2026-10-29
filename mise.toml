@@ -79,3 +79,8 @@ ls "$SPDX/licenses.json" "$SPDX/exceptions.json"
 description = "Empreintes et signatures de tous les outils (cosign du nixpkgs épinglé, GPG en trousseau temporaire)"
 depends = ["outils"]
 run = "poc/infra/verifier-outils.sh | sed \"s#$HOME#~#g\" | tee poc/infra/resultats/outils.txt"
+
+[tasks.bancs]
+description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
+depends = ["outils"]
+run = "poc/infra/bancs-laptop.sh"
