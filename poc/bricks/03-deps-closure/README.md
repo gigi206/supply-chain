@@ -28,6 +28,8 @@ Banc : **oras v1.3.5 puis v1.3.6**, deux versions proches d'un vrai projet Go (2
 | Pull par tag | **Refusé** |
 | Blob altéré dans le stockage du registre | **Refusé** (« mismatched digest ») |
 
+**Rejeu sur le laptop (29/10/2026)** ([`resultats/bench-laptop.log`](resultats/bench-laptop.log)) : **binaires identiques au cloud**, sample-app `e3749c68…` (Go 1.26.10), oras `cc397d5e…` et `web/dist`. Déduplication **93,0 %** (92,9 %), négatifs refusés. Le digest de la fermeture change (`625d0f7c…` contre `2cab9804…`), comme prévu : les tuiles `sumdb` dépendent de la date du prefetch.
+
 ## Constats
 
 - **Chemins canoniques obligatoires.** Hermeto inscrit des chemins absolus dans `.build-config.json` et dans le lockfile npm réécrit par `inject-files`. La fermeture doit donc être restaurée **au même chemin** qu'au prefetch. Les pods de build monteront sources et fermeture à des chemins fixes (par exemple `/workspace/source` et `/workspace/deps`), et le replay fera de même.

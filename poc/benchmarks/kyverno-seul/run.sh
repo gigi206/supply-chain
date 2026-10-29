@@ -32,7 +32,8 @@ indent = lambda p: "\n".join(" " * 12 + l for l in open(p).read().strip().splitl
 open(sys.argv[4], "w").write(tmpl.replace("__CHAINS_PUB__", indent(sys.argv[2])).replace("__VSA_PUB__", indent(sys.argv[3])))
 PY
 
-ms() { date +%s%3N; }
+# Horloge monotone (/proc/uptime, au centième) : date +%s%3N suit l'horloge murale, qui peut reculer.
+ms() { local u; read -r u _ < /proc/uptime; echo $(( 10 * 10#${u/./} )); }
 
 {
   echo "| Cas | Attendu | Conforma | Kyverno | Conforma (ms) | Kyverno (ms) | Motif Conforma | Motif Kyverno |"

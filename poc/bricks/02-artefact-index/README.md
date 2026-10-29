@@ -35,6 +35,8 @@ Registre Zot local peuplé avec :
 
 Tests unitaires ([`tools/index/test_index.py`](../../../tools/index/test_index.py), registre en mémoire) : 5 tests réussis. Ils couvrent les deux formats (referrer et `.att`), le fichier brut, les signatures non comptées comme attestations, le recrawl idempotent (ni bundle ni blob relu) et les `materials` v0.2.
 
+**Rejeu sur le laptop (29/10/2026)** ([`resultats/bench-laptop.log`](resultats/bench-laptop.log)) : requêtes **exactes** et identiques au cloud (même artefact retrouvé pour le fichier brut), en 0 ms ; reconstruction en **19 s** (58 s dans le cloud). Les compteurs diffèrent de 2 dépôts et 6 artefacts, parce que le registre du cloud contenait déjà les fermetures de la brique 03.
+
 ## Limites et suite
 
 - Le recrawl incrémental relit tous les tags. Au-delà de quelques dizaines de milliers d'artefacts, il faudra s'abonner aux **événements de Zot** (extension `events`, à vérifier) ou à ceux de Chains, et garder le recrawl complet en contrôle périodique.

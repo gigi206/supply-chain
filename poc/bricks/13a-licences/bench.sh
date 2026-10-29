@@ -48,9 +48,12 @@ extract() {
   (cd "$1" && unshare -rn env -i PATH="$PATH" HOME="$W" GOMODCACHE="$3" GOTOOLCHAIN=local GOSUMDB=off \
     GOFLAGS=-mod=readonly GOPROXY="file://$2/deps/gomod/pkg/mod/cache/download" "$GO" mod download)
 }
+# Syft analyse les sources Go avec le `go` du PATH s'il en trouve un : le module principal
+# apparaît alors, sans licence. PATH réduit à Syft pour que le SBOM ne dépende que des entrées.
+syft_bin=$(command -v "$SYFT")
 syft_dir() { # $1 = sources, $2 = cache de modules, $3 = sortie, $4 = recherche de licences (true|false)
-  unshare -rn env SYFT_CHECK_FOR_APP_UPDATE=false SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES="$4" \
-    SYFT_GOLANG_LOCAL_MOD_CACHE_DIR="$2" "$SYFT" scan "dir:$1" -o "cyclonedx-json=$3" -q
+  unshare -rn env PATH="${syft_bin%/*}" SYFT_CHECK_FOR_APP_UPDATE=false SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES="$4" \
+    SYFT_GOLANG_LOCAL_MOD_CACHE_DIR="$2" "$syft_bin" scan "dir:$1" -o "cyclonedx-json=$3" -q
 }
 
 # 1. Dépendances réelles.

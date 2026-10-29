@@ -36,6 +36,12 @@ La politique fournie vise une **application distribuée en binaire sous licence 
 
 Tests unitaires ([`test_licences.py`](test_licences.py)) : 9 tests réussis. Ils couvrent la grammaire SPDX et la normalisation, les expressions invalides, NOASSERTION et curation, les PURL écrits autrement, OR et AND, les licences hors politique, les `LicenseRef`, les entrées non SPDX, les exclusions et les obligations de sources.
 
+## Rejeu sur le laptop (29/10/2026)
+
+Journal : [`resultats/bench-laptop.log`](resultats/bench-laptop.log). **Sortie identique au cloud** (7 contrôles sur 7), à un détail près : le digest de l'image de test régénérée à chaque passage.
+
+**Constat : le SBOM de Syft dépend de l'hôte.** Le premier passage a trouvé 4 composants pour sample-app, dont un `NOASSERTION` (ERROR), contre 3 dans le cloud. Quand un `go` est dans le `PATH`, Syft 1.38 analyse les sources (métadonnées `go-source-entry`) et ajoute le **module principal** `example.com/supply-chain/sample-app`, sans version ni licence. Sans `go` dans le `PATH`, il ne l'ajoute pas. Ni le cache de modules ni le réseau n'y sont pour rien (vérifié avec un cache vide et sans réseau). Correctif du banc : Syft est lancé avec un `PATH` réduit à son seul dossier. Sur la plateforme, la tâche de scan tournera dans une image épinglée par digest, sans toolchain. La licence du module principal (le produit lui-même) relève de REUSE, pas du SBOM des dépendances.
+
 ## Constats
 
 - **Les 4 avertissements d'oras ne sont pas cosmétiques.** Trois viennent de fichiers de licence que Syft ne reconnaît pas (empreinte au lieu d'un identifiant). Pour `go.yaml.in/yaml/v4`, le fichier ignoré contient probablement la part MIT d'une licence double, que la déclaration « Apache-2.0 » omet. C'est le rôle de **ScanCode** (brique 13b) de trancher ces cas.

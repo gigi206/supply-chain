@@ -1,0 +1,15 @@
+# hermeto.sh (laptop), 2026-10-29T10:04:28Z, hermeto 0.64.0, go version go1.24.7 linux/amd64, node v22.22.0, npm 10.9.4
+Fermeture : 219145 octets
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+B-1 sample-app : 99ddc97c9fa3ddb3e9e90e3330597e65ef6256b379bb37cd2f52d44bcf4c862b (identique)
+B-1 web/dist/index.html : 4edbd0c5062a0ca56bf30317e0a21df520e156682e104a95d220d453abe097d9 (identique)
+B-1 web/dist/marked.umd.js : aced561246e2cf95f6a7007310a73c2edfc86e2ee136ae0c11a59f9ac8fee097 (identique)
+T1 zip Go altéré, env Hermeto, go build : accepté (attendu)
+T1 zip Go altéré, env Hermeto, go mod verify : rejeté (attendu)
+T2 zip Go altéré, GOPROXY en lecture seule : rejeté (attendu)
+T3 archive npm altérée : rejeté (attendu)
+SBOM : 179 composants, {'pkg:golang': 177, 'pkg:npm': 2}, 173 sans version (bibliothèque standard Go)
+   pkg:golang/github.com/go-chi/chi/v5@v5.2.3?type=module
+   pkg:npm/marked@16.4.1
+exit=0 durée=17 s

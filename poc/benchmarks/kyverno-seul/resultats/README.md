@@ -31,6 +31,12 @@ Le détail par cas est dans [`resultats.md`](resultats.md).
 - **Temps médian par artefact** : Conforma 987 ms (max 1 162), Kyverno 498 ms (max 574).
 - **Taille des règles** : Conforma 77 lignes de Rego + 13 lignes de données ; Kyverno 88 lignes de YAML/CEL.
 
+### Rejeu sur le laptop (29/10/2026)
+
+Mêmes versions (outils de [`mise.toml`](../../../../mise.toml), sommes et signatures vérifiées), même registre Zot v2.1.22 : **17 cas sur 17 avec les mêmes verdicts et les mêmes motifs** pour les deux moteurs ([`resultats-laptop.md`](resultats-laptop.md)). Temps médian : Conforma **750 ms** (max 4 350 ms), Kyverno **330 ms** (max 370 ms). C-6 ne change pas (≤ 5 s pour les deux).
+
+Le premier passage a affiché une durée **négative** (−59 ms). `run.sh` mesurait avec `date +%s%3N`, une horloge murale qui peut reculer. Il utilise désormais `/proc/uptime`, une horloge monotone au centième de seconde, comme le banc de la brique 07a.
+
 ## Constat de sécurité : confusion signature / attestation (cosign v3)
 
 Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSSE in-toto** de type `https://sigstore.dev/cosign/sign/v1`. Les vérifications « par défaut » n'exigent pas ce type précis.

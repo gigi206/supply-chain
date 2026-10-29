@@ -34,6 +34,22 @@ Seuil (README, brique 04) :
 
 Durée du banc : ≈ 2 min (4 builds sans cache, dont 2 de l'image de build).
 
+## Rejeu sur le laptop (29/10/2026)
+
+Journal : [`resultats/bench-laptop.log`](resultats/bench-laptop.log). Outils de [`mise.toml`](../../../mise.toml) ; BuildKit 0.25.2 et runc 1.3.3 du même nixpkgs que dans le cloud, mais démon **rootless** (rootlesskit 2.3.5, `--net=host`), sans root ni Docker.
+
+| Mesure | Cloud (root) | Laptop (rootless) |
+|---|---|---|
+| **Image sample-app** | `sha256:3a7ca1b1…` | **identique**, 10 h 45 plus tard, sur un autre hôte |
+| Binaire dans l'image | `e3749c68…` | **identique** |
+| Image de build, 2 builds | identique (`bdd56bab…`) | identique (`509f03bb…`), mais **différente du cloud** |
+| Négatifs (sans fermeture, sortie réseau) | refusés | refusés |
+| Durée | 113 s | 51 s |
+
+Un second passage avec la **release amont** de BuildKit et de runc (au lieu du nixpkgs) donne les **mêmes digests** (`509f03bb…`, `3a7ca1b1…`). Le digest ne dépend donc ni du binaire BuildKit ni du mode root ou rootless : les couches de l'image de build ont toutes uid/gid 0 et des dates à 0, sans en-tête pax.
+
+L'écart de l'image **de build** vient donc d'une **entrée** (busybox statique ou arbre de la toolchain Go), et on ne peut pas trancher : le cloud n'avait pas archivé ces entrées par digest. **Enseignement** : chaque entrée de l'image de build (archive de toolchain, binaires copiés) doit être archivée et inscrite par digest dans la provenance de cette image (brique 11). L'image de l'application, elle, ne dépend que du binaire et de BuildKit, d'où son identité.
+
 ## Constats
 
 - **Le binaire ne dépend que des entrées** (toolchain, fermeture, sources, options) : même sha256 dans BuildKit et hors BuildKit. C'est ce que le replay indépendant (brique 10) exploitera : un autre domaine d'administration peut rebâtir avec un autre moteur et comparer.
@@ -43,6 +59,6 @@ Durée du banc : ≈ 2 min (4 builds sans cache, dont 2 de l'image de build).
 
 ## Reste à faire sur le laptop
 
-- BuildKit **en pod** (rootless, ou Kata) dans une tâche Tekton, avec push dans une tâche séparée ; sujets et `resolvedDependencies` de la provenance Chains (B-5, brique 08).
-- **2 hôtes à ≥ 1 h d'écart** (B-1 complet), puis le replay indépendant (brique 10).
+- BuildKit **en pod** (rootless, déjà validé hors pod sur le laptop, ou Kata) dans une tâche Tekton, avec push dans une tâche séparée ; sujets et `resolvedDependencies` de la provenance Chains (B-5, brique 08).
+- ~~2 hôtes à ≥ 1 h d'écart~~ : fait (cloud, laptop) ; reste le replay indépendant (brique 10).
 - Traefik : gomod + yarn berry, interface construite dans l'image de build.

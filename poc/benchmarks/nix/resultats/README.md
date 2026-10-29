@@ -11,6 +11,22 @@ Grille : [ADR 0000 §3](../../../../docs/adr/0000-assembler-ou-adopter.md) (fig�
 | Candidat Nix | [`flake.nix`](../flake.nix) : `buildNpmPackage` (interface), `buildGoModule` (binaire, Go 1.25.10), `dockerTools.buildLayeredImage` (image) |
 | Référence | **Hermeto 0.64.0** (installé depuis le tag source avec l'accord du propriétaire), Go 1.24.7 et Node 22 de l'hôte. Script reproductible : [`reference/hermeto.sh`](../reference/hermeto.sh), journal : [`reference-hermeto.log`](reference-hermeto.log). La **solution de repli** (vendoring natif : `go mod vendor`, cache npm) a aussi été mesurée. **Image** : BuildKit 0.25.2 en démon éphémère, sans Docker, mesuré par la [brique 04](../../../bricks/04-hermetic-repro/README.md) (Go 1.26.10 dans une image de build construite par la plateforme) |
 
+## Rejeu sur le laptop (29/10/2026) : B-1 sur deux hôtes
+
+Second hôte : le laptop de l'[infra du PoC](../../../infra/README.md) (Intel i7-11800H, Ubuntu 26.04, noyau 7.0), outils épinglés par [`mise.toml`](../../../../mise.toml), mêmes versions qu'ici. Écart avec les mesures du cloud : **11 h 31** pour le binaire, **10 h 45** pour l'image.
+
+| Empreinte | Cloud (28/10) | Laptop (29/10) |
+|---|---|---|
+| Binaire, Go 1.24.7, fermeture Hermeto ([`hermeto.sh`](../reference/hermeto.sh)) | `99ddc97c…` | **identique** ([journal](reference-hermeto-laptop.log)) |
+| `web/dist/index.html`, `marked.umd.js` | `4edbd0c5…`, `aced5612…` | **identiques** |
+| Binaire, Go 1.26.10 (brique 03, hors BuildKit) | `e3749c68…` | **identique** |
+| **Image sample-app** (brique 04, BuildKit) | `sha256:3a7ca1b1…` | **identique**, en BuildKit **rootless** (le cloud tournait en root), avec le BuildKit du nixpkgs comme avec la release amont |
+| Tests d'altération T1 à T3, taille de la fermeture | 219 145 octets | **identiques** |
+
+Seule l'image **de build** diffère (`509f03bb…` contre `bdd56bab…`, voir la [brique 04](../../../bricks/04-hermetic-repro/README.md)) : ses entrées (busybox, arbre de la toolchain) n'avaient pas été archivées par digest dans le cloud.
+
+**Nix** : le cloud n'a archivé aucune empreinte de sortie Nix, donc B-1 multi-hôtes ne peut pas être mesuré contre lui. Les empreintes du laptop sont archivées pour un second hôte ([`nix-b1-laptop.log`](nix-b1-laptop.log)) : binaire `7bdcccfa…`, image `99bee8bf…`.
+
 ## Mesures
 
 | Critère | Nix | Référence (Hermeto ; repli : vendoring natif) |
@@ -27,15 +43,15 @@ Grille : [ADR 0000 §3](../../../../docs/adr/0000-assembler-ou-adopter.md) (fig�
 
 | Critère | Poids | Nix | Justification | Référence | Justification |
 |---|---|---|---|---|---|
-| B-1 | 25 | 4 | Binaire, interface et image identiques, y compris en store vierge hors réseau ; manque 2 hôtes à ≥ 1 h d'écart | 4 | Binaire, interface et image identiques (brique 04) ; manque 2 hôtes à ≥ 1 h d'écart |
+| B-1 | 25 | 4 | Binaire, interface et image identiques, y compris en store vierge hors réseau ; **2 hôtes non mesurés** : le cloud n'a pas archivé les empreintes des sorties Nix (celles du laptop le sont, pour un second hôte) | **5** | **Binaire, interface et image identiques sur 2 hôtes (cloud, laptop) à plus de 10 h d'écart, caches vides** : `99ddc97c` (Go 1.24.7, [journal laptop](reference-hermeto-laptop.log)), `e3749c68` et image `3a7ca1b1` (Go 1.26.10, briques 03 et 04) |
 | B-2 | 20 | 5 | Offline complet, toolchains incluses | 4 | Offline ; toolchain Go dans l'image de build archivée (brique 04) ; Node encore de l'hôte |
 | B-3 | 10 | 3 | Fermeture lourde (toolchains) mais déduplication excellente | 4 | Fermeture minime, mais hors toolchains |
 | B-4 | 15 | 2 | SBOM natif inexploitable (`pkg:nix`) ; Syft ne décrit qu'en partie l'artefact réel | 5 | PURL standards complets en combinant Hermeto (dépendances) et Syft (version de Go) |
 | B-6 | 10 | 4 | Rapide, mais piège TLS et second écosystème | 5 | Une ligne de configuration ; pièges documentés |
 | B-7 | 5 | 3 | À surveiller | 3 | À surveiller |
-| **Score sur les critères mesurés** | 85 | **63 → 74/100** | | **72 → 85/100** (63 → 74 avant la brique 04) | |
+| **Score sur les critères mesurés** | 85 | **63 → 74/100** | | **77 → 91/100** (72 → 85 avant le rejeu sur le laptop, 63 → 74 avant la brique 04) | |
 
-**Lecture provisoire** : **la référence passe devant (85 contre 74)** depuis que la brique 04 a mesuré l'image BuildKit et l'image de build archivée. La règle de décision exige **+15 points** pour Nix : on en est loin, **Nix reste en veille**. Seules les mesures restantes (B-1 sur 2 hôtes, B-5 en pod userns) pourraient encore changer la donne. Les deux approches ont des forces complémentaires :
+**Lecture provisoire** : **la référence passe devant (91 contre 74)**. La brique 04 a mesuré l'image BuildKit et l'image de build archivée ; le rejeu sur le laptop (29/10/2026) a ensuite retrouvé les empreintes du cloud, soit B-1 sur 2 hôtes. La règle de décision exige **+15 points** pour Nix : on en est loin, **Nix reste en veille**. Même avec 5 en B-1 et en B-5, Nix atteindrait 83/100, alors que la référence compte déjà 77 points sans B-5 : l'écart de +15 exigé est hors d'atteinte. Les deux approches ont des forces complémentaires :
 - **Nix** l'emporte sur la reconstruction offline complète, toutes toolchains incluses (Node compris) ;
 - **la référence** l'emporte sur l'exploitabilité du SBOM et sur le coût.
 

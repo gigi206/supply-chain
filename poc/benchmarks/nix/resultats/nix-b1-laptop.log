@@ -1,0 +1,5 @@
+# nix build (laptop), 2026-10-29T10:17:32Z, nix (Nix) 2.34.5, flake poc/benchmarks/nix (nixpkgs b6018f87da91)
+web : /nix/store/z05cc1g5cwk7gnfyhgjr1r8p3avsvcz5-sample-app-web-1.0.0 ; arbre sha256 82ea979f6015b397e93ded5e7c1391eca1efb172db502850fb80a55911cbc59f
+app : /nix/store/q1ywq46r8d20vr3dlz27vkga8wxzwb13-sample-app-1.0.0 ; arbre sha256 050d336ae42f6dc09c0ea9edf6802b1d6d440ea37a836e0f7058e3cab1b4ab2d
+7bdcccfadf9b4f6bd82a0f1501b57480bbda5a2f61cfce0603e92747d6578f7c  /nix/store/q1ywq46r8d20vr3dlz27vkga8wxzwb13-sample-app-1.0.0/bin/sample-app
+image : /nix/store/6yw1p1zj0jkdjyf9rnhyhkifxpn7n4ds-sample-app.tar.gz ; sha256 99bee8bf10063c07df39322b360d8a98f0aa467117ebaffd36d2527b1347a467

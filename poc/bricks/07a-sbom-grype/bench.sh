@@ -26,7 +26,8 @@ read -r -a oras_opts <<<"${ORAS_OPTS:---plain-http}"
 cosign_opts=(--use-signing-config=false --tlog-upload=false --allow-http-registry --yes)
 export COSIGN_PASSWORD=""
 ko=0
-ms() { date +%s%3N; }
+# Horloge monotone (/proc/uptime, au centième) : date +%s%3N suit l'horloge murale, qui peut reculer.
+ms() { local u; read -r u _ < /proc/uptime; echo $(( 10 * 10#${u/./} )); }
 
 chmod -R u+w -- "$W" 2>/dev/null || true
 rm -rf -- "${W:?}"
