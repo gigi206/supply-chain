@@ -60,7 +60,9 @@ Restauration (bundles rejoués dans l'ordre, puis refs du dernier rapport valide
 python3 -m unittest -v test_sync
 ```
 
-10 tests sur des dépôts git locaux, tous réussis (git 2.43, Python 3.13) :
+10 tests sur des dépôts git locaux, tous réussis (git 2.43, Python 3.13 ; puis sur le laptop : git 2.53, Python 3.15, locale `fr_FR.UTF-8`).
+
+Sur le laptop, 3 tests ont d'abord échoué : `sync.py` reconnaît le refus d'un bundle vide au message de git (« empty bundle »), que git traduisait en français. Le run finissait donc en erreur au lieu de constater qu'il n'y avait rien à sauvegarder. Correctif : git est lancé avec `LC_ALL=C`. Les 10 tests passent sous `fr_FR.UTF-8` comme sous `C`.
 
 | Test | Vérifie |
 |---|---|

@@ -41,9 +41,10 @@ class GitError(Exception):
 def git(repo, *args, stdin=None, check=True):
     # Pas de hooks, objets vérifiés à la réception (fsck), protocoles limités par
     # GIT_ALLOW_PROTOCOL (posé par main) : pas de transport `ext::` ni de `file` en production.
+    # LC_ALL=C : les messages de git sont analysés (« empty bundle ») et ne doivent pas être traduits.
     cmd = ["git", "-C", str(repo), "-c", "core.hooksPath=/dev/null",
            "-c", "transfer.fsckObjects=true", *args]
-    r = subprocess.run(cmd, input=stdin, capture_output=True, text=True)
+    r = subprocess.run(cmd, input=stdin, capture_output=True, text=True, env={**os.environ, "LC_ALL": "C"})
     if check and r.returncode != 0:
         raise GitError(f"{' '.join(args[:2])} : {r.stderr.strip()}")
     return r
