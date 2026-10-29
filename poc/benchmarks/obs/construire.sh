@@ -75,6 +75,8 @@ for d in "${DEPOTS[@]}"; do
   SSH_OBS_SCP=1 "$here/ssh-obs.sh" -r "root@192.168.161.10:/root/banc-a2/bin/$d/." "$B/" 2>/dev/null || true
   (cd "$B" && find . -type f ! -name '_*' -printf '%P\n' | sort | xargs -r sha256sum) > "$R/$lib/$d/sha256.txt"
   for f in _buildenv _statistics _slsa_provenance.json; do [[ -s $B/$f ]] && cp "$B/$f" "$R/$lib/$d/"; done
+  # _buildenv embarque le prjconf de build.opensuse.org (sans licence déclarée) : remplacé par son sha256
+  [[ -s $R/$lib/$d/_buildenv ]] && python3 -I "$here/retirer-config.py" "$R/$lib/$d/_buildenv"
   echo "$d : $(wc -l < "$R/$lib/$d/sha256.txt") fichiers ; type de VM : $(grep -m1 -o -E 'Doing (kvm|qemu|chroot|[a-z]+) build' "$R/$lib/$d/build.log" | paste -sd' ')"
   sed 's/^/  /' "$R/$lib/$d/sha256.txt"
 done

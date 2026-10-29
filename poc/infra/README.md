@@ -105,13 +105,15 @@ Activer un swap zram serait un réglage système : c'est au propriétaire d'en d
 
 **Disque.** Le pool dédié irait sur `/`, avec 70 Go au plus pour 90 Go libres. A1 (Docker, aussi sur `/`) doit donc être démonté avant 08. Si de l'espace peut être libéré, on agrandit d'abord les disques de `build` et de `stockage`.
 
-**Modèle de CPU (proposé, pas acquis).** On utilise **`Haswell-v4`**, utilisable sur cet hôte selon `virsh domcapabilities` : il couvre x86-64-v3 sans AVX-512. On écarte `host-passthrough`, qui exposerait x86-64-v4. Un modèle nommé n'expose pas `vmx` : la VM `build` devra l'exiger (`<feature policy='require' name='vmx'/>`). Le modèle retenu est inscrit dans `internalParameters.cpuModel`.
+**Modèle de CPU (vérifié au banc A2, 29/10/2026).** On utilise **`Haswell-v4`**, utilisable sur cet hôte selon `virsh domcapabilities` : il couvre x86-64-v3 sans AVX-512. On écarte `host-passthrough`, qui exposerait x86-64-v4. Un modèle nommé n'expose pas `vmx` : la VM `build` doit l'exiger (`<feature policy='require' name='vmx'/>`). Le modèle retenu est inscrit dans `internalParameters.cpuModel`.
 
-**Contrôles au premier démarrage** (résultats attendus) :
-- dans chaque VM, `ld.so --help` affiche x86-64-v3 « supported » et pas x86-64-v4 ;
-- dans `build`, `/dev/kvm` est présent et `kvm_intel` chargé ;
+Il faut **`check='partial'`** : avec `check='full'`, libvirt refuse de démarrer la VM, parce que QEMU ajoute au modèle des fonctions (f16c, rdrand, xsaveopt, sous-fonctions vmx). Le XML du banc A2 sert de modèle : [`poc/benchmarks/obs/libvirt/sc-obs.xml`](../benchmarks/obs/libvirt/sc-obs.xml).
+
+**Contrôles au premier démarrage.** Les trois premiers ont été **obtenus au banc A2** (VM `sc-obs`, [`configuration.log`](../benchmarks/obs/resultats/configuration.log)) ; le dernier reste à vérifier :
+- dans chaque VM, `ld.so --help` affiche x86-64-v3 « supported » et pas x86-64-v4, sans AVX-512 ;
+- dans `build`, `/dev/kvm` est présent et `kvm_intel` chargé. Des VM KVM imbriquées y ont tourné : ce sont les VM de build d'OBS ;
 - les VM sortent sur le réseau par le NAT libvirt, malgré la politique `FORWARD` de Docker sur l'hôte ;
-- à l'installation de Kata : les invités héritent bien du modèle de CPU de la VM `build` (à vérifier).
+- à l'installation de Kata : les invités héritent bien du modèle de CPU de la VM `build`. Au banc A2, les VM imbriquées lancées en `-cpu host` héritaient de Haswell-v4.
 
 **Images des VM** : image cloud officielle (Debian ou Ubuntu, à choisir en brique 08), dont on vérifie l'empreinte et la signature, et graine cloud-init NoCloud construite avec `genisoimage`.
 
@@ -119,7 +121,7 @@ Activer un swap zram serait un réglage système : c'est au propriétaire d'en d
 
 | Changement | Phase |
 |---|---|
-| Pool libvirt dédié au PoC sur `/` (répertoire à créer) | A2, 08 |
-| Réseau libvirt NAT dédié au PoC (pont et sous-réseau propres, séparés des VM personnelles) | A2, 08 |
-| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2, 08 |
+| Pool libvirt dédié au PoC sur `/` (répertoire à créer) | A2 : validé, créé puis supprimé le 29/10/2026 (`supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc`) ; 08 : à confirmer |
+| Réseau libvirt NAT dédié au PoC (pont et sous-réseau propres, séparés des VM personnelles) | A2 : validé, créé puis supprimé le 29/10/2026 (`virbr-scpoc`, 192.168.161.0/24) ; 08 : à confirmer |
+| Téléchargement de l'appliance OBS et des images cloud (empreinte et signature vérifiées) | A2 : fait (appliance conservée dans `~/.cache/supply-chain-poc/obs`) ; 08 : images cloud à confirmer |
 | Installation des outils de 4b | 4b |
