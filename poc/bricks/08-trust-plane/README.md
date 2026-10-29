@@ -157,3 +157,16 @@ Correctif : une carte VGA sans affichage (ni VNC ni SPICE) dans les trois défin
 **Erreur de vérification corrigée.** Pour m'assurer que le jeton du server n'était pas sur les agents, je l'ai passé en argument de `sudo grep` : sudo journalise ses lignes de commande, et le jeton s'est retrouvé dans le journal des deux agents (une entrée chacun). Le cluster étant neuf, tout a été recréé avec une nouvelle CA et des jetons neufs ; aucune entrée de ce type ne subsiste. **Règle pour la suite : aucun secret en argument de commande** (sudo, ssh, kubectl), seulement des fichiers 0600 ou l'entrée standard.
 
 **Point ouvert pour J2 : kubectl.** Le kubectl de `mise.toml` (1.37.2) sort de la tolérance de version de Kubernetes face à un serveur 1.35 (une version mineure d'écart au plus). En attendant, les commandes passent par `k3s kubectl` dans `sc-confiance`. Il faudra ajouter un kubectl 1.35 à `mise.toml`, ce qui demande un accord.
+
+## Proposition pour J2 : stockage (en attente d'accord)
+
+Vérifications du 29/10/2026 :
+- **images Forgejo** (`codeberg.org/forgejo/forgejo:15.0.11-rootless`, index `3cd6bc2b…`) : aucune signature cosign (pas de tag `.sig` ni `.att`), seulement un manifeste d'attestation BuildKit **non signé** dans l'index ;
+- **Zot** : ni l'image ni les binaires ne sont signés (doc 04) ;
+- les **binaires** Forgejo 15.0.11 (GPG, clé principale comparée à forgejo.org) et Zot 2.1.22 (sha256 contre le fichier de sommes amont) sont déjà déclarés dans `mise.toml` et vérifiés par `poc/infra/verifier-outils.sh` depuis 4b.
+
+Proposé :
+1. **Forgejo et Zot en services systemd sur `sc-stockage`**, à partir de ces binaires vérifiés, plutôt qu'en pods sur des images non signées. Ils restent dans la zone stockage ; le cluster les joint par 192.168.161.13.
+2. **TLS** par une petite CA du PoC (clé en 0600 dans `~/.cache/supply-chain-poc/08/secrets`), qui délivre les certificats de Zot et de Forgejo. La CA est déclarée à containerd (`registries.yaml` de k3s) et, plus tard, à Chains.
+3. **kubectl 1.35** dans `mise.toml` à la place du 1.37.2 (le banc A1 est démonté), vérifié comme les autres outils (signature sigstore).
+4. **RAM au repos** de J1 mesurée au début de J2.
