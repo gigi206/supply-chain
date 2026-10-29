@@ -1,0 +1,36 @@
+# verifier-outils.sh, 2026-10-29T09:56:04Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
+OK   aqua:anchore/grype 0.104.1 : sha256 = mise.lock (2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f)
+OK   aqua:anchore/grype : signature sigstore (workflows de github.com/anchore/grype)
+OK   aqua:anchore/grype : sha256 présent dans grype_0.104.1_checksums.txt signé
+OK   aqua:anchore/syft 1.38.0 : sha256 = mise.lock (bc664debb00db1b9b4b9dae4ba1a29d99621e33b641b94b78b9048374b812a3d)
+OK   aqua:anchore/syft : signature sigstore (workflows de github.com/anchore/syft)
+OK   aqua:anchore/syft : sha256 présent dans syft_1.38.0_checksums.txt signé
+OK   aqua:google/go-containerregistry 0.20.6 : sha256 = mise.lock (c1d593d01551f2c9a3df5ca0a0be4385a839bd9b86d4a76e18d7b17d16559127)
+--   aqua:google/go-containerregistry : provenance SLSA publiée (multiple.intoto.jsonl), non vérifiée ici (il faut slsa-verifier) ; sha256 présent dans checksums.txt amont, non signé
+OK   aqua:kyverno/kyverno 1.19.2 : sha256 = mise.lock (357eaf1df8bc24ddd5a73979fadeaae6a032e8710f11af264229756e4956bf4a)
+OK   aqua:kyverno/kyverno : signature sigstore (workflows de github.com/kyverno/kyverno)
+OK   aqua:moby/buildkit 0.25.2 : sha256 = mise.lock (d18b8188b600e201a1b3d08c20e2a1e439cf51d2c2285f132dd9bd51c666f6d6)
+--   aqua:moby/buildkit : aucune signature publiée ; sha256 cité par la provenance amont, non signée
+OK   aqua:opencontainers/runc 1.3.3 : sha256 = mise.lock (8781ab9f71c12f314d21c8e85f13ca1a82d90cf475aa5131a7b543fcc5487543)
+OK   aqua:opencontainers/runc : signature GPG, clé C9C370B246B09F6DBCFC744C34401015D1D2D386
+OK   aqua:oras-project/oras 1.3.6 : sha256 = mise.lock (66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0)
+OK   aqua:oras-project/oras : signature GPG, clé C6FC42F0DE84A345FAADB742F44418110791EF37
+OK   aqua:project-zot/zot 2.1.22 : sha256 = mise.lock (33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e)
+--   aqua:project-zot/zot : aucune signature publiée (docs/04 §5) ; sha256 présent dans checksums.sha256.txt amont, non signé
+OK   aqua:rootless-containers/rootlesskit 2.3.5 : sha256 = mise.lock (118208e25becd144ee7317c172fc9decce7b16174d5c1bbf80f1d1d0eacc6b5f)
+OK   aqua:rootless-containers/rootlesskit : signature GPG, clé C020EA876CE4E06C7AB95AEF49524C6F9F638F1A
+OK   aqua:rootless-containers/rootlesskit : sha256 présent dans SHA256SUMS signé
+OK   aqua:sigstore/cosign 3.1.4 : sha256 = mise.lock (424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa)
+OK   aqua:sigstore/cosign : signature sigstore (keyless@projectsigstore.iam.gserviceaccount.com, émetteur accounts.google.com)
+OK   github:conforma/cli 0.10.42 : sha256 = mise.lock (895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf)
+--   github:conforma/cli : aucune signature publiée (docs/04 §5) ; sha256 présent dans ec_linux_amd64.sha256 amont, non signé
+OK   go 1.24.7 : sha256 = mise.lock (da18191ddb7db8a9339816f3e2b54bdded8047cdc2a5d67059478f8d1595c43f)
+OK   go : signature GPG, clé EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+OK   python 3.13.12 : sha256 = mise.lock (91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229)
+OK   python : attestation GitHub (https://slsa.dev/provenance/v1, https://github.com/astral-sh/python-build-standalone/.github/workflows/release.yml@refs/heads/main)
+OK   hermeto : hermeto 0.64.0 (tag 0.64.0 = commit 1f37e32d, dépendances installées avec --require-hashes)
+OK   go 1.26.10 : module golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64, h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0= = sum.golang.org
+OK   nix md5ikacq7vzcr3xxx58i2miy4iz0dipj-busybox-static-x86_64-unknown-linux-musl-1.36.1 : signature cache.nixos.org-1
+OK   nix cv0fsvzbdjrbjn8j6i52lfg49shvf9bg-spdx-license-list-data-3.27.0-json : signature cache.nixos.org-1
+OK   nix maqnymxaw4gp1lqfg6623iy6vhf1zir6-python3.13-reuse-6.2.0 : signature cache.nixos.org-1
+OK   nix fmn3qnmkxyyq6wg1vj14zvn53pz3jzvw-cosign-3.0.6 : signature cache.nixos.org-1

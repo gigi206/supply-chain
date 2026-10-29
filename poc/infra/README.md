@@ -21,6 +21,30 @@ Hôte de toutes les mesures qui demandent KVM, un cluster ou des VM ([ADR 0001](
 | Alimentation | Secteur branché, profil de plateforme `performance` (intel_pstate, EPP `performance`) | Mesures de temps à faire sur secteur |
 | Outils des bancs | Présents : python3 3.15.2, git, make, Node 26.12.1, jq, curl, gpg, runc 1.2.5. **Absents** : Go, Hermeto, oras, crane, cosign, Zot, BuildKit, Syft, Grype, Conforma (`ec`), Kyverno, reuse, diffoscope | Liste d'installation de 4b, soumise à part. Pour retrouver les empreintes du cloud, il faut les **mêmes versions** : Node 22.22.0 et pas le 26 de l'hôte, Go 1.24.7 et 1.26.10, BuildKit 0.25.2 et runc 1.3.3 du nixpkgs épinglé |
 
+## Outils des bancs (4b)
+
+Les outils sont déclarés dans [`mise.toml`](../../mise.toml), à la racine du dépôt, aux versions des mesures du cloud. [`mise.lock`](../../mise.lock) fige les URL et les sha256 pour linux-x64. Rien n'est installé au niveau système.
+
+```bash
+mise install && mise run outils:verifier
+```
+
+- **Backends mise** : Go 1.24.7, Python 3.13.12, BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, Zot 2.1.22, oras 1.3.6, crane 0.20.6, cosign 3.1.4, Kyverno 1.19.2, Syft 1.38.0, Grype 0.104.1 et Conforma `ec` 0.10.42.
+- **Tâches `outils:*`**, pour ce qu'aucun backend ne fournit :
+  - Hermeto 0.64.0, absent de PyPI : tag source vérifié, dépendances installées avec `--require-hashes` ;
+  - Go 1.26.10 comme module `golang.org/toolchain`, comme dans le cloud ;
+  - busybox statique, liste SPDX 3.27.0 et reuse 6.2.0, tirés du nixpkgs épinglé du banc B pour obtenir les mêmes binaires que dans le cloud.
+- **Vérification** ([`verifier-outils.sh`](verifier-outils.sh), résultat : [`resultats/outils.txt`](resultats/outils.txt)) : **31 contrôles réussis, aucun échec**.
+  - Les sha256 de `mise.lock` viennent du service tiers `mise-versions`. Ils ont été recoupés avec les fichiers de sommes publiés par chaque projet.
+  - Les signatures sont vérifiées partout où elles existent :
+    - sigstore (cosign, Kyverno, Syft, Grype), avec le cosign du nixpkgs épinglé, indépendant de mise ;
+    - GPG (oras, runc, rootlesskit, Go) ;
+    - attestation GitHub (Python) ;
+    - sum.golang.org (Go 1.26.10) ;
+    - cache.nixos.org (paquets Nix).
+  - **Sans signature publiée** : Zot et Conforma (constat du doc 04), BuildKit (provenance amont non signée), crane (provenance SLSA non vérifiée : il faudrait slsa-verifier). Pour ces quatre outils, seul le sha256 est contrôlé, contre le fichier de sommes amont.
+  - mise ne vérifie aucune signature à l'installation quand `mise.lock` contient déjà les sommes (« skipping provenance detection »). D'où ce script, à relancer à chaque changement de version.
+
 ## Dimensionnement
 
 **Validé par le propriétaire le 29/10/2026** : pas de cluster pour 4b, **kind jetable pour A1**, **VM libvirt + k3s (topologie T2, profil nominal) pour la brique 08 et la suite**. Les changements sur l'hôte (pool, réseau, téléchargements) restent confirmés un par un au moment de les faire.

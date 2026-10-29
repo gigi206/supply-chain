@@ -1,0 +1,80 @@
+# Outils des bancs et des briques du PoC, épinglés aux versions des mesures faites
+# dans le cloud (journaux des dossiers resultats/). Rien n'est installé au niveau
+# système : `mise install`, puis `mise run outils`.
+#
+# mise vérifie les sommes de contrôle et, quand le registre aqua les déclare, les
+# signatures (cosign, SLSA, attestations GitHub) ; mise.lock fige versions, URL et
+# sommes. Les tâches `outils:*` couvrent ce qu'aucun backend ne fournit.
+
+[settings]
+lockfile_platforms = ["linux-x64"]   # amd64 uniquement (docs/01)
+
+[tools]
+go = "1.24.7"                                   # banc B ; Go 1.26.10 : tâche outils:go-toolchain
+python = "3.13.12"                              # venv de Hermeto
+"aqua:moby/buildkit" = "0.25.2"                 # brique 04 (buildctl, buildkitd)
+"aqua:opencontainers/runc" = "1.3.3"
+"aqua:rootless-containers/rootlesskit" = "2.3.5" # BuildKit sans root
+"aqua:project-zot/zot" = "2.1.22"               # registre local (localhost:5000)
+"aqua:oras-project/oras" = "1.3.6"
+"aqua:google/go-containerregistry" = "0.20.6"   # crane
+"aqua:sigstore/cosign" = "3.1.4"
+"aqua:kyverno/kyverno" = "1.19.2"
+"aqua:anchore/syft" = "1.38.0"
+"aqua:anchore/grype" = "0.104.1"
+"github:conforma/cli" = { version = "0.10.42", asset_pattern = "ec_linux_amd64", bin = "ec" }
+
+[env]
+# Chemins lus par les bench.sh ; WORKDIR et les données restent sur disque, pas dans /tmp (tmpfs).
+POC_OUTILS = "{{env.HOME}}/.cache/supply-chain-poc/outils"
+HERMETO = "{{env.HOME}}/.cache/supply-chain-poc/outils/hermeto/bin/hermeto"
+GOROOT_DIR = "{{env.HOME}}/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64"
+BUSYBOX = "{{env.HOME}}/.cache/supply-chain-poc/outils/busybox/bin/busybox"
+SPDX = "{{env.HOME}}/.cache/supply-chain-poc/outils/spdx-json/json"   # nix suffixe le lien du nom de la sortie
+_.path = ["{{env.HOME}}/.cache/supply-chain-poc/outils/reuse/bin"]
+
+[tasks.outils]
+description = "Outils hors backends mise"
+depends = ["outils:hermeto", "outils:go-toolchain", "outils:nix"]
+
+[tasks."outils:hermeto"]
+description = "Hermeto 0.64.0 (absent de PyPI) : tag source vérifié, dépendances installées par hash"
+run = '''
+set -eu
+v="$POC_OUTILS/hermeto"
+src=$(mktemp -d)
+git -c advice.detachedHead=false clone -q --depth 1 --branch 0.64.0 https://github.com/hermetoproject/hermeto.git "$src/hermeto"
+test "$(git -C "$src/hermeto" rev-parse HEAD)" = 1f37e32dfdf28342b50c6f394c3e99914fdb24e9
+rm -rf "$v"
+python -m venv "$v"
+"$v/bin/pip" install -q --require-hashes --no-deps -r "$src/hermeto/requirements-build.txt"
+"$v/bin/pip" install -q --require-hashes --no-deps -r "$src/hermeto/requirements.txt"
+"$v/bin/pip" install -q --no-deps --no-build-isolation "$src/hermeto"
+rm -rf "$src"
+"$HERMETO" --version
+'''
+
+[tasks."outils:go-toolchain"]
+description = "Go 1.26.10 comme module golang.org/toolchain, vérifié par sum.golang.org (comme dans le cloud)"
+run = '''
+set -eu
+GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.26.10 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+"$GOROOT_DIR/bin/go" version
+'''
+
+[tasks."outils:nix"]
+description = "busybox statique, liste SPDX et reuse du nixpkgs épinglé du banc B (mêmes binaires que dans le cloud, dépendances figées) ; cosign de vérification"
+run = '''
+set -eu
+for p in pkgsStatic.busybox:busybox spdx-license-list-data.json:spdx reuse:reuse cosign:cosign-nix; do
+  nix build --inputs-from ./poc/benchmarks/nix "nixpkgs#${p%%:*}" --out-link "$POC_OUTILS/${p##*:}"
+done
+"$BUSYBOX" | head -1
+ls "$SPDX/licenses.json" "$SPDX/exceptions.json"
+"$POC_OUTILS/reuse/bin/reuse" --version
+'''
+
+[tasks."outils:verifier"]
+description = "Empreintes et signatures de tous les outils (cosign du nixpkgs épinglé, GPG en trousseau temporaire)"
+depends = ["outils"]
+run = "poc/infra/verifier-outils.sh | sed \"s#$HOME#~#g\" | tee poc/infra/resultats/outils.txt"
