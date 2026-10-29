@@ -11,7 +11,7 @@ Légende : **Validé (local)** = seuil atteint pour la partie testable ici ; **�
 | **B. Nix ou Hermeto** | Partie locale faite ; **B-1 de la référence mesuré sur 2 hôtes** | **Nix 74, référence 91** (provisoire) : binaire `99ddc97c` et image `3a7ca1b1` retrouvés sur le laptop, > 10 h après le cloud. Nix reste en veille. Constat : l'environnement de `hermeto generate-env` laisse passer un zip Go altéré | [résultats](../poc/benchmarks/nix/resultats/README.md) |
 | **C. Kyverno seul ou Conforma + Kyverno** | Partie locale faite, **rejouée sur le laptop** (17/17, médianes 1 030 et 330 ms) | **76 / 63** (provisoire), décision suspendue (TSA, parité à l'admission). Constat : confusion signature / attestation de cosign v3 | [résultats](../poc/benchmarks/kyverno-seul/resultats/README.md) |
 | **A1. Konflux** | **Fait sur le laptop** (29/10/2026, kind) | **17/57, non adopté** ; élimination proposée (critère 1 : une PR lit la clé de Chains sur le nœud). Installation 7 min, premier build signé 1 h 24, image reproductible ; 3/8 tests négatifs bloqués ; constat : `tpa-scan`, exigée par la politique par défaut, envoie le SBOM à un service Red Hat | [résultats](../poc/benchmarks/konflux/resultats/README.md) |
-| A2. OBS | **Laptop** | — | [protocoles](../poc/benchmarks/README.md) |
+| A2. OBS | **Fait sur le laptop** (29/10/2026, appliance master en VM KVM) | **42/55, non adopté** (grille restreinte ; lecture de A-1 à valider). rpm et deb bit-identiques sur 2 builds, rebuild hors ligne identique, provenance DSSE non falsifiable (6 tentatives). Constats : provenance seulement sur master (pas de release depuis 2019), snapshot.debian.org rejeté par le DoD d'OBS, initrd de l'appliance inutilisable pour les VM de build | [résultats](../poc/benchmarks/obs/resultats/README.md) |
 
 ## Briques
 
@@ -52,7 +52,7 @@ Prérequis :
 | Sujet | Ce qui reste | Brique ou banc |
 |---|---|---|
 | Konflux | ~~Installation, premier build signé, grille A~~ (fait le 29/10/2026) ; cluster kind supprimé et Forgejo arrêté le 29/10/2026 (données de Forgejo conservées dans `~/.cache/supply-chain-poc/forgejo`) ; confirmation de l'élimination par le propriétaire | A1 |
-| OBS | rpm et deb bit-identiques sur 2 builds, grille A restreinte | A2 |
+| OBS | ~~rpm et deb bit-identiques sur 2 builds, grille A restreinte~~ (fait le 29/10/2026) ; validation par le propriétaire de la lecture de A-1 et de la non-adoption ; démontage de la VM, du pool et du réseau | A2 |
 | Nix | ~~B-1 de la référence~~ (fait le 29/10/2026) ; B-1 de Nix sur un second hôte (empreintes du laptop archivées) ; B-5 (sandbox Nix en pod userns sous Tekton + Chains) | B |
 | Kyverno seul | Contrôle 9 (horodatage RFC 3161) ; parité CLI / admission ; bibliothèque Conforma `slsa3` / `trusted_task` sur une vraie provenance Chains | C, 08 |
 | Plan de confiance | k3s, Tekton, Chains (mode `dsse` tant que tektoncd/chains#2096 n'est pas publiée), OpenBao, job TSA, Trusted Resources, Kyverno, Conforma, intercepteur HMAC ; **les 8 tests négatifs** | 08 |

@@ -18,6 +18,18 @@
 
 - Versions ; ressources ; journaux de build ; sha256 des deux builds ; provenance produite.
 
+## Résultats (29/10/2026)
+
+**42/100 contre 55 pour la référence restreinte : OBS n'est pas adopté pour le packaging.** La lecture de A-1 reste à valider. Le seuil du banc est atteint : rpm et deb bit-identiques sur 2 builds. Détail, preuves et notation : [`resultats/README.md`](resultats/README.md).
+
+Rejeu :
+1. `mise run packaging:sources` ;
+2. `mise run obs:preparer`, puis `obs:vm -- creer`, `obs:premier-acces`, `obs:configurer` et `obs:depots` ;
+3. `obs:construire -- envoyer build-1`, puis `obs:construire -- reconstruire <libellé>` et `obs:comparer` ;
+4. `obs:tests -- hostile [hostile2]`, `obs:tests -- dsse|materiau <libellé>`, `obs:horsligne`, `obs:etat` et `obs:preuves`.
+
+Démontage : `mise run obs:vm -- detruire`.
+
 ## Décisions du propriétaire (29/10/2026)
 
 ### Version évaluée : appliance « Unstable », épinglée
