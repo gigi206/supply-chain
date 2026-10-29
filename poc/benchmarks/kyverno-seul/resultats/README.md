@@ -77,23 +77,23 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
 
 ## Notation provisoire (grille C)
 
-Les notes sont provisoires tant que le contrôle 9 et C-2 ne sont pas mesurés.
+Les notes sont provisoires tant que C-2 n'est pas mesuré (contrôle 9 mesuré en brique 08, J5 ; lecture du propriétaire du 29/10/2026, voir plus bas).
 
 | Critère | Poids | Kyverno seul | Justification | Conforma + Kyverno | Justification |
 |---|---|---|---|---|---|
-| C-1 Couverture | 35 | 4 | 9/9 contrôles testés réussis, contrôle 9 non testé | 4 | Idem |
+| C-1 Couverture | 35 | 5 | 10/10 : contrôles 1 à 8 et 10 au banc (17/17 cas) ; contrôle 9 en brique 08 (J5), vérifié par cosign v3.1.4 dans la porte (`tools/verify-ts`), compté par décision du propriétaire | 5 | Idem : le contrôle 9 ne dépend pas du moteur |
 | C-2 Parité CLI / admission | 15 | 4 | Même politique et même moteur en CLI et à l'admission (à confirmer sur cluster) | 2 | Deux langages (Rego en CLI, CEL à l'admission) : parité par double maintenance |
-| C-3 Bundles, referrers, TSA | 15 | 3 | Natifs ; doc d'`extractPayload` inexacte ; TSA non testée | 3 | Natifs mais non documentés ; TSA non testée |
+| C-3 Bundles, referrers, TSA | 15 | 2 | Bundles et referrers natifs, y compris dans un dépôt séparé ; doc d'`extractPayload` inexacte ; **horodatage natif mais en erreur interne** avec une clé sans journal (brique 08, J5, CLI) | 3 | Natifs mais non documentés ; horodatage de Conforma non mesuré (aucune option dans `ec validate image`), à reprendre en J8 |
 | C-4 Maintenabilité | 15 | 3 | 88 lignes, un seul langage ; tests (`kyverno test`) à écrire | 2 | 77 lignes de Rego + 88 de CEL, deux langages ; tests à écrire |
 | C-5 Santé | 10 | 4 | Sain, CNCF, plusieurs employeurs (Scorecard 7,8) | 2 | Limité par Conforma : 0.x, sponsor unique (6,6) |
 | C-6 Performance | 10 | 5 | ≈ 0,5 s | 5 | ≈ 1 s |
-| **Score /100** | | **76** | | **63** | |
+| **Score /100** | | **80** | | **70** | |
 
 **Contrôle 9 mesuré en brique 08, J5 (29/10/2026)** ([journal](../../../bricks/08-trust-plane/resultats/tsa-chemins.log)). Le job d'horodatage réémet chaque enveloppe de Chains en bundle v0.3 avec un jeton RFC 3161, dans un dépôt séparé de celui de l'image :
 - **Kyverno 1.19.2, CLI** (attestor à clé, `insecureIgnoreTlog`, `tsaCertChain`) : jeton valide → `error` (« nil pointer dereference ») ; jeton absent ou aucun bundle → refus. Le contrôle 9 n'est donc pas assuré par le CLI de Kyverno ; l'admission partage ce code, la parité se mesure en J6 (C-2). Sans `tsaCertChain`, le même bundle passe (témoin). Kyverno ne vérifie pas non plus la provenance au format historique (`.att`) sans journal de transparence ;
 - **cosign v3.1.4** (`--use-signed-timestamps`, racine de confiance du TSA) : jeton valide accepté ; aucun bundle, bundle sans jeton, jeton altéré, jeton d'une autre signature et jeton d'une TSA étrangère refusés ;
 - **Conforma v0.10.42** : non mesuré (aucune option d'horodatage dans `ec validate image`).
 
-Les notes ci-dessus restent inchangées : la lecture de C-1 avec un contrôle 9 vérifié hors du moteur (`tools/verify-ts`) revient au propriétaire.
+**Lecture du propriétaire (29/10/2026)** : un contrôle 9 vérifié hors du moteur de politique (`tools/verify-ts`, ici cosign) compte dans C-1, pour les deux options. Notes mises à jour en conséquence : C-1 passe de 4 à 5 pour les deux (10/10), et C-3 de Kyverno seul passe de 3 à 2 (horodatage natif mais en erreur). Scores : 76 → **80** et 63 → **70**.
 
-**Lecture provisoire.** Kyverno seul dépasse nettement le seuil de 90 % de la référence (76 ≥ 57). La décision reste **suspendue** à la règle « 10/10 contrôles » : il faut tester le contrôle 9 (TSA) et la parité à l'admission en brique 08. Réserve : la bibliothèque Conforma (`slsa3`, `trusted_task` sur la vraie provenance Chains) n'a pas été mise à profit ici ; la réimplémenter en CEL sur la vraie provenance pourrait coûter plus que dans ce banc synthétique.
+**Lecture provisoire.** Kyverno seul dépasse nettement le seuil de 90 % de la référence (80 ≥ 63) et couvre 10/10 contrôles avec la lecture du propriétaire. La décision reste **suspendue** à la parité à l'admission (C-2), mesurée en brique 08, J6. Réserve : la bibliothèque Conforma (`slsa3`, `trusted_task` sur la vraie provenance Chains) n'a pas été mise à profit ici ; la réimplémenter en CEL sur la vraie provenance pourrait coûter plus que dans ce banc synthétique.

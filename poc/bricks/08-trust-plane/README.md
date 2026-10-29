@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). **Le choix du chemin de vérification de J5 attend le propriétaire** ; J6 attend son accord.
+**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). Chemin de vérification de J5 retenu par le propriétaire : bundle réémis, vérifié par cosign. J6 attend son accord.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -96,7 +96,7 @@ Chaque jalon se termine par un point de contrôle : mesures archivées, `docs/03
 | 5 | Webhook Forgejo non signé, ou webhook valide rejoué | Intercepteur HMAC et anti-rejeu | Journal de l'EventListener |
 | 6 | Connexion sortante pendant l'étape de build | NetworkPolicy deny-all (contrôleur kube-router intégré à k3s) | **Paquets refusés journalisés en NFLOG, groupe 100** (règle de kube-router, limitée à 10 par minute), lus sur `sc-build` par `tcpdump -i nflog:100` ; journal de la tâche |
 | 7 | Publier ou admettre un artefact non signé, y compris un artefact qui ne porte que des attestations signées | Type `https://sigstore.dev/cosign/sign/v1` exigé (banc C) | Refus de Kyverno et de Conforma |
-| 8 | Attestation avec un jeton d'horodatage absent ou falsifié | Vérification TSA (chemin choisi en J5) | Refus de Kyverno ou de `tools/verify-ts`, puis de Conforma |
+| 8 | Attestation avec un jeton d'horodatage absent ou falsifié | Bundle réémis dans un dépôt séparé, vérifié par cosign v3.1.4 dans la porte (`tools/verify-ts`), chemin retenu en J5 | Refus de `tools/verify-ts` (mesuré en J5 : absent, altéré, autre signature, TSA étrangère), puis de Conforma |
 
 ## Points à vérifier en cours de brique (non supposés)
 
@@ -372,8 +372,13 @@ Rejeu : `mise run confiance:tsa -- image pki openbao deployer essais horodater c
 
 **Constats** :
 - **cosign, chemin historique** : sur une attestation `.att`, `--use-signed-timestamps` n'exige pas de jeton (`VerifyRFC3161Timestamp` renvoie `nil, nil` quand il manque). Y ajouter un jeton réécrirait en plus le tag `.att`, donc rouvrirait la course du constat de J4. **Écarté.**
-- **Kyverno 1.19.2 renvoie une erreur interne sur un jeton valide**, avec un attestor à clé sans journal. Le code le rend plausible : dans ce cas, Kyverno ne charge pas le matériel de confiance de Sigstore, et n'y ajoute donc pas la TSA (`opts.go`). Une erreur interne n'est pas une décision : **Kyverno ne peut pas assurer le contrôle 9** dans cette configuration. Le CLI et l'admission partagent ce code (`pkg/image/verifiers/ivpol/cosign`) ; la parité se mesure en J6.
-- **Kyverno 1.19.2 ne vérifie aucune attestation au format historique sans journal** : `verifyAttestationSignatures` exige une preuve d'inclusion dans un journal, alors que `verifyImageSignatures` s'en passe avec `insecureIgnoreTlog` (`verifier.go`). **Pour J6**, la provenance de Chains (`dsse`) n'est lisible par Kyverno qu'à travers les bundles réémis (témoin : `pass`) : le job d'horodatage sert aussi de pont entre Chains et Kyverno.
+- **Kyverno 1.19.2 renvoie une erreur interne sur un jeton valide**, avec un attestor à clé sans journal. Une erreur interne n'est pas une décision : **Kyverno ne peut pas assurer le contrôle 9** dans cette configuration. Le CLI et l'admission partagent ce code (`pkg/image/verifiers/ivpol/cosign`) ; la parité se mesure en J6. **Cause, lue dans le code** (à la demande du propriétaire) :
+  - avec une clé et `insecureIgnoreTlog`, Kyverno ne construit pas de matériel de confiance (`TrustedMaterial` nil), et il n'y ajoute la chaîne TSA que si ce matériel existe (`opts.go` l. 176) ;
+  - cosign v3.1.4 enveloppe ce `TrustedMaterial` nil dans `verifyTrustedMaterial` (`pkg/cosign/verify.go`) ;
+  - sigstore-go v1.3.0 n'appelle `TimestampingAuthorities()` que pour un jeton présent dans le bundle (`pkg/verify/tsa.go` l. 93). L'appel sur l'interface nil explique le plantage sur un jeton valide, et le refus propre d'un bundle sans jeton ;
+  - cosign en CLI ne plante pas, car `--trusted-root` lui donne ce matériel ;
+  - **aucun ticket trouvé chez Kyverno pour ce cas.** Le correctif en brouillon kyverno/kyverno#16048 ne couvre que le chemin keyless (matériel issu du TUF). Pas de ticket ouvert : décision du propriétaire.
+- **Kyverno 1.19.2 ne vérifie aucune attestation au format historique sans journal** : `verifyAttestationSignatures` exige une preuve d'inclusion dans un journal, alors que `verifyImageSignatures` s'en passe avec `insecureIgnoreTlog` (`verifier.go`). **Défaut connu** : tickets kyverno/kyverno#17109 et #18054, correctif #17217 ouvert, non fusionné au 29/10/2026 ; même code sur la branche principale. **Pour J6**, la provenance de Chains (`dsse`) n'est lisible par Kyverno qu'à travers les bundles réémis (témoin : `pass`) : le job d'horodatage sert aussi de pont entre Chains et Kyverno.
 - **kube-router, côté entrée** : le TSA a d'abord refusé (« connection refused ») un job neuf, car sa NetworkPolicy ne connaissait pas encore l'IP du pod. Le job attend désormais Zot et le TSA.
 - **Même délai pour l'EventListener de J4.** Au premier rejeu de J1 à J5, Forgejo a reçu « connection refused » sur le NodePort de l'EventListener, à la seconde où celui-ci devenait disponible. Forgejo n'a pas relivré : l'EventListener n'a reçu aucune requête dans les 2 min suivantes, et le test 5 a échoué faute de PipelineRun. Le rejeu précédent n'avait rien montré : l'étape avait duré 44 s, contre 5 s cette fois. `tekton.sh webhook` attend désormais que la sonde `/live` réponde depuis `sc-stockage`. En production, la même course ferait perdre un push : à traiter en J6, avec la relivraison des webhooks de Forgejo ou une resynchronisation.
 - **Renouvellement du jeton du TSA : deux défauts corrigés après le rejeu.**
@@ -383,10 +388,12 @@ Rejeu : `mise run confiance:tsa -- image pki openbao deployer essais horodater c
 - **Zot** : oras n'écrit pas un blob déjà présent, et l'opération réussit même sans droit d'écriture. Les essais de refus utilisent donc un contenu neuf, plus un contrôle direct en HTTP 401.
 - **Conforma v0.10.42** : aucune option d'horodatage dans `ec validate image` ; non mesuré, à reprendre en J8.
 
-**Choix du chemin de vérification : décision du propriétaire, en attente.** Proposition, fondée sur ces mesures :
+**Choix du chemin de vérification : décision du propriétaire (29/10/2026), sur ces mesures.** Retenu :
 - **stockage** : bundle réémis dans un dépôt séparé. C'est le format natif de Sigstore, sans réécriture de `.att` ;
 - **contrôle 9** : vérifié par cosign v3.1.4 dans la porte de release. `tools/verify-ts` se réduit alors à un appel de cosign, sans code cryptographique maison ;
-- **à l'admission** : Kyverno vérifie la signature des bundles, mais pas leur horodatage tant que l'erreur n'est pas corrigée. Signaler l'erreur à Kyverno demande l'accord du propriétaire.
+- **à l'admission** : Kyverno vérifie la signature des bundles, mais pas leur horodatage tant que l'erreur n'est pas corrigée ; aucun ticket amont (décision du propriétaire).
+
+Le propriétaire a aussi tranché la lecture de C-1 pour la décision C : un contrôle 9 vérifié hors du moteur de politique compte (notes du banc C mises à jour, voir l'ADR 0000). Écarté : un `tools/verify-ts` écrit en Go, qui n'apporte rien de mesuré sur cosign, et l'attente d'un correctif de Kyverno.
 
 **Limites** :
 - l'heure des jetons est celle de la VM ;
