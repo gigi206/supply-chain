@@ -1,6 +1,6 @@
-# politique.sh droits, 2026-10-29T22:46:07Z
+# politique.sh droits, 2026-10-29T23:26:25Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
-47 vérifications, 47 conformes
+52 vérifications, 52 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
   accordé : el-forgejo list eventlisteners.triggers.tekton.dev (declencheurs)
   accordé : el-forgejo list clusterinterceptors.triggers.tekton.dev (*)

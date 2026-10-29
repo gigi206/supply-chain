@@ -1,0 +1,9 @@
+## a) tag .att → index OCI
+a) index : code 1, 0 ligne(s) en sortie ; Error: unmarshaling payload: invalid character 's' looking for beginning of value error during command execution: unmarshaling payload: invalid character 's' looking for beginning of value
+## b) couche texte, pas du JSON
+b) texte : code 1, 0 ligne(s) en sortie ; Error: unmarshaling payload: invalid character 'p' looking for beginning of value error during command execution: unmarshaling payload: invalid character 'p' looking for beginning of value
+## c) couche JSON qui n'est pas une enveloppe DSSE
+c) JSON : code 0, 1 ligne(s) en sortie ; 
+## d) couche absente (manifeste qui désigne un blob inexistant)
+push du manifeste à couche absente : code 1 Error response from registry: manifest blob unknown: blob unknown to registry: map[description:This error MAY be returned when a manifest blob is unknown to the
+d) couche absente : code 0, 0 ligne(s) en sortie ; 

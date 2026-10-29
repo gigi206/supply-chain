@@ -50,3 +50,9 @@ operateur|get|secrets|declencheurs|no
 operateur|patch|configmaps|tekton-pipelines|no
 operateur|create|verificationpolicies.tekton.dev|builds|no
 operateur|delete|validatingpolicies.policies.kyverno.io|*|no
+# Job d'horodatage (compte horodatage, sans jeton monté) : aucun droit sur l'API ; il ne lit que Zot.
+horodatage|list|taskruns.tekton.dev|builds|no
+horodatage|list|pipelineruns.tekton.dev|builds|no
+horodatage|get|secrets|horodatage|no
+horodatage|list|secrets|*|no
+horodatage|create|pods|horodatage|no

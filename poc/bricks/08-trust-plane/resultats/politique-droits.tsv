@@ -46,3 +46,8 @@ operateur	get	secrets	declencheurs	no	no
 operateur	patch	configmaps	tekton-pipelines	no	no
 operateur	create	verificationpolicies.tekton.dev	builds	no	no
 operateur	delete	validatingpolicies.policies.kyverno.io	*	no	no
+horodatage	list	taskruns.tekton.dev	builds	no	no
+horodatage	list	pipelineruns.tekton.dev	builds	no	no
+horodatage	get	secrets	horodatage	no	no
+horodatage	list	secrets	*	no	no
+horodatage	create	pods	horodatage	no	no

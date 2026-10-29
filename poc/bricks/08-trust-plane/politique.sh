@@ -26,9 +26,15 @@
 #              l'espace de confiance declencheurs, droits réduits (politique/declencheurs.yaml) ; webhook Forgejo rebranché ;
 #              objets de J4 retirés de builds. Puis test 5 rejoué : EL_NS=declencheurs JOURNAL=politique JALON=J6
 #              mise run confiance:tekton -- essais_webhook
+#   horodatage horodatage automatique par réconciliation périodique : CronJob horodatage (politique/horodatage-cronjob.yaml,
+#              tsa/horodater.sh sans $IMAGE) qui parcourt builds/ dans Zot et horodate chaque enveloppe de Chains vérifiée
+#              (clé de Chains, sujet, prédicat) ; trois témoins posés par poc-ecriture (autre clé, autre sujet : refusés ;
+#              tag .att illisible : anomalie) à chaque passage, sans arrêter le parcours ; rattrapage, nouvelle exécution
+#              signée puis supprimée de l'API (latence), passage sans nouveauté ; une requête de jeton par enveloppe
+#              horodatée dans le journal du TSA ; un bundle par enveloppe ; chemin de la porte
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
-#              opérateur ; RBAC seul, l'admission n'y figure pas) dans resultats/politique-droits.tsv ; écritures de
-#              l'EventListener dans l'audit de l'API pendant le test 5
+#              opérateur, job d'horodatage ; RBAC seul, l'admission n'y figure pas) dans resultats/politique-droits.tsv ;
+#              écritures de l'EventListener dans l'audit de l'API pendant le test 5
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -477,6 +483,204 @@ etape_declencheurs() {
   kubectl get pods -n declencheurs -o json | jq -r '.items[] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName)"'
 }
 
+TEMOIN_CLE=essai-j6-autre-cle       # enveloppe bien formée, signée par une autre clé que celle de Chains
+TEMOIN_SUJET=essai-j6-autre-sujet   # enveloppe authentique de Chains, posée sur une autre image
+TEMOIN_ILLISIBLE=essai-j6-att-illisible   # tag .att dont la couche n'est pas du JSON (cosign download échoue)
+
+zot_ecrire() { oras "$@" --ca-file "$P/ca-poc.crt" --registry-config "$T/auth/zot.json"; }   # poc-ecriture, depuis l'hôte
+existe() { oras manifest fetch --ca-file "$P/ca-poc.crt" --descriptor "$REG_HOTE/$1" >/dev/null 2>&1; }
+
+image_temoin() { # dépôt : image témoin dans builds (manifeste fait main : même digest à chaque exécution de l'étape) ; digest
+  printf 'témoin J6 : builds/%s\n' "$1" > "$T/temoin.txt"
+  printf '{}' > "$T/vide.json"
+  zot_ecrire blob push "$REG_HOTE/builds/$1" "$T/vide.json" >/dev/null
+  zot_ecrire blob push "$REG_HOTE/builds/$1" "$T/temoin.txt" >/dev/null
+  jq -nc --arg d "sha256:$(sha256sum < "$T/temoin.txt" | cut -c1-64)" --argjson n "$(stat -c%s "$T/temoin.txt")" '{schemaVersion: 2,
+    mediaType: "application/vnd.oci.image.manifest.v1+json", artifactType: "application/vnd.poc.temoin.v1",
+    config: {mediaType: "application/vnd.oci.empty.v1+json", digest: "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", size: 2},
+    layers: [{mediaType: "text/plain", digest: $d, size: $n}]}' > "$T/temoin.json"
+  zot_ecrire manifest push "$REG_HOTE/builds/$1:temoin" "$T/temoin.json" | sed -n 's/^Digest: //p'
+}
+
+att_temoin() { # dépôt digest enveloppe : tag .att d'une seule enveloppe, au format de Chains (couche DSSE, config rootfs)
+  local l c
+  l=sha256:$(sha256sum < "$3" | cut -c1-64)
+  jq -nc --arg l "$l" '{architecture: "", os: "", config: {}, rootfs: {type: "layers", diff_ids: [$l]}}' > "$T/att-config.json"
+  c=sha256:$(sha256sum < "$T/att-config.json" | cut -c1-64)
+  zot_ecrire blob push "$REG_HOTE/builds/$1" "$3" >/dev/null
+  zot_ecrire blob push "$REG_HOTE/builds/$1" "$T/att-config.json" >/dev/null
+  jq -nc --arg l "$l" --argjson n "$(stat -c%s "$3")" --arg c "$c" --argjson cn "$(stat -c%s "$T/att-config.json")" '{schemaVersion: 2,
+    mediaType: "application/vnd.oci.image.manifest.v1+json", config: {mediaType: "application/vnd.oci.image.config.v1+json", digest: $c, size: $cn},
+    layers: [{mediaType: "application/vnd.dsse.envelope.v1+json", digest: $l, size: $n,
+      annotations: {"dev.cosignproject.cosign/signature": "", "dev.sigstore.cosign/certificate": "", "dev.sigstore.cosign/chain": ""}}]}' > "$T/att.json"
+  zot_ecrire manifest push "$REG_HOTE/builds/$1:sha256-${2#sha256:}.att" "$T/att.json" >/dev/null
+}
+
+verif_blob() { # enveloppe clé digest : bundle sans jeton vérifié sur l'hôte comme dans le réconciliateur ; « Verified OK » ou motif
+  jq -r '.signatures[0].sig' "$1" > "$T/vb.sig"
+  jq -r .payload "$1" | base64 -d > "$T/vb.payload"
+  cosign bundle create --artifact "$T/vb.payload" --signature "$T/vb.sig" --attestation "$1" --key "$2" --ignore-tlog \
+    --out "$T/vb.bundle" 2>/dev/null
+  cosign verify-blob-attestation --bundle "$T/vb.bundle" --new-bundle-format --key "$2" --insecure-ignore-tlog \
+    --type https://slsa.dev/provenance/v1 --digest "${3#sha256:}" --digestAlg sha256 2>&1 | grep -E '^(Verified OK|Error: )' | head -1
+}
+
+enveloppes() { # dépôt : nombre d'enveloppes de Chains dans le tag .att de l'image d'essai
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$1@$APP_DIGEST" 2>/dev/null | wc -l
+}
+
+bundles() { # digest : nombre de bundles horodatés de ce digest dans horodatage/bundles (referrers, lecture anonyme)
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/referrers/$1" \
+    | jq '[.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json")] | length'
+}
+
+passage() { # instant : premier passage du CronJob créé après cet instant, attendu terminé ; nom du job
+  local j=""
+  for _ in $(seq 100); do
+    j=$(kubectl get jobs -n horodatage -o json | jq -r --arg t "$1" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
+      and .name == "horodatage") and .metadata.creationTimestamp > $t and ((.status.succeeded // 0) + (.status.failed // 0)) > 0)]
+      | sort_by(.metadata.creationTimestamp) | .[0].metadata.name // empty')
+    [ -n "$j" ] && break
+    sleep 2
+  done
+  [ -n "$j" ] || { echo "KO   aucun passage du CronJob terminé depuis $1" >&2; exit 1; }
+  echo "$j"
+}
+
+analyser() { # job : journal du passage (enveloppes déjà horodatées résumées) ; requêtes de jeton reçues par le TSA pendant
+  # le passage (une par enveloppe horodatée, aucune pour une enveloppe refusée) ; témoins : deux refus, une anomalie
+  local j=$1 a b ip h r an
+  kubectl logs -n horodatage "job/$j" > "$T/passage.log"
+  kubectl get job -n horodatage "$j" -o json > "$T/job.json"
+  [ "$(jq -r '.status.succeeded // 0' "$T/job.json")" = 1 ] || { cat "$T/passage.log" >&2; echo "KO   passage $j en échec" >&2; exit 1; }
+  read -r a b < <(jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | @tsv' "$T/job.json")
+  ip=$(kubectl get pods -n horodatage -l job-name="$j" -o jsonpath='{.items[0].status.podIP}')
+  kubectl logs -n tsa deploy/timestamp-authority -c timestamp-server --since-time="$(jq -r .status.startTime "$T/job.json")" \
+    | jq -Rr --argjson a "$a" --argjson b "$b" 'fromjson? | select(.ts >= $a - 1 and .ts <= $b + 1) | .message
+      | select(test("\"POST [^ ]*/api/v1/timestamp ")) | capture("from (?<ip>[0-9.]+):").ip' > "$T/posts"
+  h=$(grep -c '^HORODATEE' "$T/passage.log" || true)
+  r=$(grep -c '^REFUSEE' "$T/passage.log" || true)
+  grep -v '^DEJA_HORODATEE' "$T/passage.log" | sed 's/^/  /'
+  awk -F'|' '$1 == "DEJA_HORODATEE" {n[$2]++} END {for (d in n) printf "  DEJA_HORODATEE|%s ×%d\n", d, n[d]}' "$T/passage.log" | sort
+  echo "passage $j : $(jq -r '"\(.status.startTime[11:19]) → \(.status.completionTime[11:19])"' "$T/job.json"), pod $ip ;" \
+    "requêtes de jeton reçues par le TSA : $(wc -l < "$T/posts")$(sort -u "$T/posts" | sed 's/^/, depuis /' | paste -sd' ')"
+  [ "$(wc -l < "$T/posts")" = "$h" ] && [ "$(sort -u "$T/posts" | grep -vxF "$ip" | wc -l)" = 0 ] \
+    && echo "OK   une requête de jeton par enveloppe horodatée ($h), toutes du pod du passage ; aucune pour les $r refusées" \
+    || { echo "KO   $(wc -l < "$T/posts") requête(s) de jeton pour $h enveloppe(s) horodatée(s)" >&2; exit 1; }
+  [ "$r" = 2 ] || { echo "KO   $r enveloppe(s) refusée(s) au lieu des 2 témoins" >&2; exit 1; }
+  an=$(grep -cE '^(IMAGE_ABSENTE|AUCUNE_ATTESTATION|ATTESTATIONS_ILLISIBLES|TAGS_ILLISIBLES)\|' "$T/passage.log" || true)
+  [ "$an" = 1 ] && grep -q "^ATTESTATIONS_ILLISIBLES|builds/$TEMOIN_ILLISIBLE|" "$T/passage.log" \
+    || { echo "KO   $an anomalie(s) au lieu du seul témoin illisible" >&2; exit 1; }
+}
+
+etape_horodatage() {
+  local x y z pt t j e0 e1 b0 n w jeton pipe o
+  kubectl get secret -n horodatage zot-horodatage >/dev/null 2>&1 || { echo "KO   secret zot-horodatage absent (tsa.sh horodater)" >&2; exit 1; }
+  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  mkdir -p "$T/auth" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/zot.json"
+  config_horodatage   # avant les témoins : le script de J5 échouerait sur le témoin illisible, à chaque passage
+
+  echo "## témoins posés dans builds par poc-ecriture (compte d'écriture général) : jamais horodatables"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null | head -1 > "$T/chains-env.json"
+  x=$(image_temoin "$TEMOIN_CLE")
+  if existe "builds/$TEMOIN_CLE:sha256-${x#sha256:}.att"; then echo "builds/$TEMOIN_CLE@$x : témoin existant"; else
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/auth/autre.key")
+    openssl pkey -in "$T/auth/autre.key" -pubout -out "$T/autre.pub"
+    jq -r .payload "$T/chains-env.json" | base64 -d | jq -c --arg x "${x#sha256:}" '.subject |= map(.digest.sha256 = $x)' > "$T/faux.payload"
+    pt=$(jq -r .payloadType "$T/chains-env.json")
+    { printf 'DSSEv1 %d %s %d ' "${#pt}" "$pt" "$(stat -c%s "$T/faux.payload")"; cat "$T/faux.payload"; } > "$T/faux.pae"
+    openssl dgst -sha256 -sign "$T/auth/autre.key" -out "$T/faux.sig" "$T/faux.pae"
+    jq -nc --arg t "$pt" --arg p "$(base64 -w0 "$T/faux.payload")" --arg s "$(base64 -w0 "$T/faux.sig")" \
+      '{payloadType: $t, payload: $p, signatures: [{keyid: "", sig: $s}]}' > "$T/faux-env.json"
+    att_temoin "$TEMOIN_CLE" "$x" "$T/faux-env.json"
+    echo "builds/$TEMOIN_CLE@$x : provenance de Chains réécrite pour l'image témoin, signée (DSSE) par une clé jetable"
+    echo "  sur l'hôte : clé du témoin → $(verif_blob "$T/faux-env.json" "$T/autre.pub" "$x") ; clé de Chains → $(verif_blob "$T/faux-env.json" "$R/chains-cle-publique.pem" "$x")"
+  fi
+  y=$(image_temoin "$TEMOIN_SUJET")
+  if existe "builds/$TEMOIN_SUJET:sha256-${y#sha256:}.att"; then echo "builds/$TEMOIN_SUJET@$y : témoin existant"; else
+    att_temoin "$TEMOIN_SUJET" "$y" "$T/chains-env.json"
+    echo "builds/$TEMOIN_SUJET@$y : enveloppe authentique de Chains (sujet $APP_DIGEST), posée sur l'image témoin"
+    echo "  sur l'hôte : digest de l'image d'essai → $(verif_blob "$T/chains-env.json" "$R/chains-cle-publique.pem" "$APP_DIGEST") ; digest du témoin → $(verif_blob "$T/chains-env.json" "$R/chains-cle-publique.pem" "$y")"
+  fi
+  z=$(image_temoin "$TEMOIN_ILLISIBLE")
+  if existe "builds/$TEMOIN_ILLISIBLE:sha256-${z#sha256:}.att"; then echo "builds/$TEMOIN_ILLISIBLE@$z : témoin existant"; else
+    printf 'pas du JSON\n' > "$T/illisible.txt"
+    att_temoin "$TEMOIN_ILLISIBLE" "$z" "$T/illisible.txt"
+    echo "builds/$TEMOIN_ILLISIBLE@$z : tag .att dont la couche n'est pas du JSON (sonde : resultats/politique-horodatage-sonde-att.log)"
+  fi
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$TEMOIN_ILLISIBLE@$z" > /dev/null 2> "$T/illisible.err" \
+    && { echo "KO   témoin illisible lu par cosign" >&2; exit 1; }
+  echo "  sur l'hôte : cosign download attestation échoue ($(sed -n 's/^Error: //p' "$T/illisible.err" | head -1)) ; le script de J5 (set -e) aurait échoué à chaque passage"
+
+  echo "## CronJob horodatage (politique/horodatage-cronjob.yaml)"
+  e0=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); b0=$(bundles "$APP_DIGEST")
+  echo "avant : $e0 enveloppe(s) de Chains pour $APP_DIGEST (builds/essai-signature et builds/essai-webhook), $b0 bundle(s)"
+  echo "prédiction du premier passage : $((e0 - b0)) horodatée(s), $b0 déjà horodatée(s), 2 refusées et 1 anomalie (témoins), $((e0 - b0)) requête(s) de jeton"
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  sed -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@REG@#$REG#g" "$here/politique/horodatage-cronjob.yaml" \
+    | kubectl apply --server-side -f - >/dev/null
+  kubectl get cronjob -n horodatage horodatage -o json | jq -c '{schedule: .spec.schedule, concurrencyPolicy: .spec.concurrencyPolicy,
+    startingDeadlineSeconds: .spec.startingDeadlineSeconds, activeDeadlineSeconds: .spec.jobTemplate.spec.activeDeadlineSeconds}'
+
+  echo "## premier passage : rattrapage"
+  j=$(passage "$t")
+  analyser "$j"
+  [ "$(grep -c '^HORODATEE' "$T/passage.log" || true)" = $((e0 - b0)) ] && echo "OK   prédiction tenue" \
+    || { echo "KO   prédiction : $((e0 - b0)) horodatée(s)" >&2; exit 1; }
+  grep -q "^REFUSEE|builds/$TEMOIN_CLE|.*accepted signatures do not match threshold" "$T/passage.log" \
+    && grep -q "^REFUSEE|builds/$TEMOIN_SUJET|.*provided artifact digest does not match" "$T/passage.log" \
+    && echo "OK   témoins refusés pour leur motif (autre clé ; autre sujet ; illisible en anomalie), avant toute demande au TSA, sans arrêter le parcours" \
+    || { echo "KO   motifs des refus" >&2; exit 1; }
+  kubectl get pods -n horodatage -l job-name="$j" -o json | jq -r '.items[0] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName), volumes de jeton projetés \([.spec.volumes[] | select(.projected)] | length), sortie \(.status.containerStatuses[0].state.terminated.reason)"'
+
+  echo "## nouvelle exécution signée, supprimée de l'API après sa signature : horodatée au passage suivant"
+  pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  sed "s#@PIPELINE@#$pipe#" "$here/politique/declencheurs.yaml" > "$T/declencheurs.yaml"
+  e0=$(enveloppes builds/essai-webhook)
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  verdict "exécution du bundle signé" True "$(pipelinerun j6-horodatage "$pipe" 5555555555555555555555555555555555555555)"
+  o=$(kubectl get taskrun -n builds -l tekton.dev/pipelineRun=j6-horodatage -o jsonpath='{.items[0].metadata.name}')
+  echo "Chains : TaskRun $o signé=$(signe taskrun "$o"), PipelineRun j6-horodatage signé=$(signe pipelinerun j6-horodatage)"
+  e1=$(enveloppes builds/essai-webhook)
+  w=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -r --arg t "$t" 'select(.time >= $t and .subject == "poc-build" and .status == 201
+    and (.object | test("^/v2/builds/essai-webhook/manifests/sha256-.*[.]att$"))) | .time' | tail -1)
+  echo "builds/essai-webhook : $e0 → $e1 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : ${w:-absente}"
+  [ "$e1" -gt "$e0" ] && [ -n "$w" ] || { echo "KO   aucune nouvelle enveloppe de Chains" >&2; exit 1; }
+  kubectl delete pipelinerun -n builds j6-horodatage --wait=true >/dev/null
+  n=$(kubectl get pipelineruns,taskruns -n builds -l tekton.dev/pipelineRun=j6-horodatage -o name | wc -l)
+  [ "$n" = 0 ] && ! kubectl get pipelinerun -n builds j6-horodatage >/dev/null 2>&1 \
+    && echo "PipelineRun j6-horodatage et son TaskRun supprimés de l'API avant le passage (seul Zot garde la trace)" \
+    || { echo "KO   exécution encore présente dans l'API" >&2; exit 1; }
+  j=$(passage "$(date -u +%Y-%m-%dT%H:%M:%SZ)")
+  analyser "$j"
+  n=$(grep -c '^HORODATEE|builds/essai-webhook|' "$T/passage.log" || true)
+  [ "$n" = $((e1 - e0)) ] && echo "OK   $n nouvelle(s) enveloppe(s) horodatée(s) au premier passage après la signature, exécution déjà purgée de l'API" \
+    || { echo "KO   $n horodatée(s) pour $((e1 - e0)) nouvelle(s)" >&2; exit 1; }
+  jeton=$(grep '^HORODATEE|builds/essai-webhook|' "$T/passage.log" | tail -1 | cut -d'|' -f6)
+  echo "latence : écriture .att par Chains $(date -u -d "$w" +%T) → jeton du TSA $(date -u -d "${jeton% UTC}" +%T) :" \
+    "$(( $(date -d "${jeton% UTC}" +%s) - $(date -d "$w" +%s) )) s (borne : période de 60 s, plus la durée d'un passage)"
+
+  echo "## passage suivant : rien de nouveau"
+  oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/$DEPOT_BUNDLES" | sort > "$T/tags-avant"
+  j=$(passage "$(jq -r .metadata.creationTimestamp "$T/job.json")")
+  analyser "$j"
+  oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/$DEPOT_BUNDLES" | sort > "$T/tags-apres"
+  [ "$(grep -c '^HORODATEE' "$T/passage.log" || true)" = 0 ] && cmp -s "$T/tags-avant" "$T/tags-apres" \
+    && echo "OK   aucune enveloppe horodatée, aucun jeton demandé, étiquettes de $DEPOT_BUNDLES inchangées ($(wc -l < "$T/tags-apres"))" \
+    || { echo "KO   passage sans nouveauté" >&2; exit 1; }
+
+  echo "## contrôles"
+  e1=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); n=$(bundles "$APP_DIGEST")
+  [ "$e1" = "$n" ] && echo "OK   un bundle par enveloppe de Chains : $n pour $APP_DIGEST" || { echo "KO   $n bundle(s) pour $e1 enveloppe(s)" >&2; exit 1; }
+  [ "$(bundles "$x")" = 0 ] && [ "$(bundles "$y")" = 0 ] && [ "$(bundles "$z")" = 0 ] && echo "OK   aucun bundle pour les images témoins" || { echo "KO   bundle d'un témoin" >&2; exit 1; }
+  COSIGN_REPOSITORY=$REG_HOTE/$DEPOT_BUNDLES cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+    --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --type slsaprovenance1 \
+    --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" > "$T/porte.out" 2> "$T/porte.err" \
+    || { cat "$T/porte.err" >&2; echo "KO   vérification de la porte" >&2; exit 1; }
+  echo "OK   chemin de la porte (cosign v3.1.4, bundles de $DEPOT_BUNDLES, jeton exigé, racine du TSA) : $(wc -l < "$T/porte.out") attestation(s) vérifiée(s)"
+}
+
 etape_droits() {
   local debut sujet as verbe ressource ns attendu obtenu nom n k=0
   kubectl apply --server-side -f "$here/politique/droits.yaml" >/dev/null
@@ -489,6 +693,7 @@ etape_droits() {
       build) as=(--as=system:serviceaccount:builds:build) ;;
       el-forgejo) as=(--as=system:serviceaccount:declencheurs:el-forgejo) ;;
       operateur) as=(--as=operateur --as-group=operateurs) ;;
+      horodatage) as=(--as=system:serviceaccount:horodatage:horodatage) ;;
     esac
     if [ "$ns" = '*' ]; then obtenu=$(kubectl auth can-i "$verbe" "$ressource" -A "${as[@]}" 2>/dev/null || true)
     else obtenu=$(kubectl auth can-i "$verbe" "$ressource" -n "$ns" "${as[@]}" 2>/dev/null || true); fi

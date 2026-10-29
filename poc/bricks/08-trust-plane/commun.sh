@@ -9,6 +9,10 @@ W=$O/travail
 REG_HOTE=192.168.161.13:5000          # Zot depuis l'hôte (pas de résolution de poc.test) : SAN IP du certificat
 REG=sc-stockage.poc.test:5000         # Zot depuis les nœuds et les pods
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
+# Horodatage (J5, tsa.sh ; J6, CronJob de politique.sh) : image d'outils du job et dépôt des bundles réémis
+OUTILS=plateforme/outils-horodatage
+OUTILS_DIGEST=sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0   # assemblage reproductible (tsa.sh image)
+DEPOT_BUNDLES=horodatage/bundles   # bundles réémis, hors des dépôts des images (voir tsa/horodater.sh)
 declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stockage]=192.168.161.13)
 SSH_OPTS=(-i "$O/ssh/id_ed25519" -o UserKnownHostsFile="$O/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 mkdir -p "$R" "$P" "$W"
@@ -122,6 +126,14 @@ brancher_forgejo() { # EventListener de $EL_NS attendu, puis seul webhook du dé
   api -X POST https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks -d @"$T/auth/hook.json" \
     | jq -c '{id, type, active, events, url: .config.url, content_type: .config.content_type}'
   rm -f "$T/auth/hook.json" "$T/auth/entete"
+}
+
+config_horodatage() { # ConfigMap du job d'horodatage (J5) et du CronJob (J6) : script, CA du PoC, clé publique de Chains,
+  # racine de confiance du TSA (vérification de bout en bout d'un bundle avant sa publication) ; rien de secret
+  kubectl create configmap horodatage -n horodatage --from-file=horodater.sh="$here/tsa/horodater.sh" \
+    --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=chains.pub="$R/chains-cle-publique.pem" \
+    --from-file=tsa-racine-confiance.json="$P/tsa-racine-confiance.json" \
+    --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
 }
 
 certificat() { # nom SAN : certificat de service signé par la CA du PoC (stockage.sh pki), clé en 0600

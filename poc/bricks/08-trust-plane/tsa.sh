@@ -39,12 +39,9 @@ ORAS_TGZ_SHA=66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0   
 ORAS_FPR=C6FC42F0DE84A345FAADB742F44418110791EF37   # « ORAS Project Release Signing » (KEYS du dépôt, oras.land)
 MIROIR_TSA=amont/sigstore/timestamp-server
 MIROIR_COSIGN=amont/sigstore/cosign/cosign
-OUTILS=plateforme/outils-horodatage
-OUTILS_DIGEST=sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0   # assemblage reproductible (tsa.sh image)
 BAO_INDEX=sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh
 SUJET=system:serviceaccount:tsa:timestamp-authority
 URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp
-DEPOT_BUNDLES=horodatage/bundles   # bundles réémis, hors des dépôts des images (voir tsa/horodater.sh)
 APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # images d'essai signées en J4
 DL=$O/telechargements/tsa
 T=$W/tsa
@@ -358,9 +355,7 @@ etape_horodater() {
   kubectl create secret generic zot-horodatage -n horodatage --from-file=config.json="$T/zot-horodatage.json" \
     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   echo "secret zot-horodatage appliqué (poc-horodatage, $REG ; lu sur l'entrée standard de kubectl, sans annotation last-applied)"
-  kubectl create configmap horodatage -n horodatage --from-file=horodater.sh="$here/tsa/horodater.sh" \
-    --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=chains.pub="$R/chains-cle-publique.pem" \
-    --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
+  config_horodatage
   echo "## builds/essai-signature (une exécution signée en J4)"
   job_horodatage builds/essai-signature
   echo "## builds/essai-webhook (une enveloppe par exécution signée de l'essai du webhook)"

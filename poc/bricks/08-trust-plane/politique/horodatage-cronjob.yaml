@@ -1,0 +1,79 @@
+# Brique 08, J6 : horodatage automatique par réconciliation périodique (politique.sh horodatage). Chaque minute, un job
+# parcourt les dépôts de Zot sous builds/ et horodate les enveloppes de Chains qui ne le sont pas encore (tsa/horodater.sh
+# sans $IMAGE). Même pod que le job de J5 (tsa/horodatage-job.yaml) : nœud de confiance, Pod Security restricted, aucun
+# jeton de compte de service ; sorties DNS, TSA et Zot seulement (tsa/horodatage.yaml).
+# @OUTILS@ : image d'outils de J5, épinglée par digest ; @REG@ : Zot vu des pods.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: horodatage
+  namespace: horodatage
+spec:
+  schedule: "* * * * *"
+  timeZone: Etc/UTC
+  # Deux passages simultanés publieraient deux bundles pour une même enveloppe (étiquette réécrite, referrer en double).
+  concurrencyPolicy: Forbid
+  # Un passage qui n'a pas pu partir dans les 120 s (cluster arrêté) est abandonné : le suivant traite tout.
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      # Borne un passage bloqué : avec Forbid, il retiendrait tous les suivants.
+      activeDeadlineSeconds: 300
+      template:
+        spec:
+          serviceAccountName: horodatage
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          restartPolicy: Never
+          nodeSelector:
+            zone: confiance
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: horodater
+            image: @OUTILS@
+            command: [sh, /etc/horodatage/horodater.sh]
+            env:
+            - name: REGISTRE
+              value: @REG@
+            - name: PREFIXES
+              value: builds
+            - name: DEPOT
+              value: @REG@/horodatage/bundles
+            - name: TSA
+              value: http://timestamp-authority.tsa.svc.cluster.local:3000
+            - name: HOME
+              value: /travail
+            - name: TMPDIR
+              value: /travail
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+            volumeMounts:
+            - name: travail
+              mountPath: /travail
+            - name: config
+              mountPath: /etc/horodatage
+              readOnly: true
+            - name: zot
+              mountPath: /var/run/zot
+              readOnly: true
+          volumes:
+          - name: travail
+            emptyDir:
+              sizeLimit: 64Mi
+          - name: config
+            configMap:
+              name: horodatage
+          - name: zot
+            secret:
+              secretName: zot-horodatage

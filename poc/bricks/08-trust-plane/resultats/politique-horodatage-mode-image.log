@@ -1,0 +1,16 @@
+# mode une image (J5) de tsa/horodater.sh après sa réécriture en J6 : job de tsa/horodatage-job.yaml lancé à la main, 2026-10-29T23:37:32Z
+# (tsa.sh horodater n'est pas rejoué : il écraserait resultats/tsa-horodater.log ; le rejeu de J1 à J6 le rejouera)
+## mode une image (J5), builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : réussi/échoué = 1/
+JOINT|Zot et TSA, essai 1
+FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 1 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+DEJA_HORODATEE ×1
+## mode une image (J5), builds/essai-j6-autre-cle@sha256:f214bf05c70cc5ca049aba8cd927fbcd246688d044ac52ce15ea43db2ccc309e : réussi/échoué = /1
+JOINT|Zot et TSA, essai 1
+REFUSEE|builds/essai-j6-autre-cle|1|signature 7295b4ac5cc03a1b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 0 déjà, 1 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-j6-autre-cle@sha256:f214bf05c70cc5ca049aba8cd927fbcd246688d044ac52ce15ea43db2ccc309e → sc-stockage.poc.test:5000/horodatage/bundles
+DEJA_HORODATEE ×0
+## mode une image (J5), builds/essai-j6-att-illisible@sha256:4eee7d404fb7a1382bb5c23ac1c0de542c3dcb32eb5bcb3ca9298208d3956a72 : réussi/échoué = /1
+JOINT|Zot et TSA, essai 1
+ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+FIN|1 image(s), 0 enveloppe(s) : 0 horodatée(s), 0 déjà, 0 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-j6-att-illisible@sha256:4eee7d404fb7a1382bb5c23ac1c0de542c3dcb32eb5bcb3ca9298208d3956a72 → sc-stockage.poc.test:5000/horodatage/bundles
+DEJA_HORODATEE ×0

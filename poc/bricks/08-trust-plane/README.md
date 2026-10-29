@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). Chemin de vérification de J5 retenu par le propriétaire : bundle réémis, vérifié par cosign. **J6 en cours** (accord du 29/10/2026) : Kyverno à l'admission, C-2 mesuré ; Trusted Resources ; règles d'admission ; EventListener et secrets sortis de la zone build, RBAC réduit, test 5 rejoué sous politique.
+**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). Chemin de vérification de J5 retenu par le propriétaire : bundle réémis, vérifié par cosign. **J6 en cours** (accord du 29/10/2026) : Kyverno à l'admission, C-2 mesuré ; Trusted Resources ; règles d'admission ; EventListener et secrets sortis de la zone build, RBAC réduit, test 5 rejoué sous politique ; horodatage automatique par réconciliation périodique.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -327,7 +327,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 ## Jalon J6 : politique (en cours, 29/10/2026)
 
-Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite taches admission chains declencheurs`, puis le test 5 (`EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook`), puis `mise run confiance:politique -- droits`. Journaux : `resultats/politique-<étape>.log`.
+Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite taches admission chains declencheurs horodatage`, puis le test 5 (`EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook`), puis `mise run confiance:politique -- droits`. Journaux : `resultats/politique-<étape>.log`.
 
 | Étape | Durée | Résultat |
 |---|---|---|
@@ -338,6 +338,7 @@ Accord du propriétaire : « continue », après le compactage demandé avant J6
 | `admission` | 28 s | Règles d'admission de Kyverno, voir ci-dessous |
 | `chains` | 2 s | Identifiants Zot de Chains sortis de `builds`, voir ci-dessous |
 | `declencheurs` | 27 s | Tâche et pipeline de J4 en bundles signés ; EventListener dans `declencheurs`, voir ci-dessous |
+| `horodatage` | 152 s, puis 193 s à la seconde exécution (trois passages du CronJob, un par minute) | Horodatage automatique par réconciliation périodique, voir ci-dessous |
 | `essais_webhook` (de `tekton.sh`) | 38 s | Test 5 rejoué sous politique, voir ci-dessous |
 | `droits` | 3 s | Matrice des droits et audit de l'API, voir ci-dessous |
 
@@ -433,9 +434,42 @@ Les objets de J4 sont supprimés de `builds`, puis contrôlés : aucun secret, n
 
 **Constat d'affichage, corrigé** : le tag `.att` accumule les enveloppes de toutes les exécutions d'un même sujet. Au premier passage de J6, l'affichage de la provenance a pris la première enveloppe du commit réel, celle de J4. Il ne retient plus que les enveloppes de l'essai en cours (`startedOn`).
 
+**Horodatage automatique, par réconciliation périodique** ([`politique-horodatage.log`](resultats/politique-horodatage.log), [`politique/horodatage-cronjob.yaml`](politique/horodatage-cronjob.yaml), [`tsa/horodater.sh`](tsa/horodater.sh)). Le job de J5 devient un CronJob de l'espace `horodatage`. Chaque minute, un passage parcourt les dépôts de `builds/` dans Zot ; chaque tag `sha256-<digest>.att` y désigne une image attestée par Chains.
+- **Source : Zot, pas l'API.** Le plan noté avant l'étape lisait les TaskRuns et PipelineRuns signés de `builds` par l'API. Il fallait pour cela un jeton dans `horodatage`, un rôle de lecture dans `builds`, une sortie vers l'API et une image avec kubectl à vérifier. Et les résultats `IMAGE_URL` et `IMAGE_DIGEST` viennent du pod de build, en zone hostile. Le passage lit Zot en anonyme, sans jeton (aucun volume de jeton dans le pod), avec la NetworkPolicy de J5 (DNS, TSA, Zot). Une exécution purgée de l'API reste horodatée (mesuré, voir plus bas). Un passage interrompu est repris par le suivant, par construction : chaque passage relit tout l'état de Zot (non mesuré).
+- **Vérification avant le TSA.** Lu dans le code de cosign v3.1.4 (`AssembleNewBundleFromPayload`, appelé par `cosign bundle create`) : la clé n'y sert qu'à calculer son empreinte (`hint`), rien n'est vérifié. Le job de J5 aurait horodaté n'importe quelle enveloppe d'un tag `.att`, alors que `poc-ecriture` écrit dans `builds/**`. Le compte d'écriture des images de J7 y écrira aussi, et pourra écrire les tags `.att` si Zot ne permet pas de les lui interdire (voir les suites). Chaque enveloppe passe donc d'abord par `cosign verify-blob-attestation`, sur un bundle sans jeton : signature de la clé de Chains, sujet égal au digest de l'image (tiré du nom du tag), prédicat `https://slsa.dev/provenance/v1`. Mesuré sur l'hôte avant l'écriture du script, sans réseau ni cache TUF : enveloppe authentique acceptée ; autre digest, autre clé, autre prédicat refusés. Une enveloppe refusée est écartée (`REFUSEE` : ni jeton, ni bundle) sans arrêter le parcours, car Zot ne permet pas de la supprimer.
+- **Tag `.att` illisible** : sonde faite hors de `builds/` ([`politique-horodatage-sonde-att.log`](resultats/politique-horodatage-sonde-att.log)). `cosign download attestation` échoue (code 1) sur un tag `.att` qui désigne un index OCI, ou dont la couche n'est pas du JSON. Une couche JSON qui n'est pas une enveloppe passe, puis elle est refusée. Zot refuse d'emblée un manifeste dont une couche manque. Avec `set -e`, le premier script aurait fait échouer chaque passage, indéfiniment. Ces échecs, comme celui de la liste des tags d'un dépôt, sont désormais comptés en anomalies (`ATTESTATIONS_ILLISIBLES`, `TAGS_ILLISIBLES`), et le parcours continue.
+- **Vérification après le TSA** : avant sa publication, le bundle horodaté est revérifié de bout en bout (jeton exigé, racine de confiance du TSA ajoutée à la ConfigMap).
+- `concurrencyPolicy: Forbid` (deux passages simultanés publieraient deux bundles pour une même enveloppe) ; `startingDeadlineSeconds: 120` ; `activeDeadlineSeconds: 300` (avec `Forbid`, un passage bloqué retiendrait les suivants).
+
+**Témoins**, posés dans `builds` par `poc-ecriture` (le compte d'écriture général) et laissés en place, puisque Zot ne permet pas de les supprimer :
+- `builds/essai-j6-autre-cle` : la provenance de Chains, réécrite pour l'image témoin et signée en DSSE par une clé jetable. Sur l'hôte, sa propre clé la vérifie, celle de Chains la refuse ;
+- `builds/essai-j6-autre-sujet` : une enveloppe authentique de Chains, posée sur l'image témoin. Sur l'hôte, elle est acceptée pour le digest de l'image d'essai et refusée pour celui du témoin ;
+- `builds/essai-j6-att-illisible` : un tag `.att` dont la couche n'est pas du JSON. Sur l'hôte, `cosign download attestation` échoue.
+
+**Mesures**, en deux exécutions de l'étape. La prédiction est écrite par l'étape avant le premier passage, à partir des enveloppes et des bundles comptés dans Zot.
+- **Première exécution** ([`politique-horodatage-rattrapage.log`](resultats/politique-horodatage-rattrapage.log)) : deux témoins, script d'avant la protection des tags `.att` illisibles ;
+- **seconde exécution** ([`politique-horodatage.log`](resultats/politique-horodatage.log)) : avec le témoin illisible, et le PipelineRun supprimé de l'API (TaskRun compris) entre sa signature par Chains et le passage.
+
+| Passage | Prédiction | Mesure | Requêtes de jeton reçues par le TSA |
+|---|---|---|---|
+| 1re exécution, rattrapage (31 s) | 10 horodatées, 5 déjà, 2 refusées | **10 horodatées** (enveloppes des exécutions de J6), 5 déjà (J5), 2 refusées | **10**, toutes du pod du passage |
+| 1re exécution, après une exécution signée (9 s) | les nouvelles enveloppes | **2 horodatées** (TaskRun et PipelineRun `j6-horodatage`), 15 déjà, 2 refusées | **2** |
+| 1re exécution, sans nouveauté (5 s) | aucune | 0 horodatée, 17 déjà, 2 refusées ; étiquettes de `horodatage/bundles` inchangées | **0** |
+| 2e exécution, premier passage (4 s) | 0 horodatée, 17 déjà, 2 refusées, 1 anomalie | conforme ; le témoin illisible, parcouru en premier, est compté en anomalie | **0** |
+| 2e exécution, après une exécution signée **puis supprimée de l'API** (9 s) | les nouvelles enveloppes | **2 horodatées**, 17 déjà, 2 refusées, 1 anomalie | **2** |
+| 2e exécution, sans nouveauté (4 s) | aucune | 0 horodatée, 19 déjà, 2 refusées, 1 anomalie ; étiquettes inchangées | **0** |
+
+- à chaque passage, les témoins sont traités avant `builds/essai-webhook` (ordre du catalogue). Les deux premiers sont refusés pour leur motif : « accepted signatures do not match threshold » (autre clé), « provided artifact digest does not match any digest in statement » (autre sujet). Le troisième est compté en anomalie (`ATTESTATIONS_ILLISIBLES`). Le TSA ne reçoit aucune requête pour eux, et le parcours continue ;
+- **latence mesurée : 18 s puis 46 s**, entre la dernière écriture `.att` de Chains (audit de Zot) et le jeton. La borne est la période (60 s) plus la durée du passage, environ 3 s par enveloppe à horodater ;
+- **une exécution purgée de l'API reste horodatée** : à la seconde exécution, PipelineRun et TaskRun étaient supprimés avant le passage, seul Zot gardait leurs enveloppes ;
+- **un bundle par enveloppe** : 19 bundles pour 19 enveloppes de Chains (`essai-signature` et `essai-webhook`, même digest), aucun pour les trois images témoins ;
+- **chemin de la porte** (cosign v3.1.4, bundles de `horodatage/bundles`, jeton exigé, racine du TSA) : 19 attestations vérifiées ;
+- pod du passage sur `sc-confiance`, compte `horodatage`, sans volume de jeton ; entre les deux exécutions, le CronJob a tourné seul, en passages de 4 à 5 s, tous réussis ;
+- **mode « une image » de J5 conservé** ([`politique-horodatage-mode-image.log`](resultats/politique-horodatage-mode-image.log)), avec le script protégé : un job de `tsa/horodatage-job.yaml`, lancé à la main, réussit sur `essai-signature` (déjà horodatée) ; il échoue sur le témoin `autre-cle` (refusé) et sur le témoin illisible (anomalie). `tsa.sh horodater` n'a pas été rejoué, car il aurait écrasé le journal de J5 ; le rejeu de J1 à J6 le rejouera.
+
 **Droits** ([`politique-droits.log`](resultats/politique-droits.log), [`politique-droits.tsv`](resultats/politique-droits.tsv), [`politique/droits.txt`](politique/droits.txt), [`politique/droits.yaml`](politique/droits.yaml)) :
 - rôle sur mesure `operateur-builds` (groupe `operateurs`), **en lecture seule** : PipelineRuns, TaskRuns, pods, journaux et événements de `builds`. Les rôles agrégés `edit` et `admin` (`tekton-aggregate-edit`) ne conviennent pas : ils donneraient `pods/exec` et la lecture des secrets de l'espace ;
-- **47 vérifications `kubectl auth can-i`, toutes conformes**. Compte `build` : aucun droit, et `can-i --list` ne montre que les droits de découverte communs à tout compte. EventListener : seulement ses lectures et la création de PipelineRuns dans `builds`. Opérateur : ni `taskruns/status` ni `pipelineruns/status` (test 3), ni modification des TaskRuns, ni `exec`, `attach`, `portforward` ou conteneur éphémère, ni secrets, ni `serviceaccounts/token` dans `tekton-chains`, `openbao` et `tsa`, ni création de pods dans la zone de confiance ;
+- **52 vérifications `kubectl auth can-i`, toutes conformes**. Compte `horodatage` du CronJob : aucun droit sur l'API, ni lecture des TaskRuns et PipelineRuns de `builds`, ni secrets, ni création de pods. Compte `build` : aucun droit, et `can-i --list` ne montre que les droits de découverte communs à tout compte. EventListener : seulement ses lectures et la création de PipelineRuns dans `builds`. Opérateur : ni `taskruns/status` ni `pipelineruns/status` (test 3), ni modification des TaskRuns, ni `exec`, `attach`, `portforward` ou conteneur éphémère, ni secrets, ni `serviceaccounts/token` dans `tekton-chains`, `openbao` et `tsa`, ni création de pods dans la zone de confiance ;
 - `can-i` ne juge que le RBAC : un droit accordé reste soumis à l'admission (Kyverno, webhooks de Tekton) ;
 - **audit de l'API pendant le test 5** : le compte `el-forgejo` n'écrit que des `create pipelineruns` dans `builds` (2 en 201, 2 rejeux en 409), **aucun refus 403**, et aucun « forbidden » dans le journal de l'EventListener. L'audit ne journalise pas les lectures (politique de J1) : leur suffisance se lit au fonctionnement de l'EventListener et à son journal.
 
@@ -444,6 +478,13 @@ Les objets de J4 sont supprimés de `builds`, puis contrôlés : aucun secret, n
 **Limites et suites** :
 - les pods de Tekton dans `builds` ne respectent pas Pod Security `restricted` : ni les conteneurs d'initialisation de Tekton (`prepare`, `place-scripts`) ni le conteneur d'étape ne posent `allowPrivilegeEscalation: false` et `capabilities.drop` (relevé sur le pod d'un TaskRun et par un `kubectl label --dry-run=server`). Pistes à mesurer : le drapeau `set-security-context` de Pipelines, et le `securityContext` des étapes dans les tâches signées ;
 - l'identifiant `poc-build` de Chains peut toujours écraser `.sig` et `.att` (constat de J4), mais il n'est plus monté que dans la zone de confiance ;
+- horodatage automatique :
+  - chaque passage relit toutes les enveloppes de `builds/` (catalogue, tags, téléchargements) : le coût croît avec leur nombre (4 à 5 s pour une vingtaine d'enveloppes). En production, il faudrait mémoriser le digest du tag `.att` déjà traité, ou lire les bundles en referrers quand Chains les publiera (tektoncd/chains#2096) ;
+  - un refus n'est visible que dans le journal du passage : ni alerte, ni événement, puisque le compte n'a pas accès à l'API. À brancher sur la supervision ;
+  - relancer `tsa.sh horodater` pendant que le CronJob tourne peut publier deux bundles pour une même enveloppe (deux écrivains sur une étiquette). Le rejeu lance J5 avant de créer le CronJob ;
+  - une enveloppe perdue par la course du tag `.att` (constat de J4) n'est jamais horodatée, puisqu'elle n'existe plus dans Zot ;
+  - une enveloppe est sautée dès que son étiquette existe dans `horodatage/bundles`. Une étiquette occupée d'avance par `poc-ecriture` ou `poc-horodatage` ferait donc sauter en silence une enveloppe authentique. Le contrôle « un bundle par enveloppe » de l'étape le verrait, mais pas le CronJob ;
+  - un tag `.att` aux couches énormes dépasserait le volume de travail du pod (64 Mi) et ferait échouer chaque passage (non mesuré) ;
 - la construction de J7 devra pousser l'image depuis la zone build : il faudra un compte d'écriture distinct, limité aux images, sans accès aux tags `.sig` et `.att`, si Zot le permet ;
 - le correctif de Chains et le compte `build` passent par `kubectl patch`. Mesuré en dry-run serveur : un nouveau `tekton.sh installer` **conserve** le correctif de Chains (`DOCKER_CONFIG`, volume `zot-chains` : l'apply côté serveur ne retire pas les champs posés par un autre gestionnaire). En revanche, `tekton.sh signature` réapplique `tekton/builds.yaml` : `imagePullSecrets: zot-build` revient sur le compte `build` (le jeton reste désactivé), et le secret `zot-build` est recréé dans `builds`. Il faut alors rejouer `politique.sh chains`.
 
@@ -523,7 +564,7 @@ Le propriétaire a aussi tranché la lecture de C-1 pour la décision C : un con
 **Limites** :
 - l'heure des jetons est celle de la VM ;
 - jeton OpenBao périodique d'1 h : si OpenBao reste scellé plus d'1 h, le TSA ne signe plus jusqu'à la recréation de son pod ;
-- le job n'est pas déclenché automatiquement après Chains (J6) ;
+- le job n'est pas déclenché automatiquement après Chains : **traité en J6** (réconciliation périodique) ;
 - un bundle porte sur un digest : il couvre toutes les images de même digest ;
 - `poc-horodatage` peut ajouter des bundles et réétiqueter les siens, mais pas en supprimer ; un faux bundle échoue à la vérification (signature de Chains et jeton) ;
 - l'image d'outils n'est pas signée, et la signature de sa base ne la lie pas à un tag ;

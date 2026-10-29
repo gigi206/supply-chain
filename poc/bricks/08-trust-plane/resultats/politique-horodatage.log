@@ -1,0 +1,56 @@
+# politique.sh horodatage, 2026-10-29T23:33:53Z
+## témoins posés dans builds par poc-ecriture (compte d'écriture général) : jamais horodatables
+builds/essai-j6-autre-cle@sha256:f214bf05c70cc5ca049aba8cd927fbcd246688d044ac52ce15ea43db2ccc309e : témoin existant
+builds/essai-j6-autre-sujet@sha256:d50a20b1289772091fa0fb01c1fd7d056e5650f1bfad8ec9cc918fa16b6772b1 : témoin existant
+builds/essai-j6-att-illisible@sha256:4eee7d404fb7a1382bb5c23ac1c0de542c3dcb32eb5bcb3ca9298208d3956a72 : tag .att dont la couche n'est pas du JSON (sonde : resultats/politique-horodatage-sonde-att.log)
+  sur l'hôte : cosign download attestation échoue (unmarshaling payload: invalid character 'p' looking for beginning of value) ; le script de J5 (set -e) aurait échoué à chaque passage
+## CronJob horodatage (politique/horodatage-cronjob.yaml)
+avant : 17 enveloppe(s) de Chains pour sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (builds/essai-signature et builds/essai-webhook), 17 bundle(s)
+prédiction du premier passage : 0 horodatée(s), 17 déjà horodatée(s), 2 refusées et 1 anomalie (témoins), 0 requête(s) de jeton
+{"schedule":"* * * * *","concurrencyPolicy":"Forbid","startingDeadlineSeconds":120,"activeDeadlineSeconds":300}
+## premier passage : rattrapage
+  JOINT|Zot et TSA, essai 1
+  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 7295b4ac5cc03a1b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature 8ae47e0aa424117b|failed to verify signature: provided artifact digest does not match any digest in statement
+  FIN|5 image(s), 19 enveloppe(s) : 0 horodatée(s), 17 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
+  DEJA_HORODATEE|builds/essai-signature ×1
+  DEJA_HORODATEE|builds/essai-webhook ×16
+passage horodatage-29888615 : 23:35:00 → 23:35:04, pod 10.42.0.77 ; requêtes de jeton reçues par le TSA : 0
+OK   une requête de jeton par enveloppe horodatée (0), toutes du pod du passage ; aucune pour les 2 refusées
+OK   prédiction tenue
+OK   témoins refusés pour leur motif (autre clé ; autre sujet ; illisible en anomalie), avant toute demande au TSA, sans arrêter le parcours
+pod horodatage-29888615-x5b6t : nœud sc-confiance, compte horodatage, volumes de jeton projetés 0, sortie Completed
+## nouvelle exécution signée, supprimée de l'API après sa signature : horodatée au passage suivant
+OK   exécution du bundle signé : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
+Chains : TaskRun j6-horodatage-publier signé=true, PipelineRun j6-horodatage signé=true
+builds/essai-webhook : 16 → 18 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : 2026-10-29T23:35:19.512583227Z
+PipelineRun j6-horodatage et son TaskRun supprimés de l'API avant le passage (seul Zot garde la trace)
+  JOINT|Zot et TSA, essai 1
+  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 7295b4ac5cc03a1b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature 8ae47e0aa424117b|failed to verify signature: provided artifact digest does not match any digest in statement
+  HORODATEE|builds/essai-webhook|17|signature a1d40d4ba65c097f|https://slsa.dev/provenance/v1|2026-10-29 23:36:02 +0000 UTC|referrer sha256:bff1dc0b378a6c039a385c90f136b1ff6b60e41cfd57488a6a8e5adc3941a0a5
+  HORODATEE|builds/essai-webhook|18|signature f644b40946b130b6|https://slsa.dev/provenance/v1|2026-10-29 23:36:05 +0000 UTC|referrer sha256:f079c9496ffb039a6ae720ccc3a14bcf8bd98f34b2f3449f5d833e806eae379a
+  FIN|5 image(s), 21 enveloppe(s) : 2 horodatée(s), 17 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
+  DEJA_HORODATEE|builds/essai-signature ×1
+  DEJA_HORODATEE|builds/essai-webhook ×16
+passage horodatage-29888616 : 23:36:00 → 23:36:09, pod 10.42.0.78 ; requêtes de jeton reçues par le TSA : 2, depuis 10.42.0.78
+OK   une requête de jeton par enveloppe horodatée (2), toutes du pod du passage ; aucune pour les 2 refusées
+OK   2 nouvelle(s) enveloppe(s) horodatée(s) au premier passage après la signature, exécution déjà purgée de l'API
+latence : écriture .att par Chains 23:35:19 → jeton du TSA 23:36:05 : 46 s (borne : période de 60 s, plus la durée d'un passage)
+## passage suivant : rien de nouveau
+  JOINT|Zot et TSA, essai 1
+  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 7295b4ac5cc03a1b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature 8ae47e0aa424117b|failed to verify signature: provided artifact digest does not match any digest in statement
+  FIN|5 image(s), 21 enveloppe(s) : 0 horodatée(s), 19 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
+  DEJA_HORODATEE|builds/essai-signature ×1
+  DEJA_HORODATEE|builds/essai-webhook ×18
+passage horodatage-29888617 : 23:37:00 → 23:37:04, pod 10.42.0.79 ; requêtes de jeton reçues par le TSA : 0
+OK   une requête de jeton par enveloppe horodatée (0), toutes du pod du passage ; aucune pour les 2 refusées
+OK   aucune enveloppe horodatée, aucun jeton demandé, étiquettes de horodatage/bundles inchangées (19)
+## contrôles
+OK   un bundle par enveloppe de Chains : 19 pour sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   aucun bundle pour les images témoins
+OK   chemin de la porte (cosign v3.1.4, bundles de horodatage/bundles, jeton exigé, racine du TSA) : 19 attestation(s) vérifiée(s)
