@@ -1,0 +1,14 @@
+# Brique 08, J4 : zone build. Compte de service des TaskRuns ; secret zot-build (compte Zot poc-build, builds/**
+# seulement), lu par Chains pour pousser .sig et .att (créé par tekton.sh, jamais versionné).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: builds
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build
+  namespace: builds
+imagePullSecrets:
+- name: zot-build

@@ -3,7 +3,8 @@
 #   pki        CA du PoC (ECDSA P-256, pathlen 0, contraintes de nom : pki.cnf) et un certificat par service ;
 #              clés en 0600 dans ~/.cache/supply-chain-poc/08/secrets, certificats dans …/08/pki
 #   zot        Zot 2.1.22, binaire de mise.toml revérifié dans la VM, service systemd durci, TLS ;
-#              lecture anonyme, écriture par le seul compte poc-ecriture (htpasswd bcrypt), sans suppression
+#              lecture anonyme ; écriture par poc-ecriture (tous les dépôts) et poc-build (builds/** seulement, zone
+#              build) en htpasswd bcrypt, sans suppression
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -61,10 +62,14 @@ etape_zot() {
   local z d=$W/zot h
   z=$(type -P zot)
   echo "$ZOT_SHA  $z" | sha256sum -c | sed "s#$HOME#~#g"
-  [ -s "$S/zot-poc-ecriture.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-poc-ecriture.password")
-  h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-poc-ecriture.password")
-  case $h in '$2b$12$'*) echo "htpasswd : bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac
-  rm -rf "$d" && (umask 077 && mkdir -p "$d" && printf 'poc-ecriture:%s\n' "$h" > "$d/htpasswd")
+  # poc-ecriture : hôte (tous les dépôts) ; poc-build : zone build, dépôts builds/** seulement (zot.json). Sans suppression.
+  rm -rf "$d" && (umask 077 && mkdir -p "$d")
+  for compte in poc-ecriture poc-build; do
+    [ -s "$S/zot-$compte.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-$compte.password")
+    h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-$compte.password")
+    case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac
+    (umask 077 && printf '%s:%s\n' "$compte" "$h" >> "$d/htpasswd")
+  done
   cp "$z" "$here/stockage/zot.json" "$here/stockage/zot.service" "$P/zot.crt" "$S/zot.key" "$d/"
   copier sc-stockage /tmp/zot-installation "$d"/*
   sur sc-stockage sudo bash -s <<EOF
@@ -123,6 +128,13 @@ etape_registre() {
   refus "suppression du manifeste par poc-ecriture" "403|forbidden|denied" \
     oras manifest delete --force --ca-file "$P/ca-poc.crt" --registry-config "$A/ecriture.json" "$REG_HOTE/$DEPOT@$APP_DIGEST"
   refus "lecture sans la CA du PoC" "x509|certificate" oras manifest fetch --registry-config "$A/anonyme.json" "$REG_HOTE/$DEPOT@$APP_DIGEST"
+  auth_zot "$A/build.json" "" poc-build
+  oras cp --from-oci-layout "$src" "$REG_HOTE/builds/essai-compte@$APP_DIGEST" "${ca[@]}" --to-registry-config "$A/build.json" >/dev/null
+  echo "OK   push par poc-build dans builds/ : $REG_HOTE/builds/essai-compte@$APP_DIGEST"
+  refus "push par poc-build hors de builds/ (workspace/)" "403|denied|forbidden" \
+    oras cp --from-oci-layout "$src" "$REG_HOTE/workspace/essai-build@$APP_DIGEST" "${ca[@]}" --to-registry-config "$A/build.json"
+  refus "suppression par poc-build dans builds/" "403|denied|forbidden" \
+    oras manifest delete --force --ca-file "$P/ca-poc.crt" --registry-config "$A/build.json" "$REG_HOTE/builds/essai-compte@$APP_DIGEST"
   lu=$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" --registry-config "$A/anonyme.json" "$REG_HOTE/$DEPOT@$APP_DIGEST" | jq -r .digest)
   echo "manifeste toujours présent après la tentative de suppression : $lu"
   echo "## journal d'audit de Zot (écritures acceptées)"

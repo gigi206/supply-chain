@@ -1,0 +1,35 @@
+# Brique 08, J4 : essai de la chaîne de signature (tekton.sh signature). La tâche ne construit rien : elle publie
+# IMAGE_URL/IMAGE_DIGEST d'une image poussée depuis l'hôte. taskSpec en ligne : à interdire en J6 (test 2).
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: essai-signature
+  namespace: builds
+spec:
+  serviceAccountName: build
+  podTemplate:
+    nodeSelector:
+      zone: build
+    tolerations:
+    - key: zone
+      operator: Equal
+      value: build
+      effect: NoSchedule
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      seccompProfile:
+        type: RuntimeDefault
+  taskSpec:
+    results:
+    - name: IMAGE_URL
+      type: string
+    - name: IMAGE_DIGEST
+      type: string
+    steps:
+    - name: publier
+      image: @BUSYBOX@
+      script: |
+        #!/bin/sh
+        printf '%s' '@IMAGE@' > $(results.IMAGE_URL.path)
+        printf '%s' '@DIGEST@' > $(results.IMAGE_DIGEST.path)

@@ -218,3 +218,7 @@ run = "poc/bricks/08-trust-plane/rejeu.sh"
 [tasks."confiance:redemarrer"]
 description = "Brique 08 : redémarrage complet des trois VM, puis contrôle de Zot, Forgejo et OpenBao (descellé, même clé Transit) ; journal resultats/redemarrage-vm.log"
 run = "poc/bricks/08-trust-plane/redemarrer.sh"
+
+[tasks."confiance:tekton"]
+description = "Brique 08, J4 : Tekton Pipelines v1.15.5, Chains v0.29.9, Triggers v0.37.2 épinglés par digest après revue, copiés dans Zot (étapes : revue miroir installer signature)"
+run = "poc/bricks/08-trust-plane/tekton.sh"

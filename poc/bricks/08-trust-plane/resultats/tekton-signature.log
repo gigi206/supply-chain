@@ -1,0 +1,19 @@
+# tekton.sh signature, 2026-10-29T18:36:10Z
+taskrun.tekton.dev/essai-signature condition met
+{"pod":"essai-signature-pod","résultats":{"IMAGE_DIGEST":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","IMAGE_URL":"sc-stockage.poc.test:5000/builds/essai-signature"}}
+annotation chains.tekton.dev/signed = true
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Starting to upload attestations to OCI ...","error":null}
+{"level":"info","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5...","error":null}
+{"level":"info","msg":"Successfully uploaded attestation using legacy format for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","error":null}
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Uploading sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 signature","error":null}
+{"level":"info","msg":"Successfully uploaded signature using legacy format","error":null}
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Starting to upload attestations to OCI ...","error":null}
+{"level":"info","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5...","error":null}
+{"level":"info","msg":"Successfully uploaded attestation using legacy format for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","error":null}
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Uploading sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 signature","error":null}
+sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.att
+sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.sig

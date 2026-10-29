@@ -1,0 +1,13 @@
+# Brique 08, J4 : release.yaml réécrit vers Zot (tekton.sh), contrôleurs et webhooks sur le nœud de confiance.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- release.yaml
+patches:
+- target:
+    kind: Deployment
+  patch: |-
+    - op: add
+      path: /spec/template/spec/nodeSelector
+      value:
+        zone: confiance

@@ -1,0 +1,27 @@
+# Provenance SLSA v1 (slsa/v2alpha4), signatures et attestations en dsse sous .sig/.att (chains#2096 non publiée),
+# clé Transit chains d'OpenBao, sans transparence publique. builder.id et buildType : ceux des politiques du banc C.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-config
+  namespace: tekton-chains
+data:
+  artifacts.taskrun.format: slsa/v2alpha4
+  artifacts.taskrun.storage: oci
+  artifacts.taskrun.signer: kms
+  artifacts.pipelinerun.format: slsa/v2alpha4
+  artifacts.pipelinerun.storage: oci
+  artifacts.pipelinerun.signer: kms
+  artifacts.pipelinerun.enable-deep-inspection: "true"
+  artifacts.oci.format: simplesigning
+  artifacts.oci.storage: oci
+  artifacts.oci.signer: kms
+  storage.oci.encoding-format: dsse
+  signers.kms.kmsref: hashivault://chains
+  signers.kms.auth.address: https://openbao.openbao.svc.cluster.local:8200
+  signers.kms.auth.oidc.path: jwt
+  signers.kms.auth.oidc.role: tekton-chains
+  signers.kms.auth.oidc.token-path: /var/run/secrets/openbao/token
+  transparency.enabled: "false"
+  builder.id: https://supply-chain.example/builders/tekton-chains@v1
+  builddefinition.buildtype: https://tekton.dev/chains/v2/slsa

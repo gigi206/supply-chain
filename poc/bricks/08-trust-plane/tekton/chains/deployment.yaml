@@ -1,0 +1,35 @@
+# Jeton projeté d'audience openbao (rôle JWT tekton-chains, J3), relu à chaque signature ; CA du PoC pour OpenBao
+# (VAULT_CACERT, lu par vault/api) et pour Zot (SSL_CERT_FILE : Chains ne joint aucun autre service TLS).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-chains-controller
+  namespace: tekton-chains
+spec:
+  template:
+    spec:
+      containers:
+      - name: tekton-chains-controller
+        env:
+        - name: VAULT_CACERT
+          value: /etc/ca-poc/ca.crt
+        - name: SSL_CERT_FILE
+          value: /etc/ca-poc/ca.crt
+        volumeMounts:
+        - name: ca-poc
+          mountPath: /etc/ca-poc
+          readOnly: true
+        - name: openbao-jeton
+          mountPath: /var/run/secrets/openbao
+          readOnly: true
+      volumes:
+      - name: ca-poc
+        configMap:
+          name: ca-poc
+      - name: openbao-jeton
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: openbao
+              expirationSeconds: 600
+              path: token

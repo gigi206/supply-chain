@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1, J2 et J3 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; voir plus bas). J4 (Tekton, Chains, Triggers) attend l'accord du propriétaire et la décision sur les images non vérifiables.
+**Statut (29/10/2026) : J1, J2 et J3 faits ; J4 en cours** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée ; voir plus bas). Reste pour J4 : construction de sample-app dans un pod (décision du propriétaire), Triggers et webhook Forgejo.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -118,6 +118,7 @@ J1 validé et fait le 29/10/2026 (téléchargements, pool, réseau, VM, k3s). Le
 | Dans les VM | k3s, puis les composants des jalons J2 à J7. Kata (J7) est soumis à un accord séparé. J2 : sur `sc-stockage`, **git et 9 dépendances par apt** (versions épinglées, accord du propriétaire du 29/10/2026), Zot et Forgejo en services systemd (comptes système `zot` et `forgejo`) ; sur les trois nœuds, `registries.yaml` et la CA du PoC dans `/etc/rancher/k3s` |
 | Outils de l'hôte (`mise.toml`) | J2 : kubectl 1.35.10 à la place de 1.37.2 |
 | Cache de l'hôte | J2 : `~/.cache/supply-chain-poc/08/pki` (certificats publics) ; dans `…/08/secrets` (0600) : clés de la CA et des services, mot de passe du compte d'écriture de Zot, mot de passe et jeton de l'administrateur de Forgejo |
+| J4 | Dans le cluster : Tekton Pipelines, Triggers (espaces `tekton-pipelines`, `tekton-pipelines-resolvers`) et Chains (`tekton-chains`), espace `builds` ; dans Zot : manifestes linux/amd64 des 13 images Tekton et du busybox sous `amont/`, dépôt d'essai `builds/essai-signature` ; dans `…/08/secrets` : mot de passe du compte Zot `poc-build` ; `~/.cache/supply-chain-poc/08/telechargements/tekton` : release.yaml des deux sources |
 | J3 | Dans le cluster : OpenBao (espace `openbao`, PVC de 1 Gi sur `sc-confiance`), espace et compte de service `tekton-chains` créés avant Chains ; dans Zot : copie de l'image OpenBao (`amont/openbao/openbao`, 6 plateformes et 4 bundles de signature) ; dans `…/08/secrets` (0600) : jeton root, clé de descellement (b64 et hex), clé TLS d'OpenBao |
 
 Démontage complet en fin de phase, comme au banc A2. Le cluster sert aussi aux étapes 4e (briques 01, 03 et 19, puis 2b-2) : on ne démonte qu'à la fin de 4e, sauf avis contraire.
@@ -250,3 +251,31 @@ Rejeu (après J2) : `mise run confiance:openbao -- image deployer initialiser co
 - **kube-router applique la NetworkPolicy à un pod neuf avec un délai** : sa première connexion est rejetée (REJECT, donc `connection refused`, pas un délai dépassé) pendant environ 1 s, le temps que kube-router ajoute son IP. Les scripts d'essai attendent. Pour Chains, à vérifier en J4 : une première signature juste après le démarrage du contrôleur peut échouer et doit être réessayée.
 - tcpdump ne sait pas filtrer l'interface NFLOG (« link-layer type filtering not implemented ») : on filtre après la capture.
 - Le volume local-path est en 0777 sur le nœud ; les données d'OpenBao y sont chiffrées par la barrière, et `audit.log` est en 0600.
+
+## Jalon J4 : Tekton, Chains, Triggers (en cours, 29/10/2026)
+
+**Décision du propriétaire (29/10/2026)** : les `release.yaml` et les images de Tekton Pipelines, Chains et Triggers, non vérifiables (doc 04 §5), sont **épinglés par digest après revue**. La reconstruction depuis les tags relève de la brique 11.
+
+Rejeu : `mise run confiance:tekton -- revue miroir installer signature verifier`. Journaux : `resultats/tekton-<étape>.log` ([revue](resultats/tekton-revue.log), [miroir](resultats/tekton-miroir.log), [installer](resultats/tekton-installer.log), [signature](resultats/tekton-signature.log), [verifier](resultats/tekton-verifier.log)) ; images : [`tekton-images.tsv`](resultats/tekton-images.tsv) ; correctifs dans [`tekton/`](tekton/).
+
+| Étape | Durée | Résultat |
+|---|---|---|
+| `revue` | 17 s | **Les quatre `release.yaml`** (Pipelines v1.15.5, Chains v0.29.9, Triggers v0.37.2 et ses intercepteurs) sont **identiques sur GitHub et sur infra.tekton.dev**, et égaux aux digests des assets publiés par GitHub ; leurs sha256 sont épinglés dans [`tekton.sh`](tekton.sh). **Les 13 images Tekton** y sont déjà référencées par tag et digest : chaque digest est **celui du tag dans le registre**, et le manifeste linux/amd64 est listé dans l'index épinglé. Deux images tierces : l'image shell `cgr.dev/chainguard/busybox` (signée, mais par une identité `distroless/busybox` que seule la lecture du certificat révèle) est **remplacée par le busybox 1.37.0 des images airgap de k3s** (digest d'index `101b4afd…` identique sur le nœud et sur docker.io) ; `powershell:nanoserver` ne sert qu'aux nœuds Windows. Revue des droits et des webhooks : voir plus bas |
+| `miroir` | 64 s | 14 manifestes linux/amd64 copiés dans Zot sous `amont/` et relus par digest. On ne copie pas les index complets : `entrypoint` et `nop` contiennent des couches Windows |
+| `installer` | 36 s | Manifestes **réécrits vers Zot**, puis contrôleurs, webhooks et résolveurs **placés sur `sc-confiance`** (kustomize). Il ne reste dans les manifestes rendus aucune référence d'image externe, hormis `powershell` et un texte de documentation d'une CRD. **Les 8 images réellement tirées viennent toutes de `sc-stockage.poc.test:5000/amont/`** (`imageID` des conteneurs). Chains : `slsa/v2alpha4`, signataire KMS `hashivault://chains`, `oidc.token-path` vers un jeton projeté d'audience `openbao`, `VAULT_CACERT` et `SSL_CERT_FILE` sur la CA du PoC, stockage OCI en `dsse` (tags `.sig`/`.att`), sans transparence publique ; `builder.id` et `buildType` sont ceux des politiques du banc C |
+| `signature` | 10 s | **Essai de la chaîne de signature, pas un build.** Un TaskRun sur `sc-build` publie seulement `IMAGE_URL`/`IMAGE_DIGEST` d'une image poussée depuis l'hôte (sample-app de la brique 04, dans `builds/essai-signature`). Chains signe via OpenBao, pousse `.sig` et `.att` dans Zot avec le compte `poc-build`, et annote le TaskRun `chains.tekton.dev/signed=true`, sans erreur au premier essai |
+| `verifier` | < 1 s | Sur l'hôte, avec la clé publique de Transit (`chains-cle-publique.pem`) : **signature de l'image vérifiée** (`cosign container image signature`, digest `3a7ca1b1…`) ; **attestation SLSA v1 vérifiée** (`verify-attestation --type slsaprovenance1`) ; **une autre clé est refusée**. Audit d'OpenBao : connexion JWT de `tekton-chains-controller`, lecture de la clé, deux signatures, sous la seule politique `chains-signature` |
+
+**Revue des droits** (ClusterRoles des `release.yaml`, toutes liées au niveau du cluster) :
+- les contrôleurs de **Pipelines et de Chains lisent tous les `secrets` du cluster** (`tenant-access`), et Chains peut aussi créer et supprimer des pods. Chains en a besoin pour lire les identifiants de registre des TaskRuns ; c'est un point à garder en tête : un Chains compromis lit tous les secrets ;
+- le résolveur de Pipelines lit tous les `secrets` ; les intercepteurs de Triggers aussi, et ne peuvent modifier que leur propre secret de certificat (`resourceNames`) ;
+- `tekton-triggers-eventlistener-roles` (droit `impersonate` sur les comptes de service) n'est lié à rien par les releases : il le sera par les EventListeners ;
+- les six webhooks d'admission sont en `failurePolicy: Fail` et sans effet de bord.
+
+**Constats sur la provenance de l'essai** ([`tekton-verifier.log`](resultats/tekton-verifier.log)) :
+- **`resolvedDependencies` attribue l'image d'étape à `docker.io`** (`oci://docker.io/rancher/mirrored-library-busybox`, digest d'index `101b4afd…`) alors qu'elle a été tirée de Zot (manifeste amd64 `ad9fa4d0…`). Ce busybox existait déjà sur le nœud par les images airgap de k3s, et containerd rapporte le nom et le digest de son magasin local. **L'origine inscrite dans la provenance dépend de ce que le nœud contient déjà** : le contrôle « dépendances depuis Zot » du banc C doit en tenir compte, et les images d'étape de la plateforme ne doivent exister que dans Zot ;
+- **`internalParameters` ne contient que les drapeaux de Tekton** (`enforceNonfalsifiability: none`, `verificationNoMatchPolicy: ignore`, etc.). Les paramètres de plateforme prévus (`hermetic`, `isolation`, `cpuModel`) restent à inscrire (point à vérifier, doc 02 §3) ;
+- **chaque exécution d'un TaskRun de même sujet ajoute une enveloppe** sous le même tag `.att` (deux après deux essais) ;
+- le compte `poc-build`, utilisé par Chains pour pousser, a le droit `update` : il peut **écraser les tags `.sig` et `.att`**. Ce n'est pas une falsification, la vérification échouerait, mais c'est une suppression de preuve. À traiter avant J8.
+
+**Pour J6** : les cinq résolveurs sont actifs (`bundles`, `cluster`, `git`, `http`, `hub`) et peuvent chercher des définitions de tâches hors de la plateforme ; l'essai utilise un `taskSpec` en ligne, que le test 2 doit refuser.

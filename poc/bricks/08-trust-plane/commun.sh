@@ -30,9 +30,10 @@ refus() { # libellé motif commande… : la commande doit échouer, avec le moti
   fi
 }
 
-auth_zot() { # fichier [mot-de-passe-fichier] : authentification Zot au format docker (0600), compte poc-ecriture
-  (umask 077 && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" \
-    "$(printf 'poc-ecriture:%s' "$(cat "${2:-$S/zot-poc-ecriture.password}")" | base64 -w0)" > "$1")
+auth_zot() { # fichier [mot-de-passe-fichier] [compte] [registre] : authentification Zot au format docker (0600)
+  local compte=${3:-poc-ecriture}
+  (umask 077 && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "${4:-$REG_HOTE}" \
+    "$(printf '%s:%s' "$compte" "$(cat "${2:-$S/zot-$compte.password}")" | base64 -w0)" > "$1")
 }
 
 certificat() { # nom SAN : certificat de service signé par la CA du PoC (stockage.sh pki), clé en 0600

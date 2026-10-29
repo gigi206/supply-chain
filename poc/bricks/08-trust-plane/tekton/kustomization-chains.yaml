@@ -1,0 +1,15 @@
+# Brique 08, J4 : Chains réécrit vers Zot (tekton.sh), sur le nœud de confiance, signataire KMS OpenBao (chains/).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- release.yaml
+patches:
+- target:
+    kind: Deployment
+  patch: |-
+    - op: add
+      path: /spec/template/spec/nodeSelector
+      value:
+        zone: confiance
+- path: deployment.yaml
+- path: chains-config.yaml

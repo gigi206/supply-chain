@@ -22,11 +22,37 @@
     "accessControl": {
       "repositories": {
         "**": {
-          "anonymousPolicy": ["read"],
+          "anonymousPolicy": [
+            "read"
+          ],
           "policies": [
             {
-              "users": ["poc-ecriture"],
-              "actions": ["read", "create", "update"]
+              "users": [
+                "poc-ecriture"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            }
+          ]
+        },
+        "builds/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-ecriture",
+                "poc-build"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
             }
           ]
         }

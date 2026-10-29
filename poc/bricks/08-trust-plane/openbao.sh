@@ -15,6 +15,7 @@
 #   temoin         avant un redémarrage : message signé par la clé chains, empreinte de la clé publique complète
 #   controle       après : même empreinte, même version, toujours non exportable, signature témoin vérifiée par openssl
 #   redemarrage    pod supprimé : il revient scellé, non prêt et sans endpoint ; descellement ; controle
+#   cle            clé publique de la clé chains dans resultats/chains-cle-publique.pem (vérification cosign sur l'hôte)
 # Aucun secret en argument de commande : le jeton root et la clé de descellement passent par l'entrée standard de
 # kubectl exec (la ligne de commande d'exec figure dans l'URL, donc dans l'audit de l'API).
 #
@@ -291,6 +292,12 @@ etape_deverrouiller() {
 
 T=$W/openbao-temoin   # message, signature et clé publique (rien de secret) conservés entre temoin et controle
 cle_chains() { racine <<<'bao read -format=json transit/keys/chains' | jq '.data | {latest_version, exportable, allow_plaintext_backup, public_key: .keys["1"].public_key}'; }
+
+etape_cle() { # clé publique de la clé chains (rien de secret), pour cosign sur l'hôte : resultats/chains-cle-publique.pem
+  cle_chains > "$B/cle.json"
+  jq -r .public_key "$B/cle.json" > "$R/chains-cle-publique.pem"
+  echo "clé publique chains : $(jq -c 'del(.public_key)' "$B/cle.json"), empreinte $(sha256sum < "$R/chains-cle-publique.pem" | cut -c1-16)…"
+}
 
 etape_temoin() {
   rm -rf "$T" && mkdir -p "$T"

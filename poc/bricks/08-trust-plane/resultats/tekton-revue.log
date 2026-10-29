@@ -1,0 +1,44 @@
+# tekton.sh revue, 2026-10-29T18:33:41Z
+## release.yaml (deux sources, empreintes épinglées)
+OK   pipeline v1.15.5 release.yaml : c2fe5c2ac98af298… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   chains v0.29.9 release.yaml : a3f9154467f8dd40… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   triggers v0.37.2 release.yaml : c4113c01e977e313… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   triggers v0.37.2 interceptors.yaml : cf2a59a98817d97c… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+## images (digest du release.yaml = digest du tag ; manifeste linux/amd64 dans l'index épinglé)
+--   busybox (image shell) : remplacée par docker.io/rancher/mirrored-library-busybox:1.37.0 (sha256:101b4afd76732482eff9b95cae5f94bcf295e521fbec4e01b69c5421f3f3f3e5)
+OK   controller:v0.29.9 : 486b562d5962 = tag v0.29.9 ; linux/amd64 2200972dcead
+OK   controller-10a3e32792f33651396d02b6855a6e36:v1.15.5 : 687a9f102365 = tag v1.15.5 ; linux/amd64 922d86c3f230
+OK   entrypoint-bff0a22da108bc2f16c818c97641a296:v1.15.5 : f20af440d762 = tag v1.15.5 ; linux/amd64 4627f27b93e2
+OK   events-a9042f7efb0cbade2a868a1ee5ddd52c:v1.15.5 : 6375e56fc283 = tag v1.15.5 ; linux/amd64 2e8346b44279
+OK   nop-8eac7c133edad5df719dc37b36b62482:v1.15.5 : bb27452a83b9 = tag v1.15.5 ; linux/amd64 f03429f84f52
+OK   resolvers-ff86b24f130c42b88983d3c13993056d:v1.15.5 : 8e98a0e406d3 = tag v1.15.5 ; linux/amd64 12ac07273611
+OK   sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.15.5 : 6f5c28363a76 = tag v1.15.5 ; linux/amd64 a660a7b9d119
+OK   webhook-d4749e605405422fd87700164e31b2d1:v1.15.5 : e48f0a03067f = tag v1.15.5 ; linux/amd64 61ef794b055f
+OK   workingdirinit-0c558922ec6a1b739e550e349f2d5fc1:v1.15.5 : 744b8a5e7e8c = tag v1.15.5 ; linux/amd64 aa1ab5775fc2
+OK   controller-f656ca31de179ab913fa76abc255c315:v0.37.2 : b62fbe87635a = tag v0.37.2 ; linux/amd64 94b30be58cdf
+OK   eventlistenersink-7ad1faa98cddbcb0c24990303b220bb8:v0.37.2 : 0218059259a7 = tag v0.37.2 ; linux/amd64 d7ecfc50960f
+OK   interceptors-3176d6a3f314c3655b30bfd36e421dd5:v0.37.2 : 198aa2c488ef = tag v0.37.2 ; linux/amd64 cef0f4936b68
+OK   webhook-dd1edc925ee1772a9f76e2c1bc291ef6:v0.37.2 : d878bae1b370 = tag v0.37.2 ; linux/amd64 dd01d6de851a
+--   powershell:nanoserver : image Windows (-shell-image-win), jamais tirée sur des nœuds Linux, non copiée
+OK   busybox 1.37.0 : 101b4afd7673 = image airgap de k3s sur sc-confiance = tag docker.io ; linux/amd64 ad9fa4d07136
+14 images dans tekton-images.tsv
+## droits : ClusterRoles (règles à surveiller : secrets, pods, exec, jetons, impersonation, jokers) et portée des liaisons
+chains-v0.29.9  tekton-chains-controller-cluster-access  cluster  core  pods                                            list,watch                                 tous
+chains-v0.29.9  tekton-chains-controller-tenant-access   cluster  core  pods,pods/log,events,persistentvolumeclaims     get,list,create,update,delete,patch,watch  tous
+chains-v0.29.9  tekton-chains-controller-tenant-access   cluster  core  configmaps,limitranges,secrets,serviceaccounts  get,list,watch                             tous
+pipeline-v1.15.5  tekton-pipelines-controller-cluster-access             cluster  core  pods                                            list,watch                                 tous
+pipeline-v1.15.5  tekton-pipelines-controller-tenant-access              cluster  core  pods,persistentvolumeclaims                     get,list,create,update,delete,patch,watch  tous
+pipeline-v1.15.5  tekton-pipelines-controller-tenant-access              cluster  core  configmaps,limitranges,secrets,serviceaccounts  get,list,watch                             tous
+pipeline-v1.15.5  tekton-pipelines-resolvers-resolution-request-updates  cluster  core  secrets,serviceaccounts                         get,list,watch                             tous
+triggers-v0.37.2  tekton-triggers-admin                       cluster  serving.knative.dev  *,*/status,*/finalizers  get,list,create,update,delete,deletecollection,patch,watch  tous
+triggers-v0.37.2  tekton-triggers-core-interceptors           cluster  core                 secrets                  get,list,watch                                              tous
+triggers-v0.37.2  tekton-triggers-core-interceptors-secrets   cluster  core                 secrets                  get,list,watch,update                                       seulement tekton-triggers-core-interceptors-certs
+triggers-v0.37.2  tekton-triggers-eventlistener-roles         aucune   core                 serviceaccounts          impersonate                                                 tous
+triggers-v0.37.2  tekton-triggers-eventlistener-clusterroles  aucune   core                 secrets                  get,list,watch                                              tous
+## webhooks d'admission (failurePolicy, effets de bord, portée)
+pipeline-v1.15.5  Validating  validation.webhook.pipeline.tekton.dev  Fail  None  {}
+pipeline-v1.15.5  Mutating    webhook.pipeline.tekton.dev             Fail  None  {}
+pipeline-v1.15.5  Validating  config.webhook.pipeline.tekton.dev      Fail  None  {"matchLabels":{"app.kubernetes.io/part-of":"tekton-pipelines"}}
+triggers-v0.37.2  Validating  validation.webhook.triggers.tekton.dev  Fail  None  {}
+triggers-v0.37.2  Mutating    webhook.triggers.tekton.dev             Fail  None  {}
+triggers-v0.37.2  Validating  config.webhook.triggers.tekton.dev      Fail  None  {"matchExpressions":[{"key":"triggers.tekton.dev/release","operator":"Exists"}]}
