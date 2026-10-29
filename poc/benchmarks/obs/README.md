@@ -20,7 +20,7 @@
 
 ## Résultats (29/10/2026)
 
-**42/100 contre 55 pour la référence restreinte : OBS n'est pas adopté pour le packaging.** La lecture de A-1 reste à valider. Le seuil du banc est atteint : rpm et deb bit-identiques sur 2 builds. Détail, preuves et notation : [`resultats/README.md`](resultats/README.md).
+**42/100 contre 55 pour la référence restreinte : OBS n'est pas adopté pour le packaging.** Lecture de A-1 et non-adoption validées par le propriétaire le 29/10/2026 ; le critère 5 reste à trancher. Le seuil du banc est atteint : rpm et deb bit-identiques sur 2 builds. Détail, preuves et notation : [`resultats/README.md`](resultats/README.md).
 
 Rejeu :
 1. `mise run packaging:sources` ;

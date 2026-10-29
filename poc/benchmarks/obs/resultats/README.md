@@ -125,7 +125,7 @@ Après 6 builds de sample-app et 2 builds hostiles, le magasin ne contient qu'**
 
 ## Notation (grille A restreinte)
 
-Ont été validés **avant** les mesures : l'échelle de A-1 (4/4 → 5, 3/4 → 4, 2/4 → 2, ≤ 1 → 0), A-3 sur rpm et deb, et la référence restreinte. **Ne l'a pas été** le classement de B1, B4, B5 et B8 en « couvert » ou « partiel » : il est proposé ci-dessous et soumis au propriétaire.
+Ont été validés **avant** les mesures : l'échelle de A-1 (4/4 → 5, 3/4 → 4, 2/4 → 2, ≤ 1 → 0), A-3 sur rpm et deb, et la référence restreinte. Le classement de B1, B4, B5 et B8 en « couvert » ou « partiel » a été fixé après les mesures, puis **validé par le propriétaire le 29/10/2026**, ainsi que la non-adoption.
 
 Les règles d'interpolation et d'arrondi sont celles du banc A1. **Pour A-1, un besoin partiel ne compte pas**, comme au banc A1 ; le texte de chaque besoin est celui du doc 01.
 
@@ -146,7 +146,7 @@ Les règles d'interpolation et d'arrondi sont celles du banc A1. **Pour A-1, un 
 
 **Référence restreinte : 55** (§2.3 : A-1 = 2, A-3 = 3, A-5 = 4, A-6 = 3). **Seuil d'adoption : 65. OBS n'est pas adopté.**
 
-**Sensibilité** : la lecture de A-1 n'a pas été validée avant la mesure ; elle est soumise au propriétaire. Variantes :
+**Sensibilité** (pour mémoire, la lecture retenue ayant été validée) :
 
 | Variante | Score |
 |---|---|
