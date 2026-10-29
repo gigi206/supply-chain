@@ -1,0 +1,4 @@
+# Reproductibilité de l'image sample-app (A-3), 2026-10-29T12:48:12Z
+# Même commit, deux PipelineRuns de PR (pods éphémères, stockage buildah vierge à chaque run) ; hermetic=true, source-date-epoch=0, rewrite-timestamp=true
+2cfmd : commit ad8ccc3760a7c3e54c4c6719ecd84144093ada38, build 2026-10-29T12:19:55Z → 2026-10-29T12:24:41Z, IMAGE_DIGEST sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819
+9qt8d : commit ad8ccc3760a7c3e54c4c6719ecd84144093ada38, build 2026-10-29T12:44:07Z → 2026-10-29T12:47:37Z, IMAGE_DIGEST sha256:3aa51998d84c6f21409ab9df1313bb7e0afdd9aa65992a8938e4dabe81915819

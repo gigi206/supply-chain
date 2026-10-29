@@ -115,6 +115,10 @@ run = "poc/benchmarks/konflux/tests-negatifs.sh"
 description = "Banc A1 : signature, provenance et Conforma (politique default) d'une image ; T7 (non signée, attestation seule)"
 run = "poc/benchmarks/konflux/verifier.sh"
 
+[tasks."konflux:preuves"]
+description = "Banc A1 : preuves archivées (écarts d'intégration, sorties vers des tiers, rpm/deb, santé)"
+run = "poc/benchmarks/konflux/preuves.sh"
+
 [tasks."konflux:demonter"]
 description = "Banc A1 : supprime le cluster kind et son KUBECONFIG dédié"
 run = '''

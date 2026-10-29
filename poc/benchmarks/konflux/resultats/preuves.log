@@ -1,0 +1,52 @@
+# preuves.sh, 2026-10-29T12:52:50Z
+## 1. Écarts d'intégration
+Service NodePort livré par Konflux (dependencies/tekton-config/pac-nodeport-service.yml) : targetPort 8080
+Service NodePort en place (corrigé) : [{"nodePort":30012,"port":8180,"protocol":"TCP","targetPort":8082}]
+Service PaC (opérateur Tekton) : [{"name":"http-listener","port":8080,"protocol":"TCP","targetPort":8082},{"name":"http-metrics","port":9090,"protocol":"TCP","targetPort":9090}]
+Conteneur pac-controller : [{"containerPort":8082,"name":"api","protocol":"TCP"},{"containerPort":9090,"name":"metrics","protocol":"TCP"}]
+NetworkPolicy pac-controller, entrée : [{"from":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"monitoring"}}}],"ports":[{"port":9090,"protocol":"TCP"}]},{"ports":[{"port":8082,"protocol":"TCP"}]}]
+TektonConfig, options PaC : ["pipelines-as-code-controller","pipelines-as-code-watcher"]
+OpenShiftPipelinesAsCode, options (posées à la main, l'opérateur ne les propage pas) : ["pipelines-as-code-controller","pipelines-as-code-watcher"]
+Volumes trusted-ca : {"pipelines-as-code-controller":["tls","trusted-ca"],"pipelines-as-code-watcher":["trusted-ca"]}
+Forgejo, livraisons de webhooks échouées (gitea.log) :
+  2026/10/29 12:17:16 tâche 1 → http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080 : Post "http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080": dial t
+  2026/10/29 12:17:16 tâche 2 → http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080 : Post "http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080": dial t
+  2026/10/29 12:17:16 tâche 3 → http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080 : Post "http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080": dial t
+  2026/10/29 12:17:16 tâche 4 → http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080 : Post "http://pipelines-as-code-controller.tekton-pipelines.svc.cluster.local:8080": dial t
+Journaux des pods PaC d'avant les redéploiements : perdus (pods remplacés).
+## 2. Sorties vers des tiers
+tpa-scan (quay.io/konflux-ci/tekton-catalog/task-tpa-scan:0.1@sha256:6a204cecc1a1091bf928b3db5a4082735c2111f90befdb5b043c498833c02bcf) : tpa-url par défaut = https://exhort.stage.devshift.net/api/v5/analysis
+  envoi : curl -f --show-error -L -X POST -T "${sbom_file}" -H "Content-Type:application/vnd.${sbom_format}+json" "${TPA_URL}" 
+deprecated-image-check (quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.5@sha256:0ccc688a77e9b7b0b8973c132a1e840844137e77f887be4a0bec8893b0776872) : https://catalog.redhat.com/api/containers/v1/repositories/registry/
+Politique « default », data 8eaa4f44c2bf67e6e2b20c5777b0d73e978c632b, required_tasks.yml (pipeline docker) :
+          - tpa-scan
+          - [clamav-scan, clamav-scan-min]
+          - deprecated-image-check
+NetworkPolicy du tenant : {"podSelector":{"matchLabels":{"tekton.dev/pipelineTask":"tpa-scan"}},"policyTypes":["Egress"]}
+  pod/sample-app-on-pull-request-2cfmd-tpa-scan-pod (2026-10-29T12:24:53Z) : Running TPA scan on amd64 image manifest
+  pod/sample-app-on-pull-request-9qt8d-tpa-scan-pod (2026-10-29T12:47:45Z) : Task tpa-scan failed: Failed to get image manifests from image 
+## 3. rpm et deb
+install.yaml de Konflux v0.2.2 : 0 occurrence de multi-platform-controller
+konflux-ci/rpmbuild-pipeline @ 587b661617585d9274e367c113b7f5971f7b275a, docs/architecture.md :
+  example, `rpmbuild-x86_64` Task must be executed in a native `x86_64`
+  environment.  Konflux needs to allocate a virtual machine for this task
+Dépôts konflux-ci contenant « deb », « debian » ou « sbuild » : 0
+## 4. Santé (A-6) : commits humains depuis 2026-07-31T00:00:00Z
+konflux-ci/konflux-ci : 89 commits, 19 auteurs ; domaines : redhat.com 79 ; gmail.com 8 ; kelchen-thinkpadp1gen7.boston.csb 2 ; 
+konflux-ci/build-service : 39 commits, 8 auteurs ; domaines : redhat.com 25 ; gmail.com 13 ; users.noreply.github.com 1 ; 
+konflux-ci/integration-service : 95 commits, 13 auteurs ; domaines : redhat.com 66 ; users.noreply.github.com 14 ; gmail.com 14 ; fedoraproject.org 1 ; 
+konflux-ci/release-service : 17 commits, 9 auteurs ; domaines : redhat.com 17 ; 
+Employeur déclaré (profil GitHub) des auteurs sans adresse redhat.com :
+  14rcole (14) : Red Hat
+  tisutisu (13) : Red Hat
+  jencull (6) : Redhat
+  saikat709 (3) : non renseigné
+  ainephelan365 (3) : Red Hat
+  NigelByrne1 (3) : Red Hat
+  Troy876 (2) : Red Hat
+  Josh-Everett (2) : Red Hat
+  mkosiarc (1) : non renseigné
+  hguemar (1) : @redhat-openstack 
+  dipakshimpi (1) : @OpenGeeks-Community
+  dipak0000812 (1) : non renseigné
+  dev-aditya-hub (1) : Polaris school of technology 

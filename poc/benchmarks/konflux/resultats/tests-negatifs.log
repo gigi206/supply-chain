@@ -1,0 +1,30 @@
+# tests-negatifs.sh, 2026-10-29T12:44:01Z
+PR n° 2 ouverte (branche tests-negatifs, commit 246c011)
+T2 : pipelinerun.tekton.dev/tests-negatifs-l4fjj créé par PaC depuis .tekton/ avec un taskSpec inline (aucun refus à l'admission)
+état : Succeeded Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0
+T1 API : GET secret tekton-pipelines/signing-secrets -> HTTP 403
+T3 API : PATCH status du TaskRun terminé sample-app-on-pull-request-2cfmd-build-container -> HTTP 403
+T4 : étape lancée, uid=0, privilégiée=oui, hostPath / monté : etcd.yaml kube-apiserver.yaml kube-controller-manager.yaml kube-scheduler.yaml 
+T1 noeud : clé de Chains lue depuis la tâche, sha256 8bded1cd8f4009ed5743cfd55e927512a1e2565454ed80ee68e3207ec23da92e
+T6 : HEAD https://quay.io/ depuis l'étape -> HTTP 200
+T6 : https://forgejo.banc-a1.svc.cluster.local depuis l'étape -> HTTP 200
+référence : sha256 de cosign.key du secret tekton-pipelines/signing-secrets (lu par l'administrateur) = 8bded1cd8f4009ed5743cfd55e927512a1e2565454ed80ee68e3207ec23da92e
+PSA du tenant : {}
+RBAC user2@konflux.dev : patch taskruns.tekton.dev --subresource=status -n default-tenant -> no
+RBAC user2@konflux.dev : update pipelineruns.tekton.dev --subresource=status -n default-tenant -> no
+RBAC user2@konflux.dev : create taskruns.tekton.dev -n default-tenant -> no
+RBAC user2@konflux.dev : create pods -n default-tenant -> no
+RBAC user2@konflux.dev : get secrets -n default-tenant -> no
+RBAC build-pipeline-sample-app : patch taskruns.tekton.dev --subresource=status -n default-tenant -> no
+RBAC build-pipeline-sample-app : update pipelineruns.tekton.dev --subresource=status -n default-tenant -> no
+RBAC build-pipeline-sample-app : create taskruns.tekton.dev -n default-tenant -> no
+RBAC build-pipeline-sample-app : create pods -n default-tenant -> no
+RBAC build-pipeline-sample-app : get secrets -n default-tenant -> yes
+livraison de référence : hook_task 26, X-Forgejo-Delivery c5481ea0-cc3b-4552-bb64-114483dd6820
+T5 sans-signature : HTTP 202 ({"status":202,"message":"accepted"} ), PipelineRuns de la PR hostile : 1 -> 1
+T5 signature-fausse : HTTP 202 ({"status":202,"message":"accepted"} ), PipelineRuns de la PR hostile : 1 -> 1
+T5 valides : HTTP 202 ({"status":202,"message":"accepted"} ), PipelineRuns de la PR hostile : 1 -> 2
+     PaC :       1 error handling event: client setup failed: could not validate payload, check your webhook secret?: gitea/forgejo webhook signature validation failed
+     PaC :       1 error handling event: client setup failed: could not validate payload, check your webhook secret?: no signature has been detected, for security reason we are not allowing webhooks without a secret
+T8 chains-config : transparency.enabled=false
+T8 : aucun horodatage RFC 3161 configuré dans Chains (contrôle absent)
