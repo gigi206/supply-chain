@@ -1,0 +1,22 @@
+# Banc A1 : sample-app construite par Konflux (buildah, prefetch Hermeto gomod + npm).
+# Images de base de registry.access.redhat.com, seul registre admis par la politique
+# Conforma par défaut de Konflux ; épinglées par digest, signatures GPG Red Hat vérifiées
+# par onboarder.sh. Les dépendances viennent de /cachi2 (prefetch), jamais du réseau.
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:06f5f49a1f94a0ff6822de8b99a62717945ec227883c914d9371a84103612ea4 AS web
+USER 0
+WORKDIR /src/web
+COPY web/ ./
+RUN . /cachi2/cachi2.env && npm ci --no-audit --no-fund && npm run build
+
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:a3b89f072fe0704b9388f3c9ad5681a6cf16293324e3f25ca0107bc09217cf62 AS build
+USER 0
+WORKDIR /src
+COPY . .
+COPY --from=web /src/web/dist web/dist
+RUN . /cachi2/cachi2.env && CGO_ENABLED=0 go build -trimpath -buildvcs=false \
+    -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+
+FROM registry.access.redhat.com/ubi9/ubi-micro@sha256:5be877a2a280ae36eb9ab80ca4efb28bbf77c57abbba38137cdc37a03b8465e6
+COPY --from=build /out/sample-app /usr/bin/sample-app
+USER 65532:65532
+ENTRYPOINT ["/usr/bin/sample-app"]
