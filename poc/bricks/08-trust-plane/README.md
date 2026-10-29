@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1, J2 et J3 faits ; J4 en cours** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée ; voir plus bas). Reste pour J4 : construction de sample-app dans un pod (décision du propriétaire), Triggers et webhook Forgejo.
+**Statut (29/10/2026) : J1 à J4 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). J5 (horodatage) attend l'accord du propriétaire.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -77,10 +77,10 @@ Chaque jalon se termine par un point de contrôle : mesures archivées, `docs/03
 | J1 | Infra | Pool, réseau, 3 VM (cloud-init), k3s (server + 2 agents, images système en airgap, sans Traefik ni ServiceLB), taint et labels de zone | `ld.so` en x86-64-v3 sans v4 dans les 3 VM ; `/dev/kvm` dans `sc-build` ; nœuds `Ready` ; RAM au repos |
 | J2 | Stockage | Zot et Forgejo sur `sc-stockage` | Push/pull par digest ; dépôt `workspace/sample-app` |
 | J3 | Clés | OpenBao (Transit, audit activé), clé de provenance non exportable ; authentification JWT liée au **seul** compte de service de Chains (`signers.kms.auth.oidc`, jeton du compte de service) | Signature Transit depuis Chains ; refus depuis un autre compte de service |
-| J4 | Orchestration | Tekton Pipelines, Chains (`slsa/v2alpha4`, `dsse`, KMS `hashivault://`), Triggers et intercepteur HMAC Forgejo avec anti-rejeu | Premier PipelineRun de sample-app : provenance signée dans Zot, vérifiée par cosign |
+| J4 | Orchestration | Tekton Pipelines, Chains (`slsa/v2alpha4`, `dsse`, KMS `hashivault://`), Triggers et intercepteur HMAC Forgejo avec anti-rejeu | Premier PipelineRun de sample-app : provenance signée dans Zot, vérifiée par cosign ; **contrôle modifié le 29/10/2026 (option C du propriétaire)** : chaîne de signature prouvée par un essai et PipelineRun déclenché par un webhook Forgejo signé, sans construction, qui passe en J7 |
 | J5 | Horodatage | timestamp-authority (clé séparée), job TSA hors des pods de build, **choix du chemin de vérification** : bundle réémis (`tsaCertChain` de Kyverno) ou `tools/verify-ts` | Jeton valide accepté ; jeton absent ou falsifié refusé |
 | J6 | Politique | Trusted Resources (bundles de tâches signés), Kyverno (admission), Conforma (porte), RBAC, posture des pipelines (tekton-lint) | Politiques du banc C chargées à l'admission |
-| J7 | Isolation | Kata 4.3.1 sur `sc-build` (RuntimeClass), avec CPU des invités vérifié | Pod Kata en x86-64-v3 ; pod privilégié hors Kata refusé |
+| J7 | Isolation | Kata 4.3.1 sur `sc-build` (RuntimeClass), avec CPU des invités vérifié ; **construction de sample-app** (BuildKit rootless dans un pod Kata, reportée de J4 le 29/10/2026) | Pod Kata en x86-64-v3 ; pod privilégié hors Kata refusé ; PipelineRun de sample-app qui construit l'image depuis Forgejo, provenance signée vérifiée par cosign, digest comparé à `3a7ca1b1…` |
 | J8 | Preuves | Les 8 tests négatifs ; fin du banc C | 8/8 refusés avec trace ; notes C mises à jour dans l'ADR 0000 |
 
 ## Les 8 tests négatifs (doc 01) et leur trace
@@ -98,7 +98,7 @@ Chaque jalon se termine par un point de contrôle : mesures archivées, `docs/03
 
 ## Points à vérifier en cours de brique (non supposés)
 
-- **Signature des webhooks de Forgejo** (en-tête et format du HMAC), puis **mécanisme d'anti-rejeu** : les intercepteurs livrés avec Triggers ne le fournissent peut-être pas, et un intercepteur maison (ClusterInterceptor) serait alors nécessaire.
+- ~~**Signature des webhooks de Forgejo** et anti-rejeu~~ : **vérifié en J4**. Forgejo v15.0.11 envoie `X-Hub-Signature-256: sha256=<hmac>` (HMAC-SHA256 du corps), que l'intercepteur GitHub de Triggers v0.37.2 exige ; les en-têtes de livraison ne sont pas signés. Anti-rejeu sans intercepteur maison : le nom du PipelineRun dérive du commit signé (voir « Jalon J4 »).
 - ~~**Authentification de Chains auprès d'OpenBao** par le jeton du compte de service (méthode JWT d'OpenBao, avec la clé publique de l'émetteur de comptes de service de k3s)~~ : **vérifié en J3** dans le code de Chains v0.29.9. `signers.kms.auth.oidc.path`, `.role` et `.token-path` suffisent, sans SPIRE, et le signataire KMS est recréé à chaque signature (voir « Jalon J3 »).
 - **`internalParameters`** (`hermetic`, `isolation`, `cpuModel`) inscrits **par la plateforme**, pas par le code de build (doc 02 §3).
 - **Sujet non-image** (rpm via ORAS, `isBuildArtifact: true`) : déduit du code de Chains (doc 00), à tester.
@@ -252,11 +252,13 @@ Rejeu (après J2) : `mise run confiance:openbao -- image deployer initialiser co
 - tcpdump ne sait pas filtrer l'interface NFLOG (« link-layer type filtering not implemented ») : on filtre après la capture.
 - Le volume local-path est en 0777 sur le nœud ; les données d'OpenBao y sont chiffrées par la barrière, et `audit.log` est en 0600.
 
-## Jalon J4 : Tekton, Chains, Triggers (en cours, 29/10/2026)
+## Jalon J4 : Tekton, Chains, Triggers (29/10/2026)
 
-**Décision du propriétaire (29/10/2026)** : les `release.yaml` et les images de Tekton Pipelines, Chains et Triggers, non vérifiables (doc 04 §5), sont **épinglés par digest après revue**. La reconstruction depuis les tags relève de la brique 11.
+**Décisions du propriétaire (29/10/2026)** :
+- les `release.yaml` et les images de Tekton Pipelines, Chains et Triggers, non vérifiables (doc 04 §5), sont **épinglés par digest après revue**. La reconstruction depuis les tags relève de la brique 11 ;
+- **option C pour la construction de sample-app** : J4 se clôt avec la chaîne de signature prouvée par un essai, Triggers et le webhook Forgejo ; la vraie construction passe en **J7**, avec BuildKit rootless dans un pod Kata sur `sc-build`, sans relâcher seccomp ni AppArmor, en visant le digest `3a7ca1b1…` de la brique 04. Les options écartées : BuildKit en pod dès J4 (seccomp et AppArmor relâchés jusqu'à J7), ou une construction sans démon avec un outillage maison.
 
-Rejeu : `mise run confiance:tekton -- revue miroir installer signature verifier`. Journaux : `resultats/tekton-<étape>.log` ([revue](resultats/tekton-revue.log), [miroir](resultats/tekton-miroir.log), [installer](resultats/tekton-installer.log), [signature](resultats/tekton-signature.log), [verifier](resultats/tekton-verifier.log)) ; images : [`tekton-images.tsv`](resultats/tekton-images.tsv) ; correctifs dans [`tekton/`](tekton/).
+Rejeu : `mise run confiance:tekton -- revue miroir installer signature verifier webhook essais_webhook`. Journaux : `resultats/tekton-<étape>.log` ([revue](resultats/tekton-revue.log), [miroir](resultats/tekton-miroir.log), [installer](resultats/tekton-installer.log), [signature](resultats/tekton-signature.log), [verifier](resultats/tekton-verifier.log)) ; images : [`tekton-images.tsv`](resultats/tekton-images.tsv) ; correctifs dans [`tekton/`](tekton/).
 
 | Étape | Durée | Résultat |
 |---|---|---|
@@ -265,6 +267,26 @@ Rejeu : `mise run confiance:tekton -- revue miroir installer signature verifier`
 | `installer` | 36 s | Manifestes **réécrits vers Zot**, puis contrôleurs, webhooks et résolveurs **placés sur `sc-confiance`** (kustomize). Il ne reste dans les manifestes rendus aucune référence d'image externe, hormis `powershell` et un texte de documentation d'une CRD. **Les 8 images réellement tirées viennent toutes de `sc-stockage.poc.test:5000/amont/`** (`imageID` des conteneurs). Chains : `slsa/v2alpha4`, signataire KMS `hashivault://chains`, `oidc.token-path` vers un jeton projeté d'audience `openbao`, `VAULT_CACERT` et `SSL_CERT_FILE` sur la CA du PoC, stockage OCI en `dsse` (tags `.sig`/`.att`), sans transparence publique ; `builder.id` et `buildType` sont ceux des politiques du banc C |
 | `signature` | 10 s | **Essai de la chaîne de signature, pas un build.** Un TaskRun sur `sc-build` publie seulement `IMAGE_URL`/`IMAGE_DIGEST` d'une image poussée depuis l'hôte (sample-app de la brique 04, dans `builds/essai-signature`). Chains signe via OpenBao, pousse `.sig` et `.att` dans Zot avec le compte `poc-build`, et annote le TaskRun `chains.tekton.dev/signed=true`, sans erreur au premier essai |
 | `verifier` | < 1 s | Sur l'hôte, avec la clé publique de Transit (`chains-cle-publique.pem`) : **signature de l'image vérifiée** (`cosign container image signature`, digest `3a7ca1b1…`) ; **attestation SLSA v1 vérifiée** (`verify-attestation --type slsaprovenance1`) ; **une autre clé est refusée**. Audit d'OpenBao : connexion JWT de `tekton-chains-controller`, lecture de la clé, deux signatures, sous la seule politique `chains-signature` |
+| `webhook` | 4 s | Secret HMAC aléatoire (0600 sur l'hôte, secret Kubernetes `forgejo-webhook`). Task `publier-essai` et Pipeline `sample-app-essai` (objets, pas de spec en ligne), TriggerTemplate, EventListener `forgejo` sur `sc-confiance` (NodePort, joignable depuis Forgejo car 192.168.161.0/24 est autorisé), intercepteurs GitHub (HMAC, événement `push`) puis CEL (branche `main`, dépôt `workspace/sample-app`, commit de 40 caractères hexadécimaux). Webhook Forgejo créé par l'API, secret passé par fichier |
+| `essais_webhook` | 20 s | Test 5, voir ci-dessous |
+
+**Test 5 : webhook non signé ou rejoué** ([`tekton-essais_webhook.log`](resultats/tekton-essais_webhook.log)). L'EventListener répond toujours HTTP 202, car il traite les événements de façon asynchrone. Le résultat se lit donc aux PipelineRuns créés et aux journaux. Chaque essai refusable utilise un commit dont l'acceptation se verrait :
+| Essai | Résultat | Trace |
+|---|---|---|
+| A. Livraison réelle de Forgejo (test du webhook, commit `6391fd43…`) | **Acceptée** : PipelineRun `sample-app-6391fd43…` terminé, signé par Chains | — |
+| B. Corps non signé (commit `1111…`) | **Refusé** | intercepteurs : `no X-Hub-Signature-256 header set` |
+| C. Signature calculée avec un autre secret | **Refusé** | `payload signature check failed` |
+| D. Corps modifié sous une signature valide (corps du commit `1111…`, signature du corps du commit `2222…`) | **Refusé** | `payload signature check failed` |
+| E. Contrôle positif : livraison signée ici avec le secret du webhook (commit `2222…`) | **Acceptée** : la signature calculée hors de Forgejo est valide, donc les refus ne viennent pas d'un défaut du calcul | — |
+| F. **Rejeu à l'identique de E** | **Sans effet** : un seul PipelineRun pour `2222…` | EventListener : `pipelineruns.tekton.dev "sample-app-2222…" already exists` |
+| G. Nouvelle livraison de Forgejo pour le même commit | **Sans effet** : un seul PipelineRun pour `6391fd43…` | `already exists` |
+
+Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclenché par Forgejo, vérifiée par cosign avec la clé de Transit, porte le pipeline `sample-app-essai`, le commit `6391fd43…` et le dépôt.
+
+**Limites du webhook** :
+- **l'anti-rejeu dure tant que le PipelineRun existe** : un nettoyage des PipelineRuns rouvre la possibilité de rejouer une livraison. Il n'y a pas d'horodatage signé dans les événements `push` ;
+- **le commit n'est pas encore confronté à Forgejo** : quiconque détient le secret du webhook fait signer par Chains une provenance pour un commit arbitraire (essai E : commit `2222…` inexistant). La construction de J7 récupérera les sources par ce commit depuis Forgejo, ce qui fera échouer un commit inexistant ;
+- l'EventListener écoute en HTTP (le HMAC protège l'intégrité, pas la confidentialité du contenu, qui n'est pas secret) ; il tourne dans l'espace `builds`, et son compte de service lit les `secrets` du cluster (`tekton-triggers-eventlistener-clusterroles`). RBAC à resserrer en J6.
 
 **Revue des droits** (ClusterRoles des `release.yaml`, toutes liées au niveau du cluster) :
 - les contrôleurs de **Pipelines et de Chains lisent tous les `secrets` du cluster** (`tenant-access`), et Chains peut aussi créer et supprimer des pods. Chains en a besoin pour lire les identifiants de registre des TaskRuns ; c'est un point à garder en tête : un Chains compromis lit tous les secrets ;

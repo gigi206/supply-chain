@@ -23,7 +23,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
 D=$O/telechargements/tekton
 T=$W/tekton
-trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
 # composant version fichier sha256 (assets GitHub = infra.tekton.dev, relevé du 29/10/2026)
 RELEASES="pipeline v1.15.5 release.yaml c2fe5c2ac98af2984f2d58199e81ef2056802f671051744d986ec998ad19ba84
 chains v0.29.9 release.yaml a3f9154467f8dd40d438ccd7a0b144d4ff419b18189c99b9b5e6e1a2af31fa46
@@ -211,6 +211,114 @@ etape_verifier() { # signature et attestation de l'essai, vérifiées sur l'hôt
   echo "## audit d'OpenBao pendant l'essai (depuis $debut)"
   kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log \
     | jq -c --arg d "$debut" 'select(.type == "response" and .time >= $d) | {time: .time[11:19], chemin: .request.path, compte: .auth.display_name, politiques: .auth.policies, erreur: (.error // .response.data.error // null)}'
+}
+
+hmac_corps() { # fichier : HMAC-SHA256 (hex) du fichier avec le secret du webhook, lu dans un fichier (jamais en argument)
+  python3 -I -c 'import hashlib, hmac, sys; print(hmac.new(open(sys.argv[1], "rb").read(), open(sys.argv[2], "rb").read(), hashlib.sha256).hexdigest())' \
+    "$S/forgejo-webhook.secret" "$1"
+}
+el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n builds el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
+
+etape_webhook() {
+  local img=$REG/builds/essai-webhook dig=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 url id
+  mkdir -p "$T/auth" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/zot.json"
+  oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04/app-layout@$dig" "$REG_HOTE/builds/essai-webhook@$dig" \
+    --to-ca-file "$P/ca-poc.crt" --to-registry-config "$T/auth/zot.json" >/dev/null
+  [ -s "$S/forgejo-webhook.secret" ] || (umask 077 && openssl rand -hex 32 | tr -d '\n' > "$S/forgejo-webhook.secret")
+  kubectl create secret generic forgejo-webhook -n builds --from-file=secret="$S/forgejo-webhook.secret" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f - >/dev/null
+  sed -e "s#@IMAGE@#$img#" -e "s#@DIGEST@#$dig#" -e "s#@BUSYBOX@#$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$TSV")#" \
+    "$here/tekton/webhook.yaml" | kubectl apply --server-side -f - >/dev/null
+  for _ in $(seq 60); do kubectl get deploy -n builds el-forgejo >/dev/null 2>&1 && break; sleep 2; done
+  kubectl wait -n builds --for=condition=Available deploy/el-forgejo --timeout=180s
+  kubectl get pods -n builds -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
+  url=$(el_url)
+  echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance)"
+  # Webhook Forgejo : le secret passe par un fichier 0600 (curl -d @fichier), jamais en argument.
+  printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
+  api() { curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -H 'Content-Type: application/json' "$@"; }
+  for id in $(api https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks | jq -r '.[].id'); do
+    api -X DELETE "https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks/$id" >/dev/null
+  done
+  jq -n --arg u "$url" --rawfile s "$S/forgejo-webhook.secret" '{type: "forgejo", active: true, events: ["push"], branch_filter: "main",
+    config: {url: $u, content_type: "json", secret: $s}}' > "$T/auth/hook.json"
+  api -X POST https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks -d @"$T/auth/hook.json" \
+    | jq -c '{id, type, active, events, url: .config.url, content_type: .config.content_type}'
+  rm -f "$T/auth/hook.json" "$T/auth/entete"
+}
+
+pr_attendre() { # commit : attend le PipelineRun sample-app-<commit> (présent, puis terminé)
+  for _ in $(seq 60); do kubectl get pipelinerun -n builds "sample-app-$1" >/dev/null 2>&1 && break; sleep 2; done
+  kubectl wait -n builds --for=condition=Succeeded "pipelinerun/sample-app-$1" --timeout=180s >/dev/null
+}
+envoyer() { # libellé fichier-corps signature|"" : livraison vers l'EventListener, comme Forgejo (en-têtes GitHub)
+  local h=() code
+  [ -z "$3" ] || h=(-H "X-Hub-Signature-256: sha256=$3")
+  code=$(curl -s -o "$T/webhook/reponse" -w '%{http_code}' -H 'Content-Type: application/json' -H 'X-GitHub-Event: push' \
+    -H "X-GitHub-Delivery: $(cat /proc/sys/kernel/random/uuid)" "${h[@]}" --data-binary @"$2" "$(el_url)")
+  echo "$1 : HTTP $code $(jq -c '{eventID}' "$T/webhook/reponse" 2>/dev/null)"
+}
+nb_pr() { kubectl get pipelinerun -n builds -o name | grep -c "sample-app-$1" || true; }
+
+etape_essais_webhook() {
+  local debut reel=6391fd437f26696847041be3226bbbf633f55a2f faux=1111111111111111111111111111111111111111 neuf=2222222222222222222222222222222222222222
+  rm -rf "$T/webhook" && (umask 077 && mkdir -p "$T/webhook" "$T/auth")
+  debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl delete pipelinerun -n builds --all --wait=true >/dev/null
+  corps() { jq -nc --arg c "$1" --arg r "${2:-refs/heads/main}" '{ref: $r, after: $c, repository: {full_name: "workspace/sample-app", clone_url: "https://sc-stockage.poc.test:3000/workspace/sample-app.git"}}' > "$T/webhook/$3"; }
+  printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
+  forgejo_test() { curl -fsS -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -X POST \
+    "https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks/$(curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks | jq -r '.[0].id')/tests"; }
+
+  echo "## A. livraison réelle de Forgejo (test du webhook : dernier commit de main)"
+  echo "Forgejo, POST hooks/…/tests : HTTP $(forgejo_test)"
+  pr_attendre "$reel"
+  echo "OK   PipelineRun sample-app-$reel terminé ($(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.status.conditions[0].reason}'))"
+
+  echo "## B. corps non signé (commit $faux)"
+  corps "$faux" "" b.json; envoyer "non signé" "$T/webhook/b.json" ""
+  echo "## C. signature calculée avec un autre secret"
+  corps "$faux" "" c.json
+  (umask 077 && openssl rand -hex 32 | tr -d '\n' > "$T/webhook/autre.secret")
+  envoyer "mauvaise signature" "$T/webhook/c.json" "$(python3 -I -c 'import hashlib, hmac, sys; print(hmac.new(open(sys.argv[1], "rb").read(), open(sys.argv[2], "rb").read(), hashlib.sha256).hexdigest())' "$T/webhook/autre.secret" "$T/webhook/c.json")"
+  echo "## D. corps modifié sous une signature valide (signature du corps du commit $neuf, corps du commit $faux)"
+  corps "$neuf" "" e.json; corps "$faux" "" d.json
+  envoyer "corps modifié" "$T/webhook/d.json" "$(hmac_corps "$T/webhook/e.json")"
+  echo "## E. contrôle positif : livraison valide signée avec le secret du webhook (commit $neuf)"
+  local sig_e
+  sig_e=$(hmac_corps "$T/webhook/e.json")
+  envoyer "valide" "$T/webhook/e.json" "$sig_e"
+  pr_attendre "$neuf"
+  echo "OK   PipelineRun sample-app-$neuf créé et terminé : la signature calculée ici est acceptée"
+  echo "## F. rejeu à l'identique de E (même corps, même signature)"
+  envoyer "rejeu de E" "$T/webhook/e.json" "$sig_e"
+  echo "## G. nouvelle livraison de Forgejo pour le même commit (rejeu d'une livraison réelle)"
+  echo "Forgejo, POST hooks/…/tests : HTTP $(forgejo_test)"
+  sleep 8
+
+  echo "## bilan (PipelineRuns par commit)"
+  local n_faux n_neuf n_reel
+  n_faux=$(nb_pr "$faux"); n_neuf=$(nb_pr "$neuf"); n_reel=$(nb_pr "$reel")
+  echo "commit réel : $n_reel ; commit $faux (B, C, D) : $n_faux ; commit $neuf (E, F) : $n_neuf"
+  [ "$n_faux" = 0 ] && echo "OK   B, C, D refusés : aucun PipelineRun pour $faux" || { echo "KO   livraison non signée ou falsifiée acceptée" >&2; exit 1; }
+  [ "$n_neuf" = 1 ] && [ "$n_reel" = 1 ] && echo "OK   F et G sans effet : un seul PipelineRun par commit" || { echo "KO   rejeu accepté" >&2; exit 1; }
+  echo "## refus des intercepteurs (service tekton-triggers-core-interceptors) depuis $debut"
+  kubectl logs -n tekton-pipelines deploy/tekton-triggers-core-interceptors --since-time="$debut" \
+    | jq -Rc 'fromjson? | select((.msg // "") | test("Continue:false")) | {t: (.ts | todate | .[11:19]), refus: (.msg | capture("Code:(?<code>[A-Za-z]+) Message:(?<message>[^}]*)"))}'
+  echo "## EventListener : rejeux refusés à la création (AlreadyExists) depuis $debut"
+  kubectl logs -n builds deploy/el-forgejo --since-time="$debut" \
+    | jq -Rc 'fromjson? | select(.severity == "error" and (.message | startswith("couldn'"'"'t create resource"))) | {t: .timestamp[11:19], eventID: ."/triggers-eventid", erreur: (.message | capture("(?<e>pipelineruns.tekton.dev .* already exists)").e)}'
+  echo "## Chains : PipelineRuns signés"
+  kubectl get pipelinerun -n builds -o json | jq -r '.items[] | "\(.metadata.name) signé=\(.metadata.annotations["chains.tekton.dev/signed"] // "non")"'
+  rm -f "$T/auth/entete"
+  echo "## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit)"
+  cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
+    "$REG_HOTE/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" 2>/dev/null \
+    | jq -c '.payload | @base64d | fromjson | .predicate | select(.buildDefinition.externalParameters.runSpec.pipelineRef != null)
+      | {buildType: .buildDefinition.buildType, pipeline: .buildDefinition.externalParameters.runSpec.pipelineRef.name,
+         params: (.buildDefinition.externalParameters.runSpec.params | map({(.name): .value}) | add), builder: .runDetails.builder.id}' \
+    | grep "$reel" | head -1
 }
 
 lancer tekton J4 "$@"

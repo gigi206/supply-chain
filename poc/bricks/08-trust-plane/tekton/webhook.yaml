@@ -1,0 +1,172 @@
+# Brique 08, J4 : webhook Forgejo → EventListener → PipelineRun (tekton.sh webhook). @BUSYBOX@, @IMAGE@, @DIGEST@ : tekton.sh.
+# HMAC : intercepteur GitHub de Triggers (X-Hub-Signature-256, que Forgejo envoie), secret forgejo-webhook (jamais versionné).
+# Anti-rejeu : le nom du PipelineRun dérive du commit (body.after, couvert par le HMAC) ; une livraison rejouée échoue à la
+# création (AlreadyExists) tant que le PipelineRun existe. Option C du propriétaire : la tâche ne construit rien encore (J7).
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: publier-essai
+  namespace: builds
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  steps:
+  - name: publier
+    image: @BUSYBOX@
+    env:
+    - name: COMMIT
+      value: $(params.commit)
+    - name: DEPOT
+      value: $(params.depot)
+    script: |
+      #!/bin/sh
+      echo "commit $COMMIT de $DEPOT (essai : aucune construction avant J7)"
+      printf '%s' '@IMAGE@' > $(results.IMAGE_URL.path)
+      printf '%s' '@DIGEST@' > $(results.IMAGE_DIGEST.path)
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: sample-app-essai
+  namespace: builds
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: publier
+    taskRef:
+      name: publier-essai
+    params:
+    - name: commit
+      value: $(params.commit)
+    - name: depot
+      value: $(params.depot)
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: sample-app
+  namespace: builds
+spec:
+  params:
+  - name: commit
+  - name: depot
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      name: sample-app-$(tt.params.commit)
+    spec:
+      pipelineRef:
+        name: sample-app-essai
+      params:
+      - name: commit
+        value: $(tt.params.commit)
+      - name: depot
+        value: $(tt.params.depot)
+      taskRunTemplate:
+        serviceAccountName: build
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: el-forgejo
+  namespace: builds
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: el-forgejo
+  namespace: builds
+subjects:
+- kind: ServiceAccount
+  name: el-forgejo
+  namespace: builds
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-roles
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: el-forgejo-builds
+subjects:
+- kind: ServiceAccount
+  name: el-forgejo
+  namespace: builds
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterroles
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: forgejo
+  namespace: builds
+spec:
+  serviceAccountName: el-forgejo
+  triggers:
+  - name: sample-app-push
+    interceptors:
+    - ref:
+        name: github
+        kind: ClusterInterceptor
+      params:
+      - name: secretRef
+        value:
+          secretName: forgejo-webhook
+          secretKey: secret
+      - name: eventTypes
+        value: [push]
+    - ref:
+        name: cel
+        kind: ClusterInterceptor
+      params:
+      - name: filter
+        value: "body.ref == 'refs/heads/main' && body.repository.full_name == 'workspace/sample-app' && body.after.matches('^[0-9a-f]{40}$')"
+    bindings:
+    - name: commit
+      value: $(body.after)
+    - name: depot
+      value: $(body.repository.clone_url)
+    template:
+      ref: sample-app
+  resources:
+    kubernetesResource:
+      serviceType: NodePort
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              zone: confiance
