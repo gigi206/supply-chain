@@ -58,6 +58,43 @@ miroir() { # source@digest dépôt-zot fichier-auth-zot [-r] : copie par digest 
   echo "copié dans Zot : $REG_HOTE/$dst@$d (cache $([ "${1:-}" = -r ] && echo 'avec referrers, ')${cache#"$O"/})"
 }
 
+ivpol() { # dépôt-des-bundles [chaîne-TSA [nom]] : ImageValidatingPolicy du contrôle 9 (attestor à clé, sans journal ; J5, J6)
+  cat <<EOF
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: ${3:-horodatage}
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  matchImageReferences:
+    - glob: "$REG_HOTE/*"
+  attestors:
+    - name: chains
+      cosign:
+        key:
+          data: |
+$(sed 's/^/            /' "$R/chains-cle-publique.pem")
+$([ -n "$1" ] && printf '        source:\n          repository: %s\n' "$REG_HOTE/$1")
+        ctlog:
+          insecureIgnoreTlog: true
+$([ -n "${2:-}" ] && printf '          tsaCertChain: |\n' && sed 's/^/            /' "$2")
+  attestations:
+    - name: prov
+      intoto:
+        type: https://slsa.dev/provenance/v1
+  validations:
+    - expression: >-
+        images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e > 0)
+      message: "C9 : provenance sans horodatage RFC 3161 valide"
+EOF
+}
+
 certificat() { # nom SAN : certificat de service signé par la CA du PoC (stockage.sh pki), clé en 0600
   local n=$1 cn=${2%%,*}
   if [ -s "$S/$n.key" ] && [ -s "$P/$n.crt" ]; then echo "$n : certificat existant"; else

@@ -394,42 +394,6 @@ publier_bundle() { # dépôt fichier : bundle publié en referrer de l'image d'e
   oras manifest push --ca-file "$P/ca-poc.crt" --registry-config "$T/zot.json" "$REG_HOTE/$1:${1##*/}" "$T/manifeste.json" >/dev/null
 }
 
-ivpol() { # dépôt-des-bundles [chaîne-TSA] : ImageValidatingPolicy du contrôle 9 (attestor à clé, sans journal)
-  cat <<EOF
-apiVersion: policies.kyverno.io/v1
-kind: ImageValidatingPolicy
-metadata:
-  name: horodatage
-spec:
-  validationActions: [Deny]
-  matchConstraints:
-    resourceRules:
-      - apiGroups: [""]
-        apiVersions: ["v1"]
-        operations: ["CREATE"]
-        resources: ["pods"]
-  matchImageReferences:
-    - glob: "$REG_HOTE/*"
-  attestors:
-    - name: chains
-      cosign:
-        key:
-          data: |
-$(sed 's/^/            /' "$R/chains-cle-publique.pem")
-$([ -n "$1" ] && printf '        source:\n          repository: %s\n' "$REG_HOTE/$1")
-        ctlog:
-          insecureIgnoreTlog: true
-$([ -n "${2:-}" ] && printf '          tsaCertChain: |\n' && sed 's/^/            /' "$2")
-  attestations:
-    - name: prov
-      intoto:
-        type: https://slsa.dev/provenance/v1
-  validations:
-    - expression: >-
-        images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e > 0)
-      message: "C9 : provenance sans horodatage RFC 3161 valide"
-EOF
-}
 
 verif_cosign() { # dépôt-des-bundles : vérification par cosign v3.1.4 (bundle, clé de Chains, racine de confiance du TSA)
   COSIGN_REPOSITORY=$REG_HOTE/$1 cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \

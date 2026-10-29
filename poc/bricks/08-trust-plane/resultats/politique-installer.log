@@ -1,0 +1,32 @@
+# politique.sh installer, 2026-10-29T22:01:55Z
+~/.cache/supply-chain-poc/08/telechargements/kyverno/install.yaml: OK
+OK   install.yaml = config/install-latest-testing.yaml du commit e63308f1e16c05cd009ac4864be6ec25c66b49be, latest → v1.19.2 (versions et images)
+## références d'images hors de Zot dans le manifeste rendu
+aucune
+kyverno : 71 objets, sha256 6cbfc7d9210520b9…
+deployment.apps/kyverno-admission-controller condition met
+deployment.apps/kyverno-background-controller condition met
+deployment.apps/kyverno-cleanup-controller condition met
+deployment.apps/kyverno-reports-controller condition met
+kyverno-admission-controller-6b78f498b9-s7dd5 Running sc-confiance
+kyverno-background-controller-76bd696776-56959 Running sc-confiance
+kyverno-cleanup-controller-5647df8554-zfwnj Running sc-confiance
+kyverno-reports-controller-7696b58bd5-vqpcr Running sc-confiance
+## images réellement tirées (imageID des conteneurs)
+sc-stockage.poc.test:5000/amont/kyverno/background-controller@sha256:c46e124f21ef…
+sc-stockage.poc.test:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c931…
+sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720…
+sc-stockage.poc.test:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628…
+sc-stockage.poc.test:5000/amont/kyverno/reports-controller@sha256:5fb6d3e73805…
+OK   5 images, toutes tirées de sc-stockage.poc.test:5000/amont/kyverno/
+## webhooks d'admission de Kyverno
+ValidatingWebhookConfiguration kyverno-cel-exception-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-cleanup-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-exception-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-global-context-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-policy-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-resource-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-ttl-validating-webhook-cfg : Ignore
+MutatingWebhookConfiguration kyverno-policy-mutating-webhook-cfg : Fail
+MutatingWebhookConfiguration kyverno-resource-mutating-webhook-cfg : Fail
+MutatingWebhookConfiguration kyverno-verify-mutating-webhook-cfg : Ignore

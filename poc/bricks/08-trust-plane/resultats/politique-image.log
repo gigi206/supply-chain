@@ -1,0 +1,33 @@
+# politique.sh image, 2026-10-29T21:47:03Z
+OK   tag v1.19.2 → commit e63308f1e16c05cd009ac4864be6ec25c66b49be (signature du commit vérifiée par GitHub)
+## kyverno
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+OK   identité voisine (tag v1.19.1) : refusé (no matching)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 (cache telechargements/oci/amont/kyverno/kyverno)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyverno@sha256:f4cb07c481ab6a9a7da8338b6bc1fe4541433ee1c614548fd95319f32f4cc406 (cache telechargements/oci/amont/kyverno/kyverno)
+OK   signature de 192.168.161.13:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## kyvernopre
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 (cache telechargements/oci/amont/kyverno/kyvernopre)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:6955bdac17879ca1d2e7373e377841d0a706cde13836693a7f2d2538ee5acba1 (cache telechargements/oci/amont/kyverno/kyvernopre)
+OK   signature de 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## background-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 (cache telechargements/oci/amont/kyverno/background-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/background-controller@sha256:a2f3aac0947d32bdb879801c08b36f9fe0e3235192fcfbbce713a7826347cebf (cache telechargements/oci/amont/kyverno/background-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## cleanup-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 (cache telechargements/oci/amont/kyverno/cleanup-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:6a60f5347fda92a453da9deff5ea83352af5e6d0511635aa582c1d4346fba0d6 (cache telechargements/oci/amont/kyverno/cleanup-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## reports-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 (cache telechargements/oci/amont/kyverno/reports-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:b3b1b487706474952f22717b870dfcdbc0df8fdf61fdc794f90550318e6636d9 (cache telechargements/oci/amont/kyverno/reports-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)

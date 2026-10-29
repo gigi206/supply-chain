@@ -1,0 +1,40 @@
+# Brique 08, J6 : install.yaml de Kyverno v1.19.2 réécrit vers Zot (politique.sh), contrôleurs sur le nœud de confiance.
+# CA du PoC pour joindre Zot (vérification des images) : SSL_CERT_FILE, lu par Go, pointe vers elle seule ; Kyverno ne
+# joint aucun registre public (attestors à clé, sans journal de transparence).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- install.yaml
+configMapGenerator:
+- name: ca-poc
+  namespace: kyverno
+  files:
+  - ca.crt
+  options:
+    disableNameSuffixHash: true
+patches:
+- target:
+    kind: Deployment
+    namespace: kyverno
+  patch: |-
+    - op: add
+      path: /spec/template/spec/nodeSelector
+      value:
+        zone: confiance
+    - op: add
+      path: /spec/template/spec/volumes/-
+      value:
+        name: ca-poc
+        configMap:
+          name: ca-poc
+    - op: add
+      path: /spec/template/spec/containers/0/volumeMounts/-
+      value:
+        name: ca-poc
+        mountPath: /etc/poc
+        readOnly: true
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: SSL_CERT_FILE
+        value: /etc/poc/ca.crt

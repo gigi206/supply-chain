@@ -1,0 +1,68 @@
+# politique.sh parite, 2026-10-29T21:55:31Z
+## banc C : 17 cas poussés dans Zot (192.168.161.13:5000/bench/), clés de test du banc
+Private key written to chains.key
+Public key written to chains.pub
+Private key written to vsa.key
+Public key written to vsa.pub
+Private key written to rogue.key
+Public key written to rogue.pub
+préparé : ok → 192.168.161.13:5000/bench/ok@sha256:6440ef2a1a9f…
+préparé : c1-unsigned → 192.168.161.13:5000/bench/c1-unsigned@sha256:50c4aa0a777d…
+préparé : c1-rogue → 192.168.161.13:5000/bench/c1-rogue@sha256:8fa9090bf8ff…
+préparé : c2-no-prov → 192.168.161.13:5000/bench/c2-no-prov@sha256:4719da1efc6d…
+préparé : c2-bad-builder → 192.168.161.13:5000/bench/c2-bad-builder@sha256:4a0ae8dc2ec9…
+préparé : c3-bad-source → 192.168.161.13:5000/bench/c3-bad-source@sha256:87a2723aaad0…
+préparé : c4-unpinned → 192.168.161.13:5000/bench/c4-unpinned@sha256:7ba1f629a468…
+préparé : c4-external-dep → 192.168.161.13:5000/bench/c4-external-dep@sha256:225312881fd5…
+préparé : c5-untrusted-task → 192.168.161.13:5000/bench/c5-untrusted-task@sha256:b7218f1ccf5e…
+préparé : c6-no-vsa → 192.168.161.13:5000/bench/c6-no-vsa@sha256:09f92c6cb12c…
+préparé : c6-vsa-failed → 192.168.161.13:5000/bench/c6-vsa-failed@sha256:fe5066c334af…
+préparé : c6-vsa-wrong-key → 192.168.161.13:5000/bench/c6-vsa-wrong-key@sha256:a395fe4bb36c…
+préparé : c7-kev → 192.168.161.13:5000/bench/c7-kev@sha256:662640ca0b63…
+préparé : c7-kev-vex-ok → 192.168.161.13:5000/bench/c7-kev-vex-ok@sha256:a214b0d5e7db…
+préparé : c7-mal → 192.168.161.13:5000/bench/c7-mal@sha256:da0fdf292731…
+préparé : c8-licence → 192.168.161.13:5000/bench/c8-licence@sha256:0d2be4a9ef86…
+préparé : c10-vex-expired → 192.168.161.13:5000/bench/c10-vex-expired@sha256:57f0f6e32be8…
+  écart avec le modèle du banc : <     - glob: "localhost:5000/*"
+  écart avec le modèle du banc : >     - glob: "192.168.161.13:5000/bench/*"
+OK   dry-run serveur évalué par Kyverno : c1-unsigned refusé (admission webhook "ivpol.validate.kyverno.svc-fail" denied the request: Policy bench-release failed: C1 : signature de l'image absente ou invalide )
+OK   ok : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   c1-unsigned : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c1-rogue : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c2-no-prov : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c2-bad-builder : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c3-bad-source : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c4-unpinned : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c4-external-dep : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c5-untrusted-task : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-no-vsa : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-vsa-failed : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-vsa-wrong-key : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c7-kev : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c7-kev-vex-ok : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   c7-mal : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c8-licence : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c10-vex-expired : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+## J5 : contrôle 9, attestor à clé sans journal ; une politique par variante (pas de cache partagé entre variantes)
+OK   j5-temoin : CLI PASS (code 0), admission PASS (attendu PASS)
+ÉCART j5-jeton-valide : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (admission webhook "ivpol.validate.kyverno.svc-fail" denied the request: Policy j5-jeton-valide error: failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer de) (attendu PASS)
+OK   j5-sans-jeton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   j5-aucun-bundle : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+ÉCART j5-jeton-altere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (admission webhook "ivpol.validate.kyverno.svc-fail" denied the request: Policy j5-jeton-altere error: failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer de) (attendu FAIL)
+ÉCART j5-autre-signature : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (admission webhook "ivpol.validate.kyverno.svc-fail" denied the request: Policy j5-autre-signature error: failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer) (attendu FAIL)
+ÉCART j5-tsa-etrangere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (admission webhook "ivpol.validate.kyverno.svc-fail" denied the request: Policy j5-tsa-etrangere error: failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer d) (attendu FAIL)
+OK   j5-att-historique : CLI FAIL (code 1), admission FAIL (attendu PASS)
+## synthèse
+  écart de libellé : j5-jeton-valide (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-jeton-altere (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-autre-signature (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-tsa-etrangere (CLI ERREUR (code 1), admission FAIL)
+parité des libellés : 21 cas sur 25 ; parité des décisions (admis ou refusé) : 25 cas sur 25
+  CLI ≠ attendu : j5-jeton-valide (ERREUR (code 1) au lieu de PASS)
+  admission ≠ attendu : j5-jeton-valide (FAIL au lieu de PASS)
+  CLI ≠ attendu : j5-jeton-altere (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-autre-signature (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-tsa-etrangere (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-att-historique (FAIL (code 1) au lieu de PASS)
+  admission ≠ attendu : j5-att-historique (FAIL au lieu de PASS)
+durée moyenne par cas : CLI 406 ms, admission 144 ms

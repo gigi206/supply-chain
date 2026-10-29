@@ -226,3 +226,7 @@ run = "poc/bricks/08-trust-plane/tekton.sh"
 [tasks."confiance:tsa"]
 description = "Brique 08, J5 : horodatage RFC 3161, timestamp-authority v2.2.0 avec la clé Transit tsa, job d'horodatage et mesure des chemins de vérification (étapes : image pki openbao deployer temoin essais horodater chemins)"
 run = "poc/bricks/08-trust-plane/tsa.sh"
+
+[tasks."confiance:politique"]
+description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission (étapes : image installer)"
+run = "poc/bricks/08-trust-plane/politique.sh"
