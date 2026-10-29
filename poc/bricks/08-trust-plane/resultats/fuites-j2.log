@@ -1,0 +1,35 @@
+# fuites.sh j2, 2026-10-29T17:12:29Z
+## sc-confiance : 4741 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    zot-poc-ecriture.password
+0    zot.key
+## sc-build : 2721 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    zot-poc-ecriture.password
+0    zot.key
+## sc-stockage : 3190 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    zot-poc-ecriture.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM

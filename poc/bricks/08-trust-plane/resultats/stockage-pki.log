@@ -1,4 +1,4 @@
-# stockage.sh pki, 2026-10-29T17:08:53Z
+# stockage.sh pki, 2026-10-29T17:12:44Z
 subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
 notAfter=Oct 29 16:39:08 2027 GMT
 sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
@@ -28,8 +28,8 @@ total 12
 ~/.cache/supply-chain-poc/08/secrets:
 total 36
 -rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
--rw------- 1 gigi gigi  33 Oct 29 18:07 forgejo-admin.password
--rw------- 1 gigi gigi  41 Oct 29 18:07 forgejo-admin.token
+-rw------- 1 gigi gigi  33 Oct 29 18:09 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Oct 29 18:09 forgejo-admin.token
 -rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
 -rw------- 1 gigi gigi 139 Oct 29 18:08 k3s-jeton-agent-securise

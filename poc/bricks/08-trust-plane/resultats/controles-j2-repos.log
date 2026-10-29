@@ -1,0 +1,95 @@
+# controles.sh j2-repos, 2026-10-29T17:15:42Z
+## sc-confiance
+noyau : 6.12.113+deb13-amd64 ; vCPU : 4 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 0 vCPU sur 4
+/dev/kvm absent
+               total        used        free      shared  buff/cache   available
+Mem:            7947         899        6200           1        1091        7048
+/dev/vda1        15G  1.6G   13G  12% /
+sortie NAT (deb.debian.org) : 200
+active inactive
+## sc-build
+noyau : 6.12.113+deb13-amd64 ; vCPU : 6 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 6 vCPU sur 6
+crw-rw---- 1 root kvm 10, 232 Oct 29 17:08 /dev/kvm
+kvm_intel             417792  0
+kvm                  1396736  1 kvm_intel
+               total        used        free      shared  buff/cache   available
+Mem:            9950         540        8781           0         875        9409
+/dev/vda1        30G  1.4G   27G   5% /
+sortie NAT (deb.debian.org) : 200
+inactive active
+## sc-stockage
+noyau : 6.12.113+deb13-amd64 ; vCPU : 2 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 0 vCPU sur 2
+/dev/kvm absent
+               total        used        free      shared  buff/cache   available
+Mem:            5931         669        3880           0        1626        5262
+/dev/vda1        20G  2.1G   17G  12% /
+sortie NAT (deb.debian.org) : 200
+inactive active
+## cluster
+k3s version v1.35.9+k3s1 (58877f27)
+NAME           STATUS   ROLES           AGE     VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>          7m5s    v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   7m20s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          6m53s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+NŒUD           TAINTS
+sc-build       [map[effect:NoSchedule key:zone value:build]]
+sc-confiance   <none>
+sc-stockage    <none>
+NAMESPACE     NAME                                     READY   STATUS    RESTARTS   AGE     IP          NODE           NOMINATED NODE   READINESS GATES
+kube-system   coredns-b644fd95b-qrn2g                  1/1     Running   0          7m15s   10.42.0.4   sc-confiance   <none>           <none>
+kube-system   local-path-provisioner-d9d8769b6-tdpbg   1/1     Running   0          7m15s   10.42.0.3   sc-confiance   <none>           <none>
+kube-system   metrics-server-7f4b6d9bd7-9hvwk          1/1     Running   0          7m15s   10.42.0.2   sc-confiance   <none>           <none>
+contrôleur de NetworkPolicy (kube-router) : 33 règles KUBE-ROUTER
+NAME           CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+sc-build       8m           0%       250Mi           2%          
+sc-confiance   30m          0%       547Mi           6%          
+sc-stockage    8m           0%       388Mi           6%          
+## images système sur sc-confiance
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+## images système sur sc-build
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+sc-stockage.poc.test:5000/workspace/sample-app:<none> 0672b88de1499
+## images système sur sc-stockage
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+## hôte : RSS des processus QEMU
+sc-confiance : 2432 Mo
+sc-build : 1947 Mo
+sc-stockage : 2670 Mo
+               total        used        free      shared  buff/cache   available
+Mem:           62742       38096       21608        7372       11113       24645

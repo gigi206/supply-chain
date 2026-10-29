@@ -46,6 +46,7 @@ declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stock
 SSH_OPTS=(-i "$O/ssh/id_ed25519" -o UserKnownHostsFile="$O/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 mkdir -p "$R" "$P" "$W"
 (umask 077 && mkdir -p "$S")
+trap 'rm -rf "$W/zot" "$W/registre" "$W/forgejo" "$W/depot" "$W/refus.out"' EXIT   # copies de secrets, même en cas d'échec
 chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
 sur() { local vm=$1; shift; ssh "${SSH_OPTS[@]}" "poc@${IP[$vm]}" "$@"; }
 copier() { # vm répertoire-distant fichiers…
