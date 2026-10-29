@@ -1,6 +1,6 @@
 # Résultats du banc A2 : Open Build Service (master, appliance Build53.24) en VM KVM (29/10/2026)
 
-**42/100 contre 55 pour la référence restreinte : OBS n'est pas adopté pour le packaging.** Les critères éliminatoires 1 à 4 sont démontrés. Le critère 5 ne l'est que partiellement : seules rocky-9 et debian-13 ont été construites. Lu à la lettre (« éliminé si un point n'est pas démontré »), il éliminerait OBS ; c'est **au propriétaire de trancher**. La non-adoption ne dépend pas de ce choix.
+**42/100 contre 55 pour la référence restreinte : OBS n'est pas adopté pour le packaging.** Les critères éliminatoires 1 à 4 sont démontrés. Le critère 5 ne l'est que partiellement : seules rocky-9 et debian-13 ont été construites. Le propriétaire l'a **jugé non éliminatoire** le 29/10/2026 : les autres distributions passent par le même mécanisme de DoD. OBS est donc non adopté, pas éliminé.
 
 Le score tient à A-1 : sur les 4 besoins de la grille restreinte, un seul est couvert nativement. Sur le reste, OBS fait mieux que prévu :
 - **rpm et deb sont bit-identiques sur 2 builds** (seuil du banc atteint), et le restent hors ligne ;
@@ -164,7 +164,7 @@ Les règles d'interpolation et d'arrondi sont celles du banc A1. **Pour A-1, un 
 | 2. Fonctionnement hors ligne | **Démontré** (build-5) |
 | 3. Licence open source, auto-hébergement | **Démontré** : GPL-2.0, tout dans la VM, aucun SaaS. Mais la provenance exige master, jamais publié en release |
 | 4. Santé | **Sain** (doc 04) |
-| 5. amd64 et distributions cibles | **Partiellement démontré, à trancher par le propriétaire** : rocky-9 et debian-13 seulement. Les autres reposent sur le même mécanisme de DoD (build.opensuse.org les construit), mais n'ont pas été mesurées. Lu à la lettre, le §1 éliminerait OBS |
+| 5. amd64 et distributions cibles | **Partiellement démontré, jugé non éliminatoire par le propriétaire (29/10/2026)** : rocky-9 et debian-13 seulement. Les autres reposent sur le même mécanisme de DoD (build.opensuse.org les construit), mais n'ont pas été mesurées. |
 
 ## Constats
 

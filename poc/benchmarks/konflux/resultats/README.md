@@ -144,7 +144,7 @@ Référence « assemblage » : **57/100** (§2.3, papier). Règle de décision A
 | 4. Santé (pas « Risqué ») | Démontré : À surveiller |
 | 5. amd64 et distros cibles | **Non démontré** pour rpm et deb |
 
-**Proposition** au propriétaire (décideur de l'ADR) : constater l'élimination au titre du critère 1, en configuration par défaut. La décision tient sans elle : 17 contre 57.
+**Décision du propriétaire (29/10/2026)** : élimination constatée au titre du critère 1, en configuration par défaut. La non-adoption tenait sans elle : 17 contre 57.
 
 ## Ce que l'assemblage reprend de Konflux
 

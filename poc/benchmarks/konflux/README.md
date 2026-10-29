@@ -23,7 +23,7 @@
 
 ## Résultats (29/10/2026)
 
-**17/100 contre 57 pour la référence : Konflux n'est pas adopté** ; élimination proposée au titre du critère 1. Détail, preuves et notation : [`resultats/README.md`](resultats/README.md). Rejeu : `mise run konflux:preparer`, puis `deployer`, `forgejo`, `onboarder`, `parametrer`, `verifier`, `tests-negatifs`, `t6-hermetique` et `preuves` ; démontage : `mise run konflux:demonter` et `mise run konflux:forgejo -- stop`.
+**17/100 contre 57 pour la référence : Konflux n'est pas adopté** ; **éliminé** au titre du critère 1 (confirmé par le propriétaire le 29/10/2026). Détail, preuves et notation : [`resultats/README.md`](resultats/README.md). Rejeu : `mise run konflux:preparer`, puis `deployer`, `forgejo`, `onboarder`, `parametrer`, `verifier`, `tests-negatifs`, `t6-hermetique` et `preuves` ; démontage : `mise run konflux:demonter` et `mise run konflux:forgejo -- stop`.
 
 ## Préparation sur le laptop (29/10/2026) : validée par le propriétaire et exécutée
 

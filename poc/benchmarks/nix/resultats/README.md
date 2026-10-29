@@ -51,7 +51,7 @@ Seule l'image **de build** diffère (`509f03bb…` contre `bdd56bab…`, voir la
 | B-7 | 5 | 3 | À surveiller | 3 | À surveiller |
 | **Score sur les critères mesurés** | 85 | **63 → 74/100** | | **77 → 91/100** (72 → 85 avant le rejeu sur le laptop, 63 → 74 avant la brique 04) | |
 
-**Lecture provisoire** : **la référence passe devant (91 contre 74)**. La brique 04 a mesuré l'image BuildKit et l'image de build archivée ; le rejeu sur le laptop (29/10/2026) a ensuite retrouvé les empreintes du cloud, soit B-1 sur 2 hôtes. La règle de décision exige **+15 points** pour Nix : on en est loin, **Nix reste en veille**. Même avec 5 en B-1 et en B-5, Nix atteindrait 83/100, alors que la référence compte déjà 77 points sans B-5 : l'écart de +15 exigé est hors d'atteinte. Les deux approches ont des forces complémentaires :
+**Décision du propriétaire (29/10/2026) : banc clos, Nix reste en veille** ; B-1 = 5 de la référence validé (cloud et laptop comptent pour 2 hôtes). **La référence passe devant (91 contre 74)**. La brique 04 a mesuré l'image BuildKit et l'image de build archivée ; le rejeu sur le laptop (29/10/2026) a ensuite retrouvé les empreintes du cloud, soit B-1 sur 2 hôtes. La règle de décision exige **+15 points** pour Nix : on en est loin, **Nix reste en veille**. Même avec 5 en B-1 et en B-5, Nix atteindrait 83/100, alors que la référence compte déjà 77 points sans B-5 : l'écart de +15 exigé est hors d'atteinte. Les deux approches ont des forces complémentaires :
 - **Nix** l'emporte sur la reconstruction offline complète, toutes toolchains incluses (Node compris) ;
 - **la référence** l'emporte sur l'exploitabilité du SBOM et sur le coût.
 
