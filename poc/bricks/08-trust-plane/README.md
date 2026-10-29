@@ -139,7 +139,8 @@ Rejeu : `mise run confiance:preparer`, puis `confiance:vm -- creer`, `confiance:
 - contrôleur de NetworkPolicy de k3s (kube-router) actif : 33 règles `KUBE-ROUTER` ;
 - journal d'audit de l'API activé (politique [`audit-policy.yaml`](k3s/audit-policy.yaml)), secrets chiffrés au repos (`secrets-encryption`) ;
 - composants k3s (CoreDNS, local-path, metrics-server) placés sur `sc-confiance`, qui n'a pas de taint ; Traefik et ServiceLB désactivés ;
-- RAM juste après l'installation : 2,5, 2,0 et 1,7 Go de RSS QEMU sur l'hôte (6,3 Go au total) ; 25 Gi restent disponibles sur l'hôte.
+- RAM juste après l'installation : 2,5, 2,0 et 1,7 Go de RSS QEMU sur l'hôte (6,3 Go au total) ; 25 Gi restent disponibles sur l'hôte ;
+- **RAM au repos** (6 min après l'installation, [`controles-j1-repos.log`](resultats/controles-j1-repos.log)) : RSS QEMU de 2,5 Go (`sc-confiance`), 1,8 Go (`sc-build`) et 1,6 Go (`sc-stockage`), soit **6,0 Go** au total ; mémoire vue par k3s : 593, 250 et 234 Mi ; 25,6 Gi restent disponibles sur l'hôte.
 
 **Constat : sans carte vidéo, l'image Debian 13 ne démarre pas.** GRUB affiche « Booting `Debian GNU/Linux' » puis la VM redémarre aussitôt, environ trois fois par seconde, sans aucun message du noyau. Diagnostic, chaque fois avec un seul changement :
 - CPU `host-model` au lieu de Haswell-v4 : même boucle ;
@@ -158,7 +159,7 @@ Correctif : une carte VGA sans affichage (ni VNC ni SPICE) dans les trois défin
 
 **Point ouvert pour J2 : kubectl.** Le kubectl de `mise.toml` (1.37.2) sort de la tolérance de version de Kubernetes face à un serveur 1.35 (une version mineure d'écart au plus). En attendant, les commandes passent par `k3s kubectl` dans `sc-confiance`. Il faudra ajouter un kubectl 1.35 à `mise.toml`, ce qui demande un accord.
 
-## Proposition pour J2 : stockage (en attente d'accord)
+## J2 : stockage (choix validés par le propriétaire le 29/10/2026)
 
 Vérifications du 29/10/2026 :
 - **images Forgejo** (`codeberg.org/forgejo/forgejo:15.0.11-rootless`, index `3cd6bc2b…`) : aucune signature cosign (pas de tag `.sig` ni `.att`), seulement un manifeste d'attestation BuildKit **non signé** dans l'index ;
@@ -169,4 +170,3 @@ Proposé :
 1. **Forgejo et Zot en services systemd sur `sc-stockage`**, à partir de ces binaires vérifiés, plutôt qu'en pods sur des images non signées. Ils restent dans la zone stockage ; le cluster les joint par 192.168.161.13.
 2. **TLS** par une petite CA du PoC (clé en 0600 dans `~/.cache/supply-chain-poc/08/secrets`), qui délivre les certificats de Zot et de Forgejo. La CA est déclarée à containerd (`registries.yaml` de k3s) et, plus tard, à Chains.
 3. **kubectl 1.35** dans `mise.toml` à la place du 1.37.2 (le banc A1 est démonté), vérifié comme les autres outils (signature sigstore).
-4. **RAM au repos** de J1 mesurée au début de J2.
