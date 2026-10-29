@@ -145,7 +145,7 @@ Outil : `cosign v3.1.4` (checksum vérifié), avec la racine de confiance Sigsto
 
 | Projet | Risque | Contre-contrôle ou sortie |
 |---|---|---|
-| Tekton Chains | 0.x, **aucun substitut L3**. En mode `sigstore-bundle`, la v0.29.x écrit des **signatures d'image invalides** (correctif [chains#2096](https://github.com/tektoncd/chains/pull/2096) non publié au 28/10/2026) | **Mode `dsse`** (tags) jusqu'au correctif ; contrôle strict `cosign/sign/v1`. Sortie : OpenShift Pipelines ou Konflux (embarquent Chains). VSA de replay signée par une autre clé |
+| Tekton Chains | 0.x, **aucun substitut L3**. En mode `sigstore-bundle`, la v0.29.x écrit des **signatures d'image invalides** (correctif [chains#2096](https://github.com/tektoncd/chains/pull/2096) non publié au 28/10/2026) | **Mode `dsse`** (tags) jusqu'au correctif ; contrôle strict `cosign/sign/v1`. **Coût du mode `dsse` mesuré en brique 08 (29/10/2026)** : deux envois d'attestations simultanés vers un même digest en perdent un sans erreur (lecture puis réécriture du tag `.att`, sans verrou ; [constat](../poc/bricks/08-trust-plane/resultats/constat-att-ecrasee.log)). Le choix se pose donc entre signatures d'image invalides (`sigstore-bundle`) et attestations perdues sous concurrence (`dsse`) ; contre-contrôle : une enveloppe par exécution signée. Sortie : OpenShift Pipelines ou Konflux (embarquent Chains). VSA de replay signée par une autre clé |
 | Conforma | 0.x, sponsor unique | Mini-politique dupliquée en Kyverno-JSON ou OPA ; **challenger 2a : Kyverno moteur unique** |
 | Hermeto | 3 avis Critical en 08/2026 | Dernière version, prefetch isolé sans secrets ; sortie : vendoring natif scripté |
 | mock | Scorecard 4,9 | OBS (benchmark 2a) |

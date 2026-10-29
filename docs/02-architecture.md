@@ -109,7 +109,7 @@ sequenceDiagram
   B->>Z: artefacts (binaire, image, rpm, deb via ORAS)
   B-->>C: résultats *_ARTIFACT_* / IMAGE_DIGEST
   C->>C: provenance SLSA v1 (slsa/v2alpha4), signée via OpenBao
-  C->>Z: signature + attestation (mode dsse en attendant chains#2096, puis bundle en referrer)
+  C->>Z: signature + attestation (mode dsse en attendant chains#2096, puis bundle en referrer ; en dsse, écritures du tag .att non atomiques : brique 08)
   S->>Z: horodatage RFC 3161 (bundle réémis ou jeton) [brique 08]
   Z->>A: SBOM, scan Grype (base datée), licences
   A->>Z: SBOM, résultats, VEX appliqués (attestations)

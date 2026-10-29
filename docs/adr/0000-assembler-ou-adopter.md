@@ -112,6 +112,8 @@ Jeu de règles de référence : les **10 contrôles de release** qui doivent êt
 
 > À compléter après les benchmarks : notes, preuves, scores, décision et plan de sortie. **La grille ci-dessus ne doit pas être modifiée** ; tout ajustement passe par un nouvel ADR.
 >
+> **Constat de la brique 08 (29/10/2026), coût du mode `dsse` retenu pour Chains** : deux envois d'attestations simultanés vers un même digest en perdent un, sans erreur ([constat](../../poc/bricks/08-trust-plane/resultats/constat-att-ecrasee.log)). Les contrôles de provenance doivent vérifier qu'il existe une enveloppe par exécution signée.
+
 > **Constat de sécurité du banc C** : avec les bundles cosign v3, `cosign verify`, Conforma et Kyverno acceptent une image **sans signature** dès qu'elle porte une attestation signée par la clé de confiance. Il faut un contrôle strict du type `https://sigstore.dev/cosign/sign/v1` et des clés séparées par usage (voir les résultats du banc C). Ce comportement est connu publiquement (cosign-orb#47, zot#4492) et touche aussi Chains v0.29.x en mode `sigstore-bundle` (chains#2096, non publiée) : **Chains reste en mode `dsse`** jusqu'au correctif.
 
 | Évaluation | Score candidat | Score référence | Éliminé ? | Décision |
