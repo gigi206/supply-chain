@@ -1,0 +1,55 @@
+# redemarrer.sh, 2026-10-29T18:09:10Z
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller temoin
+# openbao.sh deverrouiller, 2026-10-29T18:09:10Z
+{"sealed":false,"t":1,"n":1,"progress":0}
+{"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
+# openbao.sh temoin, 2026-10-29T18:09:14Z
+témoin : message signé par la clé chains ; empreinte de la clé publique 35411a64064f681f… ; {"latest_version":1,"exportable":false}
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh arreter
+Domain 'sc-confiance' is being shutdown
+
+Domain 'sc-build' is being shutdown
+
+Domain 'sc-stockage' is being shutdown
+
+Network supply-chain-poc destroyed
+
+## durée 4 s : mise run confiance:vm -- arreter
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh demarrer
+Network supply-chain-poc started
+
+Domain 'sc-confiance' started
+
+Domain 'sc-build' started
+
+Domain 'sc-stockage' started
+
+## durée 9 s : mise run confiance:vm -- demarrer
+## durée 14 s : trois nœuds réenregistrés (nouveau bootID) et Ready
+sc-confiance : démarré à 2026-10-29 18:09:20
+sc-build : démarré à 2026-10-29 18:09:20
+sc-stockage : démarré à 2026-10-29 18:09:20
+NAME           STATUS   ROLES           AGE     VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>          8m50s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   9m4s    v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          8m38s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+## stockage
+active active
+OK   Zot : manifeste sample-app par digest, lecture anonyme (HTTP 200)
+OK   Forgejo : workspace/sample-app, main = 6391fd437f26696847041be3226bbbf633f55a2f
+## OpenBao
+après redémarrage : {"initialized":true,"sealed":true} ; redémarrages du conteneur : 2
+OK   OpenBao scellé après le redémarrage des VM
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller controle
+# openbao.sh deverrouiller, 2026-10-29T18:09:43Z
+{"sealed":false,"t":1,"n":1,"progress":0}
+{"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
+# openbao.sh controle, 2026-10-29T18:09:46Z
+OK   clé publique identique (empreinte 35411a64064f681f…)
+OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
+OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
+NAMESPACE     NAME                                     READY   STATUS    RESTARTS      AGE     IP           NODE           NOMINATED NODE   READINESS GATES
+kube-system   coredns-b644fd95b-6x2vl                  1/1     Running   2 (30s ago)   9m2s    10.42.0.20   sc-confiance   <none>           <none>
+kube-system   local-path-provisioner-d9d8769b6-q54p8   1/1     Running   2 (30s ago)   9m2s    10.42.0.21   sc-confiance   <none>           <none>
+kube-system   metrics-server-7f4b6d9bd7-p449j          0/1     Running   2 (30s ago)   9m2s    10.42.0.19   sc-confiance   <none>           <none>
+openbao       openbao-0                                1/1     Running   2 (29s ago)   2m12s   10.42.0.22   sc-confiance   <none>           <none>

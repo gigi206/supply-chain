@@ -1,10 +1,10 @@
-# k3s.sh, 2026-10-29T18:00:30Z
+# k3s.sh, 2026-10-29T18:10:25Z
 k3s: OK
 k3s-airgap-images-amd64.tar.zst: OK
 Created symlink '/etc/systemd/system/multi-user.target.wants/k3s.service' -> '/etc/systemd/system/k3s.service'.
 k3s version v1.35.9+k3s1 (58877f27)
 sc-confiance : k3s server installé
-jeton agent sécurisé : empreinte de la CA du server 979a8be060052648… vérifiée
+jeton agent sécurisé : empreinte de la CA du server 335ca4e87aa0b1d0… vérifiée
 k3s: OK
 k3s-airgap-images-amd64.tar.zst: OK
 Created symlink '/etc/systemd/system/multi-user.target.wants/k3s-agent.service' -> '/etc/systemd/system/k3s-agent.service'.

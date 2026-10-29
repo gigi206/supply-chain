@@ -12,6 +12,9 @@
 #   essais         signature par le compte de service de Chains (vérifiée sur l'hôte par openssl) ; refus : autre compte,
 #                  autre audience, export, clé rendue exportable, sauvegarde, réseau depuis sc-build ; trace de l'audit
 #   deverrouiller  descellement après un redémarrage (OpenBao redémarre scellé : Chains ne peut plus signer)
+#   temoin         avant un redémarrage : message signé par la clé chains, empreinte de la clé publique complète
+#   controle       après : même empreinte, même version, toujours non exportable, signature témoin vérifiée par openssl
+#   redemarrage    pod supprimé : il revient scellé, non prêt et sans endpoint ; descellement ; controle
 # Aucun secret en argument de commande : le jeton root et la clé de descellement passent par l'entrée standard de
 # kubectl exec (la ligne de commande d'exec figure dans l'URL, donc dans l'audit de l'API).
 #
@@ -284,6 +287,52 @@ EOF
 
 etape_deverrouiller() {
   desceller
+}
+
+T=$W/openbao-temoin   # message, signature et clé publique (rien de secret) conservés entre temoin et controle
+cle_chains() { racine <<<'bao read -format=json transit/keys/chains' | jq '.data | {latest_version, exportable, allow_plaintext_backup, public_key: .keys["1"].public_key}'; }
+
+etape_temoin() {
+  rm -rf "$T" && mkdir -p "$T"
+  printf 'Brique 08, J3 : témoin de redémarrage, %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$T/message"
+  cle_chains > "$T/cle.json"
+  jq -r .public_key "$T/cle.json" > "$T/chains.pub"
+  racine <<EOF | sed 's/^vault:v1://' | base64 -d > "$T/sig.der"
+bao write -field=signature transit/sign/chains/sha2-256 input=$(openssl dgst -sha256 -binary "$T/message" | base64 -w0) prehashed=true
+EOF
+  openssl dgst -sha256 -verify "$T/chains.pub" -signature "$T/sig.der" "$T/message" >/dev/null
+  echo "témoin : message signé par la clé chains ; empreinte de la clé publique $(sha256sum < "$T/chains.pub" | cut -c1-16)… ; $(jq -c '{latest_version, exportable}' "$T/cle.json")"
+}
+
+etape_controle() {
+  [ -s "$T/sig.der" ] || { echo "KO   pas de témoin (étape temoin)" >&2; exit 1; }
+  cle_chains > "$B/cle.json"
+  jq -r .public_key "$B/cle.json" > "$B/chains.pub"
+  cmp -s "$T/chains.pub" "$B/chains.pub" && echo "OK   clé publique identique (empreinte $(sha256sum < "$B/chains.pub" | cut -c1-16)…)" || { echo "KO   clé publique différente" >&2; exit 1; }
+  jq -e '.latest_version == 1 and .exportable == false and .allow_plaintext_backup == false' "$B/cle.json" >/dev/null \
+    && echo "OK   $(jq -c 'del(.public_key)' "$B/cle.json")" || { echo "KO   $(jq -c 'del(.public_key)' "$B/cle.json")" >&2; exit 1; }
+  openssl dgst -sha256 -verify "$B/chains.pub" -signature "$T/sig.der" "$T/message" >/dev/null \
+    && echo "OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée" || { echo "KO   signature témoin" >&2; exit 1; }
+}
+
+etape_redemarrage() {
+  etape_temoin
+  kubectl delete pod -n openbao openbao-0 --wait=true >/dev/null
+  for _ in $(seq 90); do
+    [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ] && break
+    sleep 2
+  done
+  sleep 6   # au moins une sonde de disponibilité
+  local st pret ep
+  st=$(bao_status | jq -c '{initialized, sealed}')
+  pret=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+  ep=$(kubectl get endpointslice -n openbao -l kubernetes.io/service-name=openbao -o json | jq '[.items[].endpoints[]? | select(.conditions.ready == true)] | length')
+  echo "après suppression du pod : $st, Ready=$pret, endpoints prêts du Service : $ep"
+  [ "$(jq -r .sealed <<<"$st")" = true ] && [ "$pret" = False ] && [ "$ep" = 0 ] \
+    && echo "OK   OpenBao redémarre scellé, non prêt, retiré du Service" || { echo "KO   état après redémarrage" >&2; exit 1; }
+  desceller
+  echo "endpoints prêts du Service : $(kubectl get endpointslice -n openbao -l kubernetes.io/service-name=openbao -o json | jq '[.items[].endpoints[]? | select(.conditions.ready == true)] | length')"
+  etape_controle
 }
 
 lancer openbao J3 "$@"

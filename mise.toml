@@ -214,3 +214,7 @@ run = "poc/bricks/08-trust-plane/openbao.sh"
 [tasks."confiance:rejeu"]
 description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J3), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
 run = "poc/bricks/08-trust-plane/rejeu.sh"
+
+[tasks."confiance:redemarrer"]
+description = "Brique 08 : redémarrage complet des trois VM, puis contrôle de Zot, Forgejo et OpenBao (descellé, même clé Transit) ; journal resultats/redemarrage-vm.log"
+run = "poc/bricks/08-trust-plane/redemarrer.sh"

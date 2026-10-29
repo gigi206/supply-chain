@@ -23,6 +23,6 @@ etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
 etape k3s mise run confiance:k3s
 etape J2 mise run confiance:stockage -- pki zot registre containerd forgejo depot
-etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais
+etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais redemarrage
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

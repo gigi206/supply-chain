@@ -1,7 +1,7 @@
-# openbao.sh essais, 2026-10-29T18:03:04Z
+# openbao.sh essais, 2026-10-29T18:12:53Z
 ## compte de service de Chains (audience openbao), sur sc-confiance
 OpenBao joint au bout de 2 essai(s) (synchronisation de kube-router)
-CONNEXION_ACCEPTEE  "lease_duration": 0,  "renewable": false,  "data": null,  "warnings": null,  "policies": [  "chains-signature"  ],  "token_policies": [  "chains-signature"  ],  "entity_id": "d5667e9c-da8a-8c59-cbb0-965d9b8a6c4b",  "lease_duration": 300,  "renewable": false,  "mfa_requirement": null  }
+CONNEXION_ACCEPTEE  "lease_duration": 0,  "renewable": false,  "data": null,  "warnings": null,  "policies": [  "chains-signature"  ],  "token_policies": [  "chains-signature"  ],  "entity_id": "7777593b-0506-2e8b-040c-004730308612",  "lease_duration": 300,  "renewable": false,  "mfa_requirement": null  }
 clé publique : Public-Key (256 bit field, 128 bit security level) ASN1 OID prime256v1 NIST CURVE P-256
 Verified OK
 OK   signature Transit (prehashed sha2-256, comme le client hashivault de Chains) vérifiée par openssl sur l'hôte
@@ -14,11 +14,11 @@ OK   jeton de Chains, liste des moteurs : refusé (Code: 403 ; permission denied
 OK   jeton de Chains, lecture de son propre jeton : refusé (Code: 403 ; permission denied)
 OK   autre-compte : connexion refusée (Code: 400. Errors: * error validating token: invalid subject (sub) claim )
 OK   autre-audience : connexion refusée (Code: 400. Errors: * error validating token: invalid audience (aud) claim: audience claim does not match any expected audience )
-OK   pod de j3-essais sur sc-build : OpenBao injoignable (15 essais sur 15 s|Error checking seal status: Get "https://openbao.openbao.svc.cluster.local:8200/v1/sys/seal-status": dial tcp 10.43.30.73:8200: connect: connection refused)
+OK   pod de j3-essais sur sc-build : OpenBao injoignable (15 essais sur 15 s|Error checking seal status: Get "https://openbao.openbao.svc.cluster.local:8200/v1/sys/seal-status": dial tcp 10.43.168.119:8200: connect: connection refused)
 ## NFLOG (groupe 100) sur sc-confiance pendant l'essai réseau : source 10.42.1.0/24 (pods de sc-build)
-18:03:15.087143 IP 10.42.1.4.46046 > 10.42.0.6.8200: Flags [S], seq 2331370557, win 64860, options [mss 1410,sackOK,TS val 892529030 ecr 0,nop,wscale 7], length 0
-18:03:15.094859 IP 10.42.1.4.46046 > 10.42.0.6.8200: Flags [S], seq 2331370557, win 64860, options [mss 1410,sackOK,TS val 892529030 ecr 0,nop,wscale 7], length 0
-18:03:16.207161 IP 10.42.1.4.46056 > 10.42.0.6.8200: Flags [S], seq 1978714538, win 64860, options [mss 1410,sackOK,TS val 736383555 ecr 0,nop,wscale 7], length 0
+18:13:03.685581 IP 10.42.1.4.44530 > 10.42.0.6.8200: Flags [S], seq 1084969981, win 64860, options [mss 1410,sackOK,TS val 329261078 ecr 0,nop,wscale 7], length 0
+18:13:03.688252 IP 10.42.1.4.44530 > 10.42.0.6.8200: Flags [S], seq 1084969981, win 64860, options [mss 1410,sackOK,TS val 329261078 ecr 0,nop,wscale 7], length 0
+18:13:04.773538 IP 10.42.1.4.44546 > 10.42.0.6.8200: Flags [S], seq 739100264, win 64860, options [mss 1410,sackOK,TS val 2818149651 ecr 0,nop,wscale 7], length 0
 26 packets captured
 26 packets received by filter
 OK   SYN du pod de sc-build vers OpenBao journalisés comme refusés
@@ -29,18 +29,18 @@ Code: 500. Errors:
 * 1 error occurred:
  * exporting is disallowed on the policy
 OK   export et sauvegarde en clair refusés même au jeton root
-## audit d'OpenBao depuis 2026-10-29T18:03:04Z (connexions, signatures, refus)
-{"time":"18:03:06","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:ab9dc8c2e7c933a691deb0fe9a1fa65f096b3b11585fffb6b7ad8b48baa21f7a"}
-{"time":"18:03:06","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:605d3306af31e3aa78ebb83c191e0cc94bc856b20b5030718aec08ce2ebf997e"}
-{"time":"18:03:06","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"18:03:07","chemin":"transit/sign/chains/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"18:03:07","chemin":"transit/keys/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"18:03:07","chemin":"transit/export/signing-key/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:07","chemin":"transit/keys/chains/config","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:07","chemin":"transit/backup/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:07","chemin":"transit/keys/autre","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:07","chemin":"sys/mounts","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:07","chemin":"auth/token/lookup-self","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"18:03:50","chemin":"transit/export/signing-key/chains","op":"read","compte":"root","politiques":["root"],"erreur":"hmac-sha256:4b2b1dbb9ca549a6aa40908cb9a5926ff6b717ae5ac694ab76564704fb692d48"}
-{"time":"18:03:50","chemin":"transit/backup/chains","op":"read","compte":"root","politiques":["root"],"erreur":"1 error occurred:\n\t* exporting is disallowed on the policy\n\n"}
+## audit d'OpenBao depuis 2026-10-29T18:12:53Z (connexions, signatures, refus)
+{"time":"18:12:55","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"18:12:55","chemin":"transit/sign/chains/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"18:12:55","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:f24d945d89413146238fc5f0536279afcb88009c99887fa5f27c73db6a11d9be"}
+{"time":"18:12:55","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:85eced0dba4085d4210ef2b75a830545acebfcc8cbc1489d1354771d8369ea87"}
+{"time":"18:12:55","chemin":"transit/keys/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"18:12:55","chemin":"transit/export/signing-key/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:12:55","chemin":"transit/keys/chains/config","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:12:56","chemin":"transit/backup/chains","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:12:56","chemin":"transit/keys/autre","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:12:56","chemin":"sys/mounts","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:12:56","chemin":"auth/token/lookup-self","op":"read","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"18:13:38","chemin":"transit/export/signing-key/chains","op":"read","compte":"root","politiques":["root"],"erreur":"hmac-sha256:b034747dc185164b5787ae72a90132d9378cd3abad0163e694f91dfee1fb09e7"}
+{"time":"18:13:38","chemin":"transit/backup/chains","op":"read","compte":"root","politiques":["root"],"erreur":"1 error occurred:\n\t* exporting is disallowed on the policy\n\n"}
 valeurs sensibles en HMAC dans l'audit : hmac-sha256:…

@@ -132,3 +132,49 @@ J3 configurer	2026-10-29T18:03:02Z
 J3 configurer fait	2026-10-29T18:03:04Z	
 J3 essais	2026-10-29T18:03:04Z	
 J3 essais fait	2026-10-29T18:03:50Z	
+J3 redemarrage	2026-10-29T18:07:32Z	
+J3 redemarrage fait	2026-10-29T18:07:47Z	
+J3 temoin	2026-10-29T18:08:08Z	
+J3 temoin fait	2026-10-29T18:08:08Z	
+J3 deverrouiller	2026-10-29T18:08:26Z	
+J3 deverrouiller fait	2026-10-29T18:08:26Z	
+J3 controle	2026-10-29T18:08:26Z	
+J3 temoin	2026-10-29T18:09:00Z	
+J3 deverrouiller	2026-10-29T18:09:10Z	
+J3 deverrouiller fait	2026-10-29T18:09:14Z	
+J3 temoin	2026-10-29T18:09:14Z	
+J3 temoin fait	2026-10-29T18:09:15Z	
+J3 deverrouiller	2026-10-29T18:09:43Z	
+J3 deverrouiller fait	2026-10-29T18:09:46Z	
+J3 controle	2026-10-29T18:09:46Z	
+J3 controle fait	2026-10-29T18:09:46Z	
+VM, pool et réseau détruits	2026-10-29T18:10:04Z	
+J1 VM définies	2026-10-29T18:10:13Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T18:10:25Z	
+J1 installation de k3s	2026-10-29T18:10:25Z	
+J1 server prêt	2026-10-29T18:10:40Z	
+J1 trois nœuds prêts	2026-10-29T18:11:04Z	
+J2 pki	2026-10-29T18:11:04Z	
+J2 pki fait	2026-10-29T18:11:05Z	
+J2 zot	2026-10-29T18:11:05Z	
+J2 zot fait	2026-10-29T18:11:09Z	
+J2 registre	2026-10-29T18:11:09Z	
+J2 registre fait	2026-10-29T18:11:18Z	
+J2 containerd	2026-10-29T18:11:18Z	
+J2 containerd fait	2026-10-29T18:11:37Z	
+J2 forgejo	2026-10-29T18:11:37Z	
+J2 forgejo fait	2026-10-29T18:11:48Z	
+J2 depot	2026-10-29T18:11:48Z	
+J2 depot fait	2026-10-29T18:11:50Z	
+J3 image	2026-10-29T18:11:51Z	
+J3 image fait	2026-10-29T18:12:32Z	
+J3 deployer	2026-10-29T18:12:32Z	
+J3 deployer fait	2026-10-29T18:12:39Z	
+J3 initialiser	2026-10-29T18:12:39Z	
+J3 initialiser fait	2026-10-29T18:12:51Z	
+J3 configurer	2026-10-29T18:12:51Z	
+J3 configurer fait	2026-10-29T18:12:53Z	
+J3 essais	2026-10-29T18:12:53Z	
+J3 essais fait	2026-10-29T18:13:38Z	
+J3 redemarrage	2026-10-29T18:13:38Z	
+J3 redemarrage fait	2026-10-29T18:13:54Z	
