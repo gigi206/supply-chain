@@ -52,7 +52,7 @@ Prérequis :
 | Sujet | Ce qui reste | Brique ou banc |
 |---|---|---|
 | Konflux | ~~Installation, premier build signé, grille A~~ (fait le 29/10/2026) ; cluster kind supprimé et Forgejo arrêté le 29/10/2026 (données de Forgejo conservées dans `~/.cache/supply-chain-poc/forgejo`) ; confirmation de l'élimination par le propriétaire | A1 |
-| OBS | ~~rpm et deb bit-identiques sur 2 builds, grille A restreinte~~ (fait le 29/10/2026) ; validation par le propriétaire de la lecture de A-1 et de la non-adoption ; démontage de la VM, du pool et du réseau | A2 |
+| OBS | ~~rpm et deb bit-identiques sur 2 builds, grille A restreinte~~ (fait le 29/10/2026) ; VM, pool et réseau démontés le 29/10/2026 (restent dans `~/.cache/supply-chain-poc/obs` l'appliance archivée et les clés et prjconf épinglés) ; validation par le propriétaire de la lecture de A-1 et de la non-adoption | A2 |
 | Nix | ~~B-1 de la référence~~ (fait le 29/10/2026) ; B-1 de Nix sur un second hôte (empreintes du laptop archivées) ; B-5 (sandbox Nix en pod userns sous Tekton + Chains) | B |
 | Kyverno seul | Contrôle 9 (horodatage RFC 3161) ; parité CLI / admission ; bibliothèque Conforma `slsa3` / `trusted_task` sur une vraie provenance Chains | C, 08 |
 | Plan de confiance | k3s, Tekton, Chains (mode `dsse` tant que tektoncd/chains#2096 n'est pas publiée), OpenBao, job TSA, Trusted Resources, Kyverno, Conforma, intercepteur HMAC ; **les 8 tests négatifs** | 08 |
