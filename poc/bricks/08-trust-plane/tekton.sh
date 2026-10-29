@@ -110,8 +110,9 @@ etape_miroir() {
   auth_zot "$T/auth/zot.json"
   while IFS=$'\t' read -r src d a m; do
     [ "$src" = source ] && continue
-    oras cp "${src%:*}@$a" "$REG_HOTE/${m#"$REG"/}" --to-ca-file "$P/ca-poc.crt" --to-registry-config "$T/auth/zot.json" >/dev/null
-    [ "$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" "$REG_HOTE/${m#"$REG"/}" | jq -r .digest)" = "$a" ] || { echo "KO   $m" >&2; exit 1; }
+    m=${m#"$REG"/}
+    miroir "${src%:*}@$a" "${m%@*}" "$T/auth/zot.json" >/dev/null
+    [ "$(oras manifest fetch --descriptor --ca-file "$P/ca-poc.crt" "$REG_HOTE/$m" | jq -r .digest)" = "$a" ] || { echo "KO   $m" >&2; exit 1; }
     n=$((n + 1))
   done < "$TSV"
   echo "OK   $n manifestes linux/amd64 copiés dans Zot sous amont/ et relus par digest"
@@ -237,7 +238,14 @@ etape_webhook() {
   kubectl wait -n builds --for=condition=Available deploy/el-forgejo --timeout=180s
   kubectl get pods -n builds -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
   url=$(el_url)
-  echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance)"
+  # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3) : Forgejo n'a pas relivré un webhook
+  # refusé (rejeu de J5) ; on attend l'EventListener joignable depuis sc-stockage (sonde /live, sans événement).
+  local n=1
+  until [ "$(sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' $url/live" || true)" = 200 ]; do
+    [ $n -lt 60 ] || { echo "KO   EventListener injoignable depuis sc-stockage" >&2; exit 1; }
+    n=$((n + 1)); sleep 1
+  done
+  echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance ; /live depuis sc-stockage, essai $n)"
   # Webhook Forgejo : le secret passe par un fichier 0600 (curl -d @fichier), jamais en argument.
   printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
   api() { curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -H 'Content-Type: application/json' "$@"; }

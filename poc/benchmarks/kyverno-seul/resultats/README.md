@@ -71,7 +71,7 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
   - les attestations signées par une **autre clé** que celle passée en `--public-key` sont ignorées en entrée ; la VSA est donc vérifiée via `ec.sigstore.verify_attestation(ref, {"public_key": …})` ;
   - la lecture des bundles et des referrers fonctionne, mais elle **n'est pas documentée**.
 - **Non testé en local** :
-  - **contrôle 9** (horodatage RFC 3161) : il faut une TSA ;
+  - **contrôle 9** (horodatage RFC 3161) : il faut une TSA ; **mesuré en brique 08, J5** (voir plus bas) ;
   - **C-2** (parité entre CLI et admission) : il faut un cluster ;
   - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : à refaire en brique 08.
 
@@ -88,5 +88,12 @@ Les notes sont provisoires tant que le contrôle 9 et C-2 ne sont pas mesurés.
 | C-5 Santé | 10 | 4 | Sain, CNCF, plusieurs employeurs (Scorecard 7,8) | 2 | Limité par Conforma : 0.x, sponsor unique (6,6) |
 | C-6 Performance | 10 | 5 | ≈ 0,5 s | 5 | ≈ 1 s |
 | **Score /100** | | **76** | | **63** | |
+
+**Contrôle 9 mesuré en brique 08, J5 (29/10/2026)** ([journal](../../../bricks/08-trust-plane/resultats/tsa-chemins.log)). Le job d'horodatage réémet chaque enveloppe de Chains en bundle v0.3 avec un jeton RFC 3161, dans un dépôt séparé de celui de l'image :
+- **Kyverno 1.19.2, CLI** (attestor à clé, `insecureIgnoreTlog`, `tsaCertChain`) : jeton valide → `error` (« nil pointer dereference ») ; jeton absent ou aucun bundle → refus. Le contrôle 9 n'est donc pas assuré par le CLI de Kyverno ; l'admission partage ce code, la parité se mesure en J6 (C-2). Sans `tsaCertChain`, le même bundle passe (témoin). Kyverno ne vérifie pas non plus la provenance au format historique (`.att`) sans journal de transparence ;
+- **cosign v3.1.4** (`--use-signed-timestamps`, racine de confiance du TSA) : jeton valide accepté ; aucun bundle, bundle sans jeton, jeton altéré, jeton d'une autre signature et jeton d'une TSA étrangère refusés ;
+- **Conforma v0.10.42** : non mesuré (aucune option d'horodatage dans `ec validate image`).
+
+Les notes ci-dessus restent inchangées : la lecture de C-1 avec un contrôle 9 vérifié hors du moteur (`tools/verify-ts`) revient au propriétaire.
 
 **Lecture provisoire.** Kyverno seul dépasse nettement le seuil de 90 % de la référence (76 ≥ 57). La décision reste **suspendue** à la règle « 10/10 contrôles » : il faut tester le contrôle 9 (TSA) et la parité à l'admission en brique 08. Réserve : la bibliothèque Conforma (`slsa3`, `trusted_task` sur la vraie provenance Chains) n'a pas été mise à profit ici ; la réimplémenter en CEL sur la vraie provenance pourrait coûter plus que dans ce banc synthétique.

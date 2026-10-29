@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Brique 08 : redémarrage complet des trois VM (arrêt propre puis démarrage), comme après un redémarrage du laptop.
 #   Avant : témoin OpenBao (message signé par la clé chains). Après : nœuds Ready, Zot et Forgejo actifs et lisibles
-#   (manifeste sample-app par digest, branche main), OpenBao scellé puis descellé (deverrouiller), même clé Transit.
+#   (manifeste sample-app par digest, branche main), OpenBao scellé puis descellé (deverrouiller), même clé Transit ;
+#   TSA (J5) relancé avec un nouveau jeton OpenBao, jeton témoin vérifié (tsa.sh temoin).
 #
 # Usage (racine du dépôt) : mise run confiance:redemarrer   (journal : resultats/redemarrage-vm.log)
 set -euo pipefail
@@ -58,4 +59,11 @@ done
 echo "après redémarrage : $(jq -c '{initialized, sealed}' <<<"$st") ; redémarrages du conteneur : $(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.containerStatuses[0].restartCount}')"
 [ "$(jq -r .sealed <<<"$st")" = true ] && echo "OK   OpenBao scellé après le redémarrage des VM" || { echo "KO   OpenBao non scellé" >&2; exit 1; }
 mise run confiance:openbao -- deverrouiller controle
+echo "## TSA (J5) : nouveau jeton OpenBao au démarrage du pod, une fois OpenBao descellé"
+# Pendant le scellement, la connexion du conteneur d'initialisation échoue et kubelet espace ses relances (jusqu'à 5 min) :
+# on recrée le pod plutôt que d'attendre la relance suivante.
+kubectl delete pod -n tsa -l app=timestamp-authority --wait=false >/dev/null
+kubectl rollout status -n tsa deployment/timestamp-authority --timeout=180s
+kubectl logs -n tsa deployment/timestamp-authority -c connexion
+mise run confiance:tsa -- temoin
 kubectl get pods -A -o wide

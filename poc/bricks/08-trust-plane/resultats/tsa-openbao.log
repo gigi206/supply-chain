@@ -1,0 +1,46 @@
+# tsa.sh openbao, 2026-10-29T21:06:59Z
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-10-29T21:07:00.128305787Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEiLQJQ6N6D8DCL6bLI4CynGdCUjeH
+LSEIjHBU8uAr2AD+PL2LRhrhBxTPhEqkypZP2ZFgC+33XREb4UCx5L3YGQ==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      tsa
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: tsa-signature
+Success! Data written to: auth/jwt/role/tsa
+{"name":"tsa","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:tsa:timestamp-authority","user_claim":"sub","token_policies":["tsa-signature"],"token_no_default_policy":true,"token_type":"service","token_period":3600,"token_ttl":0,"token_max_ttl":0}
+path "transit/keys/tsa" {
+  capabilities = ["read"]
+}
+path "transit/sign/tsa" {
+  capabilities = ["update"]
+}
+path "transit/sign/tsa/*" {
+  capabilities = ["update"]
+}
+path "auth/token/renew-self" {
+  capabilities = ["update"]
+}
+certificat feuille émis pour la clé Transit tsa
+~/.cache/supply-chain-poc/08/pki/tsa-feuille.crt: OK
+subject=O=supply-chain PoC, CN=TSA du PoC issuer=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Oct 29 21:07:00 2027 GMT X509v3 Basic Constraints: critical CA:FALSE X509v3 Key Usage: critical Digital Signature X509v3 Extended Key Usage: critical Time Stamping
+OK   clé publique du certificat = clé publique Transit tsa (SPKI sha256 c98c6a24d58244bb…)
+{"mediaType":"application/vnd.dev.sigstore.trustedroot+json;version=0.1","tsa":[{"uri":"http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp","certificats":2,"validFor":{"start":"2026-10-29T21:07:00Z"}}],"tlogs":0,"ca":0,"ctlogs":0}

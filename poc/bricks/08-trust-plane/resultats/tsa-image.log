@@ -1,0 +1,31 @@
+# tsa.sh image, 2026-10-29T21:06:17Z
+## timestamp-server v2.2.0
+OK   tag v2.2.0 (objet 11108902eaf0307666abeef7e16cd8eab8050e81, signé et vérifié par GitHub) → commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2
+ghcr.io/sigstore/timestamp-server:v2.2.0 → sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:0cddebb024e8bb135d250da6ffc603d847d4bdd8a0470622701efdf6db1ac037
+OK   attestation GitHub de oci://ghcr.io/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 : https://slsa.dev/provenance/v1, https://github.com/sigstore/timestamp-authority/.github/workflows/build_container.yml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+copié dans Zot : 192.168.161.13:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 (cache avec referrers, telechargements/oci/amont/sigstore/timestamp-server)
+OK   attestation GitHub de oci://192.168.161.13:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 : https://slsa.dev/provenance/v1, https://github.com/sigstore/timestamp-authority/.github/workflows/build_container.yml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+## cosign v3.1.4-dev (base de l'image d'outils)
+ghcr.io/sigstore/cosign/cosign:v3.1.4-dev → sha256:8af1a2cf9fba903fdfc6bdafdc25f7b13ef34ad722095543ea787fb96f7240c1 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d
+OK   signature de ghcr.io/sigstore/cosign/cosign@sha256:8af1a2cf9fba903fdfc6bdafdc25f7b13ef34ad722095543ea787fb96f7240c1 : keyless@projectsigstore.iam.gserviceaccount.com (https://accounts.google.com), type https://sigstore.dev/cosign/sign/v1
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+OK   identité voisine : refusé (no matching CertificateIdentity)
+copié dans Zot : 192.168.161.13:5000/amont/sigstore/cosign/cosign@sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d (cache telechargements/oci/amont/sigstore/cosign/cosign)
+## timestamp-cli v2.2.0
+timestamp-cli-linux-amd64: OK
+timestamp-cli-linux-amd64: OK
+OK   attestation GitHub de timestamp-cli : https://github.com/sigstore/timestamp-authority/.github/workflows/release.yaml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+## oras 1.3.6
+OK   empreinte C6FC42F0DE84A345FAADB742F44418110791EF37 publiée sur oras.land (dépôt oras-www, version 1.3)
+OK   signature GPG de oras_1.3.6_checksums.txt : clé primaire C6FC42F0DE84A345FAADB742F44418110791EF37
+oras_1.3.6_linux_amd64.tar.gz: OK
+oras_1.3.6_linux_amd64.tar.gz: OK
+## image d'outils du job (crane append, couche reproductible)
+2be7e2b668fc32329408ca17f104021bdb93407266537b6410668ed7d05c4611  oras
+18ee91ff6980ce279f49a0643808bf943785e88101aac5c8593170d642235f3d  timestamp-cli
+image d'outils : 192.168.161.13:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   même digest que l'image épinglée (assemblage reproductible)

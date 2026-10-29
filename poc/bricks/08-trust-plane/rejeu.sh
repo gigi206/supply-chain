@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J4) : démontage, VM, k3s, stockage, OpenBao, Tekton, puis
-# contrôle des secrets dans les journaux. Téléchargements, CA et certificats restent en cache ; l'état des services
-# est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte.
+# Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J5) : démontage, VM, k3s, stockage, OpenBao, Tekton,
+# horodatage, puis contrôle des secrets dans les journaux. Téléchargements, CA et certificats restent en cache ; l'état
+# des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte.
 #
 # Usage (racine du dépôt) : mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
 export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
-lib=${1:-j1-j4}
+lib=${1:-j1-j5}
 exec > >(sed -u "s#$HOME#~#g" | tee "$here/resultats/rejeu-$lib.log") 2>&1
 echo "# rejeu.sh $lib, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 t0=$(date +%s)
@@ -25,5 +25,6 @@ etape k3s mise run confiance:k3s
 etape J2 mise run confiance:stockage -- pki zot registre containerd forgejo depot
 etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais redemarrage
 etape J4 mise run confiance:tekton -- revue miroir installer signature verifier webhook essais_webhook
+etape J5 mise run confiance:tsa -- image pki openbao deployer essais horodater chemins
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

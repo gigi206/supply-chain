@@ -1,0 +1,231 @@
+# Brique 08, jalon J5 : service d'horodatage RFC 3161 (timestamp-authority v2.2.0) sur le nœud de confiance.
+# @TSA@ et @BAO@ : index signés, copiés dans Zot (tsa.sh image, openbao.sh image).
+# Clé de signature : clé Transit tsa d'OpenBao, non exportable, lue et utilisée par le client hashivault de sigstore.
+# Ce client ne sait pas se connecter seul (kms.Get sans options) : il lit un jeton OpenBao dans ~/.vault-token, une fois.
+# Le conteneur d'initialisation l'obtient avec le jeton projeté du compte de service (rôle JWT tsa) ; le jeton est
+# périodique (1 h) et renouvelé toutes les 15 min par un conteneur voisin. Aucun jeton Kubernetes monté.
+# Sans sortie réseau, la surveillance NTP du serveur est désactivée : l'heure des jetons est celle de la VM.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tsa
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: timestamp-authority
+  namespace: tsa
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: timestamp-authority
+  namespace: tsa
+spec:
+  selector:
+    app: timestamp-authority
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timestamp-authority
+  namespace: tsa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timestamp-authority
+  template:
+    metadata:
+      labels:
+        app: timestamp-authority
+    spec:
+      serviceAccountName: timestamp-authority
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      nodeSelector:
+        zone: confiance
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: connexion
+        image: @BAO@
+        command: [sh, -c]
+        args:
+        - |
+          set -eu
+          umask 027
+          # kube-router rejette le trafic d'un pod neuf pendant environ 1 s (J3) : quelques essais.
+          n=1
+          until bao write -field=token auth/jwt/login role=tsa jwt=@/var/run/secrets/openbao/token \
+              > /var/run/tsa/.vault-token 2> /var/run/tsa/erreur; do
+            [ $n -lt 30 ] || { cat /var/run/tsa/erreur >&2; exit 1; }
+            n=$((n + 1)); sleep 1
+          done
+          rm -f /var/run/tsa/erreur
+          echo "jeton OpenBao obtenu (rôle tsa, essai $n)"
+        env:
+        - name: BAO_ADDR
+          value: https://openbao.openbao.svc.cluster.local:8200
+        - name: BAO_CACERT
+          value: /etc/tsa/ca-poc.crt
+        securityContext: &restreint
+          runAsUser: 100
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: etat
+          mountPath: /var/run/tsa
+        - name: config
+          mountPath: /etc/tsa
+          readOnly: true
+        - name: openbao-jeton
+          mountPath: /var/run/secrets/openbao
+          readOnly: true
+      containers:
+      - name: timestamp-server
+        image: @TSA@
+        command: [timestamp-server]
+        args:
+        - serve
+        - --host=0.0.0.0
+        - --port=3000
+        - --log-type=prod
+        - --timestamp-signer=kms
+        - --kms-key-resource=hashivault://tsa
+        - --timestamp-signer-hash=sha256
+        - --certificate-chain-path=/etc/tsa/chaine.pem
+        - --disable-ntp-monitoring
+        env:
+        - name: VAULT_ADDR
+          value: https://openbao.openbao.svc.cluster.local:8200
+        - name: VAULT_CACERT
+          value: /etc/tsa/ca-poc.crt
+        - name: HOME
+          value: /var/run/tsa
+        ports:
+        - name: http
+          containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /api/v1/timestamp/certchain
+            port: http
+          periodSeconds: 10
+        securityContext:
+          runAsUser: 65532
+          runAsGroup: 65532
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: etat
+          mountPath: /var/run/tsa
+          readOnly: true
+        - name: config
+          mountPath: /etc/tsa
+          readOnly: true
+      - name: renouvellement
+        image: @BAO@
+        command: [sh, -c]
+        args:
+        - |
+          set -u
+          # Après plus d'1 h sans OpenBao descellé, le jeton expire et le TSA ne signe plus : supprimer le pod.
+          # sh est le PID 1 du conteneur et ignore SIGTERM par défaut : sans ce trap, l'arrêt d'un nœud attend
+          # 90 s (délai de systemd) et la suppression du pod 30 s.
+          # Premier renouvellement dès le démarrage : son journal prouve que le jeton se renouvelle (tsa.sh deployer).
+          trap 'exit 0' TERM INT
+          while :; do
+            if d=$(BAO_TOKEN=$(cat /var/run/tsa/.vault-token) bao token renew -format=json 2>&1); then
+              echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) jeton renouvelé : $(echo "$d" | tr -d '\n ' | sed -n 's/.*"auth":{.*"lease_duration":\([0-9]*\).*/\1/p') s"
+            else
+              echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) renouvellement refusé : $(echo "$d" | tail -1)"
+            fi
+            sleep 900 & wait $!
+          done
+        env:
+        - name: BAO_ADDR
+          value: https://openbao.openbao.svc.cluster.local:8200
+        - name: BAO_CACERT
+          value: /etc/tsa/ca-poc.crt
+        securityContext: *restreint
+        volumeMounts:
+        - name: etat
+          mountPath: /var/run/tsa
+          readOnly: true
+        - name: config
+          mountPath: /etc/tsa
+          readOnly: true
+      volumes:
+      - name: etat
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Mi
+      - name: config
+        configMap:
+          name: tsa-config
+      - name: openbao-jeton
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: openbao
+              expirationSeconds: 600
+              path: token
+---
+# Entrée : le seul job d'horodatage (espace horodatage), sur le port de l'API. Sortie : DNS et OpenBao.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: timestamp-authority
+  namespace: tsa
+spec:
+  podSelector:
+    matchLabels:
+      app: timestamp-authority
+  policyTypes: [Ingress, Egress]
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: horodatage
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: openbao
+      podSelector:
+        matchLabels:
+          app: openbao
+    ports:
+    - protocol: TCP
+      port: 8200

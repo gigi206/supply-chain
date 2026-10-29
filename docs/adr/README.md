@@ -5,7 +5,7 @@
 | [0000](0000-assembler-ou-adopter.md) | Adopter (Konflux, OBS) ou assembler ; challengers Nix (build) et Kyverno seul (politique) | **Proposé, grille figée le 28/10/2026** | Fin de la phase 2a (résultats en annexe) |
 | [0001](0001-runtime-isolation.md) | Runtime, isolation des builds, infrastructure du PoC | **Proposé (provisoire)** | Définitif en phase 3 |
 | 0002 | Fermeture des dépendances et snapshots de distros (Pulp ou aptly) | À rédiger | Fin de 2c (brique 14) |
-| 0003 | Clés, signature (OpenBao, OpenPGP), horodatage, TUF | À rédiger | Phase 3 |
+| 0003 | Clés, signature (OpenBao, OpenPGP), horodatage, TUF | À rédiger | Phase 3. Entrées mesurées : brique 08, J3 (clé de provenance Transit) et J5 (clé `tsa` séparée, racine TSA dédiée, jeton OpenBao périodique, chemin de vérification) |
 | 0004 | Vulnérabilités et VEX (OpenVEX ou CSAF) | À rédiger | Phase 3 |
 | 0005 | Licences (politique ORT et DT, curations) | À rédiger | Phase 3 |
 | 0006 | Archive WORM (Ceph hors cluster ou S3 Object Lock compliance) | À rédiger | Fin de 2c (brique 15) |

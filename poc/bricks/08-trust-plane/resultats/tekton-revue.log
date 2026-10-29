@@ -1,4 +1,4 @@
-# tekton.sh revue, 2026-10-29T19:30:27Z
+# tekton.sh revue, 2026-10-29T21:03:55Z
 ## release.yaml (deux sources, empreintes épinglées)
 OK   pipeline v1.15.5 release.yaml : c2fe5c2ac98af298… = GitHub = infra.tekton.dev = digest de l'asset GitHub
 OK   chains v0.29.9 release.yaml : a3f9154467f8dd40… = GitHub = infra.tekton.dev = digest de l'asset GitHub

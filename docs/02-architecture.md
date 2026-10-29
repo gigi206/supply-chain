@@ -110,7 +110,7 @@ sequenceDiagram
   B-->>C: résultats *_ARTIFACT_* / IMAGE_DIGEST
   C->>C: provenance SLSA v1 (slsa/v2alpha4), signée via OpenBao
   C->>Z: signature + attestation (mode dsse en attendant chains#2096, puis bundle en referrer ; en dsse, écritures du tag .att non atomiques : brique 08)
-  S->>Z: horodatage RFC 3161 (bundle réémis ou jeton) [brique 08]
+  S->>Z: horodatage RFC 3161 : par enveloppe de Chains, jeton du TSA (clé Transit tsa) sur la signature, bundle v0.3 réémis dans un dépôt séparé de celui de l'image [brique 08, J5]
   Z->>A: SBOM, scan Grype (base datée), licences
   A->>Z: SBOM, résultats, VEX appliqués (attestations)
   Z->>R: provenance + entrées épinglées
@@ -205,6 +205,7 @@ EL8 n'est pas mis automatiquement à 0.
 | Clé | Stockage | Usage | Rotation |
 |---|---|---|---|
 | Provenance | OpenBao Transit (zone Confiance) | Signatures Chains | Périodique ; horodatage pour la vérifiabilité dans le temps |
+| Horodatage (TSA) | OpenBao Transit, clé `tsa` distincte de la clé de provenance (zone Confiance), certifiée par une **racine TSA dédiée**, hors de la CA TLS (brique 08, J5) | Jetons RFC 3161 du job d'horodatage | Certificat feuille annuel ; racine longue, hors ligne en production |
 | VSA | KMS du **domaine de replay** | Résultats de replay | Indépendante de la clé de provenance |
 | OpenPGP dépôts et paquets | HSM du service de signature isolé | `rpmsign`, `debsign`, `Release`/`repomd` | Expiration planifiée, révocation |
 | Racine TUF | **Hors ligne** (cérémonie) | Distribution des clés publiques | Seuils, cérémonie documentée |

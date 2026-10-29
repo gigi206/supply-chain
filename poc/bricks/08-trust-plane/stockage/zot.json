@@ -55,6 +55,24 @@
               ]
             }
           ]
+        },
+        "horodatage/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-ecriture",
+                "poc-horodatage"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            }
+          ]
         }
       }
     }

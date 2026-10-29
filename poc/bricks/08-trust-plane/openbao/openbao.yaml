@@ -135,6 +135,13 @@ spec:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: tekton-chains
+    # J5 : le TSA signe ses jetons avec la clé Transit tsa (rôle JWT tsa, compte de service tsa:timestamp-authority)
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: tsa
+      podSelector:
+        matchLabels:
+          app: timestamp-authority
     ports:
     - protocol: TCP
       port: 8200

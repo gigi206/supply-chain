@@ -1,0 +1,27 @@
+# tsa.sh horodater, 2026-10-29T21:07:56Z
+secret zot-horodatage appliqué (poc-horodatage, sc-stockage.poc.test:5000 ; lu sur l'entrée standard de kubectl, sans annotation last-applied)
+## builds/essai-signature (une exécution signée en J4)
+JOINT|Zot et TSA, essai 1
+HORODATEE|1|signature 27aa4c7b7769acc0|https://slsa.dev/provenance/v1|2026-10-29 21:08:00 +0000 UTC|referrer sha256:37b1a8efdc12960e587af447cef380a8a23c5ef767fd509c46563f843aede7d3
+FIN|1 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+## builds/essai-webhook (une enveloppe par exécution signée de l'essai du webhook)
+JOINT|Zot et TSA, essai 1
+HORODATEE|1|signature 4d889bceaa1601da|https://slsa.dev/provenance/v1|2026-10-29 21:08:07 +0000 UTC|referrer sha256:8a12734897db4c2f4fc97d9a7f754ef669e65b5280d228c4fcb277cd5668c3b0
+HORODATEE|2|signature a9982bbc7b648569|https://slsa.dev/provenance/v1|2026-10-29 21:08:09 +0000 UTC|referrer sha256:7f31e9e4abc301b95fcadd59d72cb07a4963dcfb4f1105bccbe60b981562574a
+HORODATEE|3|signature ea6e0395590f71a7|https://slsa.dev/provenance/v1|2026-10-29 21:08:12 +0000 UTC|referrer sha256:42e3bee5ce26b386a516337eaeb9ffe420476c55d984b7039398bd8e7c7e1f37
+HORODATEE|4|signature 200a47e03a832293|https://slsa.dev/provenance/v1|2026-10-29 21:08:15 +0000 UTC|referrer sha256:29089129173b0dc5a315b6ea17f0bcd9ec5cd0598c03d31f0f50373471b3e45f
+FIN|4 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+## reprise : builds/essai-signature une seconde fois
+JOINT|Zot et TSA, essai 1
+DEJA_HORODATEE|1|signature 27aa4c7b7769acc0|https://slsa.dev/provenance/v1
+FIN|1 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+OK   reprise sans nouvel horodatage ni nouveau bundle
+## referrers de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 dans horodatage/bundles (aucun dans les dépôts des images)
+{"digest":"37b1a8efdc12","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8a12734897db","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"7f31e9e4abc3","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"42e3bee5ce26","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"29089129173b","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+builds/essai-signature : 0 referrer(s)
+builds/essai-webhook : 0 referrer(s)
+OK   un bundle par enveloppe de Chains

@@ -1,0 +1,19 @@
+# Brique 08, jalon J5 : racine TSA dédiée et certificat de la clé Transit tsa (tsa.sh pki et openbao).
+# Clés séparées par usage : la CA TLS du PoC ne certifie pas le TSA, et la racine TSA ne certifie rien d'autre.
+# La feuille porte l'EKU timeStamping seul et critique (RFC 3161 §2.3, exigé par timestamp-authority).
+[ req ]
+distinguished_name = dn
+
+[ dn ]
+
+[ racine_tsa ]
+basicConstraints = critical, CA:TRUE, pathlen:0
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+
+[ feuille_tsa ]
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical, timeStamping
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always

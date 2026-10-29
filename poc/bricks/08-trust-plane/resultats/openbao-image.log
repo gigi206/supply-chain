@@ -1,4 +1,4 @@
-# openbao.sh image, 2026-10-29T19:28:21Z
+# openbao.sh image, 2026-10-29T21:01:53Z
 ghcr.io/openbao/openbao:2.7.2 → sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f (= digest épinglé)
 OK   l'index signé référence le manifeste linux/amd64 sha256:a78eb12a9fc7a3ebb4bec1724e2bdd6a28e33394820641d061166919a3f1866b
 OK   signature de ghcr.io/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f : https://github.com/openbao/openbao/.github/workflows/release-images.yml@refs/tags/v2.7.2, commit 9e0a0d3c3504a0a00b45e61355afac5e35c78379, déclencheur release
@@ -6,7 +6,6 @@ OK   signature de ghcr.io/openbao/openbao@sha256:5046911075e137e154ce49ab051502f
   - Existence of the claims in the transparency log was verified offline
   - The code-signing certificate was verified using trusted certificate authority certificates
 OK   signature avec une identité voisine (tag v2.7.1) : refusé (no matching CertificateIdentity)
-Copied [registry] ghcr.io/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f => [registry] 192.168.161.13:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
-Digest: sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+copié dans Zot : 192.168.161.13:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f (cache avec referrers, telechargements/oci/amont/openbao/openbao)
 OK   signature revérifiée sur la copie de Zot : sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
 referrers dans Zot : application/vnd.dev.sigstore.bundle.v0.3+json ×4

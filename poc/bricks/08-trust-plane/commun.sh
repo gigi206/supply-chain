@@ -30,6 +30,11 @@ refus() { # libellé motif commande… : la commande doit échouer, avec le moti
   fi
 }
 
+racine() { # script sh sur l'entrée standard, exécuté dans openbao-0 avec le jeton root lu sur l'entrée standard (J3, J5)
+  { tr -d '\n' < "$S/openbao-root.token"; echo; cat; } \
+    | kubectl exec -i -n openbao openbao-0 -- sh -c 'read -r BAO_TOKEN && export BAO_TOKEN && exec sh -s'
+}
+
 attendre_sa() { # espace : le compte de service default d'un espace neuf est créé de façon asynchrone par le contrôleur
   for _ in $(seq 60); do kubectl get serviceaccount default -n "$1" >/dev/null 2>&1 && return 0; sleep 1; done
   echo "KO   compte de service default absent de $1" >&2; return 1
@@ -39,6 +44,18 @@ auth_zot() { # fichier [mot-de-passe-fichier] [compte] [registre] : authentifica
   local compte=${3:-poc-ecriture}
   (umask 077 && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "${4:-$REG_HOTE}" \
     "$(printf '%s:%s' "$compte" "$(cat "${2:-$S/zot-$compte.password}")" | base64 -w0)" > "$1")
+}
+
+miroir() { # source@digest dépôt-zot fichier-auth-zot [-r] : copie par digest d'une image amont dans Zot (REG_HOTE), par
+  # un cache OCI local (…/08/telechargements/oci/<dépôt>) rempli une seule fois : le rejeu ne dépend plus du débit du
+  # registre amont (Zot coupe un envoi qui stagne : « i/o timeout »), et Zot reçoit les blobs à la vitesse du réseau local.
+  # Les blobs sont relus et vérifiés par digest à chaque copie (oras).
+  local src=$1 dst=$2 auth=$3 d=${1##*@} cache=$O/telechargements/oci/$2; shift 3
+  mkdir -p "$cache"
+  oras manifest fetch --oci-layout --descriptor "$cache@$d" >/dev/null 2>&1 \
+    || oras cp "$@" "$src" --to-oci-layout "$cache@$d" >/dev/null
+  oras cp "$@" --from-oci-layout "$cache@$d" "$REG_HOTE/$dst@$d" --to-ca-file "$P/ca-poc.crt" --to-registry-config "$auth" >/dev/null
+  echo "copié dans Zot : $REG_HOTE/$dst@$d (cache $([ "${1:-}" = -r ] && echo 'avec referrers, ')${cache#"$O"/})"
 }
 
 certificat() { # nom SAN : certificat de service signé par la CA du PoC (stockage.sh pki), clé en 0600
@@ -60,7 +77,7 @@ lancer() { # préfixe-du-journal jalon étape… : chaque étape etape_<nom> tou
   for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
   for e in "$@"; do
     chrono "$j $e"
-    { echo "# $p.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | tee "$R/$p-$e.log"
+    { echo "# $p.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/$p-$e.log"
     chrono "$j $e fait"
   done
 }

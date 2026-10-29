@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1 à J4 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). J5 (horodatage) attend l'accord du propriétaire.
+**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). **Le choix du chemin de vérification de J5 attend le propriétaire** ; J6 attend son accord.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -47,7 +47,9 @@ Relevé du 29/10/2026. Versions de k3s et image des VM : décidées par le propr
 | Tekton Chains | v0.29.9, mode **`dsse`** (chains#2096 toujours ouverte au 29/10/2026) | confiance | Non vérifiable (doc 04 §5) |
 | Tekton Triggers | v0.37.2 | confiance | Non vérifiable (même processus de release) |
 | OpenBao | 2.7.2 | confiance | Image signée sans clé (GitHub OIDC), vérifiée en doc 04 |
-| timestamp-authority | v2.2.0 | confiance | **Attestation de release GitHub vérifiée** (`gh release verify`, tag `1110890…`) et provenance SLSA v1 du workflow `release.yaml@refs/tags/v2.2.0` ; binaire `327980b4…` |
+| timestamp-authority | v2.2.0 | confiance | **Attestation de release GitHub vérifiée** (`gh release verify`, tag `1110890…`) et provenance SLSA v1 du workflow `release.yaml@refs/tags/v2.2.0` ; binaire `327980b4…`. J5 : **image `timestamp-server` vérifiée** (attestation GitHub du workflow `build_container.yml` au tag, commit `526e9de7…` du tag signé), index `77c615f0…`, revérifiée depuis sa copie dans Zot ; `timestamp-cli` `18ee91ff…` (attestation GitHub de release) |
+| cosign (image du job d'horodatage) | v3.1.4-dev | confiance | **Signature sans clé vérifiée** : identité `keyless@projectsigstore.iam.gserviceaccount.com` (émetteur `https://accounts.google.com`), documentée par Sigstore ; elle ne lie pas l'image à un tag. Index `8af1a2cf…`, manifeste amd64 `c142f6bc…` (base busybox) |
+| oras (image du job d'horodatage) | 1.3.6 | confiance | **GPG** : `oras_1.3.6_checksums.txt` signé par la clé de release `C6FC42F0…EF37` (fichier `KEYS` du dépôt, empreinte recoupée sur oras.land) ; archive `66fb0ad7…` (= `mise.lock`). L'image officielle d'oras n'est pas signée |
 | Kyverno | v1.19.2 | confiance | Image signée sans clé, signatures dans `ghcr.io/kyverno/signatures` (doc 04) |
 | Conforma `ec` | v0.10.42 (celle du banc C) | hôte (mise) et tâche | sha256 seulement (doc 04) |
 | Kata Containers | 4.3.1 (`kata-deploy`) | build | **Attestation de release GitHub vérifiée** (`gh release verify`, tag `03cf2ec…`) : `kata-deploy-4.3.1.tgz` `c2507741…`, `kata-static-4.3.1-amd64.tar.zst` `1463a2b8…`. L'image `kata-deploy` reste à vérifier au jalon J7 |
@@ -102,7 +104,7 @@ Chaque jalon se termine par un point de contrôle : mesures archivées, `docs/03
 - ~~**Authentification de Chains auprès d'OpenBao** par le jeton du compte de service (méthode JWT d'OpenBao, avec la clé publique de l'émetteur de comptes de service de k3s)~~ : **vérifié en J3** dans le code de Chains v0.29.9. `signers.kms.auth.oidc.path`, `.role` et `.token-path` suffisent, sans SPIRE, et le signataire KMS est recréé à chaque signature (voir « Jalon J3 »).
 - **`internalParameters`** (`hermetic`, `isolation`, `cpuModel`) inscrits **par la plateforme**, pas par le code de build (doc 02 §3).
 - **Sujet non-image** (rpm via ORAS, `isBuildArtifact: true`) : déduit du code de Chains (doc 00), à tester.
-- **Vérification d'un jeton RFC 3161 séparé par Kyverno** (non documentée) et support des bundles Sigstore par Conforma (doc 00).
+- ~~**Vérification d'un jeton RFC 3161 séparé par Kyverno** (non documentée)~~ : **mesurée en J5**. Kyverno 1.19.2 ne lit l'horodatage que dans un bundle et plante sur un jeton valide avec un attestor à clé sans journal (voir « Jalon J5 »). Support des bundles Sigstore par Conforma (doc 00) : à mesurer en J8.
 - Visibilité des pods Kata pour la NetworkPolicy et pour la trace NFLOG (Kata imbriqué).
 
 ## Changements sur l'hôte
@@ -111,7 +113,7 @@ J1 validé et fait le 29/10/2026 (téléchargements, pool, réseau, VM, k3s). Le
 
 | Changement | Détail |
 |---|---|
-| Téléchargements | Image Debian (439 Mo), `SHA512SUMS` et manifeste ; k3s et ses images airgap (272 Mo) ; puis, jalon par jalon, les manifestes et images listés plus haut. Tout va dans `~/.cache/supply-chain-poc/08/` |
+| Téléchargements | Image Debian (439 Mo), `SHA512SUMS` et manifeste ; k3s et ses images airgap (272 Mo) ; puis, jalon par jalon, les manifestes et images listés plus haut. Tout va dans `~/.cache/supply-chain-poc/08/` ; depuis J5, les images amont copiées dans Zot y sont gardées en cache OCI (`telechargements/oci`) |
 | Pool libvirt | `supply-chain-poc`, `/var/lib/libvirt/supply-chain-poc` (sur `/`) |
 | Réseau libvirt | NAT `supply-chain-poc`, `virbr-scpoc`, 192.168.161.0/24, sans démarrage automatique |
 | VM | `sc-confiance`, `sc-build`, `sc-stockage` (12 vCPU, 24 Gi, 65 Go), sans démarrage automatique |
@@ -119,6 +121,7 @@ J1 validé et fait le 29/10/2026 (téléchargements, pool, réseau, VM, k3s). Le
 | Outils de l'hôte (`mise.toml`) | J2 : kubectl 1.35.10 à la place de 1.37.2 |
 | Cache de l'hôte | J2 : `~/.cache/supply-chain-poc/08/pki` (certificats publics) ; dans `…/08/secrets` (0600) : clés de la CA et des services, mot de passe du compte d'écriture de Zot, mot de passe et jeton de l'administrateur de Forgejo |
 | J4 | Dans le cluster : Tekton Pipelines, Triggers (espaces `tekton-pipelines`, `tekton-pipelines-resolvers`) et Chains (`tekton-chains`), espace `builds` ; dans Zot : manifestes linux/amd64 des 13 images Tekton et du busybox sous `amont/`, dépôt d'essai `builds/essai-signature` ; dans `…/08/secrets` : mot de passe du compte Zot `poc-build` ; `~/.cache/supply-chain-poc/08/telechargements/tekton` : release.yaml des deux sources |
+| J5 | Dans le cluster : TSA (espace `tsa`), espace `horodatage` du job ; dans OpenBao : clé Transit `tsa`, politique `tsa-signature`, rôle JWT `tsa`, NetworkPolicy ouverte à l'espace `tsa` ; dans Zot : compte `poc-horodatage` (`horodatage/**` seulement), copies de `timestamp-server` (index et attestations) et de cosign v3.1.4-dev (amd64) sous `amont/sigstore/`, image d'outils `plateforme/outils-horodatage`, bundles dans `horodatage/bundles`, cas d'essai dans `essais-j5/*` ; dans `…/08/secrets` (0600) : clé de la racine TSA, mot de passe de `poc-horodatage` ; dans `…/08/pki` : racine, feuille et chaîne du TSA, racine de confiance de cosign ; `…/08/telechargements/tsa` : `timestamp-cli`, archive, sommes et signature d'oras, fichier `KEYS` et page de vérification d'oras.land |
 | J3 | Dans le cluster : OpenBao (espace `openbao`, PVC de 1 Gi sur `sc-confiance`), espace et compte de service `tekton-chains` créés avant Chains ; dans Zot : copie de l'image OpenBao (`amont/openbao/openbao`, 6 plateformes et 4 bundles de signature) ; dans `…/08/secrets` (0600) : jeton root, clé de descellement (b64 et hex), clé TLS d'OpenBao |
 
 Démontage complet en fin de phase, comme au banc A2. Le cluster sert aussi aux étapes 4e (briques 01, 03 et 19, puis 2b-2) : on ne démonte qu'à la fin de 4e, sauf avis contraire.
@@ -237,7 +240,7 @@ Rejeu (après J2) : `mise run confiance:openbao -- image deployer initialiser co
 
 **Redémarrages.**
 - **Pod** (étape `redemarrage`, dans le rejeu complet, [`openbao-redemarrage.log`](resultats/openbao-redemarrage.log)). Avant, un message témoin est signé par la clé `chains`, et on relève l'empreinte de la clé publique complète. Après la suppression du pod, OpenBao revient **scellé, non prêt et retiré du Service** (0 endpoint prêt). Une fois descellé, il présente la **même clé publique** (version 1, non exportable), et **la signature témoin d'avant se vérifie avec la clé relue après** : la clé privée est bien conservée par raft sur le PVC.
-- **Trois VM** (`mise run confiance:redemarrer`, [`redemarrage-vm.log`](resultats/redemarrage-vm.log)), comme après un redémarrage du laptop. Arrêt propre en 4 s, démarrage jusqu'à SSH en 9 s, trois nœuds réenregistrés (nouveau `bootID`) en 14 s. Zot et Forgejo repartent seuls (unités `enable`) et restent lisibles (manifeste sample-app par digest, branche `main`). OpenBao revient scellé ; `deverrouiller` le descelle, et le témoin se vérifie avec la même clé. Constat : juste après le démarrage, l'API garde l'état d'avant (nœuds `Ready`, pods prêts) tant que les kubelets ne se sont pas réenregistrés. Le script attend donc un nouveau `bootID` ; un premier essai, qui ne l'attendait pas, avait lu cet état périmé.
+- **Trois VM** (`mise run confiance:redemarrer`, [`redemarrage-vm.log`](resultats/redemarrage-vm.log)), comme après un redémarrage du laptop. Arrêt propre en 4 s, démarrage jusqu'à SSH en 9 s, trois nœuds réenregistrés (nouveau `bootID`) en 14 s (journal réécrit en J5, avec le TSA : 6, 9 et 14 s). Zot et Forgejo repartent seuls (unités `enable`) et restent lisibles (manifeste sample-app par digest, branche `main`). OpenBao revient scellé ; `deverrouiller` le descelle, et le témoin se vérifie avec la même clé. Constat : juste après le démarrage, l'API garde l'état d'avant (nœuds `Ready`, pods prêts) tant que les kubelets ne se sont pas réenregistrés. Le script attend donc un nouveau `bootID` ; un premier essai, qui ne l'attendait pas, avait lu cet état périmé.
 
 **RAM au repos après J3** (6 min après le rejeu, [`controles-j3-repos.log`](resultats/controles-j3-repos.log)) : RSS QEMU de 2,7 Go (`sc-confiance`, OpenBao compris), 2,1 Go (`sc-build`) et 3,1 Go (`sc-stockage`), soit **7,8 Go** au total (7,0 Go après J2, 6,0 Go après J1). Mémoire vue par k3s : 663, 255 et 393 Mi ; 23,2 Gi (23 779 Mi) restent disponibles sur l'hôte. Dans `sc-stockage`, 2,0 Gi sont du cache de pages (la copie multi-plateforme de l'image OpenBao s'y ajoute).
 
@@ -319,3 +322,79 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 - le compte `poc-build`, utilisé par Chains pour pousser, a le droit `update` : il peut **écraser les tags `.sig` et `.att`**. Ce n'est pas une falsification, la vérification échouerait, mais c'est une suppression de preuve. À traiter avant J8.
 
 **Pour J6** : les cinq résolveurs sont actifs (`bundles`, `cluster`, `git`, `http`, `hub`) et peuvent chercher des définitions de tâches hors de la plateforme ; l'essai utilise un `taskSpec` en ligne, que le test 2 doit refuser.
+
+## Jalon J5 : horodatage RFC 3161 (29/10/2026)
+
+Rejeu : `mise run confiance:tsa -- image pki openbao deployer essais horodater chemins`. Après un redémarrage des VM, [`redemarrer.sh`](redemarrer.sh) recrée le pod du TSA une fois OpenBao descellé, puis rejoue `temoin`.
+
+**Architecture** ([`tsa/`](tsa/)) :
+- **TSA** : timestamp-authority v2.2.0 sur `sc-confiance`, espace `tsa` (Pod Security restricted, non root, racine en lecture seule, aucun jeton Kubernetes monté).
+  - Signataire `kms` sur la **clé Transit `tsa`** d'OpenBao (ecdsa-p256, non exportable, sans sauvegarde en clair), distincte de la clé `chains`.
+  - Le client hashivault de sigstore v1.11.1, utilisé par le serveur, ne sait pas se connecter seul (`kms.Get` sans options d'authentification) : il lit un jeton OpenBao dans `~/.vault-token`, une seule fois. Un conteneur d'initialisation l'obtient avec le jeton projeté du compte de service `tsa:timestamp-authority` (rôle JWT `tsa`, audience `openbao`). Un conteneur voisin renouvelle ce jeton périodique (1 h) toutes les 15 min.
+  - Politique `tsa-signature` : lecture de la clé `tsa`, signature, renouvellement de son propre jeton.
+- **Racine TSA dédiée**, distincte de la CA TLS du PoC (clés séparées par usage), clé en 0600 sur l'hôte. La **feuille porte la clé publique de Transit** (`openssl x509 -new -force_pubkey`), avec l'EKU `timeStamping` seul et critique ; sa clé publique est recoupée avec Transit, et le serveur contrôle la chaîne au démarrage.
+- **Réseau** : entrée réservée à l'espace `horodatage` (port 3000, en HTTP : le jeton est signé, sa valeur ne dépend pas du transport) ; sortie vers DNS et OpenBao seulement. Sans sortie, la surveillance NTP du serveur est désactivée.
+- **Job d'horodatage** ([`horodater.sh`](tsa/horodater.sh)), dans l'espace `horodatage`, sur le nœud de confiance, hors des pods de build. Pour chaque enveloppe DSSE du tag `.att` de l'image :
+  - jeton du TSA sur les **octets bruts de la signature**, ce que vérifient sigstore-go et cosign pour un bundle ;
+  - bundle Sigstore v0.3 (`cosign bundle create`), publié en referrer de l'image **dans un dépôt séparé, `horodatage/bundles`**, avec le compte Zot `poc-horodatage` (`horodatage/**` seulement). Pourquoi un dépôt séparé : dès qu'un bundle est rattaché à l'image, Kyverno ne lit plus que les bundles et ignore `.sig` et `.att` (`buildCheckOptsWithBundleDetection`, Kyverno 1.19.2), alors que Chains en `dsse` ne produit pas de signature d'image au format bundle. Zot accepte un referrer dont le sujet est dans un autre dépôt et le liste dans l'API referrers ;
+  - rejouable : le manifeste est étiqueté par le digest de l'image et l'empreinte de la signature, une enveloppe déjà horodatée est sautée.
+- **Image d'outils du job**, assemblée sans Docker (`crane append`) : base cosign v3.1.4-dev (signée), `oras` (GPG) et `timestamp-cli` (attestation GitHub). La couche est reproductible : même digest `c7bebae2…` à chaque assemblage. L'image elle-même n'est pas signée ; sa reconstruction relève de la brique 11.
+
+**Rejeu complet de J1 à J5 depuis zéro** (`mise run confiance:rejeu`, [`rejeu-j1-j5.log`](resultats/rejeu-j1-j5.log)) : **533 s**, dont **151 s pour J5** (VM 22 s, k3s 41 s, J2 53 s, J3 122 s, J4 141 s) ; 106 contrôles OK ; aucun des 17 secrets dans les journaux des trois VM ([`fuites-j1-j5.log`](resultats/fuites-j1-j5.log)). Journaux : `resultats/tsa-<étape>.log` ; ceux des étapes de J2 à J4 viennent aussi de ce rejeu. Il a fallu quatre rejeux. Le premier a révélé le délai de l'EventListener, le second une coupure de Zot sur un registre amont lent. Le quatrième a suivi la correction du renouvellement du jeton du TSA (voir les constats), et il est suivi d'un redémarrage des trois VM : arrêt en 6 s, TSA relancé avec un nouveau jeton, jeton témoin vérifié ([`redemarrage-vm.log`](resultats/redemarrage-vm.log)).
+
+| Étape | Durée | Résultat |
+|---|---|---|
+| `image` | 42 s | **timestamp-server** : le tag annoté v2.2.0, signé et vérifié par GitHub, désigne le commit `526e9de7…` ; index `77c615f0…` = digest du tag ; attestation GitHub (workflow `build_container.yml` au tag, commit du tag, déclencheur `push`) vérifiée sur ghcr.io **puis sur la copie de Zot** (`--bundle-from-oci`). **cosign v3.1.4-dev** : signature vérifiée, identité voisine refusée. **timestamp-cli** : sommes et attestation GitHub de release. **oras** : empreinte de la clé publiée sur oras.land, signature GPG des sommes, archive identique à `mise.lock`. Image d'outils assemblée, même digest que l'image épinglée |
+| `pki` | < 1 s | Racine TSA ECDSA P-256, 10 ans, `pathlen:0` (réutilisée d'un rejeu à l'autre, comme la CA du PoC) |
+| `openbao` | 1 s | Clé `tsa`, politique, rôle (`token_period` 1 h, sans politique par défaut). Feuille émise pour la nouvelle clé Transit, vérifiée (`timestampsign`), clé publique = Transit. Chaîne publiée ([`tsa-chaine.pem`](resultats/tsa-chaine.pem)) et racine de confiance de cosign (TSA seule, sans Rekor, Fulcio ni CT) |
+| `deployer` | 5 s | NetworkPolicy d'OpenBao seule appliquée, sans toucher au StatefulSet (un redémarrage le rescellerait). TSA prêt, jeton OpenBao obtenu puis renouvelé (« jeton renouvelé : 3600 s »), images tirées de Zot |
+| `essais` | 51 s | Voir ci-dessous |
+| `horodater` | 32 s | **5 bundles pour 5 enveloppes** (1 pour `essai-signature`, 4 pour `essai-webhook`, même digest) ; la reprise ne refait rien ; aucun referrer dans les dépôts des images |
+| `chemins` | 19 s | Voir ci-dessous |
+
+**Essais du TSA** ([`tsa-essais.log`](resultats/tsa-essais.log)) :
+- **jeton témoin** demandé depuis l'espace `horodatage` : vérifié par `timestamp-cli` dans le pod et **par openssl sur l'hôte** avec la racine TSA (politique `1.3.6.1.4.1.57264.2`, sha256, précision 1 s, nonce, TSA « TSA du PoC ») ; refusé sur un autre contenu (« message imprint mismatch ») et avec la CA TLS du PoC ; la chaîne servie est la chaîne émise ;
+- **TSA injoignable** depuis un autre espace (15 essais) ;
+- **OpenBao** : le rôle `tsa` signe avec la clé `tsa` et renouvelle son jeton. **7 refus** : clé `chains` (signature, lecture) ; clé `tsa` (export, passage en exportable, sauvegarde en clair) ; lecture de son propre jeton ; clé `tsa` avec le rôle `tekton-chains`. **2 connexions croisées refusées** (« invalid subject (sub) claim »). Chaque appel figure dans l'audit avec son compte ;
+- **Zot** : `poc-horodatage` écrit dans `horodatage/`, et il est refusé dans `builds/` et `amont/` ; écriture anonyme refusée (401).
+
+**Contrôle de J5 et test 8 : mesure des chemins de vérification** ([`tsa-chemins.log`](resultats/tsa-chemins.log)). Les cas falsifiés sont construits à partir des bundles du job et publiés dans `essais-j5/*` :
+
+| Cas | cosign v3.1.4 : bundle en dépôt séparé, `--use-signed-timestamps`, racine de confiance du TSA | Kyverno 1.19.2 en CLI : attestor à clé, `insecureIgnoreTlog`, `tsaCertChain` |
+|---|---|---|
+| Jeton valide | **Accepté** | **`error`** : « nil pointer dereference ». Sans `tsaCertChain`, le même bundle passe (témoin) |
+| Aucun bundle | Refusé | Refusé |
+| Bundle sans jeton | Refusé : 0 jeton vérifié pour 1 exigé | Refusé |
+| Jeton altéré (dernier octet de la signature du TSA) | Refusé : `x509: ECDSA verification failure` | Non mesuré : le cas valide échoue déjà |
+| Jeton valide d'une autre signature de Chains | Refusé : `hashed messages don't match` | Non mesuré |
+| Jeton d'une TSA étrangère (même forme, même CN) | Refusé : le certificat du jeton n'est pas celui du TSA | Non mesuré |
+| **Chemin historique** : `.att` de Chains, sans jeton | **Accepté**, malgré `--use-signed-timestamps` | Refusé, même sans `tsaCertChain` : « cosign bundle verification failed » |
+
+**Constats** :
+- **cosign, chemin historique** : sur une attestation `.att`, `--use-signed-timestamps` n'exige pas de jeton (`VerifyRFC3161Timestamp` renvoie `nil, nil` quand il manque). Y ajouter un jeton réécrirait en plus le tag `.att`, donc rouvrirait la course du constat de J4. **Écarté.**
+- **Kyverno 1.19.2 renvoie une erreur interne sur un jeton valide**, avec un attestor à clé sans journal. Le code le rend plausible : dans ce cas, Kyverno ne charge pas le matériel de confiance de Sigstore, et n'y ajoute donc pas la TSA (`opts.go`). Une erreur interne n'est pas une décision : **Kyverno ne peut pas assurer le contrôle 9** dans cette configuration. Le CLI et l'admission partagent ce code (`pkg/image/verifiers/ivpol/cosign`) ; la parité se mesure en J6.
+- **Kyverno 1.19.2 ne vérifie aucune attestation au format historique sans journal** : `verifyAttestationSignatures` exige une preuve d'inclusion dans un journal, alors que `verifyImageSignatures` s'en passe avec `insecureIgnoreTlog` (`verifier.go`). **Pour J6**, la provenance de Chains (`dsse`) n'est lisible par Kyverno qu'à travers les bundles réémis (témoin : `pass`) : le job d'horodatage sert aussi de pont entre Chains et Kyverno.
+- **kube-router, côté entrée** : le TSA a d'abord refusé (« connection refused ») un job neuf, car sa NetworkPolicy ne connaissait pas encore l'IP du pod. Le job attend désormais Zot et le TSA.
+- **Même délai pour l'EventListener de J4.** Au premier rejeu de J1 à J5, Forgejo a reçu « connection refused » sur le NodePort de l'EventListener, à la seconde où celui-ci devenait disponible. Forgejo n'a pas relivré : l'EventListener n'a reçu aucune requête dans les 2 min suivantes, et le test 5 a échoué faute de PipelineRun. Le rejeu précédent n'avait rien montré : l'étape avait duré 44 s, contre 5 s cette fois. `tekton.sh webhook` attend désormais que la sonde `/live` réponde depuis `sc-stockage`. En production, la même course ferait perdre un push : à traiter en J6, avec la relivraison des webhooks de Forgejo ou une resynchronisation.
+- **Renouvellement du jeton du TSA : deux défauts corrigés après le rejeu.**
+  - Au redémarrage des VM, l'arrêt a pris 93 s au lieu de 4 s. systemd a dû tuer le conteneur de renouvellement au bout de son délai de 90 s : `sh`, PID 1 du conteneur, ignorait SIGTERM pendant son `sleep`. Le script gère désormais SIGTERM, et le pod se supprime en 2 s.
+  - En relisant ce conteneur, il est apparu que sa commande (`bao token renew -field=…`) était invalide, comme l'essai l'avait montré à part. **Le TSA aurait cessé de signer au bout d'1 h.** Le conteneur renouvelle désormais dès son démarrage, et `deployer` exige la trace « jeton renouvelé : 3600 s ».
+- **Débit amont et cache OCI** : au second rejeu de J1 à J5, Zot a coupé un envoi de l'image OpenBao (« i/o timeout ») pendant une copie en flux de ghcr.io vers Zot, alors que le débit de ghcr.io était tombé à 0,7 Mo/s (76 Mo en 102 s). Les copies des images amont (OpenBao, Tekton, TSA, cosign) passent désormais par un **cache OCI local** (`…/08/telechargements/oci`, fonction `miroir` de [`commun.sh`](commun.sh)) : téléchargement une seule fois, par digest, puis envoi à Zot sur le réseau local. Le rejeu ne dépend plus du registre amont, sauf pour les vérifications de signature, qui restent faites en ligne puis sur la copie de Zot.
+- **Zot** : oras n'écrit pas un blob déjà présent, et l'opération réussit même sans droit d'écriture. Les essais de refus utilisent donc un contenu neuf, plus un contrôle direct en HTTP 401.
+- **Conforma v0.10.42** : aucune option d'horodatage dans `ec validate image` ; non mesuré, à reprendre en J8.
+
+**Choix du chemin de vérification : décision du propriétaire, en attente.** Proposition, fondée sur ces mesures :
+- **stockage** : bundle réémis dans un dépôt séparé. C'est le format natif de Sigstore, sans réécriture de `.att` ;
+- **contrôle 9** : vérifié par cosign v3.1.4 dans la porte de release. `tools/verify-ts` se réduit alors à un appel de cosign, sans code cryptographique maison ;
+- **à l'admission** : Kyverno vérifie la signature des bundles, mais pas leur horodatage tant que l'erreur n'est pas corrigée. Signaler l'erreur à Kyverno demande l'accord du propriétaire.
+
+**Limites** :
+- l'heure des jetons est celle de la VM ;
+- jeton OpenBao périodique d'1 h : si OpenBao reste scellé plus d'1 h, le TSA ne signe plus jusqu'à la recréation de son pod ;
+- le job n'est pas déclenché automatiquement après Chains (J6) ;
+- un bundle porte sur un digest : il couvre toutes les images de même digest ;
+- `poc-horodatage` peut ajouter des bundles et réétiqueter les siens, mais pas en supprimer ; un faux bundle échoue à la vérification (signature de Chains et jeton) ;
+- l'image d'outils n'est pas signée, et la signature de sa base ne la lie pas à un tag ;
+- la clé de la racine TSA est sur l'hôte, comme celle de la CA du PoC ; en production, elle serait hors ligne ou dans un HSM ;
+- une seule instance du TSA, en HTTP ;
+- cas non mesuré, à reprendre en J8 : un bundle valide d'un **autre digest** rattaché à l'image par `poc-horodatage`. sigstore-go devrait le refuser (le digest du sujet est imposé à la vérification), mais aucun essai ne le prouve encore.

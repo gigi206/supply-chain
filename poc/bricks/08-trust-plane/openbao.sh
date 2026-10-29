@@ -39,10 +39,6 @@ B=$W/openbao
 (umask 077 && mkdir -p "$B")
 
 bao_status() { kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true; }   # code 2 si scellé
-racine() { # script sh sur l'entrée standard, exécuté dans openbao-0 avec le jeton root lu sur l'entrée standard
-  { tr -d '\n' < "$S/openbao-root.token"; echo; cat; } \
-    | kubectl exec -i -n openbao openbao-0 -- sh -c 'read -r BAO_TOKEN && export BAO_TOKEN && exec sh -s'
-}
 verifier_signature() { # référence [options cosign…]
   cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-identity "$BAO_ID" \
     --certificate-github-workflow-sha "$BAO_COMMIT" --certificate-github-workflow-trigger release "$@" > "$B/cosign.json" 2> "$B/cosign.err"
@@ -78,7 +74,7 @@ etape_image() {
     cosign verify --certificate-oidc-issuer https://token.actions.githubusercontent.com \
       --certificate-identity "${BAO_ID%v2.7.2}v2.7.1" "$AMONT@$BAO_INDEX"
   auth_zot "$B/zot.json"
-  oras cp -r "$AMONT@$BAO_INDEX" "$REG_HOTE/$MIROIR@$BAO_INDEX" --to-ca-file "$P/ca-poc.crt" --to-registry-config "$B/zot.json" | tail -2
+  miroir "$AMONT@$BAO_INDEX" "$MIROIR" "$B/zot.json" -r
   verifier_signature --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$MIROIR@$BAO_INDEX" \
     && echo "OK   signature revérifiée sur la copie de Zot : $REG/$MIROIR@$BAO_INDEX" || { cat "$B/cosign.err" >&2; exit 1; }
   echo "referrers dans Zot : $(oras discover --ca-file "$P/ca-poc.crt" --format json "$REG_HOTE/$MIROIR@$BAO_INDEX" | jq -r '[.referrers[]?.artifactType] | group_by(.) | map("\(.[0]) ×\(length)") | join(", ")')"

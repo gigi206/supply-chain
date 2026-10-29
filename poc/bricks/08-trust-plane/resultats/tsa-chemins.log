@@ -1,0 +1,22 @@
+# tsa.sh chemins, 2026-10-29T21:08:28Z
+## cas falsifiés, construits à partir des bundles du job (publiés par poc-ecriture dans essais-j5/*)
+jeton altéré : dernier octet (signature ECDSA du TSA) inversé, 1 octet modifié sur 1184
+jeton d'une autre signature : jeton valide du TSA, porté par l'enveloppe MEQCICfLCHhJ… et non MEQCIFeGbDk9…
+TSA étrangère : jeton valide pour sa propre racine (même CN « TSA du PoC », autre clé)
+## cosign v3.1.4 : bundle dans un dépôt séparé, --use-signed-timestamps et racine de confiance du TSA
+OK   valide : accepté
+OK   aucun bundle : refusé (no matching attestations (aucun bundle))
+OK   bundle sans jeton : refusé (aucun jeton vérifié (0 < 1))
+OK   jeton altéré : refusé (aucun jeton vérifié (0 < 1) : unable to verify signed timestamps: error parsing response into Timestamp: x509: ECDSA verification failure)
+OK   jeton d'une autre signature : refusé (aucun jeton vérifié (0 < 1) : unable to verify signed timestamps: hashed messages don't match)
+OK   jeton d'une TSA étrangère : refusé (aucun jeton vérifié (0 < 1) : unable to verify signed timestamps: certificate embedded in the TSR does not match the provided TSA certificate)
+## cosign v3.1.4 : chemin historique (tag .att de Chains, sans jeton), --use-signed-timestamps et chaîne du TSA
+CONSTAT attestation sans jeton ACCEPTÉE : ce chemin ne peut pas exiger le jeton (VerifyRFC3161Timestamp renvoie nil sans jeton)
+## Kyverno 1.19.2 (CLI ; même code de vérification qu'à l'admission, parité mesurée en J6) : attestor à clé, insecureIgnoreTlog
+bundle valide, sans tsaCertChain (témoin)     : pass (success)
+bundle valide, tsaCertChain du TSA            : error (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference)
+bundle sans jeton, tsaCertChain du TSA        : fail (C9 : provenance sans horodatage RFC 3161 valide)
+aucun bundle, tsaCertChain du TSA             : fail (C9 : provenance sans horodatage RFC 3161 valide)
+chemin historique (.att), sans tsaCertChain   : fail (C9 : provenance sans horodatage RFC 3161 valide)
+  motif : image verification failed error="cosign bundle verification failed"
+  motif : evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"

@@ -351,3 +351,247 @@ J4 webhook	2026-10-29T19:32:36Z
 J4 webhook fait	2026-10-29T19:33:20Z	
 J4 essais_webhook	2026-10-29T19:33:20Z	
 J4 essais_webhook fait	2026-10-29T19:33:52Z	
+J2 zot	2026-10-29T20:04:57Z	
+J2 zot fait	2026-10-29T20:05:02Z	
+J5 image	2026-10-29T20:05:05Z	
+J5 image	2026-10-29T20:05:38Z	
+J5 image fait	2026-10-29T20:06:31Z	
+J5 image	2026-10-29T20:06:38Z	
+J5 image fait	2026-10-29T20:07:03Z	
+J5 pki	2026-10-29T20:07:08Z	
+J5 pki fait	2026-10-29T20:07:08Z	
+J5 openbao	2026-10-29T20:07:08Z	
+J5 openbao fait	2026-10-29T20:07:08Z	
+J5 deployer	2026-10-29T20:07:19Z	
+J5 deployer	2026-10-29T20:07:27Z	
+J5 deployer fait	2026-10-29T20:07:31Z	
+J5 essais	2026-10-29T20:08:54Z	
+J5 essais	2026-10-29T20:09:05Z	
+J5 essais	2026-10-29T20:09:51Z	
+J5 essais	2026-10-29T20:11:00Z	
+J5 essais fait	2026-10-29T20:11:49Z	
+J5 horodater	2026-10-29T20:12:39Z	
+J5 horodater	2026-10-29T20:13:03Z	
+J5 horodater fait	2026-10-29T20:13:31Z	
+J5 chemins	2026-10-29T20:14:19Z	
+J5 chemins	2026-10-29T20:14:51Z	
+J5 chemins	2026-10-29T20:14:58Z	
+J5 chemins	2026-10-29T20:15:51Z	
+J5 chemins	2026-10-29T20:16:09Z	
+J5 chemins fait	2026-10-29T20:16:14Z	
+VM, pool et réseau détruits	2026-10-29T20:17:30Z	
+J1 VM définies	2026-10-29T20:17:37Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T20:17:45Z	
+J1 installation de k3s	2026-10-29T20:17:45Z	
+J1 server prêt	2026-10-29T20:17:59Z	
+J1 trois nœuds prêts	2026-10-29T20:18:23Z	
+J2 pki	2026-10-29T20:18:24Z	
+J2 pki fait	2026-10-29T20:18:24Z	
+J2 zot	2026-10-29T20:18:24Z	
+J2 zot fait	2026-10-29T20:18:29Z	
+J2 registre	2026-10-29T20:18:29Z	
+J2 registre fait	2026-10-29T20:18:44Z	
+J2 containerd	2026-10-29T20:18:44Z	
+J2 containerd fait	2026-10-29T20:19:04Z	
+J2 forgejo	2026-10-29T20:19:04Z	
+J2 forgejo fait	2026-10-29T20:19:16Z	
+J2 depot	2026-10-29T20:19:16Z	
+J2 depot fait	2026-10-29T20:19:19Z	
+J3 image	2026-10-29T20:19:19Z	
+J3 image fait	2026-10-29T20:20:01Z	
+J3 deployer	2026-10-29T20:20:01Z	
+J3 deployer fait	2026-10-29T20:20:09Z	
+J3 initialiser	2026-10-29T20:20:09Z	
+J3 initialiser fait	2026-10-29T20:20:26Z	
+J3 configurer	2026-10-29T20:20:26Z	
+J3 configurer fait	2026-10-29T20:20:28Z	
+J3 essais	2026-10-29T20:20:28Z	
+J3 essais fait	2026-10-29T20:21:13Z	
+J3 redemarrage	2026-10-29T20:21:13Z	
+J3 redemarrage fait	2026-10-29T20:21:29Z	
+J4 revue	2026-10-29T20:21:30Z	
+J4 revue fait	2026-10-29T20:21:47Z	
+J4 miroir	2026-10-29T20:21:47Z	
+J4 miroir fait	2026-10-29T20:23:01Z	
+J4 installer	2026-10-29T20:23:01Z	
+J4 installer fait	2026-10-29T20:23:35Z	
+J4 signature	2026-10-29T20:23:35Z	
+J4 signature fait	2026-10-29T20:23:47Z	
+J4 verifier	2026-10-29T20:23:47Z	
+J3 cle	2026-10-29T20:23:47Z	
+J3 cle fait	2026-10-29T20:23:47Z	
+J4 verifier fait	2026-10-29T20:23:47Z	
+J4 webhook	2026-10-29T20:23:47Z	
+J4 webhook fait	2026-10-29T20:23:52Z	
+J4 essais_webhook	2026-10-29T20:23:52Z	
+VM, pool et réseau détruits	2026-10-29T20:26:51Z	
+J1 VM définies	2026-10-29T20:26:59Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T20:27:10Z	
+J1 installation de k3s	2026-10-29T20:27:10Z	
+J1 server prêt	2026-10-29T20:27:25Z	
+J1 trois nœuds prêts	2026-10-29T20:27:49Z	
+J2 pki	2026-10-29T20:27:49Z	
+J2 pki fait	2026-10-29T20:27:49Z	
+J2 zot	2026-10-29T20:27:49Z	
+J2 zot fait	2026-10-29T20:27:54Z	
+J2 registre	2026-10-29T20:27:54Z	
+J2 registre fait	2026-10-29T20:28:10Z	
+J2 containerd	2026-10-29T20:28:10Z	
+J2 containerd fait	2026-10-29T20:28:29Z	
+J2 forgejo	2026-10-29T20:28:29Z	
+J2 forgejo fait	2026-10-29T20:29:35Z	
+J2 depot	2026-10-29T20:29:35Z	
+J2 depot fait	2026-10-29T20:29:38Z	
+J3 image	2026-10-29T20:29:38Z	
+J3 image	2026-10-29T20:34:25Z	
+J3 image fait	2026-10-29T20:43:08Z	
+J4 revue	2026-10-29T20:43:08Z	
+J4 revue fait	2026-10-29T20:43:24Z	
+J4 miroir	2026-10-29T20:43:24Z	
+J4 miroir fait	2026-10-29T20:44:51Z	
+J5 image	2026-10-29T20:44:52Z	
+J5 image fait	2026-10-29T20:45:45Z	
+VM, pool et réseau détruits	2026-10-29T20:45:55Z	
+J1 VM définies	2026-10-29T20:46:02Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T20:46:12Z	
+J1 installation de k3s	2026-10-29T20:46:12Z	
+J1 server prêt	2026-10-29T20:46:26Z	
+J1 trois nœuds prêts	2026-10-29T20:46:51Z	
+J2 pki	2026-10-29T20:46:51Z	
+J2 pki fait	2026-10-29T20:46:51Z	
+J2 zot	2026-10-29T20:46:51Z	
+J2 zot fait	2026-10-29T20:46:56Z	
+J2 registre	2026-10-29T20:46:56Z	
+J2 registre fait	2026-10-29T20:47:12Z	
+J2 containerd	2026-10-29T20:47:12Z	
+J2 containerd fait	2026-10-29T20:47:31Z	
+J2 forgejo	2026-10-29T20:47:31Z	
+J2 forgejo fait	2026-10-29T20:47:43Z	
+J2 depot	2026-10-29T20:47:43Z	
+J2 depot fait	2026-10-29T20:47:46Z	
+J3 image	2026-10-29T20:47:46Z	
+J3 image fait	2026-10-29T20:48:20Z	
+J3 deployer	2026-10-29T20:48:20Z	
+J3 deployer fait	2026-10-29T20:48:26Z	
+J3 initialiser	2026-10-29T20:48:26Z	
+J3 initialiser fait	2026-10-29T20:48:40Z	
+J3 configurer	2026-10-29T20:48:40Z	
+J3 configurer fait	2026-10-29T20:48:42Z	
+J3 essais	2026-10-29T20:48:42Z	
+J3 essais fait	2026-10-29T20:49:28Z	
+J3 redemarrage	2026-10-29T20:49:28Z	
+J3 redemarrage fait	2026-10-29T20:49:43Z	
+J4 revue	2026-10-29T20:49:43Z	
+J4 revue fait	2026-10-29T20:49:59Z	
+J4 miroir	2026-10-29T20:49:59Z	
+J4 miroir fait	2026-10-29T20:50:39Z	
+J4 installer	2026-10-29T20:50:39Z	
+J4 installer fait	2026-10-29T20:51:12Z	
+J4 signature	2026-10-29T20:51:12Z	
+J4 signature fait	2026-10-29T20:51:24Z	
+J4 verifier	2026-10-29T20:51:24Z	
+J3 cle	2026-10-29T20:51:25Z	
+J3 cle fait	2026-10-29T20:51:25Z	
+J4 verifier fait	2026-10-29T20:51:25Z	
+J4 webhook	2026-10-29T20:51:25Z	
+J4 webhook fait	2026-10-29T20:52:08Z	
+J4 essais_webhook	2026-10-29T20:52:08Z	
+J4 essais_webhook fait	2026-10-29T20:52:40Z	
+J5 image	2026-10-29T20:52:40Z	
+J5 image fait	2026-10-29T20:53:25Z	
+J5 pki	2026-10-29T20:53:25Z	
+J5 pki fait	2026-10-29T20:53:25Z	
+J5 openbao	2026-10-29T20:53:25Z	
+J5 openbao fait	2026-10-29T20:53:26Z	
+J5 deployer	2026-10-29T20:53:26Z	
+J5 deployer fait	2026-10-29T20:53:31Z	
+J5 essais	2026-10-29T20:53:31Z	
+J5 essais fait	2026-10-29T20:54:24Z	
+J5 horodater	2026-10-29T20:54:24Z	
+J5 horodater fait	2026-10-29T20:54:57Z	
+J5 chemins	2026-10-29T20:54:57Z	
+J5 chemins fait	2026-10-29T20:55:17Z	
+J3 deverrouiller	2026-10-29T20:55:47Z	
+J3 deverrouiller fait	2026-10-29T20:55:48Z	
+J3 temoin	2026-10-29T20:55:48Z	
+J3 temoin fait	2026-10-29T20:55:48Z	
+J3 deverrouiller	2026-10-29T20:57:43Z	
+J3 deverrouiller fait	2026-10-29T20:57:48Z	
+J3 controle	2026-10-29T20:57:48Z	
+J3 controle fait	2026-10-29T20:57:48Z	
+J5 temoin	2026-10-29T20:57:52Z	
+J5 temoin fait	2026-10-29T20:57:56Z	
+J5 deployer	2026-10-29T20:58:26Z	
+J5 deployer fait	2026-10-29T20:58:30Z	
+J5 deployer	2026-10-29T20:59:36Z	
+J5 deployer fait	2026-10-29T20:59:39Z	
+VM, pool et réseau détruits	2026-10-29T20:59:57Z	
+J1 VM définies	2026-10-29T21:00:06Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-29T21:00:19Z	
+J1 installation de k3s	2026-10-29T21:00:20Z	
+J1 server prêt	2026-10-29T21:00:36Z	
+J1 trois nœuds prêts	2026-10-29T21:00:59Z	
+J2 pki	2026-10-29T21:01:00Z	
+J2 pki fait	2026-10-29T21:01:00Z	
+J2 zot	2026-10-29T21:01:00Z	
+J2 zot fait	2026-10-29T21:01:05Z	
+J2 registre	2026-10-29T21:01:05Z	
+J2 registre fait	2026-10-29T21:01:20Z	
+J2 containerd	2026-10-29T21:01:20Z	
+J2 containerd fait	2026-10-29T21:01:38Z	
+J2 forgejo	2026-10-29T21:01:38Z	
+J2 forgejo fait	2026-10-29T21:01:50Z	
+J2 depot	2026-10-29T21:01:50Z	
+J2 depot fait	2026-10-29T21:01:53Z	
+J3 image	2026-10-29T21:01:53Z	
+J3 image fait	2026-10-29T21:02:32Z	
+J3 deployer	2026-10-29T21:02:32Z	
+J3 deployer fait	2026-10-29T21:02:39Z	
+J3 initialiser	2026-10-29T21:02:39Z	
+J3 initialiser fait	2026-10-29T21:02:53Z	
+J3 configurer	2026-10-29T21:02:53Z	
+J3 configurer fait	2026-10-29T21:02:54Z	
+J3 essais	2026-10-29T21:02:54Z	
+J3 essais fait	2026-10-29T21:03:40Z	
+J3 redemarrage	2026-10-29T21:03:40Z	
+J3 redemarrage fait	2026-10-29T21:03:55Z	
+J4 revue	2026-10-29T21:03:55Z	
+J4 revue fait	2026-10-29T21:04:11Z	
+J4 miroir	2026-10-29T21:04:11Z	
+J4 miroir fait	2026-10-29T21:04:51Z	
+J4 installer	2026-10-29T21:04:51Z	
+J4 installer fait	2026-10-29T21:05:26Z	
+J4 signature	2026-10-29T21:05:26Z	
+J4 signature fait	2026-10-29T21:05:38Z	
+J4 verifier	2026-10-29T21:05:38Z	
+J3 cle	2026-10-29T21:05:38Z	
+J3 cle fait	2026-10-29T21:05:38Z	
+J4 verifier fait	2026-10-29T21:05:38Z	
+J4 webhook	2026-10-29T21:05:38Z	
+J4 webhook fait	2026-10-29T21:05:43Z	
+J4 essais_webhook	2026-10-29T21:05:43Z	
+J4 essais_webhook fait	2026-10-29T21:06:16Z	
+J5 image	2026-10-29T21:06:17Z	
+J5 image fait	2026-10-29T21:06:59Z	
+J5 pki	2026-10-29T21:06:59Z	
+J5 pki fait	2026-10-29T21:06:59Z	
+J5 openbao	2026-10-29T21:06:59Z	
+J5 openbao fait	2026-10-29T21:07:00Z	
+J5 deployer	2026-10-29T21:07:00Z	
+J5 deployer fait	2026-10-29T21:07:05Z	
+J5 essais	2026-10-29T21:07:05Z	
+J5 essais fait	2026-10-29T21:07:56Z	
+J5 horodater	2026-10-29T21:07:56Z	
+J5 horodater fait	2026-10-29T21:08:28Z	
+J5 chemins	2026-10-29T21:08:28Z	
+J5 chemins fait	2026-10-29T21:08:47Z	
+J3 deverrouiller	2026-10-29T21:08:49Z	
+J3 deverrouiller fait	2026-10-29T21:08:49Z	
+J3 temoin	2026-10-29T21:08:49Z	
+J3 temoin fait	2026-10-29T21:08:50Z	
+J3 deverrouiller	2026-10-29T21:09:21Z	
+J3 deverrouiller fait	2026-10-29T21:09:23Z	
+J3 controle	2026-10-29T21:09:23Z	
+J3 controle fait	2026-10-29T21:09:24Z	
+J5 temoin	2026-10-29T21:09:27Z	
+J5 temoin fait	2026-10-29T21:09:31Z	

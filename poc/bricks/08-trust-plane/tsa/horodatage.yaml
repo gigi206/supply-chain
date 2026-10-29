@@ -1,0 +1,56 @@
+# Brique 08, jalon J5 : espace du job d'horodatage, sur le nœud de confiance (hors des pods de build).
+# Le job lit les attestations de Chains dans Zot (lecture anonyme), demande les jetons au TSA et publie les bundles
+# dans horodatage/** avec le compte Zot poc-horodatage (secret zot-horodatage, créé par tsa.sh). Sortie : DNS, TSA, Zot.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: horodatage
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: horodatage
+  namespace: horodatage
+automountServiceAccountToken: false
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: horodatage
+  namespace: horodatage
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: tsa
+      podSelector:
+        matchLabels:
+          app: timestamp-authority
+    ports:
+    - protocol: TCP
+      port: 3000
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.13/32
+    ports:
+    - protocol: TCP
+      port: 5000

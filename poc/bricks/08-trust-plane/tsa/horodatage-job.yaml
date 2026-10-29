@@ -1,0 +1,62 @@
+# Brique 08, jalon J5 : un job d'horodatage par image (tsa.sh horodater). @OUTILS@ : image d'outils assemblée
+# (base cosign v3.1.4-dev signée, plus oras et timestamp-cli vérifiés), épinglée par digest (tsa.sh image).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: @NOM@
+  namespace: horodatage
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: horodatage
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      restartPolicy: Never
+      nodeSelector:
+        zone: confiance
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: horodater
+        image: @OUTILS@
+        command: [sh, /etc/horodatage/horodater.sh]
+        env:
+        - name: IMAGE
+          value: @IMAGE@
+        - name: DEPOT
+          value: @DEPOT@
+        - name: TSA
+          value: http://timestamp-authority.tsa.svc.cluster.local:3000
+        - name: HOME
+          value: /travail
+        - name: TMPDIR
+          value: /travail
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: travail
+          mountPath: /travail
+        - name: config
+          mountPath: /etc/horodatage
+          readOnly: true
+        - name: zot
+          mountPath: /var/run/zot
+          readOnly: true
+      volumes:
+      - name: travail
+        emptyDir:
+          sizeLimit: 64Mi
+      - name: config
+        configMap:
+          name: horodatage
+      - name: zot
+        secret:
+          secretName: zot-horodatage

@@ -212,7 +212,7 @@ description = "Brique 08, J3 : OpenBao 2.7.2 sur sc-confiance, Transit non expor
 run = "poc/bricks/08-trust-plane/openbao.sh"
 
 [tasks."confiance:rejeu"]
-description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J4), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
+description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J5), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
 run = "poc/bricks/08-trust-plane/rejeu.sh"
 
 [tasks."confiance:redemarrer"]
@@ -222,3 +222,7 @@ run = "poc/bricks/08-trust-plane/redemarrer.sh"
 [tasks."confiance:tekton"]
 description = "Brique 08, J4 : Tekton Pipelines v1.15.5, Chains v0.29.9, Triggers v0.37.2 épinglés par digest après revue, copiés dans Zot (étapes : revue miroir installer signature)"
 run = "poc/bricks/08-trust-plane/tekton.sh"
+
+[tasks."confiance:tsa"]
+description = "Brique 08, J5 : horodatage RFC 3161, timestamp-authority v2.2.0 avec la clé Transit tsa, job d'horodatage et mesure des chemins de vérification (étapes : image pki openbao deployer temoin essais horodater chemins)"
+run = "poc/bricks/08-trust-plane/tsa.sh"
