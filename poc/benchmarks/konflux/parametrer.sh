@@ -2,7 +2,8 @@
 # Banc A1 : règle les paramètres natifs des PipelineRuns que le build-service a proposés
 # dans la PR de configuration (branche konflux-sample-app), par un commit sur cette branche :
 # - hermetic=true et prefetch-input gomod + npm (le Containerfile lit /cachi2) ;
-# - source-date-epoch=0 et rewrite-timestamp=true (reproductibilité, critère A-3).
+# - source-date-epoch=0 et rewrite-timestamp=true (reproductibilité, critère A-3) ;
+# - image de sortie sous registry-service.kind-registry (nom couvert par le certificat du registre).
 # Le push déclenche le pipeline de PR (événement pull_request synchronisé).
 #
 # Usage (racine du dépôt) : mise run konflux:parametrer
@@ -38,6 +39,9 @@ ajout = '''  - name: hermetic
 ancre = "  - name: path-context\n    value: .\n  pipelineSpec:\n"
 for p in sys.argv[1:]:
     s = open(p).read()
+    # Le certificat du registre interne couvre registry-service.kind-registry, pas la forme .svc.cluster.local.
+    s = s.replace("registry-service.kind-registry.svc.cluster.local/", "registry-service.kind-registry/")
+    open(p, "w").write(s)
     if "  - name: hermetic\n    value:" in s.split("  pipelineSpec:")[0]:
         continue
     assert s.count(ancre) == 1, p

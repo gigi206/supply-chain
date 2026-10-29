@@ -107,6 +107,10 @@ run = "poc/benchmarks/konflux/onboarder.sh"
 description = "Banc A1 : build hermétique, prefetch gomod + npm et SOURCE_DATE_EPOCH dans la PR de configuration"
 run = "poc/benchmarks/konflux/parametrer.sh"
 
+[tasks."konflux:tests-negatifs"]
+description = "Banc A1 : tests négatifs T1 à T6 et T8 (PR hostile, RBAC, webhooks non signé et rejoué, horodatage)"
+run = "poc/benchmarks/konflux/tests-negatifs.sh"
+
 [tasks."konflux:demonter"]
 description = "Banc A1 : supprime le cluster kind et son KUBECONFIG dédié"
 run = '''

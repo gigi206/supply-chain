@@ -26,7 +26,7 @@ F=${FORGEJO_DIR:-$HOME/.cache/supply-chain-poc/forgejo}
 W=${WORKDIR:-$HOME/.cache/supply-chain-poc/konflux/onboarding}
 HOST=forgejo.banc-a1.svc.cluster.local
 TENANT=default-tenant
-IMAGE=registry-service.kind-registry.svc.cluster.local/$TENANT/sample-app
+IMAGE=registry-service.kind-registry/$TENANT/sample-app   # nom couvert par le certificat du registre interne
 RH_FPR=567E347AD0044ADE55BA8A5F199E2F91FD431D51
 gw=$(docker network inspect kind --format '{{range .IPAM.Config}}{{.Gateway}} {{end}}' | tr ' ' '\n' | grep -m1 -E '^[0-9.]+$')
 base=https://$gw:3000
@@ -90,17 +90,20 @@ ok "secret SCM forgejo-banc ($TENANT, scm.host=$HOST)"
 kubectl patch svc -n tekton-pipelines pipelines-as-code-controller-nodeport --type json \
   -p '[{"op": "replace", "path": "/spec/ports/0/targetPort", "value": 8082}]' >/dev/null
 ok "écart a : NodePort de PaC (30012 → 127.0.0.1:8180) dirigé vers le port 8082"
-# b. le contrôleur PaC ne monte pas le bundle trusted-ca (Konflux le fait pour Chains et les
-#    résolveurs) : l'API Forgejo en HTTPS échoue. L'opérateur Tekton ne propage pas les
-#    options du TektonConfig vers son objet PaC sur Kubernetes : on pose les deux.
+# b. le contrôleur et le watcher PaC ne montent pas le bundle trusted-ca (Konflux le fait
+#    pour Chains et les résolveurs) : l'API Forgejo en HTTPS échoue, et le watcher ne crée
+#    pas le secret git du PipelineRun. L'opérateur Tekton ne propage pas les options du
+#    TektonConfig vers son objet PaC sur Kubernetes : on pose les deux.
 kubectl patch tektonconfig config --type merge --patch-file "$here/k8s/tektonconfig-pac-trusted-ca.yaml" >/dev/null
 kubectl patch openshiftpipelinesascode pipelines-as-code --type merge --patch-file "$here/k8s/pac-trusted-ca.json" >/dev/null
-for _ in $(seq 1 30); do
-  kubectl get deploy -n tekton-pipelines pipelines-as-code-controller -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[*].name}' | grep -qw trusted-ca && break
-  sleep 5
+for d in controller watcher; do
+  for _ in $(seq 1 30); do
+    kubectl get deploy -n tekton-pipelines "pipelines-as-code-$d" -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[*].name}' | grep -qw trusted-ca && break
+    sleep 5
+  done
+  kubectl rollout status -n tekton-pipelines "deploy/pipelines-as-code-$d" --timeout=180s >/dev/null
 done
-kubectl rollout status -n tekton-pipelines deploy/pipelines-as-code-controller --timeout=180s >/dev/null
-ok "écart b : bundle trusted-ca monté dans le contrôleur PaC"
+ok "écart b : bundle trusted-ca monté dans le contrôleur et le watcher PaC"
 # c. l'URL de webhook vue depuis Forgejo doit être en place avant le Component, sinon le
 #    build-service crée un premier webhook vers l'URL interne du cluster, injoignable.
 kubectl patch konflux konflux --type merge -p "{\"spec\": {\"buildService\": {\"spec\": {\"webhookURLs\": {\"https://$HOST\": \"http://127.0.0.1:8180\"}}}}}" >/dev/null

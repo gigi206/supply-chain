@@ -3,27 +3,88 @@
 # et aux résolveurs (dependencies/tekton-config/tekton-config.yml). Patch « merge » du TektonConfig.
 # Constat : l'opérateur Tekton v0.81.1 ne le propage pas vers l'objet OpenShiftPipelinesAsCode
 # sur Kubernetes ; pac-trusted-ca.json pose la même option sur cet objet (onboarder.sh).
-spec:
-  platforms:
-    kubernetes:
-      pipelinesAsCode:
-        options:
-          deployments:
-            pipelines-as-code-controller:
-              spec:
-                template:
-                  spec:
-                    volumes:
-                      - name: trusted-ca
-                        configMap:
-                          name: trusted-ca
-                          items:
-                            - key: ca-bundle.crt
-                              path: ca-bundle.crt
-                          optional: true
-                    containers:
-                      - name: pac-controller
-                        volumeMounts:
-                          - name: trusted-ca
-                            mountPath: /etc/ssl/certs
-                            readOnly: true
+# (JSON, sous-ensemble de YAML.)
+{
+  "spec": {
+    "platforms": {
+      "kubernetes": {
+        "pipelinesAsCode": {
+          "options": {
+            "deployments": {
+              "pipelines-as-code-controller": {
+                "spec": {
+                  "template": {
+                    "spec": {
+                      "volumes": [
+                        {
+                          "name": "trusted-ca",
+                          "configMap": {
+                            "name": "trusted-ca",
+                            "items": [
+                              {
+                                "key": "ca-bundle.crt",
+                                "path": "ca-bundle.crt"
+                              }
+                            ],
+                            "optional": true
+                          }
+                        }
+                      ],
+                      "containers": [
+                        {
+                          "name": "pac-controller",
+                          "volumeMounts": [
+                            {
+                              "name": "trusted-ca",
+                              "mountPath": "/etc/ssl/certs",
+                              "readOnly": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "pipelines-as-code-watcher": {
+                "spec": {
+                  "template": {
+                    "spec": {
+                      "volumes": [
+                        {
+                          "name": "trusted-ca",
+                          "configMap": {
+                            "name": "trusted-ca",
+                            "items": [
+                              {
+                                "key": "ca-bundle.crt",
+                                "path": "ca-bundle.crt"
+                              }
+                            ],
+                            "optional": true
+                          }
+                        }
+                      ],
+                      "containers": [
+                        {
+                          "name": "pac-watcher",
+                          "volumeMounts": [
+                            {
+                              "name": "trusted-ca",
+                              "mountPath": "/etc/ssl/certs",
+                              "readOnly": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
