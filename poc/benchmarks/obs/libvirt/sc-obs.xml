@@ -1,0 +1,47 @@
+<!-- Banc A2 : VM de l'appliance OBS. Modèle Haswell-v4 (x86-64-v3 sans AVX-512, voir poc/infra),
+     vmx exigé pour les workers KVM imbriqués ; check='partial' : avec 'full', QEMU refuse les fonctions
+     qu'il ajoute au modèle (f16c, rdrand, xsaveopt, sous-fonctions vmx) ; l'absence d'AVX-512 est
+     contrôlée dans la VM avec ld.so. Disque plafonné à 40 Go ; pas de démarrage automatique. -->
+<domain type='kvm'>
+  <name>sc-obs</name>
+  <memory unit='GiB'>8</memory>
+  <vcpu placement='static'>6</vcpu>
+  <os>
+    <type arch='x86_64' machine='q35'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='custom' match='exact' check='partial'>
+    <model fallback='forbid'>Haswell-v4</model>
+    <feature policy='require' name='vmx'/>
+  </cpu>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <disk type='volume' device='disk'>
+      <driver name='qemu' type='qcow2' discard='unmap'/>
+      <source pool='supply-chain-poc' volume='sc-obs.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <interface type='network'>
+      <source network='supply-chain-poc'/>
+      <mac address='52:54:00:5c:0b:51'/>
+      <model type='virtio'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+    <memballoon model='virtio'/>
+  </devices>
+</domain>

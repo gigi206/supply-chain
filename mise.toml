@@ -130,6 +130,22 @@ KUBECONFIG="$HOME/.kube/supply-chain-poc-konflux.yaml" kind delete cluster --nam
 rm -f "$HOME/.kube/supply-chain-poc-konflux.yaml"
 '''
 
+[tasks."obs:preparer"]
+description = "Banc A2 : appliance OBS épinglée (Unstable Build53.24) téléchargée, clé sur 3 canaux, signature et sha256 vérifiés"
+run = "poc/benchmarks/obs/preparer.sh"
+
+[tasks."obs:vm"]
+description = "Banc A2 : pool, réseau NAT et VM sc-obs (creer|demarrer|arreter|detruire), sans démarrage automatique"
+run = "poc/benchmarks/obs/vm.sh"
+
+[tasks."obs:premier-acces"]
+description = "Banc A2 : console série de sc-obs, mot de passe root et clé SSH remplacés, sshd activé"
+run = "poc/benchmarks/obs/premier-acces.sh"
+
+[tasks."obs:configurer"]
+description = "Banc A2 : compte Admin, osc, worker (1 instance KVM, 3 Gi) et contrôles de la VM sc-obs"
+run = "poc/benchmarks/obs/configurer.sh"
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]

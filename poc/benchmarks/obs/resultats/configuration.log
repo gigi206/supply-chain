@@ -1,0 +1,36 @@
+# configurer.sh, 2026-10-29T13:56:26Z
+## Compte Admin
+ancien mot de passe sur /person/Admin : HTTP 401
+nouveau mot de passe sur /person/Admin : HTTP 200
+  <revision>2.11~alpha.20261029T112345.58021baee2</revision>
+  <commit>58021baee225e36251c0ad407d0be3479fab0684</commit>
+## Worker
+OBS_WORKER_INSTANCES="1"
+OBS_WORKER_JOBS="4"
+OBS_VM_TYPE="kvm"
+OBS_VM_DISK_AUTOSETUP_ROOT_FILESIZE="16384"
+OBS_INSTANCE_MEMORY="3072"
+Oct 29 13:55:40 sc-obs obsworker[3260]: Run 1 obsworker using /var/cache/obs/worker
+Oct 29 13:55:40 sc-obs obsworker[3260]: Type of obsworker is KVM virtual machine
+Oct 29 13:56:35 sc-obs obsworker[3536]: Run 1 obsworker using /var/cache/obs/worker
+Oct 29 13:56:35 sc-obs obsworker[3536]: Type of obsworker is KVM virtual machine
+worker inactif : x86_64:sc-obs:1
+## Contrôles
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+AVX-512 absent
+/dev/kvm : crw-rw-rw- kvm ; modules : kvm_intel kvm
+sortie réseau : HTTP 200
+services OBS actifs : apache2.service memcached.service obs-clockwork.service obs-delayedjob-queue-consistency_check.service obs-delayedjob-queue-default.service obs-delayedjob-queue-issuetracking.service obs-delayedjob-queue-mailers.service obs-delayedjob-queue-project_log_rotate.service obs-delayedjob-queue-quick@0.service obs-delayedjob-queue-quick@1.service obs-delayedjob-queue-quick@2.service obs-delayedjob-queue-releasetracking.service obs-delayedjob-queue-scm.service obs-delayedjob-queue-staging.service obs-gitea-bridge.service obs-sphinx.service obsapisetup.service obsdeltastore.service obsdispatcher.service obsdodup.service obspublisher.service obsrepserver.service obsscheduler.service obsservice.service obsservicedispatch.service obssignd.service obssigner.service obssrcserver.service obsstoragesetup.service obswarden.service obsworker.service
+RPM installés : 554
+clé OBS dans la base rpm : gpg-pubkey-c5c219e7-51236685, copie de 2013 expirée le 30/04/2015 (embarquée dans config.sh de l appliance)
+               total        used        free      shared  buff/cache   available
+Mem:            7939        3294        4461           3         428        4645
+/dev/vda3        28G  3.4G   23G  13% /
+/dev/vda2        10G  228M  9.8G   3% /srv/obs/service
+RAM de la VM vue par l'hôte (RSS de qemu) : 4.2 Gi
+## Paquets rpm de la VM comparés au SBOM de la qcow2 (même build)
+composants du SBOM : pkg:golang 434, pkg:rpm 554, sans purl 1
+écarts : 1 lignes (code diff 1)
+79d78
+< gpg-pubkey c5c219e7-51236685

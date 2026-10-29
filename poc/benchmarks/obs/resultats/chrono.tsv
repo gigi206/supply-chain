@@ -1,0 +1,5 @@
+étape	date (UTC)	depuis le début
+1. accord du propriétaire (début du banc A2)	2026-10-29T13:47:28Z	0h00m00s
+2. VM sc-obs démarrée (pool, réseau, disque de 40G)	2026-10-29T13:51:17Z	0h03m49s
+3. premier accès : root et clé SSH remplacés	2026-10-29T13:54:12Z	0h06m44s
+4. appliance configurée : Admin, osc, worker KVM (1 instance), contrôles	2026-10-29T13:56:53Z	0h09m25s

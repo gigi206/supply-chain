@@ -1,0 +1,22 @@
+# premier-acces.sh, 2026-10-29T13:53:55Z
+[console] session root déjà ouverte (après 15 s)
+[console] $ install -d -m 700 /root/.ssh
+[console] code 0
+[console] $ printf '%s\n' 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBiEav0TP/PfNzUhjbZxDk/4v/OkhVFybbXmS5sTbsf7 sc-obs-banc-a2' > /root/.ssh/authorized_keys
+[console] code 0
+[console] $ chmod 600 /root/.ssh/authorized_keys
+[console] code 0
+[console] $ (commande masquée)
+[console] code 0
+[console] $ systemctl enable --now sshd
+Created symlink '/etc/systemd/system/multi-user.target.wants/sshd.service' ��� '/usr/lib/systemd/system/sshd.service'.
+[console] code 0
+[console] $ systemctl is-active sshd
+active
+[console] code 0
+## SSH
+Warning: Permanently added '192.168.161.10' (ED25519) to the list of known hosts.
+sc-obs.poc.test
+VERSION_ID="16.0"
+PRETTY_NAME="openSUSE Leap 16.0"
+empreinte de l'hôte : SHA256:AL2Lylk+tTz+QQ5WCV/dVef/3DGIPbJx7gKd9c8E1qs (ED25519)
