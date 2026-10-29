@@ -1,0 +1,960 @@
+[    0s] Using BUILD_ROOT=/var/cache/obs/worker/root_1/.mount
+[    0s] Using BUILD_ARCH=x86_64:i686:i586:i486:i386
+[    0s] Doing kvm build in /var/cache/obs/worker/root_1/root
+[    0s] 
+[    0s] 
+[    0s] sc-obs started "build hostile.spec" at Thu Oct 29 14:47:47 UTC 2026.
+[    0s] 
+[    0s] Building hostile for project 'poc' repository 'rocky_9' arch 'x86_64' srcmd5 '4ee1f691939864729064abda111b371c'
+[    0s] 
+[    0s] processing recipe /var/cache/obs/worker/root_1/.build-srcdir/hostile.spec ...
+[    1s] running changelog2spec --target rpm --file /var/cache/obs/worker/root_1/.build-srcdir/hostile.spec
+[    1s] init_buildsystem --configdir /srv/obs/run/worker/1/build/configs --cachedir /var/cache/build --prepare --clean --rpmlist /var/cache/obs/worker/root_1/.build.rpmlist /var/cache/obs/worker/root_1/.build-srcdir/hostile.spec build ...
+[    1s] cycle: filesystem -> bash
+[    1s]   breaking dependency filesystem -> bash
+[    1s] cycle: filesystem -> setup
+[    1s]   breaking dependency filesystem -> setup
+[    1s] cycle: glibc -> glibc-common -> bash
+[    1s]   breaking dependency glibc -> glibc-common
+[    1s] cycle: glibc -> libgcc
+[    1s]   breaking dependency glibc -> libgcc
+[    1s] cycle: perl-libs -> perl-Carp
+[    1s]   breaking dependency perl-libs -> perl-Carp
+[    1s] cycle: perl-libs -> perl-Encode -> perl-interpreter
+[    1s]   breaking dependency perl-Encode -> perl-interpreter
+[    1s] cycle: perl-libs -> perl-Encode
+[    1s]   breaking dependency perl-Encode -> perl-libs
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Carp
+[    1s]   breaking dependency perl-Encode -> perl-Carp
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Exporter
+[    1s]   breaking dependency perl-Encode -> perl-Exporter
+[    1s] cycle: perl-libs -> perl-Encode -> perl-File-Basename
+[    1s]   breaking dependency perl-Encode -> perl-File-Basename
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Getopt-Long
+[    1s]   breaking dependency perl-Encode -> perl-Getopt-Long
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Getopt-Std
+[    1s]   breaking dependency perl-Encode -> perl-Getopt-Std
+[    1s] cycle: perl-libs -> perl-Encode -> perl-MIME-Base64
+[    1s]   breaking dependency perl-Encode -> perl-MIME-Base64
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Storable
+[    1s]   breaking dependency perl-Storable -> perl-libs
+[    1s] cycle: perl-libs -> perl-Encode -> perl-Storable -> perl-Carp
+[    1s]   breaking dependency perl-Encode -> perl-Storable
+[    1s] cycle: perl-libs -> perl-Encode -> perl-constant
+[    1s]   breaking dependency perl-libs -> perl-Encode
+[    1s] cycle: perl-libs -> perl-Exporter
+[    1s]   breaking dependency perl-libs -> perl-Exporter
+[    1s] cycle: perl-libs -> perl-PathTools
+[    1s]   breaking dependency perl-PathTools -> perl-libs
+[    1s] cycle: perl-libs -> perl-PathTools -> perl-Carp
+[    1s]   breaking dependency perl-PathTools -> perl-Carp
+[    1s] cycle: perl-libs -> perl-PathTools -> perl-Errno
+[    1s]   breaking dependency perl-PathTools -> perl-Errno
+[    1s] cycle: perl-libs -> perl-PathTools -> perl-Exporter
+[    1s]   breaking dependency perl-PathTools -> perl-Exporter
+[    1s] cycle: perl-libs -> perl-PathTools -> perl-Scalar-List-Utils
+[    1s]   breaking dependency perl-Scalar-List-Utils -> perl-libs
+[    1s] cycle: perl-libs -> perl-PathTools -> perl-Scalar-List-Utils -> perl-Carp
+[    1s]   breaking dependency perl-libs -> perl-PathTools
+[    1s] cycle: openssl-libs -> ca-certificates -> coreutils
+[    1s]   breaking dependency coreutils -> openssl-libs
+[    1s] cycle: openssl-libs -> openssl-fips-provider
+[    1s]   breaking dependency openssl-libs -> openssl-fips-provider
+[    1s] cycle: perl-Carp -> perl-Exporter
+[    1s]   breaking dependency perl-Exporter -> perl-Carp
+[    1s] cycle: perl-B -> perl-Data-Dumper
+[    1s]   breaking dependency perl-Data-Dumper -> perl-B
+[    1s] cycle: perl-Getopt-Long -> perl-Pod-Usage
+[    1s]   breaking dependency perl-Pod-Usage -> perl-Getopt-Long
+[    1s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-podlators
+[    1s]   breaking dependency perl-podlators -> perl-Getopt-Long
+[    1s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-podlators -> perl-Pod-Simple
+[    1s]   breaking dependency perl-podlators -> perl-Pod-Simple
+[    1s] cycle: perl-Pod-Usage -> perl-podlators
+[    1s]   breaking dependency perl-podlators -> perl-Pod-Usage
+[    1s] cycle: perl-HTTP-Tiny -> perl-IO-Socket-SSL
+[    1s]   breaking dependency perl-IO-Socket-SSL -> perl-HTTP-Tiny
+[    1s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-Pod-Perldoc -> perl-Pod-Simple
+[    1s]   breaking dependency perl-Pod-Perldoc -> perl-Pod-Simple
+[    1s] cycle: rpm -> rpm-libs
+[    1s]   breaking dependency rpm-libs -> rpm
+[    1s] cycle: dbus -> dbus-broker -> systemd
+[    1s]   breaking dependency systemd -> dbus
+[    1s] cycle: pam -> libpwquality
+[    1s]   breaking dependency pam -> libpwquality
+[    1s] cycle: systemd -> systemd-pam
+[    1s]   breaking dependency systemd -> systemd-pam
+[    1s] cycle: device-mapper-libs -> device-mapper
+[    1s]   breaking dependency device-mapper -> device-mapper-libs
+[    1s] [1/132] preinstalling coreutils-common...
+[    1s] [2/132] preinstalling libssh-config...
+[    1s] [3/132] preinstalling ncurses-base...
+[    1s] [4/132] preinstalling pcre2-syntax...
+[    1s] [5/132] preinstalling publicsuffix-list-dafsa...
+[    1s] [6/132] preinstalling rocky-release...
+[    1s] [7/132] preinstalling tzdata...
+[    1s] [8/132] preinstalling filesystem...
+[    1s] [9/132] preinstalling setup...
+[    1s] [10/132] preinstalling basesystem...
+[    1s] [11/132] preinstalling glibc...
+[    1s] [12/132] preinstalling bzip2-libs...
+[    1s] [13/132] preinstalling gdbm-libs...
+[    1s] [14/132] preinstalling gmp...
+[    1s] [15/132] preinstalling keyutils-libs...
+[    2s] [16/132] preinstalling libattr...
+[    2s] [17/132] preinstalling libbrotli...
+[    2s] [18/132] preinstalling libcap-ng...
+[    2s] [19/132] preinstalling libcom_err...
+[    2s] [20/132] preinstalling libffi...
+[    2s] [21/132] preinstalling libnghttp2...
+[    2s] [22/132] preinstalling libsepol...
+[    2s] [23/132] preinstalling libsigsegv...
+[    2s] [24/132] preinstalling libtasn1...
+[    2s] [25/132] preinstalling libtool-ltdl...
+[    2s] [26/132] preinstalling libunistring...
+[    2s] [27/132] preinstalling libverto...
+[    2s] [28/132] preinstalling libxcrypt...
+[    2s] [29/132] preinstalling libzstd...
+[    2s] [30/132] preinstalling lua-libs...
+[    2s] [31/132] preinstalling lz4-libs...
+[    2s] [32/132] preinstalling pcre...
+[    2s] [33/132] preinstalling popt...
+[    2s] [34/132] preinstalling xz-libs...
+[    2s] [35/132] preinstalling zlib...
+[    2s] [36/132] preinstalling libgcc...
+[    2s] [37/132] preinstalling ncurses-libs...
+[    2s] [38/132] preinstalling pcre2...
+[    2s] [39/132] preinstalling audit-libs...
+[    2s] [40/132] preinstalling libacl...
+[    2s] [41/132] preinstalling libcap...
+[    2s] [42/132] preinstalling libidn2...
+[    2s] [43/132] preinstalling libstdc++...
+[    2s] [44/132] preinstalling mpfr...
+[    2s] [45/132] preinstalling ncurses...
+[    2s] [46/132] preinstalling readline...
+[    2s] [47/132] preinstalling sqlite-libs...
+[    2s] [48/132] preinstalling bash...
+[    2s] [49/132] preinstalling libselinux...
+[    2s] [50/132] preinstalling libxml2...
+[    2s] [51/132] preinstalling p11-kit...
+[    2s] [52/132] preinstalling perl-libs...
+[    2s] [53/132] preinstalling crypto-policies...
+[    2s] [54/132] preinstalling perl-if...
+[    2s] [55/132] preinstalling perl-parent...
+[    2s] [56/132] preinstalling perl-subs...
+[    2s] [57/132] preinstalling findutils...
+[    2s] [58/132] preinstalling perl-Exporter...
+[    2s] [59/132] preinstalling perl-interpreter...
+[    2s] [60/132] preinstalling perl-mro...
+[    2s] [61/132] preinstalling glibc-common...
+[    2s] [62/132] preinstalling sed...
+[    2s] [63/132] preinstalling grep...
+[    2s] [64/132] preinstalling groff-base...
+[    2s] [65/132] preinstalling libpsl...
+[    2s] [66/132] preinstalling p11-kit-trust...
+[    2s] [67/132] preinstalling libsemanage...
+[    2s] [68/132] preinstalling gawk...
+[    2s] [69/132] preinstalling coreutils...
+[    2s] [70/132] preinstalling perl-Carp...
+[    2s] [71/132] preinstalling perl-Getopt-Std...
+[    2s] [72/132] preinstalling perl-Symbol...
+[    2s] [73/132] preinstalling perl-Term-ANSIColor...
+[    2s] [74/132] preinstalling perl-Fcntl...
+[    2s] [75/132] preinstalling perl-MIME-Base64...
+[    2s] [76/132] preinstalling ca-certificates...
+[    2s] [77/132] preinstalling shadow-utils...
+[    2s] [78/132] preinstalling perl-AutoLoader...
+[    2s] [79/132] preinstalling perl-base...
+[    2s] [80/132] preinstalling perl-constant...
+[    2s] [81/132] preinstalling perl-overloading...
+[    2s] [82/132] preinstalling perl-vars...
+[    2s] [83/132] preinstalling perl-Class-Struct...
+[    2s] [84/132] preinstalling perl-Errno...
+[    2s] [85/132] preinstalling perl-File-Basename...
+[    2s] [86/132] preinstalling perl-SelectSaver...
+[    2s] [87/132] preinstalling perl-Text-ParseWords...
+[    2s] [88/132] preinstalling perl-Digest...
+[    2s] [89/132] preinstalling perl-Scalar-List-Utils...
+[    2s] [90/132] preinstalling perl-Socket...
+[    2s] [91/132] preinstalling openssl-libs...
+[    2s] [92/132] preinstalling perl-POSIX...
+[    2s] [93/132] preinstalling libevent...
+[    2s] [94/132] preinstalling openssl-fips-provider...
+[    2s] [95/132] preinstalling perl-Pod-Escapes...
+[    2s] [96/132] preinstalling perl-Text-Tabs+Wrap...
+[    2s] [97/132] preinstalling perl-Digest-MD5...
+[    2s] [98/132] preinstalling perl-Term-Cap...
+[    3s] [99/132] preinstalling perl-overload...
+[    3s] [100/132] preinstalling perl-Time-Local...
+[    3s] [101/132] preinstalling perl-Data-Dumper...
+[    3s] [102/132] preinstalling perl-PathTools...
+[    3s] [103/132] preinstalling libarchive...
+[    3s] [104/132] preinstalling perl-Net-SSLeay...
+[    3s] [105/132] preinstalling krb5-libs...
+[    3s] [106/132] preinstalling rpm-libs...
+[    3s] [107/132] preinstalling perl-Mozilla-CA...
+[    3s] [108/132] preinstalling cyrus-sasl-lib...
+[    3s] [109/132] preinstalling libssh...
+[    3s] [110/132] preinstalling perl-B...
+[    3s] [111/132] preinstalling perl-File-Path...
+[    3s] [112/132] preinstalling perl-File-stat...
+[    3s] [113/132] preinstalling perl-Encode...
+[    3s] [114/132] preinstalling openldap...
+[    3s] [115/132] preinstalling perl-IO...
+[    3s] [116/132] preinstalling perl-podlators...
+[    3s] [117/132] preinstalling perl-FileHandle...
+[    3s] [118/132] preinstalling perl-Storable...
+[    3s] [119/132] preinstalling perl-IO-Socket-IP...
+[    3s] [120/132] preinstalling perl-IPC-Open3...
+[    3s] [121/132] preinstalling libcurl...
+[    3s] [122/132] preinstalling perl-File-Temp...
+[    3s] [123/132] preinstalling curl...
+[    3s] [124/132] preinstalling perl-libnet...
+[    3s] [125/132] preinstalling rpm...
+[    3s] [126/132] preinstalling perl-URI...
+[    3s] [127/132] preinstalling perl-IO-Socket-SSL...
+[    3s] [128/132] preinstalling perl-HTTP-Tiny...
+[    3s] [129/132] preinstalling perl-Pod-Perldoc...
+[    3s] [130/132] preinstalling perl-Pod-Usage...
+[    3s] [131/132] preinstalling perl-Getopt-Long...
+[    3s] [132/132] preinstalling perl-Pod-Simple...
+[    3s] 
+[    3s] [1/35] preinstalling acl...
+[    3s] [2/35] preinstalling expat...
+[    3s] [3/35] preinstalling gzip...
+[    3s] [4/35] preinstalling kmod-libs...
+[    3s] [5/35] preinstalling libdb...
+[    3s] [6/35] preinstalling libeconf...
+[    3s] [7/35] preinstalling libgpg-error...
+[    3s] [8/35] preinstalling libmnl...
+[    3s] [9/35] preinstalling libnfnetlink...
+[    3s] [10/35] preinstalling libseccomp...
+[    3s] [11/35] preinstalling libsmartcols...
+[    3s] [12/35] preinstalling libutempter...
+[    3s] [13/35] preinstalling libuuid...
+[    3s] [14/35] preinstalling openssl...
+[    3s] [15/35] preinstalling systemd-rpm-macros...
+[    3s] [16/35] preinstalling cracklib...
+[    3s] [17/35] preinstalling libblkid...
+[    3s] [18/35] preinstalling libgcrypt...
+[    3s] [19/35] preinstalling libnetfilter_conntrack...
+[    3s] [20/35] preinstalling cracklib-dicts...
+[    3s] [21/35] preinstalling iptables-libs...
+[    3s] [22/35] preinstalling systemd-libs...
+[    3s] [23/35] preinstalling libfdisk...
+[    3s] [24/35] preinstalling libmount...
+[    3s] [25/35] preinstalling util-linux-core...
+[    3s] [26/35] preinstalling pam...
+[    3s] [27/35] preinstalling libpwquality...
+[    3s] [28/35] preinstalling util-linux...
+[    3s] [29/35] preinstalling systemd...
+[    3s] [30/35] preinstalling dbus-common...
+[    3s] [31/35] preinstalling systemd-pam...
+[    3s] [32/35] preinstalling device-mapper...
+[    3s] [33/35] preinstalling device-mapper-libs...
+[    3s] [34/35] preinstalling dbus-broker...
+[    3s] [35/35] preinstalling dbus...
+[    3s] copying packages...
+[    4s] reordering...cycle: filesystem -> bash
+[    4s]   breaking dependency filesystem -> bash
+[    4s] cycle: filesystem -> setup
+[    4s]   breaking dependency filesystem -> setup
+[    4s] cycle: glibc -> glibc-common -> bash
+[    4s]   breaking dependency glibc -> glibc-common
+[    4s] cycle: glibc -> libgcc
+[    4s]   breaking dependency glibc -> libgcc
+[    4s] cycle: coreutils -> openssl-libs -> ca-certificates
+[    4s]   breaking dependency coreutils -> openssl-libs
+[    4s] cycle: dbus -> dbus-broker -> systemd
+[    4s]   breaking dependency systemd -> dbus
+[    4s] cycle: openssl-libs -> openssl-fips-provider
+[    4s]   breaking dependency openssl-libs -> openssl-fips-provider
+[    4s] cycle: pam -> libpwquality
+[    4s]   breaking dependency pam -> libpwquality
+[    4s] cycle: systemd -> systemd-pam
+[    4s]   breaking dependency systemd -> systemd-pam
+[    4s] cycle: rpm -> rpm-libs
+[    4s]   breaking dependency rpm-libs -> rpm
+[    4s] cycle: fonts-srpm-macros -> redhat-rpm-config
+[    4s]   breaking dependency redhat-rpm-config -> fonts-srpm-macros
+[    4s] cycle: redhat-rpm-config -> go-srpm-macros
+[    4s]   breaking dependency redhat-rpm-config -> go-srpm-macros
+[    4s] cycle: perl-libs -> perl-Carp
+[    4s]   breaking dependency perl-libs -> perl-Carp
+[    4s] cycle: perl-interpreter -> perl-libs -> perl-Encode
+[    4s]   breaking dependency perl-Encode -> perl-interpreter
+[    4s] cycle: perl-libs -> perl-Encode
+[    4s]   breaking dependency perl-Encode -> perl-libs
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Carp
+[    4s]   breaking dependency perl-Encode -> perl-Carp
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Exporter
+[    4s]   breaking dependency perl-Encode -> perl-Exporter
+[    4s] cycle: perl-libs -> perl-Encode -> perl-File-Basename
+[    4s]   breaking dependency perl-Encode -> perl-File-Basename
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Getopt-Long
+[    4s]   breaking dependency perl-Encode -> perl-Getopt-Long
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Getopt-Std
+[    4s]   breaking dependency perl-Encode -> perl-Getopt-Std
+[    4s] cycle: perl-libs -> perl-Encode -> perl-MIME-Base64
+[    4s]   breaking dependency perl-Encode -> perl-MIME-Base64
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Storable
+[    4s]   breaking dependency perl-Storable -> perl-libs
+[    4s] cycle: perl-libs -> perl-Encode -> perl-Storable -> perl-Carp
+[    4s]   breaking dependency perl-Encode -> perl-Storable
+[    4s] cycle: perl-libs -> perl-Encode -> perl-constant
+[    4s]   breaking dependency perl-libs -> perl-Encode
+[    4s] cycle: perl-libs -> perl-Exporter
+[    4s]   breaking dependency perl-libs -> perl-Exporter
+[    4s] cycle: perl-libs -> perl-PathTools
+[    4s]   breaking dependency perl-PathTools -> perl-libs
+[    4s] cycle: perl-libs -> perl-PathTools -> perl-Carp
+[    4s]   breaking dependency perl-PathTools -> perl-Carp
+[    4s] cycle: perl-libs -> perl-PathTools -> perl-Errno
+[    4s]   breaking dependency perl-PathTools -> perl-Errno
+[    4s] cycle: perl-libs -> perl-PathTools -> perl-Exporter
+[    4s]   breaking dependency perl-PathTools -> perl-Exporter
+[    4s] cycle: perl-libs -> perl-PathTools -> perl-Scalar-List-Utils
+[    4s]   breaking dependency perl-Scalar-List-Utils -> perl-libs
+[    4s] cycle: perl-libs -> perl-PathTools -> perl-Scalar-List-Utils -> perl-Carp
+[    4s]   breaking dependency perl-libs -> perl-PathTools
+[    4s] cycle: redhat-rpm-config -> python-srpm-macros
+[    4s]   breaking dependency redhat-rpm-config -> python-srpm-macros
+[    4s] cycle: perl-Carp -> perl-Exporter
+[    4s]   breaking dependency perl-Exporter -> perl-Carp
+[    4s] cycle: libxcrypt-devel -> glibc-devel
+[    4s]   breaking dependency libxcrypt-devel -> glibc-devel
+[    4s] cycle: perl-B -> perl-Data-Dumper
+[    4s]   breaking dependency perl-Data-Dumper -> perl-B
+[    4s] cycle: device-mapper-libs -> device-mapper
+[    4s]   breaking dependency device-mapper -> device-mapper-libs
+[    4s] cycle: binutils -> binutils-gold
+[    4s]   breaking dependency binutils -> binutils-gold
+[    4s] cycle: perl-Getopt-Long -> perl-Pod-Usage
+[    4s]   breaking dependency perl-Pod-Usage -> perl-Getopt-Long
+[    4s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-podlators
+[    4s]   breaking dependency perl-podlators -> perl-Getopt-Long
+[    4s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-podlators -> perl-Pod-Simple
+[    4s]   breaking dependency perl-podlators -> perl-Pod-Simple
+[    4s] cycle: perl-Pod-Usage -> perl-podlators
+[    4s]   breaking dependency perl-podlators -> perl-Pod-Usage
+[    4s] cycle: perl-HTTP-Tiny -> perl-IO-Socket-SSL
+[    4s]   breaking dependency perl-IO-Socket-SSL -> perl-HTTP-Tiny
+[    4s] cycle: perl-Getopt-Long -> perl-Pod-Usage -> perl-Pod-Perldoc -> perl-Pod-Simple
+[    4s]   breaking dependency perl-Pod-Perldoc -> perl-Pod-Simple
+[    4s] cycle: perl-ExtUtils-Install -> perl-ExtUtils-MakeMaker
+[    4s]   breaking dependency perl-ExtUtils-MakeMaker -> perl-ExtUtils-Install
+[    4s] cycle: perl-CPAN -> perl
+[    4s]   breaking dependency perl -> perl-CPAN
+[    4s] done
+[    4s] booting kvm...
+[    4s] ### VM INTERACTION START ###
+[    4s] Using UART console
+[    4s] /usr/bin/qemu-kvm -nodefaults -no-reboot -nographic -vga none -cpu host -M pc,accel=kvm,usb=off,dump-guest-core=off,vmport=off -sandbox on -object rng-random,filename=/dev/hwrng,id=rng0 -device virtio-rng-pci,rng=rng0 -object iothread,id=io0 -run-with user=qemu -net none -kernel /boot/vmlinuz -initrd /boot/initrd.obs.guest -append root=/dev/disk/by-id/virtio-0 rootfstype=ext3 rootflags=data=writeback,nobarrier,commit=150,noatime kvmclock mitigations=off elevator=noop nmi_watchdog=0 rw rd.driver.pre=binfmt_misc oops=panic panic=1 quiet console=ttyS0 init=/.build/build -m 3072 -drive file=/var/cache/obs/worker/root_1/root,format=raw,if=none,id=disk,cache=unsafe,aio=io_uring -device virtio-blk-pci,iothread=io0,drive=disk,serial=0 -drive file=/var/cache/obs/worker/root_1/swap,format=raw,if=none,id=swap,cache=unsafe,aio=io_uring -device virtio-blk-pci,iothread=io0,drive=swap,serial=1 -serial stdio -chardev socket,id=monitor,server=on,wait=off,path=/var/cache/obs/worker/root_1/root.qemu/monitor -mon chardev=monitor,mode=readline -smp 4
+[    5s] [0mSeaBIOS (version rel-1.16.3-2-gc13ff2cd-prebuilt.qemu.org)
+[    7s] Booting from ROM..104104### VM INTERACTION END ###
+[    7s] 2nd stage started in virtual machine
+[    7s] ^[[1;1R^[[24;80Rmachine type: x86_64
+[    7s] Linux version: 6.12.0-160000.40-default #1 SMP PREEMPT_DYNAMIC T[    2.409984][  T678] sysrq: Changing Loglevel
+[    7s] hu Oct 22 09:10:[    2.412614][  T678] sysrq: Loglevel set to 4
+[    7s] 19 UTC 2026 (3fd31e5)
+[    7s] Time: Thu Oct 29 14:47:53 UTC 2026
+[    7s] Increasing log level from now on...
+[    7s] Enable sysrq operations
+[    7s] mount: /sys/fs/cgroup: none already mounted or mount point busy.
+[    7s] Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+[    7s] no label, UUID=59081dbf-70c0-44b9-aaa0-5e7b03cf4ea4
+[    7s] logging output to //.build.log...
+[    7s] processing recipe //.build-srcdir/hostile.spec ...
+[    7s] init_buildsystem --configdir /.build/configs --cachedir /var/cache/build //.build-srcdir/hostile.spec build ...
+[    7s] initializing rpm db...
+[    7s] querying package ids...
+[    8s] [1/459] installing bind-license-32:9.16.23-34.el9_7.2
+[    8s] [2/459] installing coreutils-common-8.32-39.el9
+[    8s] [3/459] installing emacs-filesystem-1:27.2-18.el9
+[    8s] [4/459] installing gettext-common-devel-0.21-8.el9
+[    8s] [5/459] installing ghc-srpm-macros-1.5.0-6.el9
+[    8s] [6/459] installing kernel-headers-5.14.0-611.55.1.el9_7
+[    9s] [7/459] installing libssh-config-0.10.4-17.el9_7
+[    9s] [8/459] installing llvm-filesystem-20.1.8-3.el9
+[    9s] [9/459] installing ncurses-base-6.2-12.20210508.el9
+[    9s] [10/459] installing ocaml-srpm-macros-6-6.el9
+[    9s] [11/459] installing openblas-srpm-macros-2-11.el9
+[    9s] [12/459] installing pcre2-syntax-10.40-6.el9
+[    9s] [13/459] installing perl-srpm-macros-1-41.el9
+[    9s] [14/459] installing pkgconf-m4-1.7.3-10.el9
+[    9s] [15/459] installing publicsuffix-list-dafsa-20210518-3.el9
+[    9s] [16/459] installing pyproject-srpm-macros-1.16.2-1.el9
+[    9s] [17/459] installing python3-setuptools-wheel-53.0.0-15.el9
+[    9s] [18/459] installing qt5-srpm-macros-5.15.9-1.el9
+[    9s] [19/459] installing rocky-release-9.7-1.7.el9
+[    9s] [20/459] installing rust-srpm-macros-17-4.el9
+[    9s] [21/459] installing tzdata-2026a-1.el9_7
+[    9s] [22/459] installing filesystem-3.16-5.el9
+[    9s] [23/459] installing vim-filesystem-2:8.2.2637-23.el9_7.3
+[    9s] [24/459] installing setup-2.13.7-10.el9
+[    9s] [25/459] installing basesystem-11-13.el9.0.1
+[    9s] [26/459] installing glibc-2.34-231.el9_7.10
+[    9s] [27/459] installing SDL2-2.26.0-1.el9
+[    9s] [28/459] installing alternatives-1.24-2.el9
+[    9s] [29/459] installing bzip2-libs-1.0.8-10.el9_5
+[    9s] [30/459] installing cpio-2.13-16.el9
+[    9s] [31/459] installing diffutils-3.7-12.el9
+[    9s] [32/459] installing expat-2.5.0-5.el9_7.1
+[    9s] [33/459] installing fstrm-0.6.1-3.el9
+[    9s] [34/459] installing fuse-libs-2.9.9-17.el9
+[    9s] [35/459] installing gdbm-libs-1:1.23-1.el9
+[    9s] [36/459] installing glibc-headers-2.34-231.el9_7.10
+[    9s] [37/459] installing gmp-1:6.2.0-13.el9
+[    9s] [38/459] installing gpm-libs-1.20.7-29.el9
+[    9s] [39/459] installing json-c-0.14-11.el9
+[    9s] [40/459] installing keyutils-libs-1.6.3-1.el9
+[    9s] [41/459] installing libattr-2.5.1-3.el9
+[    9s] [42/459] installing libbrotli-1.0.9-9.el9_7
+[    9s] [43/459] installing libcap-ng-0.8.2-7.el9
+[    9s] [44/459] installing libcom_err-1.46.5-8.el9
+[    9s] [45/459] installing libdb-5.3.28-57.el9_6
+[   10s] [46/459] installing libeconf-0.4.1-4.el9
+[   10s] [47/459] installing libffi-3.4.2-8.el9
+[   10s] [48/459] installing libgomp-11.5.0-11.el9
+[   10s] [49/459] installing libgpg-error-1.42-5.el9
+[   10s] [50/459] installing libipt-2.0.4-5.el9
+[   10s] [51/459] installing libmaxminddb-1.5.2-4.el9
+[   10s] [52/459] installing libmnl-1.0.4-16.el9_4
+[   10s] [53/459] installing libnfnetlink-1.0.1-23.el9_5
+[   10s] [54/459] installing libnghttp2-1.43.0-6.el9_7.1
+[   10s] [55/459] installing libpipeline-1.5.3-4.el9
+[   10s] [56/459] installing libpkgconf-1.7.3-10.el9
+[   10s] [57/459] installing libseccomp-2.5.2-2.el9
+[   10s] [58/459] installing libsepol-3.6-3.el9
+[   10s] [59/459] installing libsigsegv-2.13-4.el9
+[   10s] [60/459] installing libsmartcols-2.37.4-21.el9_7
+[   10s] [61/459] installing libtasn1-4.16.0-9.el9
+[   10s] [62/459] installing libtool-ltdl-2.4.6-46.el9
+[   10s] [63/459] installing libunistring-0.9.10-15.el9
+[   10s] [64/459] installing libuuid-2.37.4-21.el9_7
+[   10s] [65/459] installing libuv-1:1.42.0-2.el9_4
+[   10s] [66/459] installing libverto-0.3.2-3.el9
+[   10s] [67/459] installing libxcrypt-4.4.18-3.el9
+[   10s] [68/459] installing libzstd-1.5.5-1.el9
+[   10s] [69/459] installing lmdb-libs-0.9.29-3.el9
+[   10s] [70/459] installing lua-libs-5.4.4-4.el9
+[   10s] [71/459] installing lz4-libs-1.9.3-5.el9
+[   10s] [72/459] installing m4-1.4.19-1.el9
+[   10s] [73/459] installing make-1:4.3-8.el9
+[   10s] [74/459] installing nettle-3.10.1-1.el9
+[   10s] [75/459] installing npth-1.6-8.el9
+[   10s] [76/459] installing pcre-8.44-4.el9
+[   10s] [77/459] installing popt-1.18-8.el9
+[   10s] [78/459] installing protobuf-c-1.3.3-13.el9
+[   10s] [79/459] installing which-2.21-30.el9_6
+[   10s] [80/459] installing xz-libs-5.2.5-8.el9_0
+[   10s] [81/459] installing zlib-1.2.11-40.el9
+[   10s] [82/459] installing libgcc-11.5.0-11.el9
+[   10s] [83/459] installing ncurses-libs-6.2-12.20210508.el9
+[   10s] [84/459] installing pcre2-10.40-6.el9
+[   10s] [85/459] installing audit-libs-3.1.5-7.el9
+[   10s] [86/459] installing bison-3.7.4-5.el9
+[   10s] [87/459] installing e2fsprogs-libs-1.46.5-8.el9
+[   10s] [88/459] installing file-libs-5.39-16.el9
+[   10s] [89/459] installing flex-2.6.4-9.el9
+[   10s] [90/459] installing libacl-2.3.1-4.el9
+[   10s] [91/459] installing libassuan-2.5.5-3.el9
+[   10s] [92/459] installing libcap-2.48-10.el9_7.1
+[   11s] [93/459] installing libedit-3.1-38.20210216cvs.el9
+[   11s] [94/459] installing libgcrypt-1.10.0-11.el9
+[   11s] [95/459] installing libidn2-2.3.0-7.el9
+[   11s] [96/459] installing libksba-1.5.1-7.el9
+[   11s] [97/459] installing libss-1.46.5-8.el9
+[   11s] [98/459] installing libstdc++-11.5.0-11.el9
+[   11s] [99/459] installing mpfr-4.1.0-7.el9
+[   11s] [100/459] installing ncurses-6.2-12.20210508.el9
+[   11s] [101/459] installing pkgconf-1.7.3-10.el9
+[   11s] [102/459] installing psmisc-23.4-3.el9
+[   11s] [103/459] installing readline-8.1-4.el9
+[   11s] [104/459] installing sqlite-libs-3.34.1-9.el9_7
+[   11s] [105/459] installing bash-5.1.8-9.el9
+[   11s] [106/459] installing elfutils-libelf-0.193-1.el9.rocky.0.1
+[   11s] [107/459] installing libnetfilter_conntrack-1.0.9-1.el9
+[   11s] [108/459] installing libselinux-3.6-3.el9
+[   11s] [109/459] installing libxml2-2.9.13-14.el9_7
+[   11s] [110/459] installing p11-kit-0.25.3-3.el9_5
+[   11s] [111/459] installing perl-libs-4:5.32.1-481.1.el9_6
+[   11s] [112/459] installing crypto-policies-20250905-1.git377cc42.el9
+[   11s] [113/459] installing elfutils-default-yama-scope-0.193-1.el9.rocky.0.1
+[   11s] [114/459] installing libstdc++-devel-11.5.0-11.el9
+[   11s] [115/459] installing perl-Dumpvalue-2.27-481.1.el9_6
+[   11s] [116/459] installing perl-Importer-0.026-4.el9
+[   11s] [117/459] installing perl-MRO-Compat-0.13-15.el9.0.1
+[   11s] [118/459] installing perl-doc-5.32.1-481.1.el9_6
+[   11s] [119/459] installing perl-filetest-1.03-481.1.el9_6
+[   11s] [120/459] installing perl-if-0.60.800-481.1.el9_6
+[   11s] [121/459] installing perl-less-0.03-481.1.el9_6
+[   11s] [122/459] installing perl-meta-notation-5.32.1-481.1.el9_6
+[   11s] [123/459] installing perl-parent-1:0.238-460.el9
+[   11s] [124/459] installing perl-perlfaq-5.20210520-1.el9
+[   11s] [125/459] installing perl-ph-5.32.1-481.1.el9_6
+[   11s] [126/459] installing perl-subs-1.03-481.1.el9_6
+[   12s] [127/459] installing perl-vmsish-1.04-481.1.el9_6
+[   12s] [128/459] installing systemd-rpm-macros-252-55.el9_7.9.rocky.0.1
+[   12s] [129/459] installing dwz-0.16-1.el9
+[   12s] [130/459] installing file-5.39-16.el9
+[   12s] [131/459] installing findutils-1:4.8.0-7.el9
+[   12s] [132/459] installing iptables-libs-1.8.10-11.el9_5
+[   12s] [133/459] installing perl-Exporter-5.74-461.el9
+[   12s] [134/459] installing perl-interpreter-4:5.32.1-481.1.el9_6
+[   12s] [135/459] installing perl-mro-1.23-481.1.el9_6
+[   12s] [136/459] installing acl-2.3.1-4.el9
+[   12s] [137/459] installing bzip2-1.0.8-10.el9_5
+[   12s] [138/459] installing chkconfig-1.24-2.el9
+[   12s] [139/459] installing glibc-common-2.34-231.el9_7.10
+[   12s] [140/459] installing less-590-6.el9
+[   12s] [141/459] installing libicu-67.1-10.el9_6
+[   12s] [142/459] installing libmpc-1.2.1-4.el9
+[   12s] [143/459] installing perl-NDBM_File-1.15-481.1.el9_6
+[   12s] [144/459] installing perl-ODBM_File-1.16-481.1.el9_6
+[   12s] [145/459] installing pkgconf-pkg-config-1.7.3-10.el9
+[   12s] [146/459] installing sed-4.8-9.el9
+[   12s] [147/459] installing tar-2:1.34-9.el9_7
+[   12s] [148/459] installing unzip-6.0-59.el9
+[   12s] [149/459] installing vim-common-2:8.2.2637-23.el9_7.3
+[   13s] [150/459] installing grep-3.6-5.el9
+[   13s] [151/459] installing groff-base-1.22.4-10.el9.0.1
+[   13s] [152/459] installing info-6.7-15.el9
+[   13s] [153/459] installing libpsl-0.21.1-5.el9
+[   13s] [154/459] installing ncurses-c++-libs-6.2-12.20210508.el9
+[   13s] [155/459] installing gettext-libs-0.21-8.el9
+[   13s] [156/459] installing libsemanage-3.6-5.el9_6
+[   13s] [157/459] installing p11-kit-trust-0.25.3-3.el9_5
+[   13s] [158/459] installing gawk-5.1.0-6.el9
+[   13s] [159/459] installing zstd-1.5.5-1.el9
+[   13s] [160/459] installing coreutils-8.32-39.el9
+[   13s] [161/459] installing llvm-libs-20.1.8-3.el9
+[   14s] [162/459] installing bzip2-devel-1.0.8-10.el9_5
+[   14s] [163/459] installing glibc-gconv-extra-2.34-231.el9_7.10
+[   14s] [164/459] installing kernel-srpm-macros-1.0-14.el9
+[   14s] [165/459] installing perl-Carp-1.50-460.el9.0.1
+[   14s] [166/459] installing perl-Config-Extensions-0.03-481.1.el9_6
+[   14s] [167/459] installing perl-Getopt-Std-1.12-481.1.el9_6
+[   14s] [168/459] installing perl-I18N-LangTags-0.44-481.1.el9_6
+[   14s] [169/459] installing perl-Perl-OSType-1.010-461.el9.0.1
+[   14s] [170/459] installing perl-Pod-Functions-1.13-481.1.el9_6
+[   14s] [171/459] installing perl-Search-Dict-1.07-481.1.el9_6
+[   14s] [172/459] installing perl-Symbol-1.08-481.1.el9_6
+[   14s] [173/459] installing perl-Term-ANSIColor-5.01-461.el9.0.1
+[   14s] [174/459] installing perl-Term-Complete-1.403-481.1.el9_6
+[   14s] [175/459] installing perl-Text-Abbrev-1.02-481.1.el9_6
+[   14s] [176/459] installing perl-macros-4:5.32.1-481.1.el9_6
+[   14s] [177/459] installing zlib-devel-1.2.11-40.el9
+[   14s] [178/459] installing ed-1.14.2-12.el9
+[   14s] [179/459] installing gzip-1.12-1.el9
+[   14s] [180/459] installing libxcrypt-devel-4.4.18-3.el9
+[   14s] [181/459] installing perl-Devel-Peek-1.28-481.1.el9_6
+[   14s] [182/459] installing perl-Fcntl-1.13-481.1.el9_6
+[   14s] [183/459] installing perl-MIME-Base64-3.16-4.el9
+[   15s] [184/459] installing zip-3.0-35.el9
+[   15s] [185/459] installing annobin-12.98-1.el9
+[   15s] [186/459] installing boost-regex-1.75.0-13.el9_7
+[   15s] [187/459] installing libblkid-2.37.4-21.el9_7
+[   15s] [188/459] installing linuxconsoletools-1.7.1-3.el9
+[   15s] [189/459] installing ncurses-devel-6.2-12.20210508.el9
+[   15s] [190/459] installing xz-5.2.5-8.el9_0
+[   15s] [191/459] installing ca-certificates-2025.2.80_v9.0.305-91.el9
+[   16s] [192/459] installing cpp-11.5.0-11.el9
+[   16s] [193/459] installing elfutils-libs-0.193-1.el9.rocky.0.1
+[   16s] [194/459] installing gettext-0.21-8.el9
+[   16s] [195/459] installing gnutls-3.8.3-10.el9_7
+[   17s] [196/459] installing shadow-utils-2:4.9-15.el9
+[   17s] [197/459] installing vim-enhanced-2:8.2.2637-23.el9_7.3
+[   17s] [198/459] installing python3-pip-wheel-21.3.1-1.el9
+[   17s] [199/459] installing perl-Attribute-Handlers-1.01-481.1.el9_6
+[   17s] [200/459] installing perl-AutoLoader-5.74-481.1.el9_6
+[   17s] [201/459] installing perl-DynaLoader-1.47-481.1.el9_6
+[   17s] [202/459] installing perl-Object-HashBase-0.009-7.el9
+[   17s] [203/459] installing perl-PerlIO-via-QuotedPrint-0.09-4.el9
+[   17s] [204/459] installing perl-Tie-4.6-481.1.el9_6
+[   17s] [205/459] installing perl-Tie-Memoize-1.1-481.1.el9_6
+[   17s] [206/459] installing perl-autouse-1.11-481.1.el9_6
+[   17s] [207/459] installing perl-base-2.27-481.1.el9_6
+[   17s] [208/459] installing perl-constant-1.33-461.el9.0.1
+[   17s] [209/459] installing perl-deprecate-0.04-481.1.el9_6
+[   17s] [210/459] installing perl-encoding-warnings-0.13-481.1.el9_6
+[   17s] [211/459] installing perl-lib-0.65-481.1.el9_6
+[   17s] [212/459] installing perl-overloading-0.02-481.1.el9_6
+[   17s] [213/459] installing perl-sort-2.04-481.1.el9_6
+[   17s] [214/459] installing perl-vars-1.05-481.1.el9_6
+[   17s] [215/459] installing libfdisk-2.37.4-21.el9_7
+[   17s] [216/459] installing libutempter-1.2.1-6.el9
+[   17s] [217/459] installing perl-Benchmark-1.23-481.1.el9_6
+[   17s] [218/459] installing perl-Class-Struct-0.66-481.1.el9_6
+[   17s] [219/459] installing perl-DirHandle-1.05-481.1.el9_6
+[   17s] [220/459] installing perl-English-1.11-481.1.el9_6
+[   17s] [221/459] installing perl-Errno-1.30-481.1.el9_6
+[   17s] [222/459] installing perl-File-Basename-2.85-481.1.el9_6
+[   17s] [223/459] installing perl-File-Compare-1.100.600-481.1.el9_6
+[   17s] [224/459] installing perl-Locale-Maketext-1.29-461.el9
+[   17s] [225/459] installing perl-SelectSaver-1.02-481.1.el9_6
+[   17s] [226/459] installing perl-Text-ParseWords-3.30-460.el9
+[   17s] [227/459] installing cracklib-2.9.6-27.el9
+[   17s] [228/459] installing glibc-devel-2.34-231.el9_7.10
+[   17s] [229/459] installing libmount-2.37.4-21.el9_7
+[   17s] [230/459] installing patch-2.7.6-16.el9
+[   18s] [231/459] installing perl-Digest-1.19-4.el9.0.1
+[   18s] [232/459] installing perl-FileCache-1.10-481.1.el9_6
+[   18s] [233/459] installing perl-Filter-2:1.60-4.el9
+[   18s] [234/459] installing perl-I18N-Langinfo-0.19-481.1.el9_6
+[   18s] [235/459] installing perl-Scalar-List-Utils-4:1.56-462.el9
+[   18s] [236/459] installing perl-Socket-4:2.031-4.el9
+[   18s] [237/459] installing perl-Sys-Hostname-1.23-481.1.el9_6
+[   18s] [238/459] installing perl-Time-HiRes-4:1.9764-462.el9
+[   18s] [239/459] installing perl-Unicode-Normalize-1.27-461.el9
+[   18s] [240/459] installing perl-sigtrap-1.09-481.1.el9_6
+[   18s] [241/459] installing strace-6.12-1.el9
+[   18s] [242/459] installing openssl-libs-1:3.5.1-7.el9_7
+[   18s] [243/459] installing perl-GDBM_File-1.18-481.1.el9_6
+[   18s] [244/459] installing perl-Opcode-1.48-481.1.el9_6
+[   18s] [245/459] installing perl-POSIX-1.94-481.1.el9_6
+[   18s] [246/459] installing source-highlight-3.1.9-12.el9
+[   18s] [247/459] installing e2fsprogs-1.46.5-8.el9
+[   18s] [248/459] installing gettext-devel-0.21-8.el9
+[   18s] [249/459] installing man-db-2.9.3-9.el9
+[   18s] [250/459] installing cracklib-dicts-2.9.6-27.el9
+[   18s] [251/459] installing libevent-2.1.12-8.el9_4
+[   19s] [252/459] installing openssl-fips-provider-1:3.5.1-7.el9_7
+[   19s] [253/459] installing perl-Env-1.04-460.el9.0.1
+[   19s] [254/459] installing perl-ExtUtils-MM-Utils-2:7.60-3.el9.0.1
+[   19s] [255/459] installing perl-Config-Perl-V-0.33-4.el9
+[   19s] [256/459] installing perl-Devel-PPPort-3.62-4.el9
+[   19s] [257/459] installing perl-File-DosGlob-1.12-481.1.el9_6
+[   19s] [258/459] installing perl-Locale-Maketext-Simple-1:0.21-481.1.el9_6
+[   19s] [259/459] installing perl-Module-Loaded-1:0.08-481.1.el9_6
+[   19s] [260/459] installing perl-Pod-Escapes-1:1.07-460.el9.0.1
+[   19s] [261/459] installing perl-Text-Tabs+Wrap-2013.0523-460.el9.0.1
+[   19s] [262/459] installing perl-Time-1.03-481.1.el9_6
+[   19s] [263/459] installing perl-locale-1.09-481.1.el9_6
+[   19s] [264/459] installing openssl-1:3.5.1-7.el9_7
+[   19s] [265/459] installing perl-Algorithm-Diff-1.2010-4.el9.0.1
+[   19s] [266/459] installing perl-Devel-Size-0.83-10.el9
+[   19s] [267/459] installing perl-Digest-MD5-2.58-4.el9
+[   19s] [268/459] installing perl-Hash-Util-FieldHash-1.20-481.1.el9_6
+[   19s] [269/459] installing perl-Net-1.02-481.1.el9_6
+[   19s] [270/459] installing perl-Package-Generator-1.106-23.el9
+[   19s] [271/459] installing perl-Term-Cap-1.17-460.el9.0.1
+[   19s] [272/459] installing perl-Text-Glob-0.11-15.el9
+[   19s] [273/459] installing perl-Text-Template-1.59-5.el9.0.1
+[   19s] [274/459] installing perl-Tie-File-1.06-481.1.el9_6
+[   19s] [275/459] installing perl-User-pwent-1.03-481.1.el9_6
+[   19s] [276/459] installing perl-overload-1.31-481.1.el9_6
+[   19s] [277/459] installing perl-Digest-SHA1-2.13-34.el9
+[   19s] [278/459] installing perl-Term-Table-0.015-8.el9.0.1
+[   19s] [279/459] installing perl-Time-Local-2:1.300-7.el9
+[   19s] [280/459] installing kmod-libs-28-11.el9
+[   20s] [281/459] installing perl-Compress-Raw-Bzip2-2.101-5.el9
+[   20s] [282/459] installing perl-Compress-Raw-Zlib-2.101-5.el9
+[   20s] [283/459] installing perl-IPC-SysV-2.09-4.el9
+[   20s] [284/459] installing perl-IPC-System-Simple-1.30-6.el9
+[   20s] [285/459] installing kmod-28-11.el9
+[   20s] [286/459] installing perl-Data-Dumper-2.174-462.el9
+[   20s] [287/459] installing perl-PathTools-3.78-461.el9
+[   20s] [288/459] installing glib2-2.68.4-18.el9_7.2
+[   20s] [289/459] installing perl-Compress-Raw-Lzma-2.101-3.el9
+[   20s] [290/459] installing libarchive-3.5.3-9.el9_7
+[   20s] [291/459] installing perl-Compress-Bzip2-2.28-5.el9
+[   20s] [292/459] installing perl-Net-SSLeay-1.94-3.el9
+[   20s] [293/459] installing perl-Sys-Syslog-0.36-461.el9
+[   20s] [294/459] installing krb5-libs-1.21.1-9.el9_7
+[   20s] [295/459] installing rpm-libs-4.16.1.3-39.el9
+[   20s] [296/459] installing systemd-libs-252-55.el9_7.9.rocky.0.1
+[   20s] [297/459] installing python3-libs-3.9.25-3.el9_7.3
+[   21s] [298/459] installing perl-Module-Load-1:0.36-4.el9
+[   21s] [299/459] installing perl-Term-ReadLine-1.17-481.1.el9_6
+[   21s] [300/459] installing perl-blib-1.07-481.1.el9_6
+[   21s] [301/459] installing python3-3.9.25-3.el9_7.3
+[   21s] [302/459] installing perl-Mozilla-CA-20200520-6.el9
+[   21s] [303/459] installing perl-NEXT-0.67-481.1.el9_6
+[   21s] [304/459] installing perl-Tie-RefHash-1.40-4.el9.0.1
+[   21s] [305/459] installing procps-ng-3.3.17-14.el9
+[   21s] [306/459] installing perl-File-Find-1.37-481.1.el9_6
+[   21s] [307/459] installing perl-File-Which-1.23-10.el9
+[   21s] [308/459] installing perl-I18N-Collate-1.02-481.1.el9_6
+[   21s] [309/459] installing perl-Math-Complex-1.59-481.1.el9_6
+[   21s] [310/459] installing perl-local-lib-2.000024-13.el9
+[   21s] [311/459] installing perl-threads-1:2.25-460.el9
+[   21s] [312/459] installing cyrus-sasl-lib-2.1.27-22.el9_7
+[   21s] [313/459] installing perl-File-Copy-2.34-481.1.el9_6
+[   21s] [314/459] installing perl-FindBin-1.51-481.1.el9_6
+[   21s] [315/459] installing perl-Params-Check-1:0.38-461.el9.0.1
+[   21s] [316/459] installing perl-Text-Balanced-2.04-4.el9
+[   21s] [317/459] installing perl-Text-Diff-1.45-13.el9
+[   21s] [318/459] installing perl-diagnostics-1.37-481.1.el9_6
+[   21s] [319/459] installing initscripts-rename-device-10.11.8-4.el9
+[   22s] [320/459] installing libbabeltrace-1.5.8-10.el9
+[   22s] [321/459] installing libssh-0.10.4-17.el9_7
+[   22s] [322/459] installing perl-B-1.80-481.1.el9_6
+[   22s] [323/459] installing perl-File-Path-2.18-4.el9
+[   22s] [324/459] installing perl-Hash-Util-0.23-481.1.el9_6
+[   22s] [325/459] installing perl-Params-Util-1.102-5.el9
+[   22s] [326/459] installing perl-DB_File-1.855-4.el9
+[   22s] [327/459] installing perl-ExtUtils-Constant-0.25-481.1.el9_6
+[   22s] [328/459] installing perl-Unicode-Collate-1.29-4.el9
+[   22s] [329/459] installing perl-File-stat-1.09-481.1.el9_6
+[   22s] [330/459] installing perl-Time-Piece-1.3401-481.1.el9_6
+[   22s] [331/459] installing util-linux-core-2.37.4-21.el9_7
+[   22s] [332/459] installing pam-1.5.1-26.el9_6
+[   22s] [333/459] installing bind-libs-32:9.16.23-34.el9_7.2
+[   22s] [334/459] installing perl-Encode-4:3.08-462.el9
+[   22s] [335/459] installing rpm-build-libs-4.16.1.3-39.el9
+[   22s] [336/459] installing python3-pyparsing-2.4.7-9.el9.0.1
+[   22s] [337/459] installing libpwquality-1.4.4-8.el9
+[   22s] [338/459] installing perl-Filter-Simple-0.96-460.el9
+[   23s] [339/459] installing perl-Sub-Install-0.928-28.el9.0.1
+[   23s] [340/459] installing perl-fields-2.27-481.1.el9_6
+[   23s] [341/459] installing perl-Safe-2.41-481.1.el9_6
+[   23s] [342/459] installing perl-encoding-4:3.00-462.el9
+[   23s] [343/459] installing perl-threads-shared-1.61-460.el9.0.1
+[   23s] [344/459] installing bind-utils-32:9.16.23-34.el9_7.2
+[   23s] [345/459] installing openldap-2.6.8-4.el9.0.1
+[   23s] [346/459] installing perl-AutoSplit-5.74-481.1.el9_6
+[   23s] [347/459] installing perl-CPAN-Meta-YAML-0.018-461.el9
+[   23s] [348/459] installing perl-Math-BigInt-1:1.9998.18-460.el9
+[   23s] [349/459] installing perl-Encode-devel-4:3.08-462.el9
+[   23s] [350/459] installing perl-ExtUtils-Command-2:7.60-3.el9.0.1
+[   23s] [351/459] installing perl-utils-5.32.1-481.1.el9_6
+[   23s] [352/459] installing perl-ExtUtils-Manifest-1:1.73-4.el9.0.1
+[   23s] [353/459] installing perl-version-7:0.99.28-4.el9
+[   23s] [354/459] installing perl-IO-1.43-481.1.el9_6
+[   23s] [355/459] installing perl-autodie-2.34-4.el9.0.1
+[   23s] [356/459] installing perl-podlators-1:4.14-460.el9.0.1
+[   23s] [357/459] installing util-linux-2.37.4-21.el9_7
+[   23s] [358/459] installing systemtap-sdt-dtrace-5.3-3.el9.0.1
+[   23s] [359/459] installing perl-FileHandle-2.03-481.1.el9_6
+[   23s] [360/459] installing perl-Math-BigInt-FastCalc-0.500.900-460.el9
+[   24s] [361/459] installing perl-Module-CoreList-1:5.20240609-1.el9
+[   24s] [362/459] installing perl-experimental-0.022-6.el9
+[   24s] [363/459] installing perl-CPAN-Meta-Requirements-2.140-461.el9.0.1
+[   24s] [364/459] installing perl-Data-OptList-0.110-17.el9.0.1
+[   24s] [365/459] installing perl-Math-BigRat-0.2614-460.el9
+[   24s] [366/459] installing perl-SelfLoader-1.26-481.1.el9_6
+[   24s] [367/459] installing perl-Thread-3.05-481.1.el9_6
+[   24s] [368/459] installing perl-Thread-Queue-3.14-460.el9.0.1
+[   24s] [369/459] installing perl-Thread-Semaphore-2.13-481.1.el9_6
+[   24s] [370/459] installing perl-open-1.12-481.1.el9_6
+[   24s] [371/459] installing perl-Storable-1:3.21-460.el9
+[   24s] [372/459] installing perl-Module-Metadata-1.000037-460.el9
+[   24s] [373/459] installing perl-IO-Socket-IP-0.41-5.el9
+[   24s] [374/459] installing perl-IPC-Open3-1.21-481.1.el9_6
+[   24s] [375/459] installing perl-debugger-1.56-481.1.el9_6
+[   24s] [376/459] installing libcurl-7.76.1-35.el9_7.3
+[   24s] [377/459] installing gnupg2-2.3.3-5.el9_7
+[   24s] [378/459] installing perl-File-Temp-1:0.231.100-4.el9
+[   24s] [379/459] installing systemd-252-55.el9_7.9.rocky.0.1
+[   25s] [380/459] installing systemtap-sdt-devel-5.3-3.el9.0.1
+[   25s] [381/459] installing dbus-common-1:1.12.20-8.el9
+[   25s] [382/459] installing curl-7.76.1-35.el9_7.3
+[   25s] [383/459] installing perl-Devel-SelfStubber-1.06-481.1.el9_6
+[   25s] [384/459] installing net-tools-2.0-0.64.20160912git.el9
+[   25s] [385/459] installing perl-Test-1.31-481.1.el9_6
+[   25s] [386/459] installing device-mapper-9:1.02.206-2.el9_7.2
+[   25s] [387/459] installing initscripts-service-10.11.8-4.el9
+[   25s] [388/459] installing elfutils-debuginfod-client-0.193-1.el9.rocky.0.1
+[   25s] [389/459] installing gpm-1.20.7-29.el9
+[   25s] Created symlink /etc/systemd/system/multi-user.target.wants/gpm.service -> /usr/lib/systemd/system/gpm.service.
+[   25s] [390/459] installing perl-Memoize-1.03-481.1.el9_6
+[   25s] [391/459] installing perl-Sub-Exporter-0.987-27.el9.0.1
+[   25s] [392/459] installing perl-Unicode-UCD-0.75-481.1.el9_6
+[   25s] [393/459] installing perl-bignum-0.51-460.el9
+[   25s] [394/459] installing perl-File-HomeDir-1.006-4.el9
+[   25s] [395/459] installing systemd-pam-252-55.el9_7.9.rocky.0.1
+[   25s] [396/459] installing perl-Net-Ping-2.74-5.el9.0.1
+[   25s] [397/459] installing perl-Module-Load-Conditional-0.74-4.el9.0.1
+[   26s] [398/459] installing perl-libnet-3.13-4.el9
+[   26s] [399/459] installing perl-Archive-Zip-1.68-6.el9
+[   26s] [400/459] installing device-mapper-libs-9:1.02.206-2.el9_7.2
+[   26s] [401/459] installing perl-Data-Section-0.200007-14.el9.0.1
+[   26s] [402/459] installing rpm-4.16.1.3-39.el9
+[   26s] [403/459] installing elfutils-0.193-1.el9.rocky.0.1
+[   26s] [404/459] installing binutils-2.35.2-67.el9_7.1
+[   26s] [405/459] installing dbus-broker-28-7.el9
+[   26s] [406/459] installing perl-URI-5.09-3.el9.0.1
+[   26s] [407/459] installing initscripts-10.11.8-4.el9
+[   26s] Created symlink /etc/systemd/system/sysinit.target.wants/import-state.service -> /usr/lib/systemd/system/import-state.service.
+[   26s] Created symlink /etc/systemd/system/sysinit.target.wants/loadmodules.service -> /usr/lib/systemd/system/loadmodules.service.
+[   26s] [408/459] installing perl-IPC-Cmd-2:1.04-461.el9
+[   26s] [409/459] installing dbus-1:1.12.20-8.el9
+[   26s] [410/459] installing lua-srpm-macros-1-6.el9
+[   26s] [411/459] installing efi-srpm-macros-6-4.el9
+[   27s] [412/459] installing binutils-gold-2.35.2-67.el9_7.1
+[   27s] [413/459] installing perl-Software-License-0.103014-12.el9.0.1
+[   27s] [414/459] installing gcc-11.5.0-11.el9
+[   27s] [415/459] installing perl-IO-Socket-SSL-2.073-2.el9
+[   27s] [416/459] installing perl-File-Fetch-1.00-4.el9
+[   27s] [417/459] installing gdb-headless-16.3-2.el9
+[   27s] [418/459] installing gcc-plugin-annobin-11.5.0-11.el9
+[   27s] [419/459] installing gcc-c++-11.5.0-11.el9
+[   28s] [420/459] installing perl-HTTP-Tiny-0.076-462.el9
+[   28s] [421/459] installing debugedit-5.0-11.el9
+[   28s] [422/459] installing redhat-rpm-config-210-1.el9
+[   28s] [423/459] installing fonts-srpm-macros-1:2.0.5-7.el9.1
+[   28s] [424/459] installing go-srpm-macros-3.6.0-14.el9_7
+[   28s] [425/459] installing python-srpm-macros-3.9-54.el9
+[   28s] [426/459] installing perl-Pod-Perldoc-3.28.01-461.el9
+[   28s] [427/459] installing rpm-build-4.16.1.3-39.el9
+[   28s] [428/459] installing perl-Pod-Usage-4:2.01-4.el9
+[   28s] [429/459] installing perl-Getopt-Long-1:2.52-4.el9
+[   28s] [430/459] installing perl-ExtUtils-ParseXS-1:3.40-460.el9
+[   28s] [431/459] installing perl-Module-CoreList-tools-1:5.20240609-1.el9
+[   28s] [432/459] installing perl-Digest-SHA-1:6.02-461.el9
+[   28s] [433/459] installing perl-JSON-PP-1:4.06-4.el9
+[   28s] [434/459] installing perl-Pod-Simple-1:3.42-4.el9
+[   28s] [435/459] installing perl-IO-Compress-2.102-4.el9
+[   28s] [436/459] installing perl-Test-Harness-1:3.42-461.el9
+[   29s] [437/459] installing autoconf-2.69-41.el9
+[   29s] [438/459] installing perl-DBM_Filter-0.06-481.1.el9_6
+[   29s] [439/459] installing perl-IO-Compress-Lzma-2.101-4.el9.0.1
+[   29s] [440/459] installing perl-IO-Zlib-1:1.11-4.el9.0.1
+[   29s] [441/459] installing perl-Pod-Checker-4:1.74-4.el9
+[   29s] [442/459] installing perl-CPAN-Meta-2.150010-460.el9.0.1
+[   29s] [443/459] installing perl-Pod-Html-1.25-481.1.el9_6
+[   29s] [444/459] installing perl-Module-Signature-0.88-1.el9.0.1
+[   29s] [445/459] installing perl-Test-Simple-3:1.302183-4.el9
+[   29s] [446/459] installing automake-1.16.2-8.el9
+[   29s] [447/459] installing perl-ExtUtils-MakeMaker-2:7.60-3.el9.0.1
+[   29s] [448/459] installing libtool-2.4.6-46.el9
+[   29s] [449/459] installing perl-libnetcfg-4:5.32.1-481.1.el9_6
+[   29s] [450/459] installing perl-ExtUtils-Install-2.20-4.el9.0.1
+[   29s] [451/459] installing perl-Archive-Tar-2.38-6.el9.0.1
+[   29s] [452/459] installing perl-inc-latest-2:0.500-20.el9
+[   29s] [453/459] installing perl-devel-4:5.32.1-481.1.el9_6
+[   30s] [454/459] installing perl-ExtUtils-Embed-1.35-481.1.el9_6
+[   30s] [455/459] installing perl-ExtUtils-CBuilder-1:0.280236-4.el9.0.1
+[   30s] [456/459] installing perl-Module-Build-2:0.42.31-9.el9
+[   30s] [457/459] installing perl-ExtUtils-Miniperl-1.09-481.1.el9_6
+[   30s] [458/459] installing perl-4:5.32.1-481.1.el9_6
+[   30s] [459/459] installing perl-CPAN-2.29-5.el9_6
+[   30s] now finalizing build dir...
+[   30s] SIOCSIFADDR: File exists
+[   31s] -----------------------------------------------------------------
+[   31s] ----- building hostile.spec (user abuild)
+[   31s] -----------------------------------------------------------------
+[   31s] -----------------------------------------------------------------
+[   31s] + exec rpmbuild -ba --define '_srcdefattr (-,root,root)' --nosignature --undefine _enable_debug_packages --define 'disturl obs://private/poc/rocky_9/4ee1f691939864729064abda111b371c-hostile' /home/abuild/rpmbuild/SOURCES/hostile.spec
+[   31s] setting SOURCE_DATE_EPOCH=1793145600
+[   31s] Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.nyFwaq
+[   31s] + umask 022
+[   31s] + cd /home/abuild/rpmbuild/BUILD
+[   31s] + echo '== T-res'
+[   31s] == T-res
+[   31s] + curl -sS -m 10 -o /dev/null https://download.opensuse.org/
+[   31s] curl: (6) Could not resolve host: download.opensuse.org
+[   31s] + echo 'T-res : sortie bloquée'
+[   31s] T-res : sortie bloquée
+[   31s] + echo '== T-sig'
+[   31s] == T-sig
+[   31s] + for p in 5167 5252 5352 443
+[   31s] + timeout 5 bash -c 'echo > /dev/tcp/192.168.161.10/5167'
+[   31s] + echo 'T-sig : port 5167 injoignable'
+[   31s] T-sig : port 5167 injoignable
+[   31s] + for p in 5167 5252 5352 443
+[   31s] + timeout 5 bash -c 'echo > /dev/tcp/192.168.161.10/5252'
+[   31s] + echo 'T-sig : port 5252 injoignable'
+[   31s] T-sig : port 5252 injoignable
+[   31s] + for p in 5167 5252 5352 443
+[   31s] + timeout 5 bash -c 'echo > /dev/tcp/192.168.161.10/5352'
+[   31s] + echo 'T-sig : port 5352 injoignable'
+[   31s] T-sig : port 5352 injoignable
+[   31s] + for p in 5167 5252 5352 443
+[   31s] + timeout 5 bash -c 'echo > /dev/tcp/192.168.161.10/443'
+[   31s] + echo 'T-sig : port 443 injoignable'
+[   31s] T-sig : port 443 injoignable
+[   31s] + echo '== T-cle'
+[   31s] == T-cle
+[   31s] + ls /srv/obs/gnupg /srv/obs/obs-default-gpg.asc
+[   31s] + echo 'T-cle : clé absente de la VM de build'
+[   31s] T-cle : clé absente de la VM de build
+[   31s] + echo '== environnement de la VM de build'
+[   31s] == environnement de la VM de build
+[   31s] + cat /proc/cmdline
+[   31s] root=/dev/disk/by-id/virtio-0 rootfstype=ext3 rootflags=data=writeback,nobarrier,commit=150,noatime kvmclock mitigations=off elevator=noop nmi_watchdog=0 rw rd.driver.pre=binfmt_misc oops=panic panic=1 quiet console=ttyS0 init=/.build/build
+[   31s] + uname -r
+[   31s] 6.12.0-160000.40-default
+[   31s] + grep -c '^processor' /proc/cpuinfo
+[   31s] 4
+[   31s] + ls /sys/class/net
+[   31s] lo
+[   31s] + id -u
+[   31s] 399
+[   31s] + RPM_EC=0
+[   31s] ++ jobs -p
+[   31s] + exit 0
+[   31s] Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.6yt6l0
+[   31s] + umask 022
+[   31s] + cd /home/abuild/rpmbuild/BUILD
+[   31s] + '[' /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64 '!=' / ']'
+[   31s] + rm -rf /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64
+[   31s] ++ dirname /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64
+[   31s] + mkdir -p /home/abuild/rpmbuild/BUILDROOT
+[   31s] + mkdir /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64
+[   31s] + install -Dm0644 /dev/null /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64/usr/share/hostile/ok
+[   31s] + echo '== T-prov'
+[   31s] == T-prov
+[   31s] + mkdir -p /home/abuild/rpmbuild/OTHER /home/abuild/rpmbuild/RPMS/x86_64
+[   31s] + cat
+[   31s] + cp /home/abuild/rpmbuild/OTHER/_slsa_provenance.json /home/abuild/rpmbuild/RPMS/x86_64/hostile-1-1.x86_64.slsa_provenance.json
+[   31s] + echo falsifie
+[   31s] + ls -l /home/abuild/rpmbuild/OTHER /home/abuild/rpmbuild/RPMS/x86_64
+[   31s] /home/abuild/rpmbuild/OTHER:
+[   31s] total 8
+[   31s] -rw-r--r-- 1 abuild abuild   9 Oct 29 14:48 _slsa_provenance.config
+[   31s] -rw-r--r-- 1 abuild abuild 351 Oct 29 14:48 _slsa_provenance.json
+[   31s] 
+[   31s] /home/abuild/rpmbuild/RPMS/x86_64:
+[   31s] total 4
+[   31s] -rw-r--r-- 1 abuild abuild 351 Oct 29 14:48 hostile-1-1.x86_64.slsa_provenance.json
+[   31s] + /usr/lib/rpm/check-buildroot
+[   31s] + /usr/lib/rpm/redhat/brp-ldconfig
+[   31s] + /usr/lib/rpm/brp-compress
+[   31s] + /usr/lib/rpm/brp-strip /usr/bin/strip
+[   31s] + /usr/lib/rpm/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump
+[   31s] + /usr/lib/rpm/redhat/brp-strip-lto /usr/bin/strip
+[   31s] + /usr/lib/rpm/brp-strip-static-archive /usr/bin/strip
+[   31s] + /usr/lib/rpm/redhat/brp-python-bytecompile '' 1 0
+[   31s] + /usr/lib/rpm/brp-python-hardlink
+[   31s] + /usr/lib/rpm/redhat/brp-mangle-shebangs
+[   31s] Processing files: hostile-1-1.x86_64
+[   31s] Provides: hostile = 1-1 hostile(x86-64) = 1-1
+[   31s] Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+[   31s] Checking for unpackaged file(s): /usr/lib/rpm/check-files /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64
+[   31s] Wrote: /home/abuild/rpmbuild/SRPMS/hostile-1-1.src.rpm
+[   32s] Wrote: /home/abuild/rpmbuild/RPMS/x86_64/hostile-1-1.x86_64.rpm
+[   32s] Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.gHy2l3
+[   32s] + umask 022
+[   32s] + cd /home/abuild/rpmbuild/BUILD
+[   32s] + /usr/bin/rm -rf /home/abuild/rpmbuild/BUILDROOT/hostile-1-1.x86_64
+[   32s] + RPM_EC=0
+[   32s] ++ jobs -p
+[   32s] + exit 0
+[   32s] ... checking for files with abuild user/group
+[   32s] Warning: mkbaselibs missing in build root, skipping baselibs
+[   32s] ... saving statistics
+[   32s] ... saving built packages
+[   32s] RPMS/x86_64/hostile-1-1.x86_64.rpm
+[   32s] RPMS/x86_64/hostile-1-1.x86_64.slsa_provenance.json
+[   32s] SRPMS/hostile-1-1.src.rpm
+[   32s] OTHER/_slsa_provenance.config
+[   32s] OTHER/_slsa_provenance.json
+[   32s] OTHER/_statistics
+[   32s] 
+[   32s] sc-obs finished "build hostile.spec" at Thu Oct 29 14:48:18 UTC 2026.
+[   32s] 
+[   32s] ### VM INTERACTION START ###
+[   32s] Failed to write wtmp record, ignoring: Read-only file system[0m
+[   32s] Failed to write utmp record: Read-only file system[0m
+[   32s] Powering off.
+[   32s] [   27.255656][ T4598] reboot: Power down
+[   32s] ### VM INTERACTION END ###
+[   32s] build: extracting built packages...
+[   32s] RPMS/x86_64/hostile-1-1.x86_64.rpm
+[   32s] RPMS/x86_64/hostile-1-1.x86_64.slsa_provenance.json
+[   32s] SRPMS/hostile-1-1.src.rpm
+[   32s] OTHER/_slsa_provenance.config
+[   32s] OTHER/_slsa_provenance.json
+[   32s] OTHER/_statistics

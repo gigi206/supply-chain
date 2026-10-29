@@ -33,8 +33,9 @@ hostile() {
   done
   echo "## Journal de build (lignes des tests)"
   s "osc remotebuildlog poc hostile rocky_9 x86_64" > "$R/tests-hostile-build.log" 2>&1 || true
-  grep -E '^(\[ *[0-9.]+\] )?(== |T-|/proc|BOOT_IMAGE|[0-9]+$|lo$|eth0$)' "$R/tests-hostile-build.log" | sed 's/^\[ *[0-9.]*\] //' | head -40
-  grep -m3 -E 'booting kvm|Linux version|kvm' "$R/tests-hostile-build.log" | sed 's/^/  /'
+  grep -E '^\[ *[0-9]+s\] (== |T-|root=|[0-9.]+-[0-9]+-default$|[0-9]+$|lo$|eth[0-9]$|-rw|/home/abuild/rpmbuild/(OTHER|RPMS))' "$R/tests-hostile-build.log" \
+    | sed -E 's/^\[ *[0-9]+s\] //' || true
+  grep -m1 -o -E 'Doing [a-z]+ build' "$R/tests-hostile-build.log" | sed 's/^/  /' || true
   echo "## Binaires publiés"
   s "osc ls -b -l poc hostile -r rocky_9 -a x86_64"
   echo "## Provenances publiées"

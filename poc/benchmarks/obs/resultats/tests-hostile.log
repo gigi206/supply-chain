@@ -1,0 +1,43 @@
+# tests.sh hostile, 2026-10-29T14:49:13Z
+Sending meta data...
+Done.
+A    poc/hostile
+A    poc/hostile/hostile.spec
+At revision 1.
+nothing to do for package hostile
+14:49:49 rocky_9 : succeeded
+## Journal de build (lignes des tests)
+== T-res
+T-res : sortie bloquée
+== T-sig
+T-sig : port 5167 injoignable
+T-sig : port 5252 injoignable
+T-sig : port 5352 injoignable
+T-sig : port 443 injoignable
+== T-cle
+T-cle : clé absente de la VM de build
+== environnement de la VM de build
+root=/dev/disk/by-id/virtio-0 rootfstype=ext3 rootflags=data=writeback,nobarrier,commit=150,noatime kvmclock mitigations=off elevator=noop nmi_watchdog=0 rw rd.driver.pre=binfmt_misc oops=panic panic=1 quiet console=ttyS0 init=/.build/build
+4
+lo
+399
+== T-prov
+/home/abuild/rpmbuild/OTHER:
+-rw-r--r-- 1 abuild abuild   9 Oct 29 14:48 _slsa_provenance.config
+-rw-r--r-- 1 abuild abuild 351 Oct 29 14:48 _slsa_provenance.json
+/home/abuild/rpmbuild/RPMS/x86_64:
+-rw-r--r-- 1 abuild abuild 351 Oct 29 14:48 hostile-1-1.x86_64.slsa_provenance.json
+  Doing kvm build
+## Binaires publiés
+   112920 Oct 29 14:48 _buildenv                               
+    36949 Oct 29 14:48 _slsa_provenance.config                 
+   198561 Oct 29 14:48 _slsa_provenance.json                   
+     1394 Oct 29 14:48 _statistics                             
+     7474 Oct 29 14:48 hostile-1-1.src.rpm                     
+     6943 Oct 29 14:48 hostile-1-1.x86_64.rpm                  
+## Provenances publiées
+_slsa_provenance.json : DSSE ; sujets : hostile-1-1.x86_64.rpm=7d6aa3cd50be9168…, hostile-1-1.src.rpm=1014fdeef0dce875… ; builder : obs://private ; buildType : https://open-build-service.org/worker
+hostile-1-1.x86_64.slsa_provenance.json : absent
+Creating directory "hostile-bin"
+7d6aa3cd50be916803992d1b098a1f16d634a89a3630b282be14b77fecdf3498  hostile-bin/hostile-1-1.x86_64.rpm
+_slsa_provenance.json (hostile) : signature DSSE valide, clé E8B41B97868AFF2CAC28C5C11623E6E2967FFC39

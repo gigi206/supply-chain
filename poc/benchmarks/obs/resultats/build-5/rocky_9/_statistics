@@ -1,0 +1,64 @@
+<buildstatistics>
+  <disk>
+    <usage>
+      <size unit="M">1212</size>
+      <io_requests>62848</io_requests>
+      <io_sectors>4023922</io_sectors>
+    </usage>
+  </disk>
+  <memory>
+    <usage>
+      <size unit="M">416</size>
+    </usage>
+  </memory>
+  <times>
+    <total>
+      <time unit="s">50</time>
+    </total>
+    <preinstall>
+      <time unit="s">3</time>
+    </preinstall>
+    <install>
+      <time unit="s">27</time>
+    </install>
+    <main>
+      <time unit="s">13</time>
+    </main>
+    <postchecks>
+      <time unit="s">0</time>
+    </postchecks>
+    <rpmlint>
+      <time unit="s">0</time>
+    </rpmlint>
+    <buildcmp>
+      <time unit="s">0</time>
+    </buildcmp>
+    <deltarpms>
+      <time unit="s">0</time>
+    </deltarpms>
+    <download>
+      <time unit="s">1</time>
+    </download>
+    <cpusteal>
+      <time unit="s">0</time>
+    </cpusteal>
+  </times>
+  <download>
+    <size unit="k">2610</size>
+    <binaries>6</binaries>
+    <cachehits>466</cachehits>
+  </download>
+  <info>
+    <workerid>sc-obs:1</workerid>
+    <hostarch>x86_64</hostarch>
+    <srcmd5>85347ea794c63a5435416b2374025c50</srcmd5>
+    <verifymd5>85347ea794c63a5435416b2374025c50</verifymd5>
+    <rev>1</rev>
+    <file>sample-app.spec</file>
+    <buildtype>spec</buildtype>
+    <readytime>1793286804</readytime>
+    <starttime>1793286848</starttime>
+    <endtime>1793286898</endtime>
+    <jobid>8df782307934602a00e0637745e4140a</jobid>
+  </info>
+</buildstatistics>

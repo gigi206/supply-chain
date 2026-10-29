@@ -1,0 +1,54 @@
+# horsligne.sh build-5 (référence build-3), 2026-10-29T15:13:12Z
+table inet banc_a2 {
+	chain sortie {
+		type filter hook output priority filter; policy accept;
+		oif "lo" accept
+		ip daddr 192.168.161.10 accept
+		ip daddr 192.168.161.1 tcp sport 22 accept
+		ip daddr 192.168.161.1 meta l4proto { tcp, udp } th dport 53 counter packets 0 bytes 0 accept
+		counter packets 0 bytes 0 log prefix "banc-a2-sortie " drop
+	}
+}
+contrôle : sortie bloquée (curl échoue)
+## Build hors ligne
+## Collecte
+rocky_9 : 2 fichiers ; type de VM : Doing kvm build
+  defba3ecc3e1188a84bb45f43c8afea2b561cffd55648c777780457b09f0b062  sample-app-1.0.0-1.src.rpm
+  0dea909eca765e3970b7ee1040eed2ffe8da8a8d5e5d8a7dfc76893d0be37461  sample-app-1.0.0-1.x86_64.rpm
+debian_13 : 6 fichiers ; type de VM : Doing kvm build
+  863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f  sample-app_1.0.0-1.debian.tar.xz
+  9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6  sample-app_1.0.0-1.dsc
+  a79413968cc5e0e46bdafd977a629a82db2b6c539d0bd565fb20538954930d86  sample-app_1.0.0-1_amd64.buildinfo
+  ecca4636c2b78d3d072b3b634360110f89906fe8b0cb8284ed4bc6aca9a816cb  sample-app_1.0.0-1_amd64.changes
+  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5  sample-app_1.0.0-1_amd64.deb
+  07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz
+## Sorties bloquées pendant le build
+ip daddr 192.168.161.1 meta l4proto { tcp, udp } th dport 53 counter packets 104 bytes 6388 accept
+counter packets 36 bytes 2160 log prefix "banc-a2-sortie " drop
+     20 151.101.122.132 TCP 443
+      9 195.135.223.50 TCP 80
+      7 195.135.223.226 TCP 443
+## Comparaison avec build-3
+debian_13/sample-app_1.0.0-1_amd64.deb
+  nevra                    = sample-app_1.0.0-1_amd64
+  sha256                   = 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+  => IDENTIQUE (fichier entier)
+rocky_9/sample-app-1.0.0-1.src.rpm
+  nevra                    = sample-app-1.0.0-1.x86_64
+  buildtime                = 1793145600
+  buildhost                = reproducible
+  disturl                  = obs://private/poc/rocky_9/85347ea794c63a5435416b2374025c50-sample-app
+  signature                = PGP,RSA
+  sha256_hors_signature    = e5cbf401e1066b5484488266520b6de3b71288805dcc96156055cc7551066814
+  sha256                   ≠ 10f4912c6a6306b8fbdb7a2dddde3673924ee8269ff72ad3e71bf4850f09a248  |  defba3ecc3e1188a84bb45f43c8afea2b561cffd55648c777780457b09f0b062
+  => IDENTIQUE (hors signature)
+rocky_9/sample-app-1.0.0-1.x86_64.rpm
+  nevra                    = sample-app-1.0.0-1.x86_64
+  buildtime                = 1793145600
+  buildhost                = reproducible
+  disturl                  = obs://private/poc/rocky_9/85347ea794c63a5435416b2374025c50-sample-app
+  signature                = PGP,RSA
+  sha256_hors_signature    = 57343ca678561e135f8e0e7c17b4ae48221bbe8c1798113e8e9ad99dc0ff77e2
+  sha256                   ≠ f30dcf0fbe75e3f1c370d3dd3eb3d78cde6ba5380f6d825792be9213f2b5837f  |  0dea909eca765e3970b7ee1040eed2ffe8da8a8d5e5d8a7dfc76893d0be37461
+  => IDENTIQUE (hors signature)
+RÉSULTAT : tous les paquets identiques (rpm hors signature, deb entiers)

@@ -1,0 +1,30 @@
+# preuves.sh, 2026-10-29T14:50:28Z
+## Licences
+openSUSE/open-build-service : GPL-2.0 ; archivé : false
+openSUSE/obs-build : GPL-2.0 ; archivé : false
+openSUSE/obs-sign : GPL-2.0 ; archivé : false
+## Releases (tags) et écart avec master
+  2.10.30 : 2025-12-17T10:38:59Z
+  2.10.31 : 2026-03-10T12:14:14Z
+  2.10.32 : 2026-04-24T13:12:38Z
+  2.10.33 : 2026-07-16T13:05:47Z
+  2.10.34 : 2026-08-05T12:18:30Z
+commits de master non publiés depuis 2.10.34 : 21964
+## Santé : commits humains depuis 2026-07-31T00:00:00Z
+openSUSE/open-build-service : 638 commits, 21 auteurs ; domaines : suse.com 179 ; gmail.com 163 ; suse.de 161 ; opensuse.org 124 ; 
+openSUSE/obs-build : 92 commits, 5 auteurs ; domaines : suse.de 90 ; users.noreply.github.com 1 ; suse.com 1 ; 
+openSUSE/obs-sign : 10 commits, 1 auteurs ; domaines : suse.de 10 ; 
+Employeur déclaré (profil GitHub) des auteurs sans adresse suse.com / suse.de :
+  hennevogel (125) : SUSE
+  rubhanazeem (77) : SUSE
+  danidoni (74) : non renseigné
+  Dotify71 (5) : non renseigné
+  RedZapdos123 (3) : Indian Institute of Information Technology, Allahabad
+  pranavchoudhary-tech (2) : non renseigné
+  wineee (1) : @NixOS @linuxdeepin 
+  bmwiedemann (1) : @SUSE
+  bhavesh-210 (1) : non renseigné
+  anant2526 (1) : non renseigné
+  Kardbord (1) : non renseigné
+  Jarvis-J-Jacob (1) : non renseigné
+Auteurs distincts (tous dépôts) : 23 ; part des commits du premier auteur : 18 %

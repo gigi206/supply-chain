@@ -1,0 +1,46 @@
+# etat.sh repos, 2026-10-29T15:16:36Z
+## Builds en cours : 0
+## RAM
+qemu (sc-obs), RSS vu de l'hôte (mémoire touchée par la VM, non rendue) :7.94 Gi
+               total        used        free      shared  buff/cache   available
+Mem:            7939        3672        2035           3        2507        4267
+## Composants (services de longue durée)
+  apache2.service
+  mariadb.service
+  memcached.service
+  obs-clockwork.service
+  obs-delayedjob-queue-consistency_check.service
+  obs-delayedjob-queue-default.service
+  obs-delayedjob-queue-issuetracking.service
+  obs-delayedjob-queue-mailers.service
+  obs-delayedjob-queue-project_log_rotate.service
+  obs-delayedjob-queue-quick@.service
+  obs-delayedjob-queue-releasetracking.service
+  obs-delayedjob-queue-scm.service
+  obs-delayedjob-queue-staging.service
+  obs-gitea-bridge.service
+  obs-sphinx.service
+  obsdeltastore.service
+  obsdispatcher.service
+  obsdodup.service
+  obspublisher.service
+  obsrepserver.service
+  obsscheduler.service
+  obsservice.service
+  obsservicedispatch.service
+  obssignd.service
+  obssigner.service
+  obssrcserver.service
+  obswarden.service
+  obsworker.service
+total : 28 (gabarits comptés une fois)
+processus de l'appliance (hors noyau) : 100
+## Disque
+Capacity:       40.00 GiB
+Allocation:     17.54 GiB
+/dev/vda3        28G   22G  4.7G  83% /
+/dev/vda2        10G  228M  9.8G   3% /srv/obs/service
+568M	/srv/obs/build
+492K	/srv/obs/sources
+92K	/srv/obs/repos
+169M	/srv/obs/MySQL

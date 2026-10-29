@@ -170,6 +170,14 @@ run = "poc/benchmarks/obs/etat.sh"
 description = "Banc A2 : compare deux builds collectés (NEVRA, rpm hors signature, deb) dans resultats/comparaison-<A>-<B>.txt"
 run = "poc/benchmarks/obs/comparer.sh"
 
+[tasks."obs:horsligne"]
+description = "Banc A2 : rebuild avec toute sortie de l'appliance bloquée et journalisée (nftables), comparé à un build de référence"
+run = "poc/benchmarks/obs/horsligne.sh"
+
+[tasks."obs:preuves"]
+description = "Banc A2 : santé et pérennité d'OBS (commits humains sur 90 jours, auteurs, employeurs, licences, releases)"
+run = "poc/benchmarks/obs/preuves.sh"
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]

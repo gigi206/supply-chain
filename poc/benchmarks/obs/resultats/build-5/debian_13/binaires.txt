@@ -1,0 +1,10 @@
+    42406 Oct 29 15:14 _buildenv                               
+    10449 Oct 29 15:14 _slsa_provenance.config                 
+    91285 Oct 29 15:14 _slsa_provenance.json                   
+     1464 Oct 29 15:14 _statistics                             
+     2684 Oct 29 15:13 sample-app_1.0.0-1.debian.tar.xz        
+      919 Oct 29 15:13 sample-app_1.0.0-1.dsc                  
+     5613 Oct 29 15:14 sample-app_1.0.0-1_amd64.buildinfo      
+     1871 Oct 29 15:14 sample-app_1.0.0-1_amd64.changes        
+  1952080 Oct 29 15:14 sample-app_1.0.0-1_amd64.deb            
+   140171 Oct 29 15:13 sample-app_1.0.0.orig.tar.gz            
