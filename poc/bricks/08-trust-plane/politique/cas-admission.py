@@ -74,6 +74,8 @@ cas("tr-compte-default", "FAIL", TR, "compte de service autre que build", lambda
 cas("tr-gabarit-volume-secret", "FAIL", TR, "podTemplate avec un volume secret",
     lambda o: o["spec"]["podTemplate"].update(volumes=[{"name": "s", "secret": {"secretName": "forgejo-webhook"}}]))
 cas("tr-gabarit-hostnetwork", "FAIL", TR, "podTemplate en hostNetwork", lambda o: o["spec"]["podTemplate"].update(hostNetwork=True))
+cas("tr-gabarit-jeton", "FAIL", TR, "podTemplate qui monte le jeton du compte de service",
+    lambda o: o["spec"]["podTemplate"].update(automountServiceAccountToken=True))
 cas("tr-workspace-secret", "FAIL", TR, "workspace lié à un secret",
     lambda o: o["spec"].update(workspaces=[{"name": "w", "secret": {"secretName": "forgejo-webhook"}}]))
 cas("pr-bundle-signe", "PASS", PR, "bundle de tekton/pipelines, épinglé par digest")
@@ -107,6 +109,19 @@ cas("zone-tolerance-universelle", "FAIL", ZONE, "pod de tekton-chains qui tolèr
     lambda o: o["spec"].update(tolerations=[{"operator": "Exists"}]))
 cas("zone-nodename-build", "FAIL", ZONE, "pod d'openbao placé directement sur sc-build (nodeName)",
     lambda o: (o["metadata"].update(namespace="openbao"), o["spec"].update(nodeName="sc-build")))
+cas("zone-declencheurs", "FAIL", ZONE, "pod de declencheurs (EventListener) sans nodeSelector",
+    lambda o: (o["metadata"].update(namespace="declencheurs"), o["spec"].pop("nodeSelector")))
+# Zone build (pods des TaskRuns) ; automountServiceAccountToken explicite : le CLI ne voit pas le jeton ajouté par l'API
+BUILD = copy.deepcopy(POD)
+BUILD["metadata"]["namespace"] = "builds"
+BUILD["spec"].update(nodeSelector={"zone": "build"}, tolerations=GABARIT["tolerations"], serviceAccountName="build",
+                     automountServiceAccountToken=False)
+cas("build-pod", "PASS", BUILD, "pod de builds sur le nœud de build, sans jeton")
+cas("build-sans-nodeselector", "FAIL", BUILD, "pod de builds sans nodeSelector", lambda o: o["spec"].pop("nodeSelector"))
+cas("build-nodename-confiance", "FAIL", BUILD, "pod de builds placé directement sur sc-confiance (nodeName)",
+    lambda o: o["spec"].update(nodeName="sc-confiance"))
+cas("build-jeton", "FAIL", BUILD, "pod de builds avec un volume de jeton de compte de service",
+    lambda o: o["spec"].update(volumes=[{"name": "jeton", "projected": {"sources": [{"serviceAccountToken": {"path": "token"}}]}}]))
 # StepAction
 cas("stepaction", "FAIL", {"apiVersion": "tekton.dev/v1beta1", "kind": "StepAction", "metadata": {"name": "x", "namespace": "builds"},
                            "spec": {"image": busybox, "script": "true"}}, "création d'une StepAction")

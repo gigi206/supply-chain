@@ -1,0 +1,190 @@
+# Brique 08, J6 : webhook Forgejo → EventListener → PipelineRun, sorti de l'espace builds (constat de J4 : un TaskRun de
+# builds pouvait monter le secret HMAC). L'EventListener, son compte et le secret forgejo-webhook vivent dans l'espace de
+# confiance declencheurs ; la TriggerTemplate crée le PipelineRun dans builds (metadata.namespace du gabarit, lu dans le
+# code de Triggers v0.37.2 : pkg/resources/create.go). @PIPELINE@ : bundle signé, épinglé par digest (politique.sh).
+#
+# Droits du compte el-forgejo, lus dans le code de Triggers v0.37.2 (au lieu des deux ClusterRoles de la release) :
+#   - informateurs limités à son espace (cmd/eventlistenersink : WithNamespaceScope) : eventlisteners, triggers,
+#     triggerbindings, triggertemplates, interceptors ; ConfigMaps de son espace (adaptateur knative) ; événements ;
+#   - clusterinterceptors et clustertriggerbindings : ressources de cluster ;
+#   - aucun secret : le secret HMAC est lu par le service des intercepteurs, avec son propre compte, dans l'espace du
+#     trigger (pkg/interceptors/secret_getter.go) ; aucune impersonation (aucun trigger ne porte de serviceAccountName) ;
+#   - dans builds : création de PipelineRuns seulement.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: declencheurs
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: el-forgejo
+  namespace: declencheurs
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: el-forgejo
+  namespace: declencheurs
+rules:
+- apiGroups: [triggers.tekton.dev]
+  resources: [eventlisteners, triggers, triggerbindings, triggertemplates, interceptors]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [events]
+  verbs: [create, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: el-forgejo
+  namespace: declencheurs
+subjects:
+- kind: ServiceAccount
+  name: el-forgejo
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: el-forgejo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: el-forgejo-cluster
+rules:
+- apiGroups: [triggers.tekton.dev]
+  resources: [clusterinterceptors, clustertriggerbindings]
+  verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: el-forgejo-cluster
+subjects:
+- kind: ServiceAccount
+  name: el-forgejo
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: el-forgejo-cluster
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: el-forgejo-pipelineruns
+  namespace: builds
+rules:
+- apiGroups: [tekton.dev]
+  resources: [pipelineruns]
+  verbs: [create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: el-forgejo-pipelineruns
+  namespace: builds
+subjects:
+- kind: ServiceAccount
+  name: el-forgejo
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: el-forgejo-pipelineruns
+---
+# Anti-rejeu de J4 inchangé : le nom du PipelineRun dérive du commit (body.after, couvert par le HMAC).
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: sample-app
+  namespace: declencheurs
+spec:
+  params:
+  - name: commit
+  - name: depot
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      name: sample-app-$(tt.params.commit)
+      namespace: builds
+    spec:
+      pipelineRef:
+        resolver: bundles
+        params:
+        - name: bundle
+          value: @PIPELINE@
+        - name: name
+          value: sample-app-essai
+        - name: kind
+          value: pipeline
+      params:
+      - name: commit
+        value: $(tt.params.commit)
+      - name: depot
+        value: $(tt.params.depot)
+      taskRunTemplate:
+        serviceAccountName: build
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: forgejo
+  namespace: declencheurs
+spec:
+  serviceAccountName: el-forgejo
+  triggers:
+  - name: sample-app-push
+    interceptors:
+    - ref:
+        name: github
+        kind: ClusterInterceptor
+      params:
+      - name: secretRef
+        value:
+          secretName: forgejo-webhook
+          secretKey: secret
+      - name: eventTypes
+        value: [push]
+    - ref:
+        name: cel
+        kind: ClusterInterceptor
+      params:
+      - name: filter
+        value: "body.ref == 'refs/heads/main' && body.repository.full_name == 'workspace/sample-app' && body.after.matches('^[0-9a-f]{40}$')"
+    bindings:
+    - name: commit
+      value: $(body.after)
+    - name: depot
+      value: $(body.repository.clone_url)
+    template:
+      ref: sample-app
+  resources:
+    kubernetesResource:
+      serviceType: NodePort
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              zone: confiance

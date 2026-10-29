@@ -18,6 +18,17 @@
 #   admission  règles d'admission de Kyverno (politique/admission.yaml, CEL) : références Tekton signées (test 2), isolation
 #              des pods (test 4), confinement de la zone confiance, StepActions interdites ; 30 cas présentés au CLI et à
 #              l'admission (dry-run serveur), tableau dans resultats/politique-admission.tsv
+#   chains     identifiants Zot de Chains (compte poc-build) sortis de builds : secret zot-chains dans tekton-chains,
+#              DOCKER_CONFIG (politique/chains-zot.yaml) ; compte build sans imagePullSecrets ni jeton ; zot-build supprimé
+#   declencheurs  tâche et pipeline de J4 en v1beta1, signées et publiées en bundles (tekton/tasks, tekton/pipelines) ;
+#              PipelineRun du bundle signé exécuté et signé par Chains (push de poc-build dans l'audit de Zot), pipeline
+#              modifiée après signature refusée ; EventListener, secret du webhook et TriggerTemplate déplacés dans
+#              l'espace de confiance declencheurs, droits réduits (politique/declencheurs.yaml) ; webhook Forgejo rebranché ;
+#              objets de J4 retirés de builds. Puis test 5 rejoué : EL_NS=declencheurs JOURNAL=politique JALON=J6
+#              mise run confiance:tekton -- essais_webhook
+#   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
+#              opérateur ; RBAC seul, l'admission n'y figure pas) dans resultats/politique-droits.tsv ; écritures de
+#              l'EventListener dans l'audit de l'API pendant le test 5
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -41,6 +52,7 @@ BANC=$repo/poc/benchmarks/kyverno-seul
 NS_ESSAI=bancc   # espace des pods d'essai (jamais créés : dry-run côté serveur)
 BUSYBOX_AMONT=docker.io/rancher/mirrored-library-busybox:1.37.0   # image d'étape de J4 (copie dans Zot : tekton-images.tsv)
 DL=$O/telechargements/kyverno
+EL_NS=declencheurs   # EventListener de J6 (commun.sh : el_url, brancher_forgejo)
 T=$W/politique
 trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
 mkdir -p "$T" "$DL"
@@ -132,9 +144,12 @@ msg = "; ".join((r.get("message") or "").replace("\n", " ") for r in d.get("resu
 print(res + " (code " + sys.argv[2] + ")\t" + msg[:160])' "$T/cli.json" "$c"
 }
 
-admission() { # pod : décision de l'admission (PASS : admis en dry-run serveur ; FAIL : refusé) et motif
-  if kubectl create --dry-run=server -f "$1" > "$T/adm.out" 2>&1; then printf 'PASS\t\n'
-  else printf 'FAIL\t%s\n' "$(tr '\n' ' ' < "$T/adm.out" | sed -e 's/^Error from server\( ([A-Za-z]*)\)\{0,1\}: //' -e 's/^error when creating "[^"]*": //' | cut -c1-200)"; fi
+admission() { # pod : décision de l'admission (PASS : admis en dry-run serveur ; FAIL : refusé par un webhook) et motif ;
+  # ERREUR : autre réponse de l'API (espace absent, par exemple), qui n'est pas une décision d'admission
+  local m
+  if kubectl create --dry-run=server -f "$1" > "$T/adm.out" 2>&1; then printf 'PASS\t\n'; return; fi
+  m=$(tr '\n' ' ' < "$T/adm.out" | sed -e 's/^Error from server\( ([A-Za-z]*)\)\{0,1\}: //' -e 's/^error when creating "[^"]*": //' | cut -c1-200)
+  if grep -q 'denied the request' "$T/adm.out"; then printf 'FAIL\t%s\n' "$m"; else printf 'ERREUR\t%s\n' "$m"; fi
 }
 
 charger() { # fichier nom [type] : politique chargée à l'admission, attendue prête (webhook de Kyverno à jour)
@@ -216,19 +231,41 @@ EOF
   awk -F'\t' 'NR > 1 { a += $5; b += $6; n++ } END { printf "durée moyenne par cas : CLI %d ms, admission %d ms\n", a / n, b / n }' "$TSV_PARITE"
 }
 
-taskrun() { # nom résolveur bundle : TaskRun d'essai créé dans builds, puis attendu ; affiche l'issue et la vérification
-  local n=$1 i
-  sed -e "s#@NOM@#$n#" -e "s#@RESOLVEUR@#$2#" -e "s#@BUNDLE@#$3#" "$here/politique/taches/taskrun.yaml" > "$T/tr-$n.yaml"
-  kubectl delete taskrun -n builds "$n" --ignore-not-found --wait=true >/dev/null
-  kubectl create -f "$T/tr-$n.yaml" >/dev/null
-  for i in $(seq 120); do
-    [ "$(kubectl get taskrun -n builds "$n" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')" != Unknown ] \
-      && [ -n "$(kubectl get taskrun -n builds "$n" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')" ] && break
+creer() { # fichier : création dans builds ; un refus à l'admission (Kyverno, webhook de Tekton) est une issue du même format
+  kubectl create -f "$1" > "$T/creer.out" 2>&1 && return 0
+  printf 'False|RefusAdmission|-|%s|\n' "$(tr '\n' ' ' < "$T/creer.out" | sed -e 's/^Error from server\( ([A-Za-z]*)\)\{0,1\}: //' -e 's/^error when creating "[^"]*": //' | cut -c1-230)"
+  return 1
+}
+
+issue() { # type nom : attend la fin d'un TaskRun ou d'un PipelineRun de builds ; issue, vérification, résultats
+  local st
+  for _ in $(seq 120); do
+    st=$(kubectl get "$1" -n builds "$2" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')
+    [ -n "$st" ] && [ "$st" != Unknown ] && break
     sleep 1
   done
-  kubectl get taskrun -n builds "$n" -o json | jq -r '.status as $s | ($s.conditions // []) as $c
+  kubectl get "$1" -n builds "$2" -o json | jq -r '.status as $s | ($s.conditions // []) as $c
     | ($c[] | select(.type == "Succeeded")) as $r
     | "\($r.status)|\($r.reason)|\(($c[] | select(.type == "TrustedResourcesVerified") | .status) // "-")|\($r.message // "" | gsub("\n"; " ") | .[0:230])|\($s.results // [] | map(.name + "=" + .value) | join(","))"'
+}
+
+taskrun() { # nom résolveur bundle : TaskRun d'essai créé dans builds, puis attendu ; affiche l'issue et la vérification
+  local n=$1
+  sed -e "s#@NOM@#$n#" -e "s#@RESOLVEUR@#$2#" -e "s#@BUNDLE@#$3#" "$here/politique/taches/taskrun.yaml" > "$T/tr-$n.yaml"
+  kubectl delete taskrun -n builds "$n" --ignore-not-found --wait=true >/dev/null
+  creer "$T/tr-$n.yaml" || return 0
+  issue taskrun "$n"
+}
+
+pipelinerun() { # nom bundle commit : PipelineRun du gabarit de declencheurs.yaml (rendu), créé dans builds ; issue
+  local n=$1
+  awk '/^kind: TriggerTemplate$/ {t = 1} t && /^  - apiVersion: tekton.dev\/v1$/ {p = 1} p && /^---$/ {exit} p' "$T/declencheurs.yaml" \
+    | sed -e 's/^    //' -e 's/^  - apiVersion/apiVersion/' -e "s#name: sample-app-\$(tt.params.commit)#name: $n#" \
+      -e "s#value: \$(tt.params.commit)#value: '$3'#" -e 's#value: \$(tt.params.depot)#value: https://sc-stockage.poc.test:3000/workspace/sample-app.git#' \
+      -e "s#value: $REG/tekton/pipelines/sample-app-essai@.*#value: $2#" > "$T/pr-$n.yaml"
+  kubectl delete pipelinerun -n builds "$n" --ignore-not-found --wait=true >/dev/null
+  creer "$T/pr-$n.yaml" || return 0
+  issue pipelinerun "$n"
 }
 
 verdict() { # libellé attendu (True|False) issue : ligne OK ou KO
@@ -312,6 +349,7 @@ etape_admission() {
   TSV_PARITE=$R/politique-admission.tsv
   printf 'cas\tattendu\tCLI\tadmission\tCLI (ms)\tadmission (ms)\tmotif CLI\tmotif admission\n' > "$TSV_PARITE"
   kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  sed -n '1,/^---$/p' "$here/politique/declencheurs.yaml" | kubectl apply --server-side -f - >/dev/null   # espace des cas zone-declencheurs
   d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
   rm -rf "$T/adm"
   python3 -I "$here/politique/cas-admission.py" "$T/adm" "$REG/tekton/tasks/essai-confiance@$d" \
@@ -337,12 +375,143 @@ etape_admission() {
     END { printf "parité CLI / admission : %d cas sur %d\n", p, n }' "$TSV_PARITE"
   awk -F'\t' 'NR > 1 { split($3, c, " ") } NR > 1 && c[1] != $2 { printf "  CLI ≠ attendu : %s (%s au lieu de %s)\n", $1, $3, $2; k++ }
     NR > 1 && $4 != "-" && $4 != $2 { printf "  admission ≠ attendu : %s (%s au lieu de %s)\n", $1, $4, $2; k++ }
-    END { printf "conformes au résultat attendu : %s\n", k ? "non (" k " écarts)" : "tous" }' "$TSV_PARITE"
+    END { printf "conformes au résultat attendu : %s\n", k ? "non (" k " écarts)" : "tous"; exit k > 0 }' "$TSV_PARITE"
   awk -F'\t' 'NR > 1 && $4 == "FAIL" { split($8, m, " denied the request: "); w[$1] = m[1] } END { for (c in w) n[w[c]]++; for (x in n) printf "  refus par %s : %d cas\n", x, n[x] }' "$TSV_PARITE" | sort
   echo "## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)"
   kubectl get events -A --field-selector reason=PolicyViolation -o json | jq -r --arg t "$t0" '.items[]
     | select(.involvedObject.kind == "ValidatingPolicy" and (.lastTimestamp // .eventTime) >= $t)
     | "\(.involvedObject.name)"' | sort | uniq -c | sed 's/^ */  /; s/ \([a-z]\)/ événements, politique \1/'
+}
+
+etape_chains() {
+  local d
+  mkdir -p "$T/auth" && chmod 700 "$T/auth"
+  echo "## identifiants Zot de Chains (compte poc-build) : secret zot-chains dans tekton-chains, DOCKER_CONFIG"
+  auth_zot "$T/auth/chains.json" "" poc-build "$REG"
+  kubectl create secret generic zot-chains -n tekton-chains --from-file=config.json="$T/auth/chains.json" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f - >/dev/null
+  kubectl patch deployment -n tekton-chains tekton-chains-controller --type strategic --patch-file "$here/politique/chains-zot.yaml" >/dev/null
+  kubectl rollout status -n tekton-chains deploy/tekton-chains-controller --timeout=180s
+  kubectl get deploy -n tekton-chains tekton-chains-controller -o json | jq -r '.spec.template.spec as $p | ($p.containers[0].env[] | select(.name == "DOCKER_CONFIG") | "DOCKER_CONFIG=\(.value)"),
+    ($p.volumes[] | select(.secret.secretName == "zot-chains") | "volume \(.name) : secret \(.secret.secretName)")'
+  echo "## compte build : ni imagePullSecrets ni jeton ; zot-build retiré de builds"
+  kubectl patch serviceaccount build -n builds --type merge -p '{"imagePullSecrets":null,"automountServiceAccountToken":false}' >/dev/null
+  kubectl delete secret -n builds zot-build --ignore-not-found --wait=true >/dev/null
+  kubectl get serviceaccount build -n builds -o json | jq -c '{compte: .metadata.name, imagePullSecrets: (.imagePullSecrets // []), automountServiceAccountToken}'
+  d=$(kubectl get serviceaccount build -n builds -o json | jq -r '(.imagePullSecrets // [] | length) == 0 and .automountServiceAccountToken == false')
+  [ "$d" = true ] && echo "OK   compte build sans identifiant de registre ni jeton monté" || { echo "KO   compte build" >&2; exit 1; }
+}
+
+signe() { # type nom : attend l'annotation de Chains sur un TaskRun ou un PipelineRun de builds ; sa valeur
+  local v=""
+  for _ in $(seq 60); do
+    v=$(kubectl get "$1" -n builds "$2" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')
+    [ "$v" = true ] && break
+    sleep 2
+  done
+  echo "${v:-absente}"
+}
+
+etape_declencheurs() {
+  local busybox tache pipe autre t0 n o
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
+  kubectl get validatingpolicy zone-build >/dev/null 2>&1 || { echo "KO   règles d'admission absentes (étape admission)" >&2; exit 1; }
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+
+  echo "## tâche et pipeline de J4 en v1beta1, signées par la clé des tâches et publiées en bundles"
+  sed -e "s#@IMAGE@#$REG/builds/essai-webhook#" -e "s#@DIGEST@#$APP_DIGEST#" -e "s#@BUSYBOX@#$busybox#" \
+    "$here/politique/taches/publier-essai.yaml" > "$T/publier-essai.yaml"
+  tkn task sign "$T/publier-essai.yaml" -K "$S/taches.key" -f "$T/publier-essai-signee.yaml" >/dev/null
+  tache=$REG/tekton/tasks/publier-essai@$(bundle "$T/publier-essai-signee.yaml" tekton/tasks/publier-essai)
+  echo "tâche publier-essai : $tache"
+  sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/sample-app-essai.yaml"
+  tkn pipeline sign "$T/sample-app-essai.yaml" -K "$S/taches.key" -f "$T/sample-app-essai-signee.yaml" >/dev/null
+  pipe=$REG/tekton/pipelines/sample-app-essai@$(bundle "$T/sample-app-essai-signee.yaml" tekton/pipelines/sample-app-essai)
+  echo "pipeline sample-app-essai : $pipe"
+  # Pipeline modifiée après signature : sa tâche est remplacée par une autre tâche signée (essai-confiance).
+  autre=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
+  sed "s#value: $tache#value: $REG/tekton/tasks/essai-confiance@$autre#" "$T/sample-app-essai-signee.yaml" > "$T/pipeline-modifiee.yaml"
+  echo "pipeline modifiée : $(diff "$T/sample-app-essai-signee.yaml" "$T/pipeline-modifiee.yaml" | grep -c '^>') ligne changée (référence de tâche), même signature"
+  autre=$REG/tekton/pipelines/essai-modifiee@$(bundle "$T/pipeline-modifiee.yaml" tekton/pipelines/essai-modifiee)
+  sed "s#@PIPELINE@#$pipe#" "$here/politique/declencheurs.yaml" > "$T/declencheurs.yaml"
+
+  echo "## PipelineRuns du bundle (dans builds, gabarit de la TriggerTemplate) ; signature par Chains avec ses identifiants"
+  verdict "pipeline signée (tâche tirée de son bundle signé)" True "$(pipelinerun j6-pipeline-signee "$pipe" 3333333333333333333333333333333333333333)"
+  o=$(kubectl get taskrun -n builds -l tekton.dev/pipelineRun=j6-pipeline-signee -o jsonpath='{.items[0].metadata.name}')
+  kubectl get taskrun -n builds "$o" -o json | jq -r '"TaskRun enfant \(.metadata.name) : taskRef \(.spec.taskRef.resolver) \(.spec.taskRef.params[] | select(.name == "bundle") | .value | .[0:72])… ; TrustedResourcesVerified=\(.status.conditions[] | select(.type == "TrustedResourcesVerified") | .status)"'
+  echo "Chains : TaskRun $o signé=$(signe taskrun "$o"), PipelineRun j6-pipeline-signee signé=$(signe pipelinerun j6-pipeline-signee)"
+  echo "## audit de Zot : écritures de manifestes depuis $t0 (Chains ; compte attendu poc-build)"
+  sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$t0" 'select(.time >= $t and (.object | test("/manifests/")) and .action != "GET" and .action != "HEAD")
+    | {t: .time[11:19], compte: .subject, action, objet: (.object | sub("^/v2/"; "") | sub("sha256-(?<d>.{12}).*[.](?<s>sig|att)$"; "sha256-\(.d)….\(.s)")), code: .status}' > "$T/zot-audit.json"
+  grep -F 'builds/essai-webhook' "$T/zot-audit.json" || true
+  n=$(jq -s '[.[] | select((.objet | test("^builds/essai-webhook/manifests/sha256-.*[.]att$")) and .compte == "poc-build" and .code == 201)] | length' "$T/zot-audit.json")
+  [ "$n" -ge 1 ] && echo "OK   Chains pousse l'attestation avec poc-build (DOCKER_CONFIG) : $n écriture(s) .att" \
+    || { echo "KO   aucune écriture .att de poc-build depuis $t0" >&2; exit 1; }
+  verdict "pipeline modifiée après signature" False "$(pipelinerun j6-pipeline-modifiee "$autre" 4444444444444444444444444444444444444444)"
+
+  echo "## EventListener, secret du webhook et TriggerTemplate : de builds (J4) à declencheurs"
+  kubectl delete eventlistener -n builds forgejo --ignore-not-found --wait=true >/dev/null
+  kubectl delete triggertemplate -n builds sample-app --ignore-not-found >/dev/null
+  kubectl delete pipeline.tekton.dev -n builds sample-app-essai --ignore-not-found >/dev/null
+  kubectl delete task.tekton.dev -n builds publier-essai --ignore-not-found >/dev/null
+  kubectl delete rolebinding -n builds el-forgejo --ignore-not-found >/dev/null
+  kubectl delete serviceaccount -n builds el-forgejo --ignore-not-found >/dev/null
+  kubectl delete clusterrolebinding el-forgejo-builds --ignore-not-found >/dev/null
+  kubectl delete secret -n builds forgejo-webhook --ignore-not-found >/dev/null
+  kubectl apply --server-side -f "$T/declencheurs.yaml" >/dev/null
+  kubectl create secret generic forgejo-webhook -n declencheurs --from-file=secret="$S/forgejo-webhook.secret" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f - >/dev/null
+  brancher_forgejo
+
+  echo "## contrôles"
+  n=$(kubectl get secret -n builds -o name | wc -l)
+  [ "$n" = 0 ] && echo "OK   aucun secret dans builds" || { echo "KO   $n secret(s) dans builds : $(kubectl get secret -n builds -o name | paste -sd' ')" >&2; exit 1; }
+  n=$(kubectl get eventlisteners,triggertemplates,triggerbindings,tasks.tekton.dev,pipelines.tekton.dev -n builds -o name | wc -l)
+  [ "$n" = 0 ] && echo "OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds" || { echo "KO   $n objet(s) de J4 restant(s) dans builds" >&2; exit 1; }
+  kubectl get clusterrolebindings,rolebindings -A -o json | jq -r '.items[] | select(.roleRef.name | startswith("tekton-triggers-eventlistener")) | "\(.kind) \(.metadata.name)"' > "$T/liaisons-el"
+  [ ! -s "$T/liaisons-el" ] && echo "OK   ClusterRoles tekton-triggers-eventlistener-* (secrets du cluster, impersonation) liées à rien" \
+    || { echo "KO   liaisons restantes : $(paste -sd' ' "$T/liaisons-el")" >&2; exit 1; }
+  kubectl get pods -n declencheurs -o json | jq -r '.items[] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName)"'
+}
+
+etape_droits() {
+  local debut sujet as verbe ressource ns attendu obtenu nom n k=0
+  kubectl apply --server-side -f "$here/politique/droits.yaml" >/dev/null
+  TSV_DROITS=$R/politique-droits.tsv
+  printf 'sujet\tverbe\tressource\tespace\tattendu\tobtenu\n' > "$TSV_DROITS"
+  echo "## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)"
+  while IFS='|' read -r sujet verbe ressource ns attendu; do
+    case $sujet in
+      '#'*|'') continue ;;
+      build) as=(--as=system:serviceaccount:builds:build) ;;
+      el-forgejo) as=(--as=system:serviceaccount:declencheurs:el-forgejo) ;;
+      operateur) as=(--as=operateur --as-group=operateurs) ;;
+    esac
+    if [ "$ns" = '*' ]; then obtenu=$(kubectl auth can-i "$verbe" "$ressource" -A "${as[@]}" 2>/dev/null || true)
+    else obtenu=$(kubectl auth can-i "$verbe" "$ressource" -n "$ns" "${as[@]}" 2>/dev/null || true); fi
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$sujet" "$verbe" "$ressource" "$ns" "$attendu" "$obtenu" >> "$TSV_DROITS"
+    [ "$obtenu" = "$attendu" ] || { echo "KO   $sujet $verbe $ressource ($ns) : $obtenu au lieu de $attendu" >&2; k=$((k + 1)); }
+  done < "$here/politique/droits.txt"
+  awk -F'\t' 'NR > 1 { n++; if ($5 == $6) ok++ } END { printf "%d vérifications, %d conformes\n", n, ok }' "$TSV_DROITS"
+  awk -F'\t' 'NR > 1 && $6 == "yes" { printf "  accordé : %s %s %s (%s)\n", $1, $2, $3, $4 }' "$TSV_DROITS"
+  [ "$k" = 0 ] || exit 1
+  echo "## droits complets du compte build dans builds (kubectl auth can-i --list)"
+  kubectl auth can-i --list -n builds --as=system:serviceaccount:builds:build | sed 's/^/  /'
+  echo "## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)"
+  debut=$(awk -F'\t' '$1 == "J6 essais_webhook" {d = $2} END {print d}' "$R/chrono.tsv")
+  [ -n "$debut" ] || { echo "KO   test 5 de J6 absent de chrono.tsv" >&2; exit 1; }
+  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" \
+    | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:el-forgejo")
+      | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
+    | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-el"
+  ! grep -qE ' 403$' "$T/audit-el" && echo "OK   aucun refus (403) pour el-forgejo depuis $debut" || { echo "KO   refus RBAC pour el-forgejo" >&2; exit 1; }
+  echo "## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement"
+  nom=$(kubectl get pods -n declencheurs -l eventlistener=forgejo -o jsonpath='{.items[0].metadata.name}')
+  n=$(kubectl logs -n declencheurs "$nom" | grep -ci 'forbidden' || true)
+  [ "$n" = 0 ] && echo "OK   aucun « forbidden » dans le journal de $nom" || { echo "KO   $n « forbidden » dans le journal de $nom" >&2; exit 1; }
 }
 
 lancer politique J6 "$@"

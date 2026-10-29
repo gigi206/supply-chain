@@ -1,0 +1,26 @@
+# politique.sh declencheurs, 2026-10-29T22:43:20Z
+## tâche et pipeline de J4 en v1beta1, signées par la clé des tâches et publiées en bundles
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+tâche publier-essai : sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba5dce66127cad2a1c854e9354992350c0b358e7e559452097d79a
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+pipeline sample-app-essai : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:062a2f53800b71d7650b8b58ae6ad6b72a8885ec3c2ef150905b2274ebd82c08
+pipeline modifiée : 1 ligne changée (référence de tâche), même signature
+## PipelineRuns du bundle (dans builds, gabarit de la TriggerTemplate) ; signature par Chains avec ses identifiants
+OK   pipeline signée (tâche tirée de son bundle signé) : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
+TaskRun enfant j6-pipeline-signee-publier : taskRef bundles sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba… ; TrustedResourcesVerified=True
+Chains : TaskRun j6-pipeline-signee-publier signé=true, PipelineRun j6-pipeline-signee signé=true
+## audit de Zot : écritures de manifestes depuis 2026-10-29T22:43:20Z (Chains ; compte attendu poc-build)
+{"t":"22:43:36","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+{"t":"22:43:39","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+OK   Chains pousse l'attestation avec poc-build (DOCKER_CONFIG) : 2 écriture(s) .att
+OK   pipeline modifiée après signature : refusée, ResourceVerificationFailed : pipelineRun builds/j6-pipeline-modifiee referred resource sample-app-essai failed signature verification: resource verification failed: resource sample-app-essai in namespace  fails verification ; TrustedResourcesVerified=False
+## EventListener, secret du webhook et TriggerTemplate : de builds (J4) à declencheurs
+deployment.apps/el-forgejo condition met
+EventListener : el-forgejo-79b6fd78c6-lz27r Running sc-confiance
+EventListener joignable par Forgejo : http://192.168.161.11:32442 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
+{"id":2,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:32442","content_type":"json"}
+## contrôles
+OK   aucun secret dans builds
+OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds
+OK   ClusterRoles tekton-triggers-eventlistener-* (secrets du cluster, impersonation) liées à rien
+pod el-forgejo-79b6fd78c6-lz27r : nœud sc-confiance, compte el-forgejo

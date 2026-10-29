@@ -1,0 +1,52 @@
+# Brique 08, J6 : matrice des droits vérifiés par kubectl auth can-i (politique.sh droits).
+# sujet|verbe|ressource|espace (* : tout le cluster)|attendu (yes|no)
+# Compte des TaskRuns : aucun droit.
+build|get|secrets|builds|no
+build|list|secrets|*|no
+build|create|pods|builds|no
+build|create|taskruns.tekton.dev|builds|no
+build|create|pipelineruns.tekton.dev|builds|no
+build|get|taskruns.tekton.dev|builds|no
+build|create|serviceaccounts/token|tekton-chains|no
+# EventListener : lecture de ses objets Triggers, création de PipelineRuns dans builds, rien d'autre.
+el-forgejo|create|pipelineruns.tekton.dev|builds|yes
+el-forgejo|create|taskruns.tekton.dev|builds|no
+el-forgejo|get|pipelineruns.tekton.dev|builds|no
+el-forgejo|create|pipelineruns.tekton.dev|declencheurs|no
+el-forgejo|get|secrets|declencheurs|no
+el-forgejo|list|secrets|*|no
+el-forgejo|impersonate|serviceaccounts|declencheurs|no
+el-forgejo|create|pods|declencheurs|no
+el-forgejo|list|eventlisteners.triggers.tekton.dev|declencheurs|yes
+el-forgejo|list|eventlisteners.triggers.tekton.dev|builds|no
+el-forgejo|list|clusterinterceptors.triggers.tekton.dev|*|yes
+el-forgejo|list|configmaps|declencheurs|yes
+el-forgejo|create|events|declencheurs|yes
+# Opérateur des builds (groupe operateurs) : lecture seule ; test 3 (status), exec, jetons, secrets, zone confiance.
+operateur|get|pipelineruns.tekton.dev|builds|yes
+operateur|get|pods/log|builds|yes
+operateur|create|pipelineruns.tekton.dev|builds|no
+operateur|create|taskruns.tekton.dev|builds|no
+operateur|update|taskruns.tekton.dev|builds|no
+operateur|patch|taskruns.tekton.dev/status|builds|no
+operateur|update|taskruns.tekton.dev/status|builds|no
+operateur|patch|pipelineruns.tekton.dev/status|builds|no
+operateur|delete|pipelineruns.tekton.dev|builds|no
+operateur|create|pods/exec|builds|no
+operateur|create|pods/attach|builds|no
+operateur|create|pods/portforward|builds|no
+operateur|patch|pods/ephemeralcontainers|builds|no
+operateur|get|secrets|builds|no
+operateur|list|secrets|*|no
+operateur|create|pods|builds|no
+operateur|create|pods|tekton-chains|no
+operateur|create|pods|openbao|no
+operateur|create|pods/exec|tekton-chains|no
+operateur|create|pods/exec|openbao|no
+operateur|create|serviceaccounts/token|tekton-chains|no
+operateur|create|serviceaccounts/token|openbao|no
+operateur|create|serviceaccounts/token|tsa|no
+operateur|get|secrets|declencheurs|no
+operateur|patch|configmaps|tekton-pipelines|no
+operateur|create|verificationpolicies.tekton.dev|builds|no
+operateur|delete|validatingpolicies.policies.kyverno.io|*|no

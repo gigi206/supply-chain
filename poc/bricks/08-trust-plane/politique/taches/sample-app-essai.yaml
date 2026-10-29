@@ -1,0 +1,34 @@
+# Brique 08, J6 : pipeline de J4 migrée en v1beta1 (tkn pipeline sign décode aussi en v1beta1), signée par la clé des
+# tâches et publiée en bundle (tekton/pipelines/sample-app-essai). Sa tâche est tirée du bundle signé @TACHE@, épinglé
+# par digest : la signature de la pipeline couvre donc aussi le choix de la tâche. @TACHE@ : politique.sh declencheurs.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: sample-app-essai
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @TACHE@
+      - name: name
+        value: publier-essai
+      - name: kind
+        value: task
+    params:
+    - name: commit
+      value: $(params.commit)
+    - name: depot
+      value: $(params.depot)

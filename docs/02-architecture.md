@@ -16,14 +16,14 @@ flowchart LR
   end
 
   subgraph BUILD["Zone Build (nœuds de build isolés : Kata / gVisor / userns) [ADR 0001]"]
-    TRIG[Tekton Triggers<br/>intercepteur HMAC Forgejo]
     PF[Pod prefetch<br/>Hermeto · mock lock · .buildinfo<br/>egress contrôlé]
     BLD[Pod build<br/>BuildKit éphémère · mock · sbuild<br/>egress = 0]
     PUSH[Pod push<br/>ORAS / registre]
-    TRIG --> PF --> BLD --> PUSH
+    PF --> BLD --> PUSH
   end
 
   subgraph TRUST["Zone Confiance (nœuds dédiés)"]
+    TRIG[Tekton Triggers<br/>EventListener · intercepteur HMAC Forgejo<br/>espace dédié, hors de la zone build]
     CH[Tekton Chains<br/>provenance SLSA v1]
     BAO[(OpenBao Transit<br/>clé provenance)]
     TSA[Job TSA RFC 3161]
@@ -61,6 +61,7 @@ flowchart LR
   end
 
   FWS -- webhook signé --> TRIG
+  TRIG -- PipelineRun<br/>bundles signés --> PF
   PF -- fermeture --> ZOT
   PUSH --> ZOT
   BLD -. résultats TaskRun .-> CH
@@ -81,6 +82,7 @@ flowchart LR
 
 **Principes :**
 - **Séparation des zones.** La clé de provenance (OpenBao) et Chains ne tournent jamais sur les nœuds de build. Le domaine de replay a son propre administrateur et sa propre clé.
+- **Aucun secret dans la zone build.** Quiconque crée un TaskRun peut monter un secret de son espace, sans droit RBAC sur les secrets. Le secret HMAC du webhook et l'EventListener vivent donc dans un espace de la zone Confiance, et les identifiants de registre de Chains dans l'espace de Chains. Le compte des TaskRuns n'a aucun droit ni jeton monté. L'EventListener ne peut que créer des PipelineRuns dans l'espace des builds (brique 08, J6).
 - **Tout est adressé par digest.** Commit git, images de build, tâches Tekton (bundles), fermetures de dépendances, snapshots, artefacts.
 - **Les attestations sont la source de vérité.** Index, score, Dependency-Track et métriques en sont des **projections reconstructibles**.
 - **Les métriques informent, elles ne décident jamais.** Les portes sont Conforma (release) et Kyverno (admission).
@@ -165,7 +167,7 @@ Points à valider en brique 08 :
 | `sources/<projet>` | `git bundle` horodatés (copie WORM en 2c) | horodatage |
 | `deps/<projet>/<type>` | Fermetures : Hermeto, verrou mock, paquets du `.buildinfo` (couches par fichier) | SBOM Hermeto |
 | `builders/<image>` | Images de build construites par la plateforme | provenance, SBOM, signature |
-| `tekton/tasks/<nom>` | Bundles Tekton signés (Trusted Resources) | signature |
+| `tekton/{tasks,pipelines}/<nom>` | Bundles Tekton signés (Trusted Resources) ; la pipeline désigne ses tâches par bundle et digest | aucun : la signature est une annotation de l'objet dans le bundle (`tekton.dev/signature`, brique 08, J6) |
 | `artifacts/<projet>/{bin,image,rpm,deb}` | Artefacts livrés | provenance, SBOM, VEX, résultats de scan, licences (NOTICE, SBOM « concluded »), **VSA de replay**, horodatage, verdict de la porte, **bundle de sources GPL**, attestation de lien OpenPGP |
 
 **`tools/index`** se reconstruit à partir de Zot (listes et événements CloudEvents). Il répond en moins d'une minute à deux questions :

@@ -95,6 +95,35 @@ $([ -n "${2:-}" ] && printf '          tsaCertChain: |\n' && sed 's/^/          
 EOF
 }
 
+EL_NS=${EL_NS:-builds}   # espace de l'EventListener forgejo : builds en J4, declencheurs depuis J6
+el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
+
+brancher_forgejo() { # EventListener de $EL_NS attendu, puis seul webhook du dépôt sample-app (J4, J6) ; répertoire $T/auth
+  local url id n=1
+  for _ in $(seq 60); do kubectl get deploy -n "$EL_NS" el-forgejo >/dev/null 2>&1 && break; sleep 2; done
+  kubectl wait -n "$EL_NS" --for=condition=Available deploy/el-forgejo --timeout=180s
+  kubectl get pods -n "$EL_NS" -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
+  url=$(el_url)
+  # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3) : Forgejo n'a pas relivré un webhook
+  # refusé (rejeu de J5) ; on attend l'EventListener joignable depuis sc-stockage (sonde /live, sans événement).
+  until [ "$(sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' $url/live" || true)" = 200 ]; do
+    [ $n -lt 60 ] || { echo "KO   EventListener injoignable depuis sc-stockage" >&2; exit 1; }
+    n=$((n + 1)); sleep 1
+  done
+  echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance ; /live depuis sc-stockage, essai $n)"
+  # Webhook Forgejo : le secret passe par un fichier 0600 (curl -d @fichier), jamais en argument.
+  printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
+  api() { curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -H 'Content-Type: application/json' "$@"; }
+  for id in $(api https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks | jq -r '.[].id'); do
+    api -X DELETE "https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks/$id" >/dev/null
+  done
+  jq -n --arg u "$url" --rawfile s "$S/forgejo-webhook.secret" '{type: "forgejo", active: true, events: ["push"], branch_filter: "main",
+    config: {url: $u, content_type: "json", secret: $s}}' > "$T/auth/hook.json"
+  api -X POST https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks -d @"$T/auth/hook.json" \
+    | jq -c '{id, type, active, events, url: .config.url, content_type: .config.content_type}'
+  rm -f "$T/auth/hook.json" "$T/auth/entete"
+}
+
 certificat() { # nom SAN : certificat de service signé par la CA du PoC (stockage.sh pki), clé en 0600
   local n=$1 cn=${2%%,*}
   if [ -s "$S/$n.key" ] && [ -s "$P/$n.crt" ]; then echo "$n : certificat existant"; else
@@ -114,7 +143,7 @@ lancer() { # préfixe-du-journal jalon étape… : chaque étape etape_<nom> tou
   for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
   for e in "$@"; do
     chrono "$j $e"
-    { echo "# $p.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/$p-$e.log"
+    { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/$p-$e.log"
     chrono "$j $e fait"
   done
 }

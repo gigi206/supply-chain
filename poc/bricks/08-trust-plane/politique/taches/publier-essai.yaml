@@ -1,0 +1,31 @@
+# Brique 08, J6 : tâche de J4 (tekton/webhook.yaml) migrée en v1beta1 (tektoncd/cli#2894), signée par la clé des tâches
+# et publiée en bundle (tekton/tasks/publier-essai). @BUSYBOX@, @IMAGE@, @DIGEST@ : politique.sh declencheurs.
+# Option C du propriétaire : la tâche ne construit rien encore (J7).
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: publier-essai
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  steps:
+  - name: publier
+    image: @BUSYBOX@
+    env:
+    - name: COMMIT
+      value: $(params.commit)
+    - name: DEPOT
+      value: $(params.depot)
+    script: |
+      #!/bin/sh
+      echo "commit $COMMIT de $DEPOT (essai : aucune construction avant J7)"
+      printf '%s' '@IMAGE@' > $(results.IMAGE_URL.path)
+      printf '%s' '@DIGEST@' > $(results.IMAGE_DIGEST.path)

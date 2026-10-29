@@ -1,0 +1,41 @@
+# politique.sh droits, 2026-10-29T22:46:07Z
+## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
+47 vérifications, 47 conformes
+  accordé : el-forgejo create pipelineruns.tekton.dev (builds)
+  accordé : el-forgejo list eventlisteners.triggers.tekton.dev (declencheurs)
+  accordé : el-forgejo list clusterinterceptors.triggers.tekton.dev (*)
+  accordé : el-forgejo list configmaps (declencheurs)
+  accordé : el-forgejo create events (declencheurs)
+  accordé : operateur get pipelineruns.tekton.dev (builds)
+  accordé : operateur get pods/log (builds)
+## droits complets du compte build dans builds (kubectl auth can-i --list)
+  Resources                                       Non-Resource URLs                      Resource Names   Verbs
+  selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
+  selfsubjectaccessreviews.authorization.k8s.io   []                                     []               [create]
+  selfsubjectrulesreviews.authorization.k8s.io    []                                     []               [create]
+                                                  [/.well-known/openid-configuration/]   []               [get]
+                                                  [/.well-known/openid-configuration]    []               [get]
+                                                  [/api/*]                               []               [get]
+                                                  [/api]                                 []               [get]
+                                                  [/apis/*]                              []               [get]
+                                                  [/apis]                                []               [get]
+                                                  [/healthz]                             []               [get]
+                                                  [/healthz]                             []               [get]
+                                                  [/livez]                               []               [get]
+                                                  [/livez]                               []               [get]
+                                                  [/openapi/*]                           []               [get]
+                                                  [/openapi]                             []               [get]
+                                                  [/openid/v1/jwks/]                     []               [get]
+                                                  [/openid/v1/jwks]                      []               [get]
+                                                  [/readyz]                              []               [get]
+                                                  [/readyz]                              []               [get]
+                                                  [/version/]                            []               [get]
+                                                  [/version/]                            []               [get]
+                                                  [/version]                             []               [get]
+                                                  [/version]                             []               [get]
+## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
+  2 create pipelineruns builds 201
+  2 create pipelineruns builds 409
+OK   aucun refus (403) pour el-forgejo depuis 2026-10-29T22:45:26Z
+## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement
+OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-lz27r

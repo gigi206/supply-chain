@@ -1,0 +1,11 @@
+# politique.sh chains, 2026-10-29T22:43:15Z
+## identifiants Zot de Chains (compte poc-build) : secret zot-chains dans tekton-chains, DOCKER_CONFIG
+Waiting for deployment "tekton-chains-controller" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "tekton-chains-controller" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "tekton-chains-controller" rollout to finish: 1 old replicas are pending termination...
+deployment "tekton-chains-controller" successfully rolled out
+DOCKER_CONFIG=/etc/zot-chains
+volume zot-chains : secret zot-chains
+## compte build : ni imagePullSecrets ni jeton ; zot-build retiré de builds
+{"compte":"build","imagePullSecrets":[],"automountServiceAccountToken":false}
+OK   compte build sans identifiant de registre ni jeton monté

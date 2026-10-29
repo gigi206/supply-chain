@@ -1,0 +1,23 @@
+# Brique 08, J6 : identifiants Zot de Chains (compte poc-build) sortis de l'espace builds (constat de J4 : un TaskRun
+# pouvait monter zot-build et écraser .sig et .att). Secret zot-chains dans tekton-chains, clé config.json ; DOCKER_CONFIG
+# le désigne. Lu dans le code : Chains v0.29.9 s'authentifie par k8schain (pkg/chains/storage/oci/legacy.go), soit les
+# imagePullSecrets du compte du TaskRun (build, qui n'en a plus), puis authn.DefaultKeychain de go-containerregistry
+# v0.21.9, qui lit $DOCKER_CONFIG/config.json quand $HOME/.docker/config.json n'existe pas.
+# Correctif stratégique appliqué par politique.sh chains (kubectl patch). Mesuré en dry-run serveur : un nouveau
+# tekton.sh installer (apply côté serveur) le conserve ; tekton.sh signature remet zot-build dans builds.
+spec:
+  template:
+    spec:
+      containers:
+      - name: tekton-chains-controller
+        env:
+        - name: DOCKER_CONFIG
+          value: /etc/zot-chains
+        volumeMounts:
+        - name: zot-chains
+          mountPath: /etc/zot-chains
+          readOnly: true
+      volumes:
+      - name: zot-chains
+        secret:
+          secretName: zot-chains

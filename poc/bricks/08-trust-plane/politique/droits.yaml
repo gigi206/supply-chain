@@ -1,0 +1,30 @@
+# Brique 08, J6 : rôle des opérateurs des builds (groupe operateurs), sur mesure. Les rôles agrégés edit et admin
+# (tekton-aggregate-edit) donneraient pods/exec et la lecture des secrets de l'espace. Lecture seule : un build ne part que
+# d'un webhook signé ; aucun droit sur taskruns/status ni pipelineruns/status (test 3), ni pods/exec, ni secrets, ni
+# serviceaccounts/token. Le compte de service build, sous lequel tournent les TaskRuns, n'a aucun droit et aucun jeton monté.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: operateur-builds
+  namespace: builds
+rules:
+- apiGroups: [tekton.dev]
+  resources: [pipelineruns, taskruns]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [pods, pods/log, events]
+  verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: operateurs
+  namespace: builds
+subjects:
+- kind: Group
+  name: operateurs
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: operateur-builds

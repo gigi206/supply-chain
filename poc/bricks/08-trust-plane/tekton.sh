@@ -16,6 +16,8 @@
 #              contenu de la provenance ; audit d'OpenBao
 #
 # Usage (racine du dépôt) : mise run confiance:tekton -- <étape>…   (journal : resultats/tekton-<étape>.log)
+# Test 5 rejoué sous la politique de J6 : EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook
+# (EventListener de l'espace declencheurs, journal resultats/politique-essais_webhook.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -222,10 +224,9 @@ hmac_corps() { # fichier : HMAC-SHA256 (hex) du fichier avec le secret du webhoo
   python3 -I -c 'import hashlib, hmac, sys; print(hmac.new(open(sys.argv[1], "rb").read(), open(sys.argv[2], "rb").read(), hashlib.sha256).hexdigest())' \
     "$S/forgejo-webhook.secret" "$1"
 }
-el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n builds el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
 
 etape_webhook() {
-  local img=$REG/builds/essai-webhook dig=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 url id
+  local img=$REG/builds/essai-webhook dig=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
   auth_zot "$T/auth/zot.json"
   oras cp --from-oci-layout "$HOME/.cache/supply-chain-poc/w/b04/app-layout@$dig" "$REG_HOTE/builds/essai-webhook@$dig" \
@@ -235,29 +236,7 @@ etape_webhook() {
     | kubectl apply --server-side -f - >/dev/null
   sed -e "s#@IMAGE@#$img#" -e "s#@DIGEST@#$dig#" -e "s#@BUSYBOX@#$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$TSV")#" \
     "$here/tekton/webhook.yaml" | kubectl apply --server-side -f - >/dev/null
-  for _ in $(seq 60); do kubectl get deploy -n builds el-forgejo >/dev/null 2>&1 && break; sleep 2; done
-  kubectl wait -n builds --for=condition=Available deploy/el-forgejo --timeout=180s
-  kubectl get pods -n builds -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
-  url=$(el_url)
-  # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3) : Forgejo n'a pas relivré un webhook
-  # refusé (rejeu de J5) ; on attend l'EventListener joignable depuis sc-stockage (sonde /live, sans événement).
-  local n=1
-  until [ "$(sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' $url/live" || true)" = 200 ]; do
-    [ $n -lt 60 ] || { echo "KO   EventListener injoignable depuis sc-stockage" >&2; exit 1; }
-    n=$((n + 1)); sleep 1
-  done
-  echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance ; /live depuis sc-stockage, essai $n)"
-  # Webhook Forgejo : le secret passe par un fichier 0600 (curl -d @fichier), jamais en argument.
-  printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
-  api() { curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -H 'Content-Type: application/json' "$@"; }
-  for id in $(api https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks | jq -r '.[].id'); do
-    api -X DELETE "https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks/$id" >/dev/null
-  done
-  jq -n --arg u "$url" --rawfile s "$S/forgejo-webhook.secret" '{type: "forgejo", active: true, events: ["push"], branch_filter: "main",
-    config: {url: $u, content_type: "json", secret: $s}}' > "$T/auth/hook.json"
-  api -X POST https://192.168.161.13:3000/api/v1/repos/workspace/sample-app/hooks -d @"$T/auth/hook.json" \
-    | jq -c '{id, type, active, events, url: .config.url, content_type: .config.content_type}'
-  rm -f "$T/auth/hook.json" "$T/auth/entete"
+  brancher_forgejo
 }
 
 pr_attendre() { # commit : attend le PipelineRun sample-app-<commit> (présent, puis terminé)
@@ -332,17 +311,19 @@ etape_essais_webhook() {
   kubectl logs -n tekton-pipelines deploy/tekton-triggers-core-interceptors --since-time="$debut" \
     | jq -Rc 'fromjson? | select((.msg // "") | test("Continue:false")) | {t: (.ts | todate | .[11:19]), refus: (.msg | capture("Code:(?<code>[A-Za-z]+) Message:(?<message>[^}]*)"))}'
   echo "## EventListener : rejeux refusés à la création (AlreadyExists) depuis $debut"
-  kubectl logs -n builds deploy/el-forgejo --since-time="$debut" \
+  kubectl logs -n "$EL_NS" deploy/el-forgejo --since-time="$debut" \
     | jq -Rc 'fromjson? | select(.severity == "error" and (.message | startswith("couldn'"'"'t create resource"))) | {t: .timestamp[11:19], eventID: ."/triggers-eventid", erreur: (.message | capture("(?<e>pipelineruns.tekton.dev .* already exists)").e)}'
   echo "## Chains : PipelineRuns signés"
   kubectl get pipelinerun -n builds -o json | jq -r '.items[] | "\(.metadata.name) signé=\(.metadata.annotations["chains.tekton.dev/signed"] // "non")"'
   rm -f "$T/auth/entete"
-  echo "## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit)"
+  echo "## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ $debut)"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
     "$REG_HOTE/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" 2>/dev/null \
-    | jq -c '.payload | @base64d | fromjson | .predicate | select(.buildDefinition.externalParameters.runSpec.pipelineRef != null)
-      | {buildType: .buildDefinition.buildType, pipeline: .buildDefinition.externalParameters.runSpec.pipelineRef.name,
-         params: (.buildDefinition.externalParameters.runSpec.params | map({(.name): .value}) | add), builder: .runDetails.builder.id}' \
+    | jq -c --arg d "$debut" '.payload | @base64d | fromjson | .predicate
+      | select(.buildDefinition.externalParameters.runSpec.pipelineRef != null and .runDetails.metadata.startedOn >= $d)
+      | {buildType: .buildDefinition.buildType, pipeline: (.buildDefinition.externalParameters.runSpec.pipelineRef | .name // (.params[] | select(.name == "bundle") | .value)),
+         params: (.buildDefinition.externalParameters.runSpec.params | map({(.name): .value}) | add), builder: .runDetails.builder.id,
+         definitions: [.buildDefinition.resolvedDependencies[] | select(.name == "pipeline" or .name == "pipelineTask") | "\(.name) \(.uri)@sha256:\(.digest.sha256)"]}' \
     | grep "$reel" | head -1
   echo "## une enveloppe par exécution signée de cet essai (startedOn ≥ $debut)"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
@@ -355,4 +336,4 @@ etape_essais_webhook() {
     && echo "OK   4 exécutions signées, 4 enveloppes dans Zot" || { echo "KO   enveloppe manquante ou en trop" >&2; exit 1; }
 }
 
-lancer tekton J4 "$@"
+lancer "${JOURNAL:-tekton}" "${JALON:-J4}" "$@"
