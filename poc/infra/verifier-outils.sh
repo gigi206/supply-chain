@@ -86,6 +86,13 @@ while IFS=$'\t' read -r name ver sum url; do
         && get https://github.com/AkihiroSuda.gpg akihirosuda.gpg \
         && gpgv "$name" "$W/akihirosuda.gpg" "$W/SHA256SUMS.asc" "$W/SHA256SUMS" \
         && { grep -q "^$sum  \*\?$f$" "$W/SHA256SUMS" && ok "$name : sha256 présent dans SHA256SUMS signé" || ko "$name : sha256 absent de SHA256SUMS"; } ;;
+    node)
+      # SHASUMS256.txt signé par l'équipe de release (clés actives de github.com/nodejs/release-keys).
+      get "${url%/*}/SHASUMS256.txt" && get "${url%/*}/SHASUMS256.txt.sig" \
+        && get https://raw.githubusercontent.com/nodejs/release-keys/main/gpg-only-active-keys/pubring.kbx node.kbx \
+        && gpg -q --no-default-keyring --keyring "$W/node.kbx" --export > "$W/node.keys" \
+        && gpgv "$name" "$W/node.keys" "$W/SHASUMS256.txt.sig" "$W/SHASUMS256.txt" \
+        && { grep -q "^$sum  $f$" "$W/SHASUMS256.txt" && ok "$name : sha256 présent dans SHASUMS256.txt signé" || ko "$name : sha256 absent de SHASUMS256.txt"; } ;;
     go)
       get "$url.asc" && get https://dl.google.com/linux/linux_signing_key.pub google.pub \
         && gpgv "$name" "$W/google.pub" "$W/$f.asc" "$W/$f" ;;

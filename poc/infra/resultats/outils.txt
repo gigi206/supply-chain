@@ -1,4 +1,4 @@
-# verifier-outils.sh, 2026-10-29T09:59:52Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
+# verifier-outils.sh, 2026-10-29T10:03:02Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
 OK   aqua:anchore/grype 0.104.1 : sha256 = mise.lock (2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f)
 OK   aqua:anchore/grype : signature sigstore (workflows de github.com/anchore/grype)
 OK   aqua:anchore/grype : sha256 présent dans grype_0.104.1_checksums.txt signé
@@ -26,6 +26,9 @@ OK   github:conforma/cli 0.10.42 : sha256 = mise.lock (895c6f7e63cfefe6257a2e54c
 --   github:conforma/cli : aucune signature publiée (docs/04 §5) ; sha256 présent dans ec_linux_amd64.sha256 amont, non signé
 OK   go 1.24.7 : sha256 = mise.lock (da18191ddb7db8a9339816f3e2b54bdded8047cdc2a5d67059478f8d1595c43f)
 OK   go : signature GPG, clé EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+OK   node 22.22.0 : sha256 = mise.lock (c33c39ed9c80deddde77c960d00119918b9e352426fd604ba41638d6526a4744)
+OK   node : signature GPG, clé CC68F5A3106FF448322E48ED27F5E38D5B0A215F
+OK   node : sha256 présent dans SHASUMS256.txt signé
 OK   python 3.13.12 : sha256 = mise.lock (91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229)
 OK   python : attestation GitHub (https://slsa.dev/provenance/v1, https://github.com/astral-sh/python-build-standalone/.github/workflows/release.yml@refs/heads/main)
 OK   hermeto : hermeto 0.64.0 (tag 0.64.0 = commit 1f37e32d, dépendances installées avec --require-hashes)
