@@ -1,4 +1,4 @@
-# verifier-outils.sh, 2026-10-29T10:03:02Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
+# verifier-outils.sh, 2026-10-29T10:55:48Z, vérificateur sigstore : v3.0.6 (nixpkgs épinglé)
 OK   aqua:anchore/grype 0.104.1 : sha256 = mise.lock (2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f)
 OK   aqua:anchore/grype : signature sigstore (workflows de github.com/anchore/grype)
 OK   aqua:anchore/grype : sha256 présent dans grype_0.104.1_checksums.txt signé
@@ -7,6 +7,10 @@ OK   aqua:anchore/syft : signature sigstore (workflows de github.com/anchore/syf
 OK   aqua:anchore/syft : sha256 présent dans syft_1.38.0_checksums.txt signé
 OK   aqua:google/go-containerregistry 0.20.6 : sha256 = mise.lock (c1d593d01551f2c9a3df5ca0a0be4385a839bd9b86d4a76e18d7b17d16559127)
 --   aqua:google/go-containerregistry : provenance SLSA publiée (multiple.intoto.jsonl), non vérifiée ici (il faut slsa-verifier) ; sha256 présent dans checksums.txt amont, non signé
+OK   aqua:kubernetes-sigs/kind 0.33.0 : sha256 = mise.lock (aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d)
+--   aqua:kubernetes-sigs/kind : aucune signature publiée ; sha256 présent dans kind-linux-amd64.sha256sum amont, non signé
+OK   aqua:kubernetes/kubernetes/kubectl 1.37.2 : sha256 = mise.lock (c04487523e7aa7d1493f7808174c899db93d7a9cf57531420cd76b9bd415f8f4)
+OK   aqua:kubernetes/kubernetes/kubectl : signature sigstore (krel-staging@k8s-releng-prod.iam.gserviceaccount.com, émetteur accounts.google.com)
 OK   aqua:kyverno/kyverno 1.19.2 : sha256 = mise.lock (357eaf1df8bc24ddd5a73979fadeaae6a032e8710f11af264229756e4956bf4a)
 OK   aqua:kyverno/kyverno : signature sigstore (workflows de github.com/kyverno/kyverno)
 OK   aqua:moby/buildkit 0.25.2 : sha256 = mise.lock (d18b8188b600e201a1b3d08c20e2a1e439cf51d2c2285f132dd9bd51c666f6d6)
@@ -22,6 +26,9 @@ OK   aqua:rootless-containers/rootlesskit : signature GPG, clé C020EA876CE4E06C
 OK   aqua:rootless-containers/rootlesskit : sha256 présent dans SHA256SUMS signé
 OK   aqua:sigstore/cosign 3.1.4 : sha256 = mise.lock (424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa)
 OK   aqua:sigstore/cosign : signature sigstore (keyless@projectsigstore.iam.gserviceaccount.com, émetteur accounts.google.com)
+OK   forgejo:forgejo/forgejo 15.0.11 : sha256 = mise.lock (17b59b5f8a8f968126b7a6fcc1d45d9531228dbf293f172cf5565d2e72e999a3)
+OK   forgejo:forgejo/forgejo : signature GPG, clé EB114F5E6C0DC2BCDD183550A4B61A2DC5923710
+OK   forgejo:forgejo/forgejo : clé principale = empreinte publiée sur forgejo.org
 OK   github:conforma/cli 0.10.42 : sha256 = mise.lock (895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf)
 --   github:conforma/cli : aucune signature publiée (docs/04 §5) ; sha256 présent dans ec_linux_amd64.sha256 amont, non signé
 OK   go 1.24.7 : sha256 = mise.lock (da18191ddb7db8a9339816f3e2b54bdded8047cdc2a5d67059478f8d1595c43f)

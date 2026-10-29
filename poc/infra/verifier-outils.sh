@@ -69,6 +69,18 @@ while IFS=$'\t' read -r name ver sum url; do
         --certificate-oidc-issuer https://accounts.google.com --bundle "$W/$f.sigstore.json" "$W/$f" ;;
     aqua:kyverno/kyverno)
       get "$url.sigstore.json" && sigstore "$name" kyverno/kyverno --bundle "$W/$f.sigstore.json" "$W/$f" ;;
+    aqua:kubernetes/kubernetes/kubectl)
+      # Identité documentée par Kubernetes (kubernetes.io, « Verify Signed Kubernetes Artifacts »).
+      get "$url.sig" && get "$url.cert" && sigstore_id "$name" "krel-staging@k8s-releng-prod.iam.gserviceaccount.com, émetteur accounts.google.com" \
+        --certificate-identity krel-staging@k8s-releng-prod.iam.gserviceaccount.com \
+        --certificate-oidc-issuer https://accounts.google.com --signature "$W/$f.sig" --certificate "$W/$f.cert" "$W/$f" ;;
+    forgejo:forgejo/forgejo)
+      # Clé de l'équipe de release : empreinte publiée sur forgejo.org/download, clé tirée de keys.openpgp.org.
+      fpr=EB114F5E6C0DC2BCDD183550A4B61A2DC5923710
+      get "$url.asc" && get "https://keys.openpgp.org/vks/v1/by-fingerprint/$fpr" forgejo.pub \
+        && gpgv "$name" "$W/forgejo.pub" "$W/$f.asc" "$W/$f" \
+        && { awk '/VALIDSIG/ {print $NF}' "$W/gpg.log" | grep -qx "$fpr" \
+          && ok "$name : clé principale = empreinte publiée sur forgejo.org" || ko "$name : clé principale ≠ $fpr"; } ;;
     aqua:anchore/syft|aqua:anchore/grype)
       p=${name#aqua:anchore/}
       c=${p}_${ver}_checksums.txt
@@ -110,10 +122,11 @@ while IFS=$'\t' read -r name ver sum url; do
         && { jq -e --arg s "$sum" '[.. | objects | select(.sha256? == $s)] | length > 0' "$W/$f.provenance.json" >/dev/null \
           && na "$name : aucune signature publiée ; sha256 cité par la provenance amont, non signée" \
           || ko "$name : sha256 absent de la provenance amont"; } ;;
-    aqua:google/go-containerregistry|aqua:project-zot/zot|github:conforma/cli)
+    aqua:google/go-containerregistry|aqua:project-zot/zot|github:conforma/cli|aqua:kubernetes-sigs/kind)
       case "$name" in
         *go-containerregistry) c=checksums.txt; why="provenance SLSA publiée (multiple.intoto.jsonl), non vérifiée ici (il faut slsa-verifier)" ;;
         *zot) c=checksums.sha256.txt; why="aucune signature publiée (docs/04 §5)" ;;
+        *kind) c=$f.sha256sum; why="aucune signature publiée" ;;
         *) c=$f.sha256; why="aucune signature publiée (docs/04 §5)" ;;
       esac
       get "${url%/*}/$c" sums.txt && grep -qE "^$sum [ *]?(dist/)?$f$" "$W/sums.txt" \
