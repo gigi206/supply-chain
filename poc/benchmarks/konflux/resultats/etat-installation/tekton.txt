@@ -1,0 +1,17 @@
+tekton-operator	tekton-operator	-
+tekton-operator	tekton-operator-webhook	-
+tekton-pipelines	pipelines-as-code-controller	v0.50.0
+tekton-pipelines	pipelines-as-code-watcher	v0.50.0
+tekton-pipelines	pipelines-as-code-webhook	v0.50.0
+tekton-pipelines	tekton-chains-controller	-
+tekton-pipelines	tekton-events-controller	v1.15.0
+tekton-pipelines	tekton-operator-proxy-webhook	-
+tekton-pipelines	tekton-pipelines-controller	v1.15.0
+tekton-pipelines	tekton-pipelines-remote-resolvers	v1.15.0
+tekton-pipelines	tekton-pipelines-webhook	v1.15.0
+tekton-pipelines	tekton-results-api	v0.20.0
+tekton-pipelines	tekton-results-retention-policy-agent	v0.20.0
+tekton-pipelines	tekton-results-watcher	v0.20.0
+tekton-pipelines	tekton-triggers-controller	v0.37.0
+tekton-pipelines	tekton-triggers-core-interceptors	v0.37.0
+tekton-pipelines	tekton-triggers-webhook	v0.37.0

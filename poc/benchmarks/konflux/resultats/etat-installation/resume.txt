@@ -1,0 +1,1 @@
+état « installation » : 40 pods (0 ni Running ni Completed), 30 composants (A-5), 35 images hors kube-system dont 6 sans digest, mémoire du nœud 2.47GiB / 20GiB

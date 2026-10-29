@@ -1,0 +1,4 @@
+étape	date (UTC)	depuis le début
+1. création du cluster kind (début du banc A1)	2026-10-29T11:04:27Z	0h00m00s
+2. cluster prêt, plafond et ports contrôlés	2026-10-29T11:05:07Z	0h00m40s
+3. deploy-local.sh terminé (Konflux Ready)	2026-10-29T11:11:20Z	0h06m53s

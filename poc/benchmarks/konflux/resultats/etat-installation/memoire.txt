@@ -1,0 +1,1 @@
+konflux-control-plane	2.47GiB / 20GiB	12.35%	13.95%	1029

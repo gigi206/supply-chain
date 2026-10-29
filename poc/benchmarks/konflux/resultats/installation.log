@@ -1,0 +1,400 @@
+# deployer.sh, 2026-10-29T11:04:27Z, konflux-ci v0.2.2-1-g0af514c (adaptations 0af514c), install-epingle.yaml 7e20b88221332b92d7fe06237df9ab95138b1930a2b55dcc4311f86dca5c9fea
+# kind v0.33.0, kubectl v1.37.2, docker 28.4.0
+# hôte : 61 Gi ; system-reserved=42Gi pour un allocatable sous 20 Gi
+1. création du cluster kind (début du banc A1)	2026-10-29T11:04:27Z	0h00m00s
+inotify limits already sufficient (watches=2097152, instances=1024).
+Registry port binding is enabled. Checking if port 5001 is available...
+Port 5001 is available.
+Configuring Kind cluster with 42Gi memory...
+Using default registry port mapping (host port 5001)...
+Creating Kind cluster 'konflux'...
+Creating cluster "konflux" ...
+ • Ensuring node image (kindest/node:v1.37.0) 🖼️  ...
+ ✓ Ensuring node image (kindest/node:v1.37.0) 🖼️
+ • Preparing nodes 📦   ...
+ ✓ Preparing nodes 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+Set kubectl context to "kind-konflux"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-konflux
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+Reverting kind config to original state...
+Skipping Podman PID limit increase.
+✓ Kind cluster 'konflux' created successfully
+
+Next steps:
+  1. Deploy dependencies: ./scripts/deploy-deps.sh
+  2. Deploy operator: cd operator && make deploy
+  3. Apply Konflux CR: kubectl apply -f my-konflux.yaml
+
+Or use the all-in-one script: ./scripts/deploy-local.sh
+OK   konflux-control-plane plafonné à 20 Gi
+allocatable : 20207680Ki, capacité : 64247872Ki
+6443/tcp -> 127.0.0.1:45793
+30001/tcp -> 127.0.0.1:5001
+30010/tcp -> 127.0.0.1:8888
+30011/tcp -> 127.0.0.1:9443
+30012/tcp -> 127.0.0.1:8180
+OK   ports publiés sur 127.0.0.1 seulement
+OK   ~/.kube/config inchangé
+2. cluster prêt, plafond et ports contrôlés	2026-10-29T11:05:07Z	0h00m40s
+Verifying release assets for 'v0.2.2'...
+✓ Release assets reachable
+  install: https://github.com/konflux-ci/konflux-ci/releases/download/v0.2.2/install.yaml
+  samples: https://github.com/konflux-ci/konflux-ci/releases/download/v0.2.2/samples.tar.gz
+=========================================
+Konflux Local Development Deployment
+=========================================
+
+Configuration:
+  Environment:     ~/.cache/supply-chain-poc/konflux/konflux-ci/scripts/deploy-local.env
+  Install method:  release
+  Konflux CR:      ~/.cache/supply-chain-poc/konflux/konflux-ci/a1/konflux.yaml
+  Release:         v0.2.2
+
+=========================================
+Step 1: Skipped (DEPLOY_LOCAL_SKIP_KIND=1 — using current KUBECONFIG)
+=========================================
+
+=========================================
+Step 2: Deploying dependencies
+=========================================
+Installing Tekton, cert-manager, and other prerequisites...
+🔍 Checking requirements
+kubectl is installed
+openssl is installed
+Checking kubectl version
+kubectl version v1.37.2 meets minimum requirement (v1.31.4)
+
+All requirements are met
+Continue
+🧪 Testing PVC creation for default storage class
+Creating PVC from '~/.cache/supply-chain-poc/konflux/konflux-ci/dependencies/pre-deployment-pvc-binding' using the cluster's default storage class
+
+=== Storage Diagnostics (Initial State) ===
+--- Storage Classes ---
+NAME                 PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+standard (default)   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  3s
+=== End Storage Diagnostics ===
+
+namespace/test-pvc-ns created
+persistentvolumeclaim/test-pvc created
+pod/test-pvc-consumer created
+persistentvolumeclaim/test-pvc condition met
+namespace "test-pvc-ns" deleted
+persistentvolumeclaim "test-pvc" deleted from test-pvc-ns namespace
+pod "test-pvc-consumer" deleted from test-pvc-ns namespace
+PVC binding successfull
+🌊 Deploying Konflux Dependencies
+🔐 Deploying Cert Manager...
+namespace/cert-manager created
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io created
+serviceaccount/cert-manager created
+serviceaccount/cert-manager-cainjector created
+serviceaccount/cert-manager-startupapicheck created
+serviceaccount/cert-manager-webhook created
+role.rbac.authorization.k8s.io/cert-manager-startupapicheck:create-cert created
+role.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving created
+role.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection created
+role.rbac.authorization.k8s.io/cert-manager:leaderelection created
+clusterrole.rbac.authorization.k8s.io/cert-manager-cainjector created
+clusterrole.rbac.authorization.k8s.io/cert-manager-cluster-view created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificates created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-challenges created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-issuers created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-orders created
+clusterrole.rbac.authorization.k8s.io/cert-manager-edit created
+clusterrole.rbac.authorization.k8s.io/cert-manager-view created
+clusterrole.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews created
+rolebinding.rbac.authorization.k8s.io/cert-manager-startupapicheck:create-cert created
+rolebinding.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving created
+rolebinding.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection created
+rolebinding.rbac.authorization.k8s.io/cert-manager:leaderelection created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-cainjector created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificates created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-challenges created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-issuers created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-orders created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews created
+service/cert-manager created
+service/cert-manager-cainjector created
+service/cert-manager-webhook created
+deployment.apps/cert-manager created
+deployment.apps/cert-manager-cainjector created
+deployment.apps/cert-manager-webhook created
+job.batch/cert-manager-startupapicheck created
+mutatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
+validatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
+deployment.apps/cert-manager condition met
+deployment.apps/cert-manager-cainjector condition met
+deployment.apps/cert-manager-webhook condition met
+📊 Deploying Prometheus Operator CRDs...
+📊 Installing Prometheus Operator ServiceMonitor CRD...
+customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com created
+🤝 Deploying Trust Manager...
+customresourcedefinition.apiextensions.k8s.io/bundles.trust.cert-manager.io created
+serviceaccount/trust-manager created
+role.rbac.authorization.k8s.io/trust-manager created
+role.rbac.authorization.k8s.io/trust-manager:leaderelection created
+clusterrole.rbac.authorization.k8s.io/trust-manager created
+clusterrole.rbac.authorization.k8s.io/trust-manager-cluster-view created
+rolebinding.rbac.authorization.k8s.io/trust-manager created
+rolebinding.rbac.authorization.k8s.io/trust-manager:leaderelection created
+clusterrolebinding.rbac.authorization.k8s.io/trust-manager created
+service/trust-manager created
+service/trust-manager-metrics created
+deployment.apps/trust-manager created
+certificate.cert-manager.io/trust-manager created
+issuer.cert-manager.io/trust-manager created
+validatingwebhookconfiguration.admissionregistration.k8s.io/trust-manager created
+pod/trust-manager-84758979d6-xlkng condition met
+📜 Setting up Cluster Issuer...
+⏭️  Skipping Cluster Issuer deployment (managed by operator)
+🐱 Deploying Tekton...
+  🐱 Installing Tekton via upstream Operator...
+namespace/tekton-operator created
+customresourcedefinition.apiextensions.k8s.io/manualapprovalgates.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/openshiftpipelinesascodes.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/syncerservices.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonaddons.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonchains.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonconfigs.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektondashboards.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektoninstallersets.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonmulticlusterproxyaaes.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonpipelines.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonpruners.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonresults.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektonschedulers.operator.tekton.dev created
+customresourcedefinition.apiextensions.k8s.io/tektontriggers.operator.tekton.dev created
+serviceaccount/tekton-operator created
+role.rbac.authorization.k8s.io/tekton-operator-info created
+clusterrole.rbac.authorization.k8s.io/tekton-config-read-role created
+clusterrole.rbac.authorization.k8s.io/tekton-operator created
+clusterrole.rbac.authorization.k8s.io/tekton-pac-controller-role created
+clusterrole.rbac.authorization.k8s.io/tekton-result-read-role created
+clusterrole.rbac.authorization.k8s.io/tekton-scheduler-role created
+rolebinding.rbac.authorization.k8s.io/tekton-operator-info created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-config-read-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-operator created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-pac-controller-role-binding created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-result-read-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/tekton-scheduler-rolebinding created
+configmap/config-logging created
+configmap/tekton-config-defaults created
+configmap/tekton-config-observability created
+configmap/tekton-operator-controller-config-leader-election created
+configmap/tekton-operator-info created
+configmap/tekton-operator-webhook-config-leader-election created
+secret/tekton-operator-webhook-certs created
+service/tekton-operator created
+service/tekton-operator-webhook created
+deployment.apps/tekton-operator created
+deployment.apps/tekton-operator-webhook created
+pod/tekton-operator-6ffcd44b47-6dxlw condition met
+pod/tekton-operator-webhook-6fc8585f48-dbv4l condition met
+tektonconfig.operator.tekton.dev/config condition met
+  ⚙️  Configuring Tekton...
+service/pipelines-as-code-controller-nodeport created
+Warning: resource tektonconfigs/config is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+tektonconfig.operator.tekton.dev/config configured
+tektonconfig.operator.tekton.dev/config condition met
+  🔐 Setting up Tekton Chains RBAC...
+# Warning: 'patchesJson6902' is deprecated. Please use 'patches' instead. Run 'kustomize edit fix' to update your Kustomization automatically.
+namespace/openshift-pipelines created
+serviceaccount/chains-secrets-admin created
+role.rbac.authorization.k8s.io/chains-secret-admin created
+role.rbac.authorization.k8s.io/chains-secret-admin created
+clusterrole.rbac.authorization.k8s.io/tekton-chains-public-key-viewer created
+rolebinding.rbac.authorization.k8s.io/chains-secret-admin created
+rolebinding.rbac.authorization.k8s.io/tekton-chains-public-key-viewer created
+rolebinding.rbac.authorization.k8s.io/chains-secret-admin created
+rolebinding.rbac.authorization.k8s.io/tekton-chains-public-key-viewer created
+job.batch/tekton-chains-signing-secret created
+  ⏳ Waiting for tekton-chains-signing-secret Job in tekton-pipelines...
+job.batch/tekton-chains-signing-secret condition met
+🔑 Deploying Dex...
+⏭️  Skipping Dex deployment (managed by operator)
+📦 Deploying Registry...
+⏭️  Skipping Internal Registry deployment (managed by operator)
+🔄 Deploying Smee...
+⏭️  Skipping Smee deployment (not needed for OCP CI)
+🛡️  Deploying admission policies...
+  🛡️  Applying MutatingAdmissionPolicies from ~/.cache/supply-chain-poc/konflux/konflux-ci/dependencies/admission-policies/policy
+mutatingadmissionpolicy.admissionregistration.k8s.io/reduce-tekton-pr-taskrun-resource-requests created
+mutatingadmissionpolicybinding.admissionregistration.k8s.io/reduce-tekton-pr-taskrun-resource-requests created
+📋 Deploying Konflux Info...
+⏭️  Skipping Konflux Info deployment (managed by operator)
+🐳 Deploying Quay...
+⏭️  Skipping Quay deployment
+⏳ Waiting for the dependencies to be ready
+⏳ Waiting for Tekton configuration to be ready...
+tektonconfig.operator.tekton.dev/config condition met
+⏳ Waiting for all deployments to be available...
+deployment.apps/cert-manager condition met
+deployment.apps/cert-manager-cainjector condition met
+deployment.apps/cert-manager-webhook condition met
+deployment.apps/trust-manager condition met
+deployment.apps/coredns condition met
+deployment.apps/local-path-provisioner condition met
+deployment.apps/tekton-operator condition met
+deployment.apps/tekton-operator-webhook condition met
+deployment.apps/pipelines-as-code-controller condition met
+deployment.apps/pipelines-as-code-watcher condition met
+deployment.apps/pipelines-as-code-webhook condition met
+deployment.apps/tekton-chains-controller condition met
+deployment.apps/tekton-events-controller condition met
+deployment.apps/tekton-operator-proxy-webhook condition met
+deployment.apps/tekton-pipelines-controller condition met
+deployment.apps/tekton-pipelines-remote-resolvers condition met
+deployment.apps/tekton-pipelines-webhook condition met
+deployment.apps/tekton-results-api condition met
+deployment.apps/tekton-results-retention-policy-agent condition met
+deployment.apps/tekton-results-watcher condition met
+deployment.apps/tekton-triggers-controller condition met
+deployment.apps/tekton-triggers-core-interceptors condition met
+deployment.apps/tekton-triggers-webhook condition met
+
+=========================================
+Step 3: Deploying Konflux operator
+=========================================
+Using installation method: release
+Installing from GitHub release (v0.2.2)...
+Applying: ~/.cache/supply-chain-poc/konflux/assets/install-epingle.yaml
+namespace/konflux-operator created
+customresourcedefinition.apiextensions.k8s.io/konfluxapplicationapis.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxbuildservices.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxcertmanagers.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxclis.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxdefaulttenants.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxenterprisecontracts.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxes.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluximagecontrollers.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxinfoes.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxintegrationservices.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxinternalregistries.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxnamespacelisters.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxrbacs.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxreleaseservices.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxsegmentbridges.konflux.konflux-ci.dev created
+customresourcedefinition.apiextensions.k8s.io/konfluxuis.konflux.konflux-ci.dev created
+serviceaccount/konflux-operator-controller-manager created
+role.rbac.authorization.k8s.io/konflux-operator-leader-election-role created
+clusterrole.rbac.authorization.k8s.io/konflux-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-admin-user-actions created
+clusterrole.rbac.authorization.k8s.io/konflux-contributor-user-actions created
+clusterrole.rbac.authorization.k8s.io/konflux-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-maintainer-user-actions created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konflux-system-admin created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxapplicationapi-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxapplicationapi-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxapplicationapi-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxbuildservice-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxbuildservice-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxcertmanager-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxcertmanager-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxcertmanager-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxcli-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxcli-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxdefaulttenant-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxdefaulttenant-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxenterprisecontract-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxenterprisecontract-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxenterprisecontract-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluximagecontroller-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluximagecontroller-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluximagecontroller-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinfo-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinfo-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinfo-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxintegrationservice-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxintegrationservice-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinternalregistry-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinternalregistry-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxinternalregistry-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxnamespacelister-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxnamespacelister-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxnamespacelister-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxrbac-admin-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxrbac-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxrbac-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxreleaseservice-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxreleaseservice-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxui-editor-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-konfluxui-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-manager-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-metrics-auth-role created
+clusterrole.rbac.authorization.k8s.io/konflux-operator-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/konflux-viewer-role created
+clusterrole.rbac.authorization.k8s.io/konflux-viewer-user-actions created
+rolebinding.rbac.authorization.k8s.io/konflux-operator-leader-election-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/konflux-operator-manager-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/konflux-operator-metrics-auth-rolebinding created
+service/konflux-operator-controller-manager-metrics-service created
+deployment.apps/konflux-operator-controller-manager created
+certificate.cert-manager.io/konflux-operator-metrics-certs created
+issuer.cert-manager.io/konflux-operator-metrics-selfsigned-issuer created
+
+=========================================
+Step 4: Waiting for operator
+=========================================
+Waiting for operator deployment...
+deployment.apps/konflux-operator-controller-manager condition met
+✓ Operator is ready
+
+=========================================
+Step 5: Applying Konflux configuration
+=========================================
+Applying: ~/.cache/supply-chain-poc/konflux/konflux-ci/a1/konflux.yaml
+konflux.konflux.konflux-ci.dev/konflux created
+
+=========================================
+Step 6: Setting up secrets
+=========================================
+
+=========================================
+Step 7: Waiting for Konflux to be ready
+=========================================
+This may take several minutes...
+konflux.konflux.konflux-ci.dev/konflux condition met
+✓ Konflux is ready
+
+=========================================
+✅ Deployment Complete!
+=========================================
+
+Konflux is now running on your local Kind cluster
+
+Access the UI:
+  https://localhost:9443
+
+Demo user credentials:
+  user1@konflux.dev / password
+  user2@konflux.dev / password
+
+Internal registry:
+  localhost:5001
+
+3. deploy-local.sh terminé (Konflux Ready)	2026-10-29T11:11:20Z	0h06m53s

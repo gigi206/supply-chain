@@ -1,0 +1,14 @@
+build-service	quay.io/konflux-ci/build-service:d9f967ffe35d99d18b09373822ae2819b50c2aa1
+integration-service	quay.io/konflux-ci/integration-service:ef6599a2515d6398344e121b78b141fab091736b
+kube-system	docker.io/kindest/kindnetd:v20260820-69b56db7
+kube-system	registry.k8s.io/coredns/coredns:v1.14.6
+kube-system	registry.k8s.io/etcd:3.7.0-0
+kube-system	registry.k8s.io/kube-apiserver:v1.37.0
+kube-system	registry.k8s.io/kube-controller-manager:v1.37.0
+kube-system	registry.k8s.io/kube-proxy:v1.37.0
+kube-system	registry.k8s.io/kube-scheduler:v1.37.0
+local-path-storage	docker.io/kindest/local-path-provisioner:v20260820-69b56db7
+release-service	quay.io/konflux-ci/release-service:247e44403e4c4464e09a371b4fa474ada7ddd019
+tekton-pipelines	ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-controller:v0.50.0
+tekton-pipelines	ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-watcher:v0.50.0
+tekton-pipelines	ghcr.io/tektoncd/pipelines-as-code/pipelines-as-code-webhook:v0.50.0
