@@ -1,0 +1,10 @@
+# Banc A2 : réglages de reproductibilité des rpm, propres au projet (repris tels quels dans la
+# configuration de mock pour la brique 05). Les deb tirent SOURCE_DATE_EPOCH du changelog (dpkg).
+%if "%_repository" == "rocky_9"
+Macros:
+%_buildhost reproducible
+%source_date_epoch_from_changelog 1
+%use_source_date_epoch_as_buildtime 1
+%clamp_mtime_to_source_date_epoch 1
+:Macros
+%endif

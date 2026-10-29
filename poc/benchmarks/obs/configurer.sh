@@ -4,6 +4,7 @@
 # - osc de l'appliance configuré pour root (oscrc en 0600) ;
 # - worker : 1 instance de 4 jobs et 3 Gi (6 instances par défaut, une par vCPU, ne tiennent
 #   pas dans 8 Gi), type de VM « kvm » imposé (pas de repli silencieux en chroot) ;
+# - provenance SLSA activée pour le projet poc ($slsaprovenance, désactivée par défaut) ;
 # - contrôles : CPU (x86-64-v3 sans v4), /dev/kvm, sortie réseau, services, RAM et disque.
 #
 # Usage (racine du dépôt) : mise run obs:configurer
@@ -38,6 +39,13 @@ s 'sed -i -e "s/^OBS_WORKER_INSTANCES=.*/OBS_WORKER_INSTANCES=\"1\"/" \
    systemctl restart obsworker
    journalctl -u obsworker --no-pager -n 20 | grep -E "Run [0-9]+ obsworker|Type of obsworker"
    sleep 5; ls /srv/obs/workers/idle 2>/dev/null | sed "s/^/worker inactif : /"'
+
+echo "## Provenance SLSA du projet poc (\$slsaprovenance, préfixe « projet/dépôt » : BSSched/BuildJob.pm)"
+s 'f=/usr/lib/obs/server/BSConfig.pm
+   grep -q "^our \$slsaprovenance" "$f" || sed -i "s|^1;\$|our \$slsaprovenance = [ \"poc/\" ];\n\n1;|" "$f"
+   grep -n "^our \$slsaprovenance" "$f"; perl -c "$f" 2>&1
+   systemctl restart obssrcserver obsrepserver obsscheduler obsdispatcher obssigner obspublisher obsworker
+   systemctl is-active obssrcserver obsrepserver obsscheduler obsdispatcher obssigner obspublisher obsworker | paste -sd" "'
 
 echo "## Contrôles"
 s '/lib64/ld-linux-x86-64.so.2 --help | grep -E "x86-64-v[34]"

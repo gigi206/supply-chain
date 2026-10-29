@@ -1,0 +1,5 @@
+sample-app (1.0.0-1) trixie; urgency=medium
+
+  * Paquet du banc A2 (OBS) et des briques 05 et 06.
+
+ -- Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>  Wed, 28 Oct 2026 23:19:26 +0000

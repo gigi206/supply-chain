@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+# Build hors ligne depuis l'archive de sources.sh (vendor/ et web/node_modules inclus).
+# SOURCE_DATE_EPOCH vient de debian/changelog (dpkg).
+export GOTOOLCHAIN := local
+export GOPROXY := off
+export CGO_ENABLED := 0
+export GOFLAGS := -mod=vendor -buildvcs=false -trimpath
+export GOCACHE := $(CURDIR)/.gocache
+export GOPATH := $(CURDIR)/.gopath
+VERSION := $(shell dpkg-parsechangelog -SVersion | sed 's/-[^-]*$$//')
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	cd web && node build.mjs
+	go build -ldflags "-s -w -buildid= -X main.Version=$(VERSION)" -o sample-app .
+
+override_dh_auto_install:
+	install -Dm0755 sample-app debian/sample-app/usr/bin/sample-app
+
+override_dh_auto_clean:
+	rm -rf web/dist sample-app .gocache .gopath
+
+override_dh_auto_test:
+
+override_dh_dwz:

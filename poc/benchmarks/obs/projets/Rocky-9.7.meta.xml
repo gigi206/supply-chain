@@ -1,0 +1,32 @@
+<!-- Banc A2 : Rocky Linux 9.7 figée (vault, inchangé depuis la sortie de la 9.8), téléchargée à la demande.
+     repomd.xml.asc vérifié par bs_dodup avec la clé Rocky 9 (insérée par depots.sh). -->
+<project name="Rocky:9.7">
+  <title>Rocky Linux 9.7 (vault)</title>
+  <description>Dépôts BaseOS et AppStream téléchargés à la demande, figés ; base des builds rpm du banc A2.</description>
+  <person userid="Admin" role="maintainer"/>
+  <build>
+    <disable/>
+  </build>
+  <publish>
+    <disable/>
+  </publish>
+  <repository name="standard">
+    <path project="Rocky:9.7" repository="appstream"/>
+    <path project="Rocky:9.7" repository="baseos"/>
+    <arch>x86_64</arch>
+  </repository>
+  <repository name="appstream">
+    <download arch="x86_64" repotype="rpmmd" url="https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/">
+      <archfilter>x86_64</archfilter>
+      <pubkey>@CLES@</pubkey>
+    </download>
+    <arch>x86_64</arch>
+  </repository>
+  <repository name="baseos">
+    <download arch="x86_64" repotype="rpmmd" url="https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/">
+      <archfilter>x86_64</archfilter>
+      <pubkey>@CLES@</pubkey>
+    </download>
+    <arch>x86_64</arch>
+  </repository>
+</project>

@@ -1,0 +1,14 @@
+<!-- Banc A2 : projet de sample-app, un dépôt par distribution cible. -->
+<project name="poc">
+  <title>Banc A2 : sample-app en rpm et en deb</title>
+  <description>sample-app construit pour Rocky 9.7 (spec) et Debian 13 (dsc) depuis poc/packaging.</description>
+  <person userid="Admin" role="maintainer"/>
+  <repository name="rocky_9">
+    <path project="Rocky:9.7" repository="standard"/>
+    <arch>x86_64</arch>
+  </repository>
+  <repository name="debian_13">
+    <path project="Debian:13" repository="standard"/>
+    <arch>x86_64</arch>
+  </repository>
+</project>

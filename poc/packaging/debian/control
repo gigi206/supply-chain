@@ -1,0 +1,15 @@
+Source: sample-app
+Section: web
+Priority: optional
+Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://github.com/gigi206/supply-chain
+
+Package: sample-app
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: application de démonstration de la plateforme supply-chain
+ Binaire Go qui sert une interface web construite avec npm et embarquée à la
+ compilation.

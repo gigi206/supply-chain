@@ -1,4 +1,4 @@
-# configurer.sh, 2026-10-29T13:56:26Z
+# configurer.sh, 2026-10-29T14:02:14Z
 ## Compte Admin
 ancien mot de passe sur /person/Admin : HTTP 401
 nouveau mot de passe sur /person/Admin : HTTP 200
@@ -10,11 +10,15 @@ OBS_WORKER_JOBS="4"
 OBS_VM_TYPE="kvm"
 OBS_VM_DISK_AUTOSETUP_ROOT_FILESIZE="16384"
 OBS_INSTANCE_MEMORY="3072"
-Oct 29 13:55:40 sc-obs obsworker[3260]: Run 1 obsworker using /var/cache/obs/worker
-Oct 29 13:55:40 sc-obs obsworker[3260]: Type of obsworker is KVM virtual machine
 Oct 29 13:56:35 sc-obs obsworker[3536]: Run 1 obsworker using /var/cache/obs/worker
 Oct 29 13:56:35 sc-obs obsworker[3536]: Type of obsworker is KVM virtual machine
+Oct 29 14:02:21 sc-obs obsworker[4210]: Run 1 obsworker using /var/cache/obs/worker
+Oct 29 14:02:21 sc-obs obsworker[4210]: Type of obsworker is KVM virtual machine
 worker inactif : x86_64:sc-obs:1
+## Provenance SLSA du projet poc ($slsaprovenance, préfixe « projet/dépôt » : BSSched/BuildJob.pm)
+377:our $slsaprovenance = [ "poc/" ];
+/usr/lib/obs/server/BSConfig.pm syntax OK
+active active active active active active active
 ## Contrôles
   x86-64-v4
   x86-64-v3 (supported, searched)
@@ -25,10 +29,10 @@ services OBS actifs : apache2.service memcached.service obs-clockwork.service ob
 RPM installés : 554
 clé OBS dans la base rpm : gpg-pubkey-c5c219e7-51236685, copie de 2013 expirée le 30/04/2015 (embarquée dans config.sh de l appliance)
                total        used        free      shared  buff/cache   available
-Mem:            7939        3294        4461           3         428        4645
+Mem:            7939        3330        4422           3         429        4609
 /dev/vda3        28G  3.4G   23G  13% /
 /dev/vda2        10G  228M  9.8G   3% /srv/obs/service
-RAM de la VM vue par l'hôte (RSS de qemu) : 4.2 Gi
+RAM de la VM vue par l'hôte (RSS de qemu) : 4.3 Gi
 ## Paquets rpm de la VM comparés au SBOM de la qcow2 (même build)
 composants du SBOM : pkg:golang 434, pkg:rpm 554, sans purl 1
 écarts : 1 lignes (code diff 1)

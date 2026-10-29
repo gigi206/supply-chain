@@ -146,6 +146,14 @@ run = "poc/benchmarks/obs/premier-acces.sh"
 description = "Banc A2 : compte Admin, osc, worker (1 instance KVM, 3 Gi) et contrôles de la VM sc-obs"
 run = "poc/benchmarks/obs/configurer.sh"
 
+[tasks."obs:depots"]
+description = "Banc A2 : clés sur 2 canaux, Debian 13 (instantané) et Rocky 9.7 (vault) en DoD vérifié, projet poc"
+run = "poc/benchmarks/obs/depots.sh"
+
+[tasks."packaging:sources"]
+description = "Sources reproductibles de sample-app (vendor Go, marked vérifié) : archive, paquet source Debian, spec"
+run = "poc/packaging/sources.sh"
+
 [tasks.bancs]
 description = "Rejoue les bancs locaux de l'étape 4b (Zot et BuildKit rootless éphémères) ; journaux */resultats/*-laptop.*"
 depends = ["outils"]
