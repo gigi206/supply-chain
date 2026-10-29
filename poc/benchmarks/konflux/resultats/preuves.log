@@ -1,4 +1,4 @@
-# preuves.sh, 2026-10-29T12:52:50Z
+# preuves.sh, 2026-10-29T13:26:15Z
 ## 1. Écarts d'intégration
 Service NodePort livré par Konflux (dependencies/tekton-config/pac-nodeport-service.yml) : targetPort 8080
 Service NodePort en place (corrigé) : [{"nodePort":30012,"port":8180,"protocol":"TCP","targetPort":8082}]
@@ -25,6 +25,18 @@ Politique « default », data 8eaa4f44c2bf67e6e2b20c5777b0d73e978c632b, required
 NetworkPolicy du tenant : {"podSelector":{"matchLabels":{"tekton.dev/pipelineTask":"tpa-scan"}},"policyTypes":["Egress"]}
   pod/sample-app-on-pull-request-2cfmd-tpa-scan-pod (2026-10-29T12:24:53Z) : Running TPA scan on amd64 image manifest
   pod/sample-app-on-pull-request-9qt8d-tpa-scan-pod (2026-10-29T12:47:45Z) : Task tpa-scan failed: Failed to get image manifests from image 
+## 2b. Clé de Chains (T1) : montage dans le pod de Chains
+pod/tekton-chains-controller-778f975bb6-jtcpf, nœud konflux-control-plane (nœud de l'étape T4 : konflux-control-plane)
+  volume : {"secret":"signing-secrets","items":"toutes les clés"}
+  clés du secret signing-secrets : ["cosign.key","cosign.password","cosign.pub"]
+## 2c. Environnement Go du prefetch (comparé au constat du banc B)
+pod/sample-app-on-pull-request-ctv2d-prefetch-dependencies-pod :
+  Executing hermeto --log-level debug generate-env /var/workdir/cachi2/output --for-output-dir /cachi2/output --output /var/workdir/cachi2/cachi2.env
+  Executing hermeto --log-level debug generate-env /var/workdir/cachi2/output --for-output-dir /cachi2/output --output /var/workdir/cachi2/prefetch-env.json
+  Executing hermeto --log-level debug generate-env /var/workdir/cachi2/output --for-output-dir /cachi2/output --output /var/workdir/cachi2/prefetch.env
+  Resolving environment variable 'GOMODCACHE=${output_dir}/deps/gomod/pkg/mod'
+  Resolving environment variable 'GOPROXY=file://${GOMODCACHE}/cache/download'
+  Resolving environment variable 'GOSUMDB=off'
 ## 3. rpm et deb
 install.yaml de Konflux v0.2.2 : 0 occurrence de multi-platform-controller
 konflux-ci/rpmbuild-pipeline @ 587b661617585d9274e367c113b7f5971f7b275a, docs/architecture.md :

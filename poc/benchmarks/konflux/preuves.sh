@@ -4,7 +4,8 @@
 # 1. Écarts d'intégration de Konflux v0.2.2 : ports de PaC, NetworkPolicy, options de
 #    l'objet PaC de l'opérateur, livraisons de webhooks échouées côté Forgejo.
 # 2. Sorties vers des tiers : tpa-scan (URL par défaut, tâche exigée par la politique,
-#    blocage par la NetworkPolicy), deprecated-image-check.
+#    blocage par la NetworkPolicy), deprecated-image-check ; 2b : montage de la clé de
+#    Chains (T1) ; 2c : environnement Go généré par le prefetch (constat du banc B).
 # 3. rpm et deb : multi-platform-controller absent de l'opérateur, prérequis du pipeline
 #    rpmbuild de Konflux.
 # 4. Santé (A-6) : commits humains sur 90 jours, auteurs, domaines et employeurs déclarés.
@@ -60,6 +61,18 @@ for p in $(kubectl get pods -n "$NS" -l tekton.dev/pipelineTask=tpa-scan -o name
   t=$(kubectl logs -n "$NS" "$p" -c step-get-vulnerabilities 2>&1 | grep -oE 'Running TPA scan on [a-z0-9]+ image manifest|Task tpa-scan failed: [^\\]{0,60}' | head -1 || true)
   echo "  $p ($(kubectl get -n "$NS" "$p" -o jsonpath='{.metadata.creationTimestamp}')) : ${t:-pas de trace}"
 done
+
+echo "## 2b. Clé de Chains (T1) : montage dans le pod de Chains"
+cp=$(kubectl get pods -n tekton-pipelines -l app=tekton-chains-controller -o name | head -1)
+echo "$cp, nœud $(kubectl get -n tekton-pipelines "$cp" -o jsonpath='{.spec.nodeName}') (nœud de l'étape T4 : $(kubectl get pods -n "$NS" -l tekton.dev/pipelineTask=sonde -o jsonpath='{.items[0].spec.nodeName}'))"
+echo "  volume : $(kubectl get -n tekton-pipelines "$cp" -o json | jq -c '.spec.volumes[] | select(.secret.secretName == "signing-secrets") | {secret: .secret.secretName, items: (.secret.items // "toutes les clés")}')"
+echo "  clés du secret signing-secrets : $(kubectl get secret -n tekton-pipelines signing-secrets -o json | jq -c '.data | keys')"
+
+echo "## 2c. Environnement Go du prefetch (comparé au constat du banc B)"
+pf=$(kubectl get pods -n "$NS" -l tekton.dev/pipelineTask=prefetch-dependencies --sort-by=.metadata.creationTimestamp -o name | tail -1)
+echo "$pf :"
+kubectl logs -n "$NS" "$pf" -c step-prefetch-dependencies 2>&1 \
+  | grep -oE "Executing hermeto [^\"]*generate-env[^\"]*|Resolving environment variable '(GOMODCACHE|GOPROXY|GOSUMDB|GOFLAGS|GOTOOLCHAIN)=[^']*'" | sort -u | sed 's/^/  /'
 
 echo "## 3. rpm et deb"
 echo "install.yaml de Konflux v0.2.2 : $(grep -ciE 'multi-?platform' "$K/assets/install.yaml" || true) occurrence de multi-platform-controller"
