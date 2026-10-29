@@ -128,6 +128,7 @@ rendre() { # composant fichier : manifeste réécrit vers Zot + correctifs (kust
   done < "$TSV"
   sed -i "s#cgr.dev/chainguard/busybox@sha256:[0-9a-f]*#$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$TSV")#g" "$k/release.yaml"
   cp "$here/tekton/kustomization-$c.yaml" "$k/kustomization.yaml"
+  cp "$P/ca-poc.crt" "$k/ca.crt"   # configMapGenerator du résolveur bundles (J6)
   [ ! -d "$here/tekton/$c" ] || cp "$here/tekton/$c"/* "$k/"
   kubectl kustomize "$k" > "$k/rendu.yaml"
 }

@@ -51,6 +51,7 @@ Relevé du 29/10/2026. Versions de k3s et image des VM : décidées par le propr
 | cosign (image du job d'horodatage) | v3.1.4-dev | confiance | **Signature sans clé vérifiée** : identité `keyless@projectsigstore.iam.gserviceaccount.com` (émetteur `https://accounts.google.com`), documentée par Sigstore ; elle ne lie pas l'image à un tag. Index `8af1a2cf…`, manifeste amd64 `c142f6bc…` (base busybox) |
 | oras (image du job d'horodatage) | 1.3.6 | confiance | **GPG** : `oras_1.3.6_checksums.txt` signé par la clé de release `C6FC42F0…EF37` (fichier `KEYS` du dépôt, empreinte recoupée sur oras.land) ; archive `66fb0ad7…` (= `mise.lock`). L'image officielle d'oras n'est pas signée |
 | Kyverno | v1.19.2 | confiance | **J6 : 5 images vérifiées** par identité exacte (`release.yaml@refs/tags/v1.19.2`, commit du tag `e63308f1…`, déclencheur `push`), signatures dans `ghcr.io/kyverno/signatures` ; même digest d'index sur `reg.kyverno.io` et `ghcr.io` ; copiées dans Zot avec leurs bundles et revérifiées. `install.yaml` **non signé** (absent de `checksums.txt`), mais identique au manifeste `config/install-latest-testing.yaml` du commit du tag (signature vérifiée par GitHub), à la version près ; empreinte `4f785937…` épinglée |
+| tkn (CLI Tekton) | v0.46.2 | hôte (mise) | **sha256 seulement** : `checksums.txt` de la release, sans signature ni attestation GitHub ; empreinte identique dans `mise.lock`, `checksums.txt` et l'archive téléchargée (`f6d86bc7…`) ; installé avec l'accord du propriétaire (J6). Lié à pipeline v1.14.1 : il **ne signe correctement que des tâches v1beta1** (tektoncd/cli#2894) |
 | Conforma `ec` | v0.10.42 (celle du banc C) | hôte (mise) et tâche | sha256 seulement (doc 04) |
 | Kata Containers | 4.3.1 (`kata-deploy`) | build | **Attestation de release GitHub vérifiée** (`gh release verify`, tag `03cf2ec…`) : `kata-deploy-4.3.1.tgz` `c2507741…`, `kata-static-4.3.1-amd64.tar.zst` `1463a2b8…`. L'image `kata-deploy` reste à vérifier au jalon J7 |
 | Forgejo | v15.0.11 (LTS) | stockage | GPG, déjà vérifié au banc A1 (`mise.toml`) |
@@ -122,7 +123,7 @@ J1 validé et fait le 29/10/2026 (téléchargements, pool, réseau, VM, k3s). Le
 | Cache de l'hôte | J2 : `~/.cache/supply-chain-poc/08/pki` (certificats publics) ; dans `…/08/secrets` (0600) : clés de la CA et des services, mot de passe du compte d'écriture de Zot, mot de passe et jeton de l'administrateur de Forgejo |
 | J4 | Dans le cluster : Tekton Pipelines, Triggers (espaces `tekton-pipelines`, `tekton-pipelines-resolvers`) et Chains (`tekton-chains`), espace `builds` ; dans Zot : manifestes linux/amd64 des 13 images Tekton et du busybox sous `amont/`, dépôt d'essai `builds/essai-signature` ; dans `…/08/secrets` : mot de passe du compte Zot `poc-build` ; `~/.cache/supply-chain-poc/08/telechargements/tekton` : release.yaml des deux sources |
 | J5 | Dans le cluster : TSA (espace `tsa`), espace `horodatage` du job ; dans OpenBao : clé Transit `tsa`, politique `tsa-signature`, rôle JWT `tsa`, NetworkPolicy ouverte à l'espace `tsa` ; dans Zot : compte `poc-horodatage` (`horodatage/**` seulement), copies de `timestamp-server` (index et attestations) et de cosign v3.1.4-dev (amd64) sous `amont/sigstore/`, image d'outils `plateforme/outils-horodatage`, bundles dans `horodatage/bundles`, cas d'essai dans `essais-j5/*` ; dans `…/08/secrets` (0600) : clé de la racine TSA, mot de passe de `poc-horodatage` ; dans `…/08/pki` : racine, feuille et chaîne du TSA, racine de confiance de cosign ; `…/08/telechargements/tsa` : `timestamp-cli`, archive, sommes et signature d'oras, fichier `KEYS` et page de vérification d'oras.land |
-| J6 | Dans le cluster : Kyverno (espace `kyverno`, 4 contrôleurs sur `sc-confiance`), politique `bench-release` du banc C, espace `bancc` (pods d'essai jamais créés : dry-run) ; dans Zot : index des 5 images Kyverno et leurs bundles de signature sous `amont/kyverno/`, 17 cas du banc C sous `bench/` ; `…/08/telechargements/kyverno` : `install.yaml` |
+| J6 | Dans le cluster : Kyverno (espace `kyverno`, 4 contrôleurs sur `sc-confiance`), politique `bench-release` du banc C, 4 politiques d'admission (`tekton-references`, `pods-isolation`, `zone-confiance`, `stepactions-interdites`), espace `bancc` (pods d'essai jamais créés : dry-run) ; Tekton : `trusted-resources-verification-no-match-policy: fail`, `disable-inline-spec`, résolveur `bundles` seul, VerificationPolicy `taches-plateforme` dans `builds`, CA du PoC pour le résolveur ; dans Zot : `compat: docker2s2` (manifestes Docker v2 des bundles de tkn), index des 5 images Kyverno et leurs bundles de signature sous `amont/kyverno/`, 17 cas du banc C sous `bench/`, bundles d'essai sous `tekton/tasks/` et `essais-j6/` ; sur l'hôte : tkn v0.46.2 (`mise.toml`), clé des tâches dans `…/08/secrets` (0600), clé publique dans `…/08/pki` ; `…/08/telechargements/kyverno` : `install.yaml` |
 | J3 | Dans le cluster : OpenBao (espace `openbao`, PVC de 1 Gi sur `sc-confiance`), espace et compte de service `tekton-chains` créés avant Chains ; dans Zot : copie de l'image OpenBao (`amont/openbao/openbao`, 6 plateformes et 4 bundles de signature) ; dans `…/08/secrets` (0600) : jeton root, clé de descellement (b64 et hex), clé TLS d'OpenBao |
 
 Démontage complet en fin de phase, comme au banc A2. Le cluster sert aussi aux étapes 4e (briques 01, 03 et 19, puis 2b-2) : on ne démonte qu'à la fin de 4e, sauf avis contraire.
@@ -326,13 +327,15 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 ## Jalon J6 : politique (en cours, 29/10/2026)
 
-Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite`. Journaux : `resultats/politique-<étape>.log`.
+Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite taches admission`. Journaux : `resultats/politique-<étape>.log`.
 
 | Étape | Durée | Résultat |
 |---|---|---|
 | `image` | 87 s (copie depuis le cache OCI) | Tag v1.19.2 → commit `e63308f1…`, signature du commit vérifiée par GitHub. **5 index multi-plateformes** (kyverno, kyvernopre, background-, cleanup-, reports-controller) : même digest sur `reg.kyverno.io` et `ghcr.io` ; **signature sans clé vérifiée par identité exacte** (workflow `release.yaml` au tag, commit du tag, déclencheur `push`, dépôt `kyverno/kyverno`) ; une identité voisine (tag v1.19.1) est refusée. Index et **bundles de signature** (dépôt séparé `ghcr.io/kyverno/signatures`, étiquette de repli `sha256-<digest>`) copiés dans Zot, puis **signatures revérifiées sur la copie de Zot**, sans dépôt séparé |
 | `installer` | 5 s en réapplication (première installation : moins de 2 min 20 s jusqu'aux 4 contrôleurs prêts, d'après `chrono.tsv` ; son journal a été écrasé) | `install.yaml` épinglé (`4f785937…`) : **identique à `config/install-latest-testing.yaml` du commit du tag**, `latest` remplacé par `v1.19.2` (63 étiquettes de version, 5 images). Réécrit vers Zot par digest, 4 contrôleurs sur `sc-confiance`, CA du PoC seule (`SSL_CERT_FILE`) ; **5 images, toutes tirées de Zot** (`imageID`). Webhooks de ressources en `failurePolicy: Fail` (la règle d'une `ImageValidatingPolicy` y est servie : `ivpol.validate.kyverno.svc-fail`) ; webhooks `verify` (mutation) et `ttl` en `Ignore` |
 | `parite` | 216 s (dont la préparation des 17 cas du banc : images, signatures et attestations poussées dans Zot) | C-2, voir ci-dessous |
+| `taches` | 29 s | Trusted Resources, voir ci-dessous |
+| `admission` | 23 s | Règles d'admission de Kyverno, voir ci-dessous |
 
 **C-2 : parité entre le CLI et l'admission** ([`politique-parite.log`](resultats/politique-parite.log), [`politique-parite.tsv`](resultats/politique-parite.tsv)) :
 - **même fichier de politique** des deux côtés : le modèle `ImageValidatingPolicy` du banc C, clés injectées comme dans son `run.sh` ; seul le glob change (`localhost:5000/*` → `192.168.161.13:5000/bench/*`). **Mêmes pods**, présentés à l'admission par `kubectl create --dry-run=server` (rien n'est créé) ;
@@ -352,6 +355,38 @@ Accord du propriétaire : « continue », après le compactage demandé avant J6
 - **parité des décisions : 25/25** (admis si et seulement si `pass`, code 0 du CLI) ; parité des libellés : 21/25. **L'admission échoue fermé** : l'erreur interne de J5 donne un refus, jamais une admission ;
 - durée moyenne par cas : 406 ms en CLI (lancement du binaire compris), 144 ms à l'admission (aller-retour de `kubectl` compris) ;
 - **décision du propriétaire (29/10/2026)** : C-2 = 5 pour Kyverno seul (score 83 contre 70) ; **décision C reportée à J8**, Conforma reste la porte en J6.
+
+**Trusted Resources** ([`politique-taches.log`](resultats/politique-taches.log)). Vérifications préalables, dans le code de Pipelines v1.15.5 :
+- **seules les tâches et pipelines tirés par un résolveur sont vérifiés** (`GetTaskFunc`, `taskref.go`) : une référence locale ou une spec en ligne échappe aux VerificationPolicies. D'où les règles d'admission plus bas ;
+- le motif d'une VerificationPolicy est ancré (`^(?:…)$`) : CVE-2026-25542 est corrigée dans cette version ;
+- la source comparée au motif est le **dépôt du bundle, sans digest** (`imgRef.Context().Name()`, résolveur `bundles`) ;
+- **les StepActions ne sont pas vérifiées** (aucun appel aux VerificationPolicies), et `enable-step-actions` est sans effet (fonction stable). La plateforme n'en utilise pas ; leur création est refusée à l'admission.
+
+Mise en place : clé ECDSA P-256 **dédiée aux tâches**, distincte de celles de Chains et du TSA (0600 sur l'hôte) ; tâche signée par `tkn task sign`, publiée par `tkn bundle push` dans `tekton/tasks/` ; Tekton en `trusted-resources-verification-no-match-policy: fail` et `disable-inline-spec: pipeline,pipelinerun,taskrun`, résolveur `bundles` seul ; VerificationPolicy `taches-plateforme` (mode `enforce`, motif `sc-stockage\.poc\.test:5000/tekton/(tasks|pipelines)/[a-z0-9-]+`, clé publique en clair : le contrôleur n'a pas à joindre OpenBao). Essais, chacun par un TaskRun dans `builds` :
+
+| Essai | Résultat |
+|---|---|
+| Tâche signée, bundle de `tekton/tasks` | **Exécutée**, `TrustedResourcesVerified=True` |
+| Tâche non signée ; modifiée après signature (une ligne) ; signée par une autre clé | **Refusées** : `ResourceVerificationFailed` |
+| Tâche signée, bundle hors de `tekton/` (`essais-j6/`) | **Refusée** : aucune politique ne correspond, `no-match-policy: fail` |
+| Résolveurs `git`, `http`, `hub` et `cluster` | **Refusés** : « enable-…-resolver feature flag not true » |
+| `taskSpec` en ligne | **Refusé à l'admission** par le webhook de Tekton (« must not set the field(s): spec.taskSpec ») |
+| Tâche **v1** signée par tkn | **Refusée** (constat ci-dessous) |
+
+**Constats.**
+- **tkn v0.46.2 signe toute tâche comme une v1beta1** (`pkg/cmd/task/sign.go` : `v1beta1.Task`, même code sur la branche principale), puis réécrit le fichier depuis cette structure. Une tâche v1 signée porte alors `resources: {}` dans ses étapes, que Pipelines v1.15.5 rejette au décodage strict (`TaskRunResolutionFailed`). Défaut connu : tektoncd/cli#2894, ouvert. **Décision du propriétaire (29/10/2026)** : tâches et pipelines de la plateforme écrits en v1beta1 (dépréciée, servie par la LTS v1.15 jusqu'au 31/07/2027) ; le contrôleur vérifie la v1beta1 telle que signée, puis la convertit. Une tâche v1beta1 signée passe l'aller-retour : exécutée, et refusée dès qu'une ligne change.
+- **Zot refusait les bundles de tkn** (`MANIFEST_INVALID`) : tkn pousse des manifestes Docker v2 schéma 2, et Zot n'accepte par défaut que l'OCI. Zot 2.1.22 a une option de compatibilité : `http.compat: ["docker2s2"]` (configuration de J2), plutôt qu'un assembleur de bundles maison.
+- Le résolveur `bundles` reçoit la CA du PoC (`SSL_CERT_FILE`, configuration de J4) pour lire Zot.
+- La configuration de Tekton posée par J6 (drapeaux, résolveurs) passe par `kubectl patch` : un nouveau `tekton.sh installer` la remet aux valeurs des `release.yaml`, et J6 doit alors être rejoué.
+
+**Règles d'admission de Kyverno** ([`politique/admission.yaml`](politique/admission.yaml), [`politique-admission.log`](resultats/politique-admission.log), [`politique-admission.tsv`](resultats/politique-admission.tsv)). Quatre `ValidatingPolicy` en CEL (14 validations), chargées à l'admission et évaluées en CLI sur les mêmes fichiers :
+- **`tekton-references` (test 2)** : TaskRun et PipelineRun seulement dans `builds`, sans spec en ligne, référencés par le résolveur `bundles` vers `tekton/tasks` ou `tekton/pipelines` **épinglés par digest** ; compte de service `build` seul (y compris `taskRunSpecs`) ; `podTemplate` sans volume, `hostNetwork`, `hostUsers` ni `imagePullSecrets` ; aucun workspace `secret`, `projected` ou `csi`. Une mise à jour qui ne change pas la spec (annotation de Chains, retrait d'un finaliseur) n'est pas réévaluée ;
+- **`pods-isolation` (test 4)** : ni `hostNetwork`, `hostPID`, `hostIPC`, ni `hostPath`, ni conteneur privilégié ou capacité ajoutée (sauf `NET_BIND_SERVICE`) hors Kata (`runtimeClassName` `kata` ou `kata-qemu`), conteneurs d'initialisation et éphémères compris ;
+- **`zone-confiance`** (J3 : `bound_subject` seul) : dans `openbao`, `tekton-chains`, `tekton-pipelines`, `tekton-pipelines-resolvers`, `tsa` et `horodatage`, `nodeSelector` `zone=confiance` obligatoire, aucune tolérance du taint de zone (ni tolérance universelle), pas de `nodeName` hors de `sc-confiance` ;
+- **`stepactions-interdites`** : création de StepAction refusée.
+
+Avant le chargement, aucun pod existant hors des espaces système ne les enfreignait. **30 cas** générés par [`cas-admission.py`](politique/cas-admission.py) : **tous conformes à l'attendu**, **parité CLI / admission 29/29** (le cas « privilégié sous Kata » n'est évalué qu'en CLI : la RuntimeClass n'existe qu'en J7). Refus par Kyverno pour 22 cas ; pour deux specs en ligne, le webhook de Tekton refuse le premier, Kyverno aussi. **Trace** : un événement `PolicyViolation` par refus, émis par Kyverno même en dry-run (24 événements pour 24 refus).
+
 
 ## Jalon J5 : horodatage RFC 3161 (29/10/2026)
 

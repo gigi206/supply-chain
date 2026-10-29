@@ -1,0 +1,22 @@
+# Brique 08, J6 : CA du PoC pour le résolveur bundles (bundles Tekton signés, tirés de Zot : tekton/tasks, tekton/pipelines).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-pipelines-remote-resolvers
+  namespace: tekton-pipelines-resolvers
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        env:
+        - name: SSL_CERT_FILE
+          value: /etc/ca-poc/ca.crt
+        volumeMounts:
+        - name: ca-poc
+          mountPath: /etc/ca-poc
+          readOnly: true
+      volumes:
+      - name: ca-poc
+        configMap:
+          name: ca-poc

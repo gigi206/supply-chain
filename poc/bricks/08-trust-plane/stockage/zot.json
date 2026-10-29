@@ -9,6 +9,9 @@
     "address": "192.168.161.13",
     "port": "5000",
     "realm": "zot (PoC supply-chain)",
+    "compat": [
+      "docker2s2"
+    ],
     "tls": {
       "cert": "/etc/zot/tls/zot.crt",
       "key": "/etc/zot/tls/zot.key"

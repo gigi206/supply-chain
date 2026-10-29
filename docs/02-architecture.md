@@ -206,6 +206,7 @@ EL8 n'est pas mis automatiquement à 0.
 |---|---|---|---|
 | Provenance | OpenBao Transit (zone Confiance) | Signatures Chains | Périodique ; horodatage pour la vérifiabilité dans le temps |
 | Horodatage (TSA) | OpenBao Transit, clé `tsa` distincte de la clé de provenance (zone Confiance), certifiée par une **racine TSA dédiée**, hors de la CA TLS (brique 08, J5) | Jetons RFC 3161 du job d'horodatage | Certificat feuille annuel ; racine longue, hors ligne en production |
+| Tâches et pipelines (Trusted Resources) | PoC : fichier 0600 sur l'hôte d'administration (brique 08, J6) ; en production, KMS ou HSM hors de la zone build | Annotation `tekton.dev/signature` des tâches et pipelines publiés en bundles dans `tekton/` (tkn), vérifiée par le contrôleur de Pipelines (VerificationPolicy, clé publique en clair) | Distincte des clés de provenance et du TSA ; rotation par republication des bundles |
 | VSA | KMS du **domaine de replay** | Résultats de replay | Indépendante de la clé de provenance |
 | OpenPGP dépôts et paquets | HSM du service de signature isolé | `rpmsign`, `debsign`, `Release`/`repomd` | Expiration planifiée, révocation |
 | Racine TUF | **Hors ligne** (cérémonie) | Distribution des clés publiques | Seuils, cérémonie documentée |

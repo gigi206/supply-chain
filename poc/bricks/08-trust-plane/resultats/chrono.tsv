@@ -607,3 +607,18 @@ J6 parite fait	2026-10-29T21:59:07Z
 J6 décision du propriétaire	2026-10-29T22:00:54Z	C-2 de Kyverno seul noté 5 (25/25 décisions identiques) ; décision C attendue en J8, Conforma reste la porte en J6
 J6 installer	2026-10-29T22:01:55Z	
 J6 installer fait	2026-10-29T22:02:00Z	
+J4 installer	2026-10-29T22:05:12Z	
+J4 installer fait	2026-10-29T22:05:17Z	
+J6 taches	2026-10-29T22:06:30Z	
+J2 zot	2026-10-29T22:07:04Z	
+J2 zot fait	2026-10-29T22:07:09Z	
+J6 taches	2026-10-29T22:07:12Z	
+J6 taches	2026-10-29T22:07:23Z	
+J6 décision du propriétaire	2026-10-29T22:11:50Z	Trusted Resources : tkn v0.46.2 avec des tâches et pipelines v1beta1 (tkn signe tout en v1beta1, tektoncd/cli#2894)
+J6 taches	2026-10-29T22:11:52Z	
+J6 taches	2026-10-29T22:12:28Z	
+J6 taches fait	2026-10-29T22:12:57Z	
+J6 admission	2026-10-29T22:17:09Z	
+J6 admission fait	2026-10-29T22:17:31Z	
+J6 admission	2026-10-29T22:17:54Z	
+J6 admission fait	2026-10-29T22:18:17Z	

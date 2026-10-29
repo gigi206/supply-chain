@@ -21,6 +21,7 @@ node = "22.22.0"                                # interface de sample-app (banc 
 "aqua:google/go-containerregistry" = "0.20.6"   # crane
 "aqua:sigstore/cosign" = "3.1.4"
 "aqua:kyverno/kyverno" = "1.19.2"
+"aqua:tektoncd/cli" = "0.46.2"                   # tkn : brique 08, J6 (Trusted Resources, bundles Tekton) ; sha256 seulement (accord du propriétaire)
 "aqua:anchore/syft" = "1.38.0"
 "aqua:anchore/grype" = "0.104.1"
 "github:conforma/cli" = { version = "0.10.42", asset_pattern = "ec_linux_amd64", bin = "ec" }
@@ -228,5 +229,5 @@ description = "Brique 08, J5 : horodatage RFC 3161, timestamp-authority v2.2.0 a
 run = "poc/bricks/08-trust-plane/tsa.sh"
 
 [tasks."confiance:politique"]
-description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission (étapes : image installer)"
+description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission (étapes : image installer parite taches admission)"
 run = "poc/bricks/08-trust-plane/politique.sh"

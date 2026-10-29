@@ -1,0 +1,30 @@
+# Brique 08, J6 : TaskRun d'essai de Trusted Resources ; la tâche vient d'un bundle (@BUNDLE@), par le résolveur @RESOLVEUR@.
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: @NOM@
+  namespace: builds
+spec:
+  serviceAccountName: build
+  podTemplate:
+    nodeSelector:
+      zone: build
+    tolerations:
+    - key: zone
+      operator: Equal
+      value: build
+      effect: NoSchedule
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      seccompProfile:
+        type: RuntimeDefault
+  taskRef:
+    resolver: @RESOLVEUR@
+    params:
+    - name: bundle
+      value: @BUNDLE@
+    - name: name
+      value: essai-confiance
+    - name: kind
+      value: task

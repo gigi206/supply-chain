@@ -1,0 +1,19 @@
+# Brique 08, J6 : Trusted Resources. Les tâches et pipelines tirés par un résolveur depuis tekton/tasks ou tekton/pipelines
+# de Zot doivent porter la signature de la clé des tâches de la plateforme (clé publique en clair : le contrôleur de
+# Pipelines n'a pas à joindre OpenBao). Toute autre source est refusée (trusted-resources-verification-no-match-policy:
+# fail). Le motif est ancré par Tekton (^(?:…)$, correctif de CVE-2026-25542) et comparé au dépôt du bundle, sans digest.
+apiVersion: tekton.dev/v1alpha1
+kind: VerificationPolicy
+metadata:
+  name: taches-plateforme
+  namespace: builds
+spec:
+  resources:
+  - pattern: 'sc-stockage\.poc\.test:5000/tekton/(tasks|pipelines)/[a-z0-9-]+'
+  authorities:
+  - name: plateforme
+    key:
+      hashAlgorithm: sha256
+      data: |
+@CLE@
+  mode: enforce

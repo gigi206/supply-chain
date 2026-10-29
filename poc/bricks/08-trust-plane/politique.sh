@@ -9,6 +9,15 @@
 #   parite     C-2 (ADR 0000) : les 17 cas du banc C (setup.sh du banc, poussés dans Zot sous bench/) et les 8 cas
 #              d'horodatage de J5, évalués par le CLI (kyverno apply) et à l'admission (kubectl create --dry-run=server)
 #              avec le même fichier de politique et le même pod ; tableau cas par cas dans resultats/politique-parite.tsv
+#   taches     Trusted Resources : clé des tâches de la plateforme (ECDSA P-256, 0600 sur l'hôte, distincte de celles de
+#              Chains et du TSA) ; tâche v1beta1 signée par tkn v0.46.2 (une v1 signée est rejetée : tektoncd/cli#2894),
+#              publiée en bundle Tekton dans Zot (tekton/tasks/) ;
+#              Tekton : vérification obligatoire (no-match-policy fail), specs en ligne interdites (disable-inline-spec),
+#              résolveur bundles seul ; VerificationPolicy dans builds ; essais : tâche signée exécutée ; non signée,
+#              modifiée, signée par une autre clé, hors de tekton/, en ligne et par les résolveurs désactivés : refusées
+#   admission  règles d'admission de Kyverno (politique/admission.yaml, CEL) : références Tekton signées (test 2), isolation
+#              des pods (test 4), confinement de la zone confiance, StepActions interdites ; 30 cas présentés au CLI et à
+#              l'admission (dry-run serveur), tableau dans resultats/politique-admission.tsv
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -30,6 +39,7 @@ reports-controller sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c91244
 APP_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # images d'essai signées en J4
 BANC=$repo/poc/benchmarks/kyverno-seul
 NS_ESSAI=bancc   # espace des pods d'essai (jamais créés : dry-run côté serveur)
+BUSYBOX_AMONT=docker.io/rancher/mirrored-library-busybox:1.37.0   # image d'étape de J4 (copie dans Zot : tekton-images.tsv)
 DL=$O/telechargements/kyverno
 T=$W/politique
 trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
@@ -124,17 +134,17 @@ print(res + " (code " + sys.argv[2] + ")\t" + msg[:160])' "$T/cli.json" "$c"
 
 admission() { # pod : décision de l'admission (PASS : admis en dry-run serveur ; FAIL : refusé) et motif
   if kubectl create --dry-run=server -f "$1" > "$T/adm.out" 2>&1; then printf 'PASS\t\n'
-  else printf 'FAIL\t%s\n' "$(tr '\n' ' ' < "$T/adm.out" | sed -e 's/^Error from server: //' -e 's/^error when creating "[^"]*": //' | cut -c1-200)"; fi
+  else printf 'FAIL\t%s\n' "$(tr '\n' ' ' < "$T/adm.out" | sed -e 's/^Error from server\( ([A-Za-z]*)\)\{0,1\}: //' -e 's/^error when creating "[^"]*": //' | cut -c1-200)"; fi
 }
 
-charger() { # fichier nom : ImageValidatingPolicy chargée à l'admission, attendue prête (webhook de Kyverno à jour)
-  local i
+charger() { # fichier nom [type] : politique chargée à l'admission, attendue prête (webhook de Kyverno à jour)
+  local i k=${3:-imagevalidatingpolicy}
   kubectl apply -f "$1" >/dev/null
   for i in $(seq 60); do
-    [ "$(kubectl get imagevalidatingpolicy "$2" -o jsonpath='{.status.conditionStatus.ready}' 2>/dev/null)" = true ] && break
+    [ "$(kubectl get "$k" "$2" -o jsonpath='{.status.conditionStatus.ready}' 2>/dev/null)" = true ] && break
     sleep 1
   done
-  [ "$i" -lt 60 ] || { echo "KO   politique $2 jamais prête" >&2; kubectl get imagevalidatingpolicy "$2" -o yaml >&2; exit 1; }
+  [ "$i" -lt 60 ] || { echo "KO   politique $2 jamais prête" >&2; kubectl get "$k" "$2" -o yaml >&2; exit 1; }
   sleep 2   # Kyverno publie ensuite la règle dans sa configuration de webhook
 }
 
@@ -204,6 +214,135 @@ EOF
     if ((c[1] == "PASS") == ($4 == "PASS")) d++ } END { printf "parité des libellés : %d cas sur %d ; parité des décisions (admis ou refusé) : %d cas sur %d\n", p, n, d, n }' "$TSV_PARITE"
   awk -F'\t' 'NR > 1 { split($3, c, " ") } NR > 1 && c[1] != $2 { printf "  CLI ≠ attendu : %s (%s au lieu de %s)\n", $1, $3, $2 } NR > 1 && $4 != $2 { printf "  admission ≠ attendu : %s (%s au lieu de %s)\n", $1, $4, $2 }' "$TSV_PARITE"
   awk -F'\t' 'NR > 1 { a += $5; b += $6; n++ } END { printf "durée moyenne par cas : CLI %d ms, admission %d ms\n", a / n, b / n }' "$TSV_PARITE"
+}
+
+taskrun() { # nom résolveur bundle : TaskRun d'essai créé dans builds, puis attendu ; affiche l'issue et la vérification
+  local n=$1 i
+  sed -e "s#@NOM@#$n#" -e "s#@RESOLVEUR@#$2#" -e "s#@BUNDLE@#$3#" "$here/politique/taches/taskrun.yaml" > "$T/tr-$n.yaml"
+  kubectl delete taskrun -n builds "$n" --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/tr-$n.yaml" >/dev/null
+  for i in $(seq 120); do
+    [ "$(kubectl get taskrun -n builds "$n" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')" != Unknown ] \
+      && [ -n "$(kubectl get taskrun -n builds "$n" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')" ] && break
+    sleep 1
+  done
+  kubectl get taskrun -n builds "$n" -o json | jq -r '.status as $s | ($s.conditions // []) as $c
+    | ($c[] | select(.type == "Succeeded")) as $r
+    | "\($r.status)|\($r.reason)|\(($c[] | select(.type == "TrustedResourcesVerified") | .status) // "-")|\($r.message // "" | gsub("\n"; " ") | .[0:230])|\($s.results // [] | map(.name + "=" + .value) | join(","))"'
+}
+
+verdict() { # libellé attendu (True|False) issue : ligne OK ou KO
+  local l=$1 e=$2 st r v m res
+  IFS='|' read -r st r v m res <<< "$3"
+  if [ "$st" = "$e" ]; then echo "OK   $l : $([ "$st" = True ] && echo "exécutée ($res)" || echo "refusée, $r : $m") ; TrustedResourcesVerified=$v"
+  else echo "KO   $l : Succeeded=$st, $r : $m ; TrustedResourcesVerified=$v" >&2; exit 1; fi
+}
+
+bundle() { # fichier dépôt : bundle Tekton poussé dans Zot par tkn (date de création fixe : digest reproductible) ; digest
+  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt tkn bundle push "$REG_HOTE/$2:essai" -f "$1" > "$T/tkn.out" 2>&1 \
+    || { cat "$T/tkn.out" >&2; exit 1; }
+  SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$2:essai"
+}
+
+etape_taches() {
+  local b d tr
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  echo "## clé des tâches de la plateforme (ADR 0003 : clés séparées par usage)"
+  if [ -s "$S/taches.key" ]; then echo "clé existante"; else
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/taches.key")
+  fi
+  openssl pkey -in "$S/taches.key" -pubout -out "$P/taches.pub"
+  echo "clé publique : $P/taches.pub, sha256 $(openssl pkey -pubin -in "$P/taches.pub" -outform DER | sha256sum | cut -c1-16)…"
+  for f in "$R/chains-cle-publique.pem" "$P/tsa-chaine.pem"; do
+    ! cmp -s <(openssl pkey -pubin -in "$P/taches.pub" -outform DER) <(openssl pkey -pubin -in "$f" -outform DER 2>/dev/null || openssl x509 -in "$f" -pubkey -noout | openssl pkey -pubin -outform DER) \
+      || { echo "KO   clé des tâches = $f" >&2; exit 1; }
+  done
+  echo "OK   distincte de la clé de Chains et de celle du TSA"
+  (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/autre.key")
+
+  echo "## tâche d'essai signée par tkn $(tkn version --component client)"
+  sed "s#@BUSYBOX@#$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")#" "$here/politique/taches/essai-confiance.yaml" > "$T/tache.yaml"
+  sed 's#^apiVersion: tekton.dev/v1beta1$#apiVersion: tekton.dev/v1#' "$T/tache.yaml" > "$T/tache-v1.yaml"
+  tkn task sign "$T/tache-v1.yaml" -K "$S/taches.key" -f "$T/signee-v1.yaml" >/dev/null
+  tkn task sign "$T/tache.yaml" -K "$S/taches.key" -f "$T/signee.yaml" >/dev/null
+  tkn task sign "$T/tache.yaml" -K "$T/autre.key" -f "$T/autre-cle.yaml" >/dev/null
+  sed 's/tâche signée par la plateforme/tâche modifiée après signature/' "$T/signee.yaml" > "$T/modifiee.yaml"
+  echo "annotation tekton.dev/signature : $(grep -c 'tekton.dev/signature' "$T/signee.yaml") (signée), $(grep -c 'tekton.dev/signature' "$T/tache.yaml") (non signée) ;" \
+    "modifiée : $(diff "$T/signee.yaml" "$T/modifiee.yaml" | grep -c '^>') ligne changée, même annotation"
+  : > "$T/bundles.txt"
+  for b in signee:tekton/tasks/essai-confiance tache:tekton/tasks/essai-non-signee modifiee:tekton/tasks/essai-modifiee \
+      autre-cle:tekton/tasks/essai-autre-cle signee:essais-j6/tasks/essai-confiance signee-v1:tekton/tasks/essai-v1; do
+    d=$(bundle "$T/${b%%:*}.yaml" "${b#*:}")
+    echo "${b#*:} $REG/${b#*:}@$d" >> "$T/bundles.txt"
+    echo "bundle ${b#*:} ← ${b%%:*}.yaml : $d"
+  done
+
+  echo "## Tekton : vérification obligatoire, specs en ligne interdites, résolveur bundles seul"
+  kubectl patch configmap feature-flags -n tekton-pipelines --type merge \
+    -p '{"data":{"trusted-resources-verification-no-match-policy":"fail","disable-inline-spec":"pipeline,pipelinerun,taskrun"}}' >/dev/null
+  kubectl patch configmap resolvers-feature-flags -n tekton-pipelines-resolvers --type merge -p '{"data":{"enable-bundles-resolver":"true",
+    "enable-cluster-resolver":"false","enable-git-resolver":"false","enable-http-resolver":"false","enable-hub-resolver":"false"}}' >/dev/null
+  kubectl get configmap feature-flags -n tekton-pipelines -o json | jq -r '.data | "feature-flags : trusted-resources-verification-no-match-policy=\(.["trusted-resources-verification-no-match-policy"]), disable-inline-spec=\(.["disable-inline-spec"])"'
+  kubectl get configmap resolvers-feature-flags -n tekton-pipelines-resolvers -o json | jq -r '.data | to_entries | map("\(.key)=\(.value)") | join(", ") | "résolveurs : " + .'
+  awk -v f="$P/taches.pub" '/^@CLE@$/ { while ((getline l < f) > 0) print "        " l; next } { print }' \
+    "$here/politique/verification-policy.yaml" | kubectl apply -f - >/dev/null
+  kubectl get verificationpolicy -n builds taches-plateforme -o json | jq -r '"VerificationPolicy \(.metadata.name) : \(.spec.mode), motif \(.spec.resources[0].pattern), autorité \(.spec.authorities[0].name)"'
+  sleep 5   # les contrôleurs relisent les ConfigMaps par informer
+
+  echo "## essais (TaskRuns dans builds, pods sur sc-build)"
+  tr=$(taskrun j6-signee bundles "$(awk '$1 == "tekton/tasks/essai-confiance" {print $2}' "$T/bundles.txt")")
+  verdict "tâche signée, tekton/tasks" True "$tr"
+  verdict "tâche non signée" False "$(taskrun j6-non-signee bundles "$(awk '$1 == "tekton/tasks/essai-non-signee" {print $2}' "$T/bundles.txt")")"
+  verdict "tâche modifiée après signature" False "$(taskrun j6-modifiee bundles "$(awk '$1 == "tekton/tasks/essai-modifiee" {print $2}' "$T/bundles.txt")")"
+  verdict "tâche signée par une autre clé" False "$(taskrun j6-autre-cle bundles "$(awk '$1 == "tekton/tasks/essai-autre-cle" {print $2}' "$T/bundles.txt")")"
+  verdict "tâche v1 signée par tkn (constat tektoncd/cli#2894)" False "$(taskrun j6-v1 bundles "$(awk '$1 == "tekton/tasks/essai-v1" {print $2}' "$T/bundles.txt")")"
+  verdict "tâche signée, hors de tekton/ (essais-j6/)" False "$(taskrun j6-hors-politique bundles "$(awk '$1 == "essais-j6/tasks/essai-confiance" {print $2}' "$T/bundles.txt")")"
+  for b in git http hub cluster; do
+    verdict "résolveur $b désactivé" False "$(taskrun "j6-resolveur-$b" "$b" "$(awk '$1 == "tekton/tasks/essai-confiance" {print $2}' "$T/bundles.txt")")"
+  done
+  { sed -n '1,/^  taskRef:$/p' "$T/tr-j6-signee.yaml" | sed -e '$d' -e 's/name: j6-signee/name: j6-en-ligne/'; echo '  taskSpec:'
+    sed -n '/^  results:$/,$p' "$T/tache.yaml" | sed 's/^/  /'; } > "$T/tr-en-ligne.yaml"
+  refus "taskSpec en ligne (TaskRun), webhook de Tekton" "must not set the field\(s\): spec.taskSpec" kubectl create --dry-run=server -f "$T/tr-en-ligne.yaml"
+}
+
+etape_admission() {
+  local c e a desc d n r t0
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  TSV_PARITE=$R/politique-admission.tsv
+  printf 'cas\tattendu\tCLI\tadmission\tCLI (ms)\tadmission (ms)\tmotif CLI\tmotif admission\n' > "$TSV_PARITE"
+  kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
+  rm -rf "$T/adm"
+  python3 -I "$here/politique/cas-admission.py" "$T/adm" "$REG/tekton/tasks/essai-confiance@$d" \
+    "$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")"
+  echo "## politiques chargées ($(grep -c '^kind: ValidatingPolicy' "$here/politique/admission.yaml") ValidatingPolicy, $(grep -c '^  - expression:' "$here/politique/admission.yaml") validations)"
+  for n in $(awk '/^kind: ValidatingPolicy/ {k = 1} k && /^  name:/ {print $2; k = 0}' "$here/politique/admission.yaml"); do
+    charger "$here/politique/admission.yaml" "$n" validatingpolicy
+    echo "prête : $n"
+  done
+  echo "ValidatingAdmissionPolicy natives générées par Kyverno : $(kubectl get validatingadmissionpolicies -o name 2>/dev/null | grep -c . || true)"
+  echo "## $(wc -l < "$T/adm/cas.tsv") cas, CLI puis admission (dry-run serveur)"
+  while IFS=$'\t' read -r c e a desc; do
+    if [ "$a" = oui ]; then comparer "$c" "$e" "$here/politique/admission.yaml" "$T/adm/$c.json"
+    else
+      r=$(cli "$here/politique/admission.yaml" "$T/adm/$c.json")
+      printf '%s\t%s\t%s\t-\t-\t-\t%s\t%s\n' "$c" "$e" "${r%%$'\t'*}" "${r#*$'\t'}" "$desc" >> "$TSV_PARITE"
+      [ "${r%% *}" = "$e" ] && echo "OK   $c : CLI ${r%%$'\t'*} (attendu $e ; admission non évaluée : $desc)" \
+        || { echo "KO   $c : CLI ${r%%$'\t'*} (attendu $e)" >&2; exit 1; }
+    fi
+  done < "$T/adm/cas.tsv"
+  echo "## synthèse"
+  awk -F'\t' 'NR > 1 && $4 != "-" { n++; split($3, c, " "); if (c[1] == $4) p++; else printf "  écart : %s (CLI %s, admission %s)\n", $1, $3, $4 }
+    END { printf "parité CLI / admission : %d cas sur %d\n", p, n }' "$TSV_PARITE"
+  awk -F'\t' 'NR > 1 { split($3, c, " ") } NR > 1 && c[1] != $2 { printf "  CLI ≠ attendu : %s (%s au lieu de %s)\n", $1, $3, $2; k++ }
+    NR > 1 && $4 != "-" && $4 != $2 { printf "  admission ≠ attendu : %s (%s au lieu de %s)\n", $1, $4, $2; k++ }
+    END { printf "conformes au résultat attendu : %s\n", k ? "non (" k " écarts)" : "tous" }' "$TSV_PARITE"
+  awk -F'\t' 'NR > 1 && $4 == "FAIL" { split($8, m, " denied the request: "); w[$1] = m[1] } END { for (c in w) n[w[c]]++; for (x in n) printf "  refus par %s : %d cas\n", x, n[x] }' "$TSV_PARITE" | sort
+  echo "## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)"
+  kubectl get events -A --field-selector reason=PolicyViolation -o json | jq -r --arg t "$t0" '.items[]
+    | select(.involvedObject.kind == "ValidatingPolicy" and (.lastTimestamp // .eventTime) >= $t)
+    | "\(.involvedObject.name)"' | sort | uniq -c | sed 's/^ */  /; s/ \([a-z]\)/ événements, politique \1/'
 }
 
 lancer politique J6 "$@"

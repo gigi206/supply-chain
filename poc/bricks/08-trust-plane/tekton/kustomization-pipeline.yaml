@@ -11,3 +11,11 @@ patches:
       path: /spec/template/spec/nodeSelector
       value:
         zone: confiance
+- path: resolveurs.yaml
+configMapGenerator:
+- name: ca-poc
+  namespace: tekton-pipelines-resolvers
+  files:
+  - ca.crt
+  options:
+    disableNameSuffixHash: true

@@ -1,0 +1,157 @@
+# Brique 08, J6 : règles d'admission de Kyverno (ValidatingPolicy, CEL), évaluées aussi en CLI (politique.sh admission).
+# Espaces système exclus par la configuration de Kyverno (kube-system, kyverno). Une mise à jour qui ne change pas la spec
+# (annotation de Chains, retrait d'un finaliseur) n'est pas réévaluée : un objet antérieur aux règles reste supprimable.
+#
+# Test 2 : un TaskRun ou un PipelineRun ne référence qu'une définition signée, tirée d'un bundle de tekton/ dans Zot et
+# épinglée par digest (Trusted Resources ne vérifie que ce que tire un résolveur : une référence locale ou une spec en
+# ligne lui échappe). Tekton refuse déjà les specs en ligne (disable-inline-spec) ; cette règle double ce refus.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: tekton-references
+spec:
+  validationActions: [Deny]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [tekton.dev]
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [taskruns, pipelineruns]
+  matchConditions:
+  - name: creation-ou-spec-modifiee
+    expression: "request.operation == 'CREATE' || object.spec != oldObject.spec"
+  variables:
+  - name: tache
+    expression: "'^sc-stockage\\\\.poc\\\\.test:5000/tekton/tasks/[a-z0-9-]+@sha256:[0-9a-f]{64}$'"
+  - name: pipeline
+    expression: "'^sc-stockage\\\\.poc\\\\.test:5000/tekton/pipelines/[a-z0-9-]+@sha256:[0-9a-f]{64}$'"
+  - name: ref
+    expression: "object.kind == 'TaskRun' ? (has(object.spec.taskRef) ? object.spec.taskRef : null) : (has(object.spec.pipelineRef) ? object.spec.pipelineRef : null)"
+  - name: espaces
+    expression: "has(object.spec.workspaces) ? object.spec.workspaces : []"
+  - name: gabarits
+    expression: >-
+      object.kind == 'TaskRun'
+        ? (has(object.spec.podTemplate) ? [object.spec.podTemplate] : [])
+        : (has(object.spec.taskRunTemplate) && has(object.spec.taskRunTemplate.podTemplate) ? [object.spec.taskRunTemplate.podTemplate] : [])
+          + (has(object.spec.taskRunSpecs) ? object.spec.taskRunSpecs.filter(s, has(s.podTemplate)).map(s, s.podTemplate) : [])
+  - name: comptes
+    expression: >-
+      object.kind == 'TaskRun'
+        ? [has(object.spec.serviceAccountName) ? object.spec.serviceAccountName : 'default']
+        : [has(object.spec.taskRunTemplate) && has(object.spec.taskRunTemplate.serviceAccountName) ? object.spec.taskRunTemplate.serviceAccountName : 'default']
+          + (has(object.spec.taskRunSpecs) ? object.spec.taskRunSpecs.filter(s, has(s.serviceAccountName)).map(s, s.serviceAccountName) : [])
+  validations:
+  - expression: "object.metadata.namespace == 'builds'"
+    message: "test 2 : TaskRun et PipelineRun seulement dans l'espace builds"
+  - expression: "!has(object.spec.taskSpec) && !has(object.spec.pipelineSpec)"
+    message: "test 2 : spec en ligne interdite (taskSpec, pipelineSpec)"
+  - expression: >-
+      variables.ref != null && has(variables.ref.resolver) && variables.ref.resolver == 'bundles' && has(variables.ref.params)
+      && variables.ref.params.exists(p, p.name == 'bundle'
+           && string(p.value).matches(object.kind == 'TaskRun' ? variables.tache : variables.pipeline))
+    message: "test 2 : référence obligatoire à un bundle signé de tekton/tasks (TaskRun) ou tekton/pipelines (PipelineRun), épinglé par digest, par le résolveur bundles (ni référence locale, ni autre résolveur)"
+  - expression: "variables.comptes.all(c, c == 'build')"
+    message: "test 2 : compte de service build seulement"
+  - expression: >-
+      variables.gabarits.all(g, !has(g.volumes) && !(has(g.hostNetwork) && g.hostNetwork)
+        && !(has(g.hostUsers) && g.hostUsers) && !has(g.imagePullSecrets))
+    message: "test 2 : podTemplate sans volume, sans hostNetwork ni hostUsers, sans imagePullSecrets"
+  - expression: "variables.espaces.all(w, !has(w.secret) && !has(w.projected) && !has(w.csi))"
+    message: "test 2 : workspace de type secret, projected ou csi interdit"
+---
+# Test 4 : ni pod privilégié hors Kata, ni hostPath, ni hostNetwork, hostPID ou hostIPC, ni capacité ajoutée (sauf
+# NET_BIND_SERVICE) hors des espaces système. La règle couvre aussi les conteneurs éphémères (kubectl debug).
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: pods-isolation
+spec:
+  validationActions: [Deny]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods, pods/ephemeralcontainers]
+  matchConditions:
+  - name: creation-ou-spec-modifiee
+    expression: "request.operation == 'CREATE' || object.spec != oldObject.spec"
+  variables:
+  - name: kata
+    expression: "has(object.spec.runtimeClassName) && object.spec.runtimeClassName in ['kata', 'kata-qemu']"
+  - name: sc
+    expression: >-
+      object.spec.containers.map(c, has(c.securityContext) ? c.securityContext : {})
+      + (has(object.spec.initContainers) ? object.spec.initContainers.map(c, has(c.securityContext) ? c.securityContext : {}) : [])
+      + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers.map(c, has(c.securityContext) ? c.securityContext : {}) : [])
+  validations:
+  - expression: "!(has(object.spec.hostNetwork) && object.spec.hostNetwork) && !(has(object.spec.hostPID) && object.spec.hostPID) && !(has(object.spec.hostIPC) && object.spec.hostIPC)"
+    message: "test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système"
+  - expression: "!has(object.spec.volumes) || object.spec.volumes.all(v, !has(v.hostPath))"
+    message: "test 4 : volume hostPath interdit hors des espaces système"
+  - expression: "variables.kata || variables.sc.all(s, !has(s.privileged) || !s.privileged)"
+    message: "test 4 : conteneur privilégié interdit hors Kata"
+  - expression: >-
+      variables.kata || variables.sc.all(s, !has(s.capabilities) || !has(s.capabilities.add)
+        || s.capabilities.add.all(a, a == 'NET_BIND_SERVICE'))
+    message: "test 4 : capacité ajoutée interdite hors Kata (sauf NET_BIND_SERVICE)"
+---
+# Zone confiance (J3 : bound_subject seul ; J5 : TSA) : les pods des espaces de confiance ne tournent que sur le nœud de
+# confiance, sans tolérer le taint de la zone build. Un pod placé sur sc-build y exposerait le jeton de son compte
+# (Chains, OpenBao, TSA) à la zone hostile.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: zone-confiance
+spec:
+  validationActions: [Deny]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values: [openbao, tekton-chains, tekton-pipelines, tekton-pipelines-resolvers, tsa, horodatage]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE]
+      resources: [pods]
+  validations:
+  - expression: "has(object.spec.nodeSelector) && 'zone' in object.spec.nodeSelector && object.spec.nodeSelector['zone'] == 'confiance'"
+    message: "zone confiance : nodeSelector zone=confiance obligatoire"
+  - expression: "!has(object.spec.tolerations) || object.spec.tolerations.all(t, has(t.key) && t.key != 'zone')"
+    message: "zone confiance : aucune tolérance du taint de zone (ni tolérance universelle)"
+  - expression: "!has(object.spec.nodeName) || object.spec.nodeName == 'sc-confiance'"
+    message: "zone confiance : nodeName hors du nœud de confiance"
+---
+# StepActions : Trusted Resources ne les vérifie pas (Pipelines v1.15.5 : seules les tâches et les pipelines tirés par un
+# résolveur passent par les VerificationPolicies) et leur drapeau enable-step-actions est sans effet. La plateforme n'en
+# utilise pas : leur création est refusée (une étape ref d'une tâche signée ne trouverait rien en local).
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: stepactions-interdites
+spec:
+  validationActions: [Deny]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [tekton.dev]
+      apiVersions: ["*"]
+      operations: [CREATE]
+      resources: [stepactions]
+  validations:
+  - expression: "false"
+    message: "StepAction interdite : non vérifiée par Trusted Resources"

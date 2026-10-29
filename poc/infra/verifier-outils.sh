@@ -122,11 +122,12 @@ while IFS=$'\t' read -r name ver sum url; do
         && { jq -e --arg s "$sum" '[.. | objects | select(.sha256? == $s)] | length > 0' "$W/$f.provenance.json" >/dev/null \
           && na "$name : aucune signature publiée ; sha256 cité par la provenance amont, non signée" \
           || ko "$name : sha256 absent de la provenance amont"; } ;;
-    aqua:google/go-containerregistry|aqua:project-zot/zot|github:conforma/cli|aqua:kubernetes-sigs/kind)
+    aqua:google/go-containerregistry|aqua:project-zot/zot|github:conforma/cli|aqua:kubernetes-sigs/kind|aqua:tektoncd/cli)
       case "$name" in
         *go-containerregistry) c=checksums.txt; why="provenance SLSA publiée (multiple.intoto.jsonl), non vérifiée ici (il faut slsa-verifier)" ;;
         *zot) c=checksums.sha256.txt; why="aucune signature publiée (docs/04 §5)" ;;
         *kind) c=$f.sha256sum; why="aucune signature publiée" ;;
+        *tektoncd/cli) c=checksums.txt; why="aucune signature ni attestation publiée (épinglé après revue, accord du propriétaire, brique 08 J6)" ;;
         *) c=$f.sha256; why="aucune signature publiée (docs/04 §5)" ;;
       esac
       get "${url%/*}/$c" sums.txt && grep -qE "^$sum [ *]?(dist/)?$f$" "$W/sums.txt" \

@@ -1,0 +1,51 @@
+# politique.sh admission, 2026-10-29T22:17:54Z
+## politiques chargées (4 ValidatingPolicy, 14 validations)
+prête : tekton-references
+prête : pods-isolation
+prête : zone-confiance
+prête : stepactions-interdites
+ValidatingAdmissionPolicy natives générées par Kyverno : 0
+## 30 cas, CLI puis admission (dry-run serveur)
+OK   tr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   tr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-resolveur-git : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-bundle-etiquette : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-bundle-hors-tekton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-espace-default : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-compte-default : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-gabarit-volume-secret : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-gabarit-hostnetwork : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-workspace-secret : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-taskrunspecs-compte : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-restreint : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pod-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-privilegie-kata : CLI PASS (code 0) (attendu PASS ; admission non évaluée : conteneur privilégié sous Kata (RuntimeClass de J7, absente : CLI seul))
+OK   pod-init-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostpath : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostnetwork : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostpid : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-cap-sys-admin : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-cap-net-bind : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   zone-confiance : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   zone-sans-nodeselector : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-build : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-tolerance-universelle : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-nodename-build : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   stepaction : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+## synthèse
+parité CLI / admission : 29 cas sur 29
+conformes au résultat attendu : tous
+  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 2 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-7358f429" : 4 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-e94d8fa6" : 1 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" : 6 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 11 cas
+## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)
+  6 événements, politique pods-isolation
+  1 événements, politique stepactions-interdites
+  13 événements, politique tekton-references
+  4 événements, politique zone-confiance
