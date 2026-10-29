@@ -31,6 +31,9 @@ python-tuf	theupdateframework/python-tuf	signature	non
 go-tuf	theupdateframework/go-tuf	signature	non
 Kata Containers	kata-containers/kata-containers	isolation	non
 gVisor	google/gvisor	isolation	non
+k3s	k3s-io/k3s	runtime	oui
+kind	kubernetes-sigs/kind	runtime	non
+k3d	k3d-io/k3d	runtime	non
 Tetragon	cilium/tetragon	isolation	non
 Witness	in-toto/witness	provenance	non
 gittuf	gittuf/gittuf	sources	non

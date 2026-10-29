@@ -31,7 +31,7 @@ Généré par `tools/health/scorecard.sh` :
 - **Ne jamais mélanger** ces scores avec ceux de `scorecard --local`, qui n'exécute qu'une partie des contrôles.
 - Relevés anciens : **sbomqs (2024-07-05)** et **Grype (2026-05-18)**. L'API ne se rafraîchit pas à la demande ; il faut le CLI avec un jeton.
 
-Relevé du 2026-10-28 via https://api.securityscorecards.dev
+Relevé du 2026-10-28 via https://api.securityscorecards.dev ; k3s, kind et k3d ajoutés le 2026-10-29 (même API).
 
 | Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
 |---|---|---|---|---|---|---|---|---|---|
@@ -67,6 +67,9 @@ Relevé du 2026-10-28 via https://api.securityscorecards.dev
 | go-tuf | theupdateframework/go-tuf | signature | non | 7.5 | 2026-10-19 | 10 | -1 | 10 | ? |
 | Kata Containers | kata-containers/kata-containers | isolation | non | 6.9 | 2026-10-28 | 10 | 8 | 9 | 0 |
 | gVisor | google/gvisor | isolation | non | 6.2 | 2026-10-19 | 10 | 0 | 0 | ? |
+| k3s | k3s-io/k3s | runtime | oui | 8 | 2026-10-29 | 10 | 0 | 10 | 0 |
+| kind | kubernetes-sigs/kind | runtime | non | 6.6 | 2026-10-19 | 10 | 0 | 10 | ? |
+| k3d | k3d-io/k3d | runtime | non | 3.6 | 2026-10-26 | 2 | 0 | 6 | ? |
 | Tetragon | cilium/tetragon | isolation | non | n/d | — | — | — | — | — |
 | Witness | in-toto/witness | provenance | non | 7.9 | 2026-10-24 | 8 | 8 | 8 | 0 |
 | gittuf | gittuf/gittuf | sources | non | 9.3 | 2026-10-28 | 10 | 8 | 10 | 7 |
@@ -101,9 +104,9 @@ Relevé du 2026-10-28 via https://api.securityscorecards.dev
 |---|---|
 | **Sain** | Tekton Pipelines, Kyverno (≥ 1.19.2), OpenBao, cosign, timestamp-authority, Argo CD (≥ 3.5.4), OBS, Buildah, Kata, gVisor, Renovate, Zot*, Harbor, ORAS, Pulp, Verdaccio, Rook, Syft, OSV-Scanner, osv.dev, GuardDog, Scorecard, ORT (sans SECURITY.md), ScanCode.io, SW360, Forgejo, Guix, Prometheus, Loki |
 | **Sain, mais un seul éditeur** | Chainloop, DejaCode, Grafana (Grafana Labs, AGPL) |
-| **À surveiller, chemin critique** | **Chains, Triggers, Conforma, Hermeto, mock, BuildKit, Grype, sbuild, mmdebstrap, tekton-lint** |
-| **À surveiller (Scorecard < 6)** | REUSE (4,0), Athens (5,8), mock (4,9), Ceph (4,6), aptly (3,4), tekton-lint (5,8), VictoriaMetrics (5,4) |
-| **À surveiller, hors chemin critique** | Konflux, rpm-lockfile-prototype, ko, nfpm, Witness, gittuf, AMPEL, vunnel, grype-db, Dependency-Track v5 (un seul mainteneur fusionne), Trustify, GUAC, vexctl, sbomqs, sbomasm, malicious-packages, Trivy, cdxgen, cyclonedx-cli, protobom, Macaron, sbomnix, createrepo_c, devpi, SeaweedFS, nixpkgs vmTools, StageX, debusine, diffoscope, reprotest, strip-nondeterminism, add-determinism, rebuilderd, OSS Rebuild, repro-env, debuerreotype, ScanCode toolkit, FOSSology, Grant, ORT Server, Plumber CLI, octoscan, frizbee |
+| **À surveiller, chemin critique** | **Chains, Triggers, Conforma, Hermeto, mock, BuildKit, Grype, sbuild, mmdebstrap, tekton-lint, k3s** (Scorecard 8, releases mensuelles, v1.37.1+k3s1 du 30/09/2026 ; signatures des releases et diversité des employeurs non vérifiées) |
+| **À surveiller (Scorecard < 6)** | REUSE (4,0), Athens (5,8), mock (4,9), Ceph (4,6), aptly (3,4), tekton-lint (5,8), VictoriaMetrics (5,4), k3d (3,6 ; Maintained 2, une release en 16 mois : **non retenu**, kind et k3s couvrent ses usages) |
+| **À surveiller, hors chemin critique** | kind (v0.33.0 du 26/08/2026, sert au seul banc A1 ; signatures des releases non vérifiées), Konflux, rpm-lockfile-prototype, ko, nfpm, Witness, gittuf, AMPEL, vunnel, grype-db, Dependency-Track v5 (un seul mainteneur fusionne), Trustify, GUAC, vexctl, sbomqs, sbomasm, malicious-packages, Trivy, cdxgen, cyclonedx-cli, protobom, Macaron, sbomnix, createrepo_c, devpi, SeaweedFS, nixpkgs vmTools, StageX, debusine, diffoscope, reprotest, strip-nondeterminism, add-determinism, rebuilderd, OSS Rebuild, repro-env, debuerreotype, ScanCode toolkit, FOSSology, Grant, ORT Server, Plumber CLI, octoscan, frizbee |
 | **Risqué → interdit** | kkRepo, Archivista, RSTUF, Sysbox, bombon, Hyades (archivé), go-licenses, askalono (archivé), ClearlyDefined (en offline), Legitify, kaniko (archivé), repro-get (archivé), Earthly, MinIO (archivé), Tern |
 
 \* Zot : **image v2.1.22 non signée** sur ghcr.io (voir §5). On la reconstruit, ou on l'épingle par digest après revue.
@@ -150,6 +153,7 @@ Outil : `cosign v3.1.4` (checksum vérifié), avec la racine de confiance Sigsto
 | Grype | Unique scanner sur EL | Base archivée datée ; OSV-Scanner sur le SBOM (à valider) |
 | sbuild / mmdebstrap | Bus factor faible | Paquets Debian épinglés (contrôle des uploads) ; debusine en option |
 | Dependency-Track | Un seul mainteneur | Projection reconstructible depuis les SBOM et VEX (ré-ingest testé) |
+| k3s | Éditeur dominant (SUSE) ; signatures des releases à vérifier avant installation | Manifestes en Kubernetes standard, sans dépendance propre à k3s : toute distribution conforme (kubeadm, RKE2) convient |
 
 **Versions minimales imposées** :
 - Chains ≥ 0.29.0 (`sigstore-bundle`) ;
