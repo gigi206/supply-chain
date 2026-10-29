@@ -47,13 +47,13 @@ url = "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-li
 url_api = "https://api.github.com/repos/kubernetes-sigs/kind/releases/assets/531396433"
 
 [[tools."aqua:kubernetes/kubernetes/kubectl"]]
-version = "1.37.2"
+version = "1.35.10"
 backend = "aqua:kubernetes/kubernetes/kubectl"
-specifiers = ["1.37.2"]
+specifiers = ["1.35.10"]
 
 [tools."aqua:kubernetes/kubernetes/kubectl"."platforms.linux-x64"]
-checksum = "sha256:c04487523e7aa7d1493f7808174c899db93d7a9cf57531420cd76b9bd415f8f4"
-url = "https://dl.k8s.io/v1.37.2/bin/linux/amd64/kubectl"
+checksum = "sha256:c49a28f1f4efc4d475ed05f47f2ce8e563bf7bef69ed77fe1b924ea6d83b6327"
+url = "https://dl.k8s.io/v1.35.10/bin/linux/amd64/kubectl"
 
 [[tools."aqua:kyverno/kyverno"]]
 version = "1.19.2"

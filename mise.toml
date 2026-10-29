@@ -25,7 +25,7 @@ node = "22.22.0"                                # interface de sample-app (banc 
 "aqua:anchore/grype" = "0.104.1"
 "github:conforma/cli" = { version = "0.10.42", asset_pattern = "ec_linux_amd64", bin = "ec" }
 "aqua:kubernetes-sigs/kind" = "0.33.0"          # banc A1 (Konflux)
-"aqua:kubernetes/kubernetes/kubectl" = "1.37.2" # nœud kind v1.37.0
+"aqua:kubernetes/kubernetes/kubectl" = "1.35.10" # brique 08 : k3s v1.35.9 (écart de version toléré : ±1) ; banc A1 (kind v1.37.0) mesuré en 1.37.2
 "forgejo:forgejo/forgejo" = "15.0.11"           # banc A1 : forge de test (LTS)
 
 [env]
