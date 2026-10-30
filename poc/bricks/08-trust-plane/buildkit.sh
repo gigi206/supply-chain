@@ -18,6 +18,11 @@
 #   sample_app voie A sur sample-app : BuildKit en root dans un pod Kata privilégié, racine de BuildKit sur un tmpfs de l'invité,
 #           mêmes entrées que la voie D (tar épinglé), image de build de la voie D, Dockerfile et options de la brique 04, deux
 #           constructions depuis deux chemins, comparées à 3a7ca1b1 (après voie-d.sh image compiler)
+#   sans_reseau  option 3 du contrôle de sortie (choix du propriétaire du 30/10/2026), prédiction d'abord : NetworkPolicy
+#           politique/construction-sans-sortie.yaml posée (pods tekton.dev/task=construire-image) ; témoins : pod Kata privilégié
+#           sans le label (Zot joignable) et avec (refusé) ; dans un pod Kata privilégié au label, image de build tirée de Zot
+#           (docker-image://, doit échouer) puis livrée en layout OCI (oras cp, blobs contrôlés par sha256 dans le pod,
+#           oci-layout://) : image comparée à 3a7ca1b1 (après sample_app)
 #
 # Usage (racine du dépôt) : mise run confiance:buildkit -- <étape>…   (journal : resultats/buildkit-<étape>.log)
 set -euo pipefail
@@ -433,6 +438,108 @@ etape_sample_app() {
   echo "couche $(jq -r '.layers[0].digest' "$m"), diff_id $(jq -r '.rootfs.diff_ids[0]' "$c"), config $(jq -r '.config.digest' "$m")"
   echo "config : $(jq -S -c 'del(.rootfs)' "$c")"
   attendu "image de la voie A (BuildKit v0.34.1 sous Kata) face à la brique 04 (BuildKit 0.25.2)" "$d1" "$APP_REF"
+}
+
+POLITIQUE_SANS_SORTIE=$here/politique/construction-sans-sortie.yaml
+SONDE_ZOT='sleep 4
+for c in Zot:192.168.161.13:5000 Forgejo:192.168.161.13:3000; do
+  l=${c%%:*}; r=${c#*:}
+  if nc -z -w 3 ${r%:*} ${r##*:} 2>/dev/null; then echo "SORTIE|$l|OUVERT"; else echo "SORTIE|$l|FERME"; fi
+done'
+SANS_RESEAU='printf "%s\n" "$CA_POC" > /tmp/ca.crt
+printf "[registry.\"sc-stockage.poc.test:5000\"]\n  ca = [\"/tmp/ca.crt\"]\n" > /tmp/bk.toml
+mkdir -p /tmp/run /tmp/w/src-1
+cp -a /tmp/w/src/. /tmp/w/src-1/; printf "web/node_modules\n.git\n" > /tmp/w/src-1/.dockerignore
+n=0
+for f in /tmp/w/builder/blobs/sha256/*; do
+  [ "$(sha256sum < $f | cut -c1-64)" = "${f##*/}" ] || { echo "BLOBS|KO|${f##*/}"; exit 1; }; n=$((n + 1))
+done
+echo "BLOBS|OK|$n"
+echo "SORTIE|Zot|$(nc -z -w 3 192.168.161.13 5000 2>/dev/null && echo OUVERT || echo FERME)"
+buildkitd --config /tmp/bk.toml --oci-worker-snapshotter=native --addr unix:///tmp/run/bk.sock --root /bk > /tmp/bkd.log 2>&1 &
+k=$!
+for i in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
+b() { buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 \
+  --local context=/tmp/w/src-1 --local dockerfile=/tmp/w/df --opt filename=Dockerfile \
+  --local deps=/tmp/w/deps --opt context:deps=local:deps "$@"; }
+t=$(date +%s)
+b --opt context:builder=docker-image://'"$BUILDER_D"' --output type=oci,dest=/tmp/app-registre.tar,rewrite-timestamp=true > /tmp/app-registre.log 2>&1
+echo "REGISTRE|$?|$(($(date +%s) - t)) s|$(grep -o -m1 -E "(dial tcp|lookup) [^\"]*" /tmp/app-registre.log)"
+t=$(date +%s)
+b --oci-layout magasin=/tmp/w/builder --opt context:builder=oci-layout://magasin@'"${BUILDER_D#*@}"' \
+  --output type=oci,dest=/tmp/app-layout.tar,rewrite-timestamp=true > /tmp/app-layout.log 2>&1
+echo "LAYOUT|$?|$(($(date +%s) - t)) s|$(tar -xOf /tmp/app-layout.tar index.json 2>/dev/null | sed -n "s/.*\"digest\":\"\(sha256:[0-9a-f]*\)\".*/\1/p")"
+kill $k 2> /dev/null; wait $k 2> /dev/null; true'
+
+etiqueter() { # nom : label de la tâche construire-image sur le pod de $T/<nom>.json (sélectionné par construction-sans-sortie)
+  jq '.metadata.labels = {"tekton.dev/task": "construire-image"}' "$T/$1.json" > "$T/$1.tmp" && mv "$T/$1.tmp" "$T/$1.json"
+}
+
+etape_sans_reseau() {
+  local p=j7-bk-sans-reseau d s m l
+  echo "## prédiction (écrite le 30/10/2026, avant la mesure ; option 3 du contrôle de sortie, choix du propriétaire)"
+  echo "- témoins, pods Kata privilégiés, sortie testée 4 s après le lancement (au-delà de la fenêtre de 570 ms) : sans le label,"
+  echo "  Zot et Forgejo joignables ; avec tekton.dev/task=construire-image, les deux refusés"
+  echo "- layout OCI de l'image de build (oras cp) : index qui désigne ${BUILDER_D#*@}, blobs conformes à leur sha256 dans le pod"
+  echo "- pod de construction au label : Zot refusé ; construction avec docker-image:// en échec réseau (résolution ou connexion) ;"
+  echo "  construction avec oci-layout:// réussie, image $APP_REF et binaire $BIN_REF, ceux de sample_app : l'image finale part"
+  echo "  de scratch et ne contient que le binaire, et l'image de build est la même, par digest"
+  echo "## politique"
+  kubectl apply -f "$POLITIQUE_SANS_SORTIE" >/dev/null
+  echo "construction-sans-sortie : sélection $(kubectl get netpol -n builds construction-sans-sortie -o jsonpath='{.spec.podSelector.matchLabels}'), \
+types $(kubectl get netpol -n builds construction-sans-sortie -o jsonpath='{.spec.policyTypes}'), aucune règle ; politiques de builds : \
+$(kubectl get netpol -n builds -o name | tr '\n' ' ')"
+  echo "## entrées"
+  [ -s "$ENTREES" ] || { echo "KO   $ENTREES absent : lancer voie-d.sh compiler" >&2; exit 1; }
+  attendu "tar des entrées de la voie D (sha256 épinglé)" "$(sha256sum < "$ENTREES" | cut -c1-64)" "$ENTREES_SHA"
+  rm -rf -- "${T:?}/layout" && mkdir -p "$T/layout"
+  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" "$REG_HOTE/${BUILDER_D#"$REG"/}" --to-oci-layout "$T/layout/builder:builder" > /dev/null
+  attendu "index du layout OCI de l'image de build" "$(jq -r '.manifests[0].digest' "$T/layout/builder/index.json")" "${BUILDER_D#*@}"
+  tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$T/layout" -cf "$T/layout.tar" builder
+  s=$(sha256sum < "$T/layout.tar" | cut -c1-64)
+  echo "layout : $(du -sm "$T/layout/builder" | cut -f1) Mo, $(find "$T/layout/builder/blobs/sha256" -type f | wc -l) blobs, tar $s"
+  echo "## témoins : pods Kata privilégiés sans puis avec le label"
+  pod_spec j7-bk-sonde-sans-label kata "$BUILDKIT" 0 - "$SONDE_ZOT" "$PRIVILEGIE"
+  pod_lancer j7-bk-sonde-sans-label
+  pod_spec j7-bk-sonde-label kata "$BUILDKIT" 0 - "$SONDE_ZOT" "$PRIVILEGIE"
+  etiqueter j7-bk-sonde-label
+  pod_lancer j7-bk-sonde-label
+  attendu "sans le label : sorties" "$(grep '^SORTIE|' "$T/j7-bk-sonde-sans-label.log" | cut -d'|' -f2,3 | tr '\n' ' ')" "Zot|OUVERT Forgejo|OUVERT "
+  attendu "avec le label : sorties" "$(grep '^SORTIE|' "$T/j7-bk-sonde-label.log" | cut -d'|' -f2,3 | tr '\n' ' ')" "Zot|FERME Forgejo|FERME "
+  echo "## pod $p (Kata, privilégié, root, limites $LIMITES_A, label tekton.dev/task=construire-image, racine de BuildKit sur tmpfs)"
+  pod_spec "$p" kata "$BUILDKIT" 0 "$LIMITES_A" "sleep 1200" "$PRIVILEGIE"
+  etiqueter "$p"
+  jq '.spec.volumes = [{name: "bk", emptyDir: {medium: "Memory", sizeLimit: "4Gi"}}] | .spec.containers[0].volumeMounts = [{name: "bk", mountPath: "/bk"}]' \
+    "$T/$p.json" > "$T/$p.tmp" && mv "$T/$p.tmp" "$T/$p.json"
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/$p.json" >/dev/null
+  kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s >/dev/null
+  echo "labels du pod : $(kubectl get pod -n builds "$p" -o jsonpath='{.metadata.labels}')"
+  attendu "entrées livrées par kubectl exec (sha256 dans le pod)" \
+    "$(kubectl exec -i -n builds "$p" -- sh -c 'mkdir -p /tmp/w/df && tee /tmp/entrees.tar | sha256sum | cut -c1-64' < "$ENTREES")" "$ENTREES_SHA"
+  kubectl exec -n builds "$p" -- tar -xf /tmp/entrees.tar -C /tmp/w
+  attendu "layout livré par kubectl exec (sha256 dans le pod)" \
+    "$(kubectl exec -i -n builds "$p" -- sh -c 'tee /tmp/layout.tar | sha256sum | cut -c1-64' < "$T/layout.tar")" "$s"
+  kubectl exec -n builds "$p" -- tar -xf /tmp/layout.tar -C /tmp/w
+  kubectl exec -i -n builds "$p" -- sh -c 'cat > /tmp/w/df/Dockerfile' < "$repo/poc/bricks/04-hermetic-repro/Dockerfile"
+  kubectl exec -n builds "$p" -- sh -c "$SANS_RESEAU" > "$T/$p.log" 2>&1 || true
+  echo "### $p"; sed 's/^/     /' "$T/$p.log"
+  kubectl exec -n builds "$p" -- cat /tmp/app-layout.tar > "$T/app-layout.tar" 2>/dev/null || true
+  kubectl exec -n builds "$p" -- sh -c 'grep -h -E "ERROR|error:" /tmp/app-layout.log | head -5' || true
+  kubectl delete pod -n builds "$p" --wait=false >/dev/null
+  echo "## comparaison"
+  attendu "blobs du layout dans le pod" "$(grep '^BLOBS|' "$T/$p.log" | cut -d'|' -f2)" OK
+  attendu "pod au label : Zot" "$(grep '^SORTIE|Zot|' "$T/$p.log" | cut -d'|' -f3)" FERME
+  [ "$(grep '^REGISTRE|' "$T/$p.log" | cut -d'|' -f2)" != 0 ] && grep -qE '^REGISTRE\|[0-9]+\|[0-9]+ s\|(dial tcp|lookup) ' "$T/$p.log" \
+    && echo "OK   docker-image:// : échec réseau ($(grep '^REGISTRE|' "$T/$p.log" | cut -d'|' -f4))" \
+    || { echo "KO   docker-image:// : $(grep '^REGISTRE|' "$T/$p.log")" >&2; exit 1; }
+  attendu "oci-layout:// : code de retour" "$(grep '^LAYOUT|' "$T/$p.log" | cut -d'|' -f2)" 0
+  d=$(tar -xOf "$T/app-layout.tar" index.json | jq -r '.manifests[0].digest')
+  rm -rf -- "${T:?}/app-layout" && mkdir -p "$T/app-layout" && tar -xf "$T/app-layout.tar" -C "$T/app-layout"
+  m=$T/app-layout/blobs/sha256/${d#sha256:}
+  l=$T/app-layout/blobs/sha256/$(jq -r '.layers[0].digest' "$m" | cut -c8-)
+  attendu "binaire dans l'image" "$(gzip -dc "$l" | tar -xOf - sample-app | sha256sum | cut -c1-64)" "$BIN_REF"
+  attendu "image construite sans réseau, image de build en layout OCI, face à la voie A (3a7ca1b1)" "$d" "$APP_REF"
 }
 
 lancer buildkit J7 "$@"

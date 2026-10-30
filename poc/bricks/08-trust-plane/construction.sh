@@ -7,21 +7,31 @@
 #               refusés ; secret zot-images et ConfigMap ca-poc (CA publique du PoC) dans builds
 #   entrees     fermeture Hermeto (closure.sh de la brique 03) et web/dist (sortie de la brique 03), arbres épinglés de voie-d.sh,
 #               poussés dans Zot par poc-ecriture, deux fois : même digest ; relus en lecture anonyme : mêmes contenus
-#   taches      construire-image (pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs) et publier-image (pod runc
-#               restreint, poc-images) rendues, signées par tkn, comparées à leur signature versionnée (SIGNER=1 pour la refaire),
-#               digests exigés dans la liste revue ; pipeline sample-app signée, entrées hors dépôt fixées par digest ; bundles
+#   taches      preparer-entrees (pod runc restreint : sources de Forgejo, fermeture, web/dist et image de build en layout OCI
+#               tirés dans le workspace ; option 3 du contrôle de sortie, choix du propriétaire du 30/10/2026), construire-image
+#               (pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs, sans aucune sortie réseau, image de build par
+#               oci-layout://) et publier-image (pod runc restreint, poc-images) rendues, signées par tkn, comparées à leur
+#               signature versionnée (SIGNER=1 pour la refaire), digests exigés dans la liste revue ; pipeline sample-app signée,
+#               entrées hors dépôt fixées par digest ; bundles
 #   constat_cm  sous Kata 4.3.1, deux conteneurs d'un pod montent la même ConfigMap : quand le premier se termine, le second ne la
 #               lit plus (lien ca.crt orphelin) ; témoin : premier conteneur encore en vie ; un emptyDir sur disque survit.
 #               D'où la CA montée dans la seule première étape de construire-image, qui la recopie (premier passage en échec)
-#   construire  PipelineRun du gabarit en service (pipeline remplacée, commit de main, workspace PVC, runtimeClassName kata pour
+#   construire  NetworkPolicy construction-sans-sortie posée (politique/construction-sans-sortie.yaml), invariant contrôlé (une
+#               seule politique sélectionne les pods de construire-image, aucune politique de builds n'autorise de trafic) ;
+#               PipelineRun du gabarit en service (pipeline remplacée, commit de main, workspace PVC, runtimeClassName kata pour
 #               la seule tâche construire) : image attendue 3a7ca1b1, poussée par poc-images, signée par Chains ; taille de
-#               l'invité ; même PipelineRun sans runtimeClassName : pod de construction refusé, rien de poussé
+#               l'invité ; label tekton.dev/task du pod et délai avant l'étape construire ; témoins : label tekton.dev/task
+#               imposé par le créateur (taskRunSpecs, PipelineRun annulé une fois le pod lu), ancienne pipeline (construire-image
+#               qui tire ses entrées elle-même, relue dans l'historique git par taches : échec fermé) ; même PipelineRun sans runtimeClassName : pod de construction
+#               refusé, rien de poussé
 #   provenance  provenance du PipelineRun vérifiée par cosign (clé de Chains ; autre clé refusée) ; sujet, buildType,
-#               resolvedDependencies (commit, fermeture, web/dist, image de build, images d'étape, pipeline, tâches) ;
+#               resolvedDependencies (commit, fermeture, web/dist et image de build déclarés par preparer-entrees, images
+#               d'étape, pipeline, trois tâches) ;
 #               runtimeClassName kata dans la spec signée
 # Retrait : dépôts Zot entrees/sample-app/*, builds/sample-app, builds/essai-images, tekton/tasks/construire-image,
-# tekton/tasks/publier-image, tekton/pipelines/sample-app (Zot n'autorise pas la suppression) ; secret zot-images et ConfigMap
-# ca-poc de builds ; compte poc-images (stockage/zot.json, stockage.sh zot).
+# tekton/tasks/preparer-entrees, tekton/tasks/publier-image, tekton/pipelines/sample-app (Zot n'autorise pas la suppression) ;
+# secret zot-images, ConfigMap ca-poc et NetworkPolicy construction-sans-sortie de builds ; compte poc-images (stockage/zot.json,
+# stockage.sh zot).
 #
 # Usage (racine du dépôt) : mise run confiance:construction -- <étape>…   (journal : resultats/construction-<étape>.log)
 set -euo pipefail
@@ -49,6 +59,11 @@ SAMPLE_APP=workspace/sample-app
 TETE_J2=6391fd437f26696847041be3226bbbf633f55a2f    # stockage.sh depot ; main y est remise après les essais de J6
 ARBRE_J2=30e808ffa327288c656ddda7b6fafe4005234b77   # arbre git de ce commit (= poc/sample-app à HEAD lors de J2)
 PR=j7-sample-app
+POLITIQUE=$here/politique/construction-sans-sortie.yaml
+# témoin : première version de construire-image (J7, 30/10/2026), qui tire ses entrées elle-même ; signature versionnée et
+# gabarit de pipeline relus dans l'historique git à ce commit (taches : ancienne_pipeline)
+COMMIT_ANCIEN=b77ff6b9e8b01a2444cd6948b0e72fd33b7b125c
+ANCIENNE_TACHE=sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
 T=$W/construction
 mkdir -p "$T"
 (umask 077 && mkdir -p "$T/auth/docker")
@@ -152,6 +167,21 @@ signer_tache() { # nom : tâche rendue $T/<nom>.yaml signée, comparée à sa si
   else echo "KO   $n absente de la liste revue politique/porte/taches.yml : $r" >&2; exit 1; fi
 }
 
+ancienne_pipeline() { # témoin : construire-image c7e8b275 (signature versionnée au commit $COMMIT_ANCIEN) et la pipeline de ce
+  # commit, rendue et signée, publiées en bundles (étiquette j7-ancienne) ; référence de la pipeline dans $T/ancienne-pipeline.ref
+  local r
+  git -C "$repo" show "$COMMIT_ANCIEN:poc/bricks/08-trust-plane/politique/taches/construire-image.signee.yaml" > "$T/ancienne-construire-image-signee.yaml"
+  r=$REG/tekton/tasks/construire-image@$(bundle "$T/ancienne-construire-image-signee.yaml" tekton/tasks/construire-image j7-ancienne)
+  attendu "bundle de l'ancienne construire-image (signature versionnée au commit ${COMMIT_ANCIEN:0:7})" "${r#*@}" "$ANCIENNE_TACHE"
+  git -C "$repo" show "$COMMIT_ANCIEN:poc/bricks/08-trust-plane/politique/taches/sample-app.yaml" \
+    | sed -e "s#@CONSTRUIRE@#$r#" -e "s#@PUBLIER@#$(cat "$T/publier-image.ref")#" -e "s#@FERMETURE@#$REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST#" \
+      -e "s#@WEB_DIST@#$REG/$DEPOT_WEB_DIST@$WEB_DIST_DIGEST#" -e "s#@IMAGE@#$IMAGE#" > "$T/ancienne-sample-app.yaml"
+  ! grep -n '@[A-Z_]*@' "$T/ancienne-sample-app.yaml" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans l'ancienne pipeline" >&2; exit 1; }
+  tkn pipeline sign "$T/ancienne-sample-app.yaml" -K "$S/taches.key" -f "$T/ancienne-sample-app-signee.yaml" > /dev/null
+  echo "$REG/tekton/pipelines/sample-app@$(bundle "$T/ancienne-sample-app-signee.yaml" tekton/pipelines/sample-app j7-ancienne)" > "$T/ancienne-pipeline.ref"
+  echo "ancienne pipeline (témoin) : $(cat "$T/ancienne-pipeline.ref")"
+}
+
 etape_taches() {
   local s p
   [ -n "$FERMETURE_DIGEST" ] && [ -n "$WEB_DIST_DIGEST" ] || { echo "KO   digests des entrées non épinglés (étape entrees)" >&2; exit 1; }
@@ -159,21 +189,26 @@ etape_taches() {
   auth_zot "$T/auth/docker/config.json"
   s=$(sha256sum < "$DOCKERFILE" | cut -c1-64)
   echo "## tâches (tkn $(tkn version --component client)) ; Dockerfile de la brique 04 : $s"
+  sed -e "s#@BUILDKIT@#$BUILDKIT#g" -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#g" "$here/politique/taches/preparer-entrees.yaml" \
+    > "$T/preparer-entrees.yaml"
   awk -v f="$DOCKERFILE" '$1 == "@DOCKERFILE@" && NF == 1 { match($0, /^ */); i = substr($0, 1, RLENGTH)
       while ((getline l < f) > 0) print (l == "" ? "" : i l); next } { print }' "$here/politique/taches/construire-image.yaml" \
-    | sed -e "s#@BUILDKIT@#$BUILDKIT#g" -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#g" -e "s#@BUILDER@#$BUILDER#g" -e "s#@DOCKERFILE_SHA@#$s#g" \
-    > "$T/construire-image.yaml"
+    | sed -e "s#@BUILDKIT@#$BUILDKIT#g" -e "s#@BUILDER_DIGEST@#${BUILDER#*@}#g" -e "s#@DOCKERFILE_SHA@#$s#g" > "$T/construire-image.yaml"
   sed -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#g" "$here/politique/taches/publier-image.yaml" > "$T/publier-image.yaml"
-  for p in construire-image publier-image; do
+  for p in preparer-entrees construire-image publier-image; do
     ! grep -n '@[A-Z_]*@' "$T/$p.yaml" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans $p" >&2; exit 1; }
     signer_tache "$p"
   done
   echo "## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)"
-  sed -e "s#@CONSTRUIRE@#$(cat "$T/construire-image.ref")#" -e "s#@PUBLIER@#$(cat "$T/publier-image.ref")#" \
-    -e "s#@FERMETURE@#$REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST#" -e "s#@WEB_DIST@#$REG/$DEPOT_WEB_DIST@$WEB_DIST_DIGEST#" \
-    -e "s#@IMAGE@#$IMAGE#" "$here/politique/taches/sample-app.yaml" > "$T/sample-app.yaml"
+  sed -e "s#@PREPARER@#$(cat "$T/preparer-entrees.ref")#" -e "s#@CONSTRUIRE@#$(cat "$T/construire-image.ref")#" \
+    -e "s#@PUBLIER@#$(cat "$T/publier-image.ref")#" -e "s#@FERMETURE@#$REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST#" \
+    -e "s#@WEB_DIST@#$REG/$DEPOT_WEB_DIST@$WEB_DIST_DIGEST#" -e "s#@BUILDER@#$BUILDER#" -e "s#@IMAGE@#$IMAGE#" \
+    "$here/politique/taches/sample-app.yaml" > "$T/sample-app.yaml"
+  ! grep -n '@[A-Z_]*@' "$T/sample-app.yaml" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans sample-app" >&2; exit 1; }
   tkn pipeline sign "$T/sample-app.yaml" -K "$S/taches.key" -f "$T/sample-app-signee.yaml" > /dev/null
   echo "$REG/tekton/pipelines/sample-app@$(bundle "$T/sample-app-signee.yaml" tekton/pipelines/sample-app j7)" | tee "$T/pipeline.ref"
+  echo "## témoin : première version de construire-image et sa pipeline, depuis l'historique git"
+  ancienne_pipeline
 }
 
 etape_constat_cm() {
@@ -212,15 +247,17 @@ etape_constat_cm() {
   echo "        entre étapes n'est lisible que par la première. Non trouvé dans les issues de kata-containers (recherche du 30/10/2026)"
 }
 
-pr_j7() { # nom kata|- : PipelineRun du gabarit en service dans declencheurs (pipeline sample-app, commit de main, workspace sortie
-  # en PVC ; avec kata, runtimeClassName pour la seule tâche construire, gabarit de pod du PipelineRun recopié) ; $T/pr-<nom>.json
-  kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "$1" --arg b "$(cat "$T/pipeline.ref")" --arg c "$TETE_J2" \
-    --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg k "$2" '.spec.resourcetemplates[0] | .metadata.name = $n
+pr_j7() { # nom kata|- [bundle de pipeline] [labels JSON] : PipelineRun du gabarit en service dans declencheurs (pipeline sample-app,
+  # commit de main, workspace sortie en PVC ; avec kata, runtimeClassName pour la seule tâche construire, gabarit de pod du
+  # PipelineRun recopié ; labels : posés par le créateur sur le TaskRun construire, taskRunSpecs[].metadata) ; $T/pr-<nom>.json
+  kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "$1" --arg b "${3:-$(cat "$T/pipeline.ref")}" --arg c "$TETE_J2" \
+    --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg k "$2" --argjson l "${4:-null}" '.spec.resourcetemplates[0] | .metadata.name = $n
       | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b elif .name == "name" then .value = "sample-app" else . end)
       | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)
       | .spec.workspaces = [{name: "sortie", volumeClaimTemplate: {spec: {accessModes: ["ReadWriteOnce"], resources: {requests: {storage: "1Gi"}}}}}]
       | if $k == "kata" then .spec.taskRunSpecs = [{pipelineTaskName: "construire",
-          podTemplate: (.spec.taskRunTemplate.podTemplate + {runtimeClassName: "kata"})}] else . end' > "$T/pr-$1.json"
+          podTemplate: (.spec.taskRunTemplate.podTemplate + {runtimeClassName: "kata"})}] else . end
+      | if $l != null then .spec.taskRunSpecs[0].metadata = {labels: $l} else . end' > "$T/pr-$1.json"
 }
 
 fin_pr() { # nom [secondes] : attend la fin d'un PipelineRun de builds ; « statut|raison|message »
@@ -246,31 +283,55 @@ journaux_pr() { # nom : sortie de chaque étape de chaque TaskRun du PipelineRun
   done
 }
 
+pod_tache() { # PipelineRun tâche : nom du pod de la tâche, attendu jusqu'à 300 s (vide sinon)
+  local p=""
+  for _ in $(seq 300); do
+    p=$(kubectl get pods -n builds -l "tekton.dev/pipelineRun=$1,tekton.dev/pipelineTask=$2" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    [ -n "$p" ] && break
+    sleep 1
+  done
+  echo "$p"
+}
+
+politique_sans_sortie() { # construction-sans-sortie posée ; invariant d'union des NetworkPolicy de builds contrôlé
+  kubectl apply -f "$POLITIQUE" > /dev/null
+  kubectl get netpol -n builds -o json > "$T/netpol.json"
+  echo "NetworkPolicy de builds : $(jq -r '[.items[].metadata.name] | join(", ")' "$T/netpol.json")"
+  attendu "politiques qui sélectionnent les pods de construire-image, sans entrée ni sortie" \
+    "$(jq -r '[.items[] | select(.spec.podSelector.matchLabels["tekton.dev/task"] == "construire-image" and (.spec.policyTypes | sort) == ["Egress", "Ingress"])] | length' "$T/netpol.json")" 1
+  attendu "politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient)" \
+    "$(jq -r '[.items[] | select(((.spec.egress // []) | length) > 0 or ((.spec.ingress // []) | length) > 0)] | length' "$T/netpol.json")" 0
+}
+
 etape_construire() {
-  local r q cons pub aa n t0
+  local r q cons pub aa n t0 e
   [ -s "$T/pipeline.ref" ] || { echo "KO   pipeline non publiée (étape taches)" >&2; exit 1; }
-  echo "## prédiction"
-  echo "PipelineRun $PR (gabarit de declencheurs, commit $TETE_J2) : réussi ; Trusted Resources vérifie la pipeline et les deux tâches"
+  echo "## prédiction (après buildkit.sh sans_reseau : image 3a7ca1b1 sans réseau, image de build en layout OCI)"
+  echo "PipelineRun $PR (gabarit de declencheurs, commit $TETE_J2) : réussi ; Trusted Resources vérifie la pipeline et les trois tâches"
   echo "  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build"
-  echo "  construire : pod Kata sur sc-build, QEMU -smp 3 -m 6176M (limites 2 CPU et 6 Gi de la seule étape construire) ; arbre"
-  echo "    $ARBRE_J2 ; fermeture et web/dist tirés ; image $APP_REF (binaire $BIN_REF : l'écart web/package*.json du dépôt"
-  echo "    ne touche pas l'image, qui ne contient que le binaire)"
+  echo "  preparer : pod runc ; arbre $ARBRE_J2 ; fermeture, web/dist et image de build en layout OCI tirés dans le workspace"
+  echo "  construire : pod Kata sur sc-build, label tekton.dev/task=construire-image (sélectionné par construction-sans-sortie),"
+  echo "    QEMU -smp 3 -m 6176M ; layout contrôlé (3 blobs) ; aucune sortie réseau ; image $APP_REF ; l'étape construire démarre"
+  echo "    plusieurs secondes après le premier conteneur du pod (initialisation de Tekton), au-delà de la fenêtre de démarrage"
+  echo "    mesurée (0,5 à 1,1 s, kata.sh reseau)"
   echo "  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build"
-  echo "  Chains signe les deux TaskRuns et le PipelineRun"
-  echo "même PipelineRun sans runtimeClassName : construire refusé à la création du pod (Pod Security restricted : privileged),"
-  echo "  publier jamais lancé, aucune écriture de poc-images"
+  echo "  Chains signe les trois TaskRuns et le PipelineRun"
+  echo "label tekton.dev/task imposé à « autre » par le créateur (taskRunSpecs[construire].metadata) : le pod garde construire-image"
+  echo "  (fixé par le contrôleur au nom de la tâche résolue, taskrun.go) ; un autre label du créateur y figure (témoin)"
+  echo "ancienne pipeline (construire-image c7e8b275, qui tire ses entrées elle-même) : construire en échec à l'étape sources"
+  echo "  (Forgejo injoignable : résolution refusée), publier jamais lancé, aucune écriture de poc-images"
+  echo "même PipelineRun sans runtimeClassName : preparer réussi, construire refusé à la création du pod (Pod Security restricted :"
+  echo "  privileged), publier jamais lancé, aucune écriture de poc-images"
+  echo "## politique"
+  politique_sans_sortie
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   pr_j7 "$PR" kata
   purger_pr "$PR"
   kubectl create -f "$T/pr-$PR.json" > /dev/null
   echo "## $PR créé ($(jq -c '.spec.taskRunSpecs' "$T/pr-$PR.json"))"
-  cons=""
-  for _ in $(seq 300); do
-    cons=$(kubectl get pods -n builds -l "tekton.dev/pipelineRun=$PR,tekton.dev/pipelineTask=construire" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
-    [ -n "$cons" ] && [ "$(kubectl get pod -n builds "$cons" -o jsonpath='{.status.phase}')" = Running ] && break
-    sleep 1
-  done
+  cons=$(pod_tache "$PR" construire)
   [ -n "$cons" ] || { kubectl get pipelinerun,taskrun -n builds -l "tekton.dev/pipelineRun=$PR" >&2; echo "KO   pod construire absent" >&2; exit 1; }
+  for _ in $(seq 300); do [ "$(kubectl get pod -n builds "$cons" -o jsonpath='{.status.phase}')" = Running ] && break; sleep 1; done
   q=$(sur sc-build "sudo k3s crictl pods --namespace builds --name $cons -q" | sed -n 1p)
   sur sc-build "pgrep -af 'qemu-system.*sandbox-$q'" > "$T/qemu.txt" || true
   echo "processus QEMU du sandbox de $cons : $(wc -l < "$T/qemu.txt")"
@@ -283,10 +344,14 @@ etape_construire() {
   attendu "kata : QEMU" "$(for f in -smp -m; do printf '%s %s ' "$f" "$(tr ' ' '\n' < "$T/qemu.txt" | grep -A1 -x -m1 -- "$f" | tail -1 | cut -d, -f1)"; done | sed 's/ $//')" "-smp 3 -m 6176M"
   kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR" -o json | jq -r '.items[] | "TaskRun \(.metadata.labels["tekton.dev/pipelineTask"]) : TrustedResourcesVerified=\(.status.conditions[] | select(.type == "TrustedResourcesVerified") | .status // "-"), pod \(.status.podName)"'
   kubectl get pipelinerun -n builds "$PR" -o json | jq -r '"PipelineRun : TrustedResourcesVerified=\(.status.conditions[] | select(.type == "TrustedResourcesVerified") | .status // "-") ; résultats \(.status.results | map(.name + "=" + .value) | join(", "))"'
-  kubectl get pods -n builds -l "tekton.dev/pipelineRun=$PR" -o json | jq -r '.items[] | "pod \(.metadata.labels["tekton.dev/pipelineTask"]) : nœud \(.spec.nodeName), runtimeClassName \(.spec.runtimeClassName // "-"), étapes \([.spec.containers[] | "\(.name)=\(if .securityContext.privileged then "privilégiée" else "uid \(.securityContext.runAsUser // "pod")" end)"] | join(" "))"'
+  kubectl get pods -n builds -l "tekton.dev/pipelineRun=$PR" -o json | jq -r '.items[] | "pod \(.metadata.labels["tekton.dev/pipelineTask"]) : nœud \(.spec.nodeName), runtimeClassName \(.spec.runtimeClassName // "-"), tekton.dev/task \(.metadata.labels["tekton.dev/task"] // "-"), étapes \([.spec.containers[] | "\(.name)=\(if .securityContext.privileged then "privilégiée" else "uid \(.securityContext.runAsUser // "pod")" end)"] | join(" "))"'
+  attendu "label tekton.dev/task du pod construire" "$(kubectl get pod -n builds "$cons" -o jsonpath='{.metadata.labels.tekton\.dev/task}')" construire-image
+  e=$(kubectl get pod -n builds "$cons" -o json | jq -r '([.status.initContainerStatuses[]?.state.terminated.startedAt] | min | fromdateiso8601) as $p
+    | (.status.containerStatuses[] | select(.name == "step-construire") | .state.terminated.startedAt | fromdateiso8601) - $p')
+  echo "CONSTAT  étape construire lancée $e s après le premier conteneur du pod (fenêtre de démarrage mesurée : 0,5 à 1,1 s ; horodatages à la seconde)"
   pub=$(kubectl get pipelinerun -n builds "$PR" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
-  attendu "image de sample-app construite dans le PipelineRun (voie A, BuildKit v0.34.1 sous Kata)" "$pub" "$APP_REF"
-  attendu "arbre du commit (dépôt Forgejo)" "$(sed -n 's/.*arbre \([0-9a-f]\{40\}\).*/\1/p' "$T"/"$PR"-construire-step-sources.log)" "$ARBRE_J2"
+  attendu "image de sample-app construite dans le PipelineRun (voie A, sans sortie réseau, image de build en layout OCI)" "$pub" "$APP_REF"
+  attendu "arbre du commit (dépôt Forgejo)" "$(sed -n 's/.*arbre \([0-9a-f]\{40\}\).*/\1/p' "$T"/"$PR"-preparer-step-sources.log)" "$ARBRE_J2"
   echo "## Chains"
   for r in $(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR" -o jsonpath='{.items[*].metadata.name}'); do
     echo "TaskRun $r signé=$(signe taskrun "$r")"
@@ -298,6 +363,38 @@ etape_construire() {
     | sub("sha256[-:](?<d>.{12})[0-9a-f]*"; "sha256…\(.d)")), code: .status}' | tee "$T/zot-audit.json"
   n=$(jq -s '[.[] | select(.compte == "poc-images" and .code == 201)] | length' "$T/zot-audit.json")
   [ "$n" -ge 1 ] && echo "OK   image poussée par poc-images ($n écriture(s) par digest)" || { echo "KO   aucune écriture de poc-images" >&2; exit 1; }
+
+  echo "## témoin : label tekton.dev/task imposé par le créateur (PipelineRun annulé une fois le pod lu)"
+  pr_j7 "$PR-etiquette" kata "" '{"tekton.dev/task": "autre", "essai": "etiquette"}'
+  purger_pr "$PR-etiquette"
+  kubectl create -f "$T/pr-$PR-etiquette.json" > /dev/null
+  echo "taskRunSpecs : $(jq -c '.spec.taskRunSpecs[0].metadata' "$T/pr-$PR-etiquette.json")"
+  n=$(pod_tache "$PR-etiquette" construire)
+  [ -n "$n" ] || { echo "KO   pod construire absent ($PR-etiquette)" >&2; exit 1; }
+  kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR-etiquette,tekton.dev/pipelineTask=construire" -o json \
+    | jq -r '.items[] | "TaskRun \(.metadata.name) : tekton.dev/task=\(.metadata.labels["tekton.dev/task"]), essai=\(.metadata.labels.essai // "-")"'
+  kubectl get pod -n builds "$n" -o json | jq -r '"pod \(.metadata.name) : tekton.dev/task=\(.metadata.labels["tekton.dev/task"]), essai=\(.metadata.labels.essai // "-")"'
+  attendu "label tekton.dev/task du pod, imposé à « autre » par le créateur" "$(kubectl get pod -n builds "$n" -o jsonpath='{.metadata.labels.tekton\.dev/task}')" construire-image
+  attendu "autre label du créateur, transmis au pod (témoin)" "$(kubectl get pod -n builds "$n" -o jsonpath='{.metadata.labels.essai}')" etiquette
+  kubectl patch pipelinerun -n builds "$PR-etiquette" --type merge -p '{"spec":{"status":"Cancelled"}}' > /dev/null
+  echo "PipelineRun $PR-etiquette annulé : $(fin_pr "$PR-etiquette" 300)"
+
+  [ -s "$T/ancienne-pipeline.ref" ] || { echo "KO   ancienne pipeline non publiée (étape taches)" >&2; exit 1; }
+  echo "## témoin : ancienne pipeline ($(cat "$T/ancienne-pipeline.ref"))"
+  pr_j7 "$PR-ancienne" kata "$(cat "$T/ancienne-pipeline.ref")"
+  purger_pr "$PR-ancienne"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl create -f "$T/pr-$PR-ancienne.json" > /dev/null
+  r=$(fin_pr "$PR-ancienne" 300)
+  journaux_pr "$PR-ancienne"
+  echo "PipelineRun $PR-ancienne : $r"
+  [ "${r%%|*}" = False ] && grep -qE 'Could not resolve host|Failed to connect|Connection refused' "$T/$PR-ancienne-construire-step-sources.log" \
+    && echo "OK   ancienne construire-image en échec fermé : $(grep -m1 -oE "(Could not resolve host|Failed to connect|Connection refused)[^']*" "$T/$PR-ancienne-construire-step-sources.log")" \
+    || { echo "KO   ancienne pipeline : échec réseau attendu à l'étape sources" >&2; exit 1; }
+  attendu "TaskRun publier de l'ancienne pipeline" "$(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR-ancienne,tekton.dev/pipelineTask=publier" -o name | wc -l)" 0
+  n=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$t0" 'select(.time[0:19] >= ($t[0:19]) and .subject == "poc-images")' | wc -l)
+  attendu "écritures de poc-images depuis $t0" "$n" 0
+
   echo "## même PipelineRun sans runtimeClassName"
   pr_j7 "$PR-sans-kata" -
   purger_pr "$PR-sans-kata"
@@ -308,6 +405,7 @@ etape_construire() {
   kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR-sans-kata" -o json | jq -r '.items[] | "TaskRun \(.metadata.labels["tekton.dev/pipelineTask"]) : \(.status.conditions[0].reason) : \(.status.conditions[0].message | .[0:300])"' | tee "$T/sans-kata.txt"
   [ "${r%%|*}" = False ] && grep -q 'violates PodSecurity "restricted:latest": privileged' "$T/sans-kata.txt" \
     && echo "OK   pod de construction refusé hors Kata (Pod Security restricted de builds)" || { echo "KO   refus attendu" >&2; exit 1; }
+  attendu "TaskRun preparer du PipelineRun sans Kata" "$(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR-sans-kata,tekton.dev/pipelineTask=preparer" -o jsonpath='{.items[0].status.conditions[0].reason}')" Succeeded
   attendu "TaskRun publier du PipelineRun sans Kata" "$(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$PR-sans-kata,tekton.dev/pipelineTask=publier" -o name | wc -l)" 0
   n=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$t0" 'select(.time[0:19] >= ($t[0:19]) and .subject == "poc-images")' | wc -l)
   attendu "écritures de poc-images depuis $t0" "$n" 0
@@ -318,8 +416,9 @@ etape_provenance() {
   uid=$(kubectl get pipelinerun -n builds "$PR" -o jsonpath='{.metadata.uid}')
   echo "## prédiction"
   echo "cosign (clé de Chains) : enveloppes valides sur $IMAGE@$APP_REF, dont celle du PipelineRun $PR (invocationId $uid) ;"
-  echo "  buildType slsa-tekton ; sujet $IMAGE ; resolvedDependencies : pipeline et deux tâches (bundles), images d'étape (BuildKit,"
-  echo "  outils), git+https://…/$SAMPLE_APP.git@sha1:$TETE_J2, fermeture, web/dist et image de build par digest ;"
+  echo "  buildType slsa-tekton ; sujet $IMAGE ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,"
+  echo "  outils), git+https://…/$SAMPLE_APP.git@sha1:$TETE_J2, fermeture, web/dist et image de build par digest, déclarés désormais"
+  echo "  par preparer-entrees ;"
   echo "  runtimeClassName kata dans les paramètres externes (taskRunSpecs) et dans le TaskRun construire ; autre clé refusée"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
     "$REG_HOTE/builds/sample-app@$APP_REF" > "$T/att.json" 2> "$T/cosign.err" || { cat "$T/cosign.err" >&2; exit 1; }
@@ -336,6 +435,8 @@ etape_provenance() {
   attendu "fermeture" "$(jq -r --arg u "oci://$REG/$DEPOT_FERMETURE" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$FERMETURE_DIGEST"
   attendu "web/dist" "$(jq -r --arg u "oci://$REG/$DEPOT_WEB_DIST" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$WEB_DIST_DIGEST"
   attendu "image de build" "$(jq -r --arg u "oci://${BUILDER%@*}" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "${BUILDER#*@}"
+  attendu "tâche preparer-entrees (bundle) dans resolvedDependencies" "$(jq -r --arg u "$REG/tekton/tasks/preparer-entrees" '.predicate.buildDefinition.resolvedDependencies[]
+    | select(.name == "pipelineTask" and .uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$(cut -d@ -f2 "$T/preparer-entrees.ref")"
   attendu "runtimeClassName de construire (paramètres externes)" \
     "$(jq -r '.predicate.buildDefinition.externalParameters.runSpec.taskRunSpecs[] | select(.pipelineTaskName == "construire") | .podTemplate.runtimeClassName' "$T/prov.json")" kata
   attendu "runtimeClassName du TaskRun construire (contenu signé de resolvedDependencies)" "$(jq -r '.predicate.buildDefinition.resolvedDependencies[]

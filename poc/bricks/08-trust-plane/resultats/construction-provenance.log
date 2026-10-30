@@ -1,10 +1,11 @@
-# construction.sh provenance, 2026-10-30T16:07:04Z
+# construction.sh provenance, 2026-10-30T18:29:27Z
 ## prédiction
-cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId cf66fede-29ac-4cd6-b3fa-d6a60928043b) ;
-  buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et deux tâches (bundles), images d'étape (BuildKit,
-  outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest ;
+cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId ba5aecf3-1f9b-4620-895d-869ea1de0c5a) ;
+  buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,
+  outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest, déclarés désormais
+  par preparer-entrees ;
   runtimeClassName kata dans les paramètres externes (taskRunSpecs) et dans le TaskRun construire ; autre clé refusée
-OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   cosign verify-attestation : 8 enveloppe(s) valide(s) sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 OK   enveloppes du PipelineRun j7-sample-app : 1
 sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 buildType : https://tekton.dev/chains/v2/slsa-tekton
@@ -12,21 +13,23 @@ builder : https://supply-chain.example/builders/tekton-chains@v1
 paramètres externes : commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git
 taskRunSpecs : [{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"runtimeClassName":"kata","securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}]}}]
 resolvedDependencies :
-  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:b200fbb4ef7dcd9c25bce42887dc05f47a68940fa10fea9a147366372fc586d9
-  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-image sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906 (contenu)
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:f148166f6e6526738957741e894865f37e23a5d3fa8e027c643873d08d631999
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4 (contenu)
   - oci://sc-stockage.poc.test:5000/amont/moby/buildkit sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
   - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-image sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63 (contenu)
   pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b (contenu)
   inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+  inputs/result oci://sc-stockage.poc.test:5000/plateforme/builder-go-voie-d sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
   inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/fermeture sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
   inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/web-dist sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
-  inputs/result oci://sc-stockage.poc.test:5000/plateforme/builder-go-voie-d sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
 OK   sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
 OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
 OK   fermeture : sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
 OK   web/dist : sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
 OK   image de build : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   tâche preparer-entrees (bundle) dans resolvedDependencies : sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
 OK   runtimeClassName de construire (paramètres externes) : kata
 OK   runtimeClassName du TaskRun construire (contenu signé de resolvedDependencies) : kata
 OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)

@@ -1,0 +1,11 @@
+# construction.sh taches, 2026-10-30T16:04:20Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:b200fbb4ef7dcd9c25bce42887dc05f47a68940fa10fea9a147366372fc586d9

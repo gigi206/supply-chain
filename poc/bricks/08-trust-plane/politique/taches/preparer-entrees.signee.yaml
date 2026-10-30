@@ -1,0 +1,116 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIQCV6XnmbL6Zjyt/pUqRguokXYXWYKrKha7FR9lXHwkHcwIgCITo1W/LUWQatQ4GgmVuAYi0/Z6S/U2980bmQvXaPBQ=
+  name: preparer-entrees
+spec:
+  params:
+  - name: depot
+    type: string
+  - name: commit
+    type: string
+  - name: fermeture
+    type: string
+  - name: web-dist
+    type: string
+  - name: builder
+    type: string
+  results:
+  - name: CHAINS-GIT_URL
+    type: string
+  - name: CHAINS-GIT_COMMIT
+    type: string
+  - name: FERMETURE_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: WEB_DIST_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: BUILDER_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    - name: COMMIT
+      value: $(params.commit)
+    image: sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+    name: sources
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      case $COMMIT in *[!0-9a-f]*) echo "commit invalide : $COMMIT" >&2; exit 1 ;; esac
+      [ ${#COMMIT} = 40 ] || { echo "commit invalide : $COMMIT" >&2; exit 1; }
+      case $DEPOT in https://sc-stockage.poc.test:3000/*.git) ;; *) echo "dépôt hors de Forgejo : $DEPOT" >&2; exit 1 ;; esac
+      e=$(workspaces.sortie.path)/entrees
+      [ ! -e "$e" ] || { echo "workspace déjà rempli : $e" >&2; exit 1; }
+      export HOME=/tmp GIT_CONFIG_NOSYSTEM=1 GIT_SSL_CAINFO=/etc/ca-poc/ca.crt GIT_TERMINAL_PROMPT=0
+      git clone --quiet --no-checkout "$DEPOT" /tmp/depot
+      git -C /tmp/depot checkout --quiet --detach "$COMMIT"
+      [ "$(git -C /tmp/depot rev-parse HEAD)" = "$COMMIT" ] || { echo "HEAD différent du commit demandé" >&2; exit 1; }
+      echo "$(git --version) ; commit $COMMIT, arbre $(git -C /tmp/depot rev-parse 'HEAD^{tree}')"
+      mkdir -p "$e/src"
+      git -C /tmp/depot archive --format=tar HEAD | tar -xf - -C "$e/src"
+      printf '%s' "$DEPOT" > $(results.CHAINS-GIT_URL.path)
+      printf '%s' "$COMMIT" > $(results.CHAINS-GIT_COMMIT.path)
+  - env:
+    - name: FERMETURE
+      value: $(params.fermeture)
+    - name: WEB_DIST
+      value: $(params.web-dist)
+    - name: BUILDER
+      value: $(params.builder)
+    image: sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+    name: entrees
+    resources: {}
+    script: |
+      #!/busybox/sh
+      set -eu
+      for r in "$FERMETURE" "$WEB_DIST" "$BUILDER"; do
+        case $r in sc-stockage.poc.test:5000/*@sha256:*) ;; *) echo "référence hors de Zot ou sans digest : $r" >&2; exit 1 ;; esac
+      done
+      export HOME=/tmp
+      e=$(workspaces.sortie.path)/entrees
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/deps" "$FERMETURE" > /dev/null
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/src/web/dist" "$WEB_DIST" > /dev/null
+      oras cp --no-tty --from-ca-file /etc/ca-poc/ca.crt "$BUILDER" --to-oci-layout "$e/builder:builder" > /dev/null
+      i=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' "$e/builder/index.json")
+      [ "$i" = "${BUILDER#*@}" ] || { echo "layout de l'image de build : $i, attendu ${BUILDER#*@}" >&2; exit 1; }
+      echo "fermeture : $(find "$e/deps" -type f | wc -l) fichiers ; web/dist : $(find "$e/src/web/dist" -type f | wc -l) fichiers ; image de build en layout OCI : $i"
+      printf '{"uri":"oci://%s","digest":"%s"}' "${FERMETURE%@*}" "${FERMETURE#*@}" > $(results.FERMETURE_ARTIFACT_INPUTS.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${WEB_DIST%@*}" "${WEB_DIST#*@}" > $(results.WEB_DIST_ARTIFACT_INPUTS.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${BUILDER%@*}" "${BUILDER#*@}" > $(results.BUILDER_ARTIFACT_INPUTS.path)
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  workspaces:
+  - name: sortie

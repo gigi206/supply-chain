@@ -2,8 +2,10 @@
 # Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6) : démontage, VM, k3s, stockage, OpenBao, Tekton,
 # horodatage, politique (test 5 rejoué sous politique entre declencheurs et porte, comme au premier passage ; porte avant
 # rattrapage, qui juge avec elle ; droits, qui lit l'audit du test 5 et du rattrapage ; posture), J7 en cours (Kata :
-# vérification, installation, essais, exemption Pod Security de la RuntimeClass kata (server k3s redémarré) ; cas d'admission rejoués avec la RuntimeClass kata ; BuildKit : image, essais, mesure après l'exemption ; voie D ; voie A sur sample-app ; construction de sample-app dans un
-# PipelineRun : compte Zot poc-images, entrées, tâches signées, constat sur les ConfigMaps sous Kata, construction, provenance ; réseau des pods Kata :
+# vérification, installation, essais, exemption Pod Security de la RuntimeClass kata (server k3s redémarré) ; cas d'admission rejoués avec la RuntimeClass kata ; BuildKit : image, essais, mesure après l'exemption ; voie D ; voie A sur sample-app ; voie A
+# sans réseau (NetworkPolicy construction-sans-sortie, image de build en layout OCI) ; construction de sample-app dans un
+# PipelineRun : compte Zot poc-images, entrées, tâches signées, constat sur les ConfigMaps sous Kata, construction sans sortie
+# réseau et ses témoins, provenance ; réseau des pods Kata :
 # fenêtre de kube-router, NFLOG, usurpation d'adresse), puis contrôle des
 # secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, non rejoué au 30/10/2026. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
@@ -40,6 +42,7 @@ etape "J7 (admission)" mise run confiance:politique -- admission
 etape "J7 (BuildKit)" mise run confiance:buildkit -- image essais exempte
 etape "J7 (voie D)" mise run confiance:voie-d -- image compiler assembler
 etape "J7 (voie A, sample-app)" mise run confiance:buildkit -- sample_app
+etape "J7 (sans réseau)" mise run confiance:buildkit -- sans_reseau
 etape "J7 (construction)" mise run confiance:construction -- compte entrees taches constat_cm construire provenance
 etape "J7 (réseau)" mise run confiance:kata -- reseau
 etape fuites mise run confiance:fuites -- "$lib"

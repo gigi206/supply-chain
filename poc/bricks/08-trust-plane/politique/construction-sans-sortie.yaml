@@ -1,0 +1,17 @@
+# Brique 08, J7 (option 3 du contrôle de sortie, choix du propriétaire du 30/10/2026) : aucune entrée ni sortie réseau pour
+# les pods de la tâche construire-image. Sélection par tekton.dev/task, que le contrôleur de Tekton v1.15.5 réécrit avec le nom
+# de la tâche résolue, donc celui du bundle signé (pkg/reconciler/taskrun/taskrun.go, storeTaskSpecAndMergeMeta) ; les labels
+# posés par le créateur du PipelineRun (taskRunSpecs[].metadata) ne le remplacent pas. Les NetworkPolicy s'additionnent : aucune
+# autre politique de builds ne doit autoriser une sortie à un pod que le créateur peut étiqueter (contrôlé par construction.sh).
+# Limites mesurées (kata.sh reseau) : fenêtre de démarrage de kube-router, contournement par usurpation d'adresse depuis le
+# root de l'invité.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: construction-sans-sortie
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/task: construire-image
+  policyTypes: [Ingress, Egress]

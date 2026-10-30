@@ -557,7 +557,7 @@ nettoyer_reseau() {
 etape_reseau() {
   local ko=0 i p ip o d f n s
   echo "## prédiction (écrite le 30/10/2026, avant la mesure)"
-  echo "- la politique ne sélectionne que les pods de mesure ; rien dans builds ne l'est aujourd'hui (aucune NetworkPolicy) ;"
+  echo "- la politique ne sélectionne que les pods de mesure (label app=$SONDE) ;"
   echo "- fenêtre : sous runc sur sc-build, comme en J6 sur sc-confiance, Zot (interdit) joignable dans la première seconde du"
   echo "  conteneur pour au moins un essai sur trois, puis fermé. Sous Kata, même fenêtre : kubelet ne publie l'IP du pod qu'au"
   echo "  passage qui suit le lancement des conteneurs, puis kube-router pose la règle ; la VM retarde le conteneur, pas la règle ;"
@@ -575,8 +575,9 @@ etape_reseau() {
   echo "- témoins sans NET_ADMIN, pod Kata restreint (posture de la voie D) et pod runc restreint (posture de publier) : ajout de"
   echo "  l'adresse refusé (« Operation not permitted »), liaison de nc à l'adresse refusée (adresse non locale)"
   echo "## état de départ"
-  n=$(kubectl get netpol -n builds -o name | wc -l)
-  [ "$n" = 0 ] && echo "OK   aucune NetworkPolicy dans builds" || { echo "KO   $n NetworkPolicy dans builds" >&2; exit 1; }
+  echo "NetworkPolicy de builds : $(kubectl get netpol -n builds -o name | tr '\n' ' ')"
+  n=$(kubectl get netpol -n builds -o name | { grep -x "networkpolicy.networking.k8s.io/$SONDE" || true; } | wc -l)
+  [ "$n" = 0 ] && echo "OK   pas de politique $SONDE résiduelle" || { echo "KO   politique $SONDE résiduelle" >&2; exit 1; }
   echo "sc-build : bridge-nf-call-iptables $(sur sc-build 'cat /proc/sys/net/bridge/bridge-nf-call-iptables'), rp_filter de cni0 \
 $(sur sc-build 'cat /proc/sys/net/ipv4/conf/cni0/rp_filter') (2 : lâche), $(sur sc-build 'sudo iptables -S' | grep -c 'KUBE-ROUTER') règles KUBE-ROUTER"
   rm -f "$T/fenetres.txt" "$T/traces.txt"
@@ -693,7 +694,7 @@ $(grep -cE "ARP, Reply ${USURPEE//./\\.} is-at" "$T/usurpation.txt" || true) lig
   kubectl delete -f "$here/kata/sonde-reseau.yaml" >/dev/null
   trap - EXIT
   for _ in $(seq 30); do n=$(sur sc-build 'sudo iptables -S' | grep -c "builds/$SONDE" || true); [ "$n" = 0 ] && break; sleep 1; done
-  [ "$(kubectl get netpol -n builds -o name | wc -l)" = 0 ] && [ "$n" = 0 ] \
+  [ "$(kubectl get netpol -n builds -o name | { grep -x "networkpolicy.networking.k8s.io/$SONDE" || true; } | wc -l)" = 0 ] && [ "$n" = 0 ] \
     && echo "OK   NetworkPolicy et pods de mesure retirés ; aucune règle de kube-router pour builds/$SONDE sur sc-build" \
     || { echo "KO   retrait incomplet ($n règle(s))" >&2; ko=1; }
   [ "$ko" = 0 ] || exit 1

@@ -1,8 +1,10 @@
-# Brique 08, J7 : pipeline de construction de sample-app (voie A), signée par la clé des tâches et publiée en bundle
+# Brique 08, J7 : pipeline de construction de sample-app (voie A ; option 3 du contrôle de sortie : la construction n'a aucune
+# sortie réseau, ses entrées sont préparées par une tâche runc), signée par la clé des tâches et publiée en bundle
 # (tekton/pipelines/sample-app). Ses tâches sont tirées de leurs bundles signés, épinglés par digest, et ses entrées hors du
-# dépôt (fermeture, web/dist) sont fixées ici par digest : la signature de la pipeline couvre ces choix, que le créateur du
-# PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt, le workspace sortie (PVC) et le runtimeClassName
-# de la tâche construire (taskRunSpecs). @CONSTRUIRE@, @PUBLIER@, @FERMETURE@, @WEB_DIST@, @IMAGE@ : construction.sh taches.
+# dépôt (fermeture, web/dist, image de build) sont fixées ici par digest : la signature de la pipeline couvre ces choix, que le
+# créateur du PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt, le workspace sortie (PVC) et le
+# runtimeClassName de la tâche construire (taskRunSpecs).
+# @PREPARER@, @CONSTRUIRE@, @PUBLIER@, @FERMETURE@, @WEB_DIST@, @BUILDER@, @IMAGE@ : construction.sh taches.
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -21,14 +23,14 @@ spec:
   - name: IMAGE_DIGEST
     value: $(tasks.publier.results.IMAGE_DIGEST)
   tasks:
-  - name: construire
+  - name: preparer
     taskRef:
       resolver: bundles
       params:
       - name: bundle
-        value: @CONSTRUIRE@
+        value: @PREPARER@
       - name: name
-        value: construire-image
+        value: preparer-entrees
       - name: kind
         value: task
     params:
@@ -40,6 +42,22 @@ spec:
       value: @FERMETURE@
     - name: web-dist
       value: @WEB_DIST@
+    - name: builder
+      value: @BUILDER@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: construire
+    runAfter: [preparer]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE@
+      - name: name
+        value: construire-image
+      - name: kind
+        value: task
     workspaces:
     - name: sortie
       workspace: sortie

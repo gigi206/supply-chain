@@ -8,9 +8,15 @@ trusted_tasks:
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-essai:
     - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
   # J7 : construction de sample-app (voie A, pipeline sample-app de construction.sh) : politique/taches/construire-image.signee.yaml,
-  # pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs ; entrées déclarées à Chains
+  # pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs, sans aucune sortie réseau (option 3 du contrôle de sortie,
+  # choix du propriétaire du 30/10/2026), image de build en layout OCI. Remplace c7e8b275 (première version, qui tirait ses
+  # entrées elle-même : échec fermé sous la NetworkPolicy construction-sans-sortie), retirée de la liste
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-image:
-    - ref: sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+    - ref: sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+  # J7 : politique/taches/preparer-entrees.signee.yaml, pod runc restreint : sources, fermeture, web/dist et image de build
+  # (layout OCI) tirés dans le workspace ; entrées déclarées à Chains
+  oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees:
+    - ref: sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
   # J7 : politique/taches/publier-image.signee.yaml, pod runc restreint, push par digest avec le compte poc-images
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-image:
     - ref: sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
