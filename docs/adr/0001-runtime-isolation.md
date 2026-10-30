@@ -95,6 +95,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - [x] Dimensionnement et topologie sur le laptop : **validés le 29/10/2026** (kind pour A1, trois VM libvirt + k3s pour 08 ; [`poc/infra`](../../poc/infra/README.md)).
 - [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
+- [ ] Cluster final (note du propriétaire du 30/10/2026, à traiter lors de sa mise en place, pas dans le PoC) : Kubernetes sécurisé (durcissement RKE2, audit), journalisation, métriques et alertes, et mTLS entre services par un service mesh (Linkerd, Istio, ou Cilium s'il est retenu). Candidats à évaluer au doc 04 ([doc 02 §8](../02-architecture.md)).
 - [ ] Contrôle de sortie de la zone build (brique 08, J7, avant J8 et le test 6). Une NetworkPolicy de kube-router est contournée par usurpation d'adresse depuis le root de l'invité, et ne porte que sur un pod entier. Trois options sont soumises ([détail](../../poc/bricks/08-trust-plane/README.md#jalon-j7--isolation-par-kata-en-cours-30102026), « Contrôle de sortie de la zone build ») :
   - voie A avec anti-usurpation côté nœud, par l'un de ces trois moyens :
     - kube-router amont v2.10.0 ou plus, en seul contrôleur de politiques avec `--netpol-default-deny`. k3s embarque la v2.6.3, et flannel serait conservé ;

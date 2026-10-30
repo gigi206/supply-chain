@@ -238,3 +238,4 @@ EL8 n'est pas mis automatiquement à 0.
 | 0004 | Vulnérabilités et VEX (OpenVEX ou CSAF) | Phase 3 |
 | 0005 | Licences (politique, curations) | Phase 3 |
 | 0006 | Archive WORM (Ceph hors cluster ou S3 Object Lock compliance) | Fin de 2c |
+| 0001 | **Cluster final** (note du propriétaire du 30/10/2026, hors PoC) : Kubernetes sécurisé (durcissement RKE2, audit), journalisation, métriques et alertes ; **mTLS entre services par un service mesh** (Linkerd, Istio, ou Cilium s'il est retenu comme contrôleur réseau). Chaque candidat est d'abord évalué au doc 04 | Mise en place du cluster final, pas dans le PoC |
