@@ -1348,7 +1348,7 @@ etape_porte() {
   echo "$APP_DIGEST" > "$T/porte-en-service.image"
   prov_pr "builds/essai-webhook@$APP_DIGEST" > "$T/prov-webhook.jsonl"
   jq -sr --arg t "$t" --arg k "$tache" 'length as $n | max_by(.predicate.runDetails.metadata.finishedOn) | (tostring | length) as $o | .predicate
-    | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
+    | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .uri != null) | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
     | "\(if .runDetails.metadata.startedOn >= $t and $u == $k then "OK  " else "KO  " end) la plus récente des \($n) : début \(.runDetails.metadata.startedOn), "
       + "\($o) octets, buildType \(.buildDefinition.buildType), entrées pipelineTask avec contenu : "
       + "\([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"' "$T/prov-webhook.jsonl" | tee "$T/prov-webhook.ligne"
@@ -1422,7 +1422,7 @@ EOF
     && echo "OK   en-service : trusted_task.trusted et porte.taches_vues parmi les succès" || { echo "KO   succès de en-service" >&2; exit 1; }
   succes slsa trusted_task.trusted && echo "CONSTAT  slsa : trusted_task.trusted compté parmi les succès alors qu'aucune tâche n'est vue (succès à vide) ; seuls tasks.pipeline_has_tasks (collection slsa3) et le témoin porte.taches_vues refusent ; avec trusted_task seul, l'image est admise"
   jq -sr --arg t "$tache" 'sort_by(.predicate.runDetails.metadata.finishedOn)
-    | map(.predicate | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
+    | map(.predicate | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .uri != null) | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
       | "  \(.runDetails.metadata.finishedOn) \(.buildDefinition.buildType // "-" | sub(".*/"; "")) \(if $u == "" then "sans tâche" elif $u == $t then "listée" else "non listée" end)")
     | .[]' "$T/prov-webhook.jsonl" > "$T/provenances-en-service"
   echo "provenances de PipelineRun de builds/essai-webhook (image de la tâche en service) : $(wc -l < "$T/provenances-en-service") ; listées : $(grep -cE ' (slsa|slsa-tekton|-) listée$' "$T/provenances-en-service" || true),"\

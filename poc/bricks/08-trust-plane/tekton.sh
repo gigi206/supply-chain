@@ -337,7 +337,8 @@ etape_essais_webhook() {
       | select(.buildDefinition.externalParameters.runSpec.pipelineRef != null and .runDetails.metadata.startedOn >= $d)
       | {buildType: .buildDefinition.buildType, pipeline: (.buildDefinition.externalParameters.runSpec.pipelineRef | .name // (.params[] | select(.name == "bundle") | .value)),
          params: (.buildDefinition.externalParameters.runSpec.params | map({(.name): .value}) | add), builder: .runDetails.builder.id,
-         definitions: [.buildDefinition.resolvedDependencies[] | select(.name == "pipeline" or .name == "pipelineTask") | "\(.name) \(.uri)@sha256:\(.digest.sha256)"]}' \
+         definitions: [.buildDefinition.resolvedDependencies[] | select(.name == "pipeline" or .name == "pipelineTask")
+           | "\(.name) \(if .uri then "\(.uri)@sha256:\(.digest.sha256)" else "sans uri ni digest (référence locale)\(if .content then ", contenu en ligne" else "" end)" end)"]}' \
     | grep "$reel" | head -1
   echo "## une enveloppe par exécution signée de cet essai (startedOn ≥ $debut)"
   cosign verify-attestation --key "$R/chains-cle-publique.pem" --type slsaprovenance1 --insecure-ignore-tlog=true --registry-cacert "$P/ca-poc.crt" \
