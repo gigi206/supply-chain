@@ -100,6 +100,11 @@ EOF
 }
 
 EL_NS=${EL_NS:-builds}   # espace de l'EventListener forgejo : builds en J4, declencheurs depuis J6
+audit_api() { # motif (chaîne fixe, sans espace ni guillemet) : lignes de l'audit de l'API qui la contiennent, fichiers tournés
+  # compris (audit-log-maxsize=100 : audit-<horodatage>.log par tranche de 100 Mo, puis audit.log), dans l'ordre chronologique
+  sur sc-confiance "sudo sh -c 'grep -hF -- $1 \$(ls -1 /var/lib/rancher/k3s/server/logs/audit*.log | LC_ALL=C sort) || true'"
+}
+
 el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
 
 el_joignable() { # EventListener de $EL_NS disponible et joignable depuis sc-stockage ; une ligne

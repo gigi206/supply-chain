@@ -39,6 +39,7 @@ Relevé du 2026-10-28 via https://api.securityscorecards.dev ; k3s, kind et k3d 
 | Tekton Chains | tektoncd/chains | provenance | oui | 7.1 | 2026-10-19 | 10 | 0 | 10 | ? |
 | Tekton Triggers | tektoncd/triggers | orchestration | oui | 6.9 | 2026-10-19 | 10 | 0 | 8 | ? |
 | Conforma | conforma/cli | politique | oui | 6.6 | 2026-10-28 | 10 | 0 | 10 | 0 |
+| Conforma policy | conforma/policy | politique | oui | 7.0 | 2026-10-29 | 10 | -1 | 8 | 0 |
 | Kyverno | kyverno/kyverno | politique | oui | 7.8 | 2026-10-13 | 10 | 8 | 10 | 7 |
 | Hermeto | hermetoproject/hermeto | dépendances | oui | n/d | — | — | — | — | — |
 | mock | rpm-software-management/mock | packaging | oui | 4.9 | 2026-10-19 | 10 | 0 | 7 | ? |
@@ -104,7 +105,7 @@ Relevé du 2026-10-28 via https://api.securityscorecards.dev ; k3s, kind et k3d 
 |---|---|
 | **Sain** | Tekton Pipelines, Kyverno (≥ 1.19.2), OpenBao, cosign, timestamp-authority, Argo CD (≥ 3.5.4), OBS, Buildah, Kata, gVisor, Renovate, Zot*, Harbor, ORAS, Pulp, Verdaccio, Rook, Syft, OSV-Scanner, osv.dev, GuardDog, Scorecard, ORT (sans SECURITY.md), ScanCode.io, SW360, Forgejo, Guix, Prometheus, Loki |
 | **Sain, mais un seul éditeur** | Chainloop, DejaCode, Grafana (Grafana Labs, AGPL) |
-| **À surveiller, chemin critique** | **Chains, Triggers, Conforma, Hermeto, mock, BuildKit, Grype, sbuild, mmdebstrap, tekton-lint, k3s** (Scorecard 8, releases mensuelles, v1.37.1+k3s1 du 30/09/2026 ; signatures des releases et diversité des employeurs non vérifiées) |
+| **À surveiller, chemin critique** | **Chains, Triggers, Conforma, Conforma policy (bibliothèque de règles : v1.0.28 du 26/08/2026, aucune release depuis, commits continus ; tags non signés, commit de fusion signé par GitHub ; 12 auteurs depuis le 01/08/2026 ; sur les 100 derniers commits, 54 avec une adresse redhat.com, 45 avec une adresse noreply de GitHub, employeur non vérifiable, et 1 autre ; relevé du 30/10/2026, brique 08), Hermeto, mock, BuildKit, Grype, sbuild, mmdebstrap, tekton-lint, k3s** (Scorecard 8, releases mensuelles, v1.37.1+k3s1 du 30/09/2026 ; signatures des releases et diversité des employeurs non vérifiées) |
 | **À surveiller (Scorecard < 6)** | REUSE (4,0), Athens (5,8), mock (4,9), Ceph (4,6), aptly (3,4), tekton-lint (5,8), VictoriaMetrics (5,4), k3d (3,6 ; Maintained 2, une release en 16 mois : **non retenu**, kind et k3s couvrent ses usages) |
 | **À surveiller, hors chemin critique** | kind (v0.33.0 du 26/08/2026, sert au seul banc A1 ; signatures des releases non vérifiées), Konflux, rpm-lockfile-prototype, ko, nfpm, Witness, gittuf, AMPEL, vunnel, grype-db, Dependency-Track v5 (un seul mainteneur fusionne), Trustify, GUAC, vexctl, sbomqs, sbomasm, malicious-packages, Trivy, cdxgen, cyclonedx-cli, protobom, Macaron, sbomnix, createrepo_c, devpi, SeaweedFS, nixpkgs vmTools, StageX, debusine, diffoscope, reprotest, strip-nondeterminism, add-determinism, rebuilderd, OSS Rebuild, repro-env, debuerreotype, ScanCode toolkit, FOSSology, Grant, ORT Server, Plumber CLI, octoscan, frizbee |
 | **Risqué → interdit** | kkRepo, Archivista, RSTUF, Sysbox, bombon, Hyades (archivé), go-licenses, askalono (archivé), ClearlyDefined (en offline), Legitify, kaniko (archivé), repro-get (archivé), Earthly, MinIO (archivé), Tern |

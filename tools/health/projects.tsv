@@ -3,6 +3,7 @@ Tekton Pipelines	tektoncd/pipeline	orchestration	oui
 Tekton Chains	tektoncd/chains	provenance	oui
 Tekton Triggers	tektoncd/triggers	orchestration	oui
 Conforma	conforma/cli	politique	oui
+Conforma policy	conforma/policy	politique	oui
 Kyverno	kyverno/kyverno	politique	oui
 Hermeto	hermetoproject/hermeto	dépendances	oui
 mock	rpm-software-management/mock	packaging	oui

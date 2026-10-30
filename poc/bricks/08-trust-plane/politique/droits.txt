@@ -74,3 +74,9 @@ rattrapage|list|secrets|*|no
 rattrapage|create|pods|declencheurs|no
 rattrapage|create|cronjobs.batch|declencheurs|no
 rattrapage|get|eventlisteners.triggers.tekton.dev|declencheurs|no
+# Porte de release (compte porte, sans jeton monté) : aucun droit sur l'API ; elle ne lit que Zot.
+porte|list|pipelineruns.tekton.dev|builds|no
+porte|get|configmaps|porte|no
+porte|list|secrets|*|no
+porte|create|pods|porte|no
+porte|create|jobs.batch|porte|no

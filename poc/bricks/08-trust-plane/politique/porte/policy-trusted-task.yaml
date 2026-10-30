@@ -1,0 +1,12 @@
+# Brique 08, J6 : variante de mesure de la politique de la porte (politique.sh porte), règles trusted_task seules, sans
+# la collection slsa3 ni les règles du PoC. Montre ce que trusted_task juge quand la provenance ne lui donne aucune tâche.
+sources:
+  - name: porte
+    policy:
+      - /politique/policy/release
+      - /politique/policy/lib
+    data:
+      - /etc/porte/donnees
+    config:
+      include:
+        - trusted_task

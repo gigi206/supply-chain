@@ -67,3 +67,8 @@ rattrapage	list	secrets	*	no	no
 rattrapage	create	pods	declencheurs	no	no
 rattrapage	create	cronjobs.batch	declencheurs	no	no
 rattrapage	get	eventlisteners.triggers.tekton.dev	declencheurs	no	no
+porte	list	pipelineruns.tekton.dev	builds	no	no
+porte	get	configmaps	porte	no	no
+porte	list	secrets	*	no	no
+porte	create	pods	porte	no	no
+porte	create	jobs.batch	porte	no	no

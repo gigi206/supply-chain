@@ -1,0 +1,20 @@
+# Brique 08, J6 : politique de la porte (ec validate image --policy), montée dans le pod de la porte.
+# Bibliothèque conforma/policy (v1.0.28, commit ebd3fbd2) dans l'image, sous /politique ; règles et données du PoC
+# dans la ConfigMap porte, sous /etc/porte.
+sources:
+  - name: porte
+    policy:
+      - /politique/policy/release
+      - /politique/policy/lib
+      - /etc/porte/regles
+    data:
+      - /etc/porte/donnees
+    ruleData:
+      # Défaut de la bibliothèque : https://tekton.dev/chains/v2 ; builder.id de chains-config (J4)
+      allowed_builder_ids:
+        - https://supply-chain.example/builders/tekton-chains@v1
+    config:
+      include:
+        - "@slsa3"
+        - trusted_task
+        - porte

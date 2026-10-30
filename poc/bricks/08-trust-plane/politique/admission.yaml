@@ -104,7 +104,7 @@ spec:
         || s.capabilities.add.all(a, a == 'NET_BIND_SERVICE'))
     message: "test 4 : capacité ajoutée interdite hors Kata (sauf NET_BIND_SERVICE)"
 ---
-# Zone confiance (J3 : bound_subject seul ; J5 : TSA ; J6 : declencheurs) : les pods des espaces de confiance ne tournent
+# Zone confiance (J3 : bound_subject seul ; J5 : TSA ; J6 : declencheurs, porte) : les pods des espaces de confiance ne tournent
 # que sur le nœud de confiance, sans tolérer le taint de la zone build. Un pod placé sur sc-build y exposerait le jeton de
 # son compte (Chains, OpenBao, TSA, EventListener) à la zone hostile.
 apiVersion: policies.kyverno.io/v1
@@ -121,7 +121,7 @@ spec:
       matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: [openbao, tekton-chains, tekton-pipelines, tekton-pipelines-resolvers, tsa, horodatage, declencheurs]
+        values: [openbao, tekton-chains, tekton-pipelines, tekton-pipelines-resolvers, tsa, horodatage, declencheurs, porte]
     resourceRules:
     - apiGroups: [""]
       apiVersions: [v1]

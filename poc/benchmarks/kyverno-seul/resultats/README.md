@@ -73,7 +73,7 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
 - **Non testé en local** :
   - **contrôle 9** (horodatage RFC 3161) : il faut une TSA ; **mesuré en brique 08, J5** (voir plus bas) ;
   - **C-2** (parité entre CLI et admission) : il faut un cluster ; **mesuré en brique 08, J6** (voir plus bas) ;
-  - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : à refaire en brique 08.
+  - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : **mesurée en brique 08, J6** (voir plus bas).
 
 ## Notation provisoire (grille C)
 
@@ -104,3 +104,15 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
 - durée moyenne par cas : 406 ms en CLI (lancement du binaire compris), 144 ms à l'admission (aller-retour de `kubectl` compris).
 
 **Lecture du propriétaire (29/10/2026)** : C-2 = 5 pour Kyverno seul (parité totale des décisions). Score 80 → **83**, référence inchangée à **70** (C-2 = 2, deux langages : non mesurable par construction). Kyverno seul passe la règle C (10/10, 83 ≥ 63), mais **la décision C est reportée à J8** : Conforma reste la porte de release en J6, et la réserve ci-dessous est mesurée d'abord. Réserve : la bibliothèque Conforma (`slsa3`, `trusted_task` sur la vraie provenance Chains) n'a pas été mise à profit ici ; la réimplémenter en CEL sur la vraie provenance pourrait coûter plus que dans ce banc synthétique.
+
+**Réserve mesurée en brique 08, J6 (30/10/2026)** ([journal](../../../bricks/08-trust-plane/resultats/politique-porte.log)). Conforma v0.10.42 et sa bibliothèque v1.0.28 (`conforma/policy`, collection `slsa3` et règles `trusted_task`) jugent des images du PoC, dans un Job de la zone de confiance. Les notes de la grille C ne changent pas : ces faits pèsent sur la décision C, reportée à J8.
+- **Ce que la bibliothèque exige de Chains** (lu dans son code et dans celui de Chains v0.29.9). Elle ne lit les tâches d'une provenance SLSA v1 que dans le TaskRun complet des entrées `pipelineTask`. Or Chains ne l'écrit qu'en buildType `https://tekton.dev/chains/v2/slsa-tekton`, alors que le PoC est en `…/v2/slsa` depuis J4.
+- **Succès à vide, mesuré.** Avec le buildType `slsa`, `trusted_task.trusted` figure parmi les succès, puisqu'aucune tâche n'est vue. Avec les seules règles `trusted_task`, l'image est admise. Seule la règle `tasks.pipeline_has_tasks` de `slsa3` refuse, avec un témoin ajouté par le PoC.
+- **En `slsa-tekton`, la bibliothèque opère.** La tâche approuvée est acceptée. Sont refusées : une tâche signée mais hors liste, une version non listée de la tâche approuvée, une image non signée et une attestation signée par une autre clé. Ce sont 7 verdicts sur 7 conformes à la prédiction, en 0 à 1 s chacun. La provenance passe d'environ 2,5 ko à 11,5 ko.
+- **La bibliothèque ne juge que la provenance la plus récente d'un digest.**
+- **Les règles de source échouent jusqu'à J7**, faute de source git dans la provenance de l'essai.
+- **Configuration nécessaire** :
+  - `allowed_builder_ids`, dont le défaut est `https://tekton.dev/chains/v2` ;
+  - une liste `trusted_tasks` par digest ;
+  - Conforma dans un pod, et non sur l'hôte, qui ne résout pas les noms des bundles.
+- **Pour la décision C.** En CEL, il faudrait réécrire ces règles sur le même contenu (`slsa-tekton`), ou sur l'URI et le digest des tâches (`slsa`). Le choix du buildType est soumis au propriétaire.

@@ -1,0 +1,47 @@
+# Brique 08, J6 : porte de release (politique.sh porte). Conforma (ec v0.10.42) et la bibliothèque conforma/policy
+# dans une image d'une couche sur base vide, épinglée par digest ; un Job par image à juger. Espace de confiance :
+# la provenance nomme les bundles de tâches en sc-stockage.poc.test, que seuls les nœuds et les pods résolvent.
+# Lecture anonyme de Zot ; aucun jeton, aucun droit sur l'API. Sorties : DNS et Zot.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: porte
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: porte
+  namespace: porte
+automountServiceAccountToken: false
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: porte
+  namespace: porte
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.13/32
+    ports:
+    - protocol: TCP
+      port: 5000

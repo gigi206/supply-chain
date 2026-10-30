@@ -1,0 +1,13 @@
+# Brique 08, J6 : sonde du prototype de la porte, ec v0.10.42 lancé depuis l'hôte (30/10/2026, 08:33:07 → 08:38:07 UTC)
+# Provenance jugée : buildType slsa-tekton (image builds/essai-porte, cas approuvé du prototype), dont l'entrée pipelineTask
+# nomme le bundle en sc-stockage.poc.test:5000, nom que l'hôte ne résout pas (getent bloque aussi).
+# Commande (politique du prototype : bibliothèque v1.0.28, slsa3, trusted_task, témoin) :
+#   SSL_CERT_FILE=~/.cache/supply-chain-poc/08/pki/ca-poc.crt timeout 300 ec validate image \
+#     --image 192.168.161.13:5000/builds/essai-porte@sha256:51393b91fb01ebb94a9b05b8771ad2d83c3480ba467a1c738abaecc6c43dd41f \
+#     --public-key resultats/chains-cle-publique.pem --policy <politique du prototype> --ignore-rekor --output json --info --show-successes
+# Résultat : code 124 (arrêt par timeout 300 de la sonde, pas par ec), durée 5 min 0 s, sortie standard vide (aucun verdict).
+# Ce qui est mesuré : ec reste bloqué au moins 5 min sur la lecture du bundle, sans verdict. Ce qui ne l'est pas : son
+# comportement seul (délai interne, issue). La porte tourne donc dans un pod de la zone de confiance, où le nom se résout.
+## sortie d'erreur de ec
+time="2026-10-30T09:38:07+01:00" level=error msg="failed to fetch image" action="fetch image" error="Get \"https://sc-stockage.poc.test:5000/v2/\": terminated signal received" function=ec.oci.image_manifest input_ref="sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:aa3e5a8e66b78643840cebb704f93b47a3b5bc8480f97b141061ee5402ad3849"
+Error: error validating image 192.168.161.13:5000/builds/essai-porte@sha256:51393b91fb01ebb94a9b05b8771ad2d83c3480ba467a1c738abaecc6c43dd41f of component Unnamed: query rule: check: query rule: evaluating policy: eval_cancel_error: context canceled

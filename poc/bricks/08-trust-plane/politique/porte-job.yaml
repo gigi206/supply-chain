@@ -1,0 +1,87 @@
+# Brique 08, J6 : jugement d'une image par la porte (politique.sh porte). @NOM@, @IMAGE@ (référence par digest, nom
+# vu des pods), @PORTE@ (image de la porte, épinglée par digest), @POLITIQUE@ (fichier de politique de la ConfigMap porte).
+# Verdict JSON de ec sur la sortie standard.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "@NOM@"
+  namespace: porte
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: porte
+    spec:
+      serviceAccountName: porte
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      restartPolicy: Never
+      nodeSelector:
+        zone: confiance
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: porte
+        image: "@PORTE@"
+        args:
+        - validate
+        - image
+        - --image
+        - "@IMAGE@"
+        - --public-key
+        - /etc/porte/chains.pub
+        - --policy
+        - /etc/porte/@POLITIQUE@
+        - --ignore-rekor
+        - --info
+        - --show-successes
+        - --output
+        - json
+        env:
+        - name: SSL_CERT_FILE
+          value: /etc/porte/ca-poc.crt
+        - name: HOME
+          value: /tmp
+        - name: TMPDIR
+          value: /tmp
+        resources:
+          limits:
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: porte
+          mountPath: /etc/porte
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: porte
+        configMap:
+          name: porte
+          items:
+          - key: policy.yaml
+            path: policy.yaml
+          - key: policy-trusted-task.yaml
+            path: policy-trusted-task.yaml
+          - key: porte.rego
+            path: regles/porte.rego
+          - key: taches.yml
+            path: donnees/taches.yml
+          - key: chains.pub
+            path: chains.pub
+          - key: ca-poc.crt
+            path: ca-poc.crt
+      - name: tmp
+        emptyDir:
+          sizeLimit: 256Mi

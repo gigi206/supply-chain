@@ -111,6 +111,8 @@ cas("zone-nodename-build", "FAIL", ZONE, "pod d'openbao placé directement sur s
     lambda o: (o["metadata"].update(namespace="openbao"), o["spec"].update(nodeName="sc-build")))
 cas("zone-declencheurs", "FAIL", ZONE, "pod de declencheurs (EventListener) sans nodeSelector",
     lambda o: (o["metadata"].update(namespace="declencheurs"), o["spec"].pop("nodeSelector")))
+cas("zone-porte", "FAIL", ZONE, "pod de porte (porte de release) en zone build, taint toléré",
+    lambda o: (o["metadata"].update(namespace="porte"), o["spec"].update(nodeSelector={"zone": "build"}, tolerations=GABARIT["tolerations"])))
 # Zone build (pods des TaskRuns) ; automountServiceAccountToken explicite : le CLI ne voit pas le jeton ajouté par l'API
 BUILD = copy.deepcopy(POD)
 BUILD["metadata"]["namespace"] = "builds"

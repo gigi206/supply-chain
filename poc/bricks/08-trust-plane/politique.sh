@@ -39,8 +39,14 @@
 #              (NetworkPolicy, fenêtre de démarrage) ; webhook perdu (EventListener à 0 réplique), aucune relivraison en
 #              150 s, rattrapage, même spec et même provenance qu'un PipelineRun de l'EventListener, horodatage, course
 #              avec l'EventListener ; main remise à 6391fd43 (force-push)
+#   porte      porte de release : Conforma (ec v0.10.42, empreinte du verrou mise) et la bibliothèque conforma/policy
+#              v1.0.28 (commit signé, arbre vérifié) dans une image d'une couche sur base vide (même digest) ; Job de
+#              l'espace porte (zone confiance, DNS et Zot seulement, aucun droit sur l'API) ; collection slsa3, trusted_task
+#              (digests approuvés) et règles du PoC (politique/porte) ; provenance actuelle (buildType slsa) et quatre
+#              images d'essai, dont trois produites avec Chains en buildType slsa-tekton le temps des essais : approuvée,
+#              tâche hors liste, version non listée, non signée ; plus le témoin signé par une autre clé
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
-#              opérateur, job d'horodatage, rattrapage ; RBAC seul, l'admission n'y figure pas) dans
+#              opérateur, job d'horodatage, rattrapage, porte ; RBAC seul, l'admission n'y figure pas) dans
 #              resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
@@ -68,6 +74,14 @@ DL=$O/telechargements/kyverno
 RATTRAPAGE=plateforme/rattrapage
 RATTRAPAGE_BIN=f6d7dcc6d2040203e723149d0eb52b43125a8d26c8354191cb214779f57e952f   # politique/rattrapage, Go 1.26.10 de mise.toml
 RATTRAPAGE_DIGEST=sha256:c3992728ff77d2d7b412626ab2c34de8d84154bb384aae572042b9aabe0e3c03   # base vide, une couche, linux/amd64, utilisateur 65532
+# Porte de release : ec v0.10.42 (mise.toml) et bibliothèque conforma/policy v1.0.28 dans une image d'une couche
+EC_BIN=895c6f7e63cfefe6257a2e54c052c3d90803e8127adf5a7eb13f245262859abf   # ec_linux_amd64 v0.10.42 (mise.lock)
+CPOL_DEPOT=conforma/policy
+CPOL_TAG=6b5d1d2c94fa81bd1a00ce5f5a5f3b41e0e6976a      # tag annoté v1.0.28, non signé (GitHub Action, 26/08/2026)
+CPOL_COMMIT=ebd3fbd270297c15f590f4023360465ffb41d4fe   # commit du tag, signé par GitHub (fusion de la PR #1817)
+CPOL_ARBRE=0fd26021bb08582553f392565ca0faf316c51229    # arbre du commit (contenu signé)
+PORTE=plateforme/porte
+PORTE_DIGEST=sha256:e77994c20705b4bffd434067033ef2c2f748cf2311f9997c7346b33f0b943926   # base vide, une couche (ec, policy/release et policy/lib sans tests)
 FORGEJO_HOTE=https://192.168.161.13:3000
 SAMPLE_APP=workspace/sample-app
 TETE_J2=6391fd437f26696847041be3226bbbf633f55a2f   # commit de stockage.sh depot ; main y est remise après les essais
@@ -294,10 +308,10 @@ verdict() { # libellé attendu (True|False) issue : ligne OK ou KO
   else echo "KO   $l : Succeeded=$st, $r : $m ; TrustedResourcesVerified=$v" >&2; exit 1; fi
 }
 
-bundle() { # fichier dépôt : bundle Tekton poussé dans Zot par tkn (date de création fixe : digest reproductible) ; digest
-  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt tkn bundle push "$REG_HOTE/$2:essai" -f "$1" > "$T/tkn.out" 2>&1 \
+bundle() { # fichier dépôt [tag] : bundle Tekton poussé dans Zot par tkn (date de création fixe : digest reproductible) ; digest
+  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt tkn bundle push "$REG_HOTE/$2:${3:-essai}" -f "$1" > "$T/tkn.out" 2>&1 \
     || { cat "$T/tkn.out" >&2; exit 1; }
-  SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$2:essai"
+  SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$2:${3:-essai}"
 }
 
 etape_taches() {
@@ -369,6 +383,7 @@ etape_admission() {
   printf 'cas\tattendu\tCLI\tadmission\tCLI (ms)\tadmission (ms)\tmotif CLI\tmotif admission\n' > "$TSV_PARITE"
   kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
   sed -n '1,/^---$/p' "$here/politique/declencheurs.yaml" | kubectl apply --server-side -f - >/dev/null   # espace des cas zone-declencheurs
+  sed -n '1,/^---$/p' "$here/politique/porte.yaml" | kubectl apply --server-side -f - >/dev/null   # espace du cas zone-porte
   d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
   rm -rf "$T/adm"
   python3 -I "$here/politique/cas-admission.py" "$T/adm" "$REG/tekton/tasks/essai-confiance@$d" \
@@ -724,7 +739,7 @@ origine() { # nom : chemin de création d'un PipelineRun de builds, lu dans ses 
 }
 
 creations() { # instant nom : créations du PipelineRun nom dans l'audit de l'API depuis l'instant (compte, code)
-  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" | jq -r --arg d "$1" --arg n "$2" 'select(.stageTimestamp >= $d
+  audit_api "$2" | jq -r --arg d "$1" --arg n "$2" 'select(.stageTimestamp >= $d
     and .verb == "create" and .objectRef.resource == "pipelineruns" and .objectRef.namespace == "builds"
     and .objectRef.name == $n) | "\(.user.username | sub("system:serviceaccount:"; "")) \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */    /'
@@ -955,6 +970,193 @@ EOF
   rm -f "$T/auth/entete"; rm -rf "$T/depot"
 }
 
+prov_pr() { # image (REG_HOTE, par digest) : provenances de PipelineRun signées par Chains (une par ligne), lues dans Zot
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$1" 2>/dev/null \
+    | jq -c '.payload | @base64d | fromjson | select(.predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)'
+}
+
+variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest propre au cas), tâche et pipeline signées par la
+  # clé des tâches et publiées en bundles, PipelineRun du gabarit de declencheurs, exécuté et signé ; $T/porte-<cas>.{image,tache}
+  local c=$1 d tache pipe st
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/cas=$c" \
+    -t "$REG_HOTE/builds/essai-porte:$c" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null)
+  echo "${d##*@}" > "$T/porte-$c.image"
+  [ "$c" = non-signee ] && { echo "$c : image builds/essai-porte@${d##*@}, jamais présentée à Chains"; return; }
+  sed -e "s#@IMAGE@#$REG/builds/essai-porte#" -e "s#@DIGEST@#${d##*@}#" -e "s#@BUSYBOX@#$busybox#" \
+    "$here/politique/taches/publier-essai.yaml" > "$T/porte-$c-tache.yaml"
+  tkn task sign "$T/porte-$c-tache.yaml" -K "$S/taches.key" -f "$T/porte-$c-tache-signee.yaml" >/dev/null 2>&1
+  tache=$REG/$2@$(bundle "$T/porte-$c-tache-signee.yaml" "$2" "porte-$c")
+  echo "$tache" > "$T/porte-$c.tache"
+  sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/porte-$c-pipeline.yaml"
+  tkn pipeline sign "$T/porte-$c-pipeline.yaml" -K "$S/taches.key" -f "$T/porte-$c-pipeline-signee.yaml" >/dev/null 2>&1
+  pipe=$REG/tekton/pipelines/porte-$c@$(bundle "$T/porte-$c-pipeline-signee.yaml" "tekton/pipelines/porte-$c" "porte-$c")
+  kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "j6-porte-$c" --arg b "$pipe" --arg c "$TETE_J2" \
+    --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n
+      | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b else . end)
+      | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)' > "$T/pr-porte-$c.json"
+  kubectl delete pipelinerun -n builds "j6-porte-$c" --ignore-not-found --wait=true >/dev/null
+  creer "$T/pr-porte-$c.json" || { cat "$T/creer.out" >&2; exit 1; }
+  st=$(issue pipelinerun "j6-porte-$c")
+  [ "${st%%|*}" = True ] || { echo "KO   j6-porte-$c : $st" >&2; exit 1; }
+  echo "$c : tâche ${tache#"$REG/"}, image builds/essai-porte@${d##*@} ; PipelineRun exécuté, Chains : signé=$(signe pipelinerun "j6-porte-$c")"
+}
+
+juger() { # cas image (nom vu des pods, par digest) [politique] : Job de la porte ; une ligne VERDICT|cas|success|violations|
+  # avertissements|durée du conteneur en s (codes de règles triés), ou ERREUR|cas|motif si ec n'a rendu aucun verdict
+  local j=porte-$1 l d
+  kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
+  sed -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" \
+    "$here/politique/porte-job.yaml" | kubectl create -f - >/dev/null
+  for _ in $(seq 150); do
+    [ -n "$(kubectl get job -n porte "$j" -o jsonpath='{.status.succeeded}{.status.failed}')" ] && break
+    sleep 2
+  done
+  kubectl logs -n porte "job/$j" > "$T/$j.log" 2>&1 || true
+  l=$(grep -m1 '^{' "$T/$j.log" || true)
+  [ -n "$l" ] || { echo "ERREUR|$1|$(tail -1 "$T/$j.log" | cut -c1-200)"; return; }
+  printf '%s\n' "$l" > "$T/$j.json"
+  d=$(kubectl get pod -n porte -l job-name="$j" -o json | jq -r '.items[0].status.containerStatuses[0].state.terminated
+    | (.finishedAt | fromdate) - (.startedAt | fromdate)')
+  jq -r --arg c "$1" --arg d "$d" '[.components[] | .violations[]? | .metadata.code] as $v
+    | [.components[] | .warnings[]? | .metadata.code] as $w
+    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)"' "$T/$j.json"
+}
+
+succes() { # cas code : la règle figure parmi les succès du verdict de la porte
+  jq -e --arg c "$2" '[.components[] | .successes[]? | .metadata.code] | index($c) != null' "$T/porte-$1.json" >/dev/null
+}
+
+trier() { tr ',' '\n' <<< "$1" | sort -u | paste -sd, -; }
+
+etape_porte() {
+  local d e bt0 r v c n k=0 src prevu busybox
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
+  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  kubectl get validatingpolicy zone-confiance -o json | jq -e '.spec.matchConstraints.namespaceSelector.matchExpressions[0].values
+    | index("porte") != null' >/dev/null || { echo "KO   porte absent de la règle zone-confiance (étape admission)" >&2; exit 1; }
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+
+  echo "## bibliothèque $CPOL_DEPOT v1.0.28 (Apache-2.0)"
+  [ "$(gh api "repos/$CPOL_DEPOT/git/ref/tags/v1.0.28" --jq '.object.type + " " + .object.sha')" = "tag $CPOL_TAG" ] \
+    && [ "$(gh api "repos/$CPOL_DEPOT/git/tags/$CPOL_TAG" --jq '.object.type + " " + .object.sha + " " + (.verification.verified | tostring)')" = "commit $CPOL_COMMIT false" ] \
+    && [ "$(gh api "repos/$CPOL_DEPOT/commits/$CPOL_COMMIT" --jq '(.commit.verification.verified | tostring) + " " + (.commit.verification.payload | split("\n")[0])')" = "true tree $CPOL_ARBRE" ] \
+    && echo "OK   tag v1.0.28 (annoté, non signé) → commit $CPOL_COMMIT, signé (vérifié par GitHub), arbre $CPOL_ARBRE dans le contenu signé" \
+    || { echo "KO   tag v1.0.28 de $CPOL_DEPOT" >&2; exit 1; }
+  d=$O/telechargements/conforma-policy
+  [ -d "$d" ] || git init -q --bare "$d"
+  git -C "$d" cat-file -e "$CPOL_COMMIT^{commit}" 2>/dev/null \
+    || git -C "$d" -c transfer.fsckObjects=true fetch -q --depth 1 "https://github.com/$CPOL_DEPOT" "$CPOL_COMMIT"
+  [ "$(git -C "$d" rev-parse "$CPOL_COMMIT^{tree}")" = "$CPOL_ARBRE" ] \
+    && echo "OK   commit récupéré par git (objets vérifiés), même arbre" || { echo "KO   arbre du commit" >&2; exit 1; }
+
+  echo "## image de la porte : ec v0.10.42 et bibliothèque (policy/release, policy/lib, sans les tests), une couche, base vide"
+  e=$(command -v ec)
+  [ "$(sha256sum < "$e" | cut -c1-64)" = "$EC_BIN" ] && echo "OK   ec : empreinte du verrou mise ($EC_BIN)" \
+    || { echo "KO   empreinte de $e" >&2; exit 1; }
+  rm -rf "$T/porte-racine" && mkdir -p "$T/porte-racine/politique"
+  install -m 0755 "$e" "$T/porte-racine/ec"
+  git -C "$d" archive "$CPOL_COMMIT" policy/release policy/lib | tar -x -C "$T/porte-racine/politique"
+  find "$T/porte-racine/politique" -name '*_test.rego' -delete
+  find "$T/porte-racine/politique" -type d -exec chmod 0755 {} +
+  find "$T/porte-racine/politique" -type f -exec chmod 0644 {} +
+  chmod 0755 "$T/porte-racine"
+  echo "bibliothèque : $(find "$T/porte-racine/politique" -name '*.rego' | wc -l) fichiers Rego"
+  tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$T/porte.tar" -C "$T/porte-racine" ec politique
+  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane append --oci-empty-base -f "$T/porte.tar" -t "$REG_HOTE/$PORTE:v1" >/dev/null 2>&1
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --set-platform linux/amd64 --user 65532:65532 \
+    --entrypoint /ec -t "$REG_HOTE/$PORTE:v1" "$REG_HOTE/$PORTE:v1" 2>/dev/null)
+  echo "image : $REG_HOTE/$PORTE@${d##*@}"
+  [ "${d##*@}" = "$PORTE_DIGEST" ] && echo "OK   même digest que l'image épinglée (assemblage reproductible)" \
+    || { echo "KO   digest différent de l'image épinglée $PORTE_DIGEST" >&2; exit 1; }
+
+  echo "## état de départ : buildType de Chains et provenance la plus récente de builds/essai-webhook (seule jugée par la bibliothèque)"
+  bt0=$(kubectl get configmap -n tekton-chains chains-config -o jsonpath='{.data.builddefinition\.buildtype}')
+  echo "chains-config : builddefinition.buildtype=$bt0"
+  [ "$bt0" = https://tekton.dev/chains/v2/slsa ] || { echo "KO   buildType inattendu" >&2; exit 1; }
+  prov_pr "builds/essai-webhook@$APP_DIGEST" > "$T/prov-webhook.jsonl"
+  jq -sr 'length as $n | max_by(.predicate.runDetails.metadata.finishedOn) | "la plus récente des \($n) : fin \(.predicate.runDetails.metadata.finishedOn), "
+    + "\(tostring | length) octets, buildType \(.predicate.buildDefinition.buildType), entrées pipelineTask avec contenu : "
+    + "\([.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"' "$T/prov-webhook.jsonl"
+
+  echo "## images d'essai : une par cas (la bibliothèque ne juge que la provenance la plus récente d'un digest)"
+  echo "Chains en buildType slsa-tekton le temps des essais (TaskRun complet dans resolvedDependencies), puis rétabli"
+  trap 'kubectl patch configmap -n tekton-chains chains-config --type merge -p "{\"data\":{\"builddefinition.buildtype\":\"'"$bt0"'\"}}" >/dev/null; rm -rf "$T/auth" "$W/refus.out"' EXIT
+  kubectl patch configmap -n tekton-chains chains-config --type merge \
+    -p '{"data":{"builddefinition.buildtype":"https://tekton.dev/chains/v2/slsa-tekton"}}' >/dev/null
+  variante approuvee tekton/tasks/publier-essai
+  variante hors-liste tekton/tasks/publier-hors-liste
+  variante version-non-listee tekton/tasks/publier-essai
+  variante non-signee -
+  kubectl patch configmap -n tekton-chains chains-config --type merge -p "{\"data\":{\"builddefinition.buildtype\":\"$bt0\"}}" >/dev/null
+  trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+  echo "chains-config rétabli : $(kubectl get configmap -n tekton-chains chains-config -o jsonpath='{.data.builddefinition\.buildtype}')"
+  for c in approuvee hors-liste version-non-listee; do
+    prov_pr "builds/essai-porte@$(cat "$T/porte-$c.image")" | jq -sr --arg c "$c" 'max_by(.predicate.runDetails.metadata.finishedOn)
+      | "\($c) : \(tostring | length) octets, buildType \(.predicate.buildDefinition.buildType), entrées pipelineTask avec contenu : "
+      + "\([.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"'
+  done
+  prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.internalParameters
+    | "internalParameters en slsa-tekton : \(keys | join(", ")) ; labels du PipelineRun : \(.labels | keys | join(", "))"'
+  [ "$(prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.buildType')" \
+    = https://tekton.dev/chains/v2/slsa-tekton ] || { echo "KO   provenance des essais hors slsa-tekton" >&2; exit 1; }
+
+  echo "## ConfigMap porte : politique (politique/porte/policy.yaml), règles du PoC (politique/porte/porte.rego), tâches approuvées"
+  echo "## (ancien format trusted_tasks : digest épinglé), clé publique de Chains, CA du PoC ; espace porte (politique/porte.yaml)"
+  r=$(cat "$T/porte-approuvee.tache")
+  printf 'trusted_tasks:\n  oci://%s:\n    - ref: %s\n' "${r%@*}" "${r#*@}" > "$T/taches.yml"
+  sed 's/^/  /' "$T/taches.yml"
+  kubectl apply --server-side -f "$here/politique/porte.yaml" >/dev/null
+  kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
+    --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
+    --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$T/taches.yml" \
+    --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f - >/dev/null
+
+  echo "## verdicts de la porte (Job de l'espace porte, sorties DNS et Zot) ; prédiction : codes des règles en violation"
+  src=slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay
+  echo "règles de source (slsa_source_*) en échec attendu jusqu'à J7 : aucune source git dans la provenance de l'essai, aucune source attendue fournie"
+  c=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/builds/$TEMOIN_CLE:temoin")
+  while IFS='|' read -r n r pol prevu; do
+    prevu=$(trier "${prevu//@SRC@/$src}")
+    v=$(juger "$n" "$REG/$r" "$pol")
+    echo "  $v"
+    case $v in
+      VERDICT\|*) if [ "$prevu" = PASS ]; then
+          [ "$(cut -d'|' -f3,4 <<< "$v")" = "true|" ] && echo "OK   $n : admis, comme prédit" || { echo "KO   $n : admission prédite" >&2; k=$((k + 1)); }
+        else
+          [ "$(cut -d'|' -f4 <<< "$v")" = "$prevu" ] && [ "$(cut -d'|' -f3 <<< "$v")" = false ] \
+            && echo "OK   $n : refus, violations prédites" || { echo "KO   $n : prédiction $prevu" >&2; k=$((k + 1)); }
+        fi ;;
+      *) echo "KO   $n : aucun verdict" >&2; k=$((k + 1)) ;;
+    esac
+  done <<EOF
+slsa|builds/essai-webhook@$APP_DIGEST|policy.yaml|porte.taches_vues,tasks.pipeline_has_tasks,slsa_build_scripted_build.build_task_image_results_found,@SRC@
+slsa-trusted-task-seul|builds/essai-webhook@$APP_DIGEST|policy-trusted-task.yaml|PASS
+approuvee|builds/essai-porte@$(cat "$T/porte-approuvee.image")|policy.yaml|@SRC@
+hors-liste|builds/essai-porte@$(cat "$T/porte-hors-liste.image")|policy.yaml|trusted_task.trusted,@SRC@
+version-non-listee|builds/essai-porte@$(cat "$T/porte-version-non-listee.image")|policy.yaml|trusted_task.trusted,@SRC@
+non-signee|builds/essai-porte@$(cat "$T/porte-non-signee.image")|policy.yaml|builtin.attestation.signature_check,builtin.image.signature_check
+autre-cle|builds/$TEMOIN_CLE@$c|policy.yaml|builtin.attestation.signature_check,builtin.image.signature_check
+EOF
+  [ "$k" = 0 ] || exit 1
+  succes approuvee trusted_task.trusted && succes approuvee porte.taches_vues \
+    && echo "OK   approuvee : trusted_task.trusted et porte.taches_vues parmi les succès" || { echo "KO   succès de approuvee" >&2; exit 1; }
+  succes slsa trusted_task.trusted && echo "CONSTAT  slsa : trusted_task.trusted compté parmi les succès alors qu'aucune tâche n'est vue (succès à vide) ; seuls tasks.pipeline_has_tasks (collection slsa3) et le témoin porte.taches_vues refusent ; avec trusted_task seul, l'image est admise"
+  prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr --arg t "$(cat "$T/porte-approuvee.tache")" 'sort_by(.predicate.runDetails.metadata.finishedOn)
+    | map(.predicate | [.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | .uri + "@sha256:" + .digest.sha256][0] as $u
+      | "  \(.runDetails.metadata.finishedOn) \(.buildDefinition.buildType | sub(".*/"; "")) tâche \($u | sub(".*@sha256:"; "") | .[0:12])… \(if $u == $t then "listée" else "non listée" end)")
+    | .[]' > "$T/provenances-approuvee"
+  echo "provenances de PipelineRun de l'image approuvée, de la plus ancienne à la plus récente :"; cat "$T/provenances-approuvee"
+  n=$(grep -c 'non listée$' "$T/provenances-approuvee" || true)
+  if [ "$n" -gt 0 ] && tail -1 "$T/provenances-approuvee" | grep -q ' listée$'; then
+    echo "CONSTAT  la bibliothèque ne juge que la provenance la plus récente d'un digest (max de finishedOn) : $n provenance(s) plus ancienne(s), signée(s) par Chains avec une tâche non listée, n'empêche(nt) pas trusted_task.trusted"
+  else echo "provenance unique ou dernière non listée : jugement de la seule provenance la plus récente non observable à cette exécution"; fi
+  jq -r '[.components[] | .violations[]? | select(.metadata.code == "trusted_task.trusted") | .msg] | .[0]' "$T/porte-hors-liste.json" | cut -c1-200 | sed 's/^/  motif hors-liste : /'
+  jq -r '[.components[] | .violations[]?] | map("\(.metadata.code) : \(.msg | .[0:120])") | .[]' "$T/porte-non-signee.json" | sed 's/^/  motif non-signee : /'
+}
+
 etape_droits() {
   local debut sujet as verbe ressource ns attendu obtenu nom n k=0
   kubectl apply --server-side -f "$here/politique/droits.yaml" >/dev/null
@@ -969,6 +1171,7 @@ etape_droits() {
       operateur) as=(--as=operateur --as-group=operateurs) ;;
       horodatage) as=(--as=system:serviceaccount:horodatage:horodatage) ;;
       rattrapage) as=(--as=system:serviceaccount:declencheurs:rattrapage) ;;
+      porte) as=(--as=system:serviceaccount:porte:porte) ;;
       *) echo "KO   sujet inconnu : $sujet" >&2; exit 1 ;;
     esac
     if [ "$ns" = '*' ]; then obtenu=$(kubectl auth can-i "$verbe" "$ressource" -A "${as[@]}" 2>/dev/null || true)
@@ -984,15 +1187,16 @@ etape_droits() {
   echo "## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)"
   debut=$(awk -F'\t' '$1 == "J6 essais_webhook" {d = $2} END {print d}' "$R/chrono.tsv")
   [ -n "$debut" ] || { echo "KO   test 5 de J6 absent de chrono.tsv" >&2; exit 1; }
-  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" \
+  audit_api system:serviceaccount:declencheurs:el-forgejo \
     | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:el-forgejo")
       | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-el"
-  ! grep -qE ' 403$' "$T/audit-el" && echo "OK   aucun refus (403) pour el-forgejo depuis $debut" || { echo "KO   refus RBAC pour el-forgejo" >&2; exit 1; }
+  [ -s "$T/audit-el" ] && ! grep -qE ' 403$' "$T/audit-el" && echo "OK   aucun refus (403) pour el-forgejo depuis $debut" \
+    || { echo "KO   refus RBAC ou aucune écriture pour el-forgejo" >&2; exit 1; }
   echo "## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage"
   debut=$(awk -F'\t' '$1 == "J6 rattrapage" {d = $2} END {print d}' "$R/chrono.tsv")
   [ -n "$debut" ] || { echo "KO   étape rattrapage absente de chrono.tsv" >&2; exit 1; }
-  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" \
+  audit_api system:serviceaccount:declencheurs:rattrapage \
     | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:rattrapage")
       | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-rattrapage"
