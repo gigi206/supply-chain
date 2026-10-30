@@ -5,10 +5,11 @@
 #   (aléatoires, 0600, ~/.cache/supply-chain-poc/08/secrets) ; puis les deux agents, qui ne reçoivent que
 #   le jeton agent au format sécurisé (K10<empreinte de la CA>::…), après contrôle de cette empreinte ;
 #   kubeconfig dédié ~/.kube/supply-chain-poc.yaml (0600), jamais fusionné dans ~/.kube/config.
-#   RESEAU=cilium (J7, option 1b accordée par le propriétaire le 30/10/2026 ; défaut flannel) : server sans flannel ni kube-router
+#   RESEAU=cilium (J7, option 1b ; défaut depuis la décision du propriétaire du 30/10/2026 de garder Cilium) : server sans flannel ni kube-router
 #   (k3s/sc-confiance-cilium.yaml en fichier d'appoint), HelmChart cilium (chart vérifié en base64) dans les manifestes du server,
 #   archives OCI amd64 de Cilium avec les images airgap ; tout est préparé par cilium.sh telecharger et revérifié par sha256
-#   dans chaque VM. Les nœuds ne sont prêts qu'une fois l'agent Cilium démarré.
+#   dans chaque VM. Les nœuds ne sont prêts qu'une fois l'agent Cilium démarré. RESEAU=flannel : flannel et kube-router de k3s
+#   (retour arrière ; chemin non rejoué depuis les adaptations de J7).
 #
 # Usage (racine du dépôt) : mise run confiance:k3s
 set -euo pipefail
@@ -22,7 +23,7 @@ K3S_SHA=897acb21cca57d477a211102251a6591450ce767344a9faaa121a1007ca9fa9a
 K3S_IMG=k3s-airgap-images-amd64.tar.zst
 K3S_IMG_SHA=7f1cbfea56d38f5e69aec13500a89290119096cc2f5a6d4f542e5f26599977d0
 KUBECONFIG_POC=$HOME/.kube/supply-chain-poc.yaml
-RESEAU=${RESEAU:-flannel}
+RESEAU=${RESEAU:-cilium}
 CIL=$O/telechargements/cilium   # cilium.sh telecharger
 case $RESEAU in flannel|cilium) ;; *) echo "RESEAU inconnu : $RESEAU" >&2; exit 1 ;; esac
 declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stockage]=192.168.161.13)

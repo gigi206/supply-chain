@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Brique 08, J7 : réseau Cilium 1.20.4 à la place de flannel et de kube-router (option 1b du contrôle de sortie de la zone build ;
-# plan du README accordé par le propriétaire le 30/10/2026 ; installé par k3s.sh avec RESEAU=cilium).
+# plan du README accordé par le propriétaire le 30/10/2026 ; installé par k3s.sh avec RESEAU=cilium, le défaut depuis la décision
+# du propriétaire du 30/10/2026 de garder Cilium).
 #   telecharger  sur l'hôte, avant tout démontage : chart OCI vérifié par cosign (identité relevée release.yaml@refs/heads/main ;
 #                témoin : identité du tag refusée), archive du chart (sha256 égal au digest publié par helm.cilium.io) ; images
 #                cilium et operator-generic : index vérifié par cosign (identité documentée au tag ; témoin : autre tag refusé),
@@ -11,7 +12,7 @@
 #   verifier     après J1 (point d'arrêt du rejeu), prédiction d'abord : nœuds prêts, agents et opérateur prêts, images importées
 #                (digest amd64, aucun tirage), podCIDRs repris de k3s, état des agents, flannel et kube-router absents, binaire
 #                hubble dans l'agent, mémoire des agents
-# Retrait : rejeu avec RESEAU=flannel (cluster recréé).
+# Retrait : rejeu avec RESEAU=flannel (cluster recréé ; chemin non rejoué depuis les adaptations de J7).
 #
 # Usage (racine du dépôt) : mise run confiance:cilium -- <étape>…   (journal : resultats/cilium-<étape>.log)
 set -euo pipefail

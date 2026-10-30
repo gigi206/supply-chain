@@ -6,8 +6,9 @@
 # sans réseau (NetworkPolicy construction-sans-sortie, image de build en layout OCI) ; construction de sample-app dans un
 # PipelineRun : compte Zot poc-images, entrées, tâches signées, constat sur les ConfigMaps sous Kata, construction sans sortie
 # réseau et ses témoins, provenance ; réseau des pods Kata :
-# fenêtre de kube-router, NFLOG, usurpation d'adresse), puis contrôle des
-# secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, non rejoué au 30/10/2026. Téléchargements, CA et certificats restent en cache ; l'état
+# fenêtre de démarrage, trace des refus (Hubble sous Cilium, NFLOG sous kube-router), usurpation d'adresse), puis contrôle des
+# secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, rejoué sous Cilium le 30/10/2026 en
+# cinq morceaux, pas encore d'un seul tenant. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
 # lit les entrées des bancs du laptop (~/.cache/supply-chain-poc/w/b03, empreintes épinglées) et interroge sum.golang.org.
 #
@@ -17,8 +18,12 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 lib=${1:-j1-j6}
-# RESEAU=cilium (J7, option 1b) : k3s.sh installe Cilium, contrôlé par cilium.sh verifier juste après J1. JUSQUA=<étape> arrête
+# RESEAU=cilium, par défaut (J7, option 1b ; décision du propriétaire du 30/10/2026 de garder Cilium) : k3s.sh installe Cilium,
+# contrôlé par cilium.sh verifier juste après J1 ; préalable sur l'hôte : mise run confiance:cilium -- telecharger. RESEAU=flannel :
+# flannel et kube-router de k3s (retour arrière ; chemin non rejoué depuis les adaptations de J7). JUSQUA=<étape> arrête
 # après cette étape (point d'arrêt) ; DEPUIS=<étape> reprend à cette étape, les précédentes étant sautées.
+RESEAU=${RESEAU:-cilium}
+export RESEAU   # même réseau pour k3s.sh, lancé par mise
 DEPUIS=${DEPUIS:-}
 JUSQUA=${JUSQUA:-}
 actif=1
@@ -36,11 +41,11 @@ etape() { # libellé commande…
   echo "## durée $l : $(( $(date +%s) - t )) s"
   [ "$l" != "$JUSQUA" ] || { echo "## arrêt après $l (JUSQUA), $(( $(date +%s) - t0 )) s"; exit 0; }
 }
-echo "réseau : ${RESEAU:-flannel}${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
+echo "réseau : $RESEAU${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
 etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
 etape k3s mise run confiance:k3s
-[ "${RESEAU:-flannel}" != cilium ] || etape Cilium mise run confiance:cilium -- verifier
+[ "$RESEAU" != cilium ] || etape Cilium mise run confiance:cilium -- verifier
 etape J2 mise run confiance:stockage -- pki zot registre containerd forgejo depot
 etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais redemarrage
 etape J4 mise run confiance:tekton -- revue miroir installer signature verifier webhook essais_webhook

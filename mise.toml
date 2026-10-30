@@ -193,7 +193,7 @@ description = "Brique 08 : pool, réseau NAT et VM sc-confiance, sc-build, sc-st
 run = "poc/bricks/08-trust-plane/vm.sh"
 
 [tasks."confiance:k3s"]
-description = "Brique 08 : k3s (server sur sc-confiance, agents sur sc-build et sc-stockage), sans install.sh ; kubeconfig dédié"
+description = "Brique 08 : k3s (server sur sc-confiance, agents sur sc-build et sc-stockage), sans install.sh ; kubeconfig dédié ; réseau Cilium par défaut (RESEAU=flannel : retour arrière)"
 run = "poc/bricks/08-trust-plane/k3s.sh"
 
 [tasks."confiance:controles"]
@@ -213,7 +213,7 @@ description = "Brique 08, J3 : OpenBao 2.7.2 sur sc-confiance, Transit non expor
 run = "poc/bricks/08-trust-plane/openbao.sh"
 
 [tasks."confiance:rejeu"]
-description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
+description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J7), réseau Cilium par défaut, puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
 run = "poc/bricks/08-trust-plane/rejeu.sh"
 
 [tasks."confiance:redemarrer"]
