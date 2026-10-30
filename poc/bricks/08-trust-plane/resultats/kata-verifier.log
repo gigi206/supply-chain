@@ -1,4 +1,4 @@
-# kata.sh verifier, 2026-10-30T13:08:18Z
+# kata.sh verifier, 2026-10-30T13:28:22Z
 ## tag et release 4.3.1
 OK   tag léger 4.3.1 → commit 03cf2ec06a5d302f23af811744f6bcea49988bfb, signé et vérifié par GitHub
 OK   release immuable
@@ -28,6 +28,7 @@ machine_type = "q35"
 rootfs_type = "ext4"
 rootless = false
 enable_annotations = ["enable_iommu", "kernel_params", "kernel_verity_params", "default_vcpus", "default_memory"]
+seccomp_sandbox = ""
 cpu_features = "pmu=off"
 default_vcpus = 1
 overhead_vcpus = 0.2
@@ -42,6 +43,7 @@ disable_guest_seccomp = true
 sandbox_cgroup_only = true
 static_sandbox_resource_mgmt = true
 CONSTAT disable_guest_seccomp = true : le profil seccomp déclaré dans le pod n'est pas appliqué dans l'invité
+CONSTAT seccomp_sandbox vide : QEMU tourne sur le nœud sans bac à sable seccomp (lu, non mesuré)
 CONSTAT enable_annotations : un pod peut changer kernel_params, default_vcpus et default_memory si containerd lui transmet les annotations (pod_annotations)
    50.5 Mo  /opt/kata/runtime-rs/bin/containerd-shim-kata-v2
     0.0 Mo  /opt/kata/share/defaults/kata-containers/runtime-rs/configuration-qemu-runtime-rs.toml

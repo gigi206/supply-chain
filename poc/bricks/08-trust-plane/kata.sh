@@ -122,9 +122,11 @@ etape_verifier() {
   rm -rf "$T/x" && mkdir -p "$T/x"
   zstd -dc "$DL/$KATA_STATIC" | tar -x -C "$T/x" ".$SHIM_CONF"
   c=$T/x$SHIM_CONF
-  grep -E '^(path|kernel|image|machine_type|rootfs_type|enable_annotations|cpu_features|default_vcpus|default_memory|overhead_vcpus|overhead_memory|shared_fs|virtio_fs_daemon|rootless|disable_nesting_checks|internetworking_model|disable_guest_seccomp|sandbox_cgroup_only|static_sandbox_resource_mgmt|disable_guest_selinux) ' "$c"
+  grep -E '^(path|kernel|image|machine_type|rootfs_type|enable_annotations|cpu_features|seccomp_sandbox|default_vcpus|default_memory|overhead_vcpus|overhead_memory|shared_fs|virtio_fs_daemon|rootless|disable_nesting_checks|internetworking_model|disable_guest_seccomp|sandbox_cgroup_only|static_sandbox_resource_mgmt|disable_guest_selinux) ' "$c"
   grep -q '^disable_guest_seccomp = true$' "$c" \
     && echo "CONSTAT disable_guest_seccomp = true : le profil seccomp déclaré dans le pod n'est pas appliqué dans l'invité"
+  grep -q '^seccomp_sandbox = ""$' "$c" \
+    && echo "CONSTAT seccomp_sandbox vide : QEMU tourne sur le nœud sans bac à sable seccomp (lu, non mesuré)"
   echo "CONSTAT enable_annotations : un pod peut changer kernel_params, default_vcpus et default_memory si containerd lui transmet les annotations (pod_annotations)"
   total=0
   for f in /opt/kata/runtime-rs/bin/containerd-shim-kata-v2 "$SHIM_CONF" \
@@ -232,14 +234,13 @@ etape_installer() {
   kubectl get runtimeclass kata -o json | jq -c '{handler, overhead, scheduling}'
 }
 
-MESURE='echo "noyau : $(uname -r)"; echo "vCPU : $(nproc)"; grep MemTotal /proc/meminfo
+MESURE='echo "noyau : $(uname -r)"; echo "vCPU : $(nproc)"; grep MemTotal /proc/meminfo; grep -m1 "model name" /proc/cpuinfo
 /lib/ld-linux-x86-64.so.2 --help | grep -E "x86-64-v[234]"
 echo "drapeaux avx512 : $(grep -o "avx512[a-z_]*" /proc/cpuinfo | sort -u | wc -l)"
 grep -E "^(Seccomp|NoNewPrivs|CapEff):" /proc/self/status'
 
-pod_essai() { # nom runtimeClass|- annotation=valeur|- : pod de builds conforme à restricted, journal dans $T/<nom>.log
-  local d f
-  jq -n --arg n "$1" --arg rc "$2" --arg an "$3" --arg i "$BUSYBOX" --arg s "$MESURE" '{apiVersion: "v1", kind: "Pod",
+pod_spec() { # nom runtimeClass|- annotation=valeur|- script : pod de builds conforme à restricted, dans $T/<nom>.json
+  jq -n --arg n "$1" --arg rc "$2" --arg an "$3" --arg i "$BUSYBOX" --arg s "$4" '{apiVersion: "v1", kind: "Pod",
     metadata: ({name: $n, namespace: "builds"} + (if $an == "-" then {} else {annotations: {($an | split("=")[0]): ($an | split("=")[1])}} end)),
     spec: ({restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
       tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
@@ -247,6 +248,11 @@ pod_essai() { # nom runtimeClass|- annotation=valeur|- : pod de builds conforme 
       containers: [{name: "mesure", image: $i, command: ["sh", "-c", $s],
         securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}
       + (if $rc == "-" then {} else {runtimeClassName: $rc} end))}' > "$T/$1.json"
+}
+
+pod_essai() { # nom runtimeClass|- annotation=valeur|- : pod de mesure (MESURE) terminé, journal dans $T/<nom>.log
+  local d
+  pod_spec "$1" "$2" "$3" "$MESURE"
   kubectl delete pod -n builds "$1" --ignore-not-found --wait=true >/dev/null
   kubectl create -f "$T/$1.json" >/dev/null
   kubectl wait -n builds "pod/$1" --for=jsonpath='{.status.phase}'=Succeeded --timeout=240s >/dev/null \
@@ -256,6 +262,17 @@ pod_essai() { # nom runtimeClass|- annotation=valeur|- : pod de builds conforme 
     | map(fromdateiso8601) | .[1] - .[0]')
   echo "### $1 (runtimeClassName $2, annotation $3) : nœud $(kubectl get pod -n builds "$1" -o jsonpath='{.spec.nodeName}'), conteneur lancé $d s après la création"
   sed 's/^/     /' "$T/$1.log"
+}
+
+ligne_qemu() { # arguments -cpu, -machine, -m et -smp de QEMU sur sc-build, pendant la vie d'un pod Kata qui dort
+  pod_spec j7-kata-qemu kata - 'sleep 300'
+  kubectl delete pod -n builds j7-kata-qemu --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/j7-kata-qemu.json" >/dev/null
+  kubectl wait -n builds pod/j7-kata-qemu --for=condition=Ready --timeout=240s >/dev/null
+  sur sc-build 'pgrep -a qemu-system' > "$T/qemu.txt"
+  kubectl delete pod -n builds j7-kata-qemu --wait=false >/dev/null
+  echo "processus QEMU sur sc-build : $(wc -l < "$T/qemu.txt")"
+  for a in -cpu -machine -m -smp; do echo "$a $(tr ' ' '\n' < "$T/qemu.txt" | grep -A1 -x -m1 -- "$a" | tail -1)"; done
 }
 
 champ() { sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$T/$1.log" | head -1; }   # pod libellé : valeur d'une ligne « libellé : valeur »
@@ -268,10 +285,13 @@ etape_essais() {
   echo "kata : noyau de l'invité 6.18.56, 1 vCPU, MemTotal sous 2048 Mio, Seccomp: 0 (disable_guest_seccomp), x86-64-v3 pris en charge, v4 non"
   echo "kata avec l'annotation default_memory=4096 : même mémoire que kata (annotation non transmise par containerd)"
   echo "kata privilégié dans builds : refusé par Pod Security (enforce restricted), avant Kyverno"
+  echo "kata : QEMU lancé avec -cpu host,pmu=off (type host et cpu_features, lus dans cmdline_generator.rs de runtime-rs 4.3.1),"
+  echo "       donc même modèle de CPU (model name) dans l'invité que dans sc-build"
   echo "## mesures"
   pod_essai j7-runc - -
   pod_essai j7-kata kata -
   pod_essai j7-kata-memoire kata io.katacontainers.config.hypervisor.default_memory=4096
+  ligne_qemu | tee "$T/qemu-args.txt"
   echo "## comparaison"
   [ "$(champ j7-runc noyau)" = "$h" ] && [ "$(champ j7-runc Seccomp)" = 2 ] && echo "OK   runc : noyau de sc-build, seccomp filtré" \
     || { echo "KO   runc" >&2; exit 1; }
@@ -290,6 +310,10 @@ etape_essais() {
   if [ "$(champ j7-kata Seccomp)" = 0 ]; then
     echo "CONSTAT kata : Seccomp: 0 dans l'invité malgré seccompProfile RuntimeDefault (disable_guest_seccomp = true) ; le pod est conforme à restricted sans filtre seccomp effectif"
   else echo "KO   kata : Seccomp $(champ j7-kata Seccomp), contraire à la configuration lue" >&2; exit 1; fi
+  [ "$(awk '$1 == "-cpu" {print $2}' "$T/qemu-args.txt")" = host,pmu=off ] && [ -n "$(champ j7-kata 'model name')" ] \
+    && [ "$(champ j7-kata 'model name')" = "$(champ j7-runc 'model name')" ] \
+    && echo "OK   kata : QEMU en -cpu host,pmu=off, même modèle de CPU que sc-build ($(champ j7-kata 'model name'))" \
+    || { echo "KO   kata : modèle de CPU de l'invité" >&2; exit 1; }
   echo "NoNewPrivs et CapEff : runc $(champ j7-runc NoNewPrivs) $(champ j7-runc CapEff), kata $(champ j7-kata NoNewPrivs) $(champ j7-kata CapEff)"
   echo "## pod Kata privilégié dans builds (dry-run serveur)"
   jq '.metadata.name = "j7-kata-privilegie" | .spec.containers[0].securityContext = {privileged: true, allowPrivilegeEscalation: true}' \
@@ -298,6 +322,8 @@ etape_essais() {
   for p in j7-runc j7-kata j7-kata-memoire; do kubectl delete pod -n builds "$p" --wait=false >/dev/null; done
   echo "## qui peut créer, modifier ou supprimer une RuntimeClass (pods-isolation reconnaît Kata au nom de la RuntimeClass)"
   echo "RuntimeClasses : $(kubectl get runtimeclasses -o jsonpath='{range .items[*]}{.metadata.name}={.handler} {end}')"
+  echo "runtimes de containerd sur sc-build (crictl info) : $(sur sc-build 'sudo k3s crictl info' | jq -r '.config.containerd.runtimes | keys | join(" ")')"
+  echo "les RuntimeClasses créées par k3s (crun, nvidia, wasm…) n'ont pas de runtime derrière sur sc-build : un pod qui les désigne n'y démarre pas"
   # Première prédiction (ramasse-miettes seul) démentie le 30/10/2026 (resultats/kata-essais-premiere-prediction.log) : le
   # contrôleur des espaces de noms peut aussi supprimer (delete sur tout, pour vider un espace). Supprimer la RuntimeClass
   # kata ne contourne rien : l'API refuse un pod qui désigne une RuntimeClass absente.
