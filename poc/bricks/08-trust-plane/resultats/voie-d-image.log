@@ -1,0 +1,13 @@
+# voie-d.sh image, 2026-10-30T15:02:03Z
+## prédiction
+deux assemblages de l'image de build, depuis deux répertoires : même tar, même digest (crane n'ajoute aucune date :
+  entrée d'historique à valeur nulle, mutate.AppendLayers de go-containerregistry v0.20.6)
+## entrées
+OK   toolchain golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64 : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0= = sum.golang.org ; arbre extrait 4d51374d9c3a8771e2211a04b6973da3dac8e2d2a11b02d6872d53fb549ce03d
+busybox : /nix/store/md5ikacq7vzcr3xxx58i2miy4iz0dipj-busybox-static-x86_64-unknown-linux-musl-1.36.1/bin/busybox (BusyBox v1.36.1 () multi-call binary.), sha256 49227c027f9b972f929780d60ee486dee5948ea7042cb7ab400690bb104418bc, 395 applets
+## assemblage (tar GNU, crane append et mutate), deux fois
+a : couche 683ffab60c2ef72f40f1eab285d1e7e639e3d2e9ff9353639682e836123ce83c (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+b : couche 683ffab60c2ef72f40f1eab285d1e7e639e3d2e9ff9353639682e836123ce83c (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   image de build identique sur deux assemblages : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+{"architecture":"amd64","os":"linux","config":{"Env":["PATH=/usr/local/go/bin:/bin","HOME=/tmp","CGO_ENABLED=0","GOTOOLCHAIN=local","GOFLAGS=-mod=readonly","GOSUMDB=off"]},"history":[{"created":"0001-01-01T00:00:00Z"}]}
+image des pods : sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67

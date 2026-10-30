@@ -239,3 +239,7 @@ run = "poc/bricks/08-trust-plane/kata.sh"
 [tasks."confiance:buildkit"]
 description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité), puis, après l'exemption de kata : attributs étendus dans l'invité, options de virtiofsd, rootless en pod Kata privilégié et non privilégié, root en pod Kata privilégié (étapes : image essais exempte)"
 run = "poc/bricks/08-trust-plane/buildkit.sh"
+
+[tasks."confiance:voie-d"]
+description = "Brique 08, J7 : voie D (mesure demandée par le propriétaire) ; sans conteneur imbriqué ni BuildKit : image de build assemblée sans rien exécuter (tar GNU déterministe, crane), compilation de sample-app dans un pod Kata de builds sous unshare -U -r -n, image sample-app assemblée par tar et crane, comparée à 3a7ca1b1 (étapes : image compiler assembler)"
+run = "poc/bricks/08-trust-plane/voie-d.sh"

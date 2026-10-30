@@ -2,7 +2,7 @@
 # Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6) : démontage, VM, k3s, stockage, OpenBao, Tekton,
 # horodatage, politique (test 5 rejoué sous politique entre declencheurs et porte, comme au premier passage ; porte avant
 # rattrapage, qui juge avec elle ; droits, qui lit l'audit du test 5 et du rattrapage ; posture), J7 en cours (Kata :
-# vérification, installation, essais, exemption Pod Security de la RuntimeClass kata (server k3s redémarré) ; cas d'admission rejoués avec la RuntimeClass kata ; BuildKit : image, essais, mesure après l'exemption), puis contrôle des
+# vérification, installation, essais, exemption Pod Security de la RuntimeClass kata (server k3s redémarré) ; cas d'admission rejoués avec la RuntimeClass kata ; BuildKit : image, essais, mesure après l'exemption ; voie D), puis contrôle des
 # secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, non rejoué au 30/10/2026. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte.
 #
@@ -35,5 +35,6 @@ etape "J6 (suite)" mise run confiance:politique -- porte rattrapage droits postu
 etape J7 mise run confiance:kata -- verifier installer essais exemption
 etape "J7 (admission)" mise run confiance:politique -- admission
 etape "J7 (BuildKit)" mise run confiance:buildkit -- image essais exempte
+etape "J7 (voie D)" mise run confiance:voie-d -- image compiler assembler
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

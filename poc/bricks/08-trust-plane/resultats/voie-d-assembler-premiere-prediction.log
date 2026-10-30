@@ -1,0 +1,20 @@
+# voie-d.sh assembler, 2026-10-30T15:03:30Z
+## prédiction (écart d'en-tête relevé en exploratoire le 30/10/2026, avant cette prédiction)
+deux assemblages depuis deux répertoires : même couche, même digest
+face à 3a7ca1b1 : même binaire, mêmes nom, mode (0755), UID et GID (0), noms vides et date (0), même taille de tar ; en-tête
+  différent par devmajor et devminor (vides chez GNU tar, zéros octaux chez BuildKit), donc par la somme de contrôle :
+  diff_id différent ; configuration identique hors historique (User, Env, Entrypoint, WorkingDir, plateforme fixés comme la
+  référence) ; digest différent
+a : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+b : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+OK   image sample-app identique sur deux assemblages : sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+## comparaison avec sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (BuildKit, brique 04)
+OK   binaire extrait de la couche de référence : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   taille du tar (référence, voie D) : 6199296 6199296
+octets différents : 18, aux positions 149 150 151 152 329 330 331 332 333 334 335 337 338 339 340 341 342 343
+  chksum : 4 octet(s)
+  devmajor : 7 octet(s)
+  devminor : 7 octet(s)
+OK   écarts limités à l'en-tête du fichier : somme de contrôle, devmajor, devminor
+diff_id : référence sha256:2996737dd3b6fed64439882bc0fc3d520ce9ab98e626738e75355d1fc7aea34f, voie D sha256:f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397
+KO   configuration hors rootfs et historique (référence = voie D) : {"architecture":"amd64","config":{"Entrypoint":["/sample-app"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"User":"65532:65532","WorkingDir":"/"},"created":"0001-01-01T00:00:00Z","os":"linux"} (attendu : {"architecture":"amd64","config":{"Entrypoint":["/sample-app"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"User":"65532:65532","WorkingDir":"/"},"created":"1970-01-01T00:00:00Z","os":"linux"})
