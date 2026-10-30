@@ -408,7 +408,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 | Mesure | runc | Kata |
 |---|---|---|
 | Bounding set, `NoNewPrivs`, `Seccomp` | 0, 1, 2 | 0, 1, **0** |
-| AppArmor | `cri-containerd.apparmor.d` (enforce) | absent de l'invité |
+| Étiquette AppArmor (`/proc/self/attr/current`) | `cri-containerd.apparmor.d` (enforce) | illisible (`Invalid argument`) ; la présence d'AppArmor dans l'invité n'est pas mesurée |
 | `unshare -U -r -m` (user namespace sans privilège) | **refusé** (`Operation not permitted`) | **réussi** : bounding set complet dans le nouvel espace, tmpfs monté |
 | rootlesskit de l'image | (non essayé) | **échec** : `newuidmap … Could not set caps` |
 | buildkitd sous `unshare -U -r` (un seul UID, sans `newuidmap`) | (non essayé) | démon démarré (`no-sandbox`, `native`) ; **aucun `RUN`** : `lchown` d'un fichier à l'UID 65534 (busybox de Zot), puis, sur une base où tout appartient à l'UID 0, montage de `devpts` refusé (`gid=5` hors correspondance) |

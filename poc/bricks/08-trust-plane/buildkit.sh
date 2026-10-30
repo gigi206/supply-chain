@@ -190,7 +190,7 @@ etape_essais() {
   local f q
   echo "## prédiction : résultats de l'essai exploratoire du 30/10/2026, rejoués ici"
   echo "runc : CapBnd 0, NoNewPrivs 1, Seccomp 2, AppArmor cri-containerd.apparmor.d (enforce) ; unshare refusé (Operation not permitted)"
-  echo "kata : CapBnd 0, NoNewPrivs 1, Seccomp 0, pas d'AppArmor dans l'invité ; unshare -U -r -m réussit, bounding set complet dans"
+  echo "kata : CapBnd 0, NoNewPrivs 1, Seccomp 0, étiquette AppArmor illisible dans l'invité (Invalid argument) ; unshare -U -r -m réussit, bounding set complet dans"
   echo "       le nouvel espace (000001ffffffffff), uid_map 0 65532 1, tmpfs monté"
   echo "kata, rootlesskit de l'image : échec de newuidmap (« Could not set caps »)"
   echo "kata, buildkitd sous unshare -U -r : démon v0.34.1 démarré (no-sandbox, native) ; construction a (busybox de Zot) : échec"
@@ -222,7 +222,7 @@ etape_essais() {
   case $(champ j7-bk-sonde-runc unshare) in "rc 1 unshare: unshare("*"): Operation not permitted") echo "OK   runc : unshare refusé ($(champ j7-bk-sonde-runc unshare))" ;;
     *) echo "KO   runc : unshare $(champ j7-bk-sonde-runc unshare)" >&2; exit 1 ;; esac
   attendu "kata : bounding set, no_new_privs, seccomp" "$(champ j7-bk-sonde-kata CapBnd) $(champ j7-bk-sonde-kata NoNewPrivs) $(champ j7-bk-sonde-kata Seccomp)" "0000000000000000 1 0"
-  echo "kata : AppArmor : $(champ j7-bk-sonde-kata AppArmor)"
+  attendu "kata : étiquette AppArmor (/proc/self/attr/current)" "$(champ j7-bk-sonde-kata AppArmor)" "cat: read error: Invalid argument"
   attendu "kata : unshare -U -r -m" "$(champ j7-bk-sonde-kata unshare)" "rc 0 "
   attendu "kata : nouvel espace (bounding set, uid_map, tmpfs)" "$(champ j7-bk-sonde-kata 'espace CapBnd') $(champ j7-bk-sonde-kata 'espace uid_map') $(champ j7-bk-sonde-kata 'espace tmpfs')" "000001ffffffffff 0 65532 1 monté"
   case $(champ j7-bk-rootlesskit rootlesskit) in "rc 1 newuidmap"*"Could not set caps"*) echo "OK   kata : rootlesskit en échec ($(champ j7-bk-rootlesskit rootlesskit))" ;;

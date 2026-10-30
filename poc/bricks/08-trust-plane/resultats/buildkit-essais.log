@@ -1,7 +1,7 @@
-# buildkit.sh essais, 2026-10-30T13:55:35Z
+# buildkit.sh essais, 2026-10-30T14:01:55Z
 ## prédiction : résultats de l'essai exploratoire du 30/10/2026, rejoués ici
 runc : CapBnd 0, NoNewPrivs 1, Seccomp 2, AppArmor cri-containerd.apparmor.d (enforce) ; unshare refusé (Operation not permitted)
-kata : CapBnd 0, NoNewPrivs 1, Seccomp 0, pas d'AppArmor dans l'invité ; unshare -U -r -m réussit, bounding set complet dans
+kata : CapBnd 0, NoNewPrivs 1, Seccomp 0, étiquette AppArmor illisible dans l'invité (Invalid argument) ; unshare -U -r -m réussit, bounding set complet dans
        le nouvel espace (000001ffffffffff), uid_map 0 65532 1, tmpfs monté
 kata, rootlesskit de l'image : échec de newuidmap (« Could not set caps »)
 kata, buildkitd sous unshare -U -r : démon v0.34.1 démarré (no-sandbox, native) ; construction a (busybox de Zot) : échec
@@ -32,14 +32,14 @@ kata, limites 2 CPU et 3 Gi : static_sandbox_resource_mgmt (initial_size.rs) don
 ### j7-bk-rootlesskit (runtimeClassName kata, uid 1000, limites -)
      CapBnd:	0000000000000000
      NoNewPrivs:	1
-     rootlesskit : rc 1 newuidmap 9 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootlesskit : rc 1 newuidmap 8 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
 ### j7-bk-unshare (runtimeClassName kata, uid 1000, limites {"cpu": "2", "memory": "3Gi"})
      vCPU : 3
      MemTotal:        3029232 kB
      démon : github.com/moby/buildkit v0.34.1 f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, process-mode:no-sandbox, snapshotter:native
-     construction a : rc 1 failed to Lchown "/run/user/1000/containerd-mount785262375/home" for UID 65534, GID 65534
+     construction a : rc 1 failed to Lchown "/run/user/1000/containerd-mount922169855/home" for UID 65534, GID 65534
      construction b : rc 1 error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: invalid argument
-processus QEMU du sandbox b3d46832984685546bae0977c4944558beb4cac01f4447b3751ee9ff8a325be3 : 1
+processus QEMU du sandbox 4d243cd9935dd7f1d244c326a59cf450109c35a0ee5b91b6b49284e6bf5b875d : 1
 -smp 3
 -m 3104M,slots=10,maxmem=9950M
 ## comparaison
@@ -47,12 +47,12 @@ OK   runc : bounding set, no_new_privs, seccomp : 0000000000000000 1 2
 OK   runc : AppArmor : cri-containerd.apparmor.d (enforce)
 OK   runc : unshare refusé (rc 1 unshare: unshare(0x10020000): Operation not permitted)
 OK   kata : bounding set, no_new_privs, seccomp : 0000000000000000 1 0
-kata : AppArmor : cat: read error: Invalid argument
+OK   kata : étiquette AppArmor (/proc/self/attr/current) : cat: read error: Invalid argument
 OK   kata : unshare -U -r -m : rc 0 
 OK   kata : nouvel espace (bounding set, uid_map, tmpfs) : 000001ffffffffff 0 65532 1 monté
-OK   kata : rootlesskit en échec (rc 1 newuidmap 9 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   kata : rootlesskit en échec (rc 1 newuidmap 8 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
 OK   kata : démon sous unshare : github.com/moby/buildkit v0.34.1 f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, process-mode:no-sandbox, snapshotter:native
-OK   construction a (busybox de Zot) : rc 1 failed to Lchown "/run/user/1000/containerd-mount785262375/home" for UID 65534, GID 65534
+OK   construction a (busybox de Zot) : rc 1 failed to Lchown "/run/user/1000/containerd-mount922169855/home" for UID 65534, GID 65534
 OK   construction b (tout à l'UID 0) : rc 1 error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: invalid argument
 OK   kata, limites 2 CPU et 3 Gi : QEMU : -smp 3 -m 3104M
 OK   kata, limites 2 CPU et 3 Gi : invité de 3 vCPU, MemTotal 3029232 kB
