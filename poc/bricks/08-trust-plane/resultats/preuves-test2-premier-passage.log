@@ -1,0 +1,12 @@
+# preuves.sh test2, 2026-10-30T22:16:12Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- TaskRun à taskSpec en ligne créé par l'administrateur, et PipelineRun à pipelineSpec en ligne créé par el-forgejo :
+  refusés à l'admission par la règle tekton-references de Kyverno (le webhook de Tekton, en disable-inline-spec, les
+  refuserait aussi : la réponse de l'API ne nomme qu'un refus) ; TaskRun en ligne créé par el-forgejo : refusé par RBAC,
+  el-forgejo ne créant que des PipelineRuns ; aucun objet créé
+- témoins : TaskRun du bundle signé (administrateur) et PipelineRun du bundle signé (el-forgejo) admis en dry-run serveur
+- trace : refus de l'API ; un événement PolicyViolation de tekton-references par refus de Kyverno ; chaque requête dans
+  l'audit de l'API, avec le compte (l'administrateur apparaît comme emprunteur de l'identité d'el-forgejo)
+## tentatives (créations réelles)
+KO   TaskRun en ligne, administrateur : refusé par autre chose que tekton-references (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.taskSpec )

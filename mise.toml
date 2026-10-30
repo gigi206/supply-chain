@@ -236,6 +236,10 @@ run = "poc/bricks/08-trust-plane/politique.sh"
 description = "Brique 08, J7 : réseau Cilium 1.20.4 (option 1b accordée par le propriétaire) ; chart et images vérifiés par cosign, archives OCI amd64 et HelmChart sur l'hôte, puis contrôle après J1 (étapes : telecharger verifier)"
 run = "poc/bricks/08-trust-plane/cilium.sh"
 
+[tasks."confiance:preuves"]
+description = "Brique 08, J8 : les 8 tests négatifs (plan validé par le propriétaire le 30/10/2026), une étape par test, trace dans resultats/preuves-<étape>.log"
+run = "poc/bricks/08-trust-plane/preuves.sh"
+
 [tasks."confiance:sante-reseau"]
 description = "Brique 08, J7 : santé de Cilium et de kube-router amont selon les critères du doc 04, sans rien installer (étapes : releves signatures)"
 run = "poc/bricks/08-trust-plane/sante-reseau.sh"

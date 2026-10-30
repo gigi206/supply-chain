@@ -1566,4 +1566,5 @@ etape_posture() {
   echo "OK   aucun cache dans le répertoire personnel (TL_CACHE_DIR)"
 }
 
-lancer politique J6 "$@"
+# Sourcé par preuves.sh (J8) pour ses fonctions : les étapes ne sont lancées que si le script est exécuté.
+[ "${BASH_SOURCE[0]}" != "$0" ] || lancer politique J6 "$@"
