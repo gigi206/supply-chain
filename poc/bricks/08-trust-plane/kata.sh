@@ -478,6 +478,8 @@ etape_temoin() {
 
 SONDE=sonde-reseau-j7   # label des pods de mesure et nom de la NetworkPolicy (kata/sonde-reseau.yaml)
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build (10.42.1.0/24), inutilisée (contrôlé avant l'essai)
+HORS_CIDR=10.42.0.250   # sous Cilium : adresse inutilisée du sous-réseau des pods de sc-confiance (contrôlé avant l'essai)
+EXTERNE=203.0.113.10    # sous Cilium : adresse de documentation (RFC 5737), hors du cluster
 # Sonde de J6 (politique.sh rattrapage), adaptée : un refus de Zot ne compte que si Forgejo (permis) répond, pour ne pas
 # confondre la règle avec un réseau pas encore prêt ; fin après 3 refus de suite (60 s au plus), puis sorties par adresse.
 FENETRE='cs() { read u r < /proc/uptime; echo $(( ${u%.*} * 100 + 1${u#*.} - 100 )); }
@@ -582,7 +584,11 @@ reseau_cilium() {
   echo "  (vérification de l'adresse source, documentée : annotations de pod), aucune réponse de Zot, flux de $USURPEE refusés"
   echo "  dans Hubble avec un motif d'adresse source ;"
   echo "- témoins sans NET_ADMIN, pod Kata restreint et pod runc restreint : ajout et liaison de l'adresse refusés, comme sous"
-  echo "  kube-router (indépendant du contrôleur réseau)"
+  echo "  kube-router (indépendant du contrôleur réseau) ;"
+  echo "- autres sources depuis le même pod privilégié (ajout écrit le 30/10/2026, après le premier passage sous Cilium) : IP d'un"
+  echo "  pod témoin endormi de sc-build (label de la sonde : sortie vers Forgejo permise), adresse inutilisée du CIDR de"
+  echo "  sc-confiance ($HORS_CIDR), adresse externe de documentation ($EXTERNE) : Zot et Forgejo refusés pour chacune, motif"
+  echo "  INVALID_SOURCE_IP dans Hubble ; aucun paquet de $EXTERNE sur enp1s0 de sc-build (non masquée, elle y serait visible)"
   echo "## état de départ"
   echo "NetworkPolicy de builds : $(kubectl get netpol -n builds -o name | tr '\n' ' ')"
   n=$(kubectl get netpol -n builds -o name | { grep -x "networkpolicy.networking.k8s.io/$SONDE" || true; } | wc -l)
@@ -682,6 +688,43 @@ $(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-policy}
     || { echo "KO   Hubble : aucun flux de $USURPEE" >&2; ko=1; }
   echo "  capture -i any sur sc-build : $(syn_distincts "$T/usurpation.txt" "$USURPEE" 192.168.161.13.5000) SYN distinct(s) de $USURPEE vers Zot, \
 $(grep -cE "192\.168\.161\.13\.5000 > ${USURPEE//./\\.}\.[0-9]+: Flags \[S\.\]" "$T/usurpation.txt" || true) ligne(s) SYN-ACK en retour"
+
+  echo "## usurpation : autres sources (IP d'un pod témoin du nœud, CIDR d'un autre nœud, adresse externe)"
+  pod_reseau j7-reseau-voisin - - "sleep 300"
+  kubectl wait -n builds pod/j7-reseau-voisin --for=condition=Ready --timeout=120s >/dev/null
+  v=$(ip_pod j7-reseau-voisin)
+  n=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}' | grep -cxF "$HORS_CIDR" || true)
+  d=$(kubectl get ciliumendpoints -A -o json | jq --arg u "$HORS_CIDR" '[.items[].status.networking.addressing[]?.ipv4 | select(. == $u)] | length')
+  [ "$n" = 0 ] && [ "$d" = 0 ] && echo "OK   pod témoin $v sur $(kubectl get pod -n builds j7-reseau-voisin -o jsonpath='{.spec.nodeName}') ; $HORS_CIDR inutilisée" \
+    || { echo "KO   $HORS_CIDR en usage" >&2; exit 1; }
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  capture "$T/enp1s0.txt" 70 -i enp1s0 host "$EXTERNE" or host "$HORS_CIDR"
+  pod_reseau j7-reseau-sources kata privilegie "for a in $v $HORS_CIDR $EXTERNE; do
+  ip addr add \$a/32 dev eth0
+  for c in Zot:192.168.161.13:5000 Forgejo:192.168.161.13:3000; do
+    l=\${c%%:*}; r=\${c#*:}
+    if nc -s \$a -z -w 3 \${r%:*} \${r##*:} 2>/dev/null; then echo \"SOURCE|\$a|\$l|OUVERT\"; else echo \"SOURCE|\$a|\$l|FERME\"; fi
+  done
+  ip addr del \$a/32 dev eth0
+done
+echo FIN
+sleep 5"
+  pod_fini j7-reseau-sources
+  sed 's/^/  /' "$T/j7-reseau-sources.log"
+  wait
+  for a in "$v" "$HORS_CIDR" "$EXTERNE"; do
+    hubble_refus sc-build "$t0" --ip "$a" > "$T/hubble-source-$a.txt" || true   # le pod témoin dort : aucun flux à lui
+    s=$(grep "^SOURCE|$a|" "$T/j7-reseau-sources.log" | awk -F'|' '$4 == "OUVERT" {print $3}' | tr '\n' ' ')
+    n=$(grep -c "INVALID_SOURCE_IP" "$T/hubble-source-$a.txt" || true)
+    sed -n "1,4s/^/  Hubble ($a) : /p" "$T/hubble-source-$a.txt"
+    [ -z "$s" ] && [ "$n" -ge 1 ] && echo "OK   source $a : Zot et Forgejo refusés, $n flux INVALID_SOURCE_IP dans Hubble" \
+      || { echo "KO   source $a : ouverts « $s », $n flux INVALID_SOURCE_IP" >&2; ko=1; }
+  done
+  grep -E 'packets (captured|received)' "$T/enp1s0.txt" | sed 's/^/  tcpdump enp1s0 : /' || true
+  n=$(grep -c -E "IP ${EXTERNE//./\\.}\.[0-9]+ > " "$T/enp1s0.txt" || true)
+  [ "$n" = 0 ] && echo "OK   aucun paquet de $EXTERNE sur enp1s0 de sc-build : rien ne sort du nœud" \
+    || { echo "KO   $n paquet(s) de $EXTERNE sur enp1s0" >&2; ko=1; }
+  kubectl delete pod -n builds j7-reseau-voisin j7-reseau-sources --wait=false >/dev/null
 
   echo "## retrait"
   kubectl delete pod -n builds -l "app=$SONDE" --ignore-not-found --wait=true >/dev/null

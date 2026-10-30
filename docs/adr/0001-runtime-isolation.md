@@ -89,7 +89,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     - Sans `NET_ADMIN` (pods restreints, runc et Kata), l'usurpation est refusée.
   - **Sous Cilium 1.20.4** (option 1b, mesurée sur accord du propriétaire le 30/10/2026, cluster recréé et J1 à J7 rejoués, [journal](../../poc/bricks/08-trust-plane/resultats/kata-reseau.log)) :
     - **Fenêtre** : aucune, sous runc comme sous Kata. Le CNI attend la première régénération de l'endpoint, d'après le code.
-    - **Usurpation** : refusée, motif `INVALID_SOURCE_IP` dans Hubble, aucune réponse.
+    - **Usurpation** : refusée, motif `INVALID_SOURCE_IP` dans Hubble, aucune réponse. C'est vrai pour une adresse inutilisée du nœud, pour l'IP d'un autre pod du nœud, pour une adresse d'un autre nœud et pour une adresse externe, cette dernière n'apparaissant pas sur l'interface du nœud.
     - **Traces** : chaque refus est tracé par Hubble, avec son motif et sans plafond.
     - **Écarts au plan** : `policyCIDRMatchMode: nodes`, réglage bêta, est nécessaire parce que Zot et Forgejo tournent sur un nœud ; un refus étant une perte de paquet, les clients attendent leur délai ; le L7 est coupé.
   - **Conséquence** : sous kube-router, le contrôle de sortie de la zone build ne peut pas reposer sur cette NetworkPolicy dès que du code est root dans l'invité. De plus, une NetworkPolicy porte sur un pod et non sur une étape. La conception du test 6 est une décision du propriétaire avant J8.

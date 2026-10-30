@@ -752,8 +752,8 @@ Mesures, prédictions écrites avant :
 
 **Durée estimée** : une demi-journée d'adaptations, environ une heure de rejeu (1 784 s pour J1 à J6, plus J7), une demi-journée de mesures. Le budget de la brique reste loin du seuil de 11 pw.
 
-**Mesure de Cilium** (option 1b, plan accordé par le propriétaire le 30/10/2026). Fichiers : [`cilium.sh`](cilium.sh), [`cilium/valeurs.yaml`](cilium/valeurs.yaml). Journaux : [`cilium-telecharger.log`](resultats/cilium-telecharger.log), [`cilium-verifier.log`](resultats/cilium-verifier.log), [`cilium-appliquer.log`](resultats/cilium-appliquer.log), rejeu en cinq morceaux (`rejeu-j1-j7-cilium*.log`). Le cluster a été recréé de zéro avec Cilium 1.20.4 à la place de flannel et de kube-router, et J1 à J7 ont été rejoués : c'est aussi le premier rejeu complet avec J7. Prédictions écrites avant.
-- **Préalable sur l'hôte**, conforme : chart vérifié (témoin refusé), images vérifiées sur leur index (témoin refusé), archives OCI amd64 (245 et 36 Mo), HelmChart rendu.
+**Mesure de Cilium** (option 1b, plan accordé par le propriétaire le 30/10/2026). Les sections J2 à J6 et le bloc « Réseau des pods Kata » décrivent l'état sous kube-router : délai d'entrée, accès depuis le nœud, NFLOG. Le cluster actuel tourne sous Cilium. Fichiers : [`cilium.sh`](cilium.sh), [`cilium/valeurs.yaml`](cilium/valeurs.yaml). Journaux : [`cilium-telecharger.log`](resultats/cilium-telecharger.log), [`cilium-verifier.log`](resultats/cilium-verifier.log), [`cilium-appliquer.log`](resultats/cilium-appliquer.log), rejeu en cinq morceaux (`rejeu-j1-j7-cilium*.log`). Le cluster a été recréé de zéro avec Cilium 1.20.4 à la place de flannel et de kube-router, et J1 à J7 ont été rejoués : c'est aussi le premier rejeu complet avec J7. Prédictions écrites avant.
+- **Préalable sur l'hôte**, conforme : chart vérifié (témoin refusé), images vérifiées sur leur index (témoin refusé), archives OCI amd64 (245 et 36 Mo), HelmChart rendu. L'empreinte du HelmChart dans `cilium-telecharger.log` (`cc9d2315`) précède l'ajout de `policyCIDRMatchMode` ; celle en service (`95ce7a3f`) figure dans `cilium-appliquer.log`.
 - **J1, point d'arrêt** :
   - **Premier passage en échec**, archivé ([diagnostic](resultats/cilium-premier-passage-diagnostic.log)) : nœud `NotReady`, « cni plugin not initialized ». Avec `flannel-backend: none`, k3s n'écrit aucune section CNI dans la configuration de containerd, qui lit alors ses chemins par défaut. Les chemins de k3s, relevés sur le cluster flannel et passés au chart, étaient donc faux ; les défauts du chart conviennent.
   - **Second passage**, prédiction conforme :
@@ -770,6 +770,13 @@ Mesures, prédictions écrites avant :
 - **Résultats** :
   - **Fenêtre de démarrage : aucune.** En J6 (rattrapage), Zot n'est jamais joignable ; dans `kata.sh reseau`, pas une fois sur les 6 essais, runc et Kata ([journal](resultats/kata-reseau.log)). La prédiction, écrite d'après le code, est conforme : le CNI attend la première régénération de l'endpoint, labels du pod compris.
   - **Usurpation refusée** : avec `10.42.1.250`, Zot, SSH, l'API et le kubelet sont injoignables, sans aucune réponse. Hubble donne `INVALID_SOURCE_IP` pour les 15 SYN, et la capture ne montre aucun SYN-ACK. Témoin : avec l'IP du pod, Zot est refusé.
+  - **Autres sources usurpées**, toutes refusées. Ces essais ont été ajoutés après le premier passage sous Cilium, avec leur prédiction écrite avant. Ce sont les cas que `--netpol-default-deny` de kube-router amont ne couvrirait pas.
+    - **Sources essayées**, depuis le même pod privilégié :
+      - l'IP d'un pod témoin endormi de `sc-build`, dont la sortie vers Forgejo est permise ;
+      - une adresse inutilisée du sous-réseau de `sc-confiance` (`10.42.0.250`) ;
+      - une adresse externe de documentation (`203.0.113.10`).
+    - **Résultat** : pour chacune, Zot et Forgejo sont fermés, avec 6 flux `INVALID_SOURCE_IP` dans Hubble.
+    - **Preuve que rien ne sort** : aucun paquet de `203.0.113.10` sur `enp1s0` de `sc-build`. Cette adresse n'étant pas masquée, elle y serait visible si elle sortait.
   - **Trace du test 6** : Hubble donne chaque refus avec l'IP du pod, le port, le motif (`POLICY_DENIED`) et le sens, sans plafond. Chaque SYN refusé par la politique y figure deux fois au même instant ; la cause n'en est pas établie.
   - **Adresses de service** : l'API jointe par son adresse de service est autorisée, comme par l'adresse du nœud. Cilium traduit donc l'adresse de service avant d'appliquer la politique.
   - **Construction sans sortie** : même image `3a7ca1b1` et mêmes témoins. Sous Cilium, l'ancienne tâche échoue sur un délai DNS dépassé plutôt que sur un refus.
