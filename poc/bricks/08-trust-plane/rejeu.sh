@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6) : démontage, VM, k3s, stockage, OpenBao, Tekton,
 # horodatage, politique (test 5 rejoué sous politique entre declencheurs et porte, comme au premier passage ; porte avant
-# rattrapage, qui juge avec elle ; droits, qui lit l'audit du test 5 et du rattrapage ; posture), puis contrôle des
-# secrets dans les journaux. Téléchargements, CA et certificats restent en cache ; l'état
+# rattrapage, qui juge avec elle ; droits, qui lit l'audit du test 5 et du rattrapage ; posture), J7 en cours (Kata :
+# vérification, installation, essais ; cas d'admission rejoués avec la RuntimeClass kata), puis contrôle des
+# secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, non rejoué au 30/10/2026. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte.
 #
 # Usage (racine du dépôt) : mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
@@ -31,5 +32,7 @@ etape J5 mise run confiance:tsa -- image pki openbao deployer essais horodater c
 etape J6 mise run confiance:politique -- image installer parite taches admission chains declencheurs restreint horodatage
 etape "test 5 (J6)" env EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook
 etape "J6 (suite)" mise run confiance:politique -- porte rattrapage droits posture
+etape J7 mise run confiance:kata -- verifier installer essais
+etape "J7 (admission)" mise run confiance:politique -- admission
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

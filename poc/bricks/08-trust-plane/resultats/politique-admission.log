@@ -1,4 +1,4 @@
-# politique.sh admission, 2026-10-30T12:08:22Z
+# politique.sh admission, 2026-10-30T13:22:54Z
 ## politiques chargées (5 ValidatingPolicy, 17 validations)
 prête : tekton-references
 prête : pods-isolation
@@ -6,7 +6,7 @@ prête : zone-confiance
 prête : zone-build
 prête : stepactions-interdites
 ValidatingAdmissionPolicy natives générées par Kyverno : 0
-## 37 cas, CLI puis admission (dry-run serveur)
+## 38 cas, CLI puis admission (dry-run serveur)
 OK   tr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
 OK   tr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   tr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
@@ -25,7 +25,8 @@ OK   pr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   pr-taskrunspecs-compte : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   pod-restreint : CLI PASS (code 0), admission PASS (attendu PASS)
 OK   pod-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
-OK   pod-privilegie-kata : CLI PASS (code 0) (attendu PASS ; admission non évaluée : conteneur privilégié sous Kata (RuntimeClass de J7, absente : CLI seul))
+OK   pod-privilegie-kata : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pod-privilegie-crun : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   pod-init-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   pod-hostpath : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   pod-hostnetwork : CLI FAIL (code 1), admission FAIL (attendu FAIL)
@@ -45,16 +46,16 @@ OK   build-nodename-confiance : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   build-jeton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 OK   stepaction : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 ## synthèse
-parité CLI / admission : 36 cas sur 36
+parité CLI / admission : 38 cas sur 38
 conformes au résultat attendu : tous
-  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 1 cas
+  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 2 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-1e13e32f" : 3 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-e33a6329" : 6 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-e94d8fa6" : 1 cas
-  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" : 6 cas
-  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 13 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" : 7 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 12 cas
 ## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)
-  6 événements, politique pods-isolation
+  7 événements, politique pods-isolation
   1 événements, politique stepactions-interdites
   14 événements, politique tekton-references
   3 événements, politique zone-build

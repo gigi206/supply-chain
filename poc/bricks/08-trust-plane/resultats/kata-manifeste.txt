@@ -1,0 +1,25 @@
+8722a3e4c8ef0feb2e7a669f5f854c72d5d6390b25598f9745dc95e5ffe51dce  opt/kata/VERSION
+6c0dab34e6b191ccf933c57c3a97f166b50250b616319a706fc492b78c20b3d6  opt/kata/bin/qemu-system-x86_64
+15b2e72a78cc08a9bd8a6943e89fb69c88cb3cbeb63069efceade835342ac7d4  opt/kata/libexec/virtiofsd
+c9a43977c61ff649c8233efd9ce6cf28e0bf777523071e838b8ebc3362f57016  opt/kata/runtime-rs/bin/containerd-shim-kata-v2
+915b45824b6e13c28944b7a0ee9f923398debbd136507303ec09c3d3af0eed3c  opt/kata/share/defaults/kata-containers/runtime-rs/configuration-qemu-runtime-rs.toml
+6770db2cca5710593f27c9ac5e1d9d7aab836422695a5e5c4807496a92a0f24d  opt/kata/share/kata-containers/kata-ubuntu-resolute.image
+f87d8359035cb7557b16a319e6431ea09b183e62268aef436bf8dc6530d786b6  opt/kata/share/kata-containers/vmlinux-6.18.56-208
+ae6f6aa973aaccc143f57aa960fb035fd9de4daee4ad0cd713322f8c259e7650  opt/kata/share/kata-qemu/qemu/bios-256k.bin
+d226177d125aaf1b91e507738f4e9a0ade9474169b211751f78be08008cb394c  opt/kata/share/kata-qemu/qemu/bios-microvm.bin
+3dfd946d0c03ab0e022f84f10c3eb5f1dd507761f73e7d8067511ba35a10f776  opt/kata/share/kata-qemu/qemu/bios.bin
+1ddeaed2e7d2e9ecb960bdfc1b8ee45387aff70d056d985d145949af3951657c  opt/kata/share/kata-qemu/qemu/edk2-licenses.txt
+33090cc07675baa5190d9f1e84bf5176b33bcbfa9bacac522961150cdb6dbb2a  opt/kata/share/kata-qemu/qemu/edk2-x86_64-code.fd
+32807682a9e5c0e2d192ecb6077941d4be8bcfa6b9cd6e60830c3a9f48c0555a  opt/kata/share/kata-qemu/qemu/edk2-x86_64-secure-code.fd
+26be36901db7f8181c306cc62bd74891d8646528965a78e40cceadba5dd7c8e7  opt/kata/share/kata-qemu/qemu/efi-virtio.rom
+2e2d12d24d1a5bd8a938ddbb7da20fe47b7ec275f68eb5d3eec1f403177b4f69  opt/kata/share/kata-qemu/qemu/firmware/50-edk2-i386-secure.json
+52d6289981d221197b24a6f58e0381e129118f2021f1834dba1bc0052528fc62  opt/kata/share/kata-qemu/qemu/firmware/50-edk2-x86_64-secure.json
+b4ef39fdf435f33145aefb12953b0a72f7dd5d4e752e914b70d7ce819c545936  opt/kata/share/kata-qemu/qemu/firmware/60-edk2-x86_64.json
+cdf057a71b07e3b52b19cbe210bdefa59250d01a9810b960f7fe1f98eed95a27  opt/kata/share/kata-qemu/qemu/kvmvapic.bin
+9c49e255340c78fc12e54ed043462bca02fb7fca29b7cfab62ff88a5344b6950  opt/kata/share/kata-qemu/qemu/linuxboot_dma.bin
+46def003b1c413cc4a5880d858ca54456ad6978d5fdb6e1b7d086b2905a66df0  opt/kata/share/kata-qemu/qemu/multiboot_dma.bin
+918ff03a118615c2f4611a5df2d9496aabe099b5cfaaf69e544ebf973305d59d  opt/kata/share/kata-qemu/qemu/pvh.bin
+9b9dfc6c25740d6225625570d71cab6805cc9216e68c8932e343266daaeb8c4b  opt/kata/share/kata-qemu/qemu/qboot.rom
+93f79a2b6e0f97bc7b7c75ded89a3c4c7657af37c087cf067470771e0affda9c  opt/kata/share/kata-qemu/qemu/qemu-nsis.bmp
+opt/kata/share/kata-containers/kata-containers.img -> kata-ubuntu-resolute.image
+opt/kata/share/kata-containers/vmlinux.container -> vmlinux-6.18.56-208

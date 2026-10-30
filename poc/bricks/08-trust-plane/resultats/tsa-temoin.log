@@ -1,12 +1,12 @@
-# tsa.sh temoin, 2026-10-30T12:24:34Z
+# tsa.sh temoin, 2026-10-30T13:24:17Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-10-30 12:24:36 +0000 UTC
+Artifact timestamped at 2026-10-30 13:24:19 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 12:24:36 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x3710D0E0EA368BD2260F0B3B6607F837EC93FF27 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 13:24:19 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x4DEA47DC26915C9FA8F0CB19A513329686FF99C1 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)

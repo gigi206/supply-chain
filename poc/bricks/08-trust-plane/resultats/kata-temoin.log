@@ -1,0 +1,14 @@
+# kata.sh temoin, 2026-10-30T13:25:07Z
+OK   runtime kata chargé par containerd sur sc-build
+### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 5 s après la création
+     noyau : 6.18.56
+     vCPU : 1
+     MemTotal:        1969780 kB
+       x86-64-v4
+       x86-64-v3 (supported, searched)
+       x86-64-v2 (supported, searched)
+     drapeaux avx512 : 0
+     CapEff:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	0
+OK   pod Kata : noyau de l'invité 6.18.56

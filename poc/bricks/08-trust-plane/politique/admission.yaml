@@ -86,7 +86,7 @@ spec:
     expression: "request.operation == 'CREATE' || object.spec != oldObject.spec"
   variables:
   - name: kata
-    expression: "has(object.spec.runtimeClassName) && object.spec.runtimeClassName in ['kata', 'kata-qemu']"
+    expression: "has(object.spec.runtimeClassName) && object.spec.runtimeClassName == 'kata'"   # J7 : seule RuntimeClass de Kata (kata/runtimeclass.yaml)
   - name: sc
     expression: >-
       object.spec.containers.map(c, has(c.securityContext) ? c.securityContext : {})

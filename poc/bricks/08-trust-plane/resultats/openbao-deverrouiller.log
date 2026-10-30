@@ -1,3 +1,3 @@
-# openbao.sh deverrouiller, 2026-10-30T12:24:28Z
+# openbao.sh deverrouiller, 2026-10-30T13:24:10Z
 {"sealed":false,"t":1,"n":1,"progress":0}
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}

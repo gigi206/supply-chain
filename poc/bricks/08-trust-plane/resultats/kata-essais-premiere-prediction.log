@@ -1,0 +1,60 @@
+# kata.sh essais, 2026-10-30T13:20:50Z
+## prédiction
+runc : noyau de sc-build (6.12.113+deb13-amd64), seccomp filtré (Seccomp: 2), x86-64-v3 pris en charge, v4 non, aucun drapeau avx512
+kata : noyau de l'invité 6.18.56, 1 vCPU, MemTotal sous 2048 Mio, Seccomp: 0 (disable_guest_seccomp), x86-64-v3 pris en charge, v4 non
+kata avec l'annotation default_memory=4096 : même mémoire que kata (annotation non transmise par containerd)
+kata privilégié dans builds : refusé par Pod Security (enforce restricted), avant Kyverno
+## mesures
+### j7-runc (runtimeClassName -, annotation -) : nœud sc-build, conteneur lancé 0 s après la création
+     noyau : 6.12.113+deb13-amd64
+     vCPU : 6
+     MemTotal:       10189560 kB
+       x86-64-v4
+       x86-64-v3 (supported, searched)
+       x86-64-v2 (supported, searched)
+     drapeaux avx512 : 0
+     CapEff:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	2
+### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 4 s après la création
+     noyau : 6.18.56
+     vCPU : 1
+     MemTotal:        1969780 kB
+       x86-64-v4
+       x86-64-v3 (supported, searched)
+       x86-64-v2 (supported, searched)
+     drapeaux avx512 : 0
+     CapEff:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	0
+### j7-kata-memoire (runtimeClassName kata, annotation io.katacontainers.config.hypervisor.default_memory=4096) : nœud sc-build, conteneur lancé 3 s après la création
+     noyau : 6.18.56
+     vCPU : 1
+     MemTotal:        1969780 kB
+       x86-64-v4
+       x86-64-v3 (supported, searched)
+       x86-64-v2 (supported, searched)
+     drapeaux avx512 : 0
+     CapEff:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	0
+## comparaison
+OK   runc : noyau de sc-build, seccomp filtré
+OK   j7-runc : x86-64-v3 pris en charge, v4 non, aucun drapeau avx512
+OK   j7-kata : x86-64-v3 pris en charge, v4 non, aucun drapeau avx512
+OK   kata : noyau de l'invité 6.18.56 (sc-build : 6.12.113+deb13-amd64)
+OK   kata : 1 vCPU, MemTotal 1969780 kB (défaut de 2048 Mio)
+OK   annotation default_memory=4096 sans effet : MemTotal 1969780 kB (pod_annotations vide)
+CONSTAT kata : Seccomp: 0 dans l'invité malgré seccompProfile RuntimeDefault (disable_guest_seccomp = true) ; le pod est conforme à restricted sans filtre seccomp effectif
+NoNewPrivs et CapEff : runc 1 0000000000000000, kata 1 0000000000000000
+## pod Kata privilégié dans builds (dry-run serveur)
+OK   pod Kata privilégié dans builds : refusé (violates PodSecurity "restricted:latest")
+## qui peut créer, modifier ou supprimer une RuntimeClass (pods-isolation reconnaît Kata au nom de la RuntimeClass)
+RuntimeClasses : crun=crun kata=kata lunatic=lunatic nvidia=nvidia nvidia-experimental=nvidia-experimental slight=slight spin=spin wasmedge=wasmedge wasmer=wasmer wasmtime=wasmtime wws=wws 
+prédiction : parmi les comptes de service, le ramasse-miettes de Kubernetes seul (update, patch, delete) ; l'opérateur : rien
+72 comptes de service et l'opérateur examinés ; accordés :
+  kube-system:generic-garbage-collector delete
+  kube-system:generic-garbage-collector patch
+  kube-system:generic-garbage-collector update
+  kube-system:namespace-controller delete
+CONSTAT  liste différente de la prédiction (ci-dessus)

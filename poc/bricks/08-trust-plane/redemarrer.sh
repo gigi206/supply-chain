@@ -6,6 +6,7 @@
 #   J6 : Kyverno prêt et répondant avant OpenBao, le TSA et Tekton (webhooks en failurePolicy Fail : un pod créé avant
 #   qu'il réponde est refusé ; sonde : refus attendu de la règle zone-confiance, dry-run serveur) ; Tekton et
 #   EventListener prêts ; un passage réussi de chaque CronJob (horodatage, rattrapage) créé après le retour du TSA.
+#   J7 : runtime kata rechargé par containerd sur sc-build, pod Kata lancé dans l'invité (kata.sh temoin).
 #
 # Usage (racine du dépôt) : mise run confiance:redemarrer   (journal : resultats/redemarrage-vm.log)
 set -euo pipefail
@@ -129,4 +130,6 @@ for ns in tekton-pipelines tekton-pipelines-resolvers tekton-chains declencheurs
 echo "## CronJobs (J6) : un passage réussi de chacun, créé après le retour du TSA ($t)"
 passage_ok horodatage horodatage "$t"
 passage_ok declencheurs rattrapage "$t"
+echo "## Kata (J7)"
+mise run confiance:kata -- temoin
 kubectl get pods -A -o wide

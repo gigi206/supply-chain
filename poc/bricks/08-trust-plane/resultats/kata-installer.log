@@ -1,0 +1,15 @@
+# kata.sh installer, 2026-10-30T13:18:41Z
+## archive kata-static-4.3.1-amd64.tar.zst
+OK   sha256 1463a2b86845f4d3d8e87f2f764ec59856fc0fee3520967a79ade32762be2e97, revérifié avant l'extraction
+## fichiers lus par qemu-runtime-rs, extraits sur l'hôte (liens conservés)
+manifeste (resultats/kata-manifeste.txt) : 23 fichiers, 2 liens, 394.2 Mo
+## /opt/kata sur sc-build
+OK   /opt/kata de sc-build conforme au manifeste (sha256 de chaque fichier, liens, aucun fichier en trop) ; root:root 755 root:root 755
+## containerd : fichier d'appoint /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d/kata.toml
+## redémarrage de k3s-agent sur sc-build (containerd embarqué)
+rattrapage suspendu ; aucun PipelineRun actif, aucun pod en cours sur sc-build
+k3s-agent : active ; sc-build Ready ; rattrapage réactivé
+runtime kata chargé par containerd : {"runtimeType":"io.containerd.kata.v2","runtimePath":"/opt/kata/runtime-rs/bin/containerd-shim-kata-v2","privileged_without_host_devices":true,"PodAnnotations":[],"ContainerAnnotations":["io.kubernetes.container.terminationMessage*"],"ConfigPath":"/opt/kata/share/defaults/kata-containers/runtime-rs/configuration-qemu-runtime-rs.toml"}
+OK   section kata conforme au fichier d'appoint (aucune annotation de pod transmise)
+## RuntimeClass kata
+{"handler":"kata","overhead":{"podFixed":{"cpu":"250m","memory":"320Mi"}},"scheduling":{"nodeSelector":{"zone":"build"},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}]}}

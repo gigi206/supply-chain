@@ -10,6 +10,7 @@ import pathlib
 import sys
 
 out, bundle, busybox = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+kata = sys.argv[4] if len(sys.argv) > 4 else "non"   # RuntimeClass kata présente (J7) : oui | non
 out.mkdir(parents=True, exist_ok=True)
 lignes = []
 
@@ -87,8 +88,10 @@ cas("pr-taskrunspecs-compte", "FAIL", PR, "taskRunSpecs : autre compte de servic
 # Test 4
 cas("pod-restreint", "PASS", POD, "pod restreint (Pod Security restricted)")
 cas("pod-privilegie", "FAIL", POD, "conteneur privilégié hors Kata", sc(privileged=True, allowPrivilegeEscalation=True))
-cas("pod-privilegie-kata", "PASS", POD, "conteneur privilégié sous Kata (RuntimeClass de J7, absente : CLI seul)",
-    lambda o: (sc(privileged=True, allowPrivilegeEscalation=True)(o), o["spec"].update(runtimeClassName="kata-qemu")), admission="non")
+cas("pod-privilegie-kata", "PASS", POD, "conteneur privilégié sous Kata (RuntimeClass kata" + (")" if kata == "oui" else ", absente avant J7 : CLI seul)"),
+    lambda o: (sc(privileged=True, allowPrivilegeEscalation=True)(o), o["spec"].update(runtimeClassName="kata")), admission=kata)
+cas("pod-privilegie-crun", "FAIL", POD, "conteneur privilégié sous une autre RuntimeClass (crun, créée par k3s)",
+    lambda o: (sc(privileged=True, allowPrivilegeEscalation=True)(o), o["spec"].update(runtimeClassName="crun")))
 cas("pod-init-privilegie", "FAIL", POD, "conteneur d'initialisation privilégié",
     lambda o: o["spec"].update(initContainers=[{"name": "i", "image": busybox, "securityContext": dict(RESTREINT, privileged=True, allowPrivilegeEscalation=True)}]))
 cas("pod-hostpath", "FAIL", POD, "volume hostPath",

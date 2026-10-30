@@ -411,7 +411,8 @@ etape_admission() {
   d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
   rm -rf "$T/adm"
   python3 -I "$here/politique/cas-admission.py" "$T/adm" "$REG/tekton/tasks/essai-confiance@$d" \
-    "$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")"
+    "$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")" \
+    "$(kubectl get runtimeclass kata >/dev/null 2>&1 && echo oui || echo non)"   # avant J7, cas Kata en CLI seul
   echo "## politiques chargées ($(grep -c '^kind: ValidatingPolicy' "$here/politique/admission.yaml") ValidatingPolicy, $(grep -c '^  - expression:' "$here/politique/admission.yaml") validations)"
   for n in $(awk '/^kind: ValidatingPolicy/ {k = 1} k && /^  name:/ {print $2; k = 0}' "$here/politique/admission.yaml"); do
     charger "$here/politique/admission.yaml" "$n" validatingpolicy
