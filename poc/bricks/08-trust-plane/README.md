@@ -334,9 +334,9 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 **Pour J6** : les cinq résolveurs sont actifs (`bundles`, `cluster`, `git`, `http`, `hub`) et peuvent chercher des définitions de tâches hors de la plateforme ; l'essai utilise un `taskSpec` en ligne, que le test 2 doit refuser.
 
-## Préparation de J8 (30/10/2026, plan à valider par le propriétaire)
+## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
 
-Rien n'est lancé : ce bloc prépare J8 et les décisions qui le précèdent. J7 reste « en cours » tant que le propriétaire n'a pas tranché les deux points qui lui reviennent.
+**Plan validé par le propriétaire le 30/10/2026** : canal (c) des `internalParameters`, conception du test 6, `dsse` gardé avec le contrôle qui compare les exécutions aux enveloppes, mesure de la réserve C. Le changement de configuration de Zot (décision 3) sera demandé à part, au moment d'y arriver. J7 reste « en cours » tant que la bascule du gabarit n'est pas tranchée.
 
 **Contrôle de fin de J7 : atteint**, avec des preuves rejouées sous Cilium.
 
@@ -346,7 +346,7 @@ Rien n'est lancé : ce bloc prépare J8 et les décisions qui le précèdent. J7
 | Pod privilégié hors Kata refusé | [`kata-exemption.log`](resultats/kata-exemption.log) : pod runc privilégié refusé par Pod Security `restricted`, pod Kata privilégié admis. [`construction-construire.log`](resultats/construction-construire.log) : le PipelineRun sans `runtimeClassName` est refusé (`PodAdmissionFailed`) |
 | PipelineRun de sample-app depuis Forgejo, provenance signée vérifiée par cosign, digest comparé à `3a7ca1b1` | [`construction-construire.log`](resultats/construction-construire.log) : image `3a7ca1b1`. [`construction-provenance.log`](resultats/construction-provenance.log) : 2 enveloppes valides, une autre clé refusée |
 
-Restent au propriétaire : le canal des `internalParameters`, qu'il avait reporté à J7, et la bascule du gabarit en service vers `sample-app`.
+Reste au propriétaire : la bascule du gabarit en service vers `sample-app`. Le canal des `internalParameters` est tranché : option (c), retenue à la validation de ce plan.
 
 **Les 8 tests dans l'état actuel** (relus dans ce README et dans les journaux cités) :
 
@@ -883,7 +883,7 @@ Mesures, prédictions écrites avant :
 
 **Suites de J7** :
 - ~~fenêtre de kube-router et trace NFLOG, sur un pod Kata~~ : mesurées (voir « Réseau des pods Kata ») ; ouvertes à la place : le contrôle de sortie de la zone build face à l'usurpation d'adresse et la conception du test 6, trois options soumises au propriétaire (voir « Contrôle de sortie de la zone build »). L'option 3 est faite (voir « Construction sans sortie réseau »). Pour l'option 1, Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026, « À surveiller » tous deux. Cilium a ensuite été mesuré sur accord du propriétaire (voir « Mesure de Cilium ») : aucune fenêtre, usurpation refusée, y compris après un redémarrage des VM. **Cilium gardé** (décision du propriétaire du 30/10/2026). Reste à concevoir le test 6 sous Cilium : trace par Hubble, à proposer en J8 ;
-- canal des `internalParameters`, avec la mesure de la construction : `runtimeClassName` signé dans la provenance (option (c)) ;
+- ~~canal des `internalParameters`~~ : option (c), retenue par le propriétaire le 30/10/2026 (voir « Préparation de J8 ») ;
 - bascule du gabarit en service vers la pipeline `sample-app` (décision du propriétaire) ;
 - ~~rejeu complet avec J7~~ : fait sous Cilium le 30/10/2026, en cinq morceaux et avec quatre ajustements (voir « Mesure de Cilium ») ; pas encore rejoué d'un seul tenant.
 
@@ -1202,7 +1202,7 @@ Mesuré :
 - **Qui peut écrire ces labels.** À la création : l'EventListener, le rattrapage et les administrateurs, dans `builds`. Ensuite, ni l'EventListener, ni l'opérateur, ni les comptes `build`, `horodatage`, `porte` et `rattrapage` (14 vérifications ajoutées à la matrice, 89 sur 89). Parmi les **72 comptes de service du cluster**, trois seulement peuvent modifier un PipelineRun de `builds` : les contrôleurs de Pipelines et de Chains, et le ramasse-miettes de Kubernetes (`kube-system:generic-garbage-collector`, qui gère propriétaires et finaliseurs). S'y ajoutent les administrateurs du cluster. Ni Kyverno, ni les résolveurs, ni Triggers. La première prédiction, tirée de la matrice, avait oublié le ramasse-miettes ([`politique-droits-premiere-prediction.log`](resultats/politique-droits-premiere-prediction.log)). L'admission ne juge pas une modification qui ne touche que les métadonnées (`matchConditions` de `tekton-references`, lu). Chains lit les labels à la signature, après l'exécution.
 - **Constat** : dans le TaskRun signé, l'annotation `tekton.dev/signature` est celle de la **pipeline** en service (`MEUCIA+mcZrw…`, lue dans son bundle), pas celle de la tâche (`MEUCIGnBv80D…`). Les annotations du PipelineRun, reçues de la Pipeline, sont propagées au TaskRun et priment sur celles de la Task. Aucune politique ne la lit, et `trusted_task` épingle la tâche par digest ; un vérificateur qui la lirait attribuerait à la tâche la signature de la pipeline.
 
-**Conséquence pour le doc 02 §3** : `hermetic`, `isolation` et `cpuModel` ne peuvent pas être inscrits « par la configuration Chains ». Le seul canal vers `internalParameters` est un label ou une annotation du PipelineRun, déclaration de son créateur ou de la Pipeline signée, que Chains signe sans la vérifier. **Décision du propriétaire (30/10/2026) : choix reporté à J7**, une fois `runtimeClassName`, réseau et nœud mesurés sous Kata ; aucune valeur de plateforme n'est inscrite d'ici là. Options présentées, avec ce que chacune couvre :
+**Conséquence pour le doc 02 §3** : `hermetic`, `isolation` et `cpuModel` ne peuvent pas être inscrits « par la configuration Chains ». Le seul canal vers `internalParameters` est un label ou une annotation du PipelineRun, déclaration de son créateur ou de la Pipeline signée, que Chains signe sans la vérifier. **Décision du propriétaire (30/10/2026) : choix reporté à J7**, une fois `runtimeClassName`, réseau et nœud mesurés sous Kata ; aucune valeur de plateforme n'est inscrite d'ici là. **Puis option (c) retenue le 30/10/2026**, à la validation du plan de J8. Options présentées, avec ce que chacune couvre :
 - (a) labels posés par les créateurs de confiance (gabarit de `declencheurs`, rattrapage) : les trois valeurs, comme déclarations. Leur vérité repose sur des règles Kyverno à écrire : labels exigés à la création, cohérence avec le gabarit de pod, modification refusée sauf aux contrôleurs (la règle actuelle ignore les changements de métadonnées). Après la création, les contrôleurs de Pipelines et de Chains, le ramasse-miettes et les administrateurs peuvent les changer ;
 - (b) labels de la Pipeline signée, le PipelineRun n'ayant pas le droit de poser ces clés (règle Kyverno) : les trois valeurs, comme déclarations signées par la plateforme, mais une valeur par pipeline, pas par exécution ; même fenêtre de modification ;
 - (c) rien dans `internalParameters`, la porte juge des faits du TaskRun signé : `isolation` par `runtimeClassName`, seulement s'il est écrit dans la spec (pas s'il vient d'un `default-pod-template` ou d'une mutation) ; `hermetic` et `cpuModel` ne sont pas des champs du pod et demandent une autre réponse (`cpuModel` par un `nodeSelector` du gabarit, à mesurer). Le doc 02 et l'ADR 0001 changeraient.
