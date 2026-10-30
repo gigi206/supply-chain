@@ -1,0 +1,41 @@
+# Constat de J6 (30/10/2026) : la suppression au premier plan d'un PipelineRun signé par Chains v0.29.9 ne bloque pas sur ses dépendants
+# Contexte : second rejeu de J1 à J6 (rejeu-j1-j6-ecart-2.log), test 5 sous politique arrêté à la lecture de la provenance de A :
+# sample-app-6391fd43… recréé par l'EventListener à 11:46:06.819, startTime de l'ancien (11:32:28), aucun TaskRun enfant (repris).
+## audit de l'API pendant la purge du test 5 (écritures sur sample-app-6391fd43…, hors événements)
+11:46:06.163 delete pipelineruns  system:admin (kubectl delete --cascade=foreground --all --wait=true)
+11:46:06.186 patch  pipelineruns  tekton-chains-controller ?fieldManager=tekton-chains-controller/finalizers&force=false (application côté serveur)
+11:46:06.819 create pipelineruns  declencheurs:el-forgejo 201 (le nom était libre : l'ancien PipelineRun avait disparu)
+11:46:07.308 delete taskruns sample-app-6391fd43…-publier  kube-system:generic-garbage-collector (après la recréation)
+aucune écriture du ramasse-miettes sur ce PipelineRun (il patche les propriétaires pour retirer foregroundDeletion : patch pipelineruns j6-pipeline-modifiee à 11:46:06.136)
+## expérience avec témoin : une ConfigMap dépendante retenue par une finalisation poc.test/retenir (blockOwnerDeletion: true), propriétaire supprimé au premier plan
+  ## propriétaire configmap/proprietaire-temoin, finalisations : 
+  configmap/retenue-proprietaire-temoin
+  configmap "proprietaire-temoin" deleted from builds namespace
+  après 3 s : propriétaire [2026-10-30T11:51:16Z ["foregroundDeletion"]]
+               dépendante [2026-10-30T11:51:16Z ["poc.test/retenir"]]
+  dépendante libérée, 2 s après : propriétaire [Error from server (NotFound): configmaps "proprietaire-temoin" not found]
+  ## propriétaire pipelinerun/sample-app-6391fd437f26696847041be3226bbbf633f55a2f, finalisations : ["chains.tekton.dev/pipelinerun"]
+  configmap/retenue-sample-app-6391fd437
+  pipelinerun.tekton.dev "sample-app-6391fd437f26696847041be3226bbbf633f55a2f" deleted from builds namespace
+  après 3 s : propriétaire [Error from server (NotFound): pipelineruns.tekton.dev "sample-app-6391fd437f26696847041be3226bbbf633]
+               dépendante [2026-10-30T11:51:21Z ["poc.test/retenir"]]
+  dépendante libérée, 2 s après : propriétaire [Error from server (NotFound): pipelineruns.tekton.dev "sample-app-6391fd437f26696847041be3226bbbf633]
+## audit de l'expérience
+  11:51:15.803 create configmaps proprietaire-temoin system:admin 201 ?fieldManager=kubectl-create&fieldValidation=Strict
+  11:51:15.982 create configmaps retenue-proprietaire-temoin system:admin 201 ?fieldManager=kubectl-create&fieldValidation=Strict
+  11:51:16.033 delete configmaps proprietaire-temoin system:admin 200 
+  11:51:16.037 delete configmaps retenue-proprietaire-temoin kube-system:generic-garbage-collector 200 
+  11:51:16.039 delete configmaps retenue-proprietaire-temoin kube-system:generic-garbage-collector 200 
+  11:51:19.184 patch configmaps retenue-proprietaire-temoin system:admin 200 ?fieldManager=kubectl-patch
+  11:51:19.187 patch configmaps proprietaire-temoin kube-system:generic-garbage-collector 200 
+  11:51:21.407 create configmaps retenue-sample-app-6391fd437 system:admin 201 ?fieldManager=kubectl-create&fieldValidation=Strict
+  11:51:21.458 delete pipelineruns sample-app-6391fd437f2669684 system:admin 200 
+  11:51:21.465 delete configmaps retenue-sample-app-6391fd437 kube-system:generic-garbage-collector 200 
+  11:51:21.469 patch pipelineruns sample-app-6391fd437f2669684 tekton-chains:tekton-chains-controller 200 ?fieldManager=tekton-chains-controller%2Ffinalizers&force=false
+  11:51:21.471 delete configmaps retenue-sample-app-6391fd437 kube-system:generic-garbage-collector 200 
+  11:51:24.612 patch configmaps retenue-sample-app-6391fd437 system:admin 200 ?fieldManager=kubectl-patch
+## conclusion
+témoin : le ramasse-miettes retire foregroundDeletion du propriétaire 3 ms après la libération de la dépendante (19.184 → 19.187).
+PipelineRun : seule écriture entre la suppression (21.458) et la disparition, le patch d'application côté serveur de Chains sur ses finalisations
+(21.469) ; le PipelineRun disparaît alors que sa dépendante bloquante existe encore (libérée à 24.612). Correctif : purger_pr (commun.sh)
+supprime les TaskRuns par leur label tekton.dev/pipelineRun et les attend disparus ; non_repris (tekton.sh) détecte une reprise.

@@ -313,7 +313,7 @@ pipelinerun() { # nom bundle commit : PipelineRun du gabarit de declencheurs.yam
     | sed -e 's/^    //' -e 's/^  - apiVersion/apiVersion/' -e "s#name: sample-app-\$(tt.params.commit)#name: $n#" \
       -e "s#value: \$(tt.params.commit)#value: '$3'#" -e 's#value: \$(tt.params.depot)#value: https://sc-stockage.poc.test:3000/workspace/sample-app.git#' \
       -e "s#value: $REG/tekton/pipelines/sample-app-essai@.*#value: $2#" > "$T/pr-$n.yaml"
-  kubectl delete pipelinerun -n builds --cascade=foreground "$n" --ignore-not-found --wait=true >/dev/null
+  purger_pr "$n"
   creer "$T/pr-$n.yaml" || return 0
   issue pipelinerun "$n"
 }
@@ -550,7 +550,7 @@ pr_gabarit() { # nom pipeline : PipelineRun du gabarit en service dans declenche
     --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n
       | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b else . end)
       | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)' > "$T/pr-$1.json"
-  kubectl delete pipelinerun -n builds --cascade=foreground "$1" --ignore-not-found --wait=true >/dev/null
+  purger_pr "$1"
   creer "$T/pr-$1.json" || return 0
   issue pipelinerun "$1"
 }
@@ -875,7 +875,7 @@ etape_horodatage() {
     and (.object | test("^/v2/builds/essai-webhook/manifests/sha256-.*[.]att$"))) | .time' | tail -1)
   echo "builds/essai-webhook : $e0 → $e1 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : ${w:-absente}"
   [ "$e1" -gt "$e0" ] && [ -n "$w" ] || { echo "KO   aucune nouvelle enveloppe de Chains" >&2; exit 1; }
-  kubectl delete pipelinerun -n builds --cascade=foreground j6-horodatage --wait=true >/dev/null
+  purger_pr j6-horodatage
   n=$(kubectl get pipelineruns,taskruns -n builds -l tekton.dev/pipelineRun=j6-horodatage -o name | wc -l)
   [ "$n" = 0 ] && ! kubectl get pipelinerun -n builds j6-horodatage >/dev/null 2>&1 \
     && echo "PipelineRun j6-horodatage et son TaskRun supprimés de l'API avant le passage (seul Zot garde la trace)" \
@@ -1012,7 +1012,7 @@ etape_rattrapage() {
   kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null 2>&1 || true
   kubectl scale deploy -n declencheurs el-forgejo --replicas=1 >/dev/null
   [ "$(tete)" = "$TETE_J2" ] || { git_forgejo push -q --force "$FORGEJO_HOTE/$SAMPLE_APP.git" "$TETE_J2:refs/heads/main"; tete_servie "$TETE_J2"; }
-  kubectl delete pipelinerun -n builds --cascade=foreground "sample-app-$c1" "sample-app-$c2" --ignore-not-found --wait=true >/dev/null
+  purger_pr "sample-app-$c1" "sample-app-$c2"
   if kubectl get pipelinerun -n builds "sample-app-$TETE_J2" >/dev/null 2>&1; then
     kubectl get pipelinerun -n builds "sample-app-$TETE_J2" -o json | jq -r '"\(.metadata.name) : créé \(.metadata.creationTimestamp), signé=\(.metadata.annotations["chains.tekton.dev/signed"])"'
     d=PRESENT

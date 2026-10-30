@@ -100,6 +100,22 @@ EOF
 }
 
 EL_NS=${EL_NS:-builds}   # espace de l'EventListener forgejo : builds en J4, declencheurs depuis J6
+purger_pr() { # --all | nom… : PipelineRuns de builds supprimés, puis leurs TaskRuns (label tekton.dev/pipelineRun),
+  # attendus disparus. La suppression au premier plan ne suffit pas : Chains v0.29.9 retire sa finalisation par
+  # application côté serveur, et le PipelineRun disparaît aussitôt, avant ses TaskRuns (foregroundDeletion perdue, mesuré
+  # en J6). Recréé sous le même nom, il reprendrait un TaskRun encore présent (Pipelines v1.15.5 le cherche par nom).
+  local n
+  if [ "$1" = --all ]; then
+    kubectl delete pipelinerun -n builds --all --wait=true >/dev/null
+    kubectl delete taskrun -n builds -l tekton.dev/pipelineRun --ignore-not-found --wait=true >/dev/null
+  else
+    for n in "$@"; do
+      kubectl delete pipelinerun -n builds "$n" --ignore-not-found --wait=true >/dev/null
+      kubectl delete taskrun -n builds -l "tekton.dev/pipelineRun=$n" --ignore-not-found --wait=true >/dev/null
+    done
+  fi
+}
+
 audit_api() { # motif (chaîne fixe, sans espace ni guillemet) : lignes de l'audit de l'API qui la contiennent, fichiers tournés
   # compris (audit-log-maxsize=100 : audit-<horodatage>.log par tranche de 100 Mo, puis audit.log), dans l'ordre chronologique
   sur sc-confiance "sudo sh -c 'grep -hF -- $1 \$(ls -1 /var/lib/rancher/k3s/server/logs/audit*.log | LC_ALL=C sort) || true'"

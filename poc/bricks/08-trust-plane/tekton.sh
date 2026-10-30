@@ -239,6 +239,13 @@ etape_webhook() {
   brancher_forgejo
 }
 
+non_repris() { # commit : le TaskRun publier de sample-app-<commit> appartient à ce PipelineRun (pas d'adoption après purge)
+  local u
+  u=$(kubectl get pipelinerun -n builds "sample-app-$1" -o jsonpath='{.metadata.uid}')
+  [ "$(kubectl get taskrun -n builds "sample-app-$1-publier" -o jsonpath='{.metadata.ownerReferences[0].uid}' 2>/dev/null)" = "$u" ] \
+    && echo "OK   TaskRun sample-app-$1-publier créé par ce PipelineRun (propriétaire $u)" \
+    || { echo "KO   sample-app-$1 : TaskRun publier absent ou d'un autre PipelineRun (repris après la purge)" >&2; exit 1; }
+}
 pr_attendre() { # commit : attend le PipelineRun sample-app-<commit> (présent, puis terminé)
   for _ in $(seq 60); do kubectl get pipelinerun -n builds "sample-app-$1" >/dev/null 2>&1 && break; sleep 2; done
   kubectl wait -n builds --for=condition=Succeeded "pipelinerun/sample-app-$1" --timeout=180s >/dev/null
@@ -276,10 +283,9 @@ etape_essais_webhook() {
     echo "CronJob rattrapage suspendu pendant l'essai (aucun passage actif)"
   fi
   debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  # Suppression au premier plan : les TaskRuns partent avant les PipelineRuns. Sinon, le PipelineRun de A, recréé sous le
-  # même nom, reprend le TaskRun encore présent de l'ancien (Pipelines v1.15.5 le cherche par nom, sans vérifier son
-  # propriétaire) et se termine sans rien exécuter (constat de J6).
-  kubectl delete pipelinerun -n builds --cascade=foreground --all --wait=true >/dev/null
+  # TaskRuns attendus disparus avant la livraison (purger_pr) : sinon, le PipelineRun de A, recréé sous le même nom, reprend
+  # le TaskRun encore présent de l'ancien et se termine sans rien exécuter (constat de J6 ; non_repris le détecte).
+  purger_pr --all
   corps() { jq -nc --arg c "$1" --arg r "${2:-refs/heads/main}" '{ref: $r, after: $c, repository: {full_name: "workspace/sample-app", clone_url: "https://sc-stockage.poc.test:3000/workspace/sample-app.git"}}' > "$T/webhook/$3"; }
   printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
   forgejo_test() { curl -fsS -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -X POST \
@@ -289,6 +295,7 @@ etape_essais_webhook() {
   echo "Forgejo, POST hooks/…/tests : HTTP $(forgejo_test)"
   pr_attendre "$reel"
   signe_attendre "$reel"
+  non_repris "$reel"
   echo "OK   PipelineRun sample-app-$reel terminé ($(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.status.conditions[0].reason}'))"
   [ -n "$(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.metadata.labels.triggers\.tekton\.dev/eventlistener}')" ] \
     && echo "OK   créé par l'EventListener (label triggers.tekton.dev/eventlistener)" || { echo "KO   PipelineRun de A créé hors de l'EventListener" >&2; exit 1; }
@@ -308,6 +315,7 @@ etape_essais_webhook() {
   envoyer "valide" "$T/webhook/e.json" "$sig_e"
   pr_attendre "$neuf"
   signe_attendre "$neuf"
+  non_repris "$neuf"
   echo "OK   PipelineRun sample-app-$neuf créé et terminé : la signature calculée ici est acceptée"
   echo "## F. rejeu à l'identique de E (même corps, même signature)"
   envoyer "rejeu de E" "$T/webhook/e.json" "$sig_e"
