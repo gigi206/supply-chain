@@ -1,4 +1,4 @@
-# voie-d.sh compiler, 2026-10-30T15:02:48Z
+# voie-d.sh compiler, 2026-10-30T15:16:11Z
 ## prédiction
 pod Kata (builds, contexte de restricted) : NoNewPrivs 1, CapBnd 0, CapEff 0, Seccomp 0 (disable_guest_seccomp) ; la même
   spec sans runtimeClassName est admise par Pod Security restricted (dry-run serveur)
@@ -6,8 +6,9 @@ Zot joignable depuis le pod ; dans unshare -U -r -n : interface lo seule, Zot in
 compilation sous unshare -n, fermeture Hermeto en GOPROXY : réussie, binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 (brique 03, image 3a7ca1b1)
 fermeture vide : échec, module github.com/go-chi/chi/v5@v5.2.3 introuvable ; proxy réseau (Zot) : échec, réseau injoignable
 ## entrées de la compilation (arbre de la brique 04 : canon/source sans .git, plus web/dist)
-sources 24e5e080c90471d67a7e745035b3dbb00c9e975ac21514b3e641cb31217f70b0 ; dont web/dist f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a ; fermeture 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
+OK   empreintes des sources, de web/dist et de la fermeture (épinglées) : 24e5e080c90471d67a7e745035b3dbb00c9e975ac21514b3e641cb31217f70b0 f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
 écart connu : poc/sample-app (dépôt Forgejo de J2) diffère de canon/source par web/package.json et web/package-lock.json
+OK   tar des entrées (épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
 ## pod j7-voie-d (image sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67)
 OK   même spec sans runtimeClassName : admise dans builds (Pod Security restricted, dry-run serveur)
 pod prêt sur sc-build, image sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
@@ -20,7 +21,7 @@ OK   entrées livrées par kubectl exec (sha256 du tar, hôte et pod) : 3ab76623
      pod : Zot joignable
      espace réseau : interfaces lo
      espace réseau, Zot : injoignable
-     compilation : rc 0 en 27 s
+     compilation : rc 0 en 25 s
      fermeture vide : rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory
      proxy réseau : rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable
      binaire : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
@@ -28,7 +29,7 @@ OK   entrées livrées par kubectl exec (sha256 du tar, hôte et pod) : 3ab76623
 ## comparaison
 OK   pod Kata : NoNewPrivs, CapBnd, CapEff, Seccomp : 1 0000000000000000 0000000000000000 0
 OK   réseau : depuis le pod, puis dans l'espace réseau : Zot joignable / interfaces lo / injoignable
-OK   compilation sous unshare -n : rc 0 en 27 s
+OK   compilation sous unshare -n : rc 0 en 25 s
 OK   binaire (pod, puis relu sur l'hôte) : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 OK   fermeture vide : refusée (rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory)
 OK   proxy réseau : refusé (rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable)

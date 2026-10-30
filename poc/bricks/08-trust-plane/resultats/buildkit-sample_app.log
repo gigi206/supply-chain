@@ -1,0 +1,22 @@
+# buildkit.sh sample_app, 2026-10-30T15:15:10Z
+## prédiction (après un premier passage en échec : COPY --from refusé sur virtio-fs, racine de BuildKit passée sur tmpfs)
+deux constructions depuis deux chemins : même image ; binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, celle de BuildKit 0.25.2 (brique 04 :
+  le digest de l'image ne dépend que du binaire et de BuildKit). Incertitude : changement de version 0.25.2 → 0.34.1. Un écart
+  exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata
+## entrées
+OK   tar des entrées de la voie D (sha256 épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619 ; image de build sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+## pod j7-bk-sample-app (Kata, privilégié, root, limites {"cpu": "2", "memory": "6Gi"}, racine de BuildKit sur un emptyDir en mémoire)
+OK   entrées livrées par kubectl exec (sha256 dans le pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+### j7-bk-sample-app
+     invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs
+     construction 1 : rc 0 en 26 s, index sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     après la construction 1 : tmpfs de BuildKit 1124 Mo
+     construction 2 : rc 0 en 18 s, index sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     après la construction 2 : tmpfs de BuildKit 1699 Mo
+## comparaison
+OK   deux constructions, deux chemins : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   binaire dans l'image : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+couche sha256:965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd, diff_id sha256:2996737dd3b6fed64439882bc0fc3d520ce9ab98e626738e75355d1fc7aea34f, config sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb
+config : {"architecture":"amd64","config":{"Entrypoint":["/sample-app"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"User":"65532:65532","WorkingDir":"/"},"created":"1970-01-01T00:00:00Z","history":[{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"COPY /out/sample-app /sample-app # buildkit"},{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"USER 65532:65532","empty_layer":true},{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"ENTRYPOINT [\"/sample-app\"]","empty_layer":true}],"os":"linux"}
+OK   image de la voie A (BuildKit v0.34.1 sous Kata) face à la brique 04 (BuildKit 0.25.2) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5

@@ -237,7 +237,7 @@ description = "Brique 08, J7 : isolation par Kata Containers 4.3.1 sur sc-build 
 run = "poc/bricks/08-trust-plane/kata.sh"
 
 [tasks."confiance:buildkit"]
-description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité), puis, après l'exemption de kata : attributs étendus dans l'invité, options de virtiofsd, rootless en pod Kata privilégié et non privilégié, root en pod Kata privilégié (étapes : image essais exempte)"
+description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité), puis, après l'exemption de kata : attributs étendus dans l'invité, options de virtiofsd, rootless en pod Kata privilégié et non privilégié, root en pod Kata privilégié ; voie A sur sample-app, après confiance:voie-d (étapes : image essais exempte sample_app)"
 run = "poc/bricks/08-trust-plane/buildkit.sh"
 
 [tasks."confiance:voie-d"]

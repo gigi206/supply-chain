@@ -26,6 +26,11 @@ DEPOT_BUILDER=plateforme/builder-go-voie-d
 DEPOT_APP=essais-j7/sample-app-voie-d
 APP_REF=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sample-app par BuildKit (brique 04)
 BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11          # binaire de la brique 03
+# Empreintes épinglées des entrées (relevées au premier passage, 30/10/2026) : le répertoire des bancs peut être réécrit
+ARBRE_SRC=24e5e080c90471d67a7e745035b3dbb00c9e975ac21514b3e641cb31217f70b0
+ARBRE_DIST=f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a
+ARBRE_DEPS=51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
+ENTREES_SHA=3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
 LIMITES='{"cpu": "2", "memory": "3Gi"}'
 POD=j7-voie-d
 T=$W/voie-d
@@ -140,10 +145,12 @@ etape_compiler() {
   (cd "$B03/canon/source" && tar --exclude=./.git --exclude=./web/node_modules -cf - .) | tar -xf - -C "$T/entrees/src"
   cp -a "$B03/build-apres/web/dist" "$T/entrees/src/web/"
   cp -a "$B03/canon/deps/." "$T/entrees/deps/"
-  echo "sources $(arbre "$T/entrees/src") ; dont web/dist $(arbre "$T/entrees/src/web/dist") ; fermeture $(arbre "$T/entrees/deps")"
+  attendu "empreintes des sources, de web/dist et de la fermeture (épinglées)" \
+    "$(arbre "$T/entrees/src") $(arbre "$T/entrees/src/web/dist") $(arbre "$T/entrees/deps")" "$ARBRE_SRC $ARBRE_DIST $ARBRE_DEPS"
   echo "écart connu : poc/sample-app (dépôt Forgejo de J2) diffère de canon/source par web/package.json et web/package-lock.json"
   tar --sort=name --format=ustar --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$T/entrees" -cf "$T/entrees.tar" src deps   # ustar : lu par busybox
   s=$(sha256sum < "$T/entrees.tar" | cut -c1-64)
+  attendu "tar des entrées (épinglé)" "$s" "$ENTREES_SHA"
   echo "## pod $POD (image $img)"
   pod_spec "$POD" - "$img" > "$T/$POD-runc.json"
   kubectl create --dry-run=server -f "$T/$POD-runc.json" > "$T/dry.out" 2>&1 \

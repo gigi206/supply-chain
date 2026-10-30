@@ -15,6 +15,9 @@
 #           (racine du conteneur et tmpfs, runc et Kata) ; options de virtiofsd relevées sur sc-build ; rootlesskit de l'image
 #           dans un pod Kata privilégié et dans un pod Kata non privilégié avec allowPrivilegeEscalation ; buildkitd en root
 #           dans un pod Kata privilégié : trois constructions, dont une qui cherche le démon depuis une étape et joint Zot
+#   sample_app voie A sur sample-app : BuildKit en root dans un pod Kata privilégié, racine de BuildKit sur un tmpfs de l'invité,
+#           mêmes entrées que la voie D (tar épinglé), image de build de la voie D, Dockerfile et options de la brique 04, deux
+#           constructions depuis deux chemins, comparées à 3a7ca1b1 (après voie-d.sh image compiler)
 #
 # Usage (racine du dépôt) : mise run confiance:buildkit -- <étape>…   (journal : resultats/buildkit-<étape>.log)
 set -euo pipefail
@@ -360,6 +363,76 @@ essai root - ''" "$PRIVILEGIE"
   echo "CONSTAT sous Kata, BuildKit rootless de l'image est impossible, même exempté et privilégié : virtiofsd sans --xattr, les"
   echo "        capacités de fichier de newuidmap ne sont pas visibles dans l'invité ; BuildKit en root dans un pod Kata privilégié"
   echo "        construit, avec le bac à sable des processus"
+}
+
+# Voie A sur sample-app : BuildKit v0.34.1 en root dans un pod Kata privilégié, mêmes entrées que la voie D (tar de voie-d.sh
+# compiler, épinglé), image de build de la voie D en contexte nommé, Dockerfile et options de la brique 04, deux constructions
+# depuis deux chemins. Tout dans un seul exec : le démon ne survit pas à la session qui l'a lancé. Racine de BuildKit sur un
+# tmpfs de l'invité (emptyDir en mémoire) : sur la racine du conteneur (virtio-fs sans --xattr), le calcul d'empreinte du
+# COPY --from échoue (premier passage, resultats/buildkit-sample_app-premier-passage.log).
+LIMITES_A='{"cpu": "2", "memory": "6Gi"}'   # tmpfs de BuildKit compté dans la mémoire du pod
+ENTREES=$W/voie-d/entrees.tar
+ENTREES_SHA=3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28   # voie-d.sh compiler
+BUILDER_D=$REG/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67   # voie-d.sh image
+APP_REF=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+BIN_REF=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+SAMPLE='printf "%s\n" "$CA_POC" > /tmp/ca.crt
+printf "[registry.\"sc-stockage.poc.test:5000\"]\n  ca = [\"/tmp/ca.crt\"]\n" > /tmp/bk.toml
+mkdir -p /tmp/run /tmp/w/src-1 /tmp/w/autre/src-2
+for s in /tmp/w/src-1 /tmp/w/autre/src-2; do cp -a /tmp/w/src/. $s/; printf "web/node_modules\n.git\n" > $s/.dockerignore; done
+echo "invité : $(nproc) vCPU, $(awk "/MemTotal/ {print \$2}" /proc/meminfo) kB ; racine de BuildKit : $(awk "\$2 == \"/bk\" {print \$3}" /proc/mounts)"
+buildkitd --config /tmp/bk.toml --oci-worker-snapshotter=native --addr unix:///tmp/run/bk.sock --root /bk > /tmp/bkd.log 2>&1 &
+k=$!
+for i in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
+i=0
+for s in /tmp/w/src-1 /tmp/w/autre/src-2; do
+  i=$((i + 1)); t=$(date +%s)
+  buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 \
+    --local context=$s --local dockerfile=/tmp/w/df --opt filename=Dockerfile \
+    --opt context:builder=docker-image://'"$BUILDER_D"' --local deps=/tmp/w/deps --opt context:deps=local:deps \
+    --output type=oci,dest=/tmp/app-$i.tar,rewrite-timestamp=true > /tmp/app-$i.log 2>&1
+  echo "construction $i : rc $? en $(($(date +%s) - t)) s, index $(tar -xOf /tmp/app-$i.tar index.json 2>/dev/null | sed -n "s/.*\"digest\":\"\(sha256:[0-9a-f]*\)\".*/\1/p")"
+  echo "après la construction $i : tmpfs de BuildKit $(du -sm /bk | cut -f1) Mo"
+done
+kill $k 2> /dev/null; wait $k 2> /dev/null; true'
+
+etape_sample_app() {
+  local p=j7-bk-sample-app d1 d2 m c l
+  echo "## prédiction (après un premier passage en échec : COPY --from refusé sur virtio-fs, racine de BuildKit passée sur tmpfs)"
+  echo "deux constructions depuis deux chemins : même image ; binaire $BIN_REF ; image $APP_REF, celle de BuildKit 0.25.2 (brique 04 :"
+  echo "  le digest de l'image ne dépend que du binaire et de BuildKit). Incertitude : changement de version 0.25.2 → 0.34.1. Un écart"
+  echo "  exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata"
+  echo "## entrées"
+  [ -s "$ENTREES" ] || { echo "KO   $ENTREES absent : lancer voie-d.sh compiler" >&2; exit 1; }
+  attendu "tar des entrées de la voie D (sha256 épinglé)" "$(sha256sum < "$ENTREES" | cut -c1-64)" "$ENTREES_SHA"
+  echo "Dockerfile de la brique 04 : $(sha256sum < "$repo/poc/bricks/04-hermetic-repro/Dockerfile" | cut -c1-64) ; image de build $BUILDER_D"
+  echo "## pod $p (Kata, privilégié, root, limites $LIMITES_A, racine de BuildKit sur un emptyDir en mémoire)"
+  pod_spec "$p" kata "$BUILDKIT" 0 "$LIMITES_A" "sleep 1200" "$PRIVILEGIE"
+  jq '.spec.volumes = [{name: "bk", emptyDir: {medium: "Memory", sizeLimit: "4Gi"}}] | .spec.containers[0].volumeMounts = [{name: "bk", mountPath: "/bk"}]' \
+    "$T/$p.json" > "$T/$p.tmp" && mv "$T/$p.tmp" "$T/$p.json"
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/$p.json" >/dev/null
+  kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s >/dev/null
+  attendu "entrées livrées par kubectl exec (sha256 dans le pod)" \
+    "$(kubectl exec -i -n builds "$p" -- sh -c 'mkdir -p /tmp/w/df && tee /tmp/entrees.tar | sha256sum | cut -c1-64' < "$ENTREES")" "$ENTREES_SHA"
+  kubectl exec -n builds "$p" -- tar -xf /tmp/entrees.tar -C /tmp/w
+  kubectl exec -i -n builds "$p" -- sh -c 'cat > /tmp/w/df/Dockerfile' < "$repo/poc/bricks/04-hermetic-repro/Dockerfile"
+  kubectl exec -n builds "$p" -- sh -c "$SAMPLE" > "$T/$p.log" 2>&1 || true
+  echo "### $p"; sed 's/^/     /' "$T/$p.log"
+  for i in 1 2; do kubectl exec -n builds "$p" -- cat "/tmp/app-$i.tar" > "$T/app-$i.tar" 2>/dev/null || true; done
+  kubectl exec -n builds "$p" -- sh -c 'grep -h -E "ERROR|error:" /tmp/app-1.log | head -5' || true
+  kubectl delete pod -n builds "$p" --wait=false >/dev/null
+  echo "## comparaison"
+  d1=$(tar -xOf "$T/app-1.tar" index.json | jq -r '.manifests[0].digest'); d2=$(tar -xOf "$T/app-2.tar" index.json | jq -r '.manifests[0].digest')
+  attendu "deux constructions, deux chemins" "$d1" "$d2"
+  rm -rf -- "${T:?}/app-1" && mkdir -p "$T/app-1" && tar -xf "$T/app-1.tar" -C "$T/app-1"
+  m=$T/app-1/blobs/sha256/${d1#sha256:}
+  c=$T/app-1/blobs/sha256/$(jq -r '.config.digest' "$m" | cut -c8-)
+  l=$T/app-1/blobs/sha256/$(jq -r '.layers[0].digest' "$m" | cut -c8-)
+  attendu "binaire dans l'image" "$(gzip -dc "$l" | tar -xOf - sample-app | sha256sum | cut -c1-64)" "$BIN_REF"
+  echo "couche $(jq -r '.layers[0].digest' "$m"), diff_id $(jq -r '.rootfs.diff_ids[0]' "$c"), config $(jq -r '.config.digest' "$m")"
+  echo "config : $(jq -S -c 'del(.rootfs)' "$c")"
+  attendu "image de la voie A (BuildKit v0.34.1 sous Kata) face à la brique 04 (BuildKit 0.25.2)" "$d1" "$APP_REF"
 }
 
 lancer buildkit J7 "$@"

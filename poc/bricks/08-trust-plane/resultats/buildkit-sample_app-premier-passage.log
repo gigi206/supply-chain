@@ -1,0 +1,19 @@
+# buildkit.sh sample_app, 2026-10-30T15:07:25Z
+## prédiction
+deux constructions depuis deux chemins : même image ; binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, celle de BuildKit 0.25.2 (brique 04 :
+  le digest de l'image ne dépend que du binaire et de BuildKit). Incertitude : changement de version 0.25.2 → 0.34.1. Un écart
+  exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata
+## entrées
+OK   tar des entrées de la voie D (sha256 épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619 ; image de build sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+## pod j7-bk-sample-app (Kata, privilégié, root, limites {"cpu": "2", "memory": "3Gi"})
+OK   entrées livrées par kubectl exec (sha256 dans le pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+### j7-bk-sample-app
+     construction 1 : rc 1 en 203 s, index 
+     construction 2 : rc 1 en 218 s, index 
+#11 ERROR: failed to calculate checksum of ref vhbaqbvgvx75gp27reobqfjcl::l9b569vpkhm6xkmn8njct1120: failed to create hash for /out/sample-app: operation not supported
+error: failed to solve: failed to compute cache key: failed to calculate checksum of ref vhbaqbvgvx75gp27reobqfjcl::l9b569vpkhm6xkmn8njct1120: failed to create hash for /out/sample-app: operation not supported
+## comparaison
+tar: This does not look like a tar archive
+tar: index.json: Not found in archive
+tar: Exiting with failure status due to previous errors
