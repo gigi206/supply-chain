@@ -10,6 +10,10 @@
 #     (premier passage, resultats/cilium-premier-passage-diagnostic.log) laissaient le nœud NotReady ;
 #   - L7 coupé pour la mesure : ni Envoy (cilium/proxy, non évalué au doc 04) ni toFQDNs (le proxy DNS exige le L7,
 #     pkg/fqdn/bootstrap/dns_proxy.go au tag) ; Hubble dans l'agent, sans relais ni interface ;
+#   - policyCIDRMatchMode nodes (bêta) : par défaut, les sélecteurs CIDR (ipBlock) ne désignent ni les pods ni les nœuds
+#     (Documentation/security/policy/layer3.rst au tag) ; or Zot et Forgejo tournent sur l'hôte de sc-stockage. Sans ce
+#     réglage, les NetworkPolicy qui les autorisent par ipBlock refusent (rejeu sous Cilium, J5 : job d'horodatage refusé
+#     vers Zot, POLICY_DENIED dans Hubble) ;
 #   - digests des manifestes amd64 à la place des index (les archives airgap ne contiennent que l'amd64 ; la signature est
 #     vérifiée sur l'index, qui les liste : cilium.sh telecharger).
 k8sServiceHost: 192.168.161.11
@@ -21,6 +25,7 @@ routingMode: native
 autoDirectNodeRoutes: true
 ipv4NativeRoutingCIDR: 10.42.0.0/16
 policyEnforcementMode: default
+policyCIDRMatchMode: nodes
 l7Proxy: false
 envoy:
   enabled: false

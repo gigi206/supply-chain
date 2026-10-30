@@ -6,6 +6,8 @@
 #                cilium et operator-generic : index vérifié par cosign (identité documentée au tag ; témoin : autre tag refusé),
 #                manifeste amd64 listé par l'index, archive OCI amd64 nommée par son tag et par son digest (le chart référence
 #                l'image par digest) ; HelmChart rendu (chart en base64, cilium/valeurs.yaml) ; empreintes dans sums.txt
+#   appliquer    HelmChart rendu de nouveau (cilium/valeurs.yaml modifié), installé sur sc-confiance (sha256 revérifié), mise à
+#                jour par le contrôleur Helm de k3s, agents et opérateur redémarrés (le chart ne le fait pas), configuration relue
 #   verifier     après J1 (point d'arrêt du rejeu), prédiction d'abord : nœuds prêts, agents et opérateur prêts, images importées
 #                (digest amd64, aucun tirage), podCIDRs repris de k3s, état des agents, flannel et kube-router absents, binaire
 #                hubble dans l'agent, mémoire des agents
@@ -76,7 +78,13 @@ etape_telecharger() {
   done
   ! signature "témoin : cilium avec l'identité du tag v1.20.3" "${IMAGES_ID%v$CILIUM_VER}v1.20.3" "quay.io/cilium/cilium@${INDEX[cilium]}" \
     || { echo "KO   témoin accepté" >&2; exit 1; }
+  rendre_helmchart
+  du -sm "$D" | awk '{print "téléchargements : " $1 " Mo"}'
+}
+
+rendre_helmchart() { # $D/cilium-helmchart.yaml (chart vérifié en base64, cilium/valeurs.yaml, digests amd64) ; empreintes dans sums.txt
   echo "## HelmChart (chart en base64, valeurs de cilium/valeurs.yaml, digests amd64)"
+  attendu "chart : archive" "sha256:$(sha256sum < "$D/cilium-$CILIUM_VER.tgz" | cut -c1-64)" "$CHART_TGZ"
   sed -e "s#@CILIUM_AMD64@#${AMD64[cilium]}#" -e "s#@OPERATOR_AMD64@#${AMD64[operator-generic]}#" "$here/cilium/valeurs.yaml" \
     | grep -v '^#' > "$T/valeurs.yaml"
   ! grep -n '@[A-Z0-9_]*@' "$T/valeurs.yaml" || { echo "KO   variable non rendue" >&2; exit 1; }
@@ -85,7 +93,25 @@ etape_telecharger() {
     sed 's/^/    /' "$T/valeurs.yaml"; } > "$D/cilium-helmchart.yaml"
   (cd "$D" && sha256sum cilium-amd64.tar operator-generic-amd64.tar cilium-helmchart.yaml > sums.txt)
   sed 's/^/  /' "$D/sums.txt"
-  du -sm "$D" | awk '{print "téléchargements : " $1 " Mo"}'
+}
+
+etape_appliquer() {
+  local g
+  rendre_helmchart
+  g=$(kubectl -n kube-system get pods -l k8s-app=cilium -o jsonpath='{.items[0].metadata.creationTimestamp}')
+  scp -q "${SSH_OPTS[@]}" "$D/cilium-helmchart.yaml" "poc@${IP[sc-confiance]}:/tmp/cilium-helmchart.yaml"
+  sur sc-confiance "echo '$(grep ' cilium-helmchart.yaml$' "$D/sums.txt" | cut -c1-64)  /tmp/cilium-helmchart.yaml' | sha256sum -c \
+    && sudo install -m 0600 /tmp/cilium-helmchart.yaml /var/lib/rancher/k3s/server/manifests/cilium.yaml && rm -f /tmp/cilium-helmchart.yaml"
+  for _ in $(seq 60); do
+    [ "$(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.policy-cidr-match-mode}' 2>/dev/null)" = nodes ] && break; sleep 2
+  done
+  echo "cilium-config : policy-cidr-match-mode=$(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.policy-cidr-match-mode}')"
+  kubectl -n kube-system rollout restart ds/cilium deploy/cilium-operator > /dev/null
+  kubectl -n kube-system rollout status ds/cilium --timeout=300s > /dev/null
+  kubectl -n kube-system rollout status deploy/cilium-operator --timeout=300s > /dev/null
+  attendu "DaemonSet cilium prêt" "$(kubectl -n kube-system get ds cilium -o jsonpath='{.status.numberReady}/{.status.desiredNumberScheduled}')" 3/3
+  echo "agents recréés après $g : $(kubectl -n kube-system get pods -l k8s-app=cilium -o jsonpath='{range .items[*]}{.spec.nodeName}={.metadata.creationTimestamp} {end}')"
+  attendu "policy-cidr-match-mode lu par l'agent de sc-confiance" "$(kubectl -n kube-system exec ds/cilium -c cilium-agent -- cilium-dbg config --all 2>/dev/null | awk '$1 ~ /PolicyCIDRMatchMode/ {print $NF}' | head -1)" "[nodes]"
 }
 
 etape_verifier() {

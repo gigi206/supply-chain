@@ -1,0 +1,4 @@
+# tsa.sh horodater, 2026-10-30T19:26:02Z
+secret zot-horodatage appliqué (poc-horodatage, sc-stockage.poc.test:5000 ; lu sur l'entrée standard de kubectl, sans annotation last-applied)
+## builds/essai-signature (une exécution signée en J4)
+KO   job h-essai-signature : /

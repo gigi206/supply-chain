@@ -48,6 +48,9 @@ metadata:
 data:
   essai.sh: |
     set -u
-    # 15 essais à 1 s d'intervalle : le délai de synchronisation de kube-router ne doit pas ouvrir de fenêtre.
+    # 15 essais à 1 s d'intervalle : le délai de synchronisation de kube-router ne doit pas ouvrir de fenêtre. Délai du client
+    # borné à 2 s : sous Cilium (J7), un refus est une perte de paquet, pas un REJECT, et chaque essai attendrait le délai par
+    # défaut du client (premier passage sous Cilium : pod non terminé en 120 s).
+    export BAO_CLIENT_TIMEOUT=2s
     n=0; until o=$(bao status 2>&1) || [ $n -ge 15 ]; do n=$((n+1)); sleep 1; done
-    if [ $n -lt 15 ]; then echo "JOINT|essai $n"; else echo "INJOIGNABLE|15 essais sur 15 s|$(echo "$o" | tail -1)"; fi
+    if [ $n -lt 15 ]; then echo "JOINT|essai $n"; else echo "INJOIGNABLE|15 essais (délai du client 2 s)|$(echo "$o" | tail -1)"; fi
