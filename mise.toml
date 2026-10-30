@@ -213,7 +213,7 @@ description = "Brique 08, J3 : OpenBao 2.7.2 sur sc-confiance, Transit non expor
 run = "poc/bricks/08-trust-plane/openbao.sh"
 
 [tasks."confiance:rejeu"]
-description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J5), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
+description = "Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6), puis contrôle des fuites ; journal resultats/rejeu-<libellé>.log"
 run = "poc/bricks/08-trust-plane/rejeu.sh"
 
 [tasks."confiance:redemarrer"]
