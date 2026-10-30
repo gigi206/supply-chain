@@ -1,35 +1,31 @@
-# kata.sh reseau, 2026-10-30T18:29:43Z
-## prédiction (écrite le 30/10/2026, avant la mesure)
+# kata.sh reseau, 2026-10-30T20:17:42Z
+## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)
 - la politique ne sélectionne que les pods de mesure (label app=sonde-reseau-j7) ;
-- fenêtre : sous runc sur sc-build, comme en J6 sur sc-confiance, Zot (interdit) joignable dans la première seconde du
-  conteneur pour au moins un essai sur trois, puis fermé. Sous Kata, même fenêtre : kubelet ne publie l'IP du pod qu'au
-  passage qui suit le lancement des conteneurs, puis kube-router pose la règle ; la VM retarde le conteneur, pas la règle ;
+- fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,
+  plugins/cilium-cni/cmd/cmd.go) ; l'agent résout les labels du pod puis attend la première régénération avant de rendre
+  la main (WaitForFirstRegeneration, pkg/endpoint/api/endpoint_api_manager.go, au tag v1.20.4) : Zot refusé dès la
+  première tentative ;
 - une fois la règle posée, sous runc comme sous Kata : Forgejo seul ouvert ; Zot, SSH de sc-stockage, API (nœud et
-  service), kubelet local et kubelet de sc-confiance fermés ;
-- NFLOG (groupe 100, lu sur sc-build) : chaque SYN refusé vers Zot (3 par pod) y figure deux fois, avec l'IP du pod, pour le
-  pod runc comme pour le pod Kata : règle de journalisation de la chaîne de la politique (préfixe « DROP by policy
-  builds/sonde-reseau-j7 »), puis celle de la chaîne du pod, avant le REJECT (règles relevées au premier passage, archivé :
-  kata-reseau-premiere-prediction.log ; une seule ligne par SYN était prédite). Chaque règle a son plafond (10 par minute) ;
-- usurpation, pod Kata privilégié (root, NET_ADMIN dans l'invité) : avec son IP, Zot refusé et journalisé ; avec une
-  adresse inutilisée du sous-réseau des pods (10.42.1.250), Zot, SSH de sc-stockage, API et kubelet local joignables,
-  et une requête en clair à Zot obtient la réponse de son serveur TLS (« HTTP/1.0 400 Bad Request », serveur Go) :
-  kube-router ne filtre la sortie que par l'IP source des pods qu'il connaît ; la réponse revient par cni0 (ARP résolu
-  par l'invité) ; aucune trace NFLOG pour l'adresse usurpée, aucune règle de kube-router ne la mentionne ;
-- témoins sans NET_ADMIN, pod Kata restreint (posture de la voie D) et pod runc restreint (posture de publier) : ajout de
-  l'adresse refusé (« Operation not permitted »), liaison de nc à l'adresse refusée (adresse non locale)
+  service), kubelet local et kubelet de sc-confiance fermés. Un refus de Cilium est une perte de paquet, pas un REJECT :
+  délai dépassé côté client ;
+- Hubble (agent de sc-build) : au moins un flux refusé par tentative vers Zot, avec l'IP du pod et un motif de politique,
+  pour le pod runc comme pour le pod Kata ; aucun plafond ;
+- usurpation, pod Kata privilégié (root, NET_ADMIN dans l'invité) : avec son IP, Zot refusé ; avec 10.42.1.250, tout refusé
+  (vérification de l'adresse source, documentée : annotations de pod), aucune réponse de Zot, flux de 10.42.1.250 refusés
+  dans Hubble avec un motif d'adresse source ;
+- témoins sans NET_ADMIN, pod Kata restreint et pod runc restreint : ajout et liaison de l'adresse refusés, comme sous
+  kube-router (indépendant du contrôleur réseau)
 ## état de départ
 NetworkPolicy de builds : networkpolicy.networking.k8s.io/construction-sans-sortie 
 OK   pas de politique sonde-reseau-j7 résiduelle
-sc-build : bridge-nf-call-iptables 1, rp_filter de cni0 2 (2 : lâche), 12 règles KUBE-ROUTER
+Cilium : OK ; enable-policy default ; routing-mode native
 NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=sonde-reseau-j7
 ## fenêtre de démarrage, trois essais alternés runc et Kata
-### j7-reseau-runc-1 : IP 10.42.1.170, nœud sc-build, conteneur lancé 0 s après la création
-      0 ms : Zot OUVERT ; Forgejo OUVERT
-    500 ms : Zot OUVERT ; Forgejo OUVERT
-   1010 ms : Zot FERME ; Forgejo OUVERT
-   2510 ms : Zot FERME ; Forgejo OUVERT
-   4020 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 2 fois, la dernière à 500 ms du lancement ; puis 3 refus de suite
+### j7-reseau-runc-1 : IP 10.42.1.155, nœud sc-build, conteneur lancé 1 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -38,13 +34,11 @@ NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000)
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-1 : IP 10.42.1.171, nœud sc-build, conteneur lancé 4 s après la création
-      0 ms : Zot OUVERT ; Forgejo OUVERT
-    560 ms : Zot OUVERT ; Forgejo OUVERT
-   1100 ms : Zot FERME ; Forgejo OUVERT
-   1630 ms : Zot FERME ; Forgejo OUVERT
-   2160 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 2 fois, la dernière à 560 ms du lancement ; puis 3 refus de suite
+### j7-reseau-kata-1 : IP 10.42.1.51, nœud sc-build, conteneur lancé 3 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
+   1560 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -53,12 +47,11 @@ OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-2 : IP 10.42.1.172, nœud sc-build, conteneur lancé 0 s après la création
-      0 ms : Zot OUVERT ; Forgejo OUVERT
-    510 ms : Zot FERME ; Forgejo OUVERT
-   2010 ms : Zot FERME ; Forgejo OUVERT
-   3520 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 1 fois, la dernière à 0 ms du lancement ; puis 3 refus de suite
+### j7-reseau-runc-2 : IP 10.42.1.81, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -67,13 +60,11 @@ OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-2 : IP 10.42.1.173, nœud sc-build, conteneur lancé 4 s après la création
-     10 ms : Zot OUVERT ; Forgejo OUVERT
-    570 ms : Zot OUVERT ; Forgejo OUVERT
-   1100 ms : Zot FERME ; Forgejo OUVERT
-   1630 ms : Zot FERME ; Forgejo OUVERT
-   2150 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 2 fois, la dernière à 570 ms du lancement ; puis 3 refus de suite
+### j7-reseau-kata-2 : IP 10.42.1.180, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1560 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -82,12 +73,11 @@ OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-3 : IP 10.42.1.174, nœud sc-build, conteneur lancé 0 s après la création
-      0 ms : Zot OUVERT ; Forgejo OUVERT
-    500 ms : Zot FERME ; Forgejo OUVERT
-   2010 ms : Zot FERME ; Forgejo OUVERT
-   3520 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 1 fois, la dernière à 0 ms du lancement ; puis 3 refus de suite
+### j7-reseau-runc-3 : IP 10.42.1.197, nœud sc-build, conteneur lancé 0 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
+   1510 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -96,13 +86,11 @@ OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-3 : IP 10.42.1.175, nœud sc-build, conteneur lancé 4 s après la création
-     10 ms : Zot OUVERT ; Forgejo OUVERT
-    560 ms : Zot OUVERT ; Forgejo OUVERT
-   1090 ms : Zot FERME ; Forgejo OUVERT
-   1620 ms : Zot FERME ; Forgejo OUVERT
-   2150 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 2 fois, la dernière à 560 ms du lancement ; puis 3 refus de suite
+### j7-reseau-kata-3 : IP 10.42.1.132, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1570 ms : Zot FERME ; Forgejo OUVERT
+   3110 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
@@ -111,94 +99,87 @@ OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-3 : une fois la règle posée, Forgejo seul ouvert
-CONSTAT  runc : fenêtre ouverte dans 3 essai(s) sur 3 (Zot joignable avant la pose de la règle)
-CONSTAT  kata : fenêtre ouverte dans 3 essai(s) sur 3 (Zot joignable avant la pose de la règle)
-## trace NFLOG sur sc-build (règle limitée à 10 par minute, rafale de 10 : attente de 65 s avant la capture)
-### j7-reseau-trace-runc : IP 10.42.1.176, nœud sc-build, conteneur lancé 0 s après la création
+OK   runc : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+OK   kata : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+## trace Hubble sur sc-build (agent Cilium du nœud)
+### j7-reseau-trace-runc : IP 10.42.1.209, nœud sc-build, conteneur lancé 0 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-### j7-reseau-trace-kata : IP 10.42.1.177, nœud sc-build, conteneur lancé 4 s après la création
+  Hubble : 20:20:29.970 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:29.971 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:31.973 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:31.973 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:33.976 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:33.976 10.42.1.209 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   runc (10.42.1.209) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+### j7-reseau-trace-kata : IP 10.42.1.116, nœud sc-build, conteneur lancé 4 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-  tcpdump : 12 packets captured
-  tcpdump : 12 packets received by filter
-  18:32:10.655422 IP 10.42.1.176.44233 > 192.168.161.13.5000: Flags [S], seq 2728906940, win 64860, options [mss 1410,sackOK,TS val 3107791629 ecr 0,nop,wscale 7], length 0
-  18:32:10.655539 IP 10.42.1.176.44233 > 192.168.161.13.5000: Flags [S], seq 2728906940, win 64860, options [mss 1410,sackOK,TS val 3107791629 ecr 0,nop,wscale 7], length 0
-  18:32:12.671352 IP 10.42.1.176.43847 > 192.168.161.13.5000: Flags [S], seq 1551736962, win 64860, options [mss 1410,sackOK,TS val 1887397669 ecr 0,nop,wscale 7], length 0
-  18:32:12.671423 IP 10.42.1.176.43847 > 192.168.161.13.5000: Flags [S], seq 1551736962, win 64860, options [mss 1410,sackOK,TS val 1887397669 ecr 0,nop,wscale 7], length 0
-  18:32:14.463359 IP 10.42.1.176.45749 > 192.168.161.13.5000: Flags [S], seq 3397358685, win 64860, options [mss 1410,sackOK,TS val 2244740900 ecr 0,nop,wscale 7], length 0
-  18:32:14.463366 IP 10.42.1.176.45749 > 192.168.161.13.5000: Flags [S], seq 3397358685, win 64860, options [mss 1410,sackOK,TS val 2244740900 ecr 0,nop,wscale 7], length 0
-OK   runc (10.42.1.176) : 3 connexions refusées, 3 SYN distincts vers Zot dans NFLOG, 2 lignes chacun
-  18:32:14.463292 IP 10.42.1.177.44501 > 192.168.161.13.5000: Flags [S], seq 3341412632, win 64860, options [mss 1410,sackOK,TS val 3728114321 ecr 0,nop,wscale 8], length 0
-  18:32:14.463353 IP 10.42.1.177.44501 > 192.168.161.13.5000: Flags [S], seq 3341412632, win 64860, options [mss 1410,sackOK,TS val 3728114321 ecr 0,nop,wscale 8], length 0
-  18:32:14.463370 IP 10.42.1.177.34973 > 192.168.161.13.5000: Flags [S], seq 144355196, win 64860, options [mss 1410,sackOK,TS val 2729794238 ecr 0,nop,wscale 8], length 0
-  18:32:14.463377 IP 10.42.1.177.34973 > 192.168.161.13.5000: Flags [S], seq 144355196, win 64860, options [mss 1410,sackOK,TS val 2729794238 ecr 0,nop,wscale 8], length 0
-  18:32:16.479390 IP 10.42.1.177.34475 > 192.168.161.13.5000: Flags [S], seq 2075366381, win 64860, options [mss 1410,sackOK,TS val 2043080502 ecr 0,nop,wscale 8], length 0
-  18:32:16.479469 IP 10.42.1.177.34475 > 192.168.161.13.5000: Flags [S], seq 2075366381, win 64860, options [mss 1410,sackOK,TS val 2043080502 ecr 0,nop,wscale 8], length 0
-OK   kata (10.42.1.177) : 3 connexions refusées, 3 SYN distincts vers Zot dans NFLOG, 2 lignes chacun
+  Hubble : 20:20:33.737 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:33.737 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:35.758 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:35.758 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:37.779 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:20:37.779 10.42.1.116 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   kata (10.42.1.116) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
 ## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)
-### j7-reseau-temoin-runc : IP 10.42.1.178, nœud sc-build, conteneur lancé 0 s après la création
+### j7-reseau-temoin-runc : IP 10.42.1.42, nœud sc-build, conteneur lancé 1 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   runc restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
-### j7-reseau-temoin-kata : IP 10.42.1.179, nœud sc-build, conteneur lancé 3 s après la création
+### j7-reseau-temoin-kata : IP 10.42.1.107, nœud sc-build, conteneur lancé 4 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   kata restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
-## usurpation d'adresse source : pod Kata privilégié (attente de 65 s : plafond de NFLOG)
-OK   10.42.1.250 inutilisée : ni réservée par l'IPAM de sc-build (host-local, cbr0), ni portée par un pod
-### j7-reseau-usurpation : IP 10.42.1.180, nœud sc-build, conteneur lancé 4 s après la création
+## usurpation d'adresse source : pod Kata privilégié
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+### j7-reseau-usurpation : IP 10.42.1.207, nœud sc-build, conteneur lancé 4 s après la création
   AVANT|Zot|FERME
   AVANT|Forgejo|OUVERT
-  ADRESSES|10.42.1.180/24 10.42.1.250/32 
-  USURPEE|Zot|192.168.161.13:5000|OUVERT
-  USURPEE|SSH-stockage|192.168.161.13:22|OUVERT
-  USURPEE|API-noeud|192.168.161.11:6443|OUVERT
-  USURPEE|kubelet-local|192.168.161.12:10250|OUVERT
-  ECHANGE|Zot|HTTP/1.0 400 Bad Request
+  ADRESSES|10.42.1.207/32 10.42.1.250/32 
+  USURPEE|Zot|192.168.161.13:5000|FERME
+  USURPEE|SSH-stockage|192.168.161.13:22|FERME
+  USURPEE|API-noeud|192.168.161.11:6443|FERME
+  USURPEE|kubelet-local|192.168.161.12:10250|FERME
+  ECHANGE|Zot|
   APRES|Zot|FERME
   FIN
-  règles iptables de sc-build pendant l'essai : 10 avec l'IP du pod (10.42.1.180), 0 avec 10.42.1.250
-  voisin 10.42.1.250 sur sc-build : 10.42.1.250 dev cni0 lladdr 76:54:f7:75:30:10 REACHABLE 
-  tcpdump : ~/.cache/supply-chain-poc/08/travail/kata/nflog-usurpation.txt:4 packets captured
-  tcpdump : ~/.cache/supply-chain-poc/08/travail/kata/nflog-usurpation.txt:4 packets received by filter
-  tcpdump : ~/.cache/supply-chain-poc/08/travail/kata/usurpation.txt:72 packets captured
-  tcpdump : ~/.cache/supply-chain-poc/08/travail/kata/usurpation.txt:73 packets received by filter
-  NFLOG : 18:34:44.479320 IP 10.42.1.180.35995 > 192.168.161.13.5000: Flags [S], seq 2094996647, win 64860, options [mss 1410,sackOK,TS val 2011526759 ecr 0,nop,wscale 8], length 0
-  NFLOG : 18:34:44.479456 IP 10.42.1.180.35995 > 192.168.161.13.5000: Flags [S], seq 2094996647, win 64860, options [mss 1410,sackOK,TS val 2011526759 ecr 0,nop,wscale 8], length 0
-  NFLOG : 18:34:44.479465 IP 10.42.1.180.36883 > 192.168.161.13.5000: Flags [S], seq 3453431279, win 64860, options [mss 1410,sackOK,TS val 3285043710 ecr 0,nop,wscale 8], length 0
-  NFLOG : 18:34:44.479476 IP 10.42.1.180.36883 > 192.168.161.13.5000: Flags [S], seq 3453431279, win 64860, options [mss 1410,sackOK,TS val 3285043710 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.527731 vethd73b9873 P   IP 10.42.1.250.39083 > 192.168.161.13.5000: Flags [S], seq 2195107196, win 64860, options [mss 1410,sackOK,TS val 1996065775 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.527731 cni0  In  IP 10.42.1.250.39083 > 192.168.161.13.5000: Flags [S], seq 2195107196, win 64860, options [mss 1410,sackOK,TS val 1996065775 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.528061 cni0  Out ARP, Request who-has 10.42.1.250 tell 10.42.1.1, length 28
-  any : 18:34:43.528065 vethd73b9873 Out ARP, Request who-has 10.42.1.250 tell 10.42.1.1, length 28
-  any : 18:34:43.528140 vethd73b9873 P   ARP, Reply 10.42.1.250 is-at 76:54:f7:75:30:10, length 28
-  any : 18:34:43.528140 cni0  In  ARP, Reply 10.42.1.250 is-at 76:54:f7:75:30:10, length 28
-  any : 18:34:43.528144 cni0  Out IP 192.168.161.13.5000 > 10.42.1.250.39083: Flags [S.], seq 3272760526, ack 2195107197, win 65160, options [mss 1460,sackOK,TS val 3968363007 ecr 1996065775,nop,wscale 7], length 0
-  any : 18:34:43.528145 vethd73b9873 Out IP 192.168.161.13.5000 > 10.42.1.250.39083: Flags [S.], seq 3272760526, ack 2195107197, win 65160, options [mss 1460,sackOK,TS val 3968363007 ecr 1996065775,nop,wscale 7], length 0
-  any : 18:34:43.537455 vethd73b9873 P   IP 10.42.1.250.44855 > 192.168.161.13.22: Flags [S], seq 2652943945, win 64860, options [mss 1410,sackOK,TS val 3288353455 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.537455 cni0  In  IP 10.42.1.250.44855 > 192.168.161.13.22: Flags [S], seq 2652943945, win 64860, options [mss 1410,sackOK,TS val 3288353455 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.537722 cni0  Out IP 192.168.161.13.22 > 10.42.1.250.44855: Flags [S.], seq 2636947769, ack 2652943946, win 65160, options [mss 1460,sackOK,TS val 2427025793 ecr 3288353455,nop,wscale 7], length 0
-  any : 18:34:43.537724 vethd73b9873 Out IP 192.168.161.13.22 > 10.42.1.250.44855: Flags [S.], seq 2636947769, ack 2652943946, win 65160, options [mss 1460,sackOK,TS val 2427025793 ecr 3288353455,nop,wscale 7], length 0
-  any : 18:34:43.546475 vethd73b9873 P   IP 10.42.1.250.41569 > 192.168.161.11.6443: Flags [S], seq 1234054445, win 64860, options [mss 1410,sackOK,TS val 675557176 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.546475 cni0  In  IP 10.42.1.250.41569 > 192.168.161.11.6443: Flags [S], seq 1234054445, win 64860, options [mss 1410,sackOK,TS val 675557176 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.546840 cni0  Out IP 192.168.161.11.6443 > 10.42.1.250.41569: Flags [S.], seq 2770668477, ack 1234054446, win 65160, options [mss 1460,sackOK,TS val 3225826598 ecr 675557176,nop,wscale 7], length 0
-  any : 18:34:43.546842 vethd73b9873 Out IP 192.168.161.11.6443 > 10.42.1.250.41569: Flags [S.], seq 2770668477, ack 1234054446, win 65160, options [mss 1460,sackOK,TS val 3225826598 ecr 675557176,nop,wscale 7], length 0
-  any : 18:34:43.555611 vethd73b9873 P   IP 10.42.1.250.39477 > 192.168.161.12.10250: Flags [S], seq 2139655787, win 64860, options [mss 1410,sackOK,TS val 503356090 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.555611 cni0  In  IP 10.42.1.250.39477 > 192.168.161.12.10250: Flags [S], seq 2139655787, win 64860, options [mss 1410,sackOK,TS val 503356090 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.555656 cni0  Out IP 192.168.161.12.10250 > 10.42.1.250.39477: Flags [S.], seq 758960395, ack 2139655788, win 64308, options [mss 1410,sackOK,TS val 1564992691 ecr 503356090,nop,wscale 7], length 0
-  any : 18:34:43.555657 vethd73b9873 Out IP 192.168.161.12.10250 > 10.42.1.250.39477: Flags [S.], seq 758960395, ack 2139655788, win 64308, options [mss 1410,sackOK,TS val 1564992691 ecr 503356090,nop,wscale 7], length 0
-  any : 18:34:43.577192 vethd73b9873 P   IP 10.42.1.250.38553 > 192.168.161.13.5000: Flags [S], seq 3332921906, win 64860, options [mss 1410,sackOK,TS val 616008257 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.577192 cni0  In  IP 10.42.1.250.38553 > 192.168.161.13.5000: Flags [S], seq 3332921906, win 64860, options [mss 1410,sackOK,TS val 616008257 ecr 0,nop,wscale 8], length 0
-  any : 18:34:43.577478 cni0  Out IP 192.168.161.13.5000 > 10.42.1.250.38553: Flags [S.], seq 1768745063, ack 3332921907, win 65160, options [mss 1460,sackOK,TS val 2975878558 ecr 616008257,nop,wscale 7], length 0
-  any : 18:34:43.577490 vethd73b9873 Out IP 192.168.161.13.5000 > 10.42.1.250.38553: Flags [S.], seq 1768745063, ack 3332921907, win 65160, options [mss 1460,sackOK,TS val 2975878558 ecr 616008257,nop,wscale 7], length 0
+  Hubble (IP du pod) : 20:21:18.442 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:18.442 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:19.470 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:19.470 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:20.494 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:20.494 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:36.577 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:36.577 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:37.583 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:37.583 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:38.607 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:21:38.607 10.42.1.207 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (10.42.1.250) : 20:21:21.503 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:22.510 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:23.535 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:24.513 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:25.518 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:26.542 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:27.524 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:28.527 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:29.550 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:30.535 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:31.567 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:32.591 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:33.559 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:34.575 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 20:21:35.599 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  tcpdump : 15 packets captured
+  tcpdump : 16 packets received by filter
 OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert
-OK   NFLOG : 2 SYN distincts du pod (10.42.1.180) vers Zot, ceux du témoin, 2 lignes chacun
-CONSTAT  NFLOG : aucune trace de 10.42.1.250
-CONSTAT  avec 10.42.1.250, la NetworkPolicy est contournée : ouverts : Zot SSH-stockage API-noeud kubelet-local 
-CONSTAT  avec 10.42.1.250, échange de données avec Zot : requête envoyée, réponse lue (HTTP/1.0 400 Bad Request)
-  capture -i any (chaque paquet vu sur la veth du pod et sur cni0) : 2 connexion(s) de 10.42.1.250 vers Zot, 4 lignes SYN-ACK en retour, 2 lignes de réponse ARP pour 10.42.1.250
+OK   Hubble : 12 flux refusés du pod (10.42.1.207) vers Zot, ceux du témoin
+OK   avec 10.42.1.250, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)
+OK   avec 10.42.1.250, aucune réponse de Zot
+OK   Hubble : 15 flux de 10.42.1.250 refusés, motif(s) INVALID_SOURCE_IP
+  capture -i any sur sc-build : 2 SYN distinct(s) de 10.42.1.250 vers Zot, 0 ligne(s) SYN-ACK en retour
 ## retrait
-OK   NetworkPolicy et pods de mesure retirés ; aucune règle de kube-router pour builds/sonde-reseau-j7 sur sc-build
+OK   NetworkPolicy et pods de mesure retirés

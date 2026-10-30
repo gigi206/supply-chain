@@ -1,4 +1,4 @@
-# politique.sh droits, 2026-10-30T12:32:45Z
+# politique.sh droits, 2026-10-30T19:57:04Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
 89 vérifications, 89 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
@@ -17,14 +17,16 @@
   accordé : chains patch pipelineruns.tekton.dev (builds)
 ## comptes de service du cluster qui peuvent modifier un PipelineRun de builds (update ou patch), donc ses labels et annotations,
 ## que Chains signe en slsa-tekton (internalParameters) ; prédiction : contrôleurs de Pipelines et de Chains, ramasse-miettes de Kubernetes
-72 comptes de service examinés ; accordés :
+76 comptes de service examinés ; accordés :
   kube-system:generic-garbage-collector patch
   kube-system:generic-garbage-collector update
+  kube-system:helm-cilium patch
+  kube-system:helm-cilium update
   tekton-chains:tekton-chains-controller patch
   tekton-chains:tekton-chains-controller update
   tekton-pipelines:tekton-pipelines-controller patch
   tekton-pipelines:tekton-pipelines-controller update
-OK   seuls ces trois contrôleurs, parmi les comptes de service (plus les administrateurs du cluster)
+CONSTAT  liste différente de la prédiction (ci-dessus) : compte de service ajouté ou retiré
 ## droits complets du compte build dans builds (kubectl auth can-i --list)
   Resources                                       Non-Resource URLs                      Resource Names   Verbs
   selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
@@ -53,10 +55,10 @@ OK   seuls ces trois contrôleurs, parmi les comptes de service (plus les admini
 ## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
   3 create pipelineruns builds 201
   3 create pipelineruns builds 409
-OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T12:13:08Z
+OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T19:43:06Z
 ## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
   1 create pipelineruns builds 201
-OK   aucun refus (403) pour rattrapage depuis 2026-10-30T12:15:33Z
+OK   aucun refus (403) pour rattrapage depuis 2026-10-30T19:49:05Z
 ## journal de l'EventListener : refus de lecture (informateurs), conteneurs précédent et en cours du pod actuel
-pod el-forgejo-79b6fd78c6-pbzbs créé à 2026-10-30T12:16:55Z ; journal lu : 8 lignes, de 2026-10-30T12:21:14.294Z à 2026-10-30T12:22:11.467Z
-OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-pbzbs
+pod el-forgejo-79b6fd78c6-nzvgn créé à 2026-10-30T19:51:05Z ; journal lu : 8 lignes, de 2026-10-30T19:55:44.104Z à 2026-10-30T19:56:43.282Z
+OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-nzvgn

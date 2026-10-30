@@ -74,20 +74,25 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     - Son compte Zot ne peut que créer par digest dans `builds/**`, ce qui exclut tout tag, donc `.sig` et `.att`. C'est une condition CEL de Zot v2.1.22.
     - L'identifiant n'entre pas dans la VM où s'exécutent les `RUN`.
   - **Provenance signée** : elle contient `runtimeClassName: kata` et toutes les entrées (commit, fermeture, `web/dist`, image de build).
-  - **Sans sortie réseau** (option 3 du contrôle de sortie, choix du propriétaire du 30/10/2026, [journal](../../poc/bricks/08-trust-plane/resultats/construction-construire.log)) :
+  - **Sans sortie réseau** (option 3 du contrôle de sortie, choix du propriétaire du 30/10/2026, [journal sous kube-router](../../poc/bricks/08-trust-plane/resultats/construction-construire-kube-router.log)) :
     - Une tâche runc restreinte prépare les entrées dans le workspace : sources, fermeture, `web/dist` et l'image de build en layout OCI.
     - La tâche Kata de construction n'a ni entrée ni sortie. La NetworkPolicy `construction-sans-sortie` sélectionne `tekton.dev/task`, que le contrôleur de Tekton fixe au nom de la tâche signée (mesuré : un label imposé par le créateur est écrasé).
     - Résultat : même image `3a7ca1b1`. L'ancienne version de la tâche échoue fermée.
     - Limite : depuis le root de l'invité, l'usurpation d'adresse contourne toujours la politique.
   - **Constat** : sous Kata 4.3.1, une ConfigMap partagée entre conteneurs d'un pod disparaît dès que l'un d'eux se termine. Une ConfigMap partagée entre étapes Tekton d'une tâche Kata n'est donc lisible que par la première étape (le cas d'un secret n'est pas mesuré). Les tâches de la plateforme doivent en tenir compte.
-- **Réseau des pods Kata** (brique 08, J7, [journal](../../poc/bricks/08-trust-plane/resultats/kata-reseau.log)) :
+- **Réseau des pods Kata** (brique 08, J7, [journal sous kube-router](../../poc/bricks/08-trust-plane/resultats/kata-reseau-kube-router.log)) :
   - **Ce qui tient** : la NetworkPolicy de kube-router s'applique aux pods Kata, car la sortie de l'invité est filtrée sur la veth du pod, côté nœud. Une fois la règle posée, seule la sortie permise passe, et les refus figurent dans NFLOG avec l'IP du pod (deux lignes par SYN).
   - **Fenêtre de démarrage** : Kata ne la ferme pas. Zot (interdit) est joignable jusqu'à 540 à 570 ms après le lancement du conteneur dans les 12 essais, contre 0 à 10 ms sous runc dans 11 essais sur 12 (500 ms une fois).
   - **Constat majeur** : un pod Kata privilégié (`NET_ADMIN` dans l'invité, posture de la voie A) contourne la politique en ajoutant une adresse inutilisée du sous-réseau des pods.
     - kube-router ne rattache la sortie d'un pod à sa politique que par son IP source.
     - Résultat : échange de données avec Zot ; SSH, API et kubelet joignables ; aucune trace dans NFLOG ni dans les règles.
     - Sans `NET_ADMIN` (pods restreints, runc et Kata), l'usurpation est refusée.
-  - **Conséquence** : le contrôle de sortie de la zone build ne peut pas reposer sur cette NetworkPolicy dès que du code est root dans l'invité. De plus, une NetworkPolicy porte sur un pod et non sur une étape. La conception du test 6 est une décision du propriétaire avant J8.
+  - **Sous Cilium 1.20.4** (option 1b, mesurée sur accord du propriétaire le 30/10/2026, cluster recréé et J1 à J7 rejoués, [journal](../../poc/bricks/08-trust-plane/resultats/kata-reseau.log)) :
+    - **Fenêtre** : aucune, sous runc comme sous Kata. Le CNI attend la première régénération de l'endpoint, d'après le code.
+    - **Usurpation** : refusée, motif `INVALID_SOURCE_IP` dans Hubble, aucune réponse.
+    - **Traces** : chaque refus est tracé par Hubble, avec son motif et sans plafond.
+    - **Écarts au plan** : `policyCIDRMatchMode: nodes`, réglage bêta, est nécessaire parce que Zot et Forgejo tournent sur un nœud ; un refus étant une perte de paquet, les clients attendent leur délai ; le L7 est coupé.
+  - **Conséquence** : sous kube-router, le contrôle de sortie de la zone build ne peut pas reposer sur cette NetworkPolicy dès que du code est root dans l'invité. De plus, une NetworkPolicy porte sur un pod et non sur une étape. La conception du test 6 est une décision du propriétaire avant J8.
 
 ## Questions ouvertes (propriétaire)
 
@@ -104,4 +109,4 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
     Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2 et, lui non plus, aucune provenance pour son image : seuls ses binaires en ont une. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
-  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». L'option 1 reste à décider par le propriétaire. Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6.
+  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6. Cilium a été mesuré (option 1b) : aucune fenêtre, et l'usurpation est refusée. Il reste au propriétaire à choisir entre garder Cilium (avec un réglage bêta et sans L7) et revenir à flannel.

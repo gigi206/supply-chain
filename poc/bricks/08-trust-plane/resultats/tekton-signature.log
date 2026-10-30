@@ -1,4 +1,4 @@
-# tekton.sh signature, 2026-10-30T11:58:58Z
+# tekton.sh signature, 2026-10-30T19:23:07Z
 taskrun.tekton.dev/essai-signature condition met
 {"pod":"essai-signature-pod","résultats":{"IMAGE_DIGEST":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","IMAGE_URL":"sc-stockage.poc.test:5000/builds/essai-signature"}}
 annotation chains.tekton.dev/signed = true

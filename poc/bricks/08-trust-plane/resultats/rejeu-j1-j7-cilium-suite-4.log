@@ -1,0 +1,901 @@
+# rejeu.sh j1-j7-cilium-suite-4, 2026-10-30T20:01:17Z
+réseau : cilium ; reprise à J7 (admission)
+## démontage : sautée (reprise à J7 (admission))
+## VM : sautée (reprise à J7 (admission))
+## k3s : sautée (reprise à J7 (admission))
+## Cilium : sautée (reprise à J7 (admission))
+## J2 : sautée (reprise à J7 (admission))
+## J3 : sautée (reprise à J7 (admission))
+## J4 : sautée (reprise à J7 (admission))
+## J5 : sautée (reprise à J7 (admission))
+## J6 : sautée (reprise à J7 (admission))
+## test 5 (J6) : sautée (reprise à J7 (admission))
+## J6 (suite) : sautée (reprise à J7 (admission))
+## J7 : sautée (reprise à J7 (admission))
+[confiance:politique] $ poc/bricks/08-trust-plane/politique.sh admission
+# politique.sh admission, 2026-10-30T20:01:17Z
+## politiques chargées (5 ValidatingPolicy, 17 validations)
+prête : tekton-references
+prête : pods-isolation
+prête : zone-confiance
+prête : zone-build
+prête : stepactions-interdites
+ValidatingAdmissionPolicy natives générées par Kyverno : 0
+## 38 cas, CLI puis admission (dry-run serveur)
+OK   tr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   tr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-resolveur-git : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-bundle-etiquette : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-bundle-hors-tekton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-espace-default : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-compte-default : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-gabarit-volume-secret : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-gabarit-hostnetwork : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-gabarit-jeton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   tr-workspace-secret : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-locale : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pr-taskrunspecs-compte : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-restreint : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pod-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-privilegie-kata : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   pod-privilegie-crun : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-init-privilegie : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostpath : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostnetwork : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-hostpid : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-cap-sys-admin : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   pod-cap-net-bind : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   zone-confiance : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   zone-sans-nodeselector : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-build : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-tolerance-universelle : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-nodename-build : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-declencheurs : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   zone-porte : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   build-pod : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   build-sans-nodeselector : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   build-nodename-confiance : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   build-jeton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   stepaction : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+## synthèse
+parité CLI / admission : 38 cas sur 38
+conformes au résultat attendu : tous
+  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 1 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-1e13e32f" : 3 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-e33a6329" : 6 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-e94d8fa6" : 1 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" : 7 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 13 cas
+## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)
+  7 événements, politique pods-isolation
+  1 événements, politique stepactions-interdites
+  14 événements, politique tekton-references
+  3 événements, politique zone-build
+  6 événements, politique zone-confiance
+## durée J7 (admission) : 30 s
+[confiance:buildkit] $ poc/bricks/08-trust-plane/buildkit.sh image essais exempte
+# buildkit.sh image, 2026-10-30T20:01:47Z
+## tag v0.34.1
+OK   tag annoté v0.34.1 (objet 401bf63d02833b70ef9393eb9702e2b5648dfaaf, signé et vérifié par GitHub) → commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e
+## image docker.io/moby/buildkit:v0.34.1-rootless
+index sha256:f68752a5a94acfcdad2d07867b7075601a421638e17fc5f28efc1c814d0c4f89 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b et son manifeste d'attestation sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   sujet du manifeste d'attestation et de la provenance SLSA v1 qu'il porte : sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+provenance : constructeur https://github.com/moby/buildkit/actions/runs/39497521590/attempts/1, 3 couches in-toto (https://spdx.dev/Document, https://spdx.dev/Document, https://slsa.dev/provenance/v1)
+## signature (seul le manifeste d'attestation est signé ; l'image l'est à travers lui, par son sujet)
+référents de l'index : 0 ; du manifeste amd64 : ["application/vnd.docker.attestation.manifest.v1+json"]
+bundle sigstore référent de sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 : sha256:0f1ab5c661be3b5347695c45d30f3337483ab9c884390ece2e96f44118438406, sujet sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   cosign : https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, dépôt moby/buildkit, refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push ; type https://sigstore.dev/cosign/sign/v1
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+OK   gh attestation verify : signataire https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, appelant https://github.com/moby/buildkit/.github/workflows/buildkit.yml@refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push, exécuteur github-hosted
+OK   identité voisine (tag v0.34.0) : refusé (no matching CertificateIdentity)
+## copie dans Zot
+copié dans Zot : 192.168.161.13:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b (cache telechargements/oci/amont/moby/buildkit)
+copié dans Zot : 192.168.161.13:5000/amont/moby/buildkit@sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 (cache avec referrers, telechargements/oci/amont/moby/buildkit)
+référents du manifeste amd64 dans Zot : ["sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 application/vnd.docker.attestation.manifest.v1+json"]
+bundle sigstore référent de sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 : sha256:0f1ab5c661be3b5347695c45d30f3337483ab9c884390ece2e96f44118438406, sujet sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   cosign sur la copie de Zot
+OK   gh attestation verify : signataire https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, appelant https://github.com/moby/buildkit/.github/workflows/buildkit.yml@refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push, exécuteur github-hosted
+image des pods : sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+## newuidmap et newgidmap dans les couches (rootlesskit les appelle pour une correspondance de plusieurs UID)
+usr/bin/newgidmap : mode 0755, 0:0, security.capability 0100000240000000000000000000000000000000 (permis : CAP_SETGID, effectif)
+usr/bin/newuidmap : mode 0755, 0:0, security.capability 0100000280000000000000000000000000000000 (permis : CAP_SETUID, effectif)
+CONSTAT pas de bit setuid : capacités de fichier (attribut étendu security.capability) ; sous Kata, elles ne sont pas visibles
+        dans l'invité (virtiofsd sans --xattr : étape exempte)
+## pour mémoire : v0.25.2-rootless (version de la brique 04), non retenue
+index sha256:a02f6571999693089dc928e9bbb64836c21703b214195d8637c011f1a7025ef6, linux/amd64 sha256:d947144c3dc4f827f8dacaaf98d622f0143465740075fa9790991bc381761dc9, attestation sha256:fd44ad550e18be0111c82d27159dd0b289f50d1cbbe97418b6f7dfd65bad5f51 (provenance https://slsa.dev/provenance/v0.2, sujet OCI absent)
+référents : index 0, amd64 0 (hors attestation), attestation 0
+CONSTAT v0.25.2 : aucune signature (ni référent ni bundle), provenance non signée ; v0.34.1 retenue (signée, maintenue). La brique 04
+        a mesuré 3a7ca1b1 avec BuildKit 0.25.2 (nixpkgs et release amont), en root (cloud) et en rootless (laptop, rootlesskit
+        2.3.5) : un digest différent sous Kata exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata
+# buildkit.sh essais, 2026-10-30T20:02:26Z
+## prédiction : résultats de l'essai exploratoire du 30/10/2026, rejoués ici
+runc : CapBnd 0, NoNewPrivs 1, Seccomp 2, AppArmor cri-containerd.apparmor.d (enforce) ; unshare refusé (Operation not permitted)
+kata : CapBnd 0, NoNewPrivs 1, Seccomp 0, étiquette AppArmor illisible dans l'invité (Invalid argument) ; unshare -U -r -m réussit, bounding set complet dans
+       le nouvel espace (000001ffffffffff), uid_map 0 65532 1, tmpfs monté
+kata, rootlesskit de l'image : échec de newuidmap (« Could not set caps »)
+kata, buildkitd sous unshare -U -r : démon v0.34.1 démarré (no-sandbox, native) ; construction a (busybox de Zot) : échec
+       lchown d'un fichier à l'UID 65534 ; construction b (tout à l'UID 0) : échec du montage devpts (gid=5 hors correspondance)
+kata, limites 2 CPU et 3 Gi : static_sandbox_resource_mgmt (initial_size.rs) donne ceil(0,2 + 2) = 3 vCPU et 32 + 3072 = 3104 Mio ;
+       surcoût de la RuntimeClass (320Mi, 250m) exclu par kubelet (calculateSandboxResources, ExcludeOverhead) :
+       QEMU -smp 3, -m 3104M ; nproc 3, MemTotal sous 3104 Mio
+## mesures
+### j7-bk-sonde-runc (runtimeClassName -, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	2
+     AppArmor : cri-containerd.apparmor.d (enforce)
+     max_user_namespaces : 39633
+     unshare : rc 1 unshare: unshare(0x10020000): Operation not permitted
+### j7-bk-sonde-kata (runtimeClassName kata, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	0
+     AppArmor : cat: read error: Invalid argument
+     max_user_namespaces : 7677
+     espace CapBnd :	000001ffffffffff
+     espace uid_map :  0 65532 1
+     espace tmpfs : monté
+     unshare : rc 0 
+### j7-bk-rootlesskit (runtimeClassName kata, uid 1000, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     CapBnd:	0000000000000000
+     NoNewPrivs:	1
+     rootlesskit : rc 1 newuidmap 8 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+### j7-bk-unshare (runtimeClassName kata, uid 1000, limites {"cpu": "2", "memory": "3Gi"})
+     vCPU : 3
+     MemTotal:        3029232 kB
+     démon : github.com/moby/buildkit v0.34.1 f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, process-mode:no-sandbox, snapshotter:native
+     construction a : rc 1 failed to Lchown "/run/user/1000/containerd-mount611645941/home" for UID 65534, GID 65534
+     construction b : rc 1 error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: invalid argument
+processus QEMU du sandbox 3a6e2c3c4e9f2264c10ff05227086951411813def63c7ee5171bb4700c8a4055 : 1
+-smp 3
+-m 3104M,slots=10,maxmem=9950M
+## comparaison
+OK   runc : bounding set, no_new_privs, seccomp : 0000000000000000 1 2
+OK   runc : AppArmor : cri-containerd.apparmor.d (enforce)
+OK   runc : unshare refusé (rc 1 unshare: unshare(0x10020000): Operation not permitted)
+OK   kata : bounding set, no_new_privs, seccomp : 0000000000000000 1 0
+OK   kata : étiquette AppArmor (/proc/self/attr/current) : cat: read error: Invalid argument
+OK   kata : unshare -U -r -m : rc 0 
+OK   kata : nouvel espace (bounding set, uid_map, tmpfs) : 000001ffffffffff 0 65532 1 monté
+OK   kata : rootlesskit en échec (rc 1 newuidmap 8 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   kata : démon sous unshare : github.com/moby/buildkit v0.34.1 f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, process-mode:no-sandbox, snapshotter:native
+OK   construction a (busybox de Zot) : rc 1 failed to Lchown "/run/user/1000/containerd-mount611645941/home" for UID 65534, GID 65534
+OK   construction b (tout à l'UID 0) : rc 1 error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: invalid argument
+OK   kata, limites 2 CPU et 3 Gi : QEMU : -smp 3 -m 3104M
+OK   kata, limites 2 CPU et 3 Gi : invité de 3 vCPU, MemTotal 3029232 kB
+CONSTAT en restricted, BuildKit ne peut exécuter aucun RUN, sous runc (user namespace refusé par seccomp) comme sous Kata :
+        newuidmap échoue (cause mesurée par l'étape exempte : capacités de fichier invisibles dans l'invité), et une
+        correspondance d'un seul UID bute sur devpts (gid=5) pour toute étape RUN
+# buildkit.sh exempte, 2026-10-30T20:03:01Z
+## prédiction corrigée le 30/10/2026, après le premier passage (resultats/buildkit-exempte-premiere-prediction.log) : la
+## prédiction du README, écrite avant l'accord, est démentie pour le pod privilégié (newuidmap en échec malgré NoNewPrivs 0)
+virtiofsd lancé sans --xattr (disable_guest_selinux = true, et runtime-rs 4.3.1 n'ajoute --xattr que si ce drapeau est
+       faux, share_virtio_fs_standalone.rs)
+attributs étendus : runc, racine du conteneur : posés ; kata, racine du conteneur (virtio-fs) : refusés (Operation not
+       supported) ; kata, tmpfs de l'invité : posés et relus
+kata privilégié, rootless (UID 1000) : NoNewPrivs 0, bounding set complet, mais newuidmap échoue (« Could not set caps ») :
+       les capacités de fichier ne sont pas visibles dans l'invité ; pas de démon, aucune construction
+kata non privilégié, allowPrivilegeEscalation et capacités par défaut, rootless : même échec de newuidmap
+kata privilégié, en root (UID 0, buildkitd sans rootlesskit) : démon en process-mode sandbox, réseau host (mode auto sans
+       configuration CNI : repli sur l'hôte, netproviders) ; constructions a, b et c réussies ; l'étape ne voit pas le démon ;
+       Zot joignable par le réseau par défaut, injoignable en --network=none
+OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption)
+## mesures
+### j7-xattr-runc (runtimeClassName -, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     racine du conteneur, système de fichiers : overlay
+     racine du conteneur : rc 0 
+     tmpfs : rc 0 
+     tmpfs, relu : user.essai="1"
+### j7-xattr-kata (runtimeClassName kata, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     racine du conteneur, système de fichiers : virtiofs
+     racine du conteneur : rc 1 setfattr: /tmp/f: Operation not supported
+     tmpfs : rc 0 
+     tmpfs, relu : user.essai="1"
+virtiofsd du sandbox f13b7fcd7664540dcfbabe76ffae2fafeddf9be25b478f3c2e836673bc1e254e : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
+### j7-bk-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 1000
+     rootless démon :  newuidmap 26 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless construction a : rc 1 failed to list workers
+     rootless construction b : rc 1 failed to list workers
+     rootless construction c : rc 1 failed to list workers
+### j7-bk-escalade (runtimeClassName kata, uid 1000, contexte {"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	00000000a80425fb
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 1000
+     rootless démon :  newuidmap 24 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless construction a : rc 1 failed to list workers
+     rootless construction b : rc 1 failed to list workers
+     rootless construction c : rc 1 failed to list workers
+### j7-bk-root (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	000001ffffffffff
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 0
+     root démon : process-mode:sandbox network:host
+     root construction a : rc 0 
+     root construction b : rc 0 
+     root construction c : rc 0 
+     root étape processus : démon visible 0, signal -, racine lisible -
+     root étape réseau par défaut : Zot joignable
+     root étape network=none : Zot injoignable
+## comparaison
+OK   virtiofsd du pod Kata lancé sans --xattr
+OK   runc : attribut étendu sur la racine du conteneur : rc 0 
+OK   kata : attribut étendu refusé sur la racine du conteneur (rc 1 setfattr: /tmp/f: Operation not supported)
+OK   kata : attribut étendu sur le tmpfs de l'invité (témoin positif) : rc 0  user.essai="1"
+OK   j7-bk-privilegie : no_new_privs : 0
+OK   j7-bk-privilegie : rootlesskit en échec (newuidmap 26 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-escalade : no_new_privs : 0
+OK   j7-bk-escalade : rootlesskit en échec (newuidmap 24 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-privilegie : bounding set : 000001ffffffffff
+OK   en root : UID, démon : 0 | process-mode:sandbox network:host
+OK   en root : constructions a, b, c : rc 0 |rc 0 |rc 0 
+OK   en root : étape et démon : démon visible 0, signal -, racine lisible -
+OK   en root : réseau de l'étape : Zot joignable / Zot injoignable
+CONSTAT sous Kata, BuildKit rootless de l'image est impossible, même exempté et privilégié : virtiofsd sans --xattr, les
+        capacités de fichier de newuidmap ne sont pas visibles dans l'invité ; BuildKit en root dans un pod Kata privilégié
+        construit, avec le bac à sable des processus
+## durée J7 (BuildKit) : 179 s
+[confiance:voie-d] $ poc/bricks/08-trust-plane/voie-d.sh image compiler assembler
+# voie-d.sh image, 2026-10-30T20:04:46Z
+## prédiction
+deux assemblages de l'image de build, depuis deux répertoires : même tar, même digest (crane n'ajoute aucune date :
+  entrée d'historique à valeur nulle, mutate.AppendLayers de go-containerregistry v0.20.6)
+## entrées
+OK   toolchain golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64 : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0= = sum.golang.org ; arbre extrait 4d51374d9c3a8771e2211a04b6973da3dac8e2d2a11b02d6872d53fb549ce03d
+busybox : /nix/store/md5ikacq7vzcr3xxx58i2miy4iz0dipj-busybox-static-x86_64-unknown-linux-musl-1.36.1/bin/busybox (BusyBox v1.36.1 () multi-call binary.), sha256 49227c027f9b972f929780d60ee486dee5948ea7042cb7ab400690bb104418bc, 395 applets
+## assemblage (tar GNU, crane append et mutate), deux fois
+a : couche 683ffab60c2ef72f40f1eab285d1e7e639e3d2e9ff9353639682e836123ce83c (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+b : couche 683ffab60c2ef72f40f1eab285d1e7e639e3d2e9ff9353639682e836123ce83c (226570240 octets), image sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   image de build identique sur deux assemblages : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+{"architecture":"amd64","os":"linux","config":{"Env":["PATH=/usr/local/go/bin:/bin","HOME=/tmp","CGO_ENABLED=0","GOTOOLCHAIN=local","GOFLAGS=-mod=readonly","GOSUMDB=off"]},"history":[{"created":"0001-01-01T00:00:00Z"}]}
+image des pods : sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+# voie-d.sh compiler, 2026-10-30T20:05:26Z
+## prédiction
+pod Kata (builds, contexte de restricted) : NoNewPrivs 1, CapBnd 0, CapEff 0, Seccomp 0 (disable_guest_seccomp) ; la même
+  spec sans runtimeClassName est admise par Pod Security restricted (dry-run serveur)
+Zot joignable depuis le pod ; dans unshare -U -r -n : interface lo seule, Zot injoignable
+compilation sous unshare -n, fermeture Hermeto en GOPROXY : réussie, binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 (brique 03, image 3a7ca1b1)
+fermeture vide : échec, module github.com/go-chi/chi/v5@v5.2.3 introuvable ; proxy réseau (Zot) : échec, réseau injoignable
+## entrées de la compilation (arbre de la brique 04 : canon/source sans .git, plus web/dist)
+OK   empreintes des sources, de web/dist et de la fermeture (épinglées) : 24e5e080c90471d67a7e745035b3dbb00c9e975ac21514b3e641cb31217f70b0 f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
+écart connu : poc/sample-app (dépôt Forgejo de J2) diffère de canon/source par web/package.json et web/package-lock.json
+OK   tar des entrées (épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+## pod j7-voie-d (image sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67)
+OK   même spec sans runtimeClassName : admise dans builds (Pod Security restricted, dry-run serveur)
+pod prêt sur sc-build, image sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   entrées livrées par kubectl exec (sha256 du tar, hôte et pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+### compiler
+     CapEff:	0000000000000000
+     CapBnd:	0000000000000000
+     NoNewPrivs:	1
+     Seccomp:	0
+     pod : Zot joignable
+     espace réseau : interfaces lo
+     espace réseau, Zot : injoignable
+     compilation : rc 0 en 25 s
+     fermeture vide : rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory
+     proxy réseau : rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable
+     binaire : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+     go : go version go1.26.10 linux/amd64
+## comparaison
+OK   pod Kata : NoNewPrivs, CapBnd, CapEff, Seccomp : 1 0000000000000000 0000000000000000 0
+OK   réseau : depuis le pod, puis dans l'espace réseau : Zot joignable / interfaces lo / injoignable
+OK   compilation sous unshare -n : rc 0 en 25 s
+OK   binaire (pod, puis relu sur l'hôte) : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   fermeture vide : refusée (rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory)
+OK   proxy réseau : refusé (rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable)
+# voie-d.sh assembler, 2026-10-30T20:06:03Z
+## prédiction (écart d'en-tête relevé en exploratoire le 30/10/2026, avant cette prédiction ; corrigée après un premier
+## passage démenti sur created, resultats/voie-d-assembler-premiere-prediction.log)
+deux assemblages depuis deux répertoires : même couche, même digest
+face à 3a7ca1b1 : même binaire, mêmes nom, mode (0755), UID et GID (0), noms vides et date (0), même taille de tar ; en-tête
+  différent par devmajor et devminor (vides chez GNU tar, zéros octaux chez BuildKit), donc par la somme de contrôle :
+  diff_id différent ; configuration identique hors historique et created (User, Env, Entrypoint, WorkingDir, plateforme
+  fixés comme la référence ; created : 0001-01-01, date nulle de Go, chez crane, que crane 0.20.6 ne permet pas de fixer,
+  contre 1970-01-01 chez BuildKit) ; digest différent
+a : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+b : couche f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397, image sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+OK   image sample-app identique sur deux assemblages : sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+## comparaison avec sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (BuildKit, brique 04)
+OK   binaire extrait de la couche de référence : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   taille du tar (référence, voie D) : 6199296 6199296
+octets différents : 18, aux positions 149 150 151 152 329 330 331 332 333 334 335 337 338 339 340 341 342 343
+  chksum : 4 octet(s)
+  devmajor : 7 octet(s)
+  devminor : 7 octet(s)
+OK   écarts limités à l'en-tête du fichier : somme de contrôle, devmajor, devminor
+diff_id : référence sha256:2996737dd3b6fed64439882bc0fc3d520ce9ab98e626738e75355d1fc7aea34f, voie D sha256:f6bdd526c154614c9bb3a6f2d56d2a12fa50171c9c967a25e940826ec7612397
+OK   configuration hors rootfs, historique et created (référence = voie D) : {"architecture":"amd64","config":{"Entrypoint":["/sample-app"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"User":"65532:65532","WorkingDir":"/"},"os":"linux"}
+OK   created (référence, voie D) : 1970-01-01T00:00:00Z 0001-01-01T00:00:00Z
+historique de la voie D : [{"created":"0001-01-01T00:00:00Z"}]
+historique de la référence : ["COPY /out/sample-app /sample-app # buildkit","USER 65532:65532","ENTRYPOINT [\"/sample-app\"]"]
+en-tête gzip de la couche : référence  1f 8b 08 00 00 00 00 00 00 ff, voie D  1f 8b 08 00 00 00 00 00 04 ff
+couche compressée : référence sha256:965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd, voie D c55e3de0b678e279b7a07b70c9e478fc6d6c8291ea5dc5f85b2568102dce683b
+digest : référence sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, voie D sha256:c92441397f91e7f182981c4958a9e46f865109fbe371db4326afc092842ee3cd
+## durée J7 (voie D) : 85 s
+[confiance:buildkit] $ poc/bricks/08-trust-plane/buildkit.sh sample_app
+# buildkit.sh sample_app, 2026-10-30T20:06:11Z
+## prédiction (après un premier passage en échec : COPY --from refusé sur virtio-fs, racine de BuildKit passée sur tmpfs)
+deux constructions depuis deux chemins : même image ; binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, celle de BuildKit 0.25.2 (brique 04 :
+  le digest de l'image ne dépend que du binaire et de BuildKit). Incertitude : changement de version 0.25.2 → 0.34.1. Un écart
+  exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata
+## entrées
+OK   tar des entrées de la voie D (sha256 épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619 ; image de build sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+## pod j7-bk-sample-app (Kata, privilégié, root, limites {"cpu": "2", "memory": "6Gi"}, racine de BuildKit sur un emptyDir en mémoire)
+OK   entrées livrées par kubectl exec (sha256 dans le pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+### j7-bk-sample-app
+     invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs
+     construction 1 : rc 0 en 28 s, index sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     après la construction 1 : tmpfs de BuildKit 1124 Mo
+     construction 2 : rc 0 en 18 s, index sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     après la construction 2 : tmpfs de BuildKit 1699 Mo
+## comparaison
+OK   deux constructions, deux chemins : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   binaire dans l'image : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+couche sha256:965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd, diff_id sha256:2996737dd3b6fed64439882bc0fc3d520ce9ab98e626738e75355d1fc7aea34f, config sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb
+config : {"architecture":"amd64","config":{"Entrypoint":["/sample-app"],"Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"User":"65532:65532","WorkingDir":"/"},"created":"1970-01-01T00:00:00Z","history":[{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"COPY /out/sample-app /sample-app # buildkit"},{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"USER 65532:65532","empty_layer":true},{"comment":"buildkit.dockerfile.v0","created":"1970-01-01T00:00:00Z","created_by":"ENTRYPOINT [\"/sample-app\"]","empty_layer":true}],"os":"linux"}
+OK   image de la voie A (BuildKit v0.34.1 sous Kata) face à la brique 04 (BuildKit 0.25.2) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## durée J7 (voie A, sample-app) : 54 s
+[confiance:buildkit] $ poc/bricks/08-trust-plane/buildkit.sh sans_reseau
+# buildkit.sh sans_reseau, 2026-10-30T20:07:05Z
+## prédiction (écrite le 30/10/2026, avant la mesure ; option 3 du contrôle de sortie, choix du propriétaire)
+- témoins, pods Kata privilégiés, sortie testée 4 s après le lancement (au-delà de la fenêtre de 570 ms) : sans le label,
+  Zot et Forgejo joignables ; avec tekton.dev/task=construire-image, les deux refusés
+- layout OCI de l'image de build (oras cp) : index qui désigne sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67, blobs conformes à leur sha256 dans le pod
+- pod de construction au label : Zot refusé ; construction avec docker-image:// en échec réseau (résolution ou connexion) ;
+  construction avec oci-layout:// réussie, image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 et binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11, ceux de sample_app : l'image finale part
+  de scratch et ne contient que le binaire, et l'image de build est la même, par digest
+## politique
+construction-sans-sortie : sélection {"tekton.dev/task":"construire-image"}, types ["Ingress","Egress"], aucune règle ; politiques de builds : networkpolicy.networking.k8s.io/construction-sans-sortie 
+## entrées
+OK   tar des entrées de la voie D (sha256 épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+OK   index du layout OCI de l'image de build : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+layout : 73 Mo, 3 blobs, tar 8480d6d5275b52d8ed733f57153175d43f4e7250d5ef6b29a2ebc81be637ff03
+## témoins : pods Kata privilégiés sans puis avec le label
+### j7-bk-sonde-sans-label (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites -) : phase Succeeded
+     SORTIE|Zot|OUVERT
+     SORTIE|Forgejo|OUVERT
+### j7-bk-sonde-label (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites -) : phase Succeeded
+     SORTIE|Zot|FERME
+     SORTIE|Forgejo|FERME
+OK   sans le label : sorties : Zot|OUVERT Forgejo|OUVERT 
+OK   avec le label : sorties : Zot|FERME Forgejo|FERME 
+## pod j7-bk-sans-reseau (Kata, privilégié, root, limites {"cpu": "2", "memory": "6Gi"}, label tekton.dev/task=construire-image, racine de BuildKit sur tmpfs)
+labels du pod : {"tekton.dev/task":"construire-image"}
+OK   entrées livrées par kubectl exec (sha256 dans le pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+OK   layout livré par kubectl exec (sha256 dans le pod) : 8480d6d5275b52d8ed733f57153175d43f4e7250d5ef6b29a2ebc81be637ff03
+### j7-bk-sans-reseau
+     BLOBS|OK|3
+     SORTIE|Zot|FERME
+     REGISTRE|1|60 s|lookup sc-stockage.poc.test: i/o timeout
+     LAYOUT|0|26 s|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## comparaison
+OK   blobs du layout dans le pod : OK
+OK   pod au label : Zot : FERME
+OK   docker-image:// : échec réseau (lookup sc-stockage.poc.test: i/o timeout)
+OK   oci-layout:// : code de retour : 0
+OK   binaire dans l'image : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   image construite sans réseau, image de build en layout OCI, face à la voie A (3a7ca1b1) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## durée J7 (sans réseau) : 135 s
+[confiance:construction] $ poc/bricks/08-trust-plane/construction.sh compte entrees taches constat_cm construire provenance
+# construction.sh compte, 2026-10-30T20:09:20Z
+## prédiction (condition CEL lue dans le code de Zot v2.1.22 : pkg/api/authz.go, manifestWriteAuthzChecks)
+poc-images : blobs et manifeste par digest dans builds/ acceptés, deux fois (une référence par digest sans tag demande la
+  création, pas la mise à jour) ; refus 403 : manifeste par tag, tag sha256-….att, digest avec ?tag= (motif de la condition
+  dans la réponse), dépôt hors de builds/ et suppression (aucune politique)
+## écritures de poc-images (image sample-app de la brique 04, sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
+OK   push par digest n° 1 (oras cp, blobs et manifeste) : builds/essai-images@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   push par digest n° 2 (oras cp, blobs et manifeste) : builds/essai-images@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   PUT du manifeste par digest (curl) : 201
+OK   tag essai : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   tag .att : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   digest avec ?tag=essai : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   dépôt hors de builds/ (workspace/essai-images) : 403
+OK   suppression du manifeste : 403
+## audit de Zot (écritures de poc-images)
+{"t":"20:09:22","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+{"t":"20:09:23","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+{"t":"20:09:24","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+## objets de builds : secret zot-images (poc-images, sc-stockage.poc.test:5000) et ConfigMap ca-poc
+Secret zot-images : clés config.json
+ConfigMap ca-poc : clés ca.crt
+secret zot-images appliqué depuis un fichier 0600 (entrée standard de kubectl, sans annotation last-applied)
+# construction.sh entrees, 2026-10-30T20:09:30Z
+## prédiction
+arbres de la brique 03 : fermeture 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b, web/dist f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a (voie-d.sh) ; deux poussées de chacun : même digest
+  (manifeste sans date, un fichier par couche) ; relus en lecture anonyme : mêmes chemins et contenus
+OK   arbre de la fermeture (canon/deps de la brique 03) : 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
+OK   arbre de web/dist (build-apres de la brique 03) : f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a
+OK   fermeture poussée deux fois (closure.sh) : 192.168.161.13:5000/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web/dist poussé deux fois : 192.168.161.13:5000/entrees/sample-app/web-dist@sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   fermeture relu(e) en lecture anonyme : chemins et contenus : 1852dbbd7863300e7f85563de65273477fa66ee94b606f349bb7a18ad7f6dcd0
+application/vnd.supply-chain.deps-closure.v1, 8 couche(s), 220967 octets
+OK   web-dist relu(e) en lecture anonyme : chemins et contenus : 86af872ed9b21d3ab1054cc12233db3f1a354748e2f410618f4a6e32579073ba
+application/vnd.supply-chain.web-dist.v1, 2 couche(s), 41285 octets
+OK   fermeture (digest épinglé) : sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web/dist (digest épinglé) : sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+# construction.sh taches, 2026-10-30T20:09:38Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-entrees dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406
+## témoin : première version de construire-image et sa pipeline, depuis l'historique git
+OK   bundle de l'ancienne construire-image (signature versionnée au commit b77ff6b) : sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:d6f176a9bf53ab1c7eadbb688c3d00c847481779526cec6abf1b4774b02252b8
+# construction.sh constat_cm, 2026-10-30T20:09:46Z
+## prédiction (relevée sur le premier passage de construire, puis sur un essai exploratoire du 30/10/2026)
+pod Kata, conteneurs a et b montant la ConfigMap ca-poc et un emptyDir ; a lit la CA, écrit dans l'emptyDir, puis :
+  sort aussitôt : b, 15 s plus tard, lit l'emptyDir mais plus la CA (No such file or directory) ;
+  reste en vie (témoin) : b lit l'emptyDir et la CA
+### j7-cm-sort
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : head: /etc/ca-poc/ca.crt: No such file or directory
+### j7-cm-vivant
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+OK   a sorti : b lit l'emptyDir, puis la CA : écrit / head: /etc/ca-poc/ca.crt: No such file or directory
+OK   a en vie (témoin) : b lit l'emptyDir, puis la CA : écrit / -----BEGIN CERTIFICATE-----
+CONSTAT sous Kata 4.3.1 (runtime-rs), la copie d'une ConfigMap dans l'invité disparaît pour tout le pod dès qu'un conteneur
+        qui la monte se termine ; les étapes de Tekton se terminent l'une après l'autre : une ConfigMap ou un secret partagé
+        entre étapes n'est lisible que par la première. Non trouvé dans les issues de kata-containers (recherche du 30/10/2026)
+# construction.sh construire, 2026-10-30T20:10:34Z
+## prédiction (après buildkit.sh sans_reseau : image 3a7ca1b1 sans réseau, image de build en layout OCI)
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les trois tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  preparer : pod runc ; arbre 30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture, web/dist et image de build en layout OCI tirés dans le workspace
+  construire : pod Kata sur sc-build, label tekton.dev/task=construire-image (sélectionné par construction-sans-sortie),
+    QEMU -smp 3 -m 6176M ; layout contrôlé (3 blobs) ; aucune sortie réseau ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; l'étape construire démarre
+    plusieurs secondes après le premier conteneur du pod (initialisation de Tekton), au-delà de la fenêtre de démarrage
+    mesurée (0,5 à 1,1 s, kata.sh reseau)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les trois TaskRuns et le PipelineRun
+label tekton.dev/task imposé à « autre » par le créateur (taskRunSpecs[construire].metadata) : le pod garde construire-image
+  (fixé par le contrôleur au nom de la tâche résolue, taskrun.go) ; un autre label du créateur y figure (témoin)
+ancienne pipeline (construire-image c7e8b275, qui tire ses entrées elle-même) : construire en échec à l'étape sources
+  (Forgejo injoignable : résolution refusée), publier jamais lancé, aucune écriture de poc-images
+même PipelineRun sans runtimeClassName : preparer réussi, construire refusé à la création du pod (Pod Security restricted :
+  privileged), publier jamais lancé, aucune écriture de poc-images
+## politique
+NetworkPolicy de builds : construction-sans-sortie
+OK   politiques qui sélectionnent les pods de construire-image, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient) : 0
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (Succeeded, pod j7-sample-app-construire-pod)
+     step-construire : invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs ; image de build sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67, 3 blobs conformes
+     step-construire : time="2026-10-30T20:10:54Z" level=warning msg="failed check for fsverity support" error="enable fsverity failed: inappropriate ioctl for device" path=/workspace/sortie/entrees/builder
+     step-construire : #1 [internal] load build definition from Dockerfile
+     step-construire : #1 transferring dockerfile: 680B done
+     step-construire : #1 DONE 0.0s
+     step-construire : 
+     step-construire : #2 [context deps] load .dockerignore
+     step-construire : #2 transferring deps: 2B done
+     step-construire : #2 DONE 0.0s
+     step-construire : 
+     step-construire : #3 [context builder] load metadata for docker.io/library/builder@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+     step-construire : #3 DONE 0.0s
+     step-construire : 
+     step-construire : #4 [internal] load .dockerignore
+     step-construire : #4 transferring context: 2B done
+     step-construire : #4 DONE 0.0s
+     step-construire : 
+     step-construire : #5 [context deps] load from client
+     step-construire : #5 transferring deps: 222.34kB 0.0s done
+     step-construire : #5 DONE 0.0s
+     step-construire : 
+     step-construire : #6 [internal] load build context
+     step-construire : #6 transferring context: 56.68kB 0.0s done
+     step-construire : #6 DONE 0.0s
+     step-construire : 
+     step-construire : #7 [context builder] OCI load from client
+     step-construire : #7 resolve docker.io/library/builder@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 done
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 8.39MB / 76.20MB 0.2s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 19.92MB / 76.20MB 0.3s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 33.17MB / 76.20MB 0.5s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 42.46MB / 76.20MB 0.6s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 53.48MB / 76.20MB 0.8s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 63.31MB / 76.20MB 0.9s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 75.50MB / 76.20MB 1.1s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 76.20MB / 76.20MB 1.1s done
+     step-construire : #7 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc
+     step-construire : #7 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 3.6s done
+     step-construire : #7 DONE 4.7s
+     step-construire : 
+     step-construire : #8 [build 1/4] WORKDIR /src
+     step-construire : #8 DONE 2.0s
+     step-construire : 
+     step-construire : #9 [build 2/4] COPY . .
+     step-construire : #9 DONE 2.0s
+     step-construire : 
+     step-construire : #10 [build 3/4] RUN --network=none --mount=type=bind,from=deps,target=/deps     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+     step-construire : #10 2.218 go: downloading github.com/go-chi/chi/v5 v5.2.3
+     step-construire : #10 DONE 17.3s
+     step-construire : 
+     step-construire : #11 [stage-1 1/1] COPY --from=build /out/sample-app /sample-app
+     step-construire : #11 DONE 0.0s
+     step-construire : 
+     step-construire : #12 exporting to oci image format
+     step-construire : #12 exporting layers
+     step-construire : #12 exporting layers 0.2s done
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC)
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC) 0.2s done
+     step-construire : #12 exporting manifest sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 done
+     step-construire : #12 exporting config sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb done
+     step-construire : #12 sending tarball 0.0s done
+     step-construire : #12 DONE 0.5s
+     step-construire : construction en 27 s : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; tmpfs de BuildKit 1123 Mo
+### TaskRun j7-sample-app-preparer (Succeeded, pod j7-sample-app-preparer-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : fermeture : 8 fichiers ; web/dist : 2 fichiers ; image de build en layout OCI : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+### TaskRun j7-sample-app-publier (Succeeded, pod j7-sample-app-publier-pod)
+     step-publier : publiée : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (relue en lecture anonyme)
+## mesures
+OK   PipelineRun j7-sample-app : True|Succeeded
+OK   kata : QEMU : -smp 3 -m 6176M
+TaskRun construire : TrustedResourcesVerified=True, pod j7-sample-app-construire-pod
+TaskRun preparer : TrustedResourcesVerified=True, pod j7-sample-app-preparer-pod
+TaskRun publier : TrustedResourcesVerified=True, pod j7-sample-app-publier-pod
+PipelineRun : TrustedResourcesVerified=True ; résultats IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app, IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+pod construire : nœud sc-build, runtimeClassName kata, tekton.dev/task construire-image, étapes step-construire=privilégiée
+pod preparer : nœud sc-build, runtimeClassName -, tekton.dev/task preparer-entrees, étapes step-sources=uid 65532 step-entrees=uid 65532
+pod publier : nœud sc-build, runtimeClassName -, tekton.dev/task publier-image, étapes step-publier=uid pod
+OK   label tekton.dev/task du pod construire : construire-image
+CONSTAT  étape construire lancée 2 s après le premier conteneur du pod (fenêtre de démarrage mesurée : 0,5 à 1,1 s ; horodatages à la seconde)
+OK   image de sample-app construite dans le PipelineRun (voie A, sans sortie réseau, image de build en layout OCI) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   arbre du commit (dépôt Forgejo) : 30e808ffa327288c656ddda7b6fafe4005234b77
+## Chains
+TaskRun j7-sample-app-construire signé=true
+TaskRun j7-sample-app-preparer signé=true
+TaskRun j7-sample-app-publier signé=true
+OK   PipelineRun j7-sample-app signé par Chains : true
+## audit de Zot : écritures de manifestes de builds/sample-app depuis 2026-10-30T20:10:34Z
+{"t":"20:11:27","compte":"poc-images","action":"PUT","objet":"sha256…3a7ca1b14dbf","code":201}
+{"t":"20:11:30","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.att","code":201}
+{"t":"20:11:32","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.sig","code":201}
+{"t":"20:11:34","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.att","code":201}
+OK   image poussée par poc-images (1 écriture(s) par digest)
+## témoin : label tekton.dev/task imposé par le créateur (PipelineRun annulé une fois le pod lu)
+taskRunSpecs : {"labels":{"tekton.dev/task":"autre","essai":"etiquette"}}
+TaskRun j7-sample-app-etiquette-construire : tekton.dev/task=construire-image, essai=etiquette
+pod j7-sample-app-etiquette-construire-pod : tekton.dev/task=construire-image, essai=etiquette
+OK   label tekton.dev/task du pod, imposé à « autre » par le créateur : construire-image
+OK   autre label du créateur, transmis au pod (témoin) : etiquette
+PipelineRun j7-sample-app-etiquette annulé : False|Cancelled|PipelineRun "j7-sample-app-etiquette" was cancelled
+## témoin : ancienne pipeline (sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:d6f176a9bf53ab1c7eadbb688c3d00c847481779526cec6abf1b4774b02252b8)
+### TaskRun j7-sample-app-ancienne-construire (StepFailed, pod j7-sample-app-ancienne-construire-pod)
+     step-sources : fatal: unable to access 'https://sc-stockage.poc.test:3000/workspace/sample-app.git/': Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+     step-entrees : 2026/10/30 20:12:13 Skipping step because a previous step failed
+     step-construire : 2026/10/30 20:12:13 Skipping step because a previous step failed
+PipelineRun j7-sample-app-ancienne : False|Failed|Tasks Completed: 1 (Failed: 1, Cancelled 0), Skipped: 1
+OK   ancienne construire-image en échec fermé : Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+OK   TaskRun publier de l'ancienne pipeline : 0
+OK   écritures de poc-images depuis 2026-10-30T20:11:48Z : 0
+## même PipelineRun sans runtimeClassName
+PipelineRun j7-sample-app-sans-kata : False|Failed|Tasks Completed: 2 (Failed: 1, Cancelled 0), Skipped: 1
+TaskRun construire : PodAdmissionFailed : pods "j7-sample-app-sans-kata-construire-pod" is forbidden: violates PodSecurity "restricted:latest": privileged (container "step-construire" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "step-construire" must set securityContext.allowPrivilegeEscalatio
+TaskRun preparer : Succeeded : All Steps have completed executing
+OK   pod de construction refusé hors Kata (Pod Security restricted de builds)
+OK   TaskRun preparer du PipelineRun sans Kata : Succeeded
+OK   TaskRun publier du PipelineRun sans Kata : 0
+OK   écritures de poc-images depuis 2026-10-30T20:12:15Z : 0
+# construction.sh provenance, 2026-10-30T20:12:24Z
+## prédiction
+cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId 1fb94652-d29c-4f0a-bf98-d0af21b446c8) ;
+  buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,
+  outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest, déclarés désormais
+  par preparer-entrees ;
+  runtimeClassName kata dans les paramètres externes (taskRunSpecs) et dans le TaskRun construire ; autre clé refusée
+OK   cosign verify-attestation : 2 enveloppe(s) valide(s) sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   enveloppes du PipelineRun j7-sample-app : 1
+sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+builder : https://supply-chain.example/builders/tekton-chains@v1
+paramètres externes : commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git
+taskRunSpecs : [{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"runtimeClassName":"kata","securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}]}}]
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4 (contenu)
+  - oci://sc-stockage.poc.test:5000/amont/moby/buildkit sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-image sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63 (contenu)
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b (contenu)
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+  inputs/result oci://sc-stockage.poc.test:5000/plateforme/builder-go-voie-d sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+  inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/fermeture sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+  inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/web-dist sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   fermeture : sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web/dist : sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   image de build : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   tâche preparer-entrees (bundle) dans resolvedDependencies : sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+OK   runtimeClassName de construire (paramètres externes) : kata
+OK   runtimeClassName du TaskRun construire (contenu signé de resolvedDependencies) : kata
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)
+## durée J7 (construction) : 185 s
+[confiance:kata] $ poc/bricks/08-trust-plane/kata.sh reseau
+# kata.sh reseau, 2026-10-30T20:12:25Z
+## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)
+- la politique ne sélectionne que les pods de mesure (label app=sonde-reseau-j7) ;
+- fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,
+  plugins/cilium-cni/cmd/cmd.go) ; l'agent résout les labels du pod puis attend la première régénération avant de rendre
+  la main (WaitForFirstRegeneration, pkg/endpoint/api/endpoint_api_manager.go, au tag v1.20.4) : Zot refusé dès la
+  première tentative ;
+- une fois la règle posée, sous runc comme sous Kata : Forgejo seul ouvert ; Zot, SSH de sc-stockage, API (nœud et
+  service), kubelet local et kubelet de sc-confiance fermés. Un refus de Cilium est une perte de paquet, pas un REJECT :
+  délai dépassé côté client ;
+- Hubble (agent de sc-build) : au moins un flux refusé par tentative vers Zot, avec l'IP du pod et un motif de politique,
+  pour le pod runc comme pour le pod Kata ; aucun plafond ;
+- usurpation, pod Kata privilégié (root, NET_ADMIN dans l'invité) : avec son IP, Zot refusé ; avec 10.42.1.250, tout refusé
+  (vérification de l'adresse source, documentée : annotations de pod), aucune réponse de Zot, flux de 10.42.1.250 refusés
+  dans Hubble avec un motif d'adresse source ;
+- témoins sans NET_ADMIN, pod Kata restreint et pod runc restreint : ajout et liaison de l'adresse refusés, comme sous
+  kube-router (indépendant du contrôleur réseau)
+## état de départ
+NetworkPolicy de builds : networkpolicy.networking.k8s.io/construction-sans-sortie 
+OK   pas de politique sonde-reseau-j7 résiduelle
+Cilium : OK ; enable-policy default ; routing-mode native
+NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=sonde-reseau-j7
+## fenêtre de démarrage, trois essais alternés runc et Kata
+### j7-reseau-runc-1 : IP 10.42.1.52, nœud sc-build, conteneur lancé 1 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-1 : IP 10.42.1.171, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1580 ms : Zot FERME ; Forgejo OUVERT
+   3110 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-runc-2 : IP 10.42.1.46, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1510 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-2 : IP 10.42.1.249, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1570 ms : Zot FERME ; Forgejo OUVERT
+   3100 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-runc-3 : IP 10.42.1.159, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-3 : IP 10.42.1.58, nœud sc-build, conteneur lancé 4 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
+   1560 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-3 : une fois la règle posée, Forgejo seul ouvert
+OK   runc : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+OK   kata : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+## trace Hubble sur sc-build (agent Cilium du nœud)
+### j7-reseau-trace-runc : IP 10.42.1.165, nœud sc-build, conteneur lancé 1 s après la création
+  TRACE|1|FERME
+  TRACE|2|FERME
+  TRACE|3|FERME
+  Hubble : 20:15:14.076 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:14.076 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:16.078 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:16.078 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:18.081 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:18.081 10.42.1.165 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   runc (10.42.1.165) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (SYN)
+### j7-reseau-trace-kata : IP 10.42.1.193, nœud sc-build, conteneur lancé 4 s après la création
+  TRACE|1|FERME
+  TRACE|2|FERME
+  TRACE|3|FERME
+  Hubble : 20:15:17.794 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:17.794 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:19.815 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:19.815 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:21.835 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 20:15:21.835 10.42.1.193 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   kata (10.42.1.193) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (SYN)
+## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)
+### j7-reseau-temoin-runc : IP 10.42.1.46, nœud sc-build, conteneur lancé 1 s après la création
+  AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
+  LIAISON|refusée|nc: bind: Cannot assign requested address
+OK   runc restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
+### j7-reseau-temoin-kata : IP 10.42.1.237, nœud sc-build, conteneur lancé 4 s après la création
+  AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
+  LIAISON|refusée|nc: bind: Cannot assign requested address
+OK   kata restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
+## usurpation d'adresse source : pod Kata privilégié
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+### j7-reseau-usurpation : IP 10.42.1.186, nœud sc-build, conteneur lancé 4 s après la création
+  AVANT|Zot|FERME
+  AVANT|Forgejo|OUVERT
+  ADRESSES|10.42.1.186/32 10.42.1.250/32 
+  USURPEE|Zot|192.168.161.13:5000|FERME
+  USURPEE|SSH-stockage|192.168.161.13:22|FERME
+  USURPEE|API-noeud|192.168.161.11:6443|FERME
+  USURPEE|kubelet-local|192.168.161.12:10250|FERME
+  ECHANGE|Zot|
+  APRES|Zot|FERME
+  FIN
+  Hubble (IP du pod) : 20:16:02.513 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:02.513 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:03.530 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:03.530 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:04.554 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:04.554 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:20.653 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:20.653 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:21.674 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:21.674 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:22.698 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 20:16:22.698 10.42.1.186 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble ($USURPEE) : 20:16:05.567 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:06.570 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:07.594 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:08.580 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:09.610 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:10.634 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:11.591 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:12.618 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:13.642 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:14.602 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:15.626 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:16.650 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:17.630 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:18.634 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble ($USURPEE) : 20:16:19.658 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  tcpdump : 15 packets captured
+  tcpdump : 16 packets received by filter
+OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert
+OK   Hubble : 12 flux refusés du pod (10.42.1.186) vers Zot, ceux du témoin
+OK   avec 10.42.1.250, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)
+OK   avec 10.42.1.250, aucune réponse de Zot
+OK   Hubble : 15 flux de 10.42.1.250 refusés, motif(s) SYN
+  capture -i any sur sc-build : 2 SYN distinct(s) de 10.42.1.250 vers Zot, 0 ligne(s) SYN-ACK en retour
+## retrait
+OK   NetworkPolicy et pods de mesure retirés
+## durée J7 (réseau) : 275 s
+[confiance:fuites] $ poc/bricks/08-trust-plane/fuites.sh j1-j7-cilium-suite-4
+# fuites.sh j1-j7-cilium-suite-4, 2026-10-30T20:17:00Z
+## sc-confiance : 50502 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-build : 19151 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-stockage : 22768 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM
+## durée fuites : 2 s
+## durée totale : 945 s

@@ -1,4 +1,4 @@
-# kata.sh exemption, 2026-10-30T14:09:10Z
+# kata.sh exemption, 2026-10-30T20:00:24Z
 ## prédiction
 kube-apiserver relancé avec --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml (fichier d'appoint de config.yaml.d, clé kube-apiserver-arg+)
 server k3s redémarré sans arrêter les conteneurs de sc-confiance (unité k3s en KillMode=process) : mêmes conteneurs, mêmes
@@ -9,40 +9,41 @@ admission (dry-run serveur) : dans builds, pod Kata privilégié admis, pod Kata
   RuntimeClass lui ajoute le nodeSelector et la tolérance de la zone build)
 ## état avant
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh temoin
-# openbao.sh temoin, 2026-10-30T14:09:10Z
-témoin : message signé par la clé chains ; empreinte de la clé publique bb194d4bc03d0604… ; {"latest_version":1,"exportable":false}
-18 pods durables et 19 conteneurs en cours sur sc-confiance
+# openbao.sh temoin, 2026-10-30T20:00:25Z
+témoin : message signé par la clé chains ; empreinte de la clé publique 431dcfb819c8430c… ; {"latest_version":1,"exportable":false}
+20 pods durables et 21 conteneurs en cours sur sc-confiance
 kube-apiserver : --enable-admission-plugins=NodeRestriction
 rattrapage suspendu ; aucun PipelineRun actif
 ## pose sur sc-confiance (0600) et redémarrage du server k3s
-API prête et trois nœuds Ready 6 s après le redémarrage ; k3s : active
+API prête et trois nœuds Ready 7 s après le redémarrage ; k3s : active
 ## après le redémarrage
 OK   kube-apiserver : --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml --enable-admission-plugins=NodeRestriction
-OK   mêmes conteneurs sur sc-confiance (19), mêmes identifiants : aucun arrêté par le redémarrage
+OK   mêmes conteneurs sur sc-confiance (21), mêmes identifiants : aucun arrêté par le redémarrage
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+exec dans openbao-0 servi après 3 essai(s)
 OK   OpenBao descellé après le redémarrage du server
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
-# openbao.sh controle, 2026-10-30T14:09:20Z
-OK   clé publique identique (empreinte bb194d4bc03d0604…)
+# openbao.sh controle, 2026-10-30T20:00:39Z
+OK   clé publique identique (empreinte 431dcfb819c8430c…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-10-30T14:09:20Z
+# tsa.sh temoin, 2026-10-30T20:00:39Z
 ## jeton témoin, depuis l'espace horodatage
-JOINT|essai 1
+JOINT|essai 3
 Generating a new signed timestamp
-Artifact timestamped at 2026-10-30 14:09:22 +0000 UTC
+Artifact timestamped at 2026-10-30 20:00:52 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 14:09:22 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x0B7F518DD688E52186EB72932D98741B8355F528 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 20:00:52 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x0DA54A54B087F7FD40A7FC39230BDB05A4614648 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
-## CronJobs : un passage réussi de chacun, créé après le redémarrage (2026-10-30T14:09:19Z)
-passage horodatage-29889490 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
+## CronJobs : un passage réussi de chacun, créé après le redémarrage (2026-10-30T20:00:33Z)
+passage horodatage-29889841 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
 OK   horodatage/horodatage : passage réussi après le retour du TSA
-passage rattrapage-29889490 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
+passage rattrapage-29889841 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
 OK   declencheurs/rattrapage : passage réussi après le retour du TSA
 ## admission (dry-run serveur)
 OK   pod Kata privilégié dans builds : admis (pod/j7-exemption created (server dry run))

@@ -1,4 +1,4 @@
-# politique.sh restreint, 2026-10-30T12:09:14Z
+# politique.sh restreint, 2026-10-30T19:38:43Z
 ## état de départ
 labels de builds : aucun label pod-security (niveau privileged par défaut)
 set-security-context : false
@@ -11,7 +11,7 @@ pods existants de builds au regard de restricted (label enforce en dry-run serve
 ## variante : tâche en service signée sans son stepTemplate
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-pipeline signée : tekton/pipelines/sans-restriction@sha256:cc3e143ca7006cd9d90e0ef32b28092066d028b01b5099ea6c21fcffc0af6825
+pipeline signée : tekton/pipelines/sans-restriction@sha256:d006497ba9e99e7ae1dc7d97dfa5768659571997c2812813fbd04ad90941f07a
 ## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus
 OK   tâche sans stepTemplate, sous warn et audit : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 OK   j6-sans-restriction signé par Chains, enveloppes du TaskRun et du PipelineRun présentes (6 → 8)

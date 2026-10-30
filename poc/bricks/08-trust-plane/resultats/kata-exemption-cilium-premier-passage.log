@@ -1,0 +1,29 @@
+# kata.sh exemption, 2026-10-30T19:59:20Z
+## prédiction
+kube-apiserver relancé avec --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml (fichier d'appoint de config.yaml.d, clé kube-apiserver-arg+)
+server k3s redémarré sans arrêter les conteneurs de sc-confiance (unité k3s en KillMode=process) : mêmes conteneurs, mêmes
+  identifiants ; OpenBao reste descellé, même clé ; Kyverno répond ; témoin TSA vérifié ; un passage réussi de chaque CronJob
+admission (dry-run serveur) : dans builds, pod Kata privilégié admis, pod Kata non privilégié avec allowPrivilegeEscalation
+  et les capacités par défaut admis, pod runc privilégié refusé par Pod Security, pod Kata privilégié avec hostPath refusé
+  par Kyverno (pods-isolation) ; dans tsa, pod Kata privilégié sans nodeSelector refusé par Kyverno (zone-confiance : la
+  RuntimeClass lui ajoute le nodeSelector et la tolérance de la zone build)
+## état avant
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh temoin
+# openbao.sh temoin, 2026-10-30T19:59:21Z
+témoin : message signé par la clé chains ; empreinte de la clé publique 431dcfb819c8430c… ; {"latest_version":1,"exportable":false}
+20 pods durables et 21 conteneurs en cours sur sc-confiance
+kube-apiserver : --enable-admission-plugins=NodeRestriction
+rattrapage suspendu ; aucun PipelineRun actif
+## pose sur sc-confiance (0600) et redémarrage du server k3s
+API prête et trois nœuds Ready 7 s après le redémarrage ; k3s : active
+## après le redémarrage
+OK   kube-apiserver : --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml --enable-admission-plugins=NodeRestriction
+OK   mêmes conteneurs sur sc-confiance (21), mêmes identifiants : aucun arrêté par le redémarrage
+OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+CONSTAT OpenBao scellé après le redémarrage du server : 
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller
+# openbao.sh deverrouiller, 2026-10-30T19:59:30Z
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
+# openbao.sh controle, 2026-10-30T19:59:30Z
+error: Internal error occurred: error sending request: Post "https://192.168.161.11:10250/exec/openbao/openbao-0/openbao?command=sh&command=-c&command=read+-r+BAO_TOKEN+%26%26+export+BAO_TOKEN+%26%26+exec+sh+-s&error=1&input=1&output=1": proxy error from 127.0.0.1:6443 while dialing 192.168.161.11:10250, code 502: 502 Bad Gateway
+[confiance:openbao] ERROR task failed

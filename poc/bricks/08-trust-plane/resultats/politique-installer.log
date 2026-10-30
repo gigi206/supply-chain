@@ -1,4 +1,4 @@
-# politique.sh installer, 2026-10-30T12:03:48Z
+# politique.sh installer, 2026-10-30T19:33:12Z
 ~/.cache/supply-chain-poc/08/telechargements/kyverno/install.yaml: OK
 OK   install.yaml = config/install-latest-testing.yaml du commit e63308f1e16c05cd009ac4864be6ec25c66b49be, latest → v1.19.2 (versions et images)
 ## références d'images hors de Zot dans le manifeste rendu
@@ -8,10 +8,10 @@ deployment.apps/kyverno-admission-controller condition met
 deployment.apps/kyverno-background-controller condition met
 deployment.apps/kyverno-cleanup-controller condition met
 deployment.apps/kyverno-reports-controller condition met
-kyverno-admission-controller-6b78f498b9-rb5bw Running sc-confiance
-kyverno-background-controller-76bd696776-xqbtw Running sc-confiance
-kyverno-cleanup-controller-5647df8554-wflqb Running sc-confiance
-kyverno-reports-controller-7696b58bd5-jrrxf Running sc-confiance
+kyverno-admission-controller-6b78f498b9-vql6n Running sc-confiance
+kyverno-background-controller-76bd696776-dp5bk Running sc-confiance
+kyverno-cleanup-controller-5647df8554-xdwsm Running sc-confiance
+kyverno-reports-controller-7696b58bd5-j55q6 Running sc-confiance
 ## images réellement tirées (imageID des conteneurs)
 sc-stockage.poc.test:5000/amont/kyverno/background-controller@sha256:c46e124f21ef…
 sc-stockage.poc.test:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c931…

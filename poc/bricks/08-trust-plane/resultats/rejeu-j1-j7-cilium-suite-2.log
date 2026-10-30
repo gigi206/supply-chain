@@ -1,0 +1,433 @@
+# rejeu.sh j1-j7-cilium-suite-2, 2026-10-30T19:21:36Z
+réseau : cilium ; reprise à J4
+## démontage : sautée (reprise à J4)
+## VM : sautée (reprise à J4)
+## k3s : sautée (reprise à J4)
+## Cilium : sautée (reprise à J4)
+## J2 : sautée (reprise à J4)
+## J3 : sautée (reprise à J4)
+[confiance:tekton] $ poc/bricks/08-trust-plane/tekton.sh revue miroir installer signature verifier webhook essais_webhook
+# tekton.sh revue, 2026-10-30T19:21:36Z
+## release.yaml (deux sources, empreintes épinglées)
+OK   pipeline v1.15.5 release.yaml : c2fe5c2ac98af298… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   chains v0.29.9 release.yaml : a3f9154467f8dd40… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   triggers v0.37.2 release.yaml : c4113c01e977e313… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+OK   triggers v0.37.2 interceptors.yaml : cf2a59a98817d97c… = GitHub = infra.tekton.dev = digest de l'asset GitHub
+## images (digest du release.yaml = digest du tag ; manifeste linux/amd64 dans l'index épinglé)
+--   busybox (image shell) : remplacée par docker.io/rancher/mirrored-library-busybox:1.37.0 (sha256:101b4afd76732482eff9b95cae5f94bcf295e521fbec4e01b69c5421f3f3f3e5)
+OK   controller:v0.29.9 : 486b562d5962 = tag v0.29.9 ; linux/amd64 2200972dcead
+OK   controller-10a3e32792f33651396d02b6855a6e36:v1.15.5 : 687a9f102365 = tag v1.15.5 ; linux/amd64 922d86c3f230
+OK   entrypoint-bff0a22da108bc2f16c818c97641a296:v1.15.5 : f20af440d762 = tag v1.15.5 ; linux/amd64 4627f27b93e2
+OK   events-a9042f7efb0cbade2a868a1ee5ddd52c:v1.15.5 : 6375e56fc283 = tag v1.15.5 ; linux/amd64 2e8346b44279
+OK   nop-8eac7c133edad5df719dc37b36b62482:v1.15.5 : bb27452a83b9 = tag v1.15.5 ; linux/amd64 f03429f84f52
+OK   resolvers-ff86b24f130c42b88983d3c13993056d:v1.15.5 : 8e98a0e406d3 = tag v1.15.5 ; linux/amd64 12ac07273611
+OK   sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.15.5 : 6f5c28363a76 = tag v1.15.5 ; linux/amd64 a660a7b9d119
+OK   webhook-d4749e605405422fd87700164e31b2d1:v1.15.5 : e48f0a03067f = tag v1.15.5 ; linux/amd64 61ef794b055f
+OK   workingdirinit-0c558922ec6a1b739e550e349f2d5fc1:v1.15.5 : 744b8a5e7e8c = tag v1.15.5 ; linux/amd64 aa1ab5775fc2
+OK   controller-f656ca31de179ab913fa76abc255c315:v0.37.2 : b62fbe87635a = tag v0.37.2 ; linux/amd64 94b30be58cdf
+OK   eventlistenersink-7ad1faa98cddbcb0c24990303b220bb8:v0.37.2 : 0218059259a7 = tag v0.37.2 ; linux/amd64 d7ecfc50960f
+OK   interceptors-3176d6a3f314c3655b30bfd36e421dd5:v0.37.2 : 198aa2c488ef = tag v0.37.2 ; linux/amd64 cef0f4936b68
+OK   webhook-dd1edc925ee1772a9f76e2c1bc291ef6:v0.37.2 : d878bae1b370 = tag v0.37.2 ; linux/amd64 dd01d6de851a
+--   powershell:nanoserver : image Windows (-shell-image-win), jamais tirée sur des nœuds Linux, non copiée
+OK   busybox 1.37.0 : 101b4afd7673 = image airgap de k3s sur sc-confiance = tag docker.io ; linux/amd64 ad9fa4d07136
+14 images dans tekton-images.tsv
+## droits : ClusterRoles (règles à surveiller : secrets, pods, exec, jetons, impersonation, jokers) et portée des liaisons
+chains-v0.29.9  tekton-chains-controller-cluster-access  cluster  core  pods                                            list,watch                                 tous
+chains-v0.29.9  tekton-chains-controller-tenant-access   cluster  core  pods,pods/log,events,persistentvolumeclaims     get,list,create,update,delete,patch,watch  tous
+chains-v0.29.9  tekton-chains-controller-tenant-access   cluster  core  configmaps,limitranges,secrets,serviceaccounts  get,list,watch                             tous
+pipeline-v1.15.5  tekton-pipelines-controller-cluster-access             cluster  core  pods                                            list,watch                                 tous
+pipeline-v1.15.5  tekton-pipelines-controller-tenant-access              cluster  core  pods,persistentvolumeclaims                     get,list,create,update,delete,patch,watch  tous
+pipeline-v1.15.5  tekton-pipelines-controller-tenant-access              cluster  core  configmaps,limitranges,secrets,serviceaccounts  get,list,watch                             tous
+pipeline-v1.15.5  tekton-pipelines-resolvers-resolution-request-updates  cluster  core  secrets,serviceaccounts                         get,list,watch                             tous
+triggers-v0.37.2  tekton-triggers-admin                       cluster  serving.knative.dev  *,*/status,*/finalizers  get,list,create,update,delete,deletecollection,patch,watch  tous
+triggers-v0.37.2  tekton-triggers-core-interceptors           cluster  core                 secrets                  get,list,watch                                              tous
+triggers-v0.37.2  tekton-triggers-core-interceptors-secrets   cluster  core                 secrets                  get,list,watch,update                                       seulement tekton-triggers-core-interceptors-certs
+triggers-v0.37.2  tekton-triggers-eventlistener-roles         aucune   core                 serviceaccounts          impersonate                                                 tous
+triggers-v0.37.2  tekton-triggers-eventlistener-clusterroles  aucune   core                 secrets                  get,list,watch                                              tous
+## webhooks d'admission (failurePolicy, effets de bord, portée)
+pipeline-v1.15.5  Validating  validation.webhook.pipeline.tekton.dev  Fail  None  {}
+pipeline-v1.15.5  Mutating    webhook.pipeline.tekton.dev             Fail  None  {}
+pipeline-v1.15.5  Validating  config.webhook.pipeline.tekton.dev      Fail  None  {"matchLabels":{"app.kubernetes.io/part-of":"tekton-pipelines"}}
+triggers-v0.37.2  Validating  validation.webhook.triggers.tekton.dev  Fail  None  {}
+triggers-v0.37.2  Mutating    webhook.triggers.tekton.dev             Fail  None  {}
+triggers-v0.37.2  Validating  config.webhook.triggers.tekton.dev      Fail  None  {"matchExpressions":[{"key":"triggers.tekton.dev/release","operator":"Exists"}]}
+# tekton.sh miroir, 2026-10-30T19:21:53Z
+OK   14 manifestes linux/amd64 copiés dans Zot sous amont/ et relus par digest
+# tekton.sh installer, 2026-10-30T19:22:33Z
+## références d'images restantes hors de Zot dans les manifestes rendus
+      1 gcr.io/tekton-releases/catalog/upstream/*
+      1 gcr.io/tekton-releases/catalog/upstream/git-clone
+      1 mcr.microsoft.com/powershell:nanoserver@sha256:b6d5ff841b78bdf2dfed7550000fd4f3437385b8fa686ec0f010be24777654d6
+pipeline : 77 objets, sha256 37a529e629f7a327…
+triggers : 42 objets, sha256 e6aae8d7b619068e…
+interceptors : 9 objets, sha256 e7f0acb04844b5d3…
+chains : 18 objets, sha256 db1a43edbf3d928e…
+deployment.apps/tekton-events-controller condition met
+deployment.apps/tekton-pipelines-controller condition met
+deployment.apps/tekton-pipelines-webhook condition met
+deployment.apps/tekton-pipelines-remote-resolvers condition met
+deployment.apps/tekton-events-controller condition met
+deployment.apps/tekton-pipelines-controller condition met
+deployment.apps/tekton-pipelines-webhook condition met
+deployment.apps/tekton-triggers-controller condition met
+deployment.apps/tekton-triggers-core-interceptors condition met
+deployment.apps/tekton-triggers-webhook condition met
+deployment.apps/tekton-chains-controller condition met
+tekton-pipelines tekton-events-controller-747c585746-wm9w8 Running sc-confiance
+tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-bj275 Running sc-confiance
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-dfpdc Running sc-confiance
+tekton-pipelines tekton-triggers-controller-8449556669-6xqzj Running sc-confiance
+tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-7vs6v Running sc-confiance
+tekton-pipelines tekton-triggers-webhook-5d67f65bf8-pdxr6 Running sc-confiance
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-p7gw5 Running sc-confiance
+tekton-chains tekton-chains-controller-8d5d9dbdb-8lbfn Running sc-confiance
+## images réellement tirées (imageID des conteneurs)
+sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead…
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:922d86c3f230…
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/events-a9042f7efb0cbade2a868a1ee5ddd52c@sha256:2e8346b44279…
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d@sha256:12ac07273611…
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/webhook-d4749e605405422fd87700164e31b2d1@sha256:61ef794b055f…
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/controller-f656ca31de179ab913fa76abc255c315@sha256:94b30be58cdf…
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/interceptors-3176d6a3f314c3655b30bfd36e421dd5@sha256:cef0f4936b68…
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/webhook-dd1edc925ee1772a9f76e2c1bc291ef6@sha256:dd01d6de851a…
+OK   8 images, toutes tirées de sc-stockage.poc.test:5000/amont/
+## configuration de Chains
+artifacts.oci.format = simplesigning
+artifacts.oci.signer = kms
+artifacts.oci.storage = oci
+artifacts.pipelinerun.enable-deep-inspection = true
+artifacts.pipelinerun.format = slsa/v2alpha4
+artifacts.pipelinerun.signer = kms
+artifacts.pipelinerun.storage = oci
+artifacts.taskrun.format = slsa/v2alpha4
+artifacts.taskrun.signer = kms
+artifacts.taskrun.storage = oci
+builddefinition.buildtype = https://tekton.dev/chains/v2/slsa-tekton
+builder.id = https://supply-chain.example/builders/tekton-chains@v1
+signers.kms.auth.address = https://openbao.openbao.svc.cluster.local:8200
+signers.kms.auth.oidc.path = jwt
+signers.kms.auth.oidc.role = tekton-chains
+signers.kms.auth.oidc.token-path = /var/run/secrets/openbao/token
+signers.kms.kmsref = hashivault://chains
+storage.oci.encoding-format = dsse
+transparency.enabled = false
+# tekton.sh signature, 2026-10-30T19:23:07Z
+taskrun.tekton.dev/essai-signature condition met
+{"pod":"essai-signature-pod","résultats":{"IMAGE_DIGEST":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","IMAGE_URL":"sc-stockage.poc.test:5000/builds/essai-signature"}}
+annotation chains.tekton.dev/signed = true
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Starting to upload attestations to OCI ...","error":null}
+{"level":"info","msg":"Starting attestation upload to OCI for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5...","error":null}
+{"level":"info","msg":"Successfully uploaded attestation using legacy format for sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","error":null}
+{"level":"info","msg":"Signing object with kms","error":null}
+{"level":"info","msg":"Uploading sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 signature","error":null}
+{"level":"info","msg":"Successfully uploaded signature using legacy format","error":null}
+sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.att
+sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.sig
+# tekton.sh verifier, 2026-10-30T19:23:19Z
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh cle
+clé publique chains : {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}, empreinte 431dcfb819c8430c…
+OK   signature de l'image vérifiée avec la clé Transit chains : [{"type":"cosign container image signature","digest":"3a7ca1b14dbf","ref":"sc-stockage.poc.test:5000/builds/essai-signature"}]
+OK   attestation SLSA v1 vérifiée (1 enveloppe(s))
+{
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "subject": [
+    {
+      "name": "sc-stockage.poc.test:5000/builds/essai-signature",
+      "digest": {
+        "sha256": "3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"
+      }
+    }
+  ],
+  "buildType": "https://tekton.dev/chains/v2/slsa-tekton",
+  "externalParameters": {
+    "runSpec": {
+      "podTemplate": {
+        "nodeSelector": {
+          "zone": "build"
+        },
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "tolerations": [
+          {
+            "effect": "NoSchedule",
+            "key": "zone",
+            "operator": "Equal",
+            "value": "build"
+          }
+        ]
+      },
+      "serviceAccountName": "build",
+      "taskSpec": {
+        "results": [
+          {
+            "name": "IMAGE_URL",
+            "type": "string"
+          },
+          {
+            "name": "IMAGE_DIGEST",
+            "type": "string"
+          }
+        ],
+        "steps": [
+          {
+            "computeResources": {},
+            "image": "sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f",
+            "name": "publier",
+            "script": "#!/bin/sh\nprintf '%s' 'sc-stockage.poc.test:5000/builds/essai-signature' > $(results.IMAGE_URL.path)\nprintf '%s' 'sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5' > $(results.IMAGE_DIGEST.path)\n"
+          }
+        ]
+      },
+      "timeout": "1h0m0s"
+    }
+  },
+  "internalParameters": {
+    "annotations": {
+      "pipeline.tekton.dev/release": "7c7d6de"
+    },
+    "labels": {
+      "app.kubernetes.io/managed-by": "tekton-pipelines"
+    },
+    "tekton-pipelines-feature-flags": {
+      "awaitSidecarReadiness": true,
+      "coschedule": "workspaces",
+      "enableAPIFields": "beta",
+      "enableProvenanceInStatus": true,
+      "enforceNonfalsifiability": "none",
+      "maxResultSize": 4096,
+      "resultExtractionMethod": "termination-message",
+      "runningInEnvWithInjectedSidecars": true,
+      "sendCloudEventsForRuns": true,
+      "verificationNoMatchPolicy": "ignore"
+    }
+  },
+  "resolvedDependencies": [
+    {
+      "uri": "oci://docker.io/rancher/mirrored-library-busybox",
+      "digest": {
+        "sha256": "101b4afd76732482eff9b95cae5f94bcf295e521fbec4e01b69c5421f3f3f3e5"
+      }
+    }
+  ],
+  "builder": "https://supply-chain.example/builders/tekton-chains@v1",
+  "invocationId": null
+}
+OK   signature vérifiée avec une autre clé : refusé (no matching signatures)
+## audit d'OpenBao pendant l'essai (depuis 2026-10-30T19:23:10Z)
+{"time":"19:23:15","chemin":"auth/jwt/login","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"19:23:15","chemin":"transit/keys/chains","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"19:23:15","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"19:23:17","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"19:23:19","chemin":"transit/keys/chains","compte":"root","politiques":["root"],"erreur":null}
+# tekton.sh webhook, 2026-10-30T19:23:20Z
+EventListener joignable par Forgejo : http://192.168.161.11:30983 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
+EventListener : el-forgejo-79dd5d5488-6df55 Running sc-confiance
+{"id":1,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:30983","content_type":"json"}
+# tekton.sh essais_webhook, 2026-10-30T19:23:25Z
+## A. livraison réelle de Forgejo (test du webhook : dernier commit de main)
+Forgejo, POST hooks/…/tests : HTTP 204
+OK   TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier créé par ce PipelineRun (propriétaire c8fb4854-947b-4284-9c62-0dd847ada1c8)
+OK   PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f terminé (Succeeded)
+OK   créé par l'EventListener (label triggers.tekton.dev/eventlistener)
+## B. corps non signé (commit 1111111111111111111111111111111111111111)
+non signé : HTTP 202 {"eventID":"1fc3165b-4162-4514-8260-45fd846c148d"}
+## C. signature calculée avec un autre secret
+mauvaise signature : HTTP 202 {"eventID":"6c3afa30-e3d0-47bf-b07f-b783112eec61"}
+## D. corps modifié sous une signature valide (signature du corps du commit 2222222222222222222222222222222222222222, corps du commit 1111111111111111111111111111111111111111)
+corps modifié : HTTP 202 {"eventID":"e16537a4-62cc-4786-9c82-b3f80e6765ac"}
+## E. contrôle positif : livraison valide signée avec le secret du webhook (commit 2222222222222222222222222222222222222222)
+valide : HTTP 202 {"eventID":"368ca818-01bc-4ac5-8533-ea61e0e20809"}
+OK   TaskRun sample-app-2222222222222222222222222222222222222222-publier créé par ce PipelineRun (propriétaire 7c40278f-6c10-46bf-bf49-c3070879caed)
+OK   PipelineRun sample-app-2222222222222222222222222222222222222222 créé et terminé : la signature calculée ici est acceptée
+## F. rejeu à l'identique de E (même corps, même signature)
+rejeu de E : HTTP 202 {"eventID":"8c89ab73-a74f-4e5d-bfa9-c5c2cb751d84"}
+## G. nouvelle livraison de Forgejo pour le même commit (rejeu d'une livraison réelle)
+Forgejo, POST hooks/…/tests : HTTP 204
+## bilan (PipelineRuns par commit)
+commit réel : 1 ; commit 1111111111111111111111111111111111111111 (B, C, D) : 0 ; commit 2222222222222222222222222222222222222222 (E, F) : 1
+OK   B, C, D refusés : aucun PipelineRun pour 1111111111111111111111111111111111111111
+OK   F et G sans effet : un seul PipelineRun par commit
+## refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-10-30T19:23:25Z
+{"t":"19:23:41","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"19:23:41","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"19:23:41","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+## EventListener : rejeux refusés à la création (AlreadyExists) depuis 2026-10-30T19:23:25Z
+{"t":"19:23:53","eventID":"8c89ab73-a74f-4e5d-bfa9-c5c2cb751d84","erreur":"pipelineruns.tekton.dev \"sample-app-2222222222222222222222222222222222222222\" already exists"}
+{"t":"19:23:54","eventID":"b0026011-246b-42e2-ae1c-1634ac33fa19","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+## Chains : PipelineRuns signés
+sample-app-2222222222222222222222222222222222222222 signé=true
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f signé=true
+## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ 2026-10-30T19:23:25Z)
+{"buildType":"https://tekton.dev/chains/v2/slsa-tekton","pipeline":"sample-app-essai","params":{"commit":"6391fd437f26696847041be3226bbbf633f55a2f","depot":"https://sc-stockage.poc.test:3000/workspace/sample-app.git"},"builder":"https://supply-chain.example/builders/tekton-chains@v1","definitions":["pipelineTask sans uri ni digest (référence locale), contenu en ligne"]}
+## une enveloppe par exécution signée de cet essai (startedOn ≥ 2026-10-30T19:23:25Z)
+PipelineRun 2222222222222222222222222222222222222222
+PipelineRun 6391fd437f26696847041be3226bbbf633f55a2f
+TaskRun 2222222222222222222222222222222222222222
+TaskRun 6391fd437f26696847041be3226bbbf633f55a2f
+OK   4 exécutions signées, 4 enveloppes dans Zot
+## durée J4 : 146 s
+[confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh image pki openbao deployer essais horodater chemins
+# tsa.sh image, 2026-10-30T19:24:02Z
+## timestamp-server v2.2.0
+OK   tag v2.2.0 (objet 11108902eaf0307666abeef7e16cd8eab8050e81, signé et vérifié par GitHub) → commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2
+ghcr.io/sigstore/timestamp-server:v2.2.0 → sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:0cddebb024e8bb135d250da6ffc603d847d4bdd8a0470622701efdf6db1ac037
+OK   attestation GitHub de oci://ghcr.io/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 : https://slsa.dev/provenance/v1, https://github.com/sigstore/timestamp-authority/.github/workflows/build_container.yml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+copié dans Zot : 192.168.161.13:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 (cache avec referrers, telechargements/oci/amont/sigstore/timestamp-server)
+OK   attestation GitHub de oci://192.168.161.13:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 : https://slsa.dev/provenance/v1, https://github.com/sigstore/timestamp-authority/.github/workflows/build_container.yml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+## cosign v3.1.4-dev (base de l'image d'outils)
+ghcr.io/sigstore/cosign/cosign:v3.1.4-dev → sha256:8af1a2cf9fba903fdfc6bdafdc25f7b13ef34ad722095543ea787fb96f7240c1 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d
+OK   signature de ghcr.io/sigstore/cosign/cosign@sha256:8af1a2cf9fba903fdfc6bdafdc25f7b13ef34ad722095543ea787fb96f7240c1 : keyless@projectsigstore.iam.gserviceaccount.com (https://accounts.google.com), type https://sigstore.dev/cosign/sign/v1
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+OK   identité voisine : refusé (no matching CertificateIdentity)
+copié dans Zot : 192.168.161.13:5000/amont/sigstore/cosign/cosign@sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d (cache telechargements/oci/amont/sigstore/cosign/cosign)
+## timestamp-cli v2.2.0
+timestamp-cli-linux-amd64: OK
+timestamp-cli-linux-amd64: OK
+OK   attestation GitHub de timestamp-cli : https://github.com/sigstore/timestamp-authority/.github/workflows/release.yaml@refs/tags/v2.2.0, commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2, déclencheur push
+## oras 1.3.6
+OK   empreinte C6FC42F0DE84A345FAADB742F44418110791EF37 publiée sur oras.land (dépôt oras-www, version 1.3)
+OK   signature GPG de oras_1.3.6_checksums.txt : clé primaire C6FC42F0DE84A345FAADB742F44418110791EF37
+oras_1.3.6_linux_amd64.tar.gz: OK
+oras_1.3.6_linux_amd64.tar.gz: OK
+## image d'outils du job (crane append, couche reproductible)
+2be7e2b668fc32329408ca17f104021bdb93407266537b6410668ed7d05c4611  oras
+18ee91ff6980ce279f49a0643808bf943785e88101aac5c8593170d642235f3d  timestamp-cli
+image d'outils : 192.168.161.13:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+OK   même digest que l'image épinglée (assemblage reproductible)
+# tsa.sh pki, 2026-10-30T19:24:49Z
+racine TSA existante
+subject=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Oct 26 20:07:08 2036 GMT X509v3 Basic Constraints: critical CA:TRUE, pathlen:0 X509v3 Key Usage: critical Certificate Sign, CRL Sign
+sha256 Fingerprint=1D:C3:4F:30:32:74:68:5F:3A:27:0C:56:8B:F6:BE:9A:D6:26:97:AA:26:38:54:22:49:06:CA:0D:B1:6C:B7:7D
+# tsa.sh openbao, 2026-10-30T19:24:49Z
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-10-30T19:24:49.506526639Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJVqzQLNLS4qTI/JOzNivZiO0Cfoi
+vzagVxCtWZsgmLNlgiDYJa2EPAAKv5A3Br0J+YRL45+Vzg/w1Vwjwd3u4Q==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      tsa
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: tsa-signature
+Success! Data written to: auth/jwt/role/tsa
+{"name":"tsa","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:tsa:timestamp-authority","user_claim":"sub","token_policies":["tsa-signature"],"token_no_default_policy":true,"token_type":"service","token_period":3600,"token_ttl":0,"token_max_ttl":0}
+path "transit/keys/tsa" {
+  capabilities = ["read"]
+}
+path "transit/sign/tsa" {
+  capabilities = ["update"]
+}
+path "transit/sign/tsa/*" {
+  capabilities = ["update"]
+}
+path "auth/token/renew-self" {
+  capabilities = ["update"]
+}
+certificat feuille émis pour la clé Transit tsa
+~/.cache/supply-chain-poc/08/pki/tsa-feuille.crt: OK
+subject=O=supply-chain PoC, CN=TSA du PoC issuer=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Oct 30 19:24:50 2027 GMT X509v3 Basic Constraints: critical CA:FALSE X509v3 Key Usage: critical Digital Signature X509v3 Extended Key Usage: critical Time Stamping
+OK   clé publique du certificat = clé publique Transit tsa (SPKI sha256 5f4ebc2a8e6fb8e2…)
+{"mediaType":"application/vnd.dev.sigstore.trustedroot+json;version=0.1","tsa":[{"uri":"http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp","certificats":2,"validFor":{"start":"2026-10-30T19:24:50Z"}}],"tlogs":0,"ca":0,"ctlogs":0}
+# tsa.sh deployer, 2026-10-30T19:24:50Z
+{"kubernetes.io/metadata.name":"tekton-chains"} 
+{"kubernetes.io/metadata.name":"tsa"} {"app":"timestamp-authority"}
+namespace/tsa serverside-applied
+serviceaccount/timestamp-authority serverside-applied
+service/timestamp-authority serverside-applied
+deployment.apps/timestamp-authority serverside-applied
+networkpolicy.networking.k8s.io/timestamp-authority serverside-applied
+configmap/tsa-config serverside-applied
+Waiting for deployment "timestamp-authority" rollout to finish: 0 of 1 updated replicas are available...
+deployment "timestamp-authority" successfully rolled out
+NAME                                   READY   STATUS    RESTARTS   AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+timestamp-authority-6bc94bc9bd-clpcs   2/2     Running   0          4s    10.42.0.242   sc-confiance   <none>           <none>
+renouvellement sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+timestamp-server sc-stockage.poc.test:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306
+jeton OpenBao obtenu (rôle tsa, essai 1)
+OK   jeton OpenBao du TSA renouvelé au démarrage (2026-10-30T19:24:53Z jeton renouvelé : 3600 s)
+starting timestamp-server @ {
+}
+ntp monitoring disabled
+2026/10/30 19:24:53 VAULT_TOKEN or BAO_TOKEN not set, trying to find token helper
+Serving timestamp server at http://[::]:3000
+# tsa.sh essais, 2026-10-30T19:24:54Z
+## jeton témoin, depuis l'espace horodatage
+JOINT|essai 1
+Generating a new signed timestamp
+Artifact timestamped at 2026-10-30 19:24:57 +0000 UTC
+Wrote timestamp response to temoin.tsr
+VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
+OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 19:24:57 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x13B270A070792612ED6EDFCDB1D2E4069251AD26 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
+OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
+OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
+## TSA injoignable hors de l'espace horodatage
+INJOIGNABLE|15 essais sur environ 45 s
+OK   TSA injoignable depuis j5-essais (NetworkPolicy)
+## OpenBao : rôle tsa et clés séparées
+CONNEXION_ACCEPTEE|"token_policies":["tsa-signature"]
+SIGNATURE_TSA|vault:v1:MEU…
+RENOUVELLEMENT|durée 3600 s
+REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|export de la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|clé tsa rendue exportable|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|sauvegarde en clair de la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de son propre jeton|Code: 403. Errors: * 1 error occurred: * permission denied 
+CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+CONNEXION_ACCEPTEE|"token_policies":["chains-signature"]
+REFUSE|signature avec la clé tsa (rôle tekton-chains)|Code: 403. Errors: * 1 error occurred: * permission denied 
+CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+OK   rôle tsa : signe avec la seule clé tsa ; 7 refus, 2 connexions croisées refusées
+## Zot : poc-horodatage limité à horodatage/**
+Digest: sha256:e4e39e98771633f58ddf7d72094521f95e0585bf469cefa350eb03fa9bb188b6
+OK   poc-horodatage écrit dans horodatage/
+OK   poc-horodatage dans builds/ : refusé (denied)
+OK   poc-horodatage dans amont/ : refusé (denied)
+OK   écriture anonyme dans horodatage/ : refusé (basic credential not found)
+OK   ouverture d'un envoi anonyme dans horodatage/ : HTTP 401
+## audit d'OpenBao depuis 2026-10-30T19:24:54Z
+{"time":"19:24:57","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"19:25:52","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"19:25:52","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"19:25:52","chemin":"auth/token/renew-self","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"19:25:53","chemin":"transit/sign/chains/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"transit/keys/chains","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"transit/export/signing-key/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"transit/keys/tsa/config","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"transit/backup/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"auth/token/lookup-self","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"19:25:53","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:99f81c74bad0aee8428247a1966d2e308a252cb56bd61ed0f1ea7529b5866cbf"} ×2
+{"time":"19:25:53","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"19:25:53","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+# tsa.sh horodater, 2026-10-30T19:26:02Z
+secret zot-horodatage appliqué (poc-horodatage, sc-stockage.poc.test:5000 ; lu sur l'entrée standard de kubectl, sans annotation last-applied)
+## builds/essai-signature (une exécution signée en J4)
+KO   job h-essai-signature : /
+[confiance:tsa] ERROR task failed

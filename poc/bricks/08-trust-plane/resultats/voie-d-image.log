@@ -1,4 +1,4 @@
-# voie-d.sh image, 2026-10-30T15:02:03Z
+# voie-d.sh image, 2026-10-30T20:04:46Z
 ## prédiction
 deux assemblages de l'image de build, depuis deux répertoires : même tar, même digest (crane n'ajoute aucune date :
   entrée d'historique à valeur nulle, mutate.AppendLayers de go-containerregistry v0.20.6)

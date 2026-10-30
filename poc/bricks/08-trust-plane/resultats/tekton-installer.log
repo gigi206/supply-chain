@@ -1,4 +1,4 @@
-# tekton.sh installer, 2026-10-30T11:58:24Z
+# tekton.sh installer, 2026-10-30T19:22:33Z
 ## références d'images restantes hors de Zot dans les manifestes rendus
       1 gcr.io/tekton-releases/catalog/upstream/*
       1 gcr.io/tekton-releases/catalog/upstream/git-clone
@@ -18,14 +18,14 @@ deployment.apps/tekton-triggers-controller condition met
 deployment.apps/tekton-triggers-core-interceptors condition met
 deployment.apps/tekton-triggers-webhook condition met
 deployment.apps/tekton-chains-controller condition met
-tekton-pipelines tekton-events-controller-747c585746-5c97w Running sc-confiance
-tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-pglxl Running sc-confiance
-tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-2hdwr Running sc-confiance
-tekton-pipelines tekton-triggers-controller-8449556669-8vl88 Running sc-confiance
-tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-xl8mv Running sc-confiance
-tekton-pipelines tekton-triggers-webhook-5d67f65bf8-vnlx8 Running sc-confiance
-tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-h74bj Running sc-confiance
-tekton-chains tekton-chains-controller-8d5d9dbdb-tp9h2 Running sc-confiance
+tekton-pipelines tekton-events-controller-747c585746-wm9w8 Running sc-confiance
+tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-bj275 Running sc-confiance
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-dfpdc Running sc-confiance
+tekton-pipelines tekton-triggers-controller-8449556669-6xqzj Running sc-confiance
+tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-7vs6v Running sc-confiance
+tekton-pipelines tekton-triggers-webhook-5d67f65bf8-pdxr6 Running sc-confiance
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-p7gw5 Running sc-confiance
+tekton-chains tekton-chains-controller-8d5d9dbdb-8lbfn Running sc-confiance
 ## images réellement tirées (imageID des conteneurs)
 sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead…
 sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:922d86c3f230…

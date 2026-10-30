@@ -1,5 +1,5 @@
-# fuites.sh j7, 2026-10-30T18:36:18Z
-## sc-confiance : 162279 lignes de journaux
+# fuites.sh j7, 2026-10-30T20:22:28Z
+## sc-confiance : 51862 lignes de journaux
 témoin retrouvé (1)
 0    ca-poc.key
 0    forgejo-admin.password
@@ -20,7 +20,7 @@ témoin retrouvé (1)
 0    zot-poc-horodatage.password
 0    zot-poc-images.password
 0    zot.key
-## sc-build : 53334 lignes de journaux
+## sc-build : 21677 lignes de journaux
 témoin retrouvé (1)
 0    ca-poc.key
 0    forgejo-admin.password
@@ -41,7 +41,7 @@ témoin retrouvé (1)
 0    zot-poc-horodatage.password
 0    zot-poc-images.password
 0    zot.key
-## sc-stockage : 82749 lignes de journaux
+## sc-stockage : 23541 lignes de journaux
 témoin retrouvé (1)
 0    ca-poc.key
 0    forgejo-admin.password

@@ -1,0 +1,11 @@
+# cilium.sh appliquer, 2026-10-30T19:30:29Z
+## HelmChart (chart en base64, valeurs de cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+  7d5d82c892510d7c17251c207259d4822c9f71c5613d3cab74a32ddd091f2b37  cilium-amd64.tar
+  01fbcd5456b4bb5d83408d82447f552fa9e5d96fd44a710269514bf5bf742c2e  operator-generic-amd64.tar
+  95ce7a3ff677f390d5b5a67c014fe6fbc71bd57ccefa31545e1044754957a95e  cilium-helmchart.yaml
+/tmp/cilium-helmchart.yaml: OK
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-10-30T19:14:29Z : sc-confiance=2026-10-30T19:30:36Z sc-stockage=2026-10-30T19:30:49Z sc-build=2026-10-30T19:30:36Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]

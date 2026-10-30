@@ -1,4 +1,4 @@
-# voie-d.sh compiler, 2026-10-30T15:16:11Z
+# voie-d.sh compiler, 2026-10-30T20:05:26Z
 ## prédiction
 pod Kata (builds, contexte de restricted) : NoNewPrivs 1, CapBnd 0, CapEff 0, Seccomp 0 (disable_guest_seccomp) ; la même
   spec sans runtimeClassName est admise par Pod Security restricted (dry-run serveur)

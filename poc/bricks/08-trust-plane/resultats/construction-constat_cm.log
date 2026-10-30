@@ -1,4 +1,4 @@
-# construction.sh constat_cm, 2026-10-30T16:03:14Z
+# construction.sh constat_cm, 2026-10-30T20:09:46Z
 ## prédiction (relevée sur le premier passage de construire, puis sur un essai exploratoire du 30/10/2026)
 pod Kata, conteneurs a et b montant la ConfigMap ca-poc et un emptyDir ; a lit la CA, écrit dans l'emptyDir, puis :
   sort aussitôt : b, 15 s plus tard, lit l'emptyDir mais plus la CA (No such file or directory) ;

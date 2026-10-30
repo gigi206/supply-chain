@@ -204,7 +204,9 @@ suspendre_rattrapage() { # CronJob de rattrapage suspendu (rétabli à la sortie
   trap reprendre_rattrapage EXIT
   for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
   n=$(kubectl get pipelineruns -n builds -o json | jq '[.items[] | select(.status.completionTime == null)] | length')
-  [ -z "${1:-}" ] || r=$(kubectl get pods -A --field-selector "spec.nodeName=$1,status.phase=Running" -o name | wc -l)
+  # pods de DaemonSet exclus : agents de nœud (Cilium sous RESEAU=cilium), qui restent ; k3s-agent ne tue pas ses conteneurs
+  [ -z "${1:-}" ] || r=$(kubectl get pods -A --field-selector "spec.nodeName=$1,status.phase=Running" -o json \
+    | jq '[.items[] | select(([.metadata.ownerReferences[]?.kind] | index("DaemonSet")) == null)] | length')
   [ "$n" = 0 ] && [ "$r" = 0 ] && echo "rattrapage suspendu ; aucun PipelineRun actif${1:+, aucun pod en cours sur $1}" \
     || { echo "KO   $n PipelineRun(s) actif(s)${1:+, $r pod(s) en cours sur $1} : redémarrage reporté" >&2; exit 1; }
 }
@@ -433,6 +435,10 @@ etape_exemption() {
       echo "OK   mêmes conteneurs sur sc-confiance ($(wc -l < "$T/conteneurs-apres.txt")), mêmes identifiants : aucun arrêté par le redémarrage"
     else echo "CONSTAT conteneurs de sc-confiance changés par le redémarrage :"; diff "$T/conteneurs-avant.txt" "$T/conteneurs-apres.txt" || true; fi
     sonde_kyverno
+    # exec servi par le kubelet du server redémarré : attendu avant de lire l'état d'OpenBao (sous Cilium, premier passage : exec
+    # refusé quelques secondes après le redémarrage, état vide pris pour « scellé »)
+    for i in $(seq 30); do kubectl exec -n openbao openbao-0 -- true >/dev/null 2>&1 && break; sleep 2; done
+    echo "exec dans openbao-0 servi après $i essai(s)"
     st=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true)
     if [ "$(jq -r .sealed <<<"$st")" = false ]; then echo "OK   OpenBao descellé après le redémarrage du server"
     else echo "CONSTAT OpenBao scellé après le redémarrage du server : $(jq -c '{initialized, sealed}' <<<"$st")"; mise run confiance:openbao -- deverrouiller; fi
@@ -624,7 +630,7 @@ $(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-policy}
     hubble_refus sc-build "$t0" --from-ip "$ip" --to-ip 192.168.161.13 --to-port 5000 > "$T/hubble-trace-$p.txt" || true
     sed 's/^/  Hubble : /' "$T/hubble-trace-$p.txt"
     n=$(wc -l < "$T/hubble-trace-$p.txt")
-    [ "$o" = 3 ] && [ "$n" -ge 3 ] && echo "OK   $p ($ip) : 3 connexions refusées, $n flux refusés vers Zot dans Hubble ($(cut -d' ' -f5 "$T/hubble-trace-$p.txt" | sort -u | paste -sd,))" \
+    [ "$o" = 3 ] && [ "$n" -ge 3 ] && echo "OK   $p ($ip) : 3 connexions refusées, $n flux refusés vers Zot dans Hubble (motif $(cut -d' ' -f6 "$T/hubble-trace-$p.txt" | sort -u | paste -sd,))" \
       || { echo "KO   $p ($ip) : $o refus, $n flux dans Hubble" >&2; ko=1; }
     kubectl delete pod -n builds "j7-reseau-trace-$p" --wait=false >/dev/null
   done
@@ -659,7 +665,7 @@ $(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-policy}
   hubble_refus sc-build "$t0" --from-ip "$ip" --to-port 5000 > "$T/hubble-temoin.txt" || true
   hubble_refus sc-build "$t0" --ip "$USURPEE" > "$T/hubble-usurpation.txt" || true
   sed 's/^/  Hubble (IP du pod) : /' "$T/hubble-temoin.txt"
-  sed 's/^/  Hubble ($USURPEE) : /' "$T/hubble-usurpation.txt"
+  sed "s/^/  Hubble ($USURPEE) : /" "$T/hubble-usurpation.txt"
   grep -E 'packets (captured|received)' "$T/usurpation.txt" | sed 's/^/  tcpdump : /' || true
   grep -qx 'AVANT|Zot|FERME' "$T/j7-reseau-usurpation.log" && grep -qx 'AVANT|Forgejo|OUVERT' "$T/j7-reseau-usurpation.log" \
     && grep -qx 'APRES|Zot|FERME' "$T/j7-reseau-usurpation.log" \
@@ -672,7 +678,7 @@ $(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-policy}
   grep -qx 'ECHANGE|Zot|HTTP/1.0 400 Bad Request' "$T/j7-reseau-usurpation.log" \
     && { echo "KO   avec $USURPEE, échange de données avec Zot" >&2; ko=1; } || echo "OK   avec $USURPEE, aucune réponse de Zot"
   n=$(wc -l < "$T/hubble-usurpation.txt")
-  [ "$n" -ge 1 ] && echo "OK   Hubble : $n flux de $USURPEE refusés, motif(s) $(cut -d' ' -f5 "$T/hubble-usurpation.txt" | sort -u | paste -sd,)" \
+  [ "$n" -ge 1 ] && echo "OK   Hubble : $n flux de $USURPEE refusés, motif(s) $(cut -d' ' -f6 "$T/hubble-usurpation.txt" | sort -u | paste -sd,)" \
     || { echo "KO   Hubble : aucun flux de $USURPEE" >&2; ko=1; }
   echo "  capture -i any sur sc-build : $(syn_distincts "$T/usurpation.txt" "$USURPEE" 192.168.161.13.5000) SYN distinct(s) de $USURPEE vers Zot, \
 $(grep -cE "192\.168\.161\.13\.5000 > ${USURPEE//./\\.}\.[0-9]+: Flags \[S\.\]" "$T/usurpation.txt" || true) ligne(s) SYN-ACK en retour"

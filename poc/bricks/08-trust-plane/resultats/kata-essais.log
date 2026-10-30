@@ -1,16 +1,16 @@
-# kata.sh essais, 2026-10-30T15:24:11Z
+# kata.sh essais, 2026-10-30T19:58:43Z
 ## prédiction
 runc : noyau de sc-build (6.12.113+deb13-amd64), seccomp filtré (Seccomp: 2), x86-64-v3 pris en charge, v4 non, aucun drapeau avx512
 kata : noyau de l'invité 6.18.56, 1 vCPU, MemTotal sous 2048 Mio, Seccomp: 0 (disable_guest_seccomp), x86-64-v3 pris en charge, v4 non
 kata avec l'annotation default_memory=4096 : même mémoire que kata (annotation non transmise par containerd)
-kata privilégié dans builds : admis (exemption de la RuntimeClass kata, étape exemption)
+kata privilégié dans builds : refusé par Pod Security (enforce restricted), avant Kyverno
 kata : QEMU lancé avec -cpu host,pmu=off (type host et cpu_features, lus dans cmdline_generator.rs de runtime-rs 4.3.1),
        donc même modèle de CPU (model name) dans l'invité que dans sc-build
 ## mesures
-### j7-runc (runtimeClassName -, annotation -) : nœud sc-build, conteneur lancé 0 s après la création
+### j7-runc (runtimeClassName -, annotation -) : nœud sc-build, conteneur lancé 4 s après la création
      noyau : 6.12.113+deb13-amd64
      vCPU : 6
-     MemTotal:       10189560 kB
+     MemTotal:       10189564 kB
      model name	: Intel Core Processor (Haswell, no TSX, IBRS)
        x86-64-v4
        x86-64-v3 (supported, searched)
@@ -31,7 +31,7 @@ kata : QEMU lancé avec -cpu host,pmu=off (type host et cpu_features, lus dans c
      CapEff:	0000000000000000
      NoNewPrivs:	1
      Seccomp:	0
-### j7-kata-memoire (runtimeClassName kata, annotation io.katacontainers.config.hypervisor.default_memory=4096) : nœud sc-build, conteneur lancé 4 s après la création
+### j7-kata-memoire (runtimeClassName kata, annotation io.katacontainers.config.hypervisor.default_memory=4096) : nœud sc-build, conteneur lancé 3 s après la création
      noyau : 6.18.56
      vCPU : 1
      MemTotal:        1969780 kB
@@ -59,15 +59,19 @@ CONSTAT kata : Seccomp: 0 dans l'invité malgré seccompProfile RuntimeDefault (
 OK   kata : QEMU en -cpu host,pmu=off, même modèle de CPU que sc-build (Intel Core Processor (Haswell, no TSX, IBRS))
 NoNewPrivs et CapEff : runc 1 0000000000000000, kata 1 0000000000000000
 ## pod Kata privilégié dans builds (dry-run serveur)
-OK   pod Kata privilégié dans builds, exemption posée : admis (pod/j7-kata-privilegie created (server dry run))
+OK   pod Kata privilégié dans builds : refusé (violates PodSecurity "restricted:latest")
 ## qui peut créer, modifier ou supprimer une RuntimeClass (pods-isolation reconnaît Kata au nom de la RuntimeClass)
 RuntimeClasses : crun=crun kata=kata lunatic=lunatic nvidia=nvidia nvidia-experimental=nvidia-experimental slight=slight spin=spin wasmedge=wasmedge wasmer=wasmer wasmtime=wasmtime wws=wws 
 runtimes de containerd sur sc-build (crictl info) : kata runc runhcs-wcow-process
 les RuntimeClasses créées par k3s (crun, nvidia, wasm…) n'ont pas de runtime derrière sur sc-build : un pod qui les désigne n'y démarre pas
 prédiction : ramasse-miettes de Kubernetes (update, patch, delete), contrôleur des espaces de noms (delete) ; aucune création ; l'opérateur : rien
-72 comptes de service et l'opérateur examinés ; accordés :
+76 comptes de service et l'opérateur examinés ; accordés :
   kube-system:generic-garbage-collector delete
   kube-system:generic-garbage-collector patch
   kube-system:generic-garbage-collector update
+  kube-system:helm-cilium create
+  kube-system:helm-cilium delete
+  kube-system:helm-cilium patch
+  kube-system:helm-cilium update
   kube-system:namespace-controller delete
-OK   ces deux contrôleurs seuls, parmi les comptes de service, et aucune création (plus les administrateurs du cluster)
+CONSTAT  liste différente de la prédiction (ci-dessus)

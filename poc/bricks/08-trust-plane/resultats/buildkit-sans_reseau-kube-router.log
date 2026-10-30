@@ -1,0 +1,39 @@
+# buildkit.sh sans_reseau, 2026-10-30T18:19:15Z
+## prédiction (écrite le 30/10/2026, avant la mesure ; option 3 du contrôle de sortie, choix du propriétaire)
+- témoins, pods Kata privilégiés, sortie testée 4 s après le lancement (au-delà de la fenêtre de 570 ms) : sans le label,
+  Zot et Forgejo joignables ; avec tekton.dev/task=construire-image, les deux refusés
+- layout OCI de l'image de build (oras cp) : index qui désigne sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67, blobs conformes à leur sha256 dans le pod
+- pod de construction au label : Zot refusé ; construction avec docker-image:// en échec réseau (résolution ou connexion) ;
+  construction avec oci-layout:// réussie, image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 et binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11, ceux de sample_app : l'image finale part
+  de scratch et ne contient que le binaire, et l'image de build est la même, par digest
+## politique
+construction-sans-sortie : sélection {"tekton.dev/task":"construire-image"}, types ["Ingress","Egress"], aucune règle ; politiques de builds : networkpolicy.networking.k8s.io/construction-sans-sortie 
+## entrées
+OK   tar des entrées de la voie D (sha256 épinglé) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+OK   index du layout OCI de l'image de build : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+layout : 73 Mo, 3 blobs, tar 8480d6d5275b52d8ed733f57153175d43f4e7250d5ef6b29a2ebc81be637ff03
+## témoins : pods Kata privilégiés sans puis avec le label
+### j7-bk-sonde-sans-label (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites -) : phase Succeeded
+     SORTIE|Zot|OUVERT
+     SORTIE|Forgejo|OUVERT
+### j7-bk-sonde-label (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites -) : phase Succeeded
+     SORTIE|Zot|FERME
+     SORTIE|Forgejo|FERME
+OK   sans le label : sorties : Zot|OUVERT Forgejo|OUVERT 
+OK   avec le label : sorties : Zot|FERME Forgejo|FERME 
+## pod j7-bk-sans-reseau (Kata, privilégié, root, limites {"cpu": "2", "memory": "6Gi"}, label tekton.dev/task=construire-image, racine de BuildKit sur tmpfs)
+labels du pod : {"tekton.dev/task":"construire-image"}
+OK   entrées livrées par kubectl exec (sha256 dans le pod) : 3ab76623d0fe5fb573858828531bbaede2112f0c2f3849a1ab7d73f8ad477d28
+OK   layout livré par kubectl exec (sha256 dans le pod) : 8480d6d5275b52d8ed733f57153175d43f4e7250d5ef6b29a2ebc81be637ff03
+### j7-bk-sans-reseau
+     BLOBS|OK|3
+     SORTIE|Zot|FERME
+     REGISTRE|1|20 s|lookup sc-stockage.poc.test on 10.43.0.10:53: read udp 10.42.1.133:34442->10.43.0.10:53: read: connection refused
+     LAYOUT|0|29 s|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## comparaison
+OK   blobs du layout dans le pod : OK
+OK   pod au label : Zot : FERME
+OK   docker-image:// : échec réseau (lookup sc-stockage.poc.test on 10.43.0.10:53: read udp 10.42.1.133:34442->10.43.0.10:53: read: connection refused)
+OK   oci-layout:// : code de retour : 0
+OK   binaire dans l'image : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+OK   image construite sans réseau, image de build en layout OCI, face à la voie A (3a7ca1b1) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5

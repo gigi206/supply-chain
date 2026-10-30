@@ -1,0 +1,316 @@
+# rejeu.sh j1-j7-cilium-suite, 2026-10-30T19:15:45Z
+réseau : cilium ; reprise à J2
+## démontage : sautée (reprise à J2)
+## VM : sautée (reprise à J2)
+## k3s : sautée (reprise à J2)
+## Cilium : sautée (reprise à J2)
+[confiance:stockage] $ poc/bricks/08-trust-plane/stockage.sh pki zot registre containerd forgejo depot
+# stockage.sh pki, 2026-10-30T19:15:45Z
+subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
+notAfter=Oct 29 16:39:08 2027 GMT
+sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
+X509v3 Basic Constraints: critical
+    CA:TRUE, pathlen:0
+X509v3 Key Usage: critical
+    Certificate Sign, CRL Sign
+X509v3 Name Constraints: critical
+    Permitted:
+      DNS:poc.test
+      DNS:svc.cluster.local
+      IP:192.168.161.0/255.255.255.0
+      IP:10.43.0.0/255.255.0.0
+zot : certificat existant
+~/.cache/supply-chain-poc/08/pki/zot.crt: OK
+subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
+forgejo : certificat existant
+~/.cache/supply-chain-poc/08/pki/forgejo.crt: OK
+subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
+OK   certificat registre.exemple.org signé par la CA : refusé (permitted subtree violation)
+~/.cache/supply-chain-poc/08/pki:
+total 36
+-rw-rw-r-- 1 gigi gigi  765 Oct 29 17:39 ca-poc.crt
+-rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 forgejo.crt
+-rw-rw-r-- 1 gigi gigi  806 Oct 29 18:55 openbao.crt
+-rw-rw-r-- 1 gigi gigi  178 Oct 30 13:07 taches.pub
+-rw-rw-r-- 1 gigi gigi 1356 Oct 30 13:00 tsa-chaine.pem
+-rw-rw-r-- 1 gigi gigi  704 Oct 30 13:00 tsa-feuille.crt
+-rw------- 1 gigi gigi 1599 Oct 30 13:00 tsa-racine-confiance.json
+-rw-rw-r-- 1 gigi gigi  652 Oct 29 21:07 tsa-racine.crt
+-rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 zot.crt
+
+~/.cache/supply-chain-poc/08/secrets:
+total 76
+-rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
+-rw------- 1 gigi gigi  33 Oct 30 12:55 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Oct 30 12:55 forgejo-admin.token
+-rw------- 1 gigi gigi  64 Oct 29 19:59 forgejo-webhook.secret
+-rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
+-rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
+-rw------- 1 gigi gigi 139 Oct 30 20:14 k3s-jeton-agent-securise
+-rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-serveur
+-rw------- 1 gigi gigi  44 Oct 30 12:56 openbao-descellement.b64
+-rw------- 1 gigi gigi  64 Oct 30 12:56 openbao-descellement.hex
+-rw------- 1 gigi gigi  26 Oct 30 12:56 openbao-root.token
+-rw------- 1 gigi gigi 241 Oct 29 18:55 openbao.key
+-rw------- 1 gigi gigi 241 Oct 29 23:06 taches.key
+-rw------- 1 gigi gigi 241 Oct 29 21:07 tsa-racine.key
+-rw------- 1 gigi gigi  48 Oct 29 19:30 zot-poc-build.password
+-rw------- 1 gigi gigi  48 Oct 29 17:39 zot-poc-ecriture.password
+-rw------- 1 gigi gigi  48 Oct 29 21:04 zot-poc-horodatage.password
+-rw------- 1 gigi gigi  48 Oct 30 16:47 zot-poc-images.password
+-rw------- 1 gigi gigi 241 Oct 29 17:39 zot.key
+# stockage.sh zot, 2026-10-30T19:15:45Z
+~/.local/share/mise/installs/aqua-project-zot-zot/2.1.22/zot: OK
+htpasswd : poc-ecriture, bcrypt, coût 12
+htpasswd : poc-build, bcrypt, coût 12
+htpasswd : poc-horodatage, bcrypt, coût 12
+htpasswd : poc-images, bcrypt, coût 12
+zot: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/zot.service' -> '/etc/systemd/system/zot.service'.
+https://192.168.161.13:5000/v2/ (CA du PoC) : HTTP 200
+active
+{"time":"2026-10-30T19:15:50.958127628Z","level":"info","message":"version","distribution-spec":"1.1.1","commit":"v2.1.22-0-g6bbc7e5","binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs","go version":"go1.27.1","caller":"zotregistry.dev/zot/v2/pkg/cli/server/root.go:261","func":"zotregistry.dev/zot/v2/pkg/cli/server.NewServerRootCmd.func1","goroutine":1}
+LISTEN 0      4096   192.168.161.13:5000       0.0.0.0:*    users:(("zot",pid=2183,fd=11))           
+drwxr-x--- 3 root zot 4096 Oct 30 19:15 /etc/zot
+drwxr-x--- 3 zot  zot 4096 Oct 30 19:15 /var/lib/zot
+drwxr-x--- 2 zot  zot 4096 Oct 30 19:15 /var/log/zot
+/etc/zot:
+total 12
+-rw-r----- 1 root zot 2313 Oct 30 19:15 config.json
+-rw-r----- 1 root zot  293 Oct 30 19:15 htpasswd
+drwxr-x--- 2 root zot 4096 Oct 30 19:15 tls
+
+/etc/zot/tls:
+total 8
+-rw-r--r-- 1 root root 778 Oct 30 19:15 zot.crt
+-rw-r----- 1 root zot  241 Oct 30 19:15 zot.key
+-> Overall exposure level for zot.service: 3.0 OK :-)
+# stockage.sh registre, 2026-10-30T19:15:51Z
+OK   ouverture d'un envoi de blob sans identifiants : HTTP 401
+OK   push anonyme : refusé (basic credential not found)
+OK   push avec un mauvais mot de passe : refusé (401)
+Copying 965ee3102e59 application/vnd.oci.image.layer.v1.tar+gzip
+Copying 0672b88de149 application/vnd.oci.image.config.v1+json
+Copied  0672b88de149 application/vnd.oci.image.config.v1+json
+Copied  965ee3102e59 application/vnd.oci.image.layer.v1.tar+gzip
+Copying 3a7ca1b14dbf application/vnd.oci.image.manifest.v1+json
+Copied  3a7ca1b14dbf application/vnd.oci.image.manifest.v1+json
+Copied [oci-layout] ~/.cache/supply-chain-poc/w/b04/app-layout@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 => [registry] 192.168.161.13:5000/workspace/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+Digest: sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   push par digest : 192.168.161.13:5000/workspace/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (compte poc-ecriture)
+OK   relecture anonyme du manifeste : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   pull anonyme par digest : blobs identiques à ceux de la brique 04
+OK   suppression du manifeste par poc-ecriture : refusé (denied)
+OK   lecture sans la CA du PoC : refusé (certificate)
+OK   push par poc-build dans builds/ : 192.168.161.13:5000/builds/essai-compte@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   push par poc-build hors de builds/ (workspace/) : refusé (denied)
+OK   suppression par poc-build dans builds/ : refusé (denied)
+manifeste toujours présent après la tentative de suppression : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## journal d'audit de Zot (écritures acceptées)
+{"time":"2026-10-30T19:16:01.156428323Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
+{"time":"2026-10-30T19:16:01.162396907Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
+{"time":"2026-10-30T19:16:01.388347721Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/1fdccfda-b745-4f57-9e82-655d131f4359?digest=sha256%3A0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb","status":201}
+{"time":"2026-10-30T19:16:01.397398826Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/7b438749-f8d1-4825-b620-d14ae2690f96?digest=sha256%3A965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd","status":201}
+{"time":"2026-10-30T19:16:01.638356034Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","status":201}
+## journal de Zot : refus de cet essai (hors défis 401 sans identifiants, qui précèdent chaque requête authentifiée)
+{"time":"2026-10-30T19:15:55.557501465Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
+{"time":"2026-10-30T19:15:55.558269598Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
+{"time":"2026-10-30T19:15:59.770806045Z","username":"poc-ecriture","method":"DELETE","path":"/v2/workspace/sample-app/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
+{"time":"2026-10-30T19:16:04.09553069Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
+{"time":"2026-10-30T19:16:04.098790961Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
+{"time":"2026-10-30T19:16:06.333223635Z","username":"poc-build","method":"DELETE","path":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
+défis 401 sans identifiants : 13
+# stockage.sh containerd, 2026-10-30T19:16:06Z
+OK   pull sur sc-build sans la CA du PoC : refusé (x509)
+sc-stockage : k3s-agent redémarré, nœud Ready ; server = "https://sc-stockage.poc.test:5000/v2" capabilities = ["pull", "resolve", "push"] ca = ["/etc/rancher/k3s/ca-poc.crt"]
+sc-build : k3s-agent redémarré, nœud Ready ; server = "https://sc-stockage.poc.test:5000/v2" capabilities = ["pull", "resolve", "push"] ca = ["/etc/rancher/k3s/ca-poc.crt"]
+sc-confiance : k3s redémarré, nœud Ready ; server = "https://sc-stockage.poc.test:5000/v2" capabilities = ["pull", "resolve", "push"] ca = ["/etc/rancher/k3s/ca-poc.crt"]
+namespace/j2-essais created
+pod/sample-app created
+pod/dns created
+pod/sample-app condition met
+pod/dns condition met
+NAME         READY   STATUS      RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES
+dns          0/1     Completed   0          3s    10.42.1.92    sc-build   <none>           <none>
+sample-app   1/1     Running     0          3s    10.42.1.170   sc-build   <none>           <none>
+OK   pull par digest dans un pod de sc-build : sc-stockage.poc.test:5000/workspace/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+Scheduled   Successfully assigned j2-essais/sample-app to sc-build
+Pulling     Pulling image "sc-stockage.poc.test:5000/workspace/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"
+Pulled      Successfully pulled image "sc-stockage.poc.test:5000/workspace/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5" in 468ms (468ms including waiting). Image size: 2637325 bytes.
+Created     Container created
+Started     Container started
+## résolution depuis un pod de sc-build
+Server:		10.43.0.10
+Address:	10.43.0.10:53
+
+Name:	sc-stockage.poc.test
+Address: 192.168.161.13
+
+Non-authoritative answer:
+
+OK   sc-stockage.poc.test résolu depuis un pod (CoreDNS)
+namespace "j2-essais" deleted
+# stockage.sh forgejo, 2026-10-30T19:16:21Z
+~/.local/share/mise/installs/forgejo-forgejo-forgejo/15.0.11/forgejo: OK
+Get:1 file:/etc/apt/mirrors/debian.list Mirrorlist [30 B]
+Get:2 file:/etc/apt/mirrors/debian-security.list Mirrorlist [39 B]
+Get:3 https://deb.debian.org/debian trixie/main amd64 perl-modules-5.40 all 5.40.1-6+deb13u1 [3014 kB]
+Get:4 https://deb.debian.org/debian trixie/main amd64 libgdbm-compat4t64 amd64 1.24-2 [50.3 kB]
+Get:5 https://deb.debian.org/debian trixie/main amd64 libperl5.40 amd64 5.40.1-6+deb13u1 [4326 kB]
+Get:6 https://deb.debian.org/debian trixie/main amd64 perl amd64 5.40.1-6+deb13u1 [268 kB]
+Get:7 https://deb.debian.org/debian trixie/main amd64 libngtcp2-16 amd64 1.11.0-1+deb13u1 [132 kB]
+Get:8 https://deb.debian.org/debian trixie/main amd64 libngtcp2-crypto-gnutls8 amd64 1.11.0-1+deb13u1 [29.5 kB]
+Get:9 https://deb.debian.org/debian trixie/main amd64 liberror-perl all 0.17030-1 [26.9 kB]
+Get:10 https://deb.debian.org/debian trixie/main amd64 git-man all 1:2.47.3-0+deb13u1 [2205 kB]
+Get:11 https://deb.debian.org/debian trixie/main amd64 git amd64 1:2.47.3-0+deb13u1 [8862 kB]
+Get:12 https://deb.debian.org/debian-security trixie-security/main amd64 libcurl3t64-gnutls amd64 8.14.1-2+deb13u7 [385 kB]
+Setting up libgdbm-compat4t64:amd64 (1.24-2) ...
+Setting up perl-modules-5.40 (5.40.1-6+deb13u1) ...
+Setting up git-man (1:2.47.3-0+deb13u1) ...
+Setting up libngtcp2-16:amd64 (1.11.0-1+deb13u1) ...
+Setting up libngtcp2-crypto-gnutls8:amd64 (1.11.0-1+deb13u1) ...
+Setting up libcurl3t64-gnutls:amd64 (8.14.1-2+deb13u7) ...
+Setting up libperl5.40:amd64 (5.40.1-6+deb13u1) ...
+Setting up perl (5.40.1-6+deb13u1) ...
+Setting up liberror-perl (0.17030-1) ...
+Setting up git (1:2.47.3-0+deb13u1) ...
+git 1:2.47.3-0+deb13u1 perl 5.40.1-6+deb13u1
+git version 2.47.3
+forgejo: OK
+secret SECRET_KEY généré
+secret INTERNAL_TOKEN généré
+secret JWT_SECRET généré
+Created symlink '/etc/systemd/system/multi-user.target.wants/forgejo.service' -> '/etc/systemd/system/forgejo.service'.
+administrateur poc-admin créé, mot de passe en 0600 sur l'hôte
+jeton j2-depots (write:organization, write:repository) en 0600 sur l'hôte
+https://192.168.161.13:3000/api/healthz (CA du PoC) : HTTP 200 ; version 15.0.11+gitea-1.22.0
+active
+LISTEN 0      4096   192.168.161.13:3000       0.0.0.0:*    users:(("forgejo",pid=2925,fd=14))       
+/etc/forgejo:
+total 12
+-rw-r----- 1 root forgejo 1379 Oct 30 19:16 app.ini
+drwxr-x--- 2 root forgejo 4096 Oct 30 19:16 secrets
+drwxr-x--- 2 root forgejo 4096 Oct 30 19:16 tls
+
+/etc/forgejo/secrets:
+total 12
+-rw-r----- 1 root forgejo 105 Oct 30 19:16 internal_token
+-rw-r----- 1 root forgejo  43 Oct 30 19:16 jwt_secret
+-rw-r----- 1 root forgejo  43 Oct 30 19:16 secret_key
+
+/etc/forgejo/tls:
+total 8
+-rw-r--r-- 1 root root    778 Oct 30 19:16 forgejo.crt
+-rw-r----- 1 root forgejo 241 Oct 30 19:16 forgejo.key
+drwxr-x--- 3 forgejo forgejo 4096 Oct 30 19:16 /var/lib/forgejo
+OK   app.ini inchangé par Forgejo (identique à stockage/forgejo.ini, sans secret)
+OK   inscription désactivée (/user/sign_up : « Registration is disabled »)
+-> Overall exposure level for forgejo.service: 3.0 OK :-)
+# stockage.sh depot, 2026-10-30T19:16:33Z
+OK   création d'organisation sans jeton : HTTP 401
+OK   push sans jeton : refusé (could not read Username)
+OK   arbre 30e808ffa327288c656ddda7b6fafe4005234b77 = poc/sample-app à HEAD (8818ae9)
+OK   https://sc-stockage.poc.test:3000/workspace/sample-app : main = 6391fd437f26696847041be3226bbbf633f55a2f (lecture anonyme)
+## journal de Forgejo (requêtes de cet essai)
+router: completed POST /api/v1/orgs, 401 Unauthorized
+router: completed GET /api/v1/orgs/workspace, 404 Not Found
+router: completed POST /api/v1/orgs, 201 Created
+router: completed POST /api/v1/orgs/workspace/repos, 201 Created
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 401 Unauthorized
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app.git/git-receive-pack, 200 OK
+## depuis sc-build (CA déclarée aux nœuds, résolution par le DNS du réseau)
+branche lue au bout de 3 essai(s)
+{"branche":"main","commit":"6391fd437f26696847041be3226bbbf633f55a2f","auteur":"PoC brique 08","date":"2026-10-29T00:00:00Z"}
+OK   même commit vu depuis la zone build
+## durée J2 : 51 s
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh image deployer initialiser configurer essais redemarrage
+# openbao.sh image, 2026-10-30T19:16:36Z
+ghcr.io/openbao/openbao:2.7.2 → sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f (= digest épinglé)
+OK   l'index signé référence le manifeste linux/amd64 sha256:a78eb12a9fc7a3ebb4bec1724e2bdd6a28e33394820641d061166919a3f1866b
+OK   signature de ghcr.io/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f : https://github.com/openbao/openbao/.github/workflows/release-images.yml@refs/tags/v2.7.2, commit 9e0a0d3c3504a0a00b45e61355afac5e35c78379, déclencheur release
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+OK   signature avec une identité voisine (tag v2.7.1) : refusé (no matching CertificateIdentity)
+copié dans Zot : 192.168.161.13:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f (cache avec referrers, telechargements/oci/amont/openbao/openbao)
+OK   signature revérifiée sur la copie de Zot : sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+referrers dans Zot : application/vnd.dev.sigstore.bundle.v0.3+json ×4
+# openbao.sh deployer, 2026-10-30T19:17:10Z
+openbao : certificat existant
+~/.cache/supply-chain-poc/08/pki/openbao.crt: OK
+subject=O=supply-chain PoC, CN=openbao.openbao.svc.cluster.local notAfter=Apr 27 17:55:01 2027 GMT X509v3 Subject Alternative Name: DNS:openbao.openbao.svc.cluster.local
+namespace/openbao serverside-applied
+serviceaccount/openbao serverside-applied
+service/openbao serverside-applied
+statefulset.apps/openbao serverside-applied
+networkpolicy.networking.k8s.io/openbao serverside-applied
+namespace/tekton-chains serverside-applied
+serviceaccount/tekton-chains-controller serverside-applied
+configmap/openbao-config serverside-applied
+secret openbao-tls appliqué (clé lue sur l'entrée standard de kubectl, sans annotation last-applied)
+NAME        READY   STATUS    RESTARTS   AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+openbao-0   0/1     Running   0          6s    10.42.0.109   sc-confiance   <none>           <none>
+sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
+NAME             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+data-openbao-0   Bound    pvc-7679a923-a6fc-433e-9ee4-437e46c9070e   1Gi        RWO            local-path     <unset>                 6s
+uid=100(openbao) gid=1000(openbao) groups=1000(openbao)
+drwxrwsrwx    3 root     openbao       4096 Oct 30 19:17 /openbao/data
+OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z
+# openbao.sh initialiser, 2026-10-30T19:17:16Z
+état : {"initialized":false,"sealed":true}
+initialisé : 1 part, seuil 1 ; 1 clé de descellement et jeton root en 0600 sur l'hôte
+{"sealed":false,"t":1,"n":1,"progress":0}
+{"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
+{"chemin":"fichier/","type":"file","fichier":"/openbao/data/audit.log"}
+OK   audit actif avant la configuration
+total 68
+-rw-------    1 openbao  openbao       8203 Oct 30 19:17 audit.log
+drwx--S---    3 openbao  openbao       4096 Oct 30 19:17 raft
+-rw-------    1 openbao  openbao   16801792 Oct 30 19:17 vault.db
+# openbao.sh configurer, 2026-10-30T19:17:29Z
+OK   clé publique de service.key : kid XxTkx5bTyVectsudlM-fT6reuQKA6ZD78hCS0oidytc = celui du JWKS (émetteur https://kubernetes.default.svc.cluster.local)
+Success! Enabled the transit secrets engine at: transit/
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-10-30T19:17:30.371235667Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9lHd1wH+24yOqEpUyeOAWg4SEGW4
+dZ9vptCiisfw69EEedDHZ6v49q6had0mGOlzkAMG9tRR8ofxzdtgXXsENA==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      chains
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: chains-signature
+Success! Enabled jwt auth method at: jwt/
+Success! Data written to: auth/jwt/config
+Success! Data written to: auth/jwt/role/tekton-chains
+{"name":"chains","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:tekton-chains:tekton-chains-controller","user_claim":"sub","token_policies":["chains-signature"],"token_no_default_policy":true,"token_type":"batch","token_ttl":300,"token_max_ttl":300}
+{"bound_issuer":"https://kubernetes.default.svc.cluster.local","cles":1}
+path "transit/keys/chains" {
+  capabilities = ["read"]
+}
+path "transit/sign/chains" {
+  capabilities = ["update"]
+}
+path "transit/sign/chains/*" {
+  capabilities = ["update"]
+}
+# openbao.sh essais, 2026-10-30T19:17:31Z
+error: timed out waiting for the condition on pods/reseau
+[confiance:openbao] ERROR task failed
