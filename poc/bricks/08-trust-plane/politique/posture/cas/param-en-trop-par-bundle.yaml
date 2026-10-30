@@ -1,0 +1,41 @@
+# Limite : même pipeline, tâche référencée par le résolveur bundles (comme en service) : les règles croisées sautent une
+# référence sans nom (lu dans no-extra-param, no-missing-param, no-undefined-result). attendu : aucune
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: publier-local
+spec:
+  params:
+  - name: commit
+    type: string
+  steps:
+  - name: dire
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    script: |
+      #!/bin/sh
+      echo "$(params.commit)"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: essai-param-en-trop
+spec:
+  params:
+  - name: commit
+    type: string
+  tasks:
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
+      - name: name
+        value: publier-local
+      - name: kind
+        value: task
+    params:
+    - name: commit
+      value: $(params.commit)
+    - name: inconnu
+      value: x

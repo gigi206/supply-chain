@@ -1,0 +1,12 @@
+# Témoin : image sans digest, en :latest. attendu : no-latest-image
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: essai-latest
+spec:
+  steps:
+  - name: dire
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox:latest
+    script: |
+      #!/bin/sh
+      echo essai

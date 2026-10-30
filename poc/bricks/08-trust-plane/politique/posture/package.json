@@ -1,0 +1,8 @@
+{
+  "name": "posture-tekton",
+  "private": true,
+  "description": "Brique 08, J6 : tekton-lint épinglé ; dépendances figées par package-lock.json (installation : npm ci --ignore-scripts, hors du dépôt)",
+  "dependencies": {
+    "@ibm/tekton-lint": "1.2.4"
+  }
+}

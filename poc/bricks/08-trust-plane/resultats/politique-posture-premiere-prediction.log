@@ -1,0 +1,45 @@
+# politique.sh posture, 2026-10-30T12:44:00Z
+## installation depuis le verrou (politique/posture/package-lock.json), hors du dépôt : .cache/supply-chain-poc/08/outils/tekton-lint
+node v22.22.0, npm 10.9.4
+added 89 packages in 487ms
+OK   @ibm/tekton-lint 1.2.4 installé, intégrité sha512-7539FVmzcpqdA3r… (relevée le 29/10/2026)
+  89 packages have verified registry signatures
+  2 packages have verified attestations
+OK   signatures du registre npm vérifiées pour les 89 paquets installés, aucune invalide ni absente
+## ressources en service : TriggerTemplate de declencheurs, pipeline et tâches lues dans leurs bundles de Zot
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:d2f0fde9edfa8a4f4f5099240488bfe399a50306fc3738e9f954a0ffe74cc801
+  tâche sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
+  tâche d'essai sc-stockage.poc.test:5000/tekton/tasks/essai-confiance@sha256:e647a5ae98c8fff41d317a3bf51d2e81605a63e87e28cbcca4dfb619975ae349
+prédiction : aucune erreur, aucun avertissement (images par digest, scripts avec #!, paramètres déclarés et utilisés ;
+la tâche de la pipeline, référencée par bundle, échappe aux règles croisées)
+KO   sortie de tekton-lint illisible pour plateforme/*.yaml
+## sortie brute de tekton-lint sur les ressources en service (première ligne : JSON ; ensuite : journal interne, écrit sur la sortie standard)
+[{"message":"Resource TriggerTemplate 'sample-app' has an invalid 'resourceVersion' key in its resource definition.","rule":"no-resourceversion","level":"error","path":"plateforme/triggertemplate-sample-app.yaml","loc":{"range":[196,202,203],"startLine":8,"startColumn":20,"endLine":8,"endColumn":26}},{"message":"TriggerTemplate 'sample-app' references pipeline 'undefined', but the referenced pipeline cannot be found.","rule":"no-missing-resource","level":"error","path":"plateforme/triggertemplate-sample-app.yaml","loc":{}},{"message":"Pipeline 'sample-app-essai' references task 'undefined' but the referenced task cannot be found. To fix this, include all the task definitions to the lint task for this pipeline.","rule":"no-missing-resource","level":"error","path":"plateforme/pipeline-sample-app-essai.yaml","loc":{}}]
+[13:44:02.688] ERROR (423481): Cannot read properties of undefined (reading 'key')
+    err: {
+      "type": "TypeError",
+      "message": "Cannot read properties of undefined (reading 'key')",
+      "stack":
+          TypeError: Cannot read properties of undefined (reading 'key')
+              at Reporter._getLocationAVL (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/reporter.ts:181:77)
+              at Reporter.report (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/reporter.ts:117:24)
+              at file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules.ts:10:18
+              at default (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules/no-missing-resource.ts:40:17)
+              at lint (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules.ts:67:9)
+              at runner (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/runner.ts:43:16)
+              at file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/lint.ts:61:26
+    }
+[13:44:02.693] ERROR (423481): Cannot read properties of undefined (reading 'key')
+    err: {
+      "type": "TypeError",
+      "message": "Cannot read properties of undefined (reading 'key')",
+      "stack":
+          TypeError: Cannot read properties of undefined (reading 'key')
+              at Reporter._getLocationAVL (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/reporter.ts:181:77)
+              at Reporter.report (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/reporter.ts:117:24)
+              at file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules.ts:10:18
+              at default (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules/no-missing-resource.ts:81:21)
+              at lint (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/rules.ts:67:9)
+              at runner (file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/runner.ts:43:16)
+              at file://~/.cache/supply-chain-poc/08/outils/tekton-lint/node_modules/@ibm/tekton-lint/src/lint.ts:61:26
+    }

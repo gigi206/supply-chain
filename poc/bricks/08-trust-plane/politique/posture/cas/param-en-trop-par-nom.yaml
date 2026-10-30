@@ -1,0 +1,33 @@
+# Témoin : la pipeline passe un paramètre que la tâche, référencée par son nom, ne déclare pas. attendu : no-extra-param
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: publier-local
+spec:
+  params:
+  - name: commit
+    type: string
+  steps:
+  - name: dire
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    script: |
+      #!/bin/sh
+      echo "$(params.commit)"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: essai-param-en-trop
+spec:
+  params:
+  - name: commit
+    type: string
+  tasks:
+  - name: publier
+    taskRef:
+      name: publier-local
+    params:
+    - name: commit
+      value: $(params.commit)
+    - name: inconnu
+      value: x

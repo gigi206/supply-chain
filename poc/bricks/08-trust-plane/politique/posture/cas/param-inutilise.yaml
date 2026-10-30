@@ -1,0 +1,15 @@
+# Témoin : paramètre déclaré, jamais utilisé. attendu : no-unused-param
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: essai-param-inutilise
+spec:
+  params:
+  - name: inutile
+    type: string
+  steps:
+  - name: dire
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    script: |
+      #!/bin/sh
+      echo essai

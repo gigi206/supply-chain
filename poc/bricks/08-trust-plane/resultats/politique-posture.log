@@ -1,0 +1,26 @@
+# politique.sh posture, 2026-10-30T12:45:12Z
+## installation depuis le verrou (politique/posture/package-lock.json), hors du dépôt : .cache/supply-chain-poc/08/outils/tekton-lint
+node v22.22.0, npm 10.9.4
+added 89 packages in 449ms
+OK   @ibm/tekton-lint 1.2.4 installé, intégrité sha512-7539FVmzcpqdA3r… (relevée le 29/10/2026)
+  89 packages have verified registry signatures
+  2 packages have verified attestations
+OK   signatures du registre npm vérifiées pour les 89 paquets installés, aucune invalide ni absente
+## ressources en service : TriggerTemplate de declencheurs, pipeline et tâches lues dans leurs bundles de Zot
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:d2f0fde9edfa8a4f4f5099240488bfe399a50306fc3738e9f954a0ffe74cc801
+  tâche sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
+  tâche d'essai sc-stockage.poc.test:5000/tekton/tasks/essai-confiance@sha256:e647a5ae98c8fff41d317a3bf51d2e81605a63e87e28cbcca4dfb619975ae349
+prédiction : aucune erreur, aucun avertissement (images par digest, scripts avec #!, paramètres déclarés et utilisés ;
+la tâche de la pipeline, référencée par bundle, échappe aux règles croisées ; no-missing-resource désactivée)
+OK   4 ressources en service : aucun signalement, comme prédit
+## témoins (politique/posture/cas) : chaque règle visée se déclenche ; prédiction en tête de chaque fichier
+OK   gabarit-param-inutilise.yaml : no-unused-param (warning), comme prédit
+OK   image-latest.yaml : no-latest-image (warning), comme prédit
+OK   param-en-double.yaml : no-duplicate-param (error), comme prédit
+OK   param-en-trop-par-bundle.yaml : aucun signalement, comme prédit
+OK   param-en-trop-par-nom.yaml : no-extra-param (error), comme prédit
+OK   param-inutilise.yaml : no-unused-param (warning), comme prédit
+OK   param-non-defini.yaml : no-undefined-param (error), comme prédit
+OK   sans-hashbang.yaml : no-missing-hashbang (warning), comme prédit
+OK   tache-absente-par-nom.yaml : aucun signalement, comme prédit
+OK   aucun cache dans le répertoire personnel (TL_CACHE_DIR)

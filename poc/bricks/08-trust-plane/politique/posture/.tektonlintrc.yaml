@@ -1,0 +1,32 @@
+# Brique 08, J6 : configuration de tekton-lint 1.2.4 pour l'étape posture (politique.sh). Sévérités par défaut du paquet
+# (.tektonlintrc.yaml de @ibm/tekton-lint 1.2.4), recopiées pour être versionnées. Ni external-tasks (git clone à chaque
+# lancement), ni règles custom (code JavaScript chargé) : la sécurité des références reste dans Kyverno (admission.yaml).
+# Seul écart au défaut : no-missing-resource désactivée. tekton-lint 1.2.4 ne lit que les références par nom ; une référence
+# par résolveur (bundles, imposé par Kyverno, règle tekton-references) y est signalée introuvable (« task 'undefined' »),
+# puis son rapporteur plante sur la clé name absente (politique-posture-premiere-prediction.log). Perdu : la détection d'une
+# référence par nom à une ressource absente du lot (témoin cas/tache-absente-par-nom.yaml), refusée de toute façon à l'admission.
+rules: # error | warning | off
+  no-duplicate-param: error
+  no-invalid-name: error
+  no-invalid-param-type: error
+  no-pipeline-missing-parameters: error
+  no-pipeline-missing-task: error
+  no-pipeline-task-cycle: error
+  no-extra-param: error
+  no-missing-workspace: error
+  no-undefined-result: error
+  no-missing-param: error
+  no-duplicate-resource: error
+  no-resourceversion: error
+  no-duplicate-env: error
+  no-undefined-volume: error
+  no-latest-image: warning
+  prefer-beta: warning
+  prefer-kebab-case: warning
+  prefer-camel-kebab-case: off
+  no-unused-param: warning
+  no-missing-resource: off   # voir l'en-tête
+  no-undefined-param: error
+  prefer-when-expression: warning
+  no-deprecated-resource: warning
+  no-missing-hashbang: warning

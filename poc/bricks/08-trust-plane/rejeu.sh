@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Brique 08 : rejeu complet depuis zéro des jalons faits (J1 à J6) : démontage, VM, k3s, stockage, OpenBao, Tekton,
 # horodatage, politique (test 5 rejoué sous politique entre declencheurs et porte, comme au premier passage ; porte avant
-# rattrapage, qui juge avec elle ; droits en dernier, qui lit l'audit du test 5 et du rattrapage), puis contrôle des
+# rattrapage, qui juge avec elle ; droits, qui lit l'audit du test 5 et du rattrapage ; posture), puis contrôle des
 # secrets dans les journaux. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte.
 #
@@ -30,6 +30,6 @@ etape J4 mise run confiance:tekton -- revue miroir installer signature verifier 
 etape J5 mise run confiance:tsa -- image pki openbao deployer essais horodater chemins
 etape J6 mise run confiance:politique -- image installer parite taches admission chains declencheurs restreint horodatage
 etape "test 5 (J6)" env EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook
-etape "J6 (suite)" mise run confiance:politique -- porte rattrapage droits
+etape "J6 (suite)" mise run confiance:politique -- porte rattrapage droits posture
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

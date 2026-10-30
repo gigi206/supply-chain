@@ -61,6 +61,12 @@
 #              opérateur, job d'horodatage, rattrapage, porte, contrôleurs de Pipelines et de Chains ; RBAC seul,
 #              l'admission n'y figure pas) dans resultats/politique-droits.tsv ; comptes de service du cluster qui peuvent
 #              modifier un PipelineRun de builds ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
+#   posture    posture des pipelines : tekton-lint 1.2.4 (npm, sans attestation de provenance) installé hors du dépôt depuis le
+#              verrou versionné (politique/posture/package-lock.json : 90 paquets et leur intégrité sha512), npm ci sans
+#              scripts, signatures du registre npm vérifiées ; configuration versionnée (sévérités par défaut, ni tâches
+#              externes ni règles en JavaScript) ; jugés : la TriggerTemplate en service, sa pipeline et ses tâches lues dans
+#              leurs bundles de Zot (ce qui tourne) ; témoins (politique/posture/cas/) : chaque règle visée doit se déclencher,
+#              et une référence par bundle échappe aux règles croisées (limite). La sécurité des références reste à Kyverno
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -73,6 +79,7 @@ KY_DEPOT=kyverno/kyverno
 KY_COMMIT=e63308f1e16c05cd009ac4864be6ec25c66b49be   # tag léger v1.19.2 (« chore: bump chart to 3.9.2 for v1.19.2 »)
 KY_ID=https://github.com/kyverno/kyverno/.github/workflows/release.yaml@refs/tags/v1.19.2
 KY_INSTALL=4f785937dc7fe49a0731108b15def1538923c73d9236255bc69d94d498037969   # install.yaml (asset de la release)
+TL_INTEGRITE=sha512-7539FVmzcpqdA3ryjYJ0GzyykZXlXZDcu0btSubbkn7FRLKWNzKfMEXiILFuoy0X2JGZIbAIc8yPSdZfHOpntg==   # @ibm/tekton-lint 1.2.4 (npm view, 29/10/2026)
 # image index (5 plateformes), relevé du 29/10/2026 : même digest sur reg.kyverno.io et ghcr.io
 KY_IMAGES="kyverno sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
 kyvernopre sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4
@@ -1510,6 +1517,70 @@ etape_droits() {
     "de $(jq -Rr 'fromjson? | .timestamp // empty' "$T/el.log" | sort | sed -n 1p) à $(jq -Rr 'fromjson? | .timestamp // empty' "$T/el.log" | sort | tail -1)"
   n=$(grep -ci 'forbidden' "$T/el.log" || true)
   [ "$n" = 0 ] && echo "OK   aucun « forbidden » dans le journal de $nom" || { echo "KO   $n « forbidden » dans le journal de $nom" >&2; exit 1; }
+}
+
+lint() { # sortie fichier… : tekton-lint (JSON) depuis $T/posture, cache dans $T (sinon ~/.tekton-lint), configuration versionnée ;
+  # code de sortie ignoré (1 dès une erreur), jugement sur le JSON (première ligne, un tableau). Le journal interne (pino) écrit
+  # aussi sur la sortie standard : toute autre ligne est une erreur interne de l'outil, donc un contrôle non fiable
+  local o=$1 L=$O/outils/tekton-lint/node_modules/@ibm/tekton-lint/dist/lint.js
+  shift
+  (cd "$T/posture" && TL_CACHE_DIR=$T/posture/cache node "$L" --format json --color false --config "$here/politique/posture" "$@") > "$o.brut" 2>&1 || true
+  sed -n 1p "$o.brut" > "$o"
+  sed -n '2,$p' "$o.brut" > "$o.interne"
+  jq -e 'type == "array"' "$o" >/dev/null 2>&1 && [ ! -s "$o.interne" ] \
+    || { cat "$o.brut" >&2; echo "KO   sortie de tekton-lint illisible, ou erreur interne, pour $*" >&2; exit 1; }
+}
+
+etape_posture() {
+  local D=$O/outils/tekton-lint pipe tache essai c attendu obtenu k=0 n
+  mkdir -p "$D" "$T/posture/plateforme" "$T/posture/cas"
+  echo "## installation depuis le verrou (politique/posture/package-lock.json), hors du dépôt : ${D#$HOME/}"
+  cp "$here/politique/posture/package.json" "$here/politique/posture/package-lock.json" "$D/"
+  echo "node $(node --version), npm $(npm --version)"
+  npm ci --prefix "$D" --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org/ 2>&1 | tail -1
+  [ "$(jq -r '.packages["node_modules/@ibm/tekton-lint"].integrity' "$D/node_modules/.package-lock.json")" = "$TL_INTEGRITE" ] \
+    && echo "OK   @ibm/tekton-lint $(jq -r .version "$D/node_modules/@ibm/tekton-lint/package.json") installé, intégrité ${TL_INTEGRITE:0:22}… (relevée le 29/10/2026)" \
+    || { echo "KO   intégrité de tekton-lint différente de l'épinglée" >&2; exit 1; }
+  npm audit signatures --prefix "$D" --registry=https://registry.npmjs.org/ > "$T/posture/signatures.txt" 2>&1 || true
+  grep -E 'verified|invalid|missing' "$T/posture/signatures.txt" | sed 's/^/  /'
+  npm audit signatures --prefix "$D" --json --registry=https://registry.npmjs.org/ > "$T/posture/signatures.json" 2>/dev/null || true
+  n=$(jq '.packages | length' "$D/node_modules/.package-lock.json")
+  jq -e '(.invalid | length) == 0 and (.missing | length) == 0' "$T/posture/signatures.json" >/dev/null \
+    && grep -qx "$n packages have verified registry signatures" "$T/posture/signatures.txt" \
+    && echo "OK   signatures du registre npm vérifiées pour les $n paquets installés, aucune invalide ni absente" \
+    || { cat "$T/posture/signatures.json" >&2; echo "KO   signature npm invalide ou absente ($n paquets installés)" >&2; exit 1; }
+
+  echo "## ressources en service : TriggerTemplate de declencheurs, pipeline et tâches lues dans leurs bundles de Zot"
+  # Définition seule : les champs posés par le serveur (resourceVersion, uid…) sont signalés par no-resourceversion
+  kubectl get triggertemplate -n declencheurs sample-app -o json \
+    | jq '{apiVersion, kind, metadata: {name: .metadata.name, namespace: .metadata.namespace}, spec}' > "$T/posture/plateforme/triggertemplate-sample-app.yaml"
+  pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/${pipe#*/}" - | tar -xO > "$T/posture/plateforme/pipeline-sample-app-essai.yaml"
+  tache=$(jq -r '.spec.tasks[0].taskRef.params[] | select(.name == "bundle") | .value' "$T/posture/plateforme/pipeline-sample-app-essai.yaml")
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/${tache#*/}" - | tar -xO > "$T/posture/plateforme/tache-publier-essai.yaml"
+  essai=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/tekton/tasks/essai-confiance@$essai" - | tar -xO > "$T/posture/plateforme/tache-essai-confiance.yaml"
+  printf '  %s\n' "pipeline $pipe" "tâche $tache" "tâche d'essai $REG/tekton/tasks/essai-confiance@$essai"
+  echo "prédiction : aucune erreur, aucun avertissement (images par digest, scripts avec #!, paramètres déclarés et utilisés ;"
+  echo "la tâche de la pipeline, référencée par bundle, échappe aux règles croisées ; no-missing-resource désactivée)"
+  lint "$T/posture/plateforme.json" plateforme/*.yaml
+  jq -r '.[] | "  \(.level) \(.rule) \(.path):\(.loc.startLine) \(.message)"' "$T/posture/plateforme.json"
+  [ "$(jq length "$T/posture/plateforme.json")" = 0 ] && echo "OK   $(ls "$T/posture/plateforme" | wc -l) ressources en service : aucun signalement, comme prédit" \
+    || { echo "KO   $(jq length "$T/posture/plateforme.json") signalement(s) sur les ressources en service" >&2; exit 1; }
+
+  echo "## témoins (politique/posture/cas) : chaque règle visée se déclenche ; prédiction en tête de chaque fichier"
+  cp "$here"/politique/posture/cas/*.yaml "$T/posture/cas/"
+  for c in "$T"/posture/cas/*.yaml; do
+    attendu=$(sed -n 's/.*attendu : //p' "$c" | tr ',' '\n' | sed -e 's/ //g' -e '/^aucune$/d' | sort -u | paste -sd, -)
+    lint "$T/posture/cas.json" "cas/${c##*/}"
+    obtenu=$(jq -r '.[].rule' "$T/posture/cas.json" | sort -u | paste -sd, -)
+    if [ "$obtenu" = "$attendu" ]; then
+      echo "OK   ${c##*/} : ${obtenu:-aucun signalement}$(jq -r 'if length > 0 then " (\(map(.level) | unique | join(", ")))" else "" end' "$T/posture/cas.json"), comme prédit"
+    else echo "KO   ${c##*/} : attendu ${attendu:-aucun}, obtenu ${obtenu:-aucun}" >&2; jq -r '.[] | "  \(.rule) \(.message)"' "$T/posture/cas.json" >&2; k=1; fi
+  done
+  [ "$k" = 0 ] || exit 1
+  if [ -d "$HOME/.tekton-lint" ]; then echo "KO   ~/.tekton-lint créé malgré TL_CACHE_DIR" >&2; exit 1; fi
+  echo "OK   aucun cache dans le répertoire personnel (TL_CACHE_DIR)"
 }
 
 lancer politique J6 "$@"

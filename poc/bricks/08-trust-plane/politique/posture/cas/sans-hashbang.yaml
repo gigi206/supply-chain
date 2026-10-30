@@ -1,0 +1,11 @@
+# Témoin : script sans ligne #!. attendu : no-missing-hashbang
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: essai-sans-hashbang
+spec:
+  steps:
+  - name: dire
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    script: |
+      echo essai

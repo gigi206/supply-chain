@@ -1,0 +1,11 @@
+# Coût de la configuration : pipeline qui référence par son nom une tâche absente du lot ; no-missing-resource, désactivée
+# (voir .tektonlintrc.yaml), ne la signale plus. Une référence par nom est refusée à l'admission (Kyverno). attendu : aucune
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: essai-tache-absente
+spec:
+  tasks:
+  - name: publier
+    taskRef:
+      name: tache-absente

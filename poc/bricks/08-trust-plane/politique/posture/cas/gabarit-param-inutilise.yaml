@@ -1,0 +1,27 @@
+# Témoin : paramètre de TriggerTemplate jamais utilisé dans ses gabarits. attendu : no-unused-param
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: essai-gabarit
+spec:
+  params:
+  - name: commit
+  - name: inutile
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      name: essai-$(tt.params.commit)
+    spec:
+      pipelineRef:
+        resolver: bundles
+        params:
+        - name: bundle
+          value: sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:d2f0fde9edfa8a4f4f5099240488bfe399a50306fc3738e9f954a0ffe74cc801
+        - name: name
+          value: sample-app-essai
+        - name: kind
+          value: pipeline
+      params:
+      - name: commit
+        value: $(tt.params.commit)
