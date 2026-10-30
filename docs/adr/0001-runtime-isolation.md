@@ -90,3 +90,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - [x] Dimensionnement et topologie sur le laptop : **validés le 29/10/2026** (kind pour A1, trois VM libvirt + k3s pour 08 ; [`poc/infra`](../../poc/infra/README.md)).
 - [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
+- [ ] Contrôle de sortie de la zone build (brique 08, J7, avant J8 et le test 6). Une NetworkPolicy de kube-router est contournée par usurpation d'adresse depuis le root de l'invité, et ne porte que sur un pod entier. Trois options sont soumises ([détail](../../poc/bricks/08-trust-plane/README.md#jalon-j7--isolation-par-kata-en-cours-30102026), « Contrôle de sortie de la zone build ») :
+  - voie A avec anti-usurpation côté nœud : contrôleur réseau qui vérifie l'adresse source (Cilium ou Calico, absents du doc 04, réinstallation du réseau de k3s), ou règle maison ;
+  - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
+  - dans les deux cas, une tâche de construction sans sortie.

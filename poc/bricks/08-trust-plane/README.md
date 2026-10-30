@@ -570,15 +570,57 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
   - la fenêtre de démarrage reste ouverte sous Kata ;
   - depuis le root de l'invité, l'usurpation contourne la politique sans trace.
 
-  Pistes, non mesurées, à trancher par le propriétaire avant J8 :
-  - un filtrage de l'adresse source posé hors de l'invité, sur la veth du pod côté nœud ;
-  - une tâche de construction sans aucune sortie, dont les entrées sont tirées par une tâche précédente (image de build comprise) ;
-  - un contrôleur de NetworkPolicy qui refuse les adresses usurpées, à évaluer selon le doc 04.
+  Options soumises au propriétaire avant J8 : voir le bloc suivant (anti-usurpation côté nœud, voie D pour les images Go, tâche de construction sans sortie).
+
+**Contrôle de sortie de la zone build : options soumises au propriétaire** (30/10/2026, après la mesure du réseau des pods Kata ; rien n'est modifié sur `sc-build`).
+
+Faits sur lesquels elles reposent :
+- **Seule sortie pendant la construction** : l'unique `RUN` du Dockerfile de la brique 04 est déclaré `--network=none` (lu dans le Dockerfile). Le code de l'application (`go build`) n'a donc pas de réseau dans BuildKit ; ce confinement n'est pas mesuré ici. Pendant l'étape `construire`, la seule sortie est celle de `buildkitd`, qui tire l'image de build depuis Zot, et c'est du code de la plateforme.
+- **Qui peut usurper** : l'usurpation exige `NET_ADMIN` dans l'espace réseau du pod, dans l'invité (mesuré : refusée sans). En voie A, elle est à la portée du root de l'invité : le script de la tâche, `buildkitd`, ou un code qui sortirait du bac à sable de BuildKit.
+- **Pas de seccomp dans l'invité** (mesuré en J7) : un code non privilégié y fait face à tout le noyau de l'invité. Lecture, non mesurée : une élévation au root de l'invité y est plus facile qu'avec seccomp.
+- **Le privilège reste nécessaire ailleurs** : mock exige root, et l'ADR 0001 prévoit Kata privilégié pour mock, sbuild et les images. La voie D ne couvre que les images Go.
+- **Aucune NetworkPolicy dans `builds`** aujourd'hui.
+
+Options :
+1. **Voie A avec anti-usurpation côté nœud.** Elle traite l'usurpation pour toute la zone build, mock et sbuild compris.
+   - **1a. Contrôleur réseau qui vérifie l'adresse source.**
+     - **Cilium** ([documentation stable, annotations de pod](https://docs.cilium.io/en/stable/network/pod-annotations/)) : par défaut, Cilium vérifie que les paquets d'un pod portent l'IP du pod comme source, ce qui empêche l'usurpation. Le désactiver demande deux annotations : une sur l'espace de noms, posée par un administrateur, puis une sur le pod. Son [guide Kata](https://docs.cilium.io/en/stable/network/kubernetes/kata/) signale des limites de MTU et demande `socketLB.hostNamespaceOnly=true`.
+     - **Calico** ([référence de FelixConfiguration, 3.33](https://docs.tigera.io/calico/latest/reference/resources/felixconfig)) : `workloadSourceSpoofing` décide si un pod peut envoyer depuis une autre adresse grâce à l'annotation `allowedSourcePrefixes`. Il vaut `Disabled` par défaut. Le refus par défaut d'une source usurpée n'est écrit explicitement que dans une page en projet ([tigera/docs#2613](https://github.com/tigera/docs/pull/2613)).
+     - **Santé** : aucun des deux n'est au doc 04. Relevé préliminaire du 30/10/2026, qui n'est pas un verdict :
+
+       | Projet | Scorecard | Signed-Releases | Dernière release |
+       |---|---|---|---|
+       | Calico | 6,2 | 0 | v3.33.0 (« latest ») du 01/10/2026, correctif v3.32.3 du 28/10/2026 |
+       | Cilium | 6,0 | -1 | v1.20.4 (« latest ») du 23/10/2026 |
+
+       Pour mémoire, kube-router (Scorecard 7,5) et flannel (8,7), qu'embarque k3s v1.35.9 (kube-router v2.6.3-k3s1, flannel v0.28.4), ne sont pas évalués non plus.
+     - **Coûts** :
+       - évaluation au doc 04 d'abord (signatures des images, diversité des employeurs) ;
+       - k3s avec `--flannel-backend=none` et `--disable-network-policy` (documentation de k3s), donc réinstallation du réseau du cluster et rejeu de J1 à J7 ;
+       - à mesurer avec le même essai (`kata.sh reseau`) : la compatibilité avec le réseau de Kata et le refus de l'usurpation depuis un invité ;
+       - la trace du test 6 change (journaux de flux du contrôleur au lieu de NFLOG).
+   - **1b. Règle maison sur le nœud** : n'accepter sur la veth d'un pod que l'adresse de ce pod (nftables ou iptables sur `sc-build`), tenue à jour par un contrôleur à écrire. C'est de l'outillage maison, comme celui écarté en J4, et un changement système sur `sc-build`.
+2. **Voie D pour les images Go.**
+   - **Mesuré** : sans `NET_ADMIN`, l'usurpation est refusée (pod Kata restreint), et la compilation tourne sous `unshare -n`, sans réseau.
+   - **Reste**, en lecture non mesurée : une élévation dans l'invité, qui n'a pas de seccomp, rouvrirait l'usurpation.
+   - **Coûts déjà consignés** (voir « Ce que coûterait la voie D ») :
+     - crane est hors du doc 04 ;
+     - Go seulement, et du code de plateforme à maintenir ;
+     - elle remet en cause l'issue de la grille B de l'ADR 0000, qui est figée ;
+     - le digest diffère de `3a7ca1b1` (`c9244139`), donc le critère de J7 serait à changer.
+   - **Limite** : elle ne règle rien pour mock et sbuild, qui restent privilégiés. L'option 1 resterait nécessaire pour eux.
+3. **Tâche de construction sans sortie, dans les deux cas**, pour que le test 6 porte sur quelque chose.
+   - **Principe** : une tâche runc restreinte tire dans le workspace les sources, la fermeture, `web/dist` et l'image de build (en layout OCI). La tâche `construire` n'a alors plus aucune sortie, et une NetworkPolicy deny-all peut viser ses seuls pods. Le label à sélectionner est à vérifier, notamment qui le fixe : la tâche signée ou le créateur du PipelineRun.
+   - **Ce que dit la documentation** : BuildKit v0.34.1 accepte une image de build fournie en layout OCI local (`--oci-layout builder=<répertoire>` et `--opt context:builder=oci-layout://builder@sha256:…`, lu dans `docs/reference/buildctl.md` au tag).
+   - **Non mesuré** : que le digest reste `3a7ca1b1`. Prédiction : oui, car l'image finale part de `scratch` et ne contient que le binaire. C'est la première mesure de cette option.
+   - **Fenêtre de démarrage** : elle ne concernerait que les premiers conteneurs du pod, ceux de l'initialisation de Tekton. À mesurer.
+   - **Coûts** : aucun changement système, seulement les tâches resignées, la liste revue et la pipeline. La trace du test 6 reste NFLOG (deux lignes par refus, plafond partagé par politique).
+   - **Limite** : seule, elle ne suffit pas en voie A, car une politique deny-all reste contournable par usurpation depuis le root de l'invité.
 
 **Rejeu** : J7 est branché dans `rejeu.sh` (vérification, installation, essais, exemption, puis cas d'admission rejoués ; BuildKit : image, essais et mesure après l'exemption ; voies D et A ; construction ; réseau) mais pas encore rejoué au 30/10/2026. `sonde_kyverno` et `passage_ok` sont passées de `redemarrer.sh` à `commun.sh` pour servir à `kata.sh exemption`, qui les a exercées ; `redemarrer.sh` a été rejoué ensuite (30/10/2026, [`redemarrage-vm.log`](resultats/redemarrage-vm.log)) : arrêt 6 s, démarrage 9 s, nœuds prêts en 17 s, tous les contrôles de J1 à J7 repassent, et l'exemption est relue par kube-apiserver après le redémarrage des VM.
 
 **Suites de J7** :
-- ~~fenêtre de kube-router et trace NFLOG, sur un pod Kata~~ : mesurées (voir « Réseau des pods Kata ») ; ouvertes à la place : le contrôle de sortie de la zone build face à l'usurpation d'adresse et la conception du test 6 (décision du propriétaire) ;
+- ~~fenêtre de kube-router et trace NFLOG, sur un pod Kata~~ : mesurées (voir « Réseau des pods Kata ») ; ouvertes à la place : le contrôle de sortie de la zone build face à l'usurpation d'adresse et la conception du test 6, trois options soumises au propriétaire (voir « Contrôle de sortie de la zone build ») ;
 - canal des `internalParameters`, avec la mesure de la construction : `runtimeClassName` signé dans la provenance (option (c)) ;
 - bascule du gabarit en service vers la pipeline `sample-app` (décision du propriétaire) ;
 - rejeu complet avec J7.
