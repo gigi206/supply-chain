@@ -534,7 +534,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 **Réseau des pods Kata : NetworkPolicy de kube-router** ([`kata.sh`](kata.sh) `reseau`, [`kata-reseau.log`](resultats/kata-reseau.log), politique de mesure [`kata/sonde-reseau.yaml`](kata/sonde-reseau.yaml)). Suite de J7 : la fenêtre de démarrage relevée en J6 et la trace du test 6, mesurées sur des pods Kata. La prédiction est écrite avant chaque passage. La politique ne sélectionne que les pods de mesure de `builds`, avec une seule sortie, Forgejo, par adresse. Elle est retirée en fin d'étape, règles de kube-router comprises.
 - **État de départ** : aucune NetworkPolicy dans `builds`. Le mécanisme du test 6 n'existe pas encore pour les constructions.
-- **Fenêtre de démarrage sur `sc-build`** (sonde de J6, trois essais runc et trois essais Kata, alternés, rejoués trois fois) : prédiction conforme, **Kata ne ferme pas la fenêtre**.
+- **Fenêtre de démarrage sur `sc-build`** (sonde de J6, trois essais runc et trois essais Kata, alternés ; trois passages : [premier](resultats/kata-reseau-premiere-prediction.log), [deuxième](resultats/kata-reseau-deuxieme-passage.log), [troisième](resultats/kata-reseau.log)) : prédiction conforme, **Kata ne ferme pas la fenêtre**.
   - runc : Zot (interdit) joignable à la première tentative, de 0 à 10 ms après le lancement du conteneur, puis fermé à 500 ms ;
   - Kata : Zot joignable deux fois, jusqu'à 540 à 570 ms, puis fermé vers 1,1 s. Le conteneur démarre 3 à 4 s après la création du pod, contre 0 à 1 s sous runc.
   - La VM retarde le conteneur, pas la règle : kube-router ne pose celle-ci qu'une fois l'IP du pod publiée.
@@ -547,7 +547,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
   - par la règle de journalisation de la chaîne de la politique (préfixe `DROP by policy builds/sonde-reseau-j7`) ;
   - puis par celle de la chaîne du pod, avant le `REJECT`.
 
-  La première prédiction (une ligne par SYN) est démentie et archivée ([`kata-reseau-premiere-prediction.log`](resultats/kata-reseau-premiere-prediction.log)). Chaque règle a son propre plafond (10 par minute, rafale de 10), donc la trace d'une tentative répétée est partielle.
+  La première prédiction (une ligne par SYN) est démentie et archivée ([`kata-reseau-premiere-prediction.log`](resultats/kata-reseau-premiere-prediction.log)). Chaque règle a son propre plafond (10 par minute, rafale de 10), mais celle de la politique, qui porte le préfixe, est commune à tous les pods qu'elle sélectionne : seule celle du pod lui est propre. Avec plusieurs pods de build sous une même politique, un pod peut donc épuiser la trace nommée des autres. La trace d'une tentative répétée est partielle.
 - **Constat majeur : un pod Kata privilégié contourne la NetworkPolicy en usurpant une adresse source.**
   - **Essai** : le pod de mesure a la posture de la tâche `construire` (privilégié, root, donc `NET_ADMIN` dans l'invité). Il ajoute à son `eth0` une adresse inutilisée du sous-réseau des pods de `sc-build` (`10.42.1.250`). Il a été contrôlé avant que cette adresse n'est ni réservée par l'IPAM ni portée par un pod.
   - **Résultat** : avec cette adresse, Zot, le SSH de `sc-stockage`, l'API et le kubelet local sont joignables. Une requête en clair à Zot obtient la réponse de son serveur TLS (`HTTP/1.0 400 Bad Request`) : l'échange passe dans les deux sens.
@@ -559,7 +559,12 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
   - **Portée** : dans la voie A, le root de l'invité, ce sont le script de la tâche signée et `buildkitd`.
     - Les `RUN` d'un Dockerfile tournent dans le bac à sable de BuildKit, avec ses capacités par défaut, qui n'ont pas été mesurées ici.
     - Lecture, non mesurée : la voie A fait de la VM la frontière, donc tout code qui sort du bac à sable atteint le root de l'invité, et avec lui ce contournement.
-  - Aucun avis de sécurité ni aucune issue de kube-router ne décrit ce comportement (recherche du 30/10/2026). Aucune issue n'est ouverte sans accord.
+  - **Recherche amont** (30/10/2026) : aucun avis ni aucune issue ne décrit ce contournement. Ont été lus :
+    - les avis de sécurité de kube-router, de k3s et de flannel ;
+    - les issues de kube-router et de k3s, cherchées avec « spoof », « source IP », « anti-spoofing », « NET_ADMIN » et « ip spoofing » ;
+    - celles de flannel, cherchées avec « spoof », « ip spoofing » et « source address ». La n° 961 porte sur le tunnel IPIP depuis des hôtes distants, pas sur les pods.
+
+    Aucune issue n'est ouverte sans accord.
 - **Conséquences pour le test 6 (J8)**, constats :
   - une NetworkPolicy s'applique à un pod, pas à une étape, et les étapes d'une tâche partagent le réseau du pod. Or `construire` tire ses sources de Forgejo et ses entrées de Zot, et BuildKit tire l'image de build de Zot pendant l'étape de construction elle-même. « Egress = 0 pendant l'étape de build » n'est donc pas exprimable par une NetworkPolicy sur ce pod ;
   - la fenêtre de démarrage reste ouverte sous Kata ;
