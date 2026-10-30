@@ -541,23 +541,6 @@ pod_fini() { # nom : pod terminé, journal dans $T/<nom>.log ; affiche IP, nœud
 
 ip_pod() { kubectl get pod -n builds "$1" -o jsonpath='{.status.podIP}'; }
 
-capture() { # fichier durée filtre… : tcpdump sur sc-build en arrière-plan (PID dans $CAPTURE), attend qu'il écoute
-  local f=$1 d=$2; shift 2
-  sur sc-build "sudo timeout $d tcpdump -nn -l $* 2>&1" > "$f" &
-  CAPTURE=$!
-  for _ in $(seq 20); do grep -q '^listening on' "$f" && return 0; sleep 0.5; done
-  echo "KO   tcpdump ($*) n'écoute pas" >&2; cat "$f" >&2; exit 1
-}
-
-syn() { # fichier source destination.port : nombre de lignes SYN (sans ACK) de source vers destination dans une capture tcpdump
-  grep -cE "IP ${2//./\\.}\.[0-9]+ > ${3//./\\.}: Flags \[S\]," "$1" || true
-}
-
-syn_distincts() { # mêmes arguments : nombre de SYN distincts (port source et numéro de séquence)
-  { grep -E "IP ${2//./\\.}\.[0-9]+ > ${3//./\\.}: Flags \[S\]," "$1" || true; } \
-    | sed -E 's/.* IP ([0-9.]+) > .*, seq ([0-9]+),.*/\1 \2/' | sort -u | wc -l
-}
-
 nettoyer_reseau() {
   kubectl delete pod -n builds -l "app=$SONDE" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   kubectl delete -f "$here/kata/sonde-reseau.yaml" --ignore-not-found >/dev/null 2>&1 || true

@@ -174,6 +174,23 @@ hubble_refus() { # nœud depuis [filtres de hubble observe…] : flux refusés (
         ((.l4.TCP.flags // {}) | keys | join(",")), (.drop_reason_desc // "-"), (.traffic_direction // "-")] | join(" ")'
 }
 
+capture() { # fichier durée filtre… : tcpdump sur sc-build en arrière-plan (PID dans $CAPTURE), attend qu'il écoute
+  local f=$1 d=$2; shift 2
+  sur sc-build "sudo timeout $d tcpdump -nn -l $* 2>&1" > "$f" &
+  CAPTURE=$!
+  for _ in $(seq 20); do grep -q '^listening on' "$f" && return 0; sleep 0.5; done
+  echo "KO   tcpdump ($*) n'écoute pas" >&2; cat "$f" >&2; exit 1
+}
+
+syn() { # fichier source destination.port : nombre de lignes SYN (sans ACK) de source vers destination dans une capture tcpdump
+  grep -cE "IP ${2//./\\.}\.[0-9]+ > ${3//./\\.}: Flags \[S\]," "$1" || true
+}
+
+syn_distincts() { # mêmes arguments : nombre de SYN distincts (port source et numéro de séquence)
+  { grep -E "IP ${2//./\\.}\.[0-9]+ > ${3//./\\.}: Flags \[S\]," "$1" || true; } \
+    | sed -E 's/.* IP ([0-9.]+) > .*, seq ([0-9]+),.*/\1 \2/' | sort -u | wc -l
+}
+
 el_joignable() { # EventListener de $EL_NS disponible et joignable depuis sc-stockage ; une ligne
   local url n=1
   for _ in $(seq 60); do kubectl get deploy -n "$EL_NS" el-forgejo >/dev/null 2>&1 && break; sleep 2; done

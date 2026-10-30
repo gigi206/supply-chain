@@ -113,9 +113,14 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2 et, lui non plus, aucune provenance pour son image : seuls ses binaires en ont une. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
   - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6. Cilium a été mesuré (option 1b) : aucune fenêtre, et l'usurpation est refusée, y compris après un redémarrage des VM. **Décision du propriétaire (30/10/2026) : Cilium gardé**, avec un réglage bêta et sans L7 ; `RESEAU=cilium` par défaut, flannel reste le retour arrière.
-- [ ] Test 6 sous Cilium (brique 08, J8). **Conception validée par le propriétaire le 30/10/2026** (plan de J8) :
+- [x] Test 6 sous Cilium (brique 08, J8). **Conception validée par le propriétaire le 30/10/2026** (plan de J8) :
   - une variante signée de `construire-image`, pour le seul test, tente la sortie depuis l'étape de construction ;
   - un témoin par destination ;
   - les flux de Hubble sont capturés pendant le test, et le compte se fait par tentative.
 
-  Mesure à faire.
+  **Mesuré le 31/10/2026** ([`preuves-test6.log`](../../poc/bricks/08-trust-plane/resultats/preuves-test6.log), deuxième passage). Le pod de la tâche de vérification porte `tekton.dev/task=construire-image` et tourne sous Kata, privilégié, root dans l'invité. Résultats :
+  - Zot, Forgejo, l'API (par le nœud et par le service) et une adresse externe sont injoignables. Chaque tentative laisse des flux `POLICY_DENIED`, `EGRESS` dans Hubble de `sc-build`.
+  - Avec une adresse source usurpée, Zot et Forgejo sont injoignables, motif `INVALID_SOURCE_IP`.
+  - Aucun paquet n'apparaît sur `enp1s0`.
+  - Contre-épreuve : la même tâche, renommée, joint tout, et sa sortie se voit sur `enp1s0`. L'usurpation y reste refusée, donc la vérification d'adresse source de Cilium tient seule, sans la politique.
+  - Le premier passage, archivé, attendait l'adresse du service dans Hubble. J7 l'avait pourtant déjà mesurée traduite avant la politique.

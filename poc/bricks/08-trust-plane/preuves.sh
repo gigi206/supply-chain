@@ -25,6 +25,11 @@
 #          signature valide ; rejeu à l'identique d'une livraison valide, nouvelle livraison de Forgejo pour la tête de main ;
 #          témoin : livraison valide d'un commit propre au passage. Sans la purge de tekton.sh essais_webhook : les exécutions
 #          de builds restent (construction de J7 comprise). Trace : journal des intercepteurs, journal de l'EventListener
+#   test6  contrôle de conformité des barrières réseau de la zone build sur un TaskRun réel : tâche de vérification signée par la
+#          clé des tâches, du nom construire-image (bundle tekton/tasks/preuve-test6-test, hors de la liste revue), étape
+#          construire privilégiée sous Kata, image BuildKit : connexions vers Zot, Forgejo, l'API (nœud et service) et une adresse
+#          externe, puis avec une adresse source inutilisée (vérification d'adresse source de Cilium) ; contre-épreuve : même
+#          tâche, seul le nom change (non sélectionnée par construction-sans-sortie). Trace : Hubble de sc-build, capture sur enp1s0
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -39,6 +44,9 @@ mkdir -p "$T"
 EL=system:serviceaccount:declencheurs:el-forgejo
 CONTROLEUR=system:serviceaccount:tekton-pipelines:tekton-pipelines-controller   # crée les pods des TaskRuns
 APP=builds/sample-app@$APP_DIGEST
+BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh
+USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build, inutilisée (kata.sh ; contrôlé avant l'essai)
+EXTERNE=203.0.113.10    # adresse de documentation (RFC 5737), hors du cluster (kata.sh)
 
 etat_app() { # enveloppes de Chains sur l'image réelle, et provenance de PipelineRun la plus récente (seule jugée par la porte)
   local n
@@ -541,6 +549,203 @@ EOF
   [ "$c" -ge 1 ] && echo "OK   témoin : $c signature(s) de Chains dans la même lecture ($tr signé : $(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}'))" \
     || { echo "KO   témoin : aucune signature de Chains depuis $t0 (audit illisible ?)" >&2; exit 1; }
   garder apres
+}
+
+T6_DESTINATIONS="Zot:192.168.161.13:5000 Forgejo:192.168.161.13:3000 API-noeud:192.168.161.11:6443 API-service:10.43.0.1:443 Externe:$EXTERNE:443"
+
+t6_ligne() { grep "^$2|" "$T/t6-$1.log" | cut -d'|' -f2- || true; }   # passage clé : champs d'une ligne du journal de l'étape
+
+t6_inutilisee() { # adresse : portée ni par un pod ni par un endpoint de Cilium (contrôle de kata.sh)
+  local n d
+  n=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}' | grep -cxF "$1" || true)
+  d=$(kubectl get ciliumendpoints -A -o json | jq --arg u "$1" '[.items[].status.networking.addressing[]?.ipv4 | select(. == $u)] | length')
+  [ "$n" = 0 ] && [ "$d" = 0 ] && echo "OK   $1 inutilisée : portée ni par un pod ni par un endpoint de Cilium" || { echo "KO   $1 en usage" >&2; exit 1; }
+}
+
+t6_passage() { # passage (test|contre) nom-de-la-tâche : bundle, TaskRun sous Kata, journal de l'étape, Hubble et capture sur enp1s0
+  local pa=$1 nom=$2 tr=preuve-test6-$1 d t0 v pod
+  sed -e "s#@NOM@#$nom#" "$T/t6-tache.yaml" > "$T/t6-$pa.yaml"
+  tkn task sign "$T/t6-$pa.yaml" -K "$S/taches.key" -f "$T/t6-$pa-signee.yaml" >/dev/null
+  d=$(bundle "$T/t6-$pa-signee.yaml" "tekton/tasks/$tr")
+  echo "bundle tekton/tasks/$tr : $d (tâche $nom)"
+  sed -e "s#@NOM@#$tr#" -e "s#@RESOLVEUR@#bundles#" -e "s#@BUNDLE@#$REG/tekton/tasks/$tr@$d#" -e "s#value: essai-confiance#value: $nom#" \
+    "$here/politique/taches/taskrun.yaml" | awk '{print} /^  podTemplate:$/ {print "    runtimeClassName: kata"}' > "$T/tr-$tr.yaml"
+  kubectl delete taskrun -n builds "$tr" --ignore-not-found --wait=true >/dev/null
+  echo "NetworkPolicy de builds au lancement : $(kubectl get netpol -n builds -o json | jq -r '.items[] | "\(.metadata.name) (\(.spec.podSelector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")))"' | paste -sd' ')"
+  t6_inutilisee "$USURPEE"
+  capture "$T/t6-$pa-enp1s0.txt" 600 -i enp1s0 host "$EXTERNE" or host "$USURPEE"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  creer "$T/tr-$tr.yaml" || { echo "KO   TaskRun refusé : $(cat "$T/creer.out")" >&2; exit 1; }
+  v=$(issue taskrun "$tr")
+  hubble_refus sc-build "$t0" --ip "$USURPEE" > "$T/t6-$pa-hubble-usurpee.txt" || true
+  sur sc-build "sudo pkill -INT -x tcpdump" || true
+  wait "$CAPTURE" || true
+  [ "${v%%|*}" = True ] && echo "OK   TaskRun $tr terminé ($(cut -d'|' -f2 <<<"$v"), TrustedResourcesVerified=$(cut -d'|' -f3 <<<"$v"))" \
+    || { echo "KO   TaskRun $tr : $v" >&2; exit 1; }
+  pod=$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.status.podName}')
+  kubectl logs -n builds "$pod" -c step-construire > "$T/t6-$pa.log"
+  kubectl get pod -n builds "$pod" -o json > "$T/t6-$pa-pod.json"
+  hubble_refus sc-build "$t0" --from-ip "$(jq -r .status.podIP "$T/t6-$pa-pod.json")" > "$T/t6-$pa-hubble-propre.txt" || true
+  echo "## journal de l'étape construire (pod $pod)"
+  sed 's/^/  /' "$T/t6-$pa.log"
+  jq -r '"pod : nœud \(.spec.nodeName), runtimeClassName \(.spec.runtimeClassName // "-"), IP \(.status.podIP), tekton.dev/task=\(.metadata.labels["tekton.dev/task"] // "-"), "
+    + "étape \([.spec.containers[] | select(.name == "step-construire") | "privileged=\(.securityContext.privileged // false) uid \(.securityContext.runAsUser // "pod")"] | join(""))"' "$T/t6-$pa-pod.json"
+  echo "Hubble de sc-build depuis $t0, flux refusés de l'IP du pod :"; sed 's/^/  /' "$T/t6-$pa-hubble-propre.txt"
+  echo "Hubble de sc-build depuis $t0, flux refusés de $USURPEE :"; sed 's/^/  /' "$T/t6-$pa-hubble-usurpee.txt"
+  grep -E 'packets (captured|received)' "$T/t6-$pa-enp1s0.txt" | sed 's/^/  tcpdump enp1s0 : /' || true
+}
+
+t6_garde_fous() { # passage label-attendu : le pod mesuré est bien celui qu'on croit (label, Kata, adresse)
+  local pa=$1 l ip
+  l=$(jq -r '.metadata.labels["tekton.dev/task"] // "-"' "$T/t6-$pa-pod.json")
+  [ "$l" = "$2" ] && echo "OK   $pa : label tekton.dev/task=$l sur le pod" || { echo "KO   $pa : label tekton.dev/task=$l (attendu $2)" >&2; exit 1; }
+  [ "$(jq -r '.spec.runtimeClassName // "-"' "$T/t6-$pa-pod.json")" = kata ] && [ "$(t6_ligne "$pa" NOYAU)" != "$T6_NOYAU_HOTE" ] \
+    && echo "OK   $pa : pod sous Kata, noyau de l'invité $(t6_ligne "$pa" NOYAU) (sc-build : $T6_NOYAU_HOTE)" || { echo "KO   $pa : pas sous Kata" >&2; exit 1; }
+  ip=$(jq -r .status.podIP "$T/t6-$pa-pod.json")
+  [ "$(t6_ligne "$pa" IP)" = "$ip" ] && echo "OK   $pa : adresse de eth0 dans l'invité = IP du pod ($ip)" || { echo "KO   $pa : eth0 $(t6_ligne "$pa" IP), pod $ip" >&2; exit 1; }
+  [ "$(t6_ligne "$pa" AJOUT)" = accepté ] && [ "$(t6_ligne "$pa" RETRAIT)" = accepté ] \
+    && echo "OK   $pa : $USURPEE ajoutée puis retirée de eth0 (root dans l'invité)" || { echo "KO   $pa : ajout $(t6_ligne "$pa" AJOUT), retrait $(t6_ligne "$pa" RETRAIT)" >&2; exit 1; }
+}
+
+etape_test6() {
+  local a c l r h t v n ko=0
+  garder avant
+  echo "## prédiction (écrite le 31/10/2026, avant le premier passage), contrôle par contrôle"
+  echo "- objet : vérifier sur un TaskRun réel les deux contrôles réseau de la zone build, retenus par le propriétaire le"
+  echo "  30/10/2026 : la NetworkPolicy construction-sans-sortie (aucune entrée ni sortie pour les pods qui portent"
+  echo "  tekton.dev/task=construire-image) et la vérification d'adresse source de Cilium 1.20.4. Les mesures de kata.sh reseau"
+  echo "  portaient sur des pods de mesure et une politique de mesure ; ici, la politique réelle et le label posé par Tekton"
+  echo "- véhicule : tâche de vérification signée par la clé des tâches, du nom construire-image, publiée sous tekton/tasks/preuve-test6"
+  echo "  (jamais dans la liste revue de la porte : la porte refuserait toute provenance qui la cite) ; étape construire, image"
+  echo "  BuildKit de la construction réelle, privilégiée et root dans l'invité Kata, comme la vraie ; ni workspace, ni volume, ni"
+  echo "  résultat : Chains ne rattache rien à une image ; gabarit de pod du PipelineRun réel (taskRunTemplate du TriggerTemplate,"
+  echo "  plus runtimeClassName kata, comme taskRunSpecs). Elle modélise du code qui sortirait du bac à sable de BuildKit"
+  echo "- garde-fous relevés sur le pod : label tekton.dev/task=construire-image posé par le contrôleur de Tekton pour un TaskRun"
+  echo "  autonome (mesuré jusqu'ici pour un PipelineRun), pod sous Kata (noyau de l'invité différent de celui de sc-build), eth0"
+  echo "  de l'invité à l'IP du pod, adresse $USURPEE ajoutée puis retirée"
+  echo "- 1. avec l'IP du pod : Zot, Forgejo, API du nœud, API par le service (10.43.0.1:443) et $EXTERNE injoignables ; chez"
+  echo "  l'agent de sc-build, au moins un flux refusé par tentative, motif POLICY_DENIED, sens EGRESS (au test 1, le refus était"
+  echo "  à l'entrée d'OpenBao, sur sc-confiance). Compte par tentative : flux de l'IP du pod dans les 4 s qui suivent l'heure de la"
+  echo "  tentative, notée par l'étape. Corrigé après le premier passage (preuves-test6-premier-passage.log), qui attendait l'API par"
+  echo "  le service sous 10.43.0.1:443 : Hubble la montre sous l'adresse traduite, l'extrémité du service kubernetes (cause non"
+  echo "  établie : kube-proxy-replacement=false et bpf-lb-sock=false dans cilium-config)"
+  echo "- 2. avec $USURPEE (adresse inutilisée du sous-réseau des pods de sc-build) : Zot et Forgejo injoignables ; au moins un flux"
+  echo "  refusé par tentative, motif INVALID_SOURCE_IP (sens non exigé : INGRESS en J7) ; aucun paquet sur enp1s0"
+  echo "- 3. rien ne sort du nœud : aucun paquet de ou vers $EXTERNE ni de $USURPEE sur enp1s0 de sc-build pendant le passage"
+  echo "- contre-épreuve, même YAML et même image, seul le nom de la tâche change (preuve-test6-temoin, label différent, que la"
+  echo "  politique ne sélectionne pas) : Zot, Forgejo et les deux voies de l'API joignables, nc lié à l'IP du pod (-s) joignable,"
+  echo "  SYN vers $EXTERNE vus sur enp1s0 (sortie masquée par le nœud) et aucun flux refusé de l'IP du pod ; avec $USURPEE, tout"
+  echo "  refusé, INVALID_SOURCE_IP : le contrôle d'adresse source tient seul, sans la politique. Sans cette contre-épreuve, un"
+  echo "  nc qui ne marcherait pas ferait passer le test à tort : elle conditionne la conclusion"
+  echo "- passages en séquence (mémoire de sc-build) ; l'étape sort toujours en 0"
+  echo "- résidus : bundles tekton/tasks/preuve-test6-test et preuve-test6-contre dans Zot (poc-ecriture ne supprime pas) ; deux"
+  echo "  TaskRuns signés par Chains sans sujet image, dont un de tâche construire-image (contrôle exécutions/enveloppes)"
+  T6_NOYAU_HOTE=$(sur sc-build "uname -r")
+  sur sc-build "ip -o link show enp1s0" >/dev/null && echo "OK   interface enp1s0 présente sur sc-build (noyau $T6_NOYAU_HOTE)" || { echo "KO   enp1s0 absente" >&2; exit 1; }
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  cat > "$T/t6-tache.yaml" <<EOF
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: @NOM@
+spec:
+  steps:
+  - name: construire
+    image: $BUILDKIT
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+      runAsUser: 0
+      runAsNonRoot: false
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    script: |
+      #!/bin/sh
+      o() { t=\$(date +%H:%M:%S); if nc "\$@" 2>/dev/null; then r=OUVERT; else r=FERME; fi; echo "\$t|\$r"; }
+      a=\$(ip -o -4 addr show dev eth0 | awk '{print \$4}' | cut -d/ -f1)
+      echo "NOYAU|\$(uname -r)"
+      echo "IP|\$a"
+      echo "NC|\$(readlink -f "\$(command -v nc)")"
+      for c in $T6_DESTINATIONS; do
+        l=\${c%%:*}; r=\${c#*:}; h=\${r%:*}; p=\${r##*:}
+        echo "PROPRE|\$l|\$h:\$p|\$(o -z -w 3 "\$h" "\$p")"
+        sleep 1
+      done
+      echo "LIEE|Zot|192.168.161.13:5000|\$(o -s "\$a" -z -w 3 192.168.161.13 5000)"
+      if ip addr add $USURPEE/32 dev eth0 2>/dev/null; then echo "AJOUT|accepté"; else echo "AJOUT|refusé"; fi
+      for c in Zot:192.168.161.13:5000 Forgejo:192.168.161.13:3000; do
+        l=\${c%%:*}; r=\${c#*:}; h=\${r%:*}; p=\${r##*:}
+        echo "USURPEE|\$l|\$h:\$p|\$(o -s $USURPEE -z -w 3 "\$h" "\$p")"
+        sleep 1
+      done
+      if ip addr del $USURPEE/32 dev eth0 2>/dev/null; then echo "RETRAIT|accepté"; else echo "RETRAIT|refusé"; fi
+      echo FIN
+      exit 0
+EOF
+
+  echo "## contre-épreuve d'abord : tâche preuve-test6-temoin, non sélectionnée par construction-sans-sortie"
+  t6_passage contre preuve-test6-temoin
+  echo "## contre-épreuve : mesures"
+  t6_garde_fous contre preuve-test6-temoin
+  for c in $T6_DESTINATIONS; do
+    l=${c%%:*}; [ "$l" = Externe ] && continue
+    v=$(grep "^PROPRE|$l|" "$T/t6-contre.log" | cut -d'|' -f5)
+    [ "$v" = OUVERT ] && echo "OK   contre-épreuve : $l joignable" || { echo "KO   contre-épreuve : $l $v (nc ou réseau du pod inutilisable : le test ne prouverait rien)" >&2; exit 1; }
+  done
+  [ "$(grep '^LIEE|' "$T/t6-contre.log" | cut -d'|' -f5)" = OUVERT ] && echo "OK   contre-épreuve : nc lié à l'IP du pod (-s) joint Zot" \
+    || { echo "KO   contre-épreuve : nc -s inutilisable" >&2; exit 1; }
+  n=$(grep -cE "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" || true)
+  [ "$n" -ge 1 ] && echo "OK   contre-épreuve : $n SYN vers $EXTERNE:443 sur enp1s0 (source $(grep -E "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" | sed -E 's/.* IP ([0-9.]+)\.[0-9]+ > .*/\1/' | sort -u | paste -sd,))" \
+    || { echo "KO   contre-épreuve : aucun SYN vers $EXTERNE sur enp1s0 (la capture ne verrait pas une sortie)" >&2; exit 1; }
+  [ ! -s "$T/t6-contre-hubble-propre.txt" ] && echo "OK   contre-épreuve : aucun flux refusé de l'IP du pod" \
+    || { echo "KO   contre-épreuve : flux refusés de l'IP du pod" >&2; ko=1; }
+  for l in Zot Forgejo; do
+    v=$(grep "^USURPEE|$l|" "$T/t6-contre.log" | cut -d'|' -f2-)
+    h=${v#*|}; h=${h%%|*}
+    n=$(grep -cF " $USURPEE > $h SYN INVALID_SOURCE_IP " "$T/t6-contre-hubble-usurpee.txt" || true)
+    [ "${v##*|}" = FERME ] && [ "$n" -ge 1 ] && echo "OK   contre-épreuve : $l injoignable depuis $USURPEE, $n flux INVALID_SOURCE_IP (contrôle d'adresse source seul)" \
+      || { echo "KO   contre-épreuve : $l depuis $USURPEE : $v, $n flux INVALID_SOURCE_IP" >&2; ko=1; }
+  done
+  kubectl delete pod -n builds "$(jq -r .metadata.name "$T/t6-contre-pod.json")" --ignore-not-found --wait=true >/dev/null
+
+  echo "## test : tâche construire-image (sélectionnée par construction-sans-sortie)"
+  t6_passage test construire-image
+  echo "## test : mesures"
+  t6_garde_fous test construire-image
+  a=$(kubectl get endpointslices -n default -l kubernetes.io/service-name=kubernetes -o json \
+    | jq -r '[.items[] | .ports[0].port as $p | .endpoints[].addresses[] | "\(.):\($p)"] | join(" ")')
+  echo "extrémités du service kubernetes : $a"
+  for c in $T6_DESTINATIONS; do
+    l=${c%%:*}; r=${c#*:}
+    IFS='|' read -r t v < <(grep "^PROPRE|$l|" "$T/t6-test.log" | cut -d'|' -f4-)
+    awk -v ip="$(t6_ligne test IP)" -v t="$t" 'function s(x) {split(substr(x, 1, 8), a, ":"); return a[1] * 3600 + a[2] * 60 + a[3]}
+      $2 == ip && $5 == "SYN" && $6 == "POLICY_DENIED" && $7 == "EGRESS" && s($1) >= s(t) && s($1) < s(t) + 4 {print $4}' \
+      "$T/t6-test-hubble-propre.txt" > "$T/t6-fenetre.txt"
+    n=$(grep -c . "$T/t6-fenetre.txt" || true)
+    h=$(sort -u "$T/t6-fenetre.txt" | paste -sd' ')
+    [ "$l" = API-service ] && r=$a
+    [ "$v" = FERME ] && [ "$n" -ge 1 ] && [ "$h" = "$r" ] && echo "OK   1. $l (${c#*:}, tentative à $t) injoignable, $n flux POLICY_DENIED EGRESS vers $h" \
+      || { echo "KO   1. $l (${c#*:}, tentative à $t) : $v, $n flux POLICY_DENIED EGRESS vers « $h » (attendu $r)" >&2; ko=1; }
+  done
+  [ "$(grep '^LIEE|' "$T/t6-test.log" | cut -d'|' -f5)" = FERME ] && echo "OK   1. nc lié à l'IP du pod : Zot injoignable" || { echo "KO   1. nc -s : Zot joint" >&2; ko=1; }
+  for l in Zot Forgejo; do
+    v=$(grep "^USURPEE|$l|" "$T/t6-test.log" | cut -d'|' -f2-)
+    h=${v#*|}; h=${h%%|*}
+    n=$(grep -cF " $USURPEE > $h SYN INVALID_SOURCE_IP " "$T/t6-test-hubble-usurpee.txt" || true)
+    [ "${v##*|}" = FERME ] && [ "$n" -ge 1 ] && echo "OK   2. $l injoignable depuis $USURPEE, $n flux INVALID_SOURCE_IP" \
+      || { echo "KO   2. $l depuis $USURPEE : $v, $n flux INVALID_SOURCE_IP" >&2; ko=1; }
+  done
+  n=$(grep -cE " IP " "$T/t6-test-enp1s0.txt" || true)
+  [ "$n" = 0 ] && echo "OK   3. aucun paquet de ou vers $EXTERNE ni de $USURPEE sur enp1s0 de sc-build" || { echo "KO   3. $n paquet(s) sur enp1s0" >&2; ko=1; }
+  kubectl delete pod -n builds "$(jq -r .metadata.name "$T/t6-test-pod.json")" --ignore-not-found --wait=true >/dev/null
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   test 6 : au moins une mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"
