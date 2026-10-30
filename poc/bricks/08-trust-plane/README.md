@@ -675,13 +675,16 @@ Vérifié pour préparer le plan, sans rien installer :
 - **Chart** : `quay.io/cilium/charts/cilium:1.20.4` en OCI (manifeste `712e1f65`). Sa couche `505abff8` est le digest publié dans `helm.cilium.io/index.yaml`. Il est signé sans clé et vérifié par cosign avec l'identité relevée, `cilium/cilium/.github/workflows/release.yaml@refs/heads/main`. Ce workflow est lancé depuis `main` et non depuis le tag : l'identité est moins liée à la version que celle des images.
 - **Images**, épinglées par digest dans le chart (`useDigest: true`) :
   - `cilium` `20fe92e4` (amd64 `fa56fecd`, 256 Mo compressés) et `operator-generic` `7a7a3489` (amd64 `77a9b437`, 36 Mo) : signatures vérifiées au doc 04 ;
-  - `cilium-envoy` `547ab45f` (amd64 `401bc8f7`, 78 Mo) : signée par `cilium/proxy/.github/workflows/build-envoy-images-release-base.yaml@refs/heads/v1.39`, identité relevée par un refus volontaire, à vérifier avec cette identité exacte ;
+  - `cilium-envoy` `547ab45f` (amd64 `401bc8f7`, 78 Mo) : signée par `cilium/proxy/.github/workflows/build-envoy-images-release-base.yaml@refs/heads/v1.39`, identité relevée par un refus volontaire. Elle vient du dépôt `cilium/proxy`, que le doc 04 n'évalue pas ;
+  - ces digests sont ceux des **index** multi-plateformes (amd64 et arm64), et le chart y fait référence (`…:v1.20.4@sha256:20fe92e4…`). Une archive qui ne contient que le manifeste amd64 ne satisfait donc pas cette référence ;
   - Hubble relay et UI, clustermesh et certgen ne servent pas.
 - **k3s** : le server doit être lancé avec `--flannel-backend=none` et `--disable-network-policy` (guide Cilium pour k3s, documentation de k3s).
   - Chemins CNI de k3s, relevés sur `sc-build` : `/var/lib/rancher/k3s/data/cni` et `/var/lib/rancher/k3s/agent/etc/cni/net.d`. Ils diffèrent des défauts du chart (`/opt/cni/bin`, `/etc/cni/net.d`).
   - Le bpffs est monté, et le noyau est en 6.12.113.
   - Le contrôleur Helm de k3s documente `chartContent` (chart en base64) et `bootstrap: true` (chart nécessaire au démarrage). L'image `klipper-helm` v0.13.3 fait partie des images airgap de k3s.
 - **IPAM `kubernetes`** : Cilium reprend les `podCIDRs` alloués par k3s (documentation). Les adresses ne changent pas (`10.42.1.0/24` pour `sc-build`), et les scripts en dépendent.
+- **Kyverno** : le webhook des ressources exclut `kube-system` (`NotIn ["kube-system"]`, relu dans le cluster), et `resourceFilters` aussi. Les pods de Cilium (privilégiés, `hostNetwork`, `hostPath`) ne passent donc pas par `pods-isolation`, et leur recréation après J6 ne sera pas refusée. Corollaire : tout pod privilégié de `kube-system` échappe à Kyverno, et seul le RBAC de J6 garde cet espace.
+- **`toFQDNs` exige le proxy L7** : le proxy DNS ne démarre pas si `EnableL7Proxy` est faux (`pkg/fqdn/bootstrap/dns_proxy.go` au tag v1.20.4).
 
 Choix proposés (valeurs du chart) :
 - **Adresses et API** :
@@ -695,20 +698,19 @@ Choix proposés (valeurs du chart) :
   - `operator.replicas=1`, en zone de confiance ;
   - l'agent et Envoy en DaemonSet sur les trois nœuds (tolérances par défaut).
 - **Traces** : Hubble activé dans l'agent, sans relais ni interface. `hubble observe --verdict DROPPED` remplace NFLOG.
-- **L7 et Envoy** laissés actifs, comme par défaut. Ils servent aux politiques L7, et c'est à décider : les garder pour `toFQDNs`, ou les couper, ce qui retire une image et une identité de signature.
+- **L7 coupé pour la mesure** : `l7Proxy=false` et `envoy.enabled=false`. Il n'y a alors ni Envoy, ni `toFQDNs` (lu dans le code), et les politiques restent par adresse, ce qui suffit au test 6. Les garder exigerait d'abord d'évaluer `cilium/proxy` au doc 04 (règle du propriétaire). Ce serait une étape à part, sur sa décision.
+- **Digests** : les valeurs surchargent les digests d'index par ceux des manifestes amd64 (`image.digest`, `operator.image.genericDigest`). La signature est vérifiée sur l'index, qui liste ces manifestes.
 
 Installation dès J1, avant que les nœuds soient prêts :
 - **Sur l'hôte** :
   - le chart et les images amd64 sont téléchargés par digest ;
   - leurs signatures sont vérifiées par cosign, avec les identités relevées et des témoins ;
-  - les images sont mises en archives OCI, qui conservent le digest de manifeste.
+  - les images amd64 (`cilium`, `operator-generic`, soit 292 Mo compressés) sont mises en archives OCI, qui conservent le digest du manifeste amd64, celui que référencent les valeurs.
 - **Sur chaque nœud** : les archives vont dans `/var/lib/rancher/k3s/agent/images`, comme les images airgap de k3s.
 - **Sur `sc-confiance`** :
   - un HelmChart `cilium` dans `/var/lib/rancher/k3s/server/manifests` : chart en base64, valeurs versionnées, `bootstrap: true` ;
   - les options du server dans `k3s/sc-confiance.yaml`.
-- **À mesurer d'abord** : que le containerd de k3s importe l'archive OCI en gardant le digest de manifeste attendu par le chart. Sinon, deux replis :
-  - référencer les digests de manifeste amd64 dans les valeurs ;
-  - ou tirer les images d'un miroir dans Zot après J2, en déplaçant le contrôle « nœuds prêts ».
+- **À mesurer au point d'arrêt après J1** : que le containerd de k3s importe l'archive OCI en gardant le digest du manifeste. Repli : tirer les images d'un miroir dans Zot après J2, en déplaçant le contrôle « nœuds prêts ».
 
 Changements système soumis à accord :
 1. **Rejeu complet depuis zéro** (`rejeu.sh` : `vm.sh detruire` puis `creer`, comme le rejeu de J1 à J6 du 30/10/2026), avec le réseau Cilium. Il fait aussi le « rejeu complet avec J7 » en attente. Il réapplique les changements déjà accordés de J1 à J7 (installation de Kata depuis l'archive attestée, exemption Pod Security, compte `poc-images`, etc.).
@@ -716,7 +718,11 @@ Changements système soumis à accord :
    - k3s tourne sans flannel ni contrôleur de NetworkPolicy ;
    - Cilium installe ses programmes eBPF, les interfaces `cilium_host` et `cilium_net`, des règles iptables de masquage et son binaire CNI ;
    - des DaemonSets privilégiés tournent dans `kube-system` sur les trois nœuds, zone de confiance comprise, et l'opérateur sur `sc-confiance`.
-3. **Sur l'hôte** : environ 370 Mo téléchargés (images amd64 compressées et chart) dans `…/08/telechargements/cilium`.
+3. **Sur l'hôte** : environ 300 Mo téléchargés (images amd64 compressées et chart) dans `…/08/telechargements/cilium`.
+
+Déroulement :
+- **Préalable sur l'hôte, avant tout démontage** : téléchargement, signatures et archives. Une archive mal formée doit apparaître avant la destruction des VM.
+- **Point d'arrêt après J1** : `rejeu.sh` gagne une option pour s'arrêter après une étape et reprendre à une autre. On rejoue jusqu'à `k3s`, puis on contrôle Cilium : nœuds prêts, digests importés, binaire `hubble` présent dans l'image de l'agent, adresses des pods. Ensuite seulement, on reprend à J2. Un échec de Cilium coûte ainsi J1, pas J1 à J7.
 
 **Retour arrière** : un rejeu avec le réseau actuel, dont le choix reste possible par une variable. Compter environ une heure.
 
@@ -725,7 +731,7 @@ Adaptations des scripts, avant le rejeu. Une variable `RESEAU` (`flannel` ou `ci
 - `controles.sh` : état de Cilium au lieu du nombre de règles KUBE-ROUTER ;
 - `openbao.sh` (J3) : trace du refus vers OpenBao par Hubble au lieu de NFLOG ;
 - `politique.sh` (J6, rattrapage) : la fenêtre est mesurée et rapportée, au lieu d'être affirmée ;
-- `kata.sh reseau` : Hubble au lieu de NFLOG et des règles iptables, `cni0` remplacé, même essai d'usurpation ;
+- `kata.sh reseau` : Hubble au lieu de NFLOG et des règles iptables, `cni0` remplacé, même essai d'usurpation. L'adresse inutilisée se contrôle dans les endpoints de Cilium, plus dans `/var/lib/cni/networks/cbr0` (IPAM host-local de flannel) ;
 - `commun.sh` : commentaire sur le délai d'entrée de kube-router.
 
 Mesures, prédictions écrites avant :
