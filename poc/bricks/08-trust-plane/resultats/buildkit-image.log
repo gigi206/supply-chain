@@ -1,0 +1,35 @@
+# buildkit.sh image, 2026-10-30T13:56:48Z
+## tag v0.34.1
+OK   tag annoté v0.34.1 (objet 401bf63d02833b70ef9393eb9702e2b5648dfaaf, signé et vérifié par GitHub) → commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e
+## image docker.io/moby/buildkit:v0.34.1-rootless
+index sha256:f68752a5a94acfcdad2d07867b7075601a421638e17fc5f28efc1c814d0c4f89 (= digest épinglé)
+OK   l'index référence le manifeste linux/amd64 sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b et son manifeste d'attestation sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   sujet du manifeste d'attestation et de la provenance SLSA v1 qu'il porte : sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+provenance : constructeur https://github.com/moby/buildkit/actions/runs/39497521590/attempts/1, 3 couches in-toto (https://spdx.dev/Document, https://spdx.dev/Document, https://slsa.dev/provenance/v1)
+## signature (seul le manifeste d'attestation est signé ; l'image l'est à travers lui, par son sujet)
+référents de l'index : 0 ; du manifeste amd64 : ["application/vnd.docker.attestation.manifest.v1+json"]
+bundle sigstore référent de sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 : sha256:0f1ab5c661be3b5347695c45d30f3337483ab9c884390ece2e96f44118438406, sujet sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   cosign : https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, dépôt moby/buildkit, refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push ; type https://sigstore.dev/cosign/sign/v1
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+OK   gh attestation verify : signataire https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, appelant https://github.com/moby/buildkit/.github/workflows/buildkit.yml@refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push, exécuteur github-hosted
+OK   identité voisine (tag v0.34.0) : refusé (no matching CertificateIdentity)
+## copie dans Zot
+copié dans Zot : 192.168.161.13:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b (cache telechargements/oci/amont/moby/buildkit)
+copié dans Zot : 192.168.161.13:5000/amont/moby/buildkit@sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 (cache avec referrers, telechargements/oci/amont/moby/buildkit)
+référents du manifeste amd64 dans Zot : ["sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 application/vnd.docker.attestation.manifest.v1+json"]
+bundle sigstore référent de sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5 : sha256:0f1ab5c661be3b5347695c45d30f3337483ab9c884390ece2e96f44118438406, sujet sha256:163cf53ec3fffec55eb54fab08c1c95f7f7d9a61a9a966c20eb962a62d6bf8a5
+OK   cosign sur la copie de Zot
+OK   gh attestation verify : signataire https://github.com/docker/github-builder/.github/workflows/bake.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a, appelant https://github.com/moby/buildkit/.github/workflows/buildkit.yml@refs/tags/v0.34.1, commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e, déclencheur push, exécuteur github-hosted
+image des pods : sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+## newuidmap et newgidmap dans les couches (rootlesskit les appelle pour une correspondance de plusieurs UID)
+usr/bin/newgidmap : mode 0755, 0:0, security.capability 0100000240000000000000000000000000000000 (permis : CAP_SETGID, effectif)
+usr/bin/newuidmap : mode 0755, 0:0, security.capability 0100000280000000000000000000000000000000 (permis : CAP_SETUID, effectif)
+CONSTAT pas de bit setuid : capacités de fichier ; sans effet sous no_new_privs (allowPrivilegeEscalation: false de restricted)
+## pour mémoire : v0.25.2-rootless (version de la brique 04), non retenue
+index sha256:a02f6571999693089dc928e9bbb64836c21703b214195d8637c011f1a7025ef6, linux/amd64 sha256:d947144c3dc4f827f8dacaaf98d622f0143465740075fa9790991bc381761dc9, attestation sha256:fd44ad550e18be0111c82d27159dd0b289f50d1cbbe97418b6f7dfd65bad5f51 (provenance https://slsa.dev/provenance/v0.2, sujet OCI absent)
+référents : index 0, amd64 0 (hors attestation), attestation 0
+CONSTAT v0.25.2 : aucune signature (ni référent ni bundle), provenance non signée ; v0.34.1 retenue (signée, maintenue). La brique 04
+        a mesuré 3a7ca1b1 avec BuildKit 0.25.2 (nixpkgs et release amont), en root (cloud) et en rootless (laptop, rootlesskit
+        2.3.5) : un digest différent sous Kata exigera une contre-épreuve hors Kata avec la 0.34.1 avant d'être imputé à Kata

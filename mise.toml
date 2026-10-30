@@ -235,3 +235,7 @@ run = "poc/bricks/08-trust-plane/politique.sh"
 [tasks."confiance:kata"]
 description = "Brique 08, J7 : isolation par Kata Containers 4.3.1 sur sc-build ; vérification de l'archive kata-static (attestation de release) et de l'image kata-deploy, installation depuis l'archive attestée (accord du propriétaire), essais runc et Kata, témoin après redémarrage (étapes : verifier installer essais temoin)"
 run = "poc/bricks/08-trust-plane/kata.sh"
+
+[tasks."confiance:buildkit"]
+description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité) (étapes : image essais)"
+run = "poc/bricks/08-trust-plane/buildkit.sh"
