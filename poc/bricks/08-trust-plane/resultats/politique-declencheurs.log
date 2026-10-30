@@ -1,28 +1,30 @@
-# politique.sh declencheurs, 2026-10-30T09:11:17Z
+# politique.sh declencheurs, 2026-10-30T09:47:33Z
 ## tâche et pipeline de J4 en v1beta1, signées par la clé des tâches et publiées en bundles
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   tâche signée versionnée (politique/taches/publier-essai.signee.yaml) conforme au gabarit rendu, signature exceptée
 tâche publier-essai : sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
+OK   tâche en service dans la liste revue (politique/porte/taches.yml)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-pipeline sample-app-essai : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:cd7bc914d4ae1da537cf7ba26c5151a1e4b78b1921c7af4fcc2ac6ec58c50bef
+pipeline sample-app-essai : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:cdf87a692e1c79526db2cb46707120b6c9fd7b5992ae61d118e532a2ae6802d5
 pipeline modifiée : 1 ligne changée (référence de tâche), même signature
 ## PipelineRuns du bundle (dans builds, gabarit de la TriggerTemplate) ; signature par Chains avec ses identifiants
 OK   pipeline signée (tâche tirée de son bundle signé) : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 TaskRun enfant j6-pipeline-signee-publier : taskRef bundles sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d… ; TrustedResourcesVerified=True
 Chains : TaskRun j6-pipeline-signee-publier signé=true, PipelineRun j6-pipeline-signee signé=true
-## audit de Zot : écritures de manifestes depuis 2026-10-30T09:11:17Z (Chains ; compte attendu poc-build)
-{"t":"09:11:33","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
-{"t":"09:11:39","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+## audit de Zot : écritures de manifestes depuis 2026-10-30T09:47:33Z (Chains ; compte attendu poc-build)
+{"t":"09:47:48","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+{"t":"09:47:55","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
 OK   Chains pousse l'attestation avec poc-build (DOCKER_CONFIG) : 2 écriture(s) .att
 OK   pipeline modifiée après signature : refusée, ResourceVerificationFailed : pipelineRun builds/j6-pipeline-modifiee referred resource sample-app-essai failed signature verification: resource verification failed: resource sample-app-essai in namespace  fails verification ; TrustedResourcesVerified=False
 ## EventListener, secret du webhook et TriggerTemplate : de builds (J4) à declencheurs
 EventListener joignable par Forgejo : http://192.168.161.11:32442 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 1)
 EventListener : el-forgejo-79b6fd78c6-qgvhf Running sc-confiance
-{"id":3,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:32442","content_type":"json"}
+{"id":4,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:32442","content_type":"json"}
 ## contrôles
 OK   aucun secret dans builds
 OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds
 OK   ClusterRoles tekton-triggers-eventlistener-* (secrets du cluster, impersonation) liées à rien
 pod el-forgejo-79b6fd78c6-qgvhf : nœud sc-confiance, compte el-forgejo
-pod rattrapage-29889189-g6qr2 : nœud sc-confiance, compte rattrapage
-pod rattrapage-29889190-224bn : nœud sc-confiance, compte rattrapage
-pod rattrapage-29889191-6v99b : nœud sc-confiance, compte rattrapage
+pod rattrapage-29889225-qv7xp : nœud sc-confiance, compte rattrapage
+pod rattrapage-29889226-ln2bt : nœud sc-confiance, compte rattrapage
+pod rattrapage-29889227-x46rb : nœud sc-confiance, compte rattrapage

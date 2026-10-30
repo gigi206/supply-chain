@@ -1,5 +1,8 @@
 # Provenance SLSA v1 (slsa/v2alpha4), signatures et attestations en dsse sous .sig/.att (chains#2096 non publiée),
-# clé Transit chains d'OpenBao, sans transparence publique. builder.id et buildType : ceux des politiques du banc C.
+# clé Transit chains d'OpenBao, sans transparence publique. builder.id : celui des politiques du banc C.
+# buildType slsa-tekton (J6, décision du propriétaire du 30/10/2026) : TaskRun complet dans les entrées pipelineTask, lu par
+# la bibliothèque de la porte (trusted_task, tasks) ; slsa (J4, J5), le buildType des prédicats synthétiques du banc C
+# (gen_predicates.py), n'y écrivait que l'URI et le digest de la tâche. Aucune politique du PoC ne compare le buildType.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -24,4 +27,4 @@ data:
   signers.kms.auth.oidc.token-path: /var/run/secrets/openbao/token
   transparency.enabled: "false"
   builder.id: https://supply-chain.example/builders/tekton-chains@v1
-  builddefinition.buildtype: https://tekton.dev/chains/v2/slsa
+  builddefinition.buildtype: https://tekton.dev/chains/v2/slsa-tekton

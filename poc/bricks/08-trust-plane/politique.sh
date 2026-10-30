@@ -24,13 +24,15 @@
 #              PipelineRun du bundle signé exécuté et signé par Chains (push de poc-build dans l'audit de Zot), pipeline
 #              modifiée après signature refusée ; EventListener, secret du webhook et TriggerTemplate déplacés dans
 #              l'espace de confiance declencheurs, droits réduits (politique/declencheurs.yaml) ; webhook Forgejo rebranché ;
+#              tâche en service : signature versionnée (politique/taches/publier-essai.signee.yaml, SIGNER=1 pour la
+#              refaire), conforme au gabarit, digest exigé dans la liste revue (politique/porte/taches.yml) ;
 #              objets de J4 retirés de builds. Puis test 5 rejoué : EL_NS=declencheurs JOURNAL=politique JALON=J6
 #              mise run confiance:tekton -- essais_webhook
 #   restreint  Pod Security restricted pour les pods des TaskRuns : drapeau set-security-context de Pipelines (conteneurs
 #              d'initialisation de Tekton), stepTemplate restreint des tâches signées (étapes), contexte de pod du gabarit ;
-#              builds en warn et audit restricted (enforce : décision du propriétaire) ; enforce posé le temps des essais,
-#              puis retiré : tâche en service et tâche d'essai exécutées, tâche signée sans stepTemplate et drapeau
-#              désactivé refusés par Pod Security ; violation tracée dans l'audit de l'API sous warn et audit
+#              builds en warn, audit et enforce restricted (décision du propriétaire du 30/10/2026) : tâche en service et
+#              tâche d'essai exécutées, tâche signée sans stepTemplate et drapeau désactivé refusés par Pod Security ;
+#              enforce levé le temps d'un cas : violation tracée dans l'audit de l'API sous warn et audit
 #   horodatagehorodatage automatique par réconciliation périodique : CronJob horodatage (politique/horodatage-cronjob.yaml,
 #              tsa/horodater.sh sans $IMAGE) qui parcourt builds/ dans Zot et horodate chaque enveloppe de Chains vérifiée
 #              (clé de Chains, sujet, prédicat) ; trois témoins posés par poc-ecriture (autre clé, autre sujet : refusés ;
@@ -47,9 +49,10 @@
 #   porte      porte de release : Conforma (ec v0.10.42, empreinte du verrou mise) et la bibliothèque conforma/policy
 #              v1.0.28 (commit signé, arbre vérifié) dans une image d'une couche sur base vide (même digest) ; Job de
 #              l'espace porte (zone confiance, DNS et Zot seulement, aucun droit sur l'API) ; collection slsa3, trusted_task
-#              (digests approuvés) et règles du PoC (politique/porte) ; provenance actuelle (buildType slsa) et quatre
-#              images d'essai, dont trois produites avec Chains en buildType slsa-tekton le temps des essais : approuvée,
-#              tâche hors liste, version non listée, non signée ; plus le témoin signé par une autre clé
+#              (liste revue politique/porte/taches.yml) et règles du PoC (politique/porte) ; Chains en buildType slsa-tekton
+#              (décision du propriétaire du 30/10/2026) ; tâche en service (exécution de l'essai, sans adoption), et images
+#              d'essai : buildType slsa (Chains basculé le temps d'une image), tâche hors liste, version non listée, non
+#              signée ; plus le témoin signé par une autre clé
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
 #              opérateur, job d'horodatage, rattrapage, porte ; RBAC seul, l'admission n'y figure pas) dans
 #              resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
@@ -453,6 +456,11 @@ signe() { # type nom : attend l'annotation de Chains sur un TaskRun ou un Pipeli
   echo "${v:-absente}"
 }
 
+listee() { # bundle (par digest) : présent dans la liste revue des tâches approuvées (politique/porte/taches.yml)
+  awk -v d="oci://${1%@*}:" -v r="${1#*@}" '$1 == d {b = 1; next} b && /^  [^ ]/ {b = 0}
+    b && $1 == "-" && $2 == "ref:" && $3 == r {t = 1} END {exit !t}' "$here/politique/porte/taches.yml"
+}
+
 etape_declencheurs() {
   local busybox tache pipe autre t0 n o
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -466,8 +474,19 @@ etape_declencheurs() {
   sed -e "s#@IMAGE@#$REG/builds/essai-webhook#" -e "s#@DIGEST@#$APP_DIGEST#" -e "s#@BUSYBOX@#$busybox#" \
     "$here/politique/taches/publier-essai.yaml" > "$T/publier-essai.yaml"
   tkn task sign "$T/publier-essai.yaml" -K "$S/taches.key" -f "$T/publier-essai-signee.yaml" >/dev/null
-  tache=$REG/tekton/tasks/publier-essai@$(bundle "$T/publier-essai-signee.yaml" tekton/tasks/publier-essai)
+  # Tâche en service : signature versionnée (une nouvelle signature donnerait un autre digest), digest dans la liste revue.
+  # SIGNER=1 : nouvelle signature écrite dans le dépôt, à faire revoir avec politique/porte/taches.yml.
+  if [ -n "${SIGNER:-}" ]; then
+    cp "$T/publier-essai-signee.yaml" "$here/politique/taches/publier-essai.signee.yaml"
+    echo "SIGNER : nouvelle signature dans politique/taches/publier-essai.signee.yaml (liste revue à mettre à jour)"
+  fi
+  cmp -s <(grep -v 'tekton.dev/signature:' "$T/publier-essai-signee.yaml") <(grep -v 'tekton.dev/signature:' "$here/politique/taches/publier-essai.signee.yaml") \
+    && echo "OK   tâche signée versionnée (politique/taches/publier-essai.signee.yaml) conforme au gabarit rendu, signature exceptée" \
+    || { echo "KO   gabarit modifié depuis la signature versionnée : SIGNER=1, puis revue de politique/porte/taches.yml" >&2; exit 1; }
+  tache=$REG/tekton/tasks/publier-essai@$(bundle "$here/politique/taches/publier-essai.signee.yaml" tekton/tasks/publier-essai)
   echo "tâche publier-essai : $tache"
+  listee "$tache" && echo "OK   tâche en service dans la liste revue (politique/porte/taches.yml)" \
+    || { echo "KO   tâche en service absente de la liste revue politique/porte/taches.yml" >&2; exit 1; }
   sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/sample-app-essai.yaml"
   tkn pipeline sign "$T/sample-app-essai.yaml" -K "$S/taches.key" -f "$T/sample-app-essai-signee.yaml" >/dev/null
   pipe=$REG/tekton/pipelines/sample-app-essai@$(bundle "$T/sample-app-essai-signee.yaml" tekton/pipelines/sample-app-essai)
@@ -570,7 +589,7 @@ etape_restreint() {
 
   echo "## Pipelines : set-security-context (prepare, place-scripts, working-dir-initializer, sidecar des résultats)"
   drapeau true
-  echo "## builds : Pod Security restricted en warn et audit (enforce : décision du propriétaire)"
+  echo "## builds : Pod Security restricted en warn et audit, puis enforce (décision du propriétaire du 30/10/2026)"
   kubectl label --overwrite namespace builds pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest \
     pod-security.kubernetes.io/audit=restricted pod-security.kubernetes.io/audit-version=latest >/dev/null
 
@@ -585,16 +604,17 @@ etape_restreint() {
   sans=$REG/tekton/pipelines/sans-restriction@$(bundle "$T/sans-restriction-pipeline-signee.yaml" tekton/pipelines/sans-restriction restreint)
   echo "pipeline signée : ${sans#"$REG/"}"
 
-  echo "## audit : création du pod tracée, sans refus"
+  echo "## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus"
+  trap 'kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest >/dev/null 2>&1
+    drapeau true; rm -rf "$T/auth" "$W/refus.out"' EXIT
+  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || true
   verdict "tâche sans stepTemplate, sous warn et audit" True "$(pr_gabarit j6-sans-restriction "$sans")"
   m=$(violations "$t0" j6-sans-restriction-publier-pod)
   echo "audit de l'API : $m"
   grep -q 'container "step-publier"' <<< "$m" && ! grep -qE 'container "(prepare|place-scripts)"' <<< "$m" \
     && echo "OK   violations tracées pour l'étape seule" || { echo "KO   annotation d'audit" >&2; exit 1; }
 
-  echo "## enforce posé le temps des essais, puis retiré"
-  trap 'kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1
-    drapeau true; rm -rf "$T/auth" "$W/refus.out"' EXIT
+  echo "## enforce restricted sur builds"
   kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest 2>&1 \
     | grep -v '^namespace/' | sed 's/^/  /' || true
   verdict "tâche en service (pipeline du gabarit)" True "$(pr_gabarit j6-restreint "$pipe")"
@@ -617,16 +637,15 @@ etape_restreint() {
   [ "${st%%|*}" = False ] && grep -q '^PodAdmissionFailed : .*violates PodSecurity' <<< "$m" && grep -q 'containers "prepare", "place-scripts"' <<< "$m" \
     && ! grep -q '"step-publier"' <<< "$m" && echo "OK   refusée par Pod Security (conteneurs d'initialisation de Tekton seuls)" \
     || { echo "KO   drapeau désactivé" >&2; exit 1; }
-  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null
   trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
 
   echo "## contrôles"
   kubectl get namespace builds -o json | jq -r '"labels de builds : \(.metadata.labels | to_entries | map(select(.key | startswith("pod-security"))) | map("\(.key)=\(.value)") | join(", "))"'
-  [ "$(kubectl get namespace builds -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" = "" ] \
+  [ "$(kubectl get namespace builds -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" = restricted ] \
     && [ "$(kubectl get configmap feature-flags -n tekton-pipelines -o jsonpath='{.data.set-security-context}')" = true ] \
-    && echo "OK   enforce retiré, set-security-context=true" || { echo "KO   état final" >&2; exit 1; }
+    && echo "OK   enforce restricted sur builds, set-security-context=true" || { echo "KO   état final" >&2; exit 1; }
   sed -n '1,/^---$/p' "$here/tekton/builds.yaml" | sed '$d' | kubectl apply --server-side --dry-run=server -f - -o json \
-    | jq -e '.metadata.labels["pod-security.kubernetes.io/audit"] == "restricted"' >/dev/null \
+    | jq -e '.metadata.labels["pod-security.kubernetes.io/enforce"] == "restricted" and .metadata.labels["pod-security.kubernetes.io/audit"] == "restricted"' >/dev/null \
     && echo "OK   tekton.sh signature (apply de tekton/builds.yaml, dry-run serveur) conserve les labels" \
     || { echo "KO   tekton/builds.yaml retire les labels" >&2; exit 1; }
 }
@@ -1143,7 +1162,7 @@ succes() { # cas code : la règle figure parmi les succès du verdict de la port
 trier() { tr ',' '\n' <<< "$1" | sort -u | paste -sd, -; }
 
 etape_porte() {
-  local d e bt0 r v c n k=0 src prevu busybox
+  local d e bt0 r v c n k=0 src prevu busybox t st pipe tache
   [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
   kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
   kubectl get validatingpolicy zone-confiance -o json | jq -e '.spec.matchConstraints.namespaceSelector.matchExpressions[0].values
@@ -1185,46 +1204,61 @@ etape_porte() {
   [ "${d##*@}" = "$PORTE_DIGEST" ] && echo "OK   même digest que l'image épinglée (assemblage reproductible)" \
     || { echo "KO   digest différent de l'image épinglée $PORTE_DIGEST" >&2; exit 1; }
 
-  echo "## état de départ : buildType de Chains et provenance la plus récente de builds/essai-webhook (seule jugée par la bibliothèque)"
+  echo "## état de départ : buildType de Chains (slsa-tekton, décision du propriétaire du 30/10/2026)"
   bt0=$(kubectl get configmap -n tekton-chains chains-config -o jsonpath='{.data.builddefinition\.buildtype}')
   echo "chains-config : builddefinition.buildtype=$bt0"
-  [ "$bt0" = https://tekton.dev/chains/v2/slsa ] || { echo "KO   buildType inattendu" >&2; exit 1; }
+  [ "$bt0" = https://tekton.dev/chains/v2/slsa-tekton ] || { echo "KO   buildType inattendu (tekton/chains/chains-config.yaml)" >&2; exit 1; }
+  pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+
+  echo "## tâche en service : PipelineRun du gabarit ; la provenance jugée (la plus récente de builds/essai-webhook) doit venir de lui"
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  st=$(pr_gabarit j6-porte-en-service "$pipe")
+  [ "${st%%|*}" = True ] || { echo "KO   j6-porte-en-service : $st" >&2; exit 1; }
+  echo "PipelineRun j6-porte-en-service exécuté, Chains : signé=$(signe pipelinerun j6-porte-en-service)"
+  kubectl get taskrun -n builds j6-porte-en-service-publier -o json \
+    | jq -r --arg u "$(kubectl get pipelinerun -n builds j6-porte-en-service -o jsonpath='{.metadata.uid}')" --arg t "$t" \
+      'if .metadata.ownerReferences[0].uid == $u and .metadata.creationTimestamp >= $t then (.spec.taskRef.params[] | select(.name == "bundle") | .value) else "-" end' \
+    > "$T/porte-en-service.tache"
+  grep -q '@sha256:' "$T/porte-en-service.tache" && listee "$(cat "$T/porte-en-service.tache")" \
+    && echo "OK   TaskRun créé par ce PipelineRun ; tâche ${tache:=$(cat "$T/porte-en-service.tache")} dans la liste revue" \
+    || { echo "KO   TaskRun repris d'un autre PipelineRun, ou tâche hors de la liste revue" >&2; exit 1; }
+  echo "$APP_DIGEST" > "$T/porte-en-service.image"
   prov_pr "builds/essai-webhook@$APP_DIGEST" > "$T/prov-webhook.jsonl"
-  jq -sr 'length as $n | max_by(.predicate.runDetails.metadata.finishedOn) | "la plus récente des \($n) : fin \(.predicate.runDetails.metadata.finishedOn), "
-    + "\(tostring | length) octets, buildType \(.predicate.buildDefinition.buildType), entrées pipelineTask avec contenu : "
-    + "\([.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"' "$T/prov-webhook.jsonl"
+  jq -sr --arg t "$t" --arg k "$tache" 'length as $n | max_by(.predicate.runDetails.metadata.finishedOn) | (tostring | length) as $o | .predicate
+    | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
+    | "\(if .runDetails.metadata.startedOn >= $t and $u == $k then "OK  " else "KO  " end) la plus récente des \($n) : début \(.runDetails.metadata.startedOn), "
+      + "\($o) octets, buildType \(.buildDefinition.buildType), entrées pipelineTask avec contenu : "
+      + "\([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"' "$T/prov-webhook.jsonl" | tee "$T/prov-webhook.ligne"
+  grep -q '^OK' "$T/prov-webhook.ligne" || { echo "KO   provenance la plus récente hors de cette exécution" >&2; exit 1; }
+  jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.internalParameters
+    | "internalParameters : \(keys | join(", ")) ; labels du PipelineRun : \(.labels // {} | keys | join(", "))"' "$T/prov-webhook.jsonl"
 
   echo "## images d'essai : une par cas (la bibliothèque ne juge que la provenance la plus récente d'un digest)"
-  echo "Chains en buildType slsa-tekton le temps des essais (TaskRun complet dans resolvedDependencies), puis rétabli"
+  echo "mesure en buildType slsa (J4, J5) : Chains basculé le temps d'une image, puis rétabli en slsa-tekton"
   trap 'kubectl patch configmap -n tekton-chains chains-config --type merge -p "{\"data\":{\"builddefinition.buildtype\":\"'"$bt0"'\"}}" >/dev/null; rm -rf "$T/auth" "$W/refus.out"' EXIT
-  kubectl patch configmap -n tekton-chains chains-config --type merge \
-    -p '{"data":{"builddefinition.buildtype":"https://tekton.dev/chains/v2/slsa-tekton"}}' >/dev/null
-  variante approuvee tekton/tasks/publier-essai
-  variante hors-liste tekton/tasks/publier-hors-liste
-  variante version-non-listee tekton/tasks/publier-essai
-  variante non-signee -
+  kubectl patch configmap -n tekton-chains chains-config --type merge -p '{"data":{"builddefinition.buildtype":"https://tekton.dev/chains/v2/slsa"}}' >/dev/null
+  variante slsa tekton/tasks/publier-essai
   kubectl patch configmap -n tekton-chains chains-config --type merge -p "{\"data\":{\"builddefinition.buildtype\":\"$bt0\"}}" >/dev/null
   trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
   echo "chains-config rétabli : $(kubectl get configmap -n tekton-chains chains-config -o jsonpath='{.data.builddefinition\.buildtype}')"
-  for c in approuvee hors-liste version-non-listee; do
+  variante hors-liste tekton/tasks/publier-hors-liste
+  variante version-non-listee tekton/tasks/publier-essai
+  variante non-signee -
+  for c in slsa hors-liste version-non-listee; do
     prov_pr "builds/essai-porte@$(cat "$T/porte-$c.image")" | jq -sr --arg c "$c" 'max_by(.predicate.runDetails.metadata.finishedOn)
       | "\($c) : \(tostring | length) octets, buildType \(.predicate.buildDefinition.buildType), entrées pipelineTask avec contenu : "
       + "\([.predicate.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .content != null)] | length)"'
   done
-  prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.internalParameters
-    | "internalParameters en slsa-tekton : \(keys | join(", ")) ; labels du PipelineRun : \(.labels | keys | join(", "))"'
-  [ "$(prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.buildType')" \
-    = https://tekton.dev/chains/v2/slsa-tekton ] || { echo "KO   provenance des essais hors slsa-tekton" >&2; exit 1; }
+  [ "$(prov_pr "builds/essai-porte@$(cat "$T/porte-slsa.image")" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.buildType')" \
+    = https://tekton.dev/chains/v2/slsa ] || { echo "KO   provenance de la variante slsa hors slsa" >&2; exit 1; }
 
-  echo "## ConfigMap porte : politique (politique/porte/policy.yaml), règles du PoC (politique/porte/porte.rego), tâches approuvées"
-  echo "## (ancien format trusted_tasks : digest épinglé), clé publique de Chains, CA du PoC ; espace porte (politique/porte.yaml)"
-  r=$(cat "$T/porte-approuvee.tache")
-  printf 'trusted_tasks:\n  oci://%s:\n    - ref: %s\n' "${r%@*}" "${r#*@}" > "$T/taches.yml"
-  sed 's/^/  /' "$T/taches.yml"
+  echo "## ConfigMap porte : politique (politique/porte/policy.yaml), règles du PoC (politique/porte/porte.rego), liste revue des"
+  echo "## tâches approuvées (politique/porte/taches.yml, ancien format trusted_tasks : digest épinglé), clé publique de Chains, CA du PoC"
+  grep -v '^ *#' "$here/politique/porte/taches.yml" | sed 's/^/  /'
   kubectl apply --server-side -f "$here/politique/porte.yaml" >/dev/null
   kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
     --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
-    --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$T/taches.yml" \
+    --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
     --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml \
     | kubectl apply --server-side -f - >/dev/null
 
@@ -1246,25 +1280,27 @@ etape_porte() {
       *) echo "KO   $n : aucun verdict" >&2; k=$((k + 1)) ;;
     esac
   done <<EOF
-slsa|builds/essai-webhook@$APP_DIGEST|policy.yaml|porte.taches_vues,tasks.pipeline_has_tasks,slsa_build_scripted_build.build_task_image_results_found,@SRC@
-slsa-trusted-task-seul|builds/essai-webhook@$APP_DIGEST|policy-trusted-task.yaml|PASS
-approuvee|builds/essai-porte@$(cat "$T/porte-approuvee.image")|policy.yaml|@SRC@
+slsa|builds/essai-porte@$(cat "$T/porte-slsa.image")|policy.yaml|porte.taches_vues,tasks.pipeline_has_tasks,slsa_build_scripted_build.build_task_image_results_found,@SRC@
+slsa-trusted-task-seul|builds/essai-porte@$(cat "$T/porte-slsa.image")|policy-trusted-task.yaml|PASS
+en-service|builds/essai-webhook@$APP_DIGEST|policy.yaml|@SRC@
 hors-liste|builds/essai-porte@$(cat "$T/porte-hors-liste.image")|policy.yaml|trusted_task.trusted,@SRC@
 version-non-listee|builds/essai-porte@$(cat "$T/porte-version-non-listee.image")|policy.yaml|trusted_task.trusted,@SRC@
 non-signee|builds/essai-porte@$(cat "$T/porte-non-signee.image")|policy.yaml|builtin.attestation.signature_check,builtin.image.signature_check
 autre-cle|builds/$TEMOIN_CLE@$c|policy.yaml|builtin.attestation.signature_check,builtin.image.signature_check
 EOF
   [ "$k" = 0 ] || exit 1
-  succes approuvee trusted_task.trusted && succes approuvee porte.taches_vues \
-    && echo "OK   approuvee : trusted_task.trusted et porte.taches_vues parmi les succès" || { echo "KO   succès de approuvee" >&2; exit 1; }
+  succes en-service trusted_task.trusted && succes en-service porte.taches_vues \
+    && echo "OK   en-service : trusted_task.trusted et porte.taches_vues parmi les succès" || { echo "KO   succès de en-service" >&2; exit 1; }
   succes slsa trusted_task.trusted && echo "CONSTAT  slsa : trusted_task.trusted compté parmi les succès alors qu'aucune tâche n'est vue (succès à vide) ; seuls tasks.pipeline_has_tasks (collection slsa3) et le témoin porte.taches_vues refusent ; avec trusted_task seul, l'image est admise"
-  prov_pr "builds/essai-porte@$(cat "$T/porte-approuvee.image")" | jq -sr --arg t "$(cat "$T/porte-approuvee.tache")" 'sort_by(.predicate.runDetails.metadata.finishedOn)
-    | map(.predicate | [.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | .uri + "@sha256:" + .digest.sha256][0] as $u
-      | "  \(.runDetails.metadata.finishedOn) \(.buildDefinition.buildType | sub(".*/"; "")) tâche \($u | sub(".*@sha256:"; "") | .[0:12])… \(if $u == $t then "listée" else "non listée" end)")
-    | .[]' > "$T/provenances-approuvee"
-  echo "provenances de PipelineRun de l'image approuvée, de la plus ancienne à la plus récente :"; cat "$T/provenances-approuvee"
-  n=$(grep -c 'non listée$' "$T/provenances-approuvee" || true)
-  if [ "$n" -gt 0 ] && tail -1 "$T/provenances-approuvee" | grep -q ' listée$'; then
+  jq -sr --arg t "$tache" 'sort_by(.predicate.runDetails.metadata.finishedOn)
+    | map(.predicate | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask") | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
+      | "  \(.runDetails.metadata.finishedOn) \(.buildDefinition.buildType // "-" | sub(".*/"; "")) \(if $u == "" then "sans tâche" elif $u == $t then "listée" else "non listée" end)")
+    | .[]' "$T/prov-webhook.jsonl" > "$T/provenances-en-service"
+  echo "provenances de PipelineRun de builds/essai-webhook (image de la tâche en service) : $(wc -l < "$T/provenances-en-service") ; listées : $(grep -cE ' (slsa|slsa-tekton|-) listée$' "$T/provenances-en-service" || true),"\
+    "non listées : $(grep -c 'non listée$' "$T/provenances-en-service" || true), sans tâche : $(grep -c 'sans tâche$' "$T/provenances-en-service" || true) ; les trois plus récentes :"
+  tail -3 "$T/provenances-en-service"
+  n=$(grep -c 'non listée$' "$T/provenances-en-service" || true)
+  if [ "$n" -gt 0 ] && tail -1 "$T/provenances-en-service" | grep -qE ' (slsa|slsa-tekton|-) listée$'; then
     echo "CONSTAT  la bibliothèque ne juge que la provenance la plus récente d'un digest (max de finishedOn) : $n provenance(s) plus ancienne(s), signée(s) par Chains avec une tâche non listée, n'empêche(nt) pas trusted_task.trusted"
   else echo "provenance unique ou dernière non listée : jugement de la seule provenance la plus récente non observable à cette exécution"; fi
   jq -r '[.components[] | .violations[]? | select(.metadata.code == "trusted_task.trusted") | .msg] | .[0]' "$T/porte-hors-liste.json" | cut -c1-200 | sed 's/^/  motif hors-liste : /'

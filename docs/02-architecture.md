@@ -135,7 +135,7 @@ Esquisse des champs attendus. Chains remplit la structure ; les tâches de confi
   "predicateType": "https://slsa.dev/provenance/v1",
   "predicate": {
     "buildDefinition": {
-      "buildType": "https://tekton.dev/chains/v2/slsa",
+      "buildType": "https://tekton.dev/chains/v2/slsa-tekton",
       "externalParameters": {
         "git": { "url": "forgejo.example/workspace/app", "ref": "refs/heads/custom/el9", "commit": "…" },
         "target": "rocky-9", "SOURCE_DATE_EPOCH": "…"
@@ -161,7 +161,7 @@ Esquisse des champs attendus. Chains remplit la structure ; les tâches de confi
 Points à valider en brique 08 :
 - `internalParameters.hermetic` et `isolation` doivent être inscrits **par la plateforme** (configuration Chains et paramètres de la tâche de confiance), pas par le code de build ;
 - un sujet non-image (rpm) passe par la référence ORAS avec `isBuildArtifact: true` (déduit du code de Chains, à tester).
-- **buildType** (brique 08, J6) : la bibliothèque de Conforma ne lit les tâches (`trusted_task`, `tasks`) que dans le TaskRun complet que Chains écrit en buildType `https://tekton.dev/chains/v2/slsa-tekton`. Avec `…/v2/slsa` (ci-dessus), `trusted_task` passe à vide ; une règle du PoC doit alors juger l'URI et le digest des entrées `pipelineTask`. **Choix soumis au propriétaire.**
+- **buildType** (brique 08, J6) : la bibliothèque de Conforma ne lit les tâches (`trusted_task`, `tasks`) que dans le TaskRun complet que Chains écrit en buildType `https://tekton.dev/chains/v2/slsa-tekton`. Avec `…/v2/slsa`, `trusted_task` passe à vide. **Décision du propriétaire (30/10/2026) : `slsa-tekton`** (ci-dessus). La provenance porte alors le TaskRun complet de chaque tâche (environ 12 ko au lieu de 2,5 ko) et les labels et annotations du PipelineRun dans `internalParameters`, qui diffèrent selon le chemin de création (EventListener ou rattrapage) : à traiter avec les paramètres de plateforme ci-dessus.
 
 ## 4. Organisation du stockage (Zot)
 

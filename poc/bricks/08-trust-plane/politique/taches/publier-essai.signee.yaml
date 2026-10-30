@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIGnBv80Dke1V1tZZmrxeMbmSH032NC826oUJc2gi64U0AiEAnOOfZRScbHDeuvYA0UVhFzvkOTw/A2B2NjPRtacgsYE=
+  name: publier-essai
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+  steps:
+  - env:
+    - name: COMMIT
+      value: $(params.commit)
+    - name: DEPOT
+      value: $(params.depot)
+    image: sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    name: publier
+    resources: {}
+    script: |
+      #!/bin/sh
+      echo "commit $COMMIT de $DEPOT (essai : aucune construction avant J7)"
+      printf '%s' 'sc-stockage.poc.test:5000/builds/essai-webhook' > $(results.IMAGE_URL.path)
+      printf '%s' 'sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5' > $(results.IMAGE_DIGEST.path)

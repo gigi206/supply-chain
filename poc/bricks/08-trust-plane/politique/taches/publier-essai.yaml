@@ -3,6 +3,8 @@
 # Option C du propriétaire : la tâche ne construit rien encore (J7).
 # stepTemplate : les champs de Pod Security restricted propres aux conteneurs, que le podTemplate ne peut pas poser
 # (politique.sh restreint).
+# Signée une fois, versionnée : politique/taches/publier-essai.signee.yaml (même fichier, même digest), digest dans la liste
+# revue politique/porte/taches.yml ; politique.sh declencheurs refuse un gabarit qui ne correspond plus à la signature.
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:

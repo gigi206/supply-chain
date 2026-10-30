@@ -1,0 +1,9 @@
+# Brique 08, J6 : liste revue des tâches approuvées par la porte (règles trusted_task de conforma/policy, ancien format
+# trusted_tasks : dépôt du bundle et digest épinglé). Fichier versionné, jamais écrit par les scripts : ajouter un digest,
+# c'est approuver une version de tâche, et le commit est relu par le propriétaire avant tout push. Chaque digest désigne
+# un bundle de tkn construit depuis une tâche signée versionnée (même fichier, même digest ; une nouvelle signature donne
+# un autre digest). politique.sh declencheurs refuse de déployer une tâche absente de cette liste.
+trusted_tasks:
+  # Tâche en service (pipeline du gabarit de declencheurs) : politique/taches/publier-essai.signee.yaml, stepTemplate restreint
+  oci://sc-stockage.poc.test:5000/tekton/tasks/publier-essai:
+    - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849

@@ -115,4 +115,4 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
   - `allowed_builder_ids`, dont le défaut est `https://tekton.dev/chains/v2` ;
   - une liste `trusted_tasks` par digest ;
   - Conforma dans un pod, et non sur l'hôte, qui ne résout pas les noms des bundles.
-- **Pour la décision C.** En CEL, il faudrait réécrire ces règles sur le même contenu (`slsa-tekton`), ou sur l'URI et le digest des tâches (`slsa`). Le choix du buildType est soumis au propriétaire.
+- **Pour la décision C.** En CEL, il faudrait réécrire ces règles sur le même contenu (`slsa-tekton`), ou sur l'URI et le digest des tâches (`slsa`). Décision du propriétaire (30/10/2026) : `slsa-tekton` ; la réécriture porterait donc sur le TaskRun complet.

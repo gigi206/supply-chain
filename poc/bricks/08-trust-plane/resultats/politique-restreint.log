@@ -1,24 +1,22 @@
-# politique.sh restreint, 2026-10-30T09:11:43Z
+# politique.sh restreint, 2026-10-30T09:48:41Z
 ## état de départ
-labels de builds : aucun label pod-security (niveau privileged par défaut)
-set-security-context : false
+labels de builds : pod-security.kubernetes.io/audit=restricted, pod-security.kubernetes.io/audit-version=latest, pod-security.kubernetes.io/enforce=restricted, pod-security.kubernetes.io/enforce-version=latest, pod-security.kubernetes.io/warn=restricted, pod-security.kubernetes.io/warn-version=latest
+set-security-context : true
 pods existants de builds au regard de restricted (label enforce en dry-run serveur) :
-  Warning: existing pods in namespace "builds" violate the new PodSecurity enforce level "restricted:latest"
-  Warning: essai-signature-pod (and 9 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
-  namespace/builds labeled (server dry run)
+  namespace/builds not labeled (server dry run)
 ## Pipelines : set-security-context (prepare, place-scripts, working-dir-initializer, sidecar des résultats)
-## builds : Pod Security restricted en warn et audit (enforce : décision du propriétaire)
+## builds : Pod Security restricted en warn et audit, puis enforce (décision du propriétaire du 30/10/2026)
 ## variante : tâche en service signée sans son stepTemplate
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-pipeline signée : tekton/pipelines/sans-restriction@sha256:1967811733cde071be09275319aae7fb0d486d8e569ef3f734d472b5e68e8ff3
-## audit : création du pod tracée, sans refus
+pipeline signée : tekton/pipelines/sans-restriction@sha256:9820427baa29c77faad8734b3802fb3ae2992da1dd9cc1418f3cfdfcf6a804da
+## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus
 OK   tâche sans stepTemplate, sous warn et audit : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 audit de l'API : privileged:latest ; would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "step-publier" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "step-publier" must set securityContext.capabilities.drop=["ALL"])
 OK   violations tracées pour l'étape seule
-## enforce posé le temps des essais, puis retiré
+## enforce restricted sur builds
   Warning: existing pods in namespace "builds" violate the new PodSecurity enforce level "restricted:latest"
-  Warning: essai-signature-pod (and 10 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
+  Warning: essai-signature-pod (and 2 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
 OK   tâche en service (pipeline du gabarit) : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 tâche en service : stepTemplate.securityContext {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}
   pod : {"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}
@@ -36,6 +34,6 @@ OK   refusée par Pod Security (étape seule)
 set-security-context désactivé, tâche en service : PipelineRun False, TaskRun PodAdmissionFailed : pods "j6-sans-drapeau-publier-pod" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (containers "prepare", "place-scripts" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containers "prepare", "place-scripts" must set securityContext.capabilities.drop=["ALL"])
 OK   refusée par Pod Security (conteneurs d'initialisation de Tekton seuls)
 ## contrôles
-labels de builds : pod-security.kubernetes.io/audit=restricted, pod-security.kubernetes.io/audit-version=latest, pod-security.kubernetes.io/warn=restricted, pod-security.kubernetes.io/warn-version=latest
-OK   enforce retiré, set-security-context=true
+labels de builds : pod-security.kubernetes.io/audit=restricted, pod-security.kubernetes.io/audit-version=latest, pod-security.kubernetes.io/enforce=restricted, pod-security.kubernetes.io/enforce-version=latest, pod-security.kubernetes.io/warn=restricted, pod-security.kubernetes.io/warn-version=latest
+OK   enforce restricted sur builds, set-security-context=true
 OK   tekton.sh signature (apply de tekton/builds.yaml, dry-run serveur) conserve les labels
