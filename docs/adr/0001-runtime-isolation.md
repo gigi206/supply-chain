@@ -87,10 +87,11 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     - kube-router ne rattache la sortie d'un pod à sa politique que par son IP source.
     - Résultat : échange de données avec Zot ; SSH, API et kubelet joignables ; aucune trace dans NFLOG ni dans les règles.
     - Sans `NET_ADMIN` (pods restreints, runc et Kata), l'usurpation est refusée.
-  - **Sous Cilium 1.20.4** (option 1b, mesurée sur accord du propriétaire le 30/10/2026, cluster recréé et J1 à J7 rejoués, [journal](../../poc/bricks/08-trust-plane/resultats/kata-reseau.log)) :
+  - **Sous Cilium 1.20.4** (option 1b, mesurée sur accord du propriétaire le 30/10/2026, cluster recréé et J1 à J7 rejoués, [journal](../../poc/bricks/08-trust-plane/resultats/kata-reseau-cilium-avant-redemarrage.log)) :
     - **Fenêtre** : aucune, sous runc comme sous Kata. Le CNI attend la première régénération de l'endpoint, d'après le code.
     - **Usurpation** : refusée, motif `INVALID_SOURCE_IP` dans Hubble, aucune réponse. C'est vrai pour une adresse inutilisée du nœud, pour l'IP d'un autre pod du nœud, pour une adresse d'un autre nœud et pour une adresse externe, cette dernière n'apparaissant pas sur l'interface du nœud.
     - **Traces** : chaque refus est tracé par Hubble, avec son motif et sans plafond.
+    - **Après un redémarrage des trois VM** : mesure rejouée sur des pods créés après le redémarrage, mêmes constats ; le réglage bêta est relu par les trois agents ([journal](../../poc/bricks/08-trust-plane/resultats/redemarrage-vm.log)). Ni la fenêtre des pods qui repartent avec le nœud, ni la tenue dans la durée ne sont mesurées.
     - **Écarts au plan** : `policyCIDRMatchMode: nodes`, réglage bêta, est nécessaire parce que Zot et Forgejo tournent sur un nœud ; un refus étant une perte de paquet, les clients attendent leur délai ; le L7 est coupé.
   - **Conséquence** : sous kube-router, le contrôle de sortie de la zone build ne peut pas reposer sur cette NetworkPolicy dès que du code est root dans l'invité. De plus, une NetworkPolicy porte sur un pod et non sur une étape. La conception du test 6 est une décision du propriétaire avant J8.
 
@@ -109,4 +110,4 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
     Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2 et, lui non plus, aucune provenance pour son image : seuls ses binaires en ont une. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
-  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6. Cilium a été mesuré (option 1b) : aucune fenêtre, et l'usurpation est refusée. Il reste au propriétaire à choisir entre garder Cilium (avec un réglage bêta et sans L7) et revenir à flannel.
+  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6. Cilium a été mesuré (option 1b) : aucune fenêtre, et l'usurpation est refusée, y compris après un redémarrage des VM. Il reste au propriétaire à choisir entre garder Cilium (avec un réglage bêta et sans L7) et revenir à flannel.

@@ -8,6 +8,9 @@
 #   EventListener prêts ; un passage réussi de chaque CronJob (horodatage, rattrapage) créé après le retour du TSA.
 #   J7 : runtime kata rechargé par containerd sur sc-build, exemption Pod Security de kata relue, pod Kata lancé dans l'invité
 #   (kata.sh temoin). sonde_kyverno et passage_ok sont dans commun.sh (aussi utilisées par kata.sh exemption).
+#   Cilium (J7, option 1b), seulement si le cluster tourne sous Cilium : agents et opérateur prêts depuis le redémarrage, avant
+#   les autres contrôles (sans agent prêt, aucun pod du nœud n'a de réseau) ; cilium-dbg status et policy-cidr-match-mode
+#   (bêta) relus dans chaque agent ; en fin de script, la mesure réseau de référence (kata.sh reseau : fenêtre, usurpations).
 #
 # Usage (racine du dépôt) : mise run confiance:redemarrer   (journal : resultats/redemarrage-vm.log)
 set -euo pipefail
@@ -63,6 +66,23 @@ echo "## durée $(( $(date +%s) - t )) s : trois nœuds réenregistrés (nouveau
 for vm in sc-confiance sc-build sc-stockage; do echo "$vm : démarré à $(sur "$vm" 'uptime -s')"; done
 kubectl get nodes -o wide -L zone
 
+if [ "$(reseau)" = cilium ]; then
+  echo "## Cilium (J7, option 1b), avant les autres contrôles"
+  echo "prédiction (écrite le 30/10/2026, avant le premier redémarrage des VM sous Cilium) : agents (3/3) et opérateur prêts"
+  echo "depuis le redémarrage ; cilium-dbg status OK et policy-cidr-match-mode nodes relu par chacun des trois agents ;"
+  echo "kata.sh reseau, en fin de script : mêmes constats qu'avant le redémarrage (aucune fenêtre, usurpations refusées)"
+  prets kube-system
+  d=$(kubectl -n kube-system get ds cilium -o jsonpath='{.status.numberReady}/{.status.desiredNumberScheduled}')
+  [ "$d" = 3/3 ] && echo "OK   DaemonSet cilium : $d" || { echo "KO   DaemonSet cilium : $d" >&2; exit 1; }
+  for p in $(kubectl -n kube-system get pods -l k8s-app=cilium -o jsonpath='{.items[*].metadata.name}'); do
+    n=$(kubectl -n kube-system get pod "$p" -o jsonpath='{.spec.nodeName}')
+    s=$(kubectl -n kube-system exec "$p" -c cilium-agent -- cilium-dbg status --brief 2>&1 | tail -1 || true)
+    m=$(kubectl -n kube-system exec "$p" -c cilium-agent -- cilium-dbg config --all 2>/dev/null | awk '$1 ~ /PolicyCIDRMatchMode/ {v = $NF} END {print v}' || true)
+    [ "$s" = OK ] && [ "$m" = "[nodes]" ] && echo "OK   agent $p ($n) : cilium-dbg status $s, PolicyCIDRMatchMode $m" \
+      || { echo "KO   agent $p ($n) : cilium-dbg status $s, PolicyCIDRMatchMode $m" >&2; exit 1; }
+  done
+fi
+
 echo "## stockage"
 sur sc-stockage "systemctl is-active zot forgejo" | paste -sd' '
 code=$(curl -s -o /dev/null -w '%{http_code}' -I --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
@@ -100,4 +120,8 @@ passage_ok horodatage horodatage "$t"
 passage_ok declencheurs rattrapage "$t"
 echo "## Kata (J7)"
 mise run confiance:kata -- temoin
+if [ "$(reseau)" = cilium ]; then
+  echo "## Réseau des pods après le redémarrage (Cilium) : mesure de référence (journal resultats/kata-reseau.log)"
+  mise run confiance:kata -- reseau
+fi
 kubectl get pods -A -o wide
