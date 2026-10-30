@@ -4,7 +4,10 @@
 # Seul écart au défaut : no-missing-resource désactivée. tekton-lint 1.2.4 ne lit que les références par nom ; une référence
 # par résolveur (bundles, imposé par Kyverno, règle tekton-references) y est signalée introuvable (« task 'undefined' »),
 # puis son rapporteur plante sur la clé name absente (politique-posture-premiere-prediction.log). Perdu : la détection d'une
-# référence par nom à une ressource absente du lot (témoin cas/tache-absente-par-nom.yaml), refusée de toute façon à l'admission.
+# référence par nom à une ressource absente du lot (témoin cas/tache-absente-par-nom.yaml), refusée de toute façon à l'admission :
+# toute référence par nom l'est (cas tr-locale et pr-locale de politique/cas-admission.py). Décision du propriétaire (30/10/2026) :
+# règle gardée désactivée ; à chaque nouvelle version de tekton-lint, rejouer la ressource en service avec la règle active, et
+# la réactiver le jour où elle lit les références par résolveur.
 rules: # error | warning | off
   no-duplicate-param: error
   no-invalid-name: error
