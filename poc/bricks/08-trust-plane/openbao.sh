@@ -218,21 +218,26 @@ etape_essais() {
     kubectl wait -n tekton-chains --for=jsonpath='{.status.phase}'=Succeeded "pod/$p" --timeout=120s >/dev/null
     kubectl logs -n tekton-chains "$p" > "$B/$p.log"
   done
-  # Trace réseau : paquets du pod de sc-build refusés par la NetworkPolicy d'OpenBao, journalisés par kube-router
-  # (NFLOG, groupe 100) sur sc-confiance. tcpdump ne filtre pas sur NFLOG : on garde ensuite les sources de sc-build.
-  local cidr tcpdump
+  # Trace réseau : paquets du pod de sc-build refusés par la NetworkPolicy d'OpenBao, journalisés sur sc-confiance par
+  # kube-router (NFLOG, groupe 100 ; tcpdump ne filtre pas sur NFLOG : on garde ensuite les sources de sc-build) ou, sous
+  # Cilium (J7, option 1b), par Hubble dans l'agent de sc-confiance (refus à l'entrée du pod d'OpenBao).
+  local cidr tcpdump="" r t0
   cidr=$(kubectl get node sc-build -o jsonpath='{.spec.podCIDR}')
-  sur sc-confiance "sudo timeout 40 tcpdump -i nflog:100 -nn -l 2>&1" > "$B/nflog.txt" &
-  tcpdump=$!
-  sleep 2
+  r=$(reseau)
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  if [ "$r" = flannel ]; then
+    sur sc-confiance "sudo timeout 40 tcpdump -i nflog:100 -nn -l 2>&1" > "$B/nflog.txt" &
+    tcpdump=$!
+    sleep 2
+  fi
   attendre_sa j3-essais
   pod_essai reseau j3-essais default build aucun | grep -v '^$' | kubectl apply -f - >/dev/null
   kubectl wait -n j3-essais --for=jsonpath='{.status.phase}'=Succeeded pod/reseau --timeout=120s >/dev/null
   kubectl logs -n j3-essais reseau > "$B/reseau.log"
-  wait "$tcpdump" || true
+  [ -z "$tcpdump" ] || wait "$tcpdump" || true
 
   echo "## compte de service de Chains (audience openbao), sur sc-confiance"
-  echo "OpenBao joint au bout de $(sed -n 's/^JOINT_AU_ESSAI|//p' "$B/chains.log") essai(s) (synchronisation de kube-router)"
+  echo "OpenBao joint au bout de $(sed -n 's/^JOINT_AU_ESSAI|//p' "$B/chains.log") essai(s) (synchronisation du contrôleur réseau, $r)"
   sed -n '/^CONNEXION/,/^SIGNATURE/p' "$B/chains.log" | grep -v -E '^(SIGNATURE|--$)' | tr -s ' ' | paste -sd' '
   grep -q '^CONNEXION_ACCEPTEE' "$B/chains.log" || { cat "$B/chains.log" >&2; exit 1; }
   sig=$(sed -n 's/^SIGNATURE|vault:v1://p' "$B/chains.log")
@@ -257,11 +262,19 @@ etape_essais() {
   done
   l=$(cat "$B/reseau.log")
   [[ $l == INJOIGNABLE* ]] && echo "OK   pod de j3-essais sur sc-build : OpenBao injoignable (${l#INJOIGNABLE|})" || { echo "KO   réseau : $l" >&2; exit 1; }
-  echo "## NFLOG (groupe 100) sur sc-confiance pendant l'essai réseau : source $cidr (pods de sc-build)"
-  grep -E "IP ${cidr%.0/24}\.[0-9]+\.[0-9]+ > [0-9.]+\.8200: Flags \[S\]" "$B/nflog.txt" | head -3
-  grep -E 'packets (captured|received)' "$B/nflog.txt"
-  grep -E "IP ${cidr%.0/24}\.[0-9]+\.[0-9]+ > [0-9.]+\.8200: Flags \[S\]" "$B/nflog.txt" >/dev/null \
-    && echo "OK   SYN du pod de sc-build vers OpenBao journalisés comme refusés" || { echo "KO   aucune trace NFLOG" >&2; exit 1; }
+  if [ "$r" = flannel ]; then
+    echo "## NFLOG (groupe 100) sur sc-confiance pendant l'essai réseau : source $cidr (pods de sc-build)"
+    grep -E "IP ${cidr%.0/24}\.[0-9]+\.[0-9]+ > [0-9.]+\.8200: Flags \[S\]" "$B/nflog.txt" | head -3
+    grep -E 'packets (captured|received)' "$B/nflog.txt"
+    grep -E "IP ${cidr%.0/24}\.[0-9]+\.[0-9]+ > [0-9.]+\.8200: Flags \[S\]" "$B/nflog.txt" >/dev/null \
+      && echo "OK   SYN du pod de sc-build vers OpenBao journalisés comme refusés" || { echo "KO   aucune trace NFLOG" >&2; exit 1; }
+  else
+    echo "## Hubble (agent Cilium de sc-confiance) depuis $t0 : flux refusés vers le port 8200, source $cidr (pods de sc-build)"
+    hubble_refus sc-confiance "$t0" --to-port 8200 > "$B/hubble.txt" || true
+    grep -E "^[0-9:.]+ ${cidr%.0/24}\.[0-9]+ > [0-9.]+:8200 " "$B/hubble.txt" | head -3 || true
+    grep -E "^[0-9:.]+ ${cidr%.0/24}\.[0-9]+ > [0-9.]+:8200 " "$B/hubble.txt" >/dev/null \
+      && echo "OK   paquets du pod de sc-build vers OpenBao refusés, avec leur motif (Hubble)" || { echo "KO   aucune trace Hubble" >&2; cat "$B/hubble.txt" >&2; exit 1; }
+  fi
 
   echo "## jeton root : la clé reste non exportable"
   racine <<'EOF' > "$B/racine.txt" 2>&1 || true

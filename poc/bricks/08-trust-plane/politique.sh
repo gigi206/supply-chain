@@ -1079,7 +1079,7 @@ EOF
     && grep -q '^OUVERT API-service ' "$T/reseau.txt" && echo "OK   sorties, une fois la règle posée : Forgejo et l'API seulement (plus le DNS)" \
     || { echo "KO   sorties du pod de rattrapage" >&2; exit 1; }
   grep -q '^FENETRE|.*puis 3 refus de suite$' "$T/reseau.txt" || { echo "KO   règle jamais appliquée en 60 s" >&2; exit 1; }
-  echo "CONSTAT  fenêtre de démarrage : une sortie interdite passe pendant la première seconde du conteneur, avant que kube-router ne pose la règle (sonde : resultats/politique-rattrapage-sonde-fenetre.log)"
+  echo "CONSTAT  fenêtre de démarrage ($(reseau)) : $(sed -n 's/^FENETRE|//p' "$T/reseau.txt") (sous kube-router : une sortie interdite passe pendant la première seconde du conteneur ; sonde : resultats/politique-rattrapage-sonde-fenetre.log)"
 
   echo "## webhook perdu : EventListener arrêté (0 réplique), push de c1"
   kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null

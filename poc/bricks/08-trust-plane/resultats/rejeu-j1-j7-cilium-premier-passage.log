@@ -1,0 +1,94 @@
+# rejeu.sh j1-j7-cilium, 2026-10-30T19:05:08Z
+réseau : cilium ; arrêt après Cilium
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh detruire
+Domain 'sc-confiance' destroyed
+
+Domain 'sc-confiance' has been undefined
+
+Domain 'sc-build' destroyed
+
+Domain 'sc-build' has been undefined
+
+Domain 'sc-stockage' destroyed
+
+Domain 'sc-stockage' has been undefined
+
+Vol sc-confiance.qcow2 deleted
+
+Vol sc-confiance-graine.iso deleted
+
+Vol sc-build.qcow2 deleted
+
+Vol sc-build-graine.iso deleted
+
+Vol sc-stockage.qcow2 deleted
+
+Vol sc-stockage-graine.iso deleted
+
+Pool supply-chain-poc destroyed
+
+Pool supply-chain-poc deleted
+
+Pool supply-chain-poc has been undefined
+
+Network supply-chain-poc destroyed
+
+Network supply-chain-poc has been undefined
+
+reste dans ~/.cache/supply-chain-poc/08 : pki telechargements ssh outils secrets 
+## durée démontage : 3 s
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh creer
+Pool supply-chain-poc defined
+
+Pool supply-chain-poc built
+
+Pool supply-chain-poc started
+
+Network supply-chain-poc defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/libvirt/reseau.xml
+
+Network supply-chain-poc started
+
+
+
+Domain 'sc-confiance' defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/libvirt/sc-confiance.xml
+
+
+
+Domain 'sc-build' defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/libvirt/sc-build.xml
+
+
+
+Domain 'sc-stockage' defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/libvirt/sc-stockage.xml
+
+ Name                      Path                                                        Type   Capacity     Allocation
+------------------------------------------------------------------------------------------------------------------------
+ sc-build-graine.iso       /var/lib/libvirt/supply-chain-poc/sc-build-graine.iso       file   366.00 KiB   368.00 KiB
+ sc-build.qcow2            /var/lib/libvirt/supply-chain-poc/sc-build.qcow2            file   30.00 GiB    1011.85 MiB
+ sc-confiance-graine.iso   /var/lib/libvirt/supply-chain-poc/sc-confiance-graine.iso   file   366.00 KiB   368.00 KiB
+ sc-confiance.qcow2        /var/lib/libvirt/supply-chain-poc/sc-confiance.qcow2        file   15.00 GiB    1011.87 MiB
+ sc-stockage-graine.iso    /var/lib/libvirt/supply-chain-poc/sc-stockage-graine.iso    file   366.00 KiB   368.00 KiB
+ sc-stockage.qcow2         /var/lib/libvirt/supply-chain-poc/sc-stockage.qcow2         file   20.00 GiB    1011.85 MiB
+
+Domain 'sc-confiance' started
+
+Domain 'sc-build' started
+
+Domain 'sc-stockage' started
+
+sc-confiance : SSH ok (clé d'hôte attendue)
+sc-build : SSH ok (clé d'hôte attendue)
+sc-stockage : SSH ok (clé d'hôte attendue)
+## durée VM : 18 s
+[confiance:k3s] $ poc/bricks/08-trust-plane/k3s.sh
+# k3s.sh, 2026-10-30T19:05:29Z, réseau cilium
+archives de Cilium conformes à ~/.cache/supply-chain-poc/08/telechargements/cilium/sums.txt
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+cilium-amd64.tar: OK
+operator-generic-amd64.tar: OK
+cilium-helmchart.yaml: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/k3s.service' -> '/etc/systemd/system/k3s.service'.
+k3s version v1.35.9+k3s1 (58877f27)
+sc-confiance : k3s server installé
+nœuds non prêts : sc-confiance
+[confiance:k3s] ERROR task failed

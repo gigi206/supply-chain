@@ -123,12 +123,26 @@ audit_api() { # motif (chaîne fixe, sans espace ni guillemet) : lignes de l'aud
 
 el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
 
+reseau() { # contrôleur réseau du cluster : cilium (DaemonSet cilium de kube-system, J7, option 1b) ou flannel (flannel et kube-router)
+  if kubectl get ds -n kube-system cilium >/dev/null 2>&1; then echo cilium; else echo flannel; fi
+}
+
+hubble_refus() { # nœud depuis [filtres de hubble observe…] : flux refusés (DROPPED) vus par l'agent Cilium du nœud depuis une date
+  # RFC 3339 ; une ligne par flux : heure, source, destination:port, drapeaux TCP, motif, sens
+  local n=$1 d=$2 p
+  shift 2
+  p=$(kubectl -n kube-system get pods -l k8s-app=cilium --field-selector "spec.nodeName=$n" -o jsonpath='{.items[0].metadata.name}')
+  kubectl -n kube-system exec "$p" -c cilium-agent -- hubble observe --since "$d" --verdict DROPPED -o json "$@" \
+    | jq -r '.flow | [.time[11:23], (.IP.source + " > " + .IP.destination + ":" + ((.l4.TCP.destination_port // .l4.UDP.destination_port // "-") | tostring)),
+        ((.l4.TCP.flags // {}) | keys | join(",")), (.drop_reason_desc // "-"), (.traffic_direction // "-")] | join(" ")'
+}
+
 el_joignable() { # EventListener de $EL_NS disponible et joignable depuis sc-stockage ; une ligne
   local url n=1
   for _ in $(seq 60); do kubectl get deploy -n "$EL_NS" el-forgejo >/dev/null 2>&1 && break; sleep 2; done
   kubectl wait -n "$EL_NS" --for=condition=Available deploy/el-forgejo --timeout=180s >/dev/null
   url=$(el_url)
-  # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3) : Forgejo n'a pas relivré un webhook
+  # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3 ; à mesurer sous Cilium) : Forgejo n'a pas relivré un webhook
   # refusé (rejeu de J5, puis code de Forgejo lu en J6) ; on attend la sonde /live depuis sc-stockage (sans événement).
   until [ "$(sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' $url/live" || true)" = 200 ]; do
     [ $n -lt 60 ] || { echo "KO   EventListener injoignable depuis sc-stockage" >&2; exit 1; }

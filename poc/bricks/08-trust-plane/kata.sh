@@ -18,7 +18,8 @@
 #              sc-confiance, OpenBao, Kyverno, TSA et CronJobs ; admission mesurée en dry-run serveur. Après essais : posée dès
 #              J1, l'exemption ferait mentir le refus du pod Kata privilégié que mesure essais
 #   temoin     après un redémarrage des VM (redemarrer.sh) : runtime kata rechargé par containerd, pod Kata lancé dans l'invité
-#   reseau     NetworkPolicy de kube-router sur des pods Kata de sc-build (kata/sonde-reseau.yaml, posée sur les seuls pods de
+#   reseau     NetworkPolicy sur des pods Kata de sc-build, sous kube-router ou, depuis l'option 1b, sous Cilium (traces par
+#              Hubble ; prédictions propres) (kata/sonde-reseau.yaml, posée sur les seuls pods de
 #              mesure, retirée à la fin), prédiction d'abord : fenêtre de démarrage (sonde de J6) sous runc et sous Kata,
 #              sorties une fois la règle posée, trace NFLOG (groupe 100) sur sc-build, usurpation d'une adresse inutilisée du
 #              sous-réseau des pods par un pod Kata privilégié (posture de la construction, voie A)
@@ -554,7 +555,138 @@ nettoyer_reseau() {
   kubectl delete -f "$here/kata/sonde-reseau.yaml" --ignore-not-found >/dev/null 2>&1 || true
 }
 
-etape_reseau() {
+etape_reseau() { # contrôleur réseau du cluster : Cilium (J7, option 1b) ou kube-router
+  if [ "$(reseau)" = cilium ]; then reseau_cilium; else reseau_kube_router; fi
+}
+
+reseau_cilium() {
+  local ko=0 i p ip o d f n s t0
+  echo "## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)"
+  echo "- la politique ne sélectionne que les pods de mesure (label app=$SONDE) ;"
+  echo "- fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,"
+  echo "  plugins/cilium-cni/cmd/cmd.go) ; l'agent résout les labels du pod puis attend la première régénération avant de rendre"
+  echo "  la main (WaitForFirstRegeneration, pkg/endpoint/api/endpoint_api_manager.go, au tag v1.20.4) : Zot refusé dès la"
+  echo "  première tentative ;"
+  echo "- une fois la règle posée, sous runc comme sous Kata : Forgejo seul ouvert ; Zot, SSH de sc-stockage, API (nœud et"
+  echo "  service), kubelet local et kubelet de sc-confiance fermés. Un refus de Cilium est une perte de paquet, pas un REJECT :"
+  echo "  délai dépassé côté client ;"
+  echo "- Hubble (agent de sc-build) : au moins un flux refusé par tentative vers Zot, avec l'IP du pod et un motif de politique,"
+  echo "  pour le pod runc comme pour le pod Kata ; aucun plafond ;"
+  echo "- usurpation, pod Kata privilégié (root, NET_ADMIN dans l'invité) : avec son IP, Zot refusé ; avec $USURPEE, tout refusé"
+  echo "  (vérification de l'adresse source, documentée : annotations de pod), aucune réponse de Zot, flux de $USURPEE refusés"
+  echo "  dans Hubble avec un motif d'adresse source ;"
+  echo "- témoins sans NET_ADMIN, pod Kata restreint et pod runc restreint : ajout et liaison de l'adresse refusés, comme sous"
+  echo "  kube-router (indépendant du contrôleur réseau)"
+  echo "## état de départ"
+  echo "NetworkPolicy de builds : $(kubectl get netpol -n builds -o name | tr '\n' ' ')"
+  n=$(kubectl get netpol -n builds -o name | { grep -x "networkpolicy.networking.k8s.io/$SONDE" || true; } | wc -l)
+  [ "$n" = 0 ] && echo "OK   pas de politique $SONDE résiduelle" || { echo "KO   politique $SONDE résiduelle" >&2; exit 1; }
+  echo "Cilium : $(kubectl -n kube-system exec ds/cilium -c cilium-agent -- cilium-dbg status --brief 2>&1 | tail -1) ; enable-policy \
+$(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.enable-policy}') ; routing-mode $(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.routing-mode}')"
+  rm -f "$T/fenetres.txt" "$T/traces.txt"
+  trap nettoyer_reseau EXIT
+  kubectl apply -f "$here/kata/sonde-reseau.yaml" >/dev/null
+  echo "NetworkPolicy $SONDE posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=$SONDE"
+
+  echo "## fenêtre de démarrage, trois essais alternés runc et Kata"
+  for i in 1 2 3; do
+    for p in runc kata; do
+      pod_reseau "j7-reseau-$p-$i" "$([ $p = kata ] && echo kata || echo -)" - "$FENETRE"
+      pod_fini "j7-reseau-$p-$i"
+      grep '^ESSAI|' "$T/j7-reseau-$p-$i.log" | awk -F'|' '{printf "  %5d ms : Zot %s ; Forgejo %s\n", $2, $3, $4}'
+      IFS='|' read -r _ o d f < <(grep '^FENETRE|' "$T/j7-reseau-$p-$i.log")
+      echo "  Zot joignable $o fois, la dernière à $d ms du lancement ; puis $f refus de suite"
+      [ "$f" = 3 ] || { echo "KO   $p-$i : règle jamais appliquée en 60 s" >&2; ko=1; }
+      echo "$p $o" >> "$T/fenetres.txt"
+      grep '^SORTIE|' "$T/j7-reseau-$p-$i.log" | awk -F'|' '{print "  " $4 " " $2 " " $3}'
+      s=$(grep '^SORTIE|' "$T/j7-reseau-$p-$i.log" | awk -F'|' '$4 == "OUVERT" {print $2}' | tr '\n' ' ')
+      [ "$s" = "Forgejo " ] && echo "OK   $p-$i : une fois la règle posée, Forgejo seul ouvert" \
+        || { echo "KO   $p-$i : ouverts : $s" >&2; ko=1; }
+      kubectl delete pod -n builds "j7-reseau-$p-$i" --wait=false >/dev/null
+    done
+  done
+  for p in runc kata; do
+    n=$(awk -v p=$p '$1 == p && $2 > 0' "$T/fenetres.txt" | wc -l)
+    [ "$n" = 0 ] && echo "OK   $p : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)" \
+      || { echo "KO   $p : fenêtre ouverte dans $n essai(s) sur 3 (prédiction : aucune)" >&2; ko=1; }
+  done
+  rm -f "$T/fenetres.txt"
+
+  echo "## trace Hubble sur sc-build (agent Cilium du nœud)"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  pod_reseau j7-reseau-trace-runc - - "$TRACE"
+  pod_reseau j7-reseau-trace-kata kata - "$TRACE"
+  for p in runc kata; do
+    pod_fini "j7-reseau-trace-$p"
+    sed 's/^/  /' "$T/j7-reseau-trace-$p.log"
+    ip=$(ip_pod "j7-reseau-trace-$p")
+    o=$(grep -c '|FERME$' "$T/j7-reseau-trace-$p.log" || true)
+    hubble_refus sc-build "$t0" --from-ip "$ip" --to-ip 192.168.161.13 --to-port 5000 > "$T/hubble-trace-$p.txt" || true
+    sed 's/^/  Hubble : /' "$T/hubble-trace-$p.txt"
+    n=$(wc -l < "$T/hubble-trace-$p.txt")
+    [ "$o" = 3 ] && [ "$n" -ge 3 ] && echo "OK   $p ($ip) : 3 connexions refusées, $n flux refusés vers Zot dans Hubble ($(cut -d' ' -f5 "$T/hubble-trace-$p.txt" | sort -u | paste -sd,))" \
+      || { echo "KO   $p ($ip) : $o refus, $n flux dans Hubble" >&2; ko=1; }
+    kubectl delete pod -n builds "j7-reseau-trace-$p" --wait=false >/dev/null
+  done
+
+  echo "## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)"
+  for p in runc kata; do
+    pod_reseau "j7-reseau-temoin-$p" "$([ $p = kata ] && echo kata || echo -)" - "$TEMOIN_USURPATION"
+    pod_fini "j7-reseau-temoin-$p"
+    sed 's/^/  /' "$T/j7-reseau-temoin-$p.log"
+    grep -q '^AJOUT|refusé|' "$T/j7-reseau-temoin-$p.log" && grep -q '^LIAISON|refusée|' "$T/j7-reseau-temoin-$p.log" \
+      && echo "OK   $p restreint : ajout de $USURPEE refusé, liaison de nc refusée" \
+      || { echo "KO   $p restreint : $(tr '\n' ' ' < "$T/j7-reseau-temoin-$p.log")" >&2; exit 1; }
+    kubectl delete pod -n builds "j7-reseau-temoin-$p" --wait=false >/dev/null
+  done
+  echo "## usurpation d'adresse source : pod Kata privilégié"
+  n=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}' | grep -cxF "$USURPEE" || true)
+  d=$(kubectl get ciliumendpoints -A -o json | jq --arg u "$USURPEE" '[.items[].status.networking.addressing[]?.ipv4 | select(. == $u)] | length')
+  [ "$n" = 0 ] && [ "$d" = 0 ] && echo "OK   $USURPEE inutilisée : portée ni par un pod ni par un endpoint de Cilium" \
+    || { echo "KO   $USURPEE en usage" >&2; exit 1; }
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  capture "$T/usurpation.txt" 70 -i any host "$USURPEE"
+  pod_reseau j7-reseau-usurpation kata privilegie "$USURPATION"
+  for _ in $(seq 120); do
+    kubectl logs -n builds j7-reseau-usurpation > "$T/j7-reseau-usurpation.log" 2>/dev/null || true
+    grep -qx FIN "$T/j7-reseau-usurpation.log" && break; sleep 1
+  done
+  grep -qx FIN "$T/j7-reseau-usurpation.log" || { kubectl describe pod -n builds j7-reseau-usurpation >&2; echo "KO   essai d'usurpation non terminé" >&2; exit 1; }
+  ip=$(ip_pod j7-reseau-usurpation)
+  pod_fini j7-reseau-usurpation
+  sed 's/^/  /' "$T/j7-reseau-usurpation.log"
+  wait
+  hubble_refus sc-build "$t0" --from-ip "$ip" --to-port 5000 > "$T/hubble-temoin.txt" || true
+  hubble_refus sc-build "$t0" --ip "$USURPEE" > "$T/hubble-usurpation.txt" || true
+  sed 's/^/  Hubble (IP du pod) : /' "$T/hubble-temoin.txt"
+  sed 's/^/  Hubble ($USURPEE) : /' "$T/hubble-usurpation.txt"
+  grep -E 'packets (captured|received)' "$T/usurpation.txt" | sed 's/^/  tcpdump : /' || true
+  grep -qx 'AVANT|Zot|FERME' "$T/j7-reseau-usurpation.log" && grep -qx 'AVANT|Forgejo|OUVERT' "$T/j7-reseau-usurpation.log" \
+    && grep -qx 'APRES|Zot|FERME' "$T/j7-reseau-usurpation.log" \
+    && echo "OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert" || { echo "KO   témoin" >&2; ko=1; }
+  n=$(wc -l < "$T/hubble-temoin.txt")
+  [ "$n" -ge 2 ] && echo "OK   Hubble : $n flux refusés du pod ($ip) vers Zot, ceux du témoin" || { echo "KO   Hubble : $n flux du témoin" >&2; ko=1; }
+  s=$(grep '^USURPEE|' "$T/j7-reseau-usurpation.log" | awk -F'|' '$4 == "OUVERT" {print $2}' | tr '\n' ' ')
+  [ -z "$s" ] && echo "OK   avec $USURPEE, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)" \
+    || { echo "KO   avec $USURPEE, ouverts : $s (prédiction : aucun)" >&2; ko=1; }
+  grep -qx 'ECHANGE|Zot|HTTP/1.0 400 Bad Request' "$T/j7-reseau-usurpation.log" \
+    && { echo "KO   avec $USURPEE, échange de données avec Zot" >&2; ko=1; } || echo "OK   avec $USURPEE, aucune réponse de Zot"
+  n=$(wc -l < "$T/hubble-usurpation.txt")
+  [ "$n" -ge 1 ] && echo "OK   Hubble : $n flux de $USURPEE refusés, motif(s) $(cut -d' ' -f5 "$T/hubble-usurpation.txt" | sort -u | paste -sd,)" \
+    || { echo "KO   Hubble : aucun flux de $USURPEE" >&2; ko=1; }
+  echo "  capture -i any sur sc-build : $(syn_distincts "$T/usurpation.txt" "$USURPEE" 192.168.161.13.5000) SYN distinct(s) de $USURPEE vers Zot, \
+$(grep -cE "192\.168\.161\.13\.5000 > ${USURPEE//./\\.}\.[0-9]+: Flags \[S\.\]" "$T/usurpation.txt" || true) ligne(s) SYN-ACK en retour"
+
+  echo "## retrait"
+  kubectl delete pod -n builds -l "app=$SONDE" --ignore-not-found --wait=true >/dev/null
+  kubectl delete -f "$here/kata/sonde-reseau.yaml" >/dev/null
+  trap - EXIT
+  [ "$(kubectl get netpol -n builds -o name | { grep -x "networkpolicy.networking.k8s.io/$SONDE" || true; } | wc -l)" = 0 ] \
+    && echo "OK   NetworkPolicy et pods de mesure retirés" || { echo "KO   retrait incomplet" >&2; ko=1; }
+  [ "$ko" = 0 ] || exit 1
+}
+
+reseau_kube_router() {
   local ko=0 i p ip o d f n s
   echo "## prédiction (écrite le 30/10/2026, avant la mesure)"
   echo "- la politique ne sélectionne que les pods de mesure (label app=$SONDE) ;"

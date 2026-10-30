@@ -35,7 +35,9 @@ s sc-confiance 'sudo k3s --version | head -1
   sudo k3s kubectl get nodes -o wide -L zone
   sudo k3s kubectl get nodes -o custom-columns=NŒUD:.metadata.name,TAINTS:.spec.taints
   sudo k3s kubectl get pods -A -o wide
-  echo "contrôleur de NetworkPolicy (kube-router) : $(sudo iptables -S | grep -c KUBE-ROUTER || true) règles KUBE-ROUTER"
+  if sudo k3s kubectl get ds -n kube-system cilium >/dev/null 2>&1; then
+    echo "contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet $(sudo k3s kubectl get ds -n kube-system cilium -o jsonpath="{.status.numberReady}/{.status.desiredNumberScheduled}") prêt"
+  else echo "contrôleur de NetworkPolicy (kube-router) : $(sudo iptables -S | grep -c KUBE-ROUTER || true) règles KUBE-ROUTER"; fi
   sudo k3s kubectl top nodes 2>/dev/null || echo "metrics-server pas encore prêt"'
 for vm in sc-confiance sc-build sc-stockage; do
   echo "## images système sur $vm"

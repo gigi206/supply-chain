@@ -1,0 +1,11 @@
+# k3s.sh, 2026-10-30T19:05:29Z, réseau cilium
+archives de Cilium conformes à /home/gigi/.cache/supply-chain-poc/08/telechargements/cilium/sums.txt
+k3s: OK
+k3s-airgap-images-amd64.tar.zst: OK
+cilium-amd64.tar: OK
+operator-generic-amd64.tar: OK
+cilium-helmchart.yaml: OK
+Created symlink '/etc/systemd/system/multi-user.target.wants/k3s.service' -> '/etc/systemd/system/k3s.service'.
+k3s version v1.35.9+k3s1 (58877f27)
+sc-confiance : k3s server installé
+nœuds non prêts : sc-confiance

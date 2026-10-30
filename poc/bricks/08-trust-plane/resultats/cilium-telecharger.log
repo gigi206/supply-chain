@@ -1,4 +1,4 @@
-# cilium.sh telecharger, 2026-10-30T19:03:41Z
+# cilium.sh telecharger, 2026-10-30T19:12:49Z
 ## chart quay.io/cilium/charts/cilium:1.20.4
 chart (identité https://github.com/cilium/cilium/.github/workflows/release.yaml@refs/heads/main) : vérifiée (https://sigstore.dev/cosign/sign/v1), digest sha256:712e1f65bf30533d117d1996ac3ace3efdb2521302d31ee887b1e45806bd6b64
 OK   chart : manifeste signé : sha256:712e1f65bf30533d117d1996ac3ace3efdb2521302d31ee887b1e45806bd6b64
@@ -20,5 +20,5 @@ témoin : cilium avec l'identité du tag v1.20.3 : refusée (expected SAN value 
 ## HelmChart (chart en base64, valeurs de cilium/valeurs.yaml, digests amd64)
   7d5d82c892510d7c17251c207259d4822c9f71c5613d3cab74a32ddd091f2b37  cilium-amd64.tar
   01fbcd5456b4bb5d83408d82447f552fa9e5d96fd44a710269514bf5bf742c2e  operator-generic-amd64.tar
-  eb570aed1120e18c8c094a0c3e2796228b8f32eb8bc7372b7663433c96db87b6  cilium-helmchart.yaml
+  cc9d23158d87c881afa97cb023c907a0355068340378dbb560d8ee6c2be11a86  cilium-helmchart.yaml
 téléchargements : 280 Mo
