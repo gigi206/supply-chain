@@ -669,6 +669,80 @@ Options :
     - **Lu dans Conforma v1.0.28** (`policy/release/lib/attestations.rego` au commit `ebd3fbd2` de la porte) : les règles, `trusted_task` comprise, n'évaluent que la dernière attestation de PipelineRun en SLSA v1, choisie par sa date de fin. Il faut en outre que toutes ces attestations portent une date. Les anciennes enveloppes ne devraient donc pas faire refuser `3a7ca1b1` tant que la plus récente vient de la version en service.
     - Non mesuré : la porte n'a pas été rejouée sur `builds/sample-app` (J8).
 
+**Option 1b : plan de mesure de Cilium** (préparé le 30/10/2026 à la demande du propriétaire, soumis à son accord ; rien n'est installé ni modifié).
+
+Vérifié pour préparer le plan, sans rien installer :
+- **Chart** : `quay.io/cilium/charts/cilium:1.20.4` en OCI (manifeste `712e1f65`). Sa couche `505abff8` est le digest publié dans `helm.cilium.io/index.yaml`. Il est signé sans clé et vérifié par cosign avec l'identité relevée, `cilium/cilium/.github/workflows/release.yaml@refs/heads/main`. Ce workflow est lancé depuis `main` et non depuis le tag : l'identité est moins liée à la version que celle des images.
+- **Images**, épinglées par digest dans le chart (`useDigest: true`) :
+  - `cilium` `20fe92e4` (amd64 `fa56fecd`, 256 Mo compressés) et `operator-generic` `7a7a3489` (amd64 `77a9b437`, 36 Mo) : signatures vérifiées au doc 04 ;
+  - `cilium-envoy` `547ab45f` (amd64 `401bc8f7`, 78 Mo) : signée par `cilium/proxy/.github/workflows/build-envoy-images-release-base.yaml@refs/heads/v1.39`, identité relevée par un refus volontaire, à vérifier avec cette identité exacte ;
+  - Hubble relay et UI, clustermesh et certgen ne servent pas.
+- **k3s** : le server doit être lancé avec `--flannel-backend=none` et `--disable-network-policy` (guide Cilium pour k3s, documentation de k3s).
+  - Chemins CNI de k3s, relevés sur `sc-build` : `/var/lib/rancher/k3s/data/cni` et `/var/lib/rancher/k3s/agent/etc/cni/net.d`. Ils diffèrent des défauts du chart (`/opt/cni/bin`, `/etc/cni/net.d`).
+  - Le bpffs est monté, et le noyau est en 6.12.113.
+  - Le contrôleur Helm de k3s documente `chartContent` (chart en base64) et `bootstrap: true` (chart nécessaire au démarrage). L'image `klipper-helm` v0.13.3 fait partie des images airgap de k3s.
+- **IPAM `kubernetes`** : Cilium reprend les `podCIDRs` alloués par k3s (documentation). Les adresses ne changent pas (`10.42.1.0/24` pour `sc-build`), et les scripts en dépendent.
+
+Choix proposés (valeurs du chart) :
+- **Adresses et API** :
+  - `ipam.mode=kubernetes` ;
+  - `k8sServiceHost=192.168.161.11` et `k8sServicePort=6443`, pour joindre l'API sans dépendre du service.
+- **kube-proxy de k3s conservé** (`kubeProxyReplacement=false`). `socketLB` reste désactivé, comme par défaut, donc la limite que signale le guide Kata ne s'applique pas.
+- **Routage natif** : `routingMode=native`, `autoDirectNodeRoutes=true`, `ipv4NativeRoutingCIDR=10.42.0.0/16`. Les trois VM sont sur un même segment L2. Sans tunnel, la MTU de route n'est pas réduite ; or c'est cette MTU que le guide Kata dit ignorée dans l'invité.
+- **CNI** : `cni.binPath` et `cni.confPath` pointent sur les chemins de k3s.
+- **Application des politiques** : `policyEnforcementMode=default`. Comme avec kube-router, un pod qu'aucune politique ne sélectionne n'est pas filtré.
+- **Placement** :
+  - `operator.replicas=1`, en zone de confiance ;
+  - l'agent et Envoy en DaemonSet sur les trois nœuds (tolérances par défaut).
+- **Traces** : Hubble activé dans l'agent, sans relais ni interface. `hubble observe --verdict DROPPED` remplace NFLOG.
+- **L7 et Envoy** laissés actifs, comme par défaut. Ils servent aux politiques L7, et c'est à décider : les garder pour `toFQDNs`, ou les couper, ce qui retire une image et une identité de signature.
+
+Installation dès J1, avant que les nœuds soient prêts :
+- **Sur l'hôte** :
+  - le chart et les images amd64 sont téléchargés par digest ;
+  - leurs signatures sont vérifiées par cosign, avec les identités relevées et des témoins ;
+  - les images sont mises en archives OCI, qui conservent le digest de manifeste.
+- **Sur chaque nœud** : les archives vont dans `/var/lib/rancher/k3s/agent/images`, comme les images airgap de k3s.
+- **Sur `sc-confiance`** :
+  - un HelmChart `cilium` dans `/var/lib/rancher/k3s/server/manifests` : chart en base64, valeurs versionnées, `bootstrap: true` ;
+  - les options du server dans `k3s/sc-confiance.yaml`.
+- **À mesurer d'abord** : que le containerd de k3s importe l'archive OCI en gardant le digest de manifeste attendu par le chart. Sinon, deux replis :
+  - référencer les digests de manifeste amd64 dans les valeurs ;
+  - ou tirer les images d'un miroir dans Zot après J2, en déplaçant le contrôle « nœuds prêts ».
+
+Changements système soumis à accord :
+1. **Rejeu complet depuis zéro** (`rejeu.sh` : `vm.sh detruire` puis `creer`, comme le rejeu de J1 à J6 du 30/10/2026), avec le réseau Cilium. Il fait aussi le « rejeu complet avec J7 » en attente. Il réapplique les changements déjà accordés de J1 à J7 (installation de Kata depuis l'archive attestée, exemption Pod Security, compte `poc-images`, etc.).
+2. **Dans les VM** :
+   - k3s tourne sans flannel ni contrôleur de NetworkPolicy ;
+   - Cilium installe ses programmes eBPF, les interfaces `cilium_host` et `cilium_net`, des règles iptables de masquage et son binaire CNI ;
+   - des DaemonSets privilégiés tournent dans `kube-system` sur les trois nœuds, zone de confiance comprise, et l'opérateur sur `sc-confiance`.
+3. **Sur l'hôte** : environ 370 Mo téléchargés (images amd64 compressées et chart) dans `…/08/telechargements/cilium`.
+
+**Retour arrière** : un rejeu avec le réseau actuel, dont le choix reste possible par une variable. Compter environ une heure.
+
+Adaptations des scripts, avant le rejeu. Une variable `RESEAU` (`flannel` ou `cilium`) est ajoutée à `commun.sh` ; elle vaut `flannel` tant que la mesure n'est pas faite.
+- `k3s.sh` : options du server, archives et HelmChart, attente que Cilium soit prêt ;
+- `controles.sh` : état de Cilium au lieu du nombre de règles KUBE-ROUTER ;
+- `openbao.sh` (J3) : trace du refus vers OpenBao par Hubble au lieu de NFLOG ;
+- `politique.sh` (J6, rattrapage) : la fenêtre est mesurée et rapportée, au lieu d'être affirmée ;
+- `kata.sh reseau` : Hubble au lieu de NFLOG et des règles iptables, `cni0` remplacé, même essai d'usurpation ;
+- `commun.sh` : commentaire sur le délai d'entrée de kube-router.
+
+Mesures, prédictions écrites avant :
+- **J1** :
+  - nœuds prêts et Cilium prêt sur les trois nœuds ;
+  - pods de `sc-build` en `10.42.1.0/24` ;
+  - mémoire des agents relevée.
+- **J2 à J7** : tous les contrôles repassent, construction sans sortie comprise.
+- **`kata.sh reseau`** :
+  - la politique s'applique aux pods Kata, et les refus apparaissent dans Hubble avec l'IP du pod et le motif ;
+  - **l'usurpation de `10.42.1.250` est refusée** par la vérification de l'adresse source, avec son motif dans Hubble ;
+  - témoin : avec l'IP du pod, Zot est refusé ;
+  - fenêtre de démarrage : la prédiction sera écrite après lecture du code de `cilium-cni`. L'attente de la première régénération n'est attestée que par une source secondaire.
+- **Risques** : la MTU et la compatibilité sous Kata (guide officiel). Si l'usurpation passe, ce sera un constat.
+
+**Durée estimée** : une demi-journée d'adaptations, environ une heure de rejeu (1 784 s pour J1 à J6, plus J7), une demi-journée de mesures. Le budget de la brique reste loin du seuil de 11 pw.
+
 **Rejeu** : J7 est branché dans `rejeu.sh` (vérification, installation, essais, exemption, puis cas d'admission rejoués ; BuildKit : image, essais et mesure après l'exemption ; voies D et A ; construction ; réseau) mais pas encore rejoué au 30/10/2026. `sonde_kyverno` et `passage_ok` sont passées de `redemarrer.sh` à `commun.sh` pour servir à `kata.sh exemption`, qui les a exercées ; `redemarrer.sh` a été rejoué ensuite (30/10/2026, [`redemarrage-vm.log`](resultats/redemarrage-vm.log)) : arrêt 6 s, démarrage 9 s, nœuds prêts en 17 s, tous les contrôles de J1 à J7 repassent, et l'exemption est relue par kube-apiserver après le redémarrage des VM.
 
 **Suites de J7** :
