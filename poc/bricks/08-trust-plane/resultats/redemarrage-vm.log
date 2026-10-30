@@ -1,8 +1,8 @@
-# redemarrer.sh, 2026-10-30T13:23:31Z
+# redemarrer.sh, 2026-10-30T15:24:53Z
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller temoin
-# openbao.sh deverrouiller, 2026-10-30T13:23:32Z
+# openbao.sh deverrouiller, 2026-10-30T15:24:53Z
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
-# openbao.sh temoin, 2026-10-30T13:23:32Z
+# openbao.sh temoin, 2026-10-30T15:24:54Z
 témoin : message signé par la clé chains ; empreinte de la clé publique bb194d4bc03d0604… ; {"latest_version":1,"exportable":false}
 [confiance:vm] $ poc/bricks/08-trust-plane/vm.sh arreter
 Domain 'sc-confiance' is being shutdown
@@ -13,7 +13,7 @@ Domain 'sc-stockage' is being shutdown
 
 Network supply-chain-poc destroyed
 
-## durée 7 s : mise run confiance:vm -- arreter
+## durée 6 s : mise run confiance:vm -- arreter
 [confiance:vm] $ poc/bricks/08-trust-plane/vm.sh demarrer
 Network supply-chain-poc started
 
@@ -24,14 +24,14 @@ Domain 'sc-build' started
 Domain 'sc-stockage' started
 
 ## durée 9 s : mise run confiance:vm -- demarrer
-## durée 19 s : trois nœuds réenregistrés (nouveau bootID) et Ready
-sc-confiance : démarré à 2026-10-30 13:23:40
-sc-build : démarré à 2026-10-30 13:23:40
-sc-stockage : démarré à 2026-10-30 13:23:40
-NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>          89m   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane   90m   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>          89m   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+## durée 17 s : trois nœuds réenregistrés (nouveau bootID) et Ready
+sc-confiance : démarré à 2026-10-30 15:25:02
+sc-build : démarré à 2026-10-30 15:25:02
+sc-stockage : démarré à 2026-10-30 15:25:02
+NAME           STATUS   ROLES           AGE     VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>          3h31m   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   3h31m   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          3h31m   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
 ## stockage
 active active
 OK   Zot : manifeste sample-app par digest, lecture anonyme (HTTP 200)
@@ -40,13 +40,13 @@ OK   Forgejo : workspace/sample-app, main = 6391fd437f26696847041be3226bbbf633f5
 OK   kyverno : 4 pod(s) prêts depuis le redémarrage
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
 ## OpenBao
-après redémarrage : {"initialized":true,"sealed":true} ; redémarrages du conteneur : 2
+après redémarrage : {"initialized":true,"sealed":true} ; redémarrages du conteneur : 3
 OK   OpenBao scellé après le redémarrage des VM
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller controle
-# openbao.sh deverrouiller, 2026-10-30T13:24:10Z
+# openbao.sh deverrouiller, 2026-10-30T15:25:36Z
 {"sealed":false,"t":1,"n":1,"progress":0}
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
-# openbao.sh controle, 2026-10-30T13:24:13Z
+# openbao.sh controle, 2026-10-30T15:25:40Z
 OK   clé publique identique (empreinte bb194d4bc03d0604…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
@@ -57,15 +57,15 @@ Waiting for deployment "timestamp-authority" rollout to finish: 0 of 1 updated r
 deployment "timestamp-authority" successfully rolled out
 jeton OpenBao obtenu (rôle tsa, essai 2)
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-10-30T13:24:17Z
+# tsa.sh temoin, 2026-10-30T15:25:44Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-10-30 13:24:19 +0000 UTC
+Artifact timestamped at 2026-10-30 15:25:46 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 13:24:19 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x4DEA47DC26915C9FA8F0CB19A513329686FF99C1 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Oct 30 15:25:46 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x1519C626260E8EC1AA4D1BA52B104897D4C32C18 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
@@ -74,19 +74,21 @@ OK   tekton-pipelines : 6 pod(s) prêts depuis le redémarrage
 OK   tekton-pipelines-resolvers : 1 pod(s) prêts depuis le redémarrage
 OK   tekton-chains : 1 pod(s) prêts depuis le redémarrage
 OK   declencheurs : 1 pod(s) prêts depuis le redémarrage
-## CronJobs (J6) : un passage réussi de chacun, créé après le retour du TSA (2026-10-30T13:24:21Z)
-passage horodatage-29889445 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
+## CronJobs (J6) : un passage réussi de chacun, créé après le retour du TSA (2026-10-30T15:25:48Z)
+passage horodatage-29889566 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
 OK   horodatage/horodatage : passage réussi après le retour du TSA
-passage rattrapage-29889445 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
+passage rattrapage-29889566 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
 OK   declencheurs/rattrapage : passage réussi après le retour du TSA
 ## Kata (J7)
 [confiance:kata] $ poc/bricks/08-trust-plane/kata.sh temoin
-# kata.sh temoin, 2026-10-30T13:25:07Z
+# kata.sh temoin, 2026-10-30T15:26:05Z
 OK   runtime kata chargé par containerd sur sc-build
-### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 5 s après la création
+exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape exemption)
+### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 4 s après la création
      noyau : 6.18.56
      vCPU : 1
      MemTotal:        1969780 kB
+     model name	: Intel Core Processor (Haswell, no TSX, IBRS)
        x86-64-v4
        x86-64-v3 (supported, searched)
        x86-64-v2 (supported, searched)
@@ -95,42 +97,42 @@ OK   runtime kata chargé par containerd sur sc-build
      NoNewPrivs:	1
      Seccomp:	0
 OK   pod Kata : noyau de l'invité 6.18.56
-NAMESPACE                    NAME                                                              READY   STATUS      RESTARTS       AGE     IP            NODE           NOMINATED NODE   READINESS GATES
-builds                       essai-signature-pod                                               0/1     Completed   0              86m     <none>        sc-build       <none>           <none>
-builds                       j6-porte-en-service-publier-pod                                   0/1     Completed   0              71m     <none>        sc-build       <none>           <none>
-builds                       j6-porte-hors-liste-publier-pod                                   0/1     Completed   0              70m     <none>        sc-build       <none>           <none>
-builds                       j6-porte-slsa-publier-pod                                         0/1     Completed   0              71m     <none>        sc-build       <none>           <none>
-builds                       j6-porte-version-non-listee-publier-pod                           0/1     Completed   0              70m     <none>        sc-build       <none>           <none>
-builds                       j6-restreint-confiance-pod                                        0/1     Completed   0              75m     <none>        sc-build       <none>           <none>
-builds                       j6-signee-pod                                                     0/1     Completed   0              77m     <none>        sc-build       <none>           <none>
-builds                       sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier-pod   0/1     Completed   0              64m     <none>        sc-build       <none>           <none>
-builds                       sample-app-2222222222222222222222222222222222222222-publier-pod   0/1     Completed   0              71m     <none>        sc-build       <none>           <none>
-builds                       sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod   0/1     Completed   0              72m     <none>        sc-build       <none>           <none>
-builds                       sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod   0/1     Completed   0              65m     <none>        sc-build       <none>           <none>
-declencheurs                 el-forgejo-79b6fd78c6-pbzbs                                       1/1     Running     2 (99s ago)    68m     10.42.0.212   sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29889443-5jnxf                                         0/1     Completed   0              2m14s   <none>        sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29889444-h5bdq                                         0/1     Completed   0              63s     10.42.0.225   sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29889445-gnkfr                                         0/1     Completed   0              14s     10.42.0.229   sc-confiance   <none>           <none>
-horodatage                   h-essai-signature-zz8sv                                           0/1     Completed   0              83m     <none>        sc-confiance   <none>           <none>
-horodatage                   h-essai-webhook-5mmnd                                             0/1     Completed   0              83m     <none>        sc-confiance   <none>           <none>
-horodatage                   horodatage-29889443-497t8                                         0/1     Completed   0              2m14s   <none>        sc-confiance   <none>           <none>
-horodatage                   horodatage-29889444-7nl64                                         0/1     Completed   0              63s     10.42.0.226   sc-confiance   <none>           <none>
-horodatage                   horodatage-29889445-58f6l                                         0/1     Completed   0              14s     10.42.0.230   sc-confiance   <none>           <none>
-horodatage                   j5-temoin                                                         0/1     Completed   0              57s     10.42.0.228   sc-confiance   <none>           <none>
-kube-system                  coredns-b644fd95b-pkpkl                                           1/1     Running     2 (100s ago)   91m     10.42.0.218   sc-confiance   <none>           <none>
-kube-system                  local-path-provisioner-d9d8769b6-8ndv4                            1/1     Running     2 (100s ago)   91m     10.42.0.211   sc-confiance   <none>           <none>
-kube-system                  metrics-server-7f4b6d9bd7-fch5f                                   1/1     Running     2 (99s ago)    91m     10.42.0.219   sc-confiance   <none>           <none>
-kyverno                      kyverno-admission-controller-6b78f498b9-rb5bw                     1/1     Running     2 (100s ago)   81m     10.42.0.222   sc-confiance   <none>           <none>
-kyverno                      kyverno-background-controller-76bd696776-xqbtw                    1/1     Running     2 (100s ago)   81m     10.42.0.208   sc-confiance   <none>           <none>
-kyverno                      kyverno-cleanup-controller-5647df8554-wflqb                       1/1     Running     2 (100s ago)   81m     10.42.0.221   sc-confiance   <none>           <none>
-kyverno                      kyverno-reports-controller-7696b58bd5-jrrxf                       1/1     Running     2 (100s ago)   81m     10.42.0.220   sc-confiance   <none>           <none>
-openbao                      openbao-0                                                         1/1     Running     2 (99s ago)    87m     10.42.0.213   sc-confiance   <none>           <none>
-tekton-chains                tekton-chains-controller-9df4dc655-c2r5g                          1/1     Running     2 (100s ago)   76m     10.42.0.210   sc-confiance   <none>           <none>
-tekton-pipelines-resolvers   tekton-pipelines-remote-resolvers-56c4c4d957-h74bj                1/1     Running     2 (100s ago)   86m     10.42.0.215   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-events-controller-747c585746-5c97w                         1/1     Running     2 (100s ago)   86m     10.42.0.217   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-pipelines-controller-7f5f7d4ff6-pglxl                      1/1     Running     2 (100s ago)   86m     10.42.0.224   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-pipelines-webhook-5fccc89bd5-2hdwr                         1/1     Running     2 (99s ago)    86m     10.42.0.223   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-controller-8449556669-8vl88                       1/1     Running     2 (100s ago)   86m     10.42.0.214   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-core-interceptors-6858f95cfc-xl8mv                1/1     Running     2 (100s ago)   86m     10.42.0.207   sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-webhook-5d67f65bf8-vnlx8                          1/1     Running     2 (99s ago)    86m     10.42.0.209   sc-confiance   <none>           <none>
-tsa                          timestamp-authority-869c59c955-wxhpb                              2/2     Running     0              61s     10.42.0.227   sc-confiance   <none>           <none>
+NAMESPACE                    NAME                                                              READY   STATUS      RESTARTS      AGE     IP            NODE           NOMINATED NODE   READINESS GATES
+builds                       essai-signature-pod                                               0/1     Completed   0             3h27m   <none>        sc-build       <none>           <none>
+builds                       j6-porte-en-service-publier-pod                                   0/1     Completed   0             3h12m   <none>        sc-build       <none>           <none>
+builds                       j6-porte-hors-liste-publier-pod                                   0/1     Completed   0             3h11m   <none>        sc-build       <none>           <none>
+builds                       j6-porte-slsa-publier-pod                                         0/1     Completed   0             3h12m   <none>        sc-build       <none>           <none>
+builds                       j6-porte-version-non-listee-publier-pod                           0/1     Completed   0             3h11m   <none>        sc-build       <none>           <none>
+builds                       j6-restreint-confiance-pod                                        0/1     Completed   0             3h16m   <none>        sc-build       <none>           <none>
+builds                       j6-signee-pod                                                     0/1     Completed   0             3h18m   <none>        sc-build       <none>           <none>
+builds                       sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier-pod   0/1     Completed   0             3h4m    <none>        sc-build       <none>           <none>
+builds                       sample-app-2222222222222222222222222222222222222222-publier-pod   0/1     Completed   0             3h12m   <none>        sc-build       <none>           <none>
+builds                       sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod   0/1     Completed   0             3h13m   <none>        sc-build       <none>           <none>
+builds                       sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod   0/1     Completed   0             3h6m    <none>        sc-build       <none>           <none>
+declencheurs                 el-forgejo-79b6fd78c6-pbzbs                                       1/1     Running     3 (76s ago)   3h9m    10.42.0.254   sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29889564-xmkhg                                         0/1     Completed   0             2m13s   <none>        sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29889565-v8xwg                                         0/1     Completed   0             41s     10.42.0.4     sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29889566-97fvn                                         0/1     Completed   0             13s     10.42.0.9     sc-confiance   <none>           <none>
+horodatage                   h-essai-signature-zz8sv                                           0/1     Completed   0             3h24m   <none>        sc-confiance   <none>           <none>
+horodatage                   h-essai-webhook-5mmnd                                             0/1     Completed   0             3h24m   <none>        sc-confiance   <none>           <none>
+horodatage                   horodatage-29889564-dr25k                                         0/1     Completed   0             2m13s   <none>        sc-confiance   <none>           <none>
+horodatage                   horodatage-29889565-p62mj                                         0/1     Completed   0             31s     10.42.0.6     sc-confiance   <none>           <none>
+horodatage                   horodatage-29889566-z6g2v                                         0/1     Completed   0             13s     10.42.0.8     sc-confiance   <none>           <none>
+horodatage                   j5-temoin                                                         0/1     Completed   0             29s     10.42.0.7     sc-confiance   <none>           <none>
+kube-system                  coredns-b644fd95b-pkpkl                                           1/1     Running     3 (78s ago)   3h32m   10.42.0.248   sc-confiance   <none>           <none>
+kube-system                  local-path-provisioner-d9d8769b6-8ndv4                            1/1     Running     3 (78s ago)   3h32m   10.42.0.243   sc-confiance   <none>           <none>
+kube-system                  metrics-server-7f4b6d9bd7-fch5f                                   1/1     Running     3 (77s ago)   3h32m   10.42.0.244   sc-confiance   <none>           <none>
+kyverno                      kyverno-admission-controller-6b78f498b9-rb5bw                     1/1     Running     3 (78s ago)   3h22m   10.42.0.252   sc-confiance   <none>           <none>
+kyverno                      kyverno-background-controller-76bd696776-xqbtw                    1/1     Running     3 (78s ago)   3h22m   10.42.0.250   sc-confiance   <none>           <none>
+kyverno                      kyverno-cleanup-controller-5647df8554-wflqb                       1/1     Running     3 (78s ago)   3h22m   10.42.0.251   sc-confiance   <none>           <none>
+kyverno                      kyverno-reports-controller-7696b58bd5-jrrxf                       1/1     Running     3 (78s ago)   3h22m   10.42.0.245   sc-confiance   <none>           <none>
+openbao                      openbao-0                                                         1/1     Running     3 (77s ago)   3h28m   10.42.0.242   sc-confiance   <none>           <none>
+tekton-chains                tekton-chains-controller-9df4dc655-c2r5g                          1/1     Running     3 (78s ago)   3h17m   10.42.0.2     sc-confiance   <none>           <none>
+tekton-pipelines-resolvers   tekton-pipelines-remote-resolvers-56c4c4d957-h74bj                1/1     Running     3 (78s ago)   3h27m   10.42.0.246   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-events-controller-747c585746-5c97w                         1/1     Running     3 (77s ago)   3h27m   10.42.0.239   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-controller-7f5f7d4ff6-pglxl                      1/1     Running     3 (77s ago)   3h27m   10.42.0.241   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-webhook-5fccc89bd5-2hdwr                         1/1     Running     3 (76s ago)   3h27m   10.42.0.247   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-controller-8449556669-8vl88                       1/1     Running     3 (77s ago)   3h27m   10.42.0.249   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-core-interceptors-6858f95cfc-xl8mv                1/1     Running     3 (78s ago)   3h27m   10.42.0.240   sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-webhook-5d67f65bf8-vnlx8                          1/1     Running     3 (76s ago)   3h27m   10.42.0.253   sc-confiance   <none>           <none>
+tsa                          timestamp-authority-869c59c955-gp6rk                              2/2     Running     0             33s     10.42.0.5     sc-confiance   <none>           <none>
