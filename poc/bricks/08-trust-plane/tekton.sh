@@ -217,7 +217,7 @@ etape_verifier() { # signature et attestation de l'essai, vérifiées sur l'hôt
   refus "signature vérifiée avec une autre clé" "no matching signatures|invalid signature|failed to verify" cosign verify --key "$T/autre.pem" "${opts[@]}" "$ref"
   echo "## audit d'OpenBao pendant l'essai (depuis $debut)"
   kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log \
-    | jq -c --arg d "$debut" 'select(.type == "response" and .time >= $d) | {time: .time[11:19], chemin: .request.path, compte: .auth.display_name, politiques: .auth.policies, erreur: (.error // .response.data.error // null)}'
+    | jq -c --arg d "$debut" 'select(.type == "response" and .time[0:19] >= ($d[0:19])) | {time: .time[11:19], chemin: .request.path, compte: .auth.display_name, politiques: .auth.policies, erreur: (.error // .response.data.error // null)}'
 }
 
 hmac_corps() { # fichier : HMAC-SHA256 (hex) du fichier avec le secret du webhook, lu dans un fichier (jamais en argument)

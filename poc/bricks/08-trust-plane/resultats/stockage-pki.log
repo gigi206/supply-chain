@@ -1,4 +1,4 @@
-# stockage.sh pki, 2026-10-29T21:01:00Z
+# stockage.sh pki, 2026-10-30T11:54:31Z
 subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
 notAfter=Oct 29 16:39:08 2027 GMT
 sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
@@ -20,30 +20,32 @@ forgejo : certificat existant
 subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
 OK   certificat registre.exemple.org signé par la CA : refusé (permitted subtree violation)
 ~/.cache/supply-chain-poc/08/pki:
-total 32
+total 36
 -rw-rw-r-- 1 gigi gigi  765 Oct 29 17:39 ca-poc.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 forgejo.crt
 -rw-rw-r-- 1 gigi gigi  806 Oct 29 18:55 openbao.crt
--rw-rw-r-- 1 gigi gigi 1361 Oct 29 21:53 tsa-chaine.pem
--rw-rw-r-- 1 gigi gigi  709 Oct 29 21:53 tsa-feuille.crt
--rw------- 1 gigi gigi 1603 Oct 29 21:53 tsa-racine-confiance.json
+-rw-rw-r-- 1 gigi gigi  178 Oct 30 12:40 taches.pub
+-rw-rw-r-- 1 gigi gigi 1361 Oct 30 12:33 tsa-chaine.pem
+-rw-rw-r-- 1 gigi gigi  709 Oct 30 12:33 tsa-feuille.crt
+-rw------- 1 gigi gigi 1603 Oct 30 12:33 tsa-racine-confiance.json
 -rw-rw-r-- 1 gigi gigi  652 Oct 29 21:07 tsa-racine.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 zot.crt
 
 ~/.cache/supply-chain-poc/08/secrets:
-total 68
+total 72
 -rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
--rw------- 1 gigi gigi  33 Oct 29 21:47 forgejo-admin.password
--rw------- 1 gigi gigi  41 Oct 29 21:47 forgejo-admin.token
+-rw------- 1 gigi gigi  33 Oct 30 12:28 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Oct 30 12:28 forgejo-admin.token
 -rw------- 1 gigi gigi  64 Oct 29 19:59 forgejo-webhook.secret
 -rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
--rw------- 1 gigi gigi 139 Oct 29 22:00 k3s-jeton-agent-securise
+-rw------- 1 gigi gigi 139 Oct 30 12:54 k3s-jeton-agent-securise
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-serveur
--rw------- 1 gigi gigi  44 Oct 29 21:48 openbao-descellement.b64
--rw------- 1 gigi gigi  64 Oct 29 21:48 openbao-descellement.hex
--rw------- 1 gigi gigi  26 Oct 29 21:48 openbao-root.token
+-rw------- 1 gigi gigi  44 Oct 30 12:29 openbao-descellement.b64
+-rw------- 1 gigi gigi  64 Oct 30 12:29 openbao-descellement.hex
+-rw------- 1 gigi gigi  26 Oct 30 12:29 openbao-root.token
 -rw------- 1 gigi gigi 241 Oct 29 18:55 openbao.key
+-rw------- 1 gigi gigi 241 Oct 29 23:06 taches.key
 -rw------- 1 gigi gigi 241 Oct 29 21:07 tsa-racine.key
 -rw------- 1 gigi gigi  48 Oct 29 19:30 zot-poc-build.password
 -rw------- 1 gigi gigi  48 Oct 29 17:39 zot-poc-ecriture.password

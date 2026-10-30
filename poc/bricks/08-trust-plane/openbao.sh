@@ -274,10 +274,10 @@ EOF
 
   echo "## audit d'OpenBao depuis $debut (connexions, signatures, refus)"
   kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log > "$B/audit.log"
-  jq -c --arg d "$debut" 'select(.type == "response" and .time >= $d and (.request.path | test("^(auth/jwt/login|transit/|sys/mounts|auth/token/lookup)")))
+  jq -c --arg d "$debut" 'select(.type == "response" and .time[0:19] >= ($d[0:19]) and (.request.path | test("^(auth/jwt/login|transit/|sys/mounts|auth/token/lookup)")))
     | {time: .time[11:19], chemin: .request.path, op: .request.operation, compte: (.auth.display_name // .auth.metadata.role // null),
        politiques: (.auth.policies // null), erreur: (.error // .response.data.error // null)}' "$B/audit.log"
-  echo "valeurs sensibles en HMAC dans l'audit : $(jq -r --arg d "$debut" 'select(.type == "request" and .time >= $d and .request.path == "auth/jwt/login") | .request.data.jwt' "$B/audit.log" | head -1 | cut -c1-12)…"
+  echo "valeurs sensibles en HMAC dans l'audit : $(jq -r --arg d "$debut" 'select(.type == "request" and .time[0:19] >= ($d[0:19]) and .request.path == "auth/jwt/login") | .request.data.jwt' "$B/audit.log" | head -1 | cut -c1-12)…"
   kubectl delete ns j3-essais --wait=false >/dev/null
   kubectl delete pod -n tekton-chains chains autre-compte autre-audience --wait=false >/dev/null
   kubectl delete -n tekton-chains configmap/j3-script configmap/ca-poc serviceaccount/autre --ignore-not-found >/dev/null

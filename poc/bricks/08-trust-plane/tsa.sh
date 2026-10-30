@@ -326,7 +326,7 @@ EOF
 
   echo "## audit d'OpenBao depuis $debut"
   kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log > "$T/audit.log"
-  jq -c --arg d "$debut" 'select(.type == "response" and .time >= $d and (.request.path | test("^(auth/jwt/login|transit/|auth/token/)")))
+  jq -c --arg d "$debut" 'select(.type == "response" and .time[0:19] >= ($d[0:19]) and (.request.path | test("^(auth/jwt/login|transit/|auth/token/)")))
     | {time: .time[11:19], chemin: .request.path, op: .request.operation, compte: (.auth.display_name // .auth.metadata.role // null),
        politiques: (.auth.policies // null), erreur: (.error // .response.data.error // null)}' "$T/audit.log" \
     | awk '{c[$0]++; if (c[$0] == 1) o[++n] = $0} END {for (i = 1; i <= n; i++) print o[i] (c[o[i]] > 1 ? " ×" c[o[i]] : "")}'

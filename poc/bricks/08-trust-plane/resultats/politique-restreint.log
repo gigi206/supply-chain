@@ -1,25 +1,27 @@
-# politique.sh restreint, 2026-10-30T10:27:42Z
+# politique.sh restreint, 2026-10-30T12:09:14Z
 ## état de départ
-labels de builds : pod-security.kubernetes.io/audit=restricted, pod-security.kubernetes.io/audit-version=latest, pod-security.kubernetes.io/enforce=restricted, pod-security.kubernetes.io/enforce-version=latest, pod-security.kubernetes.io/warn=restricted, pod-security.kubernetes.io/warn-version=latest
-set-security-context : true
+labels de builds : aucun label pod-security (niveau privileged par défaut)
+set-security-context : false
 pods existants de builds au regard de restricted (label enforce en dry-run serveur) :
-  namespace/builds not labeled (server dry run)
+  Warning: existing pods in namespace "builds" violate the new PodSecurity enforce level "restricted:latest"
+  Warning: essai-signature-pod (and 4 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
+  namespace/builds labeled (server dry run)
 ## Pipelines : set-security-context (prepare, place-scripts, working-dir-initializer, sidecar des résultats)
 ## builds : Pod Security restricted en warn et audit, puis enforce (décision du propriétaire du 30/10/2026)
 ## variante : tâche en service signée sans son stepTemplate
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-pipeline signée : tekton/pipelines/sans-restriction@sha256:d43b0c223ad6703eda7cdf399301dfd4b6341fcee0025059f8a7d6c8e90f51ec
+pipeline signée : tekton/pipelines/sans-restriction@sha256:cc3e143ca7006cd9d90e0ef32b28092066d028b01b5099ea6c21fcffc0af6825
 ## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus
 OK   tâche sans stepTemplate, sous warn et audit : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
-OK   j6-sans-restriction signé par Chains, enveloppes du TaskRun et du PipelineRun présentes (62 → 64)
+OK   j6-sans-restriction signé par Chains, enveloppes du TaskRun et du PipelineRun présentes (6 → 8)
 audit de l'API : privileged:latest ; would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "step-publier" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "step-publier" must set securityContext.capabilities.drop=["ALL"])
 OK   violations tracées pour l'étape seule
 ## enforce restricted sur builds
   Warning: existing pods in namespace "builds" violate the new PodSecurity enforce level "restricted:latest"
-  Warning: essai-signature-pod (and 2 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
+  Warning: essai-signature-pod (and 5 other pods): allowPrivilegeEscalation != false, unrestricted capabilities
 OK   tâche en service (pipeline du gabarit) : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
-OK   j6-restreint signé par Chains, enveloppes du TaskRun et du PipelineRun présentes (64 → 66)
+OK   j6-restreint signé par Chains, enveloppes du TaskRun et du PipelineRun présentes (8 → 10)
 tâche en service : stepTemplate.securityContext {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}
   pod : {"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}
   prepare : allowPrivilegeEscalation=false, capabilities.drop=ALL

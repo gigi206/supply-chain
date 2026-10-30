@@ -1,4 +1,4 @@
-# tsa.sh pki, 2026-10-29T21:06:59Z
+# tsa.sh pki, 2026-10-30T12:00:48Z
 racine TSA existante
 subject=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Oct 26 20:07:08 2036 GMT X509v3 Basic Constraints: critical CA:TRUE, pathlen:0 X509v3 Key Usage: critical Certificate Sign, CRL Sign
 sha256 Fingerprint=1D:C3:4F:30:32:74:68:5F:3A:27:0C:56:8B:F6:BE:9A:D6:26:97:AA:26:38:54:22:49:06:CA:0D:B1:6C:B7:7D

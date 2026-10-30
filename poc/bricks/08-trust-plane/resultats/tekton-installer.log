@@ -1,4 +1,4 @@
-# tekton.sh installer, 2026-10-29T22:05:12Z
+# tekton.sh installer, 2026-10-30T11:58:24Z
 ## références d'images restantes hors de Zot dans les manifestes rendus
       1 gcr.io/tekton-releases/catalog/upstream/*
       1 gcr.io/tekton-releases/catalog/upstream/git-clone
@@ -6,13 +6,10 @@
 pipeline : 77 objets, sha256 37a529e629f7a327…
 triggers : 42 objets, sha256 e6aae8d7b619068e…
 interceptors : 9 objets, sha256 e7f0acb04844b5d3…
-chains : 18 objets, sha256 0c700ef62935858e…
+chains : 18 objets, sha256 db1a43edbf3d928e…
 deployment.apps/tekton-events-controller condition met
 deployment.apps/tekton-pipelines-controller condition met
 deployment.apps/tekton-pipelines-webhook condition met
-deployment.apps/tekton-triggers-controller condition met
-deployment.apps/tekton-triggers-core-interceptors condition met
-deployment.apps/tekton-triggers-webhook condition met
 deployment.apps/tekton-pipelines-remote-resolvers condition met
 deployment.apps/tekton-events-controller condition met
 deployment.apps/tekton-pipelines-controller condition met
@@ -21,14 +18,14 @@ deployment.apps/tekton-triggers-controller condition met
 deployment.apps/tekton-triggers-core-interceptors condition met
 deployment.apps/tekton-triggers-webhook condition met
 deployment.apps/tekton-chains-controller condition met
-tekton-pipelines tekton-events-controller-747c585746-529r2 Running 60m
-tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-c2rlh Running 60m
-tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-sbtdn Running 60m
-tekton-pipelines tekton-triggers-controller-8449556669-xsphb Running 60m
-tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-bjlfd Running 60m
-tekton-pipelines tekton-triggers-webhook-5d67f65bf8-9clxp Running 60m
-tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-qz6ps Running sc-confiance
-tekton-chains tekton-chains-controller-8d5d9dbdb-8dkq5 Running 60m
+tekton-pipelines tekton-events-controller-747c585746-5c97w Running sc-confiance
+tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-pglxl Running sc-confiance
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-2hdwr Running sc-confiance
+tekton-pipelines tekton-triggers-controller-8449556669-8vl88 Running sc-confiance
+tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-xl8mv Running sc-confiance
+tekton-pipelines tekton-triggers-webhook-5d67f65bf8-vnlx8 Running sc-confiance
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-h74bj Running sc-confiance
+tekton-chains tekton-chains-controller-8d5d9dbdb-tp9h2 Running sc-confiance
 ## images réellement tirées (imageID des conteneurs)
 sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead…
 sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:922d86c3f230…
@@ -50,7 +47,7 @@ artifacts.pipelinerun.storage = oci
 artifacts.taskrun.format = slsa/v2alpha4
 artifacts.taskrun.signer = kms
 artifacts.taskrun.storage = oci
-builddefinition.buildtype = https://tekton.dev/chains/v2/slsa
+builddefinition.buildtype = https://tekton.dev/chains/v2/slsa-tekton
 builder.id = https://supply-chain.example/builders/tekton-chains@v1
 signers.kms.auth.address = https://openbao.openbao.svc.cluster.local:8200
 signers.kms.auth.oidc.path = jwt

@@ -430,7 +430,7 @@ etape_admission() {
   awk -F'\t' 'NR > 1 && $4 == "FAIL" { split($8, m, " denied the request: "); w[$1] = m[1] } END { for (c in w) n[w[c]]++; for (x in n) printf "  refus par %s : %d cas\n", x, n[x] }' "$TSV_PARITE" | sort
   echo "## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)"
   kubectl get events -A --field-selector reason=PolicyViolation -o json | jq -r --arg t "$t0" '.items[]
-    | select(.involvedObject.kind == "ValidatingPolicy" and (.lastTimestamp // .eventTime) >= $t)
+    | select(.involvedObject.kind == "ValidatingPolicy" and ((.lastTimestamp // .eventTime)[0:19]) >= ($t[0:19]))
     | "\(.involvedObject.name)"' | sort | uniq -c | sed 's/^ */  /; s/ \([a-z]\)/ événements, politique \1/'
 }
 
@@ -511,7 +511,7 @@ etape_declencheurs() {
   kubectl get taskrun -n builds "$o" -o json | jq -r '"TaskRun enfant \(.metadata.name) : taskRef \(.spec.taskRef.resolver) \(.spec.taskRef.params[] | select(.name == "bundle") | .value | .[0:72])… ; TrustedResourcesVerified=\(.status.conditions[] | select(.type == "TrustedResourcesVerified") | .status)"'
   echo "Chains : TaskRun $o signé=$(signe taskrun "$o"), PipelineRun j6-pipeline-signee signé=$(signe pipelinerun j6-pipeline-signee)"
   echo "## audit de Zot : écritures de manifestes depuis $t0 (Chains ; compte attendu poc-build)"
-  sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$t0" 'select(.time >= $t and (.object | test("/manifests/")) and .action != "GET" and .action != "HEAD")
+  sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$t0" 'select(.time[0:19] >= ($t[0:19]) and (.object | test("/manifests/")) and .action != "GET" and .action != "HEAD")
     | {t: .time[11:19], compte: .subject, action, objet: (.object | sub("^/v2/"; "") | sub("sha256-(?<d>.{12}).*[.](?<s>sig|att)$"; "sha256-\(.d)….\(.s)")), code: .status}' > "$T/zot-audit.json"
   grep -F 'builds/essai-webhook' "$T/zot-audit.json" || true
   n=$(jq -s '[.[] | select((.objet | test("^builds/essai-webhook/manifests/sha256-.*[.]att$")) and .compte == "poc-build" and .code == 201)] | length' "$T/zot-audit.json")
@@ -567,7 +567,7 @@ conteneurs() { # pod de builds : contexte de sécurité du pod, puis de chaque c
 }
 
 violations() { # instant pod : annotation audit-violations de Pod Security sur la création du pod (audit de l'API), ou « aucune »
-  audit_api "$2" | jq -r --arg t "$1" --arg p "$2" 'select(.stageTimestamp >= $t and .verb == "create" and .objectRef.resource == "pods"
+  audit_api "$2" | jq -r --arg t "$1" --arg p "$2" 'select(.stageTimestamp[0:19] >= ($t[0:19]) and .verb == "create" and .objectRef.resource == "pods"
     and .objectRef.subresource == null and .objectRef.name == $p)
     | "\(.annotations["pod-security.kubernetes.io/enforce-policy"]) ; \(.annotations["pod-security.kubernetes.io/audit-violations"] // "aucune")"' | tail -1
 }
@@ -871,7 +871,7 @@ etape_horodatage() {
   o=$(kubectl get taskrun -n builds -l tekton.dev/pipelineRun=j6-horodatage -o jsonpath='{.items[0].metadata.name}')
   echo "Chains : TaskRun $o signé=$(signe taskrun "$o"), PipelineRun j6-horodatage signé=$(signe pipelinerun j6-horodatage)"
   e1=$(enveloppes builds/essai-webhook)
-  w=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -r --arg t "$t" 'select(.time >= $t and .subject == "poc-build" and .status == 201
+  w=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -r --arg t "$t" 'select(.time[0:19] >= ($t[0:19]) and .subject == "poc-build" and .status == 201
     and (.object | test("^/v2/builds/essai-webhook/manifests/sha256-.*[.]att$"))) | .time' | tail -1)
   echo "builds/essai-webhook : $e0 → $e1 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : ${w:-absente}"
   [ "$e1" -gt "$e0" ] && [ -n "$w" ] || { echo "KO   aucune nouvelle enveloppe de Chains" >&2; exit 1; }
@@ -937,7 +937,7 @@ origine() { # nom : chemin de création d'un PipelineRun de builds, lu dans ses 
 }
 
 creations() { # instant nom : créations du PipelineRun nom dans l'audit de l'API depuis l'instant (compte, code)
-  audit_api "$2" | jq -r --arg d "$1" --arg n "$2" 'select(.stageTimestamp >= $d
+  audit_api "$2" | jq -r --arg d "$1" --arg n "$2" 'select(.stageTimestamp[0:19] >= ($d[0:19])
     and .verb == "create" and .objectRef.resource == "pipelineruns" and .objectRef.namespace == "builds"
     and .objectRef.name == $n) | "\(.user.username | sub("system:serviceaccount:"; "")) \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */    /'
@@ -1487,7 +1487,7 @@ etape_droits() {
   debut=$(awk -F'\t' '$1 == "J6 essais_webhook" {d = $2} END {print d}' "$R/chrono.tsv")
   [ -n "$debut" ] || { echo "KO   test 5 de J6 absent de chrono.tsv" >&2; exit 1; }
   audit_api system:serviceaccount:declencheurs:el-forgejo \
-    | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:el-forgejo")
+    | jq -r --arg d "$debut" 'select(.stageTimestamp[0:19] >= ($d[0:19]) and .user.username == "system:serviceaccount:declencheurs:el-forgejo")
       | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-el"
   [ -s "$T/audit-el" ] && ! grep -qE ' 403$' "$T/audit-el" && echo "OK   aucun refus (403) pour el-forgejo depuis $debut" \
@@ -1496,7 +1496,7 @@ etape_droits() {
   debut=$(awk -F'\t' '$1 == "J6 rattrapage" {d = $2} END {print d}' "$R/chrono.tsv")
   [ -n "$debut" ] || { echo "KO   étape rattrapage absente de chrono.tsv" >&2; exit 1; }
   audit_api system:serviceaccount:declencheurs:rattrapage \
-    | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:rattrapage")
+    | jq -r --arg d "$debut" 'select(.stageTimestamp[0:19] >= ($d[0:19]) and .user.username == "system:serviceaccount:declencheurs:rattrapage")
       | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-rattrapage"
   [ -s "$T/audit-rattrapage" ] && ! grep -qE ' 403$' "$T/audit-rattrapage" && echo "OK   aucun refus (403) pour rattrapage depuis $debut" \

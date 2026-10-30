@@ -715,3 +715,261 @@ J6 droits	2026-10-30T10:47:39Z
 J6 droits fait	2026-10-30T10:47:50Z	
 J6 droits	2026-10-30T10:48:14Z	
 J6 droits fait	2026-10-30T10:48:25Z	
+VM, pool et réseau détruits	2026-10-30T11:03:26Z	
+J1 VM définies	2026-10-30T11:03:33Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-30T11:03:42Z	
+J1 installation de k3s	2026-10-30T11:03:43Z	
+J1 server prêt	2026-10-30T11:03:56Z	
+J1 trois nœuds prêts	2026-10-30T11:04:20Z	
+J2 pki	2026-10-30T11:04:21Z	
+J2 pki fait	2026-10-30T11:04:21Z	
+J2 zot	2026-10-30T11:04:21Z	
+J2 zot fait	2026-10-30T11:04:25Z	
+J2 registre	2026-10-30T11:04:25Z	
+J2 registre fait	2026-10-30T11:04:40Z	
+J2 containerd	2026-10-30T11:04:40Z	
+J2 containerd fait	2026-10-30T11:04:59Z	
+J2 forgejo	2026-10-30T11:04:59Z	
+J2 forgejo fait	2026-10-30T11:05:11Z	
+J2 depot	2026-10-30T11:05:11Z	
+J2 depot fait	2026-10-30T11:05:12Z	
+J3 image	2026-10-30T11:05:12Z	
+J3 image fait	2026-10-30T11:05:44Z	
+J3 deployer	2026-10-30T11:05:44Z	
+J3 deployer fait	2026-10-30T11:05:51Z	
+J3 initialiser	2026-10-30T11:05:51Z	
+J3 initialiser fait	2026-10-30T11:06:05Z	
+J3 configurer	2026-10-30T11:06:05Z	
+J3 configurer fait	2026-10-30T11:06:06Z	
+J3 essais	2026-10-30T11:06:06Z	
+J3 essais fait	2026-10-30T11:06:52Z	
+J3 redemarrage	2026-10-30T11:06:52Z	
+J3 redemarrage fait	2026-10-30T11:07:08Z	
+J4 revue	2026-10-30T11:07:08Z	
+J4 revue fait	2026-10-30T11:07:23Z	
+J4 miroir	2026-10-30T11:07:23Z	
+J4 miroir fait	2026-10-30T11:08:03Z	
+J4 installer	2026-10-30T11:08:03Z	
+J4 installer fait	2026-10-30T11:08:36Z	
+J4 signature	2026-10-30T11:08:36Z	
+J4 signature fait	2026-10-30T11:08:48Z	
+J4 verifier	2026-10-30T11:08:48Z	
+J3 cle	2026-10-30T11:08:48Z	
+J3 cle fait	2026-10-30T11:08:48Z	
+J4 verifier fait	2026-10-30T11:08:49Z	
+J4 webhook	2026-10-30T11:08:49Z	
+J4 webhook fait	2026-10-30T11:09:32Z	
+J4 essais_webhook	2026-10-30T11:09:32Z	
+J4 essais_webhook fait	2026-10-30T11:10:04Z	
+J5 image	2026-10-30T11:10:04Z	
+J5 image fait	2026-10-30T11:10:47Z	
+J5 pki	2026-10-30T11:10:47Z	
+J5 pki fait	2026-10-30T11:10:47Z	
+J5 openbao	2026-10-30T11:10:47Z	
+J5 openbao fait	2026-10-30T11:10:48Z	
+J5 deployer	2026-10-30T11:10:48Z	
+J5 deployer fait	2026-10-30T11:10:51Z	
+J5 essais	2026-10-30T11:10:51Z	
+J5 essais fait	2026-10-30T11:11:43Z	
+J5 horodater	2026-10-30T11:11:43Z	
+J5 horodater fait	2026-10-30T11:12:16Z	
+J5 chemins	2026-10-30T11:12:16Z	
+J5 chemins fait	2026-10-30T11:12:36Z	
+J6 image	2026-10-30T11:12:36Z	
+J6 image fait	2026-10-30T11:13:46Z	
+J6 installer	2026-10-30T11:13:46Z	
+J6 installer fait	2026-10-30T11:14:05Z	
+J6 parite	2026-10-30T11:14:05Z	
+J6 parite fait	2026-10-30T11:17:48Z	
+J6 taches	2026-10-30T11:17:48Z	
+J6 taches fait	2026-10-30T11:18:18Z	
+J6 admission	2026-10-30T11:18:18Z	
+J6 admission fait	2026-10-30T11:18:47Z	
+J6 chains	2026-10-30T11:18:47Z	
+J6 chains fait	2026-10-30T11:18:48Z	
+J6 declencheurs	2026-10-30T11:18:48Z	
+J6 declencheurs fait	2026-10-30T11:19:10Z	
+J6 restreint	2026-10-30T11:19:10Z	
+J6 restreint fait	2026-10-30T11:20:02Z	
+J6 horodatage	2026-10-30T11:20:02Z	
+J6 horodatage fait	2026-10-30T11:23:06Z	
+J6 essais_webhook	2026-10-30T11:23:06Z	
+J6 essais_webhook fait	2026-10-30T11:23:43Z	
+J6 porte	2026-10-30T11:23:43Z	
+VM, pool et réseau détruits	2026-10-30T11:26:51Z	
+J1 VM définies	2026-10-30T11:26:58Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-30T11:27:08Z	
+J1 installation de k3s	2026-10-30T11:27:09Z	
+J1 server prêt	2026-10-30T11:27:22Z	
+J1 trois nœuds prêts	2026-10-30T11:27:46Z	
+J2 pki	2026-10-30T11:27:47Z	
+J2 pki fait	2026-10-30T11:27:47Z	
+J2 zot	2026-10-30T11:27:47Z	
+J2 zot fait	2026-10-30T11:27:52Z	
+J2 registre	2026-10-30T11:27:52Z	
+J2 registre fait	2026-10-30T11:28:07Z	
+J2 containerd	2026-10-30T11:28:07Z	
+J2 containerd fait	2026-10-30T11:28:26Z	
+J2 forgejo	2026-10-30T11:28:26Z	
+J2 forgejo fait	2026-10-30T11:28:38Z	
+J2 depot	2026-10-30T11:28:38Z	
+J2 depot fait	2026-10-30T11:28:41Z	
+J3 image	2026-10-30T11:28:41Z	
+J3 image fait	2026-10-30T11:29:14Z	
+J3 deployer	2026-10-30T11:29:14Z	
+J3 deployer fait	2026-10-30T11:29:21Z	
+J3 initialiser	2026-10-30T11:29:21Z	
+J3 initialiser fait	2026-10-30T11:29:33Z	
+J3 configurer	2026-10-30T11:29:33Z	
+J3 configurer fait	2026-10-30T11:29:35Z	
+J3 essais	2026-10-30T11:29:35Z	
+J3 essais fait	2026-10-30T11:30:21Z	
+J3 redemarrage	2026-10-30T11:30:21Z	
+J3 redemarrage fait	2026-10-30T11:30:36Z	
+J4 revue	2026-10-30T11:30:36Z	
+J4 revue fait	2026-10-30T11:30:53Z	
+J4 miroir	2026-10-30T11:30:53Z	
+J4 miroir fait	2026-10-30T11:31:33Z	
+J4 installer	2026-10-30T11:31:33Z	
+J4 installer fait	2026-10-30T11:32:08Z	
+J4 signature	2026-10-30T11:32:08Z	
+J4 signature fait	2026-10-30T11:32:20Z	
+J4 verifier	2026-10-30T11:32:20Z	
+J3 cle	2026-10-30T11:32:20Z	
+J3 cle fait	2026-10-30T11:32:20Z	
+J4 verifier fait	2026-10-30T11:32:21Z	
+J4 webhook	2026-10-30T11:32:21Z	
+J4 webhook fait	2026-10-30T11:32:26Z	
+J4 essais_webhook	2026-10-30T11:32:26Z	
+J4 essais_webhook fait	2026-10-30T11:33:00Z	
+J5 image	2026-10-30T11:33:01Z	
+J5 image fait	2026-10-30T11:33:45Z	
+J5 pki	2026-10-30T11:33:45Z	
+J5 pki fait	2026-10-30T11:33:45Z	
+J5 openbao	2026-10-30T11:33:45Z	
+J5 openbao fait	2026-10-30T11:33:46Z	
+J5 deployer	2026-10-30T11:33:46Z	
+J5 deployer fait	2026-10-30T11:33:51Z	
+J5 essais	2026-10-30T11:33:51Z	
+J5 essais fait	2026-10-30T11:34:42Z	
+J5 horodater	2026-10-30T11:34:42Z	
+J5 horodater fait	2026-10-30T11:35:14Z	
+J5 chemins	2026-10-30T11:35:14Z	
+J5 chemins fait	2026-10-30T11:35:34Z	
+J6 image	2026-10-30T11:35:34Z	
+J6 image fait	2026-10-30T11:36:46Z	
+J6 installer	2026-10-30T11:36:46Z	
+J6 installer fait	2026-10-30T11:37:04Z	
+J6 parite	2026-10-30T11:37:04Z	
+J6 parite fait	2026-10-30T11:40:52Z	
+J6 taches	2026-10-30T11:40:52Z	
+J6 taches fait	2026-10-30T11:41:22Z	
+J6 admission	2026-10-30T11:41:22Z	
+J6 admission fait	2026-10-30T11:41:51Z	
+J6 chains	2026-10-30T11:41:51Z	
+J6 chains fait	2026-10-30T11:41:53Z	
+J6 declencheurs	2026-10-30T11:41:53Z	
+J6 declencheurs fait	2026-10-30T11:42:23Z	
+J6 restreint	2026-10-30T11:42:23Z	
+J6 restreint fait	2026-10-30T11:43:15Z	
+J6 horodatage	2026-10-30T11:43:15Z	
+J6 horodatage fait	2026-10-30T11:46:05Z	
+J6 essais_webhook	2026-10-30T11:46:06Z	
+VM, pool et réseau détruits	2026-10-30T11:53:34Z	
+J1 VM définies	2026-10-30T11:53:42Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-10-30T11:53:51Z	
+J1 installation de k3s	2026-10-30T11:53:51Z	
+J1 server prêt	2026-10-30T11:54:05Z	
+J1 trois nœuds prêts	2026-10-30T11:54:30Z	
+J2 pki	2026-10-30T11:54:31Z	
+J2 pki fait	2026-10-30T11:54:31Z	
+J2 zot	2026-10-30T11:54:31Z	
+J2 zot fait	2026-10-30T11:54:35Z	
+J2 registre	2026-10-30T11:54:35Z	
+J2 registre fait	2026-10-30T11:54:51Z	
+J2 containerd	2026-10-30T11:54:51Z	
+J2 containerd fait	2026-10-30T11:55:09Z	
+J2 forgejo	2026-10-30T11:55:09Z	
+J2 forgejo fait	2026-10-30T11:55:21Z	
+J2 depot	2026-10-30T11:55:21Z	
+J2 depot fait	2026-10-30T11:55:24Z	
+J3 image	2026-10-30T11:55:24Z	
+J3 image fait	2026-10-30T11:55:58Z	
+J3 deployer	2026-10-30T11:55:58Z	
+J3 deployer fait	2026-10-30T11:56:06Z	
+J3 initialiser	2026-10-30T11:56:06Z	
+J3 initialiser fait	2026-10-30T11:56:24Z	
+J3 configurer	2026-10-30T11:56:24Z	
+J3 configurer fait	2026-10-30T11:56:26Z	
+J3 essais	2026-10-30T11:56:26Z	
+J3 essais fait	2026-10-30T11:57:12Z	
+J3 redemarrage	2026-10-30T11:57:12Z	
+J3 redemarrage fait	2026-10-30T11:57:28Z	
+J4 revue	2026-10-30T11:57:28Z	
+J4 revue fait	2026-10-30T11:57:44Z	
+J4 miroir	2026-10-30T11:57:44Z	
+J4 miroir fait	2026-10-30T11:58:24Z	
+J4 installer	2026-10-30T11:58:24Z	
+J4 installer fait	2026-10-30T11:58:58Z	
+J4 signature	2026-10-30T11:58:58Z	
+J4 signature fait	2026-10-30T11:59:10Z	
+J4 verifier	2026-10-30T11:59:10Z	
+J3 cle	2026-10-30T11:59:11Z	
+J3 cle fait	2026-10-30T11:59:11Z	
+J4 verifier fait	2026-10-30T11:59:11Z	
+J4 webhook	2026-10-30T11:59:11Z	
+J4 webhook fait	2026-10-30T11:59:16Z	
+J4 essais_webhook	2026-10-30T11:59:16Z	
+J4 essais_webhook fait	2026-10-30T11:59:48Z	
+J5 image	2026-10-30T11:59:48Z	
+J5 image fait	2026-10-30T12:00:48Z	
+J5 pki	2026-10-30T12:00:48Z	
+J5 pki fait	2026-10-30T12:00:48Z	
+J5 openbao	2026-10-30T12:00:48Z	
+J5 openbao fait	2026-10-30T12:00:49Z	
+J5 deployer	2026-10-30T12:00:49Z	
+J5 deployer fait	2026-10-30T12:00:54Z	
+J5 essais	2026-10-30T12:00:54Z	
+J5 essais fait	2026-10-30T12:01:45Z	
+J5 horodater	2026-10-30T12:01:45Z	
+J5 horodater fait	2026-10-30T12:02:17Z	
+J5 chemins	2026-10-30T12:02:17Z	
+J5 chemins fait	2026-10-30T12:02:36Z	
+J6 image	2026-10-30T12:02:36Z	
+J6 image fait	2026-10-30T12:03:48Z	
+J6 installer	2026-10-30T12:03:48Z	
+J6 installer fait	2026-10-30T12:04:05Z	
+J6 parite	2026-10-30T12:04:05Z	
+J6 parite fait	2026-10-30T12:07:52Z	
+J6 taches	2026-10-30T12:07:52Z	
+J6 taches fait	2026-10-30T12:08:22Z	
+J6 admission	2026-10-30T12:08:22Z	
+J6 admission fait	2026-10-30T12:08:51Z	
+J6 chains	2026-10-30T12:08:51Z	
+J6 chains fait	2026-10-30T12:08:53Z	
+J6 declencheurs	2026-10-30T12:08:53Z	
+J6 declencheurs fait	2026-10-30T12:09:14Z	
+J6 restreint	2026-10-30T12:09:14Z	
+J6 restreint fait	2026-10-30T12:10:06Z	
+J6 horodatage	2026-10-30T12:10:06Z	
+J6 horodatage fait	2026-10-30T12:13:07Z	
+J6 essais_webhook	2026-10-30T12:13:08Z	
+J6 essais_webhook fait	2026-10-30T12:13:43Z	
+J6 porte	2026-10-30T12:13:44Z	
+J6 porte fait	2026-10-30T12:15:33Z	
+J6 rattrapage	2026-10-30T12:15:33Z	
+J6 rattrapage fait	2026-10-30T12:23:05Z	
+J6 droits	2026-10-30T12:23:05Z	
+J6 droits fait	2026-10-30T12:23:16Z	
+J3 deverrouiller	2026-10-30T12:23:43Z	
+J3 deverrouiller fait	2026-10-30T12:23:43Z	
+J3 temoin	2026-10-30T12:23:43Z	
+J3 temoin fait	2026-10-30T12:23:44Z	
+J3 deverrouiller	2026-10-30T12:24:28Z	
+J3 deverrouiller fait	2026-10-30T12:24:31Z	
+J3 controle	2026-10-30T12:24:31Z	
+J3 controle fait	2026-10-30T12:24:31Z	
+J5 temoin	2026-10-30T12:24:34Z	
+J5 temoin fait	2026-10-30T12:24:39Z	
+J6 droits	2026-10-30T12:27:28Z	
+J6 droits fait	2026-10-30T12:27:39Z	

@@ -1,4 +1,4 @@
-# tsa.sh image, 2026-10-29T21:06:17Z
+# tsa.sh image, 2026-10-30T11:59:48Z
 ## timestamp-server v2.2.0
 OK   tag v2.2.0 (objet 11108902eaf0307666abeef7e16cd8eab8050e81, signé et vérifié par GitHub) → commit 526e9de76cded7d2fd7b3d9b21061305ea7c85b2
 ghcr.io/sigstore/timestamp-server:v2.2.0 → sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306 (= digest épinglé)

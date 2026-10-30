@@ -1,27 +1,27 @@
-# tsa.sh horodater, 2026-10-29T21:07:56Z
+# tsa.sh horodater, 2026-10-30T12:01:45Z
 secret zot-horodatage appliqué (poc-horodatage, sc-stockage.poc.test:5000 ; lu sur l'entrée standard de kubectl, sans annotation last-applied)
 ## builds/essai-signature (une exécution signée en J4)
 JOINT|Zot et TSA, essai 1
-HORODATEE|1|signature 27aa4c7b7769acc0|https://slsa.dev/provenance/v1|2026-10-29 21:08:00 +0000 UTC|referrer sha256:37b1a8efdc12960e587af447cef380a8a23c5ef767fd509c46563f843aede7d3
-FIN|1 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+HORODATEE|builds/essai-signature|1|signature 0659d2b93558b3fc|https://slsa.dev/provenance/v1|2026-10-30 12:01:49 +0000 UTC|referrer sha256:722955f36f53a8674d21c8b6f248c8a0046363e00b76058f273910ef035dfc7e
+FIN|1 image(s), 1 enveloppe(s) : 1 horodatée(s), 0 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 ## builds/essai-webhook (une enveloppe par exécution signée de l'essai du webhook)
 JOINT|Zot et TSA, essai 1
-HORODATEE|1|signature 4d889bceaa1601da|https://slsa.dev/provenance/v1|2026-10-29 21:08:07 +0000 UTC|referrer sha256:8a12734897db4c2f4fc97d9a7f754ef669e65b5280d228c4fcb277cd5668c3b0
-HORODATEE|2|signature a9982bbc7b648569|https://slsa.dev/provenance/v1|2026-10-29 21:08:09 +0000 UTC|referrer sha256:7f31e9e4abc301b95fcadd59d72cb07a4963dcfb4f1105bccbe60b981562574a
-HORODATEE|3|signature ea6e0395590f71a7|https://slsa.dev/provenance/v1|2026-10-29 21:08:12 +0000 UTC|referrer sha256:42e3bee5ce26b386a516337eaeb9ffe420476c55d984b7039398bd8e7c7e1f37
-HORODATEE|4|signature 200a47e03a832293|https://slsa.dev/provenance/v1|2026-10-29 21:08:15 +0000 UTC|referrer sha256:29089129173b0dc5a315b6ea17f0bcd9ec5cd0598c03d31f0f50373471b3e45f
-FIN|4 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+HORODATEE|builds/essai-webhook|1|signature 59957917b8abb9b5|https://slsa.dev/provenance/v1|2026-10-30 12:01:55 +0000 UTC|referrer sha256:1806586c9e26b082c8a8a42512821372175c09b25354c57c4e662a63c0796f11
+HORODATEE|builds/essai-webhook|2|signature 15a9bfe226a2d440|https://slsa.dev/provenance/v1|2026-10-30 12:01:58 +0000 UTC|referrer sha256:eff25e3db04e44e02ac7654aa731c4e8a24e095306f2b67f6223b3ca90e9ac5f
+HORODATEE|builds/essai-webhook|3|signature 99aa39934b60d13a|https://slsa.dev/provenance/v1|2026-10-30 12:02:01 +0000 UTC|referrer sha256:b29d2864c2cf86a3e65e7358ab1512a5366b448f4d387e827c3d0db24858793f
+HORODATEE|builds/essai-webhook|4|signature d8727b7e99ea3079|https://slsa.dev/provenance/v1|2026-10-30 12:02:04 +0000 UTC|referrer sha256:cfece67d36aa27ef36b32220662dae02b6971e0e5099b32b570e6422397eb97d
+FIN|1 image(s), 4 enveloppe(s) : 4 horodatée(s), 0 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 ## reprise : builds/essai-signature une seconde fois
 JOINT|Zot et TSA, essai 1
-DEJA_HORODATEE|1|signature 27aa4c7b7769acc0|https://slsa.dev/provenance/v1
-FIN|1 enveloppe(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+DEJA_HORODATEE|builds/essai-signature|1|signature 0659d2b93558b3fc|https://slsa.dev/provenance/v1
+FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 1 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 OK   reprise sans nouvel horodatage ni nouveau bundle
 ## referrers de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 dans horodatage/bundles (aucun dans les dépôts des images)
-{"digest":"37b1a8efdc12","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"8a12734897db","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"7f31e9e4abc3","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"42e3bee5ce26","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"29089129173b","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"722955f36f53","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"1806586c9e26","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"eff25e3db04e","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"b29d2864c2cf","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"cfece67d36aa","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
 builds/essai-signature : 0 referrer(s)
 builds/essai-webhook : 0 referrer(s)
 OK   un bundle par enveloppe de Chains

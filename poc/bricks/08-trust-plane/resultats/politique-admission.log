@@ -1,4 +1,4 @@
-# politique.sh admission, 2026-10-30T09:20:51Z
+# politique.sh admission, 2026-10-30T12:08:22Z
 ## politiques chargées (5 ValidatingPolicy, 17 validations)
 prête : tekton-references
 prête : pods-isolation
@@ -47,12 +47,12 @@ OK   stepaction : CLI FAIL (code 1), admission FAIL (attendu FAIL)
 ## synthèse
 parité CLI / admission : 36 cas sur 36
 conformes au résultat attendu : tous
-  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 2 cas
+  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 1 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-1e13e32f" : 3 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-e33a6329" : 6 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-e94d8fa6" : 1 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" : 6 cas
-  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 12 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 13 cas
 ## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)
   6 événements, politique pods-isolation
   1 événements, politique stepactions-interdites

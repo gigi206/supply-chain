@@ -1,4 +1,4 @@
-# tsa.sh deployer, 2026-10-29T21:07:00Z
+# tsa.sh deployer, 2026-10-30T12:00:49Z
 {"kubernetes.io/metadata.name":"tekton-chains"} 
 {"kubernetes.io/metadata.name":"tsa"} {"app":"timestamp-authority"}
 namespace/tsa serverside-applied
@@ -10,13 +10,13 @@ configmap/tsa-config serverside-applied
 Waiting for deployment "timestamp-authority" rollout to finish: 0 of 1 updated replicas are available...
 deployment "timestamp-authority" successfully rolled out
 NAME                                   READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
-timestamp-authority-67b56576cd-h8m9x   2/2     Running   0          4s    10.42.0.20   sc-confiance   <none>           <none>
+timestamp-authority-869c59c955-22lrc   2/2     Running   0          4s    10.42.0.20   sc-confiance   <none>           <none>
 renouvellement sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f
 timestamp-server sc-stockage.poc.test:5000/amont/sigstore/timestamp-server@sha256:77c615f0bef6ddd907b531099cd1a8cf8f698ca9a08b1abf7397b222c9352306
 jeton OpenBao obtenu (rôle tsa, essai 2)
-OK   jeton OpenBao du TSA renouvelé au démarrage (2026-10-29T21:07:04Z jeton renouvelé : 3600 s)
+OK   jeton OpenBao du TSA renouvelé au démarrage (2026-10-30T12:00:53Z jeton renouvelé : 3600 s)
 starting timestamp-server @ {
 }
 ntp monitoring disabled
-2026/10/29 21:07:04 VAULT_TOKEN or BAO_TOKEN not set, trying to find token helper
+2026/10/30 12:00:53 VAULT_TOKEN or BAO_TOKEN not set, trying to find token helper
 Serving timestamp server at http://[::]:3000
