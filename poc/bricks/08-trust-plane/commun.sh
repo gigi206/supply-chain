@@ -123,6 +123,43 @@ audit_api() { # motif (chaîne fixe, sans espace ni guillemet) : lignes de l'aud
 
 el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
 
+# Livraisons vers l'EventListener et suivi des PipelineRuns de sample-app (J4, tekton.sh essais_webhook ; J8, preuves.sh test5).
+# envoyer écrit la réponse dans $T/webhook/reponse ($T : répertoire de travail du script appelant).
+hmac_corps() { # fichier : HMAC-SHA256 (hex) du fichier avec le secret du webhook, lu dans un fichier (jamais en argument)
+  python3 -I -c 'import hashlib, hmac, sys; print(hmac.new(open(sys.argv[1], "rb").read(), open(sys.argv[2], "rb").read(), hashlib.sha256).hexdigest())' \
+    "$S/forgejo-webhook.secret" "$1"
+}
+non_repris() { # commit : le TaskRun publier de sample-app-<commit> appartient à ce PipelineRun (pas d'adoption après purge)
+  local u
+  u=$(kubectl get pipelinerun -n builds "sample-app-$1" -o jsonpath='{.metadata.uid}')
+  [ "$(kubectl get taskrun -n builds "sample-app-$1-publier" -o jsonpath='{.metadata.ownerReferences[0].uid}' 2>/dev/null)" = "$u" ] \
+    && echo "OK   TaskRun sample-app-$1-publier créé par ce PipelineRun (propriétaire $u)" \
+    || { echo "KO   sample-app-$1 : TaskRun publier absent ou d'un autre PipelineRun (repris après la purge)" >&2; exit 1; }
+}
+pr_attendre() { # commit : attend le PipelineRun sample-app-<commit> (présent, puis terminé)
+  for _ in $(seq 60); do kubectl get pipelinerun -n builds "sample-app-$1" >/dev/null 2>&1 && break; sleep 2; done
+  kubectl wait -n builds --for=condition=Succeeded "pipelinerun/sample-app-$1" --timeout=180s >/dev/null
+}
+envoyer() { # libellé fichier-corps signature|"" : livraison vers l'EventListener, comme Forgejo (en-têtes GitHub)
+  local h=() code
+  [ -z "$3" ] || h=(-H "X-Hub-Signature-256: sha256=$3")
+  code=$(curl -s -o "$T/webhook/reponse" -w '%{http_code}' -H 'Content-Type: application/json' -H 'X-GitHub-Event: push' \
+    -H "X-GitHub-Delivery: $(cat /proc/sys/kernel/random/uuid)" "${h[@]}" --data-binary @"$2" "$(el_url)")
+  echo "$1 : HTTP $code $(jq -c '{eventID}' "$T/webhook/reponse" 2>/dev/null)"
+}
+signe_attendre() { # commit : attend que Chains ait signé le TaskRun et le PipelineRun de ce commit. Les écritures du tag
+  # .att d'un même digest ne sont pas atomiques (lecture puis réécriture) : deux envois simultanés perdent une enveloppe
+  # (constat-att-ecrasee.log). Les essais sérialisent donc les exécutions qui visent la même image.
+  local o
+  for o in "taskrun/sample-app-$1-publier" "pipelinerun/sample-app-$1"; do
+    for _ in $(seq 60); do
+      [ "$(kubectl get -n builds "$o" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}' 2>/dev/null)" = true ] && break
+      sleep 2
+    done
+  done
+}
+nb_pr() { kubectl get pipelinerun -n builds -o name | grep -c "sample-app-$1" || true; }
+
 reseau() { # contrôleur réseau du cluster : cilium (DaemonSet cilium de kube-system, J7, option 1b) ou flannel (flannel et kube-router)
   if kubectl get ds -n kube-system cilium >/dev/null 2>&1; then echo cilium; else echo flannel; fi
 }

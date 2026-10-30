@@ -1,0 +1,38 @@
+# preuves.sh test4, 2026-10-30T22:30:10Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- tentatives au nom du contrôleur de Tekton, le compte qui crée les pods des TaskRuns dans builds (créations réelles) :
+  pod runc privilégié : refusé par Pod Security (restricted en enforce sur builds, HTTP 403). Pod Security est une extension
+  d'admission intégrée, appelée avant les webhooks, et le premier refus arrête l'admission : Kyverno n'est pas consulté, donc
+  aucun événement de pods-isolation pour ce pod (J6 a mesuré cette règle de Kyverno seule, dans bancc, sans Pod Security).
+  Pod Kata privilégié avec un volume hostPath, et pod Kata privilégié en hostNetwork : exemptés de Pod Security (RuntimeClass
+  kata, J7), refusés par la règle pods-isolation de Kyverno (HTTP 400), seule barrière ; un événement PolicyViolation par pod
+- témoins (même compte, dry-run serveur) : pod Kata privilégié sans hostPath ni hostNetwork, et pod runc restreint : admis
+- trace : refus de l'API ; événements de Kyverno ; audit de l'API, avec l'annotation de Pod Security : enforce-policy
+  restricted:latest pour les pods runc, exempt runtimeClass pour les pods Kata, y compris ceux que Kyverno refuse ensuite
+- hors de ce test, déjà mesurée : la voie d'un PipelineRun (podTemplate avec volume refusé par tekton-references, cas de J6 ;
+  construction sans runtimeClassName : pod refusé par Pod Security, construction-construire.log)
+## tentatives (créations réelles, au nom de system:serviceaccount:tekton-pipelines:tekton-pipelines-controller)
+OK   pod runc privilégié : refusé par Pod Security (pods "preuve-t4-runc-privilegie" is forbidden: violates PodSecurity "restricted:latest": privileged (container "app" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscala)
+OK   pod Kata privilégié avec hostPath : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : volume hostPath interdit hors des espaces système )
+OK   pod Kata privilégié en hostNetwork : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système )
+## témoins (dry-run serveur, même compte)
+OK   témoin pod Kata privilégié : admis (pod/preuve-t4-kata-privilegie created (server dry run) )
+OK   témoin pod runc restreint : admis (pod/preuve-t4-runc-restreint created (server dry run) )
+OK   aucun pod preuve-t4-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-10-30T22:30:11Z
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espaces système
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système
+OK   Kyverno a bloqué preuve-t4-kata-hostpath (événement de pods-isolation)
+OK   Kyverno a bloqué preuve-t4-kata-hostnetwork (événement de pods-isolation)
+OK   aucun événement de Kyverno pour preuve-t4-runc-privilegie : refusé par Pod Security, Kyverno non consulté
+## trace : audit de l'API (créations de pods preuve-t4-*, annotation de Pod Security)
+  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; Pod Security : exempt runtimeClass
+  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+OK   audit : preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
