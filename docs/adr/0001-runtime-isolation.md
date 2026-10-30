@@ -101,6 +101,6 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     - un contrôleur réseau qui vérifie l'adresse source (Cilium ou Calico, avec réinstallation du réseau de k3s) ;
     - une règle maison.
 
-    Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
+    Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2 et, lui non plus, aucune provenance pour son image : seuls ses binaires en ont une. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
-  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». L'option 1 reste à décider, après l'évaluation de Cilium et de kube-router amont au doc 04.
+  - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». L'option 1 reste à décider par le propriétaire. Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6.
