@@ -56,3 +56,21 @@ horodatage|list|pipelineruns.tekton.dev|builds|no
 horodatage|get|secrets|horodatage|no
 horodatage|list|secrets|*|no
 horodatage|create|pods|horodatage|no
+# Rattrapage (compte rattrapage de declencheurs, jeton projeté de 10 min) : lecture du seul gabarit sample-app, lecture et
+# création de PipelineRuns dans builds ; ni modification, ni suppression, ni secret, ni pod.
+rattrapage|get|triggertemplates.triggers.tekton.dev/sample-app|declencheurs|yes
+rattrapage|get|triggertemplates.triggers.tekton.dev/autre|declencheurs|no
+rattrapage|list|triggertemplates.triggers.tekton.dev|declencheurs|no
+rattrapage|update|triggertemplates.triggers.tekton.dev/sample-app|declencheurs|no
+rattrapage|get|pipelineruns.tekton.dev|builds|yes
+rattrapage|create|pipelineruns.tekton.dev|builds|yes
+rattrapage|update|pipelineruns.tekton.dev|builds|no
+rattrapage|patch|pipelineruns.tekton.dev|builds|no
+rattrapage|delete|pipelineruns.tekton.dev|builds|no
+rattrapage|create|taskruns.tekton.dev|builds|no
+rattrapage|create|pipelineruns.tekton.dev|declencheurs|no
+rattrapage|get|secrets|declencheurs|no
+rattrapage|list|secrets|*|no
+rattrapage|create|pods|declencheurs|no
+rattrapage|create|cronjobs.batch|declencheurs|no
+rattrapage|get|eventlisteners.triggers.tekton.dev|declencheurs|no

@@ -1,0 +1,29 @@
+# Sonde, J6 (30/10/2026) : fenêtre de démarrage d'un pod neuf sous une NetworkPolicy de sortie (kube-router embarqué de k3s v1.35.9).
+# Pod busybox de J4 dans declencheurs, label app=rattrapage (sorties permises : DNS, Forgejo 192.168.161.13:3000, API 192.168.161.11:6443) ;
+# dès le lancement du conteneur et toutes les 0,5 s pendant 40 tentatives : Zot 192.168.161.13:5000 (interdit) et Forgejo (permis).
+# Observation de départ (troisième exécution de l'étape rattrapage, la première à atteindre l'essai réseau ; essais enchaînés dès le lancement ;
+# le libellé « API(point d'accès) », découpé sur son espace, y testait un hôte nommé « d'accès) » ; journal écrasé depuis) :
+#   ## NetworkPolicy rattrapage : sorties d'un pod d'essai au même label (busybox de J4)
+#     attente kube-router : 1 essai(s)
+#     OUVERT Forgejo 192.168.161.13:3000
+#     FERME API(point d'accès):192.168.161.11
+#     OUVERT API(service) 10.43.0.1:443
+#     OUVERT Zot 192.168.161.13:5000
+#     OUVERT SSH(sc-stockage) 192.168.161.13:22
+#     FERME TSA timestamp-authority.tsa.svc.cluster.local:3000
+#     FERME OpenBao openbao.openbao.svc.cluster.local:8200
+#   KO   sorties du pod de rattrapage
+# Contre-épreuve sur un pod gardé en vie (kubectl exec, plusieurs secondes après le démarrage) : Forgejo, API (nœud et service) ouverts ;
+#   Zot, SSH de sc-stockage et de sc-confiance, pod de l'EventListener, kubelet de sc-build, hôte : fermés ; 10 règles iptables de la politique.
+## essai 1 (sonde-fenetre-1, nœud sc-confiance, conteneur démarré 2026-10-30T00:17:01Z)
+  10 ms : Zot OUVERT ; Forgejo OUVERT
+  2020 ms : Zot FERME ; Forgejo OUVERT
+  Zot ouvert : 2 tentative(s) sur 40 ; dernière à 510 ms
+## essai 2 (sonde-fenetre-2, nœud sc-confiance, conteneur démarré 2026-10-30T00:18:01Z)
+  0 ms : Zot OUVERT ; Forgejo OUVERT
+  1500 ms : Zot FERME ; Forgejo OUVERT
+  Zot ouvert : 1 tentative(s) sur 40 ; dernière à 0 ms
+## essai 3 (sonde-fenetre-3, nœud sc-confiance, conteneur démarré 2026-10-30T00:19:02Z)
+  0 ms : Zot OUVERT ; Forgejo OUVERT
+  1510 ms : Zot FERME ; Forgejo OUVERT
+  Zot ouvert : 1 tentative(s) sur 40 ; dernière à 0 ms

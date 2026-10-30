@@ -102,19 +102,25 @@ EOF
 EL_NS=${EL_NS:-builds}   # espace de l'EventListener forgejo : builds en J4, declencheurs depuis J6
 el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }
 
-brancher_forgejo() { # EventListener de $EL_NS attendu, puis seul webhook du dépôt sample-app (J4, J6) ; répertoire $T/auth
-  local url id n=1
+el_joignable() { # EventListener de $EL_NS disponible et joignable depuis sc-stockage ; une ligne
+  local url n=1
   for _ in $(seq 60); do kubectl get deploy -n "$EL_NS" el-forgejo >/dev/null 2>&1 && break; sleep 2; done
-  kubectl wait -n "$EL_NS" --for=condition=Available deploy/el-forgejo --timeout=180s
-  kubectl get pods -n "$EL_NS" -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
+  kubectl wait -n "$EL_NS" --for=condition=Available deploy/el-forgejo --timeout=180s >/dev/null
   url=$(el_url)
   # kube-router rejette le trafic vers un pod neuf pendant quelques secondes (J3) : Forgejo n'a pas relivré un webhook
-  # refusé (rejeu de J5) ; on attend l'EventListener joignable depuis sc-stockage (sonde /live, sans événement).
+  # refusé (rejeu de J5, puis code de Forgejo lu en J6) ; on attend la sonde /live depuis sc-stockage (sans événement).
   until [ "$(sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' $url/live" || true)" = 200 ]; do
     [ $n -lt 60 ] || { echo "KO   EventListener injoignable depuis sc-stockage" >&2; exit 1; }
     n=$((n + 1)); sleep 1
   done
   echo "EventListener joignable par Forgejo : $url (NodePort sur sc-confiance ; /live depuis sc-stockage, essai $n)"
+}
+
+brancher_forgejo() { # EventListener de $EL_NS attendu, puis seul webhook du dépôt sample-app (J4, J6) ; répertoire $T/auth
+  local url id
+  el_joignable
+  kubectl get pods -n "$EL_NS" -l eventlistener=forgejo -o wide --no-headers | awk '{print "EventListener :", $1, $3, $7}'
+  url=$(el_url)
   # Webhook Forgejo : le secret passe par un fichier 0600 (curl -d @fichier), jamais en argument.
   printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
   api() { curl -fsS --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -H 'Content-Type: application/json' "$@"; }

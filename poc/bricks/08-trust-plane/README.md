@@ -6,7 +6,7 @@ On termine aussi le banc C : contrôle 9 (horodatage RFC 3161), C-2 (parité ent
 
 **Effort estimé : 5,5 pw.** Une décision avec le propriétaire est déclenchée à 11 pw. Le temps passé est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
 
-**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). Chemin de vérification de J5 retenu par le propriétaire : bundle réémis, vérifié par cosign. **J6 en cours** (accord du 29/10/2026) : Kyverno à l'admission, C-2 mesuré ; Trusted Resources ; règles d'admission ; EventListener et secrets sortis de la zone build, RBAC réduit, test 5 rejoué sous politique ; horodatage automatique par réconciliation périodique.
+**Statut (29/10/2026) : J1 à J5 faits** (3 VM et k3s v1.35.9 ; Zot et Forgejo sur `sc-stockage`, CA du PoC ; OpenBao, clé Transit de Chains ; Tekton Pipelines, Chains et Triggers installés depuis Zot, chaîne de signature éprouvée, webhook Forgejo signé et anti-rejeu ; TSA avec sa propre clé Transit, job d'horodatage, chemins de vérification mesurés ; voir plus bas). La construction de sample-app dans un pod passe en J7, avec Kata (décision du propriétaire). Chemin de vérification de J5 retenu par le propriétaire : bundle réémis, vérifié par cosign. **J6 en cours** (accord du 29/10/2026) : Kyverno à l'admission, C-2 mesuré ; Trusted Resources ; règles d'admission ; EventListener et secrets sortis de la zone build, RBAC réduit, test 5 rejoué sous politique ; horodatage automatique par réconciliation périodique ; rattrapage des webhooks perdus.
 
 ## Décisions du propriétaire (29/10/2026)
 
@@ -327,7 +327,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 ## Jalon J6 : politique (en cours, 29/10/2026)
 
-Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite taches admission chains declencheurs horodatage`, puis le test 5 (`EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook`), puis `mise run confiance:politique -- droits`. Journaux : `resultats/politique-<étape>.log`.
+Accord du propriétaire : « continue », après le compactage demandé avant J6 (29/10/2026). Installations validées sur l'hôte : `tkn` v0.46.2 (Trusted Resources) et tekton-lint 1.2.4 avec un verrou npm. Rejeu : `mise run confiance:politique -- image installer parite taches admission chains declencheurs horodatage`, puis le test 5 (`EL_NS=declencheurs JOURNAL=politique JALON=J6 mise run confiance:tekton -- essais_webhook`), puis `mise run confiance:politique -- rattrapage droits`. Le test 5 suspend le CronJob de rattrapage pendant l'essai, s'il existe : sinon, celui-ci recréerait le PipelineRun de la tête de `main` après la purge, avant la livraison réelle du cas A. Journaux : `resultats/politique-<étape>.log`.
 
 | Étape | Durée | Résultat |
 |---|---|---|
@@ -339,8 +339,9 @@ Accord du propriétaire : « continue », après le compactage demandé avant J6
 | `chains` | 2 s | Identifiants Zot de Chains sortis de `builds`, voir ci-dessous |
 | `declencheurs` | 27 s | Tâche et pipeline de J4 en bundles signés ; EventListener dans `declencheurs`, voir ci-dessous |
 | `horodatage` | 152 s, puis 193 s à la seconde exécution (trois passages du CronJob, un par minute) | Horodatage automatique par réconciliation périodique, voir ci-dessous |
-| `essais_webhook` (de `tekton.sh`) | 38 s | Test 5 rejoué sous politique, voir ci-dessous |
-| `droits` | 3 s | Matrice des droits et audit de l'API, voir ci-dessous |
+| `rattrapage` | 491 s (dont 150 s d'attente imposée, cinq passages du CronJob de rattrapage et un de l'horodatage, un par minute) | Rattrapage des webhooks perdus, voir ci-dessous |
+| `essais_webhook` (de `tekton.sh`) | 38 s, puis 42 s rejoué avant `rattrapage` | Test 5 rejoué sous politique, voir ci-dessous |
+| `droits` | 5 s | Matrice des droits et audit de l'API, voir ci-dessous |
 
 **C-2 : parité entre le CLI et l'admission** ([`politique-parite.log`](resultats/politique-parite.log), [`politique-parite.tsv`](resultats/politique-parite.tsv)) :
 - **même fichier de politique** des deux côtés : le modèle `ImageValidatingPolicy` du banc C, clés injectées comme dans son `run.sh` ; seul le glob change (`localhost:5000/*` → `192.168.161.13:5000/bench/*`). **Mêmes pods**, présentés à l'admission par `kubectl create --dry-run=server` (rien n'est créé) ;
@@ -430,6 +431,7 @@ Les objets de J4 sont supprimés de `builds`, puis contrôlés : aucun secret, n
 - non signé (B), mauvaise signature (C), corps modifié (D) : **refusés par les intercepteurs**, aucun PipelineRun ;
 - rejeux F et G : **sans effet** (`already exists`) ;
 - 4 exécutions signées, 4 enveloppes dans Zot ;
+- rejoué le 30/10/2026 avant l'étape `rattrapage`, avec les mêmes résultats : le CronJob de rattrapage est suspendu pendant l'essai, et le PipelineRun du cas A est vérifié comme créé par l'EventListener (label `triggers.tekton.dev/eventlistener`) ;
 - **gain de provenance** : `externalParameters` désigne le bundle de la pipeline par digest, et `resolvedDependencies` porte la pipeline et sa tâche par digest (`pipeline`, `pipelineTask`). Dans les enveloppes de J4, encore présentes sous le même tag `.att`, `externalParameters` ne nomme que la pipeline et la tâche locales, et `resolvedDependencies` ne contient que l'image d'étape.
 
 **Constat d'affichage, corrigé** : le tag `.att` accumule les enveloppes de toutes les exécutions d'un même sujet. Au premier passage de J6, l'affichage de la provenance a pris la première enveloppe du commit réel, celle de J4. Il ne retient plus que les enveloppes de l'essai en cours (`startedOn`).
@@ -467,11 +469,64 @@ Les objets de J4 sont supprimés de `builds`, puis contrôlés : aucun secret, n
 - pod du passage sur `sc-confiance`, compte `horodatage`, sans volume de jeton ; entre les deux exécutions, le CronJob a tourné seul, en passages de 4 à 5 s, tous réussis ;
 - **mode « une image » de J5 conservé** ([`politique-horodatage-mode-image.log`](resultats/politique-horodatage-mode-image.log)), avec le script protégé : un job de `tsa/horodatage-job.yaml`, lancé à la main, réussit sur `essai-signature` (déjà horodatée) ; il échoue sur le témoin `autre-cle` (refusé) et sur le témoin illisible (anomalie). `tsa.sh horodater` n'a pas été rejoué, car il aurait écrasé le journal de J5 ; le rejeu de J1 à J6 le rejouera.
 
+**Rattrapage des webhooks perdus** ([`politique-rattrapage.log`](resultats/politique-rattrapage.log), [`politique/rattrapage.yaml`](politique/rattrapage.yaml), [`politique/rattrapage/main.go`](politique/rattrapage/main.go)). Ce point traite le constat du premier rejeu de J1 à J5 : un push perdu quand l'EventListener est injoignable.
+- **Lu dans le code de Forgejo v15.0.11** :
+  - `Deliver` (`services/webhook/deliver.go`) marque la tâche livrée (`MarkTaskDelivered`) **avant** l'envoi. Un échec reste donc « livré », avec `IsSucceed=false`, et n'est jamais retenté. Au démarrage, `populateWebhookSendingQueue` ne remet en file que les tâches jamais tentées.
+  - Le « replay » (`ReplayHookTask`) n'existe que par la route web `/settings/hooks/{id}/replay/{uuid}`. Il faut une session : les authentifications Basic et OAuth2 ne sont pas tentées hors de l'API (`services/auth/method/basic.go`, `oauth2.go`). Il faut aussi l'UUID de la tâche, qu'aucune route de l'API n'expose.
+  - L'API n'offre que `POST hooks/{id}/tests`, réservé à un administrateur du dépôt.
+  - Forgejo signe chaque livraison à l'envoi, avec le secret du webhook (`AddDefaultHeaders`).
+- **Décision du propriétaire (30/10/2026)**. Trois options lui ont été présentées :
+  - relivraison par `hooks/{id}/tests`, qui place dans la zone de confiance un jeton Forgejo d'administrateur du dépôt, capable de pousser du code ;
+  - livraison signée avec le secret HMAC, monté dans un second pod ;
+  - PipelineRun créé directement.
+
+  Option retenue : **PipelineRun direct**. Le rattrapage n'utilise ni le secret HMAC ni un jeton Forgejo.
+- **Réconciliateur.** Le CronJob `rattrapage` de `declencheurs` passe chaque minute (`Forbid`, `startingDeadlineSeconds: 120`, `activeDeadlineSeconds: 120`).
+  - Il lit la tête de `main` dans Forgejo, en lecture anonyme avec la CA du PoC.
+  - Si `sample-app-<commit>` manque dans `builds`, il crée ce PipelineRun depuis la TriggerTemplate en service, comme Triggers v0.37.2 (`pkg/template/resource.go` : remplacement textuel de `$(tt.params.…)`, `$(` doublé, `$(uid)`).
+  - Il reprend les contrôles du filtre CEL, que ce chemin contourne : dépôt, branche, commit de 40 caractères hexadécimaux.
+  - Il vérifie le gabarit rendu : un seul PipelineRun `tekton.dev/v1`, dans `builds`, nommé `sample-app-<commit>` (anti-rejeu de J4), sans variable restante.
+  - Il pose le label `poc.test/declencheur: rattrapage` à la place des labels de Triggers.
+  - Sur ce chemin, le commit est confronté à Forgejo, ce que la livraison ne fait pas avant J7.
+- **Code maison dans la zone de confiance** : 246 lignes de Go, bibliothèque standard seule.
+  - Compilé avec le Go 1.26.10 de `mise.toml`, vérifié par sum.golang.org. Deux compilations indépendantes, cache vide compris, donnent le même binaire `f6d7dcc6…`.
+  - Image d'une seule couche sur base vide, sans shell : `linux/amd64`, utilisateur 65532, même digest `c3992728…` à chaque assemblage.
+  - Écartés : le busybox de l'image d'outils, dont le `wget` ne vérifie pas les certificats TLS ; kubectl comme client HTTPS de Forgejo, qui demande un nom d'utilisateur faute d'identité.
+- **Droits.**
+  - Jeton projeté de 10 min, envoyé à l'API seulement : deux clients HTTP, aucune redirection suivie. Un jeton monté d'office demande 3607 s, mais l'API lui en accorde 365 jours (mesuré : [`politique-rattrapage-sonde-jeton.log`](resultats/politique-rattrapage-sonde-jeton.log) ; aucun drapeau `--service-account-*-token-expiration` dans les arguments de l'API de k3s, valeur par défaut).
+  - Lecture du seul gabarit `sample-app` ; lecture et création de PipelineRuns dans `builds`.
+  - NetworkPolicy limitée aux pods du rattrapage : DNS, Forgejo :3000, API :6443. Elle n'est pas en vigueur pendant la première seconde du conteneur (voir les constats), soit presque toute la durée d'un passage.
+
+**Mesures** (septième exécution de l'étape, après le test 5 rejoué ; [`chrono.tsv`](resultats/chrono.tsv)). Les six précédentes : chaîne Go de `mise` mal choisie (le `GOROOT` de Go 1.24.7 exporté par `mise`), digest de l'image pas encore épinglé, fenêtre de démarrage et libellé mal découpé dans l'essai réseau, erreur `pipefail`, passage de rattrapage manqué à la seconde près (voir les constats), puis une réussite qui comparait c1 au PipelineRun du test 5 (cette comparaison supposait l'ordre du rejeu : elle se fait désormais entre c1 et c2, créés dans l'étape).
+
+| Essai | Mesure |
+|---|---|
+| Premier passage. Prédiction : `PRESENT` pour `6391fd43…` | **Conforme** : `PRESENT`, rien n'est créé. Forgejo et l'API répondent au premier essai, sans doute avant que la NetworkPolicy ne soit posée (fenêtre de démarrage). Pod sur `sc-confiance`, sans jeton monté d'office, jeton projeté de 600 s |
+| Sorties d'un pod au même label | Une fois la règle posée : **Forgejo, l'API (nœud et service) et le DNS seulement**. Fermés : Zot, SSH de `sc-stockage`, kubelet de `sc-build`, pod de l'EventListener, TSA, OpenBao. Fenêtre de démarrage : voir les constats |
+| Webhook perdu : EventListener à 0 réplique, puis push d'un nouveau commit c1 (`e537a1db…`) | Forgejo fait **une seule tentative**, en échec (« connect: connection refused », journal de Forgejo) |
+| EventListener rétabli et joignable, puis 150 s d'attente | **Aucune relivraison** : un seul échec dans le journal, aucun PipelineRun pour c1, aucune création demandée à l'API (audit) |
+| Rattrapage : CronJob réactivé | `CREE` : PipelineRun de c1 créé **1 s après la réactivation** (push à 00:51:48, réactivation à 00:54:25, création à 00:54:26), une seule création (201, compte `rattrapage`). Exécuté, `TrustedResourcesVerified=True`, signé par Chains |
+| Passage suivant | `PRESENT` : aucune création |
+| Horodatage | L'exécution rattrapée a été horodatée par le CronJob d'horodatage dès le passage suivant sa signature : 31 bundles pour 31 enveloppes |
+| Course : EventListener et rattrapage actifs, push de c2 (`1e290e1d…`) | Un seul PipelineRun, créé par l'EventListener (201), signé par Chains ; le passage suivant du rattrapage voit `PRESENT`. Deux créations simultanées donneraient un 409, que le réconciliateur traite (`DEJA`) ; ce cas n'a pas été mesuré |
+| Comparaison des deux chemins : c1 (rattrapage) et c2 (EventListener) | **Spec identique**, commit excepté : `depot` octet pour octet, pipeline signée, gabarit de pod, compte. Les provenances de Chains, retrouvées par l'UID de chaque PipelineRun (`invocationId`), ont le **même `runSpec`**, commit excepté |
+| `main` remise à `6391fd43…` (force-push) | Tête servie par Forgejo. Livraison acceptée, puis refusée à la création (409, anti-rejeu). `PRESENT` pour le rattrapage ; PipelineRun du test 5 inchangé (créé à 00:49:09) |
+
+**Constats.**
+- **Fenêtre de démarrage des NetworkPolicy de sortie (kube-router de k3s)** ([`politique-rattrapage-sonde-fenetre.log`](resultats/politique-rattrapage-sonde-fenetre.log)).
+  - La troisième exécution de l'étape, la première à atteindre l'essai réseau, enchaînait les connexions dès le lancement du conteneur : elle a joint Zot et le SSH de `sc-stockage`. Une contre-épreuve sur un pod gardé en vie les montre fermés.
+  - Sonde (trois pods, une tentative vers Zot toutes les 0,5 s) : Zot est joignable à 0 ms, et jusqu'à 510 ms une fois, puis fermé avant 1 s.
+  - **Une sortie interdite passe donc pendant la première seconde d'un conteneur**, le temps que kube-router pose la règle. C'est l'envers du délai d'entrée de J5.
+  - L'étape mesure désormais la fenêtre, puis la matrice des sorties une fois la règle posée.
+  - **Pour J7** : la zone build (« egress = 0 ») ne peut pas compter sur une NetworkPolicy seule pendant cette seconde. Un pod de build hostile aurait le temps d'exfiltrer. À traiter avec Kata et la mesure de J7.
+- **Réactivation d'un CronJob** : le contrôleur lance aussitôt le passage manqué, dans la limite de `startingDeadlineSeconds`, parfois dans la seconde même. À la cinquième exécution, ce passage a créé le PipelineRun de c1 (201 dans l'audit). Mais l'étape attendait un passage créé strictement après l'instant de réactivation, à la seconde près : elle a lu le passage suivant (`PRESENT`) et conclu à tort à un échec. L'instant de référence est désormais pris une seconde plus tôt, et après la tête servie par Forgejo pour la course et la remise à zéro.
+- **Erreurs du script, corrigées** : à la troisième exécution, le libellé « API(point d'accès) », découpé sur son espace, a fait tester un hôte nommé « d'accès) » ; à la quatrième, `n=$(kubectl get … | wc -l)` sur un PipelineRun absent a arrêté l'étape (`pipefail` et `set -e`), sans message, après le retour de l'EventListener.
+
 **Droits** ([`politique-droits.log`](resultats/politique-droits.log), [`politique-droits.tsv`](resultats/politique-droits.tsv), [`politique/droits.txt`](politique/droits.txt), [`politique/droits.yaml`](politique/droits.yaml)) :
 - rôle sur mesure `operateur-builds` (groupe `operateurs`), **en lecture seule** : PipelineRuns, TaskRuns, pods, journaux et événements de `builds`. Les rôles agrégés `edit` et `admin` (`tekton-aggregate-edit`) ne conviennent pas : ils donneraient `pods/exec` et la lecture des secrets de l'espace ;
-- **52 vérifications `kubectl auth can-i`, toutes conformes**. Compte `horodatage` du CronJob : aucun droit sur l'API, ni lecture des TaskRuns et PipelineRuns de `builds`, ni secrets, ni création de pods. Compte `build` : aucun droit, et `can-i --list` ne montre que les droits de découverte communs à tout compte. EventListener : seulement ses lectures et la création de PipelineRuns dans `builds`. Opérateur : ni `taskruns/status` ni `pipelineruns/status` (test 3), ni modification des TaskRuns, ni `exec`, `attach`, `portforward` ou conteneur éphémère, ni secrets, ni `serviceaccounts/token` dans `tekton-chains`, `openbao` et `tsa`, ni création de pods dans la zone de confiance ;
+- **68 vérifications `kubectl auth can-i`, toutes conformes**. Compte `rattrapage` : lecture du seul gabarit `sample-app` (ni un autre gabarit, ni la liste, ni sa modification), lecture et création de PipelineRuns dans `builds` ; ni modification ni suppression de PipelineRuns, ni TaskRun, ni PipelineRun hors de `builds`, ni secrets, ni pods, ni CronJobs. Compte `horodatage` du CronJob : aucun droit sur l'API, ni lecture des TaskRuns et PipelineRuns de `builds`, ni secrets, ni création de pods. Compte `build` : aucun droit, et `can-i --list` ne montre que les droits de découverte communs à tout compte. EventListener : seulement ses lectures et la création de PipelineRuns dans `builds`. Opérateur : ni `taskruns/status` ni `pipelineruns/status` (test 3), ni modification des TaskRuns, ni `exec`, `attach`, `portforward` ou conteneur éphémère, ni secrets, ni `serviceaccounts/token` dans `tekton-chains`, `openbao` et `tsa`, ni création de pods dans la zone de confiance ;
 - `can-i` ne juge que le RBAC : un droit accordé reste soumis à l'admission (Kyverno, webhooks de Tekton) ;
-- **audit de l'API pendant le test 5** : le compte `el-forgejo` n'écrit que des `create pipelineruns` dans `builds` (2 en 201, 2 rejeux en 409), **aucun refus 403**, et aucun « forbidden » dans le journal de l'EventListener. L'audit ne journalise pas les lectures (politique de J1) : leur suffisance se lit au fonctionnement de l'EventListener et à son journal.
+- **audit de l'API depuis le dernier test 5** (test 5, puis étape `rattrapage`) : le compte `el-forgejo` n'écrit que des `create pipelineruns` dans `builds`, 3 en 201 (A, E, c2) et 3 rejeux en 409 (F, G, remise à zéro de `main`), **aucun refus 403**, et aucun « forbidden » dans le journal de l'EventListener. Le compte `rattrapage` n'écrit qu'une création de PipelineRun dans `builds` (201, c1), sans refus. L'audit ne journalise pas les lectures (politique de J1) : leur suffisance se lit au fonctionnement de l'EventListener et à son journal.
 
 **Droits résiduels, consignés** : les contrôleurs de Pipelines et de Chains, le résolveur et **les intercepteurs de Triggers lisent tous les secrets du cluster**. Pour les intercepteurs, c'est vérifié dans le code : leur informateur de secrets porte sur tout le cluster (`cmd/interceptors` sans `WithNamespaceScope`). Les restreindre à un espace casserait l'informateur. Ces composants tournent tous en zone confiance, sous la règle `zone-confiance`.
 
@@ -485,6 +540,14 @@ Les objets de J4 sont supprimés de `builds`, puis contrôlés : aucun secret, n
   - une enveloppe perdue par la course du tag `.att` (constat de J4) n'est jamais horodatée, puisqu'elle n'existe plus dans Zot ;
   - une enveloppe est sautée dès que son étiquette existe dans `horodatage/bundles`. Une étiquette occupée d'avance par `poc-ecriture` ou `poc-horodatage` ferait donc sauter en silence une enveloppe authentique. Le contrôle « un bundle par enveloppe » de l'étape le verrait, mais pas le CronJob ;
   - un tag `.att` aux couches énormes dépasserait le volume de travail du pod (64 Mi) et ferait échouer chaque passage (non mesuré) ;
+- rattrapage des webhooks :
+  - seule la tête de `main` est rattrapée. Les commits poussés pendant une panne, puis recouverts par un push suivant, ne sont jamais construits ; c'est déjà le cas avec la livraison, qui ne construit que `after` ;
+  - l'anti-rejeu repose sur l'objet PipelineRun (limite de J4). Un PipelineRun de la tête supprimé de l'API est recréé au passage suivant, avec une nouvelle provenance ;
+  - un second chemin de création contourne les intercepteurs de l'EventListener (HMAC, filtre CEL). Le réconciliateur en reprend les contrôles et lit le commit dans Forgejo, mais un compte qui peut créer des PipelineRuns dans `builds` le peut aussi sans lui (même pouvoir qu'`el-forgejo`). Les règles de Kyverno et Trusted Resources s'appliquent aux deux chemins ;
+  - délai de rattrapage borné par la période (60 s) et la durée d'un passage (3 s) ;
+  - le réconciliateur est du code maison à maintenir (246 lignes). Il ne rend compte que dans le journal de ses passages, sans alerte ;
+- NetworkPolicy de sortie des jobs courts : celles du rattrapage et de l'horodatage (« DNS, TSA, Zot ») ne s'appliquent qu'après la première seconde du conteneur (kube-router, constat de J6). Un passage de 3 à 5 s n'est donc filtré qu'en partie ;
+- le compte `el-forgejo`, qui crée des PipelineRuns dans `builds`, monte un jeton d'office (3607 s demandés, donc 365 jours accordés). Un jeton exfiltré du pod de l'EventListener resterait valable un an. Piste : un volume projeté de courte durée, comme pour le rattrapage, si Triggers le permet ;
 - la construction de J7 devra pousser l'image depuis la zone build : il faudra un compte d'écriture distinct, limité aux images, sans accès aux tags `.sig` et `.att`, si Zot le permet ;
 - le correctif de Chains et le compte `build` passent par `kubectl patch`. Mesuré en dry-run serveur : un nouveau `tekton.sh installer` **conserve** le correctif de Chains (`DOCKER_CONFIG`, volume `zot-chains` : l'apply côté serveur ne retire pas les champs posés par un autre gestionnaire). En revanche, `tekton.sh signature` réapplique `tekton/builds.yaml` : `imagePullSecrets: zot-build` revient sur le compte `build` (le jeton reste désactivé), et le secret `zot-build` est recréé dans `builds`. Il faut alors rejouer `politique.sh chains`.
 
@@ -546,7 +609,7 @@ Rejeu : `mise run confiance:tsa -- image pki openbao deployer essais horodater c
   - **aucun ticket trouvé chez Kyverno pour ce cas.** Le correctif en brouillon kyverno/kyverno#16048 ne couvre que le chemin keyless (matériel issu du TUF). Pas de ticket ouvert : décision du propriétaire.
 - **Kyverno 1.19.2 ne vérifie aucune attestation au format historique sans journal** : `verifyAttestationSignatures` exige une preuve d'inclusion dans un journal, alors que `verifyImageSignatures` s'en passe avec `insecureIgnoreTlog` (`verifier.go`). **Défaut connu** : tickets kyverno/kyverno#17109 et #18054, correctif #17217 ouvert, non fusionné au 29/10/2026 ; même code sur la branche principale. **Pour J6**, la provenance de Chains (`dsse`) n'est lisible par Kyverno qu'à travers les bundles réémis (témoin : `pass`) : le job d'horodatage sert aussi de pont entre Chains et Kyverno.
 - **kube-router, côté entrée** : le TSA a d'abord refusé (« connection refused ») un job neuf, car sa NetworkPolicy ne connaissait pas encore l'IP du pod. Le job attend désormais Zot et le TSA.
-- **Même délai pour l'EventListener de J4.** Au premier rejeu de J1 à J5, Forgejo a reçu « connection refused » sur le NodePort de l'EventListener, à la seconde où celui-ci devenait disponible. Forgejo n'a pas relivré : l'EventListener n'a reçu aucune requête dans les 2 min suivantes, et le test 5 a échoué faute de PipelineRun. Le rejeu précédent n'avait rien montré : l'étape avait duré 44 s, contre 5 s cette fois. `tekton.sh webhook` attend désormais que la sonde `/live` réponde depuis `sc-stockage`. En production, la même course ferait perdre un push : à traiter en J6, avec la relivraison des webhooks de Forgejo ou une resynchronisation.
+- **Même délai pour l'EventListener de J4.** Au premier rejeu de J1 à J5, Forgejo a reçu « connection refused » sur le NodePort de l'EventListener, à la seconde où celui-ci devenait disponible. Forgejo n'a pas relivré : l'EventListener n'a reçu aucune requête dans les 2 min suivantes, et le test 5 a échoué faute de PipelineRun. Le rejeu précédent n'avait rien montré : l'étape avait duré 44 s, contre 5 s cette fois. `tekton.sh webhook` attend désormais que la sonde `/live` réponde depuis `sc-stockage`. En production, la même course ferait perdre un push : **traité en J6** par un rattrapage périodique (Forgejo ne relivre jamais, lu dans son code ; voir « Rattrapage des webhooks perdus »).
 - **Renouvellement du jeton du TSA : deux défauts corrigés après le rejeu.**
   - Au redémarrage des VM, l'arrêt a pris 93 s au lieu de 4 s. systemd a dû tuer le conteneur de renouvellement au bout de son délai de 90 s : `sh`, PID 1 du conteneur, ignorait SIGTERM pendant son `sleep`. Le script gère désormais SIGTERM, et le pod se supprime en 2 s.
   - En relisant ce conteneur, il est apparu que sa commande (`bao token renew -field=…`) était invalide, comme l'essai l'avait montré à part. **Le TSA aurait cessé de signer au bout d'1 h.** Le conteneur renouvelle désormais dès son démarrage, et `deployer` exige la trace « jeton renouvelé : 3600 s ».

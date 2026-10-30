@@ -266,6 +266,15 @@ nb_pr() { kubectl get pipelinerun -n builds -o name | grep -c "sample-app-$1" ||
 etape_essais_webhook() {
   local debut reel=6391fd437f26696847041be3226bbbf633f55a2f faux=1111111111111111111111111111111111111111 neuf=2222222222222222222222222222222222222222
   rm -rf "$T/webhook" && (umask 077 && mkdir -p "$T/webhook" "$T/auth")
+  # Rattrapage de J6 (CronJob rattrapage de declencheurs, s'il existe) suspendu pendant l'essai, puis réactivé : il
+  # recréerait sample-app-<tête de main> après la purge, avant la livraison réelle de A (étape suivie dans un sous-shell :
+  # le piège EXIT réactive le CronJob, même en cas d'échec).
+  if kubectl get cronjob -n declencheurs rattrapage >/dev/null 2>&1; then
+    kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+    trap 'kubectl patch cronjob -n declencheurs rattrapage --type merge -p '"'"'{"spec":{"suspend":false}}'"'"' >/dev/null' EXIT
+    for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+    echo "CronJob rattrapage suspendu pendant l'essai (aucun passage actif)"
+  fi
   debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   kubectl delete pipelinerun -n builds --all --wait=true >/dev/null
   corps() { jq -nc --arg c "$1" --arg r "${2:-refs/heads/main}" '{ref: $r, after: $c, repository: {full_name: "workspace/sample-app", clone_url: "https://sc-stockage.poc.test:3000/workspace/sample-app.git"}}' > "$T/webhook/$3"; }
@@ -278,6 +287,8 @@ etape_essais_webhook() {
   pr_attendre "$reel"
   signe_attendre "$reel"
   echo "OK   PipelineRun sample-app-$reel terminé ($(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.status.conditions[0].reason}'))"
+  [ -n "$(kubectl get pipelinerun -n builds "sample-app-$reel" -o jsonpath='{.metadata.labels.triggers\.tekton\.dev/eventlistener}')" ] \
+    && echo "OK   créé par l'EventListener (label triggers.tekton.dev/eventlistener)" || { echo "KO   PipelineRun de A créé hors de l'EventListener" >&2; exit 1; }
 
   echo "## B. corps non signé (commit $faux)"
   corps "$faux" "" b.json; envoyer "non signé" "$T/webhook/b.json" ""

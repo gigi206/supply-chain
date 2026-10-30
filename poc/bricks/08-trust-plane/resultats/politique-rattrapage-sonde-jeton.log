@@ -1,0 +1,7 @@
+# Sonde, J6 (30/10/2026) : durée d'un jeton de compte de service monté d'office (k3s v1.35.9).
+# Pod busybox de J4 dans declencheurs, compte rattrapage, automountServiceAccountToken: true ; seule la partie charge utile du JWT
+# est décodée dans le pod, et seuls exp et iat sont affichés (ni signature ni jeton complet).
+expirationSeconds demandé par le volume projeté d'office : [3607]
+"exp":1824857055 "iat":1793321055
+durée du jeton monté d'office : 31536000 s (365 j) : extension de l'API (--service-account-extend-token-expiration)
+# Le CronJob rattrapage monte son propre volume projeté (expirationSeconds: 600) et désactive le montage d'office.

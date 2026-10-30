@@ -23,7 +23,7 @@ flowchart LR
   end
 
   subgraph TRUST["Zone Confiance (nœuds dédiés)"]
-    TRIG[Tekton Triggers<br/>EventListener · intercepteur HMAC Forgejo<br/>espace dédié, hors de la zone build]
+    TRIG[Tekton Triggers<br/>EventListener · intercepteur HMAC Forgejo<br/>espace dédié, hors de la zone build<br/>+ rattrapage des webhooks perdus]
     CH[Tekton Chains<br/>provenance SLSA v1]
     BAO[(OpenBao Transit<br/>clé provenance)]
     TSA[Job TSA RFC 3161]
@@ -61,6 +61,7 @@ flowchart LR
   end
 
   FWS -- webhook signé --> TRIG
+  TRIG -. rattrapage : tête de main<br/>relue chaque minute .-> FWS
   TRIG -- PipelineRun<br/>bundles signés --> PF
   PF -- fermeture --> ZOT
   PUSH --> ZOT
@@ -105,6 +106,7 @@ sequenceDiagram
 
   F->>T: push sur branche custom (webhook signé)
   T->>T: vérifie HMAC + anti-rejeu, crée le PipelineRun (bundles signés)
+  T->>F: rattrapage chaque minute (Forgejo ne relivre jamais un webhook en échec) : tête de main lue, PipelineRun créé s'il manque, même gabarit [brique 08, J6]
   T->>P: prefetch (Hermeto / mock lock / .buildinfo)
   P->>Z: fermeture des dépendances (OCI, fichier par fichier) + SBOM Hermeto
   T->>B: build hermétique (SOURCE_DATE_EPOCH, images par digest)

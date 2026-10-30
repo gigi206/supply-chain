@@ -1,0 +1,178 @@
+# Brique 08, J6 : rattrapage des pushs dont le webhook Forgejo est perdu (politique.sh rattrapage). Forgejo v15.0.11 ne
+# retente jamais une livraison échouée (politique/rattrapage/main.go) : chaque minute, un job lit la tête de main dans
+# Forgejo (lecture anonyme) et crée le PipelineRun de ce commit dans builds s'il n'existe pas, depuis la TriggerTemplate
+# en service. Ni secret HMAC ni jeton Forgejo ; un jeton projeté de 10 min (sans l'extension d'un an des jetons montés
+# d'office), envoyé à l'API seulement. Sorties : DNS, Forgejo, API. @RATTRAPAGE@ : image épinglée par digest.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rattrapage
+  namespace: declencheurs
+automountServiceAccountToken: false
+---
+# Lecture du seul gabarit sample-app.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rattrapage
+  namespace: declencheurs
+rules:
+- apiGroups: [triggers.tekton.dev]
+  resources: [triggertemplates]
+  resourceNames: [sample-app]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rattrapage
+  namespace: declencheurs
+subjects:
+- kind: ServiceAccount
+  name: rattrapage
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rattrapage
+---
+# Dans builds : lire et créer des PipelineRuns, comme el-forgejo (création), sans les modifier ni les supprimer.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rattrapage-pipelineruns
+  namespace: builds
+rules:
+- apiGroups: [tekton.dev]
+  resources: [pipelineruns]
+  verbs: [get, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rattrapage-pipelineruns
+  namespace: builds
+subjects:
+- kind: ServiceAccount
+  name: rattrapage
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rattrapage-pipelineruns
+---
+# Ne sélectionne que les pods du rattrapage : l'EventListener de l'espace n'est pas concerné.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rattrapage
+  namespace: declencheurs
+spec:
+  podSelector:
+    matchLabels:
+      app: rattrapage
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.13/32
+    ports:
+    - protocol: TCP
+      port: 3000
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.11/32
+    ports:
+    - protocol: TCP
+      port: 6443
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rattrapage
+  namespace: declencheurs
+spec:
+  schedule: "* * * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app: rattrapage
+        spec:
+          serviceAccountName: rattrapage
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          restartPolicy: Never
+          nodeSelector:
+            zone: confiance
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: rattrapage
+            image: @RATTRAPAGE@
+            command: [/rattrapage]
+            env:
+            - name: FORGEJO
+              value: https://sc-stockage.poc.test:3000
+            - name: CA_FORGEJO
+              value: /etc/rattrapage/ca-poc.crt
+            - name: DEPOT
+              value: workspace/sample-app
+            - name: BRANCHE
+              value: main
+            - name: GABARIT
+              value: declencheurs/sample-app
+            - name: ESPACE
+              value: builds
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+            volumeMounts:
+            - name: config
+              mountPath: /etc/rattrapage
+              readOnly: true
+            - name: jeton
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+          volumes:
+          - name: config
+            configMap:
+              name: rattrapage
+          - name: jeton
+            projected:
+              sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 600
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                  - key: ca.crt
+                    path: ca.crt

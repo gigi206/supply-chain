@@ -1,6 +1,6 @@
-# politique.sh droits, 2026-10-29T23:26:25Z
+# politique.sh droits, 2026-10-30T00:58:14Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
-52 vérifications, 52 conformes
+68 vérifications, 68 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
   accordé : el-forgejo list eventlisteners.triggers.tekton.dev (declencheurs)
   accordé : el-forgejo list clusterinterceptors.triggers.tekton.dev (*)
@@ -8,6 +8,9 @@
   accordé : el-forgejo create events (declencheurs)
   accordé : operateur get pipelineruns.tekton.dev (builds)
   accordé : operateur get pods/log (builds)
+  accordé : rattrapage get triggertemplates.triggers.tekton.dev/sample-app (declencheurs)
+  accordé : rattrapage get pipelineruns.tekton.dev (builds)
+  accordé : rattrapage create pipelineruns.tekton.dev (builds)
 ## droits complets du compte build dans builds (kubectl auth can-i --list)
   Resources                                       Non-Resource URLs                      Resource Names   Verbs
   selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
@@ -34,8 +37,11 @@
                                                   [/version]                             []               [get]
                                                   [/version]                             []               [get]
 ## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
-  2 create pipelineruns builds 201
-  2 create pipelineruns builds 409
-OK   aucun refus (403) pour el-forgejo depuis 2026-10-29T22:45:26Z
+  3 create pipelineruns builds 201
+  3 create pipelineruns builds 409
+OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T00:49:07Z
+## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
+  1 create pipelineruns builds 201
+OK   aucun refus (403) pour rattrapage depuis 2026-10-30T00:49:54Z
 ## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement
-OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-lz27r
+OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-qgvhf

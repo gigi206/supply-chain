@@ -62,6 +62,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - Un test négatif vérifie qu'**aucun pod privilégié ne tourne sur l'hôte** (Kyverno + brique 05).
 - Le modèle CPU et le mode d'isolation sont inscrits dans la provenance (`internalParameters`).
 - **Services de stockage hors des pods** (brique 08, J2, choix du propriétaire du 29/10/2026) : Forgejo et Zot tournent en services systemd durcis sur le nœud de stockage, à partir des binaires vérifiés de `mise.toml` (GPG pour Forgejo, sha256 pour Zot). Les images Forgejo et Zot ne sont pas signées. TLS par une CA du PoC à contraintes de nom, déclarée à containerd ([résultats](../../poc/bricks/08-trust-plane/README.md#jalon-j2--stockage-29102026)).
+- **Fenêtre de démarrage des NetworkPolicy de sortie** (brique 08, J6, mesuré sur kube-router embarqué dans k3s v1.35.9 : [sonde](../../poc/bricks/08-trust-plane/resultats/politique-rattrapage-sonde-fenetre.log)) : une sortie interdite passe pendant la première seconde d'un conteneur, avant que la règle ne soit posée. L'« egress = 0 » de la zone build ne peut donc pas reposer sur une NetworkPolicy seule : entrée à mesurer en J7, avec Kata (réseau de la VM invitée) ou un filtrage posé avant le lancement du conteneur.
 
 ## Questions ouvertes (propriétaire)
 

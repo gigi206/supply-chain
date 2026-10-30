@@ -1,0 +1,89 @@
+# politique.sh rattrapage, 2026-10-30T00:49:54Z
+## réconciliateur (politique/rattrapage : Go, bibliothèque standard seule) : deux compilations indépendantes
+go version go1.26.10 linux/amd64
+f6d7dcc6d2040203e723149d0eb52b43125a8d26c8354191cb214779f57e952f  rattrapage-1
+f6d7dcc6d2040203e723149d0eb52b43125a8d26c8354191cb214779f57e952f  rattrapage-2
+OK   binaire reproductible, empreinte épinglée
+## image : une couche (le binaire), base vide, linux/amd64, utilisateur 65532
+{"os":"linux","architecture":"amd64","user":"65532:65532","entrypoint":["/rattrapage"],"couches":1}
+image : 192.168.161.13:5000/plateforme/rattrapage@sha256:c3992728ff77d2d7b412626ab2c34de8d84154bb384aae572042b9aabe0e3c03
+OK   même digest que l'image épinglée (assemblage reproductible)
+## état de départ : main en 6391fd437f26696847041be3226bbbf633f55a2f, PipelineRuns des commits d'essai retirés
+commits d'essai (arbre de 6391fd437f26696847041be3226bbbf633f55a2f, auteur et dates fixes) : c1 e537a1db653dde7dd1f051921b0e9c1eab7a2b01, c2 1e290e1d443a1edd70d2dfd799ada3e397aa70a6
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-10-30T00:49:09Z, signé=true
+prédiction du premier passage : PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+## CronJob rattrapage (politique/rattrapage.yaml)
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   prédiction tenue
+pod rattrapage-29888691-xghf6 : nœud sc-confiance, compte rattrapage, automountServiceAccountToken=false, jeton projeté 600 s, sortie Completed
+## NetworkPolicy rattrapage : sorties d'un pod d'essai au même label (busybox de J4)
+  FENETRE|Zot joignable 1 fois, la dernière à 0 ms du lancement du conteneur, puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  OUVERT API-noeud 192.168.161.11:6443
+  OUVERT API-service 10.43.0.1:443
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME kubelet-build 192.168.161.12:10250
+  FERME EventListener 10.42.0.177:8080
+  FERME TSA timestamp-authority.tsa.svc.cluster.local:3000
+  FERME OpenBao openbao.openbao.svc.cluster.local:8200
+OK   sorties, une fois la règle posée : Forgejo et l'API seulement (plus le DNS)
+CONSTAT  fenêtre de démarrage : une sortie interdite passe pendant la première seconde du conteneur, avant que kube-router ne pose la règle (sonde : resultats/politique-rattrapage-sonde-fenetre.log)
+## webhook perdu : EventListener arrêté (0 réplique), push de c1
+EventListener : 0 réplique, 0 pod ; CronJob suspendu
+push de c1 à 2026-10-30T00:51:48Z ; tête de main dans Forgejo : e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  Forgejo : Unable to deliver webhook task[16]: unable to deliver webhook task[16] in http://192.168.161.11:32442 due to error in http client: Post "http://192.168.161.11:32442": dial tcp 192.168.161.11:32442: connect: connection re
+OK   une tentative de livraison, en échec
+## EventListener rétabli : aucune relivraison (attente de 150 s)
+EventListener joignable par Forgejo : http://192.168.161.11:32442 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
+après 150 s : 0 PipelineRun pour c1 ; échecs de livraison dans le journal de Forgejo : 1 ; créations dans l'audit de l'API :
+OK   push perdu : Forgejo n'a ni relivré ni retenté, aucune création demandée à l'API
+## rattrapage : CronJob réactivé
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  CREE|builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01|commit e537a1db653dde7dd1f051921b0e9c1eab7a2b01|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   PipelineRun de c1 créé par le rattrapage
+OK   exécution rattrapée : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
+sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01 : origine rattrapage ; labels {"poc.test/declencheur":"rattrapage"} ; Chains : signé=true
+créations de sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01 dans l'audit de l'API depuis le push :
+    1 declencheurs:rattrapage 201
+délais : push de c1 00:51:48, CronJob réactivé 00:54:25, PipelineRun créé 00:54:26
+## passage suivant : rien à rattraper
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  PRESENT|builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+OK   PRESENT : aucun PipelineRun créé
+## horodatage de l'exécution rattrapée (CronJob horodatage)
+  JOINT|Zot et TSA, essai 1
+  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 7295b4ac5cc03a1b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature 8ae47e0aa424117b|failed to verify signature: provided artifact digest does not match any digest in statement
+  FIN|5 image(s), 33 enveloppe(s) : 0 horodatée(s), 31 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
+  DEJA_HORODATEE|builds/essai-signature ×1
+  DEJA_HORODATEE|builds/essai-webhook ×30
+passage horodatage-29888696 : 00:56:00 → 00:56:05, pod 10.42.0.217 ; requêtes de jeton reçues par le TSA : 0
+OK   une requête de jeton par enveloppe horodatée (0), toutes du pod du passage ; aucune pour les 2 refusées
+OK   un bundle par enveloppe de Chains (31 pour sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) : l'exécution rattrapée est horodatée
+## course : EventListener et rattrapage actifs, push de c2
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|1e290e1d443a1edd70d2dfd799ada3e397aa70a6
+  PRESENT|builds/sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6
+créations de sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6 dans l'audit de l'API depuis le push :
+    1 declencheurs:el-forgejo 201
+sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6 : origine EventListener forgejo ; échecs de livraison : 0
+OK   exécution de c2 : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
+OK   un seul PipelineRun pour c2
+Chains : sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6 signé=true
+## même PipelineRun par les deux chemins : c1 (rattrapage) et c2 (EventListener, créé par Triggers), au commit près
+OK   spec identique (depot, pipeline signée, gabarit de pod, compte), commit excepté
+OK   provenances de Chains (retrouvées par l'UID de chaque PipelineRun) : même runSpec, commit excepté
+## main remise à 6391fd437f26696847041be3226bbbf633f55a2f (force-push) : livraison acceptée, rejeu sans effet
+tête de main : 6391fd437f26696847041be3226bbbf633f55a2f
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+créations de sample-app-6391fd437f26696847041be3226bbbf633f55a2f dans l'audit de l'API depuis la remise à zéro :
+    1 declencheurs:el-forgejo 409
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-10-30T00:49:09Z

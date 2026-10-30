@@ -32,9 +32,16 @@
 #              tag .att illisible : anomalie) à chaque passage, sans arrêter le parcours ; rattrapage, nouvelle exécution
 #              signée puis supprimée de l'API (latence), passage sans nouveauté ; une requête de jeton par enveloppe
 #              horodatée dans le journal du TSA ; un bundle par enveloppe ; chemin de la porte
+#   rattrapage rattrapage des webhooks perdus (Forgejo v15.0.11 ne retente jamais une livraison échouée) : réconciliateur
+#              en Go (politique/rattrapage, bibliothèque standard seule), compilé deux fois (même empreinte), image d'une
+#              couche sur base vide (même digest) ; CronJob rattrapage de declencheurs (politique/rattrapage.yaml) qui crée
+#              le PipelineRun de la tête de main s'il manque, depuis la TriggerTemplate en service ; sorties du pod
+#              (NetworkPolicy, fenêtre de démarrage) ; webhook perdu (EventListener à 0 réplique), aucune relivraison en
+#              150 s, rattrapage, même spec et même provenance qu'un PipelineRun de l'EventListener, horodatage, course
+#              avec l'EventListener ; main remise à 6391fd43 (force-push)
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
-#              opérateur, job d'horodatage ; RBAC seul, l'admission n'y figure pas) dans resultats/politique-droits.tsv ;
-#              écritures de l'EventListener dans l'audit de l'API pendant le test 5
+#              opérateur, job d'horodatage, rattrapage ; RBAC seul, l'admission n'y figure pas) dans
+#              resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -58,6 +65,12 @@ BANC=$repo/poc/benchmarks/kyverno-seul
 NS_ESSAI=bancc   # espace des pods d'essai (jamais créés : dry-run côté serveur)
 BUSYBOX_AMONT=docker.io/rancher/mirrored-library-busybox:1.37.0   # image d'étape de J4 (copie dans Zot : tekton-images.tsv)
 DL=$O/telechargements/kyverno
+RATTRAPAGE=plateforme/rattrapage
+RATTRAPAGE_BIN=f6d7dcc6d2040203e723149d0eb52b43125a8d26c8354191cb214779f57e952f   # politique/rattrapage, Go 1.26.10 de mise.toml
+RATTRAPAGE_DIGEST=sha256:c3992728ff77d2d7b412626ab2c34de8d84154bb384aae572042b9aabe0e3c03   # base vide, une couche, linux/amd64, utilisateur 65532
+FORGEJO_HOTE=https://192.168.161.13:3000
+SAMPLE_APP=workspace/sample-app
+TETE_J2=6391fd437f26696847041be3226bbbf633f55a2f   # commit de stockage.sh depot ; main y est remise après les essais
 EL_NS=declencheurs   # EventListener de J6 (commun.sh : el_url, brancher_forgejo)
 T=$W/politique
 trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
@@ -534,16 +547,17 @@ bundles() { # digest : nombre de bundles horodatés de ce digest dans horodatage
     | jq '[.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json")] | length'
 }
 
-passage() { # instant : premier passage du CronJob créé après cet instant, attendu terminé ; nom du job
-  local j=""
+passage() { # instant [espace CronJob] : premier passage du CronJob (horodatage par défaut) créé après cet instant, attendu
+  # terminé ; nom du job
+  local j="" ns=${2:-horodatage} cj=${3:-horodatage}
   for _ in $(seq 100); do
-    j=$(kubectl get jobs -n horodatage -o json | jq -r --arg t "$1" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
-      and .name == "horodatage") and .metadata.creationTimestamp > $t and ((.status.succeeded // 0) + (.status.failed // 0)) > 0)]
+    j=$(kubectl get jobs -n "$ns" -o json | jq -r --arg t "$1" --arg c "$cj" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
+      and .name == $c) and .metadata.creationTimestamp > $t and ((.status.succeeded // 0) + (.status.failed // 0)) > 0)]
       | sort_by(.metadata.creationTimestamp) | .[0].metadata.name // empty')
     [ -n "$j" ] && break
     sleep 2
   done
-  [ -n "$j" ] || { echo "KO   aucun passage du CronJob terminé depuis $1" >&2; exit 1; }
+  [ -n "$j" ] || { echo "KO   aucun passage du CronJob $cj terminé depuis $1" >&2; exit 1; }
   echo "$j"
 }
 
@@ -681,6 +695,266 @@ etape_horodatage() {
   echo "OK   chemin de la porte (cosign v3.1.4, bundles de $DEPOT_BUNDLES, jeton exigé, racine du TSA) : $(wc -l < "$T/porte.out") attestation(s) vérifiée(s)"
 }
 
+tete() { curl -fsS --cacert "$P/ca-poc.crt" "$FORGEJO_HOTE/api/v1/repos/$SAMPLE_APP/branches/main" | jq -r .commit.id; }
+
+tete_servie() { # commit : attend ce commit en tête de main dans l'API de Forgejo (mise à jour asynchrone, J2)
+  for _ in $(seq 30); do [ "$(tete)" = "$1" ] && return 0; sleep 1; done
+  echo "KO   tête de main ≠ $1" >&2; exit 1
+}
+
+git_forgejo() { # commande git… dans le clone $T/depot, isolé de la configuration de l'utilisateur ; jeton de poc-admin par
+  # l'environnement (en-tête http.extraHeader), jamais en argument ; auteur et dates fixes : commits d'essai reproductibles
+  (export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0
+   export GIT_AUTHOR_NAME="PoC brique 08" GIT_AUTHOR_EMAIL=poc-admin@poc.test GIT_AUTHOR_DATE=2026-10-30T00:00:00Z
+   export GIT_COMMITTER_NAME="PoC brique 08" GIT_COMMITTER_EMAIL=poc-admin@poc.test GIT_COMMITTER_DATE=2026-10-30T00:00:00Z
+   GIT_CONFIG_VALUE_0=$(cat "$T/auth/entete")
+   export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=http.extraHeader GIT_CONFIG_VALUE_0 GIT_CONFIG_KEY_1=http.sslCAInfo GIT_CONFIG_VALUE_1="$P/ca-poc.crt"
+   git -C "$T/depot" "$@")
+}
+
+journal_rattrapage() { # job : journal d'un passage du CronJob rattrapage (réussi exigé), dans $T/rattrapage.log
+  kubectl logs -n declencheurs "job/$1" > "$T/rattrapage.log" 2>&1 || true
+  sed "s/^/  /" "$T/rattrapage.log"
+  [ "$(kubectl get job -n declencheurs "$1" -o jsonpath='{.status.succeeded}')" = 1 ] || { echo "KO   passage $1 en échec" >&2; exit 1; }
+}
+
+origine() { # nom : chemin de création d'un PipelineRun de builds, lu dans ses labels
+  kubectl get pipelinerun -n builds "$1" -o json | jq -r '.metadata.labels // {} | if .["poc.test/declencheur"] then "rattrapage"
+    elif .["triggers.tekton.dev/eventlistener"] then "EventListener \(.["triggers.tekton.dev/eventlistener"])" else "inconnue" end'
+}
+
+creations() { # instant nom : créations du PipelineRun nom dans l'audit de l'API depuis l'instant (compte, code)
+  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" | jq -r --arg d "$1" --arg n "$2" 'select(.stageTimestamp >= $d
+    and .verb == "create" and .objectRef.resource == "pipelineruns" and .objectRef.namespace == "builds"
+    and .objectRef.name == $n) | "\(.user.username | sub("system:serviceaccount:"; "")) \(.responseStatus.code)"' \
+    | sort | uniq -c | sed 's/^ */    /'
+}
+
+livraisons() { # instant : échecs de livraison dans le journal de Forgejo (Info : un succès n'est tracé qu'en Trace)
+  sur sc-stockage "sudo journalctl -u forgejo --since '$1' -o cat" | grep 'Unable to deliver webhook task' | cut -c1-220 || true
+}
+
+provenance() { # nom : runSpec (externalParameters) de la provenance de Chains de ce PipelineRun de builds, retrouvée par son
+  # UID (invocationId) parmi les enveloppes de builds/essai-webhook ; commit remplacé par « COMMIT »
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null \
+    | jq -cS --arg u "$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')" '.payload | @base64d | fromjson | .predicate
+      | select(.runDetails.metadata.invocationId == $u) | .buildDefinition.externalParameters.runSpec
+      | .params |= map(if .name == "commit" then .value = "COMMIT" else . end)'
+}
+
+etape_rattrapage() {
+  local i d c1 c2 t tr tp tpush j n pr
+  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
+
+  echo "## réconciliateur (politique/rattrapage : Go, bibliothèque standard seule) : deux compilations indépendantes"
+  GOROOT=$GOROOT_DIR "$GOROOT_DIR/bin/go" version   # mise exporte le GOROOT de Go 1.24.7 (banc B)
+  for i in 1 2; do
+    rm -rf "$T/gocache-$i"
+    (cd "$here/politique/rattrapage" && GOROOT=$GOROOT_DIR GOTOOLCHAIN=local GOCACHE="$T/gocache-$i" CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOFLAGS= \
+      "$GOROOT_DIR/bin/go" build -trimpath -buildvcs=false -ldflags='-s -w -buildid=' -o "$T/rattrapage-$i" .)
+  done
+  (cd "$T" && sha256sum rattrapage-1 rattrapage-2)
+  [ "$(sha256sum < "$T/rattrapage-1" | cut -c1-64)" = "$RATTRAPAGE_BIN" ] && cmp -s "$T/rattrapage-1" "$T/rattrapage-2" \
+    && echo "OK   binaire reproductible, empreinte épinglée" || { echo "KO   binaire ≠ $RATTRAPAGE_BIN" >&2; exit 1; }
+  echo "## image : une couche (le binaire), base vide, linux/amd64, utilisateur 65532"
+  rm -rf "$T/racine" && mkdir -p "$T/racine" && chmod 0755 "$T/racine"
+  install -m 0755 "$T/rattrapage-1" "$T/racine/rattrapage"
+  tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$T/couche.tar" -C "$T/racine" rattrapage
+  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane append --oci-empty-base -f "$T/couche.tar" -t "$REG_HOTE/$RATTRAPAGE:v1" >/dev/null 2>&1
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --set-platform linux/amd64 --user 65532:65532 \
+    --entrypoint /rattrapage -t "$REG_HOTE/$RATTRAPAGE:v1" "$REG_HOTE/$RATTRAPAGE:v1" 2>/dev/null)
+  SSL_CERT_FILE=$P/ca-poc.crt crane config "$REG_HOTE/$RATTRAPAGE@${d##*@}" | jq -c '{os, architecture, user: .config.User, entrypoint: .config.Entrypoint, couches: (.rootfs.diff_ids | length)}'
+  echo "image : $REG_HOTE/$RATTRAPAGE@${d##*@}"
+  [ "${d##*@}" = "$RATTRAPAGE_DIGEST" ] && echo "OK   même digest que l'image épinglée (assemblage reproductible)" \
+    || { echo "KO   digest différent de l'image épinglée $RATTRAPAGE_DIGEST" >&2; exit 1; }
+
+  echo "## état de départ : main en $TETE_J2, PipelineRuns des commits d'essai retirés"
+  rm -rf "$T/depot" && mkdir -p "$T/depot"
+  git_forgejo clone -q --bare "$FORGEJO_HOTE/$SAMPLE_APP.git" .
+  c1=$(git_forgejo commit-tree "$TETE_J2^{tree}" -p "$TETE_J2" -m "J6 : essai du rattrapage (webhook perdu)")
+  c2=$(git_forgejo commit-tree "$TETE_J2^{tree}" -p "$c1" -m "J6 : essai de course (webhook et rattrapage)")
+  echo "commits d'essai (arbre de $TETE_J2, auteur et dates fixes) : c1 $c1, c2 $c2"
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null 2>&1 || true
+  kubectl scale deploy -n declencheurs el-forgejo --replicas=1 >/dev/null
+  [ "$(tete)" = "$TETE_J2" ] || { git_forgejo push -q --force "$FORGEJO_HOTE/$SAMPLE_APP.git" "$TETE_J2:refs/heads/main"; tete_servie "$TETE_J2"; }
+  kubectl delete pipelinerun -n builds "sample-app-$c1" "sample-app-$c2" --ignore-not-found --wait=true >/dev/null
+  if kubectl get pipelinerun -n builds "sample-app-$TETE_J2" >/dev/null 2>&1; then
+    kubectl get pipelinerun -n builds "sample-app-$TETE_J2" -o json | jq -r '"\(.metadata.name) : créé \(.metadata.creationTimestamp), signé=\(.metadata.annotations["chains.tekton.dev/signed"])"'
+    d=PRESENT
+  else
+    echo "sample-app-$TETE_J2 absent de l'API"; d=CREE
+  fi
+  echo "prédiction du premier passage : $d|builds/sample-app-$TETE_J2"
+
+  echo "## CronJob rattrapage (politique/rattrapage.yaml)"
+  kubectl create configmap rattrapage -n declencheurs --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f - >/dev/null
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  sed "s#@RATTRAPAGE@#$REG/$RATTRAPAGE@$RATTRAPAGE_DIGEST#" "$here/politique/rattrapage.yaml" | kubectl apply --server-side --force-conflicts -f - >/dev/null
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  j=$(passage "$t" declencheurs rattrapage)
+  journal_rattrapage "$j"
+  grep -q "^$d|builds/sample-app-$TETE_J2" "$T/rattrapage.log" && echo "OK   prédiction tenue" || { echo "KO   prédiction" >&2; exit 1; }
+  kubectl get pods -n declencheurs -l job-name="$j" -o json | jq -r '.items[0] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName), automountServiceAccountToken=\(.spec.automountServiceAccountToken), jeton projeté \([.spec.volumes[] | .projected.sources[]? | .serviceAccountToken.expirationSeconds | select(.)] | join(",")) s, sortie \(.status.containerStatuses[0].state.terminated.reason)"'
+
+  echo "## NetworkPolicy rattrapage : sorties d'un pod d'essai au même label (busybox de J4)"
+  sed -e "s#@BUSYBOX@#$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")#" \
+    -e "s#@EL@#$(kubectl get pods -n declencheurs -l eventlistener=forgejo -o jsonpath='{.items[0].status.podIP}')#" > "$T/reseau.yaml" <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: essai-reseau-rattrapage
+  namespace: declencheurs
+  labels:
+    app: rattrapage
+spec:
+  automountServiceAccountToken: false
+  enableServiceLinks: false
+  restartPolicy: Never
+  nodeSelector:
+    zone: confiance
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: essai
+    image: @BUSYBOX@
+    command:
+    - sh
+    - -c
+    - |
+      # Fenêtre de démarrage : Zot (interdit) tenté dès le lancement, toutes les 0,5 s, jusqu'à 3 échecs de suite (60 s au plus).
+      cs() { read u r < /proc/uptime; echo $(( ${u%.*} * 100 + 1${u#*.} - 100 )); }
+      t0=$(cs); o=0; f=0; d=-
+      while [ $f -lt 3 ] && [ $(( $(cs) - t0 )) -lt 6000 ]; do
+        if nc -z -w 1 192.168.161.13 5000 2>/dev/null; then o=$((o + 1)); f=0; d=$(( ($(cs) - t0) * 10 )); else f=$((f + 1)); fi
+        sleep 0.5
+      done
+      echo "FENETRE|Zot joignable $o fois, la dernière à $d ms du lancement du conteneur, puis $f refus de suite"
+      for c in Forgejo:192.168.161.13:3000 API-noeud:192.168.161.11:6443 API-service:10.43.0.1:443 Zot:192.168.161.13:5000 \
+               SSH-stockage:192.168.161.13:22 kubelet-build:192.168.161.12:10250 EventListener:@EL@:8080 \
+               TSA:timestamp-authority.tsa.svc.cluster.local:3000 OpenBao:openbao.openbao.svc.cluster.local:8200; do
+        l=${c%%:*}; r=${c#*:}; h=${r%:*}; p=${r##*:}
+        if nc -z -w 3 "$h" "$p" 2>/dev/null; then echo "OUVERT $l $h:$p"; else echo "FERME $l $h:$p"; fi
+      done
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: [ALL]
+EOF
+  kubectl delete pod -n declencheurs essai-reseau-rattrapage --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/reseau.yaml" >/dev/null
+  kubectl wait -n declencheurs --for=jsonpath='{.status.phase}'=Succeeded pod/essai-reseau-rattrapage --timeout=180s >/dev/null
+  kubectl logs -n declencheurs essai-reseau-rattrapage | tee "$T/reseau.txt" | sed 's/^/  /'
+  kubectl delete pod -n declencheurs essai-reseau-rattrapage --wait=false >/dev/null
+  [ "$(grep -c '^OUVERT' "$T/reseau.txt")" = 3 ] && grep -q '^OUVERT Forgejo ' "$T/reseau.txt" && grep -q '^OUVERT API-noeud ' "$T/reseau.txt" \
+    && grep -q '^OUVERT API-service ' "$T/reseau.txt" && echo "OK   sorties, une fois la règle posée : Forgejo et l'API seulement (plus le DNS)" \
+    || { echo "KO   sorties du pod de rattrapage" >&2; exit 1; }
+  grep -q '^FENETRE|.*puis 3 refus de suite$' "$T/reseau.txt" || { echo "KO   règle jamais appliquée en 60 s" >&2; exit 1; }
+  echo "CONSTAT  fenêtre de démarrage : une sortie interdite passe pendant la première seconde du conteneur, avant que kube-router ne pose la règle (sonde : resultats/politique-rattrapage-sonde-fenetre.log)"
+
+  echo "## webhook perdu : EventListener arrêté (0 réplique), push de c1"
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  for _ in $(seq 60); do [ "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" = "" ] && break; sleep 2; done
+  kubectl scale deploy -n declencheurs el-forgejo --replicas=0 >/dev/null
+  kubectl wait -n declencheurs --for=delete pod -l eventlistener=forgejo --timeout=120s >/dev/null 2>&1 || true
+  echo "EventListener : $(kubectl get deploy -n declencheurs el-forgejo -o jsonpath='{.spec.replicas}') réplique, $(kubectl get pods -n declencheurs -l eventlistener=forgejo --no-headers 2>/dev/null | wc -l) pod ; CronJob suspendu"
+  tp=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'"); tpush=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  git_forgejo push -q "$FORGEJO_HOTE/$SAMPLE_APP.git" "$c1:refs/heads/main"
+  tete_servie "$c1"
+  echo "push de c1 à $tpush ; tête de main dans Forgejo : $(tete)"
+  for _ in $(seq 30); do [ -n "$(livraisons "$tp")" ] && break; sleep 1; done
+  livraisons "$tp" | tee "$T/livraisons" | sed 's/^/  Forgejo : /'
+  [ "$(wc -l < "$T/livraisons")" = 1 ] && echo "OK   une tentative de livraison, en échec" || { echo "KO   $(wc -l < "$T/livraisons") échec(s) de livraison" >&2; exit 1; }
+
+  echo "## EventListener rétabli : aucune relivraison (attente de 150 s)"
+  kubectl scale deploy -n declencheurs el-forgejo --replicas=1 >/dev/null
+  el_joignable
+  sleep 150
+  livraisons "$tp" > "$T/livraisons-2"
+  n=$({ kubectl get pipelinerun -n builds "sample-app-$c1" -o name 2>/dev/null || true; } | wc -l)   # absent : pipefail
+  echo "après 150 s : $n PipelineRun pour c1 ; échecs de livraison dans le journal de Forgejo : $(wc -l < "$T/livraisons-2") ; créations dans l'audit de l'API :"
+  creations "$tpush" "sample-app-$c1" | tee "$T/creations"
+  [ "$n" = 0 ] && cmp -s "$T/livraisons" "$T/livraisons-2" && [ ! -s "$T/creations" ] \
+    && echo "OK   push perdu : Forgejo n'a ni relivré ni retenté, aucune création demandée à l'API" || { echo "KO   relivraison ou PipelineRun inattendu" >&2; exit 1; }
+
+  echo "## rattrapage : CronJob réactivé"
+  # Suspendu depuis le push : aucun passage avant la réactivation. Le contrôleur lance aussitôt le passage manqué
+  # (startingDeadlineSeconds), parfois dans la même seconde : l'instant de référence est pris une seconde plus tôt.
+  tr=$(date -u +%Y-%m-%dT%H:%M:%SZ); t=$(date -u -d "$tr -1 second" +%Y-%m-%dT%H:%M:%SZ)
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  j=$(passage "$t" declencheurs rattrapage)
+  journal_rattrapage "$j"
+  grep -q "^CREE|builds/sample-app-$c1|commit $c1|depot https://sc-stockage.poc.test:3000/$SAMPLE_APP.git$" "$T/rattrapage.log" \
+    && echo "OK   PipelineRun de c1 créé par le rattrapage" || { echo "KO   rattrapage de c1" >&2; exit 1; }
+  pr=sample-app-$c1
+  verdict "exécution rattrapée" True "$(issue pipelinerun "$pr")"
+  echo "$pr : origine $(origine "$pr") ; labels $(kubectl get pipelinerun -n builds "$pr" -o json | jq -c '.metadata.labels | with_entries(select(.key | startswith("tekton.dev") | not))') ; Chains : signé=$(signe pipelinerun "$pr")"
+  echo "créations de $pr dans l'audit de l'API depuis le push :"; creations "$tpush" "$pr"
+  echo "délais : push de c1 $(date -u -d "$tpush" +%T), CronJob réactivé $(date -u -d "$tr" +%T), PipelineRun créé $(kubectl get pipelinerun -n builds "$pr" -o jsonpath='{.metadata.creationTimestamp}' | cut -c12-19)"
+
+  echo "## passage suivant : rien à rattraper"
+  j=$(passage "$(kubectl get job -n declencheurs "$j" -o jsonpath='{.metadata.creationTimestamp}')" declencheurs rattrapage)
+  journal_rattrapage "$j"
+  grep -qx "PRESENT|builds/$pr" "$T/rattrapage.log" && echo "OK   PRESENT : aucun PipelineRun créé" || { echo "KO   passage sans nouveauté" >&2; exit 1; }
+
+  echo "## horodatage de l'exécution rattrapée (CronJob horodatage)"
+  # Un passage de la minute écoulée a pu les horodater déjà : on attend un passage postérieur à la signature, puis on
+  # vérifie l'invariant de l'étape horodatage (un bundle par enveloppe de Chains).
+  j=$(passage "$(date -u +%Y-%m-%dT%H:%M:%SZ)")
+  analyser "$j"
+  i=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); n=$(bundles "$APP_DIGEST")
+  [ "$i" = "$n" ] && echo "OK   un bundle par enveloppe de Chains ($n pour $APP_DIGEST) : l'exécution rattrapée est horodatée" \
+    || { echo "KO   $n bundle(s) pour $i enveloppe(s)" >&2; exit 1; }
+
+  echo "## course : EventListener et rattrapage actifs, push de c2"
+  tp=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'"); tpush=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  git_forgejo push -q "$FORGEJO_HOTE/$SAMPLE_APP.git" "$c2:refs/heads/main"
+  tete_servie "$c2"
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)   # tout passage créé ensuite lit c2
+  pr=sample-app-$c2
+  for _ in $(seq 90); do kubectl get pipelinerun -n builds "$pr" >/dev/null 2>&1 && break; sleep 1; done
+  j=$(passage "$t" declencheurs rattrapage)
+  journal_rattrapage "$j"
+  echo "créations de $pr dans l'audit de l'API depuis le push :"; creations "$tpush" "$pr"
+  echo "$pr : origine $(origine "$pr") ; échecs de livraison : $(livraisons "$tp" | wc -l)"
+  verdict "exécution de c2" True "$(issue pipelinerun "$pr")"
+  [ "$(kubectl get pipelineruns -n builds -o name | grep -c "/$pr$")" = 1 ] && echo "OK   un seul PipelineRun pour c2" || { echo "KO   doublon" >&2; exit 1; }
+  echo "Chains : $pr signé=$(signe pipelinerun "$pr")"
+
+  echo "## même PipelineRun par les deux chemins : c1 (rattrapage) et c2 (EventListener, créé par Triggers), au commit près"
+  [ "$(origine "sample-app-$c1")" = rattrapage ] && [ "$(origine "$pr")" = "EventListener forgejo" ] \
+    || { echo "KO   origines : c1 $(origine "sample-app-$c1"), c2 $(origine "$pr") (course gagnée par le rattrapage : relancer l'étape)" >&2; exit 1; }
+  for n in "$c1" "$c2"; do
+    kubectl get pipelinerun -n builds "sample-app-$n" -o json | jq -S '.spec | .params |= map(if .name == "commit" then .value = "COMMIT" else . end)' > "$T/spec-$n.json"
+    provenance "sample-app-$n" > "$T/prov-$n"
+  done
+  diff "$T/spec-$c2.json" "$T/spec-$c1.json" && echo "OK   spec identique (depot, pipeline signée, gabarit de pod, compte), commit excepté" \
+    || { echo "KO   spec différente" >&2; exit 1; }
+  [ "$(wc -l < "$T/prov-$c1")" = 1 ] && cmp -s "$T/prov-$c2" "$T/prov-$c1" \
+    && echo "OK   provenances de Chains (retrouvées par l'UID de chaque PipelineRun) : même runSpec, commit excepté" \
+    || { diff "$T/prov-$c2" "$T/prov-$c1" >&2 || true; echo "KO   provenances" >&2; exit 1; }
+
+  echo "## main remise à $TETE_J2 (force-push) : livraison acceptée, rejeu sans effet"
+  tpush=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  git_forgejo push -q --force "$FORGEJO_HOTE/$SAMPLE_APP.git" "$TETE_J2:refs/heads/main"
+  tete_servie "$TETE_J2"
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  echo "tête de main : $(tete)"
+  j=$(passage "$t" declencheurs rattrapage)
+  journal_rattrapage "$j"
+  grep -qx "PRESENT|builds/sample-app-$TETE_J2" "$T/rattrapage.log" || { echo "KO   tête $TETE_J2" >&2; exit 1; }
+  echo "créations de sample-app-$TETE_J2 dans l'audit de l'API depuis la remise à zéro :"; creations "$tpush" "sample-app-$TETE_J2"
+  kubectl get pipelinerun -n builds "sample-app-$TETE_J2" -o jsonpath='{.metadata.creationTimestamp}{"\n"}' | sed 's/^/sample-app-'"$TETE_J2"' : créé /'
+  rm -f "$T/auth/entete"; rm -rf "$T/depot"
+}
+
 etape_droits() {
   local debut sujet as verbe ressource ns attendu obtenu nom n k=0
   kubectl apply --server-side -f "$here/politique/droits.yaml" >/dev/null
@@ -694,6 +968,8 @@ etape_droits() {
       el-forgejo) as=(--as=system:serviceaccount:declencheurs:el-forgejo) ;;
       operateur) as=(--as=operateur --as-group=operateurs) ;;
       horodatage) as=(--as=system:serviceaccount:horodatage:horodatage) ;;
+      rattrapage) as=(--as=system:serviceaccount:declencheurs:rattrapage) ;;
+      *) echo "KO   sujet inconnu : $sujet" >&2; exit 1 ;;
     esac
     if [ "$ns" = '*' ]; then obtenu=$(kubectl auth can-i "$verbe" "$ressource" -A "${as[@]}" 2>/dev/null || true)
     else obtenu=$(kubectl auth can-i "$verbe" "$ressource" -n "$ns" "${as[@]}" 2>/dev/null || true); fi
@@ -713,6 +989,15 @@ etape_droits() {
       | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-el"
   ! grep -qE ' 403$' "$T/audit-el" && echo "OK   aucun refus (403) pour el-forgejo depuis $debut" || { echo "KO   refus RBAC pour el-forgejo" >&2; exit 1; }
+  echo "## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage"
+  debut=$(awk -F'\t' '$1 == "J6 rattrapage" {d = $2} END {print d}' "$R/chrono.tsv")
+  [ -n "$debut" ] || { echo "KO   étape rattrapage absente de chrono.tsv" >&2; exit 1; }
+  sur sc-confiance "sudo cat /var/lib/rancher/k3s/server/logs/audit.log" \
+    | jq -r --arg d "$debut" 'select(.stageTimestamp >= $d and .user.username == "system:serviceaccount:declencheurs:rattrapage")
+      | "\(.verb) \(.objectRef.resource)\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) \(.objectRef.namespace // "-") \(.responseStatus.code)"' \
+    | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-rattrapage"
+  [ -s "$T/audit-rattrapage" ] && ! grep -qE ' 403$' "$T/audit-rattrapage" && echo "OK   aucun refus (403) pour rattrapage depuis $debut" \
+    || { echo "KO   refus RBAC ou aucune écriture pour rattrapage" >&2; exit 1; }
   echo "## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement"
   nom=$(kubectl get pods -n declencheurs -l eventlistener=forgejo -o jsonpath='{.items[0].metadata.name}')
   n=$(kubectl logs -n declencheurs "$nom" | grep -ci 'forbidden' || true)
