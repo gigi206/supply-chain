@@ -626,7 +626,7 @@ Options :
    - **Principe** : une tâche runc restreinte tire dans le workspace les sources, la fermeture, `web/dist` et l'image de build (en layout OCI). La tâche `construire` n'a alors plus aucune sortie, et une NetworkPolicy deny-all peut viser ses seuls pods. Le label à sélectionner était à vérifier : c'est `tekton.dev/task`, fixé par le contrôleur au nom de la tâche signée (mesuré).
    - **Ce que dit la documentation** : BuildKit v0.34.1 accepte une image de build fournie en layout OCI local (`--oci-layout builder=<répertoire>` et `--opt context:builder=oci-layout://builder@sha256:…`, lu dans `docs/reference/buildctl.md` au tag).
    - **Mesuré** : le digest reste `3a7ca1b1`, comme prédit (l'image finale part de `scratch` et ne contient que le binaire).
-   - **Fenêtre de démarrage** : elle ne concerne que les premiers conteneurs du pod, ceux de l'initialisation de Tekton. Relevé : l'étape `construire` démarre 2 s après le premier conteneur.
+   - **Fenêtre de démarrage** : relevé, l'étape `construire` démarre 2 s après le premier conteneur du pod (horodatages à la seconde, donc entre 1 et 3 s, face à une fenêtre qui se ferme vers 1,1 s : non tranché).
    - **Coûts** : aucun changement système, seulement les tâches resignées, la liste revue et la pipeline. La trace du test 6 reste NFLOG (deux lignes par refus, plafond partagé par politique).
    - **Limite** : seule, elle ne suffit pas en voie A, car une politique deny-all reste contournable par usurpation depuis le root de l'invité.
 
@@ -651,7 +651,7 @@ Options :
   - Trusted Resources vérifie la pipeline et les trois tâches ; Chains les signe.
   - QEMU tourne en `-smp 3 -m 6176M`.
   - L'image est **`3a7ca1b1`**, l'arbre `30e808ff`, et le push est fait par `poc-images`.
-  - L'étape `construire` démarre 2 s après le premier conteneur du pod (horodatages à la seconde ; fenêtre mesurée : 0,5 à 1,1 s).
+  - L'étape `construire` démarre 2 s après le premier conteneur du pod. Les horodatages étant à la seconde, l'écart réel est compris entre 1 et 3 s, alors que la fenêtre mesurée se ferme vers 1,1 s : la mesure ne permet pas de conclure que l'étape démarre après la fenêtre (prédiction non tranchée). Les premiers conteneurs du pod exécutent le code de Tekton.
 - **Témoins** :
   - **Ancienne pipeline** : `construire-image` `c7e8b275` est relue dans l'historique git au commit `b77ff6b`, et son bundle est identique. Elle échoue fermée à l'étape `sources` (« Could not resolve host ») ; `publier` n'est jamais lancée et `poc-images` n'écrit rien.
   - **Sans Kata** : `preparer` réussit, le pod de construction est refusé par Pod Security, et rien n'est poussé.
@@ -663,6 +663,10 @@ Options :
   - **Confiance dans le workspace** (PVC local-path, en 0777 sur `sc-build`, constat de J3) : il est écrit par la tâche signée du même PipelineRun. La construction contrôle le layout de l'image de build, pas les sources ni la fermeture, que git et oras ont vérifiées à l'entrée.
   - **Sorties des autres tâches** : `preparer-entrees` et `publier-image` gardent leurs sorties, car aucune politique ne les sélectionne.
   - **Nom dans le journal** : BuildKit y désigne l'image de build comme `docker.io/library/builder@sha256:…`. C'est le nom local du contexte, sans effet sur l'image.
+  - **Enveloppes accumulées et liste revue** :
+    - `builds/sample-app@3a7ca1b1` porte 8 enveloppes, dont les 4 premières citent `construire-image` `c7e8b275`, retirée de la liste revue. La construction étant reproductible, chaque version de tâche ajoute ses enveloppes au même digest, et Zot interdit leur suppression.
+    - **Lu dans Conforma v1.0.28** (`policy/release/lib/attestations.rego` au commit `ebd3fbd2` de la porte) : les règles, `trusted_task` comprise, n'évaluent que la dernière attestation de PipelineRun en SLSA v1, choisie par sa date de fin. Il faut en outre que toutes ces attestations portent une date. Les anciennes enveloppes ne devraient donc pas faire refuser `3a7ca1b1` tant que la plus récente vient de la version en service.
+    - Non mesuré : la porte n'a pas été rejouée sur `builds/sample-app` (J8).
 
 **Rejeu** : J7 est branché dans `rejeu.sh` (vérification, installation, essais, exemption, puis cas d'admission rejoués ; BuildKit : image, essais et mesure après l'exemption ; voies D et A ; construction ; réseau) mais pas encore rejoué au 30/10/2026. `sonde_kyverno` et `passage_ok` sont passées de `redemarrer.sh` à `commun.sh` pour servir à `kata.sh exemption`, qui les a exercées ; `redemarrer.sh` a été rejoué ensuite (30/10/2026, [`redemarrage-vm.log`](resultats/redemarrage-vm.log)) : arrêt 6 s, démarrage 9 s, nœuds prêts en 17 s, tous les contrôles de J1 à J7 repassent, et l'exemption est relue par kube-apiserver après le redémarrage des VM.
 
