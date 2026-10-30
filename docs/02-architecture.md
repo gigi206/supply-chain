@@ -233,7 +233,7 @@ EL8 n'est pas mis automatiquement à 0.
 |---|---|---|
 | 0000 | Adopter Konflux ou OBS, ou assembler ? Challengers Nix (build) et Kyverno seul (politique) | Fin de 2a |
 | 0001 | Runtime et isolation (k3s, Kata, gVisor, userns) ; infra du PoC ; administrateur du replay | Provisoire en phase 1, définitif en phase 3 |
-| 0002 | Snapshots de distros : Pulp ou aptly ; fermetures | Fin de 2c |
+| 0002 | Snapshots de distros : Pulp ou aptly ; fermetures ; si Pulp, plugins manquants à écrire, comme `pulp_go` (exigence du propriétaire, 30/10/2026) | Fin de 2c |
 | 0003 | Clés, OpenPGP, TSA, TUF | Phase 3 |
 | 0004 | Vulnérabilités et VEX (OpenVEX ou CSAF) | Phase 3 |
 | 0005 | Licences (politique, curations) | Phase 3 |
