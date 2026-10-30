@@ -1501,9 +1501,14 @@ etape_droits() {
     | sort | uniq -c | sed 's/^ */  /' | tee "$T/audit-rattrapage"
   [ -s "$T/audit-rattrapage" ] && ! grep -qE ' 403$' "$T/audit-rattrapage" && echo "OK   aucun refus (403) pour rattrapage depuis $debut" \
     || { echo "KO   refus RBAC ou aucune écriture pour rattrapage" >&2; exit 1; }
-  echo "## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement"
+  # L'étape rattrapage recrée le pod (EventListener à 0 réplique, puis 1) : le journal du test 5 n'existe plus. Un pod neuf
+  # démarre ses informateurs avec les mêmes droits ; conteneur précédent compris (redémarrage des VM).
+  echo "## journal de l'EventListener : refus de lecture (informateurs), conteneurs précédent et en cours du pod actuel"
   nom=$(kubectl get pods -n declencheurs -l eventlistener=forgejo -o jsonpath='{.items[0].metadata.name}')
-  n=$(kubectl logs -n declencheurs "$nom" | grep -ci 'forbidden' || true)
+  { kubectl logs -n declencheurs "$nom" --previous 2>/dev/null || true; kubectl logs -n declencheurs "$nom"; } > "$T/el.log"
+  echo "pod $nom créé à $(kubectl get pod -n declencheurs "$nom" -o jsonpath='{.metadata.creationTimestamp}') ; journal lu : $(wc -l < "$T/el.log") lignes," \
+    "de $(jq -Rr 'fromjson? | .timestamp // empty' "$T/el.log" | sort | sed -n 1p) à $(jq -Rr 'fromjson? | .timestamp // empty' "$T/el.log" | sort | tail -1)"
+  n=$(grep -ci 'forbidden' "$T/el.log" || true)
   [ "$n" = 0 ] && echo "OK   aucun « forbidden » dans le journal de $nom" || { echo "KO   $n « forbidden » dans le journal de $nom" >&2; exit 1; }
 }
 

@@ -1,6 +1,8 @@
 # Constat de J6 (30/10/2026) : la suppression au premier plan d'un PipelineRun signé par Chains v0.29.9 ne bloque pas sur ses dépendants
 # Contexte : second rejeu de J1 à J6 (rejeu-j1-j6-ecart-2.log), test 5 sous politique arrêté à la lecture de la provenance de A :
 # sample-app-6391fd43… recréé par l'EventListener à 11:46:06.819, startTime de l'ancien (11:32:28), aucun TaskRun enfant (repris).
+# Recopié de la sortie des commandes (cluster détruit depuis par le rejeu suivant) : les lignes d'audit de 11:46, mises en forme, et la sortie
+# du témoin ConfigMap ; le reste (expérience sur le PipelineRun, audit de l'expérience) est la sortie brute, passée par tee.
 ## audit de l'API pendant la purge du test 5 (écritures sur sample-app-6391fd43…, hors événements)
 11:46:06.163 delete pipelineruns  system:admin (kubectl delete --cascade=foreground --all --wait=true)
 11:46:06.186 patch  pipelineruns  tekton-chains-controller ?fieldManager=tekton-chains-controller/finalizers&force=false (application côté serveur)

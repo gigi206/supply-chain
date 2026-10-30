@@ -1,4 +1,4 @@
-# politique.sh droits, 2026-10-30T12:27:28Z
+# politique.sh droits, 2026-10-30T12:32:45Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
 89 vérifications, 89 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
@@ -57,5 +57,6 @@ OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T12:13:08Z
 ## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
   1 create pipelineruns builds 201
 OK   aucun refus (403) pour rattrapage depuis 2026-10-30T12:15:33Z
-## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement
+## journal de l'EventListener : refus de lecture (informateurs), conteneurs précédent et en cours du pod actuel
+pod el-forgejo-79b6fd78c6-pbzbs créé à 2026-10-30T12:16:55Z ; journal lu : 8 lignes, de 2026-10-30T12:21:14.294Z à 2026-10-30T12:22:11.467Z
 OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-pbzbs
