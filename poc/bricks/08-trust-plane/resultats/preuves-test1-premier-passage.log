@@ -1,0 +1,36 @@
+# preuves.sh test1, 2026-10-30T22:48:58Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière
+- véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais
+  inscrit dans la liste revue de la porte), exécutée par un TaskRun de builds (compte build, gabarit de la zone build) ;
+  elle vaut une étape de build dont le code est hostile. TaskRun terminé avec succès : l'étape journalise et sort en 0
+- 1. aucun jeton de compte de service dans le pod (compte build sans montage d'office ; zone-build interdit le jeton
+  projeté) : rien à présenter à l'authentification JWT d'OpenBao ; aucune variable d'environnement de secret
+- 2. réseau : la NetworkPolicy d'OpenBao n'admet en entrée que tekton-chains et le TSA ; Cilium jette les SYN à l'entrée,
+  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod (10.42.0.12) :
+  délai du client dépassé (5 s), pas de refus ; rien chez l'agent de sc-build, aucune politique de sortie ne sélectionnant
+  ce pod
+- 3. OpenBao ne reçoit rien : aucune ligne de son audit avec l'adresse du pod. Témoin dans la même lecture : les requêtes de
+  Chains (connexion JWT et signature), qui signe ce même TaskRun
+- témoins : depuis la même étape, Zot et Forgejo joignables (le réseau du pod fonctionne) ; OpenBao descellé pendant l'essai
+- non exercées ici, mesurées en J3 (openbao-essais.log) : rôle JWT lié au seul compte de Chains (autre compte et autre
+  audience refusés), clé Transit non exportable (export et sauvegarde refusés, même au jeton root)
+- résidu : le bundle signé tekton/tasks/preuve-test1 reste dans Zot (poc-ecriture ne supprime pas) ; la porte le refuserait,
+  hors de la liste revue
+OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.12)
+## véhicule : tâche signée (tkn 0.46.2), bundle, TaskRun
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test1 : sha256:61902c99d20672fbe1b34193d1b589fc214da07369ae532b43d71545a10825d3
+OK   TaskRun preuve-test1 terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape (pod preuve-test1-pod, nœud sc-build)
+  IP|10.42.1.128
+  JETON|absent
+  SECRETS_MONTES|
+  VARIABLES|OPENBAO_IP 
+  DNS|10.43.9.27
+  OPENBAO_SERVICE|FERME|5 s
+  OPENBAO_POD|FERME|5 s
+  TEMOIN_ZOT|OUVERT|0 s
+  TEMOIN_FORGEJO|OUVERT|0 s
+OK   1. aucun jeton de compte de service dans le pod
+KO   variables : OPENBAO_IP 

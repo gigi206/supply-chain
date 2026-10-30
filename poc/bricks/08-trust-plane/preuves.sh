@@ -13,6 +13,14 @@
 #          privilégié (Pod Security restricted), pods Kata privilégiés avec hostPath ou en hostNetwork (exemptés de Pod Security
 #          par la RuntimeClass kata, J7 : Kyverno pods-isolation seul) ; témoins : pod Kata privilégié et pod runc restreint,
 #          admis (dry-run serveur) ; trace : refus de l'API, événements de Kyverno, audit de l'API et annotations de Pod Security
+#   test3  TaskRun publier terminé et signé, créé par une livraison valide (commit propre au passage) : écritures réelles (PUT)
+#          du statut falsifié et de l'objet sans l'annotation de Chains, au nom de build, el-forgejo, des opérateurs et du
+#          rattrapage ; témoin : écriture du statut par l'administrateur, puis Chains ne re-signe pas (annotation, audit
+#          d'OpenBao, enveloppes, sujet de la provenance) ; trace : refus de l'API, audit de l'API ; PipelineRun purgé à la fin
+#   test1  tâche signée par la clé des tâches, propre au test (bundle tekton/tasks/preuve-test1, hors de la liste revue), exécutée
+#          dans builds : jeton monté, variables, OpenBao par le service et par l'IP du pod ; témoins : Zot et Forgejo depuis la
+#          même étape, OpenBao descellé, signatures de Chains dans l'audit d'OpenBao ; trace : Hubble des deux agents, audit
+#          d'OpenBao filtré sur l'adresse du pod
 #   test5  livraisons vers l'EventListener de declencheurs : non signée, signée avec un autre secret, corps modifié sous une
 #          signature valide ; rejeu à l'identique d'une livraison valide, nouvelle livraison de Forgejo pour la tête de main ;
 #          témoin : livraison valide d'un commit propre au passage. Sans la purge de tekton.sh essais_webhook : les exécutions
@@ -46,19 +54,29 @@ garder() { # avant|apres : l'image réelle n'est pas touchée par l'étape
   [ "$a" = "$APP0" ] && echo "OK   $APP inchangée : $a" || { echo "KO   $APP modifiée : $a (avant : $APP0)" >&2; exit 1; }
 }
 
-tentative() { # libellé compte(admin|el|ctl) fichier : création réelle, refus attendu ; motif du refus dans $T/motif
-  local as=()
-  case $2 in el) as=(--as "$EL") ;; ctl) as=(--as "$CONTROLEUR") ;; esac
-  if kubectl create "${as[@]}" -f "$3" > "$T/creation.out" 2>&1; then
+comme() { # compte : identité empruntée par kubectl, dans le tableau AS (admin : l'administrateur du cluster, sans emprunt)
+  case $1 in
+    admin) AS=() ;;
+    el) AS=(--as "$EL") ;;
+    ctl) AS=(--as "$CONTROLEUR") ;;
+    build) AS=(--as system:serviceaccount:builds:build) ;;              # compte des TaskRuns
+    operateur) AS=(--as operateur --as-group operateurs) ;;             # opérateurs des builds (J6, politique/droits.yaml)
+    rattrapage) AS=(--as system:serviceaccount:declencheurs:rattrapage) ;;
+    *) echo "KO   compte inconnu : $1" >&2; exit 1 ;;
+  esac
+}
+
+tentative() { # libellé compte (voir comme) fichier : création réelle, refus attendu ; motif du refus dans $T/motif
+  comme "$2"
+  if kubectl create "${AS[@]}" -f "$3" > "$T/creation.out" 2>&1; then
     echo "KO   $1 : créé ($(tr '\n' ' ' < "$T/creation.out"))" >&2; kubectl delete -f "$3" --wait=false >/dev/null 2>&1 || true; exit 1
   fi
   tr '\n' ' ' < "$T/creation.out" | sed 's/^Error from server\( ([A-Za-z]*)\)\{0,1\}: //; s/^error when creating "[^"]*": //' | cut -c1-260 > "$T/motif"
 }
 
-temoin() { # libellé compte(admin|el|ctl) fichier : même compte, admis en dry-run serveur
-  local as=()
-  case $2 in el) as=(--as "$EL") ;; ctl) as=(--as "$CONTROLEUR") ;; esac
-  kubectl create "${as[@]}" --dry-run=server -f "$3" > "$T/creation.out" 2>&1 \
+temoin() { # libellé compte (voir comme) fichier : même compte, admis en dry-run serveur
+  comme "$2"
+  kubectl create "${AS[@]}" --dry-run=server -f "$3" > "$T/creation.out" 2>&1 \
     && echo "OK   témoin $1 : admis ($(tr '\n' ' ' < "$T/creation.out"))" \
     || { echo "KO   témoin $1 : refusé ($(tr '\n' ' ' < "$T/creation.out" | cut -c1-260))" >&2; exit 1; }
 }
@@ -299,6 +317,229 @@ etape_test5() {
   c=$(kubectl logs -n "$EL_NS" deploy/el-forgejo --since-time="$t0" | grep -c 'interceptor stopped trigger processing' || true)
   [ "$c" = 0 ] && echo "OK   EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, non journalisé en service)" \
     || echo "CONSTAT EventListener : $c ligne(s) « interceptor stopped trigger processing » (prédiction : aucune)"
+  garder apres
+}
+
+nb_enveloppes() { cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$1" 2>/dev/null | grep -c . || true; }   # dépôt@digest
+
+bao_chains() { # depuis : signatures par la clé Transit chains (réponses de l'audit d'OpenBao) depuis une date RFC 3339, une ligne JSON chacune
+  kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log | jq -c --arg d "$1" 'select(.type == "response" and .time[0:19] >= ($d[0:19])
+    and (.request.path | startswith("transit/sign/chains"))) | {t: .time[0:19], chemin: .request.path, compte: .auth.display_name}'
+}
+
+etape_test3() {
+  local t0 t1 neuf tr uid i v n0 n1 compte faux=sha256:0000000000000000000000000000000000000000000000000000000000000000
+  local essai=builds/essai-webhook@$APP_DIGEST
+  garder avant
+  EL_NS=declencheurs
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  neuf=$(printf 'preuves.sh test3 %s' "$t0" | sha1sum | cut -c1-40)   # commit propre au passage
+  tr=sample-app-$neuf-publier
+  rm -rf "$T/webhook" "$T/auth" && (umask 077 && mkdir -p "$T/webhook" "$T/auth")
+  echo "## prédiction (écrite le 30/10/2026, avant le premier passage)"
+  echo "- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit $neuf, propre au passage),"
+  echo "  terminé et signé par Chains : 3 signatures par la clé Transit chains dans l'audit d'OpenBao (signature de l'image et"
+  echo "  provenance du TaskRun, provenance du PipelineRun), comme au test 5"
+  echo "- tentatives réelles, au nom du compte des TaskRuns (build), d'el-forgejo, des opérateurs et du rattrapage : écriture"
+  echo "  du résultat IMAGE_DIGEST falsifié (PUT de la sous-ressource status), puis de l'objet sans l'annotation"
+  echo "  chains.tekton.dev/signed (PUT de la ressource principale) : refusées par RBAC (403, verbe update), chaque requête dans"
+  echo "  l'audit de l'API avec le nom de l'objet (présent dans l'URL). Corrigée après le premier passage (archivé) : kubectl patch"
+  echo "  lisait d'abord l'objet, refus sur la lecture, que la politique d'audit ne journalise pas"
+  echo "- témoin : la même écriture du statut par l'administrateur est acceptée ; le statut falsifié n'est pas réécrit par le"
+  echo "  contrôleur de Pipelines (un TaskRun terminé n'est plus recalculé)"
+  echo "- Chains ne re-signe pas : dans les 45 s qui suivent, annotation toujours true, aucune signature par la clé chains dans"
+  echo "  l'audit d'OpenBao, même nombre d'enveloppes sur $essai, et la provenance de ce TaskRun (invocationId"
+  echo "  = UID du TaskRun) garde son sujet d'origine, tiré du résultat IMAGE_DIGEST à la signature. Lu dans le code de Chains"
+  echo "  v0.29.9 (annotations.go, Reconciled ; reconciler/taskrun/taskrun.go) : un TaskRun terminé dont l'annotation vaut true ou"
+  echo "  failed est sauté"
+  echo "- limite lue dans ce même code, non mesurée (elle laisserait dans Zot une attestation falsifiée validement signée, que"
+  echo "  poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande"
+  echo "  un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)"
+  echo "- fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds"
+  echo "## mise en place : livraison valide (commit $neuf)"
+  corps_push "$neuf" e.json
+  envoyer "valide" "$T/webhook/e.json" "$(hmac_corps "$T/webhook/e.json")"
+  pr_attendre "$neuf"
+  signe_attendre "$neuf"
+  non_repris "$neuf"
+  [ "$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')" = true ] \
+    && echo "OK   $tr terminé ($(kubectl get taskrun -n builds "$tr" -o jsonpath='{.status.conditions[0].reason}')) et signé par Chains" \
+    || { echo "KO   $tr non signé" >&2; exit 1; }
+  uid=$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.uid}')
+  kubectl get taskrun -n builds "$tr" -o json | jq -c '.status.results' > "$T/t3-resultats.json"
+  i=$(jq '[.[].name] | index("IMAGE_DIGEST")' "$T/t3-resultats.json")
+  n0=$(nb_enveloppes "$essai")
+  echo "état avant : UID $uid, résultats $(cat "$T/t3-resultats.json"), $n0 enveloppes sur $essai"
+  # Écritures réelles par l'API brute (PUT, verbe update) : kubectl patch lit d'abord l'objet, et un compte sans droit de lecture
+  # est alors refusé sur la lecture (non journalisée par la politique d'audit), pas sur l'écriture (premier passage, archivé).
+  kubectl get taskrun -n builds "$tr" -o json > "$T/t3-objet.json"
+  jq --arg f "$faux" '(.status.results[] | select(.name == "IMAGE_DIGEST") | .value) = $f' "$T/t3-objet.json" > "$T/t3-statut.json"
+  jq 'del(.metadata.annotations["chains.tekton.dev/signed"])' "$T/t3-objet.json" > "$T/t3-sans-annotation.json"
+  echo "## tentatives (écritures réelles : PUT du statut falsifié, PUT de l'objet sans l'annotation de Chains)"
+  for compte in build el operateur rattrapage; do
+    comme "$compte"
+    if kubectl replace --raw "/apis/tekton.dev/v1/namespaces/builds/taskruns/$tr/status" -f "$T/t3-statut.json" "${AS[@]}" > "$T/patch.out" 2>&1; then
+      echo "KO   $compte : statut modifié" >&2; exit 1
+    fi
+    grep -E 'cannot update resource \\?"taskruns/status\\?"' "$T/patch.out" >/dev/null \
+      && echo "OK   $compte : écriture du statut refusée par RBAC ($(tr '\n' ' ' < "$T/patch.out" | cut -c1-230))" \
+      || { echo "KO   $compte : $(tr '\n' ' ' < "$T/patch.out")" >&2; exit 1; }
+    if kubectl replace --raw "/apis/tekton.dev/v1/namespaces/builds/taskruns/$tr" -f "$T/t3-sans-annotation.json" "${AS[@]}" > "$T/patch.out" 2>&1; then
+      echo "KO   $compte : annotation de Chains retirée" >&2; exit 1
+    fi
+    grep -E 'cannot update resource \\?"taskruns\\?"' "$T/patch.out" >/dev/null \
+      && echo "OK   $compte : retrait de l'annotation de Chains refusé par RBAC" || { echo "KO   $compte : $(tr '\n' ' ' < "$T/patch.out")" >&2; exit 1; }
+  done
+  echo "## témoin : même écriture du statut par l'administrateur"
+  t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl replace --raw "/apis/tekton.dev/v1/namespaces/builds/taskruns/$tr/status" -f "$T/t3-statut.json" > "$T/patch.out" 2>&1 \
+    && echo "OK   administrateur : statut écrit (IMAGE_DIGEST renvoyé par l'API : $(jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value' "$T/patch.out"))" \
+    || { echo "KO   administrateur : $(cat "$T/patch.out")" >&2; exit 1; }
+  echo "## Chains ne re-signe pas (45 s d'attente après l'écriture, $t1)"
+  sleep 45
+  v=$(kubectl get taskrun -n builds "$tr" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
+  [ "$v" = "$faux" ] && echo "OK   statut falsifié conservé (IMAGE_DIGEST = $v) : le contrôleur de Pipelines ne le réécrit pas" \
+    || echo "CONSTAT IMAGE_DIGEST réécrit en $v (prédiction : statut falsifié conservé)"
+  v=$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')
+  [ "$v" = true ] && echo "OK   annotation chains.tekton.dev/signed toujours $v" || { echo "KO   annotation : $v" >&2; exit 1; }
+  bao_chains "$t0" > "$T/t3-bao.txt"
+  echo "signatures par la clé chains depuis $t0 (audit d'OpenBao) :"; sed 's/^/  /' "$T/t3-bao.txt"
+  v=$(jq -c --arg t "$t1" 'select(.t < ($t[0:19]))' "$T/t3-bao.txt" | grep -c . || true)
+  [ "$v" = 3 ] && echo "OK   témoin : 3 signatures de Chains avant l'écriture, pour cette exécution" || { echo "KO   $v signature(s) de Chains avant l'écriture (3 attendues)" >&2; exit 1; }
+  v=$(jq -c --arg t "$t1" 'select(.t >= ($t[0:19]))' "$T/t3-bao.txt" | grep -c . || true)
+  [ "$v" = 0 ] && echo "OK   aucune signature de Chains depuis l'écriture" || { echo "KO   $v signature(s) de Chains depuis l'écriture" >&2; exit 1; }
+  n1=$(nb_enveloppes "$essai")
+  [ "$n1" = "$n0" ] && echo "OK   $n1 enveloppes sur $essai, comme avant l'écriture" || { echo "KO   $n1 enveloppes (avant : $n0)" >&2; exit 1; }
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$essai" 2>/dev/null | jq -c --arg u "$uid" '.payload | @base64d | fromjson
+    | select(.predicate.runDetails.metadata.invocationId == $u) | [.subject[] | "\(.name)@sha256:\(.digest.sha256)"]' > "$T/t3-sujets.txt"
+  [ "$(cat "$T/t3-sujets.txt")" = "[\"$REG/$essai\"]" ] && echo "OK   une provenance pour ce TaskRun, sujet d'origine : $(cat "$T/t3-sujets.txt")" \
+    || { echo "KO   provenance de ce TaskRun : $(cat "$T/t3-sujets.txt")" >&2; exit 1; }
+  echo "## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur $tr)"
+  audit_api "$tr" | jq -s -r --arg t "$t0" '[.[] | select(.stageTimestamp[0:19] >= ($t[0:19]) and .stage == "ResponseComplete" and .verb == "update"
+      and .user.username == "system:admin")] | unique_by(.auditID) | sort_by(.stageTimestamp) | .[]
+    | "  \(.stageTimestamp[11:19]) \(.user.username)\(if .impersonatedUser then " (pour " + .impersonatedUser.username + ")" else "" end) \(.verb) \(.objectRef.resource)/\(.objectRef.name // "-")\(if .objectRef.subresource then "/" + .objectRef.subresource else "" end) : \(.responseStatus.code)"' \
+    | tee "$T/t3-audit.txt"
+  v=$(grep -c "(pour .*) update taskruns/$tr/status : 403$" "$T/t3-audit.txt" || true)
+  [ "$v" = 4 ] && echo "OK   4 écritures du statut refusées dans l'audit, avec le nom de l'objet" || { echo "KO   $v écriture(s) du statut refusées dans l'audit (4 attendues)" >&2; exit 1; }
+  v=$(grep -c "(pour .*) update taskruns/$tr : 403$" "$T/t3-audit.txt" || true)
+  [ "$v" = 4 ] && echo "OK   4 retraits d'annotation refusés dans l'audit" || { echo "KO   $v retrait(s) d'annotation refusés dans l'audit (4 attendus)" >&2; exit 1; }
+  grep -E "^  [0-9:]+ system:admin update taskruns/$tr/status : 200$" "$T/t3-audit.txt" >/dev/null \
+    && echo "OK   écriture de l'administrateur dans l'audit (200)" || { echo "KO   écriture de l'administrateur absente de l'audit" >&2; exit 1; }
+  echo "## fin : PipelineRun sample-app-$neuf purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)"
+  purger_pr "sample-app-$neuf"
+  [ "$(nb_pr "$neuf")" = 0 ] && ! kubectl get taskrun -n builds "$tr" >/dev/null 2>&1 \
+    && echo "OK   PipelineRun et TaskRun de $neuf supprimés" || { echo "KO   exécution de $neuf encore présente" >&2; exit 1; }
+  garder apres
+}
+
+ligne_t1() { sed -n "s/^$1|//p" "$T/t1-etape.log" | head -1; }   # libellé : valeur d'une ligne LIBELLÉ|valeur du journal de l'étape
+
+etape_test1() {
+  local t0 ip bao d tr=preuve-test1 pod v c
+  garder avant
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  bao=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.podIP}')
+  echo "## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière"
+  echo "- véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais"
+  echo "  inscrit dans la liste revue de la porte), exécutée par un TaskRun de builds (compte build, gabarit de la zone build) ;"
+  echo "  elle vaut une étape de build dont le code est hostile. TaskRun terminé avec succès : l'étape journalise et sort en 0"
+  echo "- 1. aucun jeton de compte de service dans le pod (compte build sans montage d'office ; zone-build interdit le jeton"
+  echo "  projeté) : rien à présenter à l'authentification JWT d'OpenBao ; aucune variable d'environnement de secret (premier"
+  echo "  passage archivé : la sonde comptait sa propre variable, OPENBAO_IP, renommée CIBLE)"
+  echo "- 2. réseau : la NetworkPolicy d'OpenBao n'admet en entrée que tekton-chains et le TSA ; Cilium jette les SYN à l'entrée,"
+  echo "  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod ($bao) :"
+  echo "  délai du client dépassé (5 s), pas de refus ; rien chez l'agent de sc-build, aucune politique de sortie ne sélectionnant"
+  echo "  ce pod"
+  echo "- 3. OpenBao ne reçoit rien : aucune ligne de son audit avec l'adresse du pod. Témoin dans la même lecture : les requêtes de"
+  echo "  Chains (connexion JWT et signature), qui signe ce même TaskRun"
+  echo "- témoins : depuis la même étape, Zot et Forgejo joignables (le réseau du pod fonctionne) ; OpenBao descellé pendant l'essai"
+  echo "- non exercées ici, mesurées en J3 (openbao-essais.log) : rôle JWT lié au seul compte de Chains (autre compte et autre"
+  echo "  audience refusés), clé Transit non exportable (export et sauvegarde refusés, même au jeton root)"
+  echo "- résidu : le bundle signé tekton/tasks/preuve-test1 reste dans Zot (poc-ecriture ne supprime pas) ; la porte le refuserait,"
+  echo "  hors de la liste revue"
+  v=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null | jq -r .sealed || true)
+  [ "$v" = false ] && echo "OK   témoin : OpenBao descellé avant l'essai (pod $bao)" || { echo "KO   OpenBao : sealed=$v" >&2; exit 1; }
+  echo "## véhicule : tâche signée (tkn $(tkn version --component client)), bundle, TaskRun"
+  cat > "$T/$tr.yaml" <<EOF
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: $tr
+spec:
+  params:
+  - name: openbao
+    type: string
+  stepTemplate:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+  steps:
+  - name: tenter
+    image: $(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+    env:
+    - name: CIBLE
+      value: \$(params.openbao)
+    script: |
+      #!/bin/sh
+      o() { d=\$(date +%s); if nc -z -w 5 "\$1" "\$2" 2>/dev/null; then r=OUVERT; else r=FERME; fi; echo "\$r|\$(( \$(date +%s) - d )) s"; }
+      echo "IP|\$(hostname -i)"
+      if [ -e /var/run/secrets/kubernetes.io/serviceaccount/token ]; then echo "JETON|présent"; else echo "JETON|absent"; fi
+      echo "SECRETS_MONTES|\$(ls -A /var/run/secrets 2>/dev/null | tr '\n' ' ')"
+      echo "VARIABLES|\$(env | cut -d= -f1 | grep -iE 'token|vault|bao|secret|key|passw' | tr '\n' ' ')"
+      echo "DNS|\$(nslookup openbao.openbao.svc.cluster.local 2>&1 | awk '/^Address/ {a = \$NF} END {print a}')"
+      echo "OPENBAO_SERVICE|\$(o openbao.openbao.svc.cluster.local 8200)"
+      echo "OPENBAO_POD|\$(o "\$CIBLE" 8200)"
+      echo "TEMOIN_ZOT|\$(o 192.168.161.13 5000)"
+      echo "TEMOIN_FORGEJO|\$(o 192.168.161.13 3000)"
+EOF
+  tkn task sign "$T/$tr.yaml" -K "$S/taches.key" -f "$T/$tr-signee.yaml" >/dev/null
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  d=$(bundle "$T/$tr-signee.yaml" "tekton/tasks/$tr")
+  echo "bundle tekton/tasks/$tr : $d"
+  sed -e "s#@NOM@#$tr#" -e "s#@RESOLVEUR@#bundles#" -e "s#@BUNDLE@#$REG/tekton/tasks/$tr@$d#" -e "s#value: essai-confiance#value: $tr#" \
+    "$here/politique/taches/taskrun.yaml" | awk -v ip="$bao" '/^  taskRef:$/ {print "  params:"; print "  - name: openbao"; print "    value: \"" ip "\""} {print}' > "$T/tr-$tr.yaml"
+  kubectl delete taskrun -n builds "$tr" --ignore-not-found --wait=true >/dev/null
+  creer "$T/tr-$tr.yaml" || { echo "KO   TaskRun refusé : $(cat "$T/creer.out")" >&2; exit 1; }
+  v=$(issue taskrun "$tr")
+  [ "${v%%|*}" = True ] && echo "OK   TaskRun $tr terminé ($(cut -d'|' -f2 <<<"$v"), TrustedResourcesVerified=$(cut -d'|' -f3 <<<"$v"))" \
+    || { echo "KO   TaskRun $tr : $v" >&2; exit 1; }
+  pod=$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.status.podName}')
+  kubectl logs -n builds "$pod" -c step-tenter > "$T/t1-etape.log"
+  echo "## journal de l'étape (pod $pod, nœud $(kubectl get pod -n builds "$pod" -o jsonpath='{.spec.nodeName}'))"
+  sed 's/^/  /' "$T/t1-etape.log"
+  ip=$(ligne_t1 IP | awk '{print $1}')
+  [ "$(ligne_t1 JETON)" = absent ] && echo "OK   1. aucun jeton de compte de service dans le pod" || { echo "KO   jeton : $(ligne_t1 JETON)" >&2; exit 1; }
+  [ -z "$(ligne_t1 VARIABLES | tr -d ' ')" ] && echo "OK   1. aucune variable d'environnement de secret" || { echo "KO   variables : $(ligne_t1 VARIABLES)" >&2; exit 1; }
+  for c in OPENBAO_SERVICE OPENBAO_POD; do
+    v=$(ligne_t1 "$c")
+    [[ $v == FERME\|[4-7]\ s ]] && echo "OK   2. $c : injoignable, délai du client dépassé ($v)" || { echo "KO   2. $c : $v" >&2; exit 1; }
+  done
+  for c in TEMOIN_ZOT TEMOIN_FORGEJO; do
+    v=$(ligne_t1 "$c")
+    [[ $v == OUVERT* ]] && echo "OK   témoin $c : joignable depuis la même étape ($v)" || { echo "KO   témoin $c : $v" >&2; exit 1; }
+  done
+  echo "## trace : Hubble depuis $t0, flux refusés depuis $ip vers le port 8200"
+  hubble_refus sc-confiance "$t0" --from-ip "$ip" --to-port 8200 > "$T/t1-hubble-confiance.txt" || true
+  hubble_refus sc-build "$t0" --from-ip "$ip" > "$T/t1-hubble-build.txt" || true
+  echo "agent de sc-confiance : $(grep -c . "$T/t1-hubble-confiance.txt" || true) flux"; sed 's/^/  /' "$T/t1-hubble-confiance.txt"
+  echo "agent de sc-build : $(grep -c . "$T/t1-hubble-build.txt" || true) flux"; sed 's/^/  /' "$T/t1-hubble-build.txt"
+  grep -E "^[0-9:.]+ $ip > $bao:8200 SYN POLICY_DENIED INGRESS$" "$T/t1-hubble-confiance.txt" >/dev/null \
+    && echo "OK   2. SYN vers OpenBao jetés à l'entrée par Cilium (sc-confiance, POLICY_DENIED)" || { echo "KO   2. aucun refus dans Hubble de sc-confiance" >&2; exit 1; }
+  [ ! -s "$T/t1-hubble-build.txt" ] && echo "OK   2. aucun refus chez l'agent de sc-build (pas de politique de sortie sur ce pod)" \
+    || echo "CONSTAT refus vus chez l'agent de sc-build (prédiction : aucun)"
+  echo "## trace : audit d'OpenBao depuis $t0"
+  signe taskrun "$tr" > /dev/null || true
+  kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log | jq -c --arg d "$t0" 'select(.type == "response" and .time[0:19] >= ($d[0:19]))
+    | {t: .time[11:19], adresse: .request.remote_address, chemin: .request.path, compte: (.auth.display_name // "-")}' > "$T/t1-bao.txt"
+  echo "réponses journalisées : $(grep -c . "$T/t1-bao.txt" || true) ; par adresse et compte :"
+  jq -r '"\(.adresse) \(.compte)"' "$T/t1-bao.txt" | sort | uniq -c | sed 's/^/  /'
+  c=$(jq -c --arg a "$ip" 'select(.adresse == $a)' "$T/t1-bao.txt" | grep -c . || true)
+  [ "$c" = 0 ] && echo "OK   3. aucune requête de $ip dans l'audit d'OpenBao" || { echo "KO   3. $c requête(s) de $ip dans l'audit d'OpenBao" >&2; exit 1; }
+  c=$(jq -c 'select(.compte == "jwt-system:serviceaccount:tekton-chains:tekton-chains-controller" and (.chemin | startswith("transit/sign/chains")))' "$T/t1-bao.txt" | grep -c . || true)
+  [ "$c" -ge 1 ] && echo "OK   témoin : $c signature(s) de Chains dans la même lecture ($tr signé : $(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}'))" \
+    || { echo "KO   témoin : aucune signature de Chains depuis $t0 (audit illisible ?)" >&2; exit 1; }
   garder apres
 }
 
