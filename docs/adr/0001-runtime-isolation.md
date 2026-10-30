@@ -122,5 +122,6 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
   - Zot, Forgejo, l'API (par le nœud et par le service) et une adresse externe sont injoignables. Chaque tentative laisse des flux `POLICY_DENIED`, `EGRESS` dans Hubble de `sc-build`.
   - Avec une adresse source usurpée, Zot et Forgejo sont injoignables, motif `INVALID_SOURCE_IP`.
   - Aucun paquet n'apparaît sur `enp1s0`.
-  - Contre-épreuve : la même tâche, renommée, joint tout, et sa sortie se voit sur `enp1s0`. L'usurpation y reste refusée, donc la vérification d'adresse source de Cilium tient seule, sans la politique.
+  - Contre-épreuve : la même tâche, renommée, joint Zot, Forgejo et l'API, et sa sortie vers l'adresse externe se voit sur `enp1s0`. L'usurpation y reste refusée, donc la vérification d'adresse source de Cilium tient seule, sans la politique.
   - Le premier passage, archivé, attendait l'adresse du service dans Hubble. J7 l'avait pourtant déjà mesurée traduite avant la politique.
+  - **Limite** : la politique ne ferme la sortie qu'aux pods des tâches nommées `construire-image`. Toute autre tâche signée par la clé des tâches garde sa sortie (mesuré par la contre-épreuve) ; seule la porte la refuse ensuite, hors de la liste revue. La vérification d'adresse source vaut pour tous les pods.
