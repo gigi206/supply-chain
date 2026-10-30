@@ -59,8 +59,8 @@
 #              signée ; plus le témoin signé par une autre clé ; aucune liste de tâches requises (choisie par un label)
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
 #              opérateur, job d'horodatage, rattrapage, porte, contrôleurs de Pipelines et de Chains ; RBAC seul,
-#              l'admission n'y figure pas) dans resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et
-#              du rattrapage dans l'audit de l'API
+#              l'admission n'y figure pas) dans resultats/politique-droits.tsv ; comptes de service du cluster qui peuvent
+#              modifier un PipelineRun de builds ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -1463,6 +1463,24 @@ etape_droits() {
   awk -F'\t' 'NR > 1 { n++; if ($5 == $6) ok++ } END { printf "%d vérifications, %d conformes\n", n, ok }' "$TSV_DROITS"
   awk -F'\t' 'NR > 1 && $6 == "yes" { printf "  accordé : %s %s %s (%s)\n", $1, $2, $3, $4 }' "$TSV_DROITS"
   [ "$k" = 0 ] || exit 1
+  echo "## comptes de service du cluster qui peuvent modifier un PipelineRun de builds (update ou patch), donc ses labels et annotations,"
+  echo "## que Chains signe en slsa-tekton (internalParameters) ; prédiction : contrôleurs de Pipelines et de Chains, ramasse-miettes de Kubernetes"
+  # Première prédiction (contrôleurs seuls, d'après la matrice) démentie le 30/10/2026 : le ramasse-miettes de Kubernetes
+  # (kube-system:generic-garbage-collector, propriétaires et finaliseurs) peut aussi modifier tout objet.
+  kubectl get serviceaccounts -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}' > "$T/comptes"
+  while IFS=: read -r ns nom; do
+    for verbe in update patch; do
+      if [ "$(kubectl auth can-i "$verbe" pipelineruns.tekton.dev -n builds --as="system:serviceaccount:$ns:$nom" 2>/dev/null || true)" = yes ]; then
+        echo "$ns:$nom $verbe"
+      fi
+    done
+  done < "$T/comptes" | sort > "$T/modifient"
+  echo "$(wc -l < "$T/comptes") comptes de service examinés ; accordés :"; sed 's/^/  /' "$T/modifient"
+  printf '%s\n' "kube-system:generic-garbage-collector patch" "kube-system:generic-garbage-collector update" \
+    "tekton-chains:tekton-chains-controller patch" "tekton-chains:tekton-chains-controller update" \
+    "tekton-pipelines:tekton-pipelines-controller patch" "tekton-pipelines:tekton-pipelines-controller update" | cmp -s - "$T/modifient" \
+    && echo "OK   seuls ces trois contrôleurs, parmi les comptes de service (plus les administrateurs du cluster)" \
+    || echo "CONSTAT  liste différente de la prédiction (ci-dessus) : compte de service ajouté ou retiré"
   echo "## droits complets du compte build dans builds (kubectl auth can-i --list)"
   kubectl auth can-i --list -n builds --as=system:serviceaccount:builds:build | sed 's/^/  /'
   echo "## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)"

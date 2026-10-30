@@ -1,0 +1,61 @@
+# politique.sh droits, 2026-10-30T10:47:39Z
+## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
+89 vérifications, 89 conformes
+  accordé : el-forgejo create pipelineruns.tekton.dev (builds)
+  accordé : el-forgejo list eventlisteners.triggers.tekton.dev (declencheurs)
+  accordé : el-forgejo list clusterinterceptors.triggers.tekton.dev (*)
+  accordé : el-forgejo list configmaps (declencheurs)
+  accordé : el-forgejo create events (declencheurs)
+  accordé : operateur get pipelineruns.tekton.dev (builds)
+  accordé : operateur get pods/log (builds)
+  accordé : rattrapage get triggertemplates.triggers.tekton.dev/sample-app (declencheurs)
+  accordé : rattrapage get pipelineruns.tekton.dev (builds)
+  accordé : rattrapage create pipelineruns.tekton.dev (builds)
+  accordé : pipelines update pipelineruns.tekton.dev (builds)
+  accordé : pipelines patch pipelineruns.tekton.dev (builds)
+  accordé : chains update pipelineruns.tekton.dev (builds)
+  accordé : chains patch pipelineruns.tekton.dev (builds)
+## comptes de service du cluster qui peuvent modifier un PipelineRun de builds (update ou patch), donc ses labels et annotations,
+## que Chains signe en slsa-tekton (internalParameters) ; prédiction : les contrôleurs de Pipelines et de Chains seuls (matrice)
+72 comptes de service examinés ; accordés :
+  kube-system:generic-garbage-collector patch
+  kube-system:generic-garbage-collector update
+  tekton-chains:tekton-chains-controller patch
+  tekton-chains:tekton-chains-controller update
+  tekton-pipelines:tekton-pipelines-controller patch
+  tekton-pipelines:tekton-pipelines-controller update
+CONSTAT  d'autres comptes de service que les contrôleurs de Pipelines et de Chains peuvent modifier un PipelineRun de builds (liste ci-dessus)
+## droits complets du compte build dans builds (kubectl auth can-i --list)
+  Resources                                       Non-Resource URLs                      Resource Names   Verbs
+  selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
+  selfsubjectaccessreviews.authorization.k8s.io   []                                     []               [create]
+  selfsubjectrulesreviews.authorization.k8s.io    []                                     []               [create]
+                                                  [/.well-known/openid-configuration/]   []               [get]
+                                                  [/.well-known/openid-configuration]    []               [get]
+                                                  [/api/*]                               []               [get]
+                                                  [/api]                                 []               [get]
+                                                  [/apis/*]                              []               [get]
+                                                  [/apis]                                []               [get]
+                                                  [/healthz]                             []               [get]
+                                                  [/healthz]                             []               [get]
+                                                  [/livez]                               []               [get]
+                                                  [/livez]                               []               [get]
+                                                  [/openapi/*]                           []               [get]
+                                                  [/openapi]                             []               [get]
+                                                  [/openid/v1/jwks/]                     []               [get]
+                                                  [/openid/v1/jwks]                      []               [get]
+                                                  [/readyz]                              []               [get]
+                                                  [/readyz]                              []               [get]
+                                                  [/version/]                            []               [get]
+                                                  [/version/]                            []               [get]
+                                                  [/version]                             []               [get]
+                                                  [/version]                             []               [get]
+## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
+  3 create pipelineruns builds 201
+  4 create pipelineruns builds 409
+OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T09:51:15Z
+## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
+  1 create pipelineruns builds 201
+OK   aucun refus (403) pour rattrapage depuis 2026-10-30T10:32:10Z
+## journal de l'EventListener : refus de lecture (informateurs) depuis son déplacement
+OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-vp9hw

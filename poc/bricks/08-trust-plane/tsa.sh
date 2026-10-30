@@ -183,14 +183,18 @@ etape_deployer() {
   # Pod le plus récent : après un redéploiement, l'ancien peut être encore en cours d'arrêt.
   pod=$(kubectl get pods -n tsa -l app=timestamp-authority --sort-by=.metadata.creationTimestamp -o name | tail -1)
   kubectl logs -n tsa "$pod" -c connexion
+  # Journaux lus dans un fichier : « | grep -q » ou « | head » ferment le tube avant la fin de l'écriture, et l'écrivain, arrêté par
+  # SIGPIPE, rend la commande fausse sous pipefail (constat de J6 sur cosign download | head -1).
   for _ in $(seq 30); do
-    kubectl logs -n tsa "$pod" -c renouvellement 2>/dev/null | grep -q 'jeton renouvelé : 3600 s' && break
+    kubectl logs -n tsa "$pod" -c renouvellement > "$T/renouvellement.log" 2>/dev/null || true
+    grep -q 'jeton renouvelé : 3600 s' "$T/renouvellement.log" && break
     sleep 1
   done
-  kubectl logs -n tsa "$pod" -c renouvellement | grep -q 'jeton renouvelé : 3600 s' \
-    && echo "OK   jeton OpenBao du TSA renouvelé au démarrage ($(kubectl logs -n tsa "$pod" -c renouvellement | tail -1))" \
-    || { echo "KO   renouvellement du jeton" >&2; kubectl logs -n tsa "$pod" -c renouvellement >&2; exit 1; }
-  kubectl logs -n tsa deployment/timestamp-authority -c timestamp-server | jq -R -r 'fromjson? // {message: .} | .message' | grep -v -E '^\{|^  ' | head -5
+  grep -q 'jeton renouvelé : 3600 s' "$T/renouvellement.log" \
+    && echo "OK   jeton OpenBao du TSA renouvelé au démarrage ($(tail -1 "$T/renouvellement.log"))" \
+    || { echo "KO   renouvellement du jeton" >&2; cat "$T/renouvellement.log" >&2; exit 1; }
+  kubectl logs -n tsa deployment/timestamp-authority -c timestamp-server | jq -R -r 'fromjson? // {message: .} | .message' | grep -v -E '^\{|^  ' > "$T/tsa-serveur.log"
+  head -5 "$T/tsa-serveur.log"
 }
 
 pod_outils() { # nom espace script : pod d'essai avec l'image d'outils sur le nœud de confiance ; affiche sa sortie
@@ -423,7 +427,8 @@ spec:
       image: $REG_HOTE/builds/essai-signature@$APP_DIGEST
 EOF
   echo "## cas falsifiés, construits à partir des bundles du job (publiés par poc-ecriture dans essais-j5/*)"
-  referrers "$DEPOT_BUNDLES" | jq -r '.manifests[].digest' | head -2 > "$T/bundles.txt"
+  referrers "$DEPOT_BUNDLES" | jq -r '.manifests[].digest' > "$T/bundles-tous.txt"   # pas de « | head » : SIGPIPE (voir deployer)
+  head -2 "$T/bundles-tous.txt" > "$T/bundles.txt"
   b=1; while read -r d; do
     oras manifest fetch --ca-file "$P/ca-poc.crt" "$REG_HOTE/$DEPOT_BUNDLES@$d" | jq -r '.layers[0].digest' \
       | xargs -I{} oras blob fetch --ca-file "$P/ca-poc.crt" --output "$T/b$b.json" "$REG_HOTE/$DEPOT_BUNDLES@{}"

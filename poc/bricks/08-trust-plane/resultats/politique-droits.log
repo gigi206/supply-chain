@@ -1,4 +1,4 @@
-# politique.sh droits, 2026-10-30T10:40:04Z
+# politique.sh droits, 2026-10-30T10:48:14Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
 89 vérifications, 89 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
@@ -15,6 +15,16 @@
   accordé : pipelines patch pipelineruns.tekton.dev (builds)
   accordé : chains update pipelineruns.tekton.dev (builds)
   accordé : chains patch pipelineruns.tekton.dev (builds)
+## comptes de service du cluster qui peuvent modifier un PipelineRun de builds (update ou patch), donc ses labels et annotations,
+## que Chains signe en slsa-tekton (internalParameters) ; prédiction : contrôleurs de Pipelines et de Chains, ramasse-miettes de Kubernetes
+72 comptes de service examinés ; accordés :
+  kube-system:generic-garbage-collector patch
+  kube-system:generic-garbage-collector update
+  tekton-chains:tekton-chains-controller patch
+  tekton-chains:tekton-chains-controller update
+  tekton-pipelines:tekton-pipelines-controller patch
+  tekton-pipelines:tekton-pipelines-controller update
+OK   seuls ces trois contrôleurs, parmi les comptes de service (plus les administrateurs du cluster)
 ## droits complets du compte build dans builds (kubectl auth can-i --list)
   Resources                                       Non-Resource URLs                      Resource Names   Verbs
   selfsubjectreviews.authentication.k8s.io        []                                     []               [create]
