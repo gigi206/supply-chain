@@ -1,0 +1,80 @@
+# kata.sh verifier, 2026-10-30T13:08:18Z
+## tag et release 4.3.1
+OK   tag léger 4.3.1 → commit 03cf2ec06a5d302f23af811744f6bcea49988bfb, signé et vérifié par GitHub
+OK   release immuable
+OK   attestation de release vérifiée (gh release verify) : Resolved tag 4.3.1 to sha1:03cf2ec06a5d302f23af811744f6bcea49988bfb
+## kata-static-4.3.1-amd64.tar.zst
+OK   sha256 1463a2b86845f4d3d8e87f2f764ec59856fc0fee3520967a79ade32762be2e97 (épinglé), 1021129805 octets
+OK   présent dans l'attestation de release 4.3.1 (gh release verify-asset)
+CONSTAT ~/.cache/supply-chain-poc/08/telechargements/kata/kata-static-4.3.1-amd64.tar.zst : aucune attestation de build (gh attestation verify : HTTP 404)
+## kata-deploy-4.3.1.tgz
+OK   sha256 c25077416d37c178bf72df0204ea3ba89418efad1b1299b0d5d34ec02556187e (épinglé), 141445 octets
+OK   présent dans l'attestation de release 4.3.1 (gh release verify-asset)
+CONSTAT ~/.cache/supply-chain-poc/08/telechargements/kata/kata-deploy-4.3.1.tgz : aucune attestation de build (gh attestation verify : HTTP 404)
+le workflow build-kata-static-tarball-amd64.yaml atteste chaque composant poussé sur ghcr.io, pas l'archive fusionnée
+## contenu de kata-static-4.3.1-amd64.tar.zst
+171 entrées, 2.50 Go décompressés, sous /opt/kata
+OK   aucune entrée hors de /opt/kata
+présent : /opt/kata/runtime-rs/bin/containerd-shim-kata-v2 (50475296 octets)
+présent : /opt/kata/share/defaults/kata-containers/runtime-rs/configuration-qemu-runtime-rs.toml (34810 octets)
+absent  : /opt/kata/bin/containerd-shim-kata-v2
+absent  : /opt/kata/share/defaults/kata-containers/configuration-qemu.toml
+CONSTAT runtime Go absent de kata-static (publié à part, kata-go-static, 1,3 Go) ; configuration.toml pointe vers configuration-qemu.toml, absent
+## configuration du shim par défaut (qemu-runtime-rs, défaut de kata-deploy en 4.x)
+path = "/opt/kata/bin/qemu-system-x86_64"
+kernel = "/opt/kata/share/kata-containers/vmlinux.container"
+image = "/opt/kata/share/kata-containers/kata-containers.img"
+machine_type = "q35"
+rootfs_type = "ext4"
+rootless = false
+enable_annotations = ["enable_iommu", "kernel_params", "kernel_verity_params", "default_vcpus", "default_memory"]
+cpu_features = "pmu=off"
+default_vcpus = 1
+overhead_vcpus = 0.2
+default_memory = 2048
+overhead_memory = 32
+shared_fs = "virtio-fs"
+virtio_fs_daemon = "/opt/kata/libexec/virtiofsd"
+disable_nesting_checks = false
+disable_guest_selinux = true
+internetworking_model = "tcfilter"
+disable_guest_seccomp = true
+sandbox_cgroup_only = true
+static_sandbox_resource_mgmt = true
+CONSTAT disable_guest_seccomp = true : le profil seccomp déclaré dans le pod n'est pas appliqué dans l'invité
+CONSTAT enable_annotations : un pod peut changer kernel_params, default_vcpus et default_memory si containerd lui transmet les annotations (pod_annotations)
+   50.5 Mo  /opt/kata/runtime-rs/bin/containerd-shim-kata-v2
+    0.0 Mo  /opt/kata/share/defaults/kata-containers/runtime-rs/configuration-qemu-runtime-rs.toml
+   22.8 Mo  /opt/kata/bin/qemu-system-x86_64
+   40.9 Mo  /opt/kata/share/kata-containers/vmlinux.container
+  268.4 Mo  /opt/kata/share/kata-containers/kata-containers.img
+    3.3 Mo  /opt/kata/libexec/virtiofsd
+    8.3 Mo  /opt/kata/share/kata-qemu/qemu/ (micrologiciels de QEMU)
+  394.2 Mo  fichiers lus par qemu-runtime-rs, sur 2.50 Go
+## chart kata-deploy-4.3.1.tgz : images
+image:   reference: quay.io/kata-containers/kata-deploy
+image:   tag: ""
+kubectlImage:   reference: quay.io/kata-containers/kubectl
+kubectlImage:   tag: latest
+CONSTAT le chart désigne ses images par tag (kata-deploy au tag de appVersion, kubectl au tag latest), pas par digest
+## image kata-containers/kata-deploy:4.3.1
+OK   quay.io : index sha256:7399058e3e6378a766770345abcf9b20b53611a419b1b56e71162c6ac1bf625a (= épinglé)
+     linux/amd64 sha256:799c17dcbd6f2c93f2c84f69667aa74b250ce91986096cc990a12abfc8871799, config sha256:3a70f8106d66d62e8e701f87b2c7f9ffdbdeeed11be1b840e4e5ecc82d968da5, 21 couches, 1.89 Go compressés
+     tags sha256-* (signatures et attestations cosign) dans le dépôt : 0
+     referrers de l'index : 0
+OK   ghcr.io : index sha256:9f6bbd0972e6fa8c99f5a86b24503032cb87be602d22e830d1c917ba31b4db9f (= épinglé)
+     linux/amd64 sha256:dde33d0985f1a1f40359cbee8d110248f4b52e3259100ebc3792017b33c232e7, config sha256:3a70f8106d66d62e8e701f87b2c7f9ffdbdeeed11be1b840e4e5ecc82d968da5, 21 couches, 1.89 Go compressés
+     tags sha256-* (signatures et attestations cosign) dans le dépôt : 0
+     referrers de l'index : 0
+même config amd64 sur les deux registres, donc mêmes couches décompressées (diff_ids) ; couches compressées propres à chacun :
+     quay.io sha256:efae86a3fb38e05e6e2584bc2f48534a0d82f8d9e9a4163d04885d5c65423105 : en-tête gzip  1f 8b 08 00 00 00 00 00 00 ff, décompressée sha256:ad51d0769d16ba578106a177987dfe3d2e02c1668c852b795b2f6b024068242a, etc/nsswitch.conf
+     ghcr.io sha256:b839dfae01f66e15c6a8b63520557ed315bdfe036342fa7a0c537259f10d7a9a : en-tête gzip  1f 8b 08 00 00 00 00 00 00 03, décompressée sha256:ad51d0769d16ba578106a177987dfe3d2e02c1668c852b795b2f6b024068242a, etc/nsswitch.conf
+CONSTAT oci://ghcr.io/kata-containers/kata-deploy@sha256:9f6bbd0972e6fa8c99f5a86b24503032cb87be602d22e830d1c917ba31b4db9f : aucune attestation de build (gh attestation verify : HTTP 404)
+CONSTAT oci://ghcr.io/kata-containers/kata-deploy@sha256:dde33d0985f1a1f40359cbee8d110248f4b52e3259100ebc3792017b33c232e7 : aucune attestation de build (gh attestation verify : HTTP 404)
+permissions du job kata-deploy (release-amd64.yaml, au commit du tag) :
+      contents: read
+      packages: write # needed to push build artifacts to ghcr.io
+permissions du job publish-multi-arch-images (release.yaml) :
+      contents: write # needed for the `gh release` commands
+      packages: write # needed to push the multi-arch manifest to ghcr.io
+CONSTAT image kata-deploy non vérifiable par construction : les jobs qui la publient n'ont pas id-token (ni signature sans clé, ni attestation possibles)
