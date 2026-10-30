@@ -1,0 +1,21 @@
+# Brique 08, J7 (kata.sh reseau) : NetworkPolicy de sortie des seuls pods de mesure de builds (label app=sonde-reseau-j7).
+# Rien d'autre n'est sélectionné dans builds : le PipelineRun de sample-app tire ses entrées de Forgejo et de Zot (sources,
+# entrees, image de build tirée par BuildKit pendant construire, publier). Seule sortie permise : Forgejo (témoin positif), par
+# adresse, sans DNS. Posée en début d'étape, supprimée en fin d'étape.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sonde-reseau-j7
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      app: sonde-reseau-j7
+  policyTypes: [Egress]
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.13/32
+    ports:
+    - protocol: TCP
+      port: 3000
