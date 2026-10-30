@@ -7,11 +7,15 @@ build|create|pods|builds|no
 build|create|taskruns.tekton.dev|builds|no
 build|create|pipelineruns.tekton.dev|builds|no
 build|delete|pipelineruns.tekton.dev|builds|no
+build|update|pipelineruns.tekton.dev|builds|no
+build|patch|pipelineruns.tekton.dev|builds|no
 build|get|taskruns.tekton.dev|builds|no
 build|create|serviceaccounts/token|tekton-chains|no
 # EventListener : lecture de ses objets Triggers, création de PipelineRuns dans builds, rien d'autre.
 el-forgejo|create|pipelineruns.tekton.dev|builds|yes
 el-forgejo|delete|pipelineruns.tekton.dev|builds|no
+el-forgejo|update|pipelineruns.tekton.dev|builds|no
+el-forgejo|patch|pipelineruns.tekton.dev|builds|no
 el-forgejo|create|taskruns.tekton.dev|builds|no
 el-forgejo|get|pipelineruns.tekton.dev|builds|no
 el-forgejo|create|pipelineruns.tekton.dev|declencheurs|no
@@ -34,6 +38,8 @@ operateur|patch|taskruns.tekton.dev/status|builds|no
 operateur|update|taskruns.tekton.dev/status|builds|no
 operateur|patch|pipelineruns.tekton.dev/status|builds|no
 operateur|delete|pipelineruns.tekton.dev|builds|no
+operateur|update|pipelineruns.tekton.dev|builds|no
+operateur|patch|pipelineruns.tekton.dev|builds|no
 operateur|create|pods/exec|builds|no
 operateur|create|pods/attach|builds|no
 operateur|create|pods/portforward|builds|no
@@ -55,6 +61,8 @@ operateur|delete|validatingpolicies.policies.kyverno.io|*|no
 # Job d'horodatage (compte horodatage, sans jeton monté) : aucun droit sur l'API ; il ne lit que Zot.
 horodatage|list|taskruns.tekton.dev|builds|no
 horodatage|list|pipelineruns.tekton.dev|builds|no
+horodatage|update|pipelineruns.tekton.dev|builds|no
+horodatage|patch|pipelineruns.tekton.dev|builds|no
 horodatage|get|secrets|horodatage|no
 horodatage|list|secrets|*|no
 horodatage|create|pods|horodatage|no
@@ -78,7 +86,16 @@ rattrapage|create|cronjobs.batch|declencheurs|no
 rattrapage|get|eventlisteners.triggers.tekton.dev|declencheurs|no
 # Porte de release (compte porte, sans jeton monté) : aucun droit sur l'API ; elle ne lit que Zot.
 porte|list|pipelineruns.tekton.dev|builds|no
+porte|update|pipelineruns.tekton.dev|builds|no
+porte|patch|pipelineruns.tekton.dev|builds|no
 porte|get|configmaps|porte|no
 porte|list|secrets|*|no
 porte|create|pods|porte|no
 porte|create|jobs.batch|porte|no
+# Labels et annotations d'un PipelineRun, signés par Chains en slsa-tekton (internalParameters) : après la création, parmi les
+# comptes de cette matrice, seuls les contrôleurs de Pipelines et de Chains peuvent les modifier, outre les administrateurs.
+# L'admission (tekton-references) ne juge pas une modification limitée aux métadonnées (lu dans sa matchCondition).
+pipelines|update|pipelineruns.tekton.dev|builds|yes
+pipelines|patch|pipelineruns.tekton.dev|builds|yes
+chains|update|pipelineruns.tekton.dev|builds|yes
+chains|patch|pipelineruns.tekton.dev|builds|yes

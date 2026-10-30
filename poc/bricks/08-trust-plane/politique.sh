@@ -32,30 +32,35 @@
 #              d'initialisation de Tekton), stepTemplate restreint des tâches signées (étapes), contexte de pod du gabarit ;
 #              builds en warn, audit et enforce restricted (décision du propriétaire du 30/10/2026) : tâche en service et
 #              tâche d'essai exécutées, tâche signée sans stepTemplate et drapeau désactivé refusés par Pod Security ;
-#              enforce levé le temps d'un cas : violation tracée dans l'audit de l'API sous warn et audit
+#              enforce levé le temps d'un cas : violation tracée dans l'audit de l'API sous warn et audit ; exécutions vers
+#              l'image d'essai sérialisées (signature de Chains attendue, deux enveloppes exigées : constat-att-ecrasee.log)
 #   horodatagehorodatage automatique par réconciliation périodique : CronJob horodatage (politique/horodatage-cronjob.yaml,
 #              tsa/horodater.sh sans $IMAGE) qui parcourt builds/ dans Zot et horodate chaque enveloppe de Chains vérifiée
 #              (clé de Chains, sujet, prédicat) ; trois témoins posés par poc-ecriture (autre clé, autre sujet : refusés ;
 #              tag .att illisible : anomalie) à chaque passage, sans arrêter le parcours ; rattrapage, nouvelle exécution
 #              signée puis supprimée de l'API (latence), passage sans nouveauté ; une requête de jeton par enveloppe
-#              horodatée dans le journal du TSA ; un bundle par enveloppe ; chemin de la porte
+#              horodatée dans le journal du TSA ; chaque enveloppe a son bundle (appariés par signature), bundles
+#              orphelins listés (enveloppe perdue du tag .att après horodatage), aucun nouveau ; chemin de la porte
 #   rattrapage rattrapage des webhooks perdus (Forgejo v15.0.11 ne retente jamais une livraison échouée) : réconciliateur
 #              en Go (politique/rattrapage, bibliothèque standard seule), compilé deux fois (même empreinte), image d'une
 #              couche sur base vide (même digest) ; CronJob rattrapage de declencheurs (politique/rattrapage.yaml) qui crée
 #              le PipelineRun de la tête de main s'il manque, depuis la TriggerTemplate en service ; sorties du pod
 #              (NetworkPolicy, fenêtre de démarrage) ; webhook perdu (EventListener à 0 réplique), aucune relivraison en
-#              150 s, rattrapage, même spec et même provenance qu'un PipelineRun de l'EventListener, horodatage, course
-#              avec l'EventListener ; main remise à 6391fd43 (force-push)
+#              150 s, rattrapage, horodatage, course avec l'EventListener ; même spec et même runSpec signé qu'un
+#              PipelineRun de l'EventListener ; internalParameters signés (slsa-tekton) : seuls les labels de chaque créateur
+#              diffèrent ; verdict de la porte sur la provenance de chaque chemin (après l'étape porte) ; main remise à
+#              6391fd43 (force-push)
 #   porte      porte de release : Conforma (ec v0.10.42, empreinte du verrou mise) et la bibliothèque conforma/policy
 #              v1.0.28 (commit signé, arbre vérifié) dans une image d'une couche sur base vide (même digest) ; Job de
 #              l'espace porte (zone confiance, DNS et Zot seulement, aucun droit sur l'API) ; collection slsa3, trusted_task
 #              (liste revue politique/porte/taches.yml) et règles du PoC (politique/porte) ; Chains en buildType slsa-tekton
 #              (décision du propriétaire du 30/10/2026) ; tâche en service (exécution de l'essai, sans adoption), et images
 #              d'essai : buildType slsa (Chains basculé le temps d'une image), tâche hors liste, version non listée, non
-#              signée ; plus le témoin signé par une autre clé
+#              signée ; plus le témoin signé par une autre clé ; aucune liste de tâches requises (choisie par un label)
 #   droits     rôle des opérateurs (politique/droits.yaml) ; matrice kubectl auth can-i (compte build, EventListener,
-#              opérateur, job d'horodatage, rattrapage, porte ; RBAC seul, l'admission n'y figure pas) dans
-#              resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et du rattrapage dans l'audit de l'API
+#              opérateur, job d'horodatage, rattrapage, porte, contrôleurs de Pipelines et de Chains ; RBAC seul,
+#              l'admission n'y figure pas) dans resultats/politique-droits.tsv ; écritures de l'EventListener (test 5) et
+#              du rattrapage dans l'audit de l'API
 # Aucun secret en argument de commande : mots de passe par fichier 0600.
 #
 # Usage (racine du dépôt) : mise run confiance:politique -- <étape>…   (journal : resultats/politique-<étape>.log)
@@ -90,6 +95,8 @@ CPOL_COMMIT=ebd3fbd270297c15f590f4023360465ffb41d4fe   # commit du tag, signé p
 CPOL_ARBRE=0fd26021bb08582553f392565ca0faf316c51229    # arbre du commit (contenu signé)
 PORTE=plateforme/porte
 PORTE_DIGEST=sha256:e77994c20705b4bffd434067033ef2c2f748cf2311f9997c7346b33f0b943926   # base vide, une couche (ec, policy/release et policy/lib sans tests)
+# règles de source de la porte, en échec attendu jusqu'à J7 (aucune source git dans la provenance des essais)
+SRC_J7=slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay
 FORGEJO_HOTE=https://192.168.161.13:3000
 SAMPLE_APP=workspace/sample-app
 TETE_J2=6391fd437f26696847041be3226bbbf633f55a2f   # commit de stockage.sh depot ; main y est remise après les essais
@@ -608,7 +615,9 @@ etape_restreint() {
   trap 'kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest >/dev/null 2>&1
     drapeau true; rm -rf "$T/auth" "$W/refus.out"' EXIT
   kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || true
+  ENV_N=$(enveloppes builds/essai-webhook)
   verdict "tâche sans stepTemplate, sous warn et audit" True "$(pr_gabarit j6-sans-restriction "$sans")"
+  attestee j6-sans-restriction
   m=$(violations "$t0" j6-sans-restriction-publier-pod)
   echo "audit de l'API : $m"
   grep -q 'container "step-publier"' <<< "$m" && ! grep -qE 'container "(prepare|place-scripts)"' <<< "$m" \
@@ -618,6 +627,7 @@ etape_restreint() {
   kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest 2>&1 \
     | grep -v '^namespace/' | sed 's/^/  /' || true
   verdict "tâche en service (pipeline du gabarit)" True "$(pr_gabarit j6-restreint "$pipe")"
+  attestee j6-restreint
   kubectl get taskrun -n builds j6-restreint-publier -o json | jq -r '"tâche en service : stepTemplate.securityContext \(.status.taskSpec.stepTemplate.securityContext | tostring)"'
   conteneurs j6-restreint-publier-pod
   echo "audit de l'API : $(violations "$t0" j6-restreint-publier-pod)"
@@ -701,6 +711,53 @@ bundles() { # digest : nombre de bundles horodatés de ce digest dans horodatage
     | jq '[.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json")] | length'
 }
 
+couverture() { # enveloppes de Chains de APP_DIGEST (builds/essai-signature et builds/essai-webhook) et bundles horodatés de ce
+  # digest, appariés par la signature de l'enveloppe : $T/sans-bundle (enveloppes à horodater), $T/orphelins (bundles dont
+  # l'enveloppe a quitté les tags .att, réécrits sans verrou par Chains : constat-att-ecrasee.log), $T/doublons
+  local d m l
+  for d in essai-signature essai-webhook; do
+    cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$d@$APP_DIGEST" 2>/dev/null | jq -r '.signatures[0].sig'
+  done | sort > "$T/sig-env"
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/referrers/$APP_DIGEST" \
+    | jq -r '.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json") | .digest' | while read -r m; do
+      l=$(curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+        "https://$REG_HOTE/v2/$DEPOT_BUNDLES/manifests/$m" | jq -r '.layers[0].digest')
+      curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/blobs/$l" > "$T/bundle.json"
+      jq -r --arg m "$m" '"\(.dsseEnvelope.signatures[0].sig) \($m) " + (.dsseEnvelope.payload | @base64d | fromjson | .predicate
+        | "\(if .buildDefinition.externalParameters.runSpec.pipelineRef != null then "PipelineRun" else "TaskRun" end)"
+          + " \(.buildDefinition.internalParameters.labels["tekton.dev/pipelineRun"] // "-"), début \(.runDetails.metadata.startedOn)")' "$T/bundle.json"
+    done | sort > "$T/sig-bun"
+  cut -d' ' -f1 "$T/sig-bun" | sort > "$T/sig-bun-seules"
+  comm -23 "$T/sig-env" "$T/sig-bun-seules" > "$T/sans-bundle"
+  comm -13 <(sort -u "$T/sig-env") <(sort -u "$T/sig-bun-seules") > "$T/orphelins"
+  uniq -d "$T/sig-bun-seules" > "$T/doublons"
+  echo "$APP_DIGEST : $(wc -l < "$T/sig-env") enveloppe(s) de Chains, $(wc -l < "$T/sig-bun") bundle(s) ; sans bundle : $(wc -l < "$T/sans-bundle"),"\
+    "orphelin(s) : $(wc -l < "$T/orphelins"), doublon(s) : $(wc -l < "$T/doublons")"
+}
+
+couverte() { # n : chaque enveloppe de Chains de APP_DIGEST a son bundle horodaté, aucun doublon, au plus n orphelins (ceux d'avant l'étape)
+  local s
+  couverture
+  [ ! -s "$T/sans-bundle" ] && [ ! -s "$T/doublons" ] && echo "OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon" \
+    || { echo "KO   enveloppe sans bundle ou bundle en double" >&2; exit 1; }
+  while read -r s; do
+    grep "^$s " "$T/sig-bun" | cut -d' ' -f2- | sed 's/^/  orphelin : bundle /'
+  done < "$T/orphelins"
+  [ "$(wc -l < "$T/orphelins")" -le "$1" ] || { echo "KO   bundles orphelins : $1 au départ, $(wc -l < "$T/orphelins") maintenant (enveloppe perdue pendant l'étape)" >&2; exit 1; }
+  [ -s "$T/orphelins" ] && echo "CONSTAT  $(wc -l < "$T/orphelins") bundle(s) orphelin(s), aucun nouveau : enveloppe(s) perdue(s) du tag .att après leur horodatage, avant cette étape (constat-att-ecrasee-j6.log) ; le dépôt d'horodatage en garde la trace" || true
+}
+
+attestee() { # nom : exécution vers builds/essai-webhook@APP_DIGEST sérialisée. Le tag .att est réécrit sans verrou à chaque envoi
+  # (constat-att-ecrasee.log) : on attend que Chains ait signé le PipelineRun (il le signe après son TaskRun) avant toute autre
+  # exécution vers ce digest, et l'on exige ses deux enveloppes. ENV_N : nombre d'enveloppes de builds/essai-webhook avant.
+  local n
+  [ "$(signe pipelinerun "$1")" = true ] || { echo "KO   $1 non signé par Chains" >&2; exit 1; }
+  n=$(enveloppes builds/essai-webhook)
+  [ "$n" = $((ENV_N + 2)) ] && echo "OK   $1 signé par Chains, enveloppes du TaskRun et du PipelineRun présentes ($ENV_N → $n)" \
+    || { echo "KO   $1 : $ENV_N → $n enveloppe(s), deux attendues en plus" >&2; exit 1; }
+  ENV_N=$n
+}
+
 passage() { # instant [espace CronJob] : premier passage du CronJob (horodatage par défaut) créé après cet instant, attendu
   # terminé ; nom du job
   local j="" ns=${2:-horodatage} cj=${3:-horodatage}
@@ -742,7 +799,7 @@ analyser() { # job : journal du passage (enveloppes déjà horodatées résumée
 }
 
 etape_horodatage() {
-  local x y z pt t j e0 e1 b0 n w jeton pipe o
+  local x y z pt t j e0 e1 b0 o0 n w jeton pipe o
   kubectl get secret -n horodatage zot-horodatage >/dev/null 2>&1 || { echo "KO   secret zot-horodatage absent (tsa.sh horodater)" >&2; exit 1; }
   kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
@@ -750,7 +807,10 @@ etape_horodatage() {
   config_horodatage   # avant les témoins : le script de J5 échouerait sur le témoin illisible, à chaque passage
 
   echo "## témoins posés dans builds par poc-ecriture (compte d'écriture général) : jamais horodatables"
-  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null | head -1 > "$T/chains-env.json"
+  # Sortie dans un fichier, puis première ligne : « | head -1 » fermait le tube avant la fin de l'écriture de cosign, arrêté
+  # par SIGPIPE (code 141, fatal sous pipefail), observé le 30/10/2026 avec 66 enveloppes (376 ko).
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null > "$T/att-webhook.jsonl"
+  head -1 "$T/att-webhook.jsonl" > "$T/chains-env.json"
   x=$(image_temoin "$TEMOIN_CLE")
   if existe "builds/$TEMOIN_CLE:sha256-${x#sha256:}.att"; then echo "builds/$TEMOIN_CLE@$x : témoin existant"; else
     (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/auth/autre.key")
@@ -782,9 +842,9 @@ etape_horodatage() {
   echo "  sur l'hôte : cosign download attestation échoue ($(sed -n 's/^Error: //p' "$T/illisible.err" | head -1)) ; le script de J5 (set -e) aurait échoué à chaque passage"
 
   echo "## CronJob horodatage (politique/horodatage-cronjob.yaml)"
-  e0=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); b0=$(bundles "$APP_DIGEST")
-  echo "avant : $e0 enveloppe(s) de Chains pour $APP_DIGEST (builds/essai-signature et builds/essai-webhook), $b0 bundle(s)"
-  echo "prédiction du premier passage : $((e0 - b0)) horodatée(s), $b0 déjà horodatée(s), 2 refusées et 1 anomalie (témoins), $((e0 - b0)) requête(s) de jeton"
+  couverture | sed 's/^/avant : /'
+  b0=$(wc -l < "$T/sans-bundle"); o0=$(wc -l < "$T/orphelins")
+  echo "prédiction du premier passage : $b0 horodatée(s) (enveloppes sans bundle), 2 refusées et 1 anomalie (témoins), $b0 requête(s) de jeton"
   t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   sed -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@REG@#$REG#g" "$here/politique/horodatage-cronjob.yaml" \
     | kubectl apply --server-side -f - >/dev/null
@@ -794,8 +854,8 @@ etape_horodatage() {
   echo "## premier passage : rattrapage"
   j=$(passage "$t")
   analyser "$j"
-  [ "$(grep -c '^HORODATEE' "$T/passage.log" || true)" = $((e0 - b0)) ] && echo "OK   prédiction tenue" \
-    || { echo "KO   prédiction : $((e0 - b0)) horodatée(s)" >&2; exit 1; }
+  [ "$(grep -c '^HORODATEE' "$T/passage.log" || true)" = "$b0" ] && echo "OK   prédiction tenue" \
+    || { echo "KO   prédiction : $b0 horodatée(s)" >&2; exit 1; }
   grep -q "^REFUSEE|builds/$TEMOIN_CLE|.*accepted signatures do not match threshold" "$T/passage.log" \
     && grep -q "^REFUSEE|builds/$TEMOIN_SUJET|.*provided artifact digest does not match" "$T/passage.log" \
     && echo "OK   témoins refusés pour leur motif (autre clé ; autre sujet ; illisible en anomalie), avant toute demande au TSA, sans arrêter le parcours" \
@@ -839,8 +899,7 @@ etape_horodatage() {
     || { echo "KO   passage sans nouveauté" >&2; exit 1; }
 
   echo "## contrôles"
-  e1=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); n=$(bundles "$APP_DIGEST")
-  [ "$e1" = "$n" ] && echo "OK   un bundle par enveloppe de Chains : $n pour $APP_DIGEST" || { echo "KO   $n bundle(s) pour $e1 enveloppe(s)" >&2; exit 1; }
+  couverte "$o0"
   [ "$(bundles "$x")" = 0 ] && [ "$(bundles "$y")" = 0 ] && [ "$(bundles "$z")" = 0 ] && echo "OK   aucun bundle pour les images témoins" || { echo "KO   bundle d'un témoin" >&2; exit 1; }
   COSIGN_REPOSITORY=$REG_HOTE/$DEPOT_BUNDLES cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
     --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --type slsaprovenance1 \
@@ -896,9 +955,28 @@ provenance() { # nom : runSpec (externalParameters) de la provenance de Chains d
       | .params |= map(if .name == "commit" then .value = "COMMIT" else . end)'
 }
 
+internes() { # nom : internalParameters (drapeaux, labels, annotations) de la provenance de Chains de ce PipelineRun, et labels et
+  # annotations du TaskRun signé dans son entrée pipelineTask (TaskRun complet en slsa-tekton)
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null \
+    | jq -cS --arg u "$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')" '.payload | @base64d | fromjson | .predicate
+      | select(.runDetails.metadata.invocationId == $u) | .buildDefinition
+      | {drapeaux: .internalParameters["tekton-pipelines-feature-flags"], labels: .internalParameters.labels,
+         annotations: .internalParameters.annotations,
+         taskrun: ([.resolvedDependencies[] | select(.name == "pipelineTask") | .content | @base64d | fromjson
+           | {labels: .metadata.labels, annotations: .metadata.annotations}][0])}'
+}
+
+derniere() { # nom : la provenance de PipelineRun la plus récente de builds/essai-webhook, seule jugée par la porte, est la sienne
+  local u; u=$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')
+  [ "$(prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.runDetails.metadata.invocationId')" = "$u" ] \
+    && echo "OK   la provenance la plus récente de builds/essai-webhook est celle de $1" || { echo "KO   provenance la plus récente hors de $1" >&2; exit 1; }
+}
+
 etape_rattrapage() {
-  local i d c1 c2 t tr tp tpush j n pr
+  local i d c1 c2 t tr tp tpush j n pr v1 v2 s o0
   kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  kubectl get configmap -n porte porte >/dev/null 2>&1 || { echo "KO   porte absente (étape porte d'abord)" >&2; exit 1; }
+  couverture > /dev/null; o0=$(wc -l < "$T/orphelins")
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
   auth_zot "$T/auth/docker/config.json"
   printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
@@ -1063,9 +1141,12 @@ EOF
   # vérifie l'invariant de l'étape horodatage (un bundle par enveloppe de Chains).
   j=$(passage "$(date -u +%Y-%m-%dT%H:%M:%SZ)")
   analyser "$j"
-  i=$(( $(enveloppes builds/essai-signature) + $(enveloppes builds/essai-webhook) )); n=$(bundles "$APP_DIGEST")
-  [ "$i" = "$n" ] && echo "OK   un bundle par enveloppe de Chains ($n pour $APP_DIGEST) : l'exécution rattrapée est horodatée" \
-    || { echo "KO   $n bundle(s) pour $i enveloppe(s)" >&2; exit 1; }
+  couverte "$o0"
+  echo "OK   l'exécution rattrapée est horodatée"
+
+  echo "## porte sur la provenance de l'exécution rattrapée (prédiction : celle de la tâche en service, étape porte)"
+  derniere "$pr"
+  v1=$(juger rattrapage "$REG/builds/essai-webhook@$APP_DIGEST"); echo "  $v1"
 
   echo "## course : EventListener et rattrapage actifs, push de c2"
   tp=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'"); tpush=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -1081,6 +1162,9 @@ EOF
   verdict "exécution de c2" True "$(issue pipelinerun "$pr")"
   [ "$(kubectl get pipelineruns -n builds -o name | grep -c "/$pr$")" = 1 ] && echo "OK   un seul PipelineRun pour c2" || { echo "KO   doublon" >&2; exit 1; }
   echo "Chains : $pr signé=$(signe pipelinerun "$pr")"
+  echo "## porte sur la provenance de l'exécution créée par l'EventListener"
+  derniere "$pr"
+  v2=$(juger eventlistener "$REG/builds/essai-webhook@$APP_DIGEST"); echo "  $v2"
 
   echo "## même PipelineRun par les deux chemins : c1 (rattrapage) et c2 (EventListener, créé par Triggers), au commit près"
   [ "$(origine "sample-app-$c1")" = rattrapage ] && [ "$(origine "$pr")" = "EventListener forgejo" ] \
@@ -1094,6 +1178,45 @@ EOF
   [ "$(wc -l < "$T/prov-$c1")" = 1 ] && cmp -s "$T/prov-$c2" "$T/prov-$c1" \
     && echo "OK   provenances de Chains (retrouvées par l'UID de chaque PipelineRun) : même runSpec, commit excepté" \
     || { diff "$T/prov-$c2" "$T/prov-$c1" >&2 || true; echo "KO   provenances" >&2; exit 1; }
+
+  echo "## internalParameters signés (buildType slsa-tekton) : labels et annotations du PipelineRun, et du TaskRun de l'entrée pipelineTask"
+  echo "prédiction : drapeaux et annotations identiques ; labels : poc.test/declencheur=rattrapage (c1) contre les trois labels de Triggers"
+  echo "(c2), aux deux niveaux ; dans le TaskRun, en plus, tekton.dev/pipelineRun et tekton.dev/pipelineRunUID (nom et UID de chaque PipelineRun)"
+  for n in "$c1" "$c2"; do internes "sample-app-$n" > "$T/internes-$n"; done
+  jq -nS --slurpfile a "$T/internes-$c1" --slurpfile b "$T/internes-$c2" '
+    def ecart($x; $y): {rattrapage: ($x | with_entries(select(.key as $k | $y | has($k) | not))),
+      eventlistener: ($y | with_entries(select(.key as $k | $x | has($k) | not))),
+      differents: [$x | keys[] | select(. as $k | ($y | has($k)) and $x[$k] != $y[$k])]};
+    $a[0] as $x | $b[0] as $y
+    | {drapeaux_identiques: ($x.drapeaux == $y.drapeaux), annotations_identiques: ($x.annotations == $y.annotations),
+       annotations_taskrun_identiques: ($x.taskrun.annotations == $y.taskrun.annotations),
+       labels: ecart($x.labels; $y.labels), labels_taskrun: ecart($x.taskrun.labels; $y.taskrun.labels)}' > "$T/internes-ecart"
+  jq -c 'to_entries[]' "$T/internes-ecart" | sed 's/^/  /'
+  jq -e '.drapeaux_identiques and .annotations_identiques and .annotations_taskrun_identiques
+    and .labels.rattrapage == {"poc.test/declencheur": "rattrapage"} and .labels.differents == []
+    and (.labels.eventlistener | keys) == ["triggers.tekton.dev/eventlistener", "triggers.tekton.dev/trigger", "triggers.tekton.dev/triggers-eventid"]
+    and .labels.eventlistener["triggers.tekton.dev/eventlistener"] == "forgejo"
+    and .labels_taskrun.rattrapage == .labels.rattrapage and .labels_taskrun.eventlistener == .labels.eventlistener
+    and .labels_taskrun.differents == ["tekton.dev/pipelineRun", "tekton.dev/pipelineRunUID"]' "$T/internes-ecart" >/dev/null \
+    && echo "OK   seul écart signé : les labels posés par chaque créateur (chemin déclaré, identifiant d'événement de Triggers) ; aucun n'est vérifié par Chains" \
+    || { echo "KO   internalParameters : écart non prédit" >&2; exit 1; }
+  s=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/${s#*/}" - | tar -xO | jq -r '.metadata.annotations["tekton.dev/signature"]' > "$T/sig-pipeline"
+  grep -o 'tekton.dev/signature: .*' "$here/politique/taches/publier-essai.signee.yaml" | cut -d' ' -f2 > "$T/sig-tache"
+  jq -r '.taskrun.annotations["tekton.dev/signature"]' "$T/internes-$c1" > "$T/sig-taskrun"
+  if cmp -s "$T/sig-taskrun" "$T/sig-pipeline" && ! cmp -s "$T/sig-taskrun" "$T/sig-tache"; then
+    echo "CONSTAT  annotation tekton.dev/signature du TaskRun signé : celle de la pipeline en service ($(cut -c1-12 "$T/sig-pipeline")…, lue dans son bundle),"
+    echo "         pas celle de la tâche ($(cut -c1-12 "$T/sig-tache")…) : Pipelines v1.15.5 propage au TaskRun les annotations du PipelineRun, reçues de"
+    echo "         la Pipeline, et elles priment sur celles de la Task ; aucune politique ne la lit, trusted_task épingle par digest"
+  else echo "signature du TaskRun signé : $(cut -c1-12 "$T/sig-taskrun")… ; pipeline : $(cut -c1-12 "$T/sig-pipeline")… ; tâche : $(cut -c1-12 "$T/sig-tache")…"; fi
+
+  echo "## porte : verdicts des deux chemins (prédiction : celui de la tâche en service)"
+  for s in "$v1" "$v2"; do
+    [ "$(cut -d'|' -f3-5 <<< "$s")" = "false|$(trier "$SRC_J7")|trusted_task.tagged" ] || { echo "KO   verdict non prédit : $s" >&2; exit 1; }
+  done
+  succes rattrapage trusted_task.trusted && succes eventlistener trusted_task.trusted \
+    && echo "OK   même verdict par les deux chemins : règles de source seules en échec (attendu jusqu'à J7), trusted_task.trusted parmi les succès ; l'écart des labels est sans effet sur la porte" \
+    || { echo "KO   trusted_task.trusted absent des succès" >&2; exit 1; }
 
   echo "## main remise à $TETE_J2 (force-push) : livraison acceptée, rejeu sans effet"
   tpush=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -1162,7 +1285,7 @@ succes() { # cas code : la règle figure parmi les succès du verdict de la port
 trier() { tr ',' '\n' <<< "$1" | sort -u | paste -sd, -; }
 
 etape_porte() {
-  local d e bt0 r v c n k=0 src prevu busybox t st pipe tache
+  local d e bt0 r v c n k=0 prevu busybox t st pipe tache
   [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
   kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
   kubectl get validatingpolicy zone-confiance -o json | jq -e '.spec.matchConstraints.namespaceSelector.matchExpressions[0].values
@@ -1261,13 +1384,19 @@ etape_porte() {
     --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
     --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml \
     | kubectl apply --server-side -f - >/dev/null
+  # Lu dans la bibliothèque (lib/tekton/pipeline.rego) : la liste de tâches requises est choisie par le label
+  # build.appstudio.redhat.com/build_type du TaskRun, à défaut par pipelines.openshift.io/runtime des internalParameters,
+  # labels que pose le créateur du PipelineRun.
+  ! grep -qE '^ *(required-tasks|pipeline-required-tasks):' "$here/politique/porte/taches.yml" "$here/politique/porte/policy.yaml" \
+    "$here/politique/porte/policy-trusted-task.yaml" \
+    && echo "OK   aucune liste de tâches requises (required-tasks, pipeline-required-tasks) : les labels qui la choisiraient sont sans effet" \
+    || { echo "KO   listes de tâches requises fournies : le créateur du PipelineRun choisirait la sienne par un label" >&2; exit 1; }
 
   echo "## verdicts de la porte (Job de l'espace porte, sorties DNS et Zot) ; prédiction : codes des règles en violation"
-  src=slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay
   echo "règles de source (slsa_source_*) en échec attendu jusqu'à J7 : aucune source git dans la provenance de l'essai, aucune source attendue fournie"
   c=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/builds/$TEMOIN_CLE:temoin")
   while IFS='|' read -r n r pol prevu; do
-    prevu=$(trier "${prevu//@SRC@/$src}")
+    prevu=$(trier "${prevu//@SRC@/$SRC_J7}")
     v=$(juger "$n" "$REG/$r" "$pol")
     echo "  $v"
     case $v in
@@ -1322,6 +1451,8 @@ etape_droits() {
       horodatage) as=(--as=system:serviceaccount:horodatage:horodatage) ;;
       rattrapage) as=(--as=system:serviceaccount:declencheurs:rattrapage) ;;
       porte) as=(--as=system:serviceaccount:porte:porte) ;;
+      pipelines) as=(--as=system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) ;;
+      chains) as=(--as=system:serviceaccount:tekton-chains:tekton-chains-controller) ;;
       *) echo "KO   sujet inconnu : $sujet" >&2; exit 1 ;;
     esac
     if [ "$ns" = '*' ]; then obtenu=$(kubectl auth can-i "$verbe" "$ressource" -A "${as[@]}" 2>/dev/null || true)

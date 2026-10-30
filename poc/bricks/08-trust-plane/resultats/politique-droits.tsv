@@ -5,10 +5,14 @@ build	create	pods	builds	no	no
 build	create	taskruns.tekton.dev	builds	no	no
 build	create	pipelineruns.tekton.dev	builds	no	no
 build	delete	pipelineruns.tekton.dev	builds	no	no
+build	update	pipelineruns.tekton.dev	builds	no	no
+build	patch	pipelineruns.tekton.dev	builds	no	no
 build	get	taskruns.tekton.dev	builds	no	no
 build	create	serviceaccounts/token	tekton-chains	no	no
 el-forgejo	create	pipelineruns.tekton.dev	builds	yes	yes
 el-forgejo	delete	pipelineruns.tekton.dev	builds	no	no
+el-forgejo	update	pipelineruns.tekton.dev	builds	no	no
+el-forgejo	patch	pipelineruns.tekton.dev	builds	no	no
 el-forgejo	create	taskruns.tekton.dev	builds	no	no
 el-forgejo	get	pipelineruns.tekton.dev	builds	no	no
 el-forgejo	create	pipelineruns.tekton.dev	declencheurs	no	no
@@ -30,6 +34,8 @@ operateur	patch	taskruns.tekton.dev/status	builds	no	no
 operateur	update	taskruns.tekton.dev/status	builds	no	no
 operateur	patch	pipelineruns.tekton.dev/status	builds	no	no
 operateur	delete	pipelineruns.tekton.dev	builds	no	no
+operateur	update	pipelineruns.tekton.dev	builds	no	no
+operateur	patch	pipelineruns.tekton.dev	builds	no	no
 operateur	create	pods/exec	builds	no	no
 operateur	create	pods/attach	builds	no	no
 operateur	create	pods/portforward	builds	no	no
@@ -50,6 +56,8 @@ operateur	create	verificationpolicies.tekton.dev	builds	no	no
 operateur	delete	validatingpolicies.policies.kyverno.io	*	no	no
 horodatage	list	taskruns.tekton.dev	builds	no	no
 horodatage	list	pipelineruns.tekton.dev	builds	no	no
+horodatage	update	pipelineruns.tekton.dev	builds	no	no
+horodatage	patch	pipelineruns.tekton.dev	builds	no	no
 horodatage	get	secrets	horodatage	no	no
 horodatage	list	secrets	*	no	no
 horodatage	create	pods	horodatage	no	no
@@ -70,7 +78,13 @@ rattrapage	create	pods	declencheurs	no	no
 rattrapage	create	cronjobs.batch	declencheurs	no	no
 rattrapage	get	eventlisteners.triggers.tekton.dev	declencheurs	no	no
 porte	list	pipelineruns.tekton.dev	builds	no	no
+porte	update	pipelineruns.tekton.dev	builds	no	no
+porte	patch	pipelineruns.tekton.dev	builds	no	no
 porte	get	configmaps	porte	no	no
 porte	list	secrets	*	no	no
 porte	create	pods	porte	no	no
 porte	create	jobs.batch	porte	no	no
+pipelines	update	pipelineruns.tekton.dev	builds	yes	yes
+pipelines	patch	pipelineruns.tekton.dev	builds	yes	yes
+chains	update	pipelineruns.tekton.dev	builds	yes	yes
+chains	patch	pipelineruns.tekton.dev	builds	yes	yes

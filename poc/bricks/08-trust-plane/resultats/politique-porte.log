@@ -1,4 +1,4 @@
-# politique.sh porte, 2026-10-30T09:52:30Z
+# politique.sh porte, 2026-10-30T10:11:17Z
 ## bibliothèque conforma/policy v1.0.28 (Apache-2.0)
 OK   tag v1.0.28 (annoté, non signé) → commit ebd3fbd270297c15f590f4023360465ffb41d4fe, signé (vérifié par GitHub), arbre 0fd26021bb08582553f392565ca0faf316c51229 dans le contenu signé
 OK   commit récupéré par git (objets vérifiés), même arbre
@@ -12,14 +12,14 @@ chains-config : builddefinition.buildtype=https://tekton.dev/chains/v2/slsa-tekt
 ## tâche en service : PipelineRun du gabarit ; la provenance jugée (la plus récente de builds/essai-webhook) doit venir de lui
 PipelineRun j6-porte-en-service exécuté, Chains : signé=true
 OK   TaskRun créé par ce PipelineRun ; tâche sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849 dans la liste revue
-OK   la plus récente des 29 : début 2026-10-30T09:52:35Z, 11929 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
+OK   la plus récente des 30 : début 2026-10-30T10:11:22Z, 11929 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
 internalParameters : annotations, labels, tekton-pipelines-feature-flags ; labels du PipelineRun : tekton.dev/pipeline
 ## images d'essai : une par cas (la bibliothèque ne juge que la provenance la plus récente d'un digest)
 mesure en buildType slsa (J4, J5) : Chains basculé le temps d'une image, puis rétabli en slsa-tekton
-slsa : tâche tekton/tasks/publier-essai@sha256:629c9b3096e0c4871d34b6217ecd0a4d77f5fe699f020b3777090f4a0e6e19d1, image builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 ; PipelineRun exécuté, Chains : signé=true
+slsa : tâche tekton/tasks/publier-essai@sha256:38ec857758d86bbdf4904f5ca93cdcadb864dc2c169275ac2933af5356c2268a, image builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 ; PipelineRun exécuté, Chains : signé=true
 chains-config rétabli : https://tekton.dev/chains/v2/slsa-tekton
-hors-liste : tâche tekton/tasks/publier-hors-liste@sha256:4f3c5da288f52ac31c82444aec831c41c2d1488868ef94ec112fc5a7fc03e5be, image builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c ; PipelineRun exécuté, Chains : signé=true
-version-non-listee : tâche tekton/tasks/publier-essai@sha256:ba4092824ff4a68f8db93cec50f105332e1aaaac34e745aa94a7a3e84983b136, image builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 ; PipelineRun exécuté, Chains : signé=true
+hors-liste : tâche tekton/tasks/publier-hors-liste@sha256:dd44afc3b85fabe2e39e1ebc4610137b23913fb06b1dc477e783e187964f1de2, image builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c ; PipelineRun exécuté, Chains : signé=true
+version-non-listee : tâche tekton/tasks/publier-essai@sha256:d29514c6c3f22317726d2a06d147e998932a827fd04dd063e899557df8292c39, image builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 ; PipelineRun exécuté, Chains : signé=true
 non-signee : image builds/essai-porte@sha256:4f2f963d3d201e7b9997e5141c9c4db9991f42644d5f80ac833f4aca6fbf4f01, jamais présentée à Chains
 slsa : 2519 octets, buildType https://tekton.dev/chains/v2/slsa, entrées pipelineTask avec contenu : 0
 hors-liste : 11940 octets, buildType https://tekton.dev/chains/v2/slsa-tekton, entrées pipelineTask avec contenu : 1
@@ -29,6 +29,7 @@ version-non-listee : 11987 octets, buildType https://tekton.dev/chains/v2/slsa-t
   trusted_tasks:
     oci://sc-stockage.poc.test:5000/tekton/tasks/publier-essai:
       - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
+OK   aucune liste de tâches requises (required-tasks, pipeline-required-tasks) : les labels qui la choisiraient sont sans effet
 ## verdicts de la porte (Job de l'espace porte, sorties DNS et Zot) ; prédiction : codes des règles en violation
 règles de source (slsa_source_*) en échec attendu jusqu'à J7 : aucune source git dans la provenance de l'essai, aucune source attendue fournie
   VERDICT|slsa|false|porte.taches_vues,slsa_build_scripted_build.build_task_image_results_found,slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,tasks.pipeline_has_tasks||0
@@ -37,7 +38,7 @@ OK   slsa : refus, violations prédites
 OK   slsa-trusted-task-seul : admis, comme prédit
   VERDICT|en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|1
 OK   en-service : refus, violations prédites
-  VERDICT|hors-liste|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|0
+  VERDICT|hors-liste|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|1
 OK   hors-liste : refus, violations prédites
   VERDICT|version-non-listee|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|1
 OK   version-non-listee : refus, violations prédites
@@ -47,11 +48,11 @@ OK   non-signee : refus, violations prédites
 OK   autre-cle : refus, violations prédites
 OK   en-service : trusted_task.trusted et porte.taches_vues parmi les succès
 CONSTAT  slsa : trusted_task.trusted compté parmi les succès alors qu'aucune tâche n'est vue (succès à vide) ; seuls tasks.pipeline_has_tasks (collection slsa3) et le témoin porte.taches_vues refusent ; avec trusted_task seul, l'image est admise
-provenances de PipelineRun de builds/essai-webhook (image de la tâche en service) : 29 ; listées : 12, non listées : 15, sans tâche : 2 ; les trois plus récentes :
-  2026-10-30T09:51:18Z slsa-tekton listée
+provenances de PipelineRun de builds/essai-webhook (image de la tâche en service) : 30 ; listées : 13, non listées : 15, sans tâche : 2 ; les trois plus récentes :
   2026-10-30T09:51:40Z slsa-tekton listée
   2026-10-30T09:52:39Z slsa-tekton listée
+  2026-10-30T10:11:27Z slsa-tekton listée
 CONSTAT  la bibliothèque ne juge que la provenance la plus récente d'un digest (max de finishedOn) : 15 provenance(s) plus ancienne(s), signée(s) par Chains avec une tâche non listée, n'empêche(nt) pas trusted_task.trusted
-  motif hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/publier-hors-liste@sha256:4f3c5da288f52ac31c82444aec831c41c2d1488868ef94ec112fc5a7fc03e5be
+  motif hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/publier-hors-liste@sha256:dd44afc3b85fabe2e39e1ebc4610137b23913fb06b1dc477e783e187964f1de2
   motif non-signee : builtin.attestation.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more a
   motif non-signee : builtin.image.signature_check : Image signature check failed: no signatures found

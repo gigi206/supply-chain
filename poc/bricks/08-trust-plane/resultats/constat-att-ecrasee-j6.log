@@ -1,0 +1,175 @@
+# Brique 08, J6 : enveloppes de Chains perdues dans le tag .att de builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (relevé du 2026-10-30T10:23:54Z)
+# Sources : journal du contrôleur tekton-chains-controller (pod démarré le 2026-10-29T22:43:15Z, aucun redémarrage), audit de Zot
+# (/var/log/zot/audit.log de sc-stockage), cosign download attestation (enveloppes présentes), horodatage/bundles (referrers).
+## écritures d'attestation de Chains vers ce digest (début de l'envoi → « Successfully uploaded … legacy format »)
+  2026-10-29 22:43:33.780 → 22:43:36.502  builds/j6-pipeline-signee-publier
+  2026-10-29 22:43:36.990 → 22:43:39.904  builds/j6-pipeline-signee
+  2026-10-29 22:44:16.409 → 22:44:19.514  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  2026-10-29 22:44:20.082 → 22:44:23.438  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-29 22:44:31.434 → 22:44:34.813  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-29 22:44:35.302 → 22:44:38.778  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-29 22:45:33.552 → 22:45:36.769  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  2026-10-29 22:45:37.236 → 22:45:40.707  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-29 22:45:47.584 → 22:45:51.108  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-29 22:45:51.566 → 22:45:55.170  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-29 23:14:39.234 → 23:14:42.875  builds/j6-horodatage-publier
+  2026-10-29 23:14:43.320 → 23:14:46.974  builds/j6-horodatage
+  2026-10-29 23:35:11.180 → 23:35:15.165  builds/j6-horodatage-publier
+  2026-10-29 23:35:15.611 → 23:35:19.516  builds/j6-horodatage
+  2026-10-30 00:32:34.475 → 00:32:38.505  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier
+  2026-10-30 00:32:38.962 → 00:32:43.002  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  2026-10-30 00:38:29.044 → 00:38:33.323  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier
+  2026-10-30 00:38:33.774 → 00:38:38.076  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  2026-10-30 00:40:14.232 → 00:40:18.709  builds/sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier
+  2026-10-30 00:40:19.145 → 00:40:23.682  builds/sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6
+  2026-10-30 00:49:15.128 → 00:49:19.825  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  2026-10-30 00:49:20.274 → 00:49:24.998  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-30 00:49:31.154 → 00:49:36.036  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-30 00:49:36.485 → 00:49:41.432  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-30 00:54:31.643 → 00:54:36.728  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier
+  2026-10-30 00:54:37.171 → 00:54:42.275  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  2026-10-30 00:56:12.805 → 00:56:18.063  builds/sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier
+  2026-10-30 00:56:18.524 → 00:56:23.886  builds/sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6
+  2026-10-30 09:11:27.744 → 09:11:33.292  builds/j6-pipeline-signee-publier
+  2026-10-30 09:11:33.742 → 09:11:39.384  builds/j6-pipeline-signee
+  2026-10-30 09:11:56.810 → 09:12:02.842  builds/j6-sans-restriction-publier
+  2026-10-30 09:12:03.312 → 09:12:14.275  builds/j6-sans-restriction
+  2026-10-30 09:12:03.846 → 09:12:14.813  builds/j6-restreint-publier
+  2026-10-30 09:12:15.281 → 09:12:21.408  builds/j6-restreint
+  2026-10-30 09:12:44.771 → 09:12:50.779  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-30 09:14:55.170 → 09:15:01.423  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-30 09:15:01.885 → 09:15:08.621  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-30 09:18:39.522 → 09:18:45.873  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  2026-10-30 09:18:46.325 → 09:18:52.683  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-30 09:18:59.561 → 09:19:06.274  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-30 09:19:06.766 → 09:19:14.008  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-30 09:47:41.579 → 09:47:48.306  builds/j6-pipeline-signee-publier
+  2026-10-30 09:47:48.749 → 09:47:55.525  builds/j6-pipeline-signee
+  2026-10-30 09:48:11.641 → 09:48:19.609  builds/j6-sans-restriction-publier
+  2026-10-30 09:48:16.667 → 09:48:28.854  builds/j6-restreint-publier
+  2026-10-30 09:48:20.774 → 09:48:33.180  builds/j6-sans-restriction
+  2026-10-30 09:48:30.216 → 09:48:38.500  builds/j6-restreint
+  2026-10-30 09:48:54.776 → 09:49:02.757  builds/j6-sans-restriction-publier
+  2026-10-30 09:49:00.811 → 09:49:13.428  builds/j6-restreint-publier
+  2026-10-30 09:49:04.056 → 09:49:16.895  builds/j6-sans-restriction
+  2026-10-30 09:49:14.529 → 09:49:23.329  builds/j6-restreint
+  2026-10-30 09:49:33.896 → 09:49:41.297  builds/j6-porte-en-service-publier
+  2026-10-30 09:49:41.753 → 09:49:49.136  builds/j6-porte-en-service
+  2026-10-30 09:51:18.348 → 09:51:26.242  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  2026-10-30 09:51:26.705 → 09:51:34.325  builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-30 09:51:40.211 → 09:51:47.890  builds/sample-app-2222222222222222222222222222222222222222-publier
+  2026-10-30 09:51:48.343 → 09:51:56.160  builds/sample-app-2222222222222222222222222222222222222222
+  2026-10-30 09:52:39.332 → 09:52:47.174  builds/j6-porte-en-service-publier
+  2026-10-30 09:52:47.609 → 09:52:55.443  builds/j6-porte-en-service
+  2026-10-30 10:11:27.286 → 10:11:35.451  builds/j6-porte-en-service-publier
+  2026-10-30 10:11:35.895 → 10:11:44.172  builds/j6-porte-en-service
+  2026-10-30 10:17:30.978 → 10:17:39.377  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier
+  2026-10-30 10:17:39.821 → 10:17:48.226  builds/sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+total : 63 écritures réussies depuis le démarrage du contrôleur
+## écritures (PUT) du tag .att de ce digest dans l'audit de Zot, 09:10 → 09:50
+  09:11:33.293 poc-build 201
+  09:11:39.386 poc-build 201
+  09:12:02.844 poc-build 201
+  09:12:14.277 poc-build 201
+  09:12:14.814 poc-build 201
+  09:12:21.409 poc-build 201
+  09:12:50.780 poc-build 201
+  09:15:01.424 poc-build 201
+  09:15:08.622 poc-build 201
+  09:18:45.874 poc-build 201
+  09:18:52.684 poc-build 201
+  09:19:06.275 poc-build 201
+  09:19:14.010 poc-build 201
+  09:47:48.305 poc-build 201
+  09:47:55.525 poc-build 201
+  09:48:19.576 poc-build 201
+  09:48:28.853 poc-build 201
+  09:48:33.139 poc-build 201
+  09:48:38.499 poc-build 201
+  09:49:02.743 poc-build 201
+  09:49:13.427 poc-build 201
+  09:49:16.895 poc-build 201
+  09:49:23.328 poc-build 201
+  09:49:41.297 poc-build 201
+  09:49:49.134 poc-build 201
+## enveloppes présentes (début → fin, type, buildType, PipelineRun pour un TaskRun en slsa-tekton)
+  2026-10-29T21:05:44Z → 21:05:48 PR slsa 
+  2026-10-29T21:05:44Z → 21:05:48 TR slsa 
+  2026-10-29T21:05:57Z → 21:06:01 PR slsa 
+  2026-10-29T21:05:57Z → 21:06:01 TR slsa 
+  2026-10-29T22:43:25Z → 22:43:29 PR slsa 
+  2026-10-29T22:43:25Z → 22:43:29 TR slsa 
+  2026-10-29T22:44:12Z → 22:44:16 PR slsa 
+  2026-10-29T22:44:12Z → 22:44:16 TR slsa 
+  2026-10-29T22:44:25Z → 22:44:31 PR slsa 
+  2026-10-29T22:44:25Z → 22:44:31 TR slsa 
+  2026-10-29T22:45:28Z → 22:45:33 PR slsa 
+  2026-10-29T22:45:28Z → 22:45:33 TR slsa 
+  2026-10-29T22:45:42Z → 22:45:47 PR slsa 
+  2026-10-29T22:45:42Z → 22:45:47 TR slsa 
+  2026-10-29T23:14:33Z → 23:14:39 PR slsa 
+  2026-10-29T23:14:33Z → 23:14:39 TR slsa 
+  2026-10-29T23:35:05Z → 23:35:11 PR slsa 
+  2026-10-29T23:35:05Z → 23:35:11 TR slsa 
+  2026-10-30T00:32:30Z → 00:32:34 PR slsa 
+  2026-10-30T00:32:30Z → 00:32:34 TR slsa 
+  2026-10-30T00:38:24Z → 00:38:29 PR slsa 
+  2026-10-30T00:38:24Z → 00:38:29 TR slsa 
+  2026-10-30T00:40:08Z → 00:40:14 PR slsa 
+  2026-10-30T00:40:08Z → 00:40:14 TR slsa 
+  2026-10-30T00:49:09Z → 00:49:15 PR slsa 
+  2026-10-30T00:49:09Z → 00:49:15 TR slsa 
+  2026-10-30T00:49:09Z → 09:12:44 PR slsa 
+  2026-10-30T00:49:25Z → 00:49:31 PR slsa 
+  2026-10-30T00:49:25Z → 00:49:31 TR slsa 
+  2026-10-30T00:54:26Z → 00:54:31 PR slsa 
+  2026-10-30T00:54:26Z → 00:54:31 TR slsa 
+  2026-10-30T00:56:08Z → 00:56:12 PR slsa 
+  2026-10-30T00:56:09Z → 00:56:12 TR slsa 
+  2026-10-30T09:11:21Z → 09:11:27 PR slsa 
+  2026-10-30T09:11:22Z → 09:11:27 TR slsa 
+  2026-10-30T09:11:51Z → 09:11:56 TR slsa 
+  2026-10-30T09:11:58Z → 09:12:03 PR slsa 
+  2026-10-30T09:11:58Z → 09:12:03 TR slsa 
+  2026-10-30T09:14:49Z → 09:14:55 PR slsa 
+  2026-10-30T09:14:49Z → 09:14:55 TR slsa 
+  2026-10-30T09:18:35Z → 09:18:39 PR slsa 
+  2026-10-30T09:18:35Z → 09:18:39 TR slsa 
+  2026-10-30T09:18:54Z → 09:18:59 PR slsa 
+  2026-10-30T09:18:54Z → 09:18:59 TR slsa 
+  2026-10-30T09:47:37Z → 09:47:41 PR slsa-tekton 
+  2026-10-30T09:47:37Z → 09:47:41 TR slsa-tekton j6-pipeline-signee
+  2026-10-30T09:48:12Z → 09:48:16 PR slsa-tekton 
+  2026-10-30T09:48:12Z → 09:48:16 TR slsa-tekton j6-restreint
+  2026-10-30T09:48:55Z → 09:49:00 PR slsa-tekton 
+  2026-10-30T09:48:55Z → 09:49:00 TR slsa-tekton j6-restreint
+  2026-10-30T09:49:28Z → 09:49:33 PR slsa-tekton 
+  2026-10-30T09:49:28Z → 09:49:33 TR slsa-tekton j6-porte-en-service
+  2026-10-30T09:51:18Z → 09:51:18 PR slsa-tekton 
+  2026-10-30T09:51:18Z → 09:51:18 TR slsa-tekton sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+  2026-10-30T09:51:35Z → 09:51:40 PR slsa-tekton 
+  2026-10-30T09:51:35Z → 09:51:40 TR slsa-tekton sample-app-2222222222222222222222222222222222222222
+  2026-10-30T09:52:35Z → 09:52:39 PR slsa-tekton 
+  2026-10-30T09:52:35Z → 09:52:39 TR slsa-tekton j6-porte-en-service
+  2026-10-30T10:11:22Z → 10:11:27 PR slsa-tekton 
+  2026-10-30T10:11:22Z → 10:11:27 TR slsa-tekton j6-porte-en-service
+  2026-10-30T10:17:25Z → 10:17:30 PR slsa-tekton 
+  2026-10-30T10:17:25Z → 10:17:30 TR slsa-tekton sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+total : 62 enveloppes, dont 4 antérieures au démarrage du contrôleur
+## bundles horodatés de ce digest sans enveloppe dans les tags .att (essai-signature, essai-webhook) : enveloppe perdue après horodatage
+  bundle sha256:05da960a30ca…, horodaté le 2026-10-30T09:49:22Z : TR j6-sans-restriction, début 2026-10-30T09:48:49Z, fin 2026-10-30T09:48:54Z
+bundles : 64 ; enveloppes : 63 (essai-signature et essai-webhook)
+## bilan
+écritures réussies depuis le démarrage du contrôleur : 63 ; enveloppes présentes issues de cette période : 62 - 4 = 58 ; perdues : 5.
+Perdues (déduit des écritures et des enveloppes présentes, par le début et le type de chaque exécution) : toutes de j6-sans-restriction,
+l'exécution d'audit de l'étape restreint, suivie quelques secondes plus tard par j6-restreint vers le même digest :
+  - 1re exécution de l'étape (09:11-09:12) : provenance du PipelineRun (écrite à 09:12:14.275, réécrite par le TaskRun de
+    j6-restreint, envoi commencé à 09:12:03.846, avant cette écriture) ; celle du TaskRun (début 09:11:51) est présente ;
+  - 2e exécution (09:48) : TaskRun et PipelineRun ; 3e exécution (09:49) : TaskRun et PipelineRun (chronologie ci-dessus :
+    TaskRun écrit à 09:49:02.743, tag réécrit à 09:49:13.427 par le TaskRun de j6-restreint, dont l'envoi avait commencé à
+    09:49:00.811 ; PipelineRun écrit à 09:49:16.895, tag réécrit à 09:49:23.328 par le PipelineRun de j6-restreint, envoi
+    commencé à 09:49:14.529).
+Le TaskRun de la 3e exécution a été horodaté (passage de 09:49, bundle créé à 09:49:22) pendant les 6 s où son enveloppe
+figurait dans le tag : seul bundle orphelin (64 bundles pour 63 enveloppes), relevé par l'étape rattrapage du 30/10/2026 à 10:19.
+Chaque envoi dure de 8 à 12 s (journal de Chains), contre environ 3 s en J4 (constat-att-ecrasee.log) : la fenêtre de course
+s'est élargie. Cause non mesurée ; piste : l'image .att est réécrite en entier (plus de 60 couches pour ce digest).
