@@ -1,0 +1,14 @@
+# construction.sh entrees, 2026-10-30T15:56:13Z
+## prédiction
+arbres de la brique 03 : fermeture 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b, web/dist f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a (voie-d.sh) ; deux poussées de chacun : même digest
+  (manifeste sans date, un fichier par couche) ; relus en lecture anonyme : mêmes chemins et contenus
+OK   arbre de la fermeture (canon/deps de la brique 03) : 51ccd0964bea8a2065dfda803dad14b5c6246ad712c55bbccc1005c54cd7b10b
+OK   arbre de web/dist (build-apres de la brique 03) : f6e8170f1a1a04b589d7a30e07c1effb99973bb6625c4457df435c3c1710910a
+OK   fermeture poussée deux fois (closure.sh) : 192.168.161.13:5000/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web/dist poussé deux fois : 192.168.161.13:5000/entrees/sample-app/web-dist@sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   fermeture relu(e) en lecture anonyme : chemins et contenus : 1852dbbd7863300e7f85563de65273477fa66ee94b606f349bb7a18ad7f6dcd0
+application/vnd.supply-chain.deps-closure.v1, 8 couche(s), 220967 octets
+OK   web-dist relu(e) en lecture anonyme : chemins et contenus : 86af872ed9b21d3ab1054cc12233db3f1a354748e2f410618f4a6e32579073ba
+application/vnd.supply-chain.web-dist.v1, 2 couche(s), 41285 octets
+OK   fermeture (digest épinglé) : sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web/dist (digest épinglé) : sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb

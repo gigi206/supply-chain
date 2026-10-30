@@ -1,25 +1,25 @@
-# stockage.sh zot, 2026-10-30T11:54:31Z
+# stockage.sh zot, 2026-10-30T15:47:54Z
 ~/.local/share/mise/installs/aqua-project-zot-zot/2.1.22/zot: OK
 htpasswd : poc-ecriture, bcrypt, coût 12
 htpasswd : poc-build, bcrypt, coût 12
 htpasswd : poc-horodatage, bcrypt, coût 12
+htpasswd : poc-images, bcrypt, coût 12
 zot: OK
-Created symlink '/etc/systemd/system/multi-user.target.wants/zot.service' -> '/etc/systemd/system/zot.service'.
 https://192.168.161.13:5000/v2/ (CA du PoC) : HTTP 200
 active
-{"time":"2026-10-30T11:54:35.556593107Z","level":"info","message":"version","distribution-spec":"1.1.1","commit":"v2.1.22-0-g6bbc7e5","binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs","go version":"go1.27.1","caller":"zotregistry.dev/zot/v2/pkg/cli/server/root.go:261","func":"zotregistry.dev/zot/v2/pkg/cli/server.NewServerRootCmd.func1","goroutine":1}
-LISTEN 0      4096   192.168.161.13:5000       0.0.0.0:*    users:(("zot",pid=1442,fd=11))           
-drwxr-x--- 3 root zot 4096 Oct 30 11:54 /etc/zot
-drwxr-x--- 3 zot  zot 4096 Oct 30 11:54 /var/lib/zot
-drwxr-x--- 2 zot  zot 4096 Oct 30 11:54 /var/log/zot
+{"time":"2026-10-30T15:47:58.959936456Z","level":"info","message":"version","distribution-spec":"1.1.1","commit":"v2.1.22-0-g6bbc7e5","binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs","go version":"go1.27.1","caller":"zotregistry.dev/zot/v2/pkg/cli/server/root.go:261","func":"zotregistry.dev/zot/v2/pkg/cli/server.NewServerRootCmd.func1","goroutine":1}
+LISTEN 0      4096   192.168.161.13:5000       0.0.0.0:*    users:(("zot",pid=8026,fd=11))           
+drwxr-x---  3 root zot 4096 Oct 30 15:47 /etc/zot
+drwxr-x--- 13 zot  zot 4096 Oct 30 15:47 /var/lib/zot
+drwxr-x---  2 zot  zot 4096 Oct 30 11:54 /var/log/zot
 /etc/zot:
 total 12
--rw-r----- 1 root zot 1728 Oct 30 11:54 config.json
--rw-r----- 1 root zot  221 Oct 30 11:54 htpasswd
-drwxr-x--- 2 root zot 4096 Oct 30 11:54 tls
+-rw-r----- 1 root zot 2313 Oct 30 15:47 config.json
+-rw-r----- 1 root zot  293 Oct 30 15:47 htpasswd
+drwxr-x--- 2 root zot 4096 Oct 30 15:47 tls
 
 /etc/zot/tls:
 total 8
--rw-r--r-- 1 root root 778 Oct 30 11:54 zot.crt
--rw-r----- 1 root zot  241 Oct 30 11:54 zot.key
+-rw-r--r-- 1 root root 778 Oct 30 15:47 zot.crt
+-rw-r----- 1 root zot  241 Oct 30 15:47 zot.key
 -> Overall exposure level for zot.service: 3.0 OK :-)

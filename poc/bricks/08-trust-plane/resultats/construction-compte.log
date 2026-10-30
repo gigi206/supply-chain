@@ -1,0 +1,22 @@
+# construction.sh compte, 2026-10-30T15:55:44Z
+## prédiction (condition CEL lue dans le code de Zot v2.1.22 : pkg/api/authz.go, manifestWriteAuthzChecks)
+poc-images : blobs et manifeste par digest dans builds/ acceptés, deux fois (une référence par digest sans tag demande la
+  création, pas la mise à jour) ; refus 403 : manifeste par tag, tag sha256-….att, digest avec ?tag= (motif de la condition
+  dans la réponse), dépôt hors de builds/ et suppression (aucune politique)
+## écritures de poc-images (image sample-app de la brique 04, sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5)
+OK   push par digest n° 1 (oras cp, blobs et manifeste) : builds/essai-images@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   push par digest n° 2 (oras cp, blobs et manifeste) : builds/essai-images@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   PUT du manifeste par digest (curl) : 201
+OK   tag essai : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   tag .att : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   digest avec ?tag=essai : refusé (403, poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att))
+OK   dépôt hors de builds/ (workspace/essai-images) : 403
+OK   suppression du manifeste : 403
+## audit de Zot (écritures de poc-images)
+{"t":"15:55:46","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+{"t":"15:55:47","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+{"t":"15:55:47","action":"PUT","objet":"builds/essai-images/manifests/sha256…3a7ca1b14dbf","code":201}
+## objets de builds : secret zot-images (poc-images, sc-stockage.poc.test:5000) et ConfigMap ca-poc
+Secret zot-images : clés config.json
+ConfigMap ca-poc : clés ca.crt
+secret zot-images appliqué depuis un fichier 0600 (entrée standard de kubectl, sans annotation last-applied)

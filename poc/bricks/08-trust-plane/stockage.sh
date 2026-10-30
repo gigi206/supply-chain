@@ -4,8 +4,8 @@
 #              clés en 0600 dans ~/.cache/supply-chain-poc/08/secrets, certificats dans …/08/pki
 #   zot        Zot 2.1.22, binaire de mise.toml revérifié dans la VM, service systemd durci, TLS ;
 #              lecture anonyme ; écriture par poc-ecriture (tous les dépôts), poc-build (builds/** seulement, zone
-#              build) et poc-horodatage (horodatage/** seulement, job d'horodatage de J5) en htpasswd bcrypt, sans
-#              suppression
+#              build), poc-horodatage (horodatage/** seulement, job d'horodatage de J5) et poc-images (J7 : builds/**,
+#              création par digest seulement, condition CEL de zot.json) en htpasswd bcrypt, sans suppression
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -64,9 +64,10 @@ etape_zot() {
   z=$(type -P zot)
   echo "$ZOT_SHA  $z" | sha256sum -c | sed "s#$HOME#~#g"
   # poc-ecriture : hôte (tous les dépôts) ; poc-build : zone build, dépôts builds/** seulement ; poc-horodatage : job
-  # d'horodatage (J5), dépôts horodatage/** seulement (zot.json). Sans suppression.
+  # d'horodatage (J5), dépôts horodatage/** seulement ; poc-images : tâche de push de la construction (J7), builds/**, création
+  # par digest seulement, ni tag ni mise à jour (zot.json). Sans suppression.
   rm -rf "$d" && (umask 077 && mkdir -p "$d")
-  for compte in poc-ecriture poc-build poc-horodatage; do
+  for compte in poc-ecriture poc-build poc-horodatage poc-images; do
     [ -s "$S/zot-$compte.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-$compte.password")
     h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-$compte.password")
     case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac

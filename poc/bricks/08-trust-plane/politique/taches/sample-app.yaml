@@ -1,0 +1,63 @@
+# Brique 08, J7 : pipeline de construction de sample-app (voie A), signée par la clé des tâches et publiée en bundle
+# (tekton/pipelines/sample-app). Ses tâches sont tirées de leurs bundles signés, épinglés par digest, et ses entrées hors du
+# dépôt (fermeture, web/dist) sont fixées ici par digest : la signature de la pipeline couvre ces choix, que le créateur du
+# PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt, le workspace sortie (PVC) et le runtimeClassName
+# de la tâche construire (taskRunSpecs). @CONSTRUIRE@, @PUBLIER@, @FERMETURE@, @WEB_DIST@, @IMAGE@ : construction.sh taches.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: sample-app
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: construire
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE@
+      - name: name
+        value: construire-image
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    - name: fermeture
+      value: @FERMETURE@
+    - name: web-dist
+      value: @WEB_DIST@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER@
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+    params:
+    - name: image
+      value: @IMAGE@
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    workspaces:
+    - name: sortie
+      workspace: sortie

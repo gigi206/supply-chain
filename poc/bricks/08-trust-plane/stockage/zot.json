@@ -56,6 +56,28 @@
                 "create",
                 "update"
               ]
+            },
+            {
+              "users": [
+                "poc-images"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-images"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att)"
+                }
+              ]
             }
           ]
         },

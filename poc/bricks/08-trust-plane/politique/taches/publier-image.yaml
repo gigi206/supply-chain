@@ -1,0 +1,73 @@
+# Brique 08, J7 : publication de l'image construite par construire-image (choix du propriétaire du 30/10/2026 : tâche de push
+# séparée). Pod runc conforme à Pod Security restricted ; le compte Zot poc-images (secret zot-images de builds, monté par
+# cette seule tâche signée) ne peut que créer par digest dans builds/** : ni tag, donc ni .sig ni .att, ni mise à jour, ni
+# suppression (condition CEL de stockage/zot.json). Kyverno interdit un secret en podTemplate ou en workspace (test 2).
+# Seule cette tâche émet IMAGE_URL et IMAGE_DIGEST : Chains signe l'image une fois poussée, et y écrit .sig et .att.
+# Signée une fois, versionnée (publier-image.signee.yaml), digest dans la liste revue : construction.sh taches. @OUTILS@ : idem.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: publier-image
+spec:
+  params:
+  - name: image
+    type: string
+  - name: digest
+    type: string
+  workspaces:
+  - name: sortie
+    readOnly: true
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  volumes:
+  - name: ca-poc
+    configMap:
+      name: ca-poc
+  - name: zot
+    secret:
+      secretName: zot-images
+  - name: layout
+    emptyDir: {}
+  stepTemplate:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+  steps:
+  - name: publier
+    image: @OUTILS@
+    env:
+    - name: IMAGE
+      value: $(params.image)
+    - name: DIGEST
+      value: $(params.digest)
+    volumeMounts:
+    - name: ca-poc
+      mountPath: /etc/ca-poc
+      readOnly: true
+    - name: zot
+      mountPath: /etc/zot
+      readOnly: true
+    - name: layout
+      mountPath: /layout
+    script: |
+      #!/busybox/sh
+      set -eu
+      case $IMAGE in sc-stockage.poc.test:5000/builds/*) ;; *) echo "dépôt hors de builds/ : $IMAGE" >&2; exit 1 ;; esac
+      case $IMAGE in *@*|*:*:*) echo "dépôt avec tag ou digest : $IMAGE" >&2; exit 1 ;; esac
+      case ${DIGEST#sha256:} in *[!0-9a-f]*) echo "digest invalide : $DIGEST" >&2; exit 1 ;; esac
+      [ ${#DIGEST} = 71 ] || { echo "digest invalide : $DIGEST" >&2; exit 1; }
+      export HOME=/tmp
+      tar -xf $(workspaces.sortie.path)/image.tar -C /layout
+      i=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' /layout/index.json)
+      [ "$i" = "$DIGEST" ] || { echo "tar OCI : $i, différent du digest construit $DIGEST" >&2; exit 1; }
+      oras cp --no-tty --from-oci-layout "/layout@$DIGEST" "$IMAGE@$DIGEST" --to-ca-file /etc/ca-poc/ca.crt \
+        --to-registry-config /etc/zot/config.json > /dev/null
+      lu=$(oras manifest fetch --descriptor --ca-file /etc/ca-poc/ca.crt "$IMAGE@$DIGEST" | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')
+      [ "$lu" = "$DIGEST" ] || { echo "relu dans Zot : $lu" >&2; exit 1; }
+      echo "publiée : $IMAGE@$DIGEST (relue en lecture anonyme)"
+      printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+      printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)

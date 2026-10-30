@@ -1,0 +1,129 @@
+# --- premier passage : shebang /bin/sh absent de l'image d'outils (sh dans /busybox) ---
+# construction.sh construire, 2026-10-30T15:56:57Z
+## prédiction
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les deux tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  construire : pod Kata sur sc-build, QEMU -smp 3 -m 6176M (limites 2 CPU et 6 Gi de la seule étape construire) ; arbre
+    30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture et web/dist tirés ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 : l'écart web/package*.json du dépôt
+    ne touche pas l'image, qui ne contient que le binaire)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les deux TaskRuns et le PipelineRun
+même PipelineRun sans runtimeClassName : construire refusé à la création du pod (Pod Security restricted : privileged),
+  publier jamais lancé, aucune écriture de poc-images
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (StepFailed, pod j7-sample-app-construire-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : 2026/10/30 15:57:11 Error executing command: fork/exec /tekton/scripts/script-1-tkc9j: no such file or directory
+     step-construire : 2026/10/30 15:57:12 Skipping step because a previous step failed
+## mesures
+KO   PipelineRun j7-sample-app : False|Failed (attendu : True|Succeeded)
+
+# --- deuxième passage : CA de la ConfigMap perdue après la première étape (construction.sh constat_cm) ---
+# construction.sh construire, 2026-10-30T15:58:09Z
+## prédiction
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les deux tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  construire : pod Kata sur sc-build, QEMU -smp 3 -m 6176M (limites 2 CPU et 6 Gi de la seule étape construire) ; arbre
+    30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture et web/dist tirés ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 : l'écart web/package*.json du dépôt
+    ne touche pas l'image, qui ne contient que le binaire)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les deux TaskRuns et le PipelineRun
+même PipelineRun sans runtimeClassName : construire refusé à la création du pod (Pod Security restricted : privileged),
+  publier jamais lancé, aucune écriture de poc-images
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (StepFailed, pod j7-sample-app-construire-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : Error: open /etc/ca-poc/ca.crt: no such file or directory
+     step-construire : 2026/10/30 15:58:21 Skipping step because a previous step failed
+## mesures
+KO   PipelineRun j7-sample-app : False|Failed (attendu : True|Succeeded)
+
+# --- troisième passage : construction réussie (3a7ca1b1), contrôle de QEMU mal découpé (-m 6176M,slots=10,maxmem=9950M) ; étape relancée ---
+# construction.sh construire, 2026-10-30T16:04:22Z
+## prédiction
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les deux tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  construire : pod Kata sur sc-build, QEMU -smp 3 -m 6176M (limites 2 CPU et 6 Gi de la seule étape construire) ; arbre
+    30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture et web/dist tirés ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (binaire e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 : l'écart web/package*.json du dépôt
+    ne touche pas l'image, qui ne contient que le binaire)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les deux TaskRuns et le PipelineRun
+même PipelineRun sans runtimeClassName : construire refusé à la création du pod (Pod Security restricted : privileged),
+  publier jamais lancé, aucune écriture de poc-images
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (Succeeded, pod j7-sample-app-construire-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : fermeture : 8 fichiers ; web/dist : 2 fichiers
+     step-construire : invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs
+     step-construire : #1 [internal] load build definition from Dockerfile
+     step-construire : #1 transferring dockerfile: 680B done
+     step-construire : #1 DONE 0.0s
+     step-construire : 
+     step-construire : #2 [context deps] load .dockerignore
+     step-construire : #2 transferring deps: 2B done
+     step-construire : #2 DONE 0.0s
+     step-construire : 
+     step-construire : #3 [context builder] load metadata for sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+     step-construire : #3 DONE 0.1s
+     step-construire : 
+     step-construire : #4 [internal] load .dockerignore
+     step-construire : #4 transferring context: 2B done
+     step-construire : #4 DONE 0.0s
+     step-construire : 
+     step-construire : #5 [internal] load build context
+     step-construire : #5 transferring context: 56.68kB 0.0s done
+     step-construire : #5 DONE 0.0s
+     step-construire : 
+     step-construire : #6 [context builder] sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+     step-construire : #6 resolve sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 done
+     step-construire : #6 ...
+     step-construire : 
+     step-construire : #7 [context deps] load from client
+     step-construire : #7 transferring deps: 222.34kB 0.1s done
+     step-construire : #7 DONE 0.1s
+     step-construire : 
+     step-construire : #6 [context builder] sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 16.78MB / 76.20MB 0.2s
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 29.50MB / 76.20MB 0.3s
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 43.68MB / 76.20MB 0.5s
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 58.65MB / 76.20MB 0.6s
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 73.40MB / 76.20MB 0.8s
+     step-construire : #6 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 76.20MB / 76.20MB 0.8s done
+     step-construire : #6 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc
+     step-construire : #6 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 4.3s done
+     step-construire : #6 DONE 5.1s
+     step-construire : 
+     step-construire : #8 [build 1/4] WORKDIR /src
+     step-construire : #8 DONE 2.4s
+     step-construire : 
+     step-construire : #9 [build 2/4] COPY . .
+     step-construire : #9 DONE 2.5s
+     step-construire : 
+     step-construire : #10 [build 3/4] RUN --network=none --mount=type=bind,from=deps,target=/deps     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+     step-construire : #10 2.788 go: downloading github.com/go-chi/chi/v5 v5.2.3
+     step-construire : #10 DONE 18.8s
+     step-construire : 
+     step-construire : #11 [stage-1 1/1] COPY --from=build /out/sample-app /sample-app
+     step-construire : #11 DONE 0.0s
+     step-construire : 
+     step-construire : #12 exporting to oci image format
+     step-construire : #12 exporting layers
+     step-construire : #12 exporting layers 0.2s done
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC)
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC) 0.2s done
+     step-construire : #12 exporting manifest sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 done
+     step-construire : #12 exporting config sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb done
+     step-construire : #12 sending tarball 0.0s done
+     step-construire : #12 DONE 0.5s
+     step-construire : construction en 30 s : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; tmpfs de BuildKit 1123 Mo
+### TaskRun j7-sample-app-publier (Succeeded, pod j7-sample-app-publier-pod)
+     step-publier : publiée : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (relue en lecture anonyme)
+## mesures
+OK   PipelineRun j7-sample-app : True|Succeeded
+KO   kata : QEMU : -smp 3 -m 6176M,slots=10,maxmem=9950M (attendu : -smp 3 -m 6176M)

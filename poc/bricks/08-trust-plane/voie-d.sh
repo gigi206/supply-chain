@@ -39,12 +39,6 @@ umask 022
 
 zot() { DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt "$@"; }   # crane avec le compte d'écriture et la CA du PoC
 
-arbre() { # répertoire : empreinte de l'arbre (chemins relatifs, types, modes et sha256 des fichiers, cibles des liens)
-  (cd "$1" && find . -printf '%y %m %p %l\n' | sort | while read -r y m p l; do
-    case $y in f) echo "f $m $p $(sha256sum < "$p" | cut -c1-64)" ;; l) echo "l $p -> $l" ;; *) echo "$y $m $p" ;; esac
-  done) | sha256sum | cut -c1-64
-}
-
 tar_det() { # répertoire sortie entrées… : tar POSIX déterministe (ordre, dates, propriétaires, en-têtes étendus sans PID ni atime)
   local d=$1 o=$2; shift 2
   tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \

@@ -211,6 +211,35 @@ passage_ok() { # espace CronJob instant : premier passage créé après l'instan
     || { cat "$T/passage-$cj.log" >&2; echo "KO   $ns/$cj : passage $j en échec" >&2; exit 1; }
 }
 
+# Empreinte d'arbre (J7 : voie-d.sh, construction.sh).
+arbre() { # répertoire : empreinte de l'arbre (chemins relatifs, types, modes et sha256 des fichiers, cibles des liens)
+  (cd "$1" && find . -printf '%y %m %p %l\n' | sort | while read -r y m p l; do
+    case $y in f) echo "f $m $p $(sha256sum < "$p" | cut -c1-64)" ;; l) echo "l $p -> $l" ;; *) echo "$y $m $p" ;; esac
+  done) | sha256sum | cut -c1-64
+}
+
+# Tâches et pipelines signées (J6 : politique.sh ; J7 : construction.sh). Fichiers dans $T, authentification Zot dans $T/auth/docker.
+bundle() { # fichier dépôt [tag] : bundle Tekton poussé dans Zot par tkn (date de création fixe : digest reproductible) ; digest
+  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt tkn bundle push "$REG_HOTE/$2:${3:-essai}" -f "$1" > "$T/tkn.out" 2>&1 \
+    || { cat "$T/tkn.out" >&2; exit 1; }
+  SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$2:${3:-essai}"
+}
+
+signe() { # type nom : attend l'annotation de Chains sur un TaskRun ou un PipelineRun de builds ; sa valeur
+  local v=""
+  for _ in $(seq 60); do
+    v=$(kubectl get "$1" -n builds "$2" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')
+    [ "$v" = true ] && break
+    sleep 2
+  done
+  echo "${v:-absente}"
+}
+
+listee() { # bundle (par digest) : présent dans la liste revue des tâches approuvées (politique/porte/taches.yml)
+  awk -v d="oci://${1%@*}:" -v r="${1#*@}" '$1 == d {b = 1; next} b && /^  [^ ]/ {b = 0}
+    b && $1 == "-" && $2 == "ref:" && $3 == r {t = 1} END {exit !t}' "$here/politique/porte/taches.yml"
+}
+
 lancer() { # préfixe-du-journal jalon étape… : chaque étape etape_<nom> tourne avec son journal resultats/<préfixe>-<nom>.log
   local p=$1 j=$2 e; shift 2
   [ $# -gt 0 ] || { echo "usage : $0 $(declare -F | awk '$3 ~ /^etape_/ {sub("etape_", "", $3); printf "%s|", $3}' | sed 's/|$//')…" >&2; exit 2; }

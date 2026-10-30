@@ -1,0 +1,18 @@
+# construction.sh constat_cm, 2026-10-30T16:03:14Z
+## prédiction (relevée sur le premier passage de construire, puis sur un essai exploratoire du 30/10/2026)
+pod Kata, conteneurs a et b montant la ConfigMap ca-poc et un emptyDir ; a lit la CA, écrit dans l'emptyDir, puis :
+  sort aussitôt : b, 15 s plus tard, lit l'emptyDir mais plus la CA (No such file or directory) ;
+  reste en vie (témoin) : b lit l'emptyDir et la CA
+### j7-cm-sort
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : head: /etc/ca-poc/ca.crt: No such file or directory
+### j7-cm-vivant
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+OK   a sorti : b lit l'emptyDir, puis la CA : écrit / head: /etc/ca-poc/ca.crt: No such file or directory
+OK   a en vie (témoin) : b lit l'emptyDir, puis la CA : écrit / -----BEGIN CERTIFICATE-----
+CONSTAT sous Kata 4.3.1 (runtime-rs), la copie d'une ConfigMap dans l'invité disparaît pour tout le pod dès qu'un conteneur
+        qui la monte se termine ; les étapes de Tekton se terminent l'une après l'autre : une ConfigMap ou un secret partagé
+        entre étapes n'est lisible que par la première. Non trouvé dans les issues de kata-containers (recherche du 30/10/2026)

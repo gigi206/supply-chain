@@ -1,0 +1,72 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEQCIAoDynpA28DVzLZ1CInAYHvb2tw3gC++96kS/Qnp+siGAiAOgUzeF6IG6xWXY8TimESJueX6MH6ZxKXEygFnpjj4aA==
+  name: publier-image
+spec:
+  params:
+  - name: image
+    type: string
+  - name: digest
+    type: string
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+  steps:
+  - env:
+    - name: IMAGE
+      value: $(params.image)
+    - name: DIGEST
+      value: $(params.digest)
+    image: sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+    name: publier
+    resources: {}
+    script: |
+      #!/busybox/sh
+      set -eu
+      case $IMAGE in sc-stockage.poc.test:5000/builds/*) ;; *) echo "dépôt hors de builds/ : $IMAGE" >&2; exit 1 ;; esac
+      case $IMAGE in *@*|*:*:*) echo "dépôt avec tag ou digest : $IMAGE" >&2; exit 1 ;; esac
+      case ${DIGEST#sha256:} in *[!0-9a-f]*) echo "digest invalide : $DIGEST" >&2; exit 1 ;; esac
+      [ ${#DIGEST} = 71 ] || { echo "digest invalide : $DIGEST" >&2; exit 1; }
+      export HOME=/tmp
+      tar -xf $(workspaces.sortie.path)/image.tar -C /layout
+      i=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' /layout/index.json)
+      [ "$i" = "$DIGEST" ] || { echo "tar OCI : $i, différent du digest construit $DIGEST" >&2; exit 1; }
+      oras cp --no-tty --from-oci-layout "/layout@$DIGEST" "$IMAGE@$DIGEST" --to-ca-file /etc/ca-poc/ca.crt \
+        --to-registry-config /etc/zot/config.json > /dev/null
+      lu=$(oras manifest fetch --descriptor --ca-file /etc/ca-poc/ca.crt "$IMAGE@$DIGEST" | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')
+      [ "$lu" = "$DIGEST" ] || { echo "relu dans Zot : $lu" >&2; exit 1; }
+      echo "publiée : $IMAGE@$DIGEST (relue en lecture anonyme)"
+      printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+      printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+    - mountPath: /etc/zot
+      name: zot
+      readOnly: true
+    - mountPath: /layout
+      name: layout
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  - name: zot
+    secret:
+      secretName: zot-images
+  - emptyDir: {}
+    name: layout
+  workspaces:
+  - name: sortie
+    readOnly: true

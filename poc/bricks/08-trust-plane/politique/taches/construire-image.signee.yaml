@@ -1,0 +1,182 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEYCIQDm8Mn2KZAt5W0cOTLYwP0b9r6It8HPFDps4LtcT/79lgIhAIbt9C78vIWcJ/VzvLWMwNHXk5viW9FDS41GE70emhi3
+  name: construire-image
+spec:
+  params:
+  - name: depot
+    type: string
+  - name: commit
+    type: string
+  - name: fermeture
+    type: string
+  - name: web-dist
+    type: string
+  results:
+  - name: DIGEST_CONSTRUIT
+    type: string
+  - name: CHAINS-GIT_URL
+    type: string
+  - name: CHAINS-GIT_COMMIT
+    type: string
+  - name: FERMETURE_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: WEB_DIST_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: BUILDER_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    - name: COMMIT
+      value: $(params.commit)
+    image: sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+    name: sources
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      case $COMMIT in *[!0-9a-f]*) echo "commit invalide : $COMMIT" >&2; exit 1 ;; esac
+      [ ${#COMMIT} = 40 ] || { echo "commit invalide : $COMMIT" >&2; exit 1; }
+      case $DEPOT in https://sc-stockage.poc.test:3000/*.git) ;; *) echo "dépôt hors de Forgejo : $DEPOT" >&2; exit 1 ;; esac
+      export HOME=/tmp GIT_CONFIG_NOSYSTEM=1 GIT_SSL_CAINFO=/etc/ca-poc/ca.crt GIT_TERMINAL_PROMPT=0
+      git clone --quiet --no-checkout "$DEPOT" /tmp/depot
+      git -C /tmp/depot checkout --quiet --detach "$COMMIT"
+      [ "$(git -C /tmp/depot rev-parse HEAD)" = "$COMMIT" ] || { echo "HEAD différent du commit demandé" >&2; exit 1; }
+      echo "$(git --version) ; commit $COMMIT, arbre $(git -C /tmp/depot rev-parse 'HEAD^{tree}')"
+      mkdir -p /entrees/src
+      cp /etc/ca-poc/ca.crt /entrees/ca.crt
+      git -C /tmp/depot archive --format=tar HEAD | tar -xf - -C /entrees/src
+      printf '%s' "$DEPOT" > $(results.CHAINS-GIT_URL.path)
+      printf '%s' "$COMMIT" > $(results.CHAINS-GIT_COMMIT.path)
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+    - mountPath: /entrees
+      name: entrees
+  - env:
+    - name: FERMETURE
+      value: $(params.fermeture)
+    - name: WEB_DIST
+      value: $(params.web-dist)
+    image: sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+    name: entrees
+    resources: {}
+    script: |
+      #!/busybox/sh
+      set -eu
+      for r in "$FERMETURE" "$WEB_DIST"; do
+        case $r in sc-stockage.poc.test:5000/*@sha256:*) ;; *) echo "référence hors de Zot ou sans digest : $r" >&2; exit 1 ;; esac
+      done
+      export HOME=/tmp
+      oras pull --no-tty --ca-file /entrees/ca.crt -o /entrees/deps "$FERMETURE" > /dev/null
+      oras pull --no-tty --ca-file /entrees/ca.crt -o /entrees/src/web/dist "$WEB_DIST" > /dev/null
+      echo "fermeture : $(find /entrees/deps -type f | wc -l) fichiers ; web/dist : $(find /entrees/src/web/dist -type f | wc -l) fichiers"
+      printf '{"uri":"oci://%s","digest":"%s"}' "${FERMETURE%@*}" "${FERMETURE#*@}" > $(results.FERMETURE_ARTIFACT_INPUTS.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${WEB_DIST%@*}" "${WEB_DIST#*@}" > $(results.WEB_DIST_ARTIFACT_INPUTS.path)
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /entrees
+      name: entrees
+  - env:
+    - name: BUILDER
+      value: sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+    image: sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+    name: construire
+    resources:
+      limits:
+        cpu: "2"
+        memory: 6Gi
+      requests:
+        cpu: "2"
+        memory: 6Gi
+    script: |
+      #!/bin/sh
+      set -eu
+      mkdir -p /tmp/run /tmp/df
+      printf '[registry."sc-stockage.poc.test:5000"]\n  ca = ["/entrees/ca.crt"]\n' > /tmp/bk.toml
+      cat > /tmp/df/Dockerfile <<'FIN'
+      # sample-app : binaire compilé sans réseau dans l'image de build (contexte nommé
+      # « builder », épinglé par digest), fermeture Hermeto montée en lecture seule
+      # (contexte nommé « deps »), image finale minimale.
+      FROM builder AS build
+      WORKDIR /src
+      COPY . .
+      RUN --network=none --mount=type=bind,from=deps,target=/deps \
+          GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache \
+          go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+
+      FROM scratch
+      COPY --from=build /out/sample-app /sample-app
+      USER 65532:65532
+      ENTRYPOINT ["/sample-app"]
+      FIN
+      [ "$(sha256sum < /tmp/df/Dockerfile | cut -c1-64)" = d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619 ] || { echo "Dockerfile différent de la brique 04" >&2; exit 1; }
+      echo "invité : $(nproc) vCPU, $(awk '/MemTotal/ {print $2}' /proc/meminfo) kB ; racine de BuildKit : $(awk '$2 == "/bk" {print $3}' /proc/mounts)"
+      buildkitd --config /tmp/bk.toml --oci-worker-snapshotter=native --addr unix:///tmp/run/bk.sock --root /bk > /tmp/bkd.log 2>&1 &
+      k=$!
+      for _ in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
+      t=$(date +%s)
+      buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 \
+        --local context=/entrees/src --local dockerfile=/tmp/df --opt filename=Dockerfile \
+        --opt context:builder=docker-image://$BUILDER --local deps=/entrees/deps --opt context:deps=local:deps \
+        --output type=oci,dest=$(workspaces.sortie.path)/image.tar,rewrite-timestamp=true
+      d=$(tar -xOf $(workspaces.sortie.path)/image.tar index.json | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')
+      echo "construction en $(($(date +%s) - t)) s : $d ; tmpfs de BuildKit $(du -sm /bk | cut -f1) Mo"
+      kill $k 2> /dev/null || true; wait $k 2> /dev/null || true
+      printf '%s' "$d" > $(results.DIGEST_CONSTRUIT.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${BUILDER%@*}" "${BUILDER#*@}" > $(results.BUILDER_ARTIFACT_INPUTS.path)
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+      runAsNonRoot: false
+      runAsUser: 0
+    volumeMounts:
+    - mountPath: /entrees
+      name: entrees
+    - mountPath: /bk
+      name: buildkit
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  - emptyDir: {}
+    name: entrees
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 4Gi
+    name: buildkit
+  workspaces:
+  - name: sortie

@@ -332,12 +332,6 @@ verdict() { # libellé attendu (True|False) issue : ligne OK ou KO
   else echo "KO   $l : Succeeded=$st, $r : $m ; TrustedResourcesVerified=$v" >&2; exit 1; fi
 }
 
-bundle() { # fichier dépôt [tag] : bundle Tekton poussé dans Zot par tkn (date de création fixe : digest reproductible) ; digest
-  DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt tkn bundle push "$REG_HOTE/$2:${3:-essai}" -f "$1" > "$T/tkn.out" 2>&1 \
-    || { cat "$T/tkn.out" >&2; exit 1; }
-  SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$2:${3:-essai}"
-}
-
 etape_taches() {
   local b d tr
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
@@ -461,21 +455,6 @@ etape_chains() {
   [ "$d" = true ] && echo "OK   compte build sans identifiant de registre ni jeton monté" || { echo "KO   compte build" >&2; exit 1; }
 }
 
-signe() { # type nom : attend l'annotation de Chains sur un TaskRun ou un PipelineRun de builds ; sa valeur
-  local v=""
-  for _ in $(seq 60); do
-    v=$(kubectl get "$1" -n builds "$2" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')
-    [ "$v" = true ] && break
-    sleep 2
-  done
-  echo "${v:-absente}"
-}
-
-listee() { # bundle (par digest) : présent dans la liste revue des tâches approuvées (politique/porte/taches.yml)
-  awk -v d="oci://${1%@*}:" -v r="${1#*@}" '$1 == d {b = 1; next} b && /^  [^ ]/ {b = 0}
-    b && $1 == "-" && $2 == "ref:" && $3 == r {t = 1} END {exit !t}' "$here/politique/porte/taches.yml"
-}
-
 etape_declencheurs() {
   local busybox tache pipe autre t0 n o
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -542,8 +521,10 @@ etape_declencheurs() {
   brancher_forgejo
 
   echo "## contrôles"
-  n=$(kubectl get secret -n builds -o name | wc -l)
-  [ "$n" = 0 ] && echo "OK   aucun secret dans builds" || { echo "KO   $n secret(s) dans builds : $(kubectl get secret -n builds -o name | paste -sd' ')" >&2; exit 1; }
+  # J7 : secret zot-images (compte poc-images : création par digest dans builds/** seulement), monté par la seule tâche signée
+  # publier-image (choix du propriétaire du 30/10/2026) ; Kyverno refuse un secret en podTemplate ou en workspace (test 2)
+  n=$(kubectl get secret -n builds -o name | { grep -vxF secret/zot-images || true; } | wc -l)   # grep sans ligne : 1, sous pipefail
+  [ "$n" = 0 ] && echo "OK   aucun secret dans builds, hors zot-images (J7)" || { echo "KO   $n secret(s) dans builds : $(kubectl get secret -n builds -o name | paste -sd' ')" >&2; exit 1; }
   n=$(kubectl get eventlisteners,triggertemplates,triggerbindings,tasks.tekton.dev,pipelines.tekton.dev -n builds -o name | wc -l)
   [ "$n" = 0 ] && echo "OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds" || { echo "KO   $n objet(s) de J4 restant(s) dans builds" >&2; exit 1; }
   kubectl get clusterrolebindings,rolebindings -A -o json | jq -r '.items[] | select(.roleRef.name | startswith("tekton-triggers-eventlistener")) | "\(.kind) \(.metadata.name)"' > "$T/liaisons-el"
@@ -719,12 +700,13 @@ bundles() { # digest : nombre de bundles horodatés de ce digest dans horodatage
     | jq '[.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json")] | length'
 }
 
-couverture() { # enveloppes de Chains de APP_DIGEST (builds/essai-signature et builds/essai-webhook) et bundles horodatés de ce
-  # digest, appariés par la signature de l'enveloppe : $T/sans-bundle (enveloppes à horodater), $T/orphelins (bundles dont
-  # l'enveloppe a quitté les tags .att, réécrits sans verrou par Chains : constat-att-ecrasee.log), $T/doublons
+couverture() { # enveloppes de Chains de APP_DIGEST (builds/essai-signature et builds/essai-webhook ; J7 : builds/sample-app, construit
+  # par la pipeline sample-app, même digest, absent avant J7) et bundles horodatés de ce digest, appariés par la signature de
+  # l'enveloppe : $T/sans-bundle (enveloppes à horodater), $T/orphelins (bundles dont l'enveloppe a quitté les tags .att, réécrits
+  # sans verrou par Chains : constat-att-ecrasee.log), $T/doublons
   local d m l
-  for d in essai-signature essai-webhook; do
-    cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$d@$APP_DIGEST" 2>/dev/null | jq -r '.signatures[0].sig'
+  for d in essai-signature essai-webhook sample-app; do
+    { cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$d@$APP_DIGEST" 2>/dev/null || true; } | jq -r '.signatures[0].sig'
   done | sort > "$T/sig-env"
   curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/referrers/$APP_DIGEST" \
     | jq -r '.manifests[] | select(.artifactType == "application/vnd.dev.sigstore.bundle.v0.3+json") | .digest' | while read -r m; do
