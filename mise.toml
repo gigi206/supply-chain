@@ -232,6 +232,10 @@ run = "poc/bricks/08-trust-plane/tsa.sh"
 description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission, Trusted Resources, EventListener en espace de confiance, horodatage automatique, rattrapage des webhooks perdus, Pod Security restricted des pods de build, porte de release (Conforma et sa bibliothèque), RBAC, posture des pipelines (tekton-lint 1.2.4, verrou npm) (étapes : image installer parite taches admission chains declencheurs restreint horodatage rattrapage porte droits posture)"
 run = "poc/bricks/08-trust-plane/politique.sh"
 
+[tasks."confiance:cilium"]
+description = "Brique 08, J7 : réseau Cilium 1.20.4 (option 1b accordée par le propriétaire) ; chart et images vérifiés par cosign, archives OCI amd64 et HelmChart sur l'hôte, puis contrôle après J1 (étapes : telecharger verifier)"
+run = "poc/bricks/08-trust-plane/cilium.sh"
+
 [tasks."confiance:sante-reseau"]
 description = "Brique 08, J7 : santé de Cilium et de kube-router amont selon les critères du doc 04, sans rien installer (étapes : releves signatures)"
 run = "poc/bricks/08-trust-plane/sante-reseau.sh"

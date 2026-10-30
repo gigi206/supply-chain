@@ -1,0 +1,43 @@
+# Brique 08, J7 : valeurs du chart Cilium 1.20.4 (option 1b, plan du README accordé par le propriétaire le 30/10/2026).
+# Passées par le HelmChart cilium de k3s (cilium.sh helmchart), avec le chart vérifié en base64.
+#   - API jointe par le nœud de confiance, sans dépendre du service ; kube-proxy de k3s conservé (socketLB reste désactivé :
+#     la limite du guide Kata ne s'applique pas) ;
+#   - IPAM kubernetes : les podCIDRs alloués par k3s (10.42.N.0/24), adresses inchangées ;
+#   - routage natif entre les trois VM (même segment L2) : pas de tunnel, donc pas de MTU de route réduite, celle que le
+#     guide Kata dit ignorée dans l'invité ;
+#   - chemins CNI de k3s (relevés sur sc-build), différents des défauts du chart ;
+#   - L7 coupé pour la mesure : ni Envoy (cilium/proxy, non évalué au doc 04) ni toFQDNs (le proxy DNS exige le L7,
+#     pkg/fqdn/bootstrap/dns_proxy.go au tag) ; Hubble dans l'agent, sans relais ni interface ;
+#   - digests des manifestes amd64 à la place des index (les archives airgap ne contiennent que l'amd64 ; la signature est
+#     vérifiée sur l'index, qui les liste : cilium.sh telecharger).
+k8sServiceHost: 192.168.161.11
+k8sServicePort: 6443
+kubeProxyReplacement: false
+ipam:
+  mode: kubernetes
+routingMode: native
+autoDirectNodeRoutes: true
+ipv4NativeRoutingCIDR: 10.42.0.0/16
+cni:
+  binPath: /var/lib/rancher/k3s/data/cni
+  confPath: /var/lib/rancher/k3s/agent/etc/cni/net.d
+policyEnforcementMode: default
+l7Proxy: false
+envoy:
+  enabled: false
+hubble:
+  enabled: true
+  relay:
+    enabled: false
+  ui:
+    enabled: false
+image:
+  digest: "@CILIUM_AMD64@"
+  useDigest: true
+operator:
+  replicas: 1
+  nodeSelector:
+    zone: confiance
+  image:
+    genericDigest: "@OPERATOR_AMD64@"
+    useDigest: true

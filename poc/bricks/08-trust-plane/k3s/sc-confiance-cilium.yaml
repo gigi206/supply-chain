@@ -1,0 +1,5 @@
+# Brique 08, J7 : fichier d'appoint du server k3s pour le réseau Cilium (RESEAU=cilium, option 1b accordée par le propriétaire
+# le 30/10/2026) : ni flannel ni contrôleur de NetworkPolicy intégré (kube-router), Cilium les remplace (guide Cilium pour k3s,
+# documentation de k3s). Installé dans /etc/rancher/k3s/config.yaml.d/ par k3s.sh, avec le HelmChart cilium.
+flannel-backend: none
+disable-network-policy: true

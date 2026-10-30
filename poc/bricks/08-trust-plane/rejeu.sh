@@ -17,19 +17,30 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 lib=${1:-j1-j6}
+# RESEAU=cilium (J7, option 1b) : k3s.sh installe Cilium, contrôlé par cilium.sh verifier juste après J1. JUSQUA=<étape> arrête
+# après cette étape (point d'arrêt) ; DEPUIS=<étape> reprend à cette étape, les précédentes étant sautées.
+DEPUIS=${DEPUIS:-}
+JUSQUA=${JUSQUA:-}
+actif=1
+[ -z "$DEPUIS" ] || actif=0
 exec > >(sed -u "s#$HOME#~#g" | tee "$here/resultats/rejeu-$lib.log") 2>&1
 echo "# rejeu.sh $lib, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 t0=$(date +%s)
 etape() { # libellé commande…
   local t l=$1
   shift
+  [ "$l" != "$DEPUIS" ] || actif=1
+  [ "$actif" = 1 ] || { echo "## $l : sautée (reprise à $DEPUIS)"; return 0; }
   t=$(date +%s)
   "$@"
   echo "## durée $l : $(( $(date +%s) - t )) s"
+  [ "$l" != "$JUSQUA" ] || { echo "## arrêt après $l (JUSQUA), $(( $(date +%s) - t0 )) s"; exit 0; }
 }
+echo "réseau : ${RESEAU:-flannel}${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
 etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
 etape k3s mise run confiance:k3s
+[ "${RESEAU:-flannel}" != cilium ] || etape Cilium mise run confiance:cilium -- verifier
 etape J2 mise run confiance:stockage -- pki zot registre containerd forgejo depot
 etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais redemarrage
 etape J4 mise run confiance:tekton -- revue miroir installer signature verifier webhook essais_webhook

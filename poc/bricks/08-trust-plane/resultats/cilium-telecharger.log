@@ -1,0 +1,24 @@
+# cilium.sh telecharger, 2026-10-30T19:03:41Z
+## chart quay.io/cilium/charts/cilium:1.20.4
+chart (identité https://github.com/cilium/cilium/.github/workflows/release.yaml@refs/heads/main) : vérifiée (https://sigstore.dev/cosign/sign/v1), digest sha256:712e1f65bf30533d117d1996ac3ace3efdb2521302d31ee887b1e45806bd6b64
+OK   chart : manifeste signé : sha256:712e1f65bf30533d117d1996ac3ace3efdb2521302d31ee887b1e45806bd6b64
+témoin : chart avec l'identité du tag : refusée (expected SAN value "https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.4", got "https://github.com/cilium/cilium/.github/workflows/release.yaml@refs/heads/main")
+OK   chart : couche du manifeste signé : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+OK   chart : archive (digest de helm.cilium.io) : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## images (identité documentée https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.4)
+quay.io/cilium/cilium:v1.20.4 : vérifiée (https://spdx.dev/Document, https://sigstore.dev/cosign/sign/v1), digest sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
+OK   cilium : index signé : sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
+OK   cilium : manifeste linux/amd64 listé par l'index : sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+OK   cilium : manifeste du layout : sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium : archive 245 Mo, noms quay.io/cilium/cilium:v1.20.4 et quay.io/cilium/cilium@sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+quay.io/cilium/operator-generic:v1.20.4 : vérifiée (https://sigstore.dev/cosign/sign/v1, https://spdx.dev/Document), digest sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82
+OK   operator-generic : index signé : sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82
+OK   operator-generic : manifeste linux/amd64 listé par l'index : sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
+OK   operator-generic : manifeste du layout : sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
+operator-generic : archive 36 Mo, noms quay.io/cilium/operator-generic:v1.20.4 et quay.io/cilium/operator-generic@sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
+témoin : cilium avec l'identité du tag v1.20.3 : refusée (expected SAN value "https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.3", got "https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.4")
+## HelmChart (chart en base64, valeurs de cilium/valeurs.yaml, digests amd64)
+  7d5d82c892510d7c17251c207259d4822c9f71c5613d3cab74a32ddd091f2b37  cilium-amd64.tar
+  01fbcd5456b4bb5d83408d82447f552fa9e5d96fd44a710269514bf5bf742c2e  operator-generic-amd64.tar
+  eb570aed1120e18c8c094a0c3e2796228b8f32eb8bc7372b7663433c96db87b6  cilium-helmchart.yaml
+téléchargements : 280 Mo
