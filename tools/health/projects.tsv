@@ -62,3 +62,5 @@ Forgejo	-	sources	oui
 sbuild	-	packaging	oui
 mmdebstrap	-	packaging	oui
 StageX	-	construction	non
+Cilium	cilium/cilium	réseau	oui
+kube-router (amont)	cloudnativelabs/kube-router	réseau	oui

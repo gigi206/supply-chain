@@ -1,0 +1,19 @@
+# sante-reseau.sh signatures, 2026-10-30T18:47:46Z
+## Cilium v1.20.4 (identité documentée : https://docs.cilium.io/en/stable/configuration/verify-image-signatures/)
+quay.io/cilium/cilium:v1.20.4 : rc 0 ; types https://spdx.dev/Document, https://sigstore.dev/cosign/sign/v1 ; digest sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
+quay.io/cilium/operator-generic:v1.20.4 : rc 0 ; types https://sigstore.dev/cosign/sign/v1, https://spdx.dev/Document ; digest sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82
+témoin : identité du tag v1.20.3 : rc 1 ; expected SAN value "https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.3", got "https://github.com/cilium/cilium/.github/workflows/build-images-releases.yaml@refs/tags/v1.20.4"
+attestation de l'image cilium (slsaprovenance) : rc 1
+attestation de l'image cilium (slsaprovenance1) : rc 1
+attestation de l'image cilium (slsaprovenance02) : rc 1
+attestation de l'image cilium (spdxjson) : rc 0
+index de l'image cilium (sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e) : linux/amd64, linux/arm64
+attestations GitHub de l'image cilium : aucune (HTTP 404)
+## kube-router v2.11.2 (identité lue dans .github/workflows/ci-container.yml au tag ; non documentée)
+docker.io/cloudnativelabs/kube-router:v2.11.2 : rc 0 ; types https://spdx.dev/Document, https://sigstore.dev/cosign/sign/v1 ; digest sha256:3e80cdbe0681f5c1cfc2e3caa8397a2b34dfe29a6de3e0baf1539ebaf8f339b5
+témoin : identité volontairement fausse : rc 1 ; expected SAN value "https://example.invalid/identite", got "https://github.com/cloudnativelabs/kube-router/.github/workflows/ci-container.yml@refs/tags/v2.11.2"
+attestation de l'image kube-router (slsaprovenance1) : rc 1
+attestation de l'image kube-router (spdxjson) : rc 0
+kube-router_2.11.2_linux_amd64.tar.gz: OK
+provenance SLSA v1 du binaire linux_amd64 (signataire cloudnativelabs/kube-router/.github/workflows/ci-release.yml au tag) : rc 0
+témoin : signataire ci.yml : rc 1

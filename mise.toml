@@ -232,6 +232,10 @@ run = "poc/bricks/08-trust-plane/tsa.sh"
 description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission, Trusted Resources, EventListener en espace de confiance, horodatage automatique, rattrapage des webhooks perdus, Pod Security restricted des pods de build, porte de release (Conforma et sa bibliothèque), RBAC, posture des pipelines (tekton-lint 1.2.4, verrou npm) (étapes : image installer parite taches admission chains declencheurs restreint horodatage rattrapage porte droits posture)"
 run = "poc/bricks/08-trust-plane/politique.sh"
 
+[tasks."confiance:sante-reseau"]
+description = "Brique 08, J7 : santé de Cilium et de kube-router amont selon les critères du doc 04, sans rien installer (étapes : releves signatures)"
+run = "poc/bricks/08-trust-plane/sante-reseau.sh"
+
 [tasks."confiance:kata"]
 description = "Brique 08, J7 : isolation par Kata Containers 4.3.1 sur sc-build ; vérification de l'archive kata-static (attestation de release) et de l'image kata-deploy, installation depuis l'archive attestée (accord du propriétaire), essais runc et Kata, exemption Pod Security de la RuntimeClass kata (accord du propriétaire, server k3s redémarré), témoin après redémarrage (étapes : verifier installer essais exemption temoin)"
 run = "poc/bricks/08-trust-plane/kata.sh"

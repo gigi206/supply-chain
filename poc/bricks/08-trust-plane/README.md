@@ -592,23 +592,24 @@ Options :
        - l'IP d'un autre pod du nœud, dont la chaîne s'appliquerait ;
        - une source hors du CIDR local (autre nœud, adresse externe), que `rp_filter` en mode lâche laisse sortir, en sens unique puisque la réponse ne revient pas. Passer `rp_filter` en strict sur `cni0` serait un changement système, à mesurer.
      - **Coûts** :
-       - kube-router est absent du doc 04 (relevé préliminaire : Scorecard 7,5, Signed-Releases 0) ;
+       - **doc 04** (évaluation du 30/10/2026, mêmes journaux que Cilium) : « À surveiller ». Bus factor de 2 : deux fusionneurs font 96 des 100 dernières fusions, et les employeurs ne sont pas vérifiables, hormis Mirantis. L'image est signée sans clé et vérifiée, avec une identité relevée dans le workflow au tag. La provenance SLSA v1 des binaires est vérifiée ; l'image n'a pas de provenance ;
        - k3s avec `--disable-network-policy`, plus un DaemonSet kube-router en pare-feu seul (`daemonset/kube-router-firewall-daemonset.yaml` dans son dépôt), dont l'image est copiée dans Zot et vérifiée ;
        - réglages du server k3s modifiés, puis rejeu de J1 à J7 ;
        - le comportement de NFLOG est à revérifier sur la version amont, et la piste à mesurer avec `kata.sh reseau`.
    - **1b. Contrôleur réseau qui vérifie l'adresse source.**
-     - **Cilium** ([documentation stable, annotations de pod](https://docs.cilium.io/en/stable/network/pod-annotations/)) : par défaut, Cilium vérifie que les paquets d'un pod portent l'IP du pod comme source, ce qui empêche l'usurpation. Le désactiver demande deux annotations : une sur l'espace de noms, posée par un administrateur, puis une sur le pod. Son [guide Kata](https://docs.cilium.io/en/stable/network/kubernetes/kata/) signale des limites de MTU et demande `socketLB.hostNamespaceOnly=true`.
+     - **Cilium** ([documentation stable, annotations de pod](https://docs.cilium.io/en/stable/network/pod-annotations/)) : par défaut, Cilium vérifie que les paquets d'un pod portent l'IP du pod comme source, ce qui empêche l'usurpation. Le désactiver demande deux annotations : une sur l'espace de noms, posée par un administrateur, puis une sur le pod. Son [guide Kata](https://docs.cilium.io/en/stable/network/kubernetes/kata/) signale des limites de MTU et demande `socketLB.hostNamespaceOnly=true`. Deux fonctions documentées serviraient le test 6 :
+       - le filtrage de sortie par nom (`toFQDNs`), avec une règle DNS et le proxy DNS de l'agent ([doc](https://docs.cilium.io/en/stable/security/dns/)) ;
+       - les flux refusés et leur motif dans Hubble (`hubble observe --verdict DROPPED`, « Policy denied », [doc](https://docs.cilium.io/en/stable/observability/hubble/hubble-cli/)).
      - **Calico** ([référence de FelixConfiguration, 3.33](https://docs.tigera.io/calico/latest/reference/resources/felixconfig)) : `workloadSourceSpoofing` décide si un pod peut envoyer depuis une autre adresse grâce à l'annotation `allowedSourcePrefixes`. Il vaut `Disabled` par défaut. Le refus par défaut d'une source usurpée n'est écrit explicitement que dans une page en projet ([tigera/docs#2613](https://github.com/tigera/docs/pull/2613)).
-     - **Santé** : aucun des deux n'est au doc 04. Relevé préliminaire du 30/10/2026, qui n'est pas un verdict :
-
-       | Projet | Scorecard | Signed-Releases | Dernière release |
-       |---|---|---|---|
-       | Calico | 6,2 | 0 | v3.33.0 (« latest ») du 01/10/2026, correctif v3.32.3 du 28/10/2026 |
-       | Cilium | 6,0 | -1 | v1.20.4 (« latest ») du 23/10/2026 |
-
-       Pour mémoire, kube-router (Scorecard 7,5) et flannel (8,7), qu'embarque k3s v1.35.9 (kube-router v2.6.3-k3s1, flannel v0.28.4), ne sont pas évalués non plus.
+     - **Santé** :
+       - **Cilium**, évalué au doc 04 le 30/10/2026 ([`sante-reseau.sh`](sante-reseau.sh), [relevés](resultats/sante-reseau-releves.log), [signatures](resultats/sante-reseau-signatures.log)) : « À surveiller, chemin critique ».
+         - Manquent : toute provenance pour les images, et un Scorecard de 6,0, exactement au seuil. Isovalent (Cisco) est l'éditeur dominant.
+         - Images `cilium` et `operator-generic` v1.20.4 signées sans clé et vérifiées par cosign avec l'identité documentée ; l'identité d'un autre tag est refusée (témoin).
+         - Activité : 1 685 commits en 90 jours, 16 fusionneurs, DCO, 44 avis publiés.
+       - **Calico** n'est pas évalué. Relevé préliminaire, qui n'est pas un verdict : Scorecard 6,2, Signed-Releases 0, v3.33.0 du 01/10/2026.
+       - **flannel**, qu'embarque k3s v1.35.9 (v0.28.4), n'est pas évalué non plus (Scorecard 8,7).
      - **Coûts** :
-       - évaluation au doc 04 d'abord (signatures des images, diversité des employeurs) ;
+       - plan de sortie inscrit au doc 04 (§6), le projet étant « À surveiller » sur le chemin critique ;
        - k3s avec `--flannel-backend=none` et `--disable-network-policy` (documentation de k3s), donc réinstallation du réseau du cluster et rejeu de J1 à J7 ;
        - à mesurer avec le même essai (`kata.sh reseau`) : la compatibilité avec le réseau de Kata et le refus de l'usurpation depuis un invité ;
        - la trace du test 6 change (journaux de flux du contrôleur au lieu de NFLOG).
