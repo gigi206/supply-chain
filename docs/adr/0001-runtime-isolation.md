@@ -91,6 +91,11 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
 - [ ] Contrôle de sortie de la zone build (brique 08, J7, avant J8 et le test 6). Une NetworkPolicy de kube-router est contournée par usurpation d'adresse depuis le root de l'invité, et ne porte que sur un pod entier. Trois options sont soumises ([détail](../../poc/bricks/08-trust-plane/README.md#jalon-j7--isolation-par-kata-en-cours-30102026), « Contrôle de sortie de la zone build ») :
-  - voie A avec anti-usurpation côté nœud : contrôleur réseau qui vérifie l'adresse source (Cilium ou Calico, absents du doc 04, réinstallation du réseau de k3s), ou règle maison ;
+  - voie A avec anti-usurpation côté nœud, par l'un de ces trois moyens :
+    - kube-router amont v2.10.0 ou plus, en seul contrôleur de politiques avec `--netpol-default-deny`. k3s embarque la v2.6.3, et flannel serait conservé ;
+    - un contrôleur réseau qui vérifie l'adresse source (Cilium ou Calico, avec réinstallation du réseau de k3s) ;
+    - une règle maison.
+
+    Aucun de ces projets n'est au doc 04 ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
   - dans les deux cas, une tâche de construction sans sortie.

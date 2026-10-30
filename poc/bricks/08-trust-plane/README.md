@@ -583,7 +583,20 @@ Faits sur lesquels elles reposent :
 
 Options :
 1. **Voie A avec anti-usurpation côté nœud.** Elle traite l'usurpation pour toute la zone build, mock et sbuild compris.
-   - **1a. Contrôleur réseau qui vérifie l'adresse source.**
+   - **1a. kube-router amont, v2.10.0 ou plus, en seul contrôleur de politiques, flannel conservé.**
+     - **Versions** : k3s v1.35.9 embarque kube-router v2.6.3-k3s1 (lu dans son `go.mod`), et c'est encore le cas en v1.36.5 et en v1.37.1. La dernière version amont est la v2.11.2 du 22/10/2026.
+     - **Le mécanisme** : la v2.10.0 ajoute `--netpol-default-deny` (notes de version, guide et page de dépannage, lus au tag v2.11.2). Des REJECT de rattrapage, dans `KUBE-NWPLCY-TAIL`, refusent tout trafic depuis ou vers le CIDR des pods du nœud quand l'IP en cause n'est pas dans l'ipset des pods déjà programmés.
+     - **Condition** : le `podCIDRs` du nœud doit être renseigné. Relu : `10.42.1.0/24` pour `sc-build`.
+     - **Annoncé par la documentation** : la fenêtre de démarrage se ferme (échec fermé au lieu d'ouvert).
+     - **Lecture du mécanisme, non mesurée** : une adresse inutilisée du CIDR local (`10.42.1.250`) serait refusée, puisqu'elle est absente de l'ipset. En revanche, ne seraient pas couverts :
+       - l'IP d'un autre pod du nœud, dont la chaîne s'appliquerait ;
+       - une source hors du CIDR local (autre nœud, adresse externe), que `rp_filter` en mode lâche laisse sortir, en sens unique puisque la réponse ne revient pas. Passer `rp_filter` en strict sur `cni0` serait un changement système, à mesurer.
+     - **Coûts** :
+       - kube-router est absent du doc 04 (relevé préliminaire : Scorecard 7,5, Signed-Releases 0) ;
+       - k3s avec `--disable-network-policy`, plus un DaemonSet kube-router en pare-feu seul (`daemonset/kube-router-firewall-daemonset.yaml` dans son dépôt), dont l'image est copiée dans Zot et vérifiée ;
+       - réglages du server k3s modifiés, puis rejeu de J1 à J7 ;
+       - le comportement de NFLOG est à revérifier sur la version amont, et la piste à mesurer avec `kata.sh reseau`.
+   - **1b. Contrôleur réseau qui vérifie l'adresse source.**
      - **Cilium** ([documentation stable, annotations de pod](https://docs.cilium.io/en/stable/network/pod-annotations/)) : par défaut, Cilium vérifie que les paquets d'un pod portent l'IP du pod comme source, ce qui empêche l'usurpation. Le désactiver demande deux annotations : une sur l'espace de noms, posée par un administrateur, puis une sur le pod. Son [guide Kata](https://docs.cilium.io/en/stable/network/kubernetes/kata/) signale des limites de MTU et demande `socketLB.hostNamespaceOnly=true`.
      - **Calico** ([référence de FelixConfiguration, 3.33](https://docs.tigera.io/calico/latest/reference/resources/felixconfig)) : `workloadSourceSpoofing` décide si un pod peut envoyer depuis une autre adresse grâce à l'annotation `allowedSourcePrefixes`. Il vaut `Disabled` par défaut. Le refus par défaut d'une source usurpée n'est écrit explicitement que dans une page en projet ([tigera/docs#2613](https://github.com/tigera/docs/pull/2613)).
      - **Santé** : aucun des deux n'est au doc 04. Relevé préliminaire du 30/10/2026, qui n'est pas un verdict :
@@ -599,7 +612,7 @@ Options :
        - k3s avec `--flannel-backend=none` et `--disable-network-policy` (documentation de k3s), donc réinstallation du réseau du cluster et rejeu de J1 à J7 ;
        - à mesurer avec le même essai (`kata.sh reseau`) : la compatibilité avec le réseau de Kata et le refus de l'usurpation depuis un invité ;
        - la trace du test 6 change (journaux de flux du contrôleur au lieu de NFLOG).
-   - **1b. Règle maison sur le nœud** : n'accepter sur la veth d'un pod que l'adresse de ce pod (nftables ou iptables sur `sc-build`), tenue à jour par un contrôleur à écrire. C'est de l'outillage maison, comme celui écarté en J4, et un changement système sur `sc-build`.
+   - **1c. Règle maison sur le nœud** : n'accepter sur la veth d'un pod que l'adresse de ce pod (nftables ou iptables sur `sc-build`), tenue à jour par un contrôleur à écrire. C'est de l'outillage maison, comme celui écarté en J4, et un changement système sur `sc-build`.
 2. **Voie D pour les images Go.**
    - **Mesuré** : sans `NET_ADMIN`, l'usurpation est refusée (pod Kata restreint), et la compilation tourne sous `unshare -n`, sans réseau.
    - **Reste**, en lecture non mesurée : une élévation dans l'invité, qui n'a pas de seccomp, rouvrirait l'usurpation.
