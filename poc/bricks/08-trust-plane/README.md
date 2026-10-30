@@ -334,6 +334,76 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 
 **Pour J6** : les cinq résolveurs sont actifs (`bundles`, `cluster`, `git`, `http`, `hub`) et peuvent chercher des définitions de tâches hors de la plateforme ; l'essai utilise un `taskSpec` en ligne, que le test 2 doit refuser.
 
+## Préparation de J8 (30/10/2026, plan à valider par le propriétaire)
+
+Rien n'est lancé : ce bloc prépare J8 et les décisions qui le précèdent. J7 reste « en cours » tant que le propriétaire n'a pas tranché les deux points qui lui reviennent.
+
+**Contrôle de fin de J7 : atteint**, avec des preuves rejouées sous Cilium.
+
+| Contrôle | Preuve |
+|---|---|
+| Pod Kata en x86-64-v3 | [`kata-essais.log`](resultats/kata-essais.log) : x86-64-v3 pris en charge, v4 non, aucun drapeau avx512, sous runc comme sous Kata |
+| Pod privilégié hors Kata refusé | [`kata-exemption.log`](resultats/kata-exemption.log) : pod runc privilégié refusé par Pod Security `restricted`, pod Kata privilégié admis. [`construction-construire.log`](resultats/construction-construire.log) : le PipelineRun sans `runtimeClassName` est refusé (`PodAdmissionFailed`) |
+| PipelineRun de sample-app depuis Forgejo, provenance signée vérifiée par cosign, digest comparé à `3a7ca1b1` | [`construction-construire.log`](resultats/construction-construire.log) : image `3a7ca1b1`. [`construction-provenance.log`](resultats/construction-provenance.log) : 2 enveloppes valides, une autre clé refusée |
+
+Restent au propriétaire : le canal des `internalParameters`, qu'il avait reporté à J7, et la bascule du gabarit en service vers `sample-app`.
+
+**Les 8 tests dans l'état actuel** (relus dans ce README et dans les journaux cités) :
+
+| # | Mécanisme aujourd'hui | Trace prévue | Déjà mesuré | À faire en J8 |
+|---|---|---|---|---|
+| 1 | Clé Transit non exportable ; rôle JWT lié au seul compte de Chains ; NetworkPolicy d'OpenBao, appliquée par Cilium ; RBAC et règle de zone de J6 | Audit d'OpenBao ; journal de la tâche | J3 : export, sauvegarde en clair et nouvelle clé refusés au jeton de Chains ; autre compte et autre audience refusés ; OpenBao injoignable depuis `sc-build`, refus dans Hubble. J6 : droits | Tentative depuis une vraie tâche de `builds`. Les refus n'ont jamais été lus dans l'audit d'OpenBao, la trace prévue |
+| 2 | Kyverno `tekton-references`, Trusted Resources | Événement de refus de Kyverno | J6 et rejeu sous Cilium : 13 cas refusés par `tekton-references`, 14 événements ([`politique-admission.log`](resultats/politique-admission.log)) | Rejeu du cas `taskSpec` en ligne, trace archivée sous le nom du test |
+| 3 | RBAC : aucun droit sur `taskruns/status` | Refus de l'API ; audit de k3s | J6 : refus par `can-i` (89 vérifications) | Tentative réelle sur un TaskRun terminé, 403 lu dans l'audit. « Chains ne re-signe pas » n'est pas mesuré : essai à concevoir, le statut ne pouvant être modifié que par les contrôleurs ou un administrateur |
+| 4 | Kyverno `pods-isolation`, Pod Security `restricted` en `enforce` sur `builds`, exemption de la seule RuntimeClass `kata` | Événement de refus | J6 et J7 : `pod-privilegie`, `pod-hostpath` et `pod-privilegie-crun` refusés, en CLI comme à l'admission ; pod runc privilégié refusé | Rejeu, trace archivée |
+| 5 | Intercepteur HMAC et anti-rejeu | Journal de l'EventListener | J4, puis rejoué sous politique en J6 | Rejeu, trace archivée |
+| 6 | `construction-sans-sortie` (ni entrée ni sortie pour `construire-image`), appliquée par Cilium ; anti-usurpation de Cilium | NFLOG prévu, absent sous Cilium : voir la décision 2 | J7 : construction sans sortie et témoins ; sous Cilium, aucune fenêtre, usurpation refusée, refus dans Hubble, mêmes résultats après un redémarrage des VM | Conception (décision 2), puis tentative depuis l'étape de construction elle-même |
+| 7 | Type `https://sigstore.dev/cosign/sign/v1` exigé ; Conforma dans la porte | Refus de Kyverno et de Conforma | Banc C (17/17 cas) ; J6 : `c1-unsigned` refusé par l'API (parité) | Porte rejouée sur `builds/sample-app`, y compris un manifeste créé par `poc-images` sans provenance de Chains (non mesuré, voir J7). Également : `3a7ca1b1` porte aussi les enveloppes de l'ancienne `construire-image` (`c7e8b275`), retirée de la liste, et Conforma v1.0.28 n'évalue que la dernière attestation de PipelineRun. La porte doit être jugée sur un digest qui porte l'attestation d'une pipeline non approuvée, et l'ordre des attestations doit être éprouvé |
+| 8 | Bundle réémis, vérifié par cosign v3.1.4 (`tools/verify-ts`) | Refus de `tools/verify-ts`, puis de Conforma | J5 : jeton absent, altéré, d'une autre signature ou d'une TSA étrangère, tous refusés | Joindre le contrôle 9 à la porte ; mesurer le cas d'un bundle valide d'un autre digest |
+
+Tests 7 et 8 : la porte peut juger l'image construite en J7, dont la provenance est signée. Ils ne dépendent donc de la bascule du gabarit que si J8 doit montrer la chaîne entière, du webhook à la porte. C'est ma lecture, pas une mesure.
+
+**Forme proposée pour J8** : un script `preuves.sh` avec une étape par test. Pour chacune :
+- la prédiction est écrite avant ;
+- la tentative part de la zone build ;
+- un témoin positif montre que l'essai sait détecter ce qu'il cherche ;
+- la trace est archivée dans `resultats/preuves-test<N>.log`.
+
+Puis vient le bilan des 8 tests, et les notes C sont mises à jour dans l'ADR 0000.
+
+**Décisions préalables**, chacune avec ma recommandation :
+
+1. **Canal des `internalParameters`** (options (a), (b) et (c) au bloc « `internalParameters` en `slsa-tekton` » de J6). **Je recommande (c)** : rien dans `internalParameters`, et la porte juge des faits du TaskRun signé.
+   - Pour : la mesure de J7 signe `runtimeClassName: kata` deux fois, dans les paramètres externes et dans le TaskRun en contenu ([`construction-provenance.log`](resultats/construction-provenance.log)). La porte exigerait `kata` sur le TaskRun de `construire-image`.
+   - Trous :
+     - un `runtimeClassName` posé par un `default-pod-template` ou par une mutation n'apparaît pas dans la spec ;
+     - `hermetic` n'est pas un champ du pod : il repose sur la NetworkPolicy, état du cluster absent de la provenance ;
+     - `cpuModel` passerait par un `nodeSelector` du gabarit, à mesurer.
+   - Le doc 02 §3 et l'ADR 0001 changeraient.
+2. **Test 6 sous Cilium.** Proposition :
+   - **Vecteur** : le code hostile doit atteindre l'étape `construire` sans tomber d'abord sur le test 2, qui exige une tâche signée. Deux voies, qui ne mesurent pas la même chose :
+     - **le code du dépôt** : le Dockerfile est celui de la plateforme, dans le script de la tâche (le dépôt n'en fournit pas), et son unique `RUN` est en `--network=none`. La première barrière est donc le mode réseau de BuildKit (mesuré en root : Zot joignable par le réseau par défaut, injoignable en `--network=none`, [`buildkit-exempte.log`](resultats/buildkit-exempte.log)). La NetworkPolicy n'est pas exercée ;
+     - **une variante signée de `construire-image`, pour le seul test** et hors de la liste revue, qui tente la sortie depuis l'étape `construire` : pod Kata privilégié, root dans l'invité. Elle modélise une évasion du bac à sable de BuildKit et exerce la politique de Cilium. La porte la refuserait ensuite, puisqu'elle n'est pas dans la liste revue.
+
+     **Je recommande** la variante signée, et je consigne la première voie comme barrière amont déjà mesurée.
+   - **Tentative** : depuis cette étape, connexions vers Zot, Forgejo, l'API et une adresse externe (`203.0.113.10`), puis avec une adresse source usurpée.
+   - **Témoin**, destination par destination, comme dans `kata.sh reseau`. Seule `construction-sans-sortie` sélectionne des pods de `builds` (relevé le 30/10/2026 : `tekton.dev/task: construire-image`).
+     - **Zot, Forgejo et l'API** : connexion établie depuis un pod de mesure de `builds` que cette politique ne sélectionne pas.
+     - **Adresse externe** : une connexion n'y aboutit jamais. Le témoin est donc le paquet vu sur `enp1s0` de `sc-build` quand il part d'un pod non sélectionné.
+   - **Trace** : flux de Hubble capturés pendant le test et archivés. Hubble garde ses flux dans un tampon circulaire en mémoire de chaque agent, de 4 095 flux (relu dans l'agent : « Current/Max Flows: 1878/4095 »). Le tampon se vide quand l'agent redémarre : la trace ne peut pas être relue après coup.
+   - **Compte** : par tentative, pas par ligne, puisque chaque SYN refusé apparaît deux fois (cause non établie). Attendu : aucune connexion établie, et au moins un flux refusé par tentative, `POLICY_DENIED` (ou `INVALID_SOURCE_IP` pour l'usurpation), avec l'IP et le port.
+3. **Droit `update` de `poc-build`** (« à traiter avant J8 », constat de J4). Je propose une mesure, pas une conclusion. Chains réécrit le tag `.att` à chaque enveloppe ajoutée et a peut-être besoin de ce droit.
+   - Mesure : retirer `update` à `poc-build` dans la configuration de Zot (`sc-stockage`), lancer une construction, puis voir si Chains pousse encore sa seconde enveloppe.
+   - Si Chains échoue, le droit est nécessaire. Le contrôle de la décision 4 détecterait alors une suppression après coup, sans l'empêcher.
+   - Ce changement de configuration de Zot demande l'accord du propriétaire.
+4. **Mode `sigstore-bundle`.** Vérifié le 30/10/2026 (`gh pr view 2096 --repo tektoncd/chains`) : la PR est **ouverte et non fusionnée**. Dernière release de Chains : v0.29.9 du 22/10/2026, avec des correctifs sur les branches précédentes le 26/10. La voie reste bloquée.
+   - **Je recommande** de rester en `dsse` et d'ajouter en J8 le contrôle qui compare les exécutions signées aux enveloppes présentes. Il ne demande aucun nouveau composant, mais c'est du code nouveau. L'invariant d'horodatage de J6 compare seulement les bundles aux enveloppes : une enveloppe perdue avant d'être horodatée lui échappe.
+5. **Décision C, reportée à J8** (ADR 0000, « C. Kyverno seul ») : les grilles ne changent pas, seules les notes en attente de mesure.
+   - Notes inscrites : C-1 de 4 à 5 pour les deux options, avec le contrôle 9 de J5 ; C-3 de Kyverno seul de 3 à 2 ; C-2 de 4 à 5, mesuré en J6.
+   - La réserve reste à mesurer avant de trancher : la bibliothèque Conforma (`slsa3`, `trusted_task`) réécrite en CEL, puis évaluée par Kyverno sur la vraie provenance de Chains (`3a7ca1b1`). Journal prévu : `resultats/preuves-reserve-c.log`.
+
+**Budget de la brique** : il n'existe pas de suivi en personnes-semaines. [`chrono.tsv`](resultats/chrono.tsv) date les étapes des scripts (1 295 lignes), du 29/10/2026 16:00Z au 30/10/2026 21:01Z : deux jours calendaires. Ce relevé ne suffit pas à juger le seuil de 11 pw ; l'estimation de l'effort revient au propriétaire.
+
 ## Jalon J7 : isolation par Kata (en cours, 30/10/2026)
 
 **Vérification, sans rien installer** ([`kata-verifier.log`](resultats/kata-verifier.log), [`kata.sh`](kata.sh) `verifier`) :
