@@ -11,6 +11,10 @@
 #           sonde runc et Kata (bounding set, no_new_privs, seccomp, AppArmor, user namespace et montage) ; rootlesskit de
 #           l'image ; buildkitd sous unshare -U -r (un seul UID), deux constructions ; taille de l'invité avec des limites
 #           (QEMU -smp et -m relevés sur sc-build pendant la vie du pod). Conclusion : aucun RUN possible en restricted
+#   exempte après kata.sh exemption ; prédiction corrigée après un premier passage démenti (README) : attributs étendus
+#           (racine du conteneur et tmpfs, runc et Kata) ; options de virtiofsd relevées sur sc-build ; rootlesskit de l'image
+#           dans un pod Kata privilégié et dans un pod Kata non privilégié avec allowPrivilegeEscalation ; buildkitd en root
+#           dans un pod Kata privilégié : trois constructions, dont une qui cherche le démon depuis une étape et joint Zot
 #
 # Usage (racine du dépôt) : mise run confiance:buildkit -- <étape>…   (journal : resultats/buildkit-<étape>.log)
 set -euo pipefail
@@ -109,7 +113,8 @@ for m in tarfile.open(fileobj=sys.stdin.buffer, mode="r|*"):
               + (", effectif" if c[:4] and int.from_bytes(c[:4], "little") & 1 else "") + ")")
 '
   done
-  echo "CONSTAT pas de bit setuid : capacités de fichier ; sans effet sous no_new_privs (allowPrivilegeEscalation: false de restricted)"
+  echo "CONSTAT pas de bit setuid : capacités de fichier (attribut étendu security.capability) ; sous Kata, elles ne sont pas visibles"
+  echo "        dans l'invité (virtiofsd sans --xattr : étape exempte)"
   echo "## pour mémoire : v0.25.2-rootless (version de la brique 04), non retenue"
   d=$(crane digest "$BK_AMONT:v0.25.2-rootless")
   crane manifest "$BK_AMONT@$d" > "$T/index-0.25.2.json"
@@ -126,29 +131,41 @@ BUSYBOX=$REG/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54
 BUILDKIT=$REG/$MIROIR_BK@$BK_AMD64
 LIMITES='{"cpu": "2", "memory": "3Gi"}'   # demandes = limites (QoS Guaranteed) ; invité dimensionné à partir des limites
 
-pod_spec() { # nom runtimeClass|- image uid limites|- script : pod de builds conforme à restricted, dans $T/<nom>.json
-  jq -n --arg n "$1" --arg rc "$2" --arg i "$3" --argjson u "$4" --arg l "$5" --arg s "$6" --rawfile ca "$P/ca-poc.crt" '{apiVersion: "v1", kind: "Pod",
+RESTREINT='{"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}}'   # contexte de conteneur de restricted
+
+pod_spec() { # nom runtimeClass|- image uid limites|- script [contexte du conteneur, JSON] : pod de builds, dans $T/<nom>.json ;
+  # contexte de restricted par défaut ; runAsNonRoot sauf pour l'UID 0
+  local sc=${7:-$RESTREINT}
+  jq -n --arg n "$1" --arg rc "$2" --arg i "$3" --argjson u "$4" --arg l "$5" --arg s "$6" --argjson sc "$sc" --rawfile ca "$P/ca-poc.crt" '{apiVersion: "v1", kind: "Pod",
     metadata: {name: $n, namespace: "builds"},
     spec: ({restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
       tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
-      securityContext: {runAsNonRoot: true, runAsUser: $u, runAsGroup: $u, seccompProfile: {type: "RuntimeDefault"}},
+      securityContext: {runAsNonRoot: ($u != 0), runAsUser: $u, runAsGroup: $u, seccompProfile: {type: "RuntimeDefault"}},
       containers: [{name: "mesure", image: $i, command: ["sh", "-c", $s], env: [{name: "CA_POC", value: $ca}],
-        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}
+        securityContext: $sc}
         + (if $l == "-" then {} else {resources: {requests: ($l | fromjson), limits: ($l | fromjson)}} end)]}
       + (if $rc == "-" then {} else {runtimeClassName: $rc} end))}' > "$T/$1.json"
 }
 
-pod_mesure() { # nom runtimeClass|- image uid limites|- script : pod terminé, journal dans $T/<nom>.log, affiché
-  pod_spec "$@"
+pod_lancer() { # nom [fonction appelée avec le nom, pendant la vie du pod, une fois prêt] : pod de $T/<nom>.json créé, attendu
+  # jusqu'à une phase terminale (Succeeded ou Failed) ; sa sortie est archivée dans $T/<nom>.log et affichée avant tout jugement
+  local ph=""
   kubectl delete pod -n builds "$1" --ignore-not-found --wait=true >/dev/null
   kubectl create -f "$T/$1.json" >/dev/null
-  kubectl wait -n builds "pod/$1" --for=jsonpath='{.status.phase}'=Succeeded --timeout=300s >/dev/null \
-    || { kubectl describe pod -n builds "$1" >&2; echo "KO   pod $1 non terminé" >&2; exit 1; }
-  kubectl logs -n builds "$1" > "$T/$1.log"
-  echo "### $1 (runtimeClassName $2, uid $4, limites $5)"
+  if [ -n "${2:-}" ]; then kubectl wait -n builds "pod/$1" --for=condition=Ready --timeout=300s >/dev/null; "$2" "$1"; fi
+  for _ in $(seq 150); do
+    ph=$(kubectl get pod -n builds "$1" -o jsonpath='{.status.phase}')
+    case $ph in Succeeded|Failed) break ;; esac
+    sleep 2
+  done
+  kubectl logs -n builds "$1" > "$T/$1.log" 2>&1 || true
+  echo "### $1 ($(jq -r '"runtimeClassName \(.spec.runtimeClassName // "-"), uid \(.spec.securityContext.runAsUser), contexte \(.spec.containers[0].securityContext | tostring), limites \(.spec.containers[0].resources.limits // "-" | tostring)"' "$T/$1.json")) : phase $ph"
   sed 's/^/     /' "$T/$1.log"
+  case $ph in Succeeded|Failed) ;; *) kubectl describe pod -n builds "$1" >&2; echo "KO   pod $1 non terminé (phase $ph)" >&2; exit 1 ;; esac
   kubectl delete pod -n builds "$1" --wait=false >/dev/null
 }
+
+pod_mesure() { pod_spec "$@"; pod_lancer "$1"; }   # nom runtimeClass|- image uid limites|- script [contexte]
 
 champ() { sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$T/$1.log" | head -1; }   # pod libellé : valeur d'une ligne « libellé : valeur »
 
@@ -236,8 +253,113 @@ etape_essais() {
   [ "$(champ j7-bk-unshare vCPU)" = 3 ] && [ "$(champ j7-bk-unshare MemTotal | awk '{print $1}')" -lt $((3104 * 1024)) ] \
     && echo "OK   kata, limites 2 CPU et 3 Gi : invité de $(champ j7-bk-unshare vCPU) vCPU, MemTotal $(champ j7-bk-unshare MemTotal)" \
     || { echo "KO   taille de l'invité" >&2; exit 1; }
-  echo "CONSTAT en restricted, BuildKit ne peut exécuter aucun RUN, sous runc comme sous Kata : rootlesskit exige newuidmap"
-  echo "        (neutralisé par no_new_privs), et une correspondance d'un seul UID bute sur devpts (gid=5) pour toute étape RUN"
+  echo "CONSTAT en restricted, BuildKit ne peut exécuter aucun RUN, sous runc (user namespace refusé par seccomp) comme sous Kata :"
+  echo "        newuidmap échoue (cause mesurée par l'étape exempte : capacités de fichier invisibles dans l'invité), et une"
+  echo "        correspondance d'un seul UID bute sur devpts (gid=5) pour toute étape RUN"
+}
+
+# Après l'exemption (kata.sh exemption). Démon relancé pour chaque essai (essai libellé lanceur|- options) : rootlesskit de
+# l'image (correspondance de 65537 UID par newuidmap), ou buildkitd en root (buildkit-runc), sans rootlesskit. Constructions a
+# et b comme dans essais ; c, sur busybox de Zot : une étape cherche le démon dans /proc (argv[0] « buildkitd » : signal,
+# racine lisible), puis Zot joint par le réseau par défaut et en --network=none.
+BK='grep -E "^(CapEff|CapBnd|NoNewPrivs|Seccomp):" /proc/self/status; echo "uid : $(id -u)"
+mkdir -p /tmp/a /tmp/b/bin /tmp/b/lib /tmp/c
+printf "%s\n" "$CA_POC" > /tmp/ca.crt
+printf "[registry.\"sc-stockage.poc.test:5000\"]\n  ca = [\"/tmp/ca.crt\"]\n" > /tmp/bk.toml
+printf "FROM %s\nRUN true\n" "'"$BUSYBOX"'" > /tmp/a/Dockerfile
+cp -L /bin/busybox /tmp/b/bin/; cp -L /lib/ld-musl-x86_64.so.1 /tmp/b/lib/
+printf "FROM scratch\nCOPY lib/ /lib/\nCOPY bin/ /bin/\nRUN [\"/bin/busybox\", \"true\"]\n" > /tmp/b/Dockerfile
+cat > /tmp/c/Dockerfile <<"FIN"
+FROM '"$BUSYBOX"'
+RUN n=0; s=-; l=-; for p in /proc/[0-9]*; do [ "$(head -c 9 $p/cmdline 2>/dev/null)" = buildkitd ] || continue; n=$((n + 1)); kill -0 ${p#/proc/} 2>/dev/null && s=possible || s=refusé; ls $p/root/ > /dev/null 2>&1 && l=oui || l=non; done; echo "étape processus : démon visible $n, signal $s, racine lisible $l"
+RUN nc -z -w 3 192.168.161.13 5000 && echo "étape réseau par défaut : Zot joignable" || echo "étape réseau par défaut : Zot injoignable"
+RUN --network=none nc -z -w 3 192.168.161.13 5000 && echo "étape network=none : Zot joignable" || echo "étape network=none : Zot injoignable"
+FIN
+essai() {
+  rm -rf /tmp/run; mkdir -p /tmp/run   # racine propre à chaque essai : ses fichiers peuvent appartenir aux UID subordonnés
+  l=$2; [ "$l" = - ] && l=
+  $l buildkitd --config /tmp/bk.toml --oci-worker-snapshotter=native $3 --addr unix:///tmp/run/bk.sock --root /tmp/bk-$1 > /tmp/bkd-$1.log 2>&1 &
+  k=$!
+  for i in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
+  buildctl --addr unix:///tmp/run/bk.sock debug workers -v > /tmp/w.log 2>&1
+  echo "$1 démon : $(grep -o "process-mode:.*" /tmp/w.log | tr -d "\t") $(grep -o "network:.*" /tmp/w.log | tr -d "\t")$(grep -o -m1 "newuidmap.*" /tmp/bkd-$1.log)"
+  for c in a b c; do
+    buildctl --addr unix:///tmp/run/bk.sock build --no-cache --progress plain --frontend dockerfile.v0 --local context=/tmp/$c --local dockerfile=/tmp/$c > /tmp/$1-$c.log 2>&1
+    echo "$1 construction $c : rc $? $(grep -o -m1 -E "error mounting [^:]*: [^:]*|failed to [^:]*" /tmp/$1-$c.log | head -1)"
+  done
+  sed -n -E "s/^#[0-9]+ [0-9.]+ (étape [^:]* : .*)/$1 \\1/p" /tmp/$1-c.log   # sorties des étapes, pas leur texte
+  kill $k 2> /dev/null; wait $k 2> /dev/null; true
+}'
+PRIVILEGIE='{"privileged": true, "allowPrivilegeEscalation": true}'
+ESCALADE='{"allowPrivilegeEscalation": true}'   # capacités par défaut de containerd, seccomp RuntimeDefault du pod
+
+# Attributs étendus : un fichier de la racine du conteneur (servie par virtio-fs sous Kata), puis d'un tmpfs (emptyDir en mémoire)
+XATTR='echo "racine du conteneur, système de fichiers : $(awk "\$2 == \"/\" {t = \$3} END {print t}" /proc/mounts)"
+echo essai > /tmp/f; setfattr -n user.essai -v 1 /tmp/f 2> /tmp/e; echo "racine du conteneur : rc $? $(cat /tmp/e)"
+echo essai > /m/f; setfattr -n user.essai -v 1 /m/f 2> /tmp/e; echo "tmpfs : rc $? $(cat /tmp/e)"
+echo "tmpfs, relu : $(getfattr -n user.essai /m/f 2>&1 | grep user.essai)"'
+
+releve_virtiofsd() { # pod : processus virtiofsd du sandbox du pod sur sc-build, dans $T/virtiofsd.txt
+  local q
+  q=$(sur sc-build "sudo k3s crictl pods --namespace builds --name $1 --state ready -q")
+  sur sc-build "sudo pgrep -a virtiofsd" | grep -F "$q" > "$T/virtiofsd.txt" || true   # par nom de processus : ni QEMU ni sudo
+  echo "virtiofsd du sandbox $q : $(wc -l < "$T/virtiofsd.txt") processus ; options : $(tr ' ' '\n' < "$T/virtiofsd.txt" | grep -E '^-' | sort -u | paste -sd' ')"
+}
+
+etape_exempte() {
+  local p e
+  echo "## prédiction corrigée le 30/10/2026, après le premier passage (resultats/buildkit-exempte-premiere-prediction.log) : la"
+  echo "## prédiction du README, écrite avant l'accord, est démentie pour le pod privilégié (newuidmap en échec malgré NoNewPrivs 0)"
+  echo "virtiofsd lancé sans --xattr (disable_guest_selinux = true, et runtime-rs 4.3.1 n'ajoute --xattr que si ce drapeau est"
+  echo "       faux, share_virtio_fs_standalone.rs)"
+  echo "attributs étendus : runc, racine du conteneur : posés ; kata, racine du conteneur (virtio-fs) : refusés (Operation not"
+  echo "       supported) ; kata, tmpfs de l'invité : posés et relus"
+  echo "kata privilégié, rootless (UID 1000) : NoNewPrivs 0, bounding set complet, mais newuidmap échoue (« Could not set caps ») :"
+  echo "       les capacités de fichier ne sont pas visibles dans l'invité ; pas de démon, aucune construction"
+  echo "kata non privilégié, allowPrivilegeEscalation et capacités par défaut, rootless : même échec de newuidmap"
+  echo "kata privilégié, en root (UID 0, buildkitd sans rootlesskit) : démon en process-mode sandbox, réseau host (mode auto sans"
+  echo "       configuration CNI : repli sur l'hôte, netproviders) ; constructions a, b et c réussies ; l'étape ne voit pas le démon ;"
+  echo "       Zot joignable par le réseau par défaut, injoignable en --network=none"
+  e=$(sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n' \
+    | grep -c -x -- '--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml' || true)
+  [ "$e" = 1 ] && echo "OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption)" \
+    || { echo "KO   exemption absente : lancer kata.sh exemption" >&2; exit 1; }
+  echo "## mesures"
+  for p in "j7-xattr-runc -" "j7-xattr-kata kata"; do
+    set -- $p
+    pod_spec "$1" "$2" "$BUSYBOX" 65532 - "$XATTR"
+    jq '.spec.volumes = [{name: "m", emptyDir: {medium: "Memory", sizeLimit: "16Mi"}}] | .spec.containers[0].volumeMounts = [{name: "m", mountPath: "/m"}]' \
+      "$T/$1.json" > "$T/$1.tmp" && mv "$T/$1.tmp" "$T/$1.json"
+    pod_lancer "$1"
+  done
+  pod_spec j7-bk-privilegie kata "$BUILDKIT" 1000 "$LIMITES" "sleep 5; $BK
+essai rootless rootlesskit ''" "$PRIVILEGIE"
+  pod_lancer j7-bk-privilegie releve_virtiofsd
+  pod_mesure j7-bk-escalade kata "$BUILDKIT" 1000 "$LIMITES" "$BK
+essai rootless rootlesskit ''" "$ESCALADE"
+  pod_mesure j7-bk-root kata "$BUILDKIT" 0 "$LIMITES" "$BK
+essai root - ''" "$PRIVILEGIE"
+  echo "## comparaison"
+  [ -s "$T/virtiofsd.txt" ] && ! tr ' ' '\n' < "$T/virtiofsd.txt" | grep -x -- '--xattr' >/dev/null \
+    && echo "OK   virtiofsd du pod Kata lancé sans --xattr" || { echo "KO   virtiofsd : $(cat "$T/virtiofsd.txt")" >&2; exit 1; }
+  attendu "runc : attribut étendu sur la racine du conteneur" "$(champ j7-xattr-runc 'racine du conteneur')" "rc 0 "
+  case $(champ j7-xattr-kata 'racine du conteneur') in "rc 1 "*"not supported"*) echo "OK   kata : attribut étendu refusé sur la racine du conteneur ($(champ j7-xattr-kata 'racine du conteneur'))" ;;
+    *) echo "KO   kata : racine du conteneur $(champ j7-xattr-kata 'racine du conteneur')" >&2; exit 1 ;; esac
+  attendu "kata : attribut étendu sur le tmpfs de l'invité (témoin positif)" "$(champ j7-xattr-kata tmpfs) $(champ j7-xattr-kata 'tmpfs, relu')" 'rc 0  user.essai="1"'
+  for p in j7-bk-privilegie j7-bk-escalade; do
+    attendu "$p : no_new_privs" "$(champ $p NoNewPrivs)" "0"
+    case $(champ $p 'rootless démon') in "newuidmap"*"Could not set caps") echo "OK   $p : rootlesskit en échec ($(champ $p 'rootless démon'))" ;;
+      *) echo "KO   $p : démon $(champ $p 'rootless démon')" >&2; exit 1 ;; esac
+  done
+  attendu "j7-bk-privilegie : bounding set" "$(champ j7-bk-privilegie CapBnd)" "000001ffffffffff"
+  p=j7-bk-root
+  attendu "en root : UID, démon" "$(champ $p uid) | $(champ $p 'root démon')" "0 | process-mode:sandbox network:host"
+  attendu "en root : constructions a, b, c" "$(champ $p 'root construction a')|$(champ $p 'root construction b')|$(champ $p 'root construction c')" "rc 0 |rc 0 |rc 0 "
+  attendu "en root : étape et démon" "$(champ $p 'root étape processus')" "démon visible 0, signal -, racine lisible -"
+  attendu "en root : réseau de l'étape" "$(champ $p 'root étape réseau par défaut') / $(champ $p 'root étape network=none')" "Zot joignable / Zot injoignable"
+  echo "CONSTAT sous Kata, BuildKit rootless de l'image est impossible, même exempté et privilégié : virtiofsd sans --xattr, les"
+  echo "        capacités de fichier de newuidmap ne sont pas visibles dans l'invité ; BuildKit en root dans un pod Kata privilégié"
+  echo "        construit, avec le bac à sable des processus"
 }
 
 lancer buildkit J7 "$@"

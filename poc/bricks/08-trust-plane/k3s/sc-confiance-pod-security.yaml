@@ -1,0 +1,6 @@
+# Brique 08, J7 : fichier d'appoint de la configuration du server k3s (sc-confiance :
+# /etc/rancher/k3s/config.yaml.d/pod-security.yaml, 0600), posé par kata.sh exemption, après kata.sh essais : posé dès J1,
+# il ferait mentir le refus du pod Kata privilégié que ces essais mesurent avant l'exemption. Une clé suffixée par « + »
+# s'ajoute à la liste de config.yaml au lieu de la remplacer (pkg/configfilearg de k3s v1.35.9).
+kube-apiserver-arg+:
+  - admission-control-config-file=/etc/rancher/k3s/pod-security.yaml

@@ -36,39 +36,6 @@ prets() { # espace : chaque pod hors jobs passé Ready après l'arrêt ($arret) 
     || { echo "KO   $ns : $n pod(s) sur $total non prêts depuis le redémarrage" >&2; kubectl get pods -n "$ns" >&2; exit 1; }
 }
 
-sonde_kyverno() { # pod de tsa sans nodeSelector (conforme à Pod Security restricted, qui passe avant les webhooks), créé en
-  # dry-run serveur : refus attendu de la règle zone-confiance de Kyverno, pas une erreur d'appel du webhook
-  local img msg="" i
-  img=$(kubectl get deployment -n tsa timestamp-authority -o jsonpath='{.spec.template.spec.containers[0].image}')
-  jq -n --arg i "$img" '{apiVersion: "v1", kind: "Pod", metadata: {name: "sonde-kyverno", namespace: "tsa"},
-    spec: {automountServiceAccountToken: false, securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
-      containers: [{name: "sonde", image: $i, securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$T/sonde-kyverno.json"
-  for i in $(seq 90); do
-    msg=$(kubectl create --dry-run=server -f "$T/sonde-kyverno.json" 2>&1 || true)
-    grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg" && break
-    sleep 2
-  done
-  grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg" \
-    && echo "OK   Kyverno répond à l'admission ($i essai(s)) : pod sans nodeSelector refusé par zone-confiance" \
-    || { echo "KO   Kyverno ne répond pas : $msg" >&2; exit 1; }
-}
-
-passage_ok() { # espace CronJob instant : premier passage créé après l'instant, attendu réussi ; résumé de son journal.
-  # Concurrence Forbid : un passage lancé avant le descellement peut retarder le suivant jusqu'à son échéance (300 s)
-  local ns=$1 cj=$2 t=$3 j=""
-  for _ in $(seq 210); do
-    j=$(kubectl get jobs -n "$ns" -o json | jq -r --arg t "$t" --arg c "$cj" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
-      and .name == $c) and .metadata.creationTimestamp > $t and ((.status.succeeded // 0) + (.status.failed // 0)) > 0)]
-      | sort_by(.metadata.creationTimestamp) | .[0].metadata.name // empty')
-    [ -n "$j" ] && break
-    sleep 2
-  done
-  [ -n "$j" ] || { echo "KO   aucun passage du CronJob $ns/$cj terminé depuis $t" >&2; exit 1; }
-  kubectl logs -n "$ns" "job/$j" > "$T/passage-$cj.log" 2>&1 || true
-  echo "passage $j : $(cut -d'|' -f1 "$T/passage-$cj.log" | sort | uniq -c | awk '{printf "%s %s ; ", $2, $1}')"
-  [ "$(kubectl get job -n "$ns" "$j" -o jsonpath='{.status.succeeded}')" = 1 ] && echo "OK   $ns/$cj : passage réussi après le retour du TSA" \
-    || { cat "$T/passage-$cj.log" >&2; echo "KO   $ns/$cj : passage $j en échec" >&2; exit 1; }
-}
 
 mise run confiance:openbao -- deverrouiller temoin   # descellé d'abord : rejouable après un arrêt
 avant=$(boot)

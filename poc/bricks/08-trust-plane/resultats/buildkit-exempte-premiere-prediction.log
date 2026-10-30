@@ -1,0 +1,124 @@
+# buildkit.sh exempte, 2026-10-30T14:11:41Z
+## prédiction (écrite dans le README le 30/10/2026, avant l'accord sur l'exemption)
+kata privilégié (privileged_without_host_devices) : rootlesskit réussit ; constructions a, b et c réussies avec le bac à
+       sable des processus (process-mode sandbox) ; l'étape ne voit pas le démon ; Zot joignable par le réseau par défaut,
+       injoignable en --network=none
+kata non privilégié, allowPrivilegeEscalation et capacités par défaut : rootlesskit réussit (NoNewPrivs 0, CAP_SETUID et
+       CAP_SETGID dans le bounding set) ; avec le bac à sable des processus, échec du montage de /proc (chemins masqués) ;
+       avec --oci-worker-no-process-sandbox, constructions réussies, mais l'étape voit le démon : signal possible, racine lisible
+OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption)
+## mesures
+error: timed out waiting for the condition on pods/j7-bk-privilegie
+Name:                j7-bk-privilegie
+Namespace:           builds
+Priority:            0
+Runtime Class Name:  kata
+Service Account:     build
+Node:                sc-build/192.168.161.12
+Start Time:          Fri, 30 Oct 2026 15:11:42 +0100
+Labels:              <none>
+Annotations:         <none>
+Status:              Failed
+SeccompProfile:      RuntimeDefault
+IP:                  10.42.1.51
+IPs:
+  IP:  10.42.1.51
+Containers:
+  mesure:
+    Container ID:  containerd://d4cd8100464380303af0cb050163551ffbc9b7a699b06e592d83a14d9aedcc54
+    Image:         sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+    Image ID:      sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+      grep -E "^(CapEff|CapBnd|NoNewPrivs|Seccomp):" /proc/self/status
+      mkdir -p /tmp/a /tmp/b/bin /tmp/b/lib /tmp/c
+      printf "%s\n" "$CA_POC" > /tmp/ca.crt
+      printf "[registry.\"sc-stockage.poc.test:5000\"]\n  ca = [\"/tmp/ca.crt\"]\n" > /tmp/bk.toml
+      printf "FROM %s\nRUN true\n" "sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f" > /tmp/a/Dockerfile
+      cp -L /bin/busybox /tmp/b/bin/; cp -L /lib/ld-musl-x86_64.so.1 /tmp/b/lib/
+      printf "FROM scratch\nCOPY lib/ /lib/\nCOPY bin/ /bin/\nRUN [\"/bin/busybox\", \"true\"]\n" > /tmp/b/Dockerfile
+      cat > /tmp/c/Dockerfile <<"FIN"
+      FROM sc-stockage.poc.test:5000/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+      RUN n=0; s=-; l=-; for p in /proc/[0-9]*; do [ "$(head -c 9 $p/cmdline 2>/dev/null)" = buildkitd ] || continue; n=$((n + 1)); kill -0 ${p#/proc/} 2>/dev/null && s=possible || s=refusé; ls $p/root/ > /dev/null 2>&1 && l=oui || l=non; done; echo "étape processus : démon visible $n, signal $s, racine lisible $l"
+      RUN nc -z -w 3 192.168.161.13 5000 && echo "étape réseau par défaut : Zot joignable" || echo "étape réseau par défaut : Zot injoignable"
+      RUN --network=none nc -z -w 3 192.168.161.13 5000 && echo "étape network=none : Zot joignable" || echo "étape network=none : Zot injoignable"
+      FIN
+      essai() {
+        rm -rf /tmp/run; mkdir -p /tmp/run   # racine propre à chaque mode : ses fichiers appartiennent aux UID subordonnés
+        rootlesskit buildkitd --config /tmp/bk.toml --oci-worker-snapshotter=native $2 --addr unix:///tmp/run/bk.sock --root /tmp/bk-$1 > /tmp/bkd-$1.log 2>&1 &
+        k=$!
+        for i in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
+        buildctl --addr unix:///tmp/run/bk.sock debug workers -v > /tmp/w.log 2>&1
+        echo "$1 démon : $(grep -o "process-mode:.*" /tmp/w.log | tr -d "\t")$(grep -o -m1 "newuidmap.*" /tmp/bkd-$1.log)"
+        for c in a b c; do
+          buildctl --addr unix:///tmp/run/bk.sock build --no-cache --progress plain --frontend dockerfile.v0 --local context=/tmp/$c --local dockerfile=/tmp/$c > /tmp/$1-$c.log 2>&1
+          echo "$1 construction $c : rc $? $(grep -o -m1 -E "error mounting [^:]*: [^:]*|failed to [^:]*" /tmp/$1-$c.log | head -1)"
+        done
+        sed -n -E "s/^#[0-9]+ [0-9.]+ (étape [^:]* : .*)/$1 \\1/p" /tmp/$1-c.log   # sorties des étapes, pas leur texte
+        kill $k; wait $k 2> /dev/null
+      }
+      essai sandbox ''
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Fri, 30 Oct 2026 15:11:46 +0100
+      Finished:     Fri, 30 Oct 2026 15:12:18 +0100
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      cpu:     2
+      memory:  3Gi
+    Requests:
+      cpu:     2
+      memory:  3Gi
+    Environment:
+      CA_POC:  -----BEGIN CERTIFICATE-----
+               MIICBzCCAa6gAwIBAgIUT7+ColNtyLoU7IgGS17KAZoySD0wCgYIKoZIzj0EAwIw
+               OzEZMBcGA1UECgwQc3VwcGx5LWNoYWluIFBvQzEeMBwGA1UEAwwVQ0EgZHUgUG9D
+               IChicmlxdWUgMDgpMB4XDTI2MTAyOTE2MzkwOFoXDTI3MTAyOTE2MzkwOFowOzEZ
+               MBcGA1UECgwQc3VwcGx5LWNoYWluIFBvQzEeMBwGA1UEAwwVQ0EgZHUgUG9DIChi
+               cmlxdWUgMDgpMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1cIdzYQKtHCNHCMi
+               uN2sFVPI6uUXUNv3aS/vbHw9r3FiZAERiOV29KI6LenMv40SJMyK2kUIEj6td5Ff
+               DzUvN6OBjzCBjDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAd
+               BgNVHQ4EFgQUu1SW1VhypBqwK3xcf6N3BFSw4ZEwRwYDVR0eAQH/BD0wO6A5MAqC
+               CHBvYy50ZXN0MBOCEXN2Yy5jbHVzdGVyLmxvY2FsMAqHCMCooQD///8AMAqHCAor
+               AAD//wAAMAoGCCqGSM49BAMCA0cAMEQCICZiozbkQLuxoVGWmG4Cc1jNdoNLzHUc
+               9lcxrWP5dSOJAiAcp1h6BaFtf4irozsvHjToBN2CzNhRAvNsxuBgFOqC3w==
+               -----END CERTIFICATE-----
+               
+    Mounts:    <none>
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   False 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:                      <none>
+QoS Class:                    Guaranteed
+Node-Selectors:               zone=build
+Tolerations:                  node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+                              zone=build:NoSchedule
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  5m     default-scheduler  Successfully assigned builds/j7-bk-privilegie to sc-build
+  Normal  Pulled     4m56s  kubelet            spec.containers{mesure}: Container image "sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b" already present on machine and can be accessed by the pod
+  Normal  Created    4m56s  kubelet            spec.containers{mesure}: Container created
+  Normal  Started    4m56s  kubelet            spec.containers{mesure}: Container started
+KO   pod j7-bk-privilegie non terminé
+## ajouté à la main après le KO (30/10/2026) : sortie du pod j7-bk-privilegie (kubectl logs), que l'étape n'archivait pas
+## (le pod sortait en erreur sur « kill » d'un démon déjà arrêté, d'où la phase Failed et le KO)
+     CapEff:	0000000000000000
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     sandbox démon : newuidmap 24 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     sandbox construction a : rc 1 failed to list workers
+     sandbox construction b : rc 1 failed to list workers
+     sandbox construction c : rc 1 failed to list workers
+     sh: can't kill pid 9: No such process

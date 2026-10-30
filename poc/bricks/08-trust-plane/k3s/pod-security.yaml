@@ -1,0 +1,21 @@
+# Brique 08, J7 : configuration de Pod Security du kube-apiserver de k3s (sc-confiance : /etc/rancher/k3s/pod-security.yaml,
+# 0600), posée par kata.sh exemption (accord du propriétaire du 30/10/2026). Niveaux par défaut explicités et inchangés
+# (privileged et latest, ceux de SetDefaults_PodSecurityDefaults sans fichier : chaque espace garde ses labels). Exemption :
+# les pods de la RuntimeClass kata échappent à Pod Security, dans tous les espaces ; ils restent soumis aux règles Kyverno
+# (pods-isolation : ni hostNetwork, hostPID, hostIPC, ni hostPath ; zone-confiance), et la RuntimeClass les place sur sc-build.
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+- name: PodSecurity
+  configuration:
+    apiVersion: pod-security.admission.config.k8s.io/v1
+    kind: PodSecurityConfiguration
+    defaults:
+      enforce: privileged
+      enforce-version: latest
+      audit: privileged
+      audit-version: latest
+      warn: privileged
+      warn-version: latest
+    exemptions:
+      runtimeClasses: [kata]

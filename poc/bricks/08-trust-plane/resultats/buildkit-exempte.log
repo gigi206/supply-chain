@@ -1,0 +1,76 @@
+# buildkit.sh exempte, 2026-10-30T14:38:07Z
+## prédiction corrigée le 30/10/2026, après le premier passage (resultats/buildkit-exempte-premiere-prediction.log) : la
+## prédiction du README, écrite avant l'accord, est démentie pour le pod privilégié (newuidmap en échec malgré NoNewPrivs 0)
+virtiofsd lancé sans --xattr (disable_guest_selinux = true, et runtime-rs 4.3.1 n'ajoute --xattr que si ce drapeau est
+       faux, share_virtio_fs_standalone.rs)
+attributs étendus : runc, racine du conteneur : posés ; kata, racine du conteneur (virtio-fs) : refusés (Operation not
+       supported) ; kata, tmpfs de l'invité : posés et relus
+kata privilégié, rootless (UID 1000) : NoNewPrivs 0, bounding set complet, mais newuidmap échoue (« Could not set caps ») :
+       les capacités de fichier ne sont pas visibles dans l'invité ; pas de démon, aucune construction
+kata non privilégié, allowPrivilegeEscalation et capacités par défaut, rootless : même échec de newuidmap
+kata privilégié, en root (UID 0, buildkitd sans rootlesskit) : démon en process-mode sandbox, réseau host (mode auto sans
+       configuration CNI : repli sur l'hôte, netproviders) ; constructions a, b et c réussies ; l'étape ne voit pas le démon ;
+       Zot joignable par le réseau par défaut, injoignable en --network=none
+OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption)
+## mesures
+### j7-xattr-runc (runtimeClassName -, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     racine du conteneur, système de fichiers : overlay
+     racine du conteneur : rc 0 
+     tmpfs : rc 0 
+     tmpfs, relu : user.essai="1"
+### j7-xattr-kata (runtimeClassName kata, uid 65532, contexte {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}, limites -) : phase Succeeded
+     racine du conteneur, système de fichiers : virtiofs
+     racine du conteneur : rc 1 setfattr: /tmp/f: Operation not supported
+     tmpfs : rc 0 
+     tmpfs, relu : user.essai="1"
+virtiofsd du sandbox fa1bba8212151bab747989e18aa15c38e05f689d5d3aaa4e6525e966d2a8d8c5 : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
+### j7-bk-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 1000
+     rootless démon :  newuidmap 27 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless construction a : rc 1 failed to list workers
+     rootless construction b : rc 1 failed to list workers
+     rootless construction c : rc 1 failed to list workers
+### j7-bk-escalade (runtimeClassName kata, uid 1000, contexte {"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	0000000000000000
+     CapBnd:	00000000a80425fb
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 1000
+     rootless démon :  newuidmap 24 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless construction a : rc 1 failed to list workers
+     rootless construction b : rc 1 failed to list workers
+     rootless construction c : rc 1 failed to list workers
+### j7-bk-root (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
+     CapEff:	000001ffffffffff
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     uid : 0
+     root démon : process-mode:sandbox network:host
+     root construction a : rc 0 
+     root construction b : rc 0 
+     root construction c : rc 0 
+     root étape processus : démon visible 0, signal -, racine lisible -
+     root étape réseau par défaut : Zot joignable
+     root étape network=none : Zot injoignable
+## comparaison
+OK   virtiofsd du pod Kata lancé sans --xattr
+OK   runc : attribut étendu sur la racine du conteneur : rc 0 
+OK   kata : attribut étendu refusé sur la racine du conteneur (rc 1 setfattr: /tmp/f: Operation not supported)
+OK   kata : attribut étendu sur le tmpfs de l'invité (témoin positif) : rc 0  user.essai="1"
+OK   j7-bk-privilegie : no_new_privs : 0
+OK   j7-bk-privilegie : rootlesskit en échec (newuidmap 27 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-escalade : no_new_privs : 0
+OK   j7-bk-escalade : rootlesskit en échec (newuidmap 24 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-privilegie : bounding set : 000001ffffffffff
+OK   en root : UID, démon : 0 | process-mode:sandbox network:host
+OK   en root : constructions a, b, c : rc 0 |rc 0 |rc 0 
+OK   en root : étape et démon : démon visible 0, signal -, racine lisible -
+OK   en root : réseau de l'étape : Zot joignable / Zot injoignable
+CONSTAT sous Kata, BuildKit rootless de l'image est impossible, même exempté et privilégié : virtiofsd sans --xattr, les
+        capacités de fichier de newuidmap ne sont pas visibles dans l'invité ; BuildKit en root dans un pod Kata privilégié
+        construit, avec le bac à sable des processus

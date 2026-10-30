@@ -12,8 +12,15 @@
 #   essais     pods de builds conformes à restricted, prédiction d'abord : runc et Kata comparés (noyau, vCPU,
 #              mémoire, niveau x86-64 par ld.so, seccomp), annotation default_memory non transmise, pod Kata
 #              privilégié refusé par Pod Security dans builds
+#   exemption  accord du propriétaire du 30/10/2026 (voie retenue en J6) : pods de la RuntimeClass kata exemptés de Pod Security
+#              (k3s/pod-security.yaml, passé à kube-apiserver par le fichier d'appoint k3s/sc-confiance-pod-security.yaml),
+#              server k3s redémarré (rattrapage suspendu, aucun PipelineRun actif), prédiction d'abord : mêmes conteneurs sur
+#              sc-confiance, OpenBao, Kyverno, TSA et CronJobs ; admission mesurée en dry-run serveur. Après essais : posée dès
+#              J1, l'exemption ferait mentir le refus du pod Kata privilégié que mesure essais
 #   temoin     après un redémarrage des VM (redemarrer.sh) : runtime kata rechargé par containerd, pod Kata lancé dans l'invité
-# Retrait : supprimer /opt/kata et le fichier d'appoint sur sc-build, redémarrer k3s-agent, supprimer la RuntimeClass.
+# Retrait : supprimer /opt/kata et le fichier d'appoint sur sc-build, redémarrer k3s-agent, supprimer la RuntimeClass ;
+# exemption : supprimer /etc/rancher/k3s/config.yaml.d/pod-security.yaml et /etc/rancher/k3s/pod-security.yaml sur
+# sc-confiance, redémarrer k3s.
 #
 # Usage (racine du dépôt) : mise run confiance:kata -- <étape>…   (journal : resultats/kata-<étape>.log)
 set -euo pipefail
@@ -46,6 +53,8 @@ KATA_FICHIERS=(   # lus par qemu-runtime-rs (shim ; path, kernel, image, virtio_
   opt/kata/libexec/virtiofsd
 )
 DROPIN=/var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d/kata.toml
+PSA_FICHIER=/etc/rancher/k3s/pod-security.yaml              # sc-confiance (k3s/pod-security.yaml)
+PSA_DROPIN=/etc/rancher/k3s/config.yaml.d/pod-security.yaml  # sc-confiance (k3s/sc-confiance-pod-security.yaml)
 BUSYBOX=$REG/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f   # amd64, glibc (tekton.sh miroir)
 DL=$O/telechargements/kata
 T=$W/kata
@@ -183,8 +192,22 @@ runtime_kata() { # section kata du runtime CRI chargé par containerd sur sc-bui
     privileged_without_host_devices, PodAnnotations, ContainerAnnotations, ConfigPath: .options.ConfigPath}' 2>/dev/null || true
 }
 
+suspendre_rattrapage() { # CronJob de rattrapage suspendu (rétabli à la sortie), aucun passage ni PipelineRun actif ;
+  # $1 (option) : nœud sur lequel aucun pod ne doit tourner
+  local n r=0
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap reprendre_rattrapage EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  n=$(kubectl get pipelineruns -n builds -o json | jq '[.items[] | select(.status.completionTime == null)] | length')
+  [ -z "${1:-}" ] || r=$(kubectl get pods -A --field-selector "spec.nodeName=$1,status.phase=Running" -o name | wc -l)
+  [ "$n" = 0 ] && [ "$r" = 0 ] && echo "rattrapage suspendu ; aucun PipelineRun actif${1:+, aucun pod en cours sur $1}" \
+    || { echo "KO   $n PipelineRun(s) actif(s)${1:+, $r pod(s) en cours sur $1} : redémarrage reporté" >&2; exit 1; }
+}
+
+reprendre_rattrapage() { kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null; trap - EXIT; }
+
 etape_installer() {
-  local n redemarrer=0 r
+  local redemarrer=0 r
   echo "## archive $KATA_STATIC"
   echo "$KATA_STATIC_SHA  $DL/$KATA_STATIC" | sha256sum -c --quiet && echo "OK   sha256 $KATA_STATIC_SHA, revérifié avant l'extraction"
   echo "## fichiers lus par qemu-runtime-rs, extraits sur l'hôte (liens conservés)"
@@ -210,18 +233,11 @@ etape_installer() {
   [ -n "$(runtime_kata)" ] || redemarrer=1
   if [ "$redemarrer" = 1 ]; then
     echo "## redémarrage de k3s-agent sur sc-build (containerd embarqué)"
-    kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
-    trap 'kubectl patch cronjob -n declencheurs rattrapage --type merge -p '"'"'{"spec":{"suspend":false}}'"'"' >/dev/null' EXIT
-    for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
-    n=$(kubectl get pipelineruns -n builds -o json | jq '[.items[] | select(.status.completionTime == null)] | length')
-    r=$(kubectl get pods -A --field-selector spec.nodeName=sc-build,status.phase=Running -o name | wc -l)
-    [ "$n" = 0 ] && [ "$r" = 0 ] && echo "rattrapage suspendu ; aucun PipelineRun actif, aucun pod en cours sur sc-build" \
-      || { echo "KO   $n PipelineRun(s) actif(s), $r pod(s) en cours sur sc-build : redémarrage reporté" >&2; exit 1; }
+    suspendre_rattrapage sc-build
     sur sc-build 'sudo systemctl restart k3s-agent'
     for _ in $(seq 60); do [ -n "$(runtime_kata)" ] && break; sleep 2; done
     kubectl wait --for=condition=Ready node/sc-build --timeout=180s >/dev/null
-    kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
-    trap - EXIT
+    reprendre_rattrapage
     echo "k3s-agent : $(sur sc-build 'systemctl is-active k3s-agent') ; sc-build Ready ; rattrapage réactivé"
   fi
   r=$(runtime_kata)
@@ -275,16 +291,30 @@ ligne_qemu() { # arguments -cpu, -machine, -m et -smp de QEMU sur sc-build, pend
   for a in -cpu -machine -m -smp; do echo "$a $(tr ' ' '\n' < "$T/qemu.txt" | grep -A1 -x -m1 -- "$a" | tail -1)"; done
 }
 
+admis() { # libellé commande… : la commande doit réussir (dry-run serveur)
+  local l=$1; shift
+  if "$@" > "$T/admis.out" 2>&1; then echo "OK   $l : admis ($(head -1 "$T/admis.out"))"
+  else echo "KO   $l : refusé" >&2; cat "$T/admis.out" >&2; exit 1; fi
+}
+
+args_apiserver() { # arguments du dernier lancement de kube-apiserver par k3s sur sc-confiance (journal de k3s), un par ligne
+  sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n'
+}
+
+exemption_posee() { args_apiserver | grep -x -- "--admission-control-config-file=$PSA_FICHIER" >/dev/null; }
+
 champ() { sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$T/$1.log" | head -1; }   # pod libellé : valeur d'une ligne « libellé : valeur »
 
 etape_essais() {
-  local h m1 m2 v
+  local h m1 m2 v e=0
   h=$(sur sc-build 'uname -r')
+  if exemption_posee; then e=1; fi
   echo "## prédiction"
   echo "runc : noyau de sc-build ($h), seccomp filtré (Seccomp: 2), x86-64-v3 pris en charge, v4 non, aucun drapeau avx512"
   echo "kata : noyau de l'invité 6.18.56, 1 vCPU, MemTotal sous 2048 Mio, Seccomp: 0 (disable_guest_seccomp), x86-64-v3 pris en charge, v4 non"
   echo "kata avec l'annotation default_memory=4096 : même mémoire que kata (annotation non transmise par containerd)"
-  echo "kata privilégié dans builds : refusé par Pod Security (enforce restricted), avant Kyverno"
+  if [ "$e" = 1 ]; then echo "kata privilégié dans builds : admis (exemption de la RuntimeClass kata, étape exemption)"
+  else echo "kata privilégié dans builds : refusé par Pod Security (enforce restricted), avant Kyverno"; fi
   echo "kata : QEMU lancé avec -cpu host,pmu=off (type host et cpu_features, lus dans cmdline_generator.rs de runtime-rs 4.3.1),"
   echo "       donc même modèle de CPU (model name) dans l'invité que dans sc-build"
   echo "## mesures"
@@ -318,7 +348,8 @@ etape_essais() {
   echo "## pod Kata privilégié dans builds (dry-run serveur)"
   jq '.metadata.name = "j7-kata-privilegie" | .spec.containers[0].securityContext = {privileged: true, allowPrivilegeEscalation: true}' \
     "$T/j7-kata.json" > "$T/j7-kata-privilegie.json"
-  refus "pod Kata privilégié dans builds" 'violates PodSecurity "restricted:latest"' kubectl create --dry-run=server -f "$T/j7-kata-privilegie.json"
+  if [ "$e" = 1 ]; then admis "pod Kata privilégié dans builds, exemption posée" kubectl create --dry-run=server -f "$T/j7-kata-privilegie.json"
+  else refus "pod Kata privilégié dans builds" 'violates PodSecurity "restricted:latest"' kubectl create --dry-run=server -f "$T/j7-kata-privilegie.json"; fi
   for p in j7-runc j7-kata j7-kata-memoire; do kubectl delete pod -n builds "$p" --wait=false >/dev/null; done
   echo "## qui peut créer, modifier ou supprimer une RuntimeClass (pods-isolation reconnaît Kata au nom de la RuntimeClass)"
   echo "RuntimeClasses : $(kubectl get runtimeclasses -o jsonpath='{range .items[*]}{.metadata.name}={.handler} {end}')"
@@ -344,10 +375,90 @@ etape_essais() {
     || echo "CONSTAT  liste différente de la prédiction (ci-dessus)"
 }
 
+psa_en_place() { # fichiers de l'exemption identiques aux fichiers versionnés sur sc-confiance, et lus par kube-apiserver
+  sur sc-confiance "sudo cat $PSA_FICHIER 2>/dev/null" | cmp -s - "$here/k3s/pod-security.yaml" \
+    && sur sc-confiance "sudo cat $PSA_DROPIN 2>/dev/null" | cmp -s - "$here/k3s/sc-confiance-pod-security.yaml" && exemption_posee
+}
+
+pods_durables() { # pods de sc-confiance qui ne viennent pas d'un Job, en cours : espace/nom
+  kubectl get pods -A --field-selector spec.nodeName=sc-confiance,status.phase=Running -o json \
+    | jq -r '.items[] | select(any(.metadata.ownerReferences[]?; .kind == "Job") | not) | .metadata.namespace + "/" + .metadata.name' | sort
+}
+
+conteneurs_durables() { # conteneurs en cours sur sc-confiance (crictl) des pods de $T/pods-durables.txt : pod conteneur identifiant
+  sur sc-confiance 'sudo k3s crictl ps -o json' | jq -r '.containers[] | (.labels["io.kubernetes.pod.namespace"] + "/"
+    + .labels["io.kubernetes.pod.name"]) + " " + .metadata.name + " " + .id' | sort | join - "$T/pods-durables.txt"
+}
+
+etape_exemption() {
+  local t d st
+  echo "## prédiction"
+  echo "kube-apiserver relancé avec --admission-control-config-file=$PSA_FICHIER (fichier d'appoint de config.yaml.d, clé kube-apiserver-arg+)"
+  echo "server k3s redémarré sans arrêter les conteneurs de sc-confiance (unité k3s en KillMode=process) : mêmes conteneurs, mêmes"
+  echo "  identifiants ; OpenBao reste descellé, même clé ; Kyverno répond ; témoin TSA vérifié ; un passage réussi de chaque CronJob"
+  echo "admission (dry-run serveur) : dans builds, pod Kata privilégié admis, pod Kata non privilégié avec allowPrivilegeEscalation"
+  echo "  et les capacités par défaut admis, pod runc privilégié refusé par Pod Security, pod Kata privilégié avec hostPath refusé"
+  echo "  par Kyverno (pods-isolation) ; dans tsa, pod Kata privilégié sans nodeSelector refusé par Kyverno (zone-confiance : la"
+  echo "  RuntimeClass lui ajoute le nodeSelector et la tolérance de la zone build)"
+  if psa_en_place; then
+    echo "## exemption déjà en place (fichiers identiques aux fichiers versionnés, argument lu dans le journal de k3s)"
+  else
+    echo "## état avant"
+    mise run confiance:openbao -- temoin
+    pods_durables > "$T/pods-durables.txt"
+    conteneurs_durables > "$T/conteneurs-avant.txt"
+    echo "$(wc -l < "$T/pods-durables.txt") pods durables et $(wc -l < "$T/conteneurs-avant.txt") conteneurs en cours sur sc-confiance"
+    echo "kube-apiserver : $(args_apiserver | grep -E -- '^--(enable-admission-plugins|admission-control-config-file)=' | paste -sd' ')"
+    suspendre_rattrapage
+    echo "## pose sur sc-confiance (0600) et redémarrage du server k3s"
+    sur sc-confiance "sudo install -d -m 0700 ${PSA_DROPIN%/*} && sudo tee $PSA_FICHIER >/dev/null && sudo chmod 0600 $PSA_FICHIER" < "$here/k3s/pod-security.yaml"
+    sur sc-confiance "sudo tee $PSA_DROPIN >/dev/null && sudo chmod 0600 $PSA_DROPIN" < "$here/k3s/sc-confiance-pod-security.yaml"
+    d=$(date +%s)
+    sur sc-confiance 'sudo systemctl restart k3s'
+    for _ in $(seq 90); do kubectl get --raw /readyz >/dev/null 2>&1 && break; sleep 2; done
+    kubectl wait --for=condition=Ready node --all --timeout=180s >/dev/null
+    echo "API prête et trois nœuds Ready $(( $(date +%s) - d )) s après le redémarrage ; k3s : $(sur sc-confiance 'systemctl is-active k3s')"
+    reprendre_rattrapage
+    t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    echo "## après le redémarrage"
+    psa_en_place && echo "OK   kube-apiserver : $(args_apiserver | grep -E -- '^--(enable-admission-plugins|admission-control-config-file)=' | paste -sd' ')" \
+      || { echo "KO   exemption non lue par kube-apiserver" >&2; exit 1; }
+    for _ in $(seq 30); do conteneurs_durables > "$T/conteneurs-apres.txt" && [ -s "$T/conteneurs-apres.txt" ] && break; sleep 2; done
+    if cmp -s "$T/conteneurs-avant.txt" "$T/conteneurs-apres.txt"; then
+      echo "OK   mêmes conteneurs sur sc-confiance ($(wc -l < "$T/conteneurs-apres.txt")), mêmes identifiants : aucun arrêté par le redémarrage"
+    else echo "CONSTAT conteneurs de sc-confiance changés par le redémarrage :"; diff "$T/conteneurs-avant.txt" "$T/conteneurs-apres.txt" || true; fi
+    sonde_kyverno
+    st=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true)
+    if [ "$(jq -r .sealed <<<"$st")" = false ]; then echo "OK   OpenBao descellé après le redémarrage du server"
+    else echo "CONSTAT OpenBao scellé après le redémarrage du server : $(jq -c '{initialized, sealed}' <<<"$st")"; mise run confiance:openbao -- deverrouiller; fi
+    mise run confiance:openbao -- controle
+    mise run confiance:tsa -- temoin
+    echo "## CronJobs : un passage réussi de chacun, créé après le redémarrage ($t)"
+    passage_ok horodatage horodatage "$t"
+    passage_ok declencheurs rattrapage "$t"
+  fi
+  echo "## admission (dry-run serveur)"
+  pod_spec j7-exemption kata - 'true'
+  jq '.spec.containers[0].securityContext = {privileged: true, allowPrivilegeEscalation: true}' "$T/j7-exemption.json" > "$T/j7-exemption-privilegie.json"
+  admis "pod Kata privilégié dans builds" kubectl create --dry-run=server -f "$T/j7-exemption-privilegie.json"
+  jq '.spec.containers[0].securityContext = {allowPrivilegeEscalation: true}' "$T/j7-exemption.json" > "$T/j7-exemption-escalade.json"
+  admis "pod Kata non privilégié, allowPrivilegeEscalation et capacités par défaut, dans builds" kubectl create --dry-run=server -f "$T/j7-exemption-escalade.json"
+  jq 'del(.spec.runtimeClassName)' "$T/j7-exemption-privilegie.json" > "$T/j7-exemption-runc.json"
+  refus "pod runc privilégié dans builds" 'violates PodSecurity "restricted:latest"' kubectl create --dry-run=server -f "$T/j7-exemption-runc.json"
+  jq '.spec.volumes = [{name: "h", hostPath: {path: "/var/lib/rancher"}}] | .spec.containers[0].volumeMounts = [{name: "h", mountPath: "/h"}]' \
+    "$T/j7-exemption-privilegie.json" > "$T/j7-exemption-hostpath.json"
+  refus "pod Kata privilégié avec hostPath dans builds" 'volume hostPath interdit' kubectl create --dry-run=server -f "$T/j7-exemption-hostpath.json"
+  jq '.metadata.namespace = "tsa" | del(.spec.nodeSelector, .spec.tolerations, .spec.serviceAccountName)' "$T/j7-exemption-privilegie.json" > "$T/j7-exemption-tsa.json"
+  refus "pod Kata privilégié dans tsa, sans nodeSelector" 'zone confiance' kubectl create --dry-run=server -f "$T/j7-exemption-tsa.json"
+  echo "## témoin Kata"
+  etape_temoin
+}
+
 etape_temoin() {
   local r="" v
   for _ in $(seq 60); do r=$(runtime_kata); [ -n "$r" ] && break; sleep 2; done
   [ -n "$r" ] && echo "OK   runtime kata chargé par containerd sur sc-build" || { echo "KO   runtime kata absent de crictl info" >&2; exit 1; }
+  echo "exemption Pod Security de la RuntimeClass kata : $(exemption_posee && echo "lue par kube-apiserver (étape exemption)" || echo "absente")"
   pod_essai j7-kata kata -
   v=$(champ j7-kata noyau)
   case $v in 6.18.56*) echo "OK   pod Kata : noyau de l'invité $v" ;; *) echo "KO   pod Kata : noyau $v" >&2; exit 1 ;; esac

@@ -233,9 +233,9 @@ description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vér
 run = "poc/bricks/08-trust-plane/politique.sh"
 
 [tasks."confiance:kata"]
-description = "Brique 08, J7 : isolation par Kata Containers 4.3.1 sur sc-build ; vérification de l'archive kata-static (attestation de release) et de l'image kata-deploy, installation depuis l'archive attestée (accord du propriétaire), essais runc et Kata, témoin après redémarrage (étapes : verifier installer essais temoin)"
+description = "Brique 08, J7 : isolation par Kata Containers 4.3.1 sur sc-build ; vérification de l'archive kata-static (attestation de release) et de l'image kata-deploy, installation depuis l'archive attestée (accord du propriétaire), essais runc et Kata, exemption Pod Security de la RuntimeClass kata (accord du propriétaire, server k3s redémarré), témoin après redémarrage (étapes : verifier installer essais exemption temoin)"
 run = "poc/bricks/08-trust-plane/kata.sh"
 
 [tasks."confiance:buildkit"]
-description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité) (étapes : image essais)"
+description = "Brique 08, J7 : BuildKit rootless dans un pod Kata ; image moby/buildkit v0.34.1-rootless (signature sigstore du manifeste d'attestation, vérifiée par cosign et gh, copiée dans Zot), essais en restricted sous runc et Kata (sonde, rootlesskit, buildkitd sous un seul UID, taille de l'invité), puis, après l'exemption de kata : attributs étendus dans l'invité, options de virtiofsd, rootless en pod Kata privilégié et non privilégié, root en pod Kata privilégié (étapes : image essais exempte)"
 run = "poc/bricks/08-trust-plane/buildkit.sh"

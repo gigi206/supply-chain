@@ -1,4 +1,4 @@
-# buildkit.sh image, 2026-10-30T13:56:48Z
+# buildkit.sh image, 2026-10-30T14:37:06Z
 ## tag v0.34.1
 OK   tag annoté v0.34.1 (objet 401bf63d02833b70ef9393eb9702e2b5648dfaaf, signé et vérifié par GitHub) → commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e
 ## image docker.io/moby/buildkit:v0.34.1-rootless
@@ -26,7 +26,8 @@ image des pods : sc-stockage.poc.test:5000/amont/moby/buildkit@sha256:ace6811c21
 ## newuidmap et newgidmap dans les couches (rootlesskit les appelle pour une correspondance de plusieurs UID)
 usr/bin/newgidmap : mode 0755, 0:0, security.capability 0100000240000000000000000000000000000000 (permis : CAP_SETGID, effectif)
 usr/bin/newuidmap : mode 0755, 0:0, security.capability 0100000280000000000000000000000000000000 (permis : CAP_SETUID, effectif)
-CONSTAT pas de bit setuid : capacités de fichier ; sans effet sous no_new_privs (allowPrivilegeEscalation: false de restricted)
+CONSTAT pas de bit setuid : capacités de fichier (attribut étendu security.capability) ; sous Kata, elles ne sont pas visibles
+        dans l'invité (virtiofsd sans --xattr : étape exempte)
 ## pour mémoire : v0.25.2-rootless (version de la brique 04), non retenue
 index sha256:a02f6571999693089dc928e9bbb64836c21703b214195d8637c011f1a7025ef6, linux/amd64 sha256:d947144c3dc4f827f8dacaaf98d622f0143465740075fa9790991bc381761dc9, attestation sha256:fd44ad550e18be0111c82d27159dd0b289f50d1cbbe97418b6f7dfd65bad5f51 (provenance https://slsa.dev/provenance/v0.2, sujet OCI absent)
 référents : index 0, amd64 0 (hors attestation), attestation 0
