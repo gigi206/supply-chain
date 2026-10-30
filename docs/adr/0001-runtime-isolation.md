@@ -59,7 +59,9 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).
-- Un test négatif vérifie qu'**aucun pod privilégié ne tourne sur l'hôte** (Kyverno + brique 05).
+- Un test négatif vérifie qu'**aucun pod privilégié ne tourne sur l'hôte** (Kyverno + brique 05). **Mesuré en brique 08 (J8, test 4, [journal](../../poc/bricks/08-trust-plane/resultats/preuves-test4.log))**, avec des pods créés pour de vrai dans `builds` au nom du contrôleur de Tekton :
+  - un pod runc privilégié est refusé par Pod Security avant Kyverno. Kyverno n'est pas consulté, donc aucun événement : la trace est la réponse et l'audit de l'API ;
+  - les pods Kata, exemptés de Pod Security, ont Kyverno (`pods-isolation`) pour seule barrière contre `hostPath` et `hostNetwork`. Ces deux pods sont refusés, avec un événement chacun.
 - Le modèle CPU et le mode d'isolation sont inscrits dans la provenance (`internalParameters`). Mesuré en brique 08 (J6) : Chains v0.29.9 ne les y inscrit que depuis des labels ou annotations du PipelineRun, déclarations qu'il ne vérifie pas. **Option (c) retenue par le propriétaire le 30/10/2026** : rien dans `internalParameters`, et la porte juge `runtimeClassName` sur le TaskRun signé. `hermetic` et `cpuModel` restent sans preuve dans la provenance ([doc 02 §3](../02-architecture.md)).
 - **Services de stockage hors des pods** (brique 08, J2, choix du propriétaire du 29/10/2026) : Forgejo et Zot tournent en services systemd durcis sur le nœud de stockage, à partir des binaires vérifiés de `mise.toml` (GPG pour Forgejo, sha256 pour Zot). Les images Forgejo et Zot ne sont pas signées. TLS par une CA du PoC à contraintes de nom, déclarée à containerd ([résultats](../../poc/bricks/08-trust-plane/README.md#jalon-j2--stockage-29102026)).
 - **Fenêtre de démarrage des NetworkPolicy de sortie** (brique 08, J6, mesuré sur kube-router embarqué dans k3s v1.35.9 : [sonde](../../poc/bricks/08-trust-plane/resultats/politique-rattrapage-sonde-fenetre.log)) : une sortie interdite passe pendant la première seconde d'un conteneur, avant que la règle ne soit posée. L'« egress = 0 » de la zone build ne peut donc pas reposer sur une NetworkPolicy seule : entrée à mesurer en J7, avec Kata (réseau de la VM invitée) ou un filtrage posé avant le lancement du conteneur. **Mesuré en J7** : Kata ne ferme pas la fenêtre (voir « Réseau des pods Kata »).
@@ -111,4 +113,9 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
     Évaluation au doc 04 du 30/10/2026 : Cilium et kube-router amont sont « À surveiller ». Il manque à Cilium toute provenance pour ses images, et son Scorecard est au seuil (6,0). kube-router a un bus factor de 2 et, lui non plus, aucune provenance pour son image : seuls ses binaires en ont une. Les signatures de leurs images sont vérifiées. Calico n'est pas évalué ;
   - voie D pour les images Go, qui ne règle rien pour mock et sbuild ;
   - dans les deux cas, une tâche de construction sans sortie. **Retenue par le propriétaire (30/10/2026) et faite** : voir « Construction dans un PipelineRun ». Cilium et kube-router amont ont été évalués au doc 04 le 30/10/2026 : « À surveiller » tous deux, plans de sortie au §6. Cilium a été mesuré (option 1b) : aucune fenêtre, et l'usurpation est refusée, y compris après un redémarrage des VM. **Décision du propriétaire (30/10/2026) : Cilium gardé**, avec un réglage bêta et sans L7 ; `RESEAU=cilium` par défaut, flannel reste le retour arrière.
-- [ ] Conception du test 6 sous Cilium (brique 08, J8) : trace par Hubble, à proposer. Non tranchée.
+- [ ] Test 6 sous Cilium (brique 08, J8). **Conception validée par le propriétaire le 30/10/2026** (plan de J8) :
+  - une variante signée de `construire-image`, pour le seul test, tente la sortie depuis l'étape de construction ;
+  - un témoin par destination ;
+  - les flux de Hubble sont capturés pendant le test, et le compte se fait par tentative.
+
+  Mesure à faire.

@@ -1,0 +1,8 @@
+# vérification après le test 3 (preuves.sh test3, passage de 22:42:40Z), 2026-10-30T22:53:20Z
+# Signatures par la clé Transit chains (audit d'OpenBao, réponses) entre l'écriture du statut falsifié (22:44:54Z) et le premier
+# passage du test 1 (22:48:58Z), qui couvrent la purge du PipelineRun (fin du test 3, à 22:45:40Z dans l'audit de l'API : finalisation de Chains).
+# Prédiction (code de Chains v0.29.9) : aucune, le TaskRun falsifié est annoté signed=true.
+OK   aucune signature de Chains entre l'écriture du statut falsifié et le test 1, purge comprise
+# Toutes les réponses de l'audit dans cette fenêtre (adresse, compte, chemin) :
+22:45:02 10.42.0.184 jwt-system:serviceaccount:tsa:timestamp-authority transit/sign/tsa/sha2-256
+22:45:04 10.42.0.184 jwt-system:serviceaccount:tsa:timestamp-authority transit/sign/tsa/sha2-256

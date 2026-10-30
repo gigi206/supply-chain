@@ -378,15 +378,23 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
   - le nombre d'enveloppes de `builds/essai-webhook@3a7ca1b1` ne change pas ;
   - la provenance de ce TaskRun (`invocationId` = UID du TaskRun) garde son sujet d'origine. La provenance ne porte pas les résultats eux-mêmes, seulement le sujet qui en est tiré à la signature.
 - **Lu dans le code de Chains v0.29.9** (`pkg/chains/annotations/annotations.go`, `Reconciled` ; `pkg/reconciler/taskrun/taskrun.go`) : un TaskRun terminé dont l'annotation vaut `true` ou `failed` est sauté. Sans l'annotation, Chains le signerait tel qu'il est, statut falsifié compris. La retirer demande un droit de modification des TaskRuns : administrateurs, contrôleurs de Pipelines et de Chains (droits de J6). **Non mesuré** : la mesure laisserait dans Zot une attestation falsifiée validement signée, que `poc-ecriture` ne peut pas supprimer et que le job d'horodatage horodaterait. C'est au propriétaire de décider si elle doit être faite.
-- **Fin** : le PipelineRun est purgé, pour ne laisser aucun statut falsifié dans `builds`. Ses enveloppes restent dans Zot.
+- **Fin** : le PipelineRun est purgé, pour ne laisser aucun statut falsifié dans `builds`. Ses enveloppes restent dans Zot. La purge (22:45:40, dans l'audit de l'API) déclenche la finalisation de Chains après la fenêtre de 45 s. Vérification faite ensuite ([`preuves-test3-apres-purge.log`](resultats/preuves-test3-apres-purge.log)) : aucune signature par la clé `chains` entre l'écriture falsifiée et le test suivant ; seuls apparaissent les deux horodatages du TSA.
 
 **Test 1 : jeton ou clé OpenBao depuis une tâche de build** ([`preuves-test1.log`](resultats/preuves-test1.log), deuxième passage).
 - **Véhicule** : une tâche signée par la clé des tâches de la plateforme, propre au test, générée dans le répertoire de travail. Elle est publiée en bundle `tekton/tasks/preuve-test1` et n'est jamais inscrite dans la liste revue de la porte. Un TaskRun de `builds` l'exécute, avec le compte `build` et le gabarit de la zone build. Elle tient lieu d'étape de build au code hostile.
 - **Barrière 1, identité** : aucun jeton de compte de service dans le pod (`/var/run/secrets` absent), et aucune variable d'environnement de secret. Le pod n'a rien à présenter à l'authentification JWT d'OpenBao. Au premier passage ([`preuves-test1-premier-passage.log`](resultats/preuves-test1-premier-passage.log)), la sonde comptait sa propre variable `OPENBAO_IP`, renommée depuis.
-- **Barrière 2, réseau** : OpenBao est injoignable par son service comme par l'IP de son pod. Le client dépasse son délai (5 s) : c'est un abandon, pas un refus. Hubble de `sc-confiance` montre les SYN jetés à l'entrée (`POLICY_DENIED`, `INGRESS`) : 20 flux pour 10 SYN, chaque SYN étant vu deux fois, comme en J7. Rien chez l'agent de `sc-build`, puisqu'aucune politique de sortie ne sélectionne ce pod. **Témoins** depuis la même étape : Zot et Forgejo joignables. OpenBao était descellé.
+- **Barrière 2, réseau** : OpenBao est injoignable par son service comme par l'IP de son pod. Le client dépasse son délai (5 s) : c'est un abandon, pas un refus. Hubble de `sc-confiance` montre les SYN jetés à l'entrée (`POLICY_DENIED`, `INGRESS`) : 20 flux pour 10 SYN, chaque SYN étant vu deux fois, comme en J7. Rien chez l'agent de `sc-build`, ce qui concorde avec l'absence de politique de sortie sur ce pod. C'est une observation sans témoin : la lecture ne montre que les flux refusés. **Témoins** depuis la même étape : Zot et Forgejo joignables. OpenBao était descellé.
 - **Barrière 3, OpenBao** : son audit ne contient aucune requête de l'adresse du pod, puisque rien ne lui parvient. La trace prévue, un refus dans cet audit, n'existe donc pas. Le refus se lit dans Hubble. Témoin dans la même lecture : les requêtes de Chains (connexion JWT, signature), qui signe ce même TaskRun.
 - **Non exercées ici**, mesurées en J3 ([`openbao-essais.log`](resultats/openbao-essais.log)) : rôle JWT lié au seul compte de Chains (autre compte et autre audience refusés), clé non exportable (export et sauvegarde refusés, même au jeton root).
 - **Résidu** : les bundles signés `tekton/tasks/preuve-test1` des deux passages restent dans Zot, que `poc-ecriture` ne peut pas vider. La porte les refuserait, puisqu'ils sont hors de la liste revue.
+
+**Ce que les tests 1 à 5 laissent, pour le contrôle exécutions/enveloppes** (à écrire plus tard en J8) :
+- `preuve-test1` : TaskRun signé, mais sans sujet image, donc sans enveloppe. C'est le cas des TaskRuns d'essai de J6.
+- `sample-app-a8ec9880…` : PipelineRun intact, laissé par le premier passage du test 3.
+- `sample-app-2e8ede0d…` : témoin du test 5.
+- Les enveloppes du TaskRun purgé du test 3 n'ont plus d'exécution.
+
+Le contrôle ira donc dans un seul sens : toute exécution signée qui a un sujet image a son enveloppe. Les exécutions sans sujet en sont exclues.
 
 ## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
 
