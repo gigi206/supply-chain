@@ -6,10 +6,12 @@ build|list|secrets|*|no
 build|create|pods|builds|no
 build|create|taskruns.tekton.dev|builds|no
 build|create|pipelineruns.tekton.dev|builds|no
+build|delete|pipelineruns.tekton.dev|builds|no
 build|get|taskruns.tekton.dev|builds|no
 build|create|serviceaccounts/token|tekton-chains|no
 # EventListener : lecture de ses objets Triggers, création de PipelineRuns dans builds, rien d'autre.
 el-forgejo|create|pipelineruns.tekton.dev|builds|yes
+el-forgejo|delete|pipelineruns.tekton.dev|builds|no
 el-forgejo|create|taskruns.tekton.dev|builds|no
 el-forgejo|get|pipelineruns.tekton.dev|builds|no
 el-forgejo|create|pipelineruns.tekton.dev|declencheurs|no

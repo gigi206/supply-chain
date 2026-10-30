@@ -1,0 +1,62 @@
+# Constat de J6 (30/10/2026) : PipelineRun recréé sous le même nom pendant que le TaskRun de l'ancien existe encore
+## test 5 (tekton.sh essais_webhook), premier passage après l'étape restreint : arrêt sur la provenance de A
+# tekton.sh essais_webhook, 2026-10-30T09:12:43Z
+CronJob rattrapage suspendu pendant l'essai (aucun passage actif)
+## A. livraison réelle de Forgejo (test du webhook : dernier commit de main)
+Forgejo, POST hooks/…/tests : HTTP 204
+OK   PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f terminé (Succeeded)
+OK   créé par l'EventListener (label triggers.tekton.dev/eventlistener)
+## B. corps non signé (commit 1111111111111111111111111111111111111111)
+non signé : HTTP 202 {"eventID":"32564a0f-09ae-4675-8a99-87a26dfa1e10"}
+## C. signature calculée avec un autre secret
+mauvaise signature : HTTP 202 {"eventID":"df182416-8498-40fb-b12d-72579c4e61cf"}
+## D. corps modifié sous une signature valide (signature du corps du commit 2222222222222222222222222222222222222222, corps du commit 1111111111111111111111111111111111111111)
+corps modifié : HTTP 202 {"eventID":"794750aa-d72b-4540-bfd5-ea37d5f6b6c0"}
+## E. contrôle positif : livraison valide signée avec le secret du webhook (commit 2222222222222222222222222222222222222222)
+valide : HTTP 202 {"eventID":"128d85a3-b43a-491b-a53d-1710848ee507"}
+OK   PipelineRun sample-app-2222222222222222222222222222222222222222 créé et terminé : la signature calculée ici est acceptée
+## F. rejeu à l'identique de E (même corps, même signature)
+rejeu de E : HTTP 202 {"eventID":"9376a17f-59a2-4ced-931d-7c9ad0de489a"}
+## G. nouvelle livraison de Forgejo pour le même commit (rejeu d'une livraison réelle)
+Forgejo, POST hooks/…/tests : HTTP 204
+## bilan (PipelineRuns par commit)
+commit réel : 1 ; commit 1111111111111111111111111111111111111111 (B, C, D) : 0 ; commit 2222222222222222222222222222222222222222 (E, F) : 1
+OK   B, C, D refusés : aucun PipelineRun pour 1111111111111111111111111111111111111111
+OK   F et G sans effet : un seul PipelineRun par commit
+## refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-10-30T09:12:43Z
+{"t":"09:14:49","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"09:14:49","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"09:14:49","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+## EventListener : rejeux refusés à la création (AlreadyExists) depuis 2026-10-30T09:12:43Z
+{"t":"09:15:09","eventID":"9376a17f-59a2-4ced-931d-7c9ad0de489a","erreur":"pipelineruns.tekton.dev \"sample-app-2222222222222222222222222222222222222222\" already exists"}
+{"t":"09:15:09","eventID":"2517c56e-7c90-41a8-8bca-5518cf998633","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+## Chains : PipelineRuns signés
+sample-app-2222222222222222222222222222222222222222 signé=true
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f signé=true
+## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ 2026-10-30T09:12:43Z)
+[confiance:tekton] ERROR task failed
+## audit de l'API : PipelineRun sample-app-6391fd43 (A) et son TaskRun, de la purge à la suppression par le ramasse-miettes
+09:12:43.408 delete pipelineruns sample-app-6391fd437f26696847041be3226bbbf633f55a2f system:admin 200
+09:12:44.681 create pipelineruns sample-app-6391fd437f26696847041be3226bbbf633f55a2f declencheurs:el-forgejo 201
+09:12:44.693 update pipelineruns sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 409
+09:12:44.698 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 409
+09:12:44.714 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 200
+09:12:44.726 update pipelineruns sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 200
+09:12:44.730 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 409
+09:12:44.750 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 200
+09:12:44.766 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 409
+09:12:44.777 delete taskruns sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier kube-system:generic-garbage-collector 200
+09:12:44.787 update pipelineruns/status sample-app-6391fd437f26696847041be3226bbbf633f55a2f tekton-pipelines:tekton-pipelines-controller 200
+09:12:45.177 delete pods sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod kube-system:generic-garbage-collector 200
+## provenances de PipelineRun signées par Chains pour le commit 6391fd43 (builds/essai-webhook) : pipeline et tâche par digest
+startedOn 2026-10-29T21:05:44Z finishedOn 2026-10-29T21:05:48Z : 
+startedOn 2026-10-29T22:44:12Z finishedOn 2026-10-29T22:44:16Z : pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:062a2f53800b…, pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba…
+startedOn 2026-10-29T22:45:28Z finishedOn 2026-10-29T22:45:33Z : pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:062a2f53800b…, pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba…
+startedOn 2026-10-30T00:49:09Z finishedOn 2026-10-30T00:49:15Z : pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:062a2f53800b…, pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba…
+startedOn 2026-10-30T09:11:58Z finishedOn 2026-10-30T09:12:03Z : pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:cd7bc914d4ae…, pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d…
+startedOn 2026-10-30T00:49:09Z finishedOn 2026-10-30T09:12:44Z : pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:cd7bc914d4ae…, pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:fb41bcfc94ba…
+## lecture
+- startedOn 2026-10-30T09:11:58Z : j6-restreint (étape restreint, gabarit en service, même paramètre commit), créé à 09:11:58.397 par system:admin (audit de l'API) ; exécuté normalement
+- dernière ligne : sample-app-6391fd43 recréé par l'EventListener à 09:12:44.681 ; aucun TaskRun créé ; statut repris du TaskRun de l'exécution de 00:49:09 (tâche fb41bcfc…, ancienne version), supprimé par le ramasse-miettes à 09:12:44.777 seulement ; provenance signée par Chains : pipeline en service (cd7bc914…, qui désigne la tâche 836cd080…) mais pipelineTask fb41bcfc…, startedOn 00:49:09
+## horodatage de l'enveloppe incohérente (empreinte de signature 5bb8a6a7e3ee6f68, calcul de tsa/horodater.sh) : horodatage/bundles:<digest>-<empreinte>
+{"subject":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://slsa.dev/provenance/v1","org.opencontainers.image.created":"2026-10-30T09:13:10Z"}}

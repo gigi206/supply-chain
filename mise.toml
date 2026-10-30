@@ -229,5 +229,5 @@ description = "Brique 08, J5 : horodatage RFC 3161, timestamp-authority v2.2.0 a
 run = "poc/bricks/08-trust-plane/tsa.sh"
 
 [tasks."confiance:politique"]
-description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission, Trusted Resources, EventListener en espace de confiance, horodatage automatique, rattrapage des webhooks perdus, porte de release (Conforma et sa bibliothèque), RBAC (étapes : image installer parite taches admission chains declencheurs horodatage rattrapage porte droits)"
+description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vérifiées, copiées dans Zot) à l'admission, Trusted Resources, EventListener en espace de confiance, horodatage automatique, rattrapage des webhooks perdus, Pod Security restricted des pods de build, porte de release (Conforma et sa bibliothèque), RBAC (étapes : image installer parite taches admission chains declencheurs restreint horodatage rattrapage porte droits)"
 run = "poc/bricks/08-trust-plane/politique.sh"

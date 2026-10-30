@@ -276,7 +276,10 @@ etape_essais_webhook() {
     echo "CronJob rattrapage suspendu pendant l'essai (aucun passage actif)"
   fi
   debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  kubectl delete pipelinerun -n builds --all --wait=true >/dev/null
+  # Suppression au premier plan : les TaskRuns partent avant les PipelineRuns. Sinon, le PipelineRun de A, recréé sous le
+  # même nom, reprend le TaskRun encore présent de l'ancien (Pipelines v1.15.5 le cherche par nom, sans vérifier son
+  # propriétaire) et se termine sans rien exécuter (constat de J6).
+  kubectl delete pipelinerun -n builds --cascade=foreground --all --wait=true >/dev/null
   corps() { jq -nc --arg c "$1" --arg r "${2:-refs/heads/main}" '{ref: $r, after: $c, repository: {full_name: "workspace/sample-app", clone_url: "https://sc-stockage.poc.test:3000/workspace/sample-app.git"}}' > "$T/webhook/$3"; }
   printf 'Authorization: token %s\n' "$(cat "$S/forgejo-admin.token")" > "$T/auth/entete"
   forgejo_test() { curl -fsS -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -H @"$T/auth/entete" -X POST \

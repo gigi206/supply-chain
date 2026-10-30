@@ -1,6 +1,8 @@
 # Brique 08, J6 : tâche de J4 (tekton/webhook.yaml) migrée en v1beta1 (tektoncd/cli#2894), signée par la clé des tâches
 # et publiée en bundle (tekton/tasks/publier-essai). @BUSYBOX@, @IMAGE@, @DIGEST@ : politique.sh declencheurs.
 # Option C du propriétaire : la tâche ne construit rien encore (J7).
+# stepTemplate : les champs de Pod Security restricted propres aux conteneurs, que le podTemplate ne peut pas poser
+# (politique.sh restreint).
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -16,6 +18,11 @@ spec:
     type: string
   - name: IMAGE_DIGEST
     type: string
+  stepTemplate:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
   steps:
   - name: publier
     image: @BUSYBOX@

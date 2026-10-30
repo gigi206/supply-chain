@@ -3,6 +3,7 @@
 # En v1beta1 (décision du propriétaire du 29/10/2026) : tkn v0.46.2 décode toute tâche en v1beta1 avant de la signer
 # (tektoncd/cli#2894) ; une tâche v1 signée porte alors resources: {} et Pipelines v1.15.5 la rejette. Le contrôleur
 # vérifie la v1beta1 telle que signée, puis la convertit en v1.
+# stepTemplate : les champs de Pod Security restricted propres aux conteneurs (politique.sh restreint).
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -11,6 +12,11 @@ spec:
   results:
   - name: MESSAGE
     type: string
+  stepTemplate:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
   steps:
   - name: dire
     image: @BUSYBOX@

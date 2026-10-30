@@ -1,4 +1,4 @@
-# politique.sh taches, 2026-10-29T22:49:29Z
+# politique.sh taches, 2026-10-30T09:10:52Z
 ## clé des tâches de la plateforme (ADR 0003 : clés séparées par usage)
 clé existante
 clé publique : ~/.cache/supply-chain-poc/08/pki/taches.pub, sha256 9e118e036265b4de…
@@ -8,12 +8,12 @@ OK   distincte de la clé de Chains et de celle du TSA
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 annotation tekton.dev/signature : 1 (signée), 0 (non signée) ; modifiée : 1 ligne changée, même annotation
-bundle tekton/tasks/essai-confiance ← signee.yaml : sha256:72039d8a743b7335543109474588d16bfca20f4c3ba80e44865009663f3c9aa7
-bundle tekton/tasks/essai-non-signee ← tache.yaml : sha256:cdfe0feb78bab8f7196d2e8c17671357569a77e53c34a6f0e9753664703f22c1
-bundle tekton/tasks/essai-modifiee ← modifiee.yaml : sha256:be5af2c0f6097eed6aa083bbb7699590cf15e77237db7454783c009ba46b1715
-bundle tekton/tasks/essai-autre-cle ← autre-cle.yaml : sha256:57c87ce6891826d5e4a5da166498e947f5181aed3485ed05e6911a9d9b48b67f
-bundle essais-j6/tasks/essai-confiance ← signee.yaml : sha256:72039d8a743b7335543109474588d16bfca20f4c3ba80e44865009663f3c9aa7
-bundle tekton/tasks/essai-v1 ← signee-v1.yaml : sha256:3bdbf9aa28712e0786546d50ef708512d6d4083728ef8b57ad9cee9919e9c745
+bundle tekton/tasks/essai-confiance ← signee.yaml : sha256:3982742fe51ab38f06a8c6d9675fd5681fa65ff38d30c1782202e2f965b5c129
+bundle tekton/tasks/essai-non-signee ← tache.yaml : sha256:92560481b2f9dbbee59dddd566c6d3b9c5e0c01ce51226afc627f07b8d5bcf3b
+bundle tekton/tasks/essai-modifiee ← modifiee.yaml : sha256:16e712308a8afe157a88c741171f81a08dadcd2e407b551454b1ec965e7b0275
+bundle tekton/tasks/essai-autre-cle ← autre-cle.yaml : sha256:750f286271b4f8774d76b72b31bed4d498668f5ea95aca58376646492081ea5c
+bundle essais-j6/tasks/essai-confiance ← signee.yaml : sha256:3982742fe51ab38f06a8c6d9675fd5681fa65ff38d30c1782202e2f965b5c129
+bundle tekton/tasks/essai-v1 ← signee-v1.yaml : sha256:a6d92cc46710e7570e5f822e241be063be1b281886ad78bcacafa23e7bf9e654
 ## Tekton : vérification obligatoire, specs en ligne interdites, résolveur bundles seul
 feature-flags : trusted-resources-verification-no-match-policy=fail, disable-inline-spec=pipeline,pipelinerun,taskrun
 résolveurs : enable-bundles-resolver=true, enable-cluster-resolver=false, enable-git-resolver=false, enable-http-resolver=false, enable-hub-resolver=false
@@ -23,7 +23,7 @@ OK   tâche signée, tekton/tasks : exécutée (MESSAGE=tâche signée par la pl
 OK   tâche non signée : refusée, ResourceVerificationFailed : resource verification failed: resource essai-confiance in namespace  fails verification ; TrustedResourcesVerified=False
 OK   tâche modifiée après signature : refusée, ResourceVerificationFailed : resource verification failed: resource essai-confiance in namespace  fails verification ; TrustedResourcesVerified=False
 OK   tâche signée par une autre clé : refusée, ResourceVerificationFailed : resource verification failed: resource essai-confiance in namespace  fails verification ; TrustedResourcesVerified=False
-OK   tâche v1 signée par tkn (constat tektoncd/cli#2894) : refusée, TaskRunResolutionFailed : invalid runtime object: strict decoding error: unknown field "spec.steps[0].resources" ; TrustedResourcesVerified=-
+OK   tâche v1 signée par tkn (constat tektoncd/cli#2894) : refusée, TaskRunResolutionFailed : invalid runtime object: strict decoding error: unknown field "spec.stepTemplate.resources", unknown field "spec.steps[0].resources" ; TrustedResourcesVerified=-
 OK   tâche signée, hors de tekton/ (essais-j6/) : refusée, RefusAdmission : admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" denied the request: Policy tekton-references failed: test 2 : référence obligatoire à un bundle signé de tekton/tasks (TaskRun) ou tekton/pipelin ; TrustedResourcesVerified=-
 OK   résolveur git désactivé : refusée, RefusAdmission : admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" denied the request: Policy tekton-references failed: test 2 : référence obligatoire à un bundle signé de tekton/tasks (TaskRun) ou tekton/pipelin ; TrustedResourcesVerified=-
 OK   résolveur http désactivé : refusée, RefusAdmission : admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" denied the request: Policy tekton-references failed: test 2 : référence obligatoire à un bundle signé de tekton/tasks (TaskRun) ou tekton/pipelin ; TrustedResourcesVerified=-

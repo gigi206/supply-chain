@@ -4,9 +4,11 @@ build	list	secrets	*	no	no
 build	create	pods	builds	no	no
 build	create	taskruns.tekton.dev	builds	no	no
 build	create	pipelineruns.tekton.dev	builds	no	no
+build	delete	pipelineruns.tekton.dev	builds	no	no
 build	get	taskruns.tekton.dev	builds	no	no
 build	create	serviceaccounts/token	tekton-chains	no	no
 el-forgejo	create	pipelineruns.tekton.dev	builds	yes	yes
+el-forgejo	delete	pipelineruns.tekton.dev	builds	no	no
 el-forgejo	create	taskruns.tekton.dev	builds	no	no
 el-forgejo	get	pipelineruns.tekton.dev	builds	no	no
 el-forgejo	create	pipelineruns.tekton.dev	declencheurs	no	no

@@ -26,7 +26,12 @@
 #              l'espace de confiance declencheurs, droits réduits (politique/declencheurs.yaml) ; webhook Forgejo rebranché ;
 #              objets de J4 retirés de builds. Puis test 5 rejoué : EL_NS=declencheurs JOURNAL=politique JALON=J6
 #              mise run confiance:tekton -- essais_webhook
-#   horodatage horodatage automatique par réconciliation périodique : CronJob horodatage (politique/horodatage-cronjob.yaml,
+#   restreint  Pod Security restricted pour les pods des TaskRuns : drapeau set-security-context de Pipelines (conteneurs
+#              d'initialisation de Tekton), stepTemplate restreint des tâches signées (étapes), contexte de pod du gabarit ;
+#              builds en warn et audit restricted (enforce : décision du propriétaire) ; enforce posé le temps des essais,
+#              puis retiré : tâche en service et tâche d'essai exécutées, tâche signée sans stepTemplate et drapeau
+#              désactivé refusés par Pod Security ; violation tracée dans l'audit de l'API sous warn et audit
+#   horodatagehorodatage automatique par réconciliation périodique : CronJob horodatage (politique/horodatage-cronjob.yaml,
 #              tsa/horodater.sh sans $IMAGE) qui parcourt builds/ dans Zot et horodate chaque enveloppe de Chains vérifiée
 #              (clé de Chains, sujet, prédicat) ; trois témoins posés par poc-ecriture (autre clé, autre sujet : refusés ;
 #              tag .att illisible : anomalie) à chaque passage, sans arrêter le parcours ; rattrapage, nouvelle exécution
@@ -291,12 +296,14 @@ taskrun() { # nom résolveur bundle : TaskRun d'essai créé dans builds, puis a
 }
 
 pipelinerun() { # nom bundle commit : PipelineRun du gabarit de declencheurs.yaml (rendu), créé dans builds ; issue
+  # (suppressions au premier plan : un PipelineRun recréé sous le même nom reprendrait le TaskRun encore présent de
+  # l'ancien, cherché par nom par Pipelines v1.15.5, voir tekton.sh essais_webhook)
   local n=$1
   awk '/^kind: TriggerTemplate$/ {t = 1} t && /^  - apiVersion: tekton.dev\/v1$/ {p = 1} p && /^---$/ {exit} p' "$T/declencheurs.yaml" \
     | sed -e 's/^    //' -e 's/^  - apiVersion/apiVersion/' -e "s#name: sample-app-\$(tt.params.commit)#name: $n#" \
       -e "s#value: \$(tt.params.commit)#value: '$3'#" -e 's#value: \$(tt.params.depot)#value: https://sc-stockage.poc.test:3000/workspace/sample-app.git#' \
       -e "s#value: $REG/tekton/pipelines/sample-app-essai@.*#value: $2#" > "$T/pr-$n.yaml"
-  kubectl delete pipelinerun -n builds "$n" --ignore-not-found --wait=true >/dev/null
+  kubectl delete pipelinerun -n builds --cascade=foreground "$n" --ignore-not-found --wait=true >/dev/null
   creer "$T/pr-$n.yaml" || return 0
   issue pipelinerun "$n"
 }
@@ -511,6 +518,119 @@ etape_declencheurs() {
   kubectl get pods -n declencheurs -o json | jq -r '.items[] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName)"'
 }
 
+pr_gabarit() { # nom pipeline : PipelineRun du gabarit en service dans declencheurs (pipeline remplacée, commit de main remise
+  # à zéro), créé dans builds puis attendu ; issue
+  kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "$1" --arg b "$2" --arg c "$TETE_J2" \
+    --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n
+      | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b else . end)
+      | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)' > "$T/pr-$1.json"
+  kubectl delete pipelinerun -n builds --cascade=foreground "$1" --ignore-not-found --wait=true >/dev/null
+  creer "$T/pr-$1.json" || return 0
+  issue pipelinerun "$1"
+}
+
+drapeau() { # valeur : set-security-context de Pipelines, relu par le contrôleur (informer)
+  kubectl patch configmap feature-flags -n tekton-pipelines --type merge -p "{\"data\":{\"set-security-context\":\"$1\"}}" >/dev/null
+  sleep 5
+}
+
+conteneurs() { # pod de builds : contexte de sécurité du pod, puis de chaque conteneur (initialisation compris)
+  kubectl get pod -n builds "$1" -o json | jq -r '.spec as $s | "  pod : \($s.securityContext | tostring)",
+    (($s.initContainers // []) + $s.containers | .[] | "  \(.name) : allowPrivilegeEscalation=\(.securityContext.allowPrivilegeEscalation
+      | if . == null then "absent" else tostring end), capabilities.drop=\(.securityContext.capabilities.drop // [] | join(","))")'
+}
+
+violations() { # instant pod : annotation audit-violations de Pod Security sur la création du pod (audit de l'API), ou « aucune »
+  audit_api "$2" | jq -r --arg t "$1" --arg p "$2" 'select(.stageTimestamp >= $t and .verb == "create" and .objectRef.resource == "pods"
+    and .objectRef.subresource == null and .objectRef.name == $p)
+    | "\(.annotations["pod-security.kubernetes.io/enforce-policy"]) ; \(.annotations["pod-security.kubernetes.io/audit-violations"] // "aucune")"' | tail -1
+}
+
+enfant() { # PipelineRun : issue de son TaskRun publier (raison et message)
+  kubectl get taskrun -n builds "$1-publier" -o json | jq -r '.status.conditions[] | select(.type == "Succeeded")
+    | "\(.reason) : \(.message // "" | gsub("\n"; " ") | .[0:400])"'
+}
+
+etape_restreint() {
+  local t0 busybox pipe sans conf st m
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
+  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+  pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  conf=$REG/tekton/tasks/essai-confiance@$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
+
+  echo "## état de départ"
+  kubectl get namespace builds -o json | jq -r '"labels de builds : \(.metadata.labels | to_entries | map(select(.key | startswith("pod-security"))) | map("\(.key)=\(.value)") | join(", ") | if . == "" then "aucun label pod-security (niveau privileged par défaut)" else . end)"'
+  echo "set-security-context : $(kubectl get configmap feature-flags -n tekton-pipelines -o jsonpath='{.data.set-security-context}')"
+  echo "pods existants de builds au regard de restricted (label enforce en dry-run serveur) :"
+  kubectl label --dry-run=server --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted 2>&1 | sed 's/^/  /'
+
+  echo "## Pipelines : set-security-context (prepare, place-scripts, working-dir-initializer, sidecar des résultats)"
+  drapeau true
+  echo "## builds : Pod Security restricted en warn et audit (enforce : décision du propriétaire)"
+  kubectl label --overwrite namespace builds pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=latest \
+    pod-security.kubernetes.io/audit=restricted pod-security.kubernetes.io/audit-version=latest >/dev/null
+
+  echo "## variante : tâche en service signée sans son stepTemplate"
+  sed -e "s#@IMAGE@#$REG/builds/essai-webhook#" -e "s#@DIGEST@#$APP_DIGEST#" -e "s#@BUSYBOX@#$busybox#" \
+    -e '/^  stepTemplate:$/,/^  steps:$/{/^  steps:$/!d;}' "$here/politique/taches/publier-essai.yaml" > "$T/sans-restriction.yaml"
+  [ "$(grep -c securityContext "$T/sans-restriction.yaml")" = 0 ] || { echo "KO   stepTemplate non retiré" >&2; exit 1; }
+  tkn task sign "$T/sans-restriction.yaml" -K "$S/taches.key" -f "$T/sans-restriction-signee.yaml" >/dev/null
+  sans=$REG/tekton/tasks/publier-sans-restriction@$(bundle "$T/sans-restriction-signee.yaml" tekton/tasks/publier-sans-restriction restreint)
+  sed "s#@TACHE@#$sans#" "$here/politique/taches/sample-app-essai.yaml" > "$T/sans-restriction-pipeline.yaml"
+  tkn pipeline sign "$T/sans-restriction-pipeline.yaml" -K "$S/taches.key" -f "$T/sans-restriction-pipeline-signee.yaml" >/dev/null
+  sans=$REG/tekton/pipelines/sans-restriction@$(bundle "$T/sans-restriction-pipeline-signee.yaml" tekton/pipelines/sans-restriction restreint)
+  echo "pipeline signée : ${sans#"$REG/"}"
+
+  echo "## audit : création du pod tracée, sans refus"
+  verdict "tâche sans stepTemplate, sous warn et audit" True "$(pr_gabarit j6-sans-restriction "$sans")"
+  m=$(violations "$t0" j6-sans-restriction-publier-pod)
+  echo "audit de l'API : $m"
+  grep -q 'container "step-publier"' <<< "$m" && ! grep -qE 'container "(prepare|place-scripts)"' <<< "$m" \
+    && echo "OK   violations tracées pour l'étape seule" || { echo "KO   annotation d'audit" >&2; exit 1; }
+
+  echo "## enforce posé le temps des essais, puis retiré"
+  trap 'kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1
+    drapeau true; rm -rf "$T/auth" "$W/refus.out"' EXIT
+  kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest 2>&1 \
+    | grep -v '^namespace/' | sed 's/^/  /' || true
+  verdict "tâche en service (pipeline du gabarit)" True "$(pr_gabarit j6-restreint "$pipe")"
+  kubectl get taskrun -n builds j6-restreint-publier -o json | jq -r '"tâche en service : stepTemplate.securityContext \(.status.taskSpec.stepTemplate.securityContext | tostring)"'
+  conteneurs j6-restreint-publier-pod
+  echo "audit de l'API : $(violations "$t0" j6-restreint-publier-pod)"
+  verdict "tâche d'essai de Trusted Resources (TaskRun, essai-confiance)" True "$(taskrun j6-restreint-confiance bundles "$conf")"
+  conteneurs j6-restreint-confiance-pod
+  st=$(pr_gabarit j6-sans-restriction-enforce "$sans")
+  m=$(enfant j6-sans-restriction-enforce)
+  echo "tâche sans stepTemplate : PipelineRun ${st%%|*}, TaskRun $m"
+  [ "${st%%|*}" = False ] && grep -q '^PodAdmissionFailed : .*violates PodSecurity' <<< "$m" && grep -q 'container "step-publier"' <<< "$m" \
+    && ! grep -qE 'container "(prepare|place-scripts)"' <<< "$m" && echo "OK   refusée par Pod Security (étape seule)" \
+    || { echo "KO   tâche sans stepTemplate" >&2; exit 1; }
+  drapeau false
+  st=$(pr_gabarit j6-sans-drapeau "$pipe")
+  m=$(enfant j6-sans-drapeau)
+  drapeau true
+  echo "set-security-context désactivé, tâche en service : PipelineRun ${st%%|*}, TaskRun $m"
+  [ "${st%%|*}" = False ] && grep -q '^PodAdmissionFailed : .*violates PodSecurity' <<< "$m" && grep -q 'containers "prepare", "place-scripts"' <<< "$m" \
+    && ! grep -q '"step-publier"' <<< "$m" && echo "OK   refusée par Pod Security (conteneurs d'initialisation de Tekton seuls)" \
+    || { echo "KO   drapeau désactivé" >&2; exit 1; }
+  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null
+  trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+
+  echo "## contrôles"
+  kubectl get namespace builds -o json | jq -r '"labels de builds : \(.metadata.labels | to_entries | map(select(.key | startswith("pod-security"))) | map("\(.key)=\(.value)") | join(", "))"'
+  [ "$(kubectl get namespace builds -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" = "" ] \
+    && [ "$(kubectl get configmap feature-flags -n tekton-pipelines -o jsonpath='{.data.set-security-context}')" = true ] \
+    && echo "OK   enforce retiré, set-security-context=true" || { echo "KO   état final" >&2; exit 1; }
+  sed -n '1,/^---$/p' "$here/tekton/builds.yaml" | sed '$d' | kubectl apply --server-side --dry-run=server -f - -o json \
+    | jq -e '.metadata.labels["pod-security.kubernetes.io/audit"] == "restricted"' >/dev/null \
+    && echo "OK   tekton.sh signature (apply de tekton/builds.yaml, dry-run serveur) conserve les labels" \
+    || { echo "KO   tekton/builds.yaml retire les labels" >&2; exit 1; }
+}
+
 TEMOIN_CLE=essai-j6-autre-cle       # enveloppe bien formée, signée par une autre clé que celle de Chains
 TEMOIN_SUJET=essai-j6-autre-sujet   # enveloppe authentique de Chains, posée sur une autre image
 TEMOIN_ILLISIBLE=essai-j6-att-illisible   # tag .att dont la couche n'est pas du JSON (cosign download échoue)
@@ -676,7 +796,7 @@ etape_horodatage() {
     and (.object | test("^/v2/builds/essai-webhook/manifests/sha256-.*[.]att$"))) | .time' | tail -1)
   echo "builds/essai-webhook : $e0 → $e1 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : ${w:-absente}"
   [ "$e1" -gt "$e0" ] && [ -n "$w" ] || { echo "KO   aucune nouvelle enveloppe de Chains" >&2; exit 1; }
-  kubectl delete pipelinerun -n builds j6-horodatage --wait=true >/dev/null
+  kubectl delete pipelinerun -n builds --cascade=foreground j6-horodatage --wait=true >/dev/null
   n=$(kubectl get pipelineruns,taskruns -n builds -l tekton.dev/pipelineRun=j6-horodatage -o name | wc -l)
   [ "$n" = 0 ] && ! kubectl get pipelinerun -n builds j6-horodatage >/dev/null 2>&1 \
     && echo "PipelineRun j6-horodatage et son TaskRun supprimés de l'API avant le passage (seul Zot garde la trace)" \
@@ -795,7 +915,7 @@ etape_rattrapage() {
   kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null 2>&1 || true
   kubectl scale deploy -n declencheurs el-forgejo --replicas=1 >/dev/null
   [ "$(tete)" = "$TETE_J2" ] || { git_forgejo push -q --force "$FORGEJO_HOTE/$SAMPLE_APP.git" "$TETE_J2:refs/heads/main"; tete_servie "$TETE_J2"; }
-  kubectl delete pipelinerun -n builds "sample-app-$c1" "sample-app-$c2" --ignore-not-found --wait=true >/dev/null
+  kubectl delete pipelinerun -n builds --cascade=foreground "sample-app-$c1" "sample-app-$c2" --ignore-not-found --wait=true >/dev/null
   if kubectl get pipelinerun -n builds "sample-app-$TETE_J2" >/dev/null 2>&1; then
     kubectl get pipelinerun -n builds "sample-app-$TETE_J2" -o json | jq -r '"\(.metadata.name) : créé \(.metadata.creationTimestamp), signé=\(.metadata.annotations["chains.tekton.dev/signed"])"'
     d=PRESENT
@@ -990,13 +1110,7 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
   sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/porte-$c-pipeline.yaml"
   tkn pipeline sign "$T/porte-$c-pipeline.yaml" -K "$S/taches.key" -f "$T/porte-$c-pipeline-signee.yaml" >/dev/null 2>&1
   pipe=$REG/tekton/pipelines/porte-$c@$(bundle "$T/porte-$c-pipeline-signee.yaml" "tekton/pipelines/porte-$c" "porte-$c")
-  kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "j6-porte-$c" --arg b "$pipe" --arg c "$TETE_J2" \
-    --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n
-      | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b else . end)
-      | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)' > "$T/pr-porte-$c.json"
-  kubectl delete pipelinerun -n builds "j6-porte-$c" --ignore-not-found --wait=true >/dev/null
-  creer "$T/pr-porte-$c.json" || { cat "$T/creer.out" >&2; exit 1; }
-  st=$(issue pipelinerun "j6-porte-$c")
+  st=$(pr_gabarit "j6-porte-$c" "$pipe")
   [ "${st%%|*}" = True ] || { echo "KO   j6-porte-$c : $st" >&2; exit 1; }
   echo "$c : tâche ${tache#"$REG/"}, image builds/essai-porte@${d##*@} ; PipelineRun exécuté, Chains : signé=$(signe pipelinerun "j6-porte-$c")"
 }

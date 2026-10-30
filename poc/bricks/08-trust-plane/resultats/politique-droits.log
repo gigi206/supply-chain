@@ -1,6 +1,6 @@
-# politique.sh droits, 2026-10-30T08:50:17Z
+# politique.sh droits, 2026-10-30T09:25:10Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
-73 vérifications, 73 conformes
+75 vérifications, 75 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
   accordé : el-forgejo list eventlisteners.triggers.tekton.dev (declencheurs)
   accordé : el-forgejo list clusterinterceptors.triggers.tekton.dev (*)
@@ -37,9 +37,9 @@
                                                   [/version]                             []               [get]
                                                   [/version]                             []               [get]
 ## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
-  3 create pipelineruns builds 201
-  3 create pipelineruns builds 409
-OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T00:49:07Z
+  2 create pipelineruns builds 201
+  2 create pipelineruns builds 409
+OK   aucun refus (403) pour el-forgejo depuis 2026-10-30T09:18:33Z
 ## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
   1 create pipelineruns builds 201
 OK   aucun refus (403) pour rattrapage depuis 2026-10-30T00:49:54Z
