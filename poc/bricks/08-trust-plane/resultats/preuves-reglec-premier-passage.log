@@ -1,0 +1,36 @@
+# preuves.sh reglec, 2026-10-30T23:58:17Z
+## prédiction
+porte (Job de l'espace porte, policy.yaml) : image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 jugée avec la clé de Chains, verdict de référence V ;
+  porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)
+images témoins (essais-j8/regle-c), clé jetable, provenance réelle au sujet réécrit, ConfigMap porte-temoin :
+  intacte : mêmes violations que V, porte.construction_kata parmi les succès ;
+  sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations de V
+  plus porte.construction_kata, et rien d'autre
+OK   ConfigMap porte : porte.rego identique au fichier versionné
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+provenance réelle reprise : PipelineRun 1fb94652-d29c-4f0a-bf98-d0af21b446c8, 47201 octets
+## images témoins
+intacte : essais-j8/regle-c@sha256:7f46232fde53d50dcf08b9662aea97b7c2319de7cf53c8ac1538492b256e4637 ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+sans-kata : essais-j8/regle-c@sha256:2d3b15b2674796822b7edad09bc3932e9bb87b2ba3da14e7b8968932c3546260 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+runc : essais-j8/regle-c@sha256:f58274d6859991045f06ec266a7a55731dfdbe4a0e730ed3e06d7df890585ac5 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+## verdicts de la porte
+  VERDICT|reglec-reel|false|slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30
+OK   réelle : porte.construction_kata parmi les succès
+  VERDICT|reglec-intacte|false|slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30
+KO   intacte : violations ou succès différents de la prédiction
+  VERDICT|reglec-sans-kata|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30
+KO   sans-kata : violations prédites porte.construction_kata,slsa_source_correlated.source_code_reference_provided
+  motif sans-kata : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "" dans la spec signée, kata exigé
+  VERDICT|reglec-runc|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30
+KO   runc : violations prédites porte.construction_kata,slsa_source_correlated.source_code_reference_provided
+  motif runc : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "runc" dans la spec signée, kata exigé
+## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)
+  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|30
+CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+KO   règle (c) : au moins une mesure contraire à la prédiction

@@ -1247,11 +1247,11 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
   echo "$c : tâche ${tache#"$REG/"}, image builds/essai-porte@${d##*@} ; PipelineRun exécuté, Chains : signé=$(signe pipelinerun "j6-porte-$c")"
 }
 
-juger() { # cas image (nom vu des pods, par digest) [politique] : Job de la porte ; une ligne VERDICT|cas|success|violations|
+juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, porte par défaut] : Job de la porte ; une ligne VERDICT|cas|success|violations|
   # avertissements|durée du conteneur en s (codes de règles triés), ou ERREUR|cas|motif si ec n'a rendu aucun verdict
   local j=porte-$1 l d
   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
-  sed -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" \
+  sed -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" -e "s#@CM@#${4:-porte}#" \
     "$here/politique/porte-job.yaml" | kubectl create -f - >/dev/null
   for _ in $(seq 150); do
     [ -n "$(kubectl get job -n porte "$j" -o jsonpath='{.status.succeeded}{.status.failed}')" ] && break

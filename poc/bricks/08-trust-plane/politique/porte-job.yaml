@@ -1,5 +1,5 @@
 # Brique 08, J6 : jugement d'une image par la porte (politique.sh porte). @NOM@, @IMAGE@ (référence par digest, nom
-# vu des pods), @PORTE@ (image de la porte, épinglée par digest), @POLITIQUE@ (fichier de politique de la ConfigMap porte).
+# vu des pods), @PORTE@ (image de la porte, épinglée par digest), @POLITIQUE@ (fichier de politique de la ConfigMap), @CM@ (ConfigMap : porte, ou porte-temoin de preuves.sh reglec).
 # Verdict JSON de ec sur la sortie standard.
 apiVersion: batch/v1
 kind: Job
@@ -68,7 +68,7 @@ spec:
       volumes:
       - name: porte
         configMap:
-          name: porte
+          name: "@CM@"
           items:
           - key: policy.yaml
             path: policy.yaml

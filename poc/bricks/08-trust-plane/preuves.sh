@@ -30,6 +30,10 @@
 #          construire privilégiée sous Kata, image BuildKit : connexions vers Zot, Forgejo, l'API (nœud et service) et une adresse
 #          externe, puis avec une adresse source inutilisée (vérification d'adresse source de Cilium) ; contre-épreuve : même
 #          tâche, seul le nom change (non sélectionnée par construction-sans-sortie). Trace : Hubble de sc-build, capture sur enp1s0
+#   reglec règle porte.construction_kata (option (c) des internalParameters) jugée par la porte du cluster : image réelle
+#          (clé de Chains), puis images témoins d'essais-j8/regle-c signées par une clé jetable et munies de la provenance réelle,
+#          sujet réécrit : intacte, runtimeClassName retiré du seul TaskRun construire (taskRunSpecs gardés à kata), runc ;
+#          même Job, même politique, ConfigMap porte-temoin (clé publique jetable). Trace : verdicts de ec, motifs
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -746,6 +750,126 @@ EOF
   kubectl delete pod -n builds "$(jq -r .metadata.name "$T/t6-test-pod.json")" --ignore-not-found --wait=true >/dev/null
   garder apres
   [ "$ko" = 0 ] || { echo "KO   test 6 : au moins une mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+RC_DEPOT=essais-j8/regle-c   # images témoins de reglec (non supprimables de Zot)
+
+oci_signe() { # digest fichier type-de-couche suffixe : tag <suffixe> d'une seule couche signée au format hérité de cosign
+  # (config rootfs, annotation de signature), dans RC_DEPOT ; pour .att, le fichier est l'enveloppe DSSE et l'annotation vide
+  local l c a
+  l=sha256:$(sha256sum < "$2" | cut -c1-64)
+  [ "$4" = sig ] && a=$(base64 -w0 "$2.sig") || a=
+  jq -nc --arg l "$l" '{architecture: "", os: "", config: {}, rootfs: {type: "layers", diff_ids: [$l]}}' > "$T/rc-config.json"
+  c=sha256:$(sha256sum < "$T/rc-config.json" | cut -c1-64)
+  zot_ecrire blob push "$REG_HOTE/$RC_DEPOT" "$2" >/dev/null
+  zot_ecrire blob push "$REG_HOTE/$RC_DEPOT" "$T/rc-config.json" >/dev/null
+  jq -nc --arg l "$l" --argjson n "$(stat -c%s "$2")" --arg c "$c" --argjson cn "$(stat -c%s "$T/rc-config.json")" --arg t "$3" --arg a "$a" \
+    '{schemaVersion: 2, mediaType: "application/vnd.oci.image.manifest.v1+json",
+      config: {mediaType: "application/vnd.oci.image.config.v1+json", digest: $c, size: $cn},
+      layers: [{mediaType: $t, digest: $l, size: $n,
+        annotations: {"dev.cosignproject.cosign/signature": $a, "dev.sigstore.cosign/certificate": "", "dev.sigstore.cosign/chain": ""}}]}' > "$T/rc-manifeste.json"
+  zot_ecrire manifest push "$REG_HOTE/$RC_DEPOT:sha256-${1#sha256:}.$4" "$T/rc-manifeste.json" >/dev/null
+}
+
+rc_temoin() { # cas filtre-jq-sur-le-TaskRun-construire : image témoin signée, provenance réelle modifiée ; digest dans $T/rc-<cas>.image
+  local c=$1 d pt
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/cas=reglec-$c-$RC_PASSAGE" \
+    -t "$REG_HOTE/$RC_DEPOT:$c" "$REG_HOTE/$APP" 2>/dev/null)
+  d=${d##*@}; echo "$d" > "$T/rc-$c.image"
+  jq -nc --arg r "$REG/$RC_DEPOT" --arg d "$d" '{critical: {identity: {"docker-reference": $r}, image: {"docker-manifest-digest": $d},
+    type: "cosign container image signature"}, optional: null}' > "$T/rc-$c-simple.json"
+  openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/rc-$c-simple.json.sig" "$T/rc-$c-simple.json"
+  oci_signe "$d" "$T/rc-$c-simple.json" application/vnd.dev.cosign.simplesigning.v1+json sig
+  jq -c --arg r "$REG/$RC_DEPOT" --arg x "${d#sha256:}" '.subject = [{name: $r, digest: {sha256: $x}}]
+    | .predicate.buildDefinition.resolvedDependencies |= map(if .name == "pipelineTask" and .content != null
+        and ((.content | @base64d | fromjson).metadata.labels["tekton.dev/task"] == "construire-image")
+      then .content = ((.content | @base64d | fromjson) | '"$2"' | tojson | @base64) else . end)' "$T/rc-prov.json" > "$T/rc-$c.payload"
+  pt=$(jq -r .payloadType "$T/rc-env-chains.json")
+  { printf 'DSSEv1 %d %s %d ' "${#pt}" "$pt" "$(stat -c%s "$T/rc-$c.payload")"; cat "$T/rc-$c.payload"; } > "$T/rc-$c.pae"
+  openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/rc-$c.dsse" "$T/rc-$c.pae"
+  jq -nc --arg t "$pt" --arg p "$(base64 -w0 "$T/rc-$c.payload")" --arg s "$(base64 -w0 "$T/rc-$c.dsse")" \
+    '{payloadType: $t, payload: $p, signatures: [{keyid: "", sig: $s}]}' > "$T/rc-$c-env.json"
+  oci_signe "$d" "$T/rc-$c-env.json" application/vnd.dsse.envelope.v1+json att
+  echo "$c : $RC_DEPOT@$d ; runtimeClassName du TaskRun construire signé : $(jq -r '.predicate.buildDefinition.resolvedDependencies[]
+    | select(.name == "pipelineTask" and .content != null) | .content | @base64d | fromjson
+    | select(.metadata.labels["tekton.dev/task"] == "construire-image") | .spec.podTemplate.runtimeClassName // "absent"' "$T/rc-$c.payload") ;"\
+    "taskRunSpecs : $(jq -r '[.predicate.buildDefinition.externalParameters.runSpec.taskRunSpecs[] | .podTemplate.runtimeClassName] | join(",")' "$T/rc-$c.payload")"
+  echo "  sur l'hôte, clé jetable : signature $(cosign verify --key "$T/rc.pub" --insecure-ignore-tlog --registry-cacert "$P/ca-poc.crt" \
+    "$REG_HOTE/$RC_DEPOT@$d" >/dev/null 2>&1 && echo vérifiée || echo REFUSÉE), attestation $(cosign verify-attestation --key "$T/rc.pub" \
+    --insecure-ignore-tlog --type https://slsa.dev/provenance/v1 --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$RC_DEPOT@$d" >/dev/null 2>&1 \
+    && echo vérifiée || echo REFUSÉE) ; clé de Chains : $(cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+    --type https://slsa.dev/provenance/v1 --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$RC_DEPOT@$d" >/dev/null 2>&1 && echo vérifiée || echo refusée)"
+}
+
+etape_reglec() {
+  local v c r n ko=0 vr
+  echo "## prédiction"
+  echo "porte (Job de l'espace porte, policy.yaml) : image réelle $APP jugée avec la clé de Chains, verdict de référence V ;"
+  echo "  porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)"
+  echo "images témoins ($RC_DEPOT), clé jetable, provenance réelle au sujet réécrit, ConfigMap porte-temoin :"
+  echo "  intacte : violations de V plus slsa_build_scripted_build.subject_build_task_matches (le digest du témoin n'est pas"
+  echo "  celui que donne le résultat de la tâche de build, constaté au premier passage), porte.construction_kata parmi les succès ;"
+  echo "  sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations"
+  echo "  d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)"
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}') "$here/politique/porte/porte.rego" \
+    && echo "OK   ConfigMap porte : porte.rego identique au fichier versionné" \
+    || { echo "KO   ConfigMap porte différente de politique/porte/porte.rego (rejouer politique.sh porte)" >&2; exit 1; }
+  garder avant
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/zot.json"
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ)
+  (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/auth/rc.key")
+  openssl pkey -in "$T/auth/rc.key" -pubout -out "$T/rc.pub"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null > "$T/rc-envs.jsonl"
+  jq -c 'select(.payload | @base64d | fromjson | .predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)' "$T/rc-envs.jsonl" \
+    | jq -sc 'max_by(.payload | @base64d | fromjson | .predicate.runDetails.metadata.finishedOn)' > "$T/rc-env-chains.json"
+  jq -r .payload "$T/rc-env-chains.json" | base64 -d > "$T/rc-prov.json"
+  echo "provenance réelle reprise : PipelineRun $(jq -r .predicate.runDetails.metadata.invocationId "$T/rc-prov.json"), $(stat -c%s "$T/rc-prov.json") octets"
+
+  echo "## images témoins"
+  rc_temoin intacte '.'
+  rc_temoin sans-kata 'del(.spec.podTemplate.runtimeClassName)'
+  rc_temoin runc '.spec.podTemplate.runtimeClassName = "runc"'
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/rc.pub" '.data["chains.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains"
+
+  echo "## verdicts de la porte"
+  vr=$(juger reglec-reel "$REG/$APP")
+  echo "  $vr"
+  [ "${vr%%|*}" = VERDICT ] || { echo "KO   image réelle : aucun verdict" >&2; exit 1; }
+  succes reglec-reel porte.construction_kata && echo "OK   réelle : porte.construction_kata parmi les succès" \
+    || { echo "KO   réelle : porte.construction_kata absente des succès" >&2; ko=1; }
+  v=$(trier "$(cut -d'|' -f4 <<< "$vr"),slsa_build_scripted_build.subject_build_task_matches")
+  for c in intacte sans-kata runc; do
+    r=$(juger "reglec-$c" "$REG/$RC_DEPOT@$(cat "$T/rc-$c.image")" policy.yaml porte-temoin)
+    echo "  $r"
+    if [ "$c" = intacte ]; then
+      [ "$(cut -d'|' -f4 <<< "$r")" = "$v" ] && succes "reglec-$c" porte.construction_kata \
+        && echo "OK   $c : violations de l'image réelle plus subject_build_task_matches, porte.construction_kata parmi les succès" \
+        || { echo "KO   $c : violations ou succès différents de la prédiction" >&2; ko=1; }
+    else
+      [ "$(cut -d'|' -f4 <<< "$r")" = "$(trier "${v:+$v,}porte.construction_kata")" ] && [ "$(cut -d'|' -f3 <<< "$r")" = false ] \
+        && echo "OK   $c : refusée, violations d'intacte plus porte.construction_kata seule" \
+        || { echo "KO   $c : violations prédites $(trier "${v:+$v,}porte.construction_kata")" >&2; ko=1; }
+      jq -r '[.components[] | .violations[]? | select(.metadata.code == "porte.construction_kata") | .msg] | .[0] // "-"' \
+        "$T/porte-reglec-$c.json" | sed "s/^/  motif $c : /"
+    fi
+  done
+  echo "## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)"
+  r=$(juger reglec-en-service "$REG/builds/essai-webhook@$APP_DIGEST")
+  echo "  $r"
+  n=$(prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -s 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.buildDefinition.resolvedDependencies
+    | [.[] | select(.name == "pipelineTask" and .content != null) | .content | @base64d | fromjson
+    | select(.metadata.labels["tekton.dev/task"] == "construire-image")] | length')
+  succes reglec-en-service porte.construction_kata && [ "$n" = 0 ] \
+    && echo "CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)" \
+    || echo "en-service : $n TaskRun(s) de construire-image, porte.construction_kata parmi les succès : $(succes reglec-en-service porte.construction_kata && echo oui || echo non)"
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie"
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   règle (c) : au moins une mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"

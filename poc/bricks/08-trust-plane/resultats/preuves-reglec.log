@@ -1,0 +1,36 @@
+# preuves.sh reglec, 2026-10-31T00:02:11Z
+## prédiction
+porte (Job de l'espace porte, policy.yaml) : image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 jugée avec la clé de Chains, verdict de référence V ;
+  porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)
+images témoins (essais-j8/regle-c), clé jetable, provenance réelle au sujet réécrit, ConfigMap porte-temoin :
+  intacte : violations de V plus slsa_build_scripted_build.subject_build_task_matches (le digest du témoin n'est pas
+  celui que donne le résultat de la tâche de build, constaté au premier passage), porte.construction_kata parmi les succès ;
+  sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations
+  d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)
+OK   ConfigMap porte : porte.rego identique au fichier versionné
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+provenance réelle reprise : PipelineRun 1fb94652-d29c-4f0a-bf98-d0af21b446c8, 47201 octets
+## images témoins
+intacte : essais-j8/regle-c@sha256:8652457d27225a7f44ed7498277714093c934296c7affcaca5a51f809ed1f169 ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+sans-kata : essais-j8/regle-c@sha256:427bfd229f07790efde178f5f279b41923da602c47df92f9ef86db336e67a4d4 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+runc : essais-j8/regle-c@sha256:5b0eb6ae0c048473f2b1301d7a13870fe7f4a63a3f3e024b85093e6c6c5a243c ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+## verdicts de la porte
+  VERDICT|reglec-reel|false|slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31
+OK   réelle : porte.construction_kata parmi les succès
+  VERDICT|reglec-intacte|false|slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31
+OK   intacte : violations de l'image réelle plus subject_build_task_matches, porte.construction_kata parmi les succès
+  VERDICT|reglec-sans-kata|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31
+OK   sans-kata : refusée, violations d'intacte plus porte.construction_kata seule
+  motif sans-kata : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "" dans la spec signée, kata exigé
+  VERDICT|reglec-runc|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31
+OK   runc : refusée, violations d'intacte plus porte.construction_kata seule
+  motif runc : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "runc" dans la spec signée, kata exigé
+## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)
+  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31
+CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
