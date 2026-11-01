@@ -72,7 +72,7 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
   - **Mise en œuvre** : sample-app est construite depuis Forgejo par une pipeline signée de deux tâches signées, qui donne `3a7ca1b1`.
     - La tâche de construction s'exécute en pod Kata privilégié (BuildKit en root, état sur tmpfs de l'invité). Le `runtimeClassName` est posé par le créateur du PipelineRun (`taskRunSpecs`).
     - Sans lui, Pod Security refuse le pod.
-    - **En service depuis le 01/11/2026** (brique 08, J8, bascule du gabarit, décision du propriétaire, [journal](../../poc/bricks/08-trust-plane/resultats/preuves-bascule.log)). Le gabarit de `declencheurs` pose ce `runtimeClassName` : le webhook Forgejo et le rattrapage construisent sous Kata, avec la même spec qu'en J7 et la même image `3a7ca1b1`. La porte admet l'image sur la nouvelle provenance.
+    - **En service depuis le 01/11/2026** (brique 08, J8, bascule du gabarit, décision du propriétaire, [journal](../../poc/bricks/08-trust-plane/resultats/preuves-bascule-troisieme-passage.log), repassé au rejeu d'un seul tenant : [journal](../../poc/bricks/08-trust-plane/resultats/preuves-bascule.log)). Le gabarit de `declencheurs` pose ce `runtimeClassName` : le webhook Forgejo et le rattrapage construisent sous Kata, avec la même spec qu'en J7 et la même image `3a7ca1b1`. La porte admet l'image sur la nouvelle provenance.
   - **Push dans une tâche runc restreinte séparée** (choix du propriétaire du 30/10/2026).
     - Son compte Zot ne peut que créer par digest dans `builds/**`, ce qui exclut tout tag, donc `.sig` et `.att`. C'est une condition CEL de Zot v2.1.22.
     - L'identifiant n'entre pas dans la VM où s'exécutent les `RUN`.
