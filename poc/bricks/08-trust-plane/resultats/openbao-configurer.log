@@ -1,5 +1,5 @@
-# openbao.sh configurer, 2026-11-01T15:56:05Z
-OK   clé publique de service.key : kid rXajYzH21JGIT5vFyg3nKmkbO7PU_R6O-hRuL9yRDdw = celui du JWKS (émetteur https://kubernetes.default.svc.cluster.local)
+# openbao.sh configurer, 2026-11-01T18:14:33Z
+OK   clé publique de service.key : kid iENwvbaRk9eupPU7OaLNEhUL4UKL0NF1qlgs3nQ8O-s = celui du JWKS (émetteur https://kubernetes.default.svc.cluster.local)
 Success! Enabled the transit secrets engine at: transit/
 Key                       Value
 ---                       -----
@@ -9,9 +9,9 @@ deletion_allowed          false
 derived                   false
 exportable                false
 imported_key              false
-keys                      map[1:map[certificate_chain: creation_time:2026-11-01T15:56:06.320754875Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkhoaYwQonzfhCwtig1bnxArXgfep
-gIqmvesVdaz1+J8qJBmg5HFS9OI3dEnM7APmCn4f2BFRnl12mQoSqS28CA==
+keys                      map[1:map[certificate_chain: creation_time:2026-11-01T18:14:34.248295975Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEolLdqd8rAnljBjpXZMWtutcSid6L
+rRRQUOt6USH+NYQYxFW7Do8KYvmIdijnfE0P3BB7EtIzyQ4aAqYjqavBQw==
 -----END PUBLIC KEY-----
 ]]
 latest_version            1
