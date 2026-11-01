@@ -1,0 +1,68 @@
+# preuves.sh bascule, 2026-11-01T15:17:50Z
+## prédiction (bascule du gabarit en service, décision du propriétaire du 01/11/2026)
+gabarit (politique/gabarit-sample-app.yaml, pipeline sample-app de construction.sh taches) : PipelineRun rendu admis à blanc
+  au nom de el-forgejo et du rattrapage ; appliqué, il remplace le gabarit d'essai ; rattrapage suspendu pendant les purges
+chemin 1, livraison de Forgejo (POST hooks/<id>/tests : HTTP 204) pour la tête de main 6391fd437f26696847041be3226bbbf633f55a2f, sample-app-6391fd437f26696847041be3226bbbf633f55a2f purgé avant :
+  PipelineRun créé par el-forgejo (une création, 201), pipeline sample-app, réussi ; pod construire sous Kata sur sc-build ;
+  résultats IMAGE_URL sc-stockage.poc.test:5000/builds/sample-app et IMAGE_DIGEST sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; spec identique à celle de j7-sample-app, bundle masqué ;
+  Chains signe les trois TaskRuns et le PipelineRun : deux enveloppes de plus sur l'image réelle (TaskRun publier, PipelineRun),
+  horodatées ; porte (source workspace/sample-app@6391fd437f26696847041be3226bbbf633f55a2f) : admise, aucune violation, contrôle 9 ok ; la provenance jugée est la nouvelle
+  écritures de poc-images : non jugées (le manifeste existe déjà ; oras cp peut ne rien écrire), relevées
+chemin 2, rattrapage (sample-app-6391fd437f26696847041be3226bbbf633f55a2f purgé, CronJob repris, aucune livraison) : mêmes mesures, créé par le compte rattrapage ;
+  spec identique à celle du chemin 1
+rejeu de la livraison de Forgejo : refusé à la création (already exists), même PipelineRun (même UID)
+contrôle exécutions/enveloppes : aucune anomalie au départ ni à la fin ; image réelle : quatre enveloppes de plus, provenance
+  la plus récente = celle du chemin 2
+posture (tekton-lint) du gabarit, de la pipeline et de ses trois tâches lues dans leurs bundles : aucun signalement
+## départ
+OK   bundle de la pipeline dans Zot : sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406
+OK   tâche preparer dans la liste revue : tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+OK   tâche construire dans la liste revue : tekton/tasks/construire-image@sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   NetworkPolicy construction-sans-sortie présente
+pipeline : tekton/pipelines/sample-app@sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406 ; celle de j7-sample-app : même bundle
+gabarit en service : pipeline sample-app
+CronJob rattrapage suspendu (aucun passage actif)
+OK   aucune exécution en cours ni en attente de Chains
+depart : COUVERTE 29, ECHEC_SIGNATURE 8, SANS_SUJET 18
+OK   départ : aucune anomalie
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 4 enveloppes, dernière provenance de PipelineRun : a076586d-d09f-4f04-94cd-b93721b7caac (2026-11-01T15:17:33Z)
+## gabarit
+OK   témoin PipelineRun du gabarit, au nom de el-forgejo : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
+OK   témoin PipelineRun du gabarit, au nom du rattrapage : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
+OK   gabarit en service : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406
+## chemin 1 : livraison de Forgejo
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+OK   webhook : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : EventListener forgejo
+    1 declencheurs:el-forgejo 201
+OK   webhook : une création, par declencheurs:el-forgejo (audit de l'API)
+OK   webhook : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:13e2d4eb6d417d1f80d583add668d25452fd9ebbbd9484354e3c3bedce866406
+OK   webhook : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
+TaskRun construire : Succeeded, TrustedResourcesVerified=True
+TaskRun preparer : Succeeded, TrustedResourcesVerified=True
+TaskRun publier : Succeeded, TrustedResourcesVerified=True
+pod preparer : nœud sc-build, runtimeClassName -
+pod publier : nœud sc-build, runtimeClassName -
+pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : résultats : IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app
+OK   webhook : spec identique à celle de j7-sample-app (J7), bundle de la pipeline masqué
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   webhook : PipelineRun signé par Chains : true
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-01T15:17:57Z : 1 (le manifeste existait déjà)
+OK   aucune exécution en cours ni en attente de Chains
+passage d'horodatage horodatage-29892439
+sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 45 enveloppe(s) de Chains, 45 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
+OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
+  VERDICT|ba-webhook|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 45 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+OK   webhook : verdict de la porte (succès|violations|horodatage) : true||ok
+OK   webhook : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : 683635b6-6b92-474c-8e9d-5d16a2c5db6d
+## chemin 2 : rattrapage
+CronJob rattrapage repris
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+KO   rattrapage : création de sample-app-6391fd437f26696847041be3226bbbf633f55a2f absente du journal
+CronJob rattrapage repris

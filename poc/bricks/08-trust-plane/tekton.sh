@@ -237,6 +237,7 @@ etape_webhook() {
 etape_essais_webhook() {
   local debut reel=6391fd437f26696847041be3226bbbf633f55a2f faux=1111111111111111111111111111111111111111 neuf=2222222222222222222222222222222222222222
   rm -rf "$T/webhook" && (umask 077 && mkdir -p "$T/webhook" "$T/auth")
+  [ "$EL_NS" != declencheurs ] || gabarit_essai   # test 5 rejoué sous politique : pipeline d'essai (commits inexistants dans Forgejo)
   # Rattrapage de J6 (CronJob rattrapage de declencheurs, s'il existe) suspendu pendant l'essai, puis réactivé : il
   # recréerait sample-app-<tête de main> après la purge, avant la livraison réelle de A (étape suivie dans un sous-shell :
   # le piège EXIT réactive le CronJob, même en cas d'échec).

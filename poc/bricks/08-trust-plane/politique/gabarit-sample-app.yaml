@@ -1,0 +1,76 @@
+# Brique 08, J8 : bascule du gabarit en service vers la pipeline de construction sample-app (décision du propriétaire du
+# 01/11/2026), appliquée par preuves.sh bascule après la construction de J7. Remplace la TriggerTemplate d'essai de
+# declencheurs.yaml (J6), qui reste la référence des étapes de J6 et des tests de J8 qui en dérivent leurs exécutions d'essai :
+# politique.sh declencheurs la réapplique (bascule à rejouer ensuite). Forme mesurée en J7 (construction.sh pr_j7) : workspace
+# sortie en PVC, runtimeClassName kata pour la seule tâche construire (gabarit de pod recopié). Les paramètres commit et depot,
+# seuls exigés par le rattrapage, sont inchangés, comme l'anti-rejeu (nom dérivé du commit). @PIPELINE@ : bundle signé de
+# construction.sh taches, épinglé par digest.
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: sample-app
+  namespace: declencheurs
+spec:
+  params:
+  - name: commit
+  - name: depot
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      name: sample-app-$(tt.params.commit)
+      namespace: builds
+    spec:
+      pipelineRef:
+        resolver: bundles
+        params:
+        - name: bundle
+          value: @PIPELINE@
+        - name: name
+          value: sample-app
+        - name: kind
+          value: pipeline
+      params:
+      - name: commit
+        value: $(tt.params.commit)
+      - name: depot
+        value: $(tt.params.depot)
+      workspaces:
+      - name: sortie
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 1Gi
+      taskRunTemplate:
+        serviceAccountName: build
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+      taskRunSpecs:
+      - pipelineTaskName: construire
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          runtimeClassName: kata

@@ -4,7 +4,8 @@
 # un bundle de tkn construit depuis une tâche signée versionnée (même fichier, même digest ; une nouvelle signature donne
 # un autre digest). politique.sh declencheurs refuse de déployer une tâche absente de cette liste.
 trusted_tasks:
-  # Tâche en service (pipeline du gabarit de declencheurs) : politique/taches/publier-essai.signee.yaml, stepTemplate restreint
+  # Tâche d'essai (pipeline sample-app-essai du gabarit d'essai de J6, en service jusqu'à la bascule de J8 du 01/11/2026) :
+  # politique/taches/publier-essai.signee.yaml, stepTemplate restreint ; véhicule des étapes de J6 et des cas de la porte
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-essai:
     - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
   # J7 : construction de sample-app (voie A, pipeline sample-app de construction.sh) : politique/taches/construire-image.signee.yaml,

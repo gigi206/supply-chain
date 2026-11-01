@@ -515,6 +515,8 @@ etape_declencheurs() {
   kubectl delete serviceaccount -n builds el-forgejo --ignore-not-found >/dev/null
   kubectl delete clusterrolebinding el-forgejo-builds --ignore-not-found >/dev/null
   kubectl delete secret -n builds forgejo-webhook --ignore-not-found >/dev/null
+  o=$(kubectl get triggertemplate -n declencheurs sample-app -o json 2>/dev/null | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value' || true)
+  [ "$o" != sample-app ] || echo "CONSTAT  gabarit de la bascule de J8 remplacé par le gabarit d'essai : rejouer preuves.sh bascule après les étapes de J6"
   kubectl apply --server-side -f "$T/declencheurs.yaml" >/dev/null
   kubectl create secret generic forgejo-webhook -n declencheurs --from-file=secret="$S/forgejo-webhook.secret" --dry-run=client -o yaml \
     | kubectl apply --server-side -f - >/dev/null
@@ -534,7 +536,8 @@ etape_declencheurs() {
 }
 
 pr_gabarit() { # nom pipeline : PipelineRun du gabarit en service dans declencheurs (pipeline remplacée, commit de main remise
-  # à zéro), créé dans builds puis attendu ; issue
+  # à zéro), créé dans builds puis attendu ; issue. Gabarit d'essai de J6 exigé (sa pipeline n'a ni workspace ni tâche construire)
+  gabarit_essai
   kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "$1" --arg b "$2" --arg c "$TETE_J2" \
     --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n
       | .spec.pipelineRef.params |= map(if .name == "bundle" then .value = $b else . end)
@@ -572,7 +575,7 @@ etape_restreint() {
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
   auth_zot "$T/auth/docker/config.json"
   [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
-  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  gabarit_essai   # gabarit d'essai de J6 en service (pas celui de la bascule de J8)
   busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
   pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
   conf=$REG/tekton/tasks/essai-confiance@$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
@@ -791,7 +794,7 @@ analyser() { # job : journal du passage (enveloppes déjà horodatées résumée
 etape_horodatage() {
   local x y z pt t j e0 e1 b0 o0 n w jeton pipe o
   kubectl get secret -n horodatage zot-horodatage >/dev/null 2>&1 || { echo "KO   secret zot-horodatage absent (tsa.sh horodater)" >&2; exit 1; }
-  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  gabarit_essai   # gabarit d'essai de J6 en service (pas celui de la bascule de J8)
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
   auth_zot "$T/auth/zot.json"
   config_horodatage   # avant les témoins : le script de J5 échouerait sur le témoin illisible, à chaque passage
@@ -964,7 +967,7 @@ derniere() { # nom : la provenance de PipelineRun la plus récente de builds/ess
 
 etape_rattrapage() {
   local i d c1 c2 t tr tp tpush j n pr v1 v2 s o0
-  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  gabarit_essai   # gabarit d'essai de J6 en service (pas celui de la bascule de J8)
   kubectl get configmap -n porte porte >/dev/null 2>&1 || { echo "KO   porte absente (étape porte d'abord)" >&2; exit 1; }
   couverture > /dev/null; o0=$(wc -l < "$T/orphelins")
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
@@ -1295,7 +1298,7 @@ trier() { tr ',' '\n' <<< "$1" | sort -u | paste -sd, -; }
 etape_porte() {
   local d e bt0 r v c n k=0 prevu busybox t st pipe tache
   [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente (étape taches)" >&2; exit 1; }
-  kubectl get triggertemplate -n declencheurs sample-app >/dev/null 2>&1 || { echo "KO   gabarit absent (étape declencheurs)" >&2; exit 1; }
+  gabarit_essai   # gabarit d'essai de J6 en service (pas celui de la bascule de J8)
   kubectl get validatingpolicy zone-confiance -o json | jq -e '.spec.matchConstraints.namespaceSelector.matchExpressions[0].values
     | index("porte") != null' >/dev/null || { echo "KO   porte absent de la règle zone-confiance (étape admission)" >&2; exit 1; }
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
@@ -1548,6 +1551,7 @@ etape_posture() {
     || { cat "$T/posture/signatures.json" >&2; echo "KO   signature npm invalide ou absente ($n paquets installés)" >&2; exit 1; }
 
   echo "## ressources en service : TriggerTemplate de declencheurs, pipeline et tâches lues dans leurs bundles de Zot"
+  gabarit_essai   # une seule tâche lue (.spec.tasks[0]) ; après la bascule de J8, la posture du gabarit est jugée par preuves.sh bascule
   # Définition seule : les champs posés par le serveur (resourceVersion, uid…) sont signalés par no-resourceversion
   kubectl get triggertemplate -n declencheurs sample-app -o json \
     | jq '{apiVersion, kind, metadata: {name: .metadata.name, namespace: .metadata.namespace}, spec}' > "$T/posture/plateforme/triggertemplate-sample-app.yaml"

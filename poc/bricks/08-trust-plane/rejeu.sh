@@ -6,8 +6,9 @@
 # sans réseau (NetworkPolicy construction-sans-sortie, image de build en layout OCI) ; construction de sample-app dans un
 # PipelineRun : compte Zot poc-images, entrées, tâches signées, constat sur les ConfigMaps sous Kata, construction sans sortie
 # réseau et ses témoins, provenance ; réseau des pods Kata :
-# fenêtre de démarrage, trace des refus (Hubble sous Cilium, NFLOG sous kube-router), usurpation d'adresse), puis contrôle des
-# secrets dans les journaux. Libellé par défaut j1-j6 tant que J7 n'est pas fini ; avec J7, rejoué sous Cilium le 30/10/2026 en
+# fenêtre de démarrage, trace des refus (Hubble sous Cilium, NFLOG sous kube-router), usurpation d'adresse), bascule du gabarit
+# en service vers la pipeline sample-app (J8, preuves.sh bascule : en dernier, les étapes de J6 et les tests de J8 qui supposent
+# le gabarit d'essai la refusent, garde gabarit_essai), puis contrôle des secrets dans les journaux. Libellé par défaut j1-j6 (nom historique des journaux ; J7 est fini depuis le 01/11/2026) ; avec J7, rejoué sous Cilium le 30/10/2026 en
 # cinq morceaux, pas encore d'un seul tenant. Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
 # lit les entrées des bancs du laptop (~/.cache/supply-chain-poc/w/b03, empreintes épinglées) et interroge sum.golang.org.
@@ -61,5 +62,6 @@ etape "J7 (voie A, sample-app)" mise run confiance:buildkit -- sample_app
 etape "J7 (sans réseau)" mise run confiance:buildkit -- sans_reseau
 etape "J7 (construction)" mise run confiance:construction -- compte entrees taches constat_cm construire provenance
 etape "J7 (réseau)" mise run confiance:kata -- reseau
+etape "J8 (bascule)" mise run confiance:preuves -- bascule
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

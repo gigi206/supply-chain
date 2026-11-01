@@ -65,6 +65,14 @@
 #          déplacé) ; PipelineRun preuve-decision3 signé par Chains sur une image à digest propre au passage (builds/essai-decision3).
 #          Trace : annotations de Chains, refus du journal de Zot (journald), enveloppes du tag .att, audit d'OpenBao, contrôle
 #          exécutions/enveloppes ; exécutions de la mesure purgées à la fin
+#   bascule  gabarit en service basculé vers la pipeline de construction sample-app (décision du propriétaire du 01/11/2026 ;
+#          politique/gabarit-sample-app.yaml, bundle de construction.sh taches) : PipelineRun rendu admis à blanc au nom de
+#          el-forgejo et du rattrapage ; chaîne entière sur la tête de main 6391fd43, par les deux chemins de création, l'un après
+#          l'autre : livraison de Forgejo (EventListener), puis rattrapage (CronJob), PipelineRun purgé avant chacun ; construction
+#          sous Kata, image 3a7ca1b1, spec identique à celle de J7 (construction.sh construire), signature de Chains, horodatage,
+#          porte de release (source attendue) sur la nouvelle provenance, contrôle exécutions/enveloppes ; rejeu de la livraison sans
+#          effet ; posture du gabarit, de la pipeline et de ses trois tâches. À lancer après J7 et après les étapes de J6 et de J8 qui
+#          supposent le gabarit d'essai (garde gabarit_essai). Trace : labels et audit de l'API, audit de Zot, verdicts de ec
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -288,6 +296,7 @@ el_existe() { # depuis : erreurs « already exists » de l'EventListener (Pipeli
 
 etape_test5() {
   local t0 reel=6391fd437f26696847041be3226bbbf633f55a2f faux=1111111111111111111111111111111111111111 neuf sig_e ev_f c o
+  gabarit_essai   # commit du témoin inexistant dans Forgejo : la pipeline sample-app de la bascule échouerait à preparer
   garder avant
   EL_NS=declencheurs
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -373,6 +382,7 @@ bao_chains() { # depuis : signatures par la clé Transit chains (réponses de l'
 etape_test3() {
   local t0 t1 neuf tr uid i v n0 n1 compte faux=sha256:0000000000000000000000000000000000000000000000000000000000000000
   local essai=builds/essai-webhook@$APP_DIGEST
+  gabarit_essai   # cible : le TaskRun publier de la pipeline d'essai, vers builds/essai-webhook
   garder avant
   EL_NS=declencheurs
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -2009,6 +2019,196 @@ etape_decision3() {
     || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies" >&2; ko=1; }
   garder apres
   [ "$ko" = 0 ] || { echo "KO   décision 3 : mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+BA_PR=sample-app-$TETE_J2                          # PipelineRun de la tête de main (anti-rejeu : nom dérivé du commit)
+BA_J7=j7-sample-app                                # PipelineRun de construction.sh construire : forme mesurée en J7
+BA_URL=https://sc-stockage.poc.test:3000/$SAMPLE_APP.git
+
+ba_reprendre() { # CronJob rattrapage repris ; idempotent (trap EXIT)
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  echo "CronJob rattrapage repris"
+}
+
+ba_attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }   # construction.sh
+
+ba_fin() { # nom : attend la fin du PipelineRun (600 s au plus) ; « statut|raison »
+  local st=""
+  for _ in $(seq 300); do
+    st=$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}' 2>/dev/null || true)
+    [ -n "$st" ] && [ "$st" != Unknown ] && break
+    sleep 2
+  done
+  kubectl get pipelinerun -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}|{.status.conditions[?(@.type=="Succeeded")].reason}'
+}
+
+ba_spec() { # nom : spec du PipelineRun, bundle de la pipeline masqué (comparé à part : construction.sh taches resigne à chaque passage)
+  kubectl get pipelinerun -n builds "$1" -o json | jq -S '.spec | .pipelineRef.params |= map(if .name == "bundle" then .value = "BUNDLE" else . end)'
+}
+
+ba_param() { kubectl get pipelinerun -n builds "$1" -o json | jq -r --arg p "$2" '.spec.pipelineRef.params[] | select(.name == $p) | .value'; }   # nom param
+
+ba_chemin() { # libellé origine compte t0 : chaîne entière du PipelineRun BA_PR créé par ce chemin depuis t0 ; UID dans BA_UID,
+  # spec dans $T/ba-<libellé>.spec
+  local l=$1 st tr pub t j r c
+  for _ in $(seq 120); do kubectl get pipelinerun -n builds "$BA_PR" >/dev/null 2>&1 && break; sleep 2; done
+  kubectl get pipelinerun -n builds "$BA_PR" >/dev/null 2>&1 || { echo "KO   $l : aucun PipelineRun $BA_PR" >&2; exit 1; }
+  BA_UID=$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')
+  ba_attendu "$l : origine de $BA_PR (labels)" "$(origine "$BA_PR")" "$2"
+  st=$(ba_fin "$BA_PR")
+  creations "$4" "$BA_PR" | tee "$T/ba-$l.creations"
+  grep -q -x " *1 $3 201" "$T/ba-$l.creations" && echo "OK   $l : une création, par $3 (audit de l'API)" \
+    || { echo "KO   $l : créations contraires dans l'audit de l'API" >&2; exit 1; }
+  ba_attendu "$l : pipeline" "$(ba_param "$BA_PR" name)@$(ba_param "$BA_PR" bundle)" "sample-app@$BA_PIPE"
+  ba_attendu "$l : PipelineRun $BA_PR" "$st" "True|Succeeded"
+  kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$BA_PR" -o json | jq -r '.items[] | "TaskRun \(.metadata.labels["tekton.dev/pipelineTask"]) : \(.status.conditions[0].reason), TrustedResourcesVerified=\(.status.conditions[] | select(.type == "TrustedResourcesVerified") | .status // "-")"'
+  kubectl get pods -n builds -l "tekton.dev/pipelineRun=$BA_PR" -o json | jq -r '.items[] | "pod \(.metadata.labels["tekton.dev/pipelineTask"]) : nœud \(.spec.nodeName), runtimeClassName \(.spec.runtimeClassName // "-")"' | tee "$T/ba-$l.pods"
+  ba_attendu "$l : pod construire" "$(grep '^pod construire ' "$T/ba-$l.pods" | cut -d' ' -f4-)" "nœud sc-build, runtimeClassName kata"
+  pub=$(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '.status.results | map(.name + "=" + .value) | sort | join(" ")')
+  ba_attendu "$l : résultats" "$pub" "IMAGE_DIGEST=$APP_DIGEST IMAGE_URL=$REG/builds/sample-app"
+  ba_spec "$BA_PR" > "$T/ba-$l.spec"
+  diff "$T/ba-j7.spec" "$T/ba-$l.spec" > "$T/ba-$l.diff" && echo "OK   $l : spec identique à celle de $BA_J7 (J7), bundle de la pipeline masqué" \
+    || { sed 's/^/  /' "$T/ba-$l.diff"; echo "KO   $l : spec différente de celle de $BA_J7" >&2; exit 1; }
+  for tr in $(kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$BA_PR" -o jsonpath='{.items[*].metadata.name}'); do
+    echo "TaskRun $tr signé=$(signe taskrun "$tr")"
+  done
+  ba_attendu "$l : PipelineRun signé par Chains" "$(signe pipelinerun "$BA_PR")" true
+  c=$(sur sc-stockage "sudo cat /var/log/zot/audit.log" | jq -c --arg t "$4" 'select(.time[0:19] >= ($t[0:19]) and .subject == "poc-images"
+    and (.object | test("^/v2/builds/sample-app/manifests/")) and .action != "GET" and .action != "HEAD")' | wc -l)
+  echo "CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis $4 : $c (le manifeste existait déjà)"
+  ee_calme
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  j=$(passage "$t")
+  echo "passage d'horodatage $j"
+  couverte "$BA_O0"
+  r=$(juger "ba-$l" "$REG/$APP" policy.yaml porte "$BA_SRC")
+  echo "  $r"
+  ba_attendu "$l : verdict de la porte (succès|violations|horodatage)" "$(cut -d'|' -f3,4,7 <<< "$r")" "true||ok"
+  ba_attendu "$l : provenance de PipelineRun la plus récente de $APP (seule jugée)" \
+    "$(prov_pr "$APP" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.runDetails.metadata.invocationId')" "$BA_UID"
+}
+
+etape_bascule() {
+  local t0 j n e0 e1 u1 code k=0
+  EL_NS=declencheurs
+  echo "## prédiction (bascule du gabarit en service, décision du propriétaire du 01/11/2026)"
+  echo "gabarit (politique/gabarit-sample-app.yaml, pipeline sample-app de construction.sh taches) : PipelineRun rendu admis à blanc"
+  echo "  au nom de el-forgejo et du rattrapage ; appliqué, il remplace le gabarit d'essai ; rattrapage suspendu pendant les purges"
+  echo "chemin 1, livraison de Forgejo (POST hooks/<id>/tests : HTTP 204) pour la tête de main $TETE_J2, $BA_PR purgé avant :"
+  echo "  PipelineRun créé par el-forgejo (une création, 201), pipeline sample-app, réussi ; pod construire sous Kata sur sc-build ;"
+  echo "  résultats IMAGE_URL $REG/builds/sample-app et IMAGE_DIGEST $APP_DIGEST ; spec identique à celle de $BA_J7, bundle masqué ;"
+  echo "  Chains signe les trois TaskRuns et le PipelineRun : deux enveloppes de plus sur l'image réelle (TaskRun publier, PipelineRun),"
+  echo "  horodatées ; porte (source $SAMPLE_APP@$TETE_J2) : admise, aucune violation, contrôle 9 ok ; la provenance jugée est la nouvelle"
+  echo "  écritures de poc-images : non jugées (le manifeste existe déjà ; oras cp peut ne rien écrire), relevées"
+  echo "chemin 2, rattrapage ($BA_PR purgé, CronJob repris, aucune livraison) : mêmes mesures, créé par le compte rattrapage ;"
+  echo "  spec identique à celle du chemin 1"
+  echo "rejeu de la livraison de Forgejo : refusé à la création (already exists), même PipelineRun (même UID)"
+  echo "contrôle exécutions/enveloppes : aucune anomalie au départ ni à la fin ; image réelle : quatre enveloppes de plus, provenance"
+  echo "  la plus récente = celle du chemin 2"
+  echo "posture (tekton-lint) du gabarit, de la pipeline et de ses trois tâches lues dans leurs bundles : aucun signalement"
+
+  echo "## départ"
+  [ -s "$W/construction/pipeline.ref" ] || { echo "KO   pipeline sample-app non publiée (construction.sh taches)" >&2; exit 1; }
+  BA_PIPE=$(cat "$W/construction/pipeline.ref")
+  ba_attendu "bundle de la pipeline dans Zot" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/${BA_PIPE#*/}")" "${BA_PIPE#*@}"
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/${BA_PIPE#*/}" - | tar -xO > "$T/ba-pipeline.json"
+  while read -r n j; do
+    listee "$j" && echo "OK   tâche $n dans la liste revue : ${j#"$REG/"}" || { echo "KO   tâche $n hors de la liste revue : $j" >&2; exit 1; }
+  done < <(jq -r '.spec.tasks[] | "\(.name) \(.taskRef.params[] | select(.name == "bundle") | .value)"' "$T/ba-pipeline.json")
+  kubectl get networkpolicy -n builds construction-sans-sortie >/dev/null && echo "OK   NetworkPolicy construction-sans-sortie présente" \
+    || { echo "KO   construction-sans-sortie absente (construction.sh construire)" >&2; exit 1; }
+  kubectl get pipelinerun -n builds "$BA_J7" >/dev/null || { echo "KO   $BA_J7 absent (construction.sh construire)" >&2; exit 1; }
+  ba_spec "$BA_J7" > "$T/ba-j7.spec"
+  echo "pipeline : ${BA_PIPE#"$REG/"} ; celle de $BA_J7 : $( [ "$(ba_param "$BA_J7" bundle)" = "$BA_PIPE" ] && echo même bundle || echo "autre bundle ($(ba_param "$BA_J7" bundle | cut -d@ -f2 | cut -c1-19)…)")"
+  echo "gabarit en service : pipeline $(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value')"
+  (umask 077 && mkdir -p "$T/auth")   # forgejo_livrer : en-tête du jeton, retiré aussitôt
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap 'ba_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT   # remplace le piège du script : nettoyage repris
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] || { echo "KO   passage du rattrapage toujours actif" >&2; exit 1; }
+  echo "CronJob rattrapage suspendu (aucun passage actif)"
+  ee_calme
+  ee_controle depart
+  [ -z "$(ee_anomalies depart)" ] && echo "OK   départ : aucune anomalie" \
+    || { ee_anomalies depart | sed 's/^/  /'; echo "KO   départ : anomalies" >&2; exit 1; }
+  couverture > /dev/null
+  BA_O0=$(wc -l < "$T/orphelins")
+  BA_SRC=$(jq -nc --arg u "$BA_URL" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  e0=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  echo "$APP : $(etat_app)"
+
+  echo "## gabarit"
+  sed "s#@PIPELINE@#$BA_PIPE#" "$here/politique/gabarit-sample-app.yaml" > "$T/ba-gabarit.yaml"
+  ! grep -n '@[A-Z_]*@' "$T/ba-gabarit.yaml" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans le gabarit" >&2; exit 1; }
+  kubectl create --dry-run=client -f "$T/ba-gabarit.yaml" -o json | jq --arg c "$TETE_J2" --arg u "$BA_URL" '.spec.resourcetemplates[0]
+    | .metadata.name = "bascule-a-blanc" | walk(if type == "string" then gsub("\\$\\(tt.params.commit\\)"; $c) | gsub("\\$\\(tt.params.depot\\)"; $u) else . end)' > "$T/ba-pr.json"
+  ! grep -q '\$(tt\.' "$T/ba-pr.json" || { echo "KO   variable du gabarit non remplacée" >&2; exit 1; }
+  temoin "PipelineRun du gabarit, au nom de el-forgejo" el "$T/ba-pr.json"
+  temoin "PipelineRun du gabarit, au nom du rattrapage" rattrapage "$T/ba-pr.json"
+  kubectl apply --server-side -f "$T/ba-gabarit.yaml" >/dev/null
+  ba_attendu "gabarit en service" "$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params
+    | (.[] | select(.name == "name") | .value) + "@" + (.[] | select(.name == "bundle") | .value)')" "sample-app@$BA_PIPE"
+  sleep 5   # informateur de l'EventListener
+
+  echo "## chemin 1 : livraison de Forgejo"
+  purger_pr "$BA_PR"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  code=$(forgejo_livrer)
+  ba_attendu "Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
+  ba_chemin webhook "EventListener forgejo" declencheurs:el-forgejo "$t0"
+  u1=$BA_UID
+
+  echo "## chemin 2 : rattrapage"
+  purger_pr "$BA_PR"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  ba_reprendre
+  ba_chemin rattrapage rattrapage declencheurs:rattrapage "$t0"
+  # À la reprise, le contrôleur lance aussitôt le passage manqué pendant la suspension, puis celui de la minute (deuxième passage,
+  # archivé : deux jobs à 11 s d'écart, le second PRESENT) : journaux de tous les passages créés depuis la reprise
+  : > "$T/rattrapage-passages.log"
+  for j in $(kubectl get jobs -n declencheurs -o json | jq -r --arg t "$t0" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
+      and .name == "rattrapage") and .metadata.creationTimestamp >= $t)] | sort_by(.metadata.creationTimestamp) | .[].metadata.name'); do
+    journal_rattrapage "$j" | sed "s/^/$j/"
+    sed "s/^/$j /" "$T/rattrapage.log" >> "$T/rattrapage-passages.log"
+  done
+  n=$(grep -c " CREE|builds/$BA_PR|commit $TETE_J2|depot $BA_URL$" "$T/rattrapage-passages.log" || true)
+  ba_attendu "rattrapage : créations de $BA_PR dans les journaux des passages depuis la reprise" "$n" 1
+  [ "$BA_UID" != "$u1" ] || { echo "KO   même UID qu'au chemin 1" >&2; exit 1; }
+  diff "$T/ba-webhook.spec" "$T/ba-rattrapage.spec" >/dev/null && echo "OK   spec identique par les deux chemins" \
+    || { echo "KO   specs différentes selon le chemin" >&2; exit 1; }
+
+  echo "## rejeu de la livraison"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  code=$(forgejo_livrer)
+  ba_attendu "Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
+  n=0
+  for _ in $(seq 30); do n=$(el_existe "$t0" | grep -c . || true); [ "$n" -ge 1 ] && break; sleep 2; done
+  el_existe "$t0" | sed 's/^/  /'
+  [ "$n" -ge 1 ] && echo "OK   rejeu refusé à la création (already exists)" || { echo "KO   aucun refus « already exists » de l'EventListener" >&2; exit 1; }
+  ba_attendu "UID de $BA_PR après le rejeu" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')" "$BA_UID"
+
+  echo "## fin"
+  ee_calme
+  ee_controle fin
+  [ -z "$(ee_anomalies fin)" ] && echo "OK   fin : aucune anomalie" \
+    || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies" >&2; k=1; }
+  e1=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  ba_attendu "enveloppes de Chains sur $APP" "$e0 → $e1" "$e0 → $((e0 + 4))"
+  echo "$APP : $(etat_app)"
+
+  echo "## posture du gabarit en service, de sa pipeline et de ses tâches (bundles de Zot)"
+  rm -rf "$T/posture/bascule" && mkdir -p "$T/posture/bascule"
+  kubectl get triggertemplate -n declencheurs sample-app -o json \
+    | jq '{apiVersion, kind, metadata: {name: .metadata.name, namespace: .metadata.namespace}, spec}' > "$T/posture/bascule/triggertemplate-sample-app.yaml"
+  cp "$T/ba-pipeline.json" "$T/posture/bascule/pipeline-sample-app.yaml"
+  while read -r n j; do
+    SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/${j#*/}" - | tar -xO > "$T/posture/bascule/tache-$n.yaml"
+  done < <(jq -r '.spec.tasks[] | "\(.name) \(.taskRef.params[] | select(.name == "bundle") | .value)"' "$T/ba-pipeline.json")
+  lint "$T/posture/bascule.json" bascule/*.yaml
+  jq -r '.[] | "  \(.level) \(.rule) \(.path):\(.loc.startLine) \(.message)"' "$T/posture/bascule.json"
+  [ "$(jq length "$T/posture/bascule.json")" = 0 ] && echo "OK   $(ls "$T/posture/bascule" | wc -l) ressources : aucun signalement, comme prédit" \
+    || { echo "KO   $(jq length "$T/posture/bascule.json") signalement(s)" >&2; k=1; }
+  [ "$k" = 0 ] || { echo "KO   bascule : mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"

@@ -99,6 +99,15 @@ $([ -n "${2:-}" ] && printf '          tsaCertChain: |\n' && sed 's/^/          
 EOF
 }
 
+gabarit_essai() { # l'étape suppose le gabarit d'essai de J6 (declencheurs.yaml, pipeline sample-app-essai) ; KO sinon, notamment
+  # après la bascule de J8 (preuves.sh bascule, politique/gabarit-sample-app.yaml) : à rejouer avant elle, ou après
+  # politique.sh declencheurs (qui remet le gabarit d'essai)
+  local n
+  n=$(kubectl get triggertemplate -n declencheurs sample-app -o json 2>/dev/null \
+    | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value') || n=""
+  [ "$n" = sample-app-essai ] || { echo "KO   gabarit en service : pipeline ${n:-absente} ; l'étape suppose le gabarit d'essai de J6 (politique.sh declencheurs)" >&2; exit 1; }
+}
+
 EL_NS=${EL_NS:-builds}   # espace de l'EventListener forgejo : builds en J4, declencheurs depuis J6
 purger_pr() { # --all | nom… : PipelineRuns de builds supprimés, puis leurs TaskRuns (label tekton.dev/pipelineRun),
   # attendus disparus. La suppression au premier plan ne suffit pas : Chains v0.29.9 retire sa finalisation par

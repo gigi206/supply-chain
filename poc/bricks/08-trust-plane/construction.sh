@@ -256,7 +256,7 @@ pr_j7() { # nom kata|- [bundle de pipeline] [labels JSON] : PipelineRun du gabar
       | .spec.params |= map(if .name == "commit" then .value = $c elif .name == "depot" then .value = $u else . end)
       | .spec.workspaces = [{name: "sortie", volumeClaimTemplate: {spec: {accessModes: ["ReadWriteOnce"], resources: {requests: {storage: "1Gi"}}}}}]
       | if $k == "kata" then .spec.taskRunSpecs = [{pipelineTaskName: "construire",
-          podTemplate: (.spec.taskRunTemplate.podTemplate + {runtimeClassName: "kata"})}] else . end
+          podTemplate: (.spec.taskRunTemplate.podTemplate + {runtimeClassName: "kata"})}] else del(.spec.taskRunSpecs) end
       | if $l != null then .spec.taskRunSpecs[0].metadata = {labels: $l} else . end' > "$T/pr-$1.json"
 }
 
