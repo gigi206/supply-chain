@@ -40,6 +40,8 @@
 #          citant construire-image c7e8b275, retirée de la liste : seule, plus récente, plus ancienne, à égalité, sans date), puis
 #          par de vraies signatures de Chains sur builds/essai-webhook (tâche signée hors liste, bundle tekton/tasks/preuve-test7,
 #          puis gabarit en service). Trace : verdicts de ec, motifs, provenances du tag .att
+#   attseule complément du test 7 : témoin d'essais-j8/test7 à attestation signée (clé jetable) sans signature d'image (constat
+#          du banc C), jugé par la porte avec la source attendue. Trace : verdict de ec, motifs
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -903,7 +905,7 @@ t7_temoin() { # cas prov… : image témoin de T7_DEPOT signée par la clé jeta
   jq -nc --arg r "$REG/$T7_DEPOT" --arg d "$d" '{critical: {identity: {"docker-reference": $r}, image: {"docker-manifest-digest": $d},
     type: "cosign container image signature"}, optional: null}' > "$T/t7-$c-simple.json"
   openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/t7-$c-simple.json.sig" "$T/t7-$c-simple.json"
-  OCI_DEPOT=$T7_DEPOT oci_signe "$d" application/vnd.dev.cosign.simplesigning.v1+json sig "$T/t7-$c-simple.json"
+  [ -n "${T7_SANS_SIG:-}" ] || OCI_DEPOT=$T7_DEPOT oci_signe "$d" application/vnd.dev.cosign.simplesigning.v1+json sig "$T/t7-$c-simple.json"
   pt=$(jq -r .payloadType "$T/rc-env-chains.json")
   for p in "${@:2}"; do
     i=$((i + 1))
@@ -915,7 +917,7 @@ t7_temoin() { # cas prov… : image témoin de T7_DEPOT signée par la clé jeta
     envs+=("$T/t7-$c-$i.env")
   done
   OCI_DEPOT=$T7_DEPOT oci_signe "$d" application/vnd.dsse.envelope.v1+json att "${envs[@]}"
-  echo "$c : $T7_DEPOT@$d ; enveloppes dans l'ordre des couches : $(for p in "${@:2}"; do jq -r --arg p "$p" '.predicate as $q
+  echo "$c : $T7_DEPOT@$d${T7_SANS_SIG:+ (aucun tag .sig)} ; enveloppes dans l'ordre des couches : $(for p in "${@:2}"; do jq -r --arg p "$p" '.predicate as $q
     | ([$q.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and (.uri // "" | endswith("/construire-image")))][0].digest.sha256[0:8]) as $t
     | "\($p) (construire-image \($t), finishedOn \($q.runDetails.metadata.finishedOn // "absent"))"' "$T/t7-$p.prov"; done | paste -sd' ' -)"
   echo "  sur l'hôte, clé jetable : signature $(cosign verify --key "$T/rc.pub" --insecure-ignore-tlog --registry-cacert "$P/ca-poc.crt" \
@@ -1102,6 +1104,46 @@ etape_test7() {
     || { echo "KO   en-service : trusted_task.trusted absente des succès, ou provenance de preuve-test7 perdue" >&2; ko=$((ko + 1)); }
   garder apres
   [ "$ko" = 0 ] || { echo "KO   test 7 : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
+}
+
+etape_attseule() { # test 7, complément : attestation signée sans signature d'image (constat du banc C), dans la porte du cluster
+  local r v ko=0
+  echo "## prédiction (étape séparée du test 7 : le rejouer remettrait des provenances permanentes sur builds/essai-webhook)"
+  echo "témoin att-seule ($T7_DEPOT, ConfigMap porte-temoin, source attendue) : provenance réelle listée au sujet réécrit, tag .att signé"
+  echo "  par une clé jetable, aucun tag .sig (Chains reste en mode dsse : la porte doit refuser une attestation valide sans signature) ;"
+  echo "  refusée, builtin.image.signature_check présent, builtin.attestation.signature_check absent (l'attestation est valide) ;"
+  echo "  ensemble complet relevé (ec évalue-t-il les règles quand une seule des deux vérifications échoue : non lu)"
+  echo "non couvert : le format bundle de cosign v3 (referrers), qui faisait passer l'attaque au banc C ; Chains est en mode dsse"
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}') "$here/politique/porte/porte.rego" \
+    && echo "OK   ConfigMap porte : porte.rego identique au fichier versionné" || { echo "KO   ConfigMap porte différente" >&2; exit 1; }
+  garder avant
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/zot.json"
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ)
+  (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/auth/rc.key")
+  openssl pkey -in "$T/auth/rc.key" -pubout -out "$T/rc.pub"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null \
+    | jq -c 'select(.payload | @base64d | fromjson | .predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)' \
+    | jq -sc 'max_by(.payload | @base64d | fromjson | .predicate.runDetails.metadata.finishedOn)' > "$T/rc-env-chains.json"
+  jq -r .payload "$T/rc-env-chains.json" | base64 -d > "$T/rc-prov.json"
+  t7_prov L '.'
+  T7_SANS_SIG=1 t7_temoin att-seule L
+  echo "tags du témoin : $(SSL_CERT_FILE=$P/ca-poc.crt crane ls "$REG_HOTE/$T7_DEPOT" 2>/dev/null | grep -F "$(cut -c8-71 "$T/t7-att-seule.image")" | sed 's/^sha256-.\{64\}//' | paste -sd' ' -)"
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/rc.pub" '.data["chains.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  r=$(juger t7-att-seule "$REG/$T7_DEPOT@$(cat "$T/t7-att-seule.image")" policy.yaml porte-temoin \
+    "$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')")
+  echo "  $r"
+  v=$(cut -d'|' -f4 <<< "$r")
+  [ "$(cut -d'|' -f1,3 <<< "$r")" = "VERDICT|false" ] && grep -qw builtin.image.signature_check <<< "$v" && ! grep -qw builtin.attestation.signature_check <<< "$v" \
+    && echo "OK   att-seule : refusée par builtin.image.signature_check, attestation acceptée ; violations : $v" \
+    || { echo "KO   att-seule : prédiction" >&2; ko=1; }
+  jq -r '[.components[] | .violations[]?] | map("\(.metadata.code) : \(.msg | .[0:160])") | .[]' "$T/porte-t7-att-seule.json" | sed 's/^/  motif : /'
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie"
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   att-seule : mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"
