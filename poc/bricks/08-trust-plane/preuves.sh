@@ -2284,6 +2284,14 @@ etape_helm_cilium() {
     [ "$(kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true)" = yes ] && echo "$u" >> "$T/hc-createurs"
   done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
   echo "comptes de service qui peuvent créer des pods dans kube-system (hors helm-cilium) : $(wc -l < "$T/hc-createurs")"
+  kubectl get clusterrolebinding -o json > "$T/hc-crbs.json"
+  kubectl get clusterrole -o json > "$T/hc-crs.json"
+  while read -r u; do   # liaisons d'ensemble du cluster qui donnent create sur pods (rôles des release.yaml amont pour Tekton et Chains)
+    echo "  $u : $(jq -r --arg u "$u" --slurpfile r "$T/hc-crs.json" '[.items[] | select(any(.subjects[]?; (.kind == "ServiceAccount"
+      and "system:serviceaccount:\(.namespace):\(.name)" == $u) or (.kind == "User" and .name == $u))) | .roleRef.name as $n
+      | select(any($r[0].items[] | select(.metadata.name == $n) | .rules[]?; ((.resources // []) | index("pods") or index("*"))
+        and ((.verbs // []) | index("create") or index("*")))) | "\(.metadata.name) → \($n)"] | if length == 0 then "aucune ClusterRoleBinding directe" else join(", ") end' "$T/hc-crbs.json")"
+  done < "$T/hc-createurs"
   hc_pod helm-cilium "$T/hc-pod.json"
   hc_pod default "$T/hc-pod-default.json"
   while read -r u; do

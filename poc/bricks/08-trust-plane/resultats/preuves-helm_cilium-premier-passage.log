@@ -1,0 +1,51 @@
+# preuves.sh helm_cilium, 2026-11-01T17:40:10Z
+Prédiction (écrite avant le premier passage, d'après chart.go de helm-controller v0.17.9 et pkg/server/server.go de k3s
+v1.35.9+k3s1, commit 58877f27) :
+- liaison helm-kube-system-cilium vers cluster-admin, sujet helm-cilium seul ; helm-cilium peut tout ; aucun Secret de jeton de compte de
+  service dans le cluster ; job helm-install-cilium terminé ; release cilium deployed, hash égal au configHash du job (ErrSkip)
+- pod portant helm-cilium dans kube-system admis en dry-run serveur au nom de chaque compte qui peut y créer des pods (aucune
+  règle d'admission ne nomme le compte d'un pod de kube-system) ; témoin : même pod avec le compte default, admis aussi
+- liaison retirée : helm-cilium ne peut plus tout ; HelmChart réconcilié (annotation) : le contrôleur passe par ErrSkip, ne
+  relance pas le job (même UID, aucun événement ApplyJob) et ne recrée pas la liaison ; agents de Cilium toujours prêts
+- liaison remise par trap, identique (roleRef, sujets, hash de wrangler) ; non essayé : relance du job (cilium.sh appliquer,
+  suppression du job), qui recréerait la liaison d'après le code mais refait le helm upgrade de Cilium
+## lectures
+  {"roleRef":"cluster-admin","sujets":["ServiceAccount kube-system/helm-cilium"],"proprietaires":0}
+OK   rôle lié à helm-cilium : cluster-admin helm-cilium
+OK   can-i '*' '*' au nom de helm-cilium : yes
+OK   Secrets de jeton de compte de service dans le cluster : 0
+OK   job helm-install-cilium terminé : 1
+OK   release cilium : statut et hash (configHash du job, 63 caractères) : deployed C98704B929141DE4DB447BCDB6046FA98D68835F6FF6B70B3CB181A765B63A4
+  jeton du pod du job (projeté, expirationSeconds 3607) : pod Succeeded, volume projeté démonté (lu sur sc-confiance) : 0 entrée
+## chemin : pod portant helm-cilium dans kube-system (dry-run serveur)
+comptes de service qui peuvent créer des pods dans kube-system (hors helm-cilium) : 9
+OK   system:serviceaccount:kube-system:daemon-set-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:job-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:local-path-provisioner-service-account : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:persistent-volume-binder : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replicaset-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replication-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:statefulset-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod à helm-cilium admis
+  témoin, compte default : admis
+OK   témoin négatif, compte build : error when creating "~/.cache/supply-chain-poc/08/travail/preuves/hc-pod.json": pods is forbidden: User "system:serviceaccount:builds:build" cannot cre
+## retrait de la liaison
+OK   can-i '*' '*' au nom de helm-cilium, liaison retirée : no
+HelmChart annoté (2026-11-01T17:40:14Z) : réconciliation forcée ; attente de 60 s
+OK   liaison recréée par le contrôleur après 60 s : 0
+OK   UID du job helm-install-cilium : d0a6cf69-3571-4824-b5ee-dd6ff5bc9c99
+OK   événements ApplyJob du HelmChart depuis le retrait : 0
+OK   agents et opérateur de Cilium prêts : 3/3 1
+OK   can-i '*' '*' au nom de helm-cilium, après la réconciliation : no
+## remise
+OK   liaison helm-kube-system-cilium remise : roleRef, sujets et hash identiques, helm-cilium peut de nouveau tout
+OK   can-i '*' '*' au nom de helm-cilium, liaison remise : yes

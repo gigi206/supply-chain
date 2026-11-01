@@ -1,4 +1,4 @@
-# preuves.sh helm_cilium, 2026-11-01T17:40:10Z
+# preuves.sh helm_cilium, 2026-11-01T17:43:56Z
 Prédiction (écrite avant le premier passage, d'après chart.go de helm-controller v0.17.9 et pkg/server/server.go de k3s
 v1.35.9+k3s1, commit 58877f27) :
 - liaison helm-kube-system-cilium vers cluster-admin, sujet helm-cilium seul ; helm-cilium peut tout ; aucun Secret de jeton de compte de
@@ -19,6 +19,15 @@ OK   release cilium : statut et hash (configHash du job, 63 caractères) : deplo
   jeton du pod du job (projeté, expirationSeconds 3607) : pod Succeeded, volume projeté démonté (lu sur sc-confiance) : 0 entrée
 ## chemin : pod portant helm-cilium dans kube-system (dry-run serveur)
 comptes de service qui peuvent créer des pods dans kube-system (hors helm-cilium) : 9
+  system:serviceaccount:kube-system:daemon-set-controller : system:controller:daemon-set-controller → system:controller:daemon-set-controller
+  system:serviceaccount:kube-system:job-controller : system:controller:job-controller → system:controller:job-controller
+  system:serviceaccount:kube-system:local-path-provisioner-service-account : local-path-provisioner-bind → local-path-provisioner-role
+  system:serviceaccount:kube-system:persistent-volume-binder : system:controller:persistent-volume-binder → system:controller:persistent-volume-binder
+  system:serviceaccount:kube-system:replicaset-controller : system:controller:replicaset-controller → system:controller:replicaset-controller
+  system:serviceaccount:kube-system:replication-controller : system:controller:replication-controller → system:controller:replication-controller
+  system:serviceaccount:kube-system:statefulset-controller : system:controller:statefulset-controller → system:controller:statefulset-controller
+  system:serviceaccount:tekton-chains:tekton-chains-controller : tekton-chains-controller-tenant-access → tekton-chains-controller-tenant-access
+  system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : tekton-pipelines-controller-tenant-access → tekton-pipelines-controller-tenant-access
 OK   system:serviceaccount:kube-system:daemon-set-controller : pod à helm-cilium admis
   témoin, compte default : admis
 OK   system:serviceaccount:kube-system:job-controller : pod à helm-cilium admis
@@ -40,7 +49,7 @@ OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod à
 OK   témoin négatif, compte build : error when creating "~/.cache/supply-chain-poc/08/travail/preuves/hc-pod.json": pods is forbidden: User "system:serviceaccount:builds:build" cannot cre
 ## retrait de la liaison
 OK   can-i '*' '*' au nom de helm-cilium, liaison retirée : no
-HelmChart annoté (2026-11-01T17:40:14Z) : réconciliation forcée ; attente de 60 s
+HelmChart annoté (2026-11-01T17:44:00Z) : réconciliation forcée ; attente de 60 s
 OK   liaison recréée par le contrôleur après 60 s : 0
 OK   UID du job helm-install-cilium : d0a6cf69-3571-4824-b5ee-dd6ff5bc9c99
 OK   événements ApplyJob du HelmChart depuis le retrait : 0
