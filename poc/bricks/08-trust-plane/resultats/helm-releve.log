@@ -1,0 +1,47 @@
+# relevé de santé et vérification de Helm v4.3.1, 2026-11-01T18:04:14Z (brique 08, option (b) du propriétaire du 01/11/2026)
+## Scorecard (api.securityscorecards.dev)
+{"score":9.1,"date":"2026-11-01T07:28:57Z","checks":{"Code-Review":10,"Dependency-Update-Tool":10,"Maintained":10,"Dangerous-Workflow":10,"Packaging":-1,"Security-Policy":9,"Binary-Artifacts":10,"Token-Permissions":10,"Pinned-Dependencies":10,"CII-Best-Practices":5,"SAST":10,"Fuzzing":10,"Signed-Releases":8,"Branch-Protection":5,"License":10,"Vulnerabilities":7,"CI-Tests":10,"Contributors":10}}
+## dépôt
+archivé=false dernier push=2026-10-30T09:53:59Z licence=Apache-2.0
+## releases (6 dernières)
+v4.3.1 2026-10-15T01:08:37Z prerelease=false
+v3.22.1 2026-10-15T17:02:01Z prerelease=false
+v4.3.0 2026-09-09T23:51:48Z prerelease=false
+v3.22.0 2026-09-10T00:08:41Z prerelease=false
+v4.3.0-rc.1 2026-08-31T22:09:46Z prerelease=true
+v3.22.0-rc.1 2026-08-31T22:56:05Z prerelease=true
+## commits depuis 2026-08-03T18:04:14Z (pagination plafonnée par l'API à 100 lignes ici : au moins)
+100
+domaines des adresses d'auteur :
+     58 users.noreply.github.com
+     25 gmail.com
+      8 outlook.com
+      4 suse.com
+      2 qq.com
+      1 ucsd.edu
+      1 r6by.com
+      1 nvidia.com
+## mainteneurs (OWNERS au tag v4.3.1)
+10
+## sécurité
+SECURITY.md présent (171 octets)
+avis publiés : 24, dont depuis le 01/11/2025 :
+  GHSA-vmx8-mqv2-9gmg 2026-04-09 high
+  GHSA-q5jf-9vfq-h4h7 2026-04-09 critical
+  GHSA-hr2v-4r36-88hr 2026-04-09 medium
+versions touchées (v4.3.1 hors plage) :
+  GHSA-vmx8-mqv2-9gmg : >=4.0.0,<=4.1.3 corrigé en 4.1.4
+  GHSA-q5jf-9vfq-h4h7 : >=4.0.0,<=4.1.3 corrigé en 4.1.4
+  GHSA-hr2v-4r36-88hr : <=3.20.1,<=4.1.3 corrigé en 3.20.2,4.1.4
+## assets de v4.3.1 : provenance ?
+assets de provenance ou de signature sigstore : 0
+## vérification GPG du tarball linux-amd64 (tarball de get.helm.sh, .asc de la release GitHub, clés du fichier KEYS au tag)
+gpg: Signature made Thu Oct 15 03:01:46 2026 CEST
+gpg:                using RSA key 208DD36ED5BB3745A16743A4C7C6FBB5B91C1155
+gpg: Good signature from "Scott Rigby <scott@r6by.com>" [unknown]
+gpg: Signature notation: manu=2,2.5+1.12,0,3
+Primary key fingerprint: 208D D36E D5BB 3745 A167  43A4 C7C6 FBB5 B91C 1155
+empreinte annoncée dans les notes de version : signed with `208D D36E D5BB 3745 A167 43A4 C7C6 FBB5 B91C 1155`
+sha256 du tarball : 0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b
+sha256 de mise.lock : 0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b
+binaire installé : v4.3.1+gc0d08d0
