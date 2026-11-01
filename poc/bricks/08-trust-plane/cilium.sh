@@ -114,7 +114,7 @@ etape_installer() {
   echo "## release cilium (helm $(helm version --short), depuis l'hôte)"
   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" --reset-values \
     --server-side=true --wait=watcher --timeout 5m --hide-notes
-  attendu "release cilium : statut et version" "$(helm status cilium -n kube-system -o json | jq -r '"\(.info.status) \(.chart.metadata.version)"')" "deployed $CILIUM_VER"
+  attendu "release cilium : statut et version" "$(helm list -n kube-system -f '^cilium$' -o json | jq -r '.[] | "\(.status) \(.chart)"')" "deployed cilium-$CILIUM_VER"
 }
 
 etape_appliquer() {
@@ -150,7 +150,7 @@ etape_verifier() {
   kubectl wait node --all --for=condition=Ready --timeout=300s > /dev/null && echo "OK   nœuds prêts"
   kubectl -n kube-system rollout status ds/cilium --timeout=300s > /dev/null
   kubectl -n kube-system rollout status deploy/cilium-operator --timeout=300s > /dev/null
-  attendu "release Helm cilium (depuis l'hôte)" "$(helm status cilium -n kube-system -o json | jq -r '"\(.info.status) \(.chart.metadata.version)"')" "deployed $CILIUM_VER"
+  attendu "release Helm cilium (depuis l'hôte)" "$(helm list -n kube-system -f '^cilium$' -o json | jq -r '.[] | "\(.status) \(.chart)"')" "deployed cilium-$CILIUM_VER"
   if kubectl get crd helmcharts.helm.cattle.io >/dev/null 2>&1; then
     attendu "HelmCharts du cluster (CRD présente)" "$(kubectl get helmcharts.helm.cattle.io -A -o name | grep -c . || true)" 0
   else

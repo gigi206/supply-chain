@@ -1486,3 +1486,8 @@ J8 helm_cilium	2026-11-01T17:43:56Z
 J8 helm_cilium fait	2026-11-01T17:45:01Z	
 J7 rendre	2026-11-01T18:08:39Z	
 J7 rendre fait	2026-11-01T18:08:39Z	
+VM, pool et réseau détruits	2026-11-01T18:08:57Z	
+J1 VM définies	2026-11-01T18:09:03Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-11-01T18:09:13Z	
+J1 installation de k3s	2026-11-01T18:09:14Z	
+J7 installer	2026-11-01T18:09:29Z	

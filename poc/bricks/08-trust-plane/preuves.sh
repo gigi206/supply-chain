@@ -2260,7 +2260,7 @@ etape_helm_cilium() {
   fi
   ba_attendu "comptes de service helm-*" "$(kubectl get sa -A -o name | grep -c '/helm-' || true)" 0
   ba_attendu "liaisons helm-*" "$(jq -r '.items[].metadata.name' "$T/hc-liaisons.json" | grep -c '^helm-' || true)" 0
-  ba_attendu "release Helm cilium (depuis l'hôte)" "$(helm status cilium -n kube-system -o json | jq -r '.info.status')" deployed
+  ba_attendu "release Helm cilium (depuis l'hôte)" "$(helm list -n kube-system -f '^cilium$' -o json | jq -r '.[] | "\(.status) \(.chart)"')" "deployed cilium-1.20.4"
   ba_attendu "can-i '*' '*' au nom de helm-cilium (compte absent)" "$(kubectl auth can-i '*' '*' --as "$HC_SA" 2>/dev/null || true)" no
 
   echo "## pod portant helm-cilium dans kube-system (dry-run serveur)"
