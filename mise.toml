@@ -234,7 +234,7 @@ description = "Brique 08, J6 : politique ; Kyverno v1.19.2 (images signées vér
 run = "poc/bricks/08-trust-plane/politique.sh"
 
 [tasks."confiance:cilium"]
-description = "Brique 08, J7 : réseau Cilium 1.20.4 (option 1b accordée par le propriétaire) ; chart et images vérifiés par cosign, archives OCI amd64 et HelmChart sur l'hôte, puis contrôle après J1 (étapes : telecharger verifier)"
+description = "Brique 08, J7 : réseau Cilium 1.20.4 (option 1b accordée par le propriétaire) ; chart et images vérifiés par cosign, archives OCI amd64 sur l'hôte ; installation depuis l'hôte par Helm (option (b), contrôleur Helm de k3s désactivé), puis contrôle après J1 (étapes : telecharger rendre installer appliquer verifier)"
 run = "poc/bricks/08-trust-plane/cilium.sh"
 
 [tasks."confiance:preuves"]

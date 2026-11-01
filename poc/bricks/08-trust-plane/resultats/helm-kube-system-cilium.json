@@ -1,0 +1,32 @@
+{
+  "apiVersion": "rbac.authorization.k8s.io/v1",
+  "kind": "ClusterRoleBinding",
+  "metadata": {
+    "annotations": {
+      "objectset.rio.cattle.io/applied": "H4sIAAAAAAAA/4yRT2+bQBDFv0o1Z6A1/gdIPbQ+tFJvrtRLlcMwTMyEZRftDkSJ5e8egR3LkWInx/3zfvPmvT1gJ//YB3EWCvAlUoK91s7LM6o4mzRZSMR9HWYQQSO2ggI2pg/KfusM/xRbid1BBC0rVqgIxR7QWqeTPIxHVz4waWBNvLiEUNXwyJQRVrNpY3JWvTOGfUw1eo097ySonxgQXSW4R8s+3g3NCXTxNMyiL3/EVt9/s2k3I/RDjsWWoQASI337qd+hQxolTV9yHJ6CcguHCAyWbG6uXmOooYBvGVVpli7W6Zoom1M+xwUt8nVJeZous1VOq3yZp6sRenI35XUxLz7ZPUTgneEt308NdPLLu7671em7hcJ5EB0vY6xasSM+9MdloPi/f1X+ZT8I8Q8i11uFty7PQV6N6u7wEgAA///hn07BgQIAAA",
+      "objectset.rio.cattle.io/id": "helm-controller-chart-registration",
+      "objectset.rio.cattle.io/owner-gvk": "helm.cattle.io/v1, Kind=HelmChart",
+      "objectset.rio.cattle.io/owner-name": "cilium",
+      "objectset.rio.cattle.io/owner-namespace": "kube-system"
+    },
+    "creationTimestamp": "2026-11-01T17:41:15Z",
+    "labels": {
+      "objectset.rio.cattle.io/hash": "08cd2824727cc83c93a4c497bc9225869c695926"
+    },
+    "name": "helm-kube-system-cilium",
+    "resourceVersion": "49137",
+    "uid": "48a073e4-c17e-4092-b89f-a6c412429d67"
+  },
+  "roleRef": {
+    "apiGroup": "rbac.authorization.k8s.io",
+    "kind": "ClusterRole",
+    "name": "cluster-admin"
+  },
+  "subjects": [
+    {
+      "kind": "ServiceAccount",
+      "name": "helm-cilium",
+      "namespace": "kube-system"
+    }
+  ]
+}

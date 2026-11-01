@@ -6,9 +6,11 @@
 #   le jeton agent au format sécurisé (K10<empreinte de la CA>::…), après contrôle de cette empreinte ;
 #   kubeconfig dédié ~/.kube/supply-chain-poc.yaml (0600), jamais fusionné dans ~/.kube/config.
 #   RESEAU=cilium (J7, option 1b ; défaut depuis la décision du propriétaire du 30/10/2026 de garder Cilium) : server sans flannel ni kube-router
-#   (k3s/sc-confiance-cilium.yaml en fichier d'appoint), HelmChart cilium (chart vérifié en base64) dans les manifestes du server,
-#   archives OCI amd64 de Cilium avec les images airgap ; tout est préparé par cilium.sh telecharger et revérifié par sha256
-#   dans chaque VM. Les nœuds ne sont prêts qu'une fois l'agent Cilium démarré. RESEAU=flannel : flannel et kube-router de k3s
+#   (k3s/sc-confiance-cilium.yaml en fichier d'appoint), contrôleur Helm de k3s désactivé (option (b) du propriétaire du
+#   01/11/2026 : plus de compte helm-cilium à cluster-admin), archives OCI amd64 de Cilium avec les images airgap, préparées par
+#   cilium.sh telecharger et revérifiées par sha256 dans chaque VM ; Cilium installé depuis l'hôte (cilium.sh installer, Helm)
+#   dès que l'API du server répond, avant d'attendre le nœud. Les nœuds ne sont prêts qu'une fois l'agent Cilium démarré.
+#   RESEAU=flannel : flannel et kube-router de k3s
 #   (retour arrière ; chemin non rejoué depuis les adaptations de J7).
 #
 # Usage (racine du dépôt) : mise run confiance:k3s
@@ -64,12 +66,11 @@ installer() { # vm server|agent
     sommes=$(grep ' cilium-amd64.tar$' "$CIL/sums.txt")
     reseau="install -m 0644 cilium-amd64.tar /var/lib/rancher/k3s/agent/images/cilium-amd64.tar"
     if [ "$role" = server ]; then
-      fichiers+=("$CIL/operator-generic-amd64.tar" "$CIL/cilium-helmchart.yaml" "$here/k3s/sc-confiance-cilium.yaml")
-      sommes=$(grep -E ' (cilium|operator-generic)-amd64.tar$| cilium-helmchart.yaml$' "$CIL/sums.txt")
+      fichiers+=("$CIL/operator-generic-amd64.tar" "$here/k3s/sc-confiance-cilium.yaml")
+      sommes=$(grep -E ' (cilium|operator-generic)-amd64.tar$' "$CIL/sums.txt")
       reseau="$reseau; install -m 0644 operator-generic-amd64.tar /var/lib/rancher/k3s/agent/images/operator-generic-amd64.tar"
-      reseau="$reseau; install -d -m 0700 /etc/rancher/k3s/config.yaml.d /var/lib/rancher/k3s/server/manifests"
+      reseau="$reseau; install -d -m 0700 /etc/rancher/k3s/config.yaml.d"
       reseau="$reseau; install -m 0600 sc-confiance-cilium.yaml /etc/rancher/k3s/config.yaml.d/reseau.yaml"
-      reseau="$reseau; install -m 0600 cilium-helmchart.yaml /var/lib/rancher/k3s/server/manifests/cilium.yaml"
     fi
   fi
   sur "$vm" "rm -rf $d && mkdir -m 0700 $d"
@@ -115,8 +116,22 @@ pret() { # nœuds attendus…
   echo "nœuds non prêts : $*" >&2; return 1
 }
 
+kubeconfig() { # kubeconfig dédié du PoC, lu par les scripts des jalons et par helm
+  mkdir -p "$(dirname "$KUBECONFIG_POC")"
+  (umask 077 && sur sc-confiance "sudo cat /etc/rancher/k3s/k3s.yaml" \
+    | sed -e 's#https://127.0.0.1:6443#https://192.168.161.11:6443#' -e 's/: default$/: supply-chain-poc/' > "$KUBECONFIG_POC")
+  echo "kubeconfig : $KUBECONFIG_POC ($(stat -c %a "$KUBECONFIG_POC"))"
+}
+
 chrono "J1 installation de k3s"
 installer sc-confiance server
+for _ in $(seq 90); do
+  sur sc-confiance "sudo k3s kubectl get --raw /readyz" 2>/dev/null | grep -x ok >/dev/null && break
+  sleep 2
+done
+sur sc-confiance "sudo k3s kubectl get --raw /readyz" | grep -x ok >/dev/null && echo "API du server prête (/readyz)"
+kubeconfig
+if [ "$RESEAU" = cilium ]; then "$here/cilium.sh" installer; fi
 pret sc-confiance
 chrono "J1 server prêt"
 
@@ -136,8 +151,4 @@ installer sc-stockage agent
 pret sc-confiance sc-build sc-stockage
 chrono "J1 trois nœuds prêts"
 
-mkdir -p "$(dirname "$KUBECONFIG_POC")"
-(umask 077 && sur sc-confiance "sudo cat /etc/rancher/k3s/k3s.yaml" \
-  | sed -e 's#https://127.0.0.1:6443#https://192.168.161.11:6443#' -e 's/: default$/: supply-chain-poc/' > "$KUBECONFIG_POC")
-echo "kubeconfig : $KUBECONFIG_POC ($(stat -c %a "$KUBECONFIG_POC"))"
 sur sc-confiance "sudo k3s kubectl get nodes -o wide -L zone"

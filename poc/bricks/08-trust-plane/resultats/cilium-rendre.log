@@ -1,0 +1,8 @@
+# cilium.sh rendre, 2026-11-01T18:08:39Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## empreintes (sums.txt)
+OK   archives des images inchangées
+  7d5d82c892510d7c17251c207259d4822c9f71c5613d3cab74a32ddd091f2b37  cilium-amd64.tar
+  01fbcd5456b4bb5d83408d82447f552fa9e5d96fd44a710269514bf5bf742c2e  operator-generic-amd64.tar
+  505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed  cilium-1.20.4.tgz

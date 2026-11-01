@@ -6,12 +6,17 @@
 #                témoin : identité du tag refusée), archive du chart (sha256 égal au digest publié par helm.cilium.io) ; images
 #                cilium et operator-generic : index vérifié par cosign (identité documentée au tag ; témoin : autre tag refusé),
 #                manifeste amd64 listé par l'index, archive OCI amd64 nommée par son tag et par son digest (le chart référence
-#                l'image par digest) ; HelmChart rendu (chart en base64, cilium/valeurs.yaml) ; empreintes dans sums.txt
-#   appliquer    HelmChart rendu de nouveau (cilium/valeurs.yaml modifié), installé sur sc-confiance (sha256 revérifié), mise à
-#                jour par le contrôleur Helm de k3s, agents et opérateur redémarrés (le chart ne le fait pas), configuration relue
+#                l'image par digest) ; empreintes dans sums.txt
+#   rendre       valeurs rendues (cilium/valeurs.yaml, digests amd64), archive du chart revérifiée, empreintes dans sums.txt, sans
+#                téléchargement
+#   installer    depuis l'hôte, appelé par k3s.sh dès que l'API répond (option (b) du propriétaire du 01/11/2026 : contrôleur Helm de
+#                k3s désactivé, plus de compte helm-cilium à cluster-admin) : helm upgrade --install de l'archive du chart revérifiée
+#                (Helm v4.3.1, mise.toml), release cilium dans kube-system, apply côté serveur, attente des ressources
+#   appliquer    cilium/valeurs.yaml modifié : installer, puis agents et opérateur redémarrés (le chart ne le fait pas), configuration
+#                relue
 #   verifier     après J1 (point d'arrêt du rejeu), prédiction d'abord : nœuds prêts, agents et opérateur prêts, images importées
 #                (digest amd64, aucun tirage), podCIDRs repris de k3s, état des agents, flannel et kube-router absents, binaire
-#                hubble dans l'agent, mémoire des agents
+#                hubble dans l'agent, mémoire des agents ; depuis l'option (b) : release Helm de l'hôte, ni HelmChart ni compte helm-*
 # Retrait : rejeu avec RESEAU=flannel (cluster recréé ; chemin non rejoué depuis les adaptations de J7).
 #
 # Usage (racine du dépôt) : mise run confiance:cilium -- <étape>…   (journal : resultats/cilium-<étape>.log)
@@ -79,30 +84,43 @@ etape_telecharger() {
   done
   ! signature "témoin : cilium avec l'identité du tag v1.20.3" "${IMAGES_ID%v$CILIUM_VER}v1.20.3" "quay.io/cilium/cilium@${INDEX[cilium]}" \
     || { echo "KO   témoin accepté" >&2; exit 1; }
-  rendre_helmchart
+  rendre_valeurs
+  NEUF=1 empreintes
   du -sm "$D" | awk '{print "téléchargements : " $1 " Mo"}'
 }
 
-rendre_helmchart() { # $D/cilium-helmchart.yaml (chart vérifié en base64, cilium/valeurs.yaml, digests amd64) ; empreintes dans sums.txt
-  echo "## HelmChart (chart en base64, valeurs de cilium/valeurs.yaml, digests amd64)"
+rendre_valeurs() { # $T/valeurs.yaml (cilium/valeurs.yaml, digests amd64) ; archive du chart revérifiée (digest épinglé)
+  echo "## valeurs (cilium/valeurs.yaml, digests amd64)"
   attendu "chart : archive" "sha256:$(sha256sum < "$D/cilium-$CILIUM_VER.tgz" | cut -c1-64)" "$CHART_TGZ"
   sed -e "s#@CILIUM_AMD64@#${AMD64[cilium]}#" -e "s#@OPERATOR_AMD64@#${AMD64[operator-generic]}#" "$here/cilium/valeurs.yaml" \
     | grep -v '^#' > "$T/valeurs.yaml"
   ! grep -n '@[A-Z0-9_]*@' "$T/valeurs.yaml" || { echo "KO   variable non rendue" >&2; exit 1; }
-  { printf 'apiVersion: helm.cattle.io/v1\nkind: HelmChart\nmetadata:\n  name: cilium\n  namespace: kube-system\nspec:\n'
-    printf '  bootstrap: true\n  targetNamespace: kube-system\n  chartContent: %s\n  valuesContent: |-\n' "$(base64 -w0 < "$D/cilium-$CILIUM_VER.tgz")"
-    sed 's/^/    /' "$T/valeurs.yaml"; } > "$D/cilium-helmchart.yaml"
-  (cd "$D" && sha256sum cilium-amd64.tar operator-generic-amd64.tar cilium-helmchart.yaml > sums.txt)
+}
+
+empreintes() { # archives des images et du chart, relues par k3s.sh dans chaque VM
+  echo "## empreintes (sums.txt)"
+  if [ -s "$D/sums.txt" ] && [ "${NEUF:-0}" != 1 ]; then   # archives déjà relevées : inchangées (NEUF=1 : téléchargement du passage)
+    (cd "$D" && grep -E ' (cilium|operator-generic)-amd64.tar$' sums.txt | sha256sum -c --quiet) && echo "OK   archives des images inchangées"
+  fi
+  rm -f "$D/cilium-helmchart.yaml"   # HelmChart de k3s, avant l'option (b)
+  (cd "$D" && sha256sum cilium-amd64.tar operator-generic-amd64.tar "cilium-$CILIUM_VER.tgz" > sums.txt)
   sed 's/^/  /' "$D/sums.txt"
+}
+
+etape_rendre() { rendre_valeurs; empreintes; }
+
+etape_installer() {
+  rendre_valeurs
+  echo "## release cilium (helm $(helm version --short), depuis l'hôte)"
+  helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" --reset-values \
+    --server-side=true --wait=watcher --timeout 5m --hide-notes
+  attendu "release cilium : statut et version" "$(helm status cilium -n kube-system -o json | jq -r '"\(.info.status) \(.chart.metadata.version)"')" "deployed $CILIUM_VER"
 }
 
 etape_appliquer() {
   local g
-  rendre_helmchart
   g=$(kubectl -n kube-system get pods -l k8s-app=cilium -o jsonpath='{.items[0].metadata.creationTimestamp}')
-  scp -q "${SSH_OPTS[@]}" "$D/cilium-helmchart.yaml" "poc@${IP[sc-confiance]}:/tmp/cilium-helmchart.yaml"
-  sur sc-confiance "echo '$(grep ' cilium-helmchart.yaml$' "$D/sums.txt" | cut -c1-64)  /tmp/cilium-helmchart.yaml' | sha256sum -c \
-    && sudo install -m 0600 /tmp/cilium-helmchart.yaml /var/lib/rancher/k3s/server/manifests/cilium.yaml && rm -f /tmp/cilium-helmchart.yaml"
+  etape_installer
   for _ in $(seq 60); do
     [ "$(kubectl -n kube-system get cm cilium-config -o jsonpath='{.data.policy-cidr-match-mode}' 2>/dev/null)" = nodes ] && break; sleep 2
   done
@@ -124,12 +142,22 @@ etape_verifier() {
   echo "- podCIDRs des CiliumNodes égaux à ceux de k3s (10.42.N.0/24) ; pods système dans le podCIDR de leur nœud"
   echo "- cilium-dbg status : OK sur les trois agents ; ni interface flannel.1 ni règle KUBE-ROUTER sur les nœuds"
   echo "- binaire hubble présent dans l'agent, flux lisibles (hubble observe)"
+  echo "## prédiction ajoutée le 01/11/2026 (option (b) du propriétaire : contrôleur Helm de k3s désactivé)"
+  echo "- release Helm cilium deployed, installée depuis l'hôte ; ni HelmChart, ni compte de service helm-*, ni liaison helm-* ; la ligne"
+  echo "  « HelmChart installé » de la prédiction du 30/10/2026 ne s'applique plus"
   echo "## nœuds"
   kubectl get nodes -o wide -L zone
   kubectl wait node --all --for=condition=Ready --timeout=300s > /dev/null && echo "OK   nœuds prêts"
   kubectl -n kube-system rollout status ds/cilium --timeout=300s > /dev/null
   kubectl -n kube-system rollout status deploy/cilium-operator --timeout=300s > /dev/null
-  echo "HelmChart cilium : job $(kubectl -n kube-system get job helm-install-cilium -o jsonpath='{.status.succeeded}' 2>/dev/null || echo -) réussi"
+  attendu "release Helm cilium (depuis l'hôte)" "$(helm status cilium -n kube-system -o json | jq -r '"\(.info.status) \(.chart.metadata.version)"')" "deployed $CILIUM_VER"
+  if kubectl get crd helmcharts.helm.cattle.io >/dev/null 2>&1; then
+    attendu "HelmCharts du cluster (CRD présente)" "$(kubectl get helmcharts.helm.cattle.io -A -o name | grep -c . || true)" 0
+  else
+    echo "OK   CRD helmcharts.helm.cattle.io absente"
+  fi
+  attendu "comptes de service helm-*" "$(kubectl get sa -A -o name | grep -c '/helm-' || true)" 0
+  attendu "liaisons helm-*" "$(kubectl get clusterrolebinding,rolebinding -A -o name | grep -c '/helm-' || true)" 0
   attendu "DaemonSet cilium prêt" "$(kubectl -n kube-system get ds cilium -o jsonpath='{.status.numberReady}/{.status.desiredNumberScheduled}')" 3/3
   attendu "opérateur prêt, sur" "$(kubectl -n kube-system get pods -l name=cilium-operator -o jsonpath='{range .items[*]}{.status.containerStatuses[0].ready} {.spec.nodeName}{end}')" "true sc-confiance"
   echo "## images"
