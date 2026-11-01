@@ -1247,29 +1247,43 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
   echo "$c : tâche ${tache#"$REG/"}, image builds/essai-porte@${d##*@} ; PipelineRun exécuté, Chains : signé=$(signe pipelinerun "j6-porte-$c")"
 }
 
-juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, porte par défaut] [source attendue, JSON] : Job de la porte ;
-  # une ligne VERDICT|cas|success|violations|avertissements|durée du conteneur en s (codes de règles triés), ou ERREUR|cas|motif
-  # si ec n'a rendu aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images
-  # (spec ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, le Job est celui de J6
-  local j=porte-$1 l d s=()
+cm_porte() { # ConfigMap porte : politique, règles du PoC, liste revue, clé publique de Chains, CA du PoC ; J8 (test 8) : contrôle 9
+  # (politique/porte/horodatage.sh) et racine de confiance du TSA (J5)
+  kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
+    --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
+    --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
+    --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" \
+    --from-file=horodatage.sh="$here/politique/porte/horodatage.sh" --from-file=tsa-racine-confiance.json="$P/tsa-racine-confiance.json" \
+    --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
+}
+
+juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, porte par défaut] [source attendue, JSON] [dépôt des
+  # bundles, horodatage/bundles par défaut] : Job de la porte ; une ligne VERDICT|cas|success|violations|avertissements|durée du
+  # conteneur ec en s|horodatage (ok, refus)|détail du contrôle 9 (codes de règles triés), ou ERREUR|cas|motif si ec n'a rendu
+  # aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images (spec
+  # ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, ec juge comme en J6. Les champs 7 et 8
+  # (J8, test 8) viennent du conteneur horodatage ; success (champ 3) reste celui de ec
+  local j=porte-$1 l d h s=()
   [ -n "${5:-}" ] && s=(-e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'$(jq -nc --arg c "$1" --arg i "$2" --argjson s "$5" \
     '{components: [{name: $c, containerImage: $i, source: $s}]}')'#")
   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
   sed "${s[@]}" -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" -e "s#@CM@#${4:-porte}#" \
-    "$here/politique/porte-job.yaml" | kubectl create -f - >/dev/null
+    -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@BUNDLES@#${6:-$REG/$DEPOT_BUNDLES}#" "$here/politique/porte-job.yaml" | kubectl create -f - >/dev/null
   for _ in $(seq 150); do
     [ -n "$(kubectl get job -n porte "$j" -o jsonpath='{.status.succeeded}{.status.failed}')" ] && break
     sleep 2
   done
-  kubectl logs -n porte "job/$j" > "$T/$j.log" 2>&1 || true
+  kubectl logs -n porte "job/$j" -c porte > "$T/$j.log" 2>&1 || true
+  kubectl logs -n porte "job/$j" -c horodatage > "$T/$j.horodatage" 2>&1 || true
   l=$(grep -m1 '^{' "$T/$j.log" || true)
   [ -n "$l" ] || { echo "ERREUR|$1|$(tail -1 "$T/$j.log" | cut -c1-200)"; return; }
   printf '%s\n' "$l" > "$T/$j.json"
-  d=$(kubectl get pod -n porte -l job-name="$j" -o json | jq -r '.items[0].status.containerStatuses[0].state.terminated
+  d=$(kubectl get pod -n porte -l job-name="$j" -o json | jq -r '.items[0].status.initContainerStatuses[0].state.terminated
     | (.finishedAt | fromdate) - (.startedAt | fromdate)')
-  jq -r --arg c "$1" --arg d "$d" '[.components[] | .violations[]? | .metadata.code] as $v
+  h=$(grep -m1 '^HORODATAGE|' "$T/$j.horodatage" | cut -d'|' -f2- || true)
+  jq -r --arg c "$1" --arg d "$d" --arg h "${h:-absent|$(tail -1 "$T/$j.horodatage" | cut -c1-160)}" '[.components[] | .violations[]? | .metadata.code] as $v
     | [.components[] | .warnings[]? | .metadata.code] as $w
-    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)"' "$T/$j.json"
+    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)"' "$T/$j.json"
 }
 
 succes() { # cas code : la règle figure parmi les succès du verdict de la porte
@@ -1373,11 +1387,7 @@ etape_porte() {
   echo "## tâches approuvées (politique/porte/taches.yml, ancien format trusted_tasks : digest épinglé), clé publique de Chains, CA du PoC"
   grep -v '^ *#' "$here/politique/porte/taches.yml" | sed 's/^/  /'
   kubectl apply --server-side -f "$here/politique/porte.yaml" >/dev/null
-  kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
-    --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
-    --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
-    --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml \
-    | kubectl apply --server-side -f - >/dev/null
+  cm_porte
   # Lu dans la bibliothèque (lib/tekton/pipeline.rego) : la liste de tâches requises est choisie par le label
   # build.appstudio.redhat.com/build_type du TaskRun, à défaut par pipelines.openshift.io/runtime des internalParameters,
   # labels que pose le créateur du PipelineRun.

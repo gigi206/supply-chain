@@ -42,6 +42,12 @@
 #          puis gabarit en service). Trace : verdicts de ec, motifs, provenances du tag .att
 #   attseule complément du test 7 : témoin d'essais-j8/test7 à attestation signée (clé jetable) sans signature d'image (constat
 #          du banc C), jugé par la porte avec la source attendue. Trace : verdict de ec, motifs
+#   test8  contrôle 9 joint à la porte du cluster (conteneur horodatage après ec, politique/porte/horodatage.sh) : chaque attestation
+#          vérifiée par ec doit avoir un bundle horodaté valide qui porte sa signature ; image réelle avec horodatage/bundles, puis
+#          dépôts d'essai écrits par poc-horodatage (horodatage/essais-test8) : copie, aucun, partiel, sans jeton, jeton altéré,
+#          jetons échangés, TSA étrangère, bundles d'une autre image de même digest, bundle valide d'un autre digest, mélange ;
+#          ancien contrôle de J6 sur les mêmes dépôts ; image sans Chains ; format bundle de cosign v3 (témoins d'essais-j8/test8,
+#          clé jetable : attestation seule, signature et attestation). Trace : verdicts de ec et du contrôle 9, motifs de cosign
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -1144,6 +1150,263 @@ etape_attseule() { # test 7, complément : attestation signée sans signature d'
   echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie"
   garder apres
   [ "$ko" = 0 ] || { echo "KO   att-seule : mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+T8_BUNDLES=horodatage/essais-test8   # bundles d'essai du test 8, écrits par poc-horodatage (horodatage/** seulement ; non supprimables)
+T8_DEPOT=essais-j8/test8             # témoins au format bundle de cosign v3 (non supprimables de Zot)
+TYPE_BUNDLE=application/vnd.dev.sigstore.bundle.v0.3+json
+
+t8_index() { # digest : bundles de ce digest dans horodatage/bundles (referrers, lecture anonyme), un fichier par bundle dans $T/t8-b ;
+  # lignes « signature fichier » sur la sortie
+  local m l
+  mkdir -p "$T/t8-b"
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/referrers/$1" \
+    | jq -r --arg t "$TYPE_BUNDLE" '.manifests[] | select(.artifactType == $t) | .digest' | while read -r m; do
+      l=$(curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+        "https://$REG_HOTE/v2/$DEPOT_BUNDLES/manifests/$m" | jq -r '.layers[0].digest')
+      curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/blobs/$l" > "$T/t8-b/${m#sha256:}.json"
+      echo "$(jq -r '.dsseEnvelope.signatures[0].sig' "$T/t8-b/${m#sha256:}.json") $T/t8-b/${m#sha256:}.json"
+    done
+}
+
+t8_publier() { # cas fichier… : bundles publiés par poc-horodatage en referrers de builds/sample-app@APP_DIGEST (manifeste fait main :
+  # sujet hors du dépôt, comme tsa.sh publier_bundle), dans $T8_BUNDLES/<cas>-<passage> ; dépôt sur la sortie
+  local r=$T8_BUNDLES/$1-$T8_PASSAGE f i=0 o=(--ca-file "$P/ca-poc.crt" --registry-config "$T/auth/horodatage.json"); shift
+  printf '{}' > "$T/t8-vide.json"
+  oras blob push "${o[@]}" "$REG_HOTE/$r" "$T/t8-vide.json" >/dev/null
+  for f in "$@"; do
+    i=$((i + 1))
+    oras blob push "${o[@]}" "$REG_HOTE/$r" "$f" >/dev/null
+    jq -n --arg t "$TYPE_BUNDLE" --arg ld "sha256:$(sha256sum < "$f" | cut -c1-64)" --argjson ls "$(stat -c%s "$f")" \
+      --arg pt "$(jq -r '.dsseEnvelope.payload | @base64d | fromjson | .predicateType' "$f")" --slurpfile s "$T/t8-sujet.json" '{
+      schemaVersion: 2, mediaType: "application/vnd.oci.image.manifest.v1+json", artifactType: $t,
+      config: {mediaType: "application/vnd.oci.empty.v1+json", digest: "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", size: 2},
+      layers: [{mediaType: $t, digest: $ld, size: $ls}],
+      subject: $s[0], annotations: {"dev.sigstore.bundle.content": "dsse-envelope", "dev.sigstore.bundle.predicateType": $pt}}' > "$T/t8-manifeste.json"
+    oras manifest push "${o[@]}" "$REG_HOTE/$r:b$i" "$T/t8-manifeste.json" >/dev/null
+  done
+  echo "$r"
+}
+
+t8_jeton() { # bundle jeton-der sortie : bundle dont le jeton RFC 3161 est remplacé
+  jq -c --arg t "$(base64 -w0 "$2")" '.verificationMaterial.timestampVerificationData.rfc3161Timestamps[0].signedTimestamp = $t' "$1" > "$3"
+}
+
+t8_cas() { # cas attendu (ok ou refus) dépôt-des-bundles couvertes-attendues (« k/n ») : image réelle, source attendue, porte du cluster ;
+  # ec doit admettre (aucune violation), le contrôle 9 rendre l'attendu ; ko incrémenté
+  local r
+  r=$(juger "t8-$1" "$REG/$APP" policy.yaml porte "$SRC8" "$REG/$3")
+  echo "  $r"
+  grep -v '^HORODATAGE|' "$T/porte-t8-$1.horodatage" | sed 's/^/    /'
+  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|true||$2" ] && grep -q "^$4 enveloppe" <<< "$(cut -d'|' -f8 <<< "$r")" \
+    && echo "OK   $1 : ec admet, contrôle 9 $2 ($4 couvertes) : porte $([ "$2" = ok ] && echo admet || echo refuse)" \
+    || { echo "KO   $1 : contrôle 9 $2 ($4 couvertes) prédit" >&2; ko=$((ko + 1)); }
+}
+
+t8_ancien() { # cas dépôt attendu (accepté ou refusé) : chemin de J6 sur l'hôte (cosign verify-attestation, bundles du dépôt : un bundle
+  # valide du digest suffit, sans lien avec les enveloppes de l'image jugée) ; ko incrémenté
+  local k n
+  if COSIGN_REPOSITORY=$REG_HOTE/$2 cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+      --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --type slsaprovenance1 \
+      --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" > "$T/t8-ancien.out" 2>/dev/null; then k=accepté; else k=refusé; fi
+  n=$(grep -c . "$T/t8-ancien.out" || true)
+  [ "$k" = "$3" ] && echo "OK   ancien contrôle (J6), $1 : $k, $n bundle(s) vérifié(s), comme prédit" \
+    || { echo "KO   ancien contrôle (J6), $1 : $k ($3 prédit)" >&2; ko=$((ko + 1)); }
+}
+
+t8_v3() { # cas signer (0 ou 1) : témoin de T8_DEPOT au format bundle de cosign v3 (referrers dans le dépôt de l'image), clé jetable :
+  # attestation de la provenance réelle (prédicat repris, sujet posé par cosign), plus la signature d'image si signer=1 ; digest dans
+  # $T/t8-<cas>.image
+  local d o=(--key "$T/auth/v3.key" --new-bundle-format --use-signing-config=false --tlog-upload=false --yes --registry-cacert "$P/ca-poc.crt")
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/cas=test8-$1-$RC_PASSAGE" \
+    -t "$REG_HOTE/$T8_DEPOT:$1" "$REG_HOTE/$APP" 2>/dev/null)
+  d=${d##*@}; echo "$d" > "$T/t8-$1.image"
+  DOCKER_CONFIG=$T/auth/docker COSIGN_PASSWORD='' cosign attest "${o[@]}" --type slsaprovenance1 --predicate "$T/t8-predicat.json" \
+    "$REG_HOTE/$T8_DEPOT@$d" > "$T/t8-cosign.out" 2>&1 || { cat "$T/t8-cosign.out" >&2; echo "KO   cosign attest ($1)" >&2; exit 1; }
+  if [ "$2" = 1 ]; then
+    DOCKER_CONFIG=$T/auth/docker COSIGN_PASSWORD='' cosign sign "${o[@]}" "$REG_HOTE/$T8_DEPOT@$d" > "$T/t8-cosign.out" 2>&1 \
+      || { cat "$T/t8-cosign.out" >&2; echo "KO   cosign sign ($1)" >&2; exit 1; }
+  fi
+  echo "$1 : $T8_DEPOT@$d ; referrers : $(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$T8_DEPOT/referrers/$d" \
+    | jq -r '[.manifests[] | "\(.artifactType) (\(.annotations["dev.sigstore.bundle.predicateType"] // "-"))"] | join(", ")') ;"\
+    "tags .sig/.att : $(SSL_CERT_FILE=$P/ca-poc.crt crane ls "$REG_HOTE/$T8_DEPOT" 2>/dev/null | grep -c "^sha256-${d#sha256:}\." || true)"
+  echo "  sur l'hôte, clé jetable : cosign verify $(cosign verify --key "$T/auth/v3.pub" --insecure-ignore-tlog --new-bundle-format \
+    --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$T8_DEPOT@$d" >/dev/null 2>&1 && echo accepte || echo refuse),"\
+    "cosign verify-attestation $(cosign verify-attestation --key "$T/auth/v3.pub" --insecure-ignore-tlog --new-bundle-format \
+    --type slsaprovenance1 --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$T8_DEPOT@$d" >/dev/null 2>&1 && echo accepte || echo refuse)"
+}
+
+etape_test8() {
+  local ko=0 e1 e2 s1 s2 b1 b2 bw x r v n w a
+  echo "## prédiction (contrôle 9 joint à la porte : politique/porte/horodatage.sh, conteneur horodatage du Job, après ec)"
+  echo "règle : chaque signature d'attestation vérifiée par ec doit se retrouver dans un bundle du dépôt de bundles vérifié par cosign v3.1.4"
+  echo "  (clé de Chains, sujet = digest jugé, slsaprovenance1, jeton exigé, racine du TSA) ; aucune attestation vérifiée par ec : refus."
+  echo "  Porte = ec admet ET contrôle 9 ok. Image réelle $APP, source attendue (test 7) ; ec admet dans tous les cas ci-dessous"
+  echo "reel (horodatage/bundles) : ok, n/n ; copie (les n bundles réels, dépôt d'essai) : ok ; aucun : refus, 0/n ; partiel (1 bundle) : refus, 1/n"
+  echo "sans-jeton, jeton-altere, autre-signature (jetons échangés), tsa-etrangere : refus, 0/n (motifs de J5 relevés sur l'hôte en J5)"
+  echo "webhook-seul (bundles valides de deux enveloppes de builds/essai-webhook, même digest) : refus, 0/n, cosign en vérifie 2"
+  echo "autre-digest (bundle valide, Chains et TSA, d'un autre digest, rattaché à $APP par poc-horodatage) : refus, 0/n ; sur l'hôte,"
+  echo "  cosign verify-blob-attestation : vérifié avec son digest, refusé avec ${APP_DIGEST:0:19}… (motif relevé : le sujet est-il imposé ?)"
+  echo "melange (n bundles réels + autre-digest + un sans jeton) : ok, n/n (poc-horodatage ne bloque pas une image en ajoutant des bundles)"
+  echo "ancien contrôle de J6 (un bundle valide du digest suffit), sur l'hôte : copie et partiel et webhook-seul acceptés (CONSTAT), aucun refusé"
+  echo "poc-images (builds/essai-images@${APP_DIGEST:7:8}, sans Chains) : ec refuse (signatures, comme au test 7), contrôle 9 refus (aucune attestation)"
+  echo "format bundle de cosign v3, témoins de $T8_DEPOT (clé jetable, ConfigMap porte-temoin) :"
+  echo "  v3-att (attestation seule, attaque du banc C) : builtin.image.signature_check parmi les succès malgré 0 signature (banc C) ;"
+  echo "    refus par porte.image_signature et subject_build_task_matches (sujet du témoin ≠ résultat de build, comme au test 7) ;"
+  echo "  v3-sig (signature et attestation) : subject_build_task_matches seule, porte.image_signature parmi les succès ;"
+  echo "  contrôle 9 refus pour les deux (aucun bundle horodaté de ces digests)"
+  echo "limites écrites d'avance : image d'outils non signée dans la porte ; image neuve refusée jusqu'au passage suivant du CronJob ;"
+  echo "  sorties du pod : celles de la NetworkPolicy porte (DNS, Zot), vérification hors ligne"
+  garder avant
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/horodatage.json" "" poc-horodatage
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ); T8_PASSAGE=$(tr 'A-Z' 'a-z' <<< "$RC_PASSAGE")
+  SRC8=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  [ "$(tete)" = "$TETE_J2" ] && echo "OK   tête de main dans Forgejo : $TETE_J2 (source attendue)" || { echo "KO   tête de main différente de $TETE_J2" >&2; exit 1; }
+
+  echo "## porte élargie"
+  cm_porte
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.horodatage\.sh}') "$here/politique/porte/horodatage.sh" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}') "$here/politique/porte/porte.rego" \
+    && echo "OK   ConfigMap porte : horodatage.sh, porte.rego identiques aux fichiers versionnés ; racine de confiance du TSA ajoutée" \
+    || { echo "KO   ConfigMap porte" >&2; exit 1; }
+  echo "Job : ec ($PORTE@${PORTE_DIGEST:7:8}, conteneur d'initialisation, --strict=false), puis horodatage ($OUTILS@${OUTILS_DIGEST:7:8})"
+  kubectl get networkpolicy -n porte porte -o json | jq -r '"sorties de la NetworkPolicy porte : " + ([.spec.egress[] | (.to[0] | if .ipBlock then .ipBlock.cidr else "kube-dns" end)
+    + ":" + ([.ports[].port | tostring] | unique | join(","))] | join(" ; ")) + " ; entrées : aucune"'
+
+  echo "## enveloppes de l'image réelle et bundles de son digest (horodatage/bundles)"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | jq -r '.signatures[0].sig' > "$T/t8-sigs"
+  n=$(grep -c . "$T/t8-sigs")
+  [ "$n" = 2 ] || { echo "KO   $n enveloppe(s) de Chains sur $APP, 2 attendues (prédictions en n = 2)" >&2; exit 1; }
+  s1=$(sed -n 1p "$T/t8-sigs"); s2=$(sed -n 2p "$T/t8-sigs")
+  t8_index "$APP_DIGEST" > "$T/t8-index"
+  b1=$(awk -v s="$s1" '$1 == s {print $2; exit}' "$T/t8-index"); b2=$(awk -v s="$s2" '$1 == s {print $2; exit}' "$T/t8-index")
+  [ -n "$b1" ] && [ -n "$b2" ] || { echo "KO   enveloppe de l'image réelle sans bundle" >&2; exit 1; }
+  echo "$APP : $n enveloppes ; $(wc -l < "$T/t8-index") bundles pour ${APP_DIGEST:0:19}… (toutes les images de ce digest)"
+  oras manifest fetch --ca-file "$P/ca-poc.crt" --descriptor "$REG_HOTE/$APP" > "$T/t8-sujet.json"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null \
+    | jq -r '.signatures[0].sig' | grep -v -x -F -f "$T/t8-sigs" | while read -r x; do awk -v s="$x" '$1 == s {print $2; exit}' "$T/t8-index"; done \
+    | awk 'NF && n < 2 {print; n++}' > "$T/t8-webhook"
+  [ "$(grep -c . "$T/t8-webhook")" = 2 ] || { echo "KO   moins de deux bundles d'enveloppes de builds/essai-webhook" >&2; exit 1; }
+
+  echo "## bundles falsifiés (à partir des deux bundles réels)"
+  jq -c 'del(.verificationMaterial.timestampVerificationData)' "$b1" > "$T/t8-sj1.json"
+  jq -c 'del(.verificationMaterial.timestampVerificationData)' "$b2" > "$T/t8-sj2.json"
+  for i in 1 2; do
+    jq -r '.verificationMaterial.timestampVerificationData.rfc3161Timestamps[0].signedTimestamp' "$(eval echo "\$b$i")" | base64 -d > "$T/t8-jeton$i.der"
+    python3 -I -c 'import sys; b = bytearray(open(sys.argv[1], "rb").read()); b[-1] ^= 1; open(sys.argv[2], "wb").write(b)' "$T/t8-jeton$i.der" "$T/t8-alt$i.der"
+  done
+  t8_jeton "$b1" "$T/t8-alt1.der" "$T/t8-alt1.json"; t8_jeton "$b2" "$T/t8-alt2.der" "$T/t8-alt2.json"
+  t8_jeton "$b1" "$T/t8-jeton2.der" "$T/t8-ech1.json"; t8_jeton "$b2" "$T/t8-jeton1.der" "$T/t8-ech2.json"
+  echo "jeton altéré : dernier octet (signature ECDSA du TSA) inversé ; jetons échangés entre les deux enveloppes"
+  # TSA étrangère (tsa.sh chemins) : même forme, même CN, autre racine, jeton sur les octets bruts de chaque signature
+  mkdir -p "$T/t8-etrangere" && cd "$T/t8-etrangere"
+  openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out racine.key 2>/dev/null
+  openssl req -x509 -new -key racine.key -subj "/O=Ailleurs/CN=Racine TSA etrangere" -days 30 -sha256 -config "$here/tsa/pki.cnf" -extensions racine_tsa -out racine.crt
+  openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out feuille.key 2>/dev/null
+  openssl pkey -in feuille.key -pubout -out feuille.pub
+  openssl x509 -new -force_pubkey feuille.pub -subj "/O=Ailleurs/CN=TSA du PoC" -CA racine.crt -CAkey racine.key -set_serial 2 -days 30 -sha256 \
+    -extfile "$here/tsa/pki.cnf" -extensions feuille_tsa -out feuille.crt
+  printf '[ tsa ]\ndefault_tsa = e\n[ e ]\nserial = ./serial\nsigner_cert = ./feuille.crt\nsigner_key = ./feuille.key\nsigner_digest = sha256\ndefault_policy = 1.3.6.1.4.1.57264.2\ndigests = sha256\ness_cert_id_alg = sha256\ness_cert_id_chain = no\n' > ts.cnf
+  echo 01 > serial
+  for i in 1 2; do
+    jq -r '.dsseEnvelope.signatures[0].sig' "$(eval echo "\$b$i")" | base64 -d > sig$i.bin
+    openssl ts -query -data sig$i.bin -sha256 -cert -out req$i.tsq 2>/dev/null
+    openssl ts -reply -queryfile req$i.tsq -config ts.cnf -out rep$i.tsr 2>/dev/null
+    openssl ts -verify -data sig$i.bin -in rep$i.tsr -CAfile racine.crt -untrusted feuille.crt 2>&1 | grep -q '^Verification: OK' \
+      || { echo "KO   TSA étrangère ($i)" >&2; exit 1; }
+    t8_jeton "$(eval echo "\$b$i")" rep$i.tsr "$T/t8-etr$i.json"
+  done
+  cd - >/dev/null
+  echo "TSA étrangère : jetons valides pour leur propre racine (même CN « TSA du PoC », autre clé)"
+  # Bundle valide d'un autre digest : étiquette <digest>-<empreinte> de horodatage/bundles (horodater.sh), premier autre digest trié
+  a=$(oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/$DEPOT_BUNDLES" | grep -E '^[0-9a-f]{64}-[0-9a-f]{16}$' | grep -v "^${APP_DIGEST#sha256:}-" | sort | awk 'NR == 1')
+  [ -n "$a" ] || { echo "KO   aucun bundle d'un autre digest" >&2; exit 1; }
+  x=$(curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$REG_HOTE/v2/$DEPOT_BUNDLES/manifests/$a" | jq -r '.layers[0].digest')
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/blobs/$x" > "$T/t8-autre.json"
+  x=sha256:$(jq -r '.dsseEnvelope.payload | @base64d | fromjson | .subject[0].digest.sha256' "$T/t8-autre.json")
+  echo "autre digest : bundle $a de $DEPOT_BUNDLES, sujet ${x:0:19}… ($(jq -r '.dsseEnvelope.payload | @base64d | fromjson | .subject[0].name' "$T/t8-autre.json"))"
+  for d in "$x" "$APP_DIGEST"; do
+    if cosign verify-blob-attestation --bundle "$T/t8-autre.json" --new-bundle-format --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+        --type slsaprovenance1 --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --digest "${d#sha256:}" --digestAlg sha256 \
+        > "$T/t8-blob.out" 2>&1; then v=vérifié; else v=refusé; fi
+    echo "  cosign verify-blob-attestation, --digest ${d:0:19}… : $v ($({ grep -m1 '^Error: ' "$T/t8-blob.out" || echo "-"; } | sed 's/^Error: //' | cut -c1-200))"
+    { [ "$d" = "$x" ] && [ "$v" = vérifié ]; } || { [ "$d" = "$APP_DIGEST" ] && [ "$v" = refusé ]; } \
+      || { echo "KO   bundle d'un autre digest : $v avec ${d:0:19}…" >&2; ko=$((ko + 1)); }
+  done
+
+  echo "## dépôts d'essai ($T8_BUNDLES/<cas>-$T8_PASSAGE, écrits par poc-horodatage)"
+  for c in "copie $b1 $b2" "aucun" "partiel $b1" "sans-jeton $T/t8-sj1.json $T/t8-sj2.json" "jeton-altere $T/t8-alt1.json $T/t8-alt2.json" \
+      "autre-signature $T/t8-ech1.json $T/t8-ech2.json" "tsa-etrangere $T/t8-etr1.json $T/t8-etr2.json" "webhook-seul $(paste -sd' ' "$T/t8-webhook")" \
+      "autre-digest $T/t8-autre.json" "melange $b1 $b2 $T/t8-autre.json $T/t8-sj1.json"; do
+    set -- $c
+    echo "$1 : $(t8_publier "$@") ($(($# - 1)) bundle(s))"
+  done
+
+  echo "## verdicts de la porte (image réelle, source attendue)"
+  t8_cas reel ok "$DEPOT_BUNDLES" 2/2
+  succes t8-reel slsa_source_correlated.expected_source_code_reference && succes t8-reel trusted_task.trusted \
+    && echo "OK   reel : même verdict de ec qu'au test 7 (expected_source_code_reference, trusted_task.trusted parmi les succès)" || { echo "KO   reel : succès de ec" >&2; ko=$((ko + 1)); }
+  t8_cas copie ok "$T8_BUNDLES/copie-$T8_PASSAGE" 2/2
+  t8_cas aucun refus "$T8_BUNDLES/aucun-$T8_PASSAGE" 0/2
+  t8_cas partiel refus "$T8_BUNDLES/partiel-$T8_PASSAGE" 1/2
+  for c in sans-jeton jeton-altere autre-signature tsa-etrangere webhook-seul autre-digest; do
+    t8_cas "$c" refus "$T8_BUNDLES/$c-$T8_PASSAGE" 0/2
+  done
+  grep -q '|0/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s)' <<< "$(grep -h '^HORODATAGE|' "$T/porte-t8-webhook-seul.horodatage")" \
+    && echo "OK   webhook-seul : cosign vérifie les 2 bundles (valides pour le digest), aucun n'est apparié à une enveloppe de l'image jugée" \
+    || { echo "KO   webhook-seul : 2 bundles vérifiés prédits" >&2; ko=$((ko + 1)); }
+  t8_cas melange ok "$T8_BUNDLES/melange-$T8_PASSAGE" 2/2
+  for c in sans-jeton jeton-altere autre-signature tsa-etrangere autre-digest melange; do
+    echo "  cosign dans la porte, $c : $(grep -h '^HORODATAGE|' "$T/porte-t8-$c.horodatage" | cut -d'|' -f3)"
+  done
+
+  echo "## ancien contrôle de J6, sur l'hôte"
+  t8_ancien copie "$T8_BUNDLES/copie-$T8_PASSAGE" accepté
+  t8_ancien aucun "$T8_BUNDLES/aucun-$T8_PASSAGE" refusé
+  t8_ancien partiel "$T8_BUNDLES/partiel-$T8_PASSAGE" accepté
+  t8_ancien webhook-seul "$T8_BUNDLES/webhook-seul-$T8_PASSAGE" accepté
+  echo "CONSTAT  l'ancien contrôle (un bundle valide du digest) accepte partiel et webhook-seul, que la porte refuse : le jeton n'y est pas lié aux enveloppes jugées"
+
+  echo "## image sans Chains : builds/essai-images@${APP_DIGEST:7:8} (poussée par poc-images, J7)"
+  r=$(juger t8-poc-images "$REG/builds/essai-images@$APP_DIGEST" policy.yaml porte "$SRC8")
+  echo "  $r"
+  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|builtin.attestation.signature_check,builtin.image.signature_check|refus" ] \
+    && [ "$(cut -d'|' -f8 <<< "$r")" = "aucune attestation vérifiée par ec" ] \
+    && echo "OK   poc-images : ec refuse (signatures), contrôle 9 refus (aucune attestation vérifiée par ec)" || { echo "KO   poc-images" >&2; ko=$((ko + 1)); }
+
+  echo "## format bundle de cosign v3 : témoins à clé jetable ($T8_DEPOT)"
+  (cd "$T/auth" && COSIGN_PASSWORD='' cosign generate-key-pair --output-key-prefix v3 >/dev/null 2>&1)
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null \
+    | jq -c 'select(.payload | @base64d | fromjson | .predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)' \
+    | jq -sc 'max_by(.payload | @base64d | fromjson | .predicate.runDetails.metadata.finishedOn)' | jq -r .payload | base64 -d | jq .predicate > "$T/t8-predicat.json"
+  echo "prédicat repris : provenance de PipelineRun la plus récente de $APP ($(jq -r .runDetails.metadata.invocationId "$T/t8-predicat.json"))"
+  t8_v3 v3-att 0
+  t8_v3 v3-sig 1
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/auth/v3.pub" '.data["chains.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains"
+  w=slsa_build_scripted_build.subject_build_task_matches
+  r=$(juger t8-v3-att "$REG/$T8_DEPOT@$(cat "$T/t8-v3-att.image")" policy.yaml porte-temoin "$SRC8")
+  echo "  $r"
+  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|$(trier "porte.image_signature,$w")|refus" ] \
+    && echo "OK   v3-att : refusée par porte.image_signature et $w ; contrôle 9 refus" || { echo "KO   v3-att : prédiction" >&2; ko=$((ko + 1)); }
+  succes t8-v3-att builtin.image.signature_check \
+    && echo "CONSTAT  v3-att : builtin.image.signature_check parmi les succès avec $(jq '[.components[] | .signatures // [] | length] | add' "$T/porte-t8-v3-att.json") signature d'image (banc C reproduit dans la porte du cluster)" \
+    || echo "MESURE   v3-att : builtin.image.signature_check hors des succès (différent du banc C)"
+  r=$(juger t8-v3-sig "$REG/$T8_DEPOT@$(cat "$T/t8-v3-sig.image")" policy.yaml porte-temoin "$SRC8")
+  echo "  $r"
+  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|$w|refus" ] && succes t8-v3-sig porte.image_signature \
+    && echo "OK   v3-sig : $w seule, porte.image_signature parmi les succès ($(jq '[.components[] | .signatures // [] | length] | add' "$T/porte-t8-v3-sig.json") signature(s) d'image)" \
+    || { echo "KO   v3-sig : prédiction" >&2; ko=$((ko + 1)); }
+  for c in v3-att v3-sig; do
+    jq -r '[.components[] | .violations[]?] | map("\(.metadata.code) : \(.msg | .[0:160])") | .[]' "$T/porte-t8-$c.json" | sed "s/^/  motif $c : /"
+  done
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie ; ConfigMap porte laissée élargie (porte en service)"
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   test 8 : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"

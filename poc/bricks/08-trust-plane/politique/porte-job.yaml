@@ -1,6 +1,9 @@
 # Brique 08, J6 : jugement d'une image par la porte (politique.sh porte). @NOM@, @IMAGE@ (référence par digest, nom
 # vu des pods), @PORTE@ (image de la porte, épinglée par digest), @POLITIQUE@ (fichier de politique de la ConfigMap), @CM@ (ConfigMap : porte, ou porte-temoin de preuves.sh reglec).
-# Verdict JSON de ec sur la sortie standard.
+# J8 (test 8) : ec en conteneur d'initialisation (--strict=false : il rend son verdict, JSON sur la sortie standard et dans
+# /partage, même en refus ; une erreur de ec fait échouer le pod), puis le contrôle 9 (politique/porte/horodatage.sh) sur
+# l'image d'outils @OUTILS@ (cosign v3.1.4), avec les bundles de @BUNDLES@. Verdict de la porte : succès de ec et
+# horodatage complet (code de sortie du conteneur horodatage).
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -27,7 +30,7 @@ spec:
         runAsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
-      containers:
+      initContainers:
       - name: porte
         image: "@PORTE@"
         args:
@@ -44,6 +47,9 @@ spec:
         - --show-successes
         - --output
         - json
+        - --output
+        - json=/partage/ec.json
+        - --strict=false
         env:
         - name: SSL_CERT_FILE
           value: /etc/porte/ca-poc.crt
@@ -65,6 +71,38 @@ spec:
           readOnly: true
         - name: tmp
           mountPath: /tmp
+        - name: partage
+          mountPath: /partage
+      containers:
+      - name: horodatage
+        image: "@OUTILS@"
+        command: [sh, /etc/porte/horodatage.sh]
+        env:
+        - name: IMAGE
+          value: @IMAGE@
+        - name: BUNDLES
+          value: "@BUNDLES@"
+        - name: HOME
+          value: /tmp
+        - name: TMPDIR
+          value: /tmp
+        resources:
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: porte
+          mountPath: /etc/porte
+          readOnly: true
+        - name: partage
+          mountPath: /partage
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
       volumes:
       - name: porte
         configMap:
@@ -82,6 +120,13 @@ spec:
             path: chains.pub
           - key: ca-poc.crt
             path: ca-poc.crt
+          - key: horodatage.sh
+            path: horodatage.sh
+          - key: tsa-racine-confiance.json
+            path: tsa-racine-confiance.json
+      - name: partage
+        emptyDir:
+          sizeLimit: 16Mi
       - name: tmp
         emptyDir:
           sizeLimit: 256Mi
