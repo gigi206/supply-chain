@@ -49,6 +49,11 @@
 #          referrer illisible ;
 #          ancien contrôle de J6 sur les mêmes dépôts ; image sans Chains ; format bundle de cosign v3 (témoins d'essais-j8/test8,
 #          clé jetable : attestation seule, signature et attestation). Trace : verdicts de ec et du contrôle 9, motifs de cosign
+#   enveloppes  contrôle exécutions/enveloppes (décision 4, dsse gardé) : toute exécution signée par Chains qui a un sujet image a
+#          exactement une enveloppe vérifiée de son UID, qui nomme ce sujet, dans le tag .att de ce dépôt ; autre forme de sujet,
+#          tag illisible ou double : anomalie. Témoin logique (même digest, autre dépôt) ; témoin réel builds/essai-enveloppes
+#          (PipelineRun preuve-enveloppes signé par Chains, tag .att réécrit par poc-ecriture : enveloppe du TaskRun retirée,
+#          enveloppe du PipelineRun en double, puis tag d'origine remis). Ponctuel, depuis l'hôte : une mesure, pas une détection continue
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -1413,6 +1418,203 @@ etape_test8() {
   echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie ; ConfigMap porte laissée élargie (porte en service)"
   garder apres
   [ "$ko" = 0 ] || { echo "KO   test 8 : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
+}
+
+ENV_DEPOT=builds/essai-enveloppes   # témoin du contrôle exécutions/enveloppes : image à digest propre au passage (crane mutate)
+ENV_TR=preuve-enveloppes            # son PipelineRun (gabarit en service, tâche et pipeline signées propres au témoin)
+# Noms de résultats qui font un sujet pour Chains v0.29.9 (pkg/artifacts/signable.go : suffixes IMAGE_URL et IMAGE_DIGEST,
+# IMAGES, suffixe ARTIFACT_OUTPUTS ; pkg/chains/formats/slsa/extract : suffixes ARTIFACT_URI et ARTIFACT_DIGEST)
+ENV_SUJETS='(IMAGE_URL|IMAGE_DIGEST|IMAGES|ARTIFACT_OUTPUTS|ARTIFACT_URI|ARTIFACT_DIGEST)$'
+
+ee_runs() { # TaskRuns et PipelineRuns du cluster : type|nom|uid|annotation signed de Chains|sujet (url@digest ; « - » sans résultat
+  # de sujet ; « ?noms » pour toute autre forme de sujet, que le contrôle ne sait pas lire : anomalie, jamais « sans sujet »)
+  local k
+  for k in taskrun pipelinerun; do
+    kubectl get "$k" -A -o json | jq -r --arg k "$k" --arg m "$ENV_SUJETS" '.items[] | (.status.results // []) as $r
+      | ([$r[] | select(.name | test($m)) | .name] | sort) as $s
+      | (if $s == [] then "-" elif $s == ["IMAGE_DIGEST", "IMAGE_URL"]
+         then "\($r[] | select(.name == "IMAGE_URL") | .value)@\($r[] | select(.name == "IMAGE_DIGEST") | .value)"
+         else "?" + ($s | join(",")) end) as $sujet
+      | "\($k)|\(.metadata.namespace)/\(.metadata.name)|\(.metadata.uid)|\(.metadata.annotations["chains.tekton.dev/signed"] // "absente")|\($sujet)"'
+  done
+}
+
+ee_calme() { # aucune exécution en cours, et chaque exécution terminée porte la décision de Chains (signed true ou failed) ;
+  # attend jusqu'à 240 s. Sinon, une signature en vol passerait pour une enveloppe absente
+  local n=""
+  for _ in $(seq 120); do
+    n=$(for k in taskrun pipelinerun; do kubectl get "$k" -A -o json | jq -r '.items[] | select((([.status.conditions[]? | select(.type == "Succeeded")
+      | .status][0] // "Unknown") == "Unknown") or ((.metadata.annotations["chains.tekton.dev/signed"] // "") | IN("true", "failed") | not))
+      | .metadata.name'; done)
+    [ -z "$n" ] && { echo "OK   aucune exécution en cours ni en attente de Chains"; return; }
+    sleep 2
+  done
+  echo "KO   exécutions en cours ou en attente de Chains : $(paste -sd' ' <<< "$n")" >&2; exit 1
+}
+
+ee_lire() { # url@digest fichier : tag .att de l'image (nom du registre vu des pods remplacé par REG_HOTE) ; fichier.brut : enveloppes
+  # téléchargées ; fichier.v : enveloppes vérifiées par la clé de Chains (slsaprovenance1) ; fichier : uid|sujet par sujet de chaque
+  # enveloppe vérifiée (invocationId de runDetails : UID de l'exécution). Code 1 si la lecture est impossible (motif dans fichier.err) :
+  # un tag illisible n'est pas un tag vide (témoin essai-j6-att-illisible : cosign download échoue)
+  local i=$REG_HOTE/${1#"$REG/"}
+  echo "$1" > "$2.sujet"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$i" > "$2.brut" 2> "$2.err" || return 1
+  cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog --type slsaprovenance1 \
+    --registry-cacert "$P/ca-poc.crt" "$i" > "$2.v" 2> "$2.err" || { grep -q 'no matching attestations' "$2.err" || return 1; : > "$2.v"; }
+  jq -r '.payload | @base64d | fromjson | (.predicate.runDetails.metadata.invocationId // "-") as $u
+    | .subject[] | "\($u)|\(.name)@sha256:\(.digest.sha256)"' "$2.v" > "$2"
+}
+
+ee_controle() { # libellé : toute exécution signée qui a un sujet image a exactement une enveloppe vérifiée de son UID qui nomme ce
+  # sujet, dans le tag .att de ce dépôt (pas d'un autre dépôt de même digest). Une ligne par exécution dans $T/ee-<libellé> : COUVERTE,
+  # ABSENTE, DOUBLE, LECTURE_IMPOSSIBLE, FORME_NON_TRAITEE (anomalies : les quatre dernières), SANS_SUJET, ECHEC_SIGNATURE (signed
+  # failed : aucune enveloppe attendue). EE_SUBST=nom=url@digest remplace le sujet d'une exécution (témoin logique)
+  local l=$1 k n u sg s f c
+  ee_runs > "$T/ee-runs"
+  rm -rf "$T/ee" && mkdir -p "$T/ee"
+  while IFS='|' read -r k n u sg s; do
+    [ -n "${EE_SUBST:-}" ] && [ "$n" = "${EE_SUBST%%=*}" ] && s=${EE_SUBST#*=}
+    [ "$sg" = true ] || { echo "ECHEC_SIGNATURE|$k $n|signed=$sg"; continue; }
+    case $s in
+      -) echo "SANS_SUJET|$k $n"; continue ;;
+      \?*) echo "FORME_NON_TRAITEE|$k $n|${s#\?}"; continue ;;
+    esac
+    f=$T/ee/$(printf '%s' "$s" | sha256sum | cut -c1-16)
+    [ -e "$f.etat" ] || { ee_lire "$s" "$f" < /dev/null && echo lue > "$f.etat" || echo impossible > "$f.etat"; }
+    if [ "$(cat "$f.etat")" = impossible ]; then
+      echo "LECTURE_IMPOSSIBLE|$k $n|$s|$(grep -m1 -i error "$f.err" | cut -c1-160)"; continue
+    fi
+    c=$(grep -c -x -F "$u|$s" "$f" || true)
+    case $c in
+      0) echo "ABSENTE|$k $n|$s" ;;
+      1) echo "COUVERTE|$k $n|$s" ;;
+      *) echo "DOUBLE|$k $n|$s|$c enveloppes" ;;
+    esac
+  done < "$T/ee-runs" > "$T/ee-$l"
+  echo "$l : $(cut -d'|' -f1 "$T/ee-$l" | sort | uniq -c | awk '{printf "%s%s %s", (NR > 1 ? ", " : ""), $2, $1}')"
+}
+
+ee_anomalies() { grep -E '^(ABSENTE|DOUBLE|LECTURE_IMPOSSIBLE|FORME_NON_TRAITEE)\|' "$T/ee-$1" || true; }   # libellé
+
+ee_depots() { # dépôts lus au dernier contrôle : enveloppes téléchargées, vérifiées par la clé de Chains, et enveloppes vérifiées sans
+  # exécution présente (sens inverse, information seulement : exécutions purgées, témoins posés sans Chains)
+  local f s
+  for f in "$T"/ee/*.etat; do
+    f=${f%.etat}; s=$(cat "$f.sujet")
+    [ "$(cat "$f.etat")" = lue ] || { echo "  ${s#"$REG/"} : lecture impossible"; continue; }
+    echo "  ${s#"$REG/"} : $(grep -c . "$f.brut" || true) téléchargée(s), $(grep -c . "$f.v" || true) vérifiée(s), sans exécution présente :"\
+      "$(cut -d'|' -f1 "$f" | sort -u | grep -c -v -x -F -f <(cut -d'|' -f3 "$T/ee-runs") || true)"
+  done
+}
+
+ee_att() { # fichier : manifeste du tag .att du témoin, poussé par poc-ecriture (droit update de builds/**, celui de poc-build aussi)
+  zot_ecrire manifest push "$REG_HOTE/$ENV_DEPOT:sha256-${ENV_DIGEST#sha256:}.att" "$1" >/dev/null
+}
+
+etape_enveloppes() {
+  local ko=0 busybox d tache pipe st tr pr l u a b
+  echo "## prédiction (contrôle exécutions/enveloppes : décision 4 du plan validé le 30/10/2026, dsse gardé)"
+  echo "règle : toute exécution (TaskRun, PipelineRun) que Chains a signée et qui a un sujet image a exactement une enveloppe, vérifiée par la"
+  echo "  clé de Chains, dont l'invocationId est son UID et dont le sujet nomme son IMAGE_URL@IMAGE_DIGEST, dans le tag .att de ce dépôt ;"
+  echo "  sans sujet ou signature échouée : listées, rien d'attendu ; autre forme de sujet (noms de Chains v0.29.9 : $ENV_SUJETS),"
+  echo "  tag illisible, enveloppe en double : anomalie. Lecture seulement quand aucune exécution n'est en cours ni en attente de Chains"
+  echo "depart : aucune anomalie (prototype du 01/11/2026 : 27 exécutions à sujet, toutes couvertes)"
+  echo "temoin logique : j6-porte-en-service-publier (sujet builds/essai-webhook) cherché dans builds/essai-signature, même digest : ABSENTE"
+  echo "temoin reel : $ENV_TR, gabarit en service, tâche et pipeline signées propres au témoin, image $ENV_DEPOT à digest propre au passage ;"
+  echo "  après signature, deux enveloppes (TaskRun publier et PipelineRun), les deux COUVERTE ; puis tag .att réécrit par poc-ecriture"
+  echo "  (droit update, le même que celui de poc-build) : sans l'enveloppe du TaskRun : TaskRun ABSENTE, PipelineRun COUVERTE, rien"
+  echo "  d'autre ne change ; enveloppe du PipelineRun en double : PipelineRun DOUBLE ; tag d'origine remis : les deux COUVERTE"
+  echo "fin : aucune anomalie, même résultat qu'au départ plus les deux exécutions du témoin"
+  garder avant
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/zot.json"
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ)
+
+  echo "## départ"
+  ee_calme
+  ee_controle depart
+  ee_depots
+  [ -z "$(ee_anomalies depart)" ] && echo "OK   départ : aucune anomalie" \
+    || { ee_anomalies depart | sed 's/^/  /'; echo "KO   départ : anomalies" >&2; ko=$((ko + 1)); }
+  grep -E '^(SANS_SUJET|ECHEC_SIGNATURE)\|' "$T/ee-depart" | sed 's/^/  /'
+
+  echo "## témoin logique : appariement par dépôt"
+  EE_SUBST="builds/j6-porte-en-service-publier=$REG/builds/essai-signature@$APP_DIGEST" ee_controle logique >/dev/null
+  l=$(grep -F "|taskrun builds/j6-porte-en-service-publier|" "$T/ee-logique" || true)
+  [ "${l%%|*}" = ABSENTE ] && [ "$(ee_anomalies logique | wc -l)" = 1 ] \
+    && echo "OK   j6-porte-en-service-publier cherché dans builds/essai-signature : ABSENTE, seule anomalie (son enveloppe est dans builds/essai-webhook)" \
+    || { echo "KO   témoin logique : ${l:-exécution introuvable}" >&2; ko=$((ko + 1)); }
+
+  echo "## témoin réel : $ENV_TR"
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente" >&2; exit 1; }
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/enveloppes=$RC_PASSAGE" \
+    -t "$REG_HOTE/$ENV_DEPOT:$RC_PASSAGE" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null)
+  ENV_DIGEST=${d##*@}
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+  sed -e "s#@IMAGE@#$REG/$ENV_DEPOT#" -e "s#@DIGEST@#$ENV_DIGEST#" -e "s#@BUSYBOX@#$busybox#" \
+    "$here/politique/taches/publier-essai.yaml" > "$T/ee-tache.yaml"
+  tkn task sign "$T/ee-tache.yaml" -K "$S/taches.key" -f "$T/ee-tache-signee.yaml" >/dev/null 2>&1
+  tache=$REG/tekton/tasks/$ENV_TR@$(bundle "$T/ee-tache-signee.yaml" "tekton/tasks/$ENV_TR" "$RC_PASSAGE")
+  sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/ee-pipeline.yaml"
+  tkn pipeline sign "$T/ee-pipeline.yaml" -K "$S/taches.key" -f "$T/ee-pipeline-signee.yaml" >/dev/null 2>&1
+  pipe=$REG/tekton/pipelines/$ENV_TR@$(bundle "$T/ee-pipeline-signee.yaml" "tekton/pipelines/$ENV_TR" "$RC_PASSAGE")
+  st=$(pr_gabarit "$ENV_TR" "$pipe")
+  [ "${st%%|*}" = True ] || { echo "KO   $ENV_TR : $st" >&2; exit 1; }
+  echo "image $ENV_DEPOT@$ENV_DIGEST ; tâche ${tache#"$REG/"} ; PipelineRun $ENV_TR : $(cut -d'|' -f1-2 <<< "$st"), Chains : signé=$(signe pipelinerun "$ENV_TR")"
+  ee_calme
+  tr="taskrun builds/$ENV_TR-publier"; pr="pipelinerun builds/$ENV_TR"
+  ee_controle temoin
+  a=$(grep -F "|$tr|" "$T/ee-temoin" | cut -d'|' -f1); b=$(grep -F "|$pr|" "$T/ee-temoin" | cut -d'|' -f1)
+  [ "$a|$b" = "COUVERTE|COUVERTE" ] && [ -z "$(ee_anomalies temoin)" ] && [ "$(nb_enveloppes "$ENV_DEPOT@$ENV_DIGEST")" = 2 ] \
+    && echo "OK   témoin signé : deux enveloppes, TaskRun et PipelineRun couverts, aucune anomalie" \
+    || { echo "KO   témoin signé : TaskRun $a, PipelineRun $b, $(nb_enveloppes "$ENV_DEPOT@$ENV_DIGEST") enveloppe(s)" >&2; exit 1; }
+  oras manifest fetch --ca-file "$P/ca-poc.crt" "$REG_HOTE/$ENV_DEPOT:sha256-${ENV_DIGEST#sha256:}.att" > "$T/ee-att-origine.json"
+  u=$(kubectl get taskrun -n builds "$ENV_TR-publier" -o jsonpath='{.metadata.uid}')
+  : > "$T/ee-couches"
+  for l in $(jq -r '.layers[].digest' "$T/ee-att-origine.json"); do
+    echo "$l $(oras blob fetch --ca-file "$P/ca-poc.crt" --output - "$REG_HOTE/$ENV_DEPOT@$l" | jq -r '.payload | @base64d | fromjson
+      | .predicate.runDetails.metadata.invocationId')" >> "$T/ee-couches"
+  done
+  l=$(awk -v u="$u" '$2 == u {print $1}' "$T/ee-couches")
+  [ -n "$l" ] && [ "$(wc -l < "$T/ee-couches")" = 2 ] || { echo "KO   couche du TaskRun introuvable dans le tag .att" >&2; exit 1; }
+  echo "tag .att : $(wc -l < "$T/ee-couches") couches ; enveloppe du TaskRun (UID ${u:0:8}) : couche ${l:7:12}"
+
+  jq -c --arg l "$l" '.layers |= map(select(.digest != $l))' "$T/ee-att-origine.json" > "$T/ee-att-retiree.json"
+  ee_att "$T/ee-att-retiree.json"
+  ee_controle retiree
+  a=$(grep -F "|$tr|" "$T/ee-retiree" | cut -d'|' -f1); b=$(grep -F "|$pr|" "$T/ee-retiree" | cut -d'|' -f1)
+  [ "$a|$b" = "ABSENTE|COUVERTE" ] && [ "$(ee_anomalies retiree | wc -l)" = 1 ] \
+    && cmp -s <(grep -v -F -e "|$tr|" -e "|$pr|" "$T/ee-temoin") <(grep -v -F -e "|$tr|" -e "|$pr|" "$T/ee-retiree") \
+    && echo "OK   enveloppe du TaskRun retirée par réécriture du tag : TaskRun ABSENTE, PipelineRun COUVERTE, seule anomalie, rien d'autre ne change" \
+    || { echo "KO   retirée : TaskRun $a, PipelineRun $b, $(ee_anomalies retiree | wc -l) anomalie(s)" >&2; ko=$((ko + 1)); }
+
+  l=$(awk -v u="$u" '$2 != u {print $1}' "$T/ee-couches")
+  jq -c --arg l "$l" '.layers += [.layers[] | select(.digest == $l)]' "$T/ee-att-origine.json" > "$T/ee-att-double.json"
+  ee_att "$T/ee-att-double.json"
+  ee_controle double
+  a=$(grep -F "|$tr|" "$T/ee-double" | cut -d'|' -f1); b=$(grep -F "|$pr|" "$T/ee-double" | cut -d'|' -f1-4)
+  [ "$a|$b" = "COUVERTE|DOUBLE|$pr|$REG/$ENV_DEPOT@$ENV_DIGEST|2 enveloppes" ] && [ "$(ee_anomalies double | wc -l)" = 1 ] \
+    && echo "OK   enveloppe du PipelineRun en double : PipelineRun DOUBLE (2 enveloppes), TaskRun COUVERTE, seule anomalie" \
+    || { echo "KO   double : TaskRun $a, PipelineRun $b" >&2; ko=$((ko + 1)); }
+
+  ee_att "$T/ee-att-origine.json"
+  ee_controle remis
+  [ "$(cut -d'|' -f1 "$T/ee-remis" | sort | uniq -c)" = "$(cut -d'|' -f1 "$T/ee-temoin" | sort | uniq -c)" ] && [ -z "$(ee_anomalies remis)" ] \
+    && echo "OK   tag d'origine remis : aucune anomalie, mêmes décomptes qu'après la signature du témoin" \
+    || { echo "KO   tag d'origine remis : anomalies" >&2; ko=$((ko + 1)); }
+
+  echo "## fin"
+  ee_calme
+  ee_controle fin
+  ee_depots
+  # un passage précédent de l'étape a laissé un témoin, couvert au départ, purgé puis recréé par pr_gabarit
+  a=$(grep -c '^COUVERTE|' "$T/ee-depart" || true); b=$(grep -c -F -e "|$tr|" -e "|$pr|" "$T/ee-depart" || true)
+  [ -z "$(ee_anomalies fin)" ] && [ "$(grep -c '^COUVERTE|' "$T/ee-fin")" = $((a - b + 2)) ] \
+    && echo "OK   fin : aucune anomalie, $(grep -c '^COUVERTE|' "$T/ee-fin") exécutions couvertes (départ, $b du témoin précédent remplacées par les deux du témoin)" \
+    || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies ou décompte" >&2; ko=$((ko + 1)); }
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   contrôle exécutions/enveloppes : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"
