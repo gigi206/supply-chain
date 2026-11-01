@@ -78,7 +78,9 @@
 #          helm-kube-system-cilium relevée sous le HelmChart de k3s (resultats/helm-kube-system-cilium.json) ; ni HelmChart, ni
 #          compte ni liaison helm-* ; release Helm cilium de l'hôte ; pod portant helm-cilium dans kube-system refusé en dry-run
 #          serveur au nom de chaque compte qui peut y créer des pods (témoin : compte default, admis) ; source de leurs droits.
-#          Mesure sous le HelmChart de k3s : preuves-helm_cilium-helmchart.log (étape d'alors au commit 661a826). Trace : can-i,
+#          Pouvoirs des comptes de kube-system (can-i) et pod portant clusterrole-aggregation-controller, au nom des contrôleurs de
+#          Tekton et de Chains (dry-run serveur). Mesure sous le HelmChart de k3s : preuves-helm_cilium-helmchart.log (étape d'alors
+#          au commit 661a826). Trace : can-i,
 #          refus et admissions de l'API
 # Aucun secret en argument de commande.
 #
@@ -2290,6 +2292,41 @@ etape_helm_cilium() {
     kubectl create --as "$u" --dry-run=server -f "$T/hc-pod-default.json" >/dev/null 2>&1 && echo "  témoin, compte default : admis" \
       || { echo "KO   témoin refusé pour $u" >&2; k=1; }
   done < "$T/hc-createurs"
+
+  echo "## pouvoirs des comptes de kube-system (ajouté après un relevé à la main du 01/11/2026 : prédiction non aveugle)"
+  echo "Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalate, update et patch sur clusterroles, donc"
+  echo "  capable d'élargir sa propre ClusterRole ; pod portant ce compte admis au nom des contrôleurs de Tekton et de Chains : le"
+  echo "  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai)"
+  set -f
+  while read -r sa; do
+    u=system:serviceaccount:kube-system:$sa
+    r=""
+    while IFS='|' read -r v res; do
+      [ "$(kubectl auth can-i "$v" "$res" -n kube-system --as "$u" 2>/dev/null || true)" = yes ] && r="$r [$v $res]"
+    done <<'LISTE'
+*|*
+escalate|clusterroles
+bind|clusterroles
+update|clusterroles
+create|clusterrolebindings
+impersonate|serviceaccounts
+create|serviceaccounts/token
+create|pods
+LISTE
+    [ -z "$r" ] || echo "  $sa :$r"
+  done < <(kubectl get sa -n kube-system -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+  set +f
+  ba_attendu "comptes de kube-system à '*' '*'" "$(kubectl get sa -n kube-system -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
+    | while read -r sa; do kubectl auth can-i '*' '*' --as "system:serviceaccount:kube-system:$sa" 2>/dev/null || true; done | grep -c '^yes$' || true)" 0
+  u=system:serviceaccount:kube-system:clusterrole-aggregation-controller
+  ba_attendu "clusterrole-aggregation-controller : escalate, update, patch sur clusterroles" \
+    "$(for v in escalate update patch; do kubectl auth can-i "$v" clusterroles --as "$u" 2>/dev/null || true; done | paste -sd,)" "yes,yes,yes"
+  hc_pod clusterrole-aggregation-controller "$T/hc-pod-crac.json"
+  for u in system:serviceaccount:tekton-pipelines:tekton-pipelines-controller system:serviceaccount:tekton-chains:tekton-chains-controller; do
+    kubectl create --as "$u" --dry-run=server -f "$T/hc-pod-crac.json" > "$T/creation.out" 2>&1 \
+      && echo "OK   $u : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert" \
+      || { echo "KO   $u : pod portant clusterrole-aggregation-controller refusé ($(tr '\n' ' ' < "$T/creation.out" | cut -c1-200))" >&2; k=1; }
+  done
   [ "$k" = 0 ] || { echo "KO   helm_cilium : mesure contraire à la prédiction" >&2; exit 1; }
 }
 

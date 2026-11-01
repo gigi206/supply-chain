@@ -1,4 +1,4 @@
-# preuves.sh helm_cilium, 2026-11-01T19:09:50Z
+# preuves.sh helm_cilium, 2026-11-01T19:15:38Z
 Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
 - aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
   helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)
@@ -46,3 +46,21 @@ OK   system:serviceaccount:tekton-chains:tekton-chains-controller : refusé (pod
   témoin, compte default : admis
 OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
   témoin, compte default : admis
+## pouvoirs des comptes de kube-system (ajouté après un relevé à la main du 01/11/2026 : prédiction non aveugle)
+Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalate, update et patch sur clusterroles, donc
+  capable d'élargir sa propre ClusterRole ; pod portant ce compte admis au nom des contrôleurs de Tekton et de Chains : le
+  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai)
+  clusterrole-aggregation-controller : [escalate clusterroles] [update clusterroles]
+  daemon-set-controller : [create pods]
+  generic-garbage-collector : [update clusterroles]
+  job-controller : [create pods]
+  local-path-provisioner-service-account : [create pods]
+  persistent-volume-binder : [create pods]
+  replicaset-controller : [create pods]
+  replication-controller : [create pods]
+  service-account-controller : [create serviceaccounts/token]
+  statefulset-controller : [create pods]
+OK   comptes de kube-system à '*' '*' : 0
+OK   clusterrole-aggregation-controller : escalate, update, patch sur clusterroles : yes,yes,yes
+OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert
+OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert
