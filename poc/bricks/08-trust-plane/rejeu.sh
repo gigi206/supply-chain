@@ -9,7 +9,7 @@
 # fenêtre de démarrage, trace des refus (Hubble sous Cilium, NFLOG sous kube-router), usurpation d'adresse), bascule du gabarit
 # en service vers la pipeline sample-app (J8, preuves.sh bascule : en dernier, les étapes de J6 et les tests de J8 qui supposent
 # le gabarit d'essai la refusent, garde gabarit_essai), puis contrôle des secrets dans les journaux. Libellé par défaut j1-j6 (nom historique des journaux ; J7 est fini depuis le 01/11/2026) ; avec J7, rejoué sous Cilium le 30/10/2026 en
-# cinq morceaux, pas encore d'un seul tenant. Téléchargements, CA et certificats restent en cache ; l'état
+# cinq morceaux, puis d'un seul tenant avec J8 le 01/11/2026 (libellé j1-j8). Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
 # lit les entrées des bancs du laptop (~/.cache/supply-chain-poc/w/b03, empreintes épinglées) et interroge sum.golang.org.
 #

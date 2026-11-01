@@ -1,4 +1,4 @@
-# tsa.sh openbao, 2026-10-30T19:24:49Z
+# tsa.sh openbao, 2026-11-01T16:01:00Z
 Key                       Value
 ---                       -----
 allow_plaintext_backup    false
@@ -7,9 +7,9 @@ deletion_allowed          false
 derived                   false
 exportable                false
 imported_key              false
-keys                      map[1:map[certificate_chain: creation_time:2026-10-30T19:24:49.506526639Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJVqzQLNLS4qTI/JOzNivZiO0Cfoi
-vzagVxCtWZsgmLNlgiDYJa2EPAAKv5A3Br0J+YRL45+Vzg/w1Vwjwd3u4Q==
+keys                      map[1:map[certificate_chain: creation_time:2026-11-01T16:01:00.484975491Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAER4qFFQzu+Kjj01jta+ANbRg3Vugm
+LD74aBSAgMSoMVV0XjJzFq1sLSluLWJpaIpOgjUHwGh21OBn5WVsoixSsA==
 -----END PUBLIC KEY-----
 ]]
 latest_version            1
@@ -41,6 +41,6 @@ path "auth/token/renew-self" {
 }
 certificat feuille émis pour la clé Transit tsa
 ~/.cache/supply-chain-poc/08/pki/tsa-feuille.crt: OK
-subject=O=supply-chain PoC, CN=TSA du PoC issuer=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Oct 30 19:24:50 2027 GMT X509v3 Basic Constraints: critical CA:FALSE X509v3 Key Usage: critical Digital Signature X509v3 Extended Key Usage: critical Time Stamping
-OK   clé publique du certificat = clé publique Transit tsa (SPKI sha256 5f4ebc2a8e6fb8e2…)
-{"mediaType":"application/vnd.dev.sigstore.trustedroot+json;version=0.1","tsa":[{"uri":"http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp","certificats":2,"validFor":{"start":"2026-10-30T19:24:50Z"}}],"tlogs":0,"ca":0,"ctlogs":0}
+subject=O=supply-chain PoC, CN=TSA du PoC issuer=O=supply-chain PoC, CN=Racine TSA du PoC notAfter=Nov 1 16:01:01 2027 GMT X509v3 Basic Constraints: critical CA:FALSE X509v3 Key Usage: critical Digital Signature X509v3 Extended Key Usage: critical Time Stamping
+OK   clé publique du certificat = clé publique Transit tsa (SPKI sha256 a033952643d8ee79…)
+{"mediaType":"application/vnd.dev.sigstore.trustedroot+json;version=0.1","tsa":[{"uri":"http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp","certificats":2,"validFor":{"start":"2026-11-01T16:01:01Z"}}],"tlogs":0,"ca":0,"ctlogs":0}
