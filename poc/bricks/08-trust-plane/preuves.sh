@@ -54,6 +54,12 @@
 #          tag illisible ou double : anomalie. Témoin logique (même digest, autre dépôt) ; témoin réel builds/essai-enveloppes
 #          (PipelineRun preuve-enveloppes signé par Chains, tag .att réécrit par poc-ecriture : enveloppe du TaskRun retirée,
 #          enveloppe du PipelineRun en double, puis tag d'origine remis). Ponctuel, depuis l'hôte : une mesure, pas une détection continue
+#   reserve_c  réserve de la décision C (ADR 0000) : règles de fond de conforma/policy v1.0.28 (slsa3, trusted_task) réécrites en CEL
+#          (politique/reserve-c), évaluées par le CLI Kyverno 1.19.2 sur l'image réelle ; provenance lue dans les bundles du job
+#          d'horodatage (tag .att non vérifiable sans journal, kyverno#17109). Choix de la provenance par Kyverno sur le vrai dépôt et
+#          sur des dépôts d'essai du test 8 (lecture seule) ; parité règle par règle avec ec sur le PipelineRun réel (dépôt d'essai
+#          qui ne porte que son bundle) ; témoins de données (liste revue, révision, builder) jugés par les deux moteurs. Trace :
+#          diagnostics de Kyverno, verdicts de ec, ordre des referrers
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -1625,6 +1631,183 @@ etape_enveloppes() {
     || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies ou décompte" >&2; ko=$((ko + 1)); }
   garder apres
   [ "$ko" = 0 ] || { echo "KO   contrôle exécutions/enveloppes : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
+}
+
+RCV_URL=https://sc-stockage.poc.test:3000/$SAMPLE_APP.git
+RCV_PR=horodatage/essais-test8/partiel-20261101t122804z   # dépôt d'essai du test 8 : le seul bundle du PipelineRun réel 1fb94652
+RCV_NA='attestation_type.deprecated_policy_attestation_format|builtin.attestation.syntax_check|porte\.|_provided$|\.data$|\.data_format$|future_deny_rule|build_script_used|trusted_task\.current'
+
+rc_ordre() { # dépôt-des-bundles : invocationId (8 car.) et genre (PR si une entrée pipelineTask a un contenu, sinon TR) de chaque
+  # bundle referrer de l'image réelle, dans l'ordre de l'index rendu par Zot (celui que Kyverno parcourt)
+  local m l
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$1/referrers/$APP_DIGEST" \
+    | jq -r --arg t "$TYPE_BUNDLE" '.manifests[] | select(.artifactType == $t) | .digest' | while read -r m; do
+      l=$(curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$REG_HOTE/v2/$1/manifests/$m" \
+        | jq -r '.layers[0].digest')
+      curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$1/blobs/$l" | jq -r '.dsseEnvelope.payload | @base64d | fromjson | .predicate
+        | .runDetails.metadata.invocationId[0:8] + ":" + (if any(.buildDefinition.resolvedDependencies[]; .name == "pipelineTask" and has("content"))
+          then "PR" else "TR" end)' 2>/dev/null || echo "illisible:-"
+    done
+}
+
+rc_kyverno() { # libellé dépôt-des-bundles mode [taches.yml] [policy.yaml] [révision] : politique rendue, CLI 1.19.2 sur l'image réelle ;
+  # $T/rc-<libellé>.res (pass|fail|error, message) et .ms ; KO si la politique n'est pas évaluée (le CLI saute en silence un document
+  # illisible : « Applying 0 policy rule(s) », code 0)
+  local l=$1 t0 t1
+  python3 -I "$here/politique/reserve-c/generer.py" "$here/politique/reserve-c/ivpol.tmpl.yaml" "$R/chains-cle-publique.pem" \
+    "${4:-$here/politique/porte/taches.yml}" "${5:-$here/politique/porte/policy.yaml}" reserve-c "$REG_HOTE/*" "$REG_HOTE/$2" "$RCV_URL" \
+    "${6:-$TETE_J2}" "$3" > "$T/rc-$l.yaml"
+  printf 'apiVersion: v1\nkind: Pod\nmetadata: {name: reserve-c, namespace: bancc}\nspec:\n  containers:\n    - name: app\n      image: %s\n' \
+    "$REG_HOTE/$APP" > "$T/rc-pod.yaml"
+  t0=$(ms)
+  SSL_CERT_FILE=$P/ca-poc.crt kyverno apply "$T/rc-$l.yaml" --resource "$T/rc-pod.yaml" --policy-report --output-format json \
+    > "$T/rc-$l.out" 2> "$T/rc-$l.err" || true
+  t1=$(ms); echo $((t1 - t0)) > "$T/rc-$l.ms"
+  python3 -I -c 'import json,re,sys
+t = re.sub(r"\x1b\[[0-9;]*m", "", open(sys.argv[1]).read()); i = t.find("{"); d = json.loads(t[i:]) if i >= 0 else {}
+r = d.get("results", [])
+if len(r) != 1: print("absent\tpolitique non évaluée"); sys.exit()
+print(r[0].get("result", "?") + "\t" + (r[0].get("message") or "").replace("\n", " "))' "$T/rc-$l.out" > "$T/rc-$l.res"
+  grep -q '^absent' "$T/rc-$l.res" && { echo "KO   $l : politique non évaluée par le CLI ($(head -c 200 "$T/rc-$l.err"))" >&2; exit 1; }
+  return 0
+}
+
+rc_diag() { # libellé dépôt-des-bundles [taches.yml] [policy.yaml] [révision] : diagnostic ; $T/rc-<libellé>.regles (code=ok|ko|avert,
+  # triées) ; invocationId de la provenance retenue sur la sortie
+  local m
+  rc_kyverno "$1" "$2" diagnostic "${3:-}" "${4:-}" "${5:-}"
+  m=$(cut -f2 "$T/rc-$1.res")
+  [ "${m%% *}" = DIAG ] || { echo "KO   $1 : diagnostic attendu, reçu : $(cut -c1-300 "$T/rc-$1.res")" >&2; exit 1; }
+  tr ' ' '\n' <<< "$m" | sed -n '3,$p' | sort > "$T/rc-$1.regles"
+  cut -d' ' -f2 <<< "$m"
+}
+
+rc_ko() { { grep '=ko$' "$T/rc-$1.regles" || true; } | sed 's/=ko$//' | paste -sd, -; }   # libellé : règles en échec (CEL), triées
+
+rc_ec() { # libellé : statuts de ec réduits aux codes réécrits (succès ok, violation ko, une par code ; avertissements : un par entrée)
+  local c
+  c=$(cut -d= -f1 "$T/rc-$1.regles" | sort -u | paste -sd'|' -)
+  jq -r '.components[] | (.successes[]? | .metadata.code + "=ok"), (.violations[]? | .metadata.code + "=ko"), (.warnings[]? | .metadata.code + "=avert")' \
+    "$T/porte-rc-$1.json" | grep -E "^($c)=" | awk -F= '$2 == "avert" || !v[$0]++' | sort
+}
+
+rc_parite() { # libellé : même liste de statuts pour Kyverno (CEL) et ec, règle par règle ; écarts sur la sortie
+  diff <(rc_ec "$1") "$T/rc-$1.regles" | grep '^[<>]' | sed -e 's/^</  ec seul      :/' -e 's/^>/  Kyverno seul :/' || true
+}
+
+etape_reserve_c() {
+  local ko=0 d r inv att dern v e n l c
+  echo "## prédiction (réserve de la décision C, ADR 0000 ; plan validé par le propriétaire le 30/10/2026)"
+  echo "règles : collection slsa3 (20) et paquet trusted_task (9) de conforma/policy v1.0.28, inclus par la porte ; réécrites en CEL (Kyverno 1.19.2) :"
+  echo "  les règles de fond, avec les données de la porte (liste revue, allowed_builder_ids, source attendue) ; sans objet : règles de"
+  echo "  données (*_provided, rule_data_provided, data, data_format), future_deny_rule (format trusted_task_rules, absent de la porte),"
+  echo "  build_script_used (vide dans la bibliothèque sur ce format : elle lit task.name et task.steps, absents d'un TaskRun complet),"
+  echo "  current (aucune date d'expiration dans la liste revue de la porte)"
+  echo "  (passage précédent archivé : subject_build_task_matches réécrite avec la règle voisine image_built_by_trusted_task, collection"
+  echo "  redhat, hors de la porte, lue sans ses métadonnées ; pinned sorti seulement en avertissement ; relevé par le témoin liste)"
+  echo "  Sondes exploratoires faites avant cette prédiction, avec le même CLI depuis l'hôte (01/11/2026) ; l'étape les rejoue"
+  echo "entrée : le tag .att de Chains n'est pas vérifiable par Kyverno sans journal (kyverno#17109, J5) ; provenance lue dans les bundles"
+  echo "  du job d'horodatage (attestor à dépôt séparé, sans tsaCertChain : erreur interne avec, J5). ec juge le tag .att : entrées différentes"
+  echo "choix de la provenance (code de Kyverno 1.19.2 : loadBundles suit l'index des referrers de Zot, verifyBundles vérifie tous les bundles,"
+  echo "  AddVerifiedIntotoPayloads garde une provenance par type, la dernière) : Kyverno retient la dernière provenance valide de l'index,"
+  echo "  la bibliothèque le PipelineRun le plus récent (finishedOn). Sur horodatage/bundles (toutes les images du digest), une autre image peut"
+  echo "  être retenue ; deux dépôts aux deux mêmes bundles dans l'ordre inverse donnent deux provenances différentes"
+  echo "parité (PipelineRun réel 1fb94652, seul bundle de $RCV_PR) : mêmes statuts règle par règle que ec sur l'image réelle,"
+  echo "  toutes respectées, trusted_task.tagged en avertissement une fois par tâche (3), pinned respectée ; Kyverno admet"
+  echo "témoins de données, même provenance, mêmes changements pour les deux moteurs :"
+  echo "  publier-image retirée de la liste revue : trusted_task.trusted"
+  echo "  révision attendue fictive : slsa_source_correlated.expected_source_code_reference"
+  echo "  allowed_builder_ids sans le builder de Chains : slsa_build_build_service.slsa_builder_id_accepted"
+  echo "configuration réelle (horodatage/bundles) : Kyverno refuse l'image réelle, que ec admet (provenance retenue : une autre image du digest)"
+  garder avant
+  [ "$(kyverno version 2>/dev/null | sed -n 's/^Version: //p')" = 1.19.2 ] && echo "OK   CLI Kyverno 1.19.2 (mise.toml)" \
+    || { echo "KO   version du CLI Kyverno" >&2; exit 1; }
+  rc_src() { jq -nc --arg u "$RCV_URL" --arg r "$1" '{git: {url: $u, revision: $r}}'; }
+
+  echo "## coût de la réécriture (lignes hors commentaires et lignes vides)"
+  n=$(grep -v -E '^\s*(#|$)' "$here/politique/reserve-c/ivpol.tmpl.yaml" | wc -l)
+  l=$(sed -n '/- name: pr$/,/^  validations:/p' "$here/politique/reserve-c/ivpol.tmpl.yaml" | grep -v -E '^\s*(#|$)' | wc -l)
+  d=$O/telechargements/conforma-policy
+  v=$(for c in attestation_type slsa_provenance_available slsa_build_build_service slsa_build_scripted_build slsa_source_version_controlled \
+      slsa_source_correlated tasks trusted_task; do git -C "$d" show "$CPOL_COMMIT:policy/release/$c/$c.rego"; done | grep -v -E '^\s*(#|$)' | wc -l)
+  e=$(for c in release/lib/attestations.rego lib/tekton/task.rego lib/tekton/refs.rego lib/tekton/task_results.rego lib/tekton/trusted.rego; do
+      git -C "$d" show "$CPOL_COMMIT:policy/$c"; done | grep -v -E '^\s*(#|$)' | wc -l)
+  echo "CEL (politique/reserve-c/ivpol.tmpl.yaml) : $n lignes, dont $l pour les règles (le reste : attestors, variables d'entrée, données)"
+  echo "Rego de la bibliothèque pour les mêmes paquets : $v lignes (8 paquets), plus $e lignes des bibliothèques lib qu'ils appellent"
+  echo "  (tous les formats de la bibliothèque ; la réécriture ne couvre que ceux de la porte : SLSA v1, slsa-tekton, résolveur bundles, ancien format)"
+
+  echo "## choix de la provenance par Kyverno (index des referrers de Zot ; dernière provenance valide attendue)"
+  for r in horodatage/bundles horodatage/essais-test8/copie-20261101t120333z horodatage/essais-test8/copie-20261101t122804z \
+      horodatage/essais-test8/partiel-20261101t120333z "$RCV_PR" horodatage/essais-test8/webhook-seul-20261101t122804z; do
+    rc_ordre "$r" > "$T/rc-ordre"
+    dern=$(tail -1 "$T/rc-ordre")
+    l=${r##*/}
+    inv=$(rc_diag "sel-$l" "$r")
+    att=$(rc_ko "sel-$l")
+    echo "$r : $(grep -c . "$T/rc-ordre") bundle(s), $(cut -d: -f2 "$T/rc-ordre" | sort | uniq -c | awk '{printf "%s%s %s", s, $1, $2; s=", "}') ; dernier de l'index : $dern"
+    [ "${inv:0:8}" = "${dern%%:*}" ] && echo "OK   retenue : ${inv:0:8} (dernière de l'index) ; Kyverno : ${att:-admis}" \
+      || { echo "KO   retenue : ${inv:0:8}, dernière de l'index ${dern%%:*}" >&2; ko=$((ko + 1)); }
+    if [ "$(grep -c . "$T/rc-ordre")" -le 4 ]; then echo "  index : $(paste -sd' ' "$T/rc-ordre")"; fi
+  done
+  a=$(rc_ordre horodatage/essais-test8/copie-20261101t120333z | cut -d: -f1 | paste -sd' ' -)
+  b=$(rc_ordre horodatage/essais-test8/copie-20261101t122804z | cut -d: -f1 | paste -sd' ' -)
+  [ "$a" = "$(awk '{print $2, $1}' <<< "$b")" ] && [ "$(rc_ko sel-copie-20261101t120333z)" != "$(rc_ko sel-copie-20261101t122804z)" ] \
+    && echo "OK   mêmes deux enveloppes de l'image réelle ($a, puis $b) : la provenance retenue suit l'ordre de l'index, le verdict aussi" \
+    || { echo "KO   copie : ordres $a / $b" >&2; ko=$((ko + 1)); }
+  inv=$(rc_diag sel-bundles horodatage/bundles)
+  kubectl get pipelinerun,taskrun -A -o json | jq -r --arg u "$inv" '.items[] | select(.metadata.uid == $u)
+    | "provenance retenue sur horodatage/bundles : \(.kind) \(.metadata.namespace)/\(.metadata.name), image \([.status.results[]? | select(.name | endswith("IMAGE_URL")) | .value] | join(","))"' \
+    | grep . || echo "provenance retenue sur horodatage/bundles : $inv (exécution purgée du cluster)"
+
+  echo "## parité règle par règle : PipelineRun réel 1fb94652 ($RCV_PR pour Kyverno, tag .att pour ec), source attendue"
+  inv=$(rc_diag reel "$RCV_PR")
+  r=$(juger rc-reel "$REG/$APP" policy.yaml porte "$(rc_src "$TETE_J2")")
+  echo "  $r"
+  e=$(rc_parite reel)
+  [ "$inv" = 1fb94652-d29c-4f0a-bf98-d0af21b446c8 ] && [ -z "$e" ] && [ "$(grep -c '=ok$' "$T/rc-reel.regles")" = "$(grep -c '=' "$T/rc-reel.regles" | awk '{print $1 - 3}')" ] \
+    && [ "$(grep -c 'tagged=avert' "$T/rc-reel.regles")" = 3 ] && [ "$(cut -d'|' -f3,4 <<< "$r")" = "true|" ] \
+    && echo "OK   $(grep -c '=ok$' "$T/rc-reel.regles") règles respectées et trusted_task.tagged ×3 en avertissement, pour les deux moteurs ; ec et Kyverno admettent" \
+    || { echo "KO   parité sur le PipelineRun réel (retenue $inv)" >&2; printf '%s\n' "$e" >&2; ko=$((ko + 1)); }
+  rc_kyverno reel-decision "$RCV_PR" decision
+  [ "$(cut -f1 "$T/rc-reel-decision.res")" = pass ] && echo "OK   politique de décision : pass ($(cat "$T/rc-reel-decision.ms") ms, CLI lancé compris)" \
+    || { echo "KO   décision : $(cat "$T/rc-reel-decision.res")" >&2; ko=$((ko + 1)); }
+  echo "codes de ec non réécrits (sans objet), statut chez ec :"
+  jq -r '.components[] | (.successes[]? | .metadata.code + "=ok"), (.violations[]? | .metadata.code + "=ko"), (.warnings[]? | .metadata.code + "=avert")' \
+    "$T/porte-rc-reel.json" | sort -u | awk -F= 'NR == FNR {c[$1]; next} !($1 in c)' "$T/rc-reel.regles" - \
+    | paste -sd' ' - | fold -s -w 150 | sed 's/^/  /'
+  jq -r '.components[] | (.successes[]?, .violations[]?, .warnings[]?) | .metadata.code' "$T/porte-rc-reel.json" | sort -u \
+    | grep -v -E "$RCV_NA" | grep -v -F -x -f <(cut -d= -f1 "$T/rc-reel.regles" | sort -u) \
+    && { echo "KO   code de ec ni réécrit ni classé sans objet" >&2; ko=$((ko + 1)); } || echo "OK   chaque code de ec est réécrit ou classé sans objet"
+
+  echo "## témoins de données (même provenance, même changement pour les deux moteurs)"
+  grep -v -e 'tekton/tasks/publier-image:' -e 'd21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b' "$here/politique/porte/taches.yml" > "$T/rc-taches.yml"
+  sed 's#- https://supply-chain.example/builders/tekton-chains@v1#- https://supply-chain.example/builders/autre@v1#' "$here/politique/porte/policy.yaml" > "$T/rc-policy.yaml"
+  cmp -s "$T/rc-policy.yaml" "$here/politique/porte/policy.yaml" && { echo "KO   policy.yaml du témoin inchangé" >&2; exit 1; }
+  par=$(printf 'test7 : revision absente du depot' | sha1sum | cut -c1-40)   # révision fictive du test 7 (404 dans Forgejo)
+  for c in "liste|$T/rc-taches.yml|$here/politique/porte/policy.yaml|$TETE_J2|trusted_task.trusted" \
+      "revision|$here/politique/porte/taches.yml|$here/politique/porte/policy.yaml|$par|slsa_source_correlated.expected_source_code_reference" \
+      "builder|$here/politique/porte/taches.yml|$T/rc-policy.yaml|$TETE_J2|slsa_build_build_service.slsa_builder_id_accepted"; do
+    IFS='|' read -r l a b v e <<< "$c"
+    kubectl get configmap -n porte porte -o json | jq --rawfile t "$a" --rawfile p "$b" '.data["taches.yml"] = $t | .data["policy.yaml"] = $p
+      | .metadata = {name: "porte-rc", namespace: "porte"}' | kubectl apply --server-side --force-conflicts -f - >/dev/null
+    rc_diag "$l" "$RCV_PR" "$a" "$b" "$v" >/dev/null
+    r=$(juger "rc-$l" "$REG/$APP" policy.yaml porte-rc "$(rc_src "$v")")
+    echo "  $r"
+    n=$(rc_parite "$l")
+    [ "$(rc_ko "$l")" = "$e" ] && [ "$(cut -d'|' -f3,4 <<< "$r")" = "false|$(trier "$e")" ] && [ -z "$n" ] \
+      && echo "OK   $l : ec et Kyverno refusent, mêmes statuts règle par règle (en échec : $e)" \
+      || { echo "KO   $l : Kyverno $(rc_ko "$l"), ec $(cut -d'|' -f4 <<< "$r")" >&2; printf '%s\n' "$n" >&2; ko=$((ko + 1)); }
+  done
+  kubectl delete configmap -n porte porte-rc --ignore-not-found >/dev/null && echo "ConfigMap porte-rc retirée"
+
+  echo "## configuration réelle : horodatage/bundles"
+  rc_kyverno bundles-decision horodatage/bundles decision
+  [ "$(cut -f1 "$T/rc-bundles-decision.res")" = fail ] \
+    && echo "CONSTAT  Kyverno refuse l'image réelle que ec admet : $(cut -f2 "$T/rc-bundles-decision.res" | cut -c1-200)" \
+    || { echo "KO   horodatage/bundles : $(cat "$T/rc-bundles-decision.res")" >&2; ko=$((ko + 1)); }
+  echo "durées du CLI (lancement compris) : $(for l in "$T"/rc-*.ms; do cat "$l"; done | sort -n | awk '{a[NR]=$1} END {printf "médiane %d ms, max %d ms, %d évaluations", a[int((NR+1)/2)], a[NR], NR}')"
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   réserve C : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"

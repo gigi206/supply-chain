@@ -73,7 +73,7 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
 - **Non testé en local** :
   - **contrôle 9** (horodatage RFC 3161) : il faut une TSA ; **mesuré en brique 08, J5** (voir plus bas) ;
   - **C-2** (parité entre CLI et admission) : il faut un cluster ; **mesuré en brique 08, J6** (voir plus bas) ;
-  - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : **mesurée en brique 08, J6** (voir plus bas).
+  - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : **mesurée en brique 08, J6** ; réécrite en CEL pour Kyverno et mesurée en **J8** (voir plus bas).
 
 ## Notation provisoire (grille C)
 
@@ -83,7 +83,7 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
 |---|---|---|---|---|---|
 | C-1 Couverture | 35 | 5 | 10/10 : contrôles 1 à 8 et 10 au banc (17/17 cas) ; contrôle 9 en brique 08 (J5), vérifié par cosign v3.1.4 dans la porte (`tools/verify-ts`), compté par décision du propriétaire | 5 | Idem : le contrôle 9 ne dépend pas du moteur |
 | C-2 Parité CLI / admission | 15 | 5 | **Mesuré en brique 08, J6** : même fichier de politique, mêmes pods, 25/25 décisions identiques (17 cas du banc, 8 cas d'horodatage) ; note retenue par le propriétaire | 2 | Deux langages (Rego en CLI, CEL à l'admission) : parité par double maintenance |
-| C-3 Bundles, referrers, TSA | 15 | 2 | Bundles et referrers natifs, y compris dans un dépôt séparé ; doc d'`extractPayload` inexacte ; **horodatage natif mais en erreur interne** avec une clé sans journal (brique 08, J5, CLI) | 3 | Natifs mais non documentés ; horodatage de Conforma non mesuré (aucune option dans `ec validate image`), à reprendre en J8 |
+| C-3 Bundles, referrers, TSA | 15 | 2 | Bundles et referrers natifs, y compris dans un dépôt séparé ; doc d'`extractPayload` inexacte ; **horodatage natif mais en erreur interne** avec une clé sans journal (brique 08, J5, CLI) | 3 | Natifs mais non documentés ; aucun horodatage dans Conforma (aucune option dans `ec validate image`, J5) ; en brique 08, J8 (test 8), le contrôle 9 est joint à la porte par cosign, hors de Conforma |
 | C-4 Maintenabilité | 15 | 3 | 88 lignes, un seul langage ; tests (`kyverno test`) à écrire | 2 | 77 lignes de Rego + 88 de CEL, deux langages ; tests à écrire |
 | C-5 Santé | 10 | 4 | Sain, CNCF, plusieurs employeurs (Scorecard 7,8) | 2 | Limité par Conforma : 0.x, sponsor unique (6,6) |
 | C-6 Performance | 10 | 5 | ≈ 0,5 s | 5 | ≈ 1 s |
@@ -116,3 +116,17 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
   - une liste `trusted_tasks` par digest ;
   - Conforma dans un pod, et non sur l'hôte, qui ne résout pas les noms des bundles.
 - **Pour la décision C.** En CEL, il faudrait réécrire ces règles sur le même contenu (`slsa-tekton`), ou sur l'URI et le digest des tâches (`slsa`). Décision du propriétaire (30/10/2026) : `slsa-tekton` ; la réécriture porterait donc sur le TaskRun complet.
+
+**Réserve mesurée côté Kyverno en brique 08, J8 (01/11/2026)** ([journal](../../../bricks/08-trust-plane/resultats/preuves-reserve_c.log), [politique](../../../bricks/08-trust-plane/politique/reserve-c/ivpol.tmpl.yaml), détail dans le README de la brique). Les notes ne changent pas ; ces faits pèsent sur la décision C, qui revient au propriétaire.
+- **Réécriture** : les règles de fond de `slsa3` et `trusted_task` sont réécrites en CEL, soit 20 codes, dont 2 contrôles de signature, plus `tagged` et `pinned`.
+  - 112 lignes de règles, 171 au total. Le Rego de la bibliothèque compte 861 lignes pour ces 8 paquets, plus 963 lignes de `lib`, pour tous les formats.
+  - La réécriture ne couvre que les formats de la porte.
+  - Les TaskRuns complets se décodent par `base64.decode` et `json.unmarshal`.
+- **Parité sur la bonne provenance** : sur le PipelineRun réel, Kyverno 1.19.2 et ec rendent les mêmes statuts règle par règle.
+  - Les trois témoins de données donnent aussi les mêmes statuts : liste revue, révision attendue, builder.
+  - Au deuxième passage, une règle voisine hors de la porte avait été fusionnée par erreur. Seul un témoin l'a relevée.
+- **Choix de la provenance, non réécrivable.**
+  - Kyverno ne vérifie pas le tag `.att` sans journal (kyverno#17109) : il lit les bundles d'horodatage du digest.
+  - Il garde la dernière provenance valide de l'index des referrers de Zot. Le code de Kyverno 1.19.2 le montre (`loadBundles`, `verifyBundles`, `AddVerifiedIntotoPayloads`), et la mesure le confirme dans 6 cas sur 6. Les deux mêmes enveloppes, dans l'ordre inverse, donnent deux verdicts.
+  - Sur la configuration réelle, il juge la provenance d'une autre image du même digest et **refuse l'image réelle, que ec admet**. La bibliothèque juge le PipelineRun le plus récent.
+- **Durée** : 350 ms en médiane par évaluation du CLI.

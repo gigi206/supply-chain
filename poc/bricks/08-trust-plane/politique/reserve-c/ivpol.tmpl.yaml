@@ -1,0 +1,199 @@
+# Brique 08, J8 : réserve de la décision C (ADR 0000). Règles de fond de la bibliothèque conforma/policy v1.0.28 (commit
+# ebd3fbd2 ; collection slsa3 et paquet trusted_task, inclus par politique/porte/policy.yaml) réécrites en CEL pour Kyverno
+# 1.19.2, avec les données de la porte (politique/porte/taches.yml, ruleData de policy.yaml, source attendue du test 7).
+# Codes = ceux de ec, pour comparer règle par règle. Règles de données (*_provided, rule_data_provided, data, data_format) :
+# sans objet, les données sont dans la politique ; future_deny_rule : format trusted_task_rules, absent de la porte ; current :
+# aucune date d'expiration dans la liste revue (le générateur ne lit que ref).
+# Les marqueurs entre doubles soulignés sont remplacés par preuves.sh (etape_reserve_c, reserve-c.py) : nom, glob des images,
+# dépôt des bundles, clé de Chains, builders admis, source attendue, liste revue, et validation (décision ou diagnostic).
+# Choix de la provenance : Kyverno ne garde qu'une provenance par type de prédicat (la dernière des referrers vérifiés,
+# AddVerifiedIntotoPayloads) ; la bibliothèque juge le PipelineRun le plus récent. Les règles portent donc sur la provenance
+# retenue par Kyverno, et celles que la bibliothèque applique aux provenances de PipelineRun sont vides si elle n'en est pas une.
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: __NOM__
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  matchImageReferences:
+    - glob: "__GLOB__"
+  attestors:
+    # Signature d'image : tag .sig du dépôt de l'image (Chains en dsse)
+    - name: image
+      cosign:
+        key:
+          data: |
+__CHAINS_PUB__
+        ctlog:
+          insecureIgnoreTlog: true
+    # Provenance : bundles du job d'horodatage (dépôt séparé) ; le tag .att n'est pas vérifiable sans journal (kyverno#17109).
+    # Sans tsaCertChain : avec, erreur interne (J5)
+    - name: bundles
+      cosign:
+        key:
+          data: |
+__CHAINS_PUB__
+        source:
+          repository: __BUNDLES__
+        ctlog:
+          insecureIgnoreTlog: true
+  attestations:
+    - name: prov
+      intoto:
+        type: https://slsa.dev/provenance/v1
+  variables:
+    - name: img
+      expression: images.containers[0]
+    - name: digestImage
+      expression: variables.img.split('@')[1]
+    - name: sigImage
+      expression: verifyImageSignatures(variables.img, [attestors.image]) > 0
+    - name: sigProv
+      expression: verifyAttestationSignatures(variables.img, attestations.prov, [attestors.bundles]) > 0
+    # Énoncé in-toto complet de la provenance retenue (extractPayload exige la vérification avant)
+    - name: st
+      expression: "variables.sigProv ? extractPayload(variables.img, attestations.prov) : {'predicate': {}}"
+    - name: bd
+      expression: "variables.st.predicate.?buildDefinition.orValue({})"
+    - name: deps
+      expression: "variables.bd.?resolvedDependencies.orValue([])"
+    # Données de la porte
+    - name: builders
+      expression: "__BUILDERS__"
+    - name: taches
+      expression: "__TACHES__"
+    - name: sourceUrl
+      expression: "'__SOURCE_URL__'"
+    - name: sourceRev
+      expression: "'__SOURCE_REV__'"
+    # Provenance de PipelineRun (lib.pipelinerun_attestations) : buildType admis et runSpec de pipeline
+    - name: pr
+      expression: >-
+        variables.st.?predicateType.orValue('') == 'https://slsa.dev/provenance/v1'
+        && variables.bd.?buildType.orValue('') in ['tekton.dev/v1/PipelineRun', 'tekton.dev/v1beta1/PipelineRun',
+          'https://tekton.dev/attestations/chains/pipelinerun@v2', 'https://tekton.dev/chains/v2/slsa',
+          'https://tekton.dev/chains/v2/slsa-tekton']
+        && (!has(variables.bd.externalParameters) || !has(variables.bd.externalParameters.runSpec)
+          || has(variables.bd.externalParameters.runSpec.pipelineRef) || has(variables.bd.externalParameters.runSpec.pipelineSpec))
+    # Tâches (tekton.tasks) : TaskRuns complets des entrées pipelineTask (buildType slsa-tekton), de genre task ; référence
+    # (tekton.task_ref) : champ bundle ou résolveur bundles de spec.taskRef. Autres formes (git, en ligne) : sans bundle, donc
+    # non approuvées
+    - name: taches_pr
+      expression: >-
+        variables.pr ? variables.deps.filter(d, d.?name.orValue('') == 'pipelineTask' && has(d.content))
+          .map(d, json.unmarshal(string(base64.decode(d.content)))) : []
+    - name: t
+      expression: >-
+        variables.taches_pr.map(x, cel.bind(r, x.?spec.?taskRef.orValue({}),
+          cel.bind(pb, r.?params.orValue([]).filter(p, p.name == 'bundle').map(p, p.value),
+          cel.bind(pk, r.?params.orValue([]).filter(p, p.name == 'kind').map(p, p.value),
+          cel.bind(b, r.?bundle.orValue(size(pb) > 0 ? pb[0] : ''),
+          cel.bind(n, b.split('@')[0],
+          cel.bind(tag, n.lastIndexOf(':') > n.lastIndexOf('/') ? n.substring(n.lastIndexOf(':') + 1) : '',
+          cel.bind(repo, tag != '' ? n.substring(0, n.lastIndexOf(':')) : n, {
+            'run': dyn(x),
+            'nom': dyn(x.?metadata.?labels.orValue({})[?'tekton.dev/pipelineTask'].orValue('?')),
+            'kind': dyn(r.?kind.orValue(size(pk) > 0 ? pk[0] : 'task').lowerAscii()),
+            'bundle': dyn(b),
+            'tag': dyn(tag),
+            'digest': dyn(size(b.split('@')) > 1 ? b.split('@')[1] : ''),
+            'cle': dyn(tag != '' ? 'oci://' + repo + ':' + tag : 'oci://' + repo),
+            'resultats': dyn(x.?status.?results.orValue([])),
+            'params': dyn(x.?spec.?params.orValue([]))
+          })))))))).filter(k, k.kind == 'task')
+    # Approuvée (is_trusted_task_legacy) : clé dans la liste et digest épinglé parmi ses ref
+    - name: approuvees
+      expression: >-
+        variables.t.filter(k, k.digest != '' && k.cle in variables.taches && k.digest in variables.taches[k.cle]).map(k, k.nom)
+    # Tâches de build (tekton.build_tasks) : résultats *IMAGE_URL/*IMAGE_DIGEST, *ARTIFACT_URI/*ARTIFACT_DIGEST, *IMAGES ;
+    # paires url@digest par préfixe de nom (la bibliothèque apparie par rang, après tri par nom dans chaque suffixe)
+    - name: build
+      expression: >-
+        variables.t.map(k, cel.bind(v, k.resultats.filter(r, type(r.value) == string && r.value.trim() != ''), {
+          'k': dyn(k),
+          'paires': dyn((v.filter(r, r.name.endsWith('IMAGE_URL')).map(r, cel.bind(pre, r.name.substring(0, size(r.name) - 9),
+              v.filter(s, s.name == pre + 'IMAGE_DIGEST').map(s, r.value.trim() + '@' + s.value.trim())))
+            + v.filter(r, r.name.endsWith('ARTIFACT_URI')).map(r, cel.bind(pre, r.name.substring(0, size(r.name) - 12),
+              v.filter(s, s.name == pre + 'ARTIFACT_DIGEST').map(s, r.value.trim() + '@' + s.value.trim())))
+            + v.filter(r, r.name.endsWith('IMAGES')).map(r, r.value.split(',').map(i, i.trim()).filter(i, i.contains('@')))).flatten())
+        })).filter(e, size(e.paires) > 0)
+    - name: digestsBuild
+      expression: "variables.build.map(e, e.paires.map(x, x.split('@')[1])).flatten()"
+    # Matériaux git (slsa_source_version_controlled.materials, slsa_source_correlated._source_references)
+    - name: materiaux
+      expression: "variables.deps.filter(d, has(d.uri) && has(d.digest) && has(d.digest.sha1))"
+    - name: refsAttestees
+      expression: >-
+        variables.deps.filter(d, has(d.uri) && has(d.digest) && ['git', 'hg', 'bzr', 'svn'].exists(v, d.uri.startsWith(v + '+')))
+          .map(d, d.digest.map(a, a in ['sha1', 'gitCommit', 'sha256', 'sha224', 'sha384', 'sha512'] ? d.uri + '@' + a + ':' + d.digest[a] : '')
+          .filter(x, x != '')).flatten()
+    - name: refsAttendues
+      expression: >-
+        cel.bind(u, 'git+' + variables.sourceUrl, [u, u.endsWith('.git') ? u.substring(0, size(u) - 4) : u, u + '.git',
+          u.endsWith('/') ? u.substring(0, size(u) - 1) : u, (u.endsWith('/') ? u.substring(0, size(u) - 1) : u) + '.git']
+          .map(x, ['sha1', 'gitCommit'].map(a, x + '@' + a + ':' + variables.sourceRev)).flatten())
+    # Valeurs (chaînes) d'un paramètre ou d'un résultat : chaîne, liste ou objet (lib.param_values, lib.result_values)
+    - name: sures
+      expression: >-
+        variables.build.filter(e, e.k.nom in variables.approuvees).map(e, e.k.resultats.map(r,
+          (type(r.value) == string ? [r.value] : type(r.value) == list ? r.value : r.value.map(c, r.value[c]))
+            .filter(v, type(v) == string).map(v, v.findAll('sha256:[0-9a-f]{64}')).flatten()).flatten()).flatten()
+          + [variables.digestImage]
+    - name: sortiesTA
+      expression: >-
+        variables.t.map(k, k.resultats.filter(r, r.name.endsWith('_ARTIFACT') && type(r.value) == string
+          && r.value.matches('oci:.*@sha256:[0-9a-f]{64}')).map(r, r.value)).flatten()
+    # Une entrée par règle : code -> respectée
+    - name: regles
+      expression: >-
+        {
+          'builtin.image.signature_check': variables.sigImage,
+          'builtin.attestation.signature_check': variables.sigProv,
+          'attestation_type.known_attestation_type': !variables.pr
+            || variables.st.?_type.orValue('') in ['https://in-toto.io/Statement/v0.1', 'https://in-toto.io/Statement/v1'],
+          'attestation_type.pipelinerun_attestation_found': variables.pr,
+          'slsa_provenance_available.attestation_predicate_type_accepted': !variables.pr
+            || variables.st.predicateType in ['https://slsa.dev/provenance/v0.2', 'https://slsa.dev/provenance/v1'],
+          'slsa_build_build_service.slsa_builder_id_found': !variables.pr
+            || variables.st.predicate.?runDetails.?builder.?id.hasValue(),
+          'slsa_build_build_service.slsa_builder_id_accepted': !variables.pr
+            || variables.st.predicate.?runDetails.?builder.?id.orValue('') in variables.builders,
+          'slsa_build_scripted_build.build_task_image_results_found': !variables.pr || size(variables.build) > 0,
+          'slsa_build_scripted_build.subject_build_task_matches': !variables.pr || size(variables.build) == 0
+            || variables.st.?subject.orValue([]).all(s, s.digest.all(a,
+              variables.build.exists(e, e.paires.exists(p, p.split('@')[0].split(':')[0] == s.name.split(':')[0]
+                && p.split('@')[1] == a + ':' + s.digest[a])))),
+          'slsa_source_version_controlled.materials_format_okay': !variables.pr || size(variables.materiaux) > 0,
+          'slsa_source_version_controlled.materials_uri_is_git_repo': variables.materiaux.all(m, m.uri.startsWith('git+')),
+          'slsa_source_version_controlled.materials_include_git_sha': variables.materiaux.all(m, m.digest.sha1.matches('^[a-f0-9]{40}$')),
+          'slsa_source_correlated.source_code_reference_provided': variables.sourceUrl != '',
+          'slsa_source_correlated.attested_source_code_reference': size(variables.refsAttestees) > 0,
+          'slsa_source_correlated.expected_source_code_reference': size(variables.refsAttestees) == 0 || variables.sourceUrl == ''
+            || variables.refsAttendues.exists(x, x in variables.refsAttestees),
+          'tasks.pipeline_has_tasks': !variables.pr || size(variables.t) > 0,
+          'tasks.successful_pipeline_tasks': variables.t.all(k, k.run.?status.?conditions.orValue([]).exists(c, c.type == 'Succeeded')
+            && k.run.status.conditions.filter(c, c.type == 'Succeeded').all(c, c.status == 'True')),
+          'trusted_task.trusted': variables.t.all(k, k.nom in variables.approuvees),
+          'trusted_task.trusted_parameters': variables.build.all(e, e.k.params.filter(p, !p.name.endsWith('_ARTIFACT')).all(p,
+            (type(p.value) == string ? [p.value] : type(p.value) == list ? p.value : p.value.map(c, p.value[c]))
+              .filter(v, type(v) == string).all(v, v.findAll('sha256:[0-9a-f]{64}').all(d, d in variables.sures)))),
+          'trusted_task.valid_trusted_artifact_inputs': variables.t.all(k, k.params.filter(p, p.name.endsWith('_ARTIFACT')
+            && type(p.value) == string && p.value.matches('oci:.*@sha256:[0-9a-f]{64}')).all(p, p.value in variables.sortiesTA))
+        }
+    # Lignes code=ok|ko, puis avertissements de trusted_task (tagged : bundle sans tag ; pinned : sans digest), un par tâche,
+    # ou =ok sans avertissement (comme ec). image_built_by_trusted_task (collection redhat) n'est pas dans la porte
+    - name: lignes
+      expression: >-
+        variables.regles.map(c, c + '=' + (variables.regles[c] ? 'ok' : 'ko'))
+          + cel.bind(w, variables.t.filter(k, k.bundle != '' && k.tag == '').map(k, 'trusted_task.tagged=avert'),
+            size(w) > 0 ? w : ['trusted_task.tagged=ok'])
+          + cel.bind(w, variables.t.filter(k, k.digest == '').map(k, 'trusted_task.pinned=avert'),
+            size(w) > 0 ? w : ['trusted_task.pinned=ok'])
+  validations:
+__VALIDATION__
