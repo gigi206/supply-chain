@@ -1,0 +1,97 @@
+# preuves.sh test7, 2026-11-01T11:23:58Z
+## prédiction (bibliothèque conforma/policy v1.0.28, lue au commit ebd3fbd2 ; politique policy.yaml de la porte)
+source attendue : dépôt workspace/sample-app de Forgejo et commit TETE_J2 du script, comparé à la tête de main dans l'API de
+  Forgejo, jamais lu dans la provenance jugée ; transmise à ec par --images (input.image.source)
+A  image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, source attendue : admise, aucune violation (premier verdict complet d'une image réelle)
+B  même image, révision fictive absente du dépôt, puis URL d'un autre dépôt : refusée, slsa_source_correlated.expected_source_code_reference seule
+C  builds/essai-images@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (même digest, poussé par poc-images en J7, jamais présenté à Chains ; signatures dans
+   builds/sample-app seulement) : refusée, builtin.attestation.signature_check et builtin.image.signature_check
+D1 témoins à clé jetable (essais-j8/test7, ConfigMap porte-temoin), provenance réelle au sujet réécrit, source attendue ; L : listée
+   (construire-image 403ccbd8), N : même provenance citant construire-image c7e8b275, retirée de la liste revue. Référence W =
+   violations de « listee » : subject_build_task_matches seule (digest du témoin, constat de reglec) ; trusted_task.trusted parmi ses succès
+   non-listee (N) : W + trusted_task.trusted ; nl-recente (L, puis N plus récente d'une heure) : W + trusted_task.trusted ;
+   l-recente (N plus ancienne d'une heure, puis L) : W, admise par trusted_task (seule la plus récente est jugée : faiblesse mesurée) ;
+   egalite (L et N au même finishedOn) : W + trusted_task.trusted (les deux sont jugées) ;
+   sans-date (L, puis N sans finishedOn) : aucune provenance de PipelineRun retenue (toutes doivent être datées), trusted_task.trusted
+   en succès à vide ; refus porté par attestation_type.pipelinerun_attestation_found (lib.pipelinerun_attestations vide) et
+   porte.taches_vues ; tasks.pipeline_has_tasks ne parcourt que les provenances retenues et ne refuse rien (deuxième passage :
+   prédit à tort, lu ensuite dans tasks.rego)
+D2 vraies signatures de Chains sur builds/essai-webhook@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (image de la tâche en service, sans source git : Vw =
+   violations de son verdict de départ) : PipelineRun d'une pipeline signée dont la tâche, signée par la clé des tâches, est hors de la
+   liste revue (bundle tekton/tasks/preuve-test7) : sa provenance devient la plus récente, Vw + trusted_task.trusted ; puis PipelineRun
+   du gabarit en service : Vw, trusted_task.trusted parmi les succès, la provenance non listée plus ancienne restant dans le tag .att
+OK   ConfigMap porte : porte.rego et policy.yaml identiques aux fichiers versionnés
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## source attendue
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f (commit du script)
+révision du cas B : df5e344157272eb01650c727c29c34be50807653 (fictive, absente du dépôt : 404 dans l'API de Forgejo ; 6391fd437f26696847041be3226bbbf633f55a2f est la racine, sans parent)
+## A, B : image réelle
+  VERDICT|t7-reel|true||trusted_task.tagged|30
+OK   reel : admise, aucune violation
+OK   reel : expected_source_code_reference, trusted_task.trusted et porte.construction_kata parmi les succès
+  VERDICT|t7-mauvaise-revision|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|30
+OK   mauvaise-revision : refusée, violations prédites
+  motif mauvaise-revision : The expected source code reference "git+https://sc-stockage.poc.test:3000/workspace/sample-app.git@df5e344157272eb01650c727c29c34be50807653" is not attested
+  VERDICT|t7-mauvaise-url|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|30
+OK   mauvaise-url : refusée, violations prédites
+  motif mauvaise-url : The expected source code reference "git+https://sc-stockage.poc.test:3000/workspace/autre-depot.git@6391fd437f26696847041be3226bbbf633f55a2f" is not attested
+## C : même digest dans builds/essai-images, poussé par poc-images (J7, construction.sh compte), sans Chains
+builds/essai-images : enveloppes 0, signature 0
+  VERDICT|t7-poc-images|false|builtin.attestation.signature_check,builtin.image.signature_check||30
+OK   poc-images : refusée, violations prédites
+  motif poc-images : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matching attestations: 
+## D1 : témoins à clé jetable, ordre des provenances
+provenance réelle reprise : PipelineRun 1fb94652-d29c-4f0a-bf98-d0af21b446c8, finishedOn 2026-10-30T20:11:28Z
+listee : essais-j8/test7@sha256:341514912f1e582adb0a224d01700954ebb0d2db677d988cb9bc5646a4ac4ad3 ; enveloppes dans l'ordre des couches : L (construire-image 403ccbd8, finishedOn 2026-10-30T20:11:28Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 1 ; clé de Chains : refusée
+non-listee : essais-j8/test7@sha256:ff5a12efbdbb86b2ea6b4bcb61433e8d1d5f5d021d56329718301f49a29175ca ; enveloppes dans l'ordre des couches : N (construire-image c7e8b275, finishedOn 2026-10-30T20:11:28Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 1 ; clé de Chains : refusée
+nl-recente : essais-j8/test7@sha256:df889c6538bb85ac2a745a8d9815c7fda8043b37262dba6b503d3de12c2c9fb5 ; enveloppes dans l'ordre des couches : L (construire-image 403ccbd8, finishedOn 2026-10-30T20:11:28Z) N-recente (construire-image c7e8b275, finishedOn 2026-10-30T21:11:28Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+l-recente : essais-j8/test7@sha256:6a458430dc28330bf8ed4276d07359d1a330cefa18c18db2815b8d898d956433 ; enveloppes dans l'ordre des couches : N-ancienne (construire-image c7e8b275, finishedOn 2026-10-30T19:11:28Z) L (construire-image 403ccbd8, finishedOn 2026-10-30T20:11:28Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+egalite : essais-j8/test7@sha256:3ef6c8be055b527c786d9065bf92d8e7b7bbdd6f7f7928ec5c1208a769d20c16 ; enveloppes dans l'ordre des couches : L (construire-image 403ccbd8, finishedOn 2026-10-30T20:11:28Z) N (construire-image c7e8b275, finishedOn 2026-10-30T20:11:28Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+sans-date : essais-j8/test7@sha256:f8a5e37c1d26dad641f62e2ed9cb6dd9bc6c0b876ad135763f57d9b2167c1376 ; enveloppes dans l'ordre des couches : L (construire-image 403ccbd8, finishedOn 2026-10-30T20:11:28Z) N-sans-date (construire-image c7e8b275, finishedOn absent)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+  VERDICT|t7-listee|false|slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|30
+OK   listee : refusée, violations prédites
+OK   listee : trusted_task.trusted parmi les succès
+  VERDICT|t7-non-listee|false|slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|30
+OK   non-listee : refusée, violations prédites
+  VERDICT|t7-nl-recente|false|slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|30
+OK   nl-recente : refusée, violations prédites
+  VERDICT|t7-egalite|false|slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|31
+OK   egalite : refusée, violations prédites
+  motif nl-recente : PipelineTask "construire" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906. Please upgrade the task v
+  VERDICT|t7-l-recente|false|slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|31
+OK   l-recente : refusée, violations prédites
+CONSTAT  l-recente : trusted_task.trusted en succès malgré l'enveloppe signée citant construire-image c7e8b275, plus ancienne (seule la plus récente est jugée)
+  VERDICT|t7-sans-date|false|attestation_type.pipelinerun_attestation_found,porte.taches_vues||31
+OK   sans-date : refusée par attestation_type.pipelinerun_attestation_found et porte.taches_vues seules, trusted_task.trusted hors des violations
+CONSTAT  sans-date : trusted_task.trusted en succès à vide (aucune provenance de PipelineRun retenue)
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+## D2 : vraies signatures de Chains, builds/essai-webhook@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+provenances de PipelineRun de builds/essai-webhook : 17 ; non listées : 2 ; les trois plus récentes :
+  2026-10-30T23:53:03Z bd04d9f9 listée
+  2026-11-01T11:21:42Z a34511dd non listée (preuve-test7@sha256:a3d1d9eb4ddcc3418139)
+  2026-11-01T11:22:35Z 108cc015 listée
+  VERDICT|t7-webhook-depart|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31
+OK   départ : trusted_task.trusted parmi les succès ; Vw = slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay
+tâche hors liste : tekton/tasks/preuve-test7@sha256:353daa0d07725ccb49a87e7a98c0397400aa0f22e7f7fd74ab1376ca4540c4fd (gabarit de publier-essai, même image et même digest, nouvelle signature)
+PipelineRun preuve-test7-hors-liste (tekton/pipelines/preuve-test7@sha256:ae6a7d4552f86cd0cbc721c852ee66f412e0a2b65c9cf16b28edc9cecbcb680d) : True|Succeeded|True, Chains : signé=true
+OK   la provenance la plus récente de builds/essai-webhook est celle de preuve-test7-hors-liste (49e8d44c-17c7-4cb2-810a-c1a09246ba59)
+  VERDICT|t7-webhook-hors-liste|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|31
+OK   webhook-hors-liste : refusée, violations prédites
+  motif webhook-hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/preuve-test7@sha256:353daa0d07725ccb49a87e7a98c0397400aa0f22e7f7fd74ab1376ca4540c4fd
+PipelineRun preuve-test7-en-service (gabarit en service) : True|Succeeded|True, Chains : signé=true
+OK   la provenance la plus récente de builds/essai-webhook est celle de preuve-test7-en-service (134478d9-39ff-4a14-b48e-afa02c17b610)
+  VERDICT|t7-webhook-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31
+OK   webhook-en-service : refusée, violations prédites
+provenances de PipelineRun de builds/essai-webhook : 19 ; non listées : 3 ; les trois plus récentes :
+  2026-11-01T11:22:35Z 108cc015 listée
+  2026-11-01T11:31:37Z 49e8d44c non listée (preuve-test7@sha256:353daa0d07725ccb49a8)
+  2026-11-01T11:32:31Z 134478d9 listée
+CONSTAT  vraies signatures : trusted_task.trusted en succès, la provenance de preuve-test7-hors-liste (plus ancienne, non listée) restant dans le tag .att
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)

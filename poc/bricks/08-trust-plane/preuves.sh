@@ -34,6 +34,12 @@
 #          (clé de Chains), puis images témoins d'essais-j8/regle-c signées par une clé jetable et munies de la provenance réelle,
 #          sujet réécrit : intacte, runtimeClassName retiré du seul TaskRun construire (taskRunSpecs gardés à kata), runc ;
 #          même Job, même politique, ConfigMap porte-temoin (clé publique jetable). Trace : verdicts de ec, motifs
+#   test7  porte de release du cluster, source attendue fournie (--images, commit du script comparé à la tête de Forgejo) : image
+#          réelle, mauvaise révision, mauvaise URL ; même digest dans builds/essai-images (poussé par poc-images, sans Chains) ;
+#          ordre des provenances, par des témoins d'essais-j8/test7 signés par une clé jetable (provenance réelle listée, et la même
+#          citant construire-image c7e8b275, retirée de la liste : seule, plus récente, plus ancienne, à égalité, sans date), puis
+#          par de vraies signatures de Chains sur builds/essai-webhook (tâche signée hors liste, bundle tekton/tasks/preuve-test7,
+#          puis gabarit en service). Trace : verdicts de ec, motifs, provenances du tag .att
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -754,21 +760,24 @@ EOF
 
 RC_DEPOT=essais-j8/regle-c   # images témoins de reglec (non supprimables de Zot)
 
-oci_signe() { # digest fichier type-de-couche suffixe : tag <suffixe> d'une seule couche signée au format hérité de cosign
-  # (config rootfs, annotation de signature), dans RC_DEPOT ; pour .att, le fichier est l'enveloppe DSSE et l'annotation vide
-  local l c a
-  l=sha256:$(sha256sum < "$2" | cut -c1-64)
-  [ "$4" = sig ] && a=$(base64 -w0 "$2.sig") || a=
-  jq -nc --arg l "$l" '{architecture: "", os: "", config: {}, rootfs: {type: "layers", diff_ids: [$l]}}' > "$T/rc-config.json"
+oci_signe() { # digest type-de-couche suffixe fichier… : tag <suffixe> signé au format hérité de cosign (config rootfs, annotation
+  # de signature), une couche par fichier, dans OCI_DEPOT (RC_DEPOT par défaut) ; pour .att, chaque fichier est une enveloppe DSSE
+  # et l'annotation est vide (Chains : une enveloppe par couche)
+  local d=${OCI_DEPOT:-$RC_DEPOT} f a c ls=()
+  for f in "${@:4}"; do
+    [ "$3" = sig ] && a=$(base64 -w0 "$f.sig") || a=
+    zot_ecrire blob push "$REG_HOTE/$d" "$f" >/dev/null
+    ls+=("$(jq -nc --arg l "sha256:$(sha256sum < "$f" | cut -c1-64)" --argjson n "$(stat -c%s "$f")" --arg t "$2" --arg a "$a" \
+      '{mediaType: $t, digest: $l, size: $n,
+        annotations: {"dev.cosignproject.cosign/signature": $a, "dev.sigstore.cosign/certificate": "", "dev.sigstore.cosign/chain": ""}}')")
+  done
+  printf '%s\n' "${ls[@]}" | jq -sc '{architecture: "", os: "", config: {}, rootfs: {type: "layers", diff_ids: map(.digest)}}' > "$T/rc-config.json"
   c=sha256:$(sha256sum < "$T/rc-config.json" | cut -c1-64)
-  zot_ecrire blob push "$REG_HOTE/$RC_DEPOT" "$2" >/dev/null
-  zot_ecrire blob push "$REG_HOTE/$RC_DEPOT" "$T/rc-config.json" >/dev/null
-  jq -nc --arg l "$l" --argjson n "$(stat -c%s "$2")" --arg c "$c" --argjson cn "$(stat -c%s "$T/rc-config.json")" --arg t "$3" --arg a "$a" \
+  zot_ecrire blob push "$REG_HOTE/$d" "$T/rc-config.json" >/dev/null
+  printf '%s\n' "${ls[@]}" | jq -sc --arg c "$c" --argjson cn "$(stat -c%s "$T/rc-config.json")" \
     '{schemaVersion: 2, mediaType: "application/vnd.oci.image.manifest.v1+json",
-      config: {mediaType: "application/vnd.oci.image.config.v1+json", digest: $c, size: $cn},
-      layers: [{mediaType: $t, digest: $l, size: $n,
-        annotations: {"dev.cosignproject.cosign/signature": $a, "dev.sigstore.cosign/certificate": "", "dev.sigstore.cosign/chain": ""}}]}' > "$T/rc-manifeste.json"
-  zot_ecrire manifest push "$REG_HOTE/$RC_DEPOT:sha256-${1#sha256:}.$4" "$T/rc-manifeste.json" >/dev/null
+      config: {mediaType: "application/vnd.oci.image.config.v1+json", digest: $c, size: $cn}, layers: .}' > "$T/rc-manifeste.json"
+  zot_ecrire manifest push "$REG_HOTE/$d:sha256-${1#sha256:}.$3" "$T/rc-manifeste.json" >/dev/null
 }
 
 rc_temoin() { # cas filtre-jq-sur-le-TaskRun-construire : image témoin signée, provenance réelle modifiée ; digest dans $T/rc-<cas>.image
@@ -779,7 +788,7 @@ rc_temoin() { # cas filtre-jq-sur-le-TaskRun-construire : image témoin signée,
   jq -nc --arg r "$REG/$RC_DEPOT" --arg d "$d" '{critical: {identity: {"docker-reference": $r}, image: {"docker-manifest-digest": $d},
     type: "cosign container image signature"}, optional: null}' > "$T/rc-$c-simple.json"
   openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/rc-$c-simple.json.sig" "$T/rc-$c-simple.json"
-  oci_signe "$d" "$T/rc-$c-simple.json" application/vnd.dev.cosign.simplesigning.v1+json sig
+  oci_signe "$d" application/vnd.dev.cosign.simplesigning.v1+json sig "$T/rc-$c-simple.json"
   jq -c --arg r "$REG/$RC_DEPOT" --arg x "${d#sha256:}" '.subject = [{name: $r, digest: {sha256: $x}}]
     | .predicate.buildDefinition.resolvedDependencies |= map(if .name == "pipelineTask" and .content != null
         and ((.content | @base64d | fromjson).metadata.labels["tekton.dev/task"] == "construire-image")
@@ -789,7 +798,7 @@ rc_temoin() { # cas filtre-jq-sur-le-TaskRun-construire : image témoin signée,
   openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/rc-$c.dsse" "$T/rc-$c.pae"
   jq -nc --arg t "$pt" --arg p "$(base64 -w0 "$T/rc-$c.payload")" --arg s "$(base64 -w0 "$T/rc-$c.dsse")" \
     '{payloadType: $t, payload: $p, signatures: [{keyid: "", sig: $s}]}' > "$T/rc-$c-env.json"
-  oci_signe "$d" "$T/rc-$c-env.json" application/vnd.dsse.envelope.v1+json att
+  oci_signe "$d" application/vnd.dsse.envelope.v1+json att "$T/rc-$c-env.json"
   echo "$c : $RC_DEPOT@$d ; runtimeClassName du TaskRun construire signé : $(jq -r '.predicate.buildDefinition.resolvedDependencies[]
     | select(.name == "pipelineTask" and .content != null) | .content | @base64d | fromjson
     | select(.metadata.labels["tekton.dev/task"] == "construire-image") | .spec.podTemplate.runtimeClassName // "absent"' "$T/rc-$c.payload") ;"\
@@ -870,6 +879,229 @@ etape_reglec() {
   echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie"
   garder apres
   [ "$ko" = 0 ] || { echo "KO   règle (c) : au moins une mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+T7_DEPOT=essais-j8/test7   # images témoins du test 7 (non supprimables de Zot)
+C7E8=sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906   # construire-image retirée de la liste revue (J7)
+
+t7_prov() { # nom filtre-jq : provenance réelle ($T/rc-prov.json) modifiée par le filtre, dans $T/t7-<nom>.prov
+  jq -c --arg c "${C7E8#sha256:}" 'def non_listee: .predicate.buildDefinition.resolvedDependencies |= map(
+      if .name == "pipelineTask" and (.uri // "" | endswith("/tekton/tasks/construire-image")) then .digest.sha256 = $c
+        | if .content != null then .content = ((.content | @base64d | fromjson)
+            | .spec.taskRef.params |= map(if .name == "bundle" then .value |= sub("@sha256:[0-9a-f]+$"; "@sha256:" + $c) else . end)
+            | .status.provenance.refSource.digest.sha256 = $c | tojson | @base64) else . end
+      else . end);
+    '"$2" "$T/rc-prov.json" > "$T/t7-$1.prov"
+}
+
+t7_temoin() { # cas prov… : image témoin de T7_DEPOT signée par la clé jetable, une enveloppe par provenance (sujet réécrit), dans
+  # l'ordre donné ; digest dans $T/t7-<cas>.image
+  local c=$1 d p pt i=0 envs=()
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/cas=test7-$c-$RC_PASSAGE" \
+    -t "$REG_HOTE/$T7_DEPOT:$c" "$REG_HOTE/$APP" 2>/dev/null)
+  d=${d##*@}; echo "$d" > "$T/t7-$c.image"
+  jq -nc --arg r "$REG/$T7_DEPOT" --arg d "$d" '{critical: {identity: {"docker-reference": $r}, image: {"docker-manifest-digest": $d},
+    type: "cosign container image signature"}, optional: null}' > "$T/t7-$c-simple.json"
+  openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/t7-$c-simple.json.sig" "$T/t7-$c-simple.json"
+  OCI_DEPOT=$T7_DEPOT oci_signe "$d" application/vnd.dev.cosign.simplesigning.v1+json sig "$T/t7-$c-simple.json"
+  pt=$(jq -r .payloadType "$T/rc-env-chains.json")
+  for p in "${@:2}"; do
+    i=$((i + 1))
+    jq -c --arg r "$REG/$T7_DEPOT" --arg x "${d#sha256:}" '.subject = [{name: $r, digest: {sha256: $x}}]' "$T/t7-$p.prov" > "$T/t7-$c-$i.payload"
+    { printf 'DSSEv1 %d %s %d ' "${#pt}" "$pt" "$(stat -c%s "$T/t7-$c-$i.payload")"; cat "$T/t7-$c-$i.payload"; } > "$T/t7-$c-$i.pae"
+    openssl dgst -sha256 -sign "$T/auth/rc.key" -out "$T/t7-$c-$i.dsse" "$T/t7-$c-$i.pae"
+    jq -nc --arg t "$pt" --arg p "$(base64 -w0 "$T/t7-$c-$i.payload")" --arg s "$(base64 -w0 "$T/t7-$c-$i.dsse")" \
+      '{payloadType: $t, payload: $p, signatures: [{keyid: "", sig: $s}]}' > "$T/t7-$c-$i.env"
+    envs+=("$T/t7-$c-$i.env")
+  done
+  OCI_DEPOT=$T7_DEPOT oci_signe "$d" application/vnd.dsse.envelope.v1+json att "${envs[@]}"
+  echo "$c : $T7_DEPOT@$d ; enveloppes dans l'ordre des couches : $(for p in "${@:2}"; do jq -r --arg p "$p" '.predicate as $q
+    | ([$q.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and (.uri // "" | endswith("/construire-image")))][0].digest.sha256[0:8]) as $t
+    | "\($p) (construire-image \($t), finishedOn \($q.runDetails.metadata.finishedOn // "absent"))"' "$T/t7-$p.prov"; done | paste -sd' ' -)"
+  echo "  sur l'hôte, clé jetable : signature $(cosign verify --key "$T/rc.pub" --insecure-ignore-tlog --registry-cacert "$P/ca-poc.crt" \
+    "$REG_HOTE/$T7_DEPOT@$d" >/dev/null 2>&1 && echo vérifiée || echo REFUSÉE), enveloppes vérifiées : $(cosign verify-attestation --key "$T/rc.pub" \
+    --insecure-ignore-tlog --type https://slsa.dev/provenance/v1 --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$T7_DEPOT@$d" 2>/dev/null | grep -c . || true) ;"\
+    "clé de Chains : $(cosign verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog --type https://slsa.dev/provenance/v1 \
+    --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$T7_DEPOT@$d" >/dev/null 2>&1 && echo vérifiée || echo refusée)"
+}
+
+t7_derniere() { # PipelineRun : attend que la provenance la plus récente de builds/essai-webhook soit la sienne (envoi de Chains)
+  local u; u=$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')
+  for _ in $(seq 60); do
+    [ "$(prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.runDetails.metadata.invocationId')" = "$u" ] \
+      && { echo "OK   la provenance la plus récente de builds/essai-webhook est celle de $1 ($u)"; return; }
+    sleep 2
+  done
+  echo "KO   provenance la plus récente de builds/essai-webhook hors de $1" >&2; exit 1
+}
+
+t7_provenances() { # provenances de PipelineRun de builds/essai-webhook : listées ou non (tâche publier), les trois plus récentes
+  prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -sr --arg t "$1" 'sort_by(.predicate.runDetails.metadata.finishedOn)
+    | map(.predicate | ([.buildDefinition.resolvedDependencies[] | select(.name == "pipelineTask" and .uri != null) | (.uri | sub("^oci://"; "")) + "@sha256:" + .digest.sha256][0] // "") as $u
+      | "\(.runDetails.metadata.finishedOn) \(.runDetails.metadata.invocationId[0:8]) \(if $u == "" then "sans tâche" elif $u == $t then "listée" else "non listée (\($u | sub(".*/tasks/"; "") | .[0:40]))" end)")
+    | .[]' > "$T/t7-provenances"
+  echo "provenances de PipelineRun de builds/essai-webhook : $(wc -l < "$T/t7-provenances") ; non listées : $(grep -c 'non listée' "$T/t7-provenances" || true) ; les trois plus récentes :"
+  tail -3 "$T/t7-provenances" | sed 's/^/  /'
+}
+
+t7_verdict() { # cas attendu (violations triées, ou PASS) image [ConfigMap] [source] : juger, puis ligne OK ou KO ; ko incrémenté
+  local r
+  r=$(juger "t7-$1" "$3" policy.yaml "${4:-porte}" "${5:-}")
+  echo "  $r"
+  if [ "$2" = PASS ]; then
+    [ "$(cut -d'|' -f1,3,4 <<< "$r")" = "VERDICT|true|" ] && echo "OK   $1 : admise, aucune violation" || { echo "KO   $1 : admission prédite" >&2; ko=$((ko + 1)); }
+  else
+    [ "$(cut -d'|' -f1,3 <<< "$r")" = "VERDICT|false" ] && [ "$(cut -d'|' -f4 <<< "$r")" = "$(trier "$2")" ] \
+      && echo "OK   $1 : refusée, violations prédites" || { echo "KO   $1 : violations prédites $(trier "$2")" >&2; ko=$((ko + 1)); }
+  fi
+}
+
+motif() { # cas code : premier motif de cette règle dans le verdict
+  jq -r --arg c "$2" '[.components[] | .violations[]? | select(.metadata.code == $c) | .msg] | .[0] // "-"' "$T/porte-t7-$1.json" \
+    | cut -c1-220 | sed "s/^/  motif $1 : /"
+}
+
+etape_test7() {
+  local ko=0 src par f0 fm fp busybox tache pipe pipe_svc st w ww tsvc r
+  echo "## prédiction (bibliothèque conforma/policy v1.0.28, lue au commit ebd3fbd2 ; politique policy.yaml de la porte)"
+  echo "source attendue : dépôt workspace/sample-app de Forgejo et commit TETE_J2 du script, comparé à la tête de main dans l'API de"
+  echo "  Forgejo, jamais lu dans la provenance jugée ; transmise à ec par --images (input.image.source)"
+  echo "A  image réelle $APP, source attendue : admise, aucune violation (premier verdict complet d'une image réelle)"
+  echo "B  même image, révision fictive absente du dépôt, puis URL d'un autre dépôt : refusée, slsa_source_correlated.expected_source_code_reference seule"
+  echo "C  builds/essai-images@${APP_DIGEST#sha256:} (même digest, poussé par poc-images en J7, jamais présenté à Chains ; signatures dans"
+  echo "   builds/sample-app seulement) : refusée, builtin.attestation.signature_check et builtin.image.signature_check"
+  echo "D1 témoins à clé jetable ($T7_DEPOT, ConfigMap porte-temoin), provenance réelle au sujet réécrit, source attendue ; L : listée"
+  echo "   (construire-image 403ccbd8), N : même provenance citant construire-image ${C7E8:7:8}, retirée de la liste revue. Référence W ="
+  echo "   violations de « listee » : subject_build_task_matches seule (digest du témoin, constat de reglec) ; trusted_task.trusted parmi ses succès"
+  echo "   non-listee (N) : W + trusted_task.trusted ; nl-recente (L, puis N plus récente d'une heure) : W + trusted_task.trusted ;"
+  echo "   l-recente (N plus ancienne d'une heure, puis L) : W, admise par trusted_task (seule la plus récente est jugée : faiblesse mesurée) ;"
+  echo "   egalite (L et N au même finishedOn) : W + trusted_task.trusted (les deux sont jugées) ;"
+  echo "   sans-date (L, puis N sans finishedOn) : aucune provenance de PipelineRun retenue (toutes doivent être datées), trusted_task.trusted"
+  echo "   en succès à vide ; refus porté par attestation_type.pipelinerun_attestation_found (lib.pipelinerun_attestations vide) et"
+  echo "   porte.taches_vues ; tasks.pipeline_has_tasks ne parcourt que les provenances retenues et ne refuse rien (deuxième passage :"
+  echo "   prédit à tort, lu ensuite dans tasks.rego)"
+  echo "D2 vraies signatures de Chains sur builds/essai-webhook@${APP_DIGEST#sha256:} (image de la tâche en service, sans source git : Vw ="
+  echo "   violations de son verdict de départ) : PipelineRun d'une pipeline signée dont la tâche, signée par la clé des tâches, est hors de la"
+  echo "   liste revue (bundle tekton/tasks/preuve-test7) : sa provenance devient la plus récente, Vw + trusted_task.trusted ; puis PipelineRun"
+  echo "   du gabarit en service : Vw, trusted_task.trusted parmi les succès, la provenance non listée plus ancienne restant dans le tag .att"
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}') "$here/politique/porte/porte.rego" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.policy\.yaml}') "$here/politique/porte/policy.yaml" \
+    && echo "OK   ConfigMap porte : porte.rego et policy.yaml identiques aux fichiers versionnés" \
+    || { echo "KO   ConfigMap porte différente des fichiers versionnés (rejouer politique.sh porte)" >&2; exit 1; }
+  garder avant
+  mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/zot.json"
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ)
+
+  echo "## source attendue"
+  [ "$(tete)" = "$TETE_J2" ] && echo "OK   tête de main dans Forgejo : $TETE_J2 (commit du script)" || { echo "KO   tête de main différente de $TETE_J2" >&2; exit 1; }
+  # Premier passage : TETE_J2 est la racine du dépôt (aucun parent dans l'API de Forgejo) ; révision fictive à la place
+  par=$(printf 'test7 : revision absente du depot' | sha1sum | cut -c1-40)
+  [ "$(curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" "$FORGEJO_HOTE/api/v1/repos/$SAMPLE_APP/git/commits/$par")" = 404 ] \
+    && echo "révision du cas B : $par (fictive, absente du dépôt : 404 dans l'API de Forgejo ; $TETE_J2 est la racine, sans parent)" \
+    || { echo "KO   révision fictive présente dans le dépôt" >&2; exit 1; }
+  src() { jq -nc --arg u "https://sc-stockage.poc.test:3000/$1.git" --arg r "$2" '{git: {url: $u, revision: $r}}'; }
+
+  echo "## A, B : image réelle"
+  t7_verdict reel PASS "$REG/$APP" porte "$(src "$SAMPLE_APP" "$TETE_J2")"
+  succes t7-reel slsa_source_correlated.expected_source_code_reference && succes t7-reel trusted_task.trusted \
+    && succes t7-reel porte.construction_kata && echo "OK   reel : expected_source_code_reference, trusted_task.trusted et porte.construction_kata parmi les succès" \
+    || { echo "KO   reel : succès attendus absents" >&2; ko=$((ko + 1)); }
+  t7_verdict mauvaise-revision slsa_source_correlated.expected_source_code_reference "$REG/$APP" porte "$(src "$SAMPLE_APP" "$par")"
+  motif mauvaise-revision slsa_source_correlated.expected_source_code_reference
+  t7_verdict mauvaise-url slsa_source_correlated.expected_source_code_reference "$REG/$APP" porte "$(src workspace/autre-depot "$TETE_J2")"
+  motif mauvaise-url slsa_source_correlated.expected_source_code_reference
+
+  echo "## C : même digest dans builds/essai-images, poussé par poc-images (J7, construction.sh compte), sans Chains"
+  echo "builds/essai-images : enveloppes $(nb_enveloppes "builds/essai-images@$APP_DIGEST"), signature $(cosign download signature \
+    --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-images@$APP_DIGEST" 2>/dev/null | grep -c . || true)"
+  t7_verdict poc-images builtin.attestation.signature_check,builtin.image.signature_check "$REG/builds/essai-images@$APP_DIGEST" porte \
+    "$(src "$SAMPLE_APP" "$TETE_J2")"
+  motif poc-images builtin.attestation.signature_check
+
+  echo "## D1 : témoins à clé jetable, ordre des provenances"
+  (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$T/auth/rc.key")
+  openssl pkey -in "$T/auth/rc.key" -pubout -out "$T/rc.pub"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null \
+    | jq -c 'select(.payload | @base64d | fromjson | .predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)' \
+    | jq -sc 'max_by(.payload | @base64d | fromjson | .predicate.runDetails.metadata.finishedOn)' > "$T/rc-env-chains.json"
+  jq -r .payload "$T/rc-env-chains.json" | base64 -d > "$T/rc-prov.json"
+  f0=$(jq -r .predicate.runDetails.metadata.finishedOn "$T/rc-prov.json")
+  fm=$(date -u -d "$f0 - 1 hour" +%Y-%m-%dT%H:%M:%SZ); fp=$(date -u -d "$f0 + 1 hour" +%Y-%m-%dT%H:%M:%SZ)
+  echo "provenance réelle reprise : PipelineRun $(jq -r .predicate.runDetails.metadata.invocationId "$T/rc-prov.json"), finishedOn $f0"
+  t7_prov L '.'
+  t7_prov N 'non_listee'
+  t7_prov N-recente "non_listee | .predicate.runDetails.metadata.finishedOn = \"$fp\""
+  t7_prov N-ancienne "non_listee | .predicate.runDetails.metadata.finishedOn = \"$fm\""
+  t7_prov N-sans-date 'non_listee | del(.predicate.runDetails.metadata.finishedOn)'
+  t7_temoin listee L
+  t7_temoin non-listee N
+  t7_temoin nl-recente L N-recente
+  t7_temoin l-recente N-ancienne L
+  t7_temoin egalite L N
+  t7_temoin sans-date L N-sans-date
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/rc.pub" '.data["chains.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains"
+  w=slsa_build_scripted_build.subject_build_task_matches
+  t7_verdict listee "$w" "$REG/$T7_DEPOT@$(cat "$T/t7-listee.image")" porte-temoin "$(src "$SAMPLE_APP" "$TETE_J2")"
+  succes t7-listee trusted_task.trusted && echo "OK   listee : trusted_task.trusted parmi les succès" || { echo "KO   listee : trusted_task.trusted absente des succès" >&2; ko=$((ko + 1)); }
+  for r in non-listee nl-recente egalite; do
+    t7_verdict "$r" "$w,trusted_task.trusted" "$REG/$T7_DEPOT@$(cat "$T/t7-$r.image")" porte-temoin "$(src "$SAMPLE_APP" "$TETE_J2")"
+  done
+  motif nl-recente trusted_task.trusted
+  t7_verdict l-recente "$w" "$REG/$T7_DEPOT@$(cat "$T/t7-l-recente.image")" porte-temoin "$(src "$SAMPLE_APP" "$TETE_J2")"
+  succes t7-l-recente trusted_task.trusted && echo "CONSTAT  l-recente : trusted_task.trusted en succès malgré l'enveloppe signée citant construire-image ${C7E8:7:8}, plus ancienne (seule la plus récente est jugée)" \
+    || { echo "KO   l-recente : trusted_task.trusted absente des succès" >&2; ko=$((ko + 1)); }
+  r=$(juger t7-sans-date "$REG/$T7_DEPOT@$(cat "$T/t7-sans-date.image")" policy.yaml porte-temoin "$(src "$SAMPLE_APP" "$TETE_J2")")
+  echo "  $r"
+  [ "$(cut -d'|' -f1,3 <<< "$r")" = "VERDICT|false" ] && ! grep -qw trusted_task.trusted <<< "$(cut -d'|' -f4 <<< "$r")" \
+    && [ "$(cut -d'|' -f4 <<< "$r")" = attestation_type.pipelinerun_attestation_found,porte.taches_vues ] \
+    && echo "OK   sans-date : refusée par attestation_type.pipelinerun_attestation_found et porte.taches_vues seules, trusted_task.trusted hors des violations" \
+    || { echo "KO   sans-date : prédiction" >&2; ko=$((ko + 1)); }
+  succes t7-sans-date trusted_task.trusted && echo "CONSTAT  sans-date : trusted_task.trusted en succès à vide (aucune provenance de PipelineRun retenue)"
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée ; clé jetable effacée avec $T/auth à la sortie"
+
+  echo "## D2 : vraies signatures de Chains, builds/essai-webhook@${APP_DIGEST#sha256:}"
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente" >&2; exit 1; }
+  tsvc=$(awk '/tekton\/tasks\/publier-essai:/ {getline; print $3}' "$here/politique/porte/taches.yml")
+  tsvc=sc-stockage.poc.test:5000/tekton/tasks/publier-essai@$tsvc
+  t7_provenances "$tsvc"
+  ww=$(juger t7-webhook-depart "$REG/builds/essai-webhook@$APP_DIGEST")
+  echo "  $ww"
+  [ "${ww%%|*}" = VERDICT ] && succes t7-webhook-depart trusted_task.trusted && echo "OK   départ : trusted_task.trusted parmi les succès ; Vw = $(cut -d'|' -f4 <<< "$ww")" \
+    || { echo "KO   départ : la plus récente n'est pas listée, ou aucun verdict" >&2; exit 1; }
+  ww=$(cut -d'|' -f4 <<< "$ww")
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+  sed -e "s#@IMAGE@#$REG/builds/essai-webhook#" -e "s#@DIGEST@#$APP_DIGEST#" -e "s#@BUSYBOX@#$busybox#" \
+    "$here/politique/taches/publier-essai.yaml" > "$T/t7-tache.yaml"
+  tkn task sign "$T/t7-tache.yaml" -K "$S/taches.key" -f "$T/t7-tache-signee.yaml" >/dev/null 2>&1
+  tache=$REG/tekton/tasks/preuve-test7@$(bundle "$T/t7-tache-signee.yaml" tekton/tasks/preuve-test7 "$RC_PASSAGE")
+  ! listee "$tache" && echo "tâche hors liste : ${tache#"$REG/"} (gabarit de publier-essai, même image et même digest, nouvelle signature)" \
+    || { echo "KO   tâche dans la liste revue" >&2; exit 1; }
+  sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/t7-pipeline.yaml"
+  tkn pipeline sign "$T/t7-pipeline.yaml" -K "$S/taches.key" -f "$T/t7-pipeline-signee.yaml" >/dev/null 2>&1
+  pipe=$REG/tekton/pipelines/preuve-test7@$(bundle "$T/t7-pipeline-signee.yaml" tekton/pipelines/preuve-test7 "$RC_PASSAGE")
+  st=$(pr_gabarit preuve-test7-hors-liste "$pipe")
+  [ "${st%%|*}" = True ] || { echo "KO   preuve-test7-hors-liste : $st" >&2; exit 1; }
+  echo "PipelineRun preuve-test7-hors-liste (${pipe#"$REG/"}) : $(cut -d'|' -f1-3 <<< "$st"), Chains : signé=$(signe pipelinerun preuve-test7-hors-liste)"
+  t7_derniere preuve-test7-hors-liste
+  t7_verdict webhook-hors-liste "$ww,trusted_task.trusted" "$REG/builds/essai-webhook@$APP_DIGEST"
+  motif webhook-hors-liste trusted_task.trusted
+  pipe_svc=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  st=$(pr_gabarit preuve-test7-en-service "$pipe_svc")
+  [ "${st%%|*}" = True ] || { echo "KO   preuve-test7-en-service : $st" >&2; exit 1; }
+  echo "PipelineRun preuve-test7-en-service (gabarit en service) : $(cut -d'|' -f1-3 <<< "$st"), Chains : signé=$(signe pipelinerun preuve-test7-en-service)"
+  t7_derniere preuve-test7-en-service
+  t7_verdict webhook-en-service "$ww" "$REG/builds/essai-webhook@$APP_DIGEST"
+  t7_provenances "$tsvc"
+  succes t7-webhook-en-service trusted_task.trusted && grep -q "non listée (preuve-test7" "$T/t7-provenances" \
+    && echo "CONSTAT  vraies signatures : trusted_task.trusted en succès, la provenance de preuve-test7-hors-liste (plus ancienne, non listée) restant dans le tag .att" \
+    || { echo "KO   en-service : trusted_task.trusted absente des succès, ou provenance de preuve-test7 perdue" >&2; ko=$((ko + 1)); }
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   test 7 : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"

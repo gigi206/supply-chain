@@ -190,7 +190,8 @@ flowchart LR
 
 **La porte rejette** si l'une de ces conditions est vraie :
 - provenance ou signature invalide ;
-- tâche non approuvée (`trusted_task`) ;
+- tâche non approuvée (`trusted_task`). **Mesuré en brique 08 (J8, test 7)** : seule la provenance de PipelineRun la plus récente est jugée, et une provenance non approuvée plus ancienne n'empêche pas l'admission ([journal](../poc/bricks/08-trust-plane/resultats/preuves-test7.log)) ;
+- source non attestée : la source attendue (dépôt et commit) vient de la plateforme, jamais de la provenance jugée (mesuré en J8 : `3a7ca1b1` admise avec la bonne source, refusée avec une autre révision ou un autre dépôt) ;
 - VSA de replay absente ou KO (hors EL8) ;
 - MAL- ;
 - KEV sans VEX ;

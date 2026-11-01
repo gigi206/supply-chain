@@ -1,0 +1,25 @@
+# preuves.sh test7, 2026-11-01T11:13:35Z
+## prédiction (bibliothèque conforma/policy v1.0.28, lue au commit ebd3fbd2 ; politique policy.yaml de la porte)
+source attendue : dépôt workspace/sample-app de Forgejo et commit TETE_J2 du script, comparé à la tête de main dans l'API de
+  Forgejo, jamais lu dans la provenance jugée ; transmise à ec par --images (input.image.source)
+A  image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, source attendue : admise, aucune violation (premier verdict complet d'une image réelle)
+B  même image, révision parente du commit, puis URL d'un autre dépôt : refusée, slsa_source_correlated.expected_source_code_reference seule
+C  builds/essai-images@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (même digest, poussé par poc-images en J7, jamais présenté à Chains ; signatures dans
+   builds/sample-app seulement) : refusée, builtin.attestation.signature_check et builtin.image.signature_check
+D1 témoins à clé jetable (essais-j8/test7, ConfigMap porte-temoin), provenance réelle au sujet réécrit, source attendue ; L : listée
+   (construire-image 403ccbd8), N : même provenance citant construire-image c7e8b275, retirée de la liste revue. Référence W =
+   violations de « listee » : subject_build_task_matches seule (digest du témoin, constat de reglec) ; trusted_task.trusted parmi ses succès
+   non-listee (N) : W + trusted_task.trusted ; nl-recente (L, puis N plus récente d'une heure) : W + trusted_task.trusted ;
+   l-recente (N plus ancienne d'une heure, puis L) : W, admise par trusted_task (seule la plus récente est jugée : faiblesse mesurée) ;
+   egalite (L et N au même finishedOn) : W + trusted_task.trusted (les deux sont jugées) ;
+   sans-date (L, puis N sans finishedOn) : aucune provenance de PipelineRun retenue (toutes doivent être datées), trusted_task.trusted
+   en succès à vide ; refus porté par tasks.pipeline_has_tasks et porte.taches_vues
+D2 vraies signatures de Chains sur builds/essai-webhook@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (image de la tâche en service, sans source git : Vw =
+   violations de son verdict de départ) : PipelineRun d'une pipeline signée dont la tâche, signée par la clé des tâches, est hors de la
+   liste revue (bundle tekton/tasks/preuve-test7) : sa provenance devient la plus récente, Vw + trusted_task.trusted ; puis PipelineRun
+   du gabarit en service : Vw, trusted_task.trusted parmi les succès, la provenance non listée plus ancienne restant dans le tag .att
+OK   ConfigMap porte : porte.rego et policy.yaml identiques aux fichiers versionnés
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## source attendue
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f (commit du script)
+KO   commit parent introuvable

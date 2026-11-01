@@ -1247,11 +1247,15 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
   echo "$c : tâche ${tache#"$REG/"}, image builds/essai-porte@${d##*@} ; PipelineRun exécuté, Chains : signé=$(signe pipelinerun "j6-porte-$c")"
 }
 
-juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, porte par défaut] : Job de la porte ; une ligne VERDICT|cas|success|violations|
-  # avertissements|durée du conteneur en s (codes de règles triés), ou ERREUR|cas|motif si ec n'a rendu aucun verdict
-  local j=porte-$1 l d
+juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, porte par défaut] [source attendue, JSON] : Job de la porte ;
+  # une ligne VERDICT|cas|success|violations|avertissements|durée du conteneur en s (codes de règles triés), ou ERREUR|cas|motif
+  # si ec n'a rendu aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images
+  # (spec ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, le Job est celui de J6
+  local j=porte-$1 l d s=()
+  [ -n "${5:-}" ] && s=(-e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'$(jq -nc --arg c "$1" --arg i "$2" --argjson s "$5" \
+    '{components: [{name: $c, containerImage: $i, source: $s}]}')'#")
   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
-  sed -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" -e "s#@CM@#${4:-porte}#" \
+  sed "${s[@]}" -e "s#@NOM@#$j#" -e "s#@IMAGE@#$2#" -e "s#@PORTE@#$REG/$PORTE@$PORTE_DIGEST#" -e "s#@POLITIQUE@#${3:-policy.yaml}#" -e "s#@CM@#${4:-porte}#" \
     "$here/politique/porte-job.yaml" | kubectl create -f - >/dev/null
   for _ in $(seq 150); do
     [ -n "$(kubectl get job -n porte "$j" -o jsonpath='{.status.succeeded}{.status.failed}')" ] && break
