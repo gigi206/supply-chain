@@ -113,7 +113,7 @@ sequenceDiagram
   B->>Z: artefacts (binaire, image, rpm, deb via ORAS)
   B-->>C: résultats *_ARTIFACT_* / IMAGE_DIGEST
   C->>C: provenance SLSA v1 (slsa/v2alpha4), signée via OpenBao
-  C->>Z: signature + attestation (mode dsse en attendant chains#2096, puis bundle en referrer ; en dsse, écritures du tag .att non atomiques : brique 08)
+  C->>Z: signature + attestation (mode dsse en attendant chains#2096, puis bundle en referrer ; en dsse, écritures du tag .att non atomiques : brique 08 ; contrôle exécutions/enveloppes : une enveloppe vérifiée par exécution signée à sujet image, brique 08, J8)
   S->>Z: horodatage RFC 3161 par réconciliation périodique (CronJob, chaque minute, lecture de Zot seule) : par enveloppe de Chains vérifiée (clé de Chains, sujet = digest de l'image) avant toute demande au TSA, jeton du TSA (clé Transit tsa) sur la signature, bundle v0.3 réémis dans un dépôt séparé de celui de l'image [brique 08, J5 ; automatique en J6]
   Z->>A: SBOM, scan Grype (base datée), licences
   A->>Z: SBOM, résultats, VEX appliqués (attestations)

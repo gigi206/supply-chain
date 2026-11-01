@@ -1,0 +1,74 @@
+# preuves.sh enveloppes, 2026-11-01T12:50:59Z
+## prédiction (contrôle exécutions/enveloppes : décision 4 du plan validé le 30/10/2026, dsse gardé)
+règle : toute exécution (TaskRun, PipelineRun) que Chains a signée et qui a un sujet image a exactement une enveloppe, vérifiée par la
+  clé de Chains, dont l'invocationId est son UID et dont le sujet nomme son IMAGE_URL@IMAGE_DIGEST, dans le tag .att de ce dépôt ;
+  sans sujet ou signature échouée : listées, rien d'attendu ; autre forme de sujet (noms de Chains v0.29.9 : (IMAGE_URL|IMAGE_DIGEST|IMAGES|ARTIFACT_OUTPUTS|ARTIFACT_URI|ARTIFACT_DIGEST)$),
+  tag illisible, enveloppe en double : anomalie. Lecture seulement quand aucune exécution n'est en cours ni en attente de Chains
+depart : aucune anomalie (prototype du 01/11/2026 : 27 exécutions à sujet, toutes couvertes)
+temoin logique : j6-porte-en-service-publier (sujet builds/essai-webhook) cherché dans builds/essai-signature, même digest : ABSENTE
+temoin reel : preuve-enveloppes, gabarit en service, tâche et pipeline signées propres au témoin, image builds/essai-enveloppes à digest propre au passage ;
+  après signature, deux enveloppes (TaskRun publier et PipelineRun), les deux COUVERTE ; puis tag .att réécrit par poc-ecriture
+  (droit update, le même que celui de poc-build) : sans l'enveloppe du TaskRun : TaskRun ABSENTE, PipelineRun COUVERTE, rien
+  d'autre ne change ; enveloppe du PipelineRun en double : PipelineRun DOUBLE ; tag d'origine remis : les deux COUVERTE
+fin : aucune anomalie, même résultat qu'au départ plus les deux exécutions du témoin
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## départ
+OK   aucune exécution en cours ni en attente de Chains
+depart : COUVERTE 27, ECHEC_SIGNATURE 8, SANS_SUJET 16
+  builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 38 téléchargée(s), 38 vérifiée(s), sans exécution présente : 20
+  builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 téléchargée(s), 2 vérifiée(s), sans exécution présente : 0
+  builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 1 téléchargée(s), 1 vérifiée(s), sans exécution présente : 0
+OK   départ : aucune anomalie
+  ECHEC_SIGNATURE|taskrun builds/j6-autre-cle|signed=failed
+  ECHEC_SIGNATURE|taskrun builds/j6-hors-politique|signed=failed
+  ECHEC_SIGNATURE|taskrun builds/j6-modifiee|signed=failed
+  ECHEC_SIGNATURE|taskrun builds/j6-non-signee|signed=failed
+  SANS_SUJET|taskrun builds/j6-resolveur-cluster
+  SANS_SUJET|taskrun builds/j6-resolveur-git
+  SANS_SUJET|taskrun builds/j6-resolveur-http
+  SANS_SUJET|taskrun builds/j6-resolveur-hub
+  SANS_SUJET|taskrun builds/j6-restreint-confiance
+  SANS_SUJET|taskrun builds/j6-signee
+  SANS_SUJET|taskrun builds/j6-v1
+  SANS_SUJET|taskrun builds/j7-sample-app-ancienne-construire
+  SANS_SUJET|taskrun builds/j7-sample-app-construire
+  ECHEC_SIGNATURE|taskrun builds/j7-sample-app-etiquette-construire|signed=failed
+  SANS_SUJET|taskrun builds/j7-sample-app-etiquette-preparer
+  SANS_SUJET|taskrun builds/j7-sample-app-preparer
+  ECHEC_SIGNATURE|taskrun builds/j7-sample-app-sans-kata-construire|signed=failed
+  SANS_SUJET|taskrun builds/j7-sample-app-sans-kata-preparer
+  SANS_SUJET|taskrun builds/preuve-test1
+  SANS_SUJET|taskrun builds/preuve-test6-contre
+  SANS_SUJET|taskrun builds/preuve-test6-test
+  SANS_SUJET|pipelinerun builds/j7-sample-app-ancienne
+  ECHEC_SIGNATURE|pipelinerun builds/j7-sample-app-etiquette|signed=failed
+  ECHEC_SIGNATURE|pipelinerun builds/j7-sample-app-sans-kata|signed=failed
+## témoin logique : appariement par dépôt
+OK   j6-porte-en-service-publier cherché dans builds/essai-signature : ABSENTE, seule anomalie (son enveloppe est dans builds/essai-webhook)
+## témoin réel : preuve-enveloppes
+image builds/essai-enveloppes@sha256:13f4bc7f8780705ca371468f8d159b74863f3b6dae190ff7f26aeb24a560d764 ; tâche tekton/tasks/preuve-enveloppes@sha256:3be14e8a87ebfcb9f6160f9671c3bf51e264e68909a1a21a88dfdd9cc8c25f16 ; PipelineRun preuve-enveloppes : True|Succeeded, Chains : signé=true
+OK   aucune exécution en cours ni en attente de Chains
+temoin : COUVERTE 29, ECHEC_SIGNATURE 8, SANS_SUJET 16
+OK   témoin signé : deux enveloppes, TaskRun et PipelineRun couverts, aucune anomalie
+tag .att : 2 couches ; enveloppe du TaskRun (UID 0cde630b) : couche 9de87b5484bd
+retiree : ABSENTE 1, COUVERTE 28, ECHEC_SIGNATURE 8, SANS_SUJET 16
+OK   enveloppe du TaskRun retirée par réécriture du tag : TaskRun ABSENTE, PipelineRun COUVERTE, seule anomalie, rien d'autre ne change
+double : COUVERTE 28, DOUBLE 1, ECHEC_SIGNATURE 8, SANS_SUJET 16
+OK   enveloppe du PipelineRun en double : PipelineRun DOUBLE (2 enveloppes), TaskRun COUVERTE, seule anomalie
+remis : COUVERTE 29, ECHEC_SIGNATURE 8, SANS_SUJET 16
+OK   tag d'origine remis : aucune anomalie, mêmes décomptes qu'après la signature du témoin
+## fin
+OK   aucune exécution en cours ni en attente de Chains
+fin : COUVERTE 29, ECHEC_SIGNATURE 8, SANS_SUJET 16
+  builds/essai-porte@sha256:d648eaba258307bac6957705b6f111220cfca8d9b8f16f71ab6aeb81e8270f62 : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/essai-enveloppes@sha256:13f4bc7f8780705ca371468f8d159b74863f3b6dae190ff7f26aeb24a560d764 : 2 téléchargée(s), 2 vérifiée(s), sans exécution présente : 0
+  builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 38 téléchargée(s), 38 vérifiée(s), sans exécution présente : 20
+  builds/essai-porte@sha256:9cc3954b81ad5732134b8cd94233a4fecdd0204f2c2e4a47be24dde2a8f54620 : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/essai-porte@sha256:4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c : 4 téléchargée(s), 4 vérifiée(s), sans exécution présente : 2
+  builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 téléchargée(s), 2 vérifiée(s), sans exécution présente : 0
+  builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 1 téléchargée(s), 1 vérifiée(s), sans exécution présente : 0
+OK   fin : aucune anomalie, 29 exécutions couvertes (départ, 0 du témoin précédent remplacées par les deux du témoin)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)

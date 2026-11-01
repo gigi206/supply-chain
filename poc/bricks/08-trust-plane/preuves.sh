@@ -1467,18 +1467,20 @@ ee_lire() { # url@digest fichier : tag .att de l'image (nom du registre vu des p
 
 ee_controle() { # libellé : toute exécution signée qui a un sujet image a exactement une enveloppe vérifiée de son UID qui nomme ce
   # sujet, dans le tag .att de ce dépôt (pas d'un autre dépôt de même digest). Une ligne par exécution dans $T/ee-<libellé> : COUVERTE,
-  # ABSENTE, DOUBLE, LECTURE_IMPOSSIBLE, FORME_NON_TRAITEE (anomalies : les quatre dernières), SANS_SUJET, ECHEC_SIGNATURE (signed
-  # failed : aucune enveloppe attendue). EE_SUBST=nom=url@digest remplace le sujet d'une exécution (témoin logique)
+  # ABSENTE, DOUBLE, LECTURE_IMPOSSIBLE, FORME_NON_TRAITEE, SUJET_NON_SIGNE (sujet, mais signed autre que true) : anomalies ;
+  # SANS_SUJET, ECHEC_SIGNATURE (sans sujet, signed failed) : information. EE_SUBST=nom=url@digest remplace le sujet d'une
+  # exécution (témoin logique)
   local l=$1 k n u sg s f c
   ee_runs > "$T/ee-runs"
   rm -rf "$T/ee" && mkdir -p "$T/ee"
   while IFS='|' read -r k n u sg s; do
     [ -n "${EE_SUBST:-}" ] && [ "$n" = "${EE_SUBST%%=*}" ] && s=${EE_SUBST#*=}
-    [ "$sg" = true ] || { echo "ECHEC_SIGNATURE|$k $n|signed=$sg"; continue; }
     case $s in
-      -) echo "SANS_SUJET|$k $n"; continue ;;
+      -) [ "$sg" = true ] && echo "SANS_SUJET|$k $n" || echo "ECHEC_SIGNATURE|$k $n|signed=$sg"; continue ;;
       \?*) echo "FORME_NON_TRAITEE|$k $n|${s#\?}"; continue ;;
     esac
+    # un sujet sans signature de Chains est une image publiée sans provenance : anomalie, jamais une simple information
+    [ "$sg" = true ] || { echo "SUJET_NON_SIGNE|$k $n|$s|signed=$sg"; continue; }
     f=$T/ee/$(printf '%s' "$s" | sha256sum | cut -c1-16)
     [ -e "$f.etat" ] || { ee_lire "$s" "$f" < /dev/null && echo lue > "$f.etat" || echo impossible > "$f.etat"; }
     if [ "$(cat "$f.etat")" = impossible ]; then
@@ -1494,7 +1496,7 @@ ee_controle() { # libellé : toute exécution signée qui a un sujet image a exa
   echo "$l : $(cut -d'|' -f1 "$T/ee-$l" | sort | uniq -c | awk '{printf "%s%s %s", (NR > 1 ? ", " : ""), $2, $1}')"
 }
 
-ee_anomalies() { grep -E '^(ABSENTE|DOUBLE|LECTURE_IMPOSSIBLE|FORME_NON_TRAITEE)\|' "$T/ee-$1" || true; }   # libellé
+ee_anomalies() { grep -E '^(ABSENTE|DOUBLE|LECTURE_IMPOSSIBLE|FORME_NON_TRAITEE|SUJET_NON_SIGNE)\|' "$T/ee-$1" || true; }   # libellé
 
 ee_depots() { # dépôts lus au dernier contrôle : enveloppes téléchargées, vérifiées par la clé de Chains, et enveloppes vérifiées sans
   # exécution présente (sens inverse, information seulement : exécutions purgées, témoins posés sans Chains)
@@ -1516,10 +1518,13 @@ etape_enveloppes() {
   echo "## prédiction (contrôle exécutions/enveloppes : décision 4 du plan validé le 30/10/2026, dsse gardé)"
   echo "règle : toute exécution (TaskRun, PipelineRun) que Chains a signée et qui a un sujet image a exactement une enveloppe, vérifiée par la"
   echo "  clé de Chains, dont l'invocationId est son UID et dont le sujet nomme son IMAGE_URL@IMAGE_DIGEST, dans le tag .att de ce dépôt ;"
-  echo "  sans sujet ou signature échouée : listées, rien d'attendu ; autre forme de sujet (noms de Chains v0.29.9 : $ENV_SUJETS),"
-  echo "  tag illisible, enveloppe en double : anomalie. Lecture seulement quand aucune exécution n'est en cours ni en attente de Chains"
+  echo "  sans sujet (signée ou non) : listée, rien d'attendu ; sujet sans signature de Chains (signed autre que true), autre forme de"
+  echo "  sujet (noms de Chains v0.29.9 : $ENV_SUJETS), tag illisible, enveloppe en double : anomalie."
+  echo "  Lecture seulement quand aucune exécution n'est en cours ni en attente de Chains"
+  echo "  (premier passage, conforme, archivé : signed=failed était classé avant le sujet, échec ouvert relevé par l'advisor, corrigé)"
   echo "depart : aucune anomalie (prototype du 01/11/2026 : 27 exécutions à sujet, toutes couvertes)"
   echo "temoin logique : j6-porte-en-service-publier (sujet builds/essai-webhook) cherché dans builds/essai-signature, même digest : ABSENTE"
+  echo "temoin logique 2 : j6-autre-cle (signed=failed, sans sujet) muni du sujet builds/essai-webhook : SUJET_NON_SIGNE, seule anomalie"
   echo "temoin reel : $ENV_TR, gabarit en service, tâche et pipeline signées propres au témoin, image $ENV_DEPOT à digest propre au passage ;"
   echo "  après signature, deux enveloppes (TaskRun publier et PipelineRun), les deux COUVERTE ; puis tag .att réécrit par poc-ecriture"
   echo "  (droit update, le même que celui de poc-build) : sans l'enveloppe du TaskRun : TaskRun ABSENTE, PipelineRun COUVERTE, rien"
@@ -1545,6 +1550,11 @@ etape_enveloppes() {
   [ "${l%%|*}" = ABSENTE ] && [ "$(ee_anomalies logique | wc -l)" = 1 ] \
     && echo "OK   j6-porte-en-service-publier cherché dans builds/essai-signature : ABSENTE, seule anomalie (son enveloppe est dans builds/essai-webhook)" \
     || { echo "KO   témoin logique : ${l:-exécution introuvable}" >&2; ko=$((ko + 1)); }
+  EE_SUBST="builds/j6-autre-cle=$REG/builds/essai-webhook@$APP_DIGEST" ee_controle logique2 >/dev/null
+  l=$(grep -F "|taskrun builds/j6-autre-cle|" "$T/ee-logique2" || true)
+  [ "${l%%|*}" = SUJET_NON_SIGNE ] && [ "$(ee_anomalies logique2 | wc -l)" = 1 ] \
+    && echo "OK   j6-autre-cle (signed=failed) muni d'un sujet : SUJET_NON_SIGNE, seule anomalie (image publiée sans provenance)" \
+    || { echo "KO   témoin logique 2 : ${l:-exécution introuvable}" >&2; ko=$((ko + 1)); }
 
   echo "## témoin réel : $ENV_TR"
   [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente" >&2; exit 1; }
