@@ -1,0 +1,80 @@
+# preuves.sh controleurs, 2026-11-01T23:26:34Z
+Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :
+- ValidatingAdmissionPolicy tekton-controleurs-builds et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)
+- au nom de chacun des deux contrôleurs (Pipelines, Chains), essais réels refusés par la règle, rien de créé ni de modifié :
+  pod de kube-system portant clusterrole-aggregation-controller ; StatefulSet de kube-system ; PVC de kube-system ;
+  annotation d'un pod existant de kube-system ; annotation du StatefulSet openbao ; pod portant tekton-chains-controller
+  dans tekton-chains ; plus le changement d'image d'un pod de kube-system (dry-run serveur), refusé
+- témoins : même pod et même StatefulSet admis au nom de l'administrateur (dry-run serveur) ; pod default admis au nom de
+  chaque autre compte qui peut créer des pods dans kube-system (dry-run serveur) ; pods créés dans builds par le contrôleur
+  de Pipelines depuis la pose de la règle (audit) : au moins un, aucun refusé par elle
+- aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)
+- reste ouvert (information, hors admission) : lecture des Secrets de tout le cluster par les deux contrôleurs
+## règle
+OK   ValidatingAdmissionPolicy tekton-controleurs-builds (failurePolicy, à jour, avertissements de typage) : Fail true 0
+OK   liaison tekton-controleurs-builds : tekton-controleurs-builds Deny
+posée le 2026-11-01T21:37:06Z
+OK   tekton-pipelines-controller : create, update, patch, delete sur la règle et sa liaison : no
+OK   tekton-chains-controller : create, update, patch, delete sur la règle et sa liaison : no
+## essais réels au nom des contrôleurs
+pod existant visé : kube-system/local-path-provisioner-d9d8769b6-vc6rm (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao
+OK   tekton-pipelines-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   tekton-pipelines-controller : StatefulSet de kube-system : refusé (The statefulsets "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors )
+OK   tekton-pipelines-controller : PVC de kube-system : refusé (The persistentvolumeclaims "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Te)
+OK   tekton-pipelines-controller : annotation du pod local-path-provisioner-d9d8769b6-vc6rm : refusé (The pods "local-path-provisioner-d9d8769b6-vc6rm" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de )
+OK   tekton-pipelines-controller : image du pod local-path-provisioner-d9d8769b6-vc6rm remplacée (dry-run serveur) : refusé (The pods "local-path-provisioner-d9d8769b6-vc6rm" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de )
+OK   tekton-pipelines-controller : annotation du StatefulSet openbao : refusé (The statefulsets "openbao" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de builds :)
+OK   tekton-pipelines-controller : pod de tekton-chains portant tekton-chains-controller : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   tekton-chains-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   tekton-chains-controller : StatefulSet de kube-system : refusé (The statefulsets "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors )
+OK   tekton-chains-controller : PVC de kube-system : refusé (The persistentvolumeclaims "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Te)
+OK   tekton-chains-controller : annotation du pod local-path-provisioner-d9d8769b6-vc6rm : refusé (The pods "local-path-provisioner-d9d8769b6-vc6rm" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de )
+OK   tekton-chains-controller : image du pod local-path-provisioner-d9d8769b6-vc6rm remplacée (dry-run serveur) : refusé (The pods "local-path-provisioner-d9d8769b6-vc6rm" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de )
+OK   tekton-chains-controller : annotation du StatefulSet openbao : refusé (The statefulsets "openbao" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de builds :)
+OK   tekton-chains-controller : pod de tekton-chains portant tekton-chains-controller : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains) : 0
+OK   annotations preuve-controleurs posées : 0
+## témoins
+OK   administrateur : même pod admis (dry-run serveur)
+OK   administrateur : même StatefulSet admis (dry-run serveur)
+OK   daemon-set-controller : pod default de kube-system admis (dry-run serveur)
+OK   job-controller : pod default de kube-system admis (dry-run serveur)
+OK   local-path-provisioner-service-account : pod default de kube-system admis (dry-run serveur)
+OK   persistent-volume-binder : pod default de kube-system admis (dry-run serveur)
+OK   replicaset-controller : pod default de kube-system admis (dry-run serveur)
+OK   replication-controller : pod default de kube-system admis (dry-run serveur)
+OK   statefulset-controller : pod default de kube-system admis (dry-run serveur)
+refus de la règle dans l'audit de l'API (namespace, utilisateur, verbe, ressource) :
+      4   kube-system admin create persistentvolumeclaims
+      8   kube-system admin create pods
+      2   kube-system admin create statefulsets
+      8   kube-system admin patch pods
+      4   openbao admin patch statefulsets
+      4   tekton-chains admin create pods
+OK   refus de la règle dans builds (audit) : 0
+OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 30
+## reste ouvert : lecture des Secrets (hors admission)
+  tekton-pipelines-controller : list secrets dans tout le cluster : yes
+  tekton-chains-controller : list secrets dans tout le cluster : yes
+  Secrets du cluster (namespace/nom type), lisibles par les deux :
+    builds/zot-images Opaque
+    declencheurs/forgejo-webhook Opaque
+    horodatage/zot-horodatage Opaque
+    kube-system/cilium-ca Opaque
+    kube-system/hubble-server-certs kubernetes.io/tls
+    kube-system/k3s-serving kubernetes.io/tls
+    kube-system/sc-build.node-password.k3s k3s.cattle.io/node-password
+    kube-system/sc-confiance.node-password.k3s k3s.cattle.io/node-password
+    kube-system/sc-stockage.node-password.k3s k3s.cattle.io/node-password
+    kube-system/sh.helm.release.v1.cilium.v1 helm.sh/release.v1
+    kyverno/kyverno-cleanup-controller.kyverno.svc.kyverno-tls-ca kubernetes.io/tls
+    kyverno/kyverno-cleanup-controller.kyverno.svc.kyverno-tls-pair kubernetes.io/tls
+    kyverno/kyverno-generate-provenance Opaque
+    kyverno/kyverno-svc.kyverno.svc.kyverno-tls-ca kubernetes.io/tls
+    kyverno/kyverno-svc.kyverno.svc.kyverno-tls-pair kubernetes.io/tls
+    openbao/openbao-tls Opaque
+    tekton-chains/signing-secrets Opaque
+    tekton-chains/zot-chains Opaque
+    tekton-pipelines/tekton-triggers-core-interceptors-certs Opaque
+    tekton-pipelines/triggers-webhook-certs Opaque
+    tekton-pipelines/webhook-certs Opaque

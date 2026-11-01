@@ -1,0 +1,41 @@
+# Brique 08 : les contrôleurs de Tekton Pipelines et de Chains n'écrivent pods, StatefulSets et PVC que dans builds
+# (décision du propriétaire du 01/11/2026). Leurs ClusterRoles amont (tenant-access des release.yaml épinglés) leur donnent
+# create, update, patch et delete sur ces objets dans tout le cluster : un pod de kube-system portant
+# clusterrole-aggregation-controller (escalate sur les ClusterRoles) menait à cluster-admin (preuves.sh helm_cilium).
+# Liste blanche tirée de l'audit de l'API (resultats/controleurs-audit-avant-regle.log : toutes leurs écritures sont dans
+# builds ; Chains n'a créé aucun pod). Règle native de l'API et non Kyverno : Kyverno exclut kube-system (resourceFilters
+# et namespaceSelector de ses webhooks). StatefulSets couverts : sinon statefulset-controller crée le pod à leur place ;
+# UPDATE couvert : l'image d'un conteneur de pod est modifiable. Lectures (secrets de tout le cluster) hors admission.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: tekton-controleurs-builds
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE", "DELETE"]
+        resources: ["pods", "pods/*", "persistentvolumeclaims"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE", "DELETE"]
+        resources: ["statefulsets", "statefulsets/*"]
+  matchConditions:
+    - name: controleurs-tekton
+      expression: >-
+        request.userInfo.username in ['system:serviceaccount:tekton-pipelines:tekton-pipelines-controller',
+        'system:serviceaccount:tekton-chains:tekton-chains-controller']
+  validations:
+    - expression: request.namespace == 'builds'
+      messageExpression: >-
+        'contrôleur de Tekton hors de builds : ' + request.operation + ' ' + request.resource.resource + ' dans ' + request.namespace
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: tekton-controleurs-builds
+spec:
+  policyName: tekton-controleurs-builds
+  validationActions: ["Deny"]

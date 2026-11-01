@@ -1,0 +1,35 @@
+# Écritures des contrôleurs de Tekton Pipelines et de Chains dans l'audit de l'API, relevé du 2026-11-01T19:50:22Z
+# cluster du rejeu de l'option (b) (audit depuis la création de l'API : un seul fichier, premier événement 2026-11-01T18:10:58.940054Z) ; lectures et leases hors audit (k3s/audit-policy.yaml)
+# colonnes : nombre, namespace, verbe, ressource, code
+== system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+    396 builds create events 201
+      6 builds create persistentvolumeclaims 201
+     37 builds create pipelines 201
+     30 builds create pods 201
+      6 builds create pods 403
+     63 builds create resolutionrequests 201
+      6 builds create statefulsets 201
+     30 builds create taskruns 201
+    319 builds create tasks 201
+      2 builds delete pods 200
+      6 builds delete statefulsets 200
+     34 builds delete statefulsets 404
+    123 builds patch events 200
+     29 builds patch pods 200
+    109 builds patch resolutionrequests/status 200
+     34 builds patch resolutionrequests/status 409
+      1 builds patch taskruns 200
+      1 builds patch taskruns 400
+     30 builds update pipelineruns 200
+     14 builds update pipelineruns 409
+     96 builds update pipelineruns/status 200
+     71 builds update pipelineruns/status 409
+     43 builds update taskruns 200
+     15 builds update taskruns 409
+    225 builds update taskruns/status 200
+    113 builds update taskruns/status 409
+== system:serviceaccount:tekton-chains:tekton-chains-controller
+     81 builds create events 201
+     85 builds patch events 200
+     79 builds patch pipelineruns 200
+    140 builds patch taskruns 200

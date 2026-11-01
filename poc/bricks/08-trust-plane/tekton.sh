@@ -8,7 +8,8 @@
 #              airgap de k3s (vérifiées en J1) au lieu de cgr.dev/chainguard/busybox (identité de signature non documentée)
 #   installer  manifestes réécrits vers Zot (aucune référence externe tirée), contrôleurs en zone confiance (kustomize) ;
 #              Chains : KMS hashivault://chains (OpenBao, JWT avec un jeton projeté d'audience openbao), slsa/v2alpha4,
-#              stockage OCI en dsse, sans transparence publique ; contrôle : toutes les images tirées viennent de Zot
+#              stockage OCI en dsse, sans transparence publique ; contrôle : toutes les images tirées viennent de Zot ;
+#              contrôleurs de Pipelines et de Chains bornés à builds (tekton/controleurs-builds.yaml, ajouté en J8)
 #   signature  essai de la chaîne de signature : TaskRun sur sc-build qui ne fait que publier IMAGE_URL/IMAGE_DIGEST d'une
 #              image poussée depuis l'hôte ; Chains signe via OpenBao, pousse .sig et .att dans Zot ; vérification cosign
 #              avec la clé publique de Transit. Ce n'est pas un build : la provenance décrit une image non construite
@@ -159,6 +160,18 @@ etape_installer() {
   kubectl apply --server-side --force-conflicts -f "$T/chains/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
   kubectl wait --for=condition=Available deployment --all -n tekton-chains --timeout=300s
+  # Contrôleurs de Pipelines et de Chains bornés à builds pour pods, StatefulSets et PVC (J8, décision du propriétaire du
+  # 01/11/2026 ; mesure : preuves.sh controleurs)
+  kubectl apply --server-side -f "$here/tekton/controleurs-builds.yaml" >/dev/null
+  for _ in $(seq 30); do
+    [ "$(kubectl get validatingadmissionpolicy tekton-controleurs-builds -o jsonpath='{.status.observedGeneration}')" \
+      = "$(kubectl get validatingadmissionpolicy tekton-controleurs-builds -o jsonpath='{.metadata.generation}')" ] && break
+    sleep 1
+  done
+  kubectl get validatingadmissionpolicy tekton-controleurs-builds -o json | jq -e '.status.observedGeneration == .metadata.generation
+    and ((.status.typeChecking.expressionWarnings // []) | length) == 0' >/dev/null \
+    && echo "OK   ValidatingAdmissionPolicy tekton-controleurs-builds posée, vérifiée par l'API (aucun avertissement de typage)" \
+    || { kubectl get validatingadmissionpolicy tekton-controleurs-builds -o jsonpath='{.status}' >&2; echo "KO   tekton-controleurs-builds" >&2; exit 1; }
   for n in tekton-pipelines tekton-pipelines-resolvers tekton-chains; do kubectl get pods -n "$n" -o wide --no-headers | awk -v n="$n" '{print n, $1, $3, $7}'; done
   echo "## images réellement tirées (imageID des conteneurs)"
   kubectl get pods -n tekton-pipelines -o json | jq -r '.items[].status.containerStatuses[].imageID' > "$T/ids"

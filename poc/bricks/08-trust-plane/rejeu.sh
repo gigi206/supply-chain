@@ -9,8 +9,9 @@
 # fenêtre de démarrage, trace des refus (Hubble sous Cilium, NFLOG sous kube-router), usurpation d'adresse), bascule du gabarit
 # en service vers la pipeline sample-app (J8, preuves.sh bascule : en dernier, les étapes de J6 et les tests de J8 qui supposent
 # le gabarit d'essai la refusent, garde gabarit_essai), sous Cilium aucun compte de service à cluster-admin (preuves.sh helm_cilium,
-# option (b) du propriétaire du 01/11/2026), puis contrôle des secrets dans les journaux. Libellé par défaut j1-j6 (nom historique des journaux ; J7 est fini depuis le 01/11/2026) ; avec J7, rejoué sous Cilium le 30/10/2026 en
-# cinq morceaux, puis d'un seul tenant avec J8 le 01/11/2026 (libellé j1-j8), puis avec l'option (b) (libellé option-b). Téléchargements, CA et certificats restent en cache ; l'état
+# option (b) du propriétaire du 01/11/2026), contrôleurs de Tekton et de Chains bornés à builds (preuves.sh controleurs, règle posée
+# en J4 par tekton.sh installer), puis contrôle des secrets dans les journaux. Libellé par défaut j1-j6 (nom historique des journaux ; J7 est fini depuis le 01/11/2026) ; avec J7, rejoué sous Cilium le 30/10/2026 en
+# cinq morceaux, puis d'un seul tenant avec J8 le 01/11/2026 (libellé j1-j8), puis avec l'option (b) (libellé option-b), puis avec la règle des contrôleurs (libellé controleurs). Téléchargements, CA et certificats restent en cache ; l'état
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
 # lit les entrées des bancs du laptop (~/.cache/supply-chain-poc/w/b03, empreintes épinglées) et interroge sum.golang.org.
 #
@@ -65,5 +66,6 @@ etape "J7 (construction)" mise run confiance:construction -- compte entrees tach
 etape "J7 (réseau)" mise run confiance:kata -- reseau
 etape "J8 (bascule)" mise run confiance:preuves -- bascule
 [ "$RESEAU" != cilium ] || etape "J8 (helm-cilium)" mise run confiance:preuves -- helm_cilium
+etape "J8 (contrôleurs)" mise run confiance:preuves -- controleurs
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

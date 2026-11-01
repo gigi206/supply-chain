@@ -1,11 +1,11 @@
-# politique.sh admission, 2026-11-01T18:48:16Z
+# politique.sh admission, 2026-11-01T22:07:17Z
 ## politiques chargées (5 ValidatingPolicy, 17 validations)
 prête : tekton-references
 prête : pods-isolation
 prête : zone-confiance
 prête : zone-build
 prête : stepactions-interdites
-ValidatingAdmissionPolicy natives générées par Kyverno : 0
+ValidatingAdmissionPolicy natives générées par Kyverno : 1
 ## 38 cas, CLI puis admission (dry-run serveur)
 OK   tr-bundle-signe : CLI PASS (code 0), admission PASS (attendu PASS)
 OK   tr-en-ligne : CLI FAIL (code 1), admission FAIL (attendu FAIL)

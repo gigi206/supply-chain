@@ -1,4 +1,4 @@
-# preuves.sh helm_cilium, 2026-11-01T19:15:38Z
+# preuves.sh helm_cilium, 2026-11-01T23:25:53Z
 Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
 - aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
   helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)
@@ -6,6 +6,10 @@ Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), c
 - pod portant helm-cilium dans kube-system refusé en dry-run serveur (compte introuvable) au nom de chaque compte qui peut y
   créer des pods ; témoin : même pod avec le compte default, admis ; les comptes créateurs et la source de leurs droits
   restent ceux de la mesure sous le HelmChart (information)
+Prédiction ajoutée (01/11/2026, avant le premier passage sous la règle tekton-controleurs-builds) : pour les contrôleurs de
+  Tekton et de Chains, pod à helm-cilium toujours refusé comme introuvable (contrôle du compte avant la validation) et
+  témoin default refusé par la règle ; pod portant clusterrole-aggregation-controller refusé par la règle au nom des deux
+  contrôleurs, admis au nom de l'administrateur (témoin) : chemin de ces contrôleurs vers cluster-admin fermé
 ## liaisons vers cluster-admin
   ClusterRoleBinding -/cluster-admin → Group -/system:masters
   témoin : ClusterRoleBinding -/helm-kube-system-cilium → ServiceAccount kube-system/helm-cilium
@@ -43,13 +47,14 @@ OK   system:serviceaccount:kube-system:replication-controller : refusé (pods "p
 OK   system:serviceaccount:kube-system:statefulset-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
   témoin, compte default : admis
 OK   system:serviceaccount:tekton-chains:tekton-chains-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
-  témoin, compte default : admis
+  témoin, compte default : refusé par tekton-controleurs-builds
 OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
-  témoin, compte default : admis
+  témoin, compte default : refusé par tekton-controleurs-builds
 ## pouvoirs des comptes de kube-system (ajouté après un relevé à la main du 01/11/2026 : prédiction non aveugle)
 Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalate, update et patch sur clusterroles, donc
   capable d'élargir sa propre ClusterRole ; pod portant ce compte admis au nom des contrôleurs de Tekton et de Chains : le
-  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai)
+  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai) ; depuis la règle
+  tekton-controleurs-builds : voir la prédiction ajoutée en tête
   clusterrole-aggregation-controller : [escalate clusterroles] [update clusterroles]
   daemon-set-controller : [create pods]
   generic-garbage-collector : [update clusterroles]
@@ -58,9 +63,10 @@ Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalat
   persistent-volume-binder : [create pods]
   replicaset-controller : [create pods]
   replication-controller : [create pods]
-  service-account-controller : [create serviceaccounts/token]
+  service-account-controller : [create serviceaccounts]
   statefulset-controller : [create pods]
 OK   comptes de kube-system à '*' '*' : 0
 OK   clusterrole-aggregation-controller : escalate, update, patch sur clusterroles : yes,yes,yes
-OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert
-OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert
+OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod portant clusterrole-aggregation-controller refusé par tekton-controleurs-builds (dry-run serveur)
+OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod portant clusterrole-aggregation-controller refusé par tekton-controleurs-builds (dry-run serveur)
+OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)
