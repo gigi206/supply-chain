@@ -128,5 +128,6 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
 - **Choix de la provenance, non réécrivable.**
   - Kyverno ne vérifie pas le tag `.att` sans journal (kyverno#17109) : il lit les bundles d'horodatage du digest.
   - Il garde la dernière provenance valide de l'index des referrers de Zot. Le code de Kyverno 1.19.2 le montre (`loadBundles`, `verifyBundles`, `AddVerifiedIntotoPayloads`), et la mesure le confirme dans 6 cas sur 6. Les deux mêmes enveloppes, dans l'ordre inverse, donnent deux verdicts.
-  - Sur la configuration réelle, il juge la provenance d'une autre image du même digest et **refuse l'image réelle, que ec admet**. La bibliothèque juge le PipelineRun le plus récent.
-- **Durée** : 350 ms en médiane par évaluation du CLI.
+  - Aucune fonction CEL de l'ivpol ne donne accès à une autre provenance vérifiée. `getImageData` ne rend que le manifeste et la configuration.
+  - Sur la configuration réelle, il juge la provenance d'une autre image du même digest et **refuse l'image réelle, que ec admet**. La bibliothèque juge le PipelineRun le plus récent. Une admission à tort par ce biais n'est pas mesurée.
+- **Durée** : 350 ms en médiane par évaluation du CLI. Toutes ces mesures viennent du CLI ; l'admission, avec son propre budget de coût, n'est pas mesurée pour cette politique.

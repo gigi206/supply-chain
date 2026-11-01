@@ -530,7 +530,7 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
   - `verifyBundles` vérifie tous les bundles ;
   - `AddVerifiedIntotoPayloads` (sdk `imagedataloader`) garde une seule provenance par type de prédicat, la dernière vérifiée.
 
-  `extractPayload` rend donc la **dernière provenance valide de l'index**. La bibliothèque, elle, juge le PipelineRun le plus récent (`max(finishedOn)`, filtre `_is_pipelinerun_v1`). Aucune expression CEL ne voit les autres provenances, et la réécriture ne peut pas rétablir ce choix. Les mesures confirment le code dans 6 cas sur 6 :
+  `extractPayload` rend donc la **dernière provenance valide de l'index**. La bibliothèque, elle, juge le PipelineRun le plus récent (`max(finishedOn)`, filtre `_is_pipelinerun_v1`). Aucune fonction CEL de l'ivpol ne donne accès à une autre provenance **vérifiée**, et la réécriture ne peut pas rétablir ce choix. Les fonctions lues sont celles de `pkg/cel/libs/imageverify/lib.go` (`verifyImageSignatures`, `verifyAttestationSignatures`, `getImageData`, `extractPayload`). `getImageData` ne rend que la référence, l'index, le manifeste et la configuration (`ImageDescriptor` du sdk). Les bibliothèques `image` et `imagedata` du sdk ne font qu'analyser des références et lire des métadonnées. Les bibliothèques qui liraient des données non vérifiées, comme `http`, n'ont pas été examinées. Les mesures confirment le code dans 6 cas sur 6 :
 
 | Dépôt des bundles (image `builds/sample-app@3a7ca1b1`) | Index de Zot | Retenue par Kyverno | Verdict du CEL |
 |---|---|---|---|
@@ -552,16 +552,16 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
 | Révision attendue fictive (celle du test 7, absente de Forgejo) | `slsa_source_correlated.expected_source_code_reference` |
 | `allowed_builder_ids` sans le builder de Chains | `slsa_build_build_service.slsa_builder_id_accepted` |
 
-- **Configuration réelle** : avec `horodatage/bundles`, la politique de décision de Kyverno **refuse l'image réelle, que ec admet**. Elle juge la provenance d'`essai-webhook`, que l'index de Zot met en dernier. Le refus ne vient que de l'absence de source git dans cette provenance. Une autre image du même digest dont la provenance citerait la source attendue serait jugée à la place de la bonne : c'est le cas `webhook-seul` du test 8, reproduit ici dans le moteur.
+- **Configuration réelle** : avec `horodatage/bundles`, la politique de décision de Kyverno **refuse l'image réelle, que ec admet**. Elle juge la provenance d'`essai-webhook`, que l'index de Zot met en dernier. Le refus ne vient que de l'absence de source git dans cette provenance. Une provenance d'une autre image du même digest qui citerait la source attendue serait jugée à la place de la bonne, comme dans le cas `webhook-seul` du test 8. Qu'elle fasse admettre à tort une image que la bonne provenance ferait refuser n'est **pas mesuré** : les cas mesurés ne produisent que des refus à tort. Le mesurer demanderait d'écrire de nouveaux bundles dans un dépôt d'essai, ce qui est à décider.
 - **Coût** :
-  - CEL : 171 lignes, dont 112 pour les règles. Le reste couvre les attestors, les variables d'entrée et les données ;
+  - CEL : 171 lignes, dont 112 pour les règles. Le reste couvre les attestors, les variables d'entrée et les données. Les 112 lignes comprennent 2 lignes d'une variable restée sans usage après la correction du deuxième passage (`digestsBuild`) ;
   - Rego de la bibliothèque pour les mêmes paquets : 861 lignes, plus 963 lignes des bibliothèques `lib` qu'ils appellent. Elles couvrent tous les formats ; la réécriture ne couvre que ceux de la porte : SLSA v1, `slsa-tekton`, résolveur `bundles` et ancien format de liste ;
-  - durée du CLI, lancement compris : médiane 350 ms, au plus 490 ms, sur 12 évaluations.
+  - durée du CLI, lancement compris : médiane 350 ms, au plus 490 ms, sur 12 évaluations. Toutes les mesures de cette section viennent du CLI : la politique n'a pas été chargée à l'admission, puisque son glob, en `Deny`, toucherait bien plus que `bancc`.
 - **Écritures CEL, mesurées** :
   - `base64.decode` (`ext.Encoders`, chargé par `pkg/cel/compiler/env.go`) et `json.unmarshal` (sdk, `extensions/cel/libs/json`) décodent les TaskRuns complets ;
   - les littéraux doivent être homogènes (`HomogeneousAggregateLiterals`) : objets en `dyn()`, règles en table code → booléen ;
   - `orValue` ne s'applique qu'à un optionnel ;
-  - aucun dépassement de budget de coût.
+  - aucun dépassement de budget de coût en CLI. L'admission a son propre code de budget (`pkg/cel/requestbudget`), non mesuré.
 
   **Le CLI ignore en silence une politique illisible** : il affiche « Applying 0 policy rule(s) » et rend le code 0. L'étape exige donc un résultat.
 - **Approximations**, sans effet sur les cas mesurés :
@@ -575,9 +575,9 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
   - [deuxième](resultats/preuves-reserve_c-deuxieme-passage.log) : **contraire à la prédiction**. J'avais réécrit `subject_build_task_matches` en y fusionnant la règle voisine du même fichier, `image_built_by_trusted_task` (collection `redhat`, hors de la porte), parce que j'avais lu le Rego sans ses métadonnées. Le témoin « liste » l'a révélé : ec admettait cette règle, Kyverno la refusait. Une sonde Rego dans la porte a d'abord écarté une autre hypothèse, un `ec.oci.image_manifests` indéfini (il est défini). Le passage a aussi montré que `pinned` n'était sorti qu'en avertissement, alors que ec le compte parmi les succès. Les deux ont été corrigés et la prédiction mise à jour ;
   - les sondes exploratoires faites avant la prédiction, avec le même CLI depuis l'hôte, sont rejouées par l'étape.
 - **Pour la décision C**, qui revient au propriétaire ; les grilles et les notes ne changent pas :
-  - (a) **le choix de la provenance n'est pas réécrivable** : Kyverno juge la dernière provenance valide de l'index de Zot, pas le PipelineRun le plus récent de l'image. Sur la configuration réelle, cela donne un faux refus de l'image réelle, et un faux accord possible sur la provenance d'une autre image du même digest ;
+  - (a) **le choix de la provenance n'est pas réécrivable** : Kyverno juge la dernière provenance valide de l'index de Zot, pas le PipelineRun le plus récent de l'image, et aucune fonction CEL ne donne accès à une autre provenance vérifiée. Sur la configuration réelle, cela donne un refus à tort de l'image réelle (mesuré). Une admission à tort sur la provenance d'une autre image du même digest n'est pas mesurée ;
   - (b) sur la bonne provenance, la réécriture rend les mêmes statuts que la bibliothèque, règle par règle, dans 4 cas sur 4 ;
-  - (c) le coût de la réécriture est de 112 lignes de règles. La fidélité tient aux formats de la porte seulement, et une erreur de lecture du Rego n'a été rattrapée que par un témoin. La maintenance suivrait la bibliothèque à la main.
+  - (c) le coût de la réécriture est de 112 lignes de règles, 171 au total, contre 88 lignes pour la politique synthétique du banc. La fidélité tient aux formats de la porte seulement, et une erreur de lecture du Rego n'a été rattrapée que par un témoin. La maintenance suivrait la bibliothèque à la main. Ce point peut peser sur C-4.
   - **Une option, non mise en œuvre** : un dépôt de bundles par image, où le job d'horodatage n'écrirait que la provenance du dernier PipelineRun. Cette construction n'existe pas dans la plateforme, et elle déplacerait le choix de la provenance dans le job. Elle est à décider.
 - **Image réelle inchangée.** **Résidus** : aucun dans Zot. ConfigMap `porte-rc` retirée. Jobs `porte-rc-*` dans l'espace `porte`, comme ceux des étapes précédentes, dont `porte-rc-sonde` des deux sondes Rego manuelles.
 
