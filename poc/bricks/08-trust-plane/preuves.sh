@@ -73,6 +73,12 @@
 #          porte de release (source attendue) sur la nouvelle provenance, contrôle exécutions/enveloppes ; rejeu de la livraison sans
 #          effet ; posture du gabarit, de la pipeline et de ses trois tâches. À lancer après J7 et après les étapes de J6 et de J8 qui
 #          supposent le gabarit d'essai (garde gabarit_essai). Trace : labels et audit de l'API, audit de Zot, verdicts de ec
+#   helm_cilium  constat du rejeu d'un seul tenant (accord du propriétaire du 01/11/2026 pour mesurer) : compte kube-system:helm-cilium
+#          lié à cluster-admin par le contrôleur Helm de k3s (helm-controller v0.17.9, rôle littéral dans pkg/server/server.go de
+#          k3s v1.35.9+k3s1). Lectures : liaison, droits, jetons, job, hash de la release (ErrSkip de chart.go) ; chemin : pod portant
+#          ce compte dans kube-system, en dry-run serveur, au nom de chaque compte qui peut y créer des pods (témoin : compte default) ;
+#          retrait de la liaison, réconciliation forcée du HelmChart (annotation), liaison remise par trap et revérifiée. Trace :
+#          can-i, refus et admissions de l'API, événements du HelmChart
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2209,6 +2215,113 @@ etape_bascule() {
   [ "$(jq length "$T/posture/bascule.json")" = 0 ] && echo "OK   $(ls "$T/posture/bascule" | wc -l) ressources : aucun signalement, comme prédit" \
     || { echo "KO   $(jq length "$T/posture/bascule.json") signalement(s)" >&2; k=1; }
   [ "$k" = 0 ] || { echo "KO   bascule : mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+HC_SA=system:serviceaccount:kube-system:helm-cilium
+HC_CRB=helm-kube-system-cilium
+
+hc_droits() { kubectl auth can-i '*' '*' --as "$HC_SA" 2>/dev/null || true; }   # « yes » si le compte peut tout
+
+hc_remettre() { # liaison sauvegardée remise si elle a été retirée, puis revérifiée ; idempotent (trap EXIT)
+  if [ "${HC_RETIREE:-0}" = 1 ]; then
+    kubectl create -f "$T/hc-crb.json" >/dev/null && HC_RETIREE=0
+    kubectl get clusterrolebinding "$HC_CRB" -o json | jq -S '{roleRef, subjects, hash: .metadata.labels["objectset.rio.cattle.io/hash"]}' > "$T/hc-crb-remise.cle"
+    diff -q "$T/hc-crb.cle" "$T/hc-crb-remise.cle" >/dev/null && [ "$(hc_droits)" = yes ] \
+      && echo "OK   liaison $HC_CRB remise : roleRef, sujets et hash identiques, helm-cilium peut de nouveau tout" \
+      || echo "KO   liaison $HC_CRB NON remise à l'identique : à remettre à la main ($T/hc-crb.json)" >&2
+  fi
+  kubectl annotate helmchart -n kube-system cilium preuve.poc.test/reconciliation- >/dev/null 2>&1 || true
+  rm -rf "$T/auth" "$T/webhook" "$W/refus.out"
+}
+
+hc_pod() { # compte-du-pod fichier : pod minimal de kube-system, conforme à restricted, image du job du contrôleur Helm (déjà sur le nœud)
+  jq -n --arg sa "$1" --arg img "$(kubectl get job -n kube-system helm-install-cilium -o jsonpath='{.spec.template.spec.containers[0].image}')" '{
+    apiVersion: "v1", kind: "Pod", metadata: {name: "preuve-helm-cilium", namespace: "kube-system"},
+    spec: {serviceAccountName: $sa, restartPolicy: "Never",
+      securityContext: {runAsNonRoot: true, runAsUser: 65534, seccompProfile: {type: "RuntimeDefault"}},
+      containers: [{name: "c", image: $img, command: ["true"],
+        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$2"
+}
+
+etape_helm_cilium() {
+  local k=0 n u j0 r t0 e
+  echo "Prédiction (écrite avant le premier passage, d'après chart.go de helm-controller v0.17.9 et pkg/server/server.go de k3s"
+  echo "v1.35.9+k3s1, commit 58877f27) :"
+  echo "- liaison $HC_CRB vers cluster-admin, sujet helm-cilium seul ; helm-cilium peut tout ; aucun Secret de jeton de compte de"
+  echo "  service dans le cluster ; job helm-install-cilium terminé ; release cilium deployed, hash égal au configHash du job (ErrSkip)"
+  echo "- pod portant helm-cilium dans kube-system admis en dry-run serveur au nom de chaque compte qui peut y créer des pods (aucune"
+  echo "  règle d'admission ne nomme le compte d'un pod de kube-system) ; témoin : même pod avec le compte default, admis aussi"
+  echo "- liaison retirée : helm-cilium ne peut plus tout ; HelmChart réconcilié (annotation) : le contrôleur passe par ErrSkip, ne"
+  echo "  relance pas le job (même UID, aucun événement ApplyJob) et ne recrée pas la liaison ; agents de Cilium toujours prêts"
+  echo "- liaison remise par trap, identique (roleRef, sujets, hash de wrangler) ; non essayé : relance du job (cilium.sh appliquer,"
+  echo "  suppression du job), qui recréerait la liaison d'après le code mais refait le helm upgrade de Cilium"
+
+  echo "## lectures"
+  kubectl get clusterrolebinding "$HC_CRB" -o json > "$T/hc-crb.brut"
+  jq -S '{roleRef, subjects, hash: .metadata.labels["objectset.rio.cattle.io/hash"]}' "$T/hc-crb.brut" > "$T/hc-crb.cle"
+  jq -c '{roleRef: .roleRef.name, sujets: [.subjects[] | "\(.kind) \(.namespace)/\(.name)"], proprietaires: (.metadata.ownerReferences // [] | length)}' "$T/hc-crb.brut" | sed 's/^/  /'
+  ba_attendu "rôle lié à helm-cilium" "$(jq -r '.roleRef.name' "$T/hc-crb.brut") $(jq -r '[.subjects[].name] | join(",")' "$T/hc-crb.brut")" "cluster-admin helm-cilium"
+  ba_attendu "can-i '*' '*' au nom de helm-cilium" "$(hc_droits)" yes
+  ba_attendu "Secrets de jeton de compte de service dans le cluster" \
+    "$(kubectl get secret -A --field-selector type=kubernetes.io/service-account-token -o name | grep -c . || true)" 0
+  j0=$(kubectl get job -n kube-system helm-install-cilium -o jsonpath='{.metadata.uid}')
+  ba_attendu "job helm-install-cilium terminé" "$(kubectl get job -n kube-system helm-install-cilium -o jsonpath='{.status.succeeded}')" 1
+  r=$(kubectl get secret -n kube-system -l owner=helm,name=cilium -o json | jq -r '.items | sort_by(.metadata.labels.version | tonumber) | last
+    | "\(.metadata.labels.status) \(.metadata.labels["helmcharts.helm.cattle.io/configHash"])"')
+  e=$(kubectl get job -n kube-system helm-install-cilium -o jsonpath='{.spec.template.metadata.annotations.helmcharts\.helm\.cattle\.io/configHash}')
+  e=${e#SHA256=}; e=${e:0:63}
+  ba_attendu "release cilium : statut et hash (configHash du job, 63 caractères)" "$r" "deployed $e"
+  echo "  jeton du pod du job (projeté, expirationSeconds $(kubectl get pod -n kube-system -l batch.kubernetes.io/controller-uid="$j0" -o json \
+    | jq -r '[.items[0].spec.volumes[] | .projected.sources[]? | .serviceAccountToken.expirationSeconds // empty] | first')) : pod $(kubectl get pod -n kube-system \
+    -l batch.kubernetes.io/controller-uid="$j0" -o jsonpath='{.items[0].status.phase}'), volume projeté démonté (lu sur sc-confiance) : $(sur sc-confiance \
+    "sudo find /var/lib/kubelet/pods/$(kubectl get pod -n kube-system -l batch.kubernetes.io/controller-uid="$j0" -o jsonpath='{.items[0].metadata.uid}')/volumes/kubernetes.io~projected -mindepth 1 | wc -l") entrée"
+
+  echo "## chemin : pod portant helm-cilium dans kube-system (dry-run serveur)"
+  : > "$T/hc-createurs"
+  while IFS=: read -r ns sa; do
+    u=system:serviceaccount:$ns:$sa
+    [ "$u" = "$HC_SA" ] && continue
+    [ "$(kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true)" = yes ] && echo "$u" >> "$T/hc-createurs"
+  done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
+  echo "comptes de service qui peuvent créer des pods dans kube-system (hors helm-cilium) : $(wc -l < "$T/hc-createurs")"
+  hc_pod helm-cilium "$T/hc-pod.json"
+  hc_pod default "$T/hc-pod-default.json"
+  while read -r u; do
+    if kubectl create --as "$u" --dry-run=server -f "$T/hc-pod.json" > "$T/creation.out" 2>&1; then
+      echo "OK   $u : pod à helm-cilium admis"
+    else
+      echo "ÉCART $u : pod à helm-cilium refusé : $(tr '\n' ' ' < "$T/creation.out" | cut -c1-200)"; k=1
+    fi
+    kubectl create --as "$u" --dry-run=server -f "$T/hc-pod-default.json" >/dev/null 2>&1 && echo "  témoin, compte default : admis" \
+      || { echo "KO   témoin refusé pour $u" >&2; k=1; }
+  done < "$T/hc-createurs"
+  kubectl create --as system:serviceaccount:builds:build --dry-run=server -f "$T/hc-pod.json" > "$T/creation.out" 2>&1 \
+    && { echo "KO   témoin négatif : le compte build crée le pod" >&2; k=1; } \
+    || echo "OK   témoin négatif, compte build : $(tr '\n' ' ' < "$T/creation.out" | sed 's/^Error from server ([A-Za-z]*): //' | cut -c1-160)"
+
+  echo "## retrait de la liaison"
+  jq 'del(.metadata.uid, .metadata.resourceVersion, .metadata.creationTimestamp, .metadata.managedFields, .metadata.generation)' "$T/hc-crb.brut" > "$T/hc-crb.json"
+  trap hc_remettre EXIT   # remplace le piège du script : nettoyage repris
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl delete clusterrolebinding "$HC_CRB" >/dev/null && HC_RETIREE=1
+  ba_attendu "can-i '*' '*' au nom de helm-cilium, liaison retirée" "$(hc_droits)" no
+  kubectl annotate helmchart -n kube-system cilium preuve.poc.test/reconciliation="$t0" --overwrite >/dev/null
+  echo "HelmChart annoté ($t0) : réconciliation forcée ; attente de 60 s"
+  sleep 60
+  n=$(kubectl get clusterrolebinding "$HC_CRB" -o name 2>/dev/null | grep -c . || true)
+  ba_attendu "liaison recréée par le contrôleur après 60 s" "$n" 0
+  ba_attendu "UID du job helm-install-cilium" "$(kubectl get job -n kube-system helm-install-cilium -o jsonpath='{.metadata.uid}')" "$j0"
+  n=$(kubectl get events -n kube-system --field-selector involvedObject.kind=HelmChart,involvedObject.name=cilium,reason=ApplyJob -o json \
+    | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime // "") >= $t)] | length')
+  ba_attendu "événements ApplyJob du HelmChart depuis le retrait" "$n" 0
+  ba_attendu "agents et opérateur de Cilium prêts" "$(kubectl get ds -n kube-system cilium -o jsonpath='{.status.numberReady}/{.status.desiredNumberScheduled}') $(kubectl get deploy -n kube-system cilium-operator -o jsonpath='{.status.readyReplicas}')" "3/3 1"
+  ba_attendu "can-i '*' '*' au nom de helm-cilium, après la réconciliation" "$(hc_droits)" no
+
+  echo "## remise"
+  hc_remettre
+  [ "${HC_RETIREE:-0}" = 0 ] || exit 1
+  ba_attendu "can-i '*' '*' au nom de helm-cilium, liaison remise" "$(hc_droits)" yes
+  [ "$k" = 0 ] || { echo "KO   helm_cilium : mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"
