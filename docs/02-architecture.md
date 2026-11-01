@@ -196,7 +196,7 @@ flowchart LR
 - MAL- ;
 - KEV sans VEX ;
 - violation de licence ERROR ;
-- horodatage invalide.
+- horodatage invalide : chaque attestation jugée doit avoir un bundle horodaté valide (clé de provenance, sujet, jeton du TSA) qui porte sa propre signature ; un bundle valide du même digest, mais d'une autre enveloppe ou d'une autre image, ne suffit pas (mesuré en brique 08, J8, test 8 : [journal](../poc/bricks/08-trust-plane/resultats/preuves-test8.log)).
 
 **Score informatif v1** :
 - 35 % vulnérabilités après VEX (CVSS × EPSS) ;

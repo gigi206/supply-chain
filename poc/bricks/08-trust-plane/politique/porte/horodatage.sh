@@ -6,7 +6,8 @@
 # digest de $IMAGE, prédicat slsaprovenance1, jeton exigé, racine de confiance du TSA). Un bundle valide pour le même
 # digest mais d'une autre enveloppe (autre image de même digest, provenance plus ancienne) ne compte pas.
 # cosign liste lui-même les referrers de $BUNDLES (COSIGN_REPOSITORY) : un bundle invalide ajouté au dépôt est écarté
-# sans masquer les bundles valides (mesuré au test 8). Aucune attestation vérifiée par ec : refus.
+# sans masquer les bundles valides (mesuré au test 8 pour des bundles bien formés). Aucune attestation vérifiée par ec, ou
+# extraction incomplète : refus.
 # Sortie : une ligne par enveloppe (COUVERTE ou NON_COUVERTE, empreinte de la signature), puis
 # HORODATAGE|ok|… ou HORODATAGE|refus|… ; code de sortie 0 ou 1 (succès ou échec du Job).
 set -eu
@@ -19,6 +20,10 @@ grep -o -E '"predicateType":"[^"]*",("predicateBuildType":"[^"]*",)?"signatures"
   | sed -e 's/.*"sig":"//' -e 's/"$//' > sigs-ec || true
 n=$(grep -c . sigs-ec || true)
 [ "$n" -gt 0 ] || { echo "HORODATAGE|refus|aucune attestation vérifiée par ec"; exit 1; }
+# Échec fermé : une attestation que l'extraction ne reconnaît pas (autre forme, plusieurs signatures) ne doit pas échapper au
+# contrôle ; chaque attestation de la sortie de ec porte un champ predicateType (vérifié sur les verdicts archivés de J8).
+a=$(grep -o '"predicateType":' "$EC" | wc -l)
+[ "$a" = "$n" ] || { echo "HORODATAGE|refus|$a attestation(s) dans le verdict de ec, $n signature(s) extraite(s)"; exit 1; }
 COSIGN_REPOSITORY=$BUNDLES cosign verify-attestation --key /etc/porte/chains.pub --insecure-ignore-tlog --use-signed-timestamps \
   --trusted-root /etc/porte/tsa-racine-confiance.json --type slsaprovenance1 --registry-cacert /etc/porte/ca-poc.crt \
   "$IMAGE" > verifiees 2> erreur || true

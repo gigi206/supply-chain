@@ -45,7 +45,8 @@
 #   test8  contrôle 9 joint à la porte du cluster (conteneur horodatage après ec, politique/porte/horodatage.sh) : chaque attestation
 #          vérifiée par ec doit avoir un bundle horodaté valide qui porte sa signature ; image réelle avec horodatage/bundles, puis
 #          dépôts d'essai écrits par poc-horodatage (horodatage/essais-test8) : copie, aucun, partiel, sans jeton, jeton altéré,
-#          jetons échangés, TSA étrangère, bundles d'une autre image de même digest, bundle valide d'un autre digest, mélange ;
+#          jetons échangés, TSA étrangère, bundles d'une autre image de même digest, bundle valide d'un autre digest, mélange,
+#          referrer illisible ;
 #          ancien contrôle de J6 sur les mêmes dépôts ; image sans Chains ; format bundle de cosign v3 (témoins d'essais-j8/test8,
 #          clé jetable : attestation seule, signature et attestation). Trace : verdicts de ec et du contrôle 9, motifs de cosign
 # Aucun secret en argument de commande.
@@ -1178,7 +1179,7 @@ t8_publier() { # cas fichier… : bundles publiés par poc-horodatage en referre
     i=$((i + 1))
     oras blob push "${o[@]}" "$REG_HOTE/$r" "$f" >/dev/null
     jq -n --arg t "$TYPE_BUNDLE" --arg ld "sha256:$(sha256sum < "$f" | cut -c1-64)" --argjson ls "$(stat -c%s "$f")" \
-      --arg pt "$(jq -r '.dsseEnvelope.payload | @base64d | fromjson | .predicateType' "$f")" --slurpfile s "$T/t8-sujet.json" '{
+      --arg pt "$(jq -r '.dsseEnvelope.payload | @base64d | fromjson | .predicateType' "$f" 2>/dev/null || echo https://slsa.dev/provenance/v1)" --slurpfile s "$T/t8-sujet.json" '{
       schemaVersion: 2, mediaType: "application/vnd.oci.image.manifest.v1+json", artifactType: $t,
       config: {mediaType: "application/vnd.oci.empty.v1+json", digest: "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", size: 2},
       layers: [{mediaType: $t, digest: $ld, size: $ls}],
@@ -1247,7 +1248,10 @@ etape_test8() {
   echo "webhook-seul (bundles valides de deux enveloppes de builds/essai-webhook, même digest) : refus, 0/n, cosign en vérifie 2"
   echo "autre-digest (bundle valide, Chains et TSA, d'un autre digest, rattaché à $APP par poc-horodatage) : refus, 0/n ; sur l'hôte,"
   echo "  cosign verify-blob-attestation : vérifié avec son digest, refusé avec ${APP_DIGEST:0:19}… (motif relevé : le sujet est-il imposé ?)"
-  echo "melange (n bundles réels + autre-digest + un sans jeton) : ok, n/n (poc-horodatage ne bloque pas une image en ajoutant des bundles)"
+  echo "melange (n bundles réels + autre-digest + un sans jeton) : ok, n/n (poc-horodatage ne bloque pas une image en ajoutant des bundles bien formés)"
+  echo "illisible (n bundles réels + un referrer de type bundle dont la couche n'est pas du JSON, ajouté au deuxième passage) : ok, n/n"
+  echo "  (deuxième passage : refus prédit, par échec de toute la vérification ; mesuré : cosign écarte le referrer illisible, prédiction corrigée)"
+  echo "garde-fou (deuxième passage) : nombre de predicateType du verdict de ec = nombre de signatures extraites, sinon refus ; aucun cas ne le déclenche"
   echo "ancien contrôle de J6 (un bundle valide du digest suffit), sur l'hôte : copie et partiel et webhook-seul acceptés (CONSTAT), aucun refusé"
   echo "poc-images (builds/essai-images@${APP_DIGEST:7:8}, sans Chains) : ec refuse (signatures, comme au test 7), contrôle 9 refus (aucune attestation)"
   echo "format bundle de cosign v3, témoins de $T8_DEPOT (clé jetable, ConfigMap porte-temoin) :"
@@ -1336,10 +1340,11 @@ etape_test8() {
       || { echo "KO   bundle d'un autre digest : $v avec ${d:0:19}…" >&2; ko=$((ko + 1)); }
   done
 
+  printf 'pas du JSON : referrer illisible (test 8)\n' > "$T/t8-illisible.json"
   echo "## dépôts d'essai ($T8_BUNDLES/<cas>-$T8_PASSAGE, écrits par poc-horodatage)"
   for c in "copie $b1 $b2" "aucun" "partiel $b1" "sans-jeton $T/t8-sj1.json $T/t8-sj2.json" "jeton-altere $T/t8-alt1.json $T/t8-alt2.json" \
       "autre-signature $T/t8-ech1.json $T/t8-ech2.json" "tsa-etrangere $T/t8-etr1.json $T/t8-etr2.json" "webhook-seul $(paste -sd' ' "$T/t8-webhook")" \
-      "autre-digest $T/t8-autre.json" "melange $b1 $b2 $T/t8-autre.json $T/t8-sj1.json"; do
+      "autre-digest $T/t8-autre.json" "melange $b1 $b2 $T/t8-autre.json $T/t8-sj1.json" "illisible $b1 $b2 $T/t8-illisible.json"; do
     set -- $c
     echo "$1 : $(t8_publier "$@") ($(($# - 1)) bundle(s))"
   done
@@ -1358,7 +1363,8 @@ etape_test8() {
     && echo "OK   webhook-seul : cosign vérifie les 2 bundles (valides pour le digest), aucun n'est apparié à une enveloppe de l'image jugée" \
     || { echo "KO   webhook-seul : 2 bundles vérifiés prédits" >&2; ko=$((ko + 1)); }
   t8_cas melange ok "$T8_BUNDLES/melange-$T8_PASSAGE" 2/2
-  for c in sans-jeton jeton-altere autre-signature tsa-etrangere autre-digest melange; do
+  t8_cas illisible ok "$T8_BUNDLES/illisible-$T8_PASSAGE" 2/2
+  for c in sans-jeton jeton-altere autre-signature tsa-etrangere autre-digest melange illisible; do
     echo "  cosign dans la porte, $c : $(grep -h '^HORODATAGE|' "$T/porte-t8-$c.horodatage" | cut -d'|' -f3)"
   done
 
