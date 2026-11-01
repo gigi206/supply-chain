@@ -131,3 +131,10 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
   - Aucune fonction CEL de l'ivpol ne donne accès à une autre provenance vérifiée. `getImageData` ne rend que le manifeste et la configuration.
   - Sur la configuration réelle, il juge la provenance d'une autre image du même digest et **refuse l'image réelle, que ec admet**. La bibliothèque juge le PipelineRun le plus récent. Une admission à tort par ce biais n'est pas mesurée.
 - **Durée** : 350 ms en médiane par évaluation du CLI. Toutes ces mesures viennent du CLI ; l'admission, avec son propre budget de coût, n'est pas mesurée pour cette politique.
+
+**Décision du propriétaire (01/11/2026) : Conforma reste la porte de release, Kyverno reste à l'admission ; Kyverno seul n'est pas adopté**, sur l'avis de l'advisor. Raisons :
+- le défaut porte sur ce que la porte doit garantir, juger la provenance du dernier PipelineRun ;
+- il vient de Kyverno et ne dépend pas du mode de Chains : en `sigstore-bundle`, Kyverno garderait toujours la dernière provenance par type ;
+- la parité CEL ne compense pas, car elle tient sur une entrée choisie à la main.
+
+Notes inchangées. Question à rouvrir si Kyverno expose toutes les provenances vérifiées, ou permet de les choisir.
