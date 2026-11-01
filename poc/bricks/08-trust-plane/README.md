@@ -330,7 +330,7 @@ Aucun PipelineRun pour `1111…`. La provenance signée du PipelineRun déclench
 - **`resolvedDependencies` attribue l'image d'étape à `docker.io`** (`oci://docker.io/rancher/mirrored-library-busybox`, digest d'index `101b4afd…`) alors qu'elle a été tirée de Zot (manifeste amd64 `ad9fa4d0…`). Ce busybox existait déjà sur le nœud par les images airgap de k3s, et containerd rapporte le nom et le digest de son magasin local. **L'origine inscrite dans la provenance dépend de ce que le nœud contient déjà** : le contrôle « dépendances depuis Zot » du banc C doit en tenir compte, et les images d'étape de la plateforme ne doivent exister que dans Zot ;
 - **`internalParameters` ne contient que les drapeaux de Tekton** (`enforceNonfalsifiability: none`, `verificationNoMatchPolicy: ignore`, etc.). Les paramètres de plateforme prévus (`hermetic`, `isolation`, `cpuModel`) restent à inscrire (point à vérifier, doc 02 §3 ; J6 : `internalParameters` en `slsa-tekton`) ;
 - **chaque exécution d'un TaskRun de même sujet ajoute une enveloppe** sous le même tag `.att` (deux enveloppes après deux exécutions au premier passage ; le journal archivé, issu du rejeu complet, n'en compte qu'une, pour une seule exécution) ;
-- le compte `poc-build`, utilisé par Chains pour pousser, a le droit `update` : il peut **écraser les tags `.sig` et `.att`**. Ce n'est pas une falsification, la vérification échouerait, mais c'est une suppression de preuve. À traiter avant J8.
+- le compte `poc-build`, utilisé par Chains pour pousser, a le droit `update` : il peut **écraser les tags `.sig` et `.att`**. Ce n'est pas une falsification, la vérification échouerait, mais c'est une suppression de preuve. À traiter avant J8. **Mesuré en J8** (« Décision 3 » du jalon J8) : droit nécessaire dans la configuration actuelle, gardé.
 
 **Pour J6** : les cinq résolveurs sont actifs (`bundles`, `cluster`, `git`, `http`, `hub`) et peuvent chercher des définitions de tâches hors de la plateforme ; l'essai utilise un `taskSpec` en ligne, que le test 2 doit refuser.
 
@@ -581,6 +581,28 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
   - **Une option, non mise en œuvre** : un dépôt de bundles par image, où le job d'horodatage n'écrirait que la provenance du dernier PipelineRun. Cette construction n'existe pas dans la plateforme, et elle déplacerait le choix de la provenance dans le job. Elle n'est pas retenue (décision du 01/11/2026).
 - **Image réelle inchangée.** **Résidus** : aucun dans Zot. ConfigMap `porte-rc` retirée. Jobs `porte-rc-*` dans l'espace `porte`, comme ceux des étapes précédentes, dont `porte-rc-sonde` des deux sondes Rego manuelles.
 
+**Décision 3 : droit `update` de `poc-build`** (`mise run confiance:preuves -- decision3`, [`preuves-decision3.log`](resultats/preuves-decision3.log), conforme au deuxième passage ; accord du propriétaire du 01/11/2026 pour modifier Zot le temps de la mesure ; plan relu par l'advisor avant l'écriture).
+- **Règle de Zot v2.1.22** (code lu : `manifestWriteAuthzChecks`, `pkg/api/authz.go`) : un PUT de manifeste sur un tag existant exige `update`, sur un tag neuf `create`.
+- **Montage** :
+  - configuration de `builds/**` scindée, générée par `jq` hors du dépôt : `poc-build` en `read` et `create`, `poc-ecriture` inchangé ;
+  - Zot redémarré, avec les CronJobs `rattrapage` et `horodatage` suspendus et aucun job d'horodatage actif ;
+  - configuration d'origine remise à la fin par un `trap`, même en cas d'échec, et vérifiée par son empreinte (`6caa4dba…`, identique à `stockage/zot.json` avant et après).
+- **Témoin direct**, avec les identifiants de `poc-build` :
+  - un tag neuf est créé ;
+  - le déplacement du même tag est refusé (`DENIED`, 403 dans le journal de Zot) ;
+  - `poc-ecriture` le déplace ;
+  - après la remise de l'origine, `poc-build` le déplace de nouveau.
+- **Mesure** : PipelineRun `preuve-decision3` du gabarit en service, sur une image à digest propre au passage (`builds/essai-decision3`, sans `.att` au départ).
+  - **Le TaskRun signe en premier** : il crée `.sig` et `.att`, et passe à `signed=true`.
+  - **Le PipelineRun doit réécrire `.att` : refusé.** Chaque tentative refait une signature Transit et un PUT `.att` refusé (403), puis il passe à `signed=failed`, `retries=3`.
+  - **Une seule enveloppe** reste dans `.att`, celle du TaskRun. La provenance du PipelineRun, la seule que juge la porte, n'est publiée nulle part : l'image serait refusée à la release.
+  - **Le contrôle exécutions/enveloppes** classe le PipelineRun en `SUJET_NON_SIGNE`, seule anomalie.
+- **Nombre de tentatives non fixé** : 7 au premier passage, 8 au deuxième, au lieu des 5 que prévoit `MaxRetries = 3`. `HandleRetry` lit et incrémente `retries` sur l'objet du cache de l'informer, qui peut retarder sur l'API : c'est ma lecture du code de Chains v0.29.9, non mesurée. Le premier passage, contraire à la prédiction sur ce seul point (5 tentatives attendues), est archivé ([`preuves-decision3-premier-passage.log`](resultats/preuves-decision3-premier-passage.log)). Le second attend au moins 5 tentatives et 2 + N signatures pour N PUT refusés : 10 signatures pour 8 tentatives.
+- **Conclusion** : le droit `update` est nécessaire à `poc-build` dans la configuration actuelle, où le TaskRun et le PipelineRun stockent chacun une attestation dans le même tag `.att`. Il est gardé : la configuration d'origine est en service. Le contrôle exécutions/enveloppes détecte une enveloppe retirée après coup, sans l'empêcher.
+  - Lecture, non mesurée : une reconstruction au même digest aurait besoin de `update` même avec un seul écrivain, puisque le tag `.att` (et `.sig`) existerait déjà.
+  - Une condition CEL de Zot (comme celle de `poc-images`) ne peut pas exiger qu'une réécriture garde les couches existantes : elle ne voit que la requête.
+- **Image réelle inchangée.** **Résidus** : dans Zot, `builds/essai-decision3` (images de mesure, tags témoins, `.sig` et `.att` d'une enveloppe) ; bundles `tekton/tasks/preuve-decision3` et `tekton/pipelines/preuve-decision3`. Exécutions de la mesure purgées ; à la fin, aucune anomalie.
+
 ## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
 
 **Plan validé par le propriétaire le 30/10/2026** : canal (c) des `internalParameters`, conception du test 6, `dsse` gardé avec le contrôle qui compare les exécutions aux enveloppes, mesure de la réserve C. Le changement de configuration de Zot (décision 3) sera demandé à part, au moment d'y arriver. J7 reste « en cours » tant que la bascule du gabarit n'est pas tranchée.
@@ -643,6 +665,7 @@ Puis vient le bilan des 8 tests, et les notes C sont mises à jour dans l'ADR 00
    - Mesure : retirer `update` à `poc-build` dans la configuration de Zot (`sc-stockage`), lancer une construction, puis voir si Chains pousse encore sa seconde enveloppe.
    - Si Chains échoue, le droit est nécessaire. Le contrôle de la décision 4 détecterait alors une suppression après coup, sans l'empêcher.
    - Ce changement de configuration de Zot demande l'accord du propriétaire.
+   - **Mesuré en J8**, sur accord du propriétaire du 01/11/2026 ([`preuves-decision3.log`](resultats/preuves-decision3.log)) : sans `update`, Chains ne pousse pas la seconde enveloppe (PipelineRun `signed=failed`, PUT `.att` refusés). Droit gardé, configuration d'origine remise.
 4. **Mode `sigstore-bundle`.** Vérifié le 30/10/2026 (`gh pr view 2096 --repo tektoncd/chains`) : la PR est **ouverte et non fusionnée**. Dernière release de Chains : v0.29.9 du 22/10/2026, avec des correctifs sur les branches précédentes le 26/10. La voie reste bloquée.
    - **Je recommande** de rester en `dsse` et d'ajouter en J8 le contrôle qui compare les exécutions signées aux enveloppes présentes. **Fait en J8** (contrôle exécutions/enveloppes, au jalon J8). Il ne demande aucun nouveau composant, mais c'est du code nouveau. L'invariant d'horodatage de J6 compare seulement les bundles aux enveloppes : une enveloppe perdue avant d'être horodatée lui échappe.
 5. **Décision C, reportée à J8** (ADR 0000, « C. Kyverno seul ») : les grilles ne changent pas, seules les notes en attente de mesure.

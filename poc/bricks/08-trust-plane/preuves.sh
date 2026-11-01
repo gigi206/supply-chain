@@ -60,6 +60,11 @@
 #          sur des dépôts d'essai du test 8 (lecture seule) ; parité règle par règle avec ec sur le PipelineRun réel (dépôt d'essai
 #          qui ne porte que son bundle) ; témoins de données (liste revue, révision, builder) jugés par les deux moteurs. Trace :
 #          diagnostics de Kyverno, verdicts de ec, ordre des referrers
+#   decision3  droit update de poc-build (décision 3, accord du propriétaire du 01/11/2026) : configuration de Zot modifiée le temps
+#          de la mesure (builds/** : poc-build en read+create), puis remise (trap) ; témoin direct (tag neuf créé, tag existant non
+#          déplacé) ; PipelineRun preuve-decision3 signé par Chains sur une image à digest propre au passage (builds/essai-decision3).
+#          Trace : annotations de Chains, refus du journal de Zot (journald), enveloppes du tag .att, audit d'OpenBao, contrôle
+#          exécutions/enveloppes ; exécutions de la mesure purgées à la fin
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -1808,6 +1813,202 @@ etape_reserve_c() {
   echo "durées du CLI (lancement compris) : $(for l in "$T"/rc-*.ms; do cat "$l"; done | sort -n | awk '{a[NR]=$1} END {printf "médiane %d ms, max %d ms, %d évaluations", a[int((NR+1)/2)], a[NR], NR}')"
   garder apres
   [ "$ko" = 0 ] || { echo "KO   réserve C : $ko mesure(s) contraire(s) à la prédiction" >&2; exit 1; }
+}
+
+D3_DEPOT=builds/essai-decision3   # mesure de la décision 3 : image à digest propre au passage (crane mutate), tag .att neuf
+D3_PR=preuve-decision3            # son PipelineRun (gabarit en service, tâche et pipeline signées propres à la mesure)
+
+d3_zot() { # fichier : configuration installée sur sc-stockage, Zot redémarré puis attendu ; empreinte en service (16 car.)
+  local code=000 e
+  copier sc-stockage /tmp/zot-decision3 "$1"
+  e=$(sur sc-stockage sudo bash -s <<EOF
+set -euo pipefail
+install -m 0640 -g zot /tmp/zot-decision3/${1##*/} /etc/zot/config.json
+systemctl restart zot
+rm -rf /tmp/zot-decision3
+sha256sum /etc/zot/config.json | cut -c1-16
+EOF
+)
+  for _ in $(seq 30); do
+    code=$(curl -s -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/" || true)
+    [ "$code" = 000 ] || break
+    sleep 1
+  done
+  [ "$code" != 000 ] || { echo "KO   Zot ne répond plus après le redémarrage" >&2; return 1; }
+  echo "$e"
+}
+
+d3_remettre() { # configuration d'origine (stockage/zot.json) remise et vérifiée si elle a été changée, CronJobs repris ;
+  # idempotent (trap EXIT)
+  local e
+  if [ "${D3_MODIFIE:-0}" = 1 ]; then
+    e=$(d3_zot "$here/stockage/zot.json") && [ "$e" = "${D3_ORIGINE:0:16}" ] \
+      && { D3_MODIFIE=0; echo "OK   configuration d'origine de Zot remise (empreinte $e…)"; } \
+      || echo "KO   configuration d'origine de Zot NON remise (empreinte ${e:-illisible}) : à remettre à la main (stockage.sh zot)" >&2
+  fi
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  kubectl patch cronjob -n horodatage horodatage --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  echo "CronJobs rattrapage et horodatage repris"
+}
+
+d3_tag() { # compte image tag : tag posé par crane avec les identifiants du compte ; « 0 » ou « code-de-sortie|erreur »
+  local r
+  r=$(DOCKER_CONFIG=$T/auth/$1 SSL_CERT_FILE=$P/ca-poc.crt crane tag "$REG_HOTE/$2" "$3" 2>&1) && { echo 0; return; }
+  echo "$?|$(grep -o -E 'DENIED[^"]*|[0-9]{3} [A-Za-z ]+' <<< "$r" | head -1)"
+}
+
+d3_refus() { # depuis : requêtes de poc-build refusées par Zot, 403 (journal général, journald : l'audit ne garde que les succès ;
+  # les 404 sont les tests d'existence des clients)
+  sur sc-stockage "sudo journalctl -u zot --since '$(date -u -d "$1" '+%Y-%m-%d %H:%M:%S') UTC' -o cat" \
+    | jq -R -r 'fromjson? | select(.username == "poc-build" and .statusCode == 403) | "\(.method) \(.path) \(.statusCode)"' || true
+}
+
+etape_decision3() {
+  local busybox d x y tache pipe st t0 tr pr a b n e c l ko=0
+  echo "## prédiction (décision 3 du plan validé le 30/10/2026 : droit update de poc-build, mesure sur accord du propriétaire du 01/11/2026)"
+  echo "Zot v2.1.22 (manifestWriteAuthzChecks, pkg/api/authz.go) : PUT d'un manifeste sur un tag existant = update, sur un tag neuf = create."
+  echo "Chains (dsse) : le TaskRun publier pousse la signature d'image (.sig) et son attestation (.att), le PipelineRun son attestation"
+  echo "  (.att) ; les deux attestations vont dans le même tag .att (témoin enveloppes : .sig 1 couche, .att 2 couches)."
+  echo "Configuration modifiée : builds/** scindé, poc-build en read+create, poc-ecriture inchangé ; Zot redémarré ; rattrapage et"
+  echo "  horodatage suspendus pendant la mesure ; configuration d'origine remise à la fin, même en cas d'échec (trap)"
+  echo "temoin direct (poc-build) : tag neuf créé ; même tag déplacé : refusé (403 DENIED, journal de Zot) ; poc-ecriture le déplace ;"
+  echo "  après remise de l'origine, poc-build le déplace de nouveau"
+  echo "mesure ($D3_PR, image $D3_DEPOT à digest propre au passage) : le premier objet signé crée .att (et .sig pour le TaskRun) ;"
+  echo "  le second doit réécrire .att : refusé (403 sur manifests/sha256-….att). Chains v0.29.9 (HandleRetry) : au moins 5"
+  echo "  tentatives (retries 0 à 3, lus sur l'objet du cache de l'informer, qui peut retarder : nombre exact non fixé ; premier"
+  echo "  passage, archivé, 7 au lieu des 5 prédits), puis signed=failed. Attendu dans l'un ou l'autre ordre : un objet signed=true,"
+  echo "  l'autre signed=failed et retries=3, une seule enveloppe dans .att, celle de l'objet signé ; N >= 5 PUT .att refusés, un par"
+  echo "  tentative ; signatures Transit : 2 + N si le PipelineRun échoue, 1 + 2N si c'est le TaskRun (.sig refusé dès la 2e tentative)"
+  echo "  contrôle exécutions/enveloppes : l'objet en échec SUJET_NON_SIGNE, seule anomalie"
+  echo "contraire : les deux signed=true (update inutile) ; les deux failed (montage faux)"
+  echo "fin : exécutions de la mesure purgées, aucune anomalie, configuration d'origine en service"
+  garder avant
+  mkdir -p "$T/auth/docker" "$T/auth/build" && chmod 700 "$T/auth"
+  auth_zot "$T/auth/docker/config.json"
+  auth_zot "$T/auth/zot.json"
+  auth_zot "$T/auth/build/config.json" "" poc-build
+  RC_PASSAGE=$(date -u +%Y%m%dT%H%M%SZ)
+
+  echo "## départ"
+  D3_ORIGINE=$(sha256sum "$here/stockage/zot.json" | cut -d' ' -f1)
+  e=$(sur sc-stockage "sudo sha256sum /etc/zot/config.json" | cut -d' ' -f1)
+  [ "$e" = "$D3_ORIGINE" ] && echo "OK   configuration en service = stockage/zot.json (${e:0:16}…)" \
+    || { echo "KO   configuration en service différente du dépôt (${e:0:16}…)" >&2; exit 1; }
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  kubectl patch cronjob -n horodatage horodatage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap d3_remettre EXIT
+  for _ in $(seq 60); do
+    n=$(kubectl get jobs -n horodatage -o json | jq '[.items[] | select((.status.active // 0) > 0)] | length')
+    [ "$n" = 0 ] && break
+    sleep 2
+  done
+  [ "$n" = 0 ] || { echo "KO   job d'horodatage toujours actif" >&2; exit 1; }
+  echo "CronJobs rattrapage et horodatage suspendus, aucun job d'horodatage actif"
+  ee_calme
+  ee_controle depart
+  [ -z "$(ee_anomalies depart)" ] && echo "OK   départ : aucune anomalie" \
+    || { ee_anomalies depart | sed 's/^/  /'; echo "KO   départ : anomalies" >&2; exit 1; }
+  # deux images de la mesure, poussées par poc-ecriture avant le changement : x (construite) et y (pour le témoin direct)
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/decision3=$RC_PASSAGE" \
+    -t "$REG_HOTE/$D3_DEPOT:$RC_PASSAGE" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null)
+  x=${d##*@}
+  d=$(DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt crane mutate --label "poc.test/decision3=$RC_PASSAGE-y" \
+    -t "$REG_HOTE/$D3_DEPOT:$RC_PASSAGE-y" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null)
+  y=${d##*@}
+  existe "$D3_DEPOT:sha256-${x#sha256:}.att" && { echo "KO   tag .att déjà présent pour $x" >&2; exit 1; }
+  echo "images $D3_DEPOT : x=${x:7:12} (mesure, sans .att), y=${y:7:12}"
+
+  echo "## configuration modifiée"
+  jq '.http.accessControl.repositories["builds/**"].policies |= ([.[0] | .users -= ["poc-build"]]
+    + [{users: ["poc-build"], actions: ["read", "create"]}] + .[1:])' "$here/stockage/zot.json" > "$T/zot-decision3.json"
+  diff <(jq -S . "$here/stockage/zot.json") <(jq -S . "$T/zot-decision3.json") | sed 's/^/  /' || true
+  D3_MODIFIE=1
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  e=$(d3_zot "$T/zot-decision3.json")
+  [ "$e" = "$(sha256sum "$T/zot-decision3.json" | cut -c1-16)" ] && echo "OK   configuration modifiée en service (${e}…), Zot redémarré" \
+    || { echo "KO   configuration modifiée non installée (${e:-illisible})" >&2; exit 1; }
+
+  echo "## témoin direct"
+  a=$(d3_tag build "$D3_DEPOT@$x" "temoin-$RC_PASSAGE")
+  [ "$a" = 0 ] && echo "OK   poc-build crée le tag neuf temoin-$RC_PASSAGE (x)" || { echo "KO   poc-build, tag neuf : $a" >&2; exit 1; }
+  a=$(d3_tag build "$D3_DEPOT@$y" "temoin-$RC_PASSAGE")
+  [ "${a%%|*}" != 0 ] && echo "OK   poc-build ne déplace pas ce tag vers y : $a" || { echo "KO   poc-build déplace le tag : update encore permis" >&2; exit 1; }
+  a=$(d3_tag docker "$D3_DEPOT@$y" "temoin-$RC_PASSAGE")
+  [ "$a" = 0 ] && echo "OK   poc-ecriture le déplace vers y (droit update gardé)" || { echo "KO   poc-ecriture : $a" >&2; exit 1; }
+  d3_refus "$t0" | sed 's/^/  refus : /'
+
+  echo "## mesure : $D3_PR"
+  [ -s "$S/taches.key" ] || { echo "KO   clé des tâches absente" >&2; exit 1; }
+  busybox=$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")
+  sed -e "s#@IMAGE@#$REG/$D3_DEPOT#" -e "s#@DIGEST@#$x#" -e "s#@BUSYBOX@#$busybox#" \
+    "$here/politique/taches/publier-essai.yaml" > "$T/d3-tache.yaml"
+  tkn task sign "$T/d3-tache.yaml" -K "$S/taches.key" -f "$T/d3-tache-signee.yaml" >/dev/null 2>&1
+  tache=$REG/tekton/tasks/$D3_PR@$(bundle "$T/d3-tache-signee.yaml" "tekton/tasks/$D3_PR" "$RC_PASSAGE")
+  sed "s#@TACHE@#$tache#" "$here/politique/taches/sample-app-essai.yaml" > "$T/d3-pipeline.yaml"
+  tkn pipeline sign "$T/d3-pipeline.yaml" -K "$S/taches.key" -f "$T/d3-pipeline-signee.yaml" >/dev/null 2>&1
+  pipe=$REG/tekton/pipelines/$D3_PR@$(bundle "$T/d3-pipeline-signee.yaml" "tekton/pipelines/$D3_PR" "$RC_PASSAGE")
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  st=$(pr_gabarit "$D3_PR" "$pipe")
+  [ "${st%%|*}" = True ] || { echo "KO   $D3_PR : $st" >&2; exit 1; }
+  echo "tâche ${tache#"$REG/"} ; PipelineRun $D3_PR : $(cut -d'|' -f1-2 <<< "$st")"
+  ee_calme
+  tr=$(kubectl get taskrun -n builds "$D3_PR-publier" -o json | jq -r '[.metadata.uid, .metadata.annotations["chains.tekton.dev/signed"] // "absente",
+    .metadata.annotations["chains.tekton.dev/retries"] // "-"] | join("|")')
+  pr=$(kubectl get pipelinerun -n builds "$D3_PR" -o json | jq -r '[.metadata.uid, .metadata.annotations["chains.tekton.dev/signed"] // "absente",
+    .metadata.annotations["chains.tekton.dev/retries"] // "-"] | join("|")')
+  echo "TaskRun   $D3_PR-publier : UID ${tr:0:8}, signed=$(cut -d'|' -f2 <<< "$tr"), retries=$(cut -d'|' -f3 <<< "$tr")"
+  echo "PipelineRun $D3_PR : UID ${pr:0:8}, signed=$(cut -d'|' -f2 <<< "$pr"), retries=$(cut -d'|' -f3 <<< "$pr")"
+  d3_refus "$t0" > "$T/d3-refus"
+  sed 's/^/  refus : /' "$T/d3-refus"
+  : > "$T/d3-couches"
+  if existe "$D3_DEPOT:sha256-${x#sha256:}.att"; then
+    oras manifest fetch --ca-file "$P/ca-poc.crt" "$REG_HOTE/$D3_DEPOT:sha256-${x#sha256:}.att" > "$T/d3-att.json"
+    for l in $(jq -r '.layers[].digest' "$T/d3-att.json"); do
+      oras blob fetch --ca-file "$P/ca-poc.crt" --output - "$REG_HOTE/$D3_DEPOT@$l" | jq -r '.payload | @base64d | fromjson
+        | .predicate.runDetails.metadata.invocationId' >> "$T/d3-couches"
+    done
+  fi
+  echo "tag .att : $(grep -c . "$T/d3-couches" || true) enveloppe(s), invocationId : $(cut -c1-8 "$T/d3-couches" | paste -sd' ' -)"
+  echo "tag .sig : $(existe "$D3_DEPOT:sha256-${x#sha256:}.sig" && oras manifest fetch --ca-file "$P/ca-poc.crt" \
+    "$REG_HOTE/$D3_DEPOT:sha256-${x#sha256:}.sig" | jq '.layers | length' || echo absent) couche(s)"
+  n=$(bao_chains "$t0" | grep -c . || true)
+  echo "signatures Transit (clé chains) depuis la création du PipelineRun : $n"
+  a=$(cut -d'|' -f2,3 <<< "$tr"); b=$(cut -d'|' -f2,3 <<< "$pr")
+  c=$(grep -c -E '^PUT /v2/'"$D3_DEPOT"'/manifests/sha256-'"${x#sha256:}"'\.att 403$' "$T/d3-refus" || true)
+  if [ "$a" = "true|-" ] && [ "$b" = "failed|3" ]; then
+    [ "$(cat "$T/d3-couches")" = "$(cut -d'|' -f1 <<< "$tr")" ] && [ "$c" -ge 5 ] && [ "$n" = $((2 + c)) ] \
+      && echo "OK   PipelineRun refusé : signed=failed après $c tentatives (un PUT .att refusé chacune), seule l'enveloppe du TaskRun dans .att, $n signatures (2 + $c)" \
+      || { echo "KO   PipelineRun en échec, mais enveloppes, refus ($c) ou signatures ($n) contraires" >&2; ko=1; }
+  elif [ "$a" = "failed|3" ] && [ "$b" = "true|-" ]; then
+    [ "$(cat "$T/d3-couches")" = "$(cut -d'|' -f1 <<< "$pr")" ] && [ "$c" -ge 5 ] && [ "$n" = $((1 + 2 * c)) ] \
+      && echo "OK   TaskRun refusé : signed=failed après $c tentatives (un PUT .att refusé chacune), seule l'enveloppe du PipelineRun dans .att, $n signatures (1 + 2 × $c)" \
+      || { echo "KO   TaskRun en échec, mais enveloppes, refus ($c) ou signatures ($n) contraires" >&2; ko=1; }
+  else
+    echo "KO   contraire à la prédiction : TaskRun $a, PipelineRun $b" >&2; ko=1
+  fi
+  ee_controle mesure
+  ee_anomalies mesure | sed 's/^/  /'
+  a=$(ee_anomalies mesure)
+  [ "$(grep -c . <<< "$a")" = 1 ] && grep -q -E "^SUJET_NON_SIGNE\|(taskrun builds/$D3_PR-publier|pipelinerun builds/$D3_PR)\|.*\|signed=failed$" <<< "$a" \
+    && echo "OK   contrôle exécutions/enveloppes : l'objet en échec SUJET_NON_SIGNE, seule anomalie" \
+    || { echo "KO   contrôle exécutions/enveloppes : anomalies contraires" >&2; ko=1; }
+
+  echo "## remise en état"
+  d3_remettre
+  [ "${D3_MODIFIE:-0}" = 0 ] || exit 1
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  a=$(d3_tag build "$D3_DEPOT@$x" "temoin-$RC_PASSAGE")
+  [ "$a" = 0 ] && echo "OK   poc-build déplace de nouveau le tag témoin (droit update rendu)" || { echo "KO   poc-build après remise : $a" >&2; ko=1; }
+  purger_pr "$D3_PR"
+  echo "exécutions de la mesure purgées ($D3_PR et ses TaskRuns)"
+
+  echo "## fin"
+  ee_calme
+  ee_controle fin
+  [ -z "$(ee_anomalies fin)" ] && echo "OK   fin : aucune anomalie" \
+    || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies" >&2; ko=1; }
+  garder apres
+  [ "$ko" = 0 ] || { echo "KO   décision 3 : mesure contraire à la prédiction" >&2; exit 1; }
 }
 
 lancer preuves J8 "$@"
