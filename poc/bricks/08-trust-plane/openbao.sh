@@ -91,10 +91,21 @@ etape_deployer() {
   kubectl create secret generic openbao-tls -n openbao --from-file=tls.crt="$P/openbao.crt" --from-file=tls.key="$S/openbao.key" \
     --from-file=ca.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   echo "secret openbao-tls appliqué (clé lue sur l'entrée standard de kubectl, sans annotation last-applied)"
+  # Attente du pod de la révision appliquée : quand la configuration change, l'ancien pod reste Running pendant son arrêt
+  # (rejeu ciblé de la brique 19, O2 : controle parti trop tôt, connexion refusée). D'abord la génération observée par le
+  # contrôleur (updateRevision à jour), puis openbao-0 à cette révision et Running.
+  local rev=""
+  for _ in $(seq 30); do
+    [ "$(kubectl get statefulset -n openbao openbao -o jsonpath='{.status.observedGeneration}/{.metadata.generation}' \
+      | awk -F/ '{print ($1 == $2)}')" = 1 ] && break
+    sleep 1
+  done
+  rev=$(kubectl get statefulset -n openbao openbao -o jsonpath='{.status.updateRevision}')
   for _ in $(seq 90); do
-    [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ] && break
+    [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.labels.controller-revision-hash}/{.status.phase}' 2>/dev/null)" = "$rev/Running" ] && break
     sleep 2
   done
+  echo "openbao-0 à la révision $rev : $(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.phase}')"
   kubectl get pod -n openbao openbao-0 -o wide
   kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.containerStatuses[0].imageID}{"\n"}'
   kubectl get pvc -n openbao
