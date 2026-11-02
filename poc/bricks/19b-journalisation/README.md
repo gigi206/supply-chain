@@ -279,3 +279,50 @@ Journaux :
   - copies de secrets effacées même en cas d'échec (`trap`) ;
   - secrets propres aux VM ajoutés : jetons de k3s, jeton de métriques et `app.ini` de Forgejo.
   - **Premier essai du test de `SourceMuette` faux** : j'attendais l'alerte en attente à 15 min. Prometheus 3 évalue les fenêtres ouvertes à gauche : la fenêtre (9 min, 14 min] ne voit plus de hausse dès 14 min, donc elle se déclenche à 16 min. Attendu corrigé, commentaire dans le test.
+
+## L4, exécuté (02/11/2026, 21:13 à 21:34 UTC, accord du propriétaire : « Oui, lancer L4 »)
+
+Commandes :
+- `JALON=l4 mise run journalisation -- prometheus_alloy`, puis `JALON=l4 mise run observabilite -- regles deployer` (19) ;
+- `JALON=l4 mise run journalisation -- temoins secrets muette`.
+
+Journaux :
+- [`l4-prometheus_alloy.log`](resultats/l4-prometheus_alloy.log) : il contient la trace d'une erreur Python, née de l'attente de la cible pendant le redémarrage de Prometheus, puis la cible `alloy` `up` ;
+- [`l4-cibles.log`](resultats/l4-cibles.log) : premier relevé 13 s après le redémarrage de `deployer`, d'où `unknown` partout ; second à 21:29:43 ;
+- [`l4-temoins.log`](resultats/l4-temoins.log), [`l4-secrets.log`](resultats/l4-secrets.log), [`l4-muette.log`](resultats/l4-muette.log) ;
+- [`l4-muette-analyse.log`](resultats/l4-muette-analyse.log) et [`l4-evenements-horodatage.log`](resultats/l4-evenements-horodatage.log).
+
+**Passages archivés :**
+- `temoins` :
+  - [premier](resultats/l4-temoins-premier-passage.log) : Event refusé par l'API (`involvedObject.namespace` vide) ;
+  - [deuxième](resultats/l4-temoins-deuxieme-passage.log) : Event témoin sans horodatage (`firstTimestamp`, `lastTimestamp` et `eventTime` nuls), **jamais collecté**, absent de Loki depuis le début du schéma. Les vrais événements sont horodatés : un seul des 918 ne l'était pas, et c'était le témoin. Le témoin est désormais daté comme un vrai événement.
+- `secrets` :
+  - [premier](resultats/l4-secrets-premier-passage.log) et [deuxième](resultats/l4-secrets-deuxieme-passage.log) : pages de 5 000 lignes. Loki journalise « ResourceExhausted » sur un message gRPC interne de plus de 4 Mo, et curl échoue (« bad decrypt »). Corrigé : pages de 1 000 lignes, nouvel essai sur erreur ;
+  - [troisième](resultats/l4-secrets-troisieme-passage.log) : 213 lignes manquantes, perdues à la reprise de page (horodatage maximal + 1) ; et les secrets de Forgejo cherchés dans `app.ini`, qui ne contient que leurs chemins (`*_URI = file:…`).
+  - Les copies de secrets ont été effacées après chaque échec : vérifié, aucune copie restante dans le répertoire de travail.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| 1 | Configuration valide ; 9 cibles `up`, dont `alloy` (21:29:43) | conforme |
+| 2 | 11 règles, tests réussis ; toutes `ok`, `inactive` | conforme |
+| 3 | **Contre-épreuve : marqueur jamais émis absent.** Les dix témoins sont lus par l'auditeur à travers Grafana, **en 2 à 5 s** (J1 sur les trois nœuds, J2 sur `sc-confiance` et `sc-build`, J3, J4, J5, J6, J8). J5 : le chemin `sys/policy/<marqueur>` figure en clair dans l'audit d'OpenBao. J6 : l'étiquette poussée figure dans l'audit de Zot | conforme, prédictions faibles comprises |
+| 4 | 45 fichiers de motifs, dont 6 lus sur les VM (jetons de k3s, quatre secrets de Forgejo) : **0 ligne pour chacun ; témoin positif : 1 ligne**. 326 597 lignes exportées pour 326 558 comptées par Loki | conforme pour les secrets ; **écart de 39 lignes (0,01 %) non expliqué** |
+| 5 | Alloy de `sc-build` arrêté à 21:29:38. **`SourceMuette` `{noeud="sc-build"}` `firing` en 180 s**, notifiée. Relancé à 21:32:49 : **les deux témoins écrits pendant l'arrêt sont lus dans Grafana** (reprise sans perte). Résolution 210 s après l'arrêt, notifiée. Une notification `firing` et une `resolved` | conforme, sauf le délai (**faux** : 6 à 8 min prévus) |
+
+**Écart de l'export.** L'export compte 39 lignes de plus que Loki. Une page manquante donnerait moins de lignes, et chaque page a répondu 200 : l'export ne manque donc pas de page. La cause de l'excédent n'est pas mesurée. Hypothèses non vérifiées : un comptage approché de `count_over_time` par découpage de la requête, ou des lignes de même horodatage et même texte, gardées par l'export et regroupées par Loki. La conclusion « aucun secret » porte sur les 326 597 lignes exportées.
+
+**Délai de `SourceMuette` : constat qui la rend inutilisable telle quelle pour `sc-build`.** Les 180 s ne viennent pas de la règle, mais du trafic.
+- Avant l'arrêt, `sc-build` n'avait rien envoyé depuis 21:26 : silence naturel de 3 min 30.
+- Sur la journée (13:00 à 21:29), **`sc-build` est resté silencieux 5 min ou plus à 23 reprises, jusqu'à 27 min** (`l4-muette-analyse.log`). Il n'a pas de build en continu, et son journal système est calme.
+- La règle se déclencherait donc régulièrement à tort pour ce nœud. Depuis L3, la relecture de l'historique masquait ces silences.
+- `sc-confiance` (plus de 2 000 lignes par 5 min) et `sc-stockage` ne sont pas concernés à ce jour, mais rien ne le garantit.
+- **Proposé, D18 : un battement de cœur.** Un timer systemd sur chaque VM écrit une ligne par minute (`logger -t battement-19b`). `SourceMuette` signifie alors « chaîne de collecte rompue », et non « nœud calme ». Cela installe un timer sur les trois VM : accord requis.
+
+**Seuil de la brique :** témoins de toutes les sources retenues lus dans Grafana en moins de 2 min (atteint) ; aucun secret connu dans Loki (atteint, avec l'écart de 39 lignes) ; alerte « source muette » déclenchée à l'arrêt d'un agent, sans perte (atteint). **Réserve** : sans D18, l'alerte n'est pas exploitable pour `sc-build`, à cause des fausses alertes. Le seuil est donc **atteint avec réserve**, levée par D18 et un nouvel essai.
+
+Limites :
+- `LokiInjoignable` n'est éprouvée que par promtool ;
+- l'arrêt d'Alloy de `sc-stockage` relève de `CollecteEnPanne`, non éprouvée ici ;
+- résidu dans Zot : `essais-19b/temoin`, trois étiquettes (une par passage), que `poc-ecriture` ne peut pas supprimer ;
+- les témoins J2 passent par `kubectl exec`, dont ceux dans l'agent Cilium privilégié de `kube-system` ;
+- pare-feu par NetworkPolicies à faire après validation (décision du propriétaire).

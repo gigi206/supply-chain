@@ -1,0 +1,13 @@
+# journalisation.sh muette, 2026-11-02T21:29:37Z
+SourceMuette avant : inactive
+inactive
+Alloy de sc-build arrêté à 21:29:38
+SourceMuette : firing après 180 s ; étiquettes : ["sc-build"]
+notification : {"statut":"firing","noeud":"sc-build"}
+active
+Alloy de sc-build relancé à 21:32:49, après 191 s d'arrêt
+OK   témoin écrit pendant l'arrêt (début) : t4-arret-1-1793654978521587780 lu par l'auditeur dans Grafana en 4 s
+OK   témoin écrit pendant l'arrêt (après le déclenchement) : t4-arret-2-1793655158161604844 lu par l'auditeur dans Grafana en 0 s
+SourceMuette : inactive 210 s après l'arrêt
+notifications :       1 {"statut":"firing","noeud":"sc-build"}
+notifications :       1 {"statut":"resolved","noeud":"sc-build"}

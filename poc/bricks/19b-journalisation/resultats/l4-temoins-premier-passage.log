@@ -1,0 +1,9 @@
+# journalisation.sh temoins, 2026-11-02T21:14:24Z
+OK   contre-épreuve : marqueur jamais émis absent
+OK   J1 journal de sc-confiance : t4-journal-sc-confiance-1793654186345771366 lu par l'auditeur dans Grafana en 2 s
+OK   J1 journal de sc-build : t4-journal-sc-build-1793654188706830331 lu par l'auditeur dans Grafana en 5 s
+OK   J1 journal de sc-stockage : t4-journal-sc-stockage-1793654193048611208 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-confiance (openbao-0) : t4-pods-confiance-1793654195364448060 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-build (cilium-qvlnm) : t4-pods-build-1793654197611290211 lu par l'auditeur dans Grafana en 2 s
+OK   J3 audit de l'API : t4-audit-k8s-1793654199741220012 lu par l'auditeur dans Grafana en 5 s
+The Event "t4-evenement-1793654204152761959" is invalid: involvedObject.namespace: Invalid value: "": does not match event.namespace

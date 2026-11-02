@@ -1,0 +1,43 @@
+# relevé après prometheus_alloy et deployer (2026-11-02T21:14:19Z)
+alertmanager unknown
+alloy unknown
+chains unknown
+fichiers up
+forgejo unknown
+kyverno unknown
+openbao unknown
+prometheus unknown
+zot unknown
+OpenBaoScelle unknown unknown
+ChainsEchecSignature unknown unknown
+ChainsMarqueSansSignature unknown unknown
+ReplayNonBitIdentique unknown unknown
+MiroirEnRetard unknown unknown
+KyvernoRefusAnormaux unknown unknown
+CertificatExpireBientot unknown unknown
+DisqueStockagePlein unknown unknown
+SourceMuette unknown unknown
+LokiInjoignable unknown unknown
+CollecteEnPanne unknown unknown
+
+# relevé repris (2026-11-02T21:29:43Z), Prometheus redémarré à 21:14:06 ; essai muette en cours
+alertmanager up
+alloy up
+chains up
+fichiers up
+forgejo up
+kyverno up
+openbao up
+prometheus up
+zot up
+OpenBaoScelle ok inactive
+ChainsEchecSignature ok inactive
+ChainsMarqueSansSignature ok inactive
+ReplayNonBitIdentique ok inactive
+MiroirEnRetard ok inactive
+KyvernoRefusAnormaux ok inactive
+CertificatExpireBientot ok inactive
+DisqueStockagePlein ok inactive
+SourceMuette ok inactive
+LokiInjoignable ok inactive
+CollecteEnPanne ok inactive

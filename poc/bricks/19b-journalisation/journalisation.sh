@@ -480,8 +480,11 @@ etape_temoins() {
 apiVersion: v1
 kind: Event
 metadata: {name: $m, namespace: observabilite}
-involvedObject: {kind: Namespace, name: observabilite, apiVersion: v1}
+involvedObject: {kind: Namespace, name: observabilite, namespace: observabilite, apiVersion: v1}
 reason: TemoinL4
+firstTimestamp: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+lastTimestamp: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+count: 1
 message: "$m"
 type: Normal
 source: {component: brique-19b}
@@ -505,7 +508,7 @@ EOF
 
 etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hôte (répertoire 0700), recherche par motifs lus dans
   # des fichiers (jamais en argument ni dans une requête) ; témoin positif : une valeur aléatoire écrite dans Loki doit être trouvée
-  local x=$W/secrets-l4 f n debut fin c t total attendu v
+  local x=$W/secrets-l4 f n debut fin c t total attendu v precedent=
   trap 'rm -rf "${W:?}/secrets-l4" "${W:?}/lki.out" "${W:?}/lki.err" "${D:?}" "${W:?}/refus.out"' EXIT   # copies de secrets
   rm -rf "${x:?}" && (umask 077 && mkdir -p "$x/motifs")
   (umask 077 && openssl rand -hex 24 > "$x/motifs/temoin-positif")
@@ -522,29 +525,40 @@ etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hô
   done
   # Secrets qui ne vivent que sur les VM, lus par ssh (sortie standard) dans le même répertoire 0700.
   for v in "sc-confiance:/var/lib/rancher/k3s/server/token" "sc-confiance:/var/lib/rancher/k3s/server/agent-token" \
-           "sc-stockage:/etc/forgejo/secrets/metrics_token"; do
+           "sc-stockage:/etc/forgejo/secrets/metrics_token" "sc-stockage:/etc/forgejo/secrets/secret_key" \
+           "sc-stockage:/etc/forgejo/secrets/internal_token" "sc-stockage:/etc/forgejo/secrets/jwt_secret"; do
     f=vm-${v%%:*}-$(basename "${v#*:}")
     (umask 077 && sur "${v%%:*}" "sudo cat ${v#*:} 2>/dev/null" | tr -d '\n' > "$x/motifs/$f")
     [ "$(wc -c < "$x/motifs/$f")" -ge 12 ] && echo >> "$x/motifs/$f" || rm -f "${x:?}/motifs/${f:?}"
   done
-  (umask 077 && sur sc-stockage "sudo awk -F' *= *' '\$1 ~ /^(SECRET_KEY|INTERNAL_TOKEN|JWT_SECRET|LFS_JWT_SECRET)\$/ && length(\$2) >= 12 {print \$2}' /etc/forgejo/app.ini" > "$x/motifs/vm-sc-stockage-forgejo-app.ini")
+  # app.ini de Forgejo ne contient pas les valeurs : *_URI = file:/etc/forgejo/secrets/… (troisième passage, archivé).
+  for f in "$x"/motifs/*; do [ -s "$f" ] || { echo "motif vide écarté : ${f##*/}"; rm -f "${f:?}"; }; done
   echo "motifs : $(ls "$x/motifs" | wc -l) fichiers (dont $(ls "$x/motifs" | grep -c '^vm-') lus sur les VM : $(ls "$x/motifs" | grep '^vm-' | paste -sd' ')), valeurs jamais affichées ; témoin positif compris"
   sleep 5
   fin=$(date +%s)000000000; debut=$(date -u -d 2026-11-01T00:00:00Z +%s)000000000; total=0   # début du schéma de Loki
   : > "$x/export"
-  while :; do   # pagination vers l'avant, 5 000 lignes par requête
-    lki controle /loki/api/v1/query_range -G --data-urlencode 'query={source=~".+"}' --data-urlencode "start=$debut" \
-      --data-urlencode "end=$fin" --data-urlencode limit=5000 --data-urlencode direction=forward > "$x/code"
-    [ "$(cat "$x/code")" = 200 ] || { echo "KO   page d'export : HTTP $(cat "$x/code")" >&2; exit 1; }
+  while :; do   # pagination vers l'avant, 1 000 lignes par requête (5 000 : message gRPC interne de Loki au-delà de 4 Mo, passages archivés)
+    for _ in 1 2 3; do
+      lki controle /loki/api/v1/query_range -G --data-urlencode 'query={source=~".+"}' --data-urlencode "start=$debut" \
+        --data-urlencode "end=$fin" --data-urlencode limit=1000 --data-urlencode direction=forward > "$x/code"
+      [ "$(cat "$x/code")" = 200 ] && break
+      echo "  page à $debut : HTTP $(cat "$x/code") ($(tail -1 "$W/lki.err" | cut -c1-120)), nouvel essai"; sleep 3
+    done
+    [ "$(cat "$x/code")" = 200 ] || { echo "KO   page d'export : HTTP $(cat "$x/code") ($(tail -1 "$W/lki.err" | cut -c1-200))" >&2; exit 1; }
     cp "$W/lki.out" "$x/page.json"
     n=$(jq '[.data.result[].values[]] | length' "$x/page.json")
     jq -r '.data.result[] | .stream as $s | .values[] | "\(.[0]) \($s | tostring) \(.[1])"' "$x/page.json" >> "$x/export"
     total=$((total + n))
-    [ "$n" -lt 5000 ] && break
-    debut=$(jq -r '[.data.result[].values[][0]] | max' "$x/page.json")   # nanosecondes, en chaîne (pas de perte de précision)
-    debut=$((debut + 1))
+    [ "$n" -lt 1000 ] && break
+    # Reprise à l'horodatage maximal inclus (+1 perdait les lignes de même horodatage au-delà de la page : 213 lignes au troisième
+    # passage) ; les lignes relues sont des doublons exacts, retirés ensuite (Loki dédoublonne déjà les entrées identiques d'un flux).
+    debut=$(jq -r '[.data.result[].values[][0]] | max' "$x/page.json")
+    [ "$n" = 1000 ] && [ "$debut" = "${precedent:-}" ] && { echo "KO   plus de 1 000 lignes au même horodatage" >&2; exit 1; }
+    precedent=$debut
   done
-  echo "lignes exportées : $total ($(du -h "$x/export" | cut -f1))"
+  sort -u -o "$x/export" "$x/export"
+  total=$(wc -l < "$x/export")
+  echo "lignes exportées, doublons de reprise retirés : $total ($(du -h "$x/export" | cut -f1))"
   attendu=$(lki controle /loki/api/v1/query -G --data-urlencode "query=sum(count_over_time({source=~\".+\"}[$(( (fin - $(date -u -d 2026-11-01T00:00:00Z +%s)000000000) / 1000000000 ))s]))" \
     --data-urlencode "time=$fin" >/dev/null; jq -r '.data.result[0].value[1] // "?"' "$W/lki.out")
   echo "lignes comptées par Loki sur la même fenêtre : $attendu"
