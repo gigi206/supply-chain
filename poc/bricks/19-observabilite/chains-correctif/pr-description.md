@@ -21,7 +21,7 @@ On a k3s cluster with a KMS signer (OpenBao, `hashivault://`), with v0.29.9 + #1
 
 With v0.29.9 alone, the same scenario marks the four objects `signed=true` with no signature, and every failure counter stays at 0.
 
-One observation, not addressed here: the 3 retries are exhausted within a few seconds (the workqueue backoff starts at 5 ms, and each annotation patch probably triggers a new reconcile). So a run that completes during a KMS outage ends `signed=failed` and is not retried once the KMS is back.
+One observation (on v0.29.9 + #1834), not addressed here: the 3 retries are exhausted within a few seconds (the workqueue backoff starts at 5 ms, and each annotation patch probably triggers a new reconcile). So a run that completes during a KMS outage ends `signed=failed` and is not retried once the KMS is back.
 
 As far as I can tell, #1834 is not in any release yet, nor on the `release-v0.2x.x` branches. Would a backport be possible?
 

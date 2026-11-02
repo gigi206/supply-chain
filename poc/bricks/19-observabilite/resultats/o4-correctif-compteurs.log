@@ -4,3 +4,22 @@
   pipelinerunmetrics error_type=signer_unavailable : 22:54:05=7
   taskrunmetrics error_type=signer_unavailable : 22:53:35=13 22:54:05=20 22:53:05=7
 ## lignes « No signer » du journal du pod d'essai : 27 (o4-correctif_a2.log) = 20 + 7
+
+## additif (2026-11-02T23:08:22Z, relecture demandée par l'advisor) : tous les compteurs watcher_* du pod d'essai, échantillons bruts de 22:52:20 à 22:54:25 UTC
+# le pod d'essai a tourné de 22:52:26 à la remise en état (pod officiel prêt à 22:54:23), OpenBao descellé à partir de 22:53:44
+  watcher_pipelinerun_marked_signed_total  : 22:52:20=26
+  watcher_pipelinerun_payload_stored_total  : 22:52:20=24
+  watcher_pipelinerun_sign_created_total  : 22:52:20=30
+  watcher_pipelinerun_signing_failures_total payload_creation : 22:52:20=25
+  watcher_pipelinerun_signing_failures_total signer_unavailable : 22:54:05=7
+  watcher_pipelinerun_signing_failures_total storage : 22:52:20=6
+  watcher_taskrun_marked_signed_total  : 22:52:20=46
+  watcher_taskrun_payload_stored_total  : 22:52:20=63
+  watcher_taskrun_sign_created_total  : 22:52:20=63
+  watcher_taskrun_signing_failures_total payload_creation : 22:52:20=27
+  watcher_taskrun_signing_failures_total signer_unavailable : 22:53:35=13 22:54:05=20 22:53:05=7
+# séries absentes ci-dessus = jamais créées par le pod d'essai (un compteur OpenTelemetry n'apparaît qu'à son premier incrément)
+# correction : le filtre ci-dessus (borne en 2025) n'a rien écarté ; les valeurs à 22:52:20 seul sont celles de l'ancien pod officiel (série close au redémarrage). Relecture à partir de 22:52:35 (pod d'essai seul collecté) :
+  watcher_pipelinerun_signing_failures_total signer_unavailable : 22:54:05=7
+  watcher_taskrun_signing_failures_total signer_unavailable : 22:53:35=13 22:54:05=20 22:53:05=7
+# conclusion : de 22:52:35 à 22:54:20, le pod d'essai n'a créé que les séries signer_unavailable ; aucun marked_signed, sign_created ni payload_stored, y compris après le descellement (22:53:44) : le binaire d'essai n'a rien signé (tag .att resté à 4 enveloppes, o4-correctif_a2.log)

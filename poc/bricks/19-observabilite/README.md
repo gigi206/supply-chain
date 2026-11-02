@@ -326,7 +326,7 @@ Le correctif amont `b1c0af9` (#1834) n'est dans aucune release, ni dans aucune b
 |---|---|---|
 | 1 | digest `8aa1200d…` ; couches de l'officielle + `1df7048f…`, binaire relu dans Zot identique ; pod prêt 6 s après le changement | conforme |
 | 2 | OpenBao scellé à 22:52:30 ; build réussi à 22:53:36, même digest `3a7ca1b1` ; **les quatre objets `signed=failed`, `retries=3`, à 22:53:42**, aucun `signed=true` ; `No signer kms configured for tekton` au journal | conforme |
-| 3 | `signer_unavailable` : **20 (TaskRuns) et 7 (PipelineRun)**, soit les 27 lignes « No signer » du journal ; `marked_signed` et `sign_created` : 0. Le script les a lus trop tôt (13, série PipelineRun pas encore collectée : collecte toutes les 30 s) ; valeurs finales relues dans Prometheus ([`o4-correctif-compteurs.log`](resultats/o4-correctif-compteurs.log)) | conforme |
+| 3 | `signer_unavailable` : **20 (TaskRuns) et 7 (PipelineRun)**, soit les 27 lignes « No signer » du journal. Le script les a lus trop tôt (13, série PipelineRun pas encore collectée : collecte toutes les 30 s) ; valeurs finales relues dans Prometheus ([`o4-correctif-compteurs.log`](resultats/o4-correctif-compteurs.log)). **Le binaire d'essai n'a rien signé** : de 22:52:35 à sa dernière collecte (22:54:05), il n'a créé aucune série `marked_signed`, `sign_created` ni `payload_stored`, y compris après le descellement ; le tag `.att` est passé de 4 à 6 enveloppes, et les 2 nouvelles sont celles du build de contrôle, sous l'image officielle | conforme |
 | 4 | **`ChainsEchecSignature` déclenchée** (premier volet, `error_type="signer_unavailable"`), notifiée à 22:53:17, résolue à 23:03:40 ; `ChainsMarqueSansSignature` inactive, 0 notification | conforme |
 | 5 | après le descellement : les quatre objets restent `signed=failed` ; PipelineRun et TaskRun `publier` **ABSENTE** du tag `.att` | conforme |
 | 6 | image officielle `2200972d…` remise, spec du pod identique à celle d'avant l'essai ; build normal `signed=true`, enveloppes **COUVERTE** ; exécutions purgées ; clé Transit inchangée ; A1 déclenchée puis résolue ; passages d'`horodatage` et de `rattrapage` réussis | conforme |
@@ -335,7 +335,7 @@ Le correctif amont `b1c0af9` (#1834) n'est dans aucune release, ni dans aucune b
 - **Pas de reprise après la panne :** les cinq tentatives (la première, puis `retries` de 0 à 3) sont épuisées en quelques secondes (file de knative à 5 ms, doublée à chaque échec, et réconciliation à chaque patch d'annotation), et un build fait pendant une panne du KMS reste définitivement non signé ; il faut le relancer.
 - **Version essayée :** v0.29.9 + #1834, pas `main` (tests unitaires sur les deux).
 - **Rien n'est publié :** la PR chez tektoncd/chains attend l'accord du propriétaire. L'issue #1796 est attribuée à une mainteneuse depuis le 15/07/2026.
-- **Résidu :** l'image d'essai reste dans Zot (`essais-chains/controller:essai`).
+- **Résidus :** l'image d'essai reste dans Zot (`essais-chains/controller:essai`) ; deux commits vides de plus sur `custom/s5` du fork (essai et build de contrôle).
 
 
 ## O5 : déplacé dans la brique 19b
