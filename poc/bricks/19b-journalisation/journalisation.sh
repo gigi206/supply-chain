@@ -227,6 +227,18 @@ etape_controle() {
   c=$(graf auditeur POST /api/dashboards/db '{"dashboard":{"title":"essai-l2"},"overwrite":false}'); echo "auditeur, création de tableau : HTTP $c"
   c=$(graf auditeur POST /api/datasources '{"name":"essai","type":"loki","url":"http://127.0.0.1:1","access":"proxy"}'); echo "auditeur, création de source : HTTP $c"
   c=$(graf admin DELETE /api/datasources/uid/loki); echo "administrateur, suppression de la source provisionnée loki : HTTP $c ($(head -c 120 "$W/graf.out"))"
+  echo "## chemin du navigateur : session de l'auditeur (POST /login, cookie, contrôle d'origine)"
+  jq -n --rawfile p "$S/grafana-auditeur.password" '{user: "auditeur", password: $p}' | (umask 077 && cat > "$W/login.json")
+  c=$(curl -sS --cacert "$P/ca-poc.crt" -c "$W/session" -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' \
+    -X POST "https://$HOTE:3001/login" -d @"$W/login.json"); echo "POST /login : HTTP $c, cookie de session : $(grep -c grafana_session "$W/session" || true)"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" -b "$W/session" -o "$W/graf.out" -w '%{http_code}' -H "Origin: https://$HOTE:3001" "https://$HOTE:3001/api/user")
+  echo "GET /api/user avec la session : HTTP $c ($(jq -r '.login // empty' "$W/graf.out" 2>/dev/null))"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" -o /dev/null -w '%{redirect_url}' "https://$HOTE:3001/"); echo "redirection de / sans session : $c"
+  rm -f "${W:?}/login.json" "${W:?}/session"
+  echo "## journal de Grafana : la lecture de l'auditeur est tracée (router_logging)"
+  sur sc-stockage "sudo journalctl -u grafana --since '10 min ago' -o cat | grep -E 'path=/api/ds/query' | grep -c 'userId=' || true" | sed 's/^/  requêtes \/api\/ds\/query journalisées avec leur utilisateur : /'
+  echo "## appels vers Grafana Labs dans les journaux de loki et grafana depuis leur démarrage"
+  sur sc-stockage "sudo journalctl -u grafana -u loki -o cat | grep -ciE 'grafana\.com|stats\.grafana' || true" | sed 's/^/  lignes : /'
   echo "## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)"
   sur sc-stockage "sudo ss -tnp state established | grep -E 'users:\(\(\"(loki|grafana)' | awk '{print \$4}' | grep -vE '^(192\.168\.161\.|127\.0\.0\.1|\[::1\])' || echo '  aucune'"
   echo "## mémoire"

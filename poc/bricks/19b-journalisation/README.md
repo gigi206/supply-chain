@@ -142,4 +142,9 @@ Prédictions : [`l2-predictions.md`](resultats/l2-predictions.md), écrites à 2
 
 **Alerte de disque (D13 a)** : règle `DisqueStockagePlein` (`disque_utilise_ratio > 0.8`, `for: 5m`, avertissement) ajoutée aux règles de la 19, avec son test. `promtool` 3.13.5 a été extrait de l'archive vérifiée de la 19, sur l'hôte, sans installation : `SUCCESS` sur 9 règles. Contrôle par mutation : avec un seuil à 0,82, le test échoue.
 
+**Corrections après relecture (additif daté aux prédictions)** :
+- `domain` de Grafana mis à `192.168.161.13` : l'hôte ne résout pas `poc.test`, et `root_url`, qui sert aux redirections et au contrôle d'origine des sessions, en dépend. Contrôle ajouté pour le chemin du navigateur : connexion, cookie de session, en-tête `Origin`.
+- `router_logging = true` : Grafana OSS n'a pas de section `[auditing]` (lu dans `defaults.ini`), donc aucun journal d'audit des actions de ses utilisateurs. Chaque requête HTTP est journalisée avec son utilisateur, et L3 collecte ce journal. Limite consignée (ADR 0001).
+- Absence d'appels vers Grafana Labs vérifiée sur tout le journal des services, et non plus sur une seule capture de `ss`.
+
 **Points mesurés en L2, non supposés** : Grafana sous `ProtectSystem=strict`, et sans `MemoryDenyWriteExecute`, retiré par prudence (à mesurer) ; `$__file{}` dans les `secureJsonData` provisionnées ; code de refus de la suppression dans Loki ; suppression d'une source provisionnée.

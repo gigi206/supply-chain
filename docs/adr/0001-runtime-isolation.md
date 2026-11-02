@@ -105,6 +105,11 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
 - [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
 - [ ] Cluster final (note du propriétaire du 30/10/2026, à traiter lors de sa mise en place, pas dans le PoC) : Kubernetes sécurisé (durcissement RKE2, audit), journalisation, métriques et alertes, et mTLS entre services par un service mesh (Linkerd, Istio, ou Cilium : retenu pour le PoC, à confirmer pour le cluster final). Candidats à évaluer au doc 04 ([doc 02 §8](../02-architecture.md)).
+  - Relevé de la brique 19b, L1 (02/11/2026, [`l1-releve.log`](../../poc/bricks/19b-journalisation/resultats/l1-releve.log)), à reprendre pour le cluster final ; aucune note modifiée :
+    - l'audit de l'API (k3s), d'OpenBao et de Zot existe déjà dans le PoC (posé par la 08) ;
+    - **le journal d'audit d'OpenBao, fichier sur le volume persistant, n'a pas de rotation**, et OpenBao refuse toute requête s'il ne peut plus écrire dans son seul device d'audit : un disque plein arrêterait les signatures (D15 a : second device vers la sortie standard, préparé en L3) ;
+    - la politique d'audit de l'API ne journalise pas les lectures (`get`, `list`, `watch`), sauf celles de Secrets par Tekton, Chains et les résolveurs (D14 a : limite gardée dans le PoC) ;
+    - Grafana OSS n'a pas de journal d'audit des actions de ses utilisateurs : seules les requêtes HTTP sont tracées (`router_logging`).
 - [x] Contrôle de sortie de la zone build (brique 08, J7, avant J8 et le test 6). **Décidé par le propriétaire le 30/10/2026** : voie A, avec construction sans sortie (option 3) et anti-usurpation côté nœud par Cilium, gardé après sa mesure (option 1b) ; voie D non retenue. Une NetworkPolicy de kube-router est contournée par usurpation d'adresse depuis le root de l'invité, et ne porte que sur un pod entier. Trois options sont soumises ([détail](../../poc/bricks/08-trust-plane/README.md#jalon-j7--isolation-par-kata-30102026), « Contrôle de sortie de la zone build ») :
   - voie A avec anti-usurpation côté nœud, par l'un de ces trois moyens :
     - kube-router amont v2.10.0 ou plus, en seul contrôleur de politiques avec `--netpol-default-deny`. k3s embarque la v2.6.3, et flannel serait conservé ;
