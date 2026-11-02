@@ -54,3 +54,15 @@ Hors périmètre : KPI supply-chain (brique 20, 2c) ; observabilité du domaine 
 - Métriques réelles de Chains pour un échec de signature (nom et étiquettes, version v0.29.9) ; de Kyverno 1.19.2 pour les refus d'admission ; d'OpenBao pour l'état scellé (accès aux métriques sans jeton, ou avec un jeton de lecture limité).
 - Effet de la collecte sur la zone de confiance : un compte de lecture Kubernetes (D1 a) ne doit lire aucun Secret.
 - Lecture de `sync.prom` : Prometheus ne lit pas de fichier, il collecte des points HTTP. Il faut un exportateur : node_exporter et son collecteur textfile (non audité au doc 04), ou un serveur minimal qui sert ce seul fichier en lecture ; à trancher en O1.
+
+## O1, partie lecture seule (02/11/2026, pendant le rejeu de la 08)
+
+Moyens de vérification des binaires amont ([`o1-verification-amont.log`](resultats/o1-verification-amont.log), 14:29 UTC) :
+
+| Binaire | Release | Vérification disponible |
+|---|---|---|
+| Prometheus | v3.15.1 (21/10/2026) ; branche 3.13 encore corrigée (v3.13.5 le même jour) | `sha256sums.txt` sans signature ; **attestation de release GitHub** (bundle Sigstore v0.3, prédicat `https://in-toto.io/attestation/release/v0.2`, 38 sujets, certificat et jeton d'horodatage) qui lie l'archive au tag de la release ; ce n'est pas une provenance de build |
+| Alertmanager | v0.34.2 (29/10/2026) | `sha256sums.txt` seul, **aucune attestation ni signature** |
+| Images `quay.io/prometheus/*` | — | aucun tag `.sig` ni `.att` |
+
+Conséquence pour D1 (a) : l'empreinte de Prometheus peut être liée à sa release par l'attestation de GitHub (vérification à faire avec l'outil adapté, `gh release verify-asset` ou cosign sur le bundle, avant toute installation) ; Alertmanager ne peut être vérifié que par l'empreinte publiée sur la même page que l'archive, ce qui ne protège pas d'une release compromise. Même situation que Zot (doc 04 §5) : à consigner comme limite, ou à reconstruire depuis les sources (brique 11). Choix de la version de Prometheus (3.15 ou branche 3.13) à faire en O1 d'après la politique de support amont, lue et non supposée.

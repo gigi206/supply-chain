@@ -1,0 +1,15 @@
+# O1, relevé des moyens de vérification (lecture seule), 2026-11-02T14:29:36Z
+## releases de prometheus/prometheus (hors préversions)
+v3.15.1 2026-10-21 prometheus-3.15.1.linux-amd64.tar.gz sha256sums.txt
+v3.13.5 2026-10-21 prometheus-3.13.5.linux-amd64.tar.gz sha256sums.txt
+v3.13.4 2026-10-02 prometheus-3.13.4.linux-amd64.tar.gz sha256sums.txt
+## releases de prometheus/alertmanager (hors préversions)
+v0.34.2 2026-10-29 alertmanager-0.34.2.linux-amd64.tar.gz sha256sums.txt
+v0.34.1 2026-09-17 alertmanager-0.34.1.linux-amd64.tar.gz sha256sums.txt
+v0.34.0 2026-08-16 alertmanager-0.34.0.linux-amd64.tar.gz sha256sums.txt
+## attestations GitHub de prometheus-3.15.1.linux-amd64.tar.gz (6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84)
+[{"mediaType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://in-toto.io/attestation/release/v0.2","sujets":38,"materiel":["certificate","timestampVerificationData"]}]
+## attestations GitHub de alertmanager-0.34.2.linux-amd64.tar.gz (17ee14acd0f6ba6e25a436ff223d9c17ddd5cf484f543ad12f0932eaa89ba186)
+{"message":"Not Found"}
+## quay.io/prometheus/prometheus : tags .sig ou .att : 0
+## quay.io/prometheus/alertmanager : tags .sig ou .att : 0
