@@ -23,5 +23,5 @@ that a retry is recorded. It fails without the change.
   go test -race ./...
   golangci-lint run ./pkg/chains/... ./pkg/metrics/...
 
-Signed-off-by: Ghislain LE MEUR <ghislain.lemeur@gmail.com>
+Signed-off-by: Ghislain LE MEUR <13576579+gigi206@users.noreply.github.com>
 Assisted-by: Claude Opus 5.5 (via Claude Code)
