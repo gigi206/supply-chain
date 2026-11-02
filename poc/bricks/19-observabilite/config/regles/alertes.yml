@@ -1,0 +1,67 @@
+# Brique 19, O3 : règles des 5 alertes critiques (A1 à A5), de A6 (non critique) et de la panne de collecte.
+# Noms de métriques relevés en O1 et O2 (o1-metriques-cluster.log, o2-cibles.log), pas supposés.
+# Seul ce fichier est déployé dans /etc/prometheus/regles/ ; les tests (alertes-tests.yml) restent dans le dépôt.
+# Une expression par ligne : observabilite.sh (étape reference) les évalue sur le Prometheus réel avant déploiement.
+groups:
+  - name: poc-supply-chain
+    rules:
+      # A1. OpenBao scellé : scellé, le pod n'est plus Ready et le proxy de l'API répond 503 (O2) : la jauge n'est
+      # plus collectée, l'alerte repose sur up == 0. Kyverno passe par le même proxy et le même jeton : s'il est aussi
+      # en panne, c'est la collecte qui l'est (CollecteEnPanne), pas OpenBao.
+      - alert: OpenBaoScelle
+        expr: vault_core_unsealed == 0 or (up{job="openbao"} == 0 and on() up{job="kyverno"} == 1)
+        for: 1m
+        labels:
+          alerte: A1
+          severite: critique
+
+      # A2. Échec de signature de Chains (v0.29.9) : compteurs sans étiquette d'espace ni d'exécution (O1), donc aucun
+      # filtre possible sur les essais négatifs de la 08. Une hausse sur 10 min, ou une série apparue depuis moins de
+      # 10 min (après un redémarrage du contrôleur, le premier échec crée la série à 1 et increase() vaut 0).
+      - alert: ChainsEchecSignature
+        expr: (increase(watcher_pipelinerun_signing_failures_total[10m]) > 0) or (watcher_pipelinerun_signing_failures_total unless watcher_pipelinerun_signing_failures_total offset 10m) or (increase(watcher_taskrun_signing_failures_total[10m]) > 0) or (watcher_taskrun_signing_failures_total unless watcher_taskrun_signing_failures_total offset 10m)
+        labels:
+          alerte: A2
+          severite: critique
+
+      # A3. Replay non bit-identique : contrat de métrique fixé pour la brique 10 (D2 a), servi comme sync.prom :
+      # replay_dernier_resultat{projet} = 1 si le dernier replay est bit-identique, 0 sinon. Pas d'absent() : la
+      # brique 10 n'existe pas encore, l'alerte serait déclenchée en permanence.
+      - alert: ReplayNonBitIdentique
+        expr: replay_dernier_resultat == 0
+        labels:
+          alerte: A3
+          severite: critique
+
+      # A4. Miroir en retard de plus de 24 h (sync.prom de la brique 01), ou plus aucune série (fichier disparu).
+      - alert: MiroirEnRetard
+        expr: time() - sync_derniere_reussite_timestamp_seconds > 86400 or absent(sync_derniere_reussite_timestamp_seconds)
+        labels:
+          alerte: A4
+          severite: critique
+
+      # A5. Refus Kyverno anormaux : plus de 5 refus d'admission en 5 min, tous espaces confondus. Seuil provisoire,
+      # à confirmer par la mesure de référence (o3-reference.log). Les séries apparues depuis moins de 5 min comptent
+      # pour leur valeur (même raison que A2).
+      - alert: KyvernoRefusAnormaux
+        expr: sum((increase(kyverno_admission_requests_total{request_allowed="false"}[5m]) > 0) or (kyverno_admission_requests_total{request_allowed="false"} unless kyverno_admission_requests_total{request_allowed="false"} offset 5m)) > 5
+        labels:
+          alerte: A5
+          severite: critique
+
+      # A6 (non critique, décision du propriétaire) : certificat du PoC expirant dans moins de 30 jours
+      # (certificats.prom, écrit depuis la PKI de la 08, décision 6).
+      - alert: CertificatExpireBientot
+        expr: certificat_expiration_timestamp_seconds - time() < 30 * 86400
+        labels:
+          alerte: A6
+          severite: avertissement
+
+      # Collecte en panne depuis 5 min (proxy de l'API, jeton invalidé par un rejeu complet de la 08, service arrêté).
+      # OpenBao est exclu : son indisponibilité relève de A1.
+      - alert: CollecteEnPanne
+        expr: up{job!="openbao"} == 0
+        for: 5m
+        labels:
+          alerte: collecte
+          severite: avertissement

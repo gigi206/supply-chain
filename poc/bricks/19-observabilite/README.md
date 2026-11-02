@@ -12,7 +12,7 @@ Cible (doc 02 §7) : métriques de Tekton, Kyverno, Zot, OpenBao et Forgejo ; Pr
 | A4 | Miroir en retard de plus de 24 h | `sync.prom` de la brique 01 (`sync_derniere_reussite_timestamp_seconds`) | timer arrêté et horodatage vieilli (fichier de test), ou règle évaluée avec un seuil réduit |
 | A5 | Refus Kyverno anormaux | métriques d'admission de Kyverno | rafale de créations refusées (cas du test 2 ou 4 de la 08) |
 
-**Alerte non critique ajoutée** (décision du propriétaire du 02/11/2026, cert-manager reporté) : **A6, expiration d'un certificat à moins de 30 jours**, hors du seuil des 5 alertes critiques. Certificats du PoC relevés le 02/11/2026 (`openssl x509 -enddate`) : Zot, Forgejo et OpenBao (TLS, 180 jours) le 27/04/2027 ; CA du PoC le 29/10/2027 ; feuille du TSA le 02/11/2027 ; racine du TSA le 26/10/2036. Source de la métrique à choisir en O1 (sonde TLS des trois services, ou fichier de dates écrit par les scripts de la 08 à chaque émission) ; incident simulé : seuil abaissé dans le test de la règle (`promtool test rules`).
+**Alerte non critique ajoutée** (décision du propriétaire du 02/11/2026, cert-manager reporté) : **A6, expiration d'un certificat à moins de 30 jours**, hors du seuil des 5 alertes critiques. Certificats du PoC relevés le 02/11/2026 (`openssl x509 -enddate`) : Zot, Forgejo et OpenBao (TLS, 180 jours) le 27/04/2027 ; CA du PoC le 29/10/2027 ; feuille du TSA le 02/11/2027 ; racine du TSA le 26/10/2036. Source de la métrique à choisir en O1 (sonde TLS des trois services, ou fichier de dates écrit par les scripts de la 08 à chaque émission) ; incident simulé : série de test dont l'échéance est à moins de 30 jours dans `promtool test rules` (promtool ne permet pas d'abaisser le seuil d'une règle : seuil réel conservé, correction d'O3).
 
 ## Constats relevés avant le protocole (02/11/2026, pendant le rejeu `enchainement` de la 08 ; lecture seule)
 
@@ -160,3 +160,25 @@ Décisions : **Zot (a)**, compte `poc-metriques` ; **D7 (a) reconfirmée** aprè
 **Non-interférence côté 01** : runs planifiés de 17:18 (`sample-app-sync`) et 17:27 (`traefik`), après le redémarrage de Forgejo, terminés en code 0 ([`o2-timers-01-apres.log`](resultats/o2-timers-01-apres.log)).
 
 **O2 : seuil de jalon atteint** (toutes les cibles `up`, lecture seule mesurée). Suite : O3 (règles des 5 alertes et de A6, tests `promtool test rules`), sur accord.
+
+## O3, préparation à sec (02/11/2026, 17:54 UTC ; rien d'exécuté sur `sc-stockage`, rien de déployé)
+
+Prédictions datées : [`o3-predictions.md`](resultats/o3-predictions.md). Règles : [`config/regles/alertes.yml`](config/regles/alertes.yml) ; tests : [`config/regles/alertes-tests.yml`](config/regles/alertes-tests.yml) ; étapes `regles`, `reference` et `deployer` d'`observabilite.sh` (journaux `resultats/o3-<étape>.log`).
+
+| Alerte | Expression (résumé) | Pièges couverts par un test |
+|---|---|---|
+| A1 `OpenBaoScelle` (critique) | `vault_core_unsealed == 0`, ou `up{job="openbao"} == 0` **si** `up{job="kyverno"} == 1` ; `for: 1m` | scellé : jauge non collectée (O2), seul `up` tombe ; proxy ou jeton en panne (Kyverno aussi en panne) : pas de A1 ; borne du `for` |
+| A2 `ChainsEchecSignature` (critique) | hausse sur 10 min de `watcher_{pipelinerun,taskrun}_signing_failures_total`, **ou série apparue depuis moins de 10 min** | après un redémarrage du contrôleur, le premier échec crée la série à 1 et `increase()` vaut 0 ; compteur ancien stable sans alerte |
+| A3 `ReplayNonBitIdentique` (critique) | `replay_dernier_resultat == 0` (contrat de la brique 10, D2 a) | série de test ; pas d'`absent()` (la 10 n'existe pas) |
+| A4 `MiroirEnRetard` (critique) | `time() - sync_derniere_reussite_timestamp_seconds > 86400`, ou plus aucune série | un projet en retard, l'autre à jour ; fichier disparu |
+| A5 `KyvernoRefusAnormaux` (critique) | plus de **5** refus d'admission en 5 min (hausses, et séries apparues depuis moins de 5 min), tous espaces | refus anciens stables ; rafale ; nouvelle combinaison espace et type apparue avec 7 refus ; admissions acceptées ignorées |
+| A6 `CertificatExpireBientot` (avertissement) | échéance à moins de 30 jours | 20 jours ; 30 jours et 10 min (franchit le seuil pendant le test) ; un an |
+| `CollecteEnPanne` (avertissement) | `up == 0` depuis 5 min, OpenBao exclu (A1) | proxy en panne : Kyverno et Chains, pas OpenBao |
+
+**Constats de conception** :
+
+- **A2 ne peut pas être filtrée** : les compteurs de Chains v0.29.9 n'ont que `error_type` (O1), ni espace ni exécution. Chaque rejeu de la 08 la déclenchera (essais négatifs J6 et J7, décision 3). Ne pas filtrer non plus sur `error_type` : le type produit par un OpenBao scellé n'est pas encore mesuré (O4).
+- **A5** : Kyverno porte `resource_namespace` ; exclure `bancc` (essais du banc) est possible. Seuil de 5 refus en 5 min **provisoire**, à confirmer par la mesure de référence (étape `reference`).
+- **Limite commune à A2 et A5** : si Prometheus perd plus de 5 min de données (arrêt), toutes les séries paraissent « nouvelles » à la reprise et les deux alertes se déclenchent à tort pendant 10 min (A2) ou 5 min (A5).
+- **Rechargement** : le lifecycle est désactivé (O2) et l'unité n'a pas d'`ExecReload` ; le déploiement redémarre Prometheus (données conservées dans `/var/lib/prometheus`). `ExecStartPre` (`promtool check config`) vérifie aussi les fichiers de règles.
+

@@ -11,9 +11,16 @@
 #                 quatre unités (prometheus, alertmanager, fichiers-metriques, recepteur-alertes)
 #   cibles        toutes les cibles « up » dans l'API de Prometheus ; noms réels des métriques relevés par source
 #   lecture_seule refus attendus : API d'administration, lifecycle, remote-write ; écoute sur 127.0.0.1 seulement
+# Jalon O3 (règles, config/regles/) :
+#   regles        promtool check rules et promtool test rules dans un répertoire temporaire de la VM (promtool installé
+#                 en O2), sans déploiement
+#   reference     requêtes en lecture sur Prometheus : début des données, refus de Kyverno et échecs de Chains sur
+#                 l'historique (référence de A5 et A2), évaluation de chaque expression de alertes.yml avant déploiement
+#   deployer      alertes.yml dans /etc/prometheus/regles/, redémarrage de Prometheus (lifecycle désactivé : pas de
+#                 rechargement par l'API), règles chargées lues dans l'API
 # Aucun secret en argument de commande : fichiers 0600 ou entrée standard.
 #
-# Usage (racine du dépôt) : mise run observabilite -- <étape>…   (journal : resultats/o2-<étape>.log)
+# Usage (racine du dépôt) : mise run observabilite -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -161,13 +168,60 @@ etape_lecture_seule() {
     systemctl is-active prometheus"
 }
 
+REGLES=$here/config/regles
+
+etape_regles() {
+  copier sc-stockage /tmp/regles-test "$REGLES/alertes.yml" "$REGLES/alertes-tests.yml"
+  sur sc-stockage 'cd /tmp/regles-test && promtool --version | head -1 && promtool check rules alertes.yml && promtool test rules alertes-tests.yml; r=$?; cd / && rm -rf /tmp/regles-test; exit $r'
+}
+
+requete() { # expression PromQL (sans apostrophe) : résultat instantané, une ligne par série
+  sur sc-stockage "curl -s -G http://127.0.0.1:9090/api/v1/query --data-urlencode 'query=$1'" \
+    | jq -r 'if .status != "success" then "ERREUR \(.error)" elif (.data.result | length) == 0 then "  (aucun résultat)" else .data.result[] | "  \(.metric | del(.__name__) | tostring) \(.value[1])" end'
+}
+
+etape_reference() {
+  local d e
+  d=$(requete 'prometheus_tsdb_lowest_timestamp_seconds' | awk '{print $2}')
+  echo "début des données de Prometheus : $(date -u -d "@${d%.*}" +%Y-%m-%dT%H:%M:%SZ)"
+  echo "## A5 : refus de Kyverno sur l'historique, par espace"
+  requete 'sum by (resource_namespace) (increase(kyverno_admission_requests_total{request_allowed="false"}[3h]))'
+  echo "## A5 : maximum, sur l'historique, des refus en 5 min (tous espaces)"
+  requete 'max_over_time(sum(increase(kyverno_admission_requests_total{request_allowed="false"}[5m]))[3h:1m])'
+  echo "## A5 : admissions acceptées sur l'historique (activité de référence)"
+  requete 'sum(increase(kyverno_admission_requests_total{request_allowed="true"}[3h]))'
+  echo "## A2 : échecs de signature de Chains sur l'historique"
+  requete 'sum by (error_type) (increase(watcher_pipelinerun_signing_failures_total[3h]))'
+  requete 'sum by (error_type) (increase(watcher_taskrun_signing_failures_total[3h]))'
+  echo "## expressions de alertes.yml évaluées sur le Prometheus réel (règles non déployées)"
+  sed -n 's/^ *expr: //p' "$REGLES/alertes.yml" | while IFS= read -r e; do
+    echo "- $e"
+    requete "$e"
+  done
+}
+
+etape_deployer() {
+  copier sc-stockage /tmp/regles-deploiement "$REGLES/alertes.yml"
+  sur sc-stockage sudo bash -s <<'EOF2'
+set -euo pipefail
+install -m 0640 -g prometheus /tmp/regles-deploiement/alertes.yml /etc/prometheus/regles/alertes.yml
+rm -rf /tmp/regles-deploiement
+systemctl restart prometheus
+sleep 5
+systemctl is-active prometheus
+EOF2
+  sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/rules" \
+    | jq -r '.data.groups[] | .file as $f | .rules[] | "  \($f)\t\(.name)\t\(.health)\t\(.state)"'
+}
+
 etapes=("$@")
-[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule>…" >&2; exit 2; }
+[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer>…" >&2; exit 2; }
 for e in "${etapes[@]}"; do
   declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
+  case $e in regles|reference|deployer) jalon=o3 ;; *) jalon=o2 ;; esac
   {
     echo "# observabilite.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     "etape_$e"
-  } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R19/o2-$e.log"
+  } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R19/$jalon-$e.log"
   [ "${PIPESTATUS[0]}" -eq 0 ] || exit 1
 done

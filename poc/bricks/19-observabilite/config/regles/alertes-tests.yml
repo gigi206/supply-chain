@@ -1,0 +1,184 @@
+# Brique 19, O3 : tests unitaires des règles (promtool test rules alertes-tests.yml), avant tout incident simulé.
+# Dans promtool, time() part de 0 : les horodatages des séries sont relatifs au début du test.
+# Pour chaque alerte : cas positif, cas négatif (exp_alerts vide) et, quand la règle a un for:, sa borne.
+rule_files:
+  - alertes.yml
+
+evaluation_interval: 1m
+
+tests:
+  # A1 : OpenBao scellé (pod non Ready, proxy en 503) à partir de 5 min, Kyverno collecté.
+  - interval: 30s
+    input_series:
+      - series: 'up{job="openbao", instance="api"}'
+        values: '1x10 0x30'
+      - series: 'up{job="kyverno", instance="api"}'
+        values: '1x40'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: OpenBaoScelle
+        exp_alerts: []
+      - eval_time: 6m      # en attente (for: 1m)
+        alertname: OpenBaoScelle
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: OpenBaoScelle
+        exp_alerts:
+          - exp_labels: {alerte: A1, severite: critique, job: openbao, instance: api}
+
+  # A1 : jauge de descellement à 0 (cas où elle resterait collectée).
+  - interval: 30s
+    input_series:
+      - series: 'vault_core_unsealed{job="openbao", instance="api"}'
+        values: '0x10'
+      - series: 'up{job="openbao", instance="api"}'
+        values: '1x10'
+      - series: 'up{job="kyverno", instance="api"}'
+        values: '1x10'
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: OpenBaoScelle
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: OpenBaoScelle
+        exp_alerts:
+          - exp_labels: {alerte: A1, severite: critique, job: openbao, instance: api}
+
+  # Proxy de l'API en panne (ou jeton invalide) : pas de A1, CollecteEnPanne après 5 min, OpenBao exclu.
+  - interval: 30s
+    input_series:
+      - series: 'up{job="openbao", instance="api"}'
+        values: '0x20'
+      - series: 'up{job="kyverno", instance="api"}'
+        values: '0x20'
+      - series: 'up{job="chains", instance="api"}'
+        values: '0x20'
+      - series: 'up{job="zot", instance="zot"}'
+        values: '1x20'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: OpenBaoScelle
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: CollecteEnPanne
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: CollecteEnPanne
+        exp_alerts:
+          - exp_labels: {alerte: collecte, severite: avertissement, job: kyverno, instance: api}
+          - exp_labels: {alerte: collecte, severite: avertissement, job: chains, instance: api}
+
+  # A2 : compteur ancien stable (aucune alerte une fois 10 min de données passées), série créée à 1 vers 15 min,
+  # puis hausse du compteur ancien à 32 min.
+  - interval: 1m
+    input_series:
+      - series: 'watcher_pipelinerun_signing_failures_total{error_type="storage", job="chains", instance="api"}'
+        values: '6x31 7x8'
+      - series: 'watcher_taskrun_signing_failures_total{error_type="signing", job="chains", instance="api"}'
+        values: '_x15 1x25'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: ChainsEchecSignature
+        exp_alerts: []
+      - eval_time: 17m
+        alertname: ChainsEchecSignature
+        exp_alerts:
+          - exp_labels: {alerte: A2, severite: critique, error_type: signing, job: chains, instance: api}
+      - eval_time: 30m
+        alertname: ChainsEchecSignature
+        exp_alerts: []
+      - eval_time: 33m
+        alertname: ChainsEchecSignature
+        exp_alerts:
+          - exp_labels: {alerte: A2, severite: critique, error_type: storage, job: chains, instance: api}
+
+  # A3 : contrat de la brique 10, série de test.
+  - interval: 1m
+    input_series:
+      - series: 'replay_dernier_resultat{projet="sample-app", job="fichiers", instance="local"}'
+        values: '1x5 0x5'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: ReplayNonBitIdentique
+        exp_alerts: []
+      - eval_time: 8m
+        alertname: ReplayNonBitIdentique
+        exp_alerts:
+          - exp_labels: {alerte: A3, severite: critique, projet: sample-app, job: fichiers, instance: local}
+
+  # A4 : sample-app-sync sans réussite depuis l'instant 0, traefik réussi à chaque collecte (toutes les 4 min).
+  - interval: 4m
+    input_series:
+      - series: 'sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync", job="fichiers", instance="local"}'
+        values: '0x400'
+      - series: 'sync_derniere_reussite_timestamp_seconds{projet="traefik", job="fichiers", instance="local"}'
+        values: '0+240x400'
+    alert_rule_test:
+      - eval_time: 1380m   # 23 h
+        alertname: MiroirEnRetard
+        exp_alerts: []
+      - eval_time: 1500m   # 25 h
+        alertname: MiroirEnRetard
+        exp_alerts:
+          - exp_labels: {alerte: A4, severite: critique, projet: sample-app-sync, job: fichiers, instance: local}
+
+  # A4 : plus aucune série de la 01 (fichier disparu).
+  - interval: 1m
+    input_series:
+      - series: 'up{job="fichiers", instance="local"}'
+        values: '1x5'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: MiroirEnRetard
+        exp_alerts:
+          - exp_labels: {alerte: A4, severite: critique}
+
+  # A5 : refus anciens stables ; rafale de 20 refus vers 21 min ; nouvelle combinaison apparue à 7 vers 30 min.
+  - interval: 1m
+    input_series:
+      - series: 'kyverno_admission_requests_total{request_allowed="false", resource_namespace="bancc", resource_kind="Pod", job="kyverno", instance="api"}'
+        values: '2x40'
+      - series: 'kyverno_admission_requests_total{request_allowed="false", resource_namespace="builds", resource_kind="Pod", job="kyverno", instance="api"}'
+        values: '2x20 12 22 22x18'
+      - series: 'kyverno_admission_requests_total{request_allowed="false", resource_namespace="builds", resource_kind="TaskRun", job="kyverno", instance="api"}'
+        values: '_x30 7x10'
+      - series: 'kyverno_admission_requests_total{request_allowed="true", resource_namespace="builds", resource_kind="Pod", job="kyverno", instance="api"}'
+        values: '0+10x40'
+    alert_rule_test:
+      - eval_time: 18m
+        alertname: KyvernoRefusAnormaux
+        exp_alerts: []
+      - eval_time: 23m
+        alertname: KyvernoRefusAnormaux
+        exp_alerts:
+          - exp_labels: {alerte: A5, severite: critique}
+      - eval_time: 28m     # rafale sortie de la fenêtre, nouvelle série pas encore apparue
+        alertname: KyvernoRefusAnormaux
+        exp_alerts: []
+      - eval_time: 32m
+        alertname: KyvernoRefusAnormaux
+        exp_alerts:
+          - exp_labels: {alerte: A5, severite: critique}
+      - eval_time: 40m
+        alertname: KyvernoRefusAnormaux
+        exp_alerts: []
+
+  # A6 : zot à 20 jours de l'échéance ; forgejo à 30 jours et 10 min (franchit le seuil vers 10 min) ; CA à un an.
+  - interval: 1m
+    input_series:
+      - series: 'certificat_expiration_timestamp_seconds{certificat="zot", job="fichiers", instance="local"}'
+        values: '1728000x20'
+      - series: 'certificat_expiration_timestamp_seconds{certificat="forgejo", job="fichiers", instance="local"}'
+        values: '2592600x20'
+      - series: 'certificat_expiration_timestamp_seconds{certificat="ca-poc", job="fichiers", instance="local"}'
+        values: '31536000x20'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: CertificatExpireBientot
+        exp_alerts:
+          - exp_labels: {alerte: A6, severite: avertissement, certificat: zot, job: fichiers, instance: local}
+      - eval_time: 15m
+        alertname: CertificatExpireBientot
+        exp_alerts:
+          - exp_labels: {alerte: A6, severite: avertissement, certificat: zot, job: fichiers, instance: local}
+          - exp_labels: {alerte: A6, severite: avertissement, certificat: forgejo, job: fichiers, instance: local}
