@@ -304,6 +304,15 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 - refs propres du fork (`custom/essai`, `paquet/deb`, `custom-1`) intactes après toutes les réécritures ;
 - restauration depuis les bundles et les rapports de la VM : refs `upstream` et `archive` identiques au miroir local.
 
+**Résultats** (02/11/2026, 15:12 à 15:13 UTC, accord du propriétaire ; [`forgejo-negatifs.log`](resultats/forgejo-negatifs.log)) : **conformes à toutes les prédictions**.
+
+- **Passage archivé** ([`forgejo-negatifs-premier-passage.log`](resultats/forgejo-negatifs-premier-passage.log)) : conforme jusqu'au 6e run, refusé par systemd (« start of the service was attempted too often ») : **une unité ne démarre pas plus de 5 fois en 10 s** (`StartLimitBurst` par défaut). Limite gardée pour le service ; les runs du test sont espacés de 3 s ; état d'échec de l'unité levé (`reset-failed`) avant le second passage.
+- Force-push de `main` : code 2, `force-push`, ancienne tête sous `refs/archive/20261102T151246Z/heads/main` dans `mirror/`, `main` du fork alignée sur l'amont. Le même run a rattrapé la suppression de `feature/x` laissée en suspens par le passage interrompu (`branch-deleted`, archivée) : rattrapage conforme à la conception.
+- Tag `v1.0.0` : créé (code 0), déplacé (code 2, `tag-moved`, archive publiée), supprimé (code 2, `tag-deleted`, archive publiée, retiré de la vue amont de `mirror/`) ; gardé dans le fork, à sa dernière valeur.
+- Branche `feature/x` créée puis supprimée : code 0 les deux fois, archive publiée, branche gardée dans le fork.
+- Refs propres du fork (`custom/essai`, `paquet/deb`, `custom-1`) intactes.
+- Restauration dans la VM depuis 10 bundles et le dernier rapport : 12 refs `upstream` et `archive`, identiques au miroir local.
+
 ## Jalon S5 : branche custom buildée (étude du 02/11/2026, lecture seule de la brique 08 ; option (ii) retenue par le propriétaire le même jour)
 
 **Ce que D2 (b) ne change pas** (lu dans [`declencheurs.yaml`](../08-trust-plane/politique/declencheurs.yaml) et [`gabarit-sample-app.yaml`](../08-trust-plane/politique/gabarit-sample-app.yaml)) : un **EventListener séparé** `forgejo-sync` dans `declencheurs` (même compte `el-forgejo`, même intercepteur HMAC, avec un secret de webhook propre ; filtre CEL : `workspace/sample-app-sync` et `refs/heads/custom/*`) et une TriggerTemplate `sample-app-sync` **dérivée à l'exécution de celle en service** (même pipeline signée, même anti-rejeu par le nom, préfixe `sample-app-sync-`) laissent intacts l'EventListener `forgejo` et le gabarit de la 08. La porte reçoit la source attendue à chaque jugement (`juger … [source attendue]`) : aucune modification de la porte. Le rattrapage ne lit qu'une branche (`DEPOT`, `BRANCHE`) : un webhook perdu sur une branche custom n'est pas rattrapé, limite à consigner ou à traiter.

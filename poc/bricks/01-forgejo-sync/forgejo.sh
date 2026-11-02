@@ -304,6 +304,9 @@ etape_bout_en_bout() {
 U=synchro@$PROJET
 run_vm() { # attendu-code : un run du service, code de sync.py relevé (ExecMainStatus) ; dernier rapport dans $T/rapport.json
   local c f
+  # systemd refuse plus de 5 démarrages en 10 s (StartLimitBurst par défaut, mesuré le 02/11/2026 au 6e run de S4) :
+  # limite gardée pour le service, runs du test espacés.
+  sleep 3
   sur sc-stockage "sudo systemctl start $U.service" || { echo "KO   échec de l'unité $U" >&2; exit 1; }
   c=$(sur sc-stockage "systemctl show -p ExecMainStatus --value $U.service")
   f=$(sur sc-stockage "sudo sh -c 'ls -1 /var/lib/synchro/$PROJET/rapports/*.json | tail -1'")
