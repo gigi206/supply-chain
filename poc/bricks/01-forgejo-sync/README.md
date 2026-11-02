@@ -266,3 +266,19 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 - branche `feature/x` créée puis supprimée : code 0 les deux fois, archive publiée, branche gardée dans le fork ;
 - refs propres du fork (`custom/essai`, `paquet/deb`, `custom-1`) intactes après toutes les réécritures ;
 - restauration depuis les bundles et les rapports de la VM : refs `upstream` et `archive` identiques au miroir local.
+
+## Jalon S5 : branche custom buildée (étude du 02/11/2026, lecture seule de la brique 08 ; décision du propriétaire attendue)
+
+**Ce que D2 (b) ne change pas** (lu dans [`declencheurs.yaml`](../08-trust-plane/politique/declencheurs.yaml) et [`gabarit-sample-app.yaml`](../08-trust-plane/politique/gabarit-sample-app.yaml)) : un **EventListener séparé** `forgejo-sync` dans `declencheurs` (même compte `el-forgejo`, même intercepteur HMAC, avec un secret de webhook propre ; filtre CEL : `workspace/sample-app-sync` et `refs/heads/custom/*`) et une TriggerTemplate `sample-app-sync` **dérivée à l'exécution de celle en service** (même pipeline signée, même anti-rejeu par le nom, préfixe `sample-app-sync-`) laissent intacts l'EventListener `forgejo` et le gabarit de la 08. La porte reçoit la source attendue à chaque jugement (`juger … [source attendue]`) : aucune modification de la porte. Le rattrapage ne lit qu'une branche (`DEPOT`, `BRANCHE`) : un webhook perdu sur une branche custom n'est pas rattrapé, limite à consigner ou à traiter.
+
+**Constat qui touche la brique 08** : la pipeline signée [`sample-app`](../08-trust-plane/politique/taches/sample-app.yaml) fixe, sous sa signature, le dépôt Zot de l'image (`@IMAGE@` = `builds/sample-app`), la fermeture des dépendances et `web/dist`. Une branche custom construite par elle :
+- publie dans **le même dépôt** que l'image réelle de la 08 ;
+- si son arbre ne change rien à la construction (sources Go identiques), donne **le même digest `3a7ca1b1`** (construction reproductible). Sa provenance, de source `workspace/sample-app-sync`, devient alors la plus récente de l'image réelle ; or la porte ne juge que la plus récente (test 7) : l'image réelle, jugée avec la source `workspace/sample-app`, serait **refusée** ;
+- ne peut changer ni les dépendances ni l'interface web : la fermeture et `web/dist` sont épinglés.
+
+| Option | Contenu | Coût |
+|---|---|---|
+| **(i)** même pipeline, branche custom qui change le code Go | Digest différent, donc aucune provenance ajoutée à l'image réelle | Repose sur le contenu de la branche : la première branche custom sans changement de code casse la porte de l'image réelle. Fragile |
+| **(ii)** seconde pipeline signée `sample-app-sync`, recommandée | Mêmes tâches signées (liste revue des tâches inchangée), `@IMAGE@` = `builds/sample-app-sync` ; bundle produit et signé comme celui de `construction.sh taches`, sans modifier la 08 | Une pipeline de plus à signer et à épingler ; mêmes fermeture et `web/dist` (limite inchangée) |
+
+En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en est la forme réduite. Rien n'est écrit pour S5 avant la décision.

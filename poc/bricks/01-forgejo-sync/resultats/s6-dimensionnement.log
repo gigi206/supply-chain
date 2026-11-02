@@ -1,0 +1,16 @@
+# dimensionnement de S6, 2026-11-02T14:08:22Z (pendant le rejeu enchainement de la 08, après J7)
+## API publique de GitHub (lecture anonyme)
+{"full_name":"traefik/traefik","size_ko":163561,"default_branch":"master","pushed_at":"2026-11-02T10:42:06Z"}
+## refs de l'amont (git ls-remote), par espace
+      1 HEAD
+     30 refs/heads
+   7704 refs/pull
+     10 refs/reviewable
+   6553 refs/semaphoreci
+      1 refs/semaphoreci2
+    593 refs/tags
+## sc-stockage
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        20G  5.6G   14G  30% /
+6.7M	/var/lib/forgejo
+2.4G	/var/lib/zot
