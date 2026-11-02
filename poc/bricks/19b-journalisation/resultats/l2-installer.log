@@ -1,0 +1,15 @@
+# journalisation.sh installer, 2026-11-02T20:51:45Z
+loki-linux-amd64.zip: OK
+grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
+ports 3001, 3100, 9096 avant installation : 0 écoute(s)
+loki, version 3.7.9 (branch: release-3.7.x, revision: d3b4a2f7)
+grafana version 13.3.0
+Created symlink '/etc/systemd/system/timers.target.wants/disque-metriques.timer' -> '/etc/systemd/system/disque-metriques.timer'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/loki.service' -> '/etc/systemd/system/loki.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/grafana.service' -> '/etc/systemd/system/grafana.service'.
+active
+active
+active
+## compte auditeur (Viewer) de Grafana
+création de auditeur : HTTP 200
+[{"login":"admin","role":"Admin"},{"login":"auditeur","role":"Viewer"}]

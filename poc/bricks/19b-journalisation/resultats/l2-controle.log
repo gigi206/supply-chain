@@ -1,0 +1,45 @@
+# journalisation.sh controle, 2026-11-02T20:52:09Z
+## écoute sur sc-stockage
+127.0.0.1:9096 users:(("loki",pid=47496,fd=8))
+192.168.161.13:3100 users:(("loki",pid=47496,fd=7))
+192.168.161.13:3001 users:(("grafana",pid=47547,fd=71))
+## Loki
+sans certificat client : HTTP 000 (curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0)
+OK   refusé à la poignée TLS
+avec le certificat controle : /ready HTTP 503
+écriture de la ligne témoin temoin-l2-1793652729424068618 : HTTP 204
+OK   ligne témoin relue (HTTP 200)
+demande de suppression : HTTP 403 (deletion is not available for this tenant)
+OK   suppression refusée
+## Grafana
+anonyme, /api/search : HTTP 401
+OK   anonyme refusé
+santé de la source prometheus : HTTP 200 {"status":"OK","message":"Successfully queried the Prometheus API."}
+santé de la source loki : HTTP 200 {"status":"OK","message":"Data source successfully connected."}
+OK   auditeur : ligne témoin lue dans Loki par Grafana (HTTP 200)
+auditeur, Prometheus (up) : HTTP 200, 8 série(s)
+auditeur, création de tableau : HTTP 403
+auditeur, création de source : HTTP 403
+administrateur, suppression de la source provisionnée loki : HTTP 403 ({"message":"Cannot delete read-only data source"})
+## chemin du navigateur : session de l'auditeur (POST /login, cookie, contrôle d'origine)
+POST /login : HTTP 200, cookie de session : 2
+GET /api/user avec la session : HTTP 200 (auditeur)
+redirection de / sans session : https://192.168.161.13:3001/login
+## journal de Grafana : la lecture de l'auditeur est tracée (router_logging)
+  requêtes /api/ds/query journalisées avec leur utilisateur : 2
+## appels vers Grafana Labs dans les journaux de loki et grafana depuis leur démarrage
+  lignes : 0
+## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)
+  aucune
+## mémoire
+Mem:            5931        1390         219           2        4618        4541
+loki : 46 Mi
+grafana : 303 Mi
+prometheus : 65 Mi
+## mesure du disque
+# HELP disque_utilise_ratio Part utilisée du système de fichiers (df), entre 0 et 1.
+# TYPE disque_utilise_ratio gauge
+disque_utilise_ratio{point="/"} 0.4036
+Mon 2026-11-02 20:52:57 UTC  44s Mon 2026-11-02 20:51:57 UTC 15s ago disque-metriques.timer disque-metriques.service
+/ready à 20:52:19 : Ingester not ready: waiting for 15s after being ready
+ HTTP 503

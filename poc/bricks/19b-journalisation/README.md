@@ -148,3 +148,33 @@ Prédictions : [`l2-predictions.md`](resultats/l2-predictions.md), écrites à 2
 - Absence d'appels vers Grafana Labs vérifiée sur tout le journal des services, et non plus sur une seule capture de `ss`.
 
 **Points mesurés en L2, non supposés** : Grafana sous `ProtectSystem=strict`, et sans `MemoryDenyWriteExecute`, retiré par prudence (à mesurer) ; `$__file{}` dans les `secureJsonData` provisionnées ; code de refus de la suppression dans Loki ; suppression d'une source provisionnée.
+
+## L2, exécuté (02/11/2026, 20:51 à 20:53 UTC, accord du propriétaire : « Oui, lancer L2 »)
+
+Commande : `JALON=l2 mise run journalisation -- certificats installer controle`, puis `JALON=l2 mise run observabilite -- regles deployer` (19).
+
+Journaux :
+- 19b : [`l2-certificats.log`](resultats/l2-certificats.log), [`l2-installer.log`](resultats/l2-installer.log), [`l2-controle.log`](resultats/l2-controle.log) et [`l2-complement.log`](resultats/l2-complement.log), ce dernier relevé après coup ;
+- 19 : [`l2-regles.log`](../19-observabilite/resultats/l2-regles.log) et [`l2-deployer.log`](../19-observabilite/resultats/l2-deployer.log).
+
+La dernière ligne de `l2-controle.log` (`/ready` à 20:52:19) a été ajoutée à la main, juste après l'étape.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| 1 | Quatre certificats vérifiés (serveur pour `loki` et `grafana`, client pour `grafana-client` et `controle`) ; clés et mots de passe en 0600 | conforme |
+| 2 | Ports libres avant l'installation (0 écoute) ; empreintes revérifiées dans la VM ; Loki 3.7.9 (`d3b4a2f7`) et Grafana 13.3.0 ; `loki`, `grafana` et le timer `active` ; compte `auditeur` créé (HTTP 200), avec `admin` (Admin) et `auditeur` (Viewer). Grafana tourne sous `ProtectSystem=strict`, et `$__file{}` des `secureJsonData` est interprété (la source Loki se connecte en mTLS) | conforme, prédictions faibles comprises |
+| 3 | Sans certificat client : poignée TLS refusée (« tlsv13 alert certificate required », HTTP 000). **`/ready` répond 503 juste après le démarrage** (« Ingester not ready: waiting for 15s after being ready », 20:52:09 et 20:52:19), puis 200 à partir de 20:52:33, soit 35 s après le démarrage (20:51:58). Ligne témoin écrite (204) puis relue ; **suppression refusée, HTTP 403** (« deletion is not available for this tenant ») | conforme, sauf le délai de `/ready`, non prévu |
+| 4 | Anonyme : 401 ; sources Prometheus et Loki saines ; **l'auditeur lit la ligne témoin dans Loki à travers Grafana**, et 8 séries `up` dans Prometheus ; création de tableau et de source par l'auditeur : 403 ; suppression de la source provisionnée par l'administrateur : **403, « Cannot delete read-only data source »** | conforme |
+| 5 | Aucune connexion établie de `loki` ou de `grafana` hors du réseau du PoC à l'instant du contrôle | conforme, portée limitée à cet instant |
+| 6 | `disque_utilise_ratio{point="/"}` à 0,4036, une seule ligne ; collecté par Prometheus (0,4094 à 20:53:44) | **faux de peu** (0,36 à 0,40 prévu) |
+| 7 | 9 règles, tests réussis ; `DisqueStockagePlein` chargée, `ok`, `inactive` | conforme |
+| 8 | Mémoire disponible : 4 541 Mi ; Loki 46 Mi, Grafana 303 Mi, Prometheus 65 Mi | conforme (Loki sous la fourchette) |
+| 9 | `POST /login` en tant qu'auditeur : 200, cookie de session ; `GET /api/user` avec le cookie et l'en-tête `Origin` : 200 (`auditeur`) ; `/` sans session redirige vers `https://192.168.161.13:3001/login` | conforme |
+| 10 | 2 requêtes `/api/ds/query` journalisées avec leur `userId` | conforme |
+| 11 | 0 ligne mentionnant `grafana.com` ou `stats.grafana` dans les journaux des deux services | conforme |
+
+**Constats :**
+- **Effet de bord de `deletion_mode: disabled`** : chaque requête vers Loki produit une ligne `level=error` (« error loading cache generation numbers … deletion is not available for this tenant »). On en compte 5 depuis le démarrage, sur 6 erreurs au total. C'est du bruit **dans le journal d'audit lui-même**, et il faudra l'exclure des alertes sur les erreurs de Loki en L4. Effet sur le cache des résultats : non mesuré.
+- La sonde de disponibilité de Loki n'est utilisable que 35 s environ après un démarrage. L3 doit en tenir compte, car Alloy réessaie ses envois (à mesurer).
+
+**Seuil de la brique : non atteint.** Seule la ligne témoin de l'hôte est dans Loki : les sources J1 à J6 et J8 arrivent en L3, par Alloy.

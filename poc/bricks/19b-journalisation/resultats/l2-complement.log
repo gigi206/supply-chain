@@ -1,0 +1,7 @@
+# relevé complémentaire (2026-11-02T20:53:44Z) : /ready après le démarrage, bruit d'erreurs du compacteur, alerte de disque
+/ready : ready  HTTP 200
+démarrage de loki : Mon 2026-11-02 20:51:58 UTC
+lignes 'error loading cache generation numbers' depuis le démarrage : 5
+lignes level=error au total : 6
+règle DisqueStockagePlein ok inactive
+collecté : {'__name__': 'disque_utilise_ratio', 'instance': '127.0.0.1:9101', 'job': 'fichiers', 'point': '/'} 0.4094

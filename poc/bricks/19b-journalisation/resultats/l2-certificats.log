@@ -1,0 +1,11 @@
+# journalisation.sh certificats, 2026-11-02T20:51:45Z
+~/.cache/supply-chain-poc/08/pki/loki.crt: OK
+~/.cache/supply-chain-poc/08/pki/grafana.crt: OK
+~/.cache/supply-chain-poc/08/pki/grafana-client.crt: OK
+~/.cache/supply-chain-poc/08/pki/controle.crt: OK
+600 grafana-admin.password
+600 grafana-auditeur.password
+600 loki.key
+600 grafana-client.key
+600 grafana.key
+600 controle.key
