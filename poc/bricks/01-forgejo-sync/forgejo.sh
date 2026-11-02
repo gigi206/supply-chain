@@ -15,6 +15,9 @@
 #                  par poc-sync) ; acceptés (refs propres du fork par poc-dev) ; administrateur : mesuré, pas supposé
 #   bout_en_bout   collision amont sur custom/essai et avance de main : sync.py avec --push et --fork, code 2, ref propre du
 #                  fork intacte, main du fork avancée, collision publiée dans mirror/
+#   negatifs       S4, après executeur.sh installer : force-push de main, tag créé puis déplacé puis supprimé, branche
+#                  supprimée, dans l'amont ; chaque fois un run du service de la VM : code, archive publiée dans mirror/,
+#                  fork sans perte ; refs propres intactes ; restauration identique dans la VM
 # Aucun secret en argument de commande : jetons dans des fichiers 0600 ; en-tête Authorization passé à git par
 # GIT_CONFIG_* et limité au préfixe d'URL de la cible (http.<url>.extraHeader) : il n'est jamais envoyé à l'amont.
 #
@@ -257,4 +260,73 @@ etape_bout_en_bout() {
   journal "$debut"
 }
 
-lancer forgejo S2 "$@"
+# S4 : réécritures de l'amont d'essai, synchronisées par le service de la VM (S3, executeur.sh installer).
+U=synchro@$PROJET
+run_vm() { # attendu-code : un run du service, code de sync.py relevé (ExecMainStatus) ; dernier rapport dans $T/rapport.json
+  local c f
+  sur sc-stockage "sudo systemctl start $U.service" || { echo "KO   échec de l'unité $U" >&2; exit 1; }
+  c=$(sur sc-stockage "systemctl show -p ExecMainStatus --value $U.service")
+  f=$(sur sc-stockage "sudo sh -c 'ls -1 /var/lib/synchro/$PROJET/rapports/*.json | tail -1'")
+  sur sc-stockage "sudo cat $f" > "$T/rapport.json"
+  echo "run ${f##*/} : code $c, $(jq -c '[.events[] | {type, ref, archive}]' "$T/rapport.json")"
+  [ "$c" = "$1" ] && echo "OK   code $c" || { echo "KO   code $c ($1 attendu)" >&2; exit 1; }
+}
+archive_publiee() { # ref (heads/x ou tags/x) ancienne-valeur : l'archive du dernier rapport est dans mirror/ avec cette valeur
+  local a
+  a=$(jq -r --arg r "$1" '.events[] | select(.ref == $r and .archive != null) | .archive' "$T/rapport.json")
+  [ -n "$a" ] && [ "$(distant "$MIROIR" "$a")" = "$2" ] && echo "OK   $1 archivée dans $MIROIR ($a)" || { echo "KO   archive de $1 absente de $MIROIR" >&2; exit 1; }
+}
+
+etape_negatifs() {
+  local avant v1 v1b dev
+  dev=$(distant "$FORK" refs/heads/custom/essai)
+  clone_travail "$AMONT"
+  echo "## 1. force-push de main (branche sensible)"
+  avant=$(git -C "$T/w" rev-parse HEAD)
+  git -C "$T/w" reset -q --hard HEAD~1 && git -C "$T/w" commit -q --allow-empty -m "amont : main réécrite (S4)"
+  accepte "force-push de main par poc-amont" poc-amont "$AMONT" +main
+  run_vm 2
+  [ "$(jq -r '.events[] | select(.ref == "heads/main") | .type' "$T/rapport.json")" = force-push ] && echo "OK   force-push détecté" || { echo "KO   événement de main" >&2; exit 1; }
+  archive_publiee heads/main "$avant"
+  [ "$(distant "$FORK" refs/heads/main)" = "$(git -C "$T/w" rev-parse HEAD)" ] && echo "OK   main du fork suit l'amont (ancienne valeur archivée)" || { echo "KO   main du fork" >&2; exit 1; }
+  echo "## 2. tag v1.0.0 créé, puis déplacé, puis supprimé"
+  git -C "$T/w" tag -a v1.0.0 -m "v1.0.0 (S4)"
+  accepte "tag v1.0.0 par poc-amont" poc-amont "$AMONT" refs/tags/v1.0.0
+  run_vm 0
+  v1=$(distant "$MIROIR" refs/tags/v1.0.0)
+  git -C "$T/w" commit -q --allow-empty -m "amont : après v1.0.0" && git -C "$T/w" tag -f -a v1.0.0 -m "v1.0.0 déplacé (S4)" >/dev/null
+  accepte "tag v1.0.0 déplacé par poc-amont" poc-amont "$AMONT" main +refs/tags/v1.0.0
+  run_vm 2
+  archive_publiee tags/v1.0.0 "$v1"
+  v1b=$(distant "$MIROIR" refs/tags/v1.0.0)
+  accepte "tag v1.0.0 supprimé par poc-amont" poc-amont "$AMONT" :refs/tags/v1.0.0
+  run_vm 2
+  archive_publiee tags/v1.0.0 "$v1b"
+  [ -z "$(distant "$MIROIR" refs/tags/v1.0.0)" ] && echo "OK   tag supprimé de la vue amont de $MIROIR (archivé)" || { echo "KO   tag encore dans $MIROIR" >&2; exit 1; }
+  [ "$(distant "$FORK" refs/tags/v1.0.0)" = "$v1b" ] && echo "OK   tag gardé dans le fork (pas de --prune)" || echo "MESURE tag du fork : $(distant "$FORK" refs/tags/v1.0.0)"
+  echo "## 3. branche feature/x créée puis supprimée"
+  accepte "branche feature/x par poc-amont" poc-amont "$AMONT" HEAD:refs/heads/feature/x
+  run_vm 0
+  avant=$(distant "$MIROIR" refs/heads/feature/x)
+  accepte "branche feature/x supprimée par poc-amont" poc-amont "$AMONT" :refs/heads/feature/x
+  run_vm 0
+  archive_publiee heads/feature/x "$avant"
+  [ "$(distant "$FORK" refs/heads/feature/x)" = "$avant" ] && echo "OK   feature/x gardée dans le fork" || { echo "KO   feature/x du fork" >&2; exit 1; }
+  echo "## 4. refs propres du fork après toutes les réécritures"
+  [ "$(distant "$FORK" refs/heads/custom/essai)" = "$dev" ] && [ -n "$(distant "$FORK" refs/heads/paquet/deb)" ] && [ -n "$(distant "$FORK" refs/tags/custom-1)" ] \
+    && echo "OK   custom/essai, paquet/deb et custom-1 intactes" || { echo "KO   ref propre du fork modifiée" >&2; exit 1; }
+  echo "## 5. restauration dans la VM depuis les bundles et les rapports"
+  sur sc-stockage "sudo -u synchro bash -s" <<EOF
+set -euo pipefail
+d=/var/lib/synchro/$PROJET
+t=\$(mktemp -d)
+python3 -I /usr/local/lib/synchro/sync.py --mirror \$d/miroir.git --report-dir \$d/rapports --bundle-dir \$d/bundles --restore \$t/restaure.git
+a=\$(git -C \$d/miroir.git for-each-ref --format='%(refname) %(objectname)' refs/upstream refs/archive | sha256sum)
+b=\$(git -C \$t/restaure.git for-each-ref --format='%(refname) %(objectname)' refs/upstream refs/archive | sha256sum)
+echo "refs upstream et archive : \$(git -C \$d/miroir.git for-each-ref refs/upstream refs/archive | wc -l) ; bundles : \$(ls \$d/bundles | wc -l)"
+rm -rf \$t
+[ "\$a" = "\$b" ] && echo "OK   miroir restauré identique (refs upstream et archive)" || { echo "KO   restauration différente" >&2; exit 1; }
+EOF
+}
+
+lancer forgejo S2-S4 "$@"

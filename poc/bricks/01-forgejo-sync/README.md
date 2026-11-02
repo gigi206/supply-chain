@@ -255,3 +255,14 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 - `essai` : run réussi pour systemd ; rapport de statut `ok` (l'état de S2 est repris : aucun événement nouveau) ; métrique cohérente ; jeton absent du journal de l'unité ;
 - `planifie` : deux runs planifiés en moins de 5 min, sans intervention ; période d'une heure rétablie après la mesure ;
 - `refspec` : avec git 2.47.3, même comportement qu'avec 2.53.0 (négatif comparé à la destination), prédiction faible ; sans effet sur `sync.py`, qui n'en dépend plus.
+
+## Jalon S4 : tests négatifs sur le vrai Forgejo (préparé le 02/11/2026, exécution après S3)
+
+Étape `negatifs` de [`forgejo.sh`](forgejo.sh) : `poc-amont` réécrit l'amont d'essai, puis chaque fois un run du service `synchro@sample-app-sync` de la VM (S3) ; contrôle du code (`ExecMainStatus`), du rapport, de l'archive publiée dans `mirror/`, du fork, puis restauration dans la VM.
+
+**Prédictions** (écrites le 02/11/2026 vers 14:10 UTC, avant toute exécution) :
+- force-push de `main` : code 2, événement `force-push`, ancienne tête sous `refs/archive/<horodatage>/heads/main` dans `mirror/`, `main` du fork alignée sur l'amont ;
+- tag `v1.0.0` créé (code 0), déplacé (code 2, `tag-moved`, archive publiée), supprimé (code 2, `tag-deleted`, archive publiée, retiré de la vue amont de `mirror/`) ; dans le fork, le tag garde sa dernière valeur (pas de `--prune`) ;
+- branche `feature/x` créée puis supprimée : code 0 les deux fois, archive publiée, branche gardée dans le fork ;
+- refs propres du fork (`custom/essai`, `paquet/deb`, `custom-1`) intactes après toutes les réécritures ;
+- restauration depuis les bundles et les rapports de la VM : refs `upstream` et `archive` identiques au miroir local.
