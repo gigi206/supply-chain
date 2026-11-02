@@ -1,0 +1,83 @@
+# Brique 19, O2 (décisions 3 et 7 du propriétaire, 02/11/2026) : compte de lecture de Prometheus (sc-stockage).
+# Seul droit : get sur services/proxy de trois services nommés (Kyverno, Chains, OpenBao) ; get = requêtes GET seulement.
+# Aucune lecture de Secret, de pod ni de journal. Jeton longue durée (Secret service-account-token), copié sur sc-stockage
+# (zone hors confiance) : limite consignée au README.
+# Forme des noms dans resourceNames (« service:port » ou « schéma:service:port », comme dans l'URL) : prédiction d'O2,
+# mesurée par kubectl auth can-i et une vraie requête avant d'en dépendre.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observabilite
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-lecture
+  namespace: observabilite
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-lecture-jeton
+  namespace: observabilite
+  annotations:
+    kubernetes.io/service-account.name: prometheus-lecture
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: metriques-par-proxy
+  namespace: kyverno
+rules:
+  - apiGroups: [""]
+    resources: [services/proxy]
+    resourceNames: ["kyverno-svc-metrics:8000"]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metriques-par-proxy
+  namespace: kyverno
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: metriques-par-proxy}
+subjects: [{kind: ServiceAccount, name: prometheus-lecture, namespace: observabilite}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: metriques-par-proxy
+  namespace: tekton-chains
+rules:
+  - apiGroups: [""]
+    resources: [services/proxy]
+    resourceNames: ["tekton-chains-metrics:9090"]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metriques-par-proxy
+  namespace: tekton-chains
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: metriques-par-proxy}
+subjects: [{kind: ServiceAccount, name: prometheus-lecture, namespace: observabilite}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: metriques-par-proxy
+  namespace: openbao
+rules:
+  - apiGroups: [""]
+    resources: [services/proxy]
+    resourceNames: ["https:openbao:8200"]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metriques-par-proxy
+  namespace: openbao
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: metriques-par-proxy}
+subjects: [{kind: ServiceAccount, name: prometheus-lecture, namespace: observabilite}]

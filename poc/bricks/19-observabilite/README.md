@@ -91,7 +91,7 @@ Prédictions écrites avant mesure : [`o1-predictions.md`](resultats/o1-predicti
 - **Constat de sécurité pour la 08 (mesuré)** : par le proxy de l'API, `sys/health` d'OpenBao a répondu alors que la NetworkPolicy `openbao` n'admet en entrée que `tekton-chains`, la TSA et `horodatage`. Qui détient `get` sur `services/proxy` dans l'espace `openbao` atteint donc OpenBao sans passer par cette politique. La cause (trafic de l'hôte admis par Cilium, nœud du serveur d'API) n'a pas été vérifiée. Avec la collecte par le proxy, l'ouverture de la NetworkPolicy ne serait pas nécessaire, mais ce droit deviendrait un chemin vers OpenBao à borner (espace et nom de service).
 - **Version de Prometheus** : la 3.13 est la LTS en cours (fin de support le 31/07/2027, correctifs CVSS ≥ 7,0, « best effort ») ; la 3.15 n'est pas LTS et cesse d'être corrigée à la mineure suivante. **Recommandé : v3.13.5** (21/10/2026), dont l'archive `linux-amd64` porte aussi une attestation de release GitHub (sha256 `0388822a…`).
 
-**Décisions du propriétaire avant O2 :**
+**Décisions du propriétaire avant O2** (toutes retenues comme recommandées le 02/11/2026, « Go ») :
 
 1. Alertmanager v0.34.2 sans signature ni attestation : limite consignée (comme Zot), ou reconstruction depuis les sources (brique 11).
 2. Lecture de `sync.prom` : node_exporter et son collecteur textfile (non audité au doc 04), ou serveur minimal qui ne sert que ce fichier.
@@ -99,4 +99,25 @@ Prédictions écrites avant mesure : [`o1-predictions.md`](resultats/o1-predicti
 4. Modifications de la 08 ci-dessus, et le rejeu qu'elles entraînent.
 5. Version de Prometheus : 3.13.5 (LTS) recommandée.
 
+Retenu : (1) limite d'Alertmanager consignée ; (2) serveur minimal pour `sync.prom` ; (3) collecte par le proxy de l'API, droit `services/proxy` borné à `kyverno` et `tekton-chains` ; (4) modifications de la 08 faites maintenant, avec rejeu ciblé ; (5) Prometheus 3.13.5.
+
 **Temps relevé** : O1 en deux parties, relevé amont à 14:29 UTC et relevé du cluster de 16:46 à 16:50 UTC, attribution des échecs de Chains comprise ; le temps de rédaction du protocole n'a pas été relevé, le cumul de la brique face aux 0,5 pw n'est donc pas établi.
+
+## O2, préparé à sec (02/11/2026, 16:54 UTC ; rien d'installé ni d'appliqué, accord du propriétaire attendu)
+
+Prédictions : [`o2-predictions.md`](resultats/o2-predictions.md). Script : [`observabilite.sh`](observabilite.sh) (`mise run observabilite -- <étape>`), configurations dans [`config/`](config/), unités et services minimaux dans [`systemd/`](systemd/), compte de lecture dans [`cluster/lecture.yaml`](cluster/lecture.yaml) (validé en `--dry-run=client` seulement).
+
+**Modifications de la 08 (décision 4), écrites, pas encore appliquées :**
+- [`openbao/config.hcl`](../08-trust-plane/openbao/config.hcl) : `telemetry` (format Prometheus, sans nom d'hôte) et `unauthenticated_metrics_access` sur l'écouteur ([doc de l'écouteur tcp d'OpenBao](https://openbao.org/docs/configuration/listener/tcp/)). Aucun jeton OpenBao sur `sc-stockage`.
+- [`stockage/zot.json`](../08-trust-plane/stockage/zot.json) : extension `metrics`.
+- [`stockage.sh`](../08-trust-plane/stockage.sh), étape `forgejo` : jeton de `/metrics` généré dans la VM, section `[metrics]` ajoutée à `app.ini` à l'installation (le dépôt n'en contient aucun).
+- Rejeu ciblé proposé : `mise run confiance:openbao -- temoin deployer deverrouiller controle` (le pod redémarre et revient scellé : descellement de J3, puis même clé Transit vérifiée), `mise run confiance:stockage -- zot forgejo`, puis la porte de la 01 (`mise run synchro:declencheur -- porte`) pour vérifier que l'image réelle de la 08 est toujours admise. Le prochain rejeu complet de la 08 reprendra ces fichiers.
+
+**Deux décisions de plus, nées de la préparation :**
+- **D6, source d'A6** : recommandé, un fichier `certificats.prom` écrit depuis la PKI de la 08 sur l'hôte (étape `certificats`), servi par le même serveur minimal que `sync.prom` ; pas de blackbox_exporter (non audité). Limite : à réécrire à chaque réémission de certificat.
+- **D7, chemin vers OpenBao (A1)** : recommandé, **(a) proxy de l'API borné au seul service `https:openbao:8200`**, en `get` seulement : le compte ne fait que des GET sans jeton OpenBao, donc n'atteint que les points publics (`sys/health`, `sys/seal-status`, `sys/metrics`). L'alternative (b), un NodePort ouvert à l'IP de `sc-stockage`, donnerait à cette VM hors confiance l'accès à toute l'API d'OpenBao (connexion, descellement), en POST compris.
+
+**Limites consignées :**
+- Alertmanager 0.34.2 vérifié par sha256 seul (décision 1).
+- Jeton longue durée du compte de lecture sur `sc-stockage`, zone hors confiance. Ses droits : GET sur trois services nommés, mesurés par l'étape `compte`.
+- Le serveur de fichiers a le groupe `synchro` : il pourrait lire les rapports et bundles de la 01 ; le code ne lit que les `.prom`.

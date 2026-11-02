@@ -1,0 +1,35 @@
+# Brique 19, O2 (décisions 2 et 6) : fichiers de métriques servis en lecture sur 127.0.0.1:9101 (fichiers.py).
+# Groupe synchro en plus pour lire /var/lib/synchro/<projet>/<projet>.prom (0640) ; le code ne lit que les .prom.
+[Unit]
+Description=Fichiers de métriques du PoC (brique 19)
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+DynamicUser=true
+SupplementaryGroups=synchro
+ExecStart=/usr/bin/python3 -I /usr/local/lib/observabilite/fichiers.py
+Restart=on-failure
+RestartSec=5s
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

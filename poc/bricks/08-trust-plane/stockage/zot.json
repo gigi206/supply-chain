@@ -105,5 +105,13 @@
   "log": {
     "level": "info",
     "audit": "/var/log/zot/audit.log"
+  },
+  "extensions": {
+    "metrics": {
+      "enable": true,
+      "prometheus": {
+        "path": "/metrics"
+      }
+    }
   }
 }

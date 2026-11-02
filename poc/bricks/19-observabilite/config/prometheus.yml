@@ -1,0 +1,80 @@
+# Brique 19, O2 : Prometheus 3.13.5 (LTS) sur sc-stockage, décisions du propriétaire du 02/11/2026.
+# Lecture seule : écoute sur 127.0.0.1, ni --web.enable-admin-api, ni --web.enable-lifecycle, ni récepteur remote-write.
+# Secrets hors de ce fichier : /etc/prometheus/secrets/{k8s.token,forgejo.token} (0640, groupe prometheus).
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["127.0.0.1:9093"]
+
+rule_files:
+  - /etc/prometheus/regles/*.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["127.0.0.1:9090"]
+
+  - job_name: alertmanager
+    static_configs:
+      - targets: ["127.0.0.1:9093"]
+
+  # Services ClusterIP du cluster : collecte par le proxy de l'API de k3s (décision 3), compte prometheus-lecture
+  # (get sur services/proxy, noms bornés, aucun autre droit : cluster/lecture.yaml).
+  - job_name: kyverno
+    scheme: https
+    metrics_path: /api/v1/namespaces/kyverno/services/kyverno-svc-metrics:8000/proxy/metrics
+    authorization:
+      credentials_file: /etc/prometheus/secrets/k8s.token
+    tls_config:
+      ca_file: /etc/prometheus/k8s-ca.crt
+    static_configs:
+      - targets: ["192.168.161.11:6443"]
+
+  - job_name: chains
+    scheme: https
+    metrics_path: /api/v1/namespaces/tekton-chains/services/tekton-chains-metrics:9090/proxy/metrics
+    authorization:
+      credentials_file: /etc/prometheus/secrets/k8s.token
+    tls_config:
+      ca_file: /etc/prometheus/k8s-ca.crt
+    static_configs:
+      - targets: ["192.168.161.11:6443"]
+
+  # OpenBao : voie (a) de la décision 7 (proxy borné au service openbao) ; /v1/sys/metrics sans jeton OpenBao.
+  - job_name: openbao
+    scheme: https
+    metrics_path: /api/v1/namespaces/openbao/services/https:openbao:8200/proxy/v1/sys/metrics
+    params:
+      format: [prometheus]
+    authorization:
+      credentials_file: /etc/prometheus/secrets/k8s.token
+    tls_config:
+      ca_file: /etc/prometheus/k8s-ca.crt
+    static_configs:
+      - targets: ["192.168.161.11:6443"]
+
+  # Services de sc-stockage (CA du PoC, SAN IP 192.168.161.13).
+  - job_name: zot
+    scheme: https
+    tls_config:
+      ca_file: /etc/prometheus/ca-poc.crt
+    static_configs:
+      - targets: ["192.168.161.13:5000"]
+
+  - job_name: forgejo
+    scheme: https
+    authorization:
+      credentials_file: /etc/prometheus/secrets/forgejo.token
+    tls_config:
+      ca_file: /etc/prometheus/ca-poc.crt
+    static_configs:
+      - targets: ["192.168.161.13:3000"]
+
+  # Fichiers de métriques locaux (décisions 2 et 6) : sync.prom de la brique 01, dates d'expiration des certificats.
+  - job_name: fichiers
+    static_configs:
+      - targets: ["127.0.0.1:9101"]

@@ -1,0 +1,33 @@
+# Brique 19, O2 (D4) : récepteur webhook local d'Alertmanager sur 127.0.0.1:9095 ; journalise les alertes reçues.
+[Unit]
+Description=Récepteur local des alertes (brique 19)
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+DynamicUser=true
+ExecStart=/usr/bin/python3 -I /usr/local/lib/observabilite/recepteur.py
+Restart=on-failure
+RestartSec=5s
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

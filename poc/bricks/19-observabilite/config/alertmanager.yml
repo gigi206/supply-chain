@@ -1,0 +1,14 @@
+# Brique 19, O2 : Alertmanager 0.34.2 sur sc-stockage (D4 : aucune notification externe).
+# Une seule destination : le récepteur webhook local, qui journalise chaque notification (preuve de la chaîne).
+route:
+  receiver: recepteur-local
+  group_by: [alertname]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+
+receivers:
+  - name: recepteur-local
+    webhook_configs:
+      - url: http://127.0.0.1:9095/alerte
+        send_resolved: true

@@ -1,0 +1,41 @@
+# Brique 19, O2 : Prometheus 3.13.5 (archive vérifiée : sha256 et attestation de release GitHub) en service durci.
+# Lecture seule : 127.0.0.1 seulement, ni API d'administration, ni lifecycle, ni récepteur remote-write.
+[Unit]
+Description=Prometheus du PoC (brique 19)
+Documentation=https://prometheus.io/docs/
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=prometheus
+Group=prometheus
+ExecStartPre=/usr/local/bin/promtool check config /etc/prometheus/prometheus.yml
+ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus --storage.tsdb.retention.time=15d --web.listen-address=127.0.0.1:9090
+Restart=on-failure
+RestartSec=5s
+StateDirectory=prometheus
+StateDirectoryMode=0750
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

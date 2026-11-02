@@ -1,0 +1,41 @@
+# Brique 19, O2 : Alertmanager 0.34.2 (sha256 publié seul, sans signature ni attestation : limite consignée, décision 1).
+# 127.0.0.1 seulement, sans grappe (--cluster.listen-address vide).
+[Unit]
+Description=Alertmanager du PoC (brique 19)
+Documentation=https://prometheus.io/docs/alerting/latest/alertmanager/
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=alertmanager
+Group=alertmanager
+ExecStartPre=/usr/local/bin/amtool check-config /etc/alertmanager/alertmanager.yml
+ExecStart=/usr/local/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/var/lib/alertmanager --web.listen-address=127.0.0.1:9093 --cluster.listen-address=
+Restart=on-failure
+RestartSec=5s
+StateDirectory=alertmanager
+StateDirectoryMode=0750
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

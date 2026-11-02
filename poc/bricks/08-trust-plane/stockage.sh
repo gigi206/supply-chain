@@ -13,6 +13,7 @@
 #   forgejo    git par apt (versions épinglées, accord du propriétaire du 29/10/2026), Forgejo 15.0.11 (binaire GPG de
 #              mise.toml revérifié dans la VM) en service systemd durci, HTTPS, sqlite, sans SSH ni inscription ;
 #              secrets générés dans la VM ; mot de passe et jeton de l'administrateur en 0600 sur l'hôte
+#              (brique 19, O2 : /metrics activé derrière un jeton généré dans la VM, ajouté à app.ini à l'installation)
 #   depot      organisation workspace, dépôt workspace/sample-app (sources de poc/sample-app à HEAD, commit à
 #              auteur et date fixes) ; push sans jeton refusé ; lecture depuis sc-build
 # Aucun secret en argument de commande : fichiers 0600 ou entrée standard.
@@ -244,6 +245,11 @@ for s in SECRET_KEY INTERNAL_TOKEN JWT_SECRET; do
   n=/etc/forgejo/secrets/\${s,,}
   if [ ! -s "\$n" ]; then (umask 027 && /usr/local/bin/forgejo generate secret "\$s" > "\$n" && chgrp forgejo "\$n"); echo "secret \$s généré"; fi
 done
+# Brique 19, O2 : /metrics derrière un jeton généré dans la VM (TOKEN sans variante _URI documentée), ajouté à app.ini
+# à l'installation, jamais dans le dépôt ; Prometheus (même VM) le lit dans une copie de /etc/prometheus/secrets.
+n=/etc/forgejo/secrets/metrics_token
+if [ ! -s "\$n" ]; then (umask 027 && head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "\$n" && chgrp forgejo "\$n"); echo "jeton de /metrics généré"; fi
+printf '\n[metrics]\nENABLED = true\nTOKEN = %s\n' "\$(cat "\$n")" >> /etc/forgejo/app.ini
 install -m 0644 forgejo.service /etc/systemd/system/forgejo.service
 cd / && rm -rf /tmp/forgejo-installation
 $FG migrate > /var/log/forgejo-migrate.log 2>&1 || { tail -20 /var/log/forgejo-migrate.log; exit 1; }
