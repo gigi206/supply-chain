@@ -201,7 +201,7 @@ Prédictions : [`l3-predictions.md`](resultats/l3-predictions.md).
 
 Les trois compositions sont validées sur l'hôte par `alloy validate`, avec le binaire extrait de l'archive vérifiée, sans installation. Un témoin cassé (récepteur inexistant) est refusé.
 
-**D17, proposée : relais en écriture seule sur `sc-stockage`.** Avec D16 seule, chaque agent porterait un certificat accepté par Loki, et pourrait donc lire tous les journaux de la plateforme. C'est grave pour `sc-build`, où tournent les builds. Proposé :
+**D17 : relais en écriture seule sur `sc-stockage` ; retenue par le propriétaire le 02/11/2026 (« a, relais »).** Avec D16 seule, chaque agent porterait un certificat accepté par Loki, et pourrait donc lire tous les journaux de la plateforme. C'est grave pour `sc-build`, où tournent les builds. Proposé :
 - `sc-confiance` et `sc-build` n'écrivent que vers un relais Alloy de `sc-stockage` : port 3501 pour l'une, 3502 pour l'autre ;
 - chaque port n'accepte que les certificats d'une **autorité propre au nœud**, hors de la CA du PoC, que Loki refuse ;
 - le relais **impose l'étiquette `noeud`** : un nœud ne peut pas se faire passer pour un autre ;
