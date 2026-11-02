@@ -75,9 +75,9 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
   - **C-2** (parité entre CLI et admission) : il faut un cluster ; **mesuré en brique 08, J6** (voir plus bas) ;
   - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : **mesurée en brique 08, J6** ; réécrite en CEL pour Kyverno et mesurée en **J8** (voir plus bas).
 
-## Notation provisoire (grille C)
+## Notation arrêtée (grille C, clôture de J8 du 02/11/2026 ; lecture de C-4 à confirmer)
 
-Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propriétaire a reporté la décision C à J8 (voir plus bas). Contrôle 9 mesuré en brique 08, J5 ; lecture du propriétaire du 29/10/2026.
+Notes arrêtées à la clôture de J8 (accord du propriétaire du 02/11/2026), sans changement de valeur ; décision C du 01/11/2026 (voir plus bas). C-2 mesuré en brique 08, J6 ; contrôle 9 mesuré en brique 08, J5 ; lecture du propriétaire du 29/10/2026. C-5 relevé de nouveau le 02/11/2026 ([`sante-c5.log`](sante-c5.log)). Lecture de C-4 (les 17 cas du banc, à verdicts attendus, valent-ils tests des règles ?) laissée au propriétaire : avec l'ancre 0 de la grille (« pas de tests »), 74 et 64, sans effet sur la décision.
 
 | Critère | Poids | Kyverno seul | Justification | Conforma + Kyverno | Justification |
 |---|---|---|---|---|---|
@@ -85,7 +85,7 @@ Les notes restent provisoires : C-2 est mesuré (brique 08, J6), mais le propri�
 | C-2 Parité CLI / admission | 15 | 5 | **Mesuré en brique 08, J6** : même fichier de politique, mêmes pods, 25/25 décisions identiques (17 cas du banc, 8 cas d'horodatage) ; note retenue par le propriétaire | 2 | Deux langages (Rego en CLI, CEL à l'admission) : parité par double maintenance |
 | C-3 Bundles, referrers, TSA | 15 | 2 | Bundles et referrers natifs, y compris dans un dépôt séparé ; doc d'`extractPayload` inexacte ; **horodatage natif mais en erreur interne** avec une clé sans journal (brique 08, J5, CLI) | 3 | Natifs mais non documentés ; aucun horodatage dans Conforma (aucune option dans `ec validate image`, J5) ; en brique 08, J8 (test 8), le contrôle 9 est joint à la porte par cosign, hors de Conforma |
 | C-4 Maintenabilité | 15 | 3 | 88 lignes, un seul langage ; tests (`kyverno test`) à écrire | 2 | 77 lignes de Rego + 88 de CEL, deux langages ; tests à écrire |
-| C-5 Santé | 10 | 4 | Sain, CNCF, plusieurs employeurs (Scorecard 7,8) | 2 | Limité par Conforma : 0.x, sponsor unique (6,6) |
+| C-5 Santé | 10 | 4 | Scorecard 7,8 (Maintained 10, Contributors 10, Signed-Releases 8, Vulnerabilities 7), [`sante-c5.log`](sante-c5.log) | 2 | Limité par Conforma : 0.x (v0.10.42), Scorecard 6,6 (Signed-Releases 0, Vulnerabilities 0), [`sante-c5.log`](sante-c5.log) |
 | C-6 Performance | 10 | 5 | ≈ 0,5 s | 5 | ≈ 1 s |
 | **Score /100** | | **83** | | **70** | |
 
