@@ -1,0 +1,29 @@
+# Chains v0.29.9, pkg/chains/signing.go (lu le 2026-11-02T19:53:57Z par l'API de GitHub, tag v0.29.9 et branche main)
+## v0.29.9 : signataire absent
+173-			signer, ok := signers[signerType]
+174-			if !ok {
+175:				logger.Warnf("No signer %s configured for %s", signerType, signableType.Type())
+176-				continue
+177-			}
+178-
+## v0.29.9 : marquage
+280-		}
+281-	}
+282-
+283-	// Now mark the TektonObject as signed
+284:	if err := annotations.MarkSigned(ctx, tektonObj, o.Pipelineclientset, extraAnnotations); err != nil {
+285-		return err
+286-	}
+## main : signataire absent
+173-			signer, ok := signers[signerType]
+174-			if !ok {
+175:				logger.Warnf("No signer %s configured for %s", signerType, signableType.Type())
+176-				merr = multierror.Append(merr, fmt.Errorf("no signer %s configured for %s", signerType, signableType.Type()))
+177-				break
+178-			}
+## commits amont sur signing.go
+b1c0af9a9a 2026-08-13T12:00:13Z fix(signing): aggregate no-signer-configured errors into MarkSigned decision (#1834)
+1475ad986d 2026-07-29T11:38:05Z fix: aggregate per-artifact signing failures so signed annotation is not set (#1666)
+b5ecaf7785 2026-07-24T07:38:04Z feat(storage): add OCI 1.1 Referrers API support with sigstore-bundle format (#1691)
+## dernière release : v0.29.9 2026-10-22T12:14:25Z
+## b1c0af9 contenu dans v0.29.9 ? statut de la comparaison v0.29.9...b1c0af9a9a : diverged

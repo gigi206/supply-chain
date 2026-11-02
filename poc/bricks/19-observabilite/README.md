@@ -271,7 +271,7 @@ Prédictions : [`o4-predictions.md`](resultats/o4-predictions.md). Étapes de [`
 **Effets de bord relevés** :
 - le `chrono.tsv` de la 08 garde une ligne `J8 decision3` à 18:59:19 UTC, sans ligne de fin (étape en KO) ; son journal `preuves-decision3.log` a été rendu à sa version versionnée ;
 - une image témoin de plus dans `builds/essai-decision3` (tag `temoin-20261102T185919Z`), comme à chaque passage de `decision3` ;
-- pendant A4, un build de `sample-app-sync` lancé par erreur depuis la brique 01 (voir son README) : réussi et signé, même digest que l'image de S5, sans effet sur les alertes.
+- pendant A4, un build de `sample-app-sync` lancé par erreur depuis la brique 01 (voir son README) : réussi et signé, même digest que l'image de S5, sans effet sur les alertes ; il a ajouté une provenance au tag `.att` de cette image (voir A2, deuxième passage).
 
 **O4 : seuil de la brique non atteint** (A2 non éprouvée). Décision à prendre pour A2.
 
@@ -287,5 +287,14 @@ Prédictions 8 à 12 ([`o4-predictions.md`](resultats/o4-predictions.md), 19:40:
   - Non vérifié, car les exécutions ont été purgées avant le contrôle : ce qu'en dirait le contrôle exécutions/enveloppes de la 08, et la porte pour une image **neuve** (ici, le digest avait déjà des attestations d'un build identique, donc la porte l'admettrait).
 - **Prédiction 12 conforme** : A1 déclenchée (19:41:37) puis résolue (19:45:37), notifications reçues ; passages d'`horodatage` et de `rattrapage` réussis après le descellement (relevé de 19:50).
 - **Défaut de l'étape** : elle n'a pas attendu la résolution de A1 ni relevé les CronJobs, car elle s'est arrêtée en KO sur la notification de A2 (relevé fait à part).
+- **Preuve directe, après la purge** ([`o4-a2-att-releve.log`](resultats/o4-a2-att-releve.log)) : le tag `.att` de `builds/sample-app-sync@3a7ca1b1…` ne contient que les provenances des builds de 15:17 (`1599e311`, S5) et 18:38 (`e209907f`) ; aucune du build de 19:40 (PipelineRun `8054172c-…`).
+- **Code de Chains** ([`o4-a2-chains-code.log`](resultats/o4-a2-chains-code.log)) : en v0.29.9, un signataire absent fait `continue` sans ajouter d'erreur, puis `MarkSigned` marque l'objet. Sur `main` (commit `b1c0af9`, #1834, 13/08/2026), l'erreur est agrégée et l'objet n'est plus marqué signé ; ce commit n'est pas dans v0.29.9 (dernière release, 22/10/2026). **Même corrigé, ce cas n'appelle pas `recordError` : `signing_failures` ne le compterait toujours pas.**
+- **Référence pour une détection** ([`o4-a2-ecart-reference.log`](resultats/o4-a2-ecart-reference.log)) : écart `increase(marked_signed[10m]) - increase(sign_created[10m])`, de 17:12 à 19:35 UTC (un seul build normal, celui de 18:38) : maximum 0 pour les PipelineRuns comme pour les TaskRuns (minimum −1,05 pour les TaskRuns : `publier` crée deux signatures) ; pendant le build scellé : 1,05 et 3,16.
 
-**A2 reste non éprouvée ; seuil de la brique non atteint.** Décisions à prendre (voir la conversation du 02/11/2026).
+**A2 reste non éprouvée ; seuil de la brique non atteint.** Options proposées au propriétaire :
+
+1. **(a) recommandé : étendre A2 d'une branche « marqué sans signature »** : `increase(watcher_*_marked_signed_total[10m]) - increase(watcher_*_sign_created_total[10m]) > 0`, avec `for: 1m` (un compteur peut entrer dans la fenêtre une collecte avant l'autre), tests `promtool` (échec en ouvert seul, build normal, bord de fenêtre), puis **troisième passage** du même incident, avec contrôle exécutions/enveloppes de la 08 et lecture de Zot **avant** la purge. Limites à consigner : référence faite sur un seul build normal ; en trafic mêlé, un build normal à reprises peut masquer un échec en ouvert.
+2. (b) Garder A2 telle quelle et consigner qu'elle ne voit pas cette panne ; la brique reste à 4 alertes critiques sur 5 éprouvées.
+3. Indépendamment : signaler à l'amont que le cas « signataire absent » ne compte aucun échec, même sur `main` (action publique chez un tiers : sur accord explicite seulement). Et passer à une version de Chains qui contient `b1c0af9` dès sa publication.
+
+**Effet de bord à revérifier** : le build de 18:38 lancé par erreur depuis la 01 a ajouté une provenance (commit `e209907f`, branche `custom/n…/b`) au tag `.att` que juge la porte de la 01 ; la non-interférence de la 01 avait été mesurée sur `1599e311`. Revérifier la porte (`synchro:declencheur -- porte`) est à décider.

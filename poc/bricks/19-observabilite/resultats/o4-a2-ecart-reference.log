@@ -1,0 +1,13 @@
+# Écart marked_signed - sign_created de Chains sur 10 min, relevé 2026-11-02T19:53:56Z
+## pipelinerun : maximum de l'écart, 17:12 à 19:35 UTC (fonctionnement normal, build de 18:38 compris)
+  0
+## pipelinerun : minimum sur la même période
+  0
+## pipelinerun : maximum de 19:35 à 20:00 UTC (build pendant le scellement de 19:40)
+  1.0526315789473684
+## taskrun : maximum de l'écart, 17:12 à 19:35 UTC (fonctionnement normal, build de 18:38 compris)
+  0
+## taskrun : minimum sur la même période
+  -1.0526315789473686
+## taskrun : maximum de 19:35 à 20:00 UTC (build pendant le scellement de 19:40)
+  3.1578947368421053

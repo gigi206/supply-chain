@@ -1,0 +1,4 @@
+# Tag .att de builds/sample-app-sync@sha256:3a7ca1b14dbf…, relevé 2026-11-02T19:53:56Z (lecture anonyme)
+couches : 4
+  v1 invocationId=c69ec0d2-0d28-4a7c-a1c7-19ce1c7bb186 début=2026-11-02T15:17:35Z source=git+https://sc-stockage.poc.test:3000/workspace/sample-app-sync.git 1599e311314d672453b8b3fc053cd854cec530d0
+  v1 invocationId=f53718b3-cdea-425c-95c9-c1466d4dcbb4 début=2026-11-02T18:38:36Z source=git+https://sc-stockage.poc.test:3000/workspace/sample-app-sync.git e209907fe1339d701939b99ede69dfd8380ed675
