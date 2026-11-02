@@ -1,0 +1,33 @@
+# /metrics de Zot et Forgejo après le rejeu ciblé, 2026-11-02T17:01:40Z (depuis sc-stockage, root ; jeton passé à curl par l'entrée standard)
+Zot sans authentification : HTTP 401
+Forgejo sans jeton : HTTP 401
+Forgejo, jeton faux : HTTP 401
+Forgejo avec jeton : HTTP 200
+## Zot : noms
+## Forgejo : noms
+gitea_accesses
+gitea_attachments
+gitea_build_info
+gitea_comments
+gitea_follows
+gitea_hooktasks
+gitea_issues
+gitea_issues_closed
+gitea_issues_open
+gitea_labels
+gitea_loginsources
+gitea_milestones
+gitea_mirrors
+gitea_oauths
+gitea_organizations
+gitea_projects
+gitea_projects_boards
+gitea_publickeys
+gitea_releases
+gitea_repositories
+gitea_stars
+gitea_teams
+gitea_updatetasks
+gitea_users
+gitea_watches
+gitea_webhooks

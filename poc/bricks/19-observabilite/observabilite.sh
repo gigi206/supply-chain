@@ -2,7 +2,7 @@
 # Brique 19, jalon O2 (décisions du propriétaire du 02/11/2026) : Prometheus et Alertmanager en services durcis sur
 # sc-stockage, collecte des cinq sources, en lecture seule.
 #   telecharger   archives amont épinglées (gh release download) dans ~/.cache/supply-chain-poc/19/amont :
-#                 sha256 figés ici ; Prometheus : attestation de release GitHub vérifiée (gh attestation verify) ;
+#                 sha256 figés ici ; Prometheus : attestation de release GitHub vérifiée (gh release verify-asset) ;
 #                 Alertmanager : sha256 seul (aucune attestation ni signature publiée, limite consignée : décision 1)
 #   certificats   dates d'expiration des certificats du PoC (PKI de la 08 sur l'hôte) en métriques (A6, décision 6)
 #   compte        compte de lecture prometheus-lecture (cluster/lecture.yaml) ; droits mesurés : get sur services/proxy
@@ -36,9 +36,10 @@ etape_telecharger() {
   [ -s "$A/$PROM_ARCHIVE" ] || gh release download "v$PROM_VERSION" -R prometheus/prometheus -p "$PROM_ARCHIVE" -D "$A"
   [ -s "$A/$AM_ARCHIVE" ] || gh release download "v$AM_VERSION" -R prometheus/alertmanager -p "$AM_ARCHIVE" -D "$A"
   (cd "$A" && printf '%s  %s\n%s  %s\n' "$PROM_SHA" "$PROM_ARCHIVE" "$AM_SHA" "$AM_ARCHIVE" | sha256sum -c)
-  # Lie l'archive à la release v3.13.5 de prometheus/prometheus (prédicat release v0.2) ; ce n'est pas une provenance de build.
-  gh attestation verify "$A/$PROM_ARCHIVE" --repo prometheus/prometheus \
-    --predicate-type https://in-toto.io/attestation/release/v0.2 2>&1
+  # Lie l'archive à la release v3.13.5 de prometheus/prometheus (attestation de release, prédicat release v0.2) ; ce n'est
+  # pas une provenance de build. gh attestation verify ne la trouve pas (« no attestations found », premier passage du
+  # 02/11/2026) : les attestations de release se vérifient par gh release verify-asset.
+  gh release verify-asset "v$PROM_VERSION" "$A/$PROM_ARCHIVE" -R prometheus/prometheus 2>&1
   echo "Alertmanager : sha256 seul (aucune attestation ni signature publiée : limite consignée, décision 1)"
   for f in "$PROM_ARCHIVE" "$AM_ARCHIVE"; do tar -tzf "$A/$f" | sed "s#^#  $f : #" | grep -E '/(prometheus|promtool|alertmanager|amtool)$'; done
 }
@@ -71,11 +72,14 @@ etape_compte() {
   # Droits déclarés, lus par l'API (kubectl auth can-i), puis par une vraie requête avec le jeton.
   for ns_n in kyverno/kyverno-svc-metrics:8000 tekton-chains/tekton-chains-metrics:9090 openbao/https:openbao:8200; do
     ns=${ns_n%%/*}; n=${ns_n#*/}
-    echo "can-i get services/proxy/$n -n $ns : $(kubectl auth can-i get "services/proxy/$n" -n "$ns" --as "$sa" 2>&1 || true)"
+    echo "can-i get services/$n --subresource=proxy -n $ns : $(kubectl auth can-i get "services/$n" --subresource=proxy -n "$ns" --as "$sa" 2>&1 || true)"
   done
-  for d in "get secrets -n openbao" "get secrets -n observabilite" "list pods -n kyverno" "get pods/log -n tekton-chains" \
-           "create services/proxy/kyverno-svc-metrics:8000 -n kyverno" "get services/proxy/kyverno-svc:443 -n kyverno" \
-           "get services/proxy/https:openbao:8201 -n openbao" "get services/proxy/timestamp-authority:3000 -n tsa"; do
+  # Syntaxe de can-i pour un sous-ressource : services/<nom> --subresource=proxy (« services/proxy/<nom> » répond « no »
+  # à tort : premier passage du 02/11/2026, archivé).
+  for d in "get secrets -n openbao" "get secrets -n observabilite" "list pods -n kyverno" "get pods --subresource=log -n tekton-chains" \
+           "create services/kyverno-svc-metrics:8000 --subresource=proxy -n kyverno" "get services/kyverno-svc:443 --subresource=proxy -n kyverno" \
+           "get services/https:openbao:8201 --subresource=proxy -n openbao" "get services/kyverno-svc-metrics --subresource=proxy -n kyverno" \
+           "get services/timestamp-authority:3000 --subresource=proxy -n tsa"; do
     # shellcheck disable=SC2086
     echo "can-i $d : $(kubectl auth can-i $d --as "$sa" 2>&1 || true)"
   done

@@ -281,8 +281,11 @@ EOF
   echo "$FORGEJO_HOTE/api/healthz (CA du PoC) : HTTP $code ; version $(curl -fsS --cacert "$P/ca-poc.crt" "$FORGEJO_HOTE/api/v1/version" | jq -r .version)"
   [ "$code" = 200 ] || { sur sc-stockage "sudo journalctl -u forgejo -n 30 -o cat" >&2; exit 1; }
   sur sc-stockage "systemctl is-active forgejo; sudo ss -ltnp | grep ':3000 '; sudo ls -l /etc/forgejo /etc/forgejo/tls /etc/forgejo/secrets; ls -ld /var/lib/forgejo"
-  [ "$(sur sc-stockage "sudo sha256sum /etc/forgejo/app.ini" | cut -d' ' -f1)" = "$(sha256sum "$here/stockage/forgejo.ini" | cut -d' ' -f1)" ] \
-    && echo "OK   app.ini inchangé par Forgejo (identique à stockage/forgejo.ini, sans secret)" || { echo "KO   app.ini modifié" >&2; exit 1; }
+  # app.ini = stockage/forgejo.ini suivi de la seule section [metrics] ajoutée à l'installation (brique 19, O2) ; jeton masqué.
+  [ "$(sur sc-stockage "sudo head -n -4 /etc/forgejo/app.ini | sha256sum" | cut -d' ' -f1)" = "$(sha256sum < "$here/stockage/forgejo.ini" | cut -d' ' -f1)" ] \
+    && [ "$(sur sc-stockage "sudo tail -n 4 /etc/forgejo/app.ini" | sed 's/^TOKEN = [0-9a-f]\{64\}$/TOKEN = <masqué>/' | paste -sd'|')" = "|[metrics]|ENABLED = true|TOKEN = <masqué>" ] \
+    && echo "OK   app.ini inchangé par Forgejo (stockage/forgejo.ini, plus la section [metrics] et son jeton généré dans la VM)" \
+    || { echo "KO   app.ini modifié" >&2; exit 1; }
   curl -fsS --cacert "$P/ca-poc.crt" "$FORGEJO_HOTE/user/sign_up" | grep 'Registration is disabled' >/dev/null \
     && echo "OK   inscription désactivée (/user/sign_up : « Registration is disabled »)" || { echo "KO   inscription ouverte" >&2; exit 1; }
   sur sc-stockage "systemd-analyze security forgejo 2>/dev/null | tail -1"

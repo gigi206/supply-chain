@@ -1,0 +1,29 @@
+# stockage.sh forgejo, 2026-11-02T17:00:57Z
+~/.local/share/mise/installs/forgejo-forgejo-forgejo/15.0.11/forgejo: OK
+git 1:2.47.3-0+deb13u1 perl 5.40.1-6+deb13u1
+git version 2.47.3
+forgejo: OK
+jeton de /metrics généré
+administrateur poc-admin existant
+https://192.168.161.13:3000/api/healthz (CA du PoC) : HTTP 200 ; version 15.0.11+gitea-1.22.0
+active
+LISTEN 0      4096   192.168.161.13:3000       0.0.0.0:*    users:(("forgejo",pid=28321,fd=17))      
+/etc/forgejo:
+total 12
+-rw-r----- 1 root forgejo 1601 Nov  2 17:01 app.ini
+drwxr-x--- 2 root forgejo 4096 Nov  2 17:01 secrets
+drwxr-x--- 2 root forgejo 4096 Nov  2 17:01 tls
+
+/etc/forgejo/secrets:
+total 16
+-rw-r----- 1 root forgejo 105 Nov  2 13:13 internal_token
+-rw-r----- 1 root forgejo  43 Nov  2 13:13 jwt_secret
+-rw-r----- 1 root forgejo  64 Nov  2 17:01 metrics_token
+-rw-r----- 1 root forgejo  43 Nov  2 13:13 secret_key
+
+/etc/forgejo/tls:
+total 8
+-rw-r--r-- 1 root root    778 Nov  2 17:01 forgejo.crt
+-rw-r----- 1 root forgejo 241 Nov  2 17:01 forgejo.key
+drwxr-x--- 3 forgejo forgejo 4096 Nov  2 13:13 /var/lib/forgejo
+KO   app.ini modifié

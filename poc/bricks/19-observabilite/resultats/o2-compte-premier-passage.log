@@ -1,0 +1,27 @@
+# observabilite.sh compte, 2026-11-02T17:01:50Z
+namespace/observabilite serverside-applied
+serviceaccount/prometheus-lecture serverside-applied
+secret/prometheus-lecture-jeton serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+jeton du compte en 0600 sur l'hôte
+can-i get services/proxy/kyverno-svc-metrics:8000 -n kyverno : no
+can-i get services/proxy/tekton-chains-metrics:9090 -n tekton-chains : no
+can-i get services/proxy/https:openbao:8200 -n openbao : no
+can-i get secrets -n openbao : no
+can-i get secrets -n observabilite : no
+can-i list pods -n kyverno : no
+can-i get pods/log -n tekton-chains : no
+can-i create services/proxy/kyverno-svc-metrics:8000 -n kyverno : no
+can-i get services/proxy/kyverno-svc:443 -n kyverno : no
+can-i get services/proxy/https:openbao:8201 -n openbao : no
+can-i get services/proxy/timestamp-authority:3000 -n tsa : no
+GET /api/v1/namespaces/kyverno/services/kyverno-svc-metrics:8000/proxy/metrics : HTTP 200
+GET /api/v1/namespaces/tekton-chains/services/tekton-chains-metrics:9090/proxy/metrics : HTTP 200
+GET /api/v1/namespaces/openbao/services/https:openbao:8200/proxy/v1/sys/metrics?format=prometheus : HTTP 200
+GET /api/v1/namespaces/openbao/secrets : HTTP 403
+GET /api/v1/namespaces/kyverno/services/kyverno-svc:443/proxy/ : HTTP 403

@@ -1,0 +1,20 @@
+# OpenBao scellé après le changement de configuration, 2026-11-02T17:00:35Z (proxy de l'API, compte administrateur)
+{"initialized":true,"sealed":true}
+pod : False (Ready)
+## sys/health
+Error from server (ServiceUnavailable): no endpoints available for service "https:openbao:8200"
+
+## sys/seal-status
+Error from server (ServiceUnavailable): no endpoints available for service "https:openbao:8200"
+
+## sys/metrics?format=prometheus
+Error from server (ServiceUnavailable): no endpoints available for service "https:openbao:8200"
+
+## sys/metrics dans le pod (127.0.0.1, sans passer par le Service)
+# HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 1.7272e-05
+go_gc_duration_seconds{quantile="0.25"} 1.7272e-05
+go_gc_duration_seconds{quantile="0.5"} 3.363
+## métriques d'état dans le pod scellé (noms contenant seal, unseal, active, standby)
+vault_core_unsealed{cluster=""} 0

@@ -1,0 +1,5 @@
+# observabilite.sh telecharger, 2026-11-02T16:59:37Z
+prometheus-3.13.5.linux-amd64.tar.gz: OK
+alertmanager-0.34.2.linux-amd64.tar.gz: OK
+
+Error: no attestations found

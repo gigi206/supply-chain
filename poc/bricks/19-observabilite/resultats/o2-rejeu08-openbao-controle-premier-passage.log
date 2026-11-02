@@ -1,0 +1,3 @@
+# openbao.sh controle, 2026-11-02T17:00:19Z
+Error reading transit/keys/chains: Get "https://127.0.0.1:8200/v1/transit/keys/chains": dial tcp 127.0.0.1:8200: connect: connection refused
+command terminated with exit code 2

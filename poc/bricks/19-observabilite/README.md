@@ -103,7 +103,7 @@ Retenu : (1) limite d'Alertmanager consignée ; (2) serveur minimal pour `sync.p
 
 **Temps relevé** : O1 en deux parties, relevé amont à 14:29 UTC et relevé du cluster de 16:46 à 16:50 UTC, attribution des échecs de Chains comprise ; le temps de rédaction du protocole n'a pas été relevé, le cumul de la brique face aux 0,5 pw n'est donc pas établi.
 
-## O2, préparé à sec (02/11/2026, 16:54 UTC ; rien d'installé ni d'appliqué, accord du propriétaire attendu)
+## O2, préparation (02/11/2026, 16:54 UTC, exécuté ensuite : voir la section suivante)
 
 Prédictions : [`o2-predictions.md`](resultats/o2-predictions.md). Script : [`observabilite.sh`](observabilite.sh) (`mise run observabilite -- <étape>`), configurations dans [`config/`](config/), unités et services minimaux dans [`systemd/`](systemd/), compte de lecture dans [`cluster/lecture.yaml`](cluster/lecture.yaml) (validé en `--dry-run=client` seulement).
 
@@ -121,3 +121,24 @@ Prédictions : [`o2-predictions.md`](resultats/o2-predictions.md). Script : [`ob
 - Alertmanager 0.34.2 vérifié par sha256 seul (décision 1).
 - Jeton longue durée du compte de lecture sur `sc-stockage`, zone hors confiance. Ses droits : GET sur trois services nommés, mesurés par l'étape `compte`.
 - Le serveur de fichiers a le groupe `synchro` : il pourrait lire les rapports et bundles de la 01 ; le code ne lit que les `.prom`.
+
+## O2, exécuté (02/11/2026, 16:59 à 17:06 UTC, accord du propriétaire, D6 et D7 (a) retenus)
+
+**Résultat : 7 cibles sur 8 `up` ; Zot `down` (401), décision du propriétaire en attente.** Rien d'autre en échec.
+
+| # | Prédiction ([`o2-predictions.md`](resultats/o2-predictions.md)) | Mesure | Verdict |
+|---|---|---|---|
+| 1 | sha256 conformes, attestation de Prometheus vérifiée | sha256 conformes ; `gh attestation verify` : « no attestations found » ([premier passage](resultats/o2-telecharger-premier-passage.log)) ; **`gh release verify-asset v3.13.5` réussit** ([`o2-telecharger.log`](resultats/o2-telecharger.log)) | conforme, outil corrigé |
+| 2 | nom avec le port dans `resourceNames` ; refus ailleurs | requêtes réelles : 200 sur les trois services, 403 sur les Secrets d'`openbao` et sur `kyverno-svc:443` ; `can-i` : `yes` pour les trois, `no` pour le reste, **y compris le nom sans port** ([`o2-compte.log`](resultats/o2-compte.log)) ; premier passage avec une syntaxe de `can-i` fausse (`services/proxy/<nom>` : `no` partout) archivé | conforme |
+| 3 | `sys/metrics` en 200 sans jeton ; scellé : plus de 200 | descellé : 200 par le proxy, `vault_core_unsealed` = 1 dans Prometheus ; **scellé : le pod n'est plus Ready, le Service n'a plus d'endpoint, le proxy répond 503** (« no endpoints available ») ; dans le pod, `vault_core_unsealed` = 0 reste servi ([`o2-openbao-scelle.log`](resultats/o2-openbao-scelle.log)) | conforme : A1 reposera sur `up{job="openbao"} == 0` (ou `absent`), la jauge n'étant pas collectable scellée |
+| 4 | Zot `/metrics` lisible sans authentification | **401** ; le code de Zot v2.1.22 (`MetricsAuthzHandler`) refuse tout, anonyme ou authentifié, sans `accessControl.metrics` ([`o2-zot-forgejo-metriques.log`](resultats/o2-zot-forgejo-metriques.log)) | **fausse** |
+| 5 | Forgejo 401/403 sans jeton, 200 avec | 401 sans jeton et avec un jeton faux, 200 avec le jeton ; métriques `gitea_*` (compteurs d'objets) | conforme |
+| 6 | API de k3s joignable, cibles `up` en 35 s | 7/8 `up` au premier relevé ([`o2-cibles.log`](resultats/o2-cibles.log)) | conforme hors Zot |
+| 7 | API d'administration, lifecycle, remote-write refusés (4xx) ; écoute locale | `delete_series` et `snapshot` : **HTTP 500** « admin APIs disabled », séries `up` intactes ; `/-/reload` et `/-/quit` : 403 ; `/api/v1/write` : 404 ; écoute sur 127.0.0.1 seulement (9090, 9093, 9095, 9101), pas de 9094 ([`o2-lecture_seule.log`](resultats/o2-lecture_seule.log)) | conforme sur le fond, **code faux** (500 et non 4xx) |
+| 8 | rejeu ciblé sans perte | OpenBao scellé puis descellé, même clé Transit ; Zot et Forgejo redémarrés ; porte inchangée ([`o2-porte-apres-rejeu08.log`](resultats/o2-porte-apres-rejeu08.log)) ; défaut d'attente dans `openbao.sh deployer` et contrôle d'`app.ini` à adapter (premiers passages archivés, [README de la 08](../08-trust-plane/README.md)) | conforme, deux défauts de script |
+
+**Noms réels relevés pour O3** ([`o2-cibles.log`](resultats/o2-cibles.log)) : `vault_core_unsealed` (OpenBao) ; `watcher_*_signing_failures_total` (Chains) ; `kyverno_admission_requests_total`, `kyverno_image_validating_policy_results_total` (Kyverno) ; `sync_derniere_reussite_timestamp_seconds` (01) ; `certificat_expiration_timestamp_seconds` (D6) ; `gitea_*` (Forgejo, pas d'alerte prévue).
+
+**Décision du propriétaire pour Zot** (seule cible `down`) :
+- **(a) recommandé** : compte htpasswd `poc-metriques` (bcrypt, mot de passe généré, comme les autres comptes de la 08) et `accessControl.metrics.users = ["poc-metriques"]` ; Prometheus en `basic_auth` avec un fichier de mot de passe sur la même VM ;
+- (b) `accessControl.metrics.anonymousPolicy = ["read"]` : aucun secret de plus, mais métriques de Zot lisibles depuis la zone build (noms des dépôts déjà lisibles anonymement, volumes et requêtes en plus).

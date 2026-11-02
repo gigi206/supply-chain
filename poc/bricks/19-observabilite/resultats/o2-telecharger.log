@@ -1,0 +1,13 @@
+# observabilite.sh telecharger, 2026-11-02T17:00:01Z
+prometheus-3.13.5.linux-amd64.tar.gz: OK
+alertmanager-0.34.2.linux-amd64.tar.gz: OK
+Calculated digest for prometheus-3.13.5.linux-amd64.tar.gz: sha256:0388822ace519c5a3a8ef556a541ce1b536e21d872f82deded465bd27a5a0699
+Resolved tag v3.13.5 to sha1:ad400d14c7f420650464fa4d860d8bc456902441
+Loaded attestation from GitHub API
+
+✓ Verification succeeded! prometheus-3.13.5.linux-amd64.tar.gz is present in release v3.13.5
+Alertmanager : sha256 seul (aucune attestation ni signature publiée : limite consignée, décision 1)
+  prometheus-3.13.5.linux-amd64.tar.gz : prometheus-3.13.5.linux-amd64/prometheus
+  prometheus-3.13.5.linux-amd64.tar.gz : prometheus-3.13.5.linux-amd64/promtool
+  alertmanager-0.34.2.linux-amd64.tar.gz : alertmanager-0.34.2.linux-amd64/alertmanager
+  alertmanager-0.34.2.linux-amd64.tar.gz : alertmanager-0.34.2.linux-amd64/amtool
