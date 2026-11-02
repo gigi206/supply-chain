@@ -1,0 +1,41 @@
+# Brique 19b, L2 : Grafana 13.3.0 (archive vérifiée par sha256, publié par Grafana Labs sur deux sources ; aucune signature)
+# en service durci ; installé dans /opt/grafana-13.3.0 (lecture seule), données dans /var/lib/grafana.
+[Unit]
+Description=Grafana du PoC (brique 19b)
+Documentation=https://grafana.com/docs/grafana/
+Wants=network-online.target
+After=network-online.target loki.service prometheus.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=grafana
+Group=grafana
+WorkingDirectory=/opt/grafana-13.3.0
+ExecStart=/opt/grafana-13.3.0/bin/grafana server --homepath=/opt/grafana-13.3.0 --config=/etc/grafana/grafana.ini
+Restart=on-failure
+RestartSec=5s
+StateDirectory=grafana
+StateDirectoryMode=0750
+# MemoryDenyWriteExecute absent : à mesurer (moteur JavaScript côté serveur possible)
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

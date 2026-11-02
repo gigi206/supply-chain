@@ -1,0 +1,15 @@
+# Brique 19b, L2 : certificats clients de la CA du PoC (mTLS de Loki, D16). La CA de la 08 contraint les noms
+# (poc.test, réseau des nœuds) : les SAN des clients restent sous poc.test. SAN passé par l'environnement.
+[req]
+distinguished_name = dn
+prompt = no
+
+[dn]
+
+[client_poc]
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature
+extendedKeyUsage = clientAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+subjectAltName = $ENV::SAN

@@ -6,9 +6,18 @@
 #                (dl.grafana.com et API grafana.com, concordants au relevé), aucune signature ni attestation de l'archive
 #   releve       ressources de sc-stockage ; volume de journald et des journaux de pods sur la dernière heure, par VM et
 #                par espace ; événements Kubernetes ; audits existants (k3s, OpenBao, Zot) ; CLA de Grafana Labs
-# Aucun secret en argument de commande.
+# Jalon L2 (D8, D10, D13 a, D16) : Loki et Grafana sur sc-stockage, en services durcis.
+#   certificats  certificats serveur de Loki et de Grafana (CA du PoC) ; certificats clients (mTLS de Loki) : grafana-client,
+#                controle (l'hôte, pour les essais) ; mots de passe de l'administrateur et de l'auditeur de Grafana (0600)
+#   installer    archives revérifiées dans la VM ; utilisateurs loki et grafana ; configurations, sources de données
+#                provisionnées, unités ; mesure du disque (timer disque-metriques, alerte DisqueStockagePlein de la 19) ;
+#                compte auditeur (Viewer) de Grafana créé par l'API
+#   controle     écoute ; Loki : sans certificat client refusé, avec : ligne témoin écrite puis relue, suppression refusée ;
+#                Grafana : anonyme refusé, sources saines, auditeur lit Loki et Prometheus, écritures refusées ; aucune
+#                connexion sortante hors du réseau du PoC
+# Aucun secret en argument de commande : identifiants passés à curl par sa configuration sur l'entrée standard (-K -).
 #
-# Usage (racine du dépôt) : mise run journalisation -- <étape>…   (journal : resultats/l1-<étape>.log)
+# Usage (racine du dépôt) : mise run journalisation -- <étape>…   (journal : resultats/l1-<étape>.log ; JALON=l2 : l2-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -87,4 +96,144 @@ etape_releve() {
   done
 }
 
-lancer l1 L1 "$@"
+# ---------------------------------------------------------------------------------------------------------------- L2
+HOTE=192.168.161.13
+PKI08=$here/../08-trust-plane/stockage/pki.cnf
+D=$W/journalisation
+trap 'rm -rf "${D:?}" "${W:?}/refus.out"' EXIT   # copies de secrets, même en cas d'échec
+
+cert_serveur() { # nom : certificat serveur de sc-stockage (DNS sc-stockage.poc.test, IP 192.168.161.13), comme certificat() de la 08
+  local n=$1
+  if [ -s "$S/$n.key" ] && [ -s "$P/$n.crt" ]; then echo "$n : certificat existant"; else
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/$n.key")
+    SAN="DNS:sc-stockage.poc.test,IP:$HOTE" openssl req -new -config "$PKI08" -key "$S/$n.key" -subj "/O=supply-chain PoC/CN=sc-stockage.poc.test" -out "$W/$n.csr"
+    SAN="DNS:sc-stockage.poc.test,IP:$HOTE" openssl x509 -req -in "$W/$n.csr" -CA "$P/ca-poc.crt" -CAkey "$S/ca-poc.key" -set_serial "0x$(openssl rand -hex 16)" \
+      -days 180 -sha256 -extfile "$PKI08" -extensions serveur_poc -out "$P/$n.crt" 2>/dev/null
+    rm -f "${W:?}/${n:?}.csr"
+  fi
+  openssl verify -CAfile "$P/ca-poc.crt" -purpose sslserver "$P/$n.crt"
+}
+cert_client() { # nom : certificat client <nom>.clients.poc.test (mTLS de Loki, D16)
+  local n=$1 c=$here/config/pki-client.cnf
+  if [ -s "$S/$n.key" ] && [ -s "$P/$n.crt" ]; then echo "$n : certificat existant"; else
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/$n.key")
+    SAN="DNS:$n.clients.poc.test" openssl req -new -config "$c" -key "$S/$n.key" -subj "/O=supply-chain PoC/CN=$n.clients.poc.test" -out "$W/$n.csr"
+    SAN="DNS:$n.clients.poc.test" openssl x509 -req -in "$W/$n.csr" -CA "$P/ca-poc.crt" -CAkey "$S/ca-poc.key" -set_serial "0x$(openssl rand -hex 16)" \
+      -days 180 -sha256 -extfile "$c" -extensions client_poc -out "$P/$n.crt" 2>/dev/null
+    rm -f "${W:?}/${n:?}.csr"
+  fi
+  openssl verify -CAfile "$P/ca-poc.crt" -purpose sslclient "$P/$n.crt"
+}
+
+etape_certificats() {
+  cert_serveur loki; cert_serveur grafana
+  cert_client grafana-client; cert_client controle
+  [ -s "$S/grafana-admin.password" ] || (umask 077 && openssl rand -base64 24 | tr -d '\n' > "$S/grafana-admin.password")
+  [ -s "$S/grafana-auditeur.password" ] || (umask 077 && openssl rand -base64 24 | tr -d '\n' > "$S/grafana-auditeur.password")
+  stat -c '%a %n' "$S"/grafana-*.password "$S"/loki.key "$S"/grafana*.key "$S"/controle.key | sed "s#$S/##"
+}
+
+graf() { # compte méthode chemin [corps-json] : API de Grafana depuis l'hôte ; identifiants par la configuration de curl (entrée standard)
+  local c=$1 m=$2 u=$3; shift 3
+  printf 'user = "%s:%s"\n' "$c" "$(cat "$S/grafana-$c.password")" \
+    | curl -sS -K - --cacert "$P/ca-poc.crt" -o "$W/graf.out" -w '%{http_code}' -X "$m" -H 'Content-Type: application/json' \
+      "https://$HOTE:3001$u" ${1:+-d "$1"}
+}
+
+etape_installer() {
+  [ -s "$P/loki.crt" ] && [ -s "$P/grafana-client.crt" ] || { echo "KO   certificats absents (étape certificats)" >&2; exit 1; }
+  rm -rf "${D:?}" && (umask 077 && mkdir -p "$D")
+  cp "$A/$LOKI_ARCHIVE" "$A/$GRAFANA_ARCHIVE" "$P/ca-poc.crt" "$P/loki.crt" "$S/loki.key" "$P/grafana.crt" "$S/grafana.key" \
+     "$P/grafana-client.crt" "$S/grafana-client.key" "$S/grafana-admin.password" "$here/config/loki.yaml" "$here/config/grafana.ini" \
+     "$here/config/provisioning/datasources/sources.yaml" "$here"/systemd/* "$D/"
+  copier sc-stockage /tmp/journalisation-installation "$D"/*
+  rm -rf "${D:?}"
+  sur sc-stockage sudo bash -s <<EOS
+set -euo pipefail
+cd /tmp/journalisation-installation
+printf '%s  %s\n%s  %s\n' "$LOKI_SHA" "$LOKI_ARCHIVE" "$GRAFANA_SHA" "$GRAFANA_ARCHIVE" | sha256sum -c
+echo "ports 3001, 3100, 9096 avant installation : \$(ss -ltn | awk '{print \$4}' | grep -cE ':(3001|3100|9096)\$' || true) écoute(s)"
+python3 -c 'import zipfile; zipfile.ZipFile("$LOKI_ARCHIVE").extract("loki-linux-amd64")'
+for u in loki grafana; do id \$u >/dev/null 2>&1 || useradd --system --user-group --home-dir /var/lib/\$u --no-create-home --shell /usr/sbin/nologin \$u; done
+install -m 0755 loki-linux-amd64 /usr/local/bin/loki
+[ -d /opt/grafana-$GRAFANA_VERSION ] || tar -xzf "$GRAFANA_ARCHIVE" -C /opt
+chown -R root:root /opt/grafana-$GRAFANA_VERSION
+install -d -m 0750 -g loki /etc/loki /etc/loki/tls
+install -m 0640 -g loki loki.yaml /etc/loki/loki.yaml
+install -m 0644 ca-poc.crt loki.crt /etc/loki/tls/
+install -m 0640 -g loki loki.key /etc/loki/tls/loki.key
+install -d -m 0750 -g grafana /etc/grafana /etc/grafana/tls /etc/grafana/secrets /etc/grafana/provisioning /etc/grafana/provisioning/datasources
+for d in dashboards plugins alerting; do install -d -m 0750 -g grafana /etc/grafana/provisioning/\$d; done
+install -m 0640 -g grafana grafana.ini /etc/grafana/grafana.ini
+install -m 0640 -g grafana sources.yaml /etc/grafana/provisioning/datasources/sources.yaml
+install -m 0644 ca-poc.crt grafana.crt grafana-client.crt /etc/grafana/tls/
+install -m 0640 -g grafana grafana.key grafana-client.key /etc/grafana/tls/
+install -m 0640 -g grafana grafana-admin.password /etc/grafana/secrets/admin.password
+install -m 0755 disque-metriques.sh /usr/local/lib/observabilite/disque-metriques.sh
+install -m 0644 loki.service grafana.service disque-metriques.service disque-metriques.timer /etc/systemd/system/
+cd / && rm -rf /tmp/journalisation-installation
+/usr/local/bin/loki -version 2>&1 | head -1
+/opt/grafana-$GRAFANA_VERSION/bin/grafana --version 2>&1 | head -1
+systemctl daemon-reload
+systemctl enable --now disque-metriques.timer 2>&1
+for u in loki grafana; do systemctl enable \$u 2>&1; systemctl restart \$u; done
+for i in \$(seq 60); do curl -s -o /dev/null --cacert /etc/grafana/tls/ca-poc.crt https://$HOTE:3001/api/health && break; sleep 2; done
+systemctl is-active loki grafana disque-metriques.timer
+EOS
+  echo "## compte auditeur (Viewer) de Grafana"
+  local c
+  c=$(graf admin GET "/api/users/lookup?loginOrEmail=auditeur")
+  if [ "$c" = 200 ]; then echo "auditeur existant"; else
+    (umask 077 && jq -n --rawfile p "$S/grafana-auditeur.password" '{name: "auditeur", login: "auditeur", email: "auditeur@poc.test", password: $p, OrgId: 1}' > "$W/auditeur.json")
+    c=$(printf 'user = "admin:%s"\n' "$(cat "$S/grafana-admin.password")" | curl -sS -K - --cacert "$P/ca-poc.crt" -o "$W/graf.out" -w '%{http_code}' \
+      -X POST -H 'Content-Type: application/json' "https://$HOTE:3001/api/admin/users" -d @"$W/auditeur.json")
+    rm -f "${W:?}/auditeur.json"
+    echo "création de auditeur : HTTP $c"
+  fi
+  graf admin GET "/api/orgs/1/users" >/dev/null; jq -c '[.[] | {login, role}]' "$W/graf.out"
+}
+
+lki() { # certificat-client|aucun chemin [options curl…] : requête vers Loki depuis l'hôte ; code HTTP, 000 si la poignée TLS échoue
+  local n=$1 u=$2; shift 2
+  if [ "$n" = aucun ]; then curl -sS --cacert "$P/ca-poc.crt" -o "$W/lki.out" -w '%{http_code}' "$@" "https://$HOTE:3100$u" 2>"$W/lki.err" || true
+  else curl -sS --cacert "$P/ca-poc.crt" --cert "$P/$n.crt" --key "$S/$n.key" -o "$W/lki.out" -w '%{http_code}' "$@" "https://$HOTE:3100$u" 2>"$W/lki.err" || true; fi
+}
+
+etape_controle() {
+  local c t m q
+  echo "## écoute sur sc-stockage"
+  sur sc-stockage "sudo ss -ltnp | grep -E ':(3001|3100|9096) ' | awk '{print \$4, \$6}'"
+  echo "## Loki"
+  : > "$W/lki.out"
+  c=$(lki aucun /ready); echo "sans certificat client : HTTP $c ($(tail -1 "$W/lki.err" | cut -c1-120))"
+  [ "$c" = 000 ] && echo "OK   refusé à la poignée TLS" || echo "KO   accepté sans certificat client"
+  c=$(lki controle /ready); echo "avec le certificat controle : /ready HTTP $c"
+  t=$(date +%s%N); m="temoin-l2-$t"
+  jq -nc --arg t "$t" --arg m "$m" '{streams: [{stream: {source: "controle-l2"}, values: [[$t, $m]]}]}' > "$W/push.json"
+  c=$(lki controle /loki/api/v1/push -X POST -H 'Content-Type: application/json' --data @"$W/push.json"); echo "écriture de la ligne témoin $m : HTTP $c"
+  sleep 3
+  c=$(lki controle /loki/api/v1/query_range -G --data-urlencode 'query={source="controle-l2"}' --data-urlencode "start=$((t / 1000000000 - 60))")
+  grep -q "$m" "$W/lki.out" && echo "OK   ligne témoin relue (HTTP $c)" || echo "KO   ligne témoin absente (HTTP $c)"
+  c=$(lki controle "/loki/api/v1/delete?query=%7Bsource%3D%22controle-l2%22%7D&start=0" -X POST); echo "demande de suppression : HTTP $c ($(head -c 160 "$W/lki.out"))"
+  case $c in 4*|5*) echo "OK   suppression refusée" ;; *) echo "KO   suppression acceptée" ;; esac
+  echo "## Grafana"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" -o /dev/null -w '%{http_code}' "https://$HOTE:3001/api/search"); echo "anonyme, /api/search : HTTP $c"
+  [ "$c" = 401 ] && echo "OK   anonyme refusé" || echo "KO   anonyme : $c"
+  for q in prometheus loki; do c=$(graf admin GET "/api/datasources/uid/$q/health"); echo "santé de la source $q : HTTP $c $(jq -c '{status, message}' "$W/graf.out" 2>/dev/null | cut -c1-160)"; done
+  q=$(jq -nc '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: "{source=\"controle-l2\"}", queryType: "range"}], from: "now-15m", to: "now"}')
+  c=$(graf auditeur POST /api/ds/query "$q"); grep -q "$m" "$W/graf.out" && echo "OK   auditeur : ligne témoin lue dans Loki par Grafana (HTTP $c)" || echo "KO   auditeur, Loki : HTTP $c $(head -c 200 "$W/graf.out")"
+  q='{"queries":[{"refId":"A","datasource":{"uid":"prometheus"},"expr":"up","instant":true}],"from":"now-5m","to":"now"}'
+  c=$(graf auditeur POST /api/ds/query "$q"); echo "auditeur, Prometheus (up) : HTTP $c, $(jq '[.results.A.frames[]?] | length' "$W/graf.out" 2>/dev/null) série(s)"
+  c=$(graf auditeur POST /api/dashboards/db '{"dashboard":{"title":"essai-l2"},"overwrite":false}'); echo "auditeur, création de tableau : HTTP $c"
+  c=$(graf auditeur POST /api/datasources '{"name":"essai","type":"loki","url":"http://127.0.0.1:1","access":"proxy"}'); echo "auditeur, création de source : HTTP $c"
+  c=$(graf admin DELETE /api/datasources/uid/loki); echo "administrateur, suppression de la source provisionnée loki : HTTP $c ($(head -c 120 "$W/graf.out"))"
+  echo "## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)"
+  sur sc-stockage "sudo ss -tnp state established | grep -E 'users:\(\(\"(loki|grafana)' | awk '{print \$4}' | grep -vE '^(192\.168\.161\.|127\.0\.0\.1|\[::1\])' || echo '  aucune'"
+  echo "## mémoire"
+  sur sc-stockage "free -m | sed -n 2p; for u in loki grafana prometheus; do echo \"\$u : \$(( \$(systemctl show -p MemoryCurrent --value \$u) / 1048576 )) Mi\"; done"
+  echo "## mesure du disque"
+  sur sc-stockage "cat /etc/fichiers-metriques/disque.prom; systemctl list-timers disque-metriques.timer --no-pager | sed -n 2p"
+  rm -f "${W:?}/push.json" "${W:?}/lki.out" "${W:?}/lki.err" "${W:?}/graf.out"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; *) lancer l1 L1 "$@" ;; esac

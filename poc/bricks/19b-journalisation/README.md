@@ -109,3 +109,37 @@ Deux passages du relevé sont archivés. Le premier ([`l1-releve-premier-passage
   - (c) Consigner la limite et poser seulement une alerte sur le disque.
 
   Recommandé : (a). C'est une modification de la 08, à mesurer.
+
+### Décisions D13 à D15 : retenues par le propriétaire le 02/11/2026 (« Oui, les trois (a) »)
+
+D13 (a) : rétention de 30 jours, alerte sur le disque à 80 %. D14 (a) : politique d'audit de l'API de la 08 gardée (écritures, plus les lectures de Secrets), limite consignée. D15 (a) : second device d'audit d'OpenBao vers la sortie standard, collecté par Alloy (modification de la 08, préparée en L3).
+
+## L2, préparation à sec (02/11/2026, 20:43 UTC ; rien installé)
+
+Fichiers :
+- [`config/loki.yaml`](config/loki.yaml), [`config/grafana.ini`](config/grafana.ini) et [`config/provisioning/datasources/sources.yaml`](config/provisioning/datasources/sources.yaml) ;
+- [`systemd/`](systemd/) : `loki.service` et `grafana.service`, durcis comme Prometheus, et la mesure du disque `disque-metriques` (timer chaque minute) ;
+- étapes `certificats installer controle` de [`journalisation.sh`](journalisation.sh), avec `JALON=l2`.
+
+Prédictions : [`l2-predictions.md`](resultats/l2-predictions.md), écrites à 20:43:24Z.
+
+**Lu dans la configuration de référence (Loki v3.7.9, Grafana 13.3.0), pas supposé :**
+- **Loki supprime sur demande par défaut** (`deletion_mode`, défaut `filter-and-delete`). Il est mis à `disabled` (D10). La rétention exige `delete_request_store`, renseigné `filesystem`.
+- Loki envoie des statistiques d'usage à Grafana Labs par défaut (`analytics.reporting_enabled`). Coupé.
+- Grafana joint l'extérieur par défaut, de plusieurs façons, toutes coupées :
+  - rapports d'usage ;
+  - vérification des mises à jour de Grafana et des plugins ;
+  - fil de nouvelles ;
+  - **préinstallation de plugins avec mise à jour automatique** (`preinstall_auto_update = true`) ;
+  - instantanés externes.
+- Également désactivés : tableaux publics, alerting de Grafana (les alertes restent dans Alertmanager), accès anonyme et inscription. Le mot de passe de l'administrateur est lu par `$__file{}`.
+
+**D16, proposée : authentification par certificat client (mTLS) plutôt qu'un pare-feu.** D10 prévoyait « Loki joignable seulement depuis les trois VM (pare-feu) ».
+- Loki exige à la place un certificat client de la CA du PoC (`RequireAndVerifyClientCert`). Chaque agent Alloy aura le sien en L3, Grafana a `grafana-client`.
+- C'est plus fort qu'un filtrage par adresse, et la configuration réseau de `sc-stockage` reste inchangée.
+- Limite : Loki ne distingue pas lecture et écriture. Tout porteur d'un certificat client peut lire tous les journaux et en écrire. Un nœud compromis lit donc aussi les journaux des autres.
+- Le pare-feu pourra s'ajouter plus tard si le propriétaire le veut.
+
+**Alerte de disque (D13 a)** : règle `DisqueStockagePlein` (`disque_utilise_ratio > 0.8`, `for: 5m`, avertissement) ajoutée aux règles de la 19, avec son test. `promtool` 3.13.5 a été extrait de l'archive vérifiée de la 19, sur l'hôte, sans installation : `SUCCESS` sur 9 règles. Contrôle par mutation : avec un seuil à 0,82, le test échoue.
+
+**Points mesurés en L2, non supposés** : Grafana sous `ProtectSystem=strict`, et sans `MemoryDenyWriteExecute`, retiré par prudence (à mesurer) ; `$__file{}` dans les `secureJsonData` provisionnées ; code de refus de la suppression dans Loki ; suppression d'une source provisionnée.

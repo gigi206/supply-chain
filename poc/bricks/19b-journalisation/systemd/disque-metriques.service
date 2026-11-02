@@ -1,0 +1,13 @@
+# Brique 19b, L2 (D13 a) : métrique d'occupation du disque de sc-stockage (alerte DisqueStockagePlein, brique 19).
+[Unit]
+Description=Occupation du disque de sc-stockage en métriques (brique 19b)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/observabilite/disque-metriques.sh
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/etc/fichiers-metriques
+ProtectHome=true
+PrivateTmp=true
+PrivateNetwork=true

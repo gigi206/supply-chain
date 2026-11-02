@@ -1,0 +1,40 @@
+# Brique 19b, L2 : Loki 3.7.9 (archive vérifiée par sha256 ; aucune attestation ni signature publiée) en service durci.
+[Unit]
+Description=Loki du PoC (brique 19b)
+Documentation=https://grafana.com/docs/loki/
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=loki
+Group=loki
+ExecStartPre=/usr/local/bin/loki -config.file=/etc/loki/loki.yaml -verify-config
+ExecStart=/usr/local/bin/loki -config.file=/etc/loki/loki.yaml
+Restart=on-failure
+RestartSec=5s
+StateDirectory=loki
+StateDirectoryMode=0750
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

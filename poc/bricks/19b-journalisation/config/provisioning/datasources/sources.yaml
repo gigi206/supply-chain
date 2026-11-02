@@ -1,0 +1,23 @@
+# Brique 19b, L2 : sources de données de Grafana, versionnées (non modifiables dans l'interface).
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://127.0.0.1:9090
+    isDefault: true
+    editable: false
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: https://192.168.161.13:3100
+    editable: false
+    jsonData:
+      tlsAuth: true
+      tlsAuthWithCACert: true
+    secureJsonData:
+      tlsCACert: $__file{/etc/grafana/tls/ca-poc.crt}
+      tlsClientCert: $__file{/etc/grafana/tls/grafana-client.crt}
+      tlsClientKey: $__file{/etc/grafana/tls/grafana-client.key}

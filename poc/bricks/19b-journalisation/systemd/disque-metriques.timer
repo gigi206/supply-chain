@@ -1,0 +1,10 @@
+# Brique 19b, L2 (D13 a) : une mesure par minute.
+[Unit]
+Description=Occupation du disque de sc-stockage, chaque minute (brique 19b)
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target

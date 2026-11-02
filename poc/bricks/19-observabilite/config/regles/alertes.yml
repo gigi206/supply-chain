@@ -72,6 +72,15 @@ groups:
           alerte: A6
           severite: avertissement
 
+      # Disque de sc-stockage occupé à plus de 80 % (brique 19b, D13 a : rétention de 30 jours des journaux dans Loki,
+      # compression réelle à mesurer). Métrique écrite chaque minute par disque-metriques (19b), servie par fichiers.
+      - alert: DisqueStockagePlein
+        expr: disque_utilise_ratio > 0.8
+        for: 5m
+        labels:
+          alerte: disque
+          severite: avertissement
+
       # Collecte en panne depuis 5 min (proxy de l'API, jeton invalidé par un rejeu complet de la 08, service arrêté).
       # OpenBao est exclu : son indisponibilité relève de A1.
       - alert: CollecteEnPanne

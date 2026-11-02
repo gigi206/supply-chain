@@ -245,3 +245,22 @@ tests:
         exp_alerts:
           - exp_labels: {alerte: A6, severite: avertissement, certificat: zot, job: fichiers, instance: local}
           - exp_labels: {alerte: A6, severite: avertissement, certificat: forgejo, job: fichiers, instance: local}
+
+  # Disque (19b, D13 a) : / à 79 % puis à 81 % à partir de 10 min ; /var/lib reste à 50 %. En attente pendant le for: 5m.
+  - interval: 1m
+    input_series:
+      - series: 'disque_utilise_ratio{point="/", job="fichiers", instance="local"}'
+        values: '0.79x9 0.81x20'
+      - series: 'disque_utilise_ratio{point="/var/lib", job="fichiers", instance="local"}'
+        values: '0.5x30'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: DisqueStockagePlein
+        exp_alerts: []
+      - eval_time: 14m
+        alertname: DisqueStockagePlein
+        exp_alerts: []
+      - eval_time: 16m
+        alertname: DisqueStockagePlein
+        exp_alerts:
+          - exp_labels: {alerte: disque, severite: avertissement, point: /, job: fichiers, instance: local}
