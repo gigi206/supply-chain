@@ -18,9 +18,18 @@
 #                 l'historique (référence de A5 et A2), évaluation de chaque expression de alertes.yml avant déploiement
 #   deployer      alertes.yml dans /etc/prometheus/regles/, redémarrage de Prometheus (lifecycle désactivé : pas de
 #                 rechargement par l'API), règles chargées lues dans l'API
+# Jalon O4 (incidents simulés, un par alerte ; chaque étape relève les changements d'état dans Prometheus et Alertmanager,
+# puis les notifications firing et resolved reçues par le récepteur local) :
+#   fichiers      fichiers.py servant aussi /etc/fichiers-metriques/*.prom (séries de test), service redémarré
+#   a1            OpenBao redémarré, donc scellé (état mesuré en O2), puis descellé (procédure de J3) ; clé Transit
+#                 inchangée ; reprise des CronJobs horodatage et rattrapage
+#   a2            mesure de la décision 3 de la 08 (PUT .att refusé, échec de type storage), qui remet Zot d'elle-même
+#   a3, a4, a6    séries de test dans /etc/fichiers-metriques/essais-o4.prom, retour à la normale par la valeur, retirées
+#   a5            rafales de créations refusées par Kyverno (dry-run serveur) : 4 refus (sous le seuil), puis 10
 # Aucun secret en argument de commande : fichiers 0600 ou entrée standard.
 #
-# Usage (racine du dépôt) : mise run observabilite -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
+# Usage (racine du dépôt) : mise run observabilite -- <étape>…   (journal : resultats/<jalon>-<étape>.log ; JALON=o4 pour
+# rejouer regles ou deployer sans écraser les journaux d'O3)
 set -euo pipefail
 export LC_ALL=C
 
@@ -214,11 +223,250 @@ EOF2
     | jq -r '.data.groups[] | .file as $f | .rules[] | "  \($f)\t\(.name)\t\(.health)\t\(.state)"'
 }
 
+ESSAIS=/etc/fichiers-metriques/essais-o4.prom   # séries de test de A3, A4 et A6, retirées en fin d'étape
+
+etape_fichiers() {
+  copier sc-stockage /tmp/fichiers-o4 "$here/systemd/fichiers.py"
+  sur sc-stockage sudo bash -s <<'EOF3'
+set -euo pipefail
+install -m 0644 /tmp/fichiers-o4/fichiers.py /usr/local/lib/observabilite/fichiers.py
+rm -rf /tmp/fichiers-o4 /tmp/regles-mutation   # avec la copie laissée par le contrôle par mutation d'O3 (aucun secret)
+systemctl restart fichiers-metriques
+sleep 2
+systemctl is-active fichiers-metriques
+EOF3
+  sleep 35   # une collecte
+  requete 'up{job="fichiers"}'
+  requete 'count by (__name__) ({job="fichiers", __name__!~"up|scrape_.*"})'
+}
+
+etat_alerte() { # nom : <état dans Prometheus>|<état dans Alertmanager>, « inactive|absente » hors incident
+  local p a
+  p=$(sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/alerts" | jq -r --arg n "$1" \
+    '[.data.alerts[] | select(.labels.alertname == $n) | .state] | unique | if length == 0 then "inactive" else join(",") end')
+  a=$(sur sc-stockage "curl -s http://127.0.0.1:9093/api/v2/alerts" | jq -r --arg n "$1" \
+    '[.[] | select(.labels.alertname == $n) | .status.state] | unique | if length == 0 then "absente" else join(",") end')
+  echo "$p|$a"
+}
+
+attendre() { # nom état-visé délai-en-s : chaque changement d'état, horodaté, jusqu'à l'état visé
+  local n=$1 vise=$2 fin=$((SECONDS + $3)) e prec=""
+  while [ $SECONDS -lt $fin ]; do
+    e=$(etat_alerte "$n")
+    [ "$e" = "$prec" ] || { echo "$(date -u +%H:%M:%S) $n : prometheus=${e%|*}, alertmanager=${e#*|}"; prec=$e; }
+    [ "$e" = "$vise" ] && return 0
+    sleep 5
+  done
+  echo "KO   $n : « $vise » non atteint en $3 s" >&2; return 1
+}
+
+recues() { # nom époque statut : notifications de ce statut reçues par le récepteur local depuis l'instant
+  sur sc-stockage "sudo journalctl -u recepteur-alertes --since @$2 -o short-iso --no-pager" \
+    | grep -F "\"alerte\": \"$1\"" | grep -F "\"statut\": \"$3\"" || true
+}
+
+attendre_recue() { # nom époque statut délai-en-s
+  local fin=$((SECONDS + $4)) l
+  while [ $SECONDS -lt $fin ]; do
+    l=$(recues "$1" "$2" "$3")
+    [ -n "$l" ] && { sed 's/^/  reçu : /' <<<"$l"; return 0; }
+    sleep 5
+  done
+  echo "KO   $1 : aucune notification « $3 » reçue en $4 s" >&2; return 1
+}
+
+debut() { # nom : l'alerte doit être inactive avant l'incident
+  local e
+  e=$(etat_alerte "$1")
+  [ "$e" = "inactive|absente" ] && echo "OK   $1 inactive avant l'incident" || { echo "KO   $1 déjà active : $e" >&2; exit 1; }
+}
+declenchee() { # nom époque délai-en-s : firing dans Prometheus, active dans Alertmanager, notification firing reçue
+  attendre "$1" "firing|active" "$3" || exit 1
+  attendre_recue "$1" "$2" firing 120 || exit 1
+}
+resolue() { # nom époque délai-en-s : retour à la normale, notification resolved reçue
+  attendre "$1" "inactive|absente" "$3" || exit 1
+  attendre_recue "$1" "$2" resolved 180 || exit 1
+  echo "OK   $1 : déclenchée puis résolue, notifications firing et resolved reçues"
+}
+
+essai() { # séries… : fichier de test servi par fichiers-metriques (écriture atomique ; sans HELP ni TYPE)
+  printf '%s\n' "$@" | sur sc-stockage "sudo sh -c 'cat > /etc/fichiers-metriques/.essais-o4 && mv /etc/fichiers-metriques/.essais-o4 $ESSAIS'"
+  echo "$(date -u +%H:%M:%S) essais-o4.prom : $*"
+}
+essai_retirer() {
+  sur sc-stockage "sudo rm -f $ESSAIS /etc/fichiers-metriques/.essais-o4"
+  echo "$(date -u +%H:%M:%S) essais-o4.prom retiré"
+}
+
+etape_a3() { # contrat de la brique 10 : replay_dernier_resultat à 0, puis à 1
+  local t0
+  debut ReplayNonBitIdentique
+  trap essai_retirer EXIT
+  t0=$(date +%s)
+  essai 'replay_dernier_resultat{projet="essai-o4"} 0'
+  declenchee ReplayNonBitIdentique "$t0" 180
+  essai 'replay_dernier_resultat{projet="essai-o4"} 1'
+  resolue ReplayNonBitIdentique "$t0" 180
+  trap - EXIT; essai_retirer
+  echo "## collecte des fichiers pendant l'incident (minimum de up sur 10 min)"
+  requete 'min_over_time(up{job="fichiers"}[10m])'
+}
+
+etape_a4() { # dernière réussite vieille de 25 h, puis rattrapée (horodatage présent)
+  local t0
+  debut MiroirEnRetard
+  trap essai_retirer EXIT
+  t0=$(date +%s)
+  essai "sync_derniere_reussite_timestamp_seconds{projet=\"essai-o4\"} $((t0 - 90000))"
+  declenchee MiroirEnRetard "$t0" 480
+  essai "sync_derniere_reussite_timestamp_seconds{projet=\"essai-o4\"} $(date +%s)"
+  resolue MiroirEnRetard "$t0" 180
+  trap - EXIT; essai_retirer
+  requete 'min_over_time(up{job="fichiers"}[10m])'
+}
+
+etape_a6() { # certificat à 20 jours de l'échéance, puis renouvelé (60 jours)
+  local t0
+  debut CertificatExpireBientot
+  trap essai_retirer EXIT
+  t0=$(date +%s)
+  essai "certificat_expiration_timestamp_seconds{certificat=\"essai-o4\"} $((t0 + 20 * 86400))"
+  declenchee CertificatExpireBientot "$t0" 180
+  essai "certificat_expiration_timestamp_seconds{certificat=\"essai-o4\"} $(($(date +%s) + 60 * 86400))"
+  resolue CertificatExpireBientot "$t0" 180
+  trap - EXIT; essai_retirer
+  requete 'min_over_time(up{job="fichiers"}[10m])'
+}
+
+refus_kyverno() { # n : n créations du pod de sonde de la 08 (tsa, sans nodeSelector) en dry-run serveur, refusées par Kyverno
+  local i ok=0 msg img
+  img=$(kubectl get deployment -n tsa timestamp-authority -o jsonpath='{.spec.template.spec.containers[0].image}')
+  jq -n --arg i "$img" '{apiVersion: "v1", kind: "Pod", metadata: {name: "sonde-o4", namespace: "tsa"},
+    spec: {automountServiceAccountToken: false, securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+      containers: [{name: "sonde", image: $i, securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$W/sonde-o4.json"
+  for i in $(seq "$1"); do
+    msg=$(kubectl create --dry-run=server -f "$W/sonde-o4.json" 2>&1 || true)
+    grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg" && ok=$((ok + 1))
+  done
+  echo "$(date -u +%H:%M:%S) rafale : $ok refus de zone-confiance sur $1 créations (dry-run serveur)"
+  [ "$ok" = "$1" ] || { echo "KO   refus attendus : $1" >&2; exit 1; }
+}
+compteur_refus() { # compteur brut des refus (tous espaces) et valeur de l'expression de A5, après une collecte
+  sleep 35
+  echo "compteur brut des refus :"; requete 'sum(kyverno_admission_requests_total{request_allowed="false"})'
+  echo "somme des hausses sur 5 min (extrapolée) :"; requete 'sum(increase(kyverno_admission_requests_total{request_allowed="false"}[5m]))'
+}
+
+etape_a5() {
+  local t0 fin e
+  debut KyvernoRefusAnormaux
+  compteur_refus
+  echo "## rafale sous le seuil : 4 refus, l'alerte doit rester inactive pendant toute la fenêtre de 5 min"
+  refus_kyverno 4
+  compteur_refus
+  fin=$((SECONDS + 300))
+  while [ $SECONDS -lt $fin ]; do
+    e=$(etat_alerte KyvernoRefusAnormaux)
+    [ "$e" = "inactive|absente" ] || { echo "KO   KyvernoRefusAnormaux $e après 4 refus" >&2; exit 1; }
+    sleep 10
+  done
+  echo "maximum de l'expression sur 6 min :"
+  requete 'max_over_time(sum(increase(kyverno_admission_requests_total{request_allowed="false"}[5m]))[6m:30s])'
+  echo "OK   4 refus : KyvernoRefusAnormaux restée inactive"
+  echo "## rafale au-dessus du seuil : 10 refus"
+  t0=$(date +%s)
+  refus_kyverno 10
+  declenchee KyvernoRefusAnormaux "$t0" 180
+  compteur_refus
+  resolue KyvernoRefusAnormaux "$t0" 480
+  echo "maximum de l'expression sur 8 min :"
+  requete 'max_over_time(sum(increase(kyverno_admission_requests_total{request_allowed="false"}[5m]))[8m:30s])'
+}
+
+cle_chains_empreinte() { racine <<<'bao read -format=json transit/keys/chains' | jq -r '.data.keys["1"].public_key' | sha256sum | cut -c1-16; }
+desceller_o4() { # descellement de J3 (clé sur l'entrée standard), puis pod prêt ; attend d'abord le pod en marche (sinon,
+  # appelé tôt par le trap, le statut serait vide et le descellement sauté)
+  local st
+  for _ in $(seq 90); do
+    [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ] && break
+    sleep 2
+  done
+  sleep 6   # au moins une sonde, comme etape_redemarrage de la 08
+  st=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true)
+  if [ "$(jq -r .sealed <<<"$st")" = true ]; then
+    tr -d '\n' < "$S/openbao-descellement.b64" | kubectl exec -i -n openbao openbao-0 -- bao write -format=json sys/unseal key=- \
+      | jq -c '(.data // .) | {sealed}'
+  fi
+  kubectl wait --for=condition=Ready pod/openbao-0 -n openbao --timeout=120s
+}
+passage_reussi() { # espace CronJob époque : un passage créé après l'instant, réussi (attente bornée à 6 min : concurrence Forbid,
+  # un passage lancé pendant le scellement peut retarder le suivant)
+  local j=""
+  for _ in $(seq 72); do
+    j=$(kubectl get jobs -n "$1" -o json | jq -r --arg c "$2" --arg t "$(date -u -d "@$3" +%Y-%m-%dT%H:%M:%SZ)" '[.items[]
+      | select(any(.metadata.ownerReferences[]?; .name == $c) and .metadata.creationTimestamp > $t and (.status.succeeded // 0) > 0)]
+      | .[0].metadata.name // empty')
+    [ -n "$j" ] && { echo "OK   $1/$2 : passage $j réussi après le descellement"; return 0; }
+    sleep 5
+  done
+  echo "KO   $1/$2 : aucun passage réussi depuis le descellement" >&2; return 1
+}
+
+etape_a1() {
+  local t0 t1 c1 c2
+  debut OpenBaoScelle
+  c1=$(cle_chains_empreinte)
+  echo "clé Transit chains avant : $c1…"
+  trap desceller_o4 EXIT   # OpenBao jamais laissé scellé, même en cas d'échec
+  t0=$(date +%s)
+  echo "$(date -u +%H:%M:%S) incident : suppression du pod openbao-0 (il redémarre scellé)"
+  kubectl delete pod -n openbao openbao-0 --wait=true >/dev/null
+  declenchee OpenBaoScelle "$t0" 300
+  echo "## branche de l'expression"
+  requete 'vault_core_unsealed'
+  requete 'up{job=~"openbao|kyverno"}'
+  echo "## effets de bord pendant le scellement"
+  kubectl get jobs -n horodatage -o json | jq -r --arg t "$(date -u -d "@$t0" +%Y-%m-%dT%H:%M:%SZ)" '.items[]
+    | select(.metadata.creationTimestamp > $t) | "  horodatage/\(.metadata.name) réussi=\(.status.succeeded // 0) échoué=\(.status.failed // 0)"'
+  echo "ChainsEchecSignature : $(etat_alerte ChainsEchecSignature)"
+  t1=$(date +%s)
+  echo "$(date -u +%H:%M:%S) retour : descellement"
+  desceller_o4
+  trap - EXIT
+  resolue OpenBaoScelle "$t0" 300
+  c2=$(cle_chains_empreinte)
+  [ "$c1" = "$c2" ] && echo "OK   clé Transit chains inchangée ($c2…)" || { echo "KO   clé Transit chains : $c1… puis $c2…" >&2; exit 1; }
+  passage_reussi horodatage horodatage "$t1"
+  passage_reussi declencheurs rattrapage "$t1"
+  echo "TSA : $(kubectl get deployment -n tsa timestamp-authority -o jsonpath='{.status.readyReplicas}/{.spec.replicas}') prêt(s)"
+}
+
+etape_a2() { # le journal de la 08 est copié ici, puis rendu à sa version versionnée (preuve de la 08 inchangée)
+  local t0 r=0 j=$here/../08-trust-plane/resultats/preuves-decision3.log
+  debut ChainsEchecSignature
+  echo "## compteurs d'échec avant"
+  requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  t0=$(date +%s)
+  echo "$(date -u +%H:%M:%S) incident : preuves.sh decision3 (08)"
+  "$here/../08-trust-plane/preuves.sh" decision3 > /dev/null 2>&1 || r=$?
+  cp "$j" "$R19/o4-a2-preuves-decision3.log"
+  git -C "$repo" checkout -- poc/bricks/08-trust-plane/resultats/preuves-decision3.log
+  echo "fichiers de la 08 modifiés après la mesure (seul chrono.tsv attendu) :"
+  git -C "$repo" status --short poc/bricks/08-trust-plane | sed 's/^/  /'
+  grep -E '^(OK|KO) ' "$R19/o4-a2-preuves-decision3.log" | sed 's/^/  08 : /'
+  [ "$r" = 0 ] || { echo "KO   decision3 : code $r" >&2; exit 1; }
+  declenchee ChainsEchecSignature "$t0" 300
+  echo "## compteurs d'échec après"
+  requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  resolue ChainsEchecSignature "$t0" 900
+}
+
 etapes=("$@")
-[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer>…" >&2; exit 2; }
+[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer|fichiers|a1|a2|a3|a4|a5|a6>…" >&2; exit 2; }
 for e in "${etapes[@]}"; do
   declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
-  case $e in regles|reference|deployer) jalon=o3 ;; *) jalon=o2 ;; esac
+  case $e in regles|reference|deployer) jalon=${JALON:-o3} ;; fichiers|a[1-6]) jalon=o4 ;; *) jalon=o2 ;; esac
   {
     echo "# observabilite.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     "etape_$e"

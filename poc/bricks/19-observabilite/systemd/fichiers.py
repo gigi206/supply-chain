@@ -2,12 +2,13 @@
 """Brique 19, O2 (décisions 2 et 6 du propriétaire, 02/11/2026) : sert en lecture, sur 127.0.0.1:9101/metrics, la seule
 concaténation des fichiers de métriques au format texte de Prometheus :
   /var/lib/synchro/<projet>/<projet>.prom   (brique 01, sync.py --metriques)
-  /etc/fichiers-metriques/certificats.prom  (dates d'expiration des certificats du PoC, écrit par observabilite.sh)
+  /etc/fichiers-metriques/*.prom            (certificats.prom : dates d'expiration des certificats du PoC, écrit par
+                                            observabilite.sh ; séries de test d'O4, retirées après chaque incident)
 Aucun autre chemin n'est lu ; GET /metrics seulement ; bibliothèque standard seulement."""
 import glob
 import http.server
 
-SOURCES = ["/var/lib/synchro/*/*.prom", "/etc/fichiers-metriques/certificats.prom"]
+SOURCES = ["/var/lib/synchro/*/*.prom", "/etc/fichiers-metriques/*.prom"]
 
 
 class Gestionnaire(http.server.BaseHTTPRequestHandler):

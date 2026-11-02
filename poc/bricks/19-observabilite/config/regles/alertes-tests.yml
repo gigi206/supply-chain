@@ -122,16 +122,32 @@ tests:
         exp_alerts:
           - exp_labels: {alerte: A4, severite: critique, projet: sample-app-sync, job: fichiers, instance: local}
 
-  # A4 : plus aucune série de la 01 (fichier disparu).
+  # A4 : plus aucune série de la 01 (fichier disparu) : en attente pendant le for: 5m, puis déclenchée.
   - interval: 1m
     input_series:
       - series: 'up{job="fichiers", instance="local"}'
-        values: '1x5'
+        values: '1x10'
     alert_rule_test:
-      - eval_time: 2m
+      - eval_time: 4m
+        alertname: MiroirEnRetard
+        exp_alerts: []
+      - eval_time: 6m
         alertname: MiroirEnRetard
         exp_alerts:
           - exp_labels: {alerte: A4, severite: critique}
+
+  # A4 : une collecte manquée (séries périmées pendant 2 min), puis revenue : pas d'alerte.
+  - interval: 1m
+    input_series:
+      - series: 'sync_derniere_reussite_timestamp_seconds{projet="traefik", job="fichiers", instance="local"}'
+        values: '0+60x4 stale stale 360+60x6'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: MiroirEnRetard
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: MiroirEnRetard
+        exp_alerts: []
 
   # A5 : refus anciens stables ; rafale de 20 refus vers 21 min ; nouvelle combinaison apparue à 7 vers 30 min.
   - interval: 1m

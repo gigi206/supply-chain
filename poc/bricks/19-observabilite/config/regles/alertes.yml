@@ -34,8 +34,11 @@ groups:
           severite: critique
 
       # A4. Miroir en retard de plus de 24 h (sync.prom de la brique 01), ou plus aucune série (fichier disparu).
+      # for: 5m (O4, préparation) : une seule collecte manquée des fichiers marque toutes leurs séries périmées et absent()
+      # devient vrai ; sans délai, un redémarrage du serveur de fichiers déclencherait cette alerte critique.
       - alert: MiroirEnRetard
         expr: time() - sync_derniere_reussite_timestamp_seconds > 86400 or absent(sync_derniere_reussite_timestamp_seconds)
+        for: 5m
         labels:
           alerte: A4
           severite: critique

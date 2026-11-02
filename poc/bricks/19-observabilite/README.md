@@ -200,3 +200,54 @@ Prédictions datées : [`o3-predictions.md`](resultats/o3-predictions.md). Règl
 
 **O3 : seuil de jalon atteint** (tests de règles réussis). Suite : O4, un incident simulé par alerte avec retour à la normale, sur accord.
 
+
+## O4, préparation à sec (02/11/2026, 18:29 UTC, rien exécuté sur les VM ni le cluster)
+
+Prédictions : [`o4-predictions.md`](resultats/o4-predictions.md). Étapes de [`observabilite.sh`](observabilite.sh) : `fichiers`, puis un incident par alerte (`a1` à `a6`). Chaque étape vérifie que l'alerte est inactive au départ, puis relève, horodaté, chaque changement d'état dans Prometheus (`/api/v1/alerts`) et Alertmanager (`/api/v2/alerts`). Elle attend enfin les notifications `firing` et `resolved` dans le journal du récepteur local.
+
+| Alerte | Incident | Retour à la normale |
+|---|---|---|
+| A1 | pod `openbao-0` supprimé : il redémarre scellé (état mesuré en O2) | descellement de J3 (clé par l'entrée standard) ; clé Transit `chains` comparée avant et après ; reprise des CronJobs `horodatage` et `rattrapage` vérifiée |
+| A2 | `preuves.sh decision3` de la 08 : PUT `.att` refusé par Zot, échec de signature de type `storage` | la mesure remet Zot d'elle-même ; résolution après la fenêtre de 10 min |
+| A3 | `replay_dernier_resultat{projet="essai-o4"} 0` | valeur à 1, puis fichier de test retiré |
+| A4 | `sync_derniere_reussite_timestamp_seconds{projet="essai-o4"}` vieille de 25 h | horodatage à l'instant présent, puis fichier retiré |
+| A5 | 4 créations refusées par Kyverno (sous le seuil, aucune alerte attendue), puis 10 | fin de la fenêtre de 5 min |
+| A6 | `certificat_expiration_timestamp_seconds{certificat="essai-o4"}` à 20 jours | échéance à 60 jours, puis fichier retiré |
+
+`CollecteEnPanne` n'a pas d'incident dédié : arrêter une collecte pendant 5 min déclencherait aussi A4 (`absent`) ou A1.
+
+**Choix proposés au propriétaire** (préparés selon la recommandation, à confirmer avec l'accord d'O4) :
+
+1. **Chemin des séries de test (A3, A4, A6)**. `fichiers.py` ne lisait que `sync.prom` et `certificats.prom`.
+   - **Recommandé : (a)** élargir ses sources à `/etc/fichiers-metriques/*.prom`, une modification de code avec redéploiement du service (étape `fichiers`). La brique 10 pourra y servir sa métrique.
+   - (b) un répertoire de test sous `/var/lib/synchro/`. Pas de code à changer, mais il mêle des essais à l'état de la 01.
+   - Dans les deux cas, le vrai `sync.prom` de la 01 n'est pas vieilli : le timer le réécrit et les scripts de la 01 le lisent.
+2. **A4 avec `for: 5m`** (défaut trouvé en préparation). Une seule collecte manquée du serveur de fichiers marque toutes ses séries périmées : `absent()` devient vrai et A4, critique et sans délai, se déclencherait. Cela peut arriver au redémarrage de l'étape `fichiers` comme à un redémarrage de la VM.
+   - **Recommandé** : `for: 5m`. Le seuil de 24 h rend ce délai négligeable.
+   - Les tests sont complétés : absence en attente puis déclenchée, collecte manquée 2 min sans alerte.
+   - Ils doivent être rejoués (`JALON=o4 … regles deployer`, sans écraser les journaux d'O3) avant l'étape `fichiers`.
+3. **A1 par redémarrage du pod plutôt que `bao operator seal`** (incident proposé au protocole).
+   - Le redémarrage n'utilise pas le jeton root, et son état scellé a été mesuré en O2.
+   - `bao operator seal` laisse le pod en marche : son effet sur la disponibilité du pod n'est pas mesuré.
+4. **Type d'échec de Chains quand OpenBao est scellé** (point ouvert d'O3). **Recommandé : mesure reportée.**
+   - A2 est éprouvée par l'échec `storage` de la décision 3 : déterministe, et sa remise en état est déjà prouvée.
+   - Mesurer l'échec sous scellement demanderait une exécution signée lancée pendant A1, puis purgée pour garder la référence de la 08 (`ECHEC_SIGNATURE 8`).
+   - Conséquence du report : A2 reste non filtrée sur `error_type`, comme décidé en O3.
+5. **Journal de la 08** : `decision3` réécrit `08-trust-plane/resultats/preuves-decision3.log` et ajoute deux lignes au `chrono.tsv` de la 08.
+   - L'étape `a2` copie le journal dans [`o4-a2-preuves-decision3.log`](resultats/) et rend à la 08 sa version versionnée (`git checkout` de ce seul fichier).
+   - Les lignes du `chrono.tsv` restent : elles datent un vrai passage de la mesure.
+6. **Rafale de A5 en dry-run serveur** : le pod de sonde de la 08 est refusé par la règle `zone-confiance` sans rien créer, même si une politique l'admettait par erreur.
+   - Le comptage des requêtes en dry-run par Kyverno n'est pas vérifié. L'étape relève le compteur brut avant et après chaque rafale.
+
+**Constat à consigner (calcul, à confirmer par la mesure)** : `increase()` extrapole aux bords de la fenêtre. Avec une collecte toutes les 30 s, 5 refus valent environ 5,56 et déclenchent A5 : le seuil réel est « au moins 5 refus en 5 min ».
+
+**Ménage** : l'étape `fichiers` supprime aussi `/tmp/regles-mutation`, laissé dans `sc-stockage` en O3.
+
+**Effets de bord d'O4, à accepter avec l'accord** :
+- OpenBao scellé environ 3 à 5 min (A1) : aucune signature de Chains possible, la TSA et les passages d'`horodatage` peuvent échouer pendant ce temps.
+- Zot reconfiguré puis remis, deux redémarrages ; CronJobs `rattrapage` et `horodatage` suspendus environ 1 min (`decision3`, A2).
+- Prometheus redémarré (`deployer`, A4 avec `for: 5m`) ; jusque-là, `alertes.yml` en service diffère de celui du dépôt.
+- `fichiers.py` modifié et son service redémarré (`fichiers`) ; `/tmp/regles-mutation` supprimé.
+- Environ 50 min d'exécution en arrière-plan.
+
+**Retour manuel si l'exécution est interrompue pendant A1** : `mise run confiance:openbao -- deverrouiller`, puis `git checkout` de `08-trust-plane/resultats/openbao-deverrouiller.log`. Le trap de l'étape `a1` descelle déjà en cas d'échec ; il attend le pod en marche avant de lire son statut.
