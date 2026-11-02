@@ -39,3 +39,10 @@ Délais communs : collecte toutes les 30 s, évaluation toutes les 30 s, `group_
     - Prédiction faible : on ne sait pas si le compteur compte chaque tentative ou seulement l'échec final. Dans les deux cas, il augmente avant le descellement.
 11. **A2 `firing` pendant le scellement**, avec sa notification. Après le descellement, aucune reprise : `failed` est définitif. Après la purge des exécutions, A2 se résout au plus 10 min après le dernier échec, puis la notification `resolved` arrive.
 12. **A1 se déclenche aussi** (OpenBao scellé environ 4 à 7 min), puis se résout. Clé Transit inchangée ; les CronJobs reprennent.
+
+## A2, troisième passage : second volet `ChainsMarqueSansSignature` (décision du propriétaire « a, étendre A2 » ; écrit le 2026-11-02T19:58:48Z, avant l'exécution)
+
+13. **`regles`** (journal `o4-a2-regles.log`) : 8 règles, tests réussis, dont les deux cas du second volet (échec en ouvert en attente à 10 min et déclenché à 11 min, résolu à 21 min ; bord de fenêtre absorbé par le `for: 1m`). **`deployer`** : 8 règles chargées. Aucune alerte active ensuite : l'échec en ouvert de 19:41 est sorti de la fenêtre de 10 min.
+14. **Incident** : même déroulé qu'au deuxième passage (build réussi, même digest, quatre objets `signed=true`, aucune signature). L'écart vaut environ 1,05 pour les PipelineRuns et 3,16 pour les TaskRuns, comme au deuxième passage. **`ChainsMarqueSansSignature` passe en `pending` à la première collecte qui voit le marquage**, puis en `firing` 1 min plus tard, pendant le scellement, avec sa notification. `ChainsEchecSignature` ne se déclenche pas.
+15. **Contrôle exécutions/enveloppes avant la purge** : le PipelineRun et le TaskRun `publier` sont **ABSENTE** (signés selon Chains, sans enveloppe de leur UID dans le tag `.att`, qui garde 4 enveloppes). Le contrôle de la 08 les classerait en anomalie.
+16. **Retour** : A1 résolue après le descellement. `ChainsMarqueSansSignature` est résolue environ 10 min après le marquage (fenêtre), puis la notification `resolved` arrive. Clé inchangée, CronJobs repris.

@@ -298,3 +298,20 @@ Prédictions 8 à 12 ([`o4-predictions.md`](resultats/o4-predictions.md), 19:40:
 3. Indépendamment : signaler à l'amont que le cas « signataire absent » ne compte aucun échec, même sur `main` (action publique chez un tiers : sur accord explicite seulement). Et passer à une version de Chains qui contient `b1c0af9` dès sa publication.
 
 **Effet de bord à revérifier** : le build de 18:38 lancé par erreur depuis la 01 a ajouté une provenance (commit `e209907f`, branche `custom/n…/b`) au tag `.att` que juge la porte de la 01 ; la non-interférence de la 01 avait été mesurée sur `1599e311`. Revérifier la porte (`synchro:declencheur -- porte`) est à décider.
+
+### A2, troisième passage : second volet `ChainsMarqueSansSignature` (02/11/2026, 19:58 à 20:11 UTC, décision du propriétaire « a, étendre A2 »)
+
+Règle ajoutée ([`alertes.yml`](config/regles/alertes.yml)) : `increase(marked_signed[10m]) - increase(sign_created[10m]) > 0`, pour les PipelineRuns ou les TaskRuns, `for: 1m`, étiquettes `alerte: A2`, `severite: critique`. Tests : échec en ouvert (en attente puis déclenché, résolu à la sortie de la fenêtre), build normal et bord de fenêtre sans alerte. Prédictions 13 à 16 ([`o4-predictions.md`](resultats/o4-predictions.md)).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 13 | `SUCCESS: 8 rules found`, tests réussis ([`o4-a2-regles.log`](resultats/o4-a2-regles.log)) ; 8 règles chargées, aucune alerte active au départ ([`o4-a2-deployer.log`](resultats/o4-a2-deployer.log), lu 5 s après le redémarrage : `unknown`) ; **pas de contrôle par mutation** des nouveaux tests | conforme |
+| 14 | OpenBao scellé à 19:59:10 ; build réussi à 20:00:06, même digest ; quatre objets `signed=true`, aucune signature ; écart 1,05 (PipelineRuns) et 3,16 (TaskRuns) ; **`ChainsMarqueSansSignature` `pending` dès 20:00:06** (marquage du TaskRun `preparer` à 19:59:22), **`firing` à 20:00:38, notification à 20:00:47**, pendant le scellement ; `ChainsEchecSignature` jamais déclenchée ([`o4-a2.log`](resultats/o4-a2.log)) | conforme |
+| 15 | avant la purge : tag `.att` à 4 enveloppes ; PipelineRun et TaskRun `publier` **ABSENTE** (`signed=true`, aucune enveloppe de leur UID) | conforme |
+| 16 | descellement à 20:01:42, clé inchangée ; A1 déclenchée (20:00:37) puis résolue (20:02:07), notification `resolved` ; `ChainsMarqueSansSignature` résolue à 20:10:12 (environ 10 min après le marquage), deux notifications `resolved` (séries des TaskRuns et des PipelineRuns) ; passages d'`horodatage` et de `rattrapage` réussis | conforme |
+
+**O4 : seuil de la brique atteint : les 5 alertes critiques se déclenchent sur incident simulé** (A1 et A3 à A5 au premier passage, A2 par son second volet au troisième), avec retour à la normale et notifications reçues par le récepteur local ; A6 aussi. Limites consignées :
+- A3 éprouvée sur une série de test (contrat de la brique 10, D2 a) ; preuve complète à la brique 10.
+- Le premier volet de A2 (`signing_failures`) n'a été déclenché par aucun incident réel ici : `decision3`, qui le produisait, ne tourne plus depuis la bascule de J8.
+- Second volet : référence sur un seul build normal ; en trafic mêlé, un build normal à reprises peut masquer un échec en ouvert.
+- Chains v0.29.9 échoue en ouvert sans OpenBao : l'alerte le détecte, elle ne l'empêche pas. Le correctif amont (`b1c0af9`) n'est pas publié.

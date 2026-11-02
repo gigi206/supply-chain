@@ -15,3 +15,5 @@ O4 accord du propriétaire, exécution	2026-11-02T18:33:18Z	« Oui, tout » (six
 O4 fin de l exécution	2026-11-02T18:59:33Z	A1, A3 à A6 conformes ; A2 en KO (decision3 suppose le gabarit d essai, basculé en J8)
 O4 A2 décision du propriétaire	2026-11-02T19:39:27Z	« a, build pendant scellé »
 O4 A2 deuxième passage	2026-11-02T19:40:16Z	build pendant le scellement : Chains marque signé sans signature, A2 non déclenchée
+O4 A2 décision du propriétaire	2026-11-02T19:57:41Z	« a, étendre A2 »
+O4 A2 troisième passage, fin d O4	2026-11-02T20:10:48Z	ChainsMarqueSansSignature déclenchée puis résolue ; 5 alertes critiques sur 5

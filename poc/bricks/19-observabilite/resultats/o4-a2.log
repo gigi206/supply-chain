@@ -1,0 +1,69 @@
+# observabilite.sh a2, 2026-11-02T19:59:04Z
+OK   ChainsMarqueSansSignature inactive avant l'incident
+OK   ChainsEchecSignature inactive avant l'incident
+## compteurs d'échec avant
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 25
+  {"error_type":"storage","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 6
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/taskrunmetrics"} 27
+clé Transit chains avant : 078097039e8d4365…
+19:59:05 scellement : suppression du pod openbao-0
+19:59:10 OpenBao scellé
+## build : commit poussé sur custom/s5 du fork par poc-dev
+remote: 
+remote: Create a new pull request for 'workspace:custom/s5':        
+remote:   https://sc-stockage.poc.test:3000/mirror/sample-app/compare/main...workspace:custom/s5        
+remote: 
+19:59:10 commit 019e0777c687 poussé
+OK   PipelineRun sample-app-sync-019e0777c687b3eaeef4fb8a798adb7188861705 créé
+20:00:06 build réussi : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## Chains pendant le scellement (OpenBao gardé scellé jusqu'à l'issue de chaque objet, au plus 6 min)
+  20:00:06 PipelineRun/sample-app-sync-019e0777c687b3eaeef4fb8a798adb7188861705 signed=true retries=-
+  20:00:06 TaskRun/sample-app-sync-019e077984cc315a84a2691c39639594a12c84c-publier signed=true retries=-
+  20:00:06 TaskRun/sample-app-sync-019e07984cc315a84a2691c39639594a12c84c-preparer signed=true retries=-
+  20:00:06 TaskRun/sample-app-sync-019e984cc315a84a2691c39639594a12c84c-construire signed=true retries=-
+20:00:06 ChainsMarqueSansSignature : prometheus=pending, alertmanager=absente
+20:00:38 ChainsMarqueSansSignature : prometheus=firing,pending, alertmanager=active
+20:01:41 ChainsMarqueSansSignature : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T20:00:47+00:00 sc-stockage python3[30431]: {"alerte": "ChainsMarqueSansSignature", "debut": "2026-11-02T20:00:37.032Z", "etiquettes": {"alerte": "A2", "alertname": "ChainsMarqueSansSignature", "instance": "192.168.161.11:6443", "job": "chains", "otel_scope_name": "github.com/tektoncd/chains/pkg/taskrunmetrics", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+ChainsEchecSignature (premier volet, aveugle à cette panne) : inactive|absente
+## compteurs de Chains pendant le scellement (hausse sur 10 min)
+  pipelinerun_marked_signed : 1.0526334256726768
+  pipelinerun_sign_created : 0
+  taskrun_marked_signed : 3.1579002770180304
+  taskrun_sign_created : 0
+  pipelinerun_signing_failures : 0
+  taskrun_signing_failures : 0
+## contrôle exécutions/enveloppes avant la purge
+tag .att de builds/sample-app-sync@3a7ca1b14dbf : 4 enveloppe(s)
+  ABSENTE pipelinerun sample-app-sync-019e0777c687b3eaeef4fb8a798adb7188861705 (142f0736) : signed=true
+  ABSENTE taskrun sample-app-sync-019e077984cc315a84a2691c39639594a12c84c-publier (adb9ca62) : signed=true
+## journal du contrôleur de Chains depuis le scellement (erreurs de signature, 10 premières)
+  {"level":"warn","ts":"2026-11-02T19:59:22.076Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8
+  {"level":"warn","ts":"2026-11-02T19:59:59.219Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8
+  {"level":"warn","ts":"2026-11-02T20:00:06.259Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8
+  {"level":"warn","ts":"2026-11-02T20:00:06.292Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8
+20:01:42 descellement
+{"sealed":false}
+pod/openbao-0 condition met
+OK   clé Transit chains inchangée (078097039e8d4365…)
+## objets après le descellement (une reprise de Chains serait visible ici)
+  PipelineRun/sample-app-sync-019e0777c687b3eaeef4fb8a798adb7188861705 signed=true retries=-
+  TaskRun/sample-app-sync-019e077984cc315a84a2691c39639594a12c84c-publier signed=true retries=-
+  TaskRun/sample-app-sync-019e07984cc315a84a2691c39639594a12c84c-preparer signed=true retries=-
+  TaskRun/sample-app-sync-019e984cc315a84a2691c39639594a12c84c-construire signed=true retries=-
+exécutions sample-app-sync-019e0777c687b3eaeef4fb8a798adb7188861705 purgées (référence de la 08 gardée)
+20:02:20 OpenBaoScelle : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T20:02:47+00:00 sc-stockage python3[30431]: {"alerte": "OpenBaoScelle", "debut": "2026-11-02T20:00:37.032Z", "etiquettes": {"alerte": "A1", "alertname": "OpenBaoScelle", "instance": "192.168.161.11:6443", "job": "openbao", "severite": "critique"}, "fin": "2026-11-02T20:02:07.032Z", "recu": true, "statut": "resolved"}
+OK   OpenBaoScelle : déclenchée puis résolue, notifications firing et resolved reçues
+20:02:51 ChainsMarqueSansSignature : prometheus=firing, alertmanager=active
+20:10:12 ChainsMarqueSansSignature : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T20:10:47+00:00 sc-stockage python3[30431]: {"alerte": "ChainsMarqueSansSignature", "debut": "2026-11-02T20:01:37.032Z", "etiquettes": {"alerte": "A2", "alertname": "ChainsMarqueSansSignature", "instance": "192.168.161.11:6443", "job": "chains", "otel_scope_name": "github.com/tektoncd/chains/pkg/pipelinerunmetrics", "severite": "critique"}, "fin": "2026-11-02T20:10:07.032Z", "recu": true, "statut": "resolved"}
+  reçu : 2026-11-02T20:10:47+00:00 sc-stockage python3[30431]: {"alerte": "ChainsMarqueSansSignature", "debut": "2026-11-02T20:00:37.032Z", "etiquettes": {"alerte": "A2", "alertname": "ChainsMarqueSansSignature", "instance": "192.168.161.11:6443", "job": "chains", "otel_scope_name": "github.com/tektoncd/chains/pkg/taskrunmetrics", "severite": "critique"}, "fin": "2026-11-02T20:10:07.032Z", "recu": true, "statut": "resolved"}
+OK   ChainsMarqueSansSignature : déclenchée puis résolue, notifications firing et resolved reçues
+## compteurs d'échec à la fin
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 25
+  {"error_type":"storage","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 6
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/taskrunmetrics"} 27
+ChainsEchecSignature pendant tout l'incident : 0 notification(s)
+OK   horodatage/horodatage : passage horodatage-29894168 réussi après le descellement
+OK   declencheurs/rattrapage : passage rattrapage-29894168 réussi après le descellement

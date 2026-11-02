@@ -92,6 +92,53 @@ tests:
         exp_alerts:
           - exp_labels: {alerte: A2, severite: critique, error_type: storage, job: chains, instance: api}
 
+  # A2, second volet : échec en ouvert d'un PipelineRun à 10 min (marqué, aucune signature créée) ; en attente à 10 min,
+  # déclenchée à 11 min, résolue quand la hausse sort de la fenêtre.
+  - interval: 1m
+    input_series:
+      - series: 'watcher_pipelinerun_marked_signed_total{job="chains", instance="api"}'
+        values: '5x9 6x20'
+      - series: 'watcher_pipelinerun_sign_created_total{job="chains", instance="api"}'
+        values: '7x30'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts:
+          - exp_labels: {alerte: A2, severite: critique, job: chains, instance: api}
+      - eval_time: 21m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+
+  # A2, second volet : build normal ; marquage du TaskRun collecté une minute avant sa signature : écart positif pendant une
+  # seule évaluation à l'entrée dans la fenêtre (à la sortie, l'écart est négatif), le for: 1m l'absorbe ; PipelineRun
+  # marqué et signé à la même collecte : écart nul.
+  - interval: 1m
+    input_series:
+      - series: 'watcher_taskrun_marked_signed_total{job="chains", instance="api"}'
+        values: '3x9 4x20'
+      - series: 'watcher_taskrun_sign_created_total{job="chains", instance="api"}'
+        values: '6x10 7x20'
+      - series: 'watcher_pipelinerun_marked_signed_total{job="chains", instance="api"}'
+        values: '2x9 3x20'
+      - series: 'watcher_pipelinerun_sign_created_total{job="chains", instance="api"}'
+        values: '2x9 3x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+      - eval_time: 21m
+        alertname: ChainsMarqueSansSignature
+        exp_alerts: []
+
   # A3 : contrat de la brique 10, série de test.
   - interval: 1m
     input_series:

@@ -24,6 +24,18 @@ groups:
           alerte: A2
           severite: critique
 
+      # A2, second volet (O4) : objet marqué signé sans signature. Chains v0.29.9 échoue en ouvert quand son signataire KMS
+      # est injoignable (OpenBao scellé) : marked_signed monte, sign_created non, aucun compteur d'échec (mesuré en O4, corrigé
+      # sur main de l'amont sans compteur). En fonctionnement normal, l'écart reste <= 0 (référence : o4-a2-ecart-reference.log).
+      # for: 1m : un compteur peut entrer dans la fenêtre (ou en sortir) une collecte avant l'autre.
+      # Limite : en trafic mêlé, un build normal à reprises (signatures en plus) peut masquer un échec en ouvert.
+      - alert: ChainsMarqueSansSignature
+        expr: (increase(watcher_pipelinerun_marked_signed_total[10m]) - increase(watcher_pipelinerun_sign_created_total[10m]) > 0) or (increase(watcher_taskrun_marked_signed_total[10m]) - increase(watcher_taskrun_sign_created_total[10m]) > 0)
+        for: 1m
+        labels:
+          alerte: A2
+          severite: critique
+
       # A3. Replay non bit-identique : contrat de métrique fixé pour la brique 10 (D2 a), servi comme sync.prom :
       # replay_dernier_resultat{projet} = 1 si le dernier replay est bit-identique, 0 sinon. Pas d'absent() : la
       # brique 10 n'existe pas encore, l'alerte serait déclenchée en permanence.

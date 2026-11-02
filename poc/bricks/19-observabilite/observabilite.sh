@@ -452,8 +452,30 @@ objets_chains() { # PipelineRun : « type/nom signed=… retries=… » pour lui
     | jq -r '"\(.kind)/\(.metadata.name) signed=\(.metadata.annotations["chains.tekton.dev/signed"] // "absente") retries=\(.metadata.annotations["chains.tekton.dev/retries"] // "-")"'
 }
 
-etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao est scellé (incident prévu au protocole)
+enveloppes_att() { # PipelineRun : pour lui et son TaskRun publier (exécutions à sujet image), présence d'une enveloppe de son UID
+  # dans le tag .att de l'image (règle du contrôle exécutions/enveloppes de la 08, reproduite ici : ABSENTE ou COUVERTE)
+  local img dg k n u l
+  img=$(kubectl get pipelinerun -n builds "$1" -o json | jq -r '.status.results[] | select(.name == "IMAGE_URL") | .value')
+  dg=$(kubectl get pipelinerun -n builds "$1" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
+  : > "$W/o4-uids"
+  oras manifest fetch --ca-file "$P/ca-poc.crt" "$REG_HOTE/${img#*/}:sha256-${dg#sha256:}.att" > "$W/o4-att.json"
+  for l in $(jq -r '.layers[].digest' "$W/o4-att.json"); do
+    oras blob fetch --ca-file "$P/ca-poc.crt" --output - "$REG_HOTE/${img#*/}@$l" \
+      | jq -r '.payload | @base64d | fromjson | .predicate.runDetails.metadata.invocationId // empty' >> "$W/o4-uids"
+  done
+  echo "tag .att de ${img#*/}@${dg:7:12} : $(jq '.layers | length' "$W/o4-att.json") enveloppe(s)"
+  { echo "pipelinerun $1 $(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')"
+    kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$1,tekton.dev/pipelineTask=publier" -o json \
+      | jq -r '.items[] | "taskrun \(.metadata.name) \(.metadata.uid)"'; } | while read -r k n u; do
+    grep -qx -F "$u" "$W/o4-uids" && echo "  COUVERTE $k $n (${u:0:8})" || echo "  ABSENTE $k $n (${u:0:8}) : signed=$(kubectl get "$k" -n builds "$n" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')"
+  done
+  rm -f "$W/o4-att.json" "$W/o4-uids"
+}
+
+etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao est scellé (incident prévu au protocole) ;
+  # Chains v0.29.9 échoue en ouvert (deuxième passage) : l'alerte attendue est ChainsMarqueSansSignature (A2, second volet)
   local t0 t1 c c1 c2 pr st fin
+  debut ChainsMarqueSansSignature
   debut ChainsEchecSignature
   echo "## compteurs d'échec avant"
   requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
@@ -495,9 +517,14 @@ etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao 
     sleep 5
   done
   objets_chains "$pr" | sed "s/^/  $(date -u +%H:%M:%S) /"
-  attendre ChainsEchecSignature "firing|active" 240 || true   # issue relevée ; notification attendue plus bas
-  echo "## compteurs d'échec pendant le scellement"
-  requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  declenchee ChainsMarqueSansSignature "$t0" 300
+  echo "ChainsEchecSignature (premier volet, aveugle à cette panne) : $(etat_alerte ChainsEchecSignature)"
+  echo "## compteurs de Chains pendant le scellement (hausse sur 10 min)"
+  for m in pipelinerun_marked_signed pipelinerun_sign_created taskrun_marked_signed taskrun_sign_created pipelinerun_signing_failures taskrun_signing_failures; do
+    echo "  $m : $(requete "sum(increase(watcher_${m}_total[10m]))" | awk '{print $2}')"
+  done
+  echo "## contrôle exécutions/enveloppes avant la purge"
+  enveloppes_att "$pr"
   echo "## journal du contrôleur de Chains depuis le scellement (erreurs de signature, 10 premières)"
   kubectl logs -n tekton-chains deploy/tekton-chains-controller --since-time="$(date -u -d "@$t0" +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null \
     | grep -iE 'error|fail' | cut -c1-300 | head -10 | sed 's/^/  /' || true
@@ -512,11 +539,11 @@ etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao 
   objets_chains "$pr" | sed 's/^/  /'
   purger_pr "$pr"
   echo "exécutions $pr purgées (référence de la 08 gardée)"
-  attendre_recue ChainsEchecSignature "$t0" firing 120 || exit 1
-  resolue ChainsEchecSignature "$t0" 900
+  resolue OpenBaoScelle "$t0" 300
+  resolue ChainsMarqueSansSignature "$t0" 900
   echo "## compteurs d'échec à la fin"
   requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
-  echo "OpenBaoScelle (déclenchée aussi pendant le scellement) : $(etat_alerte OpenBaoScelle) ; notifications : $(recues OpenBaoScelle "$t0" firing | grep -c . || true) firing, $(recues OpenBaoScelle "$t0" resolved | grep -c . || true) resolved"
+  echo "ChainsEchecSignature pendant tout l'incident : $(recues ChainsEchecSignature "$t0" firing | grep -c . || true) notification(s)"
   passage_reussi horodatage horodatage "$t1"
   passage_reussi declencheurs rattrapage "$t1"
 }
