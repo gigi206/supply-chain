@@ -64,3 +64,6 @@ mmdebstrap	-	packaging	oui
 StageX	-	construction	non
 Cilium	cilium/cilium	réseau	oui
 kube-router (amont)	cloudnativelabs/kube-router	réseau	oui
+Grafana Alloy	grafana/alloy	observabilité	non
+Vector	vectordotdev/vector	observabilité	non
+Fluent Bit	fluent/fluent-bit	observabilité	non

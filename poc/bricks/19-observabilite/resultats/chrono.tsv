@@ -17,3 +17,4 @@ O4 A2 décision du propriétaire	2026-11-02T19:39:27Z	« a, build pendant scell�
 O4 A2 deuxième passage	2026-11-02T19:40:16Z	build pendant le scellement : Chains marque signé sans signature, A2 non déclenchée
 O4 A2 décision du propriétaire	2026-11-02T19:57:41Z	« a, étendre A2 »
 O4 A2 troisième passage, fin d O4	2026-11-02T20:10:48Z	ChainsMarqueSansSignature déclenchée puis résolue ; 5 alertes critiques sur 5
+O5 préparation à sec	2026-11-02T20:29:35Z	exigence du propriétaire (tout dans Grafana) ; santé des candidats (o5-sante.log)

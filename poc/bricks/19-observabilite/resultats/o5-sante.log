@@ -1,0 +1,33 @@
+# O5, relevé de santé et de vérifiabilité des outils de journalisation (2026-11-02T20:29:35Z), lecture seule, réseau public
+## releases (API GitHub), hors préversions
+grafana/grafana v13.3.0 2026-10-27 fichiers=13 sommes= signatures=0
+  licence AGPL-3.0, archivé false
+grafana/loki v3.7.9 2026-10-20 fichiers=48 sommes=SHA256SUMS signatures=0
+  licence AGPL-3.0, archivé false
+grafana/alloy v1.21.3 2026-10-28 fichiers=22 sommes=SHA256SUMS signatures=0
+  licence Apache-2.0, archivé false
+vectordotdev/vector v0.61.0 2026-10-29 fichiers=19 sommes=vector-0.61.0-SHA256SUMS signatures=0
+  licence MPL-2.0, archivé false
+fluent/fluent-bit v5.1.5 2026-10-21 fichiers=2 sommes= signatures=0
+  licence Apache-2.0, archivé false
+## attestations GitHub des archives linux-amd64 (API attestations, par sha256 lu dans les sommes publiées)
+grafana/loki v3.7.9 loki-linux-amd64.zip sha256=17a5fae28ce733b3560c27c76620920b169bd2aea9473947b733b511f92e81dd
+  attestations GitHub : 0
+grafana/alloy v1.21.3 alloy-linux-amd64.zip sha256=50d23af2d0f98c00beac6ce9a365693e60f87fb76b6cad6fe1d161e80588af6d
+  attestations GitHub : 1
+vectordotdev/vector v0.61.0 vector-0.61.0-x86_64-unknown-linux-gnu.tar.gz sha256=84a27c3ad6b772fdb05bb76ea01a31498bfc8f5e71f32cc78a0d96841f1aa827
+  attestations GitHub : 0
+  alloy, prédicat : https://in-toto.io/attestation/release/v0.2 (attestation de release, pas une provenance de build)
+  grafana 13.3.0 : .deb sur GitHub sans attestation (404) ; archive dl.grafana.com : .sha256 publié, aucun .asc (404)
+## images (cosign tree, docker.io)
+grafana/loki:3.7.9 : 1 = aucun artefact de signature
+grafana/alloy:v1.21.3 : 1 = aucun artefact de signature
+grafana/grafana:13.3.0 : 1 = aucun artefact de signature
+## Promtail (docs/sources/send-data/promtail/_index.md, tag v3.7.9)
+Promtail is end of life (EOL) as of March 2, 2026.  Commercial support has ended. No future support or updates will be provided. All future feature development will occur in Grafana Alloy.  
+## auteurs sur 90 jours (depuis 2026-08-04, clone sans blobs ; hors bots ; adresses masquées non attribuables)
+grafana/loki : 1358 commits, 42 auteurs à adresse lisible, 802 commits à adresse masquée ; domaines : grafana.com 260, pracucci.com 133, gmail.com 133, redhat.com 17, spiridonov.pro 4
+grafana/alloy : 399 commits, 27 auteurs à adresse lisible, 255 commits à adresse masquée ; domaines : grafana.com 56, gmail.com 44, regolo.cc 25, ryangeyer.com 8, protonmail.com 2
+grafana/grafana : 3589 commits, 178 auteurs à adresse lisible, 1349 commits à adresse masquée ; domaines : grafana.com 1234, gmail.com 882, mattcowley.co.uk 35, sgriffin.dev 33, hotmail.com 18
+## SECURITY.md : absent à la racine de grafana, loki, alloy ; présent dans grafana/.github (organisation) : oui
+## Scorecard : resultats/o5-scorecard.md
