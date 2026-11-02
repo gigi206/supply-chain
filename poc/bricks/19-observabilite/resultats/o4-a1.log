@@ -1,0 +1,27 @@
+# observabilite.sh a1, 2026-11-02T18:56:48Z
+OK   OpenBaoScelle inactive avant l'incident
+clé Transit chains avant : 078097039e8d4365…
+18:56:48 incident : suppression du pod openbao-0 (il redémarre scellé)
+18:56:51 OpenBaoScelle : prometheus=inactive, alertmanager=absente
+18:57:12 OpenBaoScelle : prometheus=pending, alertmanager=absente
+18:58:09 OpenBaoScelle : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T18:58:17+00:00 sc-stockage python3[30431]: {"alerte": "OpenBaoScelle", "debut": "2026-11-02T18:58:07.032Z", "etiquettes": {"alerte": "A1", "alertname": "OpenBaoScelle", "instance": "192.168.161.11:6443", "job": "openbao", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+## branche de l'expression
+  (aucun résultat)
+  {"instance":"192.168.161.11:6443","job":"openbao"} 0
+  {"instance":"192.168.161.11:6443","job":"kyverno"} 1
+## effets de bord pendant le scellement
+  horodatage/horodatage-29894097 réussi=0 échoué=1
+  horodatage/horodatage-29894098 réussi=0 échoué=0
+ChainsEchecSignature : inactive|absente
+18:58:20 retour : descellement
+{"sealed":false}
+pod/openbao-0 condition met
+18:58:32 OpenBaoScelle : prometheus=firing, alertmanager=active
+18:59:08 OpenBaoScelle : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T18:59:17+00:00 sc-stockage python3[30431]: {"alerte": "OpenBaoScelle", "debut": "2026-11-02T18:58:07.032Z", "etiquettes": {"alerte": "A1", "alertname": "OpenBaoScelle", "instance": "192.168.161.11:6443", "job": "openbao", "severite": "critique"}, "fin": "2026-11-02T18:59:07.032Z", "recu": true, "statut": "resolved"}
+OK   OpenBaoScelle : déclenchée puis résolue, notifications firing et resolved reçues
+OK   clé Transit chains inchangée (078097039e8d4365…)
+OK   horodatage/horodatage : passage horodatage-29894099 réussi après le descellement
+OK   declencheurs/rattrapage : passage rattrapage-29894099 réussi après le descellement
+TSA : 1/1 prêt(s)

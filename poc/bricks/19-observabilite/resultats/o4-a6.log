@@ -1,0 +1,13 @@
+# observabilite.sh a6, 2026-11-02T18:42:47Z
+OK   CertificatExpireBientot inactive avant l'incident
+18:42:48 essais-o4.prom : certificat_expiration_timestamp_seconds{certificat="essai-o4"} 1795372968
+18:42:48 CertificatExpireBientot : prometheus=inactive, alertmanager=absente
+18:43:40 CertificatExpireBientot : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T18:43:47+00:00 sc-stockage python3[30431]: {"alerte": "CertificatExpireBientot", "debut": "2026-11-02T18:43:37.032Z", "etiquettes": {"alerte": "A6", "alertname": "CertificatExpireBientot", "certificat": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+18:43:51 essais-o4.prom : certificat_expiration_timestamp_seconds{certificat="essai-o4"} 1798829031
+18:43:51 CertificatExpireBientot : prometheus=firing, alertmanager=active
+18:44:38 CertificatExpireBientot : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T18:44:47+00:00 sc-stockage python3[30431]: {"alerte": "CertificatExpireBientot", "debut": "2026-11-02T18:43:37.032Z", "etiquettes": {"alerte": "A6", "alertname": "CertificatExpireBientot", "certificat": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "2026-11-02T18:44:37.032Z", "recu": true, "statut": "resolved"}
+OK   CertificatExpireBientot : déclenchée puis résolue, notifications firing et resolved reçues
+18:44:49 essais-o4.prom retiré
+  {"instance":"127.0.0.1:9101","job":"fichiers"} 1

@@ -262,7 +262,7 @@ description = "Brique 08, J7 : voie D (mesure demandée par le propriétaire) ; 
 run = "poc/bricks/08-trust-plane/voie-d.sh"
 
 [tasks."synchro:forgejo"]
-description = "Brique 01, S2, S4 et S6 : Forgejo préparé pour la synchro (comptes, organisations, amont d'essai, miroir, fork, protections des refs propres, refus), tests négatifs par le service de la VM, mesure sur Traefik (étapes : comptes organisations amont miroir archives fork protections refus bout_en_bout negatifs traefik)"
+description = "Brique 01, S2, S4 et S6 : Forgejo préparé pour la synchro (comptes, organisations, amont d'essai, miroir, fork, protections des refs propres, refus), tests négatifs par le service de la VM, mesure sur Traefik (étapes : comptes organisations amont miroir archives fork protections niveaux refus bout_en_bout negatifs traefik)"
 run = "poc/bricks/01-forgejo-sync/forgejo.sh"
 
 [tasks."synchro:executeur"]

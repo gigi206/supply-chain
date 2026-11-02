@@ -1,0 +1,19 @@
+# observabilite.sh a2, 2026-11-02T18:59:19Z
+OK   ChainsEchecSignature inactive avant l'incident
+## compteurs d'échec avant
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 25
+  {"error_type":"storage","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/pipelinerunmetrics"} 6
+  {"error_type":"payload_creation","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/taskrunmetrics"} 27
+18:59:19 incident : preuves.sh decision3 (08)
+fichiers de la 08 modifiés après la mesure (seul chrono.tsv attendu) :
+   M poc/bricks/08-trust-plane/resultats/chrono.tsv
+  08 : OK   configuration en service = stockage/zot.json (de5bf9076217f781…)
+  08 : OK   aucune exécution en cours ni en attente de Chains
+  08 : OK   départ : aucune anomalie
+  08 : OK   configuration modifiée en service (fefa04bf85bfc92c…), Zot redémarré
+  08 : OK   poc-build crée le tag neuf temoin-20261102T185919Z (x)
+  08 : OK   poc-build ne déplace pas ce tag vers y : 1|DENIED: requested access to the resource is denied; map[description:The access controller denied access for the operation on a resource.]
+  08 : OK   poc-ecriture le déplace vers y (droit update gardé)
+  08 : KO   gabarit en service : pipeline sample-app ; l'étape suppose le gabarit d'essai de J6 (politique.sh declencheurs)
+  08 : OK   configuration d'origine de Zot remise (empreinte de5bf9076217f781…)
+KO   decision3 : code 1

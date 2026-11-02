@@ -1,0 +1,30 @@
+# observabilite.sh a5, 2026-11-02T18:44:49Z
+OK   KyvernoRefusAnormaux inactive avant l'incident
+compteur brut des refus :
+  {} 92
+somme des hausses sur 5 min (extrapolée) :
+  {} 0
+## rafale sous le seuil : 4 refus, l'alerte doit rester inactive pendant toute la fenêtre de 5 min
+18:45:25 rafale : 4 refus de zone-confiance sur 4 créations (dry-run serveur)
+compteur brut des refus :
+  {} 96
+somme des hausses sur 5 min (extrapolée) :
+  {} 4.444444444444445
+maximum de l'expression sur 6 min :
+  {} 4.444444444444445
+OK   4 refus : KyvernoRefusAnormaux restée inactive
+## rafale au-dessus du seuil : 10 refus
+18:51:09 rafale : 10 refus de zone-confiance sur 10 créations (dry-run serveur)
+18:51:09 KyvernoRefusAnormaux : prometheus=inactive, alertmanager=absente
+18:51:40 KyvernoRefusAnormaux : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T18:51:47+00:00 sc-stockage python3[30431]: {"alerte": "KyvernoRefusAnormaux", "debut": "2026-11-02T18:51:37.032Z", "etiquettes": {"alerte": "A5", "alertname": "KyvernoRefusAnormaux", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+compteur brut des refus :
+  {} 106
+somme des hausses sur 5 min (extrapolée) :
+  {} 11.11111111111111
+18:52:26 KyvernoRefusAnormaux : prometheus=firing, alertmanager=active
+18:56:11 KyvernoRefusAnormaux : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T18:56:47+00:00 sc-stockage python3[30431]: {"alerte": "KyvernoRefusAnormaux", "debut": "2026-11-02T18:51:37.032Z", "etiquettes": {"alerte": "A5", "alertname": "KyvernoRefusAnormaux", "severite": "critique"}, "fin": "2026-11-02T18:56:07.032Z", "recu": true, "statut": "resolved"}
+OK   KyvernoRefusAnormaux : déclenchée puis résolue, notifications firing et resolved reçues
+maximum de l'expression sur 8 min :
+  {} 11.11111111111111

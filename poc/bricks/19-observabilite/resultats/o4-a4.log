@@ -1,0 +1,14 @@
+# observabilite.sh a4, 2026-11-02T18:35:47Z
+OK   MiroirEnRetard inactive avant l'incident
+18:35:48 essais-o4.prom : sync_derniere_reussite_timestamp_seconds{projet="essai-o4"} 1793554547
+18:35:48 MiroirEnRetard : prometheus=inactive, alertmanager=absente
+18:36:41 MiroirEnRetard : prometheus=pending, alertmanager=absente
+18:41:39 MiroirEnRetard : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T18:41:47+00:00 sc-stockage python3[30431]: {"alerte": "MiroirEnRetard", "debut": "2026-11-02T18:41:37.032Z", "etiquettes": {"alerte": "A4", "alertname": "MiroirEnRetard", "instance": "127.0.0.1:9101", "job": "fichiers", "projet": "essai-o4", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+18:41:49 essais-o4.prom : sync_derniere_reussite_timestamp_seconds{projet="essai-o4"} 1793644909
+18:41:50 MiroirEnRetard : prometheus=firing, alertmanager=active
+18:42:37 MiroirEnRetard : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T18:42:47+00:00 sc-stockage python3[30431]: {"alerte": "MiroirEnRetard", "debut": "2026-11-02T18:41:37.032Z", "etiquettes": {"alerte": "A4", "alertname": "MiroirEnRetard", "instance": "127.0.0.1:9101", "job": "fichiers", "projet": "essai-o4", "severite": "critique"}, "fin": "2026-11-02T18:42:37.032Z", "recu": true, "statut": "resolved"}
+OK   MiroirEnRetard : déclenchée puis résolue, notifications firing et resolved reçues
+18:42:47 essais-o4.prom retiré
+  {"instance":"127.0.0.1:9101","job":"fichiers"} 1

@@ -1,0 +1,14 @@
+# observabilite.sh a3, 2026-11-02T18:34:05Z
+OK   ReplayNonBitIdentique inactive avant l'incident
+18:34:05 essais-o4.prom : replay_dernier_resultat{projet="essai-o4"} 0
+18:34:06 ReplayNonBitIdentique : prometheus=inactive, alertmanager=absente
+18:34:37 ReplayNonBitIdentique : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T18:34:47+00:00 sc-stockage python3[30431]: {"alerte": "ReplayNonBitIdentique", "debut": "2026-11-02T18:34:37.032Z", "etiquettes": {"alerte": "A3", "alertname": "ReplayNonBitIdentique", "instance": "127.0.0.1:9101", "job": "fichiers", "projet": "essai-o4", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+18:34:48 essais-o4.prom : replay_dernier_resultat{projet="essai-o4"} 1
+18:34:48 ReplayNonBitIdentique : prometheus=firing, alertmanager=active
+18:35:41 ReplayNonBitIdentique : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T18:35:47+00:00 sc-stockage python3[30431]: {"alerte": "ReplayNonBitIdentique", "debut": "2026-11-02T18:34:37.032Z", "etiquettes": {"alerte": "A3", "alertname": "ReplayNonBitIdentique", "instance": "127.0.0.1:9101", "job": "fichiers", "projet": "essai-o4", "severite": "critique"}, "fin": "2026-11-02T18:35:37.032Z", "recu": true, "statut": "resolved"}
+OK   ReplayNonBitIdentique : déclenchée puis résolue, notifications firing et resolved reçues
+18:35:47 essais-o4.prom retiré
+## collecte des fichiers pendant l'incident (minimum de up sur 10 min)
+  {"instance":"127.0.0.1:9101","job":"fichiers"} 1
