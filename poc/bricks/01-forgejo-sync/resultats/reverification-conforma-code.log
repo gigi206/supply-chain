@@ -1,0 +1,167 @@
+# conforma/policy ebd3fbd270297c15f590f4023360465ffb41d4fe (v1.0.28), lu le 2026-11-02T20:18:33Z après la prédiction 2 fausse
+## policy/release/lib/attestations.rego, lignes 34 à 41
+
+slsa_provenance_attestations := [att |
+	some att in input.attestations
+	att.statement.predicateType in {slsa_provenance_predicate_type_v1, slsa_provenance_predicate_type_v02}
+]
+
+# These are the ones we're interested in
+pipelinerun_attestations := array.concat(latest_v02_pipelinerun_attestation, latest_v1_pipelinerun_attestation)
+## policy/release/slsa_source_correlated/slsa_source_correlated.rego (sans commentaires)
+package slsa_source_correlated
+
+import rego.v1
+
+import data.lib
+import data.lib.json as j
+import data.lib.metadata
+import data.lib.rule_data
+
+deny contains result if {
+	source := object.get(input, ["image", "source"], {})
+	count(source) == 0
+
+	result := metadata.result_helper(rego.metadata.chain(), [])
+}
+
+deny contains result if {
+	count(_source_references) == 0
+
+	result := metadata.result_helper(rego.metadata.chain(), [])
+}
+
+deny contains result if {
+	count(_source_references) > 0
+
+	some expected_source in _expected_sources
+
+	count(expected_source.refs & _source_references) == 0
+
+	some attested_source in _source_references
+
+	result := metadata.result_helper_with_term(
+		rego.metadata.chain(),
+		[sprintf("%s@%s", [expected_source.expected_vcs_uri, expected_source.expected_revision])], attested_source,
+	)
+}
+
+deny contains result if {
+	some e in _rule_data_errors
+	result := metadata.result_helper_with_severity(rego.metadata.chain(), [e.message], e.severity)
+}
+
+_refs(expected_vcs_uri, expected_revision) := refs if {
+	uris := {
+		expected_vcs_uri,
+		trim_suffix(expected_vcs_uri, ".git"),
+		sprintf("%s.git", [expected_vcs_uri]),
+		trim_suffix(expected_vcs_uri, "/"),
+		sprintf("%s.git", [trim_suffix(expected_vcs_uri, "/")]),
+	}
+
+	refs := {ref |
+		some uri in uris
+		some algo in {"sha1", "gitCommit"}
+		ref := sprintf("%s@%s:%s", [uri, algo, expected_revision])
+	}
+}
+
+_expected_sources contains expected_source if {
+	some vcs_type, vcs_info in input.image.source
+
+	expected_vcs_uri := sprintf("%s+%s", [vcs_type, object.get(vcs_info, ["url"], "")])
+	expected_revision := object.get(vcs_info, ["revision"], "")
+	expected_source := {
+		"expected_vcs_uri": expected_vcs_uri,
+		"expected_revision": expected_revision,
+		"refs": _refs(expected_vcs_uri, expected_revision),
+	}
+}
+
+_source_references contains ref if {
+	some att in lib.slsa_provenance_attestations
+	some material in lib.attestation_materials(att)
+	some digest_alg in object.keys(material.digest)
+	some supported_vcs_type in rule_data.get("supported_vcs")
+
+	startswith(material.uri, sprintf("%s+", [supported_vcs_type]))
+
+	digest_alg in rule_data.get("supported_digests")
+
+
+## ajouté après relecture (2026-11-02T20:22:36Z) : provenances lues par chaque paquet chargé par la porte
+== policy/release/attestation_type/attestation_type.rego
+37:	some att in lib.pipelinerun_attestations
+81:	count(lib.pipelinerun_attestations) == 0
+100:	# Use input.attestations directly so we can detect the actual format in use.
+101:	some att in input.attestations
+== policy/release/slsa_provenance_available/slsa_provenance_available.rego
+43:	some att in lib.pipelinerun_attestations
+== policy/release/slsa_build_build_service/slsa_build_build_service.rego
+40:	some att in lib.pipelinerun_attestations
+67:	some att in lib.pipelinerun_attestations
+== policy/release/slsa_build_scripted_build/slsa_build_scripted_build.rego
+24:_manifests := ec.oci.image_manifests(lib.pipelinerun_bundle_refs)
+47:	some attestation in lib.pipelinerun_attestations
+74:	some attestation in lib.pipelinerun_attestations
+100:	some attestation in lib.pipelinerun_attestations
+137:		some attestation in lib.pipelinerun_attestations
+160:	untrusted_tasks := tekton.untrusted_task_refs(lib.tasks_from_pipelinerun, _manifests)
+== policy/release/slsa_source_version_controlled/slsa_source_version_controlled.rego
+55:	count(lib.pipelinerun_attestations) > 0
+116:	some attestation in lib.pipelinerun_attestations
+123:	some attestation in lib.pipelinerun_attestations
+== policy/release/slsa_source_correlated/slsa_source_correlated.rego
+166:	some att in lib.slsa_provenance_attestations
+== policy/release/tasks/tasks.rego
+37:_manifests := ec.oci.image_manifests(lib.pipelinerun_bundle_refs)
+112:	some att in lib.pipelinerun_attestations
+138:	some att in lib.pipelinerun_attestations
+200:	some att in lib.pipelinerun_attestations
+201:	some untrusted_task in tekton.untrusted_task_refs(lib.tasks_from_pipelinerun, _manifests)
+258:	some att in lib.pipelinerun_attestations
+286:	some att in lib.pipelinerun_attestations
+331:	some att in lib.pipelinerun_attestations
+372:	some att in lib.pipelinerun_attestations
+384:	some att in lib.pipelinerun_attestations
+393:	some att in lib.pipelinerun_attestations
+== policy/release/trusted_task/trusted_task.rego
+23:_manifests := ec.oci.image_manifests(lib.pipelinerun_bundle_refs)
+45:	some task in tekton.untagged_task_references(lib.tasks_from_pipelinerun)
+72:	some task in tekton.unpinned_task_references(lib.tasks_from_pipelinerun)
+105:	some task in lib.tasks_from_pipelinerun
+131:	some task in lib.tasks_from_pipelinerun
+188:	some attestation in lib.pipelinerun_attestations
+224:	some attestation in lib.pipelinerun_attestations
+328:	some attestation in lib.pipelinerun_attestations
+366:		some task in lib.tasks_from_pipelinerun
+381:	some attestation in lib.pipelinerun_attestations
+398:	some attestation in lib.pipelinerun_attestations
+423:	some attestation in lib.pipelinerun_attestations
+445:	some untrusted_task in tekton.untrusted_task_refs_rules(lib.tasks_from_pipelinerun, _manifests)
+513:	some attestation in lib.pipelinerun_attestations
+535:	some untrusted_task in tekton.untrusted_task_refs_legacy(lib.tasks_from_pipelinerun)
+== policy/release/lib/attestations.rego (tasks_from_pipelinerun, pipelinerun_bundle_refs)
+tasks_from_pipelinerun := [task |
+	some att in pipelinerun_attestations
+	some task in tekton.tasks(att)
+]
+
+# Collect all unique bundle references from tasks in the pipelineRun attestation.
+# Returns a set of bundle refs that can be passed to ec.oci.image_manifests.
+pipelinerun_bundle_refs contains ref if {
+	some task in tasks_from_pipelinerun
+	ref := tekton.task_ref(task).bundle
+	ref != ""
+}
+== attestation_type.rego, lignes 99 à 104 (seul usage de input.attestations : contrôle de format)
+deny contains result if {
+	# Use input.attestations directly so we can detect the actual format in use.
+	some att in input.attestations
+	not att.statement
+	result := metadata.result_helper(rego.metadata.chain(), [])
+}
+== poc/bricks/08-trust-plane/politique/porte/*.rego (règles propres à la porte)
+19:	msg := sprintf("aucune tâche vue dans %d provenance(s) de PipelineRun", [count(lib.pipelinerun_attestations)])
+29:deny contains {"code": "porte.image_signature", "msg": "aucune signature d'image (seulement des attestations)"} if {

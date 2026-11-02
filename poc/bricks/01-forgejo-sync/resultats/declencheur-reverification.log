@@ -1,0 +1,12 @@
+# declencheur.sh reverification, 2026-11-02T20:15:50Z
+## tag .att de builds/sample-app-sync@3a7ca1b14dbf
+4 enveloppe(s)
+{"fin":"2026-11-02T15:18:26Z","invocation":"c69ec0d2","source":["git+https://sc-stockage.poc.test:3000/workspace/sample-app-sync.git 1599e311314d672453b8b3fc053cd854cec530d0"]}
+{"fin":"2026-11-02T18:39:31Z","invocation":"f53718b3","source":["git+https://sc-stockage.poc.test:3000/workspace/sample-app-sync.git e209907fe1339d701939b99ede69dfd8380ed675"]}
+provenance de PipelineRun la plus récente : commit e209907fe1339d701939b99ede69dfd8380ed675
+commit de S5 : 1599e311314d672453b8b3fc053cd854cec530d0 ; tête de custom/s5 : 019e0777c687b3eaeef4fb8a798adb7188861705
+  VERDICT|s5-s5|true||trusted_task.tagged|31|ok|4/4 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles (source workspace/sample-app-sync@1599e311314d672453b8b3fc053cd854cec530d0)
+  VERDICT|s5-plus-recente|true||trusted_task.tagged|31|ok|4/4 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles (source workspace/sample-app-sync@e209907fe1339d701939b99ede69dfd8380ed675)
+  VERDICT|s5-tete-s5|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|31|ok|4/4 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles (source workspace/sample-app-sync@019e0777c687b3eaeef4fb8a798adb7188861705)
+## non-interférence : image réelle de la 08, jugée avec sa source
+  VERDICT|s5-reelle|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles

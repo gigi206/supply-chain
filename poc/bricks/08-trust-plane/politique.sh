@@ -963,7 +963,7 @@ internes() { # nom : internalParameters (drapeaux, labels, annotations) de la pr
            | {labels: .metadata.labels, annotations: .metadata.annotations}][0])}'
 }
 
-derniere() { # nom : la provenance de PipelineRun la plus récente de builds/essai-webhook, seule jugée par la porte, est la sienne
+derniere() { # nom : la provenance de PipelineRun la plus récente de builds/essai-webhook, seule jugée par les règles de tâches de la porte, est la sienne
   local u; u=$(kubectl get pipelinerun -n builds "$1" -o jsonpath='{.metadata.uid}')
   [ "$(prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.runDetails.metadata.invocationId')" = "$u" ] \
     && echo "OK   la provenance la plus récente de builds/essai-webhook est celle de $1" || { echo "KO   provenance la plus récente hors de $1" >&2; exit 1; }

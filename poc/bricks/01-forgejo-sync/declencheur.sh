@@ -162,4 +162,35 @@ etape_porte() {
     || { echo "KO   image réelle de la 08 refusée après S5" >&2; exit 1; }
 }
 
+etape_reverification() { # porte rejugée après les builds imprévus de 18:38 (étape niveaux) et de la brique 19 (A2, échec en ouvert
+  # de Chains) : provenances de PipelineRun du tag .att (la porte ne juge que la plus récente), puis sources S5, plus récente, tête de
+  # custom/s5, et image réelle de la 08 ; prédictions : resultats/reverification-predictions.md
+  local u d c r src tete s5 dern git_ls
+  read -r c u d < "$R/s5-construction.txt"
+  git_ls() { GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git ls-remote --refs "$FORGEJO_HOTE/$1.git" "$2" | cut -f1; }
+  echo "## tag .att de builds/$PROJET@${d:7:12}"
+  echo "$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$PROJET@$d" 2>/dev/null | grep -c .) enveloppe(s)"
+  cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/$PROJET@$d" 2>/dev/null \
+    | jq -c '.payload | @base64d | fromjson | select(.predicate.buildDefinition.externalParameters.runSpec.pipelineRef != null)
+      | {fin: .predicate.runDetails.metadata.finishedOn, invocation: .predicate.runDetails.metadata.invocationId[0:8],
+         source: [.predicate.buildDefinition.resolvedDependencies[]? | select(.uri | test("^git\\+")) | "\(.uri) \(.digest.sha1 // "-")"]}' \
+    | jq -s -c 'sort_by(.fin) | .[]' | tee "$T/provenances"
+  dern=$(tail -1 "$T/provenances" | jq -r '.source[0] // "" | split(" ")[1] // ""')
+  echo "provenance de PipelineRun la plus récente : commit ${dern:-introuvable}"
+  s5=$c
+  tete=$(git_ls "$FORK" "refs/heads/$BRANCHE")
+  echo "commit de S5 : $s5 ; tête de $BRANCHE : $tete"
+  for x in "s5:$s5" "plus-recente:$dern" "tete-s5:$tete"; do
+    [ -n "${x#*:}" ] || { echo "KO   commit $x introuvable" >&2; exit 1; }
+    src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$FORK.git" --arg r "${x#*:}" '{git: {url: $u, revision: $r}}')
+    r=$(juger "s5-${x%%:*}" "$u@$d" policy.yaml porte "$src")
+    echo "  $r (source $FORK@${x#*:})"
+  done
+  echo "## non-interférence : image réelle de la 08, jugée avec sa source"
+  tete=$(git_ls workspace/sample-app refs/heads/main)
+  r=$(juger s5-reelle "$IMAGE_08@$APP_DIGEST" policy.yaml porte "$(jq -nc --arg r "$tete" '{git: {url: "https://sc-stockage.poc.test:3000/workspace/sample-app.git", revision: $r}}')")
+  echo "  $r"
+}
+
 lancer declencheur S5 "$@"

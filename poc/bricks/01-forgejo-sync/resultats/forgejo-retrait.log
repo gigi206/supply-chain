@@ -1,0 +1,27 @@
+# forgejo.sh retrait, 2026-11-02T20:19:33Z
+PipelineRuns sample-app-sync-* avant : 2
+branches visées : custom/a/b custom/n20261102T183831Z/b
+avec la règle custom/** : suppression de custom/a/b : HTTP 403
+avec la règle custom/** : suppression de custom/n20261102T183831Z/b : HTTP 403
+règle custom/** retirée à 20:19:33
+sans la règle : suppression de custom/a/b : HTTP 204
+sans la règle : suppression de custom/n20261102T183831Z/b : HTTP 204
+## règles remises à 20:19:33
+{"rule_name":"paquet/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"rule_name":"custom/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"name_pattern":"custom-*","whitelist_usernames":["poc-dev"]}
+OK   règle custom/** remise
+OK   custom/a/b supprimée
+OK   custom/n20261102T183831Z/b supprimée
+OK   custom/s5 (019e0777c687) et custom/essai (400dd99b5a46) inchangées
+OK   création de custom/n20261102T201934Z/b (deux niveaux) par poc-sync, règle remise : refusé (protected branch)
+## builds : attente de 60 s
+PipelineRuns sample-app-sync-* après : 2
+OK   aucun build déclenché par les suppressions
+## EventListener forgejo-sync depuis le début de l'étape
+  aucune ligne
+## refs du fork à plusieurs niveaux restantes
+  aucune
+## journal de Forgejo (requêtes de push de cet essai)
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK

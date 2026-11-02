@@ -335,6 +335,58 @@ etape_niveaux() {
   journal "$debut"
 }
 
+etape_retrait() { # branches custom/ à plusieurs niveaux restantes (S2, premier passage de niveaux) : protégées, donc
+  # indestructibles même pour la liste blanche ; règle custom/** retirée le temps de la suppression, puis remise par
+  # etape_protections, même en cas d'échec (décision du propriétaire « 3 i » du 02/11/2026)
+  local b n avant apres s5 essai c debut
+  debut=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
+  s5=$(distant "$FORK" refs/heads/custom/s5); essai=$(distant "$FORK" refs/heads/custom/essai)
+  avant=$(kubectl get pipelinerun -n builds -o name | grep -c "/$PROJET-" || true)
+  echo "PipelineRuns $PROJET-* avant : $avant"
+  # Branches visées : celles de custom/ à au moins deux niveaux, lues dans le fork (pas une liste supposée).
+  mapfile -t vises < <(GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git ls-remote --refs "$FORGEJO_HOTE/$FORK.git" 'refs/heads/custom/*' | awk '{print $2}' | sed 's#^refs/heads/##' | grep '/.*/' || true)
+  echo "branches visées : ${vises[*]:-aucune}"
+  [ ${#vises[@]} -gt 0 ] || return 0
+  for b in "${vises[@]}"; do
+    c=$(curl -sS -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -H @"$T/entete-admin" -X DELETE "$FORGEJO_HOTE/api/v1/repos/$FORK/branches/$b")
+    echo "avec la règle custom/** : suppression de $b : HTTP $c"
+  done
+  trap 'echo "## règles remises (trap)"; etape_protections; rm -rf "$T" "$W/refus.out"' EXIT
+  api poc-admin DELETE "/repos/$FORK/branch_protections/$(jq -rn '"custom/**" | @uri')" >/dev/null
+  echo "règle custom/** retirée à $(date -u +%H:%M:%S)"
+  for b in "${vises[@]}"; do
+    c=$(curl -sS -o /dev/null -w '%{http_code}' --cacert "$P/ca-poc.crt" -H @"$T/entete-admin" -X DELETE "$FORGEJO_HOTE/api/v1/repos/$FORK/branches/$b")
+    echo "sans la règle : suppression de $b : HTTP $c"
+  done
+  echo "## règles remises à $(date -u +%H:%M:%S)"
+  etape_protections
+  trap 'rm -rf "$T" "$W/refus.out"' EXIT
+  api poc-admin GET "/repos/$FORK/branch_protections" | jq -e 'any(.[]; .rule_name == "custom/**")' >/dev/null \
+    && echo "OK   règle custom/** remise" || { echo "KO   règle custom/** absente" >&2; exit 1; }
+  for b in "${vises[@]}"; do
+    [ -z "$(distant "$FORK" "refs/heads/$b")" ] && echo "OK   $b supprimée" || { echo "KO   $b toujours présente" >&2; exit 1; }
+  done
+  [ "$(distant "$FORK" refs/heads/custom/s5)" = "$s5" ] && [ "$(distant "$FORK" refs/heads/custom/essai)" = "$essai" ] \
+    && echo "OK   custom/s5 (${s5:0:12}) et custom/essai (${essai:0:12}) inchangées" || { echo "KO   custom/s5 ou custom/essai modifiée" >&2; exit 1; }
+  n=n$(date -u +%Y%m%dT%H%M%SZ)
+  clone_travail "$FORK"
+  git -C "$T/w" commit -q --allow-empty -m "essai retrait $n"
+  refuse "création de custom/$n/b (deux niveaux) par poc-sync, règle remise" "$BRANCHE_PROTEGEE" poc-sync "$FORK" "HEAD:refs/heads/custom/$n/b"
+  echo "## builds : attente de 60 s"
+  sleep 60
+  apres=$(kubectl get pipelinerun -n builds -o name | grep -c "/$PROJET-" || true)
+  echo "PipelineRuns $PROJET-* après : $apres"
+  [ "$apres" = "$avant" ] && echo "OK   aucun build déclenché par les suppressions" || echo "MESURE $((apres - avant)) PipelineRun(s) de plus"
+  echo "## EventListener forgejo-sync depuis le début de l'étape"
+  kubectl logs -n declencheurs -l eventlistener=forgejo-sync --since=5m --tail=50 2>/dev/null | grep -v '^$' | cut -c1-240 || echo "  aucune ligne"
+  echo "## refs du fork à plusieurs niveaux restantes"
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git ls-remote --refs "$FORGEJO_HOTE/$FORK.git" | awk '{print $2}' | grep -E '^refs/(heads|tags)/[^/]+/[^/]+/' | sed 's/^/  /' || echo "  aucune"
+  echo "## journal de Forgejo (requêtes de push de cet essai)"
+  journal "$debut"
+}
+
 etape_bout_en_bout() {
   local dev amont code debut
   debut=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
