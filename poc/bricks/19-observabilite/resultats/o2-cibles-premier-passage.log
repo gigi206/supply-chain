@@ -156,3 +156,4 @@ zot	down	server returned HTTP status 401 Unauthorized
   sync_derniere_reecriture_timestamp_seconds
   sync_derniere_reussite_timestamp_seconds
 KO   cible(s) en échec
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"sync_derniere_reussite_timestamp_seconds","instance":"127.0.0.1:9101","job":"fichiers","projet":"sample-app-sync"},"value":[1793639314.571,"1793636233"]},{"metric":{"__name__":"sync_derniere_reussite_timestamp_seconds","instance":"127.0.0.1:9101","job":"fichiers","projet":"traefik"},"value":[1793639314.571,"1793636713"]}]}}

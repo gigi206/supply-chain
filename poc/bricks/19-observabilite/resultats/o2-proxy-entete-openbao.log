@@ -1,0 +1,15 @@
+# En-tête X-Vault-Token transmis par le proxy de l'API ? 2026-11-02T17:07:50Z (compte prometheus-lecture, jeton faux)
+## GET v1/auth/token/lookup-self, en-tête OpenBao : aucun
+{"errors":["permission denied"]}
+ [HTTP 403]
+## GET v1/auth/token/lookup-self, en-tête OpenBao : X-Vault-Token: faux
+{"errors":["permission denied"]}
+ [HTTP 403]
+## journal d'audit d'OpenBao (réponses à lookup-self ; présence d'un jeton client seulement, aucune valeur)
+# 17:07:50 : les deux requêtes par le proxy ci-dessus ; 17:07:59 : requêtes directes dans le pod (aucun en-tête, X-Vault-Token faux, Authorization: Bearer faux)
+{"t":"2026-11-02T17:07:50.811767791Z","distant":"10.42.0.110","jeton_present":false,"erreur":"1 error occurred: * permission denied "}
+{"t":"2026-11-02T17:07:50.821860578Z","distant":"10.42.0.110","jeton_present":true,"erreur":"1 error occurred: * permission denied "}
+{"t":"2026-11-02T17:07:59.545297604Z","distant":"127.0.0.1","jeton_present":false,"erreur":"1 error occurred: * permission denied "}
+{"t":"2026-11-02T17:07:59.651806357Z","distant":"127.0.0.1","jeton_present":true,"erreur":"1 error occurred: * permission denied "}
+{"t":"2026-11-02T17:07:59.753669971Z","distant":"127.0.0.1","jeton_present":true,"erreur":"1 error occurred: * permission denied "}
+## conclusion : le proxy de l'API retire Authorization (jeton Kubernetes absent côté OpenBao) mais transmet X-Vault-Token

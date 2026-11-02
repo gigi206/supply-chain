@@ -30,6 +30,7 @@ AM_SHA=17ee14acd0f6ba6e25a436ff223d9c17ddd5cf484f543ad12f0932eaa89ba186     # sh
 API=https://192.168.161.11:6443
 JETON=$S/prometheus-lecture.token
 mkdir -p "$A" "$R19"
+trap 'rm -rf "$W/observabilite" "$W/entete"' EXIT   # copies de secrets, même en cas d'échec (convention de stockage.sh)
 
 etape_telecharger() {
   local f

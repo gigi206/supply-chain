@@ -1,0 +1,15 @@
+# Recherche des jetons de la 19 dans les journaux des VM, 2026-11-02T17:08:29Z (motifs passés par l entrée standard, jamais affichés)
+## sc-stockage
+motifs : 2
+journal systemd depuis 16:55 : 0
+/var/log/zot/audit.log : 0
+/var/log/forgejo-migrate.log : 0
+/var/log/pods : 0 fichier(s)
+## sc-confiance
+motifs : 2
+journal systemd depuis 16:55 : 0
+/var/log/pods : 0 fichier(s)
+## sc-build
+motifs : 2
+journal systemd depuis 16:55 : 0
+/var/log/pods : 0 fichier(s)
