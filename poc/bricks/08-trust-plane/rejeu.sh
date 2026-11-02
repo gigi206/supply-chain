@@ -65,8 +65,11 @@ etape "J7 (sans réseau)" mise run confiance:buildkit -- sans_reseau
 etape "J7 (construction)" mise run confiance:construction -- compte entrees taches constat_cm construire provenance
 etape "J7 (réseau)" mise run confiance:kata -- reseau
 # Tests négatifs et mesures de J8, dans l'ordre du premier passage (30/10 au 01/11/2026), avant la bascule qui les refuse
-# (garde gabarit_essai) ; ajoutés le 02/11/2026 (décision du propriétaire : rejouer avant la bascule pour clore J8)
-etape "J8 (tests)" mise run confiance:preuves -- test2 test4 test5 test3 test1 test6 reglec test7 attseule test8 enveloppes reserve_c decision3
+# (garde gabarit_essai) ; ajoutés le 02/11/2026 (décision du propriétaire : rejouer avant la bascule pour clore J8).
+# reserve_c retiré le 02/11/2026 (accord du propriétaire) : il lit les dépôts d'essai du test 8 du 01/11, nommés en dur, absents
+# d'une installation neuve ; 11 KO garantis qui arrêtaient decision3 et la suite (rejeux cloture et resolveurs).
+echo "## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)"
+etape "J8 (tests)" mise run confiance:preuves -- test2 test4 test5 test3 test1 test6 reglec test7 attseule test8 enveloppes decision3
 etape "J8 (bascule)" mise run confiance:preuves -- bascule
 [ "$RESEAU" != cilium ] || etape "J8 (helm-cilium)" mise run confiance:preuves -- helm_cilium
 etape "J8 (contrôleurs)" mise run confiance:preuves -- controleurs
