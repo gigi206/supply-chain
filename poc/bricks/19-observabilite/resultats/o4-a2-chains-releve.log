@@ -1,0 +1,60 @@
+# Relevé de Chains après le deuxième passage de A2 (build pendant le scellement, PipelineRun sample-app-sync-902ce252…, purgé à 19:45 UTC)
+## relevé 2026-11-02T19:51:10Z
+## compteurs de Chains (valeur courante)
+  watcher_pipelinerun_marked_signed_total  25
+  watcher_pipelinerun_payload_stored_total  24
+  watcher_pipelinerun_sign_created_total  30
+  watcher_taskrun_marked_signed_total  43
+  watcher_taskrun_payload_stored_total  63
+  watcher_taskrun_sign_created_total  63
+## journal du contrôleur de Chains depuis 19:40 UTC (hors info)
+2026-11-02T19:40:33.233Z warn chains/signing.go:82 error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8200: connect: connection r
+2026-11-02T19:40:33.235Z warn chains/signing.go:175 No signer kms configured for tekton
+2026-11-02T19:41:09.376Z warn chains/signing.go:82 error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8200: connect: connection r
+2026-11-02T19:41:09.376Z warn chains/signing.go:175 No signer kms configured for tekton
+2026-11-02T19:41:14.407Z warn chains/signing.go:82 error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8200: connect: connection r
+2026-11-02T19:41:14.407Z warn chains/signing.go:175 No signer kms configured for tekton
+2026-11-02T19:41:14.407Z warn chains/signing.go:175 No signer kms configured for oci
+2026-11-02T19:41:14.433Z warn chains/signing.go:82 error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openbao/token} { }}}: dial tcp 10.43.252.143:8200: connect: connection r
+2026-11-02T19:41:14.434Z warn chains/signing.go:175 No signer kms configured for tekton-pipeline-run
+## journal du contrôleur, messages info mentionnant signed ou kms (20 premiers)
+2026-11-02T19:40:22.692Z record/event.go:377 Event(v1.ObjectReference{Kind:"PipelineRun", Namespace:"builds", Name:"sample-app-sync-902ce2524224c067e8c181462a38ead824067f9c", UID:"8054172c-a65e-4d40-9ce4-eaa3dbe50407", APIVersion:"tekton.dev/v1"
+2026-11-02T19:40:22.955Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:22.955Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:22.955Z record/event.go:377 Event(v1.ObjectReference{Kind:"TaskRun", Namespace:"builds", Name:"sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer", UID:"3adb0c54-9f47-4ffb-902a-071f7ffd4697", APIVersion:"tekton.dev/
+2026-11-02T19:40:23.099Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:23.403Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:23.802Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:27.068Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:28.200Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:29.208Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:30.222Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer is still running
+2026-11-02T19:40:33.234Z chains/signing.go:169 Created payload of type slsa/v2alpha4 for tekton.dev/v1/TaskRun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer
+2026-11-02T19:40:33.251Z taskrun/taskrun.go:101 taskrun builds/sample-app-sync-902ce2fb547a6e0a02bb5985d76d86bac23098-preparer has been reconciled
+2026-11-02T19:41:09.376Z chains/signing.go:169 Created payload of type slsa/v2alpha4 for tekton.dev/v1/TaskRun builds/sample-app-sync-902cfb547a6e0a02bb5985d76d86bac23098-construire
+2026-11-02T19:41:09.400Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier is still running
+2026-11-02T19:41:09.400Z record/event.go:377 Event(v1.ObjectReference{Kind:"TaskRun", Namespace:"builds", Name:"sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier", UID:"edd862c5-8768-430f-84c2-32db92a7e344", APIVersion:"tekton.dev/
+2026-11-02T19:41:09.402Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier is still running
+2026-11-02T19:41:09.457Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier is still running
+2026-11-02T19:41:09.489Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier is still running
+2026-11-02T19:41:09.501Z taskrun/taskrun.go:93 taskrun builds/sample-app-sync-902ce25fb547a6e0a02bb5985d76d86bac23098-publier is still running
+## hausse sur 40 min, par compteur
+  pipelinerun_sign_created : 0
+  pipelinerun_payload_stored : 0
+  pipelinerun_marked_signed : 1.0126582278481013
+  taskrun_sign_created : 0
+  taskrun_payload_stored : 0
+  taskrun_marked_signed : 3.037974683544304
+  pipelinerun_signing_failures : 0
+  taskrun_signing_failures : 0
+## alertes actives
+## notifications reçues depuis 19:40 UTC
+  OpenBaoScelle firing début 2026-11-02T19:41:37.032Z fin 0001-01-01T00:00:00Z
+  OpenBaoScelle resolved début 2026-11-02T19:41:37.032Z fin 2026-11-02T19:45:37.032Z
+## derniers passages des CronJobs
+  horodatage/horodatage-29894149 2026-11-02T19:49:00Z réussi=1 échoué=0
+  horodatage/horodatage-29894150 2026-11-02T19:50:00Z réussi=1 échoué=0
+  horodatage/horodatage-29894151 2026-11-02T19:51:00Z réussi=1 échoué=0
+  declencheurs/rattrapage-29894149 2026-11-02T19:49:00Z réussi=1 échoué=0
+  declencheurs/rattrapage-29894150 2026-11-02T19:50:00Z réussi=1 échoué=0
+  declencheurs/rattrapage-29894151 2026-11-02T19:51:00Z réussi=1 échoué=0

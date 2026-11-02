@@ -28,3 +28,14 @@ Délais communs : collecte toutes les 30 s, évaluation toutes les 30 s, `group_
    - **Résolution au moins 10 min après le dernier échec** (fenêtre de `increase`), puis `resolved`.
    - Le journal de la 08 est copié dans `o4-a2-preuves-decision3.log`, puis rendu à sa version versionnée. Le `chrono.tsv` de la 08 reçoit deux lignes datées d'O4.
 7. **Durée totale** : environ 50 min. Le détail : `regles deployer fichiers` 2 min, A3 4 min, A4 9 min, A6 4 min, A5 13 min, A1 7 à 12 min, A2 14 min.
+
+## A2, second choix : build pendant le scellement (décision du propriétaire, « a, build pendant scellé » ; écrit le 2026-11-02T19:40:03Z, avant l'exécution)
+
+Étape `a2` réécrite. Le signataire de Chains est `kms` (`hashivault://chains`, OpenBao, connexion OIDC par le rôle `tekton-chains`), relu dans `chains-config`.
+
+8. **Le build réussit malgré le scellement** : ni l'admission ni les tâches n'appellent OpenBao. `IMAGE_DIGEST` = `3a7ca1b1…`, comme S5 et le build de 18:38.
+9. **Chains échoue sur les quatre objets** (PipelineRun et trois TaskRuns) : OpenBao répond 503, ou le Service n'a pas d'endpoint. Après ses reprises, environ 1 min d'après les 7 ou 8 tentatives de la décision 3, chaque objet finit en `signed=failed`, avant les 6 min de garde.
+10. **Compteurs** : hausse de `watcher_pipelinerun_signing_failures_total` et `watcher_taskrun_signing_failures_total` sous un `error_type` de signature, nommé `signing` d'après le nom, sans garantie. Une série neuve pour ce type, donc la branche « série apparue ».
+    - Prédiction faible : on ne sait pas si le compteur compte chaque tentative ou seulement l'échec final. Dans les deux cas, il augmente avant le descellement.
+11. **A2 `firing` pendant le scellement**, avec sa notification. Après le descellement, aucune reprise : `failed` est définitif. Après la purge des exécutions, A2 se résout au plus 10 min après le dernier échec, puis la notification `resolved` arrive.
+12. **A1 se déclenche aussi** (OpenBao scellé environ 4 à 7 min), puis se résout. Clé Transit inchangée ; les CronJobs reprennent.

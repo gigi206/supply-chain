@@ -23,7 +23,9 @@
 #   fichiers      fichiers.py servant aussi /etc/fichiers-metriques/*.prom (séries de test), service redémarré
 #   a1            OpenBao redémarré, donc scellé (état mesuré en O2), puis descellé (procédure de J3) ; clé Transit
 #                 inchangée ; reprise des CronJobs horodatage et rattrapage
-#   a2            mesure de la décision 3 de la 08 (PUT .att refusé, échec de type storage), qui remet Zot d'elle-même
+#   a2            build de la 01 (commit sur custom/s5 du fork) pendant qu'OpenBao est scellé : échec de signature réel de
+#                 Chains, puis descellement et purge des exécutions en échec (decision3 de la 08, premier choix, suppose le
+#                 gabarit d'essai de J6, basculé en J8 : premier passage archivé)
 #   a3, a4, a6    séries de test dans /etc/fichiers-metriques/essais-o4.prom, retour à la normale par la valeur, retirées
 #   a5            rafales de créations refusées par Kyverno (dry-run serveur) : 4 refus (sous le seuil), puis 10
 # Aucun secret en argument de commande : fichiers 0600 ou entrée standard.
@@ -442,24 +444,81 @@ etape_a1() {
   echo "TSA : $(kubectl get deployment -n tsa timestamp-authority -o jsonpath='{.status.readyReplicas}/{.spec.replicas}') prêt(s)"
 }
 
-etape_a2() { # le journal de la 08 est copié ici, puis rendu à sa version versionnée (preuve de la 08 inchangée)
-  local t0 r=0 j=$here/../08-trust-plane/resultats/preuves-decision3.log
+FORGEJO_HOTE=https://192.168.161.13:3000
+FORK_S5=workspace/sample-app-sync   # fork de la brique 01, branche custom/s5 : build par le webhook du fork (D2 b de la 01)
+
+objets_chains() { # PipelineRun : « type/nom signed=… retries=… » pour lui et ses TaskRuns
+  { kubectl get pipelinerun -n builds "$1" -o json; kubectl get taskrun -n builds -l "tekton.dev/pipelineRun=$1" -o json | jq '.items[]'; } \
+    | jq -r '"\(.kind)/\(.metadata.name) signed=\(.metadata.annotations["chains.tekton.dev/signed"] // "absente") retries=\(.metadata.annotations["chains.tekton.dev/retries"] // "-")"'
+}
+
+etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao est scellé (incident prévu au protocole)
+  local t0 t1 c c1 c2 pr st fin
   debut ChainsEchecSignature
   echo "## compteurs d'échec avant"
   requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  c1=$(cle_chains_empreinte)
+  echo "clé Transit chains avant : $c1…"
+  trap desceller_o4 EXIT   # OpenBao jamais laissé scellé, même en cas d'échec
   t0=$(date +%s)
-  echo "$(date -u +%H:%M:%S) incident : preuves.sh decision3 (08)"
-  "$here/../08-trust-plane/preuves.sh" decision3 > /dev/null 2>&1 || r=$?
-  cp "$j" "$R19/o4-a2-preuves-decision3.log"
-  git -C "$repo" checkout -- poc/bricks/08-trust-plane/resultats/preuves-decision3.log
-  echo "fichiers de la 08 modifiés après la mesure (seul chrono.tsv attendu) :"
-  git -C "$repo" status --short poc/bricks/08-trust-plane | sed 's/^/  /'
-  grep -E '^(OK|KO) ' "$R19/o4-a2-preuves-decision3.log" | sed 's/^/  08 : /'
-  [ "$r" = 0 ] || { echo "KO   decision3 : code $r" >&2; exit 1; }
-  declenchee ChainsEchecSignature "$t0" 300
-  echo "## compteurs d'échec après"
+  echo "$(date -u +%H:%M:%S) scellement : suppression du pod openbao-0"
+  kubectl delete pod -n openbao openbao-0 --wait=true >/dev/null
+  for _ in $(seq 90); do
+    st=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true)
+    [ "$(jq -r .sealed <<<"$st" 2>/dev/null)" = true ] && break
+    sleep 2
+  done
+  [ "$(jq -r .sealed <<<"$st")" = true ] && echo "$(date -u +%H:%M:%S) OpenBao scellé" || { echo "KO   OpenBao pas scellé" >&2; exit 1; }
+  echo "## build : commit poussé sur custom/s5 du fork par poc-dev"
+  rm -rf "$W/o4-w"
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git clone -q "$FORGEJO_HOTE/$FORK_S5.git" "$W/o4-w"
+  git -C "$W/o4-w" checkout -q origin/custom/s5   # branche protégée contre le force-push : avance rapide
+  git -C "$W/o4-w" -c user.name="PoC brique 19" -c user.email=poc-dev@poc.test -c commit.gpgsign=false commit -q --allow-empty -m "brique 19, O4 : A2"
+  c=$(git -C "$W/o4-w" rev-parse HEAD)
+  # En-tête du jeton dans l'environnement de git, limité à l'URL du fork (jamais en argument), comme declencheur.sh de la 01.
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    GIT_CONFIG_KEY_1="http.$FORGEJO_HOTE/$FORK_S5.git.extraHeader" GIT_CONFIG_VALUE_1="Authorization: token $(cat "$S/forgejo-poc-dev.token")" \
+    git -C "$W/o4-w" push -q "$FORGEJO_HOTE/$FORK_S5.git" HEAD:refs/heads/custom/s5
+  rm -rf "$W/o4-w"
+  pr=sample-app-sync-$c
+  echo "$(date -u +%H:%M:%S) commit ${c:0:12} poussé"
+  for _ in $(seq 60); do kubectl get pipelinerun -n builds "$pr" >/dev/null 2>&1 && break; sleep 2; done
+  kubectl get pipelinerun -n builds "$pr" >/dev/null 2>&1 && echo "OK   PipelineRun $pr créé" || { echo "KO   aucun PipelineRun $pr" >&2; exit 1; }
+  kubectl wait -n builds --for=condition=Succeeded "pipelinerun/$pr" --timeout=600s >/dev/null \
+    || { kubectl get pipelinerun -n builds "$pr" -o json | jq -c '.status.conditions' >&2; exit 1; }
+  echo "$(date -u +%H:%M:%S) build réussi : $(kubectl get pipelinerun -n builds "$pr" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')"
+  echo "## Chains pendant le scellement (OpenBao gardé scellé jusqu'à l'issue de chaque objet, au plus 6 min)"
+  fin=$((SECONDS + 360))
+  while [ $SECONDS -lt $fin ]; do
+    objets_chains "$pr" | grep -q 'signed=absente' || break
+    sleep 5
+  done
+  objets_chains "$pr" | sed "s/^/  $(date -u +%H:%M:%S) /"
+  attendre ChainsEchecSignature "firing|active" 240 || true   # issue relevée ; notification attendue plus bas
+  echo "## compteurs d'échec pendant le scellement"
   requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  echo "## journal du contrôleur de Chains depuis le scellement (erreurs de signature, 10 premières)"
+  kubectl logs -n tekton-chains deploy/tekton-chains-controller --since-time="$(date -u -d "@$t0" +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null \
+    | grep -iE 'error|fail' | cut -c1-300 | head -10 | sed 's/^/  /' || true
+  t1=$(date +%s)
+  echo "$(date -u +%H:%M:%S) descellement"
+  desceller_o4
+  trap - EXIT
+  c2=$(cle_chains_empreinte)
+  [ "$c1" = "$c2" ] && echo "OK   clé Transit chains inchangée ($c2…)" || { echo "KO   clé Transit chains : $c1… puis $c2…" >&2; exit 1; }
+  sleep 30
+  echo "## objets après le descellement (une reprise de Chains serait visible ici)"
+  objets_chains "$pr" | sed 's/^/  /'
+  purger_pr "$pr"
+  echo "exécutions $pr purgées (référence de la 08 gardée)"
+  attendre_recue ChainsEchecSignature "$t0" firing 120 || exit 1
   resolue ChainsEchecSignature "$t0" 900
+  echo "## compteurs d'échec à la fin"
+  requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  echo "OpenBaoScelle (déclenchée aussi pendant le scellement) : $(etat_alerte OpenBaoScelle) ; notifications : $(recues OpenBaoScelle "$t0" firing | grep -c . || true) firing, $(recues OpenBaoScelle "$t0" resolved | grep -c . || true) resolved"
+  passage_reussi horodatage horodatage "$t1"
+  passage_reussi declencheurs rattrapage "$t1"
 }
 
 etapes=("$@")

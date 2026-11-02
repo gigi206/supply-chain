@@ -274,3 +274,18 @@ Prédictions : [`o4-predictions.md`](resultats/o4-predictions.md). Étapes de [`
 - pendant A4, un build de `sample-app-sync` lancé par erreur depuis la brique 01 (voir son README) : réussi et signé, même digest que l'image de S5, sans effet sur les alertes.
 
 **O4 : seuil de la brique non atteint** (A2 non éprouvée). Décision à prendre pour A2.
+
+### A2, deuxième passage : build pendant le scellement (02/11/2026, 19:40 à 19:47 UTC, décision du propriétaire « a, build pendant scellé »)
+
+Prédictions 8 à 12 ([`o4-predictions.md`](resultats/o4-predictions.md), 19:40:03Z). Journal : [`o4-a2-deuxieme-passage.log`](resultats/o4-a2-deuxieme-passage.log) ; relevé de Chains après coup : [`o4-a2-chains-releve.log`](resultats/o4-a2-chains-releve.log).
+
+- **Déroulé** : OpenBao scellé à 19:40:20 (pod supprimé) ; commit `902ce252…` poussé sur `custom/s5` du fork par `poc-dev` ; build réussi à 19:41:14, même digest `3a7ca1b1…` (prédiction 8 conforme) ; OpenBao gardé scellé jusqu'à 19:45:15, puis descellé, clé Transit inchangée ; exécutions purgées.
+- **Prédictions 9 à 11 fausses : Chains ne signe rien, ne compte aucun échec, et marque les quatre objets `signed=true`.**
+  - Journal du contrôleur : « error configuring kms signer … connection refused » (`signing.go:82`, niveau `warn`), puis « No signer kms configured for tekton / oci / tekton-pipeline-run » (`signing.go:175`, `warn`).
+  - Compteurs sur 40 min : `marked_signed` +1 (PipelineRun) et +3 (TaskRuns) ; `sign_created`, `payload_stored` et `signing_failures` : 0.
+  - **Constat de sécurité (Chains v0.29.9, mesuré)** : quand le signataire KMS ne peut pas être configuré, Chains **échoue en ouvert** : les objets sont marqués signés sans aucune signature ni attestation, et aucun compteur d'échec ne bouge. A2, écrite sur `signing_failures`, ne peut pas voir cette panne.
+  - Non vérifié, car les exécutions ont été purgées avant le contrôle : ce qu'en dirait le contrôle exécutions/enveloppes de la 08, et la porte pour une image **neuve** (ici, le digest avait déjà des attestations d'un build identique, donc la porte l'admettrait).
+- **Prédiction 12 conforme** : A1 déclenchée (19:41:37) puis résolue (19:45:37), notifications reçues ; passages d'`horodatage` et de `rattrapage` réussis après le descellement (relevé de 19:50).
+- **Défaut de l'étape** : elle n'a pas attendu la résolution de A1 ni relevé les CronJobs, car elle s'est arrêtée en KO sur la notification de A2 (relevé fait à part).
+
+**A2 reste non éprouvée ; seuil de la brique non atteint.** Décisions à prendre (voir la conversation du 02/11/2026).
