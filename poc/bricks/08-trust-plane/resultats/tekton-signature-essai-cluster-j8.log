@@ -1,0 +1,2 @@
+# tekton.sh signature, 2026-11-01T23:44:24Z
+Error from server: error when creating "STDIN": admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" denied the request: Policy tekton-references failed: test 2 : spec en ligne interdite (taskSpec, pipelineSpec)

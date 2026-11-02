@@ -9,7 +9,9 @@
 #   installer  manifestes réécrits vers Zot (aucune référence externe tirée), contrôleurs en zone confiance (kustomize) ;
 #              Chains : KMS hashivault://chains (OpenBao, JWT avec un jeton projeté d'audience openbao), slsa/v2alpha4,
 #              stockage OCI en dsse, sans transparence publique ; contrôle : toutes les images tirées viennent de Zot ;
-#              contrôleurs de Pipelines et de Chains bornés à builds (tekton/controleurs-builds.yaml, ajouté en J8)
+#              contrôleurs de Pipelines et de Chains bornés à builds (J8) : droits de locataire dans builds seulement
+#              (tekton/{pipeline,chains}/lecture-builds.yaml, liaisons de tout le cluster retirées), drapeaux de namespace,
+#              règle d'admission en seconde barrière (tekton/controleurs-builds.yaml)
 #   signature  essai de la chaîne de signature : TaskRun sur sc-build qui ne fait que publier IMAGE_URL/IMAGE_DIGEST d'une
 #              image poussée depuis l'hôte ; Chains signe via OpenBao, pousse .sig et .att dans Zot ; vérification cosign
 #              avec la clé publique de Transit. Ce n'est pas un build : la provenance décrit une image non construite
@@ -147,6 +149,20 @@ etape_installer() {
   for c in pipeline triggers interceptors chains; do
     echo "$c : $(grep -c '^kind:' "$T/$c/rendu.yaml") objets, sha256 $(sha256sum < "$T/$c/rendu.yaml" | cut -c1-16)…"
   done
+  # Contrôleurs de Pipelines et de Chains bornés à builds (J8, décision du propriétaire du 01/11/2026) : liaisons de locataire
+  # de tout le cluster retirées du rendu, remplacées par des RoleBindings dans builds ; drapeaux de namespace.
+  for c in pipeline chains; do
+    jq -e --arg c "tekton-$([ $c = pipeline ] && echo pipelines || echo chains)-controller-tenant-access" -s \
+      '[.[] | select(.kind == "ClusterRoleBinding" and .metadata.name == $c)] | length == 0' <(yq -o json "$T/$c/rendu.yaml") >/dev/null \
+      || { echo "KO   liaison de tout le cluster encore dans le rendu de $c" >&2; exit 1; }
+  done
+  yq -o json "$T/pipeline/rendu.yaml" | jq -e -s '[.[] | select(.kind == "Deployment" and .metadata.name == "tekton-pipelines-controller")
+    | .spec.template.spec.containers[0].args[-1]] == ["-namespace=builds"]' >/dev/null \
+    && yq -o json "$T/chains/rendu.yaml" | jq -e -s '[.[] | select(.kind == "Deployment" and .metadata.name == "tekton-chains-controller")
+    | .spec.template.spec.containers[0].args] == [["--namespace=builds"]]' >/dev/null \
+    && echo "OK   rendu : -namespace=builds (Pipelines), --namespace=builds (Chains), liaisons *-tenant-access de tout le cluster absentes" \
+    || { echo "KO   drapeaux de namespace absents du rendu" >&2; exit 1; }
+  kubectl apply --server-side -f "$here/tekton/builds.yaml" >/dev/null   # espace des RoleBindings, avant les contrôleurs
   kubectl create configmap ca-poc -n tekton-chains --from-file=ca.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   kubectl apply --server-side --force-conflicts -f "$T/pipeline/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
@@ -160,6 +176,14 @@ etape_installer() {
   kubectl apply --server-side --force-conflicts -f "$T/chains/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
   kubectl wait --for=condition=Available deployment --all -n tekton-chains --timeout=300s
+  # L'apply côté serveur n'élague pas : liaisons de tout le cluster supprimées d'une installation antérieure.
+  kubectl delete clusterrolebinding tekton-pipelines-controller-tenant-access tekton-chains-controller-tenant-access --ignore-not-found
+  for c in tekton-pipelines-controller-tenant-access tekton-chains-controller-tenant-access; do
+    [[ "$(kubectl get clusterrolebinding "$c" 2>&1 || true)" == *NotFound* ]] || { echo "KO   ClusterRoleBinding $c présente" >&2; exit 1; }
+  done
+  echo "OK   ClusterRoleBindings *-tenant-access introuvables (NotFound) ; RoleBindings dans builds :"
+  kubectl get rolebinding -n builds tekton-pipelines-controller-tenant-access tekton-chains-controller-tenant-access --no-headers \
+    | awk '{print "  " $1, $2}'
   # Contrôleurs de Pipelines et de Chains bornés à builds pour pods, StatefulSets et PVC (J8, décision du propriétaire du
   # 01/11/2026 ; mesure : preuves.sh controleurs)
   kubectl apply --server-side -f "$here/tekton/controleurs-builds.yaml" >/dev/null

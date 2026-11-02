@@ -1,0 +1,27 @@
+[confiance:construction] $ poc/bricks/08-trust-plane/construction.sh construire provenance
+# construction.sh construire, 2026-11-01T23:45:43Z
+## prédiction (après buildkit.sh sans_reseau : image 3a7ca1b1 sans réseau, image de build en layout OCI)
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les trois tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  preparer : pod runc ; arbre 30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture, web/dist et image de build en layout OCI tirés dans le workspace
+  construire : pod Kata sur sc-build, label tekton.dev/task=construire-image (sélectionné par construction-sans-sortie),
+    QEMU -smp 3 -m 6176M ; layout contrôlé (3 blobs) ; aucune sortie réseau ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; l'étape construire démarre
+    plusieurs secondes après le premier conteneur du pod (initialisation de Tekton), au-delà de la fenêtre de démarrage
+    mesurée (0,5 à 1,1 s, kata.sh reseau)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les trois TaskRuns et le PipelineRun
+label tekton.dev/task imposé à « autre » par le créateur (taskRunSpecs[construire].metadata) : le pod garde construire-image
+  (fixé par le contrôleur au nom de la tâche résolue, taskrun.go) ; un autre label du créateur y figure (témoin)
+ancienne pipeline (construire-image c7e8b275, qui tire ses entrées elle-même) : construire en échec à l'étape sources
+  (Forgejo injoignable : résolution refusée), publier jamais lancé, aucune écriture de poc-images
+même PipelineRun sans runtimeClassName : preparer réussi, construire refusé à la création du pod (Pod Security restricted :
+  privileged), publier jamais lancé, aucune écriture de poc-images
+## politique
+NetworkPolicy de builds : construction-sans-sortie
+OK   politiques qui sélectionnent les pods de construire-image, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient) : 0
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+NAME                                        SUCCEEDED   REASON               STARTTIME   COMPLETIONTIME
+taskrun.tekton.dev/j7-sample-app-preparer   False       PodAdmissionFailed   5m12s       5m12s
+KO   pod construire absent
+[confiance:construction] ERROR task failed

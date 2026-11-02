@@ -1,8 +1,11 @@
 # Brique 08, J4 : Chains réécrit vers Zot (tekton.sh), sur le nœud de confiance, signataire KMS OpenBao (chains/).
+# J8 : réconciliation filtrée sur builds (--namespace : filtre des événements, pas des informers) ; droits de locataire
+# dans builds seulement (lecture-builds.yaml), seule borne effective des lectures.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - release.yaml
+- lecture-builds.yaml
 patches:
 - target:
     kind: Deployment
@@ -11,5 +14,13 @@ patches:
       path: /spec/template/spec/nodeSelector
       value:
         zone: confiance
+- target:
+    kind: Deployment
+    name: tekton-chains-controller
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/args
+      value: [--namespace=builds]
+- path: tenant-access-supprime.yaml
 - path: deployment.yaml
 - path: chains-config.yaml

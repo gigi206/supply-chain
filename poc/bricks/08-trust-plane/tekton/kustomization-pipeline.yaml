@@ -1,8 +1,10 @@
 # Brique 08, J4 : release.yaml réécrit vers Zot (tekton.sh), contrôleurs et webhooks sur le nœud de confiance.
+# J8 : contrôleur borné à builds (informers : -namespace ; droits de locataire : lecture-builds.yaml).
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - release.yaml
+- lecture-builds.yaml
 patches:
 - target:
     kind: Deployment
@@ -11,6 +13,14 @@ patches:
       path: /spec/template/spec/nodeSelector
       value:
         zone: confiance
+- target:
+    kind: Deployment
+    name: tekton-pipelines-controller
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: -namespace=builds
+- path: tenant-access-supprime.yaml
 - path: resolveurs.yaml
 configMapGenerator:
 - name: ca-poc

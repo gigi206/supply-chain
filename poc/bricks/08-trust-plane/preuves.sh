@@ -81,13 +81,16 @@
 #          Pouvoirs des comptes de kube-system (can-i) et pod portant clusterrole-aggregation-controller, au nom des contrôleurs de
 #          Tekton et de Chains (dry-run serveur). Mesure sous le HelmChart de k3s : preuves-helm_cilium-helmchart.log (étape d'alors
 #          au commit 661a826). Trace : can-i,
-#          refus et admissions de l'API. Depuis la règle tekton-controleurs-builds : pods des deux contrôleurs refusés par elle
-#   controleurs  contrôleurs de Pipelines et de Chains bornés à builds (décision du propriétaire du 01/11/2026,
-#          tekton/controleurs-builds.yaml, ValidatingAdmissionPolicy posée par tekton.sh installer) : essais réels refusés au nom
-#          des deux (pod portant clusterrole-aggregation-controller, StatefulSet, PVC et annotation de pod dans kube-system,
-#          changement d'image en dry-run, StatefulSet openbao, pod portant tekton-chains-controller) ; témoins : administrateur,
-#          autres créateurs de pods de kube-system, pods de builds créés par le contrôleur depuis la règle ; règle hors de leur
-#          portée (can-i) ; lecture des Secrets de tout le cluster (reste ouverte). Trace : refus et audit de l'API
+#          refus et admissions de l'API. Depuis le 02/11/2026 : les deux contrôleurs ne créent plus de pods dans kube-system
+#          (droits bornés à builds), pod portant clusterrole-aggregation-controller refusé par les droits
+#   controleurs  contrôleurs de Pipelines et de Chains bornés à builds (décisions du propriétaire du 01/11/2026) : droits de
+#          locataire dans builds seulement (liaisons de tout le cluster retirées), drapeaux de namespace ; essais réels refusés
+#          par les droits au nom des deux (pod portant clusterrole-aggregation-controller, StatefulSet, PVC, annotation et image
+#          de pod dans kube-system, StatefulSet openbao, pod de tekton-chains ; lectures de Secrets hors de builds) ; règle
+#          tekton/controleurs-builds.yaml en seconde barrière, mesurée dans un espace d'essai (liaison temporaire) ; témoins :
+#          administrateur, autres créateurs de pods de kube-system, pods de builds créés par le contrôleur depuis la règle ;
+#          règle hors de leur portée (can-i) ; lectures de Secrets de ces deux comptes dans l'audit de l'API (toutes dans
+#          builds), journaux sans refus des droits ; recensement des lecteurs de Secrets de kube-system. Trace : refus, audit
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2255,6 +2258,9 @@ etape_helm_cilium() {
   echo "  Tekton et de Chains, pod à helm-cilium toujours refusé comme introuvable (contrôle du compte avant la validation) et"
   echo "  témoin default refusé par la règle ; pod portant clusterrole-aggregation-controller refusé par la règle au nom des deux"
   echo "  contrôleurs, admis au nom de l'administrateur (témoin) : chemin de ces contrôleurs vers cluster-admin fermé"
+  echo "Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire des deux contrôleurs bornés à builds) : ils ne"
+  echo "  sont plus parmi les comptes qui peuvent créer des pods dans kube-system (7 au lieu de 9) ; le pod portant"
+  echo "  clusterrole-aggregation-controller leur est refusé par les droits (RBAC), avant la règle ; témoin administrateur admis"
 
   echo "## liaisons vers cluster-admin"
   kubectl get clusterrolebinding,rolebinding -A -o json > "$T/hc-liaisons.json"
@@ -2283,7 +2289,8 @@ etape_helm_cilium() {
     u=system:serviceaccount:$ns:$sa
     [ "$(kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true)" = yes ] && echo "$u" >> "$T/hc-createurs"
   done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
-  echo "comptes de service qui peuvent créer des pods dans kube-system : $(wc -l < "$T/hc-createurs")"
+  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system (7 depuis le 02/11/2026)" "$(wc -l < "$T/hc-createurs")" 7
+  ba_attendu "contrôleurs de Pipelines et de Chains parmi eux" "$(grep -cxE "$CONTROLEUR|$CHAINS" "$T/hc-createurs" || true)" 0
   kubectl get clusterrole -o json > "$T/hc-crs.json"
   while read -r u; do   # liaisons d'ensemble du cluster qui donnent create sur pods (rôles des release.yaml amont pour Tekton et Chains)
     echo "  $u : $(jq -r --arg u "$u" --slurpfile r "$T/hc-crs.json" '[.items[] | select(.kind == "ClusterRoleBinding") | select(any(.subjects[]?; (.kind == "ServiceAccount"
@@ -2347,8 +2354,8 @@ LISTE
   for u in "$CONTROLEUR" "$CHAINS"; do
     if kubectl create --as "$u" --dry-run=server -f "$T/hc-pod-crac.json" > "$T/creation.out" 2>&1; then
       echo "KO   $u : pod portant clusterrole-aggregation-controller admis (dry-run serveur) : chemin vers cluster-admin ouvert" >&2; k=1
-    elif grep -q "$REGLE_CTRL" "$T/creation.out"; then
-      echo "OK   $u : pod portant clusterrole-aggregation-controller refusé par $REGLE_CTRL (dry-run serveur)"
+    elif grep -qE "$RBAC_REFUS" "$T/creation.out"; then
+      echo "OK   $u : pod portant clusterrole-aggregation-controller refusé par les droits, avant la règle (dry-run serveur)"
     else
       echo "KO   $u : refusé pour un autre motif ($(tr '\n' ' ' < "$T/creation.out" | cut -c1-200))" >&2; k=1
     fi
@@ -2358,12 +2365,15 @@ LISTE
   [ "$k" = 0 ] || { echo "KO   helm_cilium : mesure contraire à la prédiction" >&2; exit 1; }
 }
 
-ct_refus() { # libellé commande… : la commande (au nom d'un contrôleur) doit échouer, refusée par la règle
-  local l=$1
-  shift
+RBAC_REFUS='is forbidden: User "system:serviceaccount:[^"]*" cannot '   # refus par les droits (avant toute admission)
+REGLE_REFUS="ValidatingAdmissionPolicy '$REGLE_CTRL'"
+
+ct_refus() { # motif libellé commande… : la commande (au nom d'un contrôleur) doit échouer, refusée pour ce motif (ERE)
+  local m=$1 l=$2
+  shift 2
   if "$@" > "$T/creation.out" 2>&1; then
     echo "KO   $l : admis" >&2; return 1
-  elif grep -q "ValidatingAdmissionPolicy '$REGLE_CTRL'" "$T/creation.out"; then
+  elif grep -qE "$m" "$T/creation.out"; then
     echo "OK   $l : refusé ($(tr '\n' ' ' < "$T/creation.out" | sed 's/^Error from server ([A-Za-z]*): //; s/^error when creating "[^"]*": //' | cut -c1-190))"
   else
     echo "KO   $l : refusé pour un autre motif ($(tr '\n' ' ' < "$T/creation.out" | cut -c1-200))" >&2; return 1
@@ -2371,18 +2381,27 @@ ct_refus() { # libellé commande… : la commande (au nom d'un contrôleur) doit
 }
 
 etape_controleurs() {
-  local k=0 u n p img t0 lp
+  local k=0 u n p img t0 lp c ns sa
   echo "Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :"
   echo "- ValidatingAdmissionPolicy $REGLE_CTRL et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)"
-  echo "- au nom de chacun des deux contrôleurs (Pipelines, Chains), essais réels refusés par la règle, rien de créé ni de modifié :"
-  echo "  pod de kube-system portant clusterrole-aggregation-controller ; StatefulSet de kube-system ; PVC de kube-system ;"
-  echo "  annotation d'un pod existant de kube-system ; annotation du StatefulSet openbao ; pod portant tekton-chains-controller"
-  echo "  dans tekton-chains ; plus le changement d'image d'un pod de kube-system (dry-run serveur), refusé"
-  echo "- témoins : même pod et même StatefulSet admis au nom de l'administrateur (dry-run serveur) ; pod default admis au nom de"
-  echo "  chaque autre compte qui peut créer des pods dans kube-system (dry-run serveur) ; pods créés dans builds par le contrôleur"
-  echo "  de Pipelines depuis la pose de la règle (audit) : au moins un, aucun refusé par elle"
   echo "- aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)"
-  echo "- reste ouvert (information, hors admission) : lecture des Secrets de tout le cluster par les deux contrôleurs"
+  echo "Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire bornés à builds, décision du propriétaire du"
+  echo "01/11/2026) ; elle remplace les lignes « refusé par la règle » et « reste ouvert : lecture des Secrets » du 01/11/2026 :"
+  echo "- ClusterRoleBindings *-tenant-access introuvables ; RoleBindings du même nom dans builds ; Chains lit les ConfigMaps de"
+  echo "  tekton-chains par un Role ; contrôleur de Pipelines lancé avec -namespace=builds, Chains avec --namespace=builds"
+  echo "- au nom de chacun des deux contrôleurs, essais réels refusés par les droits (RBAC, avant l'admission), rien de créé ni de"
+  echo "  modifié : mêmes essais que le 01/11/2026 (pod portant clusterrole-aggregation-controller, StatefulSet, PVC, annotation"
+  echo "  et image d'un pod de kube-system ; annotation du StatefulSet openbao ; pod de tekton-chains) ; lectures de Secrets"
+  echo "  hors de builds refusées (k3s-serving de kube-system, Secrets d'openbao, zot-chains de tekton-chains) ; can-i list"
+  echo "  secrets : no dans tout le cluster, yes dans builds"
+  echo "- règle en seconde barrière : dans un espace d'essai où une liaison temporaire leur rend les droits de locataire, pod"
+  echo "  refusé par la règle au nom des deux contrôleurs ; liaison et espace supprimés ensuite"
+  echo "- audit de l'API (lectures de Secrets de ces deux comptes journalisées depuis l'installation de k3s) : toutes dans builds,"
+  echo "  aucun refus (403) ; journaux des deux contrôleurs : aucun refus des droits, aucun redémarrage"
+  echo "- témoins inchangés : administrateur admis ; pod default admis au nom des autres créateurs de pods de kube-system (7) ;"
+  echo "  pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle : au moins un, aucun refusé"
+  echo "- information : comptes de service qui peuvent lire les Secrets de kube-system ou de tout le cluster (les deux contrôleurs"
+  echo "  n'y sont plus)"
 
   echo "## règle"
   ba_attendu "ValidatingAdmissionPolicy $REGLE_CTRL (failurePolicy, à jour, avertissements de typage)" \
@@ -2394,6 +2413,24 @@ etape_controleurs() {
     ba_attendu "${u##*:} : create, update, patch, delete sur la règle et sa liaison" "$(for v in create update patch delete; do
       for r in validatingadmissionpolicies validatingadmissionpolicybindings; do kubectl auth can-i "$v" "$r.admissionregistration.k8s.io" --as "$u" 2>/dev/null || true; done
     done | sort -u | paste -sd,)" no
+  done
+
+  echo "## droits"
+  for c in tekton-pipelines-controller-tenant-access tekton-chains-controller-tenant-access; do
+    ba_attendu "ClusterRoleBinding $c introuvable (NotFound)" "$(kubectl get clusterrolebinding "$c" 2>&1 | grep -c NotFound || true)" 1
+    ba_attendu "RoleBinding builds/$c → ClusterRole" "$(kubectl get rolebinding -n builds "$c" -o jsonpath='{.roleRef.kind}/{.roleRef.name}')" "ClusterRole/$c"
+  done
+  ba_attendu "Role tekton-chains/tekton-chains-controller-config (ConfigMaps)" \
+    "$(kubectl get role -n tekton-chains tekton-chains-controller-config -o json | jq -c '[.rules[] | "\(.resources | join(",")):\(.verbs | join(","))"]')" '["configmaps:get,list,watch"]'
+  ba_attendu "argument de namespace du contrôleur de Pipelines" \
+    "$(kubectl get deploy -n tekton-pipelines tekton-pipelines-controller -o json | jq -r '.spec.template.spec.containers[0].args | map(select(startswith("-namespace"))) | join(",")')" "-namespace=builds"
+  ba_attendu "arguments de Chains" "$(kubectl get deploy -n tekton-chains tekton-chains-controller -o json | jq -r '.spec.template.spec.containers[0].args | join(",")')" "--namespace=builds"
+  for u in "$CONTROLEUR" "$CHAINS"; do
+    n=${u##*:}
+    ba_attendu "$n : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds)" "$( {
+      kubectl auth can-i list secrets -A --as "$u" 2>/dev/null || true; kubectl auth can-i list secrets -n builds --as "$u" 2>/dev/null || true
+      kubectl auth can-i list secrets -n kube-system --as "$u" 2>/dev/null || true; kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true
+      kubectl auth can-i create pods -n builds --as "$u" 2>/dev/null || true; } | paste -sd,)" "no,yes,no,no,yes"
   done
 
   echo "## essais réels au nom des contrôleurs"
@@ -2410,33 +2447,57 @@ etape_controleurs() {
   echo "pod existant visé : kube-system/$lp (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao"
   for u in "$CONTROLEUR" "$CHAINS"; do
     n=${u##*:}
-    ct_refus "$n : pod de kube-system portant clusterrole-aggregation-controller" kubectl create --as "$u" -f "$T/ct-pod-ks.json" || k=1
-    ct_refus "$n : StatefulSet de kube-system" kubectl create --as "$u" -f "$T/ct-sts.json" || k=1
-    ct_refus "$n : PVC de kube-system" kubectl create --as "$u" -f "$T/ct-pvc.json" || k=1
-    ct_refus "$n : annotation du pod $lp" kubectl annotate --as "$u" pod -n kube-system "$lp" preuve-controleurs=1 || k=1
-    ct_refus "$n : image du pod $lp remplacée (dry-run serveur)" kubectl patch --as "$u" pod -n kube-system "$lp" --dry-run=server \
+    ct_refus "$RBAC_REFUS" "$n : pod de kube-system portant clusterrole-aggregation-controller" kubectl create --as "$u" -f "$T/ct-pod-ks.json" || k=1
+    ct_refus "$RBAC_REFUS" "$n : StatefulSet de kube-system" kubectl create --as "$u" -f "$T/ct-sts.json" || k=1
+    ct_refus "$RBAC_REFUS" "$n : PVC de kube-system" kubectl create --as "$u" -f "$T/ct-pvc.json" || k=1
+    ct_refus "$RBAC_REFUS" "$n : annotation du pod $lp" kubectl annotate --as "$u" pod -n kube-system "$lp" preuve-controleurs=1 || k=1
+    ct_refus "$RBAC_REFUS" "$n : image du pod $lp remplacée (dry-run serveur)" kubectl patch --as "$u" pod -n kube-system "$lp" --dry-run=server \
       --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/containers/0/image\",\"value\":\"$img\"}]" || k=1
-    ct_refus "$n : annotation du StatefulSet openbao" kubectl annotate --as "$u" statefulset -n openbao openbao preuve-controleurs=1 || k=1
-    ct_refus "$n : pod de tekton-chains portant tekton-chains-controller" kubectl create --as "$u" -f "$T/ct-pod-chains.json" || k=1
+    ct_refus "$RBAC_REFUS" "$n : annotation du StatefulSet openbao" kubectl annotate --as "$u" statefulset -n openbao openbao preuve-controleurs=1 || k=1
+    ct_refus "$RBAC_REFUS" "$n : pod de tekton-chains portant tekton-chains-controller" kubectl create --as "$u" -f "$T/ct-pod-chains.json" || k=1
+    ct_refus "$RBAC_REFUS" "$n : lecture du Secret kube-system/k3s-serving" kubectl get secret -n kube-system k3s-serving --as "$u" -o name || k=1
+    ct_refus "$RBAC_REFUS" "$n : liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$u" -o name || k=1
+    ct_refus "$RBAC_REFUS" "$n : lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$u" -o name || k=1
   done
   ba_attendu "objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains)" "$( {
     kubectl get pod,statefulset,pvc -n kube-system -o name; kubectl get pod -n tekton-chains -o name; } | grep -c '/preuve-controleurs$' || true)" 0
   ba_attendu "annotations preuve-controleurs posées" "$( {
     kubectl get pod -n kube-system "$lp" -o json; kubectl get statefulset -n openbao openbao -o json; } | jq -s '[.[].metadata.annotations // {} | has("preuve-controleurs")] | map(select(.)) | length')" 0
 
+  echo "## règle en seconde barrière : espace d'essai preuve-controleurs, droits de locataire rendus par une liaison temporaire"
+  kubectl create namespace preuve-controleurs >/dev/null
+  attendre_sa preuve-controleurs
+  for c in tekton-pipelines:tekton-pipelines-controller tekton-chains:tekton-chains-controller; do
+    kubectl create rolebinding -n preuve-controleurs "${c#*:}" --clusterrole="${c#*:}-tenant-access" --serviceaccount="$c" >/dev/null
+  done
+  hc_pod default "$T/ct-pod-default.json"
+  jq '.metadata = {name: "preuve-controleurs", namespace: "preuve-controleurs"}' "$T/ct-pod-default.json" > "$T/ct-pod-essai.json"
+  for u in "$CONTROLEUR" "$CHAINS"; do
+    ba_attendu "${u##*:} : can-i create pods dans preuve-controleurs (liaison temporaire)" "$(kubectl auth can-i create pods -n preuve-controleurs --as "$u" 2>/dev/null || true)" yes
+    ct_refus "$REGLE_REFUS" "${u##*:} : pod de preuve-controleurs" kubectl create --as "$u" -f "$T/ct-pod-essai.json" || k=1
+  done
+  kubectl create --dry-run=server -f "$T/ct-pod-essai.json" >/dev/null 2>&1 && echo "OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)" \
+    || { echo "KO   témoin administrateur refusé dans preuve-controleurs" >&2; k=1; }
+  kubectl delete namespace preuve-controleurs --wait=true >/dev/null
+  ba_attendu "espace preuve-controleurs et ses liaisons temporaires introuvables (NotFound)" "$(kubectl get namespace preuve-controleurs 2>&1 | grep -c NotFound || true)" 1
+  for u in "$CONTROLEUR" "$CHAINS"; do
+    ba_attendu "${u##*:} : can-i create pods dans preuve-controleurs (après suppression)" "$(kubectl auth can-i create pods -n preuve-controleurs --as "$u" 2>/dev/null || true)" no
+  done
+
   echo "## témoins"
   kubectl create --dry-run=server -f "$T/ct-pod-ks.json" >/dev/null 2>&1 && echo "OK   administrateur : même pod admis (dry-run serveur)" \
     || { echo "KO   administrateur : pod refusé" >&2; k=1; }
   kubectl create --dry-run=server -f "$T/ct-sts.json" >/dev/null 2>&1 && echo "OK   administrateur : même StatefulSet admis (dry-run serveur)" \
     || { echo "KO   administrateur : StatefulSet refusé" >&2; k=1; }
-  hc_pod default "$T/ct-pod-default.json"
+  n=0
   while IFS=: read -r ns sa; do
     u=system:serviceaccount:$ns:$sa
-    [ "$u" != "$CONTROLEUR" ] && [ "$u" != "$CHAINS" ] || continue
     [ "$(kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true)" = yes ] || continue
+    n=$((n + 1))
     kubectl create --as "$u" --dry-run=server -f "$T/ct-pod-default.json" >/dev/null 2>&1 && echo "OK   $sa : pod default de kube-system admis (dry-run serveur)" \
       || { echo "KO   $sa : pod default refusé" >&2; k=1; }
   done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
+  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system" "$n" 7
   audit_api "$REGLE_CTRL" > "$T/ct-refus-audit.json"
   echo "refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :"
   jq -r 'select(.stage == "ResponseComplete" and .responseStatus.code >= 400) | "  \(.objectRef.namespace) \((.impersonatedUser.username // .user.username) | split(":") | last) \(.verb) \(.objectRef.resource)"' "$T/ct-refus-audit.json" | sort | uniq -c
@@ -2447,12 +2508,31 @@ etape_controleurs() {
   [ "$n" -ge 1 ] && echo "OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : $n" \
     || { echo "KO   aucun pod créé dans builds par le contrôleur de Pipelines depuis la pose de la règle" >&2; k=1; }
 
-  echo "## reste ouvert : lecture des Secrets (hors admission)"
-  for u in "$CONTROLEUR" "$CHAINS"; do
-    echo "  ${u##*:} : list secrets dans tout le cluster : $(kubectl auth can-i list secrets -A --as "$u" 2>/dev/null || true)"
+  echo "## lectures de Secrets des deux contrôleurs dans l'audit de l'API (depuis l'installation de k3s ; sans --as)"
+  { audit_api tekton-pipelines-controller; audit_api tekton-chains-controller; } | jq -c 'select(.objectRef.resource == "secrets"
+    and .impersonatedUser == null and (.user.username | test("^system:serviceaccount:tekton-(pipelines:tekton-pipelines|chains:tekton-chains)-controller$")))' \
+    | sort -u > "$T/ct-secrets.json"
+  jq -r '"  \(.user.username | split(":") | last) \(.verb) \(.objectRef.namespace // "(tout le cluster)") \(.responseStatus.code) \(.stage)"' "$T/ct-secrets.json" | sort | uniq -c
+  ba_attendu "lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer)" \
+    "$(jq -s --arg u "$CONTROLEUR" '[.[] | select(.user.username == $u and .objectRef.namespace == "builds")] | length > 0' "$T/ct-secrets.json")" true
+  ba_attendu "lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre" \
+    "$(jq -s '[.[] | select(.objectRef.namespace != "builds" or .responseStatus.code == 403)] | length' "$T/ct-secrets.json")" 0
+  echo "## journaux des contrôleurs (depuis leur démarrage)"
+  for c in tekton-pipelines/tekton-pipelines-controller tekton-chains/tekton-chains-controller; do
+    ba_attendu "${c#*/} : redémarrages" "$(kubectl get pods -n "${c%/*}" -l "app=${c#*/}" -o jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}{"\n"}{end}' | sort -u | paste -sd,)" 0
+    ba_attendu "${c#*/} : refus des droits dans le journal" "$(kubectl logs -n "${c%/*}" "deploy/${c#*/}" | grep -c 'is forbidden: User' || true)" 0   # JSON : guillemets échappés
   done
-  echo "  Secrets du cluster (namespace/nom type), lisibles par les deux :"
-  kubectl get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name} {.type}{"\n"}{end}' | sed 's/^/    /'
+
+  echo "## information : comptes de service qui peuvent lister les Secrets de kube-system, et ceux de tout le cluster"
+  kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}' > "$T/ct-comptes"
+  while IFS=: read -r ns sa; do
+    u=system:serviceaccount:$ns:$sa
+    a=$(kubectl auth can-i list secrets -A --as "$u" 2>/dev/null || true)
+    b=$(kubectl auth can-i list secrets -n kube-system --as "$u" 2>/dev/null || true)
+    [ "$b" = yes ] && echo "  $ns:$sa (tout le cluster : $a)"
+  done < "$T/ct-comptes" | tee "$T/ct-lecteurs"
+  echo "$(wc -l < "$T/ct-comptes") comptes de service examinés, $(wc -l < "$T/ct-lecteurs") lecteurs des Secrets de kube-system"
+  ba_attendu "contrôleurs de Pipelines et de Chains parmi eux" "$(grep -cE 'tekton-(pipelines|chains)-controller ' "$T/ct-lecteurs" || true)" 0
   [ "$k" = 0 ] || { echo "KO   controleurs : mesure contraire à la prédiction" >&2; exit 1; }
 }
 

@@ -1,8 +1,9 @@
 # Brique 08, J6 : horodatage automatique par réconciliation périodique (politique.sh horodatage). Chaque minute, un job
 # parcourt les dépôts de Zot sous builds/ et horodate les enveloppes de Chains qui ne le sont pas encore (tsa/horodater.sh
 # sans $IMAGE). Même pod que le job de J5 (tsa/horodatage-job.yaml) : nœud de confiance, Pod Security restricted, aucun
-# jeton de compte de service ; sorties DNS, TSA et Zot seulement (tsa/horodatage.yaml).
-# @OUTILS@ : image d'outils de J5, épinglée par digest ; @REG@ : Zot vu des pods.
+# jeton de l'API ; identifiants Zot lus dans OpenBao par le conteneur d'initialisation (J8 : jeton projeté d'audience
+# openbao, monté dans ce seul conteneur) ; sorties DNS, TSA, OpenBao et Zot seulement (tsa/horodatage.yaml).
+# @OUTILS@ : image d'outils de J5, épinglée par digest ; @BAO@ : image d'OpenBao ; @REG@ : Zot vu des pods.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -36,6 +37,46 @@ spec:
             runAsGroup: 65532
             seccompProfile:
               type: RuntimeDefault
+          initContainers:
+          - name: identifiants
+            image: @BAO@
+            command: [sh, -c]
+            args:
+            - |
+              set -eu
+              umask 077
+              # Identifiants Zot (compte poc-horodatage) lus dans OpenBao, jamais dans un Secret : connexion JWT (rôle horodatage,
+              # jeton projeté d'audience openbao), lecture, révocation du jeton. Quelques essais : le réseau d'un pod neuf (J3).
+              n=1
+              until BAO_TOKEN=$(bao write -field=token auth/jwt/login role=horodatage jwt=@/var/run/secrets/openbao/token \
+                  2> /var/run/zot/erreur); do
+                [ $n -lt 30 ] || { cat /var/run/zot/erreur >&2; exit 1; }
+                n=$((n + 1)); sleep 1
+              done
+              rm -f /var/run/zot/erreur
+              export BAO_TOKEN
+              bao read -field=config.json kv/horodatage/zot > /var/run/zot/config.json
+              bao token revoke -self >/dev/null
+              echo "identifiants Zot lus dans OpenBao (rôle horodatage, essai $n) ; jeton révoqué"
+            env:
+            - name: BAO_ADDR
+              value: https://openbao.openbao.svc.cluster.local:8200
+            - name: BAO_CACERT
+              value: /etc/horodatage/ca-poc.crt
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+            volumeMounts:
+            - name: zot
+              mountPath: /var/run/zot
+            - name: config
+              mountPath: /etc/horodatage
+              readOnly: true
+            - name: openbao-jeton
+              mountPath: /var/run/secrets/openbao
+              readOnly: true
           containers:
           - name: horodater
             image: @OUTILS@
@@ -75,5 +116,13 @@ spec:
             configMap:
               name: horodatage
           - name: zot
-            secret:
-              secretName: zot-horodatage
+            emptyDir:
+              medium: Memory
+              sizeLimit: 1Mi
+          - name: openbao-jeton
+            projected:
+              sources:
+              - serviceAccountToken:
+                  audience: openbao
+                  expirationSeconds: 600
+                  path: token

@@ -1,0 +1,118 @@
+[confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh horodater
+# tsa.sh horodater, 2026-11-01T23:56:18Z
+Success! Enabled the kv secrets engine at: kv/
+Success! Data written to: kv/horodatage/zot
+Success! Uploaded policy: horodatage-zot
+Success! Data written to: auth/jwt/role/horodatage
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:horodatage:horodatage","user_claim":"sub","token_policies":["horodatage-zot"],"token_no_default_policy":true,"token_type":"service","token_ttl":60,"token_max_ttl":60}
+path "kv/horodatage/zot" {
+  capabilities = ["read"]
+}
+path "auth/token/revoke-self" {
+  capabilities = ["update"]
+}
+secret "zot-horodatage" deleted from horodatage namespace
+OK   secret zot-horodatage introuvable (NotFound) ; identifiants Zot du job dans OpenBao (kv/horodatage/zot)
+## builds/essai-signature (une exécution signée en J4)
+  identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
+JOINT|Zot et TSA, essai 1
+DEJA_HORODATEE|builds/essai-signature|1|signature 2bceea98c90dd6d5|https://slsa.dev/provenance/v1
+FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 1 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+## builds/essai-webhook (une enveloppe par exécution signée de l'essai du webhook)
+  identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
+JOINT|Zot et TSA, essai 1
+DEJA_HORODATEE|builds/essai-webhook|1|signature 225db3d2cf224ab7|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|2|signature e802174ea2e9b33c|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|3|signature 720013b347240a23|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|4|signature fabcaaa320e29781|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|5|signature 4ade186b1d9cb28f|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|6|signature fcf590e98ea94328|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|7|signature b81489632cf20c4d|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|8|signature b4eb9d2c7089bf58|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|9|signature c584ab1db1c5c6df|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|10|signature 470eda6a8cfa299a|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|11|signature 84d71ea03c54938c|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|12|signature 758ea01f7da608cf|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|13|signature 500f38b39fc66a38|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|14|signature d872c9c4b9e80415|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|15|signature c86745b9844c83d8|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|16|signature 9df58f992c27e3a4|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|17|signature b2a4bcb2362c10ee|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|18|signature 938919718850c3f5|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|19|signature dc80569721bb2f2a|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|20|signature d6e4fa0e3881c378|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|21|signature 88a6d43d5c695762|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-webhook|22|signature 9bac20375a5d88d2|https://slsa.dev/provenance/v1
+FIN|1 image(s), 22 enveloppe(s) : 0 horodatée(s), 22 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+## reprise : builds/essai-signature une seconde fois
+  identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
+JOINT|Zot et TSA, essai 1
+DEJA_HORODATEE|builds/essai-signature|1|signature 2bceea98c90dd6d5|https://slsa.dev/provenance/v1
+FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 1 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
+OK   reprise sans nouvel horodatage ni nouveau bundle
+## referrers de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 dans horodatage/bundles (aucun dans les dépôts des images)
+{"digest":"31a47a2b949c","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"e695a135cd51","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"3ab2714a7da6","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"7f916f063036","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"6982a9a64b45","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"c41116933c2d","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"fbfb77ec0e23","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"78ae73cf8f63","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"f7c38d2b46d7","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"581e9950fcaa","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"548814018a26","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"b07261f7cf87","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"74bd563fc819","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8b4dccb6cd11","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"0a163f40a92a","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"ba6e7e47d5df","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"920e202d9193","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"68cc78da280e","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8860668d6bf6","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"969dd9bf0322","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"efc2ab549a32","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8de15bfd22d1","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8579d8d1cd38","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"55740f3cf980","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"89dcccc66771","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"08cf48bde3fd","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"2875d54e6935","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"e486446bf8ed","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"d23a607b77e3","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"1f0fdc5ba354","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"17d9ad0ce1ff","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+builds/essai-signature : 0 referrer(s)
+builds/essai-webhook : 0 referrer(s)
+KO   nombre de bundles
+[confiance:tsa] ERROR task failed
+
+# tsa.sh temoins_identifiants (hors étape, après tsa.sh horodater arrêté au contrôle de J5 « un bundle par enveloppe »), 2026-11-02T00:02:49Z
+Prédiction (écrite le 02/11/2026 après un essai sur le cluster de J8, tsa-horodater-essai-openbao.log, avant le rejeu ;
+identifiants Zot dans OpenBao, décision du propriétaire du 01/11/2026) : jeton du rôle horodatage limité à horodatage-zot, lecture de kv/horodatage/zot acceptée ; clé tsa, écriture
+et autre chemin refusés ; révocation acceptée, puis relecture refusée ; rôle refusé à horodatage:default, au TSA et à
+Chains ; jeton projeté d'audience openbao refusé par l'API (401) ; conteneur horodater sans jeton
+## identifiants Zot dans OpenBao : rôle horodatage pour son compte, puis pour d'autres comptes
+CONNEXION_ACCEPTEE|"token_policies":["horodatage-zot"]
+ACCEPTE|lecture de kv/horodatage/zot
+REFUSE|lecture de transit/keys/tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|écriture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/horodatage/autre|Code: 403. Errors: * 1 error occurred: * permission denied 
+ACCEPTE|révocation de son propre jeton
+REFUSE|lecture de kv/horodatage/zot après révocation|Code: 403. Errors: * permission denied 
+OK   jeton du rôle horodatage : lecture de ses seuls identifiants, sans écriture ; révoqué, il ne lit plus rien
+horodatage:default : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tsa:timestamp-authority : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tekton-chains:tekton-chains-controller : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+OK   rôle horodatage refusé aux autres comptes (bound_subject)
+## jeton projeté d'audience openbao présenté à l'API de Kubernetes
+OK   refusé par l'API (HTTP 401) : jeton d'audience openbao, inutilisable contre Kubernetes
+## audit d'OpenBao depuis 2026-11-01T23:56:00Z : rôle horodatage (connexions, lectures, révocations)
+  10 {"chemin":"auth/jwt/login","op":"update","role":"horodatage","erreur":null}
+  10 {"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","erreur":null}
+  2 {"chemin":"kv/horodatage/autre","op":"read","role":"horodatage","erreur":"1 error occurred:\n\t* permission denied\n\n"}
+  1 {"chemin":"kv/horodatage/zot","op":"create","role":null,"erreur":null}
+  10 {"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","erreur":null}
+  2 {"chemin":"kv/horodatage/zot","op":"read","role":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+  2 {"chemin":"kv/horodatage/zot","op":"update","role":"horodatage","erreur":"1 error occurred:\n\t* permission denied\n\n"}
+  2 {"chemin":"transit/keys/tsa","op":"read","role":"horodatage","erreur":"1 error occurred:\n\t* permission denied\n\n"}

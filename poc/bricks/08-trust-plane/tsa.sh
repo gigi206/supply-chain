@@ -14,7 +14,9 @@
 #   essais     temoin ; refus : TSA depuis un autre espace, rôle tsa pour un autre compte, clé chains avec le rôle tsa
 #              et clé tsa avec le rôle tekton-chains, export ; Zot : poc-horodatage hors de horodatage/** ; audit
 #   horodater  job d'horodatage (tsa/horodater.sh) sur les images signées de J4 : bundles v0.3 en referrers dans
-#              horodatage/bundles ; rejouable (enveloppes déjà horodatées sautées)
+#              horodatage/bundles ; rejouable (enveloppes déjà horodatées sautées) ; J8 : identifiants Zot du job dans
+#              OpenBao (kv/horodatage/zot, rôle JWT horodatage, tsa/horodatage-zot.hcl), aucun Secret ; témoins : autres
+#              comptes refusés, jeton borné à cette lecture et révoqué, jeton projeté refusé par l'API, audit d'OpenBao
 #   chemins    mesure des chemins de vérification (jeton valide, absent, falsifié) par cosign et Kyverno
 # Aucun secret en argument de commande : jetons et mots de passe par fichier 0600 ou entrée standard.
 #
@@ -338,13 +340,14 @@ job_horodatage() { # dépôt-de-l'image : job d'horodatage de l'image d'essai de
   local nom=h-${1##*/} etat=""
   kubectl delete job -n horodatage "$nom" --ignore-not-found --wait=true >/dev/null
   sed -e "s#@NOM@#$nom#" -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@IMAGE@#$REG/$1@$APP_DIGEST#" -e "s#@DEPOT@#$REG/$DEPOT_BUNDLES#" \
-    "$here/tsa/horodatage-job.yaml" | kubectl apply -f - >/dev/null
+    -e "s#@BAO@#$REG/amont/openbao/openbao@$BAO_INDEX#" "$here/tsa/horodatage-job.yaml" | kubectl apply -f - >/dev/null
   for _ in $(seq 90); do
     etat=$(kubectl get job -n horodatage "$nom" -o jsonpath='{.status.succeeded}/{.status.failed}')
     case $etat in 1/*|*/1) break ;; esac
     sleep 2
   done
-  kubectl logs -n horodatage "job/$nom"
+  kubectl logs -n horodatage "job/$nom" -c identifiants | sed 's/^/  /'
+  kubectl logs -n horodatage "job/$nom" -c horodater
   [ "${etat%%/*}" = 1 ] || { echo "KO   job $nom : $etat" >&2; return 1; }
 }
 
@@ -352,13 +355,87 @@ referrers() { # dépôt : referrers de l'image d'essai dans ce dépôt (API OCI 
   curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$1/referrers/$APP_DIGEST"
 }
 
+identifiants_horodatage() { # identifiants Zot du job d'horodatage dans OpenBao (J8, décision du propriétaire du 01/11/2026)
+  # Valeur passée dans le corps du script (entrée standard de kubectl exec), jamais en argument ; KV v1 : bao read -field
+  # rend la valeur brute. Rôle : jeton de service d'une minute, sans politique par défaut, révoqué par le pod après lecture.
+  auth_zot "$T/zot-horodatage.json" "" poc-horodatage "$REG"
+  racine <<EOF | jq -c '.data | {bound_audiences, bound_subject, user_claim, token_policies, token_no_default_policy, token_type, token_ttl, token_max_ttl}'
+set -eu
+bao secrets list -format=json | grep -q '"kv/"' || bao secrets enable -path=kv -version=1 kv >&2
+bao write kv/horodatage/zot config.json=- >&2 <<'JSON'
+$(cat "$T/zot-horodatage.json")
+JSON
+bao policy write horodatage-zot - >&2 <<'POL'
+$(cat "$here/tsa/horodatage-zot.hcl")
+POL
+bao write auth/jwt/role/horodatage role_type=jwt user_claim=sub bound_audiences=openbao \
+  bound_subject=system:serviceaccount:horodatage:horodatage token_policies=horodatage-zot token_no_default_policy=true \
+  token_type=service token_ttl=1m token_max_ttl=1m >&2
+bao read -format=json auth/jwt/role/horodatage
+EOF
+  rm -f "$T/zot-horodatage.json"
+  racine <<<'bao policy read horodatage-zot' | grep -v '^#'
+  # Secret des passages d'avant J8 : supprimé (un nouveau cluster n'en a jamais eu).
+  kubectl delete secret -n horodatage zot-horodatage --ignore-not-found
+  [[ "$(kubectl get secret -n horodatage zot-horodatage 2>&1 || true)" == *NotFound* ]] \
+    && echo "OK   secret zot-horodatage introuvable (NotFound) ; identifiants Zot du job dans OpenBao (kv/horodatage/zot)" \
+    || { echo "KO   secret zot-horodatage présent" >&2; exit 1; }
+}
+
+temoins_identifiants() { # instant : témoins de la lecture des identifiants Zot dans OpenBao (J8)
+  local debut=$1 sortie api ca
+  echo "Prédiction (écrite le 02/11/2026 après un essai sur le cluster de J8, tsa-horodater-essai-openbao.log, avant le rejeu ;"
+  echo "identifiants Zot dans OpenBao, décision du propriétaire du 01/11/2026) : jeton du rôle horodatage limité à horodatage-zot, lecture de kv/horodatage/zot acceptée ; clé tsa, écriture"
+  echo "et autre chemin refusés ; révocation acceptée, puis relecture refusée ; rôle refusé à horodatage:default, au TSA et à"
+  echo "Chains ; jeton projeté d'audience openbao refusé par l'API (401) ; conteneur horodater sans jeton"
+  echo "## identifiants Zot dans OpenBao : rôle horodatage pour son compte, puis pour d'autres comptes"
+  sortie=$(en_tant_que horodatage horodatage horodatage <<'SH'
+refus "lecture de kv/horodatage/zot" sh -c 'bao read -field=config.json kv/horodatage/zot >/dev/null'
+refus "lecture de transit/keys/tsa" bao read transit/keys/tsa
+refus "écriture de kv/horodatage/zot" sh -c 'echo x | bao write kv/horodatage/zot config.json=-'
+refus "lecture de kv/horodatage/autre" bao read kv/horodatage/autre
+refus "révocation de son propre jeton" bao token revoke -self
+refus "lecture de kv/horodatage/zot après révocation" sh -c 'bao read -field=config.json kv/horodatage/zot >/dev/null'
+SH
+)
+  echo "$sortie"
+  printf '%s\n' "CONNEXION_ACCEPTEE|\"token_policies\":[\"horodatage-zot\"]" "ACCEPTE|lecture de kv/horodatage/zot" \
+    "REFUSE|lecture de transit/keys/tsa|" "REFUSE|écriture de kv/horodatage/zot|" "REFUSE|lecture de kv/horodatage/autre|" \
+    "ACCEPTE|révocation de son propre jeton" "REFUSE|lecture de kv/horodatage/zot après révocation|" > "$T/attendu-id"
+  paste -d'\t' "$T/attendu-id" <(echo "$sortie") | awk -F'\t' 'index($2, $1) != 1 {k++} END {exit k > 0 || NR != 7}' \
+    && echo "OK   jeton du rôle horodatage : lecture de ses seuls identifiants, sans écriture ; révoqué, il ne lit plus rien" \
+    || { echo "KO   rôle horodatage pour son compte" >&2; exit 1; }
+  for c in default:horodatage timestamp-authority:tsa tekton-chains-controller:tekton-chains; do
+    sortie=$(en_tant_que "${c%%:*}" "${c#*:}" horodatage </dev/null)
+    echo "${c#*:}:${c%%:*} : $sortie"
+    [[ "$sortie" == CONNEXION_REFUSEE* ]] || { echo "KO   rôle horodatage accordé à ${c#*:}:${c%%:*}" >&2; exit 1; }
+  done
+  echo "OK   rôle horodatage refusé aux autres comptes (bound_subject)"
+  echo "## jeton projeté d'audience openbao présenté à l'API de Kubernetes"
+  api=$(kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}')
+  kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d > "$T/api-ca.crt"
+  (umask 077 && printf 'Authorization: Bearer %s\n' "$(kubectl create token horodatage -n horodatage --audience openbao --duration 10m)" > "$T/entete")
+  ca=$(curl -s -o /dev/null -w '%{http_code}' --cacert "$T/api-ca.crt" -H @"$T/entete" "$api/api/v1/namespaces/horodatage/secrets")
+  rm -f "$T/entete"
+  [ "$ca" = 401 ] && echo "OK   refusé par l'API (HTTP $ca) : jeton d'audience openbao, inutilisable contre Kubernetes" \
+    || { echo "KO   API : HTTP $ca" >&2; exit 1; }
+  echo "## audit d'OpenBao depuis $debut : rôle horodatage (connexions, lectures, révocations)"
+  kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log > "$T/audit.log"
+  jq -c --arg d "$debut" 'select(.type == "response" and .time[0:19] >= ($d[0:19])
+      and ((.auth.metadata.role // "") == "horodatage" or (.request.path == "auth/jwt/login" and (.request.data.role // "") == "horodatage")
+           or (.request.path | test("^kv/"))))
+    | {chemin: .request.path, op: .request.operation, role: (.auth.metadata.role // null),
+       erreur: (.error // null)}' "$T/audit.log" | sort | uniq -c | sed 's/^ */  /'
+}
+
 etape_horodater() {
+  local debut
+  debut=$(date -u +%FT%TZ)
   kubectl apply -f "$here/tsa/horodatage.yaml" >/dev/null
   attendre_sa horodatage
-  auth_zot "$T/zot-horodatage.json" "" poc-horodatage "$REG"
-  kubectl create secret generic zot-horodatage -n horodatage --from-file=config.json="$T/zot-horodatage.json" \
-    --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
-  echo "secret zot-horodatage appliqué (poc-horodatage, $REG ; lu sur l'entrée standard de kubectl, sans annotation last-applied)"
+  # NetworkPolicy d'OpenBao (openbao.yaml) : ouverte à l'espace horodatage (J8), sans toucher au StatefulSet.
+  awk 'BEGIN {RS = "\n---\n"} /\nkind: NetworkPolicy\n/' "$here/openbao/openbao.yaml" | kubectl apply --server-side -f - >/dev/null
+  identifiants_horodatage
   config_horodatage
   echo "## builds/essai-signature (une exécution signée en J4)"
   job_horodatage builds/essai-signature
@@ -377,6 +454,13 @@ etape_horodater() {
     = "$(($(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-signature@$APP_DIGEST" 2>/dev/null | wc -l) \
          + $(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null | wc -l)))" ] \
     && echo "OK   un bundle par enveloppe de Chains" || { echo "KO   nombre de bundles" >&2; exit 1; }
+  echo "## pods des jobs : jeton projeté dans le seul conteneur d'initialisation"
+  kubectl get pods -n horodatage -l job-name -o json | jq -r '.items[] | .spec as $s
+    | "\(.metadata.name) : automount=\($s.automountServiceAccountToken), jeton projeté monté par \([($s.initContainers + $s.containers)[]
+      | select(any(.volumeMounts[]; .name == "openbao-jeton")) | .name] | join(",")), volume zot \([$s.volumes[] | select(.name == "zot") | .emptyDir.medium] | join(""))"'
+  [ "$(kubectl get pods -n horodatage -l job-name -o json | jq '[.items[].spec | .containers[] | select(any(.volumeMounts[]; .name == "openbao-jeton"))] | length')" = 0 ] \
+    && echo "OK   conteneur horodater sans jeton (ni de l'API, ni d'OpenBao)" || { echo "KO   jeton dans le conteneur horodater" >&2; exit 1; }
+  temoins_identifiants "$debut"
 }
 
 publier_bundle() { # dépôt fichier : bundle publié en referrer de l'image d'essai (manifeste fait main : sujet hors du dépôt)

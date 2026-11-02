@@ -1,6 +1,7 @@
 # Brique 08, jalon J5 : espace du job d'horodatage, sur le nœud de confiance (hors des pods de build).
 # Le job lit les attestations de Chains dans Zot (lecture anonyme), demande les jetons au TSA et publie les bundles
-# dans horodatage/** avec le compte Zot poc-horodatage (secret zot-horodatage, créé par tsa.sh). Sortie : DNS, TSA, Zot.
+# dans horodatage/** avec le compte Zot poc-horodatage (identifiants lus dans OpenBao depuis J8, rôle JWT horodatage ;
+# auparavant secret zot-horodatage). Sortie : DNS, TSA, OpenBao, Zot.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -48,6 +49,16 @@ spec:
     ports:
     - protocol: TCP
       port: 3000
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: openbao
+      podSelector:
+        matchLabels:
+          app: openbao
+    ports:
+    - protocol: TCP
+      port: 8200
   - to:
     - ipBlock:
         cidr: 192.168.161.13/32

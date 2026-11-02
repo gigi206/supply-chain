@@ -75,6 +75,7 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
+BAO_INDEX=sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh (conteneur d'initialisation du CronJob)
 KY_DEPOT=kyverno/kyverno
 KY_COMMIT=e63308f1e16c05cd009ac4864be6ec25c66b49be   # tag léger v1.19.2 (« chore: bump chart to 3.9.2 for v1.19.2 »)
 KY_ID=https://github.com/kyverno/kyverno/.github/workflows/release.yaml@refs/tags/v1.19.2
@@ -768,7 +769,7 @@ passage() { # instant [espace CronJob] : premier passage du CronJob (horodatage 
 analyser() { # job : journal du passage (enveloppes déjà horodatées résumées) ; requêtes de jeton reçues par le TSA pendant
   # le passage (une par enveloppe horodatée, aucune pour une enveloppe refusée) ; témoins : deux refus, une anomalie
   local j=$1 a b ip h r an
-  kubectl logs -n horodatage "job/$j" > "$T/passage.log"
+  kubectl logs -n horodatage "job/$j" -c horodater > "$T/passage.log"
   kubectl get job -n horodatage "$j" -o json > "$T/job.json"
   [ "$(jq -r '.status.succeeded // 0' "$T/job.json")" = 1 ] || { cat "$T/passage.log" >&2; echo "KO   passage $j en échec" >&2; exit 1; }
   read -r a b < <(jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | @tsv' "$T/job.json")
@@ -793,7 +794,9 @@ analyser() { # job : journal du passage (enveloppes déjà horodatées résumée
 
 etape_horodatage() {
   local x y z pt t j e0 e1 b0 o0 n w jeton pipe o
-  kubectl get secret -n horodatage zot-horodatage >/dev/null 2>&1 || { echo "KO   secret zot-horodatage absent (tsa.sh horodater)" >&2; exit 1; }
+  # Identifiants Zot du CronJob dans OpenBao (J8, tsa.sh horodater) : rôle JWT horodatage présent.
+  racine <<<'bao read -format=json auth/jwt/role/horodatage' | jq -e '.data.bound_subject == "system:serviceaccount:horodatage:horodatage"' >/dev/null \
+    || { echo "KO   rôle OpenBao horodatage absent (tsa.sh horodater)" >&2; exit 1; }
   gabarit_essai   # gabarit d'essai de J6 en service (pas celui de la bascule de J8)
   mkdir -p "$T/auth" && chmod 700 "$T/auth"
   auth_zot "$T/auth/zot.json"
@@ -839,7 +842,8 @@ etape_horodatage() {
   b0=$(wc -l < "$T/sans-bundle"); o0=$(wc -l < "$T/orphelins")
   echo "prédiction du premier passage : $b0 horodatée(s) (enveloppes sans bundle), 2 refusées et 1 anomalie (témoins), $b0 requête(s) de jeton"
   t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  sed -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@REG@#$REG#g" "$here/politique/horodatage-cronjob.yaml" \
+  sed -e "s#@OUTILS@#$REG/$OUTILS@$OUTILS_DIGEST#" -e "s#@BAO@#$REG/amont/openbao/openbao@$BAO_INDEX#" -e "s#@REG@#$REG#g" \
+    "$here/politique/horodatage-cronjob.yaml" \
     | kubectl apply --server-side -f - >/dev/null
   kubectl get cronjob -n horodatage horodatage -o json | jq -c '{schedule: .spec.schedule, concurrencyPolicy: .spec.concurrencyPolicy,
     startingDeadlineSeconds: .spec.startingDeadlineSeconds, activeDeadlineSeconds: .spec.jobTemplate.spec.activeDeadlineSeconds}'
@@ -853,7 +857,7 @@ etape_horodatage() {
     && grep -q "^REFUSEE|builds/$TEMOIN_SUJET|.*provided artifact digest does not match" "$T/passage.log" \
     && echo "OK   témoins refusés pour leur motif (autre clé ; autre sujet ; illisible en anomalie), avant toute demande au TSA, sans arrêter le parcours" \
     || { echo "KO   motifs des refus" >&2; exit 1; }
-  kubectl get pods -n horodatage -l job-name="$j" -o json | jq -r '.items[0] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName), volumes de jeton projetés \([.spec.volumes[] | select(.projected)] | length), sortie \(.status.containerStatuses[0].state.terminated.reason)"'
+  kubectl get pods -n horodatage -l job-name="$j" -o json | jq -r '.items[0] | "pod \(.metadata.name) : nœud \(.spec.nodeName), compte \(.spec.serviceAccountName), volumes de jeton projetés \([.spec.volumes[] | select(.projected)] | length) (montés par \([.spec.initContainers[]? | select(any(.volumeMounts[]; .name == "openbao-jeton")) | .name] | join(","))), sortie \(.status.containerStatuses[0].state.terminated.reason)"'
 
   echo "## nouvelle exécution signée, supprimée de l'API après sa signature : horodatée au passage suivant"
   pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')

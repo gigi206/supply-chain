@@ -142,6 +142,10 @@ spec:
       podSelector:
         matchLabels:
           app: timestamp-authority
+    # J8 : le job d'horodatage lit ses identifiants Zot (rôle JWT horodatage, compte de service horodatage:horodatage)
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: horodatage
     ports:
     - protocol: TCP
       port: 8200

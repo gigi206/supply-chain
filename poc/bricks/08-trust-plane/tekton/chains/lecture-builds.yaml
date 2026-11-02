@@ -1,0 +1,41 @@
+# Brique 08, J8 (décision du propriétaire du 01/11/2026) : droits de locataire de Chains (lecture des Secrets et des comptes
+# de service pour k8schain, pods, journaux, événements) dans builds seulement. La liaison de tout le cluster du release.yaml
+# est retirée (tenant-access-supprime.yaml). Chains n'a, en amont, qu'un Role d'élection de chef dans tekton-chains : il
+# lisait sa configuration (chains-config, config-logging…) par cette liaison ; Role de lecture des ConfigMaps ajouté.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-chains-controller-tenant-access
+  namespace: builds
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-chains-controller-tenant-access
+subjects:
+- kind: ServiceAccount
+  name: tekton-chains-controller
+  namespace: tekton-chains
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-chains-controller-config
+  namespace: tekton-chains
+rules:
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-chains-controller-config
+  namespace: tekton-chains
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-chains-controller-config
+subjects:
+- kind: ServiceAccount
+  name: tekton-chains-controller
+  namespace: tekton-chains

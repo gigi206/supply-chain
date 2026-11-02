@@ -5,6 +5,16 @@ kind: Policy
 omitStages:
   - RequestReceived
 rules:
+  # J8 : lectures de Secrets des contrôleurs de Pipelines et de Chains journalisées (bornées à builds par leurs droits ;
+  # mesure : preuves.sh controleurs). Avant la règle qui exclut les lectures.
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+      - system:serviceaccount:tekton-chains:tekton-chains-controller
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets"]
   - level: None
     verbs: ["get", "list", "watch"]
   - level: None

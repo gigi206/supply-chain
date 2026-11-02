@@ -5,7 +5,10 @@
 # Liste blanche tirée de l'audit de l'API (resultats/controleurs-audit-avant-regle.log : toutes leurs écritures sont dans
 # builds ; Chains n'a créé aucun pod). Règle native de l'API et non Kyverno : Kyverno exclut kube-system (resourceFilters
 # et namespaceSelector de ses webhooks). StatefulSets couverts : sinon statefulset-controller crée le pod à leur place ;
-# UPDATE couvert : l'image d'un conteneur de pod est modifiable. Lectures (secrets de tout le cluster) hors admission.
+# UPDATE couvert : l'image d'un conteneur de pod est modifiable. Lectures hors admission : bornées depuis le 02/11/2026 par
+# les droits de locataire dans builds seulement (tekton/{pipeline,chains}/lecture-builds.yaml) ; ces droits refusent
+# désormais les écritures hors de builds avant la règle, qui reste en seconde barrière (mesurée par preuves.sh controleurs
+# dans un espace d'essai où une liaison temporaire rend ces droits).
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
