@@ -229,3 +229,29 @@ Script : [`forgejo.sh`](forgejo.sh), étapes `comptes organisations amont miroir
 - `bout_en_bout` : code 2 (collision sur `custom/essai`), collision publiée dans `mirror/`, `custom/essai` du fork inchangée, `main` du fork avancée, tag `custom-1` intact.
 
 **Avant l'exécution** : tâche `synchro:forgejo` à déclarer dans `mise.toml`, après le rejeu, car celui-ci lit `mise.toml` à chaque étape.
+
+## Jalon S3, partie hors cluster : métrique (D3)
+
+**Prédictions** (écrites le 02/11/2026 vers 14:05 UTC, juste avant le code ; heure d'abord mal notée, 14:07) : `--metriques <fichier>` écrit, après chaque run, un fichier au format texte de Prometheus **déduit des rapports** (qui font foi), réécrit atomiquement (fichier temporaire puis `os.replace`) ; un run `rewrite-detected` compte comme une réussite ; un run en erreur ne fait pas avancer la dernière réussite ; les 14 tests existants passent toujours.
+
+**Résultat** ([`s3-tests-metriques.log`](resultats/s3-tests-metriques.log)) : **16 tests sur 16 réussis**, sous `C` et sous `fr_FR.UTF-8`, conformes aux prédictions. Un premier passage, également à 16 sur 16, a précédé un allègement du test (import de `datetime`, assertion inutile retirée) ; son journal a été écrasé par le second, faute d'avoir été renommé.
+
+| Nouveau test | Vérifie |
+|---|---|
+| `test_metriques_deduites_des_rapports` | Après un run `ok`, un run à code 2 et un run en erreur : dernière réussite = run à code 2, dernière réécriture = même run, statut `error` à 1 ; aucun fichier temporaire laissé |
+| `test_metriques_sans_reussite` | Tant qu'aucun run n'a réussi, la métrique de dernière réussite est absente (l'alerte de la 19 devra traiter l'absence) |
+
+## Jalon S3, partie sur `sc-stockage` (préparée le 02/11/2026, exécution après S2)
+
+Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refspec` ; unités et lanceur dans [`systemd/`](systemd/).
+
+- **Unité modèle `synchro@<projet>.service`** (oneshot, compte système `synchro`) : durcissement repris de l'unité Forgejo de la 08 ; configuration sans secret dans `/etc/synchro/<projet>.env` ; jeton de `poc-sync` en root 0600 (`/etc/synchro/secrets/poc-sync.token`), remis au seul service par **`LoadCredential`** ; **`SuccessExitStatus=2`** : une réécriture détectée n'est pas un échec de l'unité (contrat D3) ; état dans `StateDirectory` (`/var/lib/synchro/<projet>` : miroir local, rapports, bundles, métrique `<projet>.prom`).
+- **Timer `synchro@<projet>.timer`** : toutes les heures après le run précédent (`OnUnitActiveSec=1h`, `RandomizedDelaySec=5min`, `Persistent`) ; l'étape `planifie` ramène la période à 2 min par un drop-in, le temps de la mesure, puis le retire.
+- **Lanceur [`synchro.sh`](systemd/synchro.sh)** : en-tête du jeton limité à `MIROIR` et `FORK` (`http.<url>.extraHeader`, comme en S2), jamais à l'amont ; `python3 -I`.
+- **Continuité de l'état** (risque relevé à l'écriture) : en S2, le miroir local vit sur l'hôte. Un miroir neuf dans la VM pousserait `refs/archive/*` avec `--prune` et **retirerait de `mirror/` les archives de S2**. L'étape `installer` copie donc le miroir, les rapports et les bundles de l'hôte dans la VM, qui en devient le seul propriétaire ; la copie de l'hôte est renommée.
+
+**Prédictions** (écrites le 02/11/2026 vers 14:07 UTC, avant toute exécution) :
+- `installer` : python3 (3.13, Debian 13) et git 2.47.3 présents, aucun paquet ajouté ; `sc-stockage.poc.test` résolu dans la VM ; score de `systemd-analyze security` proche de celui de Forgejo (3.0, « OK ») ;
+- `essai` : run réussi pour systemd ; rapport de statut `ok` (l'état de S2 est repris : aucun événement nouveau) ; métrique cohérente ; jeton absent du journal de l'unité ;
+- `planifie` : deux runs planifiés en moins de 5 min, sans intervention ; période d'une heure rétablie après la mesure ;
+- `refspec` : avec git 2.47.3, même comportement qu'avec 2.53.0 (négatif comparé à la destination), prédiction faible ; sans effet sur `sync.py`, qui n'en dépend plus.

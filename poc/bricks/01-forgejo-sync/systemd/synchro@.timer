@@ -1,0 +1,12 @@
+# Brique 01, S3 : synchro horaire du projet %i (alerte de la brique 19 : miroir en retard de plus de 24 h).
+[Unit]
+Description=Synchronisation horaire du miroir %i (brique 01)
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+RandomizedDelaySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

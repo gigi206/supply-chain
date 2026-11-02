@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Tests de la brique 01 sur des dépôts git locaux : python3 -m unittest -v test_sync"""
+import datetime
 import json
 import os
 import subprocess
@@ -261,6 +262,38 @@ class SyncTest(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn(("collision", "heads/custom-1"), self.events(rep))
         self.assertEqual(self.mirror_refs(fork, ("refs/heads/custom-1",)), {"refs/heads/custom-1": self.a})
+
+    def test_metriques_deduites_des_rapports(self):
+        def epoch(st):
+            return str(int(datetime.datetime.strptime(st, "%Y%m%dT%H%M%SZ")
+                           .replace(tzinfo=datetime.timezone.utc).timestamp()))
+        prom = Path(self.tmp.name) / "sync.prom"
+        m = ("--metriques", str(prom), "--projet", "p")
+        self.run_sync(*m)
+        un = self.stamp
+        self.commit("B")
+        self.run_sync(*m)
+        sh(self.up, "reset", "--quiet", "--hard", self.a)
+        self.commit("C")
+        self.assertEqual(self.run_sync(*m)[0], 2)
+        reecriture = self.stamp
+        self.assertEqual(self.run_sync(*m, allow_file=False)[0], 1)  # run en erreur
+        val = {l.rsplit(" ", 1)[0]: l.rsplit(" ", 1)[1] for l in prom.read_text().splitlines() if not l.startswith("#")}
+        self.assertEqual(val, {
+            'sync_derniere_reussite_timestamp_seconds{projet="p"}': epoch(reecriture),
+            'sync_derniere_reecriture_timestamp_seconds{projet="p"}': epoch(reecriture),
+            'sync_dernier_run_statut{projet="p",statut="ok"}': "0",
+            'sync_dernier_run_statut{projet="p",statut="rewrite-detected"}': "0",
+            'sync_dernier_run_statut{projet="p",statut="error"}': "1"})
+        self.assertNotEqual(epoch(un), epoch(reecriture))
+        self.assertEqual([f.name for f in prom.parent.glob(".sync.prom*")], [], "pas de fichier temporaire laissé")
+
+    def test_metriques_sans_reussite(self):
+        prom = Path(self.tmp.name) / "sync.prom"
+        self.run_sync("--metriques", str(prom), allow_file=False)
+        txt = prom.read_text()
+        self.assertNotIn("sync_derniere_reussite_timestamp_seconds{", txt, "absente tant qu'aucun run n'a réussi")
+        self.assertIn('sync_dernier_run_statut{projet="miroir",statut="error"} 1', txt)
 
     def test_protocole_file_refuse_sans_option(self):
         code, rep = self.run_sync(allow_file=False)

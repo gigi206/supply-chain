@@ -239,6 +239,41 @@ def restore(target, bundles, report):
     git(target, "fsck", "--no-progress", "--no-dangling")
 
 
+STATUSES = ("ok", "rewrite-detected", "error")
+
+
+def write_metrics(path, project, report_dir):
+    """Métriques au format texte de Prometheus, déduites des rapports (qui font foi).
+
+    Une réécriture détectée est une synchro réussie : l'alerte « miroir en retard »
+    ne se confond pas avec celle de réécriture. Horodatage : celui du run (début).
+    Fichier réécrit atomiquement (lecteur : collecteur textfile, brique 19).
+    """
+    def epoch(stamp):
+        return int(datetime.datetime.strptime(stamp, "%Y%m%dT%H%M%SZ")
+                   .replace(tzinfo=datetime.timezone.utc).timestamp())
+    reports = [json.loads(f.read_text()) for f in sorted(Path(report_dir).glob("*.json"))]
+    lab = f'projet="{project}"'
+    out = []
+    for name, aide, keep in (
+            ("sync_derniere_reussite_timestamp_seconds", "Dernier run réussi (ok ou rewrite-detected)",
+             ("ok", "rewrite-detected")),
+            ("sync_derniere_reecriture_timestamp_seconds", "Dernier run qui a détecté une réécriture amont",
+             ("rewrite-detected",))):
+        done = [r["stamp"] for r in reports if r["status"] in keep]
+        out += [f"# HELP {name} {aide}.", f"# TYPE {name} gauge"]
+        if done:
+            out.append(f"{name}{{{lab}}} {epoch(done[-1])}")
+    out += ["# HELP sync_dernier_run_statut Statut du dernier run (1 pour son statut, 0 pour les autres).",
+            "# TYPE sync_dernier_run_statut gauge"]
+    last = reports[-1]["status"] if reports else None
+    out += [f'sync_dernier_run_statut{{{lab},statut="{st}"}} {int(st == last)}' for st in STATUSES]
+    path = Path(path)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text("\n".join(out) + "\n")
+    os.replace(tmp, path)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--mirror", type=Path, required=True, help="dépôt nu du miroir")
@@ -251,6 +286,7 @@ def main(argv=None):
                    help="branches dont un force-push est critique (motifs fnmatch)")
     p.add_argument("--refs-propres", type=Path, help="configuration JSON des refs propres (global, depots)")
     p.add_argument("--projet", help="nom du projet dans la configuration des refs propres")
+    p.add_argument("--metriques", type=Path, help="fichier de métriques (format texte de Prometheus), réécrit à chaque run")
     p.add_argument("--stamp", help="horodatage du run (tests) ; par défaut maintenant, en UTC")
     p.add_argument("--allow-file", action="store_true", help="autorise le protocole file (tests)")
     p.add_argument("--restore", type=Path, help="reconstruit un miroir à partir des bundles et du dernier rapport")
@@ -274,6 +310,8 @@ def main(argv=None):
         report = {"schema": SCHEMA, "upstream": a.upstream, "stamp": stamp, "status": "error",
                   "error": str(e), "events": [], "refs": {}, "bundle": None}
     (a.report_dir / f"{stamp}.json").write_text(json.dumps(report, indent=2) + "\n")
+    if a.metriques:
+        write_metrics(a.metriques, a.projet or a.mirror.name, a.report_dir)
     for e in report["events"]:
         print(f"{e['type']:24} {e['ref']}  {(e['old'] or '-')[:12]} -> {(e['new'] or '-')[:12]}")
     if report["status"] == "error":

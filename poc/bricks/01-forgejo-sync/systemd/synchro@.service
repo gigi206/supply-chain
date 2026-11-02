@@ -1,0 +1,41 @@
+# Brique 01, S3 (D1 (a), décision du propriétaire du 02/11/2026) : un run de sync.py pour le projet %i, sur sc-stockage.
+# Configuration sans secret : /etc/synchro/%i.env ; jeton de poc-sync : /etc/synchro/secrets/poc-sync.token (root, 0600),
+# remis au seul service par LoadCredential. Code 2 (réécriture amont détectée) = synchro réussie (contrat D3), signalée
+# par les rapports et la métrique, pas par un échec de l'unité.
+[Unit]
+Description=Synchronisation du miroir %i (brique 01)
+Wants=network-online.target
+After=network-online.target forgejo.service
+
+[Service]
+Type=oneshot
+User=synchro
+Group=synchro
+EnvironmentFile=/etc/synchro/%i.env
+LoadCredential=jeton:/etc/synchro/secrets/poc-sync.token
+ExecStart=/usr/local/lib/synchro/synchro.sh %i
+SuccessExitStatus=2
+TimeoutStartSec=2h
+StateDirectory=synchro synchro/%i
+StateDirectoryMode=0750
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027
