@@ -1,0 +1,118 @@
+# preuves.sh reserve_c, 2026-11-02T12:48:31Z
+## prédiction (réserve de la décision C, ADR 0000 ; plan validé par le propriétaire le 30/10/2026)
+règles : collection slsa3 (20) et paquet trusted_task (9) de conforma/policy v1.0.28, inclus par la porte ; réécrites en CEL (Kyverno 1.19.2) :
+  les règles de fond, avec les données de la porte (liste revue, allowed_builder_ids, source attendue) ; sans objet : règles de
+  données (*_provided, rule_data_provided, data, data_format), future_deny_rule (format trusted_task_rules, absent de la porte),
+  build_script_used (vide dans la bibliothèque sur ce format : elle lit task.name et task.steps, absents d'un TaskRun complet),
+  current (aucune date d'expiration dans la liste revue de la porte)
+  (passage précédent archivé : subject_build_task_matches réécrite avec la règle voisine image_built_by_trusted_task, collection
+  redhat, hors de la porte, lue sans ses métadonnées ; pinned sorti seulement en avertissement ; relevé par le témoin liste)
+  Sondes exploratoires faites avant cette prédiction, avec le même CLI depuis l'hôte (01/11/2026) ; l'étape les rejoue
+entrée : le tag .att de Chains n'est pas vérifiable par Kyverno sans journal (kyverno#17109, J5) ; provenance lue dans les bundles
+  du job d'horodatage (attestor à dépôt séparé, sans tsaCertChain : erreur interne avec, J5). ec juge le tag .att : entrées différentes
+choix de la provenance (code de Kyverno 1.19.2 : loadBundles suit l'index des referrers de Zot, verifyBundles vérifie tous les bundles,
+  AddVerifiedIntotoPayloads garde une provenance par type, la dernière) : Kyverno retient la dernière provenance valide de l'index,
+  la bibliothèque le PipelineRun le plus récent (finishedOn). Sur horodatage/bundles (toutes les images du digest), une autre image peut
+  être retenue ; deux dépôts aux deux mêmes bundles dans l'ordre inverse donnent deux provenances différentes
+parité (PipelineRun réel 1fb94652, seul bundle de horodatage/essais-test8/partiel-20261101t122804z) : mêmes statuts règle par règle que ec sur l'image réelle,
+  toutes respectées, trusted_task.tagged en avertissement une fois par tâche (3), pinned respectée ; Kyverno admet
+témoins de données, même provenance, mêmes changements pour les deux moteurs :
+  publier-image retirée de la liste revue : trusted_task.trusted
+  révision attendue fictive : slsa_source_correlated.expected_source_code_reference
+  allowed_builder_ids sans le builder de Chains : slsa_build_build_service.slsa_builder_id_accepted
+configuration réelle (horodatage/bundles) : Kyverno refuse l'image réelle, que ec admet (provenance retenue : une autre image du digest)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)
+OK   CLI Kyverno 1.19.2 (mise.toml)
+## coût de la réécriture (lignes hors commentaires et lignes vides)
+CEL (politique/reserve-c/ivpol.tmpl.yaml) : 171 lignes, dont 112 pour les règles (le reste : attestors, variables d'entrée, données)
+Rego de la bibliothèque pour les mêmes paquets : 861 lignes (8 paquets), plus 963 lignes des bibliothèques lib qu'ils appellent
+  (tous les formats de la bibliothèque ; la réécriture ne couvre que ceux de la porte : SLSA v1, slsa-tekton, résolveur bundles, ancien format)
+## choix de la provenance par Kyverno (index des referrers de Zot ; dernière provenance valide attendue)
+horodatage/bundles : 33 bundle(s), 16 PR, 17 TR ; dernier de l'index : 122067ca:PR
+OK   retenue : 122067ca (dernière de l'index) ; Kyverno : slsa_source_correlated.attested_source_code_reference,slsa_source_version_controlled.materials_format_okay
+horodatage/essais-test8/copie-20261101t120333z : 0 bundle(s),  ; dernier de l'index : 
+KO   retenue : -, dernière de l'index 
+  index : 
+horodatage/essais-test8/copie-20261101t122804z : 0 bundle(s),  ; dernier de l'index : 
+KO   retenue : -, dernière de l'index 
+  index : 
+horodatage/essais-test8/partiel-20261101t120333z : 0 bundle(s),  ; dernier de l'index : 
+KO   retenue : -, dernière de l'index 
+  index : 
+horodatage/essais-test8/partiel-20261101t122804z : 0 bundle(s),  ; dernier de l'index : 
+KO   retenue : -, dernière de l'index 
+  index : 
+horodatage/essais-test8/webhook-seul-20261101t122804z : 0 bundle(s),  ; dernier de l'index : 
+KO   retenue : -, dernière de l'index 
+  index : 
+KO   copie : ordres  / 
+provenance retenue sur horodatage/bundles : PipelineRun builds/preuve-test7-en-service, image sc-stockage.poc.test:5000/builds/essai-webhook
+## parité règle par règle : PipelineRun réel 1fb94652 (horodatage/essais-test8/partiel-20261101t122804z pour Kyverno, tag .att pour ec), source attendue
+  VERDICT|rc-reel|true||trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+KO   parité sur le PipelineRun réel (retenue -)
+  ec seul      : attestation_type.pipelinerun_attestation_found=ok
+  ec seul      : builtin.attestation.signature_check=ok
+  Kyverno seul : attestation_type.pipelinerun_attestation_found=ko
+  Kyverno seul : builtin.attestation.signature_check=ko
+  ec seul      : slsa_source_correlated.attested_source_code_reference=ok
+  Kyverno seul : slsa_source_correlated.attested_source_code_reference=ko
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  Kyverno seul : trusted_task.tagged=ok
+KO   décision : fail	reserve-c : builtin.attestation.signature_check=ko attestation_type.pipelinerun_attestation_found=ko slsa_source_correlated.attested_source_code_reference=ko
+codes de ec non réécrits (sans objet), statut chez ec :
+  builtin.attestation.syntax_check=ok porte.construction_kata=ok porte.image_signature=ok porte.taches_vues=ok 
+  slsa_build_build_service.allowed_builder_ids_provided=ok slsa_build_scripted_build.build_script_used=ok 
+  slsa_provenance_available.allowed_predicate_types_provided=ok slsa_source_correlated.rule_data_provided=ok trusted_task.current=ok 
+  trusted_task.data=ok trusted_task.data_format=ok trusted_task.future_deny_rule=ok
+OK   chaque code de ec est réécrit ou classé sans objet
+## témoins de données (même provenance, même changement pour les deux moteurs)
+  VERDICT|rc-liste|false|trusted_task.trusted|trusted_task.tagged|30|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+KO   liste : Kyverno attestation_type.pipelinerun_attestation_found,builtin.attestation.signature_check,slsa_source_correlated.attested_source_code_reference, ec trusted_task.trusted
+  ec seul      : attestation_type.pipelinerun_attestation_found=ok
+  ec seul      : builtin.attestation.signature_check=ok
+  Kyverno seul : attestation_type.pipelinerun_attestation_found=ko
+  Kyverno seul : builtin.attestation.signature_check=ko
+  ec seul      : slsa_source_correlated.attested_source_code_reference=ok
+  Kyverno seul : slsa_source_correlated.attested_source_code_reference=ko
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.trusted=ko
+  Kyverno seul : trusted_task.tagged=ok
+  Kyverno seul : trusted_task.trusted=ok
+  VERDICT|rc-revision|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+KO   revision : Kyverno attestation_type.pipelinerun_attestation_found,builtin.attestation.signature_check,slsa_source_correlated.attested_source_code_reference, ec slsa_source_correlated.expected_source_code_reference
+  ec seul      : attestation_type.pipelinerun_attestation_found=ok
+  ec seul      : builtin.attestation.signature_check=ok
+  Kyverno seul : attestation_type.pipelinerun_attestation_found=ko
+  Kyverno seul : builtin.attestation.signature_check=ko
+  ec seul      : slsa_source_correlated.attested_source_code_reference=ok
+  ec seul      : slsa_source_correlated.expected_source_code_reference=ko
+  Kyverno seul : slsa_source_correlated.attested_source_code_reference=ko
+  Kyverno seul : slsa_source_correlated.expected_source_code_reference=ok
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  Kyverno seul : trusted_task.tagged=ok
+  VERDICT|rc-builder|false|slsa_build_build_service.slsa_builder_id_accepted|trusted_task.tagged|30|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+KO   builder : Kyverno attestation_type.pipelinerun_attestation_found,builtin.attestation.signature_check,slsa_source_correlated.attested_source_code_reference, ec slsa_build_build_service.slsa_builder_id_accepted
+  ec seul      : attestation_type.pipelinerun_attestation_found=ok
+  ec seul      : builtin.attestation.signature_check=ok
+  Kyverno seul : attestation_type.pipelinerun_attestation_found=ko
+  Kyverno seul : builtin.attestation.signature_check=ko
+  ec seul      : slsa_build_build_service.slsa_builder_id_accepted=ko
+  Kyverno seul : slsa_build_build_service.slsa_builder_id_accepted=ok
+  ec seul      : slsa_source_correlated.attested_source_code_reference=ok
+  Kyverno seul : slsa_source_correlated.attested_source_code_reference=ko
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  ec seul      : trusted_task.tagged=avert
+  Kyverno seul : trusted_task.tagged=ok
+ConfigMap porte-rc retirée
+## configuration réelle : horodatage/bundles
+CONSTAT  Kyverno refuse l'image réelle que ec admet : reserve-c : slsa_source_version_controlled.materials_format_okay=ko slsa_source_correlated.attested_source_code_reference=ko
+durées du CLI (lancement compris) : médiane 340 ms, max 450 ms, 12 évaluations
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)
+KO   réserve C : 11 mesure(s) contraire(s) à la prédiction

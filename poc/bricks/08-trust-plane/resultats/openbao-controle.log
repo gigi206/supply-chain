@@ -1,4 +1,4 @@
-# openbao.sh controle, 2026-11-02T09:42:09Z
-OK   clé publique identique (empreinte 83d2262b436e2828…)
+# openbao.sh controle, 2026-11-02T12:03:06Z
+OK   clé publique identique (empreinte e7ede9ad335612cb…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée

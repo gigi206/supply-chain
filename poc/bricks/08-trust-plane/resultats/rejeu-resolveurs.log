@@ -1,0 +1,442 @@
+# rejeu.sh resolveurs, 2026-11-02T12:52:17Z
+réseau : cilium ; reprise à J8 (bascule)
+## démontage : sautée (reprise à J8 (bascule))
+## VM : sautée (reprise à J8 (bascule))
+## k3s : sautée (reprise à J8 (bascule))
+## Cilium : sautée (reprise à J8 (bascule))
+## J2 : sautée (reprise à J8 (bascule))
+## J3 : sautée (reprise à J8 (bascule))
+## J4 : sautée (reprise à J8 (bascule))
+## J5 : sautée (reprise à J8 (bascule))
+## J6 : sautée (reprise à J8 (bascule))
+## test 5 (J6) : sautée (reprise à J8 (bascule))
+## J6 (suite) : sautée (reprise à J8 (bascule))
+## J7 : sautée (reprise à J8 (bascule))
+## J7 (admission) : sautée (reprise à J8 (bascule))
+## J7 (BuildKit) : sautée (reprise à J8 (bascule))
+## J7 (voie D) : sautée (reprise à J8 (bascule))
+## J7 (voie A, sample-app) : sautée (reprise à J8 (bascule))
+## J7 (sans réseau) : sautée (reprise à J8 (bascule))
+## J7 (construction) : sautée (reprise à J8 (bascule))
+## J7 (réseau) : sautée (reprise à J8 (bascule))
+## J8 (tests) : sautée (reprise à J8 (bascule))
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh bascule
+# preuves.sh bascule, 2026-11-02T12:52:17Z
+## prédiction (bascule du gabarit en service, décision du propriétaire du 01/11/2026)
+gabarit (politique/gabarit-sample-app.yaml, pipeline sample-app de construction.sh taches) : PipelineRun rendu admis à blanc
+  au nom de el-forgejo et du rattrapage ; appliqué, il remplace le gabarit d'essai ; rattrapage suspendu pendant les purges
+chemin 1, livraison de Forgejo (POST hooks/<id>/tests : HTTP 204) pour la tête de main 6391fd437f26696847041be3226bbbf633f55a2f, sample-app-6391fd437f26696847041be3226bbbf633f55a2f purgé avant :
+  PipelineRun créé par el-forgejo (une création, 201), pipeline sample-app, réussi ; pod construire sous Kata sur sc-build ;
+  résultats IMAGE_URL sc-stockage.poc.test:5000/builds/sample-app et IMAGE_DIGEST sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; spec identique à celle de j7-sample-app, bundle masqué ;
+  Chains signe les trois TaskRuns et le PipelineRun : deux enveloppes de plus sur l'image réelle (TaskRun publier, PipelineRun),
+  horodatées ; porte (source workspace/sample-app@6391fd437f26696847041be3226bbbf633f55a2f) : admise, aucune violation, contrôle 9 ok ; la provenance jugée est la nouvelle
+  écritures de poc-images : non jugées (le manifeste existe déjà ; oras cp peut ne rien écrire), relevées
+chemin 2, rattrapage (sample-app-6391fd437f26696847041be3226bbbf633f55a2f purgé, CronJob repris, aucune livraison) : mêmes mesures, créé par le compte rattrapage ;
+  spec identique à celle du chemin 1
+rejeu de la livraison de Forgejo : refusé à la création (already exists), même PipelineRun (même UID)
+contrôle exécutions/enveloppes : aucune anomalie au départ ni à la fin ; image réelle : quatre enveloppes de plus, provenance
+  la plus récente = celle du chemin 2
+posture (tekton-lint) du gabarit, de la pipeline et de ses trois tâches lues dans leurs bundles : aucun signalement
+## départ
+OK   bundle de la pipeline dans Zot : sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc
+OK   tâche preparer dans la liste revue : tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+OK   tâche construire dans la liste revue : tekton/tasks/construire-image@sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   NetworkPolicy construction-sans-sortie présente
+pipeline : tekton/pipelines/sample-app@sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc ; celle de j7-sample-app : même bundle
+gabarit en service : pipeline sample-app-essai
+CronJob rattrapage suspendu (aucun passage actif)
+OK   aucune exécution en cours ni en attente de Chains
+depart : COUVERTE 27, ECHEC_SIGNATURE 8, SANS_SUJET 16
+OK   départ : aucune anomalie
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)
+## gabarit
+OK   témoin PipelineRun du gabarit, au nom de el-forgejo : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
+OK   témoin PipelineRun du gabarit, au nom du rattrapage : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
+OK   gabarit en service : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc
+## chemin 1 : livraison de Forgejo
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+OK   webhook : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : EventListener forgejo
+    1 declencheurs:el-forgejo 201
+OK   webhook : une création, par declencheurs:el-forgejo (audit de l'API)
+OK   webhook : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc
+OK   webhook : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
+TaskRun construire : Succeeded, TrustedResourcesVerified=True
+TaskRun preparer : Succeeded, TrustedResourcesVerified=True
+TaskRun publier : Succeeded, TrustedResourcesVerified=True
+pod preparer : nœud sc-build, runtimeClassName -
+pod publier : nœud sc-build, runtimeClassName -
+pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : résultats : IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app
+OK   webhook : spec identique à celle de j7-sample-app (J7), bundle de la pipeline masqué
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   webhook : PipelineRun signé par Chains : true
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-02T12:52:24Z : 1 (le manifeste existait déjà)
+OK   aucune exécution en cours ni en attente de Chains
+passage d'horodatage horodatage-29893734
+sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 35 enveloppe(s) de Chains, 35 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
+OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
+  VERDICT|ba-webhook|true||trusted_task.tagged|31|ok|4/4 enveloppe(s) couverte(s), 35 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+OK   webhook : verdict de la porte (succès|violations|horodatage) : true||ok
+OK   webhook : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : c67e71b9-52f8-4639-aa6f-28bfdcabce37
+## chemin 2 : rattrapage
+CronJob rattrapage repris
+OK   rattrapage : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : rattrapage
+    1 declencheurs:rattrapage 201
+OK   rattrapage : une création, par declencheurs:rattrapage (audit de l'API)
+OK   rattrapage : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc
+OK   rattrapage : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
+TaskRun construire : Succeeded, TrustedResourcesVerified=True
+TaskRun preparer : Succeeded, TrustedResourcesVerified=True
+TaskRun publier : Succeeded, TrustedResourcesVerified=True
+pod preparer : nœud sc-build, runtimeClassName -
+pod publier : nœud sc-build, runtimeClassName -
+pod construire : nœud sc-build, runtimeClassName kata
+OK   rattrapage : pod construire : nœud sc-build, runtimeClassName kata
+OK   rattrapage : résultats : IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app
+OK   rattrapage : spec identique à celle de j7-sample-app (J7), bundle de la pipeline masqué
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   rattrapage : PipelineRun signé par Chains : true
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-02T12:54:48Z : 1 (le manifeste existait déjà)
+OK   aucune exécution en cours ni en attente de Chains
+passage d'horodatage horodatage-29893736
+sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 37 enveloppe(s) de Chains, 37 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
+OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
+  VERDICT|ba-rattrapage|true||trusted_task.tagged|30|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+OK   rattrapage : verdict de la porte (succès|violations|horodatage) : true||ok
+OK   rattrapage : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : 671b9274-fe4a-468b-b2b2-3a329a33b068
+rattrapage-29893734  JOINT|Forgejo et API, essai 1
+rattrapage-29893734  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893734  CREE|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+rattrapage-29893735  JOINT|Forgejo et API, essai 1
+rattrapage-29893735  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893735  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893736  JOINT|Forgejo et API, essai 1
+rattrapage-29893736  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893736  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   rattrapage : créations de sample-app-6391fd437f26696847041be3226bbbf633f55a2f dans les journaux des passages depuis la reprise : 1
+OK   spec identique par les deux chemins
+## rejeu de la livraison
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+  {"t":"12:56:50","eventID":"7cf5476e-1e8c-49a6-b87f-6b8d151124f1","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu refusé à la création (already exists)
+OK   UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : 671b9274-fe4a-468b-b2b2-3a329a33b068
+## fin
+OK   aucune exécution en cours ni en attente de Chains
+fin : COUVERTE 27, ECHEC_SIGNATURE 8, SANS_SUJET 18
+OK   fin : aucune anomalie
+OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 → 6
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 enveloppes, dernière provenance de PipelineRun : 671b9274-fe4a-468b-b2b2-3a329a33b068 (2026-11-02T12:55:41Z)
+## posture du gabarit en service, de sa pipeline et de ses tâches (bundles de Zot)
+OK   5 ressources : aucun signalement, comme prédit
+CronJob rattrapage repris
+## durée J8 (bascule) : 276 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh helm_cilium
+# preuves.sh helm_cilium, 2026-11-02T12:56:53Z
+Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
+- aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
+  helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)
+- ni HelmChart (CRD absente ou vide), ni compte de service helm-*, ni liaison helm-* ; release Helm cilium deployed, de l'hôte
+- pod portant helm-cilium dans kube-system refusé en dry-run serveur (compte introuvable) au nom de chaque compte qui peut y
+  créer des pods ; témoin : même pod avec le compte default, admis ; les comptes créateurs et la source de leurs droits
+  restent ceux de la mesure sous le HelmChart (information)
+Prédiction ajoutée (01/11/2026, avant le premier passage sous la règle tekton-controleurs-builds) : pour les contrôleurs de
+  Tekton et de Chains, pod à helm-cilium toujours refusé comme introuvable (contrôle du compte avant la validation) et
+  témoin default refusé par la règle ; pod portant clusterrole-aggregation-controller refusé par la règle au nom des deux
+  contrôleurs, admis au nom de l'administrateur (témoin) : chemin de ces contrôleurs vers cluster-admin fermé
+Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire des deux contrôleurs bornés à builds) : ils ne
+  sont plus parmi les comptes qui peuvent créer des pods dans kube-system (7 au lieu de 9) ; le pod portant
+  clusterrole-aggregation-controller leur est refusé par les droits (RBAC), avant la règle ; témoin administrateur admis
+## liaisons vers cluster-admin
+  ClusterRoleBinding -/cluster-admin → Group -/system:masters
+  témoin : ClusterRoleBinding -/helm-kube-system-cilium → ServiceAccount kube-system/helm-cilium
+OK   témoin : liaisons trouvées par le filtre dans la liaison relevée sous le HelmChart : 1
+OK   liaisons vers cluster-admin dont un sujet est un compte de service : 0
+## contrôleur Helm de k3s
+OK   CRD helmcharts.helm.cattle.io absente
+OK   comptes de service helm-* : 0
+OK   liaisons helm-* : 0
+OK   release Helm cilium (depuis l'hôte) : deployed cilium-1.20.4
+OK   can-i '*' '*' au nom de helm-cilium (compte absent) : no
+## pod portant helm-cilium dans kube-system (dry-run serveur)
+OK   comptes de service qui peuvent créer des pods dans kube-system (7 depuis le 02/11/2026) : 7
+OK   contrôleurs de Pipelines et de Chains parmi eux : 0
+  system:serviceaccount:kube-system:daemon-set-controller : system:controller:daemon-set-controller → system:controller:daemon-set-controller
+  system:serviceaccount:kube-system:job-controller : system:controller:job-controller → system:controller:job-controller
+  system:serviceaccount:kube-system:local-path-provisioner-service-account : local-path-provisioner-bind → local-path-provisioner-role
+  system:serviceaccount:kube-system:persistent-volume-binder : system:controller:persistent-volume-binder → system:controller:persistent-volume-binder
+  system:serviceaccount:kube-system:replicaset-controller : system:controller:replicaset-controller → system:controller:replicaset-controller
+  system:serviceaccount:kube-system:replication-controller : system:controller:replication-controller → system:controller:replication-controller
+  system:serviceaccount:kube-system:statefulset-controller : system:controller:statefulset-controller → system:controller:statefulset-controller
+OK   system:serviceaccount:kube-system:daemon-set-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:job-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:local-path-provisioner-service-account : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:persistent-volume-binder : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replicaset-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replication-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:statefulset-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+## pouvoirs des comptes de kube-system (ajouté après un relevé à la main du 01/11/2026 : prédiction non aveugle)
+Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalate, update et patch sur clusterroles, donc
+  capable d'élargir sa propre ClusterRole ; pod portant ce compte admis au nom des contrôleurs de Tekton et de Chains : le
+  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai) ; depuis la règle
+  tekton-controleurs-builds : voir la prédiction ajoutée en tête
+  clusterrole-aggregation-controller : [escalate clusterroles] [update clusterroles]
+  daemon-set-controller : [create pods]
+  generic-garbage-collector : [update clusterroles]
+  job-controller : [create pods]
+  local-path-provisioner-service-account : [create pods]
+  persistent-volume-binder : [create pods]
+  replicaset-controller : [create pods]
+  replication-controller : [create pods]
+  service-account-controller : [create serviceaccounts]
+  statefulset-controller : [create pods]
+OK   comptes de kube-system à '*' '*' : 0
+OK   clusterrole-aggregation-controller : escalate, update, patch sur clusterroles : yes,yes,yes
+OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod portant clusterrole-aggregation-controller refusé par les droits, avant la règle (dry-run serveur)
+OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod portant clusterrole-aggregation-controller refusé par les droits, avant la règle (dry-run serveur)
+OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)
+## durée J8 (helm-cilium) : 19 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh controleurs
+# preuves.sh controleurs, 2026-11-02T12:57:12Z
+Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :
+- ValidatingAdmissionPolicy tekton-controleurs-builds et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)
+- aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)
+Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire bornés à builds, décision du propriétaire du
+01/11/2026) ; elle remplace les lignes « refusé par la règle » et « reste ouvert : lecture des Secrets » du 01/11/2026 :
+- ClusterRoleBindings *-tenant-access introuvables ; RoleBindings du même nom dans builds ; Chains lit les ConfigMaps de
+  tekton-chains par un Role ; contrôleur de Pipelines lancé avec -namespace=builds, Chains avec --namespace=builds
+- au nom de chacun des deux contrôleurs, essais réels refusés par les droits (RBAC, avant l'admission), rien de créé ni de
+  modifié : mêmes essais que le 01/11/2026 (pod portant clusterrole-aggregation-controller, StatefulSet, PVC, annotation
+  et image d'un pod de kube-system ; annotation du StatefulSet openbao ; pod de tekton-chains) ; lectures de Secrets
+  hors de builds refusées (k3s-serving de kube-system, Secrets d'openbao, zot-chains de tekton-chains) ; can-i list
+  secrets : no dans tout le cluster, yes dans builds
+- règle en seconde barrière : dans un espace d'essai où une liaison temporaire leur rend les droits de locataire, pod
+  refusé par la règle au nom des deux contrôleurs ; liaison et espace supprimés ensuite
+- audit de l'API (lectures de Secrets de ces deux comptes journalisées depuis l'installation de k3s) : toutes dans builds,
+  aucun refus (403) ; journaux des deux contrôleurs : aucun refus des droits, aucun redémarrage
+- témoins inchangés : administrateur admis ; pod default admis au nom des autres créateurs de pods de kube-system (7) ;
+  pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle : au moins un, aucun refusé
+- information : comptes de service qui peuvent lire les Secrets de kube-system ou de tout le cluster (les deux contrôleurs
+  n'y sont plus)
+## règle
+OK   ValidatingAdmissionPolicy tekton-controleurs-builds (failurePolicy, à jour, avertissements de typage) : Fail true 0
+OK   liaison tekton-controleurs-builds : tekton-controleurs-builds Deny
+posée le 2026-11-02T11:30:43Z
+OK   tekton-pipelines-controller : create, update, patch, delete sur la règle et sa liaison : no
+OK   tekton-chains-controller : create, update, patch, delete sur la règle et sa liaison : no
+## droits
+OK   ClusterRoleBinding tekton-pipelines-controller-tenant-access introuvable (NotFound) : 1
+OK   RoleBinding builds/tekton-pipelines-controller-tenant-access → ClusterRole : ClusterRole/tekton-pipelines-controller-tenant-access
+OK   ClusterRoleBinding tekton-chains-controller-tenant-access introuvable (NotFound) : 1
+OK   RoleBinding builds/tekton-chains-controller-tenant-access → ClusterRole : ClusterRole/tekton-chains-controller-tenant-access
+OK   Role tekton-chains/tekton-chains-controller-config (ConfigMaps) : ["configmaps:get,list,watch"]
+OK   argument de namespace du contrôleur de Pipelines : -namespace=builds
+OK   arguments de Chains : --namespace=builds
+OK   tekton-pipelines-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
+OK   tekton-chains-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
+## essais réels au nom des contrôleurs
+pod existant visé : kube-system/local-path-provisioner-d9d8769b6-lnbhq (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao
+OK   tekton-pipelines-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
+OK   tekton-pipelines-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-sys)
+OK   tekton-pipelines-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespac)
+OK   tekton-pipelines-controller : annotation du pod local-path-provisioner-d9d8769b6-lnbhq : refusé (pods "local-path-provisioner-d9d8769b6-lnbhq" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
+OK   tekton-pipelines-controller : image du pod local-path-provisioner-d9d8769b6-lnbhq remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-lnbhq" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
+OK   tekton-pipelines-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "o)
+OK   tekton-pipelines-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
+OK   tekton-pipelines-controller : lecture du Secret kube-system/k3s-serving : refusé (secrets "k3s-serving" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
+OK   tekton-pipelines-controller : liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   tekton-pipelines-controller : lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "secrets" in API group "" in the namespace "tekton-chains" )
+OK   tekton-chains-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
+OK   tekton-chains-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-system" )
+OK   tekton-chains-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespace "kub)
+OK   tekton-chains-controller : annotation du pod local-path-provisioner-d9d8769b6-lnbhq : refusé (pods "local-path-provisioner-d9d8769b6-lnbhq" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
+OK   tekton-chains-controller : image du pod local-path-provisioner-d9d8769b6-lnbhq remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-lnbhq" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
+OK   tekton-chains-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "openbao)
+OK   tekton-chains-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
+OK   tekton-chains-controller : lecture du Secret kube-system/k3s-serving : refusé (secrets "k3s-serving" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
+OK   tekton-chains-controller : liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   tekton-chains-controller : lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "secrets" in API group "" in the namespace "tekton-chains" )
+OK   objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains) : 0
+OK   annotations preuve-controleurs posées : 0
+## règle en seconde barrière : espace d'essai preuve-controleurs, droits de locataire rendus par une liaison temporaire
+OK   tekton-pipelines-controller : can-i create pods dans preuve-controleurs (liaison temporaire) : yes
+OK   tekton-pipelines-controller : pod de preuve-controleurs : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   tekton-chains-controller : can-i create pods dans preuve-controleurs (liaison temporaire) : yes
+OK   tekton-chains-controller : pod de preuve-controleurs : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)
+OK   espace preuve-controleurs et ses liaisons temporaires introuvables (NotFound) : 1
+OK   tekton-pipelines-controller : can-i create pods dans preuve-controleurs (après suppression) : no
+OK   tekton-chains-controller : can-i create pods dans preuve-controleurs (après suppression) : no
+## témoins
+OK   administrateur : même pod admis (dry-run serveur)
+OK   administrateur : même StatefulSet admis (dry-run serveur)
+OK   daemon-set-controller : pod default de kube-system admis (dry-run serveur)
+OK   job-controller : pod default de kube-system admis (dry-run serveur)
+OK   local-path-provisioner-service-account : pod default de kube-system admis (dry-run serveur)
+OK   persistent-volume-binder : pod default de kube-system admis (dry-run serveur)
+OK   replicaset-controller : pod default de kube-system admis (dry-run serveur)
+OK   replication-controller : pod default de kube-system admis (dry-run serveur)
+OK   statefulset-controller : pod default de kube-system admis (dry-run serveur)
+OK   comptes de service qui peuvent créer des pods dans kube-system : 7
+refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :
+      1   preuve-controleurs tekton-chains-controller create pods
+      1   preuve-controleurs tekton-pipelines-controller create pods
+OK   refus de la règle dans builds (audit) : 0
+OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 39
+## lectures de Secrets des deux contrôleurs dans l'audit de l'API (depuis l'installation de k3s ; sans --as)
+     14   tekton-chains-controller get builds 200 ResponseComplete
+     10   tekton-pipelines-controller watch builds 200 ResponseComplete
+     12   tekton-pipelines-controller watch builds 200 ResponseStarted
+OK   lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer) : true
+OK   lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre : 0
+## journaux des contrôleurs (depuis leur démarrage)
+OK   tekton-pipelines-controller : redémarrages : 0
+OK   tekton-pipelines-controller : refus des droits dans le journal : 0
+OK   tekton-chains-controller : redémarrages : 0
+OK   tekton-chains-controller : refus des droits dans le journal : 0
+## information : comptes de service qui peuvent lister les Secrets de kube-system, et ceux de tout le cluster
+  kube-system:cilium-operator (tout le cluster : yes)
+  kube-system:generic-garbage-collector (tout le cluster : yes)
+  kube-system:namespace-controller (tout le cluster : yes)
+  kube-system:resourcequota-controller (tout le cluster : yes)
+  kube-system:token-cleaner (tout le cluster : no)
+  tekton-pipelines:tekton-triggers-core-interceptors (tout le cluster : yes)
+75 comptes de service examinés, 6 lecteurs des Secrets de kube-system
+OK   contrôleurs de Pipelines et de Chains parmi eux : 0
+## durée J8 (contrôleurs) : 19 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh resolveurs
+# preuves.sh resolveurs, 2026-11-02T12:57:31Z
+Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :
+- ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service
+  (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul
+- can-i du compte des résolveurs : list secrets tout le cluster no, get secrets builds yes, get secrets kube-system no, get
+  serviceaccounts builds yes, get serviceaccounts kube-system no, list resolutionrequests tout le cluster yes, get secrets
+  tekton-pipelines-resolvers yes (Role amont, résolveur git désactivé)
+- lectures réelles refusées par les droits au nom des résolveurs : k3s-serving de kube-system, zot-chains de tekton-chains,
+  Secrets d'openbao, comptes de service de kube-system
+- résolution réelle du bundle de la pipeline en service (sans cache) : dans builds, réussie avec le compte de service default
+  (get du compte de service) et avec le Secret zot-images sans compte de service (get du Secret) ; mêmes requêtes dans un
+  espace d'essai preuve-resolveurs : échouées, refus des droits sur le compte de service, puis sur le Secret ; espace supprimé
+- journal des résolveurs depuis le début de l'étape : refus des droits seulement dans preuve-resolveurs
+- audit de l'API : si la politique du nœud journalise les lectures des résolveurs (k3s installé avec la politique du
+  02/11/2026), au moins une lecture dans builds, aucune hors de builds sauf les refus (403) de preuve-resolveurs ; sinon aucune
+  entrée (k3s installé avant)
+- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026
+## droits
+OK   règles du ClusterRole des résolveurs sur secrets ou serviceaccounts : 0
+OK   Role builds/tekton-pipelines-resolvers-lecture : ["secrets,serviceaccounts:get"]
+OK   RoleBinding builds/tekton-pipelines-resolvers-lecture : Role/tekton-pipelines-resolvers-lecture tekton-pipelines-resolvers:tekton-pipelines-resolvers
+OK   can-i des résolveurs : no,yes,no,yes,no,yes,yes
+## lectures réelles au nom des résolveurs
+OK   lecture du Secret kube-system/k3s-serving : refusé (secrets "k3s-serving" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "kube-sy)
+OK   lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "tekton-c)
+OK   liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   lecture du compte de service kube-system/default : refusé (serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "serviceaccounts" in API group "" in the namesp)
+## résolutions réelles (bundle de la pipeline en service, sans cache)
+paramètres : [{"name":"bundle","value":"sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:1cdbebffcf7e17577003602bea542503aa2910e2cc492439231a4e5b532c8adc"},{"name":"name","value":"sample-app"},{"name":"kind","value":"pipeline"},{"name":"cache","value":"never"}]
+OK   builds : compte de service default : True
+OK   builds : Secret zot-images sans compte de service : True
+OK   preuve-resolveurs : compte de service default, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-compte": serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "service
+OK   preuve-resolveurs : Secret zot-images sans compte de service, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-secret": secrets "zot-images" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in 
+OK   espace preuve-resolveurs introuvable (NotFound) : 1
+## journal des résolveurs depuis 2026-11-02T12:57:31Z
+refus des droits : 2
+OK   refus des droits hors de preuve-resolveurs : 0
+## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)
+règle des résolveurs dans la politique d'audit du nœud : 1
+      2   get secrets builds 200 ResponseComplete
+      1   get secrets preuve-resolveurs 403 ResponseComplete
+     46   get serviceaccounts builds 200 ResponseComplete
+      1   get serviceaccounts preuve-resolveurs 403 ResponseComplete
+OK   lectures dans builds (au moins une) : true
+OK   lectures hors de builds, sauf les refus (403) de preuve-resolveurs : 0
+## lecteurs des Secrets de tout le cluster
+  kube-system:cilium-operator
+  kube-system:generic-garbage-collector
+  kube-system:namespace-controller
+  kube-system:resourcequota-controller
+  tekton-pipelines:tekton-triggers-core-interceptors
+OK   lecteurs : kube-system:cilium-operator,kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors
+## durée J8 (résolveurs) : 10 s
+[confiance:fuites] $ poc/bricks/08-trust-plane/fuites.sh resolveurs
+# fuites.sh resolveurs, 2026-11-02T12:57:41Z
+## sc-confiance : 64927 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-build : 23642 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-stockage : 43732 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM
+## durée fuites : 2 s
+## durée totale : 326 s

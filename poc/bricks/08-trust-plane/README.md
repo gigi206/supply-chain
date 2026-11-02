@@ -703,7 +703,7 @@ Plan validé par le propriétaire le 30/10/2026 (voir « Préparation de J8 »).
 
 ### Résolveurs bornés à builds, intercepteurs mesurés (02/11/2026, après la clôture)
 
-Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets de tout le cluster qui relèvent de la plateforme. Mesuré sur le cluster de J8, **pas encore rejoué sur une installation neuve** (la règle d'audit des résolveurs n'existe que sur un k3s installé après ce jour).
+Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets de tout le cluster qui relèvent de la plateforme. Mesuré sur le cluster de J8, puis **rejoué sur une installation neuve** (rejeu `resolveurs`, voir le dernier point).
 
 - **Lecture du code avant la mesure.**
   - Résolveurs (Pipelines v1.15.5) : lectures `Get` une par une, sans informer de Secrets. Elles se font dans l'espace de la requête : `bundles` passe par k8schain, qui lit le compte de service puis ses Secrets de tirage. `git` lit dans son propre espace, où le Role amont reste. Seul `bundles` est activé.
@@ -726,6 +726,18 @@ Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets 
   - témoin : une livraison mal signée est refusée par l'intercepteur `github`, aucun PipelineRun n'est créé ([`preuves-intercepteurs-temoin-webhook.log`](resultats/preuves-intercepteurs-temoin-webhook.log) ; premier passage archivé, arrêté sur un motif cherché dans le mauvais journal) ;
   - **conclusion** : les intercepteurs ne peuvent pas être bornés par les droits sans modifier Triggers. La limite est gardée. Aucune issue n'a été ouverte en amont, faute d'accord du propriétaire.
 - Contrôle des fuites : aucun secret dans les journaux des trois VM ([`fuites-resolveurs.log`](resultats/fuites-resolveurs.log)).
+- **Rejeu `resolveurs`** (02/11/2026, de zéro, accord du propriétaire), en deux parties comme le rejeu `cloture` :
+  - **Partie 1, de 11:23:54 à 12:51:06 UTC** ([`rejeu-resolveurs-partie-1.log`](resultats/rejeu-resolveurs-partie-1.log), 715 OK) :
+    - J4 : le contrôle du rendu des résolveurs passe dans `tekton.sh installer` ([`tekton-installer.log`](resultats/tekton-installer.log)) ;
+    - tests 1 à 8 sans KO, avec les mêmes nombres d'OK qu'au rejeu `cloture` ;
+    - ÉCART et CONSTAT identiques, sauf la valeur de la signature de la pipeline (nouvelle à chaque passage) ;
+    - arrêt sur `reserve_c`, non rejouable comme au rejeu `cloture` : 11 KO sur des dépôts vides, seuls KO du passage. Ce passage est archivé ([`preuves-reserve_c-rejeu-resolveurs.log`](resultats/preuves-reserve_c-rejeu-resolveurs.log)) et la mesure du 01/11 est gardée.
+  - **Entre les deux** : `decision3` relancé à la main, 15 OK.
+  - **Partie 2, reprise à la bascule sur le même cluster** ([`rejeu-resolveurs.log`](resultats/rejeu-resolveurs.log), 326 s, aucun KO) : `bascule` 44 OK, `helm_cilium` 21, `controleurs` 62, `resolveurs` 17, aucune fuite.
+  - **Audit sur l'installation neuve** ([`preuves-resolveurs.log`](resultats/preuves-resolveurs.log)) :
+    - 46 lectures de comptes de service et 2 lectures de Secrets par les résolveurs, toutes dans `builds` ;
+    - 2 refus (403), tous deux dans l'espace d'essai ;
+    - aucune autre lecture.
 
 ## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
 

@@ -1,4 +1,4 @@
-# preuves.sh test8, 2026-11-02T10:16:33Z
+# preuves.sh test8, 2026-11-02T12:37:38Z
 ## prédiction (contrôle 9 joint à la porte : politique/porte/horodatage.sh, conteneur horodatage du Job, après ec)
 règle : chaque signature d'attestation vérifiée par ec doit se retrouver dans un bundle du dépôt de bundles vérifié par cosign v3.1.4
   (clé de Chains, sujet = digest jugé, slsaprovenance1, jeton exigé, racine du TSA) ; aucune attestation vérifiée par ec : refus.
@@ -21,7 +21,7 @@ format bundle de cosign v3, témoins de essais-j8/test8 (clé jetable, ConfigMap
   contrôle 9 refus pour les deux (aucun bundle horodaté de ces digests)
 limites écrites d'avance : image d'outils non signée dans la porte ; image neuve refusée jusqu'au passage suivant du CronJob ;
   sorties du pod : celles de la NetworkPolicy porte (DNS, Zot), vérification hors ligne
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)
 OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f (source attendue)
 ## porte élargie
 OK   ConfigMap porte : horodatage.sh, porte.rego identiques aux fichiers versionnés ; racine de confiance du TSA ajoutée
@@ -32,79 +32,79 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
 ## bundles falsifiés (à partir des deux bundles réels)
 jeton altéré : dernier octet (signature ECDSA du TSA) inversé ; jetons échangés entre les deux enveloppes
 TSA étrangère : jetons valides pour leur propre racine (même CN « TSA du PoC », autre clé)
-autre digest : bundle 4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c-47ad6eb30602964b de horodatage/bundles, sujet sha256:4903e1522274… (sc-stockage.poc.test:5000/builds/essai-porte)
+autre digest : bundle 4903e152227424f52b70a6ffda319f54b52eabdfd445a674a254a7530a73360c-0e6762ddc2ce370c de horodatage/bundles, sujet sha256:4903e1522274… (sc-stockage.poc.test:5000/builds/essai-porte)
   cosign verify-blob-attestation, --digest sha256:4903e1522274… : vérifié (-)
   cosign verify-blob-attestation, --digest sha256:3a7ca1b14dbf… : refusé (failed to verify signature: provided artifact digest does not match any digest in statement)
-## dépôts d'essai (horodatage/essais-test8/<cas>-20261102t101633z, écrits par poc-horodatage)
-copie : horodatage/essais-test8/copie-20261102t101633z (2 bundle(s))
-aucun : horodatage/essais-test8/aucun-20261102t101633z (0 bundle(s))
-partiel : horodatage/essais-test8/partiel-20261102t101633z (1 bundle(s))
-sans-jeton : horodatage/essais-test8/sans-jeton-20261102t101633z (2 bundle(s))
-jeton-altere : horodatage/essais-test8/jeton-altere-20261102t101633z (2 bundle(s))
-autre-signature : horodatage/essais-test8/autre-signature-20261102t101633z (2 bundle(s))
-tsa-etrangere : horodatage/essais-test8/tsa-etrangere-20261102t101633z (2 bundle(s))
-webhook-seul : horodatage/essais-test8/webhook-seul-20261102t101633z (2 bundle(s))
-autre-digest : horodatage/essais-test8/autre-digest-20261102t101633z (1 bundle(s))
-melange : horodatage/essais-test8/melange-20261102t101633z (4 bundle(s))
-illisible : horodatage/essais-test8/illisible-20261102t101633z (3 bundle(s))
+## dépôts d'essai (horodatage/essais-test8/<cas>-20261102t123738z, écrits par poc-horodatage)
+copie : horodatage/essais-test8/copie-20261102t123738z (2 bundle(s))
+aucun : horodatage/essais-test8/aucun-20261102t123738z (0 bundle(s))
+partiel : horodatage/essais-test8/partiel-20261102t123738z (1 bundle(s))
+sans-jeton : horodatage/essais-test8/sans-jeton-20261102t123738z (2 bundle(s))
+jeton-altere : horodatage/essais-test8/jeton-altere-20261102t123738z (2 bundle(s))
+autre-signature : horodatage/essais-test8/autre-signature-20261102t123738z (2 bundle(s))
+tsa-etrangere : horodatage/essais-test8/tsa-etrangere-20261102t123738z (2 bundle(s))
+webhook-seul : horodatage/essais-test8/webhook-seul-20261102t123738z (2 bundle(s))
+autre-digest : horodatage/essais-test8/autre-digest-20261102t123738z (1 bundle(s))
+melange : horodatage/essais-test8/melange-20261102t123738z (4 bundle(s))
+illisible : horodatage/essais-test8/illisible-20261102t123738z (3 bundle(s))
 ## verdicts de la porte (image réelle, source attendue)
   VERDICT|t8-reel|true||trusted_task.tagged|30|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
-    COUVERTE|signature 820cf4579482819d
-    COUVERTE|signature fa1412717916b871
+    COUVERTE|signature 0d40eed8e65e4d23
+    COUVERTE|signature 2d20c4f330b97b78
 OK   reel : ec admet, contrôle 9 ok (2/2 couvertes) : porte admet
 OK   reel : même verdict de ec qu'au test 7 (expected_source_code_reference, trusted_task.trusted parmi les succès)
-  VERDICT|t8-copie|true||trusted_task.tagged|30|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/copie-20261102t101633z
-    COUVERTE|signature 820cf4579482819d
-    COUVERTE|signature fa1412717916b871
+  VERDICT|t8-copie|true||trusted_task.tagged|30|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/copie-20261102t123738z
+    COUVERTE|signature 0d40eed8e65e4d23
+    COUVERTE|signature 2d20c4f330b97b78
 OK   copie : ec admet, contrôle 9 ok (2/2 couvertes) : porte admet
-  VERDICT|t8-aucun|true||trusted_task.tagged|30|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/aucun-20261102t101633z ; cosign : no matching attestations: 
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-aucun|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/aucun-20261102t123738z ; cosign : no matching attestations: 
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   aucun : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-partiel|true||trusted_task.tagged|30|refus|1/2 enveloppe(s) couverte(s), 1 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/partiel-20261102t101633z
-    COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-partiel|true||trusted_task.tagged|31|refus|1/2 enveloppe(s) couverte(s), 1 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/partiel-20261102t123738z
+    COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   partiel : ec admet, contrôle 9 refus (1/2 couvertes) : porte refuse
-  VERDICT|t8-sans-jeton|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-sans-jeton|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   sans-jeton : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-jeton-altere|true||trusted_task.tagged|30|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: 
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-jeton-altere|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: 
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   jeton-altere : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-autre-signature|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-autre-signature|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   autre-signature : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-tsa-etrangere|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-tsa-etrangere|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   tsa-etrangere : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-webhook-seul|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/webhook-seul-20261102t101633z
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-webhook-seul|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/webhook-seul-20261102t123738z
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   webhook-seul : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
-  VERDICT|t8-autre-digest|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261102t101633z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
-    NON_COUVERTE|signature 820cf4579482819d
-    NON_COUVERTE|signature fa1412717916b871
+  VERDICT|t8-autre-digest|true||trusted_task.tagged|31|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261102t123738z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+    NON_COUVERTE|signature 0d40eed8e65e4d23
+    NON_COUVERTE|signature 2d20c4f330b97b78
 OK   autre-digest : ec admet, contrôle 9 refus (0/2 couvertes) : porte refuse
 OK   webhook-seul : cosign vérifie les 2 bundles (valides pour le digest), aucun n'est apparié à une enveloppe de l'image jugée
-  VERDICT|t8-melange|true||trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261102t101633z
-    COUVERTE|signature 820cf4579482819d
-    COUVERTE|signature fa1412717916b871
+  VERDICT|t8-melange|true||trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261102t123738z
+    COUVERTE|signature 0d40eed8e65e4d23
+    COUVERTE|signature 2d20c4f330b97b78
 OK   melange : ec admet, contrôle 9 ok (2/2 couvertes) : porte admet
-  VERDICT|t8-illisible|true||trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261102t101633z
-    COUVERTE|signature 820cf4579482819d
-    COUVERTE|signature fa1412717916b871
+  VERDICT|t8-illisible|true||trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261102t123738z
+    COUVERTE|signature 0d40eed8e65e4d23
+    COUVERTE|signature 2d20c4f330b97b78
 OK   illisible : ec admet, contrôle 9 ok (2/2 couvertes) : porte admet
-  cosign dans la porte, sans-jeton : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
-  cosign dans la porte, jeton-altere : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: 
-  cosign dans la porte, autre-signature : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
-  cosign dans la porte, tsa-etrangere : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261102t101633z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc
-  cosign dans la porte, autre-digest : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261102t101633z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
-  cosign dans la porte, melange : 2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261102t101633z
-  cosign dans la porte, illisible : 2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261102t101633z
+  cosign dans la porte, sans-jeton : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+  cosign dans la porte, jeton-altere : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: 
+  cosign dans la porte, autre-signature : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
+  cosign dans la porte, tsa-etrangere : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261102t123738z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc
+  cosign dans la porte, autre-digest : 0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261102t123738z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+  cosign dans la porte, melange : 2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261102t123738z
+  cosign dans la porte, illisible : 2/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261102t123738z
 ## ancien contrôle de J6, sur l'hôte
 OK   ancien contrôle (J6), copie : accepté, 2 bundle(s) vérifié(s), comme prédit
 OK   ancien contrôle (J6), aucun : refusé, 0 bundle(s) vérifié(s), comme prédit
@@ -115,10 +115,10 @@ CONSTAT  l'ancien contrôle (un bundle valide du digest) accepte partiel et webh
   VERDICT|t8-poc-images|false|builtin.attestation.signature_check,builtin.image.signature_check||30|refus|aucune attestation vérifiée par ec
 OK   poc-images : ec refuse (signatures), contrôle 9 refus (aucune attestation vérifiée par ec)
 ## format bundle de cosign v3 : témoins à clé jetable (essais-j8/test8)
-prédicat repris : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (087cf81b-5bcf-4de2-86ea-8b2abe8bde09)
-v3-att : essais-j8/test8@sha256:1a8b81d7059365a06b769c84a7d92c286332988c6636df069b872f423b51089d ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1) ; tags .sig/.att : 0
+prédicat repris : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (1fa8e114-72b0-4364-b32d-45af34f50e2e)
+v3-att : essais-j8/test8@sha256:8d8a8332ef6c9dde0409a7cba81b5ec0847dea2a9772a8452d939937f8bba076 ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1) ; tags .sig/.att : 0
   sur l'hôte, clé jetable : cosign verify accepte, cosign verify-attestation accepte
-v3-sig : essais-j8/test8@sha256:5e0bef23e7cbbfbd9d65cee4f8793240e4f5202ee9c9565d0344ff18fdb9f7b4 ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1), application/vnd.dev.sigstore.bundle.v0.3+json (https://sigstore.dev/cosign/sign/v1) ; tags .sig/.att : 0
+v3-sig : essais-j8/test8@sha256:84f11709e44e12956300fd492d81c5af970bc29f9a45956e7a3a19cd96f4b0cf ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1), application/vnd.dev.sigstore.bundle.v0.3+json (https://sigstore.dev/cosign/sign/v1) ; tags .sig/.att : 0
   sur l'hôte, clé jetable : cosign verify accepte, cosign verify-attestation accepte
 ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
   VERDICT|t8-v3-att|false|porte.image_signature,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
@@ -127,7 +127,7 @@ CONSTAT  v3-att : builtin.image.signature_check parmi les succès avec 0 signatu
   VERDICT|t8-v3-sig|false|slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
 OK   v3-sig : slsa_build_scripted_build.subject_build_task_matches seule, porte.image_signature parmi les succès (1 signature(s) d'image)
   motif v3-att : porte.image_signature : aucune signature d'image (seulement des attestations)
-  motif v3-att : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:1a8b81d7059365a06b769c84a7d92c286332988c6636df069b872f423b51089d", does not match any of th
-  motif v3-sig : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:5e0bef23e7cbbfbd9d65cee4f8793240e4f5202ee9c9565d0344ff18fdb9f7b4", does not match any of th
+  motif v3-att : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:8d8a8332ef6c9dde0409a7cba81b5ec0847dea2a9772a8452d939937f8bba076", does not match any of th
+  motif v3-sig : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:84f11709e44e12956300fd492d81c5af970bc29f9a45956e7a3a19cd96f4b0cf", does not match any of th
 ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie ; ConfigMap porte laissée élargie (porte en service)
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)

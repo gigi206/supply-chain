@@ -1,4 +1,4 @@
-# buildkit.sh sans_reseau, 2026-11-02T09:48:09Z
+# buildkit.sh sans_reseau, 2026-11-02T12:09:05Z
 ## prédiction (écrite le 30/10/2026, avant la mesure ; option 3 du contrôle de sortie, choix du propriétaire)
 - témoins, pods Kata privilégiés, sortie testée 4 s après le lancement (au-delà de la fenêtre de 570 ms) : sans le label,
   Zot et Forgejo joignables ; avec tekton.dev/task=construire-image, les deux refusés
@@ -29,7 +29,7 @@ OK   layout livré par kubectl exec (sha256 dans le pod) : 8480d6d5275b52d8ed733
      BLOBS|OK|3
      SORTIE|Zot|FERME
      REGISTRE|1|60 s|lookup sc-stockage.poc.test: i/o timeout
-     LAYOUT|0|26 s|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+     LAYOUT|0|25 s|sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 ## comparaison
 OK   blobs du layout dans le pod : OK
 OK   pod au label : Zot : FERME

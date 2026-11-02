@@ -1,4 +1,4 @@
-# cilium.sh verifier, 2026-11-02T09:05:45Z
+# cilium.sh verifier, 2026-11-02T11:25:37Z
 ## prédiction (écrite le 30/10/2026, avant le premier démarrage de k3s avec Cilium)
 - trois nœuds prêts ; DaemonSet cilium prêt sur les trois (3/3), opérateur prêt (1/1) sur sc-confiance ; HelmChart installé
 - images des pods de Cilium : digests des manifestes amd64 (fa56fecd7795, 77a9b4371fae), importées
@@ -11,9 +11,9 @@
   « HelmChart installé » de la prédiction du 30/10/2026 ne s'applique plus
 ## nœuds
 NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>          33s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane   68s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>          16s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+sc-build       Ready    <none>          34s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   70s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          19s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
 OK   nœuds prêts
 OK   release Helm cilium (depuis l'hôte) : deployed cilium-1.20.4
 OK   CRD helmcharts.helm.cattle.io absente
@@ -22,25 +22,25 @@ OK   liaisons helm-* : 0
 OK   DaemonSet cilium prêt : 3/3
 OK   opérateur prêt, sur : true sc-confiance
 ## images
-cilium-4bd2b sur sc-build : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
-cilium-7wvjb sur sc-confiance : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
-cilium-operator-5c896b4b74-t76p4 sur sc-confiance : cilium-operator sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
-cilium-ss64r sur sc-stockage : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-hqj8x sur sc-build : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-operator-5c896b4b74-nvp58 sur sc-confiance : cilium-operator sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
+cilium-rw9f5 sur sc-confiance : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-zj7lv sur sc-stockage : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
 OK   digests des images en cours : sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1,sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
 Pulled : 22, Container image "quay.io/cilium/cilium:v1.20.4@sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54" 
 OK   événements Pulling des pods de Cilium : 0
 ## adresses
 OK   podCIDRs de sc-confiance (CiliumNode / k3s) : ["10.42.0.0/24"]
 OK   podCIDRs de sc-build (CiliumNode / k3s) : ["10.42.1.0/24"]
-OK   podCIDRs de sc-stockage (CiliumNode / k3s) : ["10.42.2.0/24"]
-kube-system/coredns-b644fd95b-k6v57 sc-confiance 10.42.0.160
-kube-system/local-path-provisioner-d9d8769b6-9msxr sc-confiance 10.42.0.175
-kube-system/metrics-server-7f4b6d9bd7-cjmhk sc-confiance 10.42.0.154
+OK   podCIDRs de sc-stockage (CiliumNode / k3s) : ["10.42.3.0/24"]
+kube-system/coredns-b644fd95b-4qgkd sc-confiance 10.42.0.160
+kube-system/local-path-provisioner-d9d8769b6-lnbhq sc-confiance 10.42.0.12
+kube-system/metrics-server-7f4b6d9bd7-d545k sc-confiance 10.42.0.31
 ## agents
-cilium-4bd2b (sc-build) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-cilium-7wvjb (sc-confiance) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-cilium-ss64r (sc-stockage) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-flux récents (hubble observe --last 3 dans cilium-4bd2b) :
-sc-confiance : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 208 Mo
-sc-build : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 181 Mo
-sc-stockage : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 176 Mo
+cilium-hqj8x (sc-build) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+cilium-rw9f5 (sc-confiance) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+cilium-zj7lv (sc-stockage) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+flux récents (hubble observe --last 3 dans cilium-hqj8x) :
+sc-confiance : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 183 Mo
+sc-build : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 185 Mo
+sc-stockage : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 183 Mo

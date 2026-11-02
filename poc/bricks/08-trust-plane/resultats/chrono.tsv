@@ -2214,3 +2214,174 @@ J8 intercepteurs	2026-11-02T11:14:50Z
 J8 intercepteurs fait	2026-11-02T11:16:33Z	
 J8 resolveurs	2026-11-02T11:20:59Z	
 J8 resolveurs fait	2026-11-02T11:21:09Z	
+VM, pool et réseau détruits	2026-11-02T11:23:57Z	
+J1 VM définies	2026-11-02T11:24:03Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-11-02T11:24:11Z	
+J1 installation de k3s	2026-11-02T11:24:12Z	
+J7 installer	2026-11-02T11:24:22Z	
+J7 installer fait	2026-11-02T11:24:47Z	
+J1 server prêt	2026-11-02T11:24:47Z	
+J1 trois nœuds prêts	2026-11-02T11:25:37Z	
+J7 verifier	2026-11-02T11:25:37Z	
+J7 verifier fait	2026-11-02T11:25:40Z	
+J2 pki	2026-11-02T11:25:40Z	
+J2 pki fait	2026-11-02T11:25:40Z	
+J2 zot	2026-11-02T11:25:40Z	
+J2 zot fait	2026-11-02T11:25:46Z	
+J2 registre	2026-11-02T11:25:46Z	
+J2 registre fait	2026-11-02T11:26:01Z	
+J2 containerd	2026-11-02T11:26:01Z	
+J2 containerd fait	2026-11-02T11:26:17Z	
+J2 forgejo	2026-11-02T11:26:17Z	
+J2 forgejo fait	2026-11-02T11:26:58Z	
+J2 depot	2026-11-02T11:26:58Z	
+J2 depot fait	2026-11-02T11:27:01Z	
+J3 image	2026-11-02T11:27:01Z	
+J3 image fait	2026-11-02T11:27:34Z	
+J3 deployer	2026-11-02T11:27:34Z	
+J3 deployer fait	2026-11-02T11:27:43Z	
+J3 initialiser	2026-11-02T11:27:43Z	
+J3 initialiser fait	2026-11-02T11:27:55Z	
+J3 configurer	2026-11-02T11:27:55Z	
+J3 configurer fait	2026-11-02T11:27:56Z	
+J3 essais	2026-11-02T11:27:56Z	
+J3 essais fait	2026-11-02T11:28:54Z	
+J3 redemarrage	2026-11-02T11:28:54Z	
+J3 redemarrage fait	2026-11-02T11:29:10Z	
+J4 revue	2026-11-02T11:29:10Z	
+J4 revue fait	2026-11-02T11:29:26Z	
+J4 miroir	2026-11-02T11:29:26Z	
+J4 miroir fait	2026-11-02T11:30:07Z	
+J4 installer	2026-11-02T11:30:07Z	
+J4 installer fait	2026-11-02T11:30:43Z	
+J4 signature	2026-11-02T11:30:43Z	
+J4 signature fait	2026-11-02T11:30:58Z	
+J4 verifier	2026-11-02T11:30:58Z	
+J3 cle	2026-11-02T11:30:58Z	
+J3 cle fait	2026-11-02T11:30:58Z	
+J4 verifier fait	2026-11-02T11:30:58Z	
+J4 webhook	2026-11-02T11:30:58Z	
+J4 webhook fait	2026-11-02T11:31:39Z	
+J4 essais_webhook	2026-11-02T11:31:39Z	
+J4 essais_webhook fait	2026-11-02T11:32:14Z	
+J5 image	2026-11-02T11:32:14Z	
+J5 image fait	2026-11-02T11:32:56Z	
+J5 pki	2026-11-02T11:32:56Z	
+J5 pki fait	2026-11-02T11:32:56Z	
+J5 openbao	2026-11-02T11:32:56Z	
+J5 openbao fait	2026-11-02T11:32:57Z	
+J5 deployer	2026-11-02T11:32:57Z	
+J5 deployer fait	2026-11-02T11:33:00Z	
+J5 essais	2026-11-02T11:33:00Z	
+J5 essais fait	2026-11-02T11:34:07Z	
+J5 horodater	2026-11-02T11:34:07Z	
+J5 horodater fait	2026-11-02T11:34:43Z	
+J5 chemins	2026-11-02T11:34:43Z	
+J5 chemins fait	2026-11-02T11:35:02Z	
+J6 image	2026-11-02T11:35:02Z	
+J6 image fait	2026-11-02T11:36:13Z	
+J6 installer	2026-11-02T11:36:13Z	
+J6 installer fait	2026-11-02T11:36:30Z	
+J6 parite	2026-11-02T11:36:30Z	
+J6 parite fait	2026-11-02T11:41:21Z	
+J6 taches	2026-11-02T11:41:21Z	
+J6 taches fait	2026-11-02T11:41:51Z	
+J6 admission	2026-11-02T11:41:51Z	
+J6 admission fait	2026-11-02T11:42:22Z	
+J6 chains	2026-11-02T11:42:22Z	
+J6 chains fait	2026-11-02T11:42:23Z	
+J6 declencheurs	2026-11-02T11:42:23Z	
+J6 declencheurs fait	2026-11-02T11:42:43Z	
+J6 restreint	2026-11-02T11:42:43Z	
+J6 restreint fait	2026-11-02T11:43:35Z	
+J6 horodatage	2026-11-02T11:43:35Z	
+J6 horodatage fait	2026-11-02T11:47:07Z	
+J6 essais_webhook	2026-11-02T11:47:07Z	
+J6 essais_webhook fait	2026-11-02T11:47:45Z	
+J6 porte	2026-11-02T11:47:45Z	
+J6 porte fait	2026-11-02T11:53:16Z	
+J6 rattrapage	2026-11-02T11:53:16Z	
+J6 rattrapage fait	2026-11-02T12:01:04Z	
+J6 droits	2026-11-02T12:01:04Z	
+J6 droits fait	2026-11-02T12:01:15Z	
+J6 posture	2026-11-02T12:01:15Z	
+J6 posture fait	2026-11-02T12:01:20Z	
+J7 verifier	2026-11-02T12:01:20Z	
+J7 verifier fait	2026-11-02T12:02:07Z	
+J7 installer	2026-11-02T12:02:07Z	
+J7 installer fait	2026-11-02T12:02:15Z	
+J7 essais	2026-11-02T12:02:15Z	
+J7 essais fait	2026-11-02T12:02:52Z	
+J7 exemption	2026-11-02T12:02:52Z	
+J3 temoin	2026-11-02T12:02:52Z	
+J3 temoin fait	2026-11-02T12:02:52Z	
+J3 controle	2026-11-02T12:03:06Z	
+J3 controle fait	2026-11-02T12:03:06Z	
+J5 temoin	2026-11-02T12:03:06Z	
+J5 temoin fait	2026-11-02T12:03:11Z	
+J7 exemption fait	2026-11-02T12:03:18Z	
+J6 admission	2026-11-02T12:03:18Z	
+J6 admission fait	2026-11-02T12:03:48Z	
+J7 image	2026-11-02T12:03:48Z	
+J7 image fait	2026-11-02T12:04:32Z	
+J7 essais	2026-11-02T12:04:32Z	
+J7 essais fait	2026-11-02T12:05:04Z	
+J7 exempte	2026-11-02T12:05:04Z	
+J7 exempte fait	2026-11-02T12:06:49Z	
+J7 image	2026-11-02T12:06:49Z	
+J7 image fait	2026-11-02T12:07:28Z	
+J7 compiler	2026-11-02T12:07:28Z	
+J7 compiler fait	2026-11-02T12:08:03Z	
+J7 assembler	2026-11-02T12:08:03Z	
+J7 assembler fait	2026-11-02T12:08:10Z	
+J7 sample_app	2026-11-02T12:08:10Z	
+J7 sample_app fait	2026-11-02T12:09:04Z	
+J7 sans_reseau	2026-11-02T12:09:05Z	
+J7 sans_reseau fait	2026-11-02T12:11:20Z	
+J7 compte	2026-11-02T12:11:20Z	
+J7 compte fait	2026-11-02T12:11:30Z	
+J7 entrees	2026-11-02T12:11:30Z	
+J7 entrees fait	2026-11-02T12:11:38Z	
+J7 taches	2026-11-02T12:11:38Z	
+J7 taches fait	2026-11-02T12:11:46Z	
+J7 constat_cm	2026-11-02T12:11:46Z	
+J7 constat_cm fait	2026-11-02T12:12:33Z	
+J7 construire	2026-11-02T12:12:33Z	
+J7 construire fait	2026-11-02T12:14:23Z	
+J7 provenance	2026-11-02T12:14:23Z	
+J7 provenance fait	2026-11-02T12:14:23Z	
+J7 reseau	2026-11-02T12:14:23Z	
+J7 reseau fait	2026-11-02T12:20:41Z	
+J8 test2	2026-11-02T12:20:41Z	
+J8 test2 fait	2026-11-02T12:20:44Z	
+J8 test4	2026-11-02T12:20:44Z	
+J8 test4 fait	2026-11-02T12:20:48Z	
+J8 test5	2026-11-02T12:20:48Z	
+J8 test5 fait	2026-11-02T12:21:08Z	
+J8 test3	2026-11-02T12:21:08Z	
+J8 test3 fait	2026-11-02T12:22:10Z	
+J8 test1	2026-11-02T12:22:10Z	
+J8 test1 fait	2026-11-02T12:22:29Z	
+J8 test6	2026-11-02T12:22:29Z	
+J8 test6 fait	2026-11-02T12:23:42Z	
+J8 reglec	2026-11-02T12:23:42Z	
+J8 reglec fait	2026-11-02T12:27:15Z	
+J8 test7	2026-11-02T12:27:15Z	
+J8 test7 fait	2026-11-02T12:36:55Z	
+J8 attseule	2026-11-02T12:36:55Z	
+J8 attseule fait	2026-11-02T12:37:38Z	
+J8 test8	2026-11-02T12:37:38Z	
+J8 test8 fait	2026-11-02T12:48:06Z	
+J8 enveloppes	2026-11-02T12:48:06Z	
+J8 enveloppes fait	2026-11-02T12:48:31Z	
+J8 reserve_c	2026-11-02T12:48:31Z	
+J8 decision3	2026-11-02T12:51:28Z	
+J8 decision3 fait	2026-11-02T12:52:13Z	
+J8 bascule	2026-11-02T12:52:17Z	
+J8 bascule fait	2026-11-02T12:56:53Z	
+J8 helm_cilium	2026-11-02T12:56:53Z	
+J8 helm_cilium fait	2026-11-02T12:57:12Z	
+J8 controleurs	2026-11-02T12:57:12Z	
+J8 controleurs fait	2026-11-02T12:57:31Z	
+J8 resolveurs	2026-11-02T12:57:31Z	
+J8 resolveurs fait	2026-11-02T12:57:41Z	

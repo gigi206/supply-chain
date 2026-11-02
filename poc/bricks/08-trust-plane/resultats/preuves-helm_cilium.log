@@ -1,4 +1,4 @@
-# preuves.sh helm_cilium, 2026-11-02T10:35:52Z
+# preuves.sh helm_cilium, 2026-11-02T12:56:53Z
 Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
 - aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
   helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)

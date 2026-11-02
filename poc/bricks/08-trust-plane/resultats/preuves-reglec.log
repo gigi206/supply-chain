@@ -1,4 +1,4 @@
-# preuves.sh reglec, 2026-11-02T10:02:42Z
+# preuves.sh reglec, 2026-11-02T12:23:42Z
 ## prédiction
 porte (Job de l'espace porte, policy.yaml) : image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 jugée avec la clé de Chains, verdict de référence V ;
   porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)
@@ -8,14 +8,14 @@ images témoins (essais-j8/regle-c), clé jetable, provenance réelle au sujet r
   sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations
   d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)
 OK   ConfigMap porte : porte.rego identique au fichier versionné
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
-provenance réelle reprise : PipelineRun 087cf81b-5bcf-4de2-86ea-8b2abe8bde09, 47201 octets
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)
+provenance réelle reprise : PipelineRun 1fa8e114-72b0-4364-b32d-45af34f50e2e, 47201 octets
 ## images témoins
-intacte : essais-j8/regle-c@sha256:16034c08c40a3c4d2d612c6ae331dfe4267d4ddaaf0f24255d855b048dae2b2e ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
+intacte : essais-j8/regle-c@sha256:c7488468f0f9d623741e5518fcaf5e52bd283c3509a5b202d8b680b840a7d34d ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
-sans-kata : essais-j8/regle-c@sha256:5d38e63c134cc8750634699ea1901ed564698780a44eca339bda4202010da8d1 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
+sans-kata : essais-j8/regle-c@sha256:e985b37dad2b17332fab48c2018b4663f5f763f9d7184f8a132295ae5f4069b5 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
-runc : essais-j8/regle-c@sha256:e97c63e5a2e5224275f9e7f24857215f697c0122d594e7e3851c5194b1b5e2d3 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
+runc : essais-j8/regle-c@sha256:d448ca421c44f2e78026b7493bc7d6d19dd562e6a2103c7b803fc58015694b80 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
 ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
 ## verdicts de la porte
@@ -23,14 +23,14 @@ ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de ce
 OK   réelle : porte.construction_kata parmi les succès
   VERDICT|reglec-intacte|false|slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
 OK   intacte : violations de l'image réelle plus subject_build_task_matches, porte.construction_kata parmi les succès
-  VERDICT|reglec-sans-kata|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
+  VERDICT|reglec-sans-kata|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
 OK   sans-kata : refusée, violations d'intacte plus porte.construction_kata seule
   motif sans-kata : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "" dans la spec signée, kata exigé
-  VERDICT|reglec-runc|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
+  VERDICT|reglec-runc|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|30|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
 OK   runc : refusée, violations d'intacte plus porte.construction_kata seule
   motif runc : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "runc" dans la spec signée, kata exigé
 ## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)
-  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|26/26 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|30|ok|26/26 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
 CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)
 ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fa8e114-72b0-4364-b32d-45af34f50e2e (2026-11-02T12:13:26Z)

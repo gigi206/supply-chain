@@ -1,4 +1,4 @@
-# voie-d.sh compiler, 2026-11-02T09:46:27Z
+# voie-d.sh compiler, 2026-11-02T12:07:28Z
 ## prédiction
 pod Kata (builds, contexte de restricted) : NoNewPrivs 1, CapBnd 0, CapEff 0, Seccomp 0 (disable_guest_seccomp) ; la même
   spec sans runtimeClassName est admise par Pod Security restricted (dry-run serveur)
@@ -21,7 +21,7 @@ OK   entrées livrées par kubectl exec (sha256 du tar, hôte et pod) : 3ab76623
      pod : Zot joignable
      espace réseau : interfaces lo
      espace réseau, Zot : injoignable
-     compilation : rc 0 en 26 s
+     compilation : rc 0 en 24 s
      fermeture vide : rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory
      proxy réseau : rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable
      binaire : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
@@ -29,7 +29,7 @@ OK   entrées livrées par kubectl exec (sha256 du tar, hôte et pod) : 3ab76623
 ## comparaison
 OK   pod Kata : NoNewPrivs, CapBnd, CapEff, Seccomp : 1 0000000000000000 0000000000000000 0
 OK   réseau : depuis le pod, puis dans l'espace réseau : Zot joignable / interfaces lo / injoignable
-OK   compilation sous unshare -n : rc 0 en 26 s
+OK   compilation sous unshare -n : rc 0 en 24 s
 OK   binaire (pod, puis relu sur l'hôte) : e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11 e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 OK   fermeture vide : refusée (rc 1 github.com/go-chi/chi/v5@v5.2.3: reading file:///tmp/vide/github.com/go-chi/chi/v5/@v/v5.2.3.zip: no such file or directory)
 OK   proxy réseau : refusé (rc 1 dial tcp 192.168.161.13:5000: connect: network is unreachable)
