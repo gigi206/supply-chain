@@ -18,6 +18,8 @@
 #   negatifs       S4, après executeur.sh installer : force-push de main, tag créé puis déplacé puis supprimé, branche
 #                  supprimée, dans l'amont ; chaque fois un run du service de la VM : code, archive publiée dans mirror/,
 #                  fork sans perte ; refs propres intactes ; restauration identique dans la VM
+#   traefik        S6 : mirror/traefik depuis GitHub par le service de la VM, premier run sans fork, fork workspace/traefik,
+#                  second run ; durées, bundles, espace disque ; timer horaire activé
 # Aucun secret en argument de commande : jetons dans des fichiers 0600 ; en-tête Authorization passé à git par
 # GIT_CONFIG_* et limité au préfixe d'URL de la cible (http.<url>.extraHeader) : il n'est jamais envoyé à l'amont.
 #
@@ -329,4 +331,41 @@ rm -rf \$t
 EOF
 }
 
-lancer forgejo S2-S4 "$@"
+# S6 : Traefik depuis GitHub, par le service de la VM (S3) ; durées, bundles et espace disque.
+run_traefik() { # libellé : un run de synchro@traefik ; durée (horodatages de systemd), code, événements, bundle
+  local u=synchro@traefik.service d0 d1 c f
+  sur sc-stockage "sudo systemctl start $u" || { echo "KO   échec de l'unité $u" >&2; sur sc-stockage "sudo journalctl -u $u -n 20 -o cat" >&2; exit 1; }
+  d0=$(sur sc-stockage "systemctl show -p ExecMainStartTimestampMonotonic --value $u")
+  d1=$(sur sc-stockage "systemctl show -p ExecMainExitTimestampMonotonic --value $u")
+  c=$(sur sc-stockage "systemctl show -p ExecMainStatus --value $u")
+  f=$(sur sc-stockage "sudo sh -c 'ls -1 /var/lib/synchro/traefik/rapports/*.json | tail -1'")
+  sur sc-stockage "sudo cat $f" > "$T/rapport.json"
+  echo "$1 : code $c, $(( (d1 - d0) / 1000000 )) s ; $(jq -c '{status, evenements: (.events | group_by(.type) | map({(.[0].type): length}) | add),
+    bundle: (if .bundle then {fichier: .bundle.file, refs: (.bundle.refs | length), prerequis: (.bundle.prerequisites | length)} else null end)}' "$T/rapport.json")"
+  [ -z "$(jq -r '.bundle.file // empty' "$T/rapport.json")" ] \
+    || echo "  taille du bundle : $(sur sc-stockage "sudo stat -c %s /var/lib/synchro/traefik/bundles/$(jq -r .bundle.file "$T/rapport.json")") octets"
+}
+espace() {
+  sur sc-stockage "df -B1 / | tail -1; sudo du -sb /var/lib/synchro/traefik/miroir.git /var/lib/synchro/traefik/bundles /var/lib/forgejo/data/repos/mirror /var/lib/forgejo/data/repos/workspace 2>/dev/null"
+}
+
+etape_traefik() {
+  local id
+  echo "## espace avant"; espace
+  existe /repos/mirror/traefik || api poc-admin POST /orgs/mirror/repos '{"name": "traefik", "default_branch": "master", "private": false}' >/dev/null
+  copier sc-stockage /tmp/traefik-env "$here/systemd/traefik.env"
+  sur sc-stockage "sudo install -m 0644 /tmp/traefik-env/traefik.env /etc/synchro/traefik.env && rm -rf /tmp/traefik-env"
+  run_traefik "premier run (sans fork)"
+  [ "$(distant mirror/traefik refs/heads/master)" = "$(git ls-remote https://github.com/traefik/traefik.git refs/heads/master | cut -f1)" ] \
+    && echo "OK   master de mirror/traefik = master de GitHub" || echo "MESURE master de GitHub a pu avancer pendant le run"
+  existe /repos/workspace/traefik || api poc-admin POST /repos/mirror/traefik/forks '{"organization": "workspace", "name": "traefik"}' >/dev/null
+  for _ in $(seq 60); do [ -n "$(distant workspace/traefik refs/heads/master)" ] && break; sleep 2; done
+  sur sc-stockage "sudo sed -i 's#^FORK=\$#FORK=https://sc-stockage.poc.test:3000/workspace/traefik.git#' /etc/synchro/traefik.env && grep ^FORK= /etc/synchro/traefik.env"
+  id=$(equipe workspace synchro write false poc-sync)
+  api poc-admin PUT "/teams/$id/repos/workspace/traefik" >/dev/null
+  run_traefik "second run (avec fork, incrément depuis le premier)"
+  echo "## espace après"; espace
+  sur sc-stockage "sudo systemctl enable --now synchro@traefik.timer && systemctl list-timers synchro@traefik.timer --no-pager | head -2"
+}
+
+lancer forgejo S2-S6 "$@"

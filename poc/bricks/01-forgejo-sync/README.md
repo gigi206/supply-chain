@@ -282,3 +282,14 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 | **(ii)** seconde pipeline signée `sample-app-sync`, recommandée | Mêmes tâches signées (liste revue des tâches inchangée), `@IMAGE@` = `builds/sample-app-sync` ; bundle produit et signé comme celui de `construction.sh taches`, sans modifier la 08 | Une pipeline de plus à signer et à épingler ; mêmes fermeture et `web/dist` (limite inchangée) |
 
 En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en est la forme réduite. Rien n'est écrit pour S5 avant la décision.
+
+## Jalon S6 : mesure sur Traefik (préparée le 02/11/2026, exécution après S3)
+
+Étape `traefik` de [`forgejo.sh`](forgejo.sh) : `mirror/traefik` alimenté depuis GitHub par le service de la VM ([`traefik.env`](systemd/traefik.env)) ; premier run sans fork (le lanceur accepte `FORK` vide), puis fork `workspace/traefik` et second run ; durées lues dans les horodatages de systemd, taille des bundles, espace disque avant et après ; timer horaire activé ensuite.
+
+**Dimensionnement relevé avant** ([`s6-dimensionnement.log`](resultats/s6-dimensionnement.log), 14:08 UTC, pendant le rejeu de la 08) : Traefik pèse 163 561 Ko selon l'API de GitHub, branche par défaut `master` ; 30 branches et 593 tags, seuls lus par `sync.py` (les 7 704 `refs/pull` et 6 553 `refs/semaphoreci` ne sont pas synchronisés) ; `sc-stockage` : 14 Go libres sur 20 (Forgejo 6,7 Mo, Zot 2,4 Go).
+
+**Prédictions** (écrites le 02/11/2026 à 14:10 UTC, avant toute exécution) :
+- premier run : quelques minutes (fetch complet avec `transfer.fsckObjects`, push vers `mirror/`), code 0 ; bundle complet de l'ordre de la taille annoncée par GitHub (100 à 250 Mo) ; 623 événements de création (30 branches, 593 tags) ;
+- second run : sans événement (ou quelques-uns si l'amont a avancé), aucun bundle ou un bundle de quelques Ko à quelques Mo ;
+- espace consommé : moins de 1 Go au total (miroir local, bundles, `mirror/traefik` et fork dans Forgejo) ; l'espace pris par le fork est mesuré, pas supposé (objets partagés ou copiés).
