@@ -82,6 +82,7 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 | 01 | forgejo-sync | 2b-1 | 1 | Branche custom buildée ; force-push amont détecté et archivé ; `git bundle` exporté |
 | 08 | trust-plane (k3s) | 2b-1 | 5,5 | Tekton + HMAC, Chains (stockage prouvé), OpenBao, job TSA (chemin de vérification choisi), Trusted Resources, Kyverno, Conforma, RBAC, nœuds dédiés, posture des pipelines ; **8 tests négatifs** échouent comme attendu |
 | 19 | observabilité exploitation | 2b-1 | 0,5 | Les 5 alertes critiques se déclenchent sur incident simulé |
+| 19b | journalisation d'audit (ajoutée le 02/11/2026, exigence du propriétaire ; hors du total ci-dessus) | 2b-1 | 1 | Chaque source retenue retrouvée dans Grafana en moins de 2 min ; aucun secret dans Loki ; alerte « source muette » |
 | 03 | deps-closure | 2b-1 | 1 | Fermetures restaurables par digest ; déduplication ≥ 50 % |
 | 04 | hermetic-repro | 2b-1 | 1,5 | 0 connexion sortante ; 2 builds → même sha256 (binaire, image) ; fermeture altérée → build refusé, pour chaque gestionnaire |
 | 02 | artefact-store + index | 2b-1 | 1,5 | Attestations récupérables ; `tools/index` répond en moins d'une minute |
