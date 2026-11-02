@@ -1,0 +1,7 @@
+# journalisation.sh battement, 2026-11-02T21:57:58Z
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active

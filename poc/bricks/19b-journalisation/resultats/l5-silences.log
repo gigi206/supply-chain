@@ -1,0 +1,12 @@
+# journalisation.sh silences, 2026-11-02T22:11:07Z
+battement actif depuis 21:58:00, relevé à 22:11:07
+sc-confiance : 14 minutes avec au moins une ligne, plus long silence 0 min
+  battements des 10 dernières minutes : 10
+sc-build : 13 minutes avec au moins une ligne, plus long silence 0 min
+  battements des 10 dernières minutes : 9
+sc-stockage : 14 minutes avec au moins une ligne, plus long silence 0 min
+  battements des 10 dernières minutes : 9
+minimum de increase(…[5m]) par nœud depuis l'installation (Prometheus, pas de 30 s) :
+{"component_id":"loki.source.api.build","noeud":"sc-build"} 17.77777777777778
+{"component_id":"loki.source.api.confiance","noeud":"sc-confiance"} 2022.2222222222224
+SourceMuette : inactive

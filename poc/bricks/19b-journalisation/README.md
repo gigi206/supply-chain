@@ -335,3 +335,29 @@ Limites :
   - `silences` : après au moins 12 min, plus long silence par nœud dans Loki, minimum de l'expression de `SourceMuette` depuis l'installation, état de l'alerte ;
   - puis un nouvel essai de `muette`.
 - Prédictions : [`l5-predictions.md`](resultats/l5-predictions.md).
+
+## L5, exécuté (02/11/2026, 21:57 à 22:19 UTC, accord du propriétaire : « Oui, lancer L5 »)
+
+Journaux : [`l5-battement.log`](resultats/l5-battement.log), [`l5-silences.log`](resultats/l5-silences.log), [`l5-muette.log`](resultats/l5-muette.log).
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| 1 | Timer `battement-19b` `active` sur les trois VM (21:58:00) | conforme |
+| 2 | De 21:58 à 22:11 : **plus long silence de 0 min** sur les trois nœuds ; battements sur les 10 dernières minutes : 10 (`sc-confiance`), 9 (`sc-build`), 9 (`sc-stockage`) ; minimum de l'expression de `SourceMuette` : **17,8 pour `sc-build`** (0 avant D18), 2 022 pour `sc-confiance` ; `SourceMuette` `inactive` | conforme |
+| 3 | Alloy de `sc-build` arrêté à 22:11:11 : **`SourceMuette` `firing` après 420 s** (6 à 8 min prévus), notifiée. Relancé à 22:18:17 : les deux témoins écrits pendant l'arrêt sont lus dans Grafana. Résolution 446 s après l'arrêt ; une notification `firing` et une `resolved` | conforme |
+
+Un faux départ de ma part, sans effet : 14 s après l'installation, un seul battement était arrivé par nœud, et je l'ai pris pour un défaut. Le timer ne s'était déclenché qu'une fois.
+
+**Réserve de L4 levée. Seuil de la brique 19b atteint** :
+- chaque source retenue (J1 à J6, J8) est retrouvée par l'auditeur à travers l'API de Grafana en moins de 2 min (2 à 5 s) ;
+- aucun secret connu dans Loki (écart de 39 lignes de l'export consigné) ;
+- l'alerte « source muette » se déclenche quand un agent s'arrête, sans perte de lignes, et ne se déclenche plus sur un nœud calme.
+
+**Limites consignées** :
+- `LokiInjoignable` et l'arrêt d'Alloy de `sc-stockage` (`CollecteEnPanne`) ne sont pas éprouvés en réel ;
+- les lectures de l'API Kubernetes ne sont pas auditées (D14 a) ;
+- Grafana OSS n'a pas d'audit de ses utilisateurs : seules les requêtes HTTP sont tracées ;
+- Loki n'est pas infalsifiable : la suppression est refusée, mais root sur `sc-stockage` peut tout effacer ;
+- bruit dans les journaux : une erreur par requête avec la suppression désactivée, `AF_NETLINK` absent dans l'unité de Loki ;
+- résidu dans Zot (`essais-19b/temoin`) ;
+- le pare-feu par NetworkPolicies reste à faire, après validation (décision du propriétaire).
