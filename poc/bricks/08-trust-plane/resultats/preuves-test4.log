@@ -1,5 +1,5 @@
-# preuves.sh test4, 2026-10-30T22:30:10Z
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+# preuves.sh test4, 2026-11-02T08:52:45Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 6 enveloppes, dernière provenance de PipelineRun : 9ce29ddd-ca24-46b0-83b6-9c0533e23141 (2026-11-02T01:00:38Z)
 ## prédiction (écrite le 30/10/2026, avant le premier passage)
 - tentatives au nom du contrôleur de Tekton, le compte qui crée les pods des TaskRuns dans builds (créations réelles) :
   pod runc privilégié : refusé par Pod Security (restricted en enforce sur builds, HTTP 403). Pod Security est une extension
@@ -20,19 +20,19 @@ OK   pod Kata privilégié en hostNetwork : refusé par Kyverno (admission webho
 OK   témoin pod Kata privilégié : admis (pod/preuve-t4-kata-privilegie created (server dry run) )
 OK   témoin pod runc restreint : admis (pod/preuve-t4-runc-restreint created (server dry run) )
 OK   aucun pod preuve-t4-* dans builds
-## trace : événements PolicyViolation de Kyverno depuis 2026-10-30T22:30:11Z
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-02T08:52:45Z
   ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espaces système
   ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système
 OK   Kyverno a bloqué preuve-t4-kata-hostpath (événement de pods-isolation)
 OK   Kyverno a bloqué preuve-t4-kata-hostnetwork (événement de pods-isolation)
 OK   aucun événement de Kyverno pour preuve-t4-runc-privilegie : refusé par Pod Security, Kyverno non consulté
 ## trace : audit de l'API (créations de pods preuve-t4-*, annotation de Pod Security)
-  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
-  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
-  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
-  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; Pod Security : exempt runtimeClass
-  22:30:11 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; Pod Security : enforce-policy restricted:latest
+  08:52:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+  08:52:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+  08:52:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+  08:52:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; Pod Security : exempt runtimeClass
+  08:52:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; Pod Security : enforce-policy restricted:latest
 OK   audit : preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
 OK   audit : preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
 OK   audit : preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 6 enveloppes, dernière provenance de PipelineRun : 9ce29ddd-ca24-46b0-83b6-9c0533e23141 (2026-11-02T01:00:38Z)
