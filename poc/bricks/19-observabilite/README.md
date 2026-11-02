@@ -157,4 +157,6 @@ Décisions : **Zot (a)**, compte `poc-metriques` ; **D7 (a) reconfirmée** aprè
 - **Toutes les cibles `up` (8/8)** ([`o2-cibles.log`](resultats/o2-cibles.log)) ; métriques `zot_*` relevées.
 - Prédictions 9 à 11 ([`o2-zot-compte-metriques.log`](resultats/o2-zot-compte-metriques.log)) : `/metrics` en 401 anonyme, **200** avec `poc-metriques`, **403** avec `poc-ecriture` (hors liste) : conforme. `/v2/` et le catalogue en 200 ; écriture refusée (403) : conforme. **Prédiction 10 fausse sur la lecture** : `poc-metriques` reçoit 403 sur un manifeste de `builds/sample-app` que l'anonyme lit (200) ; dans Zot, un compte authentifié absent des politiques d'un dépôt ne reçoit pas l'`anonymousPolicy`. Le compte n'a donc que `/metrics`, `/v2/` et le catalogue : plus restreint que prévu.
 
+**Non-interférence côté 01** : runs planifiés de 17:18 (`sample-app-sync`) et 17:27 (`traefik`), après le redémarrage de Forgejo, terminés en code 0 ([`o2-timers-01-apres.log`](resultats/o2-timers-01-apres.log)).
+
 **O2 : seuil de jalon atteint** (toutes les cibles `up`, lecture seule mesurée). Suite : O3 (règles des 5 alertes et de A6, tests `promtool test rules`), sur accord.
