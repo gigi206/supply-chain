@@ -12,6 +12,8 @@ Cible (doc 02 §7) : métriques de Tekton, Kyverno, Zot, OpenBao et Forgejo ; Pr
 | A4 | Miroir en retard de plus de 24 h | `sync.prom` de la brique 01 (`sync_derniere_reussite_timestamp_seconds`) | timer arrêté et horodatage vieilli (fichier de test), ou règle évaluée avec un seuil réduit |
 | A5 | Refus Kyverno anormaux | métriques d'admission de Kyverno | rafale de créations refusées (cas du test 2 ou 4 de la 08) |
 
+**Alerte non critique ajoutée** (décision du propriétaire du 02/11/2026, cert-manager reporté) : **A6, expiration d'un certificat à moins de 30 jours**, hors du seuil des 5 alertes critiques. Certificats du PoC relevés le 02/11/2026 (`openssl x509 -enddate`) : Zot, Forgejo et OpenBao (TLS, 180 jours) le 27/04/2027 ; CA du PoC le 29/10/2027 ; feuille du TSA le 02/11/2027 ; racine du TSA le 26/10/2036. Source de la métrique à choisir en O1 (sonde TLS des trois services, ou fichier de dates écrit par les scripts de la 08 à chaque émission) ; incident simulé : seuil abaissé dans le test de la règle (`promtool test rules`).
+
 ## Constats relevés avant le protocole (02/11/2026, pendant le rejeu `enchainement` de la 08 ; lecture seule)
 
 - **Santé des projets (doc 04)** : Prometheus « Sain », Grafana « Sain, mais un seul éditeur » (Grafana Labs, AGPL), Alertmanager présent au tableau (Scorecard 6,6). **Non audités** : kube-prometheus-stack (chart), prometheus-operator, kube-state-metrics, node_exporter. Le doc 02 cite kube-prometheus-stack : il faudrait d'abord les auditer (règle du propriétaire : seulement des projets jugés, rien de « Risqué »).
