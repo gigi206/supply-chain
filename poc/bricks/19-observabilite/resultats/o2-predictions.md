@@ -10,3 +10,9 @@ Rien n'est encore installé ni appliqué : ces prédictions précèdent l'accord
 6. **Connexion** de `sc-stockage` vers l'API de k3s (192.168.161.11:6443) ouverte : toutes les cibles `up` en moins de 35 s.
 7. **Lecture seule** : `delete_series` refusé (API d'administration désactivée, HTTP 4xx), `/-/reload` et `/-/quit` refusés (lifecycle désactivé), `/api/v1/write` refusé (récepteur remote-write désactivé) ; écoute sur 127.0.0.1 seulement (9090, 9093, 9095, 9101) ; aucun port de grappe d'Alertmanager (9094).
 8. **Rejeu ciblé de la 08** : OpenBao revient scellé après le changement de configuration, descellé par `deverrouiller`, même clé Transit (étape `controle`) ; Zot et Forgejo redémarrés sans perte ; la porte admet toujours l'image réelle de la 08.
+
+## Complément Zot, décision (a) du propriétaire (2026-11-02T17:39:36Z, avant toute modification)
+
+9. Avec `accessControl.metrics.users = ["poc-metriques"]` et le compte htpasswd `poc-metriques` : `/metrics` en 200 avec ce compte, 401 sans authentification, 401 ou 403 avec un autre compte (`poc-ecriture`, pas dans la liste).
+10. `poc-metriques` n'est cité dans aucune politique de dépôt : il garde la lecture des dépôts par l'`anonymousPolicy` (lecture anonyme déjà permise), mais une écriture (création d'un blob par POST) est refusée (401 ou 403).
+11. Après le redémarrage de Zot : `/v2/` en 200, cible `zot` `up` ; les autres cibles restent `up`.

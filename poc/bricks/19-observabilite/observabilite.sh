@@ -101,7 +101,8 @@ etape_installer() {
   [ -s "$W/certificats.prom" ] || { echo "KO   certificats.prom absent (étape certificats)" >&2; exit 1; }
   rm -rf "$d" && (umask 077 && mkdir -p "$d")
   kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d > "$d/k8s-ca.crt"
-  cp "$A/$PROM_ARCHIVE" "$A/$AM_ARCHIVE" "$JETON" "$P/ca-poc.crt" "$W/certificats.prom" \
+  [ -s "$S/zot-poc-metriques.password" ] || { echo "KO   mot de passe de poc-metriques absent (confiance:stockage -- zot)" >&2; exit 1; }
+  cp "$A/$PROM_ARCHIVE" "$A/$AM_ARCHIVE" "$JETON" "$S/zot-poc-metriques.password" "$P/ca-poc.crt" "$W/certificats.prom" \
      "$here/config/prometheus.yml" "$here/config/alertmanager.yml" "$here"/systemd/*.service "$here"/systemd/*.py "$d/"
   copier sc-stockage /tmp/observabilite-installation "$d"/*
   sur sc-stockage sudo bash -s <<EOF
@@ -120,6 +121,7 @@ install -m 0644 k8s-ca.crt /etc/prometheus/k8s-ca.crt
 install -m 0644 ca-poc.crt /etc/prometheus/ca-poc.crt
 install -m 0640 -g prometheus prometheus-lecture.token /etc/prometheus/secrets/k8s.token
 install -m 0640 -g prometheus /etc/forgejo/secrets/metrics_token /etc/prometheus/secrets/forgejo.token
+install -m 0640 -g prometheus zot-poc-metriques.password /etc/prometheus/secrets/zot.password
 install -m 0640 -g alertmanager alertmanager.yml /etc/alertmanager/alertmanager.yml
 install -m 0644 certificats.prom /etc/fichiers-metriques/certificats.prom
 install -m 0644 fichiers.py recepteur.py /usr/local/lib/observabilite/

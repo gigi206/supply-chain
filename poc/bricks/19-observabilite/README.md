@@ -148,3 +148,13 @@ Prédictions : [`o2-predictions.md`](resultats/o2-predictions.md). Script : [`ob
 ### Séquence après un rejeu complet de la 08
 
 Un rejeu complet recrée les VM et le cluster : jeton du compte invalide, Prometheus absent. À rejouer, dans l'ordre : `mise run observabilite -- certificats compte installer cibles lecture_seule` (les archives vérifiées restent dans `~/.cache/supply-chain-poc/19/amont`, revérifiées à l'installation). La 08 reprend d'elle-même la télémétrie d'OpenBao, l'extension de Zot et le jeton de Forgejo. Non rejoué à ce jour.
+
+### Zot et D7 : décisions du propriétaire (02/11/2026, 17:38 UTC) et fin d'O2 (17:41 UTC)
+
+Décisions : **Zot (a)**, compte `poc-metriques` ; **D7 (a) reconfirmée** après la correction du risque (`X-Vault-Token` transmis par le proxy). Commits poussés à la même heure.
+
+- [`zot.json`](../08-trust-plane/stockage/zot.json) : `accessControl.metrics.users = ["poc-metriques"]` ; [`stockage.sh`](../08-trust-plane/stockage.sh) : compte htpasswd `poc-metriques` (bcrypt, mot de passe généré sur l'hôte en 0600, comme les autres comptes) ; Prometheus en `basic_auth` (`/etc/prometheus/secrets/zot.password`, 0640, sur la VM de Zot) ; `confiance:stockage -- zot` puis `observabilite -- installer cibles`.
+- **Toutes les cibles `up` (8/8)** ([`o2-cibles.log`](resultats/o2-cibles.log)) ; métriques `zot_*` relevées.
+- Prédictions 9 à 11 ([`o2-zot-compte-metriques.log`](resultats/o2-zot-compte-metriques.log)) : `/metrics` en 401 anonyme, **200** avec `poc-metriques`, **403** avec `poc-ecriture` (hors liste) : conforme. `/v2/` et le catalogue en 200 ; écriture refusée (403) : conforme. **Prédiction 10 fausse sur la lecture** : `poc-metriques` reçoit 403 sur un manifeste de `builds/sample-app` que l'anonyme lit (200) ; dans Zot, un compte authentifié absent des politiques d'un dépôt ne reçoit pas l'`anonymousPolicy`. Le compte n'a donc que `/metrics`, `/v2/` et le catalogue : plus restreint que prévu.
+
+**O2 : seuil de jalon atteint** (toutes les cibles `up`, lecture seule mesurée). Suite : O3 (règles des 5 alertes et de A6, tests `promtool test rules`), sur accord.

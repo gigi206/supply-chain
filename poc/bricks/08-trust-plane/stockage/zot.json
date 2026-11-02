@@ -99,6 +99,11 @@
             }
           ]
         }
+      },
+      "metrics": {
+        "users": [
+          "poc-metriques"
+        ]
       }
     }
   },

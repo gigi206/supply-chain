@@ -68,7 +68,9 @@ etape_zot() {
   # d'horodatage (J5), dépôts horodatage/** seulement ; poc-images : tâche de push de la construction (J7), builds/**, création
   # par digest seulement, ni tag ni mise à jour (zot.json). Sans suppression.
   rm -rf "$d" && (umask 077 && mkdir -p "$d")
-  for compte in poc-ecriture poc-build poc-horodatage poc-images; do
+  # poc-metriques (brique 19, O2, décision du propriétaire du 02/11/2026) : lecture de /metrics seulement
+  # (accessControl.metrics de zot.json), cité dans aucune politique de dépôt.
+  for compte in poc-ecriture poc-build poc-horodatage poc-images poc-metriques; do
     [ -s "$S/zot-$compte.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-$compte.password")
     h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-$compte.password")
     case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac

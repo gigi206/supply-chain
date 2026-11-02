@@ -1,6 +1,6 @@
 # Brique 19, O2 : Prometheus 3.13.5 (LTS) sur sc-stockage, décisions du propriétaire du 02/11/2026.
 # Lecture seule : écoute sur 127.0.0.1, ni --web.enable-admin-api, ni --web.enable-lifecycle, ni récepteur remote-write.
-# Secrets hors de ce fichier : /etc/prometheus/secrets/{k8s.token,forgejo.token} (0640, groupe prometheus).
+# Secrets hors de ce fichier : /etc/prometheus/secrets/{k8s.token,forgejo.token,zot.password} (0640, groupe prometheus).
 global:
   scrape_interval: 30s
   evaluation_interval: 30s
@@ -60,6 +60,10 @@ scrape_configs:
   # Services de sc-stockage (CA du PoC, SAN IP 192.168.161.13).
   - job_name: zot
     scheme: https
+    # Compte poc-metriques (accessControl.metrics de zot.json) : /metrics refusé à tout autre compte et à l'anonyme.
+    basic_auth:
+      username: poc-metriques
+      password_file: /etc/prometheus/secrets/zot.password
     tls_config:
       ca_file: /etc/prometheus/ca-poc.crt
     static_configs:

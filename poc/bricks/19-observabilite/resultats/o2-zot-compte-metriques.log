@@ -1,0 +1,10 @@
+# Zot, compte poc-metriques (décision (a) du propriétaire), 2026-11-02T17:40:50Z ; identifiants passés à curl par l'entrée standard
+/metrics anonyme : HTTP 401
+/metrics poc-metriques : HTTP 200
+/metrics poc-ecriture (hors liste) : HTTP 403
+/v2/ poc-metriques : HTTP 200
+/v2/_catalog poc-metriques : HTTP 200
+GET manifeste builds/sample-app par poc-metriques : HTTP 403
+POST début d'envoi de blob (essai-metriques/refus) par poc-metriques : HTTP 403
+POST début d'envoi de blob (builds/essai-metriques) par poc-metriques : HTTP 403
+GET manifeste builds/sample-app en anonyme (témoin) : HTTP 200
