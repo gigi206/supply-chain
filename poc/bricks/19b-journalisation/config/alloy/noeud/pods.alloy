@@ -1,0 +1,25 @@
+// Brique 19b, L3 (J2) : journaux de tous les conteneurs du nœud (/var/log/pods/<espace>_<pod>_<uid>/<conteneur>/N.log),
+// format CRI. Étiquettes tirées du chemin : espace, pod, conteneur ; source="pods".
+local.file_match "pods" {
+  path_targets = [{"__path__" = "/var/log/pods/*/*/*.log", source = "pods"}]
+}
+
+loki.source.file "pods" {
+  targets    = local.file_match.pods.targets
+  forward_to = [loki.process.pods.receiver]
+}
+
+loki.process "pods" {
+  stage.cri { }
+  stage.regex {
+    source     = "filename"
+    expression = "^/var/log/pods/(?P<espace>[^_]+)_(?P<pod>[^_]+)_[^/]+/(?P<conteneur>[^/]+)/"
+  }
+  stage.labels {
+    values = {espace = "", pod = "", conteneur = ""}
+  }
+  stage.label_drop {
+    values = ["filename"]
+  }
+  forward_to = [loki.write.sortie.receiver]
+}

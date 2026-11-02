@@ -1,0 +1,44 @@
+# Brique 19b, L3 : Grafana Alloy 1.21.3 (archive vérifiée : sha256 et attestation de release GitHub) en service durci, sur
+# chacune des trois VM. Lecture de tous les fichiers de journaux par CAP_DAC_READ_SEARCH seule (pas de root) ; journal systemd
+# par le groupe systemd-journal. Aucun rapport d'usage (--disable-reporting) ; interface sur 127.0.0.1 seulement.
+# /etc/alloy/env : NOEUD et RELAIS_URL (sc-confiance, sc-build).
+[Unit]
+Description=Grafana Alloy du PoC (brique 19b)
+Documentation=https://grafana.com/docs/alloy/
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=alloy
+Group=alloy
+SupplementaryGroups=systemd-journal
+EnvironmentFile=-/etc/alloy/env
+ExecStart=/usr/local/bin/alloy run --server.http.listen-addr=127.0.0.1:12345 --storage.path=/var/lib/alloy --disable-reporting /etc/alloy/config
+Restart=on-failure
+RestartSec=5s
+StateDirectory=alloy
+StateDirectoryMode=0750
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+AmbientCapabilities=CAP_DAC_READ_SEARCH
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0027

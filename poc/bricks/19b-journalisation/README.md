@@ -178,3 +178,37 @@ La dernière ligne de `l2-controle.log` (`/ready` à 20:52:19) a été ajoutée 
 - La sonde de disponibilité de Loki n'est utilisable que 35 s environ après un démarrage. L3 doit en tenir compte, car Alloy réessaie ses envois (à mesurer).
 
 **Seuil de la brique : non atteint.** Seule la ligne témoin de l'hôte est dans Loki : les sources J1 à J6 et J8 arrivent en L3, par Alloy.
+
+## L3, préparation à sec (02/11/2026 ; rien installé)
+
+Fichiers :
+- configurations d'Alloy par rôle dans [`config/alloy/`](config/alloy/) :
+  - `commun` : journal ;
+  - `noeud` : pods, et sortie vers le relais ;
+  - `confiance` : audit k8s ;
+  - `stockage` : sortie vers Loki, relais, audit de Zot, événements ;
+- [`systemd/alloy.service`](systemd/alloy.service) : compte `alloy`, seule capacité `CAP_DAC_READ_SEARCH`, groupe `systemd-journal`, `--disable-reporting` ;
+- [`cluster/evenements.yaml`](cluster/evenements.yaml) : compte `alloy-evenements`, avec seulement `get`, `list` et `watch` sur les événements ;
+- second device d'audit dans [`config.hcl`](../08-trust-plane/openbao/config.hcl) de la 08 (D15 a) ;
+- étapes `certificats_l3 evenements openbao_sortie alloy controle_l3` (`JALON=l3`).
+
+Prédictions : [`l3-predictions.md`](resultats/l3-predictions.md).
+
+**Lu dans la doc d'Alloy v1.21.3 :**
+- Alloy envoie par défaut des statistiques d'usage. Il est lancé avec `--disable-reporting`.
+- `loki.source.journal` ne relit que 7 h par défaut, porté à 168 h (`max_age`, limite d'âge de Loki).
+- Un répertoire passé à `alloy run` est lu comme une seule configuration.
+
+Les trois compositions sont validées sur l'hôte par `alloy validate`, avec le binaire extrait de l'archive vérifiée, sans installation. Un témoin cassé (récepteur inexistant) est refusé.
+
+**D17, proposée : relais en écriture seule sur `sc-stockage`.** Avec D16 seule, chaque agent porterait un certificat accepté par Loki, et pourrait donc lire tous les journaux de la plateforme. C'est grave pour `sc-build`, où tournent les builds. Proposé :
+- `sc-confiance` et `sc-build` n'écrivent que vers un relais Alloy de `sc-stockage` : port 3501 pour l'une, 3502 pour l'autre ;
+- chaque port n'accepte que les certificats d'une **autorité propre au nœud**, hors de la CA du PoC, que Loki refuse ;
+- le relais **impose l'étiquette `noeud`** : un nœud ne peut pas se faire passer pour un autre ;
+- seuls Grafana (`grafana-client`), Alloy de `sc-stockage` (`alloy-stockage`) et l'hôte (`controle`) gardent un certificat accepté par Loki.
+
+Alternative : chaque agent écrit directement dans Loki avec un certificat de la CA du PoC (limite de D16 acceptée).
+
+**D15 (a), coût pour la 08** : `config.hcl` change. Au prochain `openbao.sh deployer`, l'empreinte de la configuration, portée en annotation du gabarit, changera, et le pod sera recréé, donc scellé. C'est le chemin normal de la 08. En L3, la ConfigMap est appliquée et OpenBao rechargé par SIGHUP, sans redémarrage.
+
+**Pare-feu (décision du propriétaire, 02/11/2026) : « on fera le fw avec les network policies une fois tout validé ».** À faire après L4, avec une nuance à trancher à ce moment-là : les NetworkPolicies, et les politiques de Cilium, filtrent le trafic des pods et des nœuds du cluster (`sc-confiance`, `sc-build`), pas `sc-stockage`, qui n'est pas un nœud k3s. Elles peuvent interdire aux pods de joindre Loki (3100), le relais (3501, 3502) et Grafana (3001). Les ports de `sc-stockage` eux-mêmes demanderaient un filtrage sur la VM (nftables).

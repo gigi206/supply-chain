@@ -1,0 +1,21 @@
+// Brique 19b, L3 (J4) : événements Kubernetes de tous les espaces, lus par le compte alloy-evenements (get, list, watch sur
+// les événements seulement : cluster/evenements.yaml). Jeton en 0640 sur sc-stockage, comme celui de Prometheus.
+loki.source.kubernetes_events "evenements" {
+  job_name   = "evenements-k8s"
+  log_format = "json"
+  client {
+    api_server        = "https://192.168.161.11:6443"
+    bearer_token_file = "/etc/alloy/secrets/k8s.token"
+    tls_config {
+      ca_file = "/etc/alloy/tls/k8s-ca.crt"
+    }
+  }
+  forward_to = [loki.process.evenements.receiver]
+}
+
+loki.process "evenements" {
+  stage.static_labels {
+    values = {source = "evenements-k8s"}
+  }
+  forward_to = [loki.write.sortie.receiver]
+}

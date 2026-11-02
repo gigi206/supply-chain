@@ -1,0 +1,14 @@
+// Brique 19b, L3 (D17) : sc-confiance et sc-build n'écrivent que vers le relais de sc-stockage (port propre au nœud, autorité
+// de certification propre au nœud) ; elles n'ont aucun certificat accepté par Loki, donc aucune lecture des journaux.
+// L'étiquette noeud est imposée par le relais : celle posée ici n'est qu'indicative.
+loki.write "sortie" {
+  endpoint {
+    url = sys.env("RELAIS_URL")
+    tls_config {
+      ca_file   = "/etc/alloy/tls/ca-poc.crt"
+      cert_file = "/etc/alloy/tls/client.crt"
+      key_file  = "/etc/alloy/tls/client.key"
+    }
+  }
+  external_labels = {noeud = sys.env("NOEUD")}
+}

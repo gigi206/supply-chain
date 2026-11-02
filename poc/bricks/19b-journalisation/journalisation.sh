@@ -248,4 +248,167 @@ etape_controle() {
   rm -f "${W:?}/push.json" "${W:?}/lki.out" "${W:?}/lki.err" "${W:?}/graf.out"
 }
 
-case ${JALON:-} in l2) lancer l2 L2 "$@" ;; *) lancer l1 L1 "$@" ;; esac
+# ---------------------------------------------------------------------------------------------------------------- L3
+declare -A ROLES=([sc-confiance]="commun noeud confiance" [sc-build]="commun noeud" [sc-stockage]="commun stockage")
+declare -A PORT_RELAIS=([sc-confiance]=3501 [sc-build]=3502)
+
+ca_noeud() { # vm : autorité propre au nœud (D17), puis certificat client alloy-<vm> qu'elle signe ; hors de la CA du PoC
+  local v=$1 c=$here/config/pki-client.cnf n=alloy-$1
+  if [ ! -s "$S/ca-$v.key" ]; then
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/ca-$v.key")
+    openssl req -x509 -new -config "$c" -extensions ca_noeud -key "$S/ca-$v.key" -sha256 -days 180 \
+      -subj "/O=supply-chain PoC/CN=autorite $v (relais 19b)" -out "$P/ca-$v.crt"
+  fi
+  if [ ! -s "$S/$n.key" ]; then
+    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/$n.key")
+    SAN="DNS:$n.clients.poc.test" openssl req -new -config "$c" -key "$S/$n.key" -subj "/O=supply-chain PoC/CN=$n.clients.poc.test" -out "$W/$n.csr"
+    SAN="DNS:$n.clients.poc.test" openssl x509 -req -in "$W/$n.csr" -CA "$P/ca-$v.crt" -CAkey "$S/ca-$v.key" -set_serial "0x$(openssl rand -hex 16)" \
+      -days 180 -sha256 -extfile "$c" -extensions client_poc -out "$P/$n.crt" 2>/dev/null
+    rm -f "${W:?}/${n:?}.csr"
+  fi
+  openssl verify -CAfile "$P/ca-$v.crt" -purpose sslclient "$P/$n.crt"
+  printf '%s, vérifié par la CA du PoC : ' "$n"; openssl verify -CAfile "$P/ca-poc.crt" "$P/$n.crt" 2>&1 | tail -1
+}
+
+etape_certificats_l3() {
+  cert_serveur relais
+  cert_client alloy-stockage
+  ca_noeud sc-confiance; ca_noeud sc-build
+  stat -c '%a %n' "$S"/ca-sc-*.key "$S"/alloy-*.key "$S"/relais.key | sed "s#$S/##"
+}
+
+etape_evenements() {
+  local sa=system:serviceaccount:observabilite:alloy-evenements d
+  kubectl apply --server-side -f "$here/cluster/evenements.yaml"
+  for _ in $(seq 30); do
+    [ -n "$(kubectl -n observabilite get secret alloy-evenements-jeton -o jsonpath='{.data.token}' 2>/dev/null)" ] && break
+    sleep 1
+  done
+  (umask 077 && kubectl -n observabilite get secret alloy-evenements-jeton -o jsonpath='{.data.token}' | base64 -d > "$S/alloy-evenements.token")
+  [ -s "$S/alloy-evenements.token" ] || { echo "KO   jeton du compte absent" >&2; exit 1; }
+  for d in "list events -A" "watch events.events.k8s.io -A" "get secrets -n openbao" "list pods -A" "get pods --subresource=log -n openbao" "create events -n default"; do
+    # shellcheck disable=SC2086
+    echo "can-i $d : $(kubectl auth can-i $d --as "$sa" 2>&1 || true)"
+  done
+}
+
+etape_openbao_sortie() { # D15 (a) : second device d'audit (sortie standard) déclaré dans config.hcl de la 08 ; ConfigMap
+  # appliquée comme le fait openbao.sh deployer, puis rechargement par SIGHUP (sans redémarrage : OpenBao reste descellé)
+  local h08=$here/../08-trust-plane n
+  racine <<<'bao audit list -format=json' | jq -c 'keys'
+  kubectl create configmap openbao-config -n openbao --from-file=config.hcl="$h08/openbao/config.hcl" --dry-run=client -o yaml \
+    | kubectl apply --server-side -f -
+  for _ in $(seq 90); do   # propagation du volume de la ConfigMap par le kubelet (jusqu'à une minute environ)
+    kubectl exec -n openbao openbao-0 -- grep -q '"sortie"' /openbao/config/config.hcl 2>/dev/null && break
+    sleep 2
+  done
+  kubectl exec -n openbao openbao-0 -- grep -c '"sortie"' /openbao/config/config.hcl | sed 's/^/config.hcl vue par le pod, mentions de "sortie" : /'
+  kubectl exec -n openbao openbao-0 -- kill -HUP 1
+  sleep 3
+  racine <<<'bao audit list -format=json' | jq -c 'to_entries[] | {chemin: .key, type: .value.type, fichier: .value.options.file_path}'
+  racine <<<'bao audit list -format=json' | jq -e 'has("fichier/") and has("sortie/")' >/dev/null \
+    && echo "OK   deux devices d'audit actifs" || { echo "KO   devices d'audit" >&2; exit 1; }
+  racine <<<'bao read -format=json sys/seal-status >/dev/null'
+  n=$(kubectl logs -n openbao openbao-0 --since=30s | grep -c '"type":"request"' || true)
+  echo "lignes d'audit (request) sur la sortie standard du pod dans les 30 dernières secondes : $n"
+  [ "$n" -gt 0 ] && echo "OK   audit sur la sortie standard" || { echo "KO   aucune ligne d'audit sur la sortie standard" >&2; exit 1; }
+  echo "état : $(racine <<<'bao status -format=json' | jq -c '{sealed, initialized}')"
+}
+
+etape_alloy() {
+  local v r f
+  [ -s "$S/alloy-evenements.token" ] && [ -s "$P/alloy-sc-build.crt" ] || { echo "KO   étapes certificats_l3 et evenements d'abord" >&2; exit 1; }
+  for v in sc-confiance sc-build sc-stockage; do
+    echo "## $v : rôles ${ROLES[$v]}"
+    rm -rf "${D:?}" && (umask 077 && mkdir -p "$D/config")
+    for r in ${ROLES[$v]}; do cp "$here/config/alloy/$r"/*.alloy "$D/config/"; done
+    cp "$A/$ALLOY_ARCHIVE" "$here/systemd/alloy.service" "$P/ca-poc.crt" "$D/"
+    if [ "$v" = sc-stockage ]; then
+      cp "$P/alloy-stockage.crt" "$D/client.crt"; cp "$S/alloy-stockage.key" "$D/client.key"
+      cp "$P/relais.crt" "$S/relais.key" "$P/ca-sc-confiance.crt" "$P/ca-sc-build.crt" "$S/alloy-evenements.token" "$D/"
+      kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d > "$D/k8s-ca.crt"
+      printf 'NOEUD=%s\n' "$v" > "$D/env"
+    else
+      cp "$P/alloy-$v.crt" "$D/client.crt"; cp "$S/alloy-$v.key" "$D/client.key"
+      printf 'NOEUD=%s\nRELAIS_URL=https://%s:%s/loki/api/v1/push\n' "$v" "$HOTE" "${PORT_RELAIS[$v]}" > "$D/env"
+    fi
+    ( cd "$D" && tar -cf alloy-installation.tar --exclude=alloy-installation.tar . )
+    copier "$v" /tmp/alloy-installation "$D/alloy-installation.tar"
+    rm -rf "${D:?}"
+    sur "$v" sudo bash -s <<EOS
+set -euo pipefail
+cd /tmp/alloy-installation && tar -xf alloy-installation.tar
+printf '%s  %s\n' "$ALLOY_SHA" "$ALLOY_ARCHIVE" | sha256sum -c
+python3 -c 'import zipfile; zipfile.ZipFile("$ALLOY_ARCHIVE").extract("alloy-linux-amd64")'
+id alloy >/dev/null 2>&1 || useradd --system --user-group --home-dir /var/lib/alloy --no-create-home --shell /usr/sbin/nologin alloy
+install -m 0755 alloy-linux-amd64 /usr/local/bin/alloy
+install -d -m 0750 -g alloy /etc/alloy /etc/alloy/config /etc/alloy/tls /etc/alloy/secrets
+rm -f /etc/alloy/config/*.alloy
+install -m 0640 -g alloy config/*.alloy /etc/alloy/config/
+install -m 0640 -g alloy env /etc/alloy/env
+install -m 0644 ca-poc.crt client.crt /etc/alloy/tls/
+install -m 0640 -g alloy client.key /etc/alloy/tls/client.key
+if [ -f relais.crt ]; then
+  install -m 0644 relais.crt ca-sc-confiance.crt ca-sc-build.crt k8s-ca.crt /etc/alloy/tls/
+  install -m 0640 -g alloy relais.key /etc/alloy/tls/relais.key
+  install -m 0640 -g alloy alloy-evenements.token /etc/alloy/secrets/k8s.token
+fi
+install -m 0644 alloy.service /etc/systemd/system/alloy.service
+cd / && rm -rf /tmp/alloy-installation
+/usr/local/bin/alloy --version | head -1
+/usr/local/bin/alloy validate /etc/alloy/config && echo "configuration valide"
+systemctl daemon-reload
+systemctl enable alloy 2>&1
+systemctl restart alloy
+sleep 5
+systemctl is-active alloy
+journalctl -u alloy --since '-1 min' -o cat | grep -E 'level=(error|warn)' | tail -5 | cut -c1-240 || true
+EOS
+  done
+}
+
+loki_requete() { # LogQL : requête instantanée vers Loki (certificat controle), une ligne par série : étiquettes et valeur
+  curl -sS --cacert "$P/ca-poc.crt" --cert "$P/controle.crt" --key "$S/controle.key" -G "https://$HOTE:3100/loki/api/v1/query" \
+    --data-urlencode "query=$1" | jq -r '.data.result[]? | "  \(.metric | to_entries | map("\(.key)=\(.value)") | join(",")) \(.value[1])"'
+}
+
+etape_controle_l3() {
+  local m c t
+  echo "## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source"
+  loki_requete 'sum by (noeud, source) (count_over_time({source=~".+"}[10m]))' | sort
+  echo "## sources attendues (J1 à J6 et J8)"
+  for q in '{noeud="sc-confiance", source="journal", unite="k3s.service"}' '{noeud="sc-build", source="journal"}' \
+           '{noeud="sc-stockage", source="journal", unite="forgejo.service"}' '{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}' \
+           '{noeud="sc-confiance", source="pods", espace="tekton-chains"}' '{noeud="sc-build", source="pods"}' \
+           '{noeud="sc-confiance", source="audit-k8s"}' '{source="evenements-k8s"}' \
+           '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}'; do
+    c=$(loki_requete "sum(count_over_time(${q}[168h]))" | awk '{print $2}')
+    printf '%-110s %s\n' "$q" "${c:-0}"
+  done
+  echo "## D17 : relais en écriture seule, nœud imposé"
+  m="temoin-l3-$(date +%s%N)"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" --cert "$P/alloy-sc-build.crt" --key "$S/alloy-sc-build.key" -o /dev/null -w '%{http_code}' \
+    "https://$HOTE:3100/ready" 2>&1 | tail -1 || true); echo "certificat de sc-build vers Loki : $c"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" --cert "$P/alloy-sc-build.crt" --key "$S/alloy-sc-build.key" -o /dev/null -w '%{http_code}' \
+    -X POST -H 'Content-Type: application/json' "https://$HOTE:3501/loki/api/v1/push" -d '{"streams":[]}' 2>&1 | tail -1 || true)
+  echo "certificat de sc-build vers le port de sc-confiance : $c"
+  t=$(date +%s%N)
+  jq -nc --arg t "$t" --arg m "$m" '{streams: [{stream: {source: "controle-l3", noeud: "sc-confiance"}, values: [[$t, $m]]}]}' > "$W/push.json"
+  c=$(curl -sS --cacert "$P/ca-poc.crt" --cert "$P/alloy-sc-build.crt" --key "$S/alloy-sc-build.key" -o /dev/null -w '%{http_code}' \
+    -X POST -H 'Content-Type: application/json' "https://$HOTE:3502/loki/api/v1/push" -d @"$W/push.json" || true)
+  echo "certificat de sc-build vers son port, ligne étiquetée noeud=sc-confiance : HTTP $c"
+  sleep 5
+  loki_requete "sum by (noeud) (count_over_time({source=\"controle-l3\"} |= \"$m\" [5m]))" | sed 's/^/  stockée sous : /'
+  rm -f "${W:?}/push.json"
+  echo "## Grafana : l'auditeur lit le journal de k3s"
+  q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"k3s.service\"}","queryType":"range","maxLines":5}],"from":"now-15m","to":"now"}'
+  c=$(graf auditeur POST /api/ds/query "$q"); echo "HTTP $c, $(jq '[.results.A.frames[]?.data.values[2]? // [] | length] | add // 0' "$W/graf.out" 2>/dev/null) ligne(s)"
+  echo "## Alloy : état et erreurs sur les trois VM"
+  for v in sc-confiance sc-build sc-stockage; do
+    sur "$v" "echo \"$v : \$(systemctl is-active alloy), \$(( \$(systemctl show -p MemoryCurrent --value alloy) / 1048576 )) Mi, erreurs depuis le démarrage : \$(sudo journalctl -u alloy -o cat | grep -c 'level=error')\"; sudo journalctl -u alloy -o cat | grep 'level=error' | tail -2 | cut -c1-200"
+  done
+  sur sc-stockage "sudo ss -ltnp | grep -E ':(3501|3502|12345) ' | awk '{print \$4, \$6}'"
+  rm -f "${W:?}/graf.out"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; *) lancer l1 L1 "$@" ;; esac

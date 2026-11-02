@@ -13,3 +13,11 @@ extendedKeyUsage = clientAuth
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always
 subjectAltName = $ENV::SAN
+
+# Autorités propres à chaque nœud (D17) : elles ne signent que le certificat client d'Alloy de leur nœud ; le relais de
+# sc-stockage n'accepte, sur le port d'un nœud, que les certificats de son autorité. Hors de la CA du PoC : Loki les refuse.
+[ca_noeud]
+basicConstraints = critical, CA:TRUE, pathlen:0
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+nameConstraints = critical, permitted;DNS:clients.poc.test

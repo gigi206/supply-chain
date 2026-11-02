@@ -35,3 +35,13 @@ audit "file" "fichier" {
     file_path = "/openbao/data/audit.log"
   }
 }
+
+# Brique 19b, D15 (a) du propriétaire (02/11/2026) : second device vers la sortie standard du conteneur, collecté par Alloy avec
+# les journaux du pod. OpenBao ne refuse une requête que si aucun device ne peut l'écrire : le fichier sans rotation ne bloque
+# plus seul les signatures quand son volume est plein (comportement documenté, non mesuré dans le PoC).
+audit "file" "sortie" {
+  description = "Journal d'audit sur la sortie standard (valeurs sensibles en HMAC), collecté par Alloy (brique 19b)"
+  options {
+    file_path = "stdout"
+  }
+}

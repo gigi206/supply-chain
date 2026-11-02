@@ -1,0 +1,9 @@
+// Brique 19b, L3 (J6) : journal d'audit de Zot, posé par la 08 (log.audit de /etc/zot/config.json).
+local.file_match "audit_zot" {
+  path_targets = [{"__path__" = "/var/log/zot/audit.log", source = "audit-zot"}]
+}
+
+loki.source.file "audit_zot" {
+  targets    = local.file_match.audit_zot.targets
+  forward_to = [loki.write.sortie.receiver]
+}

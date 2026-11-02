@@ -1,0 +1,13 @@
+// Brique 19b, L3 : sc-stockage écrit directement dans Loki (même machine), avec le certificat client alloy-stockage de la
+// CA du PoC (D16) ; le relais y transfère aussi ce qu'il reçoit des deux autres nœuds.
+loki.write "sortie" {
+  endpoint {
+    url = "https://192.168.161.13:3100/loki/api/v1/push"
+    tls_config {
+      ca_file   = "/etc/alloy/tls/ca-poc.crt"
+      cert_file = "/etc/alloy/tls/client.crt"
+      key_file  = "/etc/alloy/tls/client.key"
+    }
+  }
+  external_labels = {noeud = "sc-stockage"}
+}

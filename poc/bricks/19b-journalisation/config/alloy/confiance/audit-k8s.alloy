@@ -1,0 +1,10 @@
+// Brique 19b, L3 (J3) : journal d'audit de l'API, posé par la 08 (écritures, lectures de Secrets ; D14 a). Fichier courant
+// seulement : les fichiers tournés sont lus avant leur rotation.
+local.file_match "audit_k8s" {
+  path_targets = [{"__path__" = "/var/lib/rancher/k3s/server/logs/audit.log", source = "audit-k8s"}]
+}
+
+loki.source.file "audit_k8s" {
+  targets    = local.file_match.audit_k8s.targets
+  forward_to = [loki.write.sortie.receiver]
+}

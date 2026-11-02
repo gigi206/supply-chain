@@ -1,0 +1,25 @@
+// Brique 19b, L3 (J1, J8) : journal systemd de la VM, sept jours en arrière au premier démarrage (limite d'âge de Loki).
+// Étiquettes : source="journal", unite (unité systemd ou identifiant syslog), priorite. Envoi : loki.write.sortie (fichier de rôle).
+loki.relabel "journal" {
+  forward_to = []
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unite"
+  }
+  rule {
+    source_labels = ["unite", "__journal_syslog_identifier"]
+    regex         = ";(.+)"
+    target_label  = "unite"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "priorite"
+  }
+}
+
+loki.source.journal "journal" {
+  max_age       = "168h"
+  labels        = {source = "journal"}
+  relabel_rules = loki.relabel.journal.rules
+  forward_to    = [loki.write.sortie.receiver]
+}
