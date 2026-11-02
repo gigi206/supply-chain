@@ -91,6 +91,12 @@
 #          administrateur, autres créateurs de pods de kube-system, pods de builds créés par le contrôleur depuis la règle ;
 #          règle hors de leur portée (can-i) ; lectures de Secrets de ces deux comptes dans l'audit de l'API (toutes dans
 #          builds), journaux sans refus des droits ; recensement des lecteurs de Secrets de kube-system. Trace : refus, audit
+#   resolveurs  résolveurs de Tekton bornés à builds pour les Secrets et les comptes de service (décision du propriétaire du
+#          02/11/2026) : règle retirée du ClusterRole amont, get dans builds (tekton/pipeline/resolveurs-lecture-builds.yaml) ;
+#          can-i, lectures réelles refusées hors de builds ; résolutions réelles sans cache du bundle en service, réussies dans
+#          builds, refusées par les droits dans un espace d'essai ; journal, audit de l'API, lecteurs de tout le cluster
+#   intercepteurs  mesure ponctuelle hors rejeu : informer de Secrets de tout le cluster des intercepteurs de Triggers
+#          (v0.37.2) ; liaison de lecture retirée et pod redémarré (pas prêt, refus « at the cluster scope »), puis remise
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2534,6 +2540,160 @@ etape_controleurs() {
   echo "$(wc -l < "$T/ct-comptes") comptes de service examinés, $(wc -l < "$T/ct-lecteurs") lecteurs des Secrets de kube-system"
   ba_attendu "contrôleurs de Pipelines et de Chains parmi eux" "$(grep -cE 'tekton-(pipelines|chains)-controller ' "$T/ct-lecteurs" || true)" 0
   [ "$k" = 0 ] || { echo "KO   controleurs : mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+RESOLVEURS=system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers
+INTERCEPTEURS=system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors
+
+lecteurs_cluster() { # comptes de service qui peuvent lister les Secrets de tout le cluster (namespace:nom, triés)
+  local ns sa
+  while IFS=: read -r ns sa; do
+    if [ "$(kubectl auth can-i list secrets -A --as "system:serviceaccount:$ns:$sa" 2>/dev/null || true)" = yes ]; then echo "$ns:$sa"; fi
+  done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}') | sort
+}
+
+rr_essai() { # espace nom paramètres-json : ResolutionRequest de bundles (sans cache), attendue jusqu'à 90 s ; « statut|message »
+  local ns=$1 n=$2 p=$3 s
+  kubectl delete resolutionrequest -n "$ns" "$n" --ignore-not-found >/dev/null
+  jq -n --arg ns "$ns" --arg n "$n" --argjson p "$p" '{apiVersion: "resolution.tekton.dev/v1beta1", kind: "ResolutionRequest",
+    metadata: {name: $n, namespace: $ns, labels: {"resolution.tekton.dev/type": "bundles"}}, spec: {params: $p}}' | kubectl create -f - >/dev/null
+  for _ in $(seq 45); do
+    s=$(kubectl get resolutionrequest -n "$ns" "$n" -o json | jq -r '(.status.conditions // [])[] | select(.type == "Succeeded") | .status')
+    [ -z "$s" ] || [ "$s" = Unknown ] || break
+    sleep 2
+  done
+  kubectl get resolutionrequest -n "$ns" "$n" -o json | jq -r '(.status.conditions // [])[] | select(.type == "Succeeded") | "\(.status)|\(.message // "")"'
+}
+
+etape_resolveurs() {
+  local k=0 t0 b p pol r ns
+  echo "Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :"
+  echo "- ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service"
+  echo "  (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul"
+  echo "- can-i du compte des résolveurs : list secrets tout le cluster no, get secrets builds yes, get secrets kube-system no, get"
+  echo "  serviceaccounts builds yes, get serviceaccounts kube-system no, list resolutionrequests tout le cluster yes, get secrets"
+  echo "  tekton-pipelines-resolvers yes (Role amont, résolveur git désactivé)"
+  echo "- lectures réelles refusées par les droits au nom des résolveurs : k3s-serving de kube-system, zot-chains de tekton-chains,"
+  echo "  Secrets d'openbao, comptes de service de kube-system"
+  echo "- résolution réelle du bundle de la pipeline en service (sans cache) : dans builds, réussie avec le compte de service default"
+  echo "  (get du compte de service) et avec le Secret zot-images sans compte de service (get du Secret) ; mêmes requêtes dans un"
+  echo "  espace d'essai preuve-resolveurs : échouées, refus des droits sur le compte de service, puis sur le Secret ; espace supprimé"
+  echo "- journal des résolveurs depuis le début de l'étape : refus des droits seulement dans preuve-resolveurs"
+  echo "- audit de l'API : si la politique du nœud journalise les lectures des résolveurs (k3s installé avec la politique du"
+  echo "  02/11/2026), au moins une lecture dans builds, aucune hors de builds sauf les refus (403) de preuve-resolveurs ; sinon aucune"
+  echo "  entrée (k3s installé avant)"
+  echo "- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  echo "## droits"
+  ba_attendu "règles du ClusterRole des résolveurs sur secrets ou serviceaccounts" "$(kubectl get clusterrole tekton-pipelines-resolvers-resolution-request-updates -o json \
+    | jq '[.rules[] | select(.resources | index("secrets") or index("serviceaccounts"))] | length')" 0
+  ba_attendu "Role builds/tekton-pipelines-resolvers-lecture" "$(kubectl get role -n builds tekton-pipelines-resolvers-lecture -o json \
+    | jq -c '[.rules[] | "\(.resources | join(",")):\(.verbs | join(","))"]')" '["secrets,serviceaccounts:get"]'
+  ba_attendu "RoleBinding builds/tekton-pipelines-resolvers-lecture" "$(kubectl get rolebinding -n builds tekton-pipelines-resolvers-lecture -o json \
+    | jq -r '"\(.roleRef.kind)/\(.roleRef.name) \(.subjects | map("\(.namespace):\(.name)") | join(","))"')" \
+    "Role/tekton-pipelines-resolvers-lecture tekton-pipelines-resolvers:tekton-pipelines-resolvers"
+  ba_attendu "can-i des résolveurs" "$( {
+    kubectl auth can-i list secrets -A --as "$RESOLVEURS" 2>/dev/null || true; kubectl auth can-i get secrets -n builds --as "$RESOLVEURS" 2>/dev/null || true
+    kubectl auth can-i get secrets -n kube-system --as "$RESOLVEURS" 2>/dev/null || true; kubectl auth can-i get serviceaccounts -n builds --as "$RESOLVEURS" 2>/dev/null || true
+    kubectl auth can-i get serviceaccounts -n kube-system --as "$RESOLVEURS" 2>/dev/null || true
+    kubectl auth can-i list resolutionrequests.resolution.tekton.dev -A --as "$RESOLVEURS" 2>/dev/null || true
+    kubectl auth can-i get secrets -n tekton-pipelines-resolvers --as "$RESOLVEURS" 2>/dev/null || true; } | paste -sd,)" "no,yes,no,yes,no,yes,yes"
+
+  echo "## lectures réelles au nom des résolveurs"
+  ct_refus "$RBAC_REFUS" "lecture du Secret kube-system/k3s-serving" kubectl get secret -n kube-system k3s-serving --as "$RESOLVEURS" -o name || k=1
+  ct_refus "$RBAC_REFUS" "lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$RESOLVEURS" -o name || k=1
+  ct_refus "$RBAC_REFUS" "liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$RESOLVEURS" -o name || k=1
+  ct_refus "$RBAC_REFUS" "lecture du compte de service kube-system/default" kubectl get serviceaccount -n kube-system default --as "$RESOLVEURS" -o name || k=1
+
+  echo "## résolutions réelles (bundle de la pipeline en service, sans cache)"
+  b=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  echo "bundle : $b"
+  p=$(jq -nc --arg b "$b" '[{name: "bundle", value: $b}, {name: "name", value: "sample-app"}, {name: "kind", value: "pipeline"}, {name: "cache", value: "never"}]')
+  kubectl create namespace preuve-resolveurs >/dev/null
+  attendre_sa preuve-resolveurs
+  for ns in builds preuve-resolveurs; do
+    r=$(rr_essai "$ns" preuve-resolveurs-compte "$p")
+    if [ "$ns" = builds ]; then ba_attendu "$ns : compte de service default" "${r%%|*}" True
+    else ba_attendu "$ns : compte de service default, refus des droits" "${r%%|*} $(grep -cE "serviceaccounts .*is forbidden: User .*$RESOLVEURS" <<< "$r" || true)" "False 1"; echo "  ${r#*|}" | cut -c1-230; fi
+    r=$(rr_essai "$ns" preuve-resolveurs-secret "$(jq -c '. + [{name: "serviceAccount", value: "no service account"}, {name: "secret", value: "zot-images"}]' <<< "$p")")
+    if [ "$ns" = builds ]; then ba_attendu "$ns : Secret zot-images sans compte de service" "${r%%|*}" True
+    else ba_attendu "$ns : Secret zot-images sans compte de service, refus des droits" "${r%%|*} $(grep -cE "secrets .*is forbidden: User .*$RESOLVEURS" <<< "$r" || true)" "False 1"; echo "  ${r#*|}" | cut -c1-230; fi
+  done
+  kubectl delete resolutionrequest -n builds preuve-resolveurs-compte preuve-resolveurs-secret >/dev/null
+  kubectl delete namespace preuve-resolveurs --wait=true >/dev/null
+  ba_attendu "espace preuve-resolveurs introuvable (NotFound)" "$(kubectl get namespace preuve-resolveurs 2>&1 | grep -c NotFound || true)" 1
+
+  echo "## journal des résolveurs depuis $t0"
+  kubectl logs -n tekton-pipelines-resolvers deploy/tekton-pipelines-remote-resolvers --since-time="$t0" | grep 'is forbidden: User' > "$T/rs-refus" || true
+  echo "refus des droits : $(wc -l < "$T/rs-refus")"
+  ba_attendu "refus des droits hors de preuve-resolveurs" "$(grep -vc 'preuve-resolveurs' "$T/rs-refus" || true)" 0
+
+  echo "## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)"
+  pol=$(sur sc-confiance "sudo grep -c 'serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers' /etc/rancher/k3s/audit-policy.yaml || true")
+  echo "règle des résolveurs dans la politique d'audit du nœud : $pol"
+  audit_api tekton-pipelines-resolvers:tekton-pipelines-resolvers | jq -c --arg u "$RESOLVEURS" 'select(.user.username == $u and .impersonatedUser == null
+    and (.objectRef.resource == "secrets" or .objectRef.resource == "serviceaccounts"))' | sort -u > "$T/rs-audit.json"
+  jq -r '"  \(.verb) \(.objectRef.resource) \(.objectRef.namespace // "(tout le cluster)") \(.responseStatus.code) \(.stage)"' "$T/rs-audit.json" | sort | uniq -c
+  if [ "$pol" = 0 ]; then
+    ba_attendu "entrées (politique sans la règle des résolveurs)" "$(grep -c . "$T/rs-audit.json" || true)" 0
+  else
+    ba_attendu "lectures dans builds (au moins une)" "$(jq -s '[.[] | select(.objectRef.namespace == "builds" and .responseStatus.code < 400)] | length > 0' "$T/rs-audit.json")" true
+    ba_attendu "lectures hors de builds, sauf les refus (403) de preuve-resolveurs" "$(jq -s '[.[] | select(.objectRef.namespace != "builds"
+      and (.objectRef.namespace != "preuve-resolveurs" or .responseStatus.code != 403))] | length' "$T/rs-audit.json")" 0
+  fi
+
+  echo "## lecteurs des Secrets de tout le cluster"
+  lecteurs_cluster | tee "$T/rs-lecteurs" | sed 's/^/  /'
+  ba_attendu "lecteurs" "$(paste -sd, "$T/rs-lecteurs")" \
+    "kube-system:cilium-operator,kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors"
+  [ "$k" = 0 ] || { echo "KO   resolveurs : mesure contraire à la prédiction" >&2; exit 1; }
+}
+
+etape_intercepteurs() { # mesure ponctuelle, hors rejeu : la liaison de lecture des Secrets est retirée puis remise (trap)
+  local t0 pod ca0 ca1 r
+  echo "Prédiction (écrite le 02/11/2026 avant le premier passage ; lecture du code de Triggers v0.37.2) :"
+  echo "- les intercepteurs lisent leur certificat TLS par un informer de Secrets de knative sans portée d'espace de noms"
+  echo "  (cmd/interceptors/main.go : injection.EnableInjectionOrDie sans WithNamespaceScope ; pkg/interceptors/server/server.go"
+  echo "  l. 32 et 318) : l'informer liste et surveille les Secrets de tout le cluster ; aucun drapeau ne le borne"
+  echo "- liaison tekton-triggers-core-interceptors (ClusterRole du même nom : secrets get, list, watch) retirée, pod redémarré :"
+  echo "  can-i list secrets tout le cluster no ; le nouveau pod n'est pas prêt en 90 s (informer jamais synchronisé, serveur"
+  echo "  HTTPS non démarré, sonde /ready en échec) ; son journal porte le refus de lister les Secrets « at the cluster scope »"
+  echo "- liaison remise, pod redémarré : prêt, can-i yes, aucun refus dans le journal du nouveau pod ; caBundle des"
+  echo "  ClusterInterceptors inchangé"
+  echo "- conclusion attendue : borner les intercepteurs par les droits n'est pas possible sans modifier Triggers ; limite gardée"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  ca0=$(kubectl get clusterinterceptors -o json | jq -r '[.items[] | "\(.metadata.name):\(.spec.clientConfig.caBundle | length)"] | join(",")')
+  kubectl get clusterrolebinding tekton-triggers-core-interceptors -o json \
+    | jq 'del(.metadata.resourceVersion, .metadata.uid, .metadata.creationTimestamp, .metadata.managedFields, .metadata.generation)' > "$T/ic-crb.json"
+  ba_attendu "liaison et ClusterRole" "$(jq -r '"\(.roleRef.name) \(.subjects | map("\(.namespace):\(.name)") | join(","))"' "$T/ic-crb.json") $(kubectl get clusterrole tekton-triggers-core-interceptors -o json \
+    | jq -c '[.rules[] | "\(.resources | join(",")):\(.verbs | join(","))"]')" \
+    'tekton-triggers-core-interceptors tekton-pipelines:tekton-triggers-core-interceptors ["secrets:get,list,watch"]'
+  trap 'kubectl apply --server-side -f "$T/ic-crb.json" >/dev/null; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  kubectl delete clusterrolebinding tekton-triggers-core-interceptors >/dev/null
+  ba_attendu "can-i list secrets tout le cluster (liaison retirée)" "$(kubectl auth can-i list secrets -A --as "$INTERCEPTEURS" 2>/dev/null || true)" no
+  kubectl rollout restart deployment -n tekton-pipelines tekton-triggers-core-interceptors >/dev/null
+  sleep 90
+  pod=$(kubectl get pods -n tekton-pipelines -l app.kubernetes.io/name=core-interceptors --sort-by=.metadata.creationTimestamp -o name | tail -1)
+  echo "nouveau pod : $pod (créé $(kubectl get -n tekton-pipelines "$pod" -o jsonpath='{.metadata.creationTimestamp}'))"
+  ba_attendu "nouveau pod prêt après 90 s" "$(kubectl get -n tekton-pipelines "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')" False
+  kubectl logs -n tekton-pipelines "$pod" > "$T/ic-journal" 2>&1 || true
+  grep -m3 'is forbidden' "$T/ic-journal" | cut -c1-300 | sed 's/^/  /'
+  ba_attendu "refus de lister les Secrets « at the cluster scope » dans le journal" \
+    "$(grep -c 'secrets is forbidden: User .*cannot list resource .*secrets.* at the cluster scope' "$T/ic-journal" | awk '{print ($1 > 0)}')" 1
+
+  echo "## liaison remise"
+  kubectl apply --server-side -f "$T/ic-crb.json" >/dev/null
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  ba_attendu "can-i list secrets tout le cluster (liaison remise)" "$(kubectl auth can-i list secrets -A --as "$INTERCEPTEURS" 2>/dev/null || true)" yes
+  kubectl rollout restart deployment -n tekton-pipelines tekton-triggers-core-interceptors >/dev/null
+  kubectl rollout status deployment -n tekton-pipelines tekton-triggers-core-interceptors --timeout=300s
+  pod=$(kubectl get pods -n tekton-pipelines -l app.kubernetes.io/name=core-interceptors --sort-by=.metadata.creationTimestamp -o name | tail -1)
+  r=$(kubectl get -n tekton-pipelines "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+  ba_attendu "pod $pod prêt" "$r" True
+  ba_attendu "refus dans le journal du pod" "$(kubectl logs -n tekton-pipelines "$pod" | grep -c 'is forbidden' || true)" 0
+  ca1=$(kubectl get clusterinterceptors -o json | jq -r '[.items[] | "\(.metadata.name):\(.spec.clientConfig.caBundle | length)"] | join(",")')
+  ba_attendu "caBundle des ClusterInterceptors (nom:longueur) inchangé depuis $t0" "$ca1" "$ca0"
 }
 
 lancer preuves J8 "$@"

@@ -1,0 +1,28 @@
+# Brique 08, J8 (décision du propriétaire du 02/11/2026) : résolveurs de Tekton bornés à builds pour les Secrets et les comptes
+# de service. Le ClusterRole amont tekton-pipelines-resolvers-resolution-request-updates les donnait en get, list et watch
+# dans tout le cluster ; sa règle est retirée (kustomization-pipeline.yaml), le reste (ResolutionRequests, informer de tout le
+# cluster) est gardé. Lectures du code v1.15.5 : Get un par un, dans l'espace de la requête (bundles : k8schain, compte de
+# service puis ses Secrets de tirage) ou dans tekton-pipelines-resolvers (git, Role amont) ; seul bundles est activé.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-pipelines-resolvers-lecture
+  namespace: builds
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "serviceaccounts"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-pipelines-resolvers-lecture
+  namespace: builds
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-pipelines-resolvers-lecture
+subjects:
+- kind: ServiceAccount
+  name: tekton-pipelines-resolvers
+  namespace: tekton-pipelines-resolvers

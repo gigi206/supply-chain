@@ -1,10 +1,13 @@
 # Brique 08, J4 : release.yaml réécrit vers Zot (tekton.sh), contrôleurs et webhooks sur le nœud de confiance.
-# J8 : contrôleur borné à builds (informers : -namespace ; droits de locataire : lecture-builds.yaml).
+# J8 : contrôleur borné à builds (informers : -namespace ; droits de locataire : lecture-builds.yaml) ; résolveurs : lecture
+# des Secrets et des comptes de service retirée du ClusterRole (test de la règle amont avant retrait), get dans builds
+# seulement (resolveurs-lecture-builds.yaml).
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - release.yaml
 - lecture-builds.yaml
+- resolveurs-lecture-builds.yaml
 patches:
 - target:
     kind: Deployment
@@ -20,6 +23,18 @@ patches:
     - op: add
       path: /spec/template/spec/containers/0/args/-
       value: -namespace=builds
+- target:
+    kind: ClusterRole
+    name: tekton-pipelines-resolvers-resolution-request-updates
+  patch: |-
+    - op: test
+      path: /rules/2
+      value:
+        apiGroups: [""]
+        resources: ["secrets", "serviceaccounts"]
+        verbs: ["get", "list", "watch"]
+    - op: remove
+      path: /rules/2
 - path: tenant-access-supprime.yaml
 - path: resolveurs.yaml
 configMapGenerator:

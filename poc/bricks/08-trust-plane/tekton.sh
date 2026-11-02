@@ -11,7 +11,8 @@
 #              stockage OCI en dsse, sans transparence publique ; contrôle : toutes les images tirées viennent de Zot ;
 #              contrôleurs de Pipelines et de Chains bornés à builds (J8) : droits de locataire dans builds seulement
 #              (tekton/{pipeline,chains}/lecture-builds.yaml, liaisons de tout le cluster retirées), drapeaux de namespace,
-#              règle d'admission en seconde barrière (tekton/controleurs-builds.yaml)
+#              règle d'admission en seconde barrière (tekton/controleurs-builds.yaml) ; résolveurs : Secrets et comptes de
+#              service en get dans builds seulement (tekton/pipeline/resolveurs-lecture-builds.yaml)
 #   signature  essai de la chaîne de signature : TaskRun sur sc-build qui ne fait que publier IMAGE_URL/IMAGE_DIGEST d'une
 #              image poussée depuis l'hôte ; Chains signe via OpenBao, pousse .sig et .att dans Zot ; vérification cosign
 #              avec la clé publique de Transit. Ce n'est pas un build : la provenance décrit une image non construite
@@ -162,6 +163,13 @@ etape_installer() {
     | .spec.template.spec.containers[0].args] == [["--namespace=builds"]]' >/dev/null \
     && echo "OK   rendu : -namespace=builds (Pipelines), --namespace=builds (Chains), liaisons *-tenant-access de tout le cluster absentes" \
     || { echo "KO   drapeaux de namespace absents du rendu" >&2; exit 1; }
+  # Résolveurs bornés à builds pour les Secrets et les comptes de service (J8, décision du propriétaire du 02/11/2026).
+  yq -o json "$T/pipeline/rendu.yaml" | jq -e -s '([.[] | select(.kind == "ClusterRole" and .metadata.name == "tekton-pipelines-resolvers-resolution-request-updates")
+    | .rules[] | select(.resources | index("secrets") or index("serviceaccounts"))] | length == 0)
+    and ([.[] | select(.kind == "Role" and .metadata.namespace == "builds" and .metadata.name == "tekton-pipelines-resolvers-lecture")
+    | .rules] == [[{apiGroups: [""], resources: ["secrets", "serviceaccounts"], verbs: ["get"]}]])' >/dev/null \
+    && echo "OK   rendu : résolveurs sans lecture des Secrets ni des comptes de service de tout le cluster, get dans builds" \
+    || { echo "KO   droits des résolveurs dans le rendu" >&2; exit 1; }
   kubectl apply --server-side -f "$here/tekton/builds.yaml" >/dev/null   # espace des RoleBindings, avant les contrôleurs
   kubectl create configmap ca-poc -n tekton-chains --from-file=ca.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   kubectl apply --server-side --force-conflicts -f "$T/pipeline/rendu.yaml" >/dev/null
