@@ -75,19 +75,19 @@ Avec le format bundle de cosign v3, **la signature d'image est elle-même un DSS
   - **C-2** (parité entre CLI et admission) : il faut un cluster ; **mesuré en brique 08, J6** (voir plus bas) ;
   - **bibliothèque Conforma** `slsa3` / `trusted_task` sur une **vraie** provenance Chains : **mesurée en brique 08, J6** ; réécrite en CEL pour Kyverno et mesurée en **J8** (voir plus bas).
 
-## Notation arrêtée (grille C, clôture de J8 du 02/11/2026 ; lecture de C-4 à confirmer)
+## Notation définitive (grille C, clôture de J8 du 02/11/2026)
 
-Notes arrêtées à la clôture de J8 (accord du propriétaire du 02/11/2026), sans changement de valeur ; décision C du 01/11/2026 (voir plus bas). C-2 mesuré en brique 08, J6 ; contrôle 9 mesuré en brique 08, J5 ; lecture du propriétaire du 29/10/2026. C-5 relevé de nouveau le 02/11/2026 ([`sante-c5.log`](sante-c5.log)). Lecture de C-4 (les 17 cas du banc, à verdicts attendus, valent-ils tests des règles ?) laissée au propriétaire : avec l'ancre 0 de la grille (« pas de tests »), 74 et 64, sans effet sur la décision.
+Notes définitives depuis la clôture de J8 (accord du propriétaire du 02/11/2026). Seule C-4 change : 0 pour les deux options (lecture du propriétaire du 02/11/2026, sur l'avis de l'advisor : ancre 0 de la grille, « pas de tests » ; les 17 cas à verdict attendu mesurent C-1 et ne comptent pas deux fois). Scores 83 → **74** et 70 → **64** ; règle C toujours remplie (74 ≥ 57,6), décision C du 01/11/2026 inchangée (voir plus bas). C-2 mesuré en brique 08, J6 ; contrôle 9 mesuré en brique 08, J5 ; lecture du propriétaire du 29/10/2026. C-5 relevé de nouveau le 02/11/2026 ([`sante-c5.log`](sante-c5.log)).
 
 | Critère | Poids | Kyverno seul | Justification | Conforma + Kyverno | Justification |
 |---|---|---|---|---|---|
 | C-1 Couverture | 35 | 5 | 10/10 : contrôles 1 à 8 et 10 au banc (17/17 cas) ; contrôle 9 en brique 08 (J5), vérifié par cosign v3.1.4 dans la porte (`tools/verify-ts`), compté par décision du propriétaire | 5 | Idem : le contrôle 9 ne dépend pas du moteur |
 | C-2 Parité CLI / admission | 15 | 5 | **Mesuré en brique 08, J6** : même fichier de politique, mêmes pods, 25/25 décisions identiques (17 cas du banc, 8 cas d'horodatage) ; note retenue par le propriétaire | 2 | Deux langages (Rego en CLI, CEL à l'admission) : parité par double maintenance |
 | C-3 Bundles, referrers, TSA | 15 | 2 | Bundles et referrers natifs, y compris dans un dépôt séparé ; doc d'`extractPayload` inexacte ; **horodatage natif mais en erreur interne** avec une clé sans journal (brique 08, J5, CLI) | 3 | Natifs mais non documentés ; aucun horodatage dans Conforma (aucune option dans `ec validate image`, J5) ; en brique 08, J8 (test 8), le contrôle 9 est joint à la porte par cosign, hors de Conforma |
-| C-4 Maintenabilité | 15 | 3 | 88 lignes, un seul langage ; tests (`kyverno test`) à écrire | 2 | 77 lignes de Rego + 88 de CEL, deux langages ; tests à écrire |
+| C-4 Maintenabilité | 15 | 0 | 88 lignes, un seul langage ; aucun test unitaire des règles (`kyverno test`) ; les 17 cas du banc mesurent C-1 (avant le 02/11/2026 : 3) | 0 | 77 lignes de Rego + 88 de CEL, deux langages ; aucun test unitaire des règles (`opa test`, `kyverno test`) (avant le 02/11/2026 : 2) |
 | C-5 Santé | 10 | 4 | Scorecard 7,8 (Maintained 10, Contributors 10, Signed-Releases 8, Vulnerabilities 7), [`sante-c5.log`](sante-c5.log) | 2 | Limité par Conforma : 0.x (v0.10.42), Scorecard 6,6 (Signed-Releases 0, Vulnerabilities 0), [`sante-c5.log`](sante-c5.log) |
 | C-6 Performance | 10 | 5 | ≈ 0,5 s | 5 | ≈ 1 s |
-| **Score /100** | | **83** | | **70** | |
+| **Score /100** | | **74** (83 avant C-4 = 0) | | **64** (70 avant C-4 = 0) | |
 
 **Contrôle 9 mesuré en brique 08, J5 (29/10/2026)** ([journal](../../../bricks/08-trust-plane/resultats/tsa-chemins.log)). Le job d'horodatage réémet chaque enveloppe de Chains en bundle v0.3 avec un jeton RFC 3161, dans un dépôt séparé de celui de l'image :
 - **Kyverno 1.19.2, CLI** (attestor à clé, `insecureIgnoreTlog`, `tsaCertChain`) : jeton valide → `error` (« nil pointer dereference ») ; jeton absent ou aucun bundle → refus. Le contrôle 9 n'est donc pas assuré par le CLI de Kyverno ; l'admission partage ce code, la parité se mesure en J6 (C-2). Sans `tsaCertChain`, le même bundle passe (témoin). Kyverno ne vérifie pas non plus la provenance au format historique (`.att`) sans journal de transparence ;
