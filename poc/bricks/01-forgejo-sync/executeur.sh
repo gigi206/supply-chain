@@ -7,6 +7,7 @@
 #   planifie    timer activé, période ramenée à 2 min le temps de la mesure (drop-in retiré ensuite) : deux runs planifiés
 #               successifs sans intervention, métrique cohérente avec le dernier rapport
 #   refspec     essai-refspec-negatif.sh dans la VM (git 2.47.3), à comparer à la mesure de S1 (git 2.53.0)
+#   fuites      fuites.sh de la 08 sur les trois VM (jetons de S2 compris), journal déplacé dans resultats/ de la 01
 # Prérequis : forgejo.sh comptes organisations amont miroir fork protections (S2). Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : poc/bricks/01-forgejo-sync/executeur.sh <étape>…   (journal : resultats/executeur-<étape>.log)
@@ -107,6 +108,15 @@ EOF
 etape_refspec() {
   copier sc-stockage /tmp/essai-refspec "$here/essai-refspec-negatif.sh"
   sur sc-stockage "bash /tmp/essai-refspec/essai-refspec-negatif.sh; rm -rf /tmp/essai-refspec"
+}
+
+etape_fuites() { # contrôle de fin de S3 : fuites.sh de la 08 (trois VM), qui cherche aussi les jetons de S2 (…/08/secrets)
+  local f=$here/../08-trust-plane/resultats/fuites-synchro-s3.log
+  "$here/../08-trust-plane/fuites.sh" synchro-s3 >/dev/null || true   # verdict lu dans son journal
+  sleep 2   # fuites.sh écrit son journal par tee (substitution de processus) : fin d'écriture après sa sortie
+  mv "$f" "$R/fuites-synchro-s3.log"
+  grep -E '^(OK|KO)' "$R/fuites-synchro-s3.log"
+  ! grep -q '^KO' "$R/fuites-synchro-s3.log" || exit 1
 }
 
 lancer executeur S3 "$@"

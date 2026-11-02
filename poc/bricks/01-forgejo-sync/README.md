@@ -143,7 +143,7 @@ Vérifié pour (b) : seule la règle Kyverno `pods-isolation` (pas de privilège
 
 | Métrique | Sens |
 |---|---|
-| `sync_derniere_reussite_timestamp_seconds{projet}` | Fin du dernier run de statut `ok` ou `rewrite-detected` |
+| `sync_derniere_reussite_timestamp_seconds{projet}` | Début (horodatage) du dernier run de statut `ok` ou `rewrite-detected` |
 | `sync_derniere_reecriture_timestamp_seconds{projet}` | Dernier run de statut `rewrite-detected` |
 | `sync_dernier_run_statut{projet,statut}` | 1 pour le statut du dernier run, 0 pour les autres |
 
@@ -151,7 +151,7 @@ Vérifié pour (b) : seule la règle Kyverno `pods-isolation` (pas de privilège
 
 | # | Jalon | Contenu | Contrôle de fin |
 |---|---|---|---|
-| **S1** | B7 hors cluster | `sync.py` : configuration globale et par dépôt (fichier versionné, motifs `fnmatch` sur les branches et sur les tags), refspecs négatifs au push vers `mirror/` (`^refs/heads/<motif>`, git ≥ 2.29), mise à jour du fork sans `--prune` qui exclut les motifs de refs propres, collision ; renommage de `--protected` | Nouveaux tests `test_sync.py`, tous réussis avec les 10 anciens, sous `C` et `fr_FR.UTF-8` (liste ci-dessous) |
+| **S1** | B7 hors cluster | `sync.py` : configuration globale et par dépôt (fichier versionné, motifs `fnmatch` sur les branches et sur les tags), mise à jour du fork sans `--prune` qui n'écrit aucune ref propre (refspecs négatifs abandonnés : voir le jalon S1), collision ; renommage de `--protected` | Nouveaux tests `test_sync.py`, tous réussis avec les 10 anciens, sous `C` et `fr_FR.UTF-8` (liste ci-dessous) |
 | **S2** | Forgejo | Organisations `mirror`, `workspace` (existe), `amont-essai` ; compte `poc-sync` (jeton limité à `write:repository`), seul à écrire dans `mirror/*` (équipe de l'organisation) ; protection de branches et de tags de Forgejo sur les motifs de refs propres du fork, sans `poc-sync` dans la liste blanche (défense en profondeur) ; fork `workspace/sample-app-sync` par l'API | Push d'un autre compte non administrateur vers `mirror/` refusé (journal de Forgejo) ; `poc-sync` refusé sur une ref propre du fork ; comportement de `poc-admin` face à une branche protégée **mesuré**, pas supposé |
 | **S3** | Exécution | Selon D1 ; métrique de D3 ; jeton jamais en argument ; contrôle `fuites.sh` | Deux runs planifiés successifs sans intervention ; `sync.prom` cohérent avec les rapports ; aucun secret dans les journaux des trois VM |
 | **S4** | Tests négatifs sur le vrai Forgejo | Sur `amont-essai/sample-app` : force-push de `main`, tag déplacé, tag supprimé, branche supprimée, collision sur une branche et sur un tag ; ref propre créée dans le fork | Codes et événements attendus ; archives présentes dans `mirror/` ; refs propres du fork intactes après chaque run ; restauration identique depuis bundles et rapports |
@@ -220,15 +220,20 @@ Script : [`forgejo.sh`](forgejo.sh), étapes `comptes organisations amont miroir
 
 **Jeton limité à la cible** : l'en-tête `Authorization` de `poc-sync` est passé à git par `http.<url>.extraHeader`, pour `mirror/sample-app.git` et `workspace/sample-app-sync.git` seulement. Vérifié sans réseau par `git config --get-urlmatch` ([`s2-portee-entete.log`](resultats/s2-portee-entete.log), git 2.53.0) : aucun en-tête vers l'amont, vers GitHub, vers `workspace/sample-app` ni vers un dépôt au nom voisin (`mirror/sample-app-autre.git`). En production, le jeton ne doit jamais partir vers l'amont : c'est une exigence de S3.
 
-**Prédictions** (écrites le 02/11/2026 à 14:05 UTC, avant toute exécution) :
+**Prédictions** (écrites le 02/11/2026 à 14:05 UTC, avant toute exécution ; complétées à 14:15 UTC après relecture, toujours avant exécution) :
 - `comptes` : trois comptes ordinaires (non administrateurs), un jeton `write:repository` chacun ; aucun mot de passe conservé ;
 - `miroir` : premier run de `sync.py` à code 0, `main` de `mirror/sample-app` = `main` de l'amont ; dans le journal de Forgejo, des pushes vers `mirror/` seulement ;
+- `archives` (sonde ajoutée à 14:15) : Forgejo accepte `refs/archive/*` ; force-push d'une branche non sensible de l'amont : code 0, `force-push-unprotected`, ancienne valeur lisible sous l'archive dans `mirror/` ;
 - `fork` : `workspace/sample-app-sync` marqué fork de `mirror/sample-app`, même `main` ; équipes de `workspace` limitées à ce dépôt ;
-- `refus` : refusés (HTTP 403 ou refus de branche ou de tag protégé) : push de `poc-dev` et de `poc-amont` vers `mirror/`, push de `poc-sync` vers `workspace/sample-app`, création, réécriture et suppression de refs propres du fork par `poc-sync` ; acceptés : refs propres du fork par `poc-dev`, branche ordinaire du fork par `poc-sync` ;
-- mesures sans attendu ferme : réécriture forcée de `custom/essai` par `poc-dev` (liste blanche ; **acceptée**, prédiction faible : aucune option de force-push) ; par `poc-admin` avec `apply_to_admins` (**refusée**) ; tag propre par `poc-admin` (**refusé**, prédiction faible : la protection de tag n'a pas d'option pour les administrateurs) ; push de `poc-admin` vers `mirror/` (**accepté** : l'administrateur passe outre les équipes, limite à consigner) ;
+- `refus` : chaque refus exige son motif (droits : `403` ou `permission denied` ; `protected branch` ; `protected tag`), un échec pour une autre raison est un KO ; refusés : push de `poc-dev` et de `poc-amont` vers `mirror/`, push de `poc-sync` vers `workspace/sample-app`, création, réécriture et suppression de refs propres du fork par `poc-sync` ; acceptés : refs propres du fork par `poc-dev`, branche ordinaire du fork par `poc-sync` ;
+- mesures sans attendu ferme : création de `custom/a/b` par `poc-sync` (**acceptée**, prédiction faible : le `*` des règles de Forgejo ne traverserait pas les `/`, contrairement à celui de `sync.py` ; si c'est le cas, la défense en profondeur de Forgejo est plus étroite que la protection de `sync.py` : motif `custom/**` ou limite consignée) ; réécriture forcée de `custom/essai` par `poc-dev` (liste blanche ; **acceptée**, prédiction faible : aucune option de force-push) ; par `poc-admin` avec `apply_to_admins` (**refusée**) ; tag propre par `poc-admin` (**refusé**, prédiction faible : la protection de tag n'a pas d'option pour les administrateurs) ; push de `poc-admin` vers `mirror/` (**accepté** : l'administrateur passe outre les équipes, limite à consigner) ;
 - `bout_en_bout` : code 2 (collision sur `custom/essai`), collision publiée dans `mirror/`, `custom/essai` du fork inchangée, `main` du fork avancée, tag `custom-1` intact.
 
 **Avant l'exécution** : tâche `synchro:forgejo` à déclarer dans `mise.toml`, après le rejeu, car celui-ci lit `mise.toml` à chaque étape.
+
+**Garde-fous ajoutés après relecture** (14:15 UTC) : `distant` lit `git ls-remote --refs` avec le nom exact (sans les lignes `^{}` des tags annotés, qui faisaient tenir les comparaisons par coïncidence) ; `synchro()` (hôte) refuse de tourner une fois l'état passé à la VM (un miroir neuf élaguerait les archives de `mirror/`).
+
+**Après un rejeu de la 08**, tout l'état de S2 à S6 disparaît avec les VM : S2 est à rejouer avant S3 (l'installation de S3 reprend le miroir de l'hôte).
 
 ## Jalon S3, partie hors cluster : métrique (D3)
 
@@ -281,6 +286,8 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 | **(i)** même pipeline, branche custom qui change le code Go | Digest différent, donc aucune provenance ajoutée à l'image réelle | Repose sur le contenu de la branche : la première branche custom sans changement de code casse la porte de l'image réelle. Fragile |
 | **(ii)** seconde pipeline signée `sample-app-sync`, recommandée | Mêmes tâches signées (liste revue des tâches inchangée), `@IMAGE@` = `builds/sample-app-sync` ; bundle produit et signé comme celui de `construction.sh taches`, sans modifier la 08 | Une pipeline de plus à signer et à épingler ; mêmes fermeture et `web/dist` (limite inchangée) |
 
+**Coût de (ii), vérifié dans la 08** (14:14 UTC) : la règle Kyverno `tekton-references` accepte tout bundle `tekton/pipelines/[a-z0-9-]+` épinglé par digest ; la VerificationPolicy de Trusted Resources, tout `tekton/(tasks|pipelines)/[a-z0-9-]+` signé par la clé des tâches ; la liste revue de la porte ne porte que sur les tâches, inchangées. (ii) ne demande donc aucune modification de la 08.
+
 En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en est la forme réduite. Rien n'est écrit pour S5 avant la décision.
 
 ## Jalon S6 : mesure sur Traefik (préparée le 02/11/2026, exécution après S3)
@@ -289,7 +296,12 @@ En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en 
 
 **Dimensionnement relevé avant** ([`s6-dimensionnement.log`](resultats/s6-dimensionnement.log), 14:08 UTC, pendant le rejeu de la 08) : Traefik pèse 163 561 Ko selon l'API de GitHub, branche par défaut `master` ; 30 branches et 593 tags, seuls lus par `sync.py` (les 7 704 `refs/pull` et 6 553 `refs/semaphoreci` ne sont pas synchronisés) ; `sc-stockage` : 14 Go libres sur 20 (Forgejo 6,7 Mo, Zot 2,4 Go).
 
-**Prédictions** (écrites le 02/11/2026 à 14:10 UTC, avant toute exécution) :
-- premier run : quelques minutes (fetch complet avec `transfer.fsckObjects`, push vers `mirror/`), code 0 ; bundle complet de l'ordre de la taille annoncée par GitHub (100 à 250 Mo) ; 623 événements de création (30 branches, 593 tags) ;
+**Prédictions** (écrites le 02/11/2026 à 14:10 UTC, avant toute exécution ; recompte à 14:15 UTC) :
+- premier run : quelques minutes (fetch complet avec `transfer.fsckObjects`, push vers `mirror/`), code 0 ; bundle complet de l'ordre de la taille annoncée par GitHub (100 à 250 Mo) ; **620 événements de création** (30 branches, 590 tags, comptés par `git ls-remote --refs` ; le premier décompte, 593, incluait des lignes `^{}` de tags annotés) ;
+- risque connu : avec `transfer.fsckObjects=true`, un fetch complet peut s'arrêter sur un défaut fsck d'un objet ancien de l'amont ; ce serait un constat sur l'amont, pas un bogue de `sync.py` ;
 - second run : sans événement (ou quelques-uns si l'amont a avancé), aucun bundle ou un bundle de quelques Ko à quelques Mo ;
 - espace consommé : moins de 1 Go au total (miroir local, bundles, `mirror/traefik` et fork dans Forgejo) ; l'espace pris par le fork est mesuré, pas supposé (objets partagés ou copiés).
+
+### Accords et ordre d'exécution
+
+Le rejeu `enchainement` de la 08 est analysé et commité avant toute action sur Forgejo. Accords : **S2** (préparation et exécution après le rejeu) accordé le 02/11/2026 ; **S3** installe un compte système et des unités sur `sc-stockage` : accord à demander ; **S4** suit S3 ; **S5** attend le choix entre (i) et (ii) ; **S6** attend son accord. Les jalons ne s'enchaînent pas d'un seul tenant.

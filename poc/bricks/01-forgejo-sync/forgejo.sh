@@ -7,6 +7,7 @@
 #                  poc-amont) ; workspace existe (brique 08, J2)
 #   amont          amont-essai/sample-app : sources de poc/sample-app à HEAD, commit à auteur et date fixes, poussé par poc-amont
 #   miroir         mirror/sample-app vide (administrateur), puis premier run de sync.py depuis l'hôte (--push par poc-sync)
+#   archives       sonde : Forgejo accepte refs/archive/* (force-push d'une branche non sensible de l'amont, run, archive lue)
 #   fork           workspace/sample-app-sync, fork de mirror/sample-app ; équipes de workspace limitées à ce dépôt :
 #                  synchro (poc-sync) et dev-sample-app-sync (poc-dev) ; workspace/sample-app (brique 08) hors de leur portée
 #   protections    sur le fork, une protection de branche par motif de refs-propres.json (liste blanche : poc-dev,
@@ -65,10 +66,18 @@ pousser() { # compte dépôt refspec… : push depuis $T/w ; sortie et code dans
   gitc "$c" "$FORGEJO_HOTE/$d" -C "$T/w" push "$FORGEJO_HOTE/$d.git" "$@" > "$T/push.out" 2>&1 || r=$?
   return $r
 }
-refuse() { # libellé compte dépôt refspec… : push attendu refusé, motif relevé
-  local l=$1; shift
+# Motifs de refus : un push qui échoue pour une autre raison (TLS, jeton, URL) est un KO, pas un refus.
+DROITS='403|permission denied'
+BRANCHE_PROTEGEE='protected branch'
+TAG_PROTEGE='protected tag|tag [^ ]+ is protected'
+refuse() { # libellé motif compte dépôt refspec… : push attendu refusé, avec le motif dans la sortie
+  local l=$1 m=$2; shift 2
   if pousser "$@"; then echo "KO   $l : accepté" >&2; cat "$T/push.out" >&2; exit 1; fi
-  echo "OK   $l : refusé ($(grep -oiE 'protected [a-z]+|not allowed[^.]*|403|permission denied|User permission denied[^.]*' "$T/push.out" | head -1))"
+  if grep -iE "$m" "$T/push.out" >/dev/null; then
+    echo "OK   $l : refusé ($(grep -oiE "$m" "$T/push.out" | head -1))"
+  else
+    echo "KO   $l : refusé pour une autre raison" >&2; cat "$T/push.out" >&2; exit 1
+  fi
 }
 accepte() { # libellé compte dépôt refspec… : push attendu accepté
   local l=$1; shift
@@ -78,9 +87,9 @@ mesure() { # libellé compte dépôt refspec… : push dont l'issue est relevée
   local l=$1; shift
   if pousser "$@"; then echo "MESURE $l : accepté"; else echo "MESURE $l : refusé ($(grep -E '^remote: |error:' "$T/push.out" | head -2 | paste -sd' '))"; fi
 }
-distant() { # dépôt ref : valeur de la ref dans Forgejo (lecture anonyme), vide si absente
+distant() { # dépôt ref : valeur de la ref dans Forgejo (lecture anonyme, nom exact, tag annoté non déréférencé), vide si absente
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
-    git ls-remote "$FORGEJO_HOTE/$1.git" "$2" | cut -f1
+    git ls-remote --refs "$FORGEJO_HOTE/$1.git" "$2" | awk -v r="$2" '$2 == r {print $1}'
 }
 journal() { # depuis : requêtes git de Forgejo depuis cette date (VM), sans adresse ni durée
   sur sc-stockage "sudo journalctl -u forgejo --since '$1' -o cat" \
@@ -88,7 +97,12 @@ journal() { # depuis : requêtes git de Forgejo depuis cette date (VM), sans adr
     | sed 's/ for 192.168.161.1:[0-9]*,/,/; s/ in [0-9.]*ms @.*//' || true
 }
 synchro() { # options de sync.py… : un run depuis l'hôte, jeton de poc-sync limité à mirror/ et au fork ; code renvoyé
-  local r=0
+  local r=0 v
+  # Après executeur.sh installer, la VM est seule propriétaire de l'état : un miroir neuf sur l'hôte pousserait
+  # refs/archive/* avec --prune et retirerait de mirror/ les archives créées par la VM.
+  for v in "$D1/miroirs/$PROJET.git".passe-a-la-vm-*; do
+    [ ! -e "$v" ] || { echo "KO   état passé à la VM (${v##*/}) : synchro depuis l'hôte refusée" >&2; exit 1; }
+  done
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 \
     GIT_CONFIG_COUNT=3 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
     GIT_CONFIG_KEY_1="http.$FORGEJO_HOTE/$MIROIR.git.extraHeader" GIT_CONFIG_VALUE_1="$(cat "$T/entete-poc-sync")" \
@@ -181,6 +195,24 @@ etape_miroir() {
   journal "$debut"
 }
 
+etape_archives() { # S2 : Forgejo accepte-t-il refs/archive/* ? force-push d'une branche non sensible de l'amont, puis un run
+  local avant code
+  clone_travail "$AMONT"
+  git -C "$T/w" commit -q --allow-empty -m "amont : essai/archive (S2)"
+  accepte "branche essai/archive par poc-amont" poc-amont "$AMONT" HEAD:refs/heads/essai/archive
+  code=0; synchro || code=$?
+  avant=$(distant "$AMONT" refs/heads/essai/archive)
+  git -C "$T/w" commit -q --amend --allow-empty -m "amont : essai/archive réécrite (S2)"
+  accepte "force-push de essai/archive par poc-amont" poc-amont "$AMONT" +HEAD:refs/heads/essai/archive
+  code=0; synchro || code=$?
+  local a
+  a=$(jq -r '.events[] | select(.ref == "heads/essai/archive") | "\(.type) \(.archive)"' "$(ls -1 "$D1/rapports/$PROJET"/*.json | tail -1)")
+  echo "sync.py : code $code ; événement : $a"
+  [ "$code" = 0 ] && [ "${a%% *}" = force-push-unprotected ] && echo "OK   force-push non sensible : code 0, archivé" || { echo "KO   événement ou code inattendu" >&2; exit 1; }
+  [ "$(distant "$MIROIR" "${a#* }")" = "$avant" ] && echo "OK   archive ${a#* } publiée dans $MIROIR (Forgejo accepte refs/archive/*)" \
+    || { echo "KO   archive absente de $MIROIR" >&2; exit 1; }
+}
+
 etape_fork() {
   local id
   existe "/repos/$FORK" || api poc-admin POST "/repos/$MIROIR/forks" "$(jq -nc --arg n "$PROJET" '{organization: "workspace", name: $n}')" >/dev/null
@@ -217,18 +249,20 @@ etape_refus() {
   debut=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
   clone_travail "$FORK"
   git -C "$T/w" commit -q --allow-empty -m "essai S2"
-  refuse "push vers $MIROIR par poc-dev (hors de l'équipe synchro)" poc-dev "$MIROIR" HEAD:refs/heads/essai-s2
-  refuse "push vers $MIROIR par poc-amont" poc-amont "$MIROIR" HEAD:refs/heads/essai-s2
-  refuse "push vers workspace/sample-app (brique 08) par poc-sync" poc-sync workspace/sample-app HEAD:refs/heads/essai-s2
-  refuse "création de la branche propre custom/essai du fork par poc-sync" poc-sync "$FORK" HEAD:refs/heads/custom/essai
-  refuse "création de la branche propre paquet/deb du fork par poc-sync (motif du projet)" poc-sync "$FORK" HEAD:refs/heads/paquet/deb
-  refuse "création du tag propre custom-1 du fork par poc-sync" poc-sync "$FORK" HEAD:refs/tags/custom-1
+  refuse "push vers $MIROIR par poc-dev (hors de l'équipe synchro)" "$DROITS" poc-dev "$MIROIR" HEAD:refs/heads/essai-s2
+  refuse "push vers $MIROIR par poc-amont" "$DROITS" poc-amont "$MIROIR" HEAD:refs/heads/essai-s2
+  refuse "push vers workspace/sample-app (brique 08) par poc-sync" "$DROITS" poc-sync workspace/sample-app HEAD:refs/heads/essai-s2
+  refuse "création de la branche propre custom/essai du fork par poc-sync" "$BRANCHE_PROTEGEE" poc-sync "$FORK" HEAD:refs/heads/custom/essai
+  refuse "création de la branche propre paquet/deb du fork par poc-sync (motif du projet)" "$BRANCHE_PROTEGEE" poc-sync "$FORK" HEAD:refs/heads/paquet/deb
+  refuse "création du tag propre custom-1 du fork par poc-sync" "$TAG_PROTEGE" poc-sync "$FORK" HEAD:refs/tags/custom-1
+  # Le * de sync.py (fnmatch) traverse les / ; celui des règles de protection de Forgejo peut-être pas : mesuré.
+  mesure "création de custom/a/b (deux niveaux) du fork par poc-sync" poc-sync "$FORK" HEAD:refs/heads/custom/a/b
   accepte "branche custom/essai du fork par poc-dev" poc-dev "$FORK" HEAD:refs/heads/custom/essai
   accepte "branche paquet/deb du fork par poc-dev" poc-dev "$FORK" HEAD:refs/heads/paquet/deb
   accepte "tag custom-1 du fork par poc-dev" poc-dev "$FORK" HEAD:refs/tags/custom-1
   accepte "branche ordinaire du fork par poc-sync (hors motif)" poc-sync "$FORK" HEAD:refs/heads/essai-s2
-  refuse "réécriture de la branche propre custom/essai par poc-sync (force)" poc-sync "$FORK" +HEAD~1:refs/heads/custom/essai
-  refuse "suppression du tag propre custom-1 par poc-sync" poc-sync "$FORK" :refs/tags/custom-1
+  refuse "réécriture de la branche propre custom/essai par poc-sync (force)" "$BRANCHE_PROTEGEE" poc-sync "$FORK" +HEAD~1:refs/heads/custom/essai
+  refuse "suppression du tag propre custom-1 par poc-sync" "$TAG_PROTEGE" poc-sync "$FORK" :refs/tags/custom-1
   mesure "réécriture de custom/essai par poc-dev (force, liste blanche)" poc-dev "$FORK" +HEAD~1:refs/heads/custom/essai
   pousser poc-dev "$FORK" +HEAD:refs/heads/custom/essai >/dev/null || true   # remise à l'essai S2 si la réécriture est passée
   entete_admin_comme_compte

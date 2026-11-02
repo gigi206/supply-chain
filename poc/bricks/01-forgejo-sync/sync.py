@@ -70,7 +70,8 @@ def is_ancestor(repo, old, new):
 def own_patterns(path, project):
     """Motifs des refs propres : globaux, plus ceux du projet (jamais moins).
 
-    Syntaxe commune à fnmatch et aux refspecs de git : au plus un `*`, ni `?` ni `[`.
+    Syntaxe restreinte (au plus un `*`, ni `?` ni `[`) : celle que les règles de protection de
+    Forgejo comprennent aussi. Le `*` de fnmatch traverse les `/` ; celui de Forgejo, à mesurer (S2).
     """
     conf = json.loads(Path(path).read_text()) if path else {}
     out = {}

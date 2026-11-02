@@ -14,3 +14,5 @@ Filesystem      Size  Used Avail Use% Mounted on
 /dev/vda1        20G  5.6G   14G  30% /
 6.7M	/var/lib/forgejo
 2.4G	/var/lib/zot
+## recompte du 2026-11-02T14:15:46Z : git ls-remote --refs (sans les lignes ^{} des tags annotés)
+tags : 590 ; branches : 30
