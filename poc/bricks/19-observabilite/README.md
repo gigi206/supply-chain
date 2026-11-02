@@ -1,4 +1,4 @@
-# Brique 19 : observabilité d'exploitation (protocole proposé le 02/11/2026, à valider par le propriétaire)
+# Brique 19 : observabilité d'exploitation (protocole proposé et validé par le propriétaire le 02/11/2026)
 
 Seuil (README, brique 19) : **les 5 alertes critiques se déclenchent sur incident simulé**. Effort estimé : **0,5 pw** ; décision avec le propriétaire à 1 pw. Rien n'est installé avant l'accord sur ce protocole, puis sur chaque jalon.
 
@@ -19,7 +19,9 @@ Cible (doc 02 §7) : métriques de Tekton, Kyverno, Zot, OpenBao et Forgejo ; Pr
 - **Réseau** : six espaces de la 08 ont des NetworkPolicy (`openbao`, `porte`, `tsa`, `horodatage`, `declencheurs`, `builds`). Collecter leurs métriques demande d'y autoriser l'entrée depuis Prometheus : modification de la 08, à rejouer.
 - **Signatures amont** des binaires et des images de Prometheus, Alertmanager et Grafana : **non vérifiées à ce jour** ; à relever avant tout choix (règle : empreintes et signatures vérifiées).
 
-## Décisions à prendre
+## Décisions
+
+**Retenues par le propriétaire le 02/11/2026** : D1 (a) binaires vérifiés en services systemd sur `sc-stockage` ; D2 (a) règle A3 écrite sur le contrat de métrique de la brique 10, preuve complète reportée à la 10 ; D3 Grafana reporté ; D4 aucune notification externe, récepteur webhook local.
 
 **D1. Mode de déploiement.** Recommandé : **(a)**.
 
