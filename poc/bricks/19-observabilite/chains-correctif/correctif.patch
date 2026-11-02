@@ -1,0 +1,163 @@
+diff --git a/docs/metrics.md b/docs/metrics.md
+index a931555e0..ac0bd4274 100644
+--- a/docs/metrics.md
++++ b/docs/metrics.md
+@@ -27,6 +27,17 @@ The following chains metrics are also available at `tekton-chains-metrics` servi
+ | `watcher_taskrun_marked_signed_total`         | Counter | Total number of objects marked as signed for taskruns     |
+ | `watcher_taskrun_signing_failures_total`      | Counter | Total number of TaskRun signing failures                  |
+ 
++The `*_signing_failures_total` counters carry an `error_type` label:
++
++| `error_type`         | Failure                                                                    |
++|----------------------|----------------------------------------------------------------------------|
++| `payload_creation`   | the payload could not be created                                           |
++| `marshal_payload`    | the payload could not be serialized                                        |
++| `signer_unavailable` | no signer could be configured (missing key material, unreachable KMS, ...) |
++| `signing`            | the signer failed to sign the payload                                      |
++| `tlog`               | the signature could not be uploaded to the transparency log                |
++| `storage`            | the signature or payload could not be stored                               |
++
+ To access the chains metrics, use the following commands:
+ ```shell
+ kubectl port-forward -n tekton-chains service/tekton-chains-metrics 9090
+diff --git a/pkg/chains/signing.go b/pkg/chains/signing.go
+index 3f754e002..8e8e8d589 100644
+--- a/pkg/chains/signing.go
++++ b/pkg/chains/signing.go
+@@ -173,6 +173,7 @@ func (o *ObjectSigner) Sign(ctx context.Context, tektonObj objects.TektonObject)
+ 			signer, ok := signers[signerType]
+ 			if !ok {
+ 				logger.Warnf("No signer %s configured for %s", signerType, signableType.Type())
++				o.recordError(ctx, signableType, metrics.SignerUnavailableError)
+ 				merr = multierror.Append(merr, fmt.Errorf("no signer %s configured for %s", signerType, signableType.Type()))
+ 				break
+ 			}
+diff --git a/pkg/chains/signing_test.go b/pkg/chains/signing_test.go
+index 132a01af4..1a09769e3 100644
+--- a/pkg/chains/signing_test.go
++++ b/pkg/chains/signing_test.go
+@@ -30,6 +30,7 @@ import (
+ 	"github.com/tektoncd/chains/pkg/chains/signing"
+ 	"github.com/tektoncd/chains/pkg/chains/storage"
+ 	"github.com/tektoncd/chains/pkg/config"
++	"github.com/tektoncd/chains/pkg/metrics"
+ 	"github.com/tektoncd/chains/pkg/test/tekton"
+ 	v1 "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1"
+ 	fakepipelineclient "github.com/tektoncd/pipeline/pkg/client/injection/client/fake"
+@@ -209,6 +210,102 @@ func TestSigner_Sign(t *testing.T) {
+ 	}
+ }
+ 
++// TestSigner_Sign_NoSignerRecordsError checks that a missing signer (no key
++// material, unreachable KMS, ...) is counted in the signing failure metrics,
++// and that the object is not marked as signed but scheduled for a retry.
++func TestSigner_Sign_NoSignerRecordsError(t *testing.T) {
++	tro := objects.NewTaskRunObjectV1(&v1.TaskRun{
++		ObjectMeta: metav1.ObjectMeta{
++			Name: "foo",
++		},
++	})
++
++	pro := objects.NewPipelineRunObjectV1(&v1.PipelineRun{
++		ObjectMeta: metav1.ObjectMeta{
++			Name: "foo",
++		},
++	})
++
++	tests := []struct {
++		name   string
++		object objects.TektonObject
++		config *config.Config
++	}{
++		{
++			name:   "taskrun",
++			object: tro,
++			config: &config.Config{
++				Artifacts: config.ArtifactConfigs{
++					TaskRuns: config.Artifact{
++						Format:         "in-toto",
++						StorageBackend: sets.New[string]("mock"),
++						Signer:         "x509",
++					},
++				},
++			},
++		},
++		{
++			name:   "pipelinerun",
++			object: pro,
++			config: &config.Config{
++				Artifacts: config.ArtifactConfigs{
++					PipelineRuns: config.Artifact{
++						Format:         "in-toto",
++						StorageBackend: sets.New[string]("mock"),
++						Signer:         "x509",
++					},
++				},
++			},
++		},
++	}
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			ctx, _ := rtesting.SetupFakeContext(t)
++			ps := fakepipelineclient.Get(ctx)
++			ctx = config.ToContext(ctx, tt.config.DeepCopy())
++
++			recorder := &fakeRecorder{}
++			ts := &ObjectSigner{
++				Backends:          fakeAllBackends([]*mockBackend{{backendType: "mock"}}),
++				SecretPath:        "./signing/x509/testdata/does-not-exist",
++				Pipelineclientset: ps,
++				Recorder:          recorder,
++			}
++
++			tekton.CreateObject(t, ctx, ps, tt.object)
++
++			if err := ts.Sign(ctx, tt.object); err == nil {
++				t.Fatal("Signer.Sign() expected an error, got nil")
++			}
++
++			updated, err := tekton.GetObject(t, ctx, ps, tt.object)
++			if err != nil {
++				t.Fatalf("error fetching fake object: %v", err)
++			}
++			if annotations.Reconciled(ctx, ps, updated) {
++				t.Error("object was marked as signed or failed, want a retry")
++			}
++			if got := updated.GetAnnotations()[annotations.RetryAnnotation]; got != "0" {
++				t.Errorf("retry annotation = %q, want %q", got, "0")
++			}
++			want := []metrics.MetricErrorType{metrics.SignerUnavailableError}
++			if diff := cmp.Diff(want, recorder.errors); diff != "" {
++				t.Errorf("recorded error metrics (-want +got):\n%s", diff)
++			}
++		})
++	}
++}
++
++type fakeRecorder struct {
++	errors []metrics.MetricErrorType
++}
++
++func (r *fakeRecorder) RecordCountMetrics(context.Context, metrics.Metric) {}
++
++func (r *fakeRecorder) RecordErrorMetric(_ context.Context, errType metrics.MetricErrorType) {
++	r.errors = append(r.errors, errType)
++}
++
+ func TestSigner_Transparency(t *testing.T) {
+ 	newTaskRun := func(name string) objects.TektonObject {
+ 		return objects.NewTaskRunObjectV1(&v1.TaskRun{
+diff --git a/pkg/metrics/common.go b/pkg/metrics/common.go
+index 86a9d7185..74df746d3 100644
+--- a/pkg/metrics/common.go
++++ b/pkg/metrics/common.go
+@@ -36,6 +36,9 @@ const (
+ 	SigningError         MetricErrorType = "signing"
+ 	StorageError         MetricErrorType = "storage"
+ 	TlogError            MetricErrorType = "tlog"
++	// SignerUnavailableError is recorded when no signer could be configured for the
++	// signable type (missing key material, unreachable KMS, ...).
++	SignerUnavailableError MetricErrorType = "signer_unavailable"
+ )
+ 
+ // ErrorTypeAttrKey is the OpenTelemetry attribute key used to label error metrics by type.

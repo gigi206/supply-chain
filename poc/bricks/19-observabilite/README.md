@@ -316,6 +316,27 @@ Règle ajoutée ([`alertes.yml`](config/regles/alertes.yml)) : `increase(marked_
 - Second volet : référence sur un seul build normal ; en trafic mêlé, un build normal à reprises peut masquer un échec en ouvert.
 - Chains v0.29.9 échoue en ouvert sans OpenBao : l'alerte le détecte, elle ne l'empêche pas. Le correctif amont (`b1c0af9`) n'est pas publié.
 
+### Essai d'un correctif de Chains (02/11/2026, 22:52 à 23:04 UTC, demande du propriétaire)
+
+Le correctif amont `b1c0af9` (#1834) n'est dans aucune release, ni dans aucune branche `release-v0.2x.x`, et même sur `main` le cas « aucun signataire » n'appelle pas `recordError` : `signing_failures` ne le compte pas. **Correctif proposé** ([`chains-correctif/correctif.patch`](chains-correctif/correctif.patch), sur `main` `0084070`) : une ligne qui compte ce cas sous un nouveau type `error_type="signer_unavailable"`, un test unitaire (TaskRun et PipelineRun ; il échoue sans la ligne) et la liste des `error_type` dans `docs/metrics.md`. `go test -race ./...` : 40 paquets, aucun échec ; golangci-lint v2.14.0 (celle de la CI de Chains) : 0 problème. Le second chemin de #1796 (format introuvable) est **écarté** : le corriger casse 5 tests existants (configuration OCI vide), et la ConfigMap refuse déjà tout format inconnu.
+
+**Image d'essai** ([`o4-correctif_image.log`](resultats/o4-correctif_image.log)) : v0.29.9 + #1834 + le correctif, Go 1.27.3 (archive vérifiée par sha256 ; la release est construite avec 1.26.10), options de ko ; l'image officielle plus une couche `/ko-app/controller`, dans `essais-chains/controller` (non signée, sans attestation). Même incident que le troisième passage d'A2, puis remise en état ([`o4-correctif_a2.log`](resultats/o4-correctif_a2.log), prédictions dans [`o4-correctif-chains-predictions.md`](resultats/o4-correctif-chains-predictions.md)).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 1 | digest `8aa1200d…` ; couches de l'officielle + `1df7048f…`, binaire relu dans Zot identique ; pod prêt 6 s après le changement | conforme |
+| 2 | OpenBao scellé à 22:52:30 ; build réussi à 22:53:36, même digest `3a7ca1b1` ; **les quatre objets `signed=failed`, `retries=3`, à 22:53:42**, aucun `signed=true` ; `No signer kms configured for tekton` au journal | conforme |
+| 3 | `signer_unavailable` : **20 (TaskRuns) et 7 (PipelineRun)**, soit les 27 lignes « No signer » du journal ; `marked_signed` et `sign_created` : 0. Le script les a lus trop tôt (13, série PipelineRun pas encore collectée : collecte toutes les 30 s) ; valeurs finales relues dans Prometheus ([`o4-correctif-compteurs.log`](resultats/o4-correctif-compteurs.log)) | conforme |
+| 4 | **`ChainsEchecSignature` déclenchée** (premier volet, `error_type="signer_unavailable"`), notifiée à 22:53:17, résolue à 23:03:40 ; `ChainsMarqueSansSignature` inactive, 0 notification | conforme |
+| 5 | après le descellement : les quatre objets restent `signed=failed` ; PipelineRun et TaskRun `publier` **ABSENTE** du tag `.att` | conforme |
+| 6 | image officielle `2200972d…` remise, spec du pod identique à celle d'avant l'essai ; build normal `signed=true`, enveloppes **COUVERTE** ; exécutions purgées ; clé Transit inchangée ; A1 déclenchée puis résolue ; passages d'`horodatage` et de `rattrapage` réussis | conforme |
+
+**Ce que l'essai montre :** avec #1834 et ce correctif, une panne du KMS n'échoue plus en ouvert. Les objets finissent `signed=failed`, et le premier volet d'A2 la voit. Le second volet ne sert alors plus qu'aux versions sans le correctif. Limites :
+- **Pas de reprise après la panne :** les cinq tentatives (la première, puis `retries` de 0 à 3) sont épuisées en quelques secondes (file de knative à 5 ms, doublée à chaque échec, et réconciliation à chaque patch d'annotation), et un build fait pendant une panne du KMS reste définitivement non signé ; il faut le relancer.
+- **Version essayée :** v0.29.9 + #1834, pas `main` (tests unitaires sur les deux).
+- **Rien n'est publié :** la PR chez tektoncd/chains attend l'accord du propriétaire. L'issue #1796 est attribuée à une mainteneuse depuis le 15/07/2026.
+- **Résidu :** l'image d'essai reste dans Zot (`essais-chains/controller:essai`).
+
 
 ## O5 : déplacé dans la brique 19b
 

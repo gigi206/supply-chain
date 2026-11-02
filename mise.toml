@@ -274,7 +274,7 @@ description = "Brique 01, S5 : branche custom du fork construite par une pipelin
 run = "poc/bricks/01-forgejo-sync/declencheur.sh"
 
 [tasks.observabilite]
-description = "Brique 19, O2 : Prometheus 3.13.5 (sha256 et attestation de release GitHub) et Alertmanager 0.34.2 (sha256 seul) en services durcis sur sc-stockage, collecte de Kyverno, Chains et OpenBao par le proxy de l'API (compte de lecture borné), de Zot, Forgejo et des fichiers de métriques (sync.prom, certificats), en lecture seule (étapes : telecharger certificats compte installer cibles lecture_seule) ; O3 : règles des alertes (étapes : regles reference deployer) ; O4 : incidents simulés, un par alerte (étapes : fichiers a1 a2 a3 a4 a5 a6)"
+description = "Brique 19, O2 : Prometheus 3.13.5 (sha256 et attestation de release GitHub) et Alertmanager 0.34.2 (sha256 seul) en services durcis sur sc-stockage, collecte de Kyverno, Chains et OpenBao par le proxy de l'API (compte de lecture borné), de Zot, Forgejo et des fichiers de métriques (sync.prom, certificats), en lecture seule (étapes : telecharger certificats compte installer cibles lecture_seule) ; O3 : règles des alertes (étapes : regles reference deployer) ; O4 : incidents simulés, un par alerte (étapes : fichiers a1 a2 a3 a4 a5 a6) ; essai d'un correctif de Chains (étapes : correctif_image, avec CHAINS_BIN, puis correctif_a2)"
 run = "poc/bricks/19-observabilite/observabilite.sh"
 
 [tasks.journalisation]

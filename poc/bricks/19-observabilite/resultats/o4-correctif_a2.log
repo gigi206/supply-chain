@@ -1,0 +1,79 @@
+# observabilite.sh correctif_a2, 2026-11-02T22:52:19Z
+OK   ChainsMarqueSansSignature inactive avant l'incident
+OK   ChainsEchecSignature inactive avant l'incident
+image avant : sha256:2200972dcead… ; spec du pod : a89c3312d3a2953f…
+clé Transit chains avant : 078097039e8d4365…
+22:52:20 contrôleur d'essai : essais-chains/controller@sha256:8aa1200da065…
+22:52:26 tekton-chains-controller-85b57bcd6b-fwgxw sc-stockage.poc.test:5000/essais-chains/controller@sha256:8aa1200da065445dc45479226f4f15e394326610d5fc015e2cd97255f49783de prêt=true
+22:52:26 scellement : suppression du pod openbao-0
+22:52:30 OpenBao scellé
+## build pendant le scellement
+remote: 
+remote: Create a new pull request for 'workspace:custom/s5':        
+remote:   https://sc-stockage.poc.test:3000/mirror/sample-app/compare/main...workspace:custom/s5        
+remote: 
+OK   PipelineRun sample-app-sync-826626f1587fd5c7ff8f085b69e085e0a07664a7 créé
+22:53:36 build réussi : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## Chains pendant le scellement (jusqu'à l'issue de chaque objet, au plus 4 min)
+  22:53:42 PipelineRun/sample-app-sync-826626f1587fd5c7ff8f085b69e085e0a07664a7 signed=failed retries=3
+  22:53:42 TaskRun/sample-app-sync-826626ec96e286a036ff6178febb6af0163713-preparer signed=failed retries=3
+  22:53:42 TaskRun/sample-app-sync-826626fec96e286a036ff6178febb6af0163713-publier signed=failed retries=3
+  22:53:42 TaskRun/sample-app-sync-8266ec96e286a036ff6178febb6af0163713-construire signed=failed retries=3
+22:53:43 ChainsEchecSignature : prometheus=firing, alertmanager=active
+  reçu : 2026-11-02T22:53:17+00:00 sc-stockage python3[30431]: {"alerte": "ChainsEchecSignature", "debut": "2026-11-02T22:53:07.032Z", "etiquettes": {"alerte": "A2", "alertname": "ChainsEchecSignature", "error_type": "signer_unavailable", "instance": "192.168.161.11:6443", "job": "chains", "otel_scope_name": "github.com/tektoncd/chains/pkg/taskrunmetrics", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+ChainsMarqueSansSignature pendant le scellement : inactive|absente
+## compteurs du contrôleur d'essai
+  {"error_type":"signer_unavailable","instance":"192.168.161.11:6443","job":"chains","otel_scope_name":"github.com/tektoncd/chains/pkg/taskrunmetrics"} 13
+  pipelinerun_marked_signed : 0
+  taskrun_marked_signed : 0
+  pipelinerun_sign_created : 0
+  taskrun_sign_created : 0
+## journal du contrôleur d'essai depuis le scellement (signataire, 6 premières lignes)
+  {"level":"warn","ts":"2026-11-02T22:52:42.462Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openba
+  {"level":"warn","ts":"2026-11-02T22:52:42.463Z","logger":"watcher","caller":"chains/signing.go:175","msg":"No signer kms configured for tekton","commit":"7014dc5-dirty","knative.dev/pod":"tekton-chains-controller-85b57bcd6b-fwgxw","knative.dev/controller":"git
+  {"level":"warn","ts":"2026-11-02T22:52:42.502Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openba
+  {"level":"warn","ts":"2026-11-02T22:52:42.505Z","logger":"watcher","caller":"chains/signing.go:175","msg":"No signer kms configured for tekton","commit":"7014dc5-dirty","knative.dev/pod":"tekton-chains-controller-85b57bcd6b-fwgxw","knative.dev/controller":"git
+  {"level":"warn","ts":"2026-11-02T22:52:42.547Z","logger":"watcher","caller":"chains/signing.go:82","msg":"error configuring kms signer with config {hashivault://chains {https://openbao.openbao.svc.cluster.local:8200   {jwt tekton-chains /var/run/secrets/openba
+  {"level":"warn","ts":"2026-11-02T22:52:42.548Z","logger":"watcher","caller":"chains/signing.go:175","msg":"No signer kms configured for tekton","commit":"7014dc5-dirty","knative.dev/pod":"tekton-chains-controller-85b57bcd6b-fwgxw","knative.dev/controller":"git
+  lignes « No signer » : 27
+22:53:44 descellement
+{"sealed":false}
+pod/openbao-0 condition met
+OK   clé Transit chains inchangée (078097039e8d4365…)
+## objets après le descellement (une reprise de Chains serait visible ici)
+  PipelineRun/sample-app-sync-826626f1587fd5c7ff8f085b69e085e0a07664a7 signed=failed retries=3
+  TaskRun/sample-app-sync-826626ec96e286a036ff6178febb6af0163713-preparer signed=failed retries=3
+  TaskRun/sample-app-sync-826626fec96e286a036ff6178febb6af0163713-publier signed=failed retries=3
+  TaskRun/sample-app-sync-8266ec96e286a036ff6178febb6af0163713-construire signed=failed retries=3
+## contrôle exécutions/enveloppes après le descellement
+tag .att de builds/sample-app-sync@3a7ca1b14dbf : 4 enveloppe(s)
+  ABSENTE pipelinerun sample-app-sync-826626f1587fd5c7ff8f085b69e085e0a07664a7 (dc369011) : signed=failed
+  ABSENTE taskrun sample-app-sync-826626fec96e286a036ff6178febb6af0163713-publier (7a8271ef) : signed=failed
+ChainsMarqueSansSignature pendant tout l'essai : 0 notification(s)
+## remise en état : image officielle
+22:54:23 tekton-chains-controller-bbf64c76f-879g8 sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead7b8b84f301f87616b33766afb8bd80b7bf50fd3deda487f0ae5a prêt=true
+OK   spec du pod identique à celle d'avant l'essai (a89c3312d3a2953f…)
+## build normal sous le contrôleur officiel
+remote: 
+remote: Create a new pull request for 'workspace:custom/s5':        
+remote:   https://sc-stockage.poc.test:3000/mirror/sample-app/compare/main...workspace:custom/s5        
+remote: 
+OK   PipelineRun sample-app-sync-ad3cb385e670f1611b0ed7b69f572b23ac48a7b4 créé
+22:55:26 build réussi : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  PipelineRun/sample-app-sync-ad3cb385e670f1611b0ed7b69f572b23ac48a7b4 signed=true retries=-
+  TaskRun/sample-app-sync-ad3c585874bf50b67c30cc986a536b3c77ca-construire signed=true retries=-
+  TaskRun/sample-app-sync-ad3cb3585874bf50b67c30cc986a536b3c77ca-preparer signed=true retries=-
+  TaskRun/sample-app-sync-ad3cb38585874bf50b67c30cc986a536b3c77ca-publier signed=true retries=-
+tag .att de builds/sample-app-sync@3a7ca1b14dbf : 6 enveloppe(s)
+  COUVERTE pipelinerun sample-app-sync-ad3cb385e670f1611b0ed7b69f572b23ac48a7b4 (d189e6ba)
+  COUVERTE taskrun sample-app-sync-ad3cb38585874bf50b67c30cc986a536b3c77ca-publier (d3e45dc8)
+exécutions sample-app-sync-826626f1587fd5c7ff8f085b69e085e0a07664a7 et sample-app-sync-ad3cb385e670f1611b0ed7b69f572b23ac48a7b4 purgées (référence de la 08 gardée)
+22:55:38 OpenBaoScelle : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T22:54:47+00:00 sc-stockage python3[30431]: {"alerte": "OpenBaoScelle", "debut": "2026-11-02T22:53:37.032Z", "etiquettes": {"alerte": "A1", "alertname": "OpenBaoScelle", "instance": "192.168.161.11:6443", "job": "openbao", "severite": "critique"}, "fin": "2026-11-02T22:54:07.032Z", "recu": true, "statut": "resolved"}
+OK   OpenBaoScelle : déclenchée puis résolue, notifications firing et resolved reçues
+22:55:38 ChainsEchecSignature : prometheus=firing, alertmanager=active
+23:03:40 ChainsEchecSignature : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-02T22:55:17+00:00 sc-stockage python3[30431]: {"alerte": "ChainsEchecSignature", "debut": "2026-11-02T22:54:07.032Z", "etiquettes": {"alerte": "A2", "alertname": "ChainsEchecSignature", "error_type": "signer_unavailable", "instance": "192.168.161.11:6443", "job": "chains", "otel_scope_name": "github.com/tektoncd/chains/pkg/pipelinerunmetrics", "severite": "critique"}, "fin": "2026-11-02T22:54:37.032Z", "recu": true, "statut": "resolved"}
+OK   ChainsEchecSignature : déclenchée puis résolue, notifications firing et resolved reçues
+OK   horodatage/horodatage : passage horodatage-29894341 réussi après le descellement
+OK   declencheurs/rattrapage : passage rattrapage-29894341 réussi après le descellement

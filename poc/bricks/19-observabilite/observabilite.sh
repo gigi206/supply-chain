@@ -548,11 +548,153 @@ etape_a2() { # échec de signature réel : un build de la 01 pendant qu'OpenBao 
   passage_reussi declencheurs rattrapage "$t1"
 }
 
+# Essai d'un correctif de Chains (02/11/2026, demande du propriétaire) : prédictions dans resultats/o4-correctif-chains-predictions.md.
+CHAINS_DEPLOY=tekton-chains-controller
+CHAINS_OFFICIELLE=amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead7b8b84f301f87616b33766afb8bd80b7bf50fd3deda487f0ae5a
+CHAINS_ESSAI_DEPOT=essais-chains/controller
+CHAINS_ESSAI_DIGEST=$W/chains-correctif.digest
+
+etape_correctif_image() { # image d'essai : l'officielle + une couche qui remplace /ko-app/controller par le binaire CHAINS_BIN
+  # (v0.29.9 + #1834 + chains-correctif/correctif.patch, construit hors du dépôt : voir les prédictions)
+  local t=$W/chains-correctif d
+  [ -s "${CHAINS_BIN:?binaire du contrôleur corrigé}" ] || { echo "KO   binaire absent : $CHAINS_BIN" >&2; exit 1; }
+  echo "correctif : $(sha256sum "$here/chains-correctif/correctif.patch" | cut -c1-16)…"
+  echo "binaire   : $(sha256sum "$CHAINS_BIN" | cut -c1-16)… ($(stat -c %s "$CHAINS_BIN") octets)"
+  rm -rf "${t:?}" && mkdir -p "$t/racine/ko-app" "$t/docker"
+  install -m 0555 "$CHAINS_BIN" "$t/racine/ko-app/controller"
+  tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    -C "$t/racine" -cf "$t/couche.tar" ko-app
+  auth_zot "$t/docker/config.json"
+  DOCKER_CONFIG=$t/docker SSL_CERT_FILE=$P/ca-poc.crt crane append -b "$REG_HOTE/$CHAINS_OFFICIELLE" -f "$t/couche.tar" \
+    -t "$REG_HOTE/$CHAINS_ESSAI_DEPOT:essai" >/dev/null
+  d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$CHAINS_ESSAI_DEPOT:essai")
+  echo "$d" > "$CHAINS_ESSAI_DIGEST"
+  rm -rf "${t:?}"
+  echo "image d'essai : $CHAINS_ESSAI_DEPOT@$d"
+  echo "## couches (officielle, puis essai)"
+  for i in "$CHAINS_OFFICIELLE" "$CHAINS_ESSAI_DEPOT@$d"; do
+    SSL_CERT_FILE=$P/ca-poc.crt crane manifest "$REG_HOTE/$i" | jq -r '[.layers[].digest[7:19]] | join(" ")' | sed 's/^/  /'
+  done
+  echo "## binaire de la couche ajoutée, relu dans le registre"
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/$CHAINS_ESSAI_DEPOT@$d" - | tar -xOf - ko-app/controller | sha256sum | cut -c1-16 | sed 's/^/  /'
+}
+
+remettre_chains() { # déploiement de Chains revenu sur l'image officielle, pod prêt
+  kubectl set image -n tekton-chains "deploy/$CHAINS_DEPLOY" "$CHAINS_DEPLOY=$REG/$CHAINS_OFFICIELLE" >/dev/null
+  kubectl rollout status -n tekton-chains "deploy/$CHAINS_DEPLOY" --timeout=300s >/dev/null
+}
+
+image_chains() { kubectl get pods -n tekton-chains -l app.kubernetes.io/name=controller -o json \
+  | jq -r '.items[] | select(.metadata.deletionTimestamp == null) | "\(.metadata.name) \(.status.containerStatuses[0].imageID) prêt=\(.status.containerStatuses[0].ready)"'; }
+
+pousser_s5() { # message : commit vide poussé sur custom/s5 du fork par poc-dev (comme etape_a2) ; affiche le nom du PipelineRun
+  local c
+  rm -rf "${W:?}/o4-w"
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git clone -q "$FORGEJO_HOTE/$FORK_S5.git" "$W/o4-w"
+  git -C "$W/o4-w" checkout -q origin/custom/s5
+  git -C "$W/o4-w" -c user.name="PoC brique 19" -c user.email=poc-dev@poc.test -c commit.gpgsign=false commit -q --allow-empty -m "$1"
+  c=$(git -C "$W/o4-w" rev-parse HEAD)
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    GIT_CONFIG_KEY_1="http.$FORGEJO_HOTE/$FORK_S5.git.extraHeader" GIT_CONFIG_VALUE_1="Authorization: token $(cat "$S/forgejo-poc-dev.token")" \
+    git -C "$W/o4-w" push -q "$FORGEJO_HOTE/$FORK_S5.git" HEAD:refs/heads/custom/s5
+  rm -rf "${W:?}/o4-w"
+  echo "sample-app-sync-$c"
+}
+
+attendre_build() { # PipelineRun : créé, puis réussi
+  for _ in $(seq 60); do kubectl get pipelinerun -n builds "$1" >/dev/null 2>&1 && break; sleep 2; done
+  kubectl get pipelinerun -n builds "$1" >/dev/null 2>&1 && echo "OK   PipelineRun $1 créé" || { echo "KO   aucun PipelineRun $1" >&2; exit 1; }
+  kubectl wait -n builds --for=condition=Succeeded "pipelinerun/$1" --timeout=600s >/dev/null \
+    || { kubectl get pipelinerun -n builds "$1" -o json | jq -c '.status.conditions' >&2; exit 1; }
+  echo "$(date -u +%H:%M:%S) build réussi : $(kubectl get pipelinerun -n builds "$1" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')"
+}
+
+etape_correctif_a2() { # incident d'A2 (OpenBao scellé, build de la 01) sous le contrôleur corrigé, puis remise en état
+  local t0 t1 c1 c2 st pr pr2 fin d spec0 spec1
+  d=$(cat "$CHAINS_ESSAI_DIGEST")
+  debut ChainsMarqueSansSignature
+  debut ChainsEchecSignature
+  kubectl get deploy -n tekton-chains "$CHAINS_DEPLOY" -o json > "$W/chains-deploy-avant.json"
+  spec0=$(jq -cS '.spec.template.spec' "$W/chains-deploy-avant.json" | sha256sum | cut -c1-16)
+  echo "image avant : $(jq -r '.spec.template.spec.containers[0].image' "$W/chains-deploy-avant.json" | sed 's/.*@//' | cut -c1-19)… ; spec du pod : $spec0…"
+  c1=$(cle_chains_empreinte)
+  echo "clé Transit chains avant : $c1…"
+  trap 'desceller_o4; remettre_chains' EXIT   # ni OpenBao scellé ni contrôleur d'essai laissés en place, même en cas d'échec
+  echo "$(date -u +%H:%M:%S) contrôleur d'essai : $CHAINS_ESSAI_DEPOT@${d:0:19}…"
+  kubectl set image -n tekton-chains "deploy/$CHAINS_DEPLOY" "$CHAINS_DEPLOY=$REG/$CHAINS_ESSAI_DEPOT@$d" >/dev/null
+  kubectl rollout status -n tekton-chains "deploy/$CHAINS_DEPLOY" --timeout=300s >/dev/null
+  echo "$(date -u +%H:%M:%S) $(image_chains)"
+  t0=$(date +%s)
+  echo "$(date -u +%H:%M:%S) scellement : suppression du pod openbao-0"
+  kubectl delete pod -n openbao openbao-0 --wait=true >/dev/null
+  for _ in $(seq 90); do
+    st=$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null || true)
+    [ "$(jq -r .sealed <<<"$st" 2>/dev/null)" = true ] && break
+    sleep 2
+  done
+  [ "$(jq -r .sealed <<<"$st")" = true ] && echo "$(date -u +%H:%M:%S) OpenBao scellé" || { echo "KO   OpenBao pas scellé" >&2; exit 1; }
+  echo "## build pendant le scellement"
+  pr=$(pousser_s5 "brique 19, O4 : correctif de Chains")
+  attendre_build "$pr"
+  echo "## Chains pendant le scellement (jusqu'à l'issue de chaque objet, au plus 4 min)"
+  fin=$((SECONDS + 240))
+  while [ $SECONDS -lt $fin ]; do
+    objets_chains "$pr" | grep -qvE 'signed=(failed|true)' || break
+    sleep 5
+  done
+  objets_chains "$pr" | sed "s/^/  $(date -u +%H:%M:%S) /"
+  declenchee ChainsEchecSignature "$t0" 300
+  echo "ChainsMarqueSansSignature pendant le scellement : $(etat_alerte ChainsMarqueSansSignature)"
+  echo "## compteurs du contrôleur d'essai"
+  requete 'watcher_pipelinerun_signing_failures_total or watcher_taskrun_signing_failures_total'
+  for m in pipelinerun_marked_signed taskrun_marked_signed pipelinerun_sign_created taskrun_sign_created; do
+    echo "  $m : $(requete "sum(watcher_${m}_total) or vector(0)" | awk '{print $2}')"
+  done
+  echo "## journal du contrôleur d'essai depuis le scellement (signataire, 6 premières lignes)"
+  kubectl logs -n tekton-chains "deploy/$CHAINS_DEPLOY" --since-time="$(date -u -d "@$t0" +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null \
+    | grep -E 'No signer|error configuring' | cut -c1-260 | head -6 | sed 's/^/  /' || true
+  echo "  lignes « No signer » : $(kubectl logs -n tekton-chains "deploy/$CHAINS_DEPLOY" --since-time="$(date -u -d "@$t0" +%Y-%m-%dT%H:%M:%SZ)" 2>/dev/null | grep -c 'No signer' || true)"
+  t1=$(date +%s)
+  echo "$(date -u +%H:%M:%S) descellement"
+  desceller_o4
+  c2=$(cle_chains_empreinte)
+  [ "$c1" = "$c2" ] && echo "OK   clé Transit chains inchangée ($c2…)" || { echo "KO   clé Transit chains : $c1… puis $c2…" >&2; exit 1; }
+  sleep 30
+  echo "## objets après le descellement (une reprise de Chains serait visible ici)"
+  objets_chains "$pr" | sed 's/^/  /'
+  echo "## contrôle exécutions/enveloppes après le descellement"
+  enveloppes_att "$pr"
+  echo "ChainsMarqueSansSignature pendant tout l'essai : $(recues ChainsMarqueSansSignature "$t0" firing | grep -c . || true) notification(s)"
+  echo "## remise en état : image officielle"
+  remettre_chains
+  trap - EXIT
+  echo "$(date -u +%H:%M:%S) $(image_chains)"
+  spec1=$(kubectl get deploy -n tekton-chains "$CHAINS_DEPLOY" -o json | jq -cS '.spec.template.spec' | sha256sum | cut -c1-16)
+  [ "$spec0" = "$spec1" ] && echo "OK   spec du pod identique à celle d'avant l'essai ($spec1…)" || { echo "KO   spec du pod : $spec0… puis $spec1…" >&2; exit 1; }
+  echo "## build normal sous le contrôleur officiel"
+  pr2=$(pousser_s5 "brique 19, O4 : contrôle après le correctif")
+  attendre_build "$pr2"
+  fin=$((SECONDS + 240))
+  while [ $SECONDS -lt $fin ]; do
+    objets_chains "$pr2" | grep -q 'signed=absente' || break
+    sleep 5
+  done
+  objets_chains "$pr2" | sed 's/^/  /'
+  enveloppes_att "$pr2"
+  purger_pr "$pr" "$pr2"
+  echo "exécutions $pr et $pr2 purgées (référence de la 08 gardée)"
+  resolue OpenBaoScelle "$t0" 300
+  resolue ChainsEchecSignature "$t0" 900
+  passage_reussi horodatage horodatage "$t1"
+  passage_reussi declencheurs rattrapage "$t1"
+}
+
 etapes=("$@")
-[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer|fichiers|a1|a2|a3|a4|a5|a6>…" >&2; exit 2; }
+[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer|fichiers|a1|a2|a3|a4|a5|a6|correctif_image|correctif_a2>…" >&2; exit 2; }
 for e in "${etapes[@]}"; do
   declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
-  case $e in regles|reference|deployer) jalon=${JALON:-o3} ;; fichiers|a[1-6]) jalon=o4 ;; *) jalon=o2 ;; esac
+  case $e in regles|reference|deployer) jalon=${JALON:-o3} ;; fichiers|a[1-6]|correctif_*) jalon=o4 ;; *) jalon=o2 ;; esac
   {
     echo "# observabilite.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     "etape_$e"

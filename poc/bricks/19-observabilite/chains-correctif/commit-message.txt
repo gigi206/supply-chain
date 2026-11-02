@@ -1,0 +1,27 @@
+fix(signing): count missing signers as failures
+
+Motivation:
+When no signer can be configured for a signable type (missing key
+material, or a KMS backend that is unreachable or sealed),
+ObjectSigner.Sign() logs "No signer %s configured for %s". Since
+#1834 the object is no longer marked as signed, but this path does
+not call recordError(), so the signing failure counters
+(watcher_*_signing_failures_total) stay at 0. Payload creation,
+marshalling, signing, tlog and storage failures are counted, but a
+KMS outage is not, so an alert on these counters cannot see it.
+
+Approach:
+Record a new error type, signer_unavailable, before breaking out of
+the object loop, and document the error_type values in
+docs/metrics.md.
+
+Validation:
+TestSigner_Sign_NoSignerRecordsError (TaskRun and PipelineRun) checks
+the recorded error type, that the object is not marked as signed and
+that a retry is recorded. It fails without the change.
+
+  go test -race ./...
+  golangci-lint run ./pkg/chains/... ./pkg/metrics/...
+
+Signed-off-by: Ghislain LE MEUR <ghislain.lemeur@gmail.com>
+Assisted-by: Claude Opus 5.5 (via Claude Code)

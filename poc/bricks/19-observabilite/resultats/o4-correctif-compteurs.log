@@ -1,0 +1,6 @@
+# relecture des compteurs du contrôleur d'essai dans Prometheus, 2026-11-02T23:04:10Z
+# correctif_a2 les avait lus à 22:53:43, avant la collecte suivante (scrape_interval 30s) : 13 (TaskRun), série PipelineRun pas encore collectée
+## séries signing_failures du pod d'essai (tekton-chains-controller-85b57bcd6b-fwgxw), de 22:52:30 à 22:54:25 UTC, pas de 5 s, valeurs distinctes
+  pipelinerunmetrics error_type=signer_unavailable : 22:54:05=7
+  taskrunmetrics error_type=signer_unavailable : 22:53:35=13 22:54:05=20 22:53:05=7
+## lignes « No signer » du journal du pod d'essai : 27 (o4-correctif_a2.log) = 20 + 7
