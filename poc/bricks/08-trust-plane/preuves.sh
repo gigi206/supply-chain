@@ -2566,7 +2566,7 @@ rr_essai() { # espace nom paramètres-json : ResolutionRequest de bundles (sans 
 }
 
 etape_resolveurs() {
-  local k=0 t0 b p pol r ns
+  local k=0 t0 p pol r ns
   echo "Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :"
   echo "- ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service"
   echo "  (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul"
@@ -2607,9 +2607,8 @@ etape_resolveurs() {
   ct_refus "$RBAC_REFUS" "lecture du compte de service kube-system/default" kubectl get serviceaccount -n kube-system default --as "$RESOLVEURS" -o name || k=1
 
   echo "## résolutions réelles (bundle de la pipeline en service, sans cache)"
-  b=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
-  echo "bundle : $b"
-  p=$(jq -nc --arg b "$b" '[{name: "bundle", value: $b}, {name: "name", value: "sample-app"}, {name: "kind", value: "pipeline"}, {name: "cache", value: "never"}]')
+  p=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -c '.spec.resourcetemplates[0].spec.pipelineRef.params + [{name: "cache", value: "never"}]')
+  echo "paramètres : $p"
   kubectl create namespace preuve-resolveurs >/dev/null
   attendre_sa preuve-resolveurs
   for ns in builds preuve-resolveurs; do

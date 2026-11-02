@@ -1,4 +1,4 @@
-# preuves.sh resolveurs, 2026-11-02T11:14:34Z
+# preuves.sh resolveurs, 2026-11-02T11:20:59Z
 Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :
 - ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service
   (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul
@@ -26,7 +26,7 @@ OK   lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" 
 OK   liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot list resource "secrets" in API group "" in the namespace "openbao" )
 OK   lecture du compte de service kube-system/default : refusé (serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "serviceaccounts" in API group "" in the namesp)
 ## résolutions réelles (bundle de la pipeline en service, sans cache)
-bundle : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:b97fe5c19ef8ddfca031e1058d66632f8c7fba9e395fcb138a3885ebcc161ee5
+paramètres : [{"name":"bundle","value":"sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:b97fe5c19ef8ddfca031e1058d66632f8c7fba9e395fcb138a3885ebcc161ee5"},{"name":"name","value":"sample-app"},{"name":"kind","value":"pipeline"},{"name":"cache","value":"never"}]
 OK   builds : compte de service default : True
 OK   builds : Secret zot-images sans compte de service : True
 OK   preuve-resolveurs : compte de service default, refus des droits : False 1
@@ -34,7 +34,7 @@ OK   preuve-resolveurs : compte de service default, refus des droits : False 1
 OK   preuve-resolveurs : Secret zot-images sans compte de service, refus des droits : False 1
   error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-secret": secrets "zot-images" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in 
 OK   espace preuve-resolveurs introuvable (NotFound) : 1
-## journal des résolveurs depuis 2026-11-02T11:14:34Z
+## journal des résolveurs depuis 2026-11-02T11:20:59Z
 refus des droits : 2
 OK   refus des droits hors de preuve-resolveurs : 0
 ## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)

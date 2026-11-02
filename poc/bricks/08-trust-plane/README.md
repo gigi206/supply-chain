@@ -713,7 +713,7 @@ Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets 
   - Role et RoleBinding `tekton-pipelines-resolvers-lecture` dans `builds`, avec `get` seul ([`resolveurs-lecture-builds.yaml`](tekton/pipeline/resolveurs-lecture-builds.yaml)) ;
   - contrôle du rendu dans `tekton.sh installer` ; lectures des résolveurs journalisées par l'audit de l'API ([`audit-policy.yaml`](k3s/audit-policy.yaml)).
 - **Application sur le cluster de J8 sans `installer`**, qui remet les drapeaux de Tekton : les trois objets RBAC seuls ([`tekton-resolveurs-application.log`](resultats/tekton-resolveurs-application.log)).
-- **`resolveurs`** ([`preuves-resolveurs.log`](resultats/preuves-resolveurs.log), prédiction commitée avant le passage, 16 OK) :
+- **`resolveurs`** ([`preuves-resolveurs.log`](resultats/preuves-resolveurs.log), prédiction commitée avant le passage, 16 OK ; étape branchée dans `rejeu.sh` après `controleurs`. Le premier passage, avec le nom de la pipeline écrit en dur, a donné le même résultat et reste archivé : [`preuves-resolveurs-premier-passage.log`](resultats/preuves-resolveurs-premier-passage.log)) :
   - can-i : `list secrets` de tout le cluster refusé, `get` des Secrets et des comptes de service autorisé dans `builds`, refusé dans `kube-system` ;
   - lectures réelles refusées par les droits : `k3s-serving`, `zot-chains`, Secrets d'`openbao`, compte de service de `kube-system` ;
   - résolutions réelles sans cache du bundle de la pipeline en service : réussies dans `builds`, une avec le compte de service `default` et une avec le Secret `zot-images`. Dans un espace d'essai, les mêmes requêtes échouent sur le refus des droits, d'abord sur le compte de service puis sur le Secret ;
