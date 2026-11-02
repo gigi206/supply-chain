@@ -367,6 +367,16 @@ En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en 
 - second run : sans événement (ou quelques-uns si l'amont a avancé), aucun bundle ou un bundle de quelques Ko à quelques Mo ;
 - espace consommé : moins de 1 Go au total (miroir local, bundles, `mirror/traefik` et fork dans Forgejo) ; l'espace pris par le fork est mesuré, pas supposé (objets partagés ou copiés).
 
+**Résultats** (02/11/2026, 15:22 à 15:23 UTC, accord du propriétaire ; [`forgejo-traefik.log`](resultats/forgejo-traefik.log), [`s6-journal-traefik.log`](resultats/s6-journal-traefik.log)) :
+
+- **Passage archivé** ([`forgejo-traefik-premier-passage.log`](resultats/forgejo-traefik-premier-passage.log)) : arrêt muet après le relevé d'espace, `du` sortant en erreur sur des chemins absents avant le premier run (`set -e`). Rien d'autre n'avait été fait. Corrigé.
+- **Premier run** (sans fork) : code 0, **620 événements de création** (30 branches, 590 tags), conforme au recompte ; **bundle complet de 115 428 062 octets** (115 Mo, dans la fourchette prédite de 100 à 250 Mo) ; `master` de `mirror/traefik` = `master` de GitHub. **Durée : 52,1 s** (journal de systemd : 15:22:05,5 à 15:22:57,6), 9,5 s de CPU, pic mémoire de 358 Mo ; plus rapide que prédit (« quelques minutes »). La durée calculée par le script (« 0 s ») est fausse : le journal fait foi.
+- **Second run** (avec le fork `workspace/traefik`) : code 0, aucun événement, aucun bundle ; 0,9 s.
+- **Espace** (`sc-stockage`) : miroir local 119 Mo, bundles 115 Mo, `mirror/` de Forgejo +119 Mo, **fork +0,1 Mo** (Forgejo partage les objets du fork avec son parent : mesuré) ; disque : +375 Mo, 13,6 Go libres. Conforme (moins de 1 Go).
+- **Timer** `synchro@traefik.timer` activé : il a déclenché un troisième run aussitôt (15:23:24, 0,8 s), `OnBootSec=5min` étant dépassé depuis le démarrage de la VM ; prochain run annoncé à 16:25:00 UTC. Celui de `sample-app-sync` est annoncé à 16:16:56 UTC (le délai aléatoire a été retiré de nouveau depuis l'annonce de 16:13:08).
+- Le fsck des objets de l'amont (`transfer.fsckObjects=true`) n'a rien refusé sur l'historique complet de Traefik.
+- **Non mesuré** : la taille des incréments quotidiens, qui demande des jours de synchro ; à relever plus tard dans les rapports (`bundle.file`) et dans `bundles/`.
+
 ### Accords et ordre d'exécution
 
 Le rejeu `enchainement` de la 08 est analysé et commité avant toute action sur Forgejo. Accords : **S2** (préparation et exécution après le rejeu) accordé le 02/11/2026 ; **S3** installe un compte système et des unités sur `sc-stockage` : accord à demander ; **S4** suit S3 ; **S5** attend le choix entre (i) et (ii) ; **S6** attend son accord. Les jalons ne s'enchaînent pas d'un seul tenant.

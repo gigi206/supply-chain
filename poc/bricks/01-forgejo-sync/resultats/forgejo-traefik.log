@@ -1,0 +1,19 @@
+# forgejo.sh traefik, 2026-11-02T15:22:04Z
+## espace avant
+/dev/vda1      20922114048 6022483968 13998432256  31% /
+41416	/var/lib/forgejo/data/repos/mirror
+70777	/var/lib/forgejo/data/repos/workspace
+premier run (sans fork) : code 0, 0 s ; {"status":"ok","evenements":{"branch-created":30,"tag-created":590},"bundle":{"fichier":"20261102T152205Z.bundle","refs":620,"prerequis":0}}
+  taille du bundle : 115428062 octets
+OK   master de mirror/traefik = master de GitHub
+FORK=https://192.168.161.13:3000/workspace/traefik.git
+second run (avec fork, incrément depuis le premier) : code 0, 0 s ; {"status":"ok","evenements":null,"bundle":null}
+## espace après
+/dev/vda1      20922114048 6398218240 13622697984  32% /
+119251057	/var/lib/synchro/traefik/miroir.git
+115428062	/var/lib/synchro/traefik/bundles
+119031868	/var/lib/forgejo/data/repos/mirror
+176479	/var/lib/forgejo/data/repos/workspace
+Created symlink '/etc/systemd/system/timers.target.wants/synchro@traefik.timer' -> '/etc/systemd/system/synchro@.timer'.
+NEXT LEFT LAST                          PASSED UNIT                  ACTIVATES
+-       - Mon 2026-11-02 15:23:24 UTC 30ms ago synchro@traefik.timer synchro@traefik.service

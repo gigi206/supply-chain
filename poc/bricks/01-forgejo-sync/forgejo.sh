@@ -387,7 +387,7 @@ run_traefik() { # libellé : un run de synchro@traefik ; durée (horodatages de 
     || echo "  taille du bundle : $(sur sc-stockage "sudo stat -c %s /var/lib/synchro/traefik/bundles/$(jq -r .bundle.file "$T/rapport.json")") octets"
 }
 espace() {
-  sur sc-stockage "df -B1 / | tail -1; sudo du -sb /var/lib/synchro/traefik/miroir.git /var/lib/synchro/traefik/bundles /var/lib/forgejo/data/repos/mirror /var/lib/forgejo/data/repos/workspace 2>/dev/null"
+  sur sc-stockage "df -B1 / | tail -1; sudo du -sb /var/lib/synchro/traefik/miroir.git /var/lib/synchro/traefik/bundles /var/lib/forgejo/data/repos/mirror /var/lib/forgejo/data/repos/workspace 2>/dev/null || true"   # chemins absents avant le premier run
 }
 
 etape_traefik() {

@@ -1,0 +1,5 @@
+# forgejo.sh traefik, 2026-11-02T15:21:46Z
+## espace avant
+/dev/vda1      20922114048 6022483968 13998432256  31% /
+41416	/var/lib/forgejo/data/repos/mirror
+70777	/var/lib/forgejo/data/repos/workspace
