@@ -1,0 +1,29 @@
+# preuves.sh intercepteurs, 2026-11-02T11:14:50Z
+Prédiction (écrite le 02/11/2026 avant le premier passage ; lecture du code de Triggers v0.37.2) :
+- les intercepteurs lisent leur certificat TLS par un informer de Secrets de knative sans portée d'espace de noms
+  (cmd/interceptors/main.go : injection.EnableInjectionOrDie sans WithNamespaceScope ; pkg/interceptors/server/server.go
+  l. 32 et 318) : l'informer liste et surveille les Secrets de tout le cluster ; aucun drapeau ne le borne
+- liaison tekton-triggers-core-interceptors (ClusterRole du même nom : secrets get, list, watch) retirée, pod redémarré :
+  can-i list secrets tout le cluster no ; le nouveau pod n'est pas prêt en 90 s (informer jamais synchronisé, serveur
+  HTTPS non démarré, sonde /ready en échec) ; son journal porte le refus de lister les Secrets « at the cluster scope »
+- liaison remise, pod redémarré : prêt, can-i yes, aucun refus dans le journal du nouveau pod ; caBundle des
+  ClusterInterceptors inchangé
+- conclusion attendue : borner les intercepteurs par les droits n'est pas possible sans modifier Triggers ; limite gardée
+OK   liaison et ClusterRole : tekton-triggers-core-interceptors tekton-pipelines:tekton-triggers-core-interceptors ["secrets:get,list,watch"]
+OK   can-i list secrets tout le cluster (liaison retirée) : no
+nouveau pod : pod/tekton-triggers-core-interceptors-5db75dbf95-pndts (créé 2026-11-02T11:14:50Z)
+OK   nouveau pod prêt après 90 s : False
+  E1102 11:14:51.085552       1 reflector.go:204] "Failed to watch" err="failed to list *v1.Secret: secrets is forbidden: User \"system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors\" cannot list resource \"secrets\" in API group \"\" at the cluster scope" logger="UnhandledError" r
+  E1102 11:14:52.139555       1 reflector.go:204] "Failed to watch" err="failed to list *v1.Secret: secrets is forbidden: User \"system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors\" cannot list resource \"secrets\" in API group \"\" at the cluster scope" logger="UnhandledError" r
+  E1102 11:14:55.277915       1 reflector.go:204] "Failed to watch" err="failed to list *v1.Secret: secrets is forbidden: User \"system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors\" cannot list resource \"secrets\" in API group \"\" at the cluster scope" logger="UnhandledError" r
+OK   refus de lister les Secrets « at the cluster scope » dans le journal : 1
+## liaison remise
+OK   can-i list secrets tout le cluster (liaison remise) : yes
+Waiting for deployment "tekton-triggers-core-interceptors" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "tekton-triggers-core-interceptors" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "tekton-triggers-core-interceptors" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "tekton-triggers-core-interceptors" rollout to finish: 1 old replicas are pending termination...
+deployment "tekton-triggers-core-interceptors" successfully rolled out
+OK   pod pod/tekton-triggers-core-interceptors-57546c66fb-n57jl prêt : True
+OK   refus dans le journal du pod : 0
+OK   caBundle des ClusterInterceptors (nom:longueur) inchangé depuis 2026-11-02T11:14:50Z : bitbucket:1456,cel:1456,github:1456,gitlab:1456,slack:1456

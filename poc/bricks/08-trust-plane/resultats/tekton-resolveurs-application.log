@@ -1,0 +1,13 @@
+# application des droits des résolveurs sur le cluster de J8 (sans tekton.sh installer : il remet les drapeaux de Tekton), 2026-11-02T11:14:25Z
+rendu : release.yaml réécrit de tekton.sh installer + tekton/kustomization-pipeline.yaml du commit 01869de ; sha256 3fdb2ad9ce5614ba…
+## avant
+["resolutionrequests,resolutionrequests/status:get,list,watch,update,patch","tasks,pipelines,stepactions:get,list","secrets,serviceaccounts:get,list,watch"]
+can-i list secrets -A (résolveurs) : yes
+objets appliqués : Role/builds/tekton-pipelines-resolvers-lecture ClusterRole/-/tekton-pipelines-resolvers-resolution-request-updates RoleBinding/builds/tekton-pipelines-resolvers-lecture
+role.rbac.authorization.k8s.io/tekton-pipelines-resolvers-lecture serverside-applied
+clusterrole.rbac.authorization.k8s.io/tekton-pipelines-resolvers-resolution-request-updates serverside-applied
+rolebinding.rbac.authorization.k8s.io/tekton-pipelines-resolvers-lecture serverside-applied
+## après
+["resolutionrequests,resolutionrequests/status:get,list,watch,update,patch","tasks,pipelines,stepactions:get,list"]
+can-i list secrets -A (résolveurs) : no
+feature-flags après application (valeur d'avant non relevée ; seuls les trois objets ci-dessus appliqués) : {"set-security-context":"true","no-match-policy":null}

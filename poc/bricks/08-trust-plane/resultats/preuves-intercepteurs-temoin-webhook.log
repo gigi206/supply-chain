@@ -1,0 +1,9 @@
+# témoin après preuves.sh intercepteurs (liaison remise) : livraison mal signée vers l EventListener de declencheurs, 2026-11-02T11:17:30Z
+prédiction : HTTP 202, aucun PipelineRun créé, refus « payload signature check failed » dans le journal des intercepteurs, aucun refus des droits
+livraison signée avec une clé fausse : HTTP 202 {"eventID":"5fdaa538-0430-4f6f-9ca9-e02200d47269"}
+PipelineRuns dans builds : avant 16, après 16
+OK   aucun PipelineRun créé
+## journal des intercepteurs depuis 2026-11-02T11:17:30Z
+  {"level":"info","ts":1793618250.5485568,"caller":"server/server.go:163","msg":"Interceptor response is: &{Extensions:map[] Continue:false Status:{Code:FailedPrecondition Message:payload signature check failed}}"}
+OK   refus de signature par l intercepteur github : 1
+OK   refus des droits : 0

@@ -1,0 +1,6 @@
+# témoin après preuves.sh intercepteurs : livraison mal signée vers l EventListener de declencheurs, 2026-11-02T11:16:58Z
+livraison signée avec une clé fausse : HTTP 202 {"eventID":"cf12b06a-fd98-450d-81a6-bb0c791e0e24"}
+PipelineRuns dans builds : avant 16, après 16
+OK   aucun PipelineRun créé
+## journal de l EventListener depuis 2026-11-02T11:16:58Z (refus de l intercepteur)
+(arrêt : motif cherché dans le journal de l'EventListener, qui ne journalise pas les refus d'intercepteur à ce niveau ; refus présent dans le journal des intercepteurs, relevé au passage suivant)
