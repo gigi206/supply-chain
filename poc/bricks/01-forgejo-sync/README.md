@@ -260,7 +260,7 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 
 Étape `negatifs` de [`forgejo.sh`](forgejo.sh) : `poc-amont` réécrit l'amont d'essai, puis chaque fois un run du service `synchro@sample-app-sync` de la VM (S3) ; contrôle du code (`ExecMainStatus`), du rapport, de l'archive publiée dans `mirror/`, du fork, puis restauration dans la VM.
 
-**Prédictions** (écrites le 02/11/2026 vers 14:10 UTC, avant toute exécution) :
+**Prédictions** (écrites le 02/11/2026 à 14:08 UTC, avant toute exécution ; heure d'abord mal notée, 14:10) :
 - force-push de `main` : code 2, événement `force-push`, ancienne tête sous `refs/archive/<horodatage>/heads/main` dans `mirror/`, `main` du fork alignée sur l'amont ;
 - tag `v1.0.0` créé (code 0), déplacé (code 2, `tag-moved`, archive publiée), supprimé (code 2, `tag-deleted`, archive publiée, retiré de la vue amont de `mirror/`) ; dans le fork, le tag garde sa dernière valeur (pas de `--prune`) ;
 - branche `feature/x` créée puis supprimée : code 0 les deux fois, archive publiée, branche gardée dans le fork ;
