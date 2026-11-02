@@ -1,0 +1,9 @@
+# observabilite.sh deployer, 2026-11-02T18:00:05Z
+active
+  /etc/prometheus/regles/alertes.yml	OpenBaoScelle	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	ok	inactive
+  /etc/prometheus/regles/alertes.yml	ReplayNonBitIdentique	ok	inactive
+  /etc/prometheus/regles/alertes.yml	MiroirEnRetard	ok	inactive
+  /etc/prometheus/regles/alertes.yml	KyvernoRefusAnormaux	ok	inactive
+  /etc/prometheus/regles/alertes.yml	CertificatExpireBientot	ok	inactive
+  /etc/prometheus/regles/alertes.yml	CollecteEnPanne	ok	inactive

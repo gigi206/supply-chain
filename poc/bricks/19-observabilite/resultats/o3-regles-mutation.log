@@ -1,0 +1,29 @@
+# contrôle des tests par mutation, 2026-11-02T17:59:42Z : deux attentes faussées (A2 à 17 min : error_type storage au lieu de signing ; A5 : cas « rafale sortie » évalué à 23 min, rafale encore dans la fenêtre) ; échec attendu
+86c86
+<           - exp_labels: {alerte: A2, severite: critique, error_type: signing, job: chains, instance: api}
+---
+>           - exp_labels: {alerte: A2, severite: critique, error_type: storage, job: chains, instance: api}
+155c155
+<       - eval_time: 28m     # rafale sortie de la fenêtre, nouvelle série pas encore apparue
+---
+>       - eval_time: 23m     # rafale sortie de la fenêtre, nouvelle série pas encore apparue
+  FAILED:
+    alertname: ChainsEchecSignature, time: 17m, 
+        exp:[
+            0:
+              Labels:{alerte="A2", alertname="ChainsEchecSignature", error_type="storage", instance="api", job="chains", severite="critique"}
+              Annotations:{}
+            ], 
+        got:[
+            0:
+              Labels:{alerte="A2", alertname="ChainsEchecSignature", error_type="signing", instance="api", job="chains", severite="critique"}
+              Annotations:{}
+            ]
+    alertname: KyvernoRefusAnormaux, time: 23m, 
+        exp:[], 
+        got:[
+            0:
+              Labels:{alerte="A5", alertname="KyvernoRefusAnormaux", severite="critique"}
+              Annotations:{}
+            ]
+code 1

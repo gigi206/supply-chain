@@ -1,0 +1,25 @@
+# après déploiement des règles, 2026-11-02T18:00:57Z
+## alertes actives
+[]
+## règles (dernière évaluation)
+OpenBaoScelle	ok	inactive	2026-11-02T18:00:37.034084167Z
+ChainsEchecSignature	ok	inactive	2026-11-02T18:00:37.034333232Z
+ReplayNonBitIdentique	ok	inactive	2026-11-02T18:00:37.034499777Z
+MiroirEnRetard	ok	inactive	2026-11-02T18:00:37.03452395Z
+KyvernoRefusAnormaux	ok	inactive	2026-11-02T18:00:37.03457834Z
+CertificatExpireBientot	ok	inactive	2026-11-02T18:00:37.034736021Z
+CollecteEnPanne	ok	inactive	2026-11-02T18:00:37.034790302Z
+## cibles
+alertmanager	up
+chains	up
+fichiers	up
+forgejo	up
+kyverno	up
+openbao	up
+prometheus	up
+zot	up
+## Alertmanager connu de Prometheus
+[{"url":"http://127.0.0.1:9093/api/v2/alerts"}]
+## Alertmanager : alertes reçues
+[]
+

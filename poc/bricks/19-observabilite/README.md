@@ -182,3 +182,21 @@ Prédictions datées : [`o3-predictions.md`](resultats/o3-predictions.md). Règl
 - **Limite commune à A2 et A5** : si Prometheus perd plus de 5 min de données (arrêt), toutes les séries paraissent « nouvelles » à la reprise et les deux alertes se déclenchent à tort pendant 10 min (A2) ou 5 min (A5).
 - **Rechargement** : le lifecycle est désactivé (O2) et l'unité n'a pas d'`ExecReload` ; le déploiement redémarre Prometheus (données conservées dans `/var/lib/prometheus`). `ExecStartPre` (`promtool check config`) vérifie aussi les fichiers de règles.
 
+## O3, exécuté (02/11/2026, 17:59 à 18:01 UTC, accord du propriétaire : « Oui, tout », A2 non filtrée, A5 tous espaces)
+
+| # | Prédiction ([`o3-predictions.md`](resultats/o3-predictions.md)) | Mesure | Verdict |
+|---|---|---|---|
+| 1 | `promtool check rules` : 7 règles | `SUCCESS: 7 rules found` ([`o3-regles.log`](resultats/o3-regles.log)) | conforme |
+| 2 | tous les tests réussissent au premier passage | `SUCCESS` ; **contrôle par mutation** : deux attentes faussées (A2, A5) rejetées, code 1 ([`o3-regles-mutation.log`](resultats/o3-regles-mutation.log)) : les tests discriminent | conforme |
+| 3 | aucune des 7 expressions ne rend de résultat sur le Prometheus réel | aucune ([`o3-reference.log`](resultats/o3-reference.log)) | conforme |
+| 4 | aucun refus de Kyverno depuis le début des données (vers 16:59) | 0 refus dans les 8 espaces, maximum sur 5 min = 0, pour **825 admissions acceptées** ; début des données à **17:02:19 UTC** (et non 16:59) | conforme (heure de début inexacte) |
+| 5 | aucune hausse des échecs de Chains | 0 pour `payload_creation` et `storage` | conforme |
+
+**Seuil de A5** : la référence est nulle en fonctionnement normal (58 min d'historique, sans essai de la 08 ni du banc). Elle ne calibre donc pas le seuil contre un bruit : 5 refus en 5 min est conservé comme choix (un essai négatif isolé ne le franchit pas), à éprouver par la rafale d'O4.
+
+**Déploiement** ([`o3-deployer.log`](resultats/o3-deployer.log), [`o3-apres-deploiement.log`](resultats/o3-apres-deploiement.log)) : `alertes.yml` dans `/etc/prometheus/regles/` (0640, groupe `prometheus`), Prometheus redémarré ; 7 règles `ok` et `inactive`, aucune alerte active ni reçue par Alertmanager ; 8 cibles sur 8 `up` ; Alertmanager connu de Prometheus.
+
+**Défauts rencontrés** : la boucle d'évaluation des expressions s'arrêtait après la première (`ssh` lisait la suite de la liste sur l'entrée standard) : lecture par un autre descripteur, premier passage archivé ([`o3-reference-premier-passage.log`](resultats/o3-reference-premier-passage.log)). `jq` absent de `sc-stockage` : filtrage sur l'hôte. Un répertoire `/tmp/regles-mutation` (copies des règles et des tests, aucun secret) reste dans la VM : sa suppression par `rm` dans une commande ad hoc a été refusée par le contrôle de sécurité de l'outil.
+
+**O3 : seuil de jalon atteint** (tests de règles réussis). Suite : O4, un incident simulé par alerte avec retour à la normale, sur accord.
+

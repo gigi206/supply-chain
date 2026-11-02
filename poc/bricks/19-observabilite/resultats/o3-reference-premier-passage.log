@@ -1,0 +1,22 @@
+# observabilite.sh reference, 2026-11-02T17:59:48Z
+début des données de Prometheus : 2026-11-02T17:02:19Z
+## A5 : refus de Kyverno sur l'historique, par espace
+  {"resource_namespace":"builds"} 0
+  {"resource_namespace":"bancc"} 0
+  {"resource_namespace":"declencheurs"} 0
+  {"resource_namespace":"openbao"} 0
+  {"resource_namespace":"porte"} 0
+  {"resource_namespace":"tekton-chains"} 0
+  {"resource_namespace":"tsa"} 0
+  {"resource_namespace":"default"} 0
+## A5 : maximum, sur l'historique, des refus en 5 min (tous espaces)
+  {} 0
+## A5 : admissions acceptées sur l'historique (activité de référence)
+  {} 824.6537336077109
+## A2 : échecs de signature de Chains sur l'historique
+  {"error_type":"payload_creation"} 0
+  {"error_type":"storage"} 0
+  {"error_type":"payload_creation"} 0
+## expressions de alertes.yml évaluées sur le Prometheus réel (règles non déployées)
+- vault_core_unsealed == 0 or (up{job="openbao"} == 0 and on() up{job="kyverno"} == 1)
+  (aucun résultat)

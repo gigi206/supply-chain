@@ -194,10 +194,10 @@ etape_reference() {
   requete 'sum by (error_type) (increase(watcher_pipelinerun_signing_failures_total[3h]))'
   requete 'sum by (error_type) (increase(watcher_taskrun_signing_failures_total[3h]))'
   echo "## expressions de alertes.yml évaluées sur le Prometheus réel (règles non déployées)"
-  sed -n 's/^ *expr: //p' "$REGLES/alertes.yml" | while IFS= read -r e; do
+  while IFS= read -r e <&3; do   # descripteur 3 : ssh (requete) lirait sinon la suite de la liste sur l'entrée standard
     echo "- $e"
     requete "$e"
-  done
+  done 3< <(sed -n 's/^ *expr: //p' "$REGLES/alertes.yml")
 }
 
 etape_deployer() {
