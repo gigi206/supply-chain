@@ -1,0 +1,59 @@
+# Périodicité des timers synchro@ (lecture seule, sc-stockage), relevé du 2026-11-02T16:29:47Z
+# Attendu : OnUnitActiveSec=1h + RandomizedDelaySec<=5min après le run précédent (manuel ou planifié)
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+RandomizedDelaySec=5min
+Persistent=true
+
+NEXT                         LEFT LAST                              PASSED UNIT                          ACTIVATES
+Mon 2026-11-02 17:22:02 UTC 52min Mon 2026-11-02 16:17:12 UTC    12min ago synchro@sample-app-sync.timer synchro@sample-app-sync.service
+Mon 2026-11-02 17:26:53 UTC 57min Mon 2026-11-02 16:25:12 UTC 4min 35s ago synchro@traefik.timer         synchro@traefik.service
+
+2 timers listed.
+## journal synchro@sample-app-sync.service depuis 15:00 UTC
+2026-11-02T15:08:26.943972+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:08:27.194516+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:08:37.273195+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:08:37.481859+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:18.000665+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:18.735153+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:19.493977+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:20.112491+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:20.892480+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:21.697239+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:22.449212+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:22.912709+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:23.714150+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:24.330804+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:25.049739+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Failed with result 'start-limit-hit'.
+2026-11-02T15:12:25.049951+00:00 sc-stockage systemd[1]: Failed to start synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:46.354652+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:47.176721+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:50.924960+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:51.565659+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:55.373205+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:12:56.169743+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:12:59.945383+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:13:00.420907+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:13:04.254383+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:13:04.880727+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T15:13:08.618538+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T15:13:09.085900+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-02T16:17:12.935497+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T16:17:13.149974+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+dernier rapport /var/lib/synchro/sample-app-sync/rapports/20261102T161713Z.json : "bundle":null,"status":"ok", ExecMainStatus=0
+## journal synchro@traefik.service depuis 15:00 UTC
+2026-11-02T15:22:05.542931+00:00 sc-stockage systemd[1]: Starting synchro@traefik.service - Synchronisation du miroir traefik (brique 01)...
+2026-11-02T15:22:57.641624+00:00 sc-stockage systemd[1]: Finished synchro@traefik.service - Synchronisation du miroir traefik (brique 01).
+2026-11-02T15:23:23.054363+00:00 sc-stockage systemd[1]: Starting synchro@traefik.service - Synchronisation du miroir traefik (brique 01)...
+2026-11-02T15:23:23.937172+00:00 sc-stockage systemd[1]: Finished synchro@traefik.service - Synchronisation du miroir traefik (brique 01).
+2026-11-02T15:23:24.959685+00:00 sc-stockage systemd[1]: Starting synchro@traefik.service - Synchronisation du miroir traefik (brique 01)...
+2026-11-02T15:23:25.785130+00:00 sc-stockage systemd[1]: Finished synchro@traefik.service - Synchronisation du miroir traefik (brique 01).
+2026-11-02T16:25:12.935515+00:00 sc-stockage systemd[1]: Starting synchro@traefik.service - Synchronisation du miroir traefik (brique 01)...
+2026-11-02T16:25:13.718750+00:00 sc-stockage systemd[1]: Finished synchro@traefik.service - Synchronisation du miroir traefik (brique 01).
+dernier rapport /var/lib/synchro/traefik/rapports/20261102T162513Z.json : "bundle":null,"status":"ok", ExecMainStatus=0
+## écarts mesurés (dernier run précédent -> premier run planifié)
+sample-app-sync : 15:13:08.6 (dernier run manuel de S4) -> 16:17:12.9 = 1 h 04 min 04 s (délai aléatoire 4 min 04 s <= 5 min) : conforme
+traefik         : 15:23:24.96 (début du run immédiat à l'activation) -> 16:25:12.9 = 1 h 01 min 48 s (délai aléatoire 1 min 48 s <= 5 min) : conforme
+runs planifiés sans événement ni bundle (amont inchangé), code 0
