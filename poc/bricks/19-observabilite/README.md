@@ -68,3 +68,35 @@ Moyens de vérification des binaires amont ([`o1-verification-amont.log`](result
 | Images `quay.io/prometheus/*` | — | aucun tag `.sig` ni `.att` |
 
 Conséquence pour D1 (a) : l'empreinte de Prometheus peut être liée à sa release par l'attestation de GitHub (vérification à faire avec l'outil adapté, `gh release verify-asset` ou cosign sur le bundle, avant toute installation) ; Alertmanager ne peut être vérifié que par l'empreinte publiée sur la même page que l'archive, ce qui ne protège pas d'une release compromise. Même situation que Zot (doc 04 §5) : à consigner comme limite, ou à reconstruire depuis les sources (brique 11). Choix de la version de Prometheus (3.15 ou branche 3.13) à faire en O1 d'après la politique de support amont, lue et non supposée.
+
+## O1, relevé sur le cluster et `sc-stockage` (02/11/2026, 16:46 à 16:50 UTC, accord du propriétaire, lecture seule)
+
+Prédictions écrites avant mesure : [`o1-predictions.md`](resultats/o1-predictions.md) (16:46:07Z). Relevé : [`o1-metriques-cluster.log`](resultats/o1-metriques-cluster.log). Rien n'a été installé ni modifié.
+
+| Source | Mesure | Prédiction |
+|---|---|---|
+| **Kyverno 1.19.2** (`kyverno-svc-metrics:8000`) | `kyverno_admission_requests_total{request_allowed="false",resource_kind,resource_namespace,…}` ; `kyverno_image_validating_policy_results_total{policy_name,result="pass"/"fail"/"error",…}` ; pas de `kyverno_policy_results_total` (les politiques de la 08 sont des ImageValidatingPolicy) | **partiellement fausse** (nom de la seconde métrique) |
+| **Chains v0.29.9** (`tekton-chains-metrics:9090`) | compteurs `watcher_{pipelinerun,taskrun}_sign_created_total`, `…_payload_stored_total`, `…_marked_signed_total` et **`watcher_{pipelinerun,taskrun}_signing_failures_total{error_type}`** (`payload_creation`, `storage`) | **fausse** : un compteur d'échec direct existe |
+| **OpenBao 2.7.2** | `sys/health` lisible sans jeton (`"sealed":false`) ; `sys/metrics?format=prometheus` refusé sans jeton (Forbidden) ; aucun bloc `telemetry` dans `openbao-config` | conforme |
+| **Zot v2.1.22** | binaire construit avec l'extension `metrics`, mais `extensions` absent de `config.json` : `/metrics` en 404 | conforme |
+| **Forgejo 15.0.11** | aucune section `[metrics]` dans `app.ini` : `/metrics` en 404 | conforme |
+| **NetworkPolicy** | six politiques (`builds`, `declencheurs`, `horodatage`, `openbao`, `porte`, `tsa`), dont trois limitées à certains pods ; aucune dans `kyverno` ni `tekton-chains` ; l'entrée d'OpenBao n'admet que `tekton-chains`, la TSA et `horodatage`, port 8200 | **partiellement fausse** : pas un refus par défaut dans les six espaces |
+
+**Constats pour la suite :**
+
+- **A2 (Chains)** : les compteurs d'échec ne sont pas à zéro (PipelineRuns : 25 `payload_creation`, 6 `storage` ; TaskRuns : 27 `payload_creation`). Attribution complète, d'après les journaux du contrôleur depuis son démarrage (pod lancé à 13:27:21 UTC, aucun redémarrage : compteurs et journaux couvrent la même fenêtre) : les 52 échecs `payload_creation` (25 + 27) sont les 52 erreurs « expected imageID to be separable by @ », toutes sur les exécutions **négatives J6 et J7 de la 08** dans `builds` (`j6-sans-drapeau`, `j6-sans-restriction-enforce`, `j7-sample-app-etiquette`, `j7-sample-app-sans-kata`, et leurs tâches : 5 à 7 chacune) ; les 6 `storage` sont les PUT refusés vers `builds/essai-decision3` (essai de la décision 3). **Aucun échec sur une construction normale.** Une règle sur la valeur absolue serait toujours déclenchée : la règle portera sur une hausse (`increase(...[…]) > 0`), que chaque rejeu de la 08 déclenchera aussi (essais négatifs voulus) ; à accepter, ou à filtrer par espace ou par nom d'exécution en O3.
+- **A5 (Kyverno)** : les refus sont déjà nombreux en fonctionnement normal (essais du banc `bancc` et de la 08) ; le seuil « anormal » sera un taux, fixé sur une mesure de référence en O3.
+- **Modifications de la 08 nécessaires**, chacune à rejouer : bloc `telemetry` d'OpenBao (avec `unauthenticated_metrics_access`, ou un jeton de lecture limité à `sys/metrics`), et entrée de la NetworkPolicy `openbao` **si la collecte passe par un NodePort ou une route directe** (voir le constat suivant pour le proxy de l'API) ; extension `metrics` de Zot ; `[metrics] ENABLED = true` de Forgejo (avec `TOKEN` : vide par défaut, pas d'autorisation sur `/metrics`, doc de configuration de Forgejo). Coût : un rejeu ciblé des étapes de configuration d'OpenBao, de Zot et de Forgejo, puis de `enchainement`.
+- **Accès depuis `sc-stockage` (D1 a)** : les services de Kyverno et Chains sont en `ClusterIP`, injoignables hors du cluster. Deux voies, à trancher en O2 : la collecte par le proxy de l'API (compte de lecture avec `get` sur `services/proxy` de deux espaces, sans lecture de Secret) ou des NodePort dédiés aux métriques. La lecture faite ici passait par le proxy de l'API.
+- **Constat de sécurité pour la 08 (mesuré)** : par le proxy de l'API, `sys/health` d'OpenBao a répondu alors que la NetworkPolicy `openbao` n'admet en entrée que `tekton-chains`, la TSA et `horodatage`. Qui détient `get` sur `services/proxy` dans l'espace `openbao` atteint donc OpenBao sans passer par cette politique. La cause (trafic de l'hôte admis par Cilium, nœud du serveur d'API) n'a pas été vérifiée. Avec la collecte par le proxy, l'ouverture de la NetworkPolicy ne serait pas nécessaire, mais ce droit deviendrait un chemin vers OpenBao à borner (espace et nom de service).
+- **Version de Prometheus** : la 3.13 est la LTS en cours (fin de support le 31/07/2027, correctifs CVSS ≥ 7,0, « best effort ») ; la 3.15 n'est pas LTS et cesse d'être corrigée à la mineure suivante. **Recommandé : v3.13.5** (21/10/2026), dont l'archive `linux-amd64` porte aussi une attestation de release GitHub (sha256 `0388822a…`).
+
+**Décisions du propriétaire avant O2 :**
+
+1. Alertmanager v0.34.2 sans signature ni attestation : limite consignée (comme Zot), ou reconstruction depuis les sources (brique 11).
+2. Lecture de `sync.prom` : node_exporter et son collecteur textfile (non audité au doc 04), ou serveur minimal qui ne sert que ce fichier.
+3. Collecte des métriques du cluster : proxy de l'API, ou NodePort.
+4. Modifications de la 08 ci-dessus, et le rejeu qu'elles entraînent.
+5. Version de Prometheus : 3.13.5 (LTS) recommandée.
+
+**Temps relevé** : O1 en deux parties, relevé amont à 14:29 UTC et relevé du cluster de 16:46 à 16:50 UTC, attribution des échecs de Chains comprise ; le temps de rédaction du protocole n'a pas été relevé, le cumul de la brique face aux 0,5 pw n'est donc pas établi.

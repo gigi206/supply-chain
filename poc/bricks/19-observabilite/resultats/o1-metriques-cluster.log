@@ -1,0 +1,102 @@
+# O1, relevé des métriques (lecture seule), 2026-11-02T16:47:32Z ; prédictions : o1-predictions.md (16:46:07Z)
+# Kyverno et Chains lus le 02/11/2026 vers 16:47 UTC par le proxy de l'API (kubectl get --raw …/services/<svc>/proxy/metrics)
+## Kyverno 1.19.2, kyverno-svc-metrics:8000, noms de métriques
+kyverno_admission_requests_total
+kyverno_admission_review_duration_seconds_bucket
+kyverno_admission_review_duration_seconds_count
+kyverno_admission_review_duration_seconds_sum
+kyverno_client_queries_total
+kyverno_controller_reconcile_total
+kyverno_http_requests_duration_seconds_bucket
+kyverno_http_requests_duration_seconds_count
+kyverno_http_requests_duration_seconds_sum
+kyverno_http_requests_total
+kyverno_image_validating_policy_execution_duration_seconds_bucket
+kyverno_image_validating_policy_execution_duration_seconds_count
+kyverno_image_validating_policy_execution_duration_seconds_sum
+kyverno_image_validating_policy_results_total
+kyverno_info
+kyverno_updaterequest_total
+kyverno_validating_policy_execution_duration_seconds_bucket
+kyverno_validating_policy_execution_duration_seconds_count
+kyverno_validating_policy_execution_duration_seconds_sum
+kyverno_validating_policy_results_total
+## Kyverno, refus d'admission (request_allowed="false")
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="PipelineRun",resource_namespace="builds",resource_request_operation="create"} 7
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create"} 37
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="builds",resource_request_operation="create"} 9
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="declencheurs",resource_request_operation="create"} 2
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="openbao",resource_request_operation="create"} 2
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="porte",resource_request_operation="create"} 2
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="tekton-chains",resource_request_operation="create"} 6
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="Pod",resource_namespace="tsa",resource_request_operation="create"} 2
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="StepAction",resource_namespace="builds",resource_request_operation="create"} 2
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="TaskRun",resource_namespace="builds",resource_request_operation="create"} 21
+kyverno_admission_requests_total{request_allowed="false",request_webhook="ValidatingWebhookConfiguration",resource_kind="TaskRun",resource_namespace="default",resource_request_operation="create"} 2
+## Kyverno, résultats non « pass » des ImageValidatingPolicy
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="bench-release",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="fail"} 16
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-att-historique",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="fail"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-aucun-bundle",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="fail"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-autre-signature",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="error"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-jeton-altere",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="error"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-jeton-valide",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="error"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-sans-jeton",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="fail"} 1
+kyverno_image_validating_policy_results_total{execution_cause="admission_request",policy_background_mode="true",policy_name="j5-tsa-etrangere",policy_namespace="",policy_validation_mode="Deny",resource_kind="Pod",resource_namespace="bancc",resource_request_operation="create",result="error"} 1
+## Chains v0.29.9, tekton-chains-metrics:9090, séries watcher_*
+# HELP watcher_pipelinerun_marked_signed_total Total number of objects marked as signed for pipelineruns
+watcher_pipelinerun_marked_signed_total{} 23
+# HELP watcher_pipelinerun_payload_stored_total Total number of stored payloads for pipelineruns
+watcher_pipelinerun_payload_stored_total{} 23
+# HELP watcher_pipelinerun_sign_created_total Total number of signed messages for pipelineruns
+watcher_pipelinerun_sign_created_total{} 29
+# HELP watcher_pipelinerun_signing_failures_total Total number of PipelineRun signing failures
+watcher_pipelinerun_signing_failures_total{error_type="payload_creation",} 25
+watcher_pipelinerun_signing_failures_total{error_type="storage",} 6
+# HELP watcher_taskrun_marked_signed_total Total number of objects marked as signed for taskruns
+watcher_taskrun_marked_signed_total{} 37
+# HELP watcher_taskrun_payload_stored_total Total number of stored payloads for taskruns
+watcher_taskrun_payload_stored_total{} 59
+# HELP watcher_taskrun_sign_created_total Total number of signed messages for taskruns
+watcher_taskrun_sign_created_total{} 59
+# HELP watcher_taskrun_signing_failures_total Total number of TaskRun signing failures
+watcher_taskrun_signing_failures_total{error_type="payload_creation",} 27
+## Chains, erreurs du contrôleur sur 4 h (messages regroupés, empreintes masquées)
+     58 "msg":"Returned an error
+     58 "msg":"Reconcile error
+     52 "msg":"expected imageID  to be separable by @
+      6 "msg":"writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-2345854
+      3 "msg":"Failed to watch
+## OpenBao 2.7.2
+sys/health (https, sans jeton) : {"initialized":true,"sealed":false,"standby":false,"replication_performance_mode":"primary","replication_dr_mode":"disab
+sys/metrics?format=prometheus (https, sans jeton) : Error from server (Forbidden): unknown
+bloc telemetry dans openbao-config : 0
+## NetworkPolicy du cluster
+builds         construction-sans-sortie   [Ingress Egress]   map[matchLabels:map[tekton.dev/task:construire-image]]
+declencheurs   rattrapage                 [Ingress Egress]   map[matchLabels:map[app:rattrapage]]
+horodatage     horodatage                 [Ingress Egress]   map[]
+openbao        openbao                    [Ingress Egress]   map[matchLabels:map[app:openbao]]
+porte          porte                      [Ingress Egress]   map[]
+tsa            timestamp-authority        [Ingress Egress]   map[matchLabels:map[app:timestamp-authority]]
+## openbao : entrée autorisée
+[{"from":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"tekton-chains"}}},{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"tsa"}},"podSelector":{"matchLabels":{"app":"timestamp-authority"}}},{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"horodatage"}}}],"ports":[{"port":8200,"protocol":"TCP"}]}]
+## sc-stockage
+https://192.168.161.13:5000/metrics : HTTP 404
+https://192.168.161.13:3000/metrics : HTTP 404
+Zot : extensions = null
+"commit":"v2.1.22-0-g6bbc7e5"
+"binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs"
+Forgejo : sections [metrics] dans app.ini = 0
+## Prometheus, politique de support (https://prometheus.io/docs/introduction/release-cycle/, lue le 02/11/2026)
+mineure toutes les 6 semaines, corrigée jusqu'à la suivante ; LTS : un an de correctifs choisis (CVSS >= 7.0), « best effort » ; 3.13 LTS publiée le 2026-07-01, fin de support 2027-07-31 ; 3.15 n'est pas LTS
+v3.13.5 (2026-10-21) prometheus-3.13.5.linux-amd64.tar.gz sha256 publié 0388822ace519c5a3a8ef556a541ce1b536e21d872f82deded465bd27a5a0699
+attestation GitHub : [{"mediaType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://in-toto.io/attestation/release/v0.2"}]
+## Chains, attribution des erreurs « expected imageID » (2026-11-02T16:50:12Z, journal complet du pod)
+tekton-chains-controller-bbf64c76f-kp7fc   2026-11-02T13:27:21Z   0
+      5 builds/j6-sans-drapeau
+      7 builds/j6-sans-drapeau-publier
+      7 builds/j6-sans-restriction-enforce
+      6 builds/j6-sans-restriction-enforce-publier
+      6 builds/j7-sample-app-etiquette
+      7 builds/j7-sample-app-etiquette-construire
+      7 builds/j7-sample-app-sans-kata
+      7 builds/j7-sample-app-sans-kata-construire
