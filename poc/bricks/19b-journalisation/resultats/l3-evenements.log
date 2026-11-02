@@ -1,0 +1,11 @@
+# journalisation.sh evenements, 2026-11-02T21:02:40Z
+serviceaccount/alloy-evenements serverside-applied
+secret/alloy-evenements-jeton serverside-applied
+clusterrole.rbac.authorization.k8s.io/lecture-evenements serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/lecture-evenements serverside-applied
+can-i list events -A : yes
+can-i watch events.events.k8s.io -A : yes
+can-i get secrets -n openbao : no
+can-i list pods -A : no
+can-i get pods --subresource=log -n openbao : no
+can-i create events -n default : no

@@ -212,3 +212,42 @@ Alternative : chaque agent écrit directement dans Loki avec un certificat de la
 **D15 (a), coût pour la 08** : `config.hcl` change. Au prochain `openbao.sh deployer`, l'empreinte de la configuration, portée en annotation du gabarit, changera, et le pod sera recréé, donc scellé. C'est le chemin normal de la 08. En L3, la ConfigMap est appliquée et OpenBao rechargé par SIGHUP, sans redémarrage.
 
 **Pare-feu (décision du propriétaire, 02/11/2026) : « on fera le fw avec les network policies une fois tout validé ».** À faire après L4, avec une nuance à trancher à ce moment-là : les NetworkPolicies, et les politiques de Cilium, filtrent le trafic des pods et des nœuds du cluster (`sc-confiance`, `sc-build`), pas `sc-stockage`, qui n'est pas un nœud k3s. Elles peuvent interdire aux pods de joindre Loki (3100), le relais (3501, 3502) et Grafana (3001). Les ports de `sc-stockage` eux-mêmes demanderaient un filtrage sur la VM (nftables).
+
+## L3, exécuté (02/11/2026, 21:02 à 21:05 UTC, accord du propriétaire : « Oui, lancer L3 »)
+
+Commande : `JALON=l3 mise run journalisation -- certificats_l3 evenements openbao_sortie alloy controle_l3`.
+
+Journaux :
+- [`l3-certificats_l3.log`](resultats/l3-certificats_l3.log), [`l3-evenements.log`](resultats/l3-evenements.log), [`l3-openbao_sortie.log`](resultats/l3-openbao_sortie.log), [`l3-alloy.log`](resultats/l3-alloy.log), [`l3-controle_l3.log`](resultats/l3-controle_l3.log) ;
+- [`l3-complement.log`](resultats/l3-complement.log) : relevé de sc-stockage à 21:04:57.
+
+**Passages archivés (défauts de script, sans effet sur les VM) :**
+- `certificats_l3`, deux passages :
+  - [premier](resultats/l3-certificats_l3-premier-passage.log) : `pki-client.cnf` exige `SAN`, même vide, pour l'autorité. Clé créée, certificat non ; le script teste désormais le certificat ;
+  - [deuxième](resultats/l3-certificats_l3-deuxieme-passage.log) : la vérification **attendue en échec** par la CA du PoC arrêtait le script (`pipefail`).
+- `controle_l3`, [premier passage](resultats/l3-controle_l3-premier-passage.log), avec trois défauts :
+  - le contrôle a démarré 30 s après les agents, pendant la relecture de l'historique : le journal de `sc-confiance` et de `sc-stockage` n'était pas encore arrivé ;
+  - les comptes sans étiquette étaient lus dans la mauvaise colonne (`$2` au lieu du dernier champ), d'où des 0 partout ;
+  - la fenêtre de 168 h remontait avant le début du schéma de Loki, d'où 1 476 avertissements « Query does not fit in a single sharding configuration ».
+
+  Corrigé : attente de la présence du journal des trois nœuds, dernier champ, fenêtre de 24 h.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| 1 | `relais` et `alloy-stockage` vérifiés par la CA du PoC ; `alloy-sc-confiance` et `alloy-sc-build` vérifiés par leur autorité, **refusés par la CA du PoC** (erreur 20, « unable to get local issuer certificate ») ; clés en 0600 | conforme |
+| 2 | `list events -A` et `watch events.events.k8s.io -A` : `yes` ; `get secrets`, `list pods`, `pods/log`, `create events` : `no` | conforme |
+| 3 | Avant : `["fichier/"]`. ConfigMap vue par le pod, puis SIGHUP : `fichier/` et `sortie/` (`stdout`), 3 lignes `request` sur la sortie standard dans les 30 s ; **OpenBao descellé** (`sealed: false`), sans redémarrage | conforme, prédiction faible comprise |
+| 4 | Sur les trois VM : empreinte vérifiée, Alloy v1.21.3 (`f2108cd`), `alloy validate` réussi, `active` ; aucune erreur, aucun avertissement ; tous les composants `healthy` | conforme |
+| 5 | Comptes sur 24 h :<br>• J1, journal : `k3s.service` de `sc-confiance` 19 532, `sc-build` 13 315, `forgejo.service` 2 861<br>• J8, récepteur d'alertes : 19<br>• J2, pods : `tekton-chains` 3 702, `sc-build` 2 825<br>• J3, audit k8s : 37 912<br>• J4, événements : 962<br>• **J5, audit d'OpenBao par la sortie du pod : 7**<br>• J6, audit de Zot : 2 405 | conforme |
+| 6 | Certificat de `sc-build` refusé par Loki (000) et par le port de `sc-confiance` (000) ; sur son port, une ligne étiquetée `noeud=sc-confiance` est **stockée sous `noeud=sc-build`** | conforme |
+| 7 | L'auditeur lit 5 lignes du journal de k3s à travers Grafana (HTTP 200) | conforme |
+| 8 | Alloy : 127, 96 et 125 Mi ; `sc-stockage` : 4 220 Mi disponibles, Loki 417 Mi | conforme |
+| 9 | Seuil non atteint (témoins datés et « source muette » en L4) | conforme |
+
+**Constats :**
+- **Relecture de l'historique** : en moins de 3 min, Loki a reçu environ 140 000 lignes de journal sur 7 jours, plus les fichiers existants (audit k8s, audit de Zot, pods).
+  - `/var/lib/loki` : 179 Mo ;
+  - disque de `sc-stockage` : de 40,4 % à 44,6 %, binaires d'Alloy compris.
+- **Pods de `sc-build`** : les lignes ont l'horodatage CRI d'origine. Les fichiers anciens n'apparaissent donc pas dans une fenêtre de 10 min, ce qui n'est pas une perte : 2 825 lignes sur 24 h.
+- **Loki sous `RestrictAddressFamilies`** : 16 avertissements « error getting network interfaces … address family not supported ». Il lui manque `AF_NETLINK`, sans effet mesuré. C'est du bruit ; ajouter `AF_NETLINK` reste à décider.
+- **La 08 a changé** (D15 a) : `config.hcl` déclare `sortie/`. Au prochain `openbao.sh deployer`, le pod sera recréé, donc scellé, et la procédure de descellement de la 08 s'appliquera.

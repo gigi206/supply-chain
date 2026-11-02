@@ -254,9 +254,9 @@ declare -A PORT_RELAIS=([sc-confiance]=3501 [sc-build]=3502)
 
 ca_noeud() { # vm : autorité propre au nœud (D17), puis certificat client alloy-<vm> qu'elle signe ; hors de la CA du PoC
   local v=$1 c=$here/config/pki-client.cnf n=alloy-$1
-  if [ ! -s "$S/ca-$v.key" ]; then
-    (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/ca-$v.key")
-    openssl req -x509 -new -config "$c" -extensions ca_noeud -key "$S/ca-$v.key" -sha256 -days 180 \
+  if [ ! -s "$P/ca-$v.crt" ]; then   # SAN vide exigé par pki-client.cnf (premier passage : « variable has no value »)
+    [ -s "$S/ca-$v.key" ] || (umask 077 && openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$S/ca-$v.key")
+    SAN= openssl req -x509 -new -config "$c" -extensions ca_noeud -key "$S/ca-$v.key" -sha256 -days 180 \
       -subj "/O=supply-chain PoC/CN=autorite $v (relais 19b)" -out "$P/ca-$v.crt"
   fi
   if [ ! -s "$S/$n.key" ]; then
@@ -267,7 +267,7 @@ ca_noeud() { # vm : autorité propre au nœud (D17), puis certificat client allo
     rm -f "${W:?}/${n:?}.csr"
   fi
   openssl verify -CAfile "$P/ca-$v.crt" -purpose sslclient "$P/$n.crt"
-  printf '%s, vérifié par la CA du PoC : ' "$n"; openssl verify -CAfile "$P/ca-poc.crt" "$P/$n.crt" 2>&1 | tail -1
+  printf '%s, vérifié par la CA du PoC (refus attendu) : %s\n' "$n" "$(openssl verify -CAfile "$P/ca-poc.crt" "$P/$n.crt" 2>&1 | grep -oE 'error [0-9]+ [^:]*: [^\n]*|OK$' | head -1 || true)"
 }
 
 etape_certificats_l3() {
@@ -374,6 +374,11 @@ loki_requete() { # LogQL : requête instantanée vers Loki (certificat controle)
 
 etape_controle_l3() {
   local m c t
+  # Premier passage (archivé) : contrôle lancé 30 s après le démarrage des agents, pendant la relecture de l'historique.
+  for _ in $(seq 36); do
+    [ "$(loki_requete 'count(sum by (noeud) (count_over_time({source="journal"}[24h])))' | awk '{print $NF}')" = 3 ] && break
+    sleep 5
+  done
   echo "## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source"
   loki_requete 'sum by (noeud, source) (count_over_time({source=~".+"}[10m]))' | sort
   echo "## sources attendues (J1 à J6 et J8)"
@@ -382,7 +387,7 @@ etape_controle_l3() {
            '{noeud="sc-confiance", source="pods", espace="tekton-chains"}' '{noeud="sc-build", source="pods"}' \
            '{noeud="sc-confiance", source="audit-k8s"}' '{source="evenements-k8s"}' \
            '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}'; do
-    c=$(loki_requete "sum(count_over_time(${q}[168h]))" | awk '{print $2}')
+    c=$(loki_requete "sum(count_over_time(${q}[24h]))" | awk '{print $NF}')   # 168h : antérieur au schéma de Loki (avertissements)
     printf '%-110s %s\n' "$q" "${c:-0}"
   done
   echo "## D17 : relais en écriture seule, nœud imposé"

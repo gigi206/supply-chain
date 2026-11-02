@@ -1,0 +1,7 @@
+# journalisation.sh certificats_l3, 2026-11-02T21:02:33Z
+relais : certificat existant
+~/.cache/supply-chain-poc/08/pki/relais.crt: OK
+alloy-stockage : certificat existant
+~/.cache/supply-chain-poc/08/pki/alloy-stockage.crt: OK
+~/.cache/supply-chain-poc/08/pki/alloy-sc-confiance.crt: OK
+alloy-sc-confiance, vérifié par la CA du PoC : error ~/.cache/supply-chain-poc/08/pki/alloy-sc-confiance.crt: verification failed

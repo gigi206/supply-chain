@@ -1,0 +1,36 @@
+# journalisation.sh controle_l3, 2026-11-02T21:04:44Z
+## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source
+  noeud=sc-build,source=controle-l3 1
+  noeud=sc-build,source=journal 355
+  noeud=sc-build,source=pods 1
+  noeud=sc-confiance,source=audit-k8s 37911
+  noeud=sc-confiance,source=journal 1058
+  noeud=sc-confiance,source=pods 1058
+  noeud=sc-stockage,source=audit-zot 2405
+  noeud=sc-stockage,source=evenements-k8s 152
+  noeud=sc-stockage,source=journal 16024
+## sources attendues (J1 à J6 et J8)
+{noeud="sc-confiance", source="journal", unite="k3s.service"}                                                  19532
+{noeud="sc-build", source="journal"}                                                                           13315
+{noeud="sc-stockage", source="journal", unite="forgejo.service"}                                               2861
+{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}                                     19
+{noeud="sc-confiance", source="pods", espace="tekton-chains"}                                                  3702
+{noeud="sc-build", source="pods"}                                                                              2825
+{noeud="sc-confiance", source="audit-k8s"}                                                                     37912
+{source="evenements-k8s"}                                                                                      962
+{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""                                             7
+{noeud="sc-stockage", source="audit-zot"}                                                                      2405
+## D17 : relais en écriture seule, nœud imposé
+certificat de sc-build vers Loki : 000
+certificat de sc-build vers le port de sc-confiance : 000
+certificat de sc-build vers son port, ligne étiquetée noeud=sc-confiance : HTTP 204
+  stockée sous :   noeud=sc-build 1
+## Grafana : l'auditeur lit le journal de k3s
+HTTP 200, 5 ligne(s)
+## Alloy : état et erreurs sur les trois VM
+sc-confiance : active, 127 Mi, erreurs depuis le démarrage : 0
+sc-build : active, 96 Mi, erreurs depuis le démarrage : 0
+sc-stockage : active, 125 Mi, erreurs depuis le démarrage : 0
+127.0.0.1:12345 users:(("alloy",pid=48561,fd=12))
+192.168.161.13:3501 users:(("alloy",pid=48561,fd=8))
+192.168.161.13:3502 users:(("alloy",pid=48561,fd=4))

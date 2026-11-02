@@ -1,0 +1,33 @@
+# journalisation.sh controle_l3, 2026-11-02T21:03:47Z
+## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source
+  noeud=sc-build,source=journal 198
+  noeud=sc-build,source=pods 1
+  noeud=sc-confiance,source=audit-k8s 7217
+  noeud=sc-confiance,source=pods 256
+  noeud=sc-stockage,source=audit-zot 2405
+  noeud=sc-stockage,source=evenements-k8s 152
+## sources attendues (J1 à J6 et J8)
+{noeud="sc-confiance", source="journal", unite="k3s.service"}                                                  0
+{noeud="sc-build", source="journal"}                                                                           0
+{noeud="sc-stockage", source="journal", unite="forgejo.service"}                                               0
+{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}                                     0
+{noeud="sc-confiance", source="pods", espace="tekton-chains"}                                                  0
+{noeud="sc-build", source="pods"}                                                                              0
+{noeud="sc-confiance", source="audit-k8s"}                                                                     0
+{source="evenements-k8s"}                                                                                      0
+{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""                                             0
+{noeud="sc-stockage", source="audit-zot"}                                                                      0
+## D17 : relais en écriture seule, nœud imposé
+certificat de sc-build vers Loki : 000
+certificat de sc-build vers le port de sc-confiance : 000
+certificat de sc-build vers son port, ligne étiquetée noeud=sc-confiance : HTTP 204
+  stockée sous :   noeud=sc-build 1
+## Grafana : l'auditeur lit le journal de k3s
+HTTP 200, 0 ligne(s)
+## Alloy : état et erreurs sur les trois VM
+sc-confiance : active, 129 Mi, erreurs depuis le démarrage : 0
+sc-build : active, 85 Mi, erreurs depuis le démarrage : 0
+sc-stockage : active, 145 Mi, erreurs depuis le démarrage : 0
+127.0.0.1:12345 users:(("alloy",pid=48561,fd=12))
+192.168.161.13:3501 users:(("alloy",pid=48561,fd=8))
+192.168.161.13:3502 users:(("alloy",pid=48561,fd=4))

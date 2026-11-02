@@ -1,0 +1,5 @@
+# journalisation.sh certificats_l3, 2026-11-02T21:02:25Z
+~/.cache/supply-chain-poc/08/pki/relais.crt: OK
+~/.cache/supply-chain-poc/08/pki/alloy-stockage.crt: OK
+req: Error on line 15 of config file "~/Documents/git/github/gigi206/supply-chain/poc/bricks/19b-journalisation/config/pki-client.cnf"
+801B0EFC33790000:error:07000068:configuration file routines:str_copy:variable has no value:crypto/conf/conf_def.c:757:line 15

@@ -1,0 +1,15 @@
+# journalisation.sh certificats_l3, 2026-11-02T21:02:40Z
+relais : certificat existant
+~/.cache/supply-chain-poc/08/pki/relais.crt: OK
+alloy-stockage : certificat existant
+~/.cache/supply-chain-poc/08/pki/alloy-stockage.crt: OK
+~/.cache/supply-chain-poc/08/pki/alloy-sc-confiance.crt: OK
+alloy-sc-confiance, vérifié par la CA du PoC (refus attendu) : error 20 at 0 depth lookup: u
+~/.cache/supply-chain-poc/08/pki/alloy-sc-build.crt: OK
+alloy-sc-build, vérifié par la CA du PoC (refus attendu) : error 20 at 0 depth lookup: u
+600 ca-sc-build.key
+600 ca-sc-confiance.key
+600 alloy-sc-build.key
+600 alloy-sc-confiance.key
+600 alloy-stockage.key
+600 relais.key

@@ -1,0 +1,19 @@
+# journalisation.sh alloy, 2026-11-02T21:03:13Z
+## sc-confiance : rôles commun noeud confiance
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
+## sc-build : rôles commun noeud
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
+## sc-stockage : rôles commun stockage
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
