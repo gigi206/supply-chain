@@ -1,0 +1,16 @@
+# forgejo.sh niveaux, 2026-11-02T18:38:31Z
+OK   création de custom/n20261102T183831Z/b (deux niveaux) par poc-sync : refusé (protected branch)
+OK   création de custom/n20261102T183831Z-3/b/c (trois niveaux) par poc-sync : refusé (protected branch)
+OK   création de paquet/n20261102T183831Z/deb (motif du projet, deux niveaux) par poc-sync : refusé (protected branch)
+OK   création de custom/n20261102T183831Z (un niveau) par poc-sync : refusé (protected branch)
+OK   custom/n20261102T183831Z/b par poc-dev (liste blanche) : accepté
+OK   branche hors motif essais/n20261102T183831Z/b par poc-sync : accepté
+OK   création du tag custom-n20261102T183831Z/x (deux niveaux) par poc-sync : refusé (Tag custom-n20261102T183831Z/x is protected)
+## refs d'essai supprimées
+KO   suppression de custom/n20261102T183831Z/b par poc-dev : refusé
+remote: 
+remote: Forgejo: branch custom/n20261102T183831Z/b is protected from deletion        
+remote: 
+To https://192.168.161.13:3000/workspace/sample-app-sync.git
+ ! [remote rejected] custom/n20261102T183831Z/b (pre-receive hook declined)
+error: failed to push some refs to 'https://192.168.161.13:3000/workspace/sample-app-sync.git'

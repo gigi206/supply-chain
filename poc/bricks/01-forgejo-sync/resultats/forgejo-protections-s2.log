@@ -1,0 +1,4 @@
+# forgejo.sh protections, 2026-11-02T14:43:21Z
+{"rule_name":"custom/*","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"rule_name":"paquet/*","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"name_pattern":"custom-*","whitelist_usernames":["poc-dev"]}

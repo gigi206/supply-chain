@@ -1,0 +1,31 @@
+# forgejo.sh niveaux, 2026-11-02T18:39:12Z
+OK   création de custom/n20261102T183912Z/b (deux niveaux) par poc-sync : refusé (protected branch)
+OK   création de custom/n20261102T183912Z-3/b/c (trois niveaux) par poc-sync : refusé (protected branch)
+OK   création de paquet/n20261102T183912Z/deb (motif du projet, deux niveaux) par poc-sync : refusé (protected branch)
+OK   création de custom/n20261102T183912Z (un niveau) par poc-sync : refusé (protected branch)
+OK   branche hors motif essais/n20261102T183912Z/b par poc-sync : accepté
+OK   création du tag custom-n20261102T183912Z/x (deux niveaux) par poc-sync : refusé (Tag custom-n20261102T183912Z/x is protected)
+## refs d'essai supprimées (branches hors motif essais/*, celles d'un passage interrompu comprises)
+OK   suppression de essais/n20261102T183831Z/b par poc-sync : accepté
+OK   suppression de essais/n20261102T183912Z/b par poc-sync : accepté
+OK   custom/essai inchangée (400dd99b5a46)
+## refs du fork à plusieurs niveaux restantes
+  refs/heads/custom/a/b
+  refs/heads/custom/n20261102T183831Z/b
+## journal de Forgejo (requêtes de push de cet essai)
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK

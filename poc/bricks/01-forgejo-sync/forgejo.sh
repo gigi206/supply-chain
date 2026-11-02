@@ -11,7 +11,11 @@
 #   fork           workspace/sample-app-sync, fork de mirror/sample-app ; équipes de workspace limitées à ce dépôt :
 #                  synchro (poc-sync) et dev-sample-app-sync (poc-dev) ; workspace/sample-app (brique 08) hors de leur portée
 #   protections    sur le fork, une protection de branche par motif de refs-propres.json (liste blanche : poc-dev,
-#                  apply_to_admins) et une protection de tag par motif (liste blanche : poc-dev)
+#                  apply_to_admins) et une protection de tag par motif (liste blanche : poc-dev) ; côté branches, chaque * du
+#                  motif devient ** (le * de Forgejo s'arrête aux /, celui de sync.py non : mesuré en S2), règles d'avant
+#                  retirées (décision (a) du propriétaire du 02/11/2026)
+#   niveaux        refs propres à plusieurs niveaux : création refusée à poc-sync (branches des deux motifs, tag) ; branche
+#                  hors motif acceptée, puis supprimée ; aucune branche custom/ créée (elle déclencherait un build)
 #   refus          pushes refusés (mirror/ par poc-dev et poc-amont, refs propres du fork par poc-sync, workspace/sample-app
 #                  par poc-sync) ; acceptés (refs propres du fork par poc-dev) ; administrateur : mesuré, pas supposé
 #   bout_en_bout   collision amont sur custom/essai et avance de main : sync.py avec --push et --fork, code 2, ref propre du
@@ -245,11 +249,20 @@ etape_fork() {
 }
 
 etape_protections() {
-  local p
+  local p r attendues=""
   for p in $(jq -r --arg p "$PROJET" '(.global.branches + (.depots[$p].branches // [])) | unique[]' "$CONF"); do
-    api poc-admin GET "/repos/$FORK/branch_protections" | jq -e --arg p "$p" 'any(.[]; .rule_name == $p)' >/dev/null \
-      || api poc-admin POST "/repos/$FORK/branch_protections" "$(jq -nc --arg p "$p" '{rule_name: $p, enable_push: true,
+    r=${p//\*/**}   # motif de sync.py (fnmatch : * traverse les /) traduit pour Forgejo (* s'arrête aux /, ** non)
+    attendues="$attendues $r"
+    api poc-admin GET "/repos/$FORK/branch_protections" | jq -e --arg p "$r" 'any(.[]; .rule_name == $p)' >/dev/null \
+      || api poc-admin POST "/repos/$FORK/branch_protections" "$(jq -nc --arg p "$r" '{rule_name: $p, enable_push: true,
            enable_push_whitelist: true, push_whitelist_usernames: ["poc-dev"], apply_to_admins: true}')" >/dev/null
+  done
+  # Règles d'avant la traduction (custom/*, paquet/*) retirées, une fois les nouvelles posées : jamais de fork sans protection.
+  for r in $(api poc-admin GET "/repos/$FORK/branch_protections" | jq -r '.[].rule_name'); do
+    case " $attendues " in *" $r "*) ;; *)
+      api poc-admin DELETE "/repos/$FORK/branch_protections/$(jq -rn --arg r "$r" '$r | @uri')" >/dev/null
+      echo "règle retirée : $r" ;;
+    esac
   done
   for p in $(jq -r --arg p "$PROJET" '(.global.tags + (.depots[$p].tags // [])) | unique[]' "$CONF"); do
     api poc-admin GET "/repos/$FORK/tag_protections" | jq -e --arg p "$p" 'any(.[]; .name_pattern == $p)' >/dev/null \
@@ -290,6 +303,37 @@ etape_refus() {
   journal "$debut"
 }
 entete_admin_comme_compte() { cp "$T/entete-admin" "$T/entete-poc-admin"; }
+
+etape_niveaux() {
+  local n debut b b2
+  n=n$(date -u +%Y%m%dT%H%M%SZ)
+  debut=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
+  b=$(distant "$FORK" refs/heads/custom/essai)
+  clone_travail "$FORK"
+  git -C "$T/w" commit -q --allow-empty -m "essai niveaux $n"
+  refuse "création de custom/$n/b (deux niveaux) par poc-sync" "$BRANCHE_PROTEGEE" poc-sync "$FORK" "HEAD:refs/heads/custom/$n/b"
+  refuse "création de custom/$n-3/b/c (trois niveaux) par poc-sync" "$BRANCHE_PROTEGEE" poc-sync "$FORK" "HEAD:refs/heads/custom/$n-3/b/c"
+  refuse "création de paquet/$n/deb (motif du projet, deux niveaux) par poc-sync" "$BRANCHE_PROTEGEE" poc-sync "$FORK" "HEAD:refs/heads/paquet/$n/deb"
+  refuse "création de custom/$n (un niveau) par poc-sync" "$BRANCHE_PROTEGEE" poc-sync "$FORK" "HEAD:refs/heads/custom/$n"
+  # Pas de création par poc-dev (liste blanche mesurée en S2) : tout push sur custom/ du fork déclenche un build (webhook
+  # du déclencheur, D2 b), et une branche protégée ne peut plus être supprimée, liste blanche comprise (premier passage).
+  accepte "branche hors motif essais/$n/b par poc-sync" poc-sync "$FORK" "HEAD:refs/heads/essais/$n/b"
+  # Tags : la protection de tag de Forgejo compile son motif sans séparateur (lecture, non mesurée) : custom-* couvrirait déjà
+  # custom-<x>/y. Prédiction faible, d'où le dernier essai.
+  refuse "création du tag custom-$n/x (deux niveaux) par poc-sync" "$TAG_PROTEGE" poc-sync "$FORK" "HEAD:refs/tags/custom-$n/x"
+  echo "## refs d'essai supprimées (branches hors motif essais/*, celles d'un passage interrompu comprises)"
+  for b2 in $(GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+      git ls-remote --refs "$FORGEJO_HOTE/$FORK.git" 'refs/heads/essais/*' | awk '{print $2}'); do
+    accepte "suppression de ${b2#refs/heads/} par poc-sync" poc-sync "$FORK" ":$b2"
+  done
+  [ "$(distant "$FORK" refs/heads/custom/essai)" = "$b" ] && echo "OK   custom/essai inchangée (${b:0:12})" \
+    || { echo "KO   custom/essai modifiée" >&2; exit 1; }
+  echo "## refs du fork à plusieurs niveaux restantes"
+  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
+    git ls-remote --refs "$FORGEJO_HOTE/$FORK.git" | awk '{print $2}' | grep -E '^refs/(heads|tags)/[^/]+/[^/]+/' | sed 's/^/  /' || echo "  aucune"
+  echo "## journal de Forgejo (requêtes de push de cet essai)"
+  journal "$debut"
+}
 
 etape_bout_en_bout() {
   local dev amont code debut
