@@ -1,0 +1,4 @@
+{
+  "global": {"branches": ["custom/*"], "tags": ["custom-*"]},
+  "depots": {"sample-app-sync": {"branches": ["paquet/*"], "tags": []}}
+}

@@ -211,3 +211,21 @@ Signature des rapports et des bundles (brique 09) et archivage WORM (brique 15) 
 | `test_collision_branche_et_tag` | Collisions sur `custom-1`, `paquet/deb` (motif du projet) et le tag `custom-2` : code 2, publiées dans le miroir, refs propres du fork intactes, tag absent du fork ; `autre-1` (motif d'un autre projet) propagée ; avance rapide amont d'une ref en collision : de nouveau code 2, fork inchangé |
 
 **Temps** : relevé dans [`chrono.tsv`](resultats/chrono.tsv), ouvert avec S1 (le temps de la partie locale, antérieure, n'y figure pas).
+
+## Jalon S2 : Forgejo (préparé le 02/11/2026 pendant le rejeu `enchainement` de la 08, exécution après lui)
+
+Script : [`forgejo.sh`](forgejo.sh), étapes `comptes organisations amont miroir fork protections refus bout_en_bout` (journaux `resultats/forgejo-<étape>.log`). Il charge `commun.sh` de la brique 08 (même cluster, mêmes secrets) ; ses jetons vont dans `…/08/secrets`, donc dans le contrôle `fuites.sh` de la 08. Configuration des refs propres : [`refs-propres.json`](refs-propres.json) (global : branches `custom/*`, tags `custom-*` ; projet `sample-app-sync` : branches `paquet/*`).
+
+**Vérifié avant l'écriture** (02/11/2026, lecture anonyme de `swagger.v1.json` du Forgejo en service, version `15.0.11+gitea-1.22.0`) : API des équipes (`permission`, `includes_all_repositories`, `units`), des forks (`organization`, `name`), des protections de branches (`rule_name`, liste blanche de push, **`apply_to_admins`**) et de tags (`name_pattern`, liste blanche) ; aucune option de force-push dans la protection de branche de cette version.
+
+**Jeton limité à la cible** : l'en-tête `Authorization` de `poc-sync` est passé à git par `http.<url>.extraHeader`, pour `mirror/sample-app.git` et `workspace/sample-app-sync.git` seulement. Vérifié sans réseau par `git config --get-urlmatch` ([`s2-portee-entete.log`](resultats/s2-portee-entete.log), git 2.53.0) : aucun en-tête vers l'amont, vers GitHub, vers `workspace/sample-app` ni vers un dépôt au nom voisin (`mirror/sample-app-autre.git`). En production, le jeton ne doit jamais partir vers l'amont : c'est une exigence de S3.
+
+**Prédictions** (écrites le 02/11/2026 à 14:05 UTC, avant toute exécution) :
+- `comptes` : trois comptes ordinaires (non administrateurs), un jeton `write:repository` chacun ; aucun mot de passe conservé ;
+- `miroir` : premier run de `sync.py` à code 0, `main` de `mirror/sample-app` = `main` de l'amont ; dans le journal de Forgejo, des pushes vers `mirror/` seulement ;
+- `fork` : `workspace/sample-app-sync` marqué fork de `mirror/sample-app`, même `main` ; équipes de `workspace` limitées à ce dépôt ;
+- `refus` : refusés (HTTP 403 ou refus de branche ou de tag protégé) : push de `poc-dev` et de `poc-amont` vers `mirror/`, push de `poc-sync` vers `workspace/sample-app`, création, réécriture et suppression de refs propres du fork par `poc-sync` ; acceptés : refs propres du fork par `poc-dev`, branche ordinaire du fork par `poc-sync` ;
+- mesures sans attendu ferme : réécriture forcée de `custom/essai` par `poc-dev` (liste blanche ; **acceptée**, prédiction faible : aucune option de force-push) ; par `poc-admin` avec `apply_to_admins` (**refusée**) ; tag propre par `poc-admin` (**refusé**, prédiction faible : la protection de tag n'a pas d'option pour les administrateurs) ; push de `poc-admin` vers `mirror/` (**accepté** : l'administrateur passe outre les équipes, limite à consigner) ;
+- `bout_en_bout` : code 2 (collision sur `custom/essai`), collision publiée dans `mirror/`, `custom/essai` du fork inchangée, `main` du fork avancée, tag `custom-1` intact.
+
+**Avant l'exécution** : tâche `synchro:forgejo` à déclarer dans `mise.toml`, après le rejeu, car celui-ci lit `mise.toml` à chaque étape.

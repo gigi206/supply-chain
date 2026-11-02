@@ -1,0 +1,7 @@
+# portée de http.<url>.extraHeader (jeton factice), 2026-11-02T14:04:18Z, git version 2.53.0
+https://192.168.161.13:3000/mirror/sample-app.git       : Authorization: token FACTICE-SYNC
+https://192.168.161.13:3000/workspace/sample-app-sync.git : Authorization: token FACTICE-SYNC
+https://192.168.161.13:3000/amont-essai/sample-app.git  : (aucun en-tête)
+https://github.com/traefik/traefik.git                  : (aucun en-tête)
+https://192.168.161.13:3000/workspace/sample-app.git    : (aucun en-tête)
+https://192.168.161.13:3000/mirror/sample-app-autre.git : (aucun en-tête)
