@@ -1,4 +1,4 @@
-# politique.sh rattrapage, 2026-11-01T21:57:13Z
+# politique.sh rattrapage, 2026-11-02T00:30:07Z
 ## réconciliateur (politique/rattrapage : Go, bibliothèque standard seule) : deux compilations indépendantes
 go version go1.26.10 linux/amd64
 f6d7dcc6d2040203e723149d0eb52b43125a8d26c8354191cb214779f57e952f  rattrapage-1
@@ -10,14 +10,14 @@ image : 192.168.161.13:5000/plateforme/rattrapage@sha256:c3992728ff77d2d7b412626
 OK   même digest que l'image épinglée (assemblage reproductible)
 ## état de départ : main en 6391fd437f26696847041be3226bbbf633f55a2f, PipelineRuns des commits d'essai retirés
 commits d'essai (arbre de 6391fd437f26696847041be3226bbbf633f55a2f, auteur et dates fixes) : c1 e537a1db653dde7dd1f051921b0e9c1eab7a2b01, c2 1e290e1d443a1edd70d2dfd799ada3e397aa70a6
-sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-11-01T21:51:08Z, signé=true
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-11-02T00:24:07Z, signé=true
 prédiction du premier passage : PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
 ## CronJob rattrapage (politique/rattrapage.yaml)
   JOINT|Forgejo et API, essai 1
   TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
   PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
 OK   prédiction tenue
-pod rattrapage-29892838-mrt8h : nœud sc-confiance, compte rattrapage, automountServiceAccountToken=false, jeton projeté 600 s, sortie Completed
+pod rattrapage-29892991-bm58h : nœud sc-confiance, compte rattrapage, automountServiceAccountToken=false, jeton projeté 600 s, sortie Completed
 ## NetworkPolicy rattrapage : sorties d'un pod d'essai au même label (busybox de J4)
   FENETRE|Zot joignable 0 fois, la dernière à - ms du lancement du conteneur, puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
@@ -26,18 +26,18 @@ pod rattrapage-29892838-mrt8h : nœud sc-confiance, compte rattrapage, automount
   FERME Zot 192.168.161.13:5000
   FERME SSH-stockage 192.168.161.13:22
   FERME kubelet-build 192.168.161.12:10250
-  FERME EventListener 10.42.0.138:8080
+  FERME EventListener 10.42.0.10:8080
   FERME TSA timestamp-authority.tsa.svc.cluster.local:3000
   FERME OpenBao openbao.openbao.svc.cluster.local:8200
 OK   sorties, une fois la règle posée : Forgejo et l'API seulement (plus le DNS)
 CONSTAT  fenêtre de démarrage (cilium) : Zot joignable 0 fois, la dernière à - ms du lancement du conteneur, puis 3 refus de suite (sous kube-router : une sortie interdite passe pendant la première seconde du conteneur ; sonde : resultats/politique-rattrapage-sonde-fenetre.log)
 ## webhook perdu : EventListener arrêté (0 réplique), push de c1
 EventListener : 0 réplique, 0 pod ; CronJob suspendu
-push de c1 à 2026-11-01T21:59:01Z ; tête de main dans Forgejo : e537a1db653dde7dd1f051921b0e9c1eab7a2b01
-  Forgejo : Unable to deliver webhook task[5]: unable to deliver webhook task[5] in http://192.168.161.11:32351 due to error in http client: Post "http://192.168.161.11:32351": dial tcp 192.168.161.11:32351: connect: connection refu
+push de c1 à 2026-11-02T00:32:00Z ; tête de main dans Forgejo : e537a1db653dde7dd1f051921b0e9c1eab7a2b01
+  Forgejo : Unable to deliver webhook task[5]: unable to deliver webhook task[5] in http://192.168.161.11:32711 due to error in http client: Post "http://192.168.161.11:32711": dial tcp 192.168.161.11:32711: connect: connection refu
 OK   une tentative de livraison, en échec
 ## EventListener rétabli : aucune relivraison (attente de 150 s)
-EventListener joignable par Forgejo : http://192.168.161.11:32351 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
+EventListener joignable par Forgejo : http://192.168.161.11:32711 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
 après 150 s : 0 PipelineRun pour c1 ; échecs de livraison dans le journal de Forgejo : 1 ; créations dans l'audit de l'API :
 OK   push perdu : Forgejo n'a ni relivré ni retenté, aucune création demandée à l'API
 ## rattrapage : CronJob réactivé
@@ -49,7 +49,7 @@ OK   exécution rattrapée : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/bui
 sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01 : origine rattrapage ; labels {"poc.test/declencheur":"rattrapage"} ; Chains : signé=true
 créations de sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01 dans l'audit de l'API depuis le push :
     1 declencheurs:rattrapage 201
-délais : push de c1 21:59:01, CronJob réactivé 22:01:39, PipelineRun créé 22:01:40
+délais : push de c1 00:32:00, CronJob réactivé 00:34:35, PipelineRun créé 00:34:36
 ## passage suivant : rien à rattraper
   JOINT|Forgejo et API, essai 1
   TETE|workspace/sample-app|main|e537a1db653dde7dd1f051921b0e9c1eab7a2b01
@@ -58,13 +58,13 @@ OK   PRESENT : aucun PipelineRun créé
 ## horodatage de l'exécution rattrapée (CronJob horodatage)
   JOINT|Zot et TSA, essai 1
   ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
-  REFUSEE|builds/essai-j6-autre-cle|1|signature c833dcccf4e5077f|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
-  REFUSEE|builds/essai-j6-autre-sujet|1|signature 470eda6a8cfa299a|failed to verify signature: provided artifact digest does not match any digest in statement
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 36b658d8be26e89e|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature c3dc103fce6ae2d8|failed to verify signature: provided artifact digest does not match any digest in statement
   FIN|8 image(s), 29 enveloppe(s) : 0 horodatée(s), 27 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
   DEJA_HORODATEE|builds/essai-porte ×6
   DEJA_HORODATEE|builds/essai-signature ×1
   DEJA_HORODATEE|builds/essai-webhook ×20
-passage horodatage-29892843 : 22:03:00 → 22:03:04, pod 10.42.0.228 ; requêtes de jeton reçues par le TSA : 0
+passage horodatage-29892996 : 00:36:00 → 00:36:05, pod 10.42.0.191 ; requêtes de jeton reçues par le TSA : 0
 OK   une requête de jeton par enveloppe horodatée (0), toutes du pod du passage ; aucune pour les 2 refusées
 sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 21 enveloppe(s) de Chains, 21 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
 OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
@@ -94,10 +94,10 @@ prédiction : drapeaux et annotations identiques ; labels : poc.test/declencheur
   {"key":"annotations_identiques","value":true}
   {"key":"annotations_taskrun_identiques","value":true}
   {"key":"drapeaux_identiques","value":true}
-  {"key":"labels","value":{"differents":[],"eventlistener":{"triggers.tekton.dev/eventlistener":"forgejo","triggers.tekton.dev/trigger":"sample-app-push","triggers.tekton.dev/triggers-eventid":"67e02e8e-c7c0-474e-8d68-860648128a3f"},"rattrapage":{"poc.test/declencheur":"rattrapage"}}}
-  {"key":"labels_taskrun","value":{"differents":["tekton.dev/pipelineRun","tekton.dev/pipelineRunUID"],"eventlistener":{"triggers.tekton.dev/eventlistener":"forgejo","triggers.tekton.dev/trigger":"sample-app-push","triggers.tekton.dev/triggers-eventid":"67e02e8e-c7c0-474e-8d68-860648128a3f"},"rattrapage":{"poc.test/declencheur":"rattrapage"}}}
+  {"key":"labels","value":{"differents":[],"eventlistener":{"triggers.tekton.dev/eventlistener":"forgejo","triggers.tekton.dev/trigger":"sample-app-push","triggers.tekton.dev/triggers-eventid":"a56a4873-448b-4c02-a12b-d0b19b00a2f5"},"rattrapage":{"poc.test/declencheur":"rattrapage"}}}
+  {"key":"labels_taskrun","value":{"differents":["tekton.dev/pipelineRun","tekton.dev/pipelineRunUID"],"eventlistener":{"triggers.tekton.dev/eventlistener":"forgejo","triggers.tekton.dev/trigger":"sample-app-push","triggers.tekton.dev/triggers-eventid":"a56a4873-448b-4c02-a12b-d0b19b00a2f5"},"rattrapage":{"poc.test/declencheur":"rattrapage"}}}
 OK   seul écart signé : les labels posés par chaque créateur (chemin déclaré, identifiant d'événement de Triggers) ; aucun n'est vérifié par Chains
-CONSTAT  annotation tekton.dev/signature du TaskRun signé : celle de la pipeline en service (MEQCIAzFqKbT…, lue dans son bundle),
+CONSTAT  annotation tekton.dev/signature du TaskRun signé : celle de la pipeline en service (MEQCIHGrNBKK…, lue dans son bundle),
          pas celle de la tâche (MEUCIGnBv80D…) : Pipelines v1.15.5 propage au TaskRun les annotations du PipelineRun, reçues de
          la Pipeline, et elles priment sur celles de la Task ; aucune politique ne la lit, trusted_task épingle par digest
 ## porte : verdicts des deux chemins (prédiction : celui de la tâche en service)
@@ -109,4 +109,4 @@ tête de main : 6391fd437f26696847041be3226bbbf633f55a2f
   PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
 créations de sample-app-6391fd437f26696847041be3226bbbf633f55a2f dans l'audit de l'API depuis la remise à zéro :
     1 declencheurs:el-forgejo 409
-sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-11-01T21:51:08Z
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-11-02T00:24:07Z

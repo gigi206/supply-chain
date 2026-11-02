@@ -1,4 +1,4 @@
-# politique.sh taches, 2026-11-01T21:46:09Z
+# politique.sh taches, 2026-11-02T00:18:56Z
 ## clé des tâches de la plateforme (ADR 0003 : clés séparées par usage)
 clé existante
 clé publique : ~/.cache/supply-chain-poc/08/pki/taches.pub, sha256 9e118e036265b4de…
@@ -8,12 +8,12 @@ OK   distincte de la clé de Chains et de celle du TSA
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 annotation tekton.dev/signature : 1 (signée), 0 (non signée) ; modifiée : 1 ligne changée, même annotation
-bundle tekton/tasks/essai-confiance ← signee.yaml : sha256:9b1204195afa69af5dc67af4088103e3ad86cc468ddfed25a2526e866998c302
+bundle tekton/tasks/essai-confiance ← signee.yaml : sha256:39c585b8b7cdcfb0e08e13c3db85c48195633b6872e3cecd2a73ecdd72b3a718
 bundle tekton/tasks/essai-non-signee ← tache.yaml : sha256:92560481b2f9dbbee59dddd566c6d3b9c5e0c01ce51226afc627f07b8d5bcf3b
-bundle tekton/tasks/essai-modifiee ← modifiee.yaml : sha256:555c9fbbf99fb57059edc52524536e8801f9f76bfd4de0ec26e855e9ae99652e
-bundle tekton/tasks/essai-autre-cle ← autre-cle.yaml : sha256:42cb5fa1fad01039d65e6b3fbf589bf7387a78fe260313ebe9e86832601f57e5
-bundle essais-j6/tasks/essai-confiance ← signee.yaml : sha256:9b1204195afa69af5dc67af4088103e3ad86cc468ddfed25a2526e866998c302
-bundle tekton/tasks/essai-v1 ← signee-v1.yaml : sha256:8c0483a73a27bfda838a3191a2e2c8f7b7910498eabf33f5b8825a9cdf80ba92
+bundle tekton/tasks/essai-modifiee ← modifiee.yaml : sha256:266a31c266ed4a159ac0c5e6424a2970c2707742bfc2ff55a213374f21de2168
+bundle tekton/tasks/essai-autre-cle ← autre-cle.yaml : sha256:337d4b93becaa99637f02caa5b7af2fd9370e767d59cdff05531348d4ca67e08
+bundle essais-j6/tasks/essai-confiance ← signee.yaml : sha256:39c585b8b7cdcfb0e08e13c3db85c48195633b6872e3cecd2a73ecdd72b3a718
+bundle tekton/tasks/essai-v1 ← signee-v1.yaml : sha256:6580e17643ec53ed66a8a2c9e531b6d55117890f5df953b4ef023dc7f906b497
 ## Tekton : vérification obligatoire, specs en ligne interdites, résolveur bundles seul
 feature-flags : trusted-resources-verification-no-match-policy=fail, disable-inline-spec=pipeline,pipelinerun,taskrun
 résolveurs : enable-bundles-resolver=true, enable-cluster-resolver=false, enable-git-resolver=false, enable-http-resolver=false, enable-hub-resolver=false
@@ -25,8 +25,8 @@ OK   tâche modifiée après signature : refusée, ResourceVerificationFailed : 
 OK   tâche signée par une autre clé : refusée, ResourceVerificationFailed : resource verification failed: resource essai-confiance in namespace  fails verification ; TrustedResourcesVerified=False
 OK   tâche v1 signée par tkn (constat tektoncd/cli#2894) : refusée, TaskRunResolutionFailed : invalid runtime object: strict decoding error: unknown field "spec.stepTemplate.resources", unknown field "spec.steps[0].resources" ; TrustedResourcesVerified=-
 OK   tâche signée, hors de tekton/ (essais-j6/) : refusée, ResourceVerificationFailed : failed to get matched policies: no policies are matched: no matching policies are found for resource: essai-confiance against source: sc-stockage.poc.test:5000/essais-j6/tasks/essai-confiance ; TrustedResourcesVerified=False
-OK   résolveur git désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/git-6a9a4abf3e4b4f62befcfdc0991d70b3": cannot handle resolution request, enable-git-resolver feature flag not true ; TrustedResourcesVerified=-
-OK   résolveur http désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/http-1ed41d7bbf3d57d55c3d98316421e49b": cannot handle resolution request, enable-http-resolver feature flag not true ; TrustedResourcesVerified=-
-OK   résolveur hub désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/hub-83d7cf796a81a06834aa6e25ef1c5396": cannot handle resolution request, enable-hub-resolver feature flag not true ; TrustedResourcesVerified=-
-OK   résolveur cluster désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/cluster-d6916b8f25720274218552171233d619": cannot handle resolution request, enable-cluster-resolver feature flag not true ; TrustedResourcesVerified=-
+OK   résolveur git désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/git-18db89c51fb49cc3c0dd060f35042969": cannot handle resolution request, enable-git-resolver feature flag not true ; TrustedResourcesVerified=-
+OK   résolveur http désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/http-c53e74220ad202803e59c8c79e6318d1": cannot handle resolution request, enable-http-resolver feature flag not true ; TrustedResourcesVerified=-
+OK   résolveur hub désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/hub-2a546f4a3c501a27c6e3b8c71dfa7be4": cannot handle resolution request, enable-hub-resolver feature flag not true ; TrustedResourcesVerified=-
+OK   résolveur cluster désactivé : refusée, TaskRunResolutionFailed : error requesting remote resource: invalid resource request "builds/cluster-50247fc8a455fb42693dd937af845a5f": cannot handle resolution request, enable-cluster-resolver feature flag not true ; TrustedResourcesVerified=-
 OK   taskSpec en ligne (TaskRun), webhook de Tekton : refusé (must not set the field(s): spec.taskSpec)

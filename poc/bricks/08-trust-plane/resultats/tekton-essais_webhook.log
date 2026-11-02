@@ -1,40 +1,40 @@
-# tekton.sh essais_webhook, 2026-11-01T21:37:26Z
+# tekton.sh essais_webhook, 2026-11-02T00:10:24Z
 ## A. livraison réelle de Forgejo (test du webhook : dernier commit de main)
 Forgejo, POST hooks/…/tests : HTTP 204
-OK   TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier créé par ce PipelineRun (propriétaire b4cb0c33-a02f-4fe1-b1af-e88ea59fbf6c)
+OK   TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier créé par ce PipelineRun (propriétaire 970f0647-1d35-4294-81f4-3eb71962bf1b)
 OK   PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f terminé (Succeeded)
 OK   créé par l'EventListener (label triggers.tekton.dev/eventlistener)
 ## B. corps non signé (commit 1111111111111111111111111111111111111111)
-non signé : HTTP 202 {"eventID":"01e90241-108d-4df6-9cbd-8be73ace7d04"}
+non signé : HTTP 202 {"eventID":"e9b67812-9b2b-450e-b338-54940e35b5b1"}
 ## C. signature calculée avec un autre secret
-mauvaise signature : HTTP 202 {"eventID":"967947f4-cc30-4d22-882c-64e447ed25aa"}
+mauvaise signature : HTTP 202 {"eventID":"e1b4c0b7-0d26-4a49-a22a-84bf05c25397"}
 ## D. corps modifié sous une signature valide (signature du corps du commit 2222222222222222222222222222222222222222, corps du commit 1111111111111111111111111111111111111111)
-corps modifié : HTTP 202 {"eventID":"074e6644-367b-4226-9547-6bc14dd79a97"}
+corps modifié : HTTP 202 {"eventID":"1a3223e9-21d0-4d9b-9b0f-623ebcd3a60a"}
 ## E. contrôle positif : livraison valide signée avec le secret du webhook (commit 2222222222222222222222222222222222222222)
-valide : HTTP 202 {"eventID":"6dde9a62-e050-47ab-aac1-fabaf435d494"}
-OK   TaskRun sample-app-2222222222222222222222222222222222222222-publier créé par ce PipelineRun (propriétaire 30ee46a3-c6c1-436f-be5b-ac4f00d83797)
+valide : HTTP 202 {"eventID":"c696c726-7c9b-4a1a-a1ea-1c99e7628f1f"}
+OK   TaskRun sample-app-2222222222222222222222222222222222222222-publier créé par ce PipelineRun (propriétaire 47922515-6525-4742-9611-c1c3c3af26f3)
 OK   PipelineRun sample-app-2222222222222222222222222222222222222222 créé et terminé : la signature calculée ici est acceptée
 ## F. rejeu à l'identique de E (même corps, même signature)
-rejeu de E : HTTP 202 {"eventID":"25bc42e7-b724-451c-afdc-e62539f03e68"}
+rejeu de E : HTTP 202 {"eventID":"ac3231c2-6ec2-40e2-8790-d2de35ec5924"}
 ## G. nouvelle livraison de Forgejo pour le même commit (rejeu d'une livraison réelle)
 Forgejo, POST hooks/…/tests : HTTP 204
 ## bilan (PipelineRuns par commit)
 commit réel : 1 ; commit 1111111111111111111111111111111111111111 (B, C, D) : 0 ; commit 2222222222222222222222222222222222222222 (E, F) : 1
 OK   B, C, D refusés : aucun PipelineRun pour 1111111111111111111111111111111111111111
 OK   F et G sans effet : un seul PipelineRun par commit
-## refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-01T21:37:26Z
-{"t":"21:37:39","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"21:37:39","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"21:37:39","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-## EventListener : rejeux refusés à la création (AlreadyExists) depuis 2026-11-01T21:37:26Z
-{"t":"21:37:50","eventID":"25bc42e7-b724-451c-afdc-e62539f03e68","erreur":"pipelineruns.tekton.dev \"sample-app-2222222222222222222222222222222222222222\" already exists"}
-{"t":"21:37:51","eventID":"fb3865ed-6c64-45e9-8085-9b94b112312e","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+## refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-02T00:10:24Z
+{"t":"00:10:36","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"00:10:36","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"00:10:36","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+## EventListener : rejeux refusés à la création (AlreadyExists) depuis 2026-11-02T00:10:24Z
+{"t":"00:10:48","eventID":"ac3231c2-6ec2-40e2-8790-d2de35ec5924","erreur":"pipelineruns.tekton.dev \"sample-app-2222222222222222222222222222222222222222\" already exists"}
+{"t":"00:10:50","eventID":"076c7b2c-04bd-4ab0-9679-efb490740dfd","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
 ## Chains : PipelineRuns signés
 sample-app-2222222222222222222222222222222222222222 signé=true
 sample-app-6391fd437f26696847041be3226bbbf633f55a2f signé=true
-## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ 2026-11-01T21:37:26Z)
+## provenance du PipelineRun déclenché par Forgejo (cosign, clé Transit ; enveloppe de cet essai : startedOn ≥ 2026-11-02T00:10:24Z)
 {"buildType":"https://tekton.dev/chains/v2/slsa-tekton","pipeline":"sample-app-essai","params":{"commit":"6391fd437f26696847041be3226bbbf633f55a2f","depot":"https://sc-stockage.poc.test:3000/workspace/sample-app.git"},"builder":"https://supply-chain.example/builders/tekton-chains@v1","definitions":["pipelineTask sans uri ni digest (référence locale), contenu en ligne"]}
-## une enveloppe par exécution signée de cet essai (startedOn ≥ 2026-11-01T21:37:26Z)
+## une enveloppe par exécution signée de cet essai (startedOn ≥ 2026-11-02T00:10:24Z)
 PipelineRun 2222222222222222222222222222222222222222
 PipelineRun 6391fd437f26696847041be3226bbbf633f55a2f
 TaskRun 2222222222222222222222222222222222222222

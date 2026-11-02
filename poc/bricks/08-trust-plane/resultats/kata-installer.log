@@ -1,4 +1,4 @@
-# kata.sh installer, 2026-11-01T22:06:04Z
+# kata.sh installer, 2026-11-02T00:39:05Z
 ## archive kata-static-4.3.1-amd64.tar.zst
 OK   sha256 1463a2b86845f4d3d8e87f2f764ec59856fc0fee3520967a79ade32762be2e97, revérifié avant l'extraction
 ## fichiers lus par qemu-runtime-rs, extraits sur l'hôte (liens conservés)

@@ -2529,7 +2529,7 @@ etape_controleurs() {
     u=system:serviceaccount:$ns:$sa
     a=$(kubectl auth can-i list secrets -A --as "$u" 2>/dev/null || true)
     b=$(kubectl auth can-i list secrets -n kube-system --as "$u" 2>/dev/null || true)
-    [ "$b" = yes ] && echo "  $ns:$sa (tout le cluster : $a)"
+    if [ "$b" = yes ]; then echo "  $ns:$sa (tout le cluster : $a)"; fi   # « [ ] && » finirait la boucle en échec
   done < "$T/ct-comptes" | tee "$T/ct-lecteurs"
   echo "$(wc -l < "$T/ct-comptes") comptes de service examinés, $(wc -l < "$T/ct-lecteurs") lecteurs des Secrets de kube-system"
   ba_attendu "contrôleurs de Pipelines et de Chains parmi eux" "$(grep -cE 'tekton-(pipelines|chains)-controller ' "$T/ct-lecteurs" || true)" 0

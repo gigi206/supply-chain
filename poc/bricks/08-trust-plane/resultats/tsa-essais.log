@@ -1,12 +1,12 @@
-# tsa.sh essais, 2026-11-01T21:38:48Z
+# tsa.sh essais, 2026-11-02T00:11:43Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-01 21:38:50 +0000 UTC
+Artifact timestamped at 2026-11-02 00:11:45 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 1 21:38:50 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x7B4625B86861EF99F87FA571F75ABBAB462A3B88 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 2 00:11:45 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x66D0DBFACBE8D6E432A2A42F2DF0F43A2CD9C1EE TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
@@ -15,7 +15,7 @@ INJOIGNABLE|15 essais sur environ 45 s
 OK   TSA injoignable depuis j5-essais (NetworkPolicy)
 ## OpenBao : rôle tsa et clés séparées
 CONNEXION_ACCEPTEE|"token_policies":["tsa-signature"]
-SIGNATURE_TSA|vault:v1:MEQ…
+SIGNATURE_TSA|vault:v1:MEU…
 RENOUVELLEMENT|durée 3600 s
 REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
 REFUSE|lecture de la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
@@ -29,24 +29,24 @@ REFUSE|signature avec la clé tsa (rôle tekton-chains)|Code: 403. Errors: * 1 e
 CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
 OK   rôle tsa : signe avec la seule clé tsa ; 7 refus, 2 connexions croisées refusées
 ## Zot : poc-horodatage limité à horodatage/**
-Digest: sha256:82be619dae5a90a36fd71012145f606f12fec38f5b4dc0ea0e48acbbe0f51425
+Digest: sha256:64ab9d268855d4550ad0403067e7ff91d710526f39be0a33ac0222bbc780c029
 OK   poc-horodatage écrit dans horodatage/
 OK   poc-horodatage dans builds/ : refusé (denied)
 OK   poc-horodatage dans amont/ : refusé (denied)
 OK   écriture anonyme dans horodatage/ : refusé (basic credential not found)
 OK   ouverture d'un envoi anonyme dans horodatage/ : HTTP 401
-## audit d'OpenBao depuis 2026-11-01T21:38:48Z
-{"time":"21:38:50","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
-{"time":"21:39:46","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
-{"time":"21:39:46","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
-{"time":"21:39:46","chemin":"auth/token/renew-self","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
-{"time":"21:39:46","chemin":"transit/sign/chains/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"transit/keys/chains","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"transit/export/signing-key/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"transit/keys/tsa/config","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"transit/backup/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"auth/token/lookup-self","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:46","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:d73300e7f1688f780d27edf68806c85c780b85faa01dba662f23a262739c2c54"}
-{"time":"21:39:47","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"21:39:47","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"time":"21:39:47","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:d73300e7f1688f780d27edf68806c85c780b85faa01dba662f23a262739c2c54"}
+## audit d'OpenBao depuis 2026-11-02T00:11:43Z
+{"time":"00:11:45","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"00:12:39","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"00:12:39","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"00:12:39","chemin":"auth/token/renew-self","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":null}
+{"time":"00:12:39","chemin":"transit/sign/chains/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"transit/keys/chains","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"transit/export/signing-key/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"transit/keys/tsa/config","op":"update","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"transit/backup/tsa","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"auth/token/lookup-self","op":"read","compte":"jwt-system:serviceaccount:tsa:timestamp-authority","politiques":["tsa-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:39","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:1157211c2337403d35a02d079c656feef245e296d3f3db307457628fe2c8c8ba"}
+{"time":"00:12:40","chemin":"auth/jwt/login","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"00:12:40","chemin":"transit/sign/tsa/sha2-256","op":"update","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"time":"00:12:40","chemin":"auth/jwt/login","op":"update","compte":null,"politiques":null,"erreur":"hmac-sha256:1157211c2337403d35a02d079c656feef245e296d3f3db307457628fe2c8c8ba"}

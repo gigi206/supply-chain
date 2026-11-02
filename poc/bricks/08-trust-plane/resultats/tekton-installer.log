@@ -1,12 +1,13 @@
-# tekton.sh installer, 2026-11-01T21:36:31Z
+# tekton.sh installer, 2026-11-02T00:09:31Z
 ## références d'images restantes hors de Zot dans les manifestes rendus
       1 gcr.io/tekton-releases/catalog/upstream/*
       1 gcr.io/tekton-releases/catalog/upstream/git-clone
       1 mcr.microsoft.com/powershell:nanoserver@sha256:b6d5ff841b78bdf2dfed7550000fd4f3437385b8fa686ec0f010be24777654d6
-pipeline : 77 objets, sha256 37a529e629f7a327…
+pipeline : 77 objets, sha256 7b40fcff20db6f0e…
 triggers : 42 objets, sha256 e6aae8d7b619068e…
 interceptors : 9 objets, sha256 e7f0acb04844b5d3…
-chains : 18 objets, sha256 db1a43edbf3d928e…
+chains : 20 objets, sha256 1bdafa310e6a2335…
+OK   rendu : -namespace=builds (Pipelines), --namespace=builds (Chains), liaisons *-tenant-access de tout le cluster absentes
 deployment.apps/tekton-events-controller condition met
 deployment.apps/tekton-pipelines-controller condition met
 deployment.apps/tekton-pipelines-webhook condition met
@@ -18,15 +19,18 @@ deployment.apps/tekton-triggers-controller condition met
 deployment.apps/tekton-triggers-core-interceptors condition met
 deployment.apps/tekton-triggers-webhook condition met
 deployment.apps/tekton-chains-controller condition met
+OK   ClusterRoleBindings *-tenant-access introuvables (NotFound) ; RoleBindings dans builds :
+  tekton-pipelines-controller-tenant-access ClusterRole/tekton-pipelines-controller-tenant-access
+  tekton-chains-controller-tenant-access ClusterRole/tekton-chains-controller-tenant-access
 OK   ValidatingAdmissionPolicy tekton-controleurs-builds posée, vérifiée par l'API (aucun avertissement de typage)
-tekton-pipelines tekton-events-controller-747c585746-529cs Running sc-confiance
-tekton-pipelines tekton-pipelines-controller-7f5f7d4ff6-wjvxn Running sc-confiance
-tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-bpz9p Running sc-confiance
-tekton-pipelines tekton-triggers-controller-8449556669-p597k Running sc-confiance
-tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-4mvpg Running sc-confiance
-tekton-pipelines tekton-triggers-webhook-5d67f65bf8-hk452 Running sc-confiance
-tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-gzkk4 Running sc-confiance
-tekton-chains tekton-chains-controller-8d5d9dbdb-x4dbw Running sc-confiance
+tekton-pipelines tekton-events-controller-747c585746-hb7lz Running sc-confiance
+tekton-pipelines tekton-pipelines-controller-65d4c9d57b-qkm7j Running sc-confiance
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-4cpw7 Running sc-confiance
+tekton-pipelines tekton-triggers-controller-8449556669-6fkzf Running sc-confiance
+tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-f6zbm Running sc-confiance
+tekton-pipelines tekton-triggers-webhook-5d67f65bf8-xmzhg Running sc-confiance
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-7npcg Running sc-confiance
+tekton-chains tekton-chains-controller-7b5dd49868-mdflv Running sc-confiance
 ## images réellement tirées (imageID des conteneurs)
 sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead…
 sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:922d86c3f230…

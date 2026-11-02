@@ -1,10 +1,10 @@
-# cilium.sh installer, 2026-11-01T21:31:13Z
+# cilium.sh installer, 2026-11-02T00:04:13Z
 ## valeurs (cilium/valeurs.yaml, digests amd64)
 OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
 ## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
 Release "cilium" does not exist. Installing it now.
 NAME: cilium
-LAST DEPLOYED: Sun Nov  1 22:31:13 2026
+LAST DEPLOYED: Mon Nov  2 01:04:14 2026
 NAMESPACE: kube-system
 STATUS: deployed
 REVISION: 1

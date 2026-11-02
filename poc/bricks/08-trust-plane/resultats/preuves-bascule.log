@@ -1,4 +1,4 @@
-# preuves.sh bascule, 2026-11-01T23:20:55Z
+# preuves.sh bascule, 2026-11-02T00:57:25Z
 ## prédiction (bascule du gabarit en service, décision du propriétaire du 01/11/2026)
 gabarit (politique/gabarit-sample-app.yaml, pipeline sample-app de construction.sh taches) : PipelineRun rendu admis à blanc
   au nom de el-forgejo et du rattrapage ; appliqué, il remplace le gabarit d'essai ; rattrapage suspendu pendant les purges
@@ -15,28 +15,28 @@ contrôle exécutions/enveloppes : aucune anomalie au départ ni à la fin ; ima
   la plus récente = celle du chemin 2
 posture (tekton-lint) du gabarit, de la pipeline et de ses trois tâches lues dans leurs bundles : aucun signalement
 ## départ
-OK   bundle de la pipeline dans Zot : sha256:47d124b3be22a7f95d8f4b9dfac2c12bdce53b97cbe6f5f1a063d0f9a32fc367
+OK   bundle de la pipeline dans Zot : sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9
 OK   tâche preparer dans la liste revue : tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
 OK   tâche construire dans la liste revue : tekton/tasks/construire-image@sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
 OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
 OK   NetworkPolicy construction-sans-sortie présente
-pipeline : tekton/pipelines/sample-app@sha256:47d124b3be22a7f95d8f4b9dfac2c12bdce53b97cbe6f5f1a063d0f9a32fc367 ; celle de j7-sample-app : même bundle
+pipeline : tekton/pipelines/sample-app@sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9 ; celle de j7-sample-app : même bundle
 gabarit en service : pipeline sample-app-essai
 CronJob rattrapage suspendu (aucun passage actif)
 OK   aucune exécution en cours ni en attente de Chains
 depart : COUVERTE 19, ECHEC_SIGNATURE 8, SANS_SUJET 13
 OK   départ : aucune anomalie
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 enveloppes, dernière provenance de PipelineRun : 58560f2d-54b1-45e4-bbc2-89dcfb53e2e0 (2026-11-01T23:13:40Z)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 enveloppes, dernière provenance de PipelineRun : 9eb3ddf7-5706-4926-9f16-618ca306df22 (2026-11-02T00:50:15Z)
 ## gabarit
 OK   témoin PipelineRun du gabarit, au nom de el-forgejo : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
 OK   témoin PipelineRun du gabarit, au nom du rattrapage : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run) )
-OK   gabarit en service : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:47d124b3be22a7f95d8f4b9dfac2c12bdce53b97cbe6f5f1a063d0f9a32fc367
+OK   gabarit en service : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9
 ## chemin 1 : livraison de Forgejo
 OK   Forgejo, POST hooks/…/tests : HTTP 204
 OK   webhook : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : EventListener forgejo
     1 declencheurs:el-forgejo 201
 OK   webhook : une création, par declencheurs:el-forgejo (audit de l'API)
-OK   webhook : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:47d124b3be22a7f95d8f4b9dfac2c12bdce53b97cbe6f5f1a063d0f9a32fc367
+OK   webhook : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9
 OK   webhook : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
 TaskRun construire : Succeeded, TrustedResourcesVerified=True
 TaskRun preparer : Succeeded, TrustedResourcesVerified=True
@@ -51,20 +51,20 @@ TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=tr
 TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
 TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
 OK   webhook : PipelineRun signé par Chains : true
-CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-01T23:21:02Z : 1 (le manifeste existait déjà)
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-02T00:57:32Z : 1 (le manifeste existait déjà)
 OK   aucune exécution en cours ni en attente de Chains
-passage d'horodatage horodatage-29892923
+passage d'horodatage horodatage-29893019
 sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 27 enveloppe(s) de Chains, 27 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
 OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
   VERDICT|ba-webhook|true||trusted_task.tagged|31|ok|4/4 enveloppe(s) couverte(s), 27 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
 OK   webhook : verdict de la porte (succès|violations|horodatage) : true||ok
-OK   webhook : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : db098c0e-c80d-4d88-b02f-0c2d13a6dbd1
+OK   webhook : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : e66c365a-49dd-43cf-b2e9-f003d1505e18
 ## chemin 2 : rattrapage
 CronJob rattrapage repris
 OK   rattrapage : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : rattrapage
     1 declencheurs:rattrapage 201
 OK   rattrapage : une création, par declencheurs:rattrapage (audit de l'API)
-OK   rattrapage : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:47d124b3be22a7f95d8f4b9dfac2c12bdce53b97cbe6f5f1a063d0f9a32fc367
+OK   rattrapage : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9
 OK   rattrapage : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
 TaskRun construire : Succeeded, TrustedResourcesVerified=True
 TaskRun preparer : Succeeded, TrustedResourcesVerified=True
@@ -79,36 +79,36 @@ TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=tr
 TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
 TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
 OK   rattrapage : PipelineRun signé par Chains : true
-CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-01T23:23:42Z : 1 (le manifeste existait déjà)
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-02T00:59:48Z : 1 (le manifeste existait déjà)
 OK   aucune exécution en cours ni en attente de Chains
-passage d'horodatage horodatage-29892925
+passage d'horodatage horodatage-29893021
 sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 29 enveloppe(s) de Chains, 29 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
 OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
   VERDICT|ba-rattrapage|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
 OK   rattrapage : verdict de la porte (succès|violations|horodatage) : true||ok
-OK   rattrapage : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : 5f602005-69ca-445b-986e-0508badcc56f
-rattrapage-29892923  JOINT|Forgejo et API, essai 1
-rattrapage-29892923  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
-rattrapage-29892923  CREE|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
-rattrapage-29892924  JOINT|Forgejo et API, essai 1
-rattrapage-29892924  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
-rattrapage-29892924  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
-rattrapage-29892925  JOINT|Forgejo et API, essai 1
-rattrapage-29892925  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
-rattrapage-29892925  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   rattrapage : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : 9ce29ddd-ca24-46b0-83b6-9c0533e23141
+rattrapage-29893019  JOINT|Forgejo et API, essai 1
+rattrapage-29893019  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893019  CREE|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+rattrapage-29893020  JOINT|Forgejo et API, essai 1
+rattrapage-29893020  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893020  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893021  JOINT|Forgejo et API, essai 1
+rattrapage-29893021  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-29893021  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
 OK   rattrapage : créations de sample-app-6391fd437f26696847041be3226bbbf633f55a2f dans les journaux des passages depuis la reprise : 1
 OK   spec identique par les deux chemins
 ## rejeu de la livraison
 OK   Forgejo, POST hooks/…/tests : HTTP 204
-  {"t":"23:25:51","eventID":"a1e09356-1c0e-47da-b7fc-dacc017b7437","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+  {"t":"01:01:49","eventID":"970f592e-ea9c-4bb8-a39c-31570e944be9","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
 OK   rejeu refusé à la création (already exists)
-OK   UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : 5f602005-69ca-445b-986e-0508badcc56f
+OK   UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : 9ce29ddd-ca24-46b0-83b6-9c0533e23141
 ## fin
 OK   aucune exécution en cours ni en attente de Chains
 fin : COUVERTE 19, ECHEC_SIGNATURE 8, SANS_SUJET 15
 OK   fin : aucune anomalie
 OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 2 → 6
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 enveloppes, dernière provenance de PipelineRun : 5f602005-69ca-445b-986e-0508badcc56f (2026-11-01T23:24:34Z)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 enveloppes, dernière provenance de PipelineRun : 9ce29ddd-ca24-46b0-83b6-9c0533e23141 (2026-11-02T01:00:38Z)
 ## posture du gabarit en service, de sa pipeline et de ses tâches (bundles de Zot)
 OK   5 ressources : aucun signalement, comme prédit
 CronJob rattrapage repris
