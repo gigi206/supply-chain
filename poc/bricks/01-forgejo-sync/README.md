@@ -272,7 +272,7 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 - refs propres du fork (`custom/essai`, `paquet/deb`, `custom-1`) intactes après toutes les réécritures ;
 - restauration depuis les bundles et les rapports de la VM : refs `upstream` et `archive` identiques au miroir local.
 
-## Jalon S5 : branche custom buildée (étude du 02/11/2026, lecture seule de la brique 08 ; décision du propriétaire attendue)
+## Jalon S5 : branche custom buildée (étude du 02/11/2026, lecture seule de la brique 08 ; option (ii) retenue par le propriétaire le même jour)
 
 **Ce que D2 (b) ne change pas** (lu dans [`declencheurs.yaml`](../08-trust-plane/politique/declencheurs.yaml) et [`gabarit-sample-app.yaml`](../08-trust-plane/politique/gabarit-sample-app.yaml)) : un **EventListener séparé** `forgejo-sync` dans `declencheurs` (même compte `el-forgejo`, même intercepteur HMAC, avec un secret de webhook propre ; filtre CEL : `workspace/sample-app-sync` et `refs/heads/custom/*`) et une TriggerTemplate `sample-app-sync` **dérivée à l'exécution de celle en service** (même pipeline signée, même anti-rejeu par le nom, préfixe `sample-app-sync-`) laissent intacts l'EventListener `forgejo` et le gabarit de la 08. La porte reçoit la source attendue à chaque jugement (`juger … [source attendue]`) : aucune modification de la porte. Le rattrapage ne lit qu'une branche (`DEPOT`, `BRANCHE`) : un webhook perdu sur une branche custom n'est pas rattrapé, limite à consigner ou à traiter.
 
@@ -288,7 +288,19 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 
 **Coût de (ii), vérifié dans la 08** (14:14 UTC) : la règle Kyverno `tekton-references` accepte tout bundle `tekton/pipelines/[a-z0-9-]+` épinglé par digest ; la VerificationPolicy de Trusted Resources, tout `tekton/(tasks|pipelines)/[a-z0-9-]+` signé par la clé des tâches ; la liste revue de la porte ne porte que sur les tâches, inchangées. (ii) ne demande donc aucune modification de la 08.
 
-En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en est la forme réduite. Rien n'est écrit pour S5 avant la décision.
+En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en est la forme réduite.
+
+**Option (ii) retenue par le propriétaire** (02/11/2026). Script : [`declencheur.sh`](declencheur.sh), étapes `pipeline installer construire porte` ; aucun fichier de la 08 n'est modifié, tout dérive de ce qui est en service :
+- `pipeline` : la pipeline `sample-app` du gabarit en service est lue dans Zot (`tkn bundle list`), renommée `sample-app-sync`, son paramètre `image` passé à `builds/sample-app-sync`, re-signée par la clé des tâches et publiée dans `tekton/pipelines/sample-app-sync`. Un contrôle vérifie que l'écart se limite à ces deux champs (essayé hors cluster le 02/11/2026 sur le gabarit versionné de la 08, rendu avec des valeurs factices : écart = nom, image et signature) ;
+- `installer` : secret HMAC propre, TriggerTemplate et EventListener dérivés de ceux en service, webhook du fork limité à `custom/*` ;
+- `construire` : commit sur `custom/s5` par `poc-dev`, PipelineRun créé par le webhook ;
+- `porte` : la fonction `juger` de `politique.sh` est réutilisée telle quelle (extraite, pas copiée).
+
+**Prédictions** (écrites le 02/11/2026 à 14:21 UTC, avant toute exécution) :
+- `pipeline` : un seul paramètre `image` à changer ; écart limité au nom et au dépôt ; bundle publié ;
+- `installer` : EventListener `forgejo-sync` disponible et joignable depuis `sc-stockage` ; EventListener `forgejo` et gabarit `sample-app` de la 08 inchangés ;
+- `construire` : PipelineRun `sample-app-sync-<commit>` créé par le webhook, réussi, signé par Chains ; image dans `builds/sample-app-sync` ; **digest `3a7ca1b1`**, celui de l'image réelle de la 08 (arbre identique, construction reproductible), mais dans un autre dépôt ;
+- `porte` : image de la branche custom admise avec la source `workspace/sample-app-sync@<commit>` (horodatage compris, après au plus quelques minutes du CronJob) ; refusée avec la source `workspace/sample-app` ; **image réelle de la 08 toujours admise** avec sa source (la provenance de la branche custom est attachée à un autre dépôt).
 
 ## Jalon S6 : mesure sur Traefik (préparée le 02/11/2026, exécution après S3)
 
