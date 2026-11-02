@@ -1,0 +1,40 @@
+## LC_ALL=C, 2026-11-02T13:54:37Z, git version 2.53.0, Python 3.13.12
+test_bundle_rate_rattrape_au_run_suivant (test_sync.SyncTest.test_bundle_rate_rattrape_au_run_suivant) ... erreur : disque plein
+test_collision_branche_et_tag (test_sync.SyncTest.test_collision_branche_et_tag) ... FAIL
+test_config_globale_completee_par_depot (test_sync.SyncTest.test_config_globale_completee_par_depot) ... ok
+test_force_push_branche_non_protegee (test_sync.SyncTest.test_force_push_branche_non_protegee) ... ok
+test_force_push_protege_detecte_et_archive (test_sync.SyncTest.test_force_push_protege_detecte_et_archive) ... ok
+test_fork_mis_a_jour_sans_perte (test_sync.SyncTest.test_fork_mis_a_jour_sans_perte) ... ok
+test_motif_invalide_refuse_avant_git (test_sync.SyncTest.test_motif_invalide_refuse_avant_git) ... erreur : motif de ref propre invalide : 'a*b*'
+test_premier_run_puis_avance_rapide (test_sync.SyncTest.test_premier_run_puis_avance_rapide) ... ok
+test_protocole_file_refuse_sans_option (test_sync.SyncTest.test_protocole_file_refuse_sans_option) ... erreur : fetch --quiet : fatal: transport 'file' not allowed
+test_publication_vers_forgejo (test_sync.SyncTest.test_publication_vers_forgejo) ... ok
+test_refs_custom_jamais_touchees (test_sync.SyncTest.test_refs_custom_jamais_touchees) ... ok
+test_restauration_depuis_bundles_et_rapport (test_sync.SyncTest.test_restauration_depuis_bundles_et_rapport) ... ok
+test_rien_de_change (test_sync.SyncTest.test_rien_de_change) ... ok
+test_tag_deplace_tag_supprime_branche_supprimee (test_sync.SyncTest.test_tag_deplace_tag_supprime_branche_supprimee) ... ok
+Traceback (most recent call last):
+    self.assertEqual((fk["refs/heads/custom-1"], fk["refs/heads/paquet/deb"]), (self.a, self.a), "refs propres du fork intactes")
+AssertionError: Tuples differ: ('0d6ce582ba9d335140a446e9e3967447b727aa3a'[40 chars]a3a') != ('f527cb93a645dc5ece35a329efeb999ac8e25d04'[40 chars]d04')
+Ran 14 tests in 0.900s
+FAILED (failures=1)
+## LC_ALL=fr_FR.UTF-8, 2026-11-02T13:54:38Z, git version 2.53.0, Python 3.13.12
+test_bundle_rate_rattrape_au_run_suivant (test_sync.SyncTest.test_bundle_rate_rattrape_au_run_suivant) ... erreur : disque plein
+test_collision_branche_et_tag (test_sync.SyncTest.test_collision_branche_et_tag) ... FAIL
+test_config_globale_completee_par_depot (test_sync.SyncTest.test_config_globale_completee_par_depot) ... ok
+test_force_push_branche_non_protegee (test_sync.SyncTest.test_force_push_branche_non_protegee) ... ok
+test_force_push_protege_detecte_et_archive (test_sync.SyncTest.test_force_push_protege_detecte_et_archive) ... ok
+test_fork_mis_a_jour_sans_perte (test_sync.SyncTest.test_fork_mis_a_jour_sans_perte) ... ok
+test_motif_invalide_refuse_avant_git (test_sync.SyncTest.test_motif_invalide_refuse_avant_git) ... erreur : motif de ref propre invalide : 'a*b*'
+test_premier_run_puis_avance_rapide (test_sync.SyncTest.test_premier_run_puis_avance_rapide) ... ok
+test_protocole_file_refuse_sans_option (test_sync.SyncTest.test_protocole_file_refuse_sans_option) ... erreur : fetch --quiet : fatal: transport 'file' not allowed
+test_publication_vers_forgejo (test_sync.SyncTest.test_publication_vers_forgejo) ... ok
+test_refs_custom_jamais_touchees (test_sync.SyncTest.test_refs_custom_jamais_touchees) ... ok
+test_restauration_depuis_bundles_et_rapport (test_sync.SyncTest.test_restauration_depuis_bundles_et_rapport) ... ok
+test_rien_de_change (test_sync.SyncTest.test_rien_de_change) ... ok
+test_tag_deplace_tag_supprime_branche_supprimee (test_sync.SyncTest.test_tag_deplace_tag_supprime_branche_supprimee) ... ok
+Traceback (most recent call last):
+    self.assertEqual((fk["refs/heads/custom-1"], fk["refs/heads/paquet/deb"]), (self.a, self.a), "refs propres du fork intactes")
+AssertionError: Tuples differ: ('1aa5b1fb440572b91195129bc6aa2aa15e2a2771'[40 chars]771') != ('f438b56f7fa028dfcbe9cddc3918d3d238b04448'[40 chars]448')
+Ran 14 tests in 0.910s
+FAILED (failures=1)

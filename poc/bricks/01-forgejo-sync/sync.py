@@ -5,8 +5,15 @@ Modèle de refs du miroir (dépôt nu) :
   refs/upstream/heads/*, refs/upstream/tags/*  vue courante de l'amont ;
   refs/archive/<horodatage>/{heads,tags}/*     anciennes valeurs réécrites ou supprimées ;
   refs/sync/incoming/*                         zone de transit, vidée à chaque run ;
-  refs/sync/bundled/<ref>                      valeur de <ref> déjà mise en bundle.
+  refs/sync/bundled/<ref>                      valeur de <ref> déjà mise en bundle ;
+  refs/sync/fork/{heads,tags}/*                vue amont sans les refs propres, poussée au fork.
 Les autres refs (branches custom, par exemple) ne sont jamais touchées.
+
+Refs propres (--refs-propres, --projet) : branches et tags créés chez nous, désignés par
+des motifs globaux auxquels s'ajoutent ceux du projet. Ils vivent dans le fork
+(--fork), que la synchro met à jour sans jamais les écrire ni rien y supprimer. Une
+ref amont qui correspond à un motif est une collision : publiée dans le miroir,
+jamais propagée au fork.
 
 Chaque run écrit un rapport JSON (événements + état complet des refs) et, s'il y a
 de nouveaux objets, un bundle git incrémental. Les deux partent en archive WORM :
@@ -14,7 +21,7 @@ rejouer les bundles dans l'ordre puis appliquer les refs du dernier rapport
 reconstruit le miroir (voir --restore). Un bundle raté est rattrapé au run suivant.
 
 Codes de sortie : 0 = rien d'anormal ; 2 = réécriture amont détectée (force-push
-sur une branche protégée, tag déplacé ou supprimé) ; 1 = erreur.
+sur une branche sensible, tag déplacé ou supprimé, collision) ; 1 = erreur.
 """
 import argparse
 import datetime
@@ -29,9 +36,10 @@ from pathlib import Path
 UPSTREAM = "refs/upstream/"
 INCOMING = "refs/sync/incoming/"
 BUNDLED = "refs/sync/bundled/"
+FORK = "refs/sync/fork/"
 ARCHIVE = "refs/archive/"
-SCHEMA = "https://supply-chain.example/sync-report/v1"
-CRITICAL = {"force-push", "tag-moved", "tag-deleted"}
+SCHEMA = "https://supply-chain.example/sync-report/v2"
+CRITICAL = {"force-push", "tag-moved", "tag-deleted", "collision"}
 
 
 class GitError(Exception):
@@ -59,6 +67,29 @@ def is_ancestor(repo, old, new):
     return git(repo, "merge-base", "--is-ancestor", old, new, check=False).returncode == 0
 
 
+def own_patterns(path, project):
+    """Motifs des refs propres : globaux, plus ceux du projet (jamais moins).
+
+    Syntaxe commune à fnmatch et aux refspecs de git : au plus un `*`, ni `?` ni `[`.
+    """
+    conf = json.loads(Path(path).read_text()) if path else {}
+    out = {}
+    for kind in ("branches", "tags"):
+        pats = list(conf.get("global", {}).get(kind, []))
+        pats += [x for x in conf.get("depots", {}).get(project, {}).get(kind, []) if x not in pats]
+        for x in pats:
+            if not x or x.count("*") > 1 or any(c in x for c in "?[\\") or x.startswith("^"):
+                raise ValueError(f"motif de ref propre invalide : {x!r}")
+        out[kind] = pats
+    return out
+
+
+def is_own(name, own):
+    """`heads/x` ou `tags/x` désigne-t-il une ref propre ?"""
+    kind, short = ("tags", name[5:]) if name.startswith("tags/") else ("branches", name[6:])
+    return any(fnmatch.fnmatchcase(short, p) for p in own[kind])
+
+
 def classify(repo, name, old, new, protected):
     """Type d'événement pour une ref `heads/x` ou `tags/x` qui a changé."""
     tag = name.startswith("tags/")
@@ -84,9 +115,10 @@ def init_mirror(mirror):
         git(mirror, "config", "core.logAllRefUpdates", "always")
 
 
-def sync(mirror, url, stamp, protected, bundle_dir, push_url=None):
+def sync(mirror, url, stamp, protected, bundle_dir, push_url=None, own=None, fork_url=None):
     """Un run de synchronisation. Renvoie le rapport (dict)."""
-    report = {"schema": SCHEMA, "upstream": url, "stamp": stamp, "events": [],
+    own = own or {"branches": [], "tags": []}
+    report = {"schema": SCHEMA, "upstream": url, "stamp": stamp, "refs_propres": own, "events": [],
               "refs": {}, "bundle": None, "status": "ok", "error": None}
     init_mirror(mirror)
     # --prune ne s'applique qu'à la zone de transit : rien n'est supprimé ailleurs.
@@ -111,6 +143,9 @@ def sync(mirror, url, stamp, protected, bundle_dir, push_url=None):
             # La valeur attendue (o, ou zéro pour une création) protège des runs concurrents.
             tx.append(f"update {UPSTREAM}{name} {n} {o or '0' * len(n)}")
         report["events"].append(event)
+        if n is not None and is_own(name, own):
+            # Ref amont au nom d'une ref propre : publiée dans le miroir, jamais propagée au fork.
+            report["events"].append({"type": "collision", "ref": name, "old": o, "new": n, "archive": None})
     tx += [f"delete {INCOMING}{name} {sha}" for name, sha in new.items()]
 
     if tx:
@@ -124,6 +159,8 @@ def sync(mirror, url, stamp, protected, bundle_dir, push_url=None):
         report["bundle"] = write_bundle(mirror, stamp, report["refs"], bundle_dir)
         if push_url:
             push(mirror, push_url)
+        if fork_url:
+            update_fork(mirror, fork_url, own)
     except (GitError, OSError) as e:
         # Les refs sont déjà à jour : le rapport garde les événements, et le run
         # suivant reprend le bundle et la publication.
@@ -170,6 +207,25 @@ def push(mirror, push_url):
         f"{ARCHIVE}*:{ARCHIVE}*")
 
 
+def update_fork(mirror, fork_url, own):
+    """Met à jour le fork (workspace/<projet>) depuis la vue amont, sans rien perdre.
+
+    Pas de --prune : une branche supprimée amont reste dans le fork. Seule la vue
+    amont sans les refs propres est poussée (refs/sync/fork) : aucune ref propre
+    n'est écrite, même en cas de collision. Pas de refspec négatif : git 2.53 le
+    compare au nom de destination au push, pas à la source (mesuré le 02/11/2026).
+    Le --force suit les réécritures amont, dont l'ancienne valeur est archivée.
+    """
+    want = {k: v for k, v in refs(mirror, UPSTREAM).items() if not is_own(k, own)}
+    have = refs(mirror, FORK)
+    tx = [f"update {FORK}{k} {v}" for k, v in sorted(want.items()) if have.get(k) != v]
+    tx += [f"delete {FORK}{k} {v}" for k, v in sorted(have.items()) if k not in want]
+    if tx:
+        git(mirror, "update-ref", "--stdin", stdin="\n".join(tx) + "\n")
+    git(mirror, "push", "--quiet", "--force", fork_url,
+        f"{FORK}heads/*:refs/heads/*", f"{FORK}tags/*:refs/tags/*")
+
+
 def restore(target, bundles, report):
     """Reconstruit un miroir à partir des bundles (dans l'ordre) et du dernier rapport."""
     init_mirror(target)
@@ -190,8 +246,11 @@ def main(argv=None):
     p.add_argument("--report-dir", type=Path, required=True)
     p.add_argument("--bundle-dir", type=Path, required=True)
     p.add_argument("--push", help="URL du dépôt miroir dans Forgejo")
-    p.add_argument("--protected", nargs="*", default=["main", "master", "release*", "v*"],
+    p.add_argument("--fork", help="URL du fork (workspace/<projet>) à mettre à jour sans perte")
+    p.add_argument("--sensibles", nargs="*", default=["main", "master", "release*", "v*"],
                    help="branches dont un force-push est critique (motifs fnmatch)")
+    p.add_argument("--refs-propres", type=Path, help="configuration JSON des refs propres (global, depots)")
+    p.add_argument("--projet", help="nom du projet dans la configuration des refs propres")
     p.add_argument("--stamp", help="horodatage du run (tests) ; par défaut maintenant, en UTC")
     p.add_argument("--allow-file", action="store_true", help="autorise le protocole file (tests)")
     p.add_argument("--restore", type=Path, help="reconstruit un miroir à partir des bundles et du dernier rapport")
@@ -209,8 +268,9 @@ def main(argv=None):
 
     a.report_dir.mkdir(parents=True, exist_ok=True)
     try:
-        report = sync(a.mirror, a.upstream, stamp, a.protected, a.bundle_dir, a.push)
-    except GitError as e:
+        own = own_patterns(a.refs_propres, a.projet)
+        report = sync(a.mirror, a.upstream, stamp, a.sensibles, a.bundle_dir, a.push, own, a.fork)
+    except (GitError, OSError, ValueError) as e:
         report = {"schema": SCHEMA, "upstream": a.upstream, "stamp": stamp, "status": "error",
                   "error": str(e), "events": [], "refs": {}, "bundle": None}
     (a.report_dir / f"{stamp}.json").write_text(json.dumps(report, indent=2) + "\n")

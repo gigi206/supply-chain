@@ -60,7 +60,7 @@ Restauration (bundles rejoués dans l'ordre, puis refs du dernier rapport valide
 python3 -m unittest -v test_sync
 ```
 
-10 tests sur des dépôts git locaux, tous réussis (git 2.43, Python 3.13 ; puis sur le laptop : git 2.53, Python 3.15, locale `fr_FR.UTF-8`).
+10 tests sur des dépôts git locaux, tous réussis (14 depuis S1, voir plus bas) (git 2.43, Python 3.13 ; puis sur le laptop : git 2.53, Python 3.15, locale `fr_FR.UTF-8`).
 
 Sur le laptop, 3 tests ont d'abord échoué : `sync.py` reconnaît le refus d'un bundle vide au message de git (« empty bundle »), que git traduisait en français. Le run finissait donc en erreur au lieu de constater qu'il n'y avait rien à sauvegarder. Correctif : git est lancé avec `LC_ALL=C`. Les 10 tests passent sous `fr_FR.UTF-8` comme sous `C`.
 
@@ -77,7 +77,7 @@ Sur le laptop, 3 tests ont d'abord échoué : `sync.py` reconnaît le refus d'un
 | `test_publication_vers_forgejo` | Refs publiées (`heads`, `tags`, `archive`) ; branche supprimée amont retirée de `heads` mais conservée sous `archive` |
 | `test_protocole_file_refuse_sans_option` | Transport `file` refusé hors tests ; rapport d'erreur, code 1 |
 
-## Reste à faire sur le laptop (infra du PoC)
+## Reste à faire sur le laptop (infra du PoC ; protocole plus bas)
 
 - Vrai Forgejo : dépôt `mirror/<projet>` réservé au compte de synchronisation, jeton en secret Kubernetes, fork `workspace/<projet>` pour les branches custom ; **build d'une branche custom** par le pipeline (brique 08).
 - **Refs protégées configurables** (exigence du propriétaire du 30/10/2026, B7) : les branches et tags propres, absents de l'amont, ne sont jamais perdus par une synchro ; les refs à préserver se configurent globalement et par dépôt git, le motif n'est pas imposé (par exemple `custom-*`). Proposé, à valider avec le propriétaire : configuration par dépôt qui complète ou remplace la globale, portée miroir et fork, traitement des collisions ci-dessous. État vérifié dans le code le 30/10/2026 :
@@ -89,3 +89,125 @@ Sur le laptop, 3 tests ont d'abord échoué : `sync.py` reconnaît le refus d'un
 - CronJob Kubernetes, métrique « dernière synchronisation réussie » pour l'alerte « miroir en retard de plus de 24 h » (brique 19).
 - Mesure sur **Traefik** (durée, taille du premier bundle et des bundles incrémentaux).
 - Signature des rapports et des bundles, puis archivage WORM (briques 09 et 15).
+
+## Protocole sur le laptop (proposé le 02/11/2026 ; D1 et D2 tranchées par le propriétaire le même jour)
+
+Brique choisie par le propriétaire le 02/11/2026, après la clôture de la brique 08, dont elle réutilise le cluster (Forgejo 15.0.11 sur `sc-stockage`, CA du PoC, Tekton, Chains, porte). Rien n'est implémenté avant l'accord sur ce protocole ; chaque jalon est ensuite soumis à accord, comme en 08.
+
+**Effort** : 1 pw pour toute la brique (README racine) ; le temps de la partie locale n'a pas été relevé. Décision avec le propriétaire à 2 pw. Le temps est relevé jalon par jalon dans `resultats/chrono.tsv`, ouvert à l'accord.
+
+### Décisions du propriétaire (02/11/2026)
+
+- **Refs propres (B7) : la configuration d'un dépôt complète la configuration globale.** Les motifs du dépôt s'ajoutent aux motifs globaux ; aucun dépôt ne peut retirer une protection globale.
+- **Collision** (une branche ou un tag amont correspond à un motif de ref propre) : **événement critique** (code 2), ref amont publiée dans `mirror/<projet>` comme les autres, **jamais propagée** vers le fork `workspace/<projet>`, où la ref propre reste intacte.
+- **D1 (a) : synchro par un timer systemd sur `sc-stockage`** (voir plus bas).
+- **D2 (b) : branche custom buildée par un déclencheur et un gabarit séparés pour `workspace/sample-app-sync`**, chemin de `sample-app` inchangé (voir plus bas).
+
+### Deux notions à ne pas confondre
+
+| Notion | Rôle | Aujourd'hui |
+|---|---|---|
+| **Branches sensibles** | Un force-push amont sur elles est critique (code 2) | Option `--protected` (`main`, `master`, `release*`, `v*`) |
+| **Refs propres (B7)** | Branches et tags créés chez nous, absents de l'amont, jamais perdus par une synchro | Rien : à concevoir (jalon S1) |
+
+L'option `--protected` sera renommée (`--sensibles`, par exemple) pour lever l'ambiguïté ; le schéma du rapport passe en `v2` si un champ change.
+
+### Contrainte : ne pas toucher à `workspace/sample-app`
+
+`workspace/sample-app` est l'ancre des rejeux de la 08 : commit fixe `6391fd43…` recréé à chaque rejeu, `TETE_J2`, tests 3, 5 et 7, rattrapage (tête de `main`), filtre CEL du déclencheur (`refs/heads/main` et `workspace/sample-app` en dur, [`webhook.yaml`](../08-trust-plane/tekton/webhook.yaml), [`declencheurs.yaml`](../08-trust-plane/politique/declencheurs.yaml)) et source attendue par la porte. En faire un fork d'un miroir casserait les invariants de rejeu d'une brique close. La synchro travaille donc sur des **projets distincts** :
+
+- **`sample-app-sync`** (nom proposé) : amont simulé `amont-essai/sample-app` sur le même Forgejo (mêmes sources que `poc/sample-app`), miroir `mirror/sample-app`, fork `workspace/sample-app-sync`. Il sert aux tests négatifs (force-push, tag déplacé, collision) et à la branche custom buildée ;
+- **Traefik** : amont `https://github.com/traefik/traefik.git`, miroir `mirror/traefik`, fork `workspace/traefik`. Il sert à la mesure ; il n'est pas construit (phase 4).
+
+**Limite du PoC** : l'amont simulé vit sur le Forgejo de la zone Sources, alors qu'un vrai amont est extérieur. On ne peut pas force-pousser sur GitHub, et c'est le seul moyen de rejouer une réécriture amont. L'organisation `amont-essai` a son propre compte d'écriture, distinct du compte de synchro.
+
+### Décisions à prendre avant les jalons concernés
+
+**D1. Où tourne la synchro.** **(a) retenue par le propriétaire le 02/11/2026** : timer systemd sur `sc-stockage`.
+
+| Option | Pour | Contre |
+|---|---|---|
+| **(a) Timer systemd sur `sc-stockage`** (comme Forgejo et Zot) | git 2.47.3 déjà installé par apt (versions épinglées) ; python3 de Debian 13 (présent pour cloud-init, à vérifier en S3) ; aucune image à construire ou à faire confiance ; jeton en fichier 0600 dans la VM ; sortie NAT existante ; unité durcie (`systemd-analyze security`, comme Forgejo) | Pas de CronJob Kubernetes, contrairement à ce qu'annonçait cette brique ; la métrique passe par un fichier, pas par kube-state-metrics ; le code amont non fiable (objets git) est traité sur la VM de Forgejo et de Zot (atténué par `transfer.fsckObjects`, hooks désactivés, compte système dédié) |
+| **(b) CronJob dans un espace `sources`**, `nodeSelector zone=stockage` | Conforme à l'annonce ; `kube_cronjob_status_last_successful_time` gratuit pour la 19 | Il faut une image python3 + git **épinglée et vérifiable** : signature amont non vérifiée à ce jour ; à défaut, image construite par la plateforme (nouvelle pipeline, hors estimation) ; jeton en Secret Kubernetes (lisible par les cinq lecteurs de tout le cluster, mesurés en 08) ; sortie vers GitHub sous Cilium : `toFQDNs` est impossible (L7 coupé, [`valeurs.yaml`](../08-trust-plane/cilium/valeurs.yaml)), il faudrait des `ipBlock` sur les plages publiées par GitHub, qui changent |
+
+Vérifié pour (b) : seule la règle Kyverno `pods-isolation` (pas de privilège, de `hostPath`, de `hostNetwork`) s'appliquerait à un nouvel espace ; `zone-confiance` et `zone-build` visent des espaces nommés, et Pod Security est en `privileged` par défaut, chaque espace gardant ses labels.
+
+**D2. Branche custom buildée.** **(b) retenue par le propriétaire le 02/11/2026.**
+
+| Option | Contenu | Coût |
+|---|---|---|
+| **(a) Élargir le chemin de `sample-app`** | Filtre CEL, rattrapage et source de la porte étendus aux branches custom des forks | Rouvre la 08 : nouveau rejeu de J1 à J8, ADR 0000 et 0001 et doc 03 à reprendre. Hors de 1 pw |
+| **(b) Déclencheur et gabarit séparés pour `workspace/sample-app-sync`** (retenue) | Même pipeline signée `sample-app` ; nouveau Trigger dans l'EventListener (filtre : dépôt `workspace/sample-app-sync`, `refs/heads/custom/*`), même anti-rejeu, porte avec la source attendue de ce dépôt ; chemin de `sample-app` inchangé | Le paramètre `depot` du gabarit existe déjà (`$(tt.params.depot)`), à vérifier dans la pipeline ; rattrapage : à étendre ou à exclure explicitement, à décider en S5 |
+
+**D3. Contrat de la métrique (S3).** Un run qui détecte une réécriture (code 2) **est une synchro réussie** : sinon l'alerte « miroir en retard » se confondrait avec l'alerte de réécriture. Proposé : un fichier au format texte de Prometheus, `sync.prom`, réécrit atomiquement à chaque run, sans dépendre de Prometheus (la 19 choisira comment le lire, par exemple le collecteur textfile de node_exporter) :
+
+| Métrique | Sens |
+|---|---|
+| `sync_derniere_reussite_timestamp_seconds{projet}` | Fin du dernier run de statut `ok` ou `rewrite-detected` |
+| `sync_derniere_reecriture_timestamp_seconds{projet}` | Dernier run de statut `rewrite-detected` |
+| `sync_dernier_run_statut{projet,statut}` | 1 pour le statut du dernier run, 0 pour les autres |
+
+### Jalons
+
+| # | Jalon | Contenu | Contrôle de fin |
+|---|---|---|---|
+| **S1** | B7 hors cluster | `sync.py` : configuration globale et par dépôt (fichier versionné, motifs `fnmatch` sur les branches et sur les tags), refspecs négatifs au push vers `mirror/` (`^refs/heads/<motif>`, git ≥ 2.29), mise à jour du fork sans `--prune` qui exclut les motifs de refs propres, collision ; renommage de `--protected` | Nouveaux tests `test_sync.py`, tous réussis avec les 10 anciens, sous `C` et `fr_FR.UTF-8` (liste ci-dessous) |
+| **S2** | Forgejo | Organisations `mirror`, `workspace` (existe), `amont-essai` ; compte `poc-sync` (jeton limité à `write:repository`), seul à écrire dans `mirror/*` (équipe de l'organisation) ; protection de branches et de tags de Forgejo sur les motifs de refs propres du fork, sans `poc-sync` dans la liste blanche (défense en profondeur) ; fork `workspace/sample-app-sync` par l'API | Push d'un autre compte non administrateur vers `mirror/` refusé (journal de Forgejo) ; `poc-sync` refusé sur une ref propre du fork ; comportement de `poc-admin` face à une branche protégée **mesuré**, pas supposé |
+| **S3** | Exécution | Selon D1 ; métrique de D3 ; jeton jamais en argument ; contrôle `fuites.sh` | Deux runs planifiés successifs sans intervention ; `sync.prom` cohérent avec les rapports ; aucun secret dans les journaux des trois VM |
+| **S4** | Tests négatifs sur le vrai Forgejo | Sur `amont-essai/sample-app` : force-push de `main`, tag déplacé, tag supprimé, branche supprimée, collision sur une branche et sur un tag ; ref propre créée dans le fork | Codes et événements attendus ; archives présentes dans `mirror/` ; refs propres du fork intactes après chaque run ; restauration identique depuis bundles et rapports |
+| **S5** | Branche custom buildée | Selon D2 : push sur `custom/<nom>` de `workspace/sample-app-sync` → PipelineRun → image, provenance signée, porte | Provenance dont la source est `workspace/sample-app-sync` au commit de la branche custom ; admise par la porte ; même commit sur `main` du fork non construit par ce chemin |
+| **S6** | Mesure sur Traefik | Premier run et runs incrémentaux depuis GitHub | Durée, taille du premier bundle et des incréments, espace disque de `sc-stockage` avant et après |
+
+**Tests à ajouter en S1** : tag propre ; motif `custom-*` et un autre motif configuré ; configuration par dépôt qui s'ajoute à la globale (un motif global ne peut pas être retiré) ; collision amont sur une branche et sur un tag (code 2, pas de propagation au fork) ; mise à jour du fork sans perte (ref propre intacte, branches amont mises à jour) ; push vers `mirror/` qui ne supprime pas une ref absente de l'amont désignée par un motif ; restauration d'un miroir local qui porte une ref propre (aujourd'hui non restaurée : à corriger ou à documenter).
+
+### Points à vérifier en cours de brique (non supposés)
+
+- Refspecs négatifs combinés à `--prune` sur le push de git 2.47.3 (côté `sc-stockage`) et 2.53 (hôte) : une ref exclue n'est-elle vraiment pas supprimée ?
+- Protection des tags et des branches par motif dans Forgejo 15.0.11, et son effet sur un push `--force` de l'administrateur.
+- Fork dans la même instance : objets partagés ou copiés, et effet sur l'espace disque.
+- **Espace de `sc-stockage`** (20 Go, Zot en `gc: false`) : à mesurer avant S6 ; taille de Traefik à relever avant le premier run, pas à supposer. Si l'espace manque : miroir local et bundles sur l'hôte, ou disque agrandi (accord du propriétaire).
+- Sortie vers `github.com` depuis `sc-stockage` (D1 a) : NAT existant ; filtrage de la sortie par nftables dans la VM à décider en S3.
+
+### Hors périmètre
+
+Signature des rapports et des bundles (brique 09) et archivage WORM (brique 15) ; build de Traefik (phase 4) ; observabilité (brique 19, qui lira la métrique de D3).
+
+### Prédictions (écrites le 02/11/2026, avant toute mesure)
+
+- S1 : les refspecs négatifs suffisent pour que `push --prune` épargne les refs propres de `mirror/` ; aucun changement de format des bundles.
+- S2 : Forgejo refuse le push d'un compte hors de l'équipe de `mirror` (HTTP 403 dans le journal) ; l'administrateur passe outre la protection de branche (à mesurer).
+- S4 : mêmes événements et codes que les 10 tests locaux, sur le vrai Forgejo.
+- S6 : premier run de Traefik en minutes, pas en heures ; incréments de quelques Mo par jour (ordre de grandeur, à mesurer).
+
+## Jalon S1 : refs propres (B7) hors cluster (accord du propriétaire du 02/11/2026)
+
+**Conception retenue avant le code** (02/11/2026, 13:53 UTC) :
+- configuration en JSON versionné, `{"global": {"branches": [...], "tags": [...]}, "depots": {"<projet>": {...}}}`, choisie par `--refs-propres <fichier> --projet <nom>` ; motifs du dépôt **ajoutés** aux globaux ; motifs limités à la syntaxe commune à `fnmatch` et aux refspecs de git (au plus un `*`, ni `?` ni `[`), sinon erreur ;
+- `--protected` renommé `--sensibles` ; schéma du rapport `v2` (champ `refs_propres` : motifs appliqués ; événement `collision`) ;
+- **collision** : une ref amont créée ou modifiée qui correspond à un motif donne un événement `collision`, critique (code 2), en plus de son événement ordinaire ;
+- **publication vers `mirror/` inchangée** (`--force --prune`) : un refspec négatif exclurait aussi la ref amont en collision, que la décision du propriétaire publie dans `mirror/`. Le protocole prévoyait des refspecs négatifs à cet endroit : écart assumé, `mirror/` reste la copie exacte de l'amont plus les archives, et aucune ref propre n'y vit (droits de Forgejo, S2) ;
+- **mise à jour du fork** (`--fork <url>`) : `--force` sans `--prune`, avec un refspec négatif par motif (`^refs/upstream/heads/<motif>`, `^refs/upstream/tags/<motif>`) : refs propres jamais écrites, branches supprimées amont jamais supprimées du fork. **Remplacé après le premier passage** (voir les résultats) par un espace de transit `refs/sync/fork/`, qui ne porte que la vue amont sans les refs propres ;
+- refs propres du miroir local : préservées (déjà testé) mais non restaurées ; elles vivent dans le fork, couvert par la sauvegarde (brique 12). Documenté, pas corrigé.
+
+**Prédictions** (écrites à 13:53 UTC, avant le premier passage ; git 2.53.0, Python 3.13.12 sur l'hôte) :
+- les 10 tests existants passent après le renommage, sans autre modification que `--protected` ;
+- un refspec négatif à glob exclut bien les refs sources de `git push` (git ≥ 2.29), et un `push --force` sans `--prune` laisse intactes les refs du fork absentes de la source ;
+- un motif à deux `*` est refusé par le script avant tout appel à git ;
+- tous les nouveaux tests passent au premier passage, sous `C` comme sous `fr_FR.UTF-8`.
+
+**Résultats** (02/11/2026, 13:54 à 13:56 UTC).
+
+- **Premier passage** ([`s1-tests-premier-passage.log`](resultats/s1-tests-premier-passage.log)) : 13 tests sur 14 réussis, sous `C` comme sous `fr_FR.UTF-8`. `test_collision_branche_et_tag` échoue : la mise à jour du fork **écrase les refs propres** `custom-1` et `paquet/deb` avec la valeur amont en collision. Contraire à la prédiction sur ce point.
+- **Cause, mesurée** ([`essai-refspec-negatif.sh`](essai-refspec-negatif.sh), [`s1-refspec-negatif.log`](resultats/s1-refspec-negatif.log)) : avec git 2.53.0, au push, un refspec négatif écrit sur le nom **source** (`^refs/upstream/heads/custom-*`, à glob ou exact) n'exclut rien ; écrit sur le nom **de destination** (`^refs/heads/custom-*`), il exclut. La prédiction supposait la source.
+- **Correctif** : plus de refspec négatif. `update_fork` tient à jour `refs/sync/fork/{heads,tags}/*`, copie de la vue amont **sans les refs propres** (transaction `update-ref --stdin`), et pousse ce seul espace (`--force`, sans `--prune`). Le comportement ne dépend plus de la façon dont une version de git interprète un refspec négatif ; le git 2.47.3 de `sc-stockage` sera mesuré par le même script en S3.
+- **Second passage** ([`s1-tests.log`](resultats/s1-tests.log)) : **14 tests sur 14 réussis**, sous `C` et sous `fr_FR.UTF-8` (git 2.53.0, Python 3.13.12). Les 10 anciens passent sans autre modification que le renommage de l'option.
+- Autres prédictions confirmées : motifs invalides (`a*b*`, `v?`, `[ab]`, `^x`, vide) refusés avant tout appel à git (aucun miroir créé) ; fork sans `--prune` : branche supprimée amont gardée.
+
+| Nouveau test | Vérifie |
+|---|---|
+| `test_config_globale_completee_par_depot` | Motifs du projet ajoutés aux globaux ; projet absent ou inconnu : globaux seuls ; sans fichier : aucun motif |
+| `test_motif_invalide_refuse_avant_git` | Code 1, rapport d'erreur, aucun appel à git |
+| `test_fork_mis_a_jour_sans_perte` | `main` du fork avancé ; branche supprimée amont gardée ; branches et tag propres intacts ; motifs appliqués dans le rapport |
+| `test_collision_branche_et_tag` | Collisions sur `custom-1`, `paquet/deb` (motif du projet) et le tag `custom-2` : code 2, publiées dans le miroir, refs propres du fork intactes, tag absent du fork ; `autre-1` (motif d'un autre projet) propagée ; avance rapide amont d'une ref en collision : de nouveau code 2, fork inchangé |
+
+**Temps** : relevé dans [`chrono.tsv`](resultats/chrono.tsv), ouvert avec S1 (le temps de la partie locale, antérieure, n'y figure pas).

@@ -189,6 +189,79 @@ class SyncTest(unittest.TestCase):
         fj = self.mirror_refs(self.forgejo, ("refs/",))
         self.assertEqual(set(fj), {"refs/heads/main", "refs/tags/v1.0.0", f"refs/archive/{self.stamp}/heads/old"})
 
+    # Refs propres (B7, décisions du propriétaire du 02/11/2026) : motifs du projet ajoutés aux globaux ;
+    # collision critique, publiée dans le miroir, jamais propagée au fork.
+    def config(self, conf):
+        path = Path(self.tmp.name) / "refs-propres.json"
+        path.write_text(json.dumps(conf))
+        return path
+
+    def b7(self):
+        return self.config({"global": {"branches": ["custom-*"], "tags": ["custom-*"]},
+                            "depots": {"p": {"branches": ["paquet/*"]}, "q": {"branches": ["autre-*"]}}})
+
+    def fork(self, *refs_a):
+        sh(Path(self.tmp.name), "init", "--quiet", "--bare", str(self.forgejo))
+        fork = Path(self.tmp.name) / "fork.git"
+        sh(Path(self.tmp.name), "init", "--quiet", "--bare", str(fork))
+        sh(self.up, "push", "--quiet", f"file://{fork}", *(f"{self.a}:{r}" for r in refs_a))
+        return fork
+
+    def test_config_globale_completee_par_depot(self):
+        c = self.b7()
+        self.assertEqual(sync.own_patterns(c, "p"), {"branches": ["custom-*", "paquet/*"], "tags": ["custom-*"]})
+        self.assertEqual(sync.own_patterns(c, None), {"branches": ["custom-*"], "tags": ["custom-*"]})
+        self.assertEqual(sync.own_patterns(c, "inconnu"), sync.own_patterns(c, None))
+        self.assertEqual(sync.own_patterns(None, None), {"branches": [], "tags": []})
+
+    def test_motif_invalide_refuse_avant_git(self):
+        for motif in ("a*b*", "v?", "[ab]", "^x", ""):
+            c = self.config({"global": {"branches": [motif]}})
+            code, rep = self.run_sync("--refs-propres", str(c))
+            self.assertEqual((code, rep["status"]), (1, "error"), motif)
+            self.assertIn("motif de ref propre invalide", rep["error"])
+        self.assertFalse(self.mirror.exists(), "aucun appel à git")
+
+    def test_fork_mis_a_jour_sans_perte(self):
+        fork = self.fork("refs/heads/custom-1", "refs/heads/paquet/deb", "refs/tags/custom-1")
+        sh(self.up, "branch", "old")
+        opts = ("--refs-propres", str(self.b7()), "--projet", "p", "--fork", f"file://{fork}")
+        self.assertEqual(self.run_sync(*opts)[0], 0)
+        sh(self.up, "branch", "-D", "old")
+        b = self.commit("B")
+        code, rep = self.run_sync(*opts)
+        self.assertEqual(code, 0)
+        self.assertEqual(rep["refs_propres"], {"branches": ["custom-*", "paquet/*"], "tags": ["custom-*"]})
+        fk = self.mirror_refs(fork, ("refs/",))
+        self.assertEqual(fk, {"refs/heads/main": b, "refs/heads/old": self.a, "refs/tags/v1.0.0": sh(self.up, "rev-parse", "v1.0.0"),
+                              "refs/heads/custom-1": self.a, "refs/heads/paquet/deb": self.a, "refs/tags/custom-1": self.a},
+                         "branche amont supprimée gardée, refs propres intactes")
+
+    def test_collision_branche_et_tag(self):
+        fork = self.fork("refs/heads/custom-1", "refs/heads/paquet/deb")
+        opts = ("--refs-propres", str(self.b7()), "--projet", "p", "--push", f"file://{self.forgejo}", "--fork", f"file://{fork}")
+        self.run_sync(*opts)
+        c = self.commit("C amont")
+        for r in ("refs/heads/custom-1", "refs/heads/paquet/deb", "refs/heads/autre-1"):
+            sh(self.up, "update-ref", r, c)
+        sh(self.up, "tag", "custom-2")
+        code, rep = self.run_sync(*opts)
+        self.assertEqual((code, rep["status"]), (2, "rewrite-detected"))
+        self.assertEqual({r for t, r in self.events(rep) if t == "collision"},
+                         {"heads/custom-1", "heads/paquet/deb", "tags/custom-2"}, "autre-1 est propre au projet q seulement")
+        fj = self.mirror_refs(self.forgejo, ("refs/heads/", "refs/tags/"))
+        self.assertEqual((fj["refs/heads/custom-1"], fj["refs/tags/custom-2"]), (c, c), "collision publiée dans le miroir")
+        fk = self.mirror_refs(fork, ("refs/",))
+        self.assertEqual((fk["refs/heads/custom-1"], fk["refs/heads/paquet/deb"]), (self.a, self.a), "refs propres du fork intactes")
+        self.assertNotIn("refs/tags/custom-2", fk)
+        self.assertEqual(fk["refs/heads/autre-1"], c)
+        d = self.commit("D")
+        sh(self.up, "update-ref", "refs/heads/custom-1", d)  # avance rapide amont de la ref en collision
+        code, rep = self.run_sync(*opts)
+        self.assertEqual(code, 2)
+        self.assertIn(("collision", "heads/custom-1"), self.events(rep))
+        self.assertEqual(self.mirror_refs(fork, ("refs/heads/custom-1",)), {"refs/heads/custom-1": self.a})
+
     def test_protocole_file_refuse_sans_option(self):
         code, rep = self.run_sync(allow_file=False)
         self.assertEqual((code, rep["status"]), (1, "error"))
