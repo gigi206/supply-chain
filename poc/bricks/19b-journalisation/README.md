@@ -326,3 +326,12 @@ Limites :
 - résidu dans Zot : `essais-19b/temoin`, trois étiquettes (une par passage), que `poc-ecriture` ne peut pas supprimer ;
 - les témoins J2 passent par `kubectl exec`, dont ceux dans l'agent Cilium privilégié de `kube-system` ;
 - pare-feu par NetworkPolicies à faire après validation (décision du propriétaire).
+
+## D18 : battement de cœur ; retenue par le propriétaire le 02/11/2026 (« Oui, D18 »). L5, préparé à sec
+
+- **Unités** : [`systemd/battement-19b.service`](systemd/battement-19b.service) et [`systemd/battement-19b.timer`](systemd/battement-19b.timer). Une ligne `logger -t battement-19b` par minute, sous un compte dynamique, sans réseau.
+- **Étapes** (`JALON=l5`) :
+  - `battement` : installation sur les trois VM ;
+  - `silences` : après au moins 12 min, plus long silence par nœud dans Loki, minimum de l'expression de `SourceMuette` depuis l'installation, état de l'alerte ;
+  - puis un nouvel essai de `muette`.
+- Prédictions : [`l5-predictions.md`](resultats/l5-predictions.md).

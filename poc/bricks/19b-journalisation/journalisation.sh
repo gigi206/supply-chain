@@ -617,4 +617,34 @@ etape_muette() { # Alloy de sc-stockage arrêté sur sc-build pendant au moins 8
   rm -f "${W:?}/graf.out"
 }
 
-case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; *) lancer l1 L1 "$@" ;; esac
+# ---------------------------------------------------------------------------------------------------------------- L5 (D18)
+etape_battement() { # timer battement-19b sur les trois VM ; puis, après au moins 12 min, aucun silence de 5 min par nœud
+  local v
+  for v in sc-confiance sc-build sc-stockage; do
+    copier "$v" /tmp/battement-19b "$here/systemd/battement-19b.service" "$here/systemd/battement-19b.timer"
+    sur "$v" "sudo install -m 0644 /tmp/battement-19b/battement-19b.service /tmp/battement-19b/battement-19b.timer /etc/systemd/system/ \
+      && rm -rf /tmp/battement-19b && sudo systemctl daemon-reload && sudo systemctl enable --now battement-19b.timer 2>&1 | tail -1 \
+      && systemctl is-active battement-19b.timer"
+  done
+}
+
+etape_silences() { # depuis l'installation du battement (premier argument du journal : ACTIVATION, horodatage) : plus long silence
+  # par nœud dans Loki, valeur minimale de l'expression de SourceMuette, état de l'alerte
+  local debut
+  debut=$(sur sc-build "systemctl show -p ActiveEnterTimestamp --value battement-19b.timer" | xargs -I{} date -u -d "{}" +%s)
+  echo "battement actif depuis $(date -u -d "@$debut" +%H:%M:%S), relevé à $(date -u +%H:%M:%S)"
+  for v in sc-confiance sc-build sc-stockage; do
+    lki controle /loki/api/v1/query_range -G --data-urlencode "query=sum(count_over_time({noeud=\"$v\"}[1m]))" \
+      --data-urlencode "start=$((debut + 60))" --data-urlencode "end=$(date +%s)" --data-urlencode step=60 >/dev/null
+    jq -r --arg v "$v" '[.data.result[0].values[] | .[0]] as $t | ($t | length) as $n
+      | "\($v) : \($n) minutes avec au moins une ligne, plus long silence \(if $n < 2 then "?" else ([range(1; $n) | ($t[.] - $t[. - 1]) / 60 - 1] | max) end) min"' "$W/lki.out"
+    lki controle /loki/api/v1/query -G --data-urlencode "query=sum(count_over_time({noeud=\"$v\", source=\"journal\", unite=\"battement-19b.service\"}[10m]))" >/dev/null
+    echo "  battements des 10 dernières minutes : $(jq -r '.data.result[0].value[1] // 0' "$W/lki.out")"
+  done
+  echo "minimum de increase(…[5m]) par nœud depuis l'installation (Prometheus, pas de 30 s) :"
+  prom "min_over_time(label_replace(sum by (component_id) (increase(loki_source_api_entries_written{job=\"alloy\", component_id=~\"loki.source.api.(confiance|build)\"}[5m])), \"noeud\", \"sc-\$1\", \"component_id\", \"loki.source.api.(.*)\")[$(( $(date +%s) - debut - 300 ))s:30s])"
+  echo "SourceMuette : $(alerte_etat SourceMuette)"
+  rm -f "${W:?}/lki.out" "${W:?}/lki.err"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; l5) lancer l5 L5 "$@" ;; *) lancer l1 L1 "$@" ;; esac

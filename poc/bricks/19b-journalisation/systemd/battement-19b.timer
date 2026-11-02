@@ -1,0 +1,11 @@
+# Brique 19b, D18 : une ligne par minute.
+[Unit]
+Description=Battement de cœur de la collecte des journaux, chaque minute (brique 19b)
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=1min
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

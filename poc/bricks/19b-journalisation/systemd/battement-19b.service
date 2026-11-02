@@ -1,0 +1,14 @@
+# Brique 19b, D18 du propriétaire (02/11/2026) : battement de cœur, une ligne par minute dans le journal de la VM. Alloy la
+# transmet comme toute ligne du journal ; SourceMuette signifie alors « chaîne de collecte rompue », pas « nœud calme ».
+[Unit]
+Description=Battement de cœur de la collecte des journaux (brique 19b)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/logger -t battement-19b "battement %H"
+DynamicUser=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateNetwork=true
