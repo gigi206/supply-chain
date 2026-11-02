@@ -1,4 +1,6 @@
-# Brique 01 : synchronisation des miroirs (partie locale)
+# Brique 01 : synchronisation des miroirs
+
+**Statut (02/11/2026)** : partie locale validée ; **seuil atteint sur l'infra du PoC** (S2 à S5 : branche custom construite par la plateforme, force-push amont détecté et archivé dans `mirror/`, bundles exportés et restauration identique) ; mesure sur Traefik faite (S6). Restent ouverts : la périodicité du timer observée sur un run horaire, les incréments quotidiens de Traefik, la protection `custom/a/b` côté Forgejo (décision du propriétaire), la signature des rapports et des bundles et l'archivage WORM (briques 09 et 15). **Temps** : environ 2 h 15 le 02/11/2026 (13:10 à 15:23 UTC, protocole et préparation compris, pendant et après le rejeu `enchainement` de la 08 ; [`chrono.tsv`](resultats/chrono.tsv) et heures des commits), pour une estimation de 1 pw (décision à 2 pw) ; le temps de la partie locale, antérieure, n'a pas été relevé.
 
 Seuil (README, brique 01) : branche custom buildée ; force-push amont détecté et archivé ; `git bundle` exporté.
 
@@ -77,18 +79,18 @@ Sur le laptop, 3 tests ont d'abord échoué : `sync.py` reconnaît le refus d'un
 | `test_publication_vers_forgejo` | Refs publiées (`heads`, `tags`, `archive`) ; branche supprimée amont retirée de `heads` mais conservée sous `archive` |
 | `test_protocole_file_refuse_sans_option` | Transport `file` refusé hors tests ; rapport d'erreur, code 1 |
 
-## Reste à faire sur le laptop (infra du PoC ; protocole plus bas)
+## Reste à faire sur le laptop (liste d'origine, avant le protocole ; état au 02/11/2026 entre crochets)
 
-- Vrai Forgejo : dépôt `mirror/<projet>` réservé au compte de synchronisation, jeton en secret Kubernetes, fork `workspace/<projet>` pour les branches custom ; **build d'une branche custom** par le pipeline (brique 08).
-- **Refs protégées configurables** (exigence du propriétaire du 30/10/2026, B7) : les branches et tags propres, absents de l'amont, ne sont jamais perdus par une synchro ; les refs à préserver se configurent globalement et par dépôt git, le motif n'est pas imposé (par exemple `custom-*`). Proposé, à valider avec le propriétaire : configuration par dépôt qui complète ou remplace la globale, portée miroir et fork, traitement des collisions ci-dessous. État vérifié dans le code le 30/10/2026 :
+- [Fait en S2 et S5] Vrai Forgejo : dépôt `mirror/<projet>` réservé au compte de synchronisation, jeton en secret Kubernetes, fork `workspace/<projet>` pour les branches custom ; **build d'une branche custom** par le pipeline (brique 08).
+- [Fait en S1 et S2, sauf la protection à plusieurs niveaux côté Forgejo] **Refs protégées configurables** (exigence du propriétaire du 30/10/2026, B7) : les branches et tags propres, absents de l'amont, ne sont jamais perdus par une synchro ; les refs à préserver se configurent globalement et par dépôt git, le motif n'est pas imposé (par exemple `custom-*`). Proposé, à valider avec le propriétaire : configuration par dépôt qui complète ou remplace la globale, portée miroir et fork, traitement des collisions ci-dessous. État vérifié dans le code le 30/10/2026 :
   - miroir local : seules `refs/upstream/*`, `refs/archive/*` et `refs/sync/*` sont écrites, toute autre ref est préservée. Le test ne couvre que `refs/heads/custom/*` et `refs/notes/*` : ni tag, ni autre motif, ni configuration. Les bundles et la restauration ne portent que `upstream` et `archive` : une ref propre du miroir local ne serait pas restaurée ;
   - publication vers `mirror/<projet>` : `git push --force --prune` des branches et des tags (`push()`) supprimerait toute branche ou tout tag absent de l'amont. Une ref propre ne doit donc pas y vivre, ou doit être exclue du prune par un refspec négatif ;
   - mise à jour du fork `workspace/<projet>` depuis le miroir : pas encore conçue. Elle ne doit ni supprimer ni écraser une ref protégée (pas de `--prune`, refspec qui exclut les motifs protégés) ;
   - collision : une branche ou un tag amont qui correspond à un motif protégé est aujourd'hui publié tel quel dans `mirror/`. Proposé : événement critique dans le rapport, aucune propagation vers le fork ;
   - tests à ajouter : tag protégé, motif `custom-*` et autre motif configuré, configuration par dépôt, collision amont sur une branche et sur un tag, mise à jour du fork sans perte.
-- CronJob Kubernetes, métrique « dernière synchronisation réussie » pour l'alerte « miroir en retard de plus de 24 h » (brique 19).
-- Mesure sur **Traefik** (durée, taille du premier bundle et des bundles incrémentaux).
-- Signature des rapports et des bundles, puis archivage WORM (briques 09 et 15).
+- [Fait en S3, par un timer systemd (D1) au lieu d'un CronJob ; période horaire pas encore observée] CronJob Kubernetes, métrique « dernière synchronisation réussie » pour l'alerte « miroir en retard de plus de 24 h » (brique 19).
+- [Fait en S6, sauf les incréments quotidiens] Mesure sur **Traefik** (durée, taille du premier bundle et des bundles incrémentaux).
+- [Ouvert] Signature des rapports et des bundles, puis archivage WORM (briques 09 et 15).
 
 ## Protocole sur le laptop (proposé le 02/11/2026 ; D1 et D2 tranchées par le propriétaire le même jour)
 
@@ -380,3 +382,15 @@ En production, chaque projet aura sa pipeline et son dépôt d'images : (ii) en 
 ### Accords et ordre d'exécution
 
 Le rejeu `enchainement` de la 08 est analysé et commité avant toute action sur Forgejo. Accords : **S2** (préparation et exécution après le rejeu) accordé le 02/11/2026 ; **S3** installe un compte système et des unités sur `sc-stockage` : accord à demander ; **S4** suit S3 ; **S5** attend le choix entre (i) et (ii) ; **S6** attend son accord. Les jalons ne s'enchaînent pas d'un seul tenant.
+
+### Rejouer la brique 01 après un rejeu de la 08
+
+Un rejeu de la 08 recrée les VM : Forgejo, Zot, le cluster et l'état de la synchro dans `sc-stockage` repartent de zéro, alors que l'hôte garde `~/.cache/supply-chain-poc/01` et les jetons de `…/08/secrets`. Séquence (lue dans le code le 02/11/2026, pas encore rejouée) :
+
+1. `mise run synchro:forgejo -- comptes organisations amont miroir archives fork protections refus bout_en_bout` : `comptes` recrée les comptes absents et leurs jetons ; `miroir` voit une VM sans état, met de côté l'ancien état de l'hôte (`…/01/anciens/<horodatage>`) et repart d'un miroir neuf ; `refus` trouve un fork neuf ;
+2. `mise run synchro:executeur -- installer essai planifie refspec fuites` : reprise du nouvel état de l'hôte dans la VM ;
+3. `mise run synchro:forgejo -- negatifs` ;
+4. `mise run synchro:declencheur -- pipeline installer construire porte` (après la bascule de la 08 ; `custom/s5` part de `main` sur un fork neuf) ;
+5. `mise run synchro:forgejo -- traefik`.
+
+Garde-fou : la synchro depuis l'hôte (`miroir`, `archives`, `bout_en_bout`) est refusée tant que la VM a un état pour le projet (S3 installé).

@@ -101,11 +101,23 @@ journal() { # depuis : requêtes git de Forgejo depuis cette date (VM), sans adr
     | sed 's/ for 192.168.161.1:[0-9]*,/,/; s/ in [0-9.]*ms @.*//' || true
 }
 synchro() { # options de sync.py… : un run depuis l'hôte, jeton de poc-sync limité à mirror/ et au fork ; code renvoyé
-  local r=0 v
+  local r=0 v a
   # Après executeur.sh installer, la VM est seule propriétaire de l'état : un miroir neuf sur l'hôte pousserait
-  # refs/archive/* avec --prune et retirerait de mirror/ les archives créées par la VM.
+  # refs/archive/* avec --prune et retirerait de mirror/ les archives créées par la VM. Le garde-fou lit l'état réel de la VM.
+  if sur sc-stockage "sudo test -d /var/lib/synchro/$PROJET/miroir.git"; then
+    echo "KO   état de $PROJET dans la VM (S3) : synchro depuis l'hôte refusée" >&2; exit 1
+  fi
+  # VM sans état (rejeu de la 08) : l'ancien état de l'hôte (miroir passé à la VM, rapports, bundles) est mis de côté,
+  # pour que le nouveau miroir, la restauration et la métrique ne mélangent pas deux historiques.
   for v in "$D1/miroirs/$PROJET.git".passe-a-la-vm-*; do
-    [ ! -e "$v" ] || { echo "KO   état passé à la VM (${v##*/}) : synchro depuis l'hôte refusée" >&2; exit 1; }
+    [ -e "$v" ] || continue
+    a=$D1/anciens/$(date -u +%Y%m%dT%H%M%SZ)
+    mkdir -p "$a/miroirs" "$a/rapports" "$a/bundles"
+    mv "$D1/miroirs/$PROJET.git"* "$a/miroirs/"
+    [ ! -d "$D1/rapports/$PROJET" ] || mv "$D1/rapports/$PROJET" "$a/rapports/"
+    [ ! -d "$D1/bundles/$PROJET" ] || mv "$D1/bundles/$PROJET" "$a/bundles/"
+    echo "ancien état de l'hôte mis de côté : ${a#"$HOME"/}"
+    break
   done
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 \
     GIT_CONFIG_COUNT=3 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
@@ -374,14 +386,15 @@ EOF
 
 # S6 : Traefik depuis GitHub, par le service de la VM (S3) ; durées, bundles et espace disque.
 run_traefik() { # libellé : un run de synchro@traefik ; durée (horodatages de systemd), code, événements, bundle
-  local u=synchro@traefik.service d0 d1 c f
+  local u=synchro@traefik.service d c f
   sur sc-stockage "sudo systemctl start $u" || { echo "KO   échec de l'unité $u" >&2; sur sc-stockage "sudo journalctl -u $u -n 20 -o cat" >&2; exit 1; }
-  d0=$(sur sc-stockage "systemctl show -p ExecMainStartTimestampMonotonic --value $u")
-  d1=$(sur sc-stockage "systemctl show -p ExecMainExitTimestampMonotonic --value $u")
+  # Durée lue dans le journal de l'unité (dernier Starting et dernier Finished) : la différence des horodatages
+  # ExecMain*Monotonic avait donné « 0 s » pour un run de 52 s (02/11/2026).
+  d=$(sur sc-stockage "sudo journalctl -u $u -o short-unix -n 200" | awk '/Starting synchro@/ {s = $1} /Finished synchro@/ {f = $1} END {printf "%.1f", f - s}')
   c=$(sur sc-stockage "systemctl show -p ExecMainStatus --value $u")
   f=$(sur sc-stockage "sudo sh -c 'ls -1 /var/lib/synchro/traefik/rapports/*.json | tail -1'")
   sur sc-stockage "sudo cat $f" > "$T/rapport.json"
-  echo "$1 : code $c, $(( (d1 - d0) / 1000000 )) s ; $(jq -c '{status, evenements: (.events | group_by(.type) | map({(.[0].type): length}) | add),
+  echo "$1 : code $c, $d s (journal de l'unité) ; $(jq -c '{status, evenements: (.events | group_by(.type) | map({(.[0].type): length}) | add),
     bundle: (if .bundle then {fichier: .bundle.file, refs: (.bundle.refs | length), prerequis: (.bundle.prerequisites | length)} else null end)}' "$T/rapport.json")"
   [ -z "$(jq -r '.bundle.file // empty' "$T/rapport.json")" ] \
     || echo "  taille du bundle : $(sur sc-stockage "sudo stat -c %s /var/lib/synchro/traefik/bundles/$(jq -r .bundle.file "$T/rapport.json")") octets"
