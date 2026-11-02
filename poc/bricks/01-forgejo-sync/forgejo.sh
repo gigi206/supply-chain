@@ -398,7 +398,7 @@ etape_traefik() {
     && echo "OK   master de mirror/traefik = master de GitHub" || echo "MESURE master de GitHub a pu avancer pendant le run"
   existe /repos/workspace/traefik || api poc-admin POST /repos/mirror/traefik/forks '{"organization": "workspace", "name": "traefik"}' >/dev/null
   for _ in $(seq 60); do [ -n "$(distant workspace/traefik refs/heads/master)" ] && break; sleep 2; done
-  sur sc-stockage "sudo sed -i 's#^FORK=\$#FORK=https://sc-stockage.poc.test:3000/workspace/traefik.git#' /etc/synchro/traefik.env && grep ^FORK= /etc/synchro/traefik.env"
+  sur sc-stockage "sudo sed -i 's#^FORK=\$#FORK=https://192.168.161.13:3000/workspace/traefik.git#' /etc/synchro/traefik.env && grep ^FORK= /etc/synchro/traefik.env"
   id=$(equipe workspace synchro write false poc-sync)
   api poc-admin PUT "/teams/$id/repos/workspace/traefik" >/dev/null
   run_traefik "second run (avec fork, incrément depuis le premier)"

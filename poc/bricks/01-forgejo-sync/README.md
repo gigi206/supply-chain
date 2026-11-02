@@ -280,6 +280,19 @@ Script : [`executeur.sh`](executeur.sh), étapes `installer essai planifie refsp
 - `planifie` : deux runs planifiés en moins de 5 min, sans intervention ; période d'une heure rétablie après la mesure ;
 - `refspec` : avec git 2.47.3, même comportement qu'avec 2.53.0 (négatif comparé à la destination), prédiction faible ; sans effet sur `sync.py`, qui n'en dépend plus.
 
+**Résultats** (02/11/2026, 14:46 à 15:09 UTC, accord du propriétaire ; journaux `resultats/executeur-<étape>.log`) :
+
+- **Passages archivés** :
+  - [`executeur-installer-premier-passage.log`](resultats/executeur-installer-premier-passage.log) et [`executeur-essai-premier-passage.log`](resultats/executeur-essai-premier-passage.log) : dans la VM, **`sc-stockage.poc.test` pointe vers `127.0.1.1`** (`/etc/hosts`), où Forgejo n'écoute pas ; le run échoue (« Failed to connect »), rapport d'erreur gardé dans la VM. Le contrôle « résolu dans la VM » était trop faible (adresse non vérifiée), contrairement à la prédiction. Corrigé : URL par l'adresse `192.168.161.13` (dans le certificat de Forgejo), et contrôle d'installation par une vraie connexion à l'URL configurée ;
+  - [`executeur-planifie-premier-passage.log`](resultats/executeur-planifie-premier-passage.log) : un seul run planifié en 10 min. Cause mesurée (`TimersMonotonic`) : **une affectation vide de n'importe quelle option `On…Sec` vide la liste de tous les déclencheurs** ; le drop-in faisait deux remises à zéro, la seconde (`OnBootSec=`) retirait `OnUnitActiveSec=2min`. Corrigé : une seule remise à zéro, en premier ;
+  - [`executeur-planifie-deuxieme-passage.log`](resultats/executeur-planifie-deuxieme-passage.log) : aucun run. **`systemctl enable --now` ne redémarre pas un timer déjà actif** : resté `elapsed`, il ignorait le drop-in corrigé (`NextElapseUSecMonotonic=infinity`). Corrigé : `restart` explicite.
+- `installer` : Python 3.13.5 et git 2.47.3 de la VM, aucun paquet ajouté ; `sync.py` installé identique ; état de S2 repris de l'hôte ; `systemd-analyze security` : **3.0 « OK »**, comme Forgejo. Conforme sauf la résolution (ci-dessus).
+- `essai` : run réussi pour systemd, statut `ok` sans événement (état de S2 repris), métrique cohérente (dernière réécriture = bout en bout de S2, 14:43:25 UTC) ; jeton absent du journal de l'unité. Conforme.
+- **Continuité vérifiée** : après les runs de la VM, `mirror/sample-app` garde l'archive de S2 (`refs/archive/20261102T144237Z/heads/essai/archive`), et la branche `essai-s2-admin` créée par l'administrateur en S2 a été élaguée, comme prédit.
+- `planifie` ([`executeur-planifie.log`](resultats/executeur-planifie.log)) : deux runs déclenchés par le timer sans intervention (15:08:27, au redémarrage, la période étant déjà écoulée ; 15:08:37, `OnActiveSec`). **Mesure plus faible que prévu** : la période de 2 min elle-même n'est pas observée. Période d'une heure rétablie : prochain run annoncé à 16:13:08 UTC (1 h après le dernier, plus le délai aléatoire), à vérifier dans le journal de l'unité.
+- `refspec` ([`executeur-refspec.log`](resultats/executeur-refspec.log)) : avec git 2.47.3, même comportement qu'avec 2.53.0 (négatif comparé au nom de destination) ; conforme à la prédiction faible ; sans effet sur `sync.py`.
+- `fuites` ([`fuites-synchro-s3.log`](resultats/fuites-synchro-s3.log)) : aucun secret dans les journaux des trois VM, jeton de `poc-sync` compris.
+
 ## Jalon S4 : tests négatifs sur le vrai Forgejo (préparé le 02/11/2026, exécution après S3)
 
 Étape `negatifs` de [`forgejo.sh`](forgejo.sh) : `poc-amont` réécrit l'amont d'essai, puis chaque fois un run du service `synchro@sample-app-sync` de la VM (S3) ; contrôle du code (`ExecMainStatus`), du rapport, de l'archive publiée dans `mirror/`, du fork, puis restauration dans la VM.

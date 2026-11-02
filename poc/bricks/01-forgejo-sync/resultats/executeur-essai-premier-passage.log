@@ -1,0 +1,9 @@
+# executeur.sh essai, 2026-11-02T14:46:37Z
+Job for synchro@sample-app-sync.service failed because the control process exited with error code.
+See "systemctl status synchro@sample-app-sync.service" and "journalctl -xeu synchro@sample-app-sync.service" for details.
+systemctl start : code 1 ; résultat de l'unité : exit-code 1
+Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+erreur : fetch --quiet : fatal: unable to access 'https://sc-stockage.poc.test:3000/amont-essai/sample-app.git/': Failed to connect to sc-stockage.poc.test port 3000 after 0 ms: Could not connect to server
+synchro@sample-app-sync.service: Main process exited, code=exited, status=1/FAILURE
+synchro@sample-app-sync.service: Failed with result 'exit-code'.
+Failed to start synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).

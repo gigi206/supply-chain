@@ -1,0 +1,5 @@
+# executeur.sh refspec, 2026-11-02T15:08:30Z
+git version 2.47.3
+négatif sur la source (^refs/upstream/heads/custom-*) : custom-1 écrasée
+négatif sur la source, nom exact (^refs/upstream/heads/custom-1) : custom-1 écrasée
+négatif sur la destination (^refs/heads/custom-*) : custom-1 épargnée

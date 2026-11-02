@@ -61,7 +61,15 @@ EOF
   sur sc-stockage "sudo ls -l /usr/local/lib/synchro /etc/synchro /etc/synchro/secrets /var/lib/synchro/$PROJET"
   [ "$(sur sc-stockage "sudo sha256sum /usr/local/lib/synchro/sync.py" | cut -d' ' -f1)" = "$(sha256sum "$here/sync.py" | cut -d' ' -f1)" ] \
     && echo "OK   sync.py installé identique à celui du dépôt" || { echo "KO   sync.py différent" >&2; exit 1; }
-  sur sc-stockage "getent hosts sc-stockage.poc.test" && echo "OK   sc-stockage.poc.test résolu dans la VM" || { echo "KO   résolution de sc-stockage.poc.test" >&2; exit 1; }
+  # Connexion réelle à l'URL configurée, avec la CA du PoC (une résolution de nom ne suffit pas : dans la VM,
+  # sc-stockage.poc.test pointe vers 127.0.1.1, où Forgejo n'écoute pas ; mesuré le 02/11/2026).
+  sur sc-stockage "getent hosts sc-stockage.poc.test"
+  sur sc-stockage "sudo bash -s" <<EOF || { echo "KO   Forgejo injoignable depuis la VM à l'URL configurée" >&2; exit 1; }
+set -euo pipefail
+. /etc/synchro/$PROJET.env
+curl -fsS -o /dev/null --cacert /etc/synchro/ca-poc.crt "\$MIROIR/info/refs?service=git-upload-pack"
+echo "OK   Forgejo joignable depuis la VM : \$MIROIR"
+EOF
   sur sc-stockage "systemd-analyze security $U.service 2>/dev/null | tail -1"
 }
 
@@ -86,9 +94,13 @@ etape_planifie() {
   sur sc-stockage "sudo bash -s" <<EOF
 set -euo pipefail
 install -d /etc/systemd/system/$U.timer.d
-printf '[Timer]\nOnUnitActiveSec=\nOnUnitActiveSec=2min\nRandomizedDelaySec=0\nOnBootSec=\nOnActiveSec=10s\n' > /etc/systemd/system/$U.timer.d/mesure.conf
+# Une affectation vide de n'importe quelle option On…Sec vide la liste de tous les déclencheurs (mesuré le 02/11/2026 : une
+# seconde remise à zéro, OnBootSec=, avait retiré OnUnitActiveSec=2min) : une seule remise à zéro, en premier.
+printf '[Timer]\nOnActiveSec=\nOnActiveSec=10s\nOnUnitActiveSec=2min\nRandomizedDelaySec=0\n' > /etc/systemd/system/$U.timer.d/mesure.conf
 systemctl daemon-reload
-systemctl enable --now $U.timer
+# enable --now ne redémarre pas un timer déjà actif : resté « elapsed », il ignore le drop-in (mesuré le 02/11/2026).
+systemctl enable $U.timer
+systemctl restart $U.timer
 EOF
   t0=$(sur sc-stockage "date '+%Y-%m-%d %H:%M:%S'")
   echo "timer activé à $t0 (période de mesure : 2 min)"

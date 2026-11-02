@@ -1,0 +1,7 @@
+# executeur.sh planifie, 2026-11-02T14:47:18Z
+Created symlink '/etc/systemd/system/timers.target.wants/synchro@sample-app-sync.timer' -> '/etc/systemd/system/synchro@.timer'.
+timer activé à 2026-11-02 14:47:18 (période de mesure : 2 min)
+2026-11-02T14:47:29+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-02T14:47:29+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
+2026-11-02T14:47:29+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+KO   1 run(s) planifié(s) en 10 min

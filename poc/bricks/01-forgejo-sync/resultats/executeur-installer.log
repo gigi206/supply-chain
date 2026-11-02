@@ -1,0 +1,30 @@
+# executeur.sh installer, 2026-11-02T14:47:10Z
+Python 3.13.5
+git version 2.47.3
+état de la VM existant : gardé
+/etc/synchro:
+total 16
+-rw-r--r-- 1 root root  765 Nov  2 14:47 ca-poc.crt
+-rw-r--r-- 1 root root  138 Nov  2 14:47 refs-propres.json
+-rw-r--r-- 1 root root  469 Nov  2 14:47 sample-app-sync.env
+drwx------ 2 root root 4096 Nov  2 14:47 secrets
+
+/etc/synchro/secrets:
+total 4
+-rw------- 1 root root 41 Nov  2 14:47 poc-sync.token
+
+/usr/local/lib/synchro:
+total 20
+-rw-r--r-- 1 root root 15865 Nov  2 14:47 sync.py
+-rwxr-xr-x 1 root root  1329 Nov  2 14:47 synchro.sh
+
+/var/lib/synchro/sample-app-sync:
+total 16
+drwxrwxr-x 2 synchro synchro 4096 Nov  2 14:43 bundles
+drwxrwxr-x 7 synchro synchro 4096 Nov  2 14:43 miroir.git
+drwxrwxr-x 2 synchro synchro 4096 Nov  2 14:46 rapports
+-rw-r----- 1 synchro synchro  803 Nov  2 14:46 sample-app-sync.prom
+OK   sync.py installé identique à celui du dépôt
+127.0.1.1       sc-stockage.poc.test sc-stockage
+OK   Forgejo joignable depuis la VM : https://192.168.161.13:3000/mirror/sample-app.git
+-> Overall exposure level for synchro@sample-app-sync.service: 3.0 OK :-)

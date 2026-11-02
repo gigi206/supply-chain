@@ -1,0 +1,15 @@
+# executeur.sh essai, 2026-11-02T14:47:11Z
+systemctl start : code 0 ; résultat de l'unité : success 0
+OK   run réussi (code 0 ou 2, SuccessExitStatus)
+rapport 20261102T144711Z.json
+{"status":"ok","events":[],"bundle":null}
+sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793630831
+sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793630605
+sync_dernier_run_statut{projet="sample-app-sync",statut="ok"} 1
+sync_dernier_run_statut{projet="sample-app-sync",statut="rewrite-detected"} 0
+sync_dernier_run_statut{projet="sample-app-sync",statut="error"} 0
+## journal de l'unité
+Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+synchro@sample-app-sync.service: Deactivated successfully.
+Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+OK   jeton absent du journal de l'unité
