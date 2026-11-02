@@ -50,7 +50,8 @@ etape_pipeline() {
   echo "pipeline en service : $src"
   [ "$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value')" = sample-app ] \
     || { echo "KO   gabarit en service sans la pipeline sample-app (bascule de J8 attendue)" >&2; exit 1; }
-  SSL_CERT_FILE=$P/ca-poc.crt tkn bundle list "$src" pipeline sample-app -o json > "$T/source.json"
+  # Lu depuis l'hôte : Zot par REG_HOTE (adresse IP), le nom vu des pods ne se résout pas sur l'hôte.
+  SSL_CERT_FILE=$P/ca-poc.crt tkn bundle list "${src/#$REG/$REG_HOTE}" pipeline sample-app -o json > "$T/source.json"
   # Dérivée : nom et dépôt d'image changés ; signature retirée avant la nouvelle.
   jq --arg a "$IMAGE_08" --arg b "$IMAGE_S5" --arg n "$PROJET" '.metadata.name = $n | del(.metadata.annotations["tekton.dev/signature"])
     | .spec.tasks |= map(if .params then .params |= map(if .name == "image" and .value == $a then .value = $b else . end) else . end)' "$T/source.json" > "$T/derivee.json"
@@ -72,7 +73,13 @@ etape_pipeline() {
 etape_installer() {
   local ref url
   ref=$(cat "$R/s5-pipeline.ref")
-  [ -s "$S/forgejo-webhook-sync.secret" ] || (umask 077 && openssl rand -hex 32 > "$S/forgejo-webhook-sync.secret")
+  # Sans saut de ligne, comme le secret de la 08 (tekton.sh) : Forgejo signe avec la valeur sans saut de ligne, le Secret
+  # en garderait un (premier passage du 02/11/2026 : « payload signature check failed »).
+  [ -s "$S/forgejo-webhook-sync.secret" ] || (umask 077 && openssl rand -hex 32 | tr -d '\n' > "$S/forgejo-webhook-sync.secret")
+  if [ "$(tail -c1 "$S/forgejo-webhook-sync.secret" | od -An -tx1 | tr -d ' ')" = 0a ]; then
+    (umask 077 && tr -d '\n' < "$S/forgejo-webhook-sync.secret" > "$S/forgejo-webhook-sync.secret.n") && mv "$S/forgejo-webhook-sync.secret.n" "$S/forgejo-webhook-sync.secret"
+    echo "secret du webhook normalisé (saut de ligne final retiré)"
+  fi
   kubectl create secret generic forgejo-webhook-sync -n "$EL_NS" --from-file=secret="$S/forgejo-webhook-sync.secret" \
     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   kubectl get triggertemplate -n "$EL_NS" sample-app -o json | jq --arg n "$PROJET" --arg r "$ref" '{apiVersion, kind,
@@ -93,7 +100,7 @@ etape_installer() {
   echo "EventListener forgejo-sync joignable par Forgejo : $url"
   for id in $(api GET "/repos/$FORK/hooks" | jq -r '.[].id'); do api DELETE "/repos/$FORK/hooks/$id" >/dev/null; done
   jq -n --arg u "$url" --rawfile s "$S/forgejo-webhook-sync.secret" '{type: "forgejo", active: true, events: ["push"], branch_filter: "custom/*",
-    config: {url: $u, content_type: "json", secret: ($s | rtrimstr("\n"))}}' > "$T/auth/hook.json"
+    config: {url: $u, content_type: "json", secret: $s}}' > "$T/auth/hook.json"
   api POST "/repos/$FORK/hooks" "$T/auth/hook.json" | jq -c '{id, type, active, events, branch_filter, url: .config.url}'
   rm -f "$T/auth/hook.json"
   echo "## EventListener et gabarit de la 08, inchangés"
@@ -107,13 +114,15 @@ etape_construire() {
   rm -rf "$T/w"
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
     git clone -q "$FORGEJO_HOTE/$FORK.git" "$T/w"
+  # Branche protégée contre le force-push : le commit part de custom/s5 si elle existe (avance rapide), de main sinon.
+  if git -C "$T/w" rev-parse -q --verify "refs/remotes/origin/$BRANCHE" >/dev/null; then git -C "$T/w" checkout -q "origin/$BRANCHE"; fi
   git -C "$T/w" -c user.name="PoC brique 01" -c user.email=poc-dev@poc.test -c commit.gpgsign=false commit -q --allow-empty -m "branche custom (S5)"
   c=$(git -C "$T/w" rev-parse HEAD)
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=http.sslCAInfo GIT_CONFIG_VALUE_0="$P/ca-poc.crt" \
     GIT_CONFIG_KEY_1="http.$FORGEJO_HOTE/$FORK.git.extraHeader" GIT_CONFIG_VALUE_1="$(cat "$T/auth/entete-dev")" \
     git -C "$T/w" push -q "$FORGEJO_HOTE/$FORK.git" "HEAD:refs/heads/$BRANCHE"
   rm -f "$T/auth/entete-dev"
-  echo "commit $c poussé sur $BRANCHE par poc-dev (arbre identique à main du fork)"
+  echo "commit $c poussé sur $BRANCHE par poc-dev (arbre : $(git -C "$T/w" rev-parse "HEAD^{tree}" | cut -c1-12), main du fork : $(git -C "$T/w" rev-parse "origin/main^{tree}" | cut -c1-12))"
   pr=$PROJET-$c
   for _ in $(seq 60); do kubectl get pipelinerun -n builds "$pr" >/dev/null 2>&1 && break; sleep 2; done
   kubectl get pipelinerun -n builds "$pr" >/dev/null 2>&1 && echo "OK   PipelineRun $pr créé par le webhook" || { echo "KO   aucun PipelineRun $pr" >&2; exit 1; }

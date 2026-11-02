@@ -1,0 +1,4 @@
+# declencheur.sh pipeline, 2026-11-02T15:13:47Z
+pipeline en service : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:3666986119099b27cb7b90e58e6371c3196aeec4201edc9fd811bcbfec8e0c33
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+Error: failed to fetch image: Get "https://sc-stockage.poc.test:5000/v2/": dial tcp: lookup sc-stockage.poc.test on 127.0.0.53:53: read udp 127.0.0.1:36625->127.0.0.53:53: i/o timeout

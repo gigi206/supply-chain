@@ -1,0 +1,11 @@
+# declencheur.sh construire, 2026-11-02T15:17:34Z
+remote: 
+remote: Create a new pull request for 'workspace:custom/s5':        
+remote:   https://sc-stockage.poc.test:3000/mirror/sample-app/compare/main...workspace:custom/s5        
+remote: 
+commit 1599e311314d672453b8b3fc053cd854cec530d0 poussé sur custom/s5 par poc-dev (arbre : 30e808ffa327, main du fork : 30e808ffa327)
+OK   PipelineRun sample-app-sync-1599e311314d672453b8b3fc053cd854cec530d0 créé par le webhook
+image : sc-stockage.poc.test:5000/builds/sample-app-sync@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   image publiée dans builds/sample-app-sync, pas dans builds/sample-app
+OK   PipelineRun signé par Chains
+MESURE digest sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : celui de l'image réelle de la 08 (arbre identique, construction reproductible)

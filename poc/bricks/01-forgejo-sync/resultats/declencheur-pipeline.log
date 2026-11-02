@@ -1,0 +1,8 @@
+# declencheur.sh pipeline, 2026-11-02T15:14:30Z
+pipeline en service : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:3666986119099b27cb7b90e58e6371c3196aeec4201edc9fd811bcbfec8e0c33
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   un seul paramètre image = sc-stockage.poc.test:5000/builds/sample-app dans la pipeline source
+OK   écart avec la pipeline en service : nom et dépôt d'image seulement
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app-sync@sha256:a4d543e2b2aba22c849d1aacaea11538f434744b5f2d23333d9f83a7fd7f9c3b
+[{"name":"preparer","bundle":"sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4"},{"name":"construire","bundle":"sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63"},{"name":"publier","bundle":"sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b"}]

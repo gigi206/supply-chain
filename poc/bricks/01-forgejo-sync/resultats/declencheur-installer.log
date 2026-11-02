@@ -1,0 +1,8 @@
+# declencheur.sh installer, 2026-11-02T15:17:28Z
+secret du webhook normalisé (saut de ligne final retiré)
+{"name":"sample-app-sync-push","filtre":"body.ref.startsWith('refs/heads/custom/') && body.repository.full_name == 'workspace/sample-app-sync' && body.after.matches('^[0-9a-f]{40}$')","secret":{"secretKey":"secret","secretName":"forgejo-webhook-sync"},"template":{"ref":"sample-app-sync"}}
+EventListener forgejo-sync joignable par Forgejo : http://192.168.161.11:31264
+{"id":4,"type":"forgejo","active":true,"events":["push"],"branch_filter":"custom/*","url":"http://192.168.161.11:31264"}
+## EventListener et gabarit de la 08, inchangés
+{"triggers":[{"name":"sample-app-push","template":"sample-app"}]}
+OK   gabarit sample-app de la 08 toujours sur sa pipeline
