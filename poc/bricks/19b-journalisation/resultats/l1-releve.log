@@ -1,0 +1,144 @@
+# journalisation.sh releve, 2026-11-02T20:36:47Z
+## sc-stockage : ressources
+2
+               total        used        free      shared  buff/cache   available
+Mem:            5931        1060         572           2        4595        4870
+/dev/vda1        20G  6.4G   13G  35% /
+Filesystem      Size  Used Avail Use% Mounted on
+9.6M	/var/lib/prometheus
+## journald, dernière heure (octets de la sortie JSON, lignes ; dix unités les plus bavardes)
+### sc-confiance
+   4776 6135961
+Archived and active journals take up 40.8M in the file system.
+    2188  k3s.service
+    1688  init.scope
+     613  systemd-networkd.service
+     126  kernel
+      58  user@1000.service
+      24  systemd-logind.service
+      20  ssh.service
+      14  session-117.scope
+      11  session-110.scope
+      11  session-114.scope
+### sc-build
+   2028 3385372
+Archived and active journals take up 24M in the file system.
+     624  k3s-agent.service
+     488  cri-containerd-bed8916dfe871f42b0534d426f30dd818b8638e023705860328e96e5befa4965.scope
+     488  cri-containerd-de581d4b917245445e6eabd3418f79e3fd0db54e15b1f10cfd6e546a09fb574a.scope
+     225  init.scope
+      59  systemd-networkd.service
+      58  user@1000.service
+      18  systemd-logind.service
+      14  kernel
+      14  ssh.service
+      11  session-77.scope
+### sc-stockage
+  16841 25271924
+Archived and active journals take up 115.4M in the file system.
+   11517  zot.service
+    1272  systemd-logind.service
+    1245  ssh.service
+    1032  init.scope
+     368  forgejo.service
+     336  user@1000.service
+     238  sshd-session
+      59  prometheus.service
+      11  session-1531.scope
+       9  recepteur-alertes.service
+## journaux de pods depuis 2026-11-02T19:36:47 UTC (lignes CRI horodatées ; octets et lignes par espace, sur chaque nœud)
+### sc-confiance
+   3863238 o    3431 lignes  tekton-pipelines
+    941062 o    2538 lignes  kube-system
+    220811 o     368 lignes  tekton-chains
+    135048 o     418 lignes  tsa
+     70453 o      28 lignes  porte
+     47354 o     114 lignes  kyverno
+     23997 o     171 lignes  horodatage
+     19711 o      44 lignes  tekton-pipelines-resolvers
+     17609 o     115 lignes  openbao
+      3802 o      15 lignes  declencheurs
+31M	/var/log/pods
+### sc-build
+    109258 o     221 lignes  kube-system
+2.0M	/var/log/pods
+## événements Kubernetes
+1114
+    532 horodatage
+    367 declencheurs
+    154 builds
+     36 porte
+     13 openbao
+     12 kube-system
+## audits existants
+### serveur k3s (ligne de commande et configuration)
+/etc/rancher/k3s/pod-security.yaml:16:      audit: privileged
+/etc/rancher/k3s/pod-security.yaml:17:      audit-version: latest
+/etc/rancher/k3s/audit-policy.yaml:1:# Brique 08 : journal d'audit de l'API (trace du test négatif 3, modification d'un status).
+/etc/rancher/k3s/audit-policy.yaml:3:apiVersion: audit.k8s.io/v1
+/etc/rancher/k3s/config.yaml:18:  - audit-policy-file=/etc/rancher/k3s/audit-policy.yaml
+/etc/rancher/k3s/config.yaml:19:  - audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log
+/etc/rancher/k3s/config.yaml:20:  - audit-log-maxage=30
+/etc/rancher/k3s/config.yaml:21:  - audit-log-maxbackup=10
+/etc/rancher/k3s/config.yaml:22:  - audit-log-maxsize=100
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - RequestReceived
+rules:
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+      - system:serviceaccount:tekton-chains:tekton-chains-controller
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets"]
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets", "serviceaccounts"]
+  - level: None
+    verbs: ["get", "list", "watch"]
+  - level: None
+    resources:
+      - group: "coordination.k8s.io"
+        resources: ["leases"]
+  - level: Metadata
+total 145256
+-rw------- 1 root root 104857582 Nov  2 18:13 audit-2026-11-02T18-13-29.427.log
+-rw------- 1 root root  43873866 Nov  2 20:36 audit.log
+  dernière heure : 13697 événements, 18850292 o
+### OpenBao (devices d'audit)
+{
+  "fichier/": {
+    "type": "file",
+    "description": "Journal d'audit sur le volume persistant (valeurs sensibles en HMAC)",
+    "options": {
+      "file_path": "/openbao/data/audit.log"
+    },
+    "local": false,
+    "path": "fichier/"
+  }
+}
+-rw-------    1 openbao  openbao    4744307 Nov  2 20:36 /openbao/data/audit.log
+3605
+/dev/vda1                14.6G      6.6G      7.3G  48% /openbao/config
+### Zot (section log de la configuration)
+{"level": "info", "audit": "/var/log/zot/audit.log"}
+## CLA de Grafana Labs (fichiers du dépôt, branche par défaut)
+  grafana/grafana : #### Contributor License Agreement (CLA)
+  grafana/loki : aucune mention dans CONTRIBUTING.md (racine)
+  grafana/alloy : curl: (22) The requested URL returned error: 404
+aucune mention dans CONTRIBUTING.md (racine)
+  contrôles de la dernière PR fermée (statut license/cla attendu) :
+    grafana/grafana PR 136787 : license/cla, Test Patches (event), policy-bot: main, policy-bot, Meticulous Tests, Meticulous Checks
+    grafana/loki PR 26127 : license/cla, deploy_preview
+    grafana/alloy PR 7613 : license/cla
+  workflows dont le nom évoque un CLA :
+    grafana/grafana : 
+    grafana/loki : claude-code-review.yml, claude.yml
+    grafana/alloy : 

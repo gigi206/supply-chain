@@ -1,0 +1,17 @@
+# journalisation.sh telecharger, 2026-11-02T20:35:38Z
+  169396336 alloy-linux-amd64.zip
+  482249373 grafana_13.3.0_40412481033_linux_amd64.tar.gz
+  46293622 loki-linux-amd64.zip
+loki-linux-amd64.zip: OK
+alloy-linux-amd64.zip: OK
+grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
+## Grafana : empreinte relue dans l'API grafana.com au moment du téléchargement
+  cec8f98cc59bc1a1945833b652371a073be678c5c159a9b1695ad63c04fae5a7
+## attestations de release GitHub (gh release verify-asset)
+  alloy : Calculated digest for alloy-linux-amd64.zip: sha256:50d23af2d0f98c00beac6ce9a365693e60f87fb76b6cad6fe1d161e80588af6d
+  alloy : Resolved tag v1.21.3 to sha1:f2108cd783accbd491b24843484c33abba6da52a
+  alloy : Loaded attestation from GitHub API
+  alloy : 
+  alloy : ✓ Verification succeeded! alloy-linux-amd64.zip is present in release v1.21.3
+  loki : no attestations found for tag v3.7.9 (sha1:d3b4a2f76bfc5625abee7ceb00b8896fa3c31549)
+  loki : ÉCHEC

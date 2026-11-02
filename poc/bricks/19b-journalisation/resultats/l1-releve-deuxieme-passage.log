@@ -1,0 +1,110 @@
+# journalisation.sh releve, 2026-11-02T20:36:18Z
+## sc-stockage : ressources
+2
+               total        used        free      shared  buff/cache   available
+Mem:            5931        1054         578           2        4595        4877
+/dev/vda1        20G  6.4G   13G  35% /
+Filesystem      Size  Used Avail Use% Mounted on
+9.6M	/var/lib/prometheus
+## journald, dernière heure (octets de la sortie JSON, lignes ; dix unités les plus bavardes)
+### sc-confiance
+   4678 6012949
+Archived and active journals take up 40.8M in the file system.
+### sc-build
+   1955 3293845
+Archived and active journals take up 24M in the file system.
+### sc-stockage
+  16758 25170322
+Archived and active journals take up 115.4M in the file system.
+## journaux de pods depuis 2026-11-02T19:36:18 UTC (lignes CRI horodatées ; octets et lignes par espace, sur chaque nœud)
+### sc-confiance
+   3863238 o    3431 lignes  tekton-pipelines
+    941063 o    2538 lignes  kube-system
+    220811 o     368 lignes  tekton-chains
+    135049 o     418 lignes  tsa
+     70453 o      28 lignes  porte
+     46967 o     113 lignes  kyverno
+     31794 o     227 lignes  horodatage
+     19711 o      44 lignes  tekton-pipelines-resolvers
+     17609 o     115 lignes  openbao
+      4091 o      18 lignes  declencheurs
+31M	/var/log/pods
+### sc-build
+    109258 o     221 lignes  kube-system
+2.0M	/var/log/pods
+## événements Kubernetes
+1114
+    532 horodatage
+    367 declencheurs
+    154 builds
+     36 porte
+     13 openbao
+     12 kube-system
+## audits existants
+### serveur k3s (ligne de commande et configuration)
+/etc/rancher/k3s/pod-security.yaml:16:      audit: privileged
+/etc/rancher/k3s/pod-security.yaml:17:      audit-version: latest
+/etc/rancher/k3s/audit-policy.yaml:1:# Brique 08 : journal d'audit de l'API (trace du test négatif 3, modification d'un status).
+/etc/rancher/k3s/audit-policy.yaml:3:apiVersion: audit.k8s.io/v1
+/etc/rancher/k3s/config.yaml:18:  - audit-policy-file=/etc/rancher/k3s/audit-policy.yaml
+/etc/rancher/k3s/config.yaml:19:  - audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log
+/etc/rancher/k3s/config.yaml:20:  - audit-log-maxage=30
+/etc/rancher/k3s/config.yaml:21:  - audit-log-maxbackup=10
+/etc/rancher/k3s/config.yaml:22:  - audit-log-maxsize=100
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - RequestReceived
+rules:
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+      - system:serviceaccount:tekton-chains:tekton-chains-controller
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets"]
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets", "serviceaccounts"]
+  - level: None
+    verbs: ["get", "list", "watch"]
+  - level: None
+    resources:
+      - group: "coordination.k8s.io"
+        resources: ["leases"]
+  - level: Metadata
+total 145068
+-rw------- 1 root root 104857582 Nov  2 18:13 audit-2026-11-02T18-13-29.427.log
+-rw------- 1 root root  43681983 Nov  2 20:36 audit.log
+  dernière heure : 13694 événements, 18847501 o
+### OpenBao (devices d'audit)
+{
+  "fichier/": {
+    "type": "file",
+    "description": "Journal d'audit sur le volume persistant (valeurs sensibles en HMAC)",
+    "options": {
+      "file_path": "/openbao/data/audit.log"
+    },
+    "local": false,
+    "path": "fichier/"
+  }
+}
+-rw-------    1 openbao  openbao    4741645 Nov  2 20:36 /openbao/data/audit.log
+3603
+/dev/vda1                14.6G      6.6G      7.3G  48% /openbao/config
+### Zot (section log de la configuration)
+{"level": "info", "audit": "/var/log/zot/audit.log"}
+## CLA de Grafana Labs (fichiers du dépôt, branche par défaut)
+  grafana/grafana : #### Contributor License Agreement (CLA)
+  grafana/loki : aucune mention dans CONTRIBUTING.md (racine)
+  grafana/alloy : curl: (22) The requested URL returned error: 404
+aucune mention dans CONTRIBUTING.md (racine)
+  workflows dont le nom évoque un CLA :
+    grafana/grafana : 
+    grafana/loki : claude-code-review.yml, claude.yml
+    grafana/alloy : 

@@ -31,10 +31,10 @@ SECURITY.md : absent à la racine de grafana, loki et alloy ; celui de l'organis
 |---|---|---|---|---|
 | J1 | Journaux systemd des trois VM : Forgejo (routeur, pushes), Zot, synchro de la 01 (timers), Prometheus, Alertmanager, récepteur d'alertes, sshd, sudo, k3s, containerd | 3 VM | collecteur sur chaque VM (lecture de journald) | agent sur chaque VM, y compris `sc-confiance` et `sc-build` |
 | J2 | Journaux de tous les pods : Tekton, Chains, Triggers et EventListeners, Kyverno, OpenBao, TSA, horodatage, rattrapage, porte, builds | `/var/log/pods` des nœuds | même collecteur | aucun en plus |
-| J3 | **Audit de l'API Kubernetes** : qui a fait quoi sur le cluster | serveur k3s (`sc-confiance`) | `--audit-policy-file` et `--audit-log-path` sur le serveur k3s : **redémarrage du serveur k3s** (installation système, accord requis), puis modification des scripts de la 08 pour que ce réglage survive à un rejeu | rouvre l'installation de la 08 |
+| J3 | **Audit de l'API Kubernetes** : qui a fait quoi sur le cluster | serveur k3s (`sc-confiance`) | `--audit-policy-file` et `--audit-log-path` sur le serveur k3s : **redémarrage du serveur k3s** (installation système, accord requis), puis modification des scripts de la 08 pour que ce réglage survive à un rejeu | rouvre l'installation de la 08 | **Corrigé par L1 : déjà actif depuis la 08** (écritures seulement) |
 | J4 | Événements Kubernetes, dont les refus de Kyverno et les PolicyReports | API | collecteur avec un compte de lecture (sans Secrets), comme pour Prometheus en O2 | un compte de plus |
-| J5 | **Audit d'OpenBao** : chaque signature Transit, chaque connexion | pod OpenBao | `bao audit enable file` (sortie standard ou fichier). **OpenBao refuse les requêtes s'il ne peut écrire dans aucun journal d'audit (fermé par défaut)** : à mesurer, sinon un disque plein arrête les signatures | modification de la 08 (`openbao.sh`) |
-| J6 | Audit de Zot : écritures et suppressions par compte | `sc-stockage` | `log.audit` dans la configuration de Zot | modification de la 08 (registre) |
+| J5 | **Audit d'OpenBao** : chaque signature Transit, chaque connexion | pod OpenBao | `bao audit enable file` (sortie standard ou fichier). **OpenBao refuse les requêtes s'il ne peut écrire dans aucun journal d'audit (fermé par défaut)** : à mesurer, sinon un disque plein arrête les signatures | modification de la 08 (`openbao.sh`) | **Corrigé par L1 : device `fichier/` déjà actif, sans rotation (D15)** |
+| J6 | Audit de Zot : écritures et suppressions par compte | `sc-stockage` | `log.audit` dans la configuration de Zot | modification de la 08 (registre) | **Corrigé par L1 : déjà configuré (`/var/log/zot/audit.log`)** |
 | J7 | Flux réseau refusés (Hubble de Cilium) | 3 VM | export des flux Hubble vers un fichier | volume à mesurer ; optionnel |
 | J8 | Notifications d'Alertmanager | `sc-stockage` | déjà dans journald (récepteur) : couvert par J1 | aucun |
 | J9 | Scripts du PoC lancés depuis l'hôte (`mise run …`) | laptop | collecteur **sur votre ordinateur** (installation système) ; leurs journaux sont déjà versionnés dans `resultats/` | proposé : non |
@@ -58,3 +58,54 @@ SECURITY.md : absent à la racine de grafana, loki et alloy ; celui de l'organis
 | L2 | Loki et Grafana sur `sc-stockage`, services durcis ; sources de données Prometheus et Loki provisionnées depuis git ; aucun accès anonyme | Grafana lit Prometheus et Loki ; écriture refusée au compte de lecture |
 | L3 | Alloy sur les trois VM, J1, J2, J4 et J8 ; puis, sur accord séparé, J3, J5 et J6 (modifications de la 08) | Chaque source présente dans Loki |
 | L4 | **Contrôle « tout est dans Grafana »** : pour chaque source, un événement témoin daté (push Forgejo, création de pod refusée par Kyverno, signature Transit, écriture Zot, `kubectl` sur l'API…) retrouvé par une requête **à travers l'API de Grafana** en moins de 2 min ; recherche des secrets ; redémarrage d'Alloy sans perte (reprise sur position) ; alerte « source muette » déclenchée en arrêtant un agent | Matrice source par source, journal archivé |
+
+## L1, exécuté (02/11/2026, 20:35 à 20:37 UTC, accord du propriétaire : « Oui, lancer L1 »)
+
+Script : [`journalisation.sh`](journalisation.sh), étapes `telecharger` et `releve` (`mise run journalisation -- …`). Prédictions : [`l1-predictions.md`](resultats/l1-predictions.md), écrites à 20:34:46Z. Journaux : [`l1-telecharger.log`](resultats/l1-telecharger.log) et [`l1-releve.log`](resultats/l1-releve.log).
+
+Deux passages du relevé sont archivés. Le premier ([`l1-releve-premier-passage.log`](resultats/l1-releve-premier-passage.log)) avait deux défauts : `jq` est absent des VM, donc la section `log` de Zot est restée illisible ; et ma recherche « CLA », sans distinction de casse, trouvait « clarifying ». Le deuxième ([`l1-releve-deuxieme-passage.log`](resultats/l1-releve-deuxieme-passage.log)) n'avait toujours pas le détail par unité, faute de `jq`. Les mesures de volume sont identiques à quelques pour cent près d'un passage à l'autre.
+
+| # | Prédiction | Mesuré | Verdict |
+|---|---|---|---|
+| 1 | Les trois empreintes correspondent | `OK` pour les trois ; l'API grafana.com, relue au téléchargement, donne la même empreinte pour Grafana | conforme |
+| 2 | Attestation : Alloy oui, Loki non | Alloy : « Verification succeeded », tag `v1.21.3` résolu en `f2108cd7…`. Loki : « no attestations found for tag v3.7.9 » | conforme |
+| 3 | `sc-stockage` : 2 vCPU, 4 à 5 Gi disponibles, 11 à 14 Go libres | 2 vCPU, 4 868 Mi disponibles, 13 Go libres sur 20 Go (Prometheus : 9,6 Mo) | conforme |
+| 4 | Journald : `sc-confiance` la plus bavarde (5 à 50 Mo/h), les deux autres sous 15 Mo/h | `sc-confiance` 6,1 Mo/h, `sc-build` 3,4 Mo/h, **`sc-stockage` 25,3 Mo/h, la plus bavarde** (`zot.service` : 11 517 lignes sur 16 841) | **faux** pour `sc-stockage` |
+| 5 | Pods : moins de 50 Mo/h, `kube-system`, Tekton et Chains en tête | 5,5 Mo/h, dont 3,9 Mo pour `tekton-pipelines`, 0,9 Mo pour `kube-system`, 0,2 Mo pour `tekton-chains` ; seulement 0,1 Mo sur `sc-build` | conforme |
+| 6 | Moins de 1 000 événements Kubernetes | **1 114** (`horodatage` 532, `declencheurs` 367, `builds` 154) | **faux**, de peu |
+| 7 | Aucun audit configuré (k3s, OpenBao, Zot) | **Les trois existent déjà, posés par la 08** : voir ci-dessous | **faux** |
+| 8 | CLA chez Grafana Labs (prédiction faible) | statut `license/cla` sur la dernière PR fermée de `grafana`, `loki` et `alloy` ; section « Contributor License Agreement (CLA) » dans le CONTRIBUTING.md de `grafana` | conforme |
+| 9 | 30 jours tiennent sur le disque | voir le dimensionnement : oui, avec peu de marge dans l'hypothèse haute | conforme, avec réserve |
+
+**Audits déjà en place (prédiction 7 fausse)**, ce qui change le coût de J3, J5 et J6 :
+- **k3s (J3)** : l'audit de l'API est actif depuis la 08 (test négatif 3). On le voit dans `config.yaml` (`audit-policy-file`, `audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log`, rotation : 100 Mo, 10 fichiers, 30 jours). Volume : **13 697 événements et 18,9 Mo dans la dernière heure**.
+  - La politique journalise les écritures au niveau `Metadata`.
+  - Les lectures (`get`, `list`, `watch`) **ne sont pas journalisées**, sauf les lectures de Secrets par Tekton, Chains et les résolveurs. Les leases sont exclues.
+  - Aucun redémarrage de k3s n'est donc nécessaire pour J3 : il suffit de collecter le fichier.
+- **OpenBao (J5)** : un device d'audit `fichier/` (type `file`, valeurs sensibles en HMAC) écrit dans `/openbao/data/audit.log`, sur le volume persistant. Il pèse 4,7 Mo pour 3 603 lignes. Ce volume a 7,3 Go libres.
+  - **Aucune rotation n'est visible.** OpenBao refuse toute requête s'il ne peut plus écrire dans son seul device d'audit : un disque plein arrêterait les signatures. Le débit reste à mesurer en L3.
+  - Collecte possible depuis le nœud (le volume `local-path` est lisible par root), sans modifier la 08.
+- **Zot (J6)** : `"log": {"level": "info", "audit": "/var/log/zot/audit.log"}`, déjà configuré. Son débit n'a pas été mesuré.
+
+**Dimensionnement** (hypothèse haute : sortie JSON de journald, qui grossit les lignes) :
+- journald 34,8 Mo/h, pods 5,5 Mo/h, audit k3s 18,9 Mo/h, soit environ **59 Mo/h**. Il faut y ajouter les audits d'OpenBao et de Zot, non mesurés à l'heure.
+- Cela fait environ 1,4 Go par jour et 43 Go en 30 jours, avant compression. Avec une compression de ×5 à ×10 dans Loki (hypothèse, à mesurer en L3) : **4 à 9 Go**, pour 13 Go libres sur `sc-stockage`.
+
+**Points nouveaux à décider** (avant L2) :
+- **D13. Rétention** :
+  - (a) 30 jours, avec une alerte sur le disque de `sc-stockage` à 80 %, et la compression réelle mesurée en L3 ;
+  - (b) 15 jours ;
+  - (c) agrandir le disque de `sc-stockage` (modification des VM de la 08).
+
+  Recommandé : (a).
+- **D14. Lectures de l'API Kubernetes** : « absolument tout » inclurait les `get`, `list` et `watch`, que la politique d'audit de la 08 exclut. Les contrôleurs lisent en continu, donc le volume serait multiplié, sans mesure à ce jour.
+  - (a) Garder la politique actuelle (écritures, plus les lectures de Secrets) et consigner la limite.
+  - (b) Mesurer d'abord le volume d'une politique qui ajoute les lectures en `Metadata`. Cela demande de modifier la 08 et de redémarrer le serveur k3s (accord séparé).
+
+  Recommandé : (a).
+- **D15. Rotation de l'audit d'OpenBao** : sans rotation, le journal finit par remplir le volume, et OpenBao refuse alors toute requête.
+  - (a) Ajouter un second device d'audit `socket` ou `file` vers la sortie standard, collecté par Alloy. Le blocage n'arrive alors que si les deux échouent.
+  - (b) Rotation par `logrotate` sur le nœud, avec un signal à OpenBao.
+  - (c) Consigner la limite et poser seulement une alerte sur le disque.
+
+  Recommandé : (a). C'est une modification de la 08, à mesurer.
