@@ -1,6 +1,6 @@
-# construction.sh provenance, 2026-11-02T00:51:07Z
+# construction.sh provenance, 2026-11-02T09:53:28Z
 ## prédiction
-cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId 9eb3ddf7-5706-4926-9f16-618ca306df22) ;
+cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId 087cf81b-5bcf-4de2-86ea-8b2abe8bde09) ;
   buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,
   outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest, déclarés désormais
   par preparer-entrees ;
@@ -13,7 +13,7 @@ builder : https://supply-chain.example/builders/tekton-chains@v1
 paramètres externes : commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git
 taskRunSpecs : [{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"runtimeClassName":"kata","securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}]}}]
 resolvedDependencies :
-  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:64ccbc3e2fa33e0db2848c32ef5b345d38fad2c12aaf12d3806bbcda7fd4cfc9
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:b97fe5c19ef8ddfca031e1058d66632f8c7fba9e395fcb138a3885ebcc161ee5
   pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4 (contenu)
   - oci://sc-stockage.poc.test:5000/amont/moby/buildkit sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
   - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0

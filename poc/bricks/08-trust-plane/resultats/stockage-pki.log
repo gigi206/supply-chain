@@ -1,4 +1,4 @@
-# stockage.sh pki, 2026-11-02T00:05:33Z
+# stockage.sh pki, 2026-11-02T09:05:55Z
 subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
 notAfter=Oct 29 16:39:08 2027 GMT
 sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
@@ -24,26 +24,26 @@ total 36
 -rw-rw-r-- 1 gigi gigi  765 Oct 29 17:39 ca-poc.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 forgejo.crt
 -rw-rw-r-- 1 gigi gigi  806 Oct 29 18:55 openbao.crt
--rw-rw-r-- 1 gigi gigi  178 Nov  1 22:46 taches.pub
--rw-rw-r-- 1 gigi gigi 1361 Nov  1 22:38 tsa-chaine.pem
--rw-rw-r-- 1 gigi gigi  709 Nov  1 22:38 tsa-feuille.crt
--rw------- 1 gigi gigi 1603 Nov  1 22:38 tsa-racine-confiance.json
+-rw-rw-r-- 1 gigi gigi  178 Nov  2 01:18 taches.pub
+-rw-rw-r-- 1 gigi gigi 1361 Nov  2 01:11 tsa-chaine.pem
+-rw-rw-r-- 1 gigi gigi  709 Nov  2 01:11 tsa-feuille.crt
+-rw------- 1 gigi gigi 1603 Nov  2 01:11 tsa-racine-confiance.json
 -rw-rw-r-- 1 gigi gigi  652 Oct 29 21:07 tsa-racine.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 zot.crt
 
 ~/.cache/supply-chain-poc/08/secrets:
 total 76
 -rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
--rw------- 1 gigi gigi  33 Nov  1 22:33 forgejo-admin.password
--rw------- 1 gigi gigi  41 Nov  1 22:33 forgejo-admin.token
+-rw------- 1 gigi gigi  33 Nov  2 01:06 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Nov  2 01:06 forgejo-admin.token
 -rw------- 1 gigi gigi  64 Oct 29 19:59 forgejo-webhook.secret
 -rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
--rw------- 1 gigi gigi 139 Nov  2 01:04 k3s-jeton-agent-securise
+-rw------- 1 gigi gigi 139 Nov  2 10:04 k3s-jeton-agent-securise
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-serveur
--rw------- 1 gigi gigi  44 Nov  1 22:34 openbao-descellement.b64
--rw------- 1 gigi gigi  64 Nov  1 22:34 openbao-descellement.hex
--rw------- 1 gigi gigi  26 Nov  1 22:34 openbao-root.token
+-rw------- 1 gigi gigi  44 Nov  2 01:07 openbao-descellement.b64
+-rw------- 1 gigi gigi  64 Nov  2 01:07 openbao-descellement.hex
+-rw------- 1 gigi gigi  26 Nov  2 01:07 openbao-root.token
 -rw------- 1 gigi gigi 241 Oct 29 18:55 openbao.key
 -rw------- 1 gigi gigi 241 Oct 29 23:06 taches.key
 -rw------- 1 gigi gigi 241 Oct 29 21:07 tsa-racine.key

@@ -1,4 +1,4 @@
-# politique.sh horodatage, 2026-11-02T00:21:18Z
+# politique.sh horodatage, 2026-11-02T09:22:47Z
 ## témoins posés dans builds par poc-ecriture (compte d'écriture général) : jamais horodatables
 builds/essai-j6-autre-cle@sha256:f214bf05c70cc5ca049aba8cd927fbcd246688d044ac52ce15ea43db2ccc309e : provenance de Chains réécrite pour l'image témoin, signée (DSSE) par une clé jetable
   sur l'hôte : clé du témoin → Verified OK ; clé de Chains → Error: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
@@ -13,49 +13,49 @@ prédiction du premier passage : 6 horodatée(s) (enveloppes sans bundle), 2 ref
 ## premier passage : rattrapage
   JOINT|Zot et TSA, essai 1
   ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
-  REFUSEE|builds/essai-j6-autre-cle|1|signature 36b658d8be26e89e|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
-  REFUSEE|builds/essai-j6-autre-sujet|1|signature c3dc103fce6ae2d8|failed to verify signature: provided artifact digest does not match any digest in statement
-  HORODATEE|builds/essai-webhook|5|signature 6ce0a727cb01d33c|https://slsa.dev/provenance/v1|2026-11-02 00:22:01 +0000 UTC|referrer sha256:5edf38d7a6b474ef85c1818af116200e3a9a5b5008d7896cca1fd540733d6f68
-  HORODATEE|builds/essai-webhook|6|signature 84765bdb094c9afc|https://slsa.dev/provenance/v1|2026-11-02 00:22:04 +0000 UTC|referrer sha256:0abcaaa71679df7b11a94824b1b3e0e932726e3631c3b104a8f10720dded88ca
-  HORODATEE|builds/essai-webhook|7|signature 578735785a4e06c1|https://slsa.dev/provenance/v1|2026-11-02 00:22:07 +0000 UTC|referrer sha256:f317845675890ba54da55bb2e61a5f2f5396acfb3b818b0649503a15df600b1f
-  HORODATEE|builds/essai-webhook|8|signature 4891908ccfe11f41|https://slsa.dev/provenance/v1|2026-11-02 00:22:10 +0000 UTC|referrer sha256:4f66e12deda03d007558db1d9e411b98c27e84ed512d677f4ead57bdebfce65c
-  HORODATEE|builds/essai-webhook|9|signature bbe030d7d5757998|https://slsa.dev/provenance/v1|2026-11-02 00:22:12 +0000 UTC|referrer sha256:b83781dbfeb03879c66b31f6e3d7dfc3aac55bc027365701e947cc8c199bcec5
-  HORODATEE|builds/essai-webhook|10|signature c3dc103fce6ae2d8|https://slsa.dev/provenance/v1|2026-11-02 00:22:15 +0000 UTC|referrer sha256:381bd90ecca4929478955c455e11fa1076673b6273e6e60c38b844b9b470c4f4
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 3025fd28d4f69e7b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature e9de0cac53aca667|failed to verify signature: provided artifact digest does not match any digest in statement
+  HORODATEE|builds/essai-webhook|5|signature 889c010c683f0043|https://slsa.dev/provenance/v1|2026-11-02 09:24:02 +0000 UTC|referrer sha256:227f87e28a66f2ee2636b59266f25bf68d789e486fc5f7c8f220f13cdde83a8d
+  HORODATEE|builds/essai-webhook|6|signature 931d12d88f342c00|https://slsa.dev/provenance/v1|2026-11-02 09:24:05 +0000 UTC|referrer sha256:53bb666cc3e6577b8c022050bf54f34b2b67b97b24c9d296c2817a4473575b70
+  HORODATEE|builds/essai-webhook|7|signature f658829d4f02bcad|https://slsa.dev/provenance/v1|2026-11-02 09:24:07 +0000 UTC|referrer sha256:3112a9f4092adfd2ffdad751f3aa78ee4e1bbf1f7dcfab5126bc6d8dafdd7ba4
+  HORODATEE|builds/essai-webhook|8|signature f8384fb7eb637b63|https://slsa.dev/provenance/v1|2026-11-02 09:24:10 +0000 UTC|referrer sha256:0cba341625e89229138e3962721600eab1e26bddba91b1078ab26c7996e56316
+  HORODATEE|builds/essai-webhook|9|signature 8fa39ba6394cfe65|https://slsa.dev/provenance/v1|2026-11-02 09:24:13 +0000 UTC|referrer sha256:511cc845fc73761409f6acf8e9f9f415a6ac5f6b0ed492aff231fa7d3afc416c
+  HORODATEE|builds/essai-webhook|10|signature e9de0cac53aca667|https://slsa.dev/provenance/v1|2026-11-02 09:24:16 +0000 UTC|referrer sha256:25e14c240274842ec6d8fbe651741895c02e716e7d22690029979cb4b1c6433f
   FIN|5 image(s), 13 enveloppe(s) : 6 horodatée(s), 5 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
   DEJA_HORODATEE|builds/essai-signature ×1
   DEJA_HORODATEE|builds/essai-webhook ×4
-passage horodatage-29892982 : 00:22:00 → 00:22:21, pod 10.42.0.157 ; requêtes de jeton reçues par le TSA : 6, depuis 10.42.0.157
+passage horodatage-29893524 : 09:24:00 → 09:24:21, pod 10.42.0.183 ; requêtes de jeton reçues par le TSA : 6, depuis 10.42.0.183
 OK   une requête de jeton par enveloppe horodatée (6), toutes du pod du passage ; aucune pour les 2 refusées
 OK   prédiction tenue
 OK   témoins refusés pour leur motif (autre clé ; autre sujet ; illisible en anomalie), avant toute demande au TSA, sans arrêter le parcours
-pod horodatage-29892982-r46wt : nœud sc-confiance, compte horodatage, volumes de jeton projetés 1 (montés par identifiants), sortie Completed
+pod horodatage-29893524-kmhj6 : nœud sc-confiance, compte horodatage, volumes de jeton projetés 1 (montés par identifiants), sortie Completed
 ## nouvelle exécution signée, supprimée de l'API après sa signature : horodatée au passage suivant
 OK   exécution du bundle signé : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 Chains : TaskRun j6-horodatage-publier signé=true, PipelineRun j6-horodatage signé=true
-builds/essai-webhook : 10 → 12 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : 2026-11-02T00:22:35.248194896Z
+builds/essai-webhook : 10 → 12 enveloppe(s) ; dernière écriture .att de poc-build (audit de Zot) : 2026-11-02T09:24:35.521521303Z
 PipelineRun j6-horodatage et son TaskRun supprimés de l'API avant le passage (seul Zot garde la trace)
   JOINT|Zot et TSA, essai 1
   ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
-  REFUSEE|builds/essai-j6-autre-cle|1|signature 36b658d8be26e89e|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
-  REFUSEE|builds/essai-j6-autre-sujet|1|signature c3dc103fce6ae2d8|failed to verify signature: provided artifact digest does not match any digest in statement
-  HORODATEE|builds/essai-webhook|11|signature 69cbf1a8ad4fa989|https://slsa.dev/provenance/v1|2026-11-02 00:23:02 +0000 UTC|referrer sha256:c8229cfb775e1ead8d50b186e38ec70e861de78b4aad71e71f25583f1321ab8f
-  HORODATEE|builds/essai-webhook|12|signature 855c068f5c479905|https://slsa.dev/provenance/v1|2026-11-02 00:23:04 +0000 UTC|referrer sha256:714c93ac350c0aadbc36f9d5a8c8bc448da2270f194fa4f392fa9cba688963d7
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 3025fd28d4f69e7b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature e9de0cac53aca667|failed to verify signature: provided artifact digest does not match any digest in statement
+  HORODATEE|builds/essai-webhook|11|signature c0093e7958ab1a69|https://slsa.dev/provenance/v1|2026-11-02 09:25:02 +0000 UTC|referrer sha256:e8591144c17e10189ab52a57bb240192320df6a80044ad68bc471c598624c078
+  HORODATEE|builds/essai-webhook|12|signature 6a126b209cedb658|https://slsa.dev/provenance/v1|2026-11-02 09:25:05 +0000 UTC|referrer sha256:67cf61117d507e38c43ac15026ac6a32a0b9e906b5f0949185317f1430a32abe
   FIN|5 image(s), 15 enveloppe(s) : 2 horodatée(s), 11 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
   DEJA_HORODATEE|builds/essai-signature ×1
   DEJA_HORODATEE|builds/essai-webhook ×10
-passage horodatage-29892983 : 00:23:00 → 00:23:10, pod 10.42.0.70 ; requêtes de jeton reçues par le TSA : 2, depuis 10.42.0.70
+passage horodatage-29893525 : 09:25:00 → 09:25:10, pod 10.42.0.147 ; requêtes de jeton reçues par le TSA : 2, depuis 10.42.0.147
 OK   une requête de jeton par enveloppe horodatée (2), toutes du pod du passage ; aucune pour les 2 refusées
 OK   2 nouvelle(s) enveloppe(s) horodatée(s) au premier passage après la signature, exécution déjà purgée de l'API
-latence : écriture .att par Chains 00:22:35 → jeton du TSA 00:23:04 : 29 s (borne : période de 60 s, plus la durée d'un passage)
+latence : écriture .att par Chains 09:24:35 → jeton du TSA 09:25:05 : 30 s (borne : période de 60 s, plus la durée d'un passage)
 ## passage suivant : rien de nouveau
   JOINT|Zot et TSA, essai 1
   ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
-  REFUSEE|builds/essai-j6-autre-cle|1|signature 36b658d8be26e89e|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
-  REFUSEE|builds/essai-j6-autre-sujet|1|signature c3dc103fce6ae2d8|failed to verify signature: provided artifact digest does not match any digest in statement
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 3025fd28d4f69e7b|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature e9de0cac53aca667|failed to verify signature: provided artifact digest does not match any digest in statement
   FIN|5 image(s), 15 enveloppe(s) : 0 horodatée(s), 13 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
   DEJA_HORODATEE|builds/essai-signature ×1
   DEJA_HORODATEE|builds/essai-webhook ×12
-passage horodatage-29892984 : 00:24:00 → 00:24:04, pod 10.42.0.239 ; requêtes de jeton reçues par le TSA : 0
+passage horodatage-29893526 : 09:26:00 → 09:26:05, pod 10.42.0.248 ; requêtes de jeton reçues par le TSA : 0
 OK   une requête de jeton par enveloppe horodatée (0), toutes du pod du passage ; aucune pour les 2 refusées
 OK   aucune enveloppe horodatée, aucun jeton demandé, étiquettes de horodatage/bundles inchangées (13)
 ## contrôles

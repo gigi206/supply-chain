@@ -1,4 +1,4 @@
-# buildkit.sh exempte, 2026-11-02T00:41:56Z
+# buildkit.sh exempte, 2026-11-02T09:44:03Z
 ## prédiction corrigée le 30/10/2026, après le premier passage (resultats/buildkit-exempte-premiere-prediction.log) : la
 ## prédiction du README, écrite avant l'accord, est démentie pour le pod privilégié (newuidmap en échec malgré NoNewPrivs 0)
 virtiofsd lancé sans --xattr (disable_guest_selinux = true, et runtime-rs 4.3.1 n'ajoute --xattr que si ce drapeau est
@@ -23,7 +23,7 @@ OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption
      racine du conteneur : rc 1 setfattr: /tmp/f: Operation not supported
      tmpfs : rc 0 
      tmpfs, relu : user.essai="1"
-virtiofsd du sandbox aa7f1cb30d5116aa2a1eb306ea6d8896e289945a84c334b8c63179e7c07d3ab6 : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
+virtiofsd du sandbox 19e9eaa8af2745aef8610fdd7fc909649a1d39b5e6f343b870ad76851c1ea1f7 : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
 ### j7-bk-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
      CapEff:	0000000000000000
      CapBnd:	000001ffffffffff

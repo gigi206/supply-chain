@@ -1,4 +1,4 @@
-# buildkit.sh image, 2026-11-02T00:40:46Z
+# buildkit.sh image, 2026-11-02T09:42:50Z
 ## tag v0.34.1
 OK   tag annoté v0.34.1 (objet 401bf63d02833b70ef9393eb9702e2b5648dfaaf, signé et vérifié par GitHub) → commit f5b59a1f2fb25a0cb7072c398cab9aed7835da4e
 ## image docker.io/moby/buildkit:v0.34.1-rootless

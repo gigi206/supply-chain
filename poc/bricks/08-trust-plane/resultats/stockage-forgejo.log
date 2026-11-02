@@ -1,4 +1,4 @@
-# stockage.sh forgejo, 2026-11-02T00:06:15Z
+# stockage.sh forgejo, 2026-11-02T09:06:31Z
 ~/.local/share/mise/installs/forgejo-forgejo-forgejo/15.0.11/forgejo: OK
 Get:1 file:/etc/apt/mirrors/debian.list Mirrorlist [30 B]
 Get:2 file:/etc/apt/mirrors/debian-security.list Mirrorlist [39 B]
@@ -33,24 +33,24 @@ administrateur poc-admin créé, mot de passe en 0600 sur l'hôte
 jeton j2-depots (write:organization, write:repository) en 0600 sur l'hôte
 https://192.168.161.13:3000/api/healthz (CA du PoC) : HTTP 200 ; version 15.0.11+gitea-1.22.0
 active
-LISTEN 0      4096   192.168.161.13:3000       0.0.0.0:*    users:(("forgejo",pid=2780,fd=14))       
+LISTEN 0      4096   192.168.161.13:3000       0.0.0.0:*    users:(("forgejo",pid=2765,fd=14))       
 /etc/forgejo:
 total 12
--rw-r----- 1 root forgejo 1379 Nov  2 00:06 app.ini
-drwxr-x--- 2 root forgejo 4096 Nov  2 00:06 secrets
-drwxr-x--- 2 root forgejo 4096 Nov  2 00:06 tls
+-rw-r----- 1 root forgejo 1379 Nov  2 09:07 app.ini
+drwxr-x--- 2 root forgejo 4096 Nov  2 09:07 secrets
+drwxr-x--- 2 root forgejo 4096 Nov  2 09:07 tls
 
 /etc/forgejo/secrets:
 total 12
--rw-r----- 1 root forgejo 105 Nov  2 00:06 internal_token
--rw-r----- 1 root forgejo  43 Nov  2 00:06 jwt_secret
--rw-r----- 1 root forgejo  43 Nov  2 00:06 secret_key
+-rw-r----- 1 root forgejo 105 Nov  2 09:07 internal_token
+-rw-r----- 1 root forgejo  43 Nov  2 09:07 jwt_secret
+-rw-r----- 1 root forgejo  43 Nov  2 09:07 secret_key
 
 /etc/forgejo/tls:
 total 8
--rw-r--r-- 1 root root    778 Nov  2 00:06 forgejo.crt
--rw-r----- 1 root forgejo 241 Nov  2 00:06 forgejo.key
-drwxr-x--- 3 forgejo forgejo 4096 Nov  2 00:06 /var/lib/forgejo
+-rw-r--r-- 1 root root    778 Nov  2 09:07 forgejo.crt
+-rw-r----- 1 root forgejo 241 Nov  2 09:07 forgejo.key
+drwxr-x--- 3 forgejo forgejo 4096 Nov  2 09:07 /var/lib/forgejo
 OK   app.ini inchangé par Forgejo (identique à stockage/forgejo.ini, sans secret)
 OK   inscription désactivée (/user/sign_up : « Registration is disabled »)
 -> Overall exposure level for forgejo.service: 3.0 OK :-)

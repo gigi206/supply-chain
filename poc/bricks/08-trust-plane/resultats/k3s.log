@@ -1,4 +1,4 @@
-# k3s.sh, 2026-11-02T00:04:02Z, réseau cilium
+# k3s.sh, 2026-11-02T09:04:19Z, réseau cilium
 archives de Cilium conformes à /home/gigi/.cache/supply-chain-poc/08/telechargements/cilium/sums.txt
 k3s: OK
 k3s-airgap-images-amd64.tar.zst: OK
@@ -9,20 +9,20 @@ k3s version v1.35.9+k3s1 (58877f27)
 sc-confiance : k3s server installé
 API du server prête (/readyz)
 kubeconfig : /home/gigi/.kube/supply-chain-poc.yaml (600)
-# cilium.sh installer, 2026-11-02T00:04:13Z
+# cilium.sh installer, 2026-11-02T09:04:34Z
 ## valeurs (cilium/valeurs.yaml, digests amd64)
 OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
 ## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
 Release "cilium" does not exist. Installing it now.
 NAME: cilium
-LAST DEPLOYED: Mon Nov  2 01:04:14 2026
+LAST DEPLOYED: Mon Nov  2 10:04:34 2026
 NAMESPACE: kube-system
 STATUS: deployed
 REVISION: 1
 DESCRIPTION: Install complete
 TEST SUITE: None
 OK   release cilium : statut et version : deployed cilium-1.20.4
-jeton agent sécurisé : empreinte de la CA du server 9eee09d32a381151… vérifiée
+jeton agent sécurisé : empreinte de la CA du server 82cf63f2fea2b25c… vérifiée
 k3s: OK
 k3s-airgap-images-amd64.tar.zst: OK
 cilium-amd64.tar: OK
@@ -36,6 +36,6 @@ Created symlink '/etc/systemd/system/multi-user.target.wants/k3s-agent.service' 
 k3s version v1.35.9+k3s1 (58877f27)
 sc-stockage : k3s agent installé
 NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>          28s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane   70s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>          15s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+sc-build       Ready    <none>          33s   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   68s   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          16s   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage

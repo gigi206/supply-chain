@@ -1,4 +1,4 @@
-# preuves.sh controleurs, 2026-11-02T01:02:59Z
+# preuves.sh controleurs, 2026-11-02T10:36:11Z
 Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :
 - ValidatingAdmissionPolicy tekton-controleurs-builds et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)
 - aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)
@@ -22,7 +22,7 @@ Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire 
 ## règle
 OK   ValidatingAdmissionPolicy tekton-controleurs-builds (failurePolicy, à jour, avertissements de typage) : Fail true 0
 OK   liaison tekton-controleurs-builds : tekton-controleurs-builds Deny
-posée le 2026-11-02T00:10:05Z
+posée le 2026-11-02T09:10:50Z
 OK   tekton-pipelines-controller : create, update, patch, delete sur la règle et sa liaison : no
 OK   tekton-chains-controller : create, update, patch, delete sur la règle et sa liaison : no
 ## droits
@@ -36,12 +36,12 @@ OK   arguments de Chains : --namespace=builds
 OK   tekton-pipelines-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
 OK   tekton-chains-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
 ## essais réels au nom des contrôleurs
-pod existant visé : kube-system/local-path-provisioner-d9d8769b6-trfh4 (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao
+pod existant visé : kube-system/local-path-provisioner-d9d8769b6-9msxr (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao
 OK   tekton-pipelines-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
 OK   tekton-pipelines-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-sys)
 OK   tekton-pipelines-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespac)
-OK   tekton-pipelines-controller : annotation du pod local-path-provisioner-d9d8769b6-trfh4 : refusé (pods "local-path-provisioner-d9d8769b6-trfh4" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
-OK   tekton-pipelines-controller : image du pod local-path-provisioner-d9d8769b6-trfh4 remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-trfh4" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
+OK   tekton-pipelines-controller : annotation du pod local-path-provisioner-d9d8769b6-9msxr : refusé (pods "local-path-provisioner-d9d8769b6-9msxr" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
+OK   tekton-pipelines-controller : image du pod local-path-provisioner-d9d8769b6-9msxr remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-9msxr" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the namesp)
 OK   tekton-pipelines-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "o)
 OK   tekton-pipelines-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
 OK   tekton-pipelines-controller : lecture du Secret kube-system/k3s-serving : refusé (secrets "k3s-serving" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
@@ -50,8 +50,8 @@ OK   tekton-pipelines-controller : lecture du Secret tekton-chains/zot-chains : 
 OK   tekton-chains-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
 OK   tekton-chains-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-system" )
 OK   tekton-chains-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespace "kub)
-OK   tekton-chains-controller : annotation du pod local-path-provisioner-d9d8769b6-trfh4 : refusé (pods "local-path-provisioner-d9d8769b6-trfh4" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
-OK   tekton-chains-controller : image du pod local-path-provisioner-d9d8769b6-trfh4 remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-trfh4" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
+OK   tekton-chains-controller : annotation du pod local-path-provisioner-d9d8769b6-9msxr : refusé (pods "local-path-provisioner-d9d8769b6-9msxr" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
+OK   tekton-chains-controller : image du pod local-path-provisioner-d9d8769b6-9msxr remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-d9d8769b6-9msxr" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace "k)
 OK   tekton-chains-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "openbao)
 OK   tekton-chains-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
 OK   tekton-chains-controller : lecture du Secret kube-system/k3s-serving : refusé (secrets "k3s-serving" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
@@ -80,14 +80,14 @@ OK   replication-controller : pod default de kube-system admis (dry-run serveur)
 OK   statefulset-controller : pod default de kube-system admis (dry-run serveur)
 OK   comptes de service qui peuvent créer des pods dans kube-system : 7
 refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :
-      2   preuve-controleurs tekton-chains-controller create pods
-      2   preuve-controleurs tekton-pipelines-controller create pods
+      1   preuve-controleurs tekton-chains-controller create pods
+      1   preuve-controleurs tekton-pipelines-controller create pods
 OK   refus de la règle dans builds (audit) : 0
-OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 30
+OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 39
 ## lectures de Secrets des deux contrôleurs dans l'audit de l'API (depuis l'installation de k3s ; sans --as)
      14   tekton-chains-controller get builds 200 ResponseComplete
-      5   tekton-pipelines-controller watch builds 200 ResponseComplete
-      7   tekton-pipelines-controller watch builds 200 ResponseStarted
+     11   tekton-pipelines-controller watch builds 200 ResponseComplete
+     13   tekton-pipelines-controller watch builds 200 ResponseStarted
 OK   lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer) : true
 OK   lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre : 0
 ## journaux des contrôleurs (depuis leur démarrage)

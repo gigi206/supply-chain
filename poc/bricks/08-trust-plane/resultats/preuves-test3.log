@@ -1,7 +1,7 @@
-# preuves.sh test3, 2026-10-30T22:44:35Z
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+# preuves.sh test3, 2026-11-02T10:00:09Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
 ## prédiction (écrite le 30/10/2026, avant le premier passage)
-- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit 8435fdd6100ff51e5fb9d8d4fccee93a37493145, propre au passage),
+- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit 6bcbdfe69909ded3331ecc9da3af3ff04f06d930, propre au passage),
   terminé et signé par Chains : 3 signatures par la clé Transit chains dans l'audit d'OpenBao (signature de l'image et
   provenance du TaskRun, provenance du PipelineRun), comme au test 5
 - tentatives réelles, au nom du compte des TaskRuns (build), d'el-forgejo, des opérateurs et du rattrapage : écriture
@@ -20,46 +20,46 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
   poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande
   un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)
 - fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds
-## mise en place : livraison valide (commit 8435fdd6100ff51e5fb9d8d4fccee93a37493145)
-valide : HTTP 202 {"eventID":"b6ea9922-0f6c-4a29-880e-2053ce3f178a"}
-OK   TaskRun sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier créé par ce PipelineRun (propriétaire 90deb784-b5e8-4b28-a28b-a856470df8c0)
-OK   sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier terminé (Succeeded) et signé par Chains
-état avant : UID ef6495af-fb34-4dfe-96d0-e4e13aae0b40, résultats [{"name":"IMAGE_DIGEST","type":"string","value":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"},{"name":"IMAGE_URL","type":"string","value":"sc-stockage.poc.test:5000/builds/essai-webhook"}], 28 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## mise en place : livraison valide (commit 6bcbdfe69909ded3331ecc9da3af3ff04f06d930)
+valide : HTTP 202 {"eventID":"e36fc863-eec0-4049-b79e-6767709364c0"}
+OK   TaskRun sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier créé par ce PipelineRun (propriétaire a0842c00-1e06-4b73-b711-c5bdb717a7f1)
+OK   sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier terminé (Succeeded) et signé par Chains
+état avant : UID f1b25d3e-51e6-419b-b91f-6e3590fa4acc, résultats [{"name":"IMAGE_DIGEST","type":"string","value":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"},{"name":"IMAGE_URL","type":"string","value":"sc-stockage.poc.test:5000/builds/essai-webhook"}], 26 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 ## tentatives (écritures réelles : PUT du statut falsifié, PUT de l'objet sans l'annotation de Chains)
-OK   build : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier" is forbidden: User "system:serviceaccount:builds:build" cannot update resource "taskruns/status" in API group "tekton)
+OK   build : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier" is forbidden: User "system:serviceaccount:builds:build" cannot update resource "taskruns/status" in API group "tekton)
 OK   build : retrait de l'annotation de Chains refusé par RBAC
-OK   el : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier" is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot update resource "taskruns/status" in API gr)
+OK   el : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier" is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot update resource "taskruns/status" in API gr)
 OK   el : retrait de l'annotation de Chains refusé par RBAC
-OK   operateur : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier" is forbidden: User "operateur" cannot update resource "taskruns/status" in API group "tekton.dev" in the namespace "b)
+OK   operateur : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier" is forbidden: User "operateur" cannot update resource "taskruns/status" in API group "tekton.dev" in the namespace "b)
 OK   operateur : retrait de l'annotation de Chains refusé par RBAC
-OK   rattrapage : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier" is forbidden: User "system:serviceaccount:declencheurs:rattrapage" cannot update resource "taskruns/status" in API gr)
+OK   rattrapage : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier" is forbidden: User "system:serviceaccount:declencheurs:rattrapage" cannot update resource "taskruns/status" in API gr)
 OK   rattrapage : retrait de l'annotation de Chains refusé par RBAC
 ## témoin : même écriture du statut par l'administrateur
 OK   administrateur : statut écrit (IMAGE_DIGEST renvoyé par l'API : sha256:0000000000000000000000000000000000000000000000000000000000000000)
-## Chains ne re-signe pas (45 s d'attente après l'écriture, 2026-10-30T22:44:54Z)
+## Chains ne re-signe pas (45 s d'attente après l'écriture, 2026-11-02T10:00:26Z)
 OK   statut falsifié conservé (IMAGE_DIGEST = sha256:0000000000000000000000000000000000000000000000000000000000000000) : le contrôleur de Pipelines ne le réécrit pas
 OK   annotation chains.tekton.dev/signed toujours true
-signatures par la clé chains depuis 2026-10-30T22:44:35Z (audit d'OpenBao) :
-  {"t":"2026-10-30T22:44:41","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
-  {"t":"2026-10-30T22:44:46","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
-  {"t":"2026-10-30T22:44:46","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+signatures par la clé chains depuis 2026-11-02T10:00:09Z (audit d'OpenBao) :
+  {"t":"2026-11-02T10:00:15","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-02T10:00:20","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-02T10:00:20","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
 OK   témoin : 3 signatures de Chains avant l'écriture, pour cette exécution
 OK   aucune signature de Chains depuis l'écriture
-OK   28 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, comme avant l'écriture
+OK   26 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, comme avant l'écriture
 OK   une provenance pour ce TaskRun, sujet d'origine : ["sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"]
-## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier)
-  22:44:54 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier/status : 403
-  22:44:54 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier : 403
-  22:44:54 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier/status : 403
-  22:44:54 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier : 403
-  22:44:54 system:admin (pour operateur) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier/status : 403
-  22:44:54 system:admin (pour operateur) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier : 403
-  22:44:54 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier/status : 403
-  22:44:54 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier : 403
-  22:44:54 system:admin update taskruns/sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145-publier/status : 200
+## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier)
+  10:00:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier/status : 403
+  10:00:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier : 403
+  10:00:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier/status : 403
+  10:00:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier : 403
+  10:00:26 system:admin (pour operateur) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier/status : 403
+  10:00:26 system:admin (pour operateur) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier : 403
+  10:00:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier/status : 403
+  10:00:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier : 403
+  10:00:26 system:admin update taskruns/sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930-publier/status : 200
 OK   4 écritures du statut refusées dans l'audit, avec le nom de l'objet
 OK   4 retraits d'annotation refusés dans l'audit
 OK   écriture de l'administrateur dans l'audit (200)
-## fin : PipelineRun sample-app-8435fdd6100ff51e5fb9d8d4fccee93a37493145 purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)
-OK   PipelineRun et TaskRun de 8435fdd6100ff51e5fb9d8d4fccee93a37493145 supprimés
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 1fb94652-d29c-4f0a-bf98-d0af21b446c8 (2026-10-30T20:11:28Z)
+## fin : PipelineRun sample-app-6bcbdfe69909ded3331ecc9da3af3ff04f06d930 purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)
+OK   PipelineRun et TaskRun de 6bcbdfe69909ded3331ecc9da3af3ff04f06d930 supprimés
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 087cf81b-5bcf-4de2-86ea-8b2abe8bde09 (2026-11-02T09:52:32Z)
