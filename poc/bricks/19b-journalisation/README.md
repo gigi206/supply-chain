@@ -45,7 +45,7 @@ SECURITY.md : absent à la racine de grafana, loki et alloy ; celui de l'organis
 - **D9. Périmètre** : recommandé J1 à J6 et J8. J7 en option, après une mesure de volume. J9 exclu. J3, J5 et J6 modifient la 08 : décision distincte, avec son coût de rejeu.
 - **D10. Intégrité** : Loki ne rend pas un journal infalsifiable. Proposé :
   - API de suppression de Loki laissée désactivée, rétention de 30 jours dans le PoC ;
-  - Loki joignable seulement depuis les trois VM (pare-feu) ; Grafana en lecture seule, sans accès anonyme, comptes en 0600 dans `…/08/secrets` ;
+  - ~~Loki joignable seulement depuis les trois VM (pare-feu)~~ remplacé par D16 : certificat client de la CA du PoC exigé par Loki, sans pare-feu ; Grafana en lecture seule, sans accès anonyme, comptes en 0600 dans `…/08/secrets` ;
   - limite consignée : un nœud compromis peut injecter de faux journaux ou cesser d'en envoyer. Une alerte « source muette » est ajoutée à Prometheus (absence de lignes d'une source depuis N minutes).
 - **D11. Secrets dans les journaux** : `fuites.sh` de la 08 interroge aussi Loki (LogQL) pour chaque secret connu. Les journaux d'audit d'OpenBao hachent les valeurs par défaut (HMAC) : à vérifier, pas à supposer.
 - **D12. Rattachement** : vu le temps déjà passé, la 19 approche de son plafond de 1 pw avant décision (O1 à O4 de 14:29 à 20:11 UTC, sans les préparations). Recommandé : **nouvelle brique « 19b, journalisation d'audit »**, estimée à 1 pw avec J3, J5 et J6, ou 0,5 pw sans eux, plutôt qu'un jalon de la 19 qui la ferait dépasser 2×.
@@ -134,7 +134,7 @@ Prédictions : [`l2-predictions.md`](resultats/l2-predictions.md), écrites à 2
   - instantanés externes.
 - Également désactivés : tableaux publics, alerting de Grafana (les alertes restent dans Alertmanager), accès anonyme et inscription. Le mot de passe de l'administrateur est lu par `$__file{}`.
 
-**D16, proposée : authentification par certificat client (mTLS) plutôt qu'un pare-feu.** D10 prévoyait « Loki joignable seulement depuis les trois VM (pare-feu) ».
+**D16 : authentification par certificat client (mTLS) plutôt qu'un pare-feu ; retenue par le propriétaire le 02/11/2026 (« a, mTLS seul »), elle remplace le pare-feu de D10.** D10 prévoyait « Loki joignable seulement depuis les trois VM (pare-feu) ».
 - Loki exige à la place un certificat client de la CA du PoC (`RequireAndVerifyClientCert`). Chaque agent Alloy aura le sien en L3, Grafana a `grafana-client`.
 - C'est plus fort qu'un filtrage par adresse, et la configuration réseau de `sc-stockage` reste inchangée.
 - Limite : Loki ne distingue pas lecture et écriture. Tout porteur d'un certificat client peut lire tous les journaux et en écrire. Un nœud compromis lit donc aussi les journaux des autres.
