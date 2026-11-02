@@ -416,4 +416,172 @@ etape_controle_l3() {
   rm -f "${W:?}/graf.out"
 }
 
-case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; *) lancer l1 L1 "$@" ;; esac
+# ---------------------------------------------------------------------------------------------------------------- L4
+H19=$here/../19-observabilite
+
+etape_prometheus_alloy() { # job alloy (127.0.0.1:12345) ajouté à prometheus.yml de la 19 ; règles par observabilite.sh regles deployer
+  copier sc-stockage /tmp/prometheus-l4 "$H19/config/prometheus.yml"
+  sur sc-stockage sudo bash -s <<'EOS'
+set -euo pipefail
+install -m 0640 -g prometheus /tmp/prometheus-l4/prometheus.yml /etc/prometheus/prometheus.yml
+rm -rf /tmp/prometheus-l4
+promtool check config /etc/prometheus/prometheus.yml | tail -1
+systemctl restart prometheus
+for i in $(seq 60); do
+  curl -s http://127.0.0.1:9090/api/v1/targets | python3 -c 'import sys,json; sys.exit(0 if any(t["labels"]["job"] == "alloy" and t["health"] == "up" for t in json.load(sys.stdin)["data"]["activeTargets"]) else 1)' && break
+  sleep 2
+done
+curl -s http://127.0.0.1:9090/api/v1/targets | python3 -c 'import sys,json; [print(t["labels"]["job"], t["health"]) for t in json.load(sys.stdin)["data"]["activeTargets"]]'
+EOS
+}
+
+vu_grafana() { # sélecteur marqueur : secondes jusqu'à ce que l'auditeur lise la ligne dans Loki à travers Grafana (120 s au plus)
+  local t0 q i
+  t0=$(date +%s)
+  q=$(jq -nc --arg e "$1 |= \"$2\"" '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 10}], from: "now-15m", to: "now"}')
+  for i in $(seq 60); do
+    graf auditeur POST /api/ds/query "$q" >/dev/null
+    grep -q "$2" "$W/graf.out" && { echo $(( $(date +%s) - t0 )); return 0; }
+    sleep 2
+  done
+  echo "absent"
+}
+
+temoin() { # source sélecteur marqueur : verdict d'un témoin (émis juste avant l'appel)
+  local d
+  d=$(vu_grafana "$2" "$3")
+  if [ "$d" = absent ]; then echo "KO   $1 : $3 absent de Grafana après 120 s"; else echo "OK   $1 : $3 lu par l'auditeur dans Grafana en $d s"; fi
+}
+
+etape_temoins() {
+  local m v p a
+  for v in sc-confiance sc-build sc-stockage; do
+    m=t4-journal-$v-$(date +%s%N); sur "$v" "logger -t temoin-l4 $m"
+    temoin "J1 journal de $v" "{noeud=\"$v\", source=\"journal\"}" "$m"
+  done
+  m=t4-pods-confiance-$(date +%s%N)
+  kubectl exec -n openbao openbao-0 -- sh -c "echo $m > /proc/1/fd/1"
+  temoin "J2 pods de sc-confiance (openbao-0)" '{noeud="sc-confiance", source="pods", espace="openbao"}' "$m"
+  p=$(kubectl get pods -n kube-system -l k8s-app=cilium --field-selector spec.nodeName=sc-build -o jsonpath='{.items[0].metadata.name}')
+  m=t4-pods-build-$(date +%s%N)
+  kubectl exec -n kube-system "$p" -c cilium-agent -- sh -c "echo $m > /proc/1/fd/1"
+  temoin "J2 pods de sc-build ($p)" '{noeud="sc-build", source="pods", espace="kube-system"}' "$m"
+  m=t4-audit-k8s-$(date +%s%N)
+  kubectl create configmap "$m" -n observabilite >/dev/null && kubectl delete configmap "$m" -n observabilite >/dev/null
+  temoin "J3 audit de l'API" '{noeud="sc-confiance", source="audit-k8s"}' "$m"
+  m=t4-evenement-$(date +%s%N)
+  kubectl create -f - >/dev/null <<EOF
+apiVersion: v1
+kind: Event
+metadata: {name: $m, namespace: observabilite}
+involvedObject: {kind: Namespace, name: observabilite, apiVersion: v1}
+reason: TemoinL4
+message: "$m"
+type: Normal
+source: {component: brique-19b}
+EOF
+  temoin "J4 événements" '{source="evenements-k8s"}' "$m"
+  m=t4-openbao-$(date +%s%N)
+  racine <<<"bao read sys/policy/$m >/dev/null 2>&1 || true"
+  temoin "J5 audit d'OpenBao (sortie du pod)" '{noeud="sc-confiance", espace="openbao"}' "$m"
+  m=t4-zot-$(date +%s%N)
+  auth_zot "$W/zot-l4.json"
+  printf '%s\n' "$m" > "$W/$m.txt"
+  ( cd "$W" && DOCKER_CONFIG= oras push --ca-file "$P/ca-poc.crt" --registry-config "$W/zot-l4.json" "$REG_HOTE/essais-19b/temoin:$m" "$m.txt" >/dev/null )
+  rm -f "${W:?}/zot-l4.json" "${W:?}/$m.txt"
+  temoin "J6 audit de Zot (poc-ecriture, essais-19b/temoin)" '{noeud="sc-stockage", source="audit-zot"}' "$m"
+  m=t4-recepteur-$(date +%s%N)
+  sur sc-stockage "curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' http://127.0.0.1:9095/alerte \
+    -d '{\"alerts\": [{\"status\": \"firing\", \"labels\": {\"alertname\": \"$m\"}}]}'" | sed 's/^/récepteur : HTTP /'; echo
+  temoin "J8 récepteur d'alertes" '{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}' "$m"
+  rm -f "${W:?}/graf.out"
+}
+
+etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hôte (répertoire 0700), recherche par motifs lus dans
+  # des fichiers (jamais en argument ni dans une requête) ; témoin positif : une valeur aléatoire écrite dans Loki doit être trouvée
+  local x=$W/secrets-l4 f n debut fin c t total
+  rm -rf "${x:?}" && (umask 077 && mkdir -p "$x/motifs")
+  (umask 077 && openssl rand -hex 24 > "$x/motifs/temoin-positif")
+  t=$(date +%s%N)
+  jq -nc --arg t "$t" --rawfile v "$x/motifs/temoin-positif" '{streams: [{stream: {source: "controle-l4"}, values: [[$t, ("valeur témoin " + ($v | rtrimstr("\n")))]]}]}' > "$x/push.json"
+  lki controle /loki/api/v1/push -X POST -H 'Content-Type: application/json' --data @"$x/push.json" >/dev/null; rm -f "$x/push.json"
+  for f in "$S"/*; do
+    [ -f "$f" ] || continue
+    case $f in
+      *.key) (umask 077 && grep -vE '^-----' "$f" | awk 'length($0) >= 40' > "$x/motifs/${f##*/}") ;;
+      *.crt|*.pub|*.pem|*.json) ;;
+      *) [ "$(tr -d '\n' < "$f" | wc -c)" -ge 12 ] && (umask 077 && tr -d '\n' < "$f" > "$x/motifs/${f##*/}"; echo >> "$x/motifs/${f##*/}") ;;
+    esac
+  done
+  echo "motifs : $(ls "$x/motifs" | wc -l) fichiers de secrets (valeurs jamais affichées), plus le témoin positif"
+  sleep 5
+  fin=$(date +%s)000000000; debut=$(date -u -d 2026-11-01T00:00:00Z +%s)000000000; total=0   # début du schéma de Loki
+  : > "$x/export"
+  while :; do   # pagination vers l'avant, 5 000 lignes par requête
+    lki controle /loki/api/v1/query_range -G --data-urlencode 'query={source=~".+"}' --data-urlencode "start=$debut" \
+      --data-urlencode "end=$fin" --data-urlencode limit=5000 --data-urlencode direction=forward >/dev/null
+    cp "$W/lki.out" "$x/page.json"
+    n=$(jq '[.data.result[].values[]] | length' "$x/page.json")
+    jq -r '.data.result[] | .stream as $s | .values[] | "\(.[0]) \($s | tostring) \(.[1])"' "$x/page.json" >> "$x/export"
+    total=$((total + n))
+    [ "$n" -lt 5000 ] && break
+    debut=$(jq -r '[.data.result[].values[][0]] | max' "$x/page.json")   # nanosecondes, en chaîne (pas de perte de précision)
+    debut=$((debut + 1))
+  done
+  echo "lignes exportées : $total ($(du -h "$x/export" | cut -f1))"
+  for f in "$x"/motifs/*; do
+    c=$(grep -c -F -f "$f" "$x/export" || true)
+    printf '  %-36s %s ligne(s)\n' "${f##*/}" "$c"
+  done
+  rm -rf "${x:?}" "${W:?}/lki.out" "${W:?}/lki.err"
+}
+
+prom() { # requête PromQL (sans apostrophe) sur Prometheus de sc-stockage ; une ligne par série
+  sur sc-stockage "curl -s -G http://127.0.0.1:9090/api/v1/query --data-urlencode 'query=$1'" \
+    | jq -r '.data.result[]? | "\(.metric | del(.__name__) | tostring) \(.value[1])"'
+}
+alerte_etat() { # nom : état de l'alerte dans Prometheus (inactive, pending, firing)
+  sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/alerts" | jq -r --arg n "$1" '[.data.alerts[] | select(.labels.alertname == $n) | .state] | first // "inactive"'
+}
+
+etape_muette() { # Alloy de sc-stockage arrêté sur sc-build pendant au moins 8 min : SourceMuette (noeud sc-build) déclenchée et
+  # notifiée ; témoins écrits dans le journal de sc-build pendant l'arrêt, retrouvés après la reprise (positions d'Alloy) ;
+  # résolution. Alloy de sc-build toujours relancé, même en cas d'échec.
+  local t0 t m1 m2 e i
+  echo "SourceMuette avant : $(alerte_etat SourceMuette)"
+  t0=$(date +%s)
+  trap 'sur sc-build "sudo systemctl start alloy"; rm -rf "${D:?}" "${W:?}/refus.out"' EXIT
+  sur sc-build "sudo systemctl stop alloy && systemctl is-active alloy || true"
+  echo "Alloy de sc-build arrêté à $(date -u +%H:%M:%S)"
+  m1=t4-arret-1-$(date +%s%N); sur sc-build "logger -t temoin-l4 $m1"
+  for i in $(seq 120); do
+    e=$(alerte_etat SourceMuette)
+    [ "$e" = firing ] && break
+    [ "$i" = 60 ] && { m2=t4-arret-2-$(date +%s%N); sur sc-build "logger -t temoin-l4 $m2"; }
+    sleep 5
+  done
+  t=$(date +%s)
+  echo "SourceMuette : $e après $((t - t0)) s ; étiquettes : $(sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/alerts" | jq -c '[.data.alerts[] | select(.labels.alertname == "SourceMuette") | .labels.noeud]')"
+  [ -n "${m2:-}" ] || { m2=t4-arret-2-$(date +%s%N); sur sc-build "logger -t temoin-l4 $m2"; }
+  for i in $(seq 18); do
+    sur sc-stockage "sudo journalctl -u recepteur-alertes --since @$t0 -o cat" | grep -q '"alerte": "SourceMuette"' && break
+    sleep 5
+  done
+  sur sc-stockage "sudo journalctl -u recepteur-alertes --since @$t0 -o cat" | grep '"alerte": "SourceMuette"' | jq -c '{statut, noeud: .etiquettes.noeud}' | sed 's/^/notification : /'
+  sur sc-build "sudo systemctl start alloy && systemctl is-active alloy"
+  trap 'rm -rf "${D:?}" "${W:?}/refus.out"' EXIT
+  echo "Alloy de sc-build relancé à $(date -u +%H:%M:%S), après $(( $(date +%s) - t0 )) s d'arrêt"
+  temoin "témoin écrit pendant l'arrêt (début)" '{noeud="sc-build", source="journal"}' "$m1"
+  temoin "témoin écrit pendant l'arrêt (après le déclenchement)" '{noeud="sc-build", source="journal"}' "$m2"
+  for i in $(seq 96); do
+    e=$(alerte_etat SourceMuette); [ "$e" = inactive ] && break
+    sleep 5
+  done
+  echo "SourceMuette : $e $(( $(date +%s) - t0 )) s après l'arrêt"
+  sleep 60
+  sur sc-stockage "sudo journalctl -u recepteur-alertes --since @$t0 -o cat" | grep '"alerte": "SourceMuette"' | jq -c '{statut, noeud: .etiquettes.noeud}' | sort | uniq -c | sed 's/^/notifications : /'
+  echo "lignes du journal de sc-build perdues ? (dropped d'Alloy de sc-build) : $(sur sc-build "curl -s 127.0.0.1:12345/metrics" | awk '/^loki_write_dropped_entries_total/ {s += $2} END {print s + 0}')"
+  rm -f "${W:?}/graf.out"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; *) lancer l1 L1 "$@" ;; esac

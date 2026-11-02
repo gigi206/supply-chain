@@ -264,3 +264,61 @@ tests:
         alertname: DisqueStockagePlein
         exp_alerts:
           - exp_labels: {alerte: disque, severite: avertissement, point: /, job: fichiers, instance: local}
+
+  # Source muette (19b) : sc-build se tait à 10 min (compteur figé), sc-confiance et le journal de sc-stockage continuent.
+  # En attente dès 14 min (Prometheus 3 : fenêtre ouverte à gauche, (9m, 14m] ne voit que 1000 ; premier essai à 16 min
+  # attendu vide, archivé dans le README), déclenchée à 16 min, résolue quand le compteur repart (25 min).
+  - interval: 1m
+    input_series:
+      - series: 'loki_source_api_entries_written{job="alloy", instance="local", component_id="loki.source.api.build"}'
+        values: '0+100x10 1000x14 1000+100x10'
+      - series: 'loki_source_api_entries_written{job="alloy", instance="local", component_id="loki.source.api.confiance"}'
+        values: '0+500x35'
+      - series: 'loki_source_journal_target_lines_total{job="alloy", instance="local", component_id="loki.source.journal.journal"}'
+        values: '0+50x35'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: SourceMuette
+        exp_alerts: []
+      - eval_time: 15m
+        alertname: SourceMuette
+        exp_alerts: []
+      - eval_time: 16m
+        alertname: SourceMuette
+        exp_alerts:
+          - exp_labels: {alerte: muette, severite: critique, component_id: loki.source.api.build, noeud: sc-build}
+      - eval_time: 27m
+        alertname: SourceMuette
+        exp_alerts: []
+
+  # Source muette (19b) : journal de sc-stockage figé à partir de 5 min.
+  - interval: 1m
+    input_series:
+      - series: 'loki_source_api_entries_written{job="alloy", instance="local", component_id="loki.source.api.build"}'
+        values: '0+100x20'
+      - series: 'loki_source_api_entries_written{job="alloy", instance="local", component_id="loki.source.api.confiance"}'
+        values: '0+100x20'
+      - series: 'loki_source_journal_target_lines_total{job="alloy", instance="local", component_id="loki.source.journal.journal"}'
+        values: '0+50x5 250x15'
+    alert_rule_test:
+      - eval_time: 13m
+        alertname: SourceMuette
+        exp_alerts:
+          - exp_labels: {alerte: muette, severite: critique, noeud: sc-stockage}
+
+  # Loki injoignable (19b) : envois réussis jusqu'à 10 min, puis seulement des erreurs (503).
+  - interval: 1m
+    input_series:
+      - series: 'loki_write_request_duration_seconds_count{job="alloy", instance="local", status_code="204"}'
+        values: '0+10x10 100x15'
+      - series: 'loki_write_request_duration_seconds_count{job="alloy", instance="local", status_code="503"}'
+        values: '_x10 1+5x15'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: LokiInjoignable
+        exp_alerts: []
+      - eval_time: 18m
+        alertname: LokiInjoignable
+        exp_alerts:
+          - exp_labels: {alerte: loki, severite: critique}
+

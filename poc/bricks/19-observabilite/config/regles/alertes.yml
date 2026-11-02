@@ -81,6 +81,25 @@ groups:
           alerte: disque
           severite: avertissement
 
+      # Source de journaux muette (brique 19b, L4) : aucune ligne reçue depuis 5 min par le relais pour sc-confiance ou sc-build
+      # (D17), ni lue dans le journal de sc-stockage. Métriques d'Alloy de sc-stockage (job alloy). Alloy de sc-stockage arrêté :
+      # séries absentes, c'est CollecteEnPanne (up == 0) qui se déclenche.
+      - alert: SourceMuette
+        expr: label_replace(sum by (component_id) (increase(loki_source_api_entries_written{job="alloy", component_id=~"loki.source.api.(confiance|build)"}[5m])), "noeud", "sc-$1", "component_id", "loki.source.api.(.*)") == 0 or label_replace(sum(increase(loki_source_journal_target_lines_total{job="alloy"}[5m])), "noeud", "sc-stockage", "", "") == 0
+        for: 2m
+        labels:
+          alerte: muette
+          severite: critique
+
+      # Loki injoignable ou en refus (brique 19b, L4) : aucun envoi réussi d'Alloy de sc-stockage vers Loki depuis 5 min, alors
+      # qu'il envoie en continu (son journal, le relais, les événements).
+      - alert: LokiInjoignable
+        expr: sum(increase(loki_write_request_duration_seconds_count{job="alloy", status_code=~"2.."}[5m])) == 0
+        for: 2m
+        labels:
+          alerte: loki
+          severite: critique
+
       # Collecte en panne depuis 5 min (proxy de l'API, jeton invalidé par un rejeu complet de la 08, service arrêté).
       # OpenBao est exclu : son indisponibilité relève de A1.
       - alert: CollecteEnPanne

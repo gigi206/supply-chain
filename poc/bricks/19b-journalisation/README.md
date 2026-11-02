@@ -251,3 +251,25 @@ Journaux :
 - **Pods de `sc-build`** : les lignes ont l'horodatage CRI d'origine. Les fichiers anciens n'apparaissent donc pas dans une fenêtre de 10 min, ce qui n'est pas une perte : 2 825 lignes sur 24 h.
 - **Loki sous `RestrictAddressFamilies`** : 16 avertissements « error getting network interfaces … address family not supported ». Il lui manque `AF_NETLINK`, sans effet mesuré. C'est du bruit ; ajouter `AF_NETLINK` reste à décider.
 - **La 08 a changé** (D15 a) : `config.hcl` déclare `sortie/`. Au prochain `openbao.sh deployer`, le pod sera recréé, donc scellé, et la procédure de descellement de la 08 s'appliquera.
+
+## L4, préparation à sec (02/11/2026 ; rien exécuté)
+
+Étapes `prometheus_alloy temoins secrets muette` (`JALON=l4`). Prédictions : [`l4-predictions.md`](resultats/l4-predictions.md).
+
+- **Témoins** : un marqueur daté par source, émis par le moyen le plus direct, puis lu **par l'auditeur à travers l'API de Grafana** (`/api/ds/query`), avec le délai mesuré, en 120 s au plus.
+  - J1 : `logger` sur chaque VM ;
+  - J2 : écriture sur la sortie standard d'un conteneur, `openbao-0` sur `sc-confiance` et l'agent Cilium sur `sc-build`. `sc-build` porte la taint `zone=build`, et c'est le seul pod hors de `builds` qui y tourne ;
+  - J3 : ConfigMap créée puis supprimée ;
+  - J4 : objet Event ;
+  - J5 : lecture d'un chemin inexistant dans OpenBao ;
+  - J6 : étiquette poussée dans Zot par `poc-ecriture` ;
+  - J8 : notification postée au récepteur.
+- **Secrets** :
+  - tout Loki est exporté sur l'hôte, dans un répertoire 0700 supprimé ensuite, depuis le début du schéma ;
+  - on y cherche chaque secret de `…/08/secrets` par `grep -F -f` sur un fichier de motifs : aucune valeur n'apparaît en argument, dans une requête LogQL ou dans un journal. Seul le nombre de lignes trouvées par fichier est affiché ;
+  - un témoin positif, une valeur aléatoire écrite dans Loki, doit être retrouvé.
+- **Source muette** :
+  - règles `SourceMuette` et `LokiInjoignable` dans les règles de la 19, avec leurs tests. promtool a donné `SUCCESS` sur 11 règles. Deux mutations sont détectées : fenêtre de 3 min, et codes 5xx comptés comme réussis ;
+  - Prometheus collecte Alloy de `sc-stockage` (job `alloy`, `127.0.0.1:12345`) ;
+  - essai réel : Alloy de `sc-build` est arrêté jusqu'au déclenchement, avec deux témoins écrits pendant l'arrêt et retrouvés après la reprise (absence de perte).
+  - **Premier essai du test de `SourceMuette` faux** : j'attendais l'alerte en attente à 15 min. Prometheus 3 évalue les fenêtres ouvertes à gauche : la fenêtre (9 min, 14 min] ne voit plus de hausse dès 14 min, donc elle se déclenche à 16 min. Attendu corrigé, commentaire dans le test.
