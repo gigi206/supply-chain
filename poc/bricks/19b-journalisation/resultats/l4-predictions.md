@@ -32,3 +32,13 @@ Ordre proposé :
 Limites connues d'avance :
 - `LokiInjoignable` n'est éprouvée que par promtool, pas par un arrêt réel de Loki ;
 - l'arrêt d'Alloy de `sc-stockage` relève de `CollecteEnPanne` (`up == 0`, 5 min), non éprouvé ici.
+
+## Additif (2026-11-02T21:13:30Z, avant toute exécution, après relecture)
+
+**Sonde en lecture** (marqueur jamais émis, requête de l'auditeur) : le marqueur apparaît **1 fois dans la réponse brute de Grafana** (texte de la requête) et **0 fois dans les lignes de données**. Sans correction, tout témoin aurait passé en 0 s. La recherche porte maintenant sur les seules lignes renvoyées, et une contre-épreuve ouvre l'étape `temoins` : un marqueur jamais émis doit rester absent.
+
+`prometheus.yml` déployé est identique à la version du dépôt d'avant L4 (`diff`) : seul le job `alloy` change.
+
+Changements de prédiction :
+- **4, secrets** : le total exporté est **égal** au compte de Loki sur la même fenêtre. Motifs ajoutés, lus sur les VM : jetons du serveur k3s, jeton de métriques de Forgejo, secrets de son `app.ini` (`SECRET_KEY`, `INTERNAL_TOKEN`, `JWT_SECRET`, `LFS_JWT_SECRET`) ; 0 ligne pour chacun.
+- **5, source muette** : le compteur d'entrées abandonnées est retiré. Il repart à 0 au redémarrage d'Alloy et ne prouve rien. L'absence de perte se mesure par l'arrivée des deux témoins.

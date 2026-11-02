@@ -272,4 +272,10 @@ Journaux :
   - règles `SourceMuette` et `LokiInjoignable` dans les règles de la 19, avec leurs tests. promtool a donné `SUCCESS` sur 11 règles. Deux mutations sont détectées : fenêtre de 3 min, et codes 5xx comptés comme réussis ;
   - Prometheus collecte Alloy de `sc-stockage` (job `alloy`, `127.0.0.1:12345`) ;
   - essai réel : Alloy de `sc-build` est arrêté jusqu'au déclenchement, avec deux témoins écrits pendant l'arrêt et retrouvés après la reprise (absence de perte).
+- **Défaut trouvé à la relecture, avant exécution** : la réponse de `/api/ds/query` contient le texte de la requête. Un marqueur jamais émis y figure 1 fois, contre 0 dans les lignes de données (sonde du 02/11/2026). La recherche porte donc sur les lignes seules, avec une contre-épreuve. L2 et L3 n'étaient pas touchés : ils sélectionnaient sans marqueur ou comptaient des lignes.
+- **Secrets, garde-fous ajoutés** :
+  - total exporté comparé au compte de Loki ;
+  - code HTTP vérifié page par page ;
+  - copies de secrets effacées même en cas d'échec (`trap`) ;
+  - secrets propres aux VM ajoutés : jetons de k3s, jeton de métriques et `app.ini` de Forgejo.
   - **Premier essai du test de `SourceMuette` faux** : j'attendais l'alerte en attente à 15 min. Prometheus 3 évalue les fenêtres ouvertes à gauche : la fenêtre (9 min, 14 min] ne voit plus de hausse dès 14 min, donc elle se déclenche à 16 min. Attendu corrigé, commentaire dans le test.

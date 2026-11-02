@@ -441,7 +441,10 @@ vu_grafana() { # sélecteur marqueur : secondes jusqu'à ce que l'auditeur lise 
   q=$(jq -nc --arg e "$1 |= \"$2\"" '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 10}], from: "now-15m", to: "now"}')
   for i in $(seq 60); do
     graf auditeur POST /api/ds/query "$q" >/dev/null
-    grep -q "$2" "$W/graf.out" && { echo $(( $(date +%s) - t0 )); return 0; }
+    # Dans les lignes renvoyées seulement : la réponse brute contient aussi le texte de la requête, donc le marqueur
+    # (sonde du 02/11/2026 : marqueur jamais émis présent 1 fois dans la réponse, 0 fois dans les données).
+    jq -e --arg m "$2" '[.results.A.frames[]?.data.values[]?[]? | strings | select(contains($m))] | length > 0' "$W/graf.out" >/dev/null \
+      && { echo $(( $(date +%s) - t0 )); return 0; }
     sleep 2
   done
   echo "absent"
@@ -455,6 +458,9 @@ temoin() { # source sélecteur marqueur : verdict d'un témoin (émis juste avan
 
 etape_temoins() {
   local m v p a
+  m=t4-jamais-emis-$(date +%s%N)   # contre-épreuve : un marqueur jamais émis doit rester absent
+  [ "$(vu_grafana '{noeud="sc-build", source="journal"}' "$m")" = absent ] && echo "OK   contre-épreuve : marqueur jamais émis absent" \
+    || { echo "KO   contre-épreuve : marqueur jamais émis trouvé" >&2; exit 1; }
   for v in sc-confiance sc-build sc-stockage; do
     m=t4-journal-$v-$(date +%s%N); sur "$v" "logger -t temoin-l4 $m"
     temoin "J1 journal de $v" "{noeud=\"$v\", source=\"journal\"}" "$m"
@@ -499,7 +505,8 @@ EOF
 
 etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hôte (répertoire 0700), recherche par motifs lus dans
   # des fichiers (jamais en argument ni dans une requête) ; témoin positif : une valeur aléatoire écrite dans Loki doit être trouvée
-  local x=$W/secrets-l4 f n debut fin c t total
+  local x=$W/secrets-l4 f n debut fin c t total attendu v
+  trap 'rm -rf "${W:?}/secrets-l4" "${W:?}/lki.out" "${W:?}/lki.err" "${D:?}" "${W:?}/refus.out"' EXIT   # copies de secrets
   rm -rf "${x:?}" && (umask 077 && mkdir -p "$x/motifs")
   (umask 077 && openssl rand -hex 24 > "$x/motifs/temoin-positif")
   t=$(date +%s%N)
@@ -513,13 +520,22 @@ etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hô
       *) [ "$(tr -d '\n' < "$f" | wc -c)" -ge 12 ] && (umask 077 && tr -d '\n' < "$f" > "$x/motifs/${f##*/}"; echo >> "$x/motifs/${f##*/}") ;;
     esac
   done
-  echo "motifs : $(ls "$x/motifs" | wc -l) fichiers de secrets (valeurs jamais affichées), plus le témoin positif"
+  # Secrets qui ne vivent que sur les VM, lus par ssh (sortie standard) dans le même répertoire 0700.
+  for v in "sc-confiance:/var/lib/rancher/k3s/server/token" "sc-confiance:/var/lib/rancher/k3s/server/agent-token" \
+           "sc-stockage:/etc/forgejo/secrets/metrics_token"; do
+    f=vm-${v%%:*}-$(basename "${v#*:}")
+    (umask 077 && sur "${v%%:*}" "sudo cat ${v#*:} 2>/dev/null" | tr -d '\n' > "$x/motifs/$f")
+    [ "$(wc -c < "$x/motifs/$f")" -ge 12 ] && echo >> "$x/motifs/$f" || rm -f "${x:?}/motifs/${f:?}"
+  done
+  (umask 077 && sur sc-stockage "sudo awk -F' *= *' '\$1 ~ /^(SECRET_KEY|INTERNAL_TOKEN|JWT_SECRET|LFS_JWT_SECRET)\$/ && length(\$2) >= 12 {print \$2}' /etc/forgejo/app.ini" > "$x/motifs/vm-sc-stockage-forgejo-app.ini")
+  echo "motifs : $(ls "$x/motifs" | wc -l) fichiers (dont $(ls "$x/motifs" | grep -c '^vm-') lus sur les VM : $(ls "$x/motifs" | grep '^vm-' | paste -sd' ')), valeurs jamais affichées ; témoin positif compris"
   sleep 5
   fin=$(date +%s)000000000; debut=$(date -u -d 2026-11-01T00:00:00Z +%s)000000000; total=0   # début du schéma de Loki
   : > "$x/export"
   while :; do   # pagination vers l'avant, 5 000 lignes par requête
     lki controle /loki/api/v1/query_range -G --data-urlencode 'query={source=~".+"}' --data-urlencode "start=$debut" \
-      --data-urlencode "end=$fin" --data-urlencode limit=5000 --data-urlencode direction=forward >/dev/null
+      --data-urlencode "end=$fin" --data-urlencode limit=5000 --data-urlencode direction=forward > "$x/code"
+    [ "$(cat "$x/code")" = 200 ] || { echo "KO   page d'export : HTTP $(cat "$x/code")" >&2; exit 1; }
     cp "$W/lki.out" "$x/page.json"
     n=$(jq '[.data.result[].values[]] | length' "$x/page.json")
     jq -r '.data.result[] | .stream as $s | .values[] | "\(.[0]) \($s | tostring) \(.[1])"' "$x/page.json" >> "$x/export"
@@ -529,6 +545,10 @@ etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hô
     debut=$((debut + 1))
   done
   echo "lignes exportées : $total ($(du -h "$x/export" | cut -f1))"
+  attendu=$(lki controle /loki/api/v1/query -G --data-urlencode "query=sum(count_over_time({source=~\".+\"}[$(( (fin - $(date -u -d 2026-11-01T00:00:00Z +%s)000000000) / 1000000000 ))s]))" \
+    --data-urlencode "time=$fin" >/dev/null; jq -r '.data.result[0].value[1] // "?"' "$W/lki.out")
+  echo "lignes comptées par Loki sur la même fenêtre : $attendu"
+  [ "$attendu" = "$total" ] && echo "OK   export complet" || echo "ÉCART export incomplet ou doublons : $total exportées pour $attendu"
   for f in "$x"/motifs/*; do
     c=$(grep -c -F -f "$f" "$x/export" || true)
     printf '  %-36s %s ligne(s)\n' "${f##*/}" "$c"
@@ -580,7 +600,6 @@ etape_muette() { # Alloy de sc-stockage arrêté sur sc-build pendant au moins 8
   echo "SourceMuette : $e $(( $(date +%s) - t0 )) s après l'arrêt"
   sleep 60
   sur sc-stockage "sudo journalctl -u recepteur-alertes --since @$t0 -o cat" | grep '"alerte": "SourceMuette"' | jq -c '{statut, noeud: .etiquettes.noeud}' | sort | uniq -c | sed 's/^/notifications : /'
-  echo "lignes du journal de sc-build perdues ? (dropped d'Alloy de sc-build) : $(sur sc-build "curl -s 127.0.0.1:12345/metrics" | awk '/^loki_write_dropped_entries_total/ {s += $2} END {print s + 0}')"
   rm -f "${W:?}/graf.out"
 }
 
