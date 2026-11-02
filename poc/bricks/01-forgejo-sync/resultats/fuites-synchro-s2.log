@@ -1,0 +1,74 @@
+# fuites.sh synchro-s2, 2026-11-02T14:44:03Z
+## sc-confiance : 65071 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-build : 23788 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+## sc-stockage : 43736 lignes de journaux
+témoin retrouvé (1)
+0    ca-poc.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook.secret
+0    forgejo.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM

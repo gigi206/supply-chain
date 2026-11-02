@@ -1,0 +1,9 @@
+# forgejo.sh miroir, 2026-11-02T14:42:30Z
+branch-created           heads/main  - -> 1907c19815fd
+sync.py : code 0 ; rapport 20261102T144230Z.json
+OK   mirror/sample-app : main = main de amont-essai/sample-app
+## journal de Forgejo (pushes de ce run : poc-sync vers mirror/ seulement)
+router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /amont-essai/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK

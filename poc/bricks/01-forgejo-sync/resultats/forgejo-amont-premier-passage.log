@@ -1,0 +1,4 @@
+# forgejo.sh amont, 2026-11-02T14:42:16Z
+curl: (22) The requested URL returned error: 404
+KO   push de l'amont d'essai par poc-amont : refusé
+fatal: could not read Username for 'https://192.168.161.13:3000': terminal prompts disabled

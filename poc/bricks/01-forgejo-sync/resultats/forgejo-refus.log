@@ -1,0 +1,55 @@
+# forgejo.sh refus, 2026-11-02T14:43:21Z
+OK   push vers mirror/sample-app par poc-dev (hors de l'équipe synchro) : refusé (User 'poc-dev' is not allowed to push to branch)
+OK   push vers mirror/sample-app par poc-amont : refusé (User 'poc-amont' is not allowed to push to branch)
+OK   push vers workspace/sample-app (brique 08) par poc-sync : refusé (User 'poc-sync' is not allowed to push to branch)
+OK   création de la branche propre custom/essai du fork par poc-sync : refusé (protected branch)
+OK   création de la branche propre paquet/deb du fork par poc-sync (motif du projet) : refusé (protected branch)
+OK   création du tag propre custom-1 du fork par poc-sync : refusé (Tag custom-1 is protected)
+MESURE création de custom/a/b (deux niveaux) du fork par poc-sync : accepté
+OK   branche custom/essai du fork par poc-dev : accepté
+OK   branche paquet/deb du fork par poc-dev : accepté
+OK   tag custom-1 du fork par poc-dev : accepté
+OK   branche ordinaire du fork par poc-sync (hors motif) : accepté
+OK   réécriture de la branche propre custom/essai par poc-sync (force) : refusé (branch custom/essai is protected)
+OK   suppression du tag propre custom-1 par poc-sync : refusé (Tag custom-1 is protected)
+MESURE réécriture de custom/essai par poc-dev (force, liste blanche) : refusé (remote:  remote: Forgejo: branch custom/essai is protected from force push        )
+MESURE réécriture de custom/essai par poc-admin (force, apply_to_admins) : refusé (remote:  remote: Forgejo: branch custom/essai is protected from force push        )
+MESURE tag propre custom-2 du fork par poc-admin : refusé (remote:  remote: Forgejo: Tag custom-2 is protected        )
+MESURE push vers mirror/sample-app par poc-admin : accepté
+## état du fork : 400dd99b5a46 custom/essai, 400dd99b5a46 custom-1
+## journal de Forgejo (requêtes de push de cet essai)
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK

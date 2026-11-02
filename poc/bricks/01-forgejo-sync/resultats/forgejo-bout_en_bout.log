@@ -1,0 +1,19 @@
+# forgejo.sh bout_en_bout, 2026-11-02T14:43:24Z
+OK   avance de main et branche custom/essai (collision) dans l'amont par poc-amont : accepté
+branch-created           heads/custom/essai  - -> 9d784dff246d
+collision                heads/custom/essai  - -> 9d784dff246d
+fast-forward             heads/main  1907c19815fd -> 9d784dff246d
+sync.py : code 2
+{"status":"rewrite-detected","events":[{"type":"branch-created","ref":"heads/custom/essai"},{"type":"collision","ref":"heads/custom/essai"},{"type":"fast-forward","ref":"heads/main"}]}
+OK   collision : code 2
+OK   collision publiée dans mirror/sample-app
+OK   custom/essai du fork intacte (poc-dev)
+OK   main du fork avancée
+OK   tag custom-1 du fork intact
+## journal de Forgejo (pushes de ce run)
+router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /amont-essai/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK

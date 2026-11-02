@@ -54,7 +54,7 @@ api() { # compte méthode chemin [corps-json] : appel de l'API ; sortie : corps 
     curl -fsS --cacert "$P/ca-poc.crt" -H @"$fh" -X "$m" "$FORGEJO_HOTE/api/v1$c"
   fi
 }
-existe() { curl -fsS -o /dev/null --cacert "$P/ca-poc.crt" -H @"$T/entete-admin" "$FORGEJO_HOTE/api/v1$1"; }
+existe() { curl -fs -o /dev/null --cacert "$P/ca-poc.crt" -H @"$T/entete-admin" "$FORGEJO_HOTE/api/v1$1"; }
 gitc() { # compte préfixe-d'url commande-git… : git isolé de la configuration de l'utilisateur, jeton du compte limité au préfixe
   local c=$1 u=$2; shift 2
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_TERMINAL_PROMPT=0 \
@@ -63,12 +63,16 @@ gitc() { # compte préfixe-d'url commande-git… : git isolé de la configuratio
 }
 pousser() { # compte dépôt refspec… : push depuis $T/w ; sortie et code dans $T/push.out, code renvoyé
   local c=$1 d=$2 r=0; shift 2
-  gitc "$c" "$FORGEJO_HOTE/$d" -C "$T/w" push "$FORGEJO_HOTE/$d.git" "$@" > "$T/push.out" 2>&1 || r=$?
+  # Préfixe d'URL de l'en-tête = URL exacte du dépôt, .git compris (git compare les chemins composant par composant).
+  gitc "$c" "$FORGEJO_HOTE/$d.git" -C "$T/w" push "$FORGEJO_HOTE/$d.git" "$@" > "$T/push.out" 2>&1 || r=$?
   return $r
 }
 # Motifs de refus : un push qui échoue pour une autre raison (TLS, jeton, URL) est un KO, pas un refus.
-DROITS='403|permission denied'
-BRANCHE_PROTEGEE='protected branch'
+# Forgejo 15.0.11 refuse un compte sans droit d'écriture par son hook pre-receive (mesuré le 02/11/2026, refus de poc-dev
+# vers mirror/ : « User 'poc-dev' is not allowed to push to branch … »), pas par un 403.
+DROITS="403|permission denied|User '[a-z-]+' is not allowed to push to branch"
+# Réécriture forcée d'une branche protégée (mesuré le 02/11/2026) : « branch custom/essai is protected from force push ».
+BRANCHE_PROTEGEE='protected branch|branch [^ ]+ is protected'
 TAG_PROTEGE='protected tag|tag [^ ]+ is protected'
 refuse() { # libellé motif compte dépôt refspec… : push attendu refusé, avec le motif dans la sortie
   local l=$1 m=$2; shift 2

@@ -1,0 +1,12 @@
+# forgejo.sh refus, 2026-11-02T14:42:41Z
+KO   push vers mirror/sample-app par poc-dev (hors de l'équipe synchro) : refusé pour une autre raison
+remote: 
+remote: Forgejo: User 'poc-dev' is not allowed to push to branch 'essai-s2' in 'mirror/sample-app'.        
+remote: If you instead wanted to create a pull request to the branch 'essai-s2', please use:        
+remote: git push origin HEAD:refs/for/essai-s2/choose-a-descriptor        
+remote: You might want to replace 'origin' with the name of your Git remote if it is different from origin. You can freely choose the descriptor to set it to a topic.        
+remote: You can learn about creating pull requests with AGit in the docs: https://forgejo.org/docs/latest/user/agit-support/        
+remote: 
+To https://192.168.161.13:3000/mirror/sample-app.git
+ ! [remote rejected] HEAD -> essai-s2 (pre-receive hook declined)
+error: failed to push some refs to 'https://192.168.161.13:3000/mirror/sample-app.git'

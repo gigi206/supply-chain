@@ -1,0 +1,18 @@
+# forgejo.sh comptes, 2026-11-02T14:42:13Z
+New user 'poc-sync' has been successfully created!
+compte poc-sync créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-sync (write:repository) en 0600 sur l'hôte
+New user 'poc-dev' has been successfully created!
+compte poc-dev créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-dev (write:repository) en 0600 sur l'hôte
+New user 'poc-amont' has been successfully created!
+compte poc-amont créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-amont (write:repository) en 0600 sur l'hôte
+Username Email IsAdmin 2FA
+poc-admin poc-admin@poc.test true false
+poc-sync poc-sync@poc.test false false
+poc-dev poc-dev@poc.test false false
+poc-amont poc-amont@poc.test false false
+OK   poc-sync n'est pas administrateur
+OK   poc-dev n'est pas administrateur
+OK   poc-amont n'est pas administrateur

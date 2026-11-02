@@ -235,6 +235,25 @@ Script : [`forgejo.sh`](forgejo.sh), étapes `comptes organisations amont miroir
 
 **Après un rejeu de la 08**, tout l'état de S2 à S6 disparaît avec les VM : S2 est à rejouer avant S3 (l'installation de S3 reprend le miroir de l'hôte).
 
+**Résultats** (02/11/2026, 14:42 à 14:43 UTC, après le rejeu `enchainement` de la 08 ; journaux `resultats/forgejo-<étape>.log`) :
+
+- **Passages archivés** (règle : tout passage modifié ensuite est gardé) :
+  - [`forgejo-amont-premier-passage.log`](resultats/forgejo-amont-premier-passage.log) : push de l'amont sans en-tête. Défaut du script : l'en-tête était déclaré pour `…/sample-app` et le push visait `…/sample-app.git` ; git compare les chemins composant par composant, l'en-tête n'est donc pas envoyé. La vérification à sec (`s2-portee-entete.log`) ne testait que des URL en `.git`. Corrigé : préfixe = URL exacte du dépôt ;
+  - [`forgejo-refus-premier-passage.log`](resultats/forgejo-refus-premier-passage.log) : refus réel de `poc-dev` vers `mirror/`, mais motif inattendu, donc KO (garde-fou de la relecture) : Forgejo 15.0.11 refuse un compte sans droit d'écriture par son hook pre-receive, **« User 'poc-dev' is not allowed to push to branch … »**, pas par un 403. Motif ajouté après mesure ;
+  - [`forgejo-refus-deuxieme-passage.log`](resultats/forgejo-refus-deuxieme-passage.log) : réécriture forcée refusée avec **« branch custom/essai is protected from force push »**, motif ajouté de même. Les refs créées par ce passage empêchant de le rejouer tel quel, le fork d'essai a été supprimé (HTTP 204) puis recréé par `fork`.
+- `comptes` : trois comptes ordinaires, non administrateurs, un jeton `write:repository` chacun ; aucun mot de passe conservé. `organisations` : équipes `mirror/synchro` (`poc-sync`, écriture, tous les dépôts) et `amont-essai/ecriture` (`poc-amont`). Les « 404 » du journal sont les tests d'existence (rendus silencieux ensuite).
+- `amont`, `miroir` : premier run de `sync.py` à code 0, `main` de `mirror/sample-app` = `main` de l'amont.
+- `archives` : **Forgejo accepte `refs/archive/*`** ; force-push d'une branche non sensible : code 0, `force-push-unprotected`, ancienne valeur lisible sous `refs/archive/20261102T144237Z/heads/essai/archive` dans `mirror/`. Conforme.
+- `fork` : `workspace/sample-app-sync`, fork de `mirror/sample-app`, même `main` ; équipes `workspace/synchro` et `workspace/dev-sample-app-sync` limitées à ce seul dépôt. `protections` : `custom/*` et `paquet/*` (liste blanche `poc-dev`, `apply_to_admins`), tag `custom-*` (liste blanche `poc-dev`).
+- `refus` ([`forgejo-refus.log`](resultats/forgejo-refus.log)), conformes : refus de `poc-dev` et `poc-amont` vers `mirror/`, de `poc-sync` vers `workspace/sample-app` de la 08 (dont `main` reste `6391fd43`, seule ref, vérifié après coup ; le journal de Forgejo note ce POST en 200, le refus passant par le protocole git), de `poc-sync` sur la création, la réécriture forcée et la suppression de refs propres ; acceptés : refs propres par `poc-dev`, branche ordinaire du fork par `poc-sync`.
+- Mesures :
+  - **`custom/a/b` créée par `poc-sync` : acceptée**, comme prédit (prédiction faible). Le `*` des règles de Forgejo ne traverse pas les `/`, contrairement à celui de `sync.py` : la défense en profondeur de Forgejo est plus étroite que la protection de `sync.py` pour les branches à plusieurs niveaux. À traiter (motif `custom/**` côté Forgejo, à mesurer) ou à consigner ; `sync.py` reste protégé ;
+  - **réécriture forcée de `custom/essai` par `poc-dev` : refusée**, contrairement à la prédiction (acceptée, prédiction faible) : la protection interdit le force-push à tous, liste blanche comprise ;
+  - par `poc-admin` (`apply_to_admins`) : refusée ; tag propre `custom-2` par `poc-admin` : refusé ; conformes ;
+  - **push de `poc-admin` vers `mirror/` : accepté**, comme prédit : l'administrateur passe outre les équipes. Limite consignée ; la branche `essai-s2-admin` ainsi créée sera élaguée par le prochain push de la synchro (`--prune`).
+- Fuites ([`fuites-synchro-s2.log`](resultats/fuites-synchro-s2.log), `fuites.sh` de la 08) : aucun des trois nouveaux jetons dans les journaux des trois VM, témoin retrouvé.
+- `bout_en_bout` : conforme. Collision sur `custom/essai` : code 2 (`branch-created`, `collision`, `fast-forward` de `main`), collision publiée dans `mirror/`, `custom/essai` du fork intacte (valeur de `poc-dev`), `main` du fork avancée, tag `custom-1` intact.
+
 ## Jalon S3, partie hors cluster : métrique (D3)
 
 **Prédictions** (écrites le 02/11/2026 vers 14:05 UTC, juste avant le code ; heure d'abord mal notée, 14:07) : `--metriques <fichier>` écrit, après chaque run, un fichier au format texte de Prometheus **déduit des rapports** (qui font foi), réécrit atomiquement (fichier temporaire puis `os.replace`) ; un run `rewrite-detected` compte comme une réussite ; un run en erreur ne fait pas avancer la dernière réussite ; les 14 tests existants passent toujours.

@@ -1,0 +1,19 @@
+# forgejo.sh refus, 2026-11-02T14:42:53Z
+OK   push vers mirror/sample-app par poc-dev (hors de l'équipe synchro) : refusé (User 'poc-dev' is not allowed to push to branch)
+OK   push vers mirror/sample-app par poc-amont : refusé (User 'poc-amont' is not allowed to push to branch)
+OK   push vers workspace/sample-app (brique 08) par poc-sync : refusé (User 'poc-sync' is not allowed to push to branch)
+OK   création de la branche propre custom/essai du fork par poc-sync : refusé (protected branch)
+OK   création de la branche propre paquet/deb du fork par poc-sync (motif du projet) : refusé (protected branch)
+OK   création du tag propre custom-1 du fork par poc-sync : refusé (Tag custom-1 is protected)
+MESURE création de custom/a/b (deux niveaux) du fork par poc-sync : accepté
+OK   branche custom/essai du fork par poc-dev : accepté
+OK   branche paquet/deb du fork par poc-dev : accepté
+OK   tag custom-1 du fork par poc-dev : accepté
+OK   branche ordinaire du fork par poc-sync (hors motif) : accepté
+KO   réécriture de la branche propre custom/essai par poc-sync (force) : refusé pour une autre raison
+remote: 
+remote: Forgejo: branch custom/essai is protected from force push        
+remote: 
+To https://192.168.161.13:3000/workspace/sample-app-sync.git
+ ! [remote rejected] HEAD~1 -> custom/essai (pre-receive hook declined)
+error: failed to push some refs to 'https://192.168.161.13:3000/workspace/sample-app-sync.git'
