@@ -10,10 +10,12 @@ trusted_tasks:
     - ref: sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
   # J7 : construction de sample-app (voie A, pipeline sample-app de construction.sh) : politique/taches/construire-image.signee.yaml,
   # pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs, sans aucune sortie réseau (option 3 du contrôle de sortie,
-  # choix du propriétaire du 30/10/2026), image de build en layout OCI. Remplace c7e8b275 (première version, qui tirait ses
-  # entrées elle-même : échec fermé sous la NetworkPolicy construction-sans-sortie), retirée de la liste
+  # choix du propriétaire du 30/10/2026), image de build en layout OCI. Brique 03, F3 (D5 a ; revue et accord du propriétaire du
+  # 03/11/2026 : « Retirer 403ccbd8 ») : entrées lues dans le workspace entrees monté en lecture seule (sous-dossier du PVC),
+  # écriture essayée et refusée. Remplace 403ccbd8 (J7, entrées dans le workspace sortie, inscriptible), retirée de la liste,
+  # comme c7e8b275 avant elle (première version, qui tirait ses entrées elle-même)
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-image:
-    - ref: sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+    - ref: sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
   # J7 : politique/taches/preparer-entrees.signee.yaml, pod runc restreint : sources, fermeture, web/dist et image de build
   # (layout OCI) tirés dans le workspace ; entrées déclarées à Chains
   oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees:

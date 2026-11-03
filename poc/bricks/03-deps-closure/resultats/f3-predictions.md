@@ -185,3 +185,98 @@ attestation signature: no matching attestations ». La prédiction 5 est précis
     `/var/log/pods/*` de chaque nœud), donc consultables dans Grafana ;
   - refus réseau : dans Hubble seulement, écart de F2 inchangé ;
   - étapes `regle` et `reel` : sur l'hôte, journaux dans `resultats/`, hors de la plateforme.
+
+## Accord d'exécution (03/11/2026, reçu avant 19:24 UTC) et résultats de `taches` (19:24 UTC)
+
+Réponses du propriétaire :
+- exécution de F3 : « Oui, avec la bascule (Recommandé) » ;
+- liste revue : « Retirer 403ccbd8 (Recommandé) » ;
+- push de la préparation : « Oui, pousser (Recommandé) », poussée `d7d05b4..11eba5b`.
+
+**`taches` conforme** (1 à 3). Journaux : passe `SIGNER=construire-image` dans [`f3-taches-signer.log`](f3-taches-signer.log),
+passe normale dans [`f3-taches.log`](f3-taches.log).
+- `preparer-entrees` `2070d601` et `publier-image` `d21931f3` : inchangées depuis J7.
+- `construire-image` (D5) : nouveau bundle `66a9f298`, ajouté à la liste revue, et `403ccbd8` retiré, selon l'accord.
+- Pipeline `sample-app@e11fe3af` (étiquette `f3`), fermeture épinglée `builds/fermetures/sample-app@74c265e7`.
+- `regle` relancé avec la nouvelle liste : 21/21.
+
+## Résultats de `temoins` (19:24 à 19:25 UTC)
+
+**Conforme** (7 à 10), [journal](f3-temoins.log).
+- Fermeture altérée `entrees/sample-app/fermeture-alteree@f1e0be57` : zip de chi valide. Le fichier modifié est
+  `_examples/custom-handler/main.go`, qui n'est pas compilé par sample-app.
+- `f3-alteree` : `preparer` réussit, `construire` (Kata) échoue au `go build` sur « verifying github.com/go-chi/chi/v5@v5.2.3:
+  checksum mismatch », puis « SECURITY ERROR ». `publier` n'est pas lancé.
+  - Le hash `h1:` de `go.sum` couvre tout le contenu du zip : une modification d'un fichier non compilé est refusée aussi.
+- `f3-absente` : `preparer` échoue au tirage (« not found »). Ni `construire` ni `publier`.
+- Aucune écriture de `poc-images` dans `builds/essai-f3`.
+
+## Résultats de `lecture_seule` (19:25 UTC)
+
+[Journal](f3-lecture_seule.log). Prédiction 11 conforme, 12 démentie sur son hypothèse principale.
+- Le pod runc (uid 65532) écrit `entrees/temoin`.
+- Pod Kata privilégié en root : `/e` est monté en `virtiofs ro`, la lecture réussit, l'écriture est **refusée** (« Read-only
+  file system »).
+- **Remontage `rw` accepté**, puis **écriture acceptée** : le fichier `ecrit-apres` (root) apparaît dans le PVC vu d'un autre
+  pod. Kata 4.3.1 n'applique donc pas la lecture seule côté hôte pour ce volume : elle n'existe que dans le montage de
+  l'invité.
+- **Limite de D5, mesurée** : la lecture seule du workspace `entrees` protège des écritures accidentelles de l'étape de
+  construction, pas d'une étape malveillante privilégiée.
+  - L'intégrité des modules au moment de la construction reste assurée par `go.sum`, comme le montre le témoin altéré.
+  - L'origine de la fermeture est assurée par la porte (D6).
+  - Une étape de construction compromise peut de toute façon produire n'importe quelle image : le remontage ne lui donne
+    rien de plus sur l'image produite.
+  - En revanche, elle peut modifier les entrées du PVC lues ensuite par `publier`, c'est-à-dire le sous-dossier `image/`, qui
+    lui est de toute façon ouvert en écriture.
+
+## Résultats de `porte`, `construire`, `provenance` et `bascule` (19:26 à 19:31 UTC)
+
+- **`porte`**
+  - Premier passage (19:26:13, [journal](f3-porte-premier-passage.log)) : arrêt sur un **faux écart**. La ConfigMap avait été
+    appliquée, mais ma comparaison passait par `jq -r`, qui ajoute un saut de ligne. Relue avec `jq -j` à la main, elle était
+    identique aux deux fichiers. Corrigé, relancé à 19:26:29 ([journal](f3-porte.log)).
+  - D6 est en place depuis 19:26:13. L'image réelle a été refusée de 19:26 à 19:31, jusqu'au jugement suivant la
+    construction.
+  - 4, 5 et 6 conformes.
+    - ConfigMap identique.
+    - Image réelle refusée : violations `porte.fermeture_plateforme` et `trusted_task.trusted` (retrait de `403ccbd8`). Le
+      message nomme `entrees/sample-app/fermeture@0ab5a507` : « 0 provenance(s) vérifiée(s) … no matching attestations ».
+      Horodatage ok, VSA ok.
+    - Le témoin `builds/essai-webhook` garde son verdict, sans violation de D6.
+- **`construire`** : 13 à 17 conformes ([journal](f3-construire.log)).
+  - `f3-construire` réussit en 28 s de construction.
+  - Montages de `construire` : `/workspace/entrees` (sous-dossier `entrees`, `readOnly`), `/workspace/sortie` (sous-dossier
+    `image`) et `/workspace`. Ce dernier est l'emptyDir interne de Tekton (`tekton-internal-workspace`), pas le PVC : vérifié
+    à la main.
+  - Dans l'invité : `virtiofs ro`, écriture refusée. BuildKit lit le layout en lecture seule sans erreur.
+  - **Image `3a7ca1b1`, identique à J7 et à la brique 04**, construite sur la fermeture de la plateforme.
+  - Chains signe, passage d'horodatage `horodatage-29895570` (8 enveloppes sur 8 couvertes).
+  - **Porte : admise**. ec `true`, aucune violation, avertissement `trusted_task.tagged`, horodatage ok, VSA ok.
+  - Constat : la VSA retenue est celle du rejeu de J7 (`vsa.sh` la lie au digest).
+- **`provenance`** : 18 conforme ([journal](f3-provenance.log)).
+  - 8 enveloppes valides, une pour `f3-construire`.
+  - Fermeture `builds/fermetures/sample-app@74c265e7` dans `resolvedDependencies`.
+  - `construire-image` en `66a9f298`.
+  - Workspaces signés `entrees:entrees,sortie:image`.
+  - Autre clé refusée.
+- **`bascule`** : 19 conforme ([journal](f3-bascule.log)). Le gabarit en service passe de la pipeline de J7 (`36669861`) à celle
+  de F3 (`e11fe3af`). `kubectl apply` signale l'absence de l'annotation `last-applied-configuration` : avertissement sans effet,
+  le gabarit avait été créé sans `--save-config`.
+
+## Bilan de F3
+
+**Seuil de la 03 atteint pour sample-app** :
+- la construction en service lit une fermeture produite par la plateforme ;
+- la porte exige cette origine (D6) ;
+- une fermeture altérée est refusée à la construction (`go.sum`), une fermeture absente aussi ;
+- l'image est identique.
+
+**Limite mesurée** : D5 n'est pas une frontière contre une étape privilégiée (remontage dans l'invité Kata).
+
+**Écarts consignés** :
+- la VSA est liée au digest, pas à la provenance ;
+- refus réseau du prefetch dans Hubble seulement ;
+- `web/dist` est toujours produit sur l'hôte.
+
+**Suite** : `rejeu.sh` de la 08 doit intégrer F2 et F3 avant la bascule de J8. Sinon, un rejeu complet ferait refuser l'image
+réelle par D6.

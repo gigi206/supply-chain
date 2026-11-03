@@ -1,0 +1,45 @@
+# bascule.sh temoins, 2026-11-03T19:24:39Z
+## fermeture altérée : copie de la fermeture de F2, un zip de module modifié (zip valide), poussée par poc-ecriture
+modifié : github.com/go-chi/chi/v5@v5.2.3/_examples/custom-handler/main.go
+zip valide : deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.zip
+fermeture altérée : sc-stockage.poc.test:5000/entrees/sample-app/fermeture-alteree@sha256:f1e0be5776438f49a4b6893a52d12038770889ca0620426f25dd367f0ddb9c56
+## pipelines des témoins (images dans builds/essai-f3)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:4711a7d29bad28c647be1ac0ab532e959823d6f7902260c0d28c9ef73265dcc5
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:656732a9934d82b2f07f540fc67afd28894d4fae3eacc9289c9383ae664670b6
+## f3-alteree
+PipelineRun f3-alteree : False|Failed|Tasks Completed: 2 (Failed: 1, Cancelled 0), Skipped: 1
+### TaskRun f3-alteree-construire (StepFailed), pod f3-alteree-construire-pod, runtimeClassName kata
+        7 | >>> RUN --network=none --mount=type=bind,from=deps,target=/deps \
+        8 | >>>     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache \
+        9 | >>>     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+       10 |     
+     --------------------
+     error: failed to solve: process "/bin/sh -c GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags \"-s -w -buildid= -X main.Version=1.0.0\" -o /out/sample-app ." did not complete successfully: exit code: 1
+### TaskRun f3-alteree-preparer (Succeeded), pod f3-alteree-preparer-pod, runtimeClassName 
+     2026/11/03 19:24:50 Entrypoint initialization
+     2026/11/03 19:24:51 Decoded script /tekton/scripts/script-0-jnp9f
+     2026/11/03 19:24:51 Decoded script /tekton/scripts/script-1-fbnpr
+     git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture : 7 fichiers ; web/dist : 2 fichiers ; image de build en layout OCI : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   PipelineRun f3-alteree : False
+OK   TaskRun publier de f3-alteree : 0
+## f3-absente
+PipelineRun f3-absente : False|Failed|Tasks Completed: 1 (Failed: 1, Cancelled 0), Skipped: 2
+### TaskRun f3-absente-preparer (StepFailed), pod f3-absente-preparer-pod, runtimeClassName 
+     git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     Error response from registry: sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:1da4bba83fa0ceebd8d779afe29a3f0c020d9e1913c0b2996e4d2ad7ae3bce97: not found
+     2026/11/03 19:25:26 Entrypoint initialization
+     2026/11/03 19:25:27 Decoded script /tekton/scripts/script-0-phq9f
+     2026/11/03 19:25:27 Decoded script /tekton/scripts/script-1-t6xn8
+OK   PipelineRun f3-absente : False
+OK   TaskRun publier de f3-absente : 0
+     #10 2.879 verifying github.com/go-chi/chi/v5@v5.2.3: checksum mismatch
+     #10 2.879 SECURITY ERROR
+     2.879 verifying github.com/go-chi/chi/v5@v5.2.3: checksum mismatch
+OK   fermeture altérée : go build refuse le module (go.sum)
+     Error response from registry: sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:1da4bba83fa0ceebd8d779afe29a3f0c020d9e1913c0b2996e4d2ad7ae3bce97: not found
+OK   fermeture absente : preparer échoue au tirage
+OK   écritures de poc-images dans builds/essai-f3 depuis 2026-11-03T19:24:45Z : 0
+# fin 2026-11-03T19:25:31Z

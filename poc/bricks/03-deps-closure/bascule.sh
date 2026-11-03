@@ -209,7 +209,7 @@ etape_porte() {
   echo "## ConfigMap porte : porte.rego (D6) et liste revue de F3"
   cm_porte
   for k in porte.rego taches.yml; do
-    cmp -s <(kubectl get configmap -n porte porte -o json | jq -r --arg k "$k" '.data[$k]') "$here/politique/porte/$k" \
+    cmp -s <(kubectl get configmap -n porte porte -o json | jq -j --arg k "$k" '.data[$k]') "$here/politique/porte/$k" \
       && echo "OK   ConfigMap porte : $k identique au fichier versionné" || { echo "KO   ConfigMap porte : $k" >&2; exit 1; }
   done
   echo "## image réelle, avant la construction de F3 (provenance la plus récente : fermeture de l'hôte)"

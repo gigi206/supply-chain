@@ -1,0 +1,12 @@
+# bascule.sh porte, 2026-11-03T19:26:29Z
+## ConfigMap porte : porte.rego (D6) et liste revue de F3
+OK   ConfigMap porte : porte.rego identique au fichier versionné
+OK   ConfigMap porte : taches.yml identique au fichier versionné
+## image réelle, avant la construction de F3 (provenance la plus récente : fermeture de l'hôte)
+VERDICT|f3-avant|false|porte.fermeture_plateforme,trusted_task.trusted|trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+  fermeture sc-stockage.poc.test:5000/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048 : aucune provenance de la pipeline de prefetch de la plateforme (0 provenance(s) vérifiée(s) par la clé de Chains, aucune conforme ; erreurs : verify image attestation signature: no matching attestations: )
+OK   ec (success, violations) : false|porte.fermeture_plateforme,trusted_task.trusted
+## témoin hors règle : builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (pipeline d'essai de J6, sans preparer-entrees)
+VERDICT|f3-essai|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
+OK   verdict inchangé (c6-sans-vsa, preuves-controle6.log) : false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged
+# fin 2026-11-03T19:28:14Z

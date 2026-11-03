@@ -1,0 +1,25 @@
+# bascule.sh lecture_seule, 2026-11-03T19:25:38Z
+## PVC f3-lecture-seule (local-path) écrit par un pod runc restreint (uid 65532)
+     f3-ecrire : /v:
+     f3-ecrire : total 4
+     f3-ecrire : drwxr-xr-x    2 65532    65532         4096 Nov  3 19:25 entrees
+     f3-ecrire : 
+     f3-ecrire : /v/entrees:
+     f3-ecrire : total 4
+     f3-ecrire : -rw-r--r--    1 65532    65532            8 Nov  3 19:25 temoin
+## pod Kata privilégié en root, sous-dossier entrees en readOnly (comme construire-image)
+     f3-kata : none /e virtiofs ro,relatime 0 0
+     f3-kata : lecture : témoin
+     f3-kata : touch: /e/ecrit-avant: Read-only file system
+     f3-kata : écriture avant remontage : refusée
+     f3-kata : remontage rw : accepté
+     f3-kata : none /e virtiofs rw,relatime 0 0
+     f3-kata : écriture après remontage : acceptée
+## relu côté PVC (pod runc)
+     f3-relire : total 4
+     f3-relire : -rw-r--r--    1 0        0                0 Nov  3 19:25 ecrit-apres
+     f3-relire : -rw-r--r--    1 65532    65532            8 Nov  3 19:25 temoin
+fichiers écrits par le pod Kata, vus du PVC : 1
+OK   écriture avant remontage : refusée
+CONSTAT remontage rw : accepté ; écriture après remontage : acceptée ; fichiers vus du PVC : 1
+# fin 2026-11-03T19:25:51Z

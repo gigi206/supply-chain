@@ -339,3 +339,26 @@ options de clé passées par ec à la règle sont lues dans le code de conforma/
 - pods des PipelineRuns, Jobs de la porte et pods témoins : collectés par Alloy (`pods.alloy` de la 19b) ;
 - refus réseau : dans Hubble seulement, écart de F2 inchangé ;
 - étapes `regle` et `reel` : sur l'hôte, dans `resultats/`.
+
+## F3 exécuté (03/11/2026, 19:24 à 19:31 UTC ; accord du propriétaire : « Oui, avec la bascule », « Retirer 403ccbd8 »)
+
+Résultats complets : [`resultats/f3-predictions.md`](resultats/f3-predictions.md), passages ratés archivés.
+- **Liste revue** : `construire-image@66a9f298` (D5) remplace `403ccbd8`. `preparer-entrees` et `publier-image` sont
+  inchangées.
+- **Témoins** :
+  - fermeture altérée (zip de chi valide, un fichier non compilé modifié) : refusée au `go build` (« checksum mismatch »,
+    `go.sum`) ;
+  - fermeture absente : refusée au tirage ;
+  - rien n'est poussé.
+- **D5, mesuré** : `entrees` est monté `virtiofs ro`, et une écriture est refusée. Mais **un root privilégié de l'invité Kata
+  remonte le volume en lecture-écriture, et son écriture atteint le PVC**. La lecture seule protège donc des erreurs, pas
+  d'une étape malveillante ([ADR 0001](../../../docs/adr/0001-runtime-isolation.md)).
+- **D6** : l'image réelle est refusée tant que sa provenance la plus récente nomme la fermeture de l'hôte (19:26 à 19:31). Elle
+  est admise une fois reconstruite sur la fermeture de la plateforme : **même image `3a7ca1b1`**, horodatage et VSA ok.
+- **Provenance** : elle nomme `builds/fermetures/sample-app@74c265e7` et les sous-dossiers des workspaces.
+- **Bascule** : le gabarit en service utilise la pipeline de F3 (`sample-app@e11fe3af`).
+- **Écarts** :
+  - VSA liée au digest et non à la provenance : la VSA retenue est celle du rejeu de J7 ;
+  - `web/dist` toujours produit sur l'hôte ;
+  - refus réseau du prefetch hors de Grafana (F2).
+- **Suite** : le rejeu complet de la 08 (`rejeu.sh`) doit intégrer F2 et F3 avant la bascule de J8.

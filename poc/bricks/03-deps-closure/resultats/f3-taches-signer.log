@@ -1,0 +1,22 @@
+# bascule.sh taches, 2026-11-03T19:24:04Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-entrees dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+SIGNER : nouvelle signature dans politique/taches/construire-image.signee.yaml (liste revue à mettre à jour)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+SIGNER : à ajouter à politique/porte/taches.yml après revue, puis relancer sans SIGNER : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   preparer-entrees inchangée depuis J7 : sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+OK   publier-image inchangée depuis J7 : sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+OK   construire-image nouvelle (D5) : sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
+CONSTAT construire-image de J7 (sha256:403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63, entrées inscriptibles) encore dans la liste revue
+OK   construire-image : workspace entrees readOnly
+## pipeline sample-app (D5 : sous-dossiers du workspace ; fermeture de la plateforme)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:8127ebb21bc15661537d8111283f87b3da9aa265b0fde864010ef9a54864580d
+OK   fermeture épinglée dans la pipeline : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+# fin 2026-11-03T19:24:09Z
