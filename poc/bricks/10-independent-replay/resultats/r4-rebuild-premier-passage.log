@@ -1,0 +1,33 @@
+# replay.sh rebuild, 2026-11-03T14:00:04Z
+## délai : 1440 min depuis la fin du build (2026-11-02T13:59:30Z)
+23d84bd2169e29ab77f7388e36319115d7fc32539c9b93bdde58c1e2344e5892  rebuild.sh
+23d84bd2169e29ab77f7388e36319115d7fc32539c9b93bdde58c1e2344e5892  rebuild.sh
+## interface de sc-replay côté hôte : vnet124
+Running as unit: replay-r4.service; invocation ID: 7510f99830344007a061e475bdec575c
+lien coupé à 2026-11-03T14:00:05Z (down)
+compteurs avant le lancement : rx_bytes=538313211 rx_packets=28020 rx_errs=0 rx_drop=0 tx_bytes=1769465 tx_packets=17783 tx_errs=0 tx_drop=0 = 
+compteurs juste après la coupure : rx_bytes=538318797 rx_packets=28042 rx_errs=0 rx_drop=0 tx_bytes=1774754 tx_packets=17805 tx_errs=0 tx_drop=0 = 
+compteurs juste avant le rétablissement (1200 s plus tard) : rx_bytes=538399174 rx_packets=28738 rx_errs=0 rx_drop=0 tx_bytes=1774754 tx_packets=17805 tx_errs=0 tx_drop=0 = 
+OK   sortie de la VM inchangée pendant la coupure (tx_bytes=1774754 tx_packets=17805 )
+lien rétabli à 2026-11-03T14:20:05Z
+## état de l'unité replay-r4 : success inactive
+## résultat (écrit dans la VM)
+debut=2026-11-03T14:00:05Z
+porteuse_enp1s0=0
+sortie_invite_debut=enp1s0 tx_packets=17805 tx_bytes=1774754 
+preparer_entrees_digest=OK 2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+recette_git_archive=OK
+recette_fermeture_deps=OK
+recette_web_dist_src=OK
+KO   rebuild non terminé avant le rétablissement du lien (2026-11-03T14:20:05Z) : résultat non valable hors ligne
+## journal du rebuild (fin)
+debut=2026-11-03T14:00:05Z
+porteuse_enp1s0=0
+sortie_invite_debut=enp1s0 tx_packets=17805 tx_bytes=1774754 
+fatal: detected dubious ownership in repository at '/home/replay/r3/src'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/replay/r3/src
+tar: This does not look like a tar archive
+tar: Exiting with failure status due to previous errors
+poc/bricks/10-independent-replay/replay.sh: line 1: iface: unbound variable

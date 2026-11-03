@@ -65,3 +65,19 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
 - un piège rétablit le lien si l'étape s'interrompt ;
 - `verdict` et `fin_image` sont écrits dès que le digest de l'image est connu ; le second moteur, hors du verdict, ne peut plus l'empêcher ;
 - le nettoyage de `~/r4` se fait par `sudo`, car `rebuild.sh` y écrit en root.
+
+## Résultat du premier passage (03/11/2026, 14:00:04 à 14:20:05 UTC) : [`r4-rebuild-premier-passage.log`](r4-rebuild-premier-passage.log)
+
+**Échec avant tout build, dû au code du domaine. Ce n'est pas un résultat de reproductibilité : aucune image n'a été construite.**
+
+- **Conforme** :
+  - délai de 1 440 min (prédiction 1) ;
+  - `porteuse_enp1s0=0` ;
+  - sortie de la VM inchangée pendant la coupure, avec `tx_bytes=1774754` et `tx_packets=17805` côté hôte, égaux au `sortie_invite_debut` de l'invité (prédiction 2) ;
+  - digest de `preparer-entrees` `OK` et trois opérations `OK` (prédiction 3).
+- **Arrêt à 14:00:25 UTC, 20 s après le début** : `rebuild.sh` tourne en root, et `git archive` refuse le dépôt `~replay/r3/src`, qui appartient à `replay` (`fatal: detected dubious ownership`). `tar` reçoit un flux vide, et le script s'arrête par `set -e`. Le journal de l'unité, lu dans la VM après le rétablissement, donne `status=2/INVALIDARGUMENT` et `Failed with result 'exit-code'`.
+- **Prédictions 4 à 8** : non mesurées. La clé `fin` est absente, d'où la ligne `KO rebuild non terminé avant le rétablissement`.
+- **Deux défauts de `replay.sh`, relevés en passant** :
+  - `état de l'unité replay-r4 : success inactive` est faux. `--collect` décharge l'unité en échec, et `systemctl show` rend alors les valeurs par défaut. Seul le journal de l'unité donne le vrai résultat.
+  - Le piège `EXIT` cite `$iface`, une variable locale à `etape_rebuild`. À la sortie du script, elle n'existe plus, d'où `iface: unbound variable`. Le lien avait déjà été rétabli explicitement à 14:20:05 UTC, et `domif-getlink` donne `up` à 14:20 UTC.
+- **Conséquence** : l'arrêt est conforme à la règle « rebuild non terminé avant le rétablissement : je m'arrête ». Toute correction et tout relancement passent par une décision du propriétaire.
