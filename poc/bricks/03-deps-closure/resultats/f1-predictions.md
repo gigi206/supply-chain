@@ -167,3 +167,12 @@ Journaux : [`f1-registre.log`](f1-registre.log), [`f1-restaurer.log`](f1-restaur
 - **Pour F2 (D2)** : `proxy.golang.org`, `registry.yarnpkg.com`, `storage.googleapis.com` (une connexion), plus **l'origine git des sources** (`git fetch` des tags par Hermeto, hors proxy). `sum.golang.org` n'a pas été contacté.
 - **Pour F2 (D4)** : la toolchain Go doit couvrir le `go.mod` (Traefik `v3.7.17` exige Go 1.27). Une image d'outils figée sur une toolchain devra suivre les projets.
 - Durée de F1 : de 16:21 à 16:43 UTC pour les mesures, sans compter la préparation. C'est bien en deçà de l'estimation de 0,25 pw.
+
+## Additif du 03/11/2026, 16:46 UTC : relevé complémentaire, après relecture
+
+[`f1-releve-complementaire.log`](f1-releve-complementaire.log) (lecture seule, 16:45 UTC).
+- **Le constat 24 est prouvé jusqu'au binaire installé.** `rolldown-binding.linux-x64-gnu.node` vaut `ae168566…` avec la fermeture intacte et **`e536f326…` avec le zip altéré**. L'octet altéré atteint donc `node_modules`, et le binaire natif modifié est installé sans erreur.
+- **Le SBOM de Hermeto ne porte aucune empreinte** (0 composant sur 3 880 avec `hashes`), ni pour ces paquets ni pour les autres. Il ne permet donc pas de détecter l'altération après coup.
+- **Portée, déduite et non mesurée** : faute de checksum dans `yarn.lock`, un registre amont qui servirait un autre binaire pour ces paquets serait accepté **dès le prefetch**, puis figé dans la fermeture avec un digest OCI valide. Le risque n'est pas limité à une altération de la fermeture avant son push.
+- **`storage.googleapis.com`** : le CONNECT (16:26:41 UTC) tombe dans la phase gomod de Hermeto (16:26:28 à 16:27:15 UTC). Il vient donc de go, et non de yarn.
+- **Chemins pour npm** : non mesuré en F1, qui portait sur gomod et yarn. Le constat « chemins canoniques obligatoires » de cette brique reste à revérifier pour npm en F2.

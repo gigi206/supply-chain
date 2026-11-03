@@ -61,6 +61,8 @@ L'écart de l'image **de build** vient donc d'une **entrée** (busybox statique 
 
 **Additif du 03/11/2026** : BuildKit en pod, la tâche de push séparée et la NetworkPolicy sans sortie sont faits en J7 de la 08 (voie A : root dans un pod Kata privilégié, le rootless étant mesuré impossible sous Kata). La suite est au [protocole du 03/11/2026 de la brique 03](../03-deps-closure/README.md), section « Suite sur le laptop ».
 
+**Additif du 03/11/2026, 16:46 UTC (F1 de la brique 03, Traefik)** : pour yarn 4.18.0, **le seuil « fermeture altérée → build refusé » n'est pas atteint pour les paquets conditionnels** (natifs par plateforme), qui n'ont pas de checksum dans `yarn.lock`. Un zip natif linux-x64 altéré dans la fermeture est installé hors réseau sans erreur ([relevé](../03-deps-closure/resultats/f1-releve-complementaire.log)). Il est refusé pour les autres paquets yarn (`YN0018`) et pour gomod (« checksum mismatch »).
+
 - BuildKit **en pod** (rootless, déjà validé hors pod sur le laptop, ou Kata) dans une tâche Tekton, avec push dans une tâche séparée ; sujets et `resolvedDependencies` de la provenance Chains (B-5, brique 08).
 - ~~2 hôtes à ≥ 1 h d'écart~~ : fait (cloud, laptop) ; reste le replay indépendant (brique 10).
 - Traefik : gomod + yarn berry, interface construite dans l'image de build.

@@ -180,7 +180,11 @@ Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy d
 | Altérations | zip yarn avec checksum : `YN0018` ; checksum de `yarn.lock` : `YN0018` ; zip Go valide modifié : « checksum mismatch » ; blob altéré dans Zot : « mismatched digest » ; **zip d'un paquet natif linux-x64 (sans checksum dans `yarn.lock`) : accepté** |
 
 **Constats** :
-- **Paquets yarn conditionnels non vérifiés.** yarn 4.18.0 n'enregistre pas de checksum pour les paquets à `conditions` (45 dans le `yarn.lock` de Traefik, dont 3 natifs linux-x64), et sa validation du cache les accepte sans calculer d'empreinte (`unstablePackages`, lu dans `yarn.js`, puis mesuré). Seul le digest OCI de la couche les protège. Une fermeture altérée avant son push serait acceptée.
+- **Paquets yarn conditionnels non vérifiés.** yarn 4.18.0 n'enregistre pas de checksum pour les paquets à `conditions` (45 dans le `yarn.lock` de Traefik, dont 3 natifs linux-x64), et sa validation du cache les accepte sans calculer d'empreinte (`unstablePackages`, lu dans `yarn.js`).
+  - **Mesuré** : le binaire `.node` altéré est installé dans `node_modules` (`e536f326…` au lieu de `ae168566…`, [relevé](resultats/f1-releve-complementaire.log)).
+  - Seul le digest OCI de la couche protège ces paquets, et le SBOM de Hermeto ne porte aucune empreinte.
+  - Déduit, non mesuré : un registre amont qui servirait un autre binaire serait accepté dès le prefetch, puis figé dans la fermeture.
+  - **Le seuil de la brique 04 (« fermeture altérée → build refusé, pour chaque gestionnaire ») n'est donc pas atteint pour yarn sur ces paquets.**
 - **Hermeto contacte l'origine git des sources** (`git fetch` de tous les tags), sans passer par le proxy. Dans le cluster, le pod de prefetch devra pouvoir lire Forgejo.
-- **Le chemin de la fermeture n'est pas figé** pour gomod ni pour yarn : `generate-env` le reporte dans les variables (`YARN_GLOBAL_FOLDER`, `GOPROXY`…). Le constat « chemins canoniques obligatoires » de cette brique ne vaut que pour npm, dont le lockfile est réécrit par `inject-files`.
+- **Le chemin de la fermeture n'est pas figé** pour gomod ni pour yarn : `generate-env` le reporte dans les variables (`YARN_GLOBAL_FOLDER`, `GOPROXY`…). Le constat « chemins canoniques obligatoires » de cette brique reste à revérifier pour npm (lockfile réécrit par `inject-files`), non mesuré en F1.
 - **La toolchain suit le projet** : Traefik est passé de Go 1.26 à 1.27 entre deux tags correctifs.

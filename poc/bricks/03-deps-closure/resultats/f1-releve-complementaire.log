@@ -1,0 +1,14 @@
+# relevé complémentaire de F1, 2026-11-03T16:45:42Z (lecture seule, sur les arbres laissés par restaurer et alterer)
+## binaire de @rolldown/binding-linux-x64-gnu installé, sans altération puis avec le zip altéré
+ae16856655924ebc41f231393c7f8b89566430a845d1f073fd9d6abf219db04b  webui-origine/node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
+e536f32625a837e5e2a80cb76e65102254f9e123ca5900584b7545c149663bf0  webui-altnc/node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
+## empreintes dans le SBOM de Hermeto (out-v3.7.17/bom.json)
+composants : 3880 ; avec hashes : 0
+{"name":"@rolldown/binding-linux-x64-gnu","version":"1.2.6","hashes":null}
+{"name":"@unrs/resolver-binding-linux-x64-gnu","version":"1.11.1","hashes":null}
+{"name":"lightningcss-linux-x64-gnu","version":"1.33.0","hashes":null}
+## storage.googleapis.com : heure du CONNECT (UTC) et phases de Hermeto (heure locale, UTC+1)
+2026-11-03T16:26:41Z CONNECT storage.googleapis.com:443
+2026-11-03 17:26:28,090 INFO Downloading the gomod dependencies
+2026-11-03 17:27:15,720 INFO Retrieving the list of packages
+2026-11-03 17:27:22,226 INFO Fetching the yarn dependencies at the subpath /home

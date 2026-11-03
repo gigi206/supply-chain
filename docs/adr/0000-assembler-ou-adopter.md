@@ -82,6 +82,8 @@ Banc d'essai : `poc/sample-app` (Go + front npm embarqué), qui produit un binai
 
 **Règle de décision B** : Nix est retenu pour Go et l'OCI s'il n'est pas éliminé **et** s'il dépasse la référence Hermeto + BuildKit d'au moins **15 points**, l'écart couvrant le coût d'un second écosystème. Sinon, il reste en veille.
 
+
+> **Constat de la brique 03 (F1, 03/11/2026, après la clôture du banc B ; aucune note ne change)**, sur la référence Hermeto 0.64.0 + yarn 4.18.0 (Traefik `v3.7.17`) : les paquets yarn à `conditions` (binaires natifs par plateforme) n'ont pas de checksum dans `yarn.lock`, et yarn ne les vérifie pas. Un zip natif altéré dans la fermeture est installé hors réseau sans erreur ([relevé](../../poc/bricks/03-deps-closure/resultats/f1-releve-complementaire.log)). Le SBOM de Hermeto ne porte aucune empreinte. Seul le digest OCI de la couche protège ces paquets ; un registre amont qui en servirait un autre au prefetch serait accepté (déduit, non mesuré). **Limite résiduelle** de la chaîne yarn, consignée.
 ## 4. Grille C : moteur de politique (Kyverno seul ou Conforma + Kyverno)
 
 Jeu de règles de référence : les **10 contrôles de release** qui doivent être exprimables et vérifiés **hors ligne en CLI** comme à l'admission.
