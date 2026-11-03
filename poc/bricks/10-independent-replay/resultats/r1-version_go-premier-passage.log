@@ -1,0 +1,7 @@
+# replay.sh version_go, 2026-11-03T09:51:09Z
+provenance d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 : couche sha256:0ec77652962cbd1345908b83cc9da141a39da4dd0253f73990c80f0ab7167e8d
+entrée de la provenance : sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+2026/11/03 10:51:19 retrying dial tcp: lookup sc-stockage.poc.test on 127.0.0.53:53: read udp 127.0.0.1:56154->127.0.0.53:53: i/o timeout
+2026/11/03 10:51:30 retrying dial tcp: lookup sc-stockage.poc.test on 127.0.0.53:53: read udp 127.0.0.1:59065->127.0.0.53:53: i/o timeout
+2026/11/03 10:51:40 retrying dial tcp: lookup sc-stockage.poc.test on 127.0.0.53:53: read udp 127.0.0.1:35639->127.0.0.53:53: i/o timeout
+Error: fetching manifest sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67: Get "https://sc-stockage.poc.test:5000/v2/": dial tcp: lookup sc-stockage.poc.test on 127.0.0.53:53: read udp 127.0.0.1:35639->127.0.0.53:53: i/o timeout

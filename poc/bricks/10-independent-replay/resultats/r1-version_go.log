@@ -1,0 +1,8 @@
+# replay.sh version_go, 2026-11-03T09:51:46Z
+entrée de la provenance : sc-stockage.poc.test:5000/plateforme/builder-go-voie-d@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+application/vnd.oci.image.manifest.v1+json
+couches : 1
+usr/local/go/VERSION :
+go1.26.10
+time 2026-10-19T22:20:36Z
+version retenue pour le domaine : go1.26.10

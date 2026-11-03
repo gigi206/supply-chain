@@ -138,3 +138,27 @@ Toutes les recommandations sont retenues :
 - Avec D1 (b) ou D2 (a), l'indépendance reste technique. Root sur l'hôte, ou le propriétaire seul, peut forger à la fois la provenance et la VSA.
 - La consommation de la VSA par la porte (ADR 0000, critère 6) **n'est pas dans le seuil** : c'est une suite, hors de cette brique.
 - Le Dockerfile n'est pas dans le dépôt sample-app : la recette dépend du bundle de tâche signé. Si une option n'y figurait pas, ce serait un constat sur la complétude de la provenance, pas une lecture de ce dépôt.
+
+## R1, exécuté (03/11/2026, 09:50 à 09:52 UTC, accord du propriétaire : « Oui, lancer R1 »)
+
+Commande : `mise run replay -- cosign_stockage version_go outils` ([`replay.sh`](replay.sh)). Prédictions et additif : [`r1-predictions.md`](resultats/r1-predictions.md).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 1 | Dans un espace de noms sans route (`lo` seul), `cosign attest --key` échoue d'emblée : il veut le TUF public de Sigstore (`tuf-repo-cdn.sigstore.dev`). Avec une configuration de signature sans aucun service, la signature et la vérification réussissent hors réseau | conforme (issue a) |
+| 2 | Attestation rangée en **referrer OCI 1.1** (`application/vnd.dev.sigstore.bundle.v0.3+json`), sans tag `.att` | conforme |
+| 3 | Image de build déclarée par la provenance : `go1.26.10` | conforme |
+| 4 | Toolchain officielle `go1.26.10.linux-amd64.tar.gz` vérifiée par le sha256 de go.dev (`ccfe7ae8…`) | conforme |
+| 5 | BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, cosign 3.1.4, oras 1.3.6 et crane 0.20.6 : archives vérifiées contre `mise.lock` | conforme |
+
+**Conséquences pour la suite** :
+- **Rekor** : la VSA sera signée avec `--signing-config` vide. Sans elle, cosign contacterait les services publics de Sigstore : une action publique, à proscrire.
+- **Rangement** : le referrer convient à D5, et le compte `poc-replay` n'a besoin d'aucun tag. `oras attach` n'est pas nécessaire.
+- **Politique** : la [politique de replay](politique-replay.md) est rédigée. Son digest sera figé avant R5.
+
+Écarts de passage, archivés et sans effet sur les mesures :
+- nom `poc.test` non résolu par l'hôte ;
+- page de redirection de go.dev refusée par la vérification sha256 ;
+- manifeste au format Docker de crane refusé par Zot.
+
+Téléchargements vérifiés, gardés pour la VM : `~/.cache/supply-chain-poc/10/telechargements/`.

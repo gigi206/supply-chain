@@ -1,0 +1,28 @@
+# replay.sh cosign_stockage, 2026-11-03T09:51:00Z
+## interfaces de l'espace de noms : lo ; routes : 0
+2026/11/03 10:51:00 base unspecified, using empty image
+2026/11/03 10:51:00 pushed blob: sha256:35dd5a97a9e52381981dac630ae9a3596573814031b49b01399f637eb19f6f19
+2026/11/03 10:51:00 pushed blob: sha256:328cae0e5d0f521534fa377068b05658c898103c3410469a4139cb1ee2ba93ee
+2026/11/03 10:51:00 127.0.0.1:15000/essai/image:v1: digest: sha256:830073994875cd9c45ef858bbc4fb03bbe72a51302dd0158bbd69dd8134239d8 size: 401
+## image jetable : 127.0.0.1:15000/essai/image@sha256:830073994875cd9c45ef858bbc4fb03bbe72a51302dd0158bbd69dd8134239d8
+clés jetables : cosign.key cosign.pub
+## cosign attest --key, sans option de stockage ni de journal
+Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get "https://tuf-repo-cdn.sigstore.dev/15.root.json": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:59937->127.0.0.53:53: read: connection refused
+error during command execution: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get "https://tuf-repo-cdn.sigstore.dev/15.root.json": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:59937->127.0.0.53:53: read: connection refused
+code de sortie : 1
+## configuration de signature sans aucun service (ni Fulcio, ni Rekor, ni TSA)
+{"mediaType":"application/vnd.dev.sigstore.signingconfig.v0.2+json","rekorTlogConfig":{},"tsaConfig":{}}
+## cosign attest --key --signing-config signature-vide.json
+Using payload from: vsa.json
+Signing artifact...
+code de sortie : 0
+## cosign verify-attestation --key cosign.pub, sans journal (hors réseau)
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+code de sortie : 0
+## tags du dépôt essai/image
+v1
+## referrers de l'image (API OCI 1.1)
+[{"artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","mediaType":"application/vnd.oci.image.manifest.v1+json","digest":"sha256:b0bbbb9f6ec1"}]

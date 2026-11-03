@@ -1,0 +1,5 @@
+# replay.sh outils, 2026-11-03T09:51:47Z
+## toolchain Go officielle go1.26.10 (go.dev)
+sha256 publié par go.dev : ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5
+~/.cache/supply-chain-poc/10/telechargements/go1.26.10.linux-amd64.tar.gz: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
