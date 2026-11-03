@@ -121,3 +121,22 @@ Le digest est épinglé dans `prefetch.sh`.
    - **cilium/proxy (Envoy) n'est pas évalué au doc 04** (choix de J7 : « ni Envoy (cilium/proxy, non évalué au doc 04) »).
    - **F2 est arrêté** ici, avant `compte`. Décision soumise au propriétaire.
 10. Test 6 : non rejoué, F2 étant arrêté.
+
+## Retour à `l7Proxy: false` (18:10:56 UTC ; décision du propriétaire : « Revenir et évaluer ») et évaluation de cilium/proxy
+
+[`f2-cilium-retour.log`](f2-cilium-retour.log) :
+- agents recréés de 18:10:57 à 18:11:10 UTC, 3/3 prêts ;
+- `enable-l7-proxy=false` ;
+- **aucun processus envoy** dans les trois agents.
+
+« Envoy » dans le statut du proxy n'est que le type de proxy, déjà affiché avant. La configuration de Cilium est revenue à celle d'avant F2. Le test 6 n'est pas rejoué : les valeurs sont identiques à celles de J7 et J8.
+
+**Évaluation de cilium/proxy** (lecture seule, 03/11/2026 ; [doc 04](../../../../docs/04-sante-projets.md)) : verdict **« À surveiller (Scorecard < 6) »**, pas « Risqué ».
+- Scorecard 4,4, revue de code à 1.
+- Aucune release ni tag propre, aucun SECURITY.md propre (politique de cilium/cilium).
+- 100 commits en 90 jours : 36 de Renovate, 59 de deux mainteneurs.
+- Embarqué dans l'image de l'agent : `cilium-envoy` v1.39.5 en 1.20.4, épinglé par digest dans `images/cilium/Dockerfile` au tag, et couvert par la signature de l'image de l'agent.
+- Envoy amont : Scorecard 8,5.
+- Plan de sortie : `l7Proxy: false`, avec une sortie par plages d'adresses.
+
+D2 est resoumise au propriétaire.
