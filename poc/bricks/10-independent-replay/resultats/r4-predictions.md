@@ -114,3 +114,12 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
 **Mesures M1 et M2 (14:24:45 UTC, [`r4-mesures-vm.log`](r4-mesures-vm.log))** : conformes. `unshare -rn` rend le code 0 pour `replay`, avec seulement `lo` à l'état `DOWN`. Le `git archive` corrigé rend le code 0 en root : 15 fichiers, dont `go.mod` et `main.go`, pour le commit `6391fd43…`.
 
 **Répétition, premier passage (14:24:49 UTC, [`r4-repetition-premier-passage.log`](r4-repetition-premier-passage.log))** : arrêt juste après l'affichage du diff, avant tout transport vers la VM. Sous `pipefail`, `diff`, qui rend 1 dès qu'il y a une différence, a interrompu l'étape. Correction : `{ diff … || true; }`. Je répète avec les mêmes prédictions.
+
+**Répétition, second passage (14:25:09 à 14:25:55 UTC, [`r4-repetition.log`](r4-repetition.log)), essai non compté** : toutes les prédictions sont conformes.
+- `image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5`, égale au sujet : `verdict=PASSED`.
+- Binaire de l'image et binaire du `go build` direct égaux, `e3749c68…` ; options identiques au `RUN` signé.
+- Image de build du domaine `dc20b752…`, différente de `d50ae575…` (prédiction 5).
+- Unité en 45,7 s : 21 s pour l'image de build du domaine, 15 s pour l'image. `sortie=code 0`.
+- `tx_*` de l'invité sont restés inchangés du début à la fin (18141 paquets), alors que le lien était établi. Le `go: downloading` du second moteur vient du `GOPROXY` `file://` local.
+
+Je lance le second passage hors ligne avec les mêmes prédictions.

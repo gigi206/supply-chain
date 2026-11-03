@@ -1,0 +1,50 @@
+# replay.sh repetition, 2026-11-03T14:25:09Z
+## lignes retirées de outils/rebuild.sh
+  sleep 20   # laisse à l'hôte le temps de couper le lien juste après le lancement
+    [ "$(cat "$i/carrier" 2>/dev/null)" = 0 ] || { res verdict "REFUS : lien ${i##*/} non coupé"; exit 1; }
+af532fa1f030734345b498d0ec22c6ebe5a29780c5a1f386b9b3f6ae19f4794c  rebuild.sh
+af532fa1f030734345b498d0ec22c6ebe5a29780c5a1f386b9b3f6ae19f4794c  rebuild.sh
+Main processes terminated with: code=exited, status=0/SUCCESS
+Service runtime: 45.706s
+CPU time consumed: 57.078s
+Memory peak: 2.5G (swap: 0B)
+## résultat (écrit dans la VM)
+debut=2026-11-03T14:25:09Z
+porteuse_enp1s0=1
+sortie_invite_debut=enp1s0 tx_packets=18141 tx_bytes=1856039 
+preparer_entrees_digest=OK 2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+recette_git_archive=OK
+recette_fermeture_deps=OK
+recette_web_dist_src=OK
+contexte=commit 6391fd437f26696847041be3226bbbf633f55a2f ; fermeture 8 fichiers ; web/dist 2 fichiers
+env_image_de_build=ENV PATH=/usr/local/go/bin:/bin HOME=/tmp CGO_ENABLED=0 GOTOOLCHAIN=local GOFLAGS=-mod=readonly GOSUMDB=off
+buildkit=buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e
+image_de_build_domaine=sha256:dc20b7524ba0fe1cb224f9507e96987e3216a276a352e19f0d10c93743817b7a (21 s)
+image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (15 s)
+sujet_provenance=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+verdict=PASSED
+fin_image=2026-11-03T14:25:47Z
+binaire_image=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+binaire_go_build=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+options_go_build=identiques au RUN du Dockerfile signé
+second_moteur=fait
+sortie_invite_fin=enp1s0 tx_packets=18141 tx_bytes=1856039 
+porteuse_fin=enp1s0=1 
+fin=2026-11-03T14:25:55Z
+sortie=code 0
+## journal du rebuild (fin)
+#12 sending tarball 0.0s done
+#12 DONE 0.5s
+image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (15 s)
+sujet_provenance=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+verdict=PASSED
+fin_image=2026-11-03T14:25:47Z
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+binaire_image=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+binaire_go_build=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
+options_go_build=identiques au RUN du Dockerfile signé
+second_moteur=fait
+sortie_invite_fin=enp1s0 tx_packets=18141 tx_bytes=1856039 
+porteuse_fin=enp1s0=1 
+fin=2026-11-03T14:25:55Z
+sortie=code 0
