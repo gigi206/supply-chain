@@ -351,7 +351,7 @@ etape_repetition() { # R4, répétition lien ÉTABLI, archivée comme essai et n
   # par le second passage
   local c=$W/rebuild-repetition.sh
   sed -e '/^sleep 20 /d' -e '/non coupé"; exit 1; }$/d' "$here/outils/rebuild.sh" > "$c"
-  echo "## lignes retirées de outils/rebuild.sh"; diff "$here/outils/rebuild.sh" "$c" | sed -n 's/^< /  /p'
+  echo "## lignes retirées de outils/rebuild.sh"; { diff "$here/outils/rebuild.sh" "$c" || true; } | sed -n 's/^< /  /p'   # diff rend 1 s'il y a des différences (pipefail)
   [ "$(diff "$here/outils/rebuild.sh" "$c" | grep -c '^[<>]')" = 2 ] || { echo "REFUS : copie inattendue"; exit 1; }
   transporter_r4 "$c"; rm -f -- "${c:?}"
   sur 'sudo systemd-run --unit=replay-r4-repetition --collect --wait --property=Type=exec /bin/bash /home/replay/r4/rebuild.sh' 2>&1 | tail -4 || true

@@ -1,0 +1,4 @@
+# replay.sh repetition, 2026-11-03T14:24:49Z
+## lignes retirées de outils/rebuild.sh
+  sleep 20   # laisse à l'hôte le temps de couper le lien juste après le lancement
+    [ "$(cat "$i/carrier" 2>/dev/null)" = 0 ] || { res verdict "REFUS : lien ${i##*/} non coupé"; exit 1; }

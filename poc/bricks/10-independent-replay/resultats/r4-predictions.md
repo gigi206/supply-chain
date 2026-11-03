@@ -110,3 +110,7 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
 **Second passage hors ligne** (`resultats/r4-rebuild.log`) : prédictions 1 à 8 inchangées, sha256 de `rebuild.sh` égal à `a1945ff2…`, `sortie=code 0`, et `fin` antérieur au rétablissement du lien.
 
 **Si la répétition échoue** : je corrige, je consigne, puis je répète à nouveau, sans lancer le passage hors ligne. Si l'image diffère, je m'arrête pour décider avec le propriétaire, comme pour R4.
+
+**Mesures M1 et M2 (14:24:45 UTC, [`r4-mesures-vm.log`](r4-mesures-vm.log))** : conformes. `unshare -rn` rend le code 0 pour `replay`, avec seulement `lo` à l'état `DOWN`. Le `git archive` corrigé rend le code 0 en root : 15 fichiers, dont `go.mod` et `main.go`, pour le commit `6391fd43…`.
+
+**Répétition, premier passage (14:24:49 UTC, [`r4-repetition-premier-passage.log`](r4-repetition-premier-passage.log))** : arrêt juste après l'affichage du diff, avant tout transport vers la VM. Sous `pipefail`, `diff`, qui rend 1 dès qu'il y a une différence, a interrompu l'étape. Correction : `{ diff … || true; }`. Je répète avec les mêmes prédictions.

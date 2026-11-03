@@ -1,0 +1,9 @@
+# R4, mesures préalables M1 et M2 dans la VM, lien établi, 2026-11-03T14:24:45Z
+## M1 : unshare -rn pour replay (replay)
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000\    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+0
+code 0
+## M2 : git archive corrigé, en root, vers tar -t
+commit 6391fd437f26696847041be3226bbbf633f55a2f
+code 0
+fichiers : 15 ; go.mod main.go
