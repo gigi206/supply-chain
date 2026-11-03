@@ -56,3 +56,12 @@ Le script est corrigé, et le second passage donne **0 KO**.
 - `web-dist` dans `src/web/dist`.
 
 R4 devra extraire cette recette de son bundle, au même titre que `construire-image`.
+
+## Relevé complémentaire (03/11/2026, vers 10:27 UTC, relecture de l'advisor) : configuration de l'image de build déclarée
+
+Lu dans la VM, depuis le blob de configuration de `builder-go-voie-d@sha256:d50ae575…`, transporté puis vérifié par son digest :
+- `Env` : `PATH=/usr/local/go/bin:/bin`, `HOME=/tmp`, `CGO_ENABLED=0`, `GOTOOLCHAIN=local`, `GOFLAGS=-mod=readonly`, `GOSUMDB=off` ;
+- `User`, `WorkingDir`, `Entrypoint` et `Cmd` absents ;
+- `amd64`/`linux`, `created` à zéro, historique vide.
+
+C'est le même environnement que `poc/bricks/04-hermetic-repro/Dockerfile.builder`. Pour R4, l'image de build du domaine reprendra **exactement cet `Env`**, lu dans l'entrée vérifiée et non dans ce dépôt. Seul le digest de l'image de build (`context:builder=…@<digest>`) diffère volontairement de la recette signée.
