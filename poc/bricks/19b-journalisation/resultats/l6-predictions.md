@@ -89,3 +89,12 @@ JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls control
 ## Point ouvert, sans lien avec L6
 
 Le journal de Loki contient 47 refus `ingestion rate limit exceeded` : 29 le 02/11/2026 à 21:03 et 18 à 21:04 UTC, au démarrage de L3, pendant la relecture de l'historique. Le journal d'Alloy ne contient aucun « error sending batch » sur les trois VM. Le chemin des lignes refusées (réessayées ou perdues) n'est pas établi.
+
+## Additif du 03/11/2026, après l'exécution (08:55 à 08:59 UTC)
+
+- Les sept prédictions sont conformes. Le détail est dans le README de la brique (« L6, exécuté »).
+- **Premier passage de `controle_grpc` archivé** ([`l6-controle_grpc-premier-passage.log`](l6-controle_grpc-premier-passage.log)). C'est un défaut du script, pas des services : la trame gRPC tronquée par bash (octets nuls) donnait `grpc-status: 2` aux certificats acceptés, et le piège du tunnel lisait une variable locale détruite. Le script est corrigé, et le second passage est conforme.
+- **Écart sur la prédiction 3** : un push refusé (500, `empty ring`) pendant le démarrage de Loki, et quatre `context canceled` à l'arrêt de l'ancien querier. Le push a été réessayé par l'Alloy de `sc-stockage` (48e nouvelle tentative), sans perte.
+- **Prédiction 5, correction** : le tableau des 10 dernières minutes, relevé 40 s après le redémarrage, ne prouve pas la reprise de la collecte. La version revue de ces prédictions affirmait à tort le contraire. La reprise est prouvée par les témoins, tous écrits après 08:56, et par les battements.
+- **Prédiction 7** : le battement de `sc-build` de 08:55:21 est tombé pendant l'arrêt de Loki (08:55:12 à 08:55:31) et a été livré. `loki_write_dropped_entries_total` vaut 0 sur les trois VM.
+- **Point ouvert résolu** : les 47 refus de débit du démarrage de L3 correspondent aux 47 nouvelles tentatives de l'Alloy de `sc-stockage`, sans perte ([`l6-complement.log`](l6-complement.log)).

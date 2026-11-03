@@ -24,3 +24,21 @@ loki depuis Tue 2026-11-03 08:55:12 UTC
 ## copies de sauvegarde (retour arrière manuel possible)
 -rw-r----- 1 root alloy 1489 Nov  2 21:03 /etc/alloy/relais.alloy.avant-l6
 -rw-r----- 1 root loki  1472 Nov  2 20:51 /etc/loki/loki.yaml.avant-l6
+
+## Complément (03/11/2026, vers 09:05 UTC, relecture de l'advisor) : battements autour du redémarrage de Loki et compteurs d'Alloy
+# Loki arrêté de 08:55:12 (redémarrage) à 08:55:31 (/ready 200).
+# journalctl -t battement-19b --since 08:54:30 --until 08:56:30, par VM :
+sc-confiance : 2026-11-03T08:55:08+00:00, 2026-11-03T08:56:08+00:00
+sc-build     : 2026-11-03T08:55:21+00:00, 2026-11-03T08:56:21+00:00   <- pendant l'arrêt de Loki (par le relais)
+sc-stockage  : 2026-11-03T08:55:00+00:00, 2026-11-03T08:56:02+00:00
+# Compteurs de loki.write "sortie" (127.0.0.1:12345/metrics, cumulés depuis le démarrage du processus d'Alloy de chaque VM) :
+sc-confiance (vers le relais 3501) : batch_retries_total 5, dropped_entries_total 0 pour toutes les raisons (batch_too_large, ingester_error, queue_is_full, rate_limited, stream_limited), sent_entries_total 437526
+sc-build     (vers le relais 3502) : batch_retries_total 0, dropped_entries_total 0 pour toutes les raisons, sent_entries_total 5741
+sc-stockage  (vers Loki 3100)      : batch_retries_total 48, dropped_entries_total 0 pour toutes les raisons, sent_entries_total 846590
+# Prometheus (job alloy, sc-stockage seulement, collecté depuis le 02/11 21:15, pas de 60 s) :
+loki_write_batch_retries_total : 47 au premier point (02/11 21:15), 48 à partir du 03/11 08:56, aucun autre changement
+loki_write_dropped_entries_total : 0 sur toute la période, aucun changement
+# Lecture : les 47 refus « ingestion rate limit exceeded » de Loki (02/11, 21:03 et 21:04 UTC) correspondent aux 47 nouvelles
+# tentatives de l'Alloy de sc-stockage (processus démarré le 02/11 à 21:03, seul écrivain régulier de Loki), sans perte ;
+# le refus « empty ring » de L6 est la 48e, sans perte. Les 5 nouvelles tentatives de sc-confiance ne sont pas datées
+# (pas collectées par Prometheus) ; aucune perte.
