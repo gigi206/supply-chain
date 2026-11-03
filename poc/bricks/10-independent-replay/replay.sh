@@ -34,6 +34,19 @@
 # Jalon R5 (JALON=r5) :
 #   signature_hors_registre  sur l'hôte, comme cosign_stockage : VSA signée par cosign attest-blob --statement sans registre,
 #                    poussée en referrer par oras attach, vérifiée par cosign (clé de VSA acceptée, autre clé refusée)
+#   vsa              DANS LA VM, sous unshare -rn (POLITIQUE_COMMIT : commit poussé qui fige la politique ; vsa.py de HEAD,
+#                    poussé) : outils/vsa.py revérifie le bundle horodaté de la provenance et lit le résultat de R4, puis écrit
+#                    l'énoncé ; signé par la clé du domaine (attest-blob --statement, configuration sans service), revérifié ;
+#                    énoncé et bundle archivés dans resultats/
+#   porte_avant      image réelle jugée par la porte du cluster (étape reelle de preuves.sh de la 08), avant le push ; journal
+#                    de la 08 copié dans resultats/r5-porte-avant.copie.log
+#   pousser_vsa      SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH : manifeste fait main (subject =
+#                    image) poussé par digest dans builds/vsa/sample-app ; aucun referrer ni tag ajouté à builds/sample-app
+#   porte_apres      même étape après le push ; verdict comparé à celui de porte_avant (durée exclue)
+#   lire_vsa         lecture anonyme : VSA par COSIGN_REPOSITORY (clé de VSA acceptée ; N3 : clé de Chains refusée),
+#                    provenance (N3 : clé de VSA refusée ; témoins) ; connexions de cosign relevées par strace (contrôle :
+#                    aucune hors de Zot)
+#   negatifs         DANS LA VM : outils/negatifs.sh (N1 fermeture altérée, N2 source altérée et diffoscope) ; rien poussé
 # D5 (JALON=d5), compte Zot poc-replay (accord du propriétaire : « Oui, appliquer D5 ») :
 #   compte_zot       mot de passe et ligne htpasswd bcrypt dans ~/.cache/supply-chain-poc/10/secrets (la 08 ne lit que le hash)
 #   droits_zot       après « mise run confiance:stockage -- zot » : poc-replay sur le dépôt jetable builds/essai-replay (push par
@@ -464,6 +477,145 @@ echo "## 3. cosign verify-blob-attestation --bundle (clé de VSA, puis autre cl�
 kill $z
 EOS
   cd / && rm -rf -- "${d:?}"
+}
+
+# --- R5 : VSA, porte de la 08 avant et après le push, contre-épreuves (chaque étape soumise à l'accord du propriétaire)
+REG_NOM=sc-stockage.poc.test:5000                  # nom du registre dans la provenance (sujet), repris dans la VSA
+DEPOT_VSA=builds/vsa/sample-app                    # choix du propriétaire (03/11/2026, vers 12:00 UTC) : « (a) Dépôt séparé »
+TYPE_BUNDLE=application/vnd.dev.sigstore.bundle.v0.3+json
+TYPE_VSA=https://slsa.dev/verification_summary/v1
+
+hors_zot() { # trace strace (connect) : connexions vers autre chose que Zot, comptées par adresse (vide : aucune) ; extraction de
+  # essais/tuf-verification-cle.sh (r5-tuf.log : les vérifications par clé ne tentent rien hors de Zot ; ici, contrôle)
+  grep -E '^[0-9]+ +connect\(' "$1" | grep -vF "sin_port=htons(${ZOT_POC#*:}), sin_addr=inet_addr(\"${ZOT_POC%:*}\")" \
+    | grep -oE 'sa_family=AF_[A-Z0-9]+(, sun_path="[^"]*"|, sin_port=htons\([0-9]+\), sin_addr=inet_addr\("[^"]*"\)|, sin6_port=htons\([0-9]+\)[^}]*inet_pton\(AF_INET6, "[^"]*")?' \
+    | sort | uniq -c | sed 's/^ *//' | paste -sd';' - || true
+}
+
+connexions() { # libellé trace : ligne OK/KO du contrôle des connexions d'une commande cosign
+  local h; h=$(hors_zot "$2")
+  [ -z "$h" ] && echo "OK   $1 : aucune connexion hors de Zot ($(grep -cE '^[0-9]+ +connect\(' "$2" || true) connect())" \
+    || echo "KO   $1 : connexions hors de Zot : $h"
+}
+
+etape_vsa() { # DANS LA VM, sous unshare -rn : outils/vsa.py (énoncé), signé par la clé du domaine (attest-blob --statement,
+  # configuration sans service), revérifié ; énoncé et bundle archivés dans resultats/. POLITIQUE_COMMIT : commit qui fige la
+  # politique, déjà poussé. vsa.py doit être celui de HEAD, poussé : son sha256 entre dans verifier.version (politique, 4 bis)
+  local x=$W/r5 c=${POLITIQUE_COMMIT:?commit qui fige la politique} f=poc/bricks/10-independent-replay/politique-replay.md u
+  git -C "$racine_depot" branch -r --contains "$c" | grep -q . || { echo "REFUS : $c absent des branches distantes"; exit 1; }
+  [ -z "$(git -C "$racine_depot" status --porcelain -- "$here/outils/vsa.py")" ] || { echo "REFUS : outils/vsa.py modifié hors commit"; exit 1; }
+  git -C "$racine_depot" branch -r --contains HEAD | grep -q . || { echo "REFUS : HEAD ($(git -C "$racine_depot" rev-parse --short HEAD)) non poussé"; exit 1; }
+  grep -q '^OK   sortie de la VM inchangée' "$R/r4-rebuild.log" && grep -q '^OK   rebuild terminé' "$R/r4-rebuild.log" \
+    || { echo "REFUS : R4 non valable hors ligne (resultats/r4-rebuild.log)"; exit 1; }
+  u=https://github.com/gigi206/supply-chain/blob/$c/$f
+  rm -rf -- "${x:?}" && mkdir -p "$x" && chmod 0700 "$x"
+  git -C "$racine_depot" show "$c:$f" > "$x/politique-replay.md" && cp "$here/outils/vsa.py" "$x/"
+  echo "politique : $u"
+  echo "vsa.py de HEAD ($(git -C "$racine_depot" rev-parse --short HEAD)) : $(git -C "$racine_depot" show "HEAD:poc/bricks/10-independent-replay/outils/vsa.py" | sha256sum | cut -c1-64)"
+  ( cd "$x" && sha256sum politique-replay.md vsa.py && tar -cf r5.tar politique-replay.md vsa.py )
+  sur 'sudo rm -rf ~/r5 && mkdir -m 0700 ~/r5'   # ~/r3 et ~/r4 non touchés (vsa.py lit ~/r4/rebuild.sh, celui du PASSED)
+  scp -q "${SSH_OPTS[@]}" "$x/r5.tar" "replay@$VM_IP:r5/"
+  rm -rf -- "${x:?}"
+  echo "## vsa.py (dans la VM, unshare -rn)"
+  sur "cd ~/r5 && tar -xf r5.tar && rm r5.tar && sha256sum vsa.py politique-replay.md && unshare -rn python3 -I vsa.py '$REG_NOM' '$IMAGE' '$INVOCATION' '$u' '$URL_TSA'"
+  echo "## signature (dans la VM, unshare -rn)"
+  sur bash -s "${IMAGE#*@sha256:}" "$TYPE_VSA" <<'EOS'
+set -uo pipefail   # pas de -e : chaque code est lu et affiché (premier passage de la répétition de R4)
+cd ~/r5
+rc=0; unshare -rn cosign signing-config create --out vide.json > sc.err 2>&1 || rc=$?
+echo "signing-config sans service : code $rc ; $(python3 -I -c 'import json; print(json.load(open("vide.json")))' 2>&1)"; [ "$rc" = 0 ] || { tail -3 sc.err; exit 1; }
+rc=0; COSIGN_PASSWORD=$(cat ~/vsa/mot-de-passe) unshare -rn cosign attest-blob --statement enonce.json --key ~/vsa/cosign.key \
+  --signing-config vide.json --bundle vsa.bundle.json --yes > ab.err 2>&1 || rc=$?
+echo "attest-blob : code $rc"; [ "$rc" = 0 ] || { tail -3 ab.err; exit 1; }
+rc=0; unshare -rn cosign verify-blob-attestation --bundle vsa.bundle.json --new-bundle-format --key ~/vsa/cosign.pub --insecure-ignore-tlog \
+  --type "$2" --digest "$1" --digestAlg sha256 > vb.err 2>&1 || rc=$?
+echo "verify-blob-attestation, clé du domaine : code $rc ; $(tail -1 vb.err)"; [ "$rc" = 0 ] || exit 1
+python3 -I -c 'import json, base64; b = json.load(open("vsa.bundle.json")); print("bundle :", b["mediaType"], "; tlog :", b["verificationMaterial"].get("tlogEntries"), "; horodatage :", b["verificationMaterial"].get("timestampVerificationData"), "; énoncé identique à enonce.json :", json.loads(base64.b64decode(b["dsseEnvelope"]["payload"])) == json.load(open("enonce.json")))'
+rm -f sc.err ab.err vb.err
+sha256sum enonce.json vsa.bundle.json
+EOS
+  sur 'cat ~/r5/enonce.json' > "$R/r5-vsa-enonce.json"
+  sur 'cat ~/r5/vsa.bundle.json' > "$R/r5-vsa.bundle.json"
+  echo "## copies archivées"; ( cd "$R" && sha256sum r5-vsa-enonce.json r5-vsa.bundle.json )
+}
+
+porte() { # avant|apres : étape reelle de preuves.sh de la 08 (Job de la porte, image réelle, source attendue, contrôle 9) ; son
+  # journal est copié, puisque la 08 le réécrit à chaque passage
+  PASSAGE=$1 "$racine_depot/poc/bricks/08-trust-plane/preuves.sh" reelle
+  cp "$racine_depot/poc/bricks/08-trust-plane/resultats/preuves-reelle.log" "$R/r5-porte-$1.copie.log"
+}
+etape_porte_avant() { porte avant; }
+etape_porte_apres() { # comparaison des deux passages : ligne VERDICT, champs 1 à 5, 7 et 8 (le champ 6, la durée, varie)
+  local a b
+  porte apres
+  a=$(grep -m1 '^VERDICT|' "$R/r5-porte-avant.copie.log" | cut -d'|' -f1-5,7,8 || true)
+  b=$(grep -m1 '^VERDICT|' "$R/r5-porte-apres.copie.log" | cut -d'|' -f1-5,7,8 || true)
+  echo "## comparaison avec le passage avant le push"; echo "avant : ${a:-absent}"; echo "après : ${b:-absent}"
+  [ -n "$a" ] && [ "$a" = "$b" ] && echo "OK   même verdict de la porte avant et après le push de la VSA" || echo "KO   verdict de la porte différent ou absent"
+}
+
+etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH : manifeste fait main (subject =
+  # image) poussé par digest dans builds/vsa/sample-app ; aucun referrer ni tag ajouté à builds/sample-app
+  local x=$W/pousser s m a rc=0
+  [ -s "$R/r5-vsa.bundle.json" ] || { echo "REFUS : resultats/r5-vsa.bundle.json absent (étape vsa d'abord)"; exit 1; }
+  rm -rf -- "${x:?}" && (umask 077 && mkdir -p "$x")
+  trap 'rm -rf -- "$W/pousser"' EXIT   # copie du mot de passe (auth.json) supprimée même en cas d'échec
+  strace -f -qq -e trace=connect -o "$x/trace" cosign verify-blob-attestation --bundle "$R/r5-vsa.bundle.json" --new-bundle-format \
+    --key "$R/vsa-cle-publique.pem" --insecure-ignore-tlog --type "$TYPE_VSA" --digest "${IMAGE#*@sha256:}" --digestAlg sha256 > "$x/v.err" 2>&1 || rc=$?
+  echo "bundle archivé, clé de VSA (hôte) : code $rc ; $(tail -1 "$x/v.err")"; [ "$rc" = 0 ] || exit 1
+  connexions "verify-blob-attestation (hôte)" "$x/trace"
+  printf '{"auths":{"%s":{"auth":"%s"}}}' "$ZOT_POC" "$(printf 'poc-replay:%s' "$(cat "$SECRETS/zot-poc-replay.password")" | base64 -w0)" > "$x/auth.json"
+  a=(--registry-config "$x/auth.json" --ca-file "$CA_POC")
+  printf '{}' > "$x/config.json"
+  echo "referrers de l'image dans ${IMAGE%@*}, avant : $(curl -fsS --cacert "$CA_POC" "https://$ZOT_POC/v2/${IMAGE%@*}/referrers/${IMAGE#*@}" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')"
+  # descripteur de l'image (sujet), lu en anonyme
+  s=$(curl -fsSI --cacert "$CA_POC" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$ZOT_POC/v2/${IMAGE%@*}/manifests/${IMAGE#*@}" \
+    | tr -d '\r' | python3 -I -c 'import sys,json; h={l.split(": ",1)[0].lower(): l.split(": ",1)[1] for l in sys.stdin.read().splitlines() if ": " in l}; print(json.dumps({"mediaType": h["content-type"], "digest": h["docker-content-digest"], "size": int(h["content-length"])}))')
+  echo "sujet : $s"
+  printf '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","artifactType":"%s","config":{"mediaType":"application/vnd.oci.empty.v1+json","digest":"sha256:%s","size":2},"layers":[{"mediaType":"%s","digest":"sha256:%s","size":%s}],"subject":%s,"annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"%s"}}' \
+    "$TYPE_BUNDLE" "$(sha256sum < "$x/config.json" | cut -c1-64)" "$TYPE_BUNDLE" "$(sha256sum < "$R/r5-vsa.bundle.json" | cut -c1-64)" \
+    "$(wc -c < "$R/r5-vsa.bundle.json")" "$s" "$TYPE_VSA" > "$x/manifeste.json"
+  m=sha256:$(sha256sum < "$x/manifeste.json" | cut -c1-64)
+  cp "$x/manifeste.json" "$R/r5-vsa-manifeste.json"
+  oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$R/r5-vsa.bundle.json" > /dev/null && echo "blob du bundle poussé"
+  oras blob push "${a[@]}" "$ZOT_POC/$DEPOT_VSA" "$x/config.json" > /dev/null && echo "config vide poussée"
+  oras manifest push "${a[@]}" "$ZOT_POC/$DEPOT_VSA@$m" "$x/manifeste.json" 2>&1 | tail -1
+  rm -rf -- "${x:?}"
+  echo "## relecture anonyme"
+  echo "referrers de l'image dans $DEPOT_VSA : $(curl -fsS --cacert "$CA_POC" "https://$ZOT_POC/v2/$DEPOT_VSA/referrers/${IMAGE#*@}" | python3 -I -c 'import json,sys; print([(m.get("artifactType"), m["digest"]) for m in json.load(sys.stdin)["manifests"]])')"
+  echo "étiquettes de $DEPOT_VSA : $(curl -s --cacert "$CA_POC" "https://$ZOT_POC/v2/$DEPOT_VSA/tags/list")"
+  echo "referrers de l'image dans ${IMAGE%@*}, après : $(curl -fsS --cacert "$CA_POC" "https://$ZOT_POC/v2/${IMAGE%@*}/referrers/${IMAGE#*@}" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')"
+  echo "manifeste poussé : $m"
+}
+
+etape_lire_vsa() { # lecture anonyme, cosign sous strace (connect) ; N3 (clés croisées) et témoins
+  local i=$ZOT_POC/$IMAGE c=$racine_depot/poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem
+  essai() { # libellé attendu(accepte|refus) commande… : verdict, puis contrôle des connexions
+    local l=$1 att=$2 r; shift 2
+    if strace -f -qq -e trace=connect -o "$W/lire.trace" "$@" > "$W/lire.out" 2> "$W/lire.err"; then r=accepte; else r=refus; fi
+    [ "$r" = "$att" ] && echo "OK   $l : $r ($(grep -c '^{' "$W/lire.out" || true) vérifiée(s) ; $(grep -m1 '^Error' "$W/lire.err" | cut -c1-140))" \
+      || echo "KO   $l : $r (attendu $att) ; $(grep -m1 '^Error' "$W/lire.err" | cut -c1-140)"
+    connexions "$l" "$W/lire.trace"
+  }
+  essai "VSA par COSIGN_REPOSITORY, clé de VSA" accepte env COSIGN_REPOSITORY="$ZOT_POC/$DEPOT_VSA" cosign verify-attestation \
+    --key "$R/vsa-cle-publique.pem" --insecure-ignore-tlog --type "$TYPE_VSA" --registry-cacert "$CA_POC" "$i"
+  essai "N3 : VSA par COSIGN_REPOSITORY, clé de Chains" refus env COSIGN_REPOSITORY="$ZOT_POC/$DEPOT_VSA" cosign verify-attestation \
+    --key "$c" --insecure-ignore-tlog --type "$TYPE_VSA" --registry-cacert "$CA_POC" "$i"
+  essai "N3 : provenance (tag .att), clé de VSA" refus cosign verify-attestation --key "$R/vsa-cle-publique.pem" --insecure-ignore-tlog \
+    --type slsaprovenance1 --registry-cacert "$CA_POC" "$i"
+  essai "témoin : provenance (tag .att), clé de Chains" accepte cosign verify-attestation --key "$c" --insecure-ignore-tlog \
+    --type slsaprovenance1 --registry-cacert "$CA_POC" "$i"
+  essai "témoin : signature d'image, clé de Chains" accepte cosign verify --key "$c" --insecure-ignore-tlog --registry-cacert "$CA_POC" "$i"
+  rm -f "$W/lire.out" "$W/lire.err" "$W/lire.trace"
+}
+
+etape_negatifs() { # DANS LA VM, sur des copies (outils/negatifs.sh) ; rapports diffoscope rapatriés dans resultats/ ; rien poussé
+  sur 'sudo rm -rf ~/r5n && mkdir -m 0700 ~/r5n'   # distinct de ~/r5 (VSA) : negatifs.sh écrit en root dans ~/r5n
+  scp -q "${SSH_OPTS[@]}" "$here/outils/negatifs.sh" "replay@$VM_IP:r5n/"
+  sur 'sha256sum ~/r5n/negatifs.sh && sudo bash ~/r5n/negatifs.sh; sudo cat ~/r5n/n/resultat.txt'
+  sur 'sudo cat ~/r5n/n/diffoscope-couche.txt' > "$R/r5-n2-diffoscope-couche.txt"
+  sur 'sudo cat ~/r5n/n/diffoscope-config.txt' > "$R/r5-n2-diffoscope-config.txt"
+  echo "## motif de N1 (journal de buildctl, fin)"; sur 'sudo tail -8 ~/r5n/n/n1.build.log'
 }
 
 SECRETS=$O/secrets   # secrets du domaine sur l'hôte (compte poc-replay) ; la 08 ne reçoit que le hash

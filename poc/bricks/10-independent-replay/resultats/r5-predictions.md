@@ -51,3 +51,56 @@ Préparation à sec : relecture de `main.go`, de la recette et du stockage des m
 - **Porte de la 08, avant et après le push de la VSA** : le même verdict. `success` vrai, aucune violation, contrôle 9 `ok` avec le même nombre d'enveloppes couvertes. Mesure dans le cluster : un Job de la porte par passage.
 - **CronJob d'horodatage** : aucune anomalie pour `builds/vsa/sample-app` au passage suivant le push. Attente **incertaine** : le précédent, `builds/essai-replay`, contenait une image, alors que `builds/vsa/sample-app` n'aura qu'un manifeste dont le sujet est absent du dépôt.
 - **Accès au TUF public** : aucun pendant la signature et la vérification dans la VM, qui tournent sous `unshare -rn`. Que `unshare -rn` fonctionne pour l'utilisateur `replay` dans la VM n'est **pas mesuré**. Sur l'hôte, les `connect()` de cosign pendant la lecture de la VSA sont relevés par `strace`.
+
+## Additif du 03/11/2026 à 14:56 UTC : intégration à `replay.sh`, défaut de `vsa.py` corrigé, prédictions de l'étape `vsa` (rien exécuté)
+
+**Défaut trouvé avant toute exécution.**
+- `outils/vsa.py` (commit `90043b6`) lisait les bundles et la racine de la TSA dans `~/r3/travail/`. Or `verifier_entrees.py` vide ce dossier à la fin de R3 : relevé en lecture seule dans la VM, il est vide.
+- Lancé tel quel, `vsa.py` aurait refusé l'énoncé (« bundle de l'invocation : None »).
+- **Correction** : `vsa.py` refait lui-même, dans `~/r5/travail`, la racine de la TSA (`cosign trusted-root create`, avec l'identifiant de la TSA en 5ᵉ argument) et le bundle. Il extrait le bundle du layout de R3 en lecture seule, avec `oras`, comme `verifier_entrees.py`.
+- Il exige **un seul** bundle portant l'`invocationId`, et prend le digest de `inputAttestations` sur le manifeste extrait.
+- `~/r3` et `~/r4` ne sont pas touchés, et `verifier_entrees.py` n'est pas relancé : il réécrirait `provenance.json` et `recette/`, que R4 a consommés.
+
+**Intégration.** Les étapes `vsa`, `porte_avant`, `pousser_vsa`, `porte_apres`, `lire_vsa` et `negatifs` sont ajoutées à `replay.sh`, avec ces changements par rapport aux brouillons :
+- `etape_vsa` refuse de partir dans trois cas :
+  - `outils/vsa.py` diffère du commit ;
+  - `HEAD` n'est pas poussé ;
+  - le commit de la politique n'est pas poussé.
+
+  Le sha256 de `vsa.py` entre dans `verifier.version` et doit pouvoir être confronté au dépôt.
+- Les codes de sortie de `attest-blob` et de `verify-blob-attestation` sont lus et affichés (sans `set -e`). La vérification dans la VM se fait sans `--trusted-root`, comme V1 dans `r5-tuf.log`.
+- **Porte** : deux étapes, `porte_avant` et `porte_apres`, pour deux journaux ; la seconde compare les lignes `VERDICT` sans la durée.
+- **Sur l'hôte**, chaque commande cosign de `pousser_vsa` et de `lire_vsa` tourne sous `strace -e trace=connect`. C'est un **contrôle** : `KO` dès qu'une connexion vise autre chose que `192.168.161.13:5000`. L'extraction est celle de `essais/tuf-verification-cle.sh`.
+
+**Prédictions de l'étape `vsa`** (valeurs connues d'avance, relevées dans la VM en lecture seule ou dans les journaux) :
+
+1. Les trois gardes passent (commit `309644f` et `HEAD` poussés, `vsa.py` propre). Le sha256 de la politique au commit vaut `4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450`.
+2. `vsa.py`, sous `unshare -rn` :
+   - `verdict de R4 : PASSED` et image reconstruite `3a7ca1b1…` ;
+   - racine de la TSA construite ;
+   - un seul bundle de l'invocation parmi 43 : `bundle-7af184de44b81e66` (celui de R3) ;
+   - signature de Chains et jeton de la TSA vérifiés ;
+   - énoncé identique à `~/r3/provenance.json` ;
+   - les contrôles de la politique tous `OK` ;
+   - délai : `timeVerified` `2026-11-03T14:27:05Z`, soit 24 h 27 min 35 s après `finishedOn` (`2026-11-02T13:59:30Z`).
+
+   **Attente incertaine** : `cosign trusted-root create` et `verify-blob-attestation --use-signed-timestamps --trusted-root` n'ont tourné dans la VM qu'avec le réseau (R3), jamais sous `unshare -rn`. Un échec ici serait un refus de `vsa.py`, sans énoncé.
+3. Énoncé :
+   - `subject` = `sc-stockage.poc.test:5000/builds/sample-app`, sha256 `3a7ca1b1…` ;
+   - `resourceUri` = `oci://sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b1…` ;
+   - `policy` = `https://github.com/gigi206/supply-chain/blob/309644f…/poc/bricks/10-independent-replay/politique-replay.md`, avec le digest `4f1cca93…` ;
+   - `inputAttestations` = `oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8`, avec ce même digest ;
+   - `verifier.version` :
+     - `buildkit` = `buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e…` ;
+     - `go` = `go1.26.10` ;
+     - `verifier_entrees.py` = `66fa5cb4…` ;
+     - `rebuild.sh` = `a1945ff2…` ;
+     - `vsa.py` = `734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540` ;
+   - `verificationResult` `PASSED`, `verifiedLevels` = `SLSA_BUILD_LEVEL_3` et `POC_REPLAY_BIT_IDENTIQUE`.
+4. **Signature** :
+   - `signing-config` sans service : code 0 ;
+   - `attest-blob` : code 0 ;
+   - `verify-blob-attestation` avec la clé du domaine, sans `--trusted-root` : code 0, `Verified OK` ;
+   - bundle `application/vnd.dev.sigstore.bundle.v0.3+json`, sans entrée de journal ni horodatage, énoncé identique à `enonce.json` (comme en `r5-signature_hors_registre.log`).
+5. **Sur l'hôte** (`pousser_vsa`, avant tout push) : le bundle archivé est vérifié avec `resultats/vsa-cle-publique.pem`, sans aucune connexion. `builds/vsa/sample-app` n'existe pas encore : relevé à 14:56 UTC, `tags/list` rend 404.
+6. **`lire_vsa`** : les cinq commandes cosign ne se connectent qu'à `192.168.161.13:5000` (r5-tuf.log : aucune tentative vers le TUF public pour des vérifications par clé, réussies ou refusées).

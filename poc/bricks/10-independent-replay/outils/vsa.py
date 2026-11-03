@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# Brique 10, R5, DANS LA VM : énoncé de la VSA, construit seulement d'après
+# Brique 10, R5, DANS LA VM (dossier ~/r5, sous unshare -rn) : énoncé de la VSA, construit seulement d'après
 # ce que la VM revérifie ici (bundle horodaté de la provenance : clé de Chains, sujet, jeton de la TSA) et le résultat de R4
 # (~/r4/resultat.txt) ; refus (code 1, aucun énoncé) si une condition de la politique manque. Signature : par l'appelant.
-# Usage : python3 -I vsa.py <registre> <dépôt@sha256:…> <invocationId> <uri de la politique>
-import base64, datetime, glob, hashlib, json, subprocess, sys
+# La racine de la TSA et le bundle sont refaits ici, dans travail/ : verifier_entrees.py vide ~/r3/travail en fin de R3.
+# Usage : python3 -I vsa.py <registre> <dépôt@sha256:…> <invocationId> <uri de la politique> <identifiant de la TSA>
+import base64, datetime, hashlib, json, os, subprocess, sys
 
-REG, IMAGE, INVOCATION, POLITIQUE_URI = sys.argv[1:5]
+REG, IMAGE, INVOCATION, POLITIQUE_URI, URL_TSA = sys.argv[1:6]
 DEPOT, SUJET = IMAGE.split("@")
 R3, R4 = "/home/replay/r3", "/home/replay/r4"
 ko = []
@@ -21,25 +22,40 @@ def sha256(chemin):
 def heure(texte):
     return datetime.datetime.strptime(texte, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
 
+def sh(*args):
+    return subprocess.run(args, capture_output=True, check=False)
+
+def couche(ref):   # octets de la première couche d'une étiquette du layout de R3 (lecture seule), et digest du manifeste
+    m = sh("oras", "manifest", "fetch", "--oci-layout", f"{R3}/layout:{ref}").stdout
+    d = json.loads(m)["layers"][0]["digest"]
+    return sh("oras", "blob", "fetch", "--oci-layout", f"{R3}/layout@{d}", "--output", "-").stdout, "sha256:" + hashlib.sha256(m).hexdigest()
+
 print("## résultat de R4 (~/r4/resultat.txt)")
 r4 = dict(l.split("=", 1) for l in open(f"{R4}/resultat.txt").read().splitlines() if "=" in l)
 verdict(r4.get("verdict") == "PASSED", f"verdict de R4 : {r4.get('verdict')}")
 verdict(r4.get("image_reconstruite", "").split(" ")[0] == SUJET, f"image reconstruite : {r4.get('image_reconstruite')}")
 
 print("## provenance : bundle horodaté de l'invocation, revérifié ici")
-bundle, enonce = None, None
-for chemin in sorted(glob.glob(f"{R3}/travail/bundle-*.json")):
-    b = json.load(open(chemin))
-    e = json.loads(base64.b64decode(b["dsseEnvelope"]["payload"]))
+os.makedirs("travail", exist_ok=True)
+r = sh("cosign", "trusted-root", "create", f"--tsa=url={URL_TSA},certificate-chain={R3}/tsa-chaine.pem", "--out", "travail/racine.json")
+verdict(r.returncode == 0, "racine de confiance de la TSA construite ici")
+refs = sorted(m["annotations"]["org.opencontainers.image.ref.name"] for m in json.load(open(f"{R3}/layout/index.json"))["manifests"]
+              if m["annotations"]["org.opencontainers.image.ref.name"].startswith("bundle-"))
+candidats = []
+for ref in refs:
+    octets, mb = couche(ref)
+    e = json.loads(base64.b64decode(json.loads(octets)["dsseEnvelope"]["payload"]))
     if e["predicate"]["runDetails"]["metadata"].get("invocationId") == INVOCATION:
-        bundle, enonce = chemin, e
-        break
-verdict(bundle is not None, f"bundle de l'invocation {INVOCATION} : {bundle}")
-if bundle is None or enonce is None:
+        candidats.append((ref, mb, octets, e))
+verdict(len(candidats) == 1, f"bundles de l'invocation {INVOCATION} parmi {len(refs)} : {[c[0] for c in candidats]}")
+if len(candidats) != 1:
     sys.exit(1)
+ref, mb, octets, enonce = candidats[0]
+bundle = f"travail/{ref}.json"
+open(bundle, "wb").write(octets)
 r = subprocess.run(["cosign", "verify-blob-attestation", "--bundle", bundle, "--new-bundle-format", "--key", f"{R3}/chains.pub",
                     "--insecure-ignore-tlog", "--type", "https://slsa.dev/provenance/v1", "--digest", SUJET.split(":")[1],
-                    "--digestAlg", "sha256", "--use-signed-timestamps", "--trusted-root", f"{R3}/travail/racine.json"],
+                    "--digestAlg", "sha256", "--use-signed-timestamps", "--trusted-root", "travail/racine.json"],
                    capture_output=True)
 verdict(r.returncode == 0, "signature de Chains et jeton de la TSA du bundle (cosign verify-blob-attestation)")
 verdict(enonce == json.load(open(f"{R3}/provenance.json")), "énoncé identique à la provenance vérifiée en R3")
@@ -58,9 +74,6 @@ if ko:
     print(f"REFUS : {len(ko)} condition(s) manquante(s), aucun énoncé écrit")
     sys.exit(1)
 
-ref = bundle.rsplit("/", 1)[1].removesuffix(".json")   # bundle-<empreinte>, nom dans le layout de R3
-mb = next(m["digest"] for m in json.load(open(f"{R3}/layout/index.json"))["manifests"]
-          if m["annotations"]["org.opencontainers.image.ref.name"] == ref)
 vsa = {
     "_type": "https://in-toto.io/Statement/v1",
     "subject": [{"name": f"{REG}/{DEPOT}", "digest": {"sha256": SUJET.split(":")[1]}}],
