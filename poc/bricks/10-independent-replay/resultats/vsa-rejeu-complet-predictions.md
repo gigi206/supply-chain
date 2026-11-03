@@ -57,3 +57,7 @@ Choix du propriétaire : « VSA sur 3a7ca1b1 ». Préparé à sec : rien n'a enc
 ## Limite qui demeure
 
 Chaque rejeu de zéro régénère la clé de Chains et les invocationId. La VSA que `POUSSER_VSA=1` re-poussera pointera donc de nouveau vers un bundle disparu, comme celle de `d9006af7` aujourd'hui : son `inputAttestations` `horodatage/bundles@f5969ecf…` répond 404, relevé à 23:14 UTC.
+
+## Résultat de R3 (03/11/2026, 23:20 UTC)
+
+Conforme à toutes les prédictions de R3 : 41/41 bundles, provenance `c4242a11`, entrées et digests attendus, Dockerfile `d56985c1…`, `go1.26.10`, `finishedOn` à 21:26:27 UTC, 0 KO.

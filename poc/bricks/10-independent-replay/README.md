@@ -437,3 +437,12 @@ Le rejeu de zéro de la 08 a effacé Zot. Le bundle versionné `r5-vsa.bundle.js
 ## Additif du 03/11/2026, 23:17 UTC : VSA de la construction du rejeu complet, préparée à sec (choix du propriétaire : « VSA sur 3a7ca1b1 »)
 
 Même image (`3a7ca1b1`), provenance de J7 du rejeu complet (`c4242a11`, fermeture de la plateforme). Le code et la politique sont adaptés à la fermeture rangée sous `builds/fermetures/`. Rien n'est encore joué. R4 ne peut pas commencer avant le 04/11/2026 à 21:26:27 UTC. Prédictions et différences relevées : [`vsa-rejeu-complet-predictions.md`](resultats/vsa-rejeu-complet-predictions.md).
+
+**R3 joué le 03/11/2026, de 23:20:09 à 23:20 UTC environ** (accord du propriétaire : « Oui, lancer R3 ») : conforme aux prédictions, 0 KO. Journaux [`r3-transporter.log`](resultats/r3-transporter.log) et [`r3-verifier_entrees.log`](resultats/r3-verifier_entrees.log), réécrits (ceux de `d9006af7` restent dans l'historique git).
+- 41 bundles transportés, et 41 vérifiés hors réseau avec la clé de Chains du rejeu (`07c683b0…`) ;
+- provenance `c4242a11` extraite d'un bundle vérifié ;
+- six entrées déclarées, dont la fermeture `builds/fermetures/sample-app@74c265e7…`, et digests transportés égaux ;
+- commit `6391fd43…`, Dockerfile `d56985c1…`, `go1.26.10` ;
+- `finishedOn` à 21:26:27 UTC, jeton de la TSA à 21:27:06 UTC.
+
+Prochaine étape : R4, pas avant le 04/11/2026 à 21:26:27 UTC.
