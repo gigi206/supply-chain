@@ -385,6 +385,7 @@ Découverte fortuite en préparant le pare-feu, pas une mesure planifiée : aucu
 - Les gestionnaires ne contrôlent pas le certificat client.
 - Connu en amont, sans l'angle TLS : [grafana/alloy#6071](https://github.com/grafana/alloy/issues/6071), ouvert le 16/04/2026 et non corrigé.
 - **Additif du 03/11/2026, après lecture de la documentation d'Alloy v1.21.3** : le gRPC n'est pas caché. La page de `loki.source.api` annonce que le composant « receives log entries over HTTP and gRPC ». Elle documente un bloc `grpc` > `tls` distinct de `http` > `tls`, ainsi que l'écoute par défaut sur toutes les interfaces, sur un port au hasard. Notre configuration ne l'avait pas fermé : c'est notre oubli. Ce qui n'est pas documenté : ce point d'entrée existe même sans bloc `grpc`, et reste alors sans TLS. Le repli sur 127.0.0.1 prévu par le code (`api.go`) ne joue jamais.
+- **Décision du propriétaire (03/11/2026) : « Ne rien signaler »** à Grafana, ni en privé ni sur #6071.
 
 **Conséquences** :
 - **D17** : par le relais, toute machine qui joint `192.168.161.13` pourrait écrire dans Loki sous `noeud="sc-confiance"` ou `noeud="sc-build"` (déduit du code, écriture non essayée). La joignabilité depuis un pod n'est pas mesurée.
