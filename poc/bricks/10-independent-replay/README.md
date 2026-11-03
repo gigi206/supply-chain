@@ -379,3 +379,44 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
 - **Hors R5, non tranché** : la porte de la 08 n'exige pas encore la VSA (contrôle 6 de la grille C). Elle admet l'image avec ou sans VSA.
   - **Préparé à sec le 03/11/2026 à 15:25 UTC** (choix du propriétaire : « Contrôle 6 d'abord ») : conteneur `vsa` dans la porte de la 08, prédictions datées dans [`controle6-predictions.md`](../08-trust-plane/resultats/controle6-predictions.md). Rien n'est appliqué au cluster.
   - **Mesuré le 03/11/2026, de 15:30 à 15:32 UTC** (choix du propriétaire : « Lancer controle6 » ; [`preuves-controle6.log`](../08-trust-plane/resultats/preuves-controle6.log)), avec 0 écart : la porte admet l'image réelle avec sa VSA. Elle refuse le même digest sans VSA (`essai-webhook`) et une VSA vérifiée avec la clé de Chains. La porte en service exige désormais la VSA.
+
+## Clôture (03/11/2026, 15:34 UTC ; choix du propriétaire : « Oui, clore »)
+
+**Le seuil est atteint sur le laptop, avec deux écarts.**
+
+| Élément du seuil | Résultat | Preuve |
+|---|---|---|
+| Bit-identique | Image reconstruite hors ligne de même digest que le sujet de la provenance (`3a7ca1b1…`) : `PASSED` | R4, second passage |
+| Au moins 24 h | `finishedOn` signé à 13:59:30 UTC le 02/11, corroboré par le jeton de la TSA (14:00:05 UTC) ; `timeVerified` à 14:27:05 UTC le 03/11 | R3 (`r3-verifier_entrees.log`), R5 (`r5-vsa.log`) |
+| VSA | Signée par la clé du domaine, rangée en referrer dans `builds/vsa/sample-app`, lue et vérifiée | R5 (`vsa`, `pousser_vsa`, `lire_vsa`) |
+| Clé de VSA séparée | Générée dans la VM, jamais celle de Chains ; clés croisées refusées (N3) | R2, R5 |
+| Domaine distinct | **Séparé techniquement seulement** : VM `sc-replay` avec son propre réseau, lien coupé pendant le build | R2, R4 |
+
+**Écarts** (décisions du propriétaire du 03/11/2026) :
+- D1 (b) : le domaine a le même administrateur que le plan de confiance ;
+- D2 (a) : il tourne sur le même hyperviseur.
+
+Le propriétaire, ou le root de l'hôte, peut donc forger à la fois la provenance et la VSA. Le `verifier.id` (`replay-poc-administrateur-unique@v1`) le dit.
+
+**Après R5** : la porte de la 08 exige la VSA (contrôle 6), mesuré avec 0 écart. Voir le [README de la 08](../08-trust-plane/README.md).
+
+**Effort** :
+- tout le travail de la brique a eu lieu le 03/11/2026 : la préparation à sec, dont l'heure de début n'est pas relevée, a son premier commit à 09:41:22 UTC, et la dernière mesure (`controle6`) a fini à 15:32:35 UTC ;
+- c'est moins d'une journée, très en deçà des 2 pw estimées et du seuil de décision de 4 pw ;
+- l'attente de 24 h n'est pas comptée : elle courait depuis le build de la 08 (02/11 à 13:59:30 UTC) ;
+- la règle de R4 a imposé un arrêt après le premier passage, en échec par une erreur du code du domaine.
+
+**Non fait, ou ouvert** :
+- **Journalisation dans Grafana** (exigence du propriétaire du 02/11/2026) :
+  - les journaux du domaine (build, compteurs du lien, VSA) ne sont que dans `resultats/` ; ni la VM ni l'hôte ne les envoient à Loki ;
+  - la corroboration de `timeVerified` par l'audit de Zot lu dans Loki, prévue en préparation, n'a pas été faite ;
+  - même faite, elle ne donnerait qu'une borne haute (la VSA existait au moment du push), pas la borne basse des 24 h.
+- **Limites de la politique** : `web/dist` est pris par digest, pas reconstruit (Node hors de la chaîne).
+- **Points restés ouverts en R5** :
+  - durée de vie d'un referrer, avec le GC de Zot désactivé ;
+  - capacité de `poc-images` et de `poc-replay` à bloquer une publication par un referrer de type bundle ;
+  - 43 bundles pour 6 enveloppes dans `horodatage/bundles`.
+- **Résidus** :
+  - `builds/essai-replay` (D5) ;
+  - `~/r5n` et `/var/lib/replay-buildkit-n` dans la VM (contre-épreuves ; leur nettoyage attend l'accord du propriétaire) ;
+  - la VM `sc-replay` elle-même et ses clés, dans `~/.cache/supply-chain-poc/10/`.
