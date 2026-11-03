@@ -1797,3 +1797,10 @@ L'audit de Zot trace les écritures réussies du compte, et les retrouve dans Lo
 **Résidu** : `builds/essai-replay` (image et referrer jetables).
 
 **Retrait** : retirer `poc-replay` de `stockage/zot.json`, supprimer le fichier `htpasswd` du domaine, puis rejouer `stockage.sh zot`.
+
+**Constat du 03/11/2026, mesuré par la brique 10** (Zot jetable, rien poussé ; [`r5-referrer-porte-predictions.md`](../10-independent-replay/resultats/r5-referrer-porte-predictions.md)) :
+- **Mesure** : un seul referrer de type bundle Sigstore v0.3 sur une image de `builds/**` suffit pour que ec v0.10.42 et cosign 3.1.4 cessent de lire `.sig` et `.att`. Pour l'image réelle `3a7ca1b1`, avec un bundle signé par une autre clé, la porte ne voit plus que 0 signature et 0 attestation, et **refuse**. Elle échoue fermée.
+- **Conséquence, déduite de `stockage/zot.json` et non mesurée avec ces comptes** :
+  - `poc-images`, dont le secret `zot-images` est dans `builds` (zone build), et `poc-replay` peuvent créer un tel referrer sous `builds/**`, sans pouvoir le retirer ;
+  - ils peuvent donc **bloquer la publication** d'une image : un effet sur la disponibilité, pas sur l'intégrité tant que le bundle n'est pas signé par Chains.
+- **À examiner, non mesuré** : un referrer qui réemballerait de vraies enveloppes de Chains du même digest pourrait choisir les enveloppes que ec juge. `cosign bundle create` ne vérifie rien, d'après la lecture faite en J5.
