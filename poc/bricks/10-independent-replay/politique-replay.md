@@ -1,6 +1,6 @@
 # Politique du replay indépendant (brique 10)
 
-C'est la politique que le domaine de replay applique. La VSA la cite dans `policy.uri`, avec son digest : le sha256 de ce fichier au commit qui la fige, avant R5.
+C'est la politique que le domaine de replay applique. La VSA la cite dans `policy.uri`, avec son digest : le sha256 de ce fichier au commit qui la fige, avant R5. `policy.uri` est l'URL GitHub du fichier à ce commit (choix du propriétaire du 03/11/2026).
 
 Le domaine est administré par le propriétaire, par écart documenté (D1 b). Il est hébergé dans la VM `sc-replay`, sur le même hyperviseur que le plan de confiance (D2 a). L'indépendance est donc technique, pas organisationnelle.
 

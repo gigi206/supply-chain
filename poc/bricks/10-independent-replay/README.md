@@ -85,6 +85,11 @@ Toutes les recommandations sont retenues :
   - la VSA va dans **`builds/vsa/sample-app`**, et non dans `builds/sample-app` ;
   - c'est un manifeste fait main dont le `subject` est l'image, poussé par digest sans étiquette ;
   - les droits D5 sont inchangés.
+- **`policy.uri` de la VSA** (03/11/2026, vers 12:45 UTC, choix du propriétaire : « ok pour ta recommandation ») :
+  - c'est l'URL GitHub du fichier au commit qui fige la politique, `https://github.com/gigi206/supply-chain/blob/<commit>/poc/bricks/10-independent-replay/politique-replay.md` ;
+  - `policy.digest` est le sha256 du fichier à ce commit ;
+  - l'étape de la VSA transporte la politique tirée de ce commit (`git show`), et refuse si le commit n'est sur aucune branche distante ;
+  - ce commit doit donc être poussé avant R5, et ce push reste soumis à l'accord du propriétaire.
 
 ### Jalons proposés (chacun soumis à accord ; prédictions datées avant chaque exécution)
 
