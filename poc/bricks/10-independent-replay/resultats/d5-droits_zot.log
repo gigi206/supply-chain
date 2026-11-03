@@ -1,0 +1,9 @@
+# replay.sh droits_zot, 2026-11-03T10:41:03Z
+OK   push par digest dans builds/essai-replay : accepte
+OK   push par tag dans builds/essai-replay : refus
+OK   push par digest dans workspace/essai (hors de builds/**) : refus
+OK   referrer par oras attach sur builds/essai-replay : accepte
+OK   suppression du manifeste : refus
+referrers en lecture anonyme : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:08c152dbe005')]
+tags de builds/essai-replay : 
+builds/sample-app : 6 enveloppes dans le tag .att

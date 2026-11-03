@@ -253,3 +253,10 @@ Accord du propriétaire : « Oui, à sec ». L'application aura son propre accor
 - en lecture anonyme, le referrer apparaît dans `GET /v2/builds/sample-app/referrers/sha256:3a7ca1b1…`.
 
 **À mesurer avant R5, sur l'hôte et sur un Zot jetable (comme R1)** : ce que `cosign attest --no-upload` produit avec la configuration de signature vide, dans le format bundle v0.3. Il s'agit de savoir si la VM peut signer sans registre, et si `oras attach` peut ensuite pousser ce bundle tel quel, en referrer.
+
+**D5 appliqué (03/11/2026, 10:40 à 10:42 UTC, accord du propriétaire : « Oui, appliquer D5 »)** : prédictions et additif dans [`d5-predictions.md`](resultats/d5-predictions.md).
+- Compte `poc-replay` créé. Le hash est lu par la 08, et le mot de passe reste dans le dossier du domaine.
+- Push par digest et referrer acceptés ; tag, autre dépôt et suppression refusés par le contrôleur d'accès.
+- Les refus n'apparaissent pas dans l'audit de Zot.
+- **Risque à mesurer avant R5** : l'effet d'une VSA en referrer de `builds/sample-app` sur la porte de la 08.
+- Résidu : `builds/essai-replay`.

@@ -33,6 +33,10 @@
 # Jalon R5 (JALON=r5) :
 #   signature_hors_registre  sur l'hôte, comme cosign_stockage : VSA signée par cosign attest-blob --statement sans registre,
 #                    poussée en referrer par oras attach, vérifiée par cosign (clé de VSA acceptée, autre clé refusée)
+# D5 (JALON=d5), compte Zot poc-replay (accord du propriétaire : « Oui, appliquer D5 ») :
+#   compte_zot       mot de passe et ligne htpasswd bcrypt dans ~/.cache/supply-chain-poc/10/secrets (la 08 ne lit que le hash)
+#   droits_zot       après « mise run confiance:stockage -- zot » : poc-replay sur le dépôt jetable builds/essai-replay (push par
+#                    digest et referrer acceptés ; tag, dépôt hors de builds/**, suppression refusés)
 #
 # Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
@@ -436,6 +440,47 @@ echo "## 3. cosign verify-blob-attestation --bundle (clé de VSA, puis autre cl�
 kill $z
 EOS
   cd / && rm -rf -- "${d:?}"
+}
+
+SECRETS=$O/secrets   # secrets du domaine sur l'hôte (compte poc-replay) ; la 08 ne reçoit que le hash
+
+etape_compte_zot() { # D5 : mot de passe de poc-replay et ligne htpasswd bcrypt (coût 12), dans le dossier du domaine
+  local h
+  mkdir -p "$SECRETS" && chmod 0700 "$SECRETS"
+  [ -s "$SECRETS/zot-poc-replay.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$SECRETS/zot-poc-replay.password")
+  h=$(mkpasswd -m bcrypt -R 12 -s < "$SECRETS/zot-poc-replay.password")
+  case $h in '$2b$12$'*) echo "hash bcrypt de coût 12" ;; *) echo "KO   hash bcrypt inattendu" >&2; exit 1 ;; esac
+  (umask 077 && printf 'poc-replay:%s\n' "$h" > "$SECRETS/zot-poc-replay.htpasswd")
+  stat -c '%a %n' "$SECRETS"/zot-poc-replay.* | sed "s#$SECRETS/##"
+}
+
+etape_droits_zot() { # D5 : droits de poc-replay sur le Zot du PoC, sur un dépôt jetable (builds/essai-replay)
+  local x=$W/droits a b img ref r
+  rm -rf -- "${x:?}" && (umask 077 && mkdir -p "$x")
+  trap 'rm -rf -- "$W/droits"' EXIT   # copie du mot de passe (auth.json) supprimée même en cas d'échec
+  printf '{"auths":{"%s":{"auth":"%s"}}}' "$ZOT_POC" "$(printf 'poc-replay:%s' "$(cat "$SECRETS/zot-poc-replay.password")" | base64 -w0)" > "$x/auth.json"
+  a=(--registry-config "$x/auth.json" --ca-file "$CA_POC")
+  b=(--to-registry-config "$x/auth.json" --to-ca-file "$CA_POC")
+  printf 'essai poc-replay %s\n' "$(date -u +%FT%TZ)" > "$x/f.txt"
+  ( cd "$x" && oras push --oci-layout "$x/image:v" f.txt > /dev/null )   # image jetable en layout local
+  img=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["manifests"][0]["digest"])' "$x/image/index.json")
+  essai() { # libellé attendu(accepte|refus) commande… : résultat d'une écriture
+    local l=$1 att=$2; shift 2
+    if "$@" > "$x/sortie" 2>&1; then r=accepte; else r=refus; fi
+    [ "$r" = "$att" ] && echo "OK   $l : $r" || echo "KO   $l : $r (attendu $att) : $(grep -m1 -iE 'error|denied|unauthor' "$x/sortie" | cut -c1-140)"
+  }
+  essai "push par digest dans builds/essai-replay" accepte oras cp "${b[@]}" --from-oci-layout "$x/image@$img" "$ZOT_POC/builds/essai-replay@$img"
+  essai "push par tag dans builds/essai-replay" refus oras cp "${b[@]}" --from-oci-layout "$x/image@$img" "$ZOT_POC/builds/essai-replay:tag-interdit"
+  essai "push par digest dans workspace/essai (hors de builds/**)" refus oras cp "${b[@]}" --from-oci-layout "$x/image@$img" "$ZOT_POC/workspace/essai@$img"
+  printf '{"essai":"referrer poc-replay"}' > "$x/vsa.json"
+  attacher() { (cd "$x" && oras attach "${a[@]}" --artifact-type application/vnd.dev.sigstore.bundle.v0.3+json "$ZOT_POC/builds/essai-replay@$img" vsa.json:application/vnd.dev.sigstore.bundle.v0.3+json); }   # chemin relatif : oras refuse les chemins absolus
+  essai "referrer par oras attach sur builds/essai-replay" accepte attacher
+  essai "suppression du manifeste" refus oras manifest delete "${a[@]}" --force "$ZOT_POC/builds/essai-replay@$img"
+  ref=$(curl -s --cacert "$CA_POC" "https://$ZOT_POC/v2/builds/essai-replay/referrers/$img" | python3 -I -c 'import json,sys; print([(m.get("artifactType"), m["digest"][:19]) for m in json.load(sys.stdin)["manifests"]])')
+  echo "referrers en lecture anonyme : $ref"
+  echo "tags de builds/essai-replay : $(oras repo tags --ca-file "$CA_POC" "$ZOT_POC/builds/essai-replay" | paste -sd' ')"
+  echo "builds/sample-app : $(oras manifest fetch --ca-file "$CA_POC" "$ZOT_POC/${IMAGE%@*}:$(echo "${IMAGE#*@}" | tr : -).att" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["layers"]))') enveloppes dans le tag .att"
+  rm -rf -- "${x:?}"
 }
 
 lancer "${JALON:-r1}" "$@"

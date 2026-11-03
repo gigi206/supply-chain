@@ -1779,3 +1779,21 @@ Rejeu ciblé (pas de rejeu complet) pour exposer les métriques à Prometheus ([
 - **Constat mesuré en O4 de la brique 19 (02/11/2026, 19:40 UTC) : Chains v0.29.9 échoue en ouvert si OpenBao est injoignable.** Build lancé pendant le scellement : le signataire KMS ne se configure pas (« connection refused », simple avertissement), « No signer kms configured » pour chaque type, puis **objets marqués `signed=true` sans aucune signature ni attestation** ; `marked_signed` +4, `sign_created`, `payload_stored` et `signing_failures` à 0 ; tag `.att` de l'image sans enveloppe de ce build ([`o4-a2-att-releve.log`](../19-observabilite/resultats/o4-a2-att-releve.log)). Code lu : le signataire absent fait `continue` sans erreur, puis `MarkSigned`. Corrigé sur `main` de l'amont (`b1c0af9`, #1834), pas dans v0.29.9. Conséquence : l'annotation `signed=true` ne prouve pas une signature ; c'est le contrôle exécutions/enveloppes et la porte qui jugent (non mesuré ici : exécutions purgées avant le contrôle).
 
 **Modification par la brique 19b (02/11/2026, D15 a du propriétaire)** : `openbao/config.hcl` déclare un second device d'audit, `sortie/` (`file_path = "stdout"`), collecté par Alloy avec les journaux du pod. Il a été appliqué par la ConfigMap et un SIGHUP, sans redémarrage ([`l3-openbao_sortie.log`](../19b-journalisation/resultats/l3-openbao_sortie.log)). Au prochain `openbao.sh deployer`, l'empreinte de la configuration change, et le pod est recréé, donc scellé. L'étape `initialiser` ne vérifie que `fichier/`.
+
+## Modifications pour la brique 10 (03/11/2026, accord du propriétaire : « Oui, appliquer D5 »)
+
+**Compte Zot `poc-replay`**, pour ranger la VSA du domaine de replay :
+- `stockage/zot.json`, dépôts `builds/**` : `read`, et `create` sous la condition CEL `req.referenceType != "tag"`, comme `poc-images` ;
+- `stockage.sh`, étape `zot` : la ligne `htpasswd` (bcrypt, coût 12) est lue dans le dossier du domaine, `~/.cache/supply-chain-poc/10/secrets/zot-poc-replay.htpasswd`. Le mot de passe n'est jamais lu par la 08. Si la ligne est absente, le compte n'est pas créé.
+
+**Rejeu ciblé** de `mise run confiance:stockage -- zot`, à 10:40 UTC. Zot a répondu 200 en quelques secondes, et les cinq autres comptes sont inchangés. L'ancien journal est gardé sous [`stockage-zot-avant-poc-replay.log`](resultats/stockage-zot-avant-poc-replay.log).
+
+**Droits mesurés** (brique 10, `d5-droits_zot.log` et `d5-droits_zot-refus.log`) :
+- **acceptés** : push par digest dans `builds/essai-replay`, referrer par `oras attach` ;
+- **refusés** par le contrôleur d'accès de Zot (`denied`) : tag, avec le message de la condition CEL ; dépôt hors de `builds/**` ; suppression.
+
+L'audit de Zot trace les écritures réussies du compte, et les retrouve dans Loki. Les refus n'y figurent pas.
+
+**Résidu** : `builds/essai-replay` (image et referrer jetables).
+
+**Retrait** : retirer `poc-replay` de `stockage/zot.json`, supprimer le fichier `htpasswd` du domaine, puis rejouer `stockage.sh zot`.

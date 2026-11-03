@@ -6,6 +6,7 @@
 #              lecture anonyme ; écriture par poc-ecriture (tous les dépôts), poc-build (builds/** seulement, zone
 #              build), poc-horodatage (horodatage/** seulement, job d'horodatage de J5) et poc-images (J7 : builds/**,
 #              création par digest seulement, condition CEL de zot.json) en htpasswd bcrypt, sans suppression
+#              ; poc-replay (brique 10, D5 : VSA, builds/** par digest seulement ; hash lu dans le dossier du domaine)
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -76,6 +77,15 @@ etape_zot() {
     case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac
     (umask 077 && printf '%s:%s\n' "$compte" "$h" >> "$d/htpasswd")
   done
+  # poc-replay (brique 10, D5, décision du propriétaire du 03/11/2026) : VSA du domaine de replay. Seule sa ligne htpasswd
+  # (hash bcrypt) est lue, dans le dossier du domaine ; le mot de passe n'est jamais lu ici. Absente : compte non créé.
+  local h10=$HOME/.cache/supply-chain-poc/10/secrets/zot-poc-replay.htpasswd
+  if [ -s "$h10" ]; then
+    grep -qxE 'poc-replay:\$2b\$12\$[./A-Za-z0-9]{53}' "$h10" || { echo "KO   ligne htpasswd de poc-replay inattendue" >&2; exit 1; }
+    (umask 077 && cat "$h10" >> "$d/htpasswd") && echo "htpasswd : poc-replay, bcrypt, coût 12 (hash fourni par la brique 10)"
+  else
+    echo "htpasswd : poc-replay absent (brique 10, D5 non appliqué)"
+  fi
   cp "$z" "$here/stockage/zot.json" "$here/stockage/zot.service" "$P/zot.crt" "$S/zot.key" "$d/"
   copier sc-stockage /tmp/zot-installation "$d"/*
   sur sc-stockage sudo bash -s <<EOF

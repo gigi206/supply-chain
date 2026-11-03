@@ -1,0 +1,7 @@
+# Complément de droits_zot (03/11/2026, 10:42:11 UTC) : réponses de Zot aux trois écritures refusées (second essai ; le premier a échoué côté client : oras introuvable hors du dépôt, seule la suppression avait été tentée, refusée de même)
+== oras cp vers builds/essai-replay:tag-interdit
+Error from destination registry for "192.168.161.13:5000/builds/essai-replay:tag-interdit": denied: requested access to the resource is denied: map[description:The access controller denied access for the operation on a resource. reason:poc-replay : VSA du domaine de replay (brique 10), écriture par 
+== oras cp vers workspace/essai@sha256:88ab5d7de87dd252c4eb5cb9a31b957604d64b1523aab2cf67721bb42757a1dc
+Error from destination registry for "192.168.161.13:5000/workspace/essai@sha256:88ab5d7de87dd252c4eb5cb9a31b957604d64b1523aab2cf67721bb42757a1dc": denied: requested access to the resource is denied: map[description:The access controller denied access for the operation on a resource.]
+== oras manifest delete builds/essai-replay@sha256:16f31e1f… (image de droits_zot)
+Error response from registry: denied: requested access to the resource is denied: map[description:The access controller denied access for the operation on a resource.]

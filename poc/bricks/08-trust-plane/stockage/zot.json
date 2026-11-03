@@ -78,6 +78,28 @@
                   "message": "poc-images : écriture par digest seulement, aucun tag (ni .sig ni .att)"
                 }
               ]
+            },
+            {
+              "users": [
+                "poc-replay"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-replay"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-replay : VSA du domaine de replay (brique 10), écriture par digest seulement, aucun tag"
+                }
+              ]
             }
           ]
         },
