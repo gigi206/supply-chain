@@ -1,0 +1,70 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIQDfQ3DOpg3lf5sh/yH6AFoWahRKU4o85EyObQzDocBkHQIgNpqCjCGQLM4O5njBvY6tvEpMDZ/BTUccYF+hBbWoc4g=
+  name: publier-fermeture
+spec:
+  params:
+  - name: depot
+    type: string
+  results:
+  - name: IMAGE_URL
+    type: string
+  - name: IMAGE_DIGEST
+    type: string
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    image: sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+    name: publier
+    resources: {}
+    script: |
+      #!/busybox/sh
+      set -eu
+      case $DEPOT in sc-stockage.poc.test:5000/builds/fermetures/*) ;; *) echo "dépôt hors de builds/fermetures/ : $DEPOT" >&2; exit 1 ;; esac
+      case $DEPOT in *@*|*:*:*) echo "dépôt avec tag ou digest : $DEPOT" >&2; exit 1 ;; esac
+      export HOME=/tmp
+      f=$(workspaces.sortie.path)/fermeture
+      cd "$f"
+      set --
+      for p in $(find . -type f ! -name bom.json | sed 's#^\./##' | LC_ALL=C sort); do
+        set -- "$@" "$p:application/vnd.supply-chain.deps-closure.file.v1"
+      done
+      d=$(oras push --no-tty --oci-layout --format go-template='{{.digest}}' --artifact-type application/vnd.supply-chain.deps-closure.v1 \
+        --annotation org.opencontainers.image.created=1970-01-01T00:00:00Z /layout/f:fermeture "$@")
+      oras cp --no-tty --from-oci-layout "/layout/f@$d" "$DEPOT@$d" --to-ca-file /etc/ca-poc/ca.crt --to-registry-config /etc/zot/config.json > /dev/null
+      lu=$(oras manifest fetch --descriptor --ca-file /etc/ca-poc/ca.crt "$DEPOT@$d" | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')
+      [ "$lu" = "$d" ] || { echo "relu dans Zot : $lu" >&2; exit 1; }
+      echo "publiée : $DEPOT@$d ($# couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : $(sha256sum < bom.json | cut -c1-64)"
+      printf '%s' "$DEPOT" > $(results.IMAGE_URL.path)
+      printf '%s' "$d" > $(results.IMAGE_DIGEST.path)
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+    - mountPath: /etc/zot
+      name: zot
+      readOnly: true
+    - mountPath: /layout
+      name: layout
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  - name: zot
+    secret:
+      secretName: zot-fermetures
+  - emptyDir: {}
+    name: layout
+  workspaces:
+  - name: sortie
+    readOnly: true

@@ -160,3 +160,28 @@ Décision du propriétaire : **« Sortie 443 hors privé (Recommandé) »**, sur
 17. Hubble : `DROPPED` (`POLICY_DENIED`) vers 192.168.161.11:6443, vers Zot et en 80 ; `FORWARDED` en 443 vers les adresses publiques.
 
 Point 19, ajouté : le journal de Hermeto affiche « Using registry proxy https://proxy.golang.org ».
+
+## Résultats de `compte` (18:17 UTC), de `reseau` (18:18 à 18:20 UTC) et de la passe `SIGNER=1` de `taches` (18:20 UTC)
+
+[`f2-compte.log`](f2-compte.log), [`f2-reseau.log`](f2-reseau.log), [`f2-taches-signer.log`](f2-taches-signer.log). Un premier passage de `reseau` est archivé : [`f2-reseau-premier-passage.log`](f2-reseau-premier-passage.log), où le `kubectl exec` sans `-i` ne transmettait pas le script de la sonde et où la lecture de Hubble échouait sous `pipefail`. Les deux défauts sont corrigés.
+
+- **11 à 13 conformes** :
+  - `poc-fermetures` pousse par digest deux fois ;
+  - tag refusé (403, motif de la condition), autre dépôt et suppression refusés (403) ;
+  - `poc-images` refusé (denied) ;
+  - `poc-build` écrit un tag ; lecture anonyme ;
+  - secret `zot-fermetures` créé.
+
+  htpasswd : sept comptes, dont `poc-replay` (brique 10) et `poc-fermetures`. Zot a redémarré ; le journal de la 08 [`stockage-zot.log`](../../08-trust-plane/resultats/stockage-zot.log) est réécrit, comme en D5 de la 10.
+- **14 à 17 conformes** :
+  - seule `prefetch-sortie` sélectionne ces pods ;
+  - sonde au label : `proxy.golang.org` 200, `storage.googleapis.com` 400, `sum.golang.org` 200, `github.com` 200, Forgejo joint ;
+  - **refusés** : 80 (« Network is unreachable » et non un délai : prédiction faible sur la forme démentie), API de k3s et Zot (délai) ;
+  - sonde sans label : tout joint ;
+  - Hubble : `DROPPED POLICY_DENIED` vers 192.168.161.13:5000, 192.168.161.11:6443 et 142.251.22.141:80 (14 chacun) ; `FORWARDED` vers kube-dns en 53, Forgejo en 3000 et des adresses publiques en 443.
+- **18, première passe** : signatures versionnées. Bundles :
+  - `prefetch-gomod@sha256:5e7e5662…` ;
+  - `publier-fermeture@sha256:7fa92ad3…` ;
+  - pipeline `prefetch-sample-app@sha256:a7ccba43…`.
+
+  Les deux tâches sont ajoutées à `politique/porte/taches.yml`, **soumises à la revue du propriétaire** avant la seconde passe.

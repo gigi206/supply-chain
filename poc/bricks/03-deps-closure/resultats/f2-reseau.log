@@ -1,0 +1,33 @@
+# prefetch.sh reseau, 2026-11-03T18:18:34Z
+CiliumNetworkPolicy prefetch-sortie appliquée
+## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod
+OK   politiques qui sélectionnent ces pods : CiliumNetworkPolicy prefetch-sortie
+## f2-sonde-avec (sc-build, 10.42.1.70)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : refusé (URLError : <urlopen error [Errno 101] Network is unreachable>)
+     API de k3s : refusé (URLError : <urlopen error timed out>)
+     Zot : refusé (URLError : <urlopen error timed out>)
+     Forgejo : joint (6391fd437f26)
+## f2-sonde-sans (sc-build, 10.42.1.154)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : joint (HTTP 200)
+     API de k3s : joint (HTTP 401)
+     Zot : joint (HTTP 200)
+     Forgejo : joint (6391fd437f26)
+## Hubble : flux de f2-sonde-avec depuis 2026-11-03T18:19:39Z
+     64 FORWARDED 10.42.0.67:53 
+     14 DROPPED 192.168.161.13:5000 POLICY_DENIED
+     14 DROPPED 192.168.161.11:6443 POLICY_DENIED
+     14 DROPPED 142.251.22.141:80 POLICY_DENIED
+      8 FORWARDED 192.168.161.13:3000 
+      7 FORWARDED 20.250.119.67:443 
+      5 FORWARDED 172.217.22.81:443 
+      5 FORWARDED 142.251.97.207:443 
+      5 FORWARDED 142.251.22.141:443 
+# fin 2026-11-03T18:20:04Z

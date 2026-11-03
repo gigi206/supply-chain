@@ -177,7 +177,7 @@ sonde() { # nom avec|sans : pod de builds au contexte de restricted, image d'out
   kubectl wait -n builds "pod/$1" --for=condition=Ready --timeout=180s > /dev/null
 }
 essais_sortie() { # pod : une ligne par destination (joint ou refusé, avec le motif)
-  kubectl exec -n builds "$1" -- python3 - <<'PY'
+  kubectl exec -i -n builds "$1" -- python3 - <<'PY'
 import socket, ssl, subprocess, urllib.request
 ctx = ssl.create_default_context(cafile=None)
 poc = ssl.create_default_context(cafile="/etc/ca-poc/ca.crt")
@@ -201,8 +201,16 @@ print("Forgejo : " + ("joint (" + g.stdout.split()[0][:12] + ")" if g.returncode
 PY
 }
 
+flux() { # nœud depuis ip : flux de Hubble émis par une IP de pod depuis une date, comptés par verdict, destination et motif
+  local a
+  a=$(kubectl -n kube-system get pods -l k8s-app=cilium --field-selector "spec.nodeName=$1" -o jsonpath='{.items[0].metadata.name}')
+  { kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --since "$2" --from-ip "$3" -o json 2>/dev/null || true; } \
+    | jq -r '.flow | "\(.verdict) \(.IP.destination // "-"):\((.l4.TCP.destination_port // .l4.UDP.destination_port // "-") | tostring) \(.drop_reason_desc // "")"' \
+    | sort | uniq -c | sort -rn | head -20 || true
+}
+
 etape_reseau() {
-  local n a
+  local n a t0
   [ -n "$PREFETCH_DIGEST" ] || { echo "KO   PREFETCH_DIGEST non épinglé (étape image)" >&2; exit 1; }
   kubectl apply -f "$POLITIQUE" > /dev/null && echo "CiliumNetworkPolicy prefetch-sortie appliquée"
   echo "## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod"
@@ -213,11 +221,10 @@ etape_reseau() {
   attendu "politiques qui sélectionnent ces pods" "$n" "CiliumNetworkPolicy prefetch-sortie"
   for n in f2-sonde-avec f2-sonde-sans; do kubectl delete pod -n builds "$n" --ignore-not-found --wait=true > /dev/null; done
   sonde f2-sonde-avec avec; sonde f2-sonde-sans sans
-  for n in f2-sonde-avec f2-sonde-sans; do echo "## $n ($(kubectl get pod -n builds "$n" -o jsonpath='{.spec.nodeName}'))"; essais_sortie "$n" | sed 's/^/     /'; done
-  a=$(kubectl -n kube-system get pods -l k8s-app=cilium --field-selector spec.nodeName="$(kubectl get pod -n builds f2-sonde-avec -o jsonpath='{.spec.nodeName}')" -o jsonpath='{.items[0].metadata.name}')
-  echo "## Hubble ($a) : flux de f2-sonde-avec"
-  kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --pod builds/f2-sonde-avec --last 200 -o compact 2>/dev/null \
-    | grep -E 'DROPPED|FORWARDED|dns' | sed -E 's/^[A-Za-z]+ +[0-9]+ [0-9:.]+ //' | cut -c1-170 | sort | uniq -c | sort -rn | head -25
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  for n in f2-sonde-avec f2-sonde-sans; do echo "## $n ($(kubectl get pod -n builds "$n" -o jsonpath='{.spec.nodeName}'), $(kubectl get pod -n builds "$n" -o jsonpath='{.status.podIP}'))"; essais_sortie "$n" | sed 's/^/     /'; done
+  echo "## Hubble : flux de f2-sonde-avec depuis $t0"
+  flux "$(kubectl get pod -n builds f2-sonde-avec -o jsonpath='{.spec.nodeName}')" "$t0" "$(kubectl get pod -n builds f2-sonde-avec -o jsonpath='{.status.podIP}')"
   for n in f2-sonde-avec f2-sonde-sans; do kubectl delete pod -n builds "$n" --wait=false > /dev/null; done
 }
 
@@ -274,11 +281,11 @@ fin_pr() { # nom : attend la fin (900 s) ; « statut|raison|message »
 }
 
 etape_prefetch() {
-  local pr r d i a
+  local pr r d i t0 p
   [ -s "$T/pipeline.ref" ] || { echo "KO   pipeline absente (étape taches)" >&2; exit 1; }
   for i in 1 2; do
     pr=f2-prefetch-$i
-    pr_f2 "$pr"; purger_pr "$pr"
+    pr_f2 "$pr"; purger_pr "$pr"; t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     kubectl create -f "$T/pr-$pr.json" > /dev/null
     echo "## $pr créé ($(jq -r '.spec.params | map(.name + "=" + .value) | join(", ")' "$T/pr-$pr.json"))"
     r=$(fin_pr "$pr")
@@ -292,9 +299,9 @@ etape_prefetch() {
     d=$(kubectl get pipelinerun -n builds "$pr" -o json | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
     echo "fermeture publiée : $DEPOT_FERMETURE@$d" && echo "$d" > "$T/fermeture-$i.digest"
     attendu "PipelineRun $pr signé par Chains" "$(signe pipelinerun "$pr")" true
-    a=$(kubectl -n kube-system get pods -l k8s-app=cilium --field-selector spec.nodeName=sc-build -o jsonpath='{.items[0].metadata.name}')
-    echo "Hubble ($a), pod de prefetch : $(kubectl -n kube-system exec "$a" -c cilium-agent -- hubble observe --pod "builds/$(kubectl get pods -n builds -l "tekton.dev/pipelineRun=$pr,tekton.dev/pipelineTask=prefetch" -o jsonpath='{.items[0].metadata.name}')" --last 500 -o jsonpb 2>/dev/null \
-      | jq -r 'select(.flow.verdict) | "\(.flow.verdict) \(.flow.destination_names // [] | join(",")) \(.flow.IP.destination // "")"' | sort | uniq -c | sort -rn | head -12 | paste -sd';' -)"
+    p=$(kubectl get pods -n builds -l "tekton.dev/pipelineRun=$pr,tekton.dev/pipelineTask=prefetch" -o jsonpath='{.items[0].metadata.name}')
+    echo "Hubble, pod de prefetch $p (IP relevée dans le TaskRun) :"
+    flux "$(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}')" "$t0" "$(kubectl get pod -n builds "$p" -o jsonpath='{.status.podIP}')" | sed 's/^/     /'
   done
   echo "## comparaisons"
   for i in 1 2; do

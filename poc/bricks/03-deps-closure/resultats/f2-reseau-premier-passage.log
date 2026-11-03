@@ -1,0 +1,7 @@
+# prefetch.sh reseau, 2026-11-03T18:17:54Z
+CiliumNetworkPolicy prefetch-sortie appliquée
+## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod
+OK   politiques qui sélectionnent ces pods : CiliumNetworkPolicy prefetch-sortie
+## f2-sonde-avec (sc-build)
+## f2-sonde-sans (sc-build)
+## Hubble (cilium-lndkt) : flux de f2-sonde-avec

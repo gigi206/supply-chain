@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIQDR1hyqeTvqKTxe8pE6TLAtUZktw/GPBaKJSx+TlNojAQIgfz3++yEH0j84XnxOR6CNJblpbJbPXYkOBx+o69jSv3U=
+  name: prefetch-gomod
+spec:
+  params:
+  - name: depot
+    type: string
+  - name: commit
+    type: string
+  results:
+  - name: CHAINS-GIT_URL
+    type: string
+  - name: CHAINS-GIT_COMMIT
+    type: string
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+    - mountPath: /tmp
+      name: tmp
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    - name: COMMIT
+      value: $(params.commit)
+    - name: HERMETO_GOMOD__PROXY_URL
+      value: https://proxy.golang.org
+    image: sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+    name: prefetch
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      case $COMMIT in *[!0-9a-f]*) echo "commit invalide : $COMMIT" >&2; exit 1 ;; esac
+      [ ${#COMMIT} = 40 ] || { echo "commit invalide : $COMMIT" >&2; exit 1; }
+      case $DEPOT in https://sc-stockage.poc.test:3000/*.git) ;; *) echo "dépôt hors de Forgejo : $DEPOT" >&2; exit 1 ;; esac
+      f=$(workspaces.sortie.path)/fermeture
+      [ ! -e "$f" ] || { echo "workspace déjà rempli : $f" >&2; exit 1; }
+      export HOME=/tmp GIT_CONFIG_NOSYSTEM=1 GIT_SSL_CAINFO=/etc/ca-poc/ca.crt GIT_TERMINAL_PROMPT=0
+      git clone --quiet --no-checkout "$DEPOT" /tmp/depot
+      git -C /tmp/depot checkout --quiet --detach "$COMMIT"
+      [ "$(git -C /tmp/depot rev-parse HEAD)" = "$COMMIT" ] || { echo "HEAD différent du commit demandé" >&2; exit 1; }
+      echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT"
+      hermeto fetch-deps --source /tmp/depot --output "$f" '{"type": "gomod"}'
+      echo "fermeture : $(find "$f/deps" -type f | wc -l) fichiers, $(du -sk "$f/deps" | cut -f1) Kio"
+      printf '%s' "$DEPOT" > $(results.CHAINS-GIT_URL.path)
+      printf '%s' "$COMMIT" > $(results.CHAINS-GIT_COMMIT.path)
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  - emptyDir: {}
+    name: tmp
+  workspaces:
+  - name: sortie
