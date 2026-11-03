@@ -1,0 +1,13 @@
+<!-- Brique 10 : réseau NAT propre au domaine de replay (décision du propriétaire du 03/11/2026 : réseau distinct). Sortie
+     vers l'extérieur pour les paquets Debian ; aucune route prévue vers supply-chain-poc (192.168.161.0/24), mesurée en R2. -->
+<network>
+  <name>supply-chain-replay</name>
+  <forward mode='nat'/>
+  <bridge name='virbr-screplay' stp='on' delay='0'/>
+  <ip address='192.168.162.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.162.100' end='192.168.162.199'/>
+      <host mac='52:54:00:5c:10:14' name='sc-replay' ip='192.168.162.14'/>
+    </dhcp>
+  </ip>
+</network>

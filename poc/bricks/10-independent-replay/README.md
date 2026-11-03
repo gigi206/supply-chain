@@ -186,3 +186,8 @@ En R2, chaque archive est revérifiée **dans la VM** après la copie : le domai
 **Preuve des 24 h** (pour les prédictions de R5) :
 - **Heure du build** : `finishedOn` est signé par Chains et **corroboré par un jeton RFC 3161** de la TSA de la 08. Il existe des bundles horodatés de cette image dans `horodatage/bundles`, un tag `3a7ca1b1…-<empreinte de l'enveloppe>` par enveloppe ; celui de l'enveloppe rejouée sera identifié en R3.
 - **Heure du replay** : `timeVerified` est affirmé par le domaine. Il est corroboré par l'entrée d'audit de Zot du push du referrer (J6, lue dans Loki).
+
+**Décisions du propriétaire (03/11/2026)** :
+- **réseau distinct** `supply-chain-replay`, entrées transportées par l'hôte et vérifiées dans la VM ;
+- **BuildKit 0.25.2 accepté sur sa seule empreinte**, exception consignée comme pour tkn. crane et rootlesskit sont retirés de la VM : oras, signé, couvre manifestes et blobs, et BuildKit tourne en root dans la VM dédiée ;
+- R2 lancé.

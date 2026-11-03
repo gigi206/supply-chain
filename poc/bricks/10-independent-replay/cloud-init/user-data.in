@@ -1,0 +1,27 @@
+#cloud-config
+# Brique 10 : graine NoCloud de la VM du domaine de replay. Les @…@ sont remplacés par replay.sh.
+# Clé d'hôte SSH générée sur l'hôte (known_hosts écrit d'avance) ; compte « replay » à clé seule, administrateur du domaine
+# (le propriétaire, D1 b) ; paquets installés explicitement par l'étape paquets, pas ici.
+hostname: sc-replay
+manage_etc_hosts: true
+ssh_pwauth: false
+disable_root: true
+ssh_deletekeys: true
+ssh_genkeytypes: []
+ssh_keys:
+  ed25519_private: |
+@CLE_HOTE_PRIVEE@
+  ed25519_public: @CLE_HOTE_PUBLIQUE@
+users:
+  - name: replay
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - @CLE_REPLAY@
+package_update: false
+package_upgrade: false
+growpart:
+  mode: auto
+  devices: ["/"]

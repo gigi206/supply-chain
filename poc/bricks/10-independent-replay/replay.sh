@@ -8,8 +8,16 @@
 #   version_go       version de Go de l'entrée plateforme/builder-go-voie-d de la provenance, lue dans ses couches (rien d'exécuté)
 #   outils           toolchain Go officielle de go.dev (sha256 de go.dev/dl/?mode=json) ; archives des outils de mise.lock
 #                    (BuildKit, runc, rootlesskit, cosign, oras, crane) téléchargées et vérifiées pour la VM
+# Jalon R2 (JALON=r2), création du domaine (D1 b, D2 a, D3, réseau distinct, décisions du propriétaire du 03/11/2026) :
+#   vm               image Debian 13 vérifiée (sha512, celle des trois VM), pool et réseau NAT propres (supply-chain-replay,
+#                    192.168.162.0/24), clés SSH du domaine, VM sc-replay (4 vCPU, 6 Gi, 20 Go) ; trois VM du PoC non touchées
+#   isolement        depuis la VM : 192.168.161.0/24 (Zot, Forgejo, API de k3s) injoignable ? extérieur joignable ?
+#   paquets          busybox-static et diffoscope-minimal par apt (signatures de l'archive Debian), sans recommandés
+#   outils           archives copiées puis revérifiées DANS la VM (empreintes fixées ci-dessous) ; installation
+#   cle_vsa          paire cosign générée dans la VM par replay (mot de passe aléatoire 0600, jamais sorti) ; clé publique
+#                    copiée dans resultats/vsa-cle-publique.pem
 #
-# Usage (racine du dépôt) : mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
+# Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -25,6 +33,27 @@ CA_POC=$O/ca-poc.crt                             # certificat public de la CA du
 [ -s "$CA_POC" ] || cp "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" "$CA_POC"   # public ; aucune clé de 08 n'est lue
 IMAGE=builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sujet de la provenance
 INVOCATION=d9006af7-5d9a-4a5e-878e-1c9a5bd96d56   # PipelineRun du 02/11/2026, 13:58:36 à 13:59:30 UTC
+
+# Domaine de replay : VM, réseau, clés (rien de commun avec 08 ; l'image Debian publique est relue dans le cache de 08 et revérifiée)
+IMG=$HOME/.cache/supply-chain-poc/08/telechargements/debian/debian-13-generic-amd64-20261026-2643.qcow2
+IMG_SHA512=5bd891c6e62d01639f52a5587b72a4607421e445732214be787dba6043cf9797a6ff90bed982aada6a6c7e619f1f956d961c4fad76757171abd607920aac098a
+POOL=supply-chain-replay
+POOL_DIR=/var/lib/libvirt/supply-chain-replay
+NET=supply-chain-replay
+VM=sc-replay
+VM_IP=192.168.162.14
+SSH_DIR=$O/ssh
+W=$O/travail
+SSH_OPTS=(-i "$SSH_DIR/id_ed25519" -o UserKnownHostsFile="$SSH_DIR/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
+# Empreintes attendues par le domaine (mise.lock et go.dev ; signatures vérifiées sur l'hôte pour runc, oras, cosign ;
+# BuildKit sur empreinte seule, décision du propriétaire du 03/11/2026 ; Go recoupé avec le module de sum.golang.org)
+OUTILS_SHA256="d18b8188b600e201a1b3d08c20e2a1e439cf51d2c2285f132dd9bd51c666f6d6  buildkit-v0.25.2.linux-amd64.tar.gz
+8781ab9f71c12f314d21c8e85f13ca1a82d90cf475aa5131a7b543fcc5487543  runc.amd64
+424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa  cosign-linux-amd64
+66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0  oras_1.3.6_linux_amd64.tar.gz
+ccfe7ae822d2c2f41f4fe7c956199967a4dac22d0ee0d2b2bfdb440aab3b20c5  go1.26.10.linux-amd64.tar.gz"
+v() { virsh -c qemu:///system "$@"; }
+sur() { ssh "${SSH_OPTS[@]}" "replay@$VM_IP" "$@"; }
 
 lancer() { # jalon étape… : journal resultats/<jalon>-<étape>.log
   local j=$1 e; shift
@@ -139,4 +168,105 @@ PY
   rm -f "$E/outils.tsv"
 }
 
-lancer r1 "$@"
+etape_vm() {
+  local d=$W/graine
+  echo "## VM du PoC avant : $(v list --name | grep -E '^sc-' | while read -r n; do printf '%s=%s ' "$n" "$(v domid "$n")"; done)"
+  (cd "$(dirname "$IMG")" && echo "$IMG_SHA512  $(basename "$IMG")" | sha512sum -c)
+  mkdir -p "$SSH_DIR" "$W" && chmod 0700 "$SSH_DIR" "$W"
+  [ -f "$SSH_DIR/id_ed25519" ] || ssh-keygen -q -t ed25519 -N '' -C supply-chain-poc-10-replay -f "$SSH_DIR/id_ed25519"
+  [ -f "$SSH_DIR/hote-$VM" ] || ssh-keygen -q -t ed25519 -N '' -C "$VM" -f "$SSH_DIR/hote-$VM"
+  printf '%s %s\n' "$VM_IP" "$(cut -d' ' -f1-2 "$SSH_DIR/hote-$VM.pub")" > "$SSH_DIR/known_hosts"
+  v pool-list --all --name | grep -qx "$POOL" || { v pool-define-as "$POOL" dir --target "$POOL_DIR"; v pool-build "$POOL"; }
+  v pool-list --name | grep -qx "$POOL" || v pool-start "$POOL"
+  v net-list --all --name | grep -qx "$NET" || v net-define "$here/libvirt/reseau.xml"
+  v net-autostart --disable "$NET" > /dev/null
+  v net-list --name | grep -qx "$NET" || v net-start "$NET"
+  if ! v vol-info --pool "$POOL" "$VM.qcow2" > /dev/null 2>&1; then
+    qemu-img convert -f qcow2 -O qcow2 "$IMG" "$W/$VM.qcow2" && qemu-img resize -q "$W/$VM.qcow2" 20G
+    v vol-create-as "$POOL" "$VM.qcow2" "$(stat -c %s "$W/$VM.qcow2")" --format qcow2 > /dev/null
+    v vol-upload --pool "$POOL" --sparse "$VM.qcow2" "$W/$VM.qcow2" && rm -f "$W/$VM.qcow2"
+  fi
+  if ! v vol-info --pool "$POOL" "$VM-graine.iso" > /dev/null 2>&1; then
+    rm -rf "$d" && mkdir -p "$d" && chmod 0700 "$d"
+    printf 'instance-id: %s-1\nlocal-hostname: %s\n' "$VM" "$VM" > "$d/meta-data"
+    awk -v pub="$(cut -d' ' -f1-2 "$SSH_DIR/hote-$VM.pub")" -v cle="$(cat "$SSH_DIR/id_ed25519.pub")" -v priv="$SSH_DIR/hote-$VM" '
+      /@CLE_HOTE_PRIVEE@/ { while ((getline l < priv) > 0) print "    " l; next }
+      { gsub(/@CLE_HOTE_PUBLIQUE@/, pub); gsub(/@CLE_REPLAY@/, cle); print }' "$here/cloud-init/user-data.in" > "$d/user-data"
+    if grep -q '@[A-Z_]*@' "$d/user-data"; then echo "KO   graine incomplète" >&2; exit 1; fi
+    genisoimage -quiet -output "$W/$VM-graine.iso" -volid cidata -joliet -rock "$d/user-data" "$d/meta-data"
+    rm -rf -- "${d:?}"
+    v vol-create-as "$POOL" "$VM-graine.iso" "$(stat -c %s "$W/$VM-graine.iso")" --format raw > /dev/null
+    v vol-upload --pool "$POOL" --sparse "$VM-graine.iso" "$W/$VM-graine.iso" && rm -f "$W/$VM-graine.iso"
+  fi
+  v list --all --name | grep -qx "$VM" || v define "$here/libvirt/$VM.xml"
+  v autostart --disable "$VM" > /dev/null
+  v list --name | grep -qx "$VM" || v start "$VM"
+  local debut=$SECONDS
+  for _ in $(seq 90); do sur true 2> /dev/null && break; sleep 2; done
+  sur true && echo "SSH de $VM ($VM_IP) : joignable avec la clé d'hôte attendue, $((SECONDS - debut)) s après le démarrage"
+  sur 'echo "$(hostname) : $(nproc) vCPU, $(free -g | awk "/Mem/ {print \$2}") Gi, $(df -h / | awk "NR==2 {print \$2}") ; $(. /etc/os-release; echo $PRETTY_NAME)"'
+  echo "## VM du PoC après : $(v list --name | grep -E '^sc-' | while read -r n; do printf '%s=%s ' "$n" "$(v domid "$n")"; done)"
+  echo "## réseau supply-chain-poc inchangé : $(v net-dumpxml supply-chain-poc | grep -c "host mac") baux fixes, $(v net-info supply-chain-poc | awk '/Active/ {print $2}')"
+}
+
+etape_isolement() {
+  sur bash -s <<'EOS'
+echo "## routes de la VM"; ip -4 route
+for c in 192.168.161.13:5000 192.168.161.13:3000 192.168.161.11:6443 192.168.161.1:22; do
+  if timeout 5 bash -c "</dev/tcp/${c%:*}/${c#*:}" 2> /dev/null; then echo "$c : JOIGNABLE"; else echo "$c : injoignable"; fi
+done
+echo "extérieur, https://deb.debian.org : HTTP $(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://deb.debian.org/debian/ || echo échec)"
+EOS
+}
+
+etape_paquets() {
+  sur sudo bash -s <<'EOS'
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update 2>&1 | grep -viE '^(Hit|Get|Reading)' || true
+apt-get install -y --no-install-recommends busybox-static diffoscope-minimal 2>&1 | grep -iE 'warning|untrusted|unauthenticated|^Setting up (busybox-static|diffoscope)' || true
+dpkg-query -W -f='${Package} ${Version}\n' busybox-static diffoscope-minimal
+echo "paquets installés en tout : $(dpkg-query -W | wc -l)"
+EOS
+}
+
+etape_outils() {
+  local f fichiers
+  echo "$OUTILS_SHA256" > "$W/sha256-attendues"
+  for f in $(awk '{print $2}' "$W/sha256-attendues"); do [ -s "$T/$f" ] || { echo "KO   $f absent (R1, étape outils)" >&2; exit 1; }; done
+  sur 'rm -rf /tmp/outils && mkdir -m 0700 /tmp/outils'
+  mapfile -t fichiers < <(awk -v t="$T" '{print t "/" $2}' "$W/sha256-attendues")
+  scp -q "${SSH_OPTS[@]}" "$W/sha256-attendues" "${fichiers[@]}" "replay@$VM_IP:/tmp/outils/"
+  sur sudo bash -s <<'EOS'
+set -euo pipefail
+cd /tmp/outils
+echo "## empreintes vérifiées dans la VM"; sha256sum -c sha256-attendues
+tar -xzf buildkit-v0.25.2.linux-amd64.tar.gz -C /usr/local bin/buildkitd bin/buildctl
+install -m 0755 runc.amd64 /usr/local/bin/runc
+install -m 0755 cosign-linux-amd64 /usr/local/bin/cosign
+tar -xzf oras_1.3.6_linux_amd64.tar.gz -C /usr/local/bin oras
+rm -rf /usr/local/go && tar -xzf go1.26.10.linux-amd64.tar.gz -C /usr/local
+cd / && rm -rf /tmp/outils
+echo "## versions"
+buildctl --version; buildkitd --version; runc --version | head -1; cosign version 2>&1 | grep GitVersion; oras version | head -1
+/usr/local/go/bin/go version
+EOS
+  rm -f "$W/sha256-attendues"
+}
+
+etape_cle_vsa() {
+  sur bash -s <<'EOS'
+set -euo pipefail
+umask 077
+mkdir -p ~/vsa && cd ~/vsa
+[ -s mot-de-passe ] || head -c 32 /dev/urandom | base64 | tr -d '\n' > mot-de-passe
+if [ ! -s cosign.key ]; then COSIGN_PASSWORD=$(cat mot-de-passe) cosign generate-key-pair > /dev/null 2>&1; fi
+stat -c '%a %U %n' mot-de-passe cosign.key cosign.pub
+EOS
+  sur 'cat ~/vsa/cosign.pub' > "$R/vsa-cle-publique.pem"
+  openssl pkey -pubin -in "$R/vsa-cle-publique.pem" -noout -text | head -2
+  echo "empreinte sha256 de la clé publique de VSA : $(openssl pkey -pubin -in "$R/vsa-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)"
+  echo "empreinte sha256 de la clé publique de Chains : $(openssl pkey -pubin -in "$racine_depot/poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)"
+}
+
+lancer "${JALON:-r1}" "$@"
