@@ -888,6 +888,8 @@ etape_reglec() {
   echo "  celui que donne le résultat de la tâche de build, constaté au premier passage), porte.construction_kata parmi les succès ;"
   echo "  sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations"
   echo "  d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)"
+  echo "  depuis D6 (brique 03 ; prédiction du 03/11/2026, déduite de porte.rego, non mesurée) : les trois témoins portent aussi"
+  echo "  porte.fermeture_plateforme (provenance de la fermeture signée par Chains, vérifiée avec la clé jetable de porte-temoin)"
   cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}') "$here/politique/porte/porte.rego" \
     && echo "OK   ConfigMap porte : porte.rego identique au fichier versionné" \
     || { echo "KO   ConfigMap porte différente de politique/porte/porte.rego (rejouer politique.sh porte)" >&2; exit 1; }
@@ -918,7 +920,7 @@ etape_reglec() {
   [ "${vr%%|*}" = VERDICT ] || { echo "KO   image réelle : aucun verdict" >&2; exit 1; }
   succes reglec-reel porte.construction_kata && echo "OK   réelle : porte.construction_kata parmi les succès" \
     || { echo "KO   réelle : porte.construction_kata absente des succès" >&2; ko=1; }
-  v=$(trier "$(cut -d'|' -f4 <<< "$vr"),slsa_build_scripted_build.subject_build_task_matches")
+  v=$(trier "$(cut -d'|' -f4 <<< "$vr"),slsa_build_scripted_build.subject_build_task_matches,$D6_TEMOIN")
   for c in intacte sans-kata runc; do
     r=$(juger "reglec-$c" "$REG/$RC_DEPOT@$(cat "$T/rc-$c.image")" policy.yaml porte-temoin)
     echo "  $r"
@@ -1011,6 +1013,11 @@ t7_provenances() { # provenances de PipelineRun de builds/essai-webhook : listé
   echo "provenances de PipelineRun de builds/essai-webhook : $(wc -l < "$T/t7-provenances") ; non listées : $(grep -c 'non listée' "$T/t7-provenances" || true) ; les trois plus récentes :"
   tail -3 "$T/t7-provenances" | sed 's/^/  /'
 }
+
+# D6 (brique 03, 03/11/2026) sous porte-temoin : la provenance de la fermeture est signée par Chains, et la règle la vérifie avec la
+# clé de ec, ici la clé jetable ; tout témoin dont la provenance retenue contient preparer-entrees ou construire-image porte donc
+# cette violation en plus (prédiction déduite de porte.rego, non mesurée ; test7 D1 sauf sans-date, reglec, test8 v3)
+D6_TEMOIN=porte.fermeture_plateforme
 
 t7_verdict() { # cas attendu (violations triées, ou PASS) image [ConfigMap] [source] : juger, puis ligne OK ou KO ; ko incrémenté
   local r
@@ -1112,7 +1119,7 @@ etape_test7() {
   kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/rc.pub" '.data["chains.pub"] = $k
     | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
   echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains"
-  w=slsa_build_scripted_build.subject_build_task_matches
+  w=slsa_build_scripted_build.subject_build_task_matches,$D6_TEMOIN   # D6 : voir D6_TEMOIN
   t7_verdict listee "$w" "$REG/$T7_DEPOT@$(cat "$T/t7-listee.image")" porte-temoin "$(src "$SAMPLE_APP" "$TETE_J2")"
   succes t7-listee trusted_task.trusted && echo "OK   listee : trusted_task.trusted parmi les succès" || { echo "KO   listee : trusted_task.trusted absente des succès" >&2; ko=$((ko + 1)); }
   for r in non-listee nl-recente egalite; do
@@ -1452,7 +1459,7 @@ etape_test8() {
   kubectl get configmap -n porte porte -o json | jq --rawfile k "$T/auth/v3.pub" '.data["chains.pub"] = $k
     | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
   echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains"
-  w=slsa_build_scripted_build.subject_build_task_matches
+  w=slsa_build_scripted_build.subject_build_task_matches,$D6_TEMOIN   # D6 : voir D6_TEMOIN
   r=$(juger t8-v3-att "$REG/$T8_DEPOT@$(cat "$T/t8-v3-att.image")" policy.yaml porte-temoin "$SRC8")
   echo "  $r"
   [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|$(trier "porte.image_signature,$w")|refus" ] \
@@ -1462,7 +1469,7 @@ etape_test8() {
     || echo "MESURE   v3-att : builtin.image.signature_check hors des succès (différent du banc C)"
   r=$(juger t8-v3-sig "$REG/$T8_DEPOT@$(cat "$T/t8-v3-sig.image")" policy.yaml porte-temoin "$SRC8")
   echo "  $r"
-  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|$w|refus" ] && succes t8-v3-sig porte.image_signature \
+  [ "$(cut -d'|' -f1,3,4,7 <<< "$r")" = "VERDICT|false|$(trier "$w")|refus" ] && succes t8-v3-sig porte.image_signature \
     && echo "OK   v3-sig : $w seule, porte.image_signature parmi les succès ($(jq '[.components[] | .signatures // [] | length] | add' "$T/porte-t8-v3-sig.json") signature(s) d'image)" \
     || { echo "KO   v3-sig : prédiction" >&2; ko=$((ko + 1)); }
   for c in v3-att v3-sig; do

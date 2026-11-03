@@ -453,3 +453,21 @@ Choix du propriétaire, 03/11/2026, entre 20:08 et 20:23 UTC : « 1 b » (intég
 - `reglec`.
 - Le témoin `builds/essai-webhook` du contrôle 6 (C2).
 - Les fausses alertes A2 et A5 possibles sur un Prometheus vide.
+
+**Additif du 03/11/2026, 20:29 UTC (relecture avant soumission, à sec)** :
+- **Témoins à clé jetable sous D6.** `test7` (témoins D1, sauf `sans-date`), `reglec` et `test8` (témoins `v3`) reprennent
+  la provenance réelle. Ils la re-signent avec une clé jetable, puis la jugent sous `porte-temoin`.
+  - D6 vérifie la provenance de la fermeture avec la clé de ec, ici la clé jetable. Ces témoins porteraient donc
+    `porte.fermeture_plateforme` en plus, quel que soit le montage.
+  - Leurs attendus exacts sont complétés dans `preuves.sh` (`D6_TEMOIN`). C'est une prédiction déduite de `porte.rego`, non
+    mesurée ; sans cette correction, J8 se serait arrêté en KO.
+  - L'attendu de `v3-sig` est désormais trié.
+- **Fichiers du cache.** Les CA `ca-sc-confiance` et `ca-sc-build` de la 19b sont fabriquées par `openssl`, et non tirées
+  de k3s. `k8s-ca.crt` est relu dans le kubeconfig du nouveau cluster. Les jetons périmés (Prometheus, événements d'Alloy,
+  Forgejo) sont régénérés par leurs étapes.
+- **VSA re-poussée.** Le bundle versionné atteste le rejeu de l'ancienne construction : invocation `d9006af7`, sur la
+  fermeture de l'hôte. Il n'atteste pas la construction du rejeu. Le contrôle 6 passera quand même, parce que `vsa.sh` ne lie
+  la VSA qu'au digest (même constat qu'en F3).
+- **Durée estimée** : environ 2 h. Le rejeu « enchainement » a pris 5 429 s. F2 a pris environ 5 min le 03/11, avec
+  le cache. Il faut compter environ 6 min pour la 01 (jusqu'à 15 min si `planifie` attend) et environ 10 min pour la 19 et
+  la 19b.
