@@ -312,7 +312,7 @@ description = "Brique 03, F2 : prefetch de sample-app dans la plateforme (D1 a, 
 run = "poc/bricks/03-deps-closure/prefetch.sh"
 
 [tasks."fermetures:f3"]
-description = "Brique 03, F3 : bascule de la construction de sample-app sur la fermeture de la plateforme (D5 a, D6 a) ; étapes : regle (hôte), puis taches porte temoins lecture_seule construire provenance bascule, chacune sous accord"
+description = "Brique 03, F3 : bascule de la construction de sample-app sur la fermeture de la plateforme (D5 a, D6 a) ; étapes : regle reel (hôte), puis taches temoins lecture_seule porte construire provenance bascule, chacune sous accord"
 run = "poc/bricks/03-deps-closure/bascule.sh"
 
 [tasks.journalisation]

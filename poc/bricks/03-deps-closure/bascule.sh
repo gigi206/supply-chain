@@ -5,23 +5,30 @@
 #   regle       sur l'hôte, sans le PoC : règle porte.fermeture_plateforme (D6) de politique/porte/porte.rego, ec opa check puis
 #               ec opa test (politique/porte/porte_test.rego) avec la bibliothèque conforma/policy de la porte et la liste revue ;
 #               mutations : chaque condition retirée doit faire échouer un test
+#   reel        sur l'hôte, en lecture seule (lecture anonyme de Zot par son adresse IP) : ec opa eval avec la vraie fonction
+#               ec.sigstore.verify_attestation (clé de Chains, ignore_rekor) sur la fermeture de F2, chaque provenance passée à
+#               la règle ; fermeture lue par la règle dans la provenance archivée de J7 ; autre clé refusée
 #   taches      preparer-entrees, construire-image (D5 : workspace entrees en lecture seule) et publier-image rendues, signées
 #               (tkn), comparées à leur signature versionnée (SIGNER=construire-image pour refaire la seule signature de
 #               construire-image), bundles, digests exigés dans la liste revue ; pipeline sample-app (workspace lié par sous-
 #               dossier, fermeture de la plateforme F2) signée, bundle (étiquette f3)
-#   porte       ConfigMap porte (porte.rego avec D6, liste revue de F3) ; image réelle jugée avant la nouvelle construction :
-#               refusée (fermeture de l'hôte) ; témoin hors règle (builds/essai-webhook, pipeline d'essai) : verdict inchangé
 #   temoins     fermeture altérée (zip de module valide mais modifié, poussée par poc-ecriture dans entrees/) et fermeture
 #               absente (digest inexistant) : pipelines signées, images dans builds/essai-f3 (jamais builds/sample-app : la
 #               porte ne juge que la provenance la plus récente) ; PipelineRuns en échec fermé, rien de poussé
 #   lecture_seule  témoin de D5 : PVC écrit par un pod runc, puis monté en sous-dossier readOnly par un pod Kata privilégié en
 #               root (contexte de construire-image) : écriture, remontage en lecture-écriture, nouvelle écriture ; relu côté
 #               PVC ; PVC et pods supprimés
+#   porte       ConfigMap porte (porte.rego avec D6, liste revue de F3) ; image réelle jugée avant la nouvelle construction :
+#               refusée (fermeture de l'hôte) ; témoin hors règle (builds/essai-webhook, pipeline d'essai) : verdict inchangé
 #   construire  PipelineRun de la pipeline de F3 (gabarit en service, pipeline remplacée, Kata pour construire) : image comparée
 #               à 3a7ca1b1, entrees en lecture seule dans le pod, Chains ; porte : image réelle admise
 #   provenance  provenance du PipelineRun (clé de Chains ; autre clé refusée) : fermeture de la plateforme, tâches de F3,
 #               sous-dossiers des workspaces dans le TaskRun signé
 #   bascule     gabarit en service (politique/gabarit-sample-app.yaml) rendu avec la pipeline de F3 et appliqué
+#
+# Ordre : regle reel (hôte), puis taches temoins lecture_seule porte construire provenance bascule ; porte juste avant construire
+# (fenêtre de refus de l'image réelle la plus courte). Retour arrière si construire échoue après porte : ConfigMap porte remise
+# avec porte.rego et taches.yml du commit d7d05b4 (cm_porte depuis ces fichiers), au choix du propriétaire.
 #
 # Usage (racine du dépôt) : mise run fermetures:f3 -- <étape>…   (journal : resultats/f3-<étape>.log)
 set -euo pipefail
@@ -95,6 +102,52 @@ echec|tekton.task_result(p, "IMAGE_DIGEST") == f.digest
 echec|tekton.task_result(q, "CHAINS-GIT_URL") == f.git
 FIN
   [ "$k" = 0 ] || { echo "KO   $k condition(s) non couverte(s)" >&2; exit 1; }
+}
+
+etape_reel() {
+  local b=$T/reel d=${FERMETURE#*@} k q r
+  rm -rf -- "${b:?}"; mkdir -p "$b"
+  git -C "$CPOL" archive "$CPOL_COMMIT" policy/lib policy/release/lib | tar -xf - -C "$b"
+  find "$b/policy" -name '*_test.rego' -delete
+  cp "$here/politique/porte/porte.rego" "$here/politique/porte/taches.yml" "$b/"
+  grep -q 'https://supply-chain.example/builders/tekton-chains@v1' "$here/politique/porte/policy.yaml" || { echo "KO   builder.id absent de policy.yaml" >&2; exit 1; }
+  openssl ecparam -genkey -name prime256v1 2> /dev/null | openssl ec -pubout -out "$b/autre.pub" 2> /dev/null
+  cp "$R/chains-cle-publique.pem" "$b/chains.pub"
+  # données comme ec les écrit (conftest_evaluator.go : config.default_sigstore_opts) et ruleData de policy.yaml
+  for k in chains autre; do
+    jq -n --rawfile p "$b/$k.pub" '{config: {default_sigstore_opts: {public_key: $p, ignore_rekor: true, certificate_identity: "",
+      certificate_identity_regexp: "", certificate_oidc_issuer: "", certificate_oidc_issuer_regexp: "", rekor_url: ""}},
+      rule_data__configuration__: {allowed_builder_ids: ["https://supply-chain.example/builders/tekton-chains@v1"]}}' > "$b/donnees-$k.json"
+  done
+  q='v := ec.sigstore.verify_attestation("'"$REG_HOTE/builds/fermetures/sample-app@$d"'", data.config.default_sigstore_opts)
+    f := {"ref": "'"$FERMETURE"'", "depot": "'"${FERMETURE%@*}"'", "digest": "'"$d"'", "git": "https://sc-stockage.poc.test:3000/'"$SAMPLE_APP"'.git"}
+    atts := object.get(v, "attestations", [])
+    r := {"succes": v.success, "erreurs": object.get(v, "errors", []), "verifiees": count(atts),
+      "conformes": count([a | some a in atts; data.porte._prefetch(a.statement, f)]),
+      "detail": [sprintf("%s pipelineTask=%d conforme=%v", [a.statement.predicate.runDetails.metadata.invocationId,
+        count([x | some x in a.statement.predicate.buildDefinition.resolvedDependencies; x.name == "pipelineTask"]),
+        count([1 | data.porte._prefetch(a.statement, f)]) == 1]) | some a in atts]}'
+  for k in chains autre; do
+    echo "## clé $k : verify_attestation sur $REG_HOTE/builds/fermetures/sample-app@$d, puis _prefetch"
+    (cd "$b" && SSL_CERT_FILE=$P/ca-poc.crt ec opa eval -f json -d policy -d porte.rego -d taches.yml -d "donnees-$k.json" "$q") \
+      | jq -c '.result[0].bindings.r' > "$b/$k.json"
+    jq -r '"succès \(.succes), vérifiées \(.verifiees), conformes \(.conformes)", (.detail[] | "  " + .), (.erreurs[] | "  erreur : " + (gsub("\n"; " ") | .[0:200]))' "$b/$k.json"
+  done
+  attendu "clé de Chains : provenances vérifiées / conformes à la règle" "$(jq -r '"\(.verifiees)/\(.conformes)"' "$b/chains.json")" 4/2
+  attendu "autre clé : provenances vérifiées" "$(jq -r '.verifiees' "$b/autre.json")" 0
+  echo "## fermeture de l'hôte ($REG_HOTE/entrees/sample-app/fermeture@0ab5a507…), clé de Chains"
+  (cd "$b" && SSL_CERT_FILE=$P/ca-poc.crt ec opa eval -f json -d policy -d porte.rego -d taches.yml -d donnees-chains.json \
+    'v := ec.sigstore.verify_attestation("'"$REG_HOTE"'/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048", data.config.default_sigstore_opts)
+     r := {"verifiees": count(object.get(v, "attestations", [])), "erreurs": object.get(v, "errors", [])}') | jq -c '.result[0].bindings.r' > "$b/hote.json"
+  jq -r '"vérifiées \(.verifiees)", (.erreurs[] | "  erreur : " + (gsub("\n"; " ") | .[0:200]))' "$b/hote.json"
+  attendu "fermeture de l'hôte : provenances vérifiées" "$(jq -r '.verifiees' "$b/hote.json")" 0
+  echo "## fermeture lue par la règle dans la provenance archivée de J7 ($W/construction/prov.json)"
+  jq -c '{attestations: [{statement: .}]}' "$W/construction/prov.json" > "$b/entree-j7.json"
+  r=$(cd "$b" && ec opa eval -f json -d policy -d porte.rego -d taches.yml -d donnees-chains.json -i entree-j7.json 'data.porte._fermetures' \
+    | jq -c '.result[0].expressions[0].value')
+  echo "$r"
+  attendu "fermetures de la provenance de J7" "$(jq -r 'map(.ref + " " + .git) | join(",")' <<< "$r")" \
+    "$REG/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048 https://sc-stockage.poc.test:3000/$SAMPLE_APP.git"
 }
 
 signer_tache() { # nom : comme construction.sh (signature versionnée dans la 08, bundle, liste revue) ; SIGNER=<nom> : seule
@@ -209,7 +262,8 @@ etape_temoins() {
   mkdir -p "$T/auth/docker" && auth_zot "$T/auth/docker/config.json"
   echo "## fermeture altérée : copie de la fermeture de F2, un zip de module modifié (zip valide), poussée par poc-ecriture"
   rm -rf -- "${T:?}/f-alteree"; oras pull --no-tty --ca-file "$P/ca-poc.crt" -o "$T/f-alteree" "${FERMETURE/$REG/$REG_HOTE}" > /dev/null
-  z=$(find "$T/f-alteree/deps/gomod" -name '*.zip' | LC_ALL=C sort | head -1)
+  z=$T/f-alteree/deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.zip   # seul module compilé de sample-app
+  [ -s "$z" ] || { echo "KO   zip de chi absent de la fermeture" >&2; exit 1; }
   python3 -I - "$z" <<'PY'
 import sys, zipfile, shutil
 z = sys.argv[1]

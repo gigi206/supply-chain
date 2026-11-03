@@ -130,3 +130,58 @@ Ordre proposé : `taches` (passe `SIGNER=construire-image`, revue de la liste, p
 
 **`bascule`** (cluster : TriggerTemplate `sample-app` de `declencheurs`)
 19. Gabarit en service rendu avec la pipeline de F3, appliqué, relu.
+
+## Additif du 03/11/2026, 18:58 UTC : options de ec lues dans le code, essai `reel` sur données réelles (prédictions)
+
+- **Fait lu** dans conforma/cli `v0.10.42` (`internal/evaluator/conftest_evaluator.go`) : ec écrit `config.json` avec
+  `config.default_sigstore_opts = p.SigstoreOpts()`. `public_key` y est le PEM de la clé passée par `--public-key`
+  (`PublicKeyPEM`, `internal/policy/policy.go`), et `ignore_rekor` y reflète `--ignore-rekor`. `sigstore.opts` de la
+  bibliothèque lit cette donnée : la règle reçoit donc la clé de Chains dans le pod de la porte.
+- **Nouvelle étape `reel`**, sur l'hôte, en lecture seule (lecture anonyme de Zot par son adresse IP, aucun écrit, aucun accès
+  au cluster) : `ec opa eval` avec la vraie fonction `ec.sigstore.verify_attestation`, la clé de Chains et `ignore_rekor`,
+  sur la fermeture de F2. Cela mesure la forme réelle des données, la fonction réelle et la lecture anonyme.
+  - Le vérificateur de sujet de cosign ne compare que le digest : l'adresse IP à la place du nom ne change rien à la
+    vérification.
+
+20. `verify_attestation` sur `builds/fermetures/sample-app@74c265e7` : 4 attestations vérifiées (deux PipelineRuns et deux
+    TaskRuns `publier`, comme en F2) et aucune erreur.
+21. `_prefetch`, appliquée à chacune avec les vrais noms `sc-stockage.poc.test` : **2 conformes**, les provenances des deux
+    PipelineRuns. Les deux provenances de TaskRun sont écartées (aucune entrée `pipelineTask`).
+22. `_fermetures` sur la provenance archivée de J7 (`construction.sh provenance`) : une fermeture,
+    `sc-stockage.poc.test:5000/entrees/sample-app/fermeture@0ab5a507…`, dépôt Forgejo de sample-app.
+23. Même fonction, avec une autre clé : 0 attestation et une erreur de vérification.
+
+Premier passage de `reel` (18:58 UTC, [journal](f3-reel-premier-passage.log)) : arrêt sans résultat. Ma requête d'essai appelait
+`count(v.attestations)`, refusé par le vérificateur de types d'OPA avec le type que ec déclare pour ce champ (« count:
+invalid argument(s) », relevé à la main). La règle n'est pas concernée : elle lit le champ par `object.get`, et `ec opa check`
+l'accepte. La requête est corrigée de la même façon, prédictions inchangées.
+
+## Résultats de `reel` (18:59 UTC) et additif (18:59 UTC)
+
+**Conforme** ([journal](f3-reel.log)) : 20 à 23 vérifiées.
+- Clé de Chains : 4 provenances vérifiées, dont 2 conformes, celles des PipelineRuns `0ff718a6…` (`f2-prefetch-1`) et
+  `4591474b…`. Les deux provenances de TaskRun, sans entrée `pipelineTask`, sont écartées.
+- Autre clé : 0, « no matching attestations ».
+- Fermeture de la provenance de J7 lue par la règle : `entrees/sample-app/fermeture@0ab5a507…`.
+
+24. Ajouté à `reel` : la même vérification sur la fermeture de l'hôte (`entrees/sample-app/fermeture@0ab5a507`, sans `.att`)
+    donne 0 provenance et une erreur. Prédiction : « no matching attestations » ou « no signatures found ». Cela précise la
+    prédiction 5.
+
+Résultat de 24 (18:59 UTC, même journal `f3-reel.log`, relancé avec ce cas) : **conforme**, 0 provenance et « verify image
+attestation signature: no matching attestations ». La prédiction 5 est précisée : le message de la porte contiendra cette erreur.
+
+## Additif du 03/11/2026, 19:00 UTC : ordre des étapes, témoin altéré, retour arrière, journaux
+
+- **Ordre revu** : `taches`, `temoins`, `lecture_seule`, puis `porte` **juste avant** `construire`, puis `provenance`,
+  `bascule`. Les témoins ne dépendent pas de la ConfigMap. Placés après `porte`, ils allongeaient la fenêtre de refus de
+  l'image réelle, et un KO y aurait laissé l'image refusée.
+- **Témoin altéré** : le zip modifié est désormais celui de `go-chi/chi/v5@v5.2.3`, écrit en dur, seul zip de la fermeture de F2
+  (relevé dans `~/.cache/supply-chain-poc/03/f2/f-1`). Le choisir par tri ne garantissait pas un module compilé.
+- **Retour arrière** si `construire` échoue après `porte` : remettre la ConfigMap avec `porte.rego` et `taches.yml` du commit
+  `d7d05b4`, ou garder le refus, au choix du propriétaire.
+- **Journaux** :
+  - pods des PipelineRuns, Jobs de la porte et pods témoins : collectés par Alloy (`pods.alloy` de la 19b :
+    `/var/log/pods/*` de chaque nœud), donc consultables dans Grafana ;
+  - refus réseau : dans Hubble seulement, écart de F2 inchangé ;
+  - étapes `regle` et `reel` : sur l'hôte, journaux dans `resultats/`, hors de la plateforme.

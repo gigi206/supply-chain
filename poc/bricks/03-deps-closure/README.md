@@ -323,3 +323,19 @@ l'accord d'exécution.
 - **Témoin `lecture_seule`** : un pod Kata privilégié en root, hors Tekton, dans `builds`, plus un PVC de 16 Mi. Tout est
   supprimé à la fin.
 - **`web/dist`** reste un intrant produit sur l'hôte (inchangé).
+
+**Ordre d'exécution proposé** : `taches` (passe `SIGNER=construire-image`, revue de la liste, passe normale), `temoins`,
+`lecture_seule`, puis `porte` juste avant `construire`, puis `provenance` et `bascule`. Cet ordre garde la fenêtre de refus
+de l'image réelle la plus courte. **Retour arrière** si `construire` échoue après `porte` : remettre la ConfigMap avec
+`porte.rego` et `taches.yml` de `d7d05b4`, ou garder le refus, au choix du propriétaire.
+
+**Essai réel avant tout accord** (étape `reel`, sur l'hôte, lecture anonyme de Zot seulement) : la vraie fonction
+`ec.sigstore.verify_attestation`, avec la clé de Chains, vérifie 4 provenances sur la fermeture de F2. La règle en retient 2,
+celles des deux PipelineRuns de F2, et écarte les provenances de TaskRun. Une autre clé n'en vérifie aucune. La fermeture de
+l'hôte n'en a aucune (« no matching attestations »). La règle lit bien la fermeture dans la provenance archivée de J7. Les
+options de clé passées par ec à la règle sont lues dans le code de conforma/cli v0.10.42 (`conftest_evaluator.go`).
+
+**Journaux** :
+- pods des PipelineRuns, Jobs de la porte et pods témoins : collectés par Alloy (`pods.alloy` de la 19b) ;
+- refus réseau : dans Hubble seulement, écart de F2 inchangé ;
+- étapes `regle` et `reel` : sur l'hôte, dans `resultats/`.

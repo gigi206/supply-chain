@@ -1,0 +1,20 @@
+# bascule.sh reel, 2026-11-03T18:59:26Z
+## clé chains : verify_attestation sur 192.168.161.13:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd, puis _prefetch
+succès true, vérifiées 4, conformes 2
+  3f0b342e-d267-4396-9d0a-b55383f0dcdf pipelineTask=0 conforme=false
+  0ff718a6-2501-4f93-b399-21c878682511 pipelineTask=2 conforme=true
+  f82db03d-e630-4dba-ad97-cbf46affc124 pipelineTask=0 conforme=false
+  4591474b-e95f-47fc-99e4-ed848b494c5f pipelineTask=2 conforme=true
+## clé autre : verify_attestation sur 192.168.161.13:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd, puis _prefetch
+succès false, vérifiées 0, conformes 0
+  erreur : verify image attestation signature: no matching attestations: accepted signatures do not match threshold, Found: 0, Expected 1  accepted signatures do not match threshold, Found: 0, Expected 1  accept
+OK   clé de Chains : provenances vérifiées / conformes à la règle : 4/2
+OK   autre clé : provenances vérifiées : 0
+## fermeture de l'hôte (192.168.161.13:5000/entrees/sample-app/fermeture@0ab5a507…), clé de Chains
+vérifiées 0
+  erreur : verify image attestation signature: no matching attestations: 
+OK   fermeture de l'hôte : provenances vérifiées : 0
+## fermeture lue par la règle dans la provenance archivée de J7 (~/.cache/supply-chain-poc/08/travail/construction/prov.json)
+[{"depot":"sc-stockage.poc.test:5000/entrees/sample-app/fermeture","digest":"sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048","git":"https://sc-stockage.poc.test:3000/workspace/sample-app.git","ref":"sc-stockage.poc.test:5000/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048"}]
+OK   fermetures de la provenance de J7 : sc-stockage.poc.test:5000/entrees/sample-app/fermeture@sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048 https://sc-stockage.poc.test:3000/workspace/sample-app.git
+# fin 2026-11-03T18:59:27Z
