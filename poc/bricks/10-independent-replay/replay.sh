@@ -30,6 +30,9 @@
 #                    de la VM coupé aussitôt (virsh domif-setlink down), compteurs de l'interface relus côté hôte juste après la
 #                    coupure et juste avant le rétablissement (ATTENTE_HORS_LIGNE s) ; rebuild.sh refuse de démarrer si la
 #                    porteuse est présente ; résultat lu après le rétablissement, valable seulement s'il a fini avant
+# Jalon R5 (JALON=r5) :
+#   signature_hors_registre  sur l'hôte, comme cosign_stockage : VSA signée par cosign attest-blob --statement sans registre,
+#                    poussée en referrer par oras attach, vérifiée par cosign (clé de VSA acceptée, autre clé refusée)
 #
 # Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
@@ -372,6 +375,67 @@ etape_rebuild() {
     echo "KO   rebuild non terminé avant le rétablissement du lien ($retabli) : résultat non valable hors ligne"
   fi
   echo "## journal du rebuild (fin)"; sur 'tail -15 ~/r4/rebuild.log'
+}
+
+etape_signature_hors_registre() { # R5, mesure préalable sur l'hôte (comme cosign_stockage) : VSA signée sans registre, poussée en
+  # referrer par oras, trouvée et vérifiée par cosign ; le tout dans un espace de noms réseau vide, avec Zot, image et clés jetables
+  local d=$E/signature
+  rm -rf -- "${d:?}" && mkdir -p "$d/zot" && cd "$d"
+  printf '{"distSpecVersion":"1.1.1","storage":{"rootDirectory":"%s/zot"},"http":{"address":"127.0.0.1","port":"15000"},"log":{"level":"error"}}\n' "$d" > zot.json
+  printf 'essai\n' > f && tar -cf couche.tar f
+  unshare -rn bash -s "$d" "$(command -v zot)" "$(command -v crane)" "$(command -v cosign)" "$(command -v oras)" <<'EOS'
+set -uo pipefail
+d=$1 zot=$2 crane=$3 cosign=$4 oras=$5; cd "$d"
+ip link set lo up
+echo "## espace de noms : $(ip -o link | awk -F': ' '{print $2}' | paste -sd' ') ; routes : $(ip route | wc -l)"
+"$zot" serve zot.json > zot.log 2>&1 & z=$!
+for _ in $(seq 30); do curl -s -o /dev/null http://127.0.0.1:15000/v2/ && break; sleep 0.5; done
+"$crane" append --insecure --oci-empty-base -f couche.tar -t 127.0.0.1:15000/essai/image:v1 > /dev/null 2>&1
+dig=$("$crane" digest --insecure 127.0.0.1:15000/essai/image:v1); img=127.0.0.1:15000/essai/image@$dig
+echo "image jetable : $img"
+export COSIGN_PASSWORD=essai-jetable
+mkdir vsa autre && (cd vsa && "$cosign" generate-key-pair > /dev/null 2>&1) && (cd autre && "$cosign" generate-key-pair > /dev/null 2>&1)
+"$cosign" signing-config create --out vide.json > /dev/null 2>&1
+python3 -I - "$dig" <<'PY'
+import json, sys
+json.dump({"_type": "https://in-toto.io/Statement/v1",
+           "subject": [{"name": "127.0.0.1:15000/essai/image", "digest": {"sha256": sys.argv[1].split(":")[1]}}],
+           "predicateType": "https://slsa.dev/verification_summary/v1",
+           "predicate": {"verifier": {"id": "https://supply-chain.example/verifiers/essai"}, "resourceUri": "essai",
+                         "policy": {"uri": "essai"}, "verificationResult": "PASSED", "verifiedLevels": ["POC_ESSAI"]}},
+          open("enonce.json", "w"))
+PY
+echo "## 1. cosign attest-blob --statement, sans registre (aucune référence d'image donnée)"
+"$cosign" attest-blob --statement enonce.json --key vsa/cosign.key --signing-config vide.json --bundle vsa.bundle.json --yes 2>&1 | tail -3
+echo "code de sortie : ${PIPESTATUS[0]}"
+python3 -I - <<'PY'
+import json, base64
+b = json.load(open("vsa.bundle.json"))
+print("mediaType du bundle :", b.get("mediaType"))
+e = b["dsseEnvelope"]; s = json.loads(base64.b64decode(e["payload"]))
+print("payloadType :", e["payloadType"], "; sujet :", s["subject"], "; énoncé identique à enonce.json :", s == json.load(open("enonce.json")))
+print("tlog :", b["verificationMaterial"].get("tlogEntries"), "; horodatage :", b["verificationMaterial"].get("timestampVerificationData"))
+PY
+echo "## 2. poussé en referrer par oras attach (modèle de horodater.sh)"
+"$oras" attach --plain-http --artifact-type application/vnd.dev.sigstore.bundle.v0.3+json \
+  --annotation dev.sigstore.bundle.content=dsse-envelope --annotation dev.sigstore.bundle.predicateType=https://slsa.dev/verification_summary/v1 \
+  "$img" vsa.bundle.json:application/vnd.dev.sigstore.bundle.v0.3+json 2>&1 | tail -2
+curl -s "http://127.0.0.1:15000/v2/essai/image/referrers/$dig" | python3 -I -c 'import json,sys; print("referrers :", [(m.get("artifactType"), m["digest"][:19]) for m in json.load(sys.stdin)["manifests"]])'
+echo "tags : $("$crane" ls --insecure 127.0.0.1:15000/essai/image | paste -sd' ')"
+echo "## cosign verify-attestation sur l'image (clé de VSA)"
+"$cosign" verify-attestation --key vsa/cosign.pub --insecure-ignore-tlog --type https://slsa.dev/verification_summary/v1 --allow-http-registry "$img" > v.out 2>&1
+echo "code de sortie : $? ; $(grep -vE '^\{' v.out | tail -2 | paste -sd' ')"
+echo "## cosign verify-attestation sur l'image (autre clé : refus attendu)"
+"$cosign" verify-attestation --key autre/cosign.pub --insecure-ignore-tlog --type https://slsa.dev/verification_summary/v1 --allow-http-registry "$img" > v.out 2>&1
+echo "code de sortie : $? ; $(grep -m1 '^Error' v.out | cut -c1-160)"
+echo "## 3. cosign verify-blob-attestation --bundle (clé de VSA, puis autre clé)"
+"$cosign" verify-blob-attestation --bundle vsa.bundle.json --new-bundle-format --key vsa/cosign.pub --insecure-ignore-tlog \
+  --type https://slsa.dev/verification_summary/v1 --digest "${dig#sha256:}" --digestAlg sha256 > v.out 2>&1; echo "clé de VSA : code $? ; $(tail -1 v.out)"
+"$cosign" verify-blob-attestation --bundle vsa.bundle.json --new-bundle-format --key autre/cosign.pub --insecure-ignore-tlog \
+  --type https://slsa.dev/verification_summary/v1 --digest "${dig#sha256:}" --digestAlg sha256 > v.out 2>&1; echo "autre clé : code $? ; $(grep -m1 '^Error' v.out | cut -c1-160)"
+kill $z
+EOS
+  cd / && rm -rf -- "${d:?}"
 }
 
 lancer "${JALON:-r1}" "$@"

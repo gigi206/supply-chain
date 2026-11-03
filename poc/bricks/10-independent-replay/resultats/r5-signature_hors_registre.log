@@ -1,0 +1,23 @@
+# replay.sh signature_hors_registre, 2026-11-03T10:34:22Z
+## espace de noms : lo ; routes : 0
+image jetable : 127.0.0.1:15000/essai/image@sha256:52df397c9344603344e835ab41f154d125274def49a974001ecc7a269407e320
+## 1. cosign attest-blob --statement, sans registre (aucune référence d'image donnée)
+Using statement from: enonce.json
+Signing artifact...
+Wrote bundle to file vsa.bundle.json
+code de sortie : 0
+mediaType du bundle : application/vnd.dev.sigstore.bundle.v0.3+json
+payloadType : application/vnd.in-toto+json ; sujet : [{'name': '127.0.0.1:15000/essai/image', 'digest': {'sha256': '52df397c9344603344e835ab41f154d125274def49a974001ecc7a269407e320'}}] ; énoncé identique à enonce.json : True
+tlog : None ; horodatage : None
+## 2. poussé en referrer par oras attach (modèle de horodater.sh)
+Attached to [registry] 127.0.0.1:15000/essai/image@sha256:52df397c9344603344e835ab41f154d125274def49a974001ecc7a269407e320
+Digest: sha256:d974a6bebbb74fa801211f07e322970d94d953569eedea162b6d57bcdf7ea3b0
+referrers : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:d974a6bebbb7')]
+tags : v1
+## cosign verify-attestation sur l'image (clé de VSA)
+code de sortie : 0 ;   - Existence of the claims in the transparency log was verified offline   - The signatures were verified against the specified public key
+## cosign verify-attestation sur l'image (autre clé : refus attendu)
+code de sortie : 1 ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+## 3. cosign verify-blob-attestation --bundle (clé de VSA, puis autre clé)
+clé de VSA : code 0 ; Verified OK
+autre clé : code 1 ; Error: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1

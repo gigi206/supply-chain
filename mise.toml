@@ -278,7 +278,7 @@ description = "Brique 19, O2 : Prometheus 3.13.5 (sha256 et attestation de relea
 run = "poc/bricks/19-observabilite/observabilite.sh"
 
 [tasks.replay]
-description = "Brique 10, replay indépendant (décisions D1 à D7 du 03/11/2026) : R1, essais sur l'hôte sans VM (étapes : cosign_stockage version_go outils) ; R2, création du domaine, JALON=r2 (étapes : vm isolement paquets outils cle_vsa) ; R3, préchargement, JALON=r3 (étapes : transporter verifier_entrees) ; R4, rebuild hors ligne, JALON=r4 (étape : rebuild)"
+description = "Brique 10, replay indépendant (décisions D1 à D7 du 03/11/2026) : R1, essais sur l'hôte sans VM (étapes : cosign_stockage version_go outils) ; R2, création du domaine, JALON=r2 (étapes : vm isolement paquets outils cle_vsa) ; R3, préchargement, JALON=r3 (étapes : transporter verifier_entrees) ; R4, rebuild hors ligne, JALON=r4 (étape : rebuild) ; R5, VSA, JALON=r5 (étape préalable : signature_hors_registre)"
 run = "poc/bricks/10-independent-replay/replay.sh"
 
 [tasks.journalisation]
