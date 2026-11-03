@@ -40,3 +40,14 @@ Elles ne prouvent pas le « hors ligne » : seul le replay positif de R4 le port
   - la VSA est poussée dans `builds/vsa/sample-app` par un manifeste fait main, poussé par digest, au lieu d'`oras attach` sur l'image ;
   - elle est lue par `COSIGN_REPOSITORY` ;
   - **ajout** : après le push, la porte de la 08 doit admettre l'image réelle, comme avant le push. C'est une nouvelle prédiction, à vérifier dans le cluster.
+
+## Additif du 03/11/2026 à 13:13 UTC : prédictions précisées, avant toute exécution de R5 (et avant R4)
+
+Préparation à sec : relecture de `main.go`, de la recette et du stockage des modules Go. Les lignes précédentes ne sont pas modifiées ; celles-ci les précisent.
+
+- **N2, ce qui est altéré** : `main.Version` est imposée par `-ldflags -X` à la compilation, donc la changer dans le code ne changerait pas le binaire. N2 change le littéral compilé `":8080"` de `main.go` en `":8081"` (une seule occurrence, contrôlée avant).
+- **N2, diffoscope** : « une différence dans le binaire `sample-app` et nulle part ailleurs » vaut pour le **contenu de la couche**. La configuration de l'image diffère aussi, par conséquence (`rootfs.diff_ids`). Le manifeste et l'index diffèrent par les digests et ne sont pas comparés.
+- **N1, ce qui est altéré** : un octet du contenu d'un fichier `.go` du zip de `go-chi/chi/v5`, le zip étant réécrit et **resté valide** (`testzip` consigné). Seul le contrôle de Go contre `go.sum` peut donc le refuser. Motif attendu : `checksum mismatch` et `SECURITY ERROR`.
+- **Porte de la 08, avant et après le push de la VSA** : le même verdict. `success` vrai, aucune violation, contrôle 9 `ok` avec le même nombre d'enveloppes couvertes. Mesure dans le cluster : un Job de la porte par passage.
+- **CronJob d'horodatage** : aucune anomalie pour `builds/vsa/sample-app` au passage suivant le push. Attente **incertaine** : le précédent, `builds/essai-replay`, contenait une image, alors que `builds/vsa/sample-app` n'aura qu'un manifeste dont le sujet est absent du dépôt.
+- **Accès au TUF public** : aucun pendant la signature et la vérification dans la VM, qui tournent sous `unshare -rn`. Que `unshare -rn` fonctionne pour l'utilisateur `replay` dans la VM n'est **pas mesuré**. Sur l'hôte, les `connect()` de cosign pendant la lecture de la VSA sont relevés par `strace`.

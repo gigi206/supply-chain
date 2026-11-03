@@ -90,6 +90,11 @@ Toutes les recommandations sont retenues :
   - `policy.digest` est le sha256 du fichier à ce commit ;
   - l'étape de la VSA transporte la politique tirée de ce commit (`git show`), et refuse si le commit n'est sur aucune branche distante ;
   - ce commit doit donc être poussé avant R5, et ce push reste soumis à l'accord du propriétaire.
+- **Politique alignée avant d'être figée** (03/11/2026, vers 13:20 UTC, pendant l'attente de R4 ; aucune mesure ne la citait encore) :
+  - section 1, point 1 : le texte disait que la provenance est tirée du tag `.att`. R3 l'a tirée, et vérifiée, d'un bundle horodaté de `horodatage/bundles` (`verifier_entrees.py`). Le texte suit désormais R3 ;
+  - section 6 : la signature passe par `cosign attest-blob --statement` dans la VM, chemin mesuré le 03/11 à 10:34 UTC, et non par `cosign attest`, qui exige un registre ; `inputAttestations` désigne le manifeste du bundle horodaté par son digest ;
+  - sections 4 bis et 6 : `outils/vsa.py`, qui décide de la VSA, entre dans le code du domaine et dans `verifier.version` ; `outils/negatifs.sh` est journalisé, sans entrer dans la VSA ;
+  - section 5 : `FAILED` est retiré des `verifiedLevels`. C'est une valeur de `verificationResult`, et une VSA `FAILED` n'est ni signée ni poussée.
 
 ### Jalons proposés (chacun soumis à accord ; prédictions datées avant chaque exécution)
 

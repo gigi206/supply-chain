@@ -8,7 +8,12 @@ Le domaine est administré par le propriétaire, par écart documenté (D1 b). I
 
 Chaque condition est éliminatoire : un échec arrête le replay avant tout build.
 
-1. L'enveloppe DSSE est tirée du tag `.att` de l'image, en lecture anonyme. Sa signature est vérifiée avec la clé publique de Chains, [`chains-cle-publique.pem`](../08-trust-plane/resultats/chains-cle-publique.pem), prise hors bande dans ce dépôt.
+1. La provenance est tirée d'un **bundle horodaté** du dépôt `horodatage/bundles` (brique 08), copié par l'hôte en lecture anonyme. Dans la VM, chaque bundle est vérifié hors réseau :
+   - signature avec la clé publique de Chains, [`chains-cle-publique.pem`](../08-trust-plane/resultats/chains-cle-publique.pem), prise hors bande dans ce dépôt ;
+   - sujet égal à l'image ;
+   - jeton RFC 3161 de la TSA.
+
+   L'énoncé retenu est celui du bundle vérifié de l'`invocationId` demandé, jamais celui du transport.
 2. `_type` vaut `https://in-toto.io/Statement/v1` et `predicateType` vaut `https://slsa.dev/provenance/v1`.
 3. `runDetails.builder.id` vaut `https://supply-chain.example/builders/tekton-chains@v1`, et `buildDefinition.buildType` vaut `https://tekton.dev/chains/v2/slsa-tekton`.
 4. Le sujet est l'image rejouée, et son digest est celui comparé au point 4.
@@ -60,7 +65,8 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
 
 ## 4 bis. Code du domaine
 
-- Le code qui vérifie et reconstruit est versionné dans ce dépôt : `outils/verifier_entrees.py` et `outils/rebuild.sh`. Il est copié dans la VM par l'hôte.
+- Le code qui vérifie, reconstruit et décide de la VSA est versionné dans ce dépôt : `outils/verifier_entrees.py`, `outils/rebuild.sh` et `outils/vsa.py`. Il est copié dans la VM par l'hôte.
+- `outils/negatifs.sh` (contre-épreuves N1 et N2) tourne aussi dans la VM, sur des copies des entrées. Il ne produit pas la VSA et n'est pas inscrit dans `verifier.version` ; son sha256 est journalisé.
 - Ce code n'est pas vérifié par le domaine lui-même. Son sha256 est journalisé à chaque passage et **inscrit dans la VSA** (`verifier.version`). N'importe qui peut ainsi confronter le code qui a produit la VSA à ce dépôt.
 - Les données, elles, ne sont crues qu'après vérification : signatures, digests et commit.
 
@@ -68,15 +74,17 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
 
 - `SLSA_BUILD_LEVEL_3` : si la section 1 tient (signature de Chains, `builder.id` attendu). Ce niveau repose sur les mesures de la brique 08 (isolation, clé hors des nœuds de build). Le replay ne les refait pas.
 - `POC_REPLAY_BIT_IDENTIQUE` : si le verdict est `PASSED`. C'est une valeur propre au PoC, sans le préfixe `SLSA_` réservé.
-- `FAILED` : si le verdict est `FAILED`.
+
+Avec un verdict `FAILED`, aucune VSA n'est signée ni poussée : `FAILED` est une valeur de `verificationResult`, pas un niveau, et une VSA publiée porte toujours `PASSED`.
 
 ## 6. Signature et rangement de la VSA
 
 - **`verifier.id`** : `https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1`. L'identifiant porte l'écart D1 (b) : domaine et plan de confiance ont le même administrateur.
-- **`verifier.version`** : versions de BuildKit et de Go, et sha256 de `verifier_entrees.py` et de `rebuild.sh`.
+- **`verifier.version`** : versions de BuildKit et de Go, et sha256 de `verifier_entrees.py`, de `rebuild.sh` et de `vsa.py`.
+- **`inputAttestations`** : le manifeste du bundle horodaté de la provenance, désigné par son digest (`oci://<registre>/horodatage/bundles@sha256:…`), avec ce même digest.
 
 - **Clé** : clé cosign du domaine, générée dans la VM (D6). Jamais celle de Chains, ni l'OpenBao du plan de confiance.
-- **Signature** : `cosign attest --signing-config` avec une configuration sans aucun service, donc sans Fulcio, Rekor ni TSA. Mesuré en R1 : sans cette configuration, cosign 3.1.4 interroge le TUF public de Sigstore.
+- **Signature** : dans la VM, sans registre ni réseau (`unshare -rn`), par `cosign attest-blob --statement` avec `--signing-config` pointant vers une configuration sans aucun service, donc sans Fulcio, Rekor ni TSA. Mesuré en R1 : sans cette configuration, cosign 3.1.4 interroge le TUF public de Sigstore. Mesuré le 03/11/2026 (`r5-signature_hors_registre.log`) : `attest-blob --statement` signe sans registre et garde le sujet de l'énoncé (nom et digest de l'image).
 - **Rangement** : en referrer OCI 1.1 de l'image (format bundle Sigstore v0.3, sans tag `.att`), **dans le dépôt séparé `builds/vsa/sample-app`**, et non dans celui de l'image.
   - Le manifeste est fait main : son `subject` est le descripteur de l'image. Il est poussé par digest, sans étiquette, par le compte Zot `poc-replay` en création par digest seulement (D5).
   - Chaque push est soumis à l'accord du propriétaire.
