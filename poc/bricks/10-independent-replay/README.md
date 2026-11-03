@@ -260,3 +260,30 @@ Accord du propriétaire : « Oui, à sec ». L'application aura son propre accor
 - Les refus n'apparaissent pas dans l'audit de Zot.
 - **Risque à mesurer avant R5** : l'effet d'une VSA en referrer de `builds/sample-app` sur la porte de la 08.
 - Résidu : `builds/essai-replay`.
+
+## R5, mesure préalable : VSA en referrer de l'image et porte de la 08 (03/11/2026, 11:17 à 11:23 UTC ; rien poussé)
+
+Prédictions datées, additifs et résultats : [`r5-referrer-porte-predictions.md`](resultats/r5-referrer-porte-predictions.md). Le banc :
+- l'image réelle `3a7ca1b1`, son `.sig` et son `.att` sont copiés en lecture anonyme dans un **Zot jetable** v2.1.22, dans un espace de noms réseau vide ; les digests sont égaux au PoC ;
+- **ec v0.10.42**, même empreinte que la porte, avec la politique de la porte : bibliothèque `ebd3fbd2`, `porte.rego`, `taches.yml` ;
+- cosign 3.1.4 ;
+- une VSA signée par une **clé jetable**, rangée comme en R5 ;
+- aucune écriture dans le Zot du PoC ni dans le cluster.
+
+Les scripts sont dans [`essais/`](essais), hors de `replay.sh` jusqu'à la fin de R4.
+
+**Constat : la VSA en referrer de l'image ferait refuser l'image réelle par la porte.**
+- **Avant** ([`r5-referrer_porte.log`](resultats/r5-referrer_porte.log)) : avec la source attendue, ec rend `success` vrai : 1 signature d'image, 6 attestations, 33 succès, 3 avertissements `trusted_task.tagged`. cosign vérifie la signature et les 6 attestations avec la clé de Chains.
+- **Après un seul referrer de type bundle v0.3** : ec ne lit plus `.sig` ni `.att`, et voit **0 signature et 0 attestation**. `builtin.image.signature_check` et `builtin.attestation.signature_check` passent en violation, avec ou sans source attendue. `cosign verify` et `cosign verify-attestation` refusent aussi avec la clé de Chains (`Found: 0, Expected 1`).
+- La 08 avait écarté ce rangement pour ses bundles d'horodatage. Le commentaire de `tsa/horodater.sh` l'expliquait pour Kyverno ; la mesure le confirme pour ec et cosign.
+- **Premier passage** ([archivé](resultats/r5-referrer_porte-premier-passage.log)) : sans la source attendue, il donnait la même conclusion. J'avais prédit à tort que la porte admettait l'image sans cette source.
+- **Limite du banc** : ec ne peut pas lire les bundles de tâches sur `sc-stockage.poc.test` (9 échecs, sans réseau). Le verdict « avant » reste égal à celui du test 8 de la 08.
+
+**Alternative mesurée** ([`r5-referrer_depot_separe.log`](resultats/r5-referrer_depot_separe.log)), sur le modèle de `horodatage/bundles` : un manifeste fait main dont le `subject` est l'image, dans un **autre dépôt** (nom d'essai : `builds/vsa/sample-app`), poussé **par digest, sans étiquette**.
+- Zot l'accepte alors que le sujet est absent de ce dépôt. L'API referrers de ce dépôt le liste, et le dépôt n'a aucune étiquette.
+- **L'image réelle reste admise** : ec rend `success` vrai, 1 signature, 6 attestations ; cosign l'accepte avec la clé de Chains.
+- **La VSA se lit** par `COSIGN_REPOSITORY=<dépôt séparé> cosign verify-attestation --key <clé de la VSA>`. La clé de Chains la refuse.
+- **Job d'horodatage** (journaux du passage de 11:23:00 à 11:23:04 UTC, lecture seule) : `builds/essai-replay`, sans étiquette avec un referrer depuis D5, n'y cause aucune anomalie. La seule anomalie est le témoin connu de J6.
+- **Droits** : en D5, les droits de `poc-replay` ont été mesurés sur `builds/essai-replay`. Ils acceptent un push par digest et un referrer sous `builds/**`. Le nom du dépôt définitif n'est pas mesuré.
+
+**Décision du propriétaire avant R5** : le rangement de la section 6 de la politique et de D5 est à revoir. Rien n'est poussé d'ici là.

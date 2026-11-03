@@ -1,0 +1,21 @@
+## début 11:22:21 UTC
+## espace de noms : lo ; routes : 0
+Zot jetable : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 -> sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+Zot jetable : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.sig -> sha256:925a1ff8c72f49be816c9bad85d4e6670bfb690b6df8f937be31a1c8439959af
+Zot jetable : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.att -> sha256:e7045fa8c024fe1074e6e15041a5019af2c9cd0b9850fb4de54f489e84586b44
+## VSA jetable (attest-blob sans registre), rangée dans builds/vsa/sample-app par un manifeste fait main poussé par digest
+attest-blob : code 0
+sujet : {"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": "sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5", "size": 556}
+push par digest (sha256:d31dffa0a2ec76b7b28d6fb31d34fb1c9704543998b3b71db71b9a2a2a892133) : code 0 ; Digest: sha256:d31dffa0a2ec76b7b28d6fb31d34fb1c9704543998b3b71db71b9a2a2a892133
+referrers de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 dans builds/vsa/sample-app : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:d31dffa0a2ec')]
+étiquettes de builds/vsa/sample-app : {"name":"builds/vsa/sample-app","tags":[]}
+referrers de l'image dans builds/sample-app : 0
+## porte (ec, source attendue) sur l'image réelle
+ec : code de sortie 0 ; récupérations d'images en échec (sans réseau) : 9
+ec : success True ; signatures d'image : 1 ; attestations : 6 ; violations : [] ; avertissements : ['trusted_task.tagged', 'trusted_task.tagged', 'trusted_task.tagged'] ; succès : 33
+cosign verify (clé de Chains) : code 0
+cosign verify-attestation (clé de Chains) : code 0 ; attestations vérifiées : 6
+## lecture de la VSA par COSIGN_REPOSITORY=127.0.0.1:15000/builds/vsa/sample-app
+clé de la VSA : code 0 ; attestations vérifiées : 1 ; 
+clé de Chains : code 1 ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+## fin 11:23:11 UTC

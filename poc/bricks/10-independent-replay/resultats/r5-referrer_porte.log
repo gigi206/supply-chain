@@ -1,0 +1,58 @@
+## début 11:19:21 UTC
+## outils
+OK   ec : empreinte de l'image de la porte (v0.10.42)
+zot "commit":"v2.1.22-0-g6bbc7e5" ; cosign v3.1.4 ; oras 1.3.6
+## copie en lecture anonyme : image, .sig, .att (Zot du PoC -> layout OCI)
+layout : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.sig sha256:925a1ff8c72f49be816c9bad85d4e6670bfb690b6df8f937be31a1c8439959af
+layout : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.att sha256:e7045fa8c024fe1074e6e15041a5019af2c9cd0b9850fb4de54f489e84586b44
+layout : image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+referrers de l image dans le Zot du PoC : 0
+## politique de la porte, chemins locaux
+7:      - /home/gigi/.cache/supply-chain-poc/10/essais/referrer-porte/politique/policy/release
+8:      - /home/gigi/.cache/supply-chain-poc/10/essais/referrer-porte/politique/policy/lib
+9:      - /home/gigi/.cache/supply-chain-poc/10/essais/referrer-porte/porte/regles
+11:      - /home/gigi/.cache/supply-chain-poc/10/essais/referrer-porte/porte/donnees
+## espace de noms : lo ; routes : 0
+Zot jetable : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 -> sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+Zot jetable : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.sig -> sha256:925a1ff8c72f49be816c9bad85d4e6670bfb690b6df8f937be31a1c8439959af
+Zot jetable : sha256-3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5.att -> sha256:e7045fa8c024fe1074e6e15041a5019af2c9cd0b9850fb4de54f489e84586b44
+## avant : referrers de l'image : [] ; tags : 2
+ec (sans-source) : code de sortie 0 ; récupérations d'images en échec (bundles de tâches, nom du PoC sans DNS ni réseau) : 9
+ec : success False ; signatures d'image : 1 ['']
+ec : attestations : 6 [('https://slsa.dev/provenance/v1', ('SHA256:xuBoA',))]
+ec : violations : ['slsa_source_correlated.source_code_reference_provided']
+ec : avertissements : ['trusted_task.tagged', 'trusted_task.tagged', 'trusted_task.tagged']
+ec : succès : 32 ; dont builtin : ['builtin.attestation.signature_check', 'builtin.attestation.syntax_check', 'builtin.image.signature_check']
+   violation slsa_source_correlated.source_code_reference_provided : Expected source code reference was not provided for verification
+ec (source) : code de sortie 0 ; récupérations d'images en échec (bundles de tâches, nom du PoC sans DNS ni réseau) : 9
+ec : success True ; signatures d'image : 1 ['']
+ec : attestations : 6 [('https://slsa.dev/provenance/v1', ('SHA256:xuBoA',))]
+ec : violations : []
+ec : avertissements : ['trusted_task.tagged', 'trusted_task.tagged', 'trusted_task.tagged']
+ec : succès : 33 ; dont builtin : ['builtin.attestation.signature_check', 'builtin.attestation.syntax_check', 'builtin.image.signature_check']
+cosign verify (clé de Chains) : code 0 ; Verification for 127.0.0.1:15000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 --
+cosign verify-attestation (clé de Chains, slsaprovenance1) : code 0 ; attestations vérifiées : 6 ; 
+## VSA jetable en referrer (comme R5 : attest-blob sans registre, oras attach, bundle v0.3)
+attest-blob : code 0
+Digest: sha256:df9c794994aa5dcda661511ea0506c410da5d624d3818dc9965fdc1bd3b9dc6f
+## apres : referrers de l'image : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:df9c794994aa')] ; tags : 2
+ec (sans-source) : code de sortie 0 ; récupérations d'images en échec (bundles de tâches, nom du PoC sans DNS ni réseau) : 0
+ec : success False ; signatures d'image : 0 []
+ec : attestations : 0 []
+ec : violations : ['builtin.attestation.signature_check', 'builtin.image.signature_check']
+ec : avertissements : []
+ec : succès : 0 ; dont builtin : []
+   violation builtin.attestation.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matc
+   violation builtin.image.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matc
+ec (source) : code de sortie 0 ; récupérations d'images en échec (bundles de tâches, nom du PoC sans DNS ni réseau) : 0
+ec : success False ; signatures d'image : 0 []
+ec : attestations : 0 []
+ec : violations : ['builtin.attestation.signature_check', 'builtin.image.signature_check']
+ec : avertissements : []
+ec : succès : 0 ; dont builtin : []
+   violation builtin.attestation.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matc
+   violation builtin.image.signature_check : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matc
+cosign verify (clé de Chains) : code 1 ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+cosign verify-attestation (clé de Chains, slsaprovenance1) : code 1 ; attestations vérifiées : 0 ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+témoin : cosign verify-attestation (clé jetable de la VSA) : code 0
+## fin 11:21:02 UTC
