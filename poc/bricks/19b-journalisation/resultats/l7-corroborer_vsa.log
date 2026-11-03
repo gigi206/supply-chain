@@ -1,0 +1,15 @@
+# journalisation.sh corroborer_vsa, 2026-11-03T15:47:05Z
+## écritures de poc-replay sous builds/vsa/, audit de Zot (noeud sc-stockage), 03/11/2026 de 14:00 à 16:00 UTC
+requête de l'auditeur : HTTP 200, 5 ligne(s) ; champs : ["labels","Time","Line","tsNs","labelTypes","id"]
+2026-11-03T15:00:56Z {"time":"2026-11-03T15:00:56.381751617Z","level":"info","message":"HTTP API Audit","component":"session","clientIP":"192.168.161.1:50524","subject":"poc-replay","action":"POST","object":"/v2/builds/vsa/sample-app/blobs/uploads/","status":202,"caller":"zotregistry.dev/zot/v2/pkg/api/session.go:165","func":"zotregistry.dev/zot/v2/pkg/api.SessionAuditLogger.func1.1"}
+2026-11-03T15:00:56Z {"time":"2026-11-03T15:00:56.594511822Z","level":"info","message":"HTTP API Audit","component":"session","clientIP":"192.168.161.1:50524","subject":"poc-replay","action":"PUT","object":"/v2/builds/vsa/sample-app/blobs/uploads/0a5e7435-3984-4b4a-880d-d30ba95f5772?digest=sha256%3A7b93e4b322941e23ca649a5755b452e792ee4e2fc42b971b6ba1437cad61fa45","status":201,"caller":"zotregistry.dev/zot/v2/pkg/api/session.go:165","func":"zotregistry.dev/zot/v2/pkg/api.SessionAuditLogger.func1.1"}
+2026-11-03T15:00:57Z {"time":"2026-11-03T15:00:57.814095466Z","level":"info","message":"HTTP API Audit","component":"session","clientIP":"192.168.161.1:50530","subject":"poc-replay","action":"POST","object":"/v2/builds/vsa/sample-app/blobs/uploads/","status":202,"caller":"zotregistry.dev/zot/v2/pkg/api/session.go:165","func":"zotregistry.dev/zot/v2/pkg/api.SessionAuditLogger.func1.1"}
+2026-11-03T15:00:58Z {"time":"2026-11-03T15:00:58.030108754Z","level":"info","message":"HTTP API Audit","component":"session","clientIP":"192.168.161.1:50530","subject":"poc-replay","action":"PUT","object":"/v2/builds/vsa/sample-app/blobs/uploads/d1f1913d-7250-488f-9030-2d8fbca46773?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","status":201,"caller":"zotregistry.dev/zot/v2/pkg/api/session.go:165","func":"zotregistry.dev/zot/v2/pkg/api.SessionAuditLogger.func1.1"}
+2026-11-03T15:00:59Z {"time":"2026-11-03T15:00:59.26798379Z","level":"info","message":"HTTP API Audit","component":"session","clientIP":"192.168.161.1:38816","subject":"poc-replay","action":"PUT","object":"/v2/builds/vsa/sample-app/manifests/sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03","status":201,"caller":"zotregistry.dev/zot/v2/pkg/api/session.go:165","func":"zotregistry.dev/zot/v2/pkg/api.SessionAuditLogger.func1.1"}
+## PUT du manifeste de la VSA (sha256:c1bfbcbd7a1d…)
+lignes : 1
+heure de Zot : 2026-11-03T15:00:59.26798379Z ; timeVerified : 2026-11-03T14:27:05Z
+OK   push postérieur à timeVerified, de 2034 s (borne haute de l'heure du replay)
+## contre-épreuve : marqueur jamais émis
+requête de l'auditeur : HTTP 200, 0 ligne(s) ; champs : ["labels","Time","Line","tsNs","labelTypes","id"]
+lignes de données contenant le marqueur : 0

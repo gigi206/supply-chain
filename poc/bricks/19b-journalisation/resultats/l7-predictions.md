@@ -20,3 +20,14 @@ Prédictions :
 5. Contre-épreuve : 0 ligne de données ne contient le marqueur jamais émis.
 
 **Portée** : cette corroboration ne donne qu'une **borne haute** de l'heure du replay (la VSA existait au plus tard au moment du push). La borne basse des 24 h repose sur `timeVerified`, affirmé par le domaine, et sur les compteurs du lien de R4, relevés par l'hôte.
+
+## Résultat de `corroborer_vsa` (03/11/2026, 15:47:05 UTC ; choix du propriétaire : « Oui, lancer »)
+
+[`l7-corroborer_vsa.log`](l7-corroborer_vsa.log) : **les cinq prédictions sont conformes.**
+1. HTTP 200. Champs du cadre de données de Grafana : `labels`, `Time`, `Line`, `tsNs`, `labelTypes`, `id`.
+2. Une seule ligne `PUT …/builds/vsa/sample-app/manifests/sha256:c1bfbcbd…`, `subject` `poc-replay`, statut 201, `time` à **15:00:59.268 UTC**.
+3. Quatre autres lignes, POST 202 puis PUT 201 pour chacun des deux blobs (`7b93e4b3…` et `44136fa3…`), de 15:00:56.382 à 15:00:58.030 UTC. Aucune autre écriture de `poc-replay` sous `builds/vsa/` entre 14:00 et 16:00 UTC. Toutes viennent de `192.168.161.1`, l'hôte, qui transporte la VSA.
+4. `OK` : le push est postérieur à `timeVerified` de **2 034 s**.
+5. Contre-épreuve : 0 ligne.
+
+**Portée, inchangée** : l'heure du replay est bornée par le haut, à 15:00:59 UTC au plus tard, par un témoin extérieur au domaine (l'audit de Zot, lu par l'auditeur dans Grafana). La borne basse des 24 h repose toujours sur `timeVerified`, affirmé par le domaine, et sur les compteurs du lien de R4.

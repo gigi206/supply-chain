@@ -483,7 +483,15 @@ Demande du propriétaire du 03/11/2026 : « Replay dans Grafana ». À la clôtu
 
 L'auditeur lit, à travers Grafana, les écritures de `poc-replay` sous `builds/vsa/` dans l'audit de Zot (J6), puis l'heure du PUT du manifeste de la VSA est comparée à `timeVerified`. Une contre-épreuve vérifie qu'un marqueur jamais émis est bien absent. Prédictions : [`l7-predictions.md`](resultats/l7-predictions.md). Portée : une **borne haute** de l'heure du replay, pas la borne basse des 24 h.
 
-### Journal de la VM dans Loki : contraintes et décisions à prendre
+**Exécutée le 03/11/2026 à 15:47:05 UTC** (choix du propriétaire : « Oui, lancer » ; [`l7-corroborer_vsa.log`](resultats/l7-corroborer_vsa.log)). Les cinq prédictions sont conformes :
+- le PUT du manifeste `c1bfbcbd…` par `poc-replay` est daté par Zot de **15:00:59 UTC**, soit 2 034 s après `timeVerified` ;
+- les quatre écritures des deux blobs le précèdent de 1 à 3 s ;
+- aucune autre écriture de `poc-replay` sous `builds/vsa/` entre 14:00 et 16:00 UTC ;
+- la contre-épreuve ne trouve rien.
+
+La corroboration prévue par la brique 10 est faite : borne haute seulement.
+
+### Journal de la VM dans Loki : contraintes et décisions
 
 Contraintes (mesurées ou lues, pas supposées) :
 - **réseau** : la VM ne joint pas `sc-stockage` (R2 de la 10, réseau distinct choisi par le propriétaire) ;
@@ -519,3 +527,17 @@ Contraintes (mesurées ou lues, pas supposées) :
 - journald n'est pas scellé (pas de FSS) ;
 - le root de l'hôte peut altérer un lot avant son envoi. C'est le même administrateur que le domaine (D1 b de la 10) ;
 - aucune alerte de source muette pour le domaine.
+
+### Décisions retenues par le propriétaire (03/11/2026, vers 15:46 UTC)
+
+- **D19 (b) : Alloy dans la VM**, et non ma recommandation (a). Le domaine envoie son journal en continu.
+- **D20 (a)** : port 3503 du relais, autorité propre au domaine, étiquette `noeud="sc-replay"` imposée.
+- **D21 (a)** : journal de la VM seul.
+
+**Conséquence de D19 (b), mesurée le 03/11/2026 vers 15:48 UTC** : depuis la VM, `192.168.161.13:3501` répond « Connection refused » (refus du pare-feu de libvirt entre les deux réseaux). La route vers le relais n'existe donc pas. Je n'ai pas root sur l'hôte (`sudo -n` demande un mot de passe). Deux façons de l'ouvrir :
+- (b1) **une règle de pare-feu sur l'hôte**, posée par le propriétaire en root, qui laisse passer `192.168.162.14` vers `192.168.161.13:3503` seulement. C'est une modification système du poste. Les règles de libvirt sont réécrites au redémarrage d'un réseau : la règle devrait survivre à cela (crochet de libvirt ou configuration nftables), ce que je n'ai pas lu ;
+- (b2) **un tunnel SSH inverse tenu par l'hôte**, sans root : `ssh -N -R 127.0.0.1:3503:192.168.161.13:3503` vers la VM, avec la clé du domaine, dans une unité systemd **utilisateur** du poste (`Restart=always`). Relevé dans la VM : `sshd` a `allowtcpforwarding yes` et `gatewayports no`, donc le port n'écoute que sur la boucle locale de la VM. Le TLS va de bout en bout, de l'Alloy de la VM au relais : l'hôte ne voit que du chiffré. Une option `permitlisten="127.0.0.1:3503"` sur la clé du domaine, dans `authorized_keys`, limiterait les renvois à ce seul port.
+
+Recommandé : (b2). Rien de système sur le poste, un seul port, et le chemin passe par l'hôte comme le reste du domaine.
+
+**Lu dans la doc et le code d'Alloy v1.21.3** : `loki.write` abandonne un lot après 10 nouvelles tentatives par défaut, soit environ 8 min avec un délai maximal de 5 min. Les coupures du lien de R4 duraient 20 min. Il est prévu de mettre `max_backoff_retries = 0` (essais sans fin, `args.go` : « zero means infinite retries ») pour l'Alloy de la VM seulement.
