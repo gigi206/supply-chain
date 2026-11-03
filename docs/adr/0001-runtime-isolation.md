@@ -102,8 +102,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 - [x] Infrastructure disponible : **bare metal** (laptop, KVM, virtualisation imbriquée active), vérifié le 29/10/2026.
 - [x] Dimensionnement et topologie sur le laptop : **validés le 29/10/2026** (kind pour A1, trois VM libvirt + k3s pour 08 ; [`poc/infra`](../../poc/infra/README.md)).
-- [ ] Nom de l'administrateur du domaine de replay (avant la brique 10).
-- [ ] Hébergement du domaine de replay : autre site ou autre hyperviseur ?
+- [x] Nom de l'administrateur du domaine de replay (avant la brique 10) : **le propriétaire**, par écart documenté (décision du 03/11/2026, brique 10, D1 b). La séparation est technique seulement : VM, clé SSH, clé de VSA et compte Zot propres. La séparation organisationnelle visée par docs/01 n'est pas démontrée dans le PoC, et la VSA le dit (`verifier.id`).
+- [x] Hébergement du domaine de replay : **quatrième VM libvirt `sc-replay` sur le laptop** (4 vCPU, 6 Gi, 20 Go ; décision du 03/11/2026, brique 10, D2 a et D3). Même hyperviseur : le root de l'hôte peut lire son disque, clé de VSA comprise (écart consigné).
 - [ ] Cluster final (note du propriétaire du 30/10/2026, à traiter lors de sa mise en place, pas dans le PoC) : Kubernetes sécurisé (durcissement RKE2, audit), journalisation, métriques et alertes, et mTLS entre services par un service mesh (Linkerd, Istio, ou Cilium : retenu pour le PoC, à confirmer pour le cluster final). Candidats à évaluer au doc 04 ([doc 02 §8](../02-architecture.md)).
   - Relevé de la brique 19b, L1 (02/11/2026, [`l1-releve.log`](../../poc/bricks/19b-journalisation/resultats/l1-releve.log)), à reprendre pour le cluster final ; aucune note modifiée :
     - l'audit de l'API (k3s), d'OpenBao et de Zot existe déjà dans le PoC (posé par la 08) ;

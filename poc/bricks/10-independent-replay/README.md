@@ -71,6 +71,17 @@ Demande du propriétaire : « Brique 10 ». Ce qui suit est un protocole à vali
 - **busybox statique** pour l'image de build (paquet Debian `busybox-static`, signé par l'archive Debian). Il ne change pas le binaire ;
 - **diffoscope** (paquet Debian ; verdict de doc 04 : « À surveiller, vérificateur secondaire »), utilisé seulement en cas d'écart et pour le test négatif.
 
+### Décisions retenues par le propriétaire (03/11/2026)
+
+Toutes les recommandations sont retenues :
+- **D1 (b)** : le propriétaire administre le domaine, par écart documenté. La séparation est technique seulement ; la VSA et ADR 0001 le disent.
+- **D2 (a)** : quatrième VM `sc-replay` sur le laptop, même hyperviseur (écart consigné).
+- **D3** : 4 vCPU, 6 Gi, 20 Go.
+- **D4 (a)** : lien coupé pendant le build, compteurs relus depuis l'hôte.
+- **D5 (a)** : compte Zot `poc-replay` en création par digest seulement, chaque push sur accord.
+- **D6 (a)** : clé cosign générée dans la VM.
+- **D7** : outils vérifiés, installés dans la VM.
+
 ### Jalons proposés (chacun soumis à accord ; prédictions datées avant chaque exécution)
 
 - **R1, relevé et essais sur l'hôte**, sans création de VM. Les essais se font dans `~/.cache/supply-chain-poc/10/`, sur 127.0.0.1, sans installation :
