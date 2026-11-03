@@ -541,3 +541,12 @@ Contraintes (mesurées ou lues, pas supposées) :
 Recommandé : (b2). Rien de système sur le poste, un seul port, et le chemin passe par l'hôte comme le reste du domaine.
 
 **Lu dans la doc et le code d'Alloy v1.21.3** : `loki.write` abandonne un lot après 10 nouvelles tentatives par défaut, soit environ 8 min avec un délai maximal de 5 min. Les coupures du lien de R4 duraient 20 min. Il est prévu de mettre `max_backoff_retries = 0` (essais sans fin, `args.go` : « zero means infinite retries ») pour l'Alloy de la VM seulement.
+
+### Report (03/11/2026, décision du propriétaire : « on réglera ce problème dans la stack finale »)
+
+L'envoi du journal de `sc-replay` dans Loki est **reporté à la stack finale**. Le choix de la route (tunnel SSH inverse ou règle de pare-feu sur l'hôte) et l'extension de `SourceMuette` au domaine ne sont pas tranchés. Rien n'a été installé dans la VM ni modifié sur `sc-stockage`.
+
+**État laissé** :
+- `corroborer_vsa` est fait, avec un résultat conforme ;
+- le journal de la VM reste **local et persistant**, avec 3 172 entrées depuis le 03/11/2026 à 10:00:43 UTC. Il n'est pas dans Grafana. **Supprimer la VM, ou nettoyer son journal, l'effacerait** : à faire seulement après un export, ou une fois l'envoi en place ;
+- Loki refuse les lignes de plus de 168 h. Si l'envoi arrive plus de 7 jours après un événement, cet événement n'entrera pas dans Loki par Alloy.
