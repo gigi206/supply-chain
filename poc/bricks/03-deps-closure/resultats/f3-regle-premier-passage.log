@@ -1,0 +1,731 @@
+# bascule.sh regle, 2026-11-03T18:46:20Z
+OK   bibliothèque conforma/policy : ebd3fbd270297c15f590f4023360465ffb41d4fe
+ec v0.10.42 ; 28 modules de la bibliothèque
+## ec opa check
+OK   aucune erreur
+## ec opa test
+FAILURES
+--------------------------------------------------------------------------------
+data.porte_test.test_une_bonne_parmi_plusieurs_acceptee: FAIL (45.567574ms)
+
+  query:1                                        Enter data.porte_test.test_une_bonne_parmi_plusieurs_acceptee = _  
+  porte_test.rego:203                            | Enter data.porte_test.test_une_bonne_parmi_plusieurs_acceptee  
+  porte_test.rego:118                            | | Enter data.porte_test._avec_valeur  
+  porte_test.rego:120                            | | | Enter __local2398__ = data.porte_test._regles; __local2399__ = data.porte_test._opts; d = data.porte.deny[__local1453__] with input.attestations as attestations with data.rule_data__configuration__ as __local2398__ with data.config.default_sigstore_opts as __local2399__ with ec.sigstore.verify_attestation as valeur  
+  porte.rego:19                                  | | | | Enter data.porte.deny  
+  policy/release/lib/attestations.rego:139       | | | | | Enter data.lib.tasks_from_pipelinerun  
+  policy/release/lib/attestations.rego:140       | | | | | | Enter att = data.lib.pipelinerun_attestations[__local1325__]; data.lib.tekton.tasks(att, __local2135__); task = __local2135__[__local1328__]  
+  policy/release/lib/attestations.rego:41        | | | | | | | Enter data.lib.pipelinerun_attestations  
+  policy/release/lib/attestations.rego:59        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:103       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance02  
+  policy/release/lib/attestations.rego:104       | | | | | | | | | | Enter att = input.attestations[__local1311__]; __local2671__ = att.statement.predicate.buildType; __local2672__ = data.lib._allowed_provenance_build_types; internal.member_2(__local2671__, __local2672__)  
+  policy/release/lib/attestations.rego:105       | | | | | | | | | | | Fail __local2671__ = att.statement.predicate.buildType  
+  policy/release/lib/attestations.rego:61        | | | | | | | | | Fail __local2119__ = 1  
+  policy/release/lib/attestations.rego:62        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:64        | | | | | | | | | Enter v02_with_timestamp = [a | a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)]; count(v02_with_timestamp, __local2120__); __local2665__ = data.lib.pipelinerun_slsa_provenance02; count(__local2665__, __local2121__); __local2120__ = __local2121__; __local2666__ = {ts | a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__}; max(__local2666__, __local2123__); max_v02_timestamp = __local2123__; att = v02_with_timestamp[__local1296__]; data.lib._build_finished_on(att, __local2124__); __local2124__ = max_v02_timestamp  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | Enter a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | | Fail a = data.lib.pipelinerun_slsa_provenance02[__local1287__]  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | Enter a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | | Fail a = v02_with_timestamp[__local1291__]  
+  policy/release/lib/attestations.rego:73        | | | | | | | | | | Fail max(__local2666__, __local2123__)  
+  policy/release/lib/attestations.rego:81        | | | | | | | | Enter data.lib.latest_v1_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:110       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance_v1  
+  policy/release/lib/attestations.rego:111       | | | | | | | | | | Enter att = input.attestations[__local1314__]; att.statement.predicateType = data.lib.slsa_provenance_predicate_type_v1; build_type = att.statement.predicate.buildDefinition.buildType; __local2673__ = data.lib._allowed_provenance_build_types; internal.member_2(build_type, __local2673__); data.lib._is_pipelinerun_v1(att)  
+  policy/release/lib/attestations.rego:18        | | | | | | | | | | | Enter data.lib._allowed_provenance_build_types  
+  policy/release/lib/attestations.rego:19        | | | | | | | | | | | | Enter data.lib.rule_data.get("allowed_provenance_build_types", __local2117__); t = __local2117__[__local1277__]  
+  policy/lib/rule_data/rule_data.rego:192        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:195        | | | | | | | | | | | | | | Fail value = data.rule_data__configuration__[key_name]  
+  policy/lib/rule_data/rule_data.rego:196        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:199        | | | | | | | | | | | | | | Fail value = data.rule_data_custom[key_name]  
+  policy/lib/rule_data/rule_data.rego:200        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:203        | | | | | | | | | | | | | | Fail value = data.rule_data[key_name]  
+  policy/release/lib/attestations.rego:126       | | | | | | | | | | | Enter data.lib._is_pipelinerun_v1  
+  policy/release/lib/attestations.rego:129       | | | | | | | | | | | | Fail __local2133__ = __local2134__  
+  policy/lib/tekton/task.rego:25                 | | | | | | | Enter data.lib.tekton.tasks  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Enter data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:64                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:65                 | | | | | | | | | | Fail given.statement.predicateType = data.lib.tekton.slsa_provenance_predicate_type_v02  
+  policy/lib/tekton/task.rego:69                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:70                 | | | | | | | | | | Fail given.spec  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  porte.rego:20                                  | | | | | Fail __local2143__ = 0  
+  porte.rego:45                                  | | | | Enter data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:45                                  | | | | Redo data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:74                                  | | | | Enter data.porte.deny  
+  porte.rego:98                                  | | | | | Enter data.porte._fermetures  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:98                                  | | | | | Redo data.porte._fermetures  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:89                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:89                                  | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:76                                  | | | | | Fail data.porte._construction_ou_preparation(task)  
+  porte.rego:81                                  | | | | Enter data.porte.deny  
+  porte.rego:83                                  | | | | | Enter data.porte._fermeture_prouvee(f)  
+  porte.rego:115                                 | | | | | | Enter data.porte._fermeture_prouvee  
+  porte.rego:117                                 | | | | | | | Fail __local2692__ = att.statement  
+  porte.rego:117                                 | | | | | | | Fail __local2692__ = att.statement  
+  porte.rego:83                                  | | | | | | Fail data.porte._fermeture_prouvee(f)  
+  porte_test.rego:205                            | | Enter data.porte_test._refus(__local2283__)  
+  porte_test.rego:125                            | | | Enter data.porte_test._refus  
+  porte_test.rego:127                            | | | | Fail d.code = "porte.fermeture_plateforme"  
+  porte_test.rego:205                            | | Fail not data.porte_test._refus(__local2283__)  
+  query:1                                        | Fail data.porte_test.test_une_bonne_parmi_plusieurs_acceptee = _  
+
+data.porte_test.test_fermeture_de_la_plateforme_acceptee: FAIL (49.39617ms)
+
+  query:1                                        Enter data.porte_test.test_fermeture_de_la_plateforme_acceptee = _  
+  porte_test.rego:140                            | Enter data.porte_test.test_fermeture_de_la_plateforme_acceptee  
+  porte_test.rego:111                            | | Enter data.porte_test._avec_fonction  
+  porte_test.rego:113                            | | | Enter __local2397__ = data.porte_test._regles; d = data.porte.deny[__local1448__] with input.attestations as attestations with data.rule_data__configuration__ as __local2397__ with data.config.default_sigstore_opts as opts with ec.sigstore.verify_attestation as data.porte_test._verif_bonne  
+  porte.rego:19                                  | | | | Enter data.porte.deny  
+  policy/release/lib/attestations.rego:139       | | | | | Enter data.lib.tasks_from_pipelinerun  
+  policy/release/lib/attestations.rego:140       | | | | | | Enter att = data.lib.pipelinerun_attestations[__local1325__]; data.lib.tekton.tasks(att, __local2135__); task = __local2135__[__local1328__]  
+  policy/release/lib/attestations.rego:41        | | | | | | | Enter data.lib.pipelinerun_attestations  
+  policy/release/lib/attestations.rego:59        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:103       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance02  
+  policy/release/lib/attestations.rego:104       | | | | | | | | | | Enter att = input.attestations[__local1311__]; __local2671__ = att.statement.predicate.buildType; __local2672__ = data.lib._allowed_provenance_build_types; internal.member_2(__local2671__, __local2672__)  
+  policy/release/lib/attestations.rego:105       | | | | | | | | | | | Fail __local2671__ = att.statement.predicate.buildType  
+  policy/release/lib/attestations.rego:61        | | | | | | | | | Fail __local2119__ = 1  
+  policy/release/lib/attestations.rego:62        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:64        | | | | | | | | | Enter v02_with_timestamp = [a | a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)]; count(v02_with_timestamp, __local2120__); __local2665__ = data.lib.pipelinerun_slsa_provenance02; count(__local2665__, __local2121__); __local2120__ = __local2121__; __local2666__ = {ts | a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__}; max(__local2666__, __local2123__); max_v02_timestamp = __local2123__; att = v02_with_timestamp[__local1296__]; data.lib._build_finished_on(att, __local2124__); __local2124__ = max_v02_timestamp  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | Enter a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | | Fail a = data.lib.pipelinerun_slsa_provenance02[__local1287__]  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | Enter a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | | Fail a = v02_with_timestamp[__local1291__]  
+  policy/release/lib/attestations.rego:73        | | | | | | | | | | Fail max(__local2666__, __local2123__)  
+  policy/release/lib/attestations.rego:81        | | | | | | | | Enter data.lib.latest_v1_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:110       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance_v1  
+  policy/release/lib/attestations.rego:111       | | | | | | | | | | Enter att = input.attestations[__local1314__]; att.statement.predicateType = data.lib.slsa_provenance_predicate_type_v1; build_type = att.statement.predicate.buildDefinition.buildType; __local2673__ = data.lib._allowed_provenance_build_types; internal.member_2(build_type, __local2673__); data.lib._is_pipelinerun_v1(att)  
+  policy/release/lib/attestations.rego:18        | | | | | | | | | | | Enter data.lib._allowed_provenance_build_types  
+  policy/release/lib/attestations.rego:19        | | | | | | | | | | | | Enter data.lib.rule_data.get("allowed_provenance_build_types", __local2117__); t = __local2117__[__local1277__]  
+  policy/lib/rule_data/rule_data.rego:192        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:195        | | | | | | | | | | | | | | Fail value = data.rule_data__configuration__[key_name]  
+  policy/lib/rule_data/rule_data.rego:196        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:199        | | | | | | | | | | | | | | Fail value = data.rule_data_custom[key_name]  
+  policy/lib/rule_data/rule_data.rego:200        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:203        | | | | | | | | | | | | | | Fail value = data.rule_data[key_name]  
+  policy/release/lib/attestations.rego:126       | | | | | | | | | | | Enter data.lib._is_pipelinerun_v1  
+  policy/release/lib/attestations.rego:129       | | | | | | | | | | | | Fail __local2133__ = __local2134__  
+  policy/lib/tekton/task.rego:25                 | | | | | | | Enter data.lib.tekton.tasks  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Enter data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:64                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:65                 | | | | | | | | | | Fail given.statement.predicateType = data.lib.tekton.slsa_provenance_predicate_type_v02  
+  policy/lib/tekton/task.rego:69                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:70                 | | | | | | | | | | Fail given.spec  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  porte.rego:20                                  | | | | | Fail __local2143__ = 0  
+  porte.rego:45                                  | | | | Enter data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:45                                  | | | | Redo data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:74                                  | | | | Enter data.porte.deny  
+  porte.rego:98                                  | | | | | Enter data.porte._fermetures  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:98                                  | | | | | Redo data.porte._fermetures  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:89                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:89                                  | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:76                                  | | | | | Fail data.porte._construction_ou_preparation(task)  
+  porte.rego:81                                  | | | | Enter data.porte.deny  
+  porte.rego:83                                  | | | | | Enter data.porte._fermeture_prouvee(f)  
+  porte.rego:115                                 | | | | | | Enter data.porte._fermeture_prouvee  
+  porte.rego:117                                 | | | | | | | Fail __local2692__ = att.statement  
+  porte.rego:83                                  | | | | | | Fail data.porte._fermeture_prouvee(f)  
+  porte_test.rego:141                            | | Enter data.porte_test._refus(__local2224__)  
+  porte_test.rego:125                            | | | Enter data.porte_test._refus  
+  porte_test.rego:127                            | | | | Fail d.code = "porte.fermeture_plateforme"  
+  porte_test.rego:141                            | | Fail not data.porte_test._refus(__local2224__)  
+  query:1                                        | Fail data.porte_test.test_fermeture_de_la_plateforme_acceptee = _  
+
+data.porte_test.test_seule_la_derniere_provenance_jugee: FAIL (52.37474ms)
+
+  query:1                                        Enter data.porte_test.test_seule_la_derniere_provenance_jugee = _  
+  porte_test.rego:208                            | Enter data.porte_test.test_seule_la_derniere_provenance_jugee  
+  porte_test.rego:111                            | | Enter data.porte_test._avec_fonction  
+  porte_test.rego:113                            | | | Enter __local2397__ = data.porte_test._regles; d = data.porte.deny[__local1448__] with input.attestations as attestations with data.rule_data__configuration__ as __local2397__ with data.config.default_sigstore_opts as opts with ec.sigstore.verify_attestation as data.porte_test._verif_bonne  
+  porte.rego:19                                  | | | | Enter data.porte.deny  
+  policy/release/lib/attestations.rego:139       | | | | | Enter data.lib.tasks_from_pipelinerun  
+  policy/release/lib/attestations.rego:140       | | | | | | Enter att = data.lib.pipelinerun_attestations[__local1325__]; data.lib.tekton.tasks(att, __local2135__); task = __local2135__[__local1328__]  
+  policy/release/lib/attestations.rego:41        | | | | | | | Enter data.lib.pipelinerun_attestations  
+  policy/release/lib/attestations.rego:59        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:103       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance02  
+  policy/release/lib/attestations.rego:104       | | | | | | | | | | Enter att = input.attestations[__local1311__]; __local2671__ = att.statement.predicate.buildType; __local2672__ = data.lib._allowed_provenance_build_types; internal.member_2(__local2671__, __local2672__)  
+  policy/release/lib/attestations.rego:105       | | | | | | | | | | | Fail __local2671__ = att.statement.predicate.buildType  
+  policy/release/lib/attestations.rego:105       | | | | | | | | | | | Fail __local2671__ = att.statement.predicate.buildType  
+  policy/release/lib/attestations.rego:61        | | | | | | | | | Fail __local2119__ = 1  
+  policy/release/lib/attestations.rego:62        | | | | | | | | Enter data.lib.latest_v02_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:64        | | | | | | | | | Enter v02_with_timestamp = [a | a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)]; count(v02_with_timestamp, __local2120__); __local2665__ = data.lib.pipelinerun_slsa_provenance02; count(__local2665__, __local2121__); __local2120__ = __local2121__; __local2666__ = {ts | a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__}; max(__local2666__, __local2123__); max_v02_timestamp = __local2123__; att = v02_with_timestamp[__local1296__]; data.lib._build_finished_on(att, __local2124__); __local2124__ = max_v02_timestamp  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | Enter a = data.lib.pipelinerun_slsa_provenance02[__local1287__]; data.lib._build_finished_on(a)  
+  policy/release/lib/attestations.rego:65        | | | | | | | | | | | Fail a = data.lib.pipelinerun_slsa_provenance02[__local1287__]  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | Enter a = v02_with_timestamp[__local1291__]; data.lib._build_finished_on(a, __local2122__); ts = __local2122__  
+  policy/release/lib/attestations.rego:74        | | | | | | | | | | | Fail a = v02_with_timestamp[__local1291__]  
+  policy/release/lib/attestations.rego:73        | | | | | | | | | | Fail max(__local2666__, __local2123__)  
+  policy/release/lib/attestations.rego:81        | | | | | | | | Enter data.lib.latest_v1_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:110       | | | | | | | | | Enter data.lib.pipelinerun_slsa_provenance_v1  
+  policy/release/lib/attestations.rego:111       | | | | | | | | | | Enter att = input.attestations[__local1314__]; att.statement.predicateType = data.lib.slsa_provenance_predicate_type_v1; build_type = att.statement.predicate.buildDefinition.buildType; __local2673__ = data.lib._allowed_provenance_build_types; internal.member_2(build_type, __local2673__); data.lib._is_pipelinerun_v1(att)  
+  policy/release/lib/attestations.rego:18        | | | | | | | | | | | Enter data.lib._allowed_provenance_build_types  
+  policy/release/lib/attestations.rego:19        | | | | | | | | | | | | Enter data.lib.rule_data.get("allowed_provenance_build_types", __local2117__); t = __local2117__[__local1277__]  
+  policy/lib/rule_data/rule_data.rego:192        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:195        | | | | | | | | | | | | | | Fail value = data.rule_data__configuration__[key_name]  
+  policy/lib/rule_data/rule_data.rego:196        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:199        | | | | | | | | | | | | | | Fail value = data.rule_data_custom[key_name]  
+  policy/lib/rule_data/rule_data.rego:200        | | | | | | | | | | | | | Enter data.lib.rule_data.get  
+  policy/lib/rule_data/rule_data.rego:203        | | | | | | | | | | | | | | Fail value = data.rule_data[key_name]  
+  policy/release/lib/attestations.rego:126       | | | | | | | | | | | Enter data.lib._is_pipelinerun_v1  
+  policy/release/lib/attestations.rego:129       | | | | | | | | | | | | Fail __local2133__ = __local2134__  
+  policy/release/lib/attestations.rego:111       | | | | | | | | | | Redo att = input.attestations[__local1314__]; att.statement.predicateType = data.lib.slsa_provenance_predicate_type_v1; build_type = att.statement.predicate.buildDefinition.buildType; __local2673__ = data.lib._allowed_provenance_build_types; internal.member_2(build_type, __local2673__); data.lib._is_pipelinerun_v1(att)  
+  policy/release/lib/attestations.rego:126       | | | | | | | | | | | Enter data.lib._is_pipelinerun_v1  
+  policy/release/lib/attestations.rego:129       | | | | | | | | | | | | Fail __local2133__ = __local2134__  
+  policy/release/lib/attestations.rego:83        | | | | | | | | | Fail __local2125__ = 1  
+  policy/release/lib/attestations.rego:84        | | | | | | | | Enter data.lib.latest_v1_pipelinerun_attestation  
+  policy/release/lib/attestations.rego:86        | | | | | | | | | Enter v1_with_timestamp = [a | a = data.lib.pipelinerun_slsa_provenance_v1[__local1299__]; data.lib._build_finished_on(a)]; count(v1_with_timestamp, __local2126__); __local2669__ = data.lib.pipelinerun_slsa_provenance_v1; count(__local2669__, __local2127__); __local2126__ = __local2127__; __local2670__ = {ts | a = v1_with_timestamp[__local1303__]; data.lib._build_finished_on(a, __local2128__); ts = __local2128__}; max(__local2670__, __local2129__); max_v1_timestamp = __local2129__; att = v1_with_timestamp[__local1308__]; data.lib._build_finished_on(att, __local2130__); __local2130__ = max_v1_timestamp  
+  policy/release/lib/attestations.rego:87        | | | | | | | | | | Enter a = data.lib.pipelinerun_slsa_provenance_v1[__local1299__]; data.lib._build_finished_on(a)  
+  policy/release/lib/attestations.rego:45        | | | | | | | | | | | Enter data.lib._build_finished_on  
+  policy/release/lib/attestations.rego:47        | | | | | | | | | | | | Fail timestamp = att.statement.predicate.metadata.buildFinishedOn  
+  policy/release/lib/attestations.rego:48        | | | | | | | | | | | Enter data.lib._build_finished_on  
+  policy/release/lib/attestations.rego:50        | | | | | | | | | | | | Fail timestamp = att.statement.predicate.runDetails.metadata.buildFinishedOn  
+  policy/release/lib/attestations.rego:87        | | | | | | | | | | Redo a = data.lib.pipelinerun_slsa_provenance_v1[__local1299__]; data.lib._build_finished_on(a)  
+  policy/release/lib/attestations.rego:45        | | | | | | | | | | | Enter data.lib._build_finished_on  
+  policy/release/lib/attestations.rego:47        | | | | | | | | | | | | Fail timestamp = att.statement.predicate.metadata.buildFinishedOn  
+  policy/release/lib/attestations.rego:48        | | | | | | | | | | | Enter data.lib._build_finished_on  
+  policy/release/lib/attestations.rego:50        | | | | | | | | | | | | Fail timestamp = att.statement.predicate.runDetails.metadata.buildFinishedOn  
+  policy/release/lib/attestations.rego:100       | | | | | | | | | | Fail __local2130__ = max_v1_timestamp  
+  policy/lib/tekton/task.rego:25                 | | | | | | | Enter data.lib.tekton.tasks  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Enter data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:64                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:65                 | | | | | | | | | | Fail given.statement.predicateType = data.lib.tekton.slsa_provenance_predicate_type_v02  
+  policy/lib/tekton/task.rego:69                 | | | | | | | | | Enter data.lib.tekton._maybe_tasks  
+  policy/lib/tekton/task.rego:70                 | | | | | | | | | | Fail given.spec  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/task.rego:31                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/task.rego:37                 | | | | | | | | | | Fail not task.status.results  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Enter data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:18                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | | | | | Fail bundle = r.bundle  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:166                | | | | | | | | | | | Enter data.lib.tekton._pinned_ref_for_bundle  
+  policy/lib/image/image.rego:7                  | | | | | | | | | | | | Enter data.lib.image.parse  
+  policy/lib/image/image.rego:86                 | | | | | | | | | | | | | Enter data.lib.image._get  
+  policy/lib/image/image.rego:87                 | | | | | | | | | | | | | | Fail value = ary[index]  
+  policy/lib/tekton/refs.rego:140                | | | | | | | | | | | Enter data.lib.tekton._key_for_bundle  
+  policy/lib/tekton/refs.rego:142                | | | | | | | | | | | | Fail neq(__local2574__, "")  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Enter data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:175                | | | | | | | | | | | Enter data.lib.tekton._with_tagged_ref  
+  policy/lib/tekton/refs.rego:176                | | | | | | | | | | | | Fail neq(tagged_ref, "")  
+  policy/lib/tekton/task.rego:57                 | | | | | | | | | | Enter data.lib.tekton._slsav1_task_params  
+  policy/lib/tekton/task.rego:58                 | | | | | | | | | | | Fail task.spec.params  
+  policy/lib/tekton/task.rego:26                 | | | | | | | | Redo data.lib.tekton._maybe_tasks(obj, __local1873__); maybe_task = __local1873__[__local790__]; data.lib.tekton._slsa_task(maybe_task, __local1874__); task = __local1874__  
+  policy/lib/tekton/task.rego:43                 | | | | | | | | | Redo data.lib.tekton._slsa_task  
+  policy/lib/tekton/refs.rego:34                 | | | | | | | | | | Redo data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:100                | | | | | | | | | | | Redo data.lib.tekton._param  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  policy/lib/tekton/refs.rego:102                | | | | | | | | | | | | Fail param.name = name  
+  porte.rego:20                                  | | | | | Fail __local2143__ = 0  
+  porte.rego:45                                  | | | | Enter data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:45                                  | | | | Redo data.porte.deny  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:54                                  | | | | | Enter data.porte._construction  
+  policy/lib/tekton/refs.rego:18                 | | | | | | Enter data.lib.tekton.task_ref  
+  policy/lib/tekton/refs.rego:106                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:108                | | | | | | | | Fail r = task.ref  
+  policy/lib/tekton/refs.rego:109                | | | | | | | Enter data.lib.tekton._ref  
+  policy/lib/tekton/refs.rego:111                | | | | | | | | Fail r = task.taskRef  
+  policy/lib/tekton/refs.rego:21                 | | | | | | | Fail bundle = r.bundle  
+  porte.rego:54                                  | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:47                                  | | | | | Fail data.porte._construction(task)  
+  porte.rego:74                                  | | | | Enter data.porte.deny  
+  porte.rego:98                                  | | | | | Enter data.porte._fermetures  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Enter data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Enter data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:98                                  | | | | | Redo data.porte._fermetures  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:164                | | | | | | | Fail result_name = name  
+  policy/lib/tekton/task.rego:161                | | | | | | Redo data.lib.tekton.task_result  
+  policy/lib/tekton/task.rego:238                | | | | | | | Redo data.lib.tekton._key_value  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  policy/lib/tekton/task.rego:240                | | | | | | | | Fail key = name  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:100                                 | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:77                                  | | | | | Fail __local2155__ = 0  
+  porte.rego:87                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:54                                  | | | | | | Enter data.porte._construction  
+  porte.rego:54                                  | | | | | | | Fail __local2151__.name = "construire-image"  
+  porte.rego:56                                  | | | | | | Enter data.porte._construction  
+  porte.rego:58                                  | | | | | | | Fail __local2154__[0] = "sc-stockage.poc.test:5000/tekton/tasks/construire-image"  
+  porte.rego:87                                  | | | | | | Fail data.porte._construction(task)  
+  porte.rego:89                                  | | | | | Enter data.porte._construction_ou_preparation  
+  porte.rego:91                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:91                                  | | | | | | | Fail __local2158__.name = "preparer-entrees"  
+  porte.rego:93                                  | | | | | | Enter data.porte._preparation  
+  porte.rego:95                                  | | | | | | | Fail __local2161__[0] = "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"  
+  porte.rego:89                                  | | | | | | Fail data.porte._preparation(task)  
+  porte.rego:76                                  | | | | | Fail data.porte._construction_ou_preparation(task)  
+  porte.rego:81                                  | | | | Enter data.porte.deny  
+  porte.rego:83                                  | | | | | Enter data.porte._fermeture_prouvee(f)  
+  porte.rego:115                                 | | | | | | Enter data.porte._fermeture_prouvee  
+  porte.rego:117                                 | | | | | | | Fail __local2692__ = att.statement  
+  porte.rego:83                                  | | | | | | Fail data.porte._fermeture_prouvee(f)  
+  porte_test.rego:210                            | | Enter data.porte_test._refus(__local2285__)  
+  porte_test.rego:125                            | | | Enter data.porte_test._refus  
+  porte_test.rego:127                            | | | | Fail d.code = "porte.fermeture_plateforme"  
+  porte_test.rego:210                            | | Fail not data.porte_test._refus(__local2285__)  
+  query:1                                        | Fail data.porte_test.test_seule_la_derniere_provenance_jugee = _  
+
+SUMMARY
+--------------------------------------------------------------------------------
+porte_test.rego:153:
+data.porte_test.test_sans_resultat_fermeture_refusee: PASS (16.969176ms)
+porte_test.rego:215:
+data.porte_test.test_image_d_essai_hors_regle: PASS (17.005787ms)
+porte_test.rego:149:
+data.porte_test.test_cle_absente_refusee: PASS (38.967465ms)
+porte_test.rego:144:
+data.porte_test.test_fermeture_de_l_hote_refusee: PASS (43.189665ms)
+porte_test.rego:159:
+data.porte_test.test_fermeture_sans_digest_refusee: PASS (44.113081ms)
+porte_test.rego:192:
+data.porte_test.test_builder_inconnu_refuse: PASS (43.976767ms)
+porte_test.rego:203:
+data.porte_test.test_une_bonne_parmi_plusieurs_acceptee: FAIL (45.567574ms)
+porte_test.rego:163:
+data.porte_test.test_attestation_de_taskrun_seule_refusee: PASS (45.710444ms)
+porte_test.rego:174:
+data.porte_test.test_tache_hors_liste_revue_refusee: PASS (45.600328ms)
+porte_test.rego:187:
+data.porte_test.test_autre_depot_forgejo_refuse: PASS (45.827831ms)
+porte_test.rego:182:
+data.porte_test.test_digest_publie_different_refuse: PASS (47.377394ms)
+porte_test.rego:169:
+data.porte_test.test_tache_en_trop_refusee: PASS (47.472302ms)
+porte_test.rego:197:
+data.porte_test.test_depot_hors_builds_fermetures_refuse: PASS (48.581793ms)
+porte_test.rego:140:
+data.porte_test.test_fermeture_de_la_plateforme_acceptee: FAIL (49.39617ms)
+porte_test.rego:208:
+data.porte_test.test_seule_la_derniere_provenance_jugee: FAIL (52.37474ms)
+--------------------------------------------------------------------------------
+PASS: 12/15
+FAIL: 3/15

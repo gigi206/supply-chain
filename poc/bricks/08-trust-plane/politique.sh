@@ -73,7 +73,7 @@
 set -euo pipefail
 export LC_ALL=C
 
-here=$(cd "$(dirname "$0")" && pwd)
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)   # BASH_SOURCE : aussi sourcé hors de son dossier (bascule.sh de la brique 03)
 . "$here/commun.sh"
 BAO_INDEX=sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh (conteneur d'initialisation du CronJob)
 KY_DEPOT=kyverno/kyverno

@@ -311,6 +311,10 @@ run = "poc/bricks/03-deps-closure/traefik.sh"
 description = "Brique 03, F2 : prefetch de sample-app dans la plateforme (D1 a, D2 et D3 révisées, D4 a) ; étapes : image cilium compte reseau taches prefetch provenance, chacune sous accord"
 run = "poc/bricks/03-deps-closure/prefetch.sh"
 
+[tasks."fermetures:f3"]
+description = "Brique 03, F3 : bascule de la construction de sample-app sur la fermeture de la plateforme (D5 a, D6 a) ; étapes : regle (hôte), puis taches porte temoins lecture_seule construire provenance bascule, chacune sous accord"
+run = "poc/bricks/03-deps-closure/bascule.sh"
+
 [tasks.journalisation]
 description = "Brique 19b, journalisation d'audit dans Grafana : L1, relevé en lecture seule (étapes : telecharger releve) ; L2, Loki et Grafana sur sc-stockage, JALON=l2 (étapes : certificats installer controle) ; L3, Alloy sur les trois VM, JALON=l3 (étapes : certificats_l3 evenements openbao_sortie alloy controle_l3) ; L4, contrôle final, JALON=l4 (étapes : prometheus_alloy temoins secrets muette) ; L5, battement de cœur (D18), JALON=l5 (étapes : battement silences muette) ; L6, TLS sur le gRPC de Loki et du relais, JALON=l6 (étapes : certificats_grpc avant_grpc grpc_tls controle_grpc pertes_grpc, puis controle_l3 temoins) ; L7, domaine de replay de la brique 10, JALON=l7 (étapes : corroborer_vsa)"
 run = "poc/bricks/19b-journalisation/journalisation.sh"

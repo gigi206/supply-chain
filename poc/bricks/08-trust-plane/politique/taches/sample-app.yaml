@@ -4,7 +4,11 @@
 # dépôt (fermeture, web/dist, image de build) sont fixées ici par digest : la signature de la pipeline couvre ces choix, que le
 # créateur du PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt, le workspace sortie (PVC) et le
 # runtimeClassName de la tâche construire (taskRunSpecs).
-# @PREPARER@, @CONSTRUIRE@, @PUBLIER@, @FERMETURE@, @WEB_DIST@, @BUILDER@, @IMAGE@ : construction.sh taches.
+# Brique 03, F3 (D5 a, décision du propriétaire du 03/11/2026) : un seul workspace sortie (un PVC : coschedule workspaces de
+# Tekton v1.15.5 refuse un TaskRun lié à deux PVC), lié par sous-dossier : preparer écrit entrees/ à la racine ; construire lit
+# entrees/ en lecture seule et écrit image/ ; publier lit image/. La fermeture vient de la pipeline de prefetch (F2).
+# @PREPARER@, @CONSTRUIRE@, @PUBLIER@, @FERMETURE@, @WEB_DIST@, @BUILDER@, @IMAGE@ : construction.sh taches (J7, fermeture de l'hôte)
+# ou bascule.sh taches de la brique 03 (F3, fermeture de la plateforme).
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -59,8 +63,12 @@ spec:
       - name: kind
         value: task
     workspaces:
+    - name: entrees
+      workspace: sortie
+      subPath: entrees
     - name: sortie
       workspace: sortie
+      subPath: image
   - name: publier
     taskRef:
       resolver: bundles
@@ -79,3 +87,4 @@ spec:
     workspaces:
     - name: sortie
       workspace: sortie
+      subPath: image

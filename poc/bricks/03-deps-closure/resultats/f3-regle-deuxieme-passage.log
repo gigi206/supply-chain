@@ -1,0 +1,39 @@
+# bascule.sh regle, 2026-11-03T18:46:33Z
+OK   bibliothèque conforma/policy : ebd3fbd270297c15f590f4023360465ffb41d4fe
+ec v0.10.42 ; 28 modules de la bibliothèque
+## ec opa check
+OK   aucune erreur
+## ec opa test
+porte_test.rego:153:
+data.porte_test.test_sans_resultat_fermeture_refusee: PASS (17.71938ms)
+porte_test.rego:215:
+data.porte_test.test_image_d_essai_hors_regle: PASS (16.775638ms)
+porte_test.rego:149:
+data.porte_test.test_cle_absente_refusee: PASS (38.493323ms)
+porte_test.rego:144:
+data.porte_test.test_fermeture_de_l_hote_refusee: PASS (41.274573ms)
+porte_test.rego:197:
+data.porte_test.test_depot_hors_builds_fermetures_refuse: PASS (41.962825ms)
+porte_test.rego:159:
+data.porte_test.test_fermeture_sans_digest_refusee: PASS (44.741404ms)
+porte_test.rego:192:
+data.porte_test.test_builder_inconnu_refuse: PASS (46.472914ms)
+porte_test.rego:169:
+data.porte_test.test_tache_en_trop_refusee: PASS (49.110806ms)
+porte_test.rego:163:
+data.porte_test.test_attestation_de_taskrun_seule_refusee: PASS (49.704063ms)
+porte_test.rego:174:
+data.porte_test.test_tache_hors_liste_revue_refusee: PASS (49.481689ms)
+porte_test.rego:203:
+data.porte_test.test_une_bonne_parmi_plusieurs_acceptee: PASS (56.806117ms)
+porte_test.rego:140:
+data.porte_test.test_fermeture_de_la_plateforme_acceptee: PASS (57.056114ms)
+porte_test.rego:182:
+data.porte_test.test_digest_publie_different_refuse: PASS (58.5314ms)
+porte_test.rego:187:
+data.porte_test.test_autre_depot_forgejo_refuse: PASS (73.264516ms)
+porte_test.rego:208:
+data.porte_test.test_seule_la_derniere_provenance_jugee: PASS (82.427717ms)
+--------------------------------------------------------------------------------
+PASS: 15/15
+# fin 2026-11-03T18:46:34Z

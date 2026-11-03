@@ -248,3 +248,78 @@ Résultats complets : [`resultats/f2-predictions.md`](resultats/f2-predictions.m
 - **Réseau** : `prefetch-sortie` laisse sortir en 443 vers le public, vers Forgejo et le DNS. Port 80, API de k3s et Zot refusés, avec trace dans Hubble.
 - **Prefetch** : deux PipelineRuns du commit `6391fd43` donnent **la même fermeture `74c265e7`**, dont le contenu gomod est celui de la fermeture de l'hôte. Chains la signe, et sa provenance la relie au commit, à l'image d'outils et aux tâches revues.
 - **Reste F3** : bascule de la construction, D5 et D6.
+
+## F3, préparation à sec (03/11/2026, à partir de 18:42 UTC ; demande du propriétaire : « continue », compris comme un oui à la seule préparation)
+
+Script : [`bascule.sh`](bascule.sh) (`mise run fermetures:f3 -- <étape>`). Prédictions et résultats :
+[`resultats/f3-predictions.md`](resultats/f3-predictions.md). Rien n'est poussé dans Zot ni appliqué au cluster avant
+l'accord d'exécution.
+
+**D6, règle `porte.fermeture_plateforme`** ([`porte.rego`](../08-trust-plane/politique/porte/porte.rego)) :
+- **Lecture de la fermeture** : elle vient du résultat `FERMETURE_ARTIFACT_INPUTS` du TaskRun `preparer-entrees`, dans le
+  contenu signé de la provenance, et jamais d'un motif de dépôt.
+- **Provenance jugée** : seule la plus récente des provenances de PipelineRun l'est, comme pour `trusted_task`
+  (`lib.pipelinerun_attestations` de la bibliothèque).
+  - Une construction de F3 qui redonne `3a7ca1b1` rend donc l'image de nouveau admissible, malgré l'ancienne provenance
+    restée attachée.
+  - À l'inverse, toute construction plus récente sur une fermeture de l'hôte la ferait refuser de nouveau.
+- **Vérification** : la provenance de la fermeture est vérifiée par `ec.sigstore.verify_attestation`, avec la clé et les
+  options de ec (`--public-key`, `--ignore-rekor`). Il en faut une issue d'un **PipelineRun** :
+  - buildType slsa-tekton et `builder.id` autorisé ;
+  - sujet égal à la fermeture, sous `builds/fermetures/` ;
+  - tâches exactement `prefetch-gomod` et `publier-fermeture`, de la liste revue ;
+  - digest et dépôt publiés par `publier-fermeture` ;
+  - même dépôt Forgejo que la construction.
+- **Cas exclu** : une attestation de TaskRun seule (`publier-fermeture` lancée hors de sa pipeline sur un PVC prérempli) ne
+  suffit pas.
+- **Champ** : la règle ne s'applique qu'aux provenances qui contiennent `preparer-entrees` ou `construire-image`. Les images
+  d'essai de la 08 ne sont pas touchées.
+- **Testée sur l'hôte**, étape `regle` : 21 tests sur des provenances simulées, à la forme des provenances réelles. Chacune
+  des 12 conditions testables, retirée, fait échouer au moins un test.
+  - La 13e (`predicateType`) est impliquée par la bibliothèque et gardée explicite.
+  - Quatre passages ratés sont archivés, dont un où les simulations étaient fausses et les refus non probants.
+
+**D5, entrées en lecture seule** ([`construire-image.yaml`](../08-trust-plane/politique/taches/construire-image.yaml),
+[`sample-app.yaml`](../08-trust-plane/politique/taches/sample-app.yaml)) :
+- **Pourquoi un seul PVC** : `coschedule: workspaces` de Tekton v1.15.5 refuse un TaskRun lié à deux PVC
+  (`ValidateOnlyOnePVCIsUsed`, lu au tag). La pipeline lie donc le même workspace par sous-dossier.
+  - `preparer` écrit `entrees/`.
+  - `construire` lit `entrees/` en `readOnly` et écrit `image/`.
+  - `publier` lit `image/`.
+  - Un volumeClaimTemplate donne un seul nom de PVC aux deux liaisons (`taskWorkspaceByWorkspaceVolumeSource`).
+- **Tâches touchées** : seule `construire-image` change. `preparer-entrees` et `publier-image` gardent leur bundle.
+- **Contrôle dans la tâche** : `construire-image` essaie d'écrire dans `entrees` et échoue si l'écriture passe.
+- **Lecture du layout** : BuildKit lit le layout en lecture seule. Le magasin local de containerd ne crée `ingest` qu'à la
+  première écriture (lu dans containerd v2.4.1).
+- **Limite** : l'étape est privilégiée et root. Le témoin `lecture_seule` mesure si un remontage en lecture-écriture dans
+  l'invité Kata permet d'écrire.
+
+**Autres changements** :
+- `politique.sh` calcule son dossier par `BASH_SOURCE`, pour être sourcé depuis la brique 03. Rien ne change pour
+  l'exécution directe ni pour `preuves.sh`, qui est dans le même dossier.
+- `construction.sh` (J7) rend désormais la tâche D5 et la pipeline à sous-dossiers, avec la fermeture de l'hôte.
+
+**Effets à connaître avant d'accorder l'exécution** :
+- **Zot** :
+  - bundles `tekton/tasks/{preparer-entrees,construire-image,publier-image}:f3` et `tekton/pipelines/sample-app:f3`, plus
+    `:f3-alteree` et `:f3-absente` (témoins) ;
+  - fermeture altérée dans `entrees/sample-app/fermeture-alteree` (`poc-ecriture`) ;
+  - enveloppes de Chains sur `builds/sample-app`.
+  - Zot n'autorise pas la suppression : ces objets restent.
+- **ConfigMap `porte`** : elle change durablement (D6 et liste revue). Entre les étapes `porte` et `construire`, l'image
+  réelle `3a7ca1b1` est **refusée** par la porte, pendant quelques minutes si tout se passe bien.
+- **Liste revue** :
+  - ajout du nouveau digest de `construire-image`, revu par le propriétaire en cours d'exécution, comme en F2 ;
+  - **retrait proposé de `403ccbd8`** (J7, entrées inscriptibles). Sans ce retrait, une construction avec l'ancienne tâche
+    resterait admise par `trusted_task`, et D5 ne serait qu'une option.
+- **Contrôle 6** : la VSA est liée au digest, pas à la provenance jugée (`vsa.sh`). Si F3 redonne `3a7ca1b1`, la porte retient
+  la VSA du rejeu de la provenance de J7, celle de la fermeture de l'hôte : c'est un écart à consigner. Si le digest diffère,
+  la porte refuse au contrôle 6 jusqu'à un nouveau rejeu de la brique 10 et au push d'une VSA, soumis à accord.
+- **Rejeu complet de la 08** (`rejeu.sh`) : avec D6, la bascule de J8 jugerait une image construite par J7 sur la fermeture de
+  l'hôte et la refuserait. Le rejeu doit intégrer F2 et F3 de la brique 03 avant la bascule de J8. C'est un travail à part,
+  après F3.
+- **`preuves.sh bascule`** relit `$W/construction/pipeline.ref` (J7). Rejoué après F3, il remettrait la pipeline de J7 en
+  service.
+- **Témoin `lecture_seule`** : un pod Kata privilégié en root, hors Tekton, dans `builds`, plus un PVC de 16 Mi. Tout est
+  supprimé à la fin.
+- **`web/dist`** reste un intrant produit sur l'hôte (inchangé).

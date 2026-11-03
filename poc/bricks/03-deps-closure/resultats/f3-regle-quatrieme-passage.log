@@ -1,0 +1,44 @@
+# bascule.sh regle, 2026-11-03T18:47:56Z
+OK   bibliothèque conforma/policy : ebd3fbd270297c15f590f4023360465ffb41d4fe
+ec v0.10.42 ; 28 modules de la bibliothèque
+## ec opa check
+OK   aucune erreur
+## ec opa test
+data.porte_test.test_cle_absente_refusee: PASS (36.448256ms)
+data.porte_test.test_fermeture_de_l_hote_refusee: PASS (38.799571ms)
+data.porte_test.test_builder_inconnu_refuse: PASS (42.089028ms)
+data.porte_test.test_build_type_autre_refuse: PASS (47.47476ms)
+data.porte_test.test_sujet_autre_digest_refuse: PASS (50.826223ms)
+data.porte_test.test_attestation_de_taskrun_seule_refusee: PASS (52.023492ms)
+data.porte_test.test_sans_resultat_fermeture_refusee: PASS (12.339357ms)
+data.porte_test.test_sujet_autre_nom_refuse: PASS (65.858415ms)
+data.porte_test.test_fermeture_de_la_plateforme_acceptee: PASS (70.35417ms)
+data.porte_test.test_tache_en_double_refusee: PASS (70.125792ms)
+data.porte_test.test_tache_hors_liste_revue_refusee: PASS (75.683913ms)
+data.porte_test.test_digest_publie_different_refuse: PASS (76.739893ms)
+data.porte_test.test_image_d_essai_hors_regle: PASS (42.032822ms)
+data.porte_test.test_autre_depot_forgejo_refuse: PASS (81.388631ms)
+data.porte_test.test_une_bonne_parmi_plusieurs_acceptee: PASS (81.588819ms)
+data.porte_test.test_image_url_autre_refuse: PASS (83.468471ms)
+data.porte_test.test_tache_en_trop_refusee: PASS (84.143661ms)
+data.porte_test.test_depot_hors_builds_fermetures_refuse: PASS (43.57201ms)
+data.porte_test.test_fermeture_sans_digest_refusee: PASS (35.080493ms)
+data.porte_test.test_seule_la_derniere_provenance_jugee: PASS (88.470941ms)
+data.porte_test.test_predicate_type_autre_refuse: PASS (51.385599ms)
+--------------------------------------------------------------------------------
+PASS: 21/21
+## mutations : chaque condition de la règle retirée tour à tour, au moins un test doit échouer
+OK   sans « count(_fermetures) == 0 » : test_seule_la_derniere_provenance_jugee,test_une_bonne_parmi_plusieurs_acceptee,test_fermeture_de_la_plateforme_acceptee
+OK   sans « regex.match(`^sha256:[0-9a-f]{64}$`, r.digest) » : test_fermeture_sans_digest_refusee
+KO   condition non couverte par les tests : st.predicateType == lib.slsa_provenance_predicate_type_v1
+OK   sans « st.predicate.buildDefinition.buildType == lib.tekton_slsav1_pipeline_run » : test_build_type_autre_refuse
+OK   sans « builder.id in rule_data.get("allowed_builder_ids") » : test_builder_inconnu_refuse
+OK   sans « regex.match(`^[^/]+/builds/fermetures/`, f.depot) » : test_depot_hors_builds_fermetures_refuse
+OK   sans « s.name == f.depot » : test_sujet_autre_nom_refuse
+OK   sans « sprintf("sha256:%s", [s.digest.sha256]) == f.digest » : test_sujet_autre_digest_refuse
+OK   sans « count(taches) == 2 » : test_tache_en_trop_refusee,test_tache_en_double_refusee
+OK   sans « count(tekton.untrusted_task_refs(taches, {})) == 0 » : test_tache_hors_liste_revue_refusee
+OK   sans « tekton.task_result(p, "IMAGE_URL") == f.depot » : test_image_url_autre_refuse
+OK   sans « tekton.task_result(p, "IMAGE_DIGEST") == f.digest » : test_digest_publie_different_refuse
+OK   sans « tekton.task_result(q, "CHAINS-GIT_URL") == f.git » : test_autre_depot_forgejo_refuse
+KO   1 condition(s) non couverte(s)

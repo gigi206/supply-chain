@@ -13,7 +13,11 @@
 #     Pod Security restricted de builds et par la règle pods-isolation ;
 #   - l'identifiant d'écriture de Zot n'entre jamais dans ce pod : l'image sort en tar OCI dans le workspace, et la tâche
 #     publier-image la pousse depuis un pod runc restreint ;
-#   - Dockerfile de la plateforme (brique 04), dans le script : le dépôt n'en fournit pas ; son unique RUN est en --network=none.
+#   - Dockerfile de la plateforme (brique 04), dans le script : le dépôt n'en fournit pas ; son unique RUN est en --network=none ;
+#   - brique 03, F3 (D5 a, décision du propriétaire du 03/11/2026) : les entrées sont lues dans le workspace entrees, monté en
+#     lecture seule (readOnly ; la pipeline le lie au sous-dossier entrees du PVC), l'image sort dans le workspace sortie (sous-
+#     dossier image). Une écriture dans entrees est essayée et doit échouer. Limite : l'étape est privilégiée et root ; la
+#     lecture seule protège des écritures, pas d'un remontage (mesuré à part : bascule.sh lecture_seule, brique 03).
 # @BUILDKIT@, @BUILDER_DIGEST@, @DOCKERFILE@, @DOCKERFILE_SHA@ : construction.sh taches.
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -21,6 +25,8 @@ metadata:
   name: construire-image
 spec:
   workspaces:
+  - name: entrees
+    readOnly: true
   - name: sortie
   results:
   - name: DIGEST_CONSTRUIT
@@ -51,7 +57,8 @@ spec:
     script: |
       #!/bin/sh
       set -eu
-      e=$(workspaces.sortie.path)/entrees
+      e=$(workspaces.entrees.path)
+      ! touch "$e/.ecriture" 2> /dev/null || { echo "workspace entrees inscriptible" >&2; exit 1; }
       mkdir -p /tmp/run /tmp/df
       i=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' "$e/builder/index.json")
       [ "$i" = @BUILDER_DIGEST@ ] || { echo "layout de l'image de build : $i" >&2; exit 1; }
@@ -65,6 +72,7 @@ spec:
       FIN
       [ "$(sha256sum < /tmp/df/Dockerfile | cut -c1-64)" = @DOCKERFILE_SHA@ ] || { echo "Dockerfile différent de la brique 04" >&2; exit 1; }
       echo "invité : $(nproc) vCPU, $(awk '/MemTotal/ {print $2}' /proc/meminfo) kB ; racine de BuildKit : $(awk '$2 == "/bk" {print $3}' /proc/mounts) ; image de build $i, $n blobs conformes"
+      echo "entrees : $(awk -v p="$e" '$2 == p {print $3, $4}' /proc/mounts) ; écriture refusée"
       buildkitd --oci-worker-snapshotter=native --addr unix:///tmp/run/bk.sock --root /bk > /tmp/bkd.log 2>&1 &
       k=$!
       for _ in $(seq 30); do buildctl --addr unix:///tmp/run/bk.sock debug workers > /dev/null 2>&1 && break; sleep 1; done
