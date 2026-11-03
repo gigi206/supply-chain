@@ -21,3 +21,13 @@ trusted_tasks:
   # J7 : politique/taches/publier-image.signee.yaml, pod runc restreint, push par digest avec le compte poc-images
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-image:
     - ref: sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+  # Brique 03, F2 (03/11/2026 ; décisions D1 a, D2 révisée deux fois, D3 révisée, D4 a du propriétaire) : prefetch de sample-app
+  # dans la plateforme. politique/taches/prefetch-gomod.signee.yaml, pod runc restreint sans secret, image d'outils
+  # plateforme/outils-prefetch@68e0ae70 (Dockerfile.prefetch de la 03), sortie limitée par la CiliumNetworkPolicy prefetch-sortie
+  # (adresses publiques en 443, Forgejo, DNS), proxy Go imposé (proxy.golang.org seul)
+  oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod:
+    - ref: sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+  # Brique 03, F2 : politique/taches/publier-fermeture.signee.yaml, pod runc restreint, compte Zot poc-fermetures (création par
+  # digest dans builds/fermetures/** seulement) ; émet IMAGE_URL et IMAGE_DIGEST pour que Chains signe la fermeture
+  oci://sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture:
+    - ref: sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
