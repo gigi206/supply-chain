@@ -31,3 +31,12 @@ Elles ne prouvent pas le « hors ligne » : seul le replay positif de R4 le port
 - **N1, fermeture altérée** (un octet changé dans une copie d'un zip de module Go de `deps`) : le build est **refusé**, parce que Go contrôle le zip contre `go.sum` (`checksum mismatch` ou `SECURITY ERROR`). Il n'y a pas d'image, donc rien à comparer : verdict `FAILED`, VSA ni signée ni poussée.
 - **N2, source altérée** (une chaîne changée dans une copie de `src`, par exemple `main.Version` dans le code) : le build **réussit**, avec un **digest différent** de `3a7ca1b1`. Verdict `FAILED`, VSA non poussée. Le rapport **diffoscope** entre l'image publiée et l'image reconstruite, archivé, montre une différence dans le binaire `sample-app` et nulle part ailleurs.
 - **N3, clés croisées** : la VSA vérifiée avec la **clé de Chains** est refusée, et la provenance vérifiée avec la **clé de VSA** aussi.
+
+## Additif du 03/11/2026 à 12:01 UTC : rangement révisé avant toute exécution de R5
+
+- **Mesure préalable** : [`r5-referrer-porte-predictions.md`](r5-referrer-porte-predictions.md). Une VSA en referrer de `builds/sample-app` ferait refuser l'image réelle par la porte de la 08.
+- **Choix du propriétaire** : « (a) Dépôt séparé ».
+- **Conséquences pour les prédictions de R5** :
+  - la VSA est poussée dans `builds/vsa/sample-app` par un manifeste fait main, poussé par digest, au lieu d'`oras attach` sur l'image ;
+  - elle est lue par `COSIGN_REPOSITORY` ;
+  - **ajout** : après le push, la porte de la 08 doit admettre l'image réelle, comme avant le push. C'est une nouvelle prédiction, à vérifier dans le cluster.

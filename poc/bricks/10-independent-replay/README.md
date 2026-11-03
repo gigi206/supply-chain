@@ -81,6 +81,10 @@ Toutes les recommandations sont retenues :
 - **D5 (a)** : compte Zot `poc-replay` en création par digest seulement, chaque push sur accord.
 - **D6 (a)** : clé cosign générée dans la VM.
 - **D7** : outils vérifiés, installés dans la VM.
+- **Rangement de la VSA révisé** (03/11/2026, vers 12:00 UTC, après la mesure préalable de R5, choix du propriétaire : « (a) Dépôt séparé ») :
+  - la VSA va dans **`builds/vsa/sample-app`**, et non dans `builds/sample-app` ;
+  - c'est un manifeste fait main dont le `subject` est l'image, poussé par digest sans étiquette ;
+  - les droits D5 sont inchangés.
 
 ### Jalons proposés (chacun soumis à accord ; prédictions datées avant chaque exécution)
 
@@ -287,4 +291,8 @@ Les scripts sont dans [`essais/`](essais), hors de `replay.sh` jusqu'à la fin d
 - **Durée de vie d'un referrer sans étiquette dont le sujet est absent du dépôt** : lu dans `08-trust-plane/stockage/zot.json`, `gc: false`, et aucune politique de rétention. Le ramasse-miettes de Zot est donc désactivé. **Non mesuré** dans le banc, qui a duré moins d'une minute. Les bundles de `horodatage/bundles`, eux, sont étiquetés.
 - **Droits** : en D5, les droits de `poc-replay` ont été mesurés sur `builds/essai-replay`. Ils acceptent un push par digest et un referrer sous `builds/**`. Le nom du dépôt définitif n'est pas mesuré.
 
-**Décision du propriétaire avant R5** : le rangement de la section 6 de la politique et de D5 est à revoir. Rien n'est poussé d'ici là.
+**Décision du propriétaire** (03/11/2026, vers 12:00 UTC) : « (a) Dépôt séparé ».
+- La VSA sera rangée dans `builds/vsa/sample-app`, selon la méthode mesurée ici : manifeste fait main, poussé par digest, sans étiquette.
+- `oras attach` n'est plus utilisé, car le sujet est absent de ce dépôt. Son comportement dans ce cas n'est pas mesuré.
+- La section 6 de la politique est mise à jour, avant d'en figer le digest.
+- Rien n'est poussé avant l'accord de R5.

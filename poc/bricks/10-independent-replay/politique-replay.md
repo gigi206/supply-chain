@@ -77,7 +77,11 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
 
 - **Clé** : clé cosign du domaine, générée dans la VM (D6). Jamais celle de Chains, ni l'OpenBao du plan de confiance.
 - **Signature** : `cosign attest --signing-config` avec une configuration sans aucun service, donc sans Fulcio, Rekor ni TSA. Mesuré en R1 : sans cette configuration, cosign 3.1.4 interroge le TUF public de Sigstore.
-- **Rangement** : en referrer OCI 1.1 de l'image (format bundle Sigstore v0.3, sans tag `.att`), par le compte Zot `poc-replay` en création par digest seulement (D5). Chaque push est soumis à l'accord du propriétaire.
+- **Rangement** : en referrer OCI 1.1 de l'image (format bundle Sigstore v0.3, sans tag `.att`), **dans le dépôt séparé `builds/vsa/sample-app`**, et non dans celui de l'image.
+  - Le manifeste est fait main : son `subject` est le descripteur de l'image. Il est poussé par digest, sans étiquette, par le compte Zot `poc-replay` en création par digest seulement (D5).
+  - Chaque push est soumis à l'accord du propriétaire.
+  - **Raison, mesurée le 03/11/2026** : un referrer de type bundle dans le dépôt de l'image fait ignorer `.sig` et `.att` par ec et cosign, et la porte de la 08 refuserait l'image.
+  - **Lecture** : `COSIGN_REPOSITORY=<registre>/builds/vsa/sample-app cosign verify-attestation --key <clé de la VSA> --type https://slsa.dev/verification_summary/v1 <image>`.
 
 ## Limites
 
