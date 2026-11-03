@@ -232,3 +232,9 @@ Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy d
 - provenance.
 
 D5 (workspace en lecture seule) et D6 (règle de la porte) sont faites en F3, avec la bascule de la construction : la fenêtre pendant laquelle la porte refuse `3a7ca1b1` reste ainsi la plus courte possible.
+
+**D2, révisée une seconde fois (03/11/2026, 18:17 UTC ; décision du propriétaire : « Sortie 443 hors privé (Recommandé) »).**
+- Mesuré : `l7Proxy: true` démarre l'Envoy embarqué dans les trois agents. cilium/proxy est évalué « À surveiller » au doc 04. Retour à `l7Proxy: false` à 18:11 UTC ([résultats](resultats/f2-predictions.md)).
+- Le pod de prefetch sort vers les adresses publiques en 443 seulement, plus Forgejo et le DNS.
+- La source des modules est imposée par Hermeto (`HERMETO_GOMOD__PROXY_URL=https://proxy.golang.org`), et leur intégrité par `go.sum`.
+- Limite : un pod compromis pourrait envoyer le code cloné vers une adresse publique.

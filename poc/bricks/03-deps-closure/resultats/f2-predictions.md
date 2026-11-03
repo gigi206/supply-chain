@@ -140,3 +140,23 @@ Le digest est épinglé dans `prefetch.sh`.
 - Plan de sortie : `l7Proxy: false`, avec une sortie par plages d'adresses.
 
 D2 est resoumise au propriétaire.
+
+## Additif du 03/11/2026, 18:17 UTC (avant la reprise à `compte`) : D2 révisée une seconde fois
+
+Décision du propriétaire : **« Sortie 443 hors privé (Recommandé) »**, sur l'avis de l'advisor. Envoy reste arrêté, et l'étape `cilium` est abandonnée.
+- [`prefetch-sortie.yaml`](../../08-trust-plane/politique/prefetch-sortie.yaml) :
+  - `toCIDRSet` 0.0.0.0/0 sauf 10/8, 172.16/12, 192.168/16, 169.254/16 et 127/8, en 443 seulement ;
+  - Forgejo en 3000 ;
+  - DNS vers kube-dns, sans inspection.
+- `prefetch-gomod` : `HERMETO_GOMOD__PROXY_URL=https://proxy.golang.org`, sans repli direct. Le réglage passe par l'environnement : préfixe `HERMETO_`, séparateur `__`, lus dans `config.py` de 0.64.0. La tâche n'était pas encore signée.
+- **Limite consignée** : un pod de prefetch compromis pourrait envoyer le code cloné vers une adresse publique en 443. L'intégrité des modules reste assurée par `go.sum`.
+
+**Prédictions de `reseau` remplacées** (les points 15 à 17 de 17:28 ne valent plus) :
+
+15. Sonde au label :
+    - **joints** : `proxy.golang.org` (200), `storage.googleapis.com` (400, prédiction faible sur le code), **`sum.golang.org` (200) et `github.com` (200)**, Forgejo ;
+    - **refusés** par délai dépassé : `proxy.golang.org` en 80, l'API de k3s (192.168.161.11:6443) et Zot.
+16. Sonde sans label : tout est joint (témoin).
+17. Hubble : `DROPPED` (`POLICY_DENIED`) vers 192.168.161.11:6443, vers Zot et en 80 ; `FORWARDED` en 443 vers les adresses publiques.
+
+Point 19, ajouté : le journal de Hermeto affiche « Using registry proxy https://proxy.golang.org ».

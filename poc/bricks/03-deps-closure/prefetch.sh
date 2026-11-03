@@ -7,14 +7,14 @@
 #               nix de python313, gitMinimal et cacert, Go 1.26.10 comparé à sum.golang.org, busybox) ; BuildKit rootless
 #               éphémère, deux constructions sans cache au même digest, essai des versions hors réseau ; copie dans Zot
 #               (poc-ecriture, plateforme/outils-prefetch, par digest)
-#   cilium      l7Proxy: true (cilium/valeurs.yaml) appliqué par cilium.sh appliquer ; proxy DNS actif, Envoy non démarré ;
-#               le test 6 de la 08 se rejoue ensuite (mise run confiance:preuves -- test6)
+#   cilium      l7Proxy: true (cilium/valeurs.yaml) appliqué par cilium.sh appliquer ; exécuté le 03/11/2026 : Envoy embarqué
+#               démarré, retour à l7Proxy: false ; ÉTAPE ABANDONNÉE (D2 révisée une seconde fois : sortie 443 hors privé)
 #   compte      compte Zot poc-fermetures (stockage.sh zot, Zot redémarré) : création par digest dans builds/fermetures/**
 #               acceptée ; tag, autre dépôt de builds/ et suppression refusés ; poc-images refusé dans builds/fermetures/ ;
 #               poc-build (Chains) y écrit un tag ; secret zot-fermetures dans builds
 #   reseau      CiliumNetworkPolicy prefetch-sortie (politique/prefetch-sortie.yaml) ; invariant : seule politique qui sélectionne
-#               les pods de prefetch-gomod ; pod de sonde au label : proxy.golang.org et Forgejo joints, sum.golang.org,
-#               github.com et Zot refusés ; témoin sans le label : github.com joint ; flux de Hubble
+#               les pods de prefetch-gomod ; pod de sonde au label : adresses publiques en 443 et Forgejo joints ; port 80,
+#               API de k3s et Zot refusés ; témoin sans le label : tout joint ; flux de Hubble
 #   taches      prefetch-gomod et publier-fermeture rendues, signées (tkn), comparées à leur signature versionnée (SIGNER=1 pour
 #               la refaire), bundles, digests exigés dans la liste revue ; pipeline prefetch-sample-app signée, bundle
 #   prefetch    deux PipelineRuns du même commit (gabarit en service, pipeline remplacée) : réussite, label et nœud des pods,
@@ -185,6 +185,8 @@ for nom, url, c in [("proxy.golang.org", "https://proxy.golang.org/github.com/go
                     ("storage.googleapis.com", "https://storage.googleapis.com/", ctx),
                     ("sum.golang.org", "https://sum.golang.org/latest", ctx),
                     ("github.com", "https://github.com/", ctx),
+                    ("proxy.golang.org en 80", "http://proxy.golang.org/", ctx),
+                    ("API de k3s", "https://192.168.161.11:6443/version", ssl._create_unverified_context()),
                     ("Zot", "https://sc-stockage.poc.test:5000/v2/", poc)]:
     try:
         r = urllib.request.urlopen(url, timeout=8, context=c)

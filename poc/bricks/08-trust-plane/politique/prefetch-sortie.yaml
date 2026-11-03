@@ -1,11 +1,13 @@
-# Brique 03, F2 (D2 révisée, décision du propriétaire du 03/11/2026 : proxy DNS de Cilium activé, l7Proxy: true dans
-# cilium/valeurs.yaml) : seule sortie des pods de la tâche prefetch-gomod, aucune entrée. Noms relevés sur l'hôte en F1 pour Go
-# (proxy CONNECT journalisé, resultats/f1-prefetch.log de la brique 03) : proxy.golang.org et storage.googleapis.com, en 443 ;
-# sum.golang.org n'y a pas été contacté (go.sum complet) et reste refusé. Forgejo (hôte de sc-stockage, port 3000) pour le clone
-# et le git fetch des tags que lance Hermeto. DNS par kube-dns, inspecté par le proxy DNS (règle dns, exigée par toFQDNs).
+# Brique 03, F2 (D2 révisée une seconde fois, décision du propriétaire du 03/11/2026 : « Sortie 443 hors privé ») : seule
+# sortie des pods de la tâche prefetch-gomod, aucune entrée. toFQDNs écarté : il exige l7Proxy, qui démarre l'Envoy embarqué
+# (cilium/proxy, « À surveiller » au doc 04) dans les trois agents (mesuré, resultats/f2-cilium-envoy.log de la brique 03).
+# Sortie : adresses publiques en 443 seulement (toutes plages privées, de lien local et de boucle exclues, donc ni le cluster, ni
+# les nœuds, ni Zot) ; Forgejo (hôte de sc-stockage, port 3000) pour le clone et le git fetch des tags que lance Hermeto ; DNS
+# par kube-dns. La source des modules est imposée par Hermeto (HERMETO_GOMOD__PROXY_URL=https://proxy.golang.org, sans repli
+# direct vers les forges) et leur intégrité par go.sum (F1 : zip modifié refusé). Limite consignée : un pod compromis pourrait
+# envoyer le code cloné vers une adresse publique en 443.
 # Sélection par tekton.dev/task, réécrit par Tekton avec le nom de la tâche résolue (voir construction-sans-sortie.yaml) ; les
 # politiques s'additionnent : aucune autre politique de builds ne doit sélectionner ces pods (contrôlé par prefetch.sh reseau).
-# Zot n'est pas joignable : la fermeture est poussée par publier-fermeture, seule à monter le secret de poc-fermetures.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -30,12 +32,14 @@ spec:
         protocol: UDP
       - port: "53"
         protocol: TCP
-      rules:
-        dns:
-        - matchPattern: "*"
-  - toFQDNs:
-    - matchName: proxy.golang.org
-    - matchName: storage.googleapis.com
+  - toCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 169.254.0.0/16
+      - 127.0.0.0/8
     toPorts:
     - ports:
       - port: "443"

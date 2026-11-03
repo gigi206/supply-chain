@@ -1,7 +1,7 @@
-# Brique 03, F2 (D1 a, D2 révisée, D4 a ; décisions du propriétaire du 03/11/2026) : prefetch Hermeto des modules Go d'un commit
-# de Forgejo, dans la plateforme. Pod runc conforme à Pod Security restricted, sans aucun secret ; sa seule sortie est celle de
-# la CiliumNetworkPolicy prefetch-sortie (politique/prefetch-sortie.yaml : DNS, toFQDNs proxy.golang.org et
-# storage.googleapis.com, Forgejo), qui sélectionne les pods de cette tâche. Hermeto lance aussi un git fetch des tags vers
+# Brique 03, F2 (D1 a, D2 révisée deux fois, D4 a ; décisions du propriétaire du 03/11/2026) : prefetch Hermeto des modules Go
+# d'un commit de Forgejo, dans la plateforme. Pod runc conforme à Pod Security restricted, sans aucun secret ; sa seule sortie
+# est celle de la CiliumNetworkPolicy prefetch-sortie (politique/prefetch-sortie.yaml : DNS, adresses publiques en 443, Forgejo),
+# qui sélectionne les pods de cette tâche. Proxy Go imposé : proxy.golang.org seul, sans repli direct vers les forges. Hermeto lance aussi un git fetch des tags vers
 # l'origine (mesuré en F1) : ici Forgejo. La fermeture est écrite dans le workspace sortie, que publier-fermeture pousse.
 # Image : outils de prefetch construits par la plateforme (Dockerfile.prefetch de la brique 03). Signée une fois, versionnée
 # (prefetch-gomod.signee.yaml), digest dans la liste revue : prefetch.sh taches (brique 03). @PREFETCH@ : idem.
@@ -49,6 +49,8 @@ spec:
       value: $(params.depot)
     - name: COMMIT
       value: $(params.commit)
+    - name: HERMETO_GOMOD__PROXY_URL
+      value: https://proxy.golang.org
     script: |
       #!/bin/sh
       set -eu
