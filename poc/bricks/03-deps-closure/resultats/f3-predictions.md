@@ -289,3 +289,13 @@ réelle par D6.
   journal d'audit de l'API k3s, collecté par Alloy (`audit-k8s.alloy` de la 19b, écritures). Les écritures dans Zot passent par
   `audit-zot.alloy`. Les deux sont donc consultables dans Grafana.
   - C'est déduit de la configuration de la 19b. Aucune requête n'a été faite dans Loki pour F3.
+
+## Additif du 03/11/2026, 19:45 UTC : portée de la « Suite » incomplète
+
+La « Suite » (« intégrer F2 et F3 avant la bascule de J8 ») est incomplète, pour trois raisons :
+- D6 est chargée dès J6 par `cm_porte` ;
+- `attseule`, `decision3` et `preuves.sh bascule` jugent ou reconstruisent l'image réelle avec la pipeline de J7 ;
+- `vm.sh detruire` efface aussi `sc-stockage`, donc Loki, Grafana et la VSA, ainsi que les jalons de 01, 19 et 19b
+  postérieurs au dernier rejeu complet.
+
+Inventaire et options : README de la brique, additif de 19:45 UTC. `rejeu.sh` n'est pas modifié.

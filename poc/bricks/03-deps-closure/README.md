@@ -364,3 +364,39 @@ Résultats complets : [`resultats/f3-predictions.md`](resultats/f3-predictions.m
 - **Journaux** : les changements faits par l'API et dans Zot sont dans les journaux d'audit collectés par Alloy (19b), et
   les pods dans `pods.alloy`. C'est déduit de la configuration, aucune requête n'a été faite dans Loki.
 - **Suite** : le rejeu complet de la 08 (`rejeu.sh`) doit intégrer F2 et F3 avant la bascule de J8.
+
+## Additif du 03/11/2026, 19:45 UTC : rejeu complet de la 08, inventaire à sec (rien exécuté, `rejeu.sh` inchangé)
+
+La « Suite » ci-dessus (intégrer F2 et F3 avant la bascule de J8) **sous-estimait le travail**. Relevé à sec dans les
+scripts :
+
+- **D6 est chargée dès J6.** Dans un rejeu de zéro, `politique.sh porte` (`cm_porte`) charge `porte.rego` (D6) et
+  `taches.yml` (sans `403ccbd8`) versionnés. Tout jugement ultérieur de l'image réelle se fait donc sous D6, alors que J7
+  la construit encore sur la fermeture de l'hôte. Tests de J8 touchés :
+  - `attseule` (`t8_cas`) exige « ec admet », et `decision3` exige `true||ok`. Les deux seraient refusés par
+    `porte.fermeture_plateforme`.
+  - `decision3` et `preuves.sh bascule` reconstruisent avec `$W/construction/pipeline.ref`, la pipeline de J7 (fermeture de
+    l'hôte). Placer F2 et F3 juste avant la bascule ne suffit donc pas.
+  - `reglec` compare des violations relatives à celles de l'image réelle. Il ne devrait pas changer, mais ce n'est pas
+    vérifié.
+- **`vm.sh detruire` détruit les trois VM**, `sc-stockage` comprise (`VMS=(sc-confiance sc-build sc-stockage)`). Le dernier
+  rejeu complet (« enchainement », 02/11, 13:10 à 14:40 UTC) est antérieur aux jalons suivants, qu'aucun script de
+  `rejeu.sh` ne refait :
+
+| Jalon | Perdu par `detruire` | Nécessaire pour que la porte admette l'image réelle | Rejouable sans accord à chaque action |
+|---|---|---|---|
+| 01, S2 à S6 (comptes Forgejo, synchro en timer, `sample-app-sync`, Traefik) | oui (`sc-stockage`) | non | non vérifié (S6 lit GitHub) |
+| 19, O2 et O3 (Prometheus, Alertmanager, règles) ; O4 (incidents simulés) | oui (`sc-stockage`) | non | non vérifié |
+| 19b, L2 à L6 (Loki, Grafana, Alloy sur les trois VM, battement de cœur, TLS) | oui, **avec l'historique des journaux d'audit** | non | non vérifié |
+| 10, D5 (compte Zot `poc-replay`) | non : recréé par `stockage.sh zot` (J2), depuis le htpasswd en cache | non | oui |
+| 10, R5 et 19b, L7 (VSA dans `builds/vsa/sample-app`) | oui (Zot) | **oui** : sans VSA, le contrôle 6 refuse | **non** : accord à chaque push de VSA |
+| 08, `controle6` et `reelle` (preuves.sh) | non concerné : `cm_porte` charge `vsa.sh` dès J6 | — | absents de `rejeu.sh` |
+| 03, F2 (image d'outils dans Zot, secret `zot-fermetures`, `prefetch-sortie`, tâches, prefetch) | oui (Zot, cluster) ; compte `poc-fermetures` recréé par J2 | **oui** (D6) | oui en principe, à mesurer |
+| 03, F3 (tâches D5, construction sur la fermeture de la plateforme, bascule) | oui | **oui** (D6) | oui en principe, à mesurer |
+
+- **Constantes de `bascule.sh`** : les bundles de tâches sont stables d'un rejeu à l'autre. `preparer-entrees@2070d601`
+  apparaît 17 fois, identique, dans les journaux de rejeu et de construction. La fermeture `74c265e7` a été obtenue deux
+  fois en F2. Sa stabilité depuis zéro n'est pas mesurée.
+
+**Effet à connaître** : tout rejeu de zéro efface l'historique de Loki (19b), ce qui contredit l'exigence « tout consultable
+dans Grafana », ainsi que la VSA. Une décision du propriétaire est attendue avant toute modification de `rejeu.sh`.
