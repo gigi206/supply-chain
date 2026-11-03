@@ -58,6 +58,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
    > **Constat de la brique 10, R4 (03/11/2026), avec une image de build « indépendante minimale »** : toolchain Go de go.dev, busybox de Debian, `Env` déclaré, digest `dc20b752…`, différent de celui du plan de confiance. Le rebuild **hors ligne** dans la VM `sc-replay` (BuildKit 0.25.2, caches froids, lien coupé, aucune émission de la VM) redonne bit à bit l'image signée par Chains, `3a7ca1b1…` (`PASSED`). Un `go build` direct donne le même binaire ([README de la brique](../../poc/bricks/10-independent-replay/README.md)). L'administrateur reste le propriétaire, par écart documenté (D1 b) ; aucune note modifiée.
 
+   > **Constat de la brique 10, R5 (03/11/2026)** : la VSA est écrite et signée **dans la VM, sans réseau** (`unshare -rn`), avec la clé du domaine. Elle porte `PASSED`, `SLSA_BUILD_LEVEL_3` et `POC_REPLAY_BIT_IDENTIQUE`, la politique au commit `309644f4…` et les sha256 du code du domaine. Elle est poussée par le compte `poc-replay` dans un dépôt séparé (`builds/vsa/sample-app`), où elle est relue et vérifiée. Les clés croisées sont refusées (N3), et la porte de la 08 rend le même verdict avant et après le push. Aucune note modifiée.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

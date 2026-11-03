@@ -365,4 +365,11 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
   - Signé par la clé du domaine (`attest-blob --statement`, configuration sans service) puis revérifié : `Verified OK`. Le bundle est en v0.3, sans journal de transparence ni horodatage ([`r5-vsa.bundle.json`](resultats/r5-vsa.bundle.json)).
 - **Porte de la 08 avant le push** (14:58 UTC, [`r5-porte_avant.log`](resultats/r5-porte_avant.log)) : ec admet l'image réelle sans violation, et le contrôle 9 est `ok` (6/6 enveloppes couvertes, 43 bundles). Constat : sur un dépôt inconnu, l'API referrers de Zot rend un index vide (HTTP 200), et non une erreur.
 - **VSA poussée** (15:00 UTC, choix du propriétaire : « Pousser la VSA », [`r5-pousser_vsa.log`](resultats/r5-pousser_vsa.log)) : manifeste fait main `sha256:c1bfbcbd…`, égal au digest calculé d'avance. Il est poussé par digest, avec le compte `poc-replay`, dans `builds/vsa/sample-app`. On y trouve un seul referrer de l'image et aucune étiquette ; `builds/sample-app` n'a toujours aucun referrer. Vérifiée sur l'hôte sans aucune connexion.
-- Restent, chacun sous accord : la porte après le push, la lecture avec N3, puis les contre-épreuves N1 et N2.
+- **Porte de la 08 après le push** (15:02 UTC, [`r5-porte_apres.log`](resultats/r5-porte_apres.log)) : même verdict qu'avant, durée exclue (ec admet, contrôle 9 `ok`, 6/6) ; `builds/vsa/sample-app` a 1 referrer. Le dépôt séparé ne gêne pas la porte.
+  - Le premier passage avait rendu `KO` à cause du script de la brique 10, qui comparait aussi le libellé du cas. Ce passage est archivé, et le script est corrigé.
+- **Lecture et N3** (15:03 UTC, [`r5-lire_vsa.log`](resultats/r5-lire_vsa.log)) :
+  - la VSA est acceptée avec sa clé, et refusée avec celle de Chains ;
+  - la provenance est refusée avec la clé de VSA, et acceptée avec celle de Chains (6 attestations) ;
+  - chaque commande cosign n'ouvre qu'une connexion, vers Zot.
+- Restent, sous accord : les contre-épreuves N1 et N2, dans la VM.
+- **Hors R5, non tranché** : la porte de la 08 n'exige pas encore la VSA (contrôle 6 de la grille C). Elle admet l'image avec ou sans VSA.

@@ -1,0 +1,11 @@
+# replay.sh lire_vsa, 2026-11-03T15:03:27Z
+OK   VSA par COSIGN_REPOSITORY, clé de VSA : accepte (1 vérifiée(s) ; )
+OK   VSA par COSIGN_REPOSITORY, clé de VSA : aucune connexion hors de Zot (1 connect())
+OK   N3 : VSA par COSIGN_REPOSITORY, clé de Chains : refus (0 vérifiée(s) ; Error: no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0)
+OK   N3 : VSA par COSIGN_REPOSITORY, clé de Chains : aucune connexion hors de Zot (1 connect())
+OK   N3 : provenance (tag .att), clé de VSA : refus (0 vérifiée(s) ; Error: no matching attestations: accepted signatures do not match threshold, Found: 0, Expected 1)
+OK   N3 : provenance (tag .att), clé de VSA : aucune connexion hors de Zot (1 connect())
+OK   témoin : provenance (tag .att), clé de Chains : accepte (6 vérifiée(s) ; )
+OK   témoin : provenance (tag .att), clé de Chains : aucune connexion hors de Zot (1 connect())
+OK   témoin : signature d'image, clé de Chains : accepte (0 vérifiée(s) ; )
+OK   témoin : signature d'image, clé de Chains : aucune connexion hors de Zot (1 connect())

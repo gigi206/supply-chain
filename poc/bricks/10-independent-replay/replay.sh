@@ -545,11 +545,12 @@ porte() { # avant|apres : étape reelle de preuves.sh de la 08 (Job de la porte,
   cp "$racine_depot/poc/bricks/08-trust-plane/resultats/preuves-reelle.log" "$R/r5-porte-$1.copie.log"
 }
 etape_porte_avant() { porte avant; }
-etape_porte_apres() { # comparaison des deux passages : ligne VERDICT, champs 1 à 5, 7 et 8 (le champ 6, la durée, varie)
+etape_porte_apres() { # comparaison des deux passages : ligne VERDICT, champs 3 à 5, 7 et 8 (le 2 est le libellé du cas, le 6 la
+  # durée du conteneur ec ; premier passage : le libellé, comparé, rendait KO)
   local a b
   porte apres
-  a=$(grep -m1 '^VERDICT|' "$R/r5-porte-avant.copie.log" | cut -d'|' -f1-5,7,8 || true)
-  b=$(grep -m1 '^VERDICT|' "$R/r5-porte-apres.copie.log" | cut -d'|' -f1-5,7,8 || true)
+  a=$(grep -m1 '^VERDICT|' "$R/r5-porte-avant.copie.log" | cut -d'|' -f3-5,7,8 || true)
+  b=$(grep -m1 '^VERDICT|' "$R/r5-porte-apres.copie.log" | cut -d'|' -f3-5,7,8 || true)
   echo "## comparaison avec le passage avant le push"; echo "avant : ${a:-absent}"; echo "après : ${b:-absent}"
   [ -n "$a" ] && [ "$a" = "$b" ] && echo "OK   même verdict de la porte avant et après le push de la VSA" || echo "KO   verdict de la porte différent ou absent"
 }

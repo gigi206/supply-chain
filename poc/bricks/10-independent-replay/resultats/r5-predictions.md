@@ -204,3 +204,38 @@ Ces prédictions précisent celles de 10:36, 12:01 et 13:13, sans les modifier.
   - les cinq lignes de contrôle des connexions sont `OK` : aucune connexion hors de `192.168.161.13:5000`.
 
   **Attente incertaine** : le nombre d'attestations affiché par le témoin de provenance (une ligne JSON par enveloppe vérifiée, peut-être 6).
+
+### `porte_apres`, premier passage (03/11/2026, 15:01:45 UTC) : défaut de comparaison, archivé ([`r5-porte_apres-premier-passage.log`](r5-porte_apres-premier-passage.log), [copie du journal de la 08](r5-porte-apres-premier-passage.copie.log))
+
+- **La porte est conforme** :
+  - referrers `builds/sample-app 0` et `builds/vsa/sample-app 1` ;
+  - 6 enveloppes ;
+  - `VERDICT|reelle-apres|true||trusted_task.tagged|31|ok|6/6 …, 43 bundle(s) …` ;
+  - ec admet l'image, et le contrôle 9 est `ok`.
+- **Le script de la brique 10 a rendu `KO`** à la comparaison. Il comparait aussi le champ 2, le libellé du cas, qui vaut `reelle-avant` d'un côté et `reelle-apres` de l'autre par construction.
+- **Correction** (15:02 UTC) : seuls les champs 3 à 5, 7 et 8 sont comparés (`success`, violations, avertissements, horodatage, détail du contrôle 9), d'après l'en-tête de `juger` dans `politique.sh` de la 08. Le champ 6 est la durée du conteneur ec : 31 s aux deux passages.
+- **Second passage** : relancé tel quel, sous le même accord. Prédictions inchangées, et la comparaison est attendue `OK`.
+
+### Résultat de `porte_apres`, second passage (03/11/2026, 15:02:47 UTC) : [`r5-porte_apres.log`](r5-porte_apres.log), [copie du journal de la 08](r5-porte-apres.copie.log)
+
+**Conforme.**
+- Referrers : `builds/sample-app 0`, `builds/vsa/sample-app 1`.
+- 6 enveloppes.
+- Ligne de verdict : `VERDICT|reelle-apres|true||trusted_task.tagged|30|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s)`. Le nombre de bundles n'a pas bougé.
+- **Comparaison `OK`** : avant et après le push, les champs 3 à 5, 7 et 8 sont identiques. Seule la durée change (31 s, puis 30 s).
+
+Pousser la VSA dans un dépôt séparé ne change donc pas le jugement de la porte de la 08 sur l'image réelle (choix « (a) Dépôt séparé »).
+
+### Résultat de `lire_vsa` (03/11/2026, 15:03:27 UTC) : [`r5-lire_vsa.log`](r5-lire_vsa.log)
+
+**Conforme, sur les cinq essais.**
+- **Acceptées** :
+  - la VSA par `COSIGN_REPOSITORY`, avec la clé de VSA : 1 attestation vérifiée ;
+  - le témoin de provenance (tag `.att`), avec la clé de Chains : **6** attestations, ce qui lève l'attente incertaine ;
+  - le témoin de signature d'image, avec la clé de Chains.
+- **N3, refusées** :
+  - la VSA avec la clé de Chains : `no matching attestations … Found: 0` ;
+  - la provenance avec la clé de VSA : `no matching attestations: accepted signatures do not match threshold, Found: 0, Expected 1`.
+- **Connexions** : chaque commande cosign n'ouvre qu'**une** connexion, vers `192.168.161.13:5000`, et aucune ailleurs (contrôle `OK` cinq fois). En HTTP sur le banc, la mesure TUF en relevait 2 ou 3 vers Zot.
+
+**Constat sur le comptage** : le témoin de signature affiche « 0 vérifiée(s) », bien que la commande ait réussi (code 0). `cosign verify` écrit un tableau JSON (`[…]`) et non des objets en début de ligne (`{`), que compte `essai`. L'acceptation est jugée sur le code de sortie, et le compte n'entre dans aucun verdict.

@@ -1,0 +1,13 @@
+# preuves.sh reelle, 2026-11-03T15:01:45Z
+## passage apres ; image builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 1
+enveloppes de Chains sur l'image : 6
+VERDICT|reelle-apres|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+    COUVERTE|signature 7aeae0ad999dc3f3
+    COUVERTE|signature 7af184de44b81e66
+    COUVERTE|signature 6b31823f76213191
+    COUVERTE|signature d2609724c6336863
+    COUVERTE|signature 558aac49b2f45ed9
+    COUVERTE|signature e8df04e7b3908eb8
+OK   ec admet l'image réelle (aucune violation)
+OK   contrôle 9 : ok (6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles)
