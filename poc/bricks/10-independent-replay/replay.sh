@@ -12,7 +12,8 @@
 #   vm               image Debian 13 vérifiée (sha512, celle des trois VM), pool et réseau NAT propres (supply-chain-replay,
 #                    192.168.162.0/24), clés SSH du domaine, VM sc-replay (4 vCPU, 6 Gi, 20 Go) ; trois VM du PoC non touchées
 #   isolement        depuis la VM : 192.168.161.0/24 (Zot, Forgejo, API de k3s) injoignable ? extérieur joignable ?
-#   paquets          busybox-static et diffoscope-minimal par apt (signatures de l'archive Debian), sans recommandés
+#   paquets          busybox-static et diffoscope-minimal par apt (signatures de l'archive Debian), sans recommandés ;
+#                    versions épinglées (celles mesurées au premier passage de R2)
 #   outils           archives copiées puis revérifiées DANS la VM (empreintes fixées ci-dessous) ; installation
 #   cle_vsa          paire cosign générée dans la VM par replay (mot de passe aléatoire 0600, jamais sorti) ; clé publique
 #                    copiée dans resultats/vsa-cle-publique.pem
@@ -224,7 +225,7 @@ etape_paquets() {
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update 2>&1 | grep -viE '^(Hit|Get|Reading)' || true
-apt-get install -y --no-install-recommends busybox-static diffoscope-minimal 2>&1 | grep -iE 'warning|untrusted|unauthenticated|^Setting up (busybox-static|diffoscope)' || true
+apt-get install -y --no-install-recommends busybox-static=1:1.37.0-6+b9 diffoscope-minimal=297+deb13u1 2>&1 | grep -iE 'warning|untrusted|unauthenticated|^Setting up (busybox-static|diffoscope)' || true
 dpkg-query -W -f='${Package} ${Version}\n' busybox-static diffoscope-minimal
 echo "paquets installés en tout : $(dpkg-query -W | wc -l)"
 EOS

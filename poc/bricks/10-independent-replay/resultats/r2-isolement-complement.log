@@ -1,0 +1,29 @@
+# Complément d'isolement de R2 (03/11/2026, 10:03 UTC), connexions TCP seulement
+## depuis sc-build (vers le domaine de replay et l'hôte)
+  192.168.162.14:22 : injoignable
+  192.168.162.1:22 : joignable
+  192.168.161.1:22 : joignable
+  192.168.161.1:111 : joignable
+  192.168.161.1:2049 : joignable
+  192.168.161.1:22000 : joignable
+## depuis sc-confiance (vers le domaine de replay et l'hôte)
+  192.168.162.14:22 : injoignable
+  192.168.162.1:22 : joignable
+  192.168.161.1:22 : joignable
+  192.168.161.1:111 : joignable
+  192.168.161.1:2049 : joignable
+  192.168.161.1:22000 : joignable
+## depuis sc-replay (vers l'hôte)
+  192.168.162.1:22 : joignable
+  192.168.162.1:111 : joignable
+  192.168.162.1:2049 : joignable
+  192.168.162.1:22000 : joignable
+  192.168.161.1:111 : joignable
+  192.168.161.1:2049 : joignable
+  192.168.161.1:22000 : joignable
+## horloge de sc-replay
+           Universal time: Tue 2026-11-03 10:03:45 UTC
+System clock synchronized: yes
+              NTP service: active
+2026-11-03T10:03:45Z
+hôte : 2026-11-03T10:03:45Z

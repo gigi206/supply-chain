@@ -199,11 +199,13 @@ Commande : `JALON=r2 mise run replay -- vm isolement paquets outils cle_vsa`. Pr
 | # | Mesure | Verdict |
 |---|---|---|
 | 1 | VM `sc-replay` (4 vCPU, 6 Gi, 20 Go, Debian 13) sur le réseau propre `supply-chain-replay` (`192.168.162.14`), avec pool et clés SSH du domaine. SSH en 9 s. Trois VM du PoC non touchées | conforme |
-| 2 | Zot, Forgejo et l'API de k3s **injoignables** depuis la VM ; l'extérieur joignable. **Écart** : le sshd de l'hôte (`192.168.161.1:22`) répond, et l'hôte expose aussi NFS (111, 2049), 22000 et des ports RPC sur toutes ses interfaces | conforme, avec un écart |
+| 2 | Zot, Forgejo et l'API de k3s **injoignables** depuis la VM ; l'extérieur joignable. **Sens inverse** : `sc-build` et `sc-confiance` ne joignent pas la VM. **Écart** : les services de l'hôte (22, 111, 2049, 22000) sont joignables depuis toutes les VM ([complément](resultats/r2-isolement-complement.log)) | conforme, avec un écart |
 | 3 | `busybox-static` et `diffoscope-minimal` installés par apt, sans avertissement de signature | conforme |
 | 4 | Cinq archives **revérifiées dans la VM** ; BuildKit 0.25.2, runc 1.3.3, cosign 3.1.4, oras 1.3.6, Go 1.26.10 | conforme |
 | 5 | Clé de VSA P-256 générée dans la VM (600, `replay`), différente de celle de Chains ; [clé publique](resultats/vsa-cle-publique.pem) | conforme |
 
-**Constat sur l'hôte**, hors du périmètre de la brique : les services du laptop qui écoutent sur toutes les interfaces (SSH, NFS, RPC, 22000) sont joignables depuis toutes les VM, celles du PoC comprises. Rien n'a été modifié sur le poste.
+**Constat sur l'hôte**, hors du périmètre de la brique, **mesuré** : SSH, NFS (111, 2049) et 22000 du laptop sont joignables depuis `sc-build`, `sc-confiance` et `sc-replay`. Le nœud qui exécute le code des builds atteint donc le NFS du poste. Rien n'a été modifié sur le poste.
+
+**Limite de D6** : le mot de passe de la clé de VSA est dans le même dossier 0600 que la clé. Il n'ajoute aucune protection au-delà des droits du fichier.
 
 **Suite, R3** : préchargement. Les entrées sont tirées par l'hôte, en lecture anonyme, sous forme de layouts OCI et d'un bundle git, puis transportées dans la VM et vérifiées par le domaine. La signature de la provenance est vérifiée d'abord, puis la recette et les digests.
