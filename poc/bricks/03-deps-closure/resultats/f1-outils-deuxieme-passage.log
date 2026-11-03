@@ -1,0 +1,18 @@
+# traefik.sh outils, 2026-11-03T16:21:40Z
+[outils:go-1.27] $ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.27.3 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+go version go1.27.3 linux/amd64
+go version go1.27.3 linux/amd64
+[outils:yarn] $ d=$(mktemp -d)
+Adding yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e to the cache...
+Internal Error: ENOENT: no such file or directory, lstat '~/.cache/supply-chain-poc/outils/corepack/bin'
+    at Object.realpathSync (node:fs:2798:29)
+    at EnableCommand.execute (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:23137:44)
+    at EnableCommand.validateAndExecute (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:20258:33)
+    at ~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:21195:47
+    at noopCaptureActivator (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:21420:10)
+    at _Cli.run (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:21195:24)
+    at Object.runMain (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/lib/corepack.cjs:23654:29)
+    at Object.<anonymous> (~/.local/share/mise/installs/node/22.22.0/lib/node_modules/corepack/dist/corepack.js:4:31)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+[outils:yarn] ERROR task failed

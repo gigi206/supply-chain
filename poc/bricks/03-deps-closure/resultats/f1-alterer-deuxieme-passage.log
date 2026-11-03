@@ -1,0 +1,14 @@
+# traefik.sh alterer, 2026-11-03T16:42:14Z
+## zip yarn altéré
+altéré : deps/yarn/cache/@adobe-css-tools-npm-4.4.2-e89b531279-10c0.zip
+OK   refusé : ➤ YN0018: │ @adobe/css-tools@npm:4.4.2: The remote archive doesn't match the expected checksum
+## zip yarn altéré d'un paquet sans checksum dans yarn.lock (natif linux-x64)
+altéré : deps/yarn/cache/@rolldown-binding-linux-x64-gnu-npm-1.2.6-a855a8eae6-10c0.zip
+CONSTAT accepté hors réseau : ➤ YN0000: └ Completed
+## checksum de yarn.lock altéré
+>   checksum: 10c0/019433666ad18536b0ed05d4b53fbb3dd6ede266996796462023ec77a90b4
+OK   refusé : ➤ YN0018: │ @adobe/css-tools@npm:4.4.2: The remote archive doesn't match the expected checksum
+## zip Go altéré
+altéré : deps/gomod/pkg/mod/cache/download/cloud.google.com/go/auth/@v/v0.24.1-0.20261001053825-dbc26066f70a.zip
+OK   refusé : go: downloading github.com/Myra-Security-GmbH/myrasec-go/v2 v2.62.1
+## blob altéré dans le stockage de Zot

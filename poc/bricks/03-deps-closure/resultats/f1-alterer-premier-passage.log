@@ -1,0 +1,9 @@
+# traefik.sh alterer, 2026-11-03T16:33:40Z
+## zip yarn altéré
+altéré : deps/yarn/cache/@adobe-css-tools-npm-4.4.2-e89b531279-10c0.zip
+OK   refusé : ➤ YN0000: · Yarn 4.18.0
+## zip yarn altéré d'un paquet sans checksum dans yarn.lock (natif linux-x64)
+altéré : deps/yarn/cache/@rolldown-binding-linux-x64-gnu-npm-1.2.6-a855a8eae6-10c0.zip
+CONSTAT accepté hors réseau : ➤ YN0000: └ Completed
+## checksum de yarn.lock altéré
+>   checksum: 10c0/019433666ad18536b0ed05d4b53fbb3dd6ede266996796462023ec77a90b4

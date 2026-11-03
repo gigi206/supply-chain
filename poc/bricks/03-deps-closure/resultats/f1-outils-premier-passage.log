@@ -1,0 +1,6 @@
+# traefik.sh outils, 2026-11-03T16:21:26Z
+[outils:go-1.27] $ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.27.3 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+go: downloading go1.27.3 (linux/amd64)
+go version go1.27.3 linux/amd64
+stat outils:yarn: no such file or directory
+[outils:go-1.27] ERROR task failed

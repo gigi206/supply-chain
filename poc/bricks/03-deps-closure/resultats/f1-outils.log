@@ -1,0 +1,19 @@
+# traefik.sh outils, 2026-11-03T16:21:45Z
+[outils:go-1.27] $ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.27.3 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+go version go1.27.3 linux/amd64
+go version go1.27.3 linux/amd64
+[outils:yarn] $ d=$(mktemp -d)
+Adding yarn@4.18.0 to the cache...
+4.18.0
+## Go 1.27.3
+go version go1.27.3 linux/amd64
+ziphash du cache : h1:r0ub+FnqzZxoWm/dSUOI9DcIqYWn/mNYGFJcv7PyBzs= ; sum.golang.org : h1:r0ub+FnqzZxoWm/dSUOI9DcIqYWn/mNYGFJcv7PyBzs=
+OK   toolchain conforme à sum.golang.org
+## yarn 4.18.0 (corepack 0.34.0, node v22.22.0)
+yarn
+yarnpkg
+version hors réseau, sans téléchargement : 4.18.0
+~/.cache/supply-chain-poc/outils/corepack/v1/yarn/4.18.0/.corepack : {"locator":{"name":"yarn","reference":"4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e"},"bin":["yarn","yarnpkg"],"hash":"sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e"}
+## contre-épreuve : sha512 faux (dernier chiffre changé), COREPACK_HOME jetable
+OK   sha512 faux refusé : Internal Error: Mismatch hashes. Expected fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f70, got fcb8716fe7cd0eece141ffc1
+# fin 2026-11-03T16:21:46Z

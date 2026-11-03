@@ -68,6 +68,28 @@ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.26.10 GOPROXY=https://proxy.
 "$GOROOT_DIR/bin/go" version
 '''
 
+[tasks."outils:go-1.27"]
+description = "Go 1.27.3 comme module golang.org/toolchain, vérifié par sum.golang.org (brique 03, F1 : Traefik v3.7.17 exige go 1.27.0)"
+run = '''
+set -eu
+GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.27.3 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+"$POC_OUTILS/gomodcache/golang.org/toolchain@v0.0.1-go1.27.3.linux-amd64/bin/go" version
+'''
+
+[tasks."outils:yarn"]
+description = "yarn 4.18.0 par corepack (Node de mise), sha512 du packageManager de Traefik v3.7.17 contrôlé par corepack, dans $POC_OUTILS/corepack (brique 03, F1)"
+run = '''
+set -eu
+d=$(mktemp -d)
+printf '{"packageManager":"%s"}' 'yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e' > "$d/package.json"
+cd "$d"
+COREPACK_HOME="$POC_OUTILS/corepack" COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack install
+mkdir -p "$POC_OUTILS/corepack/bin"
+COREPACK_HOME="$POC_OUTILS/corepack" corepack enable --install-directory "$POC_OUTILS/corepack/bin" yarn
+COREPACK_HOME="$POC_OUTILS/corepack" COREPACK_ENABLE_NETWORK=0 "$POC_OUTILS/corepack/bin/yarn" --version
+cd / && rm -rf -- "${d:?}"
+'''
+
 [tasks."outils:nix"]
 description = "busybox statique, liste SPDX, reuse, BuildKit et runc du nixpkgs épinglé du banc B (mêmes binaires que dans le cloud) ; cosign de vérification"
 run = '''
@@ -280,6 +302,10 @@ run = "poc/bricks/19-observabilite/observabilite.sh"
 [tasks.replay]
 description = "Brique 10, replay indépendant (décisions D1 à D7 du 03/11/2026) : R1, essais sur l'hôte sans VM (étapes : cosign_stockage version_go outils) ; R2, création du domaine, JALON=r2 (étapes : vm isolement paquets outils cle_vsa) ; R3, préchargement, JALON=r3 (étapes : transporter verifier_entrees) ; R4, rebuild hors ligne, JALON=r4 (étape : rebuild) ; R5, VSA, JALON=r5 (étape préalable : signature_hors_registre ; puis vsa porte_avant pousser_vsa porte_apres lire_vsa negatifs, chacune sous accord) ; D5, compte Zot poc-replay, JALON=d5 (étapes : compte_zot, puis confiance:stockage zot, puis droits_zot)"
 run = "poc/bricks/10-independent-replay/replay.sh"
+
+[tasks.fermetures]
+description = "Brique 03, suite sur le laptop : F1, fermetures de Traefik v3.7.16 et v3.7.17 (gomod, yarn 4.18.0) sur l'hôte (étapes : outils sources prefetch registre restaurer alterer)"
+run = "poc/bricks/03-deps-closure/traefik.sh"
 
 [tasks.journalisation]
 description = "Brique 19b, journalisation d'audit dans Grafana : L1, relevé en lecture seule (étapes : telecharger releve) ; L2, Loki et Grafana sur sc-stockage, JALON=l2 (étapes : certificats installer controle) ; L3, Alloy sur les trois VM, JALON=l3 (étapes : certificats_l3 evenements openbao_sortie alloy controle_l3) ; L4, contrôle final, JALON=l4 (étapes : prometheus_alloy temoins secrets muette) ; L5, battement de cœur (D18), JALON=l5 (étapes : battement silences muette) ; L6, TLS sur le gRPC de Loki et du relais, JALON=l6 (étapes : certificats_grpc avant_grpc grpc_tls controle_grpc pertes_grpc, puis controle_l3 temoins) ; L7, domaine de replay de la brique 10, JALON=l7 (étapes : corroborer_vsa)"

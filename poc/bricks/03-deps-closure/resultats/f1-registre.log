@@ -1,0 +1,9 @@
+# traefik.sh registre, 2026-11-03T16:35:25Z
+v3.7.16 : localhost:5000/fermetures/traefik@sha256:d7dd552aed09a15d48cdcf5dcd7a96ce2d357691aa1e695e07ba74a1b7a137e3 ; couches : 4433 ; stockage +703607815 o
+v3.7.17 : localhost:5000/fermetures/traefik@sha256:883e10663547b1897a3182b1165c2fbbe8edd17fa460c53f9c64eb788b3ecdab ; couches : 4437 ; stockage +238957942 o
+OK   même digest au second push : localhost:5000/fermetures/traefik@sha256:883e10663547b1897a3182b1165c2fbbe8edd17fa460c53f9c64eb788b3ecdab
+## blobs (digests distincts) de v3.7.17 partagés avec v3.7.16
+gomod : 2359 blobs sur 2751, 93128124 o sur 328877855 o, 28.3 % des octets
+yarn : 688 blobs sur 688, 361127721 o sur 361127721 o, 100.0 % des octets
+total : 3047 blobs sur 3439, 454255845 o sur 690005576 o, 65.8 % des octets
+# fin 2026-11-03T16:35:49Z

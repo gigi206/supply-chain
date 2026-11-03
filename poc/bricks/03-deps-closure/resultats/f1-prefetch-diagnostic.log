@@ -1,0 +1,56 @@
+# diagnostic de la connexion directe vers GitHub du prefetch, 2026-11-03T16:28:07Z ; même commande que traefik.sh prefetch (v3.7.17), strace connect + execve
+code 0
+pid de la connexion vers 140.82.x : 
+premiers execve :
+118681 execve("~/.cache/supply-chain-poc/outils/hermeto/bin/hermeto", ["~/.cache/supply-chain-poc/outils/hermeto/bin/hermeto", "fetch-deps", "--source", "~/.cache/supply-chain-poc/03/f1/src-v3.7.17", "--output", "~
+118682 execve("~/.cache/supply-chain-poc/03/f1/bin/git", ["git", "version"], 0x7b483069a4c0 /* 5 vars */) = -1 ENOENT (No such file or directory)
+118682 execve("~/.local/share/mise/installs/node/22.22.0/bin/git", ["git", "version"], 0x7b483069a4c0 /* 5 vars */) = -1 ENOENT (No such file or directory)
+118682 execve("/usr/bin/git", ["git", "version"], 0x7b483069a4c0 /* 5 vars */) = 0
+118683 execve("~/.cache/supply-chain-poc/03/f1/bin/git", ["git", "version"], 0x7b483069a3d0 /* 5 vars */) = -1 ENOENT (No such file or directory)
+118683 execve("~/.local/share/mise/installs/node/22.22.0/bin/git", ["git", "version"], 0x7b483069a3d0 /* 5 vars */) = -1 ENOENT (No such file or directory)
+118683 execve("/usr/bin/git", ["git", "version"], 0x7b483069a3d0 /* 5 vars */) = 0
+118684 execve("~/.cache/supply-chain-poc/03/f1/bin/git", ["git", "cat-file", "--batch-check"], 0x7b482ff913e0 /* 5 vars */) = -1 ENOENT (No such file or directory)
+connect() inet hors du proxy (diagnostic) :
+118690 connect(5, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+118689 connect(5, {sa_family=AF_INET, sin_port=htons(443), sin_addr=inet_addr("20.250.119.67")}, 16) = -1 EINPROGRESS (Operation now in progress)
+noms du proxy :
+     16 proxy.golang.org:443
+    688 registry.yarnpkg.com:443
+      1 storage.googleapis.com:443
+commandes exécutées (execve réussis, distinctes) :
+      6 /usr/bin/git "cat-file", "--batch-check"
+      3 ~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.27.3.linux-amd64/bin/go "list", "-e",
+      3 ~/.cache/supply-chain-poc/03/f1/bin/go "list", "-e",
+      2 /usr/bin/git "version" 
+      2 /usr/bin/git "diff", "--abbrev=40",
+      2 ~/.local/share/mise/installs/node/22.22.0/bin/node "~/.cache/supply-chain-poc/outils/corepack/bin/yarn", "install",
+      2 ~/.local/share/mise/installs/node/22.22.0/bin/node "~/.cache/supply-chain-poc/outils/corepack/bin/yarn", "info",
+      2 ~/.local/share/mise/installs/node/22.22.0/bin/node "~/.cache/supply-chain-poc/outils/corepack/bin/yarn", "--version"
+      2 ~/.cache/supply-chain-poc/outils/corepack/bin/yarn "install", "--mode",
+      2 ~/.cache/supply-chain-poc/outils/corepack/bin/yarn "info", "--all",
+      2 ~/.cache/supply-chain-poc/outils/corepack/bin/yarn "--version" 
+      2 ~/.cache/supply-chain-poc/03/f1/bin/yarn "install", "--mode",
+      2 ~/.cache/supply-chain-poc/03/f1/bin/yarn "info", "--all",
+      2 ~/.cache/supply-chain-poc/03/f1/bin/yarn "--version" 
+      1 /usr/lib/git-core/git-remote-https "origin", "https://github.com/traefik/traefik.git"
+      1 /usr/lib/git-core/git "rev-list", "--objects",
+      1 /usr/lib/git-core/git "remote-https", "origin",
+      1 /usr/lib/git-core/git "maintenance", "run",
+      1 /usr/lib/git-core/git "index-pack", "--stdin",
+      1 /usr/bin/git "tag", "--points-at",
+commandes git (execve réussis) :
+      1 ["git", "add", "--intent-to-add", "--force", "--", "."]
+      1 ["git", "cat-file", "--batch"]
+      6 ["git", "cat-file", "--batch-check"]
+      1 ["git", "diff", "--abbrev=40", "--full-index", "-M", "--raw", "-z", "--no-color", "--", "vendor"]
+      1 ["git", "diff", "--abbrev=40", "--full-index", "-M", "--raw", "-z", "--no-color", "--", "vendor/modules.txt"]
+      1 ["git", "fetch", "-v", "--force", "--", "origin", "+refs/tags/*:refs/tags/*"]
+      1 ["git", "for-each-ref", "--format", "%(refname:lstrip=2)", "refs/tags", "--merged", "04e8ccf84ada1dcb450cec06554fe27812903134"]
+      1 ["git", "reset", "--", "."]
+      1 ["git", "tag", "--points-at", "04e8ccf84ada1dcb450cec06554fe27812903134"]
+      2 ["git", "version"]
+      1 ["/usr/lib/git-core/git", "index-pack", "--stdin", "--fix-thin", "--keep=fetch-pack 118686 on xps15", "--pack_header=2,106558"]
+      1 ["/usr/lib/git-core/git", "maintenance", "run", "--auto", "--no-quiet", "--detach"]
+      1 ["/usr/lib/git-core/git-remote-https", "origin", "https://github.com/traefik/traefik.git"]
+      1 ["/usr/lib/git-core/git", "remote-https", "origin", "https://github.com/traefik/traefik.git"]
+      1 ["/usr/lib/git-core/git", "rev-list", "--objects", "--stdin", "--not", "--exclude-hidden=fetch", "--all", "--quiet", "--alternate-refs"]

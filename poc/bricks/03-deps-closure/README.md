@@ -164,3 +164,23 @@ Chaque jalon commence par des prédictions datées (`date -u`), archivées dans 
     - les témoins des étapes de la 08 qui passent par la porte (`test7`, `test8`, `reglec`, `rc`, `ba`, `controle6`) rendraient eux aussi ce refus s'ils étaient rejoués. Leurs verdicts archivés restent valables.
 - **`web/dist` reste un intrant produit sur l'hôte**, poussé par `poc-ecriture`, même après F3. « Prefetch dans Tekton » ne couvre que la fermeture : toutes les entrées ne viendront pas de la plateforme. Une règle D6 limitée à la fermeture laisse ce même trou pour `web/dist`. Le combler suppose Node dans la chaîne (2c, brique 11), hors périmètre proposé.
 - **Ordre des accords** : F1 ne dépend d'aucune des décisions D1 à D6. Le protocole et l'accord de F1 sont soumis d'abord. D1 à D6 le seront avant F2, une fois connus par F1 les noms de domaine (D2) et le comportement des chemins (D4, D5).
+
+## F1, fermetures de Traefik sur l'hôte (03/11/2026, 16:21 à 16:43 UTC ; accord du propriétaire : « Oui, tout »)
+
+Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy de relevé des noms : [`journal-connect.py`](journal-connect.py). Prédictions et résultats : [`resultats/f1-predictions.md`](resultats/f1-predictions.md), avec les passages ratés archivés.
+
+| Mesure | Résultat |
+|---|---|
+| Outils | Go 1.27.3 (module `golang.org/toolchain`, `h1:` égal à `sum.golang.org`) ; yarn 4.18.0 par corepack (sha512 du `packageManager` ; sha512 faux refusé) |
+| Sources | `v3.7.16` (`af6d927c`) et `v3.7.17` (`04e8ccf8`), **tags légers**, commits vérifiés par GitHub ; `go 1.26.0` puis `go 1.27.0` ; `yarn.lock` identique, **86 modules Go changent** |
+| Prefetch (Hermeto 0.64.0) | 87 s et 90 s. gomod 402 et 403 zips (323 et 329 Mo) ; yarn 688 zips (361 Mo) ; aucun chemin absolu dans la fermeture ; sources intactes |
+| Noms contactés | `proxy.golang.org`, `registry.yarnpkg.com`, `storage.googleapis.com` (une fois) ; **`git fetch` des tags vers l'origine (GitHub), hors proxy**, lancé par Hermeto pour dater le module principal ; `sum.golang.org` jamais contacté (`go.sum` complet) |
+| Registre (Zot, dedupe) | 4 433 et 4 437 couches ; +704 Mo puis +239 Mo ; même digest au second push ; **65,8 % des octets de `v3.7.17` partagés** (yarn 100 %, gomod 28 %) |
+| Restauration | Arbre identique ; `go build` hors réseau : **binaire `6dee223e…` identique** depuis la fermeture d'origine et depuis une restauration à un autre chemin ; `yarn install --immutable` hors réseau : **`node_modules` identiques aux deux chemins** ; sans fermeture : refus |
+| Altérations | zip yarn avec checksum : `YN0018` ; checksum de `yarn.lock` : `YN0018` ; zip Go valide modifié : « checksum mismatch » ; blob altéré dans Zot : « mismatched digest » ; **zip d'un paquet natif linux-x64 (sans checksum dans `yarn.lock`) : accepté** |
+
+**Constats** :
+- **Paquets yarn conditionnels non vérifiés.** yarn 4.18.0 n'enregistre pas de checksum pour les paquets à `conditions` (45 dans le `yarn.lock` de Traefik, dont 3 natifs linux-x64), et sa validation du cache les accepte sans calculer d'empreinte (`unstablePackages`, lu dans `yarn.js`, puis mesuré). Seul le digest OCI de la couche les protège. Une fermeture altérée avant son push serait acceptée.
+- **Hermeto contacte l'origine git des sources** (`git fetch` de tous les tags), sans passer par le proxy. Dans le cluster, le pod de prefetch devra pouvoir lire Forgejo.
+- **Le chemin de la fermeture n'est pas figé** pour gomod ni pour yarn : `generate-env` le reporte dans les variables (`YARN_GLOBAL_FOLDER`, `GOPROXY`…). Le constat « chemins canoniques obligatoires » de cette brique ne vaut que pour npm, dont le lockfile est réécrit par `inject-files`.
+- **La toolchain suit le projet** : Traefik est passé de Go 1.26 à 1.27 entre deux tags correctifs.
