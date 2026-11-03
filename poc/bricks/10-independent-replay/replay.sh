@@ -25,6 +25,11 @@
 #   verifier_entrees DANS LA VM : bundles horodatés vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA) ; provenance
 #                    extraite d'un bundle vérifié ; politique, section 1 ; digests des entrées ; commit ; recette extraite du
 #                    bundle construire-image ; version de Go ; heures du build (signée et horodatée)
+# Jalon R4 (JALON=r4), rebuild hors ligne, pas avant FIN_BUILD + 24 h :
+#   rebuild          bundle preparer-entrees et outils/rebuild.sh copiés dans la VM ; rebuild lancé détaché (systemd-run), lien
+#                    de la VM coupé aussitôt (virsh domif-setlink down), compteurs de l'interface relus côté hôte juste après la
+#                    coupure et juste avant le rétablissement (ATTENTE_HORS_LIGNE s) ; rebuild.sh refuse de démarrer si la
+#                    porteuse est présente ; résultat lu après le rétablissement, valable seulement s'il a fini avant
 #
 # Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
@@ -313,6 +318,55 @@ etape_transporter() {
 
 etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (transporté, son sha256 est journalisé)
   sur "cd ~/r3 && sha256sum verifier_entrees.py && python3 -I verifier_entrees.py '$IMAGE' '$INVOCATION' '$URL_TSA'"
+}
+
+FIN_BUILD=2026-11-02T13:59:30Z   # runDetails.metadata.finishedOn de la provenance vérifiée en R3
+ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-600}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
+
+etape_rebuild() {
+  local x=$W/r4 iface s0 s1 s2 coupe retabli d
+  if [ "$(date -u +%s)" -lt $(( $(date -u -d "$FIN_BUILD" +%s) + 86400 )) ]; then
+    echo "REFUS : moins de 24 h depuis la fin du build ($FIN_BUILD)"; exit 1
+  fi
+  echo "## délai : $(( ($(date -u +%s) - $(date -u -d "$FIN_BUILD" +%s)) / 60 )) min depuis la fin du build ($FIN_BUILD)"
+  rm -rf -- "${x:?}" && mkdir -p "$x" && chmod 0700 "$x"
+  # digest de preparer-entrees lu dans la provenance VÉRIFIÉE en R3 (dans la VM) ; la VM le revérifie dans rebuild.sh
+  d=$(sur "python3 -I -c 'import json; print([x for x in json.load(open(\"r3/provenance.json\"))[\"predicate\"][\"buildDefinition\"][\"resolvedDependencies\"] if x.get(\"uri\",\"\").endswith(\"preparer-entrees\")][0][\"digest\"][\"sha256\"])'")
+  oras copy --from-ca-file "$CA_POC" "$ZOT_POC/tekton/tasks/preparer-entrees@sha256:$d" --to-oci-layout "$x/layout:preparer-entrees" > /dev/null
+  cp "$here/outils/rebuild.sh" "$x/"
+  ( cd "$x" && sha256sum rebuild.sh && tar -cf r4.tar layout rebuild.sh )
+  sur 'rm -rf ~/r4 && mkdir -m 0700 ~/r4'
+  scp -q "${SSH_OPTS[@]}" "$x/r4.tar" "replay@$VM_IP:r4/"
+  sur 'cd ~/r4 && tar -xf r4.tar && rm r4.tar && sha256sum rebuild.sh'
+  rm -rf -- "${x:?}"
+  iface=$(v domiflist "$VM" | awk '$3 == "supply-chain-replay" {print $1}')
+  echo "## interface de $VM côté hôte : $iface"
+  s0=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  sur 'sudo systemd-run --unit=replay-r4 --collect --property=Type=exec /bin/bash /home/replay/r4/rebuild.sh' 2>&1 | tail -1
+  v domif-setlink "$VM" "$iface" down > /dev/null
+  coupe=$(date -u +%FT%TZ)
+  s1=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  echo "lien coupé à $coupe ($(v domif-getlink "$VM" "$iface" | awk '{print $NF}'))"
+  echo "compteurs avant le lancement : $s0"
+  echo "compteurs juste après la coupure : $s1"
+  sleep "$ATTENTE_HORS_LIGNE"
+  s2=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  echo "compteurs juste avant le rétablissement ($ATTENTE_HORS_LIGNE s plus tard) : $s2"
+  [ "$s1" = "$s2" ] && echo "OK   aucun octet ni paquet pendant la coupure" || echo "KO   les compteurs ont bougé pendant la coupure"
+  v domif-setlink "$VM" "$iface" up > /dev/null
+  retabli=$(date -u +%FT%TZ)
+  echo "lien rétabli à $retabli"
+  for _ in $(seq 60); do sur true 2> /dev/null && break; sleep 2; done
+  echo "## état de l'unité replay-r4 : $(sur 'systemctl show -p ActiveState -p Result --value replay-r4 2>/dev/null | paste -sd" "' || true)"
+  echo "## résultat (écrit dans la VM)"
+  sur 'cat ~/r4/resultat.txt'
+  fin=$(sur "sed -n 's/^fin=//p' ~/r4/resultat.txt")
+  if [ -n "$fin" ] && [ "$(date -u -d "$fin" +%s)" -lt "$(date -u -d "$retabli" +%s)" ]; then
+    echo "OK   rebuild terminé ($fin) avant le rétablissement du lien ($retabli)"
+  else
+    echo "KO   rebuild non terminé avant le rétablissement du lien ($retabli) : résultat non valable hors ligne"
+  fi
+  echo "## journal du rebuild (fin)"; sur 'tail -15 ~/r4/rebuild.log'
 }
 
 lancer "${JALON:-r1}" "$@"

@@ -118,7 +118,7 @@ Toutes les recommandations sont retenues :
   "subject": [{"name": "sc-stockage.poc.test:5000/builds/sample-app", "digest": {"sha256": "3a7ca1b1…"}}],
   "predicateType": "https://slsa.dev/verification_summary/v1",
   "predicate": {
-    "verifier": {"id": "https://supply-chain.example/verifiers/replay-independant@v1", "version": {"buildkit": "<version>", "go": "<version>"}},
+    "verifier": {"id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1", "version": {"buildkit": "<version>", "go": "<version>", "verifier_entrees.py": "<sha256>", "rebuild.sh": "<sha256>"}},
     "timeVerified": "<horodatage UTC du replay>",
     "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b1…",
     "policy": {"uri": "<politique de replay versionnée>", "digest": {"sha256": "<…>"}},
