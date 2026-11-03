@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Cherche chaque secret de la brique 08 dans les fichiers modifiés ou nouveaux du dépôt (motifs en fichier, jamais en argument).
+# Cherche chaque secret des briques 08 et 10 dans les fichiers modifiés ou nouveaux du dépôt (motifs en fichier, jamais en argument).
 # À lancer avant chaque commit. Les motifs vivent dans un dossier privé (0700), supprimé même en cas d'échec.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 M=$(mktemp -d)
 trap 'rm -rf -- "${M:?}"' EXIT
-for f in "$HOME"/.cache/supply-chain-poc/08/secrets/*; do
+for f in "$HOME"/.cache/supply-chain-poc/08/secrets/* "$HOME"/.cache/supply-chain-poc/10/secrets/*; do   # 10 : domaine de replay (brique 10)
   [ -f "$f" ] || continue
-  grep -v -e '^-----' -e '^$' "$f" > "$M/motif-${f##*/}" || true
+  b=${f%/secrets/*}   # 08 ou 10 : préfixe du motif (deux briques peuvent avoir le même nom de fichier)
+  grep -v -e '^-----' -e '^$' "$f" > "$M/motif-${b##*/}-${f##*/}" || true
 done
 mapfile -t fichiers < <({ git diff --name-only HEAD; git ls-files --others --exclude-standard; } | sort -u)
-echo "fichiers : ${#fichiers[@]} ; motifs : $(find "$M" -name 'motif-*' | wc -l)"
+n=$(find "$M" -name 'motif-*' | wc -l)
+echo "fichiers : ${#fichiers[@]} ; motifs : $n"
+[ "$n" -gt 0 ] || { echo "KO   aucun motif lu : contrôle impossible"; exit 1; }   # 0 motif ne doit jamais donner OK
 openssl rand -hex 16 > "$M/temoin"
 cp "$M/temoin" "$M/temoin.txt"
 n=$(grep -c -F -f "$M/temoin" "$M/temoin.txt" || true)
