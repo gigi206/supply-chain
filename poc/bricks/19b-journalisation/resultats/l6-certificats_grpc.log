@@ -1,0 +1,3 @@
+# journalisation.sh certificats_grpc, 2026-11-03T08:55:11Z
+~/.cache/supply-chain-poc/08/pki/loki-interne.crt: OK
+600 loki-interne.key

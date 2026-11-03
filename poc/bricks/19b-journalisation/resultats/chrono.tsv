@@ -55,3 +55,20 @@ L5 silences fait	2026-11-02T22:11:07Z
 L5 muette	2026-11-02T22:11:11Z	
 L5 muette fait	2026-11-02T22:19:37Z	
 L5 fin, seuil atteint	2026-11-02T22:20:04Z	réserve de L4 levée par D18
+L6 certificats_grpc	2026-11-03T08:55:11Z	
+L6 certificats_grpc fait	2026-11-03T08:55:11Z	
+L6 avant_grpc	2026-11-03T08:55:11Z	
+L6 avant_grpc fait	2026-11-03T08:55:11Z	
+L6 grpc_tls	2026-11-03T08:55:11Z	
+L6 grpc_tls fait	2026-11-03T08:55:31Z	
+L6 controle_grpc	2026-11-03T08:55:31Z	
+L6 controle_grpc	2026-11-03T08:55:49Z	
+L6 controle_grpc fait	2026-11-03T08:55:50Z	
+L6 controle_l3	2026-11-03T08:55:53Z	
+L6 controle_l3 fait	2026-11-03T08:56:00Z	
+L6 temoins	2026-11-03T08:56:00Z	
+L6 temoins fait	2026-11-03T08:58:30Z	
+L6 pertes_grpc	2026-11-03T08:58:30Z	
+L6 pertes_grpc fait	2026-11-03T08:58:31Z	
+L6 pertes_grpc	2026-11-03T08:59:33Z	
+L6 pertes_grpc fait	2026-11-03T08:59:34Z	

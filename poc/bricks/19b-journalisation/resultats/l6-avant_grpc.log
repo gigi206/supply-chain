@@ -1,0 +1,33 @@
+# journalisation.sh avant_grpc, 2026-11-03T08:55:11Z
+## ports en écoute de loki et d'alloy
+*:35459 users:(("alloy",pid=48561))
+*:38365 users:(("alloy",pid=48561))
+127.0.0.1:12345 users:(("alloy",pid=48561))
+127.0.0.1:9096 users:(("loki",pid=47496))
+192.168.161.13:3100 users:(("loki",pid=47496))
+192.168.161.13:3501 users:(("alloy",pid=48561))
+192.168.161.13:3502 users:(("alloy",pid=48561))
+== 9096, httpgrpc en clair
+HTTP/2 200  grpc-status: 0 ready
+
+== 9096, httpgrpc en TLS sans certificat client
+curl: (35) TLS connect error: error:0A00010B:SSL routines::wrong version number
+
+== 35459, httpgrpc en clair
+HTTP/2 200  grpc-status: 0 ready
+
+== 35459, httpgrpc en TLS sans certificat client
+curl: (35) TLS connect error: error:0A00010B:SSL routines::wrong version number
+
+== 38365, httpgrpc en clair
+HTTP/2 200  grpc-status: 0 ready
+
+== 38365, httpgrpc en TLS sans certificat client
+curl: (35) TLS connect error: error:0A00010B:SSL routines::wrong version number
+
+## depuis l'hôte : ports de sc-stockage hors boucle locale tenus par loki ou alloy (connexion TCP)
+3100 : ouvert
+3501 : ouvert
+3502 : ouvert
+35459 : ouvert
+38365 : ouvert

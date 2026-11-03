@@ -1,0 +1,49 @@
+# journalisation.sh controle_grpc, 2026-11-03T08:55:49Z
+## ports en écoute de loki et d'alloy
+127.0.0.1:12345 users:(("alloy",pid=48561))
+127.0.0.1:3511 users:(("alloy",pid=48561))
+127.0.0.1:3512 users:(("alloy",pid=48561))
+127.0.0.1:9096 users:(("loki",pid=80618))
+192.168.161.13:3100 users:(("loki",pid=80618))
+192.168.161.13:3501 users:(("alloy",pid=48561))
+192.168.161.13:3502 users:(("alloy",pid=48561))
+== 3511, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 3511, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+== 3512, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 3512, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+== 9096, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 9096, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+## depuis l'hôte : ports de sc-stockage hors boucle locale tenus par loki ou alloy (connexion TCP)
+3100 : ouvert
+3501 : ouvert
+3502 : ouvert
+## certificats acceptés par port gRPC (tunnel SSH vers la boucle locale de sc-stockage ; httpgrpc /ready)
+9096  loki-interne         grpc-status: 0 ready
+
+9096  controle             grpc-status: 0 ready
+
+9096  alloy-sc-confiance   curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+9096  alloy-sc-build       curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  loki-interne         curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  controle             curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  alloy-sc-confiance   grpc-status: 0 ready
+
+3511  alloy-sc-build       curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  loki-interne         curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  controle             curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  alloy-sc-confiance   curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  alloy-sc-build       grpc-status: 0 ready
+
+tunnel : Exit request sent.

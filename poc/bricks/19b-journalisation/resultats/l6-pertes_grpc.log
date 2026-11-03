@@ -1,0 +1,5 @@
+# journalisation.sh pertes_grpc, 2026-11-03T08:59:33Z
+fenêtre : 08:53:11 à 08:58:33 UTC (5 min)
+sc-confiance  journald   5   Loki   5   OK
+sc-build      journald   6   Loki   6   OK
+sc-stockage   journald   5   Loki   5   OK

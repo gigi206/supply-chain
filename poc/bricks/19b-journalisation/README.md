@@ -424,4 +424,38 @@ Choix du propriétaire : « TLS sur le gRPC (b) ».
 - Plus aucun port d'Alloy n'est ouvert au hasard.
 - Le relais HTTP est inchangé (étiquette `noeud` imposée).
 
-Prédictions : [`l6-predictions.md`](resultats/l6-predictions.md). **Rien n'est encore posé sur `sc-stockage`** : le passage attend l'accord du propriétaire.
+Prédictions : [`l6-predictions.md`](resultats/l6-predictions.md). Posé sur `sc-stockage` en L6, ci-dessous.
+
+## L6, exécuté (03/11/2026, 08:55 à 08:59 UTC, accord du propriétaire : « Oui, lancer L6 »)
+
+Commandes :
+- `JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls controle_grpc`
+- `controle_grpc`, rejoué après une correction du script
+- `controle_l3 temoins pertes_grpc`
+
+Journaux : `resultats/l6-*.log`, dont [`l6-complement.log`](resultats/l6-complement.log), relevé en lecture seule après le passage.
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 1 | `loki-interne` vérifié `OK` par la CA du PoC, clé en 600 | conforme |
+| 2 | Avant : Alloy écoute sur `*:35459` et `*:38365`, ouverts depuis l'hôte ; `httpgrpc` en clair répond « ready » sur ces deux ports et sur 9096 ; en TLS, échec de la poignée (`wrong version number`) | conforme |
+| 3 | `config is valid`, copie d'Alloy valide ; Alloy rechargé par SIGHUP (**même PID 48561**, relais rechargé en 1 s) ; Loki `/ready` 200 **19 s** après le redémarrage ; erreurs : arrêt de l'ancien querier (`context canceled`), `empty ring` au démarrage, **un push refusé (500, `empty ring`) pendant le démarrage** ; aucune erreur TLS | conforme |
+| 4 | Après : **plus aucun port sur `*`** (Alloy : 3501 et 3502 sur `192.168.161.13` ; 3511, 3512 et 12345 sur `127.0.0.1` ; Loki : 3100 et `127.0.0.1:9096`) ; en clair, échec du cadrage HTTP/2 ; sans certificat, `certificate required` ; depuis l'hôte, seuls 3100, 3501 et 3502 ; matrice des certificats identique à la prédiction (9096 : `loki-interne` et `controle` acceptés, certificats des nœuds refusés en `unknown ca` ; 3511 : `alloy-sc-confiance` seul ; 3512 : `alloy-sc-build` seul) | conforme |
+| 5 | Dans les 10 dernières minutes, des lignes des trois nœuds (dont `audit-k8s`, `pods` et `journal` de `sc-confiance`, et `journal` de `sc-build`, par le relais) ; D17 inchangée (certificat de `sc-build` refusé par Loki et par 3501, ligne `noeud=sc-confiance` stockée sous `sc-build`) ; l'auditeur lit k3s par Grafana ; Alloy : 0 erreur sur les trois VM | conforme |
+| 6 | Dix témoins lus par l'auditeur dans Grafana en 2 à 5 s, contre-épreuve comprise | conforme |
+| 7 | Battements de journald et de Loki sur 08:53:11 à 08:57:30 ([premier relevé](resultats/l6-pertes_grpc-fenetre-4min.log)) : 4 et 4 (`sc-confiance`), 5 et 5 (`sc-build`), 4 et 4 (`sc-stockage`) ; relevé de 08:59 sur 08:53:11 à 08:58:33 : 5 et 5, 6 et 6, 5 et 5 ; aucune alerte active | conforme |
+
+**Écart du script, sans effet sur les services** : au premier passage de `controle_grpc` ([archivé](resultats/l6-controle_grpc-premier-passage.log)), les certificats acceptés recevaient `grpc-status: 2`.
+- La trame gRPC était gardée dans une variable bash, et bash tronque une chaîne au premier octet nul : la trame envoyée était vide. La poignée TLS avait pourtant réussi, puisque le serveur répondait un statut gRPC.
+- Le piège de fermeture du tunnel lisait une variable locale déjà détruite (`unbound variable`). Le tunnel était fermé quand même par la fin normale de l'étape.
+- Après correction (trame écrite par une fonction, piège développé à sa pose), le second passage est conforme.
+
+**Constat (mesuré)** : les refus du gRPC (`unknown ca`, `certificate required`) n'apparaissent dans aucun journal. Le serveur gRPC de dskit ne trace pas les poignées échouées, alors que le serveur HTTP de Go les trace (`http: TLS handshake error`). Une tentative refusée sur 9096, 3511 ou 3512 ne laisse donc pas de trace d'audit. Ces ports n'écoutent que sur la boucle locale.
+
+**D16 et D17 rétablies en l'état déployé** :
+- sur le relais, seuls les certificats de l'autorité du nœud sont acceptés, en HTTP comme en gRPC ;
+- sur Loki, seuls les certificats de la CA du PoC sont acceptés, en HTTP comme en gRPC.
+
+La limite de D16 demeure : tout porteur d'un certificat de la CA du PoC lit et écrit tous les journaux. La période de L3 à L6 reste sans garantie (voir les limites du constat).
+
+**Résidus** : `/etc/loki/loki.yaml.avant-l6` et `/etc/alloy/relais.alloy.avant-l6` sur `sc-stockage`, pour un retour arrière manuel.

@@ -1,0 +1,13 @@
+# journalisation.sh grpc_tls, 2026-11-03T08:55:11Z
+copies de sauvegarde : /etc/loki/loki.yaml.avant-l6, /etc/alloy/relais.alloy.avant-l6
+level=info ts=2026-11-03T08:55:12.178928865Z caller=main.go:109 msg="config is valid"
+configuration d'alloy (copie) valide
+## alloy : nouveau relais.alloy, rechargement par SIGHUP (pid 48561)
+alloy : active, pid 48561, relais rechargé en 1 s
+## loki : nouveau loki.yaml, redémarrage
+loki : active, /ready 200, 19 s après le redémarrage
+## erreurs et avertissements de loki et d'alloy depuis le redémarrage de loki (regroupés)
+     16 level=warn caller=netutil.go:29 msg="error getting network interfaces" err="route ip+net: netlinkrib: address family not supported by protocol"
+      4 level=error caller=scheduler_processor.go:111 component=querier msg="error processing requests from scheduler" err="rpc error: code = Canceled desc = context canceled" addr=127.0.0.1:9096
+      1 level=warn caller=logging.go:144 orgID=fake msg="POST /loki/api/v1/push (500) 575.922µs Response: \"empty ring\\n\""
+      1 level=error caller=ratestore.go:110 msg="error getting ingester clients" err="empty ring"

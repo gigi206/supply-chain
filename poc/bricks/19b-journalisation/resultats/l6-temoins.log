@@ -1,0 +1,13 @@
+# journalisation.sh temoins, 2026-11-03T08:56:00Z
+OK   contre-épreuve : marqueur jamais émis absent
+OK   J1 journal de sc-confiance : t4-journal-sc-confiance-1793696282864083869 lu par l'auditeur dans Grafana en 2 s
+OK   J1 journal de sc-build : t4-journal-sc-build-1793696285270831515 lu par l'auditeur dans Grafana en 4 s
+OK   J1 journal de sc-stockage : t4-journal-sc-stockage-1793696289566603425 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-confiance (openbao-0) : t4-pods-confiance-1793696291873061569 lu par l'auditeur dans Grafana en 5 s
+OK   J2 pods de sc-build (cilium-qvlnm) : t4-pods-build-1793696296098138494 lu par l'auditeur dans Grafana en 2 s
+OK   J3 audit de l'API : t4-audit-k8s-1793696298236377857 lu par l'auditeur dans Grafana en 2 s
+OK   J4 événements : t4-evenement-1793696300417278393 lu par l'auditeur dans Grafana en 2 s
+OK   J5 audit d'OpenBao (sortie du pod) : t4-openbao-1793696302566675867 lu par l'auditeur dans Grafana en 2 s
+OK   J6 audit de Zot (poc-ecriture, essais-19b/temoin) : t4-zot-1793696304815958678 lu par l'auditeur dans Grafana en 2 s
+récepteur : HTTP 200
+OK   J8 récepteur d'alertes : t4-recepteur-1793696308629568765 lu par l'auditeur dans Grafana en 2 s

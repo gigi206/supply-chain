@@ -659,7 +659,7 @@ etape_silences() { # depuis l'installation du battement (premier argument du jou
 #   controle_grpc     mêmes sondes qu'avant_grpc, plus les certificats acceptés et refusés par port (tunnel SSH vers la boucle
 #                     locale pour les certificats des nœuds, dont les clés restent sur l'hôte)
 #   pertes_grpc       battements de cœur : lignes de journald et de Loki sur une fenêtre encadrant grpc_tls, par VM (égalité)
-GRPC_TRAME=$'\x00\x00\x00\x00\x0d\x0a\x03GET\x12\x06/ready'   # httpgrpc.HTTPRequest {method: "GET", url: "/ready"}, trame gRPC
+trame_grpc() { printf '\x00\x00\x00\x00\x0d\x0a\x03GET\x12\x06/ready'; }   # httpgrpc.HTTPRequest {GET /ready}, trame gRPC (octets nuls : pas de variable)
 
 etape_certificats_grpc() {
   cert_client loki-interne
@@ -771,8 +771,9 @@ etape_controle_grpc() {
     timeout 3 bash -c "</dev/tcp/$HOTE/$p" 2>/dev/null && echo "$p : ouvert" || echo "$p : fermé"
   done
   echo "## certificats acceptés par port gRPC (tunnel SSH vers la boucle locale de sc-stockage ; httpgrpc /ready)"
-  printf '%s' "$GRPC_TRAME" > "$W/trame-grpc"
-  trap 'ssh "${SSH_OPTS[@]}" -S "$ctl" -O exit "poc@$HOTE" 2>/dev/null || true' EXIT   # la sous-coquille de lancer : tunnel fermé même en cas d'échec
+  trame_grpc > "$W/trame-grpc"
+  # shellcheck disable=SC2064   # développé maintenant : ctl est locale et n'existe plus à la sortie
+  trap "ssh ${SSH_OPTS[*]@Q} -S ${ctl@Q} -O exit poc@$HOTE 2>/dev/null || true" EXIT   # la sous-coquille de lancer : tunnel fermé même en cas d'échec
   ssh "${SSH_OPTS[@]}" -M -S "$ctl" -o ExitOnForwardFailure=yes -f -N \
     -L 127.0.0.1:19096:127.0.0.1:9096 -L 127.0.0.1:13511:127.0.0.1:3511 -L 127.0.0.1:13512:127.0.0.1:3512 "poc@$HOTE"
   for p in 9096 3511 3512; do

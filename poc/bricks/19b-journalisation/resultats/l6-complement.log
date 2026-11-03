@@ -1,0 +1,26 @@
+# L6, relevé complémentaire (03/11/2026, vers 09:00 UTC, lecture seule sur sc-stockage)
+loki depuis Tue 2026-11-03 08:55:12 UTC
+## erreurs et avertissements de Loki depuis 08:55:30 (regroupés) : seulement le bruit connu de la suppression désactivée ;
+## GetCacheGenNumbers atteint le compactor par son client gRPC, désormais en TLS
+    979 level=warn caller=grpc_logging.go:76 method=/grpc.Compactor/GetCacheGenNumbers msg=gRPC err="deletion is not available for this tenant"
+    979 level=error caller=gennumber_loader.go:136 msg="error loading cache generation numbers" err="rpc error: code = Unknown desc = deletion is not available for this tenant"
+## connexions établies vers 127.0.0.1:9096 (clients internes de Loki) : 10
+## alertes actives dans Prometheus : []
+## lignes TLS des journaux de loki et d'alloy depuis 08:55 : 11, toutes depuis l'hôte (192.168.161.1) : sondes TCP de
+## avant_grpc et controle_grpc (EOF, sans poignée) et refus voulus du certificat de sc-build par controle_l3
+2026-11-03T08:55:11+00:00 sc-stockage loki[47496]: 2026/11/03 08:55:11 http: TLS handshake error from 192.168.161.1:39998: EOF
+2026-11-03T08:55:11+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:11 http: TLS handshake error from 192.168.161.1:56972: EOF
+2026-11-03T08:55:11+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:11 http: TLS handshake error from 192.168.161.1:48882: EOF
+2026-11-03T08:55:31+00:00 sc-stockage loki[80618]: 2026/11/03 08:55:31 http: TLS handshake error from 192.168.161.1:59466: EOF
+2026-11-03T08:55:31+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:31 http: TLS handshake error from 192.168.161.1:53280: EOF
+2026-11-03T08:55:31+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:31 http: TLS handshake error from 192.168.161.1:42646: EOF
+2026-11-03T08:55:50+00:00 sc-stockage loki[80618]: 2026/11/03 08:55:50 http: TLS handshake error from 192.168.161.1:55026: EOF
+2026-11-03T08:55:50+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:50 http: TLS handshake error from 192.168.161.1:53410: EOF
+2026-11-03T08:55:50+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:50 http: TLS handshake error from 192.168.161.1:50366: EOF
+2026-11-03T08:55:54+00:00 sc-stockage loki[80618]: 2026/11/03 08:55:54 http: TLS handshake error from 192.168.161.1:55150: tls: failed to verify certificate: x509: certificate signed by unknown authority
+2026-11-03T08:55:54+00:00 sc-stockage alloy[48561]: 2026/11/03 08:55:54 http: TLS handshake error from 192.168.161.1:53412: tls: failed to verify certificate: x509: certificate signed by unknown authority
+## constat : les refus du gRPC (sondes de controle_grpc par le tunnel, unknown ca et certificate required) n'apparaissent dans
+## aucun journal : le serveur gRPC de dskit ne trace pas les poignées échouées, contrairement au serveur HTTP de Go
+## copies de sauvegarde (retour arrière manuel possible)
+-rw-r----- 1 root alloy 1489 Nov  2 21:03 /etc/alloy/relais.alloy.avant-l6
+-rw-r----- 1 root loki  1472 Nov  2 20:51 /etc/loki/loki.yaml.avant-l6
