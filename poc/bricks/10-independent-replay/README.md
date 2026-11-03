@@ -176,7 +176,7 @@ Téléchargements vérifiés, gardés pour la VM : `~/.cache/supply-chain-poc/10
 En R2, chaque archive est revérifiée **dans la VM** après la copie : le domaine contrôle ses propres outils.
 
 **Réseau de la VM** : question laissée par D3, à trancher avec l'accord de R2. Le réseau `supply-chain-poc` est un NAT libvirt simple (`virsh net-dumpxml`), sans filtrage entre les VM.
-- (a) **Même réseau**, adresse `.14` : préchargement direct depuis Zot et Forgejo. Mais la VM joint aussi tous les ports des trois nœuds : API de k3s, kubelets, SSH, OpenBao par NodePort. Elle n'a aucun identifiant, mais le « domaine distinct » s'en trouve affaibli.
+- (a) **Même réseau**, adresse `.14` : préchargement direct depuis Zot et Forgejo. Mais la VM joint aussi tous les ports des trois nœuds : API de k3s, kubelets, SSH, et les NodePort, relevés le 03/11 : `el-forgejo` (32631, 30717) et `el-forgejo-sync` (31264, 30778), c'est-à-dire les écouteurs des déclencheurs de builds. OpenBao n'a pas de NodePort. Elle n'a aucun identifiant, mais le « domaine distinct » s'en trouve affaibli.
 - (b) **Réseau libvirt distinct** (`supply-chain-replay`), avec un NAT vers l'extérieur pour les paquets Debian (signés par l'archive), puis lien coupé.
   - Les entrées venues de Zot et de Forgejo sont **transportées par l'hôte** sous forme de fichiers (layouts OCI, bundle git), puis vérifiées dans la VM par signature et par digest. Le transport ne peut donc rien altérer sans être vu.
   - La VM ne joint jamais le plan de confiance.
