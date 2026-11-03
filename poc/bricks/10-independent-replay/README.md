@@ -421,3 +421,15 @@ Le propriétaire, ou le root de l'hôte, peut donc forger à la fois la provenan
   - `builds/essai-replay` (D5) ;
   - `~/r5n` et `/var/lib/replay-buildkit-n` dans la VM (contre-épreuves ; leur nettoyage attend l'accord du propriétaire) ;
   - la VM `sc-replay` elle-même et ses clés, dans `~/.cache/supply-chain-poc/10/`.
+
+## Additif du 03/11/2026, 22:45 UTC : VSA re-poussée dans le rejeu `complet` de la 08 (accord du propriétaire : « Oui, avec VSA »)
+
+Le rejeu de zéro de la 08 a effacé Zot. Le bundle versionné `r5-vsa.bundle.json` y a été re-poussé par
+`JALON=r5 replay.sh pousser_vsa`, ce qui a réécrit [`r5-pousser_vsa.log`](resultats/r5-pousser_vsa.log). Le journal du push du
+03/11 à 15:00 UTC reste dans l'historique git.
+- **Manifeste identique** : `r5-vsa-manifeste.json` est inchangé (`c1bfbcbd`).
+- **Contrôle 6** : C1 admise, C2 et C3 refusées.
+- **Limite acceptée en connaissance de cause** : cette VSA atteste toujours le rebuild de l'ancienne construction (invocation
+  `d9006af7`, sur la fermeture de l'hôte), pas la construction du rejeu (fermeture de la plateforme). Le contrôle 6 l'accepte
+  quand même, parce que `vsa.sh` ne lie la VSA qu'au digest `3a7ca1b1`.
+- **Le domaine `sc-replay`** n'est pas touché par le rejeu de la 08.

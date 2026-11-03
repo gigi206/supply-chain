@@ -775,6 +775,8 @@ Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets 
     - celui de l'export de L4 (19b) : 174 468 lignes pour 174 437, écart du même ordre qu'au premier passage du 02/11
       (326 597 pour 326 558).
   - **VSA re-poussée** : manifeste identique (`c1bfbcbd`). Le contrôle 6 donne C1 admise, C2 et C3 refusées.
+    La VSA atteste toujours le rebuild de l'ancienne construction (`d9006af7`, sur la fermeture de l'hôte), pas celle du rejeu.
+    `vsa.sh` ne la lie qu'au digest : le propriétaire a accepté cette limite en connaissance de cause (README de la 10).
   - **Aucune fuite** ([`fuites-complet.log`](resultats/fuites-complet.log)).
 
 ## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
