@@ -1,0 +1,27 @@
+# mesure-tuf.sh, 2026-11-03T13:21:19Z ; cosign v3.1.4 ; strace 6.19
+cache copié : .sigstore/root/tuf-repo-cdn.sigstore.dev.json .sigstore/root/tuf-repo-cdn.sigstore.dev/root.json .sigstore/root/tuf-repo-cdn.sigstore.dev/snapshot.json .sigstore/root/tuf-repo-cdn.sigstore.dev/targets.json .sigstore/root/tuf-repo-cdn.sigstore.dev/targets/trusted_root.json .sigstore/root/tuf-repo-cdn.sigstore.dev/timestamp.json
+## espace de noms : lo ; routes : 0
+image jetable : 127.0.0.1:15002/essai/image@sha256:07bea825dcc2b28dc6787bc3e05c983b171772d46a2bc0cdec4482d32653f576
+## préparation (hors sonde) : signature et attestation au format ancien (.sig, .att), comme l'image réelle
+cosign sign : code 0 ; 
+cosign attest : code 0 ; 
+tags : sha256-07bea825dcc2b28dc6787bc3e05c983b171772d46a2bc0cdec4482d32653f576.att sha256-07bea825dcc2b28dc6787bc3e05c983b171772d46a2bc0cdec4482d32653f576.sig v1
+## préparation (hors sonde) : VSA signée par attest-blob --statement, referrer fait main dans le dépôt séparé vsa/essai
+attest-blob : code 0
+referrer poussé : vsa/essai@sha256:05e117ee37009aa487e6769c5ce2c4e248532c191cb3ff274ee4d2b6fb03749a
+referrers de l'image dans vsa/essai : ["application/vnd.dev.sigstore.bundle.v0.3+json"]
+## sondes (strace -f, connect/sendto/sendmsg/write)
+temoin-attest-sans-config, HOME vide : code 1 ; connexions hors Zot : 8 sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53") ; écritures de socket citant tuf-repo-cdn : 8
+    motif : Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get "https://tuf-repo-cdn.sigstore.dev/15.root.json": dial tcp: lookup tuf-repo-cdn.sigsto
+V1-verify-blob-attestation, HOME vide : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V2-verify-attestation-COSIGN_REPOSITORY, HOME vide : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V3-verify, HOME vide : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V4-verify-attestation-att, HOME vide : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+temoin-attest-sans-config, HOME cache : code 1 ; connexions hors Zot : 8 sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53") ; écritures de socket citant tuf-repo-cdn : 8
+    motif : Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get "https://tuf-repo-cdn.sigstore.dev/15.root.json": dial tcp: lookup tuf-repo-cdn.sigsto
+V1-verify-blob-attestation, HOME cache : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V2-verify-attestation-COSIGN_REPOSITORY, HOME cache : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V3-verify, HOME cache : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+V4-verify-attestation-att, HOME cache : code 0 ; connexions hors Zot : aucune ; écritures de socket citant tuf-repo-cdn : 0
+## cache copié après les sondes : .sigstore/root/tuf-repo-cdn.sigstore.dev/root.json (fichiers modifiés)
+## HOME vide après les sondes : .sigstore/root/tuf-repo-cdn.sigstore.dev/root.json

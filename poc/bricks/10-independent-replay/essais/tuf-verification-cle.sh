@@ -2,7 +2,7 @@
 # Brique 10, R5, mesure préalable SUR L'HÔTE (prédictions : resultats/r5-tuf-predictions.md ; accord du propriétaire du
 # 03/11/2026 : « Oui, mesurer ») : cosign tente-t-il de joindre le TUF public de Sigstore quand il vérifie avec une clé ?
 # Espace de noms réseau vide (unshare -rn, boucle locale seule) : aucune connexion extérieure possible ; les TENTATIVES sont
-# relevées par strace. Zot, image et clés jetables ; HOME vide, puis HOME muni d'une COPIE du cache ~/.sigstore (le vrai cache
+# relevées par strace, pour des vérifications réussies (bonne clé) et refusées (autre clé). Zot, image et clés jetables ; HOME vide, puis HOME muni d'une COPIE du cache ~/.sigstore (le vrai cache
 # n'est pas touché). Hors de replay.sh, comme les autres essais de R5, tant que R4 exécute replay.sh.
 # Journal : resultats/r5-tuf.log
 set -euo pipefail
@@ -28,7 +28,7 @@ export HOME=$d/home-vide COSIGN_PASSWORD=essai-jetable
 "$crane" append --insecure --oci-empty-base -f couche.tar -t 127.0.0.1:15002/essai/image:v1 > /dev/null 2>&1
 dig=$("$crane" digest --insecure 127.0.0.1:15002/essai/image:v1); img=127.0.0.1:15002/essai/image@$dig
 echo "image jetable : $img"
-mkdir cle && (cd cle && "$cosign" generate-key-pair > /dev/null 2>&1)
+mkdir cle autre && (cd cle && "$cosign" generate-key-pair > /dev/null 2>&1) && (cd autre && "$cosign" generate-key-pair > /dev/null 2>&1)
 "$cosign" signing-config create --out vide.json > /dev/null 2>&1
 echo "## préparation (hors sonde) : signature et attestation au format ancien (.sig, .att), comme l'image réelle"
 o=(--key cle/cosign.key --new-bundle-format=false --use-signing-config=false --tlog-upload=false --allow-http-registry --yes)
@@ -79,6 +79,14 @@ for h in vide cache; do
     --key cle/cosign.pub --insecure-ignore-tlog --type "$V" --allow-http-registry "$img"
   sonde V3-verify "$h" "$cosign" verify --key cle/cosign.pub --insecure-ignore-tlog --allow-http-registry "$img"
   sonde V4-verify-attestation-att "$h" "$cosign" verify-attestation --key cle/cosign.pub --insecure-ignore-tlog --type slsaprovenance1 \
+    --allow-http-registry "$img"
+  # refus (cas N3 de lire_vsa) : mêmes commandes, autre clé
+  sonde V1-autre-cle "$h" "$cosign" verify-blob-attestation --bundle vsa.bundle.json --new-bundle-format --key autre/cosign.pub \
+    --insecure-ignore-tlog --type "$V" --digest "${dig#sha256:}" --digestAlg sha256
+  sonde V2-autre-cle "$h" env COSIGN_REPOSITORY=127.0.0.1:15002/vsa/essai "$cosign" verify-attestation \
+    --key autre/cosign.pub --insecure-ignore-tlog --type "$V" --allow-http-registry "$img"
+  sonde V3-autre-cle "$h" "$cosign" verify --key autre/cosign.pub --insecure-ignore-tlog --allow-http-registry "$img"
+  sonde V4-autre-cle "$h" "$cosign" verify-attestation --key autre/cosign.pub --insecure-ignore-tlog --type slsaprovenance1 \
     --allow-http-registry "$img"
 done
 echo "## cache copié après les sondes : $(find "$d/home-cache" -type f -newer zot.json | sed "s#$d/home-cache/##" | paste -sd' ' -) (fichiers modifiés)"
