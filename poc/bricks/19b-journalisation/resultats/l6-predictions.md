@@ -1,4 +1,4 @@
-# L6, TLS sur le gRPC de Loki et du relais : prédictions (écrites le 03/11/2026, vers 08:55 UTC, avant toute exécution)
+# L6, TLS sur le gRPC de Loki et du relais : prédictions (écrites le 03/11/2026, première version vers 08:45 UTC, revue après relecture de l'advisor à 08:50 UTC, avant toute exécution)
 
 Choix du propriétaire (03/11/2026) : « TLS sur le gRPC (b) ». Constat : [`constat-grpc-relais.log`](constat-grpc-relais.log). Essai local sur l'hôte, sans toucher sc-stockage : [`correctif-grpc-essai-local.log`](correctif-grpc-essai-local.log). Il en a tiré une correction du gabarit : `frontend_worker.grpc_client_config` est refusé par `-verify-config` à côté de `query_frontend_grpc_client` et de `query_scheduler_grpc_client`.
 
@@ -13,13 +13,15 @@ Choix du propriétaire (03/11/2026) : « TLS sur le gRPC (b) ». Constat : [`con
   - Boucle locale, ports fixes 3511 (confiance) et 3512 (build).
   - Même certificat et même autorité que le bloc `http` de la source.
 - **`journalisation.sh`**
-  - Jalon L6 : étapes `certificats_grpc`, `avant_grpc`, `grpc_tls` et `controle_grpc`.
+  - Jalon L6 : étapes `certificats_grpc`, `avant_grpc`, `grpc_tls`, `controle_grpc` et `pertes_grpc`.
+  - `grpc_tls` prend des copies de sauvegarde (`*.avant-l6`) et valide sur une copie. Il recharge Alloy par SIGHUP, ce qui ne redémarre que le serveur du relais et garde la file de `loki.write` (code : `NeedsRestart`). Il redémarre ensuite Loki. Si un service ne revient pas, il revient en arrière automatiquement.
+  - Le tunnel SSH de `controle_grpc` est fermé par un piège, même en cas d'échec.
   - `loki-interne` est ajouté aux étapes `certificats` et `installer` de L2, pour qu'un rejeu complet reste cohérent.
 
 Commande prévue :
 
 ```
-JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls controle_grpc controle_l3 temoins
+JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls controle_grpc controle_l3 temoins pertes_grpc
 ```
 
 ## Prédictions
@@ -35,7 +37,8 @@ JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls control
    - Depuis l'hôte, 3100, 3501, 3502 et les deux ports au hasard sont ouverts.
 3. **`grpc_tls`** :
    - `-verify-config` : « config is valid ». Alloy : configuration valide.
-   - Loki `active`, `/ready` à 200 en moins de 60 s. Alloy `active`.
+   - Alloy, après SIGHUP : même PID, 3511 et 3512 en écoute sur la boucle locale en moins de 30 s, et plus aucun port sur `*`.
+   - Loki `active`, `/ready` à 200 en moins de 60 s.
    - Erreurs depuis le redémarrage : seulement les bruits connus (`deletion is not available`, `empty ring` au démarrage).
    - Aucune erreur TLS ni `transport` sur les clients internes de Loki.
 4. **`controle_grpc`** :
@@ -57,14 +60,15 @@ JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls control
 
      `controle` est accepté sur 9096 parce que Loki accepte toute la CA du PoC, comme sur 3100 (limite de D16, inchangée).
 5. **`controle_l3`** (étape existante, rejouée) :
-   - Les dix sources attendues ont des lignes.
+   - Dans le tableau des 10 dernières minutes, `sc-confiance`, `sc-build` et `sc-stockage` ont des lignes, dont celles des sources reçues par le relais (`journal`, `pods`, `audit-k8s`). C'est ce tableau qui prouve que la collecte reprend après L6. La liste des sources porte sur 24 h et inclut des lignes d'avant L6.
    - D17 inchangée : le certificat de `sc-build` est refusé par Loki et par le port 3501, et sa ligne étiquetée `noeud=sc-confiance` est stockée sous `noeud=sc-build`.
    - L'auditeur lit le journal de k3s par Grafana.
    - Alloy `active` sur les trois VM. D'éventuelles erreurs d'envoi sont limitées à la fenêtre de redémarrage de Loki.
 6. **`temoins`** (étape existante, rejouée) : chaque témoin est lu par l'auditeur à travers Grafana en moins de 2 min. Contre-épreuve comprise.
-7. **Pas de perte** :
-   - `SourceMuette` reste `inactive`.
-   - Les lignes émises pendant le redémarrage de Loki (quelques secondes) sont réessayées par `loki.write` et arrivent. Le WAL de Loki est activé (`/var/lib/loki/wal`).
+7. **`pertes_grpc`, pas de perte** : sur la fenêtre qui va de 2 min avant `grpc_tls` à 1 min avant le relevé, le nombre de battements est le même dans journald et dans Loki, pour chacune des trois VM.
+   - Les lignes de `sc-confiance` et de `sc-build` passent par le relais rechargé.
+   - Celles de `sc-stockage` vont directement dans Loki redémarré, réessayées par `loki.write` ; le WAL de Loki est activé.
+   - `SourceMuette` reste `inactive`, mais ne prouverait rien sur une coupure de quelques secondes.
 
 ## Limites connues avant l'exécution
 
@@ -72,6 +76,15 @@ JALON=l6 mise run journalisation -- certificats_grpc avant_grpc grpc_tls control
 - `controle` reste accepté par le gRPC de Loki : le correctif ferme l'accès sans certificat, pas la limite de D16, où tout porteur d'un certificat de la CA du PoC lit et écrit.
 - Les clients gRPC internes non configurés (index gateway, bloom, pattern ingester, limites d'ingestion) ne servent pas dans cette configuration : ces fonctions sont désactivées, ou en mode binaire unique sans passerelle d'index. S'ils étaient activés, ils échoueraient en clair contre le serveur TLS. L'essai local a démarré tous les services sans erreur TLS.
 - L'écriture sans certificat par le gRPC n'a pas été essayée avant le correctif. Le propriétaire n'a pas donné son accord pour un témoin écrit par ce chemin.
+
+## Ce que le passage modifie ou écrit
+
+- Sur `sc-stockage` :
+  - `loki-interne` (certificat et clé) dans `/etc/loki/tls/`, `loki.yaml` et `relais.alloy` remplacés, copies `*.avant-l6` ;
+  - Alloy rechargé et Loki redémarré, d'où une interruption de la lecture par Grafana de quelques dizaines de secondes.
+- `controle_l3` écrit une ligne de contrôle par le port 3502.
+- `temoins` écrit des lignes témoins, dont un push vers Zot (`essais-19b/temoin`, résidu déjà consigné), comme en L4.
+- Rien n'est modifié sur le cluster, `sc-confiance` ni `sc-build`.
 
 ## Point ouvert, sans lien avec L6
 

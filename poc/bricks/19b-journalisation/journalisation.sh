@@ -653,10 +653,12 @@ etape_silences() { # depuis l'installation du battement (premier argument du jou
 # les routes HTTP de Loki et du relais sur leur port gRPC, sans le mTLS du bloc http.
 #   certificats_grpc  certificat client loki-interne (CA du PoC), présenté par les clients gRPC internes de Loki
 #   avant_grpc        relevé avant correctif : ports d'écoute de loki et d'alloy sur sc-stockage, sondes httpgrpc (lecture /ready)
-#   grpc_tls          loki.yaml (grpc_tls_config et clients internes) et relais.alloy (bloc grpc) posés sur sc-stockage ;
-#                     loki -verify-config et alloy validate avant redémarrage ; Loki prêt (WAL activé : rien de perdu)
+#   grpc_tls          loki.yaml (grpc_tls_config et clients internes) et relais.alloy (bloc grpc) posés sur sc-stockage :
+#                     copies de sauvegarde, validation sur copie, Alloy rechargé (SIGHUP) puis Loki redémarré (WAL activé),
+#                     retour arrière automatique si un service ne revient pas
 #   controle_grpc     mêmes sondes qu'avant_grpc, plus les certificats acceptés et refusés par port (tunnel SSH vers la boucle
 #                     locale pour les certificats des nœuds, dont les clés restent sur l'hôte)
+#   pertes_grpc       battements de cœur : lignes de journald et de Loki sur une fenêtre encadrant grpc_tls, par VM (égalité)
 GRPC_TRAME=$'\x00\x00\x00\x00\x0d\x0a\x03GET\x12\x06/ready'   # httpgrpc.HTTPRequest {method: "GET", url: "/ready"}, trame gRPC
 
 etape_certificats_grpc() {
@@ -693,36 +695,72 @@ etape_avant_grpc() {
   done
 }
 
-etape_grpc_tls() {
+etape_grpc_tls() { # copies de sauvegarde ; validation sur copie ; Alloy rechargé par SIGHUP (seul le serveur du relais redémarre,
+  # la file de loki.write reste) avant le redémarrage de Loki ; retour arrière automatique si un service ne revient pas
   [ -s "$P/loki-interne.crt" ] || { echo "KO   étape certificats_grpc d'abord" >&2; exit 1; }
   rm -rf "${D:?}" && (umask 077 && mkdir -p "$D")
   cp "$here/config/loki.yaml" "$here/config/alloy/stockage/relais.alloy" "$P/loki-interne.crt" "$S/loki-interne.key" "$D/"
   copier sc-stockage /tmp/grpc-tls "$D"/*
   rm -rf "${D:?}"
+  date +%s > "$W/l6-debut"   # début de la fenêtre de l'étape pertes_grpc
   sur sc-stockage sudo bash -s <<'EOS'
 set -euo pipefail
 cd /tmp/grpc-tls
+alloy_pret() { # 3511 et 3512 sur la boucle locale, aucun port d'alloy sur toutes les interfaces
+  local l; l=$(ss -ltnpH | grep 'users:(("alloy"' | awk '{print $4}')
+  grep -qx '127.0.0.1:3511' <<<"$l" && grep -qx '127.0.0.1:3512' <<<"$l" && ! grep -qE '^(\*|0\.0\.0\.0|\[::\]):' <<<"$l"
+}
+loki_pret() {
+  [ "$(curl -s -o /dev/null -w '%{http_code}' --cacert /etc/loki/tls/ca-poc.crt --cert /etc/loki/tls/loki-interne.crt \
+    --key /etc/loki/tls/loki-interne.key https://192.168.161.13:3100/ready || true)" = 200 ]
+}
 install -m 0644 loki-interne.crt /etc/loki/tls/
 install -m 0640 -g loki loki-interne.key /etc/loki/tls/
+cp -p /etc/loki/loki.yaml /etc/loki/loki.yaml.avant-l6
+cp -p /etc/alloy/config/relais.alloy /etc/alloy/relais.alloy.avant-l6   # hors de config/ : alloy charge tous les *.alloy
+echo "copies de sauvegarde : /etc/loki/loki.yaml.avant-l6, /etc/alloy/relais.alloy.avant-l6"
 /usr/local/bin/loki -config.file=loki.yaml -verify-config 2>&1 | tail -1
-install -m 0640 -g loki loki.yaml /etc/loki/loki.yaml
+mkdir -m 0750 alloy-config && cp /etc/alloy/config/*.alloy alloy-config/ && cp relais.alloy alloy-config/
+/usr/local/bin/alloy validate alloy-config && echo "configuration d'alloy (copie) valide"
+echo "## alloy : nouveau relais.alloy, rechargement par SIGHUP (pid $(systemctl show -p MainPID --value alloy))"
 install -m 0640 -g alloy relais.alloy /etc/alloy/config/relais.alloy
-/usr/local/bin/alloy validate /etc/alloy/config && echo "configuration d'alloy valide"
+systemctl kill -s HUP alloy
+for i in $(seq 30); do alloy_pret && break; sleep 1; done
+if ! alloy_pret; then
+  echo "KO   relais non rechargé en 30 s : retour arrière"
+  install -m 0640 -g alloy /etc/alloy/relais.alloy.avant-l6 /etc/alloy/config/relais.alloy; systemctl kill -s HUP alloy; exit 1
+fi
+echo "alloy : $(systemctl is-active alloy), pid $(systemctl show -p MainPID --value alloy), relais rechargé en ${i} s"
+echo "## loki : nouveau loki.yaml, redémarrage"
+install -m 0640 -g loki loki.yaml /etc/loki/loki.yaml
 cd / && rm -rf /tmp/grpc-tls
 debut=$(date +%s)
 systemctl restart loki
-for i in $(seq 90); do   # le délai de 15 s de l'ingester ne court qu'à partir d'un premier appel de /ready
-  c=$(curl -s -o /dev/null -w '%{http_code}' --cacert /etc/loki/tls/ca-poc.crt --cert /etc/loki/tls/loki-interne.crt \
-    --key /etc/loki/tls/loki-interne.key "https://192.168.161.13:3100/ready" || true)
-  [ "$c" = 200 ] && break; sleep 2
-done
-echo "loki : $(systemctl is-active loki), /ready HTTP $c, $(( $(date +%s) - debut )) s après le redémarrage"
-systemctl restart alloy
-sleep 5
-echo "alloy : $(systemctl is-active alloy)"
-echo "## erreurs et avertissements depuis le redémarrage (regroupés)"
+for i in $(seq 90); do loki_pret && break; sleep 2; done   # le délai de 15 s de l'ingester ne court qu'après un premier /ready
+if ! loki_pret; then
+  echo "KO   loki pas prêt en 180 s : retour arrière"
+  install -m 0640 -g loki /etc/loki/loki.yaml.avant-l6 /etc/loki/loki.yaml; systemctl restart loki; exit 1
+fi
+echo "loki : $(systemctl is-active loki), /ready 200, $(( $(date +%s) - debut )) s après le redémarrage"
+echo "## erreurs et avertissements de loki et d'alloy depuis le redémarrage de loki (regroupés)"
 journalctl -u loki -u alloy --since "@$debut" -o cat | grep -E 'level=(error|warn)' | sed -E 's/ts=[^ ]+ //; s/duration=[^ ]+ //' | cut -c1-200 | sort | uniq -c | sort -rn | head -12 || true
 EOS
+}
+
+etape_pertes_grpc() { # battements (un par minute et par VM) : lignes de journald et lignes de Loki sur la même fenêtre, qui commence
+  # 2 min avant grpc_tls et finit 1 min avant ce relevé ; égalité attendue
+  [ -s "$W/l6-debut" ] || { echo "KO   étape grpc_tls d'abord" >&2; exit 1; }
+  local a b v nj nl
+  a=$(( $(cat "$W/l6-debut") - 120 )); b=$(( $(date +%s) - 60 ))
+  echo "fenêtre : $(date -u -d "@$a" +%H:%M:%S) à $(date -u -d "@$b" +%H:%M:%S) UTC ($(( (b - a) / 60 )) min)"
+  for v in sc-confiance sc-build sc-stockage; do
+    nj=$(sur "$v" "sudo journalctl -t battement-19b --since @$a --until @$b -o cat | wc -l")
+    lki controle /loki/api/v1/query -G --data-urlencode "query=sum(count_over_time({noeud=\"$v\", unite=\"battement-19b.service\"}[$((b - a))s]))" \
+      --data-urlencode "time=$b" >/dev/null
+    nl=$(jq -r '.data.result[0].value[1] // 0' "$W/lki.out")
+    printf '%-13s journald %3s   Loki %3s   %s\n' "$v" "$nj" "$nl" "$([ "$nj" = "$nl" ] && echo OK || echo KO)"
+  done
+  rm -f "${W:?}/lki.out" "${W:?}/lki.err"
 }
 
 etape_controle_grpc() {
@@ -734,6 +772,7 @@ etape_controle_grpc() {
   done
   echo "## certificats acceptés par port gRPC (tunnel SSH vers la boucle locale de sc-stockage ; httpgrpc /ready)"
   printf '%s' "$GRPC_TRAME" > "$W/trame-grpc"
+  trap 'ssh "${SSH_OPTS[@]}" -S "$ctl" -O exit "poc@$HOTE" 2>/dev/null || true' EXIT   # la sous-coquille de lancer : tunnel fermé même en cas d'échec
   ssh "${SSH_OPTS[@]}" -M -S "$ctl" -o ExitOnForwardFailure=yes -f -N \
     -L 127.0.0.1:19096:127.0.0.1:9096 -L 127.0.0.1:13511:127.0.0.1:3511 -L 127.0.0.1:13512:127.0.0.1:3512 "poc@$HOTE"
   for p in 9096 3511 3512; do

@@ -395,3 +395,33 @@ Découverte fortuite en préparant le pare-feu, pas une mesure planifiée : aucu
   - (a) `listen_address = "127.0.0.1"` seul, qui ramène le relais au niveau actuel de Loki ;
   - (b) en plus, `tls { client_auth_type = "RequireAndVerifyClientCert" … }`, appliqué au serveur gRPC par dskit ;
 - pour Loki, `server.grpc_tls_config`. Il faut alors des certificats pour ses propres clients gRPC internes (à vérifier dans Loki 3.7.9, dont la version de dskit n'a pas été lue).
+
+**Limites du constat** :
+- Les lignes stockées sous `noeud="sc-confiance"` ou `noeud="sc-build"` entre L3 (02/11/2026, 21:03 UTC) et le correctif n'ont pas la garantie de D17. Une injection par le gRPC ne peut pas être exclue, parce que le serveur gRPC du relais ne journalise pas ses requêtes : dskit est lancé avec `RegisterInstrumentation=false`.
+- Pour la même raison, une écriture directe dans Loki par un processus local de `sc-stockage` ne peut pas être exclue sur cette période.
+
+### Additif du 03/11/2026 : choix (b) du propriétaire, L6 préparé
+
+Choix du propriétaire : « TLS sur le gRPC (b) ».
+
+**Correctif préparé** :
+- `config/loki.yaml` :
+  - `grpc_tls_config` avec certificat client exigé, sur la CA du PoC, comme pour le HTTP ;
+  - les clients gRPC internes de Loki présentent un nouveau certificat, `loki-interne`.
+- `relais.alloy` :
+  - un bloc `grpc` par source, sur la boucle locale, avec des ports fixes (3511, 3512) ;
+  - le même certificat et la même autorité que le bloc `http` de la source.
+- Jalon L6 dans `journalisation.sh` :
+  - sauvegarde, validation sur copie, Alloy rechargé par SIGHUP puis Loki redémarré, retour arrière automatique ;
+  - sondes avant et après, matrice des certificats ;
+  - comptage des battements de journald et de Loki, pour mesurer l'absence de perte.
+
+**Essai local sur l'hôte** ([`correctif-grpc-essai-local.log`](resultats/correctif-grpc-essai-local.log)) : binaires des archives vérifiées, PKI jetable, 127.0.0.1, sans installation.
+- `loki -verify-config` a refusé `frontend_worker.grpc_client_config` à côté de `query_frontend_grpc_client` et `query_scheduler_grpc_client`. Le gabarit est corrigé.
+- Loki a démarré tous ses services. L'écriture et la requête ont traversé le chemin interne en gRPC TLS.
+- Le gRPC de Loki et celui du relais refusent la connexion en clair, sans certificat, et avec une autre autorité. Ils répondent avec la bonne autorité.
+- Chaque port du relais n'accepte que l'autorité de sa source.
+- Plus aucun port d'Alloy n'est ouvert au hasard.
+- Le relais HTTP est inchangé (étiquette `noeud` imposée).
+
+Prédictions : [`l6-predictions.md`](resultats/l6-predictions.md). **Rien n'est encore posé sur `sc-stockage`** : le passage attend l'accord du propriétaire.
