@@ -188,3 +188,14 @@ Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy d
 - **Hermeto contacte l'origine git des sources** (`git fetch` de tous les tags), sans passer par le proxy. Dans le cluster, le pod de prefetch devra pouvoir lire Forgejo.
 - **Le chemin de la fermeture n'est pas figé** pour gomod ni pour yarn : `generate-env` le reporte dans les variables (`YARN_GLOBAL_FOLDER`, `GOPROXY`…). Le constat « chemins canoniques obligatoires » de cette brique reste à revérifier pour npm (lockfile réécrit par `inject-files`), non mesuré en F1.
 - **La toolchain suit le projet** : Traefik est passé de Go 1.26 à 1.27 entre deux tags correctifs.
+
+## Décisions D1 à D6 pour F2 (03/11/2026, choix du propriétaire : « Toutes (Recommandé) »)
+
+- **D1 (a)** : pipeline de prefetch séparée. La pipeline de construction reste épinglée sur le digest de la fermeture.
+- **D2 (a)** : `toFQDNs` limité aux noms mesurés en F1 pour Go (`proxy.golang.org`, `storage.googleapis.com`), plus la lecture de Forgejo (`git fetch` des tags par Hermeto). Aucune autre sortie. Le registre npm dépend de la question npm, encore ouverte.
+- **D3 (a)** : compte Zot `poc-fermetures`, création par digest dans `entrees/**`, avec la tâche `publier-fermeture` séparée et sans secret dans le pod de prefetch.
+- **D4 (a)** : image d'outils construite par la plateforme : Hermeto 0.64.0, ses toolchains, et Node et yarn si npm est retenu.
+- **D5 (a)** : workspace `entrees` monté en lecture seule dans `construire-image`.
+- **D6 (a)** : règle de la porte qui exige que la fermeture vienne de la pipeline de prefetch. L'image `3a7ca1b1` actuelle est refusée jusqu'à F3.
+
+Question ouverte avant F2 : le prefetch doit-il inclure npm, sachant que `web/dist` reste construit sur l'hôte ?
