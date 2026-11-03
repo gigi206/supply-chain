@@ -4,6 +4,9 @@
 # /partage, même en refus ; une erreur de ec fait échouer le pod), puis le contrôle 9 (politique/porte/horodatage.sh) sur
 # l'image d'outils @OUTILS@ (cosign v3.1.4), avec les bundles de @BUNDLES@. Verdict de la porte : succès de ec et
 # horodatage complet (code de sortie du conteneur horodatage).
+# Contrôle 6 (demandé par la brique 10, choix du propriétaire du 03/11/2026) : conteneur vsa (politique/porte/vsa.sh), même image
+# d'outils, en parallèle de horodatage ; VSA de replay lue dans builds/vsa/<nom>, clé du domaine de replay (vsa.pub). Verdict de
+# la porte : succès de ec, horodatage complet et VSA retenue (le Job ne réussit que si les deux conteneurs réussissent).
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -103,6 +106,30 @@ spec:
           readOnly: true
         - name: tmp
           mountPath: /tmp
+      - name: vsa
+        image: "@OUTILS@"
+        command: [sh, /etc/porte/vsa.sh]
+        env:
+        - name: IMAGE
+          value: @IMAGE@
+        - name: HOME
+          value: /tmp
+        - name: TMPDIR
+          value: /tmp
+        resources:
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: porte
+          mountPath: /etc/porte
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
       volumes:
       - name: porte
         configMap:
@@ -124,6 +151,10 @@ spec:
             path: horodatage.sh
           - key: tsa-racine-confiance.json
             path: tsa-racine-confiance.json
+          - key: vsa.sh
+            path: vsa.sh
+          - key: vsa.pub
+            path: vsa.pub
       - name: partage
         emptyDir:
           sizeLimit: 16Mi

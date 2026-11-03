@@ -1255,12 +1255,14 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
 }
 
 cm_porte() { # ConfigMap porte : politique, règles du PoC, liste revue, clé publique de Chains, CA du PoC ; J8 (test 8) : contrôle 9
-  # (politique/porte/horodatage.sh) et racine de confiance du TSA (J5)
+  # (politique/porte/horodatage.sh) et racine de confiance du TSA (J5) ; contrôle 6 (brique 10) : politique/porte/vsa.sh et clé
+  # publique du domaine de replay, prise hors bande dans le dépôt de la brique 10
   kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
     --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
     --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
     --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" \
     --from-file=horodatage.sh="$here/politique/porte/horodatage.sh" --from-file=tsa-racine-confiance.json="$P/tsa-racine-confiance.json" \
+    --from-file=vsa.sh="$here/politique/porte/vsa.sh" --from-file=vsa.pub="$here/../10-independent-replay/resultats/vsa-cle-publique.pem" \
     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
 }
 
@@ -1269,8 +1271,9 @@ juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, port
   # conteneur ec en s|horodatage (ok, refus)|détail du contrôle 9 (codes de règles triés), ou ERREUR|cas|motif si ec n'a rendu
   # aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images (spec
   # ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, ec juge comme en J6. Les champs 7 et 8
-  # (J8, test 8) viennent du conteneur horodatage ; success (champ 3) reste celui de ec
-  local j=porte-$1 l d h s=()
+  # (J8, test 8) viennent du conteneur horodatage ; success (champ 3) reste celui de ec. Les champs 9 et 10 (contrôle 6, brique 10)
+  # viennent du conteneur vsa (ok ou refus, détail) ; les champs 1 à 8 sont inchangés
+  local j=porte-$1 l d h v s=()
   [ -n "${5:-}" ] && s=(-e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'$(jq -nc --arg c "$1" --arg i "$2" --argjson s "$5" \
     '{components: [{name: $c, containerImage: $i, source: $s}]}')'#")
   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
@@ -1282,15 +1285,18 @@ juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, port
   done
   kubectl logs -n porte "job/$j" -c porte > "$T/$j.log" 2>&1 || true
   kubectl logs -n porte "job/$j" -c horodatage > "$T/$j.horodatage" 2>&1 || true
+  kubectl logs -n porte "job/$j" -c vsa > "$T/$j.vsa" 2>&1 || true
   l=$(grep -m1 '^{' "$T/$j.log" || true)
   [ -n "$l" ] || { echo "ERREUR|$1|$(tail -1 "$T/$j.log" | cut -c1-200)"; return; }
   printf '%s\n' "$l" > "$T/$j.json"
   d=$(kubectl get pod -n porte -l job-name="$j" -o json | jq -r '.items[0].status.initContainerStatuses[0].state.terminated
     | (.finishedAt | fromdate) - (.startedAt | fromdate)')
   h=$(grep -m1 '^HORODATAGE|' "$T/$j.horodatage" | cut -d'|' -f2- || true)
-  jq -r --arg c "$1" --arg d "$d" --arg h "${h:-absent|$(tail -1 "$T/$j.horodatage" | cut -c1-160)}" '[.components[] | .violations[]? | .metadata.code] as $v
+  v=$(grep -m1 '^VSA|' "$T/$j.vsa" | cut -d'|' -f2- || true)
+  jq -r --arg c "$1" --arg d "$d" --arg h "${h:-absent|$(tail -1 "$T/$j.horodatage" | cut -c1-160)}" \
+    --arg r "${v:-absent|$(tail -1 "$T/$j.vsa" | cut -c1-160)}" '[.components[] | .violations[]? | .metadata.code] as $v
     | [.components[] | .warnings[]? | .metadata.code] as $w
-    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)"' "$T/$j.json"
+    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)|\($r)"' "$T/$j.json"
 }
 
 succes() { # cas code : la règle figure parmi les succès du verdict de la porte

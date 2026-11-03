@@ -100,6 +100,10 @@
 #   reelle  demandé par la brique 10 (R5) : image réelle jugée par la porte du cluster comme le cas reel du test 8 (source attendue,
 #          contrôle 9 sur horodatage/bundles), avant et après le push de la VSA dans builds/vsa/sample-app (PASSAGE=avant|apres) ;
 #          referrers de l'image relevés dans les deux dépôts. La brique 10 copie le journal à chaque passage et compare les verdicts
+#   controle6  contrôle 6 dans la porte (demandé par la brique 10) : ConfigMap porte réappliquée avec politique/porte/vsa.sh et la
+#          clé publique du domaine de replay ; conteneur vsa du Job (VSA lue dans builds/vsa/<nom>) ; C1 image réelle (VSA
+#          retenue), C2 même digest dans builds/essai-webhook (aucune VSA), C3 ConfigMap porte-temoin avec la clé de Chains à la
+#          place de celle du domaine (refus) ; rien écrit dans Zot
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2716,6 +2720,50 @@ etape_reelle() { # brique 10, R5 : PASSAGE=avant|apres (push de la VSA) ; la com
   grep -v '^HORODATAGE|' "$T/porte-reelle-$PASSAGE.horodatage" | sed 's/^/    /'
   [ "$(cut -d'|' -f1,3,4 <<< "$r")" = "VERDICT|true|" ] && echo "OK   ec admet l'image réelle (aucune violation)" || echo "KO   ec n'admet pas l'image réelle"
   [ "$(cut -d'|' -f7 <<< "$r")" = ok ] && echo "OK   contrôle 9 : ok ($(cut -d'|' -f8 <<< "$r"))" || echo "KO   contrôle 9 : $(cut -d'|' -f7- <<< "$r")"
+}
+
+etape_controle6() { # contrôle 6 dans la porte (demandé par la brique 10 ; choix du propriétaire du 03/11/2026 : « Contrôle 6 d'abord »)
+  local src r c ko=0 v=$here/../10-independent-replay/resultats/vsa-cle-publique.pem
+  src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  attendu() { # libellé obtenu attendu
+    [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)"; ko=$((ko + 1)); }
+  }
+  echo "## ConfigMap porte : contrôle 6 ajouté (vsa.sh, clé publique du domaine de replay)"
+  echo "clé de VSA : $(openssl pkey -pubin -in "$v" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; R2 : 578dd771…)"
+  cm_porte
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.vsa\.sh}') "$here/politique/porte/vsa.sh" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.vsa\.pub}') "$v" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.horodatage\.sh}') "$here/politique/porte/horodatage.sh" \
+    && echo "OK   ConfigMap porte : vsa.sh, vsa.pub et horodatage.sh identiques aux fichiers versionnés" \
+    || { echo "KO   ConfigMap porte" >&2; exit 1; }
+  echo "referrers de l'image : builds/sample-app $(referrers builds/sample-app) ; builds/vsa/sample-app $(referrers builds/vsa/sample-app)"
+
+  echo "## C1 image réelle, source attendue"
+  r=$(juger c6-reelle "$REG/$APP" policy.yaml porte "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
+  sed 's/^/    /' "$T/porte-c6-reelle.vsa"
+  attendu "C1 ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
+  attendu "C1 contrôle 9" "$(cut -d'|' -f7 <<< "$r")" ok
+  attendu "C1 contrôle 6" "$(cut -d'|' -f9,10 <<< "$r")" "ok|1/1 VSA retenue(s) dans $REG/builds/vsa/sample-app"
+
+  echo "## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucune VSA dans builds/vsa/essai-webhook"
+  r=$(juger c6-sans-vsa "$REG/builds/essai-webhook@$APP_DIGEST"); echo "$r"
+  sed 's/^/    /' "$T/porte-c6-sans-vsa.vsa"
+  attendu "C2 contrôle 6" "$(cut -d'|' -f9 <<< "$r")" refus
+  attendu "C2 détail" "$(cut -d'|' -f10 <<< "$r" | cut -d';' -f1)" "0/0 VSA retenue(s) dans $REG/builds/vsa/essai-webhook "
+
+  echo "## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du domaine de replay"
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$R/chains-cle-publique.pem" '.data["vsa.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  r=$(juger c6-cle-chains "$REG/$APP" policy.yaml porte-temoin "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée"
+  sed 's/^/    /' "$T/porte-c6-cle-chains.vsa"
+  attendu "C3 ec et contrôle 9 inchangés" "$(cut -d'|' -f3-5,7 <<< "$r")" "true||trusted_task.tagged|ok"
+  attendu "C3 contrôle 6" "$(cut -d'|' -f9 <<< "$r")" refus
+  c=$(cut -d'|' -f10 <<< "$r")
+  case $c in *"accepted signatures do not match threshold"*) echo "OK   C3 motif : signature refusée" ;;
+    *) echo "KO   C3 motif : $c"; ko=$((ko + 1)) ;; esac
+  echo "## bilan : $ko écart(s) aux prédictions"
 }
 
 lancer preuves J8 "$@"

@@ -1804,3 +1804,21 @@ L'audit de Zot trace les écritures réussies du compte, et les retrouve dans Lo
   - `poc-images`, dont le secret `zot-images` est dans `builds` (zone build), et `poc-replay` peuvent créer un tel referrer sous `builds/**`, sans pouvoir le retirer ;
   - ils peuvent donc **bloquer la publication** d'une image : un effet sur la disponibilité, pas sur l'intégrité tant que le bundle n'est pas signé par Chains.
 - **À examiner, non mesuré** : un referrer qui réemballerait de vraies enveloppes de Chains du même digest pourrait choisir les enveloppes que ec juge. `cosign bundle create` ne vérifie rien, d'après la lecture faite en J5.
+
+## Contrôle 6 dans la porte : préparation à sec (03/11/2026, 15:25 UTC ; choix du propriétaire : « Contrôle 6 d'abord » ; rien appliqué au cluster)
+
+Après R5, la porte admet l'image réelle avec ou sans VSA. Le contrôle 6 de la grille C (VSA de replay signée par la clé du domaine, `PASSED`) est préparé à sec, avec des prédictions datées : [`controle6-predictions.md`](resultats/controle6-predictions.md).
+
+- **Où** : hors de ec, comme le contrôle 9. La VSA est rangée dans `builds/vsa/sample-app`, où la règle Rego du banc C ne la chercherait pas. Poser `COSIGN_REPOSITORY` sur ec détournerait aussi la signature et la provenance.
+- **Conteneur `vsa`** du Job ([`porte-job.yaml`](politique/porte-job.yaml)) : il tourne en parallèle de `horodatage`, sur la même image d'outils, avec [`vsa.sh`](politique/porte/vsa.sh). Il reprend la commande `lire_vsa` de R5.
+  - Le dépôt de la VSA est dérivé du nom de l'image : `builds/<nom>` donne `builds/vsa/<nom>`.
+  - Un énoncé est retenu si son sujet est le digest jugé, si son `verifier.id` est celui du domaine et si son résultat est `PASSED`.
+- **ConfigMap** : `cm_porte` ajoute `vsa.sh` et la clé publique du domaine, prise hors bande dans [`vsa-cle-publique.pem`](../10-independent-replay/resultats/vsa-cle-publique.pem) (empreinte DER `578dd771…`).
+- **`juger`** : nouveaux champs 9 et 10 ; les champs 1 à 8 ne changent pas.
+- **Verdict de la porte** : succès de ec, horodatage complet **et** VSA retenue.
+- **Étape de mesure** : `mise run confiance:preuves -- controle6`, avec trois cas :
+  - C1 : image réelle, VSA retenue ;
+  - C2 : même digest dans `builds/essai-webhook`, aucune VSA ;
+  - C3 : clé de Chains à la place de celle du domaine, refus.
+- **Essai de plomberie sur l'hôte**, en lecture seule, non compté : les trois cas sont conformes, et un faux cosign local rend les énoncés `FAILED`, d'un autre sujet ou d'un autre vérificateur `ECARTE`.
+- **Effet** : une fois la ConfigMap appliquée, toute image sans VSA est refusée au champ 9. Les verdicts archivés restent valables. Aucune note de l'ADR 0000 ne change : le banc C est clos.

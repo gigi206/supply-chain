@@ -377,3 +377,4 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
   - diffoscope ([couche](resultats/r5-n2-diffoscope-couche.txt), [config](resultats/r5-n2-diffoscope-config.txt)) : seul le binaire `sample-app` diffère, d'un octet, et dans la config seul `rootfs.diff_ids`.
 - **R5 est complet.**
 - **Hors R5, non tranché** : la porte de la 08 n'exige pas encore la VSA (contrôle 6 de la grille C). Elle admet l'image avec ou sans VSA.
+  - **Préparé à sec le 03/11/2026 à 15:25 UTC** (choix du propriétaire : « Contrôle 6 d'abord ») : conteneur `vsa` dans la porte de la 08, prédictions datées dans [`controle6-predictions.md`](../08-trust-plane/resultats/controle6-predictions.md). Rien n'est appliqué au cluster.
