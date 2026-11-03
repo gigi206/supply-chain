@@ -363,4 +363,5 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
     - `verifier.version`, qui donne les sha256 de `verifier_entrees.py`, `rebuild.sh` et `vsa.py` ;
     - `PASSED`, avec `SLSA_BUILD_LEVEL_3` et `POC_REPLAY_BIT_IDENTIQUE`.
   - Signé par la clé du domaine (`attest-blob --statement`, configuration sans service) puis revérifié : `Verified OK`. Le bundle est en v0.3, sans journal de transparence ni horodatage ([`r5-vsa.bundle.json`](resultats/r5-vsa.bundle.json)).
-- **Rien n'a été poussé.** Restent, chacun sous accord : la porte avant le push, le push de la VSA dans `builds/vsa/sample-app`, la porte après le push, la lecture avec N3, puis les contre-épreuves N1 et N2.
+- **Porte de la 08 avant le push** (14:58 UTC, [`r5-porte_avant.log`](resultats/r5-porte_avant.log)) : ec admet l'image réelle sans violation, et le contrôle 9 est `ok` (6/6 enveloppes couvertes, 43 bundles). Constat : sur un dépôt inconnu, l'API referrers de Zot rend un index vide (HTTP 200), et non une erreur.
+- **Rien n'a été poussé.** Restent, chacun sous accord : le push de la VSA dans `builds/vsa/sample-app`, la porte après le push, la lecture avec N3, puis les contre-épreuves N1 et N2.

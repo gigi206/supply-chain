@@ -145,3 +145,15 @@ Le précédent est le cas `reel` du test 8 (02/11) : `VERDICT|t8-reel|true||…|
 2. Enveloppes de Chains sur l'image : 6.
 3. ec admet l'image réelle, sans aucune violation : `VERDICT|reelle-avant|true||…`.
 4. Contrôle 9 `ok`, « 6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) ». Le nombre de bundles est **incertain** : le CronJob d'horodatage peut en ajouter entre le relevé et le Job.
+
+### Résultat de `porte_avant` (03/11/2026, 14:58:47 à 14:59:24 UTC) : [`r5-porte_avant.log`](r5-porte_avant.log), copie du journal de la 08 [`r5-porte-avant.copie.log`](r5-porte-avant.copie.log)
+
+1. **Écart, sans effet sur le verdict.** Pour `builds/vsa/sample-app`, la porte affiche `0`, et non « absent ou illisible ».
+   - Mesuré à 14:59 UTC : sur un dépôt inconnu, l'API referrers de Zot rend **HTTP 200 avec un index vide**. C'est vrai pour `builds/vsa/sample-app` comme pour un nom inventé (`depot/inexistant-xyz`), alors que `tags/list` rend `NAME_UNKNOWN`.
+   - Le `0` de ce passage ne distingue donc pas un dépôt absent d'un dépôt sans referrer. La prédiction supposait une erreur.
+   - `builds/sample-app` : 0, conforme.
+2. **Conforme.** 6 enveloppes.
+3. **Conforme.** `VERDICT|reelle-avant|true||trusted_task.tagged|31|ok|…` : ec admet, aucune violation.
+4. **Conforme.** Contrôle 9 `ok`, « 6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) ». Le nombre de bundles n'a pas bougé depuis le relevé, et l'enveloppe de l'invocation rejouée (`7af184de44b81e66`) fait partie des 6 couvertes.
+
+Après le push, la porte doit rendre le même `VERDICT`, durée exclue, et `builds/vsa/sample-app 1`.
