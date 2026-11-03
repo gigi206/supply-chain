@@ -1,6 +1,7 @@
 # Brique 03, F2 (D3 révisée, décision du propriétaire du 03/11/2026) : publication de la fermeture produite par prefetch-gomod,
-# comme closure.sh de la brique 03 : un fichier par couche, fichiers triés, date fixe, bom.json hors des couches (attaché en
-# referrer). Le manifeste est d'abord écrit dans un layout OCI local, puis copié par digest : le compte Zot poc-fermetures (secret
+# comme closure.sh de la brique 03 : un fichier par couche, fichiers triés, date fixe, bom.json hors des couches. Il n'est PAS
+# attaché en referrer : un referrer sur un digest signé par Chains n'est mesuré pour aucun autre type que le bundle Sigstore
+# (brique 10 : .sig et .att alors ignorés) ; son empreinte est journalisée, sa publication vient plus tard (07a). Le manifeste est d'abord écrit dans un layout OCI local, puis copié par digest : le compte Zot poc-fermetures (secret
 # zot-fermetures de builds, monté par cette seule tâche signée) ne peut que créer par digest dans builds/fermetures/** (condition
 # CEL de stockage/zot.json), ni tag, ni mise à jour, ni suppression. Pod runc conforme à restricted. Seule cette tâche émet
 # IMAGE_URL et IMAGE_DIGEST : Chains signe la fermeture une fois poussée et y écrit .sig et .att (compte poc-build).
@@ -67,8 +68,6 @@ spec:
       oras cp --no-tty --from-oci-layout "/layout/f@$d" "$DEPOT@$d" --to-ca-file /etc/ca-poc/ca.crt --to-registry-config /etc/zot/config.json > /dev/null
       lu=$(oras manifest fetch --descriptor --ca-file /etc/ca-poc/ca.crt "$DEPOT@$d" | sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p')
       [ "$lu" = "$d" ] || { echo "relu dans Zot : $lu" >&2; exit 1; }
-      oras attach --no-tty --ca-file /etc/ca-poc/ca.crt --registry-config /etc/zot/config.json --artifact-type application/vnd.cyclonedx+json \
-        --annotation org.opencontainers.image.created=1970-01-01T00:00:00Z "$DEPOT@$d" bom.json:application/vnd.cyclonedx+json > /dev/null
-      echo "publiée : $DEPOT@$d ($# couches, relue en lecture anonyme ; SBOM en referrer)"
+      echo "publiée : $DEPOT@$d ($# couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : $(sha256sum < bom.json | cut -c1-64)"
       printf '%s' "$DEPOT" > $(results.IMAGE_URL.path)
       printf '%s' "$d" > $(results.IMAGE_DIGEST.path)

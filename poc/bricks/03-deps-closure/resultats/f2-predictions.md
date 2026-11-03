@@ -86,3 +86,16 @@ Script : [`prefetch.sh`](../prefetch.sh) (`mise run fermetures:f2 -- <étape>`).
 - **Liste revue** : deux tâches ajoutées à `politique/porte/taches.yml`, à relire avant tout push.
 - **La porte et la construction ne changent pas en F2.** `3a7ca1b1` reste admise. D5 et D6 viennent en F3.
 - **Dépôts d'essai** laissés dans Zot, qui n'autorise pas la suppression : `builds/fermetures/essai`, `plateforme/outils-prefetch`, `tekton/*/prefetch-*`.
+
+## Additif du 03/11/2026, 17:31 UTC (avant exécution, après relecture)
+
+- **SBOM retiré des referrers.** `publier-fermeture` n'attache plus `bom.json` à la fermeture.
+  - Un referrer posé sur un digest que Chains signe n'est mesuré que pour le bundle Sigstore. La brique 10 a montré que `.sig` et `.att` sont alors ignorés.
+  - Le retrait est fait avant toute signature de la tâche. L'empreinte du SBOM est journalisée ; sa publication viendra plus tard (07a).
+- **Deux arrêts obligatoires dans F2** :
+  - après `image`, `PREFETCH_DIGEST` est épinglé dans `prefetch.sh`, puis commité ;
+  - `taches` se fait en deux passes. Entre les deux, les deux digests sont ajoutés à la main à `politique/porte/taches.yml`, et **le diff est montré au propriétaire, qui doit l'accepter** avant le second passage.
+- **La configuration versionnée de la 08 est déjà modifiée** dans le commit de préparation : `valeurs.yaml`, `zot.json`, `stockage.sh` et `politique.sh`. Tant que F2 n'a pas tourné, le dépôt ne décrit plus le cluster réel, et un rejeu de la 08 appliquerait ces changements. Le commit reste en local jusqu'à l'accord.
+- **Exigence « tout dans Grafana »** (19b) :
+  - les journaux des pods de `builds` (source J2, donc ceux de `prefetch-gomod` et de `publier-fermeture`) et l'audit de Zot (J6, avec les écritures de `poc-fermetures`) atteignent Loki ;
+  - **les refus de sortie du pod de prefetch ne sont visibles que dans Hubble**, dans l'agent. La source J7 (flux Hubble) a été laissée en option par D9 et n'est pas collectée. **C'est un écart à l'exigence d'audit**, consigné ici. Le collecter est une décision séparée de la 19b.
