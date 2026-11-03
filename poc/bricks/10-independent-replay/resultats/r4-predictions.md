@@ -123,3 +123,26 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
 - `tx_*` de l'invité sont restés inchangés du début à la fin (18141 paquets), alors que le lien était établi. Le `go: downloading` du second moteur vient du `GOPROXY` `file://` local.
 
 Je lance le second passage hors ligne avec les mêmes prédictions.
+
+## Résultat du second passage, hors ligne (03/11/2026, 14:26:09 à 14:46:10 UTC) : [`r4-rebuild.log`](r4-rebuild.log)
+
+**Les huit prédictions sont conformes. Verdict `PASSED` : l'image reconstruite hors ligne, dans le domaine, est bit à bit celle de la provenance.**
+
+1. **Délai** : 1 466 min depuis `finishedOn`, donc plus de 24 h.
+2. **Réseau** :
+   - `porteuse_enp1s0=0` au début, et toujours `0` à la fin ;
+   - côté hôte, `tx_bytes` et `tx_packets` sont inchangés entre la coupure et le rétablissement (1895856 et 18298), égaux aux `tx_*` de l'invité au début comme à la fin ;
+   - `rx_packets` augmente de 681 paquets : ce sont les trames du pont non délivrées, comme lors du calibrage ;
+   - `fin` à 14:27:12 UTC, avant le rétablissement à 14:46:10 UTC.
+3. **Recette de `preparer-entrees`** : digest `2070d601…` `OK`, et les trois opérations `OK`.
+4. **Contexte** : commit `6391fd43…`, 8 fichiers dans la fermeture, 2 dans `web/dist`.
+5. **Image de build du domaine** : `dc20b752…`, différente de `d50ae575…`, et la même que celle de la répétition.
+6. **Image reconstruite** : `sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5`, égale au sujet. **`PASSED`**.
+7. **Second moteur** : binaire de l'image et binaire du `go build` direct égaux, `e3749c68…`. Les options sont identiques au `RUN` signé.
+8. **Durée** : 62 s de bout en bout. Image de build en 18 s, image en 14 s.
+
+Autres constats :
+- sha256 de `rebuild.sh` égal à `a1945ff2…` des deux côtés ;
+- `sortie=code 0` ;
+- plus de `unbound variable` à la sortie ;
+- lien `up` après le passage.

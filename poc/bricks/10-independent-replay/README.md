@@ -331,3 +331,22 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
   - l'état de l'unité affiché (`success inactive`) est faux après `--collect` ; le journal de l'unité donne `status=2` ;
   - le piège `EXIT` cite une variable locale déjà disparue à la sortie. Le lien avait été rétabli explicitement ; il est bien `up`.
 - **Arrêt conforme à la règle de R4.** La correction et le second passage attendent la décision du propriétaire. Effort : bien en deçà du seuil de 4 pw.
+
+## R4, second passage hors ligne : `PASSED` (03/11/2026, 14:26 à 14:46 UTC ; choix du propriétaire : « Corriger, répéter, relancer »)
+
+- **Correctifs** :
+  - `git archive` tourne en tant que `replay` (`runuser`), et `tar` reste en root ;
+  - `rebuild.sh` écrit son code de sortie dans `resultat.txt` ;
+  - le piège du lien reçoit le nom de l'interface au moment où il est posé.
+- **Mesures dans la VM** ([`r4-mesures-vm.log`](resultats/r4-mesures-vm.log)) :
+  - **`unshare -rn` fonctionne pour `replay`** (seul `lo` est visible). La section 6 de la politique est donc applicable ;
+  - le `git archive` corrigé fonctionne en root.
+- **Répétition, lien établi, essai non compté** ([`r4-repetition.log`](resultats/r4-repetition.log)) : `PASSED` en 46 s. Son premier passage, arrêté avant tout transport par un `diff` sous `pipefail`, est archivé.
+- **Second passage, lien coupé** ([`r4-rebuild.log`](resultats/r4-rebuild.log)) : les huit prédictions sont conformes.
+  - Image reconstruite **`sha256:3a7ca1b1…`, égale au sujet de la provenance : `PASSED`**.
+  - Binaires des deux moteurs égaux, `e3749c68…`.
+  - Image de build du domaine `dc20b752…`, différente de celle du plan de confiance, qui ne change pas l'image produite.
+  - **La VM n'a rien émis pendant les 1 200 s de coupure** : compteurs de sortie inchangés côté hôte et côté invité.
+  - Rebuild en 62 s, fini 19 min avant le rétablissement du lien.
+- **Seuil B5** (le replay réussit avec 0 connexion sortante, journalisée) : atteint pour le rebuild.
+- **Reste** : R5, avec la VSA, les contre-épreuves N1 à N3 et la porte avant et après.

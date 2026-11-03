@@ -56,6 +56,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 3. **Isolation** : Kata si KVM est disponible, ce qui est le cas sur le laptop (à installer et à mesurer, y compris en virtualisation imbriquée) ; sinon gVisor ou user namespace, selon les résultats de la brique 05.
 4. **Domaine de replay** : hôte ou cluster distinct, **administré par une autre personne** (à nommer), avec sa propre clé de VSA. En 2b-1, ses images de build sont « indépendantes minimales » : toolchain Go officielle à checksum vérifié, image reconstruite dans ce domaine.
 
+   > **Constat de la brique 10, R4 (03/11/2026), avec une image de build « indépendante minimale »** : toolchain Go de go.dev, busybox de Debian, `Env` déclaré, digest `dc20b752…`, différent de celui du plan de confiance. Le rebuild **hors ligne** dans la VM `sc-replay` (BuildKit 0.25.2, caches froids, lien coupé, aucune émission de la VM) redonne bit à bit l'image signée par Chains, `3a7ca1b1…` (`PASSED`). Un `go build` direct donne le même binaire ([README de la brique](../../poc/bricks/10-independent-replay/README.md)). L'administrateur reste le propriétaire, par écart documenté (D1 b) ; aucune note modifiée.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).
