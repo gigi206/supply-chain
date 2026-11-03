@@ -468,3 +468,54 @@ La limite de D16 demeure : tout porteur d'un certificat de la CA du PoC lit et �
 **Résidus** : `/etc/loki/loki.yaml.avant-l6` et `/etc/alloy/relais.alloy.avant-l6` sur `sc-stockage`, pour un retour arrière manuel.
 
 **Point ouvert résolu (refus de débit au démarrage de L3)** : à sa première collecte par Prometheus (02/11, 21:15), l'Alloy de `sc-stockage` comptait 47 nouvelles tentatives et 0 ligne perdue. Ce processus tourne depuis 21:03, et c'est le seul écrivain régulier de Loki. Les 47 refus `ingestion rate limit exceeded` de Loki (21:03 et 21:04) ont donc été réessayés, sans perte ([complément](resultats/l6-complement.log)).
+
+## L7, domaine de replay de la brique 10 : préparation à sec (03/11/2026, 15:43 UTC ; rien écrit dans Loki)
+
+Demande du propriétaire du 03/11/2026 : « Replay dans Grafana ». À la clôture de la brique 10, deux points restaient ouverts : le domaine de replay n'envoie aucun journal à Loki, et la corroboration de `timeVerified` par l'audit de Zot n'a pas été faite.
+
+**Relevé de la VM `sc-replay`** (03/11/2026, vers 15:39 UTC, lecture seule par SSH avec la clé du domaine, non archivé dans un journal) :
+- le journal systemd est persistant (`/var/log/journal`). Il n'y a qu'un démarrage, depuis le 03/11/2026 à 10:00:43 UTC : **3 172 entrées**, 3,4 Mo en JSON, 8 Mo sur le disque ;
+- entrées par unité : `init.scope` 790, `user@1000.service` 689, `systemd-logind` 315, `ssh` 251, `cloud-init-main` 38, puis les sessions ; 75 lignes `sudo` ;
+- `replay-r4.service` n'a que **10 lignes** (démarrage, arrêt, consommation). La sortie du build va dans des fichiers, rapatriés dans `resultats/` de la 10 ;
+- le compte `replay` n'est pas dans le groupe `systemd-journal` : la lecture complète passe par `sudo`.
+
+### Étape `corroborer_vsa` (préparée, lecture seule)
+
+L'auditeur lit, à travers Grafana, les écritures de `poc-replay` sous `builds/vsa/` dans l'audit de Zot (J6), puis l'heure du PUT du manifeste de la VSA est comparée à `timeVerified`. Une contre-épreuve vérifie qu'un marqueur jamais émis est bien absent. Prédictions : [`l7-predictions.md`](resultats/l7-predictions.md). Portée : une **borne haute** de l'heure du replay, pas la borne basse des 24 h.
+
+### Journal de la VM dans Loki : contraintes et décisions à prendre
+
+Contraintes (mesurées ou lues, pas supposées) :
+- **réseau** : la VM ne joint pas `sc-stockage` (R2 de la 10, réseau distinct choisi par le propriétaire) ;
+- **suppression impossible dans Loki** (D10, 403 mesuré en L2) : un secret écrit ne s'efface plus. Le contrôle des secrets se fait donc **avant** l'envoi, pas après ;
+- **secrets du domaine** : le mot de passe et la clé privée de la VSA ne sortent pas de la VM (D6 de la 10). La recherche de ces motifs se fait dans la VM ; celle du mot de passe de `poc-replay` et de la clé SSH du domaine, sur l'hôte ;
+- **âge** : Loki refuse les lignes de plus de 168 h (`reject_old_samples_max_age`). Le journal de la VM (depuis le 03/11, 10:00:43 UTC) passe en entier ; un domaine resté plus de 7 jours sans envoi perdrait le début ;
+- **alerte** : l'expression de `SourceMuette` ne retient que `loki.source.api.(confiance|build)`. Une source envoyée par lots ne déclenche donc pas de fausse alerte, mais elle n'est pas couverte non plus ;
+- **doc d'Alloy v1.21.3** (sources au tag, `f2108cd`) : `loki.source.journal` accepte un `path` vers un répertoire de journal. Il faudrait alors copier les fichiers binaires de la VM et lancer Alloy sur l'hôte. La voie `journalctl -o json` et jq est plus simple, et le contrôle des secrets porte exactement sur les octets envoyés.
+
+**D19. Transport.**
+- (a) **Lots tirés par l'hôte**, comme les entrées en R3 : `sudo -n journalctl -o json --after-cursor=…` par SSH, avec la clé du domaine. Le curseur est gardé dans le dossier du domaine sur l'hôte, ce qui évite trous et doublons d'un lot à l'autre. Un lot est envoyé à la fin de chaque intervention dans le domaine, ou à la demande. La VM et son réseau ne changent pas. L'envoi n'est pas en temps réel.
+- (b) **Alloy dans la VM**, avec une route vers le relais. Cela revient sur le réseau distinct de R2, installe un paquet dans la VM, et donne au domaine un certificat d'écriture vers le plan de confiance.
+- Recommandé : (a).
+
+**D20. Identité d'écriture.**
+- (a) **Un port 3503 du relais**, avec une autorité propre au domaine dont la clé reste dans `~/.cache/supply-chain-poc/10/`. Le relais impose l'étiquette `noeud="sc-replay"`, et ce certificat ne lit pas Loki (D17). Il faut modifier `relais.alloy` sur `sc-stockage`, avec un rechargement par SIGHUP comme en L6, et ouvrir le bloc `grpc` sur la boucle locale (3513).
+- (b) **Le certificat `controle` de l'hôte**, directement vers Loki. Rien ne change sur `sc-stockage`, mais les étiquettes sont libres, le porteur lit tout Loki, et l'audit ne distingue pas le domaine des essais.
+- Recommandé : (a).
+
+**D21. Périmètre.**
+- (a) **Journal de la VM seul** : sshd, sudo, unités `systemd-run`, noyau, apt. Les journaux d'étape de `replay.sh` (sortie du build, compteurs du lien relevés par `virsh`, VSA) restent dans `resultats/` et dans git. Ils relèvent de J9 (scripts lancés depuis l'hôte), exclu par D9.
+- (b) **En plus, les fichiers `resultats/` de la 10**, envoyés une fois avec une étiquette `fichier`. Ces lignes n'ont pas d'heure propre : elles seraient datées de l'envoi, pas de l'événement.
+- Recommandé : (a). C'est un choix à confirmer, parce qu'il laisse hors de Grafana la preuve « 0 connexion sortante » (compteurs du lien).
+
+**Mécanique prévue avec D19 (a)** (à essayer d'abord sur l'hôte, avec un Loki jetable tiré des archives vérifiées, comme le correctif du gRPC) :
+- étiquettes reprises de [`commun/journal.alloy`](config/alloy/commun/journal.alloy) : `source="journal"`, `unite` (`_SYSTEMD_UNIT`, sinon `SYSLOG_IDENTIFIER`), `priorite` (mot clé de `PRIORITY`), plus `noeud="sc-replay"` ; la ligne est `MESSAGE`, et son heure `__REALTIME_TIMESTAMP` ;
+- lots de 500 lignes, envoyés dans l'ordre chronologique, avec un nouvel essai sur 429 ou 5xx (refus de débit vus en L3) ;
+- contrôles : sha256 du lot dans la VM et sur l'hôte ; recherche des secrets des deux côtés, chacun avec un témoin positif ; compte de journald égal au compte de Loki, unité par unité ; une ligne témoin `logger` dans la VM, lue par l'auditeur dans Grafana ; un second lot vide (pas de doublon).
+
+**Ordre** : le journal est exporté **avant** tout nettoyage de `~/r5n`, de `/var/lib/replay-buildkit-n` ou de la VM, qui l'emporterait. `~/r4` et `~/r3` ne sont pas touchés.
+
+**Limites, à consigner quel que soit le choix** :
+- journald n'est pas scellé (pas de FSS) ;
+- le root de l'hôte peut altérer un lot avant son envoi. C'est le même administrateur que le domaine (D1 b de la 10) ;
+- aucune alerte de source muette pour le domaine.

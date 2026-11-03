@@ -790,4 +790,45 @@ etape_controle_grpc() {
   rm -f "${W:?}/trame-grpc"
 }
 
-case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; l5) lancer l5 L5 "$@" ;; l6) lancer l6 L6 "$@" ;; *) lancer l1 L1 "$@" ;; esac
+# ---------------------------------------------------------------------------------------------------------------- L7
+# Domaine de replay de la brique 10 dans Grafana (demande du propriétaire du 03/11/2026 : « Replay dans Grafana »).
+#   corroborer_vsa  lecture seule : écritures de poc-replay sous builds/vsa/ lues par l'auditeur dans l'audit de Zot (J6), à
+#                   travers Grafana, sur la fenêtre du 03/11/2026 de 14:00 à 16:00 UTC ; heure du PUT du manifeste de la VSA
+#                   comparée à timeVerified (le push ne donne qu'une borne haute de l'heure du replay) ; contre-épreuve :
+#                   marqueur jamais émis, absent des lignes de données
+VSA_MANIFESTE=sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03   # resultats/r5-pousser_vsa.log de la 10
+TIME_VERIFIED=2026-11-03T14:27:05Z                                                    # resultats/r5-vsa-enonce.json de la 10
+
+lignes_auditeur() { # expression-LogQL début fin (ISO UTC) : lignes de données lues par l'auditeur à travers Grafana, une par
+  # ligne : heure de Loki (UTC) puis la ligne ; la réponse brute contient aussi le texte de la requête, d'où la lecture des
+  # seules valeurs de données (défaut trouvé avant L4)
+  local q c
+  q=$(jq -nc --arg e "$1" --arg de "$(date -ud "$2" +%s)000" --arg a "$(date -ud "$3" +%s)000" \
+    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 1000, direction: "forward"}], from: $de, to: $a}')
+  c=$(graf auditeur POST /api/ds/query "$q")
+  echo "requête de l'auditeur : HTTP $c, $(jq '[.results.A.frames[]?.data.values[2]? // [] | length] | add // 0' "$W/graf.out") ligne(s) ; champs : $(jq -c '[.results.A.frames[0]?.schema.fields[]?.name]' "$W/graf.out")" >&2
+  jq -r '.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.] / 1000 | todate) \($v[2][.])"' "$W/graf.out"
+}
+
+etape_corroborer_vsa() {
+  local m l t
+  echo "## écritures de poc-replay sous builds/vsa/, audit de Zot (noeud sc-stockage), 03/11/2026 de 14:00 à 16:00 UTC"
+  lignes_auditeur '{noeud="sc-stockage", source="audit-zot"} |= "poc-replay" |= "builds/vsa/"' 2026-11-03T14:00:00Z 2026-11-03T16:00:00Z > "$W/l7-vsa.txt"
+  cat "$W/l7-vsa.txt"
+  echo "## PUT du manifeste de la VSA (${VSA_MANIFESTE:0:19}…)"
+  l=$(grep -F "manifests/$VSA_MANIFESTE" "$W/l7-vsa.txt" || true)
+  echo "lignes : $(printf '%s' "$l" | grep -c . || true)"
+  t=$(printf '%s' "$l" | head -1 | cut -d' ' -f2- | jq -r '.time // empty' 2>/dev/null || true)
+  echo "heure de Zot : ${t:-absente} ; timeVerified : $TIME_VERIFIED"
+  if [ -n "$t" ] && [ "$(date -ud "$t" +%s)" -ge "$(date -ud "$TIME_VERIFIED" +%s)" ]; then
+    echo "OK   push postérieur à timeVerified, de $(( $(date -ud "$t" +%s) - $(date -ud "$TIME_VERIFIED" +%s) )) s (borne haute de l'heure du replay)"
+  else
+    echo "KO   push absent, ou antérieur à timeVerified"
+  fi
+  echo "## contre-épreuve : marqueur jamais émis"
+  m="jamais-emis-l7-$(date +%s%N)"
+  echo "lignes de données contenant le marqueur : $(lignes_auditeur "{noeud=\"sc-stockage\", source=\"audit-zot\"} |= \"$m\"" 2026-11-03T14:00:00Z 2026-11-03T16:00:00Z | grep -cF "$m" || true)"
+  rm -f "${W:?}/l7-vsa.txt" "${W:?}/graf.out"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; l5) lancer l5 L5 "$@" ;; l6) lancer l6 L6 "$@" ;; l7) lancer l7 L7 "$@" ;; *) lancer l1 L1 "$@" ;; esac
