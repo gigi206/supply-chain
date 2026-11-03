@@ -1,0 +1,95 @@
+# Constat du 03/11/2026 (vers 08:25 UTC) : le relais Alloy de sc-stockage expose ses routes sans mTLS par gRPC
+# Découverte fortuite en préparant le pare-feu, pas une mesure planifiée : aucune prédiction écrite avant.
+# Rien n'a été écrit dans Loki : seule la route /ready (lecture, réponse fixe « ready ») a été appelée.
+
+## Ports en écoute de l'Alloy de sc-stockage (sudo ss -ltnpH, sc-stockage)
+3501 192.168.161.13:3501 users:(("alloy",pid=48561,fd=8))
+3502 192.168.161.13:3502 users:(("alloy",pid=48561,fd=4))
+12345 127.0.0.1:12345 users:(("alloy",pid=48561,fd=12))
+35459 *:35459 users:(("alloy",pid=48561,fd=7))
+38365 *:38365 users:(("alloy",pid=48561,fd=9))
+# Commande d'Alloy : /usr/local/bin/alloy run --server.http.listen-addr=127.0.0.1:12345 --storage.path=/var/lib/alloy --disable-reporting /etc/alloy/config
+# Version : alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+# sc-confiance et sc-build : Alloy n'écoute que sur 127.0.0.1:12345 (aucun loki.source.api).
+
+## Cause, lue dans le code (Alloy v1.21.3 f2108cd, dskit 8b24b9af5808 du go.mod d'Alloy)
+# - relais.alloy : deux loki.source.api (confiance 3501, build 3502), bloc http avec TLS RequireAndVerifyClientCert, pas de bloc grpc.
+# - loki/source/api/api.go SetToDefault : Server = fnet.DefaultServerConfig(), dont GRPC{ListenAddress: "", ListenPort: 0}
+#   (toutes les interfaces, port libre au hasard). Le repli « 127.0.0.1 si GRPC == nil » d'api.go ne joue donc jamais.
+# - common/net/server.go MountAndRun : routes montées sur srv.HTTP (le routeur), puis srv.Run().
+# - dskit server/server.go Run : httpgrpc.RegisterHTTPServer(s.GRPC, httpgrpc_server.NewServer(s.HTTP, ...)) :
+#   le routeur HTTP entier est joignable par gRPC (service httpgrpc.HTTP/Handle), sans le TLS du bloc http.
+# - routes.go : aucun contrôle de r.TLS ni du certificat client dans les gestionnaires.
+# Connu en amont : grafana/alloy#6071 (ouvert le 16/04/2026, « needs-triage », « needs-attention »), dskit#954 ; non corrigé dans v1.21.3.
+
+## Joignabilité TCP (bash /dev/tcp)
+hôte -> 35459 : ouvert
+hôte -> 38365 : ouvert
+hôte -> 3501 : ouvert
+sc-build -> 35459 : ouvert
+sc-build -> 38365 : ouvert
+
+## Appel httpgrpc.HTTP/Handle {method: "GET", url: "/ready"} depuis l'hôte, sans aucun certificat (curl --http2-prior-knowledge)
+== port 35459, sans certificat
+HTTP/2 200
+grpc-status: 0
+grpc-message:
+ \0 \0 \0 \0 5 \b 310 001 022 ) \n \f C o n t
+ e n t - T y p e 022 031 t e x t / p
+ l a i n ; c h a r s e t = u t
+== port 38365, sans certificat
+HTTP/2 200
+grpc-status: 0
+grpc-message:
+ \0 \0 \0 \0 5 \b 310 001 022 ) \n \f C o n t
+ e n t - T y p e 022 031 t e x t / p
+ l a i n ; c h a r s e t = u t
+# \b 310 001 = champ Code, varint 200 : la route /ready du relais a répondu 200.
+
+## Contraste : même route par le port TLS, sans certificat client
+== port 3501 sans certificat client
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+## Conséquence (déduite du code, l'écriture n'a pas été essayée)
+# POST /loki/api/v1/push passe par le même routeur : toute machine qui joint 192.168.161.13 pourrait écrire dans Loki
+# par le relais sans certificat. L'étiquette noeud reste imposée par la source (loki.relabel), mais on ne sait pas
+# quel port aléatoire correspond à quelle source : il suffit d'essayer les deux pour écrire sous noeud="sc-confiance" ou "sc-build".
+# Le mTLS par autorité propre au nœud (D16) est contourné.
+
+## Complément (03/11/2026, vers 08:35 UTC, relecture de l'advisor) : même sonde en local sur sc-stockage, corps de réponse entier
+== 127.0.0.1:9096 (sur sc-stockage), sans certificat
+HTTP/2 200
+grpc-status: 0
+grpc-message:
+ \0 \0 \0 \0 Y \b 310 001 022 ) \n \f C o n t
+ e n t - T y p e 022 031 t e x t / p
+ l a i n ; c h a r s e t = u t
+ f - 8 022 ! \n 026 X - C o n t e n t
+ - T y p e - O p t i o n s 022 \a n
+ o s n i f f 032 006 r e a d y \n
+== 127.0.0.1:35459 (sur sc-stockage), sans certificat
+HTTP/2 200
+grpc-status: 0
+grpc-message:
+ \0 \0 \0 \0 5 \b 310 001 022 ) \n \f C o n t
+ e n t - T y p e 022 031 t e x t / p
+ l a i n ; c h a r s e t = u t
+ f - 8 032 005 r e a d y
+== 3100 TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+# 032 = champ body : « ready » pour le relais, « ready\n » pour Loki.
+# Loki 3.7.9 (d3b4a2f7), /etc/loki/loki.yaml : grpc_listen_address 127.0.0.1, grpc_listen_port 9096, http_tls_config
+# RequireAndVerifyClientCert, aucun grpc_tls_config. Même pont httpgrpc (dskit) : le mTLS de Loki (3100) est contourné
+# depuis sc-stockage seulement (boucle locale), par tout processus local (Forgejo, Zot, Grafana…).
+# Lier le gRPC du relais à 127.0.0.1 ramènerait donc le relais au niveau actuel de Loki, sans plus.
+
+## Portée de la mesure
+# Mesuré depuis l'hôte (hors cluster) et depuis l'hôte de sc-build (SSH, pas un pod). Aucun pod essayé : la joignabilité
+# depuis un pod (Cilium, NetworkPolicies) n'est pas mesurée.
+# Lecture mesurée (/ready) ; écriture (push) déduite du code, pas essayée.
+
+## Correctifs possibles, lus dans le code (non essayés)
+# - Alloy v1.21.3, common/net/config.go : GRPCConfig a un bloc tls (cert_file, key_file, client_auth_type, client_ca_file),
+#   appliqué par Into() à dskit.GRPCTLSConfig.
+# - dskit 8b24b9af5808, server/server.go:381-386 : si cert et clé sont fournis, le serveur gRPC reçoit un tls.Config
+#   (web.ConfigToTLSConfig, avec ClientAuth). La version de dskit embarquée par Loki 3.7.9 n'a pas été lue.

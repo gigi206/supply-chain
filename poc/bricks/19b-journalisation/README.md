@@ -139,6 +139,7 @@ Prédictions : [`l2-predictions.md`](resultats/l2-predictions.md), écrites à 2
 - C'est plus fort qu'un filtrage par adresse, et la configuration réseau de `sc-stockage` reste inchangée.
 - Limite : Loki ne distingue pas lecture et écriture. Tout porteur d'un certificat client peut lire tous les journaux et en écrire. Un nœud compromis lit donc aussi les journaux des autres.
 - Le pare-feu pourra s'ajouter plus tard si le propriétaire le veut.
+- **Additif du 03/11/2026** : D16 est contournée en l'état. Le gRPC de Loki (`127.0.0.1:9096`) expose les mêmes routes sans certificat, depuis `sc-stockage` ; voir [Constat du 03/11/2026](#constat-du-03112026-mtls-contourné-par-le-grpc-de-dskit).
 
 **Alerte de disque (D13 a)** : règle `DisqueStockagePlein` (`disque_utilise_ratio > 0.8`, `for: 5m`, avertissement) ajoutée aux règles de la 19, avec son test. `promtool` 3.13.5 a été extrait de l'archive vérifiée de la 19, sur l'hôte, sans installation : `SUCCESS` sur 9 règles. Contrôle par mutation : avec un seuil à 0,82, le test échoue.
 
@@ -205,6 +206,7 @@ Les trois compositions sont validées sur l'hôte par `alloy validate`, avec le 
 - `sc-confiance` et `sc-build` n'écrivent que vers un relais Alloy de `sc-stockage` : port 3501 pour l'une, 3502 pour l'autre ;
 - chaque port n'accepte que les certificats d'une **autorité propre au nœud**, hors de la CA du PoC, que Loki refuse ;
 - le relais **impose l'étiquette `noeud`** : un nœud ne peut pas se faire passer pour un autre ;
+  - **additif du 03/11/2026** : faux en l'état déployé. Chaque source du relais ouvre aussi un port gRPC sans TLS, sur toutes les interfaces, qui sert les mêmes routes : sans certificat, on lit `/ready` (mesuré) et, d'après le code, on peut écrire sous l'étiquette de l'un ou l'autre nœud (non essayé). Voir [Constat du 03/11/2026](#constat-du-03112026-mtls-contourné-par-le-grpc-de-dskit) ;
 - seuls Grafana (`grafana-client`), Alloy de `sc-stockage` (`alloy-stockage`) et l'hôte (`controle`) gardent un certificat accepté par Loki.
 
 Alternative : chaque agent écrit directement dans Loki avec un certificat de la CA du PoC (limite de D16 acceptée).
@@ -212,6 +214,8 @@ Alternative : chaque agent écrit directement dans Loki avec un certificat de la
 **D15 (a), coût pour la 08** : `config.hcl` change. Au prochain `openbao.sh deployer`, l'empreinte de la configuration, portée en annotation du gabarit, changera, et le pod sera recréé, donc scellé. C'est le chemin normal de la 08. En L3, la ConfigMap est appliquée et OpenBao rechargé par SIGHUP, sans redémarrage.
 
 **Pare-feu (décision du propriétaire, 02/11/2026) : « on fera le fw avec les network policies une fois tout validé ».** À faire après L4, avec une nuance à trancher à ce moment-là : les NetworkPolicies, et les politiques de Cilium, filtrent le trafic des pods et des nœuds du cluster (`sc-confiance`, `sc-build`), pas `sc-stockage`, qui n'est pas un nœud k3s. Elles peuvent interdire aux pods de joindre Loki (3100), le relais (3501, 3502) et Grafana (3001). Les ports de `sc-stockage` eux-mêmes demanderaient un filtrage sur la VM (nftables).
+
+**Additif du 03/11/2026 (vérifié sur le cluster)** : la phrase précédente est fausse sur un point. `sc-stockage` **est** un agent k3s (README de la 08, `k3s.sh` ; `kubectl get nodes` : `Ready` depuis le 02/11/2026 13:11 UTC), mais seul `cilium` y tourne en pod. Forgejo, Zot, Loki, Grafana, Alloy, Prometheus et Alertmanager y sont des processus de l'hôte : les NetworkPolicies, qui sélectionnent des pods, ne filtrent pas leur entrée. Deux voies : le pare-feu d'hôte de Cilium (`CiliumClusterwideNetworkPolicy` avec `nodeSelector`), désactivé (`enable-host-firewall=false` dans `cilium-config`), donc modification de la 08 ; ou nftables sur la VM, **non installé** (`nft` absent), donc installation système soumise à accord.
 
 ## L3, exécuté (02/11/2026, 21:02 à 21:05 UTC, accord du propriétaire : « Oui, lancer L3 »)
 
@@ -361,3 +365,33 @@ Un faux départ de ma part, sans effet : 14 s après l'installation, un seul bat
 - bruit dans les journaux : une erreur par requête avec la suppression désactivée, `AF_NETLINK` absent dans l'unité de Loki ;
 - résidu dans Zot (`essais-19b/temoin`) ;
 - le pare-feu par NetworkPolicies reste à faire, après validation (décision du propriétaire).
+
+## Constat du 03/11/2026 : mTLS contourné par le gRPC de dskit
+
+Découverte fortuite en préparant le pare-feu, pas une mesure planifiée : aucune prédiction écrite avant. Rien n'a été écrit dans Loki ni modifié sur le cluster. Journal : [`constat-grpc-relais.log`](resultats/constat-grpc-relais.log).
+
+**Mesuré** (requête `httpgrpc.HTTP/Handle` `GET /ready` construite à la main, envoyée avec curl en HTTP/2 sans TLS) :
+
+| Cible | Depuis | Sans certificat client |
+|---|---|---|
+| Relais Alloy, ports TLS 3501 et 3502 | hôte | refusé (`certificate required`) |
+| Relais Alloy, gRPC `*:35459` et `*:38365` (ports tirés au hasard) | hôte (les deux ports), `sc-stockage` (35459) ; depuis l'hôte de `sc-build`, connexion TCP seulement (les deux ouverts) | **200, « ready »** |
+| Loki, port TLS 3100 | `sc-stockage` | refusé (`certificate required`) |
+| Loki, gRPC `127.0.0.1:9096` | `sc-stockage` | **200, « ready »** |
+
+**Cause, lue dans le code** (Alloy v1.21.3 `f2108cd`, dskit `8b24b9af5808`) :
+- dskit enregistre toujours, sur son serveur gRPC, le pont `httpgrpc`, qui sert tout le routeur HTTP. Le TLS du bloc `http` ne s'y applique pas.
+- `loki.source.api` prend par défaut un gRPC sur toutes les interfaces, sur un port libre. Le repli sur 127.0.0.1 prévu dans `api.go` ne joue jamais, parce que `SetToDefault` remplit déjà le bloc.
+- Les gestionnaires ne contrôlent pas le certificat client.
+- Connu en amont, sans l'angle TLS : [grafana/alloy#6071](https://github.com/grafana/alloy/issues/6071), ouvert le 16/04/2026 et non corrigé.
+
+**Conséquences** :
+- **D17** : par le relais, toute machine qui joint `192.168.161.13` pourrait écrire dans Loki sous `noeud="sc-confiance"` ou `noeud="sc-build"` (déduit du code, écriture non essayée). La joignabilité depuis un pod n'est pas mesurée.
+- **D16** : tout processus local de `sc-stockage` (Forgejo, Zot, Grafana…) atteint Loki sans certificat. Il peut donc lire et écrire tous les journaux.
+- **Le seuil de la brique** (témoins, secrets, source muette) ne portait pas sur ces garanties. Il n'est pas modifié ici : la décision revient au propriétaire.
+
+**Correctifs possibles, lus dans le code, non essayés** :
+- un bloc `grpc` explicite dans chaque `loki.source.api` de `relais.alloy` (gabarit de `journalisation.sh`) :
+  - (a) `listen_address = "127.0.0.1"` seul, qui ramène le relais au niveau actuel de Loki ;
+  - (b) en plus, `tls { client_auth_type = "RequireAndVerifyClientCert" … }`, appliqué au serveur gRPC par dskit ;
+- pour Loki, `server.grpc_tls_config`. Il faut alors des certificats pour ses propres clients gRPC internes (à vérifier dans Loki 3.7.9, dont la version de dskit n'a pas été lue).
