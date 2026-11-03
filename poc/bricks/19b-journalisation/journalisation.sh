@@ -128,6 +128,7 @@ cert_client() { # nom : certificat client <nom>.clients.poc.test (mTLS de Loki, 
 etape_certificats() {
   cert_serveur loki; cert_serveur grafana
   cert_client grafana-client; cert_client controle
+  cert_client loki-interne   # L6 : clients gRPC internes de Loki (grpc_tls_config)
   [ -s "$S/grafana-admin.password" ] || (umask 077 && openssl rand -base64 24 | tr -d '\n' > "$S/grafana-admin.password")
   [ -s "$S/grafana-auditeur.password" ] || (umask 077 && openssl rand -base64 24 | tr -d '\n' > "$S/grafana-auditeur.password")
   stat -c '%a %n' "$S"/grafana-*.password "$S"/loki.key "$S"/grafana*.key "$S"/controle.key | sed "s#$S/##"
@@ -141,10 +142,10 @@ graf() { # compte méthode chemin [corps-json] : API de Grafana depuis l'hôte ;
 }
 
 etape_installer() {
-  [ -s "$P/loki.crt" ] && [ -s "$P/grafana-client.crt" ] || { echo "KO   certificats absents (étape certificats)" >&2; exit 1; }
+  [ -s "$P/loki.crt" ] && [ -s "$P/grafana-client.crt" ] && [ -s "$P/loki-interne.crt" ] || { echo "KO   certificats absents (étape certificats)" >&2; exit 1; }
   rm -rf "${D:?}" && (umask 077 && mkdir -p "$D")
   cp "$A/$LOKI_ARCHIVE" "$A/$GRAFANA_ARCHIVE" "$P/ca-poc.crt" "$P/loki.crt" "$S/loki.key" "$P/grafana.crt" "$S/grafana.key" \
-     "$P/grafana-client.crt" "$S/grafana-client.key" "$S/grafana-admin.password" "$here/config/loki.yaml" "$here/config/grafana.ini" \
+     "$P/grafana-client.crt" "$S/grafana-client.key" "$P/loki-interne.crt" "$S/loki-interne.key" "$S/grafana-admin.password" "$here/config/loki.yaml" "$here/config/grafana.ini" \
      "$here/config/provisioning/datasources/sources.yaml" "$here"/systemd/* "$D/"
   copier sc-stockage /tmp/journalisation-installation "$D"/*
   rm -rf "${D:?}"
@@ -160,8 +161,8 @@ install -m 0755 loki-linux-amd64 /usr/local/bin/loki
 chown -R root:root /opt/grafana-$GRAFANA_VERSION
 install -d -m 0750 -g loki /etc/loki /etc/loki/tls
 install -m 0640 -g loki loki.yaml /etc/loki/loki.yaml
-install -m 0644 ca-poc.crt loki.crt /etc/loki/tls/
-install -m 0640 -g loki loki.key /etc/loki/tls/loki.key
+install -m 0644 ca-poc.crt loki.crt loki-interne.crt /etc/loki/tls/
+install -m 0640 -g loki loki.key loki-interne.key /etc/loki/tls/
 install -d -m 0750 -g grafana /etc/grafana /etc/grafana/tls /etc/grafana/secrets /etc/grafana/provisioning /etc/grafana/provisioning/datasources
 for d in dashboards plugins alerting; do install -d -m 0750 -g grafana /etc/grafana/provisioning/\$d; done
 install -m 0640 -g grafana grafana.ini /etc/grafana/grafana.ini
@@ -647,4 +648,106 @@ etape_silences() { # depuis l'installation du battement (premier argument du jou
   rm -f "${W:?}/lki.out" "${W:?}/lki.err"
 }
 
-case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; l5) lancer l5 L5 "$@" ;; *) lancer l1 L1 "$@" ;; esac
+# ---------------------------------------------------------------------------------------------------------------- L6
+# Correctif du gRPC (constat du 03/11/2026, choix (b) du propriétaire : « TLS sur le gRPC (b) ») : le pont httpgrpc de dskit sert
+# les routes HTTP de Loki et du relais sur leur port gRPC, sans le mTLS du bloc http.
+#   certificats_grpc  certificat client loki-interne (CA du PoC), présenté par les clients gRPC internes de Loki
+#   avant_grpc        relevé avant correctif : ports d'écoute de loki et d'alloy sur sc-stockage, sondes httpgrpc (lecture /ready)
+#   grpc_tls          loki.yaml (grpc_tls_config et clients internes) et relais.alloy (bloc grpc) posés sur sc-stockage ;
+#                     loki -verify-config et alloy validate avant redémarrage ; Loki prêt (WAL activé : rien de perdu)
+#   controle_grpc     mêmes sondes qu'avant_grpc, plus les certificats acceptés et refusés par port (tunnel SSH vers la boucle
+#                     locale pour les certificats des nœuds, dont les clés restent sur l'hôte)
+GRPC_TRAME=$'\x00\x00\x00\x00\x0d\x0a\x03GET\x12\x06/ready'   # httpgrpc.HTTPRequest {method: "GET", url: "/ready"}, trame gRPC
+
+etape_certificats_grpc() {
+  cert_client loki-interne
+  stat -c '%a %n' "$S/loki-interne.key" | sed "s#$S/##"
+}
+
+sondes_stockage() { # sur sc-stockage : ports de loki et d'alloy, puis httpgrpc /ready en clair et en TLS sans certificat
+  sur sc-stockage sudo bash -s <<'EOS'
+set -uo pipefail
+printf '\x00\x00\x00\x00\x0d\x0a\x03GET\x12\x06/ready' > /root/trame-grpc
+reponse() { grep -iE '^HTTP|grpc-status' /root/h 2>/dev/null | tr -d '\r' | tr '\n' ' '; [ -s /root/r ] && tr -cd '[:print:]' < /root/r | grep -oE 'ready' | head -1; echo; rm -f /root/h /root/r; }
+echo "## ports en écoute de loki et d'alloy"
+ss -ltnpH | grep -E 'users:\(\("(loki|alloy)"' | awk '{print $4, $6}' | sed -E 's/,fd=[0-9]+//' | sort
+ports=$(ss -ltnpH | grep -E 'users:\(\("(loki|alloy)"' | awk '{n=split($4,a,":"); print a[n]}' | grep -vxE '3100|3501|3502|12345' | sort -un)
+for p in $ports; do
+  echo "== $p, httpgrpc en clair"
+  curl -sS --max-time 5 --http2-prior-knowledge -H 'content-type: application/grpc' -H 'te: trailers' --data-binary @/root/trame-grpc \
+    -D /root/h -o /root/r "http://127.0.0.1:$p/httpgrpc.HTTP/Handle" 2>&1 | head -1; reponse
+  echo "== $p, httpgrpc en TLS sans certificat client"
+  curl -sS --max-time 5 --http2 --cacert /etc/loki/tls/ca-poc.crt --resolve "sc-stockage.poc.test:$p:127.0.0.1" -H 'content-type: application/grpc' \
+    -H 'te: trailers' --data-binary @/root/trame-grpc -D /root/h -o /root/r "https://sc-stockage.poc.test:$p/httpgrpc.HTTP/Handle" 2>&1 | head -1; reponse
+done
+rm -f /root/trame-grpc
+EOS
+}
+
+etape_avant_grpc() {
+  sondes_stockage
+  echo "## depuis l'hôte : ports de sc-stockage hors boucle locale tenus par loki ou alloy (connexion TCP)"
+  local p
+  for p in $(sur sc-stockage "sudo ss -ltnpH | grep -E 'users:\(\(\"(loki|alloy)\"' | awk '{print \$4}' | grep -v '^127\.' | awk -F: '{print \$NF}' | sort -un"); do
+    timeout 3 bash -c "</dev/tcp/$HOTE/$p" 2>/dev/null && echo "$p : ouvert" || echo "$p : fermé"
+  done
+}
+
+etape_grpc_tls() {
+  [ -s "$P/loki-interne.crt" ] || { echo "KO   étape certificats_grpc d'abord" >&2; exit 1; }
+  rm -rf "${D:?}" && (umask 077 && mkdir -p "$D")
+  cp "$here/config/loki.yaml" "$here/config/alloy/stockage/relais.alloy" "$P/loki-interne.crt" "$S/loki-interne.key" "$D/"
+  copier sc-stockage /tmp/grpc-tls "$D"/*
+  rm -rf "${D:?}"
+  sur sc-stockage sudo bash -s <<'EOS'
+set -euo pipefail
+cd /tmp/grpc-tls
+install -m 0644 loki-interne.crt /etc/loki/tls/
+install -m 0640 -g loki loki-interne.key /etc/loki/tls/
+/usr/local/bin/loki -config.file=loki.yaml -verify-config 2>&1 | tail -1
+install -m 0640 -g loki loki.yaml /etc/loki/loki.yaml
+install -m 0640 -g alloy relais.alloy /etc/alloy/config/relais.alloy
+/usr/local/bin/alloy validate /etc/alloy/config && echo "configuration d'alloy valide"
+cd / && rm -rf /tmp/grpc-tls
+debut=$(date +%s)
+systemctl restart loki
+for i in $(seq 90); do   # le délai de 15 s de l'ingester ne court qu'à partir d'un premier appel de /ready
+  c=$(curl -s -o /dev/null -w '%{http_code}' --cacert /etc/loki/tls/ca-poc.crt --cert /etc/loki/tls/loki-interne.crt \
+    --key /etc/loki/tls/loki-interne.key "https://192.168.161.13:3100/ready" || true)
+  [ "$c" = 200 ] && break; sleep 2
+done
+echo "loki : $(systemctl is-active loki), /ready HTTP $c, $(( $(date +%s) - debut )) s après le redémarrage"
+systemctl restart alloy
+sleep 5
+echo "alloy : $(systemctl is-active alloy)"
+echo "## erreurs et avertissements depuis le redémarrage (regroupés)"
+journalctl -u loki -u alloy --since "@$debut" -o cat | grep -E 'level=(error|warn)' | sed -E 's/ts=[^ ]+ //; s/duration=[^ ]+ //' | cut -c1-200 | sort | uniq -c | sort -rn | head -12 || true
+EOS
+}
+
+etape_controle_grpc() {
+  local p cert ctl=$W/tunnel-grpc
+  sondes_stockage
+  echo "## depuis l'hôte : ports de sc-stockage hors boucle locale tenus par loki ou alloy (connexion TCP)"
+  for p in $(sur sc-stockage "sudo ss -ltnpH | grep -E 'users:\(\(\"(loki|alloy)\"' | awk '{print \$4}' | grep -v '^127\.' | awk -F: '{print \$NF}' | sort -un"); do
+    timeout 3 bash -c "</dev/tcp/$HOTE/$p" 2>/dev/null && echo "$p : ouvert" || echo "$p : fermé"
+  done
+  echo "## certificats acceptés par port gRPC (tunnel SSH vers la boucle locale de sc-stockage ; httpgrpc /ready)"
+  printf '%s' "$GRPC_TRAME" > "$W/trame-grpc"
+  ssh "${SSH_OPTS[@]}" -M -S "$ctl" -o ExitOnForwardFailure=yes -f -N \
+    -L 127.0.0.1:19096:127.0.0.1:9096 -L 127.0.0.1:13511:127.0.0.1:3511 -L 127.0.0.1:13512:127.0.0.1:3512 "poc@$HOTE"
+  for p in 9096 3511 3512; do
+    for cert in loki-interne controle alloy-sc-confiance alloy-sc-build; do
+      printf '%-5s %-20s ' "$p" "$cert"
+      curl -sS --max-time 5 --http2 --cacert "$P/ca-poc.crt" --resolve "sc-stockage.poc.test:1$p:127.0.0.1" --cert "$P/$cert.crt" --key "$S/$cert.key" \
+        -H 'content-type: application/grpc' -H 'te: trailers' --data-binary @"$W/trame-grpc" -D "$W/h" -o "$W/r" \
+        "https://sc-stockage.poc.test:1$p/httpgrpc.HTTP/Handle" 2>&1 | head -1 | cut -c1-110 || true
+      { grep -iE 'grpc-status' "$W/h" 2>/dev/null | tr -d '\r' | tr '\n' ' '; [ -s "$W/r" ] && tr -cd '[:print:]' < "$W/r" | grep -oE 'ready' | head -1; } || true
+      [ -s "$W/h" ] && echo; rm -f "$W/h" "$W/r"
+    done
+  done
+  ssh "${SSH_OPTS[@]}" -S "$ctl" -O exit "poc@$HOTE" 2>&1 | sed 's/^/tunnel : /'
+  rm -f "${W:?}/trame-grpc"
+}
+
+case ${JALON:-} in l2) lancer l2 L2 "$@" ;; l3) lancer l3 L3 "$@" ;; l4) lancer l4 L4 "$@" ;; l5) lancer l5 L5 "$@" ;; l6) lancer l6 L6 "$@" ;; *) lancer l1 L1 "$@" ;; esac

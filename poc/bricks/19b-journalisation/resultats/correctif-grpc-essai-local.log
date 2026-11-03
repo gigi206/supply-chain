@@ -1,0 +1,74 @@
+# Correctif du gRPC (choix (b) du propriétaire, 03/11/2026 : « TLS sur le gRPC (b) ») : essai local sur l'hôte, 08:39 à 08:47 UTC
+# Ni sc-stockage ni le cluster ne sont touchés. Binaires extraits des archives vérifiées de L1 (sha256sum -c : OK), lancés depuis
+# ~/.cache/supply-chain-poc/19b/essai-grpc-tls sur 127.0.0.1, sans installation ; PKI jetable (CA « essai CA jetable », seconde
+# CA « autre CA ») ; gabarits du dépôt (config/loki.yaml, config/alloy/stockage/relais.alloy) transformés par sed : chemins
+# locaux, 192.168.161.13 -> 127.0.0.1, ports 3100 -> 13100, 9096 -> 19096, 3501/3502/3511/3512 -> 13501/13502/13511/13512.
+# Dossier supprimé après l'essai (clés jetables, binaires).
+loki, version 3.7.9 (branch: release-3.7.x, revision: d3b4a2f7)
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+
+## Loki : loki -verify-config
+# Premier essai : refusé.
+failed parsing config: both `grpc_client_config` and (`query_frontend_grpc_client` or `query_scheduler_grpc_client`) are set at the same time. Please use only `query_frontend_grpc_client` and `query_scheduler_grpc_client`
+# frontend_worker.grpc_client_config retiré du gabarit ; second essai :
+level=info caller=main.go:109 msg="config is valid"
+
+## Loki démarré : services, écriture et requête (chemin interne frontend, scheduler, querier, ingester en gRPC TLS)
+store => Running ingester => Running rule-evaluator => Running query-scheduler-ring => Running query-frontend => Running ruler => Running ring => Running compactor => Running memberlist-kv => Running query-frontend-tripperware => Running query-scheduler => Running querier => Running distributor => Running cache-generation-loader => Running server => Running ingester-querier => Running
+push: 204
+["success",["essai-grpc-tls-1793695322085931836"]]
+# connexions établies vers 127.0.0.1:19096 : 10
+# /ready : 503 « Ingester not ready: waiting for 15s after being ready » au premier appel, puis 200 « ready » 15 s plus tard
+# (le délai de l'ingester ne court qu'à partir d'un premier appel de /ready).
+# Erreurs et avertissements du journal de Loki (mêmes messages que le Loki de production : bruit de la suppression désactivée,
+# anneau vide au démarrage) ; GetCacheGenNumbers atteint le compactor par son client gRPC TLS :
+      2 level=error  caller=gennumber_loader.go:136 msg="error loading cache generation numbers" err="rpc error: code = Unknown desc = deletion is not available for this tenan
+      1 level=error  caller=ratestore.go:110 msg="error getting ingester clients" err="empty ring"
+      1 level=warn  caller=grpc_logging.go:76 method=/grpc.Compactor/GetCacheGenNumbers duration=16.733µs msg=gRPC err="deletion is not available for this tenant"
+      1 level=warn  caller=grpc_logging.go:76 method=/grpc.Compactor/GetCacheGenNumbers duration=40.566µs msg=gRPC err="deletion is not available for this tenant"
+
+## Loki : httpgrpc.HTTP/Handle GET /ready sur 19096
+== en clair (h2c)
+curl: (16) Error in the HTTP2 framing layer
+== TLS sans certificat client
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+== TLS, certificat d'une autre autorité
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+== TLS, certificat client de la bonne autorité
+HTTP/2 200
+grpc-status: 0
+ o s n i f f 032 006 r e a d y \n
+
+## Relais Alloy : alloy validate puis alloy run (relais.alloy du dépôt ; source confiance : CA jetable, source build : seconde CA)
+valide
+# ports en écoute d'Alloy (plus aucun port au hasard ni sur toutes les interfaces) :
+127.0.0.1:13501
+127.0.0.1:13502
+127.0.0.1:13511
+127.0.0.1:13512
+127.0.0.1:22345
+== 13511 en clair
+curl: (16) Error in the HTTP2 framing layer
+== 13511 TLS sans certificat
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+== 13511 certificat ca (confiance)
+HTTP/2 200
+grpc-status: 0
+ f - 8 032 005 r e a d y
+== 13511 certificat ca2 (build)
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+== 13512 en clair
+curl: (16) Error in the HTTP2 framing layer
+== 13512 TLS sans certificat
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+== 13512 certificat ca (confiance)
+curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+== 13512 certificat ca2 (build)
+HTTP/2 200
+grpc-status: 0
+ f - 8 032 005 r e a d y
+
+## Relais HTTP inchangé : écriture par 13501 (étiquette noeud="usurpe" envoyée), relue dans le Loki local
+push 13501 (cert ca) : 204
+lu dans Loki après 3 s : [{"noeud":"sc-confiance","l":["relais-http-1793695386789515169"]}]
+# erreurs ou avertissements dans le journal d'Alloy : 0

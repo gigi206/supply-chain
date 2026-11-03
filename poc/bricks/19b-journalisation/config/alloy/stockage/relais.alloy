@@ -1,5 +1,8 @@
 // Brique 19b, L3 (D17) : relais en écriture seule pour sc-confiance (port 3501) et sc-build (port 3502). Chaque port n'accepte
 // que les certificats de l'autorité propre à son nœud ; l'étiquette noeud est remplacée ici, quelle que soit celle reçue.
+// Additif du 03/11/2026 (constat-grpc-relais.log) : chaque loki.source.api ouvre aussi un serveur gRPC (dskit) qui sert les
+// mêmes routes par le pont httpgrpc ; par défaut, sur toutes les interfaces, port au hasard, sans TLS. Bloc grpc explicite :
+// boucle locale, port fixe, même certificat et même autorité que le bloc http.
 loki.relabel "noeud_confiance" {
   forward_to = []
   rule {
@@ -27,6 +30,16 @@ loki.source.api "confiance" {
       client_ca_file   = "/etc/alloy/tls/ca-sc-confiance.crt"
     }
   }
+  grpc {
+    listen_address = "127.0.0.1"
+    listen_port    = 3511
+    tls {
+      cert_file        = "/etc/alloy/tls/relais.crt"
+      key_file         = "/etc/alloy/tls/relais.key"
+      client_auth_type = "RequireAndVerifyClientCert"
+      client_ca_file   = "/etc/alloy/tls/ca-sc-confiance.crt"
+    }
+  }
   use_incoming_timestamp = true
   relabel_rules          = loki.relabel.noeud_confiance.rules
   forward_to             = [loki.write.sortie.receiver]
@@ -36,6 +49,16 @@ loki.source.api "build" {
   http {
     listen_address = "192.168.161.13"
     listen_port    = 3502
+    tls {
+      cert_file        = "/etc/alloy/tls/relais.crt"
+      key_file         = "/etc/alloy/tls/relais.key"
+      client_auth_type = "RequireAndVerifyClientCert"
+      client_ca_file   = "/etc/alloy/tls/ca-sc-build.crt"
+    }
+  }
+  grpc {
+    listen_address = "127.0.0.1"
+    listen_port    = 3512
     tls {
       cert_file        = "/etc/alloy/tls/relais.crt"
       key_file         = "/etc/alloy/tls/relais.key"

@@ -1,5 +1,7 @@
 # Brique 19b, L2 : Loki 3.7.9 sur sc-stockage, binaire unique, stockage local (décisions D8, D10, D13 du propriétaire).
 # Accès : HTTPS sur 192.168.161.13:3100, certificat client de la CA du PoC exigé (mTLS, D16) ; gRPC sur 127.0.0.1 seulement.
+# Additif du 03/11/2026 (constat-grpc-relais.log) : le gRPC sert les mêmes routes que l'HTTP (pont httpgrpc de dskit) ; il exige
+# donc lui aussi un certificat client de la CA du PoC. Les clients gRPC internes de Loki (binaire unique) présentent loki-interne.
 # Intégrité (D10) : aucune suppression par l'API (deletion_mode: disabled) ; seule la rétention efface (30 jours, D13 a).
 auth_enabled: false
 
@@ -14,6 +16,35 @@ server:
     key_file: /etc/loki/tls/loki.key
     client_auth_type: RequireAndVerifyClientCert
     client_ca_file: /etc/loki/tls/ca-poc.crt
+  grpc_tls_config:
+    cert_file: /etc/loki/tls/loki.crt
+    key_file: /etc/loki/tls/loki.key
+    client_auth_type: RequireAndVerifyClientCert
+    client_ca_file: /etc/loki/tls/ca-poc.crt
+
+# Clients gRPC internes (Loki se joint lui-même sur 127.0.0.1:9096) : certificat loki-interne, nom du certificat de loki.
+ingester_client:
+  grpc_client_config: &tls_interne
+    tls_enabled: true
+    tls_cert_path: /etc/loki/tls/loki-interne.crt
+    tls_key_path: /etc/loki/tls/loki-interne.key
+    tls_ca_path: /etc/loki/tls/ca-poc.crt
+    tls_server_name: sc-stockage.poc.test
+
+frontend:
+  grpc_client_config: *tls_interne
+
+frontend_worker:  # grpc_client_config est refusé avec les deux suivants (loki -verify-config)
+  query_frontend_grpc_client: *tls_interne
+  query_scheduler_grpc_client: *tls_interne
+
+query_scheduler:
+  grpc_client_config: *tls_interne
+
+compactor_grpc_client: *tls_interne
+
+ruler:
+  ruler_client: *tls_interne
 
 common:
   instance_addr: 127.0.0.1
