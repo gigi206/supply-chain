@@ -412,3 +412,44 @@ rien n'a été arrêté ni copié. Décision du propriétaire attendue.
 **Additif du 03/11/2026, 20:08 UTC** : D22 (d) retenue par le propriétaire (« On s'en moque de tout perdre sur une démo ») :
 la perte de l'historique de Loki, de la VSA et des données de Zot n'est plus un obstacle au rejeu de zéro. Reste le choix entre
 les options (a) et (b) ci-dessus.
+
+## Additif du 03/11/2026, 20:23 UTC : intégration complète dans `rejeu.sh` (choix « b » du propriétaire), faite à sec
+
+Choix du propriétaire, 03/11/2026, entre 20:08 et 20:23 UTC : « 1 b » (intégration complète). Rien n'a été exécuté ; `rejeu.sh` et
+`construction.sh` passent `bash -n`, et chaque étape appelée existe dans son script.
+
+**Correction de l'inventaire de 19:45 UTC** (lu dans `preuves.sh` après coup) :
+- `attseule` juge un témoin sous la ConfigMap `porte-temoin`. Il exige seulement `builtin.image.signature_check` présent et
+  `builtin.attestation.signature_check` absent : une violation D6 en plus ne le change pas.
+- `decision3` construit sa propre pipeline d'essai et ne lit pas `pipeline.ref`.
+- Les tests touchés par D6 sont en fait `test7` (verdict de l'image réelle), `test8` (`t8_cas reel ok … 2/2`) et la bascule.
+  `test8` compte en dur deux enveloppes sur l'image : un F3 joué avant J8 en ajouterait deux, et le ferait échouer.
+
+**Montage retenu (B)** : J7 construit directement sur la fermeture de la plateforme, et F3 n'est plus nécessaire.
+- F2 s'insère entre `construction.sh entrees` et `construction.sh taches`. Il garde les étapes `image`, `compte`, `reseau`,
+  `taches`, `prefetch` et `provenance` ; `cilium` est abandonnée.
+- Les digests de F2 d'un passage précédent sont retirés avant, parce que le cache `03/f2` survit à `detruire`.
+- `construction.sh taches` lit le digest produit par ce passage (`03/f2/fermeture-1.digest`), sans valeur en dur. La
+  vérification de la provenance compare à cette même référence. `FERMETURE_SOURCE=hote` garde l'ancien comportement.
+
+**Ajouts après J8**, avec les étapes sautées annoncées par une ligne du journal :
+- Brique 01 : S2 à S4, puis S6. S5 est sautée : D6 refuserait l'image du fork, qui n'a pas de fermeture propre. C'est déduit
+  du code, non mesuré, et cela vaut sans doute aussi sur le cluster actuel.
+- Brique 19 : O2 sans `telecharger`, puis O3 `regles deployer` une fois Alloy en place.
+- Brique 19b :
+  - L2 ;
+  - L3 avec `evenements`, qui régénère le jeton ;
+  - L5 `battement` ;
+  - L6 réduit à `controle_grpc`, parce que L2 et L3 posent déjà la configuration finale ;
+  - L4 `temoins secrets`, sans `muette` ni L7.
+- VSA de la brique 10, avec `POUSSER_VSA=1` seulement (accord à chaque push). Le bundle versionné est re-poussé, puis le
+  contrôle 6 est joué.
+- `fuites` reste en dernier.
+
+**Non vérifié à sec** :
+- La fermeture `74c265e7` et l'image d'outils `68e0ae70` sur un nouveau cluster, un autre jour : `prefetch.sh image` exige
+  `68e0ae70` et s'arrêterait sur un écart.
+- F2 `prefetch` sous le gabarit d'essai de J6.
+- `reglec`.
+- Le témoin `builds/essai-webhook` du contrôle 6 (C2).
+- Les fausses alertes A2 et A5 possibles sur un Prometheus vide.

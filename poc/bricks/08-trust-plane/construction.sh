@@ -12,7 +12,11 @@
 #               (pod Kata privilégié, BuildKit v0.34.1 en root, état sur tmpfs, sans aucune sortie réseau, image de build par
 #               oci-layout://) et publier-image (pod runc restreint, poc-images) rendues, signées par tkn, comparées à leur
 #               signature versionnée (SIGNER=1 pour la refaire), digests exigés dans la liste revue ; pipeline sample-app signée,
-#               entrées hors dépôt fixées par digest ; bundles
+#               entrées hors dépôt fixées par digest ; bundles. Depuis le 03/11/2026 (règle D6 de la brique 03, montage (B) du rejeu),
+#               la pipeline épingle la fermeture de la plateforme (builds/fermetures/sample-app, digest lu dans
+#               ~/.cache/supply-chain-poc/03/f2/fermeture-1.digest, écrit par prefetch.sh prefetch de la brique 03, à lancer avant) ;
+#               FERMETURE_SOURCE=hote garde la fermeture de l'hôte (entrees), que la porte refuse depuis D6. Le témoin
+#               ancienne_pipeline garde la fermeture de l'hôte
 #   constat_cm  sous Kata 4.3.1, deux conteneurs d'un pod montent la même ConfigMap : quand le premier se termine, le second ne la
 #               lit plus (lien ca.crt orphelin) ; témoin : premier conteneur encore en vie ; un emptyDir sur disque survit.
 #               D'où la CA montée dans la seule première étape de construire-image, qui la recopie (premier passage en échec)
@@ -49,6 +53,7 @@ DEPOT_FERMETURE=entrees/sample-app/fermeture
 DEPOT_WEB_DIST=entrees/sample-app/web-dist
 # Manifestes déterministes (un fichier par couche, date fixe) : relevés au premier passage (30/10/2026), puis épinglés
 FERMETURE_DIGEST=sha256:0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+FERMETURE_F2=$HOME/.cache/supply-chain-poc/03/f2/fermeture-1.digest   # fermeture de la plateforme (brique 03, F2 ; montage (B))
 WEB_DIST_DIGEST=sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
 TYPE_WEB_DIST=application/vnd.supply-chain.web-dist.v1
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b          # buildkit.sh image
@@ -200,11 +205,20 @@ etape_taches() {
     signer_tache "$p"
   done
   echo "## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)"
+  if [ "${FERMETURE_SOURCE:-plateforme}" = hote ]; then
+    echo "$REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST" > "$T/fermeture.ref"
+    echo "fermeture de l'hôte (FERMETURE_SOURCE=hote ; refusée par la porte depuis D6)"
+  else
+    grep -qE '^sha256:[0-9a-f]{64}$' "$FERMETURE_F2" 2>/dev/null || { echo "KO   fermeture de la plateforme absente : $FERMETURE_F2 (brique 03, prefetch.sh prefetch)" >&2; exit 1; }
+    echo "$REG/builds/fermetures/sample-app@$(cat "$FERMETURE_F2")" > "$T/fermeture.ref"
+    echo "fermeture de la plateforme (brique 03, F2, $(date -u -r "$FERMETURE_F2" +%Y-%m-%dT%H:%M:%SZ)) : $(cat "$T/fermeture.ref")"
+  fi
   sed -e "s#@PREPARER@#$(cat "$T/preparer-entrees.ref")#" -e "s#@CONSTRUIRE@#$(cat "$T/construire-image.ref")#" \
-    -e "s#@PUBLIER@#$(cat "$T/publier-image.ref")#" -e "s#@FERMETURE@#$REG/$DEPOT_FERMETURE@$FERMETURE_DIGEST#" \
+    -e "s#@PUBLIER@#$(cat "$T/publier-image.ref")#" -e "s#@FERMETURE@#$(cat "$T/fermeture.ref")#" \
     -e "s#@WEB_DIST@#$REG/$DEPOT_WEB_DIST@$WEB_DIST_DIGEST#" -e "s#@BUILDER@#$BUILDER#" -e "s#@IMAGE@#$IMAGE#" \
     "$here/politique/taches/sample-app.yaml" > "$T/sample-app.yaml"
   ! grep -n '@[A-Z_]*@' "$T/sample-app.yaml" | grep -v '^[0-9]*:#' || { echo "KO   variable non rendue dans sample-app" >&2; exit 1; }
+  attendu "fermeture épinglée dans la pipeline" "$(sed -n '/name: fermeture/{n;s/^ *value: //p}' "$T/sample-app.yaml")" "$(cat "$T/fermeture.ref")"
   tkn pipeline sign "$T/sample-app.yaml" -K "$S/taches.key" -f "$T/sample-app-signee.yaml" > /dev/null
   echo "$REG/tekton/pipelines/sample-app@$(bundle "$T/sample-app-signee.yaml" tekton/pipelines/sample-app j7)" | tee "$T/pipeline.ref"
   echo "## témoin : première version de construire-image et sa pipeline, depuis l'historique git"
@@ -432,7 +446,7 @@ etape_provenance() {
   attendu "sujet" "$(jq -r '.subject | map("\(.name)@sha256:\(.digest.sha256)") | join(",")' "$T/prov.json")" "$IMAGE@$APP_REF"
   attendu "buildType" "$(jq -r .predicate.buildDefinition.buildType "$T/prov.json")" https://tekton.dev/chains/v2/slsa-tekton
   attendu "source" "$(jq -r '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == "git+https://sc-stockage.poc.test:3000/'"$SAMPLE_APP"'.git") | "sha1:" + .digest.sha1' "$T/prov.json")" "sha1:$TETE_J2"
-  attendu "fermeture" "$(jq -r --arg u "oci://$REG/$DEPOT_FERMETURE" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$FERMETURE_DIGEST"
+  attendu "fermeture" "$(jq -r --arg u "oci://$(cut -d@ -f1 "$T/fermeture.ref")" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$(cut -d@ -f2 "$T/fermeture.ref")"
   attendu "web/dist" "$(jq -r --arg u "oci://$REG/$DEPOT_WEB_DIST" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "$WEB_DIST_DIGEST"
   attendu "image de build" "$(jq -r --arg u "oci://${BUILDER%@*}" '.predicate.buildDefinition.resolvedDependencies[] | select(.uri == $u) | "sha256:" + .digest.sha256' "$T/prov.json")" "${BUILDER#*@}"
   attendu "tâche preparer-entrees (bundle) dans resolvedDependencies" "$(jq -r --arg u "$REG/tekton/tasks/preparer-entrees" '.predicate.buildDefinition.resolvedDependencies[]

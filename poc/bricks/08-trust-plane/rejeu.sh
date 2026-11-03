@@ -19,8 +19,13 @@
 # pas de rejeu de zéro pour l'instant) : D6 (brique 03) chargée dès J6 refuse attseule, decision3 et la bascule de J8 tant que J7
 # construit sur la fermeture de l'hôte ; detruire efface sc-stockage, donc Loki et Grafana (19b) avec l'historique d'audit, la VSA
 # (contrôle 6, brique 10) et les jalons 01, 19 et 19b, qu'aucune étape ci-dessous ne refait.
+# Additif du 03/11/2026, 20:23 UTC : intégration complète (choix « b » du propriétaire ; D22 (d) de la 19b : la perte des données
+# est acceptée) faite à sec, PAS ENCORE REJOUÉE. Montage (B) : J7 construit sur la fermeture de la plateforme (F2 de la brique 03
+# entre les entrées et les tâches de J7 ; construction.sh lit le digest produit par ce passage), F3 n'est plus nécessaire. Après
+# J8 : brique 01 (S2 à S4, S6 ; S5 sautée), brique 19 (O2, O3), brique 19b (L2, L3, L5, contrôle de L6, L4 sans muette), puis,
+# avec POUSSER_VSA=1 (accord du propriétaire pour ce push), VSA de la brique 10 re-poussée et contrôle 6, enfin fuites.
 #
-# Usage (racine du dépôt) : mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
+# Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -67,7 +72,17 @@ etape "J7 (BuildKit)" mise run confiance:buildkit -- image essais exempte
 etape "J7 (voie D)" mise run confiance:voie-d -- image compiler assembler
 etape "J7 (voie A, sample-app)" mise run confiance:buildkit -- sample_app
 etape "J7 (sans réseau)" mise run confiance:buildkit -- sans_reseau
-etape "J7 (construction)" mise run confiance:construction -- compte entrees taches constat_cm construire provenance
+# Montage (B) du 03/11/2026 : F2 de la brique 03 (prefetch dans la plateforme) entre les entrées de J7 (prefetch.sh compare à la
+# fermeture de l'hôte, poussée par entrees) et ses tâches (la pipeline sample-app épingle la fermeture de F2 : règle D6 de la porte,
+# chargée dès J6). Étape cilium de F2 abandonnée (D2 révisée). Le cache de F2 survit à detruire : ses digests sont retirés avant.
+F2=$HOME/.cache/supply-chain-poc/03/f2
+fermeture_f2() {
+  rm -f -- "${F2:?}/fermeture-1.digest" "${F2:?}/fermeture-2.digest"
+  mise run fermetures:f2 -- image compte reseau taches prefetch provenance
+}
+etape "J7 (construction, entrées)" mise run confiance:construction -- compte entrees
+etape "J7 (fermeture, F2 de la 03)" fermeture_f2
+etape "J7 (construction)" mise run confiance:construction -- taches constat_cm construire provenance
 etape "J7 (réseau)" mise run confiance:kata -- reseau
 # Tests négatifs et mesures de J8, dans l'ordre du premier passage (30/10 au 01/11/2026), avant la bascule qui les refuse
 # (garde gabarit_essai) ; ajoutés le 02/11/2026 (décision du propriétaire : rejouer avant la bascule pour clore J8).
@@ -81,5 +96,32 @@ etape "J8 (contrôleurs)" mise run confiance:preuves -- controleurs
 # Résolveurs bornés à builds (02/11/2026) : après la bascule, l'étape résout le bundle du gabarit en service.
 # preuves.sh intercepteurs n'est pas rejoué (mesure ponctuelle : retire et remet une liaison).
 etape "J8 (résolveurs)" mise run confiance:preuves -- resolveurs
+# Briques 01, 19 et 19b (choix « b » du propriétaire du 03/11/2026), après la bascule : la 01 avant la 19 (groupe synchro de
+# fichiers-metriques) ; la 19 installée avant la 19b (répertoires et Prometheus que L2 attend) ; cibles et règles de la 19 après
+# Alloy (job alloy de prometheus.yml) ; tout avant fuites, qui contrôle aussi leurs jetons. Les journaux d'étapes des briques sont
+# réécrits dans leur resultats/, comme ceux de la 08 (l'historique git garde les précédents).
+etape "01 (S2, S4)" mise run synchro:forgejo -- comptes organisations amont miroir archives fork protections refus bout_en_bout
+etape "01 (S3)" mise run synchro:executeur -- installer essai planifie fuites
+etape "01 (S4, négatifs)" mise run synchro:forgejo -- negatifs
+echo "## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)"
+echo "## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)"
+etape "01 (S6)" mise run synchro:forgejo -- traefik
+echo "## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)"
+etape "19 (O2)" mise run observabilite -- certificats compte installer
+etape "19b (L2)" env JALON=l2 mise run journalisation -- certificats installer controle
+etape "19b (L3)" env JALON=l3 mise run journalisation -- certificats_l3 evenements openbao_sortie alloy controle_l3
+etape "19b (L5)" env JALON=l5 mise run journalisation -- battement
+etape "19 (O2, suite)" mise run observabilite -- cibles lecture_seule
+etape "19 (O3)" mise run observabilite -- regles deployer
+echo "## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées"
+etape "19b (L6, contrôle)" env JALON=l6 mise run journalisation -- controle_grpc
+etape "19b (L4)" env JALON=l4 mise run journalisation -- temoins secrets
+if [ "${POUSSER_VSA:-}" = 1 ]; then
+  # VSA de la brique 10 (bundle versionné, lié au seul digest 3a7ca1b1, que J7 vérifie) re-poussée, puis contrôle 6 de la porte
+  etape "10 (VSA)" env JALON=r5 mise run replay -- pousser_vsa
+  etape "J8 (contrôle 6)" mise run confiance:preuves -- controle6
+else
+  echo "## 10 pousser_vsa et J8 controle6 : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)"
+fi
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"
