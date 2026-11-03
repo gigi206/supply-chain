@@ -1820,5 +1820,9 @@ Après R5, la porte admet l'image réelle avec ou sans VSA. Le contrôle 6 de la
   - C1 : image réelle, VSA retenue ;
   - C2 : même digest dans `builds/essai-webhook`, aucune VSA ;
   - C3 : clé de Chains à la place de celle du domaine, refus.
-- **Essai de plomberie sur l'hôte**, en lecture seule, non compté : les trois cas sont conformes, et un faux cosign local rend les énoncés `FAILED`, d'un autre sujet ou d'un autre vérificateur `ECARTE`.
+- **Essai de plomberie sur l'hôte** ([`essais/controle6-plomberie.sh`](essais/controle6-plomberie.sh), [`controle6-plomberie.log`](resultats/controle6-plomberie.log), 15:28 UTC) : lecture seule, avec les applets busybox, le cosign du verrou et `HOME` vide. Les huit prédictions sont conformes :
+  - les trois cas de l'étape, plus les refus sur le nom de l'image (hors de `builds/`, ou dans `builds/vsa/`) ;
+  - avec un faux cosign local, les énoncés `FAILED`, d'un autre sujet ou d'un autre vérificateur sont `ECARTE` ;
+  - cosign se connecte à Zot seulement. Pour le TUF, la commande à `HOME` vide est déjà mesurée en R5 (`r5-tuf.log`).
 - **Effet** : une fois la ConfigMap appliquée, toute image sans VSA est refusée au champ 9. Les verdicts archivés restent valables. Aucune note de l'ADR 0000 ne change : le banc C est clos.
+- **Retrait** : revenir sur le commit du conteneur `vsa` (Job, `cm_porte`, `juger`), puis réappliquer la ConfigMap avec `cm_porte`. Les clés `vsa.sh` et `vsa.pub` en trop dans la ConfigMap ne servent alors plus à rien.

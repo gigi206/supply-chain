@@ -49,3 +49,24 @@ Demande : brique 10, choix du propriétaire du 03/11/2026 : « Contrôle 6 d'abo
   - Les verdicts archivés restent valables. Une de ces étapes rejouée rendrait en plus `refus` au champ 9, sans changer ses champs 1 à 8 ni ses contrôles OK et KO, qui ne lisent pas le champ 9.
 - **Choix inscrit dans le code** : une copie du même digest dans un autre dépôt (`essai-webhook`) n'est pas admise avec la VSA de `sample-app`. La VSA est cherchée dans `builds/vsa/<dépôt de l'image>`.
 - **Hors du test** : une VSA signée mais `FAILED` dans le registre demanderait le push d'une VSA témoin (compte `poc-replay`, accord à chaque push). Le faux cosign couvre la logique, pas le registre.
+
+## Additif du 03/11/2026, 15:28 UTC (avant exécution) : essai de plomberie versionné
+
+L'essai ci-dessus n'a laissé de traces que hors du dépôt. Il est donc refait par [`essais/controle6-plomberie.sh`](../essais/controle6-plomberie.sh), journal `controle6-plomberie.log`. Ce passage est plus proche du pod : applets busybox, cosign du verrou, `HOME` vide, et chaque appel au vrai cosign sous strace (`connect`).
+
+- **TUF, déjà mesuré** : la commande du conteneur, `verify-attestation` par `COSIGN_REPOSITORY` avec `HOME` vide, ne tente aucune connexion hors de Zot ni aucune écriture citant `tuf-repo-cdn` (R5, [`r5-tuf.log`](../../10-independent-replay/resultats/r5-tuf.log), ligne `V2-verify-attestation-COSIGN_REPOSITORY, HOME vide`).
+- **Admission** : la règle `zone-confiance` ne contraint que le placement (`nodeSelector`, tolérances, `nodeName`). Le conteneur `vsa` reprend le contexte de sécurité de `horodatage`.
+
+Prédictions, avec Zot joint par son adresse IP :
+- `reelle` : `RETENU|énoncé c804d94698b16d3c`, `VSA|ok|1/1`, code 0 ;
+- `sans-vsa` : `refus` à 0/0, avec « no matching attestations », code 1 ;
+- `cle-chains` : `refus` à 0/0, avec « accepted signatures do not match threshold », code 1 ;
+- `hors-builds` : refus « image hors de builds/ », code 1, aucune connexion ;
+- `depot-vsa` : refus « image dans un dépôt de VSA », code 1, aucune connexion ;
+- `faux-ecartes` : trois `ECARTE`, dont les motifs sont `verificationResult`, `sujet` et `verifier.id`, puis `refus` à 0/3 ;
+- `faux-mixte` : les mêmes, plus `RETENU`, puis `ok` à 1/4 ;
+- vrai cosign : toutes ses connexions vont vers Zot (`192.168.161.13:5000`), aucune ailleurs.
+
+**Résultat** (15:28:29 UTC, [`controle6-plomberie.log`](controle6-plomberie.log)) : les huit prédictions sont conformes.
+- Le vrai cosign fait un `connect()` par appel, toujours vers Zot. Les refus sur le nom de l'image et le faux cosign n'en font aucun.
+- L'empreinte de l'énoncé retenu est celle de `r5-vsa-enonce.json` (`c804d946…`).

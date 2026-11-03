@@ -1,0 +1,38 @@
+# essais/controle6-plomberie.sh, 2026-11-03T15:28:29Z ; vsa.sh 06cae142e9302411 ; cosign v3.1.4 ; busybox v1.37.0
+## reelle : 192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b1… ; clé 578dd771bcedd582
+RETENU|énoncé c804d94698b16d3c
+VSA|ok|1/1 VSA retenue(s) dans 192.168.161.13:5000/builds/vsa/sample-app
+code 0
+connexions : 1 connect() ; hors de Zot : aucune
+## sans-vsa : 192.168.161.13:5000/builds/essai-webhook@sha256:3a7ca1b1… ; clé 578dd771bcedd582
+VSA|refus|0/0 VSA retenue(s) dans 192.168.161.13:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
+code 1
+connexions : 1 connect() ; hors de Zot : aucune
+## cle-chains : 192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b1… ; clé ecf50485df721c83
+VSA|refus|0/0 VSA retenue(s) dans 192.168.161.13:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+code 1
+connexions : 1 connect() ; hors de Zot : aucune
+## hors-builds : 192.168.161.13:5000/horodatage/bundles@sha256:3a7ca1b1… ; clé 578dd771bcedd582
+VSA|refus|image hors de builds/ : horodatage/bundles
+code 1
+connexions : 0 connect() ; hors de Zot : aucune
+## depot-vsa : 192.168.161.13:5000/builds/vsa/sample-app@sha256:3a7ca1b1… ; clé 578dd771bcedd582
+VSA|refus|image dans un dépôt de VSA : builds/vsa/sample-app
+code 1
+connexions : 0 connect() ; hors de Zot : aucune
+## faux-ecartes : 192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b1… ; clé 578dd771bcedd582 ; faux cosign
+ECARTE|énoncé 8e93d9a2ec5db00a| verificationResult
+ECARTE|énoncé c44c3072380ad7eb| sujet
+ECARTE|énoncé cbd8a5c3402b25dd| verifier.id
+VSA|refus|0/3 VSA retenue(s) dans 192.168.161.13:5000/builds/vsa/sample-app
+code 1
+connexions : 0 connect() ; hors de Zot : aucune
+## faux-mixte : 192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b1… ; clé 578dd771bcedd582 ; faux cosign
+ECARTE|énoncé 8e93d9a2ec5db00a| verificationResult
+ECARTE|énoncé c44c3072380ad7eb| sujet
+ECARTE|énoncé cbd8a5c3402b25dd| verifier.id
+RETENU|énoncé c804d94698b16d3c
+VSA|ok|1/4 VSA retenue(s) dans 192.168.161.13:5000/builds/vsa/sample-app
+code 0
+connexions : 0 connect() ; hors de Zot : aucune
+énoncé de la brique 10 : c804d94698b16d3c
