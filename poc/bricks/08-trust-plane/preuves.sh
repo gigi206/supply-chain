@@ -97,6 +97,9 @@
 #          builds, refusées par les droits dans un espace d'essai ; journal, audit de l'API, lecteurs de tout le cluster
 #   intercepteurs  mesure ponctuelle hors rejeu : informer de Secrets de tout le cluster des intercepteurs de Triggers
 #          (v0.37.2) ; liaison de lecture retirée et pod redémarré (pas prêt, refus « at the cluster scope »), puis remise
+#   reelle  demandé par la brique 10 (R5) : image réelle jugée par la porte du cluster comme le cas reel du test 8 (source attendue,
+#          contrôle 9 sur horodatage/bundles), avant et après le push de la VSA dans builds/vsa/sample-app (PASSAGE=avant|apres) ;
+#          referrers de l'image relevés dans les deux dépôts. La brique 10 copie le journal à chaque passage et compare les verdicts
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2693,6 +2696,26 @@ etape_intercepteurs() { # mesure ponctuelle, hors rejeu : la liaison de lecture 
   ba_attendu "refus dans le journal du pod" "$(kubectl logs -n tekton-pipelines "$pod" | grep -c 'is forbidden' || true)" 0
   ca1=$(kubectl get clusterinterceptors -o json | jq -r '[.items[] | "\(.metadata.name):\(.spec.clientConfig.caBundle | length)"] | join(",")')
   ba_attendu "caBundle des ClusterInterceptors (nom:longueur) inchangé depuis $t0" "$ca1" "$ca0"
+}
+
+referrers() { # dépôt : nombre de referrers de l'image réelle dans ce dépôt (lecture anonyme), ou « absent ou illisible »
+  local n
+  n=$(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$1/referrers/$APP_DIGEST" 2>/dev/null | jq '.manifests | length' 2>/dev/null || true)
+  echo "${n:-absent ou illisible}"
+}
+
+etape_reelle() { # brique 10, R5 : PASSAGE=avant|apres (push de la VSA) ; la comparaison des deux passages est faite par la brique 10
+  local src r
+  case ${PASSAGE:-} in avant|apres) ;; *) echo "REFUS : PASSAGE=avant ou PASSAGE=apres attendu" >&2; exit 2 ;; esac
+  src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  echo "## passage $PASSAGE ; image $APP"
+  echo "referrers de l'image : builds/sample-app $(referrers builds/sample-app) ; builds/vsa/sample-app $(referrers builds/vsa/sample-app)"
+  echo "enveloppes de Chains sur l'image : $(nb_enveloppes "$APP")"
+  r=$(juger "reelle-$PASSAGE" "$REG/$APP" policy.yaml porte "$src" "$REG/$DEPOT_BUNDLES")
+  echo "$r"
+  grep -v '^HORODATAGE|' "$T/porte-reelle-$PASSAGE.horodatage" | sed 's/^/    /'
+  [ "$(cut -d'|' -f1,3,4 <<< "$r")" = "VERDICT|true|" ] && echo "OK   ec admet l'image réelle (aucune violation)" || echo "KO   ec n'admet pas l'image réelle"
+  [ "$(cut -d'|' -f7 <<< "$r")" = ok ] && echo "OK   contrôle 9 : ok ($(cut -d'|' -f8 <<< "$r"))" || echo "KO   contrôle 9 : $(cut -d'|' -f7- <<< "$r")"
 }
 
 lancer preuves J8 "$@"
