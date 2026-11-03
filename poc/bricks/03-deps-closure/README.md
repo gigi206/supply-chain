@@ -143,3 +143,24 @@ Chaque jalon commence par des prédictions datées (`date -u`), archivées dans 
 - Les chemins absolus de la fermeture yarn : le prefetch et la restauration doivent-ils se faire au même chemin, comme pour npm ? La restauration à un autre chemin est faite en premier.
 - La détection d'une altération par yarn hors réseau (somme de `yarn.lock` ou du cache) : prédite en F1 après lecture du code de yarn 4.18.0, pas supposée.
 - Les noms de domaine contactés par le prefetch, relevés en F1, avant d'écrire la règle `toFQDNs`.
+
+### Additif du 03/11/2026, 16:15 UTC (avant toute exécution, après relecture)
+
+- **Heure des faits relevés** : leur début n'a pas été mesuré. Seule la fin est relevée (`date -u` : 16:11:17 UTC). Il faut lire « jusqu'à 16:12 UTC ».
+- **Go de Traefik** : le `go.mod` de `v3.7.17` exige `go 1.27.0`, sans directive `toolchain`. Go 1.26.10 (brique 04, `mise run outils:go-toolchain`) ne suffit pas.
+  - Dernière version stable : **go1.27.3** (`go.dev/dl`, relevé à 16:14 UTC).
+  - F1 demande donc en plus le **téléchargement de Go 1.27.3** comme module `golang.org/toolchain`, vérifié par `sum.golang.org` comme Go 1.26.10, dans `~/.cache/supply-chain-poc/`.
+  - Avec `GOTOOLCHAIN=local`, aucun autre téléchargement n'est permis. La façon dont Hermeto 0.64.0 choisit sa toolchain pour un `go.mod` en 1.27 sera lue dans son code avant les prédictions, sans être supposée.
+- **`go build` de Traefik hors réseau sans l'interface** : `webui/embed.go` déclare `//go:embed static`, et `webui/static/` ne contient dans le dépôt que `DONT-EDIT-FILES-IN-THIS-DIRECTORY.md`, `static/*` étant ignoré par git.
+  - La compilation n'exige donc pas l'interface construite. Le binaire de F1 est **un binaire sans interface**, ce qui suffit à mesurer la fermeture gomod. Aucun répertoire bouche-trou n'est ajouté.
+  - Pour l'interface, F1 mesure la fermeture yarn et `yarn install --immutable` hors réseau, pas `vite build`.
+- **Test négatif « fermeture poussée hors de la plateforme » de F3** : avec D1 (a), aucun mécanisme ne le refuserait aujourd'hui. Celui qui signe la pipeline peut y épingler n'importe quel digest, et rien ne vérifie d'où vient la fermeture. Sans règle, ce test serait un faux négatif. D'où D6.
+- **D6. Origine de la fermeture vérifiée par la porte.**
+  - (a) **Nouvelle règle de la porte**, recommandé : la fermeture déclarée dans `resolvedDependencies` doit avoir une provenance de Chains (clé de Chains) dont le sujet est son digest, issue de la pipeline de prefetch approuvée. Le test négatif de F3 n'est gardé qu'avec (a).
+  - (b) **Pas de règle**, et le test négatif est retiré de F3 : la fermeture est produite par la plateforme sans que la porte le vérifie.
+  - **Effets à connaître avant d'accorder (a)** :
+    - la ConfigMap `porte` change durablement ;
+    - l'image `3a7ca1b1` de `builds/sample-app`, construite avec la fermeture `0ab5a507…` poussée par `poc-ecriture` depuis l'hôte, **serait refusée** jusqu'à une construction sur une fermeture de la plateforme (F3) ;
+    - les témoins des étapes de la 08 qui passent par la porte (`test7`, `test8`, `reglec`, `rc`, `ba`, `controle6`) rendraient eux aussi ce refus s'ils étaient rejoués. Leurs verdicts archivés restent valables.
+- **`web/dist` reste un intrant produit sur l'hôte**, poussé par `poc-ecriture`, même après F3. « Prefetch dans Tekton » ne couvre que la fermeture : toutes les entrées ne viendront pas de la plateforme. Une règle D6 limitée à la fermeture laisse ce même trou pour `web/dist`. Le combler suppose Node dans la chaîne (2c, brique 11), hors périmètre proposé.
+- **Ordre des accords** : F1 ne dépend d'aucune des décisions D1 à D6. Le protocole et l'accord de F1 sont soumis d'abord. D1 à D6 le seront avant F2, une fois connus par F1 les noms de domaine (D2) et le comportement des chemins (D4, D5).
