@@ -185,3 +185,22 @@ Les six prédictions sont conformes.
    - `tags/list` rend `"tags":[]`, ce qui lève l'attente incertaine ;
    - toujours 0 referrer dans `builds/sample-app`.
 6. Le dossier `pousser`, qui contenait `auth.json`, est absent après l'étape (`~/.cache/supply-chain-poc/10/travail` vide).
+
+## Additif du 03/11/2026 à 15:01 UTC : prédictions précises de `porte_apres` et `lire_vsa` (avant exécution ; choix du propriétaire : « Lancer les deux »)
+
+Ces prédictions précisent celles de 10:36, 12:01 et 13:13, sans les modifier.
+
+- **`porte_apres`** :
+  - referrers `builds/sample-app 0` et `builds/vsa/sample-app 1` ;
+  - 6 enveloppes ;
+  - `VERDICT|reelle-apres|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) …` ;
+  - comparaison `OK` : même verdict qu'avant le push, durée exclue.
+
+  Le nombre de bundles reste incertain, à cause du CronJob.
+- **`lire_vsa`** :
+  - **acceptées** : la VSA par `COSIGN_REPOSITORY` avec la clé de VSA (1 attestation vérifiée), et les deux témoins avec la clé de Chains ;
+  - **refusées (N3)** : la VSA avec la clé de Chains, et la provenance avec la clé de VSA ;
+  - les motifs de refus sont ceux de `r5-tuf.log`, `no matching attestations … Found: 0, Expected 1` ;
+  - les cinq lignes de contrôle des connexions sont `OK` : aucune connexion hors de `192.168.161.13:5000`.
+
+  **Attente incertaine** : le nombre d'attestations affiché par le témoin de provenance (une ligne JSON par enveloppe vérifiée, peut-être 6).
