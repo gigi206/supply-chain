@@ -317,3 +317,17 @@ Accord du propriétaire : « Oui, mesurer ». Prédictions datées et résultat 
 - **Constat annexe** : `root.json` est écrit dans `~/.sigstore`, localement et sans connexion. La commande qui l'écrit n'est pas isolée par cette mesure.
 - **Conséquence** : les étapes `pousser_vsa` et `lire_vsa` peuvent garder le réseau sur l'hôte. Le relevé des `connect()` par `strace` est maintenu pendant R5, parce que le banc (HTTP local, copie de `HOME`) n'est pas R5 (TLS vers Zot, vrai `~/.sigstore`).
 - Dans la VM, `unshare -rn` reste une précaution, et la section 6 de la politique l'inscrit. Son fonctionnement pour `replay` n'est pas mesuré : il le sera après R4, avant de pousser le commit qui fige la politique.
+
+## R4, premier passage : échec avant le build, dû au code du domaine (03/11/2026, 14:00 à 14:20 UTC)
+
+Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'accord du propriétaire (« Préparer puis lancer »). Journal : [`r4-rebuild-premier-passage.log`](resultats/r4-rebuild-premier-passage.log) ; constat détaillé dans [`r4-predictions.md`](resultats/r4-predictions.md).
+
+- **Conforme** :
+  - lien coupé à 14:00:05 UTC, porteuse à `0` vue de l'invité ;
+  - **sortie de la VM inchangée pendant les 1 200 s de coupure** (`tx_bytes=1774754`, `tx_packets=17805`) ;
+  - recette de `preparer-entrees` vérifiée (digest et trois opérations `OK`).
+- **Arrêt 20 s après le début** : `rebuild.sh` tourne en root, et `git archive` refuse le dépôt `~replay/r3/src`, qui appartient à `replay` (`detected dubious ownership`). Aucune image n'a été construite : ce n'est **pas** un résultat de reproductibilité.
+- **Deux défauts de `replay.sh`** :
+  - l'état de l'unité affiché (`success inactive`) est faux après `--collect` ; le journal de l'unité donne `status=2` ;
+  - le piège `EXIT` cite une variable locale déjà disparue à la sortie. Le lien avait été rétabli explicitement ; il est bien `up`.
+- **Arrêt conforme à la règle de R4.** La correction et le second passage attendent la décision du propriétaire. Effort : bien en deçà du seuil de 4 pw.
