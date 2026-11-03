@@ -384,9 +384,15 @@ Découverte fortuite en préparant le pare-feu, pas une mesure planifiée : aucu
 - `loki.source.api` prend par défaut un gRPC sur toutes les interfaces, sur un port libre. Le repli sur 127.0.0.1 prévu dans `api.go` ne joue jamais, parce que `SetToDefault` remplit déjà le bloc.
 - Les gestionnaires ne contrôlent pas le certificat client.
 - Connu en amont, sans l'angle TLS : [grafana/alloy#6071](https://github.com/grafana/alloy/issues/6071), ouvert le 16/04/2026 et non corrigé.
+- **Additif du 03/11/2026, après lecture de la documentation d'Alloy v1.21.3** : le gRPC n'est pas caché. La page de `loki.source.api` annonce que le composant « receives log entries over HTTP and gRPC ». Elle documente un bloc `grpc` > `tls` distinct de `http` > `tls`, ainsi que l'écoute par défaut sur toutes les interfaces, sur un port au hasard. Notre configuration ne l'avait pas fermé : c'est notre oubli. Ce qui n'est pas documenté : ce point d'entrée existe même sans bloc `grpc`, et reste alors sans TLS. Le repli sur 127.0.0.1 prévu par le code (`api.go`) ne joue jamais.
 
 **Conséquences** :
 - **D17** : par le relais, toute machine qui joint `192.168.161.13` pourrait écrire dans Loki sous `noeud="sc-confiance"` ou `noeud="sc-build"` (déduit du code, écriture non essayée). La joignabilité depuis un pod n'est pas mesurée.
+  - **Additif du 03/11/2026, mesuré** : l'écriture a été essayée sur l'hôte, avec les configurations d'avant le constat prises dans git, les mêmes binaires et une PKI jetable ([`constat-grpc-ecriture-essai-local.log`](resultats/constat-grpc-ecriture-essai-local.log)). Sans aucun certificat :
+    - un push par chacun des deux ports au hasard du relais, envoyé depuis l'adresse réseau de l'hôte, est accepté (204) et stocké sous `noeud="sc-build"` pour l'un, `noeud="sc-confiance"` pour l'autre ;
+    - un push par le gRPC de Loki est stocké avec l'étiquette envoyée telle quelle (`noeud="usurpe"`).
+
+    Contre-épreuve, avec les configurations de L6 : en clair comme en TLS sans certificat, refus sur les trois ports, et aucune ligne dans Loki. Rien n'a été écrit dans le Loki d'audit.
 - **D16** : tout processus local de `sc-stockage` (Forgejo, Zot, Grafana…) atteint Loki sans certificat. Il peut donc lire et écrire tous les journaux.
 - **Le seuil de la brique** (témoins, secrets, source muette) ne portait pas sur ces garanties. Il n'est pas modifié ici : la décision revient au propriétaire.
 

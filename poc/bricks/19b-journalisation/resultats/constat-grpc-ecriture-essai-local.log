@@ -1,0 +1,59 @@
+# Écriture sans certificat par le gRPC : essai local sur l'hôte (03/11/2026, vers 09:20 UTC, demande du propriétaire :
+# « essaie le plutôt que de supposer »). Ni sc-stockage ni le cluster ne sont touchés : rien n'est écrit dans le Loki d'audit.
+# Binaires des archives de L1 (sha256 relus : 17a5fae2… loki, 50d23af2… alloy, identiques aux empreintes épinglées), PKI jetable,
+# configurations du dépôt prises dans git : « avant » = be8da5a (avant le constat), « après » = HEAD (L6) ; transformées par sed
+# comme dans correctif-grpc-essai-local.log (chemins locaux, 127.0.0.1, ports décalés ; les deux sources du relais sur la CA jetable).
+# Requête : httpgrpc.HTTPRequest {POST /loki/api/v1/push, Content-Type: application/json, corps {"streams":[{"stream":
+# {"source":"injection-grpc","noeud":"usurpe"},"values":[[<ns>,<marqueur>]]}]}} en trame gRPC, envoyée par curl en HTTP/2,
+# SANS aucun certificat client. Dossier d'essai supprimé ensuite.
+
+## Avant (be8da5a) : loki -verify-config « config is valid », alloy validate « valide »
+# ports d'écoute (même forme que sc-stockage avant L6 : deux ports d'Alloy au hasard sur toutes les interfaces)
+127.0.0.1:13100 users:(("loki-linux-amd6",pid=4091544))
+127.0.0.1:13501 users:(("alloy-linux-amd",pid=4091577))
+127.0.0.1:13502 users:(("alloy-linux-amd",pid=4091577))
+127.0.0.1:19096 users:(("loki-linux-amd6",pid=4091544))
+127.0.0.1:22345 users:(("alloy-linux-amd",pid=4091577))
+*:33737 users:(("alloy-linux-amd",pid=4091577))
+*:43609 users:(("alloy-linux-amd",pid=4091577))
+# Push vers les ports d'Alloy par l'adresse réseau de l'hôte (192.168.1.100, pas la boucle locale) ; vers Loki par 127.0.0.1
+== 192.168.1.100:33737, push httpgrpc sans certificat (marqueur injection-relais-sans-certificat-33737-1793697627646921105)
+HTTP/2 200  grpc-status: 0  8 204 1
+== 192.168.1.100:43609, push httpgrpc sans certificat (marqueur injection-relais-sans-certificat-43609-1793697627698090972)
+HTTP/2 200  grpc-status: 0  8 204 1
+== 127.0.0.1:19096, push httpgrpc sans certificat (marqueur injection-sans-certificat-19096-1793697612300472648)
+HTTP/2 200  grpc-status: 0  8 204 1
+# « 8 204 1 » : champ Code de HTTPResponse, varint 204 (No Content, réponse normale d'un push accepté)
+## relu dans Loki (certificat client valide)
+detected_level=unknown,noeud=sc-build,service_name=unknown_service,source=injection-grpc  injection-relais-sans-certificat-33737-1793697627646921105
+detected_level=unknown,noeud=sc-confiance,service_name=unknown_service,source=injection-grpc  injection-relais-sans-certificat-43609-1793697627698090972
+detected_level=unknown,noeud=usurpe,service_name=unknown_service,source=injection-grpc  injection-sans-certificat-19096-1793697612300472648
+# Lecture : sans certificat, une écriture par chaque port au hasard du relais est stockée sous le nœud de la source
+# (sc-build, sc-confiance) ; par le gRPC de Loki, l'étiquette envoyée est gardée telle quelle (noeud=usurpe).
+# (Une première tentative vers les ports du relais a échoué côté client : zsh ne découpe pas la liste des ports ; relancée en bash.)
+# Pendant cette mesure, les deux ports d'Alloy étaient joignables depuis le réseau local de l'hôte ; processus arrêtés aussitôt.
+
+## Après (HEAD, configuration de L6)
+127.0.0.1:13100 127.0.0.1:13501 127.0.0.1:13502 127.0.0.1:13511 127.0.0.1:13512 127.0.0.1:19096 127.0.0.1:22345
+== 127.0.0.1:13511, push httpgrpc en clair sans certificat
+curl: (16) Error in the HTTP2 framing layer
+== 13511, push httpgrpc en TLS sans certificat client
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+== 127.0.0.1:13512, push httpgrpc en clair sans certificat
+curl: (16) Error in the HTTP2 framing layer
+== 13512, push httpgrpc en TLS sans certificat client
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+== 127.0.0.1:19096, push httpgrpc en clair sans certificat
+curl: (56) Recv failure: Connexion ré-initialisée par le correspondant
+== 19096, push httpgrpc en TLS sans certificat client
+curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+## lignes injection-grpc dans Loki : 0
+
+## Documentation d'Alloy v1.21.3 (sources : docs/sources/reference/components/loki/loki.source.api.md et
+## docs/sources/shared/reference/components/loki-server-grpc.md), lue après l'essai
+# - première phrase : « `loki.source.api` receives log entries over HTTP and gRPC » ;
+# - blocs : `grpc` > `tls` « Configures TLS for the gRPC server », distinct de `http` > `tls` ;
+# - `grpc.listen_address` : défaut "" « accepting all incoming connections » ; `listen_port` : défaut 0 « a random free port ».
+# Le gRPC est donc un point d'entrée documenté, ouvert par défaut, avec son propre TLS : ce n'est pas un contournement caché.
+# Ce qui n'est pas documenté : que ce point d'entrée existe même sans bloc grpc, et qu'il reste sans TLS quand seul le bloc http
+# en a. Le code (api.go) prévoit un repli sur 127.0.0.1 quand le bloc grpc est absent, que SetToDefault rend inopérant.
