@@ -61,6 +61,9 @@ Accord du propriétaire : « Oui, lancer R2 ». Réseau distinct, BuildKit sur e
 ## Complément d'isolement, mesuré (03/11/2026, 10:03 UTC) : [`r2-isolement-complement.log`](r2-isolement-complement.log)
 
 - **Sens inverse : conforme.** Depuis `sc-build` et `sc-confiance`, `192.168.162.14:22` est **injoignable**. Le plan de confiance, y compris le nœud qui exécute le code des builds, ne joint pas le domaine de replay.
-- **Surface de l'hôte : mesurée.** 22, 111, 2049 (NFS) et 22000 sont **joignables** sur `192.168.161.1` depuis `sc-build`, `sc-confiance` et `sc-replay`, et sur `192.168.162.1` depuis `sc-build`, `sc-confiance` et `sc-replay`. Ce ne sont que des connexions TCP ; aucun service n'a été interrogé.
+- **Surface de l'hôte : mesurée.** Tout ce qui a été essayé est **joignable** :
+  - 22, 111, 2049 (NFS) et 22000 sur `192.168.161.1`, depuis `sc-build` et `sc-confiance` ;
+  - 111, 2049 et 22000 sur `192.168.161.1`, et 22, 111, 2049 et 22000 sur `192.168.162.1`, depuis `sc-replay` ;
+  - 22 seulement sur `192.168.162.1`, depuis `sc-build` et `sc-confiance`. Ce ne sont que des connexions TCP ; aucun service n'a été interrogé.
   - **Conséquence pour le plan de confiance**, hors de la brique 10 : depuis le système de `sc-build`, le NFS du laptop est joignable. Les pods de construction n'ont pas de sortie (NetworkPolicy de la 08), mais le nœud, lui, en a une.
 - **Horloge de `sc-replay`** : synchronisée par NTP, à la même seconde que l'hôte (10:03:45 UTC). `timeVerified` en dépendra.
