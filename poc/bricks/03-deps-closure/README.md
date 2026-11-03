@@ -198,4 +198,6 @@ Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy d
 - **D5 (a)** : workspace `entrees` monté en lecture seule dans `construire-image`.
 - **D6 (a)** : règle de la porte qui exige que la fermeture vienne de la pipeline de prefetch. L'image `3a7ca1b1` actuelle est refusée jusqu'à F3.
 
-Question ouverte avant F2 : le prefetch doit-il inclure npm, sachant que `web/dist` reste construit sur l'hôte ?
+**npm (03/11/2026, choix du propriétaire : « gomod seul (Recommandé) »)** : F2 ne préfetche que les modules Go. Le Dockerfile de la 04 ne lit que `deps/gomod`, et `web/dist` arrive tout fait. Il reste un intrant produit sur l'hôte : c'est un trou connu, à traiter avec Node dans l'image de build (2c, brique 11). D2 se limite donc à `proxy.golang.org`, `storage.googleapis.com` et la lecture de Forgejo, et D4 n'embarque ni Node ni yarn.
+
+**D1 à D6 ne valent pas accord d'exécution de F2.** F2 sera préparé à sec : image d'outils, compte `poc-fermetures`, NetworkPolicy, tâches et pipeline signées, règle D6, prédictions datées. Il sera ensuite soumis avec ses effets à connaître, dont le refus durable de `3a7ca1b1` par D6 jusqu'à F3. Rien n'est appliqué au cluster ni à Zot avant ce oui.
