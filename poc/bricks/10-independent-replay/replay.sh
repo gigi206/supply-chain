@@ -52,6 +52,11 @@
 #   droits_zot       après « mise run confiance:stockage -- zot » : poc-replay sur le dépôt jetable builds/essai-replay (push par
 #                    digest et referrer acceptés ; tag, dépôt hors de builds/**, suppression refusés)
 #
+# Additif du 03/11/2026, 23:15 UTC (préparé à sec, pas encore joué) : VSA de la construction du rejeu complet de la 08
+# (choix du propriétaire : « VSA sur 3a7ca1b1 »). Même image, autre provenance : INVOCATION c4242a11 (J7, fermeture de la
+# plateforme, builds/fermetures/sample-app) ; clé de Chains et chaîne de la TSA du rejeu (copiées du dépôt par transporter) ;
+# entrees.py et verifier_entrees.py reconnaissent la fermeture sous builds/fermetures/ ; politique révisée (nouveau
+# POLITIQUE_COMMIT). Les journaux r3, r4 et r5 seront réécrits ; ceux de d9006af7 restent dans l'historique git.
 # Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -67,7 +72,8 @@ ZOT_POC=192.168.161.13:5000                      # Zot du PoC, lecture anonyme s
 CA_POC=$O/ca-poc.crt                             # certificat public de la CA du PoC (TLS de Zot et de Forgejo), copié une fois
 [ -s "$CA_POC" ] || cp "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" "$CA_POC"   # public ; aucune clé de 08 n'est lue
 IMAGE=builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5   # sujet de la provenance
-INVOCATION=d9006af7-5d9a-4a5e-878e-1c9a5bd96d56   # PipelineRun du 02/11/2026, 13:58:36 à 13:59:30 UTC
+# INVOCATION=d9006af7-5d9a-4a5e-878e-1c9a5bd96d56   # PipelineRun du 02/11/2026, 13:58:36 à 13:59:30 UTC (VSA de R5, c804d946)
+INVOCATION=c4242a11-18f6-439f-b947-7fe3d4319078   # J7 du rejeu complet de la 08, 03/11/2026, 21:25:30 à 21:26:27 UTC (fermeture F2)
 
 # Domaine de replay : VM, réseau, clés (rien de commun avec 08 ; l'image Debian publique est relue dans le cache de 08 et revérifiée)
 IMG=$HOME/.cache/supply-chain-poc/08/telechargements/debian/debian-13-generic-amd64-20261026-2643.qcow2
@@ -341,7 +347,8 @@ etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (tra
   sur "cd ~/r3 && sha256sum verifier_entrees.py && python3 -I verifier_entrees.py '$IMAGE' '$INVOCATION' '$URL_TSA'"
 }
 
-FIN_BUILD=2026-11-02T13:59:30Z   # runDetails.metadata.finishedOn de la provenance vérifiée en R3
+# FIN_BUILD=2026-11-02T13:59:30Z   # finishedOn de d9006af7, vérifié en R3 le 03/11/2026
+FIN_BUILD=2026-11-03T21:26:27Z   # finishedOn de c4242a11, lu sans vérification le 03/11/2026 (23:13 UTC) ; R3 le revérifie
 ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 
 transporter_r4() { # rebuild.sh : bundle preparer-entrees et ce rebuild.sh copiés dans ~/r4 de la VM, vidé d'abord

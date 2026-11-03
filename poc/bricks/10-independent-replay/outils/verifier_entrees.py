@@ -23,6 +23,10 @@ L = "layout"
 ko = 0
 
 
+def est_entree(uri, nom):  # la fermeture de la plateforme (F2 de la 03) est rangée sous builds/fermetures/<application>
+    return uri.endswith(nom) or (nom == "fermeture" and "/fermetures/" in uri)
+
+
 def sh(*args, entree=None):
     return subprocess.run(args, capture_output=True, input=entree, check=False)
 
@@ -96,7 +100,7 @@ verdict(p["buildDefinition"]["buildType"] == "https://tekton.dev/chains/v2/slsa-
 verdict(any(s["digest"].get("sha256") == SUJET for s in provenance["subject"]), "sujet = image rejouée")
 attendus = {}
 for nom in ("construire-image", "fermeture", "web-dist", "builder-go-voie-d", "sample-app.git"):
-    d = [x for x in p["buildDefinition"]["resolvedDependencies"] if x.get("uri", "").endswith(nom)]
+    d = [x for x in p["buildDefinition"]["resolvedDependencies"] if est_entree(x.get("uri", ""), nom)]
     verdict(len(d) == 1, f"entrée {nom} déclarée : {d[0]['digest'] if d else 'absente'}")
     if d:
         attendus[nom] = list(d[0]["digest"].values())[0]

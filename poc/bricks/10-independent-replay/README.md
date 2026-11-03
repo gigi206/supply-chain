@@ -433,3 +433,7 @@ Le rejeu de zéro de la 08 a effacé Zot. Le bundle versionné `r5-vsa.bundle.js
   `d9006af7`, sur la fermeture de l'hôte), pas la construction du rejeu (fermeture de la plateforme). Le contrôle 6 l'accepte
   quand même, parce que `vsa.sh` ne lie la VSA qu'au digest `3a7ca1b1`.
 - **Le domaine `sc-replay`** n'est pas touché par le rejeu de la 08.
+
+## Additif du 03/11/2026, 23:17 UTC : VSA de la construction du rejeu complet, préparée à sec (choix du propriétaire : « VSA sur 3a7ca1b1 »)
+
+Même image (`3a7ca1b1`), provenance de J7 du rejeu complet (`c4242a11`, fermeture de la plateforme). Le code et la politique sont adaptés à la fermeture rangée sous `builds/fermetures/`. Rien n'est encore joué. R4 ne peut pas commencer avant le 04/11/2026 à 21:26:27 UTC. Prédictions et différences relevées : [`vsa-rejeu-complet-predictions.md`](resultats/vsa-rejeu-complet-predictions.md).

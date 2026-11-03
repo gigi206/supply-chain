@@ -19,7 +19,7 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
 4. Le sujet est l'image rejouée, et son digest est celui comparé au point 4.
 5. `resolvedDependencies` déclare :
    - le commit (`git+https://…/workspace/sample-app.git`, `sha1`) ;
-   - la fermeture (`entrees/sample-app/fermeture`) ;
+   - la fermeture : `builds/fermetures/sample-app`, produite par la pipeline de prefetch de la plateforme (F2 de la brique 03), ou `entrees/sample-app/fermeture` pour une construction antérieure au rejeu complet de la 08 du 03/11/2026 ;
    - `web/dist` (`entrees/sample-app/web-dist`) ;
    - l'image de build ;
    - le bundle de la tâche `preparer-entrees` (préparation du contexte) ;
@@ -99,4 +99,5 @@ Avec un verdict `FAILED`, aucune VSA n'est signée ni poussée : `FAILED` est un
 ## Limites
 
 - `web/dist` est pris par digest et n'est pas reconstruit : Node reste hors de la chaîne, par choix du propriétaire.
+- La provenance propre de la fermeture (pipeline de prefetch de la plateforme) n'est pas vérifiée par le domaine. C'est la porte de la 08 qui la vérifie (`porte.fermeture_plateforme`, D6). Le domaine ne vérifie que le digest déclaré par la provenance de l'image, puis le rebuild bit à bit.
 - Avec D1 (b) et D2 (a), le propriétaire, ou le root de l'hôte, peut forger à la fois la provenance et la VSA.
