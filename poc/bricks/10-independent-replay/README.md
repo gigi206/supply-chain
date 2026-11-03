@@ -232,3 +232,24 @@ Prédictions et additif : [`r3-predictions.md`](resultats/r3-predictions.md).
 Premier passage (3 KO, dus au script) archivé. Le journal de `r2-paquets.log` réécrit par l'ajout de git a été reconstitué (`r2-paquets-premier-passage.log`).
 
 **Pour R4** : la recette de `preparer-entrees` (contexte `src`, `deps`, `src/web/dist`) doit aussi être extraite de son bundle déclaré. **Le rebuild ne commence pas avant le 03/11 à 13:59:30 UTC.**
+
+## D5, compte Zot `poc-replay` : préparation à sec (03/11/2026 ; rien appliqué)
+
+Accord du propriétaire : « Oui, à sec ». L'application aura son propre accord, avant R5.
+
+**Contrainte** : la VM du domaine ne joint pas Zot (réseau distinct, R2). Le chemin est donc le suivant :
+- la VSA est **signée dans la VM**, et la clé n'en sort pas ;
+- elle est **poussée par l'hôte**, qui la transporte en referrer. La VSA étant signée, le transport ne peut pas l'altérer sans que la vérification échoue.
+
+**Secret** : le mot de passe de `poc-replay` est généré dans `~/.cache/supply-chain-poc/10/secrets/`, le dossier du domaine sur l'hôte. La 08 ne reçoit que son **hash bcrypt** : son script ne voit jamais le mot de passe.
+
+**Modifications prévues dans la 08** (rejeu ciblé `mise run confiance:stockage -- zot`, qui redémarre Zot) :
+- `stockage/zot.json`, dépôts `builds/**` : `poc-replay` reçoit `read`, et `create` avec la même condition CEL que `poc-images` (`req.referenceType != "tag"`). Il n'a ni `update`, ni tag, donc ni `.att` ni `.sig`.
+- `stockage.sh`, étape `zot` : la ligne `poc-replay:<bcrypt>` du `htpasswd` est lue dans `~/.cache/supply-chain-poc/10/secrets/zot-poc-replay.htpasswd`, sans mot de passe.
+
+**Vérifications prévues**, avec prédictions avant exécution :
+- un referrer poussé par digest dans `builds/sample-app` est accepté ;
+- un tag est refusé, de même qu'un dépôt hors de `builds/**` et une mise à jour ;
+- en lecture anonyme, le referrer apparaît dans `GET /v2/builds/sample-app/referrers/sha256:3a7ca1b1…`.
+
+**À mesurer avant R5, sur l'hôte et sur un Zot jetable (comme R1)** : ce que `cosign attest --no-upload` produit avec la configuration de signature vide, dans le format bundle v0.3. Il s'agit de savoir si la VM peut signer sans registre, et si `oras attach` peut ensuite pousser ce bundle tel quel, en referrer.
