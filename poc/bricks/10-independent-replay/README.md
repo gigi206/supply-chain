@@ -371,5 +371,9 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
   - la VSA est acceptée avec sa clé, et refusée avec celle de Chains ;
   - la provenance est refusée avec la clé de VSA, et acceptée avec celle de Chains (6 attestations) ;
   - chaque commande cosign n'ouvre qu'une connexion, vers Zot.
-- Restent, sous accord : les contre-épreuves N1 et N2, dans la VM.
+- **Contre-épreuves N1 et N2** (15:04 UTC, dans la VM, sur des copies, [`r5-negatifs.log`](resultats/r5-negatifs.log)) :
+  - **N1** (un octet changé dans le zip de `go-chi/chi`, zip resté valide) : build refusé par Go (`checksum mismatch`, `SECURITY ERROR`), `FAILED` ;
+  - **N2** (`":8080"` remplacé par `":8081"` dans `main.go`) : image `fa05b94a…`, différente du sujet, `FAILED` ;
+  - diffoscope ([couche](resultats/r5-n2-diffoscope-couche.txt), [config](resultats/r5-n2-diffoscope-config.txt)) : seul le binaire `sample-app` diffère, d'un octet, et dans la config seul `rootfs.diff_ids`.
+- **R5 est complet.**
 - **Hors R5, non tranché** : la porte de la 08 n'exige pas encore la VSA (contrôle 6 de la grille C). Elle admet l'image avec ou sans VSA.

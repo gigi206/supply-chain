@@ -1,0 +1,25 @@
+# replay.sh negatifs, 2026-11-03T15:04:59Z
+80728bafd3a8fa91057b36afe90f97db14cfe42b48aaa109939461f12accd43d  /home/replay/r5n/negatifs.sh
+image_de_build_domaine=sha256:dc20b7524ba0fe1cb224f9507e96987e3216a276a352e19f0d10c93743817b7a
+n1_altere=github.com/go-chi/chi/v5@v5.2.3/tree_test.go (octet 22671 sur 22673)
+n1_zip_valide=True
+n1_build=refusé
+n1_motif=#10 1.485 verifying github.com/go-chi/chi/v5@v5.2.3: checksum mismatch #10 1.485 SECURITY ERROR 1.485 verifying github.com/go-chi/chi/v5@v5.2.3: checksum mismatch 
+n1_verdict=FAILED
+n2_altere=main.go : 37:		addr = ":8081"
+n2_build=réussi
+n2_image=sha256:fa05b94a64337bd7764605982b234c65c526d25609a9966729aeeca27c775365
+n2_verdict=FAILED
+diffoscope_couche=code 1 ; 24 lignes
+diffoscope_config=code 1 ; 17 lignes
+fichiers_differents_couche=│ ├── sample-app
+fin=2026-11-03T15:05:20Z
+## motif de N1 (journal de buildctl, fin)
+--------------------
+   6 |     COPY . .
+   7 | >>> RUN --network=none --mount=type=bind,from=deps,target=/deps \
+   8 | >>>     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache \
+   9 | >>>     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+  10 |     
+--------------------
+error: failed to solve: process "/bin/sh -c GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags \"-s -w -buildid= -X main.Version=1.0.0\" -o /out/sample-app ." did not complete successfully: exit code: 1

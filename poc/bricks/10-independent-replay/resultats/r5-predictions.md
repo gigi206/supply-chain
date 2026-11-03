@@ -260,3 +260,25 @@ Les prédictions de N1 et N2 sont celles de 10:36, précisées à 13:13. Valeurs
   - dans la config, seul `rootfs.diff_ids` diffère.
 
 Aucune VSA n'est signée ni poussée, et les originaux de `~/r4/e` ne sont pas touchés : `negatifs.sh` travaille sur des copies, dans `~/r5n`. Le lien de la VM reste établi, car ces contre-épreuves ne servent pas à prouver le « hors ligne ».
+
+### Résultat de `negatifs` (03/11/2026, 15:04:59 à 15:05:20 UTC) : [`r5-negatifs.log`](r5-negatifs.log), rapports [`r5-n2-diffoscope-couche.txt`](r5-n2-diffoscope-couche.txt) et [`r5-n2-diffoscope-config.txt`](r5-n2-diffoscope-config.txt)
+
+**Conforme.** `negatifs.sh` `80728baf…`, image de build `dc20b752…`, comme en R4.
+
+- **N1, fermeture altérée** : refus.
+  - L'octet altéré est le 22 671ᵉ sur 22 673 de `github.com/go-chi/chi/v5@v5.2.3/tree_test.go`. Le zip, réécrit, reste valide (`True`).
+  - Le build est **refusé** : `verifying github.com/go-chi/chi/v5@v5.2.3: checksum mismatch` puis `SECURITY ERROR`, au `go build` de la recette. Verdict `FAILED`.
+  - Le fichier altéré n'est qu'un test, que le build n'utilise pas : c'est le zip entier que Go contrôle contre `go.sum`.
+- **N2, source altérée** :
+  - le build réussit après la modification de la ligne 37 de `main.go` (`addr = ":8081"`) ;
+  - image **`sha256:fa05b94a…`**, différente de `3a7ca1b1…` : verdict `FAILED`.
+- **Diffoscope** : code 1 pour les deux comparaisons.
+  - Dans la couche, **seul `sample-app` diffère**, sur une seule ligne du vidage hexadécimal : `…3830…` devient `…3831…`, c'est-à-dire `:8080` devenu `:8081`. `readelf` et `xxd` sont absents de la VM : diffoscope compare donc le binaire octet par octet.
+  - Dans la config, **seul `rootfs.diff_ids`** diffère.
+
+Rien n'a été signé ni poussé. Les copies et la racine BuildKit des contre-épreuves restent dans la VM, dans `~/r5n` et `/var/lib/replay-buildkit-n`, et `~/r4/e` n'est pas touché.
+
+**R5 est complet** :
+- VSA signée dans le domaine, poussée et relue ;
+- même verdict de la porte avant et après le push ;
+- N1, N2 et N3 conformes.

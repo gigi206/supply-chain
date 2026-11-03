@@ -1,0 +1,17 @@
+--- /home/replay/r5n/n/pub.config.json
++++ /home/replay/r5n/n/n2.config.json
+├── Pretty-printed
+│ @@ -29,12 +29,12 @@
+│              "created_by": "ENTRYPOINT [\"/sample-app\"]",
+│              "empty_layer": true
+│          }
+│      ],
+│      "os": "linux",
+│      "rootfs": {
+│          "diff_ids": [
+│ -            "sha256:2996737dd3b6fed64439882bc0fc3d520ce9ab98e626738e75355d1fc7aea34f"
+│ +            "sha256:7f34ab81f1a15f82144f8217f6bb2f200744a82a436e0b8a1b7c6cc874daad82"
+│          ],
+│          "type": "layers"
+│      }
+│  }
