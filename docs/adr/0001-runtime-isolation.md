@@ -80,6 +80,9 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
   - Pour l'étape de construction (BuildKit en root, pod privilégié, voie A), un `readOnly` protège donc des erreurs, pas d'une
     étape malveillante.
   - L'intégrité des entrées reste portée par leurs empreintes (`go.sum`, digests OCI) et par la porte (D6 de la brique 03).
+  - Comportement non trouvé dans les issues de kata-containers (recherche du 03/11/2026 sur « readonly remount », « read-only »,
+    « readOnly virtio-fs » ; la plus proche, #7268, traite d'une erreur de montage répété). Aucun signalement en amont sans
+    l'accord explicite du propriétaire.
 - **Construction dans un PipelineRun** (brique 08, J7, [résultats](../../poc/bricks/08-trust-plane/README.md#jalon-j7--isolation-par-kata-30102026), [construction](../../poc/bricks/08-trust-plane/resultats/construction-construire-premiere-version.log), [provenance](../../poc/bricks/08-trust-plane/resultats/construction-provenance-premiere-version.log)) :
   - **Mise en œuvre** : sample-app est construite depuis Forgejo par une pipeline signée de deux tâches signées, qui donne `3a7ca1b1`.
     - La tâche de construction s'exécute en pod Kata privilégié (BuildKit en root, état sur tmpfs de l'invité). Le `runtimeClassName` est posé par le créateur du PipelineRun (`taskRunSpecs`).

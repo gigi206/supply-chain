@@ -280,3 +280,12 @@ passe normale dans [`f3-taches.log`](f3-taches.log).
 
 **Suite** : `rejeu.sh` de la 08 doit intégrer F2 et F3 avant la bascule de J8. Sinon, un rejeu complet ferait refuser l'image
 réelle par D6.
+
+## Additif du 03/11/2026, 19:34 UTC : traçabilité et journaux
+
+- **`f3-regle.log`** contient désormais la relance de 19:24:30, faite après la mise à jour de la liste revue : conforme,
+  21/21. Elle a écrasé le journal de 18:54:27 cité plus haut, conforme lui aussi.
+- **Journaux des changements faits par l'API** (ConfigMap `porte`, TriggerTemplate, PVC et pods témoins) : ils passent par le
+  journal d'audit de l'API k3s, collecté par Alloy (`audit-k8s.alloy` de la 19b, écritures). Les écritures dans Zot passent par
+  `audit-zot.alloy`. Les deux sont donc consultables dans Grafana.
+  - C'est déduit de la configuration de la 19b. Aucune requête n'a été faite dans Loki pour F3.

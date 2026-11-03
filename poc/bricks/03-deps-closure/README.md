@@ -361,4 +361,6 @@ Résultats complets : [`resultats/f3-predictions.md`](resultats/f3-predictions.m
   - VSA liée au digest et non à la provenance : la VSA retenue est celle du rejeu de J7 ;
   - `web/dist` toujours produit sur l'hôte ;
   - refus réseau du prefetch hors de Grafana (F2).
+- **Journaux** : les changements faits par l'API et dans Zot sont dans les journaux d'audit collectés par Alloy (19b), et
+  les pods dans `pods.alloy`. C'est déduit de la configuration, aucune requête n'a été faite dans Loki.
 - **Suite** : le rejeu complet de la 08 (`rejeu.sh`) doit intégrer F2 et F3 avant la bascule de J8.
