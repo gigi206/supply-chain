@@ -185,3 +185,49 @@ Point 19, ajouté : le journal de Hermeto affiche « Using registry proxy https:
   - pipeline `prefetch-sample-app@sha256:a7ccba43…`.
 
   Les deux tâches sont ajoutées à `politique/porte/taches.yml`, **soumises à la revue du propriétaire** avant la seconde passe.
+
+## Résultats de la seconde passe de `taches` (18:24 UTC), de `prefetch` (18:24 à 18:25 UTC) et de `provenance` (18:25 UTC)
+
+[`f2-taches.log`](f2-taches.log), [`f2-prefetch.log`](f2-prefetch.log), [`f2-provenance.log`](f2-provenance.log). La liste revue a été acceptée par le propriétaire (« Accepter ») avant la seconde passe.
+
+18. **Conforme** : les deux tâches sont dans la liste revue, avec les mêmes bundles qu'à la première passe. La pipeline, re-signée à chaque passage, a pour digest `ab3199fa…` (contre `a7ccba43…` à la première passe), comme dans `construction.sh`.
+19. **Conforme** :
+    - deux PipelineRuns réussis, pods sur `sc-build`, `tekton.dev/task` `prefetch-gomod` et `publier-fermeture` ;
+    - Hermeto avec Go 1.26.10 et « Using registry proxy https://proxy.golang.org » ;
+    - prefetch en moins d'une seconde.
+20. **Conforme** : même contenu gomod que la fermeture de l'hôte, et digest différent (**`74c265e7…`** contre `0ab5a507…`). Les seules différences :
+    - `.build-config.json` (chemins) ;
+    - **une archive npm (`deps/npm/marked-16.4.1.tgz`) dans la fermeture de l'hôte**, préfetchée avec npm en brique 03. Celle de la plateforme n'est que gomod (choix « gomod seul »).
+
+    Aucune tuile `sumdb` dans aucune des deux. 7 fichiers, 172 Kio.
+21. **Conforme** : **les deux prefetch du même commit donnent la même fermeture** (`74c265e7…`).
+    - Le SBOM de Hermeto, lui, diffère d'un passage à l'autre (`c0705032…` puis `25c61bbf…`) : constat, il n'est pas publié.
+22. **Conforme** : PipelineRuns signés par Chains, 4 enveloppes valides sur la fermeture (deux PipelineRuns, deux TaskRuns `publier`).
+23. **Conforme** : Hubble montre `FORWARDED` vers kube-dns, vers Forgejo (12 et 14 flux) et vers une adresse publique en 443 (6), aucun `DROPPED`.
+24. **Conforme** :
+    - sujet `builds/fermetures/sample-app@sha256:74c265e7…`, `slsa-tekton` ;
+    - source `sha1:6391fd43…` ;
+    - `resolvedDependencies` : pipeline `ab3199fa…`, `prefetch-gomod` `5e7e5662…` (contenu), image d'outils `68e0ae70…`, `publier-fermeture` `7fa92ad3…` ;
+    - autre clé refusée (« no matching attestations »).
+
+## Bilan de F2
+
+**La fermeture de sample-app est désormais produite par la plateforme**, avec ces propriétés :
+- **reproductible** : deux prefetch donnent le même digest ;
+- **signée par Chains**, et sa provenance la relie au commit de Forgejo, à l'image d'outils reproductible `68e0ae70` et aux tâches revues ;
+- prefetch dans un pod sans secret, dont la sortie est limitée aux adresses publiques en 443, à Forgejo et au DNS ;
+- publication par un compte qui ne fait que créer par digest dans `builds/fermetures/**`.
+
+**Écarts et limites** :
+- D2 a été révisée deux fois : `toFQDNs` est abandonné (Envoy démarré, retour arrière mesuré), au profit de la sortie 443 hors privé ;
+- un pod compromis pourrait envoyer le code cloné vers une adresse publique ;
+- les refus de sortie ne sont visibles que dans Hubble, pas dans Grafana (source J7 de la 19b non collectée) ;
+- le SBOM n'est pas publié, et il n'est pas reproductible.
+
+**Suite : F3.**
+- Bascule de la construction sur `74c265e7`.
+- D5 : workspace en lecture seule.
+- D6 : la porte exige une fermeture produite par `prefetch-sample-app`.
+- Avec D6, `3a7ca1b1` construite sur `0ab5a507` est refusée jusqu'à la nouvelle construction.
+
+Durée de F2 : de 16:55 à 18:25 UTC, préparation comprise. C'est sous l'estimation de 0,5 pw.

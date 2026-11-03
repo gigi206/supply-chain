@@ -238,3 +238,13 @@ D5 (workspace en lecture seule) et D6 (règle de la porte) sont faites en F3, av
 - Le pod de prefetch sort vers les adresses publiques en 443 seulement, plus Forgejo et le DNS.
 - La source des modules est imposée par Hermeto (`HERMETO_GOMOD__PROXY_URL=https://proxy.golang.org`), et leur intégrité par `go.sum`.
 - Limite : un pod compromis pourrait envoyer le code cloné vers une adresse publique.
+
+## F2 exécuté (03/11/2026, 17:39 à 18:25 UTC ; accord du propriétaire : « Dans l'ordre »)
+
+Résultats complets : [`resultats/f2-predictions.md`](resultats/f2-predictions.md), avec les passages ratés archivés.
+- **Image d'outils** `plateforme/outils-prefetch@68e0ae70` : identique sur deux constructions BuildKit sans cache, 198 Mo, sans image de base externe.
+- **Cilium** : `l7Proxy: true` a démarré l'Envoy embarqué. Retour à `false`, puis D2 révisée une seconde fois.
+- **Zot** : compte `poc-fermetures`, création par digest seulement dans `builds/fermetures/**`. Mesuré : le motif le plus long remplace `builds/**`.
+- **Réseau** : `prefetch-sortie` laisse sortir en 443 vers le public, vers Forgejo et le DNS. Port 80, API de k3s et Zot refusés, avec trace dans Hubble.
+- **Prefetch** : deux PipelineRuns du commit `6391fd43` donnent **la même fermeture `74c265e7`**, dont le contenu gomod est celui de la fermeture de l'hôte. Chains la signe, et sa provenance la relie au commit, à l'image d'outils et aux tâches revues.
+- **Reste F3** : bascule de la construction, D5 et D6.

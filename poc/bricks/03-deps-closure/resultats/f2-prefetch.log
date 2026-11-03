@@ -1,0 +1,53 @@
+# prefetch.sh prefetch, 2026-11-03T18:24:34Z
+## f2-prefetch-1 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-1-prefetch (Succeeded), pod f2-prefetch-1-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     2026/11/03 18:24:39 Entrypoint initialization
+     2026/11/03 18:24:40 Decoded script /tekton/scripts/script-0-vll66
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-03 18:24:44,520 INFO Fetching the gomod dependencies at subpath .
+     2026-11-03 18:24:44,527 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-03 18:24:44,861 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+### TaskRun f2-prefetch-1-publier (Succeeded), pod f2-prefetch-1-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/03 18:24:46 Decoded script /tekton/scripts/script-0-94pqr
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : c0705032825895096d2d9a6cbd098124113f4cdc3573f8aa084e0fdda229973c
+     2026/11/03 18:24:45 Entrypoint initialization
+OK   PipelineRun f2-prefetch-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-1 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-1-prefetch-pod (IP relevée dans le TaskRun) :
+          48 FORWARDED 10.42.0.67:53 
+          12 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 142.251.97.141:443 
+## f2-prefetch-2 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-2-prefetch (Succeeded), pod f2-prefetch-2-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-03 18:25:09,557 INFO Fetching the gomod dependencies at subpath .
+     2026-11-03 18:25:09,563 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-03 18:25:09,869 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+     2026/11/03 18:25:04 Entrypoint initialization
+     2026/11/03 18:25:05 Decoded script /tekton/scripts/script-0-hr27n
+### TaskRun f2-prefetch-2-publier (Succeeded), pod f2-prefetch-2-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/03 18:25:11 Entrypoint initialization
+     2026/11/03 18:25:11 Decoded script /tekton/scripts/script-0-ldfcj
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 25c61bbf71473a177192579e93566e641751eba59b1a31fa4877a08715336ea4
+OK   PipelineRun f2-prefetch-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-2 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-2-prefetch-pod (IP relevée dans le TaskRun) :
+          48 FORWARDED 10.42.0.67:53 
+          14 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 142.251.97.141:443 
+## comparaisons
+fermeture 1 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture 2 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture de l'hôte (sha256:0ab5a507…) : 8 fichiers, contenu 1852dbbd7863300e7f85563de65273477fa66ee94b606f349bb7a18ad7f6dcd0
+     1c1
+     < f34e867c9aef391c129ab3292c4d24b1f6aa10a1998779fae6138437dce21f78  ./.build-config.json
+     ---
+     > d1bc34073c1487251bd7e8075e724fb0f95011a4ee4b65818ecb74f1dde8bd7f  ./.build-config.json
+     7a8
+     > 9144f0e2a4cea7837a698aaf84291cb89a796ef2495b28cb339c90ae78c48751  ./deps/npm/marked-16.4.1.tgz
+OK   deux prefetch du même commit : même fermeture
+# fin 2026-11-03T18:25:22Z

@@ -1,0 +1,18 @@
+# prefetch.sh provenance, 2026-11-03T18:25:29Z
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur la fermeture sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   enveloppes du PipelineRun f2-prefetch-1 : 1
+sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app sha256:ab3199fad901d324e76e022a7d8bd01ff7c864fa1411df750e472ef5810914ae
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135 (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   image d'outils du prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   tâche prefetch-gomod (bundle) : sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)
+# fin 2026-11-03T18:25:29Z
