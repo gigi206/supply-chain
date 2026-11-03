@@ -349,4 +349,5 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
   - **La VM n'a rien émis pendant les 1 200 s de coupure** : compteurs de sortie inchangés côté hôte et côté invité.
   - Rebuild en 62 s, fini 19 min avant le rétablissement du lien.
 - **Seuil B5** (le replay réussit avec 0 connexion sortante, journalisée) : atteint pour le rebuild.
+- **Politique, section 3, réécrite avant le gel** (14:48 UTC) : « VM neuve » n'était plus exact après la répétition. Les caches froids reposent désormais sur `--no-cache`, la racine BuildKit effacée et `~/r4` vidé. Un relevé en lecture seule ne trouve sur le disque de la VM aucun fichier de la répétition ([`r4-etat-residuel.log`](resultats/r4-etat-residuel.log)).
 - **Reste** : R5, avec la VSA, les contre-épreuves N1 à N3 et la porte avant et après.

@@ -1,0 +1,23 @@
+# R4, fichiers écrits pendant la répétition (14:25:05 à 14:26:09 UTC) encore présents après le second passage ; relevé en lecture seule, 2026-11-03T14:48:12Z
+/home/replay/r4/layout
+/home/replay/r4/layout/blobs
+/home/replay/r4/layout/blobs/sha256
+/home/replay/r4/layout/blobs/sha256/0483574d173320ce02e1611ca9f8464b3b4adb83a34c2c0174240e67c4d173f8
+/home/replay/r4/layout/blobs/sha256/0c11bdb172773c3922f04cb8f957470b1905d113d393d95647996d9b00e66c99
+/home/replay/r4/layout/blobs/sha256/2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+/home/replay/r4/layout/index.json
+/home/replay/r4/layout/ingest
+/home/replay/r4/layout/oci-layout
+/home/replay/r4/rebuild.sh
+## total : 10
+## contrôle : ces fichiers viennent-ils du transport du second passage (tar garde les dates de l'hôte) ?
+a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534  /home/replay/r4/rebuild.sh
+2026-11-03 14:26:32.138072215 +0000 /home/replay/r4
+2026-11-03 14:26:09.000000000 +0000 /home/replay/r4/rebuild.sh
+2026-11-03 14:26:09.000000000 +0000 /home/replay/r4/layout/index.json
+2026-11-03 14:26:10.414077794 +0000 (naissance) /home/replay/r4/rebuild.sh
+2026-11-03 14:26:10.414077794 +0000 (naissance) /home/replay/r4/layout/index.json
+/tmp tmpfs
+total 0
+drwxr-xr-x  2 root root  40 2026-11-03 14:27:05.102063557 +0000 .
+drwxrwxrwt 10 root root 200 2026-11-03 14:46:40.765677472 +0000 ..

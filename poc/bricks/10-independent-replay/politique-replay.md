@@ -53,7 +53,12 @@ Chaque condition est éliminatoire : un échec arrête le replay avant tout buil
 
   Son digest est consigné, pas comparé : la brique 04 a mesuré qu'il varie d'un hôte à l'autre alors que l'image produite ne change pas.
 - **Moteur** : BuildKit 0.25.2 (archive vérifiée, `mise.lock`), et non la version de l'image de la tâche Tekton. Le moteur n'est pas celui du plan de confiance.
-- **Caches froids** : VM neuve et `--no-cache`.
+- **Caches froids** : aucun état d'un build précédent ne sert au rebuild.
+  - `--no-cache` ;
+  - racine BuildKit effacée par `rebuild.sh` au départ ;
+  - `GOCACHE` et `GOMODCACHE` du second moteur sous `~/r4/e`, vidé avec `~/r4` à chaque transport.
+
+  Le texte du 03/11/2026 disait « VM neuve ». Ce n'est plus exact : une répétition lien établi a construit dans la même VM avant le passage compté de R4. Un relevé, fait après ce passage, ne trouve sur le disque de la VM aucun fichier de la répétition ; seuls restent ceux du transport du passage compté ([`r4-etat-residuel.log`](resultats/r4-etat-residuel.log)).
 - **Sans réseau pendant le build** (D4) : le lien de la VM est coupé, et les compteurs de son interface sont relus depuis l'hôte, avant et après le build.
 - **Délai** : `timeVerified` est au moins 24 h après `runDetails.metadata.finishedOn` de la provenance.
 

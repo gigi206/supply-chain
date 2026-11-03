@@ -146,3 +146,14 @@ Autres constats :
 - `sortie=code 0` ;
 - plus de `unbound variable` à la sortie ;
 - lien `up` après le passage.
+
+## Additif du 03/11/2026, 14:48 UTC : ordre d'écriture et état résiduel
+
+- **Ordre d'écriture** : l'additif titré « 14:25 UTC » a en réalité été écrit à 14:24:36 UTC (sortie de `date`) et commité dans `1a4b7b7`, **avant** M1 (14:24:45) et la répétition (14:24:49). Le titre arrondit l'heure ; l'ordre réel reste celui annoncé : prédictions d'abord, mesures ensuite.
+- **État résiduel de la répétition** (relevé en lecture seule à 14:48 UTC, [`r4-etat-residuel.log`](r4-etat-residuel.log)) :
+  - Fichiers et dossiers modifiés entre 14:25:05 et 14:26:09 UTC sur le disque racine de la VM, hors `/proc`, `/sys`, `/run` et `/dev` : 10, tous sous `~/r4/layout` plus `~/r4/rebuild.sh`.
+  - Ce sont ceux du **transport du second passage**. Nés à 14:26:10 UTC, ils portent la date de l'hôte conservée par `tar`, soit 14:26:09. Le sha256 de `rebuild.sh` vaut `a1945ff2…`, celui de la répétition `af532fa1…`.
+  - `/tmp` est un `tmpfs`, et `/tmp/run-bk` est vide.
+  - **Conclusion : aucun fichier de la répétition ne subsiste sur le disque de la VM.**
+- La section 3 de la politique (« Caches froids ») est réécrite en conséquence, avant d'en figer le digest.
+- **Pour R5** : `vsa.py` hache `~/r4/rebuild.sh` dans la VM, c'est-à-dire la copie qui a produit le `PASSED`. `~/r4` ne doit donc plus être retransporté avant la VSA. `~/r4/e` sert aussi à `negatifs.sh`.
