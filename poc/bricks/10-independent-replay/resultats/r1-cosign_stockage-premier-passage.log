@@ -1,0 +1,10 @@
+# Premier passage de cosign_stockage, 03/11/2026 09:50:37 UTC : journal RECONSTITUÉ depuis la sortie du terminal (le journal
+# d'origine a été écrasé par le second passage). Échec : crane, sans base, crée un manifeste au format Docker, refusé par Zot.
+## interfaces de l'espace de noms : lo ; routes : 0
+2026/11/03 10:50:37 base unspecified, using empty image
+Error: pushing image 127.0.0.1:15000/essai/image:v1: PUT http://127.0.0.1:15000/v2/essai/image/manifests/v1: MANIFEST_INVALID: manifest invalid; map[description:During upload, manifests undergo several checks ensuring validity. If those checks fail, this error MAY be returned, unless a more specific error is included. The detail will contain information the failed validation. mediaType:application/vnd.docker.distribution.manifest.v2+json]
+## image jetable : 127.0.0.1:15000/essai/image@
+clés jetables : cosign.key cosign.pub
+## cosign attest --key, sans option de stockage ni de journal
+Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get "https://tuf-repo-cdn.sigstore.dev/15.root.json": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:39741->127.0.0.53:53: read: connection refused
+code de sortie : 1

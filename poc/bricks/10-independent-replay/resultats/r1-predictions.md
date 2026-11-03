@@ -38,4 +38,14 @@ Accord du propriétaire : « Oui, lancer R1 ». Pas de VM créée, rien d'instal
 **Écarts de passage**, archivés :
 - `r1-version_go-premier-passage.log` : l'hôte ne résout pas `sc-stockage.poc.test`. L'adresse est passée en IP, couverte par le certificat de Zot.
 - `r1-outils-premier-passage.log` : sans `-L`, curl a enregistré la page de redirection de go.dev (76 octets), et la vérification sha256 l'a refusée (`FAILED`). Le fichier a été supprimé, puis `-L` ajouté.
-- Premier essai de `cosign_stockage`, non archivé, journal écrasé : crane, sans base, crée un manifeste au format Docker, que Zot 2.1.22 refuse (`MANIFEST_INVALID`). `--oci-empty-base` a été ajouté.
+- `r1-cosign_stockage-premier-passage.log`, **reconstitué** depuis la sortie du terminal, car le journal d'origine avait été écrasé : crane, sans base, crée un manifeste au format Docker, que Zot 2.1.22 refuse (`MANIFEST_INVALID`). `--oci-empty-base` a été ajouté.
+
+## Second additif du 03/11/2026, après relecture de l'advisor (vers 10:05 UTC)
+
+- **Prédiction 5 trop faible.** « `OK` contre `mise.lock` » est une empreinte relevée par mise (`checksum_source = mise-versions`), pas une signature d'éditeur. Or la règle du propriétaire demande les signatures quand elles existent. État, pour la même version et la même empreinte :
+  - **runc, oras, rootlesskit** : signature GPG vérifiée le 29/10 (`poc/infra/resultats/outils.txt`, clés `C9C370B2…`, `C6FC42F0…`, `C020EA87…`).
+  - **cosign** : signature Sigstore vérifiée le 29/10 (même fichier).
+  - **BuildKit 0.25.2** : aucune signature publiée (même fichier). Aucune attestation GitHub non plus : `gh attestation verify` répond 404 le 03/11. **Empreinte seulement.**
+  - **crane 0.20.6** : provenance SLSA publiée, non vérifiée (il faudrait slsa-verifier). Aucune attestation GitHub (404). **Empreinte seulement.** crane peut être retiré de la VM : oras, signé, couvre manifestes et blobs.
+  - **Toolchain Go** : une signature `.asc` est publiée, par la clé `0E225917414670F4442C250DFD533C07C264648F`, mais aucune source officielle trouvée ne rattache cette clé à l'équipe Go. Elle n'est donc pas retenue. À la place, **recoupement** avec le module `golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64`, vérifié par sum.golang.org le 29/10 ([`r1-go-recoupement.log`](r1-go-recoupement.log)) : les 11 503 fichiers communs sont **identiques**, binaires `go`, `compile` et `link` compris. Seuls diffèrent les tests, `api`, `misc` et la documentation (dans l'archive seulement) et les `_go.mod` renommés par l'empaquetage en module (dans le module seulement).
+- **`provenance.json` supprimé** de `~/.cache/supply-chain-poc/10/`. R1 l'avait tiré sans vérifier sa signature. R3 la prendra de ce que `cosign verify-attestation` aura vérifié, et relira la version de Go après cette vérification.

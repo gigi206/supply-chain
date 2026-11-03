@@ -1,0 +1,39 @@
+# Recoupement de la toolchain Go du domaine (03/11/2026, 09:56 UTC) : archive officielle de go.dev (sha256 de go.dev) comparée au
+# module golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64, vérifié par sum.golang.org (journal de transparence) le 29/10 (poc/infra/resultats/outils.txt)
+ziphash du module : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0=
+fichiers : module 11523, archive 15045, communs 11503
+## dans l'archive seulement : 3542, par premier répertoire :
+   3458 test
+     29 api
+     21 misc
+     20 src
+     14 doc
+## dans le module seulement : 20
+./src/_go.mod
+./src/cmd/_go.mod
+./src/cmd/compile/internal/ssa/_gen/_go.mod
+./src/cmd/objdump/testdata/testfilenum/_go.mod
+./src/cmd/vet/testdata/rangeloop/_go.mod
+./src/cmd/vet/testdata/stdversion/_go.mod
+./src/crypto/internal/fips140/aes/_asm/ctr/_go.mod
+./src/crypto/internal/fips140/aes/_asm/standard/_go.mod
+./src/crypto/internal/fips140/aes/gcm/_asm/gcm/_go.mod
+./src/crypto/internal/fips140/bigmod/_asm/_go.mod
+./src/crypto/internal/fips140/edwards25519/field/_asm/_go.mod
+./src/crypto/internal/fips140/nistec/_asm/_go.mod
+./src/crypto/internal/fips140/sha256/_asm/_go.mod
+./src/crypto/internal/fips140/sha3/_asm/_go.mod
+./src/crypto/internal/fips140/sha512/_asm/_go.mod
+./src/crypto/md5/_asm/_go.mod
+./src/crypto/sha1/_asm/_go.mod
+./src/debug/buildinfo/testdata/go117/_go.mod
+./src/runtime/_mkmalloc/_go.mod
+./src/simd/archsimd/_gen/_go.mod
+fichiers communs de contenu différent : 0
+bin/go : module 9c2a37ae5b21ba1d, archive 9c2a37ae5b21ba1d
+bin/gofmt : module 3cdd3788a0a53f11, archive 3cdd3788a0a53f11
+pkg/tool/linux_amd64/compile : module b426da26640e8069, archive b426da26640e8069
+pkg/tool/linux_amd64/link : module 8dd7e821587beabe, archive 8dd7e821587beabe
+VERSION : module 3f3fbe1bb9146eb5, archive 3f3fbe1bb9146eb5
+## signature .asc de l'archive : émise par la clé 0E225917414670F4442C250DFD533C07C264648F ; aucune source officielle trouvée
+## qui rattache cette clé à l'équipe Go : signature non authentifiée, non retenue

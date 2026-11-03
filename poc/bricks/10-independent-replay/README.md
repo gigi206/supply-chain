@@ -149,7 +149,7 @@ Commande : `mise run replay -- cosign_stockage version_go outils` ([`replay.sh`]
 | 2 | Attestation rangée en **referrer OCI 1.1** (`application/vnd.dev.sigstore.bundle.v0.3+json`), sans tag `.att` | conforme |
 | 3 | Image de build déclarée par la provenance : `go1.26.10` | conforme |
 | 4 | Toolchain officielle `go1.26.10.linux-amd64.tar.gz` vérifiée par le sha256 de go.dev (`ccfe7ae8…`) | conforme |
-| 5 | BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, cosign 3.1.4, oras 1.3.6 et crane 0.20.6 : archives vérifiées contre `mise.lock` | conforme |
+| 5 | BuildKit 0.25.2, runc 1.3.3, rootlesskit 2.3.5, cosign 3.1.4, oras 1.3.6 et crane 0.20.6 : archives vérifiées contre `mise.lock` | conforme, mais **prédiction trop faible**, voir ci-dessous |
 
 **Conséquences pour la suite** :
 - **Rekor** : la VSA sera signée avec `--signing-config` vide. Sans elle, cosign contacterait les services publics de Sigstore : une action publique, à proscrire.
@@ -162,3 +162,27 @@ Commande : `mise run replay -- cosign_stockage version_go outils` ([`replay.sh`]
 - manifeste au format Docker de crane refusé par Zot.
 
 Téléchargements vérifiés, gardés pour la VM : `~/.cache/supply-chain-poc/10/telechargements/`.
+
+**Signatures des outils du domaine** (après relecture de l'advisor) :
+
+| Outil | Vérification |
+|---|---|
+| runc, oras, rootlesskit | GPG, vérifiée le 29/10 pour la même empreinte |
+| cosign | Sigstore, vérifiée le 29/10 pour la même empreinte |
+| BuildKit 0.25.2 | **aucune signature ni attestation** : empreinte seulement |
+| crane 0.20.6 | provenance SLSA publiée mais non vérifiée, aucune attestation GitHub ; retirable de la VM, oras suffit |
+| toolchain Go 1.26.10 | `.asc` d'une clé non authentifiée, non retenue ; **recoupement** avec le module vérifié par sum.golang.org : les 11 503 fichiers communs sont identiques ([journal](resultats/r1-go-recoupement.log)) |
+
+En R2, chaque archive est revérifiée **dans la VM** après la copie : le domaine contrôle ses propres outils.
+
+**Réseau de la VM** : question laissée par D3, à trancher avec l'accord de R2. Le réseau `supply-chain-poc` est un NAT libvirt simple (`virsh net-dumpxml`), sans filtrage entre les VM.
+- (a) **Même réseau**, adresse `.14` : préchargement direct depuis Zot et Forgejo. Mais la VM joint aussi tous les ports des trois nœuds : API de k3s, kubelets, SSH, OpenBao par NodePort. Elle n'a aucun identifiant, mais le « domaine distinct » s'en trouve affaibli.
+- (b) **Réseau libvirt distinct** (`supply-chain-replay`), avec un NAT vers l'extérieur pour les paquets Debian (signés par l'archive), puis lien coupé.
+  - Les entrées venues de Zot et de Forgejo sont **transportées par l'hôte** sous forme de fichiers (layouts OCI, bundle git), puis vérifiées dans la VM par signature et par digest. Le transport ne peut donc rien altérer sans être vu.
+  - La VM ne joint jamais le plan de confiance.
+  - Les règles de transfert de libvirt entre deux réseaux n'ont pas été lues, faute de root. L'absence de route vers `192.168.161.0/24` sera **mesurée** en R2.
+- Recommandation : (b).
+
+**Preuve des 24 h** (pour les prédictions de R5) :
+- **Heure du build** : `finishedOn` est signé par Chains et **corroboré par un jeton RFC 3161** de la TSA de la 08. Il existe des bundles horodatés de cette image dans `horodatage/bundles`, un tag `3a7ca1b1…-<empreinte de l'enveloppe>` par enveloppe ; celui de l'enveloppe rejouée sera identifié en R3.
+- **Heure du replay** : `timeVerified` est affirmé par le domaine. Il est corroboré par l'entrée d'audit de Zot du push du referrer (J6, lue dans Loki).
