@@ -171,3 +171,17 @@ Relevé anonyme à 15:00:37 : le sujet est servi en `application/vnd.oci.image.m
    - aucune étiquette : `tags/list` rend `"tags":[]` ou `null`. L'attente est incertaine : Zot peut aussi rendre une erreur pour un dépôt sans étiquette ;
    - toujours **0** referrer dans `builds/sample-app`.
 6. La copie du mot de passe (`auth.json`) est supprimée en fin d'étape. Le dossier `pousser` est absent après l'étape.
+
+### Résultat de `pousser_vsa` (03/11/2026, 15:00:55 UTC) : [`r5-pousser_vsa.log`](r5-pousser_vsa.log), manifeste [`r5-vsa-manifeste.json`](r5-vsa-manifeste.json)
+
+Les six prédictions sont conformes.
+
+1. Sur l'hôte, `Verified OK`, avec **0 `connect()`**.
+2. 0 referrer avant le push.
+3. Le compte `poc-replay` a poussé les deux blobs et le manifeste par digest.
+4. Manifeste **`sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03`**, égal au digest calculé d'avance.
+5. Relecture anonyme :
+   - un seul referrer de l'image dans `builds/vsa/sample-app`, de type bundle v0.3 ;
+   - `tags/list` rend `"tags":[]`, ce qui lève l'attente incertaine ;
+   - toujours 0 referrer dans `builds/sample-app`.
+6. Le dossier `pousser`, qui contenait `auth.json`, est absent après l'étape (`~/.cache/supply-chain-poc/10/travail` vide).
