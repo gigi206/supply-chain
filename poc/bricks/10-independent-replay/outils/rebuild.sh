@@ -9,6 +9,7 @@ R3=/home/replay/r3 R4=/home/replay/r4 E=/home/replay/r4/e BK=/var/lib/replay-bui
 exec > "$R4/rebuild.log" 2>&1
 res() { echo "$1=$2" >> "$R4/resultat.txt"; echo "$1=$2"; }
 : > "$R4/resultat.txt"
+trap 'res sortie "code $?"' EXIT   # code de sortie lu par l'hôte dans resultat.txt (systemctl show ne le donne plus après --collect)
 res debut "$(date -u +%FT%TZ)"
 sleep 20   # laisse à l'hôte le temps de couper le lien juste après le lancement
 for i in /sys/class/net/*; do
@@ -40,7 +41,9 @@ grep -q '=KO' "$R4/resultat.txt" && { res verdict "REFUS : recette de preparer-e
 # --- contexte, comme preparer-entrees : sources du commit, fermeture dans deps, web-dist dans src/web/dist
 commit=$(python3 -I -c 'import json,sys; print([x for x in json.load(open(sys.argv[1]))["predicate"]["buildDefinition"]["resolvedDependencies"] if x.get("uri","").endswith("sample-app.git")][0]["digest"]["sha1"])' "$R3/provenance.json")
 rm -rf "$E" && mkdir -p "$E/src"
-git -C "$R3/src" archive --format=tar "$commit" | tar -xf - -C "$E/src"
+# git en tant que replay, propriétaire du dépôt : root ne lit jamais sa configuration (git refuse un dépôt d'un autre
+# propriétaire, « dubious ownership », premier passage de R4) ; tar reste en root
+runuser -u replay -- git -C "$R3/src" archive --format=tar "$commit" | tar -xf - -C "$E/src"
 oras pull --no-tty --oci-layout "$R3/layout:fermeture" -o "$E/deps" > /dev/null
 oras pull --no-tty --oci-layout "$R3/layout:web-dist" -o "$E/src/web/dist" > /dev/null
 res contexte "commit $commit ; fermeture $(find "$E/deps" -type f | wc -l) fichiers ; web/dist $(find "$E/src/web/dist" -type f | wc -l) fichiers"

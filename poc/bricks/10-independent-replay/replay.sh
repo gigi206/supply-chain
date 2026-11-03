@@ -30,6 +30,7 @@
 #                    de la VM coupé aussitôt (virsh domif-setlink down), compteurs de l'interface relus côté hôte juste après la
 #                    coupure et juste avant le rétablissement (ATTENTE_HORS_LIGNE s) ; rebuild.sh refuse de démarrer si la
 #                    porteuse est présente ; résultat lu après le rétablissement, valable seulement s'il a fini avant
+#   repetition       essai lien ÉTABLI, non compté : copie de rebuild.sh sans l'attente ni le refus de porteuse, même unité
 # Jalon R5 (JALON=r5) :
 #   signature_hors_registre  sur l'hôte, comme cosign_stockage : VSA signée par cosign attest-blob --statement sans registre,
 #                    poussée en referrer par oras attach, vérifiée par cosign (clé de VSA acceptée, autre clé refusée)
@@ -330,22 +331,41 @@ etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (tra
 FIN_BUILD=2026-11-02T13:59:30Z   # runDetails.metadata.finishedOn de la provenance vérifiée en R3
 ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 
-etape_rebuild() {
-  local x=$W/r4 iface s0 s1 s2 coupe retabli d
-  if [ "$(date -u +%s)" -lt $(( $(date -u -d "$FIN_BUILD" +%s) + 86400 )) ]; then
-    echo "REFUS : moins de 24 h depuis la fin du build ($FIN_BUILD)"; exit 1
-  fi
-  echo "## délai : $(( ($(date -u +%s) - $(date -u -d "$FIN_BUILD" +%s)) / 60 )) min depuis la fin du build ($FIN_BUILD)"
+transporter_r4() { # rebuild.sh : bundle preparer-entrees et ce rebuild.sh copiés dans ~/r4 de la VM, vidé d'abord
+  local x=$W/r4 d
   rm -rf -- "${x:?}" && mkdir -p "$x" && chmod 0700 "$x"
   # digest de preparer-entrees lu dans la provenance VÉRIFIÉE en R3 (dans la VM) ; la VM le revérifie dans rebuild.sh
   d=$(sur "python3 -I -c 'import json; print([x for x in json.load(open(\"r3/provenance.json\"))[\"predicate\"][\"buildDefinition\"][\"resolvedDependencies\"] if x.get(\"uri\",\"\").endswith(\"preparer-entrees\")][0][\"digest\"][\"sha256\"])'")
   oras copy --from-ca-file "$CA_POC" "$ZOT_POC/tekton/tasks/preparer-entrees@sha256:$d" --to-oci-layout "$x/layout:preparer-entrees" > /dev/null
-  cp "$here/outils/rebuild.sh" "$x/"
+  cp "$1" "$x/rebuild.sh"
   ( cd "$x" && sha256sum rebuild.sh && tar -cf r4.tar layout rebuild.sh )
   sur 'sudo rm -rf ~/r4 && mkdir -m 0700 ~/r4'   # rebuild.sh écrit en root dans ~/r4
   scp -q "${SSH_OPTS[@]}" "$x/r4.tar" "replay@$VM_IP:r4/"
   sur 'cd ~/r4 && tar -xf r4.tar && rm r4.tar && sha256sum rebuild.sh'
   rm -rf -- "${x:?}"
+}
+
+etape_repetition() { # R4, répétition lien ÉTABLI, archivée comme essai et non comptée (choix du propriétaire : « Corriger,
+  # répéter, relancer ») : copie de outils/rebuild.sh sans l'attente de 20 s ni le refus si la porteuse est présente (deux
+  # lignes retirées, diff journalisé) ; même transport, même unité systemd-run en root ; ~/r4 et la racine BuildKit sont vidés
+  # par le second passage
+  local c=$W/rebuild-repetition.sh
+  sed -e '/^sleep 20 /d' -e '/non coupé"; exit 1; }$/d' "$here/outils/rebuild.sh" > "$c"
+  echo "## lignes retirées de outils/rebuild.sh"; diff "$here/outils/rebuild.sh" "$c" | sed -n 's/^< /  /p'
+  [ "$(diff "$here/outils/rebuild.sh" "$c" | grep -c '^[<>]')" = 2 ] || { echo "REFUS : copie inattendue"; exit 1; }
+  transporter_r4 "$c"; rm -f -- "${c:?}"
+  sur 'sudo systemd-run --unit=replay-r4-repetition --collect --wait --property=Type=exec /bin/bash /home/replay/r4/rebuild.sh' 2>&1 | tail -4 || true
+  echo "## résultat (écrit dans la VM)"; sur 'cat ~/r4/resultat.txt'
+  echo "## journal du rebuild (fin)"; sur 'tail -15 ~/r4/rebuild.log'
+}
+
+etape_rebuild() {
+  local iface s0 s1 s2 coupe retabli
+  if [ "$(date -u +%s)" -lt $(( $(date -u -d "$FIN_BUILD" +%s) + 86400 )) ]; then
+    echo "REFUS : moins de 24 h depuis la fin du build ($FIN_BUILD)"; exit 1
+  fi
+  echo "## délai : $(( ($(date -u +%s) - $(date -u -d "$FIN_BUILD" +%s)) / 60 )) min depuis la fin du build ($FIN_BUILD)"
+  transporter_r4 "$here/outils/rebuild.sh"
   iface=$(v domiflist "$VM" | awk '$3 == "supply-chain-replay" {print $1}')
   echo "## interface de $VM côté hôte : $iface"
   # domifstat est vu de la VM (calibré le 03/11, r4-essai-coupure.log) : tx_* = ce que la VM émet ; rx_* bouge pendant la
@@ -354,7 +374,10 @@ etape_rebuild() {
   sortie() { v domifstat "$VM" "$iface" | awk '$2 ~ /^tx_(bytes|packets)$/ {printf "%s=%s ", $2, $3}'; }
   s0=$(st)
   sur 'sudo systemd-run --unit=replay-r4 --collect --property=Type=exec /bin/bash /home/replay/r4/rebuild.sh' 2>&1 | tail -1
-  trap 'v domif-setlink "$VM" "$iface" up > /dev/null 2>&1 || true' EXIT   # la VM ne reste jamais coupée sans surveillance
+  # la VM ne reste jamais coupée sans surveillance ; interface développée à la pose (iface est locale : le premier passage
+  # la lisait à la sortie du script, « unbound variable »)
+  # shellcheck disable=SC2064   # développement à la pose, voulu
+  trap "v domif-setlink '$VM' '$iface' up > /dev/null 2>&1 || true" EXIT
   v domif-setlink "$VM" "$iface" down > /dev/null
   coupe=$(date -u +%FT%TZ)
   s1=$(st); e1=$(sortie)
@@ -369,7 +392,8 @@ etape_rebuild() {
   retabli=$(date -u +%FT%TZ)
   echo "lien rétabli à $retabli"
   for _ in $(seq 60); do sur true 2> /dev/null && break; sleep 2; done
-  echo "## état de l'unité replay-r4 : $(sur 'systemctl show -p ActiveState -p Result --value replay-r4 2>/dev/null | paste -sd" "' || true)"
+  # code de sortie écrit par rebuild.sh (systemctl show rend des valeurs par défaut une fois l'unité déchargée par --collect)
+  echo "## sortie de rebuild.sh : $(sur "sed -n 's/^sortie=//p' ~/r4/resultat.txt" || true)"
   echo "## résultat (écrit dans la VM)"
   sur 'cat ~/r4/resultat.txt'
   fin=$(sur "sed -n 's/^fin=//p' ~/r4/resultat.txt")

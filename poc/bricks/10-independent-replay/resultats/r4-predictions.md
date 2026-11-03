@@ -81,3 +81,32 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
   - `état de l'unité replay-r4 : success inactive` est faux. `--collect` décharge l'unité en échec, et `systemctl show` rend alors les valeurs par défaut. Seul le journal de l'unité donne le vrai résultat.
   - Le piège `EXIT` cite `$iface`, une variable locale à `etape_rebuild`. À la sortie du script, elle n'existe plus, d'où `iface: unbound variable`. Le lien avait déjà été rétabli explicitement à 14:20:05 UTC, et `domif-getlink` donne `up` à 14:20 UTC.
 - **Conséquence** : l'arrêt est conforme à la règle « rebuild non terminé avant le rétablissement : je m'arrête ». Toute correction et tout relancement passent par une décision du propriétaire.
+
+## Additif du 03/11/2026, 14:25 UTC : correctifs, répétition et second passage (choix du propriétaire : « Corriger, répéter, relancer ») ; écrit avant toute exécution
+
+**Correctifs** (aucun ne touche au build ni aux comparaisons) :
+- `outils/rebuild.sh` :
+  - `git archive` tourne en tant que `replay`, par `runuser -u replay --`, et `tar` reste en root. Root ne lit jamais la configuration du dépôt.
+  - J'écarte `git config --global safe.directory`, qui laisserait une exception permanente pour root dans le domaine.
+  - Un piège `EXIT` écrit `sortie=code N` dans `resultat.txt`. Essai sur l'hôte : le piège ne s'exécute pas dans la sous-coquille du second moteur, et il rend le code de sortie du script.
+  - Nouveau sha256 : **`a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534`**, au lieu de `23d84bd2…`.
+- `replay.sh` :
+  - le transport est factorisé (`transporter_r4`) ;
+  - le piège qui rétablit le lien reçoit le nom de l'interface au moment où il est posé ;
+  - l'état de l'unité est lu dans `sortie=` de `resultat.txt`, et non plus dans `systemctl show` ;
+  - nouvelle étape `repetition`.
+
+**Mesures préalables dans la VM, lien établi** :
+- **M1, `unshare -rn true` pour `replay`** (politique, section 6) : code 0. Dans l'espace de noms, `ip -o link` ne montre que `lo`, à l'état `DOWN`. Debian 13 autorise les espaces de noms utilisateur non privilégiés.
+- **M2, la ligne corrigée en root** (`sudo runuser -u replay -- git … archive <commit> | tar -t`) : code 0. La liste des fichiers contient `main.go` et `go.mod`.
+
+**Répétition, lien établi, archivée comme essai et non comptée** (`resultats/r4-repetition.log`) :
+- copie de `rebuild.sh` sans deux lignes : l'attente de 20 s et le refus si la porteuse est présente. Le diff est journalisé, et l'étape refuse toute autre différence ;
+- mêmes prédictions 3 à 8 que le passage hors ligne : `3a7ca1b1…`, `PASSED`, binaire `e3749c68…` des deux moteurs, moins de 5 min ;
+- `sortie=code 0`. Les porteuses valent `1`, puisque le lien est établi.
+- **Ce qu'elle change** : le digest sera connu avant le passage hors ligne. La prédiction centrale reste celle de 10:30 UTC.
+- **Caches froids pour le second passage** : il vide `~/r4`, ce qui efface la sortie, `GOCACHE` et `GOMODCACHE`, tous rangés sous `~/r4/e`. `rebuild.sh` vide la racine BuildKit au départ. Aucun autre état ne sert au build.
+
+**Second passage hors ligne** (`resultats/r4-rebuild.log`) : prédictions 1 à 8 inchangées, sha256 de `rebuild.sh` égal à `a1945ff2…`, `sortie=code 0`, et `fin` antérieur au rétablissement du lien.
+
+**Si la répétition échoue** : je corrige, je consigne, puis je répète à nouveau, sans lancer le passage hors ligne. Si l'image diffère, je m'arrête pour décider avec le propriétaire, comme pour R4.
