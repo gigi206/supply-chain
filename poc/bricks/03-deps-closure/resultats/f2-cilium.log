@@ -1,0 +1,27 @@
+# prefetch.sh cilium, 2026-11-03T17:41:19Z
+## cilium/valeurs.yaml : l7Proxy: true   # brique 03, F2 (D2 révisée, décision du propriétaire du 03/11/2026) : proxy DNS pour toFQDNs ; Envoy reste coupé
+[confiance:cilium] $ poc/bricks/08-trust-plane/cilium.sh appliquer
+# cilium.sh appliquer, 2026-11-03T17:41:19Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Tue Nov  3 18:41:19 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-11-02T13:10:50Z : sc-build=2026-11-03T17:41:20Z sc-confiance=2026-11-03T17:41:20Z sc-stockage=2026-11-03T17:41:34Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]
+OK   cilium-config : enable-l7-proxy : true
+OK   cilium-config : external-envoy-proxy : false
+cilium-cgq44 (sc-build) : proxy OK, ip 10.42.1.16, 0 redirects active on ports 10000-20000, Envoy ; processus envoy : 2
+cilium-hw9nl (sc-confiance) : proxy OK, ip 10.42.0.110, 0 redirects active on ports 10000-20000, Envoy ; processus envoy : 2
+cilium-zs54l (sc-stockage) : proxy OK, ip 10.42.2.47, 0 redirects active on ports 10000-20000, Envoy ; processus envoy : 2
+suite : mise run confiance:preuves -- test6 (sortie de la construction refusée sous Cilium, rejouée après le changement)
+# fin 2026-11-03T17:41:47Z

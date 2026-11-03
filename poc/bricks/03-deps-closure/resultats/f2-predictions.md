@@ -99,3 +99,25 @@ Script : [`prefetch.sh`](../prefetch.sh) (`mise run fermetures:f2 -- <étape>`).
 - **Exigence « tout dans Grafana »** (19b) :
   - les journaux des pods de `builds` (source J2, donc ceux de `prefetch-gomod` et de `publier-fermeture`) et l'audit de Zot (J6, avec les écritures de `poc-fermetures`) atteignent Loki ;
   - **les refus de sortie du pod de prefetch ne sont visibles que dans Hubble**, dans l'agent. La source J7 (flux Hubble) a été laissée en option par D9 et n'est pas collectée. **C'est un écart à l'exigence d'audit**, consigné ici. Le collecter est une décision séparée de la 19b.
+
+## Résultats de `image` (17:39:23 à 17:41:04 UTC) et de `cilium` (17:41 UTC)
+
+[`f2-image.log`](f2-image.log), [`f2-cilium.log`](f2-cilium.log), [`f2-cilium-envoy.log`](f2-cilium-envoy.log).
+
+**`image`** :
+1. **Démentie en partie** : commit `1f37e32d…` conforme, mais **46 roues**, et non 50.
+2. **Conforme** : roue de Hermeto identique (`15ca1dc5…`).
+3. et 4. **Conformes** : `h1:5VAGHlY8…` égal à `sum.golang.org` ; 45 chemins nix (263 Mo).
+5. **Conforme** : **`sha256:68e0ae70…` sur deux constructions sans cache**.
+6. **Conforme** : `hermeto 0.64.0`, `git version 2.51.2`, `go1.26.10`, `Python 3.13.12`.
+7. **Conforme** : copiée et relue, 6 couches, 207 Mo (198 Mo compressés), sous la fourchette prédite.
+
+Le digest est épinglé dans `prefetch.sh`.
+
+**`cilium`** :
+8. **Conforme** : release révision 2, 3/3 agents recréés à 17:41:20 et 17:41:34 UTC, `enable-l7-proxy=true` et `external-envoy-proxy=false`.
+9. **Démentie** : **Envoy tourne dans les trois agents** (`cilium-envoy-starter` et `/usr/bin/cilium-envoy`, `-c /var/run/cilium/envoy/bootstrap.pb`), et `cilium-dbg status` affiche « Envoy ».
+   - Ma lecture de `pkg/envoy/cell.go`, « démarré à la demande seulement », ne tient pas : Envoy démarre avec l'agent.
+   - **cilium/proxy (Envoy) n'est pas évalué au doc 04** (choix de J7 : « ni Envoy (cilium/proxy, non évalué au doc 04) »).
+   - **F2 est arrêté** ici, avant `compte`. Décision soumise au propriétaire.
+10. Test 6 : non rejoué, F2 étant arrêté.

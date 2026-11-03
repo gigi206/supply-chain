@@ -1,0 +1,13 @@
+# relevé des processus envoy après l'étape cilium, 2026-11-03T17:42:16Z (lecture seule)
+## cilium-cgq44 (sc-build)
+pid 61 : cilium-envoy-starter -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+pid 64 : /usr/bin/cilium-envoy -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+Client: 1.20.4 beb276d2 2026-10-23T13:25:25Z go version go1.26.10 linux/amd64
+## cilium-hw9nl (sc-confiance)
+pid 101 : /usr/bin/cilium-envoy -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+pid 96 : cilium-envoy-starter -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+Client: 1.20.4 beb276d2 2026-10-23T13:25:25Z go version go1.26.10 linux/amd64
+## cilium-zs54l (sc-stockage)
+pid 57 : cilium-envoy-starter -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+pid 58 : /usr/bin/cilium-envoy -l info -c /var/run/cilium/envoy/bootstrap.pb --base-id 0 --log-format %t|%l|%n|%v 
+Client: 1.20.4 beb276d2 2026-10-23T13:25:25Z go version go1.26.10 linux/amd64
