@@ -550,3 +550,44 @@ L'envoi du journal de `sc-replay` dans Loki est **reporté à la stack finale**.
 - `corroborer_vsa` est fait, avec un résultat conforme ;
 - le journal de la VM reste **local et persistant**, avec 3 172 entrées depuis le 03/11/2026 à 10:00:43 UTC. Il n'est pas dans Grafana. **Supprimer la VM, ou nettoyer son journal, l'effacerait** : à faire seulement après un export, ou une fois l'envoi en place ;
 - Loki refuse les lignes de plus de 168 h. Si l'envoi arrive plus de 7 jours après un événement, cet événement n'entrera pas dans Loki par Alloy.
+
+## D22 : historique de Loki avant un rejeu de zéro de la 08 (proposée le 03/11/2026, 20:04 UTC ; rien exécuté)
+
+Le propriétaire a choisi, le 03/11/2026 (« 1 c »), de ne pas rejouer la 08 de zéro tant que cette décision n'est pas prise
+(inventaire du 03/11/2026, 19:45 UTC, README de la brique 03). Tout ce qui suit est lu dans la configuration et dans `vm.sh` :
+rien n'a été arrêté, copié ni essayé.
+
+**Ce qu'un rejeu de zéro efface** :
+- **Les données de Loki.** Loki 3.7.9 garde tout dans `/var/lib/loki` sur `sc-stockage` : les chunks, l'index TSDB, le compacteur et le WAL de l'ingester.
+  - Le WAL est `/var/lib/loki/wal` avec `flush_on_shutdown: false`, d'après la configuration effective relevée le 03/11/2026 (fichier de 09:38 UTC, `~/.cache/supply-chain-poc/loki-config-effective.yaml`). Une archive doit donc inclure le WAL.
+  - Le répertoire pesait 179 Mo au relevé de L3 (`l3-complement.log`).
+- **Le disque entier de `sc-stockage`.** `vm.sh detruire` efface le volume `sc-stockage.qcow2` (20 Gio, dont 9,49 Gio alloués selon `virsh vol-info` du 03/11/2026, 20:04 UTC), le pool `/var/lib/libvirt/supply-chain-poc` et `~/.cache/supply-chain-poc/08/travail`.
+  - Une sauvegarde ne doit donc être ni dans le pool ni sous `08/travail`. L'emplacement proposé est `~/.cache/supply-chain-poc/19b/historique/`.
+  - Il reste 31 Go libres sur `/home`, occupé à 95 % (`df`, 03/11/2026).
+- **Une suppression que Loki ne voit pas.** La destruction passe par `virsh` sur l'hôte. Elle contourne D10, qui interdit la suppression par l'API, et rien n'en garde trace dans Loki.
+- **La voie d'une réingestion tardive.** Loki refuse les lignes de plus de 168 h (`reject_old_samples_max_age`). Les premières lignes datent de L2 (02/11/2026, à partir de 20:51 UTC, `chrono.tsv`). Une réingestion par Alloy ou par l'API ne serait donc complète que jusque vers le 09/11/2026 à 20:51 UTC. Ce calcul est déduit : la première ligne réelle n'a pas été lue.
+
+**Options** :
+- **(a) Archive à froid de `/var/lib/loki`, restaurée avant le premier démarrage du nouveau Loki.**
+  - Déroulé :
+    - arrêter Loki ;
+    - faire un `tar` du répertoire, WAL compris, avec un `sha256` relevé dans la VM puis sur l'hôte ;
+    - au rejeu, dans `installer` de L2, déposer l'archive entre l'installation et le premier démarrage, après un nouveau contrôle du `sha256`.
+  - Conditions : même version (3.7.9) et même `schema_config` (`from: 2026-11-01`, TSDB v13). Il ne faut jamais fusionner l'archive avec un répertoire déjà écrit par un autre Loki.
+  - Ce que l'option garde : l'historique reste consultable dans la nouvelle Grafana.
+  - Coût : une étape `restaurer` à ajouter à `journalisation.sh`.
+  - Vérification possible avant toute destruction : démarrer le binaire vérifié de L1 (`~/.cache/supply-chain-poc/19b/amont/loki-linux-amd64.zip`) sur l'hôte, sur une copie de l'archive. Cet essai demande lui aussi un accord.
+- **(b) Copie à froid du volume `sc-stockage.qcow2` hors du pool** (9,5 Go sur les 31 Go libres).
+  - Ce que l'option garde : tout, c'est-à-dire Loki, Grafana, Zot avec la VSA, et Forgejo.
+  - Limite : la copie ne se consulte qu'en relançant l'ancienne VM sur un réseau isolé, puisqu'elle a la même adresse que la nouvelle, et avec l'ancienne CA. Rien ne passe dans la nouvelle Grafana.
+- **(c) Export par l'API `query_range`**, paginé, avec `curl` et le certificat client, sans `logcli` qui est absent de `mise.toml`. Le résultat est un fichier JSON avec son `sha256`.
+  - Ce que l'option garde : une preuve archivée, qui ne se consulte pas dans Grafana.
+  - Limite : une réingestion n'est possible que jusque vers le 09/11/2026, et ce serait une réécriture, avec une nouvelle réception.
+- **(d) Accepter la perte**, consignée par un additif daté. Cette option contredit l'exigence « tout consultable dans Grafana ».
+
+**Effets à connaître** pour (a) et (b), au moment de l'exécution :
+- Loki s'arrête, et pour (b) toute la VM avec Zot et Forgejo. Les alertes « source muette » (L4) et le battement (L5) peuvent se déclencher. Les tirages d'images échouent pendant l'arrêt de Zot.
+- Les lignes envoyées pendant l'arrêt sont retentées par Alloy. Nos fichiers ne configurent pas ces nouvelles tentatives : on utilise les valeurs par défaut de `loki.write`, dont le plafond n'est pas vérifié.
+- Les lignes écrites entre l'archive et la destruction sont perdues. Pour réduire cette fenêtre, il faut archiver juste avant `vm.sh detruire`.
+
+**Recommandé : (a)**, avec l'essai de restauration sur l'hôte avant toute destruction. C'est la seule option qui garde l'historique dans Grafana. La VSA et les données de Zot relèvent de l'inventaire de la brique 03 et des accords à chaque push : D22 ne les tranche pas.

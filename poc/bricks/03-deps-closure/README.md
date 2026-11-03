@@ -405,3 +405,6 @@ dans Grafana », ainsi que la VSA. Une décision du propriétaire est attendue a
 n'est pas jouable tel quel depuis le 02/11/2026 (rejeu « enchainement »). Il reste inchangé, avec un avertissement en
 en-tête. La première décision à prendre porte sur l'historique de Loki (19b) avant toute destruction de `sc-stockage`.
 Les options (a) (F2 et F3 seulement) et (b) (intégration complète) restent ouvertes.
+
+**Additif du 03/11/2026, 20:04 UTC** : les options sur l'historique de Loki sont préparées à sec en D22 (README de la 19b) ;
+rien n'a été arrêté ni copié. Décision du propriétaire attendue.
