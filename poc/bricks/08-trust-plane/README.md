@@ -1805,7 +1805,7 @@ L'audit de Zot trace les écritures réussies du compte, et les retrouve dans Lo
   - ils peuvent donc **bloquer la publication** d'une image : un effet sur la disponibilité, pas sur l'intégrité tant que le bundle n'est pas signé par Chains.
 - **À examiner, non mesuré** : un referrer qui réemballerait de vraies enveloppes de Chains du même digest pourrait choisir les enveloppes que ec juge. `cosign bundle create` ne vérifie rien, d'après la lecture faite en J5.
 
-## Contrôle 6 dans la porte : préparation à sec (03/11/2026, 15:25 UTC ; choix du propriétaire : « Contrôle 6 d'abord » ; rien appliqué au cluster)
+## Contrôle 6 dans la porte (préparé le 03/11/2026 à 15:25 UTC, choix du propriétaire : « Contrôle 6 d'abord » ; mesuré de 15:30 à 15:32 UTC, choix du propriétaire : « Lancer controle6 »)
 
 Après R5, la porte admet l'image réelle avec ou sans VSA. Le contrôle 6 de la grille C (VSA de replay signée par la clé du domaine, `PASSED`) est préparé à sec, avec des prédictions datées : [`controle6-predictions.md`](resultats/controle6-predictions.md).
 
@@ -1826,3 +1826,19 @@ Après R5, la porte admet l'image réelle avec ou sans VSA. Le contrôle 6 de la
   - cosign se connecte à Zot seulement. Pour le TUF, la commande à `HOME` vide est déjà mesurée en R5 (`r5-tuf.log`).
 - **Effet** : une fois la ConfigMap appliquée, toute image sans VSA est refusée au champ 9. Les verdicts archivés restent valables. Aucune note de l'ADR 0000 ne change : le banc C est clos.
 - **Retrait** : revenir sur le commit du conteneur `vsa` (Job, `cm_porte`, `juger`), puis réappliquer la ConfigMap avec `cm_porte`. Les clés `vsa.sh` et `vsa.pub` en trop dans la ConfigMap ne servent alors plus à rien.
+
+**Mesure** (`mise run confiance:preuves -- controle6`, [`preuves-controle6.log`](resultats/preuves-controle6.log), 15:30:47 à 15:32:35 UTC) : **0 écart aux prédictions**.
+- **ConfigMap `porte`** : réappliquée. `vsa.sh`, `vsa.pub` et `horodatage.sh` sont identiques aux fichiers versionnés, et la clé a l'empreinte `578dd771…`.
+- **Referrers** : 0 dans `builds/sample-app`, 1 dans `builds/vsa/sample-app`.
+- **C1, image réelle avec la source attendue : admise.**
+  - ec : `true`, aucune violation, avertissement `trusted_task.tagged`, 31 s ;
+  - contrôle 9 : `ok`, 6/6 enveloppes, 43 bundles ;
+  - contrôle 6 : `ok`, 1/1 VSA retenue, énoncé `c804d946…`, celui de R5.
+- **C2, même digest dans `builds/essai-webhook`, sans source** : contrôle 6 en `refus`, 0/0 dans `builds/vsa/essai-webhook`, « no matching attestations ». Les autres champs sont consignés, pas prédits :
+  - ec : `false`, faute de source fournie (`slsa_source_correlated.*`, `materials_format_okay`) ;
+  - contrôle 9 : `ok`, 30/30 enveloppes.
+- **C3, image réelle, clé de Chains à la place de celle du domaine** (ConfigMap `porte-temoin`, retirée ensuite) :
+  - ec et contrôle 9 inchangés ;
+  - contrôle 6 en `refus`, « accepted signatures do not match threshold ».
+- **Jobs** : `porte-c6-reelle` réussi ; `porte-c6-sans-vsa` et `porte-c6-cle-chains` en échec. Le Job échoue donc quand le conteneur `vsa` refuse. Rien n'est écrit dans Zot.
+- **État laissé** : la ConfigMap `porte` en service contient le contrôle 6. Les Jobs `porte-c6-*` s'effacent d'eux-mêmes une heure après leur fin (`ttlSecondsAfterFinished`).

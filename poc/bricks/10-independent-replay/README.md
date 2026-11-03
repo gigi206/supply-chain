@@ -378,3 +378,4 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
 - **R5 est complet.**
 - **Hors R5, non tranché** : la porte de la 08 n'exige pas encore la VSA (contrôle 6 de la grille C). Elle admet l'image avec ou sans VSA.
   - **Préparé à sec le 03/11/2026 à 15:25 UTC** (choix du propriétaire : « Contrôle 6 d'abord ») : conteneur `vsa` dans la porte de la 08, prédictions datées dans [`controle6-predictions.md`](../08-trust-plane/resultats/controle6-predictions.md). Rien n'est appliqué au cluster.
+  - **Mesuré le 03/11/2026, de 15:30 à 15:32 UTC** (choix du propriétaire : « Lancer controle6 » ; [`preuves-controle6.log`](../08-trust-plane/resultats/preuves-controle6.log)), avec 0 écart : la porte admet l'image réelle avec sa VSA. Elle refuse le même digest sans VSA (`essai-webhook`) et une VSA vérifiée avec la clé de Chains. La porte en service exige désormais la VSA.

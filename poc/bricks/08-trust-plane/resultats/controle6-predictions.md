@@ -70,3 +70,11 @@ Prédictions, avec Zot joint par son adresse IP :
 **Résultat** (15:28:29 UTC, [`controle6-plomberie.log`](controle6-plomberie.log)) : les huit prédictions sont conformes.
 - Le vrai cosign fait un `connect()` par appel, toujours vers Zot. Les refus sur le nom de l'image et le faux cosign n'en font aucun.
 - L'empreinte de l'énoncé retenu est celle de `r5-vsa-enonce.json` (`c804d946…`).
+
+## Résultat de l'étape `controle6` (03/11/2026, 15:30:47 à 15:32:35 UTC ; choix du propriétaire : « Lancer controle6 »)
+
+[`preuves-controle6.log`](preuves-controle6.log) : **0 écart.**
+- C1 : admise. ec à `true`, aucune violation, `trusted_task.tagged` ; contrôle 9 `ok` à 6/6 avec 43 bundles ; contrôle 6 `ok`, 1/1 VSA retenue.
+- C2 : contrôle 6 en `refus`, 0/0, « no matching attestations ». Consignés, sans prédiction : ec à `false` faute de source, et contrôle 9 `ok` à 30/30.
+- C3 : ec et contrôle 9 identiques à C1 ; contrôle 6 en `refus`, avec le motif « threshold ». `porte-temoin` est retirée.
+- Les Jobs de C2 et de C3 sont en échec, celui de C1 a réussi. Rien n'est écrit dans Zot.
