@@ -1,0 +1,31 @@
+# Essai de coupure du lien, sans build (03/11/2026, 10:30:49 UTC), interface hôte vnet124
+## calibrage, lien établi : rafale sortante de l'invité (curl deb.debian.org, ~5 Mo)
+invité tx_bytes=1702815 rx_bytes=537145886
+avant : rx_bytes=527370515 rx_packets=19503 rx_errs=0 rx_drop=0 tx_bytes=1660137 tx_packets=16865 tx_errs=0 tx_drop=0 = 
+après : rx_bytes=537146422 rx_packets=20485 rx_errs=0 rx_drop=0 tx_bytes=1703353 tx_packets=17432 tx_errs=0 tx_drop=0 = 
+Running as unit: sonde-lien.service; invocation ID: 0aa8c13b24694a69b95553a3e2243f97
+## coupure à 10:31:03
+juste après la coupure : rx_bytes=537160374 rx_packets=20548 rx_errs=0 rx_drop=0 tx_bytes=1714745 tx_packets=17479 tx_errs=0 tx_drop=0 = 
+60 s plus tard        : rx_bytes=537164226 rx_packets=20582 rx_errs=0 rx_drop=0 tx_bytes=1714745 tx_packets=17479 tx_errs=0 tx_drop=0 = 
+## rétabli à 10:32:03
+10:30:51 carrier=1 tx_p=17479 tx_b=1714745 rx_p=20539 rx_b=537158806
+10:30:56 carrier=1 tx_p=17479 tx_b=1714745 rx_p=20542 rx_b=537158962
+10:31:01 carrier=1 tx_p=17479 tx_b=1714745 rx_p=20546 rx_b=537160212
+10:31:06 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:11 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:16 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:21 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:26 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:31 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:36 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:41 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:46 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:51 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:31:56 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:32:01 carrier=0 tx_p=17479 tx_b=1714745 rx_p=20547 rx_b=537160264
+10:32:06 carrier=1 tx_p=17496 tx_b=1716345 rx_p=20555 rx_b=537161711
+10:32:11 carrier=1 tx_p=17498 tx_b=1716457 rx_p=20558 rx_b=537161857
+10:32:16 carrier=1 tx_p=17499 tx_b=1716527 rx_p=20561 rx_b=537162013
+10:32:21 carrier=1 tx_p=17499 tx_b=1716527 rx_p=20563 rx_b=537162117
+10:32:26 carrier=1 tx_p=17499 tx_b=1716527 rx_p=20566 rx_b=537162273
+# (reste de sonde-lien.log, propriété de root, supprimé ensuite avec sudo)

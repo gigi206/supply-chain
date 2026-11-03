@@ -16,7 +16,8 @@ for i in /sys/class/net/*; do
   res "porteuse_${i##*/}" "$(cat "$i/carrier" 2>/dev/null || echo ?)"
   [ "$(cat "$i/carrier" 2>/dev/null)" = 0 ] || { res verdict "REFUS : lien ${i##*/} non coupé"; exit 1; }
 done
-res reseau_debut "$(ip -o -4 route | wc -l) routes ; $(ip -o link | grep -c 'state UP') interface(s) UP"
+tx() { for i in /sys/class/net/*; do [ "${i##*/}" = lo ] || printf '%s tx_packets=%s tx_bytes=%s ' "${i##*/}" "$(cat "$i/statistics/tx_packets")" "$(cat "$i/statistics/tx_bytes")"; done; }
+res sortie_invite_debut "$(tx)"
 
 # --- recette de preparer-entrees : digest du bundle transporté comparé ici à la provenance vérifiée en R3
 python3 -I - "$R3/provenance.json" "$R4/layout" <<'PY' >> "$R4/resultat.txt"
@@ -80,8 +81,15 @@ res image_reconstruite "$d ($(($(date +%s) - t)) s)"
 sujet=$(python3 -I -c 'import json,sys; print("sha256:" + json.load(open(sys.argv[1]))["subject"][0]["digest"]["sha256"])' "$R3/provenance.json")
 res sujet_provenance "$sujet"
 kill $k 2> /dev/null || true; wait $k 2> /dev/null || true
+[ "$d" = "$sujet" ] && res verdict PASSED || res verdict FAILED
+res fin_image "$(date -u +%FT%TZ)"
 
-# --- second moteur : go build direct (Env de l'image de build, options du RUN du Dockerfile signé), binaire comparé
+# second moteur : hors du verdict (politique, section 4) ; un échec est consigné sans interrompre le script
+set +e
+(
+set -e
+
+# --- go build direct (Env de l'image de build, options du RUN du Dockerfile signé), binaire comparé
 mkdir -p "$E/image" && tar -xf "$E/image.tar" -C "$E/image"
 python3 -I - "$E/image" "$E/binaire-image" <<'PY'
 import json, sys, tarfile
@@ -101,7 +109,10 @@ res binaire_image "$(sha256sum < "$E/binaire-image" | cut -c1-64)"
 res binaire_go_build "$(sha256sum < "$E/binaire-go" | cut -c1-64)"
 grep -q -- '-trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0"' "$R3/recette/Dockerfile" \
   && res options_go_build "identiques au RUN du Dockerfile signé" || res options_go_build "DIFFÉRENTES du Dockerfile signé"
-
-res reseau_fin "$(ip -o -4 route | wc -l) routes ; porteuse $(cat /sys/class/net/*/carrier 2>/dev/null | tr '\n' ' ')"
-[ "$d" = "$sujet" ] && res verdict PASSED || res verdict FAILED
+)
+rc=$?   # pas de « || » : set -e doit rester actif dans la sous-coquille
+set -e
+[ "$rc" = 0 ] && res second_moteur "fait" || res second_moteur "ECHEC (code $rc)"
+res sortie_invite_fin "$(tx)"
+res porteuse_fin "$(for i in /sys/class/net/*; do [ "${i##*/}" = lo ] || printf '%s=%s ' "${i##*/}" "$(cat "$i/carrier" 2>/dev/null)"; done)"
 res fin "$(date -u +%FT%TZ)"

@@ -321,7 +321,7 @@ etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (tra
 }
 
 FIN_BUILD=2026-11-02T13:59:30Z   # runDetails.metadata.finishedOn de la provenance vérifiée en R3
-ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-600}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
+ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}   # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 
 etape_rebuild() {
   local x=$W/r4 iface s0 s1 s2 coupe retabli d
@@ -335,24 +335,29 @@ etape_rebuild() {
   oras copy --from-ca-file "$CA_POC" "$ZOT_POC/tekton/tasks/preparer-entrees@sha256:$d" --to-oci-layout "$x/layout:preparer-entrees" > /dev/null
   cp "$here/outils/rebuild.sh" "$x/"
   ( cd "$x" && sha256sum rebuild.sh && tar -cf r4.tar layout rebuild.sh )
-  sur 'rm -rf ~/r4 && mkdir -m 0700 ~/r4'
+  sur 'sudo rm -rf ~/r4 && mkdir -m 0700 ~/r4'   # rebuild.sh écrit en root dans ~/r4
   scp -q "${SSH_OPTS[@]}" "$x/r4.tar" "replay@$VM_IP:r4/"
   sur 'cd ~/r4 && tar -xf r4.tar && rm r4.tar && sha256sum rebuild.sh'
   rm -rf -- "${x:?}"
   iface=$(v domiflist "$VM" | awk '$3 == "supply-chain-replay" {print $1}')
   echo "## interface de $VM côté hôte : $iface"
-  s0=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  # domifstat est vu de la VM (calibré le 03/11, r4-essai-coupure.log) : tx_* = ce que la VM émet ; rx_* bouge pendant la
+  # coupure sans que l'invité reçoive (trames du pont) : consigné, pas compté
+  st() { v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}'; }
+  sortie() { v domifstat "$VM" "$iface" | awk '$2 ~ /^tx_(bytes|packets)$/ {printf "%s=%s ", $2, $3}'; }
+  s0=$(st)
   sur 'sudo systemd-run --unit=replay-r4 --collect --property=Type=exec /bin/bash /home/replay/r4/rebuild.sh' 2>&1 | tail -1
+  trap 'v domif-setlink "$VM" "$iface" up > /dev/null 2>&1 || true' EXIT   # la VM ne reste jamais coupée sans surveillance
   v domif-setlink "$VM" "$iface" down > /dev/null
   coupe=$(date -u +%FT%TZ)
-  s1=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  s1=$(st); e1=$(sortie)
   echo "lien coupé à $coupe ($(v domif-getlink "$VM" "$iface" | awk '{print $NF}'))"
   echo "compteurs avant le lancement : $s0"
   echo "compteurs juste après la coupure : $s1"
   sleep "$ATTENTE_HORS_LIGNE"
-  s2=$(v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}')
+  s2=$(st); e2=$(sortie)
   echo "compteurs juste avant le rétablissement ($ATTENTE_HORS_LIGNE s plus tard) : $s2"
-  [ "$s1" = "$s2" ] && echo "OK   aucun octet ni paquet pendant la coupure" || echo "KO   les compteurs ont bougé pendant la coupure"
+  [ "$e1" = "$e2" ] && echo "OK   sortie de la VM inchangée pendant la coupure ($e2)" || echo "KO   la VM a émis pendant la coupure : $e1 -> $e2"
   v domif-setlink "$VM" "$iface" up > /dev/null
   retabli=$(date -u +%FT%TZ)
   echo "lien rétabli à $retabli"

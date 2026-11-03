@@ -40,3 +40,28 @@ Accord du propriétaire : « Préparer puis lancer ». Le lancement est automati
 
 - Le code du domaine (`rebuild.sh`, `verifier_entrees.py`) est transporté par l'hôte. Son sha256 est journalisé et sera inscrit dans la VSA (politique, section 4 bis).
 - Les tests négatifs (fermeture altérée : build refusé ; source altérée : digest différent, VSA `FAILED` non poussée, diffoscope) sont en R5, avec leurs propres prédictions.
+
+## Additif du 03/11/2026, avant l'exécution (vers 10:30 UTC, relecture de l'advisor)
+
+- **Options de build** : la fonction `build` de `poc/bricks/04-hermetic-repro/bench.sh` utilise exactement les options de la recette signée (`--frontend dockerfile.v0 --no-cache`, `SOURCE_DATE_EPOCH=0`, `type=oci,…,rewrite-timestamp=true`, contextes `builder` et `deps`). La brique 04 a produit `3a7ca1b1` avec BuildKit 0.25.2 : la prédiction 6 tient telle quelle.
+- **Essai de coupure, sans build, sur la VM au repos** (prédiction écrite avant l'essai) :
+  - pendant la coupure, la porteuse vue par l'invité passe à `0`, et ses compteurs `tx_packets` et `tx_bytes` ne bougent pas ;
+  - côté hôte, la sortie de l'invité ne bouge pas. Je ne sais pas encore quel champ de `domifstat` la porte ; l'essai le calibre par une rafale sortante, lien établi ;
+  - l'entrée vers l'invité (ARP, STP du pont) peut faire bouger un compteur sans que l'invité émette.
+- **Critère révisé pour le rebuild** :
+  - la **sortie** de l'invité est inchangée, côté hôte (champ calibré) comme côté invité (`tx_*` relevés par `rebuild.sh` au début et à la fin) ;
+  - les mouvements d'entrée sont consignés, sans être comptés comme KO.
+
+## Résultat de l'essai de coupure (03/11/2026, 10:30 à 10:32 UTC) : [`r4-essai-coupure.log`](r4-essai-coupure.log)
+
+- **Porteuse** : `0` pendant toute la coupure, vue par l'invité ; `1` dès le rétablissement. Conforme.
+- **Invité** : `tx_packets` et `tx_bytes` sont inchangés pendant la coupure (17479 et 1714745), et `rx_*` aussi. Conforme.
+- **Calibrage de `domifstat`** : ses champs sont **vus de la VM**. Pendant la rafale descendante (environ 9,8 Mo), `rx_bytes` a augmenté de la même quantité que le `rx_bytes` de l'invité. `tx_*` correspond donc à **ce que la VM émet**.
+- **Pendant la coupure, côté hôte** : `tx_*` est inchangé, mais `rx_packets` augmente de 34 paquets (3 852 octets), alors que l'invité ne reçoit rien. Ce sont des trames entrantes du pont, non délivrées. Comparer la ligne entière aurait donné un **faux KO**.
+
+**Corrections de R4 avant le lancement** :
+- le critère porte sur `tx_bytes` et `tx_packets` de `domifstat`, et sur `tx_*` de l'invité, relevés par `rebuild.sh` au début et à la fin ;
+- l'attente hors ligne passe à 1 200 s ;
+- un piège rétablit le lien si l'étape s'interrompt ;
+- `verdict` et `fin_image` sont écrits dès que le digest de l'image est connu ; le second moteur, hors du verdict, ne peut plus l'empêcher ;
+- le nettoyage de `~/r4` se fait par `sudo`, car `rebuild.sh` y écrit en root.
