@@ -351,3 +351,16 @@ Lancé automatiquement à 14:00:04 UTC, 24 h après la fin du build, avec l'acco
 - **Seuil B5** (le replay réussit avec 0 connexion sortante, journalisée) : atteint pour le rebuild.
 - **Politique, section 3, réécrite avant le gel** (14:48 UTC) : « VM neuve » n'était plus exact après la répétition. Les caches froids reposent désormais sur `--no-cache`, la racine BuildKit effacée et `~/r4` vidé. Un relevé en lecture seule ne trouve sur le disque de la VM aucun fichier de la répétition ([`r4-etat-residuel.log`](resultats/r4-etat-residuel.log)).
 - **Reste** : R5, avec la VSA, les contre-épreuves N1 à N3 et la porte avant et après.
+
+## R5, étape `vsa` : VSA écrite et signée dans le domaine (03/11/2026, 14:57 UTC ; choix du propriétaire : « Pousser et lancer vsa »)
+
+- **Défaut corrigé avant exécution** (14:56 UTC) : `vsa.py` lisait bundles et racine de la TSA dans `~/r3/travail`, que `verifier_entrees.py` vide en fin de R3. Il les refait désormais dans `~/r5/travail`, et exige un seul bundle de l'invocation.
+- **Résultat** ([`r5-vsa.log`](resultats/r5-vsa.log)) : les prédictions 1 à 4 sont conformes.
+  - Dans la VM, sous `unshare -rn`, le bundle horodaté de la provenance est revérifié : clé de Chains et jeton de la TSA, sans réseau. Son énoncé est identique à celui de R3.
+  - L'énoncé de la VSA ([`r5-vsa-enonce.json`](resultats/r5-vsa-enonce.json)) contient :
+    - `policy.uri` au commit `309644f4…`, digest `4f1cca93…` ;
+    - `inputAttestations` `horodatage/bundles@sha256:f5969ecf…` ;
+    - `verifier.version`, qui donne les sha256 de `verifier_entrees.py`, `rebuild.sh` et `vsa.py` ;
+    - `PASSED`, avec `SLSA_BUILD_LEVEL_3` et `POC_REPLAY_BIT_IDENTIQUE`.
+  - Signé par la clé du domaine (`attest-blob --statement`, configuration sans service) puis revérifié : `Verified OK`. Le bundle est en v0.3, sans journal de transparence ni horodatage ([`r5-vsa.bundle.json`](resultats/r5-vsa.bundle.json)).
+- **Rien n'a été poussé.** Restent, chacun sous accord : la porte avant le push, le push de la VSA dans `builds/vsa/sample-app`, la porte après le push, la lecture avec N3, puis les contre-épreuves N1 et N2.

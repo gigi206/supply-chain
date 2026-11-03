@@ -1,0 +1,46 @@
+{
+ "_type": "https://in-toto.io/Statement/v1",
+ "subject": [
+  {
+   "name": "sc-stockage.poc.test:5000/builds/sample-app",
+   "digest": {
+    "sha256": "3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"
+   }
+  }
+ ],
+ "predicateType": "https://slsa.dev/verification_summary/v1",
+ "predicate": {
+  "verifier": {
+   "id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1",
+   "version": {
+    "buildkit": "buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e",
+    "go": "go1.26.10",
+    "verifier_entrees.py": "66fa5cb4f81a40e2ee4b8fc91fd4bdb3225a3a3808a5d2cb530be7f2a7b9c2e7",
+    "rebuild.sh": "a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534",
+    "vsa.py": "734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540"
+   }
+  },
+  "timeVerified": "2026-11-03T14:27:05Z",
+  "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+  "policy": {
+   "uri": "https://github.com/gigi206/supply-chain/blob/309644f4ef610383f6fd180e5c058846487ab016/poc/bricks/10-independent-replay/politique-replay.md",
+   "digest": {
+    "sha256": "4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450"
+   }
+  },
+  "inputAttestations": [
+   {
+    "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8",
+    "digest": {
+     "sha256": "f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8"
+    }
+   }
+  ],
+  "verificationResult": "PASSED",
+  "verifiedLevels": [
+   "SLSA_BUILD_LEVEL_3",
+   "POC_REPLAY_BIT_IDENTIQUE"
+  ],
+  "slsaVersion": "1.2"
+ }
+}

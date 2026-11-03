@@ -1,0 +1,66 @@
+# replay.sh vsa, 2026-11-03T14:57:26Z
+politique : https://github.com/gigi206/supply-chain/blob/309644f4ef610383f6fd180e5c058846487ab016/poc/bricks/10-independent-replay/politique-replay.md
+vsa.py de HEAD (ad135ba) : 734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540
+4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450  politique-replay.md
+734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540  vsa.py
+## vsa.py (dans la VM, unshare -rn)
+734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540  vsa.py
+4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450  politique-replay.md
+## résultat de R4 (~/r4/resultat.txt)
+OK   verdict de R4 : PASSED
+OK   image reconstruite : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (14 s)
+## provenance : bundle horodaté de l'invocation, revérifié ici
+OK   racine de confiance de la TSA construite ici
+OK   bundles de l'invocation d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 parmi 43 : ['bundle-7af184de44b81e66']
+OK   signature de Chains et jeton de la TSA du bundle (cosign verify-blob-attestation)
+OK   énoncé identique à la provenance vérifiée en R3
+## politique, sections 1 et 3 (niveaux et délai)
+OK   _type et predicateType
+OK   builder.id
+OK   buildType
+OK   sujet de la provenance
+OK   timeVerified 2026-11-03T14:27:05Z au moins 24 h après finishedOn
+{
+ "verifier": {
+  "id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1",
+  "version": {
+   "buildkit": "buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e",
+   "go": "go1.26.10",
+   "verifier_entrees.py": "66fa5cb4f81a40e2ee4b8fc91fd4bdb3225a3a3808a5d2cb530be7f2a7b9c2e7",
+   "rebuild.sh": "a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534",
+   "vsa.py": "734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540"
+  }
+ },
+ "timeVerified": "2026-11-03T14:27:05Z",
+ "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
+ "policy": {
+  "uri": "https://github.com/gigi206/supply-chain/blob/309644f4ef610383f6fd180e5c058846487ab016/poc/bricks/10-independent-replay/politique-replay.md",
+  "digest": {
+   "sha256": "4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450"
+  }
+ },
+ "inputAttestations": [
+  {
+   "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8",
+   "digest": {
+    "sha256": "f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8"
+   }
+  }
+ ],
+ "verificationResult": "PASSED",
+ "verifiedLevels": [
+  "SLSA_BUILD_LEVEL_3",
+  "POC_REPLAY_BIT_IDENTIQUE"
+ ],
+ "slsaVersion": "1.2"
+}
+## signature (dans la VM, unshare -rn)
+signing-config sans service : code 0 ; {'mediaType': 'application/vnd.dev.sigstore.signingconfig.v0.2+json', 'rekorTlogConfig': {}, 'tsaConfig': {}}
+attest-blob : code 0
+verify-blob-attestation, clé du domaine : code 0 ; Verified OK
+bundle : application/vnd.dev.sigstore.bundle.v0.3+json ; tlog : None ; horodatage : None ; énoncé identique à enonce.json : True
+c804d94698b16d3ca987e9a31715b9f517a4dc56d008d73ff902942ac8ad5867  enonce.json
+7b93e4b322941e23ca649a5755b452e792ee4e2fc42b971b6ba1437cad61fa45  vsa.bundle.json
+## copies archivées
+c804d94698b16d3ca987e9a31715b9f517a4dc56d008d73ff902942ac8ad5867  r5-vsa-enonce.json
+7b93e4b322941e23ca649a5755b452e792ee4e2fc42b971b6ba1437cad61fa45  r5-vsa.bundle.json

@@ -104,3 +104,29 @@ Préparation à sec : relecture de `main.go`, de la recette et du stockage des m
    - bundle `application/vnd.dev.sigstore.bundle.v0.3+json`, sans entrée de journal ni horodatage, énoncé identique à `enonce.json` (comme en `r5-signature_hors_registre.log`).
 5. **Sur l'hôte** (`pousser_vsa`, avant tout push) : le bundle archivé est vérifié avec `resultats/vsa-cle-publique.pem`, sans aucune connexion. `builds/vsa/sample-app` n'existe pas encore : relevé à 14:56 UTC, `tags/list` rend 404.
 6. **`lire_vsa`** : les cinq commandes cosign ne se connectent qu'à `192.168.161.13:5000` (r5-tuf.log : aucune tentative vers le TUF public pour des vérifications par clé, réussies ou refusées).
+
+### Résultat de l'étape `vsa` (03/11/2026, 14:57 UTC, choix du propriétaire : « Pousser et lancer vsa ») : [`r5-vsa.log`](r5-vsa.log)
+
+`ad135ba` a été poussé avant le lancement. `POLITIQUE_COMMIT` a été passé en hash complet, `309644f4ef610383f6fd180e5c058846487ab016` : c'est lui que porte `policy.uri`.
+
+1. **Conforme.** Les gardes passent. La politique au commit et sa copie dans la VM ont pour sha256 `4f1cca93…`, et `vsa.py` `734fb1a8…`, identique au fichier de `HEAD`.
+2. **Conforme, attente incertaine levée.** Sous `unshare -rn`, `cosign trusted-root create` et la vérification horodatée du bundle réussissent sans réseau dans la VM.
+   - `bundle-7af184de44b81e66` est le seul des 43 bundles à porter l'invocation.
+   - L'énoncé est identique à celui de R3.
+   - Tous les contrôles de la politique sont `OK`, délai compris.
+3. **Conforme.** L'énoncé porte exactement les valeurs prédites :
+   - `subject` et `resourceUri` ;
+   - `policy` (URL au commit `309644f4…`, digest `4f1cca93…`) ;
+   - `inputAttestations` `f5969ecf…` ;
+   - `verifier.version` (BuildKit `v0.25.2 dcc0fe5e…`, `go1.26.10`, `66fa5cb4…`, `a1945ff2…`, `734fb1a8…`) ;
+   - `PASSED`, `SLSA_BUILD_LEVEL_3` et `POC_REPLAY_BIT_IDENTIQUE`.
+
+   Il porte aussi `slsaVersion` `1.2`, que la prédiction ne citait pas.
+4. **Conforme.** Toute la signature passe sans réseau, dans la VM :
+   - la configuration de signature n'a aucun service (`rekorTlogConfig` et `tsaConfig` vides) ;
+   - `attest-blob` rend le code 0 ;
+   - `verify-blob-attestation` avec la clé du domaine rend `Verified OK` ;
+   - le bundle est en v0.3, sans entrée de journal ni horodatage, et son énoncé est identique à `enonce.json`.
+5. et 6. Non mesurées : elles relèvent de `pousser_vsa` et `lire_vsa`.
+
+Copies archivées : [`r5-vsa-enonce.json`](r5-vsa-enonce.json) (sha256 `c804d946…`) et [`r5-vsa.bundle.json`](r5-vsa.bundle.json) (sha256 `7b93e4b3…`), identiques aux fichiers de la VM. Rien n'a été poussé sur Zot.
