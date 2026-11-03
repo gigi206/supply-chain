@@ -157,3 +157,17 @@ Le précédent est le cas `reel` du test 8 (02/11) : `VERDICT|t8-reel|true||…|
 4. **Conforme.** Contrôle 9 `ok`, « 6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) ». Le nombre de bundles n'a pas bougé depuis le relevé, et l'enveloppe de l'invocation rejouée (`7af184de44b81e66`) fait partie des 6 couvertes.
 
 Après le push, la porte doit rendre le même `VERDICT`, durée exclue, et `builds/vsa/sample-app 1`.
+
+## Additif du 03/11/2026 à 15:00 UTC : prédictions de `pousser_vsa` (avant exécution ; choix du propriétaire : « Pousser la VSA »)
+
+Relevé anonyme à 15:00:37 : le sujet est servi en `application/vnd.oci.image.manifest.v1+json`, avec le digest `3a7ca1b1…` et 556 octets. Le digest du manifeste de la VSA, fait main, est calculé d'avance, hors ligne, avec le même `printf` que l'étape.
+
+1. Sur l'hôte, le bundle archivé est vérifié avec la clé de VSA : code 0, `Verified OK`, et **aucune** connexion (comme V1 dans `r5-tuf.log`).
+2. 0 referrer de l'image dans `builds/sample-app` avant le push.
+3. Les deux `oras blob push` (bundle de 2 631 octets, config `{}`) et `oras manifest push` par digest, avec le compte `poc-replay`, sont acceptés. D5 : création par digest seulement, dans `builds/**`.
+4. Manifeste poussé : **`sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03`**.
+5. Relecture anonyme :
+   - dans `builds/vsa/sample-app`, un referrer de l'image, `(application/vnd.dev.sigstore.bundle.v0.3+json, sha256:c1bfbcbd…)` ;
+   - aucune étiquette : `tags/list` rend `"tags":[]` ou `null`. L'attente est incertaine : Zot peut aussi rendre une erreur pour un dépôt sans étiquette ;
+   - toujours **0** referrer dans `builds/sample-app`.
+6. La copie du mot de passe (`auth.json`) est supprimée en fin d'étape. Le dossier `pousser` est absent après l'étape.
