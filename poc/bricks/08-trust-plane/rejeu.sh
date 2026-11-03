@@ -15,6 +15,11 @@
 # des services est lu dans les VM (administrateur Forgejo, initialisation d'OpenBao), pas dans les fichiers de l'hôte. La voie D
 # lit les entrées des bancs du laptop (~/.cache/supply-chain-poc/w/b03, empreintes épinglées) et interroge sum.golang.org.
 #
+# NON JOUABLE TEL QUEL depuis le 02/11/2026 (inventaire du 03/11/2026, 19:45 UTC, README de la brique 03 ; choix du propriétaire :
+# pas de rejeu de zéro pour l'instant) : D6 (brique 03) chargée dès J6 refuse attseule, decision3 et la bascule de J8 tant que J7
+# construit sur la fermeture de l'hôte ; detruire efface sc-stockage, donc Loki et Grafana (19b) avec l'historique d'audit, la VSA
+# (contrôle 6, brique 10) et les jalons 01, 19 et 19b, qu'aucune étape ci-dessous ne refait.
+#
 # Usage (racine du dépôt) : mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
 export LC_ALL=C
