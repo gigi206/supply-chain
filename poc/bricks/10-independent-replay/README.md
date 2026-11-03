@@ -411,6 +411,7 @@ Le propriétaire, ou le root de l'hôte, peut donc forger à la fois la provenan
   - les journaux du domaine (build, compteurs du lien, VSA) ne sont que dans `resultats/` ; ni la VM ni l'hôte ne les envoient à Loki ;
   - la corroboration de `timeVerified` par l'audit de Zot lu dans Loki, prévue en préparation, n'a pas été faite ;
   - même faite, elle ne donnerait qu'une borne haute (la VSA existait au moment du push), pas la borne basse des 24 h.
+  - **additif du 03/11/2026, 15:47 UTC** : corroboration faite en L7 de la 19b ([`l7-corroborer_vsa.log`](../19b-journalisation/resultats/l7-corroborer_vsa.log)). Le PUT du manifeste de la VSA par `poc-replay` est daté par Zot de 15:00:59 UTC, 2 034 s après `timeVerified`, et lu par l'auditeur à travers Grafana. C'est une borne haute seulement. L'envoi du journal de la VM est en préparation (L7, D19 b : Alloy dans la VM).
 - **Limites de la politique** : `web/dist` est pris par digest, pas reconstruit (Node hors de la chaîne).
 - **Points restés ouverts en R5** :
   - durée de vie d'un referrer, avec le GC de Zot désactivé ;
