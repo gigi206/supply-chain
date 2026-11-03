@@ -1,0 +1,46 @@
+# Brique 03, F2 (D4 a) : image d'outils du prefetch, construite par la plateforme à partir d'entrées épinglées, sans image de
+# base externe et sans réseau pendant la construction :
+#   - clôture nix de python313, gitMinimal et cacert (nixpkgs épinglé du banc B), copiée telle quelle sous /nix/store ;
+#   - busybox statique (même nixpkgs) pour /bin/sh et les applets ;
+#   - Go 1.26.10 (module golang.org/toolchain, vérifié par sum.golang.org), à /usr/local/go, où Hermeto cherche ses toolchains ;
+#   - venv de Hermeto 0.64.0 installé hors réseau depuis des roues contrôlées par les empreintes de son requirements.txt, plus
+#     la roue de Hermeto construite sur l'hôte depuis le tag vérifié.
+# Contexte et arguments : prefetch.sh image. Sortie OCI avec rewrite-timestamp et SOURCE_DATE_EPOCH=0, deux fois au même digest.
+ARG PYTHON
+ARG GIT
+
+FROM scratch AS racine
+ARG PYTHON
+ARG GIT
+COPY nix /nix
+COPY busybox /bin/busybox
+RUN ["/bin/busybox", "--install", "-s", "/bin"]
+COPY go /usr/local/go
+COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY roues /roues
+ENV SOURCE_DATE_EPOCH=0 HOME=/tmp PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN --network=none mkdir -m 1777 /tmp \
+ && ${PYTHON}/bin/python3 -m venv /opt/hermeto \
+ && /opt/hermeto/bin/pip install --no-index --find-links /roues --require-hashes --no-deps -r /roues/requirements.txt \
+ && /opt/hermeto/bin/pip install --no-index --no-deps /roues/hermeto-*.whl \
+ && rm -rf /tmp/* /roues
+
+FROM scratch AS outils
+ARG PYTHON
+ARG GIT
+COPY --from=racine /nix /nix
+COPY --from=racine /bin /bin
+COPY --from=racine /tmp /tmp
+COPY --from=racine /usr/local/go /usr/local/go
+COPY --from=racine /etc/ssl /etc/ssl
+COPY --from=racine /opt/hermeto /opt/hermeto
+ENV PATH=/opt/hermeto/bin:/usr/local/go/bin:${GIT}/bin:/bin \
+    HOME=/tmp \
+    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    GOTOOLCHAIN=local \
+    CGO_ENABLED=0
+USER 65532:65532
+
+# Essai, hors réseau : versions des outils (cible « essai », jamais publiée).
+FROM outils AS essai
+RUN --network=none hermeto --version && git --version && go version && python3 --version && ls /etc/ssl/certs/ca-certificates.crt

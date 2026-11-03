@@ -526,8 +526,10 @@ etape_declencheurs() {
   echo "## contrôles"
   # J7 : secret zot-images (compte poc-images : création par digest dans builds/** seulement), monté par la seule tâche signée
   # publier-image (choix du propriétaire du 30/10/2026) ; Kyverno refuse un secret en podTemplate ou en workspace (test 2)
-  n=$(kubectl get secret -n builds -o name | { grep -vxF secret/zot-images || true; } | wc -l)   # grep sans ligne : 1, sous pipefail
-  [ "$n" = 0 ] && echo "OK   aucun secret dans builds, hors zot-images (J7)" || { echo "KO   $n secret(s) dans builds : $(kubectl get secret -n builds -o name | paste -sd' ')" >&2; exit 1; }
+  # Brique 03, F2 : secret zot-fermetures (compte poc-fermetures : création par digest dans builds/fermetures/** seulement),
+  # monté par la seule tâche signée publier-fermeture
+  n=$(kubectl get secret -n builds -o name | { grep -vxE 'secret/(zot-images|zot-fermetures)' || true; } | wc -l)   # grep sans ligne : 1, sous pipefail
+  [ "$n" = 0 ] && echo "OK   aucun secret dans builds, hors zot-images (J7) et zot-fermetures (brique 03, F2)" || { echo "KO   $n secret(s) dans builds : $(kubectl get secret -n builds -o name | paste -sd' ')" >&2; exit 1; }
   n=$(kubectl get eventlisteners,triggertemplates,triggerbindings,tasks.tekton.dev,pipelines.tekton.dev -n builds -o name | wc -l)
   [ "$n" = 0 ] && echo "OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds" || { echo "KO   $n objet(s) de J4 restant(s) dans builds" >&2; exit 1; }
   kubectl get clusterrolebindings,rolebindings -A -o json | jq -r '.items[] | select(.roleRef.name | startswith("tekton-triggers-eventlistener")) | "\(.kind) \(.metadata.name)"' > "$T/liaisons-el"

@@ -103,6 +103,46 @@
             }
           ]
         },
+        "builds/fermetures/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-ecriture",
+                "poc-build"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            },
+            {
+              "users": [
+                "poc-fermetures"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-fermetures"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-fermetures : fermetures de la plateforme (brique 03, F2), écriture par digest seulement, aucun tag"
+                }
+              ]
+            }
+          ]
+        },
         "horodatage/**": {
           "anonymousPolicy": [
             "read"

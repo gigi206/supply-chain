@@ -201,3 +201,34 @@ Script : [`traefik.sh`](traefik.sh) (`mise run fermetures -- <étape>`). Proxy d
 **npm (03/11/2026, choix du propriétaire : « gomod seul (Recommandé) »)** : F2 ne préfetche que les modules Go. Le Dockerfile de la 04 ne lit que `deps/gomod`, et `web/dist` arrive tout fait. Il reste un intrant produit sur l'hôte : c'est un trou connu, à traiter avec Node dans l'image de build (2c, brique 11). D2 se limite donc à `proxy.golang.org`, `storage.googleapis.com` et la lecture de Forgejo, et D4 n'embarque ni Node ni yarn.
 
 **D1 à D6 ne valent pas accord d'exécution de F2.** F2 sera préparé à sec : image d'outils, compte `poc-fermetures`, NetworkPolicy, tâches et pipeline signées, règle D6, prédictions datées. Il sera ensuite soumis avec ses effets à connaître, dont le refus durable de `3a7ca1b1` par D6 jusqu'à F3. Rien n'est appliqué au cluster ni à Zot avant ce oui.
+
+## F2, préparation à sec (03/11/2026, à partir de 16:55 UTC ; demande du propriétaire : « Oui, préparer F2 »)
+
+**Deux décisions révisées par le propriétaire avant toute écriture :**
+- **D2, révisée : activer le proxy DNS de Cilium** (choix « Activer le proxy DNS (Recommandé) »).
+  - Fait relevé : `toFQDNs` est coupé dans notre Cilium. [`cilium/valeurs.yaml`](../08-trust-plane/cilium/valeurs.yaml) a `l7Proxy: false`, choix de J7, et au tag `v1.20.4`, `pkg/fqdn/bootstrap/dns_proxy.go` ne démarre pas le proxy DNS sans `EnableL7Proxy`.
+  - Au même tag, avec `envoy.enabled` faux, l'Envoy embarqué n'est démarré qu'à la demande (`onDemandXdsStarter`, `pkg/envoy/cell.go`). Une politique DNS et `toFQDNs` seule ne devrait donc pas lancer Envoy. C'est à mesurer, pas à supposer.
+  - Le test 6 de la 08 est rejoué après le changement.
+- **D3, révisée : fermetures rangées dans `builds/fermetures/**`** (choix « builds/fermetures (Recommandé) »). Chains y écrit `.sig` et `.att` avec son compte actuel `poc-build`. `poc-fermetures` y crée par digest seulement.
+  - Fait lu dans le code de Zot v2.1.22 (`pkg/api/authz.go`) : **le motif de dépôt le plus long l'emporte**. La politique `builds/fermetures/**` remplace donc `builds/**` pour ces dépôts : elle reliste la lecture anonyme, `poc-ecriture` et `poc-build`. `poc-images` et `poc-replay` n'y ont aucun droit.
+
+**Faits relevés pour l'image d'outils (D4), hors ligne** :
+- Dans le nixpkgs épinglé du banc B, déjà présents sur l'hôte : `python313` 3.13.12, `gitMinimal` 2.51.2 (avec `git-remote-https`) et `cacert` 3.123. Leur clôture fait 45 chemins et 275 Mo.
+- Les 51 dépendances de Hermeto 0.64.0 installées sur l'hôte sont toutes des roues : 44 `py*-none-any`, les autres `manylinux` en `cp313`.
+- sample-app déclare `go 1.24` : Go 1.26.10, celui de l'image de build de la 04, suffit.
+
+**Autres faits** :
+- Le CronJob d'horodatage parcourt tous les dépôts sous `builds/`. Il horodatera donc aussi les enveloppes de Chains des fermetures.
+- Aucune règle Kyverno ne restreint les images des pods de `builds`.
+- Trusted Resources couvre `tekton/(tasks|pipelines)/*`.
+
+**Périmètre de F2** :
+- image d'outils ;
+- proxy DNS de Cilium ;
+- compte `poc-fermetures` ;
+- NetworkPolicy `prefetch-sortie` ;
+- tâches `prefetch-gomod` et `publier-fermeture`, et pipeline `prefetch-sample-app` ;
+- deux prefetch du même commit ;
+- provenance.
+
+D5 (workspace en lecture seule) et D6 (règle de la porte) sont faites en F3, avec la bascule de la construction : la fenêtre pendant laquelle la porte refuse `3a7ca1b1` reste ainsi la plus courte possible.

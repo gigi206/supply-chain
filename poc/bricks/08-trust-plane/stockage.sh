@@ -71,7 +71,9 @@ etape_zot() {
   rm -rf "$d" && (umask 077 && mkdir -p "$d")
   # poc-metriques (brique 19, O2, décision du propriétaire du 02/11/2026) : lecture de /metrics seulement
   # (accessControl.metrics de zot.json), cité dans aucune politique de dépôt.
-  for compte in poc-ecriture poc-build poc-horodatage poc-images poc-metriques; do
+  # poc-fermetures (brique 03, F2, D3 révisée, décision du propriétaire du 03/11/2026) : tâche publier-fermeture,
+  # builds/fermetures/** (motif le plus long, qui remplace builds/** pour ces dépôts), création par digest seulement.
+  for compte in poc-ecriture poc-build poc-horodatage poc-images poc-metriques poc-fermetures; do
     [ -s "$S/zot-$compte.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-$compte.password")
     h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-$compte.password")
     case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac

@@ -1,0 +1,59 @@
+# Brique 03, F2 (D1 a, décision du propriétaire du 03/11/2026) : pipeline de prefetch de sample-app, séparée de la pipeline de
+# construction, signée par la clé des tâches et publiée en bundle (tekton/pipelines/prefetch-sample-app). Ses tâches sont tirées
+# de leurs bundles signés, épinglés par digest, et le dépôt de la fermeture est fixé ici. Le créateur du PipelineRun fournit le
+# commit, le dépôt de Forgejo et le workspace sortie (PVC). Chains signe la fermeture (IMAGE_URL, IMAGE_DIGEST) et la provenance
+# du PipelineRun, dont le sujet est la fermeture et les entrées le commit, l'image d'outils et les bundles.
+# @PREFETCH_TACHE@, @PUBLIER_FERMETURE@, @DEPOT_FERMETURE@ : prefetch.sh taches (brique 03).
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prefetch-sample-app
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH_TACHE@
+      - name: name
+        value: prefetch-gomod
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: publier
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER_FERMETURE@
+      - name: name
+        value: publier-fermeture
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: @DEPOT_FERMETURE@
+    workspaces:
+    - name: sortie
+      workspace: sortie

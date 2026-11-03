@@ -1,0 +1,48 @@
+# Brique 03, F2 (D2 révisée, décision du propriétaire du 03/11/2026 : proxy DNS de Cilium activé, l7Proxy: true dans
+# cilium/valeurs.yaml) : seule sortie des pods de la tâche prefetch-gomod, aucune entrée. Noms relevés sur l'hôte en F1 pour Go
+# (proxy CONNECT journalisé, resultats/f1-prefetch.log de la brique 03) : proxy.golang.org et storage.googleapis.com, en 443 ;
+# sum.golang.org n'y a pas été contacté (go.sum complet) et reste refusé. Forgejo (hôte de sc-stockage, port 3000) pour le clone
+# et le git fetch des tags que lance Hermeto. DNS par kube-dns, inspecté par le proxy DNS (règle dns, exigée par toFQDNs).
+# Sélection par tekton.dev/task, réécrit par Tekton avec le nom de la tâche résolue (voir construction-sans-sortie.yaml) ; les
+# politiques s'additionnent : aucune autre politique de builds ne doit sélectionner ces pods (contrôlé par prefetch.sh reseau).
+# Zot n'est pas joignable : la fermeture est poussée par publier-fermeture, seule à monter le secret de poc-fermetures.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prefetch-sortie
+  namespace: builds
+spec:
+  endpointSelector:
+    matchLabels:
+      tekton.dev/task: prefetch-gomod
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress: []
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: "*"
+  - toFQDNs:
+    - matchName: proxy.golang.org
+    - matchName: storage.googleapis.com
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toCIDR:
+    - 192.168.161.13/32
+    toPorts:
+    - ports:
+      - port: "3000"
+        protocol: TCP
