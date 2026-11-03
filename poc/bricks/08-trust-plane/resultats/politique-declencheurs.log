@@ -1,27 +1,27 @@
-# politique.sh declencheurs, 2026-11-02T13:27:22Z
+# politique.sh declencheurs, 2026-11-03T20:48:13Z
 ## tâche et pipeline de J4 en v1beta1, signées par la clé des tâches et publiées en bundles
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   tâche signée versionnée (politique/taches/publier-essai.signee.yaml) conforme au gabarit rendu, signature exceptée
 tâche publier-essai : sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
 OK   tâche en service dans la liste revue (politique/porte/taches.yml)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-pipeline sample-app-essai : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:91d7f5277fafe9b483c7be79520f289ca9171cd639948496914515c751a59867
+pipeline sample-app-essai : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:bedbb28956399847e22cd5e164a0bc1591dc4ba123e0b4eaf6f79e58fe3a2a74
 pipeline modifiée : 1 ligne changée (référence de tâche), même signature
 ## PipelineRuns du bundle (dans builds, gabarit de la TriggerTemplate) ; signature par Chains avec ses identifiants
 OK   pipeline signée (tâche tirée de son bundle signé) : exécutée (IMAGE_URL=sc-stockage.poc.test:5000/builds/essai-webhook,IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5) ; TrustedResourcesVerified=True
 TaskRun enfant j6-pipeline-signee-publier : taskRef bundles sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d… ; TrustedResourcesVerified=True
 Chains : TaskRun j6-pipeline-signee-publier signé=true, PipelineRun j6-pipeline-signee signé=true
-## audit de Zot : écritures de manifestes depuis 2026-11-02T13:27:22Z (Chains ; compte attendu poc-build)
-{"t":"13:27:42","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
-{"t":"13:27:45","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+## audit de Zot : écritures de manifestes depuis 2026-11-03T20:48:13Z (Chains ; compte attendu poc-build)
+{"t":"20:48:29","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
+{"t":"20:48:32","compte":"poc-build","action":"PUT","objet":"builds/essai-webhook/manifests/sha256-3a7ca1b14dbf….att","code":201}
 OK   Chains pousse l'attestation avec poc-build (DOCKER_CONFIG) : 2 écriture(s) .att
 OK   pipeline modifiée après signature : refusée, ResourceVerificationFailed : pipelineRun builds/j6-pipeline-modifiee referred resource sample-app-essai failed signature verification: resource verification failed: resource sample-app-essai in namespace  fails verification ; TrustedResourcesVerified=False
 ## EventListener, secret du webhook et TriggerTemplate : de builds (J4) à declencheurs
-EventListener joignable par Forgejo : http://192.168.161.11:32631 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
-EventListener : el-forgejo-79b6fd78c6-vwdj9 Running sc-confiance
-{"id":2,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:32631","content_type":"json"}
+EventListener joignable par Forgejo : http://192.168.161.11:32263 (NodePort sur sc-confiance ; /live depuis sc-stockage, essai 2)
+EventListener : el-forgejo-79b6fd78c6-nhvn9 Running sc-confiance
+{"id":2,"type":"forgejo","active":true,"events":["push"],"url":"http://192.168.161.11:32263","content_type":"json"}
 ## contrôles
-OK   aucun secret dans builds, hors zot-images (J7)
+OK   aucun secret dans builds, hors zot-images (J7) et zot-fermetures (brique 03, F2)
 OK   ni EventListener, ni gabarit, ni tâche ou pipeline locale dans builds
 OK   ClusterRoles tekton-triggers-eventlistener-* (secrets du cluster, impersonation) liées à rien
-pod el-forgejo-79b6fd78c6-vwdj9 : nœud sc-confiance, compte el-forgejo
+pod el-forgejo-79b6fd78c6-nhvn9 : nœud sc-confiance, compte el-forgejo

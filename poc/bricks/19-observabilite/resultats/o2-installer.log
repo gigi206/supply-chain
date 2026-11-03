@@ -1,8 +1,12 @@
-# observabilite.sh installer, 2026-11-02T17:39:56Z
+# observabilite.sh installer, 2026-11-03T22:34:57Z
 prometheus-3.13.5.linux-amd64.tar.gz: OK
 alertmanager-0.34.2.linux-amd64.tar.gz: OK
 prometheus, version 3.13.5 (branch: HEAD, revision: f497435984d1ca1d84cda5ed309387ac2eb1f8f6)
 alertmanager, version 0.34.2 (branch: HEAD, revision: e8349048265ccc0871c3d0d668b05eacc68baf50)
+Created symlink '/etc/systemd/system/multi-user.target.wants/recepteur-alertes.service' -> '/etc/systemd/system/recepteur-alertes.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/fichiers-metriques.service' -> '/etc/systemd/system/fichiers-metriques.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/alertmanager.service' -> '/etc/systemd/system/alertmanager.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/prometheus.service' -> '/etc/systemd/system/prometheus.service'.
 active
 active
 active

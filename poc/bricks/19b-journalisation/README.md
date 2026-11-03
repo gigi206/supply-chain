@@ -595,3 +595,12 @@ rien n'a été arrêté, copié ni essayé.
 **D22 (d) retenue par le propriétaire le 03/11/2026, vers 20:08 UTC** (« On s'en moque de tout perdre sur une démo ») : un
 rejeu de zéro de la 08 peut effacer l'historique de Loki, Grafana, la VSA et les données de Zot. Aucune sauvegarde n'est
 faite. Les options (a) à (c) ci-dessus sont abandonnées.
+
+## Additif du 03/11/2026, 22:43 UTC : rejouée de zéro dans le rejeu `complet` de la 08 (D22 (d) : historique perdu)
+
+L2, L3 (`evenements` compris), L5 `battement`, `controle_grpc` de L6 et L4 `temoins secrets` ont été rejoués sur une plateforme
+neuve, sans KO : [`rejeu-complet.log`](../08-trust-plane/resultats/rejeu-complet.log) de la 08.
+- **Configuration finale posée d'emblée** : L2 et L3 installent le gRPC en TLS. `avant_grpc`, `grpc_tls` et `pertes_grpc` ont
+  donc été sautées, de même que L1, `muette` et L7.
+- **ÉCART de l'export de `secrets`** : 174 468 lignes exportées pour 174 437 comptées par Loki. C'est le même ordre d'écart
+  qu'au premier passage du 02/11 (326 597 pour 326 558).

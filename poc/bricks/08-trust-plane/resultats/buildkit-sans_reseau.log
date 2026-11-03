@@ -1,4 +1,4 @@
-# buildkit.sh sans_reseau, 2026-11-02T13:55:06Z
+# buildkit.sh sans_reseau, 2026-11-03T21:14:59Z
 ## prédiction (écrite le 30/10/2026, avant la mesure ; option 3 du contrôle de sortie, choix du propriétaire)
 - témoins, pods Kata privilégiés, sortie testée 4 s après le lancement (au-delà de la fenêtre de 570 ms) : sans le label,
   Zot et Forgejo joignables ; avec tekton.dev/task=construire-image, les deux refusés

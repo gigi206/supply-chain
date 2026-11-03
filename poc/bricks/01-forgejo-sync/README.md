@@ -425,3 +425,12 @@ Un rejeu de la 08 recrée les VM : Forgejo, Zot, le cluster et l'état de la syn
 5. `mise run synchro:forgejo -- traefik`.
 
 Garde-fou : la synchro depuis l'hôte (`miroir`, `archives`, `bout_en_bout`) est refusée tant que la VM a un état pour le projet (S3 installé).
+
+## Additif du 03/11/2026, 22:43 UTC : rejouée de zéro dans le rejeu `complet` de la 08
+
+S2 à S4 et S6 ont été rejouées sur une plateforme neuve, sans KO :
+[`rejeu-complet.log`](../08-trust-plane/resultats/rejeu-complet.log) de la 08.
+- Les journaux d'étapes de `resultats/` sont ceux de ce rejeu.
+- S5 a été sautée, ainsi que `reverification`, `retrait`, `refspec` et `niveaux`.
+- **Raison de S5 (déduite du code, non mesurée)** : la règle D6 de la 03 refuserait l'image du fork, qui n'a pas de fermeture
+  propre. Son étape `porte` est de plus écrite en dur sur `3a7ca1b1`.

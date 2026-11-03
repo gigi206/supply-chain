@@ -1,4 +1,4 @@
-# journalisation.sh installer, 2026-11-02T20:51:45Z
+# journalisation.sh installer, 2026-11-03T22:35:05Z
 loki-linux-amd64.zip: OK
 grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
 ports 3001, 3100, 9096 avant installation : 0 écoute(s)

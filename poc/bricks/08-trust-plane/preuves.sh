@@ -2202,15 +2202,19 @@ etape_bascule() {
   purger_pr "$BA_PR"
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   ba_reprendre
-  ba_chemin rattrapage rattrapage declencheurs:rattrapage "$t0"
   # À la reprise, le contrôleur lance aussitôt le passage manqué pendant la suspension, puis celui de la minute (deuxième passage,
-  # archivé : deux jobs à 11 s d'écart, le second PRESENT) : journaux de tous les passages créés depuis la reprise
+  # archivé : deux jobs à 11 s d'écart, le second PRESENT) : journaux de tous les passages créés depuis la reprise, relevés dès que
+  # le PipelineRun existe (rejeu complet du 03/11/2026 : relevés après ba_chemin, plus de 3 min plus tard, le passage créateur
+  # était déjà effacé par la limite d'historique du CronJob, 3 jobs réussis)
+  for _ in $(seq 180); do kubectl get pipelinerun -n builds "$BA_PR" > /dev/null 2>&1 && break; sleep 1; done
   : > "$T/rattrapage-passages.log"
   for j in $(kubectl get jobs -n declencheurs -o json | jq -r --arg t "$t0" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
       and .name == "rattrapage") and .metadata.creationTimestamp >= $t)] | sort_by(.metadata.creationTimestamp) | .[].metadata.name'); do
+    kubectl wait -n declencheurs "job/$j" --for=condition=complete --timeout=120s > /dev/null || true   # passage encore en cours
     journal_rattrapage "$j" | sed "s/^/$j/"
     sed "s/^/$j /" "$T/rattrapage.log" >> "$T/rattrapage-passages.log"
   done
+  ba_chemin rattrapage rattrapage declencheurs:rattrapage "$t0"
   n=$(grep -c " CREE|builds/$BA_PR|commit $TETE_J2|depot $BA_URL$" "$T/rattrapage-passages.log" || true)
   ba_attendu "rattrapage : créations de $BA_PR dans les journaux des passages depuis la reprise" "$n" 1
   [ "$BA_UID" != "$u1" ] || { echo "KO   même UID qu'au chemin 1" >&2; exit 1; }

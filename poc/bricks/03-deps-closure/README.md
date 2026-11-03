@@ -471,3 +471,18 @@ Choix du propriétaire, 03/11/2026, entre 20:08 et 20:23 UTC : « 1 b » (intég
 - **Durée estimée** : environ 2 h. Le rejeu « enchainement » a pris 5 429 s. F2 a pris environ 5 min le 03/11, avec
   le cache. Il faut compter environ 6 min pour la 01 (jusqu'à 15 min si `planifie` attend) et environ 10 min pour la 19 et
   la 19b.
+
+## Additif du 03/11/2026, 22:43 UTC : rejeu `complet` de la 08 exécuté (accord du propriétaire : « Oui, avec VSA »)
+
+Il s'est déroulé de 20:31 à 22:42 UTC, en cinq parties ; le détail est dans le README de la 08.
+- **F2 dans le rejeu** : 217 s.
+  - Image d'outils `68e0ae70` et fermeture `74c265e7` reconstruites à l'identique sur un cluster neuf, un autre jour. Les deux
+    prefetch donnent le même résultat.
+  - Ce point était non vérifié à sec ; il est maintenant mesuré.
+  - Premier passage raté : le contexte de `image` copié au passage précédent était en lecture seule. Le passage est archivé
+    (`f2-image-rejeu-complet-rate.log`, condensé) et `prefetch.sh` est corrigé.
+- **Montage (B)** :
+  - J7 construit `3a7ca1b1` sur la fermeture de la plateforme ; la provenance la déclare, avec deux enveloppes.
+  - Les tests de J8 passent avec les mêmes nombres d'OK qu'avant D6.
+  - La prédiction `D6_TEMOIN` (témoins à clé jetable) est vérifiée.
+  - La bascule et le contrôle 6 sont conformes.

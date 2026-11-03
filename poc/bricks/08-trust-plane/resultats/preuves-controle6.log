@@ -1,22 +1,22 @@
-# preuves.sh controle6, 2026-11-03T15:30:47Z
+# preuves.sh controle6, 2026-11-03T22:39:57Z
 ## ConfigMap porte : contrôle 6 ajouté (vsa.sh, clé publique du domaine de replay)
 clé de VSA : 578dd771bcedd5829267820e8cad77182e91184692843cf423b4942250d1e96a (empreinte DER ; R2 : 578dd771…)
 OK   ConfigMap porte : vsa.sh, vsa.pub et horodatage.sh identiques aux fichiers versionnés
 referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 1
 ## C1 image réelle, source attendue
-VERDICT|c6-reelle|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+VERDICT|c6-reelle|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
     RETENU|énoncé c804d94698b16d3c
     VSA|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
 OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
 OK   C1 contrôle 9 : ok
 OK   C1 contrôle 6 : ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
 ## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucune VSA dans builds/vsa/essai-webhook
-VERDICT|c6-sans-vsa|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
+VERDICT|c6-sans-vsa|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
     VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
 OK   C2 contrôle 6 : refus
 OK   C2 détail : 0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook 
 ## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du domaine de replay
-VERDICT|c6-cle-chains|true||trusted_task.tagged|31|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+VERDICT|c6-cle-chains|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
 ConfigMap porte-temoin retirée
     VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
 OK   C3 ec et contrôle 9 inchangés : true||trusted_task.tagged|ok

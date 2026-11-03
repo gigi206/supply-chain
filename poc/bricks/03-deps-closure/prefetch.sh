@@ -58,6 +58,7 @@ etape_image() {
   local c=$T/contexte py gi ca s db d i bk=$T/bk
   py=$(nix_chemin python313); gi=$(nix_chemin gitMinimal); ca=$(nix_chemin cacert)
   echo "## entrées"
+  [ ! -d "$c" ] || chmod -R u+w -- "$c"   # cp -a du GOROOT garde ses répertoires en lecture seule (second passage, rejeu du 03/11/2026)
   rm -rf -- "${c:?}" "${T:?}/hermeto-src"; mkdir -p "$c/roues"
   git clone -q -c advice.detachedHead=false --depth 1 --branch "$HERMETO_TAG" https://github.com/hermetoproject/hermeto.git "$T/hermeto-src"
   attendu "Hermeto $HERMETO_TAG : commit du tag" "$(git -C "$T/hermeto-src" rev-parse HEAD)" "$HERMETO_COMMIT"

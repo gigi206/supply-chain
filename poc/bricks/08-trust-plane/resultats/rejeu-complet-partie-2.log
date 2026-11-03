@@ -1,0 +1,253 @@
+# Partie 2 du rejeu complet (03/11/2026, 21:18 à 21:22 UTC) : reprise à F2 (passée), arrêt sur construction.sh constat_cm (KO : la CA reste lisible après la sortie du premier conteneur, contrairement aux 9 rejeux précédents)
+# rejeu.sh complet, 2026-11-03T21:18:16Z
+réseau : cilium ; reprise à J7 (fermeture, F2 de la 03)
+## démontage : sautée (reprise à J7 (fermeture, F2 de la 03))
+## VM : sautée (reprise à J7 (fermeture, F2 de la 03))
+## k3s : sautée (reprise à J7 (fermeture, F2 de la 03))
+## Cilium : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J2 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J3 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J4 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J5 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J6 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## test 5 (J6) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J6 (suite) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (admission) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (BuildKit) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (voie D) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (voie A, sample-app) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (sans réseau) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (construction, entrées) : sautée (reprise à J7 (fermeture, F2 de la 03))
+[fermetures:f2] $ poc/bricks/03-deps-closure/prefetch.sh image compte reseau taches prefetch provenance
+# prefetch.sh image, 2026-11-03T21:18:16Z
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+## entrées
+OK   Hermeto 0.64.0 : commit du tag : 1f37e32dfdf28342b50c6f394c3e99914fdb24e9
+
+[notice] A new release of pip is available: 25.3 -> 26.2.2
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+roues (empreintes de requirements.txt contrôlées par pip) : 46
+
+[notice] A new release of pip is available: 25.3 -> 26.2.2
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+
+[notice] A new release of pip is available: 25.3 -> 26.2.2
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+OK   roue de Hermeto identique sur deux constructions : hermeto-0.64.0-py3-none-any.whl 15ca1dc592fe1c568ef37297c5973e1f2ec35eab99b3741f651c74b1aeec9a4a
+OK   toolchain golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64 : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0= = sum.golang.org
+python /nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12 ; git /nix/store/2bjyma6xy55jnvh5jnvnli6g0vha01sv-git-minimal-2.51.2 ; cacert /nix/store/mks1hnym57qn8m5payqgqgz5qnhjcxpk-nss-cacert-3.123 ; busybox 49227c027f9b972f
+clôture nix : 45 chemins, 263 Mo ; empreinte 66de99598aa176a1
+## BuildKit rootless éphémère (nixpkgs du banc B), deux constructions sans cache
+a : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
+b : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
+essai hors réseau (cible essai) :
+     #10 6.799 Successfully installed hermeto-0.64.0
+     #17 1.661 hermeto 0.64.0
+     #17 1.738 git version 2.51.2
+     #17 1.740 go version go1.26.10 linux/amd64
+     #17 1.742 Python 3.13.12
+     #17 1.742 /etc/ssl/certs/ca-certificates.crt
+OK   image d'outils identique sur deux constructions : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+## copie dans Zot (poc-ecriture, par digest)
+OK   relue en lecture anonyme : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+{"couches":6,"octets":207092292}
+OK   image d'outils (digest épinglé) : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+# fin 2026-11-03T21:20:08Z
+# prefetch.sh compte, 2026-11-03T21:20:08Z
+[confiance:stockage] $ poc/bricks/08-trust-plane/stockage.sh zot
+# stockage.sh zot, 2026-11-03T21:20:08Z
+~/.local/share/mise/installs/aqua-project-zot-zot/2.1.22/zot: OK
+htpasswd : poc-ecriture, bcrypt, coût 12
+htpasswd : poc-build, bcrypt, coût 12
+htpasswd : poc-horodatage, bcrypt, coût 12
+htpasswd : poc-images, bcrypt, coût 12
+htpasswd : poc-metriques, bcrypt, coût 12
+htpasswd : poc-fermetures, bcrypt, coût 12
+htpasswd : poc-replay, bcrypt, coût 12 (hash fourni par la brique 10)
+zot: OK
+https://192.168.161.13:5000/v2/ (CA du PoC) : HTTP 200
+active
+{"time":"2026-11-03T21:20:12.767534129Z","level":"info","message":"version","distribution-spec":"1.1.1","commit":"v2.1.22-0-g6bbc7e5","binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs","go version":"go1.27.1","caller":"zotregistry.dev/zot/v2/pkg/cli/server/root.go:261","func":"zotregistry.dev/zot/v2/pkg/cli/server.NewServerRootCmd.func1","goroutine":1}
+LISTEN 0      4096   192.168.161.13:5000       0.0.0.0:*    users:(("zot",pid=4779,fd=11))           
+drwxr-x---  3 root zot 4096 Nov  3 21:20 /etc/zot
+drwxr-x--- 14 zot  zot 4096 Nov  3 21:20 /var/lib/zot
+drwxr-x---  2 zot  zot 4096 Nov  3 20:33 /var/log/zot
+/etc/zot:
+total 16
+-rw-r----- 1 root zot 4142 Nov  3 21:20 config.json
+-rw-r----- 1 root zot  516 Nov  3 21:20 htpasswd
+drwxr-x--- 2 root zot 4096 Nov  3 21:20 tls
+
+/etc/zot/tls:
+total 8
+-rw-r--r-- 1 root root 778 Nov  3 21:20 zot.crt
+-rw-r----- 1 root zot  241 Nov  3 21:20 zot.key
+-> Overall exposure level for zot.service: 3.0 OK :-)
+## artefact d'essai (un fichier, layout OCI local)
+OK   poc-fermetures : push par digest n° 1 dans builds/fermetures/essai
+OK   poc-fermetures : push par digest n° 2 dans builds/fermetures/essai
+OK   poc-fermetures : tag refusé (403, motif de la condition)
+OK   poc-fermetures : autre dépôt de builds/ (builds/essai-fermetures) : 403
+OK   poc-fermetures : suppression : 403
+OK   poc-images dans builds/fermetures/ : refusé (denied)
+OK   poc-build (Chains) : tag écrit dans builds/fermetures/essai
+OK   lecture anonyme : sha256:8dc5282d1b517245ef59cb08b03d9f93943aed8199aeaccfc4fdeaaf444cc432
+## secret zot-fermetures de builds
+secret zot-fermetures : clés config.json
+# fin 2026-11-03T21:20:24Z
+# prefetch.sh reseau, 2026-11-03T21:20:24Z
+CiliumNetworkPolicy prefetch-sortie appliquée
+## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod
+OK   politiques qui sélectionnent ces pods : CiliumNetworkPolicy prefetch-sortie
+## f2-sonde-avec (sc-build, 10.42.1.89)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : refusé (URLError : <urlopen error [Errno 101] Network is unreachable>)
+     API de k3s : refusé (URLError : <urlopen error timed out>)
+     Zot : refusé (URLError : <urlopen error timed out>)
+     Forgejo : joint (6391fd437f26)
+## f2-sonde-sans (sc-build, 10.42.1.22)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : joint (HTTP 200)
+     API de k3s : joint (HTTP 401)
+     Zot : joint (HTTP 200)
+     Forgejo : joint (6391fd437f26)
+## Hubble : flux de f2-sonde-avec depuis 2026-11-03T21:20:32Z
+     64 FORWARDED 10.42.0.182:53 
+     14 DROPPED 192.168.161.13:5000 POLICY_DENIED
+     14 DROPPED 192.168.161.11:6443 POLICY_DENIED
+     14 DROPPED 172.217.22.113:80 POLICY_DENIED
+      8 FORWARDED 192.168.161.13:3000 
+      7 FORWARDED 140.82.121.3:443 
+      6 FORWARDED 142.251.142.27:443 
+      5 FORWARDED 172.217.22.81:443 
+      5 FORWARDED 172.217.22.113:443 
+# fin 2026-11-03T21:20:57Z
+# prefetch.sh taches, 2026-11-03T21:20:57Z
+## tâches (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   prefetch-gomod dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod@sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-fermeture : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-fermeture dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+## pipeline prefetch-sample-app (signée à chaque passage)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app@sha256:e06034fe3c01bb6dd013f5b82dafb4b1637442570fe63ab9b3b84a43f99534fb
+# fin 2026-11-03T21:21:01Z
+# prefetch.sh prefetch, 2026-11-03T21:21:01Z
+## f2-prefetch-1 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-1-prefetch (Succeeded), pod f2-prefetch-1-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     2026/11/03 21:21:08 Entrypoint initialization
+     2026/11/03 21:21:08 Decoded script /tekton/scripts/script-0-qshgr
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-03 21:21:11,561 INFO Fetching the gomod dependencies at subpath .
+     2026-11-03 21:21:11,567 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-03 21:21:11,800 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+### TaskRun f2-prefetch-1-publier (Succeeded), pod f2-prefetch-1-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/03 21:21:13 Entrypoint initialization
+     2026/11/03 21:21:13 Decoded script /tekton/scripts/script-0-9kp2n
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 51be79be9e161d980f395a6da5fb1c6b51a2d7be0f36b79278d518d278b41846
+OK   PipelineRun f2-prefetch-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-1 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-1-prefetch-pod (IP relevée dans le TaskRun) :
+          48 FORWARDED 10.42.0.182:53 
+          14 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 172.217.22.113:443 
+## f2-prefetch-2 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-2-prefetch (Succeeded), pod f2-prefetch-2-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-03 21:21:39,745 INFO Fetching the gomod dependencies at subpath .
+     2026-11-03 21:21:39,752 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-03 21:21:40,000 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+     2026/11/03 21:21:36 Entrypoint initialization
+     2026/11/03 21:21:36 Decoded script /tekton/scripts/script-0-2khcz
+### TaskRun f2-prefetch-2-publier (Succeeded), pod f2-prefetch-2-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/03 21:21:41 Entrypoint initialization
+     2026/11/03 21:21:41 Decoded script /tekton/scripts/script-0-6jdbv
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 8c5850631562bfc9f2c87e1ce160b8db9c9bf18ac8640d947388147afebc197a
+OK   PipelineRun f2-prefetch-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-2 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-2-prefetch-pod (IP relevée dans le TaskRun) :
+          48 FORWARDED 10.42.0.182:53 
+          14 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 172.217.22.113:443 
+## comparaisons
+fermeture 1 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture 2 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture de l'hôte (sha256:0ab5a507…) : 8 fichiers, contenu 1852dbbd7863300e7f85563de65273477fa66ee94b606f349bb7a18ad7f6dcd0
+     1c1
+     < f34e867c9aef391c129ab3292c4d24b1f6aa10a1998779fae6138437dce21f78  ./.build-config.json
+     ---
+     > d1bc34073c1487251bd7e8075e724fb0f95011a4ee4b65818ecb74f1dde8bd7f  ./.build-config.json
+     7a8
+     > 9144f0e2a4cea7837a698aaf84291cb89a796ef2495b28cb339c90ae78c48751  ./deps/npm/marked-16.4.1.tgz
+OK   deux prefetch du même commit : même fermeture
+# fin 2026-11-03T21:21:52Z
+# prefetch.sh provenance, 2026-11-03T21:21:52Z
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur la fermeture sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   enveloppes du PipelineRun f2-prefetch-1 : 1
+sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app sha256:e06034fe3c01bb6dd013f5b82dafb4b1637442570fe63ab9b3b84a43f99534fb
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135 (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   image d'outils du prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   tâche prefetch-gomod (bundle) : sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)
+# fin 2026-11-03T21:21:53Z
+## durée J7 (fermeture, F2 de la 03) : 217 s
+[confiance:construction] $ poc/bricks/08-trust-plane/construction.sh taches constat_cm construire provenance
+# construction.sh taches, 2026-11-03T21:21:53Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-entrees dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
+fermeture de la plateforme (brique 03, F2, 2026-11-03T21:21:24Z) : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   fermeture épinglée dans la pipeline : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:28496cac8333ab2269c1b599b95ff56d51650bb916cf5d69b549b2b7816afac8
+## témoin : première version de construire-image et sa pipeline, depuis l'historique git
+OK   bundle de l'ancienne construire-image (signature versionnée au commit b77ff6b) : sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:ae8dd81c3bd8f8d1a23a01154d196937d717b1a7282a117d88371d2abd6d743d
+# construction.sh constat_cm, 2026-11-03T21:22:01Z
+## prédiction (relevée sur le premier passage de construire, puis sur un essai exploratoire du 30/10/2026)
+pod Kata, conteneurs a et b montant la ConfigMap ca-poc et un emptyDir ; a lit la CA, écrit dans l'emptyDir, puis :
+  sort aussitôt : b, 15 s plus tard, lit l'emptyDir mais plus la CA (No such file or directory) ;
+  reste en vie (témoin) : b lit l'emptyDir et la CA
+### j7-cm-sort
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+### j7-cm-vivant
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+KO   a sorti : b lit l'emptyDir, puis la CA : écrit / -----BEGIN CERTIFICATE----- (attendu : écrit / head: /etc/ca-poc/ca.crt: No such file or directory)
+[confiance:construction] ERROR task failed

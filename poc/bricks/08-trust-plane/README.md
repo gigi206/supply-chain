@@ -745,6 +745,37 @@ Décision du propriétaire du 02/11/2026 : borner les deux lecteurs des Secrets 
   - ÉCART et CONSTAT identiques, sauf la valeur de signature de la pipeline, les horodatages et le CONSTAT de `reserve_c`, qui n'est plus rejouée ;
   - audit des résolveurs ([`preuves-resolveurs.log`](resultats/preuves-resolveurs.log)) : 45 lectures de comptes de service et 2 de Secrets, toutes dans `builds` ; 2 refus (403) dans l'espace d'essai ;
   - aucune fuite ([`fuites-enchainement.log`](resultats/fuites-enchainement.log)).
+- **Rejeu `complet`** (03/11/2026, de zéro, accord du propriétaire : « Oui, avec VSA ») : premier rejeu avec les briques 03 (F2,
+  montage (B)), 01, 19, 19b et la VSA de la 10. Il a demandé cinq parties, de 20:31:11 à 22:42:53 UTC ; la partie finale
+  ([`rejeu-complet.log`](resultats/rejeu-complet.log)) a duré 1 176 s. **Bilan : toutes les étapes passent.**
+  - **Les trois arrêts, chacun archivé avant la reprise par `DEPUIS`** :
+    - **Partie 1**, arrêtée à F2 `image` ([`rejeu-complet-partie-1.log`](resultats/rejeu-complet-partie-1.log), 478 OK, condensé) :
+      le contexte copié au passage du 03/11 était en lecture seule, et `rm` ne pouvait plus l'effacer. Corrigé dans `prefetch.sh`
+      (`chmod -R u+w` avant `rm`).
+    - **Parties 2 et 3**, arrêtées sur `constat_cm` ([`rejeu-complet-partie-2.log`](resultats/rejeu-complet-partie-2.log),
+      [`rejeu-complet-partie-3.log`](resultats/rejeu-complet-partie-3.log)) : le constat de Kata, reproduit dans les neuf rejeux
+      précédents, ne s'est pas reproduit, deux fois de suite, avec le même Kata 4.3.1. La CA reste lisible après la sortie du
+      premier conteneur. Cause non trouvée. Le contrôle consigne désormais un ÉCART au lieu d'arrêter ; le contournement de
+      `construire-image` reste en place.
+    - **Partie 4**, arrêtée à la bascule ([`rejeu-complet-partie-4.log`](resultats/rejeu-complet-partie-4.log), 283 OK, tests de
+      J8 sans KO) : le journal du passage du rattrapage qui avait créé la `PipelineRun` était déjà effacé, par la limite de 3 jobs
+      réussis du CronJob, quand il a été relu. Sa création figurait pourtant dans l'audit de l'API (201). Corrigé dans
+      `preuves.sh` : les journaux sont relus dès que la `PipelineRun` existe.
+    - **Partie 5**, de la bascule à `fuites` : 233 OK, aucun KO.
+  - **Montage (B) mesuré** :
+    - l'image d'outils `68e0ae70` et la fermeture `74c265e7` sont reconstruites à l'identique sur un cluster neuf (les deux prefetch
+      sont égaux) ;
+    - J7 construit `3a7ca1b1` sur cette fermeture, avec deux enveloppes.
+  - **Tests de J8** : mêmes nombres d'OK qu'au rejeu `enchainement` (`test7` 20, `test8` 24, `reglec` 6, `decision3` 15, bascule
+    44, `helm_cilium` 21, contrôleurs 62, résolveurs 17). La prédiction `D6_TEMOIN`, déduite à sec, est vérifiée : les témoins à
+    clé jetable portent `porte.fermeture_plateforme`.
+  - **ÉCART** :
+    - les quatre de J5 (plantage de la CLI de ec), identiques au rejeu `enchainement` ;
+    - celui de `constat_cm` ;
+    - celui de l'export de L4 (19b) : 174 468 lignes pour 174 437, écart du même ordre qu'au premier passage du 02/11
+      (326 597 pour 326 558).
+  - **VSA re-poussée** : manifeste identique (`c1bfbcbd`). Le contrôle 6 donne C1 admise, C2 et C3 refusées.
+  - **Aucune fuite** ([`fuites-complet.log`](resultats/fuites-complet.log)).
 
 ## Préparation de J8 (30/10/2026, plan validé par le propriétaire)
 

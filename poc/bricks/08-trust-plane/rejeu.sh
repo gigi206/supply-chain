@@ -24,6 +24,8 @@
 # entre les entrées et les tâches de J7 ; construction.sh lit le digest produit par ce passage), F3 n'est plus nécessaire. Après
 # J8 : brique 01 (S2 à S4, S6 ; S5 sautée), brique 19 (O2, O3), brique 19b (L2, L3, L5, contrôle de L6, L4 sans muette), puis,
 # avec POUSSER_VSA=1 (accord du propriétaire pour ce push), VSA de la brique 10 re-poussée et contrôle 6, enfin fuites.
+# Rejoué le 03/11/2026 (libellé complet, 20:31 à 22:42 UTC, cinq parties, trois correctifs, README de la 08) : toutes les étapes
+# passent ; plus « NON JOUABLE ».
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail

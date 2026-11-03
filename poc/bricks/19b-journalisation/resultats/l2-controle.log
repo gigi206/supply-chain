@@ -1,13 +1,13 @@
-# journalisation.sh controle, 2026-11-02T20:52:09Z
+# journalisation.sh controle, 2026-11-03T22:35:23Z
 ## écoute sur sc-stockage
-127.0.0.1:9096 users:(("loki",pid=47496,fd=8))
-192.168.161.13:3100 users:(("loki",pid=47496,fd=7))
-192.168.161.13:3001 users:(("grafana",pid=47547,fd=71))
+192.168.161.13:3001 users:(("grafana",pid=21139,fd=68))
+192.168.161.13:3100 users:(("loki",pid=21090,fd=7))
+127.0.0.1:9096 users:(("loki",pid=21090,fd=8))
 ## Loki
 sans certificat client : HTTP 000 (curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0)
 OK   refusé à la poignée TLS
 avec le certificat controle : /ready HTTP 503
-écriture de la ligne témoin temoin-l2-1793652729424068618 : HTTP 204
+écriture de la ligne témoin temoin-l2-1793745324143584677 : HTTP 204
 OK   ligne témoin relue (HTTP 200)
 demande de suppression : HTTP 403 (deletion is not available for this tenant)
 OK   suppression refusée
@@ -17,7 +17,7 @@ OK   anonyme refusé
 santé de la source prometheus : HTTP 200 {"status":"OK","message":"Successfully queried the Prometheus API."}
 santé de la source loki : HTTP 200 {"status":"OK","message":"Data source successfully connected."}
 OK   auditeur : ligne témoin lue dans Loki par Grafana (HTTP 200)
-auditeur, Prometheus (up) : HTTP 200, 8 série(s)
+auditeur, Prometheus (up) : HTTP 200, 5 série(s)
 auditeur, création de tableau : HTTP 403
 auditeur, création de source : HTTP 403
 administrateur, suppression de la source provisionnée loki : HTTP 403 ({"message":"Cannot delete read-only data source"})
@@ -32,14 +32,12 @@ redirection de / sans session : https://192.168.161.13:3001/login
 ## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)
   aucune
 ## mémoire
-Mem:            5931        1390         219           2        4618        4541
-loki : 46 Mi
-grafana : 303 Mi
-prometheus : 65 Mi
+Mem:            5931        1432         496           2        4299        4499
+loki : 54 Mi
+grafana : 304 Mi
+prometheus : 51 Mi
 ## mesure du disque
 # HELP disque_utilise_ratio Part utilisée du système de fichiers (df), entre 0 et 1.
 # TYPE disque_utilise_ratio gauge
-disque_utilise_ratio{point="/"} 0.4036
-Mon 2026-11-02 20:52:57 UTC  44s Mon 2026-11-02 20:51:57 UTC 15s ago disque-metriques.timer disque-metriques.service
-/ready à 20:52:19 : Ingester not ready: waiting for 15s after being ready
- HTTP 503
+disque_utilise_ratio{point="/"} 0.4094
+Tue 2026-11-03 22:36:17 UTC  48s Tue 2026-11-03 22:35:17 UTC 11s ago disque-metriques.timer disque-metriques.service

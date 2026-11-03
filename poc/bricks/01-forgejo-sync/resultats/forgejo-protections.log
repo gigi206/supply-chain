@@ -1,6 +1,4 @@
-# forgejo.sh protections, 2026-11-02T18:38:31Z
-règle retirée : custom/*
-règle retirée : paquet/*
+# forgejo.sh protections, 2026-11-03T22:30:19Z
 {"rule_name":"custom/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
 {"rule_name":"paquet/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
 {"name_pattern":"custom-*","whitelist_usernames":["poc-dev"]}

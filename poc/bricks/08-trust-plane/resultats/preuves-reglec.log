@@ -1,4 +1,4 @@
-# preuves.sh reglec, 2026-11-02T14:09:46Z
+# preuves.sh reglec, 2026-11-03T21:36:54Z
 ## prédiction
 porte (Job de l'espace porte, policy.yaml) : image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 jugée avec la clé de Chains, verdict de référence V ;
   porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)
@@ -7,30 +7,32 @@ images témoins (essais-j8/regle-c), clé jetable, provenance réelle au sujet r
   celui que donne le résultat de la tâche de build, constaté au premier passage), porte.construction_kata parmi les succès ;
   sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations
   d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)
+  depuis D6 (brique 03 ; prédiction du 03/11/2026, déduite de porte.rego, non mesurée) : les trois témoins portent aussi
+  porte.fermeture_plateforme (provenance de la fermeture signée par Chains, vérifiée avec la clé jetable de porte-temoin)
 OK   ConfigMap porte : porte.rego identique au fichier versionné
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 (2026-11-02T13:59:30Z)
-provenance réelle reprise : PipelineRun d9006af7-5d9a-4a5e-878e-1c9a5bd96d56, 47201 octets
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)
+provenance réelle reprise : PipelineRun c4242a11-18f6-439f-b947-7fe3d4319078, 47693 octets
 ## images témoins
-intacte : essais-j8/regle-c@sha256:0675bb54f17e4ce0c7dc93a4cebbcf64174fc790588088641fb7ef9774581877 ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
+intacte : essais-j8/regle-c@sha256:6497fd59f3a0afa390af22ab3b919b4c92f3e9d609324728641b3aca9229ed4a ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
-sans-kata : essais-j8/regle-c@sha256:8b8a95c5eedf810677673269c799d46d6dc06e324d2f763612ee005850ab3a9f ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
+sans-kata : essais-j8/regle-c@sha256:b7417255972a9bf2dad5c868748f0693aba95336ee25ed0b8500f435ccecfdf0 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
-runc : essais-j8/regle-c@sha256:4dddb7efb3b24e54b63333ccf01ad3147c7d93b57fe0de30add06828b9a60cc3 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
+runc : essais-j8/regle-c@sha256:7ea05065dcdf07003dd25b68b42432107bf5950b37a306a24676c4381658b9a2 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
   sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
 ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
 ## verdicts de la porte
-  VERDICT|reglec-reel|false|slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|ok|2/2 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+  VERDICT|reglec-reel|false|slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|61|ok|2/2 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: 
 OK   réelle : porte.construction_kata parmi les succès
-  VERDICT|reglec-intacte|false|slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
+  VERDICT|reglec-intacte|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|61|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c
 OK   intacte : violations de l'image réelle plus subject_build_task_matches, porte.construction_kata parmi les succès
-  VERDICT|reglec-sans-kata|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
+  VERDICT|reglec-sans-kata|false|porte.construction_kata,porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|60|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c
 OK   sans-kata : refusée, violations d'intacte plus porte.construction_kata seule
   motif sans-kata : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "" dans la spec signée, kata exigé
-  VERDICT|reglec-runc|false|porte.construction_kata,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|31|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: 
+  VERDICT|reglec-runc|false|porte.construction_kata,porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|61|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c
 OK   runc : refusée, violations d'intacte plus porte.construction_kata seule
   motif runc : TaskRun j7-sample-app-construire de construire-image : runtimeClassName "runc" dans la spec signée, kata exigé
 ## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)
-  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|26/26 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|26/26 enveloppe(s) couverte(s), 29 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
 CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)
 ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 (2026-11-02T13:59:30Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)

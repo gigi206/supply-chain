@@ -1,5 +1,5 @@
-# journalisation.sh openbao_sortie, 2026-11-02T21:02:44Z
-["fichier/"]
+# journalisation.sh openbao_sortie, 2026-11-03T22:35:29Z
+["fichier/","sortie/"]
 configmap/openbao-config serverside-applied
 config.hcl vue par le pod, mentions de "sortie" : 1
 {"chemin":"fichier/","type":"file","fichier":"/openbao/data/audit.log"}

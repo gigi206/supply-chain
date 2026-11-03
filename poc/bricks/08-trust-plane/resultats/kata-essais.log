@@ -1,4 +1,4 @@
-# kata.sh essais, 2026-11-02T13:47:15Z
+# kata.sh essais, 2026-11-03T21:08:14Z
 ## prédiction
 runc : noyau de sc-build (6.12.113+deb13-amd64), seccomp filtré (Seccomp: 2), x86-64-v3 pris en charge, v4 non, aucun drapeau avx512
 kata : noyau de l'invité 6.18.56, 1 vCPU, MemTotal sous 2048 Mio, Seccomp: 0 (disable_guest_seccomp), x86-64-v3 pris en charge, v4 non

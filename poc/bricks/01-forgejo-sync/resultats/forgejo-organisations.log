@@ -1,5 +1,3 @@
-# forgejo.sh organisations, 2026-11-02T14:42:16Z
-curl: (22) The requested URL returned error: 404
-curl: (22) The requested URL returned error: 404
+# forgejo.sh organisations, 2026-11-03T22:30:15Z
 équipe mirror/synchro (4) : {"permission":"write","includes_all_repositories":true,"units":["repo.code"]} ; membres : poc-sync
 équipe amont-essai/ecriture (5) : membres : poc-amont

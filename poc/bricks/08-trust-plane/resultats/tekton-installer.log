@@ -1,4 +1,4 @@
-# tekton.sh installer, 2026-11-02T13:16:45Z
+# tekton.sh installer, 2026-11-03T20:37:30Z
 ## références d'images restantes hors de Zot dans les manifestes rendus
       1 gcr.io/tekton-releases/catalog/upstream/*
       1 gcr.io/tekton-releases/catalog/upstream/git-clone
@@ -24,14 +24,14 @@ OK   ClusterRoleBindings *-tenant-access introuvables (NotFound) ; RoleBindings 
   tekton-pipelines-controller-tenant-access ClusterRole/tekton-pipelines-controller-tenant-access
   tekton-chains-controller-tenant-access ClusterRole/tekton-chains-controller-tenant-access
 OK   ValidatingAdmissionPolicy tekton-controleurs-builds posée, vérifiée par l'API (aucun avertissement de typage)
-tekton-pipelines tekton-events-controller-747c585746-vd59m Running sc-confiance
-tekton-pipelines tekton-pipelines-controller-65d4c9d57b-fd4n9 Running sc-confiance
-tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-mnsm5 Running sc-confiance
-tekton-pipelines tekton-triggers-controller-8449556669-zx5bz Running sc-confiance
-tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-422md Running sc-confiance
-tekton-pipelines tekton-triggers-webhook-5d67f65bf8-zz2xb Running sc-confiance
-tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-6mb6l Running sc-confiance
-tekton-chains tekton-chains-controller-7b5dd49868-74992 Running sc-confiance
+tekton-pipelines tekton-events-controller-747c585746-2mnps Running sc-confiance
+tekton-pipelines tekton-pipelines-controller-65d4c9d57b-mq6j9 Running sc-confiance
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-bznzv Running sc-confiance
+tekton-pipelines tekton-triggers-controller-8449556669-b86pd Running sc-confiance
+tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-xph28 Running sc-confiance
+tekton-pipelines tekton-triggers-webhook-5d67f65bf8-f5vjl Running sc-confiance
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-7hchv Running sc-confiance
+tekton-chains tekton-chains-controller-7b5dd49868-bn5xx Running sc-confiance
 ## images réellement tirées (imageID des conteneurs)
 sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller@sha256:2200972dcead…
 sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36@sha256:922d86c3f230…

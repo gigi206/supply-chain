@@ -1,14 +1,11 @@
-# observabilite.sh lecture_seule, 2026-11-02T17:02:57Z
+# observabilite.sh lecture_seule, 2026-11-03T22:36:52Z
 POST /api/v1/admin/tsdb/delete_series : HTTP 500
 POST /-/reload : HTTP 403
 POST /-/quit : HTTP 403
 POST /api/v1/write : HTTP 404
 ## écoute
-127.0.0.1:9095 users:(("python3",pid=28915,fd=3))
-127.0.0.1:9093 users:(("alertmanager",pid=28996,fd=4))
-127.0.0.1:9090 users:(("prometheus",pid=29050,fd=7))
-127.0.0.1:9101 users:(("python3",pid=28953,fd=3))
+127.0.0.1:9101 users:(("python3",pid=20758,fd=3))
+127.0.0.1:9090 users:(("prometheus",pid=20856,fd=7))
+127.0.0.1:9095 users:(("python3",pid=20720,fd=3))
+127.0.0.1:9093 users:(("alertmanager",pid=20802,fd=4))
 active
-{"status":"error","errorType":"unavailable","error":"admin APIs disabled"}
-{"status":"error","errorType":"unavailable","error":"admin APIs disabled"}
-{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1793638982.676,"8"]}]}}

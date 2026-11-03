@@ -1,4 +1,4 @@
-# stockage.sh pki, 2026-11-02T13:12:02Z
+# stockage.sh pki, 2026-11-03T20:32:56Z
 subject=O=supply-chain PoC, CN=CA du PoC (brique 08)
 notAfter=Oct 29 16:39:08 2027 GMT
 sha256 Fingerprint=D6:8A:15:A3:82:85:2F:6A:03:93:DA:51:F8:A7:E8:89:4D:F4:2A:B8:34:92:BF:60:C3:9B:6F:0B:B4:37:72:0A
@@ -20,35 +20,67 @@ forgejo : certificat existant
 subject=O=supply-chain PoC, CN=sc-stockage.poc.test notAfter=Apr 27 16:39:15 2027 GMT X509v3 Subject Alternative Name: DNS:sc-stockage.poc.test, IP Address:192.168.161.13
 OK   certificat registre.exemple.org signé par la CA : refusé (permitted subtree violation)
 ~/.cache/supply-chain-poc/08/pki:
-total 36
+total 80
+-rw-rw-r-- 1 gigi gigi  814 Nov  2 22:02 alloy-sc-build.crt
+-rw-rw-r-- 1 gigi gigi  826 Nov  2 22:02 alloy-sc-confiance.crt
+-rw-rw-r-- 1 gigi gigi  802 Nov  2 22:02 alloy-stockage.crt
 -rw-rw-r-- 1 gigi gigi  765 Oct 29 17:39 ca-poc.crt
+-rw-rw-r-- 1 gigi gigi  737 Nov  2 22:02 ca-sc-build.crt
+-rw-rw-r-- 1 gigi gigi  749 Nov  2 22:02 ca-sc-confiance.crt
+-rw-rw-r-- 1 gigi gigi  782 Nov  2 21:51 controle.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 forgejo.crt
+-rw-rw-r-- 1 gigi gigi  798 Nov  2 21:51 grafana-client.crt
+-rw-rw-r-- 1 gigi gigi  778 Nov  2 21:51 grafana.crt
+-rw-rw-r-- 1 gigi gigi  794 Nov  3 09:55 loki-interne.crt
+-rw-rw-r-- 1 gigi gigi  778 Nov  2 21:51 loki.crt
 -rw-rw-r-- 1 gigi gigi  806 Oct 29 18:55 openbao.crt
--rw-rw-r-- 1 gigi gigi  178 Nov  2 12:41 taches.pub
--rw-rw-r-- 1 gigi gigi 1361 Nov  2 12:32 tsa-chaine.pem
--rw-rw-r-- 1 gigi gigi  709 Nov  2 12:32 tsa-feuille.crt
--rw------- 1 gigi gigi 1603 Nov  2 12:32 tsa-racine-confiance.json
+-rw-rw-r-- 1 gigi gigi  778 Nov  2 22:02 relais.crt
+-rw-rw-r-- 1 gigi gigi  178 Nov  2 14:26 taches.pub
+-rw-rw-r-- 1 gigi gigi 1361 Nov  2 14:18 tsa-chaine.pem
+-rw-rw-r-- 1 gigi gigi  709 Nov  2 14:18 tsa-feuille.crt
+-rw------- 1 gigi gigi 1603 Nov  2 14:18 tsa-racine-confiance.json
 -rw-rw-r-- 1 gigi gigi  652 Oct 29 21:07 tsa-racine.crt
 -rw-rw-r-- 1 gigi gigi  778 Oct 29 17:39 zot.crt
 
 ~/.cache/supply-chain-poc/08/secrets:
-total 76
+total 160
+-rw------- 1 gigi gigi 944 Nov  2 22:02 alloy-evenements.token
+-rw------- 1 gigi gigi 241 Nov  2 22:02 alloy-sc-build.key
+-rw------- 1 gigi gigi 241 Nov  2 22:02 alloy-sc-confiance.key
+-rw------- 1 gigi gigi 241 Nov  2 22:02 alloy-stockage.key
 -rw------- 1 gigi gigi 241 Oct 29 17:39 ca-poc.key
--rw------- 1 gigi gigi  33 Nov  2 12:26 forgejo-admin.password
--rw------- 1 gigi gigi  41 Nov  2 12:26 forgejo-admin.token
+-rw------- 1 gigi gigi 241 Nov  2 22:02 ca-sc-build.key
+-rw------- 1 gigi gigi 241 Nov  2 22:02 ca-sc-confiance.key
+-rw------- 1 gigi gigi 241 Nov  2 21:51 controle.key
+-rw------- 1 gigi gigi  33 Nov  2 14:13 forgejo-admin.password
+-rw------- 1 gigi gigi  41 Nov  2 14:13 forgejo-admin.token
+-rw------- 1 gigi gigi  41 Nov  2 15:42 forgejo-poc-amont.token
+-rw------- 1 gigi gigi  41 Nov  2 15:42 forgejo-poc-dev.token
+-rw------- 1 gigi gigi  41 Nov  2 15:42 forgejo-poc-sync.token
+-rw------- 1 gigi gigi  64 Nov  2 16:17 forgejo-webhook-sync.secret
 -rw------- 1 gigi gigi  64 Oct 29 19:59 forgejo-webhook.secret
 -rw------- 1 gigi gigi 241 Oct 29 17:39 forgejo.key
+-rw------- 1 gigi gigi  32 Nov  2 21:51 grafana-admin.password
+-rw------- 1 gigi gigi  32 Nov  2 21:51 grafana-auditeur.password
+-rw------- 1 gigi gigi 241 Nov  2 21:51 grafana-client.key
+-rw------- 1 gigi gigi 241 Nov  2 21:51 grafana.key
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-agent
--rw------- 1 gigi gigi 139 Nov  2 14:11 k3s-jeton-agent-securise
+-rw------- 1 gigi gigi 139 Nov  3 21:32 k3s-jeton-agent-securise
 -rw------- 1 gigi gigi  65 Oct 29 17:19 k3s-jeton-serveur
--rw------- 1 gigi gigi  44 Nov  2 12:27 openbao-descellement.b64
--rw------- 1 gigi gigi  64 Nov  2 12:27 openbao-descellement.hex
--rw------- 1 gigi gigi  26 Nov  2 12:27 openbao-root.token
+-rw------- 1 gigi gigi 241 Nov  3 09:55 loki-interne.key
+-rw------- 1 gigi gigi 241 Nov  2 21:51 loki.key
+-rw------- 1 gigi gigi  44 Nov  2 14:14 openbao-descellement.b64
+-rw------- 1 gigi gigi  64 Nov  2 14:14 openbao-descellement.hex
+-rw------- 1 gigi gigi  26 Nov  2 14:14 openbao-root.token
 -rw------- 1 gigi gigi 241 Oct 29 18:55 openbao.key
+-rw------- 1 gigi gigi 952 Nov  2 18:02 prometheus-lecture.token
+-rw------- 1 gigi gigi 241 Nov  2 22:02 relais.key
 -rw------- 1 gigi gigi 241 Oct 29 23:06 taches.key
 -rw------- 1 gigi gigi 241 Oct 29 21:07 tsa-racine.key
 -rw------- 1 gigi gigi  48 Oct 29 19:30 zot-poc-build.password
 -rw------- 1 gigi gigi  48 Oct 29 17:39 zot-poc-ecriture.password
+-rw------- 1 gigi gigi  48 Nov  3 19:17 zot-poc-fermetures.password
 -rw------- 1 gigi gigi  48 Oct 29 21:04 zot-poc-horodatage.password
 -rw------- 1 gigi gigi  48 Oct 30 16:47 zot-poc-images.password
+-rw------- 1 gigi gigi  48 Nov  2 18:39 zot-poc-metriques.password
 -rw------- 1 gigi gigi 241 Oct 29 17:39 zot.key

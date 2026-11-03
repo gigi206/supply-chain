@@ -341,3 +341,11 @@ Le correctif amont `b1c0af9` (#1834) n'est dans aucune release, ni dans aucune b
 ## O5 : déplacé dans la brique 19b
 
 L'exigence du propriétaire du 02/11/2026 (« absolument tout doit être loggé dans grafana pour auditer ») est traitée par une brique distincte, **19b, journalisation d'audit** (décision D12, retenue par le propriétaire). Protocole, audit des outils et décisions : [README de la 19b](../19b-journalisation/README.md). Les relevés de santé ([`o5-sante.log`](resultats/o5-sante.log), [`o5-scorecard.md`](resultats/o5-scorecard.md)) restent ici, sous leur nom d'origine. D3 (Grafana reporté) est levée par D8.
+
+## Additif du 03/11/2026, 22:43 UTC : rejouée de zéro dans le rejeu `complet` de la 08
+
+O2 (sans `telecharger`) et O3 (`regles deployer`) ont été rejoués sur une plateforme neuve, sans KO :
+[`rejeu-complet.log`](../08-trust-plane/resultats/rejeu-complet.log) de la 08.
+- Ordre : la 01 d'abord (groupe `synchro`), puis `certificats compte installer`. `cibles`, `lecture_seule` et les règles
+  passent après Alloy (19b, L3).
+- `reference`, O4 et les correctifs de Chains ont été sautés : ce sont des mesures.

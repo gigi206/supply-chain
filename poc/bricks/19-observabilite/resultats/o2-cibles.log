@@ -1,5 +1,6 @@
-# observabilite.sh cibles, 2026-11-02T17:40:03Z
+# observabilite.sh cibles, 2026-11-03T22:36:16Z
 alertmanager	up	
+alloy	up	
 chains	up	
 fichiers	up	
 forgejo	up	
@@ -76,6 +77,12 @@ zot	up
   vault_audit_log_response_count
   vault_audit_log_response_failure
   vault_audit_log_response_sum
+  vault_audit_sortie__log_request
+  vault_audit_sortie__log_request_count
+  vault_audit_sortie__log_request_sum
+  vault_audit_sortie__log_response
+  vault_audit_sortie__log_response_count
+  vault_audit_sortie__log_response_sum
   vault_autopilot_failure_tolerance
   vault_autopilot_healthy
   vault_autopilot_node_healthy
@@ -113,15 +120,9 @@ zot	up
   vault_core_handle_request_sum
   vault_core_in_flight_requests
   vault_core_locked_users
+  vault_core_mount_table_num_entries
+  vault_core_mount_table_size
   vault_core_post_unseal
-  vault_core_post_unseal_count
-  vault_core_post_unseal_sum
-  vault_core_pre_seal
-  vault_core_pre_seal_count
-  vault_core_pre_seal_sum
-  vault_core_unseal
-  vault_core_unseal_count
-  vault_core_unseal_sum
 ## zot : noms des métriques
   zot_gc_duration_seconds_count
   zot_gc_duration_seconds_sum
@@ -134,6 +135,7 @@ zot	up
   zot_info
   zot_repo_downloads_total
   zot_repo_storage_bytes
+  zot_repo_uploads_total
   zot_scheduler_generators_status
   zot_scheduler_generators_total
   zot_scheduler_tasksqueue_length
@@ -174,6 +176,7 @@ zot	up
   gitea_webhooks
 ## fichiers : noms des métriques
   certificat_expiration_timestamp_seconds
+  disque_utilise_ratio
   sync_dernier_run_statut
   sync_derniere_reecriture_timestamp_seconds
   sync_derniere_reussite_timestamp_seconds
