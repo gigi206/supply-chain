@@ -43,7 +43,7 @@ Premier passage de `verifier_entrees` archivé ([`r3-verifier_entrees-premier-pa
 Le script est corrigé, et le second passage donne **0 KO**.
 
 1. **Transport** : conforme. Lectures anonymes seulement ; 77 Mo dans la VM.
-2. **Bundles** : **écart**. Il y a **43** bundles horodatés pour `3a7ca1b1`, et non 6. Le tag `.att` ne garde que 6 enveloppes, mais les builds successifs donnent le même digest, et l'horodatage a gardé un bundle par enveloppe rencontrée. Les 43 se vérifient hors réseau, et un seul contient `d9006af7…`.
+2. **Bundles** : **écart**. Il y a **43** bundles horodatés pour `3a7ca1b1`, et non 6. Le tag `.att` ne porte aujourd'hui que 6 enveloppes, alors que les 43 bundles ont 43 `invocationId` distincts. Une explication possible est que l'horodatage garde un bundle par enveloppe rencontrée, même si le tag `.att` a été réécrit depuis. Elle n'est **pas vérifiée**. Les 43 se vérifient hors réseau, et un seul contient `d9006af7…`.
 3. **Politique, section 1** : conforme.
 4. **Digests et commit** : conforme. Les quatre entrées concordent, et `main` vaut `6391fd43…`, avec un arbre propre.
 5. **Recette** : conforme. Le sha256 du Dockerfile, `d56985c1…`, est égal à celui que la tâche contrôle **et** à celui de `poc/bricks/04-hermetic-repro/Dockerfile`. Il contient un seul `RUN`, en `--network=none`.
