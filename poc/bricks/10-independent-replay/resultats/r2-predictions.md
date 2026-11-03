@@ -31,3 +31,24 @@ Accord du propriétaire : « Oui, lancer R2 ». Réseau distinct, BuildKit sur e
 
 - Le root de l'hôte peut lire le disque de la VM, clé de VSA comprise (D2 a).
 - Le compte `replay` a sudo sans mot de passe : c'est l'administrateur du domaine, c'est-à-dire le propriétaire (D1 b).
+
+## Additif du 03/11/2026, après l'exécution (10:00 à 10:02 UTC)
+
+1. **`vm`** : conforme.
+   - Image Debian `OK` (sha512) ; pool, réseau et VM créés.
+   - SSH joignable avec la clé d'hôte attendue **9 s** après le démarrage.
+   - VM de 4 vCPU, 6 Gi (`free -g` affiche 5) et 20 Go, sous Debian 13.
+   - Les trois VM du PoC gardent leurs identifiants de domaine (122, 123, 124) ; `supply-chain-poc` est actif, avec ses 3 baux fixes.
+2. **`isolement`** : **conforme, avec un écart**.
+   - Zot (`192.168.161.13:5000`), Forgejo (`:3000`) et l'API de k3s (`192.168.161.11:6443`) sont **injoignables**. L'extérieur est joignable (HTTP 200).
+   - Écart : `192.168.161.1:22` est **joignable**. Ce n'est pas une VM du PoC : c'est l'adresse de **l'hôte** sur le pont `virbr-scpoc`. Le sshd du laptop écoute sur `0.0.0.0`, et la VM l'atteint par l'hôte.
+   - Relevé de l'hôte (`ss -ltn`) : il écoute aussi sur `0.0.0.0` ou `*` pour 111 et 2049 (NFS), 22000 et plusieurs ports RPC. Toute VM, celles du PoC comprises, peut les joindre.
+   - Ce n'est pas un chemin vers le plan de confiance, mais une surface de l'hôte. La configuration du poste n'est pas modifiée ; c'est consigné pour le propriétaire.
+3. **`paquets`** : conforme. `busybox-static 1:1.37.0-6+b9` et `diffoscope-minimal 297+deb13u1`. Aucun « warning », « untrusted » ni « unauthenticated » dans la sortie d'apt.
+4. **`outils`** : conforme.
+   - Cinq empreintes `OK` dans la VM.
+   - BuildKit `v0.25.2` (`dcc0fe5e`), runc 1.3.3, cosign v3.1.4, oras 1.3.6, `go version go1.26.10 linux/amd64`.
+5. **`cle_vsa`** : conforme.
+   - `mot-de-passe`, `cosign.key` et `cosign.pub` en 600, propriété de `replay`.
+   - Clé ECDSA **P-256** (`prime256v1`), d'empreinte DER `578dd771…`, différente de celle de Chains (`ecf50485…`).
+   - [`vsa-cle-publique.pem`](vsa-cle-publique.pem).

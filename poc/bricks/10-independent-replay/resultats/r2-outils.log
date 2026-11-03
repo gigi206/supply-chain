@@ -1,0 +1,14 @@
+# replay.sh outils, 2026-11-03T10:01:43Z
+## empreintes vérifiées dans la VM
+buildkit-v0.25.2.linux-amd64.tar.gz: OK
+runc.amd64: OK
+cosign-linux-amd64: OK
+oras_1.3.6_linux_amd64.tar.gz: OK
+go1.26.10.linux-amd64.tar.gz: OK
+## versions
+buildctl github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e
+buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e
+runc version 1.3.3
+GitVersion:    v3.1.4
+Version:        1.3.6
+go version go1.26.10 linux/amd64

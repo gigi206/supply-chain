@@ -191,3 +191,19 @@ En R2, chaque archive est revérifiée **dans la VM** après la copie : le domai
 - **réseau distinct** `supply-chain-replay`, entrées transportées par l'hôte et vérifiées dans la VM ;
 - **BuildKit 0.25.2 accepté sur sa seule empreinte**, exception consignée comme pour tkn. crane et rootlesskit sont retirés de la VM : oras, signé, couvre manifestes et blobs, et BuildKit tourne en root dans la VM dédiée ;
 - R2 lancé.
+
+## R2, exécuté (03/11/2026, 10:00 à 10:02 UTC, accord du propriétaire : « Oui, lancer R2 »)
+
+Commande : `JALON=r2 mise run replay -- vm isolement paquets outils cle_vsa`. Prédictions et additif : [`r2-predictions.md`](resultats/r2-predictions.md).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 1 | VM `sc-replay` (4 vCPU, 6 Gi, 20 Go, Debian 13) sur le réseau propre `supply-chain-replay` (`192.168.162.14`), avec pool et clés SSH du domaine. SSH en 9 s. Trois VM du PoC non touchées | conforme |
+| 2 | Zot, Forgejo et l'API de k3s **injoignables** depuis la VM ; l'extérieur joignable. **Écart** : le sshd de l'hôte (`192.168.161.1:22`) répond, et l'hôte expose aussi NFS (111, 2049), 22000 et des ports RPC sur toutes ses interfaces | conforme, avec un écart |
+| 3 | `busybox-static` et `diffoscope-minimal` installés par apt, sans avertissement de signature | conforme |
+| 4 | Cinq archives **revérifiées dans la VM** ; BuildKit 0.25.2, runc 1.3.3, cosign 3.1.4, oras 1.3.6, Go 1.26.10 | conforme |
+| 5 | Clé de VSA P-256 générée dans la VM (600, `replay`), différente de celle de Chains ; [clé publique](resultats/vsa-cle-publique.pem) | conforme |
+
+**Constat sur l'hôte**, hors du périmètre de la brique : les services du laptop qui écoutent sur toutes les interfaces (SSH, NFS, RPC, 22000) sont joignables depuis toutes les VM, celles du PoC comprises. Rien n'a été modifié sur le poste.
+
+**Suite, R3** : préchargement. Les entrées sont tirées par l'hôte, en lecture anonyme, sous forme de layouts OCI et d'un bundle git, puis transportées dans la VM et vérifiées par le domaine. La signature de la provenance est vérifiée d'abord, puis la recette et les digests.

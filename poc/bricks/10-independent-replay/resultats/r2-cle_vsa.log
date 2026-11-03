@@ -1,0 +1,8 @@
+# replay.sh cle_vsa, 2026-11-03T10:01:49Z
+600 replay mot-de-passe
+600 replay cosign.key
+600 replay cosign.pub
+Public-Key: (256 bit field, 128 bit security level)
+pub:
+empreinte sha256 de la clé publique de VSA : 578dd771bcedd5829267820e8cad77182e91184692843cf423b4942250d1e96a
+empreinte sha256 de la clé publique de Chains : ecf50485df721c83472bffee4cc2a0cb4b784e4bf1e635785385238eae83a1b8

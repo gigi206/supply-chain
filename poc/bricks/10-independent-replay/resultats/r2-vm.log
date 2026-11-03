@@ -1,0 +1,23 @@
+# replay.sh vm, 2026-11-03T10:00:36Z
+## VM du PoC avant : sc-confiance=122 sc-build=123 sc-stockage=124 
+debian-13-generic-amd64-20261026-2643.qcow2: OK
+Pool supply-chain-replay defined
+
+Pool supply-chain-replay built
+
+Pool supply-chain-replay started
+
+Network supply-chain-replay defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/10-independent-replay/libvirt/reseau.xml
+
+Network supply-chain-replay started
+
+
+
+Domain 'sc-replay' defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/10-independent-replay/libvirt/sc-replay.xml
+
+Domain 'sc-replay' started
+
+SSH de sc-replay (192.168.162.14) : joignable avec la clé d'hôte attendue, 9 s après le démarrage
+sc-replay : 4 vCPU, 5 Gi, 20G ; Debian GNU/Linux 13 (trixie)
+## VM du PoC après : sc-confiance=122 sc-build=123 sc-stockage=124 sc-replay=125 
+## réseau supply-chain-poc inchangé : 3 baux fixes, yes

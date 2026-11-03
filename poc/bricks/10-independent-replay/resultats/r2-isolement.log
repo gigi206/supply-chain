@@ -1,0 +1,10 @@
+# replay.sh isolement, 2026-11-03T10:00:48Z
+## routes de la VM
+default via 192.168.162.1 dev enp1s0 proto dhcp src 192.168.162.14 metric 100 
+192.168.162.0/24 dev enp1s0 proto kernel scope link src 192.168.162.14 metric 100 
+192.168.162.1 dev enp1s0 proto dhcp scope link src 192.168.162.14 metric 100 
+192.168.161.13:5000 : injoignable
+192.168.161.13:3000 : injoignable
+192.168.161.11:6443 : injoignable
+192.168.161.1:22 : JOIGNABLE
+extérieur, https://deb.debian.org : HTTP 200
