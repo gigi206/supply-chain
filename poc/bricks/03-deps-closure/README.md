@@ -52,3 +52,94 @@ Prérequis : un Zot local ([`zot-config.json`](zot-config.json), `dedupe: true`)
 - Tâches Tekton prefetch et build, avec la fermeture montée en lecture seule à un chemin fixe et son digest dans `resolvedDependencies` (brique 08).
 - Mesure sur **Traefik** (gomod + yarn berry) : taille, nombre de couches, partage entre deux tags proches ; tests d'altération pour **yarn berry**.
 - Dédoublonnage **entre dépôts** du registre (plusieurs projets partageant des modules) et politique de rétention (briques 15 et 12).
+
+## Suite sur le laptop : protocole proposé (03/11/2026, 16:12 UTC ; rien exécuté)
+
+Origine : choix du propriétaire du 03/11/2026, « Fermetures et images » (briques 03 et 04). Rien n'est installé, appliqué au cluster ni écrit dans Zot avant son accord sur ce protocole, puis sur chaque jalon.
+
+### Ce qui est déjà fait, tranché autrement, ou reste
+
+Les lignes « Fermetures » et « Images » de la doc 03 dataient d'avant la J7 de la 08, qui en a fait l'essentiel.
+
+| Point | État | Référence |
+|---|---|---|
+| BuildKit en pod | **Fait** (08, J7) : BuildKit v0.34.1 en root dans un pod Kata privilégié (voie A), image `3a7ca1b1` retrouvée | [`construction-construire.log`](../08-trust-plane/resultats/construction-construire.log), [`buildkit-sample_app.log`](../08-trust-plane/resultats/buildkit-sample_app.log) |
+| Rootless avec seccomp et AppArmor | **Tranché autrement** : rootless mesuré impossible sous Kata 4.3.1 (`newuidmap` sans capacités de fichier dans l'invité), voie A retenue par le propriétaire le 30/10/2026, voie B (`--xattr`) non poursuivie ; pas de seccomp dans l'invité (constat de J7) | [README de la 08](../08-trust-plane/README.md), section « Jalon J7 » |
+| Push dans une tâche séparée | **Fait** : `publier-image` (pod runc restreint, compte `poc-images`, création par digest seulement) | [`construction-compte.log`](../08-trust-plane/resultats/construction-compte.log) |
+| NetworkPolicy sans sortie | **Fait** : `construction-sans-sortie` sur les pods de `construire-image` ; test 6 de J8 sous Cilium | [`preuves-test6.log`](../08-trust-plane/resultats/preuves-test6.log) |
+| Digest de la fermeture dans `resolvedDependencies` | **Fait** : fermeture, `web/dist` et image de build déclarées par `preparer-entrees` | [`construction-provenance.log`](../08-trust-plane/resultats/construction-provenance.log) |
+| Fermeture en lecture seule | **En partie** : montée en lecture seule dans l'étape `RUN` (bind de BuildKit, [`Dockerfile`](../04-hermetic-repro/Dockerfile)), mais restaurée dans le workspace `sortie`, inscriptible, que l'étape privilégiée de `construire-image` partage avec `image.tar` (aucun `readOnly` dans [`construire-image.yaml`](../08-trust-plane/politique/taches/construire-image.yaml)) | D5 ci-dessous |
+| Prefetch dans Tekton | **Reste** : la fermeture de sample-app est préfetchée sur l'hôte (sortie de cette brique), poussée par `poc-ecriture` et épinglée par digest dans la pipeline signée | [`construction-entrees.log`](../08-trust-plane/resultats/construction-entrees.log) |
+| Chemins fixes | **Reste pour yarn et npm** : sans objet pour gomod tel que monté (`GOPROXY=file://`, image identique depuis un autre chemin) ; `web/dist` est construit hors de la chaîne | F1 |
+| Traefik (gomod et yarn berry), altération yarn | **Reste** | F1 |
+| Interface de Traefik construite dans l'image de build (Node) | **Hors périmètre proposé** : demande Node dans l'image de build (2c, brique 11) | — |
+| Entrées de l'image de build archivées par digest | **Hors périmètre proposé** : brique 11 | — |
+
+### Faits relevés pour ce protocole (lecture seule, 03/11/2026, 16:00 à 16:12 UTC)
+
+- **Traefik** : dernière release stable `v3.7.17` (30/10/2026), `v3.7.16` le 20/10/2026.
+  - L'interface (`webui/`) déclare `"packageManager": "yarn@4.18.0+sha512.fcb8716f…"`, sans binaire dans `.yarn/releases`. yarn passe donc par corepack.
+  - `.yarnrc.yml` : `nodeLinker: node-modules`, `enableScripts: false`. `.nvmrc` : Node `24.21.0`. Notre `mise.toml` épingle Node `22.22.0`.
+- **Hermeto 0.64.0** est toujours la dernière release (27/10/2026).
+  - Sa documentation au tag ([`docs/yarn.md`](https://github.com/hermetoproject/hermeto/blob/0.64.0/docs/yarn.md)) annonce yarn 1, 3 et 4, tous les protocoles sauf `exec`, et les dépendances git en mode `permissive` seulement.
+  - Les plugins non officiels sont désactivés. Le prefetch appelle en interne `yarn install --mode=skip-build` : **il lui faut un binaire yarn**, que le venv de `mise run outils:hermeto` ne contient pas.
+- **Images de Hermeto 0.64.0** :
+  - `quay.io/konflux-ci/hermeto@sha256:3c7a8622…` porte les tags `.sig`, `.att` et `.sbom` de son digest. La clé ou l'identité qui permet de les vérifier n'est pas établie.
+  - `ghcr.io/hermetoproject/hermeto@sha256:b941a525…` n'a aucun tag de signature ni aucun referrer listé par `oras discover`.
+- **Sortie réseau des pods de `builds`**, déduite des fichiers versionnés et non mesurée : la seule NetworkPolicy de `builds` sélectionne les pods de `construire-image`. Ceux de `preparer-entrees` et de `publier-image` n'ont aucune politique, donc aucune restriction de sortie. Le réseau libvirt `supply-chain-poc` est en NAT : les VM sortent sur Internet.
+
+### Jalons proposés (chacun soumis à accord)
+
+| # | Contenu | Où | Estimation |
+|---|---|---|---|
+| F1 | **Traefik sur l'hôte**, comme le banc de cette brique : prefetch gomod et yarn 4.18.0 de `v3.7.16` puis `v3.7.17` dans un Zot éphémère ; taille, couches, partage entre les deux tags ; restauration par digest **à un autre chemin** puis au même chemin (`yarn install --immutable` hors réseau, `go build` hors réseau) ; altérations : zip yarn de la fermeture, archive dans le registre, `yarn.lock` | hôte, `~/.cache/supply-chain-poc/03` | 0,25 pw |
+| F2 | **Prefetch de sample-app dans Tekton** (gomod et npm) selon D1 à D4 ; fermeture poussée par une tâche séparée ; deux prefetch du même commit : même arbre hors tuiles `sumdb` | cluster | 0,5 pw |
+| F3 | **Bascule de la construction** sur la fermeture produite par la plateforme (et D5) ; image comparée à `3a7ca1b1` ; provenance (fermeture par digest, provenance du prefetch retrouvée) ; tests négatifs : fermeture absente, altérée, ou poussée hors de la plateforme | cluster | 0,25 pw |
+
+Total : **1 pw**. Décision avec le propriétaire à **2 pw**. Le temps passé avant ce protocole sur les parties locales des briques 03 et 04 (estimées à 1 et 1,5 pw au [README](../../../README.md)) n'a pas été relevé.
+
+### Décisions soumises au propriétaire
+
+- **D1. Place du prefetch.**
+  - (a) **Pipeline de prefetch séparée**, recommandé. Elle pousse la fermeture et Chains signe sa provenance. La pipeline de construction reste épinglée sur le digest de la fermeture, mis à jour par une nouvelle signature de la pipeline, et la construction garde ses entrées revues et sans sortie réseau. C'est le prefetch archivé qui sert au replay (constat des tuiles `sumdb`).
+  - (b) **Tâche dans la pipeline `sample-app`**, dont le digest passe en résultat. La provenance du PipelineRun couvre le prefetch, mais la fermeture n'est plus revue, et le modèle de confiance de la porte change : une fermeture épinglée dans une pipeline signée devient une fermeture produite à chaque build.
+- **D2. Sortie du pod de prefetch.**
+  - (a) **`toFQDNs` de Cilium**, recommandé : DNS, `proxy.golang.org`, `sum.golang.org` et `registry.npmjs.org` seulement. Les noms exacts seront relevés pendant F1 (trace des connexions de Hermeto).
+  - (b) Sortie vers Internet hors des plages privées.
+  - Dans les deux cas : aucune entrée, ni Zot ni Forgejo en écriture, et des témoins refusés (autre nom, adresse du cluster).
+- **D3. Écriture de la fermeture.** Aucun secret dans le pod de prefetch (doc 04 : « prefetch isolé sans secrets »). La fermeture passe par le workspace jusqu'à une tâche `publier-fermeture` (pod runc restreint).
+  - (a) **Nouveau compte Zot `poc-fermetures`**, recommandé : création par digest seulement, dans `entrees/**`, sous la même condition CEL que `poc-images`.
+  - (b) Étendre `poc-images` à `entrees/**`.
+  - Dans les deux cas, Zot est modifié et redémarré : accord à part.
+- **D4. Image d'outils du prefetch.**
+  - (a) **Image construite par la plateforme**, recommandé, comme l'image de build de la 04 : venv de Hermeto 0.64.0 installé par hash, Python 3.13, Go 1.26.10 de la 04 (gomod), Node 22.22.0 et yarn 4.18.0 (empreinte `sha512` du `packageManager`). Elle est construite par BuildKit, deux fois au même digest, puis poussée dans Zot. Ses entrées sont listées par digest dans le journal.
+  - (b) **`quay.io/konflux-ci/hermeto` épinglée par digest**, après avoir établi la clé de ses `.sig` et `.att` et les avoir vérifiées.
+- **D5. Fermeture en lecture seule dans le pod de construction.**
+  - (a) **Workspace `entrees` séparé**, monté `readOnly` dans `construire-image`, recommandé : `image.tar` reste dans `sortie`. Les tâches sont re-signées et la liste revue est mise à jour.
+  - (b) En rester au bind en lecture seule de BuildKit.
+
+### Accords demandés avant chaque jalon
+
+- **F1** :
+  - **téléchargement de yarn 4.18.0** par corepack, depuis `registry.npmjs.org`, dans `~/.cache/supply-chain-poc/` et non dans le système, avec contrôle du `sha512` du `packageManager` ;
+  - sources de Traefik clonées par tag, commit relevé ;
+  - Zot éphémère local, déjà utilisé par `mise run bancs`.
+  - Rien n'est installé dans le système.
+- **F2** :
+  - image d'outils (D4) ;
+  - NetworkPolicy de sortie (D2) ;
+  - compte Zot (D3) ;
+  - tâches et pipeline signées, avec leurs digests ajoutés à la liste revue de la porte.
+- **F3** :
+  - pipeline `sample-app` re-signée ;
+  - PipelineRun réel ;
+  - gabarit en service inchangé tant que le propriétaire n'a pas accordé la bascule.
+
+Chaque jalon commence par des prédictions datées (`date -u`), archivées dans `resultats/`. Les passages ratés y sont conservés.
+
+### Points à vérifier en cours de jalon (non supposés)
+
+- Hermeto avec yarn 4.18.0 sous Node 22.22.0 alors que `.nvmrc` demande Node 24.21.0 : la fermeture en dépend-elle ? La construction de l'interface reste hors périmètre.
+- Les chemins absolus de la fermeture yarn : le prefetch et la restauration doivent-ils se faire au même chemin, comme pour npm ? La restauration à un autre chemin est faite en premier.
+- La détection d'une altération par yarn hors réseau (somme de `yarn.lock` ou du cache) : prédite en F1 après lecture du code de yarn 4.18.0, pas supposée.
+- Les noms de domaine contactés par le prefetch, relevés en F1, avant d'écrire la règle `toFQDNs`.

@@ -59,6 +59,8 @@ L'écart de l'image **de build** vient donc d'une **entrée** (busybox statique 
 
 ## Reste à faire sur le laptop
 
+**Additif du 03/11/2026** : BuildKit en pod, la tâche de push séparée et la NetworkPolicy sans sortie sont faits en J7 de la 08 (voie A : root dans un pod Kata privilégié, le rootless étant mesuré impossible sous Kata). La suite est au [protocole du 03/11/2026 de la brique 03](../03-deps-closure/README.md), section « Suite sur le laptop ».
+
 - BuildKit **en pod** (rootless, déjà validé hors pod sur le laptop, ou Kata) dans une tâche Tekton, avec push dans une tâche séparée ; sujets et `resolvedDependencies` de la provenance Chains (B-5, brique 08).
 - ~~2 hôtes à ≥ 1 h d'écart~~ : fait (cloud, laptop) ; reste le replay indépendant (brique 10).
 - Traefik : gomod + yarn berry, interface construite dans l'image de build.
