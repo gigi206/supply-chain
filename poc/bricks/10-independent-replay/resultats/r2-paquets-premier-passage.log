@@ -1,0 +1,8 @@
+# replay.sh paquets, 2026-11-03T10:01:02Z : journal RECONSTITUÉ depuis la sortie du terminal (le journal d'origine a été
+# écrasé le 03/11 à 10:18 UTC par le second passage, qui ajoute git pour R3). Versions non épinglées à ce premier passage.
+Fetched 28.6 MB in 32s (881 kB/s)
+Setting up busybox-static (1:1.37.0-6+b9) ...
+Setting up diffoscope-minimal (297+deb13u1) ...
+busybox-static 1:1.37.0-6+b9
+diffoscope-minimal 297+deb13u1
+paquets installés en tout : 327

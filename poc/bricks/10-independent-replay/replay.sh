@@ -15,8 +15,16 @@
 #   paquets          busybox-static et diffoscope-minimal par apt (signatures de l'archive Debian), sans recommandés ;
 #                    versions épinglées (celles mesurées au premier passage de R2)
 #   outils           archives copiées puis revérifiées DANS la VM (empreintes fixées ci-dessous) ; installation
+#                    git ajouté le 03/11/2026 pour R3 (accord du propriétaire : « Installer git »)
 #   cle_vsa          paire cosign générée dans la VM par replay (mot de passe aléatoire 0600, jamais sorti) ; clé publique
 #                    copiée dans resultats/vsa-cle-publique.pem
+# Jalon R3 (JALON=r3), préchargement :
+#   transporter      SUR L'HÔTE, transport non fiable : copies anonymes (oras) de l'image, de son tag .att, des bundles
+#                    horodatés et des entrées déclarées dans un layout OCI ; bundle git de main (Forgejo, sans compte) ;
+#                    ancres de confiance du dépôt (clé de Chains, chaîne de la TSA) ; le tout copié dans la VM (~/r3)
+#   verifier_entrees DANS LA VM : bundles horodatés vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA) ; provenance
+#                    extraite d'un bundle vérifié ; politique, section 1 ; digests des entrées ; commit ; recette extraite du
+#                    bundle construire-image ; version de Go ; heures du build (signée et horodatée)
 #
 # Usage (racine du dépôt) : JALON=r2 mise run replay -- <étape>…   (journal : resultats/<jalon>-<étape>.log)
 set -euo pipefail
@@ -225,8 +233,8 @@ etape_paquets() {
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update 2>&1 | grep -viE '^(Hit|Get|Reading)' || true
-apt-get install -y --no-install-recommends busybox-static=1:1.37.0-6+b9 diffoscope-minimal=297+deb13u1 2>&1 | grep -iE 'warning|untrusted|unauthenticated|^Setting up (busybox-static|diffoscope)' || true
-dpkg-query -W -f='${Package} ${Version}\n' busybox-static diffoscope-minimal
+apt-get install -y --no-install-recommends busybox-static=1:1.37.0-6+b9 diffoscope-minimal=297+deb13u1 git=1:2.47.3-0+deb13u1 2>&1 | grep -iE 'warning|untrusted|unauthenticated|^Setting up (busybox-static|diffoscope|git) ' || true
+dpkg-query -W -f='${Package} ${Version}\n' busybox-static diffoscope-minimal git
 echo "paquets installés en tout : $(dpkg-query -W | wc -l)"
 EOS
 }
@@ -268,6 +276,43 @@ EOS
   openssl pkey -pubin -in "$R/vsa-cle-publique.pem" -noout -text | head -2
   echo "empreinte sha256 de la clé publique de VSA : $(openssl pkey -pubin -in "$R/vsa-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)"
   echo "empreinte sha256 de la clé publique de Chains : $(openssl pkey -pubin -in "$racine_depot/poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)"
+}
+
+URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp   # identifiant de la TSA dans la racine
+
+etape_transporter() {
+  local x=$W/r3 l t n
+  rm -rf -- "${x:?}" && mkdir -p "$x/layout" && chmod 0700 "$x"
+  oc() { oras copy --from-ca-file "$CA_POC" "$ZOT_POC/$1" --to-oci-layout "$x/layout:$2" > /dev/null && echo "copié : $1 -> $2"; }
+  oc "${IMAGE%@*}@${IMAGE#*@}" sujet
+  oc "${IMAGE%@*}:$(echo "${IMAGE#*@}" | tr : -).att" att
+  n=0
+  for t in $(oras repo tags --ca-file "$CA_POC" "$ZOT_POC/horodatage/bundles" | grep "^${IMAGE#*@sha256:}-"); do
+    n=$((n + 1)); oc "horodatage/bundles:$t" "bundle-${t##*-}"
+  done
+  echo "bundles horodatés de l'image : $n"
+  # digests des entrées lus dans la provenance NON vérifiée (transport seulement ; la VM vérifie)
+  for l in $(oras manifest fetch --ca-file "$CA_POC" "$ZOT_POC/${IMAGE%@*}:$(echo "${IMAGE#*@}" | tr : -).att" \
+             | python3 -I -c 'import json,sys; print(" ".join(x["digest"] for x in json.load(sys.stdin)["layers"]))'); do
+    oras blob fetch --ca-file "$CA_POC" --output - "$ZOT_POC/${IMAGE%@*}@$l" | python3 -I "$here/outils/entrees.py" "$INVOCATION" >> "$x/entrees.txt"
+  done
+  while read -r nom depot d; do oc "$depot@sha256:$d" "$nom"; done < "$x/entrees.txt"
+  rm -f "$x/entrees.txt"
+  rm -rf "$x/git" && GIT_TERMINAL_PROMPT=0 git -c http.sslCAInfo="$CA_POC" clone -q --mirror "https://${ZOT_POC%:*}:3000/workspace/sample-app.git" "$x/git"
+  git -C "$x/git" bundle create -q "$x/sample-app.bundle" main && rm -rf "$x/git"
+  echo "bundle git : $(du -h "$x/sample-app.bundle" | cut -f1)"
+  cp "$racine_depot/poc/bricks/08-trust-plane/resultats/chains-cle-publique.pem" "$x/chains.pub"
+  cp "$racine_depot/poc/bricks/08-trust-plane/resultats/tsa-chaine.pem" "$x/tsa-chaine.pem"
+  cp "$here/outils/verifier_entrees.py" "$x/"
+  ( cd "$x" && sha256sum chains.pub tsa-chaine.pem sample-app.bundle verifier_entrees.py && tar -cf r3.tar layout chains.pub tsa-chaine.pem sample-app.bundle verifier_entrees.py )
+  sur 'rm -rf ~/r3 && mkdir -m 0700 ~/r3'
+  scp -q "${SSH_OPTS[@]}" "$x/r3.tar" "replay@$VM_IP:r3/"
+  sur 'cd ~/r3 && tar -xf r3.tar && rm r3.tar && du -sh ~/r3 | cut -f1 | sed "s/^/taille dans la VM : /"'
+  rm -rf -- "${x:?}"
+}
+
+etape_verifier_entrees() { # tout se passe dans la VM : verifier_entrees.py (transporté, son sha256 est journalisé)
+  sur "cd ~/r3 && sha256sum verifier_entrees.py && python3 -I verifier_entrees.py '$IMAGE' '$INVOCATION' '$URL_TSA'"
 }
 
 lancer "${JALON:-r1}" "$@"

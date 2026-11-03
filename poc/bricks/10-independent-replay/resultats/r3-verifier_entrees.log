@@ -1,0 +1,82 @@
+# replay.sh verifier_entrees, 2026-11-03T10:19:57Z
+66fa5cb4f81a40e2ee4b8fc91fd4bdb3225a3a3808a5d2cb530be7f2a7b9c2e7  verifier_entrees.py
+## ancres de confiance (copiées depuis le dépôt)
+  078097039e8d4365d510bb77a22f740a1580db3a373e139358606196ff2b33ef  chains.pub
+  e659db8c32941575bd7e48c24fa4d198cedde9d467e9a441c6519c05a96a50f3  tsa-chaine.pem
+OK   racine de confiance de la TSA construite dans la VM
+OK   digest du sujet transporté : 3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## bundles horodatés : vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA)
+OK   bundle-00742f587b45726b : vérifié ; invocationId 993e621f-5d02-4de6-8f23-383f3bf4fc8a ; jeton de la TSA : Nov  2 14:22:05 2026 GMT
+OK   bundle-0701d55ff990beb4 : vérifié ; invocationId 6f862750-3ec8-4083-a0ec-17a822ea65b4 ; jeton de la TSA : Nov  2 13:33:06 2026 GMT
+OK   bundle-0af9e44b8567ce44 : vérifié ; invocationId d6c9690f-372d-428b-a36b-58882ad30909 ; jeton de la TSA : Nov  2 13:31:05 2026 GMT
+OK   bundle-0b0b33a7a34ed5ee : vérifié ; invocationId 723662fa-aaea-40dc-bbcc-04464a6a5f96 ; jeton de la TSA : Nov  2 13:33:12 2026 GMT
+OK   bundle-0c028b72f21c3b55 : vérifié ; invocationId 68aac25f-2d95-4b27-800d-c264297d6d04 ; jeton de la TSA : Nov  2 13:43:05 2026 GMT
+OK   bundle-23a457a1fdc87c0c : vérifié ; invocationId d3e45dc8-9cc3-4803-b105-23bf59fa56ad ; jeton de la TSA : Nov  2 22:56:04 2026 GMT
+OK   bundle-2af5acffcba2fc77 : vérifié ; invocationId ce432b56-17b4-46f2-8099-747289e40966 ; jeton de la TSA : Nov  2 13:20:16 2026 GMT
+OK   bundle-3bd70baffdc58673 : vérifié ; invocationId 381ee61c-1c47-46b5-b84e-863874808465 ; jeton de la TSA : Nov  2 13:20:24 2026 GMT
+OK   bundle-3d2b236df608004b : vérifié ; invocationId 13246ff3-eb1d-46a6-8271-ab2f861a84b9 ; jeton de la TSA : Nov  2 14:23:03 2026 GMT
+OK   bundle-535424f843d30f9d : vérifié ; invocationId 118d2156-b2c0-4517-bed7-92e54ebb73db ; jeton de la TSA : Nov  2 13:45:03 2026 GMT
+OK   bundle-55891381d9142741 : vérifié ; invocationId 51783030-4301-4eb5-888f-bf7a9bf72ac0 ; jeton de la TSA : Nov  2 13:31:02 2026 GMT
+OK   bundle-558aac49b2f45ed9 : vérifié ; invocationId ce9a7542-1f01-4062-beec-4cb21903cea7 ; jeton de la TSA : Nov  2 14:39:03 2026 GMT
+OK   bundle-5599e6397ba74573 : vérifié ; invocationId 7f732f94-6023-4ca5-ac06-f60f515120ee ; jeton de la TSA : Nov  2 13:30:02 2026 GMT
+OK   bundle-5c9c685d847b8486 : vérifié ; invocationId d189e6ba-5841-487f-b8ea-3d19a006ae88 ; jeton de la TSA : Nov  2 22:56:07 2026 GMT
+OK   bundle-6b2e4c4fc33cac4e : vérifié ; invocationId dc907f23-ddfd-44d9-a0df-e6b0dfc7b196 ; jeton de la TSA : Nov  2 13:30:13 2026 GMT
+OK   bundle-6b31823f76213191 : vérifié ; invocationId c2fc117f-c0d2-4cc3-82b7-7e68ce16411b ; jeton de la TSA : Nov  2 14:37:02 2026 GMT
+OK   bundle-7a559b8dcac8f3fa : vérifié ; invocationId a23feef1-4724-4b03-8057-73b9193a2426 ; jeton de la TSA : Nov  2 13:33:15 2026 GMT
+OK   bundle-7aeae0ad999dc3f3 : vérifié ; invocationId 73f3c4bd-7d9f-4b1d-8621-5db0188ac187 ; jeton de la TSA : Nov  2 14:00:03 2026 GMT
+OK   bundle-7af184de44b81e66 : vérifié ; invocationId d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 ; jeton de la TSA : Nov  2 14:00:05 2026 GMT
+OK   bundle-7b84a82513f52503 : vérifié ; invocationId fed025ec-a670-4d6d-b042-b6fc7ea5862b ; jeton de la TSA : Nov  2 14:08:08 2026 GMT
+OK   bundle-80a5fa3ba0972628 : vérifié ; invocationId 83f94b4b-4a86-4a72-aa51-9f153c4fa761 ; jeton de la TSA : Nov  2 14:07:03 2026 GMT
+OK   bundle-83210ef3fa1be048 : vérifié ; invocationId ec4c6874-7de6-441a-b2d5-c8df966d66e4 ; jeton de la TSA : Nov  2 13:45:05 2026 GMT
+OK   bundle-91ed0a928ec43f52 : vérifié ; invocationId 9953ae69-446c-49a4-a1aa-8fc097ae2830 ; jeton de la TSA : Nov  2 13:30:05 2026 GMT
+OK   bundle-9a054101f9e8cf6e : vérifié ; invocationId 80b639d4-3936-405f-93f3-87289d19c3bd ; jeton de la TSA : Nov  2 18:40:03 2026 GMT
+OK   bundle-9c3725366ab1e9f3 : vérifié ; invocationId 67bcab7a-cd74-4ea8-a12b-2a58c2db3e7a ; jeton de la TSA : Nov  2 13:20:08 2026 GMT
+OK   bundle-a06bc49484831551 : vérifié ; invocationId 8ffea873-c564-4fbf-80c5-fca46d069394 ; jeton de la TSA : Nov  2 13:30:16 2026 GMT
+OK   bundle-a2824da49d50d76f : vérifié ; invocationId 6a146488-7e98-4607-a0e5-301f65e2fe61 ; jeton de la TSA : Nov  2 13:33:09 2026 GMT
+OK   bundle-a2ee68e702cd3ffb : vérifié ; invocationId f53718b3-cdea-425c-95c9-c1466d4dcbb4 ; jeton de la TSA : Nov  2 18:40:05 2026 GMT
+OK   bundle-a917cee794638bae : vérifié ; invocationId 2eea21f5-b53b-4f17-b023-b92bc4b9afe7 ; jeton de la TSA : Nov  2 13:30:07 2026 GMT
+OK   bundle-adf8aef61b5fdfa2 : vérifié ; invocationId 5c1123ec-60f9-40c0-87fa-676ce4641600 ; jeton de la TSA : Nov  2 13:30:10 2026 GMT
+OK   bundle-afd9a2ca2e34c925 : vérifié ; invocationId e2c0441d-f252-4f8a-a1d6-3e76f908b66d ; jeton de la TSA : Nov  2 14:22:03 2026 GMT
+OK   bundle-ca8911c82a5426cb : vérifié ; invocationId 547324ea-c94e-458b-8c93-f66936c5c16b ; jeton de la TSA : Nov  2 13:20:19 2026 GMT
+OK   bundle-ce0a95ff1618c518 : vérifié ; invocationId 968c4117-dbd3-4c9a-a329-4327058746a9 ; jeton de la TSA : Nov  2 14:08:03 2026 GMT
+OK   bundle-d2609724c6336863 : vérifié ; invocationId 1c1ddc60-0989-46cb-855d-6bf688218d88 ; jeton de la TSA : Nov  2 14:37:05 2026 GMT
+OK   bundle-d9aa048e9a262c60 : vérifié ; invocationId c69ec0d2-0d28-4a7c-a1c7-19ce1c7bb186 ; jeton de la TSA : Nov  2 15:19:05 2026 GMT
+OK   bundle-dfd76de6a6806710 : vérifié ; invocationId ce9a8be7-e349-4525-9831-a7ec44123639 ; jeton de la TSA : Nov  2 13:33:03 2026 GMT
+OK   bundle-e7a41b7bf691dd96 : vérifié ; invocationId e52db554-0af3-4533-a729-d350275bcd5d ; jeton de la TSA : Nov  2 13:20:22 2026 GMT
+OK   bundle-e8df04e7b3908eb8 : vérifié ; invocationId d133bc69-7d76-4a33-9402-4cc694eabda2 ; jeton de la TSA : Nov  2 14:39:06 2026 GMT
+OK   bundle-e9feb7ca51481d3b : vérifié ; invocationId bbfa654e-f716-4170-8194-6bbb3388200a ; jeton de la TSA : Nov  2 14:08:05 2026 GMT
+OK   bundle-ec5b0538e10b8f4f : vérifié ; invocationId ec599270-a7ba-4cd5-86e7-838ce545603a ; jeton de la TSA : Nov  2 13:43:02 2026 GMT
+OK   bundle-f656b3a67ce3dd98 : vérifié ; invocationId ff91661b-3484-40d5-8e4e-b57f5226afc4 ; jeton de la TSA : Nov  2 14:23:05 2026 GMT
+OK   bundle-f687795a47c20105 : vérifié ; invocationId 80efd075-66fa-47d0-bd7f-fe3f2afc57b9 ; jeton de la TSA : Nov  2 13:34:18 2026 GMT
+OK   bundle-fffab997d19bac31 : vérifié ; invocationId cce9faf7-34ad-4f27-8b4b-1eb7e5f0321a ; jeton de la TSA : Nov  2 15:19:03 2026 GMT
+bundles vérifiés : 43 sur 43
+OK   provenance d9006af7-5d9a-4a5e-878e-1c9a5bd96d56 extraite d'un bundle vérifié
+## politique, section 1 (provenance vérifiée)
+OK   _type https://in-toto.io/Statement/v1
+OK   predicateType https://slsa.dev/provenance/v1
+OK   builder.id https://supply-chain.example/builders/tekton-chains@v1
+OK   buildType https://tekton.dev/chains/v2/slsa-tekton
+OK   sujet = image rejouée
+OK   entrée construire-image déclarée : {'sha256': '403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63'}
+OK   entrée fermeture déclarée : {'sha256': '0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048'}
+OK   entrée web-dist déclarée : {'sha256': '47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb'}
+OK   entrée builder-go-voie-d déclarée : {'sha256': 'd50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67'}
+OK   entrée sample-app.git déclarée : {'sha1': '6391fd437f26696847041be3226bbbf633f55a2f'}
+## digests des entrées transportées, recalculés
+OK   construire-image : transporté 403ccbd82c534e5611a8fcabf01d4fcd93731e945d50345d94f1fe6d58392d63
+OK   fermeture : transporté 0ab5a50767bee2e430cdd2db6b4d61580629f89fd48fb352cd1a2a545ee56048
+OK   web-dist : transporté 47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   builder-go-voie-d : transporté d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+## commit
+OK   bundle git cohérent (git bundle verify, dans le dépôt cloné)
+OK   commit de main 6391fd437f26696847041be3226bbbf633f55a2f
+OK   arbre de travail extrait au commit déclaré, propre
+## recette (bundle construire-image vérifié)
+OK   Dockerfile : sha256 d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619, contrôlé par la tâche : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+OK   options de buildctl : buildctl --addr unix:///tmp/run/bk.sock build --frontend dockerfile.v0 --no-cache --opt build-arg:SOURCE_DATE_EPOCH=0 --local context="$e/src" --local dockerfile=/tmp/df --opt filename=Dockerfile --oci-layout magasin="$e/builder" --opt context:builder=oci-layout://magasin@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 --local deps="$e/deps" --opt context:deps=local:deps --output type=oci,dest=$(workspaces.sortie.path)/image.tar,rewrite-timestamp=true
+RUN : ['RUN --network=none --mount=type=bind,from=deps,target=/deps \\']
+## version de Go de l'image de build déclarée (vérifiée)
+OK   go1.26.10 ; toolchain du domaine : go1.26.10
+## heures du build
+finishedOn signé : 2026-11-02T13:59:30Z ; jeton de la TSA : Nov  2 14:00:05 2026 GMT
+## bilan : 0 KO

@@ -209,3 +209,26 @@ Commande : `JALON=r2 mise run replay -- vm isolement paquets outils cle_vsa`. Pr
 **Limite de D6** : le mot de passe de la clé de VSA est dans le même dossier 0600 que la clé. Il n'ajoute aucune protection au-delà des droits du fichier.
 
 **Suite, R3** : préchargement. Les entrées sont tirées par l'hôte, en lecture anonyme, sous forme de layouts OCI et d'un bundle git, puis transportées dans la VM et vérifiées par le domaine. La signature de la provenance est vérifiée d'abord, puis la recette et les digests.
+
+## R3, exécuté (03/11/2026, 10:18 à 10:20 UTC, accord du propriétaire : « Oui, lancer R3 »)
+
+Commande : `JALON=r3 mise run replay -- transporter verifier_entrees`.
+- L'hôte ne sert que de transport : lectures anonymes, layout OCI et bundle git.
+- La VM vérifie tout elle-même avec [`outils/verifier_entrees.py`](outils/verifier_entrees.py).
+- `git` a été ajouté à la VM (Debian `1:2.47.3-0+deb13u1`, épinglé), avec l'accord du propriétaire : « Installer git ».
+
+Prédictions et additif : [`r3-predictions.md`](resultats/r3-predictions.md).
+
+| # | Mesure | Verdict |
+|---|---|---|
+| 1 | Transport par lectures anonymes ; 77 Mo dans la VM | conforme |
+| 2 | **43** bundles horodatés de `3a7ca1b1` (6 prévus), tous vérifiés **hors réseau** dans la VM : clé de Chains, sujet, jeton de la TSA. La provenance `d9006af7…` est extraite d'un bundle vérifié | conforme, avec un écart sur le nombre |
+| 3 | Politique, section 1 : `_type`, `predicateType`, `builder.id`, `buildType`, sujet, cinq entrées déclarées | conforme |
+| 4 | Quatre digests recalculés égaux aux digests déclarés ; `main` = `6391fd43…` (`git bundle verify`), arbre propre | conforme |
+| 5 | Dockerfile extrait du bundle signé : sha256 `d56985c1…`, égal au contrôle de la tâche et au Dockerfile de la brique 04 ; options de `buildctl` extraites | conforme |
+| 6 | Go `go1.26.10` dans l'image de build vérifiée, comme dans la VM | conforme |
+| 7 | Build terminé le 02/11 à 13:59:30 UTC (signé), horodaté par la TSA à 14:00:05 | conforme |
+
+Premier passage (3 KO, dus au script) archivé. Le journal de `r2-paquets.log` réécrit par l'ajout de git a été reconstitué (`r2-paquets-premier-passage.log`).
+
+**Pour R4** : la recette de `preparer-entrees` (contexte `src`, `deps`, `src/web/dist`) doit aussi être extraite de son bundle déclaré. **Le rebuild ne commence pas avant le 03/11 à 13:59:30 UTC.**
