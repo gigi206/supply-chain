@@ -591,3 +591,7 @@ rien n'a été arrêté, copié ni essayé.
 - Les lignes écrites entre l'archive et la destruction sont perdues. Pour réduire cette fenêtre, il faut archiver juste avant `vm.sh detruire`.
 
 **Recommandé : (a)**, avec l'essai de restauration sur l'hôte avant toute destruction. C'est la seule option qui garde l'historique dans Grafana. La VSA et les données de Zot relèvent de l'inventaire de la brique 03 et des accords à chaque push : D22 ne les tranche pas.
+
+**D22 (d) retenue par le propriétaire le 03/11/2026, vers 20:08 UTC** (« On s'en moque de tout perdre sur une démo ») : un
+rejeu de zéro de la 08 peut effacer l'historique de Loki, Grafana, la VSA et les données de Zot. Aucune sauvegarde n'est
+faite. Les options (a) à (c) ci-dessus sont abandonnées.

@@ -408,3 +408,7 @@ Les options (a) (F2 et F3 seulement) et (b) (intégration complète) restent ouv
 
 **Additif du 03/11/2026, 20:04 UTC** : les options sur l'historique de Loki sont préparées à sec en D22 (README de la 19b) ;
 rien n'a été arrêté ni copié. Décision du propriétaire attendue.
+
+**Additif du 03/11/2026, 20:08 UTC** : D22 (d) retenue par le propriétaire (« On s'en moque de tout perdre sur une démo ») :
+la perte de l'historique de Loki, de la VSA et des données de Zot n'est plus un obstacle au rejeu de zéro. Reste le choix entre
+les options (a) et (b) ci-dessus.
