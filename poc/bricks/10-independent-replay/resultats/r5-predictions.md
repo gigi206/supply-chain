@@ -239,3 +239,24 @@ Pousser la VSA dans un dépôt séparé ne change donc pas le jugement de la por
 - **Connexions** : chaque commande cosign n'ouvre qu'**une** connexion, vers `192.168.161.13:5000`, et aucune ailleurs (contrôle `OK` cinq fois). En HTTP sur le banc, la mesure TUF en relevait 2 ou 3 vers Zot.
 
 **Constat sur le comptage** : le témoin de signature affiche « 0 vérifiée(s) », bien que la commande ait réussi (code 0). `cosign verify` écrit un tableau JSON (`[…]`) et non des objets en début de ligne (`{`), que compte `essai`. L'acceptation est jugée sur le code de sortie, et le compte n'entre dans aucun verdict.
+
+## Additif du 03/11/2026 à 15:04 UTC : `negatifs` (avant exécution ; choix du propriétaire : « Lancer negatifs »)
+
+Les prédictions de N1 et N2 sont celles de 10:36, précisées à 13:13. Valeurs attendues dans `resultat.txt` :
+- **Image de build** : `image_de_build_domaine` vaut `sha256:dc20b752…`, celle de R4.
+- **N1** :
+  - `n1_altere` : un `.go` du zip `go-chi/chi/v5`, et `n1_zip_valide=True` ;
+  - `n1_build=refusé` ;
+  - `n1_motif` contient `checksum mismatch` ou `SECURITY ERROR` ;
+  - `n1_verdict=FAILED`.
+- **N2** :
+  - `n2_altere` : une seule ligne de `main.go` porte `":8081"` ;
+  - `n2_build=réussi` ;
+  - `n2_image` différent de `sha256:3a7ca1b1…` ;
+  - `n2_verdict=FAILED`.
+- **Diffoscope** :
+  - code 1 pour la couche et pour la config ;
+  - dans la couche, seul le binaire `sample-app` diffère ;
+  - dans la config, seul `rootfs.diff_ids` diffère.
+
+Aucune VSA n'est signée ni poussée, et les originaux de `~/r4/e` ne sont pas touchés : `negatifs.sh` travaille sur des copies, dans `~/r5n`. Le lien de la VM reste établi, car ces contre-épreuves ne servent pas à prouver le « hors ligne ».
