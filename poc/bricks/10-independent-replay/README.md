@@ -306,3 +306,12 @@ Les scripts sont dans [`essais/`](essais), hors de `replay.sh` jusqu'à la fin d
 - `oras attach` n'est plus utilisé, car le sujet est absent de ce dépôt. Son comportement dans ce cas n'est pas mesuré.
 - La section 6 de la politique est mise à jour, avant d'en figer le digest.
 - Rien n'est poussé avant l'accord de R5.
+
+## R5, mesure préalable : cosign et le TUF public en vérification par clé (03/11/2026, 13:21 UTC ; sur l'hôte seul)
+
+Accord du propriétaire : « Oui, mesurer ». Prédictions datées et résultat : [`r5-tuf-predictions.md`](resultats/r5-tuf-predictions.md). Script : [`essais/tuf-verification-cle.sh`](essais/tuf-verification-cle.sh). Le banc : espace de noms réseau vide, Zot, image et clés jetables, tentatives de connexion relevées par `strace`.
+
+- **Résultat** : les quatre vérifications des étapes de R5 sur l'hôte ne tentent **aucune** connexion hors de Zot, avec `HOME` vide comme avec une copie du cache TUF. Il s'agit de `verify-blob-attestation --new-bundle-format`, de `verify-attestation` par `COSIGN_REPOSITORY`, et de `verify` et `verify-attestation` au format ancien. Toutes réussissent hors réseau.
+- **Témoin** : `cosign attest` sans configuration de signature tente 8 résolutions de `tuf-repo-cdn.sigstore.dev`. La sonde voit donc ce qu'elle cherche, et les connexions à Zot sont bien relevées.
+- **Constat annexe** : `root.json` est écrit dans `~/.sigstore`, localement et sans connexion. La commande qui l'écrit n'est pas isolée par cette mesure.
+- **Conséquence** : les étapes `pousser_vsa` et `lire_vsa` peuvent garder le réseau sur l'hôte. Dans la VM, `unshare -rn` reste une précaution ; son fonctionnement pour `replay` n'est pas mesuré.

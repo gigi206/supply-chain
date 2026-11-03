@@ -1,0 +1,60 @@
+### st-temoin-attest-sans-config-cache.txt
+67145 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67147 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67147 write(4, "\257\312\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+67145 write(7, "MC\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+67145 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67147 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67145 write(7, "\330\31\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+67147 write(4, "|\n\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+67145 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+67145 write(4, "5X\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 59 <unfinished ...>
+67149 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67149 write(7, "\353F\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 59 <unfinished ...>
+67145 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16 <unfinished ...>
+67145 write(4, "2\341\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 59) = 59
+67149 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+67149 write(7, "\206k\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 59) = 59
+67149 write(2, "Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get \"https://tuf-repo-cdn.sigstore.dev/15.root.json\": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:55586->127.0.0.53:53: read: connecti"..., 311) = 311
+67149 write(2, "error during command execution: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get \"https://tuf-repo-cdn.sigstore.dev/15.root.json\": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:55586->127."..., 336) = 336
+### st-temoin-attest-sans-config-vide.txt
+66930 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66936 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66930 write(4, "\253\241\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+66936 write(7, "t\t\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+66930 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66936 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66930 write(4, "\224\221\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+66936 write(7, "^y\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 54 <unfinished ...>
+66930 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66936 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66930 write(4, "n\312\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 59) = 59
+66936 write(7, ":\373\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 59) = 59
+66930 connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66936 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0
+66930 write(4, "L\217\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\34\0\1\0\0)\4\320\0\0\0\0\0\0", 59) = 59
+66936 write(7, "\322\243\1 \0\1\0\0\0\0\0\1\ftuf-repo-cdn\10sigstore\3dev\4home\0\0\1\0\1\0\0)\4\320\0\0\0\0\0\0", 59 <unfinished ...>
+66936 write(2, "Error: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get \"https://tuf-repo-cdn.sigstore.dev/15.root.json\": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:54179->127.0.0.53:53: read: connecti"..., 311) = 311
+66936 write(2, "error during command execution: error getting signing config from TUF: error getting signing config from TUF: failed to load metadata: tuf refresh failed: Get \"https://tuf-repo-cdn.sigstore.dev/15.root.json\": dial tcp: lookup tuf-repo-cdn.sigstore.dev on 127.0.0.53:53: read udp 127.0.0.1:54179->127."..., 336) = 336
+### st-V1-verify-blob-attestation-cache.txt
+### st-V1-verify-blob-attestation-vide.txt
+### st-V2-verify-attestation-COSIGN_REPOSITORY-cache.txt
+67231 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67238 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67231 connect(7, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+### st-V2-verify-attestation-COSIGN_REPOSITORY-vide.txt
+67017 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67019 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67026 connect(7, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+### st-V3-verify-cache.txt
+67274 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67277 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+### st-V3-verify-vide.txt
+67060 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67060 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+### st-V4-verify-attestation-att-cache.txt
+67316 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67322 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+### st-V4-verify-attestation-att-vide.txt
+67103 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+67109 connect(4, {sa_family=AF_INET, sin_port=htons(15002), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
