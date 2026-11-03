@@ -130,3 +130,18 @@ Préparation à sec : relecture de `main.go`, de la recette et du stockage des m
 5. et 6. Non mesurées : elles relèvent de `pousser_vsa` et `lire_vsa`.
 
 Copies archivées : [`r5-vsa-enonce.json`](r5-vsa-enonce.json) (sha256 `c804d946…`) et [`r5-vsa.bundle.json`](r5-vsa.bundle.json) (sha256 `7b93e4b3…`), identiques aux fichiers de la VM. Rien n'a été poussé sur Zot.
+
+## Additif du 03/11/2026 à 14:58 UTC : prédictions de `porte_avant` (avant exécution ; choix du propriétaire : « Lancer porte_avant »)
+
+Relevé anonyme fait juste avant, à 14:58:35 :
+- 6 enveloppes dans le tag `.att` de l'image ;
+- 43 bundles horodatés de l'image dans `horodatage/bundles` ;
+- 0 referrer de l'image dans `builds/sample-app` ;
+- `builds/vsa/sample-app` absent (404 à 14:56).
+
+Le précédent est le cas `reel` du test 8 (02/11) : `VERDICT|t8-reel|true||…|ok|2/2 enveloppe(s) couverte(s), 33 bundle(s) vérifié(s)`.
+
+1. Referrers : `builds/sample-app 0` ; `builds/vsa/sample-app` « absent ou illisible ».
+2. Enveloppes de Chains sur l'image : 6.
+3. ec admet l'image réelle, sans aucune violation : `VERDICT|reelle-avant|true||…`.
+4. Contrôle 9 `ok`, « 6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) ». Le nombre de bundles est **incertain** : le CronJob d'horodatage peut en ajouter entre le relevé et le Job.
