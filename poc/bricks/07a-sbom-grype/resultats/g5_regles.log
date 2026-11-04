@@ -1,0 +1,53 @@
+# plateforme.sh g5_regles, 2026-11-04T21:00:44Z
+ec v0.10.42
+## ec opa check
+OK   aucune erreur
+## ec opa test
+data.scan_test.test_malveillant: PASS (3.612013ms)
+data.scan_test.test_aucun_enonce: PASS (13.341735ms)
+data.scan_test.test_autre_digest: PASS (15.749167ms)
+data.scan_test.test_scan_reel_admis: PASS (28.910497ms)
+data.scan_test.test_vex_expire: PASS (32.812844ms)
+data.scan_test.test_kev: PASS (24.541427ms)
+data.scan_test.test_autre_type: PASS (4.813202ms)
+data.scan_test.test_sans_vulnerabilites: PASS (42.654831ms)
+data.scan_test.test_vex_statut_refuse: PASS (39.907511ms)
+data.scan_test.test_kev_absent: PASS (39.699987ms)
+data.scan_test.test_memes_dates_toutes_jugees: PASS (32.376042ms)
+data.scan_test.test_vulnerabilites_hors_tableau: PASS (47.766638ms)
+data.scan_test.test_seuils_absents_refus: PASS (38.876884ms)
+data.scan_test.test_scan_trop_vieux: PASS (28.826104ms)
+data.scan_test.test_ecart_horloge_tolere: PASS (15.783098ms)
+data.scan_test.test_vex_valide: PASS (38.66057ms)
+data.scan_test.test_plus_recent_propre_masque_ancien_kev: PASS (58.364775ms)
+data.scan_test.test_sans_malicious: PASS (79.52395ms)
+data.scan_test.test_base_trop_vieille: PASS (73.987932ms)
+data.scan_test.test_sans_scanner: PASS (74.432123ms)
+data.scan_test.test_vex_sans_date: PASS (94.407094ms)
+data.scan_test.test_scan_de_7_jours_admis: PASS (39.968387ms)
+data.scan_test.test_date_illisible: PASS (90.009979ms)
+data.scan_test.test_scan_du_futur: PASS (66.215152ms)
+data.scan_test.test_enonce_d_un_autre_digest_ne_masque_pas: PASS (61.645825ms)
+data.scan_test.test_base_de_3_jours_admise: PASS (49.458503ms)
+data.scan_test.test_plus_recent_kev_refuse_malgre_ancien_propre: PASS (73.037654ms)
+--------------------------------------------------------------------------------
+PASS: 27/27
+## mutations : chaque condition retirée tour à tour, au moins un test doit échouer
+OK   sans « e.predicateType == _type » : test_autre_type
+OK   sans « s.digest.sha256 == input.digest » : test_enonce_d_un_autre_digest_ne_masque_pas,test_autre_digest
+OK   sans « s.t == max({a.t | some a in _scans}) » : test_plus_recent_propre_masque_ancien_kev
+OK   sans « count(_scans) == 0 » : test_memes_dates_toutes_jugees,test_ecart_horloge_tolere,test_scan_reel_admis,test_plus_recent_kev_refuse_malgre_ancien_propre,test_sans_scanner,test_kev,test_vulnerabilites_hors_tableau,test_scan_du_futur,test_plus_recent_propre_masque_ancien_kev,test_malveillant,test_kev_absent,test_sans_malicious,test_sans_vulnerabilites,test_vex_expire,test_vex_sans_date,test_seuils_absents_refus,test_scan_trop_vieux,test_vex_statut_refuse,test_enonce_d_un_autre_digest_ne_masque_pas,test_vex_valide,test_base_trop_vieille
+OK   sans « "vulnerabilities": is_array(object.get(p, "vulnerabilities", null)), » : test_vulnerabilites_hors_tableau
+OK   sans « "malicious": is_array(object.get(p, "malicious", null)), » : test_sans_malicious
+OK   sans « "scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")), » : test_sans_scanner
+OK   sans « "kev": _kev_lisibles(p), » : test_kev_absent
+OK   sans « not ok » : test_vex_sans_date,test_malveillant,test_scan_reel_admis,test_base_trop_vieille,test_scan_trop_vieux,test_ecart_horloge_tolere,test_kev,test_memes_dates_toutes_jugees,test_vex_expire,test_scan_du_futur,test_plus_recent_propre_masque_ancien_kev,test_plus_recent_kev_refuse_malgre_ancien_propre,test_seuils_absents_refus,test_vex_statut_refuse,test_vex_valide,test_enonce_d_un_autre_digest_ne_masque_pas
+OK   sans « not _age_admis(age) » : test_scan_reel_admis,test_vex_valide,test_kev_absent,test_plus_recent_propre_masque_ancien_kev,test_plus_recent_kev_refuse_malgre_ancien_propre,test_base_trop_vieille,test_vex_statut_refuse,test_sans_scanner,test_memes_dates_toutes_jugees,test_ecart_horloge_tolere,test_kev,test_vulnerabilites_hors_tableau,test_sans_vulnerabilites,test_malveillant,test_vex_sans_date,test_sans_malicious,test_vex_expire,test_enonce_d_un_autre_digest_ne_masque_pas
+OK   sans « age >= 0 - _derive » : test_scan_du_futur
+OK   sans « age <= _seuil("scan_age_max_jours") * _jour » : test_seuils_absents_refus,test_scan_trop_vieux
+OK   sans « not _ecart_admis(ecart) » : test_sans_malicious,test_enonce_d_un_autre_digest_ne_masque_pas,test_scan_reel_admis,test_scan_trop_vieux,test_vulnerabilites_hors_tableau,test_kev,test_vex_sans_date,test_kev_absent,test_vex_valide,test_sans_vulnerabilites,test_ecart_horloge_tolere,test_malveillant,test_scan_du_futur,test_vex_statut_refuse,test_vex_expire,test_plus_recent_kev_refuse_malgre_ancien_propre,test_plus_recent_propre_masque_ancien_kev,test_memes_dates_toutes_jugees
+OK   sans « v.kev == true » : test_vulnerabilites_hors_tableau,test_base_trop_vieille,test_sans_malicious,test_kev_absent,test_scan_reel_admis,test_malveillant,test_seuils_absents_refus,test_scan_du_futur,test_scan_trop_vieux,test_plus_recent_propre_masque_ancien_kev,test_sans_scanner,test_ecart_horloge_tolere
+OK   sans « not _vex_valide(v) » : test_vex_valide
+OK   sans « v.vex.status in _seuil("vex_statuts_acceptes") » : test_vex_statut_refuse
+OK   sans « time.parse_rfc3339_ns(v.vex.expires) > time.now_ns() » : test_vex_expire,test_vex_sans_date
+# fin 2026-11-04T21:00:50Z, code 0

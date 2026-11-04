@@ -185,3 +185,12 @@ Prochaine étape : G4, le job de scan.
 - aucun Secret dans l'espace, audit d'OpenBao sans erreur, journaux et audits lus dans Grafana.
 
 Prochaine étape : G5, le contrôle 7 dans la porte, après R5 de la 10.
+
+**G5 préparé à sec le 04/11/2026 à 21:01 UTC, rien appliqué** ([prédictions](resultats/g5-predictions.md)). R5 mesure la porte avec les fichiers de l'arbre de travail : les fichiers neufs sont donc dans [`politique/porte/`](politique/porte/) et les modifications de la 08 dans [`politique/g5-porte.patch`](politique/g5-porte.patch), appliqué après R5 par `g5_porte`, qui refuse de tourner sans nouvelle VSA dans `builds/vsa/sample-app` (celle du 03/11/2026, `c1bfbcbd…`, ne compte pas).
+
+- **Conteneurs** : `scan-verifier` (initialisation, image d'outils, toujours le code 0) vérifie les énoncés par la clé du scanner ; `scan` (principal, image de la porte) rend la décision avec `ec validate input`.
+- **Règles** : elles jugent le scan le plus récent, pas tous les scans (D4). 27 tests sur 27, 17 mutations toutes détectées.
+- **Essai sur les images réelles de la porte** : scan réel admis ; sans scan, autre clé, dépôts refusés, KEV, MAL-, scan ou base trop vieux refusés ; entrée absente ou invalide : échec fermé.
+- **À valider par le propriétaire** : deux ajouts à D4, `scan.forme` (prédicat incomplet refusé) et le refus d'un scan daté du futur.
+
+Le scan de G4 expire le 11/11/2026 à 20:40:09 UTC. Prochaine étape : `g5_porte`, après R5 de la 10 et avec l'accord du propriétaire.

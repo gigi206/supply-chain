@@ -1,0 +1,55 @@
+# plateforme.sh g5_sec, 2026-11-04T21:00:50Z
+## correctif de la 08 applicable à l'arbre, qui n'a pas changé
+OK   git apply --check
+## systèmes de fichiers des images de la porte (Zot, lecture anonyme)
+OK   cosign et ec extraits des images épinglées
+version de ec dans l'image : v0.10.42 ; empreinte 895c6f7e63cfefe6
+## scan réel : scan-verifier, puis ec sans réseau
+LU|énoncé 4d197192f0b17ac0|2026-11-04T20:40:09.254165787Z
+LECTURE|1|192.168.161.13:5000/builds/scan/sample-app|
+OK   1 énoncé vérifié, dépôt dérivé du nom de l'image
+OK   entrée : digest jugé, un énoncé, JSON valide
+RSS maximal de ec : 94788 Ko, 0.08 s
+{"success":true,"violations":[],"succes":["scan.base_recente","scan.forme","scan.kev_without_vex","scan.malicious","scan.scan_present","scan.scan_recent"]}
+OK   scan réel : code 0, admis
+## contre-épreuves de la lecture
+builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : LECTURE|0|192.168.161.13:5000/builds/scan/essai-webhook|cosign : no matching attestations: 
+OK   0 énoncé
+OK   builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : code 1, scan.scan_present
+builds/scan/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : LECTURE|0|-|image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : 192.168.161.13:5000/builds/scan/sample-app@sha256:3a7ca1b14dbf13c6655c500fee014609
+OK   0 énoncé
+OK   builds/scan/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : code 1, scan.scan_present
+builds/vsa/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : LECTURE|0|-|image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : 192.168.161.13:5000/builds/vsa/sample-app@sha256:3a7ca1b14dbf13c6655c500fee0146093
+OK   0 énoncé
+OK   builds/vsa/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : code 1, scan.scan_present
+plateforme/porte@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : LECTURE|0|-|image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : 192.168.161.13:5000/plateforme/porte@sha256:3a7ca1b14dbf13c6655c500fee01460937c2be
+OK   0 énoncé
+OK   plateforme/porte@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : code 1, scan.scan_present
+builds/sample-app:latest : LECTURE|0|-|image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : 192.168.161.13:5000/builds/sample-app:latest
+OK   0 énoncé
+OK   builds/sample-app:latest : code 1, scan.scan_present
+clé de Chains à la place de celle du scanner : LECTURE|0|192.168.161.13:5000/builds/scan/sample-app|cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Exp
+OK   0 énoncé
+OK   clé de Chains : code 1, scan.scan_present
+## contre-épreuves du jugement, ec de l'image de la porte, entrée modifiée après la lecture (la signature n'est plus en jeu : rôle de G6)
+OK   KEV : code 1, scan.kev_without_vex
+OK   VEX expiré : code 1, scan.kev_without_vex
+OK   VEX valide : code 0, admis
+OK   MAL- : code 1, scan.malicious
+OK   scan trop vieux : code 1, scan.scan_recent
+OK   base trop vieille : code 1, scan.base_recente
+KO   prédicat sans vulnerabilities : code 1, violations scan.forme,scan.forme (attendu : code 1, scan.forme) ; Error: success criteria not met
+KO   entrée au JSON invalide : code 1, violations  (attendu : code 1, sans verdict) ; Error: error validating file /partage/scan-entree.json: evaluating policy: parse configurations: parser unmarshal: unmarshal json: unexpected end of JSON input, path: /partage/scan-entree.json
+KO   entrée absente : code 1, violations  (attendu : code 1, sans verdict) ; Error: error validating file /partage/scan-entree.json: unable to parse the provided input file: /partage/scan-entree.json
+## correctif appliqué à une copie : Job rendu, ConfigMap, controle7
+OK   correctif appliqué à la copie
+OK   bash -n sur politique.sh et preuves.sh corrigés
+OK   aucun marqueur restant dans le Job
+OK   Job valide (dry-run client, rien envoyé au cluster)
+initContainers : porte, scan-verifier ; containers : horodatage, vsa, scan
+OK   porte reste le premier conteneur d'initialisation (champ 6 de VERDICT)
+OK   clés de la ConfigMap lisibles
+controle7, scan réel : ok|1 énoncé(s) vérifié(s) dans 192.168.161.13:5000/builds/scan/sample-app
+controle7, refus : refus|scan.kev_without_vex,scan.malicious ; 1 énoncé(s) vérifié(s) dans 192.168.161.13:5000/builds/scan/sample-app
+controle7, ec sans verdict : absent|1 énoncé(s) vérifié(s) dans 192.168.161.13:5000/builds/scan/sample-app ; Error: fichier absent
+# fin 2026-11-04T21:00:55Z, code 1

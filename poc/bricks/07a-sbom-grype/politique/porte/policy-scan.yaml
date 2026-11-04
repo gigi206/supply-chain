@@ -1,0 +1,16 @@
+# Brique 07a, G5 : politique du contrôle 7 (ec validate input --policy), montée dans le pod de la porte. Règles du PoC seules
+# (ConfigMap porte, sous /etc/porte/regles-scan) : la bibliothèque conforma/policy juge des images, pas cette entrée.
+sources:
+  - name: scan
+    policy:
+      - /etc/porte/regles-scan
+    ruleData:
+      # D4 du propriétaire (04/11/2026) : scan de 7 jours au plus, base construite 3 jours au plus avant lui
+      scan_age_max_jours: 7
+      base_age_max_jours: 3
+      vex_statuts_acceptes:
+        - not_affected
+        - fixed
+    config:
+      include:
+        - scan

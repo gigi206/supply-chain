@@ -1,0 +1,241 @@
+diff -ruN a/poc/bricks/08-trust-plane/politique/porte-job.yaml b/poc/bricks/08-trust-plane/politique/porte-job.yaml
+--- a/poc/bricks/08-trust-plane/politique/porte-job.yaml	2026-11-04 21:58:50.019099320 +0100
++++ b/poc/bricks/08-trust-plane/politique/porte-job.yaml	2026-11-04 21:58:50.064323181 +0100
+@@ -7,6 +7,11 @@
+ # Contrôle 6 (demandé par la brique 10, choix du propriétaire du 03/11/2026) : conteneur vsa (politique/porte/vsa.sh), même image
+ # d'outils, en parallèle de horodatage ; VSA de replay lue dans builds/vsa/<nom>, clé du domaine de replay (vsa.pub). Verdict de
+ # la porte : succès de ec, horodatage complet et VSA retenue (le Job ne réussit que si les deux conteneurs réussissent).
++# Contrôle 7 (brique 07a, G5) : conteneur d'initialisation scan-verifier après ec (politique/porte/scan-verifier.sh de la 07a, image
++# d'outils, toujours le code 0, pour ne pas empêcher horodatage et vsa de démarrer ; énoncés de builds/scan/<nom> vérifiés par la clé
++# du scanner, scanner.pub, écrits dans /partage), puis conteneur scan (ec validate input, image de la porte, base vide, sans shell ;
++# code de sortie non nul si refus). Verdict de la porte : succès de ec, horodatage complet, VSA retenue et scan admis (le Job ne
++# réussit que si les trois conteneurs réussissent).
+ apiVersion: batch/v1
+ kind: Job
+ metadata:
+@@ -76,6 +81,32 @@
+           mountPath: /tmp
+         - name: partage
+           mountPath: /partage
++      - name: scan-verifier
++        image: "@OUTILS@"
++        command: [sh, /etc/porte/scan-verifier.sh]
++        env:
++        - name: IMAGE
++          value: @IMAGE@
++        - name: HOME
++          value: /tmp
++        - name: TMPDIR
++          value: /tmp
++        resources:
++          limits:
++            memory: 512Mi
++        securityContext:
++          allowPrivilegeEscalation: false
++          readOnlyRootFilesystem: true
++          capabilities:
++            drop: [ALL]
++        volumeMounts:
++        - name: porte
++          mountPath: /etc/porte
++          readOnly: true
++        - name: partage
++          mountPath: /partage
++        - name: tmp
++          mountPath: /tmp
+       containers:
+       - name: horodatage
+         image: "@OUTILS@"
+@@ -130,6 +161,40 @@
+           readOnly: true
+         - name: tmp
+           mountPath: /tmp
++      - name: scan
++        image: "@PORTE@"
++        args:
++        - validate
++        - input
++        - /partage/scan-entree.json
++        - --policy
++        - /etc/porte/policy-scan.yaml
++        - --info
++        - --show-successes
++        - --output
++        - json
++        env:
++        - name: HOME
++          value: /tmp
++        - name: TMPDIR
++          value: /tmp
++        resources:
++          limits:
++            memory: 512Mi
++        securityContext:
++          allowPrivilegeEscalation: false
++          readOnlyRootFilesystem: true
++          capabilities:
++            drop: [ALL]
++        volumeMounts:
++        - name: porte
++          mountPath: /etc/porte
++          readOnly: true
++        - name: partage
++          mountPath: /partage
++          readOnly: true
++        - name: tmp
++          mountPath: /tmp
+       volumes:
+       - name: porte
+         configMap:
+@@ -155,6 +220,14 @@
+             path: vsa.sh
+           - key: vsa.pub
+             path: vsa.pub
++          - key: scan-verifier.sh
++            path: scan-verifier.sh
++          - key: scanner.pub
++            path: scanner.pub
++          - key: policy-scan.yaml
++            path: policy-scan.yaml
++          - key: scan.rego
++            path: regles-scan/scan.rego
+       - name: partage
+         emptyDir:
+           sizeLimit: 16Mi
+diff -ruN a/poc/bricks/08-trust-plane/politique.sh b/poc/bricks/08-trust-plane/politique.sh
+--- a/poc/bricks/08-trust-plane/politique.sh	2026-11-04 21:58:50.020826632 +0100
++++ b/poc/bricks/08-trust-plane/politique.sh	2026-11-04 21:58:50.064871058 +0100
+@@ -1258,13 +1258,18 @@
+ 
+ cm_porte() { # ConfigMap porte : politique, règles du PoC, liste revue, clé publique de Chains, CA du PoC ; J8 (test 8) : contrôle 9
+   # (politique/porte/horodatage.sh) et racine de confiance du TSA (J5) ; contrôle 6 (brique 10) : politique/porte/vsa.sh et clé
+-  # publique du domaine de replay, prise hors bande dans le dépôt de la brique 10
++  # publique du domaine de replay, prise hors bande dans le dépôt de la brique 10 ; contrôle 7 (brique 07a, G5) : scan-verifier.sh,
++  # règles et politique de ec validate input, clé publique du scanner, prise hors bande dans le dépôt de la brique 07a
+   kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
+     --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
+     --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
+     --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" \
+     --from-file=horodatage.sh="$here/politique/porte/horodatage.sh" --from-file=tsa-racine-confiance.json="$P/tsa-racine-confiance.json" \
+     --from-file=vsa.sh="$here/politique/porte/vsa.sh" --from-file=vsa.pub="$here/../10-independent-replay/resultats/vsa-cle-publique.pem" \
++    --from-file=scan-verifier.sh="$here/../07a-sbom-grype/politique/porte/scan-verifier.sh" \
++    --from-file=scan.rego="$here/../07a-sbom-grype/politique/porte/scan.rego" \
++    --from-file=policy-scan.yaml="$here/../07a-sbom-grype/politique/porte/policy-scan.yaml" \
++    --from-file=scanner.pub="$here/../07a-sbom-grype/resultats/scanner-cle-publique.pem" \
+     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
+ }
+ 
+@@ -1274,8 +1279,9 @@
+   # aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images (spec
+   # ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, ec juge comme en J6. Les champs 7 et 8
+   # (J8, test 8) viennent du conteneur horodatage ; success (champ 3) reste celui de ec. Les champs 9 et 10 (contrôle 6, brique 10)
+-  # viennent du conteneur vsa (ok ou refus, détail) ; les champs 1 à 8 sont inchangés
+-  local j=porte-$1 l d h v s=()
++  # viennent du conteneur vsa (ok ou refus, détail) ; les champs 11 et 12 (contrôle 7, brique 07a, G5) viennent des conteneurs
++  # scan-verifier et scan (ok, refus ou absent, détail, controle7) ; les champs 1 à 10 sont inchangés
++  local j=porte-$1 l d h v q s=()
+   [ -n "${5:-}" ] && s=(-e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'$(jq -nc --arg c "$1" --arg i "$2" --argjson s "$5" \
+     '{components: [{name: $c, containerImage: $i, source: $s}]}')'#")
+   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
+@@ -1288,6 +1294,8 @@
+   kubectl logs -n porte "job/$j" -c porte > "$T/$j.log" 2>&1 || true
+   kubectl logs -n porte "job/$j" -c horodatage > "$T/$j.horodatage" 2>&1 || true
+   kubectl logs -n porte "job/$j" -c vsa > "$T/$j.vsa" 2>&1 || true
++  kubectl logs -n porte "job/$j" -c scan-verifier > "$T/$j.scan-verifier" 2>&1 || true
++  kubectl logs -n porte "job/$j" -c scan > "$T/$j.scan" 2>&1 || true
+   l=$(grep -m1 '^{' "$T/$j.log" || true)
+   [ -n "$l" ] || { echo "ERREUR|$1|$(tail -1 "$T/$j.log" | cut -c1-200)"; return; }
+   printf '%s\n' "$l" > "$T/$j.json"
+@@ -1295,10 +1303,22 @@
+     | (.finishedAt | fromdate) - (.startedAt | fromdate)')
+   h=$(grep -m1 '^HORODATAGE|' "$T/$j.horodatage" | cut -d'|' -f2- || true)
+   v=$(grep -m1 '^VSA|' "$T/$j.vsa" | cut -d'|' -f2- || true)
++  q=$(controle7 "$T/$j")
+   jq -r --arg c "$1" --arg d "$d" --arg h "${h:-absent|$(tail -1 "$T/$j.horodatage" | cut -c1-160)}" \
+-    --arg r "${v:-absent|$(tail -1 "$T/$j.vsa" | cut -c1-160)}" '[.components[] | .violations[]? | .metadata.code] as $v
++    --arg r "${v:-absent|$(tail -1 "$T/$j.vsa" | cut -c1-160)}" --arg q "$q" '[.components[] | .violations[]? | .metadata.code] as $v
+     | [.components[] | .warnings[]? | .metadata.code] as $w
+-    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)|\($r)"' "$T/$j.json"
++    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)|\($r)|\($q)"' "$T/$j.json"
++}
++
++controle7() { # préfixe des journaux d'un Job de la porte : champs 11 et 12 de VERDICT. ok|n énoncé(s) vérifié(s) dans <dépôt> ;
++  # refus|codes en violation, triés ; n énoncé(s)… ; absent|… si ec n'a rendu aucun verdict (entrée absente ou invalide : Job en échec)
++  local l e
++  l=$(grep -m1 '^LECTURE|' "$1.scan-verifier" | cut -d'|' -f2- || true)
++  l="$(cut -d'|' -f1 <<< "$l") énoncé(s) vérifié(s) dans $(cut -d'|' -f2 <<< "$l")$(cut -d'|' -f3 <<< "$l" | sed 's/^./ ; &/')"
++  e=$(grep -m1 '^{' "$1.scan" || true)
++  [ -n "$e" ] || { echo "absent|$l ; $(tail -1 "$1.scan" | cut -c1-160)"; return; }
++  jq -r --arg l "$l" 'if .success then "ok|\($l)"
++    else "refus|\([.filepaths[].violations[].metadata.code] | unique | join(",")) ; \($l)" end' <<< "$e"
+ }
+ 
+ succes() { # cas code : la règle figure parmi les succès du verdict de la porte
+diff -ruN a/poc/bricks/08-trust-plane/preuves.sh b/poc/bricks/08-trust-plane/preuves.sh
+--- a/poc/bricks/08-trust-plane/preuves.sh	2026-11-04 21:58:50.022669037 +0100
++++ b/poc/bricks/08-trust-plane/preuves.sh	2026-11-04 22:00:34.925615991 +0100
+@@ -104,6 +104,10 @@
+ #          clé publique du domaine de replay ; conteneur vsa du Job (VSA lue dans builds/vsa/<nom>) ; C1 image réelle (VSA
+ #          retenue), C2 même digest dans builds/essai-webhook (aucune VSA), C3 ConfigMap porte-temoin avec la clé de Chains à la
+ #          place de celle du domaine (refus) ; rien écrit dans Zot
++#   controle7  contrôle 7 dans la porte (brique 07a, G5, après R5 de la 10) : ConfigMap porte réappliquée avec scan-verifier.sh,
++#          scan.rego, policy-scan.yaml et la clé publique du scanner ; conteneurs scan-verifier et scan du Job (scan lu dans
++#          builds/scan/<nom>) ; C1 image réelle (admise), C2 même digest dans builds/essai-webhook (aucun scan), C3 ConfigMap
++#          porte-temoin avec la clé de Chains à la place de celle du scanner (refus) ; rien écrit dans Zot
+ # Aucun secret en argument de commande.
+ #
+ # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
+@@ -2777,4 +2781,53 @@
+   echo "## bilan : $ko écart(s) aux prédictions"
+ }
+ 
++etape_controle7() { # brique 07a, G5, après R5 de la 10 : contrôle 7 dans la porte (poc/bricks/07a-sbom-grype, résultats/g5-predictions.md)
++  local src r c ko=0 h7=$here/../07a-sbom-grype s=$here/../07a-sbom-grype/resultats/scanner-cle-publique.pem
++  src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
++  attendu() { # libellé obtenu attendu
++    [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)"; ko=$((ko + 1)); }
++  }
++  echo "## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)"
++  echo "clé du scanner : $(openssl pkey -pubin -in "$s" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; G3 : 8cbcbb4e…)"
++  cm_porte
++  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan-verifier\.sh}') "$h7/politique/porte/scan-verifier.sh" \
++    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan\.rego}') "$h7/politique/porte/scan.rego" \
++    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.policy-scan\.yaml}') "$h7/politique/porte/policy-scan.yaml" \
++    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scanner\.pub}') "$s" \
++    && echo "OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés" \
++    || { echo "KO   ConfigMap porte" >&2; exit 1; }
++  echo "referrers de l'image : builds/sample-app $(referrers builds/sample-app) ; builds/scan/sample-app $(referrers builds/scan/sample-app) ; builds/vsa/sample-app $(referrers builds/vsa/sample-app)"
++
++  echo "## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés"
++  r=$(juger c7-reelle "$REG/$APP" policy.yaml porte "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
++  sed 's/^/    /' "$T/porte-c7-reelle.scan-verifier"
++  attendu "C1 ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
++  attendu "C1 contrôle 9" "$(cut -d'|' -f7 <<< "$r")" ok
++  attendu "C1 contrôle 6" "$(cut -d'|' -f9 <<< "$r")" ok
++  attendu "C1 contrôle 7" "$(cut -d'|' -f11,12 <<< "$r")" "ok|1 énoncé(s) vérifié(s) dans $REG/builds/scan/sample-app"
++  attendu "C1 Job" "$(kubectl get job -n porte porte-c7-reelle -o jsonpath='{.status.succeeded}')" 1
++
++  echo "## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook"
++  r=$(juger c7-sans-scan "$REG/builds/essai-webhook@$APP_DIGEST"); echo "$r"
++  sed 's/^/    /' "$T/porte-c7-sans-scan.scan-verifier"
++  attendu "C2 contrôle 7" "$(cut -d'|' -f11 <<< "$r")" refus
++  attendu "C2 règle" "$(cut -d'|' -f12 <<< "$r" | cut -d' ' -f1)" scan.scan_present
++  attendu "C2 Job" "$(kubectl get job -n porte porte-c7-sans-scan -o jsonpath='{.status.failed}')" 1
++
++  echo "## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du scanner"
++  kubectl get configmap -n porte porte -o json | jq --rawfile k "$R/chains-cle-publique.pem" '.data["scanner.pub"] = $k
++    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
++  r=$(juger c7-cle-chains "$REG/$APP" policy.yaml porte-temoin "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
++  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
++  echo "ConfigMap porte-temoin retirée"
++  sed 's/^/    /' "$T/porte-c7-cle-chains.scan-verifier"
++  attendu "C3 ec et contrôles 9 et 6 inchangés" "$(cut -d'|' -f3-5,7,9 <<< "$r")" "true||trusted_task.tagged|ok|ok"
++  attendu "C3 contrôle 7" "$(cut -d'|' -f11 <<< "$r")" refus
++  c=$(cut -d'|' -f12 <<< "$r")
++  case $c in *"accepted signatures do not match threshold"*) echo "OK   C3 motif : signature refusée" ;;
++    *) echo "KO   C3 motif : $c"; ko=$((ko + 1)) ;; esac
++  echo "## bilan : $ko écart(s) aux prédictions"
++  [ "$ko" = 0 ]
++}
++
+ lancer preuves J8 "$@"

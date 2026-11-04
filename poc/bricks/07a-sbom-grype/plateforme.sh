@@ -51,6 +51,15 @@
 #               scanner, base citée par digest, vulnérabilités et KEV ; audit d'OpenBao ; aucun Secret dans l'espace scan
 #   g4_grafana  journaux du job, audit d'OpenBao et audit de Zot (poussage par poc-scan) lus par l'auditeur ; identifiants absents
 #               des réponses ; job supprimé ensuite
+#   G5 (D4, D6 a) : contrôle 7 dans la porte (politique/porte/, correctif politique/g5-porte.patch de la 08) :
+#   g5_regles   hôte seul : ec opa check et ec opa test de scan.rego ; mutations (chaque condition retirée tour à tour, au moins un
+#               test doit échouer), comme bascule.sh regle de la 03
+#   g5_sec      hôte et lecture anonyme de Zot, rien d'écrit, porte et cluster non touchés : scan-verifier.sh dans le système de
+#               fichiers de l'image d'outils de la porte, ec validate input dans celui de l'image de la porte, sans réseau ; scan réel
+#               admis, contre-épreuves (sans scan, autre clé, dépôts refusés, entrée absente ou invalide, KEV, MAL-, scan trop vieux) ;
+#               correctif appliqué à une copie : Job rendu comme par juger, validé par kubectl en dry-run client, controle7
+#   g5_porte    APRÈS R5 SEULEMENT, ACCORD DU PROPRIÉTAIRE : refusé sans VSA nouvelle dans builds/vsa/sample-app (l'ancienne ne compte pas) ; correctif appliqué à l'arbre de
+#               travail ; preuves.sh controle7 de la 08 (ConfigMap porte réappliquée, C1 image réelle, C2 sans scan, C3 autre clé)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -899,11 +908,178 @@ etape_g4_grafana() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,54p "$0"; exit 2; }
+etape_g5_regles() {
+  local b=$W/g5-regles c r k=0 p=$here/politique/porte
+  rm -rf -- "${b:?}"; mkdir -p "$b/m"
+  cp "$p/scan.rego" "$p/scan_test.rego" "$b/"
+  echo "ec $(ec version 2>/dev/null | awk '/^Version/ {print $2}')"
+  echo "## ec opa check"
+  (cd "$b" && ec opa check scan.rego scan_test.rego) && ok "aucune erreur"
+  echo "## ec opa test"
+  (cd "$b" && ec opa test -v scan.rego scan_test.rego) | grep -E '^data\.scan_test\.|^PASS:|^FAIL:|^-'
+  echo "## mutations : chaque condition retirée tour à tour, au moins un test doit échouer"
+  while IFS= read -r c; do
+    grep -vF -- "$c" "$b/scan.rego" > "$b/m/scan.rego"
+    [ "$(wc -l < "$b/m/scan.rego")" = $(($(wc -l < "$b/scan.rego") - 1)) ] || { echo "KO   condition absente ou ambiguë : $c" >&2; exit 1; }
+    r=$(cd "$b" && ec opa test m/scan.rego scan_test.rego 2>&1 | sed -n 's/^data\.scan_test\.\(test_[a-z_]*\): FAIL.*/\1/p' | paste -sd, -) || true
+    [ -n "$r" ] && ok "sans « $c » : $r" || { echo "KO   condition non couverte par les tests : $c"; k=$((k + 1)); }
+  done <<'FIN'
+e.predicateType == _type
+s.digest.sha256 == input.digest
+s.t == max({a.t | some a in _scans})
+count(_scans) == 0
+"vulnerabilities": is_array(object.get(p, "vulnerabilities", null)),
+"malicious": is_array(object.get(p, "malicious", null)),
+"scanner.db.built": _date(object.get(p, ["scanner", "db", "built"], "")),
+"kev": _kev_lisibles(p),
+not ok
+not _age_admis(age)
+age >= 0 - _derive
+age <= _seuil("scan_age_max_jours") * _jour
+not _ecart_admis(ecart)
+v.kev == true
+not _vex_valide(v)
+v.vex.status in _seuil("vex_statuts_acceptes")
+time.parse_rfc3339_ns(v.vex.expires) > time.now_ns()
+FIN
+  [ "$k" = 0 ] || { echo "KO   $k condition(s) non couverte(s)" >&2; exit 1; }
+}
+
+VSA_ANCIENNE=sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03   # manifeste de r5-pousser_vsa.log du 03/11/2026
+G5_OUTILS=plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0   # commun.sh de la 08
+G5_PORTE=plateforme/porte@sha256:e77994c20705b4bffd434067033ef2c2f748cf2311f9997c7346b33f0b943926               # politique.sh de la 08
+verifier_chroot() { # racine image : scan-verifier.sh dans le système de fichiers de l'image d'outils de la porte, Zot joint à son adresse
+  unshare -rm sh -c 'mount --rbind /dev "$1/dev" && mount --rbind /proc "$1/proc" && exec chroot "$1" /busybox/env -i PATH=/busybox:/ko-app \
+    HOME=/tmp TMPDIR=/tmp IMAGE="$2" /busybox/sh /etc/porte/scan-verifier.sh' _ "$1" "$2"
+}
+ec_chroot() { # racine : ec validate input dans le système de fichiers de l'image de la porte, aucune interface réseau, mêmes arguments que le Job
+  unshare -rmn sh -c 'mount --rbind /dev "$1/dev" && mount --rbind /proc "$1/proc" && exec env -i HOME=/tmp TMPDIR=/tmp chroot "$1" /ec validate input \
+    /partage/scan-entree.json --policy /etc/porte/policy-scan.yaml --info --show-successes --output json' _ "$1"
+}
+juger_entree() { # libellé code-attendu règles-attendues (triées, virgules ; vide : admis) : entrée posée dans la racine de la porte
+  local c=0 v
+  ec_chroot "$T/porte" > "$T/ec.out" 2> "$T/ec.err" || c=$?
+  v="sans verdict"; [ ! -s "$T/ec.out" ] || v=$(jq -r '[.filepaths[].violations[].metadata.code] | unique | join(",")' "$T/ec.out")
+  [ "$c" = "$2" ] && [ "$v" = "$3" ] && ok "$1 : code $c, ${v:-admis}" || { echo "KO   $1 : code $c, violations $v (attendu : code $2, ${3:-aucune}) ; $(tail -1 "$T/ec.err" | cut -c1-200)"; ko=1; }
+}
+entree_modifiee() { # filtre jq sur le prédicat du scan réel
+  jq -c "$1" "$T/reel.json" > "$T/porte/partage/scan-entree.json"
+}
+
+etape_g5_sec() {
+  local T=$W/g5-sec-jeu ko=0 d=${IMAGE##*@sha256:} n i l q p
+  [ ! -d "$T" ] || chmod -R u+w "$T"
+  rm -rf -- "${T:?}"; mkdir -p "$T/outils" "$T/porte"
+  echo "## correctif de la 08 applicable à l'arbre, qui n'a pas changé"
+  git -C "$here/../../.." apply --check "$here/politique/g5-porte.patch" && ok "git apply --check"
+  echo "## systèmes de fichiers des images de la porte (Zot, lecture anonyme)"
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/$G5_OUTILS" - | tar -xf - -C "$T/outils" --no-same-owner --exclude='dev/*' 2>/dev/null || true
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/$G5_PORTE" - | tar -xf - -C "$T/porte" --no-same-owner
+  [ -x "$T/outils/ko-app/cosign" ] && [ -x "$T/porte/ec" ] && ok "cosign et ec extraits des images épinglées" || { echo "KO   extraction"; return 1; }
+  echo "version de ec dans l'image : $("$T/porte/ec" version 2>/dev/null | awk '/^Version/ {print $2}') ; empreinte $(sha256sum < "$T/porte/ec" | cut -c1-16)"
+  for n in outils porte; do mkdir -p "$T/$n/etc/porte/regles-scan" "$T/$n/tmp" "$T/$n/partage" "$T/$n/dev" "$T/$n/proc"; done
+  cp "$here/politique/porte/scan-verifier.sh" "$R/scanner-cle-publique.pem" "$P/ca-poc.crt" "$T/outils/etc/porte/"
+  mv "$T/outils/etc/porte/scanner-cle-publique.pem" "$T/outils/etc/porte/scanner.pub"
+  cp "$here/politique/porte/policy-scan.yaml" "$T/porte/etc/porte/"
+  cp "$here/politique/porte/scan.rego" "$T/porte/etc/porte/regles-scan/"
+
+  echo "## scan réel : scan-verifier, puis ec sans réseau"
+  verifier_chroot "$T/outils" "$REG_HOTE/$IMAGE" | tee "$T/reel.scan-verifier"
+  grep -q "^LECTURE|1|$REG_HOTE/$DEPOT_SCAN|$" "$T/reel.scan-verifier" && ok "1 énoncé vérifié, dépôt dérivé du nom de l'image" || { echo "KO   lecture"; ko=1; }
+  jq -e --arg d "$d" '.digest == $d and (.statements | length) == 1' "$T/outils/partage/scan-entree.json" >/dev/null && ok "entrée : digest jugé, un énoncé, JSON valide" || { echo "KO   entrée"; ko=1; }
+  cp "$T/outils/partage/scan-entree.json" "$T/reel.json"
+  cp "$T/reel.json" "$T/porte/partage/scan-entree.json"
+  /usr/bin/time -f "RSS maximal de ec : %M Ko, %e s" -o "$T/ec.time" bash -c "$(declare -f ec_chroot); ec_chroot '$T/porte'" > "$T/ec-reel.json" 2> /dev/null || { echo "KO   ec sur le scan réel"; ko=1; }
+  cat "$T/ec.time"
+  jq -c '{success, violations: [.filepaths[].violations[].metadata.code], succes: [.filepaths[].successes[].metadata.code]}' "$T/ec-reel.json"
+  juger_entree "scan réel" 0 ""
+
+  echo "## contre-épreuves de la lecture"
+  for i in "builds/essai-webhook@sha256:$d" "builds/scan/sample-app@sha256:$d" "builds/vsa/sample-app@sha256:$d" "plateforme/porte@sha256:$d" "builds/sample-app:latest"; do
+    l=$(verifier_chroot "$T/outils" "$REG_HOTE/$i" | tail -1)
+    echo "$i : $(cut -c1-170 <<< "$l")"
+    [ "$(cut -d'|' -f2 <<< "$l")" = 0 ] && ok "0 énoncé" || { echo "KO   $i"; ko=1; }
+    cp "$T/outils/partage/scan-entree.json" "$T/porte/partage/"
+    juger_entree "$i" 1 scan.scan_present
+  done
+  cp "$R8/resultats/chains-cle-publique.pem" "$T/outils/etc/porte/scanner.pub"
+  l=$(verifier_chroot "$T/outils" "$REG_HOTE/$IMAGE" | tail -1)
+  echo "clé de Chains à la place de celle du scanner : $(cut -c1-200 <<< "$l")"
+  [ "$(cut -d'|' -f2 <<< "$l")" = 0 ] && ok "0 énoncé" || { echo "KO   clé de Chains"; ko=1; }
+  cp "$T/outils/partage/scan-entree.json" "$T/porte/partage/"
+  juger_entree "clé de Chains" 1 scan.scan_present
+  cp "$R/scanner-cle-publique.pem" "$T/outils/etc/porte/scanner.pub"
+
+  echo "## contre-épreuves du jugement, ec de l'image de la porte, entrée modifiée après la lecture (la signature n'est plus en jeu : rôle de G6)"
+  entree_modifiee '.statements[0].predicate.vulnerabilities[0].kev = true'
+  juger_entree "KEV" 1 scan.kev_without_vex
+  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2020-01-01T00:00:00Z"}}'
+  juger_entree "VEX expiré" 1 scan.kev_without_vex
+  entree_modifiee '.statements[0].predicate.vulnerabilities[0] += {kev: true, vex: {status: "not_affected", expires: "2099-01-01T00:00:00Z"}}'
+  juger_entree "VEX valide" 0 ""
+  entree_modifiee '.statements[0].predicate.malicious = ["MAL-2026-1"]'
+  juger_entree "MAL-" 1 scan.malicious
+  entree_modifiee '.statements[0].predicate.scannedAt = "2026-10-01T00:00:00Z" | .statements[0].predicate.scanner.db.built = "2026-09-30T00:00:00Z"'
+  juger_entree "scan trop vieux" 1 scan.scan_recent
+  entree_modifiee '.statements[0].predicate.scanner.db.built = "2026-10-01T00:00:00Z"'
+  juger_entree "base trop vieille" 1 scan.base_recente
+  entree_modifiee '.statements[0].predicate |= del(.vulnerabilities)'
+  juger_entree "prédicat sans vulnerabilities" 1 scan.forme
+  printf '{"digest":"' > "$T/porte/partage/scan-entree.json"
+  juger_entree "entrée au JSON invalide" 1 "sans verdict"
+  rm "$T/porte/partage/scan-entree.json"
+  juger_entree "entrée absente" 1 "sans verdict"
+
+  echo "## correctif appliqué à une copie : Job rendu, ConfigMap, controle7"
+  q=$T/copie; mkdir -p "$q"
+  (cd "$here/../../.." && git archive HEAD poc/bricks/08-trust-plane/politique/porte-job.yaml poc/bricks/08-trust-plane/politique.sh poc/bricks/08-trust-plane/preuves.sh) | tar -xf - -C "$q"
+  patch -d "$q" -p1 --quiet < "$here/politique/g5-porte.patch" && ok "correctif appliqué à la copie"
+  p=$q/poc/bricks/08-trust-plane
+  bash -n "$p/politique.sh" && bash -n "$p/preuves.sh" && ok "bash -n sur politique.sh et preuves.sh corrigés"
+  sed -e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'{\"components\":[{\"name\":\"c\",\"containerImage\":\"$REG/$IMAGE\"}]}'#" -e "s#@NOM@#porte-g5#" -e "s#@IMAGE@#$REG/$IMAGE#" -e "s#@PORTE@#$REG/$G5_PORTE#" \
+    -e "s#@POLITIQUE@#policy.yaml#" -e "s#@CM@#porte#" -e "s#@OUTILS@#$REG/$G5_OUTILS#" -e "s#@BUNDLES@#$REG/horodatage/bundles#" "$p/politique/porte-job.yaml" > "$T/job.yaml"
+  ! grep -n '@[A-Z]*@' "$T/job.yaml" && ok "aucun marqueur restant dans le Job"
+  kubectl apply --dry-run=client --validate=strict -f "$T/job.yaml" -o json > "$T/job.json" && ok "Job valide (dry-run client, schéma strict lu sur l'API, rien d'écrit dans le cluster)"
+  jq -r '"initContainers : \([.spec.template.spec.initContainers[].name] | join(", ")) ; containers : \([.spec.template.spec.containers[].name] | join(", "))"' "$T/job.json"
+  jq -e '.spec.template.spec.initContainers[0].name == "porte"' "$T/job.json" >/dev/null && ok "porte reste le premier conteneur d'initialisation (champ 6 de VERDICT)" || { echo "KO   ordre des conteneurs"; ko=1; }
+  kubectl create configmap porte --dry-run=client -o json --from-file=scan-verifier.sh="$here/politique/porte/scan-verifier.sh" --from-file=policy-scan.yaml="$here/politique/porte/policy-scan.yaml" \
+    --from-file=scan.rego="$here/politique/porte/scan.rego" --from-file=scanner.pub="$R/scanner-cle-publique.pem" > "$T/cm.json"
+  [ "$(jq -r '.data["scan-verifier.sh"]' "$T/cm.json")" = "$(cat "$here/politique/porte/scan-verifier.sh")" ] && ok "clés de la ConfigMap lisibles" || { echo "KO   ConfigMap"; ko=1; }
+  (
+    eval "$(sed -n '/^controle7() {/,/^}/p' "$p/politique.sh")"
+    cp "$T/reel.scan-verifier" "$T/c7.scan-verifier"; jq -c . "$T/ec-reel.json" > "$T/c7.scan"
+    echo "controle7, scan réel : $(controle7 "$T/c7")"
+    jq -c '.success = false | .filepaths[0].violations = [{metadata: {code: "scan.malicious"}}, {metadata: {code: "scan.kev_without_vex"}}]' "$T/ec-reel.json" > "$T/c7.scan"
+    echo "controle7, refus : $(controle7 "$T/c7")"
+    echo 'Error: fichier absent' > "$T/c7.scan"
+    echo "controle7, ec sans verdict : $(controle7 "$T/c7")"
+  )
+  chmod -R u+w "$T"; rm -rf -- "${T:?}/outils" "${T:?}/porte"
+  return $ko
+}
+
+vsa_nouvelles() { # referrers de l'image dans builds/vsa/sample-app autres que la VSA de la provenance d9006af7, poussée le 03/11/2026 et
+  # toujours dans Zot : seule une nouvelle VSA prouve que R5 est passé
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/builds/vsa/sample-app/referrers/${IMAGE##*@}" 2>/dev/null \
+    | jq --arg v "$VSA_ANCIENNE" '[.manifests[].digest | select(. != $v)] | length' 2>/dev/null || true
+}
+
+etape_g5_porte() { # APRÈS R5 SEULEMENT, ACCORD DU PROPRIÉTAIRE
+  local n c=0 r=$(cd "$here/../../.." && pwd)
+  n=$(vsa_nouvelles)
+  [ "${n:-0}" -ge 1 ] || { echo "REFUS : aucune VSA nouvelle dans builds/vsa/sample-app, R5 de la 10 n'est pas fini (porte_avant et porte_apres comparent les verdicts)"; exit 1; }
+  if git -C "$r" apply --reverse --check "$here/politique/g5-porte.patch" 2>/dev/null; then echo "correctif déjà appliqué"
+  else git -C "$r" apply "$here/politique/g5-porte.patch"; ok "correctif appliqué à l'arbre de travail"; fi
+  "$R8/preuves.sh" controle7 || c=$?
+  cp "$R8/resultats/preuves-controle7.log" "$R/g5_porte.copie.log"   # copié aussi après un échec
+  [ "$c" = 0 ] && ! grep -q '^KO' "$R/g5_porte.copie.log"
+}
+
+[ $# -ge 1 ] || { sed -n 2,62p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
