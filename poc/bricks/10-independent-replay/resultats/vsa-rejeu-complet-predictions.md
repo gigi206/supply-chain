@@ -62,6 +62,17 @@ Chaque rejeu de zéro régénère la clé de Chains et les invocationId. La VSA 
 
 Conforme à toutes les prédictions de R3 : 41/41 bundles, provenance `c4242a11`, entrées et digests attendus, Dockerfile `d56985c1…`, `go1.26.10`, `finishedOn` à 21:26:27 UTC, 0 KO.
 
+## Résultat de R4 (04/11/2026, 21:26:33 à 21:46:36 UTC, accord du propriétaire : « 3a ») : [`r4-rebuild.log`](r4-rebuild.log)
+
+Conforme aux prédictions de R4, du premier coup :
+- lancé 1 440 min après `finishedOn`, le délai de 24 h est tenu ; `rebuild.sh` `a1945ff2…` ;
+- lien coupé pendant 1 200 s, de 21:26:34 à 21:46:34 UTC ; sortie de la VM inchangée (`tx_bytes=2524076`, `tx_packets=23504`) ; porteuse à 0 au début et à la fin ;
+- **`PASSED`** : image reconstruite `3a7ca1b1…`, égale au sujet de la provenance `c4242a11`, en 16 s ;
+- binaire `e3749c68…` identique avec le second moteur (`go build`), options identiques au `RUN` du Dockerfile signé ;
+- rebuild terminé à 21:27:41 UTC, avant le rétablissement du lien ; `sortie=code 0`.
+
+Le journal remplace celui de `d9006af7`, qui reste dans l'historique git (`4306ff3` et avant). Rien n'a encore été signé ni poussé pour cette provenance : R5 attend l'accord du propriétaire.
+
 ## Après R5 : ce qu'il faudra adapter (relevé à sec le 04/11/2026 à 18:14 UTC, rien modifié)
 
 R5 réécrit les fichiers `r5-vsa.log`, `r5-vsa-enonce.json`, `r5-vsa.bundle.json`, `r5-vsa-manifeste.json`, `r5-pousser_vsa.log`, `r5-porte_avant.log`, `r5-porte_apres.log` et `r5-lire_vsa.log`. Ceux de la VSA `c804d946` restent dans l'historique git. Points qui les citent ou qui en dépendent :

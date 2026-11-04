@@ -446,3 +446,7 @@ Même image (`3a7ca1b1`), provenance de J7 du rejeu complet (`c4242a11`, fermetu
 - `finishedOn` à 21:26:27 UTC, jeton de la TSA à 21:27:06 UTC.
 
 Prochaine étape : R4, pas avant le 04/11/2026 à 21:26:27 UTC.
+
+**R4 joué le 04/11/2026 (21:26:33 à 21:46:36 UTC, accord du propriétaire), conforme du premier coup** ([résultat](resultats/vsa-rejeu-complet-predictions.md), [journal](resultats/r4-rebuild.log)) : lien coupé 1 200 s, sortie de la VM inchangée, **`PASSED`**, image reconstruite `3a7ca1b1…` égale au sujet de `c4242a11`, binaire `e3749c68…` identique avec `go build`.
+
+Prochaine étape : R5 (`vsa`, `porte_avant`, puis `pousser_vsa` sur accord), avec `POLITIQUE_COMMIT=6c44219`. La politique et `vsa.py` n'ont pas changé depuis ce commit.

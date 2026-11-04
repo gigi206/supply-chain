@@ -1,54 +1,54 @@
-# replay.sh rebuild, 2026-11-03T14:26:09Z
-## délai : 1466 min depuis la fin du build (2026-11-02T13:59:30Z)
+# replay.sh rebuild, 2026-11-04T21:26:33Z
+## délai : 1440 min depuis la fin du build (2026-11-03T21:26:27Z)
 a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534  rebuild.sh
 a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534  rebuild.sh
 ## interface de sc-replay côté hôte : vnet124
-Running as unit: replay-r4.service; invocation ID: 98653205cda647b8b9e1003690e5aaff
-lien coupé à 2026-11-03T14:26:10Z (down)
-compteurs avant le lancement : rx_bytes=538580518 rx_packets=29419 rx_errs=0 rx_drop=0 tx_bytes=1890699 tx_packets=18278 tx_errs=0 tx_drop=0 = 
-compteurs juste après la coupure : rx_bytes=538586104 rx_packets=29441 rx_errs=0 rx_drop=0 tx_bytes=1895856 tx_packets=18298 tx_errs=0 tx_drop=0 = 
-compteurs juste avant le rétablissement (1200 s plus tard) : rx_bytes=538663727 rx_packets=30122 rx_errs=0 rx_drop=0 tx_bytes=1895856 tx_packets=18298 tx_errs=0 tx_drop=0 = 
-OK   sortie de la VM inchangée pendant la coupure (tx_bytes=1895856 tx_packets=18298 )
-lien rétabli à 2026-11-03T14:46:10Z
+Running as unit: replay-r4.service; invocation ID: 575d01c5651b48439b217a91597b8714
+lien coupé à 2026-11-04T21:26:34Z (down)
+compteurs avant le lancement : rx_bytes=746464417 rx_packets=99748 rx_errs=0 rx_drop=0 tx_bytes=2518655 tx_packets=23480 tx_errs=0 tx_drop=0 = 
+compteurs juste après la coupure : rx_bytes=746470055 rx_packets=99771 rx_errs=0 rx_drop=0 tx_bytes=2524076 tx_packets=23504 tx_errs=0 tx_drop=0 = 
+compteurs juste avant le rétablissement (1200 s plus tard) : rx_bytes=746548844 rx_packets=100454 rx_errs=0 rx_drop=0 tx_bytes=2524076 tx_packets=23504 tx_errs=0 tx_drop=0 = 
+OK   sortie de la VM inchangée pendant la coupure (tx_bytes=2524076 tx_packets=23504 )
+lien rétabli à 2026-11-04T21:46:34Z
 ## sortie de rebuild.sh : code 0
 ## résultat (écrit dans la VM)
-debut=2026-11-03T14:26:10Z
+debut=2026-11-04T21:26:34Z
 porteuse_enp1s0=0
-sortie_invite_debut=enp1s0 tx_packets=18298 tx_bytes=1895856 
+sortie_invite_debut=enp1s0 tx_packets=23504 tx_bytes=2524076 
 preparer_entrees_digest=OK 2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
 recette_git_archive=OK
 recette_fermeture_deps=OK
 recette_web_dist_src=OK
-contexte=commit 6391fd437f26696847041be3226bbbf633f55a2f ; fermeture 8 fichiers ; web/dist 2 fichiers
+contexte=commit 6391fd437f26696847041be3226bbbf633f55a2f ; fermeture 7 fichiers ; web/dist 2 fichiers
 env_image_de_build=ENV PATH=/usr/local/go/bin:/bin HOME=/tmp CGO_ENABLED=0 GOTOOLCHAIN=local GOFLAGS=-mod=readonly GOSUMDB=off
 buildkit=buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e
-image_de_build_domaine=sha256:dc20b7524ba0fe1cb224f9507e96987e3216a276a352e19f0d10c93743817b7a (18 s)
-image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (14 s)
+image_de_build_domaine=sha256:dc20b7524ba0fe1cb224f9507e96987e3216a276a352e19f0d10c93743817b7a (19 s)
+image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (16 s)
 sujet_provenance=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 verdict=PASSED
-fin_image=2026-11-03T14:27:05Z
+fin_image=2026-11-04T21:27:33Z
 binaire_image=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 binaire_go_build=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 options_go_build=identiques au RUN du Dockerfile signé
 second_moteur=fait
-sortie_invite_fin=enp1s0 tx_packets=18298 tx_bytes=1895856 
+sortie_invite_fin=enp1s0 tx_packets=23504 tx_bytes=2524076 
 porteuse_fin=enp1s0=0 
-fin=2026-11-03T14:27:12Z
+fin=2026-11-04T21:27:41Z
 sortie=code 0
-OK   rebuild terminé (2026-11-03T14:27:12Z) avant le rétablissement du lien (2026-11-03T14:46:10Z)
+OK   rebuild terminé (2026-11-04T21:27:41Z) avant le rétablissement du lien (2026-11-04T21:46:34Z)
 ## journal du rebuild (fin)
 #12 sending tarball 0.0s done
 #12 DONE 0.5s
-image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (14 s)
+image_reconstruite=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (16 s)
 sujet_provenance=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 verdict=PASSED
-fin_image=2026-11-03T14:27:05Z
+fin_image=2026-11-04T21:27:33Z
 go: downloading github.com/go-chi/chi/v5 v5.2.3
 binaire_image=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 binaire_go_build=e3749c68b6babe6d91a0d8af35aa9bddfe42f09dedafa6877d5ce702c5a69f11
 options_go_build=identiques au RUN du Dockerfile signé
 second_moteur=fait
-sortie_invite_fin=enp1s0 tx_packets=18298 tx_bytes=1895856 
+sortie_invite_fin=enp1s0 tx_packets=23504 tx_bytes=2524076 
 porteuse_fin=enp1s0=0 
-fin=2026-11-03T14:27:12Z
+fin=2026-11-04T21:27:41Z
 sortie=code 0
