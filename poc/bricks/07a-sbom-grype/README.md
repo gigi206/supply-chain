@@ -173,3 +173,7 @@ Une cinquième étape, `g3_grafana`, relit les journaux du pod et l'audit d'Open
 Le chemin que cosign appelle est `transit/sign/scanner/sha2-256`, et il lit `transit/keys/scanner`. D7 n'est toujours pas tranchée.
 
 Prochaine étape : G4, le job de scan.
+
+**G4 préparé à sec le 04/11/2026 à 20:35 UTC** ([prédictions](resultats/g4-predictions.md)) : job de scan en six conteneurs, un mode de [`politique/scanner.sh`](politique/scanner.sh) chacun. Le scan tourne sans aucun identifiant ; le jeton qui signe est pris après le scan.
+
+`scanner.sh` a tourné dans le système de fichiers de l'image réelle : 5 vulnérabilités, 0 KEV, mêmes identifiants qu'en G0. La lecture de la source demande un conteneur de plus, sur l'image BuildKit, car `outils-scan` n'a pas git. Les refus et l'anomalie du CronJob d'horodatage viennent des témoins de J6, et G1 n'a rien changé à son bilan.

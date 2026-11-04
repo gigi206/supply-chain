@@ -1,0 +1,130 @@
+# Brique 07a, jalon G4 : un job de scan par image (plateforme.sh g4_scan). Conteneurs d'initialisation en séquence, un mode de
+# politique/scanner.sh chacun : aucun identifiant ni jeton pendant le scan ; jeton projeté d'audience openbao monté dans le seul
+# conteneur jetons ; identifiants et jeton dans un volume en mémoire, le jeton signant ne vit que 5 min au plus.
+# @NOM@, @IMAGE@, @NOM_IMAGE@, @DEPOT@, @BASES@, @SOURCE@, @COMMIT@ ; @OUTILS@, @BAO@, @BUILDKIT@ : images épinglées par digest.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: @NOM@
+  namespace: scan
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1800
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: scan
+    spec:
+      serviceAccountName: scanner
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      restartPolicy: Never
+      nodeSelector:
+        zone: confiance
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+      - name: source
+        image: @BUILDKIT@
+        command: [sh, /etc/scan/scanner.sh, source]
+        env:
+        - {name: SOURCE, value: "@SOURCE@"}
+        - {name: COMMIT, value: "@COMMIT@"}
+        securityContext: &restreint
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+      - name: analyser
+        image: @OUTILS@
+        command: [sh, /etc/scan/scanner.sh, analyser]
+        env:
+        - {name: IMAGE, value: "@IMAGE@"}
+        - {name: BASES, value: "@BASES@"}
+        - {name: HOME, value: /travail}
+        - {name: TMPDIR, value: /travail}
+        resources:
+          requests: {memory: 512Mi}
+          limits: {memory: 2Gi}
+        securityContext: *restreint
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+      - name: jetons
+        image: @BAO@
+        command: [sh, /etc/scan/scanner.sh, jetons]
+        env:
+        - {name: BAO_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}
+        - {name: BAO_CACERT, value: /etc/scan/ca-poc.crt}
+        securityContext: *restreint
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+        - {name: bao, mountPath: /var/run/bao}
+        - {name: openbao-jeton, mountPath: /var/run/secrets/openbao, readOnly: true}
+      - name: attester
+        image: @OUTILS@
+        command: [sh, /etc/scan/scanner.sh, attester]
+        env:
+        - {name: IMAGE, value: "@IMAGE@"}
+        - {name: NOM, value: "@NOM_IMAGE@"}
+        - {name: VAULT_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}
+        - {name: VAULT_CACERT, value: /etc/scan/ca-poc.crt}
+        - {name: HOME, value: /travail}
+        - {name: TMPDIR, value: /travail}
+        securityContext: *restreint
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+        - {name: bao, mountPath: /var/run/bao, readOnly: true}
+      - name: publier
+        image: @OUTILS@
+        command: [sh, /etc/scan/scanner.sh, publier]
+        env:
+        - {name: IMAGE, value: "@IMAGE@"}
+        - {name: DEPOT, value: "@DEPOT@"}
+        - {name: HOME, value: /travail}
+        - {name: TMPDIR, value: /travail}
+        securityContext: *restreint
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+        - {name: bao, mountPath: /var/run/bao, readOnly: true}
+      containers:
+      - name: revocation
+        image: @BAO@
+        command: [sh, /etc/scan/scanner.sh, revocation]
+        env:
+        - {name: BAO_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}
+        - {name: BAO_CACERT, value: /etc/scan/ca-poc.crt}
+        securityContext: *restreint
+        volumeMounts:
+        - {name: travail, mountPath: /travail}
+        - {name: config, mountPath: /etc/scan, readOnly: true}
+        - {name: bao, mountPath: /var/run/bao}
+      volumes:
+      - name: travail
+        emptyDir:
+          sizeLimit: 5Gi
+      - name: config
+        configMap:
+          name: scan-config
+      - name: bao
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Mi
+      - name: openbao-jeton
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: openbao
+              expirationSeconds: 600
+              path: token

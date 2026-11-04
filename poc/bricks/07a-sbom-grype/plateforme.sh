@@ -43,6 +43,14 @@
 #               (cosign verify-blob, clé exportée), contre-épreuves ; chemins d'OpenBao réellement appelés par cosign (audit)
 #   g3_grafana  journaux du pod et signatures de l'audit d'OpenBao lus par l'auditeur à travers Grafana (19b) ; identifiants de
 #               poc-scan absents des réponses ; pods d'essai supprimés ensuite (leurs journaux doivent d'abord être collectés)
+#   G4 (D1 a, D2, D9 a) : job de scan (politique/scan-job.yaml, politique/scanner.sh, un mode par conteneur) :
+#   g4_scan     ConfigMap scan-config complétée (scanner.sh, clé publique du scanner), job lancé sur l'image, attendu ; journaux
+#               de chaque conteneur ; place libre de sc-confiance relevée pendant le job (base importée : 3,4 Go au plus haut)
+#   g4_verifier referrer de l'image lu en anonyme dans builds/scan/sample-app ; bundle vérifié sur l'hôte (clé du scanner, sujet
+#               = digest de l'image, prédicat), contre-épreuves (autre digest, autre prédicat, clé de Chains) ; prédicat relu :
+#               scanner, base citée par digest, vulnérabilités et KEV ; audit d'OpenBao ; aucun Secret dans l'espace scan
+#   g4_grafana  journaux du job, audit d'OpenBao et audit de Zot (poussage par poc-scan) lus par l'auditeur ; identifiants absents
+#               des réponses ; job supprimé ensuite
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -68,8 +76,12 @@ OUTILS_SCAN=plateforme/outils-scan
 OUTILS_SCAN_DIGEST=sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f   # G2 du 04/11/2026 (assemblage reproductible)
 R8=$(cd "$here/../08-trust-plane" && pwd)
 REG=sc-stockage.poc.test:5000                                  # Zot depuis les nœuds et les pods
+BUILDKIT_IMAGE=amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh (seule image avec git)
 BAO_IMAGE=amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh (2.7.2)
 SUJET_SCAN=system:serviceaccount:scan:scanner
+DEPOT_SCAN=builds/scan/sample-app
+JOB_SCAN=g4-sample-app
+PREDICAT_SCAN=https://supply-chain.example/scan/v1
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }   # sc-stockage
@@ -769,11 +781,129 @@ etape_g3_grafana() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,46p "$0"; exit 2; }
+etape_g4_scan() {
+  local etat="" libre mini=999999 c tag base
+  T=$W/g4-scan
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  echo "## ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner"
+  kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=scanner.sh="$here/politique/scanner.sh" \
+    --from-file=scanner.pub="$R/scanner-cle-publique.pem" --dry-run=client -o yaml | kubectl apply --server-side -f -
+  echo "## job $JOB_SCAN sur $REG/$IMAGE"
+  kubectl delete job -n scan "$JOB_SCAN" --ignore-not-found --wait=true >/dev/null
+  sed -e "s#@NOM@#$JOB_SCAN#" -e "s#@IMAGE@#$REG/$IMAGE#g" -e "s#@NOM_IMAGE@#sample-app#" -e "s#@DEPOT@#$REG/$DEPOT_SCAN#" \
+    -e "s#@BASES@#$REG/vulndb/grype#" -e "s#@SOURCE@#https://sc-stockage.poc.test:3000/workspace/sample-app.git#" -e "s#@COMMIT@#$COMMIT#" \
+    -e "s#@OUTILS@#$REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST#g" -e "s#@BAO@#$REG/$BAO_IMAGE#g" -e "s#@BUILDKIT@#$REG/$BUILDKIT_IMAGE#g" \
+    "$here/politique/scan-job.yaml" | kubectl apply -f -
+  for _ in $(seq 180); do
+    etat=$(kubectl get job -n scan "$JOB_SCAN" -o jsonpath='{.status.succeeded}/{.status.failed}')
+    libre=$(ssh "${SSH_OPTS[@]}" poc@192.168.161.11 "df -m --output=avail / | tail -1" | tr -d ' ')
+    [ "$libre" -lt "$mini" ] && mini=$libre
+    case $etat in 1/*|*/1) break ;; esac
+    sleep 5
+  done
+  for c in source analyser jetons attester publier revocation; do
+    echo "### $c"; kubectl logs -n scan "job/$JOB_SCAN" -c "$c" 2>&1 | tee "$T/$c.log" | sed 's/^/  /'
+  done
+  kubectl get pods -n scan -l job-name="$JOB_SCAN" -o json | jq -c '.items[0] | {noeud: .spec.nodeName, phase: .status.phase, debut: .status.startTime,
+    fin: (.status.containerStatuses[0].state.terminated.finishedAt // null), init: [.status.initContainerStatuses[] | {(.name): (.state.terminated.exitCode // "?")}] | add}'
+  echo "place libre la plus basse sur sc-confiance pendant le job : $mini Mo"
+  attendu "job" "${etat%%/*}" 1
+  tag=$(oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/vulndb/grype" | sort | tail -1)
+  base=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/vulndb/grype:$tag")
+  attendu "base du job = base la plus récente ($tag)" "$(sed -n 's/^BASE|[^,]*, [^@]*@\(sha256:[0-9a-f]*\),.*/\1/p' "$T/analyser.log")" "$base"
+  attendu "commit de la source" "$(sed -n 's/^SOURCE|commit \([0-9a-f]*\),.*/\1/p' "$T/source.log")" "$COMMIT"
+  sed -n 's/^SCAN|[^,]*, //p;s/^IMPORT|//p' "$T/analyser.log"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g4_verifier() {
+  local d=${IMAGE#*@} h liste man couche c
+  T=$W/g4-verifier
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  h=${d#sha256:}
+  echo "## referrers de l'image dans $DEPOT_SCAN, en lecture anonyme"
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_SCAN/referrers/$d" > "$T/referrers.json"
+  jq -c '.manifests[] | {digest, artifactType, annotations}' "$T/referrers.json"
+  man=$(jq -r '[.manifests[] | select(.annotations["dev.sigstore.bundle.predicateType"] == "'"$PREDICAT_SCAN"'")] | sort_by(.annotations["org.opencontainers.image.created"]) | last | .digest' "$T/referrers.json")
+  curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$REG_HOTE/v2/$DEPOT_SCAN/manifests/$man" > "$T/manifeste.json"
+  attendu "empreinte du manifeste" "sha256:$(sha256sum < "$T/manifeste.json" | cut -c1-64)" "$man"
+  attendu "sujet du manifeste" "$(jq -r .subject.digest "$T/manifeste.json")" "$d"
+  couche=$(jq -r '.layers[0].digest' "$T/manifeste.json")
+  curl -fsS --cacert "$P/ca-poc.crt" -L "https://$REG_HOTE/v2/$DEPOT_SCAN/blobs/$couche" > "$R/g4-scan.bundle.json"
+  attendu "empreinte du bundle" "sha256:$(sha256sum < "$R/g4-scan.bundle.json" | cut -c1-64)" "$couche"
+  verifier() { cosign verify-blob-attestation --bundle "$R/g4-scan.bundle.json" --new-bundle-format --key "$1" --insecure-ignore-tlog --type "$2" --digest "$3" --digestAlg sha256 > "$T/v.out" 2>&1; }
+  echo "## bundle vérifié sur l'hôte"
+  if verifier "$R/scanner-cle-publique.pem" "$PREDICAT_SCAN" "$h"; then ok "bundle vérifié : clé du scanner, sujet $d, prédicat $PREDICAT_SCAN ($(tail -1 "$T/v.out"))"
+  else cat "$T/v.out"; echo "KO   bundle non vérifié"; ko=1; fi
+  if verifier "$R/scanner-cle-publique.pem" "$PREDICAT_SCAN" "$(printf '0%.0s' $(seq 64))"; then echo "KO   autre digest accepté"; ko=1
+  else ok "contre-épreuve, autre digest refusé : $(grep -m1 -oE 'provided artifact digest[^:]*' "$T/v.out")"; fi
+  if verifier "$R/scanner-cle-publique.pem" https://slsa.dev/provenance/v1 "$h"; then echo "KO   autre prédicat accepté"; ko=1
+  else ok "contre-épreuve, autre prédicat refusé : $(grep -m1 -oE 'invalid predicate type' "$T/v.out")"; fi
+  if verifier "$R8/resultats/chains-cle-publique.pem" "$PREDICAT_SCAN" "$h"; then echo "KO   clé de Chains acceptée"; ko=1
+  else ok "contre-épreuve, clé de Chains refusée : $(sed -n 's/^.*Error: //p;s/^error during command execution: //p' "$T/v.out" | head -1 | cut -c1-110)"; fi
+  echo "## prédicat signé"
+  jq -r .dsseEnvelope.payload "$R/g4-scan.bundle.json" | base64 -d > "$T/enonce.json"
+  jq .predicate "$T/enonce.json" > "$R/g4-scan-predicat.json"
+  jq -c '{sujet: .subject, predicat: .predicateType, scanner: .predicate.scanner, scannedAt: .predicate.scannedAt, malveillants: .predicate.malicious}' "$T/enonce.json"
+  jq -r '.vulnerabilities[] | "  \(.id) \(.severity) kev=\(.kev) \(.packages // .package // "" | tostring | .[0:80])"' "$R/g4-scan-predicat.json"
+  attendu "sujet de l'énoncé" "$(jq -r '.subject[0].digest.sha256' "$T/enonce.json")" "$h"
+  attendu "scanner" "$(jq -r '"\(.scanner.id) \(.scanner.version)"' "$R/g4-scan-predicat.json")" "grype 0.104.1"
+  attendu "base citée par digest" "$(jq -r '.scanner.db.ref | sub("@.*"; "")' "$R/g4-scan-predicat.json")" "$REG/vulndb/grype"
+  attendu "KEV" "$(jq '[.vulnerabilities[] | select(.kev)] | length' "$R/g4-scan-predicat.json")" 0
+  attendu "paquets malveillants" "$(jq '.malicious | length' "$R/g4-scan-predicat.json")" 0
+  echo "vulnérabilités : $(jq '.vulnerabilities | length' "$R/g4-scan-predicat.json")"
+  c=$(jq -r '[.vulnerabilities[].id] | sort | join(",")' "$O/07a/g0/scan-ok.json" 2>/dev/null || true)
+  [ -z "$c" ] || attendu "identifiants = ceux de G0 (même base si elle n'a pas changé)" "$(jq -r '[.vulnerabilities[].id] | sort | join(",")' "$R/g4-scan-predicat.json")" "$c"
+  echo "## aucun Secret dans l'espace scan"
+  attendu "Secrets de l'espace scan" "$(kubectl get secrets -n scan -o name | wc -l)" 0
+  echo "## audit d'OpenBao depuis le début du job"
+  audit_openbao "$(sed -n '1s/.*, //p' "$R/g4_scan.log")"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g4_grafana() {
+  local de i
+  T=$W/g4-grafana
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/g4-grafana"' EXIT   # motif tiré du mot de passe de poc-scan supprimé même en cas d'échec
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g4_scan.log")" +%s)
+  echo "## journaux du job, lus par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{espace="scan", conteneur=~"source|analyser|jetons|attester|publier|revocation"}' "$de" "$T/job.json" "$T/job.txt"
+    grep -q '^PUBLIE|' "$T/job.txt" && grep -q 'jeton du rôle scanner révoqué' "$T/job.txt" && break
+    sleep 2
+  done
+  cut -c1-170 "$T/job.txt"
+  for m in '^SOURCE|' '^BASE|' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' 'jeton du rôle scanner révoqué'; do
+    if grep -q "$m" "$T/job.txt"; then ok "visible dans Grafana : $m"; else echo "KO   absent de Grafana : $m"; ko=1; fi
+  done
+  echo "## audit d'OpenBao, lu par l'auditeur"
+  grafana_lignes '{espace="openbao"} |= "transit/sign/scanner"' "$de" "$T/bao.json" "$T/bao.txt"
+  echo "lignes d'audit citant transit/sign/scanner : $(wc -l < "$T/bao.txt")"
+  [ -s "$T/bao.txt" ] && ok "signature du job visible dans Grafana" || { echo "KO   audit d'OpenBao absent de Grafana"; ko=1; }
+  echo "## audit de Zot, lu par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "builds/scan/sample-app" |= "poc-scan"' "$de" "$T/zot.json" "$T/zot.txt"
+    grep -q 'manifests' "$T/zot.txt" && break
+    sleep 2
+  done
+  echo "lignes d'audit de Zot : $(wc -l < "$T/zot.txt")"
+  grep -q 'manifests' "$T/zot.txt" && ok "poussage du manifeste par poc-scan visible dans Grafana" || { echo "KO   poussage absent de Grafana"; ko=1; }
+  echo "## identifiants de poc-scan absents des réponses"
+  { cat "$S8/zot-poc-scan.password"; echo; printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0; echo; } > "$T/motifs"
+  if cat "$T/job.json" "$T/bao.json" "$T/zot.json" | grep -q -F -f "$T/motifs"; then echo "KO   identifiants dans les réponses de Grafana"; ko=1
+  else ok "ni le mot de passe ni son encodage docker dans les réponses de Grafana"; fi
+  kubectl delete job -n scan "$JOB_SCAN" --wait=false >/dev/null
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,54p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
