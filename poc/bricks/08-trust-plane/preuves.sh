@@ -104,6 +104,10 @@
 #          clé publique du domaine de replay ; conteneur vsa du Job (VSA lue dans builds/vsa/<nom>) ; C1 image réelle (VSA
 #          retenue), C2 même digest dans builds/essai-webhook (aucune VSA), C3 ConfigMap porte-temoin avec la clé de Chains à la
 #          place de celle du domaine (refus) ; rien écrit dans Zot
+#   controle7  contrôle 7 dans la porte (brique 07a, G5, après R5 de la 10) : ConfigMap porte réappliquée avec scan-verifier.sh,
+#          scan.rego, policy-scan.yaml et la clé publique du scanner ; conteneurs scan-verifier et scan du Job (scan lu dans
+#          builds/scan/<nom>) ; C1 image réelle (admise), C2 même digest dans builds/essai-webhook (aucun scan), C3 ConfigMap
+#          porte-temoin avec la clé de Chains à la place de celle du scanner (refus) ; rien écrit dans Zot
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2776,6 +2780,55 @@ etape_controle6() { # contrôle 6 dans la porte (demandé par la brique 10 ; cho
   case $c in *"accepted signatures do not match threshold"*) echo "OK   C3 motif : signature refusée" ;;
     *) echo "KO   C3 motif : $c"; ko=$((ko + 1)) ;; esac
   echo "## bilan : $ko écart(s) aux prédictions"
+}
+
+etape_controle7() { # brique 07a, G5, après R5 de la 10 : contrôle 7 dans la porte (poc/bricks/07a-sbom-grype, résultats/g5-predictions.md)
+  local src r c ko=0 h7=$here/../07a-sbom-grype s=$here/../07a-sbom-grype/resultats/scanner-cle-publique.pem
+  src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  attendu() { # libellé obtenu attendu
+    [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)"; ko=$((ko + 1)); }
+  }
+  echo "## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)"
+  echo "clé du scanner : $(openssl pkey -pubin -in "$s" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; G3 : 8cbcbb4e…)"
+  cm_porte
+  cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan-verifier\.sh}') "$h7/politique/porte/scan-verifier.sh" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan\.rego}') "$h7/politique/porte/scan.rego" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.policy-scan\.yaml}') "$h7/politique/porte/policy-scan.yaml" \
+    && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scanner\.pub}') "$s" \
+    && echo "OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés" \
+    || { echo "KO   ConfigMap porte" >&2; exit 1; }
+  echo "referrers de l'image : builds/sample-app $(referrers builds/sample-app) ; builds/scan/sample-app $(referrers builds/scan/sample-app) ; builds/vsa/sample-app $(referrers builds/vsa/sample-app)"
+
+  echo "## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés"
+  r=$(juger c7-reelle "$REG/$APP" policy.yaml porte "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
+  sed 's/^/    /' "$T/porte-c7-reelle.scan-verifier"
+  attendu "C1 ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
+  attendu "C1 contrôle 9" "$(cut -d'|' -f7 <<< "$r")" ok
+  attendu "C1 contrôle 6" "$(cut -d'|' -f9 <<< "$r")" ok
+  attendu "C1 contrôle 7" "$(cut -d'|' -f11,12 <<< "$r")" "ok|1 énoncé(s) vérifié(s) dans $REG/builds/scan/sample-app"
+  attendu "C1 Job" "$(kubectl get job -n porte porte-c7-reelle -o jsonpath='{.status.succeeded}')" 1
+
+  echo "## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook"
+  r=$(juger c7-sans-scan "$REG/builds/essai-webhook@$APP_DIGEST"); echo "$r"
+  sed 's/^/    /' "$T/porte-c7-sans-scan.scan-verifier"
+  attendu "C2 contrôle 7" "$(cut -d'|' -f11 <<< "$r")" refus
+  attendu "C2 règle" "$(cut -d'|' -f12 <<< "$r" | cut -d' ' -f1)" scan.scan_present
+  attendu "C2 Job" "$(kubectl get job -n porte porte-c7-sans-scan -o jsonpath='{.status.failed}')" 1
+
+  echo "## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du scanner"
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$R/chains-cle-publique.pem" '.data["scanner.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  r=$(juger c7-cle-chains "$REG/$APP" policy.yaml porte-temoin "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée"
+  sed 's/^/    /' "$T/porte-c7-cle-chains.scan-verifier"
+  attendu "C3 ec et contrôles 9 et 6 inchangés" "$(cut -d'|' -f3-5,7,9 <<< "$r")" "true||trusted_task.tagged|ok|ok"
+  attendu "C3 contrôle 7" "$(cut -d'|' -f11 <<< "$r")" refus
+  c=$(cut -d'|' -f12 <<< "$r")
+  case $c in *"accepted signatures do not match threshold"*) echo "OK   C3 motif : signature refusée" ;;
+    *) echo "KO   C3 motif : $c"; ko=$((ko + 1)) ;; esac
+  echo "## bilan : $ko écart(s) aux prédictions"
+  [ "$ko" = 0 ]
 }
 
 lancer preuves J8 "$@"

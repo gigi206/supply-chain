@@ -60,6 +60,8 @@
 #               correctif appliqué à une copie : Job rendu comme par juger, validé par kubectl en dry-run client, controle7
 #   g5_porte    APRÈS R5 SEULEMENT, ACCORD DU PROPRIÉTAIRE : refusé sans VSA nouvelle dans builds/vsa/sample-app (l'ancienne ne compte pas) ; correctif appliqué à l'arbre de
 #               travail ; preuves.sh controle7 de la 08 (ConfigMap porte réappliquée, C1 image réelle, C2 sans scan, C3 autre clé)
+#   g5_grafana  journaux des conteneurs scan-verifier et scan des Jobs de g5_porte lus par l'auditeur (19b) : trois lectures, un verdict
+#               admis et deux refus de ec
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1075,11 +1077,32 @@ etape_g5_porte() { # APRÈS R5 SEULEMENT, ACCORD DU PROPRIÉTAIRE
   [ "$c" = 0 ] && ! grep -q '^KO' "$R/g5_porte.copie.log"
 }
 
-[ $# -ge 1 ] || { sed -n 2,62p "$0"; exit 2; }
+etape_g5_grafana() {
+  local de i a r
+  T=$W/g5-grafana
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g5_porte.log")" +%s)
+  echo "## journaux des conteneurs scan-verifier et scan, lus par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{espace="porte", conteneur=~"scan-verifier|scan"}' "$de" "$T/job.json" "$T/job.txt"
+    [ "$(grep -c '^LECTURE|' "$T/job.txt" || true)" -ge 3 ] && break
+    sleep 2
+  done
+  grep -E '^(LECTURE|LU)\|' "$T/job.txt" | cut -c1-170
+  a=$(grep -c '^{"success":true' "$T/job.txt" || true); r=$(grep -c '^{"success":false' "$T/job.txt" || true)
+  echo "verdicts de ec : $a admis, $r refusés"
+  [ "$(grep -c '^LECTURE|' "$T/job.txt" || true)" = 3 ] && ok "trois lectures visibles dans Grafana" || { echo "KO   lectures absentes de Grafana"; ko=1; }
+  [ "$a" = 1 ] && [ "$r" = 2 ] && ok "un verdict admis et deux refus visibles dans Grafana" || { echo "KO   verdicts de ec"; ko=1; }
+  [ "$(grep '^{"success":false' "$T/job.txt" | jq -r '.filepaths[].violations[].metadata.code' | sort -u)" = scan.scan_present ] \
+    && ok "refus lus : scan.scan_present" || { echo "KO   code des refus"; ko=1; }
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,64p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

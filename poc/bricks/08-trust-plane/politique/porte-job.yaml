@@ -7,6 +7,11 @@
 # Contrôle 6 (demandé par la brique 10, choix du propriétaire du 03/11/2026) : conteneur vsa (politique/porte/vsa.sh), même image
 # d'outils, en parallèle de horodatage ; VSA de replay lue dans builds/vsa/<nom>, clé du domaine de replay (vsa.pub). Verdict de
 # la porte : succès de ec, horodatage complet et VSA retenue (le Job ne réussit que si les deux conteneurs réussissent).
+# Contrôle 7 (brique 07a, G5) : conteneur d'initialisation scan-verifier après ec (politique/porte/scan-verifier.sh de la 07a, image
+# d'outils, toujours le code 0, pour ne pas empêcher horodatage et vsa de démarrer ; énoncés de builds/scan/<nom> vérifiés par la clé
+# du scanner, scanner.pub, écrits dans /partage), puis conteneur scan (ec validate input, image de la porte, base vide, sans shell ;
+# code de sortie non nul si refus). Verdict de la porte : succès de ec, horodatage complet, VSA retenue et scan admis (le Job ne
+# réussit que si les trois conteneurs réussissent).
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -76,6 +81,32 @@ spec:
           mountPath: /tmp
         - name: partage
           mountPath: /partage
+      - name: scan-verifier
+        image: "@OUTILS@"
+        command: [sh, /etc/porte/scan-verifier.sh]
+        env:
+        - name: IMAGE
+          value: @IMAGE@
+        - name: HOME
+          value: /tmp
+        - name: TMPDIR
+          value: /tmp
+        resources:
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: porte
+          mountPath: /etc/porte
+          readOnly: true
+        - name: partage
+          mountPath: /partage
+        - name: tmp
+          mountPath: /tmp
       containers:
       - name: horodatage
         image: "@OUTILS@"
@@ -130,6 +161,40 @@ spec:
           readOnly: true
         - name: tmp
           mountPath: /tmp
+      - name: scan
+        image: "@PORTE@"
+        args:
+        - validate
+        - input
+        - /partage/scan-entree.json
+        - --policy
+        - /etc/porte/policy-scan.yaml
+        - --info
+        - --show-successes
+        - --output
+        - json
+        env:
+        - name: HOME
+          value: /tmp
+        - name: TMPDIR
+          value: /tmp
+        resources:
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
+        volumeMounts:
+        - name: porte
+          mountPath: /etc/porte
+          readOnly: true
+        - name: partage
+          mountPath: /partage
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
       volumes:
       - name: porte
         configMap:
@@ -155,6 +220,14 @@ spec:
             path: vsa.sh
           - key: vsa.pub
             path: vsa.pub
+          - key: scan-verifier.sh
+            path: scan-verifier.sh
+          - key: scanner.pub
+            path: scanner.pub
+          - key: policy-scan.yaml
+            path: policy-scan.yaml
+          - key: scan.rego
+            path: regles-scan/scan.rego
       - name: partage
         emptyDir:
           sizeLimit: 16Mi

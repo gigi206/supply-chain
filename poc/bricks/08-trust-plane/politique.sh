@@ -1258,13 +1258,18 @@ variante() { # cas dépôt-de-la-tâche : image builds/essai-porte:<cas> (digest
 
 cm_porte() { # ConfigMap porte : politique, règles du PoC, liste revue, clé publique de Chains, CA du PoC ; J8 (test 8) : contrôle 9
   # (politique/porte/horodatage.sh) et racine de confiance du TSA (J5) ; contrôle 6 (brique 10) : politique/porte/vsa.sh et clé
-  # publique du domaine de replay, prise hors bande dans le dépôt de la brique 10
+  # publique du domaine de replay, prise hors bande dans le dépôt de la brique 10 ; contrôle 7 (brique 07a, G5) : scan-verifier.sh,
+  # règles et politique de ec validate input, clé publique du scanner, prise hors bande dans le dépôt de la brique 07a
   kubectl create configmap porte -n porte --from-file=policy.yaml="$here/politique/porte/policy.yaml" \
     --from-file=policy-trusted-task.yaml="$here/politique/porte/policy-trusted-task.yaml" \
     --from-file=porte.rego="$here/politique/porte/porte.rego" --from-file=taches.yml="$here/politique/porte/taches.yml" \
     --from-file=chains.pub="$R/chains-cle-publique.pem" --from-file=ca-poc.crt="$P/ca-poc.crt" \
     --from-file=horodatage.sh="$here/politique/porte/horodatage.sh" --from-file=tsa-racine-confiance.json="$P/tsa-racine-confiance.json" \
     --from-file=vsa.sh="$here/politique/porte/vsa.sh" --from-file=vsa.pub="$here/../10-independent-replay/resultats/vsa-cle-publique.pem" \
+    --from-file=scan-verifier.sh="$here/../07a-sbom-grype/politique/porte/scan-verifier.sh" \
+    --from-file=scan.rego="$here/../07a-sbom-grype/politique/porte/scan.rego" \
+    --from-file=policy-scan.yaml="$here/../07a-sbom-grype/politique/porte/policy-scan.yaml" \
+    --from-file=scanner.pub="$here/../07a-sbom-grype/resultats/scanner-cle-publique.pem" \
     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
 }
 
@@ -1274,8 +1279,9 @@ juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, port
   # aucun verdict. Avec une source ({"git":{"url":…,"revision":…}}, J8 test 7), l'image passe par --images (spec
   # ApplicationSnapshot, seul canal de input.image.source) au lieu de --image ; sans elle, ec juge comme en J6. Les champs 7 et 8
   # (J8, test 8) viennent du conteneur horodatage ; success (champ 3) reste celui de ec. Les champs 9 et 10 (contrôle 6, brique 10)
-  # viennent du conteneur vsa (ok ou refus, détail) ; les champs 1 à 8 sont inchangés
-  local j=porte-$1 l d h v s=()
+  # viennent du conteneur vsa (ok ou refus, détail) ; les champs 11 et 12 (contrôle 7, brique 07a, G5) viennent des conteneurs
+  # scan-verifier et scan (ok, refus ou absent, détail, controle7) ; les champs 1 à 10 sont inchangés
+  local j=porte-$1 l d h v q s=()
   [ -n "${5:-}" ] && s=(-e 's#^\( *- \)--image$#\1--images#' -e "s#\"@IMAGE@\"#'$(jq -nc --arg c "$1" --arg i "$2" --argjson s "$5" \
     '{components: [{name: $c, containerImage: $i, source: $s}]}')'#")
   kubectl delete job -n porte "$j" --ignore-not-found --wait=true >/dev/null
@@ -1288,6 +1294,8 @@ juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, port
   kubectl logs -n porte "job/$j" -c porte > "$T/$j.log" 2>&1 || true
   kubectl logs -n porte "job/$j" -c horodatage > "$T/$j.horodatage" 2>&1 || true
   kubectl logs -n porte "job/$j" -c vsa > "$T/$j.vsa" 2>&1 || true
+  kubectl logs -n porte "job/$j" -c scan-verifier > "$T/$j.scan-verifier" 2>&1 || true
+  kubectl logs -n porte "job/$j" -c scan > "$T/$j.scan" 2>&1 || true
   l=$(grep -m1 '^{' "$T/$j.log" || true)
   [ -n "$l" ] || { echo "ERREUR|$1|$(tail -1 "$T/$j.log" | cut -c1-200)"; return; }
   printf '%s\n' "$l" > "$T/$j.json"
@@ -1295,10 +1303,22 @@ juger() { # cas image (nom vu des pods, par digest) [politique] [ConfigMap, port
     | (.finishedAt | fromdate) - (.startedAt | fromdate)')
   h=$(grep -m1 '^HORODATAGE|' "$T/$j.horodatage" | cut -d'|' -f2- || true)
   v=$(grep -m1 '^VSA|' "$T/$j.vsa" | cut -d'|' -f2- || true)
+  q=$(controle7 "$T/$j")
   jq -r --arg c "$1" --arg d "$d" --arg h "${h:-absent|$(tail -1 "$T/$j.horodatage" | cut -c1-160)}" \
-    --arg r "${v:-absent|$(tail -1 "$T/$j.vsa" | cut -c1-160)}" '[.components[] | .violations[]? | .metadata.code] as $v
+    --arg r "${v:-absent|$(tail -1 "$T/$j.vsa" | cut -c1-160)}" --arg q "$q" '[.components[] | .violations[]? | .metadata.code] as $v
     | [.components[] | .warnings[]? | .metadata.code] as $w
-    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)|\($r)"' "$T/$j.json"
+    | "VERDICT|\($c)|\(.success)|\($v | unique | join(","))|\($w | unique | join(","))|\($d)|\($h)|\($r)|\($q)"' "$T/$j.json"
+}
+
+controle7() { # préfixe des journaux d'un Job de la porte : champs 11 et 12 de VERDICT. ok|n énoncé(s) vérifié(s) dans <dépôt> ;
+  # refus|codes en violation, triés ; n énoncé(s)… ; absent|… si ec n'a rendu aucun verdict (entrée absente ou invalide : Job en échec)
+  local l e
+  l=$(grep -m1 '^LECTURE|' "$1.scan-verifier" | cut -d'|' -f2- || true)
+  l="$(cut -d'|' -f1 <<< "$l") énoncé(s) vérifié(s) dans $(cut -d'|' -f2 <<< "$l")$(cut -d'|' -f3 <<< "$l" | sed 's/^./ ; &/')"
+  e=$(grep -m1 '^{' "$1.scan" || true)
+  [ -n "$e" ] || { echo "absent|$l ; $(tail -1 "$1.scan" | cut -c1-160)"; return; }
+  jq -r --arg l "$l" 'if .success then "ok|\($l)"
+    else "refus|\([.filepaths[].violations[].metadata.code] | unique | join(",")) ; \($l)" end' <<< "$e"
 }
 
 succes() { # cas code : la règle figure parmi les succès du verdict de la porte

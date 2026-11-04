@@ -86,6 +86,23 @@ Dans ce tableau, les cas KEV, VEX, MAL- et de fraîcheur modifient l'entrée apr
 
 Les journaux de R5 restent ceux de la porte d'avant G5 : `g5_porte` ne les réécrit pas.
 
+## Résultat de `g5_porte` (04/11/2026, 22:25:28 à 22:28:22 UTC, accord du propriétaire : « A ») : [journal](g5_porte.log), [`preuves-controle7.log`](g5_porte.copie.log)
+
+**0 écart, du premier coup.** Le contrôle 7 est en service dans la porte.
+
+| Cas | ec | Contrôle 9 | Contrôle 6 | Contrôle 7 | Job |
+|---|---|---|---|---|---|
+| C1 image réelle | `true`, aucune violation | `ok`, 10/10 | `ok`, 2/2 | `ok`, 1 énoncé | réussi |
+| C2 `builds/essai-webhook`, sans source | `false`, règles de source | `ok`, 30/30 | `refus`, 0/0 | `refus`, `scan.scan_present` | en échec |
+| C3 clé de Chains sur `scanner.pub` | `true`, aucune violation | `ok`, 10/10 | `ok`, 2/2 | `refus`, `threshold` | en échec |
+
+C1 lève trois points de « Non joué à sec » : le Job réel (utilisateur 65532, racine en lecture seule, ConfigMap sous `/etc/porte/regles-scan`) et le nom `sc-stockage.poc.test`. `porte-temoin` est retirée, rien n'est écrit dans Zot.
+
+### Prédictions de `g5_grafana` et du rejeu de `controle6`, écrites à 22:29 UTC, avant de les jouer
+
+- **`g5_grafana`** : l'auditeur lit 3 lignes `LECTURE`, 1 verdict de ec à `true` et 2 à `false`, tous deux en `scan.scan_present`. Rien ne prouve encore que la ligne JSON du conteneur `scan` arrive entière dans Loki.
+- **`controle6`, sur la porte corrigée** : 0 écart ; C1 `ok|2/2`, avec l'attendu adapté après R5 ; champs 9 et 10 inchangés malgré les champs 11 et 12.
+
 ## Effets à connaître
 
 - **Date limite du scan** : celui de G4 expire le **11/11/2026 à 20:40:09 UTC**. Après cette date, C1 rend `scan.scan_recent` tant qu'un scan n'a pas été refait : c'est le comportement voulu par D4.
