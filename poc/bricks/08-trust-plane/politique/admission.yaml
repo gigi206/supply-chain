@@ -107,6 +107,7 @@ spec:
 # Zone confiance (J3 : bound_subject seul ; J5 : TSA ; J6 : declencheurs, porte) : les pods des espaces de confiance ne tournent
 # que sur le nœud de confiance, sans tolérer le taint de la zone build. Un pod placé sur sc-build y exposerait le jeton de
 # son compte (Chains, OpenBao, TSA, EventListener) à la zone hostile.
+# Brique 07a, G3 : espace scan (job de scan, rôles JWT scanner et scan-zot d'OpenBao).
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy
 metadata:
@@ -121,7 +122,7 @@ spec:
       matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: [openbao, tekton-chains, tekton-pipelines, tekton-pipelines-resolvers, tsa, horodatage, declencheurs, porte]
+        values: [openbao, tekton-chains, tekton-pipelines, tekton-pipelines-resolvers, tsa, horodatage, declencheurs, porte, scan]
     resourceRules:
     - apiGroups: [""]
       apiVersions: [v1]

@@ -152,3 +152,11 @@ Prochaine étape : G2, l'image d'outils du scanner.
 - image `plateforme/outils-scan@sha256:7eb4f26e…` reproductible (même digest au second assemblage), digest épinglé.
 
 Prochaine étape : G3, la clé Transit `scanner` et l'espace `scan`.
+
+**G3 préparé à sec le 04/11/2026 à 20:00 UTC** ([prédictions](resultats/g3-predictions.md)). Quatre étapes de `plateforme.sh` :
+- `g3_cluster` : espace `scan` (`politique/scan.yaml`), NetworkPolicy d'OpenBao et règle `zone-confiance` de la 08, chacune réappliquée seule ;
+- `g3_openbao` : clé Transit `scanner`, politiques, identifiants de `poc-scan` dans `kv/scan/zot`, rôles, clé publique exportée ;
+- `g3_essais` : refus et connexions croisées comptés, signature vérifiée sur l'hôte ;
+- `g3_cosign` : vrai `cosign sign-blob --key hashivault://scanner` depuis un pod de `scan`, sondes réseau, audit des chemins appelés.
+
+**D9, ajoutée** : les identifiants Zot du job sont lus dans OpenBao, comme en J8, avec deux rôles liés au même compte. `scan-zot` lit les identifiants avec un jeton de 1 min ; `scanner` signe avec un jeton de 5 min pris juste avant la signature. Recommandation : (a). `scanner-signature` a donc quatre chemins, révocation comprise, et non trois.

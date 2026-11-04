@@ -1,0 +1,60 @@
+# Brique 07a, jalon G3 : espace du job de scan, sur le nœud de confiance (calque de l'espace horodatage de la 08, J5 et J8).
+# Le job lit l'image et la base dans Zot, la source au commit dans Forgejo (D1 a), signe l'attestation de scan avec la clé
+# Transit scanner d'OpenBao (rôle JWT scanner) et la pousse dans builds/scan/** avec le compte Zot poc-scan (identifiants lus
+# dans OpenBao, rôle JWT scan-zot, sans Secret). Sortie : DNS, OpenBao, Zot et Forgejo (sc-stockage). Aucune entrée.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: scan
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scanner
+  namespace: scan
+automountServiceAccountToken: false
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: scan
+  namespace: scan
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: openbao
+      podSelector:
+        matchLabels:
+          app: openbao
+    ports:
+    - protocol: TCP
+      port: 8200
+  # Zot (5000) et Forgejo (3000) ; pas Grafana (3001) ni Loki
+  - to:
+    - ipBlock:
+        cidr: 192.168.161.13/32
+    ports:
+    - protocol: TCP
+      port: 5000
+    - protocol: TCP
+      port: 3000

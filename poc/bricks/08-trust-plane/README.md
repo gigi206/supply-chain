@@ -1897,3 +1897,10 @@ Droits mesurés par la 07a (`g1_droits.log`) : 9 essais sur 9 conformes.
 **Retrait** :
 - retirer les deux comptes et les deux dépôts de `zot.json` et de `stockage.sh`, puis rejouer `stockage.sh zot` ;
 - désactiver le timer et supprimer `/usr/local/lib/base-grype`, `/etc/base-grype` et l'utilisateur.
+
+**Préparé à sec pour la brique 07a, G3 (04/11/2026, 20:00 UTC, pas encore appliqué)**
+- `openbao/openbao.yaml` : la NetworkPolicy d'OpenBao reçoit une source de plus, les pods `app=scan` de l'espace `scan`. Seul ce document sera réappliqué, sans toucher au StatefulSet.
+- `politique/admission.yaml` : `scan` rejoint les espaces de la règle `zone-confiance`. Seule cette règle sera réappliquée, comme le fait `charger`.
+- OpenBao recevra une clé Transit `scanner`, les politiques `scanner-signature` et `scan-zot`, l'entrée `kv/scan/zot` et les rôles `scanner` et `scan-zot`, tous liés à `scan:scanner`.
+
+Script et témoins : `07a-sbom-grype/plateforme.sh g3_*`.

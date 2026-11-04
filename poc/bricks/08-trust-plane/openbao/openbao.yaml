@@ -146,6 +146,14 @@ spec:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: horodatage
+    # Brique 07a, G3 : le job de scan signe avec la clé Transit scanner et lit ses identifiants Zot (rôles JWT scanner et
+    # scan-zot, compte de service scan:scanner) ; pods de l'espace scan portant l'étiquette app=scan seulement
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: scan
+      podSelector:
+        matchLabels:
+          app: scan
     ports:
     - protocol: TCP
       port: 8200

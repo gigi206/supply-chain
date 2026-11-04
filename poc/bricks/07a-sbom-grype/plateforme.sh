@@ -24,6 +24,23 @@
 #   g2_image       couche reproductible (grype, syft, oras de J5, scan-outil construit depuis outil/ à cache vide) sur l'image
 #                  cosign v3.1.4-dev (busybox) déjà copiée dans Zot par J5 ; poussée par poc-ecriture ; second assemblage :
 #                  même digest
+#   G3 (calque de J5 et J8 de la 08 : clé tsa, identifiants Zot du job d'horodatage) :
+#   g3_cluster  espace scan (politique/scan.yaml : Pod Security restricted, compte scanner, sortie vers DNS, OpenBao, Zot et
+#               Forgejo seulement), ConfigMap scan-config (CA du PoC) ; NetworkPolicy d'OpenBao ouverte aux pods app=scan de
+#               l'espace scan (document NetworkPolicy de 08-trust-plane/openbao/openbao.yaml seul : le StatefulSet n'est pas
+#               touché) ; scan ajouté à la règle zone-confiance de Kyverno (document de 08-trust-plane/politique/admission.yaml
+#               seul) ; sonde : pod de scan sans nodeSelector refusé à l'admission
+#   g3_openbao  clé Transit scanner (ecdsa-p256, non exportable, sans sauvegarde en clair), politiques scanner-signature et
+#               scan-zot (politique/*.hcl), identifiants Zot de poc-scan dans kv/scan/zot (entrée standard, jamais en
+#               argument), rôles JWT scanner (5 min) et scan-zot (1 min) liés au seul compte scan:scanner ; clé publique
+#               exportée dans resultats/scanner-cle-publique.pem
+#   g3_essais   rôles scanner et scan-zot pour leur compte (comptes exacts d'acceptations et de refus), connexions croisées
+#               refusées ; signature Transit vérifiée sur l'hôte par openssl avec la clé publique exportée, refusée avec celle de
+#               Chains ; audit d'OpenBao
+#   g3_cosign   pod de l'espace scan : jeton du rôle scanner pris par un conteneur d'initialisation OpenBao, cosign sign-blob
+#               --key hashivault://scanner hors de tout service Sigstore, jeton révoqué ; sondes réseau (Zot, Forgejo joints ;
+#               Grafana, Internet injoignables) ; pod sans l'étiquette app=scan : OpenBao injoignable ; bundle vérifié sur l'hôte
+#               (cosign verify-blob, clé exportée), contre-épreuves ; chemins d'OpenBao réellement appelés par cosign (audit)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -47,6 +64,11 @@ SYFT_TGZ_SHA=bc664debb00db1b9b4b9dae4ba1a29d99621e33b641b94b78b9048374b812a3d   
 COSIGN_BASE=amont/sigstore/cosign/cosign@sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d   # J5 (tsa.sh), v3.1.4-dev amd64
 OUTILS_SCAN=plateforme/outils-scan
 OUTILS_SCAN_DIGEST=sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f   # G2 du 04/11/2026 (assemblage reproductible)
+R8=$(cd "$here/../08-trust-plane" && pwd)
+REG=sc-stockage.poc.test:5000                                  # Zot depuis les nœuds et les pods
+BAO_IMAGE=amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f   # openbao.sh (2.7.2)
+SUJET_SCAN=system:serviceaccount:scan:scanner
+export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }   # sc-stockage
 copier() { # répertoire-distant fichiers… (comme commun.sh de la 08)
@@ -63,6 +85,76 @@ offline() { unshare -rn env GRYPE_DB_CACHE_DIR="$T/dbcache" GRYPE_DB_AUTO_UPDATE
   GRYPE_CHECK_FOR_APP_UPDATE=false SYFT_CHECK_FOR_APP_UPDATE=false "$@"; }
 ms() { local u; read -r u _ < /proc/uptime; echo $(( 10 * 10#${u/./} )); }
 purls() { python3 -I -c 'import json, sys; print("\n".join(sorted(c["purl"] for c in json.load(open(sys.argv[1])).get("components", []) if c.get("purl"))))' "$1"; }
+racine() { # script sh sur l'entrée standard, exécuté dans openbao-0 avec le jeton root lu sur l'entrée standard (commun.sh de la 08)
+  { tr -d '\n' < "$S8/openbao-root.token"; echo; cat; } \
+    | kubectl exec -i -n openbao openbao-0 -- sh -c 'read -r BAO_TOKEN && export BAO_TOKEN && exec sh -s'
+}
+en_tant_que() { # compte espace rôle : script sh (entrée standard) exécuté dans openbao-0 après connexion JWT avec ce rôle (tsa.sh)
+  # Le jeton du compte de service (audience openbao, 10 min) passe par l'entrée standard, jamais en argument.
+  { kubectl create token "$1" -n "$2" --audience openbao --duration 10m; echo; echo "$3"; cat; } \
+    | kubectl exec -i -n openbao openbao-0 -- sh -c '
+read -r JWT; read -r ROLE
+if ! r=$(printf "%s" "$JWT" | bao write -format=json auth/jwt/login role="$ROLE" jwt=- 2>&1); then
+  echo "CONNEXION_REFUSEE|$(echo "$r" | grep -E "Code:|\* " | tr "\n\t" "  " | sed "s/  */ /g")"; exit 0
+fi
+BAO_TOKEN=$(echo "$r" | sed -n "s/.*\"client_token\": \"\([^\"]*\)\".*/\1/p"); export BAO_TOKEN
+echo "CONNEXION_ACCEPTEE|$(echo "$r" | tr -d "\n " | grep -o "\"token_policies\":\[[^]]*\]")"
+refus() { l=$1; shift; if o=$("$@" 2>&1); then echo "ACCEPTE|$l"; else echo "REFUSE|$l|$(echo "$o" | grep -E "Code:|\* " | tr "\n\t" "  " | sed "s/  */ /g")"; fi; }
+eval "$(cat)"'
+}
+attendre_sa() { # espace : le compte de service default d'un espace neuf est créé de façon asynchrone (commun.sh de la 08)
+  for _ in $(seq 60); do kubectl get serviceaccount default -n "$1" >/dev/null 2>&1 && return 0; sleep 1; done
+  echo "KO   compte de service default absent de $1"; return 1
+}
+conforme() { # libellé fichier-attendu fichier-obtenu : chaque ligne obtenue commence par la ligne attendue de même rang
+  if paste -d'\t' "$2" "$3" | awk -F'\t' -v n="$(wc -l < "$2")" 'index($2, $1) != 1 {k++} END {exit k > 0 || NR != n}'; then
+    echo "OK   $1 ($(wc -l < "$2") lignes conformes)"
+  else
+    echo "KO   $1"; diff <(cut -c1-60 "$2") <(cut -c1-60 "$3") || true; ko=1
+  fi
+}
+pod_scan() { # nom étiquette-app script : pod d'essai de l'espace scan (image d'outils du scanner), sur le nœud de confiance ;
+  # étiquette vide : sans app=scan. Attend la fin (180 s au plus) et affiche la sortie.
+  local nom=$1 phase=""
+  kubectl delete pod -n scan "$nom" --ignore-not-found --wait=true >/dev/null
+  kubectl apply -f - >/dev/null <<EOF
+apiVersion: v1
+kind: Pod
+metadata: {name: $nom, namespace: scan, labels: {$([ -n "$2" ] && echo "app: $2")}}
+spec:
+  automountServiceAccountToken: false
+  enableServiceLinks: false
+  restartPolicy: Never
+  nodeSelector: {zone: confiance}
+  securityContext: {runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+  containers:
+  - name: essai
+    image: $REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST
+    command: [sh, -c, $(jq -Rs . <<<"$3")]
+    env: [{name: HOME, value: /travail}]
+    securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+    volumeMounts: [{name: travail, mountPath: /travail}]
+  volumes: [{name: travail, emptyDir: {sizeLimit: 16Mi}}]
+EOF
+  for _ in $(seq 90); do
+    phase=$(kubectl get pod -n scan "$nom" -o jsonpath='{.status.phase}')
+    case $phase in Succeeded|Failed) break ;; esac
+    sleep 2
+  done
+  kubectl logs -n scan "$nom" -c essai
+  [ "$phase" = Succeeded ] || { echo "KO   pod $nom : ${phase:-?}"; return 1; }
+}
+# Sonde réseau dans un pod (wget de busybox, sans vérification TLS : seule la joignabilité compte). Délai : connexion abandonnée.
+SONDE='sonde() { if r=$(timeout 10 wget -q -T 4 -O /dev/null "$2" 2>&1); then echo "JOINT|$1|réponse 2xx"; else
+  case $r in *"timed out"*|*nreachable*|"") echo "INJOIGNABLE|$1|${r:-délai de 10 s dépassé}" ;; *) echo "JOINT|$1|$(echo "$r" | head -1)" ;; esac; fi; }'
+audit_openbao() { # instant : réponses d'OpenBao depuis cet instant (connexions JWT, transit, kv, jetons), agrégées
+  kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log > "$T/audit.log"
+  jq -c --arg d "$1" 'select(.type == "response" and .time[0:19] >= ($d[0:19]) and (.request.path | test("^(auth/jwt/login|transit/|kv/|auth/token/)")))
+    | {chemin: .request.path, op: .request.operation, role: (.auth.metadata.role // null), politiques: (.auth.policies // null),
+       erreur: (.error // .response.data.error // null)}' "$T/audit.log" \
+    | awk '{c[$0]++; if (c[$0] == 1) o[++n] = $0} END {for (i = 1; i <= n; i++) print o[i] (c[o[i]] > 1 ? " ×" c[o[i]] : "")}'
+  rm -f "$T/audit.log"
+}
 
 etape_g0() {
   T=$W/g0
@@ -349,11 +441,296 @@ etape_g2_image() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,27p "$0"; exit 2; }
+etape_g3_cluster() {
+  local avant apres msg i
+  T=$W/g3-cluster
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  echo "## espace scan (politique/scan.yaml)"
+  kubectl apply --server-side -f "$here/politique/scan.yaml"
+  attendre_sa scan
+  kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f -
+  attendu "Pod Security de l'espace scan" "$(kubectl get ns scan -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" restricted
+  attendu "compte scanner sans jeton monté d'office" "$(kubectl get sa -n scan scanner -o jsonpath='{.automountServiceAccountToken}')" false
+  attendu "sorties de l'espace scan (ports)" "$(kubectl get networkpolicy -n scan scan -o json | jq -r '[.spec.egress[].ports[] | "\(.protocol)/\(.port)"] | join(",")')" \
+    "UDP/53,TCP/53,TCP/8200,TCP/5000,TCP/3000"
+
+  echo "## NetworkPolicy d'OpenBao (document NetworkPolicy de 08-trust-plane/openbao/openbao.yaml seul ; StatefulSet non touché)"
+  avant=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.uid} {.status.containerStatuses[0].restartCount}')
+  awk 'BEGIN {RS = "\n---\n"} /\nkind: NetworkPolicy\n/' "$R8/openbao/openbao.yaml" | kubectl apply --server-side -f -
+  kubectl get networkpolicy -n openbao openbao -o jsonpath='{range .spec.ingress[0].from[*]}{.namespaceSelector.matchLabels}{" "}{.podSelector.matchLabels}{"\n"}{end}'
+  attendu "entrée de l'espace scan, pods app=scan seulement" "$(kubectl get networkpolicy -n openbao openbao -o json \
+    | jq -r '[.spec.ingress[0].from[] | select(.namespaceSelector.matchLabels["kubernetes.io/metadata.name"] == "scan") | .podSelector.matchLabels.app] | join(",")')" scan
+  apres=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.uid} {.status.containerStatuses[0].restartCount}')
+  attendu "openbao-0 ni recréé ni redémarré (uid, redémarrages)" "$apres" "$avant"
+  attendu "OpenBao descellé" "$(racine <<<'bao status -format=json' | jq -r .sealed)" false
+
+  echo "## règle zone-confiance de Kyverno (document de 08-trust-plane/politique/admission.yaml seul, appliqué comme charger de politique.sh)"
+  awk 'BEGIN {RS = "\n---\n"} /\n  name: zone-confiance\n/' "$R8/politique/admission.yaml" | kubectl apply -f -
+  attendu "scan dans les espaces de zone-confiance" "$(kubectl get validatingpolicy zone-confiance -o json \
+    | jq -r '.spec.matchConstraints.namespaceSelector.matchExpressions[0].values | index("scan") != null')" true
+  # Sonde (comme sonde_kyverno de commun.sh) : pod de scan conforme à Pod Security restricted, sans nodeSelector, en dry-run
+  # serveur ; refus attendu de zone-confiance une fois la règle publiée dans le webhook de Kyverno.
+  jq -n --arg i "$REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST" '{apiVersion: "v1", kind: "Pod", metadata: {name: "sonde-zone", namespace: "scan"},
+    spec: {automountServiceAccountToken: false, securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+      containers: [{name: "sonde", image: $i, securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$T/sonde.json"
+  for i in $(seq 90); do
+    msg=$(kubectl create --dry-run=server -f "$T/sonde.json" 2>&1 || true)
+    grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg" && break
+    sleep 2
+  done
+  if grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg"; then
+    ok "pod de scan sans nodeSelector refusé par zone-confiance ($i essai(s))"
+  else echo "KO   pod de scan sans nodeSelector : $msg"; ko=1; fi
+  jq '.spec.nodeSelector = {zone: "confiance"}' "$T/sonde.json" > "$T/sonde-confiance.json"
+  msg=$(kubectl create --dry-run=server -f "$T/sonde-confiance.json" 2>&1 || true)
+  attendu "contre-épreuve : même pod avec nodeSelector zone=confiance" "$msg" "pod/sonde-zone created (server dry run)"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g3_openbao() {
+  local cle pub
+  T=$W/g3-openbao
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/g3-openbao"' EXIT   # copie des identifiants de poc-scan supprimée même en cas d'échec
+  # Identifiants Zot du job au format docker, registre vu des pods ; passés à OpenBao par l'entrée standard (J8).
+  (umask 077 && printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG" \
+    "$(printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0)" > "$T/zot-scan.json")
+  echo "identifiants Zot du job : compte $(jq -r '.auths[].auth | @base64d | split(":")[0]' "$T/zot-scan.json"), registre $(jq -r '.auths | keys[0]' "$T/zot-scan.json")"
+  racine <<EOF | jq -c 'if .data then .data else . end | if has("keys") then {name, type, exportable, allow_plaintext_backup, deletion_allowed, latest_version} else {bound_audiences, bound_subject, user_claim, token_policies, token_no_default_policy, token_type, token_ttl, token_max_ttl, token_period} end' | tee "$T/etat.jsonl"
+set -eu
+bao read transit/keys/scanner >/dev/null 2>&1 || bao write -f transit/keys/scanner type=ecdsa-p256 exportable=false allow_plaintext_backup=false >&2
+bao read -format=json transit/keys/scanner
+bao policy write scanner-signature - >&2 <<'POL'
+$(cat "$here/politique/scanner-signature.hcl")
+POL
+bao policy write scan-zot - >&2 <<'POL'
+$(cat "$here/politique/scan-zot.hcl")
+POL
+bao secrets list -format=json | grep -q '"kv/"' || bao secrets enable -path=kv -version=1 kv >&2
+bao write kv/scan/zot config.json=- >&2 <<'JSON'
+$(cat "$T/zot-scan.json")
+JSON
+bao write auth/jwt/role/scanner role_type=jwt user_claim=sub bound_audiences=openbao bound_subject=$SUJET_SCAN \
+  token_policies=scanner-signature token_no_default_policy=true token_type=service token_ttl=5m token_max_ttl=5m >&2
+bao write auth/jwt/role/scan-zot role_type=jwt user_claim=sub bound_audiences=openbao bound_subject=$SUJET_SCAN \
+  token_policies=scan-zot token_no_default_policy=true token_type=service token_ttl=1m token_max_ttl=1m >&2
+bao read -format=json auth/jwt/role/scanner
+bao read -format=json auth/jwt/role/scan-zot
+EOF
+  cle=$(sed -n 1p "$T/etat.jsonl")
+  attendu "clé scanner (type, exportable, sauvegarde en clair, suppression)" "$(jq -r '[.type, .exportable, .allow_plaintext_backup, .deletion_allowed] | join(",")' <<<"$cle")" "ecdsa-p256,false,false,false"
+  attendu "rôle scanner" "$(sed -n 2p "$T/etat.jsonl" | jq -r '[.bound_subject, (.bound_audiences | join("+")), (.token_policies | join("+")), .token_no_default_policy, .token_type, .token_ttl, .token_max_ttl, .token_period] | join(",")')" \
+    "$SUJET_SCAN,openbao,scanner-signature,true,service,300,300,0"
+  attendu "rôle scan-zot" "$(sed -n 3p "$T/etat.jsonl" | jq -r '[.bound_subject, (.bound_audiences | join("+")), (.token_policies | join("+")), .token_no_default_policy, .token_type, .token_ttl, .token_max_ttl, .token_period] | join(",")')" \
+    "$SUJET_SCAN,openbao,scan-zot,true,service,60,60,0"
+  for p in scanner-signature scan-zot; do
+    racine <<<"bao policy read $p" | grep -v '^#' > "$T/$p.hcl"
+    attendu "politique $p = fichier versionné (hors commentaires et lignes vides)" "$(grep -v -e '^#' -e '^$' "$T/$p.hcl" | sha256sum | cut -c1-16)" \
+      "$(grep -v -e '^#' -e '^$' "$here/politique/$p.hcl" | sha256sum | cut -c1-16)"
+  done
+  # Valeur relue dans OpenBao et comparée par empreinte, jamais affichée.
+  attendu "kv/scan/zot = identifiants de poc-scan (empreinte du JSON compact)" \
+    "$(racine <<<'bao read -format=json kv/scan/zot' | jq -r '.data["config.json"] | fromjson | tojson' | sha256sum | cut -c1-16)" \
+    "$(jq -c . "$T/zot-scan.json" | sha256sum | cut -c1-16)"
+  racine <<<'bao read -format=json transit/keys/scanner' | jq -r '.data.keys | to_entries | max_by(.key | tonumber) | .value.public_key' > "$R/scanner-cle-publique.pem"
+  pub=$(openssl pkey -pubin -in "$R/scanner-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)
+  openssl pkey -pubin -in "$R/scanner-cle-publique.pem" -noout -text | sed -n '1p;/NIST CURVE/p'
+  echo "clé publique exportée : resultats/scanner-cle-publique.pem (SPKI sha256 $pub)"
+  return $ko
+}
+
+etape_g3_essais() {
+  local debut h s
+  T=$W/g3-essais
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  h=$(printf 'Brique 07a, G3' | openssl dgst -sha256 -binary | base64)
+  echo "## rôle scanner, compte scan:scanner"
+  en_tant_que scanner scan scanner <<EOF | tee "$T/scanner.txt"
+refus "lecture de transit/keys/scanner" bao read transit/keys/scanner
+echo "SIGNATURE_SCANNER|\$(bao write -field=signature transit/sign/scanner/sha2-256 input=$h prehashed=true)"
+refus "signature avec la clé chains" bao write transit/sign/chains/sha2-256 input=$h prehashed=true
+refus "signature avec la clé tsa" bao write transit/sign/tsa/sha2-256 input=$h prehashed=true
+refus "lecture de transit/keys/chains" bao read transit/keys/chains
+refus "export de la clé scanner" bao read transit/export/signing-key/scanner
+refus "clé scanner rendue exportable" bao write transit/keys/scanner/config exportable=true
+refus "sauvegarde en clair de la clé scanner" bao read transit/backup/scanner
+refus "lecture de kv/scan/zot" sh -c 'bao read -field=config.json kv/scan/zot >/dev/null'
+refus "lecture de kv/horodatage/zot" sh -c 'bao read -field=config.json kv/horodatage/zot >/dev/null'
+refus "lecture de son propre jeton" bao token lookup
+refus "renouvellement de son propre jeton" bao token renew
+refus "révocation de son propre jeton" bao token revoke -self
+refus "signature avec la clé scanner après révocation" bao write transit/sign/scanner/sha2-256 input=$h prehashed=true
+EOF
+  printf '%s\n' 'CONNEXION_ACCEPTEE|"token_policies":["scanner-signature"]' "ACCEPTE|lecture de transit/keys/scanner" "SIGNATURE_SCANNER|vault:v1:" \
+    "REFUSE|signature avec la clé chains|" "REFUSE|signature avec la clé tsa|" "REFUSE|lecture de transit/keys/chains|" \
+    "REFUSE|export de la clé scanner|" "REFUSE|clé scanner rendue exportable|" "REFUSE|sauvegarde en clair de la clé scanner|" \
+    "REFUSE|lecture de kv/scan/zot|" "REFUSE|lecture de kv/horodatage/zot|" "REFUSE|lecture de son propre jeton|" \
+    "REFUSE|renouvellement de son propre jeton|" "ACCEPTE|révocation de son propre jeton" \
+    "REFUSE|signature avec la clé scanner après révocation|" > "$T/attendu-scanner.txt"
+  conforme "rôle scanner : signe avec la seule clé scanner ; 2 acceptations, 11 refus" "$T/attendu-scanner.txt" "$T/scanner.txt"
+
+  echo "## rôle scan-zot, compte scan:scanner"
+  en_tant_que scanner scan scan-zot <<EOF | tee "$T/scan-zot.txt"
+refus "lecture de kv/scan/zot" sh -c 'bao read -field=config.json kv/scan/zot >/dev/null'
+refus "signature avec la clé scanner" bao write transit/sign/scanner/sha2-256 input=$h prehashed=true
+refus "lecture de transit/keys/scanner" bao read transit/keys/scanner
+refus "écriture de kv/scan/zot" sh -c 'echo x | bao write kv/scan/zot config.json=-'
+refus "lecture de kv/horodatage/zot" sh -c 'bao read -field=config.json kv/horodatage/zot >/dev/null'
+refus "révocation de son propre jeton" bao token revoke -self
+refus "lecture de kv/scan/zot après révocation" sh -c 'bao read -field=config.json kv/scan/zot >/dev/null'
+EOF
+  printf '%s\n' 'CONNEXION_ACCEPTEE|"token_policies":["scan-zot"]' "ACCEPTE|lecture de kv/scan/zot" "REFUSE|signature avec la clé scanner|" \
+    "REFUSE|lecture de transit/keys/scanner|" "REFUSE|écriture de kv/scan/zot|" "REFUSE|lecture de kv/horodatage/zot|" \
+    "ACCEPTE|révocation de son propre jeton" "REFUSE|lecture de kv/scan/zot après révocation|" > "$T/attendu-scan-zot.txt"
+  conforme "rôle scan-zot : lit ses seuls identifiants, sans écriture ni signature ; révoqué, il ne lit plus rien" "$T/attendu-scan-zot.txt" "$T/scan-zot.txt"
+
+  echo "## connexions croisées"
+  for c in default:scan:scanner default:scan:scan-zot timestamp-authority:tsa:scanner tekton-chains-controller:tekton-chains:scanner \
+           horodatage:horodatage:scan-zot scanner:scan:tsa scanner:scan:tekton-chains scanner:scan:horodatage; do
+    IFS=: read -r s ns role <<<"$c"
+    echo "$ns:$s, rôle $role : $(en_tant_que "$s" "$ns" "$role" </dev/null)"
+  done | tee "$T/croisees.txt"
+  attendu "connexions croisées refusées" "$(grep -c ' : CONNEXION_REFUSEE|' "$T/croisees.txt")/$(wc -l < "$T/croisees.txt")" "8/8"
+
+  echo "## signature Transit vérifiée sur l'hôte"
+  printf 'Brique 07a, G3' > "$T/donnee.txt"
+  sed -n 's/^SIGNATURE_SCANNER|vault:v1://p' "$T/scanner.txt" | base64 -d > "$T/signature.der"
+  if openssl dgst -sha256 -verify "$R/scanner-cle-publique.pem" -signature "$T/signature.der" "$T/donnee.txt" >/dev/null 2>&1; then
+    ok "signature Transit (prehashed sha2-256) vérifiée par openssl avec resultats/scanner-cle-publique.pem"
+  else echo "KO   signature Transit non vérifiée avec la clé exportée"; ko=1; fi
+  if openssl dgst -sha256 -verify "$R8/resultats/chains-cle-publique.pem" -signature "$T/signature.der" "$T/donnee.txt" >/dev/null 2>&1; then
+    echo "KO   signature vérifiée avec la clé de Chains"; ko=1
+  else ok "contre-épreuve : même signature refusée avec la clé publique de Chains"; fi
+
+  echo "## audit d'OpenBao depuis $debut"
+  audit_openbao "$debut"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g3_cosign() {
+  local debut nom=scan-cosign phase="" c jeton_sh signer_sh revocation_sh
+  T=$W/g3-cosign
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  jeton_sh='set -eu
+umask 077
+n=1
+until bao write -field=token auth/jwt/login role=scanner jwt=@/var/run/secrets/openbao/token > /var/run/bao/token 2> /var/run/bao/erreur; do
+  [ $n -lt 30 ] || { cat /var/run/bao/erreur >&2; exit 1; }
+  n=$((n + 1)); sleep 1
+done
+rm -f /var/run/bao/erreur
+echo "jeton du rôle scanner obtenu (essai $n)"'
+  signer_sh="set -eu
+cd /travail
+$SONDE
+sonde Zot https://$REG/v2/
+sonde Forgejo https://192.168.161.13:3000/
+sonde Grafana https://192.168.161.13:3001/
+sonde \"Internet (base Grype)\" https://grype.anchore.io/databases/v6/latest.json"'
+printf "Brique 07a, G3 : signature témoin\n" > temoin.txt
+cosign signing-config create --out vide.json > cosign.log 2>&1
+VAULT_TOKEN=$(cat /var/run/bao/token) cosign sign-blob --key hashivault://scanner --signing-config vide.json --bundle temoin.bundle.json --yes temoin.txt >> cosign.log 2>&1 \
+  || { cat cosign.log; exit 1; }
+tail -1 cosign.log
+echo "CLE|$(VAULT_TOKEN=$(cat /var/run/bao/token) cosign public-key --key hashivault://scanner | base64 | tr -d "\n")"
+echo "BUNDLE|$(base64 temoin.bundle.json | tr -d "\n")"'
+  revocation_sh='BAO_TOKEN=$(cat /var/run/bao/token) bao token revoke -self && echo "jeton du rôle scanner révoqué"'
+  debut=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  echo "## pod $nom (app=scan) : jeton du rôle scanner, cosign sign-blob --key hashivault://scanner, révocation"
+  kubectl delete pod -n scan "$nom" --ignore-not-found --wait=true >/dev/null
+  # Conteneurs d'initialisation en séquence : jeton (OpenBao, jeton projeté d'audience openbao monté là seulement), signer
+  # (cosign, sans service Sigstore : configuration de signature vide), puis revocation (OpenBao) en conteneur principal.
+  kubectl apply -f - >/dev/null <<EOF
+apiVersion: v1
+kind: Pod
+metadata: {name: $nom, namespace: scan, labels: {app: scan}}
+spec:
+  serviceAccountName: scanner
+  automountServiceAccountToken: false
+  enableServiceLinks: false
+  restartPolicy: Never
+  nodeSelector: {zone: confiance}
+  securityContext: {runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+  initContainers:
+  - name: jeton
+    image: $REG/$BAO_IMAGE
+    command: [sh, -c, $(jq -Rs . <<<"$jeton_sh")]
+    env: [{name: BAO_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}, {name: BAO_CACERT, value: /etc/scan/ca-poc.crt}]
+    securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+    volumeMounts: [{name: bao, mountPath: /var/run/bao}, {name: config, mountPath: /etc/scan, readOnly: true},
+                   {name: openbao-jeton, mountPath: /var/run/secrets/openbao, readOnly: true}]
+  - name: signer
+    image: $REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST
+    command: [sh, -c, $(jq -Rs . <<<"$signer_sh")]
+    env: [{name: VAULT_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}, {name: VAULT_CACERT, value: /etc/scan/ca-poc.crt},
+          {name: HOME, value: /travail}, {name: TMPDIR, value: /travail}]
+    securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+    volumeMounts: [{name: travail, mountPath: /travail}, {name: bao, mountPath: /var/run/bao, readOnly: true},
+                   {name: config, mountPath: /etc/scan, readOnly: true}]
+  containers:
+  - name: revocation
+    image: $REG/$BAO_IMAGE
+    command: [sh, -c, $(jq -Rs . <<<"$revocation_sh")]
+    env: [{name: BAO_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}, {name: BAO_CACERT, value: /etc/scan/ca-poc.crt}]
+    securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+    volumeMounts: [{name: bao, mountPath: /var/run/bao, readOnly: true}, {name: config, mountPath: /etc/scan, readOnly: true}]
+  volumes:
+  - {name: travail, emptyDir: {sizeLimit: 16Mi}}
+  - {name: bao, emptyDir: {medium: Memory, sizeLimit: 1Mi}}
+  - {name: config, configMap: {name: scan-config}}
+  - name: openbao-jeton
+    projected: {sources: [{serviceAccountToken: {audience: openbao, expirationSeconds: 600, path: token}}]}
+EOF
+  for _ in $(seq 90); do
+    phase=$(kubectl get pod -n scan "$nom" -o jsonpath='{.status.phase}')
+    case $phase in Succeeded|Failed) break ;; esac
+    sleep 2
+  done
+  for c in jeton signer revocation; do kubectl logs -n scan "$nom" -c "$c" > "$T/$c.log" 2>&1 || true; done
+  cat "$T/jeton.log"; grep -v -E '^(CLE|BUNDLE)\|' "$T/signer.log" || true; cat "$T/revocation.log"
+  attendu "pod $nom" "$phase" Succeeded
+  attendu "sondes du pod app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE)\|[^|]*' "$T/signer.log" | paste -sd' ')" \
+    "JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (base Grype)"
+
+  echo "## bundle vérifié sur l'hôte"
+  sed -n 's/^BUNDLE|//p' "$T/signer.log" | base64 -d > "$R/g3-temoin.bundle.json"
+  printf 'Brique 07a, G3 : signature témoin\n' > "$T/temoin.txt"
+  sed -n 's/^CLE|//p' "$T/signer.log" | base64 -d > "$T/cle-cosign.pem"
+  attendu "clé publique lue par cosign = clé exportée (SPKI sha256)" "$(openssl pkey -pubin -in "$T/cle-cosign.pem" -outform DER | sha256sum | cut -c1-64)" \
+    "$(openssl pkey -pubin -in "$R/scanner-cle-publique.pem" -outform DER | sha256sum | cut -c1-64)"
+  jq -c '{mediaType, materiel: (.verificationMaterial | keys), signature: (.messageSignature | keys), condensat: .messageSignature.messageDigest.algorithm}' "$R/g3-temoin.bundle.json"
+  if cosign verify-blob --key "$R/scanner-cle-publique.pem" --bundle "$R/g3-temoin.bundle.json" --insecure-ignore-tlog=true "$T/temoin.txt" > "$T/v.out" 2>&1; then
+    ok "bundle vérifié par cosign verify-blob avec resultats/scanner-cle-publique.pem ($(tail -1 "$T/v.out"))"
+  else cat "$T/v.out"; echo "KO   bundle non vérifié"; ko=1; fi
+  printf 'autre contenu\n' > "$T/autre.txt"
+  if cosign verify-blob --key "$R/scanner-cle-publique.pem" --bundle "$R/g3-temoin.bundle.json" --insecure-ignore-tlog=true "$T/autre.txt" > "$T/v.out" 2>&1; then
+    echo "KO   contenu modifié accepté"; ko=1
+  else ok "contre-épreuve : contenu modifié refusé ($(grep -m1 -oE 'invalid signature[^:]*' "$T/v.out"))"; fi
+  if cosign verify-blob --key "$R8/resultats/chains-cle-publique.pem" --bundle "$R/g3-temoin.bundle.json" --insecure-ignore-tlog=true "$T/temoin.txt" > "$T/v.out" 2>&1; then
+    echo "KO   bundle vérifié avec la clé de Chains"; ko=1
+  else ok "contre-épreuve : clé publique de Chains refusée ($(grep -m1 -oE 'invalid signature[^:]*|key[^:]*mismatch[^:]*' "$T/v.out"))"; fi
+
+  echo "## pod sans l'étiquette app=scan"
+  pod_scan scan-sans-etiquette "" "$SONDE
+sonde Zot https://$REG/v2/
+sonde OpenBao https://openbao.openbao.svc.cluster.local:8200/v1/sys/health" | tee "$T/sans.txt"
+  attendu "sondes du pod sans app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE)\|[^|]*' "$T/sans.txt" | paste -sd' ')" "JOINT|Zot INJOIGNABLE|OpenBao"
+
+  echo "## audit d'OpenBao depuis $debut (chemins appelés par cosign)"
+  audit_openbao "$debut"
+  kubectl delete pod -n scan "$nom" scan-sans-etiquette --wait=false >/dev/null
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,44p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
