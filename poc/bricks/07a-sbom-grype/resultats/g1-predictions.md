@@ -45,3 +45,5 @@ G1 met en place la base Grype et les droits de Zot (D2, D3 a). Ordre prévu, cha
 - Contre-épreuve : archive tronquée à 1 Mio, « empreinte invalide », code non nul, aucun nouveau tag.
 - Mot de passe absent du journal. Timer actif, prochain déclenchement le 05/11/2026 vers 08:00 UTC.
 - Le journal de l'unité est consultable dans Grafana, si la 19b collecte le journal de `sc-stockage` (**à vérifier**, pas supposé).
+
+**Correction avant exécution (04/11/2026, 18:46 UTC)** : il y a aujourd'hui 7 comptes, et non 8 (les six de la boucle de `stockage.sh` plus `poc-replay`). Le htpasswd en attend donc **9**, pas 10.
