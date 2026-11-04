@@ -7,6 +7,8 @@
 #              build), poc-horodatage (horodatage/** seulement, job d'horodatage de J5) et poc-images (J7 : builds/**,
 #              création par digest seulement, condition CEL de zot.json) en htpasswd bcrypt, sans suppression
 #              ; poc-replay (brique 10, D5 : VSA, builds/** par digest seulement ; hash lu dans le dossier du domaine)
+#              ; poc-vulndb (brique 07a, D2 : base Grype du jour, vulndb/**, création seulement, tags datés) et poc-scan
+#              (brique 07a, D2 : attestations du scanner, builds/scan/** par digest seulement)
 #   registre   push par digest de l'image sample-app de la brique 04 depuis l'hôte, relecture anonyme ;
 #              refus attendus : push anonyme, mauvais mot de passe, suppression
 #   containerd pull refusé sans la CA, puis CA et registries.yaml sur les trois nœuds (redémarrés un par un) ;
@@ -73,7 +75,10 @@ etape_zot() {
   # (accessControl.metrics de zot.json), cité dans aucune politique de dépôt.
   # poc-fermetures (brique 03, F2, D3 révisée, décision du propriétaire du 03/11/2026) : tâche publier-fermeture,
   # builds/fermetures/** (motif le plus long, qui remplace builds/** pour ces dépôts), création par digest seulement.
-  for compte in poc-ecriture poc-build poc-horodatage poc-images poc-metriques poc-fermetures; do
+  # poc-vulndb et poc-scan (brique 07a, D2, décision du propriétaire du 04/11/2026) : timer de la base Grype sur sc-stockage
+  # (vulndb/**, création seulement : une base archivée ne peut pas être remplacée) ; Job du scanner (builds/scan/**, motif le
+  # plus long, création par digest seulement ; ni poc-build, ni poc-images, ni poc-replay n'y écrivent).
+  for compte in poc-ecriture poc-build poc-horodatage poc-images poc-metriques poc-fermetures poc-vulndb poc-scan; do
     [ -s "$S/zot-$compte.password" ] || (umask 077 && openssl rand -hex 24 | tr -d '\n' > "$S/zot-$compte.password")
     h=$(mkpasswd -m bcrypt -R 12 -s < "$S/zot-$compte.password")
     case $h in '$2b$12$'*) echo "htpasswd : $compte, bcrypt, coût 12" ;; *) echo "hash bcrypt inattendu" >&2; exit 1 ;; esac

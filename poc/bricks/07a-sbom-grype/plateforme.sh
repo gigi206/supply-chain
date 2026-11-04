@@ -5,7 +5,17 @@
 #       signature cherchée ; import hors réseau par la Grype épinglée (D5 a) ; SBOM de D1 (a) : Syft sur l'image lue par
 #       digest dans Zot et sur la source au commit lue dans Forgejo, fusionnés ; scans hors réseau de sample-app et du cas KEV
 #       (log4j-core 2.14.1 ajouté au SBOM, comme bench.sh)
-# Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh g0
+#   G1 (D2, D3 a ; Zot reconfiguré avant par « mise run confiance:stockage -- zot » : comptes poc-vulndb et poc-scan,
+#       dépôts vulndb/** et builds/scan/**) :
+#   g1_oras   oras 1.3.6 de J5 (archive de …/08/telechargements/tsa, empreinte de mise.lock et signature GPG revérifiées) installé
+#             dans sc-stockage (/usr/local/bin/oras), empreinte revérifiée dans la VM
+#   g1_droits droits de Zot (D2) sur des dépôts jetables : poc-scan crée par digest dans builds/scan/, pas de tag, rien ailleurs ;
+#             poc-images et poc-replay ne créent plus dans builds/scan/ ; poc-vulndb crée sous vulndb/, ne remplace pas un tag
+#   g1_base   service et timer base-grype sur sc-stockage (utilisateur dédié, mot de passe de poc-vulndb par LoadCredential)
+#   g1_essai  run du service : base du jour archivée sous vulndb/grype:<date>, empreinte et annotations relues en lecture
+#             anonyme ; second run : déjà archivée ; contre-épreuve : archive tronquée refusée, rien poussé ; mot de passe absent
+#             du journal ; timer activé
+# Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 R=$here/resultats
@@ -17,6 +27,18 @@ FORGEJO=https://192.168.161.13:3000/workspace/sample-app.git   # lecture anonyme
 COMMIT=6391fd437f26696847041be3226bbbf633f55a2f                # tête de main relevée le 04/11/2026 à 18:31 UTC
 IMAGE=builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 BASE=https://grype.anchore.io/databases/v6
+O8=$O/08
+S8=$O8/secrets
+DL=$O8/telechargements/tsa
+ORAS_TGZ_SHA=66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0   # mise.lock, oras 1.3.6 (comme tsa.sh)
+ORAS_FPR=C6FC42F0DE84A345FAADB742F44418110791EF37   # « ORAS Project Release Signing » (KEYS du dépôt, oras.land ; tsa.sh)
+SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
+sur() { ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }   # sc-stockage
+copier() { # répertoire-distant fichiers… (comme commun.sh de la 08)
+  local d=$1; shift
+  sur "rm -rf $d && mkdir -m 0700 $d"
+  scp -q "${SSH_OPTS[@]}" "$@" "poc@192.168.161.13:$d/"
+}
 ko=0
 ok() { echo "OK   $1"; }
 attendu() { # libellé valeur attendu
@@ -102,11 +124,134 @@ for x in v: print("  ", x["package"], x["id"], x["severity"], "KEV" if x["kev"] 
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,8p "$0"; exit 2; }
+etape_g1_oras() {
+  T=$W/g1-oras
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T/gnupg")
+  GNUPGHOME=$T/gnupg gpg --batch --quiet --import "$DL/oras-KEYS" 2>/dev/null
+  s=$(GNUPGHOME=$T/gnupg gpg --batch --status-fd 1 --verify "$DL/oras_1.3.6_checksums.txt.asc" "$DL/oras_1.3.6_checksums.txt" 2>/dev/null | awk '$2 == "VALIDSIG" {print $NF}')
+  attendu "signature GPG de oras_1.3.6_checksums.txt (clé primaire)" "$s" "$ORAS_FPR"
+  (cd "$DL" && grep ' oras_1.3.6_linux_amd64.tar.gz$' oras_1.3.6_checksums.txt | sha256sum -c && echo "$ORAS_TGZ_SHA  oras_1.3.6_linux_amd64.tar.gz" | sha256sum -c)
+  tar -xzf "$DL/oras_1.3.6_linux_amd64.tar.gz" -C "$T" oras
+  b=$(sha256sum < "$T/oras" | cut -c1-64)
+  attendu "binaire extrait identique à celui de mise" "$b" "$(sha256sum < "$(type -P oras)" | cut -c1-64)"
+  copier /tmp/oras-installation "$T/oras"
+  sur "sudo bash -s" <<EOF
+set -euo pipefail
+echo "$b  /tmp/oras-installation/oras" | sha256sum -c
+install -m 0755 /tmp/oras-installation/oras /usr/local/bin/oras
+rm -rf /tmp/oras-installation
+echo "$b  /usr/local/bin/oras" | sha256sum -c
+/usr/local/bin/oras version | head -1
+EOF
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g1_droits() {
+  local x=$W/g1-droits img r
+  rm -rf -- "${x:?}" && (umask 077 && mkdir -p "$x")
+  trap 'rm -rf -- "$W/g1-droits"' EXIT   # copies des mots de passe (auth-*.json) supprimées même en cas d'échec
+  for c in poc-scan poc-vulndb poc-images; do
+    printf '{"auths":{"%s":{"auth":"%s"}}}' "$REG_HOTE" "$(printf '%s:%s' "$c" "$(cat "$S8/zot-$c.password")" | base64 -w0)" > "$x/auth-$c.json"
+  done
+  printf 'essai 07a %s\n' "$(date -u +%FT%TZ)" > "$x/f.txt"
+  ( cd "$x" && oras push --oci-layout "$x/image:v" f.txt > /dev/null )
+  img=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["manifests"][0]["digest"])' "$x/image/index.json")
+  essai() { # libellé attendu(accepte|refus) compte référence-cible
+    if oras cp --to-registry-config "$x/auth-$3.json" --to-ca-file "$P/ca-poc.crt" --from-oci-layout "$x/image@$img" "$REG_HOTE/$4" > "$x/sortie" 2>&1; then r=accepte; else r=refus; fi
+    [ "$r" = "$2" ] && echo "OK   $1 : $r" || { echo "KO   $1 : $r (attendu $2) : $(grep -m1 -iE 'error|denied|unauthor' "$x/sortie" | cut -c1-140)"; ko=1; }
+  }
+  essai "poc-scan, par digest dans builds/scan/essai-07a" accepte poc-scan "builds/scan/essai-07a@$img"
+  essai "poc-scan, par tag dans builds/scan/essai-07a" refus poc-scan "builds/scan/essai-07a:tag-interdit"
+  essai "poc-scan, par digest dans builds/essai-07a (hors de builds/scan/)" refus poc-scan "builds/essai-07a@$img"
+  essai "poc-images, par digest dans builds/scan/essai-07a (motif le plus long)" refus poc-images "builds/scan/essai-07a@$img"
+  essai "poc-images, par digest dans builds/essai-07a (témoin : droit inchangé)" accepte poc-images "builds/essai-07a@$img"
+  essai "poc-vulndb, tag dans vulndb/essai-07a" accepte poc-vulndb "vulndb/essai-07a:v1"
+  essai "poc-vulndb, même tag repoussé (mise à jour)" refus poc-vulndb "vulndb/essai-07a:v1"
+  essai "poc-vulndb, par digest dans builds/essai-07a" refus poc-vulndb "builds/essai-07a@$img"
+  if [ -s "$HOME/.cache/supply-chain-poc/10/secrets/zot-poc-replay.password" ]; then
+    printf '{"auths":{"%s":{"auth":"%s"}}}' "$REG_HOTE" "$(printf 'poc-replay:%s' "$(cat "$HOME/.cache/supply-chain-poc/10/secrets/zot-poc-replay.password")" | base64 -w0)" > "$x/auth-poc-replay.json"
+    essai "poc-replay, par digest dans builds/scan/essai-07a" refus poc-replay "builds/scan/essai-07a@$img"
+  fi
+  echo "tags de vulndb/essai-07a : $(oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/vulndb/essai-07a" | paste -sd' ')"
+  rm -rf -- "${x:?}"
+  return $ko
+}
+
+etape_g1_base() {
+  copier /tmp/base-grype-installation "$here/fetch-db.sh" "$here/systemd/base-grype.sh" "$here/systemd/base-grype.service" \
+    "$here/systemd/base-grype.timer" "$P/ca-poc.crt" "$S8/zot-poc-vulndb.password"
+  sur "sudo bash -s" <<'EOF'
+set -euo pipefail
+cd /tmp/base-grype-installation
+id base-grype >/dev/null 2>&1 || useradd --system --user-group --home-dir /var/cache/base-grype --no-create-home --shell /usr/sbin/nologin base-grype
+install -d -m 0755 /usr/local/lib/base-grype /etc/base-grype
+install -d -m 0700 /etc/base-grype/secrets
+install -m 0755 fetch-db.sh base-grype.sh /usr/local/lib/base-grype/
+install -m 0644 ca-poc.crt /etc/base-grype/
+install -m 0600 zot-poc-vulndb.password /etc/base-grype/secrets/poc-vulndb.password
+install -m 0644 base-grype.service base-grype.timer /etc/systemd/system/
+cd / && rm -rf /tmp/base-grype-installation
+systemctl daemon-reload
+ls -l /usr/local/lib/base-grype /etc/base-grype /etc/base-grype/secrets
+EOF
+  for f in fetch-db.sh systemd/base-grype.sh; do
+    attendu "$(basename "$f") installé identique" "$(sur "sha256sum /usr/local/lib/base-grype/$(basename "$f")" | cut -c1-64)" "$(sha256sum < "$here/$f" | cut -c1-64)"
+  done
+  sur "systemd-analyze security base-grype.service 2>/dev/null | tail -1"
+  return $ko
+}
+
+etape_g1_essai() {
+  local debut r jour ref m
+  debut=$(sur "date '+%Y-%m-%d %H:%M:%S'")
+  r=0; sur "sudo systemctl start base-grype.service" || r=$?
+  echo "premier run : code $r ; $(sur "systemctl show -p Result -p ExecMainStatus --value base-grype.service" | paste -sd' ')"
+  echo "## journal du premier run"; sur "sudo journalctl -u base-grype.service --since '$debut' -o cat"
+  [ "$r" = 0 ] || { echo "KO   premier run"; return 1; }
+  curl -fsS -o "$W/latest.json" "$BASE/latest.json"
+  read -r path checksum built < <(python3 -I -c 'import json, sys
+d = json.load(open(sys.argv[1])); print(d["path"], d["checksum"], d["built"])' "$W/latest.json")
+  jour=${built%%T*}
+  ref=$(oras manifest fetch --ca-file "$P/ca-poc.crt" --descriptor "$REG_HOTE/vulndb/grype:$jour" | python3 -I -c 'import json, sys; print(json.load(sys.stdin)["digest"])')
+  echo "vulndb/grype:$jour -> $ref (lecture anonyme)"
+  oras manifest fetch --ca-file "$P/ca-poc.crt" "$REG_HOTE/vulndb/grype@$ref" > "$W/manifeste.json"
+  m=$(python3 -I -c 'import json, sys
+m = json.load(open(sys.argv[1])); a = m.get("annotations", {})
+c = [l["digest"] for l in m["layers"] if l["mediaType"] == "application/vnd.anchore.grype.db.v6+zstd"]
+print(m.get("artifactType"), a.get("dev.anchore.grype.db.checksum"), a.get("org.opencontainers.image.created"), c[0] if c else "-")' "$W/manifeste.json")
+  read -r at an cr co <<<"$m"
+  attendu "artifactType" "$at" application/vnd.supply-chain.grype-db.v6
+  attendu "empreinte annoncée (annotation)" "$an" "$checksum"
+  attendu "date de construction (annotation)" "$cr" "$built"
+  attendu "couche de l'archive = empreinte annoncée" "$co" "$checksum"
+  debut=$(sur "date '+%Y-%m-%d %H:%M:%S'")
+  r=0; sur "sudo systemctl start base-grype.service" || r=$?
+  attendu "second run (code)" "$r" 0
+  attendu "second run : base déjà archivée" "$(sur "sudo journalctl -u base-grype.service --since '$debut' -o cat" | grep -c '^déjà archivée : ')" 1
+  echo "## contre-épreuve : archive tronquée dans le répertoire de travail (sans identifiants)"
+  r=0; sur "bash -s" > "$W/alteree.out" 2>&1 <<EOF || r=$?
+set -euo pipefail
+t=\$(mktemp -d); trap 'rm -rf "\$t"' EXIT
+curl -fsS -o "\$t/latest.json" $BASE/latest.json
+p=\$(python3 -I -c 'import json, sys; print(json.load(open(sys.argv[1]))["path"])' "\$t/latest.json")
+curl -fsS -r 0-1048575 -o "\$t/\$p" "$BASE/\$p"
+ORAS=/usr/local/bin/oras ORAS_OPTS="--ca-file /etc/base-grype/ca-poc.crt" REG=192.168.161.13:5000 WORKDIR=\$t /usr/local/lib/base-grype/fetch-db.sh
+EOF
+  cat "$W/alteree.out"
+  [ "$r" != 0 ] && grep -q '^empreinte invalide' "$W/alteree.out" && echo "OK   archive tronquée refusée (code $r)" || { echo "KO   contre-épreuve : code $r"; ko=1; }
+  attendu "tags de vulndb/grype après la contre-épreuve" "$(oras repo tags --ca-file "$P/ca-poc.crt" "$REG_HOTE/vulndb/grype" | paste -sd' ')" "$jour"
+  if sur "sudo journalctl -u base-grype.service -o cat" | grep -q -F -f "$S8/zot-poc-vulndb.password"; then echo "KO   mot de passe dans le journal"; ko=1; else echo "OK   mot de passe de poc-vulndb absent du journal de l'unité"; fi
+  sur "sudo systemctl enable --now base-grype.timer 2>&1; systemctl list-timers base-grype.timer --no-pager | head -2"
+  rm -f "$W/latest.json" "$W/manifeste.json" "$W/alteree.out"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,19p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

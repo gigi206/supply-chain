@@ -143,6 +143,71 @@
             }
           ]
         },
+        "builds/scan/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-ecriture"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            },
+            {
+              "users": [
+                "poc-scan"
+              ],
+              "actions": [
+                "read"
+              ]
+            },
+            {
+              "users": [
+                "poc-scan"
+              ],
+              "actions": [
+                "create"
+              ],
+              "conditions": [
+                {
+                  "expression": "req.referenceType != \"tag\"",
+                  "message": "poc-scan : attestations du scanner (brique 07a, D2), écriture par digest seulement, aucun tag"
+                }
+              ]
+            }
+          ]
+        },
+        "vulndb/**": {
+          "anonymousPolicy": [
+            "read"
+          ],
+          "policies": [
+            {
+              "users": [
+                "poc-ecriture"
+              ],
+              "actions": [
+                "read",
+                "create",
+                "update"
+              ]
+            },
+            {
+              "users": [
+                "poc-vulndb"
+              ],
+              "actions": [
+                "read",
+                "create"
+              ]
+            }
+          ]
+        },
         "horodatage/**": {
           "anonymousPolicy": [
             "read"

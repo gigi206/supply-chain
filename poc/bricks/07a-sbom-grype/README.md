@@ -119,3 +119,15 @@ But : le **contrôle 7** de l'ADR 0000 (« attestation de scan : aucune KEV sans
 - sample-app a 5 vulnérabilités et 0 KEV ; le cas log4j a 2 KEV.
 
 Prochaine étape : G1 (comptes et dépôts de Zot, timer sur `sc-stockage`), avec accord, car Zot redémarre.
+
+**G1 préparé à sec le 04/11/2026 à 18:46 UTC** ([prédictions](resultats/g1-predictions.md)). Ce qui a été écrit :
+- `zot.json` (brique 08) : dépôts `builds/scan/**` (`poc-scan`, par digest seulement ; ni `poc-build`, ni `poc-images`, ni `poc-replay`) et `vulndb/**` (`poc-vulndb`, création seulement) ;
+- `stockage.sh` : comptes `poc-vulndb` et `poc-scan` ;
+- `systemd/` : `base-grype.service`, `base-grype.timer` et `base-grype.sh` ;
+- `fetch-db.sh` : ne repousse pas une base déjà archivée, après avoir vérifié l'empreinte ;
+- `plateforme.sh` : étapes `g1_oras`, `g1_droits`, `g1_base` et `g1_essai`.
+
+Une décision est ajoutée :
+- **D7** : la conservation des bases. Zot tourne avec `gc: false`, 9,7 Go sont libres sur `sc-stockage`, et chaque base fait environ 200 Mo par jour, soit environ 48 jours de marge. Recommandation : pas de rétention dans le PoC (un rejeu de zéro remet à vide), et une alerte de la 19 sur le disque, à prévoir.
+
+`oras` est absent de `sc-stockage` : on y installe le binaire 1.3.6 déjà vérifié en J5, avec son empreinte et sa signature GPG, sans nouveau téléchargement.

@@ -1,0 +1,12 @@
+# Brique 07a, G1 : archivage quotidien de la base Grype (construite vers 06:20 UTC, relevé du 04/11/2026). La porte refuse un
+# scan dont la base a plus de 3 jours (D4).
+[Unit]
+Description=Archivage quotidien de la base Grype (brique 07a)
+
+[Timer]
+OnCalendar=*-*-* 08:00:00 UTC
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

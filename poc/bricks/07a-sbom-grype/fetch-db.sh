@@ -21,6 +21,12 @@ d = json.load(open("latest.json"))
 print(d["path"], d["checksum"], d["built"], d["schemaVersion"])')
 [ -f "$path" ] || curl -fsS -o "$path" "$BASE/$path"
 [ "sha256:$(sha256sum < "$path" | cut -c1-64)" = "$checksum" ] || { echo "empreinte invalide : $path" >&2; exit 1; }
+# Brique 07a, G1 : une base déjà archivée sous son tag daté n'est pas repoussée (poc-vulndb n'a que le droit de créer ;
+# l'empreinte est vérifiée avant, même quand on s'arrête ici).
+if existant=$("$ORAS" manifest fetch "${opts[@]}" --descriptor "$REG/vulndb/grype:${built%%T*}" 2>/dev/null); then
+  echo "déjà archivée : $REG/vulndb/grype@$(python3 -I -c 'import json, sys; print(json.load(sys.stdin)["digest"])' <<<"$existant")"
+  exit 0
+fi
 
 digest=$("$ORAS" push "${opts[@]}" --no-tty --format go-template='{{.digest}}' \
   --artifact-type application/vnd.supply-chain.grype-db.v6 \
