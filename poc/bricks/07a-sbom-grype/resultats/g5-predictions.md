@@ -31,6 +31,8 @@ Le contrôle 7 dans la porte de release. **Rien n'est appliqué** : ni la Config
   - `scan.scan_recent` refuse aussi un scan daté de plus de 5 min dans le futur : il resterait retenu indéfiniment. D4 ne le demandait pas.
 - `ec opa test` au lieu de `opa` : `opa` n'est pas installé, et `bascule.sh` de la 03 fait de même.
 
+**Décision du propriétaire (04/11/2026, après 21:05 UTC, réponse « 2 a ») : les deux ajouts sont retenus.**
+
 ## Mesuré à sec (04/11/2026, entre 20:51 et 21:01 UTC, sur l'hôte)
 
 **Règles** ([journal](g5_regles.log)) : 27 tests sur 27, et les 17 conditions retirées tour à tour font chacune échouer au moins un test.
