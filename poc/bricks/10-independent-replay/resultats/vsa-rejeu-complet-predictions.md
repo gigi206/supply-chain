@@ -61,3 +61,13 @@ Chaque rejeu de zéro régénère la clé de Chains et les invocationId. La VSA 
 ## Résultat de R3 (03/11/2026, 23:20 UTC)
 
 Conforme à toutes les prédictions de R3 : 41/41 bundles, provenance `c4242a11`, entrées et digests attendus, Dockerfile `d56985c1…`, `go1.26.10`, `finishedOn` à 21:26:27 UTC, 0 KO.
+
+## Après R5 : ce qu'il faudra adapter (relevé à sec le 04/11/2026 à 18:14 UTC, rien modifié)
+
+R5 réécrit les fichiers `r5-vsa.log`, `r5-vsa-enonce.json`, `r5-vsa.bundle.json`, `r5-vsa-manifeste.json`, `r5-pousser_vsa.log`, `r5-porte_avant.log`, `r5-porte_apres.log` et `r5-lire_vsa.log`. Ceux de la VSA `c804d946` restent dans l'historique git. Points qui les citent ou qui en dépendent :
+
+- `08-trust-plane/preuves.sh` (contrôle 6, C1) : l'attendu `ok|1/1 VSA retenue(s)` devient `ok|2/2` tant que l'ancienne VSA reste dans Zot ;
+- `08-trust-plane/resultats/controle6-predictions.md` : il cite l'énoncé `c804d946…` et `1/1`. Ces valeurs seront corrigées en additif, sans réécrire le texte ;
+- `19b-journalisation/journalisation.sh` (L7) : `VSA_MANIFESTE` (`c1bfbcbd…`), `TIME_VERIFIED` (`2026-11-03T14:27:05Z`) et la fenêtre du 03/11/2026 de 14:00 à 16:00 UTC sont à remplacer par ceux du nouveau push ;
+- `03-deps-closure/bascule.sh` (étape `construire`) : le CONSTAT affiché sans condition (« atteste le rejeu de la provenance de J7 (fermeture de l'hôte) ») n'est plus exact pour la nouvelle VSA. Il est à reformuler ;
+- `08-trust-plane/rejeu.sh` (`POUSSER_VSA=1`) re-pousse `r5-vsa.bundle.json`. Au prochain rejeu de zéro, ce sera la nouvelle VSA, avec la limite décrite plus haut.
