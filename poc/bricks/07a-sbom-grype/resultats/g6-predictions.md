@@ -54,6 +54,15 @@ Parcours complet dans un espace de noms réseau vide, sur un Zot jetable en TLS 
 
 **`temoins_scan`** essayée avec des bouchons à la place de `kubectl` et `juger` : tableau lu, porte-temoin posée et retirée, écart volontaire détecté, code 1.
 
+## Résultat de `g6_temoins` (04/11/2026, 22:47:50 à 22:59:26 UTC, accord du propriétaire : « A ») : [journal](g6_temoins.log), [`preuves-temoins_scan.log`](g6_temoins.copie.log)
+
+**0 écart, du premier coup** : les 15 cas sont conformes au tableau, sur le vrai Zot et la vraie porte, et l'image réelle reste admise par ec et les contrôles 9, 6 et 7.
+
+- Écritures : 14 images par `poc-ecriture`, 16 referrers par `poc-scan`, droits réels acceptés ;
+- clé privée jetable et identifiants effacés, `porte-temoin` retirée ;
+- CronJob d'horodatage lu dans Grafana : 12 passages entre 22:47 et 22:59 UTC, tous à `12 image(s), 56 enveloppe(s) : 0 horodatée(s), 54 déjà, 2 refusée(s), 1 anomalie(s)`, comme prédit ;
+- **une durée mal prédite** : 11 min 36 s au lieu d'environ 8 min, sans effet sur le résultat.
+
 ## Effets à connaître
 
 - Quatorze tags dans `builds/essai-scan` et seize manifestes dans `builds/scan/essai-scan`, sans suppression possible par `poc-scan`. Taille négligeable : même couche que l'image réelle.

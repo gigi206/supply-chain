@@ -207,3 +207,5 @@ R5 de la 10 est fini le 04/11/2026 à 22:21 UTC : `g5_porte` n'attend plus que l
 Une image sans scan récent a désormais son Job en échec, et `rejeu.sh` ne lance pas encore de scan : c'est G7. Prochaine étape : G6, les témoins négatifs signés.
 
 **G6 préparé à sec le 04/11/2026 à 22:43 UTC, rien appliqué** ([prédictions](resultats/g6-predictions.md)) : 15 témoins signés par une clé jetable, joués sur un Zot jetable avec le cosign et le ec des images de la porte, tous conformes. Ils couvrent KEV (log4j), MAL-, VEX, fraîcheur, prédicat incomplet, autre digest, clé étrangère, plusieurs scans et referrer illisible. `g6_temoins` écrit dans Zot : il attend l'accord du propriétaire.
+
+**G6 appliqué le 04/11/2026 (22:47 à 22:59 UTC, accord du propriétaire : « A »), 0 écart du premier coup** ([résultat](resultats/g6-predictions.md)) : les 15 témoins sont jugés comme prédit par la vraie porte, l'image réelle reste admise, le bilan du CronJob d'horodatage n'a pas bougé. Prochaine étape : G7, `rejeu.sh`, passage périodique du scan et constat dans l'ADR 0000 ; D7 reste à trancher.
