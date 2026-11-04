@@ -159,4 +159,6 @@ Prochaine étape : G3, la clé Transit `scanner` et l'espace `scan`.
 - `g3_essais` : refus et connexions croisées comptés, signature vérifiée sur l'hôte ;
 - `g3_cosign` : vrai `cosign sign-blob --key hashivault://scanner` depuis un pod de `scan`, sondes réseau, audit des chemins appelés.
 
+Une cinquième étape, `g3_grafana`, relit les journaux du pod et l'audit d'OpenBao à travers Grafana (correction avant exécution, consignée dans les prédictions).
+
 **D9, ajoutée** : les identifiants Zot du job sont lus dans OpenBao, comme en J8, avec deux rôles liés au même compte. `scan-zot` lit les identifiants avec un jeton de 1 min ; `scanner` signe avec un jeton de 5 min pris juste avant la signature. Recommandation : (a). `scanner-signature` a donc quatre chemins, révocation comprise, et non trois.

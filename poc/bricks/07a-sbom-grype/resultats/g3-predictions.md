@@ -106,3 +106,23 @@ Ordre : `g3_cluster g3_openbao g3_essais g3_cosign`.
 - **R4 et R5 de la 10** : aucune interaction. La porte, `sc-replay` et la VSA ne sont pas touchés. G3 dure quelques minutes.
 - **Rejeu de zéro de la 08** : il effacera la clé, les rôles et l'espace. À intégrer en G7, dans `rejeu.sh`.
 - **Bundle témoin** archivé dans `resultats/g3-temoin.bundle.json` : c'est la signature d'un texte d'essai, pas d'une image.
+
+## Corrections avant exécution (04/11/2026, 20:05 UTC, rien appliqué)
+
+**Sonde Internet.** Le texte plus haut cite « Internet (base Grype) ». Un nom non résolu serait tombé dans la branche « joint », et le DNS aurait répondu à la place de la NetworkPolicy. Deux corrections :
+- la sonde vise maintenant une adresse littérale, `https://1.1.1.1/`, attendue injoignable ;
+- un nom non résolu est classé `NON_RESOLU`, ce qui fait échouer la comparaison.
+
+**Étape ajoutée : `g3_grafana`**, après `g3_cosign`. Ordre : `g3_cluster g3_openbao g3_essais g3_cosign g3_grafana`. G3 n'avait aucune preuve lue dans Grafana, alors que tout doit y être consultable.
+- Le collecteur lit `/var/log/pods/*/*/*.log` : l'espace `scan` est collecté sans modification de la 19b.
+- L'audit d'OpenBao arrive par la sortie du pod : 941 requêtes dans les 2 189 dernières lignes, relevé à 20:05 UTC.
+- Aucune signature `transit/sign` dans cette fenêtre, ce qui est normal : il n'y a pas eu de nouvelle enveloppe. La requête de Grafana n'a donc rien rendu sur 2 h.
+
+Prédictions, lues par l'auditeur :
+- les lignes `jeton du rôle scanner obtenu` et `jeton du rôle scanner révoqué` du pod `scan-cosign` ;
+- au moins une ligne d'audit citant `transit/sign/scanner` ;
+- ni le mot de passe de `poc-scan`, ni son encodage docker dans les réponses.
+
+Les pods d'essai sont supprimés par `g3_grafana`, et non plus par `g3_cosign` : leurs journaux doivent d'abord être collectés.
+
+**Clé de Chains de la contre-épreuve** : `resultats/chains-cle-publique.pem` de la 08 est bien la clé en service (SPKI `d8c637ab3f7ddb2c`, égale à `chains.pub` de la ConfigMap `horodatage`, relevé entre 20:01 et 20:05 UTC).

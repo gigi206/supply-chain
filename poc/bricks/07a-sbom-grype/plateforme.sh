@@ -41,6 +41,8 @@
 #               --key hashivault://scanner hors de tout service Sigstore, jeton révoqué ; sondes réseau (Zot, Forgejo joints ;
 #               Grafana, Internet injoignables) ; pod sans l'étiquette app=scan : OpenBao injoignable ; bundle vérifié sur l'hôte
 #               (cosign verify-blob, clé exportée), contre-épreuves ; chemins d'OpenBao réellement appelés par cosign (audit)
+#   g3_grafana  journaux du pod et signatures de l'audit d'OpenBao lus par l'auditeur à travers Grafana (19b) ; identifiants de
+#               poc-scan absents des réponses ; pods d'essai supprimés ensuite (leurs journaux doivent d'abord être collectés)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -145,8 +147,9 @@ EOF
   [ "$phase" = Succeeded ] || { echo "KO   pod $nom : ${phase:-?}"; return 1; }
 }
 # Sonde réseau dans un pod (wget de busybox, sans vérification TLS : seule la joignabilité compte). Délai : connexion abandonnée.
+# Nom non résolu : ni joint ni injoignable, le DNS répond à la place de la NetworkPolicy.
 SONDE='sonde() { if r=$(timeout 10 wget -q -T 4 -O /dev/null "$2" 2>&1); then echo "JOINT|$1|réponse 2xx"; else
-  case $r in *"timed out"*|*nreachable*|"") echo "INJOIGNABLE|$1|${r:-délai de 10 s dépassé}" ;; *) echo "JOINT|$1|$(echo "$r" | head -1)" ;; esac; fi; }'
+  case $r in *"bad address"*) echo "NON_RESOLU|$1|$r" ;; *"timed out"*|*nreachable*|"") echo "INJOIGNABLE|$1|${r:-délai de 10 s dépassé}" ;; *) echo "JOINT|$1|$(echo "$r" | head -1)" ;; esac; fi; }'
 audit_openbao() { # instant : réponses d'OpenBao depuis cet instant (connexions JWT, transit, kv, jetons), agrégées
   kubectl exec -n openbao openbao-0 -- cat /openbao/data/audit.log > "$T/audit.log"
   jq -c --arg d "$1" 'select(.type == "response" and .time[0:19] >= ($d[0:19]) and (.request.path | test("^(auth/jwt/login|transit/|kv/|auth/token/)")))
@@ -629,7 +632,7 @@ $SONDE
 sonde Zot https://$REG/v2/
 sonde Forgejo https://192.168.161.13:3000/
 sonde Grafana https://192.168.161.13:3001/
-sonde \"Internet (base Grype)\" https://grype.anchore.io/databases/v6/latest.json"'
+sonde \"Internet (1.1.1.1)\" https://1.1.1.1/"'
 printf "Brique 07a, G3 : signature témoin\n" > temoin.txt
 cosign signing-config create --out vide.json > cosign.log 2>&1
 VAULT_TOKEN=$(cat /var/run/bao/token) cosign sign-blob --key hashivault://scanner --signing-config vide.json --bundle temoin.bundle.json --yes temoin.txt >> cosign.log 2>&1 \
@@ -692,8 +695,8 @@ EOF
   for c in jeton signer revocation; do kubectl logs -n scan "$nom" -c "$c" > "$T/$c.log" 2>&1 || true; done
   cat "$T/jeton.log"; grep -v -E '^(CLE|BUNDLE)\|' "$T/signer.log" || true; cat "$T/revocation.log"
   attendu "pod $nom" "$phase" Succeeded
-  attendu "sondes du pod app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE)\|[^|]*' "$T/signer.log" | paste -sd' ')" \
-    "JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (base Grype)"
+  attendu "sondes du pod app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE|NON_RESOLU)\|[^|]*' "$T/signer.log" | paste -sd' ')" \
+    "JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (1.1.1.1)"
 
   echo "## bundle vérifié sur l'hôte"
   sed -n 's/^BUNDLE|//p' "$T/signer.log" | base64 -d > "$R/g3-temoin.bundle.json"
@@ -717,20 +720,60 @@ EOF
   pod_scan scan-sans-etiquette "" "$SONDE
 sonde Zot https://$REG/v2/
 sonde OpenBao https://openbao.openbao.svc.cluster.local:8200/v1/sys/health" | tee "$T/sans.txt"
-  attendu "sondes du pod sans app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE)\|[^|]*' "$T/sans.txt" | paste -sd' ')" "JOINT|Zot INJOIGNABLE|OpenBao"
+  attendu "sondes du pod sans app=scan" "$(grep -oE '^(JOINT|INJOIGNABLE|NON_RESOLU)\|[^|]*' "$T/sans.txt" | paste -sd' ')" "JOINT|Zot INJOIGNABLE|OpenBao"
 
   echo "## audit d'OpenBao depuis $debut (chemins appelés par cosign)"
   audit_openbao "$debut"
-  kubectl delete pod -n scan "$nom" scan-sans-etiquette --wait=false >/dev/null
   rm -rf -- "${T:?}"
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,44p "$0"; exit 2; }
+grafana_lignes() { # requête-LogQL depuis-epoch fichier-réponse fichier-lignes : lecture par l'auditeur à travers Grafana (g1_grafana)
+  local q c
+  q=$(jq -nc --arg e "$1" --arg de "${2}000" --arg a "$(date -u +%s)000" \
+    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 1000, direction: "forward"}], from: $de, to: $a}')
+  c=$(printf 'user = "auditeur:%s"\n' "$(cat "$S8/grafana-auditeur.password")" \
+    | curl -sS -K - --cacert "$P/ca-poc.crt" -o "$3" -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q")
+  [ "$c" = 200 ] || { echo "KO   requête de l'auditeur : HTTP $c"; ko=1; }
+  jq -r '.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | $v[2][.]' "$3" > "$4"
+}
+
+etape_g3_grafana() {
+  local de i
+  T=$W/g3-grafana
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/g3-grafana"' EXIT   # motif tiré du mot de passe de poc-scan supprimé même en cas d'échec
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g3_cluster.log")" +%s)
+  echo "## journaux du pod scan-cosign, lus par l'auditeur (Loki ingère avec quelques secondes de retard)"
+  for i in $(seq 30); do
+    grafana_lignes '{espace="scan", pod="scan-cosign"}' "$de" "$T/pod.json" "$T/pod.txt"
+    grep -q 'jeton du rôle scanner révoqué' "$T/pod.txt" && break
+    sleep 2
+  done
+  grep -v -E '^(CLE|BUNDLE)\|' "$T/pod.txt" || true
+  grep -q 'jeton du rôle scanner obtenu' "$T/pod.txt" && grep -q 'jeton du rôle scanner révoqué' "$T/pod.txt" \
+    && ok "connexion et révocation visibles dans Grafana ($i essai(s))" || { echo "KO   journaux du pod absents de Grafana"; ko=1; }
+  echo "## audit d'OpenBao, lu par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{espace="openbao"} |= "transit/sign/scanner"' "$de" "$T/audit.json" "$T/audit.txt"
+    [ -s "$T/audit.txt" ] && break
+    sleep 2
+  done
+  echo "lignes d'audit citant transit/sign/scanner : $(wc -l < "$T/audit.txt")"
+  [ -s "$T/audit.txt" ] && ok "signatures de la clé scanner visibles dans Grafana ($i essai(s))" || { echo "KO   audit absent de Grafana"; ko=1; }
+  echo "## identifiants de poc-scan absents des réponses"
+  { cat "$S8/zot-poc-scan.password"; echo; printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0; echo; } > "$T/motifs"
+  if cat "$T/pod.json" "$T/audit.json" | grep -q -F -f "$T/motifs"; then echo "KO   identifiants dans les réponses de Grafana"; ko=1
+  else ok "ni le mot de passe ni son encodage docker dans les réponses de Grafana"; fi
+  kubectl delete pod -n scan scan-cosign scan-sans-etiquette --ignore-not-found --wait=false >/dev/null
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,46p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
