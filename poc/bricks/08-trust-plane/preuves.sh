@@ -108,6 +108,9 @@
 #          scan.rego, policy-scan.yaml et la clé publique du scanner ; conteneurs scan-verifier et scan du Job (scan lu dans
 #          builds/scan/<nom>) ; C1 image réelle (admise), C2 même digest dans builds/essai-webhook (aucun scan), C3 ConfigMap
 #          porte-temoin avec la clé de Chains à la place de celle du scanner (refus) ; rien écrit dans Zot
+#   temoins_scan  brique 07a, G6, appelé par plateforme.sh g6_temoins : un Job de la porte par témoin de
+#          07a-sbom-grype/resultats/g6-temoins.tsv, ConfigMap porte-temoin avec la clé jetable (clé publique versionnée) à la place de
+#          celle du scanner ; témoin : image réelle admise sous la ConfigMap porte ; rien écrit dans Zot
 # Aucun secret en argument de commande.
 #
 # Usage (racine du dépôt) : mise run confiance:preuves -- <étape>…   (journal : resultats/preuves-<étape>.log)
@@ -2827,6 +2830,27 @@ etape_controle7() { # brique 07a, G5, après R5 de la 10 : contrôle 7 dans la p
   c=$(cut -d'|' -f12 <<< "$r")
   case $c in *"accepted signatures do not match threshold"*) echo "OK   C3 motif : signature refusée" ;;
     *) echo "KO   C3 motif : $c"; ko=$((ko + 1)) ;; esac
+  echo "## bilan : $ko écart(s) aux prédictions"
+  [ "$ko" = 0 ]
+}
+
+etape_temoins_scan() { # brique 07a, G6 ; champ 3 sans objet : ces images n'ont ni signature ni provenance, seuls les champs 11 et 12 sont jugés
+  local src r c d cm e a l n ko=0 x=$here/../07a-sbom-grype/resultats
+  src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  kubectl get configmap -n porte porte -o json | jq --rawfile k "$x/g6-temoin-cle-publique.pem" '.data["scanner.pub"] = $k
+    | .metadata = {name: "porte-temoin", namespace: "porte"}' | kubectl apply --server-side -f - >/dev/null
+  echo "ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle du scanner"
+  while IFS='|' read -r -u3 c d cm e a l; do
+    r=$(juger "g6-$c" "$REG/builds/essai-scan@sha256:$d" policy.yaml "$cm"); echo "$r" | cut -d'|' -f1-3,11,12
+    n=$(sed -n 's/^LECTURE|\([0-9]*\)|.*/\1/p' "$T/porte-g6-$c.scan-verifier")
+    if [ "$(cut -d'|' -f11 <<< "$r")" = "$a" ] && [ "$n" = "$e" ] && { [ "$a" = ok ] || [ "$(cut -d'|' -f12 <<< "$r" | cut -d' ' -f1)" = "$l" ]; }
+    then echo "OK   $c ($cm) : $a${l:+, $l}, $n énoncé(s)"; else echo "KO   $c ($cm) : prédit $a, $l, $e énoncé(s) ; obtenu $n énoncé(s)"; ko=$((ko + 1)); fi
+  done 3< "$x/g6-temoins.tsv"
+  kubectl delete configmap -n porte porte-temoin --ignore-not-found >/dev/null
+  echo "ConfigMap porte-temoin retirée"
+  echo "## témoin : image réelle, ConfigMap porte"
+  r=$(juger g6-reelle "$REG/$APP" policy.yaml porte "$src" "$REG/$DEPOT_BUNDLES"); echo "$r"
+  [ "$(cut -d'|' -f3,4,7,9,11 <<< "$r")" = "true||ok|ok|ok" ] && echo "OK   image réelle admise par les trois contrôles" || { echo "KO   image réelle"; ko=$((ko + 1)); }
   echo "## bilan : $ko écart(s) aux prédictions"
   [ "$ko" = 0 ]
 }

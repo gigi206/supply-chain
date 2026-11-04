@@ -1,0 +1,9 @@
+# plateforme.sh g6_sec, 2026-11-04T22:42:51Z
+## systèmes de fichiers des images de la porte et image de base (Zot, lecture anonyme)
+## Zot jetable : certificat à la volée, écoute sur 127.0.0.1
+# plateforme.sh g6_sec_ns, 2026-11-04T22:42:53Z
+2026/11/04 23:42:53 pushed blob: sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb
+2026/11/04 23:42:53 pushed blob: sha256:965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd
+Error: PUT https://127.0.0.1:15000/v2/builds/sample-app/manifests/base: MANIFEST_INVALID: manifest invalid; map[description:During upload, manifests undergo several checks ensuring validity. If those checks fail, this error MAY be returned, unless a more specific error is included. The detail will contain information the failed validation. mediaType:application/vnd.docker.distribution.manifest.v2+json]
+# fin 2026-11-04T22:42:53Z, code 1
+# fin 2026-11-04T22:42:53Z, code 1

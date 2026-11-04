@@ -1,0 +1,201 @@
+{
+  "malicious": [],
+  "scannedAt": "2026-11-04T19:42:14.182252936+01:00",
+  "scanner": {
+    "db": {
+      "built": "2026-11-04T06:20:59Z",
+      "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326",
+      "schema": "v6.1.10"
+    },
+    "id": "grype",
+    "version": "0.104.1"
+  },
+  "vulnerabilities": [
+    {
+      "id": "GHSA-j6qf-3m9c-vwj3",
+      "aliases": [
+        "CVE-2026-114437"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.00129,
+      "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "fixedIn": [
+        "5.4.0"
+      ]
+    },
+    {
+      "id": "GHSA-mqqf-5wvp-8fh8",
+      "aliases": [
+        "CVE-2025-69725"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.00258,
+      "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "fixedIn": [
+        "5.2.4"
+      ]
+    },
+    {
+      "id": "GO-2026-5774",
+      "aliases": [
+        "GHSA-3fxj-6jh8-hvhx"
+      ],
+      "severity": "Unknown",
+      "kev": false,
+      "kevCves": [],
+      "epss": null,
+      "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "fixedIn": [
+        "5.3.0"
+      ]
+    },
+    {
+      "id": "GO-2026-5775",
+      "aliases": [
+        "GHSA-9g5q-2w5x-hmxf"
+      ],
+      "severity": "Unknown",
+      "kev": false,
+      "kevCves": [],
+      "epss": null,
+      "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "fixedIn": [
+        "5.3.0"
+      ]
+    },
+    {
+      "id": "GO-2026-5777",
+      "aliases": [
+        "GHSA-rjr7-jggh-pgcp"
+      ],
+      "severity": "Unknown",
+      "kev": false,
+      "kevCves": [],
+      "epss": null,
+      "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "fixedIn": [
+        "5.3.0"
+      ]
+    },
+    {
+      "id": "GHSA-3pxv-7cmr-fjr4",
+      "aliases": [
+        "CVE-2026-34480"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.01046,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.25.4"
+      ]
+    },
+    {
+      "id": "GHSA-6hg6-v5c8-fphq",
+      "aliases": [
+        "CVE-2026-34477"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.0056,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.25.4"
+      ]
+    },
+    {
+      "id": "GHSA-7rjr-3q55-vv33",
+      "aliases": [
+        "CVE-2021-45046"
+      ],
+      "severity": "Critical",
+      "kev": true,
+      "kevCves": [
+        "CVE-2021-45046"
+      ],
+      "epss": 0.99977,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.16.0"
+      ]
+    },
+    {
+      "id": "GHSA-8489-44mv-ggj8",
+      "aliases": [
+        "CVE-2021-44832"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.97906,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.17.1"
+      ]
+    },
+    {
+      "id": "GHSA-h383-gmxw-35v2",
+      "aliases": [
+        "CVE-2026-34479"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.00535,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.25.4"
+      ]
+    },
+    {
+      "id": "GHSA-jfh8-c2jp-5v3q",
+      "aliases": [
+        "CVE-2021-44228"
+      ],
+      "severity": "Critical",
+      "kev": true,
+      "kevCves": [
+        "CVE-2021-44228"
+      ],
+      "epss": 0.99999,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.15.0"
+      ]
+    },
+    {
+      "id": "GHSA-p6xc-xr62-6r2g",
+      "aliases": [
+        "CVE-2021-45105"
+      ],
+      "severity": "High",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.99999,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.17.0"
+      ]
+    },
+    {
+      "id": "GHSA-vc5p-v9hr-52mj",
+      "aliases": [
+        "CVE-2025-68161"
+      ],
+      "severity": "Medium",
+      "kev": false,
+      "kevCves": [],
+      "epss": 0.00767,
+      "package": "pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1",
+      "fixedIn": [
+        "2.25.3"
+      ]
+    }
+  ]
+}

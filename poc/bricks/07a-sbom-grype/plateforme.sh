@@ -62,6 +62,12 @@
 #               travail ; preuves.sh controle7 de la 08 (ConfigMap porte réappliquée, C1 image réelle, C2 sans scan, C3 autre clé)
 #   g5_grafana  journaux des conteneurs scan-verifier et scan des Jobs de g5_porte lus par l'auditeur (19b) : trois lectures, un verdict
 #               admis et deux refus de ec
+#   G6 : témoins négatifs signés par une clé jetable (image à digest propre sous builds/essai-scan, scan en referrer sous
+#   builds/scan/essai-scan, tableau resultats/g6-temoins.tsv : cas|digest|ConfigMap|énoncés|contrôle 7|règle) :
+#   g6_sec      hôte seul, aucune écriture dans Zot, ni le cluster : tout le parcours sur un Zot jetable, dans un espace de noms réseau
+#               vide, avec cosign et ec des images de la porte
+#   g6_temoins  ACCORD DU PROPRIÉTAIRE : témoins écrits dans Zot (poc-ecriture, poc-scan), clé jetable effacée ensuite ; puis
+#               preuves.sh temoins_scan de la 08 (ConfigMap porte-temoin, un Job de la porte par cas)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1098,11 +1104,147 @@ etape_g5_grafana() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,64p "$0"; exit 2; }
+G6_DEPOT=builds/essai-scan
+temoin_scan() { # registre digest-signé digest-sujet prédicat : scan signé par la clé jetable (modes attester et publier de scanner.sh, hors
+  # de tout OpenBao), publié en referrer de digest-sujet ; un digest signé différent du sujet donne le cas autre-digest
+  local d=$T/travail/$RANDOM$RANDOM
+  mkdir -p "$d"
+  cp "$4" "$d/scan.json"
+  env TRAVAIL="$d" CA="$G6_CA" CLE="$T/auth/temoin.key" CLE_PUBLIQUE="$T/auth/temoin.pub" COSIGN_PASSWORD= NOM=sample-app IMAGE="x@sha256:$2" \
+    sh "$here/politique/scanner.sh" attester > "$d/attester.out"
+  env TRAVAIL="$d" CA="$G6_CA" SECRETS="$T/auth" IMAGE="$1/$G6_DEPOT@sha256:$3" DEPOT="$1/builds/scan/${G6_DEPOT#builds/}" \
+    sh "$here/politique/scanner.sh" publier > "$d/publier.out"
+}
+temoin_illisible() { # registre digest-sujet : referrer du type d'un bundle, dont la couche n'est pas du JSON
+  local d=$T/travail/$RANDOM$RANDOM
+  mkdir -p "$d"
+  echo 'ceci n est pas un bundle' > "$d/bundle.json"
+  env TRAVAIL="$d" CA="$G6_CA" SECRETS="$T/auth" IMAGE="$1/$G6_DEPOT@sha256:$2" DEPOT="$1/builds/scan/${G6_DEPOT#builds/}" \
+    sh "$here/politique/scanner.sh" publier > "$d/publier.out"
+}
+temoins() { # registre image-de-base tableau : une image par cas, à digest propre ; DOCKER_CONFIG et $T/auth/config.json posés par l'appelant
+  local reg=$1 base=$2 tab=$3 passage n b d c v j=$T/predicats
+  mkdir -p "$j" "$T/travail"
+  passage=$(date -u +%Y%m%dT%H%M%SZ); n=$(date -u +%FT%TZ); b=$(date -ud '1 hour ago' +%FT%TZ)
+  (cd "$T/auth" && COSIGN_PASSWORD= cosign generate-key-pair --output-key-prefix temoin > /dev/null 2>&1)
+  # Prédicats du scan réel de G4 et du cas log4j de G0, passé par scan-outil : mêmes champs, dates du passage
+  propre() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g4-scan-predicat.json"; }
+  kev() { jq --arg n "$n" --arg b "$b" '.scannedAt = $n | .scanner.db.built = $b' "$R/g6-predicat-kev.json"; }
+  vex() { kev | jq --arg s "$1" --arg e "$2" '.vulnerabilities |= map(if .kev then . + {vex: {status: $s, expires: $e}} else . end)'; }
+  dater() { jq --arg n "$(date -ud "$1" +%FT%TZ)" --arg b "$(date -ud "$2" +%FT%TZ)" '.scannedAt = $n | .scanner.db.built = $b'; }
+  propre > "$j/propre.json"; kev > "$j/kev.json"
+  propre | jq '.malicious = ["MAL-2026-0001"]' > "$j/mal.json"
+  vex not_affected "$(date -ud '1 day ago' +%FT%TZ)" > "$j/vex-expire.json"
+  vex not_affected "$(date -ud '30 days' +%FT%TZ)" > "$j/vex-valide.json"
+  propre | dater '8 days ago' '8 days ago 1 hour ago' > "$j/vieux.json"
+  propre | dater '1 hour' 'now' > "$j/futur.json"
+  propre | dater 'now' '4 days ago' > "$j/base-vieille.json"
+  propre | jq 'del(.vulnerabilities)' > "$j/incomplet.json"
+  propre | dater '1 day ago' '1 day ago 1 hour ago' > "$j/hier-propre.json"
+  kev | dater '1 day ago' '1 day ago 1 hour ago' > "$j/hier-kev.json"
+  : > "$tab"
+  for c in propre absent kev mal vex-expire vex-valide vieux futur base-vieille incomplet autre-digest recent-propre recent-kev illisible; do
+    d=$(crane mutate --label "poc.test/cas=g6-$c-$passage" -t "$reg/$G6_DEPOT:$c" "$base" 2>/dev/null)
+    echo "${d##*@sha256:}" > "$T/image-$c"
+  done
+  i() { cat "$T/image-$1"; }
+  v=$(i propre)
+  temoin_scan "$reg" "$v" "$v" "$j/propre.json"
+  for c in kev mal vex-expire vex-valide vieux futur base-vieille incomplet; do temoin_scan "$reg" "$(i "$c")" "$(i "$c")" "$j/$c.json"; done
+  temoin_scan "$reg" "$v" "$(i autre-digest)" "$j/propre.json"
+  temoin_scan "$reg" "$(i recent-propre)" "$(i recent-propre)" "$j/hier-kev.json"
+  temoin_scan "$reg" "$(i recent-propre)" "$(i recent-propre)" "$j/propre.json"
+  temoin_scan "$reg" "$(i recent-kev)" "$(i recent-kev)" "$j/hier-propre.json"
+  temoin_scan "$reg" "$(i recent-kev)" "$(i recent-kev)" "$j/kev.json"
+  temoin_scan "$reg" "$(i illisible)" "$(i illisible)" "$j/propre.json"
+  temoin_illisible "$reg" "$(i illisible)"
+  while IFS='|' read -r c cm e r l; do echo "${c#*:}|$(i "${c%%:*}")|$cm|$e|$r|$l" >> "$tab"; done <<'FIN'
+propre|porte-temoin|1|ok|
+propre:cle-etrangere|porte|0|refus|scan.scan_present
+absent|porte-temoin|0|refus|scan.scan_present
+kev|porte-temoin|1|refus|scan.kev_without_vex
+mal|porte-temoin|1|refus|scan.malicious
+vex-expire|porte-temoin|1|refus|scan.kev_without_vex
+vex-valide|porte-temoin|1|ok|
+vieux|porte-temoin|1|refus|scan.scan_recent
+futur|porte-temoin|1|refus|scan.scan_recent
+base-vieille|porte-temoin|1|refus|scan.base_recente
+incomplet|porte-temoin|1|refus|scan.forme
+autre-digest|porte-temoin|0|refus|scan.scan_present
+recent-propre|porte-temoin|2|ok|
+recent-kev|porte-temoin|2|refus|scan.kev_without_vex
+illisible|porte-temoin|1|ok|
+FIN
+  echo "$(wc -l < "$tab") cas, $(ls "$T/travail" | wc -l) publications"
+}
+
+etape_g6_sec() {
+  local T=$W/g6-sec-jeu n
+  [ ! -d "$T" ] || chmod -R u+w "$T"
+  rm -rf -- "${T:?}"; mkdir -p "$T/outils" "$T/porte"; (umask 077 && mkdir -p "$T/auth" "$T/docker")
+  echo "## systèmes de fichiers des images de la porte et image de base (Zot, lecture anonyme)"
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/$G5_OUTILS" - | tar -xf - -C "$T/outils" --no-same-owner --exclude='dev/*' 2>/dev/null || true
+  SSL_CERT_FILE=$P/ca-poc.crt crane export "$REG_HOTE/$G5_PORTE" - | tar -xf - -C "$T/porte" --no-same-owner
+  SSL_CERT_FILE=$P/ca-poc.crt crane pull --format=oci "$REG_HOTE/$IMAGE" "$T/base"
+  for n in outils porte; do mkdir -p "$T/$n/etc/porte/regles-scan" "$T/$n/tmp" "$T/$n/partage" "$T/$n/dev" "$T/$n/proc"; done
+  cp "$here/politique/porte/scan-verifier.sh" "$T/outils/etc/porte/"
+  cp "$here/politique/porte/policy-scan.yaml" "$T/porte/etc/porte/"
+  cp "$here/politique/porte/scan.rego" "$T/porte/etc/porte/regles-scan/"
+  echo "## Zot jetable : certificat à la volée, écoute sur 127.0.0.1"
+  openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 1 -subj /CN=zot-jetable -addext subjectAltName=IP:127.0.0.1 \
+    -addext basicConstraints=critical,CA:TRUE -keyout "$T/auth/zot.key" -out "$T/zot.crt" 2>/dev/null
+  cp "$T/zot.crt" "$T/outils/etc/porte/ca-poc.crt"
+  jq -n --arg r "$T/zot" --arg c "$T/zot.crt" --arg k "$T/auth/zot.key" '{distSpecVersion: "1.1.1", storage: {rootDirectory: $r, gc: false},
+    http: {address: "127.0.0.1", port: "15000", tls: {cert: $c, key: $k}}, log: {level: "error"}}' > "$T/zot.json"
+  G6_T=$T unshare -rn bash -c 'ip link set lo up && exec "$@"' _ "$0" g6_sec_ns
+  rm -f "$R/g6_sec_ns.log"
+  chmod -R u+w "$T"; rm -rf -- "${T:?}/outils" "${T:?}/porte" "${T:?}/zot" "${T:?}/base" "${T:?}/auth"
+}
+
+etape_g6_sec_ns() { # dans l'espace de noms réseau vide de g6_sec
+  local T=$G6_T reg=127.0.0.1:15000 c d cm e r l t ko=0 zp v
+  zot serve "$T/zot.json" > "$T/zot.out" 2>&1 & zp=$!
+  # shellcheck disable=SC2064   # développement à la pose, voulu
+  trap "kill $zp 2>/dev/null || true" EXIT
+  for _ in $(seq 40); do curl -fsS --cacert "$T/zot.crt" "https://$reg/v2/" >/dev/null 2>&1 && break; sleep 0.25; done
+  export SSL_CERT_FILE=$T/zot.crt DOCKER_CONFIG=$T/docker G6_CA=$T/zot.crt
+  echo '{}' > "$T/auth/config.json"; echo '{}' > "$T/docker/config.json"
+  crane push "$T/base" "$reg/builds/sample-app:base" 2> /dev/null > /dev/null
+  temoins "$reg" "$reg/builds/sample-app:base" "$T/temoins.tsv"
+  cp "$T/auth/temoin.pub" "$T/temoin.pub"
+  while IFS='|' read -r c d cm e r l; do
+    if [ "$cm" = porte ]; then cp "$R/scanner-cle-publique.pem" "$T/outils/etc/porte/scanner.pub"; else cp "$T/temoin.pub" "$T/outils/etc/porte/scanner.pub"; fi
+    t=$(verifier_chroot "$T/outils" "$reg/$G6_DEPOT@sha256:$d" | tee "$T/lecture-$c" | tail -1)
+    v=$(cut -d'|' -f2 <<< "$t")
+    echo "$c ($cm) : $(cut -d'|' -f2,4 <<< "$t" | cut -c1-150)"
+    [ "$v" = "$e" ] && ok "$c : $e énoncé(s)" || { echo "KO   $c : $v énoncé(s), prédit $e"; ko=1; }
+    cp "$T/outils/partage/scan-entree.json" "$T/porte/partage/"
+    if [ "$r" = ok ]; then juger_entree "$c" 0 ""; else juger_entree "$c" 1 "$l"; fi
+  done < "$T/temoins.tsv"
+  return $ko
+}
+
+etape_g6_temoins() { # ACCORD DU PROPRIÉTAIRE : écrit dans Zot
+  local T=$W/g6-temoins c=0
+  [ ! -d "$T" ] || chmod -R u+w "$T"
+  rm -rf -- "${T:?}"; (umask 077 && mkdir -p "$T/auth" "$T/docker")
+  trap 'rm -rf -- "$W/g6-temoins/auth" "$W/g6-temoins/docker" "$W/g6-temoins/travail"' EXIT   # clé jetable et identifiants, même en cas d'échec
+  printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-ecriture:%s' "$(cat "$S8/zot-poc-ecriture.password")" | base64 -w0)" > "$T/docker/config.json"
+  printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0)" > "$T/auth/config.json"
+  export SSL_CERT_FILE=$P/ca-poc.crt DOCKER_CONFIG=$T/docker G6_CA=$P/ca-poc.crt
+  temoins "$REG_HOTE" "$REG_HOTE/$IMAGE" "$R/g6-temoins.tsv"
+  cp "$T/auth/temoin.pub" "$R/g6-temoin-cle-publique.pem"
+  unset SSL_CERT_FILE DOCKER_CONFIG
+  "$R8/preuves.sh" temoins_scan || c=$?
+  cp "$R8/resultats/preuves-temoins_scan.log" "$R/g6_temoins.copie.log"   # copié aussi après un échec
+  [ "$c" = 0 ] && ! grep -q '^KO' "$R/g6_temoins.copie.log"
+}
+
+[ $# -ge 1 ] || { sed -n 2,70p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

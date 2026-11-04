@@ -1,0 +1,52 @@
+# plateforme.sh g6_sec, 2026-11-04T22:43:00Z
+## systèmes de fichiers des images de la porte et image de base (Zot, lecture anonyme)
+## Zot jetable : certificat à la volée, écoute sur 127.0.0.1
+# plateforme.sh g6_sec_ns, 2026-11-04T22:43:02Z
+15 cas, 16 publications
+propre (porte-temoin) : 1|
+OK   propre : 1 énoncé(s)
+OK   propre : code 0, admis
+cle-etrangere (porte) : 0|cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expe
+OK   cle-etrangere : 0 énoncé(s)
+OK   cle-etrangere : code 1, scan.scan_present
+absent (porte-temoin) : 0|cosign : no matching attestations: 
+OK   absent : 0 énoncé(s)
+OK   absent : code 1, scan.scan_present
+kev (porte-temoin) : 1|
+OK   kev : 1 énoncé(s)
+OK   kev : code 1, scan.kev_without_vex
+mal (porte-temoin) : 1|
+OK   mal : 1 énoncé(s)
+OK   mal : code 1, scan.malicious
+vex-expire (porte-temoin) : 1|
+OK   vex-expire : 1 énoncé(s)
+OK   vex-expire : code 1, scan.kev_without_vex
+vex-valide (porte-temoin) : 1|
+OK   vex-valide : 1 énoncé(s)
+OK   vex-valide : code 0, admis
+vieux (porte-temoin) : 1|
+OK   vieux : 1 énoncé(s)
+OK   vieux : code 1, scan.scan_recent
+futur (porte-temoin) : 1|
+OK   futur : 1 énoncé(s)
+OK   futur : code 1, scan.scan_recent
+base-vieille (porte-temoin) : 1|
+OK   base-vieille : 1 énoncé(s)
+OK   base-vieille : code 1, scan.base_recente
+incomplet (porte-temoin) : 1|
+OK   incomplet : 1 énoncé(s)
+OK   incomplet : code 1, scan.forme
+autre-digest (porte-temoin) : 0|cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+OK   autre-digest : 0 énoncé(s)
+OK   autre-digest : code 1, scan.scan_present
+recent-propre (porte-temoin) : 2|
+OK   recent-propre : 2 énoncé(s)
+OK   recent-propre : code 0, admis
+recent-kev (porte-temoin) : 2|
+OK   recent-kev : 2 énoncé(s)
+OK   recent-kev : code 1, scan.kev_without_vex
+illisible (porte-temoin) : 1|
+OK   illisible : 1 énoncé(s)
+OK   illisible : code 0, admis
+# fin 2026-11-04T22:43:08Z, code 0
+# fin 2026-11-04T22:43:08Z, code 0

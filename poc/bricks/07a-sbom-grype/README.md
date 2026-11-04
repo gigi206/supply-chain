@@ -205,3 +205,5 @@ R5 de la 10 est fini le 04/11/2026 à 22:21 UTC : `g5_porte` n'attend plus que l
 - journaux lus par l'auditeur dans Grafana ; `controle6` rejoué sur la porte corrigée, 0 écart.
 
 Une image sans scan récent a désormais son Job en échec, et `rejeu.sh` ne lance pas encore de scan : c'est G7. Prochaine étape : G6, les témoins négatifs signés.
+
+**G6 préparé à sec le 04/11/2026 à 22:43 UTC, rien appliqué** ([prédictions](resultats/g6-predictions.md)) : 15 témoins signés par une clé jetable, joués sur un Zot jetable avec le cosign et le ec des images de la porte, tous conformes. Ils couvrent KEV (log4j), MAL-, VEX, fraîcheur, prédicat incomplet, autre digest, clé étrangère, plusieurs scans et referrer illisible. `g6_temoins` écrit dans Zot : il attend l'accord du propriétaire.
