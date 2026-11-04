@@ -109,3 +109,5 @@ But : le **contrôle 7** de l'ADR 0000 (« attestation de scan : aucune KEV sans
 - La porte gagne un conteneur. Une image sans scan récent est refusée : le rejeu de la 08 devra lancer un scan avant la porte.
 - La base importée ajoute 3,2 Go temporaires sur `sc-confiance`, et l'archive environ 200 Mo par jour dans Zot.
 - Pas de VEX avant la 07b. « KEV sans VEX » veut donc dire, en pratique, « aucune KEV ».
+
+**Décisions du propriétaire (04/11/2026, vers 18:37 UTC, « Go ») : D1 (a), D2, D3 (a), D4 (7 jours et 3 jours), D5 (a), D6 (a), toutes conformes aux recommandations ; G0 lancé.** Prédictions de G0 : [`resultats/g0-predictions.md`](resultats/g0-predictions.md).

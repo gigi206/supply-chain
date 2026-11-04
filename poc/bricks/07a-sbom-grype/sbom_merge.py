@@ -11,7 +11,8 @@ La fusion se fait donc sur une clé normalisée. Les composants sans version
 (paquets de la bibliothèque standard listés par Hermeto) sont écartés : ils ne
 sont pas corrélables.
 
-Usage : sbom_merge.py <hermeto.json> <syft.json> > fusion.json   (CycloneDX 1.6)
+Usage : sbom_merge.py <hermeto.json> <syft.json> [libellé-1 libellé-2] > fusion.json   (CycloneDX 1.6)
+Libellés par défaut : hermeto et syft (plateforme, D1 a : source et image, deux SBOM de Syft).
 """
 import json
 import re
@@ -54,10 +55,11 @@ def merge(docs):
 
 
 def main(argv):
-    if len(argv) != 3:
-        print(__doc__.strip().splitlines()[-1], file=sys.stderr)
+    if len(argv) not in (3, 5):
+        print(__doc__.strip().splitlines()[-2], file=sys.stderr)
         return 2
-    docs = [("hermeto", json.load(open(argv[1]))), ("syft", json.load(open(argv[2])))]
+    l1, l2 = argv[3:5] if len(argv) == 5 else ("hermeto", "syft")
+    docs = [(l1, json.load(open(argv[1]))), (l2, json.load(open(argv[2])))]
     json.dump(merge(docs), sys.stdout, indent=2)
     print()
     return 0
