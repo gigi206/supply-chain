@@ -1,0 +1,30 @@
+# plateforme.sh g4_scan, 2026-11-04T20:38:17Z
+## ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner
+configmap/scan-config serverside-applied
+## job g4-sample-app sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+job.batch/g4-sample-app created
+### source
+  SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+### analyser
+  BASE|2026-11-04, sc-stockage.poc.test:5000/vulndb/grype@sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326, empreinte sha256:ed08c5e32eb299ebc83b87ab05b23debd749b55c30cf73281ec4223851b5f896, 2 s
+  IMPORT|3222 Mo, 103 s ; 3411 Mo dans le volume, au plus haut
+  SBOM|4 composants avec PURL (D1 a), 2 s
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+  PREDICAT|sha256 97fd7d134c7873e11a0c09639702ce54974191e37b22729e8828b059f160a8c7, 108 s en tout
+### jetons
+  identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+  jeton du rôle scanner obtenu
+### attester
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 7c70dfff9d091c6cdb9ddbcc0eede4d39bdee6ab970621335882f4fe868748ed, vérifié avec la clé publique
+### publier
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:23ec3bcfb6177a7fc752566291fbe099d5358efc191acb533814a4896a5d4c6e, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+### revocation
+  jeton du rôle scanner révoqué ; identifiants et jeton effacés
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-04T20:38:17Z","fin":"2026-11-04T20:40:17Z","init":{"source":0,"analyser":0,"jetons":0,"attester":0,"publier":0}}
+place libre la plus basse sur sc-confiance pendant le job : 2505 Mo
+OK   job : 1
+OK   base du job = base la plus récente (2026-11-04) : sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326
+OK   commit de la source : 6391fd437f26696847041be3226bbbf633f55a2f
+3222 Mo, 103 s ; 3411 Mo dans le volume, au plus haut
+5 vulnérabilités, 0 KEV, 1 s
+# fin 2026-11-04T20:40:22Z, code 0

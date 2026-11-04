@@ -1,0 +1,40 @@
+# plateforme.sh g4_verifier, 2026-11-04T20:40:26Z
+## referrers de l'image dans builds/scan/sample-app, en lecture anonyme
+{"digest":"sha256:23ec3bcfb6177a7fc752566291fbe099d5358efc191acb533814a4896a5d4c6e","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-04T20:40:14Z"}}
+OK   empreinte du manifeste : sha256:23ec3bcfb6177a7fc752566291fbe099d5358efc191acb533814a4896a5d4c6e
+OK   sujet du manifeste : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   empreinte du bundle : sha256:7c70dfff9d091c6cdb9ddbcc0eede4d39bdee6ab970621335882f4fe868748ed
+## bundle vérifié sur l'hôte
+OK   bundle vérifié : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1 (Verified OK)
+OK   contre-épreuve, autre digest refusé : provided artifact digest does not match any digest in statement
+OK   contre-épreuve, autre prédicat refusé : invalid predicate type
+OK   contre-épreuve, clé de Chains refusée : failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, E
+## prédicat signé
+{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-04T06:20:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-04T20:40:09.254165787Z","malveillants":[]}
+  GHSA-j6qf-3m9c-vwj3 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GHSA-mqqf-5wvp-8fh8 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-5774 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-5775 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-5777 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+OK   sujet de l'énoncé : 3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   scanner : grype 0.104.1
+OK   base citée par digest : sc-stockage.poc.test:5000/vulndb/grype
+OK   KEV : 0
+OK   paquets malveillants : 0
+vulnérabilités : 5
+OK   identifiants = ceux de G0 (même base si elle n'a pas changé) : GHSA-j6qf-3m9c-vwj3,GHSA-mqqf-5wvp-8fh8,GO-2026-5774,GO-2026-5775,GO-2026-5777
+## aucun Secret dans l'espace scan
+OK   Secrets de l'espace scan : 0
+## audit d'OpenBao depuis le début du job
+{"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"auth/token/renew-self","op":"update","role":"tsa","politiques":["tsa-signature"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+# fin 2026-11-04T20:40:27Z, code 0

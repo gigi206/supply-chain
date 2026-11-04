@@ -177,3 +177,11 @@ Prochaine étape : G4, le job de scan.
 **G4 préparé à sec le 04/11/2026 à 20:35 UTC** ([prédictions](resultats/g4-predictions.md)) : job de scan en six conteneurs, un mode de [`politique/scanner.sh`](politique/scanner.sh) chacun. Le scan tourne sans aucun identifiant ; le jeton qui signe est pris après le scan.
 
 `scanner.sh` a tourné dans le système de fichiers de l'image réelle : 5 vulnérabilités, 0 KEV, mêmes identifiants qu'en G0. La lecture de la source demande un conteneur de plus, sur l'image BuildKit, car `outils-scan` n'a pas git. Les refus et l'anomalie du CronJob d'horodatage viennent des témoins de J6, et G1 n'a rien changé à son bilan.
+
+**G4 appliqué le 04/11/2026 (20:38 à 20:40 UTC, accord du propriétaire : « Oui les 2 »), conforme du premier coup** ([prédictions et résultat](resultats/g4-predictions.md)) :
+- job de 2 min sur `sc-confiance`, base `vulndb/grype@sha256:13729131…` importée en 103 s, **5 vulnérabilités, 0 KEV**, mêmes identifiants qu'en G0 ;
+- attestation signée par la clé `scanner`, sujet `3a7ca1b1…`, publiée par `poc-scan` en referrer dans `builds/scan/sample-app@sha256:23ec3bcf…` ;
+- bundle vérifié sur l'hôte, autre digest, autre prédicat et clé de Chains refusés ;
+- aucun Secret dans l'espace, audit d'OpenBao sans erreur, journaux et audits lus dans Grafana.
+
+Prochaine étape : G5, le contrôle 7 dans la porte, après R5 de la 10.

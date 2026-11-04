@@ -85,3 +85,39 @@ Ordre : `g4_scan g4_verifier g4_grafana`.
 - **Porte** : elle ne lit pas `builds/scan` avant G5. Aucun effet sur les déploiements.
 - **R4 et R5 de la 10** : aucune interaction.
 - **À noter pour G7** : rejouer `g3_cluster` réappliquerait `scan-config` avec la seule CA et retirerait `scanner.sh` et `scanner.pub`.
+
+## Résultat (04/11/2026, de 20:38:17 à 20:40:27 UTC)
+
+Accord du propriétaire : « Oui les 2 » (pousser `84b90d3`, appliquer G4). Trois étapes, code 0 du premier coup, sans passage raté à archiver.
+
+**g4_scan** : job terminé en 2 min (20:38:17 à 20:40:17), sous la limite de 2 Gi.
+- `source` : commit `6391fd43…`, arbre `30e808ff…`, 12 fichiers, premier essai, avec le git de BuildKit sous l'uid 65532.
+- `analyser` : base `2026-11-04`, `13729131…`, empreinte `ed08c5e3…` ; import de 3 222 Mo en 103 s ; 3 411 Mo dans le volume au plus haut ; 4 composants avec PURL ; **5 vulnérabilités, 0 KEV** ; 108 s en tout.
+- `jetons` : identifiants lus, jeton `scan-zot` révoqué, jeton `scanner` obtenu.
+- `attester` : bundle `7c70dfff…`, vérifié dans le job avec la clé publique.
+- `publier` : `builds/scan/sample-app@sha256:23ec3bcf…`, referrer de `3a7ca1b1…`.
+- `revocation` : jeton révoqué, identifiants et jeton effacés.
+- Place libre la plus basse sur `sc-confiance` : 2 505 Mo.
+
+**g4_verifier**
+- Un seul referrer de scan, lu en anonyme ; manifeste et bundle aux bonnes empreintes.
+- Bundle vérifié sur l'hôte ; autre digest, autre prédicat et clé de Chains refusés.
+- Prédicat archivé ([`g4-scan-predicat.json`](g4-scan-predicat.json), [`g4-scan.bundle.json`](g4-scan.bundle.json)) : `grype 0.104.1`, base citée par digest, 0 KEV, 0 paquet malveillant, mêmes 5 identifiants qu'en G0 (tous sur chi `v5.2.3`), `scannedAt` à 20:40:09.
+- 0 Secret dans l'espace `scan`.
+- Audit d'OpenBao conforme, sans erreur : connexions `scan-zot` et `scanner`, `kv/scan/zot`, `transit/keys/scanner`, `transit/sign/scanner/sha2-256`, deux `revoke-self`.
+
+**g4_grafana** : lignes du job lues par l'auditeur, signature visible dans l'audit d'OpenBao (2 lignes), poussage par `poc-scan` visible dans l'audit de Zot (5 lignes), identifiants absents des réponses. Job supprimé ensuite.
+
+**Levés par ce passage** : `source` avec le git de BuildKit, `jetons`, `revocation`, le réseau limité de `scan`, la limite de mémoire (ni arrêt ni échec), le poussage réel par digest par `poc-scan`.
+
+**Écarts et marges**
+- Place libre basse tout juste au-dessus de la prédiction (2 505 Mo pour « au moins 2,5 Go ») : l'image BuildKit, tirée pour la première fois sur `sc-confiance`, y reste. Après le job, 5 915 Mo sont libres, contre 6,2 Go avant.
+- Import plus lent que sur l'hôte (103 s contre 78 s), dans la fourchette prédite.
+
+**Limites**
+- La consommation mémoire réelle du conteneur n'a pas été relevée.
+- Le refus d'une base corrompue dans le job n'a pas été essayé.
+- La porte n'exige pas encore ce scan : ce sera G5, après R5. Les négatifs viennent en G6.
+- Le job est lancé à la main : le passage périodique et le rejeu de zéro sont à traiter en G7.
+
+**CronJob d'horodatage** : même bilan après G4, conforme à la prédiction. Passage de 20:41:00 UTC, postérieur au poussage : 12 images, 56 enveloppes, 54 déjà, 2 refusées, 1 anomalie, sans aucune ligne citant `builds/scan`.
