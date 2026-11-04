@@ -196,3 +196,5 @@ Prochaine étape : G5, le contrôle 7 dans la porte, après R5 de la 10.
 Le scan de G4 expire le 11/11/2026 à 20:40:09 UTC. Prochaine étape : `g5_porte`, après R5 de la 10 et avec l'accord du propriétaire.
 
 **Décision du propriétaire (04/11/2026, après 21:05 UTC, réponse « 2 a ») : les deux ajouts à D4 sont retenus**, `scan.forme` et le refus d'un scan daté de plus de 5 min dans le futur.
+
+R5 de la 10 est fini le 04/11/2026 à 22:21 UTC : `g5_porte` n'attend plus que l'accord du propriétaire. Le correctif s'applique toujours à l'arbre après les adaptations d'après R5.

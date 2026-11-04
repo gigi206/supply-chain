@@ -793,11 +793,12 @@ etape_controle_grpc() {
 # ---------------------------------------------------------------------------------------------------------------- L7
 # Domaine de replay de la brique 10 dans Grafana (demande du propriétaire du 03/11/2026 : « Replay dans Grafana »).
 #   corroborer_vsa  lecture seule : écritures de poc-replay sous builds/vsa/ lues par l'auditeur dans l'audit de Zot (J6), à
-#                   travers Grafana, sur la fenêtre du 03/11/2026 de 14:00 à 16:00 UTC ; heure du PUT du manifeste de la VSA
+#                   travers Grafana, sur la fenêtre du dernier push ; heure du PUT du manifeste de la VSA
 #                   comparée à timeVerified (le push ne donne qu'une borne haute de l'heure du replay) ; contre-épreuve :
 #                   marqueur jamais émis, absent des lignes de données
-VSA_MANIFESTE=sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03   # resultats/r5-pousser_vsa.log de la 10
-TIME_VERIFIED=2026-11-03T14:27:05Z                                                    # resultats/r5-vsa-enonce.json de la 10
+VSA_MANIFESTE=sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b   # resultats/r5-pousser_vsa.log de la 10
+TIME_VERIFIED=2026-11-04T21:27:33Z                                                    # resultats/r5-vsa-enonce.json de la 10
+VSA_DE=2026-11-04T22:00:00Z VSA_A=2026-11-04T23:00:00Z                                # fenêtre du push du 04/11/2026
 
 lignes_auditeur() { # expression-LogQL début fin (ISO UTC) : lignes de données lues par l'auditeur à travers Grafana, une par
   # ligne : heure de Loki (UTC) puis la ligne ; la réponse brute contient aussi le texte de la requête, d'où la lecture des
@@ -812,8 +813,8 @@ lignes_auditeur() { # expression-LogQL début fin (ISO UTC) : lignes de données
 
 etape_corroborer_vsa() {
   local m l t
-  echo "## écritures de poc-replay sous builds/vsa/, audit de Zot (noeud sc-stockage), 03/11/2026 de 14:00 à 16:00 UTC"
-  lignes_auditeur '{noeud="sc-stockage", source="audit-zot"} |= "poc-replay" |= "builds/vsa/"' 2026-11-03T14:00:00Z 2026-11-03T16:00:00Z > "$W/l7-vsa.txt"
+  echo "## écritures de poc-replay sous builds/vsa/, audit de Zot (noeud sc-stockage), de $VSA_DE à $VSA_A"
+  lignes_auditeur '{noeud="sc-stockage", source="audit-zot"} |= "poc-replay" |= "builds/vsa/"' "$VSA_DE" "$VSA_A" > "$W/l7-vsa.txt"
   cat "$W/l7-vsa.txt"
   echo "## PUT du manifeste de la VSA (${VSA_MANIFESTE:0:19}…)"
   l=$(grep -F "manifests/$VSA_MANIFESTE" "$W/l7-vsa.txt" || true)
@@ -827,7 +828,7 @@ etape_corroborer_vsa() {
   fi
   echo "## contre-épreuve : marqueur jamais émis"
   m="jamais-emis-l7-$(date +%s%N)"
-  echo "lignes de données contenant le marqueur : $(lignes_auditeur "{noeud=\"sc-stockage\", source=\"audit-zot\"} |= \"$m\"" 2026-11-03T14:00:00Z 2026-11-03T16:00:00Z | grep -cF "$m" || true)"
+  echo "lignes de données contenant le marqueur : $(lignes_auditeur "{noeud=\"sc-stockage\", source=\"audit-zot\"} |= \"$m\"" "$VSA_DE" "$VSA_A" | grep -cF "$m" || true)"
   rm -f "${W:?}/l7-vsa.txt" "${W:?}/graf.out"
 }
 

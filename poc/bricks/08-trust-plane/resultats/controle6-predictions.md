@@ -78,3 +78,7 @@ Prédictions, avec Zot joint par son adresse IP :
 - C2 : contrôle 6 en `refus`, 0/0, « no matching attestations ». Consignés, sans prédiction : ec à `false` faute de source, et contrôle 9 `ok` à 30/30.
 - C3 : ec et contrôle 9 identiques à C1 ; contrôle 6 en `refus`, avec le motif « threshold ». `porte-temoin` est retirée.
 - Les Jobs de C2 et de C3 sont en échec, celui de C1 a réussi. Rien n'est écrit dans Zot.
+
+## Additif du 04/11/2026 (22:22 UTC) : après R5 sur `c4242a11`
+
+Une seconde VSA, `69a2b103…`, a rejoint `c1bfbcbd…` dans `builds/vsa/sample-app`. Les valeurs ci-dessus restent celles du passage du 03/11/2026. Mesuré par `porte_apres` : `VSA|ok|2/2`. L'attendu de `controle6` suit désormais le nombre de referrers ; l'étape n'a pas été rejouée.

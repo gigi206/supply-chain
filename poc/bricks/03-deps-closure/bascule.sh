@@ -368,7 +368,7 @@ etape_construire() {
   attendu "ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
   attendu "contrôle 9 (horodatage)" "$(cut -d'|' -f7 <<< "$r")" ok
   attendu "contrôle 6 (VSA)" "$(cut -d'|' -f9 <<< "$r")" ok
-  echo "CONSTAT la VSA retenue atteste le rejeu de la provenance de J7 (fermeture de l'hôte) : vsa.sh la lie au digest, pas à la provenance jugée"
+  echo "CONSTAT une VSA retenue atteste le rejeu d'une provenance de ce digest : vsa.sh la lie au digest, pas à la provenance jugée"
 }
 
 etape_provenance() {

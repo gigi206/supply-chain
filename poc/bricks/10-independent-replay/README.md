@@ -450,3 +450,7 @@ Prochaine étape : R4, pas avant le 04/11/2026 à 21:26:27 UTC.
 **R4 joué le 04/11/2026 (21:26:33 à 21:46:36 UTC, accord du propriétaire), conforme du premier coup** ([résultat](resultats/vsa-rejeu-complet-predictions.md), [journal](resultats/r4-rebuild.log)) : lien coupé 1 200 s, sortie de la VM inchangée, **`PASSED`**, image reconstruite `3a7ca1b1…` égale au sujet de `c4242a11`, binaire `e3749c68…` identique avec `go build`.
 
 Prochaine étape : R5 (`vsa`, `porte_avant`, puis `pousser_vsa` sur accord), avec `POLITIQUE_COMMIT=6c44219`. La politique et `vsa.py` n'ont pas changé depuis ce commit.
+
+**R5 joué le 04/11/2026 (22:09 à 22:21 UTC, accords du propriétaire), 0 KO** ([résultat](resultats/vsa-rejeu-complet-predictions.md)) : VSA `PASSED` de `c4242a11`, signée par la clé du domaine, poussée en `69a2b103…`, digest prédit. Porte inchangée avant et après le push, contrôle 6 à `2/2`. Clés croisées refusées. Push lu par l'auditeur dans Grafana.
+
+La provenance de la plateforme (fermeture de `builds/fermetures/`) a donc sa propre VSA. Celle de `d9006af7` reste dans Zot.

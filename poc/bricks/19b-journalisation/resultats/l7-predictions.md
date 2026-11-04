@@ -31,3 +31,7 @@ Prédictions :
 5. Contre-épreuve : 0 ligne.
 
 **Portée, inchangée** : l'heure du replay est bornée par le haut, à 15:00:59 UTC au plus tard, par un témoin extérieur au domaine (l'audit de Zot, lu par l'auditeur dans Grafana). La borne basse des 24 h repose toujours sur `timeVerified`, affirmé par le domaine, et sur les compteurs du lien de R4.
+
+## Additif du 04/11/2026 (22:22 UTC) : VSA de `c4242a11`
+
+`corroborer_vsa` rejoué sur le nouveau push, [journal](l7-corroborer_vsa.log) réécrit (celui du 03/11/2026 reste dans l'historique git) : PUT du manifeste `69a2b103…` par `poc-replay` à 22:20:05 UTC, 3 152 s après `timeVerified` ; 3 lignes d'audit ; marqueur jamais émis absent.

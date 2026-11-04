@@ -91,6 +91,24 @@ Le journal remplace celui de `d9006af7`, qui reste dans l'historique git (`4306f
 - `porte_apres` : champs 3 à 5, 7 et 8 identiques à ceux de `porte_avant`, et contrôle 6 à `ok|2/2 VSA retenue(s)` ;
 - `lire_vsa` : les deux VSA vérifiées par la clé du domaine, clé de Chains refusée, connexions de cosign vers Zot seulement.
 
+## Résultat de `pousser_vsa`, `porte_apres` et `lire_vsa` (04/11/2026, 22:20:02 à 22:21:18 UTC, accord du propriétaire : « Oui »)
+
+Conforme à toutes les prédictions, 0 KO :
+- **`pousser_vsa`** ([journal](r5-pousser_vsa.log)) : manifeste `sha256:69a2b103…`, égal au digest calculé d'avance ; `builds/vsa/sample-app` a 2 referrers, 0 tag ; `builds/sample-app` reste à 0 referrer ;
+- **`porte_apres`** ([journal](r5-porte_apres.log)) : champs 3 à 5, 7 et 8 identiques à `porte_avant`, contrôle 6 à `ok|2/2 VSA retenue(s)` ;
+- **`lire_vsa`** ([journal](r5-lire_vsa.log)) : 2 VSA vérifiées par la clé du domaine, clé de Chains refusée, provenance refusée avec la clé de VSA, témoins acceptés, une seule connexion, vers Zot ;
+- **Grafana** ([journal L7](../../19b-journalisation/resultats/l7-corroborer_vsa.log)) : l'auditeur lit le PUT du manifeste par `poc-replay` à 22:20:05 UTC, 3 152 s après `timeVerified` ; le marqueur jamais émis est absent.
+
+Limite inchangée : le témoin de signature d'image affiche « 0 vérifiée(s) », comme dans le journal précédent. Le compteur ne vaut que pour les attestations ; l'acceptation repose sur le code de sortie de cosign.
+
+## Adaptations d'après R5, faites le 04/11/2026 à 22:22 UTC
+
+- `preuves.sh` (contrôle 6, C1) : l'attendu suit le nombre de referrers au lieu d'un `2/2` en dur : il vaudra 1 après un rejeu de zéro. Non rejoué : `controle6` n'a pas retourné depuis ;
+- `journalisation.sh` (L7) : manifeste, `timeVerified` et fenêtre remplacés, rejoué ;
+- `bascule.sh` : le CONSTAT ne nomme plus de provenance particulière ;
+- `controle6-predictions.md` : additif ;
+- `rejeu.sh` : rien à changer. Il re-poussera `r5-vsa.bundle.json`, donc la nouvelle VSA.
+
 ## Après R5 : ce qu'il faudra adapter (relevé à sec le 04/11/2026 à 18:14 UTC, rien modifié)
 
 R5 réécrit les fichiers `r5-vsa.log`, `r5-vsa-enonce.json`, `r5-vsa.bundle.json`, `r5-vsa-manifeste.json`, `r5-pousser_vsa.log`, `r5-porte_avant.log`, `r5-porte_apres.log` et `r5-lire_vsa.log`. Ceux de la VSA `c804d946` restent dans l'historique git. Points qui les citent ou qui en dépendent :

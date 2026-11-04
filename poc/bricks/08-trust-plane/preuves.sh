@@ -2734,7 +2734,7 @@ etape_reelle() { # brique 10, R5 : PASSAGE=avant|apres (push de la VSA) ; la com
 }
 
 etape_controle6() { # contrôle 6 dans la porte (demandé par la brique 10 ; choix du propriétaire du 03/11/2026 : « Contrôle 6 d'abord »)
-  local src r c ko=0 v=$here/../10-independent-replay/resultats/vsa-cle-publique.pem
+  local src r c n ko=0 v=$here/../10-independent-replay/resultats/vsa-cle-publique.pem
   src=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
   attendu() { # libellé obtenu attendu
     [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)"; ko=$((ko + 1)); }
@@ -2754,7 +2754,8 @@ etape_controle6() { # contrôle 6 dans la porte (demandé par la brique 10 ; cho
   sed 's/^/    /' "$T/porte-c6-reelle.vsa"
   attendu "C1 ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
   attendu "C1 contrôle 9" "$(cut -d'|' -f7 <<< "$r")" ok
-  attendu "C1 contrôle 6" "$(cut -d'|' -f9,10 <<< "$r")" "ok|1/1 VSA retenue(s) dans $REG/builds/vsa/sample-app"
+  n=$(referrers builds/vsa/sample-app)   # 2 depuis la VSA de c4242a11 (R5 du 04/11/2026), 1 après un rejeu de zéro
+  attendu "C1 contrôle 6" "$(cut -d'|' -f9,10 <<< "$r")" "ok|$n/$n VSA retenue(s) dans $REG/builds/vsa/sample-app"
 
   echo "## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucune VSA dans builds/vsa/essai-webhook"
   r=$(juger c6-sans-vsa "$REG/builds/essai-webhook@$APP_DIGEST"); echo "$r"

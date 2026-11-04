@@ -1,8 +1,8 @@
-# preuves.sh reelle, 2026-11-04T22:09:15Z
-## passage avant ; image builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 1
+# preuves.sh reelle, 2026-11-04T22:20:10Z
+## passage apres ; image builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 2
 enveloppes de Chains sur l'image : 10
-VERDICT|reelle-avant|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+VERDICT|reelle-apres|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|2/2 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
     COUVERTE|signature 3b1d5bd814010efa
     COUVERTE|signature fd514f9d8d7853d0
     COUVERTE|signature 52b218a123e4949b
