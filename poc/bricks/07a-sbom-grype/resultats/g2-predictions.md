@@ -41,3 +41,22 @@ Image d'outils du scanner `plateforme/outils-scan`, construite depuis la base co
 - Un téléchargement d'environ 60 Mo depuis GitHub.
 - Un push dans Zot (`plateforme/outils-scan`, avec un tag) par `poc-ecriture`.
 - Rien dans le cluster ni dans `sc-stockage`.
+- **Décision du propriétaire (04/11/2026, après 19:37 UTC, « Oui ») : D8 (a) retenue, G2 appliqué.**
+
+## Résultat (04/11/2026, 19:44:05 à 19:44:31 UTC) : conforme
+
+Journaux : [`g2_telecharger.log`](g2_telecharger.log), [`g2_verifier.log`](g2_verifier.log) et [`g2_image.log`](g2_image.log).
+
+**g2_telecharger** : 8 fichiers téléchargés, soit 27,7 Mo pour Grype et 23,3 Mo pour Syft. C'est moins que les 60 Mo prédits, sans conséquence.
+
+**g2_verifier**
+- Les empreintes sont celles de `mise.lock` et de `checksums.txt`.
+- La signature sans clé est vérifiée pour les deux releases. L'identité, lue dans le certificat, est `https://github.com/anchore/<dépôt>/.github/workflows/release.yaml@refs/heads/main` : le workflow de release tourne sur `main`, pas sur le tag.
+- L'identité d'un autre dépôt est refusée.
+- Le `.pem` était bien en base64 : le cas « incertain » était réel, et le script l'a traité.
+
+**g2_image**
+- Les binaires sont `c833472c…` (grype), `6d380157…` (syft), `2be7e2b6…` (oras) et `3d442df7…` (scan-outil) ; grype et syft sont identiques à ceux de mise.
+- La couche fait 162,6 Mo (`5f2c05ab…`), contre environ 150 Mo prédits.
+- L'image est `plateforme/outils-scan@sha256:7eb4f26e…`. **Le second assemblage donne le même digest**, relu en lecture anonyme.
+- Ce digest est désormais épinglé dans `plateforme.sh` (`OUTILS_SCAN_DIGEST`).

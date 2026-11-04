@@ -146,3 +146,9 @@ Prochaine étape : G2, l'image d'outils du scanner.
 **G2 préparé à sec le 04/11/2026 à 19:37 UTC** ([prédictions](resultats/g2-predictions.md)) : l'image d'outils du scanner est assemblée sur la base cosign de J5, avec Grype, Syft, oras et `scan-outil`.
 
 **D8, ajoutée** : `scan-outil` réécrit en Go la fusion et le prédicat, parce que l'image n'a pas de python. Mesuré à sec : même JSON que les scripts Python sur G0, binaire reproductible.
+
+**G2 appliqué le 04/11/2026 (19:44 UTC, accord du propriétaire : « Oui », D8 (a) retenue), conforme** ([prédictions et résultat](resultats/g2-predictions.md)) :
+- releases de Grype 0.104.1 et de Syft 1.38.0 vérifiées : empreintes de `mise.lock`, signature sans clé du workflow de release sur `main`, contre-épreuve d'identité refusée ;
+- image `plateforme/outils-scan@sha256:7eb4f26e…` reproductible (même digest au second assemblage), digest épinglé.
+
+Prochaine étape : G3, la clé Transit `scanner` et l'espace `scan`.

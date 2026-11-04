@@ -1,0 +1,14 @@
+# plateforme.sh g2_verifier, 2026-11-04T19:44:11Z
+## grype 0.104.1
+grype_0.104.1_linux_amd64.tar.gz: OK
+grype_0.104.1_linux_amd64.tar.gz: OK
+identité du certificat : https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main
+OK   signature sans clé de grype_0.104.1_checksums.txt : https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main
+OK   identité d'un autre dépôt refusée : Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/grype/.github/workflows
+## syft 1.38.0
+syft_1.38.0_linux_amd64.tar.gz: OK
+syft_1.38.0_linux_amd64.tar.gz: OK
+identité du certificat : https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main
+OK   signature sans clé de syft_1.38.0_checksums.txt : https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main
+OK   identité d'un autre dépôt refusée : Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/syft/.github/workflows/
+# fin 2026-11-04T19:44:14Z, code 0

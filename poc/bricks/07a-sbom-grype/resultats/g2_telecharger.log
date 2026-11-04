@@ -1,0 +1,10 @@
+# plateforme.sh g2_telecharger, 2026-11-04T19:44:05Z
+grype_0.104.1_linux_amd64.tar.gz : 27670364 octets
+grype_0.104.1_checksums.txt : 1468 octets
+grype_0.104.1_checksums.txt.sig : 96 octets
+grype_0.104.1_checksums.txt.pem : 3160 octets
+syft_1.38.0_linux_amd64.tar.gz : 23256931 octets
+syft_1.38.0_checksums.txt : 2302 octets
+syft_1.38.0_checksums.txt.sig : 96 octets
+syft_1.38.0_checksums.txt.pem : 3152 octets
+# fin 2026-11-04T19:44:11Z, code 0
