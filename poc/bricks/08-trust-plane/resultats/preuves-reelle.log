@@ -1,13 +1,17 @@
-# preuves.sh reelle, 2026-11-03T15:02:47Z
-## passage apres ; image builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+# preuves.sh reelle, 2026-11-04T22:09:15Z
+## passage avant ; image builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 1
-enveloppes de Chains sur l'image : 6
-VERDICT|reelle-apres|true||trusted_task.tagged|30|ok|6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
-    COUVERTE|signature 7aeae0ad999dc3f3
-    COUVERTE|signature 7af184de44b81e66
-    COUVERTE|signature 6b31823f76213191
-    COUVERTE|signature d2609724c6336863
-    COUVERTE|signature 558aac49b2f45ed9
-    COUVERTE|signature e8df04e7b3908eb8
+enveloppes de Chains sur l'image : 10
+VERDICT|reelle-avant|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+    COUVERTE|signature 3b1d5bd814010efa
+    COUVERTE|signature fd514f9d8d7853d0
+    COUVERTE|signature 52b218a123e4949b
+    COUVERTE|signature 5ee20b211d2d20c1
+    COUVERTE|signature bbed67cc8688332d
+    COUVERTE|signature bbab8e4bc96488ef
+    COUVERTE|signature a1d126f38756fe0c
+    COUVERTE|signature bb7ee548e707281e
+    COUVERTE|signature 7d70f7362d71d0f5
+    COUVERTE|signature 74d27cff1bf8d341
 OK   ec admet l'image réelle (aucune violation)
-OK   contrôle 9 : ok (6/6 enveloppe(s) couverte(s), 43 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles)
+OK   contrôle 9 : ok (10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles)

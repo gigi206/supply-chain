@@ -15,24 +15,24 @@
    "version": {
     "buildkit": "buildkitd github.com/moby/buildkit v0.25.2 dcc0fe5e96ae78919b30057d0804c52f13a2eb7e",
     "go": "go1.26.10",
-    "verifier_entrees.py": "66fa5cb4f81a40e2ee4b8fc91fd4bdb3225a3a3808a5d2cb530be7f2a7b9c2e7",
+    "verifier_entrees.py": "eda0fe010d219cb3819c22f0d8746c33526508ccffa555c3697b000b9245ca7a",
     "rebuild.sh": "a1945ff2374ffd66a8e130c29aa313f259a62128a11986dc4d07045cdf6b6534",
     "vsa.py": "734fb1a8a372997208eed30137483d4e6030078611964ce65da332ee29c6d540"
    }
   },
-  "timeVerified": "2026-11-03T14:27:05Z",
+  "timeVerified": "2026-11-04T21:27:33Z",
   "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5",
   "policy": {
-   "uri": "https://github.com/gigi206/supply-chain/blob/309644f4ef610383f6fd180e5c058846487ab016/poc/bricks/10-independent-replay/politique-replay.md",
+   "uri": "https://github.com/gigi206/supply-chain/blob/6c44219/poc/bricks/10-independent-replay/politique-replay.md",
    "digest": {
-    "sha256": "4f1cca93f20945ee5f168b4e3f42a189c4c6ecbbc6a401199d4c187b6c2f2450"
+    "sha256": "143c6227818b73183bc33a4775cdede288b3b8714a13ef6eed43d4a6235d49dd"
    }
   },
   "inputAttestations": [
    {
-    "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8",
+    "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:d09de1257396e8b45a76eb3a56ae4383750ba5033f0ee514f7d65c3b3c82812e",
     "digest": {
-     "sha256": "f5969ecfd00414058a49cf18af8f1adde2932860b0fc027cccbc53eed90860a8"
+     "sha256": "d09de1257396e8b45a76eb3a56ae4383750ba5033f0ee514f7d65c3b3c82812e"
     }
    }
   ],

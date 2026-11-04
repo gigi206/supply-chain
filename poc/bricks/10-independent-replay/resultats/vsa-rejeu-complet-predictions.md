@@ -73,6 +73,24 @@ Conforme aux prédictions de R4, du premier coup :
 
 Le journal remplace celui de `d9006af7`, qui reste dans l'historique git (`4306ff3` et avant). Rien n'a encore été signé ni poussé pour cette provenance : R5 attend l'accord du propriétaire.
 
+## Résultat de `vsa` et de `porte_avant` (04/11/2026, 22:09 à 22:10 UTC, accord du propriétaire : « Oui »)
+
+**`vsa`** ([journal](r5-vsa.log)), 0 KO :
+- politique figée `6c44219`, `143c6227…` ;
+- bundle de `c4242a11` retrouvé parmi 41, revérifié dans la VM (signature de Chains et jeton de la TSA) ;
+- `inputAttestations` : `horodatage/bundles@sha256:d09de125…`, présent dans Zot, de sujet `3a7ca1b1…` ;
+- `timeVerified` `2026-11-04T21:27:33Z`, soit 24 h et 66 s après `finishedOn` ;
+- `PASSED` ; signé par la clé du domaine et revérifié, sans journal de transparence ni horodatage ;
+- énoncé `17a75bdd…`, bundle `2a55e529…`.
+
+**`porte_avant`** ([journal](r5-porte_avant.log)), 0 KO, sans la VSA nouvelle : `VERDICT|reelle-avant|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s)…|ok|1/1 VSA retenue(s)…`. Referrers : `builds/sample-app` 0, `builds/vsa/sample-app` 1.
+
+**Prédictions de `pousser_vsa` et de `porte_apres`, écrites à 22:10 UTC, avant le push** :
+- manifeste **`sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b`**, calculé d'avance à partir du format de celui du 03/11 ; rien de nouveau dans `builds/sample-app`, aucun tag ;
+- `builds/vsa/sample-app` passe à 2 referrers, `c1bfbcbd…` et ce manifeste ;
+- `porte_apres` : champs 3 à 5, 7 et 8 identiques à ceux de `porte_avant`, et contrôle 6 à `ok|2/2 VSA retenue(s)` ;
+- `lire_vsa` : les deux VSA vérifiées par la clé du domaine, clé de Chains refusée, connexions de cosign vers Zot seulement.
+
 ## Après R5 : ce qu'il faudra adapter (relevé à sec le 04/11/2026 à 18:14 UTC, rien modifié)
 
 R5 réécrit les fichiers `r5-vsa.log`, `r5-vsa-enonce.json`, `r5-vsa.bundle.json`, `r5-vsa-manifeste.json`, `r5-pousser_vsa.log`, `r5-porte_avant.log`, `r5-porte_apres.log` et `r5-lire_vsa.log`. Ceux de la VSA `c804d946` restent dans l'historique git. Points qui les citent ou qui en dépendent :
