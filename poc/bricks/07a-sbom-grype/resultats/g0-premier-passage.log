@@ -1,0 +1,68 @@
+# plateforme.sh g0, 2026-11-04T18:39:13Z
+## outils : grype 0.104.1 (2025-11-24T16:11:42Z), syft 1.38.0, oras 1.3.6
+## base du jour
+latest.json : built, checksum, path, schemaVersion, status ; construite 2026-11-04T06:20:59Z ; schéma v6.1.10
+OK   schéma : v6.1.10
+archive vulnerability-db_v6.1.10_2026-11-04T00:19:46Z_1793773259.tar.zst : 198717703 octets en 2 s
+OK   empreinte de l'archive : sha256:ed08c5e32eb299ebc83b87ab05b23debd749b55c30cf73281ec4223851b5f896
+signature cherchée : vulnerability-db_v6.1.10_2026-11-04T00:19:46Z_1793773259.tar.zst.sig -> 404
+signature cherchée : vulnerability-db_v6.1.10_2026-11-04T00:19:46Z_1793773259.tar.zst.sigstore.json -> 404
+signature cherchée : vulnerability-db_v6.1.10_2026-11-04T00:19:46Z_1793773259.tar.zst.pem -> 404
+signature cherchée : latest.json.sig -> 404
+signature cherchée : latest.json.sigstore.json -> 404
+import hors réseau en 74 s : Schema: v6.1.10 Built: 2026-11-04T06:20:59Z Status: valid
+base importée : 3222 Mo
+## SBOM de D1 (a)
+OK   commit de la source : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   git fsck de la source
+fichiers de verrou : ./go.mod ./go.sum ./web/package-lock.json
+OK   digest de l'image lue : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+image (Syft) :
+  pkg:golang/example.com/supply-chain/sample-app
+  pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  pkg:golang/stdlib@1.26.10
+source (Syft) :
+  pkg:golang/example.com/supply-chain/sample-app
+  pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  pkg:npm/marked@16.4.1
+  pkg:npm/sample-app-web@1.0.0
+fusion :
+  pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  pkg:golang/stdlib@1.26.10
+  pkg:npm/marked@16.4.1
+  pkg:npm/sample-app-web@1.0.0
+KO   fusion : pkg:golang/github.com/go-chi/chi/v5@v5.2.3 absent
+OK   fusion : pkg:golang/stdlib@
+OK   fusion : pkg:npm/marked@16.4.1
+OK   image : marked absent (prédit)
+## scans hors réseau
+scan ok en 630 ms : 5 vulnérabilités dont 0 KEV : -
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GHSA-j6qf-3m9c-vwj3 Medium 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GHSA-mqqf-5wvp-8fh8 Medium 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5774 Unknown 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5775 Unknown 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5777 Unknown 
+scan kev en 630 ms : 13 vulnérabilités dont 2 KEV : CVE-2021-44228, CVE-2021-45046
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GHSA-j6qf-3m9c-vwj3 Medium 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GHSA-mqqf-5wvp-8fh8 Medium 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5774 Unknown 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5775 Unknown 
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5 GO-2026-5777 Unknown 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-3pxv-7cmr-fjr4 Medium 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-6hg6-v5c8-fphq Medium 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-7rjr-3q55-vv33 Critical KEV
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-8489-44mv-ggj8 Medium 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-h383-gmxw-35v2 Medium 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-jfh8-c2jp-5v3q Critical KEV
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-p6xc-xr62-6r2g High 
+   pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1 GHSA-vc5p-v9hr-52mj Medium 
+OK   KEV de sample-app : 0
+OK   cas KEV : CVE-2021-44228
+OK   cas KEV : CVE-2021-45046
+## empreintes
+388809e82982ad9cbb6f7888f32e0881eff2df9933f8521d9494cb4ae0809ed2  sbom-image.json
+62bf44dec6002c6f0b375321f544bcd112aa34ffda4fef1213acfc29edf6013d  sbom-source.json
+dba7b4fe0da6643e6d2c99789deef0f778aef68f498986af01770268fd3a846f  sbom-ok.json
+a244eae2bb0fdeca4b777e6b456e6aa4e9b7a66e5a984f465b7aebf6ab7ce376  scan-ok.json
+3401a9e4d6f4377f67185fac59d1b5e66e08d3cc1d2a5565096a7651a58ef179  scan-kev.json
+# fin 2026-11-04T18:40:36Z, code 1

@@ -111,3 +111,11 @@ But : le **contrôle 7** de l'ADR 0000 (« attestation de scan : aucune KEV sans
 - Pas de VEX avant la 07b. « KEV sans VEX » veut donc dire, en pratique, « aucune KEV ».
 
 **Décisions du propriétaire (04/11/2026, vers 18:37 UTC, « Go ») : D1 (a), D2, D3 (a), D4 (7 jours et 3 jours), D5 (a), D6 (a), toutes conformes aux recommandations ; G0 lancé.** Prédictions de G0 : [`resultats/g0-predictions.md`](resultats/g0-predictions.md).
+
+**G0 joué le 04/11/2026 (18:39 à 18:42 UTC), conforme** ([prédictions et résultat](resultats/g0-predictions.md), [journal](resultats/g0.log)). Premier passage archivé : un seul KO, dû au contrôle, qui attendait le PURL de chi sous sa forme Hermeto. Résultats :
+- la base du jour n'a **aucune signature**, seulement une empreinte ;
+- l'import hors réseau par Grype 0.104.1 prend 74 s, pour 3,2 Go ;
+- D1 (a) retrouve les 4 dépendances versionnées du banc ; Syft sur l'image seule ne voit pas `marked` ;
+- sample-app a 5 vulnérabilités et 0 KEV ; le cas log4j a 2 KEV.
+
+Prochaine étape : G1 (comptes et dépôts de Zot, timer sur `sc-stockage`), avec accord, car Zot redémarre.

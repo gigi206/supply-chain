@@ -69,7 +69,9 @@ print(d["path"], d["checksum"], d["built"], d["schemaVersion"])')
   echo "source (Syft) :"; purls sbom-source.json | sed 's/^/  /'
   python3 -I "$here/sbom_merge.py" sbom-source.json sbom-image.json source image > sbom-ok.json
   echo "fusion :"; purls sbom-ok.json | sed 's/^/  /'
-  for p in 'pkg:golang/github.com/go-chi/chi/v5@v5.2.3' 'pkg:golang/stdlib@' 'pkg:npm/marked@16.4.1'; do
+  # PURL de Syft des deux côtés (D1 a) : chi s'écrit …/chi@v5.2.3#v5, pas …/chi/v5@v5.2.3 comme chez Hermeto (constat de la
+  # 07a ; premier passage du 04/11/2026 en KO sur ce seul contrôle, resultats/g0-premier-passage.log)
+  for p in 'pkg:golang/github.com/go-chi/chi@v5.2.3#v5' 'pkg:golang/stdlib@' 'pkg:npm/marked@16.4.1'; do
     if purls sbom-ok.json | grep -q -F "$p"; then ok "fusion : $p"; else echo "KO   fusion : $p absent"; ko=1; fi
   done
   if purls sbom-image.json | grep -q 'pkg:npm/marked'; then echo "KO   image : marked vu par Syft (prédit absent)"; ko=1; else ok "image : marked absent (prédit)"; fi
