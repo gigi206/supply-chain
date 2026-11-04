@@ -16,6 +16,14 @@
 #             anonyme ; second run : déjà archivée ; contre-épreuve : archive tronquée refusée, rien poussé ; mot de passe absent
 #             du journal ; timer activé
 #   g1_grafana journal de base-grype.service lu par l'auditeur à travers Grafana (19b)
+#   G2 (D5 a, D8) : image d'outils du scanner, plateforme/outils-scan dans Zot :
+#   g2_telecharger archives de release de Grype 0.104.1 et Syft 1.38.0, checksums.txt, .sig et .pem (…/07a/telechargements)
+#   g2_verifier    empreintes de mise.lock et de checksums.txt ; signature sans clé de checksums.txt vérifiée par cosign
+#                  (identité : workflow de release du dépôt anchore, émetteur GitHub Actions ; vérification seule, comme
+#                  tsa.sh pour cosign) ; contre-épreuve : identité d'un autre dépôt refusée
+#   g2_image       couche reproductible (grype, syft, oras de J5, scan-outil construit depuis outil/ à cache vide) sur l'image
+#                  cosign v3.1.4-dev (busybox) déjà copiée dans Zot par J5 ; poussée par poc-ecriture ; second assemblage :
+#                  même digest
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -33,6 +41,11 @@ S8=$O8/secrets
 DL=$O8/telechargements/tsa
 ORAS_TGZ_SHA=66fb0ad7206f3f6fa77ed5b552049d364ccf4b50b1684554f731f76302b52ca0   # mise.lock, oras 1.3.6 (comme tsa.sh)
 ORAS_FPR=C6FC42F0DE84A345FAADB742F44418110791EF37   # « ORAS Project Release Signing » (KEYS du dépôt, oras.land ; tsa.sh)
+DL7=$W/telechargements
+GRYPE_TGZ_SHA=2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f   # mise.lock, grype 0.104.1
+SYFT_TGZ_SHA=bc664debb00db1b9b4b9dae4ba1a29d99621e33b641b94b78b9048374b812a3d    # mise.lock, syft 1.38.0
+COSIGN_BASE=amont/sigstore/cosign/cosign@sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d   # J5 (tsa.sh), v3.1.4-dev amd64
+OUTILS_SCAN=plateforme/outils-scan
 SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }   # sc-stockage
 copier() { # répertoire-distant fichiers… (comme commun.sh de la 08)
@@ -263,11 +276,82 @@ etape_g1_grafana() { # journal de base-grype.service lu par l'auditeur à traver
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,19p "$0"; exit 2; }
+etape_g2_telecharger() {
+  local o v
+  mkdir -p "$DL7"
+  for o in grype:0.104.1 syft:1.38.0; do
+    v=${o#*:}; o=${o%%:*}
+    for f in "${o}_${v}_linux_amd64.tar.gz" "${o}_${v}_checksums.txt" "${o}_${v}_checksums.txt.sig" "${o}_${v}_checksums.txt.pem"; do
+      [ -s "$DL7/$f" ] || curl -fsSL -o "$DL7/$f" "https://github.com/anchore/$o/releases/download/v$v/$f"
+      echo "$f : $(stat -c %s "$DL7/$f") octets"
+    done
+  done
+}
+
+etape_g2_verifier() {
+  local o v c id
+  T=$W/g2-verifier
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  for o in grype:0.104.1:$GRYPE_TGZ_SHA syft:1.38.0:$SYFT_TGZ_SHA; do
+    IFS=: read -r o v c <<<"$o"
+    echo "## $o $v"
+    (cd "$DL7" && echo "$c  ${o}_${v}_linux_amd64.tar.gz" | sha256sum -c && grep " ${o}_${v}_linux_amd64.tar.gz\$" "${o}_${v}_checksums.txt" | sha256sum -c)
+    # Certificat publié en PEM encodé en base64 (goreleaser) ou en PEM : ramené au PEM.
+    if grep -q -- '-----BEGIN' "$DL7/${o}_${v}_checksums.txt.pem"; then cp "$DL7/${o}_${v}_checksums.txt.pem" "$T/$o.pem"; else base64 -d < "$DL7/${o}_${v}_checksums.txt.pem" > "$T/$o.pem"; fi
+    id=$(openssl x509 -in "$T/$o.pem" -noout -ext subjectAltName | sed -n 's/^ *URI://p')
+    echo "identité du certificat : $id"
+    if cosign verify-blob --certificate "$T/$o.pem" --signature "$DL7/${o}_${v}_checksums.txt.sig" \
+         --certificate-identity-regexp "^https://github\.com/anchore/$o/\.github/workflows/release\.yaml@refs/" \
+         --certificate-oidc-issuer https://token.actions.githubusercontent.com "$DL7/${o}_${v}_checksums.txt" > "$T/v.out" 2>&1; then
+      echo "OK   signature sans clé de ${o}_${v}_checksums.txt : $id"
+    else cat "$T/v.out"; echo "KO   signature de ${o}_${v}_checksums.txt"; ko=1; fi
+    if cosign verify-blob --certificate "$T/$o.pem" --signature "$DL7/${o}_${v}_checksums.txt.sig" \
+         --certificate-identity-regexp "^https://github\.com/anchore/autre/" \
+         --certificate-oidc-issuer https://token.actions.githubusercontent.com "$DL7/${o}_${v}_checksums.txt" > "$T/v.out" 2>&1; then
+      echo "KO   identité d'un autre dépôt acceptée"; ko=1
+    else echo "OK   identité d'un autre dépôt refusée : $(grep -m1 -iE 'error|expected' "$T/v.out" | cut -c1-140)"; fi
+  done
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g2_image() {
+  local d1 d2 b
+  T=$W/g2-image
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T/docker")
+  trap 'rm -rf -- "$W/g2-image"' EXIT   # copie du mot de passe de poc-ecriture supprimée même en cas d'échec
+  printf '{"auths":{"%s":{"auth":"%s"}}}\n' "$REG_HOTE" "$(printf 'poc-ecriture:%s' "$(cat "$S8/zot-poc-ecriture.password")" | base64 -w0)" > "$T/docker/config.json"
+  (cd "$DL" && echo "$ORAS_TGZ_SHA  oras_1.3.6_linux_amd64.tar.gz" | sha256sum -c)
+  (cd "$DL7" && echo "$GRYPE_TGZ_SHA  grype_0.104.1_linux_amd64.tar.gz" | sha256sum -c && echo "$SYFT_TGZ_SHA  syft_1.38.0_linux_amd64.tar.gz" | sha256sum -c)
+  b=$T/racine/usr/local/bin
+  mkdir -p "$b" && chmod 0755 "$T/racine" "$T/racine/usr" "$T/racine/usr/local" "$b"
+  tar -xzf "$DL/oras_1.3.6_linux_amd64.tar.gz" -C "$b" oras
+  tar -xzf "$DL7/grype_0.104.1_linux_amd64.tar.gz" -C "$b" grype
+  tar -xzf "$DL7/syft_1.38.0_linux_amd64.tar.gz" -C "$b" syft
+  (cd "$here/outil" && CGO_ENABLED=0 GOCACHE=$T/cache GOFLAGS=-mod=mod go build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o "$b/scan-outil" .)
+  rm -rf -- "${T:?}/cache"
+  chmod 0755 "$b"/*
+  (cd "$b" && sha256sum grype syft oras scan-outil)
+  attendu "grype de l'image = grype de mise" "$(sha256sum < "$b/grype" | cut -c1-64)" "$(sha256sum < "$(type -P grype)" | cut -c1-64)"
+  attendu "syft de l'image = syft de mise" "$(sha256sum < "$b/syft" | cut -c1-64)" "$(sha256sum < "$(type -P syft)" | cut -c1-64)"
+  tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf "$T/couche.tar" -C "$T/racine" usr
+  echo "couche : $(sha256sum < "$T/couche.tar" | cut -c1-64), $(stat -c %s "$T/couche.tar") octets"
+  d1=$(DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt crane append -b "$REG_HOTE/$COSIGN_BASE" -f "$T/couche.tar" \
+    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0" 2>/dev/null)
+  echo "image d'outils du scanner : $d1"
+  d2=$(DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt crane append -b "$REG_HOTE/$COSIGN_BASE" -f "$T/couche.tar" \
+    -t "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0" 2>/dev/null)
+  attendu "second assemblage (même digest)" "${d2##*@}" "${d1##*@}"
+  attendu "relue en lecture anonyme" "$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/$OUTILS_SCAN:grype-0.104.1-syft-1.38.0")" "${d1##*@}"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,27p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

@@ -142,3 +142,7 @@ Une décision est ajoutée :
 Un écart de prédiction : `/v2/` répond 200 (lecture anonyme), pas 401. D7, sans rétention, n'est pas encore tranchée : rien ne s'y oppose avant une trentaine de jours.
 
 Prochaine étape : G2, l'image d'outils du scanner.
+
+**G2 préparé à sec le 04/11/2026 à 19:37 UTC** ([prédictions](resultats/g2-predictions.md)) : l'image d'outils du scanner est assemblée sur la base cosign de J5, avec Grype, Syft, oras et `scan-outil`.
+
+**D8, ajoutée** : `scan-outil` réécrit en Go la fusion et le prédicat, parce que l'image n'a pas de python. Mesuré à sec : même JSON que les scripts Python sur G0, binaire reproductible.
