@@ -3,7 +3,44 @@
   "storage": {
     "rootDirectory": "/var/lib/zot",
     "dedupe": true,
-    "gc": false
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "retention": {
+      "dryRun": false,
+      "delay": "336h",
+      "policies": [
+        {
+          "repositories": [
+            "vulndb/grype"
+          ],
+          "deleteReferrers": false,
+          "deleteUntagged": true,
+          "keepTags": [
+            {
+              "patterns": [
+                ".*"
+              ],
+              "mostRecentlyPushedCount": 11
+            }
+          ]
+        },
+        {
+          "repositories": [
+            "builds/scan/**"
+          ],
+          "deleteReferrers": true,
+          "deleteUntagged": false
+        },
+        {
+          "repositories": [
+            "**"
+          ],
+          "deleteReferrers": false,
+          "deleteUntagged": false
+        }
+      ]
+    }
   },
   "http": {
     "address": "192.168.161.13",

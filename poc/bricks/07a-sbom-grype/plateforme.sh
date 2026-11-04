@@ -68,6 +68,13 @@
 #               vide, avec cosign et ec des images de la porte
 #   g6_temoins  ACCORD DU PROPRIÉTAIRE : témoins écrits dans Zot (poc-ecriture, poc-scan), clé jetable effacée ensuite ; puis
 #               preuves.sh temoins_scan de la 08 (ConfigMap porte-temoin, un Job de la porte par cas)
+#   G7 (D7 b, D10) : rétention (storage de 08-trust-plane/stockage/zot.json), passage périodique du scan, intégration à rejeu.sh :
+#   g7_sec      hôte seul, lecture seule de sc-stockage : copie du stockage réel, blobs vieillis de 30 jours, bases et scans synthétiques ;
+#               Zot jetable, storage et compat de zot.json, sur trois copies : sans règle, à blanc, règles proposées ; un balayage complet
+#   g7_zot      ACCORD DU PROPRIÉTAIRE : Zot reconfiguré et redémarré (confiance:stockage zot), lectures et horodatage contrôlés
+#   g7_balayage premier balayage du vrai Zot attendu (35 min environ) : aucune suppression prédite, le store a moins de 14 jours
+#   g7_periodique ACCORD DU PROPRIÉTAIRE : CronJob scan-sample-app (rendu de scan-job.yaml), un passage lancé depuis lui, referrer vérifié
+#   g7_grafana  journaux du passage, audit d'OpenBao, audit de Zot et décisions de rétention lus par l'auditeur (19b)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -99,6 +106,8 @@ SUJET_SCAN=system:serviceaccount:scan:scanner
 DEPOT_SCAN=builds/scan/sample-app
 JOB_SCAN=g4-sample-app
 PREDICAT_SCAN=https://supply-chain.example/scan/v1
+CRON_SCAN=scan-sample-app
+HORAIRE_SCAN='30 9 * * *'   # après le timer de la base (08:00 UTC, retard aléatoire de 15 min au plus)
 export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
 SSH_OPTS=(-i "$O8/ssh/id_ed25519" -o UserKnownHostsFile="$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { ssh "${SSH_OPTS[@]}" poc@192.168.161.13 "$@"; }   # sc-stockage
@@ -186,6 +195,18 @@ audit_openbao() { # instant : réponses d'OpenBao depuis cet instant (connexions
        erreur: (.error // .response.data.error // null)}' "$T/audit.log" \
     | awk '{c[$0]++; if (c[$0] == 1) o[++n] = $0} END {for (i = 1; i <= n; i++) print o[i] (c[o[i]] > 1 ? " ×" c[o[i]] : "")}'
   rm -f "$T/audit.log"
+}
+
+cm_scan() { # ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner (seule source : ne pas en réappliquer une partie)
+  kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=scanner.sh="$here/politique/scanner.sh" \
+    --from-file=scanner.pub="$R/scanner-cle-publique.pem" --dry-run=client -o yaml | kubectl apply --server-side -f -
+}
+
+rendre_scan() { # nom : politique/scan-job.yaml rendu sur l'image
+  sed -e "s#@NOM@#$1#" -e "s#@IMAGE@#$REG/$IMAGE#g" -e "s#@NOM_IMAGE@#sample-app#" -e "s#@DEPOT@#$REG/$DEPOT_SCAN#" \
+    -e "s#@BASES@#$REG/vulndb/grype#" -e "s#@SOURCE@#https://sc-stockage.poc.test:3000/workspace/sample-app.git#" -e "s#@COMMIT@#$COMMIT#" \
+    -e "s#@OUTILS@#$REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST#g" -e "s#@BAO@#$REG/$BAO_IMAGE#g" -e "s#@BUILDKIT@#$REG/$BUILDKIT_IMAGE#g" \
+    "$here/politique/scan-job.yaml"
 }
 
 etape_g0() {
@@ -480,7 +501,7 @@ etape_g3_cluster() {
   echo "## espace scan (politique/scan.yaml)"
   kubectl apply --server-side -f "$here/politique/scan.yaml"
   attendre_sa scan
-  kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f -
+  cm_scan   # scanner-cle-publique.pem du dépôt : sur une installation neuve, celle d'avant, remplacée par g4_scan après g3_openbao
   attendu "Pod Security de l'espace scan" "$(kubectl get ns scan -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" restricted
   attendu "compte scanner sans jeton monté d'office" "$(kubectl get sa -n scan scanner -o jsonpath='{.automountServiceAccountToken}')" false
   attendu "sorties de l'espace scan (ports)" "$(kubectl get networkpolicy -n scan scan -o json | jq -r '[.spec.egress[].ports[] | "\(.protocol)/\(.port)"] | join(",")')" \
@@ -803,14 +824,10 @@ etape_g4_scan() {
   T=$W/g4-scan
   rm -rf -- "${T:?}" && mkdir -p "$T"
   echo "## ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner"
-  kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$P/ca-poc.crt" --from-file=scanner.sh="$here/politique/scanner.sh" \
-    --from-file=scanner.pub="$R/scanner-cle-publique.pem" --dry-run=client -o yaml | kubectl apply --server-side -f -
+  cm_scan
   echo "## job $JOB_SCAN sur $REG/$IMAGE"
   kubectl delete job -n scan "$JOB_SCAN" --ignore-not-found --wait=true >/dev/null
-  sed -e "s#@NOM@#$JOB_SCAN#" -e "s#@IMAGE@#$REG/$IMAGE#g" -e "s#@NOM_IMAGE@#sample-app#" -e "s#@DEPOT@#$REG/$DEPOT_SCAN#" \
-    -e "s#@BASES@#$REG/vulndb/grype#" -e "s#@SOURCE@#https://sc-stockage.poc.test:3000/workspace/sample-app.git#" -e "s#@COMMIT@#$COMMIT#" \
-    -e "s#@OUTILS@#$REG/$OUTILS_SCAN@$OUTILS_SCAN_DIGEST#g" -e "s#@BAO@#$REG/$BAO_IMAGE#g" -e "s#@BUILDKIT@#$REG/$BUILDKIT_IMAGE#g" \
-    "$here/politique/scan-job.yaml" | kubectl apply -f -
+  rendre_scan "$JOB_SCAN" | kubectl apply -f -
   for _ in $(seq 180); do
     etat=$(kubectl get job -n scan "$JOB_SCAN" -o jsonpath='{.status.succeeded}/{.status.failed}')
     libre=$(ssh "${SSH_OPTS[@]}" poc@192.168.161.11 "df -m --output=avail / | tail -1" | tr -d ' ')
@@ -870,8 +887,8 @@ etape_g4_verifier() {
   attendu "KEV" "$(jq '[.vulnerabilities[] | select(.kev)] | length' "$R/g4-scan-predicat.json")" 0
   attendu "paquets malveillants" "$(jq '.malicious | length' "$R/g4-scan-predicat.json")" 0
   echo "vulnérabilités : $(jq '.vulnerabilities | length' "$R/g4-scan-predicat.json")"
-  c=$(jq -r '[.vulnerabilities[].id] | sort | join(",")' "$O/07a/g0/scan-ok.json" 2>/dev/null || true)
-  [ -z "$c" ] || attendu "identifiants = ceux de G0 (même base si elle n'a pas changé)" "$(jq -r '[.vulnerabilities[].id] | sort | join(",")' "$R/g4-scan-predicat.json")" "$c"
+  c=$(jq -r 'select(.scanner.db.built == $b) | [.vulnerabilities[].id] | sort | join(",")' --arg b "$(jq -r .scanner.db.built "$R/g4-scan-predicat.json")" "$O/07a/g0/scan-ok.json" 2>/dev/null || true)
+  [ -z "$c" ] || attendu "identifiants = ceux de G0 (même base)" "$(jq -r '[.vulnerabilities[].id] | sort | join(",")' "$R/g4-scan-predicat.json")" "$c"
   echo "## aucun Secret dans l'espace scan"
   attendu "Secrets de l'espace scan" "$(kubectl get secrets -n scan -o name | wc -l)" 0
   echo "## audit d'OpenBao depuis le début du job"
@@ -1240,11 +1257,310 @@ etape_g6_temoins() { # ACCORD DU PROPRIÉTAIRE : écrit dans Zot
   [ "$c" = 0 ] && ! grep -q '^KO' "$R/g6_temoins.copie.log"
 }
 
-[ $# -ge 1 ] || { sed -n 2,70p "$0"; exit 2; }
+g7_inventaire() { # racine : une ligne par entrée d'index.json (dépôt|digest|tag|sujet) ; VIDE|dépôt ; MANQUE|dépôt|digest pour chaque blob absent
+  python3 -I - "$1" <<'PY' | LC_ALL=C sort
+import json, os, sys
+racine = sys.argv[1]
+def chemin(depot, digest): return os.path.join(racine, depot, "blobs", "sha256", digest.split(":")[1])
+def charge(depot, digest):
+    if not os.path.exists(chemin(depot, digest)):
+        print(f"MANQUE|{depot}|{digest}"); return None
+    return json.load(open(chemin(depot, digest), "rb"))
+def parcours(depot, j, vus):
+    for d in [j.get("config")] + j.get("layers", []) + j.get("manifests", []):
+        if not d or d["digest"] in vus: continue
+        vus.add(d["digest"])
+        if "manifest" in d.get("mediaType", ""):
+            e = charge(depot, d["digest"])
+            if e is not None: parcours(depot, e, vus)
+        elif not os.path.exists(chemin(depot, d["digest"])):
+            print(f"MANQUE|{depot}|{d['digest']}")
+for rep, dirs, fichiers in os.walk(racine):
+    dirs[:] = [d for d in dirs if d != "blobs"]
+    if "index.json" not in fichiers or "oci-layout" not in fichiers: continue
+    depot = os.path.relpath(rep, racine)
+    lignes = json.load(open(os.path.join(rep, "index.json"))).get("manifests") or []
+    if not lignes: print(f"VIDE|{depot}")
+    for m in lignes:
+        j = charge(depot, m["digest"])
+        if j is None: continue
+        parcours(depot, j, set())
+        tag = (m.get("annotations") or {}).get("org.opencontainers.image.ref.name", "-")
+        print(f"{depot}|{m['digest']}|{tag}|{(j.get('subject') or {}).get('digest', '-')}")
+PY
+}
+
+g7_config() { # répertoire port filtre-jq : zot.json de la 08, seuls la racine, l'écoute, TLS, l'authentification et les journaux changent
+  jq --arg r "$1/racine" --arg p "$2" --arg d "$1" '.storage.rootDirectory = $r | .http = {address: "127.0.0.1", port: $p, compat: .http.compat}
+    | .log = {level: "debug", output: ($d + "/zot.log"), audit: ($d + "/audit.log")} | '"$3" "$R8/stockage/zot.json" > "$1/zot.json"
+  zot verify "$1/zot.json" 2>&1 | grep -q 'config file is valid' || { echo "KO   configuration refusée par zot verify : $1/zot.json"; exit 1; }
+}
+
+g7_demarrer() { # répertoire port
+  zot serve "$1/zot.json" > "$1/zot.out" 2>&1 &
+  echo $! > "$1/zot.pid"
+  for _ in $(seq 240); do curl -fsS "http://127.0.0.1:$2/v2/" >/dev/null 2>&1 && return 0; sleep 0.25; done
+  echo "KO   Zot jetable muet : $1"; exit 1
+}
+
+g7_arreter() { kill "$(cat "$1/zot.pid")" 2>/dev/null || true; while kill -0 "$(cat "$1/zot.pid")" 2>/dev/null; do sleep 0.2; done; }
+
+g7_referrer() { # registre racine dépôt sujet-descripteur libellé âge-en-jours : referrer de la forme de scanner.sh publier, vieilli par son blob ; digest rendu
+  local f m d
+  f=$(mktemp -d -p "$W")
+  printf '{}' > "$f/vide"; printf '%s' "$5" > "$f/couche"
+  oras blob push --plain-http "$1/$3" "$f/vide" > /dev/null
+  oras blob push --plain-http "$1/$3" "$f/couche" > /dev/null
+  jq -nc --arg t application/vnd.dev.sigstore.bundle.v0.3+json --arg c "sha256:$(sha256sum < "$f/couche" | cut -c1-64)" --argjson n "${#5}" --argjson s "$4" \
+    --arg p "$PREDICAT_SCAN" '{schemaVersion: 2, mediaType: "application/vnd.oci.image.manifest.v1+json", artifactType: $t,
+      config: {mediaType: "application/vnd.oci.empty.v1+json", digest: "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", size: 2},
+      layers: [{mediaType: $t, digest: $c, size: $n}], subject: $s, annotations: {"dev.sigstore.bundle.predicateType": $p}}' | tr -d '\n' > "$f/manifeste"
+  d=sha256:$(sha256sum < "$f/manifeste" | cut -c1-64)
+  oras manifest push --plain-http "$1/$3@$d" "$f/manifeste" > /dev/null
+  [ "$6" = 0 ] || touch -d "$6 days ago" "$2/$3/blobs/sha256/${d#sha256:}"
+  rm -rf -- "${f:?}"
+  echo "$d"
+}
+
+etape_g7_sec() {
+  local T=$W/g7-sec P0 n i j c d s r sujet d15 d13 d0 v15 base04 base05 nd
+  export LC_ALL=C
+  [ ! -d "$T" ] || chmod -R u+w "$T"
+  rm -rf -- "${T:?}"; mkdir -p "$T/prep/racine"
+  # shellcheck disable=SC2064   # développement à la pose, voulu
+  trap "for f in $T/*/zot.pid; do kill \"\$(cat \"\$f\")\" 2>/dev/null || true; done" EXIT
+  P0=$T/prep
+  echo "## copie du stockage réel, lecture seule (ni sessions, ni téléversements en cours)"
+  sur 'sudo tar -C /var/lib/zot --exclude=./_sessions --exclude=./.uploads -cf - .' | tar -xf - -C "$P0/racine" --no-same-owner
+  echo "copie : $(du -sm "$P0/racine" | cut -f1) Mo, $(find "$P0/racine" -name index.json | wc -l) dépôts"
+  echo "## blobs vieillis de 30 jours : sur un store de deux jours, le délai de rétention masquerait les suppressions à venir"
+  find "$P0/racine" -path '*/blobs/sha256/*' -type f -exec touch -d '30 days ago' {} +
+  g7_config "$P0" 15070 '.storage.gc = false | del(.storage.retention)'
+  g7_demarrer "$P0" 15070
+  r=127.0.0.1:15070
+  sujet=$(curl -fsS "http://$r/v2/builds/sample-app/manifests/${IMAGE#*@}" -H 'Accept: application/vnd.oci.image.manifest.v1+json' -o "$T/m" -w '%{size_download}')
+  sujet=$(jq -nc --arg d "${IMAGE#*@}" --argjson n "$sujet" '{mediaType: "application/vnd.oci.image.manifest.v1+json", digest: $d, size: $n}')
+  base04=$(jq -r '.manifests[] | select(.annotations["org.opencontainers.image.ref.name"] == "2026-11-04") | .digest' "$P0/racine/vulndb/grype/index.json")
+  echo "## bases synthétiques : douze tags datés, poussés dans l'ordre, 13 tags en tout"
+  mkdir -p "$T/bases"
+  for i in $(seq 1 12); do
+    d=$(date -ud "2026-11-04 +$i days" +%F)
+    echo "$d" > "$T/bases/base"
+    (cd "$T/bases" && oras push --plain-http --artifact-type application/vnd.supply-chain.grype-db.v6 "$r/vulndb/grype:$d" base > /dev/null)
+    sleep 1.1
+  done
+  base05=$(oras manifest fetch --plain-http --descriptor "$r/vulndb/grype:2026-11-05" | jq -r .digest)
+  echo "## scans synthétiques : referrers de l'image réelle, de 15, 13 et 0 jours ; un referrer de 15 jours dans builds/vsa/sample-app"
+  d15=$(g7_referrer "$r" "$P0/racine" "$DEPOT_SCAN" "$sujet" jour-15 15)
+  d13=$(g7_referrer "$r" "$P0/racine" "$DEPOT_SCAN" "$sujet" jour-13 13)
+  d0=$(g7_referrer "$r" "$P0/racine" "$DEPOT_SCAN" "$sujet" jour-0 0)
+  v15=$(g7_referrer "$r" "$P0/racine" builds/vsa/sample-app "$sujet" jour-15-vsa 15)
+  echo "scans : 15 j ${d15:7:12}, 13 j ${d13:7:12}, 0 j ${d0:7:12} ; VSA de 15 j ${v15:7:12}"
+  g7_arreter "$P0"
+  g7_inventaire "$P0/racine" > "$T/avant.txt"
+  n=$(find "$P0/racine" -name oci-layout | wc -l)
+  echo "avant : $n dépôts, $(grep -c '^[^|]*|sha256' "$T/avant.txt") entrées, $(grep -c '^VIDE|' "$T/avant.txt") dépôt(s) vide(s), $(grep -c '^MANQUE|' "$T/avant.txt" || true) blob(s) manquant(s)"
+  attendu "blobs manquants avant le balayage" "$(grep -c '^MANQUE|' "$T/avant.txt" || true)" 0
+
+  echo "## trois copies, un Zot par copie, un balayage complet ($n dépôts, 15 s par dépôt en moyenne)"
+  i=15071
+  for c in sansregle blanc prop; do
+    mkdir -p "$T/$c"
+    cp -al "$P0/racine" "$T/$c/racine"
+    find "$P0/racine" \( -name index.json -o -name cache.db -o -name meta.db \) -printf '%P\n' | while read -r f; do cp --remove-destination -p "$P0/racine/$f" "$T/$c/racine/$f"; done
+    case $c in
+      sansregle) g7_config "$T/$c" "$i" 'del(.storage.retention)' ;;
+      blanc) g7_config "$T/$c" "$i" '.storage.retention.dryRun = true' ;;
+      prop) g7_config "$T/$c" "$i" '.' ;;
+    esac
+    g7_demarrer "$T/$c" "$i"
+    i=$((i + 1))
+  done
+  for s in $(seq 3000); do
+    j=0
+    for c in sansregle blanc prop; do
+      [ "$(grep -o 'gc successfully completed for [^"]*' "$T/$c/zot.log" | sort -u | wc -l)" -ge "$n" ] && j=$((j + 1))
+    done
+    [ "$j" = 3 ] && break
+    sleep 2
+  done
+  echo "balayages finis : $j/3, $((s * 2)) s environ"
+  for c in sansregle blanc prop; do echo "$c : $(grep -o 'gc successfully completed for [^"]*' "$T/$c/zot.log" | sort -u | wc -l) dépôts balayés"; done
+  attendu "balayages complets" "$j" 3
+
+  echo "## règles proposées : lectures par l'API, Zot jetable toujours en marche"
+  r=127.0.0.1:15073
+  h() { curl -s -o /dev/null -w '%{http_code}' -I -H 'Accept: application/vnd.oci.image.manifest.v1+json' "http://$r/v2/$1"; }
+  attendu "image réelle, sans tag" "$(h "builds/sample-app/manifests/${IMAGE#*@}")" 200
+  attendu "signature .sig" "$(h "builds/sample-app/manifests/sha256-${IMAGE#*@sha256:}.sig")" 200
+  attendu "attestation .att" "$(h "builds/sample-app/manifests/sha256-${IMAGE#*@sha256:}.att")" 200
+  attendu "VSA de builds/vsa/sample-app (2 réelles, 1 de 15 jours)" "$(curl -fsS "http://$r/v2/builds/vsa/sample-app/referrers/${IMAGE#*@}" | jq '.manifests | length')" 3
+  attendu "scans restants (13 et 0 jours)" "$(curl -fsS "http://$r/v2/$DEPOT_SCAN/referrers/${IMAGE#*@}" | jq -r '[.manifests[].digest] | sort | join(" ")')" "$(printf '%s\n' "$d13" "$d0" | sort | paste -sd' ')"
+  attendu "tags de vulndb/grype (les 11 plus récemment poussés)" "$(curl -fsS "http://$r/v2/vulndb/grype/tags/list" | jq -r '.tags | sort | join(" ")')" "$(for i in $(seq 2 12); do date -ud "2026-11-04 +$i days" +%F; done | paste -sd' ')"
+  attendu "base du 5/11 : tag retiré" "$(h vulndb/grype/manifests/2026-11-05)" 404
+  attendu "base du 5/11 : encore lisible par digest, plus jeune que le délai" "$(h "vulndb/grype/manifests/$base05")" 200
+  attendu "base du 4/11 (30 jours) : effacée" "$(h "vulndb/grype/manifests/$base04")" 404
+  for c in sansregle blanc prop; do g7_arreter "$T/$c"; g7_inventaire "$T/$c/racine" > "$T/$c/apres.txt"; done
+
+  echo "## règles proposées : différence exacte avec la prédiction"
+  awk -F'|' -v a="$d13" -v b="$d0" -v b4="$base04" -v b5="$base05" '
+    $1 == "VIDE" { next }
+    $1 ~ /^builds\/scan\// && $4 != "-" && $2 != a && $2 != b { next }
+    $1 == "vulndb/grype" && $2 == b4 { next }
+    $1 == "vulndb/grype" && $2 == b5 { print $1 "|" $2 "|-|" $4; next }
+    { print }' "$T/avant.txt" | sort > "$T/prevu.txt"
+  nd=$(diff "$T/prevu.txt" <(grep -v '^VIDE|' "$T/prop/apres.txt") | grep -c '^[<>]' || true)
+  diff "$T/prevu.txt" <(grep -v '^VIDE|' "$T/prop/apres.txt") | cut -c1-140 | head -20 || true
+  attendu "écarts à la prédiction ligne à ligne" "$nd" 0
+  attendu "blobs manquants après le balayage" "$(grep -c '^MANQUE|' "$T/prop/apres.txt" || true)" 0
+  echo "entrées : avant $(grep -c '^[^|]*|sha256' "$T/avant.txt"), après $(grep -c '^[^|]*|sha256' "$T/prop/apres.txt")"
+  echo "taille : avant $(du -sm "$P0/racine" | cut -f1) Mo, après $(du -sm "$T/prop/racine" | cut -f1) Mo (liens durs : blobs mesurés séparément)"
+  echo "dépôts disparus : $(comm -23 <(find "$P0/racine" -name oci-layout -printf '%P\n' | sed 's#/oci-layout$##' | sort) <(find "$T/prop/racine" -name oci-layout -printf '%P\n' | sed 's#/oci-layout$##' | sort) | paste -sd' ')"
+  echo "journal d'audit, décisions de suppression : $(grep -c '"decision":"delete"' "$T/prop/audit.log" || true)"
+  grep '"decision":"delete"' "$T/prop/audit.log" | jq -r '[.repository, .reason, .message] | join(" | ")' | sort | uniq -c
+  cp "$T/prop/audit.log" "$R/g7-sec-audit-prop.log"
+
+  echo "## à blanc : décisions journalisées, rien de changé"
+  attendu "à blanc : entrées modifiées" "$(diff "$T/avant.txt" "$T/blanc/apres.txt" | grep -c '^[<>]' || true)" 0
+  echo "décisions de suppression journalisées à blanc : $(grep -c '"decision":"delete"' "$T/blanc/audit.log" || true)"
+
+  echo "## témoin sans règle : le défaut de Zot avec gc: true"
+  echo "entrées : $(grep -c '^[^|]*|sha256' "$T/sansregle/apres.txt") (avant $(grep -c '^[^|]*|sha256' "$T/avant.txt")) ; blobs manquants : $(grep -c '^MANQUE|' "$T/sansregle/apres.txt" || true)"
+  comm -23 <(grep '|sha256' "$T/avant.txt") <(grep '|sha256' "$T/sansregle/apres.txt") | cut -d'|' -f1 | sed -E 's#^(amont|bench|essais-[a-z0-9]+|plateforme|tekton|workspace|builds/scan|builds/vsa|horodatage|vulndb)(/.*)?$#\1#' | sort | uniq -c
+  if grep -q "^builds/sample-app|${IMAGE#*@}|" "$T/sansregle/apres.txt"; then echo "KO   témoin : image réelle conservée sans règle"; ko=1
+  else ok "témoin : image réelle sans tag effacée quand aucune règle ne la protège"; fi
+  chmod -R u+w "$T"; rm -rf -- "${T:?}"
+  return $ko
+}
+
+g7_lectures() { # image réelle, signature, attestation, scan, VSA et base lues en anonyme dans le vrai Zot
+  local c=$P/ca-poc.crt u=https://$REG_HOTE/v2 d=${IMAGE#*@}
+  h() { curl -s --cacert "$c" -o /dev/null -w '%{http_code}' -I -H 'Accept: application/vnd.oci.image.manifest.v1+json' "$u/$1"; }
+  attendu "image réelle, sans tag" "$(h "builds/sample-app/manifests/$d")" 200
+  attendu "signature .sig" "$(h "builds/sample-app/manifests/sha256-${d#sha256:}.sig")" 200
+  attendu "attestation .att" "$(h "builds/sample-app/manifests/sha256-${d#sha256:}.att")" 200
+  echo "referrers : $DEPOT_SCAN $(curl -fsS --cacert "$c" "$u/$DEPOT_SCAN/referrers/$d" | jq '.manifests | length'), builds/vsa/sample-app $(curl -fsS --cacert "$c" "$u/builds/vsa/sample-app/referrers/$d" | jq '.manifests | length')"
+  echo "tags de vulndb/grype : $(curl -fsS --cacert "$c" "$u/vulndb/grype/tags/list" | jq -r '.tags | sort | join(" ")')"
+  echo "dépôts au catalogue : $(curl -fsS --cacert "$c" "$u/_catalog?n=1000" | jq '.repositories | length')"
+}
+
+etape_g7_zot() { # ACCORD DU PROPRIÉTAIRE : modifie Zot et le redémarre
+  local i a
+  echo "## avant"; g7_lectures
+  mise run confiance:stockage -- zot
+  echo "## après"
+  for i in $(seq 60); do curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/" >/dev/null 2>&1 && break; sleep 1; done
+  echo "Zot répond après $i s"
+  attendu "storage en service = storage de zot.json" "$(sur 'sudo cat /etc/zot/config.json' | jq -cS .storage | sha256sum | cut -c1-16)" "$(jq -cS .storage "$R8/stockage/zot.json" | sha256sum | cut -c1-16)"
+  g7_lectures
+  echo "## horodatage : deux passages de plus, chaque minute"
+  a=$(date -u +%s)
+  for i in $(seq 40); do
+    [ "$(kubectl get jobs -n horodatage -o json | jq --argjson a "$a" '[.items[] | select((.status.completionTime // "2000-01-01T00:00:00Z" | fromdate) > $a and .status.succeeded == 1)] | length')" -ge 2 ] && break
+    sleep 5
+  done
+  kubectl get jobs -n horodatage --no-headers | tail -3
+  [ "$i" -lt 40 ] && ok "horodatage : passages réussis après le redémarrage" || { echo "KO   horodatage : pas de passage réussi après le redémarrage"; ko=1; }
+  return $ko
+}
+
+etape_g7_balayage() { # premier balayage du vrai Zot, lu dans le journal de zot.service ; rien à effacer, le store a moins de 14 jours
+  local de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g7_zot.log")" '+%Y-%m-%d %H:%M:%S') n b=0 i a
+  n=$(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/_catalog?n=1000" | jq '.repositories | length')
+  for i in $(seq 360); do
+    b=$(sur "sudo journalctl -u zot.service --since '$de' -o cat" | grep -o 'gc successfully completed for [^"]*' | sort -u | wc -l)
+    [ "$b" -ge "$n" ] && break
+    sleep 10
+  done
+  attendu "dépôts balayés" "$b" "$n"
+  a=$(sur "sudo journalctl -u zot.service --since '$de' -o cat" | grep -c '"decision":"delete"' || true)
+  attendu "décisions de suppression" "$a" 0
+  sur "sudo journalctl -u zot.service --since '$de' -o cat" | grep '"module":"retention"' | jq -r '[.repository, .decision, .reason] | join(" | ")' | sort | uniq -c | head -20
+  g7_lectures
+  sur 'df -m --output=used,avail / | tail -1; sudo du -sm /var/lib/zot'
+  return $ko
+}
+
+etape_g7_periodique() { # ACCORD DU PROPRIÉTAIRE : CronJob dans l'espace scan, un passage lancé depuis lui
+  local d=${IMAGE#*@} u=https://$REG_HOTE/v2/$DEPOT_SCAN avant apres etat="" c m couche libre mini=999999
+  T=$W/g7-periodique
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  rendre_scan "$CRON_SCAN" | kubectl create --dry-run=client -o json -f - | jq --arg h "$HORAIRE_SCAN" '{apiVersion: "batch/v1", kind: "CronJob",
+    metadata: {name: .metadata.name, namespace: .metadata.namespace},
+    spec: {schedule: $h, timeZone: "Etc/UTC", concurrencyPolicy: "Forbid", startingDeadlineSeconds: 3600, successfulJobsHistoryLimit: 3, failedJobsHistoryLimit: 3,
+      jobTemplate: {spec: (.spec | del(.ttlSecondsAfterFinished))}}}' > "$T/cronjob.json"
+  if [ "${G7_SEC:-}" = 1 ]; then kubectl apply --dry-run=server -f "$T/cronjob.json"; return 0; fi
+  cm_scan
+  kubectl apply --server-side -f "$T/cronjob.json"
+  attendu "horaire" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.schedule} {.spec.timeZone} {.spec.concurrencyPolicy}')" "$HORAIRE_SCAN Etc/UTC Forbid"
+  avant=$(curl -fsS --cacert "$P/ca-poc.crt" "$u/referrers/$d" | jq '.manifests | length')
+  kubectl create job -n scan g7-manuel --from="cronjob/$CRON_SCAN"
+  for _ in $(seq 360); do
+    etat=$(kubectl get job -n scan g7-manuel -o jsonpath='{.status.succeeded}/{.status.failed}')
+    libre=$(ssh "${SSH_OPTS[@]}" poc@192.168.161.11 "df -m --output=avail / | tail -1" | tr -d ' ')
+    [ "$libre" -lt "$mini" ] && mini=$libre
+    case $etat in 1/*|*/1) break ;; esac
+    sleep 5
+  done
+  for c in source analyser jetons attester publier revocation; do
+    echo "### $c"; kubectl logs -n scan job/g7-manuel -c "$c" 2>&1 | tee "$T/$c.log" | sed 's/^/  /'
+  done
+  echo "place libre la plus basse sur sc-confiance pendant le job : $mini Mo"
+  attendu "job" "${etat%%/*}" 1
+  apres=$(curl -fsS --cacert "$P/ca-poc.crt" "$u/referrers/$d" | jq '.manifests | length')
+  attendu "referrers de l'image" "$apres" "$((avant + 1))"
+  m=$(sed -n 's/^PUBLIE|[^@]*@\(sha256:[0-9a-f]*\),.*/\1/p' "$T/publier.log")
+  curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "$u/manifests/$m" > "$T/manifeste.json"
+  attendu "sujet du referrer publié" "$(jq -r .subject.digest "$T/manifeste.json")" "$d"
+  couche=$(jq -r '.layers[0].digest' "$T/manifeste.json")
+  curl -fsS --cacert "$P/ca-poc.crt" -L "$u/blobs/$couche" > "$T/bundle.json"
+  cosign verify-blob-attestation --bundle "$T/bundle.json" --new-bundle-format --key "$R/scanner-cle-publique.pem" --insecure-ignore-tlog \
+    --type "$PREDICAT_SCAN" --digest "${d#sha256:}" --digestAlg sha256 > "$T/v.out" 2>&1 \
+    && ok "bundle vérifié sur l'hôte : clé du scanner, sujet $d" || { cat "$T/v.out"; echo "KO   bundle non vérifié"; ko=1; }
+  jq -r .dsseEnvelope.payload "$T/bundle.json" | base64 -d | jq -c '{scannedAt: .predicate.scannedAt, base: .predicate.scanner.db, vulnerabilites: (.predicate.vulnerabilities | length), kev: ([.predicate.vulnerabilities[] | select(.kev)] | length)}'
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g7_grafana() {
+  local de i
+  T=$W/g7-grafana
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/g7-grafana"' EXIT   # motif tiré du mot de passe de poc-scan supprimé même en cas d'échec
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g7_periodique.log")" +%s)
+  echo "## journaux du passage, lus par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{espace="scan", pod=~"g7-manuel.*"}' "$de" "$T/job.json" "$T/job.txt"
+    grep -q '^PUBLIE|' "$T/job.txt" && grep -q 'jeton du rôle scanner révoqué' "$T/job.txt" && break
+    sleep 2
+  done
+  for m in '^SOURCE|' '^BASE|' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' 'jeton du rôle scanner révoqué'; do
+    if grep -q "$m" "$T/job.txt"; then ok "visible dans Grafana : $m"; else echo "KO   absent de Grafana : $m"; ko=1; fi
+  done
+  echo "## audit d'OpenBao et de Zot, lus par l'auditeur"
+  grafana_lignes '{espace="openbao"} |= "transit/sign/scanner"' "$de" "$T/bao.json" "$T/bao.txt"
+  [ -s "$T/bao.txt" ] && ok "signature du job visible dans Grafana ($(wc -l < "$T/bao.txt") ligne(s))" || { echo "KO   audit d'OpenBao absent de Grafana"; ko=1; }
+  grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "builds/scan/sample-app" |= "poc-scan"' "$de" "$T/zot.json" "$T/zot.txt"
+  grep -q 'manifests' "$T/zot.txt" && ok "poussage par poc-scan visible dans Grafana" || { echo "KO   poussage absent de Grafana"; ko=1; }
+  echo "## décisions de rétention du vrai Zot, lues par l'auditeur"
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g7_zot.log")" +%s)
+  grafana_lignes '{noeud="sc-stockage", source="journal", unite="zot.service"} |= "\"module\":\"retention\"" |= "vulndb/grype"' "$de" "$T/ret.json" "$T/ret.txt"
+  grep -q '"decision":"keep"' "$T/ret.txt" && ok "décision de rétention sur vulndb/grype visible dans Grafana ($(wc -l < "$T/ret.txt") ligne(s))" || { echo "KO   rétention absente de Grafana"; ko=1; }
+  grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "\"decision\":\"delete\""' "$de" "$T/sup.json" "$T/sup.txt"
+  echo "suppressions dans l'audit de Zot : $(wc -l < "$T/sup.txt")"
+  echo "## identifiants de poc-scan absents des réponses"
+  { cat "$S8/zot-poc-scan.password"; echo; printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0; echo; } > "$T/motifs"
+  if cat "$T/job.json" "$T/bao.json" "$T/zot.json" "$T/ret.json" | grep -q -F -f "$T/motifs"; then echo "KO   identifiants dans les réponses de Grafana"; ko=1
+  else ok "ni le mot de passe ni son encodage docker dans les réponses de Grafana"; fi
+  kubectl delete job -n scan g7-manuel --wait=false >/dev/null
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,77p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_periodique|g7_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
