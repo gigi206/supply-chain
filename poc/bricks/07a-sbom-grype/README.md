@@ -198,3 +198,10 @@ Le scan de G4 expire le 11/11/2026 à 20:40:09 UTC. Prochaine étape : `g5_porte
 **Décision du propriétaire (04/11/2026, après 21:05 UTC, réponse « 2 a ») : les deux ajouts à D4 sont retenus**, `scan.forme` et le refus d'un scan daté de plus de 5 min dans le futur.
 
 R5 de la 10 est fini le 04/11/2026 à 22:21 UTC : `g5_porte` n'attend plus que l'accord du propriétaire. Le correctif s'applique toujours à l'arbre après les adaptations d'après R5.
+
+**G5 appliqué le 04/11/2026 (22:25 à 22:28 UTC, accord du propriétaire : « A »), 0 écart du premier coup** ([résultat](resultats/g5-predictions.md)). **Le contrôle 7 est en service dans la porte** :
+- image réelle admise, Job réussi, contrôles 6 et 9 inchangés ;
+- même digest sans scan refusé (`scan.scan_present`), clé de Chains à la place de celle du scanner refusée, Jobs en échec ;
+- journaux lus par l'auditeur dans Grafana ; `controle6` rejoué sur la porte corrigée, 0 écart.
+
+Une image sans scan récent a désormais son Job en échec, et `rejeu.sh` ne lance pas encore de scan : c'est G7. Prochaine étape : G6, les témoins négatifs signés.

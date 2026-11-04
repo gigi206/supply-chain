@@ -96,12 +96,18 @@ Les journaux de R5 restent ceux de la porte d'avant G5 : `g5_porte` ne les réé
 | C2 `builds/essai-webhook`, sans source | `false`, règles de source | `ok`, 30/30 | `refus`, 0/0 | `refus`, `scan.scan_present` | en échec |
 | C3 clé de Chains sur `scanner.pub` | `true`, aucune violation | `ok`, 10/10 | `ok`, 2/2 | `refus`, `threshold` | en échec |
 
-C1 lève trois points de « Non joué à sec » : le Job réel (utilisateur 65532, racine en lecture seule, ConfigMap sous `/etc/porte/regles-scan`) et le nom `sc-stockage.poc.test`. `porte-temoin` est retirée, rien n'est écrit dans Zot.
+C1 lève deux points de « Non joué à sec » : le Job réel (utilisateur 65532, racine en lecture seule, ConfigMap sous `/etc/porte/regles-scan`) et le nom `sc-stockage.poc.test`. `porte-temoin` est retirée, rien n'est écrit dans Zot.
 
-### Prédictions de `g5_grafana` et du rejeu de `controle6`, écrites à 22:29 UTC, avant de les jouer
+### Prédictions de `g5_grafana` et du rejeu de `controle6`, écrites à 22:28 UTC, avant de les jouer
 
 - **`g5_grafana`** : l'auditeur lit 3 lignes `LECTURE`, 1 verdict de ec à `true` et 2 à `false`, tous deux en `scan.scan_present`. Rien ne prouve encore que la ligne JSON du conteneur `scan` arrive entière dans Loki.
 - **`controle6`, sur la porte corrigée** : 0 écart ; C1 `ok|2/2`, avec l'attendu adapté après R5 ; champs 9 et 10 inchangés malgré les champs 11 et 12.
+
+### Résultat de `g5_grafana` et de `controle6` (04/11/2026, 22:28:59 à 22:31:53 UTC)
+
+Conformes :
+- [`g5_grafana`](g5_grafana.log) : 3 lectures, 1 verdict admis et 2 refus `scan.scan_present` lus par l'auditeur. La ligne JSON de ec arrive entière dans Loki ;
+- [`controle6`](../../08-trust-plane/resultats/preuves-controle6.log) : 0 écart, C1 `ok|2/2`, champs 9 et 10 inchangés.
 
 ## Effets à connaître
 

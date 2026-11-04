@@ -1911,3 +1911,5 @@ Script et témoins : `07a-sbom-grype/plateforme.sh g3_*`.
 - supprimer l'espace `scan` ;
 - retirer ses entrées de `openbao/openbao.yaml` et de `politique/admission.yaml`, puis réappliquer ces deux documents ;
 - supprimer les rôles `scanner` et `scan-zot`, les politiques `scanner-signature` et `scan-zot`, et `kv/scan/zot`. La clé Transit `scanner` a `deletion_allowed` à false : elle reste en place, sauf à changer ce réglage avec le jeton root (non essayé).
+
+**Additif du 04/11/2026 (22:32 UTC) : contrôle 7 dans la porte (brique 07a, G5, accord du propriétaire).** Conteneurs `scan-verifier` et `scan` ajoutés au Job (`politique/porte-job.yaml`), quatre clés dans la ConfigMap `porte`, champs 11 et 12 de `VERDICT`, étape `controle7` de `preuves.sh`. Les fichiers de ces conteneurs sont dans [`../07a-sbom-grype/politique/porte/`](../07a-sbom-grype/politique/porte/). Résultat : [`g5-predictions.md`](../07a-sbom-grype/resultats/g5-predictions.md). Le Job de la porte échoue désormais pour toute image sans scan récent ; les lecteurs de `VERDICT` n'en dépendent pas.

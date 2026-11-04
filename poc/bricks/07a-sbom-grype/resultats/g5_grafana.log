@@ -1,0 +1,11 @@
+# plateforme.sh g5_grafana, 2026-11-04T22:28:59Z
+## journaux des conteneurs scan-verifier et scan, lus par l'auditeur
+LECTURE|0|sc-stockage.poc.test:5000/builds/scan/sample-app|cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures d
+LU|énoncé 4d197192f0b17ac0|2026-11-04T20:40:09.254165787Z
+LECTURE|1|sc-stockage.poc.test:5000/builds/scan/sample-app|
+LECTURE|0|sc-stockage.poc.test:5000/builds/scan/essai-webhook|cosign : no matching attestations: 
+verdicts de ec : 1 admis, 2 refusés
+OK   trois lectures visibles dans Grafana
+OK   un verdict admis et deux refus visibles dans Grafana
+OK   refus lus : scan.scan_present
+# fin 2026-11-04T22:28:59Z, code 0
