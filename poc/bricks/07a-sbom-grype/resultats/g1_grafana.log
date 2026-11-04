@@ -1,0 +1,7 @@
+# plateforme.sh g1_grafana, 2026-11-04T19:28:05Z
+OK   requête de l'auditeur (HTTP) : 200
+2026-11-04T19:27:24Z 192.168.161.13:5000/vulndb/grype@sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326
+2026-11-04T19:27:28Z déjà archivée : 192.168.161.13:5000/vulndb/grype@sha256:13729131a09fde2d66b92762dbe44f046214a62fcdadb5632dd96446dc028326
+OK   archivage visible dans Grafana
+OK   mot de passe de poc-vulndb absent de la réponse
+# fin 2026-11-04T19:28:05Z, code 0

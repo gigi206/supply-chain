@@ -1,0 +1,9 @@
+# plateforme.sh g1_oras, 2026-11-04T19:26:54Z
+OK   signature GPG de oras_1.3.6_checksums.txt (clé primaire) : C6FC42F0DE84A345FAADB742F44418110791EF37
+oras_1.3.6_linux_amd64.tar.gz: OK
+oras_1.3.6_linux_amd64.tar.gz: OK
+OK   binaire extrait identique à celui de mise : 2be7e2b668fc32329408ca17f104021bdb93407266537b6410668ed7d05c4611
+/tmp/oras-installation/oras: OK
+/usr/local/bin/oras: OK
+Version:        1.3.6
+# fin 2026-11-04T19:26:55Z, code 0

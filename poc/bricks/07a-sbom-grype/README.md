@@ -131,3 +131,14 @@ Une décision est ajoutée :
 - **D7** : la conservation des bases. Zot tourne avec `gc: false`, 9,7 Go sont libres sur `sc-stockage`, et chaque base fait environ 200 Mo par jour, soit environ 48 jours de marge. Recommandation : pas de rétention dans le PoC (un rejeu de zéro remet à vide), et une alerte de la 19 sur le disque, à prévoir.
 
 `oras` est absent de `sc-stockage` : on y installe le binaire 1.3.6 déjà vérifié en J5, avec son empreinte et sa signature GPG, sans nouveau téléchargement.
+
+**G1 appliqué le 04/11/2026 (19:26 à 19:28 UTC, accord du propriétaire : « Oui »), conforme** ([prédictions et résultat](resultats/g1-predictions.md)) :
+- Zot reconfiguré : 9 comptes, `builds/scan/**` et `vulndb/**` ;
+- oras 1.3.6 vérifié (GPG et empreinte), puis installé sur `sc-stockage` ;
+- droits : 9 essais sur 9 conformes. `poc-images` et `poc-replay` n'écrivent plus dans `builds/scan/`, et une base archivée ne peut pas être remplacée ;
+- base du jour archivée sous `vulndb/grype:2026-11-04`, à l'empreinte `ed08c5e3…` ; l'archive tronquée est refusée ;
+- timer quotidien actif ; journal lisible dans Grafana.
+
+Un écart de prédiction : `/v2/` répond 200 (lecture anonyme), pas 401. D7, sans rétention, n'est pas encore tranchée : rien ne s'y oppose avant une trentaine de jours.
+
+Prochaine étape : G2, l'image d'outils du scanner.

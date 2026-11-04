@@ -1875,3 +1875,25 @@ Après R5, la porte admet l'image réelle avec ou sans VSA. Le contrôle 6 de la
   - contrôle 6 en `refus`, « accepted signatures do not match threshold ».
 - **Jobs** : `porte-c6-reelle` réussi ; `porte-c6-sans-vsa` et `porte-c6-cle-chains` en échec. Le Job échoue donc quand le conteneur `vsa` refuse. Rien n'est écrit dans Zot.
 - **État laissé** : la ConfigMap `porte` en service contient le contrôle 6. Les Jobs `porte-c6-*` s'effacent d'eux-mêmes une heure après leur fin (`ttlSecondsAfterFinished`).
+
+## Modifications pour la brique 07a (04/11/2026, accord du propriétaire : « Oui », G1)
+
+**Comptes Zot `poc-vulndb` et `poc-scan`** (décision D2 de la 07a). Mots de passe dans `…/08/secrets`, htpasswd en bcrypt de coût 12.
+
+**`stockage/zot.json`**
+- `vulndb/**` : `poc-vulndb` peut lire et créer, mais pas mettre à jour. Une base archivée sous son tag daté ne peut donc pas être remplacée.
+- `builds/scan/**` : `poc-scan` peut lire et créer, sous la condition CEL `req.referenceType != "tag"`. C'est le motif le plus long : il remplace `builds/**` pour ces dépôts, où ni `poc-build`, ni `poc-images`, ni `poc-replay` n'écrivent.
+
+**Rejeu ciblé** de `mise run confiance:stockage -- zot`, à 19:26 UTC. L'ancien journal est gardé sous [`stockage-zot-avant-07a.log`](resultats/stockage-zot-avant-07a.log).
+
+Droits mesurés par la 07a (`g1_droits.log`) : 9 essais sur 9 conformes.
+
+**Résidus** : `builds/scan/essai-07a`, `builds/essai-07a` et `vulndb/essai-07a`.
+
+**Sur `sc-stockage`** :
+- `oras` 1.3.6, l'archive de J5, revérifiée ;
+- l'utilisateur `base-grype`, ainsi que `base-grype.service` et `.timer` (brique 07a, D3 a).
+
+**Retrait** :
+- retirer les deux comptes et les deux dépôts de `zot.json` et de `stockage.sh`, puis rejouer `stockage.sh zot` ;
+- désactiver le timer et supprimer `/usr/local/lib/base-grype`, `/etc/base-grype` et l'utilisateur.

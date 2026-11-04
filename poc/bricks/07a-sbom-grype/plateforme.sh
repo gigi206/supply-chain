@@ -15,6 +15,7 @@
 #   g1_essai  run du service : base du jour archivée sous vulndb/grype:<date>, empreinte et annotations relues en lecture
 #             anonyme ; second run : déjà archivée ; contre-épreuve : archive tronquée refusée, rien poussé ; mot de passe absent
 #             du journal ; timer activé
+#   g1_grafana journal de base-grype.service lu par l'auditeur à travers Grafana (19b)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -247,11 +248,26 @@ EOF
   return $ko
 }
 
+etape_g1_grafana() { # journal de base-grype.service lu par l'auditeur à travers Grafana (19b), depuis le début de G1
+  local q c o=$W/graf.out
+  q=$(jq -nc --arg e '{noeud="sc-stockage", source="journal", unite="base-grype.service"}' --arg de "$(date -ud 2026-11-04T19:20:00Z +%s)000" \
+    --arg a "$(date -u +%s)000" '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 1000, direction: "forward"}], from: $de, to: $a}')
+  c=$(printf 'user = "auditeur:%s"\n' "$(cat "$S8/grafana-auditeur.password")" \
+    | curl -sS -K - --cacert "$P/ca-poc.crt" -o "$o" -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q")
+  attendu "requête de l'auditeur (HTTP)" "$c" 200
+  jq -r '.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.] / 1000 | todate) \($v[2][.])"' "$o" > "$W/lignes"
+  cat "$W/lignes"
+  grep -q '/vulndb/grype@sha256:' "$W/lignes" && echo "OK   archivage visible dans Grafana" || { echo "KO   archivage absent de Grafana"; ko=1; }
+  if grep -q -F -f "$S8/zot-poc-vulndb.password" "$o"; then echo "KO   mot de passe dans la réponse de Grafana"; ko=1; else echo "OK   mot de passe de poc-vulndb absent de la réponse"; fi
+  rm -f "$o" "$W/lignes"
+  return $ko
+}
+
 [ $# -ge 1 ] || { sed -n 2,19p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

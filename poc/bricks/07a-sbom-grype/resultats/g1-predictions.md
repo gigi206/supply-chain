@@ -47,3 +47,33 @@ G1 met en place la base Grype et les droits de Zot (D2, D3 a). Ordre prévu, cha
 - Le journal de l'unité est consultable dans Grafana, si la 19b collecte le journal de `sc-stockage` (**à vérifier**, pas supposé).
 
 **Correction avant exécution (04/11/2026, 18:46 UTC)** : il y a aujourd'hui 7 comptes, et non 8 (les six de la boucle de `stockage.sh` plus `poc-replay`). Le htpasswd en attend donc **9**, pas 10.
+
+## Résultat (04/11/2026, 19:26 à 19:28 UTC, accord du propriétaire : « Oui ») : conforme, avec un écart de prédiction
+
+Journaux : `../../08-trust-plane/resultats/stockage-zot.log` (l'ancien est gardé sous `stockage-zot-avant-07a.log`), [`g1_oras.log`](g1_oras.log), [`g1_droits.log`](g1_droits.log), [`g1_base.log`](g1_base.log), [`g1_essai.log`](g1_essai.log) et [`g1_grafana.log`](g1_grafana.log).
+
+**zot (19:26 UTC)**
+- Le htpasswd compte **9 comptes**, comme prédit après correction. Zot est actif.
+- **Écart de prédiction** : `/v2/` répond **200**, pas 401. La lecture anonyme y est permise, ce que montrait déjà le journal précédent. L'erreur vient de la prédiction, pas de Zot.
+
+**g1_oras**
+- La signature GPG est faite par `C6FC42F0…`. L'empreinte de l'archive est conforme.
+- Le binaire est `2be7e2b6…`, identique à celui de mise. Il est installé et revérifié dans la VM (`oras` 1.3.6).
+
+**g1_droits** : 9 essais sur 9 conformes.
+- `poc-scan` ne crée que par digest dans `builds/scan/`.
+- `poc-images` et `poc-replay` sont refusés dans `builds/scan/` : le motif le plus long remplace bien `builds/**`. Le témoin `poc-images` reste accepté dans `builds/`.
+- `poc-vulndb` crée un tag, puis **ne peut pas le repousser** : le cas incertain est tranché, Zot exige `update` même pour un manifeste identique.
+- Résidus jetables : `builds/scan/essai-07a`, `builds/essai-07a` et `vulndb/essai-07a:v1`.
+
+**g1_base**
+- Les deux scripts sont installés identiques au dépôt. Le mot de passe est en 0600, root.
+- Exposition « 3.0 OK », comme Zot.
+
+**g1_essai**
+- Premier run en quelques secondes (pic mémoire de 207,5 Mo) : `vulndb/grype:2026-11-04` → `sha256:13729131…`, relu en lecture anonyme. `artifactType`, empreinte annoncée (`ed08c5e3…`), date de construction et couche sont conformes.
+- Second run : « déjà archivée ».
+- Contre-épreuve : « empreinte invalide », code 1, aucun nouveau tag.
+- Le mot de passe est absent du journal. Le timer est actif ; prochain run le 05/11/2026 à 08:01:55 UTC.
+
+**g1_grafana** : le journal de `base-grype.service` sur `sc-stockage` est lu par l'auditeur à travers Grafana (HTTP 200, deux lignes : archivage et « déjà archivée »), et la réponse ne contient pas le mot de passe. Le point « à vérifier » est donc vérifié.
