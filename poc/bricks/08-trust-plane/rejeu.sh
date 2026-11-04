@@ -26,6 +26,11 @@
 # avec POUSSER_VSA=1 (accord du propriétaire pour ce push), VSA de la brique 10 re-poussée et contrôle 6, enfin fuites.
 # Rejoué le 03/11/2026 (libellé complet, 20:31 à 22:42 UTC, cinq parties, trois correctifs, README de la 08) : toutes les étapes
 # passent ; plus « NON JOUABLE ».
+# Additif du 05/11/2026 : brique 07a ajoutée à sec (G7), PAS ENCORE REJOUÉE. Après la 19b, parce que ses étapes lisent Grafana :
+# base (timer, compte poc-vulndb), image d'outils du scanner, clé et rôles, job de scan, CronJob ; avec POUSSER_VSA=1, contrôle 7 et
+# témoins signés après le contrôle 6 (C1 de controle7 attend les contrôles 6 et 9 à ok). Rien ne s'y oppose plus tôt dans le
+# rejeu : un Job de la porte sans scan échoue sur le conteneur scan, mais les tests de J6 et de J8 ne lisent que les champs de
+# VERDICT, dont le champ 3 reste celui de ec ; seul controle7 regarde l'état du Job. J2 pose zot.json avec la rétention (D7 b).
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
@@ -118,12 +123,24 @@ etape "19 (O3)" mise run observabilite -- regles deployer
 echo "## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées"
 etape "19b (L6, contrôle)" env JALON=l6 mise run journalisation -- controle_grpc
 etape "19b (L4)" env JALON=l4 mise run journalisation -- temoins secrets
+# Brique 07a (G7). Sautées, archives en cache revérifiées par g2_image : g0, g2_telecharger, g2_verifier ; sautées, mesures ponctuelles
+# ou correctif déjà appliqué : g5_regles, g5_sec, g5_porte, g5_grafana, g6_sec, g7_sec ; sans objet, Zot naît avec la rétention en J2 :
+# g7_zot, g7_balayage. g3_openbao réécrit resultats/scanner-cle-publique.pem : une installation neuve a une clé neuve, que cm_porte
+# reprend au contrôle 6 ou 7 et que le scan de g4_scan utilise déjà.
+plateforme() { mise exec -- "$here/../07a-sbom-grype/plateforme.sh" "$@"; }
+etape "07a (G1)" plateforme g1_oras g1_droits g1_base g1_essai g1_grafana
+etape "07a (G2)" plateforme g2_image
+etape "07a (G3)" plateforme g3_cluster g3_openbao g3_essais g3_cosign g3_grafana
+etape "07a (G4)" plateforme g4_scan g4_verifier g4_grafana
+etape "07a (passage périodique)" plateforme g7_periodique g7_grafana
 if [ "${POUSSER_VSA:-}" = 1 ]; then
   # VSA de la brique 10 (bundle versionné, lié au seul digest 3a7ca1b1, que J7 vérifie) re-poussée, puis contrôle 6 de la porte
   etape "10 (VSA)" env JALON=r5 mise run replay -- pousser_vsa
   etape "J8 (contrôle 6)" mise run confiance:preuves -- controle6
+  etape "J8 (contrôle 7)" mise run confiance:preuves -- controle7
+  etape "07a (G6)" plateforme g6_temoins
 else
-  echo "## 10 pousser_vsa et J8 controle6 : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)"
+  echo "## 10 pousser_vsa, J8 controle6, controle7 et 07a g6_temoins : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)"
 fi
 etape fuites mise run confiance:fuites -- "$lib"
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

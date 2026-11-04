@@ -2808,7 +2808,7 @@ etape_controle7() { # brique 07a, G5, après R5 de la 10 : contrôle 7 dans la p
   attendu "C1 ec (success, violations, avertissements)" "$(cut -d'|' -f3-5 <<< "$r")" "true||trusted_task.tagged"
   attendu "C1 contrôle 9" "$(cut -d'|' -f7 <<< "$r")" ok
   attendu "C1 contrôle 6" "$(cut -d'|' -f9 <<< "$r")" ok
-  attendu "C1 contrôle 7" "$(cut -d'|' -f11,12 <<< "$r")" "ok|1 énoncé(s) vérifié(s) dans $REG/builds/scan/sample-app"
+  attendu "C1 contrôle 7" "$(cut -d'|' -f11,12 <<< "$r")" "ok|$(referrers builds/scan/sample-app) énoncé(s) vérifié(s) dans $REG/builds/scan/sample-app"
   attendu "C1 Job" "$(kubectl get job -n porte porte-c7-reelle -o jsonpath='{.status.succeeded}')" 1
 
   echo "## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook"
