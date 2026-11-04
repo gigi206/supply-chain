@@ -162,3 +162,14 @@ Prochaine étape : G3, la clé Transit `scanner` et l'espace `scan`.
 Une cinquième étape, `g3_grafana`, relit les journaux du pod et l'audit d'OpenBao à travers Grafana (correction avant exécution, consignée dans les prédictions).
 
 **D9, ajoutée** : les identifiants Zot du job sont lus dans OpenBao, comme en J8, avec deux rôles liés au même compte. `scan-zot` lit les identifiants avec un jeton de 1 min ; `scanner` signe avec un jeton de 5 min pris juste avant la signature. Recommandation : (a). `scanner-signature` a donc quatre chemins, révocation comprise, et non trois.
+
+**G3 appliqué le 04/11/2026 (20:21 à 20:22 UTC, accord du propriétaire : « 1 a, 2 oui, 3 oui », D9 (a) retenue), conforme du premier coup** ([prédictions et résultat](resultats/g3-predictions.md)) :
+- clé Transit `scanner` non exportable, rôles `scanner` (5 min) et `scan-zot` (1 min) liés au seul compte `scan:scanner`, identifiants de `poc-scan` dans `kv/scan/zot` ;
+- 16 refus et 8 connexions croisées refusées, comptes exacts ;
+- vrai `cosign sign-blob --key hashivault://scanner` depuis un pod de `scan`, bundle vérifié sur l'hôte avec [`scanner-cle-publique.pem`](resultats/scanner-cle-publique.pem) ;
+- sorties de `scan` limitées à DNS, OpenBao, Zot et Forgejo (Grafana et Internet injoignables) ; OpenBao injoignable sans l'étiquette `app=scan` ;
+- journaux et audit lus par l'auditeur dans Grafana.
+
+Le chemin que cosign appelle est `transit/sign/scanner/sha2-256`, et il lit `transit/keys/scanner`. D7 n'est toujours pas tranchée.
+
+Prochaine étape : G4, le job de scan.

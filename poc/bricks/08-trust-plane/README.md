@@ -1904,3 +1904,10 @@ Droits mesurés par la 07a (`g1_droits.log`) : 9 essais sur 9 conformes.
 - OpenBao recevra une clé Transit `scanner`, les politiques `scanner-signature` et `scan-zot`, l'entrée `kv/scan/zot` et les rôles `scanner` et `scan-zot`, tous liés à `scan:scanner`.
 
 Script et témoins : `07a-sbom-grype/plateforme.sh g3_*`.
+
+**Appliqué pour la brique 07a, G3 (04/11/2026, 20:21 UTC, accord du propriétaire)** : les modifications préparées plus haut sont en place. `openbao-0` n'a été ni recréé ni redémarré. Le rejeu de zéro ne les recrée pas encore : l'intégration à `rejeu.sh` est prévue en G7.
+
+**Retrait** :
+- supprimer l'espace `scan` ;
+- retirer ses entrées de `openbao/openbao.yaml` et de `politique/admission.yaml`, puis réappliquer ces deux documents ;
+- supprimer les rôles `scanner` et `scan-zot`, les politiques `scanner-signature` et `scan-zot`, et `kv/scan/zot`. La clé Transit `scanner` a `deletion_allowed` à false : elle reste en place, sauf à changer ce réglage avec le jeton root (non essayé).

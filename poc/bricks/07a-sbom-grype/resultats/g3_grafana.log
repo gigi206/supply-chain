@@ -1,0 +1,17 @@
+# plateforme.sh g3_grafana, 2026-11-04T20:22:08Z
+## journaux du pod scan-cosign, lus par l'auditeur (Loki ingère avec quelques secondes de retard)
+jeton du rôle scanner obtenu (essai 1)
+Success! Revoked token (if it existed)
+jeton du rôle scanner révoqué
+JOINT|Zot|réponse 2xx
+JOINT|Forgejo|réponse 2xx
+INJOIGNABLE|Grafana|wget: download timed out
+INJOIGNABLE|Internet (1.1.1.1)|wget: download timed out
+Wrote bundle to file temoin.bundle.json
+OK   connexion et révocation visibles dans Grafana (1 essai(s))
+## audit d'OpenBao, lu par l'auditeur
+lignes d'audit citant transit/sign/scanner : 8
+OK   signatures de la clé scanner visibles dans Grafana (1 essai(s))
+## identifiants de poc-scan absents des réponses
+OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
+# fin 2026-11-04T20:22:08Z, code 0

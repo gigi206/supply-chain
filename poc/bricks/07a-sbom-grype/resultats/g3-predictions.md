@@ -126,3 +126,28 @@ Prédictions, lues par l'auditeur :
 Les pods d'essai sont supprimés par `g3_grafana`, et non plus par `g3_cosign` : leurs journaux doivent d'abord être collectés.
 
 **Clé de Chains de la contre-épreuve** : `resultats/chains-cle-publique.pem` de la 08 est bien la clé en service (SPKI `d8c637ab3f7ddb2c`, égale à `chains.pub` de la ConfigMap `horodatage`, relevé entre 20:01 et 20:05 UTC).
+
+## Résultat (04/11/2026, de 20:21:26 à 20:22:08 UTC)
+
+Accord du propriétaire : D9 (a), appliquer G3, pousser les deux commits (« 1 a, 2 oui, 3 oui »). Cinq étapes, code 0 du premier coup, sans passage raté à archiver.
+
+**Conforme à toutes les prédictions de fond :**
+- `g3_cluster` : espace `scan`, quatre sources dans la NetworkPolicy d'OpenBao, `openbao-0` ni recréé ni redémarré (uid `73d86162…`, 0 redémarrage), OpenBao descellé, pod sans nodeSelector refusé, contre-épreuve acceptée ;
+- `g3_openbao` : clé `ecdsa-p256,false,false,false`, deux rôles à 300 s et 60 s, politiques égales aux fichiers, `kv/scan/zot` de même empreinte, clé publique SPKI `8cbcbb4e…` ;
+- `g3_essais` : rôle `scanner` 15 lignes (2 acceptations, 11 refus), rôle `scan-zot` 8 lignes (2 acceptations, 5 refus), 8 connexions croisées refusées sur 8 ; signature vérifiée par openssl, refusée avec la clé de Chains ;
+- `g3_cosign` : pod `Succeeded`, Zot et Forgejo joints, Grafana et 1.1.1.1 injoignables, `sign-blob` réussi, clé lue par cosign égale à la clé exportée, bundle vérifié, contenu modifié et clé de Chains refusés ; pod sans `app=scan` : Zot joint, OpenBao injoignable ;
+- `g3_grafana` : connexion et révocation visibles, 8 lignes d'audit citant `transit/sign/scanner`, identifiants de `poc-scan` absents des réponses.
+
+**Point incertain levé.** Chemins appelés par le client hashivault de cosign v3.1.4-dev, relevés dans l'audit :
+- `auth/jwt/login` (par le conteneur `jeton`) ;
+- `transit/keys/scanner`, en lecture, 2 fois (signature et `public-key`) ;
+- `transit/sign/scanner/sha2-256` ;
+- `auth/token/revoke-self` (par le conteneur `revocation`).
+
+Aucune erreur. `transit/sign/scanner` sans algorithme n'a pas été appelé : ce troisième chemin de la politique, repris de J5, n'a pas servi ici. Il reste en place, comme dans la politique `tsa-signature`.
+
+**Écarts mineurs de prédiction :**
+- pod sans nodeSelector refusé dès le premier essai, et non « après quelques essais » : la règle était déjà publiée ;
+- jeton obtenu au premier essai, et le premier tirage de `outils-scan` tient dans la fenêtre : le pod avait fini moins de 21 s après sa création (son âge relevé en fin d'étape).
+
+**Limites.** Le jeton du rôle `scanner` reste valable le temps entre le conteneur `jeton` et le conteneur `revocation`. Si le pod échoue avant la révocation, il expire seul après 5 min au plus. Le témoin signe un texte d'essai, pas une image : le prédicat de scan et le push viennent en G4.

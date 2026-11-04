@@ -1,0 +1,44 @@
+# plateforme.sh g3_openbao, 2026-11-04T20:21:31Z
+identifiants Zot du job : compte poc-scan, registre sc-stockage.poc.test:5000
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-11-04T20:21:32.15059507Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyXzXzmabe/6H91mfqgDQpCCH+lGn
+M+teGYYK7oEsXGFOgKAgotfL2uFOeWow1YJDnjs/kf+jCA+qgbWWrgjakg==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      scanner
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: scanner-signature
+Success! Uploaded policy: scan-zot
+Success! Data written to: kv/scan/zot
+Success! Data written to: auth/jwt/role/scanner
+Success! Data written to: auth/jwt/role/scan-zot
+{"name":"scanner","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:scan:scanner","user_claim":"sub","token_policies":["scanner-signature"],"token_no_default_policy":true,"token_type":"service","token_ttl":300,"token_max_ttl":300,"token_period":0}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:scan:scanner","user_claim":"sub","token_policies":["scan-zot"],"token_no_default_policy":true,"token_type":"service","token_ttl":60,"token_max_ttl":60,"token_period":0}
+OK   clé scanner (type, exportable, sauvegarde en clair, suppression) : ecdsa-p256,false,false,false
+OK   rôle scanner : system:serviceaccount:scan:scanner,openbao,scanner-signature,true,service,300,300,0
+OK   rôle scan-zot : system:serviceaccount:scan:scanner,openbao,scan-zot,true,service,60,60,0
+OK   politique scanner-signature = fichier versionné (hors commentaires et lignes vides) : be4295fcda158148
+OK   politique scan-zot = fichier versionné (hors commentaires et lignes vides) : ed4e7c417e8205b8
+OK   kv/scan/zot = identifiants de poc-scan (empreinte du JSON compact) : 951318c01a892f5c
+Public-Key: (256 bit field, 128 bit security level)
+NIST CURVE: P-256
+clé publique exportée : resultats/scanner-cle-publique.pem (SPKI sha256 8cbcbb4ebe3b43240255bfc458a695de83db5abc969ffdb8d7cf88e08144a94c)
+# fin 2026-11-04T20:21:33Z, code 0

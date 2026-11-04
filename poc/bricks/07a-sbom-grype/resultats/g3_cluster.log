@@ -1,0 +1,24 @@
+# plateforme.sh g3_cluster, 2026-11-04T20:21:26Z
+## espace scan (politique/scan.yaml)
+namespace/scan serverside-applied
+serviceaccount/scanner serverside-applied
+networkpolicy.networking.k8s.io/scan serverside-applied
+configmap/scan-config serverside-applied
+OK   Pod Security de l'espace scan : restricted
+OK   compte scanner sans jeton monté d'office : false
+OK   sorties de l'espace scan (ports) : UDP/53,TCP/53,TCP/8200,TCP/5000,TCP/3000
+## NetworkPolicy d'OpenBao (document NetworkPolicy de 08-trust-plane/openbao/openbao.yaml seul ; StatefulSet non touché)
+networkpolicy.networking.k8s.io/openbao serverside-applied
+{"kubernetes.io/metadata.name":"tekton-chains"} 
+{"kubernetes.io/metadata.name":"tsa"} {"app":"timestamp-authority"}
+{"kubernetes.io/metadata.name":"horodatage"} 
+{"kubernetes.io/metadata.name":"scan"} {"app":"scan"}
+OK   entrée de l'espace scan, pods app=scan seulement : scan
+OK   openbao-0 ni recréé ni redémarré (uid, redémarrages) : 73d86162-0e8a-4f35-9281-36e6c1a6131e 0
+OK   OpenBao descellé : false
+## règle zone-confiance de Kyverno (document de 08-trust-plane/politique/admission.yaml seul, appliqué comme charger de politique.sh)
+validatingpolicy.policies.kyverno.io/zone-confiance configured
+OK   scan dans les espaces de zone-confiance : true
+OK   pod de scan sans nodeSelector refusé par zone-confiance (1 essai(s))
+OK   contre-épreuve : même pod avec nodeSelector zone=confiance : pod/sonde-zone created (server dry run)
+# fin 2026-11-04T20:21:27Z, code 0

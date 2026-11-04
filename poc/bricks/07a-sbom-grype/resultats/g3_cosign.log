@@ -1,0 +1,31 @@
+# plateforme.sh g3_cosign, 2026-11-04T20:21:43Z
+## pod scan-cosign (app=scan) : jeton du rôle scanner, cosign sign-blob --key hashivault://scanner, révocation
+jeton du rôle scanner obtenu (essai 1)
+JOINT|Zot|réponse 2xx
+JOINT|Forgejo|réponse 2xx
+INJOIGNABLE|Grafana|wget: download timed out
+INJOIGNABLE|Internet (1.1.1.1)|wget: download timed out
+Wrote bundle to file temoin.bundle.json
+Success! Revoked token (if it existed)
+jeton du rôle scanner révoqué
+OK   pod scan-cosign : Succeeded
+OK   sondes du pod app=scan : JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (1.1.1.1)
+## bundle vérifié sur l'hôte
+OK   clé publique lue par cosign = clé exportée (SPKI sha256) : 8cbcbb4ebe3b43240255bfc458a695de83db5abc969ffdb8d7cf88e08144a94c
+{"mediaType":"application/vnd.dev.sigstore.bundle.v0.3+json","materiel":["publicKey"],"signature":["messageDigest","signature"],"condensat":"SHA2_256"}
+OK   bundle vérifié par cosign verify-blob avec resultats/scanner-cle-publique.pem (Verified OK)
+OK   contre-épreuve : contenu modifié refusé (invalid signature when validating ASN.1 encoded signature)
+OK   contre-épreuve : clé publique de Chains refusée (invalid signature when validating ASN.1 encoded signature)
+## pod sans l'étiquette app=scan
+JOINT|Zot|réponse 2xx
+INJOIGNABLE|OpenBao|wget: download timed out
+OK   sondes du pod sans app=scan : JOINT|Zot INJOIGNABLE|OpenBao
+## audit d'OpenBao depuis 2026-11-04T20:21:43Z (chemins appelés par cosign)
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null} ×2
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+{"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+# fin 2026-11-04T20:22:04Z, code 0

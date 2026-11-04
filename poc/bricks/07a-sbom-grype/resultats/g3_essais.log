@@ -1,0 +1,67 @@
+# plateforme.sh g3_essais, 2026-11-04T20:21:36Z
+## rôle scanner, compte scan:scanner
+CONNEXION_ACCEPTEE|"token_policies":["scanner-signature"]
+ACCEPTE|lecture de transit/keys/scanner
+SIGNATURE_SCANNER|vault:v1:MEUCIQCoQeGxjaj3Ij+h7qZ8NcVkv5QVr4zRiKcObeJfab9+CgIgAqmcwHEtJs3Nm+vt3nGsnIfHAgJIIou476AJIxKYsXg=
+REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|export de la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|clé scanner rendue exportable|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|sauvegarde en clair de la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de son propre jeton|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|renouvellement de son propre jeton|Code: 403. Errors: * 1 error occurred: * permission denied 
+ACCEPTE|révocation de son propre jeton
+REFUSE|signature avec la clé scanner après révocation|Code: 403. Errors: * permission denied 
+OK   rôle scanner : signe avec la seule clé scanner ; 2 acceptations, 11 refus (15 lignes conformes)
+## rôle scan-zot, compte scan:scanner
+CONNEXION_ACCEPTEE|"token_policies":["scan-zot"]
+ACCEPTE|lecture de kv/scan/zot
+REFUSE|signature avec la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de transit/keys/scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|écriture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+ACCEPTE|révocation de son propre jeton
+REFUSE|lecture de kv/scan/zot après révocation|Code: 403. Errors: * permission denied 
+OK   rôle scan-zot : lit ses seuls identifiants, sans écriture ni signature ; révoqué, il ne lit plus rien (8 lignes conformes)
+## connexions croisées
+scan:default, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:default, rôle scan-zot : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tsa:timestamp-authority, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tekton-chains:tekton-chains-controller, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+horodatage:horodatage, rôle scan-zot : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle tsa : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle tekton-chains : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle horodatage : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+OK   connexions croisées refusées : 8/8
+## signature Transit vérifiée sur l'hôte
+OK   signature Transit (prehashed sha2-256) vérifiée par openssl avec resultats/scanner-cle-publique.pem
+OK   contre-épreuve : même signature refusée avec la clé publique de Chains
+## audit d'OpenBao depuis 2026-11-04T20:21:36Z
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/chains/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/sign/tsa/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/chains","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/export/signing-key/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/scanner/config","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/backup/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/scan/zot","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/horodatage/zot","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/lookup-self","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/renew-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/jwt/login","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/scanner","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/scan/zot","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/horodatage/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:d2bf63c99f2ac79876ea811221992f19406a1fce5464f49d5c47fa36aa72bb40"} ×8
+# fin 2026-11-04T20:21:40Z, code 0
