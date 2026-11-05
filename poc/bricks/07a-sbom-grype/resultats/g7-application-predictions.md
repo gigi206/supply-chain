@@ -21,23 +21,23 @@
 
 ## 3. `g7_retention` (lecture)
 
-- Au moins une ligne `"decision":"keep"` sur `vulndb/grype` visible dans Grafana. **Première lecture de ce format** : `g7_sec` n'a relevé que les suppressions. Si la ligne manque alors que le journal de `zot.service` la porte, c'est la requête qui est fausse, pas la rétention.
+- Au moins une ligne `"decision":"keep"` sur `vulndb/grype` visible dans Grafana, de raison `retained by … policy`. **Déduit du code, jamais observé** : la raison relevée dans l'audit de `g7_sec` (`didn't meet any tag retention rule`, soit `filteredByTagRules`) n'existe que dans `GetRetainedTagsFromMetaDB`, et cette fonction appelle `logAction(repo, "keep", …, &p.log)` pour chaque tag gardé. Si la ligne manque alors que le journal de `zot.service` la porte, c'est la requête qui est fausse, pas la rétention.
 - 0 suppression dans l'audit de Zot, mot de passe de `poc-scan` absent.
 
 ## 4. `g7_periodique` (accord)
 
 - CronJob `scan-sample-app`, `30 9 * * *`, `Etc/UTC`, `Forbid`. Il n'existait aucun autre CronJob dans l'espace `scan`.
 - `g7-manuel` réussit, comme G4 : référence de la base résolue en digest, 5 vulnérabilités, 0 KEV avec la base du 04/11. Une base plus récente peut changer ce compte, et seule la signature fait foi. Durée d'analyse de l'ordre de 2 min.
-- Un referrer de plus (2 si le CronJob n'est pas encore passé), sujet égal au digest de l'image, bundle vérifié sur l'hôte avec la clé du scanner.
+- Exactement un referrer de plus qu'avant le passage, sujet égal au digest de l'image, bundle vérifié sur l'hôte avec la clé du scanner. L'étape attend 10:00 UTC si elle tombe entre 09:00 et 10:00 UTC. Je n'ai pas vérifié si `Forbid` voit un job lancé par `--from`, et cette attente rend la question sans objet.
 - Place libre la plus basse sur `sc-confiance` : environ 2 400 Mo (5 834 Mo moins les 3 411 Mo du volume). G4 avait relevé 2 505 Mo.
 
-## 5. `g7_grafana` (lecture)
+## 5. `g7_grafana` (lecture, sous l'accord de `g7_periodique`)
 
-Marqueurs `SOURCE`, `BASE`, `SCAN`, `ATTESTATION`, `PUBLIE` et révocation du jeton lus par l'auditeur, signature `transit/sign/scanner` et poussage de `poc-scan` visibles, identifiants absents. Scindée ce jour : la partie rétention est passée à `g7_retention`, et `rejeu.sh` ne l'appelle pas.
+Seule écriture : la suppression de `g7-manuel` à la fin. Marqueurs `SOURCE`, `BASE`, `SCAN`, `ATTESTATION`, `PUBLIE` et révocation du jeton lus par l'auditeur, signature `transit/sign/scanner` et poussage de `poc-scan` visibles, identifiants absents. Scindée ce jour : la partie rétention est passée à `g7_retention`, et `rejeu.sh` ne l'appelle pas.
 
-## 6. `preuves.sh controle7` de la 08 (lecture, aucune VSA poussée)
+## 6. `preuves.sh controle7` de la 08 (accord)
 
-**Ajouté à G7 : `5649c38` a changé C1 sans jamais le rejouer.** Réapplique la ConfigMap `porte` (identique) et crée trois Jobs dans l'espace `porte`.
+**Ajouté à G7 : `5649c38` a changé C1 sans jamais le rejouer.** Aucune VSA poussée, mais ce n'est pas une lecture : l'étape réapplique la ConfigMap `porte` (identique), crée puis retire `porte-temoin`, et crée trois Jobs dans l'espace `porte`.
 
 - C1 image réelle admise : `ok|2 énoncé(s) vérifié(s) dans …/builds/scan/sample-app`, le scan le plus récent retenu, contrôles 6 et 9 inchangés.
 - C2 refus `scan.scan_present`, C3 refus par signature.

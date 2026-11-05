@@ -1913,3 +1913,13 @@ Script et témoins : `07a-sbom-grype/plateforme.sh g3_*`.
 - supprimer les rôles `scanner` et `scan-zot`, les politiques `scanner-signature` et `scan-zot`, et `kv/scan/zot`. La clé Transit `scanner` a `deletion_allowed` à false : elle reste en place, sauf à changer ce réglage avec le jeton root (non essayé).
 
 **Additif du 04/11/2026 (22:32 UTC) : contrôle 7 dans la porte (brique 07a, G5, accord du propriétaire).** Conteneurs `scan-verifier` et `scan` ajoutés au Job (`politique/porte-job.yaml`), quatre clés dans la ConfigMap `porte`, champs 11 et 12 de `VERDICT`, étape `controle7` de `preuves.sh`. Les fichiers de ces conteneurs sont dans [`../07a-sbom-grype/politique/porte/`](../07a-sbom-grype/politique/porte/). Résultat : [`g5-predictions.md`](../07a-sbom-grype/resultats/g5-predictions.md). Le Job de la porte échoue désormais pour toute image sans scan récent ; les lecteurs de `VERDICT` n'en dépendent pas.
+
+**Préparé à sec pour la brique 07a, G7 (05/11/2026, 00:31 UTC, pas encore appliqué) : rétention de Zot (D7 b, décision du propriétaire).** `stockage/zot.json` passe à `gc: true`, avec trois règles :
+
+- `vulndb/grype` : les 11 tags les plus récemment poussés ;
+- `builds/scan/**` : `deleteReferrers`, délai de 14 jours ;
+- `**`, en dernier : aucune suppression. **Cette dernière règle protège l'image réelle** : sans elle, Zot efface tout manifeste sans tag.
+
+Mesure sur copie : [`g7-predictions.md`](../07a-sbom-grype/resultats/g7-predictions.md). Tout rejeu de `mise run confiance:stockage -- zot` applique déjà ce fichier : **ne pas relancer cette étape avant l'accord de G7**, et elle s'applique dès J2 en cas de rejeu de zéro.
+
+**Retrait** : remettre `gc: false` dans `stockage/zot.json` et retirer `retention`, puis relancer l'étape `zot`. Ce qui a été effacé ne revient pas.

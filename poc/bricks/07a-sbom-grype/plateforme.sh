@@ -1448,7 +1448,7 @@ g7_lectures() { # image réelle, signature, attestation, scan, VSA et base lues 
 etape_g7_zot() { # ACCORD DU PROPRIÉTAIRE : modifie Zot et le redémarre
   local i a
   echo "## avant"; g7_lectures
-  cp "$R8/resultats/stockage-zot.log" "$R8/resultats/stockage-zot-avant-g7.log"   # le rejeu ciblé réécrit ce journal
+  [ -e "$R8/resultats/stockage-zot-avant-g7.log" ] || cp "$R8/resultats/stockage-zot.log" "$R8/resultats/stockage-zot-avant-g7.log"   # le rejeu ciblé réécrit ce journal
   mise run confiance:stockage -- zot
   echo "## après"
   for i in $(seq 60); do curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/" >/dev/null 2>&1 && break; sleep 1; done
@@ -1508,6 +1508,8 @@ etape_g7_periodique() { # ACCORD DU PROPRIÉTAIRE : CronJob dans l'espace scan, 
     spec: {schedule: $h, timeZone: "Etc/UTC", concurrencyPolicy: "Forbid", startingDeadlineSeconds: 3600, successfulJobsHistoryLimit: 3, failedJobsHistoryLimit: 3,
       jobTemplate: {spec: (.spec | del(.ttlSecondsAfterFinished))}}}' > "$T/cronjob.json"
   if [ "${G7_SEC:-}" = 1 ]; then kubectl apply --dry-run=server -f "$T/cronjob.json"; return 0; fi
+  # Hors de 09:00 à 10:00 UTC : deux scans simultanés demanderaient 6,8 Go sur sc-confiance, et compter les referrers n'aurait plus de sens.
+  while [ "$(date -u +%H)" = 09 ]; do echo "attente de 10:00 UTC, le passage planifié est à 09:30"; sleep 60; done
   cm_scan
   kubectl apply --server-side -f "$T/cronjob.json"
   attendu "horaire" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.schedule} {.spec.timeZone} {.spec.concurrencyPolicy}')" "$HORAIRE_SCAN Etc/UTC Forbid"
