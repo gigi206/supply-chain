@@ -222,3 +222,5 @@ Une image sans scan récent a désormais son Job en échec, et `rejeu.sh` ne lan
 Ajouts depuis les prédictions : `g7_grafana` scindée (la lecture de la rétention, `g7_retention`, reste hors de `rejeu.sh`, car `vulndb/grype` n'existe pas au balayage de J2), et rejeu de `controle7` après le passage périodique, car le changement de C1 dans `preuves.sh` n'a jamais été joué. Prédictions de l'application, **sous accord du propriétaire** : [`resultats/g7-application-predictions.md`](resultats/g7-application-predictions.md).
 
 La rétention n'effacera rien de réel avant le 18 ou le 19 novembre : d'ici là, seule cette mesure à sec en répond.
+
+**G7 : décisions du propriétaire du 05/11/2026.** Application de la rétention (« 2 oui »), à 08:18 UTC. **D10 (« A ») : passage périodique du scan, CronJob quotidien à 09:30 UTC sur l'image `3a7ca1b1`.** Une panne du CronJob se traduit par un refus de la porte au bout de 7 jours : elle coûte de la disponibilité, pas de la sécurité, et aucune alerte n'est prévue.

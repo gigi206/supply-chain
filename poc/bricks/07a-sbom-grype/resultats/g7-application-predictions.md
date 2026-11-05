@@ -51,4 +51,17 @@ Le journal réécrit `08-trust-plane/resultats/preuves-controle7.log` ; il sera 
 - **Rejeu de zéro.** `rejeu.sh` n'est pas rejoué : le scan et les témoins y sont ajoutés (`5649c38`), sans essai.
 - **Passage planifié.** `g7-manuel` part du CronJob à la main ; le premier passage réellement planifié aura lieu à 09:30 UTC le jour suivant et devra être relu à part.
 
+## Additif du 05/11/2026, 08:24 UTC, avant `g7_periodique`
+
+**Décision du propriétaire, D10 (05/11/2026, « A »)** : CronJob quotidien à 09:30 UTC, recommandé par l'advisor et par moi. `g7_zot` est passée à 08:18 UTC, et le balayage suit son cours.
+
+**Corrections de la section « Hors d'atteinte ».** J'y écrivais que le premier passage planifié aurait lieu « le jour suivant ». C'est faux si le CronJob existe avant 09:30 UTC :
+
+- `g7_periodique` lancé avant 09:00 UTC : passage planifié **aujourd'hui à 09:30 UTC**, un referrer de plus (3 au total) ;
+- `g7_periodique` lancé entre 09:00 et 10:00 UTC : l'étape attend 10:00 UTC, et le premier passage planifié a lieu demain à 09:30 UTC.
+
+**Prédictions du premier passage planifié**, à relire à part : un Job `scan-sample-app-…` réussi, 1 Job au plus à la fois, base du 05/11, place libre la plus basse sur `sc-confiance` de l'ordre de 2 400 Mo, comme `g7-manuel`.
+
+**`controle7`** est tenu hors de 09:25 à 09:40 UTC : un scan publié entre le jugement et le compte des referrers fausserait la valeur attendue de C1, sans rien dire de la porte.
+
 ## Résultat
