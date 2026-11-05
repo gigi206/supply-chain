@@ -1,0 +1,26 @@
+relevé du 05/11/2026 à 22:21 UTC
+
+## mock dans EPEL 9
+mock-6.9-1.el9.noarch.rpm
+mock-core-configs-45.2-1.el9.noarch.rpm
+
+## Rocky : versions publiées et archivées
+pub   : 9.0 9.1 9.2 9.3 9.4 9.5 9.6 9.7 9.8 
+vault : 9.0 9.1 9.2 9.3 9.4 9.5 9.6 9.7 
+BaseOS 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+AppStream 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+CRB 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+
+## Debian stable (madison)
+sbuild stable 0.89.3+deb13u4
+mmdebstrap stable 1.5.7-1+deb13u1
+diffoscope stable 297+deb13u1
+reprotest stable 0.7.30
+golang-go stable 2:1.24~2
+nodejs stable 20.19.2+dfsg-1+deb13u2
+
+## Instantané Debian 20261105T000000Z
+InRelease HTTP 200
+Suite: stable
+Codename: trixie
+Date: Sat, 12 Sep 2026 07:55:41 UTC

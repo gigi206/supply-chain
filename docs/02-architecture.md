@@ -228,6 +228,8 @@ EL8 n'est pas mis automatiquement à 0.
 - **KPI supply-chain (2c)** : `tools/metrics-exporter` dérive les métriques **des attestations** (taux L3 vérifié, taux de replay identique, KEV ouvertes et délai de correction, couverture VEX, violations de licences, âge des pins et des clés). Seuil : 0 écart avec le recalcul.
 - Grafana et Prometheus tournent en **lecture seule**, hors des nœuds de confiance. Les tableaux de bord sont versionnés dans git.
 
+> **Additif du 05/11/2026 (état du PoC, briques 19 et 19b)** : kube-prometheus-stack n'a pas été déployé. Prometheus, Alertmanager et Grafana tournent en services systemd durcis sur `sc-stockage`, et les 5 alertes se sont déclenchées sur incident simulé. La journalisation d'audit, absente de ce document, a été ajoutée le 02/11/2026 sur exigence du propriétaire : Alloy collecte sur les nœuds, Loki stocke, et tout se consulte dans Grafana. Détails : [brique 19](../poc/bricks/19-observabilite/README.md), [brique 19b](../poc/bricks/19b-journalisation/README.md).
+
 ## 8. Choix ouverts
 
 | ADR | Question | Quand |

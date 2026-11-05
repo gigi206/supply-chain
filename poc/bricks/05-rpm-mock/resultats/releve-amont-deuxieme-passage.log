@@ -1,0 +1,56 @@
+relevé du 05/11/2026 à 22:26 UTC
+
+## mock dans EPEL 9
+mock-6.9-1.el9.noarch.rpm
+mock-core-configs-45.2-1.el9.noarch.rpm
+
+## Rocky : versions publiées et archivées
+pub   : 9.0 9.1 9.2 9.3 9.4 9.5 9.6 9.7 9.8 
+vault : 9.0 9.1 9.2 9.3 9.4 9.5 9.6 9.7 
+BaseOS 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+AppStream 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+CRB 9.7 : repomd.xml HTTP 200, repomd.xml.asc HTTP 200, sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+
+## Debian stable (madison)
+sbuild stable 0.89.3+deb13u4
+mmdebstrap stable 1.5.7-1+deb13u1
+diffoscope stable 297+deb13u1
+reprotest stable 0.7.30
+golang-go stable 2:1.24~2
+nodejs stable 20.19.2+dfsg-1+deb13u2
+
+## Instantané Debian 20261105T000000Z
+InRelease HTTP 200, 1 redirection, servi par https://snapshot.debian.org/file/aa33cb317177428f33c9ff72fc3e9b634645f6ae/InRelease
+sha1 du contenu : aa33cb317177428f33c9ff72fc3e9b634645f6ae (l'adresse de /file/ est le sha1 du contenu)
+Suite: stable
+Codename: trixie
+Date: Sat, 12 Sep 2026 07:55:41 UTC
+Valid-Until : 0 ligne
+
+## Configuration de mock, tag mock-core-configs-45.2-1
+include('templates/rocky-9.tpl')
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/$basearch/debug/tree/
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/$basearch/os/
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/source/tree/
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/$basearch/debug/tree/
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/$basearch/os/
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/source/tree/
+
+## Documentation hermétique de mock, tag mock-6.9-1
+9:Mock (v5.7+) supports hermetic RPM builds, sometimes referred to as "isolated"
+176:  helpful for, doesn't provide reproducible builds.  For reproducible builds,
+185:  For now, we also require the Bootstrap Image to be *ready*.  This simplifies
+204:  now—avoid using mirrored repositories (and prefer Koji buildroots only) and
+38:Currently, we do not provide a compatibility promise.  Only the exact same
+39:version of Mock that produced the file is guaranteed to read and process it.
+
+## Manuel de sbuild, tag debian/0.89.3+deb13u4
+417:Don't enable network access during build (only implemented for the unshare mode) (default).  This
+1320:two small suid binaries (newuidmap and newgidmap). This backend allows
+
+## uidmap de Debian 13 : droits de newuidmap (paquet lu, rien d'extrait ni d'exécuté)
+OK   Packages.xz présent dans InRelease
+OK   uidmap_4.17.4-2_amd64.deb : sha256 conforme à l'index
+-rwsr-xr-x root/root     63584 2025-04-19 12:20 ./usr/bin/newgidmap
+-rwsr-xr-x root/root     59488 2025-04-19 12:20 ./usr/bin/newuidmap
+scripts du paquet : 0  postinst
