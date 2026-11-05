@@ -39,6 +39,14 @@ Hors cluster, D6 exclut déjà Zot, Forgejo, Loki et Grafana.
 
 **(c) Hubble et Kyverno : déconseillé.** Kyverno est la porte d'admission. Il dépendrait de cert-manager, qui dépend d'OpenBao, scellé après chaque redémarrage des VM ([`redemarrer.sh`](../08-trust-plane/redemarrer.sh)). Aujourd'hui, Kyverno renouvelle seul ses certificats.
 
+**Additif du 05/11/2026, 21:02 UTC, réponse du propriétaire** : « on en aura besoin pour exposer des services ensuite ». cert-manager reste donc prévu, **lié à l'exposition de services**, et non abandonné. Pas d'installation dans le rejeu RKE2 ni dans la 08c, sauf demande contraire.
+
+À trancher au moment de ce jalon, rien de mesuré ici :
+- quels services sont exposés, et avec quels noms ;
+- quelle Gateway : aucune n'est retenue au PoC, et celle de Cilium reste exclue tant que `l7Proxy` vaut `false` ;
+- quel émetteur, et qui fait confiance à sa racine. Zot, Forgejo, Loki et Grafana restent hors de portée tant qu'ils ne passent pas par cette Gateway ;
+- les droits relevés ci-dessus restent à réduire avant l'installation.
+
 ## Prédictions sous (b)
 
 Écrites le 05/11/2026 à 20:50 UTC, avant toute exécution. Elles ne valent que sous D7 (b), après le rejeu RKE2 et hors des étapes de la 08c en cours.
