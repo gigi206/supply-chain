@@ -66,6 +66,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 05/11/2026, 20:50 UTC** : les relevés de la [brique 08d](../../poc/bricks/08d-cert-manager/README.md) remettent en cause l'intérêt de cert-manager dans le PoC (D6 de la 08b), sans rien changer à cette décision : un seul consommateur direct, Hubble, dont le port n'a pas de client, et deux comptes de plus sur tous les Secrets du cluster. Décision D7 soumise au propriétaire.
 
+> **Additif du 05/11/2026, 21:39 UTC** : relevé à sec pour S1 dans la [brique 08c](../../poc/bricks/08c-durcissement/README.md), sans décision et sans note. `bearer.oidc` existe dans Zot v2.1.22, mais la règle `zone-build` interdit les jetons dans `builds`, et l'émetteur du cluster est injoignable depuis l'hôte de Zot. Proposition soumise au propriétaire : `zot-chains` injecté, `forgejo-webhook` copié, `zot-images` et `zot-fermetures` copiés sauf assouplissement de `zone-build`.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

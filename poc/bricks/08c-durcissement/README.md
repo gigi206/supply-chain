@@ -62,6 +62,35 @@ Relevé du cluster le 05/11/2026, 23 Secrets, valeurs non lues :
 
 **S1, recommandé (a)** : lecture directe d'OpenBao par jeton court, comme pour l'horodatage et le scan. Le secret n'existe alors pas dans Kubernetes. External Secrets seulement si un outil exige un vrai Secret. **(b)** : External Secrets partout : plus simple, mais le secret reste dans etcd, et le fournisseur OpenBao est listé en alpha.
 
+### Relevé pour S1 (05/11/2026, 21:39 UTC, lecture seule)
+
+Demande du propriétaire : ne pas trancher S1, et confirmer à sec l'hypothèse « supprimer d'abord, injecter ensuite, copier en dernier recours ». Rien n'a été modifié. [`releve-secrets.sh`](releve-secrets.sh), journaux `resultats/releve-secrets-<étape>.log`. Ce relevé ne note aucune grille de l'ADR 0000.
+
+| Secret | Consommateur et usage | Ce qu'il exige | Sort proposé |
+|---|---|---|---|
+| `zot-chains` | Contrôleur Chains, volume, fichier lu par `DOCKER_CONFIG` | Un fichier `config.json`, relu à chaque résolution. Pas de Secret : le trousseau Kubernetes ne lit que ce que le compte référence, et `build` ne référence rien ([journal](resultats/releve-secrets-chains.log)) | **Injecté** |
+| `zot-images` | Tâche signée `publier-image`, compte `build`, volume, `oras --to-registry-config` | Un fichier `config.json` dans le pod. Aucun jeton n'y est permis pour aller le chercher ailleurs | **Copié**, sauf choix contraire |
+| `zot-fermetures` | Tâche signée `publier-fermeture`, même compte, même usage | Idem | **Copié**, sauf choix contraire |
+| `forgejo-webhook` | Intercepteur `core-interceptors`, via `secretRef` de l'EventListener | Un vrai Secret : `Secrets(triggerNS).Get` ([journal](resultats/releve-secrets-webhook.log)) | **Copié** |
+
+**Aucun des quatre n'est utilisé en `imagePullSecrets`.** Les nœuds tirent de Zot en anonyme : `registries.yaml` ne porte que la CA, aucune ligne d'authentification dans containerd, lecture HTTP 200 depuis les trois nœuds ([journal](resultats/releve-secrets-noeuds.log)). BuildKit n'a pas d'identifiant : sortie `type=oci` dans le workspace, entrées locales, aucune sortie réseau ([journal](resultats/releve-secrets-buildkit.log)).
+
+**« Supprimer » est bloqué pour l'instant**, malgré `bearer.oidc` présent dans Zot v2.1.22 ([journal](resultats/releve-secrets-zot.log)) :
+- **Zone build** : `zone-build`, en `Deny`, refuse tout jeton de compte projeté dans `builds`. L'OIDC de Zot comme OpenBao en ont besoin. La NetworkPolicy d'OpenBao n'admet pas non plus `builds`. Cette règle bloque aussi l'injection pour `zot-images` et `zot-fermetures` ;
+- **Émetteur** : Zot tourne sur l'hôte `sc-stockage`, où `kubernetes.default.svc.cluster.local` ne se résout pas. La découverte et le JWKS y répondent 401. Le code ne prévoit ni clé statique ni en-tête d'authentification vers l'émetteur ;
+- **htpasswd** : la combinaison avec `bearer.oidc` n'est pas listée dans la documentation au tag. Dès que `realm` et `service` sont posés, Zot annonce un défi Bearer, et l'échange de jeton ne reconnaît que l'OIDC et les clés d'API. Lu, pas essayé. Il y a 9 comptes htpasswd ;
+- **Chains** : il lui faudrait de toute façon un `config.json` réécrit à chaque jeton, le trousseau ne lisant pas un jeton projeté.
+
+**Injection sans nouveau composant, prédiction** : le motif du job d'horodatage (conteneur d'initialisation, `auth/jwt`, `kv/`, volume vide, révocation du jeton) est déjà en service et mesuré. `tekton-chains` remplit ses conditions : jeton d'audience `openbao` projeté, espace admis par OpenBao. Il reste un rôle et une politique `kv` distincts de ceux de Transit. L'Agent Injector n'apporterait rien ici, et il n'a pas été audité au doc 04. Un OpenBao scellé bloquerait le redémarrage de Chains, qui ne peut de toute façon pas signer dans cet état.
+
+**Mention « listé en alpha » : exacte.** La page publiée et sa source au tag v2.14.0 listent OpenBao en alpha, mainteneur @phil9909 ([journal](resultats/releve-secrets-stabilite.log)). Nuance : la page du fournisseur renvoie au fournisseur Vault, listé stable, et indique un essai avec External Secrets v0.16.1 et OpenBao v2.2.0, loin de v2.14.0 et v2.7.2. Le texte de S1 ci-dessus reste valable.
+
+**Autres constats** :
+- `signing-secrets` n'a aucune clé. Il reste monté par Chains ;
+- `zot-build` n'existe plus. `tekton/builds.yaml` le cite encore, et `politique.sh chains` retire la référence. Deux pods terminés le gardent ;
+- sur `sc-stockage`, `/etc/hosts` résout le nom de Zot en 127.0.1.1, où il n'écoute pas. Sans effet aujourd'hui : aucun pod de ce nœud ne tire de Zot. À revoir si cela change. Premier passage archivé ;
+- `kv/` est actif dans OpenBao depuis J8 (`tsa.sh`).
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
