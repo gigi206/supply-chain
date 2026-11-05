@@ -1,0 +1,13 @@
+# Brique 08c, S1 : retour au Secret zot-chains (secrets.sh s1_retrait). politique.sh chains seul ne suffit pas : son correctif
+# ajouterait secret à un volume qui garde emptyDir, ce que l'API refuse.
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: identifiants
+        $patch: delete
+      volumes:
+      - name: zot-chains
+        emptyDir: null
+        secret:
+          secretName: zot-chains

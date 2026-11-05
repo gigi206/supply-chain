@@ -91,6 +91,33 @@ Demande du propriétaire : ne pas trancher S1, et confirmer à sec l'hypothèse 
 - sur `sc-stockage`, `/etc/hosts` résout le nom de Zot en 127.0.1.1, où il n'écoute pas. Sans effet aujourd'hui : aucun pod de ce nœud ne tire de Zot. À revoir si cela change. Premier passage archivé ;
 - `kv/` est actif dans OpenBao depuis J8 (`tsa.sh`).
 
+### Décision S1 (05/11/2026, 21:56 UTC) : « Oui, valide S1 »
+
+Le propriétaire valide les trois choix recommandés, après la question « n est ce trop compliqué sans ESO ? » :
+1. `zone-build` reste telle quelle. `zot-images` et `zot-fermetures` restent des Secrets, copiés depuis OpenBao ;
+2. `forgejo-webhook` : copie scriptée depuis OpenBao, sans External Secrets ;
+3. OIDC de Zot : reporté.
+
+`zot-chains` est injecté par le motif du job d'horodatage. Aucun nouveau composant, donc pas de passage au doc 04. External Secrets et l'Agent Injector restent non audités et non essayés. À rouvrir pour la plateforme finale si une rotation automatique est exigée, si le nombre de Secrets obligatoires augmente, ou avec plusieurs clusters.
+
+**Jalon préparé à sec, rien appliqué.** [`secrets.sh`](secrets.sh) `verifier` est conforme, 20 contrôles ([journal](resultats/secrets-verifier.log)) : correctif de Chains joué en local, aller et retour, puis admis en dry-run serveur, comme un pod complet. Le chemin `kv/`, les témoins et le conteneur d'initialisation n'ont jamais tourné.
+
+| Étape | Effet | Prédiction, écrite avant toute exécution |
+|---|---|---|
+| `s1_source` | 4 chemins `kv/`, politique et rôle `chains-zot` | Relecture identique aux sources, le webhook octet pour octet. Le jeton de la politique lit `kv/tekton-chains/zot`, et rien d'autre : ni `kv/horodatage/zot`, ni `kv/builds/`, ni `transit/`, ni écriture. Compte `horodatage` refusé à la connexion |
+| `s1_chains` | Conteneur d'initialisation, volume en mémoire, Secret supprimé | Déploiement prêt en moins de 180 s, journal « jeton révoqué ». Seul `signing-secrets` reste monté comme Secret. Le prochain passage écrit `.sig` et `.att` avec `poc-build`, sans autre changement du contrôleur |
+| `s1_copies` | 3 Secrets recréés depuis OpenBao | Contenu inchangé : publication et test 5 (HMAC) identiques |
+
+**Place dans la brique** : après H4, avant H5, pour que le passage en `Deny` juge l'état final. Après H4, le chemin vers OpenBao reste celui de Transit : `tekton-chains` est dans la liste fermée, et la NetworkPolicy d'OpenBao l'admet.
+
+**Ce que S1 n'apporte pas** :
+- **OpenBao n'est pas l'origine des valeurs.** `stockage.sh` tourne avant OpenBao et bâtit le htpasswd de Zot depuis les mots de passe de l'hôte. `secrets.sh` les recopie, et ils restent sur l'hôte. Le gain des copies est une source unique pour les consommateurs, pas une rotation ;
+- **Le rejeu recrée les Secrets.** `politique.sh chains`, `construction.sh`, `prefetch.sh` et `tekton.sh` ne sont pas modifiés. Il faut relancer `secrets.sh` après chaque rejeu, jusqu'à une intégration que je ne propose qu'une fois le jalon prouvé ;
+- **`politique.sh chains` rejoué sur Chains injecté échoue** : volume à deux sources, refus de l'API mesuré en dry-run. `s1_retrait` est le chemin de retour ;
+- **Redémarrage des VM** : OpenBao scellé, le conteneur d'initialisation échoue et kubelet espace ses relances, jusqu'à 5 min. [`redemarrer.sh`](../08-trust-plane/redemarrer.sh) recrée le pod TSA pour cette raison, pas celui de Chains. Avant tout redémarrage après `s1_chains`, il faudra y ajouter le même traitement. Je prédis un contrôle `prets tekton-chains` en échec ou retardé sans cela.
+
+Estimation : 4 h. Une décision s'impose à partir de 8 h.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

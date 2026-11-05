@@ -68,6 +68,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 05/11/2026, 21:39 UTC** : relevé à sec pour S1 dans la [brique 08c](../../poc/bricks/08c-durcissement/README.md), sans décision et sans note. `bearer.oidc` existe dans Zot v2.1.22, mais la règle `zone-build` interdit les jetons dans `builds`, et l'émetteur du cluster est injoignable depuis l'hôte de Zot. Proposition soumise au propriétaire : `zot-chains` injecté, `forgejo-webhook` copié, `zot-images` et `zot-fermetures` copiés sauf assouplissement de `zone-build`.
 
+> **Additif du 05/11/2026, 21:56 UTC** : S1 tranchée par le propriétaire (« Oui, valide S1 »), sans External Secrets. `zone-build` reste telle quelle, `zot-chains` est injecté par le motif de l'horodatage, `zot-images`, `zot-fermetures` et `forgejo-webhook` restent des Secrets copiés depuis OpenBao, l'OIDC de Zot est reporté. Aucune note ne change. Jalon préparé à sec dans la [brique 08c](../../poc/bricks/08c-durcissement/README.md), rien appliqué. OpenBao ne devient pas l'origine des valeurs : les mots de passe restent sur l'hôte, car `stockage.sh` tourne avant lui.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

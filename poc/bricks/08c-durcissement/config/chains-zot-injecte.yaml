@@ -1,0 +1,64 @@
+# Brique 08c, S1 : correctif stratégique du contrôleur Chains (secrets.sh s1_chains). Reprend le motif du job d'horodatage (J8) :
+# conteneur d'initialisation, identifiants lus dans OpenBao, volume en mémoire, jeton révoqué. Le volume garde son nom, son point
+# de montage et DOCKER_CONFIG : le contrôleur ne change pas. Le jeton projeté d'audience openbao et ca-poc existent déjà.
+# @BAO@ : image d'OpenBao par digest, celle de politique.sh.
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: identifiants
+        image: @BAO@
+        command: [sh, -c]
+        args:
+        - |
+          set -eu
+          umask 077
+          # Quelques essais : le réseau d'un pod neuf (J3). Pendant un scellement, le conteneur échoue et kubelet le relance.
+          n=1
+          until BAO_TOKEN=$(bao write -field=token auth/jwt/login role=chains-zot jwt=@/var/run/secrets/openbao/token \
+              2> /etc/zot-chains/erreur); do
+            [ $n -lt 30 ] || { cat /etc/zot-chains/erreur >&2; exit 1; }
+            n=$((n + 1)); sleep 1
+          done
+          rm -f /etc/zot-chains/erreur
+          export BAO_TOKEN
+          bao read -field=config.json kv/tekton-chains/zot > /etc/zot-chains/config.json
+          bao token revoke -self >/dev/null
+          echo "identifiants Zot lus dans OpenBao (rôle chains-zot, essai $n) ; jeton révoqué"
+        env:
+        - name: BAO_ADDR
+          value: https://openbao.openbao.svc.cluster.local:8200
+        - name: BAO_CACERT
+          value: /etc/ca-poc/ca.crt
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
+          runAsGroup: 65532
+          capabilities:
+            drop: [ALL]
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - name: zot-chains
+          mountPath: /etc/zot-chains
+        - name: ca-poc
+          mountPath: /etc/ca-poc
+          readOnly: true
+        - name: openbao-jeton
+          mountPath: /var/run/secrets/openbao
+          readOnly: true
+      volumes:
+      - name: zot-chains
+        secret: null
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1Mi
