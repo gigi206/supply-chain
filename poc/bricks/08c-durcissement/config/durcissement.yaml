@@ -1,0 +1,9 @@
+# Brique 08c : fichier d'appoint de RKE2 (/etc/rancher/rke2/config.yaml.d/durcissement.yaml, 0600), sur le server. Réglages repris de
+# docs/rke2/hardening.md et de vagrant/scripts/install_master.sh du dépôt du propriétaire (https://github.com/gigi206/k8s). Une clé suffixée
+# s'ajoute à la liste de config.yaml. kube-apiserver ne garde que la dernière valeur d'enable-admission-plugins : NodeRestriction, posé par le
+# profil cis, doit figurer ici (piège noté dans ce dépôt). AlwaysPullImages reste absent : il casserait les images préchargées.
+kube-apiserver-arg+:
+  - enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit
+  - request-timeout=60s
+  - service-account-lookup=true
+pod-security-admission-config-file: /etc/rancher/rke2/admission.yaml

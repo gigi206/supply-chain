@@ -1,0 +1,4 @@
+# Brique 08c : troisième -f de cilium.sh après H3, une fois les flux relevés en audit.
+hostFirewall:
+  enabled: true
+policyAuditMode: false

@@ -62,6 +62,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Décision du propriétaire (05/11/2026) : RKE2 à la place de k3s, dans le PoC** (« A la place de k3s ce sera un rke2 plutot », puis « PoC maintenant »). Durci avec `profile: cis`, audit activé ; Cilium reste le CNI, avec `kubeProxyReplacement=true` ; anti-usurpation et test 6 à remesurer. Le point 1 ci-dessus reste écrit tel quel, mais il est **remplacé pour le PoC** dès que la [brique 08b](../../poc/bricks/08b-rke2/README.md) aura passé son seuil. **Rien n'est installé à cette date** : k3s reste en service, et les mesures de cet ADR ont été faites sous k3s. Au doc 04, RKE2 est « À surveiller » (Scorecard 5,9, images sans signature trouvée). Constats à sec : le contrôleur Helm de RKE2 ne se désactive pas, et RKE2 ne fournit pas de provisionneur de volumes.
 
+> **Additif du 05/11/2026** : exigence du propriétaire de durcir le cluster au maximum (PSA, Kyverno, rôles, politiques Cilium, audit), préparée à sec dans la [brique 08c](../../poc/bricks/08c-durcissement/README.md). Rien n'est appliqué, et aucune note n'est modifiée. Le pare-feu d'hôte de Cilium y couvrirait pour la première fois Zot et Forgejo, processus de l'hôte hors de portée des NetworkPolicy.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

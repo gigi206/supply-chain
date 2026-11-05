@@ -139,3 +139,10 @@ Elles remplacent la liste du 05/11/2026, 20:10 UTC, sous D1 à D6 (a). Elles val
 10. **Disque et mémoire** : `sc-stockage` garde au moins 5 Go libres (9,1 Go aujourd'hui, images de RKE2 en plus). `sc-confiance` n'atteint pas le seuil d'éviction pendant le scan.
 11. **`kube-bench`** : des FAIL ou WARN liés au profil inadapté. Chacun sera classé, aucun n'est prédit.
 12. **Durée et correctifs** : plus de 3 574 s, et au moins un KO corrigé avant un passage complet. Les passages ratés seront archivés.
+
+## Additif : idées du dépôt `gigi206/k8s` (05/11/2026, 20:39 UTC, « Oui, intègre »)
+
+- **Correctif de la conversion** : sous RKE2, kubelet et containerd écrivent dans des fichiers, pas dans le journal. Ils n'étaient ni collectés ni contrôlés. [`journaux-rke2.alloy`](config/alloy/journaux-rke2.alloy) les envoie à Loki, `fuites.sh` les lit, et les sources attendues de la 19b les vérifient. Repéré dans [`gigi206/k8s`](https://github.com/gigi206/k8s).
+- **Politique d'audit** : [`config/audit-policy.yaml`](config/audit-policy.yaml), reprise de ce dépôt et adaptée, remplace `k3s/audit-policy.yaml` sous RKE2. Elle **revient sur D14 (a) de la 19b** : les lectures de Secrets et de ConfigMaps sont journalisées pour tous, en Metadata. Sous k3s, rien ne change.
+- **Prédiction ajoutée au n° 9** : les journaux `kubelet` et `containerd` sont lus dans Grafana, et les tests qui lisent l'audit repassent. Le volume d'audit est relevé, pas prédit.
+- Le reste du durcissement est dans la [brique 08c](../08c-durcissement/README.md), après le rejeu de cette brique.

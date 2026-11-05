@@ -1,0 +1,102 @@
+# Brique 08b : journal d'audit de l'API sous RKE2. Reprend deploy/argocd/audit-policy-base.yaml du dépôt du propriétaire
+# (https://github.com/gigi206/k8s, relu le 05/11/2026), adapté à la plateforme : lectures de Secrets et de ConfigMaps journalisées pour tous,
+# jetons de compte de service en Metadata, ressources de Tekton, Kyverno et Cilium ajoutées. Remplace D14 (a) de la 19b, qui excluait les
+# lectures. La première règle qui correspond s'applique : les règles sensibles viennent avant les exclusions de volume. Le contenu des Secrets et
+# des ConfigMaps n'est jamais journalisé (Metadata), et aucune règle en Request ou RequestResponse ne vise serviceaccounts/token.
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages:
+  - RequestReceived
+rules:
+  # Sondes et métriques : volume sans intérêt
+  - level: None
+    nonResourceURLs: ["/healthz*", "/livez*", "/readyz*", "/version", "/metrics"]
+  # Événements et baux : très gros volume
+  - level: None
+    resources:
+      - group: ""
+        resources: ["events", "endpoints"]
+      - group: "events.k8s.io"
+        resources: ["events"]
+      - group: "coordination.k8s.io"
+        resources: ["leases"]
+  # Ressources sensibles, en Metadata seulement, comptes système compris
+  - level: Metadata
+    users:
+      - system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers   # lu par preuves.sh resolveurs
+    verbs: ["get", "list", "watch"]
+    resources:
+      - group: ""
+        resources: ["secrets", "serviceaccounts"]
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["secrets", "configmaps", "serviceaccounts/token"]
+      - group: "authentication.k8s.io"
+        resources: ["tokenreviews"]
+      - group: "authorization.k8s.io"
+        resources: ["subjectaccessreviews", "selfsubjectaccessreviews", "selfsubjectrulesreviews"]
+      - group: "certificates.k8s.io"
+        resources: ["certificatesigningrequests"]
+  # Lectures courantes des composants système et flux de watch : très gros volume
+  - level: None
+    users:
+      - system:kube-scheduler
+      - system:apiserver
+      - system:kube-controller-manager
+      - system:serviceaccount:kube-system:generic-garbage-collector
+      - system:serviceaccount:kube-system:namespace-controller
+      - system:serviceaccount:kube-system:resourcequota-controller
+      - system:serviceaccount:kube-system:rke2-coredns
+    verbs: ["get", "list", "watch"]
+  - level: None
+    verbs: ["watch"]
+  # Accès interactif : kubectl exec passe par un GET depuis Kubernetes 1.30
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["pods/exec", "pods/portforward", "pods/attach"]
+    verbs: ["create", "get"]
+  # Ce qui peut contourner la plateforme : droits, admission, CRD, agrégation, RuntimeClass, règles de la porte et du réseau
+  - level: RequestResponse
+    resources:
+      - group: "rbac.authorization.k8s.io"
+      - group: "admissionregistration.k8s.io"
+      - group: "apiextensions.k8s.io"
+        resources: ["customresourcedefinitions"]
+      - group: "apiregistration.k8s.io"
+        resources: ["apiservices"]
+      - group: "node.k8s.io"
+        resources: ["runtimeclasses"]
+      - group: "policies.kyverno.io"
+      - group: "kyverno.io"
+      - group: "cilium.io"
+        resources: ["ciliumnetworkpolicies", "ciliumclusterwidenetworkpolicies"]
+      - group: "tekton.dev"
+        resources: ["verificationpolicies"]
+    verbs: ["create", "delete", "update", "patch", "deletecollection"]
+  - level: RequestResponse
+    resources:
+      - group: ""
+        resources: ["namespaces", "serviceaccounts"]
+    verbs: ["create", "delete", "update", "patch"]
+  # Charges de travail : corps de la requête, pour suivre les changements
+  - level: Request
+    resources:
+      - group: ""
+        resources: ["pods", "services", "persistentvolumeclaims", "persistentvolumes"]
+      - group: "apps"
+        resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+      - group: "batch"
+        resources: ["jobs", "cronjobs"]
+      - group: "networking.k8s.io"
+    verbs: ["create", "delete", "update", "patch"]
+  # Exécutions de Tekton : créations et suppressions. Les mises à jour de statut restent en Metadata (règle finale), code de réponse compris,
+  # ce que lit le test 3
+  - level: Request
+    resources:
+      - group: "tekton.dev"
+        resources: ["pipelineruns", "taskruns"]
+    verbs: ["create", "delete"]
+  # Tout le reste : métadonnées, écritures et lectures
+  - level: Metadata

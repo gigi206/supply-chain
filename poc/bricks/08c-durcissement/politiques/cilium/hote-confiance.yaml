@@ -1,0 +1,33 @@
+# Brique 08c : pare-feu d'hôte de sc-confiance. Le supervisor (9345) n'accepte que les nœuds : c'est ce qui ferme la limite relevée par le test 6
+# de la 08b. L'API reste ouverte aux pods : leur sortie est déjà bornée par leurs propres politiques. Plage NodePort : l'EventListener, joint par
+# Forgejo depuis sc-stockage et par les essais depuis l'hôte.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: hote-confiance
+spec:
+  description: "sc-confiance : API, supervisor des nœuds seulement, EventListener"
+  nodeSelector:
+    matchLabels:
+      zone: confiance
+  ingress:
+    - fromEntities: [cluster]
+      toPorts:
+        - ports:
+            - {port: "6443", protocol: TCP}
+    - fromCIDR: [192.168.161.1/32]
+      toPorts:
+        - ports:
+            - {port: "6443", protocol: TCP}
+    - fromEntities: [remote-node]
+      toPorts:
+        - ports:
+            - {port: "9345", protocol: TCP}
+    - fromEntities: [remote-node]
+      toPorts:
+        - ports:
+            - {port: "30000", endPort: 32767, protocol: TCP}
+    - fromCIDR: [192.168.161.1/32]
+      toPorts:
+        - ports:
+            - {port: "30000", endPort: 32767, protocol: TCP}

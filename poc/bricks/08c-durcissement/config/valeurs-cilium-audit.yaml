@@ -1,0 +1,5 @@
+# Brique 08c : troisième -f de cilium.sh pendant H3. Pare-feu d'hôte activé, sans rien bloquer. Le mode audit ne survit pas au redémarrage d'un
+# agent : la doc de Cilium le dit, et un agent relancé appliquerait aussitôt les politiques d'hôte. D'où la console virsh prête pendant H3.
+hostFirewall:
+  enabled: true
+policyAuditMode: true

@@ -324,6 +324,7 @@ etape_alloy() {
     rm -rf "${D:?}" && (umask 077 && mkdir -p "$D/config")
     for r in ${ROLES[$v]}; do cp "$here/config/alloy/$r"/*.alloy "$D/config/"; done
     sed -i "s#/var/lib/rancher/k3s#$D_ETAT#" "$D"/config/*.alloy
+    [ "$DISTRO" = k3s ] || cp "$here/../08b-rke2/config/alloy/journaux-rke2.alloy" "$D/config/"   # kubelet et containerd, en fichiers sous RKE2
     cp "$A/$ALLOY_ARCHIVE" "$here/systemd/alloy.service" "$P/ca-poc.crt" "$D/"
     if [ "$v" = sc-stockage ]; then
       cp "$P/alloy-stockage.crt" "$D/client.crt"; cp "$S/alloy-stockage.key" "$D/client.key"
@@ -388,7 +389,8 @@ etape_controle_l3() {
            '{noeud="sc-stockage", source="journal", unite="forgejo.service"}' '{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}' \
            '{noeud="sc-confiance", source="pods", espace="tekton-chains"}' '{noeud="sc-build", source="pods"}' \
            '{noeud="sc-confiance", source="audit-k8s"}' '{source="evenements-k8s"}' \
-           '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}'; do
+           '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}' \
+           ${D_JOURNAUX:+'{noeud="sc-build", source="rke2", composant="kubelet"}' '{noeud="sc-confiance", source="rke2", composant="containerd"}'}; do
     c=$(loki_requete "sum(count_over_time(${q}[24h]))" | awk '{print $NF}')   # 168h : antérieur au schéma de Loki (avertissements)
     printf '%-110s %s\n' "$q" "${c:-0}"
   done

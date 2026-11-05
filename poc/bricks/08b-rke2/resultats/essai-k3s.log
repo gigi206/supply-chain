@@ -1,13 +1,14 @@
-# essai-k3s.sh, 2026-11-05T20:22:22Z, base d1ae7b1
+# essai-k3s.sh, 2026-11-05T20:39:34Z, base d1ae7b1
 ## 1. substitution inverse (lignes restantes : ce qui change vraiment)
 --- poc/bricks/08-trust-plane/buildkit.sh : 3 ligne(s)
 <   e=$(sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n' \
 <     | grep -c -x -- '--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml' || true)
 >   e=$(args_apiserver | grep -c -x -- "--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml" || true)
---- poc/bricks/08-trust-plane/cilium.sh : 4 ligne(s)
+--- poc/bricks/08-trust-plane/cilium.sh : 5 ligne(s)
 <   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" --reset-values \
 >   local supp=()
 >   [ "$DISTRO" = k3s ] || supp=(-f "$here/../08b-rke2/config/valeurs-cilium.yaml")   # kubeProxyReplacement sous RKE2 (brique 08b)
+>   [ -z "${VALEURS_08C:-}" ] || supp+=(-f "$VALEURS_08C")   # pare-feu d'hôte, posé par durcissement.sh (brique 08c)
 >   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" "${supp[@]}" --reset-values \
 --- poc/bricks/08-trust-plane/commun.sh : 1 ligne(s)
 > . "${BASH_SOURCE[0]%/*}/distro.sh"
@@ -93,10 +94,14 @@
 >       sed "$([ "$DISTRO" = k3s ] || [ "$vm" != sc-confiance ] || echo "s#<memory unit='GiB'>8<#<memory unit='GiB'>12<#")" "$here/libvirt/$vm.xml" > 
 >       v define "$W/$vm.xml"
 >     fi
---- poc/bricks/19b-journalisation/journalisation.sh : 5 ligne(s)
+--- poc/bricks/19b-journalisation/journalisation.sh : 9 ligne(s)
 >     sed -i "s#/var/lib/rancher/k3s#/var/lib/rancher/k3s#" "$D"/config/*.alloy
+>     [ "$DISTRO" = k3s ] || cp "$here/../08b-rke2/config/alloy/journaux-rke2.alloy" "$D/config/"   # kubelet et containerd, en fichiers sous RKE2
 <   for q in '{noeud="sc-confiance", source="journal", unite="k3s.service"}' '{noeud="sc-build", source="journal"}' \
 >   for q in "{noeud=\"sc-confiance\", source=\"journal\", unite=\"k3s.service\"}" '{noeud="sc-build", source="journal"}' \
+<            '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}'; do
+>            '{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""' '{noeud="sc-stockage", source="audit-zot"}' \
+>            ${D_JOURNAUX:+'{noeud="sc-build", source="rke2", composant="kubelet"}' '{noeud="sc-confiance", source="rke2", composant="containerd"}'}; 
 <   q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"k3s.service\"}","queryType":"range","maxLines":5}
 >   q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"'"k3s"'.service\"}","queryType":"range","maxLines
 ## 2. lectures réelles sous k3s

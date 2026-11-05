@@ -1,0 +1,107 @@
+# Brique 08c : règles d'admission ajoutées à celles de la 08, en Audit d'abord (44 pods hors kube-system sans limites au relevé du 05/11/2026) :
+# elles passent en Deny une fois les refus relevés. Espaces système exclus, comme dans la 08. Idées de jetons montés et d'espace default reprises
+# du dépôt du propriétaire (https://github.com/gigi206/k8s), écrites en validation et non en mutation : une mutation changerait les pods de build.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: limites-obligatoires
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kube-public, kube-node-lease, kyverno, local-path-storage]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE]
+      resources: [pods]
+  validations:
+  - expression: >-
+      object.spec.containers.all(c, has(c.resources) && has(c.resources.limits)
+        && 'memory' in c.resources.limits && 'cpu' in c.resources.limits)
+    message: "durcissement : limites de mémoire et de CPU obligatoires"
+---
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: images-zot-par-digest
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kube-public, kube-node-lease, kyverno, local-path-storage]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE]
+      resources: [pods]
+  variables:
+  - name: images
+    expression: >-
+      object.spec.containers.map(c, c.image)
+      + (has(object.spec.initContainers) ? object.spec.initContainers.map(c, c.image) : [])
+  validations:
+  - expression: "variables.images.all(i, i.startsWith('sc-stockage.poc.test:5000/') && i.contains('@sha256:'))"
+    message: "durcissement : image du Zot du PoC, par digest"
+---
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: espace-default-interdit
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values: [default]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE]
+      resources: [pods]
+  validations:
+  - expression: "false"
+    message: "durcissement : aucun pod dans l'espace default"
+---
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: jeton-compte-default
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kube-public, kube-node-lease]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE]
+      resources: [pods]
+  validations:
+  - expression: >-
+      !(!has(object.spec.serviceAccountName) || object.spec.serviceAccountName == 'default')
+      || (has(object.spec.automountServiceAccountToken) && !object.spec.automountServiceAccountToken)
+    message: "durcissement : le compte default ne monte pas de jeton"

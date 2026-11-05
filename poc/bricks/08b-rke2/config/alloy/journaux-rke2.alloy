@@ -1,0 +1,13 @@
+// Brique 08b : sous RKE2, le kubelet et containerd écrivent dans des fichiers, pas dans le journal de l'unité (repéré dans le dépôt du
+// propriétaire, https://github.com/gigi206/k8s, application alloy). Copié par journalisation.sh quand DISTRO=rke2, sur les trois nœuds.
+local.file_match "rke2" {
+  path_targets = [
+    {"__path__" = "/var/lib/rancher/rke2/agent/logs/*.log", source = "rke2", composant = "kubelet"},
+    {"__path__" = "/var/lib/rancher/rke2/agent/containerd/containerd.log", source = "rke2", composant = "containerd"},
+  ]
+}
+
+loki.source.file "rke2" {
+  targets    = local.file_match.rke2.targets
+  forward_to = [loki.write.sortie.receiver]
+}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: essai
+  namespace: builds
+spec:
+  serviceAccountName: default
+  automountServiceAccountToken: false
+  containers:
+  - name: c
+    image: sc-stockage.poc.test:5000/amont/busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi

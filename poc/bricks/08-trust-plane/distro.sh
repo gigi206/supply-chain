@@ -15,6 +15,7 @@ case $DISTRO in
     D_CTR="k3s ctr"
     D_SERVING=k3s-serving                  # Secret de kube-system, cible des refus de lecture de preuves.sh
     D_LP_NS=kube-system                    # espace de local-path-provisioner
+    D_JOURNAUX=""                          # journaux en fichiers propres à la distribution, en plus de /var/log
     ;;
   rke2)
     D_CONF=/etc/rancher/rke2
@@ -27,6 +28,7 @@ case $DISTRO in
     D_CTR="/var/lib/rancher/rke2/bin/ctr --address /run/k3s/containerd/containerd.sock"
     D_SERVING=rke2-serving
     D_LP_NS=local-path-storage
+    D_JOURNAUX="/var/lib/rancher/rke2/agent/logs /var/lib/rancher/rke2/agent/containerd"   # kubelet et containerd
     ;;
   *) echo "DISTRO inconnue : $DISTRO" >&2; exit 1 ;;
 esac

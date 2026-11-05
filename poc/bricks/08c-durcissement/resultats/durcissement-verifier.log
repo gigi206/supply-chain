@@ -1,0 +1,43 @@
+# durcissement.sh verifier, 2026-11-05T20:39:28Z, DISTRO=k3s
+## politique d'audit : première règle qui correspond, sur des cas prédits
+OK   Metadata alice get  secrets
+OK   Metadata system:serviceaccount:tekton-chains:tekton-chains-controller get  secrets
+OK   Metadata system:kube-controller-manager get  secrets
+OK   Metadata alice create  secrets
+OK   Metadata alice patch  configmaps
+OK   Metadata alice create  serviceaccounts/token
+OK   RequestResponse alice create  pods/exec
+OK   RequestResponse alice get  pods/exec
+OK   RequestResponse alice patch rbac.authorization.k8s.io clusterroles
+OK   RequestResponse alice delete policies.kyverno.io validatingpolicies
+OK   RequestResponse alice create cilium.io ciliumclusterwidenetworkpolicies
+OK   Request alice create  pods
+OK   Request alice create tekton.dev pipelineruns
+OK   Metadata alice patch tekton.dev taskruns/status
+OK   Metadata alice get  pods
+OK   None system:kube-scheduler get  pods
+OK   None alice watch  pods
+OK   None alice create coordination.k8s.io leases
+règles : 12 , dernière : {'level': 'Metadata'}
+OK   aucun corps de requête pour les Secrets, les ConfigMaps et les jetons
+## règles Kyverno, CLI sur des pods d'essai (attendu dans le nom : -pass ou -fail)
+OK   espace-default-interdit--a-fail : ["fail"]
+OK   images-zot-par-digest--a-pass : ["pass"]
+OK   images-zot-par-digest--b-fail : ["fail"]
+OK   images-zot-par-digest--c-fail : ["fail"]
+OK   jeton-compte-default--a-pass : ["pass"]
+OK   jeton-compte-default--b-fail : ["fail"]
+OK   jeton-compte-default--c-pass : ["pass"]
+OK   limites-obligatoires--a-pass : ["pass"]
+OK   limites-obligatoires--b-fail : ["fail"]
+## manifestes validés par l'API en service (dry-run : rien n'est créé)
+OK   espaces-sans-politique.yaml : 1 objet(s)
+OK   hote-commun.yaml : 1 objet(s)
+OK   hote-confiance.yaml : 1 objet(s)
+OK   hote-stockage.yaml : 1 objet(s)
+OK   durcissement.yaml : 4 objet(s)
+## valeurs de Cilium, rendues sans cluster
+valeurs-cilium-audit : enable-host-firewall: "true"; enable-l7-proxy: "false"; kube-proxy-replacement: "true"; policy-audit-mode: "true"
+valeurs-cilium : enable-host-firewall: "true"; enable-l7-proxy: "false"; kube-proxy-replacement: "true"; policy-audit-mode: "false"
+valeurs-cilium-wireguard : enable-encryption-strict-mode-egress: "true"; enable-host-firewall: "false"; enable-l7-proxy: "false"; enable-wireguard: "true"; encryption-strict-egress-cidr: "10.42.0.0/16"; kube-proxy-replacement: "true"
+RÉSULTAT : conforme

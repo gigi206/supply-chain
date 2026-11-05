@@ -1,0 +1,33 @@
+# Brique 08c : pare-feu d'hôte de sc-stockage. Zot, Forgejo, Grafana et Loki sont des processus de l'hôte, hors de portée des NetworkPolicy
+# (constat de la 19b) : cette politique les couvre pour la première fois. 192.168.162.0/24 : réseau de sc-replay, lecture anonyme de Zot et de
+# Forgejo ; l'adresse vue après routage par libvirt est à confirmer en audit.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: hote-stockage
+spec:
+  description: "sc-stockage : Zot et Forgejo du cluster, Grafana et Loki de l'hôte, relais d'Alloy des nœuds"
+  nodeSelector:
+    matchLabels:
+      zone: stockage
+  ingress:
+    - fromEntities: [cluster]
+      toPorts:
+        - ports:
+            - {port: "5000", protocol: TCP}
+            - {port: "3000", protocol: TCP}
+    - fromCIDR: [192.168.161.1/32, 192.168.162.0/24]
+      toPorts:
+        - ports:
+            - {port: "5000", protocol: TCP}
+            - {port: "3000", protocol: TCP}
+    - fromCIDR: [192.168.161.1/32]
+      toPorts:
+        - ports:
+            - {port: "3001", protocol: TCP}
+            - {port: "3100", protocol: TCP}
+    - fromEntities: [remote-node]
+      toPorts:
+        - ports:
+            - {port: "3501", protocol: TCP}
+            - {port: "3502", protocol: TCP}

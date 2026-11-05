@@ -21,7 +21,7 @@ echo "## 1. substitution inverse (lignes restantes : ce qui change vraiment)"
 for f in $(git -C "$repo" diff --name-only "$BASE" -- poc/bricks/08-trust-plane poc/bricks/19b-journalisation | grep -v distro.sh); do
   git -C "$repo" show "$BASE:$f" > "$W/avant" 2>/dev/null || continue
   sed -e "s#\$D_ETAT#$D_ETAT#g" -e "s#\$D_CONF#$D_CONF#g" -e "s#\$D_CRICTL#$D_CRICTL#g" -e "s#\$D_CTR#$D_CTR#g" -e "s#\$D_SERVEUR#$D_SERVEUR#g" \
-      -e "s#\$D_AGENT#$D_AGENT#g" -e "s#\$D_SERVING#$D_SERVING#g" -e "s#\$D_LP_NS#$D_LP_NS#g" "$repo/$f" > "$W/apres"
+      -e "s#\$D_AGENT#$D_AGENT#g" -e "s#\$D_SERVING#$D_SERVING#g" -e "s#\$D_LP_NS#$D_LP_NS#g" -e "s# \$D_JOURNAUX##" "$repo/$f" > "$W/apres"
   n=$(diff "$W/avant" "$W/apres" | grep -c '^[<>]')
   echo "--- $f : $n ligne(s)"
   diff "$W/avant" "$W/apres" | grep '^[<>]' | cut -c1-150

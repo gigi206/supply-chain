@@ -1,0 +1,34 @@
+# Brique 08c : pare-feu d'hôte, base des trois nœuds. Structure reprise de default-deny-host-ingress du dépôt du propriétaire
+# (https://github.com/gigi206/k8s), resserrée : cette règle y laisse entrer tout le trafic de cluster, donc les pods, ce qui ne fermerait pas
+# 9345 et 2379. Ports issus du relevé `ss` du 05/11/2026 sous k3s, à confirmer en audit sous RKE2. 192.168.161.1 : l'hôte d'administration.
+# Fermés : etcd (2379 à 2381), LLMNR (5355), métriques de l'opérateur (9963).
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: hote-commun
+spec:
+  description: "Nœuds : SSH de l'hôte, kubelet et santé de Cilium entre nœuds"
+  nodeSelector: {}
+  ingress:
+    - fromEntities: [host]
+    - fromCIDR: [192.168.161.1/32]
+      toPorts:
+        - ports:
+            - {port: "22", protocol: TCP}
+    - fromEntities: [remote-node]
+      toPorts:
+        - ports:
+            - {port: "10250", protocol: TCP}
+            - {port: "4240", protocol: TCP}
+            - {port: "4244", protocol: TCP}
+    - fromEntities: [health]
+      toPorts:
+        - ports:
+            - {port: "4240", protocol: TCP}
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:app: rke2-metrics-server
+      toPorts:
+        - ports:
+            - {port: "10250", protocol: TCP}

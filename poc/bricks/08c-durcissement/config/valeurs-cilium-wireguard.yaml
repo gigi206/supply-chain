@@ -1,0 +1,13 @@
+# Brique 08c, H6 (mesure, pas décision) : chiffrement WireGuard de Cilium entre nœuds, sans Envoy ni mesh, idée reprise de
+# vagrant/scripts/configure_cilium.sh du dépôt du propriétaire (https://github.com/gigi206/k8s). Format du chart 1.20.4 : strictMode y est séparé en
+# egress et ingress, l'ancienne forme n'a plus d'effet (rendu à sec du 05/11/2026). Le guide Kata de Cilium signale une limite de MTU avec
+# WireGuard : à mesurer sur la construction.
+encryption:
+  enabled: true
+  type: wireguard
+  nodeEncryption: true
+  strictMode:
+    egress:
+      enabled: true
+      cidr: 10.42.0.0/16
+      allowRemoteNodeIdentities: true

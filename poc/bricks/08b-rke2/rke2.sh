@@ -98,7 +98,7 @@ $RKE2_IMG_SHA  $RKE2_IMG
 $(cat "$A/sums.txt")
 $(grep ' cilium-amd64.tar$' "$cil/sums.txt")"
   if [ "$role" = server ]; then
-    fichiers+=("$cil/operator-generic-amd64.tar" "$b08/k3s/audit-policy.yaml")
+    fichiers+=("$cil/operator-generic-amd64.tar" "$C/audit-policy.yaml")
     sommes="$sommes
 $(grep ' operator-generic-amd64.tar$' "$cil/sums.txt")"
   fi

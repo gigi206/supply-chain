@@ -1,0 +1,8 @@
+# Brique 08c : fichier d'appoint de RKE2 (/etc/rancher/rke2/config.yaml.d/kubelet.yaml, 0600), sur les trois nœuds. Réglages repris du dépôt
+# du propriétaire (https://github.com/gigi206/k8s, deploy/argocd/config/config.yaml). pod-max-pids est à mesurer sur la construction.
+kubelet-arg+:
+  - anonymous-auth=false
+  - event-qps=5
+  - pod-max-pids=4096
+  - seccomp-default=true
+  - tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
