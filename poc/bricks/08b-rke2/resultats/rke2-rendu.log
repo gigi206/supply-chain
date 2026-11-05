@@ -1,0 +1,17 @@
+# rke2.sh rendu, 2026-11-05T20:20:30Z
+OK   rke2.linux-amd64.tar.gz
+OK   rke2-images-core.linux-amd64.tar.zst
+OK   rke2-coredns-1.47.102.tgz
+OK   rke2-metrics-server-3.14.001.tgz
+OK   local-path-storage.yaml
+OK   archives de local-path et de busybox
+OK   archives de Cilium
+OK   local-path : 2 images par digest, chemin "paths":["/var/lib/rancher/rke2/storage"]
+6:      ca_file: /etc/rancher/rke2/ca-poc.crt
+CoreDNS : 9 label(s) kube-dns, clusterIP 10.43.0.10 ; metrics-server : 12 label(s)
+## ConfigMap cilium-config, RKE2 contre k3s (seules ces clés doivent différer)
+>   bpf-lb-sock-hostns-only: "true"
+<   kube-proxy-replacement: "false"
+>   kube-proxy-replacement-healthz-bind-address: ""
+>   kube-proxy-replacement: "true"
+l7 :  enable-l7-proxy: "false", external-envoy-proxy: "false"

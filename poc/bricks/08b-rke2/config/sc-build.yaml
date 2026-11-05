@@ -1,0 +1,9 @@
+# Brique 08b : nœud de build, RKE2 agent. Même taint que la 08 ; jonction par le supervisor (9345), jeton agent au format sécurisé (K10…).
+server: https://192.168.161.11:9345
+token-file: /etc/rancher/rke2/jeton
+node-ip: 192.168.161.12
+profile: cis
+node-label:
+  - zone=build
+node-taint:
+  - zone=build:NoSchedule

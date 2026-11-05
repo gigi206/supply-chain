@@ -1,0 +1,28 @@
+# Brique 08b : nœud de confiance, RKE2 server, durci CIS (décision du propriétaire du 05/11/2026). Même séparation des jetons que la 08.
+# cni: none, disable : RKE2 ne pose ni CNI ni charts, donc aucun HelmChart et aucun compte helm-* (D1 a). Cilium, CoreDNS et metrics-server
+# restent en service, installés depuis l'hôte par rke2.sh. disable-kube-proxy : Cilium remplace kube-proxy (kubeProxyReplacement=true).
+token-file: /etc/rancher/rke2/jeton
+agent-token-file: /etc/rancher/rke2/jeton-agent
+node-ip: 192.168.161.11
+tls-san:
+  - 192.168.161.11
+  - sc-confiance.poc.test
+node-label:
+  - zone=confiance
+profile: cis
+cni: none
+ingress-controller: none
+disable-kube-proxy: true
+disable:
+  - rke2-coredns
+  - rke2-metrics-server
+  - rke2-snapshot-controller
+  - rke2-snapshot-controller-crd
+  - rke2-snapshot-validation-webhook
+write-kubeconfig-mode: "0600"
+audit-policy-file: /etc/rancher/rke2/audit-policy.yaml
+kube-apiserver-arg:
+  - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log
+  - audit-log-maxage=30
+  - audit-log-maxbackup=10
+  - audit-log-maxsize=100

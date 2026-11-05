@@ -86,7 +86,7 @@ etape_revue() {
   done < <(ref_images "$D"/*/github/*.yaml)
   d=$(crane digest "$BUSYBOX_AMONT")
   a=$(amd64 "${BUSYBOX_AMONT%:*}@$BUSYBOX_INDEX")
-  sur sc-confiance "sudo k3s ctr -n k8s.io images ls name==$BUSYBOX_AMONT" | grep -F "$BUSYBOX_INDEX" >/dev/null \
+  sur sc-confiance "sudo $D_CTR -n k8s.io images ls name==$BUSYBOX_AMONT" | grep -F "$([ "$DISTRO" = k3s ] && echo "$BUSYBOX_INDEX" || echo "$a")" >/dev/null \
     && [ "$d" = "$BUSYBOX_INDEX" ] && echo "OK   busybox 1.37.0 : ${BUSYBOX_INDEX:7:12} = image airgap de k3s sur sc-confiance = tag docker.io ; linux/amd64 ${a:7:12}" \
     || { echo "KO   busybox : $d" >&2; exit 1; }
   printf '%s\t%s\t%s\t%s\n' "$BUSYBOX_AMONT" "$BUSYBOX_INDEX" "$a" "$REG/amont/rancher/mirrored-library-busybox@$a" >> "$TSV"

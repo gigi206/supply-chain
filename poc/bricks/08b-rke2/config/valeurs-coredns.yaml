@@ -1,0 +1,5 @@
+# Brique 08b : chart rke2-coredns 1.47.102 installé depuis l'hôte (D1 a). RKE2 fournit ces globales quand il pose le chart lui-même.
+# Le chart garde le label k8s-app=kube-dns, celui des NetworkPolicy du PoC et de default-network-dns-policy (profil cis).
+global:
+  clusterDNS: 10.43.0.10
+  clusterDomain: cluster.local

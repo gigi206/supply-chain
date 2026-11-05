@@ -23,6 +23,8 @@ POOL_DIR=/var/lib/libvirt/supply-chain-poc
 NET=supply-chain-poc
 VMS=(sc-confiance sc-build sc-stockage)
 declare -A TAILLE=([sc-confiance]=15G [sc-build]=30G [sc-stockage]=20G)
+. "$here/distro.sh"
+[ "$DISTRO" = k3s ] || TAILLE[sc-confiance]=25G   # D3 a de la 08b, avec 12 Gi ci-dessous
 declare -A IP=([sc-confiance]=192.168.161.11 [sc-build]=192.168.161.12 [sc-stockage]=192.168.161.13)
 S=$O/ssh
 W=$O/travail
@@ -97,7 +99,10 @@ creer() {
       televerser "$W/$vm-graine.iso" "$vm-graine.iso" raw
       rm -f "$W/$vm-graine.iso"
     fi
-    existe dom "$vm" || v define "$here/libvirt/$vm.xml"
+    if ! existe dom "$vm"; then
+      sed "$([ "$DISTRO" = k3s ] || [ "$vm" != sc-confiance ] || echo "s#<memory unit='GiB'>8<#<memory unit='GiB'>12<#")" "$here/libvirt/$vm.xml" > "$W/$vm.xml"
+      v define "$W/$vm.xml"
+    fi
     v autostart --disable "$vm" >/dev/null
   done
   v pool-refresh "$POOL" >/dev/null

@@ -112,7 +112,9 @@ etape_rendre() { rendre_valeurs; empreintes; }
 etape_installer() {
   rendre_valeurs
   echo "## release cilium (helm $(helm version --short), depuis l'hôte)"
-  helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" --reset-values \
+  local supp=()
+  [ "$DISTRO" = k3s ] || supp=(-f "$here/../08b-rke2/config/valeurs-cilium.yaml")   # kubeProxyReplacement sous RKE2 (brique 08b)
+  helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" "${supp[@]}" --reset-values \
     --server-side=true --wait=watcher --timeout 5m --hide-notes
   attendu "release cilium : statut et version" "$(helm list -n kube-system -f '^cilium$' -o json | jq -r '.[] | "\(.status) \(.chart)"')" "deployed cilium-$CILIUM_VER"
 }

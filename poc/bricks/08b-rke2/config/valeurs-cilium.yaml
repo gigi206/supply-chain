@@ -1,0 +1,7 @@
+# Brique 08b : ajouts aux valeurs de la 08 (cilium/valeurs.yaml), passés en second -f par cilium.sh quand DISTRO=rke2.
+#   - kubeProxyReplacement : choix du propriétaire du 05/11/2026, avec disable-kube-proxy: true dans la configuration de RKE2 ;
+#   - socketLB.hostNamespaceOnly : exigé par le guide Kata de Cilium, le socket LB étant sans effet dans une VM.
+# l7Proxy et envoy restent coupés (décision du 03/11/2026) : la Gateway API de Cilium n'est donc pas disponible.
+kubeProxyReplacement: true
+socketLB:
+  hostNamespaceOnly: true

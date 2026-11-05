@@ -11,6 +11,7 @@ set -euo pipefail
 export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
+. "$here/distro.sh"
 R=$here/resultats
 O=${CONFIANCE_DIR:-$HOME/.cache/supply-chain-poc/08}
 S=$O/secrets
@@ -32,7 +33,7 @@ printf '%s\n' "$temoin" > "$W/temoin"
 ko=0
 for vm in sc-confiance sc-build sc-stockage; do
   "$here/ssh.sh" "$vm" "logger -t fuites-temoin $temoin" < /dev/null
-  (umask 077 && "$here/ssh.sh" "$vm" 'sudo journalctl -o cat --no-pager; sudo find /var/log /var/lib/rancher/k3s/server/logs /var/lib/rancher/k3s/storage -type f -name "*.log" -exec cat {} + 2>/dev/null' \
+  (umask 077 && "$here/ssh.sh" "$vm" "sudo journalctl -o cat --no-pager; sudo find /var/log $D_ETAT/server/logs $D_ETAT/storage -type f -name '*.log' -exec cat {} + 2>/dev/null" \
     < /dev/null > "$W/$vm.txt" || true)
   echo "## $vm : $(wc -l < "$W/$vm.txt") lignes de journaux"
   n=$(grep -c -F -f "$W/temoin" "$W/$vm.txt" || true)

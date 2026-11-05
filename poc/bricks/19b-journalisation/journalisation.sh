@@ -71,9 +71,9 @@ etape_releve() {
   kubectl get events -A --no-headers 2>/dev/null | awk '{print $1}' | sort | uniq -c | sort -rn | head -8
   echo "## audits existants"
   echo "### serveur k3s (ligne de commande et configuration)"
-  sur sc-confiance "sudo grep -rn audit /etc/rancher/k3s/ 2>/dev/null || echo '  aucune mention d audit dans /etc/rancher/k3s'; \
-    sudo grep -v '^ *#' /etc/rancher/k3s/audit-policy.yaml; sudo ls -l /var/lib/rancher/k3s/server/logs/; \
-    sudo awk -v t='$t' '\$0 ~ \"requestReceivedTimestamp\" { if (match(\$0, /\"requestReceivedTimestamp\":\"[^\"]*/) && substr(\$0, RSTART + 28, 19) >= t) { n++; b += length(\$0) + 1 } } END { printf \"  dernière heure : %d événements, %d o\\n\", n, b }' /var/lib/rancher/k3s/server/logs/audit.log"
+  sur sc-confiance "sudo grep -rn audit $D_CONF/ 2>/dev/null || echo '  aucune mention d audit dans $D_CONF'; \
+    sudo grep -v '^ *#' $D_CONF/audit-policy.yaml; sudo ls -l $D_ETAT/server/logs/; \
+    sudo awk -v t='$t' '\$0 ~ \"requestReceivedTimestamp\" { if (match(\$0, /\"requestReceivedTimestamp\":\"[^\"]*/) && substr(\$0, RSTART + 28, 19) >= t) { n++; b += length(\$0) + 1 } } END { printf \"  dernière heure : %d événements, %d o\\n\", n, b }' $D_ETAT/server/logs/audit.log"
   echo "### OpenBao (devices d'audit)"
   racine <<<'bao audit list -format=json 2>&1 || true'
   kubectl exec -n openbao openbao-0 -- sh -c 'ls -l /openbao/data/audit.log; wc -l < /openbao/data/audit.log; df -h /openbao/data | tail -1'
@@ -323,6 +323,7 @@ etape_alloy() {
     echo "## $v : rôles ${ROLES[$v]}"
     rm -rf "${D:?}" && (umask 077 && mkdir -p "$D/config")
     for r in ${ROLES[$v]}; do cp "$here/config/alloy/$r"/*.alloy "$D/config/"; done
+    sed -i "s#/var/lib/rancher/k3s#$D_ETAT#" "$D"/config/*.alloy
     cp "$A/$ALLOY_ARCHIVE" "$here/systemd/alloy.service" "$P/ca-poc.crt" "$D/"
     if [ "$v" = sc-stockage ]; then
       cp "$P/alloy-stockage.crt" "$D/client.crt"; cp "$S/alloy-stockage.key" "$D/client.key"
@@ -383,7 +384,7 @@ etape_controle_l3() {
   echo "## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source"
   loki_requete 'sum by (noeud, source) (count_over_time({source=~".+"}[10m]))' | sort
   echo "## sources attendues (J1 à J6 et J8)"
-  for q in '{noeud="sc-confiance", source="journal", unite="k3s.service"}' '{noeud="sc-build", source="journal"}' \
+  for q in "{noeud=\"sc-confiance\", source=\"journal\", unite=\"$D_SERVEUR.service\"}" '{noeud="sc-build", source="journal"}' \
            '{noeud="sc-stockage", source="journal", unite="forgejo.service"}' '{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}' \
            '{noeud="sc-confiance", source="pods", espace="tekton-chains"}' '{noeud="sc-build", source="pods"}' \
            '{noeud="sc-confiance", source="audit-k8s"}' '{source="evenements-k8s"}' \
@@ -407,7 +408,7 @@ etape_controle_l3() {
   loki_requete "sum by (noeud) (count_over_time({source=\"controle-l3\"} |= \"$m\" [5m]))" | sed 's/^/  stockée sous : /'
   rm -f "${W:?}/push.json"
   echo "## Grafana : l'auditeur lit le journal de k3s"
-  q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"k3s.service\"}","queryType":"range","maxLines":5}],"from":"now-15m","to":"now"}'
+  q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"'"$D_SERVEUR"'.service\"}","queryType":"range","maxLines":5}],"from":"now-15m","to":"now"}'
   c=$(graf auditeur POST /api/ds/query "$q"); echo "HTTP $c, $(jq '[.results.A.frames[]?.data.values[2]? // [] | length] | add // 0' "$W/graf.out" 2>/dev/null) ligne(s)"
   echo "## Alloy : état et erreurs sur les trois VM"
   for v in sc-confiance sc-build sc-stockage; do
@@ -525,7 +526,7 @@ etape_secrets() { # aucun secret connu dans Loki : export de tout Loki sur l'hô
     esac
   done
   # Secrets qui ne vivent que sur les VM, lus par ssh (sortie standard) dans le même répertoire 0700.
-  for v in "sc-confiance:/var/lib/rancher/k3s/server/token" "sc-confiance:/var/lib/rancher/k3s/server/agent-token" \
+  for v in "sc-confiance:$D_ETAT/server/token" "sc-confiance:$D_ETAT/server/agent-token" \
            "sc-stockage:/etc/forgejo/secrets/metrics_token" "sc-stockage:/etc/forgejo/secrets/secret_key" \
            "sc-stockage:/etc/forgejo/secrets/internal_token" "sc-stockage:/etc/forgejo/secrets/jwt_secret"; do
     f=vm-${v%%:*}-$(basename "${v#*:}")

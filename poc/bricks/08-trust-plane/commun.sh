@@ -1,5 +1,6 @@
 # Brique 08 : variables et fonctions communes des jalons J2 et suivants (chargé par stockage.sh, openbao.sh…).
 # Le script appelant pose `here` (son répertoire) avant de charger ce fichier.
+. "${BASH_SOURCE[0]%/*}/distro.sh"
 repo=$(git -C "$here" rev-parse --show-toplevel)
 R=$here/resultats
 O=${CONFIANCE_DIR:-$HOME/.cache/supply-chain-poc/08}
@@ -127,7 +128,7 @@ purger_pr() { # --all | nom… : PipelineRuns de builds supprimés, puis leurs T
 
 audit_api() { # motif (chaîne fixe, sans espace ni guillemet) : lignes de l'audit de l'API qui la contiennent, fichiers tournés
   # compris (audit-log-maxsize=100 : audit-<horodatage>.log par tranche de 100 Mo, puis audit.log), dans l'ordre chronologique
-  sur sc-confiance "sudo sh -c 'grep -hF -- $1 \$(ls -1 /var/lib/rancher/k3s/server/logs/audit*.log | LC_ALL=C sort) || true'"
+  sur sc-confiance "sudo sh -c 'grep -hF -- $1 \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort) || true'"
 }
 
 el_url() { echo "http://${IP[sc-confiance]}:$(kubectl get svc -n "$EL_NS" el-forgejo -o jsonpath='{.spec.ports[?(@.name=="http-listener")].nodePort}')"; }

@@ -637,6 +637,7 @@ EOF
 }
 
 T6_DESTINATIONS="Zot:192.168.161.13:5000 Forgejo:192.168.161.13:3000 API-noeud:192.168.161.11:6443 API-service:10.43.0.1:443 Externe:$EXTERNE:443"
+[ "$DISTRO" = k3s ] || T6_DESTINATIONS="$T6_DESTINATIONS Supervisor:192.168.161.11:9345 Etcd:192.168.161.11:2379"   # ports propres à RKE2 (brique 08b)
 
 t6_ligne() { grep "^$2|" "$T/t6-$1.log" | cut -d'|' -f2- || true; }   # passage clé : champs d'une ligne du journal de l'étape
 
@@ -2473,9 +2474,9 @@ etape_controleurs() {
       template: {metadata: {labels: {app: "preuve-controleurs"}}, spec: (.spec | del(.restartPolicy))}}}' "$T/ct-pod.json" > "$T/ct-sts.json"   # Always seul admis
   jq -n '{apiVersion: "v1", kind: "PersistentVolumeClaim", metadata: {name: "preuve-controleurs", namespace: "kube-system"},
     spec: {accessModes: ["ReadWriteOnce"], storageClassName: "local-path", resources: {requests: {storage: "1Mi"}}}}' > "$T/ct-pvc.json"
-  lp=$(kubectl get pods -n kube-system -l app=local-path-provisioner -o jsonpath='{.items[0].metadata.name}')
+  lp=$(kubectl get pods -n "$D_LP_NS" -l app=local-path-provisioner -o jsonpath='{.items[0].metadata.name}')
   img=$(jq -r '.spec.containers[0].image' "$T/ct-pod.json")
-  echo "pod existant visé : kube-system/$lp (local-path-provisioner, crée des pods dans kube-system) ; StatefulSet visé : openbao/openbao"
+  echo "pod existant visé : $D_LP_NS/$lp (local-path-provisioner, crée des pods dans $D_LP_NS) ; StatefulSet visé : openbao/openbao"
   for u in "$CONTROLEUR" "$CHAINS"; do
     n=${u##*:}
     ct_refus "$RBAC_REFUS" "$n : pod de kube-system portant clusterrole-aggregation-controller" kubectl create --as "$u" -f "$T/ct-pod-ks.json" || k=1
@@ -2486,7 +2487,7 @@ etape_controleurs() {
       --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/containers/0/image\",\"value\":\"$img\"}]" || k=1
     ct_refus "$RBAC_REFUS" "$n : annotation du StatefulSet openbao" kubectl annotate --as "$u" statefulset -n openbao openbao preuve-controleurs=1 || k=1
     ct_refus "$RBAC_REFUS" "$n : pod de tekton-chains portant tekton-chains-controller" kubectl create --as "$u" -f "$T/ct-pod-chains.json" || k=1
-    ct_refus "$RBAC_REFUS" "$n : lecture du Secret kube-system/k3s-serving" kubectl get secret -n kube-system k3s-serving --as "$u" -o name || k=1
+    ct_refus "$RBAC_REFUS" "$n : lecture du Secret kube-system/$D_SERVING" kubectl get secret -n kube-system $D_SERVING --as "$u" -o name || k=1
     ct_refus "$RBAC_REFUS" "$n : liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$u" -o name || k=1
     ct_refus "$RBAC_REFUS" "$n : lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$u" -o name || k=1
   done
@@ -2626,7 +2627,7 @@ etape_resolveurs() {
     kubectl auth can-i get secrets -n tekton-pipelines-resolvers --as "$RESOLVEURS" 2>/dev/null || true; } | paste -sd,)" "no,yes,no,yes,no,yes,yes"
 
   echo "## lectures réelles au nom des résolveurs"
-  ct_refus "$RBAC_REFUS" "lecture du Secret kube-system/k3s-serving" kubectl get secret -n kube-system k3s-serving --as "$RESOLVEURS" -o name || k=1
+  ct_refus "$RBAC_REFUS" "lecture du Secret kube-system/$D_SERVING" kubectl get secret -n kube-system $D_SERVING --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "lecture du compte de service kube-system/default" kubectl get serviceaccount -n kube-system default --as "$RESOLVEURS" -o name || k=1
@@ -2654,7 +2655,7 @@ etape_resolveurs() {
   ba_attendu "refus des droits hors de preuve-resolveurs" "$(grep -vc 'preuve-resolveurs' "$T/rs-refus" || true)" 0
 
   echo "## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)"
-  pol=$(sur sc-confiance "sudo grep -c 'serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers' /etc/rancher/k3s/audit-policy.yaml || true")
+  pol=$(sur sc-confiance "sudo grep -c 'serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers' $D_CONF/audit-policy.yaml || true")
   echo "règle des résolveurs dans la politique d'audit du nœud : $pol"
   audit_api tekton-pipelines-resolvers:tekton-pipelines-resolvers | jq -c --arg u "$RESOLVEURS" 'select(.user.username == $u and .impersonatedUser == null
     and (.objectRef.resource == "secrets" or .objectRef.resource == "serviceaccounts"))' | sort -u > "$T/rs-audit.json"

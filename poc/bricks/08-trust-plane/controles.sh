@@ -9,6 +9,7 @@ set -euo pipefail
 export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
+. "$here/distro.sh"
 R=$here/resultats
 lib=${1:-j1}
 mkdir -p "$R"
@@ -27,21 +28,21 @@ for vm in sc-confiance sc-build sc-stockage; do
     free -m | sed -n 1,2p
     df -h / | tail -1
     echo "sortie NAT (deb.debian.org) : $(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 https://deb.debian.org/debian/ || echo échec)"
-    systemctl is-active k3s k3s-agent 2>/dev/null | paste -sd" " || true'
+    systemctl is-active '"$D_SERVEUR $D_AGENT"' 2>/dev/null | paste -sd" " || true'
 done
 
 echo "## cluster"
-s sc-confiance 'sudo k3s --version | head -1
-  sudo k3s kubectl get nodes -o wide -L zone
-  sudo k3s kubectl get nodes -o custom-columns=NŒUD:.metadata.name,TAINTS:.spec.taints
-  sudo k3s kubectl get pods -A -o wide
-  if sudo k3s kubectl get ds -n kube-system cilium >/dev/null 2>&1; then
-    echo "contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet $(sudo k3s kubectl get ds -n kube-system cilium -o jsonpath="{.status.numberReady}/{.status.desiredNumberScheduled}") prêt"
+s sc-confiance "KC='$D_KUBECTL'; V='$D_VERSION'; "'sudo $V | head -1
+  sudo $KC get nodes -o wide -L zone
+  sudo $KC get nodes -o custom-columns=NŒUD:.metadata.name,TAINTS:.spec.taints
+  sudo $KC get pods -A -o wide
+  if sudo $KC get ds -n kube-system cilium >/dev/null 2>&1; then
+    echo "contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet $(sudo $KC get ds -n kube-system cilium -o jsonpath="{.status.numberReady}/{.status.desiredNumberScheduled}") prêt"
   else echo "contrôleur de NetworkPolicy (kube-router) : $(sudo iptables -S | grep -c KUBE-ROUTER || true) règles KUBE-ROUTER"; fi
-  sudo k3s kubectl top nodes 2>/dev/null || echo "metrics-server pas encore prêt"'
+  sudo $KC top nodes 2>/dev/null || echo "metrics-server pas encore prêt"'
 for vm in sc-confiance sc-build sc-stockage; do
   echo "## images système sur $vm"
-  s "$vm" 'sudo k3s crictl images 2>/dev/null | tail -n +2 | awk "{print \$1\":\"\$2\" \"\$3}"'
+  s "$vm" "CRICTL='$D_CRICTL'; "'sudo $CRICTL images 2>/dev/null | tail -n +2 | awk "{print \$1\":\"\$2\" \"\$3}"'
 done
 
 echo "## hôte : RSS des processus QEMU"

@@ -1,0 +1,184 @@
+# controles.sh essai-08b, 2026-11-05T20:21:16Z
+## sc-confiance
+noyau : 6.12.113+deb13-amd64 ; vCPU : 4 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 0 vCPU sur 4
+/dev/kvm absent
+               total        used        free      shared  buff/cache   available
+Mem:            7947        3296         638          24        4339        4651
+/dev/vda1        15G  8.7G  5.3G  63% /
+sortie NAT (deb.debian.org) : 200
+active inactive
+## sc-build
+noyau : 6.12.113+deb13-amd64 ; vCPU : 6 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 6 vCPU sur 6
+crw-rw---- 1 root kvm 10, 232 Nov  3 22:27 /dev/kvm
+kvm_intel             417792  0
+kvm                  1396736  1 kvm_intel
+               total        used        free      shared  buff/cache   available
+Mem:            9950        1017        2961           2        6284        8932
+/dev/vda1        30G  6.3G   22G  23% /
+sortie NAT (deb.debian.org) : 200
+inactive active
+## sc-stockage
+noyau : 6.12.113+deb13-amd64 ; vCPU : 2 ; modèle :  Intel Core Processor (Haswell, no TSX, IBRS)
+  x86-64-v4
+  x86-64-v3 (supported, searched)
+  x86-64-v2 (supported, searched)
+drapeaux avx512 : 0
+vmx : 0 vCPU sur 2
+/dev/kvm absent
+               total        used        free      shared  buff/cache   available
+Mem:            5931        1766         749           2        3713        4165
+/dev/vda1        20G  9.6G  9.1G  52% /
+sortie NAT (deb.debian.org) : 200
+inactive active
+## cluster
+k3s version v1.35.9+k3s1 (58877f27)
+NAME           STATUS   ROLES           AGE   VERSION        INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>          47h   v1.35.9+k3s1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane   47h   v1.35.9+k3s1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>          47h   v1.35.9+k3s1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+NŒUD           TAINTS
+sc-build       [map[effect:NoSchedule key:zone value:build]]
+sc-confiance   <none>
+sc-stockage    <none>
+NAMESPACE                    NAME                                                              READY   STATUS      RESTARTS   AGE     IP               NODE           NOMINATED NODE   READINESS GATES
+builds                       essai-signature-pod                                               0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       f2-prefetch-1-prefetch-pod                                        0/1     Completed   0          47h     10.42.1.163      sc-build       <none>           <none>
+builds                       f2-prefetch-1-publier-pod                                         0/1     Completed   0          47h     10.42.1.25       sc-build       <none>           <none>
+builds                       f2-prefetch-2-prefetch-pod                                        0/1     Completed   0          46h     10.42.1.251      sc-build       <none>           <none>
+builds                       f2-prefetch-2-publier-pod                                         0/1     Completed   0          46h     10.42.1.228      sc-build       <none>           <none>
+builds                       j6-porte-en-service-publier-pod                                   0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j6-porte-hors-liste-publier-pod                                   0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j6-porte-slsa-publier-pod                                         0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j6-porte-version-non-listee-publier-pod                           0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j6-restreint-confiance-pod                                        0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j6-signee-pod                                                     0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-ancienne-construire-pod                             0/3     Error       0          46h     10.42.1.228      sc-build       <none>           <none>
+builds                       j7-sample-app-construire-pod                                      0/1     Completed   0          46h     10.42.1.162      sc-build       <none>           <none>
+builds                       j7-sample-app-etiquette-preparer-pod                              0/2     Completed   0          46h     10.42.1.181      sc-build       <none>           <none>
+builds                       j7-sample-app-preparer-pod                                        0/2     Completed   0          46h     10.42.1.22       sc-build       <none>           <none>
+builds                       j7-sample-app-publier-pod                                         0/1     Completed   0          46h     10.42.1.146      sc-build       <none>           <none>
+builds                       j7-sample-app-sans-kata-preparer-pod                              0/2     Completed   0          46h     10.42.1.122      sc-build       <none>           <none>
+builds                       preuve-enveloppes-publier-pod                                     0/1     Completed   0          46h     10.42.1.2        sc-build       <none>           <none>
+builds                       preuve-test1-pod                                                  0/1     Completed   0          46h     10.42.1.133      sc-build       <none>           <none>
+builds                       preuve-test7-en-service-publier-pod                               0/1     Completed   0          46h     10.42.1.55       sc-build       <none>           <none>
+builds                       preuve-test7-hors-liste-publier-pod                               0/1     Completed   0          46h     10.42.1.188      sc-build       <none>           <none>
+builds                       sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier-pod   0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       sample-app-2222222222222222222222222222222222222222-publier-pod   0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+builds                       sample-app-22f1c8cd942c372ebd46e93d0779d7ff3c424f5a-publier-pod   0/1     Completed   0          46h     10.42.1.22       sc-build       <none>           <none>
+builds                       sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod   0/2     Completed   0          45h     10.42.1.101      sc-build       <none>           <none>
+builds                       sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod   0/1     Completed   0          45h     10.42.1.22       sc-build       <none>           <none>
+builds                       sample-app-6391fd437f2669687e9b7cc76faf05b526d9bfccede94a6c-pod   0/1     Completed   0          45h     10.42.1.242      sc-build       <none>           <none>
+builds                       sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod   0/1     Completed   0          47h     <none>           sc-build       <none>           <none>
+declencheurs                 el-forgejo-79b6fd78c6-5kwl2                                       1/1     Running     0          47h     10.42.0.82       sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29898499-hlrrr                                         0/1     Completed   0          2m17s   10.42.0.111      sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29898500-hs689                                         0/1     Completed   0          77s     10.42.0.38       sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29898501-zfvz2                                         0/1     Completed   0          17s     10.42.0.142      sc-confiance   <none>           <none>
+horodatage                   h-essai-signature-66hk8                                           0/1     Completed   0          47h     <none>           sc-confiance   <none>           <none>
+horodatage                   h-essai-webhook-6qpvr                                             0/1     Completed   0          47h     <none>           sc-confiance   <none>           <none>
+horodatage                   horodatage-29898499-bx2bw                                         0/1     Completed   0          2m17s   10.42.0.248      sc-confiance   <none>           <none>
+horodatage                   horodatage-29898500-7l55w                                         0/1     Completed   0          77s     10.42.0.61       sc-confiance   <none>           <none>
+horodatage                   horodatage-29898501-kssxd                                         0/1     Completed   0          17s     10.42.0.237      sc-confiance   <none>           <none>
+horodatage                   j5-temoin                                                         0/1     Completed   0          47h     10.42.0.181      sc-confiance   <none>           <none>
+kube-system                  cilium-8pb4f                                                      1/1     Running     0          47h     192.168.161.12   sc-build       <none>           <none>
+kube-system                  cilium-8w8cf                                                      1/1     Running     0          47h     192.168.161.13   sc-stockage    <none>           <none>
+kube-system                  cilium-operator-5c896b4b74-wrhlb                                  1/1     Running     0          47h     192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  cilium-t4zk6                                                      1/1     Running     0          47h     192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  coredns-b644fd95b-z7rmw                                           1/1     Running     0          47h     10.42.0.182      sc-confiance   <none>           <none>
+kube-system                  local-path-provisioner-d9d8769b6-sznmt                            1/1     Running     0          47h     10.42.0.201      sc-confiance   <none>           <none>
+kube-system                  metrics-server-7f4b6d9bd7-xw2fg                                   1/1     Running     0          47h     10.42.0.119      sc-confiance   <none>           <none>
+kyverno                      kyverno-admission-controller-6b78f498b9-9s7z5                     1/1     Running     0          47h     10.42.0.123      sc-confiance   <none>           <none>
+kyverno                      kyverno-background-controller-76bd696776-58825                    1/1     Running     0          47h     10.42.0.198      sc-confiance   <none>           <none>
+kyverno                      kyverno-cleanup-controller-5647df8554-65zlw                       1/1     Running     0          47h     10.42.0.63       sc-confiance   <none>           <none>
+kyverno                      kyverno-reports-controller-7696b58bd5-744nj                       1/1     Running     0          47h     10.42.0.153      sc-confiance   <none>           <none>
+openbao                      openbao-0                                                         1/1     Running     0          47h     10.42.0.79       sc-confiance   <none>           <none>
+scan                         scan-sample-app-29897850-g6hdj                                    0/1     Completed   0          10h     10.42.0.31       sc-confiance   <none>           <none>
+tekton-chains                tekton-chains-controller-bbf64c76f-vkcgh                          1/1     Running     0          47h     10.42.0.175      sc-confiance   <none>           <none>
+tekton-pipelines-resolvers   tekton-pipelines-remote-resolvers-56c4c4d957-7hchv                1/1     Running     0          47h     10.42.0.231      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-events-controller-747c585746-2mnps                         1/1     Running     0          47h     10.42.0.87       sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-controller-65d4c9d57b-mq6j9                      1/1     Running     0          47h     10.42.0.230      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-webhook-5fccc89bd5-bznzv                         1/1     Running     0          47h     10.42.0.207      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-controller-8449556669-b86pd                       1/1     Running     0          47h     10.42.0.66       sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-core-interceptors-6858f95cfc-xph28                1/1     Running     0          47h     10.42.0.187      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-webhook-5d67f65bf8-f5vjl                          1/1     Running     0          47h     10.42.0.227      sc-confiance   <none>           <none>
+tsa                          timestamp-authority-f5c68cb75-fsh9h                               2/2     Running     0          47h     10.42.0.102      sc-confiance   <none>           <none>
+contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet 3/3 prêt
+NAME           CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+sc-build       29m          0%       575Mi           5%          
+sc-confiance   141m         3%       3906Mi          49%         
+sc-stockage    59m          2%       1964Mi          33%         
+## images système sur sc-confiance
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+quay.io/cilium/cilium:v1.20.4 1320017dd0b61
+quay.io/cilium/operator-generic:v1.20.4 1fb303f6baa0b
+sc-stockage.poc.test:5000/amont/kyverno/background-controller:<none> e9626bf73c5e1
+sc-stockage.poc.test:5000/amont/kyverno/cleanup-controller:<none> 73ac800a24b3a
+sc-stockage.poc.test:5000/amont/kyverno/kyverno:<none> b5dc8e933ff42
+sc-stockage.poc.test:5000/amont/kyverno/kyvernopre:<none> 53a61ed92172b
+sc-stockage.poc.test:5000/amont/kyverno/reports-controller:<none> 34cfea895a940
+sc-stockage.poc.test:5000/amont/moby/buildkit:<none> 9cca736f4c5c9
+sc-stockage.poc.test:5000/amont/openbao/openbao:<none> 9089bc6d4aac6
+sc-stockage.poc.test:5000/amont/sigstore/timestamp-server:<none> 6477bb13ab28e
+sc-stockage.poc.test:5000/amont/tektoncd/chains/github.com/tektoncd/chains/cmd/controller:<none> 75999264e8033
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36:<none> 326af4fba18c7
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/events-a9042f7efb0cbade2a868a1ee5ddd52c:<none> 7782f5907bd3b
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d:<none> 68b6d1388a92b
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/webhook-d4749e605405422fd87700164e31b2d1:<none> 1c2c4da16bebc
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/controller-f656ca31de179ab913fa76abc255c315:<none> b57b09ea75470
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/eventlistenersink-7ad1faa98cddbcb0c24990303b220bb8:<none> a781d35c67c7b
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/interceptors-3176d6a3f314c3655b30bfd36e421dd5:<none> 6c8b85f9d0895
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/webhook-dd1edc925ee1772a9f76e2c1bc291ef6:<none> 658c410407a71
+sc-stockage.poc.test:5000/plateforme/outils-horodatage:<none> c4687f5b5d85a
+sc-stockage.poc.test:5000/plateforme/outils-scan:<none> 2788659a992d1
+sc-stockage.poc.test:5000/plateforme/porte:<none> 8eee811aca4e4
+sc-stockage.poc.test:5000/plateforme/rattrapage:<none> 8b16f0d3a0664
+## images système sur sc-build
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+quay.io/cilium/cilium:v1.20.4 1320017dd0b61
+sc-stockage.poc.test:5000/amont/moby/buildkit:<none> 9cca736f4c5c9
+sc-stockage.poc.test:5000/amont/openbao/openbao:<none> 9089bc6d4aac6
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/entrypoint-bff0a22da108bc2f16c818c97641a296:<none> 77c5e5a6f5c30
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/nop-8eac7c133edad5df719dc37b36b62482:<none> 7c5cbc82c0449
+sc-stockage.poc.test:5000/plateforme/builder-go-voie-d:<none> f1190d6003bd6
+sc-stockage.poc.test:5000/plateforme/outils-horodatage:<none> c4687f5b5d85a
+sc-stockage.poc.test:5000/plateforme/outils-prefetch:<none> b7a5ad7ede57e
+sc-stockage.poc.test:5000/workspace/sample-app:<none> 0672b88de1499
+## images système sur sc-stockage
+docker.io/rancher/klipper-helm:v0.13.3-build20260727 8e0d8d2218ec8
+docker.io/rancher/klipper-lb:v0.4.17 eaa1212a2b456
+docker.io/rancher/local-path-provisioner:v0.0.37 683316f41426e
+docker.io/rancher/mirrored-coredns-coredns:1.14.7 97efff2babf85
+docker.io/rancher/mirrored-library-busybox:1.37.0 ff7a7936e9306
+docker.io/rancher/mirrored-library-traefik:3.7.13 88d3f28abf146
+docker.io/rancher/mirrored-metrics-server:v0.9.0 d7b01abacd67f
+docker.io/rancher/mirrored-pause:3.10.2 4a83b15d3ecfe
+quay.io/cilium/cilium:v1.20.4 1320017dd0b61
+## hôte : RSS des processus QEMU
+sc-confiance : 8014 Mo
+sc-build : 8441 Mo
+sc-stockage : 6087 Mo
+               total        used        free      shared  buff/cache   available
+Mem:           62742       40998        4880        5087       22674       21743

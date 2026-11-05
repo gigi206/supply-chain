@@ -144,7 +144,7 @@ etape_configurer() {
   iss=$(kubectl get --raw /.well-known/openid-configuration | jq -r .issuer)
   kubectl get --raw /openid/v1/jwks > "$B/jwks.json"
   [ "$(jq '.keys | length' "$B/jwks.json")" = 1 ] || { echo "KO   le JWKS ne contient pas une seule clé" >&2; exit 1; }
-  sur sc-confiance "sudo openssl pkey -in /var/lib/rancher/k3s/server/tls/service.key -pubout" > "$B/sa.pub"
+  sur sc-confiance "sudo openssl pkey -in $D_ETAT/server/tls/service.key -pubout" > "$B/sa.pub"
   kid=$(jq -r '.keys[0].kid' "$B/jwks.json")
   kid_calc=$(openssl pkey -pubin -in "$B/sa.pub" -outform DER | openssl dgst -sha256 -binary | basenc --base64url | tr -d '=')
   [ "$kid" = "$kid_calc" ] && echo "OK   clé publique de service.key : kid $kid = celui du JWKS (émetteur $iss)" || { echo "KO   kid $kid_calc ≠ $kid" >&2; exit 1; }

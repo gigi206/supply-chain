@@ -1,0 +1,3 @@
+# Brique 08b : fichier d'appoint du server RKE2 (/etc/rancher/rke2/config.yaml.d/pod-security.yaml, 0600), posé par kata.sh exemption, après
+# kata.sh essais, comme sous k3s : avant, le défaut du profil cis (rke2-pss.yaml) doit refuser le pod Kata privilégié que ces essais mesurent.
+pod-security-admission-config-file: /etc/rancher/rke2/pod-security.yaml

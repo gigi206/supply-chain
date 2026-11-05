@@ -44,6 +44,8 @@ lib=${1:-j1-j6}
 # après cette étape (point d'arrêt) ; DEPUIS=<étape> reprend à cette étape, les précédentes étant sautées.
 RESEAU=${RESEAU:-cilium}
 export RESEAU   # même réseau pour k3s.sh, lancé par mise
+. "$here/distro.sh"   # DISTRO=rke2 (brique 08b) : rke2.sh à la place de k3s.sh ; préalable sur l'hôte : rke2.sh telecharger
+export DISTRO
 DEPUIS=${DEPUIS:-}
 JUSQUA=${JUSQUA:-}
 actif=1
@@ -64,7 +66,7 @@ etape() { # libellé commande…
 echo "réseau : $RESEAU${DEPUIS:+ ; reprise à $DEPUIS}${JUSQUA:+ ; arrêt après $JUSQUA}"
 etape démontage mise run confiance:vm -- detruire
 etape VM mise run confiance:vm -- creer
-etape k3s mise run confiance:k3s
+if [ "$DISTRO" = k3s ]; then etape k3s mise run confiance:k3s; else etape RKE2 mise exec -- "$here/../08b-rke2/rke2.sh" installer; fi
 [ "$RESEAU" != cilium ] || etape Cilium mise run confiance:cilium -- verifier
 etape J2 mise run confiance:stockage -- pki zot registre containerd forgejo depot
 etape J3 mise run confiance:openbao -- image deployer initialiser configurer essais redemarrage
@@ -146,4 +148,5 @@ else
   echo "## 10 pousser_vsa, J8 controle6, controle7 et 07a g6_temoins : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)"
 fi
 etape fuites mise run confiance:fuites -- "$lib"
+[ "$DISTRO" = k3s ] || etape "08b (CIS)" mise exec -- "$here/../08b-rke2/rke2.sh" cis
 echo "## durée totale : $(( $(date +%s) - t0 )) s"

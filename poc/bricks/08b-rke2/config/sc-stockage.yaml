@@ -1,0 +1,7 @@
+# Brique 08b : nœud de stockage, RKE2 agent. Jonction par le supervisor (9345), jeton agent au format sécurisé (K10…).
+server: https://192.168.161.11:9345
+token-file: /etc/rancher/rke2/jeton
+node-ip: 192.168.161.13
+profile: cis
+node-label:
+  - zone=stockage

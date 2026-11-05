@@ -349,7 +349,7 @@ etape_construire() {
   cons=$(pod_tache "$PR" construire)
   [ -n "$cons" ] || { kubectl get pipelinerun,taskrun -n builds -l "tekton.dev/pipelineRun=$PR" >&2; echo "KO   pod construire absent" >&2; exit 1; }
   for _ in $(seq 300); do [ "$(kubectl get pod -n builds "$cons" -o jsonpath='{.status.phase}')" = Running ] && break; sleep 1; done
-  q=$(sur sc-build "sudo k3s crictl pods --namespace builds --name $cons -q" | sed -n 1p)
+  q=$(sur sc-build "sudo $D_CRICTL pods --namespace builds --name $cons -q" | sed -n 1p)
   sur sc-build "pgrep -af 'qemu-system.*sandbox-$q'" > "$T/qemu.txt" || true
   echo "processus QEMU du sandbox de $cons : $(wc -l < "$T/qemu.txt")"
   aa=$(kubectl get pods -n builds -l app.kubernetes.io/component=affinity-assistant -o json | jq -r '.items[] | "\(.metadata.name) sur \(.spec.nodeName), phase \(.status.phase)"')

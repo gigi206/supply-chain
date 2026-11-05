@@ -1,0 +1,13 @@
+# rke2.sh telecharger, 2026-11-05T20:20:04Z
+OK   rke2.linux-amd64.tar.gz
+OK   rke2-images-core.linux-amd64.tar.zst
+OK   rke2-coredns-1.47.102.tgz
+OK   rke2-metrics-server-3.14.001.tgz
+OK   local-path-storage.yaml
+OK   kube-bench_0.16.0_linux_amd64.tar.gz
+local-path : archive 15 Mo
+busybox : archive 3 Mo
+  8601f69bd24394328ea0f061f1ff91fb845f18a9261959243fc050bba0b975ae  local-path-amd64.tar
+  a75d8a7961e2f98560fddf6cdd3cbd120bbeadeb8d24fb190cf4474be36fde80  busybox-amd64.tar
+OK   archives de Cilium
+téléchargements : 846 Mo

@@ -172,15 +172,16 @@ etape_registre() {
 
 etape_containerd() {
   refus "pull sur sc-build sans la CA du PoC" "x509|certificate signed by unknown authority" \
-    sur sc-build "sudo k3s crictl pull $REG/$DEPOT@$APP_DIGEST"
+    sur sc-build "sudo $D_CRICTL pull $REG/$DEPOT@$APP_DIGEST"
   local vm unite
   for vm in sc-stockage sc-build sc-confiance; do
-    if [ "$vm" = sc-confiance ]; then unite=k3s; else unite=k3s-agent; fi
-    copier "$vm" /tmp/registre-installation "$here/stockage/registries.yaml" "$P/ca-poc.crt"
+    if [ "$vm" = sc-confiance ]; then unite=$D_SERVEUR; else unite=$D_AGENT; fi
+    sed "s#/etc/rancher/k3s#$D_CONF#" "$here/stockage/registries.yaml" > "$W/registries.yaml"
+    copier "$vm" /tmp/registre-installation "$W/registries.yaml" "$P/ca-poc.crt"
     sur "$vm" sudo bash -s <<EOF
 set -euo pipefail
-install -m 0644 /tmp/registre-installation/ca-poc.crt /etc/rancher/k3s/ca-poc.crt
-install -m 0600 /tmp/registre-installation/registries.yaml /etc/rancher/k3s/registries.yaml
+install -m 0644 /tmp/registre-installation/ca-poc.crt $D_CONF/ca-poc.crt
+install -m 0600 /tmp/registre-installation/registries.yaml $D_CONF/registries.yaml
 rm -rf /tmp/registre-installation
 systemctl restart $unite
 EOF
@@ -190,7 +191,7 @@ EOF
       sleep 2
     done
     [ "$ok" = 1 ] || { echo "KO   $vm pas Ready après redémarrage" >&2; exit 1; }
-    echo "$vm : $unite redémarré, nœud Ready ; $(sur "$vm" "sudo cat /var/lib/rancher/k3s/agent/etc/containerd/certs.d/$REG/hosts.toml" | grep -E 'ca|server' | paste -sd' ')"
+    echo "$vm : $unite redémarré, nœud Ready ; $(sur "$vm" "sudo cat $D_ETAT/agent/etc/containerd/certs.d/$REG/hosts.toml" | grep -E 'ca|server' | paste -sd' ')"
   done
   kubectl get ns j2-essais >/dev/null 2>&1 || kubectl create ns j2-essais
   attendre_sa j2-essais
@@ -347,7 +348,7 @@ etape_depot() {
   # Forgejo enregistre la branche de façon asynchrone après le premier push (404 pendant quelques secondes).
   local b="" n
   for n in $(seq 30); do
-    b=$(sur sc-build "sudo curl -fsS --cacert /etc/rancher/k3s/ca-poc.crt $FORGEJO/api/v1/repos/$DEPOT/branches/main" 2>/dev/null) && break
+    b=$(sur sc-build "sudo curl -fsS --cacert $D_CONF/ca-poc.crt $FORGEJO/api/v1/repos/$DEPOT/branches/main" 2>/dev/null) && break
     sleep 1
   done
   [ -n "$b" ] || { echo "KO   branche main illisible depuis sc-build" >&2; exit 1; }

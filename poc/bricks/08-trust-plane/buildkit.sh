@@ -231,7 +231,7 @@ etape_essais() {
   kubectl delete pod -n builds j7-bk-unshare --ignore-not-found --wait=true >/dev/null
   kubectl create -f "$T/j7-bk-unshare.json" >/dev/null
   kubectl wait -n builds pod/j7-bk-unshare --for=condition=Ready --timeout=300s >/dev/null
-  q=$(sur sc-build "sudo k3s crictl pods --namespace builds --name j7-bk-unshare --state ready -q")
+  q=$(sur sc-build "sudo $D_CRICTL pods --namespace builds --name j7-bk-unshare --state ready -q")
   sur sc-build "pgrep -af 'qemu-system.*sandbox-$q'" > "$T/qemu.txt"
   kubectl wait -n builds pod/j7-bk-unshare --for=jsonpath='{.status.phase}'=Succeeded --timeout=300s >/dev/null \
     || { kubectl describe pod -n builds j7-bk-unshare >&2; echo "KO   pod j7-bk-unshare non terminé" >&2; exit 1; }
@@ -309,7 +309,7 @@ echo "tmpfs, relu : $(getfattr -n user.essai /m/f 2>&1 | grep user.essai)"'
 
 releve_virtiofsd() { # pod : processus virtiofsd du sandbox du pod sur sc-build, dans $T/virtiofsd.txt
   local q
-  q=$(sur sc-build "sudo k3s crictl pods --namespace builds --name $1 --state ready -q")
+  q=$(sur sc-build "sudo $D_CRICTL pods --namespace builds --name $1 --state ready -q")
   sur sc-build "sudo pgrep -a virtiofsd" | grep -F "$q" > "$T/virtiofsd.txt" || true   # par nom de processus : ni QEMU ni sudo
   echo "virtiofsd du sandbox $q : $(wc -l < "$T/virtiofsd.txt") processus ; options : $(tr ' ' '\n' < "$T/virtiofsd.txt" | grep -E '^-' | sort -u | paste -sd' ')"
 }
@@ -328,8 +328,7 @@ etape_exempte() {
   echo "kata privilégié, en root (UID 0, buildkitd sans rootlesskit) : démon en process-mode sandbox, réseau host (mode auto sans"
   echo "       configuration CNI : repli sur l'hôte, netproviders) ; constructions a, b et c réussies ; l'étape ne voit pas le démon ;"
   echo "       Zot joignable par le réseau par défaut, injoignable en --network=none"
-  e=$(sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n' \
-    | grep -c -x -- '--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml' || true)
+  e=$(args_apiserver | grep -c -x -- "--admission-control-config-file=$D_CONF/pod-security.yaml" || true)
   [ "$e" = 1 ] && echo "OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption)" \
     || { echo "KO   exemption absente : lancer kata.sh exemption" >&2; exit 1; }
   echo "## mesures"

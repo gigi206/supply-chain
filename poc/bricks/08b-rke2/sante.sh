@@ -5,6 +5,7 @@
 #               des adresses (hors robots), fusionneurs des 100 dernières PR, SECURITY.md, avis publiés
 #   signatures  sommes publiées de RKE2 à la version visée ; signatures cherchées sur les images (cosign tree) ; cert-manager :
 #               cosign verify avec la clé publiée par le projet, témoin d'une autre image refusé
+#   kubebench   mêmes critères pour kube-bench (D5 a)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08b-rke2/sante.sh <étape>…   (journal : resultats/sante-<étape>.log)
 set -uo pipefail
@@ -63,6 +64,20 @@ etape_signatures() {
   rc=0; cosign verify --signature-digest-algorithm sha512 --insecure-ignore-tlog --key "$T/cert-manager.pem" "$LP_IMAGE" > /dev/null 2> "$T/verify.err" || rc=$?
   echo "témoin : autre image avec la même clé : rc $rc (refus attendu) ; $(tail -1 "$T/verify.err")"
   echo "provenance cherchée : $(cosign tree "quay.io/jetstack/cert-manager-controller:$CM_TAG" 2>&1 | grep -c -i -E 'attestation|provenance') entrée(s)"
+}
+
+etape_kubebench() { # D5 a : outil lancé ponctuellement sur les nœuds, hors du chemin critique
+  local r=aquasecurity/kube-bench
+  printf 'kube-bench\t%s\tconformité\tnon\n' "$r" > "$T/projets.tsv"
+  "$repo/tools/health/scorecard.sh" "$T/projets.tsv"
+  gh api "repos/$r" --jq '"archivé \(.archived), licence \(.license.spdx_id)"'
+  echo "dernière release : $(gh api "repos/$r/releases/latest" --jq '"\(.tag_name) du \(.published_at[0:10])"')"
+  echo "fichiers de la release : $(gh api "repos/$r/releases/latest" --jq '[.assets[].name | select(test("checksums|sig$|pem$|bundle$|intoto"))] | join(", ")')"
+  echo "commits depuis $DEPUIS : $(gh api "repos/$r/commits?since=$DEPUIS&per_page=100" --paginate --jq '.[].sha' | wc -l)"
+  echo "fusionneurs des 100 dernières PR : $(gh pr list --repo "$r" --state merged --limit 100 --json mergedBy --jq '[.[] | .mergedBy.login] | group_by(.) | map("\(.[0]) \(length)") | join(", ")')"
+  echo "SECURITY.md : $(gh api "repos/$r/contents/SECURITY.md" --jq .name 2>/dev/null || echo absent)"
+  echo "avis publiés : $(gh api "repos/$r/security-advisories?per_page=100" --jq 'length')"
+  echo "profils RKE2 : $(gh api "repos/$r/contents/cfg" --jq '[.[].name | select(startswith("rke2-"))] | join(" ")')"
 }
 
 for e in "$@"; do

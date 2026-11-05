@@ -1,0 +1,14 @@
+# sante.sh kubebench, 2026-11-05T20:21:11Z
+Relevé du 2026-11-05 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| kube-bench | aquasecurity/kube-bench | conformité | non | 5.2 | 2026-03-16 | 10 | 0 | 10 | ? |
+archivé false, licence Apache-2.0
+dernière release : v0.16.0 du 2026-08-05
+fichiers de la release : kube-bench_0.16.0_checksums.txt
+commits depuis 2026-08-07T00:00:00Z : 5
+fusionneurs des 100 dernières PR : LaibaBareera 1, afdesk 82, antonpetrov-aquasec 4, eyalke 13
+SECURITY.md : {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent
+avis publiés : 0
+profils RKE2 : rke2-cis-1.23 rke2-cis-1.24 rke2-cis-1.7 rke2-cis-1.8 rke2-cis-1.9

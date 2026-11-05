@@ -90,3 +90,52 @@ Prédictions écrites le 05/11/2026 à 20:10 UTC, sous réserve de D1 (a), D2 (a
 - Rien n'est mesuré sous RKE2 à ce stade, en particulier Kata, `config-v3.toml.d`, le socket de containerd et le comportement exact du profil CIS.
 - Le guide d'auto-évaluation CIS de RKE2 pour Kubernetes 1.35 n'a pas été trouvé ; le guide CIS 2.0 existe.
 - La partie sur le provisionneur repose sur la doc d'Epinio et des guides tiers, pas sur la doc de RKE2. Elle sera vérifiée au premier démarrage.
+
+## Décisions du propriétaire (05/11/2026, vers 20:13 UTC)
+
+« Oui, tout en (a) » : D1 (a), D2 (a), D3 (a), D4 (a), D5 (a), D6 (a).
+
+## Conversion à sec (05/11/2026, 20:21 UTC, rien installé, cluster k3s inchangé)
+
+**Le choix de fond : `DISTRO=k3s` reste le défaut.** Le cluster en service et le relevé du 06/11/2026 passent par ces scripts : aucun chemin ne doit bouger avant le rejeu. `DISTRO=rke2` n'est pris que par `rke2.sh`, ou par `rejeu.sh` lancé avec cette variable. `mise.toml` n'est pas touché.
+
+| Fichier | Rôle |
+|---|---|
+| [`distro.sh`](../08-trust-plane/distro.sh) | Chemins, unités, outils et `args_apiserver`, selon `DISTRO` |
+| [`rke2.sh`](rke2.sh) | `telecharger`, `rendu`, `installer`, `cis` |
+| [`config/`](config/) | Configuration des trois nœuds, Pod Security, valeurs de Cilium et de CoreDNS |
+| [`essai-k3s.sh`](essai-k3s.sh) | Preuve de non-changement sous k3s |
+| [`sante.sh`](sante.sh) | Audits du doc 04, dont kube-bench |
+
+**Vérifié à sec** :
+- [`rke2-telecharger.log`](resultats/rke2-telecharger.log) : toutes les empreintes conformes, 846 Mo.
+- [`rke2-rendu.log`](resultats/rke2-rendu.log) : charts rendus. CoreDNS garde `k8s-app=kube-dns` et 10.43.0.10. Dans la configuration de Cilium, seules changent `kube-proxy-replacement` et `bpf-lb-sock-hostns-only` (plus la clé `kube-proxy-replacement-healthz-bind-address`, vide) ; `enable-l7-proxy` reste à `false`.
+- [`essai-k3s.log`](resultats/essai-k3s.log) : substitution inverse sur chaque script, seules les lignes structurelles restent ; 11 lectures réelles conformes sur le cluster k3s ; `args_apiserver` de RKE2 essayé sur un manifeste d'essai, pas sur un vrai.
+- [`controles-essai-08b.log`](../08-trust-plane/resultats/controles-essai-08b.log) : `controles.sh`, lecture seule, sur le cluster en service.
+
+**Non vérifié** : aucun script n'a tourné avec `DISTRO=rke2` hors `telecharger`, `rendu` et `sante`. Le binaire `rke2` n'a jamais été exécuté, donc la configuration des nœuds n'a pas été validée. Le rendu des charts ne prouve pas leur fonctionnement.
+
+**Constats de la conversion** :
+- **Pod Security** : `rke2.sh` ne pose pas l'exemption. Comme sous k3s, `kata.sh essais` doit d'abord mesurer le refus du pod Kata privilégié, cette fois par le défaut du profil cis, avant que `kata.sh exemption` ne redémarre le server.
+- **Réseau du profil cis** : avec `cni: none`, RKE2 retire les politiques par espace (`cisnetworkpolicy.Cleanup`), mais garde celles de `kube-system`, `default` et `kube-public`. Celles de CoreDNS et de metrics-server visent des labels que les charts conservent. La prédiction 5 ci-dessus est donc **remplacée** ci-dessous.
+- **busybox** : absente des images de RKE2, alors que la 08 et le pod auxiliaire de `local-path` s'en servent. Archive ajoutée, même digest amd64 que `kata.sh`.
+- **`local-path`** : le manifeste amont n'est pas la classe par défaut, et les pipelines en ont besoin. `rke2.sh` pose l'annotation.
+- **Chiffrement des Secrets** : `secrets-encryption` est masquée dans RKE2. Elle n'est pas dans `config/` ; son état est relevé par `rke2 secrets-encrypt status`.
+- **kube-bench** : audité ([`sante-kubebench.log`](resultats/sante-kubebench.log)), Scorecard 5,2 du 16/03/2026, 82 des 100 dernières fusions par une seule personne, sommes seulement. **Aucun profil RKE2 pour Kubernetes 1.35** : `rke2-cis-1.9` est le plus proche. Son résultat sera indicatif, pas une preuve de conformité CIS 2.0.
+
+## Prédictions de l'application (05/11/2026, 20:21 UTC)
+
+Elles remplacent la liste du 05/11/2026, 20:10 UTC, sous D1 à D6 (a). Elles valent à partir de la commande `DISTRO=rke2 mise run confiance:rejeu -- rke2`, sous accord, après le relevé du 06/11, 09:48 UTC.
+
+1. **Installation** : VM recréées, `sc-confiance` en 12 Gi et 25 Go ; les trois nœuds `Ready` après Cilium ; 0 HelmChart, 0 pod `kube-proxy`. Risque connu : les chemins CNI, qui ont fait échouer le premier passage sous k3s, peuvent demander un ajustement de `valeurs-cilium.yaml`.
+2. **`cilium.sh verifier`, `helm_cilium`** : conformes, ni compte ni liaison `helm-*`, aucun compte de service lié à `cluster-admin`.
+3. **`kata.sh essais`** : pod Kata privilégié refusé par le défaut cis, puis admis après l'exemption.
+4. **Pod Security** : au moins un composant de la plateforme refusé au premier passage, faute de label d'espace (défaut `restricted`). Liste non prédite, relevée.
+5. **DNS et métriques sous CIS** : aucune adaptation de NetworkPolicy, les labels étant conservés. `kubectl top nodes` répond. Cette prédiction peut tomber sur metrics-server : le serveur d'API n'est pas un pod de `kube-system`.
+6. **Image et entrées** : image `3a7ca1b1`, binaire `e3749c68`, fermeture `74c265e7`.
+7. **Test 6** : `construire-image` n'atteint ni Zot, ni Forgejo, ni l'API, ni l'adresse externe. Sous RKE2, `preuves.sh` y ajoute 9345 et 2379 : refusés pour `construire-image`, et joignables par la contre-épreuve, qui doit les atteindre pour que le test prouve quelque chose. Ce serait aussi une limite à consigner : une autre tâche signée garde cette sortie. Motifs `POLICY_DENIED` et `INVALID_SOURCE_IP`, rien sur `enp1s0`, adresse de service toujours traduite avant la politique.
+8. **Tests 1 à 5, 7 et 8, contrôles 6 et 7** : mêmes verdicts que le rejeu `complet` du 03/11/2026.
+9. **Journalisation** : les dix témoins relus dans Grafana, avec `rke2-server.service`. Les journaux de `kube-apiserver` passent par la source des pods. Aucun secret dans Loki.
+10. **Disque et mémoire** : `sc-stockage` garde au moins 5 Go libres (9,1 Go aujourd'hui, images de RKE2 en plus). `sc-confiance` n'atteint pas le seuil d'éviction pendant le scan.
+11. **`kube-bench`** : des FAIL ou WARN liés au profil inadapté. Chacun sera classé, aucun n'est prédit.
+12. **Durée et correctifs** : plus de 3 574 s, et au moins un KO corrigé avant un passage complet. Les passages ratés seront archivés.

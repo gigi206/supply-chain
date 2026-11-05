@@ -36,6 +36,7 @@ k3s	k3s-io/k3s	runtime	oui
 RKE2	rancher/rke2	runtime	oui
 cert-manager	cert-manager/cert-manager	signature	non
 local-path-provisioner	rancher/local-path-provisioner	stockage	non
+kube-bench	aquasecurity/kube-bench	conformité	non
 kind	kubernetes-sigs/kind	runtime	non
 k3d	k3d-io/k3d	runtime	non
 Tetragon	cilium/tetragon	isolation	non

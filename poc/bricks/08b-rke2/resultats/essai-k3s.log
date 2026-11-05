@@ -1,0 +1,117 @@
+# essai-k3s.sh, 2026-11-05T20:22:22Z, base d1ae7b1
+## 1. substitution inverse (lignes restantes : ce qui change vraiment)
+--- poc/bricks/08-trust-plane/buildkit.sh : 3 ligne(s)
+<   e=$(sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n' \
+<     | grep -c -x -- '--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml' || true)
+>   e=$(args_apiserver | grep -c -x -- "--admission-control-config-file=/etc/rancher/k3s/pod-security.yaml" || true)
+--- poc/bricks/08-trust-plane/cilium.sh : 4 ligne(s)
+<   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" --reset-values \
+>   local supp=()
+>   [ "$DISTRO" = k3s ] || supp=(-f "$here/../08b-rke2/config/valeurs-cilium.yaml")   # kubeProxyReplacement sous RKE2 (brique 08b)
+>   helm upgrade --install cilium "$D/cilium-$CILIUM_VER.tgz" --namespace kube-system -f "$T/valeurs.yaml" "${supp[@]}" --reset-values \
+--- poc/bricks/08-trust-plane/commun.sh : 1 ligne(s)
+> . "${BASH_SOURCE[0]%/*}/distro.sh"
+--- poc/bricks/08-trust-plane/construction.sh : 0 ligne(s)
+--- poc/bricks/08-trust-plane/controles.sh : 19 ligne(s)
+> . "$here/distro.sh"
+<     systemctl is-active k3s k3s-agent 2>/dev/null | paste -sd" " || true'
+>     systemctl is-active '"k3s k3s-agent"' 2>/dev/null | paste -sd" " || true'
+< s sc-confiance 'sudo k3s --version | head -1
+<   sudo k3s kubectl get nodes -o wide -L zone
+<   sudo k3s kubectl get nodes -o custom-columns=NŒUD:.metadata.name,TAINTS:.spec.taints
+<   sudo k3s kubectl get pods -A -o wide
+<   if sudo k3s kubectl get ds -n kube-system cilium >/dev/null 2>&1; then
+<     echo "contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet $(sudo k3s kubectl get ds -n kube-system cilium -o jsonpath="{.status.numberR
+> s sc-confiance "KC='$D_KUBECTL'; V='$D_VERSION'; "'sudo $V | head -1
+>   sudo $KC get nodes -o wide -L zone
+>   sudo $KC get nodes -o custom-columns=NŒUD:.metadata.name,TAINTS:.spec.taints
+>   sudo $KC get pods -A -o wide
+>   if sudo $KC get ds -n kube-system cilium >/dev/null 2>&1; then
+>     echo "contrôleur réseau et de NetworkPolicy (Cilium) : DaemonSet $(sudo $KC get ds -n kube-system cilium -o jsonpath="{.status.numberReady}/{.
+<   sudo k3s kubectl top nodes 2>/dev/null || echo "metrics-server pas encore prêt"'
+>   sudo $KC top nodes 2>/dev/null || echo "metrics-server pas encore prêt"'
+<   s "$vm" 'sudo k3s crictl images 2>/dev/null | tail -n +2 | awk "{print \$1\":\"\$2\" \"\$3}"'
+>   s "$vm" "CRICTL='k3s crictl'; "'sudo $CRICTL images 2>/dev/null | tail -n +2 | awk "{print \$1\":\"\$2\" \"\$3}"'
+--- poc/bricks/08-trust-plane/fuites.sh : 3 ligne(s)
+> . "$here/distro.sh"
+<   (umask 077 && "$here/ssh.sh" "$vm" 'sudo journalctl -o cat --no-pager; sudo find /var/log /var/lib/rancher/k3s/server/logs /var/lib/rancher/k3s/st
+>   (umask 077 && "$here/ssh.sh" "$vm" "sudo journalctl -o cat --no-pager; sudo find /var/log /var/lib/rancher/k3s/server/logs /var/lib/rancher/k3s/st
+--- poc/bricks/08-trust-plane/kata.sh : 30 ligne(s)
+< PSA_FICHIER=/etc/rancher/k3s/pod-security.yaml              # sc-confiance (k3s/pod-security.yaml)
+< PSA_DROPIN=/etc/rancher/k3s/config.yaml.d/pod-security.yaml  # sc-confiance (k3s/sc-confiance-pod-security.yaml)
+> PSA_FICHIER=/etc/rancher/k3s/pod-security.yaml              # sc-confiance (k3s/pod-security.yaml, ou config/ de la 08b)
+> PSA_DROPIN=/etc/rancher/k3s/config.yaml.d/pod-security.yaml  # sc-confiance (k3s/sc-confiance-pod-security.yaml, ou config/ de la 08b)
+> PSA_SOURCES=$here/k3s; [ "$DISTRO" = k3s ] || PSA_SOURCES=$here/../08b-rke2/config
+<   sur sc-build 'sudo k3s crictl info' 2>/dev/null | jq -c '.config.containerd.runtimes.kata // empty | {runtimeType, runtimePath,
+>   sur sc-build "sudo k3s crictl info" 2>/dev/null | jq -c '.config.containerd.runtimes.kata // empty | {runtimeType, runtimePath,
+<     sur sc-build 'sudo systemctl restart k3s-agent'
+>     sur sc-build "sudo systemctl restart k3s-agent"
+<     echo "k3s-agent : $(sur sc-build 'systemctl is-active k3s-agent') ; sc-build Ready ; rattrapage réactivé"
+>     echo "k3s-agent : $(sur sc-build "systemctl is-active k3s-agent") ; sc-build Ready ; rattrapage réactivé"
+< args_apiserver() { # arguments du dernier lancement de kube-apiserver par k3s sur sc-confiance (journal de k3s), un par ligne
+<   sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n'
+< }
+<   echo "runtimes de containerd sur sc-build (crictl info) : $(sur sc-build 'sudo k3s crictl info' | jq -r '.config.containerd.runtimes | keys | join
+>   echo "runtimes de containerd sur sc-build (crictl info) : $(sur sc-build "sudo k3s crictl info" | jq -r '.config.containerd.runtimes | keys | join
+<   sur sc-confiance "sudo cat $PSA_FICHIER 2>/dev/null" | cmp -s - "$here/k3s/pod-security.yaml" \
+<     && sur sc-confiance "sudo cat $PSA_DROPIN 2>/dev/null" | cmp -s - "$here/k3s/sc-confiance-pod-security.yaml" && exemption_posee
+>   sur sc-confiance "sudo cat $PSA_FICHIER 2>/dev/null" | cmp -s - "$PSA_SOURCES/pod-security.yaml" \
+>     && sur sc-confiance "sudo cat $PSA_DROPIN 2>/dev/null" | cmp -s - "$PSA_SOURCES/sc-confiance-pod-security.yaml" && exemption_posee
+<   sur sc-confiance 'sudo k3s crictl ps -o json' | jq -r '.containers[] | (.labels["io.kubernetes.pod.namespace"] + "/"
+>   sur sc-confiance "sudo k3s crictl ps -o json" | jq -r '.containers[] | (.labels["io.kubernetes.pod.namespace"] + "/"
+<     sur sc-confiance "sudo install -d -m 0700 ${PSA_DROPIN%/*} && sudo tee $PSA_FICHIER >/dev/null && sudo chmod 0600 $PSA_FICHIER" < "$here/k3s/pod
+<     sur sc-confiance "sudo tee $PSA_DROPIN >/dev/null && sudo chmod 0600 $PSA_DROPIN" < "$here/k3s/sc-confiance-pod-security.yaml"
+>     sur sc-confiance "sudo install -d -m 0700 ${PSA_DROPIN%/*} && sudo tee $PSA_FICHIER >/dev/null && sudo chmod 0600 $PSA_FICHIER" < "$PSA_SOURCES/
+>     sur sc-confiance "sudo tee $PSA_DROPIN >/dev/null && sudo chmod 0600 $PSA_DROPIN" < "$PSA_SOURCES/sc-confiance-pod-security.yaml"
+<     sur sc-confiance 'sudo systemctl restart k3s'
+>     sur sc-confiance "sudo systemctl restart k3s"
+<     echo "API prête et trois nœuds Ready $(( $(date +%s) - d )) s après le redémarrage ; k3s : $(sur sc-confiance 'systemctl is-active k3s')"
+>     echo "API prête et trois nœuds Ready $(( $(date +%s) - d )) s après le redémarrage ; k3s : $(sur sc-confiance "systemctl is-active k3s")"
+--- poc/bricks/08-trust-plane/openbao.sh : 0 ligne(s)
+--- poc/bricks/08-trust-plane/preuves.sh : 3 ligne(s)
+> [ "$DISTRO" = k3s ] || T6_DESTINATIONS="$T6_DESTINATIONS Supervisor:192.168.161.11:9345 Etcd:192.168.161.11:2379"   # ports propres à RKE2 (brique 
+<   lp=$(kubectl get pods -n kube-system -l app=local-path-provisioner -o jsonpath='{.items[0].metadata.name}')
+>   lp=$(kubectl get pods -n "kube-system" -l app=local-path-provisioner -o jsonpath='{.items[0].metadata.name}')
+--- poc/bricks/08-trust-plane/rejeu.sh : 5 ligne(s)
+> . "$here/distro.sh"   # DISTRO=rke2 (brique 08b) : rke2.sh à la place de k3s.sh ; préalable sur l'hôte : rke2.sh telecharger
+> export DISTRO
+< etape k3s mise run confiance:k3s
+> if [ "$DISTRO" = k3s ]; then etape k3s mise run confiance:k3s; else etape RKE2 mise exec -- "$here/../08b-rke2/rke2.sh" installer; fi
+> [ "$DISTRO" = k3s ] || etape "08b (CIS)" mise exec -- "$here/../08b-rke2/rke2.sh" cis
+--- poc/bricks/08-trust-plane/stockage.sh : 3 ligne(s)
+<     copier "$vm" /tmp/registre-installation "$here/stockage/registries.yaml" "$P/ca-poc.crt"
+>     sed "s#/etc/rancher/k3s#/etc/rancher/k3s#" "$here/stockage/registries.yaml" > "$W/registries.yaml"
+>     copier "$vm" /tmp/registre-installation "$W/registries.yaml" "$P/ca-poc.crt"
+--- poc/bricks/08-trust-plane/tekton.sh : 2 ligne(s)
+<   sur sc-confiance "sudo k3s ctr -n k8s.io images ls name==$BUSYBOX_AMONT" | grep -F "$BUSYBOX_INDEX" >/dev/null \
+>   sur sc-confiance "sudo k3s ctr -n k8s.io images ls name==$BUSYBOX_AMONT" | grep -F "$([ "$DISTRO" = k3s ] && echo "$BUSYBOX_INDEX" || echo "$a")" 
+--- poc/bricks/08-trust-plane/vm.sh : 7 ligne(s)
+> . "$here/distro.sh"
+> [ "$DISTRO" = k3s ] || TAILLE[sc-confiance]=25G   # D3 a de la 08b, avec 12 Gi ci-dessous
+<     existe dom "$vm" || v define "$here/libvirt/$vm.xml"
+>     if ! existe dom "$vm"; then
+>       sed "$([ "$DISTRO" = k3s ] || [ "$vm" != sc-confiance ] || echo "s#<memory unit='GiB'>8<#<memory unit='GiB'>12<#")" "$here/libvirt/$vm.xml" > 
+>       v define "$W/$vm.xml"
+>     fi
+--- poc/bricks/19b-journalisation/journalisation.sh : 5 ligne(s)
+>     sed -i "s#/var/lib/rancher/k3s#/var/lib/rancher/k3s#" "$D"/config/*.alloy
+<   for q in '{noeud="sc-confiance", source="journal", unite="k3s.service"}' '{noeud="sc-build", source="journal"}' \
+>   for q in "{noeud=\"sc-confiance\", source=\"journal\", unite=\"k3s.service\"}" '{noeud="sc-build", source="journal"}' \
+<   q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"k3s.service\"}","queryType":"range","maxLines":5}
+>   q='{"queries":[{"refId":"A","datasource":{"uid":"loki"},"expr":"{noeud=\"sc-confiance\", unite=\"'"k3s"'.service\"}","queryType":"range","maxLines
+## 2. lectures réelles sous k3s
+OK   DISTRO par défaut
+OK   unités actives
+OK   args_apiserver : exemption lue
+OK   audit_api lit le journal
+OK   D_CRICTL
+OK   D_CTR
+OK   D_KUBECTL
+OK   clé de service lue par le chemin converti
+OK   local-path dans son espace
+OK   registries.yaml rendu identique
+OK   XML de sc-confiance rendu identique sous k3s
+## 3. args_apiserver de RKE2, manifeste d'essai
+OK   ligne entre guillemets reconnue
+OK   commande non confondue avec un argument
+RÉSULTAT : conforme

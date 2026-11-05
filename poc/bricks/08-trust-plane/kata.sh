@@ -57,9 +57,10 @@ KATA_FICHIERS=(   # lus par qemu-runtime-rs (shim ; path, kernel, image, virtio_
   opt/kata/share/kata-containers/kata-ubuntu-resolute.image
   opt/kata/libexec/virtiofsd
 )
-DROPIN=/var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.d/kata.toml
-PSA_FICHIER=/etc/rancher/k3s/pod-security.yaml              # sc-confiance (k3s/pod-security.yaml)
-PSA_DROPIN=/etc/rancher/k3s/config.yaml.d/pod-security.yaml  # sc-confiance (k3s/sc-confiance-pod-security.yaml)
+DROPIN=$D_ETAT/agent/etc/containerd/config-v3.toml.d/kata.toml
+PSA_FICHIER=$D_CONF/pod-security.yaml              # sc-confiance (k3s/pod-security.yaml, ou config/ de la 08b)
+PSA_DROPIN=$D_CONF/config.yaml.d/pod-security.yaml  # sc-confiance (k3s/sc-confiance-pod-security.yaml, ou config/ de la 08b)
+PSA_SOURCES=$here/k3s; [ "$DISTRO" = k3s ] || PSA_SOURCES=$here/../08b-rke2/config
 BUSYBOX=$REG/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f   # amd64, glibc (tekton.sh miroir)
 DL=$O/telechargements/kata
 T=$W/kata
@@ -193,7 +194,7 @@ conforme_vm() { # /opt/kata de sc-build conforme au manifeste : fichiers (sha256
 }
 
 runtime_kata() { # section kata du runtime CRI chargé par containerd sur sc-build (crictl info), vide si absente
-  sur sc-build 'sudo k3s crictl info' 2>/dev/null | jq -c '.config.containerd.runtimes.kata // empty | {runtimeType, runtimePath,
+  sur sc-build "sudo $D_CRICTL info" 2>/dev/null | jq -c '.config.containerd.runtimes.kata // empty | {runtimeType, runtimePath,
     privileged_without_host_devices, PodAnnotations, ContainerAnnotations, ConfigPath: .options.ConfigPath}' 2>/dev/null || true
 }
 
@@ -241,11 +242,11 @@ etape_installer() {
   if [ "$redemarrer" = 1 ]; then
     echo "## redémarrage de k3s-agent sur sc-build (containerd embarqué)"
     suspendre_rattrapage sc-build
-    sur sc-build 'sudo systemctl restart k3s-agent'
+    sur sc-build "sudo systemctl restart $D_AGENT"
     for _ in $(seq 60); do [ -n "$(runtime_kata)" ] && break; sleep 2; done
     kubectl wait --for=condition=Ready node/sc-build --timeout=180s >/dev/null
     reprendre_rattrapage
-    echo "k3s-agent : $(sur sc-build 'systemctl is-active k3s-agent') ; sc-build Ready ; rattrapage réactivé"
+    echo "k3s-agent : $(sur sc-build "systemctl is-active $D_AGENT") ; sc-build Ready ; rattrapage réactivé"
   fi
   r=$(runtime_kata)
   echo "runtime kata chargé par containerd : $r"
@@ -304,9 +305,6 @@ admis() { # libellé commande… : la commande doit réussir (dry-run serveur)
   else echo "KO   $l : refusé" >&2; cat "$T/admis.out" >&2; exit 1; fi
 }
 
-args_apiserver() { # arguments du dernier lancement de kube-apiserver par k3s sur sc-confiance (journal de k3s), un par ligne
-  sur sc-confiance "sudo journalctl -u k3s --no-pager -o cat | grep 'Running kube-apiserver' | tail -n 1" | tr ' ' '\n'
-}
 
 exemption_posee() { args_apiserver | grep -x -- "--admission-control-config-file=$PSA_FICHIER" >/dev/null; }
 
@@ -360,7 +358,7 @@ etape_essais() {
   for p in j7-runc j7-kata j7-kata-memoire; do kubectl delete pod -n builds "$p" --wait=false >/dev/null; done
   echo "## qui peut créer, modifier ou supprimer une RuntimeClass (pods-isolation reconnaît Kata au nom de la RuntimeClass)"
   echo "RuntimeClasses : $(kubectl get runtimeclasses -o jsonpath='{range .items[*]}{.metadata.name}={.handler} {end}')"
-  echo "runtimes de containerd sur sc-build (crictl info) : $(sur sc-build 'sudo k3s crictl info' | jq -r '.config.containerd.runtimes | keys | join(" ")')"
+  echo "runtimes de containerd sur sc-build (crictl info) : $(sur sc-build "sudo $D_CRICTL info" | jq -r '.config.containerd.runtimes | keys | join(" ")')"
   echo "les RuntimeClasses créées par k3s (crun, nvidia, wasm…) n'ont pas de runtime derrière sur sc-build : un pod qui les désigne n'y démarre pas"
   # Première prédiction (ramasse-miettes seul) démentie le 30/10/2026 (resultats/kata-essais-premiere-prediction.log) : le
   # contrôleur des espaces de noms peut aussi supprimer (delete sur tout, pour vider un espace). Supprimer la RuntimeClass
@@ -383,8 +381,8 @@ etape_essais() {
 }
 
 psa_en_place() { # fichiers de l'exemption identiques aux fichiers versionnés sur sc-confiance, et lus par kube-apiserver
-  sur sc-confiance "sudo cat $PSA_FICHIER 2>/dev/null" | cmp -s - "$here/k3s/pod-security.yaml" \
-    && sur sc-confiance "sudo cat $PSA_DROPIN 2>/dev/null" | cmp -s - "$here/k3s/sc-confiance-pod-security.yaml" && exemption_posee
+  sur sc-confiance "sudo cat $PSA_FICHIER 2>/dev/null" | cmp -s - "$PSA_SOURCES/pod-security.yaml" \
+    && sur sc-confiance "sudo cat $PSA_DROPIN 2>/dev/null" | cmp -s - "$PSA_SOURCES/sc-confiance-pod-security.yaml" && exemption_posee
 }
 
 pods_durables() { # pods de sc-confiance qui ne viennent pas d'un Job, en cours : espace/nom
@@ -393,7 +391,7 @@ pods_durables() { # pods de sc-confiance qui ne viennent pas d'un Job, en cours 
 }
 
 conteneurs_durables() { # conteneurs en cours sur sc-confiance (crictl) des pods de $T/pods-durables.txt : pod conteneur identifiant
-  sur sc-confiance 'sudo k3s crictl ps -o json' | jq -r '.containers[] | (.labels["io.kubernetes.pod.namespace"] + "/"
+  sur sc-confiance "sudo $D_CRICTL ps -o json" | jq -r '.containers[] | (.labels["io.kubernetes.pod.namespace"] + "/"
     + .labels["io.kubernetes.pod.name"]) + " " + .metadata.name + " " + .id' | sort | join - "$T/pods-durables.txt"
 }
 
@@ -418,13 +416,13 @@ etape_exemption() {
     echo "kube-apiserver : $(args_apiserver | grep -E -- '^--(enable-admission-plugins|admission-control-config-file)=' | paste -sd' ')"
     suspendre_rattrapage
     echo "## pose sur sc-confiance (0600) et redémarrage du server k3s"
-    sur sc-confiance "sudo install -d -m 0700 ${PSA_DROPIN%/*} && sudo tee $PSA_FICHIER >/dev/null && sudo chmod 0600 $PSA_FICHIER" < "$here/k3s/pod-security.yaml"
-    sur sc-confiance "sudo tee $PSA_DROPIN >/dev/null && sudo chmod 0600 $PSA_DROPIN" < "$here/k3s/sc-confiance-pod-security.yaml"
+    sur sc-confiance "sudo install -d -m 0700 ${PSA_DROPIN%/*} && sudo tee $PSA_FICHIER >/dev/null && sudo chmod 0600 $PSA_FICHIER" < "$PSA_SOURCES/pod-security.yaml"
+    sur sc-confiance "sudo tee $PSA_DROPIN >/dev/null && sudo chmod 0600 $PSA_DROPIN" < "$PSA_SOURCES/sc-confiance-pod-security.yaml"
     d=$(date +%s)
-    sur sc-confiance 'sudo systemctl restart k3s'
+    sur sc-confiance "sudo systemctl restart $D_SERVEUR"
     for _ in $(seq 90); do kubectl get --raw /readyz >/dev/null 2>&1 && break; sleep 2; done
     kubectl wait --for=condition=Ready node --all --timeout=180s >/dev/null
-    echo "API prête et trois nœuds Ready $(( $(date +%s) - d )) s après le redémarrage ; k3s : $(sur sc-confiance 'systemctl is-active k3s')"
+    echo "API prête et trois nœuds Ready $(( $(date +%s) - d )) s après le redémarrage ; k3s : $(sur sc-confiance "systemctl is-active $D_SERVEUR")"
     reprendre_rattrapage
     t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "## après le redémarrage"
