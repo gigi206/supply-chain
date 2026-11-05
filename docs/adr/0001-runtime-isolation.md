@@ -64,6 +64,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 05/11/2026** : exigence du propriétaire de durcir le cluster au maximum (PSA, Kyverno, rôles, politiques Cilium, audit), préparée à sec dans la [brique 08c](../../poc/bricks/08c-durcissement/README.md). Rien n'est appliqué, et aucune note n'est modifiée. Le pare-feu d'hôte de Cilium y couvrirait pour la première fois Zot et Forgejo, processus de l'hôte hors de portée des NetworkPolicy.
 
+> **Additif du 05/11/2026, 20:50 UTC** : les relevés de la [brique 08d](../../poc/bricks/08d-cert-manager/README.md) remettent en cause l'intérêt de cert-manager dans le PoC (D6 de la 08b), sans rien changer à cette décision : un seul consommateur direct, Hubble, dont le port n'a pas de client, et deux comptes de plus sur tous les Secrets du cluster. Décision D7 soumise au propriétaire.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

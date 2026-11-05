@@ -146,3 +146,7 @@ Elles remplacent la liste du 05/11/2026, 20:10 UTC, sous D1 à D6 (a). Elles val
 - **Politique d'audit** : [`config/audit-policy.yaml`](config/audit-policy.yaml), reprise de ce dépôt et adaptée, remplace `k3s/audit-policy.yaml` sous RKE2. Elle **revient sur D14 (a) de la 19b** : les lectures de Secrets et de ConfigMaps sont journalisées pour tous, en Metadata. Sous k3s, rien ne change.
 - **Prédiction ajoutée au n° 9** : les journaux `kubelet` et `containerd` sont lus dans Grafana, et les tests qui lisent l'audit repassent. Le volume d'audit est relevé, pas prédit.
 - Le reste du durcissement est dans la [brique 08c](../08c-durcissement/README.md), après le rejeu de cette brique.
+
+## Additif : D6 relevée à sec (05/11/2026, 20:50 UTC)
+
+D6 (a) reste valable tant que le propriétaire n'en décide pas autrement. Les relevés de la [brique 08d](../08d-cert-manager/README.md) montrent un seul consommateur direct, Hubble, sur un port sans client, et un contrôleur en écriture sur tous les Secrets. La CA du PoC ne peut pas signer l'émetteur : OpenBao devrait porter une racine séparée. Décision D7 ouverte, rien installé.

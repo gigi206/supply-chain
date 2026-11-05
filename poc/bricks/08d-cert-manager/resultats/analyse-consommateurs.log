@@ -1,0 +1,34 @@
+# analyse.sh consommateurs, 2026-11-05T20:49:30Z
+## Secrets portant un certificat : espace/nom, type, propriétaire (label), clés
+kube-system/cilium-ca Opaque Helm ca.crt,ca.key
+kube-system/hubble-server-certs kubernetes.io/tls Helm ca.crt,tls.crt,tls.key
+kube-system/k3s-serving kubernetes.io/tls - tls.crt,tls.key
+kyverno/kyverno-cleanup-controller.kyverno.svc.kyverno-tls-ca kubernetes.io/tls kyverno tls.crt,tls.key
+kyverno/kyverno-cleanup-controller.kyverno.svc.kyverno-tls-pair kubernetes.io/tls kyverno tls.crt,tls.key
+kyverno/kyverno-svc.kyverno.svc.kyverno-tls-ca kubernetes.io/tls kyverno tls.crt,tls.key
+kyverno/kyverno-svc.kyverno.svc.kyverno-tls-pair kubernetes.io/tls kyverno tls.crt,tls.key
+openbao/openbao-tls Opaque - ca.crt,tls.crt,tls.key
+tekton-pipelines/tekton-triggers-core-interceptors-certs Opaque - ca-cert.pem,server-cert.pem,server-key.pem
+tekton-pipelines/triggers-webhook-certs Opaque - ca-cert.pem,server-cert.pem,server-key.pem
+tekton-pipelines/webhook-certs Opaque - ca-cert.pem,server-cert.pem,server-key.pem
+## certificat Hubble : sujet, SAN et fin, partie publique
+subject=CN=*.default.hubble-grpc.cilium.io
+notAfter=Nov  3 20:31:41 2027 GMT
+X509v3 Subject Alternative Name: 
+DNS:*.default.hubble-grpc.cilium.io
+## clients du port 4244
+pods Hubble Relay ou UI : 0
+server: unix:///var/run/cilium/hubble.sock
+tls: false
+## CA du PoC
+X509v3 Basic Constraints: critical
+CA:TRUE, pathlen:0
+X509v3 Name Constraints: critical
+Permitted:
+DNS:poc.test
+DNS:svc.cluster.local
+IP:192.168.161.0/255.255.255.0
+IP:10.43.0.0/255.255.0.0
+## OpenBao en service : version, scellement au redémarrage mesuré dans redemarrer.sh
+OpenBao v2.7.2 (9e0a0d3c3504a0a00b45e61355afac5e35c78379), committed 2026-10-26T20:32:27Z
+sc-stockage.poc.test:5000/amont/openbao/openbao@sha256:5046911075e137e154ce49ab051502f4ec7cf367d484ae4a4dce665d9b90561f

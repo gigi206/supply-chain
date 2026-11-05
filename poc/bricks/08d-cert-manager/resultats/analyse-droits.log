@@ -1,0 +1,38 @@
+# analyse.sh droits, 2026-11-05T20:49:31Z
+OK   empreinte du chart : 9ec67938b2981d8b333af61b3fcf53e26b4f6f5deb7ccda3de4ea116bb373a17
+objets par type : {"ClusterRole":13,"ClusterRoleBinding":10,"CustomResourceDefinition":6,"Deployment":3,"Job":1,"MutatingWebhookConfiguration":1,"Role":4,"RoleBinding":4,"Service":3,"ServiceAccount":4,"ValidatingWebhookConfiguration":1}
+## images
+Deployment/cert-manager-cainjector : quay.io/jetstack/cert-manager-cainjector:v1.21.3
+Deployment/cert-manager : quay.io/jetstack/cert-manager-controller:v1.21.3
+Deployment/cert-manager-webhook : quay.io/jetstack/cert-manager-webhook:v1.21.3
+Job/cert-manager-startupapicheck : quay.io/jetstack/cert-manager-startupapicheck:v1.21.3
+## limites et contexte de sécurité par conteneur
+cert-manager-cainjector : limites=aucune nonRoot=true seccomp=RuntimeDefault escalade=false cap-drop=["ALL"]
+cert-manager : limites=aucune nonRoot=true seccomp=RuntimeDefault escalade=false cap-drop=["ALL"]
+cert-manager-webhook : limites=aucune nonRoot=true seccomp=RuntimeDefault escalade=false cap-drop=["ALL"]
+cert-manager-startupapicheck : limites=aucune nonRoot=true seccomp=RuntimeDefault escalade=false cap-drop=["ALL"]
+## règles sur les Secrets (ClusterRole : portée du cluster ; Role : espace)
+ClusterRole cluster cert-manager-cainjector : get,list,watch 
+ClusterRole cluster cert-manager-controller-issuers : get,list,watch,create,update,delete 
+ClusterRole cluster cert-manager-controller-clusterissuers : get,list,watch,create,update,delete 
+ClusterRole cluster cert-manager-controller-certificates : get,list,watch,create,update,delete,patch 
+ClusterRole cluster cert-manager-controller-orders : get,list,watch 
+ClusterRole cluster cert-manager-controller-challenges : get,list,watch 
+ClusterRole cluster cert-manager-controller-challenges : get,list,watch 
+Role cert-manager cert-manager-webhook:dynamic-serving : get,list,watch,update cert-manager-webhook-ca
+Role cert-manager cert-manager-webhook:dynamic-serving : create 
+## liaisons de ces rôles
+ClusterRoleBinding cert-manager-cainjector -> cert-manager-cainjector
+ClusterRoleBinding cert-manager-controller-certificates -> cert-manager
+ClusterRoleBinding cert-manager-controller-certificatesigningrequests -> cert-manager
+ClusterRoleBinding cert-manager-controller-challenges -> cert-manager
+ClusterRoleBinding cert-manager-controller-clusterissuers -> cert-manager
+ClusterRoleBinding cert-manager-controller-issuers -> cert-manager
+ClusterRoleBinding cert-manager-controller-orders -> cert-manager
+ClusterRoleBinding cert-manager-webhook:subjectaccessreviews -> cert-manager-webhook
+RoleBinding cert-manager-cainjector:leaderelection -> cert-manager-cainjector
+RoleBinding cert-manager-webhook:dynamic-serving -> cert-manager-webhook
+## droit de créer des jetons de compte de service dans le chart
+## webhooks de l'admission
+MutatingWebhookConfiguration webhook.cert-manager.io failurePolicy=Fail
+ValidatingWebhookConfiguration webhook.cert-manager.io failurePolicy=Fail

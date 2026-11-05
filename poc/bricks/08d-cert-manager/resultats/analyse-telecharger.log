@@ -1,0 +1,6 @@
+# analyse.sh telecharger, 2026-11-05T20:49:27Z
+OK   digest du tag v1.21.3 : sha256:e482675aec32862d323a9218293ff7de81192337998615e4378c56498473f240
+OK   empreinte de la clé publiée : 62151ffda7bb5350367480750ff1cb75d53f0f83baca524044e5274aa83b63a6
+OK   digest signé : sha256:e482675aec32862d323a9218293ff7de81192337998615e4378c56498473f240
+OK   témoin : autre clé refusée (rc 12)
+OK   empreinte du chart : 9ec67938b2981d8b333af61b3fcf53e26b4f6f5deb7ccda3de4ea116bb373a17
