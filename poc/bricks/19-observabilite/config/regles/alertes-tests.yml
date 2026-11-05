@@ -196,6 +196,93 @@ tests:
         alertname: MiroirEnRetard
         exp_alerts: []
 
+  # G8 : dernier scan et base datés de l'instant 0, jamais remplacés (toutes les 4 min, comme A4 : moins que la fenêtre de 5 min).
+  - interval: 4m
+    input_series:
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+        values: '0x1810'
+      - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+        values: '0x1810'
+    alert_rule_test:
+      - eval_time: 1559m   # 25 h 59
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 1564m   # en attente (for: 5m)
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 1566m
+        alertname: ScanEnRetard
+        exp_alerts:
+          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app, job: fichiers, instance: local}
+      - eval_time: 2879m   # 47 h 59
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+      - eval_time: 2884m   # en attente (for: 5m)
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+      - eval_time: 2886m
+        alertname: BaseGrypeVieillie
+        exp_alerts:
+          - exp_labels: {alerte: base, severite: critique, depot: vulndb/grype, job: fichiers, instance: local}
+      - eval_time: 7199m   # 4 j 23 h 59
+        alertname: ScanBientotRefuse
+        exp_alerts: []
+      - eval_time: 7201m
+        alertname: ScanBientotRefuse
+        exp_alerts:
+          - exp_labels: {alerte: scan, severite: critique, depot: builds/scan/sample-app, job: fichiers, instance: local}
+
+  # G8 : passage suivant le plus tardif admis, 25 h 28 après le premier (date 91680 s) : ni retard, ni base vieillie à 26 h 06.
+  - interval: 4m
+    input_series:
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+        values: '0x382 91680x20'
+      - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+        values: '0x360 86400x40'
+    alert_rule_test:
+      - eval_time: 1566m
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 1566m
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+
+  # G8 : fichier disparu ou referrer et base introuvables : en attente pendant le for: 5m, puis déclenchées.
+  - interval: 1m
+    input_series:
+      - series: 'up{job="fichiers", instance="local"}'
+        values: '1x10'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: ScanEnRetard
+        exp_alerts:
+          - exp_labels: {alerte: scan, severite: avertissement}
+      - eval_time: 4m
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: BaseGrypeVieillie
+        exp_alerts:
+          - exp_labels: {alerte: base, severite: critique}
+
+  # G8 : une collecte manquée (séries périmées pendant 2 min), puis revenue : pas d'alerte.
+  - interval: 1m
+    input_series:
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+        values: '0+60x4 stale stale 360+60x6'
+      - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+        values: '0+60x4 stale stale 360+60x6'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+
   # A5 : refus anciens stables ; rafale de 20 refus vers 21 min ; nouvelle combinaison apparue à 7 vers 30 min.
   - interval: 1m
     input_series:

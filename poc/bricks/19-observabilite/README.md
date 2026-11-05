@@ -349,3 +349,7 @@ O2 (sans `telecharger`) et O3 (`regles deployer`) ont été rejoués sur une pla
 - Ordre : la 01 d'abord (groupe `synchro`), puis `certificats compte installer`. `cibles`, `lecture_seule` et les règles
   passent après Alloy (19b, L3).
 - `reference`, O4 et les correctifs de Chains ont été sautés : ce sont des mesures.
+
+## Additif du 05/11/2026, 10:40 UTC : alertes de fraîcheur de la brique 07a, préparées à sec
+
+`ScanEnRetard`, `ScanBientotRefuse` et `BaseGrypeVieillie` ajoutées à `alertes.yml`, avec leurs tests et l'incident `a7`. **Rien n'est déployé, `promtool` n'a pas été lancé.** Elles lisent `fraicheur-scan.prom`, servi par `fichiers-metriques` sans changer ni `fichiers.py` ni `prometheus.yml`. Protocole : [`g8-predictions.md`](../07a-sbom-grype/resultats/g8-predictions.md) de la 07a.

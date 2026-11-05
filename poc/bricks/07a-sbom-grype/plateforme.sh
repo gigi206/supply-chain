@@ -76,6 +76,9 @@
 #   g7_retention décisions de ce balayage lues par l'auditeur (19b) ; hors de rejeu.sh : à J2, le dépôt vulndb/grype n'existe pas encore
 #   g7_periodique ACCORD DU PROPRIÉTAIRE : CronJob scan-sample-app (rendu de scan-job.yaml), un passage lancé depuis lui, referrer vérifié
 #   g7_grafana  journaux du passage, audit d'OpenBao et audit de Zot lus par l'auditeur (19b)
+# G8 (alerte de fraîcheur ; règles et incident simulé : observabilite.sh regles deployer a7) :
+#   g8_metriques ACCORD DU PROPRIÉTAIRE : compte et timer fraicheur-scan sur sc-stockage, métriques comparées à une lecture de Zot depuis l'hôte
+#   g8_grafana  journal de fraicheur-scan et notifications de l'incident a7 lus par l'auditeur (19b)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1570,11 +1573,65 @@ etape_g7_grafana() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,79p "$0"; exit 2; }
+etape_g8_metriques() { # ACCORD DU PROPRIÉTAIRE : compte et timer sur sc-stockage ; rien d'autre n'écrit fraicheur-scan.prom
+  local d=${IMAGE#*@} u=https://$REG_HOTE/v2 scan base m="" i
+  T=$W/g8-metriques
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  sed "s/@DIGEST@/$d/" "$here/systemd/fraicheur-scan.service" > "$T/fraicheur-scan.service"
+  copier /tmp/fraicheur-scan-installation "$here/systemd/fraicheur-scan.py" "$T/fraicheur-scan.service" "$here/systemd/fraicheur-scan.timer"
+  sur "sudo bash -s" <<'EOF'
+set -euo pipefail
+cd /tmp/fraicheur-scan-installation
+id fraicheur-scan >/dev/null 2>&1 || useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin fraicheur-scan
+install -d -m 0755 /usr/local/lib/fraicheur-scan
+install -m 0755 fraicheur-scan.py /usr/local/lib/fraicheur-scan/
+[ -e /etc/fichiers-metriques/fraicheur-scan.prom ] || install -m 0644 -o fraicheur-scan -g fraicheur-scan /dev/null /etc/fichiers-metriques/fraicheur-scan.prom
+install -m 0644 fraicheur-scan.service fraicheur-scan.timer /etc/systemd/system/
+cd / && rm -rf /tmp/fraicheur-scan-installation
+systemctl daemon-reload
+systemctl start fraicheur-scan.service
+systemctl enable --now fraicheur-scan.timer 2>&1
+EOF
+  attendu "fraicheur-scan.py installé identique" "$(sur "sha256sum /usr/local/lib/fraicheur-scan/fraicheur-scan.py" | cut -c1-64)" "$(sha256sum < "$here/systemd/fraicheur-scan.py" | cut -c1-64)"
+  sur "systemctl show -p Result --value fraicheur-scan.service; systemctl is-active fraicheur-scan.timer; sudo journalctl -u fraicheur-scan.service -n 3 -o cat --no-pager; cat /etc/fichiers-metriques/fraicheur-scan.prom; systemd-analyze security fraicheur-scan.service 2>/dev/null | tail -1"
+  # Lecture témoin depuis l'hôte, par un autre chemin que le script
+  scan=$(curl -fsS --cacert "$P/ca-poc.crt" "$u/$DEPOT_SCAN/referrers/$d" | jq -r --arg p "$PREDICAT_SCAN" \
+    '[.manifests[] | select(.annotations["dev.sigstore.bundle.predicateType"] == $p) | .annotations["org.opencontainers.image.created"] | fromdate] | max')
+  base=$(curl -fsS --cacert "$P/ca-poc.crt" "$u/vulndb/grype/tags/list" | jq -r '[.tags[] | select(test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$"))] | max')
+  base=$(curl -fsS --cacert "$P/ca-poc.crt" -H 'Accept: application/vnd.oci.image.manifest.v1+json' "$u/vulndb/grype/manifests/$base" | jq -r '.annotations["org.opencontainers.image.created"] | fromdate')
+  for i in $(seq 18); do   # collecte toutes les 30 s
+    m=$(sur "curl -s -G http://127.0.0.1:9090/api/v1/query --data-urlencode 'query={__name__=~\"scan_dernier_referrer_timestamp_seconds|base_grype_construite_timestamp_seconds\"}'" \
+      | jq -r '[.data.result[] | "\(.metric.__name__)=\(.value[1])"] | sort | join(" ")')
+    [ "$m" = "base_grype_construite_timestamp_seconds=$base scan_dernier_referrer_timestamp_seconds=$scan" ] && break
+    sleep 5
+  done
+  attendu "séries lues dans Prometheus" "$m" "base_grype_construite_timestamp_seconds=$base scan_dernier_referrer_timestamp_seconds=$scan"
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+etape_g8_grafana() {
+  local de
+  T=$W/g8-grafana
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g8_metriques.log")" +%s)
+  echo "## journal de fraicheur-scan, lu par l'auditeur (Loki ingère avec quelques secondes de retard)"
+  grafana_lignes '{noeud="sc-stockage", source="journal", unite="fraicheur-scan.service"}' "$de" "$T/f.json" "$T/f.txt"
+  sed 's/^/  /' "$T/f.txt"
+  grep -q '^scan [0-9]*, base [0-9]*$' "$T/f.txt" && ok "mesures visibles dans Grafana" || { echo "KO   mesures absentes de Grafana"; ko=1; }
+  echo "## notifications de l'incident a7, lues par l'auditeur"
+  grafana_lignes '{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"} |~ "ScanEnRetard|ScanBientotRefuse|BaseGrypeVieillie"' "$de" "$T/n.json" "$T/n.txt"
+  sed 's/^/  /' "$T/n.txt"
+  attendu "notifications firing et resolved dans Grafana" "$(grep -c -E '"statut": "(firing|resolved)"' "$T/n.txt")" 6
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,82p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana|g8_metriques|g8_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

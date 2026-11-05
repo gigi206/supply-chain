@@ -72,6 +72,32 @@ groups:
           alerte: A6
           severite: avertissement
 
+      # Scan en retard (brique 07a, G8) : Prometheus ne voit pas l'état des Jobs (pas de kube-state-metrics, non audité au doc 04),
+      # on mesure ce que la porte exige (fraicheur-scan.prom). 26 h : le passage le plus tardif admis finit à 11:00 UTC
+      # (09:30, plus startingDeadlineSeconds et activeDeadlineSeconds), 25 h 30 après le passage le plus tôt (09:32). for: 5m pour absent(), comme A4.
+      - alert: ScanEnRetard
+        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds)
+        for: 5m
+        labels:
+          alerte: scan
+          severite: avertissement
+
+      # Dernier scan à 5 jours : la porte le refuse à 7 (D4), il reste 2 jours pour réparer.
+      - alert: ScanBientotRefuse
+        expr: time() - scan_dernier_referrer_timestamp_seconds > 5 * 86400
+        labels:
+          alerte: scan
+          severite: critique
+
+      # Base construite il y a plus de 2 jours : le CronJob réussit encore, mais la porte refuse un scan dont la base a plus de
+      # 3 jours (D4) ; une base du jour a au plus 26 h juste avant la suivante (construite vers 06:20, archivée avant 08:15 UTC).
+      - alert: BaseGrypeVieillie
+        expr: time() - base_grype_construite_timestamp_seconds > 2 * 86400 or absent(base_grype_construite_timestamp_seconds)
+        for: 5m
+        labels:
+          alerte: base
+          severite: critique
+
       # Disque de sc-stockage occupé à plus de 80 % (brique 19b, D13 a : rétention de 30 jours des journaux dans Loki,
       # compression réelle à mesurer). Métrique écrite chaque minute par disque-metriques (19b), servie par fichiers.
       - alert: DisqueStockagePlein

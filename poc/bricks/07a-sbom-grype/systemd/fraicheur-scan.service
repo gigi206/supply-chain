@@ -1,0 +1,37 @@
+# Brique 07a, G8 : fraîcheur du scan et de la base en métriques (alertes ScanEnRetard, ScanBientotRefuse et BaseGrypeVieillie de la 19).
+# Seule sortie : Zot, en lecture anonyme. Seule écriture : fraicheur-scan.prom. @DIGEST@ : image scannée, rendu par plateforme.sh g8_metriques.
+[Unit]
+Description=Fraîcheur du scan et de la base Grype en métriques (brique 07a)
+After=zot.service
+
+[Service]
+Type=oneshot
+User=fraicheur-scan
+Group=fraicheur-scan
+Environment=REG=192.168.161.13:5000 CA=/etc/base-grype/ca-poc.crt DEPOT_SCAN=builds/scan/sample-app DEPOT_BASE=vulndb/grype DIGEST=@DIGEST@
+ExecStart=/usr/local/lib/fraicheur-scan/fraicheur-scan.py
+TimeoutStartSec=2min
+IPAddressDeny=any
+IPAddressAllow=192.168.161.13
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ReadWritePaths=/etc/fichiers-metriques/fraicheur-scan.prom
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+SystemCallArchitectures=native
+UMask=0022

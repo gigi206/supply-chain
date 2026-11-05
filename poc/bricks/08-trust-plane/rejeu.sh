@@ -133,6 +133,9 @@ etape "07a (G2)" plateforme g2_image
 etape "07a (G3)" plateforme g3_cluster g3_openbao g3_essais g3_cosign g3_grafana
 etape "07a (G4)" plateforme g4_scan g4_verifier g4_grafana
 etape "07a (passage périodique)" plateforme g7_periodique g7_grafana
+# Additif du 05/11/2026 : G8, à sec, PAS ENCORE REJOUÉ. Les règles sont déployées en O3, avant le scan : ScanEnRetard et BaseGrypeVieillie
+# sont actives (absent()) jusqu'à cette étape. g8_grafana et l'incident a7 sont hors du rejeu, mesures ponctuelles.
+etape "07a (G8)" plateforme g8_metriques
 if [ "${POUSSER_VSA:-}" = 1 ]; then
   # VSA de la brique 10 (bundle versionné, lié au seul digest 3a7ca1b1, que J7 vérifie) re-poussée, puis contrôle 6 de la porte
   etape "10 (VSA)" env JALON=r5 mise run replay -- pousser_vsa

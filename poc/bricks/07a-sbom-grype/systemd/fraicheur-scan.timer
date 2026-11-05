@@ -1,0 +1,10 @@
+# Brique 07a, G8 : une mesure toutes les 15 min ; un timer arrêté fige les dates, l'âge continue de croître et l'alerte se déclenche.
+[Unit]
+Description=Fraîcheur du scan et de la base Grype, toutes les 15 min (brique 07a)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+
+[Install]
+WantedBy=timers.target

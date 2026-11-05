@@ -28,6 +28,7 @@
 #                 gabarit d'essai de J6, basculé en J8 : premier passage archivé)
 #   a3, a4, a6    séries de test dans /etc/fichiers-metriques/essais-o4.prom, retour à la normale par la valeur, retirées
 #   a5            rafales de créations refusées par Kyverno (dry-run serveur) : 4 refus (sous le seuil), puis 10
+#   a7            brique 07a, G8 : séries de test des alertes de fraîcheur du scan et de la base, à côté des vraies
 # Aucun secret en argument de commande : fichiers 0600 ou entrée standard.
 #
 # Usage (racine du dépôt) : mise run observabilite -- <étape>…   (journal : resultats/<jalon>-<étape>.log ; JALON=o4 pour
@@ -339,6 +340,21 @@ etape_a6() { # certificat à 20 jours de l'échéance, puis renouvelé (60 jours
   resolue CertificatExpireBientot "$t0" 180
   trap - EXIT; essai_retirer
   requete 'min_over_time(up{job="fichiers"}[10m])'
+}
+
+etape_a7() { # brique 07a, G8 : scan à 6 jours et base à 3 jours (séries d'essai à côté des vraies), puis rattrapés
+  local t0 n
+  for n in ScanEnRetard ScanBientotRefuse BaseGrypeVieillie; do debut "$n"; done
+  trap essai_retirer EXIT
+  t0=$(date +%s)
+  essai "scan_dernier_referrer_timestamp_seconds{depot=\"essai-o4\"} $((t0 - 6 * 86400))" "base_grype_construite_timestamp_seconds{depot=\"essai-o4\"} $((t0 - 3 * 86400))"
+  declenchee ScanBientotRefuse "$t0" 180
+  declenchee ScanEnRetard "$t0" 480
+  declenchee BaseGrypeVieillie "$t0" 480
+  essai "scan_dernier_referrer_timestamp_seconds{depot=\"essai-o4\"} $(date +%s)" "base_grype_construite_timestamp_seconds{depot=\"essai-o4\"} $(date +%s)"
+  for n in ScanBientotRefuse ScanEnRetard BaseGrypeVieillie; do resolue "$n" "$t0" 180; done
+  trap - EXIT; essai_retirer
+  requete 'min_over_time(up{job="fichiers"}[15m])'
 }
 
 refus_kyverno() { # n : n créations du pod de sonde de la 08 (tsa, sans nodeSelector) en dry-run serveur, refusées par Kyverno
@@ -691,10 +707,10 @@ etape_correctif_a2() { # incident d'A2 (OpenBao scellé, build de la 01) sous le
 }
 
 etapes=("$@")
-[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer|fichiers|a1|a2|a3|a4|a5|a6|correctif_image|correctif_a2>…" >&2; exit 2; }
+[ ${#etapes[@]} -gt 0 ] || { echo "usage : $0 <telecharger|certificats|compte|installer|cibles|lecture_seule|regles|reference|deployer|fichiers|a1|a2|a3|a4|a5|a6|a7|correctif_image|correctif_a2>…" >&2; exit 2; }
 for e in "${etapes[@]}"; do
   declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }
-  case $e in regles|reference|deployer) jalon=${JALON:-o3} ;; fichiers|a[1-6]|correctif_*) jalon=o4 ;; *) jalon=o2 ;; esac
+  case $e in regles|reference|deployer) jalon=${JALON:-o3} ;; a7) jalon=g8 ;; fichiers|a[1-6]|correctif_*) jalon=o4 ;; *) jalon=o2 ;; esac
   {
     echo "# observabilite.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     "etape_$e"
