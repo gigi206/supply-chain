@@ -1,0 +1,26 @@
+# observabilite.sh a7, 2026-11-05T10:51:06Z
+OK   ScanEnRetard inactive avant l'incident
+OK   ScanBientotRefuse inactive avant l'incident
+OK   BaseGrypeVieillie inactive avant l'incident
+10:51:07 essais-o4.prom : scan_dernier_referrer_timestamp_seconds{depot="essai-o4"} 1793357467 base_grype_construite_timestamp_seconds{depot="essai-o4"} 1793616667
+10:51:07 ScanBientotRefuse : prometheus=inactive, alertmanager=absente
+10:51:38 ScanBientotRefuse : prometheus=firing, alertmanager=active
+  reçu : 2026-11-05T10:51:47+00:00 sc-stockage python3[20720]: {"alerte": "ScanBientotRefuse", "debut": "2026-11-05T10:51:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanBientotRefuse", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+10:51:49 ScanEnRetard : prometheus=pending, alertmanager=absente
+10:56:37 ScanEnRetard : prometheus=firing, alertmanager=active
+  reçu : 2026-11-05T10:56:47+00:00 sc-stockage python3[20720]: {"alerte": "ScanEnRetard", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanEnRetard", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+10:56:48 BaseGrypeVieillie : prometheus=firing, alertmanager=active
+  reçu : 2026-11-05T10:56:47+00:00 sc-stockage python3[20720]: {"alerte": "BaseGrypeVieillie", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "base", "alertname": "BaseGrypeVieillie", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+10:56:48 essais-o4.prom : scan_dernier_referrer_timestamp_seconds{depot="essai-o4"} 1793876208 base_grype_construite_timestamp_seconds{depot="essai-o4"} 1793876208
+10:56:49 ScanBientotRefuse : prometheus=firing, alertmanager=active
+10:57:41 ScanBientotRefuse : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-05T10:57:47+00:00 sc-stockage python3[20720]: {"alerte": "ScanBientotRefuse", "debut": "2026-11-05T10:51:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanBientotRefuse", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+OK   ScanBientotRefuse : déclenchée puis résolue, notifications firing et resolved reçues
+10:57:52 ScanEnRetard : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-05T10:57:47+00:00 sc-stockage python3[20720]: {"alerte": "ScanEnRetard", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanEnRetard", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+OK   ScanEnRetard : déclenchée puis résolue, notifications firing et resolved reçues
+10:57:52 BaseGrypeVieillie : prometheus=inactive, alertmanager=absente
+  reçu : 2026-11-05T10:57:47+00:00 sc-stockage python3[20720]: {"alerte": "BaseGrypeVieillie", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "base", "alertname": "BaseGrypeVieillie", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+OK   BaseGrypeVieillie : déclenchée puis résolue, notifications firing et resolved reçues
+10:57:52 essais-o4.prom retiré
+  {"instance":"127.0.0.1:9101","job":"fichiers"} 1

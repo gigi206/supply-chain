@@ -1,0 +1,14 @@
+# plateforme.sh g8_grafana, 2026-11-05T10:58:04Z
+## journal de fraicheur-scan, lu par l'auditeur (Loki ingère avec quelques secondes de retard)
+  scan 1793871105, base 1793859666
+  scan 1793871105, base 1793859666
+OK   mesures visibles dans Grafana
+## notifications de l'incident a7, lues par l'auditeur
+  {"alerte": "ScanBientotRefuse", "debut": "2026-11-05T10:51:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanBientotRefuse", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+  {"alerte": "ScanEnRetard", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanEnRetard", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+  {"alerte": "BaseGrypeVieillie", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "base", "alertname": "BaseGrypeVieillie", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "0001-01-01T00:00:00Z", "recu": true, "statut": "firing"}
+  {"alerte": "BaseGrypeVieillie", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "base", "alertname": "BaseGrypeVieillie", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+  {"alerte": "ScanEnRetard", "debut": "2026-11-05T10:56:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanEnRetard", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "avertissement"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+  {"alerte": "ScanBientotRefuse", "debut": "2026-11-05T10:51:37.032Z", "etiquettes": {"alerte": "scan", "alertname": "ScanBientotRefuse", "depot": "essai-o4", "instance": "127.0.0.1:9101", "job": "fichiers", "severite": "critique"}, "fin": "2026-11-05T10:57:37.032Z", "recu": true, "statut": "resolved"}
+OK   notifications firing et resolved dans Grafana : 6
+# fin 2026-11-05T10:58:04Z, code 0

@@ -66,6 +66,22 @@ Cumul de la brique, borne haute : 16 h 30 de temps écoulé entre le premier rel
 
 Aucun contrôle de `rejeu.sh`, `preuves.sh` ni `journalisation.sh` n'exige zéro alerte active ni un nombre fixe de notifications (recherche du 05/11/2026) : ces alertes actives pendant le rejeu ne le font pas échouer.
 
+## Décisions du propriétaire (05/11/2026, 10:50 UTC)
+
+« 1a, 2a, 3a, 4a, 5a » : D11 (a), D12 (a), D13 (a), application des étapes 1 à 5 avec le redémarrage de Prometheus, push de `f38841c`.
+
 ## Résultat
 
-Pas encore exécuté.
+Exécuté le 05/11/2026 de 10:50:11 à 10:58:04 UTC : conforme, **un écart de lecture**, à l'étape 3. La prédiction 6 reste à relever le 06/11.
+
+| # | Prédit | Mesuré | Journal |
+|---|---|---|---|
+| 1 | 14 règles, tests réussis | `SUCCESS: 14 rules found`, tests `SUCCESS` | [`g8-regles.log`](../../19-observabilite/resultats/g8-regles.log) |
+| 2 | `success`, timer actif, séries égales au témoin en moins de 90 s | conforme, en 21 s au total ; exposition systemd 2.9 ; scan 1793871105, base 1793859666 | [`g8_metriques.log`](g8_metriques.log) |
+| 3 | 14 règles `ok`, 3 nouvelles `inactive` | **écart de lecture** : l'étape lit 5 s après le redémarrage, toutes en `unknown`. Relu à 10:51:13 UTC : 14 `ok`, toutes `inactive` | [`g8-deployer.log`](../../19-observabilite/resultats/g8-deployer.log), [`g8-deployer-releve.log`](../../19-observabilite/resultats/g8-deployer-releve.log) |
+| 4 | `ScanBientotRefuse` en moins de 3 min, les deux autres en moins de 8 min ; 3 `firing`, 3 `resolved` | 31 s, puis 5 min 30 ; notifications reçues ; résolues à 10:57:52 UTC au plus tard ; `up{job="fichiers"}` à 1, fichier d'essai retiré | [`g8-a7.log`](../../19-observabilite/resultats/g8-a7.log) |
+| 5 | mesures et 6 notifications dans Grafana | conforme | [`g8_grafana.log`](g8_grafana.log) |
+
+Après l'incident : aucune alerte active. **Volume dans Zot** (relevé) : 12 lignes et 5,8 Ko sur les 2 mesures de l'installation, donc environ 280 Ko par jour au plus à 96 mesures.
+
+**Toujours pas prouvé** : le blocage réseau de l'unité (le filtre est en place et Zot passe, aucune sortie interdite n'a été essayée) ; la réaction à un vrai CronJob en échec ; `rejeu.sh`, pas rejoué. Une alerte ne sort toujours pas du PoC : il faut la lire dans Grafana.

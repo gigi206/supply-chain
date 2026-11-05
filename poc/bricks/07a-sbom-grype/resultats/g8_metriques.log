@@ -1,0 +1,13 @@
+# plateforme.sh g8_metriques, 2026-11-05T10:50:22Z
+Created symlink '/etc/systemd/system/timers.target.wants/fraicheur-scan.timer' → '/etc/systemd/system/fraicheur-scan.timer'.
+OK   fraicheur-scan.py installé identique : 48519c39f65417be949aa8ec9dd92870139ab49a6de5c84e68660a283f0607be
+success
+active
+scan 1793871105, base 1793859666
+fraicheur-scan.service: Deactivated successfully.
+Finished fraicheur-scan.service - Fraîcheur du scan et de la base Grype en métriques (brique 07a).
+scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"} 1793871105
+base_grype_construite_timestamp_seconds{depot="vulndb/grype"} 1793859666
+→ Overall exposure level for fraicheur-scan.service: 2.9 OK :-)
+OK   séries lues dans Prometheus : base_grype_construite_timestamp_seconds=1793859666 scan_dernier_referrer_timestamp_seconds=1793871105
+# fin 2026-11-05T10:50:43Z, code 0

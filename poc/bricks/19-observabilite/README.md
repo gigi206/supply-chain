@@ -353,3 +353,5 @@ O2 (sans `telecharger`) et O3 (`regles deployer`) ont été rejoués sur une pla
 ## Additif du 05/11/2026, 10:40 UTC : alertes de fraîcheur de la brique 07a, préparées à sec
 
 `ScanEnRetard`, `ScanBientotRefuse` et `BaseGrypeVieillie` ajoutées à `alertes.yml`, avec leurs tests et l'incident `a7`. **Rien n'est déployé, `promtool` n'a pas été lancé.** Elles lisent `fraicheur-scan.prom`, servi par `fichiers-metriques` sans changer ni `fichiers.py` ni `prometheus.yml`. Protocole : [`g8-predictions.md`](../07a-sbom-grype/resultats/g8-predictions.md) de la 07a.
+
+**Additif du 05/11/2026, 10:58 UTC** : alertes de fraîcheur déployées, 14 règles, incident `a7` conforme. Journaux : [`g8-regles.log`](resultats/g8-regles.log), [`g8-deployer.log`](resultats/g8-deployer.log), [`g8-deployer-releve.log`](resultats/g8-deployer-releve.log), [`g8-a7.log`](resultats/g8-a7.log).

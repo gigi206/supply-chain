@@ -1,0 +1,15 @@
+# relevé après la première évaluation (lancé pendant l'incident a7), 2026-11-05T10:51:13Z
+  OpenBaoScelle	ok	inactive
+  ChainsEchecSignature	ok	inactive
+  ChainsMarqueSansSignature	ok	inactive
+  ReplayNonBitIdentique	ok	inactive
+  MiroirEnRetard	ok	inactive
+  KyvernoRefusAnormaux	ok	inactive
+  CertificatExpireBientot	ok	inactive
+  ScanEnRetard	ok	inactive
+  ScanBientotRefuse	ok	inactive
+  BaseGrypeVieillie	ok	inactive
+  DisqueStockagePlein	ok	inactive
+  SourceMuette	ok	inactive
+  LokiInjoignable	ok	inactive
+  CollecteEnPanne	ok	inactive
