@@ -211,3 +211,14 @@ Une image sans scan récent a désormais son Job en échec, et `rejeu.sh` ne lan
 **G6 appliqué le 04/11/2026 (22:47 à 22:59 UTC, accord du propriétaire : « A »), 0 écart du premier coup** ([résultat](resultats/g6-predictions.md)) : les 15 témoins sont jugés comme prédit par la vraie porte, l'image réelle reste admise, le bilan du CronJob d'horodatage n'a pas bougé. Prochaine étape : G7, `rejeu.sh`, passage périodique du scan et constat dans l'ADR 0000 ; D7 reste à trancher.
 
 **Décision du propriétaire pour D7 (04/11/2026, « 2 b ») : une rétention réelle, à concevoir**, et non « pas de rétention » que je recommandais. Le code de Zot et un premier passage exploratoire montrent que `gc: true` efface par défaut tout manifeste sans tag, donc l'image réelle : la rétention demande des règles explicites, à mesurer sur une copie du stockage réel avant de toucher à Zot. Prédictions et règles proposées : [`resultats/g7-predictions.md`](resultats/g7-predictions.md). `zot.json` de la 08 porte ces règles, **pas encore appliquées**.
+
+**G7 mesuré à sec du 04/11/2026, 23:50 UTC, au 05/11/2026, 00:22 UTC, rien appliqué** ([résultat](resultats/g7-predictions.md)) : trois Zot jetables sur des copies du stockage réel, blobs vieillis de 30 jours, un balayage complet de 123 dépôts en 32 min.
+
+- **Règles proposées** : 0 écart ligne à ligne avec la prédiction, 0 blob manquant. 19 entrées retirées, 2 tags retirés, 190 Mo libérés. L'image réelle, sa signature, son attestation et ses VSA restent lisibles.
+- **À blanc** : 0 entrée modifiée, les mêmes 21 décisions journalisées.
+- **Sans règle** : 119 entrées effacées, dont l'image réelle. C'est le défaut de Zot avec `gc: true`, et la raison pour laquelle ces règles ne sont pas facultatives.
+- **Un écart** : j'ai prédit 2 dépôts disparus, il y en a eu 3. Un dépôt d'essai déjà vide n'était pas nommé. Cette disparition n'écrit aucune décision au journal d'audit.
+
+Ajouts depuis les prédictions : `g7_grafana` scindée (la lecture de la rétention, `g7_retention`, reste hors de `rejeu.sh`, car `vulndb/grype` n'existe pas au balayage de J2), et rejeu de `controle7` après le passage périodique, car le changement de C1 dans `preuves.sh` n'a jamais été joué. Prédictions de l'application, **sous accord du propriétaire** : [`resultats/g7-application-predictions.md`](resultats/g7-application-predictions.md).
+
+La rétention n'effacera rien de réel avant le 18 ou le 19 novembre : d'ici là, seule cette mesure à sec en répond.

@@ -49,3 +49,35 @@ Trois Zot, chacun sur sa copie, jusqu'à la fin d'un balayage complet : sans rè
 **Durée** : 123 dépôts ou plus, 15 s par dépôt en moyenne (attente aléatoire de 0 à 30 s) : 30 à 40 min pour le balayage, 1 à 2 min de préparation.
 
 ## Résultat
+
+Passage formel du 04/11/2026, 23:50:10 UTC, au 05/11/2026, 00:22:28 UTC, code 0, du premier coup : `g7_sec.log`, décisions de suppression dans `g7-sec-audit-prop.log`. Rien n'a touché le vrai Zot ni le cluster, et la copie de 2,9 Go est effacée.
+
+| Prédiction | Mesure | Verdict |
+|---|---|---|
+| 1. Image, `.sig`, `.att` lisibles | 200, 200, 200 | Conforme |
+| 2. 3 referrers dans `builds/vsa/sample-app` | 3 | Conforme |
+| 3. Restent les scans de 13 et 0 jours | Ces deux digests seulement | Conforme |
+| 4. 11 tags du 06/11 au 16/11 ; tag du 05/11 retiré, lisible par digest ; base du 04/11 effacée, environ 190 Mo | 11 tags ; 404 par tag, 200 par digest ; 404 ; 2 834 Mo puis 2 644 Mo | Conforme |
+| 5. 0 écart ligne à ligne, 18 + 1 entrées retirées | 0 écart ; 483 entrées puis 464 | Conforme |
+| 6. 0 blob manquant | 0 | Conforme |
+| 7. Dépôts disparus : `builds/scan/essai-scan` et `horodatage/essais` | Ces deux-là, **et** `horodatage/essais-test8/aucun-20261103t215715z` | **Écart** |
+| 8. Une décision de suppression au journal d'audit pour chaque retrait | 21 décisions | Conforme, détail ci-dessous |
+| À blanc : 0 entrée modifiée, décisions journalisées | 0 modifiée, 21 décisions | Conforme |
+| Sans règle : image réelle effacée | Effacée ; 483 entrées puis 364, dont 56 dans `amont`, 30 dans `builds/essai-webhook`, 10 dans `builds/sample-app` ; 0 blob manquant | Conforme |
+| Durée : 30 à 40 min de balayage, 1 à 2 min de préparation | 1 896 s environ de balayage, soit 32 min ; 32 min 18 s au total, donc moins d'1 min pour le reste | Balayage conforme ; préparation surestimée |
+
+**Écart de la prédiction 7.** L'inventaire d'avant annonçait 2 dépôts vides, et je n'en avais nommé qu'un. Le second est un dépôt d'essai du test 8 de `preuves.sh` (08), déjà vide. La disparition d'un dépôt vide n'efface aucune entrée et n'écrit aucune décision dans le journal d'audit : elle ne se voit que par comparaison des dépôts.
+
+**Format relevé (prédiction 8), dont dépendent les étapes d'application.** Les 21 lignes portent `"decision":"delete"` et se répartissent ainsi :
+
+- 18 `removed manifest without reference`, module `gc`, raison `deleteReferrers` : 16 dans `builds/scan/essai-scan`, 2 dans `builds/scan/sample-app` ;
+- 2 `applied policy`, module `retention`, pour les tags du 04/11 et du 05/11 ;
+- 1 `removed untagged manifest`, module `gc`, raison `deleteUntagged` : la base du 04/11. Celle du 05/11, plus jeune que le délai, reste.
+
+Les 2 tags retirés comptent donc comme des décisions sans être des entrées retirées : 21 décisions pour 19 entrées.
+
+**Non mesuré ici.** Le journal d'audit ne porte que les suppressions. Les décisions `keep` vont au journal principal d'après le code (`retention.go`, `logAction` avec `p.log`), et ce journal a été effacé avec la copie sans avoir été lu. `g7_retention` sera la première lecture.
+
+**Message sans conséquence en fin de journal.** `cat: …/zot.pid: No such file or directory` vient du `trap`, qui s'exécute après l'effacement de la copie. Le `trap` est corrigé, pas rejoué.
+
+**Portée.** Les blobs vieillis et les bases et scans synthétiques simulent l'état du store dans deux semaines ; ils ne prouvent rien sur la façon dont Zot se comportera avec un store réellement âgé, écrit jour après jour. La partie `vulndb/grype` repose sur la date de poussée de la base de données de Zot, et non sur celle des blobs : les tags synthétiques ont été poussés dans l'ordre pendant la préparation.

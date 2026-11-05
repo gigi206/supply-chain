@@ -1,0 +1,57 @@
+# plateforme.sh g7_sec, 2026-11-04T23:50:10Z
+## copie du stockage réel, lecture seule (ni sessions, ni téléversements en cours)
+copie : 2834 Mo, 123 dépôts
+## blobs vieillis de 30 jours : sur un store de deux jours, le délai de rétention masquerait les suppressions à venir
+## bases synthétiques : douze tags datés, poussés dans l'ordre, 13 tags en tout
+## scans synthétiques : referrers de l'image réelle, de 15, 13 et 0 jours ; un referrer de 15 jours dans builds/vsa/sample-app
+scans : 15 j 4baa1b7efab5, 13 j fcb7ee1c2fe2, 0 j 3c4c69607346 ; VSA de 15 j 34927e132eeb
+avant : 123 dépôts, 483 entrées, 2 dépôt(s) vide(s), 0 blob(s) manquant(s)
+OK   blobs manquants avant le balayage : 0
+## trois copies, un Zot par copie, un balayage complet (123 dépôts, 15 s par dépôt en moyenne)
+balayages finis : 3/3, 1896 s environ
+sansregle : 123 dépôts balayés
+blanc : 123 dépôts balayés
+prop : 123 dépôts balayés
+OK   balayages complets : 3
+## règles proposées : lectures par l'API, Zot jetable toujours en marche
+OK   image réelle, sans tag : 200
+OK   signature .sig : 200
+OK   attestation .att : 200
+OK   VSA de builds/vsa/sample-app (2 réelles, 1 de 15 jours) : 3
+OK   scans restants (13 et 0 jours) : sha256:3c4c6960734640e3e8820e076cf964258e1f366beff71781542bdfe703e3f518 sha256:fcb7ee1c2fe2542ea7f993c820d7bb150711623814a12af8b8c35b3f9e731768
+OK   tags de vulndb/grype (les 11 plus récemment poussés) : 2026-11-06 2026-11-07 2026-11-08 2026-11-09 2026-11-10 2026-11-11 2026-11-12 2026-11-13 2026-11-14 2026-11-15 2026-11-16
+OK   base du 5/11 : tag retiré : 404
+OK   base du 5/11 : encore lisible par digest, plus jeune que le délai : 200
+OK   base du 4/11 (30 jours) : effacée : 404
+## règles proposées : différence exacte avec la prédiction
+OK   écarts à la prédiction ligne à ligne : 0
+OK   blobs manquants après le balayage : 0
+entrées : avant 483, après 464
+taille : avant 2834 Mo, après 2644 Mo (liens durs : blobs mesurés séparément)
+dépôts disparus : builds/scan/essai-scan horodatage/essais horodatage/essais-test8/aucun-20261103t215715z
+journal d'audit, décisions de suppression : 21
+     16 builds/scan/essai-scan | deleteReferrers | removed manifest without reference
+      2 builds/scan/sample-app | deleteReferrers | removed manifest without reference
+      1 vulndb/grype | deleteUntagged | removed untagged manifest
+      2 vulndb/grype | didn't meet any tag retention rule | applied policy
+## à blanc : décisions journalisées, rien de changé
+OK   à blanc : entrées modifiées : 0
+décisions de suppression journalisées à blanc : 21
+## témoin sans règle : le défaut de Zot avec gc: true
+entrées : 364 (avant 483) ; blobs manquants : 0
+     56 amont
+      1 builds/essai-compte
+      3 builds/essai-enveloppes
+      1 builds/essai-images
+      3 builds/essai-porte
+      1 builds/essai-signature
+     30 builds/essai-webhook
+      4 builds/fermetures/sample-app
+     10 builds/sample-app
+      1 essais-j7
+      4 plateforme
+      4 tekton
+      1 workspace
+OK   témoin : image réelle sans tag effacée quand aucune règle ne la protège
+cat: '/home/gigi/.cache/supply-chain-poc/07a/g7-sec/*/zot.pid': No such file or directory
+# fin 2026-11-05T00:22:28Z, code 0

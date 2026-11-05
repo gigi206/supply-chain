@@ -73,8 +73,9 @@
 #               Zot jetable, storage et compat de zot.json, sur trois copies : sans règle, à blanc, règles proposées ; un balayage complet
 #   g7_zot      ACCORD DU PROPRIÉTAIRE : Zot reconfiguré et redémarré (confiance:stockage zot), lectures et horodatage contrôlés
 #   g7_balayage premier balayage du vrai Zot attendu (35 min environ) : aucune suppression prédite, le store a moins de 14 jours
+#   g7_retention décisions de ce balayage lues par l'auditeur (19b) ; hors de rejeu.sh : à J2, le dépôt vulndb/grype n'existe pas encore
 #   g7_periodique ACCORD DU PROPRIÉTAIRE : CronJob scan-sample-app (rendu de scan-job.yaml), un passage lancé depuis lui, referrer vérifié
-#   g7_grafana  journaux du passage, audit d'OpenBao, audit de Zot et décisions de rétention lus par l'auditeur (19b)
+#   g7_grafana  journaux du passage, audit d'OpenBao et audit de Zot lus par l'auditeur (19b)
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1328,7 +1329,7 @@ etape_g7_sec() {
   [ ! -d "$T" ] || chmod -R u+w "$T"
   rm -rf -- "${T:?}"; mkdir -p "$T/prep/racine"
   # shellcheck disable=SC2064   # développement à la pose, voulu
-  trap "for f in $T/*/zot.pid; do kill \"\$(cat \"\$f\")\" 2>/dev/null || true; done" EXIT
+  trap "for f in $T/*/zot.pid; do kill \"\$(cat \"\$f\" 2>/dev/null)\" 2>/dev/null || true; done" EXIT
   P0=$T/prep
   echo "## copie du stockage réel, lecture seule (ni sessions, ni téléversements en cours)"
   sur 'sudo tar -C /var/lib/zot --exclude=./_sessions --exclude=./.uploads -cf - .' | tar -xf - -C "$P0/racine" --no-same-owner
@@ -1447,6 +1448,7 @@ g7_lectures() { # image réelle, signature, attestation, scan, VSA et base lues 
 etape_g7_zot() { # ACCORD DU PROPRIÉTAIRE : modifie Zot et le redémarre
   local i a
   echo "## avant"; g7_lectures
+  cp "$R8/resultats/stockage-zot.log" "$R8/resultats/stockage-zot-avant-g7.log"   # le rejeu ciblé réécrit ce journal
   mise run confiance:stockage -- zot
   echo "## après"
   for i in $(seq 60); do curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/" >/dev/null 2>&1 && break; sleep 1; done
@@ -1478,6 +1480,22 @@ etape_g7_balayage() { # premier balayage du vrai Zot, lu dans le journal de zot.
   sur "sudo journalctl -u zot.service --since '$de' -o cat" | grep '"module":"retention"' | jq -r '[.repository, .decision, .reason] | join(" | ")' | sort | uniq -c | head -20
   g7_lectures
   sur 'df -m --output=used,avail / | tail -1; sudo du -sm /var/lib/zot'
+  return $ko
+}
+
+etape_g7_retention() { # gcInterval vaut 24 h : en rejeu de zéro, aucun balayage n'a vu vulndb/grype, d'où cette étape à part
+  local de
+  T=$W/g7-retention
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/g7-retention"' EXIT
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g7_zot.log")" +%s)
+  echo "## décisions de rétention du vrai Zot, lues par l'auditeur"
+  grafana_lignes '{noeud="sc-stockage", source="journal", unite="zot.service"} |= "\"module\":\"retention\"" |= "vulndb/grype"' "$de" "$T/ret.json" "$T/ret.txt"
+  grep -q '"decision":"keep"' "$T/ret.txt" && ok "décision de rétention sur vulndb/grype visible dans Grafana ($(wc -l < "$T/ret.txt") ligne(s))" || { echo "KO   rétention absente de Grafana"; ko=1; }
+  grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "\"decision\":\"delete\""' "$de" "$T/sup.json" "$T/sup.txt"
+  attendu "suppressions dans l'audit de Zot" "$(wc -l < "$T/sup.txt")" 0
+  if cat "$T/ret.json" "$T/sup.json" | grep -q -F -f "$S8/zot-poc-scan.password"; then echo "KO   mot de passe dans les réponses de Grafana"; ko=1
+  else ok "mot de passe de poc-scan absent des réponses de Grafana"; fi
   return $ko
 }
 
@@ -1542,25 +1560,19 @@ etape_g7_grafana() {
   [ -s "$T/bao.txt" ] && ok "signature du job visible dans Grafana ($(wc -l < "$T/bao.txt") ligne(s))" || { echo "KO   audit d'OpenBao absent de Grafana"; ko=1; }
   grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "builds/scan/sample-app" |= "poc-scan"' "$de" "$T/zot.json" "$T/zot.txt"
   grep -q 'manifests' "$T/zot.txt" && ok "poussage par poc-scan visible dans Grafana" || { echo "KO   poussage absent de Grafana"; ko=1; }
-  echo "## décisions de rétention du vrai Zot, lues par l'auditeur"
-  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/g7_zot.log")" +%s)
-  grafana_lignes '{noeud="sc-stockage", source="journal", unite="zot.service"} |= "\"module\":\"retention\"" |= "vulndb/grype"' "$de" "$T/ret.json" "$T/ret.txt"
-  grep -q '"decision":"keep"' "$T/ret.txt" && ok "décision de rétention sur vulndb/grype visible dans Grafana ($(wc -l < "$T/ret.txt") ligne(s))" || { echo "KO   rétention absente de Grafana"; ko=1; }
-  grafana_lignes '{noeud="sc-stockage", source="audit-zot"} |= "\"decision\":\"delete\""' "$de" "$T/sup.json" "$T/sup.txt"
-  echo "suppressions dans l'audit de Zot : $(wc -l < "$T/sup.txt")"
   echo "## identifiants de poc-scan absents des réponses"
   { cat "$S8/zot-poc-scan.password"; echo; printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0; echo; } > "$T/motifs"
-  if cat "$T/job.json" "$T/bao.json" "$T/zot.json" "$T/ret.json" | grep -q -F -f "$T/motifs"; then echo "KO   identifiants dans les réponses de Grafana"; ko=1
+  if cat "$T/job.json" "$T/bao.json" "$T/zot.json" | grep -q -F -f "$T/motifs"; then echo "KO   identifiants dans les réponses de Grafana"; ko=1
   else ok "ni le mot de passe ni son encodage docker dans les réponses de Grafana"; fi
   kubectl delete job -n scan g7-manuel --wait=false >/dev/null
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,77p "$0"; exit 2; }
+[ $# -ge 1 ] || { sed -n 2,79p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_periodique|g7_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
