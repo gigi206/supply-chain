@@ -72,6 +72,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 05/11/2026, 22:21 UTC** : protocoles des briques [05](../../poc/bricks/05-rpm-mock/README.md) et [06](../../poc/bricks/06-deb-sbuild/README.md) préparés à sec, rien installé. Ils proposent mock et sbuild en voie A, pod Kata privilégié et sans sortie, ce qui reste à mesurer ; décisions au propriétaire. La ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 05/11/2026, 22:37 UTC** : audit au doc 04 de podman, skopeo et des images de base, rien installé, aucun verdict « Risqué ». La plage amont d'un avis critique sur `podman run` couvre le podman de Rocky 9.7 et 9.8 ; mock n'emploie pas `podman run`, d'après son code au tag. Rien n'est mesuré sous Kata : la ligne d'isolation de cet ADR n'est pas modifiée.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).

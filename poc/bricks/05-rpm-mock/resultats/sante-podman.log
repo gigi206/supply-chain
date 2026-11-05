@@ -1,0 +1,82 @@
+# sante.sh podman, 2026-11-05T22:41:28Z
+## appels de podman et skopeo dans mock, tag mock-6.9-1
+fichiers lus sous mock/ : 160 (sources lues, jamais exécutées)
+occurrences de podman ou skopeo, quelle que soit la casse ou la forme des guillemets : 133, par fichier :
+       41 mock/py/mockbuild/podman.py
+       29 mock/tests/test_podman.py
+       18 mock/mock.spec
+       15 mock/py/mockbuild/buildroot.py
+        7 mock/docs/site-defaults.cfg
+        5 mock/tests/test_buildroot_lock.py
+        5 mock/py/mockbuild/plugins/buildroot_lock.py
+        4 mock/docs/buildroot-lock-schema-1.1.0.json
+        2 mock/py/mockbuild/config.py
+        2 mock/py/mock-hermetic-repo.py
+        1 mock/py/mockbuild/util.py
+        1 mock/integration-tests/setup-playbook/tasks/main.yml
+        1 mock/integration-tests/21-mockchain-image.tst
+        1 mock/docs/mock.1
+        1 mock/docs/buildroot-lock-schema-1.0.0.json
+occurrences contenant run, build, exec, create, load ou save comme mot :
+  mock/mock.spec:472:- hermetic: do "podman pull" instead of "podman load" for bootstrap
+  mock/mock.spec:635:- pass env to podman run (dani@lapiole.org)
+  mock/mock.spec:826:- pass proxy environment to exec of Podman (RHBZ#1772598)
+  mock/tests/test_podman.py:41:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:59:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:73:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:84:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:126:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:135:    @patch("mockbuild.podman.subprocess.run")
+  mock/tests/test_podman.py:143:    @patch("mockbuild.podman.subprocess.run")
+  mock/py/mockbuild/buildroot.py:509:          (e.g., a missing resolv.conf, which is common in 'podman run --network=none'
+  mock/py/mockbuild/podman.py:102:    """ interacts with podman to create build chroot """
+tous les appels écrits dans podman.py et mock-hermetic-repo.py :
+  mockbuild/podman.py:30:    check = [podman, "image", "inspect", image]
+  mockbuild/podman.py:73:    sys_check_cmd = [podman, "version", "--format", "{{.OsArch}}"]
+  mockbuild/podman.py:74:    image_check_cmd = [podman, "image", "inspect",
+  mockbuild/podman.py:120:        cmd = [self.podman_binary, "pull"]
+  mockbuild/podman.py:158:        cmd = ["podman", "tag", self.image_id, self._tagged_id]
+  mockbuild/podman.py:180:        cmd_mount = [self.podman_binary, "image", "mount", self.image_id]
+  mockbuild/podman.py:181:        cmd_umount = [self.podman_binary, "image", "umount", self.image_id]
+  mockbuild/podman.py:230:            cmd_podman = [tar_cmd, "-C", mount_path, "-c", "."]
+  mockbuild/podman.py:234:                cmd_tar = [tar_cmd, "-xC", destination, "-f", "-"]
+  mockbuild/podman.py:244:        cmd = ["podman", "rmi", self._tagged_id]
+  mockbuild/podman.py:253:        cmd = ["podman", "image", "inspect", self.image, "--format",
+  mockbuild/podman.py:268:        cmd = ["podman", "image", "inspect", "--format", get_query, self.image]
+  mock-hermetic-repo.py:135:    pull_cmd = ["skopeo", "sync", "--src", "docker", "--dest", "dir",
+occurrences dans les autres fichiers de code de mock :
+  mock/py/mockbuild/util.py:1120:            # running in a Podman container
+  mock/py/mockbuild/plugins/buildroot_lock.py:10:from mockbuild.podman import Podman, PodmanError
+  mock/py/mockbuild/plugins/buildroot_lock.py:108:                            podman = Podman(self.buildroot,
+  mock/py/mockbuild/plugins/buildroot_lock.py:110:                            data["bootstrap"] = podman.inspect_hermetic_metadata()
+  mock/py/mockbuild/plugins/buildroot_lock.py:111:                            data["bootstrap"]["image_digest"] = podman.get_oci_digest()
+  mock/py/mockbuild/plugins/buildroot_lock.py:112:                        except PodmanError:
+  mock/py/mockbuild/buildroot.py:28:from .podman import Podman, PodmanError
+  mock/py/mockbuild/buildroot.py:256:                "though uses container tooling itself (namely Podman) for "
+  mock/py/mockbuild/buildroot.py:267:            except PodmanError as exc:
+  mock/py/mockbuild/buildroot.py:276:            with _fallback("Can't work with Podman"):
+  mock/py/mockbuild/buildroot.py:277:                podman = Podman(self, self.chroot_image)
+  mock/py/mockbuild/buildroot.py:281:                    podman.retry_image_pull(self.image_keep_getting,
+  mock/py/mockbuild/buildroot.py:284:                    podman.read_image_id()
+  mock/py/mockbuild/buildroot.py:286:                                  self.chroot_image, podman.image_id)
+  mock/py/mockbuild/buildroot.py:287:                podman.tag_image()
+  mock/py/mockbuild/buildroot.py:293:                    digest = podman.get_oci_digest()
+  mock/py/mockbuild/buildroot.py:296:                            f"Expected digest for image {podman.image} is"
+  mock/py/mockbuild/buildroot.py:299:                if self.is_bootstrap and not podman.check_native_image_architecture():
+  mock/py/mockbuild/buildroot.py:302:                podman.cp(self.make_chroot_path(), self.config["tar_binary"])
+  mock/py/mockbuild/buildroot.py:303:                podman.untag()
+  mock/py/mockbuild/buildroot.py:509:          (e.g., a missing resolv.conf, which is common in 'podman run --network=none'
+  mock/py/mockbuild/config.py:445:    # Temporary workaround for Podman not being able to auto-detect
+  mock/py/mockbuild/config.py:843:    # skopeo (currently) can't live with tag + sha, so strip the tag
+## changelogs des paquets, dépôts signés
+empreinte : 21CB256AE16FC54C6E652949702D426D350D275D
+### vault-9.7 : repomd.xml rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Relea
+OK   other.xml.gz conforme à repomd.xml
+buildah 1.41.8-3.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 absente
+podman 5.6.0-14.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 absente
+skopeo 1.20.0-3.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 absente
+### pub-9.8 : repomd.xml rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Relea
+OK   other.xml.gz conforme à repomd.xml
+buildah 1.43.1-4.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 absente
+podman 5.8.2-8.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 présente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 présente
+skopeo 1.22.2-9.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente, CVE-2026-19730 absente

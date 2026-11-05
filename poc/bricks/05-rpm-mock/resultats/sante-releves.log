@@ -1,0 +1,96 @@
+# sante.sh releves, 2026-11-05T22:35:21Z
+Relevé du 2026-11-05 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| podman | containers/podman | construction | oui | 7.8 | 2026-11-02 | 10 | 0 | 10 | ? |
+| skopeo | containers/skopeo | construction | oui | 8.6 | 2026-11-02 | 10 | -1 | 10 | ? |
+| mock | rpm-software-management/mock | packaging | oui | 4.9 | 2026-11-02 | 10 | 0 | 7 | ? |
+| images Rocky | rocky-linux/sig-cloud-instance-images | image de base | oui | n/d | — | — | — | — | — |
+| images Debian | debuerreotype/docker-debian-artifacts | image de base | oui | n/d | — | — | — | — | — |
+| debuerreotype | debuerreotype/debuerreotype | image de base | oui | n/d | — | — | — | — | — |
+## containers/podman
+nom final podman-container-tools/podman, archivé false, licence Apache-2.0, dernier push 2026-11-05
+dernière release : v6.1.4 du 2026-10-12
+commits depuis 2026-08-07T00:00:00Z : 831 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+      194 Luap99	redhat.com
+      102 Honny1	seznam.cz
+       78 mheon	redhat.com
+       30 danishprakash	danishpraka.sh
+       20 vtushar06	gmail.com
+       16 lsm5	redhat.com
+       15 giuseppe	redhat.com
+       14 l0rd	gmail.com
+       13 ROKUMATE	gmail.com
+       10 mheon	pm.me
+fusionneurs des 100 dernières PR : Honny1 32, Luap99 41, TomSweeneyRedHat 1, ashley-cui 1, baude 1, danishprakash 5, giuseppe 1, mheon 17, ygalblum 1
+SECURITY.md : SECURITY.md
+avis publiés : 10 ; depuis un an : 5
+  GHSA-fx76-2j3w-2mx6 2026-08-13 medium podman quadlet install --replace does not fully replace the old file
+  GHSA-2cvf-wqm6-wr9g 2026-09-29 critical The `podman run` command can be instructed to disable almost all sandboxing - including user-requested sandboxing - by image annotation
+  GHSA-4hq8-gpf5-8p68 2026-06-24 high Malformed Image can trick podman run into leaking host environment variables into the container
+  GHSA-q6r4-3wmg-fwcq 2026-06-17 medium WORKDIR symlink traversal vulnerability
+## containers/skopeo
+nom final podman-container-tools/skopeo, archivé false, licence Apache-2.0, dernier push 2026-11-05
+dernière release : v1.24.1 du 2026-09-16
+commits depuis 2026-08-07T00:00:00Z : 129 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       58 mtrmac	redhat.com
+       13 Luap99	redhat.com
+        4 vtushar06	gmail.com
+        3 TomSweeneyRedHat	redhat.com
+        3 IanEff	gmail.com
+        2 lsm5	redhat.com
+        2 i-OmSharma	gmail.com
+        2 ROKUMATE	gmail.com
+        1 timcoding1988	redhat.com
+        1 renshao	shao.io
+fusionneurs des 100 dernières PR : Luap99 22, TomSweeneyRedHat 1, giuseppe 1, mheon 1, mtrmac 75
+SECURITY.md : SECURITY.md
+avis publiés : 0 ; depuis un an : 0
+## rocky-linux/sig-cloud-instance-images
+nom final rocky-linux/sig-cloud-instance-images, archivé false, licence null, dernier push 2026-11-04
+dernière release : aucune
+commits depuis 2026-08-07T00:00:00Z : 0 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+fusionneurs des 100 dernières PR : NeilHanlon 20, lumarel 3
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+## debuerreotype/docker-debian-artifacts
+nom final debuerreotype/docker-debian-artifacts, archivé false, licence Apache-2.0, dernier push 2026-11-05
+dernière release : aucune
+commits depuis 2026-08-07T00:00:00Z : 0 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+fusionneurs des 100 dernières PR : tianon 2, yosifkit 1
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+## debuerreotype/debuerreotype
+nom final debuerreotype/debuerreotype, archivé false, licence MIT, dernier push 2026-09-08
+dernière release : 0.17 du 2025-12-08
+commits depuis 2026-08-07T00:00:00Z : 2 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        2 tianon	gmail.com
+fusionneurs des 100 dernières PR : tianon 100
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+## mock : dernière release
+mock-6.9-1 du 2026-10-01
+## git.resf.org, sig_core/rocky-kiwi-descriptions (source déclarée par l'image Rocky)
+archivé false, branche main, mis à jour 2026-11-05
+derniers commits de r9 : plus récent 2026-10-30, sur 50 lus :
+       20 Louis Abel
+       10 Sherif Nagy
+        4 Jonathan Dieter
+        4 Bryan Zuelly
+        4 Brian Clemens
+        3 lumarel
+        3 Neil Hanlon
+        2 skip
+## processus de sécurité de Rocky
+security.txt : Contact: mailto:security@rockylinux.org Expires: 2027-10-01T00:00:00.000Z 
+errata : HTTP 200
+## paquets dans vault/rocky/9.7 (les rpm que mock installerait)
+  AppStream : podman-5.6.0-13.el9_7.x86_64.rpm
+  AppStream : podman-5.6.0-14.el9_7.x86_64.rpm
+  AppStream : skopeo-1.20.0-2.el9_7.x86_64.rpm
+  AppStream : skopeo-1.20.0-3.el9_7.x86_64.rpm
+  AppStream : buildah-1.41.8-2.el9_7.x86_64.rpm
+  AppStream : buildah-1.41.8-3.el9_7.x86_64.rpm
+  BaseOS : systemd-container-252-55.el9_7.8.rocky.0.1.x86_64.rpm
+  BaseOS : systemd-container-252-55.el9_7.9.rocky.0.1.x86_64.rpm

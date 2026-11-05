@@ -1,0 +1,29 @@
+# sante.sh podman, 2026-11-05T22:37:36Z
+## appels de podman et skopeo dans mock, tag mock-6.9-1
+fichiers Python lus : 52
+  emploi : mock/py/mock-hermetic-repo.py
+  emploi : mock/py/mockbuild/podman.py
+sous-commandes écrites dans ces deux fichiers :
+  podman.py:30:    check = [podman, "image", "inspect", image]
+  podman.py:73:    sys_check_cmd = [podman, "version", "--format", "{{.OsArch}}"]
+  podman.py:74:    image_check_cmd = [podman, "image", "inspect",
+  podman.py:120:        cmd = [self.podman_binary, "pull"]
+  podman.py:158:        cmd = ["podman", "tag", self.image_id, self._tagged_id]
+  podman.py:180:        cmd_mount = [self.podman_binary, "image", "mount", self.image_id]
+  podman.py:181:        cmd_umount = [self.podman_binary, "image", "umount", self.image_id]
+  podman.py:244:        cmd = ["podman", "rmi", self._tagged_id]
+  podman.py:253:        cmd = ["podman", "image", "inspect", self.image, "--format",
+  podman.py:268:        cmd = ["podman", "image", "inspect", "--format", get_query, self.image]
+  mock-hermetic-repo.py:135:    pull_cmd = ["skopeo", "sync", "--src", "docker", "--dest", "dir",
+## changelogs des paquets, dépôts signés
+empreinte : 21CB256AE16FC54C6E652949702D426D350D275D
+### vault-9.7 : repomd.xml rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Relea
+OK   other.xml.gz conforme à repomd.xml
+buildah 1.41.8-3.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente
+podman 5.6.0-14.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente
+skopeo 1.20.0-3.el9_7 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente
+### pub-9.8 : repomd.xml rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Relea
+OK   other.xml.gz conforme à repomd.xml
+buildah 1.43.1-4.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente
+podman 5.8.2-8.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 présente, CVE-2026-55686 absente, CVE-2026-33414 absente
+skopeo 1.22.2-9.el9_8 : CVE-2026-94603 absente, CVE-2026-57231 absente, CVE-2026-55686 absente, CVE-2026-33414 absente

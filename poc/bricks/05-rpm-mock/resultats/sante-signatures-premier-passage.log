@@ -1,0 +1,35 @@
+# sante.sh signatures, 2026-11-05T22:33:11Z
+## images
+### quay.io/rockylinux/rockylinux:9.7
+digest : sha256:53f4c6dcb34e1403bd93207351f0af9a593610faeb7165cb8a037346765199b0
+plateformes : arm64 ppc64le s390x amd64
+manifestes d'attestation : 0
+amd64 : sha256:ee90dc0e23c2f59af63886aed78c495fc847c8f0af7e825f48746547ddb7fbe2, créée le 2025-11-23
+cosign tree : rc 0 ; 0 entrée(s)
+  📦 Supply Chain Security Related artifacts for an image: quay.io/rockylinux/rockylinux:9.7
+  No Supply Chain Security Related Artifacts found for image quay.io/rockylinux/rockylinux:9.7,
+   start creating one with simply running$ cosign sign <img>### docker.io/library/debian:trixie-20261104-slim
+digest : sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
+plateformes : amd64 arm arm arm64 386 ppc64le riscv64 s390x
+manifestes d'attestation : 8
+amd64 : sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392, créée le 2026-11-04
+cosign tree : rc 0 ; 0 entrée(s)
+  📦 Supply Chain Security Related artifacts for an image: docker.io/library/debian:trixie-20261104-slim
+  No Supply Chain Security Related Artifacts found for image docker.io/library/debian:trixie-20261104-slim,
+   start creating one with simply running$ cosign sign <img>## attestation de l'image Debian, amd64
+manifeste d'attestation : sha256:00f161b6f42d3f3b3d8c96e0cfb1ebc1c6de3780432be3b867ffe5dcb45566d0
+  application/vnd.in-toto+json	https://spdx.dev/Document
+signatures de ce manifeste : 0 entrée(s)
+## couche de l'image Debian et empreinte publiée par debuerreotype
+série publiée : 20261104
+trixie/slim/rootfs.tar.xz.sha256 : 6ee8a2816125731534184b2e3369a01cd388b930cda0deda56c9e41e3f896814
+  couche : sha256:37fb86c2a767b88d500c6872195f88078f64765fe0d2f9cc375cc2efbd4c0a41	29856132	application/vnd.oci.image.layer.v1.tar+gzip
+DIFFÉRENT : couche et empreinte publiée
+## repomd.xml de Rocky 9.7 et clé de Rocky
+sha256 de la clé : 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+empreinte : 21CB256AE16FC54C6E652949702D426D350D275D
+identité : Rocky Enterprise Software Foundation - Release key 2022 <releng@rockylinux.org>
+BaseOS : rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Release key 2022 <releng@rockylinux.org>" [unknown]
+AppStream : rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Release key 2022 <releng@rockylinux.org>" [unknown]
+CRB : rc 0 ; gpg: Good signature from "Rocky Enterprise Software Foundation - Release key 2022 <releng@rockylinux.org>" [unknown]
+témoin altéré : rc 1 (refus attendu) ; gpg: BAD signature from "Rocky Enterprise Software Foundation - Release key 2022 <releng@rockylinux.org>" [unknown]

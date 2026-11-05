@@ -6,7 +6,7 @@ Règles reprises : projets jugés par le doc 04, rien de « Risqué » (mock : �
 
 ## État
 
-**Préparé à sec le 05/11/2026 à 22:21 UTC, rien installé, rien construit.** Seul [`releve-amont.sh`](releve-amont.sh) a tourné : il lit des métadonnées et des textes amont aux tags épinglés, et le seul paquet téléchargé, `uidmap`, est listé sans être extrait ni exécuté ([journal](resultats/releve-amont.log) ; passages incomplets archivés : [premier](resultats/releve-amont-premier-passage.log), [deuxième](resultats/releve-amont-deuxieme-passage.log)). Les décisions ci-dessous attendent le propriétaire. Les jalons M1 et suivants n'ont pas de place avant le rejeu RKE2 (08b) : tout ce qui serait posé avant serait effacé par lui.
+**Préparé à sec le 05/11/2026 à 22:21 UTC, rien installé, rien construit.** Seul [`releve-amont.sh`](releve-amont.sh) a tourné : il lit des métadonnées et des textes amont aux tags épinglés, et le seul paquet téléchargé, `uidmap`, est listé sans être extrait ni exécuté ([journal](resultats/releve-amont.log) ; passages incomplets archivés : [premier](resultats/releve-amont-premier-passage.log), [deuxième](resultats/releve-amont-deuxieme-passage.log)). Depuis, à 22:41 UTC, [`sante.sh`](sante.sh) a aussi tourné, en lecture seule : voir l'additif des préalables. Les décisions ci-dessous attendent le propriétaire. Les jalons M1 et suivants n'ont pas de place avant le rejeu RKE2 (08b) : tout ce qui serait posé avant serait effacé par lui.
 
 La brique [06](../06-deb-sbuild/README.md) suit le même plan.
 
@@ -36,6 +36,16 @@ Le protocole introduit des éléments que le doc 04 n'audite pas (recherche du 0
 - **image `quay.io/rockylinux/rockylinux`**, par digest, avec sa signature si elle existe ;
 - les versions exactes de mock et de `mock-core-configs`, déjà auditées comme projet, à repréciser.
 
+**Additif du 05/11/2026, 22:37 UTC, audit fait, rien installé** ([`sante.sh`](sante.sh), journaux : [relevés](resultats/sante-releves.log), [signatures](resultats/sante-signatures.log), [podman](resultats/sante-podman.log) ; passages antérieurs archivés : [relevés](resultats/sante-releves-premier-passage.log), [signatures](resultats/sante-signatures-premier-passage.log), podman [premier](resultats/sante-podman-premier-passage.log) et [deuxième](resultats/sante-podman-deuxieme-passage.log)). **Aucun verdict « Risqué »** ; podman, skopeo et les images Rocky sont « À surveiller », chemin critique (doc 04, §2, §3, §5, §6).
+
+- **skopeo s'ajoute à podman** : `mock-hermetic-repo` télécharge l'image de bootstrap par `skopeo sync`. La liste ci-dessus l'avait omis.
+- **Avis critique de podman** (GHSA-2cvf-wqm6-wr9g, plage amont v4.4.0 à v5.8.8 exclu) : Rocky livre 5.6.0-14 en 9.7 et 5.8.2-8 en 9.8, **tous deux dans cette plage**. Les changelogs signés ne citent ce CVE dans aucun des deux. **Cela ne prouve ni l'exposition ni un correctif** : l'absence d'une mention ne vaut pas mesure, et CVE-2026-33414, corrigé en amont en v5.8.2, n'y figure pas non plus. La faille vise `podman run`. Sur les 160 fichiers sous `mock/` au tag, les 133 occurrences de podman et skopeo sont au journal : le code n'appelle que `pull`, `image inspect`, `image mount`, `image umount`, `tag`, `rmi`, `version` et `skopeo sync`. `podman run` n'y apparaît que dans un commentaire et une ancienne entrée du changelog. Le chemin n'est donc pas employé par mock, d'après la lecture du code, sans essai d'exécution.
+- **Seule différence mesurée entre 9.7 et 9.8 sur 5 CVE** : CVE-2026-57231 et CVE-2026-19730 figurent au changelog du podman de 9.8, aucun des 5 en 9.7. Le premier vise aussi `podman run`, le second `podman quadlet` ; mock n'emploie ni l'un ni l'autre.
+- **9.7 et 9.8 ne jouent pas le même rôle** : le paragraphe D2 traite de la cible. L'image du constructeur, qui porte podman et skopeo, peut être en 9.8, plus récente, sans changer la cible en `vault/9.7`. D'où la décision D4.
+- **Versions reprécisées** : mock 6.9-1 (dernière release, 01/10/2026 ; Scorecard 4,9 au 02/11/2026), `mock-core-configs` 45.2-1.
+- **Passage raté** : le premier passage des signatures affiche « DIFFÉRENT » parce qu'il comparait l'empreinte d'un `rootfs.tar.xz` à une couche gzip. La méthode était inadaptée, ce n'était pas un écart ; le manifeste et la couche sont identiques au dépôt. Les signatures ont ensuite été rejouées deux fois (comparaison corrigée, puis Rocky 9.8), sans garder le passage intermédiaire.
+- **Images non signées** : `rockylinux:9.7` (`sha256:53f4c6dc…`, 23/11/2025) et `:9.8` (`sha256:81019941…`, 25/05/2026). M1 contrôle les rpm de l'image : signatures et `rpm -Va`. Les `repomd.xml` de 9.7 sont vérifiés, clé `21CB 256A…275D`.
+
 ## Décisions à prendre
 
 **D1. Lecture du seuil et isolation.** Recommandé : **(a)**.
@@ -49,6 +59,10 @@ Le protocole introduit des éléments que le doc 04 n'audite pas (recherche du 0
 **D3. Résolution.** Recommandé : **(a)**.
 - (a) Sur l'hôte d'abord, comme le prefetch de la 03, puis dans Tekton en M4.
 - (b) Dans Tekton dès le début : plus proche de la cible, mais une panne mêlerait mock, réseau et admission.
+
+**D4. Base de l'image du constructeur** (ajoutée le 05/11/2026, 22:37 UTC, après l'audit). Recommandé : **(a)**.
+- (a) Rocky 9.8 par digest pour l'outillage (mock, podman, skopeo), cible en `vault/9.7` selon D2. Podman 5.8.2 avec 2 CVE de plus au changelog, mais deux versions à suivre, et l'avis critique n'est pas démontré corrigé en 9.8.
+- (b) Rocky 9.7 partout. Un seul jeu de rpm, mais un podman figé en 5.6.0, sans aucun des 5 CVE au changelog.
 
 ## Jalons proposés
 
