@@ -1,0 +1,58 @@
+# sante.sh releves, 2026-11-05T20:09:50Z
+Relevé du 2026-11-05 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| RKE2 | rancher/rke2 | runtime | oui | 5.9 | 2026-10-26 | 10 | 0 | 10 | ? |
+| cert-manager | cert-manager/cert-manager | signature | non | 8.4 | 2026-11-05 | 10 | 0 | 10 | 9 |
+| local-path-provisioner | rancher/local-path-provisioner | stockage | non | 5.5 | 2026-11-02 | 10 | -1 | 2 | ? |
+## rancher/rke2
+archivé false, licence Apache-2.0
+dernière release : v1.37.1+rke2r1 du 2026-09-30
+commits depuis 2026-08-07T00:00:00Z : 254 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       26 dereknola	suse.com
+       24 manuelbuil	suse.com
+       23 mgfritch	suse.com
+       19 brandond	rancher.com
+        9 rafaelbreno	users.noreply.github.com
+        7 vitorsavian	suse.com
+        7 thomasferrandiz	suse.com
+        3 w13915984028	suse.com
+        3 cwayne18	suse.com
+        3 WebberHuang1118	suse.com
+fusionneurs des 100 dernières PR : brandond 6, cwayne18 20, dereknola 17, manuelbuil 11, mgfritch 36, rafaelbreno 5, vitorsavian 5
+SECURITY.md : {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent
+avis publiés : 3 ; depuis un an : 0
+  GHSA-x7xj-jvwp-97rv 2024-10-25 critical Privilege escalation in Windows nodes due to Insecure Access Control Lists
+  GHSA-p45j-vfv5-wprq 2023-09-08 high RKE2 supervisor port is vulnerable to unauthenticated remote denial-of-service (DoS) attack via TLS SAN stuffing attack
+  GHSA-hvj9-vfxp-c3cf 2021-07-23 medium RKE2 bootstrap data is encrypted with empty string if user does not supply a token 
+## cert-manager/cert-manager
+archivé false, licence Apache-2.0
+dernière release : v1.21.3 du 2026-10-23
+commits depuis 2026-08-07T00:00:00Z : 439 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       27 wallrj	the-moon.net
+       12 -	paloaltonetworks.com
+        7 lunarwhite	outlook.com
+        5 wallrj-cyberark	cyberark.com
+        4 hjoshi123	hjoshi.me
+        3 shashankvarma499	gmail.com
+        3 sebrandon1	redhat.com
+        3 pujitha24	gmail.com
+        3 erikgb	gmail.com
+        3 FelixPhipps	users.noreply.github.com
+fusionneurs des 100 dernières PR : app/cert-manager-prow 100
+SECURITY.md : SECURITY.md
+avis publiés : 3 ; depuis un an : 2
+  GHSA-8rvj-mm4h-c258 2026-06-25 high Direct ACME Challenge resources can bypass Issuer DNS01 solver policy and use ClusterIssuer DNS credentials
+  GHSA-gx3x-vq4p-mhhv 2026-02-02 medium cert-manager-controller DoS via Specially Crafted DNS Response
+  GHSA-r4pg-vg54-wxx4 2024-11-20 low Potential slowdown / DoS when parsing specially crafted PEM inputs
+## rancher/local-path-provisioner
+archivé false, licence Apache-2.0
+dernière release : v0.0.37 du 2026-08-05
+commits depuis 2026-08-07T00:00:00Z : 14 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        1 vitorsavian	suse.com
+fusionneurs des 100 dernières PR : app/renovate-rancher 5, derekbit 93, innobead 1, yasker 1
+SECURITY.md : {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/contents#get-repository-content","status":"404"}absent
+avis publiés : 2 ; depuis un an : 2
+  GHSA-7fxv-8wr2-mfc4 2026-05-08 high HelperPod Template Injection
+  GHSA-jr3w-9vfr-c746 2026-02-04 critical Vulnerable to path traversal via parameters.pathPattern

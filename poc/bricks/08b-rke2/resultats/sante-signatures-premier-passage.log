@@ -1,0 +1,20 @@
+# sante.sh signatures, 2026-11-05T20:09:33Z
+## RKE2 v1.35.9+rke2r1 : sommes publiées (aucun fichier de signature dans la release)
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+f9e1c9f66545618b1ae736a40b01c0087b17e9ab98b0d747bc91ef4c6da56abd  rke2-images-core.linux-amd64.tar.zst
+e2ed0b37d06d16d823289c0117e43d98c7677d65b778ae4370827243776c295e  rke2.linux-amd64.tar.gz
+## signatures cherchées sur les images (cosign tree)
+docker.io/rancher/rke2-runtime:v1.35.9-rke2r1 : rc 0 ; 0 entrée(s)
+  📦 Supply Chain Security Related artifacts for an image: docker.io/rancher/rke2-runtime:v1.35.9-rke2r1
+  No Supply Chain Security Related Artifacts found for image docker.io/rancher/rke2-runtime:v1.35.9-rke2r1,
+   start creating one with simply running$ cosign sign <img>docker.io/rancher/local-path-provisioner:v0.0.37 : rc 0 ; 0 entrée(s)
+  📦 Supply Chain Security Related artifacts for an image: docker.io/rancher/local-path-provisioner:v0.0.37
+  No Supply Chain Security Related Artifacts found for image docker.io/rancher/local-path-provisioner:v0.0.37,
+   start creating one with simply running$ cosign sign <img>## cert-manager v1.21.3, clé publiée par le projet
+sha256 de la clé : 62151ffda7bb5350367480750ff1cb75d53f0f83baca524044e5274aa83b63a6
+cert-manager-controller : rc 0 ; digest sha256:9f4f96a33c7774cef24466fcd85031997531a03a8d117f151126baa8d1290dcc
+cert-manager-webhook : rc 0 ; digest sha256:055ac8e9de6a0ba6763794838fe38944acc650f68ebe1b01dd8be079e580f458
+cert-manager-cainjector : rc 0 ; digest sha256:083d0e906f8eb44e255fe4ff817ae54e49f9ed82e22f1011bb4e9e4f4b8a641f
+témoin : autre image avec la même clé : rc 10 (refus attendu) ; error during command execution: no signatures found
+provenance cherchée : 0 entrée(s)

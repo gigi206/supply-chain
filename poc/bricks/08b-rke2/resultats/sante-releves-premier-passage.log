@@ -1,0 +1,68 @@
+# sante.sh releves, 2026-11-05T20:09:33Z
+Relevé du 2026-11-05 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| RKE2 | rancher/rke2 | runtime | oui | 5.9 | 2026-10-26 | 10 | 0 | 10 | ? |
+| cert-manager | cert-manager/cert-manager | signature | non | 8.4 | 2026-11-05 | 10 | 0 | 10 | 9 |
+| local-path-provisioner | rancher/local-path-provisioner | stockage | non | 5.5 | 2026-11-02 | 10 | -1 | 2 | ? |
+## rancher/rke2
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+dernière release : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+commits depuis 2026-08-07T00:00:00Z : 0 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+fusionneurs des 100 dernières PR : 
+SECURITY.md : absent
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+avis publiés :  ; depuis un an : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+## cert-manager/cert-manager
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+dernière release : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+commits depuis 2026-08-07T00:00:00Z : 0 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+fusionneurs des 100 dernières PR : 
+SECURITY.md : absent
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+avis publiés :  ; depuis un an : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+## rancher/local-path-provisioner
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+dernière release : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+commits depuis 2026-08-07T00:00:00Z : 0 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+fusionneurs des 100 dernières PR : 
+SECURITY.md : absent
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
+avis publiés :  ; depuis un an : 
+env: 'command' : Aucun fichier ou répertoire de ce type
+env: utilisez -[v]S pour passer des options dans les lignes shebang
