@@ -11,7 +11,7 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 - produire des **rpm et deb** multi-distro (Debian, Ubuntu, Rocky, Alma, CentOS Stream) ;
 - atteindre **SLSA Build L3**.
 
-> **Statut : phase 2a (benchmarks) et validation locale des briques.** Aucune brique n'est encore déployée sur un cluster ; l'avancement est suivi dans [`docs/03-validation-briques.md`](docs/03-validation-briques.md).
+> **Statut au 05/11/2026 : phase 2b-1, PoC en service sur un laptop (trois VM).** Les bancs de l'ADR 0000 sont terminés. La chaîne de confiance (brique 08) tourne sous k3s, du webhook à la porte ; ses 8 tests négatifs ont été mesurés et l'ensemble a été rejoué de zéro le 03/11/2026. La conversion à RKE2 (08b) est préparée mais n'a jamais été lancée ; rien de la 08c (durcissement) ni de la 08d (cert-manager) n'est appliqué. Les briques rpm et deb (05, 06, 09) ne sont pas commencées. L'avancement détaillé est suivi dans [`docs/03-validation-briques.md`](docs/03-validation-briques.md).
 
 ## Existe-t-il un projet open source qui fait tout ça ?
 
@@ -23,7 +23,11 @@ Plateforme de **supply-chain logicielle** auto-hébergée. Elle vise à :
 - Forgejo Actions, Woodpecker, Jenkins : L2 ;
 - Witness : L2.
 
-La plateforme s'assemble donc autour de Tekton + Chains, avec des briques complémentaires. Ce « Konflux allégé » est l'hypothèse par défaut ; Konflux et OBS sont benchmarkés avant de trancher (ADR 0000), ainsi que deux challengers : **Nix** comme moteur de build et **Kyverno** comme moteur de politique unique.
+La plateforme s'assemble donc autour de Tekton + Chains, avec des briques complémentaires. Ce « Konflux allégé » était l'hypothèse par défaut ; les bancs de l'[ADR 0000](docs/adr/0000-assembler-ou-adopter.md) l'ont confirmée (score du candidat contre celui de la référence) :
+- **Konflux** : éliminé, 17 contre 57 ;
+- **OBS** : non adopté, 42 contre 55, seuil à 65 ;
+- **Nix** : en veille, 74 contre 91, alors que la règle exige +15 ;
+- **Kyverno seul** : non adopté malgré 74 contre 64, à cause d'une réserve mesurée ; Conforma reste la porte de release et Kyverno l'admission.
 
 Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-existant.md).
 
@@ -40,10 +44,10 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | [`docs/02-architecture.md`](docs/02-architecture.md) | Architecture cible, flux de build, modèle de provenance, stockage, porte et score, clés, observabilité |
 | [`docs/03-validation-briques.md`](docs/03-validation-briques.md) | Résultats des bancs et des briques, et liste de ce qui reste à valider sur l'infra du PoC |
 | [`docs/04-sante-projets.md`](docs/04-sante-projets.md) | Audit de santé des projets (Scorecard, activité, signatures), plans de sortie |
-| [`docs/adr/`](docs/adr/README.md) | Décisions d'architecture (ADR 0001 provisoire) |
+| [`docs/adr/`](docs/adr/README.md) | Décisions d'architecture (ADR 0000 : grilles et résultats des bancs ; ADR 0001 provisoire) |
 | [`tools/health/`](tools/health/) | Script de ré-audit trimestriel (`scorecard.sh`, `projects.tsv`) |
 
-## Briques principales (hypothèse « Konflux allégé »)
+## Briques principales (« Konflux allégé »)
 
 | Domaine | Brique |
 |---|---|
@@ -57,18 +61,18 @@ Détails, alternatives et sources : [`docs/00-etude-existant.md`](docs/00-etude-
 | SBOM et vulnérabilités | Syft, Grype (base datée), OSV, Dependency-Track v5 (projection), VEX (OpenVEX signé) |
 | Licences | Syft + REUSE (2b), ORT + ScanCode (2c) |
 | Vérification | Rebuild **dans un domaine d'administration distinct**, diffoscope, reprotest |
-| Observabilité | Prometheus + Alertmanager + Grafana (exploitation, puis KPI supply-chain dérivés des attestations) |
+| Observabilité | Prometheus + Alertmanager + Grafana (exploitation, puis KPI supply-chain dérivés des attestations) ; Loki + Alloy (journalisation d'audit, consultable dans Grafana) |
 
 ## Phases et effort
 
-Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2× son estimation déclenche une décision.
+Les efforts sont en personnes-semaines (pw), estimés au départ : le total ne compte ni la 19b ni les briques 08b à 08d, ajoutées depuis. Une brique qui dépasse 2× son estimation déclenche une décision.
 
 | Phase | Contenu | Effort |
 |---|---|---|
-| **1. Étude** (en cours) | Étude, exigences, architecture, audit de santé, ADR 0001 provisoire | ~2 pw |
-| **2a. Adopter ou assembler** | Grille pondérée fixée d'avance ; benchmarks Konflux, OBS, Nix (build) et Kyverno seul (politique) → **ADR 0000** | ~2,5 pw |
-| **2b-1. Cœur L3** (`make slice-1`) | Briques 01, 08, 19, 03, 04, 02, 07a, 10 | ~14 pw |
-| **2b-2. Packaging** (`make slice-2`) | Briques 05, 06, 09, 13a | ~7 pw |
+| **1. Étude** (faite) | Étude, exigences, architecture, audit de santé, ADR 0001 provisoire | ~2 pw |
+| **2a. Adopter ou assembler** (bancs terminés) | Grille pondérée fixée d'avance ; benchmarks Konflux, OBS, Nix (build) et Kyverno seul (politique) → **ADR 0000** | ~2,5 pw |
+| **2b-1. Cœur L3** (en cours) | Briques 01, 08, 19, 03, 04, 02, 07a, 10 | ~14 pw |
+| **2b-2. Packaging** | Briques 05, 06, 09, 13a | ~7 pw |
 | **3. ADR** | ADR 0001 (définitif), 0003, 0004, 0005, puis **point de décision « go 2c »** | ~1 pw |
 | **2c. Élargissement** | Briques 07b, 13b, 11, 14, 15, 16, 17, 20 ; ADR 0002 et 0006 | ~18,5 pw |
 | **4. E2E** | Projet réel mirroré : **Traefik** (Go + interface web yarn 4 embarquée), avec branche custom de packaging ; matrice complète ; sauvegarde/restauration (12) | ~4 pw |
@@ -80,7 +84,10 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 | # | Brique | Phase | pw | Seuil go/no-go |
 |---|---|---|---|---|
 | 01 | forgejo-sync | 2b-1 | 1 | Branche custom buildée ; force-push amont détecté et archivé ; `git bundle` exporté |
-| 08 | trust-plane (k3s) | 2b-1 | 5,5 | Tekton + HMAC, Chains (stockage prouvé), OpenBao, job TSA (chemin de vérification choisi), Trusted Resources, Kyverno, Conforma, RBAC, nœuds dédiés, posture des pipelines ; **8 tests négatifs** échouent comme attendu |
+| 08 | trust-plane (k3s, puis RKE2 en 08b) | 2b-1 | 5,5 | Tekton + HMAC, Chains (stockage prouvé), OpenBao, job TSA (chemin de vérification choisi), Trusted Resources, Kyverno, Conforma, RBAC, nœuds dédiés, posture des pipelines ; **8 tests négatifs** échouent comme attendu |
+| 08b | RKE2 à la place de k3s, durci CIS (ajoutée le 05/11/2026, décision du propriétaire ; hors du total ci-dessus) | 2b-1 | — | Tout `rejeu.sh` repasse de zéro sur RKE2 en profil CIS, sans KO, avec la même image `3a7ca1b1` ; les 8 tests négatifs repassent, test 6 compris, avec `kubeProxyReplacement=true` ; aucun compte de service lié à `cluster-admin` |
+| 08c | durcissement du cluster et plan des secrets (ajoutée le 05/11/2026, exigence du propriétaire ; hors du total ci-dessus) | 2b-1 | — | Les 8 tests négatifs, la porte et les contrôles 6 et 7 repassent, cluster durci ; tous les ports d'hôte non listés sont refusés ; aucune règle Kyverno n'est en Audit à la fin |
+| 08d | cert-manager (ajoutée le 05/11/2026 ; hors du total ci-dessus) | à l'exposition de services | — | Pas de seuil fixé : jalon lié à l'exposition de services et au choix d'une Gateway |
 | 19 | observabilité exploitation | 2b-1 | 0,5 | Les 5 alertes critiques se déclenchent sur incident simulé |
 | 19b | journalisation d'audit (ajoutée le 02/11/2026, exigence du propriétaire ; hors du total ci-dessus) | 2b-1 | 1 | Chaque source retenue retrouvée dans Grafana en moins de 2 min ; aucun secret dans Loki ; alerte « source muette » |
 | 03 | deps-closure | 2b-1 | 1 | Fermetures restaurables par digest ; déduplication ≥ 50 % |
@@ -107,7 +114,7 @@ Les efforts sont en personnes-semaines (pw), estimés. Une brique qui dépasse 2
 
 - **Les attestations signées sont la source de vérité.** Index, score, Dependency-Track et métriques en sont des projections reconstructibles.
 - **Portes binaires** (Conforma, Kyverno) et **score informatif** (versionné) sont séparés.
-- **Tout est épinglé par digest** et mis à jour par Renovate. Un projet « Risqué » n'est jamais utilisé.
+- **Tout est épinglé par digest.** Renovate est prévu pour les mises à jour, mais n'est pas encore configuré dans ce dépôt. Un projet « Risqué » n'est jamais utilisé.
 - L3, reproductibilité et hermétisme sont **trois propriétés distinctes**, prouvées séparément.
 
 ## Ré-audit de santé
