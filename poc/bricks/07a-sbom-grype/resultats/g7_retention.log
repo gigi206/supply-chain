@@ -1,0 +1,6 @@
+# plateforme.sh g7_retention, 2026-11-05T08:48:32Z
+## décisions de rétention du vrai Zot, lues par l'auditeur
+OK   décision de rétention sur vulndb/grype visible dans Grafana (2 ligne(s))
+OK   suppressions dans l'audit de Zot : 0
+OK   mot de passe de poc-scan absent des réponses de Grafana
+# fin 2026-11-05T08:48:32Z, code 0

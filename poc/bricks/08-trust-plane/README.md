@@ -1923,3 +1923,5 @@ Script et témoins : `07a-sbom-grype/plateforme.sh g3_*`.
 Mesure sur copie : [`g7-predictions.md`](../07a-sbom-grype/resultats/g7-predictions.md). Tout rejeu de `mise run confiance:stockage -- zot` applique déjà ce fichier : **ne pas relancer cette étape avant l'accord de G7**, et elle s'applique dès J2 en cas de rejeu de zéro.
 
 **Retrait** : remettre `gc: false` dans `stockage/zot.json` et retirer `retention`, puis relancer l'étape `zot`. Ce qui a été effacé ne revient pas.
+
+**Appliqué pour la brique 07a, G7 (05/11/2026, 08:18 UTC, accord du propriétaire)** : rejeu ciblé de `mise run confiance:stockage -- zot`, ancien journal gardé sous [`stockage-zot-avant-g7.log`](resultats/stockage-zot-avant-g7.log). `preuves-controle7.log` a été réécrit à cette occasion avec 2 scans ; sa copie est dans [`g7-controle7.log`](../07a-sbom-grype/resultats/g7-controle7.log).

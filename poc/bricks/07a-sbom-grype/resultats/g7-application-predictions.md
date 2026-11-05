@@ -65,3 +65,27 @@ Le journal réécrit `08-trust-plane/resultats/preuves-controle7.log` ; il sera 
 **`controle7`** est tenu hors de 09:25 à 09:40 UTC : un scan publié entre le jugement et le compte des referrers fausserait la valeur attendue de C1, sans rien dire de la porte.
 
 ## Résultat
+
+Application du 05/11/2026, 08:18 à 08:53 UTC, accords du propriétaire (« 2 oui », « 4 oui », « A » pour D10), toutes les étapes du premier coup, codes 0.
+
+| Étape | Prédiction | Mesure | Verdict |
+|---|---|---|---|
+| `g7_zot` | `storage` identique à `zot.json`, réponse en moins de 60 s, lectures inchangées | Empreinte identique, réponse en 1 s, 3 × 200, 1 et 2 referrers, 123 dépôts | Conforme |
+| `g7_zot` | 2 passages d'horodatage réussis, échec éventuel relevé | Réussis ; 5 Jobs visibles, tous complets, aucun en échec. Historique limité : cela n'exclut pas tout à fait un échec | Conforme |
+| `g7_balayage` | Tous les dépôts, 30 à 40 min | 123 dépôts, du 08:18:39 à 08:48:30 UTC, soit 30 min | Conforme |
+| `g7_balayage` | 0 décision de suppression | 0 | Conforme |
+| `g7_balayage` | 121 dépôts au catalogue | 121 | Conforme |
+| `g7_balayage` | 2 830 Mo à 20 Mo près, plus 190 Mo environ après le timer | 3 019 Mo | Conforme |
+| `g7_retention` | Au moins une ligne `keep`, lue dans Grafana | 2 lignes, `retained by mostRecentlyPushedCount:11 policy`, une par tag | Conforme, première observation de ce format |
+| `g7_periodique` | CronJob `30 9 * * *`, `Etc/UTC`, `Forbid` | Conforme | Conforme |
+| `g7_periodique` | `g7-manuel` réussi, 5 vulnérabilités, 0 KEV, analyse de l'ordre de 2 min, base la plus récente | 5, 0 KEV, 100 s, base du 05/11 construite à 06:21 UTC | Conforme |
+| `g7_periodique` | Un referrer de plus, sujet correct, bundle vérifié | 2 referrers, sujet et bundle corrects | Conforme |
+| `g7_periodique` | Place libre la plus basse : environ 2 400 Mo | **2 168 Mo** | **Écart de 230 Mo environ** |
+| `g7_grafana` | Marqueurs, signature, poussage visibles, identifiants absents | Conforme | Conforme |
+| `controle7` | C1 admise avec 2 énoncés, C2 et C3 refusés, 0 écart | `2 énoncé(s) vérifié(s)`, `scan.scan_present`, signature refusée, 0 écart | Conforme |
+
+**Écart de place libre.** J'ai soustrait le volume de 3 413 Mo aux 5 834 Mo relevés à 00:26 UTC. La différence, environ 230 Mo, n'est pas expliquée : aucune mesure ne dit ce qui a occupé cette place sur `sc-confiance` entre-temps. Sans conséquence pour ce passage, mais à suivre : les journaux et images du nœud peuvent grignoter cette marge d'un jour à l'autre.
+
+**Ce que `controle7` ne montre pas.** Le journal liste les deux énoncés lus (`LU|…`), pas celui que les règles ont retenu. Le choix du plus récent reste couvert par les tests de la règle (G5), non par cette exécution.
+
+**Ce que le balayage ne montre pas.** Rien n'a été effacé, seuls deux dépôts vides ont disparu. Le 05/11, les règles de suppression n'ont encore rien eu à faire sur le vrai store.

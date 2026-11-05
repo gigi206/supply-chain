@@ -1,16 +1,17 @@
-# preuves.sh controle7, 2026-11-04T22:25:28Z
+# preuves.sh controle7, 2026-11-05T08:50:41Z
 ## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)
 clé du scanner : 8cbcbb4ebe3b43240255bfc458a695de83db5abc969ffdb8d7cf88e08144a94c (empreinte DER ; G3 : 8cbcbb4e…)
 OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés
-referrers de l'image : builds/sample-app 0 ; builds/scan/sample-app 1 ; builds/vsa/sample-app 2
+referrers de l'image : builds/sample-app 0 ; builds/scan/sample-app 2 ; builds/vsa/sample-app 2
 ## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés
-VERDICT|c7-reelle|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|2/2 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+VERDICT|c7-reelle|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|2/2 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
     LU|énoncé 4d197192f0b17ac0|2026-11-04T20:40:09.254165787Z
-    LECTURE|1|sc-stockage.poc.test:5000/builds/scan/sample-app|
+    LU|énoncé e36ac7e9fc64af3f|2026-11-05T08:50:22.331261177Z
+    LECTURE|2|sc-stockage.poc.test:5000/builds/scan/sample-app|
 OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
 OK   C1 contrôle 9 : ok
 OK   C1 contrôle 6 : ok
-OK   C1 contrôle 7 : ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   C1 contrôle 7 : ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
 OK   C1 Job : 1
 ## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook
 VERDICT|c7-sans-scan|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 

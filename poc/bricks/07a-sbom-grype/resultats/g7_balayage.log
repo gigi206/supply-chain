@@ -1,0 +1,13 @@
+# plateforme.sh g7_balayage, 2026-11-05T08:20:10Z
+OK   dépôts balayés : 123
+OK   décisions de suppression : 0
+      2 vulndb/grype | keep | retained by mostRecentlyPushedCount:11 policy
+OK   image réelle, sans tag : 200
+OK   signature .sig : 200
+OK   attestation .att : 200
+referrers : builds/scan/sample-app 1, builds/vsa/sample-app 2
+tags de vulndb/grype : 2026-11-04 2026-11-05
+dépôts au catalogue : 121
+ 9739  9355
+3019	/var/lib/zot
+# fin 2026-11-05T08:48:32Z, code 0

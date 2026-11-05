@@ -224,3 +224,7 @@ Ajouts depuis les prédictions : `g7_grafana` scindée (la lecture de la rétent
 La rétention n'effacera rien de réel avant le 18 ou le 19 novembre : d'ici là, seule cette mesure à sec en répond.
 
 **G7 : décisions du propriétaire du 05/11/2026.** Application de la rétention (« 2 oui »), à 08:18 UTC. **D10 (« A ») : passage périodique du scan, CronJob quotidien à 09:30 UTC sur l'image `3a7ca1b1`.** Une panne du CronJob se traduit par un refus de la porte au bout de 7 jours : elle coûte de la disponibilité, pas de la sécurité, et aucune alerte n'est prévue.
+
+**G7 appliqué le 05/11/2026 (08:18 à 08:53 UTC), du premier coup** ([résultat](resultats/g7-application-predictions.md)) : rétention en service sur le vrai Zot, premier balayage de 30 min sans aucune suppression, 2 dépôts vides disparus comme prédit. CronJob `scan-sample-app` créé, passage manuel réussi avec la base du jour, lisible dans Grafana. Porte conforme avec 2 scans, C2 et C3 toujours refusés. Un écart : 230 Mo de moins que prévu sur `sc-confiance`, non expliqués.
+
+Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `rejeu.sh` n'a pas été rejoué.
