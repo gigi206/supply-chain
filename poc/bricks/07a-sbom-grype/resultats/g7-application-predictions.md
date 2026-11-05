@@ -84,8 +84,28 @@ Application du 05/11/2026, 08:18 à 08:53 UTC, accords du propriétaire (« 2 ou
 | `g7_grafana` | Marqueurs, signature, poussage visibles, identifiants absents | Conforme | Conforme |
 | `controle7` | C1 admise avec 2 énoncés, C2 et C3 refusés, 0 écart | `2 énoncé(s) vérifié(s)`, `scan.scan_present`, signature refusée, 0 écart | Conforme |
 
-**Écart de place libre.** J'ai soustrait le volume de 3 413 Mo aux 5 834 Mo relevés à 00:26 UTC. La différence, environ 230 Mo, n'est pas expliquée : aucune mesure ne dit ce qui a occupé cette place sur `sc-confiance` entre-temps. Sans conséquence pour ce passage, mais à suivre : les journaux et images du nœud peuvent grignoter cette marge d'un jour à l'autre.
+**Écart de place libre.** J'ai soustrait le volume de 3 413 Mo aux 5 834 Mo relevés à 00:26 UTC. La différence, environ 230 Mo, tient à la place perdue par le nœud entre 00:26 et 08:50 UTC : voir « Place sur `sc-confiance` » plus bas.
 
 **Ce que `controle7` ne montre pas.** Le journal liste les deux énoncés lus (`LU|…`), pas celui que les règles ont retenu. Le choix du plus récent reste couvert par les tests de la règle (G5), non par cette exécution.
 
 **Ce que le balayage ne montre pas.** Rien n'a été effacé, seuls deux dépôts vides ont disparu. Le 05/11, les règles de suppression n'ont encore rien eu à faire sur le vrai store.
+
+**Premier passage planifié, 05/11/2026, 09:30:00 à 09:31:49 UTC** ([relevé](g7-premier-passage-planifie.log), par un [script en lecture seule](g7-premier-passage-planifie.sh) hors de `plateforme.sh`) : conforme à l'additif, sauf la place libre. Job `scan-sample-app-29897850` réussi, 1 Job à la fois, base du 05/11, 5 vulnérabilités, 0 KEV, 100 s d'analyse, 3 referrers, journaux visibles par l'auditeur dans Grafana. Place libre la plus basse : 2 161 Mo, soit le même niveau que `g7-manuel` (2 168 Mo). L'écart de 230 Mo à ma prédiction se retrouve sur les deux passages ; il est expliqué ci-dessous.
+
+## Place sur `sc-confiance` (mesure du 05/11/2026, 09:34 UTC, lecture seule)
+
+L'écart ne vient pas du scan : au repos, le nœud a 5 572 Mo libres, et 5 572 − 3 413 = 2 159 Mo, soit le creux mesuré à 2 161 Mo. **C'est le nœud qui perd de la place**, 262 Mo en 9 h 08 depuis 00:26 UTC, soit 29 Mo/h ou 690 Mo par jour à ce rythme.
+
+| Poste | Mesuré | Plafond | Reste à venir |
+|---|---|---|---|
+| Audit de l'API k3s | 641 Mo, 100 Mo toutes les 6 h environ, soit 17,5 Mo/h | `audit-log-maxbackup=10` : environ 1 100 Mo | Environ 460 Mo, atteints en un peu plus d'un jour |
+| journald | 160 Mo, environ 5,5 Mo/h d'après deux archives de 25 Mo | 282,5 Mo, annoncé par journald | Environ 120 Mo |
+| Reste | Environ 6 Mo/h, **non attribués** ; peut venir des Jobs ponctuels de la nuit et du matin | Inconnu | Inconnu |
+
+Seuils relus par `configz` : éviction à `nodefs.available` 5 %, soit 745 Mo sur 14 915 Mo ; image GC au-delà de 85 % d'occupation, soit moins de 2 237 Mo libres. **Le creux du scan franchit déjà ce second seuil** (85,5 %), le temps de 2 min environ. `DiskPressure` reste à False depuis le 03/11, aucun événement d'éviction ni d'image GC relevé.
+
+**Projection, pas une mesure.** Une fois audit et journald plafonnés, le creux du scan serait d'environ 1 580 Mo, 835 Mo au-dessus de l'éviction. Si les 6 Mo/h résiduels persistent, ces 835 Mo tiennent environ 6 jours après le plafond, donc jusque vers le 12 novembre. S'ils ne persistent pas, le creux reste stable. Prédiction vérifiable : **creux de 1 400 à 1 600 Mo au passage du 06/11 à 09:30 UTC**.
+
+Une éviction toucherait d'abord le pod de scan, plus gros consommateur de stockage éphémère, et l'image GC peut libérer de la place avant elle, effet non mesuré. Ce nœud porte aussi OpenBao. L'audit de l'API est déjà copié dans Loki (`audit-k8s.alloy`).
+
+**Point à suivre, aussi** : en régime établi, le dépôt de scans compte environ 14 énoncés et non 2. L'effet sur la durée de la porte n'est pas mesuré.

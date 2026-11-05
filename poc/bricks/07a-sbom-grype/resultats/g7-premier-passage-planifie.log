@@ -1,0 +1,15 @@
+# relevé du premier passage planifié, 2026-11-05T08:53:53Z
+job : scan-sample-app-29897850, état 1/
+scan-sample-app-29897850   2026-11-05T09:30:00Z   2026-11-05T09:31:49Z   1     <none>
+dernier passage : 2026-11-05T09:30:00Z, dernière réussite : 2026-11-05T09:31:49Z
+place libre la plus basse sur sc-confiance depuis 09:29 UTC : 2161 Mo
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-05, sc-stockage.poc.test:5000/vulndb/grype@sha256:ad6c21ccc7d31091f46c909224833c6362729c4312fa07d70fb9b10f30978a15, empreinte sha256:9fbc8d8f2428cd715ffc9591cce16c4179955a7f45c76c12fbcb9cea8dc93813, 1 s
+analyser: SBOM|4 composants avec PURL (D1 a), 1 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+analyser: PREDICAT|sha256 537cca826052ba0b9b1e61f64298c0f397f2b86934b211885b8d5986636e33d6, 100 s en tout
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 d3469f5a1c4a3c1b0d36687de1a80fcb00d4cae0a556e712845a7cad2a65f8d8, vérifié avec la clé publique
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:2de1eebeb2961a7c52b5e5d259b08114d2a89ed26cf4c3afa6d3080d7e193824, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+referrers : 3
+# fin 2026-11-05T09:31:53Z

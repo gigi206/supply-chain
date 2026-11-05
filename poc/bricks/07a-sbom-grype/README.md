@@ -228,3 +228,7 @@ La rétention n'effacera rien de réel avant le 18 ou le 19 novembre : d'ici là
 **G7 appliqué le 05/11/2026 (08:18 à 08:53 UTC), du premier coup** ([résultat](resultats/g7-application-predictions.md)) : rétention en service sur le vrai Zot, premier balayage de 30 min sans aucune suppression, 2 dépôts vides disparus comme prédit. CronJob `scan-sample-app` créé, passage manuel réussi avec la base du jour, lisible dans Grafana. Porte conforme avec 2 scans, C2 et C3 toujours refusés. Un écart : 230 Mo de moins que prévu sur `sc-confiance`, non expliqués.
 
 Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `rejeu.sh` n'a pas été rejoué.
+
+**Premier passage planifié réussi le 05/11/2026 à 09:30 UTC** (`scan-sample-app-29897850`, 3 referrers, lisible dans Grafana). Constat consigné dans l'[ADR 0000](../../../docs/adr/0000-assembler-ou-adopter.md), sans changer de note.
+
+**Écart de place expliqué (05/11/2026, 09:34 UTC)** : ce n'est pas le scan, c'est `sc-confiance` qui perd 29 Mo/h, surtout par l'audit de l'API k3s. Audit et journald sont plafonnés, environ 6 Mo/h restent non attribués. Projection, pas une mesure : marge de 835 Mo au-dessus de l'éviction, peut-être consommée vers le 12 novembre. [Détail](resultats/g7-application-predictions.md).
