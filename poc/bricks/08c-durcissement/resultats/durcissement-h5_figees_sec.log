@@ -94,3 +94,8 @@ KO   conteneur scan absent du dernier Job réussi
   preuves-h5-r4-construction_durcie : 1, 1
   preuves-h6-construction_durcie : 1, 1
 ## prédiction D, écrite le 06/11/2026 à 22:56 UTC, avant ce dry-run : PipelineRun rendu du gabarit en service, tel que l'étape bascule le présente, admis en dry-run serveur au nom de el-forgejo et du compte rattrapage sous H1 à H5, deux fois created (server dry run), aucun objet créé
+## résultat D, 2026-11-06T22:56:14Z
+objet : {"kind":"PipelineRun","ns":"builds","name":"bascule-a-blanc","variables_restantes":false}
+OK   el-forgejo : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run))
+OK   rattrapage : admis (pipelinerun.tekton.dev/bascule-a-blanc created (server dry run))
+objets bascule-a-blanc restants : 0

@@ -737,6 +737,37 @@ Bornes :
 - `helm_cilium` a laissé des dry-run dans l'audit et deux lignes dans `chrono.tsv`, rien d'autre.
 - Restent non relues sous H5 : `reglec`, `attseule`, `enveloppes`, `reserve_c`, `decision3`, `bascule`, `controle6`, `controle7`, `temoins_scan`, et les tests 5 et 6, sans passage sous H5. `controleurs` et `resolveurs` restent à rejouer pour de bon.
 
+## Additif du 06/11/2026, 22:56 UTC : étapes sans passage sous H5, relecture à sec
+
+Rien écrit dans le cluster ni dans Zot, aucune de ces étapes rejouée. Prédictions C1 à C9 committées avant le relevé (`27834ee`), prédiction D aussi (`10be4a5`). Journal : `resultats/durcissement-h5_figees_sec.log`, complément compris.
+
+**Résultat.** H5 ne bloque aucune de ces étapes d'après la lecture et les mesures. Deux blocages existent, sans lien avec H5 : la bascule pour trois étapes, le rejeu de zéro pour `reserve_c`. Le chemin 2 de la bascule reste sans passage réel.
+
+| Étapes | Constat | Preuve | Reste à mesurer |
+|---|---|---|---|
+| `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan` | Même Job : `juger` (`politique.sh:1299`) rend toujours `politique/porte-job.yaml` | Sous `Deny`, 0 KO dans `preuves-h5-test7.log` (13 VERDICT, ConfigMap `porte-temoin` comprise) ; 15 VERDICT dans `preuves-h5-test8.log` ; contrôles 9, 6 et 7 à ok dans `preuves-h5-r4-construction_durcie.log` | Verdicts propres à ces étapes, dont `porte.fermeture_plateforme` de `reglec`, jamais mesuré |
+| `enveloppes`, `decision3` | Bloquées par la garde `gabarit_essai`, levée par `PIPE_ESSAI` | `pr_gabarit` déjà passé sous `Deny` par le test 7 avec `PIPE_ESSAI` ; gabarit en service `sample-app` (C7) | Les deux étapes. `decision3` modifie et redémarre Zot : accord propre |
+| test 5 | KO immédiat : `gabarit_essai` sans condition (`preuves.sh:342`) | C7 | Autre secret et corps modifié |
+| `bascule` | Chemin 1 équivalent à `construction_durcie`, passée sous H5 | R4 et H6 ; PipelineRun du gabarit admis en dry-run serveur pour `el-forgejo` et `rattrapage` (D) | Chemin 2 : **0 création réelle** par `rattrapage` depuis `h5_deny` (C8) |
+| `reserve_c` | Non rejouable, déjà hors du rejeu : 5 dépôts d'essai du 01/11 en 404 (C6) | Son pod ne va qu'au CLI Kyverno local, jamais à l'API | Rien : mesure du 01/11 gardée |
+| test 6 | Dernier passage sous H4, à 17:48 UTC, avant H5 | Pod Kata privilégié admis (`preuves-h5-sec_h5.log`) ; TaskRun réel sous H5 (`preuves-h5-test1.log`) ; construction sous Kata (R4) | Le test lui-même sous limites |
+
+**Prédictions.** C1, C3, C4, C7, C8 et D tenues. Six KO au journal, quatre causes, toutes les miennes, aucune due à H5 :
+
+| Prédiction | Mesuré | Cause |
+|---|---|---|
+| C2, clé du scanner `8cbcbb4e` | `1656a3fa` | Texte figé, affiché par `controle7`, jamais comparé. Clé refaite par le rejeu RKE2 (`1f66a3c`), identique dans la ConfigMap, contrôle 7 ok. Libellé corrigé dans `preuves.sh` |
+| C5, `.att` par `poc-build` seul | 12 `poc-build`, 6 `poc-ecriture` | Les 6 sont dans `essais-j8/test7`, témoins du test 7 ; dans `builds/`, `poc-build` seul : le filtre de `decision3` reste valable après S1 |
+| C6, referrers de `builds/sample-app` | 0 | Chains écrit en mode dsse, par tags : `.sig` et `.att` à 200. Aucune étape n'attend le contraire |
+| C9, Jobs de la porte (3 KO) | 0 Job | `ttlSecondsAfterFinished: 3600` : plus aucun Job à lire. Mesure mal choisie, remplacée par les VERDICT archivés ci-dessus |
+
+**Corrigé à sec.** Libellé de la clé du scanner dans `preuves.sh`, étape non rejouée.
+
+Bornes :
+- « Couvert » vaut pour l'admission et l'exécution du Job de la porte ou du TaskRun, pas pour le verdict de chaque étape.
+- Le dry-run D prouve l'admission, pas la création par le binaire `rattrapage` sous H5. Son passage de chaque minute s'arrête à `PRESENT`.
+- `essais-h5-figees.sh` n'est pas à relancer tel quel : ses valeurs fausses restent telles qu'elles ont été prédites.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

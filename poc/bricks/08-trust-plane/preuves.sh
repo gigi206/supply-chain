@@ -2835,7 +2835,7 @@ etape_controle7() { # brique 07a, G5, après R5 de la 10 : contrôle 7 dans la p
     [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)"; ko=$((ko + 1)); }
   }
   echo "## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)"
-  echo "clé du scanner : $(openssl pkey -pubin -in "$s" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; G3 : 8cbcbb4e…)"
+  echo "clé du scanner : $(openssl pkey -pubin -in "$s" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; depuis le rejeu RKE2, 1f66a3c : 1656a3fa… ; G3 du 05/11 : 8cbcbb4e…)"
   cm_porte
   cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan-verifier\.sh}') "$h7/politique/porte/scan-verifier.sh" \
     && cmp -s <(kubectl get configmap -n porte porte -o jsonpath='{.data.scan\.rego}') "$h7/politique/porte/scan.rego" \
