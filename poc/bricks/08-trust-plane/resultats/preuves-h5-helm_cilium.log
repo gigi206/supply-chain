@@ -1,0 +1,66 @@
+# preuves.sh helm_cilium, 2026-11-06T22:44:28Z
+Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
+- aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
+  helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)
+- ni HelmChart (CRD absente ou vide), ni compte de service helm-*, ni liaison helm-* ; release Helm cilium deployed, de l'hôte
+- pod portant helm-cilium dans kube-system refusé en dry-run serveur (compte introuvable) au nom de chaque compte qui peut y
+  créer des pods ; témoin : même pod avec le compte default, admis ; les comptes créateurs et la source de leurs droits
+  restent ceux de la mesure sous le HelmChart (information)
+Prédiction ajoutée (01/11/2026, avant le premier passage sous la règle tekton-controleurs-builds) : pour les contrôleurs de
+  Tekton et de Chains, pod à helm-cilium toujours refusé comme introuvable (contrôle du compte avant la validation) et
+  témoin default refusé par la règle ; pod portant clusterrole-aggregation-controller refusé par la règle au nom des deux
+  contrôleurs, admis au nom de l'administrateur (témoin) : chemin de ces contrôleurs vers cluster-admin fermé
+Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire des deux contrôleurs bornés à builds) : ils ne
+  sont plus parmi les comptes qui peuvent créer des pods dans kube-system (7 au lieu de 9) ; le pod portant
+  clusterrole-aggregation-controller leur est refusé par les droits (RBAC), avant la règle ; témoin administrateur admis
+## liaisons vers cluster-admin
+  ClusterRoleBinding -/cluster-admin → Group -/system:masters
+  témoin : ClusterRoleBinding -/helm-kube-system-cilium → ServiceAccount kube-system/helm-cilium
+OK   témoin : liaisons trouvées par le filtre dans la liaison relevée sous le HelmChart : 1
+OK   liaisons vers cluster-admin dont un sujet est un compte de service : 0
+## contrôleur Helm de k3s
+OK   HelmCharts du cluster (CRD présente) : 0
+OK   comptes de service helm-* : 0
+OK   liaisons helm-* : 0
+OK   release Helm cilium (depuis l'hôte) : deployed cilium-1.20.4
+OK   can-i '*' '*' au nom de helm-cilium (compte absent) : no
+## pod portant helm-cilium dans kube-system (dry-run serveur)
+OK   comptes de service qui peuvent créer des pods dans kube-system (6 sous rke2) : 6
+OK   contrôleurs de Pipelines et de Chains parmi eux : 0
+  system:serviceaccount:kube-system:daemon-set-controller : system:controller:daemon-set-controller → system:controller:daemon-set-controller
+  system:serviceaccount:kube-system:job-controller : system:controller:job-controller → system:controller:job-controller
+  system:serviceaccount:kube-system:persistent-volume-binder : system:controller:persistent-volume-binder → system:controller:persistent-volume-binder
+  system:serviceaccount:kube-system:replicaset-controller : system:controller:replicaset-controller → system:controller:replicaset-controller
+  system:serviceaccount:kube-system:replication-controller : system:controller:replication-controller → system:controller:replication-controller
+  system:serviceaccount:kube-system:statefulset-controller : system:controller:statefulset-controller → system:controller:statefulset-controller
+OK   system:serviceaccount:kube-system:daemon-set-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:job-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:persistent-volume-binder : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replicaset-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:replication-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+OK   system:serviceaccount:kube-system:statefulset-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
+  témoin, compte default : admis
+## pouvoirs des comptes de kube-system (ajouté après un relevé à la main du 01/11/2026 : prédiction non aveugle)
+Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalate, update et patch sur clusterroles, donc
+  capable d'élargir sa propre ClusterRole ; pod portant ce compte admis au nom des contrôleurs de Tekton et de Chains : le
+  chemin de ces contrôleurs vers cluster-admin reste ouvert sans helm-cilium (non essayé pour de vrai) ; depuis la règle
+  tekton-controleurs-builds : voir la prédiction ajoutée en tête
+  clusterrole-aggregation-controller : [escalate clusterroles] [update clusterroles]
+  daemon-set-controller : [create pods]
+  generic-garbage-collector : [update clusterroles]
+  job-controller : [create pods]
+  persistent-volume-binder : [create pods]
+  replicaset-controller : [create pods]
+  replication-controller : [create pods]
+  service-account-controller : [create serviceaccounts]
+  statefulset-controller : [create pods]
+OK   comptes de kube-system à '*' '*' : 0
+OK   clusterrole-aggregation-controller : escalate, update, patch sur clusterroles : yes,yes,yes
+OK   system:serviceaccount:tekton-pipelines:tekton-pipelines-controller : pod portant clusterrole-aggregation-controller refusé par les droits, avant la règle (dry-run serveur)
+OK   system:serviceaccount:tekton-chains:tekton-chains-controller : pod portant clusterrole-aggregation-controller refusé par les droits, avant la règle (dry-run serveur)
+OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)

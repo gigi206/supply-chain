@@ -715,6 +715,28 @@ Bornes :
 | A6, `resolveurs`, lecteurs | 4 lecteurs, sans `cilium-operator`, retiré par `h5_cilium`. **Écart attendu** : la valeur figée de `preuves.sh` en attend 5, l'étape finirait KO si elle était rejouée. Correction après ce relevé |
 | A7, `helm_cilium` | Passage complet sans KO, sous sa prédiction propre : 6 créateurs de pods dans `kube-system`, aucune liaison de compte de service vers `cluster-admin`, release `deployed cilium-1.20.4`, refus par les droits des deux contrôleurs, témoin administrateur admis |
 
+**Additif du 06/11/2026, 22:45 UTC, résultat des prédictions A1 à A7, six tenues sur sept, rien écrit dans le cluster.** Relevé `resolveurs` de 22:43:47 à 22:43:53 UTC, journal [resultats/durcissement-h5_resolveurs_sec.log](resultats/durcissement-h5_resolveurs_sec.log) ; complément de 22:44:27 ajouté à la suite, sans réécrire le relevé. `helm_cilium` de 22:44:28 à 22:44:54 UTC, journal [preuves-h5-helm_cilium.log](../08-trust-plane/resultats/preuves-h5-helm_cilium.log), 20 lignes OK, 0 KO.
+
+| Prédiction | Résultat |
+|---|---|
+| A1 | Tenue : mêmes constats qu'à 15:25 |
+| A2 | Tenue : `signing-secrets` refusé par les droits ; `zot-chains` absent, refus mesuré sur un objet absent |
+| A3 | Tenue : espace et deux ResolutionRequests admis en dry-run serveur |
+| A4 | **Fausse** : 2 refus pour 0 prédit. Le pod date de 13:38 UTC et n'a jamais redémarré ; les 2 lignes sont celles de l'essai de 15:25:36 et 15:25:37, horodatées dans le complément. Aucun refus nouveau. J'avais supposé le pod recréé par H5 sans le vérifier |
+| A5 | Tenue : 85 `get serviceaccounts builds 200` contre 46 à 15:25, `get secrets builds 200` toujours à 1 (15:25:36), aucune lecture hors de `builds` sauf les deux 403. Entrées d'audit gardées depuis 13:48 UTC |
+| A6 | Tenue : 4 lecteurs, sans `cilium-operator` ; la valeur figée en attendait 5 |
+| A7 | Tenue : passage complet, 6 créateurs, 0 liaison, `deployed cilium-1.20.4` |
+
+**Corrigé à sec dans `preuves.sh`, étapes non rejouées.** Liste des lecteurs à 4 et lecture de `signing-secrets` ajoutée ; prédiction ajoutée marquée non aveugle.
+
+**Non prédit, relevé par A4.** Le pod des résolveurs n'est jamais repassé par l'admission sous H1 à H5. Un pod bâti sur le gabarit de son déploiement est admis en dry-run serveur : un redéploiement ne serait pas refusé à l'admission. Le démarrage réel d'un nouveau pod n'est pas mesuré.
+
+Bornes :
+- Aucune résolution réelle sous H1 à H5 par le chemin du Secret `zot-images` ; le chemin par compte de service tourne, d'après l'audit. Les refus dans `preuve-resolveurs` ne sont pas rejoués.
+- Les refus de `zot-chains` de l'étape `controleurs`, cités à 22:33, portent eux aussi sur un objet absent. `signing-secrets` est refusé par les droits aux deux contrôleurs (complément de 22:45:43) : Chains le reçoit par un volume, pas par l'API. La même lecture est donc ajoutée à `controleurs`, étape non rejouée.
+- `helm_cilium` a laissé des dry-run dans l'audit et deux lignes dans `chrono.tsv`, rien d'autre.
+- Restent non relues sous H5 : `reglec`, `attseule`, `enveloppes`, `reserve_c`, `decision3`, `bascule`, `controle6`, `controle7`, `temoins_scan`, et les tests 5 et 6, sans passage sous H5. `controleurs` et `resolveurs` restent à rejouer pour de bon.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

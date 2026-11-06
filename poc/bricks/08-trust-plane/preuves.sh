@@ -2523,6 +2523,7 @@ etape_controleurs() {
     ct_refus "$RBAC_REFUS" "$n : lecture du Secret kube-system/$D_SERVING" kubectl get secret -n kube-system $D_SERVING --as "$u" -o name || k=1
     ct_refus "$RBAC_REFUS" "$n : liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$u" -o name || k=1
     ct_refus "$RBAC_REFUS" "$n : lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$u" -o name || k=1
+    ct_refus "$RBAC_REFUS" "$n : lecture du Secret tekton-chains/signing-secrets" kubectl get secret -n tekton-chains signing-secrets --as "$u" -o name || k=1
   done
   ba_attendu "objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains)" "$( {
     kubectl get pod,statefulset,pvc -n kube-system -o name; kubectl get pod -n tekton-chains -o name; } | grep -c '/preuve-controleurs$' || true)" 0
@@ -2647,6 +2648,8 @@ etape_resolveurs() {
   echo "  02/11/2026), au moins une lecture dans builds, aucune hors de builds sauf les refus (403) de preuve-resolveurs ; sinon aucune"
   echo "  entrée (k3s installé avant)"
   echo "- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026"
+  echo "Prédiction ajoutée (06/11/2026, après le relevé à sec sous H1 à H5, non aveugle) : quatre lecteurs, cilium-operator retiré par"
+  echo "  h5_cilium ; zot-chains absent depuis S1, son refus porte sur un objet absent ; lecture de signing-secrets refusée aussi"
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
   echo "## droits"
@@ -2667,6 +2670,7 @@ etape_resolveurs() {
   echo "## lectures réelles au nom des résolveurs"
   ct_refus "$RBAC_REFUS" "lecture du Secret kube-system/$D_SERVING" kubectl get secret -n kube-system $D_SERVING --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "lecture du Secret tekton-chains/zot-chains" kubectl get secret -n tekton-chains zot-chains --as "$RESOLVEURS" -o name || k=1
+  ct_refus "$RBAC_REFUS" "lecture du Secret tekton-chains/signing-secrets" kubectl get secret -n tekton-chains signing-secrets --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "liste des Secrets d'openbao" kubectl get secrets -n openbao --as "$RESOLVEURS" -o name || k=1
   ct_refus "$RBAC_REFUS" "lecture du compte de service kube-system/default" kubectl get serviceaccount -n kube-system default --as "$RESOLVEURS" -o name || k=1
 
@@ -2709,7 +2713,7 @@ etape_resolveurs() {
   echo "## lecteurs des Secrets de tout le cluster"
   lecteurs_cluster | tee "$T/rs-lecteurs" | sed 's/^/  /'
   ba_attendu "lecteurs" "$(paste -sd, "$T/rs-lecteurs")" \
-    "kube-system:cilium-operator,kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors"
+    "kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors"
   [ "$k" = 0 ] || { echo "KO   resolveurs : mesure contraire à la prédiction" >&2; exit 1; }
 }
 

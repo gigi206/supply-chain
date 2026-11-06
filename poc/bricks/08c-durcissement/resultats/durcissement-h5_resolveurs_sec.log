@@ -1,0 +1,71 @@
+# essais-h5-resolveurs.sh, 2026-11-06T22:43:47Z, DISTRO=rke2
+Prédiction (écrite le 06/11/2026 à 22:43 UTC, avant ce relevé, référence : resultats/preuves-resolveurs.log de 15:25 UTC, avant H1) :
+- droits, can-i et lectures refusées : mêmes constats qu'à 15:25 ; lecture de tekton-chains/signing-secrets refusée aussi (ajoutée)
+- rke2-serving et signing-secrets existent ; zot-chains absent depuis S1 : son refus reste mesuré, mais sur un objet absent
+- bundle du gabarit inchangé ; Secret zot-images présent dans builds, compte default sans imagePullSecrets
+- dry-run serveur : espace preuve-resolveurs admis ; deux ResolutionRequests admises dans builds, sans cache
+- pod des résolveurs : prêt, 0 redémarrage, 0 refus des droits dans son journal ; aucune ResolutionRequest preuve-* restante
+- audit : règle des résolveurs présente ; aucune lecture hors de builds sauf les deux refus (403) de 15:25 ; get secrets builds 200
+  toujours 1, celle de 15:25, donc chemin du Secret sans passage sous H5 ; get serviceaccounts builds 200 depuis h5_deny : au moins 1,
+  peu sûr (le résolveur peut servir un bundle par digest depuis son cache, non lu)
+- lecteurs des Secrets de tout le cluster : 4, sans cilium-operator (h5_cilium) ; la valeur figée de preuves.sh en attend 5
+- écart attendu, si l'étape était rejouée : KO sur sa dernière comparaison ; à corriger dans preuves.sh après ce relevé
+## droits
+OK   règles du ClusterRole des résolveurs sur secrets ou serviceaccounts : 0
+OK   Role builds/tekton-pipelines-resolvers-lecture : ["secrets,serviceaccounts:get"]
+OK   RoleBinding builds/tekton-pipelines-resolvers-lecture : Role/tekton-pipelines-resolvers-lecture tekton-pipelines-resolvers:tekton-pipelines-resolvers
+OK   can-i des résolveurs : no,yes,no,yes,no,yes,yes
+## cibles (noms seulement)
+OK   Secret kube-system/rke2-serving : secret/rke2-serving
+OK   Secret tekton-chains/signing-secrets : secret/signing-secrets
+OK   Secret tekton-chains/zot-chains absent (NotFound) : 1
+OK   Secret builds/zot-images : secret/zot-images
+OK   compte builds/default : imagePullSecrets : null
+## lectures réelles au nom des résolveurs
+OK   lecture du Secret kube-system/rke2-serving : refusé (secrets "rke2-serving" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in t)
+OK   lecture du Secret tekton-chains/zot-chains (objet absent) : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the)
+OK   lecture du Secret tekton-chains/signing-secrets : refusé (secrets "signing-secrets" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" i)
+OK   liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot list resource "secrets" in API group "" in the namespace ")
+OK   lecture du compte de service kube-system/default : refusé (serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "serviceaccounts" in API gr)
+## admission (dry-run serveur, rien de créé, rien de résolu)
+OK   bundle du gabarit : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
+OK   espace preuve-resolveurs : admis (namespace/preuve-resolveurs )
+OK   ResolutionRequest builds/preuve-resolveurs-compte : admis (resolutionrequest.resolution.tekton.dev/preuve-resolveurs-compte created (server dry run) )
+OK   ResolutionRequest builds/preuve-resolveurs-secret : admis (resolutionrequest.resolution.tekton.dev/preuve-resolveurs-secret created (server dry run) )
+## pod des résolveurs
+  tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n créé 2026-11-06T13:38:02Z prêt True redémarrages 0
+OK   pods prêts sans redémarrage : 1/1
+KO   refus des droits dans le journal du pod : 2 (attendu : 0)
+OK   ResolutionRequests preuve-* dans builds : 0
+OK   espace preuve-resolveurs introuvable (NotFound) : 1
+## audit de l'API (lectures de Secrets et de comptes de service des résolveurs ; sans --as)
+OK   règle des résolveurs dans la politique d'audit du nœud : 1
+      1   get secrets builds 200 ResponseComplete
+      1   get secrets preuve-resolveurs 403 ResponseComplete
+     85   get serviceaccounts builds 200 ResponseComplete
+      1   get serviceaccounts preuve-resolveurs 403 ResponseComplete
+  première entrée gardée : 2026-11-06T13:48:02.035658Z
+  dernière get secrets builds 200 : 2026-11-06T15:25:36.737535Z
+OK   lectures hors de builds, sauf les refus (403) de preuve-resolveurs : 0
+OK   get secrets builds 200 : 1
+OK   get serviceaccounts builds 200 depuis h5_deny, au moins une : true
+## lecteurs des Secrets de tout le cluster
+  kube-system:generic-garbage-collector
+  kube-system:namespace-controller
+  kube-system:resourcequota-controller
+  tekton-pipelines:tekton-triggers-core-interceptors
+OK   lecteurs : kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors
+OK   cilium-operator encore attendu par la valeur figée de preuves.sh : 1
+## bilan : 1 écart(s)
+
+# complément du 2026-11-06T22:44:27Z, ajouté après le bilan ; le relevé ci-dessus n'est pas réécrit
+## horodatage des 2 refus du journal du pod (prédiction A4 fausse : le pod date de 13:38 UTC, il garde l'essai de 15:25)
+  2026-11-06T15:25:36.918Z error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-compte": serviceaccounts "default" is forbidden: User "system:serviceaccount:tekto
+  2026-11-06T15:25:37.089Z error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-secret": secrets "zot-images" is forbidden: User "system:serviceaccount:tekton-pip
+## pod bâti sur le gabarit du déploiement, présenté à l'admission (dry-run serveur) : le pod en service date d'avant H1 à H5
+pod/preuve-sec-resolveurs created (server dry run) 
+
+
+# complément du 2026-11-06T22:45:43Z : tekton-chains/signing-secrets au nom des deux contrôleurs, cible de remplacement de zot-chains
+tekton-pipelines-controller : Error from server (Forbidden): secrets "signing-secrets" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" canno
+tekton-chains-controller : Error from server (Forbidden): secrets "signing-secrets" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get 
