@@ -596,6 +596,28 @@ Certificats 422 et 423, pare-feu, Kyverno, SSH, API et Zot inchangés. `rattrapa
 
 W5 à W8 restent à mesurer, le risque MTU sous Kata compris.
 
+**Additif du 06/11/2026, 21:48 UTC, `h6_mesure` lancée sur accord du propriétaire (« Oui, lance h6_mesure »), de 21:42:22 à 21:45 UTC, passage unique, KO sur W5.** Journaux [resultats/durcissement-h6_mesure.log](resultats/durcissement-h6_mesure.log) et [../08-trust-plane/resultats/preuves-h6-construction_durcie.log](../08-trust-plane/resultats/preuves-h6-construction_durcie.log). La construction a réussi ; le KO vient de la prédiction « 0 paquet de pod en clair », qui ne tient pas. Passage conservé tel quel, seuil non modifié.
+
+| Prédiction | Résultat | Mesure |
+|---|---|---|
+| W5 | **Non tenue sur un point** | Tenu : image `3a7ca1b1`, enveloppes 20 → 22, porte `true`, 95 s pour moins de 114 s, 0 paquet en clair avec sc-stockage, 62637 paquets de tunnel avec sc-stockage. Non tenu : **62 paquets d'adresses de pods en clair**, pour 0 prédit |
+| W6 | Réalisée sous sa forme bénigne | Pas de blocage. Fragments du tunnel : `IpFragCreates` de 6 à 146 sur sc-build, `IpReasmOKs` de 4 à 74 sur sc-stockage, 70 fragments vus dans la capture, sur 62637 paquets. Effet sur la durée non isolé |
+| W7 | Tenue, à préciser | 2582 paquets en clair avec sc-confiance. Tout n'y est pas en TLS : voir ci-dessous |
+
+**Nature des 62 paquets.** La capture de la construction est effacée par l'étape, il n'en reste que les classes : trois adresses, `10.42.0.179` (28), `10.42.0.221` (19), `10.42.1.177` (15). Une capture de 90 s prise ensuite, hors construction, en-têtes seuls, retrouve ces trois mêmes sources ([resultats/durcissement-h6-clair.log](resultats/durcissement-h6-clair.log)) :
+
+| Source | Destination | Nature |
+|---|---|---|
+| `rke2-metrics-server`, sur sc-confiance | kubelet de sc-build, 10250 | TLS |
+| Endpoint de santé de sc-confiance, 4240 et ICMP | Hôte de sc-build | Sondes de santé de Cilium, HTTP en clair |
+| Endpoint de santé de sc-build, 4240 | Hôte de sc-confiance | Réponses aux sondes, HTTP en clair |
+
+Chaque flux va d'un pod vers un nœud, et chacun touche sc-confiance, hors du chiffrement de nœud à nœud. Aucun flux de pod à pod en clair n'apparaît dans les 90 s. Ce rapprochement repose sur les adresses : la capture de 90 s n'est pas celle de la construction. Ma prédiction confondait « adresse de pod » et « pod à pod », et n'avait pas vu que W7 s'étend aux sondes de santé.
+
+**Durée.** 95 s contre 57 s pour R4 et 55 s pour la construction de 19:26 UTC : un seul passage, cause non isolée. `Invalid source ip` reste à 57, `Policy denied` à 246 avant et après : aucun nouveau refus.
+
+**Non couvert** : retour W2 et W8, passage de `h6_retrait` non lancé. Rotation des clés, redémarrage d'un nœud sous WireGuard et mode strict en entrée restent non essayés.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

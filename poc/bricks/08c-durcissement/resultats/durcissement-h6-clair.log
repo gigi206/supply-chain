@@ -1,0 +1,6 @@
+capture du 06/11/2026 à 21:46:10 UTC, 90 s sur enp1s0 de sc-build, en-têtes seuls, adresses de pods, hors construction
+     13 10.42.0.179:eph > 192.168.161.12:10250 tcp
+      8 10.42.1.177:4240 > 192.168.161.11:eph tcp
+      7 10.42.0.221:4240 > 192.168.161.12:eph tcp
+      1 10.42.0.221:- > 192.168.161.12:- ICMP
+fin 21:47:41 UTC
