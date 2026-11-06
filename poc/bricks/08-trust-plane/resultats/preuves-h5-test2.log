@@ -1,0 +1,35 @@
+# preuves.sh test2, 2026-11-06T20:09:59Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, corrigée après le premier passage, archivé : preuves-test2-premier-passage.log)
+- TaskRun à taskSpec en ligne créé par l'administrateur, et PipelineRun à pipelineSpec en ligne créé par el-forgejo :
+  refusés à l'admission par deux barrières indépendantes, le webhook de Tekton (disable-inline-spec) et la règle
+  tekton-references de Kyverno. La réponse de l'API ne nomme qu'un refus (au premier passage, celui de Tekton) ; celui de
+  Kyverno se lit dans son événement PolicyViolation (« fail (blocked) »), un par objet refusé. TaskRun en ligne créé par
+  el-forgejo : refusé par RBAC avant l'admission (el-forgejo ne crée que des PipelineRuns), donc sans événement de Kyverno ;
+  aucun objet créé
+- témoins : TaskRun du bundle signé (administrateur) et PipelineRun du bundle signé (el-forgejo) admis en dry-run serveur
+- trace : refus de l'API ; un événement PolicyViolation de tekton-references par refus de Kyverno ; chaque requête dans
+  l'audit de l'API, avec le compte (l'administrateur apparaît comme emprunteur de l'identité d'el-forgejo)
+## tentatives (créations réelles)
+OK   TaskRun en ligne, administrateur : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.taskSpec )
+OK   PipelineRun en ligne, el-forgejo : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.pipelineSpec )
+OK   TaskRun en ligne, el-forgejo : refusé par RBAC (taskruns.tekton.dev is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot create resource "taskruns" in API group "tekton.dev" in the namespace "builds" )
+## témoins (dry-run serveur, mêmes comptes)
+OK   témoin TaskRun du bundle signé, administrateur : admis (taskrun.tekton.dev/preuve-t2-tr-bundle-signe created (server dry run) )
+OK   témoin PipelineRun du bundle signé, el-forgejo : admis (pipelinerun.tekton.dev/preuve-t2-pr-bundle-signe created (server dry run) )
+OK   aucun objet preuve-t2-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-06T20:10:00Z
+  ValidatingPolicy/tekton-references : TaskRun builds/preuve-t2-tr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+  ValidatingPolicy/tekton-references : PipelineRun builds/preuve-t2-pr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+OK   Kyverno a bloqué preuve-t2-tr-en-ligne (événement de tekton-references)
+OK   Kyverno a bloqué preuve-t2-pr-en-ligne (événement de tekton-references)
+OK   aucun événement de Kyverno pour preuve-t2-tr-en-ligne-el : refusé par RBAC avant l'admission
+## trace : audit de l'API (requêtes preuve-t2-*, et créations de TaskRuns par el-forgejo : un refus de RBAC précède la
+## lecture du corps, la requête n'a donc pas de nom d'objet)
+  20:10:00 system:admin create taskruns/preuve-t2-tr-en-ligne : 400
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-en-ligne : 400
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create taskruns/- : 403
+  20:10:00 system:admin create taskruns/preuve-t2-tr-bundle-signe (dry-run) : 201
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-bundle-signe (dry-run) : 201
+OK   les 3 refus sont dans l'audit de l'API
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)

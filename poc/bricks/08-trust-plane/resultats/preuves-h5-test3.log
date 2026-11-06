@@ -1,0 +1,65 @@
+# preuves.sh test3, 2026-11-06T20:10:08Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit c724f7017ec65e50f0220de80a21a13d18975fa7, propre au passage),
+  terminé et signé par Chains : 3 signatures par la clé Transit chains dans l'audit d'OpenBao (signature de l'image et
+  provenance du TaskRun, provenance du PipelineRun), comme au test 5
+- tentatives réelles, au nom du compte des TaskRuns (build), d'el-forgejo, des opérateurs et du rattrapage : écriture
+  du résultat IMAGE_DIGEST falsifié (PUT de la sous-ressource status), puis de l'objet sans l'annotation
+  chains.tekton.dev/signed (PUT de la ressource principale) : refusées par RBAC (403, verbe update), chaque requête dans
+  l'audit de l'API avec le nom de l'objet (présent dans l'URL). Corrigée après le premier passage (archivé) : kubectl patch
+  lisait d'abord l'objet, refus sur la lecture, que la politique d'audit ne journalise pas
+- témoin : la même écriture du statut par l'administrateur est acceptée ; le statut falsifié n'est pas réécrit par le
+  contrôleur de Pipelines (un TaskRun terminé n'est plus recalculé)
+- Chains ne re-signe pas : dans les 45 s qui suivent, annotation toujours true, aucune signature par la clé chains dans
+  l'audit d'OpenBao, même nombre d'enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, et la provenance de ce TaskRun (invocationId
+  = UID du TaskRun) garde son sujet d'origine, tiré du résultat IMAGE_DIGEST à la signature. Lu dans le code de Chains
+  v0.29.9 (annotations.go, Reconciled ; reconciler/taskrun/taskrun.go) : un TaskRun terminé dont l'annotation vaut true ou
+  failed est sauté
+- limite lue dans ce même code, non mesurée (elle laisserait dans Zot une attestation falsifiée validement signée, que
+  poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande
+  un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)
+- fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds
+## mise en place, après la bascule (brique 08c) : pas de livraison, le gabarit en service construirait la vraie image ;
+## PipelineRun de la pipeline d'essai créé par l'administrateur, seule différence avec la cible du premier passage
+OK   TaskRun sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier créé par ce PipelineRun (propriétaire b872bf52-b349-46f5-a36c-6f607dab515c)
+OK   sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier terminé (Succeeded) et signé par Chains
+état avant : UID a57e2fe1-af05-4326-bb6b-5354454856f3, résultats [{"name":"IMAGE_DIGEST","type":"string","value":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"},{"name":"IMAGE_URL","type":"string","value":"sc-stockage.poc.test:5000/builds/essai-webhook"}], 32 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## tentatives (écritures réelles : PUT du statut falsifié, PUT de l'objet sans l'annotation de Chains)
+OK   build : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:builds:build" cannot update resource "taskruns/status" in API group "tekton)
+OK   build : retrait de l'annotation de Chains refusé par RBAC
+OK   el : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot update resource "taskruns/status" in API gr)
+OK   el : retrait de l'annotation de Chains refusé par RBAC
+OK   operateur : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "operateur" cannot update resource "taskruns/status" in API group "tekton.dev" in the namespace "b)
+OK   operateur : retrait de l'annotation de Chains refusé par RBAC
+OK   rattrapage : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:declencheurs:rattrapage" cannot update resource "taskruns/status" in API gr)
+OK   rattrapage : retrait de l'annotation de Chains refusé par RBAC
+## témoin : même écriture du statut par l'administrateur
+OK   administrateur : statut écrit (IMAGE_DIGEST renvoyé par l'API : sha256:0000000000000000000000000000000000000000000000000000000000000000)
+## Chains ne re-signe pas (45 s d'attente après l'écriture, 2026-11-06T20:10:26Z)
+OK   statut falsifié conservé (IMAGE_DIGEST = sha256:0000000000000000000000000000000000000000000000000000000000000000) : le contrôleur de Pipelines ne le réécrit pas
+OK   annotation chains.tekton.dev/signed toujours true
+signatures par la clé chains depuis 2026-11-06T20:10:08Z (audit d'OpenBao) :
+  {"t":"2026-11-06T20:10:13","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-06T20:10:18","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-06T20:10:19","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+OK   témoin : 3 signatures de Chains avant l'écriture, pour cette exécution
+OK   aucune signature de Chains depuis l'écriture
+OK   32 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, comme avant l'écriture
+OK   une provenance pour ce TaskRun, sujet d'origine : ["sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"]
+## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier)
+  20:10:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour operateur) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour operateur) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 200
+OK   4 écritures du statut refusées dans l'audit, avec le nom de l'objet
+OK   4 retraits d'annotation refusés dans l'audit
+OK   écriture de l'administrateur dans l'audit (200)
+## fin : PipelineRun sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7 purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)
+OK   PipelineRun et TaskRun de c724f7017ec65e50f0220de80a21a13d18975fa7 supprimés
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)

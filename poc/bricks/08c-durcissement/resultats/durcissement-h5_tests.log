@@ -1,0 +1,637 @@
+# durcissement.sh h5_tests, 2026-11-06T20:09:59Z, DISTRO=rke2
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh test2 test4 test3 test1 test7 test8
+# preuves.sh test2, 2026-11-06T20:09:59Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, corrigée après le premier passage, archivé : preuves-test2-premier-passage.log)
+- TaskRun à taskSpec en ligne créé par l'administrateur, et PipelineRun à pipelineSpec en ligne créé par el-forgejo :
+  refusés à l'admission par deux barrières indépendantes, le webhook de Tekton (disable-inline-spec) et la règle
+  tekton-references de Kyverno. La réponse de l'API ne nomme qu'un refus (au premier passage, celui de Tekton) ; celui de
+  Kyverno se lit dans son événement PolicyViolation (« fail (blocked) »), un par objet refusé. TaskRun en ligne créé par
+  el-forgejo : refusé par RBAC avant l'admission (el-forgejo ne crée que des PipelineRuns), donc sans événement de Kyverno ;
+  aucun objet créé
+- témoins : TaskRun du bundle signé (administrateur) et PipelineRun du bundle signé (el-forgejo) admis en dry-run serveur
+- trace : refus de l'API ; un événement PolicyViolation de tekton-references par refus de Kyverno ; chaque requête dans
+  l'audit de l'API, avec le compte (l'administrateur apparaît comme emprunteur de l'identité d'el-forgejo)
+## tentatives (créations réelles)
+OK   TaskRun en ligne, administrateur : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.taskSpec )
+OK   PipelineRun en ligne, el-forgejo : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.pipelineSpec )
+OK   TaskRun en ligne, el-forgejo : refusé par RBAC (taskruns.tekton.dev is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot create resource "taskruns" in API group "tekton.dev" in the namespace "builds" )
+## témoins (dry-run serveur, mêmes comptes)
+OK   témoin TaskRun du bundle signé, administrateur : admis (taskrun.tekton.dev/preuve-t2-tr-bundle-signe created (server dry run) )
+OK   témoin PipelineRun du bundle signé, el-forgejo : admis (pipelinerun.tekton.dev/preuve-t2-pr-bundle-signe created (server dry run) )
+OK   aucun objet preuve-t2-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-06T20:10:00Z
+  ValidatingPolicy/tekton-references : TaskRun builds/preuve-t2-tr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+  ValidatingPolicy/tekton-references : PipelineRun builds/preuve-t2-pr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+OK   Kyverno a bloqué preuve-t2-tr-en-ligne (événement de tekton-references)
+OK   Kyverno a bloqué preuve-t2-pr-en-ligne (événement de tekton-references)
+OK   aucun événement de Kyverno pour preuve-t2-tr-en-ligne-el : refusé par RBAC avant l'admission
+## trace : audit de l'API (requêtes preuve-t2-*, et créations de TaskRuns par el-forgejo : un refus de RBAC précède la
+## lecture du corps, la requête n'a donc pas de nom d'objet)
+  20:10:00 system:admin create taskruns/preuve-t2-tr-en-ligne : 400
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-en-ligne : 400
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create taskruns/- : 403
+  20:10:00 system:admin create taskruns/preuve-t2-tr-bundle-signe (dry-run) : 201
+  20:10:00 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-bundle-signe (dry-run) : 201
+OK   les 3 refus sont dans l'audit de l'API
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+# preuves.sh test4, 2026-11-06T20:10:03Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- tentatives au nom du contrôleur de Tekton, le compte qui crée les pods des TaskRuns dans builds (créations réelles) :
+  pod runc privilégié : refusé par Pod Security (restricted en enforce sur builds, HTTP 403). Pod Security est une extension
+  d'admission intégrée, appelée avant les webhooks, et le premier refus arrête l'admission : Kyverno n'est pas consulté, donc
+  aucun événement de pods-isolation pour ce pod (J6 a mesuré cette règle de Kyverno seule, dans bancc, sans Pod Security).
+  Pod Kata privilégié avec un volume hostPath, et pod Kata privilégié en hostNetwork : exemptés de Pod Security (RuntimeClass
+  kata, J7), refusés par la règle pods-isolation de Kyverno (HTTP 400), seule barrière ; un événement PolicyViolation par pod
+- témoins (même compte, dry-run serveur) : pod Kata privilégié sans hostPath ni hostNetwork, et pod runc restreint : admis
+- trace : refus de l'API ; événements de Kyverno ; audit de l'API, avec l'annotation de Pod Security : enforce-policy
+  restricted:latest pour les pods runc, exempt runtimeClass pour les pods Kata, y compris ceux que Kyverno refuse ensuite
+- hors de ce test, déjà mesurée : la voie d'un PipelineRun (podTemplate avec volume refusé par tekton-references, cas de J6 ;
+  construction sans runtimeClassName : pod refusé par Pod Security, construction-construire.log)
+## tentatives (créations réelles, au nom de system:serviceaccount:tekton-pipelines:tekton-pipelines-controller)
+OK   pod runc privilégié : refusé par Pod Security (pods "preuve-t4-runc-privilegie" is forbidden: violates PodSecurity "restricted:latest": privileged (container "app" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscala)
+OK   pod Kata privilégié avec hostPath : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : volume hostPath interdit hors des espaces système )
+OK   pod Kata privilégié en hostNetwork : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système )
+## témoins (dry-run serveur, même compte)
+OK   témoin pod Kata privilégié : admis (pod/preuve-t4-kata-privilegie created (server dry run) )
+OK   témoin pod runc restreint : admis (pod/preuve-t4-runc-restreint created (server dry run) )
+OK   aucun pod preuve-t4-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-06T20:10:03Z
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espaces système
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système
+OK   Kyverno a bloqué preuve-t4-kata-hostpath (événement de pods-isolation)
+OK   Kyverno a bloqué preuve-t4-kata-hostnetwork (événement de pods-isolation)
+OK   aucun événement de Kyverno pour preuve-t4-runc-privilegie : refusé par Pod Security, Kyverno non consulté
+## trace : audit de l'API (créations de pods preuve-t4-*, annotation de Pod Security)
+  20:10:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+  20:10:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+  20:10:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+  20:10:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; Pod Security : exempt runtimeClass
+  20:10:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+OK   audit : preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+# preuves.sh test3, 2026-11-06T20:10:08Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit c724f7017ec65e50f0220de80a21a13d18975fa7, propre au passage),
+  terminé et signé par Chains : 3 signatures par la clé Transit chains dans l'audit d'OpenBao (signature de l'image et
+  provenance du TaskRun, provenance du PipelineRun), comme au test 5
+- tentatives réelles, au nom du compte des TaskRuns (build), d'el-forgejo, des opérateurs et du rattrapage : écriture
+  du résultat IMAGE_DIGEST falsifié (PUT de la sous-ressource status), puis de l'objet sans l'annotation
+  chains.tekton.dev/signed (PUT de la ressource principale) : refusées par RBAC (403, verbe update), chaque requête dans
+  l'audit de l'API avec le nom de l'objet (présent dans l'URL). Corrigée après le premier passage (archivé) : kubectl patch
+  lisait d'abord l'objet, refus sur la lecture, que la politique d'audit ne journalise pas
+- témoin : la même écriture du statut par l'administrateur est acceptée ; le statut falsifié n'est pas réécrit par le
+  contrôleur de Pipelines (un TaskRun terminé n'est plus recalculé)
+- Chains ne re-signe pas : dans les 45 s qui suivent, annotation toujours true, aucune signature par la clé chains dans
+  l'audit d'OpenBao, même nombre d'enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, et la provenance de ce TaskRun (invocationId
+  = UID du TaskRun) garde son sujet d'origine, tiré du résultat IMAGE_DIGEST à la signature. Lu dans le code de Chains
+  v0.29.9 (annotations.go, Reconciled ; reconciler/taskrun/taskrun.go) : un TaskRun terminé dont l'annotation vaut true ou
+  failed est sauté
+- limite lue dans ce même code, non mesurée (elle laisserait dans Zot une attestation falsifiée validement signée, que
+  poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande
+  un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)
+- fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds
+## mise en place, après la bascule (brique 08c) : pas de livraison, le gabarit en service construirait la vraie image ;
+## PipelineRun de la pipeline d'essai créé par l'administrateur, seule différence avec la cible du premier passage
+OK   TaskRun sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier créé par ce PipelineRun (propriétaire b872bf52-b349-46f5-a36c-6f607dab515c)
+OK   sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier terminé (Succeeded) et signé par Chains
+état avant : UID a57e2fe1-af05-4326-bb6b-5354454856f3, résultats [{"name":"IMAGE_DIGEST","type":"string","value":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"},{"name":"IMAGE_URL","type":"string","value":"sc-stockage.poc.test:5000/builds/essai-webhook"}], 32 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## tentatives (écritures réelles : PUT du statut falsifié, PUT de l'objet sans l'annotation de Chains)
+OK   build : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:builds:build" cannot update resource "taskruns/status" in API group "tekton)
+OK   build : retrait de l'annotation de Chains refusé par RBAC
+OK   el : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot update resource "taskruns/status" in API gr)
+OK   el : retrait de l'annotation de Chains refusé par RBAC
+OK   operateur : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "operateur" cannot update resource "taskruns/status" in API group "tekton.dev" in the namespace "b)
+OK   operateur : retrait de l'annotation de Chains refusé par RBAC
+OK   rattrapage : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier" is forbidden: User "system:serviceaccount:declencheurs:rattrapage" cannot update resource "taskruns/status" in API gr)
+OK   rattrapage : retrait de l'annotation de Chains refusé par RBAC
+## témoin : même écriture du statut par l'administrateur
+OK   administrateur : statut écrit (IMAGE_DIGEST renvoyé par l'API : sha256:0000000000000000000000000000000000000000000000000000000000000000)
+## Chains ne re-signe pas (45 s d'attente après l'écriture, 2026-11-06T20:10:26Z)
+OK   statut falsifié conservé (IMAGE_DIGEST = sha256:0000000000000000000000000000000000000000000000000000000000000000) : le contrôleur de Pipelines ne le réécrit pas
+OK   annotation chains.tekton.dev/signed toujours true
+signatures par la clé chains depuis 2026-11-06T20:10:08Z (audit d'OpenBao) :
+  {"t":"2026-11-06T20:10:13","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-06T20:10:18","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-06T20:10:19","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+OK   témoin : 3 signatures de Chains avant l'écriture, pour cette exécution
+OK   aucune signature de Chains depuis l'écriture
+OK   32 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, comme avant l'écriture
+OK   une provenance pour ce TaskRun, sujet d'origine : ["sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"]
+## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier)
+  20:10:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour operateur) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour operateur) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 403
+  20:10:26 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier : 403
+  20:10:26 system:admin update taskruns/sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7-publier/status : 200
+OK   4 écritures du statut refusées dans l'audit, avec le nom de l'objet
+OK   4 retraits d'annotation refusés dans l'audit
+OK   écriture de l'administrateur dans l'audit (200)
+## fin : PipelineRun sample-app-c724f7017ec65e50f0220de80a21a13d18975fa7 purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)
+OK   PipelineRun et TaskRun de c724f7017ec65e50f0220de80a21a13d18975fa7 supprimés
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+# preuves.sh test1, 2026-11-06T20:11:12Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière
+- véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais
+  inscrit dans la liste revue de la porte), exécutée par un TaskRun de builds (compte build, gabarit de la zone build) ;
+  elle vaut une étape de build dont le code est hostile. TaskRun terminé avec succès : l'étape journalise et sort en 0
+- 1. aucun jeton de compte de service dans le pod (compte build sans montage d'office ; zone-build interdit le jeton
+  projeté) : rien à présenter à l'authentification JWT d'OpenBao ; aucune variable d'environnement de secret (premier
+  passage archivé : la sonde comptait sa propre variable, OPENBAO_IP, renommée CIBLE)
+- 2. réseau : la NetworkPolicy d'OpenBao n'admet en entrée que tekton-chains et le TSA ; Cilium jette les SYN à l'entrée,
+  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod (10.42.0.3) :
+  délai du client dépassé (5 s), pas de refus ; rien chez l'agent de sc-build, aucune politique de sortie ne sélectionnant
+  ce pod
+- 3. OpenBao ne reçoit rien : aucune ligne de son audit avec l'adresse du pod. Témoin dans la même lecture : les requêtes de
+  Chains (connexion JWT et signature), qui signe ce même TaskRun
+- témoins : depuis la même étape, Zot et Forgejo joignables (le réseau du pod fonctionne) ; OpenBao descellé pendant l'essai
+- non exercées ici, mesurées en J3 (openbao-essais.log) : rôle JWT lié au seul compte de Chains (autre compte et autre
+  audience refusés), clé Transit non exportable (export et sauvegarde refusés, même au jeton root)
+- résidu : le bundle signé tekton/tasks/preuve-test1 reste dans Zot (poc-ecriture ne supprime pas) ; la porte le refuserait,
+  hors de la liste revue
+OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.3)
+## véhicule : tâche signée (tkn 0.46.2), bundle, TaskRun
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test1 : sha256:d8e5139a2af82de02c74587bc2fe39144ed2f2cb05f08b2b8b37090c81fa2750
+OK   TaskRun preuve-test1 terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape (pod preuve-test1-pod, nœud sc-build)
+  IP|10.42.1.228
+  JETON|absent
+  SECRETS_MONTES|
+  VARIABLES|
+  DNS|10.43.222.96
+  OPENBAO_SERVICE|FERME|5 s
+  OPENBAO_POD|FERME|5 s
+  TEMOIN_ZOT|OUVERT|0 s
+  TEMOIN_FORGEJO|OUVERT|0 s
+OK   1. aucun jeton de compte de service dans le pod
+OK   1. aucune variable d'environnement de secret
+OK   2. OPENBAO_SERVICE : injoignable, délai du client dépassé (FERME|5 s)
+OK   2. OPENBAO_POD : injoignable, délai du client dépassé (FERME|5 s)
+OK   témoin TEMOIN_ZOT : joignable depuis la même étape (OUVERT|0 s)
+OK   témoin TEMOIN_FORGEJO : joignable depuis la même étape (OUVERT|0 s)
+## trace : Hubble depuis 2026-11-06T20:11:12Z, flux refusés depuis 10.42.1.228 vers le port 8200
+agent de sc-confiance : 20 flux
+  20:11:19.864 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:19.864 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:20.875 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:20.875 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:21.899 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:21.899 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:22.923 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:22.923 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:23.947 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:23.947 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:24.867 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:24.867 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:25.899 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:25.899 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:26.923 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:26.923 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:27.951 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:27.951 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:28.971 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+  20:11:28.971 10.42.1.228 > 10.42.0.3:8200 SYN POLICY_DENIED INGRESS
+agent de sc-build : 0 flux
+OK   2. SYN vers OpenBao jetés à l'entrée par Cilium (sc-confiance, POLICY_DENIED)
+OK   2. aucun refus chez l'agent de sc-build (pas de politique de sortie sur ce pod)
+## trace : audit d'OpenBao depuis 2026-11-06T20:11:12Z
+réponses journalisées : 3 ; par adresse et compte :
+        3 10.42.0.58 jwt-system:serviceaccount:tekton-chains:tekton-chains-controller
+OK   3. aucune requête de 10.42.1.228 dans l'audit d'OpenBao
+OK   témoin : 1 signature(s) de Chains dans la même lecture (preuve-test1 signé : true)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+# preuves.sh test7, 2026-11-06T20:11:32Z
+## prédiction (bibliothèque conforma/policy v1.0.28, lue au commit ebd3fbd2 ; politique policy.yaml de la porte)
+source attendue : dépôt workspace/sample-app de Forgejo et commit TETE_J2 du script, comparé à la tête de main dans l'API de
+  Forgejo, jamais lu dans la provenance jugée ; transmise à ec par --images (input.image.source)
+A  image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, source attendue : admise, aucune violation (premier verdict complet d'une image réelle)
+B  même image, révision fictive absente du dépôt, puis URL d'un autre dépôt : refusée, slsa_source_correlated.expected_source_code_reference seule
+C  builds/essai-images@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (même digest, poussé par poc-images en J7, jamais présenté à Chains ; signatures dans
+   builds/sample-app seulement) : refusée, builtin.attestation.signature_check et builtin.image.signature_check
+D1 témoins à clé jetable (essais-j8/test7, ConfigMap porte-temoin), provenance réelle au sujet réécrit, source attendue ; L : listée
+   (construire-image 403ccbd8), N : même provenance citant construire-image c7e8b275, retirée de la liste revue. Référence W =
+   violations de « listee » : subject_build_task_matches seule (digest du témoin, constat de reglec) ; trusted_task.trusted parmi ses succès
+   non-listee (N) : W + trusted_task.trusted ; nl-recente (L, puis N plus récente d'une heure) : W + trusted_task.trusted ;
+   l-recente (N plus ancienne d'une heure, puis L) : W, admise par trusted_task (seule la plus récente est jugée : faiblesse mesurée) ;
+   egalite (L et N au même finishedOn) : W + trusted_task.trusted (les deux sont jugées) ;
+   sans-date (L, puis N sans finishedOn) : aucune provenance de PipelineRun retenue (toutes doivent être datées), trusted_task.trusted
+   en succès à vide ; refus porté par attestation_type.pipelinerun_attestation_found (lib.pipelinerun_attestations vide) et
+   porte.taches_vues ; tasks.pipeline_has_tasks ne parcourt que les provenances retenues et ne refuse rien (deuxième passage :
+   prédit à tort, lu ensuite dans tasks.rego)
+D2 vraies signatures de Chains sur builds/essai-webhook@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (image de la tâche en service, sans source git : Vw =
+   violations de son verdict de départ) : PipelineRun d'une pipeline signée dont la tâche, signée par la clé des tâches, est hors de la
+   liste revue (bundle tekton/tasks/preuve-test7) : sa provenance devient la plus récente, Vw + trusted_task.trusted ; puis PipelineRun
+   du gabarit en service : Vw, trusted_task.trusted parmi les succès, la provenance non listée plus ancienne restant dans le tag .att
+OK   ConfigMap porte : porte.rego et policy.yaml identiques aux fichiers versionnés
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+## source attendue
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f (commit du script)
+révision du cas B : df5e344157272eb01650c727c29c34be50807653 (fictive, absente du dépôt : 404 dans l'API de Forgejo ; 6391fd437f26696847041be3226bbbf633f55a2f est la racine, sans parent)
+## A, B : image réelle
+  VERDICT|t7-reel|true||trusted_task.tagged|1|ok|18/18 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   reel : admise, aucune violation
+OK   reel : expected_source_code_reference, trusted_task.trusted et porte.construction_kata parmi les succès
+  VERDICT|t7-mauvaise-revision|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|1|ok|18/18 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   mauvaise-revision : refusée, violations prédites
+  motif mauvaise-revision : The expected source code reference "git+https://sc-stockage.poc.test:3000/workspace/sample-app.git@df5e344157272eb01650c727c29c34be50807653" is not attested
+  VERDICT|t7-mauvaise-url|false|slsa_source_correlated.expected_source_code_reference|trusted_task.tagged|2|ok|18/18 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   mauvaise-url : refusée, violations prédites
+  motif mauvaise-url : The expected source code reference "git+https://sc-stockage.poc.test:3000/workspace/autre-depot.git@6391fd437f26696847041be3226bbbf633f55a2f" is not attested
+## C : même digest dans builds/essai-images, poussé par poc-images (J7, construction.sh compte), sans Chains
+builds/essai-images : enveloppes 0, signature 0
+  VERDICT|t7-poc-images|false|builtin.attestation.signature_check,builtin.image.signature_check||0|refus|aucune attestation vérifiée par ec|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-images ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-images ; cosign : no matching attestations: 
+OK   poc-images : refusée, violations prédites
+  motif poc-images : No image attestations found matching the given public key. Verify the correct public key was provided, and one or more attestations were created. Error: no matching attestations: 
+## D1 : témoins à clé jetable, ordre des provenances
+provenance réelle reprise : PipelineRun 5a832738-3578-49ff-8d00-c8edcfa714ec, finishedOn 2026-11-06T19:27:46Z
+listee : essais-j8/test7@sha256:23ca54a73ef9a8f5dd2a2d04ab14a10065833013b63d6b1874d19f225d048dcc ; enveloppes dans l'ordre des couches : L (construire-image 66a9f298, finishedOn 2026-11-06T19:27:46Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 1 ; clé de Chains : refusée
+non-listee : essais-j8/test7@sha256:c2cdac76f1289176e7c4dfb38d77a7173f7102a96aa19719175328125c01d8f9 ; enveloppes dans l'ordre des couches : N (construire-image c7e8b275, finishedOn 2026-11-06T19:27:46Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 1 ; clé de Chains : refusée
+nl-recente : essais-j8/test7@sha256:3546ee94d76e33e4ddf0033dc99fa8365cb0d77a505194487a6b088db48b337e ; enveloppes dans l'ordre des couches : L (construire-image 66a9f298, finishedOn 2026-11-06T19:27:46Z) N-recente (construire-image c7e8b275, finishedOn 2026-11-06T20:27:46Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+l-recente : essais-j8/test7@sha256:a254b80799e70aed314889f54ddb31c57a44b3e7e9550c20e4889b56705e4286 ; enveloppes dans l'ordre des couches : N-ancienne (construire-image c7e8b275, finishedOn 2026-11-06T18:27:46Z) L (construire-image 66a9f298, finishedOn 2026-11-06T19:27:46Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+egalite : essais-j8/test7@sha256:f556db4479174a916fdedeaf029bb096c788b9cd3e9a7a8d5c5056d06aa1f0fa ; enveloppes dans l'ordre des couches : L (construire-image 66a9f298, finishedOn 2026-11-06T19:27:46Z) N (construire-image c7e8b275, finishedOn 2026-11-06T19:27:46Z)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+sans-date : essais-j8/test7@sha256:ece1b3deaabc45c31b96f93cc439f4f997eb45c64ed535cbb871255cb41fa870 ; enveloppes dans l'ordre des couches : L (construire-image 66a9f298, finishedOn 2026-11-06T19:27:46Z) N-sans-date (construire-image c7e8b275, finishedOn absent)
+  sur l'hôte, clé jetable : signature vérifiée, enveloppes vérifiées : 2 ; clé de Chains : refusée
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+  VERDICT|t7-listee|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:23ca54a73ef9a8f5dd2a2d04ab14a10065833013b63d6b1874d19f225d048dcc
+OK   listee : refusée, violations prédites
+OK   listee : trusted_task.trusted parmi les succès
+  VERDICT|t7-non-listee|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:c2cdac76f1289176e7c4dfb38d77a7173f7102a96aa19719175328125c01d8f9
+OK   non-listee : refusée, violations prédites
+  VERDICT|t7-nl-recente|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:3546ee94d76e33e4ddf0033dc99fa8365cb0d77a505194487a6b088db48b337e
+OK   nl-recente : refusée, violations prédites
+  VERDICT|t7-egalite|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,trusted_task.trusted|trusted_task.tagged|1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:f556db4479174a916fdedeaf029bb096c788b9cd3e9a7a8d5c5056d06aa1f0fa
+OK   egalite : refusée, violations prédites
+  motif nl-recente : PipelineTask "construire" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906. Please upgrade the task v
+  VERDICT|t7-l-recente|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:a254b80799e70aed314889f54ddb31c57a44b3e7e9550c20e4889b56705e4286
+OK   l-recente : refusée, violations prédites
+CONSTAT  l-recente : trusted_task.trusted en succès malgré l'enveloppe signée citant construire-image c7e8b275, plus ancienne (seule la plus récente est jugée)
+  VERDICT|t7-sans-date|false|attestation_type.pipelinerun_attestation_found,porte.taches_vues||1|refus|0/2 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:ece1b3deaabc45c31b96f93cc439f4f997eb45c64ed535cbb871255cb41fa870
+OK   sans-date : refusée par attestation_type.pipelinerun_attestation_found et porte.taches_vues seules, trusted_task.trusted hors des violations
+CONSTAT  sans-date : trusted_task.trusted en succès à vide (aucune provenance de PipelineRun retenue)
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+## D2 : vraies signatures de Chains, builds/essai-webhook@3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+provenances de PipelineRun de builds/essai-webhook : 16 ; non listées : 2 ; les trois plus récentes :
+  2026-11-06T14:52:59Z 7cd4d4ef non listée (preuve-test7@sha256:f137309e704bb9407667)
+  2026-11-06T14:53:53Z 71af3416 listée
+  2026-11-06T20:10:13Z b872bf52 listée
+  VERDICT|t7-webhook-depart|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|1|ok|32/32 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+OK   départ : trusted_task.trusted parmi les succès ; Vw = slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay
+tâche hors liste : tekton/tasks/preuve-test7@sha256:cb21b29a35f14ec52c334c652357ab06001de72c18143142e115ba2f5ccfc654 (gabarit de publier-essai, même image et même digest, nouvelle signature)
+PipelineRun preuve-test7-hors-liste (tekton/pipelines/preuve-test7@sha256:8d341ef24b929599d8af15fed6feebb5f0c49a25f258b6ef2a4a04792937d781) : True|Succeeded|True, Chains : signé=true
+OK   la provenance la plus récente de builds/essai-webhook est celle de preuve-test7-hors-liste (f22f74be-6412-4d5e-9db4-615167f64212)
+  VERDICT|t7-webhook-hors-liste|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay,trusted_task.trusted|trusted_task.tagged|1|refus|32/34 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+OK   webhook-hors-liste : refusée, violations prédites
+  motif webhook-hors-liste : PipelineTask "publier" uses an untrusted task reference: oci://sc-stockage.poc.test:5000/tekton/tasks/preuve-test7@sha256:cb21b29a35f14ec52c334c652357ab06001de72c18143142e115ba2f5ccfc654
+après la bascule (brique 08c) : preuve-test7-en-service tourne sur la pipeline d'essai, qui n'est plus celle du gabarit en service
+PipelineRun preuve-test7-en-service (gabarit en service) : True|Succeeded|True, Chains : signé=true
+OK   la provenance la plus récente de builds/essai-webhook est celle de preuve-test7-en-service (054c8057-47b5-42e5-946b-716b3fd16f04)
+  VERDICT|t7-webhook-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|1|refus|32/36 enveloppe(s) couverte(s), 51 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+OK   webhook-en-service : refusée, violations prédites
+provenances de PipelineRun de builds/essai-webhook : 18 ; non listées : 3 ; les trois plus récentes :
+  2026-11-06T20:10:13Z b872bf52 listée
+  2026-11-06T20:14:18Z f22f74be non listée (preuve-test7@sha256:cb21b29a35f14ec52c33)
+  2026-11-06T20:14:46Z 054c8057 listée
+CONSTAT  vraies signatures : trusted_task.trusted en succès, la provenance de preuve-test7-hors-liste (plus ancienne, non listée) restant dans le tag .att
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+# preuves.sh test8, 2026-11-06T20:15:08Z
+## prédiction (contrôle 9 joint à la porte : politique/porte/horodatage.sh, conteneur horodatage du Job, après ec)
+règle : chaque signature d'attestation vérifiée par ec doit se retrouver dans un bundle du dépôt de bundles vérifié par cosign v3.1.4
+  (clé de Chains, sujet = digest jugé, slsaprovenance1, jeton exigé, racine du TSA) ; aucune attestation vérifiée par ec : refus.
+  Porte = ec admet ET contrôle 9 ok. Image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, source attendue (test 7) ; ec admet dans tous les cas ci-dessous
+reel (horodatage/bundles) : ok, n/n ; copie (les n bundles réels, dépôt d'essai) : ok ; aucun : refus, 0/n ; partiel (1 bundle) : refus, 1/n
+sans-jeton, jeton-altere, autre-signature (jetons échangés), tsa-etrangere : refus, 0/n (motifs de J5 relevés sur l'hôte en J5)
+webhook-seul (bundles valides de deux enveloppes de builds/essai-webhook, même digest) : refus, 0/n, cosign en vérifie 2
+autre-digest (bundle valide, Chains et TSA, d'un autre digest, rattaché à builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 par poc-horodatage) : refus, 0/n ; sur l'hôte,
+  cosign verify-blob-attestation : vérifié avec son digest, refusé avec sha256:3a7ca1b14dbf… (motif relevé : le sujet est-il imposé ?)
+melange (n bundles réels + autre-digest + un sans jeton) : ok, n/n (poc-horodatage ne bloque pas une image en ajoutant des bundles bien formés)
+illisible (n bundles réels + un referrer de type bundle dont la couche n'est pas du JSON, ajouté au deuxième passage) : ok, n/n
+  (deuxième passage : refus prédit, par échec de toute la vérification ; mesuré : cosign écarte le referrer illisible, prédiction corrigée)
+garde-fou (deuxième passage) : nombre de predicateType du verdict de ec = nombre de signatures extraites, sinon refus ; aucun cas ne le déclenche
+ancien contrôle de J6 (un bundle valide du digest suffit), sur l'hôte : copie et partiel et webhook-seul acceptés (CONSTAT), aucun refusé
+poc-images (builds/essai-images@3a7ca1b1, sans Chains) : ec refuse (signatures, comme au test 7), contrôle 9 refus (aucune attestation)
+format bundle de cosign v3, témoins de essais-j8/test8 (clé jetable, ConfigMap porte-temoin) :
+  v3-att (attestation seule, attaque du banc C) : builtin.image.signature_check parmi les succès malgré 0 signature (banc C) ;
+    refus par porte.image_signature et subject_build_task_matches (sujet du témoin ≠ résultat de build, comme au test 7) ;
+  v3-sig (signature et attestation) : subject_build_task_matches seule, porte.image_signature parmi les succès ;
+  contrôle 9 refus pour les deux (aucun bundle horodaté de ces digests)
+limites écrites d'avance : image d'outils non signée dans la porte ; image neuve refusée jusqu'au passage suivant du CronJob ;
+  sorties du pod : celles de la NetworkPolicy porte (DNS, Zot), vérification hors ligne
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f (source attendue)
+## porte élargie
+OK   ConfigMap porte : horodatage.sh, porte.rego identiques aux fichiers versionnés ; racine de confiance du TSA ajoutée
+Job : ec (plateforme/porte@e77994c2, conteneur d'initialisation, --strict=false), puis horodatage (plateforme/outils-horodatage@c7bebae2)
+sorties de la NetworkPolicy porte : kube-dns:53 ; 192.168.161.13/32:5000 ; entrées : aucune
+## enveloppes de l'image réelle et bundles de son digest (horodatage/bundles)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 18 enveloppes ; 52 bundles pour sha256:3a7ca1b14dbf… (toutes les images de ce digest)
+## bundles falsifiés (à partir des deux bundles réels)
+jeton altéré : dernier octet (signature ECDSA du TSA) inversé ; jetons échangés entre les deux enveloppes
+TSA étrangère : jetons valides pour leur propre racine (même CN « TSA du PoC », autre clé)
+autre digest : bundle 28fd618cfeb9496b384c3d5f83e2f1aff136267279c6edbb6f2c9631e3ee47e2-3a1984b4c0f7a815 de horodatage/bundles, sujet sha256:28fd618cfeb9… (sc-stockage.poc.test:5000/builds/essai-enveloppes)
+  cosign verify-blob-attestation, --digest sha256:28fd618cfeb9… : vérifié (-)
+  cosign verify-blob-attestation, --digest sha256:3a7ca1b14dbf… : refusé (failed to verify signature: provided artifact digest does not match any digest in statement)
+## dépôts d'essai (horodatage/essais-test8/<cas>-20261106t201508z, écrits par poc-horodatage)
+copie : horodatage/essais-test8/copie-20261106t201508z (18 bundle(s))
+aucun : horodatage/essais-test8/aucun-20261106t201508z (0 bundle(s))
+partiel : horodatage/essais-test8/partiel-20261106t201508z (1 bundle(s))
+sans-jeton : horodatage/essais-test8/sans-jeton-20261106t201508z (2 bundle(s))
+jeton-altere : horodatage/essais-test8/jeton-altere-20261106t201508z (2 bundle(s))
+autre-signature : horodatage/essais-test8/autre-signature-20261106t201508z (2 bundle(s))
+tsa-etrangere : horodatage/essais-test8/tsa-etrangere-20261106t201508z (2 bundle(s))
+webhook-seul : horodatage/essais-test8/webhook-seul-20261106t201508z (2 bundle(s))
+autre-digest : horodatage/essais-test8/autre-digest-20261106t201508z (1 bundle(s))
+melange : horodatage/essais-test8/melange-20261106t201508z (20 bundle(s))
+illisible : horodatage/essais-test8/illisible-20261106t201508z (19 bundle(s))
+## verdicts de la porte (image réelle, source attendue)
+  VERDICT|t8-reel|true||trusted_task.tagged|1|ok|18/18 enveloppe(s) couverte(s), 55 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    COUVERTE|signature aa81420ecd148227
+    COUVERTE|signature c47c3d040a2dee72
+    COUVERTE|signature 9ad3fc7a4ffbec50
+    COUVERTE|signature 74494e25639b3b65
+    COUVERTE|signature 2ce3d5155198d152
+    COUVERTE|signature d2da24ad8ced6ade
+    COUVERTE|signature 6086a32fcf2905ed
+    COUVERTE|signature 00e665dad4fdefc6
+    COUVERTE|signature a68a1a7bca7e2d69
+    COUVERTE|signature 71b135f857ca95e1
+    COUVERTE|signature 322311bc58a6d021
+    COUVERTE|signature b314e90188f6dc7c
+    COUVERTE|signature 6b00944db6cb720a
+    COUVERTE|signature 411a8f3c05679cd2
+    COUVERTE|signature 626b4357cd570b34
+    COUVERTE|signature d044ce338b593dde
+    COUVERTE|signature dc56361cc36e96d6
+    COUVERTE|signature f222ae6854249392
+OK   reel : ec admet, contrôle 9 ok (18/18 couvertes) : porte admet
+OK   reel : même verdict de ec qu'au test 7 (expected_source_code_reference, trusted_task.trusted parmi les succès)
+  VERDICT|t8-copie|true||trusted_task.tagged|2|ok|18/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/copie-20261106t201508z|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    COUVERTE|signature aa81420ecd148227
+    COUVERTE|signature c47c3d040a2dee72
+    COUVERTE|signature 9ad3fc7a4ffbec50
+    COUVERTE|signature 74494e25639b3b65
+    COUVERTE|signature 2ce3d5155198d152
+    COUVERTE|signature d2da24ad8ced6ade
+    COUVERTE|signature 6086a32fcf2905ed
+    COUVERTE|signature 00e665dad4fdefc6
+    COUVERTE|signature a68a1a7bca7e2d69
+    COUVERTE|signature 71b135f857ca95e1
+    COUVERTE|signature 322311bc58a6d021
+    COUVERTE|signature b314e90188f6dc7c
+    COUVERTE|signature 6b00944db6cb720a
+    COUVERTE|signature 411a8f3c05679cd2
+    COUVERTE|signature 626b4357cd570b34
+    COUVERTE|signature d044ce338b593dde
+    COUVERTE|signature dc56361cc36e96d6
+    COUVERTE|signature f222ae6854249392
+OK   copie : ec admet, contrôle 9 ok (18/18 couvertes) : porte admet
+  VERDICT|t8-aucun|true||trusted_task.tagged|1|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/aucun-20261106t201508z ; cosign : no matching attestations: |ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   aucun : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-partiel|true||trusted_task.tagged|1|refus|1/18 enveloppe(s) couverte(s), 1 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/partiel-20261106t201508z|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   partiel : ec admet, contrôle 9 refus (1/18 couvertes) : porte refuse
+  VERDICT|t8-sans-jeton|true||trusted_task.tagged|2|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   sans-jeton : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-jeton-altere|true||trusted_task.tagged|1|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: |ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   jeton-altere : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-autre-signature|true||trusted_task.tagged|1|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   autre-signature : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-tsa-etrangere|true||trusted_task.tagged|2|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   tsa-etrangere : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-webhook-seul|true||trusted_task.tagged|1|refus|0/18 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/webhook-seul-20261106t201508z|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   webhook-seul : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+  VERDICT|t8-autre-digest|true||trusted_task.tagged|1|refus|0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261106t201508z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    NON_COUVERTE|signature aa81420ecd148227
+    NON_COUVERTE|signature c47c3d040a2dee72
+    NON_COUVERTE|signature 9ad3fc7a4ffbec50
+    NON_COUVERTE|signature 74494e25639b3b65
+    NON_COUVERTE|signature 2ce3d5155198d152
+    NON_COUVERTE|signature d2da24ad8ced6ade
+    NON_COUVERTE|signature 6086a32fcf2905ed
+    NON_COUVERTE|signature 00e665dad4fdefc6
+    NON_COUVERTE|signature a68a1a7bca7e2d69
+    NON_COUVERTE|signature 71b135f857ca95e1
+    NON_COUVERTE|signature 322311bc58a6d021
+    NON_COUVERTE|signature b314e90188f6dc7c
+    NON_COUVERTE|signature 6b00944db6cb720a
+    NON_COUVERTE|signature 411a8f3c05679cd2
+    NON_COUVERTE|signature 626b4357cd570b34
+    NON_COUVERTE|signature d044ce338b593dde
+    NON_COUVERTE|signature dc56361cc36e96d6
+    NON_COUVERTE|signature f222ae6854249392
+OK   autre-digest : ec admet, contrôle 9 refus (0/18 couvertes) : porte refuse
+OK   webhook-seul : cosign vérifie les 2 bundles (valides pour le digest), aucun n'est apparié à une enveloppe de l'image jugée
+  VERDICT|t8-melange|true||trusted_task.tagged|2|ok|18/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261106t201508z|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    COUVERTE|signature aa81420ecd148227
+    COUVERTE|signature c47c3d040a2dee72
+    COUVERTE|signature 9ad3fc7a4ffbec50
+    COUVERTE|signature 74494e25639b3b65
+    COUVERTE|signature 2ce3d5155198d152
+    COUVERTE|signature d2da24ad8ced6ade
+    COUVERTE|signature 6086a32fcf2905ed
+    COUVERTE|signature 00e665dad4fdefc6
+    COUVERTE|signature a68a1a7bca7e2d69
+    COUVERTE|signature 71b135f857ca95e1
+    COUVERTE|signature 322311bc58a6d021
+    COUVERTE|signature b314e90188f6dc7c
+    COUVERTE|signature 6b00944db6cb720a
+    COUVERTE|signature 411a8f3c05679cd2
+    COUVERTE|signature 626b4357cd570b34
+    COUVERTE|signature d044ce338b593dde
+    COUVERTE|signature dc56361cc36e96d6
+    COUVERTE|signature f222ae6854249392
+OK   melange : ec admet, contrôle 9 ok (18/18 couvertes) : porte admet
+  VERDICT|t8-illisible|true||trusted_task.tagged|1|ok|18/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261106t201508z|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    COUVERTE|signature aa81420ecd148227
+    COUVERTE|signature c47c3d040a2dee72
+    COUVERTE|signature 9ad3fc7a4ffbec50
+    COUVERTE|signature 74494e25639b3b65
+    COUVERTE|signature 2ce3d5155198d152
+    COUVERTE|signature d2da24ad8ced6ade
+    COUVERTE|signature 6086a32fcf2905ed
+    COUVERTE|signature 00e665dad4fdefc6
+    COUVERTE|signature a68a1a7bca7e2d69
+    COUVERTE|signature 71b135f857ca95e1
+    COUVERTE|signature 322311bc58a6d021
+    COUVERTE|signature b314e90188f6dc7c
+    COUVERTE|signature 6b00944db6cb720a
+    COUVERTE|signature 411a8f3c05679cd2
+    COUVERTE|signature 626b4357cd570b34
+    COUVERTE|signature d044ce338b593dde
+    COUVERTE|signature dc56361cc36e96d6
+    COUVERTE|signature f222ae6854249392
+OK   illisible : ec admet, contrôle 9 ok (18/18 couvertes) : porte admet
+  cosign dans la porte, sans-jeton : 0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/sans-jeton-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+  cosign dans la porte, jeton-altere : 0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/jeton-altere-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestamp: x509: 
+  cosign dans la porte, autre-signature : 0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-signature-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
+  cosign dans la porte, tsa-etrangere : 0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/tsa-etrangere-20261106t201508z ; cosign : no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does not matc
+  cosign dans la porte, autre-digest : 0/18 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/autre-digest-20261106t201508z ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+  cosign dans la porte, melange : 18/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/melange-20261106t201508z
+  cosign dans la porte, illisible : 18/18 enveloppe(s) couverte(s), 18 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/essais-test8/illisible-20261106t201508z
+## ancien contrôle de J6, sur l'hôte
+OK   ancien contrôle (J6), copie : accepté, 18 bundle(s) vérifié(s), comme prédit
+OK   ancien contrôle (J6), aucun : refusé, 0 bundle(s) vérifié(s), comme prédit
+OK   ancien contrôle (J6), partiel : accepté, 1 bundle(s) vérifié(s), comme prédit
+OK   ancien contrôle (J6), webhook-seul : accepté, 2 bundle(s) vérifié(s), comme prédit
+CONSTAT  l'ancien contrôle (un bundle valide du digest) accepte partiel et webhook-seul, que la porte refuse : le jeton n'y est pas lié aux enveloppes jugées
+## image sans Chains : builds/essai-images@3a7ca1b1 (poussée par poc-images, J7)
+  VERDICT|t8-poc-images|false|builtin.attestation.signature_check,builtin.image.signature_check||0|refus|aucune attestation vérifiée par ec|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-images ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-images ; cosign : no matching attestations: 
+OK   poc-images : ec refuse (signatures), contrôle 9 refus (aucune attestation vérifiée par ec)
+## format bundle de cosign v3 : témoins à clé jetable (essais-j8/test8)
+prédicat repris : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (5a832738-3578-49ff-8d00-c8edcfa714ec)
+v3-att : essais-j8/test8@sha256:d13831c7aae4782905ef90c43a7f8785973af4702315fae14b0ea83c2cdbb5b7 ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1) ; tags .sig/.att : 0
+  sur l'hôte, clé jetable : cosign verify accepte, cosign verify-attestation accepte
+v3-sig : essais-j8/test8@sha256:06b7be0b317796d64fbd7c9d4f5682cdbd60fdf467fad25531c0ced5f07d7e66 ; referrers : application/vnd.dev.sigstore.bundle.v0.3+json (https://slsa.dev/provenance/v1), application/vnd.dev.sigstore.bundle.v0.3+json (https://sigstore.dev/cosign/sign/v1) ; tags .sig/.att : 0
+  sur l'hôte, clé jetable : cosign verify accepte, cosign verify-attestation accepte
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+  VERDICT|t8-v3-att|false|porte.fermeture_plateforme,porte.image_signature,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test8|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test8@sha256:d13831c7aae4782905ef90c43a7f8785973af4702315fae14b0ea83c2cdbb5b7
+OK   v3-att : refusée par porte.image_signature et slsa_build_scripted_build.subject_build_task_matches,porte.fermeture_plateforme ; contrôle 9 refus
+CONSTAT  v3-att : builtin.image.signature_check parmi les succès avec 0 signature d'image (banc C reproduit dans la porte du cluster)
+  VERDICT|t8-v3-sig|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test8|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test8@sha256:06b7be0b317796d64fbd7c9d4f5682cdbd60fdf467fad25531c0ced5f07d7e66
+OK   v3-sig : slsa_build_scripted_build.subject_build_task_matches,porte.fermeture_plateforme seule, porte.image_signature parmi les succès (1 signature(s) d'image)
+  motif v3-att : porte.fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd : aucune provenance de 
+  motif v3-att : porte.image_signature : aucune signature d'image (seulement des attestations)
+  motif v3-att : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:d13831c7aae4782905ef90c43a7f8785973af4702315fae14b0ea83c2cdbb5b7", does not match any of th
+  motif v3-sig : porte.fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd : aucune provenance de 
+  motif v3-sig : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "192.168.161.13:5000/essais-j8/test8@sha256:06b7be0b317796d64fbd7c9d4f5682cdbd60fdf467fad25531c0ced5f07d7e66", does not match any of th
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie ; ConfigMap porte laissée élargie (porte en service)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 18 enveloppes, dernière provenance de PipelineRun : 5a832738-3578-49ff-8d00-c8edcfa714ec (2026-11-06T19:27:46Z)

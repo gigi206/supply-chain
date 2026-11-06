@@ -447,6 +447,23 @@ Commande, ordre du rejeu, chaque KO arrêtant la suite : `DISTRO=rke2 mise exec 
 
 Trace : `durcissement-h5_tests_sec-relecture.log`.
 
+**Additif du 06/11/2026, 20:21 UTC, rejeu des tests sous H1 à H5, accord du propriétaire (« Oui, lance les tests »).** `h5_tests`, 20:09:59 à 20:20:47 UTC, soit moins de 11 minutes pour environ 20 estimées. Code 0, un seul passage, gabarit en service inchangé.
+
+| Prédiction | Résultat | Trace |
+|---|---|---|
+| T2 | **Tenue** : 11 OK, 0 KO ; refus de Tekton et de `tekton-references`, RBAC pour `el-forgejo`, témoins admis. L'événement de `tekton-references`, non relevé à sec, est bien émis | `preuves-h5-test2.log` |
+| T4 | **Tenue** : 13 OK, 0 KO ; 403 et 400 mesurés sur des créations réelles, plus en dry-run | `preuves-h5-test4.log` |
+| T3 | **Tenue** : 22 OK, 0 KO ; 8 écritures refusées et lues dans l'audit, 3 signatures avant, aucune après, 32 enveloppes avant et après, sujet d'origine, exécution purgée | `preuves-h5-test3.log` |
+| T1 | **Tenue** : 13 OK, 0 KO ; OpenBao fermé en 5 s par le service et par l'IP, SYN jetés à sc-confiance, 0 flux refusé à sc-build, aucune requête du pod dans l'audit d'OpenBao, Zot et Forgejo joints | `preuves-h5-test1.log` |
+| T7 | **Tenue** : 20 OK, 0 KO, 3 CONSTAT déjà connus ; `ec` en 0 à 2 s contre 61 ; D1 identique ; D2 tenue, sur la pipeline d'essai | `preuves-h5-test7.log` |
+| T8 | **Tenue** : 24 OK, 0 KO, 2 CONSTAT déjà connus ; 18/18 pour `reel`, `copie`, `melange`, `illisible`, 0/18 pour les sept cas de refus dont `aucun`, 1/18 pour `partiel`. Les deux risques moyens ne se sont pas réalisés : les témoins v3 rendent le verdict du premier passage avec `SIGSTORE_REKOR_PUBLIC_KEY` | `preuves-h5-test8.log` |
+
+`builds/sample-app` reste à 18 enveloppes, provenance `5a832738`, relevé par `garder` avant et après chaque test. Après coup, 20:21 UTC : trois nœuds `Ready`, neuf règles en `Deny`, gabarit `sample-app`, `porte-temoin` retirée, 0 `FailedCreate`, 0 `OOMKilled`, aucune exécution en cours, `horodatage` et `rattrapage` réussis. Les pods en `Error` de l'espace `porte` sont les refus attendus de la porte.
+
+Le **plafond** de ce résultat : T1 et T4 restent des barrières vues depuis un pod d'essai ; un seul passage ; les refus de politique sur les trois nœuds n'ont pas été relevés dans cette fenêtre.
+
+**Reste pour clore H5** : rôles (lecteurs de Secrets, comptes de RKE2, `HelmChart` côté utilisateurs et groupes), passage de `scan-sample-app` du 07/11 à 09:30 UTC. Toujours hors de ce rejeu : signature fausse et corps modifié du test 5, test 6 sous limites.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
