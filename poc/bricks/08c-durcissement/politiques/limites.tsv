@@ -1,6 +1,7 @@
-# Brique 08c, H5 : limites posées par durcissement.sh h5_limites. Pics relevés le 06/11/2026 (resultats/durcissement-h5-pics.log), marge d'environ 3, arrondie.
+# Brique 08c, H5 : limites posées par durcissement.sh h5_limites. Pics relevés le 06/11/2026 (resultats/durcissement-h5-pics.log), marge d'environ 3, arrondie, sauf horodater.
 # Requêtes explicites : sans elles, l'API les égale aux limites, et sc-confiance (4 CPU, 1 875 m déjà demandés) ne pourrait plus placer la porte.
 # scan-sample-app : jamais exécuté sur ce cluster, valeurs non mesurées. Colonnes : type, espace, nom, conteneur, liste, requête CPU, requête mémoire, limite CPU, limite mémoire.
+# horodater à 2 CPU : pod à 985 m au plus, CPU non attribué entre ses conteneurs, marge d'environ 2. Conteneurs d'initialisation non plafonnés : la règle ne les lit pas, et identifiants peut porter ce CPU.
 Deployment	tekton-pipelines	tekton-pipelines-controller	tekton-pipelines-controller	containers	20m	64Mi	500m	256Mi
 Deployment	tekton-pipelines	tekton-events-controller	tekton-events-controller	containers	20m	64Mi	500m	256Mi
 Deployment	tekton-pipelines	tekton-triggers-controller	tekton-triggers-controller	containers	20m	64Mi	500m	256Mi
@@ -9,10 +10,8 @@ Deployment	tekton-pipelines	tekton-triggers-webhook	webhook	containers	20m	64Mi	
 Deployment	tekton-chains	tekton-chains-controller	tekton-chains-controller	containers	20m	64Mi	500m	256Mi
 Deployment	tsa	timestamp-authority	timestamp-server	containers	10m	32Mi	250m	128Mi
 Deployment	tsa	timestamp-authority	renouvellement	containers	10m	32Mi	250m	128Mi
-Deployment	tsa	timestamp-authority	connexion	initContainers	10m	32Mi	250m	128Mi
 EventListener	declencheurs	forgejo	event-listener	containers	10m	32Mi	250m	128Mi
 CronJob	declencheurs	rattrapage	rattrapage	containers	10m	16Mi	100m	64Mi
-CronJob	horodatage	horodatage	horodater	containers	50m	32Mi	1	128Mi
-CronJob	horodatage	horodatage	identifiants	initContainers	10m	32Mi	250m	128Mi
+CronJob	horodatage	horodatage	horodater	containers	50m	32Mi	2	128Mi
 CronJob	scan	scan-sample-app	revocation	containers	10m	32Mi	500m	256Mi
 StatefulSet	openbao	openbao	openbao	containers	50m	128Mi	500m	512Mi

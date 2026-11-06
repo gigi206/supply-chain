@@ -26,13 +26,6 @@ spec:
       initContainers:
       - name: identifiants
         image: @BAO@
-        resources:
-          requests:
-            cpu: 10m
-            memory: 32Mi
-          limits:
-            cpu: 250m
-            memory: 128Mi
         command: [sh, -c]
         args:
         - |
@@ -78,7 +71,7 @@ spec:
             cpu: 50m
             memory: 32Mi
           limits:
-            cpu: "1"
+            cpu: "2"
             memory: 128Mi
         command: [sh, /etc/horodatage/horodater.sh]
         env:

@@ -378,6 +378,15 @@ Ce que la préparation a changé par rapport à la proposition :
 
 **Non couvert** : `scan-sample-app` tournera le 07/11 à 09:30 UTC sous les valeurs non mesurées. Tests 1 à 4, 7 et 8 non rejoués par ces étapes. Après `h5_deny`, ne passent plus sans limites : `essai-reseau-rattrapage`, les pods de `j2-essais`, ceux de `plateforme.sh` (07a) et les cas d'admission de `politique.sh`. Les témoins admis de `preuves.sh` (`hc-pod`, `ct-pod-essai`) restent à relire avant tout rejeu. Un `tekton.sh` ou `politique.sh` rejoué effacerait les correctifs : `h5_limites` se relance ensuite. Retour : `h2_kyverno` pour l'Audit, `kubectl rollout undo` pour les limites, OpenBao à desceller.
 
+**Additif du 06/11/2026, 19:18 UTC, corrections de la préparation de H5 après relecture, rien appliqué.** Il complète l'additif précédent, dont les chiffres et l'ordre ci-dessous changent.
+
+- **Ordre et CronJobs** : `horodatage` et `rattrapage` tournent chaque minute, et le premier lit OpenBao. `h5_limites` les suspend, redémarre et descelle OpenBao d'abord, puis Tekton, Chains, TSA et l'EventListener, qui démarrent face à un OpenBao sain, puis reprend les CronJobs. L1 inclut donc cette reprise. État d'avant sauvegardé dans `$T/h5-avant`, car `rollout undo` ne couvre ni les CronJobs, ni l'EventListener, ni `config-defaults` : le retour se fait depuis ces fichiers.
+- **Autres règles** : `h5_sec` juge aussi 16 pods tirés des gabarits réels, `scan-sample-app` compris, avec les quatre règles en `Deny` par le CLI : 0 échec. Témoin du CLI : pod sans limite, `fail`. `espace-default-interdit` ne s'applique à aucun d'eux.
+- **`horodater`** : limite portée à 2 CPU, marge d'environ 2 et non 3, le CPU du pod n'étant pas attribué entre ses conteneurs. `identifiants` et `connexion` ne sont pas plafonnés : la règle ne les lit pas. Table : 270 m ajoutés au lieu de 290.
+- **`h5_deny`** : attend le webhook par une boucle, et vérifie le message exact de chaque entorse. `rattrapage` ne monte pas de jeton : le refus d'`espace-default` ne peut pas venir de `jeton-compte-default`.
+- **Passages de `h5_sec`, journal écrasé à chaque passage** : le premier concluait « conforme » alors que les neuf pods de `essais/` étaient refusés pour un compte absent, le contrôle ne portant pas dessus ; le deuxième a échoué sur le script, `kubectl` lisant `/dev/null`. Le journal archivé est celui de la version finale.
+- **Temps** : environ 10 h par les écarts entre commits depuis le 05/11, briques 08b et 08c confondues, sans chrono propre à la 08c. Borne de décision : 20 h.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

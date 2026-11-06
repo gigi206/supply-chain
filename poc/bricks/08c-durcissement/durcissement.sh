@@ -12,7 +12,7 @@
 #   flux      verdicts et refus des trois agents pendant une construction, sans rien changer
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
 #   h5_sec    à sec : correctifs de limites, gabarits et règles en Deny présentés à l'API, couverture, essais de politiques ; ne change rien
-#   h5_limites limites posées, règles encore en Audit (accord) ; redémarre Tekton, Chains, TSA, l'EventListener, puis OpenBao, scellé puis descellé
+#   h5_limites limites posées, règles encore en Audit (accord) ; CronJobs par minute suspendus, OpenBao redémarré puis descellé d'abord, puis Tekton, Chains, TSA, EventListener
 #   h5_deny   quatre règles en Deny (accord, après une construction sous limites) ; retour : h2_kyverno
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
@@ -342,9 +342,9 @@ etape_h4_bloque() {
 }
 
 LIMITES=$here/politiques/limites.tsv
-limites_correctifs() { # une ligne par objet de la table : type, espace, nom, correctif en JSON ; les types sont triés, OpenBao passe donc en dernier
+limites_correctifs() { # une ligne par objet de la table : type, espace, nom, correctif en JSON ; OpenBao d'abord, ses dépendants démarrent ainsi face à un OpenBao descellé
   grep -v '^#' "$LIMITES" | jq -Rrs '
-    split("\n") | map(select(length > 0) | split("\t")) | group_by(.[0:3]) | .[]
+    split("\n") | map(select(length > 0) | split("\t")) | group_by(.[0:3]) | sort_by(.[0][0] != "StatefulSet") | .[]
     | .[0] as $o
     | (map({g: .[4], c: {name: .[3], resources: {requests: {cpu: .[5], memory: .[6]}, limits: {cpu: .[7], memory: .[8]}}}})
        | group_by(.g) | map({key: .[0].g, value: map(.c)}) | from_entries) as $s
@@ -398,19 +398,46 @@ etape_h5_sec() {
         | select((.resources.limits.cpu == null) or (.resources.limits.memory == null)) | "\($x.metadata.namespace)/\($x.metadata.name)/\(.name)")' "$T/h5-vivants.json" > "$T/h5-ecarts.json"
   attendu "contrôleurs encore sans limite" "$(jq -c . "$T/h5-ecarts.json")" "[]"
   attendu "EventListener : limites du conteneur" "$(jq -s -c 'map(select(.kind == "EventListener"))[0].spec.resources.kubernetesResource.spec.template.spec.containers[0].resources.limits' "$o")" '{"cpu":"250m","memory":"128Mi"}'
+  attendu "EventListener : reste du gabarit inchangé par le correctif" "$(jq -s -c 'map(select(.kind == "EventListener"))[0].spec.resources.kubernetesResource | del(.spec.template.spec.containers)' "$o")" "$(kubectl get eventlistener -n declencheurs forgejo -o json | jq -c '.spec.resources.kubernetesResource | del(.spec.template.spec.containers)')"
   attendu "Deployment el-forgejo : un seul conteneur, couvert par l'EventListener" "$(kubectl get deploy -n declencheurs el-forgejo -o json | jq '.spec.template.spec.containers | length')" 1
   echo "## gabarits des Jobs rendus, dry-run serveur"
   local d=sha256:0000000000000000000000000000000000000000000000000000000000000000
   sed -e 's#@NOM@#essai-h5#' -e "s#@[A-Z_]*@#$REG/essai@$d#g" -e 's#/etc/porte/sc-stockage[^ ]*#/etc/porte/policy.yaml#' "$b08/politique/porte-job.yaml" > "$T/h5-porte.yaml"
-  n=$(sed -E 's/^( *name: )"?'"$REG"'[^"]*"?$/\1porte/' "$T/h5-porte.yaml" | kubectl create --dry-run=server -f - -o json | jq -c '.spec.template.spec | [(.initContainers + .containers)[] | select((.resources.limits.cpu == null) or (.resources.requests.cpu != "50m"))] | length')
+  sed -E 's/^( *name: )"?'"$REG"'[^"]*"?$/\1porte/' "$T/h5-porte.yaml" | kubectl create --dry-run=server -f - -o json > "$T/h5-porte.json"
+  n=$(jq -c '.spec.template.spec | [(.initContainers + .containers)[] | select((.resources.limits.cpu == null) or (.resources.requests.cpu != "50m"))] | length' "$T/h5-porte.json")
   attendu "porte-job.yaml : conteneurs sans limite ou à requête CPU autre que 50m" "$n" 0
   sed -e 's#@NOM@#essai-h5#' -e "s#@[A-Z_]*@#$REG/essai@$d#g" "$b08/tsa/horodatage-job.yaml" > "$T/h5-horodatage.yaml"
-  n=$(sed -E 's/^( *name: )"?'"$REG"'[^"]*"?$/\1essai/' "$T/h5-horodatage.yaml" | kubectl create --dry-run=server -f - -o json | jq -c '.spec.template.spec | [(.initContainers + .containers)[] | select(.resources.limits.cpu == null)] | length')
-  attendu "horodatage-job.yaml : conteneurs sans limite" "$n" 0
+  sed -E 's/^( *name: )"?'"$REG"'[^"]*"?$/\1essai/' "$T/h5-horodatage.yaml" | kubectl create --dry-run=server -f - -o json > "$T/h5-horodatage.json"
+  attendu "horodatage-job.yaml : conteneurs principaux sans limite" "$(jq -c '[.spec.template.spec.containers[] | select(.resources.limits.cpu == null)] | length' "$T/h5-horodatage.json")" 0
   echo "## requêtes de CPU ajoutées, en millicoeurs : table $(grep -v '^#' "$LIMITES" | awk -F'\t' '{v = $6; if (v ~ /m$/) { sub(/m$/, "", v) } else { v *= 1000 } s += v} END {print s}') ; porte 150 à l'exécution ; sc-confiance : 4 000 allouables, 1 875 demandés"
   echo "## règles en Deny, dry-run serveur"
   attendu "objets acceptés en Deny" "$(regles_deny | kubectl apply --server-side --dry-run=server -f - -o name | grep -c . || true)" 4
   attendu "règles encore en Audit au cluster" "$(kubectl get validatingpolicies.policies.kyverno.io -o json | jq '[.items[] | select(.spec.validationActions == ["Audit"])] | length')" 4
+  echo "## quatre règles en Deny, CLI, pods tirés de chaque gabarit réel, résultats par pod"
+  local f v
+  rm -rf -- "${T:?}/h5-pods"; mkdir -p "$T/h5-pods"
+  regles_deny > "$T/h5-regles.yaml"
+  jq -c -s --slurpfile o "$o" '
+    (($o | map({key: "\(.kind)/\(.metadata.namespace)/\(.metadata.name)", value: .}) | from_entries)) as $d
+    | map(. as $v | ($d["\(.kind // "CronJob")/\(.metadata.namespace)/\(.metadata.name)"] // $v))
+    | map(select(.metadata.namespace | test("^(kube-system|kube-public|kube-node-lease|kyverno|local-path-storage)$") | not))
+    | .[] | {apiVersion: "v1", kind: "Pod", metadata: {name: .metadata.name, namespace: .metadata.namespace},
+        spec: (.spec.template.spec // .spec.jobTemplate.spec.template.spec)}
+    | if .metadata.name == "el-forgejo" then .spec.containers[0].resources = {limits: {cpu: "250m", memory: "128Mi"}} else . end' "$T/h5-vivants.json" > "$T/h5-pods.jsonl"
+  jq -c '{apiVersion: "v1", kind: "Pod", metadata: {name: "gabarit-porte", namespace: .metadata.namespace}, spec: .spec.template.spec}' "$T/h5-porte.json" >> "$T/h5-pods.jsonl"
+  jq -c '{apiVersion: "v1", kind: "Pod", metadata: {name: "gabarit-horodatage", namespace: .metadata.namespace}, spec: .spec.template.spec}' "$T/h5-horodatage.json" >> "$T/h5-pods.jsonl"
+  n=0
+  while read -r p; do
+    n=$((n + 1)); f=$T/h5-pods/$n.json
+    printf '%s\n' "$p" > "$f"
+    kyverno apply "$T/h5-regles.yaml" --resource "$f" --policy-report --output-format json > "$T/cli.json" 2> "$T/cli.err" || true
+    v=$(jq -c '[.results[]? // .[]?.results[]? | "\(.policy):\(.result)"] | sort' "$T/cli.json" 2>/dev/null || echo erreur)
+    echo "$(jq -r '"\(.metadata.namespace)/\(.metadata.name)"' "$f") $v"
+    if [ "$v" = "[]" ] || [ "$v" = erreur ] || grep -q -E ':(fail|error)"' <<< "$v"; then echo "KO   $f"; ko=1; fi
+  done < "$T/h5-pods.jsonl"
+  attendu "pods jugés par le CLI" "$n" "$(wc -l < "$T/h5-pods.jsonl")"
+  kyverno apply "$T/h5-regles.yaml" --resource "$here/essais/limites-obligatoires--b-fail.yaml" --policy-report --output-format json > "$T/cli.json" 2> "$T/cli.err" || true
+  attendu "témoin du CLI, pod sans limite" "$(jq -c '[.results[]? // .[]?.results[]? | select(.policy == "limites-obligatoires") | .result] | unique' "$T/cli.json")" '["fail"]'
   echo "## entorses à l'admission actuelle : toutes admises attendues, chacune ne heurtant que l'une des quatre règles"
   essais_politiques | tee "$T/h5-essais.txt"
   attendu "entorses refusées par une règle déjà en Deny" "$(grep -c '^refusé' "$T/h5-essais.txt" || true)" 0
@@ -418,11 +445,25 @@ etape_h5_sec() {
   echo "RÉSULTAT : conforme"
 }
 
+crons_suspendus() { # true ou false : horodatage et rattrapage tournent chaque minute et lisent OpenBao ou l'EventListener
+  kubectl patch cronjob -n horodatage horodatage --type merge -p "{\"spec\":{\"suspend\":$1}}" >/dev/null
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p "{\"spec\":{\"suspend\":$1}}" >/dev/null
+}
 etape_h5_limites() {
   exige_rke2
-  local ty ns nom p u
+  local ty ns nom p u v s=$T/h5-avant
   attendu "PipelineRun en cours" "$(kubectl get pipelineruns -A -o json | jq '[.items[] | select(.status.completionTime == null)] | length')" 0
   [ "$ko" = 0 ] || exit 1
+  # État d'avant, pour le retour : rollout undo ne couvre ni les CronJobs, ni l'EventListener, ni config-defaults
+  rm -rf -- "${s:?}"; mkdir -p "$s"
+  kubectl get cm -n tekton-pipelines config-defaults -o json > "$s/config-defaults.json"
+  while IFS=$'\t' read -r ty ns nom p; do kubectl get "${ty,,}" -n "$ns" "$nom" -o json > "$s/$ty-$ns-$nom.json"; done < <(limites_correctifs)
+  crons_suspendus true
+  trap 'crons_suspendus false' EXIT
+  for _ in $(seq 60); do
+    [ -z "$(kubectl get cronjob -n horodatage horodatage -o jsonpath='{.status.active}')$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break
+    sleep 2
+  done
   kubectl patch cm -n tekton-pipelines config-defaults --type merge -p "$(defauts_tekton)"
   u=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.uid}')
   while IFS=$'\t' read -r ty ns nom p; do
@@ -431,11 +472,21 @@ etape_h5_limites() {
       Deployment) kubectl rollout status -n "$ns" "deploy/$nom" --timeout=180s ;;
       EventListener) sleep 3; kubectl rollout status -n "$ns" "deploy/el-$nom" --timeout=180s ;;
       StatefulSet) # redémarre scellé : prêt seulement après le descellement
-        for _ in $(seq 60); do [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.uid}/{.status.phase}' 2>/dev/null || true)" != "$u/Running" ] && [ "$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.status.phase}' 2>/dev/null || true)" = Running ] && break; sleep 2; done
+        for _ in $(seq 90); do
+          v=$(kubectl get pod -n openbao openbao-0 -o jsonpath='{.metadata.uid} {.status.phase}' 2>/dev/null || true)
+          case $v in "$u "*|"") ;; *" Running") break ;; esac
+          sleep 2
+        done
+        for _ in $(seq 60); do   # pod Running ne dit pas que bao répond : desceller sauterait le descellement sur un état vide
+          [ "$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null | jq -r .sealed || true)" = true ] && break
+          sleep 2
+        done
         mise run confiance:openbao -- deverrouiller
         kubectl rollout status -n openbao statefulset/openbao --timeout=180s ;;
     esac
   done < <(limites_correctifs)
+  crons_suspendus false
+  trap - EXIT
   temoins
   [ "$ko" = 0 ] || { echo "KO   h5_limites" >&2; exit 1; }
   echo "RÉSULTAT : conforme"
@@ -443,16 +494,26 @@ etape_h5_limites() {
 
 etape_h5_deny() {
   exige_rke2
-  local l e f
+  local l e f m
   regles_deny | kubectl apply --server-side -f -
   attendu "règles encore en Audit" "$(kubectl get validatingpolicies.policies.kyverno.io -o json | jq '[.items[] | select(.spec.validationActions == ["Audit"])] | length')" 0
-  sleep 15
+  for _ in $(seq 60); do   # webhook de Kyverno à jour : la bascule n'est pas instantanée
+    essais_politiques > "$T/h5-essais.txt"
+    grep -q '^refusé sans-limite' "$T/h5-essais.txt" && break
+    sleep 2
+  done
   while read -r l; do
     case $l in "autre motif"*) echo "KO   $l"; ko=1; continue ;; esac
-    e=refusé; f=${l#* }; f=${f%% :*}
-    [ "$f" != temoin ] || e=admis
-    attendu "$f" "${l%% *}" "$e"
-  done < <(essais_politiques)
+    f=${l#* }; f=${f%% :*}
+    case $f in
+      temoin) e="admis" ; m="" ;;
+      sans-limite) e=refusé; m="durcissement : limites de mémoire et de CPU obligatoires" ;;
+      image-par-tag) e=refusé; m="durcissement : image du Zot du PoC, par digest" ;;
+      jeton-default) e=refusé; m="durcissement : le compte default ne monte pas de jeton" ;;
+      espace-default) e=refusé; m="$(sed -n 's/.*message: "\(durcissement : [^"]*\)".*/\1/p' "$here/politiques/kyverno/durcissement.yaml" | grep -i -m1 'default' | grep -v 'compte' || true)" ;;
+    esac
+    attendu "$f" "$l" "$e $f : $m"
+  done < "$T/h5-essais.txt"
   temoins
   [ "$ko" = 0 ] || { echo "KO   h5_deny" >&2; exit 1; }
   echo "RÉSULTAT : conforme"

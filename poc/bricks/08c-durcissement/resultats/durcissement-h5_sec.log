@@ -1,5 +1,6 @@
-# durcissement.sh h5_sec, 2026-11-06T19:12:57Z, DISTRO=rke2
+# durcissement.sh h5_sec, 2026-11-06T19:18:29Z, DISTRO=rke2
 ## correctifs de limites, dry-run serveur
+OK   StatefulSet openbao/openbao
 OK   CronJob declencheurs/rattrapage
 OK   CronJob horodatage/horodatage
 OK   CronJob scan/scan-sample-app
@@ -11,19 +12,38 @@ OK   Deployment tekton-pipelines/tekton-triggers-core-interceptors
 OK   Deployment tekton-pipelines/tekton-triggers-webhook
 OK   Deployment tsa/timestamp-authority
 OK   EventListener declencheurs/forgejo
-OK   StatefulSet openbao/openbao
 OK   config-defaults, dry-run serveur : true
 ## couverture de limites-obligatoires : contrôleurs vivants, correctifs simulés appliqués
 OK   contrôleurs encore sans limite : []
 OK   EventListener : limites du conteneur : {"cpu":"250m","memory":"128Mi"}
+OK   EventListener : reste du gabarit inchangé par le correctif : {"serviceType":"NodePort","spec":{"template":{"metadata":{},"spec":{"nodeSelector":{"zone":"confiance"}}}}}
 OK   Deployment el-forgejo : un seul conteneur, couvert par l'EventListener : 1
 ## gabarits des Jobs rendus, dry-run serveur
 OK   porte-job.yaml : conteneurs sans limite ou à requête CPU autre que 50m : 0
-OK   horodatage-job.yaml : conteneurs sans limite : 0
-## requêtes de CPU ajoutées, en millicoeurs : table 290 ; porte 150 à l'exécution ; sc-confiance : 4 000 allouables, 1 875 demandés
+OK   horodatage-job.yaml : conteneurs principaux sans limite : 0
+## requêtes de CPU ajoutées, en millicoeurs : table 270 ; porte 150 à l'exécution ; sc-confiance : 4 000 allouables, 1 875 demandés
 ## règles en Deny, dry-run serveur
 OK   objets acceptés en Deny : 4
 OK   règles encore en Audit au cluster : 4
+## quatre règles en Deny, CLI, pods tirés de chaque gabarit réel, résultats par pod
+declencheurs/el-forgejo ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-chains/tekton-chains-controller ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines-resolvers/tekton-pipelines-remote-resolvers ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-events-controller ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-pipelines-controller ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-pipelines-webhook ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-triggers-controller ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-triggers-core-interceptors ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tekton-pipelines/tekton-triggers-webhook ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+tsa/timestamp-authority ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+openbao/openbao ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+declencheurs/rattrapage ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+horodatage/horodatage ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+scan/scan-sample-app ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+porte/gabarit-porte ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+horodatage/gabarit-horodatage ["images-zot-par-digest:pass","jeton-compte-default:pass","limites-obligatoires:pass"]
+OK   pods jugés par le CLI : 16
+OK   témoin du CLI, pod sans limite : ["fail"]
 ## entorses à l'admission actuelle : toutes admises attendues, chacune ne heurtant que l'une des quatre règles
 admis temoin : 
 admis sans-limite : 
