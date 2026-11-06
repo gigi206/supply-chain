@@ -553,6 +553,19 @@ Prédictions, avant tout passage de `h6` :
 
 **Non couvert par ces étapes** : aucune requête d'un vrai pod applicatif ne sert de témoin de pare-feu, seul l'endpoint de santé ; le mode strict en entrée reste coupé ; la rotation des clés et le redémarrage d'un nœud sous WireGuard ne sont pas mesurés. `h6` ne lance pas `temoins`, qui écraserait des journaux cités.
 
+**Additif du 06/11/2026, 21:28 UTC, prédictions du scan manuel, accord du propriétaire (« Oui, lance le scan »), avant passage.** Le dernier succès de `scan-sample-app` date de 15:40:59 UTC, avant H1 : il n'a jamais tourné sous H1 à H5, et `h5_sec` n'a jugé que son gabarit. [essais-h5-scan.sh](essais-h5-scan.sh) crée le job `scan-sample-app-h5-manuel` depuis le CronJob, une seule fois, journal `resultats/durcissement-h5_scan.log`. État de départ relevé : 2 referrers sur l'image `3a7ca1b1`, 13642 Mo libres sur sc-confiance, aucun job dans l'espace.
+
+| Prédiction | Attendu | Risque |
+|---|---|---|
+| N1 | Job et pod admis, aucun refus d'admission dans l'audit, aucun `FailedCreate` | Faible : `h5_sec`, 0 échec sur le gabarit |
+| N2 | Six conteneurs à 0, job réussi en 300 s au plus (109 et 126 s les 05 et 06/11) | Moyen : première fois sous le pare-feu d'hôte et les politiques de H3 et H4 |
+| N3 | `revocation` sans OOM ni redémarrage sous 500m et 256Mi, valeurs non mesurées | Moyen |
+| N4 | Referrers 2 → 3 sur l'image | Lié à N2 |
+| N5 | `lastSuccessfulTime` à jour, `lastScheduleTime` vide, aucun job actif : le passage de 09:30 UTC reste libre | Faible |
+| N6 | Marqueurs SOURCE, SCAN, PUBLIE et révocation lus dans Grafana par l'auditeur, relais d'Alloy exercé | Faible |
+
+En cas d'échec, le passage est archivé tel quel et rien n'est relancé sans nouvel accord. Ce job ne prouve pas le déclenchement par le planificateur : le passage du 07/11 à 09:30 UTC reste à relire.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
