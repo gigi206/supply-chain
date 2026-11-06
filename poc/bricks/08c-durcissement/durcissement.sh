@@ -9,6 +9,7 @@
 #   h3_audit  pare-feu d'hôte et politiques de Cilium en mode audit, sans blocage (accord ; console virsh prête)
 #   h3_releve verdicts audit des trois agents, sans rien changer
 #   h3_resume relit les verdicts du dernier relevé
+#   flux      verdicts et refus des trois agents pendant une construction, sans rien changer
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
@@ -283,6 +284,23 @@ etape_h3_releve() { # ${DUREE:-2400} s de verdicts sur les trois agents : plus q
   wait
   date -u '+fin %H:%M:%S UTC'
   etape_h3_resume
+}
+
+etape_flux() { # ${DUREE:-420} s de verdicts et de refus sur les trois agents, données brutes dans $T/flux ; sans rien changer
+  exige_rke2
+  local d=$T/flux p n
+  rm -rf -- "${d:?}"; mkdir -p "$d"
+  date -u '+début %H:%M:%S UTC'
+  while read -r p n; do
+    kubectl exec -n kube-system "$p" -c cilium-agent -- timeout "${DUREE:-420}" cilium-dbg monitor -t policy-verdict > "$d/$n.txt" 2>/dev/null </dev/null &
+    kubectl exec -n kube-system "$p" -c cilium-agent -- timeout "${DUREE:-420}" cilium-dbg monitor -t drop > "$d/$n-refus.txt" 2>/dev/null </dev/null &
+  done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json | jq -r '.items[] | "\(.metadata.name) \(.spec.nodeName)"')
+  wait
+  date -u '+fin %H:%M:%S UTC'
+  for n in sc-confiance sc-build sc-stockage; do
+    echo "## $n : $(wc -l < "$d/$n.txt") verdicts, $(grep -c 'action deny' "$d/$n.txt" || true) refusés, $(grep -c 'Policy denied' "$d/$n-refus.txt" || true) refus de politique"
+    grep -h -E 'action deny|Policy denied' "$d/$n.txt" "$d/$n-refus.txt" | sed -E 's/^.*(ingress|egress), action deny.*, ([0-9.]+)(:[0-9]+)? -> ([0-9.]+)(:[0-9]+)?.*/\1 \2 -> \4\5/; s/.*Policy denied[^,]*,? *//' | cut -c1-110 | sort | uniq -c | sort -rn | head -n 20
+  done
 }
 
 etape_h3_resume() { # relit les verdicts du dernier relevé

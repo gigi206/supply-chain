@@ -131,6 +131,17 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 
 **Non prouvé** : une construction complète, le webhook par NodePort, la porte et les 8 tests sous pare-feu bloquant, un redémarrage des VM. Le filtre de la contre-épreuve retire les flux vers 9345 et 2379 sans vérifier leur motif de refus : la fermeture se lit à la connexion refusée. `espaces-sans-politique` reste un seul bloc, joignable de l'intérieur.
 
+**Additif du 06/11/2026, 18:14 UTC, construction de contrôle sous H1 à H4, décidée par le propriétaire (« Oui, construction »), prédictions avant toute exécution.** Vraie livraison du webhook de Forgejo, chemin 1 de la bascule. `sample-app-<tête>` est purgé puis recréé : Zot garde les preuves, et 2 enveloppes s'ajoutent à l'image. Flux relevés en même temps, pour une future politique par espace.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| C1 | Webhook à travers le pare-feu d'hôte : `HTTP 204`, PipelineRun créé par `el-forgejo`, réussi, 3 TaskRuns vérifiés | Moyenne : règle NodePort jamais exercée |
+| C2 | Même image `3a7ca1b1`, pod `construire` sous Kata sur `sc-build`, spec identique à J7 | Haute |
+| C3 | Durée proche de la référence, 55 s du dernier PipelineRun ; `pod-max-pids=4096` et `seccomp-default` ne gênent aucun pod | Moyenne |
+| C4 | 2 enveloppes de plus, aucune anomalie exécutions/enveloppes, porte `true`, contrôle 9 `ok` | Moyenne |
+| C5 | `PASSAGE=apres preuves.sh reelle` : `ec` admet, contrôle 9 `ok`, VSA encore retenue pour ce digest | Moyenne : nouvelle provenance, VSA plus ancienne |
+| C6 | 0 refus du pare-feu d'hôte pendant la construction ; refus seulement si `construire-image` tente une sortie, ce qu'elle ne fait pas | Moyenne |
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

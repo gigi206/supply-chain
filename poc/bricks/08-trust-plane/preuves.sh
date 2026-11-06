@@ -2876,4 +2876,35 @@ etape_temoins_scan() { # brique 07a, G6 ; champ 3 sans objet : ces images n'ont 
   [ "$ko" = 0 ]
 }
 
+etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule seul, gabarit en service inchangé ; purge le PipelineRun de la tête
+  local t0 code e0 e1
+  [ -s "$W/construction/pipeline.ref" ] || { echo "KO   pipeline sample-app non publiée" >&2; exit 1; }
+  BA_PIPE=$(cat "$W/construction/pipeline.ref")
+  ba_spec "$BA_J7" > "$T/ba-j7.spec"
+  (umask 077 && mkdir -p "$T/auth")
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap 'ba_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  ee_calme
+  ee_controle depart
+  [ -z "$(ee_anomalies depart)" ] && echo "OK   départ : aucune anomalie" || { ee_anomalies depart | sed 's/^/  /'; echo "KO   départ : anomalies" >&2; exit 1; }
+  couverture > /dev/null
+  BA_O0=$(wc -l < "$T/orphelins")
+  BA_SRC=$(jq -nc --arg u "$BA_URL" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  e0=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  echo "$APP : $(etat_app)"
+  purger_pr "$BA_PR"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  code=$(forgejo_livrer)
+  ba_attendu "Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
+  ba_chemin webhook "EventListener forgejo" declencheurs:el-forgejo "$t0"
+  echo "durée du PipelineRun : $(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | .[1] - .[0]') s"
+  ee_calme
+  ee_controle fin
+  [ -z "$(ee_anomalies fin)" ] && echo "OK   fin : aucune anomalie" || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies" >&2; exit 1; }
+  e1=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  ba_attendu "enveloppes de Chains sur $APP" "$e0 → $e1" "$e0 → $((e0 + 2))"
+  echo "$APP : $(etat_app)"
+}
+
 lancer preuves J8 "$@"
