@@ -109,3 +109,16 @@ Seuils relus par `configz` : éviction à `nodefs.available` 5 %, soit 745 Mo su
 Une éviction toucherait d'abord le pod de scan, plus gros consommateur de stockage éphémère, et l'image GC peut libérer de la place avant elle, effet non mesuré. Ce nœud porte aussi OpenBao. L'audit de l'API est déjà copié dans Loki (`audit-k8s.alloy`).
 
 **Point à suivre, aussi** : en régime établi, le dépôt de scans compte environ 14 énoncés et non 2. L'effet sur la durée de la porte n'est pas mesuré.
+
+## Additif : relevé du 06/11/2026 (06/11/2026, 10:00 UTC, [journal](g7-passage-2026-11-06.log))
+
+Passage planifié de 09:30 UTC réussi en 2 min 06. Creux de 1 645 Mo à l'échantillonneur, 1 663 Mo au script, contre 2 161 Mo le 05/11 ; 900 Mo au-dessus de l'éviction, 745 Mo ; image GC franchi environ 1 min.
+
+| Prédiction du 05/11 | Mesuré | Verdict |
+|---|---|---|
+| Creux de 1 400 à 1 600 Mo | 1 645 Mo | Non tenue, de 45 Mo, sens favorable |
+| Audit à 1 100 Mo au plus | 1 045 Mo | Tenue à ce jour, plafond pas encore éprouvé |
+| journald plafonné à 282 Mo | 244 Mo | Tenue à ce jour, plafond pas encore éprouvé |
+| Reste d'environ 6 Mo/h | 0,04 Mo/h sur 24 h | Non retrouvé |
+
+**Projection, pas une mesure** : creux d'environ 1 552 Mo une fois les plafonds atteints, 807 Mo au-dessus de l'éviction. **Jamais mesuré sous k3s** : le plafond d'audit. Le rejeu RKE2, lancé sur accord du propriétaire, retire ce cluster avant la rotation de 12:50 UTC. Décision sur le disque : aucune, recommandation « ne rien faire », `sc-confiance` passant à 25 Go sous RKE2 (D3 de la 08b).

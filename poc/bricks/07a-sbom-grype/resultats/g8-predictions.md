@@ -85,3 +85,5 @@ Exécuté le 05/11/2026 de 10:50:11 à 10:58:04 UTC : conforme, **un écart de l
 Après l'incident : aucune alerte active. **Volume dans Zot** (relevé) : 12 lignes et 5,8 Ko sur les 2 mesures de l'installation, donc environ 280 Ko par jour au plus à 96 mesures.
 
 **Toujours pas prouvé** : le blocage réseau de l'unité (le filtre est en place et Zot passe, aucune sortie interdite n'a été essayée) ; la réaction à un vrai CronJob en échec ; `rejeu.sh`, pas rejoué. Une alerte ne sort toujours pas du PoC : il faut la lire dans Grafana.
+
+**Additif du 06/11/2026, 10:00 UTC, prédiction 6 tenue** ([journal](g7-passage-2026-11-06.log)) : scan à +86 416 s, base à +86 453 s, `ALERTS` vide sur 22 h, 3 règles `ok` et `inactive`. La fenêtre commence le 05/11 à 11:49 UTC, après l'incident a7 ; 10:58 à 11:49 UTC, relu à part, est vide.

@@ -1,0 +1,204 @@
+# relevé du passage planifié du 2026-11-06, 2026-11-06T09:20:23Z
+job : scan-sample-app-29899290, état 1/
+scan-sample-app-29897850   2026-11-05T09:30:00Z   2026-11-05T09:31:49Z   1     <none>
+scan-sample-app-29899290   2026-11-06T09:30:00Z   2026-11-06T09:32:06Z   1     <none>
+dernier passage : 2026-11-06T09:30:00Z, dernière réussite : 2026-11-06T09:32:06Z
+place libre la plus basse sur sc-confiance depuis 09:29 UTC : 1663 Mo
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-06, sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd, empreinte sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23, 3 s
+analyser: SBOM|4 composants avec PURL (D1 a), 1 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 2 s
+analyser: PREDICAT|sha256 bef960bb656e4a679c72219c08b7d768fa62817d64c308656f3b7c62bde6e2be, 116 s en tout
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 21465c51f2e94286617a041caff00d8eef1f5c7b5bfde042e2fc9b0106595b3d, vérifié avec la clé publique
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:3d45d88887657862b12ef0c8ad4315286e1c4d5b414ae69310223bd02c623646, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+referrers : 4
+# fin 2026-11-06T09:32:14Z
+
+# ajouté par le relevé planifié du 06/11, lecture seule ; aucune modification de Zot, du cluster ni des VM
+
+## relevé repos avant passage, 2026-11-06T09:20:38Z
+### df -m /
+1M-blocks  Used Avail
+    14915  9172  5089
+### du -sm
+1042	/var/lib/rancher/k3s/server/logs
+244	/var/log/journal
+27	/var/lib/rancher/k3s/agent/containerd/containerd.log
+69	/var/log/pods
+### autres postes
+5261	/var/lib/rancher/k3s/agent/containerd
+55	/var/lib/rancher/k3s/server/db
+55	/var/lib/kubelet
+1	/var/lib/rancher/k3s/storage
+Archived and active journals take up 243.8M in the file system.
+total 1066008
+-rw------- 1 root root 104856182 2026-11-04T01:31:17 audit-2026-11-04T01-31-17.193.log
+-rw------- 1 root root 104856684 2026-11-04T07:27:39 audit-2026-11-04T07-27-48.464.log
+-rw------- 1 root root 104856826 2026-11-04T13:24:17 audit-2026-11-04T13-24-17.203.log
+-rw------- 1 root root 104856491 2026-11-04T19:21:59 audit-2026-11-04T19-22-00.137.log
+-rw------- 1 root root 104857222 2026-11-05T01:14:03 audit-2026-11-05T01-14-03.730.log
+-rw------- 1 root root 104856941 2026-11-05T07:10:17 audit-2026-11-05T07-10-17.196.log
+-rw------- 1 root root 104856617 2026-11-05T13:06:17 audit-2026-11-05T13-06-17.216.log
+-rw------- 1 root root 104856973 2026-11-05T19:02:29 audit-2026-11-05T19-02-38.924.log
+-rw------- 1 root root 104857123 2026-11-06T00:59:00 audit-2026-11-06T00-59-00.536.log
+-rw------- 1 root root 104856822 2026-11-06T06:55:17 audit-2026-11-06T06-55-17.156.log
+-rw------- 1 root root  42969452 2026-11-06T09:20:35 audit.log
+### condition DiskPressure
+DiskPressure=False depuis 2026-11-03T20:31:44Z raison KubeletHasNoDiskPressure
+### événements éviction, image GC, pression disque
+(fin événements, 926 événements conservés au total)
+
+## courbe de la place libre (Mo) sur sc-confiance, échantillonneur séparé, un point toutes les 8 s environ
+# le script ci-dessus mesure moins souvent : il a vu 1663 Mo, l'échantillonneur 1645 Mo à 09:31:38
+09:29:03 5085
+09:29:11 5086
+09:29:19 5085
+09:29:27 5085
+09:29:35 5086
+09:29:44 5086
+09:29:52 5086
+09:30:00 5086
+09:30:08 4569
+09:30:16 4163
+09:30:24 3763
+09:30:33 3354
+09:30:41 2948
+09:30:49 2568
+09:30:57 2336
+09:31:05 2096
+09:31:13 2019
+09:31:21 1885
+09:31:29 1824
+09:31:38 1645
+09:31:46 1663
+09:31:54 1850
+09:32:02 5084
+09:32:10 5084
+09:32:18 5084
+09:32:26 5084
+09:32:35 5084
+09:32:43 5084
+09:32:51 5084
+09:32:59 5084
+09:33:07 5084
+09:33:15 5084
+09:33:23 5083
+09:33:31 5083
+09:33:40 5084
+09:33:48 5084
+09:33:56 5084
+09:34:04 5083
+09:34:12 5083
+09:34:20 5083
+09:34:28 5083
+09:34:36 5083
+09:34:45 5083
+09:34:53 5083
+09:35:01 5083
+09:35:09 5083
+09:35:17 5083
+09:35:25 5083
+09:35:33 5083
+09:35:41 5083
+09:35:50 5083
+09:35:58 5083
+09:36:06 5082
+09:36:14 5083
+09:36:22 5082
+09:36:30 5082
+09:36:38 5083
+09:36:47 5083
+09:36:55 5083
+09:37:03 5082
+09:37:11 5082
+09:37:19 5082
+09:37:27 5082
+09:37:35 5082
+09:37:43 5082
+09:37:52 5082
+
+## relevé repos après passage, 2026-11-06T09:34:02Z
+### df -m /
+1M-blocks  Used Avail
+    14915  9178  5083
+### du -sm
+1045	/var/lib/rancher/k3s/server/logs
+244	/var/log/journal
+28	/var/lib/rancher/k3s/agent/containerd/containerd.log
+70	/var/log/pods
+### autres postes
+5262	/var/lib/rancher/k3s/agent/containerd
+55	/var/lib/rancher/k3s/server/db
+56	/var/lib/kubelet
+1	/var/lib/rancher/k3s/storage
+Archived and active journals take up 243.8M in the file system.
+total 1069860
+-rw------- 1 root root 104856182 2026-11-04T01:31:17 audit-2026-11-04T01-31-17.193.log
+-rw------- 1 root root 104856684 2026-11-04T07:27:39 audit-2026-11-04T07-27-48.464.log
+-rw------- 1 root root 104856826 2026-11-04T13:24:17 audit-2026-11-04T13-24-17.203.log
+-rw------- 1 root root 104856491 2026-11-04T19:21:59 audit-2026-11-04T19-22-00.137.log
+-rw------- 1 root root 104857222 2026-11-05T01:14:03 audit-2026-11-05T01-14-03.730.log
+-rw------- 1 root root 104856941 2026-11-05T07:10:17 audit-2026-11-05T07-10-17.196.log
+-rw------- 1 root root 104856617 2026-11-05T13:06:17 audit-2026-11-05T13-06-17.216.log
+-rw------- 1 root root 104856973 2026-11-05T19:02:29 audit-2026-11-05T19-02-38.924.log
+-rw------- 1 root root 104857123 2026-11-06T00:59:00 audit-2026-11-06T00-59-00.536.log
+-rw------- 1 root root 104856822 2026-11-06T06:55:17 audit-2026-11-06T06-55-17.156.log
+-rw------- 1 root root  46912080 2026-11-06T09:34:03 audit.log
+### condition DiskPressure
+DiskPressure=False depuis 2026-11-03T20:31:44Z raison KubeletHasNoDiskPressure
+### événements éviction, image GC, pression disque
+(fin événements, 948 événements conservés au total)
+
+## profondeur de recherche, 2026-11-06T09:34:36Z
+événements Kubernetes : le plus ancien conservé date de 2026-11-06T08:34:00Z, soit 1 h de profondeur seulement
+journal de k3s.service sur sc-confiance depuis 2026-11-05 09:34:00 : 50194 lignes, boot unique depuis le 03/11
+motif cherché : eviction_manager|attempting to reclaim|image_gc|ImageGCFailed|disk usage on image filesystem|Removing image|DiskPressure|failed to garbage collect
+résultat : 0 ligne
+
+## relevé G8, prédiction 6, 2026-11-06T09:49:04Z
+### scan_dernier_referrer_timestamp_seconds
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"scan_dernier_referrer_timestamp_seconds","depot":"builds/scan/sample-app","instance":"127.0.0.1:9101","job":"fichiers"},"value":[1793958544.840,"1793957521"]}]}}
+### base_grype_construite_timestamp_seconds
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"base_grype_construite_timestamp_seconds","depot":"vulndb/grype","instance":"127.0.0.1:9101","job":"fichiers"},"value":[1793958544.958,"1793946119"]}]}}
+### count_over_time(ALERTS{alertname=~"ScanEnRetard|ScanBientotRefuse|BaseGrypeVieillie"}[22h])
+{"status":"success","data":{"resultType":"vector","result":[]}}
+### up{job="fichiers"}
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"127.0.0.1:9101","job":"fichiers"},"value":[1793958545.195,"1"]}]}}
+### témoin : état des 3 règles
+[{"name":"ScanEnRetard","state":"inactive","health":"ok","lastEvaluation":"2026-11-06T09:48:37.034671806Z"},{"name":"ScanBientotRefuse","state":"inactive","health":"ok","lastEvaluation":"2026-11-06T09:48:37.034709428Z"},{"name":"BaseGrypeVieillie","state":"inactive","health":"ok","lastEvaluation":"2026-11-06T09:48:37.034737393Z"}]
+### timer fraicheur-scan
+Fri 2026-11-06 09:50:46 UTC  1min 41s Fri 2026-11-06 09:35:46 UTC    13min ago fraicheur-scan.timer          fraicheur-scan.service
+Result=success
+ExecMainExitTimestamp=Fri 2026-11-06 09:35:46 UTC
+
+## comparaison au 05/11 (mesures)
+| Poste | 05/11 09:34 | 06/11 09:34 | Écart | Mo/h sur 24,0 h |
+|---|---|---|---|---|
+| Place libre au repos | 5572 | 5083 | -489 | 20,4 |
+| Audit de l'API | 641 | 1045 | +404 | 16,8 |
+| journald | 160 | 244 | +84 | 3,5 |
+| Non attribué (489 - 404 - 84) | | | 1 | 0,04 |
+containerd.log (28 Mo) et /var/log/pods (70 Mo) n'ont pas de valeur au 05/11 : le bilan borne leur effet net, pas chacun d'eux.
+creux : 1645 Mo (échantillonneur), 1663 Mo (script), 2161 Mo le 05/11 ; volume du job : 5086 - 1645 = 3441 Mo, 3413 Mo le 05/11
+marge au-dessus de l'éviction (745 Mo) : 900 Mo ; seuil d'image GC (2237 Mo libres) franchi environ 1 min, entre 09:30:57 et 09:32:02 ; occupation la plus haute 89,0 %
+audit : 10 archives, encore aucune supprimée ; plafond de 1100 Mo non atteint ; prochaine rotation vers 12:50 UTC, à relire
+journald : 244 Mo, plafond de 282 Mo non atteint
+reste à venir : audit 55 Mo, journald 38 Mo, soit 93 Mo
+projection, pas une mesure : creux de 1552 Mo environ une fois les deux plafonds atteints, 807 Mo au-dessus de l'éviction, à volume de job égal et sans nouveau reste
+
+## prédictions
+G7, creux de 1400 à 1600 Mo : non tenue, 1645 Mo, soit 45 Mo au-dessus de la borne, sens favorable
+G7, audit 1100 Mo au plus : tenue à ce jour, 1045 Mo, plafond pas encore éprouvé
+G7, journald plafonné à 282 Mo : tenue à ce jour, 244 Mo, plafond pas encore éprouvé
+G7, reste de 6 Mo/h : non retrouvé, 0,04 Mo/h sur 24 h
+G8, prédiction 6 : tenue ; scan +86416 s, base +86453 s, ALERTS vide sur 22 h, 3 règles ok et inactive
+fenêtre de 22 h : elle commence le 05/11 à 11:49 UTC, après la fin de l'incident a7 ; 10:58 à 11:49 UTC n'est pas couvert
+# fin de l'ajout 2026-11-06T09:49:39Z
+
+## compléments, 2026-11-06T09:50:53Z
+trou de la fenêtre G8 : count_over_time(ALERTS{...}[51m]) à time=2026-11-05T11:49:10Z, soit de 10:58:10 à 11:49:10 UTC
+{"status":"success","data":{"resultType":"vector","result":[]}}
+comparaison à instrument égal : script 1663 Mo le 06/11 contre script 2161 Mo le 05/11, soit -498 Mo, pour -489 Mo au repos ; 1645 Mo est une borne haute du creux de l'échantillonneur (un point toutes les 8 s environ)
+formule de la projection : creux de l'échantillonneur moins reste à venir, 1645 - 93 = 1552 Mo ; depuis le repos, 5083 - 93 - 3441 = 1549 Mo
+condition : le plafond d'audit n'a pas encore agi ; la rotation attendue vers 12:50 UTC doit supprimer audit-2026-11-04T01-31-17.193.log
