@@ -130,6 +130,7 @@ APP=builds/sample-app@$APP_DIGEST
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build, inutilisée (kata.sh ; contrôlé avant l'essai)
 EXTERNE=203.0.113.10    # adresse de documentation (RFC 5737), hors du cluster (kata.sh)
+case " $* " in *" test6 "*) USURPEE=$(adresse_libre "${USURPEE%.*}") ;; esac   # une seule adresse par passage, tirage de Cilium (kata.sh)
 
 etat_app() { # enveloppes de Chains sur l'image réelle, et provenance de PipelineRun la plus récente (seule jugée par les règles de tâches de la porte)
   local n

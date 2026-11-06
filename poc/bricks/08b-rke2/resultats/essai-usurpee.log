@@ -1,0 +1,9 @@
+essai du 06/11/2026 à 13:14 UTC, faux kubectl : .250 portée par un pod, .249 par un endpoint
+== étape reseau
+USURPEE=10.42.1.248
+USURPATION : .248 4, .250 0
+TEMOIN : .248 2, .250 0
+== autre étape
+USURPEE=10.42.1.250
+USURPATION : .248 0, .250 4
+TEMOIN : .248 0, .250 2

@@ -293,6 +293,6 @@ Durée cumulée du passage de zéro et des deux reprises : environ 9 070 s, soit
 
 **Écarts anciens, sans lien avec RKE2** : `j5-*` en parité, `nil pointer` du CLI compris, identiques à la référence k3s du 03/11 ; export de 19b, 31 lignes de plus que le compte de Loki, le même écart qu'au rejeu du 03/11. Je n'avais pas relevé les `j5-*` au troisième passage : `parite` ne s'arrête pas dessus.
 
-**Risque résiduel** : `USURPEE` reste constante sur `sc-build`, avec sa garde. Un tirage de Cilium peut arrêter un passage.
+**Tirage de Cilium** : `USURPEE` et `HORS_CIDR` sont choisies libres par `adresse_libre` (`commun.sh`). `USURPEE` l'est au chargement, avant les scripts de pods qui la développent ; la garde reste. [Essai](resultats/essai-usurpee.log) sur les scripts rendus : `.248` partout quand `.250` et `.249` sont prises, constante gardée hors de l'étape `reseau`. Exécution réelle à venir au passage de zéro.
 
 **Non prouvé** : passage d'un seul tenant ; redémarrage des VM sous RKE2 ; règles 08c, S1, cert-manager, `isBuildArtifact: true`, jamais appliqués.

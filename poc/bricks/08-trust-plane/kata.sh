@@ -478,6 +478,8 @@ SONDE=sonde-reseau-j7   # label des pods de mesure et nom de la NetworkPolicy (k
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build (10.42.1.0/24), inutilisée (contrôlé avant l'essai)
 HORS_CIDR=10.42.0.250   # sous Cilium : adresse inutilisée du sous-réseau des pods de sc-confiance (contrôlé avant l'essai)
 EXTERNE=203.0.113.10    # sous Cilium : adresse de documentation (RFC 5737), hors du cluster
+# Avant les scripts de pods ci-dessous, qui développent $USURPEE : un choix plus tard ne changerait pas ce que le pod exécute.
+[ "${RESEAU:-cilium}" != cilium ] || case " $* " in *" reseau "*) USURPEE=$(adresse_libre "${USURPEE%.*}") ;; esac
 # Sonde de J6 (politique.sh rattrapage), adaptée : un refus de Zot ne compte que si Forgejo (permis) répond, pour ne pas
 # confondre la règle avec un réseau pas encore prêt ; fin après 3 refus de suite (60 s au plus), puis sorties par adresse.
 FENETRE='cs() { read u r < /proc/uptime; echo $(( ${u%.*} * 100 + 1${u#*.} - 100 )); }
@@ -674,11 +676,8 @@ $(grep -cE "192\.168\.161\.13\.5000 > ${USURPEE//./\\.}\.[0-9]+: Flags \[S\.\]" 
   pod_reseau j7-reseau-voisin - - "sleep 300"
   kubectl wait -n builds pod/j7-reseau-voisin --for=condition=Ready --timeout=120s >/dev/null
   v=$(ip_pod j7-reseau-voisin)
-  # Cilium tire les adresses au hasard dans le /24, et sc-confiance porte plus de 30 pods : .250 était prise le 06/11/2026. Première libre en descendant.
-  { kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}'
-    kubectl get ciliumendpoints -A -o json | jq -r '.items[].status.networking.addressing[]?.ipv4'; } > "$T/ip-prises"
-  HORS_CIDR=$(for i in $(seq 250 -1 200); do grep -qxF "${HORS_CIDR%.*}.$i" "$T/ip-prises" || { echo "${HORS_CIDR%.*}.$i"; break; }; done)
-  [ -n "$HORS_CIDR" ] && echo "OK   pod témoin $v sur $(kubectl get pod -n builds j7-reseau-voisin -o jsonpath='{.spec.nodeName}') ; $HORS_CIDR inutilisée" \
+  # sc-confiance porte plus de 30 pods : .250 était prise le 06/11/2026.
+  HORS_CIDR=$(adresse_libre "${HORS_CIDR%.*}") && echo "OK   pod témoin $v sur $(kubectl get pod -n builds j7-reseau-voisin -o jsonpath='{.spec.nodeName}') ; $HORS_CIDR inutilisée" \
     || { echo "KO   aucune adresse libre de .200 à .250 sur sc-confiance" >&2; exit 1; }
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   capture "$T/enp1s0.txt" 70 -i enp1s0 host "$EXTERNE" or host "$HORS_CIDR"

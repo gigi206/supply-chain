@@ -255,6 +255,14 @@ certificat() { # nom SAN : certificat de service signé par la CA du PoC (stocka
 }
 
 # Contrôles après un redémarrage (redemarrer.sh ; J7 : kata.sh exemption, redémarrage du server k3s). Fichiers dans $T.
+adresse_libre() { # préfixe du /24 : première adresse de .250 à .200 portée ni par un pod ni par un endpoint de Cilium, qui tire au hasard
+  local p=$1 i prises
+  prises=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}'
+    kubectl get ciliumendpoints -A -o json | jq -r '.items[].status.networking.addressing[]?.ipv4')
+  for i in $(seq 250 -1 200); do grep -qxF "$p.$i" <<< "$prises" || { echo "$p.$i"; return 0; }; done
+  return 1
+}
+
 sonde_kyverno() { # pod de tsa sans nodeSelector (conforme à Pod Security restricted, qui passe avant les webhooks), créé en
   # dry-run serveur : refus attendu de la règle zone-confiance de Kyverno, pas une erreur d'appel du webhook
   local img msg="" i
