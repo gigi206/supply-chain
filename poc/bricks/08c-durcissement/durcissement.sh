@@ -3,6 +3,7 @@
 #   verifier  à sec, sur l'hôte : politique d'audit simulée, règles Kyverno jouées par le CLI sur des pods d'essai, manifestes validés par l'API en
 #             dry-run ; ne change rien au cluster, y compris sous k3s
 #   h1_api    plugins d'admission, EventRateLimit, kubelet : fichiers d'appoint, redémarrage de RKE2 (accord)
+#   h1_controle contrôles de h1_api, sans redémarrage ; crée deux pods d'essai et une rafale d'Events, retirés ensuite
 #   h2_kyverno  règles en Audit (accord)
 #   h3_audit  pare-feu d'hôte et politiques de Cilium en mode audit, sans blocage (accord ; console virsh prête)
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
@@ -17,6 +18,7 @@ b08=$here/../08-trust-plane
 C=$here/config
 B08=$here/../08b-rke2/config
 A08B=$B08/audit-policy.yaml
+BUSYBOX=$REG/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f
 T=$W/durcissement
 ko=0
 mkdir -p "$T"
@@ -185,17 +187,38 @@ etape_h1_api() {
   done
   kubectl wait --for=condition=Ready node --all --timeout=300s >/dev/null
   reprendre_rattrapage
+  etape_h1_controle
+}
+
+seccomp_pod() { # nom securityContext : champ Seccomp d'un pod runc de sc-build, dans kube-system, seul espace où un pod sans profil déclaré est admis
+  jq -n --arg n "$1" --arg i "$BUSYBOX" --argjson s "$2" '{apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "kube-system"},
+    spec: {nodeName: "sc-build", restartPolicy: "Never", automountServiceAccountToken: false, tolerations: [{operator: "Exists"}], securityContext: $s,
+      containers: [{name: "c", image: $i, command: ["grep", "Seccomp:", "/proc/self/status"]}]}}' | kubectl apply -f - >/dev/null
+  kubectl wait --for=jsonpath='{.status.phase}'=Succeeded "pod/$1" -n kube-system --timeout=90s >/dev/null || true
+  kubectl logs -n kube-system "$1" | awk '{print $2}'
+  kubectl delete pod -n kube-system "$1" --wait=false >/dev/null
+}
+
+etape_h1_controle() { # contrôles de H1, sans redémarrage
+  exige_rke2
+  local v
   echo "## après"
   args_apiserver | grep -E -- '^--(request-timeout|service-account-lookup)=' || true
-  attendu "plugins d'admission" "$(args_apiserver | grep -- '^--enable-admission-plugins=' || true)" "--enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit"
+  # RKE2 écrit l'argument deux fois, le sien puis celui de config.yaml.d : le refus d'externalIPs et la rafale disent ce qui est chargé
+  attendu "plugins d'admission, dernier argument" "$(args_apiserver | grep -- '^--enable-admission-plugins=' | tail -n 1 || true)" "--enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit"
   attendu "fichier d'admission" "$(args_apiserver | grep -- '^--admission-control-config-file=' || true)" "--admission-control-config-file=$D_CONF/pod-security.yaml"
-  for v in sc-confiance sc-build sc-stockage; do
-    attendu "kubelet de $v : pids, seccomp, événements" "$(kubectl get --raw "/api/v1/nodes/$v/proxy/configz" | jq -c '.kubeletconfig | [.podPidsLimit, .seccompDefault, .eventRecordQPS]')" "[4096,true,5]"
+  attendu "externalIPs, à sec" "$(jq -n '{apiVersion: "v1", kind: "Service", metadata: {name: "essai-h1", namespace: "default"}, spec: {ports: [{port: 80}], externalIPs: ["192.0.2.1"]}}' \
+    | kubectl create --dry-run=server -f - 2>&1 | grep -c 'denied by admission control' || true)" 1
+  for v in sc-confiance sc-build sc-stockage; do # seccomp-default est un drapeau du kubelet, absent de configz : drapeau lu ici, effet mesuré par seccomp_pod
+    attendu "kubelet de $v : pids, événements" "$(kubectl get --raw "/api/v1/nodes/$v/proxy/configz" | jq -c '.kubeletconfig | [.podPidsLimit, .eventRecordQPS]')" "[4096,5]"
+    attendu "kubelet de $v : --seccomp-default=true" "$(sur "$v" "sudo pgrep -a -x kubelet | tr ' ' '\n' | grep -c -x -- --seccomp-default=true" || true)" 1
   done
+  attendu "runc sans profil déclaré, Seccomp" "$(seccomp_pod essai-h1-defaut '{}')" 2
+  attendu "témoin, Unconfined déclaré, Seccomp" "$(seccomp_pod essai-h1-temoin '{"seccompProfile": {"type": "Unconfined"}}')" 0
   rafale_evenements
   temoins
   mise run confiance:kata -- temoin
-  [ "$ko" = 0 ] || { echo "KO   h1_api" >&2; exit 1; }
+  [ "$ko" = 0 ] || { echo "KO   h1_controle" >&2; exit 1; }
   echo "RÉSULTAT : conforme"
 }
 

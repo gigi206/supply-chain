@@ -37,6 +37,21 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 | H1d | OpenBao descellé, Kyverno et TSA répondent, comme à `kata.sh exemption` | Haute |
 | H1e | Pod Kata lancé après H1 : `seccomp-default` sans effet dans l'invité (`disable_guest_seccomp`, mesuré en J7) | Moyenne |
 
+**Additif du 06/11/2026, 16:45 UTC, H1 appliqué sur accord du propriétaire (« Oui, lance H1 »).** Lancé à 16:40:46 UTC, API prête 22 s après le redémarrage, trois nœuds `Ready`, CronJob `rattrapage` rétabli. Le [premier passage](resultats/durcissement-h1_api-premier-passage.log) finit en KO, sur **deux attendus faux** et non sur le cluster ; les contrôles repassent sans redémarrage, conformes ([journal](resultats/durcissement-h1_controle.log)) :
+- `--enable-admission-plugins` figure deux fois dans le manifeste, la valeur du profil cis puis la nôtre. Le journal de `kube-apiserver` charge `NodeRestriction` et `EventRateLimit`, et un Service à `externalIPs` est refusé à sec. Le commentaire de `durcissement.yaml`, « ne garde que la dernière valeur », n'est ni confirmé ni infirmé par cette mesure ;
+- `seccompDefault` reste `false` dans `configz`, car `--seccomp-default` est un drapeau de `KubeletFlags`, combiné à la configuration seulement au lancement (`server.go:1312`, Kubernetes `v1.35.9`). L'effet est mesuré : un pod runc de `sc-build` sans profil déclaré a `Seccomp: 2`, le témoin `Unconfined` a `Seccomp: 0`.
+
+| Prédiction | Résultat |
+|---|---|
+| H1, 05/11 : arguments lus, trois nœuds `Ready` | **Tenue.** `pod-max-pids` et `seccomp-default` n'ont gêné aucun témoin, mais **aucune construction n'a tourné** : le point à mesurer reste ouvert |
+| H1a : relance en moins de 300 s | **Tenue**, 22 s |
+| H1b : `configz` à `[4096,true,5]` | **Non tenue sur la forme** : `[4096,false,5]`. `pod-max-pids`, `event-qps` et le drapeau sont appliqués sur les trois nœuds, l'effet de seccomp mesuré sur `sc-build` seulement |
+| H1c : au moins un 429 | **Tenue**, 126 puis 125 refus sur 200 |
+| H1d : OpenBao, Kyverno, TSA | **Tenue**, avant et après |
+| H1e : pod Kata sans effet de `seccomp-default` dans l'invité | **Tenue** : `Seccomp: 0`, noyau 6.18.56 |
+
+**Non prouvé par H1** : construction, porte et 8 tests sous ces réglages ; contrôles qui lisent des événements ; conteneurs inchangés sur `sc-confiance`, non comparés ; plafond d'audit. `h1_controle` crée deux pods dans `kube-system` et une rafale d'Events, retirés ensuite : 0 restant vérifié.
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |
