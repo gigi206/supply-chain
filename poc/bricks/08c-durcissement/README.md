@@ -685,6 +685,24 @@ Bornes :
 - Les étapes de `preuves.sh` n'ont pas toutes été passées en revue, seuls les pods écrits en dur ont été relus. Les témoins passant par des TaskRun ou des fichiers de politique ne sont pas couverts.
 - Ces contrôles n'annoncent pas la réussite du redémarrage : V1 à V5 restent à mesurer.
 
+### Additif du 06/11/2026, 22:33 UTC : étape `controleurs` relevée à sec sous H1 à H5
+
+`essais-h5-controleurs.sh` reprend les contrôles de `preuves.sh controleurs` sans rien créer : lectures, `can-i` et dry-run serveur, y compris pour les essais que l'étape lance pour de bon. Passage de 22:32:13 à 22:32:26, 0 écart, journal `resultats/durcissement-h5_controleurs_sec.log`.
+
+Mesuré :
+- Règle `tekton-controleurs-builds` en `Fail` et `Deny`, droits de locataire bornés à `builds`, `--namespace=builds` inchangé après S1.
+- Dix essais par contrôleur refusés par les droits, dont les lectures de Secrets hors de `builds`.
+- Seconde barrière : pod refusé par la règle au nom des deux contrôleurs dans `bancc`, droits contournés par `--as-group system:masters`, car la règle juge le nom du compte ; même pod admis pour l'administrateur.
+- Six créateurs de pods de `kube-system`, chacun admis, valeur attendue sous RKE2 inchangée après `h5_roles`.
+- Audit : 0 refus dans `builds`, 73 pods créés dans `builds` depuis la pose de la règle, lectures de Secrets des deux contrôleurs dans `builds` seulement.
+- Aucun redémarrage, aucun refus des droits dans leurs journaux depuis leur démarrage. Les quatre écarts redoutés dans la prédiction ne se sont pas produits.
+
+Bornes :
+- Ce relevé ne remplace pas un passage de l'étape. L'espace `preuve-controleurs` et ses liaisons temporaires n'ont pas été créés ; seule la création de l'espace a été admise en dry-run.
+- Le contournement par groupe n'est pas la liaison de locataire de l'étape : le refus de la règle est mesuré, pas le chemin exact.
+- Le passage laisse deux refus de plus dans l'audit de l'API, un par contrôleur, dans `bancc`. Rien n'a été écrit dans le cluster.
+- Les autres étapes de `preuves.sh` restent non relues sous H5, et ce relevé n'annonce rien sur le redémarrage : V1 à V5 restent à mesurer.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
