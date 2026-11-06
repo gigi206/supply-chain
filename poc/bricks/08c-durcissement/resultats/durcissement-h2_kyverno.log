@@ -1,0 +1,5 @@
+# durcissement.sh h2_kyverno, 2026-11-06T16:49:02Z, DISTRO=rke2
+validatingpolicy.policies.kyverno.io/limites-obligatoires serverside-applied
+validatingpolicy.policies.kyverno.io/images-zot-par-digest serverside-applied
+validatingpolicy.policies.kyverno.io/espace-default-interdit serverside-applied
+validatingpolicy.policies.kyverno.io/jeton-compte-default serverside-applied

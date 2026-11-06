@@ -52,6 +52,21 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 
 **Non prouvé par H1** : construction, porte et 8 tests sous ces réglages ; contrôles qui lisent des événements ; conteneurs inchangés sur `sc-confiance`, non comparés ; plafond d'audit. `h1_controle` crée deux pods dans `kube-system` et une rafale d'Events, retirés ensuite : 0 restant vérifié.
 
+**Additif du 06/11/2026, 16:54 UTC, H2 appliqué sur accord du propriétaire (« Oui, lance H2 »).** Les 4 règles sont en Audit depuis 16:49:02 UTC ([application](resultats/durcissement-h2_kyverno.log), [relevé](resultats/durcissement-h2_releve.log)). Elles n'ont pas de balayage de fond : les pods en service sont joués par le CLI, les pods nouveaux lus dans les rapports.
+
+| Règle | Pods en service (61, dont 5 hors du champ de deux règles) | Depuis H2, rapports de Kyverno |
+|---|---|---|
+| `limites-obligatoires` | **52 échecs**, 4 réussis ; le décompte direct donne aussi 52 | 12 échecs |
+| `images-zot-par-digest` | 56 réussis, 0 échec | 12 réussis |
+| `jeton-compte-default` | 61 réussis, 0 échec | 12 réussis |
+| `espace-default-interdit` | Aucun pod dans `default` | Aucun résultat : **jamais exercée sur le cluster**, seulement par le CLI |
+
+**Prédiction de H2** : **tenue sur « rien de refusé »** : 6 Jobs créés depuis H2, 6 réussis, 0 `FailedCreate`. **Tenue pour `limites-obligatoires`, non tenue pour `images-zot-par-digest`**, qui ne relève aucun écart, sens favorable.
+
+**Écarts de `limites-obligatoires`, par espace** : `builds` 26, `porte` 8, `horodatage` 6, `tekton-pipelines` 5, `declencheurs` 4, et un chacun pour `openbao`, `tekton-chains`, `tsa`. Le nombre varie avec les pods terminés encore présents : 58 quatre minutes plus tôt. Rien n'est corrigé : ces limites sont à décider et à mesurer avant H5, en particulier pour la construction, qui n'a pas tourné sous ces règles.
+
+**Effet relevé** : 32 événements `PolicyViolation` en 4 minutes 20 sur les seuls CronJobs, soit environ 7 par minute, tant que l'écart reste ouvert.
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

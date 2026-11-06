@@ -1,0 +1,27 @@
+# durcissement.sh h2_releve, 2026-11-06T16:53:22Z, DISTRO=rke2
+règles appliquées à 2026-11-06T16:49:02Z
+## pods en service, CLI : 61 pods
+  images-zot-par-digest pass : 56
+  jeton-compte-default pass : 61
+  limites-obligatoires fail : 52
+  limites-obligatoires pass : 4
+## limites-obligatoires, échecs par espace, conteneurs sans limites relevés à part
+  26 builds
+  4 declencheurs
+  6 horodatage
+  1 openbao
+  8 porte
+  1 tekton-chains
+  5 tekton-pipelines
+  1 tsa
+OK   échecs du CLI et décompte direct : 52
+## pods créés depuis H2, rapports de Kyverno
+  images-zot-par-digest pass : 12
+  jeton-compte-default pass : 12
+  limites-obligatoires fail : 12
+## rien de refusé depuis H2
+  declencheurs : 3 Job(s) créé(s) depuis H2, 3 réussi(s)
+  horodatage : 3 Job(s) créé(s) depuis H2, 3 réussi(s)
+OK   événements FailedCreate depuis H2 : 0
+événements PolicyViolation depuis H2 : 32
+RÉSULTAT : relevé fait

@@ -5,6 +5,7 @@
 #   h1_api    plugins d'admission, EventRateLimit, kubelet : fichiers d'appoint, redémarrage de RKE2 (accord)
 #   h1_controle contrôles de h1_api, sans redémarrage ; crée deux pods d'essai et une rafale d'Events, retirés ensuite
 #   h2_kyverno  règles en Audit (accord)
+#   h2_releve écarts relevés, sans rien changer
 #   h3_audit  pare-feu d'hôte et politiques de Cilium en mode audit, sans blocage (accord ; console virsh prête)
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
 #
@@ -225,6 +226,35 @@ etape_h1_controle() { # contrôles de H1, sans redémarrage
 etape_h2_kyverno() {
   exige_rke2
   kubectl apply --server-side -f "$here/politiques/kyverno/durcissement.yaml"
+}
+
+etape_h2_releve() { # écarts des règles : pas de balayage de fond, donc les pods en service sont joués par le CLI, ceux créés depuis H2 lus dans les rapports
+  exige_rke2
+  local d=$T/h2 i=0 p t0
+  t0=$(sed -n '1s/.*, \(20[^,]*\), DISTRO.*/\1/p' "$R/durcissement-h2_kyverno.log")
+  echo "règles appliquées à $t0"
+  rm -rf -- "${d:?}"; mkdir -p "$d/pods"
+  kubectl get pods -A -o json > "$d/pods.json"
+  jq -c '.items[] | select(.metadata.namespace | IN("kube-system", "kube-public", "kube-node-lease") | not)' "$d/pods.json" > "$d/lignes"
+  while read -r p; do i=$((i+1)); printf '%s\n' "$p" | yq -P -o yaml > "$d/pods/$i.yaml"; done < "$d/lignes"
+  kyverno apply "$here/politiques/kyverno/durcissement.yaml" --resource "$d/pods" --policy-report --output-format json > "$d/cli.json" 2> "$d/cli.err" || true
+  echo "## pods en service, CLI : $i pods"
+  jq -r '.results | group_by([.policy, .result]) | map("  \(.[0].policy) \(.[0].result) : \(length)") | .[]' "$d/cli.json"
+  echo "## limites-obligatoires, échecs par espace, conteneurs sans limites relevés à part"
+  jq -r '.results[] | select(.result == "fail") | .resources[0] | "\(.namespace)"' "$d/cli.json" | sort | uniq -c | sed 's/^ */  /'
+  attendu "échecs du CLI et décompte direct" "$(jq '[.results[] | select(.policy == "limites-obligatoires" and .result == "fail")] | length' "$d/cli.json")" \
+    "$(jq '[.items[] | select(.metadata.namespace | IN("kube-system", "kube-public", "kube-node-lease", "kyverno", "local-path-storage") | not)
+      | select(any(.spec.containers[]; (.resources.limits.memory == null) or (.resources.limits.cpu == null)))] | length' "$d/pods.json")"
+  echo "## pods créés depuis H2, rapports de Kyverno"
+  kubectl get policyreports -A -o json | jq -r '[.items[].results[]? | select(.policy | IN("limites-obligatoires", "images-zot-par-digest", "espace-default-interdit", "jeton-compte-default"))]
+    | group_by([.policy, .result]) | map("  \(.[0].policy) \(.[0].result) : \(length)") | .[]'
+  echo "## rien de refusé depuis H2"
+  kubectl get jobs -A -o json | jq -r --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp > $t)] | group_by(.metadata.namespace)
+    | map("  \(.[0].metadata.namespace) : \(length) Job(s) créé(s) depuis H2, \([.[] | select(.status.succeeded == 1)] | length) réussi(s)") | .[]'
+  attendu "événements FailedCreate depuis H2" "$(kubectl get events -A --field-selector reason=FailedCreate -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length')" 0
+  echo "événements PolicyViolation depuis H2 : $(kubectl get events -A --field-selector reason=PolicyViolation -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length')"
+  [ "$ko" = 0 ] || { echo "KO   h2_releve" >&2; exit 1; }
+  echo "RÉSULTAT : relevé fait"
 }
 
 etape_h3_audit() {
