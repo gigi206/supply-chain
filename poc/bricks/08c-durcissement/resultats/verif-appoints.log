@@ -1,0 +1,5 @@
+témoin de la fusion des appoints, 06/11/2026 à 16:33 UTC, sans cluster
+avant le correctif (1f66a3c) : clés posées deux fois : [pod-security-admission-config-file]
+  fichier effectif, dernière valeur : /etc/rancher/rke2/pod-security.yaml
+après le correctif : clés posées deux fois : []
+  fichier effectif, dernière valeur : /etc/rancher/rke2/pod-security.yaml

@@ -1,4 +1,5 @@
-# Brique 08c : admission de kube-apiserver, /etc/rancher/rke2/admission.yaml (0600). Pod Security de la 08b, avec l'exemption de la RuntimeClass
+# Brique 08c : admission de kube-apiserver, posée par h1_api sur /etc/rancher/rke2/pod-security.yaml (0600), le fichier déjà lu depuis kata.sh
+# exemption : mêmes arguments, donc exemption_posee reste vraie pour kata.sh. Pod Security de la 08b, avec l'exemption de la RuntimeClass
 # kata, plus EventRateLimit, dans un seul fichier : kube-apiserver ne lit qu'une configuration d'admission. Montage repris du dépôt du propriétaire
 # (https://github.com/gigi206/k8s). Seuils de ce dépôt, à relever sur le rejeu : un refus d'événement ne doit toucher aucun contrôle.
 apiVersion: apiserver.config.k8s.io/v1

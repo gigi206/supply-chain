@@ -15,7 +15,8 @@ here=$(cd "$(dirname "$0")" && pwd)
 b08=$here/../08-trust-plane
 . "$b08/commun.sh"
 C=$here/config
-A08B=$here/../08b-rke2/config/audit-policy.yaml
+B08=$here/../08b-rke2/config
+A08B=$B08/audit-policy.yaml
 T=$W/durcissement
 ko=0
 mkdir -p "$T"
@@ -89,10 +90,27 @@ PY
     else echo "KO   $(basename "$f") : $(tail -1 "$T/dry.out")"; ko=1; fi
   done
 
+  [ "$DISTRO" != rke2 ] || appoints
+
   echo "## valeurs de Cilium, rendues sans cluster"
   rendre_cilium hostFirewall
   [ "$ko" = 0 ] || { echo "KO   verifier" >&2; exit 1; }
   echo "RÉSULTAT : conforme"
+}
+
+doublons() { sed -n 's/^\([a-z][a-z0-9-]*\):.*/\1/p' "$@" | sort | uniq -d | paste -sd' '; }   # clés sans +, posées dans deux fichiers au moins
+
+appoints() { # readConfigFile de k3s : config.yaml, puis config.yaml.d par nom ; hors clé en +, la dernière valeur remplace les autres
+  local d=$T/appoints n
+  echo "## appoints de RKE2 sur sc-confiance : noms relevés sur le nœud, fichiers versionnés, sans lire config.yaml"
+  rm -rf -- "${d:?}"; mkdir -p "$d"
+  cp "$C/durcissement.yaml" "$C/kubelet.yaml" "$d/"
+  cp "$B08/sc-confiance-pod-security.yaml" "$d/pod-security.yaml"
+  for n in $(sur sc-confiance "sudo ls $D_CONF/config.yaml.d"); do
+    if [ -f "$d/$n" ]; then echo "OK   appoint du nœud, versionné : $n"; else echo "KO   appoint du nœud, inconnu : $n"; ko=1; fi
+  done
+  attendu "clés sans + posées deux fois" "$(doublons "$B08/sc-confiance.yaml" "$d"/*.yaml)" ""
+  attendu "fichier d'admission effectif" "$(sed -n 's/^pod-security-admission-config-file: //p' "$B08/sc-confiance.yaml" "$d"/*.yaml | tail -n 1)" "$D_CONF/pod-security.yaml"
 }
 
 rendre_cilium() {
@@ -106,19 +124,79 @@ rendre_cilium() {
   done
 }
 
+demarrage_apiserver() { kubectl get pod -n kube-system -l component=kube-apiserver -o jsonpath='{.items[0].status.containerStatuses[0].state.running.startedAt}' 2>/dev/null || true; }
+
+reprendre_rattrapage() { kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}' >/dev/null; trap - EXIT; }
+
+suspendre_rattrapage() { # comme kata.sh : aucun passage ni PipelineRun actif pendant les redémarrages, CronJob rétabli à la sortie
+  local n
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap reprendre_rattrapage EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  n=$(kubectl get pipelineruns -n builds -o json | jq '[.items[] | select(.status.completionTime == null)] | length')
+  [ "$n" = 0 ] || { echo "KO   $n PipelineRun(s) actif(s) : redémarrage reporté" >&2; exit 1; }
+}
+
+temoins() { # mêmes témoins que kata.sh exemption
+  local i
+  sonde_kyverno
+  for i in $(seq 30); do kubectl exec -n openbao openbao-0 -- true >/dev/null 2>&1 && break; sleep 2; done
+  attendu "OpenBao descellé" "$(kubectl exec -n openbao openbao-0 -- bao status -format=json 2>/dev/null | jq -r .sealed || true)" false
+  mise run confiance:openbao -- controle
+  mise run confiance:tsa -- temoin
+}
+
+rafale_evenements() { # Events réels : EventRateLimit ignore le dry-run. Au moins un 429 prouve que les limites sont chargées
+  local f=$T/evenement.json n
+  jq -n '{apiVersion: "v1", kind: "Event", metadata: {name: "essai-h1-@N@", namespace: "default", labels: {essai: "08c-h1"}},
+    involvedObject: {apiVersion: "v1", kind: "Namespace", name: "default", namespace: "default"},
+    reason: "EssaiH1", message: "rafale de la 08c", type: "Normal", source: {component: "essai-h1"}}' > "$f"
+  seq 200 | xargs -P 16 -I{} sh -c "sed s/@N@/{}/ '$f' | kubectl create -f - 2>&1" > "$T/rafale.out" || true
+  n=$(grep -c 'TooManyRequests' "$T/rafale.out" || true)
+  grep -m 1 'TooManyRequests' "$T/rafale.out" | cut -c1-200 || true
+  kubectl delete events -n default -l essai=08c-h1 --ignore-not-found >/dev/null
+  if [ "$n" -ge 1 ]; then echo "OK   EventRateLimit : $n refus sur 200 événements"; else echo "KO   EventRateLimit : aucun refus sur 200 événements"; ko=1; fi
+}
+
 etape_h1_api() {
   exige_rke2
+  local a d v
+  echo "## état avant"
+  temoins
+  suspendre_rattrapage
+  a=$(demarrage_apiserver)
+  echo "kube-apiserver démarré à $a"
   copier sc-confiance /tmp/durcissement "$C/durcissement.yaml" "$C/kubelet.yaml" "$C/admission.yaml"
-  sur sc-confiance "sudo install -m 0600 /tmp/durcissement/admission.yaml $D_CONF/admission.yaml \
+  sur sc-confiance "sudo install -m 0600 /tmp/durcissement/admission.yaml $D_CONF/pod-security.yaml \
     && sudo install -m 0600 /tmp/durcissement/durcissement.yaml /tmp/durcissement/kubelet.yaml $D_CONF/config.yaml.d/ && sudo rm -rf /tmp/durcissement"
-  sur sc-confiance "sudo systemctl restart $D_SERVEUR"
-  for _ in $(seq 120); do kubectl get --raw /readyz >/dev/null 2>&1 && break; sleep 2; done
+  d=$(date +%s)
+  sur sc-confiance "sudo systemctl restart --no-block $D_SERVEUR"
+  # /readyz peut répondre sur l'ancien kube-apiserver : attendre un autre démarrage, et ne pas toucher aux agents sinon
+  for _ in $(seq 150); do
+    v=$(demarrage_apiserver)
+    [ -n "$v" ] && [ "$v" != "$a" ] && kubectl get --raw /readyz >/dev/null 2>&1 && break
+    v=""; sleep 2
+  done
+  [ -n "$v" ] || { echo "KO   kube-apiserver non relancé en 300 s, agents non touchés : journal du pod statique, retrait au README" >&2; exit 1; }
+  echo "kube-apiserver relancé à $v, API prête $(( $(date +%s) - d )) s après le redémarrage"
   for v in sc-build sc-stockage; do
     copier "$v" /tmp/durcissement "$C/kubelet.yaml"
     sur "$v" "sudo install -d -m 0700 $D_CONF/config.yaml.d && sudo install -m 0600 /tmp/durcissement/kubelet.yaml $D_CONF/config.yaml.d/ && sudo rm -rf /tmp/durcissement && sudo systemctl restart $D_AGENT"
   done
   kubectl wait --for=condition=Ready node --all --timeout=300s >/dev/null
-  args_apiserver | grep -E -- '^--(enable-admission-plugins|admission-control-config-file|request-timeout|service-account-lookup)='
+  reprendre_rattrapage
+  echo "## après"
+  args_apiserver | grep -E -- '^--(request-timeout|service-account-lookup)=' || true
+  attendu "plugins d'admission" "$(args_apiserver | grep -- '^--enable-admission-plugins=' || true)" "--enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit"
+  attendu "fichier d'admission" "$(args_apiserver | grep -- '^--admission-control-config-file=' || true)" "--admission-control-config-file=$D_CONF/pod-security.yaml"
+  for v in sc-confiance sc-build sc-stockage; do
+    attendu "kubelet de $v : pids, seccomp, événements" "$(kubectl get --raw "/api/v1/nodes/$v/proxy/configz" | jq -c '.kubeletconfig | [.podPidsLimit, .seccompDefault, .eventRecordQPS]')" "[4096,true,5]"
+  done
+  rafale_evenements
+  temoins
+  mise run confiance:kata -- temoin
+  [ "$ko" = 0 ] || { echo "KO   h1_api" >&2; exit 1; }
+  echo "RÉSULTAT : conforme"
 }
 
 etape_h2_kyverno() {

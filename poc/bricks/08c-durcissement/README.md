@@ -16,6 +16,27 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 
 **Non vérifié** : aucune de ces règles n'a tourné. Le dry-run valide le schéma, pas l'effet. Les ports viennent d'un relevé `ss` sous k3s, pas sous RKE2. `kube-apiserver` n'a pas lu la politique d'audit, et la clé `kubelet-arg+` n'a pas été essayée sous RKE2.
 
+**Additif du 06/11/2026, 16:33 UTC, préparation de H1 sous RKE2, rien appliqué.** `durcissement.sh verifier` repasse, conforme, sur le cluster RKE2 ([journal](resultats/durcissement-verifier.log), version k3s du 05/11 dans [`durcissement-verifier-k3s.log`](resultats/durcissement-verifier-k3s.log)). Les ports restent ceux du relevé k3s : à relever avant H3.
+
+**H1, tel qu'écrit le 05/11, aurait arrêté l'API. Lu dans les sources, pas exécuté** :
+- `config.yaml.d/pod-security.yaml`, posé par `kata.sh exemption`, et `durcissement.yaml` réglaient tous deux `pod-security-admission-config-file`. `readConfigFile` (k3s `58877f27435f`) lit les appoints par nom et la dernière valeur gagne : `admission.yaml` n'aurait jamais été lu ;
+- `EventRateLimit` activé sans configuration reçoit une liste `limits` vide, que `ValidateConfiguration` (Kubernetes `v1.35.9`) refuse : `kube-apiserver` ne démarre pas ;
+- `verifier` disait conforme sans voir cette fusion. Il la contrôle désormais, avec [un témoin](resultats/verif-appoints.log) qui retrouve la clé en double sur l'ancienne version.
+
+**Correctif, à valider avec H1** : `h1_api` pose `config/admission.yaml` sur `/etc/rancher/rke2/pod-security.yaml`, le fichier déjà lu, et `durcissement.yaml` ne règle plus la clé. L'argument ne change pas : `kata.sh essais`, `kata.sh temoin` et `redemarrer.sh` voient toujours l'exemption, sans modification de `kata.sh`.
+
+**`h1_api` corrigé** : le CronJob `rattrapage` est suspendu pendant les redémarrages ; `systemctl restart --no-block`, car l'unité est en `Type=notify` sans délai (`TimeoutStartUSec=infinity`, lu sur le nœud) et une API tombée bloquerait la commande ; un `startedAt` différent est exigé, comme `/readyz`, sinon arrêt sans toucher aux agents ; arguments et `configz` des kubelets en `attendu` ; témoins Kyverno, OpenBao et TSA avant et après ; `kata.sh temoin` à la fin.
+
+**Prédictions de H1 ajoutées, 06/11/2026, 16:33 UTC, avant toute application** :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| H1a | `kube-apiserver` relancé en moins de 300 s, arguments attendus lus dans le manifeste | Haute |
+| H1b | `configz` rend `[4096,true,5]` sur les trois nœuds, aujourd'hui `[-1,false,50]` : la clé `kubelet-arg+` a été lue dans le code, jamais essayée | Moyenne |
+| H1c | Au moins un 429 sur une rafale de 200 Events réels, de 16 clients : limites chargées. Dépend du débit de `kubectl` sur l'hôte : sans refus, le résultat est indéterminé, et non une preuve d'absence | Moyenne |
+| H1d | OpenBao descellé, Kyverno et TSA répondent, comme à `kata.sh exemption` | Haute |
+| H1e | Pod Kata lancé après H1 : `seccomp-default` sans effet dans l'invité (`disable_guest_seccomp`, mesuré en J7) | Moyenne |
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |
@@ -128,5 +149,11 @@ Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kat
 - **H3 et H4 peuvent couper l'accès aux nœuds.** Secours : console `virsh`, suppression de la politique. Comme le cluster est reconstructible par `rejeu.sh`, le pire cas est un rejeu.
 - **Audit** : plus de volume, lu sur `sc-confiance` puis envoyé à Loki. Mesuré au rejeu de la 08b, jamais prédit en chiffre.
 - **Retrait** : supprimer les fichiers d'appoint et les politiques, puis relancer `cilium.sh appliquer`.
+
+- **Additif du 06/11/2026, 16:33 UTC, H1** :
+  - **Après H1, ne pas relancer `kata.sh exemption`** : il reposerait le fichier de la 08b, sans `EventRateLimit`, et `kube-apiserver` ne démarrerait plus. `rejeu.sh` n'est pas concerné : il part de zéro, et H1 n'en fait pas partie.
+  - **Retrait de H1** : reposer `08b-rke2/config/pod-security.yaml`, retirer `durcissement.yaml` et `kubelet.yaml` de `config.yaml.d`, puis redémarrer le server et les agents. Le retrait de la ligne précédente ne suffit pas.
+  - **Événements** : la limite `User` (10 par seconde, rafale 50) et `event-qps=5` peuvent perdre des événements. Contrôles qui les lisent : `cilium.sh:171` et `:173` (Pulling, avec un `attendu`), `preuves.sh:215` et `:253`, `politique.sh:451`, `stockage.sh:234`. Effet à relever au prochain passage complet : H1 ne rejoue pas ces contrôles.
+  - **Zot** n'est pas redémarré par H1 : service systemd de `sc-stockage`, hors de `rke2-agent`. La tâche du 21/11 ne bouge pas.
 
 Estimation : 10 h, hors plan des secrets. Une décision s'impose à partir de 20 h.

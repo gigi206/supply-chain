@@ -1,4 +1,4 @@
-# durcissement.sh verifier, 2026-11-05T20:39:28Z, DISTRO=k3s
+# durcissement.sh verifier, 2026-11-06T16:32:59Z, DISTRO=rke2
 ## politique d'audit : première règle qui correspond, sur des cas prédits
 OK   Metadata alice get  secrets
 OK   Metadata system:serviceaccount:tekton-chains:tekton-chains-controller get  secrets
@@ -36,6 +36,10 @@ OK   hote-commun.yaml : 1 objet(s)
 OK   hote-confiance.yaml : 1 objet(s)
 OK   hote-stockage.yaml : 1 objet(s)
 OK   durcissement.yaml : 4 objet(s)
+## appoints de RKE2 sur sc-confiance : noms relevés sur le nœud, fichiers versionnés, sans lire config.yaml
+OK   appoint du nœud, versionné : pod-security.yaml
+OK   clés sans + posées deux fois : 
+OK   fichier d'admission effectif : /etc/rancher/rke2/pod-security.yaml
 ## valeurs de Cilium, rendues sans cluster
 valeurs-cilium-audit : enable-host-firewall: "true"; enable-l7-proxy: "false"; kube-proxy-replacement: "true"; policy-audit-mode: "true"
 valeurs-cilium : enable-host-firewall: "true"; enable-l7-proxy: "false"; kube-proxy-replacement: "true"; policy-audit-mode: "false"
