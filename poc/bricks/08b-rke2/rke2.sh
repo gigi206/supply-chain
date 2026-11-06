@@ -85,7 +85,8 @@ verifier_hote() {
 }
 
 installer() { # vm server|agent
-  local vm=$1 role=$2 unite=rke2-$2 d=/tmp/rke2-installation j=$W/jetons-$vm cil=$O/telechargements/cilium
+  local vm=$1 role=$2
+  local unite=rke2-$role d=/tmp/rke2-installation j=$W/jetons-$vm cil=$O/telechargements/cilium   # second local : $vm n'existe qu'après le premier
   rm -rf -- "${j:?}" && (umask 077 && mkdir -p "$j")
   if [ "$role" = server ]; then
     cp "$S/rke2-jeton-serveur" "$j/jeton"; cp "$S/rke2-jeton-agent" "$j/jeton-agent"

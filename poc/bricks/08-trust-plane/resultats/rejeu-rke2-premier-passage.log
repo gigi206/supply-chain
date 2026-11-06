@@ -1,0 +1,90 @@
+# rejeu.sh rke2, 2026-11-06T10:00:54Z
+réseau : cilium
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh detruire
+Domain 'sc-confiance' destroyed
+
+Domain 'sc-confiance' has been undefined
+
+Domain 'sc-build' destroyed
+
+Domain 'sc-build' has been undefined
+
+Domain 'sc-stockage' destroyed
+
+Domain 'sc-stockage' has been undefined
+
+Vol sc-confiance.qcow2 deleted
+
+Vol sc-confiance-graine.iso deleted
+
+Vol sc-build.qcow2 deleted
+
+Vol sc-build-graine.iso deleted
+
+Vol sc-stockage.qcow2 deleted
+
+Vol sc-stockage-graine.iso deleted
+
+Pool supply-chain-poc destroyed
+
+Pool supply-chain-poc deleted
+
+Pool supply-chain-poc has been undefined
+
+Network supply-chain-poc destroyed
+
+Network supply-chain-poc has been undefined
+
+reste dans ~/.cache/supply-chain-poc/08 : pki telechargements rejeu-complet.console rejeu-complet-partie-5.console rejeu-complet-partie-3.console rejeu-complet-partie-4.console ssh outils secrets rejeu-complet-partie-2.console controle6.sortie essais 
+## durée démontage : 3 s
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh creer
+Pool supply-chain-poc defined
+
+Pool supply-chain-poc built
+
+Pool supply-chain-poc started
+
+Network supply-chain-poc defined from ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/libvirt/reseau.xml
+
+Network supply-chain-poc started
+
+
+
+Domain 'sc-confiance' defined from ~/.cache/supply-chain-poc/08/travail/sc-confiance.xml
+
+
+
+Domain 'sc-build' defined from ~/.cache/supply-chain-poc/08/travail/sc-build.xml
+
+
+
+Domain 'sc-stockage' defined from ~/.cache/supply-chain-poc/08/travail/sc-stockage.xml
+
+ Name                      Path                                                        Type   Capacity     Allocation
+------------------------------------------------------------------------------------------------------------------------
+ sc-build-graine.iso       /var/lib/libvirt/supply-chain-poc/sc-build-graine.iso       file   366.00 KiB   368.00 KiB
+ sc-build.qcow2            /var/lib/libvirt/supply-chain-poc/sc-build.qcow2            file   30.00 GiB    1011.84 MiB
+ sc-confiance-graine.iso   /var/lib/libvirt/supply-chain-poc/sc-confiance-graine.iso   file   366.00 KiB   368.00 KiB
+ sc-confiance.qcow2        /var/lib/libvirt/supply-chain-poc/sc-confiance.qcow2        file   25.00 GiB    1011.84 MiB
+ sc-stockage-graine.iso    /var/lib/libvirt/supply-chain-poc/sc-stockage-graine.iso    file   366.00 KiB   368.00 KiB
+ sc-stockage.qcow2         /var/lib/libvirt/supply-chain-poc/sc-stockage.qcow2         file   20.00 GiB    1011.84 MiB
+
+Domain 'sc-confiance' started
+
+Domain 'sc-build' started
+
+Domain 'sc-stockage' started
+
+sc-confiance : SSH ok (clé d'hôte attendue)
+sc-build : SSH ok (clé d'hôte attendue)
+sc-stockage : SSH ok (clé d'hôte attendue)
+## durée VM : 15 s
+# rke2.sh installer, 2026-11-06T10:01:12Z
+OK   rke2.linux-amd64.tar.gz
+OK   rke2-images-core.linux-amd64.tar.zst
+OK   rke2-coredns-1.47.102.tgz
+OK   rke2-metrics-server-3.14.001.tgz
+OK   local-path-storage.yaml
+OK   archives de local-path et de busybox
+OK   archives de Cilium
+~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/../08b-rke2/rke2.sh: line 88: vm: unbound variable
