@@ -159,6 +159,15 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 
 **Reste faux tant qu'il n'est pas appliqué** : un commit n'est construit qu'au passage suivant du rattrapage. **Non rejoué sous H4** : les 8 tests négatifs, dont le test 5, sauf le test 6. Le relevé `flux` s'est arrêté sur un `grep` sans résultat : `flux_resume` relit les mêmes données brutes.
 
+**Additif du 06/11/2026, 18:25 UTC, correctif du webhook, accord du propriétaire (« Oui, corrige »), prédictions avant application.** `preuves.sh test5` refuse de tourner après la bascule (garde `gabarit_essai`) : `construction_durcie` reprend ses refus principaux.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| W1 | Webhook de Forgejo : PipelineRun créé par `el-forgejo`, réussi, spec identique à J7, image `3a7ca1b1` | Haute |
+| W2 | 2 enveloppes de plus, 10 en tout, aucune anomalie exécutions/enveloppes, porte `true` | Moyenne |
+| W3 | Livraison non signée refusée par l'intercepteur, rejeu de Forgejo refusé (`already exists`), aucun PipelineRun du commit non signé | Moyenne |
+| W4 | 0 refus de politique pendant le passage | Moyenne |
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

@@ -2877,7 +2877,7 @@ etape_temoins_scan() { # brique 07a, G6 ; champ 3 sans objet : ces images n'ont 
 }
 
 etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule seul, gabarit en service inchangé ; purge le PipelineRun de la tête
-  local t0 code e0 e1
+  local t0 code e0 e1 n
   [ -s "$W/construction/pipeline.ref" ] || { echo "KO   pipeline sample-app non publiée" >&2; exit 1; }
   BA_PIPE=$(cat "$W/construction/pipeline.ref")
   ba_spec "$BA_J7" > "$T/ba-j7.spec"
@@ -2898,6 +2898,18 @@ etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule s
   code=$(forgejo_livrer)
   ba_attendu "Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
   ba_chemin webhook "EventListener forgejo" declencheurs:el-forgejo "$t0"
+  echo "## refus du webhook, l'EventListener atteignant de nouveau les intercepteurs"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  rm -rf "$T/webhook" && (umask 077 && mkdir -p "$T/webhook")
+  corps_push 1111111111111111111111111111111111111111 f.json
+  envoyer "non signée" "$T/webhook/f.json"
+  code=$(forgejo_livrer)
+  ba_attendu "rejeu par Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
+  for _ in $(seq 30); do n=$(el_existe "$t0" | grep -c . || true); [ "$n" -ge 1 ] && break; sleep 2; done
+  [ "$n" -ge 1 ] && echo "OK   rejeu refusé à la création (already exists)" || { echo "KO   aucun refus « already exists »" >&2; exit 1; }
+  n=$(kubectl logs -n tekton-pipelines deploy/tekton-triggers-core-interceptors --since-time="$t0" | grep -c 'no X-Hub-Signature-256 header set' || true)
+  [ "$n" -ge 1 ] && echo "OK   livraison non signée refusée par l'intercepteur github" || { echo "KO   aucun refus de signature" >&2; exit 1; }
+  ba_attendu "PipelineRun du commit non signé" "$(kubectl get pipelinerun -n builds sample-app-1111111111111111111111111111111111111111 --no-headers 2>/dev/null | wc -l)" 0
   echo "durée du PipelineRun : $(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | .[1] - .[0]') s"
   ee_calme
   ee_controle fin
