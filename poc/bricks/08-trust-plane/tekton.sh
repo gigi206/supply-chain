@@ -124,6 +124,14 @@ etape_miroir() {
   echo "OK   $n manifestes linux/amd64 copiés dans Zot sous amont/ et relus par digest"
 }
 
+builds_privilegie() { # décision D12 de la 08b : sans label, le profil cis met builds en restricted dès J4, avant set-security-context
+  # (J6) ; privileged jusqu'à politique.sh restreint, comme sous k3s. Jamais dans tekton/builds.yaml, et rien si un niveau est déjà
+  # posé : tekton.sh signature rejoué après J6 doit garder restricted.
+  [ "$DISTRO" = rke2 ] || return 0
+  [ -n "$(kubectl get namespace builds -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" ] \
+    || kubectl label namespace builds pod-security.kubernetes.io/enforce=privileged >/dev/null
+}
+
 rendre() { # composant fichier : manifeste réécrit vers Zot + correctifs (kustomize), dans $T/<composant>/rendu.yaml
   local c=$1 f=$2 k=$T/$1 src d a m
   rm -rf "$k" && mkdir -p "$k"
@@ -136,6 +144,8 @@ rendre() { # composant fichier : manifeste réécrit vers Zot + correctifs (kust
   cp "$here/tekton/kustomization-$c.yaml" "$k/kustomization.yaml"
   cp "$P/ca-poc.crt" "$k/ca.crt"   # configMapGenerator du résolveur bundles (J6)
   [ ! -d "$here/tekton/$c" ] || cp "$here/tekton/$c"/* "$k/"
+  # Décision D8 de la 08b : Chains sous le défaut restricted du profil cis (releve-restricted.log, section 5).
+  [ "$c" != chains ] || [ "$DISTRO" != rke2 ] || yq -i '.patches += [{"path": "restricted.yaml"}]' "$k/kustomization.yaml"
   kubectl kustomize "$k" > "$k/rendu.yaml"
 }
 
@@ -171,6 +181,7 @@ etape_installer() {
     && echo "OK   rendu : résolveurs sans lecture des Secrets ni des comptes de service de tout le cluster, get dans builds" \
     || { echo "KO   droits des résolveurs dans le rendu" >&2; exit 1; }
   kubectl apply --server-side -f "$here/tekton/builds.yaml" >/dev/null   # espace des RoleBindings, avant les contrôleurs
+  builds_privilegie
   kubectl create configmap ca-poc -n tekton-chains --from-file=ca.crt="$P/ca-poc.crt" --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null
   kubectl apply --server-side --force-conflicts -f "$T/pipeline/rendu.yaml" >/dev/null
   kubectl wait --for=condition=Available deployment --all -n tekton-pipelines --timeout=300s
@@ -223,6 +234,7 @@ etape_signature() {
     --to-ca-file "$P/ca-poc.crt" --to-registry-config "$T/auth/zot.json" >/dev/null
   # Zone build : compte Zot poc-build (builds/** seulement), utilisé par Chains pour pousser .sig et .att.
   kubectl apply --server-side -f "$here/tekton/builds.yaml" >/dev/null
+  builds_privilegie
   auth_zot "$T/auth/build.json" "" poc-build "$REG"
   kubectl create secret generic zot-build -n builds --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson="$T/auth/build.json" \
     --dry-run=client -o yaml | kubectl apply --server-side -f - >/dev/null

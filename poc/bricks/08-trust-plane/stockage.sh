@@ -203,6 +203,7 @@ spec:
   nodeSelector: {zone: build}
   tolerations: [{key: zone, operator: Equal, value: build, effect: NoSchedule}]
   automountServiceAccountToken: false
+  securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: RuntimeDefault}}   # D11 de la 08b : profil cis, restricted
   containers:
   - name: app
     image: $REG/$DEPOT@$APP_DIGEST
@@ -215,6 +216,7 @@ spec:
   nodeSelector: {zone: build}
   tolerations: [{key: zone, operator: Equal, value: build, effect: NoSchedule}]
   automountServiceAccountToken: false
+  securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: RuntimeDefault}}   # busybox ne déclare aucun utilisateur
   restartPolicy: Never
   containers:
   - name: dns

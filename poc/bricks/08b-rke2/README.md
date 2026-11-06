@@ -211,3 +211,38 @@ Cinquième blocage, trouvé en cherchant ce qu'un relevé des pods présents ne 
 ## Second additif à la prédiction 4 (06/11/2026, 08:56 UTC, avant tout rejeu)
 
 Le texte précédent reste écrit. **Sans D12, sont aussi attendus refusés** : les pods de TaskRun de J4 et ceux de J6 antérieurs à `restreint`, ainsi que le cas « sous warn et audit » de la ligne 612. La réserve demeure : un refus d'un composant non relu reste possible, et aucune de ces mesures ne porte sur l'exécution.
+
+## Additif : D8 à D12 adoptées en (a) (« Oui, tout en (a) », 06/11/2026, 09:11 UTC, cluster k3s inchangé)
+
+Ces cinq décisions, ouvertes plus haut, sont tranchées par le propriétaire. Les tableaux de D8 à D12 restent écrits. Le correctif a été préparé hors du dépôt, vérifié à sec, puis appliqué tel quel. **Rien n'a tourné sous RKE2, et rien n'a été appliqué au cluster.**
+
+| Décision | Fichier | Sous k3s |
+|---|---|---|
+| D8 | `tekton/chains/restricted.yaml`, ajouté au rendu par `tekton.sh rendre` | Rendu de Chains identique, 20 objets, `b21f5f22…` avant et après |
+| D9 | `politique.sh`, `install.yaml` de Kyverno modifié avant le rendu ; contrôle du rendu, arrêt si l'espace n'est pas exclu | `install.yaml` inchangé, contrôle passé sur `kube-system` |
+| D10 | `politique.sh`, fonction `espace_essai`, seul créateur de `bancc` | Aucun label |
+| D11 | `stockage.sh`, `securityContext` des deux pods | **Change aussi sous k3s** : `dns` passe de root à 65532. `sample-app` déclare déjà `65532:65532`, son utilisateur ne change pas. Rejouer `stockage.sh` sur le cluster k3s actuel échouerait : le `securityContext` d'un pod existant ne se modifie pas |
+| D12 | `tekton.sh`, fonction `builds_privilegie` ; `politique.sh`, retrait du label remplacé par `enforce=privileged` | Label de `builds` non posé. **Le cas sous warn et audit change aussi sous k3s** : sans effet attendu, non mesuré à l'exécution, notamment sur l'annotation lue par la fonction `violations` |
+
+**Vérification** : [banc](resultats/verif-d8-d12.sh) et [journal](resultats/verif-d8-d12.log), blocs extraits des scripts du clone qui portait le correctif, faux `kubectl` pour les branches RKE2, `--dry-run=server` sur k3s pour l'admission. Chains rendu sous `rke2` admis dans `scan`, les deux pods de `stockage.sh` admis dans `builds`, le pod `dns` présenté pour la première fois ; témoins refusés. `builds_privilegie` : 1 label sans niveau posé, 0 sur `restricted` ou `privileged`, jamais `--overwrite`. Témoin de D9 sans le `sed` : KO. Exclusion réelle mesurée sur `pods-isolation` : le même pod à `hostPath` admis dans `kube-system`, refusé dans `bancc`, et le sélecteur `NotIn` lu sur les webhooks des `ValidatingPolicy`. L'ajout de `local-path-storage` à ce sélecteur n'a pas été essayé sur l'API. L'espace n'est pas ajouté à `resourceFilters` : le webhook n'étant plus appelé, ce n'est pas attendu nécessaire, à confirmer au rejeu.
+
+**[Premier passage](resultats/verif-d8-d12-premier-passage.log) raté** : le banc décalait `$T`, aucun rendu n'existait, et il a affiché à tort « OK rendu identique » et « aucun KO ». Corrigé : rendus vides refusés.
+
+**Relu sans conflit** : `politique.sh` charge `distro.sh` par `commun.sh` (ligne 77) ; la 08c n'interdit pas `enforce=privileged` ; `chains-zot.yaml` n'ajoute aucun conteneur ; le conteneur injecté par S1 porte déjà ses réglages.
+
+**Balayage statique (06/11/2026, 09:16 UTC, lecture seule, sans cluster)** : tous les espaces créés par les scripts et les manifestes de la 07a, de la 08, de la 08b et de la 08c, croisés avec leurs gabarits de pods, y compris les espaces éphémères qu'un relevé du cluster ne voit pas. Sans label sous k3s et absents des relevés : `j3-essais` et `j5-essais`, gabarits conformes ; `preuve-resolveurs`, aucun pod ; `preuve-controleurs`, `hc_pod` conforme à `restricted`, donc le refus attendu reste celui de `tekton-controleurs-builds`. Le pod `essai-j5` de `tsa.sh`, sans réglage, ne sert qu'au CLI de Kyverno ; celui de `politique.sh` passe dans `bancc`, couvert par D10. **Aucun sixième blocage trouvé**. Cette lecture ne couvre pas les pods créés par des contrôleurs, sauf ceux des TaskRun de `builds`, ni l'exécution.
+
+## Troisième additif à la prédiction 4 (06/11/2026, 09:11 UTC, avant tout rejeu)
+
+Les textes précédents restent écrits. **Avec D8 à D12 en (a), aucun des cinq blocages relevés ne doit bloquer le rejeu.** Pour confronter, sous `DISTRO=rke2` :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| 4a | Chains `Available` sous `restricted`, signatures et attestations produites | Moyenne : UID 65532 déjà en service, exécution avec seccomp `RuntimeDefault` jamais mesurée |
+| 4b | `j2-essais` : `sample-app` `Ready`, `dns` `Succeeded`, résolution réussie | Haute pour `sample-app`, moyenne pour `dns` : `nslookup` jamais lancé en 65532 |
+| 4c | `builds` en `privileged` à J4, TaskRun `essai-signature` réussi, puis `restricted` après `restreint`, et le contrôle d'état final de `politique.sh restreint` conforme | Haute |
+| 4d | Cas sous warn et audit : `True`, violations de `step-publier` tracées | Moyenne : annotation d'audit non mesurée avec le label explicite |
+| 4e | Les volumes de pipeline se créent après J6 : pod auxiliaire de `local-path` non refusé | Moyenne : exclusion mesurée pour `kube-system`, pas pour cet espace |
+| 4f | `c1-unsigned` refusé par Kyverno, pas par PodSecurity ; verdicts de parité inchangés | Haute |
+
+La réserve demeure : un refus d'un composant non relu reste possible. La prédiction 12 reste valable : au moins un KO corrigé avant un passage complet.

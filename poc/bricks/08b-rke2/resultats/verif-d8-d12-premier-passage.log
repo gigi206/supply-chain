@@ -1,0 +1,25 @@
+# Premier passage du banc, 06/11/2026, 09:06 UTC. Journal écrasé par le second passage : extraits des sections 4 et 6 repris de la session, erreurs répétées omises.
+# Faux résultat : la section 4 n'a rendu aucun objet (T décalé dans le sous-shell du banc). « OK rendu identique » comparait des
+# fichiers absents, et le « aucun KO » final ne valait donc rien. Sections 1, 2, 3 et 5 : mêmes résultats au second passage.
+
+## 4. D8 : rendu réel de Chains, avec et sans correctif
+line 87: ~/.cache/supply-chain-poc/08b/verif-d8.VvMMWL/r/tsv: No such file or directory
+awk: fatal: cannot open file `~/.cache/supply-chain-poc/08b/verif-d8.VvMMWL/r/tsv' for reading: No such file or directory
+cp: cannot stat '~/.cache/supply-chain-poc/08b/verif-d8.VvMMWL/r/ca-poc.crt': No such file or directory
+OK   rendu de Chains identique sous k3s, b21f5f22b3fa55c3…
+différences k3s → rke2 :
+diff: ~/.cache/supply-chain-poc/08b/verif-d8.VvMMWL/apres-rke2.yaml: No such file or directory
+Deployments du rendu : 
+
+## 6. Présentés à l'API, à sec
+REFUSÉ   D8 : Chains rendu sous rke2, dans scan
+         error: no objects passed to create
+REFUSÉ   D8 témoin : même pod sans securityContext de pod
+         error: no objects passed to create
+ADMIS    D11 : les deux pods de j2-essais, dans builds
+REFUSÉ   D11 témoin : mêmes pods sans le correctif
+D12 ligne 612, à sec : code 0, namespace/builds labeled (server dry run)
+OK   labels de builds inchangés
+
+fin à 09:06:26 UTC
+aucun KO

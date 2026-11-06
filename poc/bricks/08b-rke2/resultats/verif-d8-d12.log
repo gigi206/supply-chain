@@ -1,0 +1,72 @@
+vérification du 06/11/2026 à 09:06 UTC
+
+## 1. Syntaxe
+OK   bash -n tekton.sh
+OK   bash -n politique.sh
+OK   bash -n stockage.sh
+shellcheck tekton.sh : 12 avis avant, 12 après
+shellcheck politique.sh : 65 avis avant, 66 après
+shellcheck stockage.sh : 16 avis avant, 16 après
+
+## 2. D12 et D10, branches RKE2 avec un faux kubectl
+OK   k3s, sans label : 0 label
+OK   rke2, sans label (J4) : 1 label
+OK   rke2, déjà restricted (tekton.sh signature rejoué après J6) : 0 label
+OK   rke2, déjà privileged : 0 label
+OK   D12 : pas de --overwrite, restricted ne peut pas être écrasé
+k3s : 0 label, 1 création
+rke2 : 1 label, 1 création
+espaces d'essai encore créés hors du helper : 1 (1 attendu, dans le helper)
+
+## 3. D9 : ligne réelle du correctif sur install.yaml
+OK   rendu : kube-system exclu des webhooks de Kyverno
+code 0
+OK   k3s : install.yaml inchangé
+OK   rendu : local-path-storage exclu des webhooks de Kyverno
+code 0
+lignes changées : 1
+["kube-system","local-path-storage"]
+["kyverno"]
+resourceFilters mentionnant local-path : 0
+témoin négatif : sed retiré, le contrôle doit dire KO
+KO   local-path-storage non exclu des webhooks de Kyverno
+code 1
+
+## 4. D8 : rendu réel de Chains, avec et sans correctif
+avant-k3s : 20 objets
+apres-k3s : 20 objets
+apres-rke2 : 20 objets
+OK   rendu de Chains identique sous k3s, b21f5f22b3fa55c3…
+différences k3s → rke2 :
+  537a538,540
+  >           capabilities:
+  >             drop:
+  >             - ALL
+  555a559,562
+  >       securityContext:
+  >         runAsNonRoot: true
+  >         seccompProfile:
+  >           type: RuntimeDefault
+{"n":"tekton-chains-controller","pod":{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"c":[{"name":"tekton-chains-controller","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsUser":65532}}]}
+Deployments du rendu : 1
+
+## 5. D11 : pods réels de stockage.sh
+pods réglés : 2
+variables non remplacées : 0
+{"n":"essai-d11-app","c":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}}
+{"n":"essai-d11-dns","c":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}}
+
+## 6. Présentés à l'API, à sec
+enforce : scan=restricted builds=restricted
+ADMIS    D8 : Chains rendu sous rke2, dans scan
+REFUSÉ   D8 témoin : même pod sans securityContext de pod
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/verif-d8.PkptZp/d8-temoin.json": pods "essai-d8" is forbidden: violates PodSecurity "restricted:latest": runAsNonRoot != true (pod or container "tekton-chains-controller" must set securityContext.runA
+ADMIS    D11 : les deux pods de j2-essais, dans builds
+REFUSÉ   D11 témoin : mêmes pods sans le correctif
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/verif-d8.PkptZp/j2-temoin.yaml": pods "essai-d11-app" is forbidden: violates PodSecurity "restricted:latest": runAsNonRoot != true (pod or container "app" must set securityContext.runAsNonRoot=true), 
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/verif-d8.PkptZp/j2-temoin.yaml": pods "essai-d11-dns" is forbidden: violates PodSecurity "restricted:latest": runAsNonRoot != true (pod or container "dns" must set securityContext.runAsNonRoot=true), 
+D12 ligne 612, à sec : code 0, namespace/builds labeled (server dry run)
+OK   labels de builds inchangés
+
+fin à 09:06:58 UTC
+aucun KO

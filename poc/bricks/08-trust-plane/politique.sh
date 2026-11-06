@@ -163,12 +163,18 @@ etape_installer() {
     || { echo "KO   install.yaml diffère du manifeste du commit du tag" >&2; diff "$T/install-commit.yaml" "$DL/install.yaml" | head -20 >&2; exit 1; }
   rm -rf "$k" && mkdir -p "$k"
   cp "$DL/install.yaml" "$k/install.yaml"
+  # Décision D9 de la 08b : espace de local-path exclu des webhooks, comme kube-system sous k3s, sinon pods-isolation y refuse le pod
+  # auxiliaire à hostPath (releve-restricted.log, section 4). Les comptes qui y créent des pods échappent alors à Kyverno.
+  [ "$D_LP_NS" = kube-system ] || sed -i "/^  webhooks: /s/\\\\\"kube-system\\\\\"/\\\\\"kube-system\\\\\",\\\\\"$D_LP_NS\\\\\"/" "$k/install.yaml"
   while read -r n d; do
     sed -i "s#\"reg.kyverno.io/kyverno/$n:v1.19.2\"#\"$REG/amont/kyverno/$n@$d\"#" "$k/install.yaml"
   done <<< "$KY_IMAGES"
   cp "$here/politique/kustomization-kyverno.yaml" "$k/kustomization.yaml"
   cp "$P/ca-poc.crt" "$k/ca.crt"
   kubectl kustomize "$k" > "$k/rendu.yaml"
+  yq -o json "$k/rendu.yaml" | jq -e -s --arg n "$D_LP_NS" '[.[] | select(.kind == "ConfigMap" and .metadata.name == "kyverno")
+    | .data.webhooks | fromjson | .namespaceSelector.matchExpressions[].values[]] | index($n) != null' >/dev/null \
+    && echo "OK   rendu : $D_LP_NS exclu des webhooks de Kyverno" || { echo "KO   $D_LP_NS non exclu des webhooks de Kyverno" >&2; exit 1; }
   echo "## références d'images hors de Zot dans le manifeste rendu"
   grep -hoE 'image: *"?[^" ]+' "$k/rendu.yaml" | grep -v "$REG/amont/" | sort | uniq -c || echo "aucune"
   echo "kyverno : $(grep -c '^kind:' "$k/rendu.yaml") objets, sha256 $(sha256sum < "$k/rendu.yaml" | cut -c1-16)…"
@@ -183,6 +189,12 @@ etape_installer() {
   echo "## webhooks d'admission de Kyverno"
   kubectl get validatingwebhookconfigurations,mutatingwebhookconfigurations -o json \
     | jq -r '.items[] | select(.metadata.name | startswith("kyverno")) | "\(.kind) \(.metadata.name) : \([(.webhooks // [])[] | .failurePolicy] | unique | join(","))"'
+}
+
+espace_essai() { # décision D10 de la 08b : bancc mesure Kyverno seul ; sous le profil cis, restricted répondrait avant lui
+  # (c1-unsigned attend FAIL et passerait pour une mauvaise raison). Pods jamais créés.
+  kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  [ "$DISTRO" != rke2 ] || kubectl label --overwrite namespace "$NS_ESSAI" pod-security.kubernetes.io/enforce=privileged >/dev/null
 }
 
 ms() { local u; read -r u _ < /proc/uptime; echo $(( 10 * 10#${u/./} )); }   # horloge monotone (run.sh du banc)
@@ -231,7 +243,7 @@ etape_parite() {
   local c e ref r v
   TSV_PARITE=$R/politique-parite.tsv
   printf 'cas\tattendu\tCLI\tadmission\tCLI (ms)\tadmission (ms)\tmotif CLI\tmotif admission\n' > "$TSV_PARITE"
-  kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  espace_essai
   attendre_sa "$NS_ESSAI"
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
   auth_zot "$T/auth/docker/config.json"
@@ -400,7 +412,7 @@ etape_admission() {
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   TSV_PARITE=$R/politique-admission.tsv
   printf 'cas\tattendu\tCLI\tadmission\tCLI (ms)\tadmission (ms)\tmotif CLI\tmotif admission\n' > "$TSV_PARITE"
-  kubectl create namespace "$NS_ESSAI" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+  espace_essai
   sed -n '1,/^---$/p' "$here/politique/declencheurs.yaml" | kubectl apply --server-side -f - >/dev/null   # espace des cas zone-declencheurs
   sed -n '1,/^---$/p' "$here/politique/porte.yaml" | kubectl apply --server-side -f - >/dev/null   # espace du cas zone-porte
   d=$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
@@ -609,7 +621,8 @@ etape_restreint() {
   echo "## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus"
   trap 'kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version=latest >/dev/null 2>&1
     drapeau true; rm -rf "$T/auth" "$W/refus.out"' EXIT
-  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || true
+  # Niveau explicite (D12 de la 08b) : sans label, le défaut du profil cis laisserait enforce en restricted sous RKE2.
+  kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=privileged pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || true
   ENV_N=$(enveloppes builds/essai-webhook)
   verdict "tâche sans stepTemplate, sous warn et audit" True "$(pr_gabarit j6-sans-restriction "$sans")"
   attestee j6-sans-restriction

@@ -1,0 +1,19 @@
+# Brique 08b, décision D8 : réglages exigés par restricted, défaut du profil cis (releve-restricted.log, section 5). Ajouté au rendu
+# sous DISTRO=rke2 seulement (tekton.sh, rendre). Le conteneur tourne déjà en UID 65532.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-chains-controller
+  namespace: tekton-chains
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: tekton-chains-controller
+        securityContext:
+          capabilities:
+            drop: [ALL]
