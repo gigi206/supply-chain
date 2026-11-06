@@ -783,6 +783,9 @@ EOF
   for c in $T6_DESTINATIONS; do
     l=${c%%:*}; [ "$l" = Externe ] && continue
     v=$(grep "^PROPRE|$l|" "$T/t6-contre.log" | cut -d'|' -f5)
+    case " ${T6_FERMES:-} " in   # ports fermés à tout pod par le pare-feu d'hôte (brique 08c, H4)
+      *" $l "*) [ "$v" = FERME ] && echo "OK   contre-épreuve : $l refusé par le pare-feu d'hôte" || { echo "KO   contre-épreuve : $l $v, attendu fermé par le pare-feu d'hôte" >&2; ko=1; }; continue ;;
+    esac
     [ "$v" = OUVERT ] && echo "OK   contre-épreuve : $l joignable" || { echo "KO   contre-épreuve : $l $v (nc ou réseau du pod inutilisable : le test ne prouverait rien)" >&2; exit 1; }
   done
   [ "$(grep '^LIEE|' "$T/t6-contre.log" | cut -d'|' -f5)" = OUVERT ] && echo "OK   contre-épreuve : nc lié à l'IP du pod (-s) joint Zot" \
@@ -790,6 +793,7 @@ EOF
   n=$(grep -cE "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" || true)
   [ "$n" -ge 1 ] && echo "OK   contre-épreuve : $n SYN vers $EXTERNE:443 sur enp1s0 (source $(grep -E "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" | sed -E 's/.* IP ([0-9.]+)\.[0-9]+ > .*/\1/' | sort -u | paste -sd,))" \
     || { echo "KO   contre-épreuve : aucun SYN vers $EXTERNE sur enp1s0 (la capture ne verrait pas une sortie)" >&2; exit 1; }
+  [ -z "${T6_FERMES:-}" ] || sed -i -E '/192\.168\.161\.11:(9345|2379) /d' "$T/t6-contre-hubble-propre.txt"
   [ ! -s "$T/t6-contre-hubble-propre.txt" ] && echo "OK   contre-épreuve : aucun flux refusé de l'IP du pod" \
     || { echo "KO   contre-épreuve : flux refusés de l'IP du pod" >&2; ko=1; }
   for l in Zot Forgejo; do

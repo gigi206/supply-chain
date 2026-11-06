@@ -84,6 +84,38 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 | H3d | Aucun verdict d'audit sur 9345 ni 2379 hors des nœuds, puisque rien ne les sollicite au repos : le refus se prouve en H4, pas ici | Haute |
 | H3e | Le format du relevé `verdicts` lit bien les lignes réelles : il n'a été essayé sur aucune sortie de `cilium-dbg monitor` | Moyenne |
 
+**Additif du 06/11/2026, 17:46 UTC, H3 appliqué sur accord du propriétaire (« Oui »).** `cilium.sh appliquer` a tourné pour la première fois sous RKE2 : 3 agents recréés en 11 s, 4 politiques actives, SSH joignable sur les trois nœuds ([application](resultats/durcissement-h3_audit.log)). Audit de 40 minutes au repos, de 17:04:09 à 17:44:09 UTC, sur 78 502 verdicts ([relevé](resultats/durcissement-h3_releve.log), [détail](resultats/durcissement-h3_resume.log)).
+
+**Seul flux qui aurait été refusé** : 124 requêtes ICMP entre les nœuds, sondes de `cilium-health`. Le filtre du relevé ne lisait pas les lignes sans port, d'où un journal de `h3_releve` sans détail : `verdicts` est corrigé, `h3_resume` relit les mêmes données brutes.
+
+| Prédiction | Résultat |
+|---|---|
+| H3, 05/11 : aucun blocage | **Tenue** |
+| H3, 05/11 : verdicts sur `sc-replay` | **Non tenue** : la VM n'a aucune route vers ce réseau. Échec de connexion mesuré à 17:05 UTC, conforme à l'isolement voulu par la brique 10 |
+| H3a : `cilium.sh appliquer` passe | **Tenue** |
+| H3b : verdict UDP 68 | **Non tenue, sens favorable** : les trois baux ont été renouvelés dans la fenêtre (fichiers datés de 17:36 à 17:39 UTC, `valid_lft` à 3 120 s et plus), sans aucun verdict |
+| H3c : verdicts ICMP | **Tenue**, 124 |
+| H3d : rien sur 9345 ni 2379 hors des nœuds | **Tenue** |
+| H3e : le relevé lit les lignes réelles | **En partie** : oui avec port, non sans port, corrigé |
+
+**Limites de la fenêtre** : au repos, sans build. Le webhook, les relais d'Alloy et Grafana n'ont ouvert aucune connexion observée : leurs règles n'ont pas été exercées. L'absence de verdict DHCP vaut en audit, pas sous blocage.
+
+**Corrigé avant H4, à valider avec H4** :
+- `hote-commun` ouvre ICMP echo entre nœuds ;
+- `hote-stockage` retire `192.168.162.0/24`, inutile ;
+- `h4_bloque` réapplique les politiques, contrôle SSH, API, Zot et les témoins avant le test 6 ;
+- `preuves.sh` : le test 6 exigeait que sa contre-épreuve joigne 9345 et 2379, ce que H4 doit fermer. `T6_FERMES` fixe cet attendu pour H4 seulement, sans changer le rejeu.
+
+**Prédictions de H4 ajoutées, 06/11/2026, 17:46 UTC, avant toute application** :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| H4a | SSH, API, Zot, témoins conformes après la fin de l'audit | Moyenne |
+| H4b | Test 6 conforme : `construire-image` refusée partout, contre-épreuve refusée sur 9345 et 2379, Zot et Forgejo joints | Moyenne : `T6_FERMES` n'a jamais tourné |
+| H4c | Baux DHCP renouvelés sous blocage : `valid_lft` remonte dans les 30 min suivantes | Moyenne |
+| H4d | Journaux de `sc-build` toujours dans Loki, après 30 min de blocage | Haute |
+| H4e | `cilium-health` sans nœud injoignable : la règle ICMP vise bien les sondes | Moyenne |
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

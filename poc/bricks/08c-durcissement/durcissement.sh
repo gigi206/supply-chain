@@ -8,6 +8,7 @@
 #   h2_releve écarts relevés, sans rien changer
 #   h3_audit  pare-feu d'hôte et politiques de Cilium en mode audit, sans blocage (accord ; console virsh prête)
 #   h3_releve verdicts audit des trois agents, sans rien changer
+#   h3_resume relit les verdicts du dernier relevé
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
@@ -268,7 +269,7 @@ etape_h3_audit() {
 }
 
 verdicts() { # lignes de cilium-dbg monitor : ce qui serait refusé, regroupé ; le port source et l'identifiant de flux sont retirés
-  sed -n -E 's/.*remote ID ([^,]+), proto ([0-9]+), (ingress|egress), action audit.* ([0-9a-f.:]+):[0-9]+ -> ([0-9a-f.:]+):([0-9]+).*/\3 proto \2 remote \1 \4 -> \5:\6/p' "$1" | sort | uniq -c | sort -rn
+  sed -n -E 's/.*remote ID ([^,]+), proto ([0-9]+), (ingress|egress), action audit.*, ([0-9.]+)(:[0-9]+)? -> ([0-9.]+)(:[0-9]+)?.*/\3 proto \2 \4 -> \6\7/p' "$1" | sort | uniq -c | sort -rn
 }
 
 etape_h3_releve() { # ${DUREE:-2400} s de verdicts sur les trois agents : plus que T1 du bail DHCP, 27 min, pour voir un renouvellement
@@ -281,16 +282,36 @@ etape_h3_releve() { # ${DUREE:-2400} s de verdicts sur les trois agents : plus q
   done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json | jq -r '.items[] | "\(.metadata.name) \(.spec.nodeName)"')
   wait
   date -u '+fin %H:%M:%S UTC'
+  etape_h3_resume
+}
+
+etape_h3_resume() { # relit les verdicts du dernier relevé
+  exige_rke2
+  local d=$T/h3 n
   for n in sc-confiance sc-build sc-stockage; do
     echo "## $n : $(wc -l < "$d/$n.txt") verdicts, $(grep -c 'action audit' "$d/$n.txt" || true) seraient refusés"
     verdicts "$d/$n.txt"
   done
+  echo "## flux admis vers les nœuds, tous les relevés"
+  cat "$d"/sc-*.txt | grep 'action allow' | sed -n -E 's/.*(ingress), action allow, auth: [a-z]+, match [^,]+, ([0-9.]+)(:[0-9]+)? -> (192\.168\.161\.[0-9]+:[0-9]+).*/\2 -> \4/p' \
+    | sed -E 's/^10\.42\.[0-9.]+/pod/' | sort | uniq -c | sort -rn
 }
 
 etape_h4_bloque() {
   exige_rke2
+  local v
+  kubectl apply --server-side -f "$here/politiques/cilium/"
   VALEURS_08C=$C/valeurs-cilium.yaml "$b08/cilium.sh" appliquer
-  mise run confiance:preuves -- test6
+  attendu "pare-feu d'hôte et mode audit" "$(kubectl -n kube-system get cm cilium-config -o json | jq -c '[.data["enable-host-firewall"], .data["policy-audit-mode"]]')" '["true","false"]'
+  kubectl wait --for=condition=Ready node --all --timeout=120s >/dev/null
+  for v in sc-confiance sc-build sc-stockage; do attendu "SSH de $v" "$(sur "$v" 'echo joint' </dev/null || true)" joint; done
+  attendu "API" "$(kubectl get --raw /readyz || true)" ok
+  v=$(curl -k -s -o /dev/null --max-time 8 -w '%{http_code}' "https://$REG_HOTE/v2/" || true)
+  if [ "${v:-000}" != 000 ]; then echo "OK   Zot joignable depuis l'hôte : HTTP $v"; else echo "KO   Zot injoignable depuis l'hôte"; ko=1; fi
+  temoins
+  T6_FERMES="Supervisor Etcd" mise run confiance:preuves -- test6
+  [ "$ko" = 0 ] || { echo "KO   h4_bloque" >&2; exit 1; }
+  echo "RÉSULTAT : conforme"
 }
 
 for e in "$@"; do

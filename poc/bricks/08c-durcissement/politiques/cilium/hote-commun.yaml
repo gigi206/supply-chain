@@ -1,6 +1,7 @@
 # Brique 08c : pare-feu d'hôte, base des trois nœuds. Structure reprise de default-deny-host-ingress du dépôt du propriétaire
 # (https://github.com/gigi206/k8s), resserrée : cette règle y laisse entrer tout le trafic de cluster, donc les pods, ce qui ne fermerait pas
-# 9345 et 2379. Ports issus du relevé `ss` du 05/11/2026 sous k3s, à confirmer en audit sous RKE2. 192.168.161.1 : l'hôte d'administration.
+# 9345 et 2379. Ports issus du relevé `ss` du 05/11/2026 sous k3s, confirmés sous RKE2 le 06/11/2026 (H3). 192.168.161.1 : l'hôte d'administration.
+# ICMP : sondes de cilium-health entre nœuds, seul flux que l'audit de H3 aurait refusé.
 # Fermés : etcd (2379 à 2381), LLMNR (5355), métriques de l'opérateur (9963).
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
@@ -21,6 +22,10 @@ spec:
             - {port: "10250", protocol: TCP}
             - {port: "4240", protocol: TCP}
             - {port: "4244", protocol: TCP}
+    - fromEntities: [remote-node]
+      icmps:
+        - fields:
+            - {type: 8, family: IPv4}
     - fromEntities: [health]
       toPorts:
         - ports:
