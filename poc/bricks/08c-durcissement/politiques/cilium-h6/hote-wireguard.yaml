@@ -1,0 +1,15 @@
+# Brique 08c, H6 : le tunnel WireGuard de Cilium entre nœuds. Port 51871 fixe (pkg/wireguard/types, v1.20.4) ; la politique d'hôte s'applique à ces paquets, comme l'annonce
+# Documentation/operations/system_requirements.rst, et hote-commun ne l'ouvre pas : sans cette règle, le mode strict jetterait le trafic entre pods de nœuds différents.
+# Hors de politiques/cilium/, que h3_audit et h4_bloque appliquent en bloc : posée avant le helm upgrade de h6, retirée après celui de h6_retrait.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: hote-wireguard
+spec:
+  description: "Nœuds : tunnel WireGuard de Cilium, H6 seulement"
+  nodeSelector: {}
+  ingress:
+    - fromEntities: [remote-node]
+      toPorts:
+        - ports:
+            - {port: "51871", protocol: UDP}

@@ -1,0 +1,36 @@
+# durcissement.sh h6_sec, 2026-11-06T21:15:28Z, DISTRO=rke2
+OK   aucune clé dans les documents comparés : 0
+## rendu : valeurs en service (-) contre valeurs de H6 (+), documents Secret retirés
++  enable-wireguard: "true"
++  wireguard-persistent-keepalive: "0s"
++  encrypt-node: "true"
++  enable-encryption-strict-mode-egress: "true"
++  encryption-strict-egress-cidr: "10.42.0.0/16"
++  encryption-strict-egress-allow-remote-node-identities: "false"
+OK   lignes du rendu hors de cilium-config : 0
+## cilium-config : en service contre rendu des valeurs en service
+163 clés en service, 163 rendues
+## règle du tunnel
+OK   hote-wireguard en service : 
+ciliumclusterwidenetworkpolicy.cilium.io/hote-wireguard serverside-applied (server dry run)
+OK   règles du répertoire appliqué en bloc qui ouvrent 51871 : 0
+## module des nœuds
+sc-confiance : modules_disabled=0, chargé=0, interface=0, modprobe-ok
+OK   sc-confiance, chiffrement : Encryption: Disabled
+sc-confiance : MTU de route 1500 1500 , IpReasmOKs=0 IpReasmFails=0 IpFragFails=0 IpFragCreates=0 
+sc-build : modules_disabled=0, chargé=1, interface=0, modprobe-ok
+OK   sc-build, chiffrement : Encryption: Disabled
+sc-build : MTU de route 1500 , IpReasmOKs=0 IpReasmFails=0 IpFragFails=0 IpFragCreates=0 
+sc-stockage : modules_disabled=0, chargé=0, interface=0, modprobe-ok
+OK   sc-stockage, chiffrement : Encryption: Disabled
+sc-stockage : MTU de route 1500 1500 , IpReasmOKs=0 IpReasmFails=0 IpFragFails=0 IpFragCreates=0 
+## état de départ
+certificats : cilium-ca 422 hubble-server-certs 423
+pare-feu depuis sc-build : 6443=ouvert 2379=ferme 
+témoins vers sc-stockage : hote:3100=ferme hote:3001=ferme hote:5000=ouvert hote:3501=ouvert sante:3100=ferme sante:3001=ferme sante:5000=ouvert sante-stockage=ouvert sante-confiance=ouvert
+coredns : sc-confiance 10.42.0.132, sc-stockage 10.42.3.227
+sonde de coupure, deux secondes (heure, Zot, coredns de sc-stockage, coredns de sc-confiance ; 1 joint) :
+  21:15:49 1 1 1
+  21:15:50 1 1 1
+redémarrages de conteneurs du cluster : 17
+OK   h6_sec

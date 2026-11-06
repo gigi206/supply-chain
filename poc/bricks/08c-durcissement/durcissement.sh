@@ -20,6 +20,10 @@
 #   h5_roles  deux règles de politiques/roles (accord) ; contrôleurs de Triggers et agent de sc-build redémarrés ; retour : kubectl delete -f politiques/roles/roles.yaml
 #   h5_cilium_sec à sec : chart rendu avec et sans la synchronisation de Secrets, documents Secret retirés, pods de Cilium en dry-run serveur, état de départ ; ne change rien
 #   h5_cilium tls.secretSync.enabled=false (config/valeurs-cilium.yaml), agents et opérateur redémarrés (accord) ; retour : retirer la clé, cilium.sh appliquer
+#   h6_sec    à sec : chart rendu avec et sans WireGuard, documents Secret retirés, règle du tunnel en dry-run serveur, module des nœuds, état de départ ; ne change rien
+#   h6        WireGuard en mesure (accord) : politiques/cilium-h6 puis valeurs-cilium.yaml et valeurs-cilium-wireguard.yaml, agents redémarrés, coupure relevée ; retour : h6_retrait
+#   h6_mesure construction de contrôle sous WireGuard (accord), en-têtes capturés sur sc-build, fragments et refus relevés ; journal preuves-h6-construction_durcie.log de la 08
+#   h6_retrait retour à valeurs-cilium.yaml, puis retrait de la règle du tunnel (accord) ; le module wireguard reste chargé jusqu'au redémarrage des nœuds
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
 set -euo pipefail
@@ -713,6 +717,204 @@ etape_h5_cilium() {
   attendu "requêtes de l'opérateur sur des Secrets depuis $t1" "$(audit_vu "$q" "$t1" ".objectRef.resource == \"secrets\"")" 0
   kubectl get nodes --no-headers </dev/null
   [ "$ko" = 0 ] && echo "OK   h5_cilium" || { echo "KO   h5_cilium"; exit 1; }
+}
+
+WG_POL=$here/politiques/cilium-h6/hote-wireguard.yaml
+
+valeurs_h6() { cat "$C/valeurs-cilium.yaml" "$C/valeurs-cilium-wireguard.yaml" > "$T/valeurs-h6.yaml"; }   # VALEURS_08C ne prend qu'un fichier ; clés distinctes, le pare-feu d'hôte et H5 restent
+
+ip_coredns() { # nœud : adresse de son pod coredns, stable pendant h6, l'autoscaler écarté par le motif
+  kubectl get pods -n kube-system -o json </dev/null | jq -r --arg n "$1" '[.items[] | select(.spec.nodeName == $n and (.metadata.name | test("^rke2-coredns-rke2-coredns-[0-9a-f]+-[a-z0-9]+$"))) | .status.podIP] | first'
+}
+
+temoins_h6() { # depuis sc-build, par l'hôte et par l'endpoint de santé (chemin d'un pod) : sc-stockage passe par le tunnel, et son pare-feu doit tenir sur le trafic déchiffré ; pare_feu ne le voit pas, sc-confiance restant hors du chiffrement de nœud à nœud
+  local s c
+  s=$(kubectl get ciliumnode sc-stockage -o jsonpath='{.spec.health.ipv4}' </dev/null)
+  c=$(kubectl get ciliumnode sc-confiance -o jsonpath='{.spec.health.ipv4}' </dev/null)
+  sur sc-build "sudo bash -c '
+    p=\$(pgrep -f cilium-health-responder | head -1)
+    t() { timeout 3 bash -c \"exec 3<>/dev/tcp/\$1/\$2\" 2>/dev/null && echo ouvert || echo ferme; }
+    v() { nsenter -t \$p -n timeout 3 bash -c \"exec 3<>/dev/tcp/\$1/\$2\" 2>/dev/null && echo ouvert || echo ferme; }
+    for q in 3100 3001 5000 3501; do printf \"hote:%s=%s \" \$q \"\$(t 192.168.161.13 \$q)\"; done
+    for q in 3100 3001 5000; do printf \"sante:%s=%s \" \$q \"\$(v 192.168.161.13 \$q)\"; done
+    printf \"sante-stockage=%s sante-confiance=%s\" \"\$(v $s 4240)\" \"\$(v $c 4240)\"'" </dev/null
+}
+
+etat_chiffrement() { # pod : ligne Encryption de cilium-dbg status, clé publique retirée. Pas de cilium-dbg encrypt status : il charge le module du nœud (21:06:40, sc-build)
+  kubectl exec -n kube-system "$1" -c cilium-agent -- cilium-dbg status </dev/null 2>/dev/null | awk '$1 == "Encryption:"' | sed -E 's/Pubkey: [^,]*, //; s/[[:space:]]+/ /g; s/ $//'
+}
+
+agent_de() { kubectl get pods -n kube-system -l k8s-app=cilium --field-selector "spec.nodeName=$1" -o jsonpath='{.items[0].metadata.name}' </dev/null; }
+
+mtu_routes() { # nœud : MTU de la route par défaut de l'endpoint de santé, recréé par l'agent, et de coredns, resté en service
+  sur "$1" "sudo bash -c 'for p in \$(pgrep -f cilium-health-responder | head -1) \$(pgrep -x coredns | head -1); do nsenter -t \$p -n ip route show default; done'" </dev/null \
+    | awk '{ for (i = 1; i <= NF; i++) if ($i == "mtu") printf "%s ", $(i + 1) }'
+}
+
+fragments() { sur "$1" 'nstat -asz IpFragCreates IpFragFails IpReasmOKs IpReasmFails' </dev/null | awk '$1 ~ /^Ip/ { printf "%s=%s ", $1, $2 }'; }
+
+refus_agent() { # nœud : compteurs de refus de son agent, par motif
+  kubectl exec -n kube-system "$(agent_de "$1")" -c cilium-agent -- cilium-dbg metrics list -o json </dev/null 2>/dev/null \
+    | jq -c '[.[] | select(.name == "cilium_drop_count_total")] | group_by(.labels.reason) | map({(.[0].labels.reason): (map(.value) | add)}) | add // {}'
+}
+
+redemarrages() { kubectl get pods -A -o json </dev/null | jq '[.items[].status.containerStatuses[]?.restartCount] | add'; }
+
+sonde_coupure() { # durée cible… : chaque seconde, depuis sc-build, une connexion par cible
+  local d=$1; shift
+  sur sc-build "for i in \$(seq $d); do printf %s \$(date -u +%H:%M:%S); for c in $*; do timeout 1 bash -c \"exec 3<>/dev/tcp/\${c%:*}/\${c#*:}\" 2>/dev/null && printf ' 1' || printf ' 0'; done; echo; sleep 1; done" </dev/null
+}
+
+resume_coupure() { # fichier : échecs par cible, avec leur première et leur dernière heure
+  awk '{ for (i = 2; i <= NF; i++) if ($i == 0) { n[i]++; if (!d[i]) d[i] = $1; f[i] = $1 } } END { for (i = 2; i <= NF; i++) printf "  cible %d : %d échec(s)%s\n", i - 1, n[i] + 0, (n[i] ? " de " d[i] " à " f[i] : ""); print "  " NR " mesures" }' "$1"
+}
+
+classes_capture() { # lignes de tcpdump -q, en-têtes seuls, vues sur enp1s0 de sc-build : paquets par classe et par pair ; un fragment non initial n'a pas de port
+  awk '$2 == "IP" {
+    s = $3; d = $5; sub(/:$/, "", d); p = split(s, a, "."); q = split(d, b, ".")
+    hs = a[1] "." a[2] "." a[3] "." a[4]; hd = b[1] "." b[2] "." b[3] "." b[4]
+    pair = (hs == "192.168.161.12" ? hd : hs)
+    if (hs ~ /^10\.42\./ || hd ~ /^10\.42\./) c = "pods-en-clair"
+    else if ($0 ~ /ip-proto-17/) c = "fragment"
+    else if (p == 5 && q == 5 && a[5] == "51871" && b[5] == "51871") c = "tunnel"
+    else c = "clair"
+    n[c " " pair]++
+  } END { for (k in n) print k, n[k] }' "$1" | sort
+}
+
+etape_h6_sec() {
+  exige_rke2
+  local a=$T/cilium-avant.yaml b=$T/cilium-apres.yaml v
+  mkdir -p "$T"
+  rendu_cilium "$a"
+  rendu_cilium "$b" -f "$C/valeurs-cilium-wireguard.yaml"
+  attendu "aucune clé dans les documents comparés" "$(cat "$a" "$b" | grep -cE 'PRIVATE KEY|LS0tLS1CRUdJTi' || true)" 0
+  echo "## rendu : valeurs en service (-) contre valeurs de H6 (+), documents Secret retirés"
+  diff -U0 "$a" "$b" | grep -vE '^(---|\+\+\+|@@)' | cut -c1-120 || true
+  attendu "lignes du rendu hors de cilium-config" "$(diff -U0 "$a" "$b" | grep -E '^[-+] ' | grep -vE '^\+  (enable-wireguard|wireguard-persistent-keepalive|encrypt-node|enable-encryption-strict-mode-egress|encryption-strict-egress-cidr|encryption-strict-egress-allow-remote-node-identities): ' | grep -c . || true)" 0
+  echo "## cilium-config : en service contre rendu des valeurs en service"
+  kubectl get cm -n kube-system cilium-config -o json </dev/null | jq -r '.data | to_entries[] | "\(.key)=\(.value)"' | sort > "$T/cm-vivant"
+  awk 'BEGIN { RS = "\n---\n" } /\n  name: cilium-config\n/' "$a" | sed -n -E '/^data:/,$s/^  ([a-z0-9-]+): +"?([^"]*)"?$/\1=\2/p' | sort > "$T/cm-rendu"
+  echo "$(wc -l < "$T/cm-vivant") clés en service, $(wc -l < "$T/cm-rendu") rendues"
+  diff "$T/cm-vivant" "$T/cm-rendu" | cut -c1-120 || true
+  echo "## règle du tunnel"
+  attendu "hote-wireguard en service" "$(kubectl get ccnp hote-wireguard --ignore-not-found -o name </dev/null)" ""
+  kubectl apply --server-side --dry-run=server -f "$WG_POL" </dev/null
+  attendu "règles du répertoire appliqué en bloc qui ouvrent 51871" "$(grep -l 51871 "$here"/politiques/cilium/*.yaml 2>/dev/null | grep -c . || true)" 0
+  echo "## module des nœuds"
+  for v in sc-confiance sc-build sc-stockage; do
+    echo "$v : modules_disabled=$(sur "$v" 'cat /proc/sys/kernel/modules_disabled' </dev/null), chargé=$(sur "$v" 'lsmod | grep -c "^wireguard " || true' </dev/null), interface=$(sur "$v" 'ip -br link show type wireguard | grep -c . || true' </dev/null), $(sur "$v" 'sudo /usr/sbin/modprobe -n wireguard && echo modprobe-ok' </dev/null)"
+    attendu "$v, chiffrement" "$(etat_chiffrement "$(agent_de "$v")")" "Encryption: Disabled"
+    echo "$v : MTU de route $(mtu_routes "$v"), $(fragments "$v")"
+  done
+  echo "## état de départ"
+  echo "certificats : $(versions_certs)"
+  echo "pare-feu depuis sc-build : $(pare_feu)"
+  echo "témoins vers sc-stockage : $(temoins_h6)"
+  echo "coredns : sc-confiance $(ip_coredns sc-confiance), sc-stockage $(ip_coredns sc-stockage)"
+  echo "sonde de coupure, deux secondes (heure, Zot, coredns de sc-stockage, coredns de sc-confiance ; 1 joint) :"
+  sonde_coupure 2 192.168.161.13:5000 "$(ip_coredns sc-stockage):53" "$(ip_coredns sc-confiance):53" | sed 's/^/  /'
+  echo "redémarrages de conteneurs du cluster : $(redemarrages)"
+  rm -f "$a" "$b" "$T/cm-vivant" "$T/cm-rendu"
+  [ "$ko" = 0 ] && echo "OK   h6_sec" || { echo "KO   h6_sec"; exit 1; }
+}
+
+etape_h6() {
+  exige_rke2
+  local c0 p0 w0 r0 v p n a
+  c0=$(versions_certs); p0=$(pare_feu); w0=$(temoins_h6); r0=$(redemarrages)
+  a=$T/coupure-h6.txt
+  attendu "avant, chiffrement de sc-build" "$(etat_chiffrement "$(agent_de sc-build)")" "Encryption: Disabled"
+  suspendre_rattrapage
+  kubectl apply --server-side -f "$WG_POL" </dev/null
+  valeurs_h6
+  sonde_coupure 240 192.168.161.13:5000 "$(ip_coredns sc-stockage):53" "$(ip_coredns sc-confiance):53" > "$a" &
+  date -u '+application %H:%M:%S UTC'
+  VALEURS_08C=$T/valeurs-h6.yaml "$b08/cilium.sh" appliquer
+  date -u '+agents prêts %H:%M:%S UTC'
+  wait
+  echo "## connexions depuis sc-build, chaque seconde : Zot, coredns de sc-stockage, coredns de sc-confiance"
+  resume_coupure "$a"
+  attendu "configuration" "$(kubectl -n kube-system get cm cilium-config -o json </dev/null | jq -c '[.data["enable-wireguard"], .data["encrypt-node"], .data["enable-encryption-strict-mode-egress"], .data["encryption-strict-egress-cidr"], .data["enable-host-firewall"], .data["policy-audit-mode"]]')" '["true","true","true","10.42.0.0/16","true","false"]'
+  kubectl wait --for=condition=Ready node --all --timeout=120s >/dev/null
+  for v in sc-confiance sc-build sc-stockage; do attendu "SSH de $v" "$(sur "$v" 'echo joint' </dev/null || true)" joint; done
+  attendu "API" "$(kubectl get --raw /readyz || true)" ok
+  v=$(curl -k -s -o /dev/null --max-time 8 -w '%{http_code}' "https://$REG_HOTE/v2/" || true)
+  if [ "${v:-000}" != 000 ]; then echo "OK   Zot joignable depuis l'hôte : HTTP $v"; else echo "KO   Zot injoignable depuis l'hôte"; ko=1; fi
+  attendu "certificats" "$(versions_certs)" "$c0"
+  attendu "pare-feu depuis sc-build" "$(pare_feu)" "$p0"
+  attendu "témoins vers sc-stockage, par le tunnel" "$(temoins_h6)" "$w0"
+  sonde_kyverno
+  sleep 60   # pairs échangés, MTU des endpoints mis à jour
+  attendu "sc-confiance, chiffrement" "$(etat_chiffrement "$(agent_de sc-confiance)")" "Encryption: Wireguard [NodeEncryption: OptedOut, cilium_wg0 (Port: 51871, Peers: 2)]"
+  attendu "sc-build, chiffrement" "$(etat_chiffrement "$(agent_de sc-build)")" "Encryption: Wireguard [NodeEncryption: Enabled, cilium_wg0 (Port: 51871, Peers: 2)]"
+  attendu "sc-stockage, chiffrement" "$(etat_chiffrement "$(agent_de sc-stockage)")" "Encryption: Wireguard [NodeEncryption: Enabled, cilium_wg0 (Port: 51871, Peers: 2)]"
+  while read -r p; do
+    attendu "$p, état" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status --brief </dev/null 2>&1 | tail -1)" OK
+    attendu "$p, Hubble" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status </dev/null 2>/dev/null | awk '$1 == "Hubble:" {print $2}')" Ok
+  done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json </dev/null | jq -r '.items[].metadata.name')
+  attendu "redémarrages de conteneurs du cluster" "$(redemarrages)" "$r0"
+  for v in sc-confiance sc-build sc-stockage; do echo "$v : MTU de route $(mtu_routes "$v")"; echo "$v : refus $(refus_agent "$v")"; done
+  kubectl get nodes --no-headers </dev/null
+  [ "$ko" = 0 ] && echo "OK   h6" || { echo "KO   h6"; exit 1; }
+}
+
+etape_h6_mesure() {
+  exige_rke2
+  local f0 s0 d0 c=0 k=$T/capture-h6.txt j=$b08/resultats/preuves-h6-construction_durcie.log
+  attendu "sc-build, chiffrement" "$(etat_chiffrement "$(agent_de sc-build)")" "Encryption: Wireguard [NodeEncryption: Enabled, cilium_wg0 (Port: 51871, Peers: 2)]"
+  f0=$(fragments sc-build); s0=$(fragments sc-stockage); d0=$(refus_agent sc-build)
+  sur sc-build "sudo timeout -s INT 900 tcpdump -n -q -l -p -i enp1s0 'ip and not port 22' 2>/dev/null" </dev/null > "$k" &
+  sleep 2
+  JOURNAL=preuves-h6 timeout 840 mise run confiance:preuves -- construction_durcie </dev/null || c=$?
+  sur sc-build 'sudo pkill -INT -x tcpdump' </dev/null || true
+  wait
+  attendu "construction, code de retour" "$c" 0
+  echo "## paquets vus sur enp1s0 de sc-build pendant la construction : classe, pair, nombre"
+  classes_capture "$k" | tee "$k.classes"
+  attendu "paquets de pods en clair" "$(awk '$1 == "pods-en-clair" { n += $3 } END { print n + 0 }' "$k.classes")" 0
+  attendu "paquets en clair avec sc-stockage" "$(awk '$1 == "clair" && $2 == "192.168.161.13" { n += $3 } END { print n + 0 }' "$k.classes")" 0
+  [ "$(awk '$1 == "tunnel" && $2 == "192.168.161.13" { n += $3 } END { print n + 0 }' "$k.classes")" -ge 1 ] && echo "OK   témoin : paquets du tunnel vers sc-stockage" || { echo "KO   aucun paquet du tunnel vers sc-stockage : le contrôle serait vide"; ko=1; }
+  echo "## fragments, avant puis après"
+  echo "sc-build : $f0 / $(fragments sc-build)"
+  echo "sc-stockage : $s0 / $(fragments sc-stockage)"
+  echo "## refus de l'agent de sc-build, avant puis après"
+  echo "$d0"; refus_agent sc-build
+  if grep -Fq 'IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5' "$j"; then echo "OK   image 3a7ca1b1 identique"; else echo "KO   image différente de 3a7ca1b1"; ko=1; fi
+  rm -f "$k"
+  [ "$ko" = 0 ] && echo "OK   h6_mesure" || { echo "KO   h6_mesure"; exit 1; }
+}
+
+etape_h6_retrait() {
+  exige_rke2
+  local c0 p0 w0 r0 v a=$T/coupure-h6-retrait.txt
+  c0=$(versions_certs); p0=$(pare_feu); w0=$(temoins_h6); r0=$(redemarrages)
+  suspendre_rattrapage
+  sonde_coupure 240 192.168.161.13:5000 "$(ip_coredns sc-stockage):53" "$(ip_coredns sc-confiance):53" > "$a" &
+  date -u '+retrait %H:%M:%S UTC'
+  VALEURS_08C=$C/valeurs-cilium.yaml "$b08/cilium.sh" appliquer
+  date -u '+agents prêts %H:%M:%S UTC'
+  wait
+  resume_coupure "$a"
+  kubectl delete -f "$WG_POL" </dev/null
+  attendu "clés de chiffrement dans cilium-config" "$(kubectl -n kube-system get cm cilium-config -o json </dev/null | jq -c '[.data | keys[] | select(test("wireguard|encrypt"))]')" '[]'
+  kubectl wait --for=condition=Ready node --all --timeout=120s >/dev/null
+  sleep 30
+  for v in sc-confiance sc-build sc-stockage; do
+    attendu "SSH de $v" "$(sur "$v" 'echo joint' </dev/null || true)" joint
+    attendu "$v, chiffrement" "$(etat_chiffrement "$(agent_de "$v")")" "Encryption: Disabled"
+    attendu "$v, interfaces WireGuard" "$(sur "$v" 'ip -br link show type wireguard | grep -c . || true' </dev/null)" 0
+    echo "$v : module chargé=$(sur "$v" 'lsmod | grep -c "^wireguard " || true' </dev/null), MTU de route $(mtu_routes "$v")"
+  done
+  attendu "API" "$(kubectl get --raw /readyz || true)" ok
+  attendu "certificats" "$(versions_certs)" "$c0"
+  attendu "pare-feu depuis sc-build" "$(pare_feu)" "$p0"
+  attendu "témoins vers sc-stockage" "$(temoins_h6)" "$w0"
+  sonde_kyverno
+  attendu "redémarrages de conteneurs du cluster" "$(redemarrages)" "$r0"
+  attendu "hote-wireguard en service" "$(kubectl get ccnp hote-wireguard --ignore-not-found -o name </dev/null)" ""
+  kubectl get nodes --no-headers </dev/null
+  [ "$ko" = 0 ] && echo "OK   h6_retrait" || { echo "KO   h6_retrait"; exit 1; }
 }
 
 for e in "$@"; do
