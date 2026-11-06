@@ -703,6 +703,18 @@ Bornes :
 - Le passage laisse deux refus de plus dans l'audit de l'API, un par contrôleur, dans `bancc`. Rien n'a été écrit dans le cluster.
 - Les autres étapes de `preuves.sh` restent non relues sous H5, et ce relevé n'annonce rien sur le redémarrage : V1 à V5 restent à mesurer.
 
+**Additif du 06/11/2026, 22:43 UTC, étapes `resolveurs` et `helm_cilium` sous H1 à H5, prédictions avant passage, rien écrit dans le cluster.** Demande : « continue ». Le passage planifié du scan n'étant que demain à 09:30 UTC, le travail reste à sec. `intercepteurs` est écartée : elle retire une liaison et redémarre un déploiement. `reelle` a déjà son passage de 19:06 UTC. `helm_cilium` ne contient que des lectures, des `can-i` et des dry-run serveur : elle peut donc être lancée telle quelle, avec `JOURNAL=preuves-h5`, sans écraser `preuves-helm_cilium.log`. `resolveurs` crée un espace et des ResolutionRequests : seul un relevé à sec est fait, par [essais-h5-resolveurs.sh](essais-h5-resolveurs.sh), référence [preuves-resolveurs.log](../08-trust-plane/resultats/preuves-resolveurs.log) de 15:25 UTC, avant H1.
+
+| Prédiction | Attendu |
+|---|---|
+| A1, `resolveurs`, droits | Mêmes constats qu'à 15:25 : Role de `builds` en `get` seul, `can-i` à `no,yes,no,yes,no,yes,yes`, lectures refusées par les droits |
+| A2, `resolveurs`, cibles | `rke2-serving` et `signing-secrets` présents, lecture de `signing-secrets` refusée (ajoutée au relevé). `zot-chains` absent depuis S1 : son refus reste mesuré, sur un objet absent |
+| A3, `resolveurs`, admission | Espace `preuve-resolveurs` et deux ResolutionRequests de `builds` admis en dry-run serveur |
+| A4, `resolveurs`, pod | Prêt, 0 redémarrage, 0 refus des droits dans son journal |
+| A5, `resolveurs`, audit | Aucune lecture hors de `builds` sauf les deux 403 de 15:25. `get secrets builds 200` toujours à 1 : le chemin du Secret n'a aucun passage sous H5. Au moins un `get serviceaccounts builds 200` depuis `h5_deny`, peu sûr : le résolveur peut servir un bundle par digest depuis son cache, non lu |
+| A6, `resolveurs`, lecteurs | 4 lecteurs, sans `cilium-operator`, retiré par `h5_cilium`. **Écart attendu** : la valeur figée de `preuves.sh` en attend 5, l'étape finirait KO si elle était rejouée. Correction après ce relevé |
+| A7, `helm_cilium` | Passage complet sans KO, sous sa prédiction propre : 6 créateurs de pods dans `kube-system`, aucune liaison de compte de service vers `cluster-admin`, release `deployed cilium-1.20.4`, refus par les droits des deux contrôleurs, témoin administrateur admis |
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
