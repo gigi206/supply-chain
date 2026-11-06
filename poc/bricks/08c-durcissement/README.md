@@ -116,6 +116,21 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 | H4d | Journaux de `sc-build` toujours dans Loki, après 30 min de blocage | Haute |
 | H4e | `cilium-health` sans nœud injoignable : la règle ICMP vise bien les sondes | Moyenne |
 
+**Additif du 06/11/2026, 18:12 UTC, H4 appliqué sur accord du propriétaire (« Oui, lance H4 »).** Fin du mode audit à 17:48 UTC, le pare-feu d'hôte bloque ([journal](resultats/durcissement-h4_bloque.log), [relecture à 21 min](resultats/durcissement-h4-relecture.log)). Politiques réseau des pods de nouveau appliquées : `construire-image` y est refusée partout.
+
+| Prédiction | Résultat |
+|---|---|
+| H4, 05/11 : SSH, API et Zot joignables ; 9345 et 2379 fermés aux tâches signées ; Zot et Forgejo protégés | **Tenue**. La contre-épreuve, une tâche signée sans la politique de sortie, n'atteint plus 9345 ni 2379 : la limite relevée au test 6 de la 08b est fermée |
+| H4a : SSH, API, Zot, témoins | **Tenue**, Zot en HTTP 200 |
+| H4b : test 6 conforme | **Tenue** : 7 destinations refusées à `construire-image`, usurpation refusée, image `3a7ca1b1` inchangée. `T6_FERMES` a fonctionné |
+| H4c : baux renouvelés sous blocage | **Tenue** : fichiers de bail datés de 18:03 à 18:05 UTC, `valid_lft` à 3 260 s et plus |
+| H4d : journaux de `sc-build` dans Loki | **Tenue** : 72 lignes de `sc-build` en 5 minutes, 4 396 de `sc-confiance`, 1 413 de `sc-stockage`, relues à 18:12 UTC. Le premier relevé groupait sur une étiquette absente, d'où le complément |
+| H4e : `cilium-health` | **Tenue**, 3/3 et 1/1 partout. Le `0/1 (1 unknown)` lu sur `sc-confiance` à 17:48:23 était une sonde prise au redémarrage de l'agent |
+
+**0 refus de politique** en 2 minutes sur les trois agents, au repos, à 18:09 UTC.
+
+**Non prouvé** : une construction complète, le webhook par NodePort, la porte et les 8 tests sous pare-feu bloquant, un redémarrage des VM. Le filtre de la contre-épreuve retire les flux vers 9345 et 2379 sans vérifier leur motif de refus : la fermeture se lit à la connexion refusée. `espaces-sans-politique` reste un seul bloc, joignable de l'intérieur.
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

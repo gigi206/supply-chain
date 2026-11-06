@@ -1,0 +1,24 @@
+relecture du 06/11/2026 à 18:09:36 UTC, H4 à 17:48 UTC
+## baux DHCP
+  .11 2026-11-06 18:05:51 valid_lft 3375sec
+  .12 2026-11-06 18:03:56 valid_lft 3260sec
+  .13 2026-11-06 18:03:56 valid_lft 3260sec
+## journaux dans Loki, 5 dernières minutes, par nœud ou source
+   5168
+  source=audit-k8s 2328
+  source=evenements-k8s 117
+  source=journal 1418
+  source=pods 680
+  source=rke2 625
+## cilium-health
+sc-build : Cluster health: 3/3 reachable (2026-11-06T18:07:38Z) (Probe interval: 1m56.754608943s); sc-build (localhost) 192.168.161.12 1/1 1/1; sc-confiance 192.168.161.11 1/1 1/1; sc-stockage 192.168.161.13 1/1 1/1
+sc-stockage : Cluster health: 3/3 reachable (2026-11-06T18:07:51Z) (Probe interval: 1m56.754608943s); sc-stockage (localhost) 192.168.161.13 1/1 1/1; sc-build 192.168.161.12 1/1 1/1; sc-confiance 192.168.161.11 1/1 1/1
+sc-confiance : Cluster health: 3/3 reachable (2026-11-06T18:07:40Z) (Probe interval: 1m56.754608943s); sc-confiance (localhost) 192.168.161.11 1/1 1/1; sc-build 192.168.161.12 1/1 1/1; sc-stockage 192.168.161.13 1/1 1/1
+## verdicts refusés de l'hôte depuis H4, deux minutes de relevé
+sc-confiance : 0 refus de politique
+sc-build : 0 refus de politique
+sc-stockage : 0 refus de politique
+## complément du 18:12:17 UTC : le premier relevé groupait sur une étiquette absente, l'étiquette réelle est noeud
+  sc-build 72
+  sc-confiance 4396
+  sc-stockage 1413
