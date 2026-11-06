@@ -70,7 +70,10 @@ spec:
         - name: TMPDIR
           value: /tmp
         resources:
+          requests:
+            cpu: 50m
           limits:
+            cpu: "1"
             memory: 1Gi
         securityContext:
           allowPrivilegeEscalation: false
@@ -96,7 +99,10 @@ spec:
         - name: TMPDIR
           value: /tmp
         resources:
+          requests:
+            cpu: 50m
           limits:
+            cpu: "1"
             memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -125,7 +131,10 @@ spec:
         - name: TMPDIR
           value: /tmp
         resources:
+          requests:
+            cpu: 50m
           limits:
+            cpu: "1"
             memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -152,7 +161,10 @@ spec:
         - name: TMPDIR
           value: /tmp
         resources:
+          requests:
+            cpu: 50m
           limits:
+            cpu: "1"
             memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -183,7 +195,10 @@ spec:
         - name: TMPDIR
           value: /tmp
         resources:
+          requests:
+            cpu: 50m
           limits:
+            cpu: "1"
             memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false

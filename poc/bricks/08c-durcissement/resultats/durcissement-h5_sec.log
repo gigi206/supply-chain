@@ -1,0 +1,34 @@
+# durcissement.sh h5_sec, 2026-11-06T19:12:57Z, DISTRO=rke2
+## correctifs de limites, dry-run serveur
+OK   CronJob declencheurs/rattrapage
+OK   CronJob horodatage/horodatage
+OK   CronJob scan/scan-sample-app
+OK   Deployment tekton-chains/tekton-chains-controller
+OK   Deployment tekton-pipelines/tekton-events-controller
+OK   Deployment tekton-pipelines/tekton-pipelines-controller
+OK   Deployment tekton-pipelines/tekton-triggers-controller
+OK   Deployment tekton-pipelines/tekton-triggers-core-interceptors
+OK   Deployment tekton-pipelines/tekton-triggers-webhook
+OK   Deployment tsa/timestamp-authority
+OK   EventListener declencheurs/forgejo
+OK   StatefulSet openbao/openbao
+OK   config-defaults, dry-run serveur : true
+## couverture de limites-obligatoires : contrôleurs vivants, correctifs simulés appliqués
+OK   contrôleurs encore sans limite : []
+OK   EventListener : limites du conteneur : {"cpu":"250m","memory":"128Mi"}
+OK   Deployment el-forgejo : un seul conteneur, couvert par l'EventListener : 1
+## gabarits des Jobs rendus, dry-run serveur
+OK   porte-job.yaml : conteneurs sans limite ou à requête CPU autre que 50m : 0
+OK   horodatage-job.yaml : conteneurs sans limite : 0
+## requêtes de CPU ajoutées, en millicoeurs : table 290 ; porte 150 à l'exécution ; sc-confiance : 4 000 allouables, 1 875 demandés
+## règles en Deny, dry-run serveur
+OK   objets acceptés en Deny : 4
+OK   règles encore en Audit au cluster : 4
+## entorses à l'admission actuelle : toutes admises attendues, chacune ne heurtant que l'une des quatre règles
+admis temoin : 
+admis sans-limite : 
+admis image-par-tag : 
+admis jeton-default : 
+admis espace-default : 
+OK   entorses refusées par une règle déjà en Deny : 0
+RÉSULTAT : conforme

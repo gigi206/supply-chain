@@ -216,6 +216,7 @@ spec:
   - name: essai
     image: $REG/$OUTILS@$OUTILS_DIGEST
     command: [sh, -c, $(jq -Rs . <<<"$3")]
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 256Mi}}   # H5 de la 08c : limites-obligatoires
     env: [{name: HOME, value: /travail}]
     securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
     volumeMounts: [{name: travail, mountPath: /travail}]

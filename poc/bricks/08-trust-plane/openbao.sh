@@ -189,6 +189,7 @@ $tol
   - name: client
     image: $IMAGE
     command: [/bin/sh, /essai/essai.sh]
+    resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 256Mi}}   # H5 de la 08c : limites-obligatoires
     env:
     - {name: BAO_ADDR, value: "https://openbao.openbao.svc.cluster.local:8200"}
     - {name: BAO_CACERT, value: /essai/ca/ca.crt}

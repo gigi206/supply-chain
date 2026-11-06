@@ -358,6 +358,26 @@ Retour si M1 ou M2 échoue : retirer la variable de `porte-job.yaml`, aucun éta
 
 **Pics, une construction de `sample-app`, sans concurrence** : `preparer` 165 Mi et 292 m ; `publier` 88 Mi et 19 m ; `construire` 2 134 Mi et 2 282 m, cgroup de la VM ; porte 107 Mi et 485 m. Contrôleurs : Chains 43 Mi et 11 m, Pipelines 45 Mi et 51 m, Triggers 24 à 29 Mi, `el-forgejo` 19 Mi, TSA 35 Mi, OpenBao 115 Mi et 77 m. Jobs d'horodatage nommés : 22 Mi et 968 m au plus. Ce sont des pics de cette fenêtre, pas des maxima : le Job `horodatage-29899860`, qui a traité les deux enveloppes, était purgé avant la lecture des noms, et le contrôleur Pipelines n'a vu qu'une exécution. Rien n'est décidé sur les limites.
 
+**Additif du 06/11/2026, 19:13 UTC, H5 préparée à sec, rien appliqué, prédictions avant exécution.** Table : `politiques/limites.tsv` ; défaut de Tekton : `politiques/tekton-defauts.yaml` ; étapes `h5_sec`, `h5_limites`, `h5_deny` de `durcissement.sh`. Journal à sec : `resultats/durcissement-h5_sec.log`, conforme.
+
+Ce que la préparation a changé par rapport à la proposition :
+
+- **Requêtes explicites** : sans elles, l'API les égale aux limites. La porte demanderait 3 CPU sur `sc-confiance`, qui en a 2 125 m de libres, et resterait `Pending`. La table ajoute 290 m, la porte 150 m.
+- **`scan-sample-app`** : CronJob absent du relevé de 18:55, car aucun pod n'existe. Son conteneur `revocation` serait refusé sous `Deny`. Valeurs non mesurées : jamais exécuté sur ce cluster.
+- **Témoins** : `sonde_kyverno`, `pod_outils` et `pod_essai` créent des pods sans limite, que les témoins de `h5_limites` et `h5_deny` utilisent. Limites ajoutées.
+- **Essais d'admission** : les pods de `essais/` visent le CLI (compte `app` absent) et ne peuvent pas servir à l'admission. `h5_sec` part du pod réel de `rattrapage`, admis, puis applique une entorse par règle : sous les règles en service, toutes sont admises, donc chacune ne heurte que l'une des quatre règles.
+
+| Prédiction | Attendu | Confiance |
+|---|---|---|
+| L1 | `h5_limites` : rollouts prêts, OpenBao scellé puis descellé, clé Transit identique, jeton TSA, Kyverno répond | Moyenne : premier redémarrage d'OpenBao sous RKE2 durci |
+| L2 | Construction sous limites : spec identique à J7, image `3a7ca1b1`, 14 → 16 enveloppes, 53 s à 15 s près, porte `true`, contrôle 16/16, VSA 1/1, aucun `OOMKilled` ni redémarrage | Moyenne : pics pris sur une seule construction |
+| L3 | Pods créés après `h5_limites` : 0 échec de `limites-obligatoires` ; `preparer` et `publier` portent le défaut de Tekton, `step-construire` garde 2 CPU et 6 Gi | Élevée pour les limites ; moyenne pour le défaut, jamais essayé |
+| L4 | 0 refus de politique Cilium pendant la construction | Élevée |
+| D1 | `h5_deny` : `temoin` admis, quatre entorses refusées par un message `durcissement :`. `espace-default-interdit` exercée à l'admission pour la première fois | Élevée |
+| D2 | Construction sous `Deny` : mêmes attendus que L2, 16 → 18 enveloppes, contrôle 18/18, 0 `FailedCreate` sur les Jobs | Élevée si L2 tenue |
+
+**Non couvert** : `scan-sample-app` tournera le 07/11 à 09:30 UTC sous les valeurs non mesurées. Tests 1 à 4, 7 et 8 non rejoués par ces étapes. Après `h5_deny`, ne passent plus sans limites : `essai-reseau-rattrapage`, les pods de `j2-essais`, ceux de `plateforme.sh` (07a) et les cas d'admission de `politique.sh`. Les témoins admis de `preuves.sh` (`hc-pod`, `ct-pod-essai`) restent à relire avant tout rejeu. Un `tekton.sh` ou `politique.sh` rejoué effacerait les correctifs : `h5_limites` se relance ensuite. Retour : `h2_kyverno` pour l'Audit, `kubectl rollout undo` pour les limites, OpenBao à desceller.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

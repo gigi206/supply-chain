@@ -269,7 +269,7 @@ sonde_kyverno() { # pod de tsa sans nodeSelector (conforme à Pod Security restr
   img=$(kubectl get deployment -n tsa timestamp-authority -o jsonpath='{.spec.template.spec.containers[0].image}')
   jq -n --arg i "$img" '{apiVersion: "v1", kind: "Pod", metadata: {name: "sonde-kyverno", namespace: "tsa"},
     spec: {automountServiceAccountToken: false, securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
-      containers: [{name: "sonde", image: $i, securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$T/sonde-kyverno.json"
+      containers: [{name: "sonde", image: $i, resources: {limits: {cpu: "100m", memory: "64Mi"}}, securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$T/sonde-kyverno.json"
   for i in $(seq 90); do
     msg=$(kubectl create --dry-run=server -f "$T/sonde-kyverno.json" 2>&1 || true)
     grep -qF 'zone confiance : nodeSelector zone=confiance obligatoire' <<<"$msg" && break

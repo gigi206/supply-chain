@@ -1,0 +1,9 @@
+# Brique 08c, H5 : valeur de default-container-resource-requirements (config-defaults). Tekton ne l'applique qu'aux conteneurs sans ressources,
+# prepare et place-scripts compris : step-construire garde ses 2 CPU et 6 Gi, les bundles et les spec ne changent pas.
+default:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
