@@ -1,0 +1,96 @@
+# essais-h5-figees.sh, 2026-11-06T22:55:11Z, DISTRO=rke2
+Prédiction (écrite le 06/11/2026 à 22:55 UTC, avant ce relevé, après lecture du code, rien de mesuré sur ces valeurs) :
+- C1 ConfigMap porte : 14 clés sur 14 identiques aux fichiers versionnés ; cm_porte de controle6 et controle7 n'y changerait rien
+- C2 empreintes DER : clé de VSA 578dd771 (R2), clé du scanner 8cbcbb4e (G3)
+- C3 fichiers de l'hôte présents, non vides, malgré S1 : pipeline.ref, taches.key, forgejo-webhook.secret, forgejo-admin.token,
+  zot-poc-ecriture.password, zot-poc-build.password
+- C4 configuration de Zot en service = stockage/zot.json ; poc-build dans la première politique de builds/** (filtre de decision3)
+- C5 audit de Zot depuis h5_deny : écritures .att par poc-build seul, au moins 1 ; S1 n'a changé que le chemin des identifiants
+- C6 Zot : essai-webhook@3a7ca1b1, BuildKit par digest, bundle du gabarit, tous les témoins de G6, referrers VSA et scan présents ;
+  horodatage/bundles présent, les cinq dépôts d'essai du 01/11 lus par reserve_c absents (rejeu.sh le dit, sans mesure depuis le 02/11)
+- C7 cluster : gabarit en service sample-app, donc garde gabarit_essai en KO pour test5 sans condition, et pour enveloppes et decision3
+  sans PIPE_ESSAI ; blocage dû à la bascule, pas à H5 ; j7-sample-app, j6-porte-en-service-publier, j6-autre-cle présents ;
+  pipeline.ref = bundle du gabarit
+- C8 audit de l'API depuis h5_deny : 0 création réelle de PipelineRun par le compte rattrapage, chemin 2 de la bascule donc sans
+  passage sous H5 ; dernier passage du CronJob réussi, dernière ligne PRESENT
+- C9 Jobs de la porte créés depuis h5_deny : au moins 1 réussi, gabarit à conteneurs vsa, scan-verifier et scan
+- écart attendu : 0
+## C1 ConfigMap porte
+OK   clés de la ConfigMap : 14
+OK   clés identiques aux fichiers : 14
+## C2 empreintes
+OK   clé de VSA : 578dd771
+KO   clé du scanner : 1656a3fa (attendu : 8cbcbb4e)
+## C3 fichiers de l'hôte (présence, taille non nulle, jamais lus ici sauf pipeline.ref, public)
+OK   pipeline.ref : présent
+OK   taches.key : présent
+OK   forgejo-webhook.secret : présent
+OK   forgejo-admin.token : présent
+OK   zot-poc-ecriture.password : présent
+OK   zot-poc-build.password : présent
+## C4 configuration de Zot
+OK   empreinte en service : 5806ba5c431d3e292fd96163bbf2e9d7936cea698c82dd844998f3324bd184cf
+OK   poc-build dans la première politique de builds/** : true
+## C5 audit de Zot, écritures .att depuis 2026-11-06T19:26:00Z
+  12 poc-build
+  6 poc-ecriture
+KO   comptes : poc-build,poc-ecriture (attendu : poc-build)
+OK   au moins une écriture
+## C6 Zot
+OK   builds/essai-webhook@3a7ca1b1 : 200
+OK   BuildKit par digest : 200
+OK   bundle du gabarit : 200
+témoins G6 présents : 14 sur 14 digests distincts
+KO   aucun referrer dans builds/sample-app
+OK   referrers de builds/vsa/sample-app : 1
+OK   referrers de builds/scan/sample-app : 3
+OK   horodatage/bundles : 200
+OK   dépôt d'essai copie-20261101t120333z (reserve_c) : 404
+OK   dépôt d'essai copie-20261101t122804z (reserve_c) : 404
+OK   dépôt d'essai partiel-20261101t120333z (reserve_c) : 404
+OK   dépôt d'essai partiel-20261101t122804z (reserve_c) : 404
+OK   dépôt d'essai webhook-seul-20261101t122804z (reserve_c) : 404
+## C7 cluster
+OK   pipeline du gabarit en service : sample-app
+OK   pipeline.ref = bundle du gabarit : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
+OK   PipelineRun j7-sample-app : pipelinerun.tekton.dev/j7-sample-app
+OK   TaskRun j6-porte-en-service-publier : taskrun.tekton.dev/j6-porte-en-service-publier
+OK   TaskRun j6-autre-cle : taskrun.tekton.dev/j6-autre-cle
+## C8 rattrapage
+OK   créations réelles depuis h5_deny : 0
+dernier passage réussi : rattrapage-29900095
+OK   dernière ligne du passage : PRESENT
+## C9 Jobs de la porte depuis 2026-11-06T19:26:00Z
+créés 0, réussis 0, en échec 0
+aucun réussi
+KO   conteneur vsa absent du dernier Job réussi
+KO   conteneur scan-verifier absent du dernier Job réussi
+KO   conteneur scan absent du dernier Job réussi
+## bilan : 6 écart(s) aux prédictions
+## complément, 2026-11-06T22:55:36Z, lectures seules, cause des six KO ci-dessus
+- clé du scanner : texte figé de preuves.sh, affiché seulement ; dernier commit du fichier versionné :
+  1f66a3c 2026-11-06T17:00:27+01:00 Brique 08b, référence RKE2 (06/11/2026, 16:00 UTC) : reprise à J8 (contrôleurs) sur décision du propriétaire, 15:2
+  2838:  echo "clé du scanner : $(openssl pkey -pubin -in "$s" -outform DER | sha256sum | cut -c1-64) (empreinte DER ; G3 : 8cbcbb4e…)"
+  contrôle 7 du dernier Job jugé sous H5 (preuves-h5-r4-construction_durcie.log), champs 11 et 12 :
+  ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+- écritures .att depuis h5_deny, par compte et préfixe de dépôt :
+  6 poc-build /v2/builds/essai-webhook
+  6 poc-build /v2/builds/sample-app
+  6 poc-ecriture /v2/essais-j8/test7
+- referrers de builds/sample-app : HTTP et nombre, sans -f :
+  {"http":"200","manifests":0}
+  fonction referrers de preuves.sh, définie ainsi :
+  08-trust-plane/preuves.sh:2766:referrers() { # dépôt : nombre de referrers de l'image réelle dans ce dépôt (lecture anonyme), ou « absent ou illisible »
+  08-trust-plane/tsa.sh:355:referrers() { # dépôt : referrers de l'image d'essai dans ce dépôt (API OCI 1.1 de Zot, lecture anonyme)
+  tags .sig et .att de l'image réelle :
+  sig : 200
+  att : 200
+- Jobs de la porte : durée de vie et présents :
+  23:  ttlSecondsAfterFinished: 3600
+  Jobs dans porte : 0
+  VERDICT sous H5, journal, lignes, contrôle 7 ok :
+  preuves-h5-test7 : 13, 3
+  preuves-h5-test8 : 15, 12
+  preuves-h5-r4-construction_durcie : 1, 1
+  preuves-h6-construction_durcie : 1, 1
+## prédiction D, écrite le 06/11/2026 à 22:56 UTC, avant ce dry-run : PipelineRun rendu du gabarit en service, tel que l'étape bascule le présente, admis en dry-run serveur au nom de el-forgejo et du compte rattrapage sous H1 à H5, deux fois created (server dry run), aucun objet créé
