@@ -387,6 +387,19 @@ Ce que la préparation a changé par rapport à la proposition :
 - **Passages de `h5_sec`, journal écrasé à chaque passage** : le premier concluait « conforme » alors que les neuf pods de `essais/` étaient refusés pour un compte absent, le contrôle ne portant pas dessus ; le deuxième a échoué sur le script, `kubectl` lisant `/dev/null`. Le journal archivé est celui de la version finale.
 - **Temps** : environ 10 h par les écarts entre commits depuis le 05/11, briques 08b et 08c confondues, sans chrono propre à la 08c. Borne de décision : 20 h.
 
+**Additif du 06/11/2026, 19:25 UTC, `h5_limites` appliquée sur accord du propriétaire, 19:19:17 à 19:20:23 UTC, et construction de contrôle, règles en Audit.** Journaux : `durcissement-h5_limites.log`, `durcissement-flux-limites.log`, `durcissement-h5-pics-limites.log`, et dans `08-trust-plane/resultats/` : `preuves-construction_limites.log`, `openbao-controle-h5.log`, `openbao-deverrouiller-h5.log`, `tsa-temoin-h5.log`.
+
+| Prédiction | Résultat |
+|---|---|
+| L1 | **Tenue** : OpenBao redémarré puis descellé en quelques secondes, premier redémarrage sous RKE2 durci. Clé Transit identique, signature témoin vérifiée, jeton TSA vérifié, Kyverno répond, Chains relit ses identifiants dans OpenBao. CronJobs repris, dernier passage à 19:20:00 UTC |
+| L2 | **Tenue** : spec identique à J7, image `3a7ca1b1`, 14 → 16 enveloppes, 47 bundles, 61 s contre 53 s, dans la marge, porte `true`, contrôle 16/16, VSA 1/1, non signée et rejeu refusés, aucune anomalie, aucun `OOMKilled` ni redémarrage. Une seule mesure : les 8 s ne sont pas attribuées |
+| L3 | **Tenue** : aucun pod créé depuis 19:20 UTC sans limite. `preparer` et `publier` portent le défaut de Tekton, `prepare` et `place-scripts` aussi, `step-construire` garde 2 CPU et 6 Gi. Spec inchangée : le défaut n'atteint pas les bundles |
+| L4 | **Tenue** : 0 refus de politique sur les trois nœuds, 9 423 verdicts relevés |
+
+**Pics sous limites** : `preparer` 162 Mi et 217 m, `publier` 86 Mi et 38 m, VM de `construire` 2 127 Mi et 2 226 m, porte 109 Mi et 200 m. Job `horodatage-29899883`, celui qui a traité les deux enveloppes : 21 Mi et 745 m. Passages sans enveloppe : jusqu'à 971 m. Cette fois, le pod nommé donne le pic du passage utile que la mesure de 19:07 n'avait pas. Le CPU reste non attribué entre ses conteneurs.
+
+**Encore ouvert** : `scan-sample-app` non exécuté, passage prévu le 07/11 à 09:30 UTC. Les règles restent en Audit : `h5_deny` demande un accord séparé.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

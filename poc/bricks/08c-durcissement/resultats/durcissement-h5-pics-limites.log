@@ -1,0 +1,70 @@
+résumé du 06/11/2026 à 19:24:57 UTC
+échantillons : 48 de kubectl top, 351 de cgroups
+lignes de kubectl top sur les pods de la construction : 12, sur ceux de la porte : 0
+(pod disparu) 0e20120b_e517_41a4_a45d_95d89dd05dd2 - 19 Mi 2098 m
+(pod disparu) 5108e6a4_da3c_41bf_9a8b_f0eb8d06f8bd - 6 Mi 3 m
+(pod disparu) 56b92546_c9ed_4ca1_afc1_cc59a7731dbc - 21 Mi 0 m
+(pod disparu) 620e50f5_4630_460d_b59c_20b90fa86ef9 - 7 Mi 0 m
+(pod disparu) 81dca8a1_5104_42b7_91a2_19212550f14c - 21 Mi 850 m
+(pod disparu) e549a2bd_d4be_4688_ab52_c3ec71879844 - 7 Mi 0 m
+builds sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod (pause ou sandbox) 6 Mi 0 m
+builds sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod - 162 Mi 217 m
+builds sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod step-entrees 17 Mi 11 m
+builds sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod step-sources 8 Mi 0 m
+builds sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod (pause ou sandbox) 5 Mi 0 m
+builds sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod - 86 Mi 38 m
+builds sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod step-publier 20 Mi 5 m
+builds sample-app-6391fd437f2669687e9b7cc76faf05b526d9bfccede94a6c-pod (pause ou sandbox) 2127 Mi 2222 m
+builds sample-app-6391fd437f2669687e9b7cc76faf05b526d9bfccede94a6c-pod - 2127 Mi 2226 m
+declencheurs el-forgejo-76596b99b8-wmm97 (pause ou sandbox) 5 Mi 0 m
+declencheurs el-forgejo-76596b99b8-wmm97 - 15 Mi 3 m
+declencheurs el-forgejo-76596b99b8-wmm97 event-listener 15 Mi 3 m
+declencheurs rattrapage-29899883-k92kz - 6 Mi 21 m
+declencheurs rattrapage-29899884-rrnfv (pause ou sandbox) 4 Mi 0 m
+declencheurs rattrapage-29899884-rrnfv - 6 Mi 0 m
+declencheurs rattrapage-29899884-rrnfv rattrapage 0 Mi 0 m
+horodatage horodatage-29899882-dq8gb (pause ou sandbox) 6 Mi 0 m
+horodatage horodatage-29899882-dq8gb - 20 Mi 971 m
+horodatage horodatage-29899882-dq8gb horodater 20 Mi 154 m
+horodatage horodatage-29899883-kgrqp (pause ou sandbox) 6 Mi 0 m
+horodatage horodatage-29899883-kgrqp - 21 Mi 745 m
+horodatage horodatage-29899883-kgrqp horodater 20 Mi 0 m
+horodatage horodatage-29899884-7zlrl (pause ou sandbox) 6 Mi 0 m
+horodatage horodatage-29899884-7zlrl - 19 Mi 665 m
+horodatage horodatage-29899884-7zlrl horodater 18 Mi 0 m
+openbao openbao-0 (pause ou sandbox) 5 Mi 0 m
+openbao openbao-0 - 56 Mi 84 m
+openbao openbao-0 openbao 56 Mi 84 m
+porte porte-ba-webhook-zvdjk (pause ou sandbox) 6 Mi 0 m
+porte porte-ba-webhook-zvdjk - 109 Mi 200 m
+porte porte-ba-webhook-zvdjk horodatage 20 Mi 0 m
+porte porte-ba-webhook-zvdjk porte 109 Mi 0 m
+porte porte-ba-webhook-zvdjk scan 13 Mi 0 m
+tekton-chains tekton-chains-controller-74657877bf-tsxkj (pause ou sandbox) 6 Mi 0 m
+tekton-chains tekton-chains-controller-74657877bf-tsxkj - 29 Mi 14 m
+tekton-chains tekton-chains-controller-74657877bf-tsxkj tekton-chains-controller 29 Mi 14 m
+tekton-pipelines tekton-events-controller-56d956d45f-jjzmg (pause ou sandbox) 6 Mi 0 m
+tekton-pipelines tekton-events-controller-56d956d45f-jjzmg - 20 Mi 4 m
+tekton-pipelines tekton-events-controller-56d956d45f-jjzmg tekton-events-controller 20 Mi 4 m
+tekton-pipelines tekton-pipelines-controller-5777f5879c-lvsjs (pause ou sandbox) 4 Mi 0 m
+tekton-pipelines tekton-pipelines-controller-5777f5879c-lvsjs - 31 Mi 68 m
+tekton-pipelines tekton-pipelines-controller-5777f5879c-lvsjs tekton-pipelines-controller 31 Mi 68 m
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-5tlqd (pause ou sandbox) 6 Mi 0 m
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-5tlqd - 113 Mi 152 m
+tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-5tlqd webhook 113 Mi 152 m
+tekton-pipelines tekton-triggers-controller-7b6f5d498d-fw2lr (pause ou sandbox) 4 Mi 0 m
+tekton-pipelines tekton-triggers-controller-7b6f5d498d-fw2lr - 16 Mi 2 m
+tekton-pipelines tekton-triggers-controller-7b6f5d498d-fw2lr tekton-triggers-controller 16 Mi 2 m
+tekton-pipelines tekton-triggers-core-interceptors-558f59555b-c9qnn (pause ou sandbox) 6 Mi 0 m
+tekton-pipelines tekton-triggers-core-interceptors-558f59555b-c9qnn - 18 Mi 4 m
+tekton-pipelines tekton-triggers-core-interceptors-558f59555b-c9qnn tekton-triggers-core-interceptors 18 Mi 4 m
+tekton-pipelines tekton-triggers-webhook-69749f8779-c5nzm (pause ou sandbox) 6 Mi 0 m
+tekton-pipelines tekton-triggers-webhook-69749f8779-c5nzm - 16 Mi 2 m
+tekton-pipelines tekton-triggers-webhook-69749f8779-c5nzm webhook 16 Mi 2 m
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n (pause ou sandbox) 5 Mi 0 m
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n - 23 Mi 14 m
+tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n controller 23 Mi 14 m
+tsa timestamp-authority-5c5f65646-s7w9f (pause ou sandbox) 5 Mi 0 m
+tsa timestamp-authority-5c5f65646-s7w9f - 30 Mi 1 m
+tsa timestamp-authority-5c5f65646-s7w9f renouvellement 18 Mi 0 m
+tsa timestamp-authority-5c5f65646-s7w9f timestamp-server 11 Mi 1 m
