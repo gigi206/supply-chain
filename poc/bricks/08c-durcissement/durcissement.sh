@@ -297,9 +297,15 @@ etape_flux() { # ${DUREE:-420} s de verdicts et de refus sur les trois agents, d
   done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json | jq -r '.items[] | "\(.metadata.name) \(.spec.nodeName)"')
   wait
   date -u '+fin %H:%M:%S UTC'
+  etape_flux_resume
+}
+
+etape_flux_resume() { # relit le dernier relevé de flux
+  exige_rke2
+  local d=$T/flux n
   for n in sc-confiance sc-build sc-stockage; do
     echo "## $n : $(wc -l < "$d/$n.txt") verdicts, $(grep -c 'action deny' "$d/$n.txt" || true) refusés, $(grep -c 'Policy denied' "$d/$n-refus.txt" || true) refus de politique"
-    grep -h -E 'action deny|Policy denied' "$d/$n.txt" "$d/$n-refus.txt" | sed -E 's/^.*(ingress|egress), action deny.*, ([0-9.]+)(:[0-9]+)? -> ([0-9.]+)(:[0-9]+)?.*/\1 \2 -> \4\5/; s/.*Policy denied[^,]*,? *//' | cut -c1-110 | sort | uniq -c | sort -rn | head -n 20
+    { grep -h 'action deny' "$d/$n.txt" || true; } | sed -E 's/^.*(ingress|egress), action deny.*, ([0-9.]+)(:[0-9]+)? -> ([0-9.]+)(:[0-9]+)?.*/\1 \2 -> \4\5/' | sort | uniq -c | sort -rn | head -n 20
   done
 }
 

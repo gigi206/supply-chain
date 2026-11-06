@@ -1,0 +1,21 @@
+# Brique 08c : l'EventListener de declencheurs appelle les intercepteurs de Triggers, dans tekton-pipelines, que espaces-sans-politique isole.
+# Relevé par la construction de contrôle du 06/11/2026 : webhook sans effet depuis H4, flux absent de l'audit de H3, fait au repos. Règle
+# séparée, bornée à ce pod et à ce port : declencheurs ne rejoint pas la liste, qui lui ouvrirait tous les espaces de la plateforme.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: intercepteurs-declencheurs
+spec:
+  description: "Intercepteurs de Triggers : l'EventListener forgejo seulement"
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: tekton-pipelines
+      k8s:app: tekton-triggers-core-interceptors
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: declencheurs
+            k8s:eventlistener: forgejo
+      toPorts:
+        - ports:
+            - {port: "8443", protocol: TCP}

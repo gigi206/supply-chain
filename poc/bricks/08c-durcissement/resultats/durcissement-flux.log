@@ -1,0 +1,7 @@
+# durcissement.sh flux, 2026-11-06T18:14:39Z, DISTRO=rke2
+début 18:14:39 UTC
+fin 18:21:39 UTC
+## sc-confiance : 10545 verdicts, 9 refusés, 9 refus de politique
+      9 ingress 10.42.0.158 -> 10.42.0.157:8443
+      9 ifindex 110, file bpf_lxc.c:2401, , identity 1457->9356: 10.42.0.158:53666 -> 10.42.0.157:8443 tcp SYN
+## sc-build : 13 verdicts, 0 refusés, 0 refus de politique

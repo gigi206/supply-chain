@@ -1,0 +1,8 @@
+# preuves.sh construction_durcie, 2026-11-06T18:14:50Z
+OK   aucune exécution en cours ni en attente de Chains
+depart : COUVERTE 31, ECHEC_SIGNATURE 8, SANS_SUJET 20
+OK   départ : aucune anomalie
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 enveloppes, dernière provenance de PipelineRun : 3e07c6a6-ada0-4c11-8bea-8a37c1821930 (2026-11-06T15:19:13Z)
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+KO   webhook : aucun PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+CronJob rattrapage repris

@@ -142,6 +142,23 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 | C5 | `PASSAGE=apres preuves.sh reelle` : `ec` admet, contrôle 9 `ok`, VSA encore retenue pour ce digest | Moyenne : nouvelle provenance, VSA plus ancienne |
 | C6 | 0 refus du pare-feu d'hôte pendant la construction ; refus seulement si `construire-image` tente une sortie, ce qu'elle ne fait pas | Moyenne |
 
+**Additif du 06/11/2026, 18:23 UTC, construction de contrôle : le webhook ne fonctionne plus depuis H4, la construction et la porte passent.** Webhook de 18:14:50 UTC ([journal de la construction](resultats/preuves-construction_durcie.log), [flux](resultats/durcissement-flux_resume.log), [porte](resultats/preuves-reelle.log)).
+
+**Défaut de H4** : `espaces-sans-politique` isole `tekton-pipelines`, et `declencheurs` n'est pas dans sa liste. `el-forgejo` n'atteint plus `tekton-triggers-core-interceptors:8443` : 9 refus, `i/o timeout` dans son journal, aucun PipelineRun. Forgejo répond pourtant `HTTP 204`. L'audit de H3, au repos, sans webhook, ne pouvait pas le voir. Le CronJob `rattrapage`, repris à la fin du script, a créé le PipelineRun à 18:18:58 UTC : c'est lui qui a construit. L'attente de `ba_chemin` a échoué avant : l'étape `construction_durcie` finit en KO, et ses contrôles de fin n'ont pas tourné.
+
+| Prédiction | Résultat |
+|---|---|
+| C1 : webhook à travers le pare-feu d'hôte | **Non tenue.** Forgejo et le NodePort passent, l'échec est après, entre l'EventListener et les intercepteurs |
+| C2 : même image, Kata, spec identique | **En partie** : `3a7ca1b1`, `construire` sous Kata sur `sc-build`, 3 TaskRuns vérifiés et signés. Spec non comparée, par le chemin du rattrapage |
+| C3 : durée, `pod-max-pids`, `seccomp-default` | **Tenue** : 58 s pour 55 s de référence, aucun pod gêné |
+| C4 : 2 enveloppes, porte | **En partie** : 6 puis 8 enveloppes, porte `true`, contrôle 9 `ok`, 8/8 couvertes. Contrôle exécutions/enveloppes de fin non passé |
+| C5 : `reelle`, VSA retenue | **Tenue** : `ec` admet, 1/1 VSA retenue |
+| C6 : 0 refus du pare-feu d'hôte | **Tenue** : le seul refus du relevé vient d'une politique de pod |
+
+**Correctif préparé, non appliqué** : `politiques/cilium/intercepteurs.yaml`, accepté à sec par l'API. Règle séparée, bornée à l'EventListener et au port 8443. Ajouter `declencheurs` à `espaces-sans-politique` lui aurait ouvert toute la plateforme.
+
+**Reste faux tant qu'il n'est pas appliqué** : un commit n'est construit qu'au passage suivant du rattrapage. **Non rejoué sous H4** : les 8 tests négatifs, dont le test 5, sauf le test 6. Le relevé `flux` s'est arrêté sur un `grep` sans résultat : `flux_resume` relit les mêmes données brutes.
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

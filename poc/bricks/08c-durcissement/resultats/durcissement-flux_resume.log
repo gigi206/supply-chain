@@ -1,0 +1,5 @@
+# durcissement.sh flux_resume, 2026-11-06T18:23:47Z, DISTRO=rke2
+## sc-confiance : 10545 verdicts, 9 refusés, 9 refus de politique
+      9 ingress 10.42.0.158 -> 10.42.0.157:8443
+## sc-build : 13 verdicts, 0 refusés, 0 refus de politique
+## sc-stockage : 3906 verdicts, 0 refusés, 0 refus de politique
