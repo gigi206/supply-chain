@@ -1,0 +1,214 @@
+# rke2.sh cis, 2026-11-06T13:08:22Z
+OK   kube-bench_0.16.0_linux_amd64.tar.gz
+## sc-confiance, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+== Summary master ==
+54 checks PASS
+0 checks FAIL
+5 checks WARN
+0 checks INFO
+== Summary etcd ==
+7 checks PASS
+0 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+1 checks PASS
+0 checks FAIL
+4 checks WARN
+0 checks INFO
+[WARN] 4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)
+[WARN] 4.2.13 Ensure that a limit is set on pod PIDs (Manual)
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+16 checks PASS
+1 checks FAIL
+2 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+78 checks PASS
+5 checks FAIL
+40 checks WARN
+7 checks INFO
+## sc-build, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[FAIL] 1.1.1 Ensure that the API server pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.2 Ensure that the API server pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.3 Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.5 Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root (Automated)
+[WARN] 1.1.7 Ensure that the etcd pod specification file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive (Manual)
+[WARN] 1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd (Manual)
+[FAIL] 1.1.13 Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.14 Ensure that the admin.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.15 Ensure that the scheduler.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.16 Ensure that the scheduler.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.17 Ensure that the controller-manager.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.18 Ensure that the controller-manager.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[FAIL] 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600 (Automated)
+[FAIL] 1.2.1 Ensure that the --anonymous-auth argument is set to false (Automated)
+[FAIL] 1.2.2 Ensure that the --token-auth-file parameter is not set (Automated)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[FAIL] 1.2.4 Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate (Automated)
+[FAIL] 1.2.5 Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)
+[FAIL] 1.2.6 Ensure that the --authorization-mode argument is not set to AlwaysAllow (Automated)
+[FAIL] 1.2.7 Ensure that the --authorization-mode argument includes Node (Automated)
+[FAIL] 1.2.8 Ensure that the --authorization-mode argument includes RBAC (Automated)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[FAIL] 1.2.10 Ensure that the admission control plugin AlwaysAdmit is not set (Automated)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+[FAIL] 1.2.12 Ensure that the admission control plugin ServiceAccount is set (Automated)
+[FAIL] 1.2.13 Ensure that the admission control plugin NamespaceLifecycle is set (Automated)
+[FAIL] 1.2.14 Ensure that the admission control plugin NodeRestriction is set (Automated)
+[FAIL] 1.2.15 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.2.16 Ensure that the --audit-log-path argument is set (Automated)
+[FAIL] 1.2.17 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)
+[FAIL] 1.2.18 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)
+[FAIL] 1.2.19 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)
+[FAIL] 1.2.20 Ensure that the --request-timeout argument is set as appropriate (Automated)
+[FAIL] 1.2.21 Ensure that the --service-account-lookup argument is set to true (Automated)
+[FAIL] 1.2.22 Ensure that the --service-account-key-file argument is set as appropriate (Automated)
+[FAIL] 1.2.23 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate (Automated)
+[FAIL] 1.2.24 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Automated)
+[FAIL] 1.2.25 Ensure that the --client-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.2.26 Ensure that the --etcd-cafile argument is set as appropriate (Automated)
+[FAIL] 1.2.27 Ensure that the --encryption-provider-config argument is set as appropriate (Automated)
+[FAIL] 1.2.28 Ensure that encryption providers are appropriately configured (Automated)
+[FAIL] 1.2.29 Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Automated)
+[WARN] 1.3.1 Ensure that the --terminated-pod-gc-threshold argument is set as appropriate (Manual)
+[FAIL] 1.3.2 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.3.3 Ensure that the --use-service-account-credentials argument is set to true (Automated)
+[FAIL] 1.3.4 Ensure that the --service-account-private-key-file argument is set as appropriate (Automated)
+[FAIL] 1.3.5 Ensure that the --root-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)
+[FAIL] 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+[FAIL] 1.4.1 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+== Summary master ==
+2 checks PASS
+48 checks FAIL
+9 checks WARN
+0 checks INFO
+[FAIL] 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)
+[FAIL] 2.2 Ensure that the --client-cert-auth argument is set to true (Automated)
+[FAIL] 2.3 Ensure that the --auto-tls argument is not set to true (Automated)
+[FAIL] 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)
+[FAIL] 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Automated)
+[FAIL] 2.6 Ensure that the --peer-auto-tls argument is not set to true (Automated)
+[FAIL] 2.7 Ensure that a unique Certificate Authority is used for etcd (Automated)
+== Summary etcd ==
+0 checks PASS
+7 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[FAIL] 3.2.1 Ensure that a minimal audit policy is created (Automated)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+0 checks PASS
+1 checks FAIL
+4 checks WARN
+0 checks INFO
+[WARN] 4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)
+[WARN] 4.2.13 Ensure that a limit is set on pod PIDs (Manual)
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+16 checks PASS
+1 checks FAIL
+2 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+18 checks PASS
+61 checks FAIL
+44 checks WARN
+7 checks INFO

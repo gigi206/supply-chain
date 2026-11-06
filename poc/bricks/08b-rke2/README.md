@@ -246,3 +246,53 @@ Les textes précédents restent écrits. **Avec D8 à D12 en (a), aucun des cinq
 | 4f | `c1-unsigned` refusé par Kyverno, pas par PodSecurity ; verdicts de parité inchangés | Haute |
 
 La réserve demeure : un refus d'un composant non relu reste possible. La prédiction 12 reste valable : au moins un KO corrigé avant un passage complet.
+
+## Rejeu sous RKE2 (06/11/2026, 13:10 UTC)
+
+Lancé sur accord du propriétaire (« Oui, lance », 06/11/2026, 10:00 UTC, `POUSSER_VSA=1`). **Chaque étape de `rejeu.sh` a passé sous RKE2 en profil `cis`, sans KO au dernier passage de chaque étape, mais pas d'un seul tenant : le seuil n'est pas encore atteint.** Il exige un passage complet de zéro, sans KO. Le passage de zéro s'est arrêté en J7 (réseau), et la fin vient de deux reprises.
+
+| Passage | Heure (UTC) | Résultat | Cause | Suite |
+|---|---|---|---|---|
+| [1](../08-trust-plane/resultats/rejeu-rke2-premier-passage.log), de zéro | 10:01 | Arrêt avant toute installation | `$vm` développé avant son `local`, `rke2.sh` jamais exécuté | Corrigé, une seule occurrence au balayage |
+| [2](../08-trust-plane/resultats/rejeu-rke2-deuxieme-passage.log), étape RKE2 | 10:06 | RKE2 installé, KO de `cilium.sh verifier` | `rke2-runtimeclasses`, déployé par défaut : `HelmChart` et compte `helm-*` lié à `cluster-admin`, oubli de la conversion | Ajouté à `disable:`, absent de la liste documentée, confirmé à l'exécution |
+| [3](../08-trust-plane/resultats/rejeu-rke2-troisieme-passage.log), de zéro | 10:28 | J1 à J5, arrêt en J6 | Sans `crun`, l'API refuse avant Kyverno : effet de bord de la correction précédente | RuntimeClass témoin le temps des cas |
+| [Reprise à J6](../08-trust-plane/resultats/rejeu-rke2-reprise-j6.log) | 10:33 | Arrêt en J6 | Artefact de la reprise : `zone-build` déjà chargée avant `taches` | Rien à corriger, repartir de zéro |
+| [5](../08-trust-plane/resultats/rejeu-rke2-cinquieme-passage.log), de zéro | 10:35 à 11:37 | J1 à J7 (construction), arrêt en J7 (réseau) | `10.42.0.250` tirée au hasard par `tekton-pipelines-webhook` | `HORS_CIDR` choisie libre juste avant l'essai |
+| [Reprise à J7 (réseau)](../08-trust-plane/resultats/rejeu-rke2-reprise-j7.log) | 11:38 à 12:33 | Réseau, 8 tests, bascule, arrêt à `helm_cilium` | Comptage figé sous k3s : 6 comptes pour 7, celui de `local-path` étant borné à son espace | Attendu dans `distro.sh` |
+| [Reprise à J8 (helm-cilium)](../08-trust-plane/resultats/rejeu-rke2-reprise-j8.log) | 12:34 à 13:08 | Jusqu'à `fuites` et `kube-bench`, 0 KO, 2 042 s | | |
+
+Durée cumulée du passage de zéro et des deux reprises : environ 9 070 s, soit 2 h 31.
+
+### Prédictions confrontées
+
+| # | Résultat | Verdict |
+|---|---|---|
+| 1 | 0 HelmChart et 0 `kube-proxy`, mais seulement après correction ; `sc-confiance` en 12 Gi et 25 Go ; aucun ajustement des chemins CNI | Non tenue au premier essai, tenue ensuite |
+| 2 | `cilium.sh verifier` et `helm_cilium` conformes, aucun compte de service lié à `cluster-admin` | Tenue |
+| 3 | Pod Kata privilégié refusé par le défaut `cis`, admis après l'exemption | Tenue |
+| 4 | 4a à 4f tenues : Chains signe sous `restricted`, `dns` résout en 65532, `builds` conforme à l'état final, violations tracées pour l'étape seule, pipelines construites après J6, `c1-unsigned` refusé par Kyverno. Aucun refus d'un composant non relu | Tenue |
+| 5 | Aucune adaptation de NetworkPolicy, `kubectl top nodes` répond | Tenue |
+| 6 | Image `3a7ca1b1`, binaire `e3749c68`, fermeture `74c265e7` | Tenue |
+| 7 | Test 6 : Zot, Forgejo, API, externe, 9345 et 2379 refusés à `construire-image`, joints par la contre-épreuve. La limite reste : une autre tâche signée garde cette sortie | Tenue |
+| 8 | Tests 1 à 5, 7 et 8, contrôles 6 et 7 conformes | Tenue |
+| 9 | 10 témoins lus dans Grafana par l'auditeur, `rke2-server.service` vu (718 lignes) ; dans Loki, seul le témoin positif trouvé. Le passage de `kube-apiserver` par la source des pods n'a pas été vérifié | Tenue en partie |
+| 10 | Au repos : `sc-stockage` 8 645 Mo libres, `sc-confiance` 14 136 Mo. Le creux pendant le scan n'a pas été mesuré, le job a réussi | Tenue au repos |
+| 11 | Voir ci-dessous | Tenue en partie : 4 contrôles sont réels |
+| 12 | Plus de 3 574 s, cinq KO corrigés | Tenue |
+
+**`kube-bench`, indicatif (D5), [journal](resultats/rke2-cis.log)** : server `sc-confiance`, 78 PASS, 5 FAIL ; agent `sc-build`, 18 PASS, 61 FAIL.
+- **Sans objet, 56 FAIL sur l'agent** : sections 1, 2 et 3, contrôles du plan de contrôle lancés sur un nœud qui n'en porte pas.
+- **Sans objet, `4.3.1` sur les deux** : `kube-proxy` n'existe pas ici.
+- **Réels, mêmes 4 contrôles sur les deux, pour la 08c** :
+  - `5.1.1` : `cluster-admin` n'est lié qu'au groupe `system:masters`, le défaut. Rien à retirer.
+  - `5.1.3` : 10 ClusterRoles à joker, dont `cluster-admin`, `rke2-cloud-controller-manager` et `tekton-triggers-admin`. Non relus un par un.
+  - `5.1.5` : 15 comptes `default` sur 19 sans `automountServiceAccountToken: false`, mais aucun pod en cours ne les utilise.
+  - `5.1.6` : 27 pods en cours sur 29 sans `automountServiceAccountToken: false` explicite. Non relu pod par pod.
+
+**Exposition de D9, relue sous RKE2** : 7 comptes sur 77 peuvent créer des pods dans `local-path-storage`, les 6 contrôleurs de `kube-system` et le provisionneur. Celui-ci n'a plus de droit sur `kube-system`.
+
+**Écarts anciens, sans lien avec RKE2** : `j5-*` en parité, `nil pointer` du CLI compris, identiques à la référence k3s du 03/11 ; export de 19b, 31 lignes de plus que le compte de Loki, le même écart qu'au rejeu du 03/11. Je n'avais pas relevé les `j5-*` au troisième passage : `parite` ne s'arrête pas dessus.
+
+**Risque résiduel** : `USURPEE` reste constante sur `sc-build`, avec sa garde. Un tirage de Cilium peut arrêter un passage.
+
+**Non prouvé** : passage d'un seul tenant ; redémarrage des VM sous RKE2 ; règles 08c, S1, cert-manager, `isBuildArtifact: true`, jamais appliqués.
