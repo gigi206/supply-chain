@@ -1,0 +1,58 @@
+relevé du 06/11/2026 à 20:58:47 UTC, rien de modifié ; fenêtre de R4 : 20:56:40 à 20:58:26 UTC
+requêtes dans la fenêtre : 1292
+## réponses par code
+    832 200
+    402 201
+      1 403
+     45 404
+     12 409
+## réponses 400 et plus, hors 404 et 409
+      1 403 get pods local-path-storage system:node:sc-build pods "helper-pod-delete-pvc-a6a65ad6-8485-4302-a2bb-898b97a1217e" is forbidden: User "system:node:sc-build" ca
+## réponses 409
+      1 create pipelineruns builds system:serviceaccount:declencheurs:el-forgejo
+      4 update pipelineruns builds system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+      1 update statefulsets builds system:serviceaccount:kube-system:statefulset-controller
+      6 update taskruns builds system:serviceaccount:tekton-pipelines:tekton-pipelines-controller
+## system:rke2-controller et comptes Triggers sur les webhooks
+     10 200 update mutatingwebhookconfigurations system:serviceaccount:kyverno:kyverno-admission-controller
+     10 200 update validatingwebhookconfigurations system:serviceaccount:kyverno:kyverno-admission-controller
+## Secrets lus par cilium-operator
+0
+## événements d'alerte depuis 20:56
+## terminaisons OOMKilled
+0
+## même refus 403 du nœud sur les pods helper de local-path, toute la conservation de l'audit (date, nœud, durée sans écart de nom)
+2026-11-06T13:35:29 system:node:sc-confiance get helper-pod-create-pvc-cbc20f9a Forbidden
+2026-11-06T13:35:29 system:node:sc-confiance get helper-pod-create-pvc-cbc20f9a Forbidden
+2026-11-06T13:35:30 system:node:sc-confiance get helper-pod-create-pvc-cbc20f9a Forbidden
+2026-11-06T14:21:44 system:node:sc-build get helper-pod-create-pvc-15c0f066 Forbidden
+2026-11-06T14:21:45 system:node:sc-build get helper-pod-create-pvc-15c0f066 Forbidden
+2026-11-06T14:21:45 system:node:sc-build get helper-pod-create-pvc-15c0f066 Forbidden
+2026-11-06T14:23:33 system:node:sc-build get helper-pod-create-pvc-b5fb7cc8 Forbidden
+2026-11-06T14:23:33 system:node:sc-build get helper-pod-create-pvc-b5fb7cc8 Forbidden
+2026-11-06T14:23:33 system:node:sc-build get helper-pod-create-pvc-b5fb7cc8 Forbidden
+2026-11-06T15:15:11 system:node:sc-build get helper-pod-create-pvc-c7abdabb Forbidden
+2026-11-06T15:18:21 system:node:sc-build get helper-pod-delete-pvc-c7abdabb Forbidden
+2026-11-06T15:18:21 system:node:sc-build get helper-pod-delete-pvc-c7abdabb Forbidden
+2026-11-06T15:18:22 system:node:sc-build get helper-pod-create-pvc-78ee39a7 Forbidden
+2026-11-06T15:18:22 system:node:sc-build get helper-pod-create-pvc-78ee39a7 Forbidden
+2026-11-06T15:18:22 system:node:sc-build get helper-pod-create-pvc-78ee39a7 Forbidden
+2026-11-06T18:14:55 system:node:sc-build get helper-pod-delete-pvc-78ee39a7 Forbidden
+2026-11-06T18:26:10 system:node:sc-build get helper-pod-delete-pvc-dd0a2443 Forbidden
+2026-11-06T18:26:10 system:node:sc-build get helper-pod-delete-pvc-dd0a2443 Forbidden
+2026-11-06T18:41:33 system:node:sc-build get helper-pod-delete-pvc-cbc05a18 Forbidden
+2026-11-06T18:41:34 system:node:sc-build get helper-pod-delete-pvc-cbc05a18 Forbidden
+2026-11-06T18:41:35 system:node:sc-build get helper-pod-create-pvc-dd149e06 Forbidden
+2026-11-06T18:41:35 system:node:sc-build get helper-pod-create-pvc-dd149e06 Forbidden
+2026-11-06T18:41:36 system:node:sc-build get helper-pod-create-pvc-dd149e06 Forbidden
+2026-11-06T18:58:22 system:node:sc-build get helper-pod-delete-pvc-dd149e06 Forbidden
+2026-11-06T19:20:53 system:node:sc-build get helper-pod-delete-pvc-b7bf8734 Forbidden
+2026-11-06T19:20:54 system:node:sc-build get helper-pod-delete-pvc-b7bf8734 Forbidden
+2026-11-06T19:20:55 system:node:sc-build get helper-pod-create-pvc-a195a388 Forbidden
+2026-11-06T19:20:55 system:node:sc-build get helper-pod-create-pvc-a195a388 Forbidden
+2026-11-06T19:20:56 system:node:sc-build get helper-pod-create-pvc-a195a388 Forbidden
+2026-11-06T19:26:55 system:node:sc-build get helper-pod-create-pvc-a6a65ad6 Forbidden
+2026-11-06T19:26:55 system:node:sc-build get helper-pod-create-pvc-a6a65ad6 Forbidden
+2026-11-06T19:26:56 system:node:sc-build get helper-pod-create-pvc-a6a65ad6 Forbidden
+2026-11-06T20:56:46 system:node:sc-build get helper-pod-delete-pvc-a6a65ad6 Forbidden
+total : 33
