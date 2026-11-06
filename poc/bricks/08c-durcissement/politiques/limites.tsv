@@ -1,6 +1,6 @@
 # Brique 08c, H5 : limites posées par durcissement.sh h5_limites. Pics relevés le 06/11/2026 (resultats/durcissement-h5-pics.log), marge d'environ 3, arrondie, sauf horodater.
 # Requêtes explicites : sans elles, l'API les égale aux limites, et sc-confiance (4 CPU, 1 875 m déjà demandés) ne pourrait plus placer la porte.
-# scan-sample-app : jamais exécuté sur ce cluster, valeurs non mesurées. Colonnes : type, espace, nom, conteneur, liste, requête CPU, requête mémoire, limite CPU, limite mémoire.
+# scan-sample-app : valeurs non mesurées, dernier passage avant H1. Colonnes : type, espace, nom, conteneur, liste, requête CPU, requête mémoire, limite CPU, limite mémoire.
 # horodater à 2 CPU : pod à 985 m au plus, CPU non attribué entre ses conteneurs, marge d'environ 2. Conteneurs d'initialisation non plafonnés : la règle ne les lit pas, et identifiants peut porter ce CPU.
 Deployment	tekton-pipelines	tekton-pipelines-controller	tekton-pipelines-controller	containers	20m	64Mi	500m	256Mi
 Deployment	tekton-pipelines	tekton-events-controller	tekton-events-controller	containers	20m	64Mi	500m	256Mi

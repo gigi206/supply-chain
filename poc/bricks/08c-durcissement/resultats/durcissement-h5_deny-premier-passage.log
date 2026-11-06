@@ -1,0 +1,32 @@
+# durcissement.sh h5_deny, 2026-11-06T19:26:05Z, DISTRO=rke2
+validatingpolicy.policies.kyverno.io/limites-obligatoires serverside-applied
+validatingpolicy.policies.kyverno.io/images-zot-par-digest serverside-applied
+validatingpolicy.policies.kyverno.io/espace-default-interdit serverside-applied
+validatingpolicy.policies.kyverno.io/jeton-compte-default serverside-applied
+OK   règles encore en Audit : 0
+KO   temoin : admis temoin : (attendu : admis temoin : )
+OK   sans-limite : refusé sans-limite : durcissement : limites de mémoire et de CPU obligatoires
+OK   image-par-tag : refusé image-par-tag : durcissement : image du Zot du PoC, par digest
+OK   jeton-default : refusé jeton-default : durcissement : le compte default ne monte pas de jeton
+OK   espace-default : refusé espace-default : durcissement : aucun pod dans l'espace default
+OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+OK   OpenBao descellé : false
+[confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
+# openbao.sh controle, 2026-11-06T19:26:07Z
+OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
+OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
+OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
+[confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
+# tsa.sh temoin, 2026-11-06T19:26:07Z
+## jeton témoin, depuis l'espace horodatage
+JOINT|essai 1
+Generating a new signed timestamp
+Artifact timestamped at 2026-11-06 19:26:09 +0000 UTC
+Wrote timestamp response to temoin.tsr
+VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
+OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 6 19:26:09 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x67FAA7B326AE7E4FB243DF61D5EBC77B1BCEFCA2 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
+OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
+OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
+KO   h5_deny

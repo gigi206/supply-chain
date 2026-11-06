@@ -512,7 +512,7 @@ etape_h5_deny() {
       jeton-default) e=refusé; m="durcissement : le compte default ne monte pas de jeton" ;;
       espace-default) e=refusé; m="$(sed -n 's/.*message: "\(durcissement : [^"]*\)".*/\1/p' "$here/politiques/kyverno/durcissement.yaml" | grep -i -m1 'default' | grep -v 'compte' || true)" ;;
     esac
-    attendu "$f" "$l" "$e $f : $m"
+    attendu "$f" "$l" "$e $f :${m:+ $m}"
   done < "$T/h5-essais.txt"
   temoins
   [ "$ko" = 0 ] || { echo "KO   h5_deny" >&2; exit 1; }

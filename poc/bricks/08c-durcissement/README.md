@@ -400,6 +400,17 @@ Ce que la préparation a changé par rapport à la proposition :
 
 **Encore ouvert** : `scan-sample-app` non exécuté, passage prévu le 07/11 à 09:30 UTC. Les règles restent en Audit : `h5_deny` demande un accord séparé.
 
+**Additif du 06/11/2026, 19:31 UTC, `h5_deny` appliquée sur accord du propriétaire, 19:26 UTC, et construction de contrôle.** Journaux : `durcissement-h5_deny.log`, `durcissement-h5_deny-premier-passage.log`, `durcissement-flux-deny.log`, et dans `08-trust-plane/resultats/` : `preuves-construction_deny.log`, `openbao-controle-deny.log`, `tsa-temoin-deny.log`.
+
+| Prédiction | Résultat |
+|---|---|
+| D1 | **Tenue au second passage** : `temoin` admis, quatre entorses refusées avec leur message exact, Kyverno, OpenBao et TSA conformes. `espace-default-interdit` a refusé à l'admission pour la première fois. Premier passage à 19:26:05 en KO sur le script seul : `read` retirait l'espace final de la ligne `temoin`, comparée avec cet espace ; verdicts identiques, construction non lancée |
+| D2 | **Tenue** : spec identique à J7, image `3a7ca1b1`, 55 s, 16 → 18 enveloppes, 49 bundles, porte `true`, contrôle 18/18, VSA 1/1, non signée et rejeu refusés, aucune anomalie, aucun `OOMKilled`. 0 `FailedCreate`, 0 refus de politique sur les trois nœuds, 9 493 verdicts relevés. `rattrapage` et `horodatage` réussissent sous `Deny` |
+
+**Correction d'une erreur de cette préparation** : `scan-sample-app` n'a pas « jamais tourné sur ce cluster », comme l'écrivent l'additif de 19:13 UTC et l'additif des corrections. Seul son `lastScheduleTime` était vide : `lastSuccessfulTime` vaut 15:40:59 UTC ce jour, avant H1. Il reste vrai que ses valeurs ne sont pas mesurées et qu'il n'a pas tourné sous H1 à H5.
+
+**H5 n'est pas close** : les quatre règles sont en `Deny` et la construction passe, mais la prédiction de l'étape comprend les tests, et les tests 1 à 4, 7 et 8 n'ont pas été rejoués sous H1 à H5. Les rôles (lecteurs de Secrets, droits des comptes de RKE2, `HelmChart` côté utilisateurs et groupes) restent à traiter. À relire : le passage de `scan-sample-app` du 07/11 à 09:30 UTC, premier sous `Deny`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
