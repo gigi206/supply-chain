@@ -1,0 +1,13 @@
+relecture du 06/11/2026 à 21:41:07 UTC, lecture seule, après h6
+sc-build pod/cilium-vs4tm créé 2026-11-06T21:35:11Z
+  refus (motif, sens, nombre) : [["Invalid source ip","EGRESS",57]]
+sc-stockage pod/cilium-46mrr créé 2026-11-06T21:35:24Z
+  refus (motif, sens, nombre) : []
+sc-confiance pod/cilium-4lgzg créé 2026-11-06T21:35:11Z
+  refus (motif, sens, nombre) : []
+192.168.161.11 : 1 mtu 1405 1 
+192.168.161.12 : 1 mtu 1405 1 
+192.168.161.13 : 1 mtu 1405 1 
+drop observés pendant 20 s sur l'agent de sc-build, hors L2 et L3 non gérés :
+      1 time=2026-11-06T21:41:10.078985675Z level=info msg="Initializing dissection cache..."
+fin

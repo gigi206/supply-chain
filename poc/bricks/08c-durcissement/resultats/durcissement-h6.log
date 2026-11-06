@@ -1,0 +1,57 @@
+# durcissement.sh h6, 2026-11-06T21:34:52Z, DISTRO=rke2
+OK   avant, chiffrement de sc-build : Encryption: Disabled
+ciliumclusterwidenetworkpolicy.cilium.io/hote-wireguard serverside-applied
+application 21:35:09 UTC
+# cilium.sh appliquer, 2026-11-06T21:35:09Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Fri Nov  6 22:35:09 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 5
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-11-06T20:53:03Z : sc-stockage=2026-11-06T21:35:24Z sc-confiance=2026-11-06T21:35:11Z sc-build=2026-11-06T21:35:11Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]
+agents prêts 21:35:36 UTC
+## connexions depuis sc-build, chaque seconde : Zot, coredns de sc-stockage, coredns de sc-confiance
+  cible 1 : 0 échec(s)
+  cible 2 : 0 échec(s)
+  cible 3 : 0 échec(s)
+  240 mesures
+OK   configuration : ["true","true","true","10.42.0.0/16","true","false"]
+OK   SSH de sc-confiance : joint
+OK   SSH de sc-build : joint
+OK   SSH de sc-stockage : joint
+OK   API : ok
+OK   Zot joignable depuis l'hôte : HTTP 200
+OK   certificats : cilium-ca 422 hubble-server-certs 423
+OK   pare-feu depuis sc-build : 6443=ouvert 2379=ferme 
+OK   témoins vers sc-stockage, par le tunnel : hote:3100=ferme hote:3001=ferme hote:5000=ouvert hote:3501=ouvert sante:3100=ferme sante:3001=ferme sante:5000=ouvert sante-stockage=ouvert sante-confiance=ouvert
+OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+OK   sc-confiance, chiffrement : Encryption: Wireguard [NodeEncryption: OptedOut, cilium_wg0 (Port: 51871, Peers: 2)]
+OK   sc-build, chiffrement : Encryption: Wireguard [NodeEncryption: Enabled, cilium_wg0 (Port: 51871, Peers: 2)]
+OK   sc-stockage, chiffrement : Encryption: Wireguard [NodeEncryption: Enabled, cilium_wg0 (Port: 51871, Peers: 2)]
+OK   cilium-46mrr, état : OK
+OK   cilium-46mrr, Hubble : Ok
+OK   cilium-4lgzg, état : OK
+OK   cilium-4lgzg, Hubble : Ok
+OK   cilium-vs4tm, état : OK
+OK   cilium-vs4tm, Hubble : Ok
+OK   redémarrages de conteneurs du cluster : 17
+sc-confiance : MTU de route 1405 1405 
+sc-confiance : refus {"Policy denied":1191,"Unsupported L2 protocol":2633,"Unsupported L3 protocol":14601}
+sc-build : MTU de route 1405 
+sc-build : refus {"Invalid source ip":57,"Policy denied":246,"Unsupported L2 protocol":402,"Unsupported L3 protocol":10112}
+sc-stockage : MTU de route 1405 1405 
+sc-stockage : refus {"Policy denied":60,"Unsupported L2 protocol":3,"Unsupported L3 protocol":8908}
+sc-build       Ready   <none>               8h    v1.35.9+rke2r1
+sc-confiance   Ready   control-plane,etcd   8h    v1.35.9+rke2r1
+sc-stockage    Ready   <none>               8h    v1.35.9+rke2r1
+OK   h6

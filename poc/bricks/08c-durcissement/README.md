@@ -581,6 +581,21 @@ Point bas sur sc-confiance : 10217 Mo pour 13641 Mo au départ, soit 3424 Mo, da
 
 **Reste de H5** : relire le passage du 07/11 à 09:30 UTC, seule preuve du déclenchement par le planificateur. Non couvert, inchangé : signature fausse et corps modifié du test 5, test 6 sous limites.
 
+**Additif du 06/11/2026, 21:41 UTC, `h6` appliquée sur accord du propriétaire (« Oui, lance h6 »), à partir de 21:34:52 UTC, passage unique, OK.** Journal [resultats/durcissement-h6.log](resultats/durcissement-h6.log), relecture [resultats/durcissement-h6-relecture.log](resultats/durcissement-h6-relecture.log). Révision 5 de la release cilium. WireGuard reste actif en attendant `h6_mesure` et `h6_retrait`, chacun avec son accord.
+
+| Prédiction | Résultat | Mesure |
+|---|---|---|
+| W1 | Tenue | Trois agents `OK`, 2 pairs chacun, `Enabled` sur sc-build et sc-stockage, `OptedOut` sur sc-confiance, interface `cilium_wg0` à 1405 sur les trois |
+| W2, aller | Tenue, mieux que prédit | 240 mesures à la seconde depuis sc-build, 0 échec vers Zot et les deux coredns, pour 60 s au plus prédites. Nouvelles connexions seulement : une connexion établie coupée ne se verrait pas. 17 redémarrages de conteneurs, inchangé |
+| W3 | Tenue sur ces témoins | Témoins vers sc-stockage inchangés par le tunnel, depuis l'hôte et l'endpoint de santé ; pas de vrai pod applicatif |
+| W4 | Tenue | Route à 1405 sur les endpoints de santé. Non prédit : coredns est aussi à 1405 sur sc-confiance et sc-stockage, alors qu'il n'a pas redémarré |
+
+Certificats 422 et 423, pare-feu, Kyverno, SSH, API et Zot inchangés. `rattrapage` a repris et réussi à 21:40:36 UTC, `horodatage` à 21:40:17 UTC.
+
+**Non prédit, cause non établie** : `Invalid source ip` à 57 en sortie sur l'agent de sc-build, recréé à 21:35:11 UTC, 0 sur les deux autres. Le compteur n'a pas bougé entre la fin de `h6` et 21:41:07 UTC, et aucun refus de ce motif n'apparaît sur 20 s de `cilium-dbg monitor`. Hubble n'en garde pas trace. Aucune valeur de référence : `refus_agent` n'existait pas avant H6.
+
+W5 à W8 restent à mesurer, le risque MTU sous Kata compris.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
