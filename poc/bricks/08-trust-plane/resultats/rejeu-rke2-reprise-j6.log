@@ -1,0 +1,168 @@
+# rejeu.sh rke2, 2026-11-06T10:29:14Z
+réseau : cilium ; reprise à J6
+## démontage : sautée (reprise à J6)
+## VM : sautée (reprise à J6)
+## RKE2 : sautée (reprise à J6)
+## Cilium : sautée (reprise à J6)
+## J2 : sautée (reprise à J6)
+## J3 : sautée (reprise à J6)
+## J4 : sautée (reprise à J6)
+## J5 : sautée (reprise à J6)
+[confiance:politique] $ poc/bricks/08-trust-plane/politique.sh image installer parite taches admission chains declencheurs restreint horodatage
+# politique.sh image, 2026-11-06T10:29:14Z
+OK   tag v1.19.2 → commit e63308f1e16c05cd009ac4864be6ec25c66b49be (signature du commit vérifiée par GitHub)
+## kyverno
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+OK   identité voisine (tag v1.19.1) : refusé (no matching)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 (cache telechargements/oci/amont/kyverno/kyverno)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyverno@sha256:f4cb07c481ab6a9a7da8338b6bc1fe4541433ee1c614548fd95319f32f4cc406 (cache telechargements/oci/amont/kyverno/kyverno)
+OK   signature de 192.168.161.13:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## kyvernopre
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 (cache telechargements/oci/amont/kyverno/kyvernopre)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:6955bdac17879ca1d2e7373e377841d0a706cde13836693a7f2d2538ee5acba1 (cache telechargements/oci/amont/kyverno/kyvernopre)
+OK   signature de 192.168.161.13:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628559b56d08363b85316819802086c9808606914f7805a244148f4 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## background-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 (cache telechargements/oci/amont/kyverno/background-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/background-controller@sha256:a2f3aac0947d32bdb879801c08b36f9fe0e3235192fcfbbce713a7826347cebf (cache telechargements/oci/amont/kyverno/background-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/background-controller@sha256:c46e124f21ef8a6bb4b48de57106808b1007edcd5ddd4ff7df5d23b9efa60ce2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## cleanup-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 (cache telechargements/oci/amont/kyverno/cleanup-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:6a60f5347fda92a453da9deff5ea83352af5e6d0511635aa582c1d4346fba0d6 (cache telechargements/oci/amont/kyverno/cleanup-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c9315080c3dafa7b765d090ced37353e89e5cd7a3f9ac69e8fb532b2 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+## reports-controller
+OK   reg.kyverno.io et ghcr.io : v1.19.2 → sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 (= digest épinglé)
+OK   signature de ghcr.io/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 (cache telechargements/oci/amont/kyverno/reports-controller)
+copié dans Zot : 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:b3b1b487706474952f22717b870dfcdbc0df8fdf61fdc794f90550318e6636d9 (cache telechargements/oci/amont/kyverno/reports-controller)
+OK   signature de 192.168.161.13:5000/amont/kyverno/reports-controller@sha256:5fb6d3e738050dbce84f60ecabaede7665fbe0578d07c1e8c912443b035e79c3 : https://sigstore.dev/cosign/sign/v1, 1 signature(s)
+# politique.sh installer, 2026-11-06T10:29:52Z
+~/.cache/supply-chain-poc/08/telechargements/kyverno/install.yaml: OK
+OK   install.yaml = config/install-latest-testing.yaml du commit e63308f1e16c05cd009ac4864be6ec25c66b49be, latest → v1.19.2 (versions et images)
+OK   rendu : local-path-storage exclu des webhooks de Kyverno
+## références d'images hors de Zot dans le manifeste rendu
+aucune
+kyverno : 71 objets, sha256 2c316496b46b8b06…
+deployment.apps/kyverno-admission-controller condition met
+deployment.apps/kyverno-background-controller condition met
+deployment.apps/kyverno-cleanup-controller condition met
+deployment.apps/kyverno-reports-controller condition met
+kyverno-admission-controller-6b78f498b9-w4xxl Running sc-confiance
+kyverno-background-controller-76bd696776-jbs4s Running sc-confiance
+kyverno-cleanup-controller-5647df8554-zrtgz Running sc-confiance
+kyverno-reports-controller-7696b58bd5-tmw9x Running sc-confiance
+## images réellement tirées (imageID des conteneurs)
+sc-stockage.poc.test:5000/amont/kyverno/background-controller@sha256:c46e124f21ef…
+sc-stockage.poc.test:5000/amont/kyverno/cleanup-controller@sha256:d7340aa7c931…
+sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720…
+sc-stockage.poc.test:5000/amont/kyverno/kyvernopre@sha256:27f3cc52e628…
+sc-stockage.poc.test:5000/amont/kyverno/reports-controller@sha256:5fb6d3e73805…
+OK   5 images, toutes tirées de sc-stockage.poc.test:5000/amont/kyverno/
+## webhooks d'admission de Kyverno
+ValidatingWebhookConfiguration kyverno-cel-exception-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-cleanup-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-exception-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-global-context-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-policy-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-resource-validating-webhook-cfg : Fail
+ValidatingWebhookConfiguration kyverno-ttl-validating-webhook-cfg : Ignore
+MutatingWebhookConfiguration kyverno-policy-mutating-webhook-cfg : Fail
+MutatingWebhookConfiguration kyverno-resource-mutating-webhook-cfg : Fail
+MutatingWebhookConfiguration kyverno-verify-mutating-webhook-cfg : Ignore
+# politique.sh parite, 2026-11-06T10:29:58Z
+## banc C : 17 cas poussés dans Zot (192.168.161.13:5000/bench/), clés de test du banc
+Private key written to chains.key
+Public key written to chains.pub
+Private key written to vsa.key
+Public key written to vsa.pub
+Private key written to rogue.key
+Public key written to rogue.pub
+préparé : ok → 192.168.161.13:5000/bench/ok@sha256:a042bb549860…
+préparé : c1-unsigned → 192.168.161.13:5000/bench/c1-unsigned@sha256:c45d8ab9918b…
+préparé : c1-rogue → 192.168.161.13:5000/bench/c1-rogue@sha256:4967810ded8f…
+préparé : c2-no-prov → 192.168.161.13:5000/bench/c2-no-prov@sha256:af882b6aa413…
+préparé : c2-bad-builder → 192.168.161.13:5000/bench/c2-bad-builder@sha256:3f2151e820ea…
+préparé : c3-bad-source → 192.168.161.13:5000/bench/c3-bad-source@sha256:472a22eadb8b…
+préparé : c4-unpinned → 192.168.161.13:5000/bench/c4-unpinned@sha256:08d8d7e6726e…
+préparé : c4-external-dep → 192.168.161.13:5000/bench/c4-external-dep@sha256:4334310a38cc…
+préparé : c5-untrusted-task → 192.168.161.13:5000/bench/c5-untrusted-task@sha256:5f90261918a2…
+préparé : c6-no-vsa → 192.168.161.13:5000/bench/c6-no-vsa@sha256:5d1b7395a814…
+préparé : c6-vsa-failed → 192.168.161.13:5000/bench/c6-vsa-failed@sha256:1b41c6bb1ae2…
+préparé : c6-vsa-wrong-key → 192.168.161.13:5000/bench/c6-vsa-wrong-key@sha256:477a48e51933…
+préparé : c7-kev → 192.168.161.13:5000/bench/c7-kev@sha256:f5e7918739d2…
+préparé : c7-kev-vex-ok → 192.168.161.13:5000/bench/c7-kev-vex-ok@sha256:84c72575d1df…
+préparé : c7-mal → 192.168.161.13:5000/bench/c7-mal@sha256:67ab0f19de51…
+préparé : c8-licence → 192.168.161.13:5000/bench/c8-licence@sha256:040c875218c4…
+préparé : c10-vex-expired → 192.168.161.13:5000/bench/c10-vex-expired@sha256:94bb4291d45e…
+  écart avec le modèle du banc : <     - glob: "localhost:5000/*"
+  écart avec le modèle du banc : >     - glob: "192.168.161.13:5000/bench/*"
+OK   dry-run serveur évalué par Kyverno : c1-unsigned refusé (Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containe)
+OK   ok : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   c1-unsigned : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c1-rogue : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c2-no-prov : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c2-bad-builder : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c3-bad-source : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c4-unpinned : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c4-external-dep : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c5-untrusted-task : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-no-vsa : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-vsa-failed : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c6-vsa-wrong-key : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c7-kev : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c7-kev-vex-ok : CLI PASS (code 0), admission PASS (attendu PASS)
+OK   c7-mal : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c8-licence : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   c10-vex-expired : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+## J5 : contrôle 9, attestor à clé sans journal ; une politique par variante (pas de cache partagé entre variantes)
+OK   j5-temoin : CLI PASS (code 0), admission PASS (attendu PASS)
+ÉCART j5-jeton-valide : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containe) (attendu PASS)
+OK   j5-sans-jeton : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+OK   j5-aucun-bundle : CLI FAIL (code 1), admission FAIL (attendu FAIL)
+ÉCART j5-jeton-altere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containe) (attendu FAIL)
+ÉCART j5-autre-signature : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containe) (attendu FAIL)
+ÉCART j5-tsa-etrangere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memory address or nil pointer dereference), admission FAIL (Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containe) (attendu FAIL)
+OK   j5-att-historique : CLI FAIL (code 1), admission FAIL (attendu PASS)
+## synthèse
+  écart de libellé : j5-jeton-valide (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-jeton-altere (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-autre-signature (CLI ERREUR (code 1), admission FAIL)
+  écart de libellé : j5-tsa-etrangere (CLI ERREUR (code 1), admission FAIL)
+parité des libellés : 21 cas sur 25 ; parité des décisions (admis ou refusé) : 25 cas sur 25
+  CLI ≠ attendu : j5-jeton-valide (ERREUR (code 1) au lieu de PASS)
+  admission ≠ attendu : j5-jeton-valide (FAIL au lieu de PASS)
+  CLI ≠ attendu : j5-jeton-altere (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-autre-signature (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-tsa-etrangere (ERREUR (code 1) au lieu de FAIL)
+  CLI ≠ attendu : j5-att-historique (FAIL (code 1) au lieu de PASS)
+  admission ≠ attendu : j5-att-historique (FAIL au lieu de PASS)
+durée moyenne par cas : CLI 513 ms, admission 213 ms
+# politique.sh taches, 2026-11-06T10:33:52Z
+## clé des tâches de la plateforme (ADR 0003 : clés séparées par usage)
+clé existante
+clé publique : ~/.cache/supply-chain-poc/08/pki/taches.pub, sha256 9e118e036265b4de…
+OK   distincte de la clé de Chains et de celle du TSA
+## tâche d'essai signée par tkn 0.46.2
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+annotation tekton.dev/signature : 1 (signée), 0 (non signée) ; modifiée : 1 ligne changée, même annotation
+bundle tekton/tasks/essai-confiance ← signee.yaml : sha256:42abc7ebac2b7c5d2b5c4e548a4a6139de7d67c137c7d44942f639f31ad16345
+bundle tekton/tasks/essai-non-signee ← tache.yaml : sha256:92560481b2f9dbbee59dddd566c6d3b9c5e0c01ce51226afc627f07b8d5bcf3b
+bundle tekton/tasks/essai-modifiee ← modifiee.yaml : sha256:c2d8f4f3aaeda4c6af0aa0724fe567c985eacfc7b3e781d2701f7afc21247fd8
+bundle tekton/tasks/essai-autre-cle ← autre-cle.yaml : sha256:f526aebe4196ea512de8e7c1c932d344506258003b691964aeb4105615c0f121
+bundle essais-j6/tasks/essai-confiance ← signee.yaml : sha256:42abc7ebac2b7c5d2b5c4e548a4a6139de7d67c137c7d44942f639f31ad16345
+bundle tekton/tasks/essai-v1 ← signee-v1.yaml : sha256:b95a856101bc0010d3a5b2ad76b70cf9e0a1622c26da8c636886d788825ba753
+## Tekton : vérification obligatoire, specs en ligne interdites, résolveur bundles seul
+feature-flags : trusted-resources-verification-no-match-policy=fail, disable-inline-spec=pipeline,pipelinerun,taskrun
+résolveurs : enable-bundles-resolver=true, enable-cluster-resolver=false, enable-git-resolver=false, enable-http-resolver=false, enable-hub-resolver=false
+VerificationPolicy taches-plateforme : enforce, motif sc-stockage\.poc\.test:5000/tekton/(tasks|pipelines)/[a-z0-9-]+, autorité plateforme
+## essais (TaskRuns dans builds, pods sur sc-build)
+KO   tâche signée, tekton/tasks : Succeeded=False, PodCreationFailed : failed to create task run pod "j6-signee": admission webhook "vpol.validate.kyverno.svc-fail-0b39fdb9" denied the request: Policy zone-build failed: zone build : jeton de compte de service interdit. Maybe missing or invalid Task b ; TrustedResourcesVerified=True
+[confiance:politique] ERROR task failed
