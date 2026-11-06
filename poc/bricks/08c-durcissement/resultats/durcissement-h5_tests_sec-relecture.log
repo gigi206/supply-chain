@@ -1,0 +1,19 @@
+# relecture de h5_tests_sec, 2026-11-06T20:08:10Z, lecture et dry-run serveur seulement
+## événements PolicyViolation de pods-isolation depuis 20:00 UTC
+2026-11-06T20:02:38 pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC inte
+2026-11-06T20:02:38 pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espac
+2026-11-06T20:03:04 pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC inte
+2026-11-06T20:03:04 pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espac
+## audit de l'API, créations de pods preuve-t4-* depuis 20:00 UTC
+20:02:38 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork (dry-run) : 400 ; exempt=runtimeClass enforce=-
+20:02:38 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath (dry-run) : 400 ; exempt=runtimeClass enforce=-
+20:02:38 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; exempt=runtimeClass enforce=-
+20:02:38 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie (dry-run) : 403 ; exempt=- enforce=restricted:latest
+20:02:38 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; exempt=- enforce=restricted:latest
+20:03:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork (dry-run) : 400 ; exempt=runtimeClass enforce=-
+20:03:04 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath (dry-run) : 400 ; exempt=runtimeClass enforce=-
+## pods réels représentés à l'API, dry-run serveur, au nom du contrôleur, limites posées
+sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod (créé le 2026-11-06T14:03:46Z) : pod/preuve-sec-h5-pod created (server dry run)
+preuve-test1-pod (créé le 2026-11-06T14:33:28Z) : pod/preuve-sec-h5-pod created (server dry run)
+j6-signee-pod (créé le 2026-11-06T13:48:02Z) : Error from server (Forbidden): pods "preuve-sec-h5-pod" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (containers "prepare", "place-scripts" must set securityContext.allowPrivilegeEscala
+## set-security-context : true

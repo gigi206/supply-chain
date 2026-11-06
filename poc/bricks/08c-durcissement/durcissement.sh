@@ -14,6 +14,8 @@
 #   h5_sec    à sec : correctifs de limites, gabarits et règles en Deny présentés à l'API, couverture, essais de politiques ; ne change rien
 #   h5_limites limites posées, règles encore en Audit (accord) ; CronJobs par minute suspendus, OpenBao redémarré puis descellé d'abord, puis Tekton, Chains, TSA, EventListener
 #   h5_deny   quatre règles en Deny (accord, après une construction sous limites) ; retour : h2_kyverno
+#   h5_tests_sec à sec : pods du test 4 et PipelineRun d'essai en dry-run serveur, décompte du test 8 ; ne change rien
+#   h5_tests  tests 2, 4, 3, 1, 7 et 8 sous H1 à H5 (accord) ; gabarit en service inchangé, journaux preuves-h5-<test>.log de la 08
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
 set -euo pipefail
@@ -517,6 +519,27 @@ etape_h5_deny() {
   temoins
   [ "$ko" = 0 ] || { echo "KO   h5_deny" >&2; exit 1; }
   echo "RÉSULTAT : conforme"
+}
+
+pipe_essai() { # bundle de sample-app-essai, lu sur un PipelineRun de J6 resté dans builds : le gabarit en service ne le cite plus
+  local b
+  b=$(kubectl get pipelinerun -n builds j6-porte-en-service -o json | jq -r '.spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  [[ $b == "$REG"/tekton/pipelines/sample-app-essai@sha256:* ]] || { echo "KO   bundle de la pipeline d'essai : ${b:-absent}" >&2; exit 1; }
+  echo "$b"
+}
+
+etape_h5_tests_sec() {
+  exige_rke2
+  local p
+  p=$(pipe_essai)
+  PIPE_ESSAI=$p JOURNAL=preuves-h5 mise run confiance:preuves -- sec_h5
+}
+
+etape_h5_tests() {
+  exige_rke2
+  local p
+  p=$(pipe_essai)
+  PIPE_ESSAI=$p JOURNAL=preuves-h5 mise run confiance:preuves -- test2 test4 test3 test1 test7 test8
 }
 
 for e in "$@"; do

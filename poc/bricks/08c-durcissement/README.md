@@ -411,6 +411,42 @@ Ce que la préparation a changé par rapport à la proposition :
 
 **H5 n'est pas close** : les quatre règles sont en `Deny` et la construction passe, mais la prédiction de l'étape comprend les tests, et les tests 1 à 4, 7 et 8 n'ont pas été rejoués sous H1 à H5. Les rôles (lecteurs de Secrets, droits des comptes de RKE2, `HelmChart` côté utilisateurs et groupes) restent à traiter. À relire : le passage de `scan-sample-app` du 07/11 à 09:30 UTC, premier sous `Deny`.
 
+**Additif du 06/11/2026, 20:03 UTC, rejeu des tests sous H1 à H5, préparé à sec, rien exécuté, prédictions avant passage.** Demande : « Continue » après la clôture de `Deny`, pris pour la préparation seule. `h5_tests_sec` n'a rien créé (`durcissement-h5_tests_sec.log`, `preuves-h5-sec_h5.log`).
+
+Sans retouche, ces tests n'auraient pas tourné :
+
+| Test | Obstacle relevé | Retouche |
+|---|---|---|
+| 3 et 7 (D2) | `gabarit_essai` les refuse depuis la bascule ; le gabarit en service construit la vraie image | `PIPE_ESSAI` rend sur l'hôte le gabarit d'essai de `declencheurs.yaml` ; `pr_gabarit` réutilise `pipelinerun`. Gabarit en service inchangé. Le PipelineRun du test 3 est créé par l'administrateur, plus par une livraison : cela ne touche ni les droits sur les TaskRuns ni Chains, seuls jugés ici |
+| 4 | Pods sans limites : les témoins seraient refusés, et `limites-obligatoires` se mêlerait aux refus mesurés | Limites sur les pods de `pod_builds` |
+| 8 | Le script exigeait 2 enveloppes ; l'image réelle en a 18 | `n` relevé. `copie`, `melange`, `illisible` portent les `n` bundles réels. Les cas falsifiés gardent 2 bundles : un bundle accepté à tort ferait passer le décompte de `0/n` à `k/n`, donc la mesure discrimine encore |
+| Journaux | `resultats/preuves-<test>.log` sont cités et seraient écrasés | `JOURNAL=preuves-h5` : `preuves-h5-<test>.log`, sans toucher aux anciens |
+
+Relevé à sec : motifs exacts de `pods-isolation` et de Pod Security sur les pods du test 4, sans `limites-obligatoires` ; témoins Kata et runc admis ; PipelineRun d'essai admis en dry-run ; 18 enveloppes, 49 bundles du digest, 15 provenances de PipelineRun sur `builds/essai-webhook` ; 14 clés sur 14 de la ConfigMap `porte` identiques aux fichiers, `cm_porte` ne change donc rien.
+
+Commande, ordre du rejeu, chaque KO arrêtant la suite : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/durcissement.sh h5_tests`.
+
+| Prédiction | Attendu | Risque |
+|---|---|---|
+| T2 | Refus par le webhook de Tekton et `tekton-references`, refus RBAC pour le TaskRun d'`el-forgejo`, deux témoins admis | Faible, aucune de ces barrières n'a changé depuis le passage d'aujourd'hui sur RKE2 |
+| T4 | Pod runc refusé par Pod Security, pods Kata refusés par `pods-isolation`, témoins admis | Faible, vu à sec ; les codes 403 et 400 de l'audit restent à mesurer |
+| T3 | 8 écritures refusées par RBAC, écriture de l'administrateur acceptée, 3 signatures avant, aucune après, sujet d'origine conservé, exécution purgée | Moyenne : premier passage de `pipelinerun` hors de J6 |
+| T1 | Ni jeton ni variable de secret, OpenBao injoignable par le service et par l'IP, SYN en `POLICY_DENIED` à l'entrée de sc-confiance, aucune ligne dans l'audit d'OpenBao ; Zot et Forgejo joints | Faible. La prédiction imprimée par le script date de J8 : la NetworkPolicy admet aussi `horodatage` et `scan` depuis, ce qui ne change rien pour `builds` |
+| T7 | A, B, C et D1 identiques au passage d'aujourd'hui, durée de `ec` autour de 1 s au lieu de 61 ; D2 : `trusted_task.trusted` en violation sur la tâche hors liste, puis en succès | Moyenne pour D2 : `preuve-test7-en-service` n'est plus sur la pipeline en service, le script le dit dans son journal |
+| T8 | `reel`, `copie`, `melange`, `illisible` à 18/18 ; `aucun`, falsifiés, `webhook-seul` et `autre-digest` à 0/18 ; `partiel` à 1/18 ; `poc-images` refusée ; v3 comme au premier passage | **Moyenne** : premier passage à 18 bundles par dépôt d'essai ; premier passage des témoins v3 avec `SIGSTORE_REKOR_PUBLIC_KEY`, dont l'effet sur le format bundle n'a pas été mesuré |
+
+**Effets à connaître.** Écritures dans Zot : `tekton/tasks/preuve-test1`, `tekton/tasks/preuve-test7`, `tekton/pipelines/preuve-test7`, témoins de `essais-j8/test7` et `essais-j8/test8`, onze dépôts sous `horodatage/essais-test8`, six enveloppes de plus sur `builds/essai-webhook`. Rien n'y est supprimé. Dans le cluster : `preuve-test7-hors-liste`, `preuve-test7-en-service` et `preuve-test1` remplacés, Jobs de la porte, ConfigMap `porte-temoin` posée puis retirée. `builds/sample-app` ne doit pas bouger : `garder` le vérifie à chaque test. Le gabarit, les règles et les limites ne sont pas touchés. Durée estimée, non mesurée : environ 20 minutes.
+
+**Hors de ce rejeu** : signature fausse et corps modifié du test 5, test 6 sous limites, rôles (lecteurs de Secrets, comptes de RKE2, `HelmChart` côté utilisateurs et groupes), passage de `scan-sample-app` du 07/11 à 09:30 UTC. H5 reste ouverte.
+
+**Additif du 06/11/2026, 20:07 UTC, canaux de trace et pods réels, relevés après relecture, rien exécuté.** Le dry-run de `h5_tests_sec` ne disait rien des traces que T2 et T4 exigent, ni des pods créés par Tekton. Relevés en lecture seule ou en dry-run :
+
+- **Événements** : `PolicyViolation` de `pods-isolation` présents à 20:02:38 et 20:03:04, malgré `EventRateLimit` de H1. Un dry-run en émet donc : `t0` des tests les ignore, mais deux dry-run proches ajoutent des lignes. L'événement de `tekton-references` n'est pas relevé sous H1, seul le même canal l'est.
+- **Audit de l'API** : refus et emprunts d'identité lus sur les requêtes de 20:02:38 : pod runc 403, `restricted:latest` ; pods Kata 400, `exempt runtimeClass` ; témoins 201. Le risque laissé à T4 sur ces codes est levé, en dry-run.
+- **Pods de Tekton** : pods réels `sample-app-e537a1db…-publier-pod` (`publier-essai`) et `preuve-test1-pod` représentés à l'API sous `Deny`, au nom du contrôleur, limites posées comme le fait `config-defaults`. Les deux sont admis, le pod de `publier-essai` servant aussi à `preuve-test7`, tâche au même gabarit. `j6-signee-pod`, d'une ancienne tâche, est refusé par Pod Security sur `prepare` et `place-scripts` : cause non recherchée, aucun test de ce rejeu ne s'en sert.
+
+Trace : `durcissement-h5_tests_sec-relecture.log`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

@@ -1,0 +1,11 @@
+# durcissement.sh h5_tests_sec, 2026-11-06T20:02:38Z, DISTRO=rke2
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh sec_h5
+# preuves.sh sec_h5, 2026-11-06T20:02:38Z
+OK   runc-privilegie : refusé, seul motif attendu (Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08/travail/preuves/preuve-t4-runc-privilegie.json": pods "preuve-t4-runc-privilegie" is forbidden: violates PodSe)
+OK   kata-hostpath : refusé, seul motif attendu (Error from server: error when creating "~/.cache/supply-chain-poc/08/travail/preuves/preuve-t4-kata-hostpath.json": admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolatio)
+OK   kata-hostnetwork : refusé, seul motif attendu (Error from server: error when creating "~/.cache/supply-chain-poc/08/travail/preuves/preuve-t4-kata-hostnetwork.json": admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isola)
+OK   témoin pod Kata privilégié : admis (pod/preuve-t4-kata-privilegie created (server dry run) )
+OK   témoin pod runc restreint : admis (pod/preuve-t4-runc-restreint created (server dry run) )
+OK   témoin PipelineRun de la pipeline d'essai : admis (pipelinerun.tekton.dev/preuve-sec-h5 created (server dry run) )
+décompte du test 8 : 18 enveloppes sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 49 bundles du digest
+provenances de PipelineRun de builds/essai-webhook : 15

@@ -555,7 +555,13 @@ etape_declencheurs() {
 }
 
 pr_gabarit() { # nom pipeline : PipelineRun du gabarit en service dans declencheurs (pipeline remplacée, commit de main remise
-  # à zéro), créé dans builds puis attendu ; issue. Gabarit d'essai de J6 exigé (sa pipeline n'a ni workspace ni tâche construire)
+  # à zéro), créé dans builds puis attendu ; issue. Gabarit d'essai de J6 exigé (sa pipeline n'a ni workspace ni tâche construire).
+  # Brique 08c : après la bascule, PIPE_ESSAI (bundle de sample-app-essai) rend ce gabarit sur l'hôte, celui en service n'est pas touché
+  if [ -n "${PIPE_ESSAI:-}" ]; then
+    sed "s#@PIPELINE@#$PIPE_ESSAI#" "$here/politique/declencheurs.yaml" > "$T/declencheurs.yaml"
+    pipelinerun "$1" "$2" "$TETE_J2"
+    return
+  fi
   gabarit_essai
   kubectl get triggertemplate -n declencheurs sample-app -o json | jq --arg n "$1" --arg b "$2" --arg c "$TETE_J2" \
     --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" '.spec.resourcetemplates[0] | .metadata.name = $n

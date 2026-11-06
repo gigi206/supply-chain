@@ -243,9 +243,11 @@ cas_j6() { # cas d'admission de J6 (cas-admission.py, bundle essai-confiance:ess
 
 pod_builds() { # cas nom filtre-jq : pod d'un cas de J6 (espace bancc) placé dans builds comme ceux des TaskRuns (zone build, sans
   # jeton de compte de service, sans relance), puis modifié par le filtre ; dans $T/<nom>.json
+  # Limites posées (brique 08c, H5) : sans elles, limites-obligatoires refuserait les témoins et se mêlerait aux refus mesurés
   jq --arg n "$2" '.metadata += {name: $n, namespace: "builds"} | .spec += {restartPolicy: "Never", serviceAccountName: "build",
     automountServiceAccountToken: false, nodeSelector: {zone: "build"},
-    tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}]} | '"$3" "$T/adm/$1.json" > "$T/$2.json"
+    tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}]}
+    | .spec.containers[0].resources = {requests: {cpu: "10m", memory: "16Mi"}, limits: {cpu: "100m", memory: "64Mi"}} | '"$3" "$T/adm/$1.json" > "$T/$2.json"
 }
 
 evenements_kyverno() { # depuis fichier : événements PolicyViolation de Kyverno depuis une date RFC 3339, copiés dans le fichier
@@ -423,7 +425,7 @@ bao_chains() { # depuis : signatures par la clé Transit chains (réponses de l'
 etape_test3() {
   local t0 t1 neuf tr uid i v n0 n1 compte faux=sha256:0000000000000000000000000000000000000000000000000000000000000000
   local essai=builds/essai-webhook@$APP_DIGEST
-  gabarit_essai   # cible : le TaskRun publier de la pipeline d'essai, vers builds/essai-webhook
+  [ -n "${PIPE_ESSAI:-}" ] || gabarit_essai   # cible : le TaskRun publier de la pipeline d'essai, vers builds/essai-webhook
   garder avant
   EL_NS=declencheurs
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -450,10 +452,17 @@ etape_test3() {
   echo "  poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande"
   echo "  un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)"
   echo "- fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds"
-  echo "## mise en place : livraison valide (commit $neuf)"
-  corps_push "$neuf" e.json
-  envoyer "valide" "$T/webhook/e.json" "$(hmac_corps "$T/webhook/e.json")"
-  pr_attendre "$neuf"
+  if [ -n "${PIPE_ESSAI:-}" ]; then
+    echo "## mise en place, après la bascule (brique 08c) : pas de livraison, le gabarit en service construirait la vraie image ;"
+    echo "## PipelineRun de la pipeline d'essai créé par l'administrateur, seule différence avec la cible du premier passage"
+    v=$(pr_gabarit "sample-app-$neuf" "$PIPE_ESSAI")
+    [ "${v%%|*}" = True ] || { echo "KO   sample-app-$neuf : $v" >&2; exit 1; }
+  else
+    echo "## mise en place : livraison valide (commit $neuf)"
+    corps_push "$neuf" e.json
+    envoyer "valide" "$T/webhook/e.json" "$(hmac_corps "$T/webhook/e.json")"
+    pr_attendre "$neuf"
+  fi
   signe_attendre "$neuf"
   non_repris "$neuf"
   [ "$(kubectl get taskrun -n builds "$tr" -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signed}')" = true ] \
@@ -1178,7 +1187,8 @@ etape_test7() {
   t7_derniere preuve-test7-hors-liste
   t7_verdict webhook-hors-liste "$ww,trusted_task.trusted" "$REG/builds/essai-webhook@$APP_DIGEST"
   motif webhook-hors-liste trusted_task.trusted
-  pipe_svc=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
+  pipe_svc=${PIPE_ESSAI:-$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')}
+  [ -z "${PIPE_ESSAI:-}" ] || echo "après la bascule (brique 08c) : preuve-test7-en-service tourne sur la pipeline d'essai, qui n'est plus celle du gabarit en service"
   st=$(pr_gabarit preuve-test7-en-service "$pipe_svc")
   [ "${st%%|*}" = True ] || { echo "KO   preuve-test7-en-service : $st" >&2; exit 1; }
   echo "PipelineRun preuve-test7-en-service (gabarit en service) : $(cut -d'|' -f1-3 <<< "$st"), Chains : signé=$(signe pipelinerun preuve-test7-en-service)"
@@ -1317,7 +1327,7 @@ t8_v3() { # cas signer (0 ou 1) : témoin de T8_DEPOT au format bundle de cosign
 }
 
 etape_test8() {
-  local ko=0 e1 e2 s1 s2 b1 b2 bw x r v n w a
+  local ko=0 e1 e2 s1 s2 b1 b2 bw x r v n w a reels
   echo "## prédiction (contrôle 9 joint à la porte : politique/porte/horodatage.sh, conteneur horodatage du Job, après ec)"
   echo "règle : chaque signature d'attestation vérifiée par ec doit se retrouver dans un bundle du dépôt de bundles vérifié par cosign v3.1.4"
   echo "  (clé de Chains, sujet = digest jugé, slsaprovenance1, jeton exigé, racine du TSA) ; aucune attestation vérifiée par ec : refus."
@@ -1361,11 +1371,14 @@ etape_test8() {
   echo "## enveloppes de l'image réelle et bundles de son digest (horodatage/bundles)"
   cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | jq -r '.signatures[0].sig' > "$T/t8-sigs"
   n=$(grep -c . "$T/t8-sigs")
-  [ "$n" = 2 ] || { echo "KO   $n enveloppe(s) de Chains sur $APP, 2 attendues (prédictions en n = 2)" >&2; exit 1; }
+  # n = 2 au premier passage ; davantage après la bascule (brique 08c) : chaque construction ajoute deux enveloppes au même digest
+  [ "$n" -ge 2 ] || { echo "KO   $n enveloppe(s) de Chains sur $APP, 2 au moins attendues" >&2; exit 1; }
   s1=$(sed -n 1p "$T/t8-sigs"); s2=$(sed -n 2p "$T/t8-sigs")
   t8_index "$APP_DIGEST" > "$T/t8-index"
   b1=$(awk -v s="$s1" '$1 == s {print $2; exit}' "$T/t8-index"); b2=$(awk -v s="$s2" '$1 == s {print $2; exit}' "$T/t8-index")
   [ -n "$b1" ] && [ -n "$b2" ] || { echo "KO   enveloppe de l'image réelle sans bundle" >&2; exit 1; }
+  reels=$(awk 'NR == FNR {s[$1] = $2; next} {print s[$1]}' "$T/t8-index" "$T/t8-sigs" | paste -sd' ')   # un bundle par enveloppe, n exigés
+  [ "$(wc -w <<< "$reels")" = "$n" ] || { echo "KO   $(wc -w <<< "$reels") bundle(s) pour $n enveloppe(s)" >&2; exit 1; }
   echo "$APP : $n enveloppes ; $(wc -l < "$T/t8-index") bundles pour ${APP_DIGEST:0:19}… (toutes les images de ce digest)"
   oras manifest fetch --ca-file "$P/ca-poc.crt" --descriptor "$REG_HOTE/$APP" > "$T/t8-sujet.json"
   cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/builds/essai-webhook@$APP_DIGEST" 2>/dev/null \
@@ -1421,28 +1434,28 @@ etape_test8() {
 
   printf 'pas du JSON : referrer illisible (test 8)\n' > "$T/t8-illisible.json"
   echo "## dépôts d'essai ($T8_BUNDLES/<cas>-$T8_PASSAGE, écrits par poc-horodatage)"
-  for c in "copie $b1 $b2" "aucun" "partiel $b1" "sans-jeton $T/t8-sj1.json $T/t8-sj2.json" "jeton-altere $T/t8-alt1.json $T/t8-alt2.json" \
+  for c in "copie $reels" "aucun" "partiel $b1" "sans-jeton $T/t8-sj1.json $T/t8-sj2.json" "jeton-altere $T/t8-alt1.json $T/t8-alt2.json" \
       "autre-signature $T/t8-ech1.json $T/t8-ech2.json" "tsa-etrangere $T/t8-etr1.json $T/t8-etr2.json" "webhook-seul $(paste -sd' ' "$T/t8-webhook")" \
-      "autre-digest $T/t8-autre.json" "melange $b1 $b2 $T/t8-autre.json $T/t8-sj1.json" "illisible $b1 $b2 $T/t8-illisible.json"; do
+      "autre-digest $T/t8-autre.json" "melange $reels $T/t8-autre.json $T/t8-sj1.json" "illisible $reels $T/t8-illisible.json"; do
     set -- $c
     echo "$1 : $(t8_publier "$@") ($(($# - 1)) bundle(s))"
   done
 
   echo "## verdicts de la porte (image réelle, source attendue)"
-  t8_cas reel ok "$DEPOT_BUNDLES" 2/2
+  t8_cas reel ok "$DEPOT_BUNDLES" "$n/$n"
   succes t8-reel slsa_source_correlated.expected_source_code_reference && succes t8-reel trusted_task.trusted \
     && echo "OK   reel : même verdict de ec qu'au test 7 (expected_source_code_reference, trusted_task.trusted parmi les succès)" || { echo "KO   reel : succès de ec" >&2; ko=$((ko + 1)); }
-  t8_cas copie ok "$T8_BUNDLES/copie-$T8_PASSAGE" 2/2
-  t8_cas aucun refus "$T8_BUNDLES/aucun-$T8_PASSAGE" 0/2
-  t8_cas partiel refus "$T8_BUNDLES/partiel-$T8_PASSAGE" 1/2
+  t8_cas copie ok "$T8_BUNDLES/copie-$T8_PASSAGE" "$n/$n"
+  t8_cas aucun refus "$T8_BUNDLES/aucun-$T8_PASSAGE" "0/$n"
+  t8_cas partiel refus "$T8_BUNDLES/partiel-$T8_PASSAGE" "1/$n"
   for c in sans-jeton jeton-altere autre-signature tsa-etrangere webhook-seul autre-digest; do
-    t8_cas "$c" refus "$T8_BUNDLES/$c-$T8_PASSAGE" 0/2
+    t8_cas "$c" refus "$T8_BUNDLES/$c-$T8_PASSAGE" "0/$n"
   done
-  grep -q '|0/2 enveloppe(s) couverte(s), 2 bundle(s) vérifié(s)' <<< "$(grep -h '^HORODATAGE|' "$T/porte-t8-webhook-seul.horodatage")" \
+  grep -q "|0/$n enveloppe(s) couverte(s), 2 bundle(s) vérifié(s)" <<< "$(grep -h '^HORODATAGE|' "$T/porte-t8-webhook-seul.horodatage")" \
     && echo "OK   webhook-seul : cosign vérifie les 2 bundles (valides pour le digest), aucun n'est apparié à une enveloppe de l'image jugée" \
     || { echo "KO   webhook-seul : 2 bundles vérifiés prédits" >&2; ko=$((ko + 1)); }
-  t8_cas melange ok "$T8_BUNDLES/melange-$T8_PASSAGE" 2/2
-  t8_cas illisible ok "$T8_BUNDLES/illisible-$T8_PASSAGE" 2/2
+  t8_cas melange ok "$T8_BUNDLES/melange-$T8_PASSAGE" "$n/$n"
+  t8_cas illisible ok "$T8_BUNDLES/illisible-$T8_PASSAGE" "$n/$n"
   for c in sans-jeton jeton-altere autre-signature tsa-etrangere autre-digest melange illisible; do
     echo "  cosign dans la porte, $c : $(grep -h '^HORODATAGE|' "$T/porte-t8-$c.horodatage" | cut -d'|' -f3)"
   done
@@ -2919,4 +2932,34 @@ etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule s
   echo "$APP : $(etat_app)"
 }
 
-lancer preuves J8 "$@"
+etape_sec_h5() { # brique 08c, à sec : pods du test 4 et PipelineRun d'essai présentés à l'API en dry-run serveur, décompte du test 8 ; rien de créé
+  local c m n b
+  [ -n "${PIPE_ESSAI:-}" ] || { echo "KO   PIPE_ESSAI non posé" >&2; exit 1; }
+  cas_j6
+  pod_builds pod-privilegie preuve-t4-runc-privilegie .
+  pod_builds pod-privilegie-kata preuve-t4-kata-hostpath \
+    '.spec.volumes = [{name: "h", hostPath: {path: "/var/lib/rancher"}}] | .spec.containers[0].volumeMounts = [{name: "h", mountPath: "/h"}]'
+  pod_builds pod-privilegie-kata preuve-t4-kata-hostnetwork '.spec.hostNetwork = true'
+  pod_builds pod-privilegie-kata preuve-t4-kata-privilegie .
+  pod_builds pod-restreint preuve-t4-runc-restreint .
+  comme ctl
+  for c in 'runc-privilegie|violates PodSecurity "restricted:latest": privileged' 'kata-hostpath|test 4 : volume hostPath interdit' \
+    'kata-hostnetwork|test 4 : hostNetwork, hostPID et hostIPC interdits'; do
+    m=$(kubectl create "${AS[@]}" --dry-run=server -f "$T/preuve-t4-${c%%|*}.json" 2>&1 | tr '\n' ' ' || true)
+    grep -F "${c#*|}" <<< "$m" >/dev/null && ! grep -F 'limites de mémoire' <<< "$m" >/dev/null \
+      && echo "OK   ${c%%|*} : refusé, seul motif attendu ($(cut -c1-200 <<< "$m"))" || { echo "KO   ${c%%|*} : $m" >&2; exit 1; }
+  done
+  temoin "pod Kata privilégié" ctl "$T/preuve-t4-kata-privilegie.json"
+  temoin "pod runc restreint" ctl "$T/preuve-t4-runc-restreint.json"
+  sed "s#@PIPELINE@#$PIPE_ESSAI#" "$here/politique/declencheurs.yaml" > "$T/declencheurs.yaml"
+  awk '/^kind: TriggerTemplate$/ {t = 1} t && /^  - apiVersion: tekton.dev\/v1$/ {p = 1} p && /^---$/ {exit} p' "$T/declencheurs.yaml" \
+    | sed -e 's/^    //' -e 's/^  - apiVersion/apiVersion/' -e 's#name: sample-app-$(tt.params.commit)#name: preuve-sec-h5#' \
+      -e "s#value: \$(tt.params.commit)#value: '$TETE_J2'#" -e 's#value: $(tt.params.depot)#value: https://sc-stockage.poc.test:3000/workspace/sample-app.git#' > "$T/pr-sec-h5.yaml"
+  temoin "PipelineRun de la pipeline d'essai" admin "$T/pr-sec-h5.yaml"
+  n=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  b=$(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_BUNDLES/referrers/$APP_DIGEST" | jq --arg t "$TYPE_BUNDLE" '[.manifests[] | select(.artifactType == $t)] | length')
+  echo "décompte du test 8 : $n enveloppes sur $APP, $b bundles du digest"
+  echo "provenances de PipelineRun de builds/essai-webhook : $(prov_pr "builds/essai-webhook@$APP_DIGEST" | jq -s length)"
+}
+
+lancer "${JOURNAL:-preuves}" J8 "$@"
