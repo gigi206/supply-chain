@@ -18,6 +18,8 @@
 #   h5_tests  tests 2, 4, 3, 1, 7 et 8 sous H1 à H5 (accord) ; gabarit en service inchangé, journaux preuves-h5-<test>.log de la 08
 #   h5_roles_sec à sec : règles de politiques/roles en dry-run serveur, chart de Cilium rendu avec et sans la synchronisation de Secrets ; ne change rien
 #   h5_roles  deux règles de politiques/roles (accord) ; contrôleurs de Triggers et agent de sc-build redémarrés ; retour : kubectl delete -f politiques/roles/roles.yaml
+#   h5_cilium_sec à sec : chart rendu avec et sans la synchronisation de Secrets, documents Secret retirés, pods de Cilium en dry-run serveur, état de départ ; ne change rien
+#   h5_cilium tls.secretSync.enabled=false (config/valeurs-cilium.yaml), agents et opérateur redémarrés (accord) ; retour : retirer la clé, cilium.sh appliquer
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
 set -euo pipefail
@@ -609,6 +611,106 @@ etape_h5_roles() {
   attendu "écritures de webhooks de Triggers refusées depuis $t1" "$(audit_vu webhookconfigurations "$t1" ".user.username == \"$w\" and .responseStatus.code >= 400 and .responseStatus.code != 409")" 0
   kubectl get nodes --no-headers </dev/null
   [ "$ko" = 0 ] && echo "OK   h5_roles" || { echo "KO   h5_roles"; exit 1; }
+}
+
+rendu_cilium() { # fichier [--set …] : chart rendu sur l'hôte avec les trois -f de cilium.sh appliquer ; documents Secret retirés, eux seuls portent des clés, générées à chaque rendu
+  local f=$1; shift
+  rendre_cilium_valeurs
+  helm template cilium "$O/telechargements/cilium/cilium-1.20.4.tgz" --namespace kube-system -f "$T/valeurs.yaml" -f "$B08/valeurs-cilium.yaml" -f "$C/valeurs-cilium.yaml" "$@" \
+    | awk 'BEGIN { RS = "\n---\n"; ORS = "\n---\n" } !/(^|\n)kind: Secret\n/' > "$f"
+}
+
+rendre_cilium_valeurs() {
+  sed -e 's/^#.*//' -e 's#@CILIUM_AMD64@#sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54#' \
+      -e 's#@OPERATOR_AMD64@#sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1#' "$b08/cilium/valeurs.yaml" > "$T/valeurs.yaml"
+}
+
+pod_cilium() { # type nom : spec en service présentée à l'admission comme un pod, en dry-run serveur, Kyverno compris
+  kubectl get "$1" -n kube-system "$2" -o json </dev/null \
+    | jq '{apiVersion: "v1", kind: "Pod", metadata: {generateName: "essai-h5-", namespace: "kube-system", annotations: (.spec.template.metadata.annotations // {})}, spec: .spec.template.spec}' \
+    | kubectl create --dry-run=server -f - 2>&1 | tr '\n' ' ' | cut -c1-320 || true
+}
+
+versions_certs() { # versions d'objet de la CA de Cilium et du certificat de Hubble : une rotation les changerait ; aucune valeur affichée
+  kubectl get secret -n kube-system cilium-ca hubble-server-certs --no-headers -o custom-columns=N:.metadata.name,V:.metadata.resourceVersion </dev/null | tr -s ' ' | paste -sd' ' -
+}
+
+pare_feu() { # depuis sc-build, port de sc-confiance : ouvert ou fermé
+  local p
+  for p in 6443 2379; do
+    printf '%s=%s ' "$p" "$(sur sc-build "timeout 4 bash -c 'exec 3<>/dev/tcp/192.168.161.11/$p' 2>/dev/null && echo ouvert || echo ferme" </dev/null)"
+  done
+}
+
+droits_cilium() { # lecture de Secrets par l'opérateur et les agents, à l'échelle du cluster et dans cilium-secrets
+  local c s
+  for c in cilium-operator cilium; do
+    s=system:serviceaccount:kube-system:$c
+    printf '%s cluster=%s cilium-secrets=%s ' "$c" "$(kubectl auth can-i list secrets -A --as="$s" </dev/null 2>/dev/null || true)" "$(kubectl auth can-i list secrets -n cilium-secrets --as="$s" </dev/null 2>/dev/null || true)"
+  done
+}
+
+etape_h5_cilium_sec() {
+  exige_rke2
+  local a=$T/cilium-avant.yaml b=$T/cilium-apres.yaml
+  mkdir -p "$T"
+  rendu_cilium "$a" --set tls.secretSync.enabled=true
+  rendu_cilium "$b"
+  attendu "aucune clé dans les documents comparés" "$(cat "$a" "$b" | grep -cE 'PRIVATE KEY|LS0tLS1CRUdJTi' || true)" 0
+  echo "## rendu : valeurs en service (-) contre valeurs préparées (+), documents Secret retirés"
+  diff -U0 "$a" "$b" | grep -vE '^(---|\+\+\+|@@)' | cut -c1-120 || true
+  echo "## cilium-config : en service contre rendu des valeurs en service"
+  kubectl get cm -n kube-system cilium-config -o json </dev/null | jq -r '.data | to_entries[] | "\(.key)=\(.value)"' | sort > "$T/cm-vivant"
+  awk 'BEGIN { RS = "\n---\n" } /\n  name: cilium-config\n/' "$a" | sed -n -E '/^data:/,$s/^  ([a-z0-9-]+): +"?([^"]*)"?$/\1=\2/p' | sort > "$T/cm-rendu"
+  echo "$(wc -l < "$T/cm-vivant") clés en service, $(wc -l < "$T/cm-rendu") rendues"
+  diff "$T/cm-vivant" "$T/cm-rendu" | cut -c1-120 || true
+  echo "## valeurs de la release en service, digests retirés"
+  helm get values cilium -n kube-system -o json </dev/null | jq -c 'del(.image, .operator.image)'
+  attendu "politiques de Cilium qui citent un Secret ou du TLS" "$(kubectl get cnp,ccnp -A -o json </dev/null | jq '[.items[] | tostring | select(test("terminatingTLS|originatingTLS|secret"; "i"))] | length')" 0
+  echo "## pods de Cilium présentés à l'admission (dry-run serveur)"
+  grep -F 'created (server dry run)' <<< "$(pod_cilium deploy cilium-operator)" >/dev/null && echo "OK   opérateur admis" || { echo "KO   opérateur"; ko=1; }
+  grep -F 'created (server dry run)' <<< "$(pod_cilium ds cilium)" >/dev/null && echo "OK   agent admis" || { echo "KO   agent"; ko=1; }
+  echo "## état de départ"
+  echo "certificats : $(versions_certs)"
+  echo "pare-feu depuis sc-build : $(pare_feu)"
+  echo "droits : $(droits_cilium)"
+  rm -f "$a" "$b" "$T/cm-vivant" "$T/cm-rendu"
+  [ "$ko" = 0 ] && echo "OK   h5_cilium_sec" || { echo "KO   h5_cilium_sec"; exit 1; }
+}
+
+etape_h5_cilium() {
+  exige_rke2
+  local c0 p0 t1 p n v o=system:serviceaccount:kube-system:cilium-operator
+  c0=$(versions_certs); p0=$(pare_feu)
+  attendu "avant, droits" "$(droits_cilium)" "cilium-operator cluster=yes cilium-secrets=yes cilium cluster=no cilium-secrets=yes "
+  suspendre_rattrapage
+  VALEURS_08C=$C/valeurs-cilium.yaml "$b08/cilium.sh" appliquer
+  t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  attendu "pare-feu d'hôte et mode audit" "$(kubectl -n kube-system get cm cilium-config -o json | jq -c '[.data["enable-host-firewall"], .data["policy-audit-mode"]]')" '["true","false"]'
+  attendu "enable-policy-secrets-sync dans cilium-config" "$(kubectl -n kube-system get cm cilium-config -o json | jq '.data | has("enable-policy-secrets-sync")')" false
+  attendu "rôle de l'opérateur dans cilium-secrets" "$(kubectl get role -n cilium-secrets cilium-operator-tlsinterception-secrets --ignore-not-found -o name </dev/null)" ""
+  kubectl wait --for=condition=Ready node --all --timeout=120s >/dev/null
+  for v in sc-confiance sc-build sc-stockage; do attendu "SSH de $v" "$(sur "$v" 'echo joint' </dev/null || true)" joint; done
+  attendu "API" "$(kubectl get --raw /readyz || true)" ok
+  v=$(curl -k -s -o /dev/null --max-time 8 -w '%{http_code}' "https://$REG_HOTE/v2/" || true)
+  if [ "${v:-000}" != 000 ]; then echo "OK   Zot joignable depuis l'hôte : HTTP $v"; else echo "KO   Zot injoignable depuis l'hôte"; ko=1; fi
+  attendu "droits" "$(droits_cilium)" "cilium-operator cluster=no cilium-secrets=no cilium cluster=no cilium-secrets=yes "
+  attendu "certificats" "$(versions_certs)" "$c0"
+  attendu "pare-feu depuis sc-build" "$(pare_feu)" "$p0"
+  sonde_kyverno
+  sleep 60   # l'opérateur prend son bail et ses observations : les relevés suivants ne doivent pas être vides
+  while read -r p; do
+    attendu "$p, état" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status --brief </dev/null 2>&1 | tail -1)" OK
+    attendu "$p, Hubble" "$(kubectl exec -n kube-system "$p" -c cilium-agent -- cilium-dbg status </dev/null 2>/dev/null | awk '$1 == "Hubble:" {print $2}')" Ok
+  done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json </dev/null | jq -r '.items[].metadata.name')
+  attendu "redémarrages de conteneurs de Cilium" "$(kubectl get pods -n kube-system -l 'k8s-app=cilium' -o json </dev/null | jq '[.items[].status.containerStatuses[].restartCount] | add')" 0
+  attendu "redémarrages de l'opérateur" "$(kubectl get pods -n kube-system -l io.cilium/app=operator -o json </dev/null | jq '[.items[].status.containerStatuses[].restartCount] | add')" 0
+  attendu "lignes forbidden du journal de l'opérateur" "$(kubectl logs -n kube-system deploy/cilium-operator </dev/null | grep -ci forbidden || true)" 0
+  n=$(audit_vu cilium-operator "$t1" ".user.username == \"$o\"")
+  [ "$n" -ge 1 ] && echo "OK   témoin : $n requête(s) de l'opérateur depuis $t1" || { echo "KO   aucune requête de l'opérateur : le contrôle suivant serait vide"; ko=1; }
+  attendu "requêtes de l'opérateur sur des Secrets depuis $t1" "$(audit_vu cilium-operator "$t1" ".user.username == \"$o\" and .objectRef.resource == \"secrets\"")" 0
+  kubectl get nodes --no-headers </dev/null
+  [ "$ko" = 0 ] && echo "OK   h5_cilium" || { echo "KO   h5_cilium"; exit 1; }
 }
 
 for e in "$@"; do

@@ -1,0 +1,56 @@
+# durcissement.sh h5_cilium_sec, 2026-11-06T20:51:21Z, DISTRO=rke2
+OK   aucune clé dans les documents comparés : 0
+## rendu : valeurs en service (-) contre valeurs préparées (+), documents Secret retirés
+-  enable-policy-secrets-sync: "true"
+-  - secrets
+-  name: cilium-operator-tlsinterception-secrets
+-  namespace: "cilium-secrets"
+-  labels:
+-    app.kubernetes.io/part-of: cilium
+-    helm.sh/chart: cilium-1.20.4
+-rules:
+-- apiGroups:
+-  - ""
+-  resources:
+-  - secrets
+-  verbs:
+-  - create
+-  - delete
+-  - update
+-  - patch
+-
+-# Source: cilium/templates/cilium-operator/role.yaml
+-apiVersion: rbac.authorization.k8s.io/v1
+-kind: Role
+-metadata:
+-  namespace: kube-system
+-
+-# Source: cilium/templates/cilium-operator/rolebinding.yaml
+-apiVersion: rbac.authorization.k8s.io/v1
+-kind: RoleBinding
+-metadata:
+-  name: cilium-operator-tlsinterception-secrets
+-  namespace: "cilium-secrets"
+-  labels:
+-    app.kubernetes.io/part-of: cilium
+-    helm.sh/chart: cilium-1.20.4
+-roleRef:
+-  apiGroup: rbac.authorization.k8s.io
+-  kind: Role
+-  name: cilium-operator-tlsinterception-secrets
+-subjects:
+-- kind: ServiceAccount
+-  name: "cilium-operator"
+## cilium-config : en service contre rendu des valeurs en service
+164 clés en service, 164 rendues
+## valeurs de la release en service, digests retirés
+{"autoDirectNodeRoutes":true,"envoy":{"enabled":false},"hostFirewall":{"enabled":true},"hubble":{"enabled":true,"relay":{"enabled":false},"ui":{"enabled":false}},"ipam":{"mode":"kubernetes"},"ipv4NativeRoutingCIDR":"10.42.0.0/16","k8sServiceHost":"192.168.161.11","k8sServicePort":6443,"kubeProxyReplacement":true,"l7Proxy":false,"operator":{"nodeSelector":{"zone":"confiance"},"replicas":1},"policyAuditMode":false,"policyCIDRMatchMode":"nodes","policyEnforcementMode":"default","routingMode":"native","socketLB":{"hostNamespaceOnly":true}}
+OK   politiques de Cilium qui citent un Secret ou du TLS : 0
+## pods de Cilium présentés à l'admission (dry-run serveur)
+OK   opérateur admis
+OK   agent admis
+## état de départ
+certificats : cilium-ca 422 hubble-server-certs 423
+pare-feu depuis sc-build : 6443=ouvert 2379=ferme 
+droits : cilium-operator cluster=yes cilium-secrets=yes cilium cluster=no cilium-secrets=yes 
+OK   h5_cilium_sec

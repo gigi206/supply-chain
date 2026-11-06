@@ -1,4 +1,9 @@
 # Brique 08c : troisième -f de cilium.sh après H3, une fois les flux relevés en audit.
+# H5 : tls.secretSync.enabled=false retire cilium-operator des lecteurs de Secrets du cluster. La synchronisation ne sert qu'aux politiques TLS, à l'Ingress et à la
+# Gateway API, tous absents avec l7Proxy=false ; le chart redonne le droit si l'une d'elles est activée.
 hostFirewall:
   enabled: true
 policyAuditMode: false
+tls:
+  secretSync:
+    enabled: false
