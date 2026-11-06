@@ -301,6 +301,18 @@ Estimation : 4 h. Une décision s'impose à partir de 8 h.
 
 **Non prouvé** : `.sig` et `.att` écrits avec les identifiants injectés, et le HMAC après la copie : aucune construction n'a tourné depuis. Les valeurs étant identiques, je m'attends à une construction conforme ; ce n'est pas une mesure. Le redémarrage des VM reste à traiter : OpenBao scellé, le conteneur d'initialisation attend, et `redemarrer.sh` ne recrée pas ce pod. `politique.sh chains` ne doit plus être rejoué sans `s1_retrait`.
 
+**Additif du 06/11/2026, 18:41 UTC, construction de preuve de S1, accord du propriétaire (« Oui, construction »), prédictions avant exécution.** `construction_durcie` par le webhook de Forgejo, `reelle` en lecture (`PASSAGE=apres`, aucune VSA poussée), `flux` pendant 7 min. Une seule construction : les 8 tests ne sont pas rejoués.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| K1 | HMAC après la copie : webhook accepté, PipelineRun créé par `el-forgejo`, réussi en environ 1 min, spec identique à J7, image `3a7ca1b1` | Haute |
+| K2 | Identifiants injectés : tous les TaskRun et le PipelineRun signés, 10 → 12 enveloppes, aucune anomalie. L'audit de Zot attribue à `poc-build` des écritures sur `builds/sample-app` depuis le départ | Haute |
+| K3 | Livraison non signée refusée, rejeu refusé (`already exists`), aucun PipelineRun du commit non signé | Haute |
+| K4 | Porte `true`, contrôle 9 à 12/12, VSA 1/1 | Haute |
+| K5 | 0 refus de la politique pour `tekton-chains`, `el-forgejo`, `construire` et `publier`. La porte retentera `34.117.62.14:443` (W4 non résolu), sans effet sur le verdict | Moyenne |
+
+Le contrôle du sujet `poc-build` est ajouté parce que K2 sans lui ne distingue pas un compte d'un autre : `ba_chemin` ne relève que `poc-images`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
