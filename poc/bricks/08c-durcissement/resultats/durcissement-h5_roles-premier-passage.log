@@ -1,0 +1,8 @@
+# durcissement.sh h5_roles, 2026-11-06T20:36:06Z, DISTRO=rke2
+OK   avant la règle, RBAC laisse passer la demande de jeton : yes
+validatingadmissionpolicy.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied
+validatingadmissionpolicybinding.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied
+validatingadmissionpolicy.admissionregistration.k8s.io/webhooks-triggers serverside-applied
+validatingadmissionpolicybinding.admissionregistration.k8s.io/webhooks-triggers serverside-applied
+KO   jeton : The serviceaccounts "build" is invalid: : ValidatingAdmissionPolicy 'jetons-rke2-controller' with binding 'jetons-rke2-controller' denied request: durcissement : system:rke2-controller ne demande pas 
+OK   témoin, jeton demandé par system:kube-controller-manager : admis

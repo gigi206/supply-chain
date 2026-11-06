@@ -1,0 +1,10 @@
+# témoin de h5_roles relu après coup, 2026-11-06T20:38:29Z, lecture seule : le KO du deuxième passage vient du texte attendu, kubectl patch n'écrit pas « server dry run »
+## étiquettes des deux webhooks visés, sans essai=h5
+{"nom":"validation.webhook.triggers.tekton.dev","labels":{"app.kubernetes.io/component":"webhook","app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-triggers","triggers.tekton.dev/release":"v0.37.2"}}
+{"nom":"kyverno-policy-validating-webhook-cfg","labels":{"webhook.kyverno.io/managed-by":"kyverno"}}
+## audit de l'API depuis 20:36 UTC : heure, compte, emprunt, verbe, objet, code, dry-run
+20:36:12 system:admin pour tekton-triggers-controller patch kyverno-policy-validating-webhook-cfg 422 dryRun=true
+20:36:42 system:admin pour tekton-triggers-controller patch kyverno-policy-validating-webhook-cfg 422 dryRun=true
+20:36:42 system:admin pour tekton-triggers-webhook patch validation.webhook.triggers.tekton.dev 200 dryRun=true
+20:36:55 tekton-triggers-webhook pour - update validation.webhook.triggers.tekton.dev 200 dryRun=false
+20:37:03 tekton-triggers-webhook pour - update webhook.triggers.tekton.dev 200 dryRun=false

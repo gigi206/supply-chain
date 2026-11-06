@@ -547,13 +547,13 @@ etape_h5_tests() {
 jeton_essai() { # identité : demande réelle pour builds/build, 10 min, audience essai ; le dry-run émet tout de même un jeton, jamais lu ni gardé ; motif de refus sur la sortie
   printf '{"apiVersion":"authentication.k8s.io/v1","kind":"TokenRequest","spec":{"audiences":["essai"],"expirationSeconds":600}}' > "$T/tr.json"
   if kubectl create --raw '/api/v1/namespaces/builds/serviceaccounts/build/token?dryRun=All' --as="$1" -f "$T/tr.json" </dev/null >/dev/null 2>"$T/tr.err"; then echo admis
-  else tr '\n' ' ' < "$T/tr.err" | cut -c1-200; fi
+  else tr '\n' ' ' < "$T/tr.err" | cut -c1-320; fi
   rm -f "$T/tr.json" "$T/tr.err"
 }
 
 webhook_essai() { # compte configuration : modification présentée à l'API, dry-run serveur, au nom d'un compte de Triggers
   kubectl patch validatingwebhookconfiguration "$2" --type=merge -p '{"metadata":{"labels":{"essai":"h5"}}}' --dry-run=server \
-    --as="system:serviceaccount:tekton-pipelines:$1" </dev/null 2>&1 | tr '\n' ' ' | cut -c1-200
+    --as="system:serviceaccount:tekton-pipelines:$1" </dev/null 2>&1 | tr '\n' ' ' | cut -c1-320 || true   # un refus est un résultat, pas une fin de script
 }
 
 etape_h5_roles_sec() {
@@ -585,7 +585,7 @@ etape_h5_roles() {
   n=$(jeton_essai "$c"); grep -F 'ne demande pas de jeton' <<< "$n" >/dev/null && echo "OK   jeton refusé : $n" || { echo "KO   jeton : $n"; ko=1; }
   attendu "témoin, jeton demandé par system:kube-controller-manager" "$(jeton_essai system:kube-controller-manager)" admis
   n=$(webhook_essai tekton-triggers-controller kyverno-policy-validating-webhook-cfg); grep -F "n'écrit que ses propres webhooks" <<< "$n" >/dev/null && echo "OK   webhook de Kyverno refusé : $n" || { echo "KO   webhook de Kyverno : $n"; ko=1; }
-  n=$(webhook_essai tekton-triggers-webhook validation.webhook.triggers.tekton.dev); grep -F 'dry run' <<< "$n" >/dev/null && echo "OK   témoin, webhook de Triggers : $n" || { echo "KO   témoin webhook de Triggers : $n"; ko=1; }
+  n=$(webhook_essai tekton-triggers-webhook validation.webhook.triggers.tekton.dev); grep -F ' patched' <<< "$n" >/dev/null && echo "OK   témoin, webhook de Triggers : $n" || { echo "KO   témoin webhook de Triggers : $n"; ko=1; }
   t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   a0=$(sur sc-build "systemctl show -p ActiveEnterTimestamp --value rke2-agent" </dev/null)
   kubectl rollout restart -n tekton-pipelines deploy/tekton-triggers-webhook deploy/tekton-triggers-controller </dev/null

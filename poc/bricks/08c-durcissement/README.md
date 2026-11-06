@@ -504,6 +504,24 @@ R3, à vérifier avant d'écrire son étape : `hubble-server-certs` et `cilium-c
 
 ADR 0000 et 0001 complétés sur le droit de `system:rke2-controller`, limite résiduelle jusqu'à décision.
 
+**Additif du 06/11/2026, 20:38 UTC, `h5_roles` appliquée sur accord du propriétaire (« Oui, lance h5_roles »), règles en service depuis 20:36:06 UTC.** Deux passages, tous deux rendus en échec par le script, jamais par les règles.
+
+| Passage | Fin | Cause |
+|---|---|---|
+| [Premier](resultats/durcissement-h5_roles-premier-passage.log), 20:36:06 à 20:36:12 | KO, arrêté avant les redémarrages, règles déjà posées | Message de refus coupé à 200 caractères, puis `kubectl` refusé qui arrête le script sous `pipefail` |
+| [Deuxième](resultats/durcissement-h5_roles.log), 20:36:37 à 20:37:31 | **« KO h5_roles » sur un seul témoin**, tout le reste OK | `kubectl patch --dry-run=server` écrit « patched », pas « server dry run ». Texte attendu faux, corrigé, étape non rejouée pour ne pas redémarrer une troisième fois |
+
+Le témoin est tranché par [l'audit](resultats/durcissement-h5_roles-temoin.log) : `tekton-triggers-webhook`, 200 en dry-run sur son webhook, aucune étiquette `essai` écrite.
+
+| Prédiction | Résultat |
+|---|---|
+| R1 | **Tenue** : jeton refusé à `system:rke2-controller` avec le message exact, témoin `system:kube-controller-manager` admis ; webhook de Kyverno refusé à Triggers, code 422, le sien admis. `auth can-i` reste à `yes` : le refus vient de l'admission, RBAC ne change pas |
+| R2 | **Tenue** : Triggers redémarré, agent de `sc-build` redémarré à 20:37:05 UTC, `Ready` ; 2 requêtes acceptées de `system:rke2-controller`, 0 refusée ; 2 mises à jour de ses webhooks par Triggers, 0 refusée ; 0 erreur aux journaux de Triggers, caBundle présents, `horodatage` et `rattrapage` réussis |
+| R3 | Non lancée : Cilium inchangé, `cilium-operator` reste lecteur, cinq lecteurs à ce stade |
+| R4 | Non lancée : aucune construction sous ces deux règles |
+
+**Effets réels** : deux jetons témoins de plus pour `builds/build`, un par passage, 10 minutes, jamais lus. **Non prouvé** : redémarrage complet des VM et jonction d'un nouveau nœud sous la règle ; webhook réel de Forgejo sous les deux règles, `construction_durcie` non rejouée ; agents de `sc-confiance` et `sc-stockage` non redémarrés. Retour : `kubectl delete -f politiques/roles/roles.yaml`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

@@ -1,0 +1,27 @@
+# durcissement.sh h5_roles, 2026-11-06T20:36:37Z, DISTRO=rke2
+OK   avant la règle, RBAC laisse passer la demande de jeton : yes
+validatingadmissionpolicy.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied
+validatingadmissionpolicybinding.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied
+validatingadmissionpolicy.admissionregistration.k8s.io/webhooks-triggers serverside-applied
+validatingadmissionpolicybinding.admissionregistration.k8s.io/webhooks-triggers serverside-applied
+OK   jeton refusé : The serviceaccounts "build" is invalid: : ValidatingAdmissionPolicy 'jetons-rke2-controller' with binding 'jetons-rke2-controller' denied request: durcissement : system:rke2-controller ne demande pas de jeton de compte de service 
+OK   témoin, jeton demandé par system:kube-controller-manager : admis
+OK   webhook de Kyverno refusé : The validatingwebhookconfigurations "kyverno-policy-validating-webhook-cfg" is invalid: : ValidatingAdmissionPolicy 'webhooks-triggers' with binding 'webhooks-triggers' denied request: durcissement : Triggers n'écrit que ses propres webhooks 
+KO   témoin webhook de Triggers : validatingwebhookconfiguration.admissionregistration.k8s.io/validation.webhook.triggers.tekton.dev patched 
+deployment.apps/tekton-triggers-webhook restarted
+deployment.apps/tekton-triggers-controller restarted
+Waiting for deployment "tekton-triggers-webhook" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "tekton-triggers-webhook" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "tekton-triggers-webhook" rollout to finish: 1 old replicas are pending termination...
+deployment "tekton-triggers-webhook" successfully rolled out
+deployment "tekton-triggers-controller" successfully rolled out
+OK   agent de sc-build redémarré : Fri 2026-11-06 16:42:04 UTC → Fri 2026-11-06 20:37:05 UTC
+node/sc-build condition met
+OK   témoin : 2 requête(s) acceptée(s) de system:rke2-controller après le redémarrage
+OK   requêtes de system:rke2-controller refusées par l'API depuis 2026-11-06T20:36:42Z : 0
+OK   témoin : 2 mise(s) à jour de ses webhooks par Triggers après le redémarrage
+OK   écritures de webhooks de Triggers refusées depuis 2026-11-06T20:36:42Z : 0
+sc-build       Ready   <none>               7h6m   v1.35.9+rke2r1
+sc-confiance   Ready   control-plane,etcd   7h8m   v1.35.9+rke2r1
+sc-stockage    Ready   <none>               7h5m   v1.35.9+rke2r1
+KO   h5_roles
