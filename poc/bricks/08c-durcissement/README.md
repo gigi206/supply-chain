@@ -566,6 +566,21 @@ Prédictions, avant tout passage de `h6` :
 
 En cas d'échec, le passage est archivé tel quel et rien n'est relancé sans nouvel accord. Ce job ne prouve pas le déclenchement par le planificateur : le passage du 07/11 à 09:30 UTC reste à relire.
 
+**Additif du 06/11/2026, 21:31 UTC, scan manuel passé de 21:28:51 à 21:30:53 UTC, H5 close sur l'admission et l'exécution, sous réserve du planificateur.** Journal [resultats/durcissement-h5_scan.log](resultats/durcissement-h5_scan.log), passage unique, bilan du script KO sur N6 seul ; relecture [resultats/durcissement-h5_scan-relecture.log](resultats/durcissement-h5_scan-relecture.log).
+
+| Prédiction | Résultat | Mesure |
+|---|---|---|
+| N1 | Tenue | Job et pod admis, aucun `FailedCreate`, aucun 403 ni 422 dans l'audit de l'espace ; cinq 404 de lecture par `cilium` et `kyverno-reports-controller`, aucun d'admission ; trois rapports de Kyverno, 0 échec |
+| N2 | Tenue | Six conteneurs à 0, job réussi, 126 s à 5 s près, sous les politiques de H3 et H4 et le pare-feu d'hôte |
+| N3 | Tenue | `revocation` à 500m et 256Mi, ni OOM ni redémarrage ; consommation réelle non mesurée, le conteneur vit moins de 2 s |
+| N4 | Tenue | Referrers 2 → 3, sujet `3a7ca1b1`, 5 vulnérabilités, 0 KEV |
+| N5 | Tenue | `lastSuccessfulTime` à 21:30:53 UTC, `lastScheduleTime` vide, aucun job actif |
+| N6 | Tenue à la relecture | Le script affiche KO, `5, attendu 4` : mon contrôle comptait une seule révocation, or `jetons` écrit aussi `révoqué`. Les cinq lignes attendues sont lues dans Grafana par l'auditeur. Contrôle corrigé, non rejoué : le job existe et le script refuse de le recréer |
+
+Point bas sur sc-confiance : 10217 Mo pour 13641 Mo au départ, soit 3424 Mo, dans la lignée de 3413 et 3441 Mo. Effet attendu d'un job manuel : avertissement `UnexpectedJob` sur le CronJob. Le job et son pod restent dans l'espace, sous la limite d'historique du CronJob.
+
+**Reste de H5** : relire le passage du 07/11 à 09:30 UTC, seule preuve du déclenchement par le planificateur. Non couvert, inchangé : signature fausse et corps modifié du test 5, test 6 sous limites.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

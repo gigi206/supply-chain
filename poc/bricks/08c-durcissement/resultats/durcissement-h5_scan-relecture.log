@@ -1,0 +1,10 @@
+relecture du 06/11/2026 à 21:31:18 UTC, lecture seule, Grafana par l auditeur
+lignes marquées lues dans Grafana depuis 21:28:40 UTC :
+SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulné
+identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:9b75e5e44344e53659f80906514e20d7437e68286e7de715227bd64421819823, r
+jeton du rôle scanner révoqué ; identifiants et jeton effacés
+SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+## état après passage
+scan-sample-app-h5-manuel   2026-11-06T21:28:51Z   2026-11-06T21:30:53Z   1     <none>
+scan-sample-app-h5-manuel-tkhh2   0/1   Completed   0     2m26s

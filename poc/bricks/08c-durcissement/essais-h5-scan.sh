@@ -78,10 +78,10 @@ grafana() { # depuis-epoch-ms : lignes du job lues par l'auditeur à travers Gra
   n=0
   for _ in 1 2 3 4 5 6 7 8 9 10 11 12; do
     n=$(grafana "${de}000" | grep -cE '^(SOURCE|SCAN|PUBLIE)\||révoqué' || true)
-    [ "$n" -ge 4 ] && break
+    [ "$n" -ge 5 ] && break
     sleep 10
   done
-  note "marqueurs SOURCE, SCAN, PUBLIE et révocation lus dans Grafana" "$n" 4
+  note "marqueurs SOURCE, SCAN, PUBLIE et les deux révocations lus dans Grafana" "$n" 5
 
   [ "$ko" = 0 ] && echo "bilan : OK" || echo "bilan : KO"
   date -u '+fin du relevé %H:%M:%S UTC'
