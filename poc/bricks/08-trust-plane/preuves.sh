@@ -2266,6 +2266,21 @@ etape_bascule() {
 
 HC_SA=system:serviceaccount:kube-system:helm-cilium
 # liaisons (ClusterRoleBinding ou RoleBinding) vers cluster-admin dont un sujet est un compte de service : « type espace/nom → sujets »
+refus_droits() { # espace/déploiement : refus des droits dans le journal du contrôleur. Sous RKE2, kube-apiserver est un pod statique : dans la
+  # minute qui suit son démarrage (kata.sh exemption), ses caches RBAC peuvent refuser un watch, repris ensuite (1 s après, mesuré le 06/11/2026).
+  # Seuls ces watch sont écartés, affichés sur la sortie d'erreur ; tout autre refus compte.
+  local d=0
+  [ "$DISTRO" != rke2 ] || d=$(kubectl get pod -n kube-system -l component=kube-apiserver -o json \
+    | jq -r '.items[0].status.containerStatuses[0].state.running.startedAt | fromdateiso8601')
+  kubectl logs -n "${1%/*}" "deploy/${1#*/}" | grep 'is forbidden: User' | jq -s --argjson d "$d" '
+    def t: .timestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601;
+    map(select(((.error // "") | test("cannot watch")) and $d > 0 and t >= $d and t < $d + 60 | not)) | length' || true
+  kubectl logs -n "${1%/*}" "deploy/${1#*/}" | grep 'is forbidden: User' | jq -r --argjson d "$d" '
+    def t: .timestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601;
+    select(((.error // "") | test("cannot watch")) and $d > 0 and t >= $d and t < $d + 60)
+    | "CONSTAT  écarté, kube-apiserver démarrant : \(.timestamp) \(.error | sub(".*cannot "; "cannot "))"' >&2 || true
+}
+
 HC_FILTRE='.items[] | select(.roleRef.name == "cluster-admin" and any(.subjects[]?; .kind == "ServiceAccount"))
   | "\(.kind) \(.metadata.namespace // "-")/\(.metadata.name) → \([.subjects[] | "\(.kind) \(.namespace // "-")/\(.name)"] | join(", "))"'
 
@@ -2553,7 +2568,7 @@ etape_controleurs() {
   echo "## journaux des contrôleurs (depuis leur démarrage)"
   for c in tekton-pipelines/tekton-pipelines-controller tekton-chains/tekton-chains-controller; do
     ba_attendu "${c#*/} : redémarrages" "$(kubectl get pods -n "${c%/*}" -l "app=${c#*/}" -o jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}{"\n"}{end}' | sort -u | paste -sd,)" 0
-    ba_attendu "${c#*/} : refus des droits dans le journal" "$(kubectl logs -n "${c%/*}" "deploy/${c#*/}" | grep -c 'is forbidden: User' || true)" 0   # JSON : guillemets échappés
+    ba_attendu "${c#*/} : refus des droits dans le journal" "$(refus_droits "$c")" 0
   done
 
   echo "## information : comptes de service qui peuvent lister les Secrets de kube-system, et ceux de tout le cluster"

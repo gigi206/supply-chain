@@ -1,0 +1,7 @@
+essai du 06/11/2026 à 15:23 UTC, journaux réels du cluster RKE2, sixième passage
+Pipelines : 0 CONSTAT  écarté, kube-apiserver démarrant : 2026-11-06T14:09:31.361Z cannot watch resource "pipelineruns" in API group "tekton.dev" in the namespace "builds" CONSTAT  écarté, kube-apiserver démarrant : 2026-11-06T14:09:31.361Z cannot watch resource "resoluti
+Chains : 0
+== témoin : sans exclusion (DISTRO=k3s), les deux refus comptent
+Pipelines : 2
+== témoin : fenêtre décalée, kube-apiserver démarré 2 min plus tôt
+Pipelines : 2

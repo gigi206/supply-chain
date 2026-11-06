@@ -296,3 +296,13 @@ Durée cumulée du passage de zéro et des deux reprises : environ 9 070 s, soit
 **Tirage de Cilium** : `USURPEE` et `HORS_CIDR` sont choisies libres par `adresse_libre` (`commun.sh`). `USURPEE` l'est au chargement, avant les scripts de pods qui la développent ; la garde reste. [Essai](resultats/essai-usurpee.log) sur les scripts rendus : `.248` partout quand `.250` et `.249` sont prises, constante gardée hors de l'étape `reseau`. Exécution réelle à venir au passage de zéro.
 
 **Non prouvé** : passage d'un seul tenant ; redémarrage des VM sous RKE2 ; règles 08c, S1, cert-manager, `isBuildArtifact: true`, jamais appliqués.
+
+## Sixième passage, de zéro, arrêté à `J8 (contrôleurs)` (06/11/2026, 15:23 UTC)
+
+Lancé sur accord (« Oui, relance »), 13:28 à 15:21 UTC, [journal](../08-trust-plane/resultats/rejeu-rke2-sixieme-passage.log). J1 à J7, les 8 tests, la bascule et `helm_cilium` passent, 0 KO jusque-là. `adresse_libre` a tourné pour de vrai, sans avoir à écarter d'adresse : `.250` était libre sur les deux nœuds. **Seuil non atteint.**
+
+**Arrêt** : 2 refus de droits au journal du contrôleur de Pipelines, `cannot watch` sur `pipelineruns` et `resolutionrequests` dans `builds`, à 14:09:31 UTC. `kata.sh exemption` a redémarré `rke2-server` ; `kube-apiserver`, pod statique, a démarré à 14:09:30, 1 s avant. L'audit de l'API ne montre pour ce contrôleur que les refus PodSecurity attendus, aucun droit manquant. Le passage précédent n'avait rien eu à cet endroit : c'est une course, pas un défaut constant.
+
+**Correction du contrôle** : sous RKE2, `refus_droits` écarte uniquement les `watch` refusés dans la minute qui suit le démarrage de `kube-apiserver`, et les affiche. Tout autre refus compte. Sous k3s, rien ne change. [Essai](resultats/essai-refus-droits.log) sur les journaux réels : 0 avec les 2 écartés affichés ; témoins sans exclusion et fenêtre décalée : 2.
+
+**Ce que cela affaiblit** : pendant cette minute, un `watch` refusé pour un vrai manque de droits ne serait pas compté. Il le serait au prochain essai, et l'informer ne fonctionnerait pas, ce que les tests suivants verraient.
