@@ -1,0 +1,19 @@
+contrôles à sec du 06/11/2026 à 22:21:35 UTC : dry-run serveur et lectures, rien écrit dans le cluster
+## témoins de preuves.sh sous les règles H5 en Deny
+dernier passage de l'étape controleurs : 06/11 15:25 UTC, avant h5_deny de 19:26
+hc-pod-default, kube-system, inchangé : pod/preuve-helm-cilium created (server dry run)
+ct-pod-essai ancien, placé dans bancc : admission webhook "vpol.validate.kyverno.svc-fail" denied the request: Policy limites-obligatoires failed: durcissement : limites de mémoire et de CPU obligatoires; Policy images-zot-par-digest failed: durcissement : image du Zot du PoC, par digest
+ct-pod-essai corrigé, placé dans bancc : pod/preuve-controleurs created (server dry run)
+espace bancc employé à la place de preuve-controleurs, qui n'existe pas et n'a pas été créé
+## valeurs figées de redemarrer.sh
+sonde_kyverno : admission webhook "vpol.validate.kyverno.svc-fail" denied the request: Policy zone-confiance failed: zone confiance : nodeSelector zone=confiance obligatoire
+Zot, manifeste sample-app, anonyme : HTTP 200
+Forgejo, main : 6391fd437f26696847041be3226bbbf633f55a2f, attendu 6391fd437f26696847041be3226bbbf633f55a2f
+## pods hors jobs non Ready, espaces de prets()
+kube-system : 13 pods, non Ready : 0
+kyverno : 4 pods, non Ready : 0
+tekton-chains : 1 pods, non Ready : 0
+tekton-pipelines : 6 pods, non Ready : 0
+tekton-pipelines-resolvers : 1 pods, non Ready : 0
+declencheurs : 1 pods, non Ready : 0
+fin 22:21:36 UTC

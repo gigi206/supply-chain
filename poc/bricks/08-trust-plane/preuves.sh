@@ -2536,7 +2536,12 @@ etape_controleurs() {
     kubectl create rolebinding -n preuve-controleurs "${c#*:}" --clusterrole="${c#*:}-tenant-access" --serviceaccount="$c" >/dev/null
   done
   hc_pod default "$T/ct-pod-default.json"
-  jq '.metadata = {name: "preuve-controleurs", namespace: "preuve-controleurs"}' "$T/ct-pod-default.json" > "$T/ct-pod-essai.json"
+  # Conforme aux règles de la 08c en Deny (sans jeton, image de Zot par digest, limites) : sinon le témoin administrateur est refusé
+  # et ces règles se mêlent au refus de la règle mesurée (relevé à sec du 06/11/2026, jamais rejoué sous H5)
+  jq --arg i "$(awk -F'\t' -v b="$BUSYBOX_AMONT" '$1 == b {print $4}' "$R/tekton-images.tsv")" \
+    '.metadata = {name: "preuve-controleurs", namespace: "preuve-controleurs"} | .spec.automountServiceAccountToken = false
+    | .spec.containers[0] += {image: $i, resources: {requests: {cpu: "10m", memory: "16Mi"}, limits: {cpu: "100m", memory: "64Mi"}}}' \
+    "$T/ct-pod-default.json" > "$T/ct-pod-essai.json"
   for u in "$CONTROLEUR" "$CHAINS"; do
     ba_attendu "${u##*:} : can-i create pods dans preuve-controleurs (liaison temporaire)" "$(kubectl auth can-i create pods -n preuve-controleurs --as "$u" 2>/dev/null || true)" yes
     ct_refus "$REGLE_REFUS" "${u##*:} : pod de preuve-controleurs" kubectl create --as "$u" -f "$T/ct-pod-essai.json" || k=1

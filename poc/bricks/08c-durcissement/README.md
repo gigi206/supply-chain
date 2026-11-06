@@ -671,6 +671,20 @@ Bornes :
 - Le redémarrage décharge `wireguard` des trois nœuds. S'il tombe pendant le créneau du 07/11, de 09:30 à 10:30 UTC, il peut faire sauter le passage planifié : à lancer après la relecture de P1 à P6.
 - `rejeu.sh` n'est pas modifié : H1 à H5 et `secrets.sh` n'y sont toujours pas intégrés, et cette intégration ne sera proposée qu'une fois le jalon prouvé. `kata.sh reseau` y passera désormais avec des limites, sans mesure de comparaison.
 
+**Additif du 06/11/2026, 22:22 UTC : témoin de l'étape `controleurs` corrigé à sec, valeurs figées de `redemarrer.sh` relues.** Contrôle : [durcissement-temoins-sec.log](resultats/durcissement-temoins-sec.log), dry-run serveur et lectures, rien écrit dans le cluster.
+
+- **Blocage trouvé :** l'étape `controleurs` de [`preuves.sh`](../08-trust-plane/preuves.sh) a tourné pour la dernière fois à 15:25 UTC, avant `h5_deny`. Son pod témoin, `ct-pod-essai`, est refusé sous `Deny` même au nom de l'administrateur : le témoin finirait KO.
+- **Refus instable :** ce pod a reçu deux réponses sur deux essais, `jeton-compte-default` seule au premier, non archivé, puis `limites-obligatoires` et `images-zot-par-digest`. Cause non établie. Le motif attendu de `ct_refus`, la règle native `tekton-controleurs-builds`, aurait pu être masqué de la même façon.
+- **Correction :** le pod passe sans jeton, avec l'image de Zot par digest et des limites. `hc-pod-default` reste inchangé, `kube-system` étant exclu de ces règles.
+- **Mesuré :** l'ancien pod est refusé, le nouveau admis en dry-run, et `bash -n` passe.
+- **Valeurs de `redemarrer.sh` :** sonde Kyverno refusée par `zone-confiance` avec le message attendu, manifeste Zot en HTTP 200, `main` de Forgejo à `6391fd43…`, aucun pod hors jobs non `Ready` dans les six espaces de `prets()`.
+
+Bornes :
+- Le dry-run a été fait dans `bancc`, car `preuve-controleurs` n'existe qu'au passage de l'étape, qui ne l'a pas créé. Rien ne prouve encore le comportement dans cet espace.
+- `preuves.sh controleurs` n'a pas été rejouée : les refus au nom des contrôleurs restent à mesurer sous `Deny`.
+- Les étapes de `preuves.sh` n'ont pas toutes été passées en revue, seuls les pods écrits en dur ont été relus. Les témoins passant par des TaskRun ou des fichiers de politique ne sont pas couverts.
+- Ces contrôles n'annoncent pas la réussite du redémarrage : V1 à V5 restent à mesurer.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
