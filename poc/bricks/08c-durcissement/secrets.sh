@@ -143,6 +143,19 @@ etape_verifier() {
   kyverno apply "$here/politiques/kyverno/durcissement.yaml" --resource "$T/pod-apres.json" --policy-report --output-format json > "$T/cli.json" 2> "$T/cli.err" || true
   attendu "images-zot-par-digest" "$(jq -c '[.results[]? // .[]?.results[]? | select(.policy == "images-zot-par-digest") | .result] | unique' "$T/cli.json")" '["pass"]'
 
+  echo "## Secrets en service comparés aux sources de l'hôte, sans affichage : ce que S1 écrira est ce que le cluster utilise déjà"
+  mkdir -m 700 "$V/s"
+  sources "$V/s"
+  for f in tekton-chains/zot-chains:config.json:chains.json builds/zot-images:config.json:images.json builds/zot-fermetures:config.json:fermetures.json declencheurs/forgejo-webhook:secret:webhook; do
+    IFS=: read -r d n m <<<"$f"
+    kubectl get secret -n "${d%%/*}" "${d##*/}" -o json | jq -r --arg k "$n" '.data[$k]' | base64 -d > "$V/s/lu"
+    case "$m" in
+      *.json) meme_json "$V/s/lu" "$V/s/$m";;
+      *) cmp -s "$V/s/lu" "$V/s/$m";;
+    esac && echo "OK   $d : identique à la source" || { echo "KO   $d : différent de la source"; ko=1; }
+  done
+  attendu "fin de ligne du secret du webhook" "$(tail -c1 "$V/s/webhook" | wc -l)" 0
+
   echo "## OpenBao en service, lecture : kv actif, rôle et chemins absents"
   d=$(racine <<<'bao secrets list -format=json | grep -c "\"kv/\"" ; bao list -format=json auth/jwt/role ; bao list -format=json kv/' | tr -d ' \n')
   echo "$d" | cut -c1-300

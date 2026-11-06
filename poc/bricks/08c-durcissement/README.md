@@ -281,6 +281,17 @@ Le propriétaire valide les trois choix recommandés, après la question « n es
 
 Estimation : 4 h. Une décision s'impose à partir de 8 h.
 
+**Additif du 06/11/2026, 18:38 UTC, prédictions de S1 sous H1 à H4, avant exécution** (accord du propriétaire : « Lance S1 ») :
+
+`secrets.sh verifier` rejoué sous H1 à H4 : conforme ([journal](resultats/secrets-verifier.log), celui du 05/11 gardé dans [`secrets-verifier-05-11.log`](resultats/secrets-verifier-05-11.log)). Contrôle ajouté, absent du 05/11 : les quatre Secrets en service sont identiques aux sources de l'hôte, comparés sans affichage. Sans lui, `copie` aurait comparé OpenBao à l'hôte, jamais au cluster.
+
+- **S1a, `s1_source`** : quatre relectures identiques, 9 témoins sur 9 conformes, connexion refusée au compte `horodatage`. Le chemin `kv/` et les témoins n'ont jamais tourné : c'est le premier risque de ce jalon ;
+- **S1b, `s1_chains`** : déploiement prêt en moins de 180 s, journal « jeton révoqué » dès le premier essai ou presque, `signing-secrets` seul monté comme Secret, `zot-chains` absent ;
+- **S1c, `s1_copies`** : trois Secrets recréés, contenu vérifié, aucun conflit d'`apply --server-side` puisque les valeurs sont inchangées ;
+- **S1d, juste après** : contrôleur `1/1`, 0 redémarrage, aucun refus de politique Cilium depuis `tekton-chains`, `limites-obligatoires` toujours à 1 échec dans cet espace (le conteneur d'initialisation a des limites).
+
+**Hors de cet accord** : `.sig` et `.att` écrits avec `poc-build`, et le HMAC après la copie de `forgejo-webhook`, ne se prouvent que par une construction. Elle écrit dans Zot : elle attend son propre accord. Tant qu'elle n'a pas tourné, S1 n'est pas prouvé de bout en bout. `preuves.sh` (lignes 2512 et 2651) lit `zot-chains` par `--as` : le refus attendu doit rester un `Forbidden`, l'autorisation passant avant l'existence du Secret ; prédit, non mesuré.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
