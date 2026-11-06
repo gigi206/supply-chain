@@ -1,0 +1,10 @@
+# durcissement.sh flux, 2026-11-06T18:41:24Z, DISTRO=rke2
+début 18:41:24 UTC
+fin 18:48:24 UTC
+## sc-confiance : 11214 verdicts, 36 refusés, 36 refus de politique
+     18 egress 10.42.0.71 -> 34.117.62.14:443
+     18 egress 10.42.0.121 -> 34.117.62.14:443
+## sc-build : 15 verdicts, 0 refusés, 0 refus de politique
+## sc-stockage : 4274 verdicts, 0 refusés, 0 refus de politique
+identité 3433 : ["k8s:batch.kubernetes.io/job-name=porte-reelle-apres","k8s:io.kubernetes.pod.namespace=porte","k8s:job-name=porte-reelle-apres"]
+identité 21613 : ["k8s:batch.kubernetes.io/job-name=porte-ba-webhook","k8s:io.kubernetes.pod.namespace=porte","k8s:job-name=porte-ba-webhook"]

@@ -313,6 +313,18 @@ Estimation : 4 h. Une décision s'impose à partir de 8 h.
 
 Le contrôle du sujet `poc-build` est ajouté parce que K2 sans lui ne distingue pas un compte d'un autre : `ba_chemin` ne relève que `poc-images`.
 
+**Additif du 06/11/2026, 18:48 UTC, construction de preuve de S1 : K1 à K5 tenues.** Webhook de 18:41:29 UTC ([construction](../08-trust-plane/resultats/preuves-construction_s1.log), [porte](../08-trust-plane/resultats/preuves-reelle-s1.log), [audit de Zot](resultats/secrets-s1-zot.log), [flux](resultats/durcissement-flux-s1.log)).
+
+- **K1 tenue** : HMAC accepté après la copie, PipelineRun créé par `el-forgejo`, réussi en 54 s, spec identique à J7, image `3a7ca1b1` ;
+- **K2 tenue** : 3 TaskRun et le PipelineRun signés, 10 → 12 enveloppes, aucune anomalie. L'audit de Zot attribue à `poc-build` 2 `.att` et leurs blobs, en HTTP 201. La forme est la même, ligne pour ligne, que celle de la construction d'avant S1 ;
+- **K3 tenue** : livraison non signée refusée, rejeu `already exists`, aucun PipelineRun du commit non signé ;
+- **K4 tenue** : porte `true`, contrôle 9 à 12/12 avec 43 bundles, VSA 1/1, aucune VSA poussée ;
+- **K5 tenue** : 0 refus sur `sc-build` et `sc-stockage`. Sur `sc-confiance`, 36 refus vers `34.117.62.14:443`, tous des Jobs `porte-ba-webhook` et `porte-reelle-apres` (identités lues dans Cilium), même nombre et même forme que W4, verdict inchangé.
+
+**Correction de ma prédiction du 05/11** (« écrit `.sig` et `.att` ») : seuls les `.att` sont écrits. L'audit ne montre qu'une écriture de `.sig` sur `builds/sample-app`, à 14:24:34 UTC. Ni la construction témoin de 18:26 ni celle-ci n'en écrivent : l'image garde le même digest. **L'écriture d'un `.sig` avec les identifiants injectés reste donc non prouvée**, elle demanderait une image de digest nouveau. Le compte et le chemin sont ceux des `.att`.
+
+**S1 est prouvé pour une construction par le webhook.** Non prouvé : tests 1 à 4, 7 et 8 sous H1 à H4 et S1, signature fausse et corps modifié du test 5, redémarrage des VM. W4 reste ouvert : la porte tente le TUF public de Sigstore, et l'outil à l'origine n'est toujours pas identifié.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
