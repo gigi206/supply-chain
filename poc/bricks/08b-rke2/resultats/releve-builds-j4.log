@@ -1,0 +1,59 @@
+relevé du 06/11/2026 à 08:59 UTC, à sec, cluster k3s en service
+serveur : v1.35.9+k3s1
+
+## 1. Qui pose le label enforce de builds
+labels déclarés par tekton/builds.yaml : 0
+politique.sh:590:  kubectl label --dry-run=server --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted 2>&1 | sed 's/^/  /'
+politique.sh:610:  trap 'kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-v
+politique.sh:612:  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || t
+politique.sh:622:  kubectl label --overwrite namespace builds pod-security.kubernetes.io/enforce=restricted pod-security.kubernetes.io/enforce-version
+enforce de builds aujourd'hui : restricted
+set-security-context aujourd'hui : true
+défaut prévu sous RKE2 : enforce:restricted
+
+## 2. Pod réel de J4, TaskRun essai-signature, créé avant le drapeau
+créé le 2026-11-03T20:38:09Z, phase Succeeded
+  pod : {"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}
+  prepare : {}
+  place-scripts : {}
+  step-publier : {}
+REFUSÉ   pod de J4 tel qu'il a tourné
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/builds-j4.Y9Q8WV/j4.json": pods "essai-j4" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (containers "prepare", "place-scripts", "step-publier" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (containers "prepare", "place-scripts", "step-pu
+
+## 3. Même pod, securityContext posé par set-security-context sur les conteneurs de Tekton seuls
+REFUSÉ   pod de J4, conteneurs d'initialisation réglés
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/builds-j4.Y9Q8WV/j4-drapeau.json": pods "essai-j4" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "step-publier" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "step-publier" must set securityContext.capabilities.drop=
+REFUSÉ   pod de J4, étape réglée aussi
+         Error from server: error when creating "~/.cache/supply-chain-poc/08b/builds-j4.Y9Q8WV/j4-conforme.json": admission webhook "vpol.validate.kyverno.svc-fail-1e13e32f" denied the request: Policy zone-build failed: zone build : jeton de compte de service interdit
+
+## 4. Tâches de J4 et J5 : securityContext déclaré
+tekton/essai-signature.yaml:18:    securityContext:
+tekton/essai-signature.yaml-19-      runAsNonRoot: true
+tekton/essai-signature.yaml-20-      runAsUser: 65532
+tekton/essai-signature.yaml-21-      seccompProfile:
+tekton/essai-signature.yaml-22-        type: RuntimeDefault
+--
+tekton/webhook.yaml:93:          securityContext:
+tekton/webhook.yaml-94-            runAsNonRoot: true
+tekton/webhook.yaml-95-            runAsUser: 65532
+tekton/webhook.yaml-96-            seccompProfile:
+tekton/webhook.yaml-97-              type: RuntimeDefault
+
+## 5. Autres pods de builds encore présents, sans réglage sur leurs conteneurs d'initialisation
+2026-11-03T20:38:09Z essai-signature-pod
+2026-11-03T20:47:25Z j6-signee-pod
+total : 2
+
+## 6. Retrait du label sous RKE2 : politique.sh, cas sous warn et audit
+  35:#              enforce levé le temps d'un cas : violation tracée dans l'audit de l'API sous warn et audit ; exécutions vers
+  609:  echo "## audit : enforce levé le temps de ce seul cas (le piège le repose) ; création du pod tracée, sans refus"
+  612:  kubectl label namespace builds pod-security.kubernetes.io/enforce- pod-security.kubernetes.io/enforce-version- >/dev/null 2>&1 || true
+autres retraits du label dans les scripts de la 08 : 0
+
+## 7. CronJob et Job du cluster, hors des espaces restricted : gabarits non vus par un relevé de pods
+total : 0
+
+## 8. Label posé sans --overwrite sur un espace déjà en restricted, à sec : ce que verrait un tekton.sh rejoué après J6
+error: 'pod-security.kubernetes.io/enforce' already has a value (restricted), and --overwrite is false
+code 1
+enforce de builds après l'essai : restricted

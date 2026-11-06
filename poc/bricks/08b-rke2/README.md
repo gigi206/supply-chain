@@ -186,3 +186,28 @@ Relecture de `rke2.sh`, de `distro.sh` et des scripts du rejeu, puis [`releve-re
 ## Additif à la prédiction 4 (06/11/2026, 08:32 UTC, avant tout rejeu)
 
 Le texte du 05/11/2026 reste écrit. « Liste non prédite » est désormais remplacée par une liste relevée à sec. **Sans D8 à D11, sont attendus refusés** : le contrôleur de Chains, les témoins du banc C dans `bancc`, et les pods de `j2-essais`. L'adoption de D8 à D11 changera cette prédiction, par un nouvel additif. Cette liste ne couvre que ce que l'admission permet de voir sur k3s : un refus d'un composant non relu ici reste possible.
+
+## Additif : `builds` avant J6 (06/11/2026, 08:56 UTC, cluster k3s inchangé)
+
+Cinquième blocage, trouvé en cherchant ce qu'un relevé des pods présents ne pouvait pas voir : les fenêtres de temps et les pods éphémères. [`releve-builds-j4.sh`](releve-builds-j4.sh), tout en `--dry-run=server`, journal [`releve-builds-j4.log`](resultats/releve-builds-j4.log). **Le rejeu s'arrêterait ici en J4 au plus tard, avec D8 à D11 seules appliquées.**
+
+**Correction** : l'additif de 08:32 UTC dit que les pods de `kata.sh` et de `preuves.sh` visent `builds`, « déjà en `restricted` sous k3s ». C'est vrai après J6, et ces pods tournent après J6. Mais `builds` n'a aucun label avant `politique.sh restreint` : `tekton/builds.yaml` n'en déclare pas, et les journaux de J6 archivés le montrent (« aucun label pod-security, niveau privileged par défaut »). Le texte de 08:32 UTC reste écrit.
+
+| # | Mesure | Effet attendu sous RKE2 |
+|---|---|---|
+| 5 | Pod réel de J4, `essai-signature-pod`, du 03/11/2026, présenté à `builds` : **refusé** par `restricted` sur `prepare`, `place-scripts` et `step-publier`. Conteneurs de Tekton réglés seuls : **encore refusé**, sur `step-publier`. Étape réglée aussi : PodSecurity passe, puis `zone-build` refuse le jeton du compte de service, règle posée en J6, après ce pod | `builds` hérite du défaut `restricted` dès sa création, avec `set-security-context` encore à faux. `tekton.sh signature` échoue sur `kubectl wait` : même effet que le blocage 1, à la même étape, et la correction de D8 ne le lève pas |
+| 6 | `politique.sh:612` retire le label `enforce` pour le cas « sous warn et audit ». Lecture seule : aucun retrait ailleurs dans les scripts de la 08 | Sous k3s, retirer le label redonne `privileged`. Sous RKE2, il redonne `restricted` : le pod est refusé au lieu d'être tracé, `verdict … True` sort en erreur, J6 s'arrête |
+
+**Mesuré conforme** : tous les CronJob et Job présents sont dans des espaces en `enforce=restricted`, aucun dans un espace sans label, `kyverno` compris. **D'après leurs manifestes, conformes ou hors de l'API** : `reserve-c`, `essai-j5` et les essais de la 08c passent par `kyverno apply`, sans l'API ; les pods de `pod_outils`, `pod_scan`, `pod_essai` et `essai-reseau-rattrapage` portent les réglages de `restricted`. `local-path-storage` est déjà en `privileged` avant son manifeste (`rke2.sh:173`). Sonde `sonde-o4` de la 19 : pod conforme, espace `tsa` déjà en `restricted`, et O4 n'est pas rejoué. Les pods de 01, 03, 19 et 19b tournent après J6 ou dans `builds` : 03 en J7 et J8, même état que sous k3s ; 01, 19 et 19b n'ajoutent aucun pod trouvé à la lecture de leurs `kubectl apply` et `create`.
+
+**Non présenté à l'API** : l'EventListener de J4 dans `builds`. Sans objet sous D12 (a).
+
+### Décision D12, ouverte
+
+| Décision | Recommandé | Autre choix |
+|---|---|---|
+| **D12, `builds` entre J4 et J6** | (a) sous `DISTRO=rke2`, `enforce=privileged` explicite sur `builds` à sa création, puis `politique.sh restreint` pose `restricted` comme aujourd'hui ; la ligne 612 passe de retrait du label à `enforce=privileged`, ce qui ne change rien sous k3s. Reproduit le chemin déjà mesuré, état final identique. **Ce que cela expose** : `builds` en `privileged` pendant le rejeu, de J4 à J6, comme sous k3s. **À écrire avec soin** : pose dans `tekton.sh`, seulement si le label est absent, jamais dans `tekton/builds.yaml`, dont `politique.sh:653` exige qu'il conserve `restricted`. `tekton.sh signature` rejoué après J6 ne doit ni rabaisser l'espace ni échouer : `kubectl label` sans `--overwrite` sort en erreur sur une valeur différente, code 1 mesuré (section 8 du journal), ce qui arrêterait le script sous `set -e` | (b) `builds` en `restricted` dès J4 : `set-security-context` activé par `tekton.sh`, étapes de `essai-signature.yaml` et `webhook.yaml` réglées. Plus strict, mais il déplace l'essai du drapeau de J6, et les tâches signées d'avant `restreint`, comme `j6-signee`, restent à relire. Le cas de la ligne 612 demande (a) de toute façon |
+
+## Second additif à la prédiction 4 (06/11/2026, 08:56 UTC, avant tout rejeu)
+
+Le texte précédent reste écrit. **Sans D12, sont aussi attendus refusés** : les pods de TaskRun de J4 et ceux de J6 antérieurs à `restreint`, ainsi que le cas « sous warn et audit » de la ligne 612. La réserve demeure : un refus d'un composant non relu reste possible, et aucune de ces mesures ne porte sur l'exécution.
