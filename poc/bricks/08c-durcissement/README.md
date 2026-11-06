@@ -67,6 +67,23 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 
 **Effet relevé** : 32 événements `PolicyViolation` en 4 minutes 20 sur les seuls CronJobs, soit environ 7 par minute, tant que l'écart reste ouvert.
 
+**Additif du 06/11/2026, 16:56 UTC, préparation de H3 sous RKE2, rien appliqué.** Relevé `ss` refait sur les trois nœuds, politiques relues.
+
+- **Ports** : tous les ports ouverts vers l'extérieur sous RKE2 sont ceux du relevé k3s. Sous RKE2, 6443 et 6444 n'écoutent qu'en local sur les agents (`rke2`), 2382 aussi sur `sc-confiance`. `routing-mode=native` : pas de VXLAN à ouvrir.
+- **Mode audit global** : `policy-audit-mode` est une option de l'agent, « non-drop ». Pendant H3, **aucune politique réseau du cluster ne refuse plus rien**, `construction-sans-sortie` comprise. Aucun build ne doit tourner entre H3 et H4 ; `preuves.sh test6`, en H4, doit prouver leur retour.
+- **DHCP** : les nœuds gardent leur adresse par un bail d'une heure de `192.168.161.1`, T1 à 27 min, avec un socket UDP 68. `hote-commun` ne l'ouvre pas : en H4, le renouvellement serait refusé. D'où une fenêtre d'audit de 40 min (`h3_releve`), et l'ouverture à ajouter avant H4 si le verdict le confirme.
+- **`sc-replay`** tourne (`virsh list`), mais sans trafic elle ne produit aucun verdict : une lecture de Zot depuis cette VM est à faire pendant la fenêtre, pour connaître son adresse source.
+
+**Prédictions de H3 ajoutées, 06/11/2026, 16:56 UTC, avant toute application** :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| H3a | `cilium.sh appliquer`, jamais lancé sous RKE2, passe : 3 agents prêts, aucun nœud perdu, SSH joignable | Moyenne |
+| H3b | Verdict d'audit UDP 68 depuis `192.168.161.1` sur chaque nœud, dans les 40 min | Moyenne : dépend du format du relevé et du moment du renouvellement |
+| H3c | Verdicts d'audit ICMP entre nœuds, pour `cilium-health` : la politique n'ouvre que 4240 | Moyenne |
+| H3d | Aucun verdict d'audit sur 9345 ni 2379 hors des nœuds, puisque rien ne les sollicite au repos : le refus se prouve en H4, pas ici | Haute |
+| H3e | Le format du relevé `verdicts` lit bien les lignes réelles : il n'a été essayé sur aucune sortie de `cilium-dbg monitor` | Moyenne |
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

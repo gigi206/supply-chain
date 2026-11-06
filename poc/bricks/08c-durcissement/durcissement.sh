@@ -7,6 +7,7 @@
 #   h2_kyverno  règles en Audit (accord)
 #   h2_releve écarts relevés, sans rien changer
 #   h3_audit  pare-feu d'hôte et politiques de Cilium en mode audit, sans blocage (accord ; console virsh prête)
+#   h3_releve verdicts audit des trois agents, sans rien changer
 #   h4_bloque fin du mode audit (accord, après revue des verdicts relevés en h3)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
@@ -261,7 +262,29 @@ etape_h3_audit() {
   exige_rke2
   VALEURS_08C=$C/valeurs-cilium-audit.yaml "$b08/cilium.sh" appliquer
   kubectl apply --server-side -f "$here/politiques/cilium/"
-  echo "relevé des verdicts : cilium-dbg monitor -t policy-verdict sur chaque nœud, et Hubble"
+  attendu "pare-feu d'hôte et mode audit" "$(kubectl -n kube-system get cm cilium-config -o json | jq -c '[.data["enable-host-firewall"], .data["policy-audit-mode"]]')" '["true","true"]'
+  kubectl wait --for=condition=Ready node --all --timeout=120s >/dev/null
+  [ "$ko" = 0 ] || { echo "KO   h3_audit" >&2; exit 1; }
+}
+
+verdicts() { # lignes de cilium-dbg monitor : ce qui serait refusé, regroupé ; le port source et l'identifiant de flux sont retirés
+  sed -n -E 's/.*remote ID ([^,]+), proto ([0-9]+), (ingress|egress), action audit.* ([0-9a-f.:]+):[0-9]+ -> ([0-9a-f.:]+):([0-9]+).*/\3 proto \2 remote \1 \4 -> \5:\6/p' "$1" | sort | uniq -c | sort -rn
+}
+
+etape_h3_releve() { # ${DUREE:-2400} s de verdicts sur les trois agents : plus que T1 du bail DHCP, 27 min, pour voir un renouvellement
+  exige_rke2
+  local d=$T/h3 p n
+  rm -rf -- "${d:?}"; mkdir -p "$d"
+  date -u '+début %H:%M:%S UTC'
+  while read -r p n; do
+    kubectl exec -n kube-system "$p" -c cilium-agent -- timeout "${DUREE:-2400}" cilium-dbg monitor -t policy-verdict > "$d/$n.txt" 2> "$d/$n.err" </dev/null &
+  done < <(kubectl get pods -n kube-system -l k8s-app=cilium -o json | jq -r '.items[] | "\(.metadata.name) \(.spec.nodeName)"')
+  wait
+  date -u '+fin %H:%M:%S UTC'
+  for n in sc-confiance sc-build sc-stockage; do
+    echo "## $n : $(wc -l < "$d/$n.txt") verdicts, $(grep -c 'action audit' "$d/$n.txt" || true) seraient refusés"
+    verdicts "$d/$n.txt"
+  done
 }
 
 etape_h4_bloque() {
