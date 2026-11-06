@@ -1,0 +1,58 @@
+# Brique 08c, H5 : deux bornes sur des droits que l'amont donne et reconstruit, en règles natives de l'API, comme tekton/controleurs-builds.yaml. Kyverno exclut
+# kube-system, et ses webhooks ne protègent pas leurs propres configurations.
+#   jetons-rke2-controller  system:rke2-controller, dont le certificat est sur chaque nœud, peut demander le jeton de n'importe quel compte de service. RKE2 recrée son
+#                           ClusterRole au démarrage (clusterrole_bootstrap.go, v1.35.9+rke2r1). 0 demande de ce compte dans l'audit conservé, redémarrages de H1 compris.
+#   webhooks-triggers       tekton-triggers-admin donne l'écriture sur toutes les configurations de webhooks, donc sur celles de Kyverno et de Pipelines.
+# Retour : kubectl delete -f de ce fichier.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: jetons-rke2-controller
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["serviceaccounts/token"]
+  validations:
+    - expression: request.userInfo.username != 'system:rke2-controller'
+      message: "durcissement : system:rke2-controller ne demande pas de jeton de compte de service"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: jetons-rke2-controller
+spec:
+  policyName: jetons-rke2-controller
+  validationActions: [Deny]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: webhooks-triggers
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["admissionregistration.k8s.io"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE", "DELETE"]
+        resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+  matchConditions:
+    - name: comptes-triggers
+      expression: >-
+        request.userInfo.username in ['system:serviceaccount:tekton-pipelines:tekton-triggers-controller',
+        'system:serviceaccount:tekton-pipelines:tekton-triggers-webhook']
+  validations:
+    - expression: request.name.endsWith('.triggers.tekton.dev')
+      message: "durcissement : Triggers n'écrit que ses propres webhooks"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: webhooks-triggers
+spec:
+  policyName: webhooks-triggers
+  validationActions: [Deny]

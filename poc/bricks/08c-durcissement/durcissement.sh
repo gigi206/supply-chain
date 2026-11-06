@@ -16,6 +16,8 @@
 #   h5_deny   quatre règles en Deny (accord, après une construction sous limites) ; retour : h2_kyverno
 #   h5_tests_sec à sec : pods du test 4 et PipelineRun d'essai en dry-run serveur, décompte du test 8 ; ne change rien
 #   h5_tests  tests 2, 4, 3, 1, 7 et 8 sous H1 à H5 (accord) ; gabarit en service inchangé, journaux preuves-h5-<test>.log de la 08
+#   h5_roles_sec à sec : règles de politiques/roles en dry-run serveur, chart de Cilium rendu avec et sans la synchronisation de Secrets ; ne change rien
+#   h5_roles  deux règles de politiques/roles (accord) ; contrôleurs de Triggers et agent de sc-build redémarrés ; retour : kubectl delete -f politiques/roles/roles.yaml
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/durcissement.sh <étape>…   (journal : resultats/durcissement-<étape>.log)
 set -euo pipefail
@@ -540,6 +542,73 @@ etape_h5_tests() {
   local p
   p=$(pipe_essai)
   PIPE_ESSAI=$p JOURNAL=preuves-h5 mise run confiance:preuves -- test2 test4 test3 test1 test7 test8
+}
+
+jeton_essai() { # identité : demande réelle pour builds/build, 10 min, audience essai ; le dry-run émet tout de même un jeton, jamais lu ni gardé ; motif de refus sur la sortie
+  printf '{"apiVersion":"authentication.k8s.io/v1","kind":"TokenRequest","spec":{"audiences":["essai"],"expirationSeconds":600}}' > "$T/tr.json"
+  if kubectl create --raw '/api/v1/namespaces/builds/serviceaccounts/build/token?dryRun=All' --as="$1" -f "$T/tr.json" </dev/null >/dev/null 2>"$T/tr.err"; then echo admis
+  else tr '\n' ' ' < "$T/tr.err" | cut -c1-200; fi
+  rm -f "$T/tr.json" "$T/tr.err"
+}
+
+webhook_essai() { # compte configuration : modification présentée à l'API, dry-run serveur, au nom d'un compte de Triggers
+  kubectl patch validatingwebhookconfiguration "$2" --type=merge -p '{"metadata":{"labels":{"essai":"h5"}}}' --dry-run=server \
+    --as="system:serviceaccount:tekton-pipelines:$1" </dev/null 2>&1 | tr '\n' ' ' | cut -c1-200
+}
+
+etape_h5_roles_sec() {
+  exige_rke2
+  local c=$HOME/.cache/supply-chain-poc/08/telechargements/cilium/cilium-1.20.4.tgz v
+  mkdir -p "$T"
+  kubectl apply --server-side --dry-run=server -f "$here/politiques/roles/roles.yaml" </dev/null
+  echo "## chart de Cilium rendu sur l'hôte, sans le cluster ; décomptes seulement, le rendu contient des clés de démonstration"
+  for v in "" tls.secretSync.enabled=false; do
+    helm template cilium "$c" -n kube-system -f "$b08/cilium/valeurs.yaml" -f "$B08/valeurs-cilium.yaml" ${v:+--set "$v"} > "$T/cilium-rendu.yaml"
+    echo "${v:-valeurs en service} : règles nommant secrets $(grep -c '^  - secrets$' "$T/cilium-rendu.yaml" || true), enable-policy-secrets-sync $(grep -c 'enable-policy-secrets-sync' "$T/cilium-rendu.yaml" || true), rôle tlsinterception de l'opérateur $(grep -c 'name: cilium-operator-tlsinterception-secrets' "$T/cilium-rendu.yaml" || true)"
+  done
+  rm -f "$T/cilium-rendu.yaml"
+}
+
+audit_vu() { # motif depuis filtre-jq : requêtes de l'audit de l'API qui contiennent le motif, depuis une date, sélectionnées par le filtre ; nombre
+  sur sc-confiance "sudo sh -c 'cat \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort) | grep -F -- $1 || true'" </dev/null \
+    | jq -c --arg t "$2" 'select(.stage == "ResponseComplete" and .stageTimestamp[0:19] >= ($t[0:19])) | select('"$3"')' | grep -c . || true
+}
+
+etape_h5_roles() {
+  exige_rke2
+  local t1 n a0 a1
+  local c=system:rke2-controller w=system:serviceaccount:tekton-pipelines:tekton-triggers-webhook
+  mkdir -p "$T"
+  attendu "avant la règle, RBAC laisse passer la demande de jeton" "$(kubectl auth can-i create serviceaccounts --subresource=token -n builds --as="$c" </dev/null 2>/dev/null)" yes
+  kubectl apply --server-side -f "$here/politiques/roles/roles.yaml" </dev/null
+  sleep 5
+  n=$(jeton_essai "$c"); grep -F 'ne demande pas de jeton' <<< "$n" >/dev/null && echo "OK   jeton refusé : $n" || { echo "KO   jeton : $n"; ko=1; }
+  attendu "témoin, jeton demandé par system:kube-controller-manager" "$(jeton_essai system:kube-controller-manager)" admis
+  n=$(webhook_essai tekton-triggers-controller kyverno-policy-validating-webhook-cfg); grep -F "n'écrit que ses propres webhooks" <<< "$n" >/dev/null && echo "OK   webhook de Kyverno refusé : $n" || { echo "KO   webhook de Kyverno : $n"; ko=1; }
+  n=$(webhook_essai tekton-triggers-webhook validation.webhook.triggers.tekton.dev); grep -F 'dry run' <<< "$n" >/dev/null && echo "OK   témoin, webhook de Triggers : $n" || { echo "KO   témoin webhook de Triggers : $n"; ko=1; }
+  t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  a0=$(sur sc-build "systemctl show -p ActiveEnterTimestamp --value rke2-agent" </dev/null)
+  kubectl rollout restart -n tekton-pipelines deploy/tekton-triggers-webhook deploy/tekton-triggers-controller </dev/null
+  kubectl rollout status -n tekton-pipelines deploy/tekton-triggers-webhook --timeout=180s </dev/null
+  kubectl rollout status -n tekton-pipelines deploy/tekton-triggers-controller --timeout=180s </dev/null
+  sur sc-build "sudo systemctl restart rke2-agent" </dev/null
+  a1=$(sur sc-build "systemctl show -p ActiveEnterTimestamp --value rke2-agent" </dev/null)
+  [ "$a1" != "$a0" ] && echo "OK   agent de sc-build redémarré : $a0 → $a1" || { echo "KO   agent de sc-build non redémarré"; ko=1; }
+  sleep 20
+  kubectl wait --for=condition=Ready node/sc-build --timeout=180s </dev/null
+  # Témoins relevés le 06/11 : chaque démarrage d'agent fait un get nodes, chaque redémarrage du webhook met à jour ses configurations
+  for _ in $(seq 18); do
+    n=$(audit_vu system:rke2-controller "$t1" ".user.username == \"$c\" and .responseStatus.code < 300")
+    [ "$n" -ge 1 ] && break
+    sleep 5
+  done
+  [ "$n" -ge 1 ] && echo "OK   témoin : $n requête(s) acceptée(s) de $c après le redémarrage" || { echo "KO   aucune requête de $c après le redémarrage : le contrôle suivant serait vide"; ko=1; }
+  attendu "requêtes de $c refusées par l'API depuis $t1" "$(audit_vu system:rke2-controller "$t1" ".user.username == \"$c\" and .responseStatus.code >= 400 and .responseStatus.code != 409")" 0
+  n=$(audit_vu webhookconfigurations "$t1" ".user.username == \"$w\" and .verb == \"update\" and .responseStatus.code == 200")
+  [ "$n" -ge 1 ] && echo "OK   témoin : $n mise(s) à jour de ses webhooks par Triggers après le redémarrage" || { echo "KO   aucune mise à jour de webhook par Triggers : le contrôle suivant serait vide"; ko=1; }
+  attendu "écritures de webhooks de Triggers refusées depuis $t1" "$(audit_vu webhookconfigurations "$t1" ".user.username == \"$w\" and .responseStatus.code >= 400 and .responseStatus.code != 409")" 0
+  kubectl get nodes --no-headers </dev/null
+  [ "$ko" = 0 ] && echo "OK   h5_roles" || { echo "KO   h5_roles"; exit 1; }
 }
 
 for e in "$@"; do

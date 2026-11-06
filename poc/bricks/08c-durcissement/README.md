@@ -464,6 +464,46 @@ Le **plafond** de ce résultat : T1 et T4 restent des barrières vues depuis un 
 
 **Reste pour clore H5** : rôles (lecteurs de Secrets, comptes de RKE2, `HelmChart` côté utilisateurs et groupes), passage de `scan-sample-app` du 07/11 à 09:30 UTC. Toujours hors de ce rejeu : signature fausse et corps modifié du test 5, test 6 sous limites.
 
+**Additif du 06/11/2026, 20:29 UTC, rôles de H5, préparés à sec sur demande du propriétaire (« Oui, prépare à sec »), rien appliqué, prédictions avant passage.** Relevé en lecture seule ([`essais-h5-droits.sh`](essais-h5-droits.sh), [journal](resultats/durcissement-h5-droits.log)), élargi aux utilisateurs et aux groupes, aux droits qui mènent aux Secrets sans les lire, et aux droits donnés par espace. Les cinq lecteurs à l'échelle du cluster sont recoupés par `auth can-i`, le reste vient du calcul sur les objets RBAC. [`h5_roles_sec`](resultats/durcissement-h5_roles_sec.log) : règles de `politiques/roles/` admises en dry-run serveur, chart de Cilium rendu sur l'hôte.
+
+**Découverte : le compte de RKE2 peut demander le jeton de n'importe quel compte de service.** `system:rke2-controller` a `create` sur `serviceaccounts/token` sans borne, `can-i` à `yes` dans cinq espaces essayés, dont `tekton-chains` et `openbao`. Son certificat est sur les trois nœuds, `sc-build` compris, en root seul. Root sur `sc-build`, après une sortie de Kata, permettrait donc d'obtenir par exemple le jeton de `generic-garbage-collector`, lecteur de tous les Secrets, sans passer par `NodeRestriction`. Chaîne lue dans les droits, pas exercée. Une demande pour `builds/build`, au nom de ce compte et en `dryRun=All`, a rendu un jeton de 870 caractères : **le dry-run en émet un vrai**. Il valait 10 minutes pour l'audience `essai`, n'a été ni affiché ni gardé, et `jeton_essai` ne le lit jamais. Le chemin vers OpenBao resterait fermé par sa NetworkPolicy, non essayé depuis un hôte. Usage réel : 82 requêtes de ce compte dans l'audit conservé depuis 13:29:16 UTC, redémarrages de H1 compris, **0 sur les comptes de service**. Cause de ce droit dans RKE2 non trouvée : la règle est dans `clusterrole_bootstrap.go`, son appelant reste à chercher.
+
+| Sujet | Droit relevé | Proposition | Raison |
+|---|---|---|---|
+| `cilium-operator` | Lit tous les Secrets | **Retirer** : `tls.secretSync.enabled: false` | Le chart ne donne ce droit que pour la synchronisation TLS, et `ingressController`, `gatewayAPI`, `bgpControlPlane` n'en ont pas besoin ici. `l7Proxy=false`, `cilium-secrets` vide. Rendu : le droit de l'opérateur et son rôle disparaissent, il reste le Role de l'agent, borné à `cilium-secrets` |
+| `system:rke2-controller` | Jeton de tout compte, sur chaque nœud | **Borner** : règle `jetons-rke2-controller` | RKE2 recrée son ClusterRole au démarrage, une règle d'admission dure, et 0 usage relevé |
+| `tekton-triggers-controller`, `-webhook` | Écrivent toutes les configurations de webhooks, Kyverno compris | **Borner** : règle `webhooks-triggers` | Nouveau au relevé. Pipelines est déjà borné par `resourceNames` |
+| `tekton-triggers-core-interceptors` | Lit tous les Secrets | **Garder, justifié** | Mesuré le 02/11 : sans ce droit le pod n'est jamais prêt, l'informer n'a pas de portée. Sortie seulement en modifiant Triggers |
+| `generic-garbage-collector`, `namespace-controller`, `resourcequota-controller` | Lisent tous les Secrets, `list` et `watch` seuls pour le dernier | **Garder, justifié** | Contrôleurs de `kube-controller-manager`, identifiants sur `sc-confiance` seul. Leur rôle l'exige. La découverte ci-dessus est ce qui les rend atteignables depuis `sc-build` |
+| `rke2-cloud-controller-manager` | `nodes` et `daemonsets` en `*` | **Garder, justifié** | `cloud-controller.kubeconfig` absent de `sc-build`, relevé ; `sc-stockage` non relevé |
+| `HelmChart` | `create` : `system:masters` seul. `patch` et `update` : aussi `generic-garbage-collector`. Lecture : `system:rke2-controller` | **Clos** | 0 `HelmChart` dans le cluster, aucun autre compte, utilisateur ou groupe. `operateurs` refusé. Le contrôleur reste actif : RKE2 ne permet pas de le couper (08b) |
+| `kyverno-background-controller` | `roles` et `rolebindings` dans tous les espaces | **Garder, à revoir** | Limité par la prévention d'escalade, 0 règle de génération en service. Le retirer toucherait au chart de Kyverno, sans gain mesuré |
+
+`system:masters` reste le seul à détenir `impersonate`, `bind` et la liaison de cluster-admin. Lecture résiduelle, 26 Secrets, valeurs non lues. Les droits par espace ne révèlent aucun lecteur hors de ses propres espaces, à part les contrôleurs de Tekton dans `builds`, déjà bornés. Le résultat serait de **quatre lecteurs à l'échelle du cluster au lieu de cinq**, tous justifiés.
+
+| Prédiction | Attendu | Risque |
+|---|---|---|
+| R1, `h5_roles` | Jeton refusé à `system:rke2-controller` avec le message exact, témoin `system:kube-controller-manager` admis ; webhook de Kyverno refusé à Triggers, le sien admis | Moyenne : première règle sur `serviceaccounts/token` |
+| R2, redémarrages | Contrôleurs de Triggers et agent de `sc-build` repartent, `sc-build` `Ready`, 0 requête refusée de `system:rke2-controller`, 0 refus de webhook | **Moyenne** : usage du droit inconnu, 0 usage observé n'est pas une preuve. Un redémarrage complet des VM n'est pas couvert |
+| R3, Cilium | Après `helm upgrade` et redémarrage : `can-i` à `no` pour l'opérateur, 0 erreur de Secrets à son journal, politiques de H4 intactes, test 6 conforme | **Moyenne à haute** : `cilium.sh appliquer` jamais rejoué sous H4, et il redémarre les agents. Étape non écrite, valeurs non modifiées : à préparer après accord |
+| R4, construction | Après R1 à R3 : chaîne complète, image `3a7ca1b1`, 18 → 20 enveloppes, porte `true`, 0 refus | Moyenne |
+
+**Effets à connaître** : `h5_roles` pose deux règles natives, redémarre deux Deployments de Triggers et l'agent RKE2 de `sc-build`, sans construction en cours ; `h5_roles` rend aussi un jeton en dry-run pour `builds/build` avant la règle, et un pour le témoin après. Retour : `kubectl delete -f politiques/roles/roles.yaml`. Limite d'une règle : elle ne protège pas de root sur `sc-confiance`, où sont les identifiants d'administration, ni des certificats de `kubelet`, bornés par `NodeRestriction`.
+
+Après décision : additif à l'ADR 0000, qui compte encore cinq lecteurs à ce jour.
+
+**Additif du 06/11/2026, 20:34 UTC, rôles de H5, relecture avant accord, rien appliqué.** Trois points de l'additif de 20:29 sont précisés.
+
+- **Cause du droit sur les jetons, trouvée.** Ajouté par le commit `562228ec09` de RKE2, « change windows calico setup to generate a sa token » (#2940). Les deux appelants de `pkg/windows`, `calico.go` et `flannel.go`, sont réservés à Windows (`//go:build windows`) ; aucun appel dans les six fichiers lus de `pkg/rke2` à v1.35.9+rke2r1. Ils ne tournent donc pas sur nos nœuds Linux. La règle est absente de `manifests/rolebindings.yaml` de k3s, branche par défaut. Non balayé : le code de k3s embarqué, recherche GitHub sans résultat, donc sans valeur.
+- **Usage réel, chiffre corrigé.** Les 82 requêtes de l'additif de 20:29 comptaient mes propres essais par emprunt d'identité. Requêtes réelles du compte, depuis 13:29:16 UTC, à la création du cluster : **54 `get nodes`, 14 `selfsubjectaccessreviews`, rien d'autre.** Cela couvre les jonctions des agents et les redémarrages de H1 sur les trois nœuds. Le risque de R2 tombe à **faible à moyen**.
+- **`rke2-cloud-controller-manager`** : `cloud-controller.kubeconfig` absent de `sc-stockage` aussi, relevé. Il n'est que sur `sc-confiance`.
+
+`h5_roles` est renforcée avant tout accord : plus de jeton émis avant la règle, `auth can-i` suffit, le témoin d'après en émet seul un ; redémarrage de l'agent prouvé par `ActiveEnterTimestamp` ; contrôles de refus précédés d'un témoin d'activité, sinon ils passeraient à vide : au moins une requête acceptée de `system:rke2-controller` après le redémarrage, et une mise à jour de ses webhooks par Triggers, deux comportements relevés dans l'audit à 16:41 et 19:20 UTC. Les 409, conflits normaux de Triggers au démarrage, ne comptent pas pour des refus.
+
+R3, à vérifier avant d'écrire son étape : `hubble-server-certs` et `cilium-ca` existent, et deux rendus locaux du chart ont produit des certificats différents, sans le cluster. Un `helm upgrade` pourrait donc en faire tourner. Non vérifié.
+
+ADR 0000 et 0001 complétés sur le droit de `system:rke2-controller`, limite résiduelle jusqu'à décision.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

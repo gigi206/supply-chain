@@ -1,0 +1,8 @@
+# durcissement.sh h5_roles_sec, 2026-11-06T20:29:00Z, DISTRO=rke2
+validatingadmissionpolicy.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied (server dry run)
+validatingadmissionpolicybinding.admissionregistration.k8s.io/jetons-rke2-controller serverside-applied (server dry run)
+validatingadmissionpolicy.admissionregistration.k8s.io/webhooks-triggers serverside-applied (server dry run)
+validatingadmissionpolicybinding.admissionregistration.k8s.io/webhooks-triggers serverside-applied (server dry run)
+## chart de Cilium rendu sur l'hôte, sans le cluster ; décomptes seulement, le rendu contient des clés de démonstration
+valeurs en service : règles nommant secrets 3, enable-policy-secrets-sync 1, rôle tlsinterception de l'opérateur 3
+tls.secretSync.enabled=false : règles nommant secrets 1, enable-policy-secrets-sync 0, rôle tlsinterception de l'opérateur 0
