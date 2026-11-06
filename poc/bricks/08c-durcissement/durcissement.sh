@@ -680,12 +680,14 @@ etape_h5_cilium_sec() {
 
 etape_h5_cilium() {
   exige_rke2
-  local c0 p0 t1 p n v o=system:serviceaccount:kube-system:cilium-operator
+  local c0 p0 t1 p n v q
   c0=$(versions_certs); p0=$(pare_feu)
   attendu "avant, droits" "$(droits_cilium)" "cilium-operator cluster=yes cilium-secrets=yes cilium cluster=no cilium-secrets=yes "
   suspendre_rattrapage
   VALEURS_08C=$C/valeurs-cilium.yaml "$b08/cilium.sh" appliquer
-  t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  # Le nouveau pod seul, depuis sa création : la fermeture de la surveillance de l'ancien tombe dans la fenêtre, et les lectures d'un démarrage la précèdent
+  q=$(kubectl get pods -n kube-system -l io.cilium/app=operator -o jsonpath='{.items[0].metadata.name}' </dev/null)
+  t1=$(kubectl get pod -n kube-system "$q" -o jsonpath='{.metadata.creationTimestamp}' </dev/null)
   attendu "pare-feu d'hôte et mode audit" "$(kubectl -n kube-system get cm cilium-config -o json | jq -c '[.data["enable-host-firewall"], .data["policy-audit-mode"]]')" '["true","false"]'
   attendu "enable-policy-secrets-sync dans cilium-config" "$(kubectl -n kube-system get cm cilium-config -o json | jq '.data | has("enable-policy-secrets-sync")')" false
   attendu "rôle de l'opérateur dans cilium-secrets" "$(kubectl get role -n cilium-secrets cilium-operator-tlsinterception-secrets --ignore-not-found -o name </dev/null)" ""
@@ -706,9 +708,9 @@ etape_h5_cilium() {
   attendu "redémarrages de conteneurs de Cilium" "$(kubectl get pods -n kube-system -l 'k8s-app=cilium' -o json </dev/null | jq '[.items[].status.containerStatuses[].restartCount] | add')" 0
   attendu "redémarrages de l'opérateur" "$(kubectl get pods -n kube-system -l io.cilium/app=operator -o json </dev/null | jq '[.items[].status.containerStatuses[].restartCount] | add')" 0
   attendu "lignes forbidden du journal de l'opérateur" "$(kubectl logs -n kube-system deploy/cilium-operator </dev/null | grep -ci forbidden || true)" 0
-  n=$(audit_vu cilium-operator "$t1" ".user.username == \"$o\"")
+  n=$(audit_vu "$q" "$t1" ".")
   [ "$n" -ge 1 ] && echo "OK   témoin : $n requête(s) de l'opérateur depuis $t1" || { echo "KO   aucune requête de l'opérateur : le contrôle suivant serait vide"; ko=1; }
-  attendu "requêtes de l'opérateur sur des Secrets depuis $t1" "$(audit_vu cilium-operator "$t1" ".user.username == \"$o\" and .objectRef.resource == \"secrets\"")" 0
+  attendu "requêtes de l'opérateur sur des Secrets depuis $t1" "$(audit_vu "$q" "$t1" ".objectRef.resource == \"secrets\"")" 0
   kubectl get nodes --no-headers </dev/null
   [ "$ko" = 0 ] && echo "OK   h5_cilium" || { echo "KO   h5_cilium"; exit 1; }
 }

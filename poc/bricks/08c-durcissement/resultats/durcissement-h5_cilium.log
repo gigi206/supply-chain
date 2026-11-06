@@ -1,0 +1,46 @@
+# durcissement.sh h5_cilium, 2026-11-06T20:52:46Z, DISTRO=rke2
+OK   avant, droits : cilium-operator cluster=yes cilium-secrets=yes cilium cluster=no cilium-secrets=yes 
+# cilium.sh appliquer, 2026-11-06T20:52:51Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Fri Nov  6 21:52:51 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 4
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-11-06T17:48:00Z : sc-build=2026-11-06T20:53:03Z sc-confiance=2026-11-06T20:52:53Z sc-stockage=2026-11-06T20:52:53Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]
+OK   pare-feu d'hôte et mode audit : ["true","false"]
+OK   enable-policy-secrets-sync dans cilium-config : false
+OK   rôle de l'opérateur dans cilium-secrets : 
+OK   SSH de sc-confiance : joint
+OK   SSH de sc-build : joint
+OK   SSH de sc-stockage : joint
+OK   API : ok
+OK   Zot joignable depuis l'hôte : HTTP 200
+OK   droits : cilium-operator cluster=no cilium-secrets=no cilium cluster=no cilium-secrets=yes 
+OK   certificats : cilium-ca 422 hubble-server-certs 423
+OK   pare-feu depuis sc-build : 6443=ouvert 2379=ferme 
+OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+OK   cilium-5l8wn, état : OK
+OK   cilium-5l8wn, Hubble : Ok
+OK   cilium-82lnn, état : OK
+OK   cilium-82lnn, Hubble : Ok
+OK   cilium-gxk2n, état : OK
+OK   cilium-gxk2n, Hubble : Ok
+OK   redémarrages de conteneurs de Cilium : 0
+OK   redémarrages de l'opérateur : 0
+OK   lignes forbidden du journal de l'opérateur : 0
+OK   témoin : 1 requête(s) de l'opérateur depuis 2026-11-06T20:53:14Z
+OK   requêtes de l'opérateur sur des Secrets depuis 2026-11-06T20:53:14Z : 0
+sc-build       Ready   <none>               7h22m   v1.35.9+rke2r1
+sc-confiance   Ready   control-plane,etcd   7h25m   v1.35.9+rke2r1
+sc-stockage    Ready   <none>               7h22m   v1.35.9+rke2r1
+OK   h5_cilium

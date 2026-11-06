@@ -1,0 +1,30 @@
+relecture du 06/11/2026 à 20:54:47 UTC, rien de modifié
+opérateur : cilium-operator-5bd56746bc-r8ptc 2026-11-06T20:52:52Z 2026-11-06T20:52:53Z
+## requêtes de l'opérateur depuis la création du pod (2026-11-06T20:52:52Z), tous stades, par ressource et verbe
+     10 ResponseComplete get customresourcedefinitions 200
+      6 ResponseComplete patch nodes 200
+      2 ResponseComplete get namespaces 200
+      1 ResponseComplete get customresourcedefinitions 404
+      1 ResponseComplete watch secrets 200
+## témoin : mêmes requêtes sur Secrets, toute la conservation, par pod de l'opérateur
+     29 ResponseStarted watch 200 cilium-operator-5c896b4b74-9g7kt dernier
+     27 ResponseComplete watch 200 cilium-operator-5c896b4b74-9g7kt dernier
+     26 ResponseStarted watch 200 cilium-operator-97d54f9d9-dvr44 dernier
+     26 ResponseComplete watch 200 cilium-operator-97d54f9d9-dvr44 dernier
+      6 ResponseStarted watch 200 cilium-operator-749f7d969d-jgh4n dernier
+      6 ResponseComplete watch 200 cilium-operator-749f7d969d-jgh4n dernier
+dernière requête sur des Secrets : 2026-11-06T20:52:52
+## CronJobs et incidents depuis le départ (20:52:46)
+declencheurs   rattrapage        false   2026-11-06T20:54:26Z
+horodatage     horodatage        false   2026-11-06T20:54:06Z
+scan           scan-sample-app   false   2026-11-06T15:40:59Z
+declencheurs/rattrapage-29899971 2026-11-06T20:51:00Z reussi=1 echec=0
+declencheurs/rattrapage-29899972 2026-11-06T20:52:00Z reussi=1 echec=0
+declencheurs/rattrapage-29899974 2026-11-06T20:54:22Z reussi=1 echec=0
+horodatage/horodatage-29899972 2026-11-06T20:52:00Z reussi=1 echec=0
+horodatage/horodatage-29899973 2026-11-06T20:53:00Z reussi=1 echec=0
+horodatage/horodatage-29899974 2026-11-06T20:54:00Z reussi=1 echec=0
+2 horodatage/horodatage-29899973-7fgjg FailedScheduling
+1 kube-system/cilium-operator-5bd56746bc-r8ptc FailedScheduling
+1 null/zone-confiance PolicyViolation
+0

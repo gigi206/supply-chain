@@ -1,0 +1,139 @@
+relevé du 06/11/2026 à 20:54:51 UTC, rien de modifié
+## secrets-lecture
+  cluster                      Group:system:masters get,list,watch [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector get,list,watch [tous] par system:controller:generic-garbage-collector
+  cluster                      ServiceAccount:kube-system/namespace-controller get,list,watch [tous] par system:controller:namespace-controller
+  cluster                      ServiceAccount:kube-system/resourcequota-controller list,watch [tous] par system:controller:resourcequota-controller
+  cluster                      ServiceAccount:tekton-pipelines/tekton-triggers-core-interceptors get,list,watch [noms:tekton-triggers-core-interceptors-certs] par tekton-triggers-core-interceptors-secrets
+  cluster                      ServiceAccount:tekton-pipelines/tekton-triggers-core-interceptors get,list,watch [tous] par tekton-triggers-core-interceptors
+  cluster                      User:system:kube-controller-manager get,list,watch [tous] par system:kube-controller-manager
+  espace kube-system           ServiceAccount:kube-system/bootstrap-signer get,list,watch [tous] par system:controller:bootstrap-signer
+  espace cilium-secrets        ServiceAccount:kube-system/cilium get,list,watch [tous] par cilium-tlsinterception-secrets
+  espace kube-system           ServiceAccount:kube-system/token-cleaner get,list,watch [tous] par system:controller:token-cleaner
+  espace kyverno               ServiceAccount:kyverno/kyverno-admission-controller get,list,watch [tous] par kyverno:admission-controller
+  espace kyverno               ServiceAccount:kyverno/kyverno-background-controller get,list,watch [tous] par kyverno:background-controller
+  espace kyverno               ServiceAccount:kyverno/kyverno-cleanup-controller get,list,watch [noms:kyverno-cleanup-controller.kyverno.svc.kyverno-tls-ca,kyverno-cleanup-controller.kyverno.svc.kyverno-tls-pair,kyverno-cleanup-controller.kyverno.metering.kyverno-tls-ca,kyverno-cleanup-controller.kyverno.metering.kyverno-tls-pair] par kyverno:cleanup-controller
+  espace kyverno               ServiceAccount:kyverno/kyverno-reports-controller get,list,watch [tous] par kyverno:reports-controller
+  espace builds                ServiceAccount:tekton-chains/tekton-chains-controller get,list,watch [tous] par tekton-chains-controller-tenant-access
+  espace builds                ServiceAccount:tekton-pipelines-resolvers/tekton-pipelines-resolvers get [tous] par tekton-pipelines-resolvers-lecture
+  espace tekton-pipelines-resolvers ServiceAccount:tekton-pipelines-resolvers/tekton-pipelines-resolvers get,list,watch [tous] par tekton-pipelines-resolvers-namespace-rbac
+  espace builds                ServiceAccount:tekton-pipelines/tekton-pipelines-controller get,list,watch [tous] par tekton-pipelines-controller-tenant-access
+  espace tekton-pipelines      ServiceAccount:tekton-pipelines/tekton-pipelines-webhook list,watch [tous] par tekton-pipelines-webhook
+  espace tekton-pipelines      ServiceAccount:tekton-pipelines/tekton-pipelines-webhook get [noms:webhook-certs] par tekton-pipelines-webhook
+  espace tekton-pipelines      ServiceAccount:tekton-pipelines/tekton-triggers-webhook get,list,watch [tous] par tekton-triggers-admin-webhook
+  (18 sujet(s))
+## helmchart-ecriture
+  cluster                      Group:system:masters create,patch,update [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector patch,update [tous] par system:controller:generic-garbage-collector
+  (2 sujet(s))
+## jeton-sa
+  cluster                      Group:system:masters create [tous] par cluster-admin
+  cluster                      User:system:kube-controller-manager create [tous] par system:kube-controller-manager
+  cluster                      User:system:rke2-controller create [tous] par system:rke2-controller
+  (3 sujet(s))
+## emprunt
+  cluster                      Group:system:masters impersonate [tous] par cluster-admin
+  (1 sujet(s))
+## rbac-escalade
+  cluster                      Group:system:masters bind,escalate [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/clusterrole-aggregation-controller escalate [tous] par system:controller:clusterrole-aggregation-controller
+  (2 sujet(s))
+## rbac-liaison
+  cluster                      Group:system:masters create,patch,update [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector patch,update [tous] par system:controller:generic-garbage-collector
+  cluster                      ServiceAccount:kyverno/kyverno-background-controller create,patch,update [tous] par kyverno:background-controller
+  (3 sujet(s))
+## webhooks
+  cluster                      Group:system:masters create,delete,patch,update [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector delete,patch,update [tous] par system:controller:generic-garbage-collector
+  cluster                      ServiceAccount:kube-system/namespace-controller delete [tous] par system:controller:namespace-controller
+  cluster                      ServiceAccount:kyverno/kyverno-admission-controller create,delete,patch,update [tous] par kyverno:admission-controller
+  cluster                      ServiceAccount:kyverno/kyverno-cleanup-controller create,delete,update [tous] par kyverno:cleanup-controller
+  cluster                      ServiceAccount:tekton-pipelines/tekton-pipelines-webhook delete,update [noms:webhook.pipeline.tekton.dev] par tekton-pipelines-webhook-cluster-access
+  cluster                      ServiceAccount:tekton-pipelines/tekton-pipelines-webhook delete,update [noms:validation.webhook.pipeline.tekton.dev,config.webhook.pipeline.tekton.dev] par tekton-pipelines-webhook-cluster-access
+  cluster                      ServiceAccount:tekton-pipelines/tekton-triggers-controller create,delete,patch,update [tous] par tekton-triggers-admin
+  cluster                      ServiceAccount:tekton-pipelines/tekton-triggers-webhook create,delete,patch,update [tous] par tekton-triggers-admin
+  (8 sujet(s))
+## noeuds-proxy
+  cluster                      Group:system:masters create,get [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector get [tous] par system:controller:generic-garbage-collector
+  cluster                      ServiceAccount:kube-system/namespace-controller get [tous] par system:controller:namespace-controller
+  cluster                      User:kube-apiserver create,get [tous] par system:kubelet-api-admin
+  (4 sujet(s))
+## pods-exec
+  cluster                      Group:system:masters create,get [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/generic-garbage-collector get [tous] par system:controller:generic-garbage-collector
+  cluster                      ServiceAccount:kube-system/namespace-controller get [tous] par system:controller:namespace-controller
+  (3 sujet(s))
+## pods-creation
+  cluster                      Group:system:masters create [tous] par cluster-admin
+  cluster                      ServiceAccount:kube-system/daemon-set-controller create [tous] par system:controller:daemon-set-controller
+  cluster                      ServiceAccount:kube-system/job-controller create [tous] par system:controller:job-controller
+  cluster                      ServiceAccount:kube-system/persistent-volume-binder create [tous] par system:controller:persistent-volume-binder
+  cluster                      ServiceAccount:kube-system/replicaset-controller create [tous] par system:controller:replicaset-controller
+  cluster                      ServiceAccount:kube-system/replication-controller create [tous] par system:controller:replication-controller
+  cluster                      ServiceAccount:kube-system/statefulset-controller create [tous] par system:controller:statefulset-controller
+  espace local-path-storage    ServiceAccount:local-path-storage/local-path-provisioner-service-account create [tous] par local-path-provisioner-role
+  espace builds                ServiceAccount:tekton-chains/tekton-chains-controller create [tous] par tekton-chains-controller-tenant-access
+  espace builds                ServiceAccount:tekton-pipelines/tekton-pipelines-controller create [tous] par tekton-pipelines-controller-tenant-access
+  (10 sujet(s))
+## recoupement par auth can-i, à l'échelle du cluster (toutes les valeurs attendues : le calcul ci-dessus)
+  kube-system/generic-garbage-collector get=yes list=yes watch=yes
+  kube-system/namespace-controller get=yes list=yes watch=yes
+  kube-system/resourcequota-controller get=no list=yes watch=yes
+  tekton-pipelines/tekton-triggers-core-interceptors get=yes list=yes watch=yes
+## Secrets du cluster, par espace et type, noms masqués, valeurs non lues
+  2 builds Opaque
+  1 declencheurs Opaque
+  1 kube-system Opaque
+  6 kube-system helm.sh/release.v1
+  2 kube-system kubernetes.io/tls
+  3 kube-system rke2.cattle.io/node-password
+  1 kyverno Opaque
+  4 kyverno kubernetes.io/tls
+  2 observabilite kubernetes.io/service-account-token
+  1 openbao Opaque
+  1 tekton-chains Opaque
+  3 tekton-pipelines Opaque
+## règle de cilium-operator sur les Secrets, et ce qu'en dit sa configuration
+  Role cilium-secrets/cilium-tlsinterception-secrets
+  Role kube-system/cilium-config-agent
+  Role kube-system/cilium-operator-ztunnel
+  RoleBinding cilium-secrets/cilium-tlsinterception-secrets
+  RoleBinding kube-system/cilium-config-agent
+  RoleBinding kube-system/cilium-operator-ztunnel
+  clustermesh-cache-ttl=0s
+  clustermesh-default-global-namespace=true
+  clustermesh-enable-endpoint-sync=false
+  clustermesh-enable-mcs-api=false
+  clustermesh-mcs-api-install-crds=true
+  egress-gateway-reconciliation-trigger-interval=1s
+  hubble-tls-cert-file=/var/lib/cilium/tls/hubble/server.crt
+  hubble-tls-client-ca-files=/var/lib/cilium/tls/hubble/client-ca.crt
+  hubble-tls-key-file=/var/lib/cilium/tls/hubble/server.key
+  policy-secrets-namespace=cilium-secrets
+  policy-secrets-only-from-secrets-namespace=true
+  proxy-xff-num-trusted-hops-ingress=0
+## lectures de Secrets par les lecteurs, audit de l'API, depuis le début des fichiers conservés (compte, verbe, espace ; champs de métadonnées seulement)
+       59 kube-system:cilium-operator watch <cluster> 200
+        2 kube-system:namespace-controller deletecollection preuve-controleurs 200
+        2 kube-system:namespace-controller list preuve-controleurs 200
+        1 kube-system:namespace-controller deletecollection j2-essais 200
+        1 kube-system:namespace-controller deletecollection j3-essais 200
+        1 kube-system:namespace-controller deletecollection j5-essais 200
+        1 kube-system:namespace-controller deletecollection preuve-resolveurs 200
+        1 kube-system:namespace-controller list j2-essais 200
+        1 kube-system:namespace-controller list j3-essais 200
+        1 kube-system:namespace-controller list j5-essais 200
+        1 kube-system:namespace-controller list preuve-resolveurs 200
+        1 system:admin patch tekton-pipelines 201
+       59 tekton-pipelines:tekton-triggers-core-interceptors watch <cluster> 200
+       19 tekton-pipelines:tekton-triggers-core-interceptors get declencheurs 200
+        3 tekton-pipelines:tekton-triggers-core-interceptors get builds 200
+        2 tekton-pipelines:tekton-triggers-core-interceptors get tekton-pipelines 200
+        1 tekton-pipelines:tekton-triggers-core-interceptors update tekton-pipelines 200
+## contrôleur Helm de RKE2, processus et manifestes (noms seulement ; config.yaml non lu)
+0
+4
+No resources found
+No resources found in kube-system namespace.
