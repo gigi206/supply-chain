@@ -631,6 +631,26 @@ Certificats 422 et 423, pare-feu, témoins vers sc-stockage, API, SSH et Kyverno
 
 **Reste de H5** : passage du 07/11 à 09:30 UTC, à relire, sur un Cilium sans WireGuard.
 
+### Additif du 06/11/2026, 22:02 UTC : relecture du passage planifié, prédictions P1 à P6, avant le passage
+
+`essais-h5-planifie.sh` relit le premier passage de `scan-sample-app` déclenché par le planificateur, attendu le 07/11 à 09:30:00 UTC. Il est en lecture seule, refuse de partir avant cette heure et refuse si son journal existe. Rien n'a été changé dans le cluster. Essai à blanc sur le job manuel à 22:01 UTC : tous les contrôles s'exécutent, et les deux seuls KO sont ceux attendus d'un job manuel (aucun passage planifié, job créé par `system:admin`). Cet essai n'est pas archivé comme preuve.
+
+| Prédiction | Attendu |
+|---|---|
+| P1, planificateur | `lastScheduleTime` à 2026-11-07T09:30:00Z, un seul job neuf rattaché au CronJob, créé dans la minute, par `system:serviceaccount:kube-system:cronjob-controller` en 201. Ce nom de compte est déduit de `job-controller`, vu dans l'audit, et n'a pas été observé |
+| P2, admission | Pod créé par `job-controller` en 201, aucun 403 ni 422 dans l'espace `scan` |
+| P3, conteneurs | Six conteneurs à 0, sans redémarrage ni OOM, pod en moins de 300 s (118 s pour le job manuel) |
+| P4, Zot | Referrers 3 → 4 sur `3a7ca1b1`. Base `2026-11-07` lue, le timer `base-grype` étant prévu le 07/11 à 08:12:33 UTC. Le nombre de vulnérabilités n'est pas prédit : il dépend de la base du jour |
+| P5, historique | Le job manuel reste listé à côté du neuf, sous la limite de 3 |
+| P6, Grafana | Cinq marqueurs lus par l'auditeur : `SOURCE`, `SCAN`, `PUBLIE` et les deux révocations |
+
+Bornes de cette relecture, relevées avant le passage :
+
+- Le CronJob a `startingDeadlineSeconds: 3600` : si les VM sont arrêtées ou suspendues au-delà de 10:30 UTC, le passage est sauté et rien n'est prouvé.
+- Si `base-grype` échoue, le scan prend la base du 06/11 : P4 ne tient pas sur ce point, sans bloquer le scan. La porte refuse une base de plus de 3 jours.
+- La différence avec le job manuel se réduit au créateur du job : le pod passe par le même contrôleur et les mêmes règles.
+- L'audit de sc-confiance garde 11 fichiers de 100 Mo (`--audit-log-maxbackup=10`), soit environ 16 h au rythme relevé de 88 minutes par fichier : à relire avant environ 01:30 UTC le 08/11.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
