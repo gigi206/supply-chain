@@ -674,10 +674,12 @@ $(grep -cE "192\.168\.161\.13\.5000 > ${USURPEE//./\\.}\.[0-9]+: Flags \[S\.\]" 
   pod_reseau j7-reseau-voisin - - "sleep 300"
   kubectl wait -n builds pod/j7-reseau-voisin --for=condition=Ready --timeout=120s >/dev/null
   v=$(ip_pod j7-reseau-voisin)
-  n=$(kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}' | grep -cxF "$HORS_CIDR" || true)
-  d=$(kubectl get ciliumendpoints -A -o json | jq --arg u "$HORS_CIDR" '[.items[].status.networking.addressing[]?.ipv4 | select(. == $u)] | length')
-  [ "$n" = 0 ] && [ "$d" = 0 ] && echo "OK   pod témoin $v sur $(kubectl get pod -n builds j7-reseau-voisin -o jsonpath='{.spec.nodeName}') ; $HORS_CIDR inutilisée" \
-    || { echo "KO   $HORS_CIDR en usage" >&2; exit 1; }
+  # Cilium tire les adresses au hasard dans le /24, et sc-confiance porte plus de 30 pods : .250 était prise le 06/11/2026. Première libre en descendant.
+  { kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}'
+    kubectl get ciliumendpoints -A -o json | jq -r '.items[].status.networking.addressing[]?.ipv4'; } > "$T/ip-prises"
+  HORS_CIDR=$(for i in $(seq 250 -1 200); do grep -qxF "${HORS_CIDR%.*}.$i" "$T/ip-prises" || { echo "${HORS_CIDR%.*}.$i"; break; }; done)
+  [ -n "$HORS_CIDR" ] && echo "OK   pod témoin $v sur $(kubectl get pod -n builds j7-reseau-voisin -o jsonpath='{.spec.nodeName}') ; $HORS_CIDR inutilisée" \
+    || { echo "KO   aucune adresse libre de .200 à .250 sur sc-confiance" >&2; exit 1; }
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   capture "$T/enp1s0.txt" 70 -i enp1s0 host "$EXTERNE" or host "$HORS_CIDR"
   pod_reseau j7-reseau-sources kata privilegie "for a in $v $HORS_CIDR $EXTERNE; do
