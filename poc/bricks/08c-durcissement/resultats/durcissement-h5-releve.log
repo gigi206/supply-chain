@@ -1,0 +1,87 @@
+relevé du 06/11/2026 à 18:54:19 UTC, rien de modifié
+## conteneurs des deux Jobs de la porte de la preuve de S1 (début, fin, secondes)
+porte-ba-webhook
+  porte 2026-11-06T18:43:15Z 2026-11-06T18:44:16Z 61 s
+  scan-verifier 2026-11-06T18:44:17Z 2026-11-06T18:44:17Z 0 s
+  horodatage 2026-11-06T18:44:18Z 2026-11-06T18:44:18Z 0 s
+  scan 2026-11-06T18:44:18Z 2026-11-06T18:44:18Z 0 s
+  vsa 2026-11-06T18:44:18Z 2026-11-06T18:44:18Z 0 s
+porte-reelle-apres
+  porte 2026-11-06T18:44:44Z 2026-11-06T18:45:45Z 61 s
+  scan-verifier 2026-11-06T18:45:45Z 2026-11-06T18:45:45Z 0 s
+  horodatage 2026-11-06T18:45:46Z 2026-11-06T18:45:46Z 0 s
+  scan 2026-11-06T18:45:46Z 2026-11-06T18:45:46Z 0 s
+  vsa 2026-11-06T18:45:46Z 2026-11-06T18:45:46Z 0 s
+## refus vers 34.117.62.14:443 pendant la preuve de S1 (SYN, identité, port source)
+      9 21613 48934
+      9 21613 58490
+      9 3433 33520
+      9 3433 48498
+## échecs de limites-obligatoires dans les rapports, par espace
+      2 limites-obligatoires builds
+      4 limites-obligatoires declencheurs
+      5 limites-obligatoires horodatage
+      4 limites-obligatoires porte
+      1 limites-obligatoires tekton-chains
+(la règle ne lit que spec.containers : les conteneurs d'initialisation sont listés ci-dessous sans compter pour elle)
+## charges hors TaskRun, conteneurs sans limite de mémoire ou de CPU
+  declencheurs Job/rattrapage rattrapage conteneur mem=- cpu=-
+  declencheurs ReplicaSet/el-forgejo event-listener conteneur mem=- cpu=-
+  horodatage -/j5-temoin essai conteneur mem=- cpu=-
+  horodatage Job/h-essai-signature horodater conteneur mem=- cpu=-
+  horodatage Job/h-essai-signature identifiants init mem=- cpu=-
+  horodatage Job/h-essai-webhook horodater conteneur mem=- cpu=-
+  horodatage Job/h-essai-webhook identifiants init mem=- cpu=-
+  horodatage Job/horodatage horodater conteneur mem=- cpu=-
+  horodatage Job/horodatage identifiants init mem=- cpu=-
+  openbao StatefulSet/openbao openbao conteneur mem=512Mi cpu=-
+  porte Job/porte-ba-webhook horodatage conteneur mem=512Mi cpu=-
+  porte Job/porte-ba-webhook porte init mem=1Gi cpu=-
+  porte Job/porte-ba-webhook scan conteneur mem=512Mi cpu=-
+  porte Job/porte-ba-webhook scan-verifier init mem=512Mi cpu=-
+  porte Job/porte-ba-webhook vsa conteneur mem=512Mi cpu=-
+  porte Job/porte-reelle-apres horodatage conteneur mem=512Mi cpu=-
+  porte Job/porte-reelle-apres porte init mem=1Gi cpu=-
+  porte Job/porte-reelle-apres scan conteneur mem=512Mi cpu=-
+  porte Job/porte-reelle-apres scan-verifier init mem=512Mi cpu=-
+  porte Job/porte-reelle-apres vsa conteneur mem=512Mi cpu=-
+  tekton-chains ReplicaSet/tekton-chains-controller tekton-chains-controller conteneur mem=- cpu=-
+  tekton-pipelines ReplicaSet/tekton-events-controller tekton-events-controller conteneur mem=- cpu=-
+  tekton-pipelines ReplicaSet/tekton-pipelines-controller tekton-pipelines-controller conteneur mem=- cpu=-
+  tekton-pipelines ReplicaSet/tekton-triggers-controller tekton-triggers-controller conteneur mem=- cpu=-
+  tekton-pipelines ReplicaSet/tekton-triggers-core-interceptors tekton-triggers-core-interceptors conteneur mem=- cpu=-
+  tekton-pipelines ReplicaSet/tekton-triggers-webhook webhook conteneur mem=- cpu=-
+  tsa ReplicaSet/timestamp-authority connexion init mem=- cpu=-
+  tsa ReplicaSet/timestamp-authority renouvellement conteneur mem=- cpu=-
+  tsa ReplicaSet/timestamp-authority timestamp-server conteneur mem=- cpu=-
+## conteneurs de la dernière exécution par le webhook
+  preparer step-sources {}
+  preparer step-entrees {}
+  preparer prepare {}
+  preparer place-scripts {}
+  publier step-publier {}
+  publier prepare {}
+  publier place-scripts {}
+  construire step-construire {"limits":{"cpu":"2","memory":"6Gi"},"requests":{"cpu":"2","memory":"6Gi"}}
+  construire prepare {}
+  construire place-scripts {}
+## consommation à l'instant, hors espaces système (metrics-server, pas un pic)
+  declencheurs el-forgejo-79b6fd78c6-qtjm7 1m 17Mi
+  openbao openbao-0 24m 82Mi
+  tekton-chains tekton-chains-controller-59b7f46cbd-wnlr4 1m 33Mi
+  tekton-pipelines tekton-events-controller-747c585746-crj65 1m 23Mi
+  tekton-pipelines tekton-pipelines-controller-65d4c9d57b-zjbpj 1m 38Mi
+  tekton-pipelines tekton-pipelines-webhook-5fccc89bd5-5tlqd 1m 88Mi
+  tekton-pipelines tekton-triggers-controller-8449556669-6q7dc 1m 21Mi
+  tekton-pipelines tekton-triggers-core-interceptors-6858f95cfc-xwpf8 1m 25Mi
+  tekton-pipelines tekton-triggers-webhook-5d67f65bf8-xqj54 1m 19Mi
+  tekton-pipelines-resolvers tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1m 21Mi
+  tsa timestamp-authority-6b5fbbb4b6-l6lmt 1m 15Mi
+## config-defaults de Tekton, clés actives (valeur _example retirée)
+  0 clé(s)
+## droits effectifs de tous les comptes de service (auth can-i, à l'échelle du cluster)
+  kube-system/cilium-operator get=yes list=yes helmchart=no
+  kube-system/generic-garbage-collector get=yes list=yes helmchart=no
+  kube-system/namespace-controller get=yes list=yes helmchart=no
+  kube-system/resourcequota-controller get=no list=yes helmchart=no
+  tekton-pipelines/tekton-triggers-core-interceptors get=yes list=yes helmchart=no

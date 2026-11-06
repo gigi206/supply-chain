@@ -325,6 +325,13 @@ Le contrôle du sujet `poc-build` est ajouté parce que K2 sans lui ne distingue
 
 **S1 est prouvé pour une construction par le webhook.** Non prouvé : tests 1 à 4, 7 et 8 sous H1 à H4 et S1, signature fausse et corps modifié du test 5, redémarrage des VM. W4 reste ouvert : la porte tente le TUF public de Sigstore, et l'outil à l'origine n'est toujours pas identifié.
 
+**Additif du 06/11/2026, 18:55 UTC, préparation de H5, rien appliqué.** Relevé en lecture seule : `essais-h5-releve.sh`, journal `resultats/durcissement-h5-releve.log`.
+
+- **W4, outil identifié** : c'est `ec validate image`, conteneur `porte`. Dans les deux Jobs de la preuve, il dure 61 s, les quatre autres conteneurs 0 s. Le code de `ec` v0.10.42 (`internal/policy/policy.go`, `checkOpts`) appelle `cosign.TrustedRoot()` même avec une clé publique, sauf si une variable `SIGSTORE_*` est définie, et poursuit sans erreur si l'appel échoue. Refus : deux connexions par pod, 9 SYN chacune, soit les 36 relevés. Le lien entre les 61 s et ces refus vient du code et de cette isolation, pas d'une mesure : Hubble n'a plus ces flux en mémoire et le moniteur ne les horodate pas. À mesurer en retirant l'appel.
+- **`limites-obligatoires`** : 16 échecs dans les rapports. La règle ne lit que `spec.containers`. Tâches Tekton : `preparer` et `publier` sans limite ; `step-construire` a 2 CPU et 6 Gi, qui ne changeraient pas. `config-defaults` a la clé `default-container-resource-requirements`, appliquée seulement aux conteneurs sans ressources, donc sans toucher aux bundles ; non essayée. Charges à régler : `el-forgejo`, `rattrapage`, `horodatage`, `tekton-chains`, les contrôleurs de `tekton-pipelines`, `timestamp-authority`, et le CPU seul pour `openbao` et la porte. Le pod `j5-temoin` est un reste de J5.
+- **Consommation** : 15 à 88 Mi à l'instant du relevé, cluster au repos. Ce n'est pas un pic : aucune limite ne peut en être tirée.
+- **Droits, `auth can-i` sur tous les comptes de service** : lisent les Secrets à l'échelle du cluster `cilium-operator`, `generic-garbage-collector`, `namespace-controller`, `resourcequota-controller` (`list` seul) et `tekton-triggers-core-interceptors`. Aucun compte de service ne peut créer de `HelmChart` ; utilisateurs et groupes non balayés par ce relevé. Reste à vérifier que ces cinq comptes sont bien ceux que l'ADR 0000 vise.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
