@@ -332,6 +332,19 @@ Le contrôle du sujet `poc-build` est ajouté parce que K2 sans lui ne distingue
 - **Consommation** : 15 à 88 Mi à l'instant du relevé, cluster au repos. Ce n'est pas un pic : aucune limite ne peut en être tirée.
 - **Droits, `auth can-i` sur tous les comptes de service** : lisent les Secrets à l'échelle du cluster `cilium-operator`, `generic-garbage-collector`, `namespace-controller`, `resourcequota-controller` (`list` seul) et `tekton-triggers-core-interceptors`. Aucun compte de service ne peut créer de `HelmChart` ; utilisateurs et groupes non balayés par ce relevé. Reste à vérifier que ces cinq comptes sont bien ceux que l'ADR 0000 vise.
 
+**Additif du 06/11/2026, 18:57 UTC, prédictions des deux mesures avant H5, sur accord du propriétaire, avant exécution.** Effet : `SIGSTORE_REKOR_PUBLIC_KEY` ajoutée au conteneur `porte` de `porte-job.yaml`, relue à chaque Job. Base : le champ 6 du verdict, durée de ce conteneur, vaut 30, 31, 60 ou 61 s sur les 132 verdicts des journaux, jamais moins.
+
+| Prédiction | Attendu | Confiance |
+|---|---|---|
+| M1 | Conteneur `porte` à moins de 10 s sur l'image réelle (61 s avant) | Moyenne : l'attribution vient du code, pas d'une mesure |
+| M2 | Verdict inchangé sur l'image réelle : `success` vrai, 0 violation, contrôle 9 à 12/12, VSA 1/1 | Élevée : sans TUF joignable, `TrustedMaterial` restait déjà vide |
+| M3 | 0 SYN vers `34.117.62.14:443` sur toute la fenêtre, réelle et construction comprises | Moyenne |
+| M4 | Construction par le webhook : spec identique à J7, image `3a7ca1b1`, enveloppes 12 → 14, porte `true`, contrôle 14/14, non signée et rejeu refusés, aucune VSA poussée | Élevée |
+| M5 | 0 refus de politique sur `sc-build` et `sc-stockage` ; sur `sc-confiance`, aucun refus de pod | Moyenne : conclusion des 36 refus |
+| M6 | Pics relevés pour `preparer`, `publier`, `horodatage`, la porte et les contrôleurs. `kubectl top` ne verra pas les conteneurs brefs, d'où `memory.peak` des cgroups, en lecture par SSH. Sous Kata, le cgroup du pod est celui de la VM : il ne dira rien de la tâche | Élevée |
+
+Retour si M1 ou M2 échoue : retirer la variable de `porte-job.yaml`, aucun état du cluster à défaire. Ni `Deny`, ni limite, ni rôle changé par ces mesures.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

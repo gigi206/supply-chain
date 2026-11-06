@@ -61,6 +61,10 @@ spec:
         env:
         - name: SSL_CERT_FILE
           value: /etc/porte/ca-poc.crt
+        # Brique 08c, H5 : toute variable SIGSTORE_* évite à ec (v0.10.42, checkOpts) d'appeler le TUF public, même avec une clé publique.
+        # Avec --ignore-rekor, ce fichier n'est pas lu comme clé de Rekor.
+        - name: SIGSTORE_REKOR_PUBLIC_KEY
+          value: /etc/porte/chains.pub
         - name: HOME
           value: /tmp
         - name: TMPDIR
