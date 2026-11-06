@@ -2321,7 +2321,7 @@ etape_helm_cilium() {
     u=system:serviceaccount:$ns:$sa
     [ "$(kubectl auth can-i create pods -n kube-system --as "$u" 2>/dev/null || true)" = yes ] && echo "$u" >> "$T/hc-createurs"
   done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
-  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system (7 depuis le 02/11/2026)" "$(wc -l < "$T/hc-createurs")" 7
+  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system ($D_KS_CREATEURS sous $DISTRO)" "$(wc -l < "$T/hc-createurs")" "$D_KS_CREATEURS"
   ba_attendu "contrôleurs de Pipelines et de Chains parmi eux" "$(grep -cxE "$CONTROLEUR|$CHAINS" "$T/hc-createurs" || true)" 0
   kubectl get clusterrole -o json > "$T/hc-crs.json"
   while read -r u; do   # liaisons d'ensemble du cluster qui donnent create sur pods (rôles des release.yaml amont pour Tekton et Chains)
@@ -2529,7 +2529,7 @@ etape_controleurs() {
     kubectl create --as "$u" --dry-run=server -f "$T/ct-pod-default.json" >/dev/null 2>&1 && echo "OK   $sa : pod default de kube-system admis (dry-run serveur)" \
       || { echo "KO   $sa : pod default refusé" >&2; k=1; }
   done < <(kubectl get sa -A -o jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}{"\n"}{end}')
-  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system" "$n" 7
+  ba_attendu "comptes de service qui peuvent créer des pods dans kube-system" "$n" "$D_KS_CREATEURS"
   audit_api "$REGLE_CTRL" > "$T/ct-refus-audit.json"
   echo "refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :"
   jq -r 'select(.stage == "ResponseComplete" and .responseStatus.code >= 400) | "  \(.objectRef.namespace) \((.impersonatedUser.username // .user.username) | split(":") | last) \(.verb) \(.objectRef.resource)"' "$T/ct-refus-audit.json" | sort | uniq -c
