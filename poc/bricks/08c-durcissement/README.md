@@ -168,6 +168,17 @@ Rien n'est appliqué tant que la brique 08b n'a pas passé son seuil. Une étape
 | W3 | Livraison non signée refusée par l'intercepteur, rejeu de Forgejo refusé (`already exists`), aucun PipelineRun du commit non signé | Moyenne |
 | W4 | 0 refus de politique pendant le passage | Moyenne |
 
+**Additif du 06/11/2026, 18:31 UTC, webhook corrigé.** `intercepteurs-declencheurs` appliquée à 18:25 UTC, sans redémarrage ; `construction_durcie` et `reelle` conformes de 18:26 à 18:30 UTC ([construction](resultats/preuves-construction_durcie.log), [porte](resultats/preuves-reelle.log), [flux](resultats/durcissement-flux.log)).
+
+| Prédiction | Résultat |
+|---|---|
+| W1 : webhook, spec, image | **Tenue** : créé par `el-forgejo`, une création dans l'audit, spec identique à J7, `3a7ca1b1`, 56 s |
+| W2 : enveloppes, anomalies, porte | **Tenue** : 8 puis 10, aucune anomalie, porte `true`, contrôle 9 `ok`, 10/10 couvertes, VSA 1/1 |
+| W3 : refus | **Tenue** : non signée refusée, rejeu `already exists`, aucun PipelineRun du commit non signé |
+| W4 : 0 refus de politique | **Non tenue, sans effet** : 36 refus, tous en sortie vers `34.117.62.14:443`, depuis les deux pods de la porte, 18 chacun. Ils viennent de la politique `porte`, antérieure au durcissement ; aucun refus du pare-feu d'hôte. La porte conclut quand même `true`. Cette adresse est celle de `tuf-repo-cdn.sigstore.dev`, résolue à 18:31 UTC : un outil de la porte tente de joindre le TUF public de Sigstore et n'y parvient pas. Aucune sortie ; l'outil à l'origine n'est pas identifié |
+
+**Non rejoué sous H1 à H4** : tests 1 à 4, 7 et 8 ; la signature fausse et le corps modifié du test 5, que `construction_durcie` ne reprend pas ; un redémarrage des VM. `h4_bloque` réapplique tout le répertoire de politiques, donc `intercepteurs-declencheurs` comprise.
+
 ## Repris de `gigi206/k8s` (non remesuré dans ce PoC)
 
 | Idée | Où | Adaptation |

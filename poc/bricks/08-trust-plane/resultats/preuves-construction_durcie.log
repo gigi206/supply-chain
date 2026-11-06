@@ -1,8 +1,45 @@
-# preuves.sh construction_durcie, 2026-11-06T18:14:50Z
+# preuves.sh construction_durcie, 2026-11-06T18:26:05Z
 OK   aucune exécution en cours ni en attente de Chains
 depart : COUVERTE 31, ECHEC_SIGNATURE 8, SANS_SUJET 20
 OK   départ : aucune anomalie
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 enveloppes, dernière provenance de PipelineRun : 3e07c6a6-ada0-4c11-8bea-8a37c1821930 (2026-11-06T15:19:13Z)
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 8 enveloppes, dernière provenance de PipelineRun : 9588ac35-68a6-475d-b817-744c5a72b260 (2026-11-06T18:19:56Z)
 OK   Forgejo, POST hooks/…/tests : HTTP 204
-KO   webhook : aucun PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   webhook : origine de sample-app-6391fd437f26696847041be3226bbbf633f55a2f (labels) : EventListener forgejo
+    1 declencheurs:el-forgejo 201
+OK   webhook : une création, par declencheurs:el-forgejo (audit de l'API)
+OK   webhook : pipeline : sample-app@sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
+OK   webhook : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f : True|Succeeded
+TaskRun construire : Succeeded, TrustedResourcesVerified=True
+TaskRun preparer : Succeeded, TrustedResourcesVerified=True
+TaskRun publier : Succeeded, TrustedResourcesVerified=True
+pod preparer : nœud sc-build, runtimeClassName -
+pod publier : nœud sc-build, runtimeClassName -
+pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : pod construire : nœud sc-build, runtimeClassName kata
+OK   webhook : résultats : IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app
+OK   webhook : spec identique à celle de j7-sample-app (J7), bundle de la pipeline masqué
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-preparer signé=true
+TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   webhook : PipelineRun signé par Chains : true
+CONSTAT  écritures de manifestes de poc-images dans builds/sample-app depuis 2026-11-06T18:26:07Z : 1 (le manifeste existait déjà)
+OK   aucune exécution en cours ni en attente de Chains
+passage d'horodatage horodatage-29899828
+sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 41 enveloppe(s) de Chains, 41 bundle(s) ; sans bundle : 0, orphelin(s) : 0, doublon(s) : 0
+OK   chaque enveloppe de Chains a son bundle horodaté, aucun doublon
+  VERDICT|ba-webhook|true||trusted_task.tagged|61|ok|10/10 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   webhook : verdict de la porte (succès|violations|horodatage) : true||ok
+OK   webhook : provenance de PipelineRun la plus récente de builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (seule jugée) : 91652813-3ed6-48ce-b514-3e6ab09949a4
+## refus du webhook, l'EventListener atteignant de nouveau les intercepteurs
+non signée : HTTP 202 {"eventID":"76df5f3c-fbfa-4b24-8860-fdf7aff4c578"}
+OK   rejeu par Forgejo, POST hooks/…/tests : HTTP 204
+OK   rejeu refusé à la création (already exists)
+OK   livraison non signée refusée par l'intercepteur github
+OK   PipelineRun du commit non signé : 0
+durée du PipelineRun : 56 s
+OK   aucune exécution en cours ni en attente de Chains
+fin : COUVERTE 31, ECHEC_SIGNATURE 8, SANS_SUJET 20
+OK   fin : aucune anomalie
+OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 8 → 10
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 10 enveloppes, dernière provenance de PipelineRun : 91652813-3ed6-48ce-b514-3e6ab09949a4 (2026-11-06T18:27:04Z)
 CronJob rattrapage repris

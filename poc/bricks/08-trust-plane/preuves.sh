@@ -2902,7 +2902,7 @@ etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule s
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   rm -rf "$T/webhook" && (umask 077 && mkdir -p "$T/webhook")
   corps_push 1111111111111111111111111111111111111111 f.json
-  envoyer "non signée" "$T/webhook/f.json"
+  EL_NS=declencheurs; envoyer "non signée" "$T/webhook/f.json" ""
   code=$(forgejo_livrer)
   ba_attendu "rejeu par Forgejo, POST hooks/…/tests" "HTTP $code" "HTTP 204"
   for _ in $(seq 30); do n=$(el_existe "$t0" | grep -c . || true); [ "$n" -ge 1 ] && break; sleep 2; done
