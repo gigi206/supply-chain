@@ -345,6 +345,19 @@ Le contrôle du sujet `poc-build` est ajouté parce que K2 sans lui ne distingue
 
 Retour si M1 ou M2 échoue : retirer la variable de `porte-job.yaml`, aucun état du cluster à défaire. Ni `Deny`, ni limite, ni rôle changé par ces mesures.
 
+**Additif du 06/11/2026, 19:07 UTC, résultats des deux mesures, fenêtre 18:57:57 à 19:05:58 UTC.** Journaux : `durcissement-flux-h5.log`, `durcissement-h5-pics.log`, `08-trust-plane/resultats/preuves-reelle-h5.log`, `preuves-construction_h5.log`.
+
+| Prédiction | Résultat |
+|---|---|
+| M1 | **Tenue** : conteneur `porte` à 1 s sur l'image réelle et sur `porte-ba-webhook`, contre 61 s. L'attribution de W4 à l'appel de `ec` est mesurée |
+| M2 | **Tenue** : ligne `VERDICT` de `reelle-apres` identique à celle de S1 sauf la durée, `true`, aucune violation, 12/12, 43 bundles, VSA 1/1 |
+| M3 | **Tenue** : 0 ligne vers `34.117.62.14` sur les trois nœuds. Témoin : le relevé des refus a vu 959 autres rejets, de protocole, et 17 773 verdicts |
+| M4 | **Tenue** : spec identique à J7, image `3a7ca1b1`, 53 s, 12 → 14 enveloppes, 45 bundles, porte `true`, contrôle 14/14, VSA 1/1, non signée et rejeu refusés, aucune anomalie. Aucune VSA poussée |
+| M5 | **Tenue, au-delà de l'attendu** : 0 refus de politique sur les trois nœuds, `sc-confiance` compris. W4 est fermé pour ces deux Jobs |
+| M6 | **Tenue** : pics relevés (cgroups, 2 s). `kubectl top` ne voit rien de la porte, 8 lignes sur la construction |
+
+**Pics, une construction de `sample-app`, sans concurrence** : `preparer` 165 Mi et 292 m ; `publier` 88 Mi et 19 m ; `construire` 2 134 Mi et 2 282 m, cgroup de la VM ; porte 107 Mi et 485 m. Contrôleurs : Chains 43 Mi et 11 m, Pipelines 45 Mi et 51 m, Triggers 24 à 29 Mi, `el-forgejo` 19 Mi, TSA 35 Mi, OpenBao 115 Mi et 77 m. Jobs d'horodatage nommés : 22 Mi et 968 m au plus. Ce sont des pics de cette fenêtre, pas des maxima : le Job `horodatage-29899860`, qui a traité les deux enveloppes, était purgé avant la lecture des noms, et le contrôleur Pipelines n'a vu qu'une exécution. Rien n'est décidé sur les limites.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

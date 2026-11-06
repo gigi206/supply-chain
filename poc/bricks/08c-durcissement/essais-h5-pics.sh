@@ -40,6 +40,8 @@ resumer() {
   {
     date -u '+résumé du %d/%m/%Y à %H:%M:%S UTC'
     echo "échantillons : $(grep -c '^T ' "$D/top.txt") de kubectl top, $(cat "$D"/cgroup-*.txt | grep -c '^T ') de cgroups"
+    echo "lignes de kubectl top sur les pods de la construction : $(grep -c '^builds ' "$D/top.txt"), sur ceux de la porte : $(grep -c '^porte ' "$D/top.txt")"
+    # Pods supprimés avant la fin (Jobs purgés) : le nom est perdu, le cgroup reste ; pods statiques de kube-system écartés (UID sans tiret). Pic pris sur 2 s : un conteneur plus bref peut échapper à sa portée, pas au cgroup du pod.
     # Clé : UID du pod et conteneur s'il y a une portée cri-containerd. Le pic mémoire est gardé, le CPU est le débit maximal entre deux échantillons.
     jq -r '.items[] | .metadata as $m | ($m.uid | gsub("-"; "_")) as $u | "P \($u) \($m.namespace) \($m.name)",
       ((.status.containerStatuses // []) + (.status.initContainerStatuses // []) | .[] | select(.containerID != null) | "C \(.containerID | sub("^containerd://"; "")) \(.name)")' "$D/pods.json" > "$D/noms.txt"
@@ -58,7 +60,8 @@ resumer() {
           uid = substr(k, RSTART + 3, RLENGTH - 9)
           nom = "-"
           if (match(k, /cri-containerd-[0-9a-f]+\.scope/)) { id = substr(k, RSTART + 15, RLENGTH - 21); nom = (id in ctr) ? ctr[id] : "(pause ou sandbox)" }
-          if (!(uid in ns) || ns[uid] ~ /^(kube-system|kyverno|local-path-storage)$/) continue
+          if (!(uid in ns)) { if (nom == "-" && uid ~ /_/) printf "(pod disparu) %s %s %d Mi %d m\n", uid, nom, pic[k] / 1048576, cpu[k]; continue }
+          if (ns[uid] ~ /^(kube-system|kyverno|local-path-storage)$/) continue
           printf "%s %s %s %d Mi %d m\n", ns[uid], pod[uid], nom, pic[k] / 1048576, cpu[k]
         }
       }' "$D/noms.txt" "$D"/cgroup-*.txt | sort -k1,1 -k2,2 -k3,3
