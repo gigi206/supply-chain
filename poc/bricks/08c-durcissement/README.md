@@ -292,6 +292,15 @@ Estimation : 4 h. Une décision s'impose à partir de 8 h.
 
 **Hors de cet accord** : `.sig` et `.att` écrits avec `poc-build`, et le HMAC après la copie de `forgejo-webhook`, ne se prouvent que par une construction. Elle écrit dans Zot : elle attend son propre accord. Tant qu'elle n'a pas tourné, S1 n'est pas prouvé de bout en bout. `preuves.sh` (lignes 2512 et 2651) lit `zot-chains` par `--as` : le refus attendu doit rester un `Forbidden`, l'autorisation passant avant l'existence du Secret ; prédit, non mesuré.
 
+**Additif du 06/11/2026, 18:40 UTC, S1 appliqué** (accord du propriétaire : « Lance S1 ») : les quatre prédictions sont tenues. [`s1_source`](resultats/secrets-s1_source.log), [`s1_chains`](resultats/secrets-s1_chains.log), [`s1_copies`](resultats/secrets-s1_copies.log), [relecture](resultats/secrets-s1-relecture.log).
+
+- **S1a tenue** : quatre relectures identiques, 9 témoins sur 9. Le compte `horodatage` est refusé pour la bonne raison : `invalid subject (sub) claim`, relevé après coup, le premier passage n'affichant qu'un code de sortie ;
+- **S1b tenue** : déploiement prêt en 4 s, « essai 1 ; jeton révoqué », `signing-secrets` seul monté comme Secret, `zot-chains` absent. **Premier passage en échec, par erreur de mon script** ([journal](resultats/secrets-s1_chains-premier-passage.log)) : `kubectl logs deploy/…` a choisi l'ancien pod en `Terminating`, sans ce conteneur. L'étape s'est arrêtée avant la suppression du Secret. Sélection du pod corrigée, étape rejouée ;
+- **S1c tenue** : trois Secrets recréés, contenu vérifié, aucun conflit ;
+- **S1d tenue** : contrôleur `1/1`, 0 redémarrage, conteneur d'initialisation `Completed` sans relance, 0 ligne d'erreur au journal. Hubble : 156 flux de `tekton-chains` en 5 min, 27 vers `openbao`, 0 refus, témoin relevé pour ne pas prendre une commande en échec pour un zéro. Kyverno : 1 échec sur le pod neuf, comme avant. La lecture de `zot-chains` au nom des résolveurs reste un `Forbidden` : `preuves.sh` lignes 2512 et 2651 ne changent pas de sens.
+
+**Non prouvé** : `.sig` et `.att` écrits avec les identifiants injectés, et le HMAC après la copie : aucune construction n'a tourné depuis. Les valeurs étant identiques, je m'attends à une construction conforme ; ce n'est pas une mesure. Le redémarrage des VM reste à traiter : OpenBao scellé, le conteneur d'initialisation attend, et `redemarrer.sh` ne recrée pas ce pod. `politique.sh chains` ne doit plus être rejoué sans `s1_retrait`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

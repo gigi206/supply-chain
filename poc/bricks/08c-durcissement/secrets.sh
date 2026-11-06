@@ -196,7 +196,8 @@ etape_s1_chains() {
   rendre_injecte > "$T/injecte.yaml"
   kubectl patch deployment -n "$NS" "$DEP" --type strategic --patch-file "$T/injecte.yaml" >/dev/null
   kubectl rollout status -n "$NS" "deploy/$DEP" --timeout=180s
-  kubectl logs -n "$NS" "deploy/$DEP" -c identifiants
+  # Pas deploy/$DEP : l'ancien pod encore en Terminating serait choisi, sans ce conteneur (premier passage du 06/11).
+  kubectl logs -n "$NS" "$(kubectl get pods -n "$NS" -o json | jq -r '.items[] | select(.metadata.deletionTimestamp == null and any(.spec.initContainers[]?; .name == "identifiants")) | .metadata.name')" -c identifiants
   kubectl delete secret -n "$NS" zot-chains --ignore-not-found >/dev/null
   attendu "Secret zot-chains" "$(kubectl get secret -n "$NS" zot-chains -o name --ignore-not-found | wc -l)" 0
   attendu "volumes Secret du contrôleur" "$(kubectl get deploy -n "$NS" "$DEP" -o json | jq -c '[.spec.template.spec.volumes[] | select(.secret) | .secret.secretName]')" '["signing-secrets"]'
