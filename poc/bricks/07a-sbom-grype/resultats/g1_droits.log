@@ -1,4 +1,4 @@
-# plateforme.sh g1_droits, 2026-11-04T19:26:55Z
+# plateforme.sh g1_droits, 2026-11-06T15:35:28Z
 OK   poc-scan, par digest dans builds/scan/essai-07a : accepte
 OK   poc-scan, par tag dans builds/scan/essai-07a : refus
 OK   poc-scan, par digest dans builds/essai-07a (hors de builds/scan/) : refus
@@ -9,4 +9,4 @@ OK   poc-vulndb, même tag repoussé (mise à jour) : refus
 OK   poc-vulndb, par digest dans builds/essai-07a : refus
 OK   poc-replay, par digest dans builds/scan/essai-07a : refus
 tags de vulndb/essai-07a : v1
-# fin 2026-11-04T19:27:14Z, code 0
+# fin 2026-11-06T15:35:47Z, code 0

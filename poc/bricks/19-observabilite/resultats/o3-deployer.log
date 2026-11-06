@@ -1,4 +1,4 @@
-# observabilite.sh deployer, 2026-11-03T22:36:54Z
+# observabilite.sh deployer, 2026-11-06T15:32:27Z
 active
   /etc/prometheus/regles/alertes.yml	OpenBaoScelle	unknown	unknown
   /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	unknown	unknown
@@ -7,6 +7,9 @@ active
   /etc/prometheus/regles/alertes.yml	MiroirEnRetard	unknown	unknown
   /etc/prometheus/regles/alertes.yml	KyvernoRefusAnormaux	unknown	unknown
   /etc/prometheus/regles/alertes.yml	CertificatExpireBientot	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanEnRetard	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanBientotRefuse	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	BaseGrypeVieillie	unknown	unknown
   /etc/prometheus/regles/alertes.yml	DisqueStockagePlein	unknown	unknown
   /etc/prometheus/regles/alertes.yml	SourceMuette	unknown	unknown
   /etc/prometheus/regles/alertes.yml	LokiInjoignable	unknown	unknown

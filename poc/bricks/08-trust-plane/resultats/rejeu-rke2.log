@@ -1,0 +1,1936 @@
+# rejeu.sh rke2, 2026-11-06T15:25:15Z
+réseau : cilium ; reprise à J8 (contrôleurs)
+## démontage : sautée (reprise à J8 (contrôleurs))
+## VM : sautée (reprise à J8 (contrôleurs))
+## RKE2 : sautée (reprise à J8 (contrôleurs))
+## Cilium : sautée (reprise à J8 (contrôleurs))
+## J2 : sautée (reprise à J8 (contrôleurs))
+## J3 : sautée (reprise à J8 (contrôleurs))
+## J4 : sautée (reprise à J8 (contrôleurs))
+## J5 : sautée (reprise à J8 (contrôleurs))
+## J6 : sautée (reprise à J8 (contrôleurs))
+## test 5 (J6) : sautée (reprise à J8 (contrôleurs))
+## J6 (suite) : sautée (reprise à J8 (contrôleurs))
+## J7 : sautée (reprise à J8 (contrôleurs))
+## J7 (admission) : sautée (reprise à J8 (contrôleurs))
+## J7 (BuildKit) : sautée (reprise à J8 (contrôleurs))
+## J7 (voie D) : sautée (reprise à J8 (contrôleurs))
+## J7 (voie A, sample-app) : sautée (reprise à J8 (contrôleurs))
+## J7 (sans réseau) : sautée (reprise à J8 (contrôleurs))
+## J7 (construction, entrées) : sautée (reprise à J8 (contrôleurs))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à J8 (contrôleurs))
+## J7 (construction) : sautée (reprise à J8 (contrôleurs))
+## J7 (réseau) : sautée (reprise à J8 (contrôleurs))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à J8 (contrôleurs))
+## J8 (bascule) : sautée (reprise à J8 (contrôleurs))
+## J8 (helm-cilium) : sautée (reprise à J8 (contrôleurs))
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh controleurs
+# preuves.sh controleurs, 2026-11-06T15:25:15Z
+Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :
+- ValidatingAdmissionPolicy tekton-controleurs-builds et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)
+- aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)
+Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire bornés à builds, décision du propriétaire du
+01/11/2026) ; elle remplace les lignes « refusé par la règle » et « reste ouvert : lecture des Secrets » du 01/11/2026 :
+- ClusterRoleBindings *-tenant-access introuvables ; RoleBindings du même nom dans builds ; Chains lit les ConfigMaps de
+  tekton-chains par un Role ; contrôleur de Pipelines lancé avec -namespace=builds, Chains avec --namespace=builds
+- au nom de chacun des deux contrôleurs, essais réels refusés par les droits (RBAC, avant l'admission), rien de créé ni de
+  modifié : mêmes essais que le 01/11/2026 (pod portant clusterrole-aggregation-controller, StatefulSet, PVC, annotation
+  et image d'un pod de kube-system ; annotation du StatefulSet openbao ; pod de tekton-chains) ; lectures de Secrets
+  hors de builds refusées (k3s-serving de kube-system, Secrets d'openbao, zot-chains de tekton-chains) ; can-i list
+  secrets : no dans tout le cluster, yes dans builds
+- règle en seconde barrière : dans un espace d'essai où une liaison temporaire leur rend les droits de locataire, pod
+  refusé par la règle au nom des deux contrôleurs ; liaison et espace supprimés ensuite
+- audit de l'API (lectures de Secrets de ces deux comptes journalisées depuis l'installation de k3s) : toutes dans builds,
+  aucun refus (403) ; journaux des deux contrôleurs : aucun refus des droits, aucun redémarrage
+- témoins inchangés : administrateur admis ; pod default admis au nom des autres créateurs de pods de kube-system (7) ;
+  pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle : au moins un, aucun refusé
+- information : comptes de service qui peuvent lire les Secrets de kube-system ou de tout le cluster (les deux contrôleurs
+  n'y sont plus)
+## règle
+OK   ValidatingAdmissionPolicy tekton-controleurs-builds (failurePolicy, à jour, avertissements de typage) : Fail true 0
+OK   liaison tekton-controleurs-builds : tekton-controleurs-builds Deny
+posée le 2026-11-06T13:38:33Z
+OK   tekton-pipelines-controller : create, update, patch, delete sur la règle et sa liaison : no
+OK   tekton-chains-controller : create, update, patch, delete sur la règle et sa liaison : no
+## droits
+OK   ClusterRoleBinding tekton-pipelines-controller-tenant-access introuvable (NotFound) : 1
+OK   RoleBinding builds/tekton-pipelines-controller-tenant-access → ClusterRole : ClusterRole/tekton-pipelines-controller-tenant-access
+OK   ClusterRoleBinding tekton-chains-controller-tenant-access introuvable (NotFound) : 1
+OK   RoleBinding builds/tekton-chains-controller-tenant-access → ClusterRole : ClusterRole/tekton-chains-controller-tenant-access
+OK   Role tekton-chains/tekton-chains-controller-config (ConfigMaps) : ["configmaps:get,list,watch"]
+OK   argument de namespace du contrôleur de Pipelines : -namespace=builds
+OK   arguments de Chains : --namespace=builds
+OK   tekton-pipelines-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
+OK   tekton-chains-controller : can-i list secrets (tout le cluster, builds, kube-system), create pods (kube-system, builds) : no,yes,no,no,yes
+## essais réels au nom des contrôleurs
+pod existant visé : local-path-storage/local-path-provisioner-645d46d5df-s9s5c (local-path-provisioner, crée des pods dans local-path-storage) ; StatefulSet visé : openbao/openbao
+OK   tekton-pipelines-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
+OK   tekton-pipelines-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-sys)
+OK   tekton-pipelines-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespac)
+OK   tekton-pipelines-controller : annotation du pod local-path-provisioner-645d46d5df-s9s5c : refusé (pods "local-path-provisioner-645d46d5df-s9s5c" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the names)
+OK   tekton-pipelines-controller : image du pod local-path-provisioner-645d46d5df-s9s5c remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-645d46d5df-s9s5c" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "pods" in API group "" in the names)
+OK   tekton-pipelines-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "o)
+OK   tekton-pipelines-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
+OK   tekton-pipelines-controller : lecture du Secret kube-system/rke2-serving : refusé (secrets "rke2-serving" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
+OK   tekton-pipelines-controller : liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   tekton-pipelines-controller : lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller" cannot get resource "secrets" in API group "" in the namespace "tekton-chains" )
+OK   tekton-chains-controller : pod de kube-system portant clusterrole-aggregation-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "kube-system" )
+OK   tekton-chains-controller : StatefulSet de kube-system : refusé (statefulsets.apps is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "statefulsets" in API group "apps" in the namespace "kube-system" )
+OK   tekton-chains-controller : PVC de kube-system : refusé (persistentvolumeclaims is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "persistentvolumeclaims" in API group "" in the namespace "kub)
+OK   tekton-chains-controller : annotation du pod local-path-provisioner-645d46d5df-s9s5c : refusé (pods "local-path-provisioner-645d46d5df-s9s5c" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace ")
+OK   tekton-chains-controller : image du pod local-path-provisioner-645d46d5df-s9s5c remplacée (dry-run serveur) : refusé (pods "local-path-provisioner-645d46d5df-s9s5c" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "pods" in API group "" in the namespace ")
+OK   tekton-chains-controller : annotation du StatefulSet openbao : refusé (statefulsets.apps "openbao" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "statefulsets" in API group "apps" in the namespace "openbao)
+OK   tekton-chains-controller : pod de tekton-chains portant tekton-chains-controller : refusé (pods is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot create resource "pods" in API group "" in the namespace "tekton-chains" )
+OK   tekton-chains-controller : lecture du Secret kube-system/rke2-serving : refusé (secrets "rke2-serving" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "secrets" in API group "" in the namespace "kube-system" )
+OK   tekton-chains-controller : liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   tekton-chains-controller : lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-chains:tekton-chains-controller" cannot get resource "secrets" in API group "" in the namespace "tekton-chains" )
+OK   objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains) : 0
+OK   annotations preuve-controleurs posées : 0
+## règle en seconde barrière : espace d'essai preuve-controleurs, droits de locataire rendus par une liaison temporaire
+OK   tekton-pipelines-controller : can-i create pods dans preuve-controleurs (liaison temporaire) : yes
+OK   tekton-pipelines-controller : pod de preuve-controleurs : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   tekton-chains-controller : can-i create pods dans preuve-controleurs (liaison temporaire) : yes
+OK   tekton-chains-controller : pod de preuve-controleurs : refusé (The pods "preuve-controleurs" is invalid: : ValidatingAdmissionPolicy 'tekton-controleurs-builds' with binding 'tekton-controleurs-builds' denied request: contrôleur de Tekton hors de build)
+OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)
+OK   espace preuve-controleurs et ses liaisons temporaires introuvables (NotFound) : 1
+OK   tekton-pipelines-controller : can-i create pods dans preuve-controleurs (après suppression) : no
+OK   tekton-chains-controller : can-i create pods dans preuve-controleurs (après suppression) : no
+## témoins
+OK   administrateur : même pod admis (dry-run serveur)
+OK   administrateur : même StatefulSet admis (dry-run serveur)
+OK   daemon-set-controller : pod default de kube-system admis (dry-run serveur)
+OK   job-controller : pod default de kube-system admis (dry-run serveur)
+OK   persistent-volume-binder : pod default de kube-system admis (dry-run serveur)
+OK   replicaset-controller : pod default de kube-system admis (dry-run serveur)
+OK   replication-controller : pod default de kube-system admis (dry-run serveur)
+OK   statefulset-controller : pod default de kube-system admis (dry-run serveur)
+OK   comptes de service qui peuvent créer des pods dans kube-system : 6
+refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :
+      2   preuve-controleurs tekton-chains-controller create pods
+      2   preuve-controleurs tekton-pipelines-controller create pods
+OK   refus de la règle dans builds (audit) : 0
+OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 43
+## lectures de Secrets des deux contrôleurs dans l'audit de l'API (depuis l'installation de k3s ; sans --as)
+     14   tekton-chains-controller get builds 200 ResponseComplete
+     15   tekton-pipelines-controller watch builds 200 ResponseComplete
+     17   tekton-pipelines-controller watch builds 200 ResponseStarted
+OK   lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer) : true
+OK   lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre : 0
+## journaux des contrôleurs (depuis leur démarrage)
+OK   tekton-pipelines-controller : redémarrages : 0
+CONSTAT  écarté, kube-apiserver démarrant : 2026-11-06T14:09:31.361Z cannot watch resource "pipelineruns" in API group "tekton.dev" in the namespace "builds"
+CONSTAT  écarté, kube-apiserver démarrant : 2026-11-06T14:09:31.361Z cannot watch resource "resolutionrequests" in API group "resolution.tekton.dev" in the namespace "builds"
+OK   tekton-pipelines-controller : refus des droits dans le journal : 0
+OK   tekton-chains-controller : redémarrages : 0
+OK   tekton-chains-controller : refus des droits dans le journal : 0
+## information : comptes de service qui peuvent lister les Secrets de kube-system, et ceux de tout le cluster
+  kube-system:cilium-operator (tout le cluster : yes)
+  kube-system:generic-garbage-collector (tout le cluster : yes)
+  kube-system:namespace-controller (tout le cluster : yes)
+  kube-system:resourcequota-controller (tout le cluster : yes)
+  kube-system:token-cleaner (tout le cluster : no)
+  tekton-pipelines:tekton-triggers-core-interceptors (tout le cluster : yes)
+77 comptes de service examinés, 6 lecteurs des Secrets de kube-system
+OK   contrôleurs de Pipelines et de Chains parmi eux : 0
+## durée J8 (contrôleurs) : 20 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh resolveurs
+# preuves.sh resolveurs, 2026-11-06T15:25:35Z
+Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :
+- ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service
+  (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul
+- can-i du compte des résolveurs : list secrets tout le cluster no, get secrets builds yes, get secrets kube-system no, get
+  serviceaccounts builds yes, get serviceaccounts kube-system no, list resolutionrequests tout le cluster yes, get secrets
+  tekton-pipelines-resolvers yes (Role amont, résolveur git désactivé)
+- lectures réelles refusées par les droits au nom des résolveurs : k3s-serving de kube-system, zot-chains de tekton-chains,
+  Secrets d'openbao, comptes de service de kube-system
+- résolution réelle du bundle de la pipeline en service (sans cache) : dans builds, réussie avec le compte de service default
+  (get du compte de service) et avec le Secret zot-images sans compte de service (get du Secret) ; mêmes requêtes dans un
+  espace d'essai preuve-resolveurs : échouées, refus des droits sur le compte de service, puis sur le Secret ; espace supprimé
+- journal des résolveurs depuis le début de l'étape : refus des droits seulement dans preuve-resolveurs
+- audit de l'API : si la politique du nœud journalise les lectures des résolveurs (k3s installé avec la politique du
+  02/11/2026), au moins une lecture dans builds, aucune hors de builds sauf les refus (403) de preuve-resolveurs ; sinon aucune
+  entrée (k3s installé avant)
+- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026
+## droits
+OK   règles du ClusterRole des résolveurs sur secrets ou serviceaccounts : 0
+OK   Role builds/tekton-pipelines-resolvers-lecture : ["secrets,serviceaccounts:get"]
+OK   RoleBinding builds/tekton-pipelines-resolvers-lecture : Role/tekton-pipelines-resolvers-lecture tekton-pipelines-resolvers:tekton-pipelines-resolvers
+OK   can-i des résolveurs : no,yes,no,yes,no,yes,yes
+## lectures réelles au nom des résolveurs
+OK   lecture du Secret kube-system/rke2-serving : refusé (secrets "rke2-serving" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "kube-s)
+OK   lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "tekton-c)
+OK   liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   lecture du compte de service kube-system/default : refusé (serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "serviceaccounts" in API group "" in the namesp)
+## résolutions réelles (bundle de la pipeline en service, sans cache)
+paramètres : [{"name":"bundle","value":"sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e"},{"name":"name","value":"sample-app"},{"name":"kind","value":"pipeline"},{"name":"cache","value":"never"}]
+OK   builds : compte de service default : True
+OK   builds : Secret zot-images sans compte de service : True
+OK   preuve-resolveurs : compte de service default, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-compte": serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "service
+OK   preuve-resolveurs : Secret zot-images sans compte de service, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-secret": secrets "zot-images" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in 
+OK   espace preuve-resolveurs introuvable (NotFound) : 1
+## journal des résolveurs depuis 2026-11-06T15:25:35Z
+refus des droits : 2
+OK   refus des droits hors de preuve-resolveurs : 0
+## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)
+règle des résolveurs dans la politique d'audit du nœud : 1
+      1   get secrets builds 200 ResponseComplete
+      1   get secrets preuve-resolveurs 403 ResponseComplete
+     46   get serviceaccounts builds 200 ResponseComplete
+      1   get serviceaccounts preuve-resolveurs 403 ResponseComplete
+OK   lectures dans builds (au moins une) : true
+OK   lectures hors de builds, sauf les refus (403) de preuve-resolveurs : 0
+## lecteurs des Secrets de tout le cluster
+  kube-system:cilium-operator
+  kube-system:generic-garbage-collector
+  kube-system:namespace-controller
+  kube-system:resourcequota-controller
+  tekton-pipelines:tekton-triggers-core-interceptors
+OK   lecteurs : kube-system:cilium-operator,kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors
+## durée J8 (résolveurs) : 11 s
+[synchro:forgejo] $ poc/bricks/01-forgejo-sync/forgejo.sh comptes organisations amont miroir archives fork protections refus bout_en_bout
+# forgejo.sh comptes, 2026-11-06T15:25:46Z
+New user 'poc-sync' has been successfully created!
+compte poc-sync créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-sync (write:repository) en 0600 sur l'hôte
+New user 'poc-dev' has been successfully created!
+compte poc-dev créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-dev (write:repository) en 0600 sur l'hôte
+New user 'poc-amont' has been successfully created!
+compte poc-amont créé (ordinaire, mot de passe aléatoire non conservé)
+jeton de poc-amont (write:repository) en 0600 sur l'hôte
+Username Email IsAdmin 2FA
+poc-admin poc-admin@poc.test true false
+poc-sync poc-sync@poc.test false false
+poc-dev poc-dev@poc.test false false
+poc-amont poc-amont@poc.test false false
+OK   poc-sync n'est pas administrateur
+OK   poc-dev n'est pas administrateur
+OK   poc-amont n'est pas administrateur
+# forgejo.sh organisations, 2026-11-06T15:25:49Z
+équipe mirror/synchro (4) : {"permission":"write","includes_all_repositories":true,"units":["repo.code"]} ; membres : poc-sync
+équipe amont-essai/ecriture (5) : membres : poc-amont
+# forgejo.sh amont, 2026-11-06T15:25:50Z
+OK   push de l'amont d'essai par poc-amont : accepté
+OK   amont-essai/sample-app : main = 1907c19815fd70aaef1b936994b326ec05221fe9
+# forgejo.sh miroir, 2026-11-06T15:25:50Z
+ancien état de l'hôte mis de côté : .cache/supply-chain-poc/01/anciens/20261106T152550Z
+branch-created           heads/main  - -> 1907c19815fd
+sync.py : code 0 ; rapport 20261106T152551Z.json
+OK   mirror/sample-app : main = main de amont-essai/sample-app
+## journal de Forgejo (pushes de ce run : poc-sync vers mirror/ seulement)
+router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /amont-essai/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+# forgejo.sh archives, 2026-11-06T15:25:51Z
+OK   branche essai/archive par poc-amont : accepté
+branch-created           heads/essai/archive  - -> 753290b62244
+OK   force-push de essai/archive par poc-amont : accepté
+force-push-unprotected   heads/essai/archive  753290b62244 -> ef18ee39787e
+sync.py : code 0 ; événement : force-push-unprotected refs/archive/20261106T152553Z/heads/essai/archive
+OK   force-push non sensible : code 0, archivé
+OK   archive refs/archive/20261106T152553Z/heads/essai/archive publiée dans mirror/sample-app (Forgejo accepte refs/archive/*)
+# forgejo.sh fork, 2026-11-06T15:25:53Z
+{"full_name":"workspace/sample-app-sync","fork":true,"parent":"mirror/sample-app","default_branch":"main"}
+équipe workspace/synchro (6) : dépôts workspace/sample-app-sync ; membres poc-sync
+équipe workspace/dev-sample-app-sync (7) : dépôts workspace/sample-app-sync ; membres poc-dev
+OK   workspace/sample-app-sync : main = main de mirror/sample-app
+# forgejo.sh protections, 2026-11-06T15:25:53Z
+{"rule_name":"custom/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"rule_name":"paquet/**","enable_push":true,"enable_push_whitelist":true,"push_whitelist_usernames":["poc-dev"],"apply_to_admins":true}
+{"name_pattern":"custom-*","whitelist_usernames":["poc-dev"]}
+# forgejo.sh refus, 2026-11-06T15:25:54Z
+OK   push vers mirror/sample-app par poc-dev (hors de l'équipe synchro) : refusé (User 'poc-dev' is not allowed to push to branch)
+OK   push vers mirror/sample-app par poc-amont : refusé (User 'poc-amont' is not allowed to push to branch)
+OK   push vers workspace/sample-app (brique 08) par poc-sync : refusé (User 'poc-sync' is not allowed to push to branch)
+OK   création de la branche propre custom/essai du fork par poc-sync : refusé (protected branch)
+OK   création de la branche propre paquet/deb du fork par poc-sync (motif du projet) : refusé (protected branch)
+OK   création du tag propre custom-1 du fork par poc-sync : refusé (Tag custom-1 is protected)
+MESURE création de custom/a/b (deux niveaux) du fork par poc-sync : refusé (remote:  remote: Forgejo: Not allowed to push to protected branch custom/a/b        )
+OK   branche custom/essai du fork par poc-dev : accepté
+OK   branche paquet/deb du fork par poc-dev : accepté
+OK   tag custom-1 du fork par poc-dev : accepté
+OK   branche ordinaire du fork par poc-sync (hors motif) : accepté
+OK   réécriture de la branche propre custom/essai par poc-sync (force) : refusé (branch custom/essai is protected)
+OK   suppression du tag propre custom-1 par poc-sync : refusé (Tag custom-1 is protected)
+MESURE réécriture de custom/essai par poc-dev (force, liste blanche) : refusé (remote:  remote: Forgejo: branch custom/essai is protected from force push        )
+MESURE réécriture de custom/essai par poc-admin (force, apply_to_admins) : refusé (remote:  remote: Forgejo: branch custom/essai is protected from force push        )
+MESURE tag propre custom-2 du fork par poc-admin : refusé (remote:  remote: Forgejo: Tag custom-2 is protected        )
+MESURE push vers mirror/sample-app par poc-admin : accepté
+## état du fork : 512c46817def custom/essai, 512c46817def custom-1
+## journal de Forgejo (requêtes de push de cet essai)
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+# forgejo.sh bout_en_bout, 2026-11-06T15:25:57Z
+OK   avance de main et branche custom/essai (collision) dans l'amont par poc-amont : accepté
+branch-created           heads/custom/essai  - -> d69dd3bdf0cc
+collision                heads/custom/essai  - -> d69dd3bdf0cc
+fast-forward             heads/main  1907c19815fd -> d69dd3bdf0cc
+sync.py : code 2
+{"status":"rewrite-detected","events":[{"type":"branch-created","ref":"heads/custom/essai"},{"type":"collision","ref":"heads/custom/essai"},{"type":"fast-forward","ref":"heads/main"}]}
+OK   collision : code 2
+OK   collision publiée dans mirror/sample-app
+OK   custom/essai du fork intacte (poc-dev)
+OK   main du fork avancée
+OK   tag custom-1 du fork intact
+## journal de Forgejo (pushes de ce run)
+router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /amont-essai/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+## durée 01 (S2, S4) : 13 s
+[synchro:executeur] $ poc/bricks/01-forgejo-sync/executeur.sh installer essai planifie fuites
+# executeur.sh installer, 2026-11-06T15:25:59Z
+Python 3.13.5
+git version 2.47.3
+état de S2 (hôte) copié dans la VM ; copie de l'hôte renommée, plus jamais synchronisée
+/etc/synchro:
+total 16
+-rw-r--r-- 1 root root  765 Nov  6 15:26 ca-poc.crt
+-rw-r--r-- 1 root root  138 Nov  6 15:26 refs-propres.json
+-rw-r--r-- 1 root root  469 Nov  6 15:26 sample-app-sync.env
+drwx------ 2 root root 4096 Nov  6 15:26 secrets
+
+/etc/synchro/secrets:
+total 4
+-rw------- 1 root root 41 Nov  6 15:26 poc-sync.token
+
+/usr/local/lib/synchro:
+total 20
+-rw-r--r-- 1 root root 15865 Nov  6 15:26 sync.py
+-rwxr-xr-x 1 root root  1329 Nov  6 15:26 synchro.sh
+
+/var/lib/synchro/sample-app-sync:
+total 12
+drwxrwxr-x 2 synchro synchro 4096 Nov  6 15:25 bundles
+drwxrwxr-x 7 synchro synchro 4096 Nov  6 15:25 miroir.git
+drwxrwxr-x 2 synchro synchro 4096 Nov  6 15:25 rapports
+OK   sync.py installé identique à celui du dépôt
+127.0.1.1       sc-stockage.poc.test sc-stockage
+OK   Forgejo joignable depuis la VM : https://192.168.161.13:3000/mirror/sample-app.git
+-> Overall exposure level for synchro@sample-app-sync.service: 3.0 OK :-)
+# executeur.sh essai, 2026-11-06T15:26:01Z
+systemctl start : code 0 ; résultat de l'unité : success 0
+OK   run réussi (code 0 ou 2, SuccessExitStatus)
+rapport 20261106T152601Z.json
+{"status":"ok","events":[],"bundle":null}
+sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793978761
+sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793978758
+sync_dernier_run_statut{projet="sample-app-sync",statut="ok"} 1
+sync_dernier_run_statut{projet="sample-app-sync",statut="rewrite-detected"} 0
+sync_dernier_run_statut{projet="sample-app-sync",statut="error"} 0
+## journal de l'unité
+Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+synchro@sample-app-sync.service: Deactivated successfully.
+Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+OK   jeton absent du journal de l'unité
+# executeur.sh planifie, 2026-11-06T15:26:02Z
+Created symlink '/etc/systemd/system/timers.target.wants/synchro@sample-app-sync.timer' -> '/etc/systemd/system/synchro@.timer'.
+timer activé à 2026-11-06 15:26:03 (période de mesure : 2 min)
+2026-11-06T15:26:13+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-06T15:26:14+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
+2026-11-06T15:26:14+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+OK   deux runs planifiés sans intervention
+rapport 20261106T152816Z.json
+{"status":"ok","events":[],"bundle":null}
+sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793978896
+sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793978758
+sync_dernier_run_statut{projet="sample-app-sync",statut="ok"} 1
+sync_dernier_run_statut{projet="sample-app-sync",statut="rewrite-detected"} 0
+sync_dernier_run_statut{projet="sample-app-sync",statut="error"} 0
+NEXT                           LEFT LAST                         PASSED UNIT                          ACTIVATES
+Fri 2026-11-06 16:29:19 UTC 1h 0min Fri 2026-11-06 15:28:16 UTC 11s ago synchro@sample-app-sync.timer synchro@sample-app-sync.service
+drop-in de mesure retiré : période d'une heure rétablie
+# executeur.sh fuites, 2026-11-06T15:28:27Z
+OK   aucun secret dans les journaux des trois VM
+## durée 01 (S3) : 156 s
+[synchro:forgejo] $ poc/bricks/01-forgejo-sync/forgejo.sh negatifs
+# forgejo.sh negatifs, 2026-11-06T15:28:35Z
+## 1. force-push de main (branche sensible)
+OK   force-push de main par poc-amont : accepté
+run 20261106T152839Z.json : code 2, [{"type":"force-push","ref":"heads/main","archive":"refs/archive/20261106T152839Z/heads/main"}]
+OK   code 2
+OK   force-push détecté
+OK   heads/main archivée dans mirror/sample-app (refs/archive/20261106T152839Z/heads/main)
+OK   main du fork suit l'amont (ancienne valeur archivée)
+## 2. tag v1.0.0 créé, puis déplacé, puis supprimé
+OK   tag v1.0.0 par poc-amont : accepté
+run 20261106T152844Z.json : code 0, [{"type":"tag-created","ref":"tags/v1.0.0","archive":null}]
+OK   code 0
+OK   tag v1.0.0 déplacé par poc-amont : accepté
+run 20261106T152848Z.json : code 2, [{"type":"fast-forward","ref":"heads/main","archive":null},{"type":"tag-moved","ref":"tags/v1.0.0","archive":"refs/archive/20261106T152848Z/tags/v1.0.0"}]
+OK   code 2
+OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261106T152848Z/tags/v1.0.0)
+OK   tag v1.0.0 supprimé par poc-amont : accepté
+run 20261106T152853Z.json : code 2, [{"type":"tag-deleted","ref":"tags/v1.0.0","archive":"refs/archive/20261106T152853Z/tags/v1.0.0"}]
+OK   code 2
+OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261106T152853Z/tags/v1.0.0)
+OK   tag supprimé de la vue amont de mirror/sample-app (archivé)
+OK   tag gardé dans le fork (pas de --prune)
+## 3. branche feature/x créée puis supprimée
+OK   branche feature/x par poc-amont : accepté
+run 20261106T152857Z.json : code 0, [{"type":"branch-created","ref":"heads/feature/x","archive":null}]
+OK   code 0
+OK   branche feature/x supprimée par poc-amont : accepté
+run 20261106T152901Z.json : code 0, [{"type":"branch-deleted","ref":"heads/feature/x","archive":"refs/archive/20261106T152901Z/heads/feature/x"}]
+OK   code 0
+OK   heads/feature/x archivée dans mirror/sample-app (refs/archive/20261106T152901Z/heads/feature/x)
+OK   feature/x gardée dans le fork
+## 4. refs propres du fork après toutes les réécritures
+OK   custom/essai, paquet/deb et custom-1 intactes
+## 5. restauration dans la VM depuis les bundles et les rapports
+refs upstream et archive : 8 ; bundles : 7
+OK   miroir restauré identique (refs upstream et archive)
+## durée 01 (S4, négatifs) : 27 s
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+[synchro:forgejo] $ poc/bricks/01-forgejo-sync/forgejo.sh traefik
+# forgejo.sh traefik, 2026-11-06T15:29:03Z
+## espace avant
+/dev/vda1      20922114048 7708221440 12312694784  39% /
+39593	/var/lib/forgejo/data/repos/mirror
+68559	/var/lib/forgejo/data/repos/workspace
+premier run (sans fork) : code 0, 1793978995.7 s (journal de l'unité) ; {"status":"ok","evenements":{"branch-created":30,"tag-created":590},"bundle":{"fichier":"20261106T152903Z.bundle","refs":620,"prerequis":0}}
+  taille du bundle : 115102168 octets
+OK   master de mirror/traefik = master de GitHub
+FORK=https://192.168.161.13:3000/workspace/traefik.git
+second run (avec fork, incrément depuis le premier) : code 0, 0.9 s (journal de l'unité) ; {"status":"ok","evenements":null,"bundle":null}
+## espace après
+/dev/vda1      20922114048 8082698240 11938217984  41% /
+118936982	/var/lib/synchro/traefik/miroir.git
+115102168	/var/lib/synchro/traefik/bundles
+118711735	/var/lib/forgejo/data/repos/mirror
+174261	/var/lib/forgejo/data/repos/workspace
+Created symlink '/etc/systemd/system/timers.target.wants/synchro@traefik.timer' -> '/etc/systemd/system/synchro@.timer'.
+NEXT LEFT LAST                          PASSED UNIT                  ACTIVATES
+-       - Fri 2026-11-06 15:30:24 UTC 20ms ago synchro@traefik.timer synchro@traefik.service
+## durée 01 (S6) : 82 s
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+[observabilite] $ poc/bricks/19-observabilite/observabilite.sh certificats compte installer
+# observabilite.sh certificats, 2026-11-06T15:30:24Z
+  # HELP certificat_expiration_timestamp_seconds Fin de validité (notAfter) du certificat, PKI de la brique 08.
+  # TYPE certificat_expiration_timestamp_seconds gauge
+  certificat_expiration_timestamp_seconds{certificat="ca-poc"} 1824827948
+  certificat_expiration_timestamp_seconds{certificat="zot"} 1808843955
+  certificat_expiration_timestamp_seconds{certificat="forgejo"} 1808843955
+  certificat_expiration_timestamp_seconds{certificat="openbao"} 1808848501
+  certificat_expiration_timestamp_seconds{certificat="tsa-feuille"} 1825508416
+  certificat_expiration_timestamp_seconds{certificat="tsa-racine"} 2108664428
+# observabilite.sh compte, 2026-11-06T15:30:24Z
+namespace/observabilite serverside-applied
+serviceaccount/prometheus-lecture serverside-applied
+secret/prometheus-lecture-jeton serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+role.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+rolebinding.rbac.authorization.k8s.io/metriques-par-proxy serverside-applied
+jeton du compte en 0600 sur l'hôte
+can-i get services/kyverno-svc-metrics:8000 --subresource=proxy -n kyverno : yes
+can-i get services/tekton-chains-metrics:9090 --subresource=proxy -n tekton-chains : yes
+can-i get services/https:openbao:8200 --subresource=proxy -n openbao : yes
+can-i get secrets -n openbao : no
+can-i get secrets -n observabilite : no
+can-i list pods -n kyverno : no
+can-i get pods --subresource=log -n tekton-chains : no
+can-i create services/kyverno-svc-metrics:8000 --subresource=proxy -n kyverno : no
+can-i get services/kyverno-svc:443 --subresource=proxy -n kyverno : no
+can-i get services/https:openbao:8201 --subresource=proxy -n openbao : no
+can-i get services/kyverno-svc-metrics --subresource=proxy -n kyverno : no
+can-i get services/timestamp-authority:3000 --subresource=proxy -n tsa : no
+GET /api/v1/namespaces/kyverno/services/kyverno-svc-metrics:8000/proxy/metrics : HTTP 200
+GET /api/v1/namespaces/tekton-chains/services/tekton-chains-metrics:9090/proxy/metrics : HTTP 200
+GET /api/v1/namespaces/openbao/services/https:openbao:8200/proxy/v1/sys/metrics?format=prometheus : HTTP 200
+GET /api/v1/namespaces/openbao/secrets : HTTP 403
+GET /api/v1/namespaces/kyverno/services/kyverno-svc:443/proxy/ : HTTP 403
+# observabilite.sh installer, 2026-11-06T15:30:25Z
+prometheus-3.13.5.linux-amd64.tar.gz: OK
+alertmanager-0.34.2.linux-amd64.tar.gz: OK
+prometheus, version 3.13.5 (branch: HEAD, revision: f497435984d1ca1d84cda5ed309387ac2eb1f8f6)
+alertmanager, version 0.34.2 (branch: HEAD, revision: e8349048265ccc0871c3d0d668b05eacc68baf50)
+Created symlink '/etc/systemd/system/multi-user.target.wants/recepteur-alertes.service' -> '/etc/systemd/system/recepteur-alertes.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/fichiers-metriques.service' -> '/etc/systemd/system/fichiers-metriques.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/alertmanager.service' -> '/etc/systemd/system/alertmanager.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/prometheus.service' -> '/etc/systemd/system/prometheus.service'.
+active
+active
+active
+active
+## durée 19 (O2) : 8 s
+[journalisation] $ poc/bricks/19b-journalisation/journalisation.sh certificats installer controle
+# journalisation.sh certificats, 2026-11-06T15:30:32Z
+loki : certificat existant
+~/.cache/supply-chain-poc/08/pki/loki.crt: OK
+grafana : certificat existant
+~/.cache/supply-chain-poc/08/pki/grafana.crt: OK
+grafana-client : certificat existant
+~/.cache/supply-chain-poc/08/pki/grafana-client.crt: OK
+controle : certificat existant
+~/.cache/supply-chain-poc/08/pki/controle.crt: OK
+loki-interne : certificat existant
+~/.cache/supply-chain-poc/08/pki/loki-interne.crt: OK
+600 grafana-admin.password
+600 grafana-auditeur.password
+600 loki.key
+600 grafana-client.key
+600 grafana.key
+600 controle.key
+# journalisation.sh installer, 2026-11-06T15:30:32Z
+loki-linux-amd64.zip: OK
+grafana_13.3.0_40412481033_linux_amd64.tar.gz: OK
+ports 3001, 3100, 9096 avant installation : 0 écoute(s)
+loki, version 3.7.9 (branch: release-3.7.x, revision: d3b4a2f7)
+grafana version 13.3.0
+Created symlink '/etc/systemd/system/timers.target.wants/disque-metriques.timer' -> '/etc/systemd/system/disque-metriques.timer'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/loki.service' -> '/etc/systemd/system/loki.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/grafana.service' -> '/etc/systemd/system/grafana.service'.
+active
+active
+active
+## compte auditeur (Viewer) de Grafana
+création de auditeur : HTTP 200
+[{"login":"admin","role":"Admin"},{"login":"auditeur","role":"Viewer"}]
+# journalisation.sh controle, 2026-11-06T15:30:50Z
+## écoute sur sc-stockage
+192.168.161.13:3100 users:(("loki",pid=20218,fd=7))
+192.168.161.13:3001 users:(("grafana",pid=20266,fd=66))
+127.0.0.1:9096 users:(("loki",pid=20218,fd=8))
+## Loki
+sans certificat client : HTTP 000 (curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0)
+OK   refusé à la poignée TLS
+avec le certificat controle : /ready HTTP 503
+écriture de la ligne témoin temoin-l2-1793979051061926702 : HTTP 204
+OK   ligne témoin relue (HTTP 200)
+demande de suppression : HTTP 403 (deletion is not available for this tenant)
+OK   suppression refusée
+## Grafana
+anonyme, /api/search : HTTP 401
+OK   anonyme refusé
+santé de la source prometheus : HTTP 200 {"status":"OK","message":"Successfully queried the Prometheus API."}
+santé de la source loki : HTTP 200 {"status":"OK","message":"Data source successfully connected."}
+OK   auditeur : ligne témoin lue dans Loki par Grafana (HTTP 200)
+auditeur, Prometheus (up) : HTTP 200, 5 série(s)
+auditeur, création de tableau : HTTP 403
+auditeur, création de source : HTTP 403
+administrateur, suppression de la source provisionnée loki : HTTP 403 ({"message":"Cannot delete read-only data source"})
+## chemin du navigateur : session de l'auditeur (POST /login, cookie, contrôle d'origine)
+POST /login : HTTP 200, cookie de session : 2
+GET /api/user avec la session : HTTP 200 (auditeur)
+redirection de / sans session : https://192.168.161.13:3001/login
+## journal de Grafana : la lecture de l'auditeur est tracée (router_logging)
+  requêtes /api/ds/query journalisées avec leur utilisateur : 2
+## appels vers Grafana Labs dans les journaux de loki et grafana depuis leur démarrage
+  lignes : 0
+## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)
+  aucune
+## mémoire
+Mem:            5931        1483         402           3        4342        4448
+loki : 53 Mi
+grafana : 319 Mi
+prometheus : 41 Mi
+## mesure du disque
+# HELP disque_utilise_ratio Part utilisée du système de fichiers (df), entre 0 et 1.
+# TYPE disque_utilise_ratio gauge
+disque_utilise_ratio{point="/"} 0.4799
+Fri 2026-11-06 15:31:44 UTC  48s Fri 2026-11-06 15:30:44 UTC 11s ago disque-metriques.timer disque-metriques.service
+## durée 19b (L2) : 23 s
+[journalisation] $ poc/bricks/19b-journalisation/journalisation.sh certificats_l3 evenements openbao_sortie alloy controle_l3
+# journalisation.sh certificats_l3, 2026-11-06T15:30:55Z
+relais : certificat existant
+~/.cache/supply-chain-poc/08/pki/relais.crt: OK
+alloy-stockage : certificat existant
+~/.cache/supply-chain-poc/08/pki/alloy-stockage.crt: OK
+~/.cache/supply-chain-poc/08/pki/alloy-sc-confiance.crt: OK
+alloy-sc-confiance, vérifié par la CA du PoC (refus attendu) : error 20 at 0 depth lookup: u
+~/.cache/supply-chain-poc/08/pki/alloy-sc-build.crt: OK
+alloy-sc-build, vérifié par la CA du PoC (refus attendu) : error 20 at 0 depth lookup: u
+600 ca-sc-build.key
+600 ca-sc-confiance.key
+600 alloy-sc-build.key
+600 alloy-sc-confiance.key
+600 alloy-stockage.key
+600 relais.key
+# journalisation.sh evenements, 2026-11-06T15:30:55Z
+serviceaccount/alloy-evenements serverside-applied
+secret/alloy-evenements-jeton serverside-applied
+clusterrole.rbac.authorization.k8s.io/lecture-evenements serverside-applied
+clusterrolebinding.rbac.authorization.k8s.io/lecture-evenements serverside-applied
+can-i list events -A : yes
+can-i watch events.events.k8s.io -A : yes
+can-i get secrets -n openbao : no
+can-i list pods -A : no
+can-i get pods --subresource=log -n openbao : no
+can-i create events -n default : no
+# journalisation.sh openbao_sortie, 2026-11-06T15:30:56Z
+["fichier/","sortie/"]
+configmap/openbao-config serverside-applied
+config.hcl vue par le pod, mentions de "sortie" : 1
+{"chemin":"fichier/","type":"file","fichier":"/openbao/data/audit.log"}
+{"chemin":"sortie/","type":"file","fichier":"stdout"}
+OK   deux devices d'audit actifs
+lignes d'audit (request) sur la sortie standard du pod dans les 30 dernières secondes : 3
+OK   audit sur la sortie standard
+état : {"sealed":false,"initialized":true}
+# journalisation.sh alloy, 2026-11-06T15:31:00Z
+## sc-confiance : rôles commun noeud confiance
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
+## sc-build : rôles commun noeud
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
+## sc-stockage : rôles commun stockage
+alloy-linux-amd64.zip: OK
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+configuration valide
+Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
+active
+# journalisation.sh controle_l3, 2026-11-06T15:31:28Z
+## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source
+  noeud=sc-build,source=journal 282
+  noeud=sc-build,source=rke2 8489
+  noeud=sc-confiance,source=audit-k8s 5962
+  noeud=sc-confiance,source=pods 237
+  noeud=sc-confiance,source=rke2 7142
+  noeud=sc-stockage,source=audit-zot 2421
+  noeud=sc-stockage,source=evenements-k8s 154
+  noeud=sc-stockage,source=journal 7692
+  noeud=sc-stockage,source=rke2 732
+  source=controle-l2 1
+## sources attendues (J1 à J6 et J8)
+{noeud="sc-confiance", source="journal", unite="rke2-server.service"}                                          694
+{noeud="sc-build", source="journal"}                                                                           17317
+{noeud="sc-stockage", source="journal", unite="forgejo.service"}                                               817
+{noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}                                     0
+{noeud="sc-confiance", source="pods", espace="tekton-chains"}                                                  94
+{noeud="sc-build", source="pods"}                                                                              2797
+{noeud="sc-confiance", source="audit-k8s"}                                                                     5962
+{source="evenements-k8s"}                                                                                      1915
+{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""                                             1
+{noeud="sc-stockage", source="audit-zot"}                                                                      2421
+{noeud="sc-build", source="rke2", composant="kubelet"}                                                         2826
+{noeud="sc-confiance", source="rke2", composant="containerd"}                                                  3558
+## D17 : relais en écriture seule, nœud imposé
+certificat de sc-build vers Loki : 000
+certificat de sc-build vers le port de sc-confiance : 000
+certificat de sc-build vers son port, ligne étiquetée noeud=sc-confiance : HTTP 204
+  stockée sous :   noeud=sc-build 1
+## Grafana : l'auditeur lit le journal de k3s
+HTTP 200, 3 ligne(s)
+## Alloy : état et erreurs sur les trois VM
+sc-confiance : active, 118 Mi, erreurs depuis le démarrage : 0
+sc-build : active, 87 Mi, erreurs depuis le démarrage : 0
+sc-stockage : active, 146 Mi, erreurs depuis le démarrage : 3
+ts=2026-11-06T15:31:38.362054145Z level=error msg="final error sending batch, no retries left, dropping data" component_path=/ component_id=loki.write.sortie component=endpoint host=192.168.161.13:310
+ts=2026-11-06T15:31:39.941186982Z level=error msg="final error sending batch, no retries left, dropping data" component_path=/ component_id=loki.write.sortie component=endpoint host=192.168.161.13:310
+192.168.161.13:3501 users:(("alloy",pid=20662,fd=8))
+192.168.161.13:3502 users:(("alloy",pid=20662,fd=4))
+127.0.0.1:12345 users:(("alloy",pid=20662,fd=14))
+## durée 19b (L3) : 45 s
+[journalisation] $ poc/bricks/19b-journalisation/journalisation.sh battement
+# journalisation.sh battement, 2026-11-06T15:31:40Z
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active
+Created symlink '/etc/systemd/system/timers.target.wants/battement-19b.timer' -> '/etc/systemd/system/battement-19b.timer'.
+active
+## durée 19b (L5) : 3 s
+[observabilite] $ poc/bricks/19-observabilite/observabilite.sh cibles lecture_seule
+# observabilite.sh cibles, 2026-11-06T15:31:43Z
+alertmanager	up	
+alloy	up	
+chains	up	
+fichiers	up	
+forgejo	up	
+kyverno	up	
+openbao	up	
+prometheus	up	
+zot	up	
+## kyverno : noms des métriques
+  http_server_request_body_size_bucket
+  http_server_request_body_size_count
+  http_server_request_body_size_sum
+  http_server_request_duration_bucket
+  http_server_request_duration_count
+  http_server_request_duration_sum
+  http_server_response_body_size_bucket
+  http_server_response_body_size_count
+  http_server_response_body_size_sum
+  kyverno_admission_requests_total
+  kyverno_admission_review_duration_seconds_bucket
+  kyverno_admission_review_duration_seconds_count
+  kyverno_admission_review_duration_seconds_sum
+  kyverno_client_queries_total
+  kyverno_controller_reconcile_total
+  kyverno_http_requests_duration_seconds_bucket
+  kyverno_http_requests_duration_seconds_count
+  kyverno_http_requests_duration_seconds_sum
+  kyverno_http_requests_total
+  kyverno_image_validating_policy_execution_duration_seconds_bucket
+  kyverno_image_validating_policy_execution_duration_seconds_count
+  kyverno_image_validating_policy_execution_duration_seconds_sum
+  kyverno_image_validating_policy_results_total
+  kyverno_info
+  kyverno_updaterequest_total
+  kyverno_validating_policy_execution_duration_seconds_bucket
+  kyverno_validating_policy_execution_duration_seconds_count
+  kyverno_validating_policy_execution_duration_seconds_sum
+  kyverno_validating_policy_results_total
+## chains : noms des métriques
+  http_client_request_duration_seconds_bucket
+  http_client_request_duration_seconds_count
+  http_client_request_duration_seconds_sum
+  kn_k8s_client_http_response_status_code_total
+  kn_workqueue_adds_total
+  kn_workqueue_depth
+  kn_workqueue_process_duration_seconds_bucket
+  kn_workqueue_process_duration_seconds_count
+  kn_workqueue_process_duration_seconds_sum
+  kn_workqueue_queue_duration_seconds_bucket
+  kn_workqueue_queue_duration_seconds_count
+  kn_workqueue_queue_duration_seconds_sum
+  kn_workqueue_retries_total
+  kn_workqueue_unfinished_work_seconds
+  target_info
+  watcher_pipelinerun_marked_signed_total
+  watcher_pipelinerun_payload_stored_total
+  watcher_pipelinerun_sign_created_total
+  watcher_pipelinerun_signing_failures_total
+  watcher_taskrun_marked_signed_total
+  watcher_taskrun_payload_stored_total
+  watcher_taskrun_sign_created_total
+  watcher_taskrun_signing_failures_total
+## openbao : noms des métriques
+  vault_audit_fichier__log_request
+  vault_audit_fichier__log_request_count
+  vault_audit_fichier__log_request_sum
+  vault_audit_fichier__log_response
+  vault_audit_fichier__log_response_count
+  vault_audit_fichier__log_response_sum
+  vault_audit_log_request
+  vault_audit_log_request_count
+  vault_audit_log_request_failure
+  vault_audit_log_request_sum
+  vault_audit_log_response
+  vault_audit_log_response_count
+  vault_audit_log_response_failure
+  vault_audit_log_response_sum
+  vault_audit_sortie__log_request
+  vault_audit_sortie__log_request_count
+  vault_audit_sortie__log_request_sum
+  vault_audit_sortie__log_response
+  vault_audit_sortie__log_response_count
+  vault_audit_sortie__log_response_sum
+  vault_autopilot_failure_tolerance
+  vault_autopilot_healthy
+  vault_autopilot_node_healthy
+  vault_barrier_delete
+  vault_barrier_delete_count
+  vault_barrier_delete_sum
+  vault_barrier_estimated_encryptions
+  vault_barrier_get
+  vault_barrier_get_count
+  vault_barrier_get_sum
+  vault_barrier_list
+  vault_barrier_list_count
+  vault_barrier_list_page
+  vault_barrier_list_page_count
+  vault_barrier_list_page_sum
+  vault_barrier_list_sum
+  vault_barrier_put
+  vault_barrier_put_count
+  vault_barrier_put_sum
+  vault_cache_hit
+  vault_cache_miss
+  vault_cache_write
+  vault_core_active
+  vault_core_check_token
+  vault_core_check_token_count
+  vault_core_check_token_sum
+  vault_core_fetch_acl_and_token
+  vault_core_fetch_acl_and_token_count
+  vault_core_fetch_acl_and_token_sum
+  vault_core_handle_login_request
+  vault_core_handle_login_request_count
+  vault_core_handle_login_request_sum
+  vault_core_handle_request
+  vault_core_handle_request_count
+  vault_core_handle_request_sum
+  vault_core_in_flight_requests
+  vault_core_locked_users
+  vault_core_mount_table_num_entries
+  vault_core_mount_table_size
+  vault_core_post_unseal
+## zot : noms des métriques
+  zot_gc_deleted_total
+  zot_gc_duration_seconds_count
+  zot_gc_duration_seconds_sum
+  zot_gc_runs_total
+  zot_http_method_latency_seconds_bucket
+  zot_http_method_latency_seconds_count
+  zot_http_method_latency_seconds_sum
+  zot_http_repo_latency_seconds_count
+  zot_http_repo_latency_seconds_sum
+  zot_http_requests_total
+  zot_info
+  zot_repo_downloads_total
+  zot_repo_storage_bytes
+  zot_repo_uploads_total
+  zot_scheduler_generators_status
+  zot_scheduler_generators_total
+  zot_scheduler_tasksqueue_length
+  zot_scheduler_workers
+  zot_scheduler_workers_tasks_duration_seconds_bucket
+  zot_scheduler_workers_tasks_duration_seconds_count
+  zot_scheduler_workers_tasks_duration_seconds_sum
+  zot_scheduler_workers_total
+  zot_storage_lock_latency_seconds_bucket
+  zot_storage_lock_latency_seconds_count
+  zot_storage_lock_latency_seconds_sum
+## forgejo : noms des métriques
+  gitea_accesses
+  gitea_attachments
+  gitea_build_info
+  gitea_comments
+  gitea_follows
+  gitea_hooktasks
+  gitea_issues
+  gitea_issues_closed
+  gitea_issues_open
+  gitea_labels
+  gitea_loginsources
+  gitea_milestones
+  gitea_mirrors
+  gitea_oauths
+  gitea_organizations
+  gitea_projects
+  gitea_projects_boards
+  gitea_publickeys
+  gitea_releases
+  gitea_repositories
+  gitea_stars
+  gitea_teams
+  gitea_updatetasks
+  gitea_users
+  gitea_watches
+  gitea_webhooks
+## fichiers : noms des métriques
+  certificat_expiration_timestamp_seconds
+  disque_utilise_ratio
+  sync_dernier_run_statut
+  sync_derniere_reecriture_timestamp_seconds
+  sync_derniere_reussite_timestamp_seconds
+OK   toutes les cibles up
+# observabilite.sh lecture_seule, 2026-11-06T15:32:19Z
+POST /api/v1/admin/tsdb/delete_series : HTTP 500
+POST /-/reload : HTTP 403
+POST /-/quit : HTTP 403
+POST /api/v1/write : HTTP 404
+## écoute
+127.0.0.1:9101 users:(("python3",pid=19885,fd=3))
+127.0.0.1:9090 users:(("prometheus",pid=19982,fd=7))
+127.0.0.1:9093 users:(("alertmanager",pid=19930,fd=4))
+127.0.0.1:9095 users:(("python3",pid=19847,fd=3))
+active
+## durée 19 (O2, suite) : 36 s
+[observabilite] $ poc/bricks/19-observabilite/observabilite.sh regles deployer
+# observabilite.sh regles, 2026-11-06T15:32:19Z
+promtool, version 3.13.5 (branch: HEAD, revision: f497435984d1ca1d84cda5ed309387ac2eb1f8f6)
+Checking alertes.yml
+  SUCCESS: 14 rules found
+
+  SUCCESS
+
+# observabilite.sh deployer, 2026-11-06T15:32:27Z
+active
+  /etc/prometheus/regles/alertes.yml	OpenBaoScelle	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ChainsMarqueSansSignature	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ReplayNonBitIdentique	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	MiroirEnRetard	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	KyvernoRefusAnormaux	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	CertificatExpireBientot	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanEnRetard	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanBientotRefuse	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	BaseGrypeVieillie	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	DisqueStockagePlein	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	SourceMuette	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	LokiInjoignable	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	CollecteEnPanne	unknown	unknown
+## durée 19 (O3) : 13 s
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+[journalisation] $ poc/bricks/19b-journalisation/journalisation.sh controle_grpc
+# journalisation.sh controle_grpc, 2026-11-06T15:32:32Z
+## ports en écoute de loki et d'alloy
+127.0.0.1:12345 users:(("alloy",pid=20662))
+127.0.0.1:3511 users:(("alloy",pid=20662))
+127.0.0.1:3512 users:(("alloy",pid=20662))
+127.0.0.1:9096 users:(("loki",pid=20218))
+192.168.161.13:3100 users:(("loki",pid=20218))
+192.168.161.13:3501 users:(("alloy",pid=20662))
+192.168.161.13:3502 users:(("alloy",pid=20662))
+== 3511, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 3511, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+== 3512, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 3512, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+== 9096, httpgrpc en clair
+curl: (16) Error in the HTTP2 framing layer
+
+== 9096, httpgrpc en TLS sans certificat client
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+
+## depuis l'hôte : ports de sc-stockage hors boucle locale tenus par loki ou alloy (connexion TCP)
+3100 : ouvert
+3501 : ouvert
+3502 : ouvert
+## certificats acceptés par port gRPC (tunnel SSH vers la boucle locale de sc-stockage ; httpgrpc /ready)
+9096  loki-interne         grpc-status: 0 ready
+
+9096  controle             grpc-status: 0 ready
+
+9096  alloy-sc-confiance   curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+9096  alloy-sc-build       curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  loki-interne         curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  controle             curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3511  alloy-sc-confiance   grpc-status: 0 ready
+
+3511  alloy-sc-build       curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  loki-interne         curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  controle             curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  alloy-sc-confiance   curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+3512  alloy-sc-build       grpc-status: 0 ready
+
+tunnel : Exit request sent.
+## durée 19b (L6, contrôle) : 1 s
+[journalisation] $ poc/bricks/19b-journalisation/journalisation.sh temoins secrets
+# journalisation.sh temoins, 2026-11-06T15:32:33Z
+OK   contre-épreuve : marqueur jamais émis absent
+OK   J1 journal de sc-confiance : t4-journal-sc-confiance-1793979275554245478 lu par l'auditeur dans Grafana en 4 s
+OK   J1 journal de sc-build : t4-journal-sc-build-1793979279986399694 lu par l'auditeur dans Grafana en 4 s
+OK   J1 journal de sc-stockage : t4-journal-sc-stockage-1793979284297354006 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-confiance (openbao-0) : t4-pods-confiance-1793979286627788631 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-build (cilium-hfp4b) : t4-pods-build-1793979288929493208 lu par l'auditeur dans Grafana en 2 s
+OK   J3 audit de l'API : t4-audit-k8s-1793979291071183787 lu par l'auditeur dans Grafana en 2 s
+OK   J4 événements : t4-evenement-1793979293401911904 lu par l'auditeur dans Grafana en 2 s
+OK   J5 audit d'OpenBao (sortie du pod) : t4-openbao-1793979295542930987 lu par l'auditeur dans Grafana en 2 s
+OK   J6 audit de Zot (poc-ecriture, essais-19b/temoin) : t4-zot-1793979297780985698 lu par l'auditeur dans Grafana en 2 s
+récepteur : HTTP 200
+OK   J8 récepteur d'alertes : t4-recepteur-1793979301577823812 lu par l'auditeur dans Grafana en 2 s
+# journalisation.sh secrets, 2026-11-06T15:35:03Z
+motifs : 52 fichiers (dont 6 lus sur les VM : vm-sc-confiance-agent-token vm-sc-confiance-token vm-sc-stockage-internal_token vm-sc-stockage-jwt_secret vm-sc-stockage-metrics_token vm-sc-stockage-secret_key), valeurs jamais affichées ; témoin positif compris
+lignes exportées, doublons de reprise retirés : 176130 (143M)
+lignes comptées par Loki sur la même fenêtre : 176099
+ÉCART export incomplet ou doublons : 176130 exportées pour 176099
+  alloy-evenements.token               0 ligne(s)
+  alloy-sc-build.key                   0 ligne(s)
+  alloy-sc-confiance.key               0 ligne(s)
+  alloy-stockage.key                   0 ligne(s)
+  ca-poc.key                           0 ligne(s)
+  ca-sc-build.key                      0 ligne(s)
+  ca-sc-confiance.key                  0 ligne(s)
+  controle.key                         0 ligne(s)
+  forgejo-admin.password               0 ligne(s)
+  forgejo-admin.token                  0 ligne(s)
+  forgejo-poc-amont.token              0 ligne(s)
+  forgejo-poc-dev.token                0 ligne(s)
+  forgejo-poc-sync.token               0 ligne(s)
+  forgejo-webhook-sync.secret          0 ligne(s)
+  forgejo-webhook.secret               0 ligne(s)
+  forgejo.key                          0 ligne(s)
+  grafana-admin.password               0 ligne(s)
+  grafana-auditeur.password            0 ligne(s)
+  grafana-client.key                   0 ligne(s)
+  grafana.key                          0 ligne(s)
+  k3s-jeton-agent                      0 ligne(s)
+  k3s-jeton-agent-securise             0 ligne(s)
+  k3s-jeton-serveur                    0 ligne(s)
+  loki-interne.key                     0 ligne(s)
+  loki.key                             0 ligne(s)
+  openbao-descellement.b64             0 ligne(s)
+  openbao-descellement.hex             0 ligne(s)
+  openbao-root.token                   0 ligne(s)
+  openbao.key                          0 ligne(s)
+  prometheus-lecture.token             0 ligne(s)
+  relais.key                           0 ligne(s)
+  rke2-jeton-agent                     0 ligne(s)
+  rke2-jeton-agent-securise            0 ligne(s)
+  rke2-jeton-serveur                   0 ligne(s)
+  taches.key                           0 ligne(s)
+  temoin-positif                       1 ligne(s)
+  tsa-racine.key                       0 ligne(s)
+  vm-sc-confiance-agent-token          0 ligne(s)
+  vm-sc-confiance-token                0 ligne(s)
+  vm-sc-stockage-internal_token        0 ligne(s)
+  vm-sc-stockage-jwt_secret            0 ligne(s)
+  vm-sc-stockage-metrics_token         0 ligne(s)
+  vm-sc-stockage-secret_key            0 ligne(s)
+  zot-poc-build.password               0 ligne(s)
+  zot-poc-ecriture.password            0 ligne(s)
+  zot-poc-fermetures.password          0 ligne(s)
+  zot-poc-horodatage.password          0 ligne(s)
+  zot-poc-images.password              0 ligne(s)
+  zot-poc-metriques.password           0 ligne(s)
+  zot-poc-scan.password                0 ligne(s)
+  zot-poc-vulndb.password              0 ligne(s)
+  zot.key                              0 ligne(s)
+## durée 19b (L4) : 174 s
+# plateforme.sh g1_oras, 2026-11-06T15:35:27Z
+OK   signature GPG de oras_1.3.6_checksums.txt (clé primaire) : C6FC42F0DE84A345FAADB742F44418110791EF37
+oras_1.3.6_linux_amd64.tar.gz: OK
+oras_1.3.6_linux_amd64.tar.gz: OK
+OK   binaire extrait identique à celui de mise : 2be7e2b668fc32329408ca17f104021bdb93407266537b6410668ed7d05c4611
+/tmp/oras-installation/oras: OK
+/usr/local/bin/oras: OK
+Version:        1.3.6
+# fin 2026-11-06T15:35:28Z, code 0
+# plateforme.sh g1_droits, 2026-11-06T15:35:28Z
+OK   poc-scan, par digest dans builds/scan/essai-07a : accepte
+OK   poc-scan, par tag dans builds/scan/essai-07a : refus
+OK   poc-scan, par digest dans builds/essai-07a (hors de builds/scan/) : refus
+OK   poc-images, par digest dans builds/scan/essai-07a (motif le plus long) : refus
+OK   poc-images, par digest dans builds/essai-07a (témoin : droit inchangé) : accepte
+OK   poc-vulndb, tag dans vulndb/essai-07a : accepte
+OK   poc-vulndb, même tag repoussé (mise à jour) : refus
+OK   poc-vulndb, par digest dans builds/essai-07a : refus
+OK   poc-replay, par digest dans builds/scan/essai-07a : refus
+tags de vulndb/essai-07a : v1
+# fin 2026-11-06T15:35:47Z, code 0
+# plateforme.sh g1_base, 2026-11-06T15:35:47Z
+/etc/base-grype:
+total 8
+-rw-r--r-- 1 root root  765 Nov  6 15:35 ca-poc.crt
+drwx------ 2 root root 4096 Nov  6 15:35 secrets
+
+/etc/base-grype/secrets:
+total 4
+-rw------- 1 root root 48 Nov  6 15:35 poc-vulndb.password
+
+/usr/local/lib/base-grype:
+total 8
+-rwxr-xr-x 1 root root  944 Nov  6 15:35 base-grype.sh
+-rwxr-xr-x 1 root root 2036 Nov  6 15:35 fetch-db.sh
+OK   fetch-db.sh installé identique : d04c0831c4738cddcb70b88b1bfed60fe45db1543f3ce0345f044c99d7c2342a
+OK   base-grype.sh installé identique : 4a0a38fe0a28a6e2ab4e8122a6c9ac19ae697d699400abe3ef402e802f02d679
+-> Overall exposure level for base-grype.service: 3.0 OK :-)
+# fin 2026-11-06T15:35:48Z, code 0
+# plateforme.sh g1_essai, 2026-11-06T15:35:48Z
+premier run : code 0 ; success 0
+## journal du premier run
+Starting base-grype.service - Archivage de la base Grype du jour (brique 07a)...
+192.168.161.13:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd
+base-grype.service: Deactivated successfully.
+Finished base-grype.service - Archivage de la base Grype du jour (brique 07a).
+base-grype.service: Consumed 1.419s CPU time, 208.4M memory peak.
+vulndb/grype:2026-11-06 -> sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd (lecture anonyme)
+OK   artifactType : application/vnd.supply-chain.grype-db.v6
+OK   empreinte annoncée (annotation) : sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23
+OK   date de construction (annotation) : 2026-11-06T06:21:59Z
+OK   couche de l'archive = empreinte annoncée : sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23
+OK   second run (code) : 0
+OK   second run : base déjà archivée : 1
+## contre-épreuve : archive tronquée dans le répertoire de travail (sans identifiants)
+empreinte invalide : vulnerability-db_v6.1.10_2026-11-05T00:22:43Z_1793946119.tar.zst
+OK   archive tronquée refusée (code 1)
+OK   tags de vulndb/grype après la contre-épreuve : 2026-11-06
+OK   mot de passe de poc-vulndb absent du journal de l'unité
+Created symlink '/etc/systemd/system/timers.target.wants/base-grype.timer' -> '/etc/systemd/system/base-grype.timer'.
+NEXT                        LEFT LAST PASSED UNIT             ACTIVATES
+Sat 2026-11-07 08:06:43 UTC  16h -         - base-grype.timer base-grype.service
+# fin 2026-11-06T15:36:20Z, code 0
+# plateforme.sh g1_grafana, 2026-11-06T15:36:20Z
+OK   requête de l'auditeur (HTTP) : 200
+2026-11-06T15:36:03Z 192.168.161.13:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd
+2026-11-06T15:36:18Z déjà archivée : 192.168.161.13:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd
+OK   archivage visible dans Grafana
+OK   mot de passe de poc-vulndb absent de la réponse
+# fin 2026-11-06T15:36:20Z, code 0
+## durée 07a (G1) : 53 s
+# plateforme.sh g2_image, 2026-11-06T15:36:20Z
+oras_1.3.6_linux_amd64.tar.gz: OK
+grype_0.104.1_linux_amd64.tar.gz: OK
+syft_1.38.0_linux_amd64.tar.gz: OK
+c833472c3d590cfc6861f948c21fd9f87350c663e0943ba0b35e278a88f94049  grype
+6d380157a79f5e9114c98df5a2ea22cb06e04d8b37343a6f638f12f4775ac180  syft
+2be7e2b668fc32329408ca17f104021bdb93407266537b6410668ed7d05c4611  oras
+3d442df7c0fedb11f5d5d8680b97c6305547aadc58737a6fe5bcb0e5ee63f1b2  scan-outil
+OK   grype de l'image = grype de mise : c833472c3d590cfc6861f948c21fd9f87350c663e0943ba0b35e278a88f94049
+OK   syft de l'image = syft de mise : 6d380157a79f5e9114c98df5a2ea22cb06e04d8b37343a6f638f12f4775ac180
+couche : 5f2c05ab674e32c881831814c232db6875c3e3ff04c1efb7d08a898930e076c9, 162611200 octets
+image d'outils du scanner : 192.168.161.13:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   second assemblage (même digest) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   digest épinglé (G2 du 04/11/2026) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   relue en lecture anonyme : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+# fin 2026-11-06T15:36:34Z, code 0
+## durée 07a (G2) : 14 s
+# plateforme.sh g3_cluster, 2026-11-06T15:36:34Z
+## espace scan (politique/scan.yaml)
+namespace/scan serverside-applied
+serviceaccount/scanner serverside-applied
+networkpolicy.networking.k8s.io/scan serverside-applied
+configmap/scan-config serverside-applied
+OK   Pod Security de l'espace scan : restricted
+OK   compte scanner sans jeton monté d'office : false
+OK   sorties de l'espace scan (ports) : UDP/53,TCP/53,TCP/8200,TCP/5000,TCP/3000
+## NetworkPolicy d'OpenBao (document NetworkPolicy de 08-trust-plane/openbao/openbao.yaml seul ; StatefulSet non touché)
+networkpolicy.networking.k8s.io/openbao serverside-applied
+{"kubernetes.io/metadata.name":"tekton-chains"} 
+{"kubernetes.io/metadata.name":"tsa"} {"app":"timestamp-authority"}
+{"kubernetes.io/metadata.name":"horodatage"} 
+{"kubernetes.io/metadata.name":"scan"} {"app":"scan"}
+OK   entrée de l'espace scan, pods app=scan seulement : scan
+OK   openbao-0 ni recréé ni redémarré (uid, redémarrages) : a0002f24-4034-4213-8c29-743d24ec7882 0
+OK   OpenBao descellé : false
+## règle zone-confiance de Kyverno (document de 08-trust-plane/politique/admission.yaml seul, appliqué comme charger de politique.sh)
+validatingpolicy.policies.kyverno.io/zone-confiance unchanged
+OK   scan dans les espaces de zone-confiance : true
+OK   pod de scan sans nodeSelector refusé par zone-confiance (1 essai(s))
+OK   contre-épreuve : même pod avec nodeSelector zone=confiance : pod/sonde-zone created (server dry run)
+# fin 2026-11-06T15:36:35Z, code 0
+# plateforme.sh g3_openbao, 2026-11-06T15:36:35Z
+identifiants Zot du job : compte poc-scan, registre sc-stockage.poc.test:5000
+Key                       Value
+---                       -----
+allow_plaintext_backup    false
+auto_rotate_period        0s
+deletion_allowed          false
+derived                   false
+exportable                false
+imported_key              false
+keys                      map[1:map[certificate_chain: creation_time:2026-11-06T15:36:35.978552435Z name:P-256 public_key:-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIO3KuitjxlQrlbx5SCEaHjMOOiXq
+U8+LoVzauFgw6FoGMwUzXeSlDzc68adlogdTYo7PpHkVCsd1QNOMj212MQ==
+-----END PUBLIC KEY-----
+]]
+latest_version            1
+min_available_version     0
+min_decryption_version    1
+min_encryption_version    0
+name                      scanner
+soft_deleted              false
+supports_decryption       false
+supports_derivation       false
+supports_encryption       false
+supports_signing          true
+type                      ecdsa-p256
+Success! Uploaded policy: scanner-signature
+Success! Uploaded policy: scan-zot
+Success! Data written to: kv/scan/zot
+Success! Data written to: auth/jwt/role/scanner
+Success! Data written to: auth/jwt/role/scan-zot
+{"name":"scanner","type":"ecdsa-p256","exportable":false,"allow_plaintext_backup":false,"deletion_allowed":false,"latest_version":1}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:scan:scanner","user_claim":"sub","token_policies":["scanner-signature"],"token_no_default_policy":true,"token_type":"service","token_ttl":300,"token_max_ttl":300,"token_period":0}
+{"bound_audiences":["openbao"],"bound_subject":"system:serviceaccount:scan:scanner","user_claim":"sub","token_policies":["scan-zot"],"token_no_default_policy":true,"token_type":"service","token_ttl":60,"token_max_ttl":60,"token_period":0}
+OK   clé scanner (type, exportable, sauvegarde en clair, suppression) : ecdsa-p256,false,false,false
+OK   rôle scanner : system:serviceaccount:scan:scanner,openbao,scanner-signature,true,service,300,300,0
+OK   rôle scan-zot : system:serviceaccount:scan:scanner,openbao,scan-zot,true,service,60,60,0
+OK   politique scanner-signature = fichier versionné (hors commentaires et lignes vides) : be4295fcda158148
+OK   politique scan-zot = fichier versionné (hors commentaires et lignes vides) : ed4e7c417e8205b8
+OK   kv/scan/zot = identifiants de poc-scan (empreinte du JSON compact) : 951318c01a892f5c
+Public-Key: (256 bit field, 128 bit security level)
+NIST CURVE: P-256
+clé publique exportée : resultats/scanner-cle-publique.pem (SPKI sha256 1656a3fa3868d9f4fecc99231b204b1f4b2d47efd0a3b0cfbfe371a61b05c802)
+# fin 2026-11-06T15:36:37Z, code 0
+# plateforme.sh g3_essais, 2026-11-06T15:36:37Z
+## rôle scanner, compte scan:scanner
+CONNEXION_ACCEPTEE|"token_policies":["scanner-signature"]
+ACCEPTE|lecture de transit/keys/scanner
+SIGNATURE_SCANNER|vault:v1:MEUCIQCizZEHsSUNHlY+QbOVWrD2rtzdFSvX7rSJETnxPAJOkgIgcG2JQckYtUKbOQToRHrC4vjllMjZSaIDTH244ar+9XQ=
+REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|export de la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|clé scanner rendue exportable|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|sauvegarde en clair de la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de son propre jeton|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|renouvellement de son propre jeton|Code: 403. Errors: * 1 error occurred: * permission denied 
+ACCEPTE|révocation de son propre jeton
+REFUSE|signature avec la clé scanner après révocation|Code: 403. Errors: * permission denied 
+OK   rôle scanner : signe avec la seule clé scanner ; 2 acceptations, 11 refus (15 lignes conformes)
+## rôle scan-zot, compte scan:scanner
+CONNEXION_ACCEPTEE|"token_policies":["scan-zot"]
+ACCEPTE|lecture de kv/scan/zot
+REFUSE|signature avec la clé scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de transit/keys/scanner|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|écriture de kv/scan/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+REFUSE|lecture de kv/horodatage/zot|Code: 403. Errors: * 1 error occurred: * permission denied 
+ACCEPTE|révocation de son propre jeton
+REFUSE|lecture de kv/scan/zot après révocation|Code: 403. Errors: * permission denied 
+OK   rôle scan-zot : lit ses seuls identifiants, sans écriture ni signature ; révoqué, il ne lit plus rien (8 lignes conformes)
+## connexions croisées
+scan:default, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:default, rôle scan-zot : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tsa:timestamp-authority, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+tekton-chains:tekton-chains-controller, rôle scanner : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+horodatage:horodatage, rôle scan-zot : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle tsa : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle tekton-chains : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+scan:scanner, rôle horodatage : CONNEXION_REFUSEE|Code: 400. Errors: * error validating token: invalid subject (sub) claim 
+OK   connexions croisées refusées : 8/8
+## signature Transit vérifiée sur l'hôte
+OK   signature Transit (prehashed sha2-256) vérifiée par openssl avec resultats/scanner-cle-publique.pem
+OK   contre-épreuve : même signature refusée avec la clé publique de Chains
+## audit d'OpenBao depuis 2026-11-06T15:36:37Z
+{"chemin":"kv/scan/zot","op":"read","role":null,"politiques":["root"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":null,"politiques":["root"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/chains/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/sign/tsa/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/chains","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/export/signing-key/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/scanner/config","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/backup/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/scan/zot","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/horodatage/zot","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/lookup-self","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/renew-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/jwt/login","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"transit/keys/scanner","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/scan/zot","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"kv/horodatage/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
+{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:dec67124de865ab54a82dfda3476780ea390fccf227ad999c3934407de0ea3e3"} ×8
+# fin 2026-11-06T15:36:41Z, code 0
+# plateforme.sh g3_cosign, 2026-11-06T15:36:41Z
+## pod scan-cosign (app=scan) : jeton du rôle scanner, cosign sign-blob --key hashivault://scanner, révocation
+jeton du rôle scanner obtenu (essai 1)
+JOINT|Zot|réponse 2xx
+JOINT|Forgejo|réponse 2xx
+INJOIGNABLE|Grafana|wget: download timed out
+INJOIGNABLE|Internet (1.1.1.1)|wget: download timed out
+Wrote bundle to file temoin.bundle.json
+Success! Revoked token (if it existed)
+jeton du rôle scanner révoqué
+OK   pod scan-cosign : Succeeded
+OK   sondes du pod app=scan : JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (1.1.1.1)
+## bundle vérifié sur l'hôte
+OK   clé publique lue par cosign = clé exportée (SPKI sha256) : 1656a3fa3868d9f4fecc99231b204b1f4b2d47efd0a3b0cfbfe371a61b05c802
+{"mediaType":"application/vnd.dev.sigstore.bundle.v0.3+json","materiel":["publicKey"],"signature":["messageDigest","signature"],"condensat":"SHA2_256"}
+OK   bundle vérifié par cosign verify-blob avec resultats/scanner-cle-publique.pem (Verified OK)
+OK   contre-épreuve : contenu modifié refusé (invalid signature when validating ASN.1 encoded signature)
+OK   contre-épreuve : clé publique de Chains refusée (invalid signature when validating ASN.1 encoded signature)
+## pod sans l'étiquette app=scan
+JOINT|Zot|réponse 2xx
+INJOIGNABLE|OpenBao|wget: download timed out
+OK   sondes du pod sans app=scan : JOINT|Zot INJOIGNABLE|OpenBao
+## audit d'OpenBao depuis 2026-11-06T15:36:41Z (chemins appelés par cosign)
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null} ×2
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+{"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
+# fin 2026-11-06T15:37:06Z, code 0
+# plateforme.sh g3_grafana, 2026-11-06T15:37:06Z
+## journaux du pod scan-cosign, lus par l'auditeur (Loki ingère avec quelques secondes de retard)
+jeton du rôle scanner obtenu (essai 1)
+Success! Revoked token (if it existed)
+jeton du rôle scanner révoqué
+JOINT|Zot|réponse 2xx
+JOINT|Forgejo|réponse 2xx
+INJOIGNABLE|Grafana|wget: download timed out
+INJOIGNABLE|Internet (1.1.1.1)|wget: download timed out
+Wrote bundle to file temoin.bundle.json
+OK   connexion et révocation visibles dans Grafana (1 essai(s))
+## audit d'OpenBao, lu par l'auditeur
+lignes d'audit citant transit/sign/scanner : 8
+OK   signatures de la clé scanner visibles dans Grafana (1 essai(s))
+## identifiants de poc-scan absents des réponses
+OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
+# fin 2026-11-06T15:37:06Z, code 0
+## durée 07a (G3) : 32 s
+# plateforme.sh g4_scan, 2026-11-06T15:37:06Z
+## ConfigMap scan-config : CA du PoC, script du job, clé publique du scanner
+configmap/scan-config serverside-applied
+## job g4-sample-app sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+job.batch/g4-sample-app created
+### source
+  SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+### analyser
+  BASE|2026-11-06, sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd, empreinte sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23, 1 s
+  IMPORT|3232 Mo, 100 s ; 3422 Mo dans le volume, au plus haut
+  SBOM|4 composants avec PURL (D1 a), 1 s
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 2 s
+  PREDICAT|sha256 36c9b578e63b143be301666f3de0d49b2be27bfca2ae6a7aa5e57f1a08a26cc9, 104 s en tout
+### jetons
+  identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+  jeton du rôle scanner obtenu
+### attester
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 02f71270253f532e23f6447b82ab8c60d2a6cbe0add6c1d7f00b58b4a4402292, vérifié avec la clé publique
+### publier
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+### revocation
+  jeton du rôle scanner révoqué ; identifiants et jeton effacés
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-06T15:37:07Z","fin":"2026-11-06T15:39:02Z","init":{"source":0,"analyser":0,"jetons":0,"attester":0,"publier":0}}
+place libre la plus basse sur sc-confiance pendant le job : 10826 Mo
+OK   job : 1
+OK   base du job = base la plus récente (2026-11-06) : sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd
+OK   commit de la source : 6391fd437f26696847041be3226bbbf633f55a2f
+3232 Mo, 100 s ; 3422 Mo dans le volume, au plus haut
+5 vulnérabilités, 0 KEV, 2 s
+# fin 2026-11-06T15:39:07Z, code 0
+# plateforme.sh g4_verifier, 2026-11-06T15:39:07Z
+## referrers de l'image dans builds/scan/sample-app, en lecture anonyme
+{"digest":"sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-06T15:39:00Z"}}
+OK   empreinte du manifeste : sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de
+OK   sujet du manifeste : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   empreinte du bundle : sha256:02f71270253f532e23f6447b82ab8c60d2a6cbe0add6c1d7f00b58b4a4402292
+## bundle vérifié sur l'hôte
+OK   bundle vérifié : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1 (Verified OK)
+OK   contre-épreuve, autre digest refusé : provided artifact digest does not match any digest in statement
+OK   contre-épreuve, autre prédicat refusé : invalid predicate type
+OK   contre-épreuve, clé de Chains refusée : failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, E
+## prédicat signé
+{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-06T06:21:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-06T15:38:55.193068299Z","malveillants":[]}
+  GHSA-3fxj-6jh8-hvhx Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GHSA-j6qf-3m9c-vwj3 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GHSA-mqqf-5wvp-8fh8 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-5775 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-5777 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+OK   sujet de l'énoncé : 3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   scanner : grype 0.104.1
+OK   base citée par digest : sc-stockage.poc.test:5000/vulndb/grype
+OK   KEV : 0
+OK   paquets malveillants : 0
+vulnérabilités : 5
+## aucun Secret dans l'espace scan
+OK   Secrets de l'espace scan : 0
+## audit d'OpenBao depuis le début du job
+{"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"auth/jwt/login","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"kv/scan/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
+{"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+{"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
+# fin 2026-11-06T15:39:07Z, code 0
+# plateforme.sh g4_grafana, 2026-11-06T15:39:07Z
+## journaux du job, lus par l'auditeur
+BASE|2026-11-06, sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd, empreinte sha256:fdc0c98e98e2c0599ae29091
+IMPORT|3232 Mo, 100 s ; 3422 Mo dans le volume, au plus haut
+SBOM|4 composants avec PURL (D1 a), 1 s
+SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 2 s
+PREDICAT|sha256 36c9b578e63b143be301666f3de0d49b2be27bfca2ae6a7aa5e57f1a08a26cc9, 104 s en tout
+ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 02f71270253f532e2
+identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+jeton du rôle scanner obtenu
+PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de, referrer de sha256:3a7ca1b14dbf13c6655c50
+jeton du rôle scanner révoqué ; identifiants et jeton effacés
+SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+OK   visible dans Grafana : ^SOURCE|
+OK   visible dans Grafana : ^BASE|
+OK   visible dans Grafana : ^SCAN|
+OK   visible dans Grafana : ^ATTESTATION|
+OK   visible dans Grafana : ^PUBLIE|
+OK   visible dans Grafana : jeton du rôle scanner révoqué
+## audit d'OpenBao, lu par l'auditeur
+lignes d'audit citant transit/sign/scanner : 2
+OK   signature du job visible dans Grafana
+## audit de Zot, lu par l'auditeur
+lignes d'audit de Zot : 5
+OK   poussage du manifeste par poc-scan visible dans Grafana
+## identifiants de poc-scan absents des réponses
+OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
+# fin 2026-11-06T15:39:07Z, code 0
+## durée 07a (G4) : 121 s
+# plateforme.sh g7_periodique, 2026-11-06T15:39:07Z
+configmap/scan-config serverside-applied
+cronjob.batch/scan-sample-app serverside-applied
+OK   horaire : 30 9 * * * Etc/UTC Forbid
+job.batch/g7-manuel created
+### source
+  SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+### analyser
+  BASE|2026-11-06, sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd, empreinte sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23, 2 s
+  IMPORT|3232 Mo, 96 s ; 3422 Mo dans le volume, au plus haut
+  SBOM|4 composants avec PURL (D1 a), 2 s
+  SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+  PREDICAT|sha256 16fa339c9c10d745de6cd6d42bd5f82ed83fda25afe70390a271881ab2da5745, 101 s en tout
+### jetons
+  identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+  jeton du rôle scanner obtenu
+### attester
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 3157259832906b3b54503f7504f876ef72b2a7f542e0ea9222f6932e30c4b9ee, vérifié avec la clé publique
+### publier
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:4ed8cca06cbd90b16bdf084e204519d04561e2b09dfe2d0163a632cfe4692933, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+### revocation
+  jeton du rôle scanner révoqué ; identifiants et jeton effacés
+place libre la plus basse sur sc-confiance pendant le job : 10824 Mo
+OK   job : 1
+OK   referrers de l'image : 2
+OK   sujet du referrer publié : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   bundle vérifié sur l'hôte : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+{"scannedAt":"2026-11-06T15:40:50.276057555Z","base":{"built":"2026-11-06T06:21:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd","schema":"v6.1.10"},"vulnerabilites":5,"kev":0}
+# fin 2026-11-06T15:41:03Z, code 0
+# plateforme.sh g7_grafana, 2026-11-06T15:41:03Z
+## journaux du passage, lus par l'auditeur
+OK   visible dans Grafana : ^SOURCE|
+OK   visible dans Grafana : ^BASE|
+OK   visible dans Grafana : ^SCAN|
+OK   visible dans Grafana : ^ATTESTATION|
+OK   visible dans Grafana : ^PUBLIE|
+OK   visible dans Grafana : jeton du rôle scanner révoqué
+## audit d'OpenBao et de Zot, lus par l'auditeur
+OK   signature du job visible dans Grafana (2 ligne(s))
+OK   poussage par poc-scan visible dans Grafana
+## identifiants de poc-scan absents des réponses
+OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
+# fin 2026-11-06T15:41:08Z, code 0
+## durée 07a (passage périodique) : 121 s
+# plateforme.sh g8_metriques, 2026-11-06T15:41:08Z
+Created symlink '/etc/systemd/system/timers.target.wants/fraicheur-scan.timer' -> '/etc/systemd/system/fraicheur-scan.timer'.
+OK   fraicheur-scan.py installé identique : 48519c39f65417be949aa8ec9dd92870139ab49a6de5c84e68660a283f0607be
+success
+active
+scan 1793979655, base 1793946119
+fraicheur-scan.service: Deactivated successfully.
+Finished fraicheur-scan.service - Fraîcheur du scan et de la base Grype en métriques (brique 07a).
+scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"} 1793979655
+base_grype_construite_timestamp_seconds{depot="vulndb/grype"} 1793946119
+-> Overall exposure level for fraicheur-scan.service: 2.9 OK :-)
+OK   séries lues dans Prometheus : base_grype_construite_timestamp_seconds=1793946119 scan_dernier_referrer_timestamp_seconds=1793979655
+# fin 2026-11-06T15:41:14Z, code 0
+## durée 07a (G8) : 6 s
+[replay] $ poc/bricks/10-independent-replay/replay.sh pousser_vsa
+# replay.sh pousser_vsa, 2026-11-06T15:41:15Z
+bundle archivé, clé de VSA (hôte) : code 0 ; Verified OK
+OK   verify-blob-attestation (hôte) : aucune connexion hors de Zot (0 connect())
+referrers de l'image dans builds/sample-app, avant : 0
+sujet : {"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": "sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5", "size": 556}
+blob du bundle poussé
+config vide poussée
+Digest: sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b
+## relecture anonyme
+referrers de l'image dans builds/vsa/sample-app : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b')]
+étiquettes de builds/vsa/sample-app : {"name":"builds/vsa/sample-app","tags":[]}
+referrers de l'image dans builds/sample-app, après : 0
+manifeste poussé : sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b
+## durée 10 (VSA) : 5 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh controle6
+# preuves.sh controle6, 2026-11-06T15:41:19Z
+## ConfigMap porte : contrôle 6 ajouté (vsa.sh, clé publique du domaine de replay)
+clé de VSA : 578dd771bcedd5829267820e8cad77182e91184692843cf423b4942250d1e96a (empreinte DER ; R2 : 578dd771…)
+OK   ConfigMap porte : vsa.sh, vsa.pub et horodatage.sh identiques aux fichiers versionnés
+referrers de l'image : builds/sample-app 0 ; builds/vsa/sample-app 1
+## C1 image réelle, source attendue
+VERDICT|c6-reelle|true||trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    RETENU|énoncé 17a75bddc3f9e993
+    VSA|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
+OK   C1 contrôle 9 : ok
+OK   C1 contrôle 6 : ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app
+## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucune VSA dans builds/vsa/essai-webhook
+VERDICT|c6-sans-vsa|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+    VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: 
+OK   C2 contrôle 6 : refus
+OK   C2 détail : 0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook 
+## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du domaine de replay
+VERDICT|c6-cle-chains|true||trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+ConfigMap porte-temoin retirée
+    VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   C3 ec et contrôle 9 inchangés : true||trusted_task.tagged|ok
+OK   C3 contrôle 6 : refus
+OK   C3 motif : signature refusée
+## bilan : 0 écart(s) aux prédictions
+## durée J8 (contrôle 6) : 173 s
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh controle7
+# preuves.sh controle7, 2026-11-06T15:44:12Z
+## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)
+clé du scanner : 1656a3fa3868d9f4fecc99231b204b1f4b2d47efd0a3b0cfbfe371a61b05c802 (empreinte DER ; G3 : 8cbcbb4e…)
+OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés
+referrers de l'image : builds/sample-app 0 ; builds/scan/sample-app 2 ; builds/vsa/sample-app 1
+## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés
+VERDICT|c7-reelle|true||trusted_task.tagged|60|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    LU|énoncé 88c575313d5f1afc|2026-11-06T15:38:55.193068299Z
+    LU|énoncé 03d474aa816b383a|2026-11-06T15:40:50.276057555Z
+    LECTURE|2|sc-stockage.poc.test:5000/builds/scan/sample-app|
+OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
+OK   C1 contrôle 9 : ok
+OK   C1 contrôle 6 : ok
+OK   C1 contrôle 7 : ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   C1 Job : 1
+## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook
+VERDICT|c7-sans-scan|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|31|ok|30/30 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+    LECTURE|0|sc-stockage.poc.test:5000/builds/scan/essai-webhook|cosign : no matching attestations: 
+OK   C2 contrôle 7 : refus
+OK   C2 règle : scan.scan_present
+OK   C2 Job : 1
+## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du scanner
+VERDICT|c7-cle-chains|true||trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+ConfigMap porte-temoin retirée
+    LECTURE|0|sc-stockage.poc.test:5000/builds/scan/sample-app|cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   C3 ec et contrôles 9 et 6 inchangés : true||trusted_task.tagged|ok|ok
+OK   C3 contrôle 7 : refus
+OK   C3 motif : signature refusée
+## bilan : 0 écart(s) aux prédictions
+## durée J8 (contrôle 7) : 174 s
+# plateforme.sh g6_temoins, 2026-11-06T15:47:06Z
+15 cas, 16 publications
+# preuves.sh temoins_scan, 2026-11-06T15:48:19Z
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle du scanner
+VERDICT|g6-propre|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   propre (porte-temoin) : ok, 1 énoncé(s)
+VERDICT|g6-cle-etrangere|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   cle-etrangere (porte) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-absent|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: 
+OK   absent (porte-temoin) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-kev|false|refus|scan.kev_without_vex ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   kev (porte-temoin) : refus, scan.kev_without_vex, 1 énoncé(s)
+VERDICT|g6-mal|false|refus|scan.malicious ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   mal (porte-temoin) : refus, scan.malicious, 1 énoncé(s)
+VERDICT|g6-vex-expire|false|refus|scan.kev_without_vex ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vex-expire (porte-temoin) : refus, scan.kev_without_vex, 1 énoncé(s)
+VERDICT|g6-vex-valide|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vex-valide (porte-temoin) : ok, 1 énoncé(s)
+VERDICT|g6-vieux|false|refus|scan.scan_recent ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vieux (porte-temoin) : refus, scan.scan_recent, 1 énoncé(s)
+VERDICT|g6-futur|false|refus|scan.scan_recent ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   futur (porte-temoin) : refus, scan.scan_recent, 1 énoncé(s)
+VERDICT|g6-base-vieille|false|refus|scan.base_recente ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   base-vieille (porte-temoin) : refus, scan.base_recente, 1 énoncé(s)
+VERDICT|g6-incomplet|false|refus|scan.forme ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   incomplet (porte-temoin) : refus, scan.forme, 1 énoncé(s)
+VERDICT|g6-autre-digest|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+OK   autre-digest (porte-temoin) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-recent-propre|false|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   recent-propre (porte-temoin) : ok, 2 énoncé(s)
+VERDICT|g6-recent-kev|false|refus|scan.kev_without_vex ; 2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   recent-kev (porte-temoin) : refus, scan.kev_without_vex, 2 énoncé(s)
+VERDICT|g6-illisible|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   illisible (porte-temoin) : ok, 1 énoncé(s)
+ConfigMap porte-temoin retirée
+## témoin : image réelle, ConfigMap porte
+VERDICT|g6-reelle|true||trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   image réelle admise par les trois contrôles
+## bilan : 0 écart(s) aux prédictions
+# fin 2026-11-06T15:58:46Z, code 0
+## durée 07a (G6) : 700 s
+[confiance:fuites] $ poc/bricks/08-trust-plane/fuites.sh rke2
+# fuites.sh rke2, 2026-11-06T15:58:46Z
+## sc-confiance : 166338 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+## sc-build : 35158 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+## sc-stockage : 82906 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM
+## durée fuites : 6 s
+# rke2.sh cis, 2026-11-06T15:58:53Z
+OK   kube-bench_0.16.0_linux_amd64.tar.gz
+## sc-confiance, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+== Summary master ==
+54 checks PASS
+0 checks FAIL
+5 checks WARN
+0 checks INFO
+== Summary etcd ==
+7 checks PASS
+0 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+1 checks PASS
+0 checks FAIL
+4 checks WARN
+0 checks INFO
+[WARN] 4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)
+[WARN] 4.2.13 Ensure that a limit is set on pod PIDs (Manual)
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+16 checks PASS
+1 checks FAIL
+2 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+78 checks PASS
+5 checks FAIL
+40 checks WARN
+7 checks INFO
+## sc-build, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[FAIL] 1.1.1 Ensure that the API server pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.2 Ensure that the API server pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.3 Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.5 Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root (Automated)
+[WARN] 1.1.7 Ensure that the etcd pod specification file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive (Manual)
+[WARN] 1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd (Manual)
+[FAIL] 1.1.13 Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.14 Ensure that the admin.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.15 Ensure that the scheduler.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.16 Ensure that the scheduler.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.17 Ensure that the controller-manager.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.18 Ensure that the controller-manager.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[FAIL] 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600 (Automated)
+[FAIL] 1.2.1 Ensure that the --anonymous-auth argument is set to false (Automated)
+[FAIL] 1.2.2 Ensure that the --token-auth-file parameter is not set (Automated)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[FAIL] 1.2.4 Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate (Automated)
+[FAIL] 1.2.5 Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)
+[FAIL] 1.2.6 Ensure that the --authorization-mode argument is not set to AlwaysAllow (Automated)
+[FAIL] 1.2.7 Ensure that the --authorization-mode argument includes Node (Automated)
+[FAIL] 1.2.8 Ensure that the --authorization-mode argument includes RBAC (Automated)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[FAIL] 1.2.10 Ensure that the admission control plugin AlwaysAdmit is not set (Automated)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+[FAIL] 1.2.12 Ensure that the admission control plugin ServiceAccount is set (Automated)
+[FAIL] 1.2.13 Ensure that the admission control plugin NamespaceLifecycle is set (Automated)
+[FAIL] 1.2.14 Ensure that the admission control plugin NodeRestriction is set (Automated)
+[FAIL] 1.2.15 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.2.16 Ensure that the --audit-log-path argument is set (Automated)
+[FAIL] 1.2.17 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)
+[FAIL] 1.2.18 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)
+[FAIL] 1.2.19 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)
+[FAIL] 1.2.20 Ensure that the --request-timeout argument is set as appropriate (Automated)
+[FAIL] 1.2.21 Ensure that the --service-account-lookup argument is set to true (Automated)
+[FAIL] 1.2.22 Ensure that the --service-account-key-file argument is set as appropriate (Automated)
+[FAIL] 1.2.23 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate (Automated)
+[FAIL] 1.2.24 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Automated)
+[FAIL] 1.2.25 Ensure that the --client-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.2.26 Ensure that the --etcd-cafile argument is set as appropriate (Automated)
+[FAIL] 1.2.27 Ensure that the --encryption-provider-config argument is set as appropriate (Automated)
+[FAIL] 1.2.28 Ensure that encryption providers are appropriately configured (Automated)
+[FAIL] 1.2.29 Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Automated)
+[WARN] 1.3.1 Ensure that the --terminated-pod-gc-threshold argument is set as appropriate (Manual)
+[FAIL] 1.3.2 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.3.3 Ensure that the --use-service-account-credentials argument is set to true (Automated)
+[FAIL] 1.3.4 Ensure that the --service-account-private-key-file argument is set as appropriate (Automated)
+[FAIL] 1.3.5 Ensure that the --root-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)
+[FAIL] 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+[FAIL] 1.4.1 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+== Summary master ==
+2 checks PASS
+48 checks FAIL
+9 checks WARN
+0 checks INFO
+[FAIL] 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)
+[FAIL] 2.2 Ensure that the --client-cert-auth argument is set to true (Automated)
+[FAIL] 2.3 Ensure that the --auto-tls argument is not set to true (Automated)
+[FAIL] 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)
+[FAIL] 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Automated)
+[FAIL] 2.6 Ensure that the --peer-auto-tls argument is not set to true (Automated)
+[FAIL] 2.7 Ensure that a unique Certificate Authority is used for etcd (Automated)
+== Summary etcd ==
+0 checks PASS
+7 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[FAIL] 3.2.1 Ensure that a minimal audit policy is created (Automated)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+0 checks PASS
+1 checks FAIL
+4 checks WARN
+0 checks INFO
+[WARN] 4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)
+[WARN] 4.2.13 Ensure that a limit is set on pod PIDs (Manual)
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+16 checks PASS
+1 checks FAIL
+2 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+18 checks PASS
+61 checks FAIL
+44 checks WARN
+7 checks INFO
+## durée 08b (CIS) : 4 s
+## durée totale : 2021 s

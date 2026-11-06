@@ -306,3 +306,13 @@ Lancé sur accord (« Oui, relance »), 13:28 à 15:21 UTC, [journal](../08-trus
 **Correction du contrôle** : sous RKE2, `refus_droits` écarte uniquement les `watch` refusés dans la minute qui suit le démarrage de `kube-apiserver`, et les affiche. Tout autre refus compte. Sous k3s, rien ne change. [Essai](resultats/essai-refus-droits.log) sur les journaux réels : 0 avec les 2 écartés affichés ; témoins sans exclusion et fenêtre décalée : 2.
 
 **Ce que cela affaiblit** : pendant cette minute, un `watch` refusé pour un vrai manque de droits ne serait pas compté. Il le serait au prochain essai, et l'informer ne fonctionnerait pas, ce que les tests suivants verraient.
+
+## Reprise à `J8 (contrôleurs)` et état du seuil (06/11/2026, 16:00 UTC)
+
+Décision du propriétaire : « Reprends à J8 », reprise de 15:25 à 15:59 UTC, 2 021 s, [journal](../08-trust-plane/resultats/rejeu-rke2.log). **0 KO jusqu'à `fuites` et `kube-bench`.** Les 2 `watch` écartés sont affichés au journal, le contrôle compte 0 pour les deux contrôleurs. Contrôles 6 et 7 conformes, VSA repoussée sur accord, aucun secret dans les journaux des VM. `kube-bench` : mêmes chiffres, 78 PASS et 5 FAIL sur le server, 18 et 61 sur l'agent. Écart d'export de 19b : 31 lignes, comme avant.
+
+**Seuil : atteint avec un écart accepté, pas au sens strict.** Le passage de zéro de 13:28 UTC a couvert J1 à `helm_cilium` sans KO, puis s'est arrêté à `J8 (contrôleurs)` ; la reprise a fini sur le même cluster. Durée : 6 780 s puis 2 021 s, soit 2 h 27. Aucune étape n'a été rejouée après correction d'un défaut du cluster : l'arrêt portait sur le contrôle. Un passage d'un seul tenant reste non fait.
+
+**Résultats** : les journaux suivis des briques portent désormais les mesures RKE2. Les versions k3s restent dans l'historique, dernier commit `d357f4d`, rejeu `complet` dans `f3cb8ad`. Les liens de l'ADR 0001 sont épinglés à `d357f4d` ; ceux des README des briques ne le sont pas, ils affichent donc du RKE2 sous un texte k3s.
+
+**Replanifié** : `supply-chain-g7-premiere-suppression`, du 19/11 au 21/11/2026, 16:00 UTC. Zot a redémarré le 06/11 à 15:14:56 UTC et le plus ancien blob de `builds/scan` date du même jour à 15:39 UTC. Les 336 h expirent le 20/11 à 15:39, juste après le balayage du 20/11 ; premier balayage utile attendu le 21/11 vers 15:15 UTC. Calcul, pas une mesure : un redémarrage de Zot le déplacerait.

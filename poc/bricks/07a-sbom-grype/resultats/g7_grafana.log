@@ -1,4 +1,4 @@
-# plateforme.sh g7_grafana, 2026-11-05T08:50:35Z
+# plateforme.sh g7_grafana, 2026-11-06T15:41:03Z
 ## journaux du passage, lus par l'auditeur
 OK   visible dans Grafana : ^SOURCE|
 OK   visible dans Grafana : ^BASE|
@@ -11,4 +11,4 @@ OK   signature du job visible dans Grafana (2 ligne(s))
 OK   poussage par poc-scan visible dans Grafana
 ## identifiants de poc-scan absents des réponses
 OK   ni le mot de passe ni son encodage docker dans les réponses de Grafana
-# fin 2026-11-05T08:50:35Z, code 0
+# fin 2026-11-06T15:41:08Z, code 0

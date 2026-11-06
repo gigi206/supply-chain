@@ -1,35 +1,41 @@
-# journalisation.sh controle_l3, 2026-11-03T22:36:01Z
+# journalisation.sh controle_l3, 2026-11-06T15:31:28Z
 ## lignes reçues par Loki dans les 10 dernières minutes, par nœud et par source
-  noeud=sc-build,source=journal 1217
-  noeud=sc-build,source=pods 180
-  noeud=sc-confiance,source=audit-k8s 6176
-  noeud=sc-confiance,source=pods 232
-  noeud=sc-stockage,source=audit-zot 2491
-  noeud=sc-stockage,source=evenements-k8s 265
-  noeud=sc-stockage,source=journal 8516
+  noeud=sc-build,source=journal 282
+  noeud=sc-build,source=rke2 8489
+  noeud=sc-confiance,source=audit-k8s 5962
+  noeud=sc-confiance,source=pods 237
+  noeud=sc-confiance,source=rke2 7142
+  noeud=sc-stockage,source=audit-zot 2421
+  noeud=sc-stockage,source=evenements-k8s 154
+  noeud=sc-stockage,source=journal 7692
+  noeud=sc-stockage,source=rke2 732
   source=controle-l2 1
 ## sources attendues (J1 à J6 et J8)
-{noeud="sc-confiance", source="journal", unite="k3s.service"}                                                  2641
-{noeud="sc-build", source="journal"}                                                                           23805
-{noeud="sc-stockage", source="journal", unite="forgejo.service"}                                               834
+{noeud="sc-confiance", source="journal", unite="rke2-server.service"}                                          694
+{noeud="sc-build", source="journal"}                                                                           17317
+{noeud="sc-stockage", source="journal", unite="forgejo.service"}                                               817
 {noeud="sc-stockage", source="journal", unite="recepteur-alertes.service"}                                     0
-{noeud="sc-confiance", source="pods", espace="tekton-chains"}                                                  202
-{noeud="sc-build", source="pods"}                                                                              3063
-{noeud="sc-confiance", source="audit-k8s"}                                                                     6673
-{source="evenements-k8s"}                                                                                      1847
-{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""                                             100
-{noeud="sc-stockage", source="audit-zot"}                                                                      2491
+{noeud="sc-confiance", source="pods", espace="tekton-chains"}                                                  94
+{noeud="sc-build", source="pods"}                                                                              2797
+{noeud="sc-confiance", source="audit-k8s"}                                                                     5962
+{source="evenements-k8s"}                                                                                      1915
+{noeud="sc-confiance", espace="openbao"} |= "\"type\":\"request\""                                             1
+{noeud="sc-stockage", source="audit-zot"}                                                                      2421
+{noeud="sc-build", source="rke2", composant="kubelet"}                                                         2826
+{noeud="sc-confiance", source="rke2", composant="containerd"}                                                  3558
 ## D17 : relais en écriture seule, nœud imposé
 certificat de sc-build vers Loki : 000
 certificat de sc-build vers le port de sc-confiance : 000
 certificat de sc-build vers son port, ligne étiquetée noeud=sc-confiance : HTTP 204
   stockée sous :   noeud=sc-build 1
 ## Grafana : l'auditeur lit le journal de k3s
-HTTP 200, 5 ligne(s)
+HTTP 200, 3 ligne(s)
 ## Alloy : état et erreurs sur les trois VM
-sc-confiance : active, 121 Mi, erreurs depuis le démarrage : 0
-sc-build : active, 85 Mi, erreurs depuis le démarrage : 0
-sc-stockage : active, 153 Mi, erreurs depuis le démarrage : 0
-192.168.161.13:3502 users:(("alloy",pid=21533,fd=7))
-192.168.161.13:3501 users:(("alloy",pid=21533,fd=9))
-127.0.0.1:12345 users:(("alloy",pid=21533,fd=11))
+sc-confiance : active, 118 Mi, erreurs depuis le démarrage : 0
+sc-build : active, 87 Mi, erreurs depuis le démarrage : 0
+sc-stockage : active, 146 Mi, erreurs depuis le démarrage : 3
+ts=2026-11-06T15:31:38.362054145Z level=error msg="final error sending batch, no retries left, dropping data" component_path=/ component_id=loki.write.sortie component=endpoint host=192.168.161.13:310
+ts=2026-11-06T15:31:39.941186982Z level=error msg="final error sending batch, no retries left, dropping data" component_path=/ component_id=loki.write.sortie component=endpoint host=192.168.161.13:310
+192.168.161.13:3501 users:(("alloy",pid=20662,fd=8))
+192.168.161.13:3502 users:(("alloy",pid=20662,fd=4))
+127.0.0.1:12345 users:(("alloy",pid=20662,fd=14))

@@ -1,18 +1,18 @@
-# plateforme.sh g1_base, 2026-11-04T19:27:14Z
+# plateforme.sh g1_base, 2026-11-06T15:35:47Z
 /etc/base-grype:
 total 8
--rw-r--r-- 1 root root  765 Nov  4 19:27 ca-poc.crt
-drwx------ 2 root root 4096 Nov  4 19:27 secrets
+-rw-r--r-- 1 root root  765 Nov  6 15:35 ca-poc.crt
+drwx------ 2 root root 4096 Nov  6 15:35 secrets
 
 /etc/base-grype/secrets:
 total 4
--rw------- 1 root root 48 Nov  4 19:27 poc-vulndb.password
+-rw------- 1 root root 48 Nov  6 15:35 poc-vulndb.password
 
 /usr/local/lib/base-grype:
 total 8
--rwxr-xr-x 1 root root  944 Nov  4 19:27 base-grype.sh
--rwxr-xr-x 1 root root 2036 Nov  4 19:27 fetch-db.sh
+-rwxr-xr-x 1 root root  944 Nov  6 15:35 base-grype.sh
+-rwxr-xr-x 1 root root 2036 Nov  6 15:35 fetch-db.sh
 OK   fetch-db.sh installé identique : d04c0831c4738cddcb70b88b1bfed60fe45db1543f3ce0345f044c99d7c2342a
 OK   base-grype.sh installé identique : 4a0a38fe0a28a6e2ab4e8122a6c9ac19ae697d699400abe3ef402e802f02d679
-→ Overall exposure level for base-grype.service: 3.0 OK :-)
-# fin 2026-11-04T19:27:15Z, code 0
+-> Overall exposure level for base-grype.service: 3.0 OK :-)
+# fin 2026-11-06T15:35:48Z, code 0

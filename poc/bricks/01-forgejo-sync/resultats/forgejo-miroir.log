@@ -1,7 +1,7 @@
-# forgejo.sh miroir, 2026-11-03T22:30:16Z
-ancien état de l'hôte mis de côté : .cache/supply-chain-poc/01/anciens/20261103T223016Z
+# forgejo.sh miroir, 2026-11-06T15:25:50Z
+ancien état de l'hôte mis de côté : .cache/supply-chain-poc/01/anciens/20261106T152550Z
 branch-created           heads/main  - -> 1907c19815fd
-sync.py : code 0 ; rapport 20261103T223016Z.json
+sync.py : code 0 ; rapport 20261106T152551Z.json
 OK   mirror/sample-app : main = main de amont-essai/sample-app
 ## journal de Forgejo (pushes de ce run : poc-sync vers mirror/ seulement)
 router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK

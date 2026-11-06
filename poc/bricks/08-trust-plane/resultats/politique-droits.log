@@ -1,4 +1,4 @@
-# politique.sh droits, 2026-11-03T21:07:05Z
+# politique.sh droits, 2026-11-06T14:07:04Z
 ## kubectl auth can-i (RBAC seul : un droit accordé reste soumis à l'admission, Kyverno compris)
 89 vérifications, 89 conformes
   accordé : el-forgejo create pipelineruns.tekton.dev (builds)
@@ -17,7 +17,7 @@
   accordé : chains patch pipelineruns.tekton.dev (builds)
 ## comptes de service du cluster qui peuvent modifier un PipelineRun de builds (update ou patch), donc ses labels et annotations,
 ## que Chains signe en slsa-tekton (internalParameters) ; prédiction : contrôleurs de Pipelines et de Chains, ramasse-miettes de Kubernetes
-75 comptes de service examinés ; accordés :
+77 comptes de service examinés ; accordés :
   kube-system:generic-garbage-collector patch
   kube-system:generic-garbage-collector update
   tekton-chains:tekton-chains-controller patch
@@ -53,10 +53,14 @@ OK   seuls ces trois contrôleurs, parmi les comptes de service (plus les admini
 ## écritures du compte el-forgejo dans l'audit de l'API, depuis le dernier test 5 (lectures non journalisées)
   3 create pipelineruns builds 201
   3 create pipelineruns builds 409
-OK   aucun refus (403) pour el-forgejo depuis 2026-11-03T20:53:07Z
+  6 get null - 200
+OK   aucun refus (403) pour el-forgejo depuis 2026-11-06T13:53:07Z
 ## écritures et refus du compte rattrapage dans l'audit de l'API, depuis la dernière étape rattrapage
   1 create pipelineruns builds 201
-OK   aucun refus (403) pour rattrapage depuis 2026-11-03T20:59:16Z
+  5 get pipelineruns builds 200
+  1 get pipelineruns builds 404
+  6 get triggertemplates declencheurs 200
+OK   aucun refus (403) pour rattrapage depuis 2026-11-06T13:59:27Z
 ## journal de l'EventListener : refus de lecture (informateurs), conteneurs précédent et en cours du pod actuel
-pod el-forgejo-79b6fd78c6-5kwl2 créé à 2026-11-03T21:01:06Z ; journal lu : 8 lignes, de 2026-11-03T21:05:46.550Z à 2026-11-03T21:06:45.725Z
-OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-5kwl2
+pod el-forgejo-79b6fd78c6-qtjm7 créé à 2026-11-06T14:01:03Z ; journal lu : 8 lignes, de 2026-11-06T14:05:46.675Z à 2026-11-06T14:06:45.857Z
+OK   aucun « forbidden » dans le journal de el-forgejo-79b6fd78c6-qtjm7

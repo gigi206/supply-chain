@@ -1,19 +1,19 @@
-# forgejo.sh traefik, 2026-11-03T22:33:24Z
+# forgejo.sh traefik, 2026-11-06T15:29:03Z
 ## espace avant
-/dev/vda1      20922114048 6232686592 13788229632  32% /
-39594	/var/lib/forgejo/data/repos/mirror
-68560	/var/lib/forgejo/data/repos/workspace
-premier run (sans fork) : code 0, 1793745266.7 s (journal de l'unité) ; {"status":"ok","evenements":{"branch-created":30,"tag-created":590},"bundle":{"fichier":"20261103T223324Z.bundle","refs":620,"prerequis":0}}
-  taille du bundle : 115464455 octets
+/dev/vda1      20922114048 7708221440 12312694784  39% /
+39593	/var/lib/forgejo/data/repos/mirror
+68559	/var/lib/forgejo/data/repos/workspace
+premier run (sans fork) : code 0, 1793978995.7 s (journal de l'unité) ; {"status":"ok","evenements":{"branch-created":30,"tag-created":590},"bundle":{"fichier":"20261106T152903Z.bundle","refs":620,"prerequis":0}}
+  taille du bundle : 115102168 octets
 OK   master de mirror/traefik = master de GitHub
 FORK=https://192.168.161.13:3000/workspace/traefik.git
 second run (avec fork, incrément depuis le premier) : code 0, 0.9 s (journal de l'unité) ; {"status":"ok","evenements":null,"bundle":null}
 ## espace après
-/dev/vda1      20922114048 6608334848 13412581376  34% /
-119288279	/var/lib/synchro/traefik/miroir.git
-115464455	/var/lib/synchro/traefik/bundles
-119067207	/var/lib/forgejo/data/repos/mirror
-174262	/var/lib/forgejo/data/repos/workspace
+/dev/vda1      20922114048 8082698240 11938217984  41% /
+118936982	/var/lib/synchro/traefik/miroir.git
+115102168	/var/lib/synchro/traefik/bundles
+118711735	/var/lib/forgejo/data/repos/mirror
+174261	/var/lib/forgejo/data/repos/workspace
 Created symlink '/etc/systemd/system/timers.target.wants/synchro@traefik.timer' -> '/etc/systemd/system/synchro@.timer'.
 NEXT LEFT LAST                          PASSED UNIT                  ACTIVATES
--       - Tue 2026-11-03 22:34:56 UTC 31ms ago synchro@traefik.timer synchro@traefik.service
+-       - Fri 2026-11-06 15:30:24 UTC 20ms ago synchro@traefik.timer synchro@traefik.service

@@ -1,20 +1,20 @@
-# executeur.sh planifie, 2026-11-03T22:30:27Z
+# executeur.sh planifie, 2026-11-06T15:26:02Z
 Created symlink '/etc/systemd/system/timers.target.wants/synchro@sample-app-sync.timer' -> '/etc/systemd/system/synchro@.timer'.
-timer activé à 2026-11-03 22:30:27 (période de mesure : 2 min)
-2026-11-03T22:30:37+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
-2026-11-03T22:30:38+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
-2026-11-03T22:30:38+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
-2026-11-03T22:32:40+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
-2026-11-03T22:32:40+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
-2026-11-03T22:32:40+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+timer activé à 2026-11-06 15:26:03 (période de mesure : 2 min)
+2026-11-06T15:26:13+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-06T15:26:14+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
+2026-11-06T15:26:14+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: Starting synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01)...
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: synchro@sample-app-sync.service: Deactivated successfully.
+2026-11-06T15:28:16+00:00 sc-stockage systemd[1]: Finished synchro@sample-app-sync.service - Synchronisation du miroir sample-app-sync (brique 01).
 OK   deux runs planifiés sans intervention
-rapport 20261103T223240Z.json
+rapport 20261106T152816Z.json
 {"status":"ok","events":[],"bundle":null}
-sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793745160
-sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793745023
+sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793978896
+sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793978758
 sync_dernier_run_statut{projet="sample-app-sync",statut="ok"} 1
 sync_dernier_run_statut{projet="sample-app-sync",statut="rewrite-detected"} 0
 sync_dernier_run_statut{projet="sample-app-sync",statut="error"} 0
 NEXT                           LEFT LAST                         PASSED UNIT                          ACTIVATES
-Tue 2026-11-03 23:37:30 UTC 1h 4min Tue 2026-11-03 22:32:40 UTC 11s ago synchro@sample-app-sync.timer synchro@sample-app-sync.service
+Fri 2026-11-06 16:29:19 UTC 1h 0min Fri 2026-11-06 15:28:16 UTC 11s ago synchro@sample-app-sync.timer synchro@sample-app-sync.service
 drop-in de mesure retiré : période d'une heure rétablie

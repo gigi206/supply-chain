@@ -1,4 +1,4 @@
-# plateforme.sh g2_image, 2026-11-04T19:44:18Z
+# plateforme.sh g2_image, 2026-11-06T15:36:20Z
 oras_1.3.6_linux_amd64.tar.gz: OK
 grype_0.104.1_linux_amd64.tar.gz: OK
 syft_1.38.0_linux_amd64.tar.gz: OK
@@ -11,5 +11,6 @@ OK   syft de l'image = syft de mise : 6d380157a79f5e9114c98df5a2ea22cb06e04d8b37
 couche : 5f2c05ab674e32c881831814c232db6875c3e3ff04c1efb7d08a898930e076c9, 162611200 octets
 image d'outils du scanner : 192.168.161.13:5000/plateforme/outils-scan@sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
 OK   second assemblage (même digest) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
+OK   digest épinglé (G2 du 04/11/2026) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
 OK   relue en lecture anonyme : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
-# fin 2026-11-04T19:44:31Z, code 0
+# fin 2026-11-06T15:36:34Z, code 0

@@ -1,5 +1,5 @@
-# preuves.sh test2, 2026-11-03T21:33:54Z
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)
+# preuves.sh test2, 2026-11-06T14:31:51Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 85ff79cc-7db8-435f-9bb8-63378195a54f (2026-11-06T14:24:30Z)
 ## prédiction (écrite le 30/10/2026, corrigée après le premier passage, archivé : preuves-test2-premier-passage.log)
 - TaskRun à taskSpec en ligne créé par l'administrateur, et PipelineRun à pipelineSpec en ligne créé par el-forgejo :
   refusés à l'admission par deux barrières indépendantes, le webhook de Tekton (disable-inline-spec) et la règle
@@ -18,7 +18,7 @@ OK   TaskRun en ligne, el-forgejo : refusé par RBAC (taskruns.tekton.dev is for
 OK   témoin TaskRun du bundle signé, administrateur : admis (taskrun.tekton.dev/preuve-t2-tr-bundle-signe created (server dry run) )
 OK   témoin PipelineRun du bundle signé, el-forgejo : admis (pipelinerun.tekton.dev/preuve-t2-pr-bundle-signe created (server dry run) )
 OK   aucun objet preuve-t2-* dans builds
-## trace : événements PolicyViolation de Kyverno depuis 2026-11-03T21:33:54Z
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-06T14:31:51Z
   ValidatingPolicy/tekton-references : TaskRun builds/preuve-t2-tr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
   ValidatingPolicy/tekton-references : PipelineRun builds/preuve-t2-pr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
 OK   Kyverno a bloqué preuve-t2-tr-en-ligne (événement de tekton-references)
@@ -26,10 +26,10 @@ OK   Kyverno a bloqué preuve-t2-pr-en-ligne (événement de tekton-references)
 OK   aucun événement de Kyverno pour preuve-t2-tr-en-ligne-el : refusé par RBAC avant l'admission
 ## trace : audit de l'API (requêtes preuve-t2-*, et créations de TaskRuns par el-forgejo : un refus de RBAC précède la
 ## lecture du corps, la requête n'a donc pas de nom d'objet)
-  21:33:54 system:admin create taskruns/preuve-t2-tr-en-ligne : 400
-  21:33:55 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-en-ligne : 400
-  21:33:55 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create taskruns/- : 403
-  21:33:55 system:admin create taskruns/preuve-t2-tr-bundle-signe (dry-run) : 201
-  21:33:55 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-bundle-signe (dry-run) : 201
+  14:31:51 system:admin create taskruns/preuve-t2-tr-en-ligne : 400
+  14:31:52 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-en-ligne : 400
+  14:31:52 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create taskruns/- : 403
+  14:31:52 system:admin create taskruns/preuve-t2-tr-bundle-signe (dry-run) : 201
+  14:31:52 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-bundle-signe (dry-run) : 201
 OK   les 3 refus sont dans l'audit de l'API
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 85ff79cc-7db8-435f-9bb8-63378195a54f (2026-11-06T14:24:30Z)

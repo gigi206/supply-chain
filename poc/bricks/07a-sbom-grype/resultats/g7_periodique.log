@@ -1,4 +1,4 @@
-# plateforme.sh g7_periodique, 2026-11-05T08:48:40Z
+# plateforme.sh g7_periodique, 2026-11-06T15:39:07Z
 configmap/scan-config serverside-applied
 cronjob.batch/scan-sample-app serverside-applied
 OK   horaire : 30 9 * * * Etc/UTC Forbid
@@ -6,24 +6,24 @@ job.batch/g7-manuel created
 ### source
   SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
 ### analyser
-  BASE|2026-11-05, sc-stockage.poc.test:5000/vulndb/grype@sha256:ad6c21ccc7d31091f46c909224833c6362729c4312fa07d70fb9b10f30978a15, empreinte sha256:9fbc8d8f2428cd715ffc9591cce16c4179955a7f45c76c12fbcb9cea8dc93813, 1 s
-  IMPORT|3224 Mo, 96 s ; 3413 Mo dans le volume, au plus haut
+  BASE|2026-11-06, sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd, empreinte sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23, 2 s
+  IMPORT|3232 Mo, 96 s ; 3422 Mo dans le volume, au plus haut
   SBOM|4 composants avec PURL (D1 a), 2 s
   SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
-  PREDICAT|sha256 13247c6696e5d2cd0d2b3f66eee1463c1a8e77db3d53b36bb6e18a35786d2d50, 100 s en tout
+  PREDICAT|sha256 16fa339c9c10d745de6cd6d42bd5f82ed83fda25afe70390a271881ab2da5745, 101 s en tout
 ### jetons
   identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
   jeton du rôle scanner obtenu
 ### attester
-  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 b119c465e41d077f32c39e99d43c61696cea3bd1baf2c1502b1231407810d32f, vérifié avec la clé publique
+  ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 3157259832906b3b54503f7504f876ef72b2a7f542e0ea9222f6932e30c4b9ee, vérifié avec la clé publique
 ### publier
-  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:d3643b2cd628b62526120fb67ae222969c6ba277f176e8c2e33ff922f0282261, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+  PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:4ed8cca06cbd90b16bdf084e204519d04561e2b09dfe2d0163a632cfe4692933, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 ### revocation
   jeton du rôle scanner révoqué ; identifiants et jeton effacés
-place libre la plus basse sur sc-confiance pendant le job : 2168 Mo
+place libre la plus basse sur sc-confiance pendant le job : 10824 Mo
 OK   job : 1
 OK   referrers de l'image : 2
 OK   sujet du referrer publié : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 OK   bundle vérifié sur l'hôte : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-{"scannedAt":"2026-11-05T08:50:22.331261177Z","base":{"built":"2026-11-05T06:21:06Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:ad6c21ccc7d31091f46c909224833c6362729c4312fa07d70fb9b10f30978a15","schema":"v6.1.10"},"vulnerabilites":5,"kev":0}
-# fin 2026-11-05T08:50:35Z, code 0
+{"scannedAt":"2026-11-06T15:40:50.276057555Z","base":{"built":"2026-11-06T06:21:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd","schema":"v6.1.10"},"vulnerabilites":5,"kev":0}
+# fin 2026-11-06T15:41:03Z, code 0

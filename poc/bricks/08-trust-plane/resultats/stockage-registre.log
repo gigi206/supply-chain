@@ -1,4 +1,4 @@
-# stockage.sh registre, 2026-11-03T20:33:02Z
+# stockage.sh registre, 2026-11-06T13:32:41Z
 OK   ouverture d'un envoi de blob sans identifiants : HTTP 401
 OK   push anonyme : refusé (basic credential not found)
 OK   push avec un mauvais mot de passe : refusé (401)
@@ -20,16 +20,16 @@ OK   push par poc-build hors de builds/ (workspace/) : refusé (denied)
 OK   suppression par poc-build dans builds/ : refusé (denied)
 manifeste toujours présent après la tentative de suppression : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 ## journal d'audit de Zot (écritures acceptées)
-{"time":"2026-11-03T20:33:12.642514497Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
-{"time":"2026-11-03T20:33:12.650463855Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
-{"time":"2026-11-03T20:33:12.882166356Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/bddb4d3e-b618-4c1d-80bd-4d1072a0032f?digest=sha256%3A0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb","status":201}
-{"time":"2026-11-03T20:33:12.886216325Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/ddb5a34d-e0d3-45a8-9b6d-82fc83694f93?digest=sha256%3A965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd","status":201}
-{"time":"2026-11-03T20:33:13.116491635Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","status":201}
+{"time":"2026-11-06T13:32:51.827293027Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
+{"time":"2026-11-06T13:32:51.835780887Z","subject":"poc-build","action":"POST","object":"/v2/builds/essai-compte/blobs/uploads/","status":202}
+{"time":"2026-11-06T13:32:52.104724694Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/5b0193f0-b02d-4091-a9bd-59dc0a50d5de?digest=sha256%3A0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb","status":201}
+{"time":"2026-11-06T13:32:52.121338174Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/blobs/uploads/42ab8393-5f8d-44be-9c24-575d58d46bf2?digest=sha256%3A965ee3102e598ece280d4f56e56caa349041be76803b5624d685f8a732d70acd","status":201}
+{"time":"2026-11-06T13:32:52.358443703Z","subject":"poc-build","action":"PUT","object":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","status":201}
 ## journal de Zot : refus de cet essai (hors défis 401 sans identifiants, qui précèdent chaque requête authentifiée)
-{"time":"2026-11-03T20:33:07.12054582Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
-{"time":"2026-11-03T20:33:07.123455925Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
-{"time":"2026-11-03T20:33:11.381069114Z","username":"poc-ecriture","method":"DELETE","path":"/v2/workspace/sample-app/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
-{"time":"2026-11-03T20:33:15.565363033Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
-{"time":"2026-11-03T20:33:15.568441739Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
-{"time":"2026-11-03T20:33:17.79968448Z","username":"poc-build","method":"DELETE","path":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
+{"time":"2026-11-06T13:32:46.121456974Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
+{"time":"2026-11-06T13:32:46.125952956Z","username":null,"method":"POST","path":"/v2/workspace/essai/blobs/uploads/","statusCode":401,"authorization":"******"}
+{"time":"2026-11-06T13:32:50.522341367Z","username":"poc-ecriture","method":"DELETE","path":"/v2/workspace/sample-app/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
+{"time":"2026-11-06T13:32:54.822380227Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
+{"time":"2026-11-06T13:32:54.826279743Z","username":"poc-build","method":"POST","path":"/v2/workspace/essai-build/blobs/uploads/","statusCode":403,"authorization":"******"}
+{"time":"2026-11-06T13:32:57.063752007Z","username":"poc-build","method":"DELETE","path":"/v2/builds/essai-compte/manifests/sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5","statusCode":403,"authorization":"******"}
 défis 401 sans identifiants : 13

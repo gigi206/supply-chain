@@ -1,0 +1,58 @@
+# rke2.sh installer, 2026-11-06T13:28:38Z
+OK   rke2.linux-amd64.tar.gz
+OK   rke2-images-core.linux-amd64.tar.zst
+OK   rke2-coredns-1.47.102.tgz
+OK   rke2-metrics-server-3.14.001.tgz
+OK   local-path-storage.yaml
+OK   archives de local-path et de busybox
+OK   archives de Cilium
+Created symlink '/etc/systemd/system/multi-user.target.wants/rke2-server.service' -> '/usr/local/lib/systemd/system/rke2-server.service'.
+rke2 version v1.35.9+rke2r1 (8229013e2b1a73eef1b41dd93708fa96cf11f11f)
+sc-confiance : RKE2 server installé
+API du server prête (/readyz)
+kubeconfig : 600
+# cilium.sh installer, 2026-11-06T13:29:30Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" does not exist. Installing it now.
+NAME: cilium
+LAST DEPLOYED: Fri Nov  6 14:29:30 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+Release "rke2-coredns" does not exist. Installing it now.
+NAME: rke2-coredns
+LAST DEPLOYED: Fri Nov  6 14:29:47 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+Release "rke2-metrics-server" does not exist. Installing it now.
+NAME: rke2-metrics-server
+LAST DEPLOYED: Fri Nov  6 14:30:22 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+Warning: would violate PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "local-path-provisioner" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "local-path-provisioner" must set securityContext.capabilities.drop=["ALL"]), runAsNonRoot != true (pod or container "local-path-provisioner" must set securityContext.runAsNonRoot=true), seccompProfile (pod or container "local-path-provisioner" must set securityContext.seccompProfile.type to "RuntimeDefault" or "Localhost")
+OK   CoreDNS, metrics-server et local-path-provisioner depuis l'hôte ; classe par défaut : local-path 
+jeton agent sécurisé : empreinte de la CA du server 6ae412beb29746a1… vérifiée
+Created symlink '/etc/systemd/system/multi-user.target.wants/rke2-agent.service' -> '/usr/local/lib/systemd/system/rke2-agent.service'.
+rke2 version v1.35.9+rke2r1 (8229013e2b1a73eef1b41dd93708fa96cf11f11f)
+sc-build : RKE2 agent installé
+Created symlink '/etc/systemd/system/multi-user.target.wants/rke2-agent.service' -> '/usr/local/lib/systemd/system/rke2-agent.service'.
+rke2 version v1.35.9+rke2r1 (8229013e2b1a73eef1b41dd93708fa96cf11f11f)
+sc-stockage : RKE2 agent installé
+NAME           STATUS   ROLES                AGE     VERSION          INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>               64s     v1.35.9+rke2r1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane,etcd   3m12s   v1.35.9+rke2r1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>               23s     v1.35.9+rke2r1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+HelmChart : 0 ; attendu 0 (D1 a)
+kube-proxy : 0 pod ; attendu 0
+chiffrement des Secrets : Encryption Status: Enabled

@@ -1,4 +1,4 @@
-# observabilite.sh cibles, 2026-11-03T22:36:16Z
+# observabilite.sh cibles, 2026-11-06T15:31:43Z
 alertmanager	up	
 alloy	up	
 chains	up	
@@ -124,8 +124,10 @@ zot	up
   vault_core_mount_table_size
   vault_core_post_unseal
 ## zot : noms des métriques
+  zot_gc_deleted_total
   zot_gc_duration_seconds_count
   zot_gc_duration_seconds_sum
+  zot_gc_runs_total
   zot_http_method_latency_seconds_bucket
   zot_http_method_latency_seconds_count
   zot_http_method_latency_seconds_sum

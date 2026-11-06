@@ -1,4 +1,4 @@
-# kata.sh reseau, 2026-11-03T21:27:23Z
+# kata.sh reseau, 2026-11-06T14:25:27Z
 ## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)
 - la politique ne sélectionne que les pods de mesure (label app=sonde-reseau-j7) ;
 - fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,
@@ -25,7 +25,7 @@ OK   pas de politique sonde-reseau-j7 résiduelle
 Cilium : OK ; enable-policy default ; routing-mode native
 NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=sonde-reseau-j7
 ## fenêtre de démarrage, trois essais alternés runc et Kata
-### j7-reseau-runc-1 : IP 10.42.1.142, nœud sc-build, conteneur lancé 1 s après la création
+### j7-reseau-runc-1 : IP 10.42.1.187, nœud sc-build, conteneur lancé 0 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
    1500 ms : Zot FERME ; Forgejo OUVERT
    3010 ms : Zot FERME ; Forgejo OUVERT
@@ -38,8 +38,8 @@ NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000)
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-1 : IP 10.42.1.103, nœud sc-build, conteneur lancé 4 s après la création
-      0 ms : Zot FERME ; Forgejo OUVERT
+### j7-reseau-kata-1 : IP 10.42.1.219, nœud sc-build, conteneur lancé 4 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
    1570 ms : Zot FERME ; Forgejo OUVERT
    3100 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
@@ -51,9 +51,9 @@ OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-2 : IP 10.42.1.79, nœud sc-build, conteneur lancé 0 s après la création
+### j7-reseau-runc-2 : IP 10.42.1.192, nœud sc-build, conteneur lancé 1 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
-   1500 ms : Zot FERME ; Forgejo OUVERT
+   1510 ms : Zot FERME ; Forgejo OUVERT
    3010 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
@@ -64,7 +64,7 @@ OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-2 : IP 10.42.1.213, nœud sc-build, conteneur lancé 16 s après la création
+### j7-reseau-kata-2 : IP 10.42.1.157, nœud sc-build, conteneur lancé 4 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
    1560 ms : Zot FERME ; Forgejo OUVERT
    3090 ms : Zot FERME ; Forgejo OUVERT
@@ -77,8 +77,8 @@ OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-3 : IP 10.42.1.105, nœud sc-build, conteneur lancé 0 s après la création
-     10 ms : Zot FERME ; Forgejo OUVERT
+### j7-reseau-runc-3 : IP 10.42.1.190, nœud sc-build, conteneur lancé 1 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
    1510 ms : Zot FERME ; Forgejo OUVERT
    3010 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
@@ -90,10 +90,10 @@ OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-3 : IP 10.42.1.99, nœud sc-build, conteneur lancé 4 s après la création
-      0 ms : Zot FERME ; Forgejo OUVERT
+### j7-reseau-kata-3 : IP 10.42.1.200, nœud sc-build, conteneur lancé 4 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
    1560 ms : Zot FERME ; Forgejo OUVERT
-   3080 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
@@ -106,43 +106,43 @@ OK   kata-3 : une fois la règle posée, Forgejo seul ouvert
 OK   runc : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
 OK   kata : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
 ## trace Hubble sur sc-build (agent Cilium du nœud)
-### j7-reseau-trace-runc : IP 10.42.1.200, nœud sc-build, conteneur lancé 0 s après la création
+### j7-reseau-trace-runc : IP 10.42.1.244, nœud sc-build, conteneur lancé 0 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-  Hubble : 21:30:24.901 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:24.901 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:26.903 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:26.903 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:28.906 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:28.906 10.42.1.200 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-OK   runc (10.42.1.200) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
-### j7-reseau-trace-kata : IP 10.42.1.17, nœud sc-build, conteneur lancé 4 s après la création
+  Hubble : 14:28:19.581 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:19.581 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:21.583 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:21.583 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:23.586 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:23.586 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   runc (10.42.1.244) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+### j7-reseau-trace-kata : IP 10.42.1.221, nœud sc-build, conteneur lancé 4 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-  Hubble : 21:30:28.669 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:28.669 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:30.695 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:30.695 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:32.721 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 21:30:32.721 10.42.1.17 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-OK   kata (10.42.1.17) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+  Hubble : 14:28:23.537 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:23.537 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:25.558 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:25.558 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:27.599 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 14:28:27.599 10.42.1.221 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   kata (10.42.1.221) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
 ## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)
-### j7-reseau-temoin-runc : IP 10.42.1.174, nœud sc-build, conteneur lancé 1 s après la création
+### j7-reseau-temoin-runc : IP 10.42.1.178, nœud sc-build, conteneur lancé 0 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   runc restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
-### j7-reseau-temoin-kata : IP 10.42.1.57, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-temoin-kata : IP 10.42.1.199, nœud sc-build, conteneur lancé 4 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   kata restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
 ## usurpation d'adresse source : pod Kata privilégié
 OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
-### j7-reseau-usurpation : IP 10.42.1.123, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-usurpation : IP 10.42.1.21, nœud sc-build, conteneur lancé 4 s après la création
   AVANT|Zot|FERME
   AVANT|Forgejo|OUVERT
-  ADRESSES|10.42.1.123/32 10.42.1.250/32 
+  ADRESSES|10.42.1.21/32 10.42.1.250/32 
   USURPEE|Zot|192.168.161.13:5000|FERME
   USURPEE|SSH-stockage|192.168.161.13:22|FERME
   USURPEE|API-noeud|192.168.161.11:6443|FERME
@@ -150,65 +150,65 @@ OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Ciliu
   ECHANGE|Zot|
   APRES|Zot|FERME
   FIN
-  Hubble (IP du pod) : 21:31:14.345 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:14.345 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:15.352 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:15.352 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:16.376 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:16.376 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:32.473 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:32.473 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:33.496 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:33.496 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:34.520 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 21:31:34.520 10.42.1.123 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (10.42.1.250) : 21:31:17.399 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:18.424 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:19.448 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:20.410 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:21.432 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:22.456 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:23.421 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:24.440 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:25.464 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:26.431 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:27.448 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:28.472 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:29.455 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:30.456 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 21:31:31.480 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (IP du pod) : 14:29:10.013 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:10.013 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:11.035 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:11.035 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:12.058 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:12.058 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:28.145 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:28.145 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:29.146 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:29.146 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:30.170 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 14:29:30.170 10.42.1.21 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (10.42.1.250) : 14:29:13.070 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:14.074 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:15.098 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:16.081 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:17.082 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:18.107 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:19.091 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:20.122 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:21.146 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:22.102 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:23.130 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:24.154 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:25.126 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:26.138 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 14:29:27.162 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
   tcpdump : 15 packets captured
   tcpdump : 16 packets received by filter
 OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert
-OK   Hubble : 12 flux refusés du pod (10.42.1.123) vers Zot, ceux du témoin
+OK   Hubble : 12 flux refusés du pod (10.42.1.21) vers Zot, ceux du témoin
 OK   avec 10.42.1.250, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)
 OK   avec 10.42.1.250, aucune réponse de Zot
 OK   Hubble : 15 flux de 10.42.1.250 refusés, motif(s) INVALID_SOURCE_IP
   capture -i any sur sc-build : 2 SYN distinct(s) de 10.42.1.250 vers Zot, 0 ligne(s) SYN-ACK en retour
 ## usurpation : autres sources (IP d'un pod témoin du nœud, CIDR d'un autre nœud, adresse externe)
-OK   pod témoin 10.42.1.177 sur sc-build ; 10.42.0.250 inutilisée
-### j7-reseau-sources : IP 10.42.1.78, nœud sc-build, conteneur lancé 4 s après la création
-  SOURCE|10.42.1.177|Zot|FERME
-  SOURCE|10.42.1.177|Forgejo|FERME
+OK   pod témoin 10.42.1.226 sur sc-build ; 10.42.0.250 inutilisée
+### j7-reseau-sources : IP 10.42.1.152, nœud sc-build, conteneur lancé 4 s après la création
+  SOURCE|10.42.1.226|Zot|FERME
+  SOURCE|10.42.1.226|Forgejo|FERME
   SOURCE|10.42.0.250|Zot|FERME
   SOURCE|10.42.0.250|Forgejo|FERME
   SOURCE|203.0.113.10|Zot|FERME
   SOURCE|203.0.113.10|Forgejo|FERME
   FIN
-  Hubble (10.42.1.177) : 21:32:18.140 10.42.1.177 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.177) : 21:32:19.152 10.42.1.177 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.177) : 21:32:20.176 10.42.1.177 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.177) : 21:32:21.151 10.42.1.177 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
-OK   source 10.42.1.177 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
-  Hubble (10.42.0.250) : 21:32:24.179 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 21:32:25.200 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 21:32:26.224 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 21:32:27.189 10.42.0.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.226) : 14:30:14.047 10.42.1.226 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.226) : 14:30:15.063 10.42.1.226 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.226) : 14:30:16.087 10.42.1.226 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.226) : 14:30:17.058 10.42.1.226 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+OK   source 10.42.1.226 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
+  Hubble (10.42.0.250) : 14:30:20.087 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 14:30:21.111 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 14:30:22.135 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 14:30:23.097 10.42.0.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
 OK   source 10.42.0.250 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
-  Hubble (203.0.113.10) : 21:32:30.215 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 21:32:31.216 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 21:32:32.240 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 21:32:33.225 203.0.113.10 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 14:30:26.124 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 14:30:27.127 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 14:30:28.151 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 14:30:29.134 203.0.113.10 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
 OK   source 203.0.113.10 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
   tcpdump enp1s0 : 0 packets captured
   tcpdump enp1s0 : 0 packets received by filter

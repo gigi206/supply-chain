@@ -1,4 +1,4 @@
-# buildkit.sh exempte, 2026-11-03T21:10:56Z
+# buildkit.sh exempte, 2026-11-06T14:11:55Z
 ## prédiction corrigée le 30/10/2026, après le premier passage (resultats/buildkit-exempte-premiere-prediction.log) : la
 ## prédiction du README, écrite avant l'accord, est démentie pour le pod privilégié (newuidmap en échec malgré NoNewPrivs 0)
 virtiofsd lancé sans --xattr (disable_guest_selinux = true, et runtime-rs 4.3.1 n'ajoute --xattr que si ce drapeau est
@@ -23,14 +23,14 @@ OK   exemption de la RuntimeClass kata lue par kube-apiserver (kata.sh exemption
      racine du conteneur : rc 1 setfattr: /tmp/f: Operation not supported
      tmpfs : rc 0 
      tmpfs, relu : user.essai="1"
-virtiofsd du sandbox ebbdeb7a1c191dcb6ae9e9eea9062094c0737671e7418c651e4245e18cf9034a : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
+virtiofsd du sandbox 45b160ee1f6dec4d6d8f2ddb829ba09feb03d85d0e7666cf02ca59c20fdb6861 : 2 processus ; options : --cache --shared-dir --socket-path --thread-pool-size=1 -o
 ### j7-bk-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}, limites {"cpu":"2","memory":"3Gi"}) : phase Succeeded
      CapEff:	0000000000000000
      CapBnd:	000001ffffffffff
      NoNewPrivs:	0
      Seccomp:	0
      uid : 1000
-     rootless démon :  newuidmap 26 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless démon :  newuidmap 23 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
      rootless construction a : rc 1 failed to list workers
      rootless construction b : rc 1 failed to list workers
      rootless construction c : rc 1 failed to list workers
@@ -40,7 +40,7 @@ virtiofsd du sandbox ebbdeb7a1c191dcb6ae9e9eea9062094c0737671e7418c651e4245e18cf
      NoNewPrivs:	0
      Seccomp:	0
      uid : 1000
-     rootless démon :  newuidmap 21 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
+     rootless démon :  newuidmap 23 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps
      rootless construction a : rc 1 failed to list workers
      rootless construction b : rc 1 failed to list workers
      rootless construction c : rc 1 failed to list workers
@@ -63,9 +63,9 @@ OK   runc : attribut étendu sur la racine du conteneur : rc 0
 OK   kata : attribut étendu refusé sur la racine du conteneur (rc 1 setfattr: /tmp/f: Operation not supported)
 OK   kata : attribut étendu sur le tmpfs de l'invité (témoin positif) : rc 0  user.essai="1"
 OK   j7-bk-privilegie : no_new_privs : 0
-OK   j7-bk-privilegie : rootlesskit en échec (newuidmap 26 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-privilegie : rootlesskit en échec (newuidmap 23 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
 OK   j7-bk-escalade : no_new_privs : 0
-OK   j7-bk-escalade : rootlesskit en échec (newuidmap 21 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
+OK   j7-bk-escalade : rootlesskit en échec (newuidmap 23 [0 1000 1 1 100000 65536] failed: newuidmap: Could not set caps)
 OK   j7-bk-privilegie : bounding set : 000001ffffffffff
 OK   en root : UID, démon : 0 | process-mode:sandbox network:host
 OK   en root : constructions a, b, c : rc 0 |rc 0 |rc 0 

@@ -1,5 +1,5 @@
-# fuites.sh synchro-s3, 2026-11-03T22:32:51Z
-## sc-confiance : 81642 lignes de journaux
+# fuites.sh synchro-s3, 2026-11-06T15:28:27Z
+## sc-confiance : 136411 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key
@@ -32,6 +32,9 @@ témoin retrouvé (1)
 0    openbao.key
 0    prometheus-lecture.token
 0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
 0    taches.key
 0    tsa-racine.key
 0    zot-poc-build.password
@@ -40,8 +43,10 @@ témoin retrouvé (1)
 0    zot-poc-horodatage.password
 0    zot-poc-images.password
 0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
 0    zot.key
-## sc-build : 28625 lignes de journaux
+## sc-build : 34609 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key
@@ -74,6 +79,9 @@ témoin retrouvé (1)
 0    openbao.key
 0    prometheus-lecture.token
 0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
 0    taches.key
 0    tsa-racine.key
 0    zot-poc-build.password
@@ -82,8 +90,10 @@ témoin retrouvé (1)
 0    zot-poc-horodatage.password
 0    zot-poc-images.password
 0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
 0    zot.key
-## sc-stockage : 54332 lignes de journaux
+## sc-stockage : 57597 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key
@@ -116,6 +126,9 @@ témoin retrouvé (1)
 0    openbao.key
 0    prometheus-lecture.token
 0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
 0    taches.key
 0    tsa-racine.key
 0    zot-poc-build.password
@@ -124,5 +137,7 @@ témoin retrouvé (1)
 0    zot-poc-horodatage.password
 0    zot-poc-images.password
 0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
 0    zot.key
 OK   aucun secret dans les journaux des trois VM

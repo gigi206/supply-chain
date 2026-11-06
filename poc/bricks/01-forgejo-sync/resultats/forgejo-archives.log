@@ -1,8 +1,8 @@
-# forgejo.sh archives, 2026-11-03T22:30:17Z
+# forgejo.sh archives, 2026-11-06T15:25:51Z
 OK   branche essai/archive par poc-amont : accepté
-branch-created           heads/essai/archive  - -> 38cda9e35ee9
+branch-created           heads/essai/archive  - -> 753290b62244
 OK   force-push de essai/archive par poc-amont : accepté
-force-push-unprotected   heads/essai/archive  38cda9e35ee9 -> 2e23dd8e2aec
-sync.py : code 0 ; événement : force-push-unprotected refs/archive/20261103T223018Z/heads/essai/archive
+force-push-unprotected   heads/essai/archive  753290b62244 -> ef18ee39787e
+sync.py : code 0 ; événement : force-push-unprotected refs/archive/20261106T152553Z/heads/essai/archive
 OK   force-push non sensible : code 0, archivé
-OK   archive refs/archive/20261103T223018Z/heads/essai/archive publiée dans mirror/sample-app (Forgejo accepte refs/archive/*)
+OK   archive refs/archive/20261106T152553Z/heads/essai/archive publiée dans mirror/sample-app (Forgejo accepte refs/archive/*)

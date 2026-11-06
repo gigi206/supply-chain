@@ -1,4 +1,4 @@
-# forgejo.sh fork, 2026-11-03T22:30:18Z
+# forgejo.sh fork, 2026-11-06T15:25:53Z
 {"full_name":"workspace/sample-app-sync","fork":true,"parent":"mirror/sample-app","default_branch":"main"}
 équipe workspace/synchro (6) : dépôts workspace/sample-app-sync ; membres poc-sync
 équipe workspace/dev-sample-app-sync (7) : dépôts workspace/sample-app-sync ; membres poc-dev

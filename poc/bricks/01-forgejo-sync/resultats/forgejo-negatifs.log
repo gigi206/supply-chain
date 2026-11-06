@@ -1,33 +1,33 @@
-# forgejo.sh negatifs, 2026-11-03T22:32:57Z
+# forgejo.sh negatifs, 2026-11-06T15:28:35Z
 ## 1. force-push de main (branche sensible)
 OK   force-push de main par poc-amont : accepté
-run 20261103T223300Z.json : code 2, [{"type":"force-push","ref":"heads/main","archive":"refs/archive/20261103T223300Z/heads/main"}]
+run 20261106T152839Z.json : code 2, [{"type":"force-push","ref":"heads/main","archive":"refs/archive/20261106T152839Z/heads/main"}]
 OK   code 2
 OK   force-push détecté
-OK   heads/main archivée dans mirror/sample-app (refs/archive/20261103T223300Z/heads/main)
+OK   heads/main archivée dans mirror/sample-app (refs/archive/20261106T152839Z/heads/main)
 OK   main du fork suit l'amont (ancienne valeur archivée)
 ## 2. tag v1.0.0 créé, puis déplacé, puis supprimé
 OK   tag v1.0.0 par poc-amont : accepté
-run 20261103T223305Z.json : code 0, [{"type":"tag-created","ref":"tags/v1.0.0","archive":null}]
+run 20261106T152844Z.json : code 0, [{"type":"tag-created","ref":"tags/v1.0.0","archive":null}]
 OK   code 0
 OK   tag v1.0.0 déplacé par poc-amont : accepté
-run 20261103T223309Z.json : code 2, [{"type":"fast-forward","ref":"heads/main","archive":null},{"type":"tag-moved","ref":"tags/v1.0.0","archive":"refs/archive/20261103T223309Z/tags/v1.0.0"}]
+run 20261106T152848Z.json : code 2, [{"type":"fast-forward","ref":"heads/main","archive":null},{"type":"tag-moved","ref":"tags/v1.0.0","archive":"refs/archive/20261106T152848Z/tags/v1.0.0"}]
 OK   code 2
-OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261103T223309Z/tags/v1.0.0)
+OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261106T152848Z/tags/v1.0.0)
 OK   tag v1.0.0 supprimé par poc-amont : accepté
-run 20261103T223314Z.json : code 2, [{"type":"tag-deleted","ref":"tags/v1.0.0","archive":"refs/archive/20261103T223314Z/tags/v1.0.0"}]
+run 20261106T152853Z.json : code 2, [{"type":"tag-deleted","ref":"tags/v1.0.0","archive":"refs/archive/20261106T152853Z/tags/v1.0.0"}]
 OK   code 2
-OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261103T223314Z/tags/v1.0.0)
+OK   tags/v1.0.0 archivée dans mirror/sample-app (refs/archive/20261106T152853Z/tags/v1.0.0)
 OK   tag supprimé de la vue amont de mirror/sample-app (archivé)
 OK   tag gardé dans le fork (pas de --prune)
 ## 3. branche feature/x créée puis supprimée
 OK   branche feature/x par poc-amont : accepté
-run 20261103T223318Z.json : code 0, [{"type":"branch-created","ref":"heads/feature/x","archive":null}]
+run 20261106T152857Z.json : code 0, [{"type":"branch-created","ref":"heads/feature/x","archive":null}]
 OK   code 0
 OK   branche feature/x supprimée par poc-amont : accepté
-run 20261103T223323Z.json : code 0, [{"type":"branch-deleted","ref":"heads/feature/x","archive":"refs/archive/20261103T223323Z/heads/feature/x"}]
+run 20261106T152901Z.json : code 0, [{"type":"branch-deleted","ref":"heads/feature/x","archive":"refs/archive/20261106T152901Z/heads/feature/x"}]
 OK   code 0
-OK   heads/feature/x archivée dans mirror/sample-app (refs/archive/20261103T223323Z/heads/feature/x)
+OK   heads/feature/x archivée dans mirror/sample-app (refs/archive/20261106T152901Z/heads/feature/x)
 OK   feature/x gardée dans le fork
 ## 4. refs propres du fork après toutes les réécritures
 OK   custom/essai, paquet/deb et custom-1 intactes

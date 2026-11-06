@@ -1,4 +1,4 @@
-# preuves.sh helm_cilium, 2026-11-03T22:29:22Z
+# preuves.sh helm_cilium, 2026-11-06T15:21:25Z
 Prédiction (écrite le 01/11/2026 avant le premier passage sous l'option (b), contrôleur Helm de k3s désactivé) :
 - aucune liaison vers cluster-admin dont un sujet est un compte de service ; le même filtre trouve la liaison
   helm-kube-system-cilium relevée sous le HelmChart de k3s (témoin)
@@ -19,17 +19,16 @@ Prédiction réécrite (02/11/2026, avant le second rejeu ; droits de locataire 
 OK   témoin : liaisons trouvées par le filtre dans la liaison relevée sous le HelmChart : 1
 OK   liaisons vers cluster-admin dont un sujet est un compte de service : 0
 ## contrôleur Helm de k3s
-OK   CRD helmcharts.helm.cattle.io absente
+OK   HelmCharts du cluster (CRD présente) : 0
 OK   comptes de service helm-* : 0
 OK   liaisons helm-* : 0
 OK   release Helm cilium (depuis l'hôte) : deployed cilium-1.20.4
 OK   can-i '*' '*' au nom de helm-cilium (compte absent) : no
 ## pod portant helm-cilium dans kube-system (dry-run serveur)
-OK   comptes de service qui peuvent créer des pods dans kube-system (7 depuis le 02/11/2026) : 7
+OK   comptes de service qui peuvent créer des pods dans kube-system (6 sous rke2) : 6
 OK   contrôleurs de Pipelines et de Chains parmi eux : 0
   system:serviceaccount:kube-system:daemon-set-controller : system:controller:daemon-set-controller → system:controller:daemon-set-controller
   system:serviceaccount:kube-system:job-controller : system:controller:job-controller → system:controller:job-controller
-  system:serviceaccount:kube-system:local-path-provisioner-service-account : local-path-provisioner-bind → local-path-provisioner-role
   system:serviceaccount:kube-system:persistent-volume-binder : system:controller:persistent-volume-binder → system:controller:persistent-volume-binder
   system:serviceaccount:kube-system:replicaset-controller : system:controller:replicaset-controller → system:controller:replicaset-controller
   system:serviceaccount:kube-system:replication-controller : system:controller:replication-controller → system:controller:replication-controller
@@ -37,8 +36,6 @@ OK   contrôleurs de Pipelines et de Chains parmi eux : 0
 OK   system:serviceaccount:kube-system:daemon-set-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
   témoin, compte default : admis
 OK   system:serviceaccount:kube-system:job-controller : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
-  témoin, compte default : admis
-OK   system:serviceaccount:kube-system:local-path-provisioner-service-account : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
   témoin, compte default : admis
 OK   system:serviceaccount:kube-system:persistent-volume-binder : refusé (pods "preuve-helm-cilium" is forbidden: error looking up service account kube-system/helm-cilium: serviceaccount "helm-cilium" not found )
   témoin, compte default : admis
@@ -57,7 +54,6 @@ Attendu : aucun compte à '*' '*' ; clusterrole-aggregation-controller : escalat
   daemon-set-controller : [create pods]
   generic-garbage-collector : [update clusterroles]
   job-controller : [create pods]
-  local-path-provisioner-service-account : [create pods]
   persistent-volume-binder : [create pods]
   replicaset-controller : [create pods]
   replication-controller : [create pods]

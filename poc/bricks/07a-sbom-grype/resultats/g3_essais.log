@@ -1,8 +1,8 @@
-# plateforme.sh g3_essais, 2026-11-04T20:21:36Z
+# plateforme.sh g3_essais, 2026-11-06T15:36:37Z
 ## rôle scanner, compte scan:scanner
 CONNEXION_ACCEPTEE|"token_policies":["scanner-signature"]
 ACCEPTE|lecture de transit/keys/scanner
-SIGNATURE_SCANNER|vault:v1:MEUCIQCoQeGxjaj3Ij+h7qZ8NcVkv5QVr4zRiKcObeJfab9+CgIgAqmcwHEtJs3Nm+vt3nGsnIfHAgJIIou476AJIxKYsXg=
+SIGNATURE_SCANNER|vault:v1:MEUCIQCizZEHsSUNHlY+QbOVWrD2rtzdFSvX7rSJETnxPAJOkgIgcG2JQckYtUKbOQToRHrC4vjllMjZSaIDTH244ar+9XQ=
 REFUSE|signature avec la clé chains|Code: 403. Errors: * 1 error occurred: * permission denied 
 REFUSE|signature avec la clé tsa|Code: 403. Errors: * 1 error occurred: * permission denied 
 REFUSE|lecture de transit/keys/chains|Code: 403. Errors: * 1 error occurred: * permission denied 
@@ -39,7 +39,9 @@ OK   connexions croisées refusées : 8/8
 ## signature Transit vérifiée sur l'hôte
 OK   signature Transit (prehashed sha2-256) vérifiée par openssl avec resultats/scanner-cle-publique.pem
 OK   contre-épreuve : même signature refusée avec la clé publique de Chains
-## audit d'OpenBao depuis 2026-11-04T20:21:36Z
+## audit d'OpenBao depuis 2026-11-06T15:36:37Z
+{"chemin":"kv/scan/zot","op":"read","role":null,"politiques":["root"],"erreur":null}
+{"chemin":"transit/keys/scanner","op":"read","role":null,"politiques":["root"],"erreur":null}
 {"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
@@ -63,5 +65,5 @@ OK   contre-épreuve : même signature refusée avec la clé publique de Chains
 {"chemin":"kv/horodatage/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":"1 error occurred:\n\t* permission denied\n\n"}
 {"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
 {"chemin":"kv/scan/zot","op":"read","role":null,"politiques":null,"erreur":"1 error occurred:\n\t* permission denied\n\n"}
-{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:d2bf63c99f2ac79876ea811221992f19406a1fce5464f49d5c47fa36aa72bb40"} ×8
-# fin 2026-11-04T20:21:40Z, code 0
+{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:dec67124de865ab54a82dfda3476780ea390fccf227ad999c3934407de0ea3e3"} ×8
+# fin 2026-11-06T15:36:41Z, code 0

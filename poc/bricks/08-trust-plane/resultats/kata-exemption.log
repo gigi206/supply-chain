@@ -1,6 +1,6 @@
-# kata.sh exemption, 2026-11-03T21:08:51Z
+# kata.sh exemption, 2026-11-06T14:09:11Z
 ## prédiction
-kube-apiserver relancé avec --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml (fichier d'appoint de config.yaml.d, clé kube-apiserver-arg+)
+kube-apiserver relancé avec --admission-control-config-file=/etc/rancher/rke2/pod-security.yaml (fichier d'appoint de config.yaml.d, clé kube-apiserver-arg+)
 server k3s redémarré sans arrêter les conteneurs de sc-confiance (unité k3s en KillMode=process) : mêmes conteneurs, mêmes
   identifiants ; OpenBao reste descellé, même clé ; Kyverno répond ; témoin TSA vérifié ; un passage réussi de chaque CronJob
 admission (dry-run serveur) : dans builds, pod Kata privilégié admis, pod Kata non privilégié avec allowPrivilegeEscalation
@@ -9,41 +9,67 @@ admission (dry-run serveur) : dans builds, pod Kata privilégié admis, pod Kata
   RuntimeClass lui ajoute le nodeSelector et la tolérance de la zone build)
 ## état avant
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh temoin
-# openbao.sh temoin, 2026-11-03T21:08:51Z
-témoin : message signé par la clé chains ; empreinte de la clé publique 07c683b078540879… ; {"latest_version":1,"exportable":false}
-20 pods durables et 21 conteneurs en cours sur sc-confiance
-kube-apiserver : --enable-admission-plugins=NodeRestriction
+# openbao.sh temoin, 2026-11-06T14:09:11Z
+témoin : message signé par la clé chains ; empreinte de la clé publique a7ca8ce8d133aa9b… ; {"latest_version":1,"exportable":false}
+26 pods durables et 27 conteneurs en cours sur sc-confiance
+kube-apiserver : --admission-control-config-file=/etc/rancher/rke2/rke2-pss.yaml --enable-admission-plugins=NodeRestriction
 rattrapage suspendu ; aucun PipelineRun actif
 ## pose sur sc-confiance (0600) et redémarrage du server k3s
-API prête et trois nœuds Ready 7 s après le redémarrage ; k3s : active
+API prête et trois nœuds Ready 43 s après le redémarrage ; k3s : active
 ## après le redémarrage
-OK   kube-apiserver : --admission-control-config-file=/etc/rancher/k3s/pod-security.yaml --enable-admission-plugins=NodeRestriction
-OK   mêmes conteneurs sur sc-confiance (21), mêmes identifiants : aucun arrêté par le redémarrage
+OK   kube-apiserver : --admission-control-config-file=/etc/rancher/rke2/pod-security.yaml --enable-admission-plugins=NodeRestriction
+CONSTAT conteneurs de sc-confiance changés par le redémarrage :
+2c2
+< kube-system/cilium-operator-5c896b4b74-9g7kt cilium-operator 93564a2b3ab3ddd4485afe9b30a37240caf995a68c85378df2d7d16bb6ec2d4d
+---
+> kube-system/cilium-operator-5c896b4b74-9g7kt cilium-operator b40fb6ffa91490372e08804a7054941ae476038fedbabc7251b4efd00ae876fb
+4c4
+< kube-system/cloud-controller-manager-sc-confiance cloud-controller-manager 3d17d45e2b680105225f16a182e73c3497502e2e00e964873fff8d6fec3c496f
+---
+> kube-system/cloud-controller-manager-sc-confiance cloud-controller-manager 57ae709818df1463ef762dba142c0d5bd7cc85aa98f97e214eab519c2702be15
+6,8c6,8
+< kube-system/kube-apiserver-sc-confiance kube-apiserver 9e2db89752d1a89fa16eda4a20c838b4ea43f6003113835f3453e4c29856dcf4
+< kube-system/kube-controller-manager-sc-confiance kube-controller-manager 53a0bdb5121e1204cf75e5c008232292b2e1075d090408682b0d18dd70ad4962
+< kube-system/kube-scheduler-sc-confiance kube-scheduler 1ee73933fae18466842c974a5362e36c2a76783e84f4737bc6e40803f87c0389
+---
+> kube-system/kube-apiserver-sc-confiance kube-apiserver 12799f83e2d6a4ea277b731455ada6104fdd27092e3058fa7428b11cb5766c18
+> kube-system/kube-controller-manager-sc-confiance kube-controller-manager 8757263f0a5417084bb8ac510fcf62d8066251f6b7ec59e223378b9d5c6f663f
+> kube-system/kube-scheduler-sc-confiance kube-scheduler c43f5a0b164a71428f4ab303d1f3710db33d589fe5df621b1bb571f476a50f20
+12,15c12,15
+< kyverno/kyverno-admission-controller-6b78f498b9-wdj9c kyverno abe3eaacda74cf91a9b86ddf0679e874b51f921db93a9c781c684e13e86582da
+< kyverno/kyverno-background-controller-76bd696776-jf8v9 controller 12fde3b9af2eda590430a13062b28e0b7e7243969550e54af4d643fa084639cc
+< kyverno/kyverno-cleanup-controller-5647df8554-8l6c9 controller 68e54361137174fbf510e73cd16540b8f300198d6f8b5377673f3b84a55ee26a
+< kyverno/kyverno-reports-controller-7696b58bd5-gw9l5 controller eb03b6c6d1b9494e164c072f0e530fe12a61f267ee696f5cd0bcf97edd189fa7
+---
+> kyverno/kyverno-admission-controller-6b78f498b9-wdj9c kyverno 0289ea0c8bcecc68cae64e68237e9bcebd2be885a148a7a840c61c2524d252ef
+> kyverno/kyverno-background-controller-76bd696776-jf8v9 controller 55a2b7f7c91d1b7c5250723ee27ad338e94109a5d4f1bafda421fa82361dc5c8
+> kyverno/kyverno-cleanup-controller-5647df8554-8l6c9 controller 1de1a0af4480ce82f58e4f648f400a2b9a3a32b02fe77b2e789c7fe3608f8e81
+> kyverno/kyverno-reports-controller-7696b58bd5-gw9l5 controller 8895b4d5f471643ae35699768d9c5c537cc059107e161b7606e0c28d351a9ee3
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
-exec dans openbao-0 servi après 3 essai(s)
+exec dans openbao-0 servi après 1 essai(s)
 OK   OpenBao descellé après le redémarrage du server
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
-# openbao.sh controle, 2026-11-03T21:09:05Z
-OK   clé publique identique (empreinte 07c683b078540879…)
+# openbao.sh controle, 2026-11-06T14:09:57Z
+OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-11-03T21:09:05Z
+# tsa.sh temoin, 2026-11-06T14:09:57Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-03 21:09:06 +0000 UTC
+Artifact timestamped at 2026-11-06 14:09:58 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 3 21:09:06 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x772B347A21F719F9367D1152F267B0AC8822E74B TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 6 14:09:58 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x1041F1C864CA527D827B8A6D2465C2BCDAABDD18 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
-## CronJobs : un passage réussi de chacun, créé après le redémarrage (2026-11-03T21:08:59Z)
-passage horodatage-29895669 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; Defaulted 1 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
+## CronJobs : un passage réussi de chacun, créé après le redémarrage (2026-11-06T14:09:55Z)
+passage horodatage-29899570 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 29 ; Defaulted 1 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
 OK   horodatage/horodatage : passage réussi après le retour du TSA
-passage rattrapage-29895669 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
+passage rattrapage-29899570 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
 OK   declencheurs/rattrapage : passage réussi après le retour du TSA
 ## admission (dry-run serveur)
 OK   pod Kata privilégié dans builds : admis (pod/j7-exemption created (server dry run))

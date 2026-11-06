@@ -1,12 +1,12 @@
-# journalisation.sh controle_grpc, 2026-11-03T22:36:59Z
+# journalisation.sh controle_grpc, 2026-11-06T15:32:32Z
 ## ports en écoute de loki et d'alloy
-127.0.0.1:12345 users:(("alloy",pid=21533))
-127.0.0.1:3511 users:(("alloy",pid=21533))
-127.0.0.1:3512 users:(("alloy",pid=21533))
-127.0.0.1:9096 users:(("loki",pid=21090))
-192.168.161.13:3100 users:(("loki",pid=21090))
-192.168.161.13:3501 users:(("alloy",pid=21533))
-192.168.161.13:3502 users:(("alloy",pid=21533))
+127.0.0.1:12345 users:(("alloy",pid=20662))
+127.0.0.1:3511 users:(("alloy",pid=20662))
+127.0.0.1:3512 users:(("alloy",pid=20662))
+127.0.0.1:9096 users:(("loki",pid=20218))
+192.168.161.13:3100 users:(("loki",pid=20218))
+192.168.161.13:3501 users:(("alloy",pid=20662))
+192.168.161.13:3502 users:(("alloy",pid=20662))
 == 3511, httpgrpc en clair
 curl: (16) Error in the HTTP2 framing layer
 

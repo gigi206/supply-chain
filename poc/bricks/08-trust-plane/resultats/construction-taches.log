@@ -1,4 +1,4 @@
-# construction.sh taches, 2026-11-03T21:24:39Z
+# construction.sh taches, 2026-11-06T14:22:33Z
 ## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
@@ -10,11 +10,11 @@ OK   construire-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tas
 OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
 OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
 ## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
-fermeture de la plateforme (brique 03, F2, 2026-11-03T21:21:24Z) : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+fermeture de la plateforme (brique 03, F2, 2026-11-06T14:22:05Z) : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
 OK   fermeture épinglée dans la pipeline : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:653ff6cf19aca6aee9e4b3132f5c0d66538278b7922dc8e9ad2c7b9c127e97f8
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
 ## témoin : première version de construire-image et sa pipeline, depuis l'historique git
 OK   bundle de l'ancienne construire-image (signature versionnée au commit b77ff6b) : sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:b0624d3dd4a528601ef98be75f353527d9e133451b7d7800b30827a9686573fd
+ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:46ca7819dbbabd110042a3aba2370cead609ed7c5b77e49703a7232520442100

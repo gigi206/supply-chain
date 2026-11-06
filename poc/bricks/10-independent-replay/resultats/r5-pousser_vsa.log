@@ -1,4 +1,4 @@
-# replay.sh pousser_vsa, 2026-11-04T22:20:02Z
+# replay.sh pousser_vsa, 2026-11-06T15:41:15Z
 bundle archivé, clé de VSA (hôte) : code 0 ; Verified OK
 OK   verify-blob-attestation (hôte) : aucune connexion hors de Zot (0 connect())
 referrers de l'image dans builds/sample-app, avant : 0
@@ -7,7 +7,7 @@ blob du bundle poussé
 config vide poussée
 Digest: sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b
 ## relecture anonyme
-referrers de l'image dans builds/vsa/sample-app : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:c1bfbcbd7a1d8b44c42634225c89dbf067f13dcff823dec794bd7344da5e5e03'), ('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b')]
+referrers de l'image dans builds/vsa/sample-app : [('application/vnd.dev.sigstore.bundle.v0.3+json', 'sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b')]
 étiquettes de builds/vsa/sample-app : {"name":"builds/vsa/sample-app","tags":[]}
 referrers de l'image dans builds/sample-app, après : 0
 manifeste poussé : sha256:69a2b10326017d997ace216a789c1d9c4820a4a5f4440aa60f724e95c7682d9b

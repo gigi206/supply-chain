@@ -1,5 +1,5 @@
-# preuves.sh test1, 2026-11-03T21:35:23Z
-builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)
+# preuves.sh test1, 2026-11-06T14:33:26Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : 85ff79cc-7db8-435f-9bb8-63378195a54f (2026-11-06T14:24:30Z)
 ## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière
 - véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais
   inscrit dans la liste revue de la porte), exécutée par un TaskRun de builds (compte build, gabarit de la zone build) ;
@@ -8,7 +8,7 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
   projeté) : rien à présenter à l'authentification JWT d'OpenBao ; aucune variable d'environnement de secret (premier
   passage archivé : la sonde comptait sa propre variable, OPENBAO_IP, renommée CIBLE)
 - 2. réseau : la NetworkPolicy d'OpenBao n'admet en entrée que tekton-chains et le TSA ; Cilium jette les SYN à l'entrée,
-  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod (10.42.0.79) :
+  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod (10.42.0.99) :
   délai du client dépassé (5 s), pas de refus ; rien chez l'agent de sc-build, aucune politique de sortie ne sélectionnant
   ce pod
 - 3. OpenBao ne reçoit rien : aucune ligne de son audit avec l'adresse du pod. Témoin dans la même lecture : les requêtes de
@@ -18,17 +18,17 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
   audience refusés), clé Transit non exportable (export et sauvegarde refusés, même au jeton root)
 - résidu : le bundle signé tekton/tasks/preuve-test1 reste dans Zot (poc-ecriture ne supprime pas) ; la porte le refuserait,
   hors de la liste revue
-OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.79)
+OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.99)
 ## véhicule : tâche signée (tkn 0.46.2), bundle, TaskRun
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-bundle tekton/tasks/preuve-test1 : sha256:8d68ac4d1ac8b2b382e8391e7178a1e9aa783fb8550b6891ed8841ceff613d29
+bundle tekton/tasks/preuve-test1 : sha256:5735cdca2b452e5fabe436a6de90a2857061c5716d6ad91d6c1a590661076f44
 OK   TaskRun preuve-test1 terminé (Succeeded, TrustedResourcesVerified=True)
 ## journal de l'étape (pod preuve-test1-pod, nœud sc-build)
-  IP|10.42.1.133
+  IP|10.42.1.189
   JETON|absent
   SECRETS_MONTES|
   VARIABLES|
-  DNS|10.43.58.135
+  DNS|10.43.222.96
   OPENBAO_SERVICE|FERME|5 s
   OPENBAO_POD|FERME|5 s
   TEMOIN_ZOT|OUVERT|0 s
@@ -39,34 +39,34 @@ OK   2. OPENBAO_SERVICE : injoignable, délai du client dépassé (FERME|5 s)
 OK   2. OPENBAO_POD : injoignable, délai du client dépassé (FERME|5 s)
 OK   témoin TEMOIN_ZOT : joignable depuis la même étape (OUVERT|0 s)
 OK   témoin TEMOIN_FORGEJO : joignable depuis la même étape (OUVERT|0 s)
-## trace : Hubble depuis 2026-11-03T21:35:23Z, flux refusés depuis 10.42.1.133 vers le port 8200
+## trace : Hubble depuis 2026-11-06T14:33:26Z, flux refusés depuis 10.42.1.189 vers le port 8200
 agent de sc-confiance : 20 flux
-  21:35:30.024 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:30.024 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:31.050 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:31.050 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:32.074 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:32.074 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:33.098 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:33.098 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:34.126 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:34.126 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:35.028 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:35.028 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:36.046 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:36.046 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:37.066 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:37.066 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:38.090 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:38.090 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:39.114 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
-  21:35:39.114 10.42.1.133 > 10.42.0.79:8200 SYN POLICY_DENIED INGRESS
+  14:33:32.836 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:32.836 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:33.868 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:33.868 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:34.892 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:34.892 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:35.916 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:35.916 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:36.940 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:36.940 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:37.839 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:37.839 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:38.860 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:38.860 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:39.884 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:39.884 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:40.908 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:40.908 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:41.932 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
+  14:33:41.932 10.42.1.189 > 10.42.0.99:8200 SYN POLICY_DENIED INGRESS
 agent de sc-build : 0 flux
 OK   2. SYN vers OpenBao jetés à l'entrée par Cilium (sc-confiance, POLICY_DENIED)
 OK   2. aucun refus chez l'agent de sc-build (pas de politique de sortie sur ce pod)
-## trace : audit d'OpenBao depuis 2026-11-03T21:35:23Z
+## trace : audit d'OpenBao depuis 2026-11-06T14:33:26Z
 réponses journalisées : 3 ; par adresse et compte :
-        3 10.42.0.175 jwt-system:serviceaccount:tekton-chains:tekton-chains-controller
-OK   3. aucune requête de 10.42.1.133 dans l'audit d'OpenBao
+        3 10.42.0.253 jwt-system:serviceaccount:tekton-chains:tekton-chains-controller
+OK   3. aucune requête de 10.42.1.189 dans l'audit d'OpenBao
 OK   témoin : 1 signature(s) de Chains dans la même lecture (preuve-test1 signé : true)
-OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : c4242a11-18f6-439f-b947-7fe3d4319078 (2026-11-03T21:26:27Z)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : 85ff79cc-7db8-435f-9bb8-63378195a54f (2026-11-06T14:24:30Z)
