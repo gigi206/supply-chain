@@ -150,3 +150,39 @@ Elles remplacent la liste du 05/11/2026, 20:10 UTC, sous D1 à D6 (a). Elles val
 ## Additif : D6 relevée à sec (05/11/2026, 20:50 UTC)
 
 D6 (a) reste valable tant que le propriétaire n'en décide pas autrement. Les relevés de la [brique 08d](../08d-cert-manager/README.md) montrent un seul consommateur direct, Hubble, sur un port sans client, et un contrôleur en écriture sur tous les Secrets. La CA du PoC ne peut pas signer l'émetteur : OpenBao devrait porter une racine séparée. Décision D7 ouverte, rien installé.
+
+## Additif : relecture à sec de la voie `DISTRO=rke2` (06/11/2026, 08:32 UTC, cluster k3s inchangé)
+
+Relecture de `rke2.sh`, de `distro.sh` et des scripts du rejeu, puis [`releve-restricted.sh`](releve-restricted.sh), tout en `--dry-run=server`. Journal : [`releve-restricted.log`](resultats/releve-restricted.log). Rien n'a tourné sous RKE2 : ces mesures portent sur l'admission du cluster k3s, pas sur l'exécution. Le passage planifié de 09:30 UTC n'est pas concerné : son script ne lit aucun fichier de la 08.
+
+**Blocages mesurés, non corrigés, décisions ci-dessous** :
+
+| # | Mesure | Effet attendu sous RKE2 |
+|---|---|---|
+| 1 | Contrôleur de Chains refusé par `restricted` : capacités, `runAsNonRoot`, seccomp. L'espace `tekton-chains` n'a pas de label, et le défaut du profil cis s'y appliquerait. Avec ces trois réglages, le même pod est admis ; son conteneur tourne déjà en UID 65532 | `tekton.sh` s'arrête sur `kubectl wait` : rien n'est signé |
+| 2 | Pod à `hostPath` refusé par `pods-isolation` dans un espace ordinaire, témoin en `emptyDir` admis. `provisioner.go` au tag v0.0.37 ajoute bien ce `hostPath`. Les webhooks de Kyverno n'excluent que `kube-system` et `kyverno` ; `local-path-storage` n'y est pas | Après J6, plus aucun volume `local-path` : **les workspaces des pipelines restent en attente**. Sous k3s, ce pod tournait dans `kube-system` |
+| 3 | Gabarit du banc C refusé par PodSecurity, sans passer par Kyverno : le message est celui de PodSecurity alors que Kyverno le refuserait aussi. **PodSecurity répond donc avant Kyverno** | `bancc` n'a pas de label : les témoins du banc C, sans `securityContext`, y seraient refusés. Pire, le contrôle `c1-unsigned` de `politique.sh` passerait pour une mauvaise raison : il attend `FAIL` et prouverait « évalué par Kyverno » sur un refus de PodSecurity. Les cas de `cas-admission.py`, eux, sont conformes (section 7 du journal) |
+| 4 | `sample-app` de `j2-essais` refusé par `restricted`, admis avec `runAsNonRoot` et seccomp. Le pod `dns` a le même `securityContext` et n'a pas été présenté. busybox ne déclare aucun utilisateur | `stockage.sh` échoue en J2 |
+
+**Mesuré conforme** : les pods de `kyverno` passent `restricted` ; `bancc`, `cilium-secrets`, `default` et `observabilite` n'ont aucun pod ; les cas `zone-confiance` et `pod-cap-net-bind`, présentés à `scan`, sont admis. D'après leurs manifestes, non présentés à l'API : les pods de `j3-essais`, `j5-essais`, `preuve-controleurs` et le conteneur d'initialisation de S1 (`chains-zot-injecte.yaml`) sont conformes. Les pods de `kata.sh` et de `preuves.sh` visent `builds`, déjà en `restricted` sous k3s : même décision attendue.
+
+**Craintes écartées à la lecture** :
+- CoreDNS : le chart ne fixe pas `replicas`, le déploiement démarre donc à un pod, et `--wait` ne bloque pas sur le seul `sc-confiance`, malgré l'anti-affinité obligatoire. Le second réplica du `preventSinglePointFailure` est attendu sur `sc-stockage`, seul autre nœud sans taint : non mesuré.
+- `share/rke2/rke2-cis-sysctl.conf`, unités et binaires sont aux chemins attendus dans l'archive. Les images de CoreDNS, de son autoscaler et de metrics-server sont dans `rke2-images-core`.
+- Le drop-in de Kata : `config-v3.toml.d` est bien importé par le gabarit de k3s au commit `58877f27435f`, celui de `go.mod` de RKE2.
+- `k8sServiceHost` est déjà posé pour Cilium, ce que `kubeProxyReplacement=true` exige. Les zones de Kyverno n'énumèrent pas `local-path-storage`.
+
+**Corrigé** : trois littéraux `-n kube-system` de `preuves.sh`, lignes 2485, 2486 et 2497, visaient le pod `$lp` que la ligne 2477 cherche dans `$D_LP_NS`. Sous RKE2, le contrôle aurait échoué en `NotFound`. Identité sous k3s, donc invisible pour `essai-k3s.sh` : **la phrase « aucun chemin de k3s ne reste actif » de la prédiction 1 du 05/11/2026, 20:10 UTC, était fausse sur ce point**. Les autres `-n kube-system` trouvés visent Cilium ou des refus de droits, et restent justes.
+
+### Décisions D8 à D11, ouvertes (D7 est celle de la 08d)
+
+| Décision | Recommandé | Autre choix |
+|---|---|---|
+| **D8, Chains sous `restricted`** | (a) `runAsNonRoot`, seccomp `RuntimeDefault` et `capabilities.drop: [ALL]` ajoutés au rendu de `tekton.sh` sous `DISTRO=rke2`. Le signataire reste en `restricted` | (b) `tekton-chains` en `enforce=privileged` : plus simple, mais affaiblit l'espace de la clé de signature |
+| **D9, `local-path-storage` et Kyverno** | (a) espace ajouté aux exclusions des webhooks de Kyverno sous `DISTRO=rke2`, comme `kube-system` sous k3s. Pas de dépendance des volumes au démarrage de Kyverno, ce qui compte après un redémarrage. **Ce que cela expose** : l'espace devient système, hors de `pods-isolation` et en `privileged`, et le compte du provisionneur y crée des pods par son Role (section 6 du journal). Ce compte échappe donc à Kyverno, comme dans `kube-system` sous k3s, ni plus ni moins. Sur 80 comptes lus, les autres autorisés sont ceux des contrôleurs de `kube-system`, par des liaisons de tout le cluster, relevées sous k3s, à relire sous RKE2 | (b) installer `local-path` dans `kube-system` : aucune exclusion nouvelle, mais revient sur D2 (a) |
+| **D10, `bancc`** | (a) espace en `enforce=privileged` sous `DISTRO=rke2` : ses pods ne sont jamais créés, tout y passe en dry-run. Le banc C et ses grilles ne bougent pas | (b) modifier le gabarit du banc C : exclu, le banc est figé |
+| **D11, `j2-essais`** | (a) `securityContext` conforme aux deux pods de `stockage.sh`, avec `runAsUser: 65532` explicite : la variante mesurée le porte, et sans lui, busybox, qui ne déclare aucun utilisateur, serait probablement refusé au lancement par kubelet. Admission mesurée, exécution non. Sans effet attendu sous k3s : prédiction | (b) espace en `privileged` : inutile pour deux pods simples |
+
+## Additif à la prédiction 4 (06/11/2026, 08:32 UTC, avant tout rejeu)
+
+Le texte du 05/11/2026 reste écrit. « Liste non prédite » est désormais remplacée par une liste relevée à sec. **Sans D8 à D11, sont attendus refusés** : le contrôleur de Chains, les témoins du banc C dans `bancc`, et les pods de `j2-essais`. L'adoption de D8 à D11 changera cette prédiction, par un nouvel additif. Cette liste ne couvre que ce que l'admission permet de voir sur k3s : un refus d'un composant non relu ici reste possible.

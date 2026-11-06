@@ -2482,8 +2482,8 @@ etape_controleurs() {
     ct_refus "$RBAC_REFUS" "$n : pod de kube-system portant clusterrole-aggregation-controller" kubectl create --as "$u" -f "$T/ct-pod-ks.json" || k=1
     ct_refus "$RBAC_REFUS" "$n : StatefulSet de kube-system" kubectl create --as "$u" -f "$T/ct-sts.json" || k=1
     ct_refus "$RBAC_REFUS" "$n : PVC de kube-system" kubectl create --as "$u" -f "$T/ct-pvc.json" || k=1
-    ct_refus "$RBAC_REFUS" "$n : annotation du pod $lp" kubectl annotate --as "$u" pod -n kube-system "$lp" preuve-controleurs=1 || k=1
-    ct_refus "$RBAC_REFUS" "$n : image du pod $lp remplacée (dry-run serveur)" kubectl patch --as "$u" pod -n kube-system "$lp" --dry-run=server \
+    ct_refus "$RBAC_REFUS" "$n : annotation du pod $lp" kubectl annotate --as "$u" pod -n "$D_LP_NS" "$lp" preuve-controleurs=1 || k=1
+    ct_refus "$RBAC_REFUS" "$n : image du pod $lp remplacée (dry-run serveur)" kubectl patch --as "$u" pod -n "$D_LP_NS" "$lp" --dry-run=server \
       --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/containers/0/image\",\"value\":\"$img\"}]" || k=1
     ct_refus "$RBAC_REFUS" "$n : annotation du StatefulSet openbao" kubectl annotate --as "$u" statefulset -n openbao openbao preuve-controleurs=1 || k=1
     ct_refus "$RBAC_REFUS" "$n : pod de tekton-chains portant tekton-chains-controller" kubectl create --as "$u" -f "$T/ct-pod-chains.json" || k=1
@@ -2494,7 +2494,7 @@ etape_controleurs() {
   ba_attendu "objets preuve-controleurs créés (pod, StatefulSet, PVC dans kube-system ; pod dans tekton-chains)" "$( {
     kubectl get pod,statefulset,pvc -n kube-system -o name; kubectl get pod -n tekton-chains -o name; } | grep -c '/preuve-controleurs$' || true)" 0
   ba_attendu "annotations preuve-controleurs posées" "$( {
-    kubectl get pod -n kube-system "$lp" -o json; kubectl get statefulset -n openbao openbao -o json; } | jq -s '[.[].metadata.annotations // {} | has("preuve-controleurs")] | map(select(.)) | length')" 0
+    kubectl get pod -n "$D_LP_NS" "$lp" -o json; kubectl get statefulset -n openbao openbao -o json; } | jq -s '[.[].metadata.annotations // {} | has("preuve-controleurs")] | map(select(.)) | length')" 0
 
   echo "## règle en seconde barrière : espace d'essai preuve-controleurs, droits de locataire rendus par une liaison temporaire"
   kubectl create namespace preuve-controleurs >/dev/null

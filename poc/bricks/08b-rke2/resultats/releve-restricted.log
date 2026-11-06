@@ -1,0 +1,62 @@
+relevé du 06/11/2026 à 08:37 UTC, à sec, cluster k3s en service
+serveur : v1.35.9+k3s1
+
+## 1. Espaces sans label enforce : pods existants face à enforce=restricted
+bancc : 0 pod(s), conformes
+cilium-secrets : 0 pod(s), conformes
+default : 0 pod(s), conformes
+kyverno : 4 pod(s), conformes
+observabilite : 0 pod(s), conformes
+tekton-chains : 1 pod(s), Warning: existing pods in namespace "tekton-chains" violate the new PodSecurity enforce level "restricted:latest"
+Warning: tekton-chains-controller-bbf64c76f-vkcgh: unrestricted capabilities, runAsNonRoot != true, seccompProfile
+
+## 2. Ordre d'admission : le gabarit du banc C, sans securityContext ni nodeSelector, dans porte (restricted, zone-confiance)
+Kyverno le refuserait aussi (nodeSelector absent) : le message dit qui parle le premier.
+REFUSÉ   gabarit du banc C dans porte
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/restricted.sD1BSl/ordre.yaml": pods "essai-ordre" is forbidden: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscalation=false), unres
+
+## 3. Pods de j2-essais (stockage.sh), présentés à builds (restricted)
+REFUSÉ   sample-app de j2-essais, securityContext actuel
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/restricted.sD1BSl/j2.json": pods "essai-j2" is forbidden: violates PodSecurity "restricted:latest": runAsNonRoot != true (pod or container "app" must set securityContext.runAsNonRoot=true), seccompProfile (pod or contain
+ADMIS    sample-app de j2-essais, runAsNonRoot et seccomp ajoutés
+
+## 4. Pod auxiliaire de local-path hors de kube-system : bancc, sans label, donc Kyverno seul
+Sous k3s ce pod tourne dans kube-system, exclu des webhooks ; D2 (a) le place dans local-path-storage, qui ne l'est pas.
+Webhooks de Kyverno, espaces exclus : ["kube-system","kyverno"]
+provisioner.go au tag v0.0.37 :
+  690:func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, o volumeOptions, cfg *Stor
+  710:			VolumeSource: v1.VolumeSource{
+  711:				HostPath: &v1.HostPathVolumeSource{
+  746:			VolumeSource: v1.VolumeSource{
+  747:				ConfigMap: &v1.ConfigMapVolumeSource{
+  959:		pvs = v1.PersistentVolumeSource{
+  960:			Local: &v1.LocalVolumeSource{
+  966:		pvs = v1.PersistentVolumeSource{
+  967:			HostPath: &v1.HostPathVolumeSource{
+REFUSÉ   pod à hostPath dans bancc
+         Error from server: error when creating "~/.cache/supply-chain-poc/08b/restricted.sD1BSl/lp.json": admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : volume hostPath interdit hors des espaces système
+ADMIS    témoin : même pod, emptyDir à la place du hostPath
+
+## 5. Contrôleur de Chains présenté à scan (restricted, zone-confiance), compte default
+REFUSÉ   Chains, securityContext actuel
+         Error from server (Forbidden): error when creating "~/.cache/supply-chain-poc/08b/restricted.sD1BSl/chains.json": pods "essai-chains" is forbidden: violates PodSecurity "restricted:latest": unrestricted capabilities (container "tekton-chains-controller" must set securityContext.capabilities.drop=["ALL
+ADMIS    Chains, runAsNonRoot, seccomp et capabilities drop ALL ajoutés
+conteneurs d'initialisation actuels : []
+
+## 6. Qui peut créer des pods dans local-path-storage (espace absent sous k3s : liaisons de tout le cluster seulement)
+oui : kube-system/daemon-set-controller
+oui : kube-system/job-controller
+oui : kube-system/local-path-provisioner-service-account
+oui : kube-system/persistent-volume-binder
+oui : kube-system/replicaset-controller
+oui : kube-system/replication-controller
+oui : kube-system/statefulset-controller
+comptes de service en lecture : 80 ; autorisés : 7
+Role de l'espace dans le manifeste v0.0.37, épinglé par sha256 :
+  {"kind":"Role","name":"local-path-provisioner-role","ns":"local-path-storage","rules":[{"apiGroups":[""],"resources":["pods"],"verbs":["get","list","watch","create","patch","update","delete"]}],"subjects":null}
+  {"kind":"RoleBinding","name":"local-path-provisioner-bind","ns":"local-path-storage","rules":null,"subjects":[{"kind":"ServiceAccount","name":"local-path-provisioner-service-account","namespace":"local-path-storage"}]}
+
+## 7. Cas d'admission de la 08 : base de ZONE et de POD (cas-admission.py), présentés à scan (restricted)
+ADMIS    cas zone-confiance, destiné à tekton-chains
+ADMIS    cas pod-cap-net-bind, destiné à bancc
+utilisateur déclaré par busybox : "aucun"
