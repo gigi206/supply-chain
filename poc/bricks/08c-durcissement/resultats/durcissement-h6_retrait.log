@@ -1,0 +1,49 @@
+# durcissement.sh h6_retrait, 2026-11-06T21:49:40Z, DISTRO=rke2
+retrait 21:49:58 UTC
+# cilium.sh appliquer, 2026-11-06T21:49:58Z
+## valeurs (cilium/valeurs.yaml, digests amd64)
+OK   chart : archive : sha256:505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed
+## release cilium (helm v4.3.1+gc0d08d0, depuis l'hôte)
+Release "cilium" has been upgraded. Happy Helming!
+NAME: cilium
+LAST DEPLOYED: Fri Nov  6 22:49:59 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 6
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+OK   release cilium : statut et version : deployed cilium-1.20.4
+cilium-config : policy-cidr-match-mode=nodes
+OK   DaemonSet cilium prêt : 3/3
+agents recréés après 2026-11-06T21:35:24Z : sc-stockage=2026-11-06T21:50:02Z sc-build=2026-11-06T21:50:02Z sc-confiance=2026-11-06T21:50:15Z 
+OK   policy-cidr-match-mode lu par l'agent de sc-confiance : [nodes]
+agents prêts 21:50:26 UTC
+  cible 1 : 2 échec(s) de 21:50:10 à 21:50:14
+  cible 2 : 2 échec(s) de 21:50:10 à 21:50:14
+  cible 3 : 1 échec(s) de 21:50:10 à 21:50:10
+  240 mesures
+ciliumclusterwidenetworkpolicy.cilium.io "hote-wireguard" deleted
+OK   clés de chiffrement dans cilium-config : []
+OK   SSH de sc-confiance : joint
+OK   sc-confiance, chiffrement : Encryption: Disabled
+OK   sc-confiance, interfaces WireGuard : 0
+sc-confiance : module chargé=1, MTU de route 1500 1500 
+OK   SSH de sc-build : joint
+OK   sc-build, chiffrement : Encryption: Disabled
+OK   sc-build, interfaces WireGuard : 0
+sc-build : module chargé=1, MTU de route 1500 
+OK   SSH de sc-stockage : joint
+OK   sc-stockage, chiffrement : Encryption: Disabled
+OK   sc-stockage, interfaces WireGuard : 0
+sc-stockage : module chargé=1, MTU de route 1500 1500 
+OK   API : ok
+OK   certificats : cilium-ca 422 hubble-server-certs 423
+OK   pare-feu depuis sc-build : 6443=ouvert 2379=ferme 
+OK   témoins vers sc-stockage : hote:3100=ferme hote:3001=ferme hote:5000=ouvert hote:3501=ouvert sante:3100=ferme sante:3001=ferme sante:5000=ouvert sante-stockage=ouvert sante-confiance=ouvert
+OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
+OK   redémarrages de conteneurs du cluster : 17
+OK   hote-wireguard en service : 
+sc-build       Ready   <none>               8h    v1.35.9+rke2r1
+sc-confiance   Ready   control-plane,etcd   8h    v1.35.9+rke2r1
+sc-stockage    Ready   <none>               8h    v1.35.9+rke2r1
+OK   h6_retrait

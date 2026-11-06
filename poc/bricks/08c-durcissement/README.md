@@ -618,6 +618,19 @@ Chaque flux va d'un pod vers un nœud, et chacun touche sc-confiance, hors du ch
 
 **Non couvert** : retour W2 et W8, passage de `h6_retrait` non lancé. Rotation des clés, redémarrage d'un nœud sous WireGuard et mode strict en entrée restent non essayés.
 
+**Additif du 06/11/2026, 21:55 UTC, `h6_retrait` lancée sur accord du propriétaire (« Oui, lance h6_retrait »), de 21:49:40 à 21:54 UTC, passage unique, OK. H6 est mesurée et retirée, comme prévu sans décision préalable.** Journal [resultats/durcissement-h6_retrait.log](resultats/durcissement-h6_retrait.log). Révision 6 de la release cilium.
+
+| Prédiction | Résultat | Mesure |
+|---|---|---|
+| W2, retour | Tenue | 240 mesures : 2 échecs vers Zot et le coredns de sc-stockage, de 21:50:10 à 21:50:14 UTC, 1 vers celui de sc-confiance à 21:50:10 UTC, pour 60 s au plus prédites. 17 redémarrages de conteneurs, inchangé |
+| W8 | Tenue | Aucune clé de chiffrement dans `cilium-config`, `Encryption: Disabled` et 0 interface WireGuard sur les trois nœuds, `hote-wireguard` retirée, module chargé sur les trois, route à 1500 |
+
+Certificats 422 et 423, pare-feu, témoins vers sc-stockage, API, SSH et Kyverno inchangés. `rattrapage` et `horodatage` tournent et réussissent. Le retour coupe un peu plus que l'aller, 0 échec contre 2 au plus sur une fenêtre de 5 s, sans cause établie.
+
+**Bilan de H6** : WireGuard fonctionne sous ce pare-feu, avec Kata et sans changement de l'image, et le retour est propre. Sept prédictions sur huit tiennent. W5 ne tient pas sur les paquets de pods en clair : sc-confiance reste en dehors pour les flux de pod vers nœud, dont les sondes de santé de Cilium en HTTP. Décision du propriétaire à prendre : l'activer pour de bon ou non. Forcer sc-confiance dans le chiffrement reste une question à part, déconseillée par la documentation de Cilium.
+
+**Reste de H5** : passage du 07/11 à 09:30 UTC, à relire, sur un Cilium sans WireGuard.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
