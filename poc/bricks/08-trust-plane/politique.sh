@@ -426,6 +426,9 @@ etape_admission() {
     echo "prête : $n"
   done
   echo "ValidatingAdmissionPolicy natives générées par Kyverno : $(kubectl get validatingadmissionpolicies -o name 2>/dev/null | grep -c . || true)"
+  # Sous RKE2, rke2-runtimeclasses est désactivé (compte helm-* lié à cluster-admin) : sans crun, l'API refuserait pod-privilegie-crun avant
+  # Kyverno, et le cas ne mesurerait plus que pods-isolation reconnaît Kata par son nom. Classe témoin, le temps des cas ; aucun pod créé.
+  [ "$DISTRO" != rke2 ] || printf 'apiVersion: node.k8s.io/v1\nkind: RuntimeClass\nmetadata: {name: crun}\nhandler: crun\n' | kubectl apply -f - >/dev/null
   echo "## $(wc -l < "$T/adm/cas.tsv") cas, CLI puis admission (dry-run serveur)"
   while IFS=$'\t' read -r c e a desc; do
     if [ "$a" = oui ]; then comparer "$c" "$e" "$here/politique/admission.yaml" "$T/adm/$c.json"
@@ -436,6 +439,7 @@ etape_admission() {
         || { echo "KO   $c : CLI ${r%%$'\t'*} (attendu $e)" >&2; exit 1; }
     fi
   done < "$T/adm/cas.tsv"
+  [ "$DISTRO" != rke2 ] || kubectl delete runtimeclass crun --ignore-not-found >/dev/null
   echo "## synthèse"
   awk -F'\t' 'NR > 1 && $4 != "-" { n++; split($3, c, " "); if (c[1] == $4) p++; else printf "  écart : %s (CLI %s, admission %s)\n", $1, $3, $4 }
     END { printf "parité CLI / admission : %d cas sur %d\n", p, n }' "$TSV_PARITE"
