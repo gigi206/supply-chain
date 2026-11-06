@@ -264,13 +264,16 @@ echo "drapeaux avx512 : $(grep -o "avx512[a-z_]*" /proc/cpuinfo | sort -u | wc -
 grep -E "^(Seccomp|NoNewPrivs|CapEff):" /proc/self/status'
 
 pod_spec() { # nom runtimeClass|- annotation=valeur|- script : pod de builds conforme à restricted, dans $T/<nom>.json
-  jq -n --arg n "$1" --arg rc "$2" --arg an "$3" --arg i "$BUSYBOX" --arg s "$4" '{apiVersion: "v1", kind: "Pod",
+  # LIMITES_MESURE (local à temoin et reseau) : limites-obligatoires de la 08c en Deny. Pas pour essais, qui attend 1 vCPU et moins
+  # de 2048 Mio : sous Kata, une limite ajoute des vCPU et de la mémoire à l'invité.
+  jq -n --arg n "$1" --arg rc "$2" --arg an "$3" --arg i "$BUSYBOX" --arg s "$4" --arg l "${LIMITES_MESURE:-}" '{apiVersion: "v1", kind: "Pod",
     metadata: ({name: $n, namespace: "builds"} + (if $an == "-" then {} else {annotations: {($an | split("=")[0]): ($an | split("=")[1])}} end)),
     spec: ({restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
       tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
       securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
       containers: [{name: "mesure", image: $i, command: ["sh", "-c", $s],
-        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}
+        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}
+        + (if $l == "" then {} else {resources: {requests: {cpu: "10m", memory: "32Mi"}, limits: {cpu: "500m", memory: "256Mi"}}} end)]}
       + (if $rc == "-" then {} else {runtimeClassName: $rc} end))}' > "$T/$1.json"
 }
 
@@ -464,7 +467,7 @@ etape_exemption() {
 }
 
 etape_temoin() {
-  local r="" v
+  local r="" v LIMITES_MESURE=1
   for _ in $(seq 60); do r=$(runtime_kata); [ -n "$r" ] && break; sleep 2; done
   [ -n "$r" ] && echo "OK   runtime kata chargé par containerd sur sc-build" || { echo "KO   runtime kata absent de crictl info" >&2; exit 1; }
   echo "exemption Pod Security de la RuntimeClass kata : $(exemption_posee && echo "lue par kube-apiserver (étape exemption)" || echo "absente")"
@@ -547,6 +550,7 @@ nettoyer_reseau() {
 }
 
 etape_reseau() { # contrôleur réseau du cluster : Cilium (J7, option 1b) ou kube-router
+  local LIMITES_MESURE=1
   if [ "$(reseau)" = cilium ]; then reseau_cilium; else reseau_kube_router; fi
 }
 

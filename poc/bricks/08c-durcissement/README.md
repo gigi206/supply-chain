@@ -651,6 +651,26 @@ Bornes de cette relecture, relevées avant le passage :
 - La différence avec le job manuel se réduit au créateur du job : le pod passe par le même contrôleur et les mêmes règles.
 - L'audit de sc-confiance garde 11 fichiers de 100 Mo (`--audit-log-maxbackup=10`), soit environ 16 h au rythme relevé de 88 minutes par fichier : à relire avant environ 01:30 UTC le 08/11.
 
+**Additif du 06/11/2026, 22:10 UTC : redémarrage des VM préparé à sec sous H1 à H5, non lancé.** Il demande son propre accord : il arrête les trois VM et relance OpenBao scellé. Contrôle : [durcissement-redemarrage-sec.log](resultats/durcissement-redemarrage-sec.log), syntaxe et dry-run serveur, rien écrit dans le cluster.
+
+Deux blocages de [`redemarrer.sh`](../08-trust-plane/redemarrer.sh) sont levés dans le code :
+- **Chains** : annoncé à S1. Si le contrôleur a le conteneur `identifiants`, son pod est recréé après le descellement, comme celui du TSA ;
+- **`kata.sh temoin` et `reseau`** : le gabarit `pod_spec` n'a pas de limites, donc `limites-obligatoires` le refuse. Mesuré en dry-run serveur : refusé sans limites, admis avec, sous Kata comme sous runc. Les limites sont posées par `local LIMITES_MESURE=1` dans ces deux étapes seulement, et le contrôle montre qu'elles n'en sortent pas. `kata.sh essais` les garde hors de ses pods, car il attend 1 vCPU et moins de 2048 Mio, et une limite Kata en ajoute à l'invité : il reste refusé sous `Deny`, et il n'a sa place qu'avant H5.
+
+| Prédiction pour le jour du redémarrage | Attendu | Confiance |
+|---|---|---|
+| V1, nœuds | Trois nouveaux `bootID`, `Ready`, sous `jetons-rke2-controller` et le pare-feu d'hôte | **Moyenne** : jamais mesuré sous ces règles |
+| V2, confiance | Kyverno répond, OpenBao scellé puis descellé, même clé Transit, TSA relancé | Haute : `deverrouiller` et le TSA ont tourné sous H1 à H5 |
+| V3, Chains | Pod recréé, `identifiants` finit par « jeton révoqué », `prets tekton-chains` OK | Haute : même chemin que `s1_chains` |
+| V4, Kata | Pod témoin admis, noyau de l'invité `6.18.56` | Haute : admission mesurée à sec |
+| V5, réseau | Pods admis, aucune fenêtre, usurpations refusées | **Moyenne** : `kata.sh reseau` n'a jamais tourné sous H3, H4 ni avec des limites, qui ajoutent du CPU et de la mémoire à l'invité |
+
+Bornes :
+- Sous RKE2, passer `DISTRO=rke2`.
+- Le script écrase `redemarrage-vm.log`, `kata-reseau.log`, `openbao-deverrouiller.log`, `openbao-controle.log` et `tsa-temoin.log` : à sauvegarder avant.
+- Le redémarrage décharge `wireguard` des trois nœuds. S'il tombe pendant le créneau du 07/11, de 09:30 à 10:30 UTC, il peut faire sauter le passage planifié : à lancer après la relecture de P1 à P6.
+- `rejeu.sh` n'est pas modifié : H1 à H5 et `secrets.sh` n'y sont toujours pas intégrés, et cette intégration ne sera proposée qu'une fois le jalon prouvé. `kata.sh reseau` y passera désormais avec des limites, sans mesure de comparaison.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

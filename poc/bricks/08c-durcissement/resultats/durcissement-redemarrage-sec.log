@@ -1,0 +1,11 @@
+contrôle à sec du 06/11/2026 à 22:10:06 UTC
+OK   syntaxe kata.sh
+OK   syntaxe redemarrer.sh
+gabarit d'essais, resources : "absent"
+essais (Kata, sans limites) : Policy limites-obligatoires failed: durcissement : limites de mémoire et de CPU obligatoires
+gabarit de temoin, resources : {"requests":{"cpu":"10m","memory":"32Mi"},"limits":{"cpu":"500m","memory":"256Mi"}}
+temoin (Kata, avec limites) : pod/sec-temoin created (server dry run)
+après temoin, LIMITES_MESURE ne fuit pas : "absent"
+reseau (runc, avec limites) : pod/sec-runc created (server dry run)
+Chains : conteneur identifiants présent : true
+Chains : sélecteur : 1 pod

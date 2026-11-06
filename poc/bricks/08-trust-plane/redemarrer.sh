@@ -11,6 +11,8 @@
 #   Cilium (J7, option 1b), seulement si le cluster tourne sous Cilium : agents et opérateur prêts depuis le redémarrage, avant
 #   les autres contrôles (sans agent prêt, aucun pod du nœud n'a de réseau) ; cilium-dbg status et policy-cidr-match-mode
 #   (bêta) relus dans chaque agent ; en fin de script, la mesure réseau de référence (kata.sh reseau : fenêtre, usurpations).
+#   S1 de la 08c : si le contrôleur de Chains lit ses identifiants dans OpenBao (conteneur identifiants), pod recréé après le
+#   descellement, comme celui du TSA. Sous RKE2 : DISTRO=rke2. Préparé à sec le 06/11/2026, jamais lancé sous H1 à H5.
 #
 # Usage (racine du dépôt) : mise run confiance:redemarrer   (journal : resultats/redemarrage-vm.log)
 set -euo pipefail
@@ -112,6 +114,13 @@ kubectl delete pod -n tsa -l app=timestamp-authority --wait=false >/dev/null
 kubectl rollout status -n tsa deployment/timestamp-authority --timeout=180s
 kubectl logs -n tsa deployment/timestamp-authority -c connexion
 mise run confiance:tsa -- temoin
+if kubectl get deployment -n tekton-chains tekton-chains-controller -o json | jq -e 'any(.spec.template.spec.initContainers[]?; .name == "identifiants")' >/dev/null; then
+  echo "## Chains (S1 de la 08c) : identifiants Zot relus dans OpenBao une fois descellé, mêmes relances espacées que le TSA"
+  # --wait=true : l'ancien pod disparu, kubectl logs ne peut plus le choisir (premier passage de s1_chains, 06/11/2026)
+  kubectl delete pod -n tekton-chains -l app.kubernetes.io/part-of=tekton-chains,app.kubernetes.io/component=controller --wait=true >/dev/null
+  prets tekton-chains
+  kubectl logs -n tekton-chains -l app.kubernetes.io/part-of=tekton-chains,app.kubernetes.io/component=controller -c identifiants
+fi
 t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 echo "## Tekton et EventListener (J6)"
 for ns in tekton-pipelines tekton-pipelines-resolvers tekton-chains declencheurs; do prets "$ns"; done
