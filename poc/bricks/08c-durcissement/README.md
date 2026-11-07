@@ -1085,6 +1085,13 @@ Conséquences, sans action :
 
 Détail : [revue-journald-stockage.log](resultats/revue-journald-stockage.log).
 
+**Additif du 07/11/2026, 20:20 UTC : P1 et P2 lues sur `sc-stockage`, sur accord du propriétaire (« traite tout »).** Une session ssh en lecture seule, rien d'écrit sur la VM.
+- P2 tenue : au redémarrage du 07/11 à 11:22:36 UTC, journald annonce un max de 1.9G (prédit : 1,8 à 2,0 G) pour 271.2M occupés. La version installée est `257.13-1~deb13u1`.
+- P1, point intermédiaire : la plus vieille archive système n'a pas bougé (06/11 à 17:03:02 UTC) et l'occupation vaut 418.1M. P1 se juge le 08/11.
+- Pour `journalctl`, l'entrée la plus ancienne date du 06/11 à 13:28:37 UTC. Par élimination d'après les noms des fichiers, elle est dans `user-1000.journal`, que journald ne supprime jamais (déduit, non lu). Cela expliquerait les lignes de 13 h à 16 h du démarrage -1.
+
+Détail : [journald-stockage-p1p2.log](resultats/journald-stockage-p1p2.log).
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.

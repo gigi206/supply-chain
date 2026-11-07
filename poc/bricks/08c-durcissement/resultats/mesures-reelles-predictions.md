@@ -676,3 +676,18 @@ Revue statique menée sur « continue », sans validation du propriétaire. Rien
 - **P3, W8b du 09/11.** Les notifications de `ScanEnRetard` depuis le 08/11 à 11:30 UTC sont encore dans le journal local : « mêmes lignes » que Loki. Confiance haute si P1 tient : pour perdre ces lignes, il faudrait environ 80 Mo/h, cinq fois le rythme moyen observé (15,7 M/h). Elle remplace la confiance moyenne de l'additif de 17:59 UTC, sans réécrire celui-ci.
 
 **Conséquence, sans action.** Depuis le redémarrage du 07/11, journald peut occuper jusqu'à environ 2,5 Go sur `sc-confiance` (25 Go), sous réserve de garder 5 % de place libre ; G7 de la 07a supposait 282 Mo. L'effet sur la marge avant éviction n'est pas mesuré. Fixer `SystemMaxUse` toucherait les VM : décision du propriétaire.
+
+## Additif du 07/11/2026, 20:20 UTC : P1 et P2 lues sur `sc-stockage`, sur accord du propriétaire
+
+Accord : « traite tout », reçu peu avant 20:17:44 UTC. Il répond au message qui citait les effets : une session ssh en lecture seule, rien d'écrit sur la VM ; pire cas, une ligne de session dans l'audit de `sc-stockage`. Lecture faite à 20:18:00 UTC. Base : [journald-stockage-p1p2.log](journald-stockage-p1p2.log).
+
+- **P2 tenue.** Au démarrage 0 (07/11 à 11:22:36 UTC), journald annonce `System Journal … is 271.2M, max 1.9G, 1.6G free` (prédit : max de 1,8 à 2,0 G). `dpkg-query -W systemd` donne `257.13-1~deb13u1`. Les 271,2 M de ce moment restent sous l'ancien plafond d'environ 290 Mo : compatible.
+- **P1, point intermédiaire seulement.** La plus vieille archive système reste `…-00000000000160aa-00065f9e95c7cfcc`, et l'occupation vaut 418.1M (plus de 386,1 M). P1 se juge à la relecture du 08/11 après la reprise.
+- **Tailles des archives.** Les sept archives d'avant le 07/11 à 10:24 UTC font chacune 37 031 936 octets (35,3 Mio). C'est sous le maximum par fichier de l'ancien plafond, environ 36,8 Mio. `system.journal` fait 134 217 728 octets, soit 128 Mio, le maximum par fichier sous le nouveau plafond. Compatible avec le mécanisme, sans être expliqué à l'octet.
+  - La huitième archive (`…-0000000000060b74`, tête du 07/11 à 10:24:02 UTC) fait 41 943 040 octets (40 Mio), au-dessus d'environ 36,8 Mio : non expliqué. Piste, non lue : fichier rouvert après le redémarrage et écrit sous le nouveau maximum avant d'être archivé. (Ajouté à 20:21 UTC, avant tout push, après relecture du conseiller.)
+- **Précision sur la « tête ».** Pour `journalctl`, l'entrée la plus ancienne date du 06/11 à 13:28:37 UTC (numéro 974, démarrage -1), et non de 17:03:02 UTC.
+  - D'après leurs noms, les archives système commencent toutes au numéro 90 282 ou après. L'entrée 974 est donc dans un autre fichier ; par élimination, `user-1000.journal`, jamais supprimé. C'est déduit, non lu directement.
+  - Cela expliquerait les lignes de 13 h à 16 h du démarrage -1 encore lisibles.
+  - Le « 06/11 à 17:03:02 UTC » des additifs précédents est la tête des archives système. C'est là que vivent les lignes du récepteur ; P1 et P3 portent sur elles.
+- **Rythme.** De 271,2 M (07/11 à 11:22 UTC) à 418,1 M (20:18 UTC), environ 16 M/h, proche des 15,7 M/h moyens. La confiance haute de P3 tient, sous réserve de P1 au 08/11.
+- Le message de journald du démarrage -1 n'est plus dans le journal (aucune ligne « max ») : le plafond d'environ 290 Mo du premier démarrage reste déduit, non lu.
