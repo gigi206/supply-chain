@@ -1,0 +1,73 @@
+# preuves.sh decision3, 2026-11-07T11:35:33Z
+## prédiction (décision 3 du plan validé le 30/10/2026 : droit update de poc-build, mesure sur accord du propriétaire du 01/11/2026)
+Zot v2.1.22 (manifestWriteAuthzChecks, pkg/api/authz.go) : PUT d'un manifeste sur un tag existant = update, sur un tag neuf = create.
+Chains (dsse) : le TaskRun publier pousse la signature d'image (.sig) et son attestation (.att), le PipelineRun son attestation
+  (.att) ; les deux attestations vont dans le même tag .att (témoin enveloppes : .sig 1 couche, .att 2 couches).
+Configuration modifiée : builds/** scindé, poc-build en read+create, poc-ecriture inchangé ; Zot redémarré ; rattrapage et
+  horodatage suspendus pendant la mesure ; configuration d'origine remise à la fin, même en cas d'échec (trap)
+temoin direct (poc-build) : tag neuf créé ; même tag déplacé : refusé (403 DENIED, journal de Zot) ; poc-ecriture le déplace ;
+  après remise de l'origine, poc-build le déplace de nouveau
+mesure (preuve-decision3, image builds/essai-decision3 à digest propre au passage) : le premier objet signé crée .att (et .sig pour le TaskRun) ;
+  le second doit réécrire .att : refusé (403 sur manifests/sha256-….att). Chains v0.29.9 (HandleRetry) : au moins 5
+  tentatives (retries 0 à 3, lus sur l'objet du cache de l'informer, qui peut retarder : nombre exact non fixé ; premier
+  passage, archivé, 7 au lieu des 5 prédits), puis signed=failed. Attendu dans l'un ou l'autre ordre : un objet signed=true,
+  l'autre signed=failed et retries=3, une seule enveloppe dans .att, celle de l'objet signé ; N >= 5 PUT .att refusés, un par
+  tentative ; signatures Transit : 2 + N si le PipelineRun échoue, 1 + 2N si c'est le TaskRun (.sig refusé dès la 2e tentative)
+  contrôle exécutions/enveloppes : l'objet en échec SUJET_NON_SIGNE, seule anomalie
+contraire : les deux signed=true (update inutile) ; les deux failed (montage faux)
+fin : exécutions de la mesure purgées, aucune anomalie, configuration d'origine en service
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+## départ
+OK   configuration en service = stockage/zot.json (5806ba5c431d3e29…)
+CronJobs rattrapage et horodatage suspendus, aucun job d'horodatage actif
+OK   aucune exécution en cours ni en attente de Chains
+depart : COUVERTE 31, ECHEC_SIGNATURE 8, SANS_SUJET 20
+OK   départ : aucune anomalie
+images builds/essai-decision3 : x=c6a9e38aeaa3 (mesure, sans .att), y=e9c862f3d81d
+## configuration modifiée
+  48c48,56
+  <                 "poc-ecriture",
+  ---
+  >                 "poc-ecriture"
+  >               ]
+  >             },
+  >             {
+  >               "actions": [
+  >                 "read",
+  >                 "create"
+  >               ],
+  >               "users": [
+OK   configuration modifiée en service (6d2f4227edea16dc…), Zot redémarré
+## témoin direct
+OK   poc-build crée le tag neuf temoin-20261107T113533Z (x)
+OK   poc-build ne déplace pas ce tag vers y : 1|DENIED: requested access to the resource is denied; map[description:The access controller denied access for the operation on a resource.]
+OK   poc-ecriture le déplace vers y (droit update gardé)
+  refus : PUT /v2/builds/essai-decision3/manifests/temoin-20261107T113533Z 403
+## mesure : preuve-decision3
+tâche tekton/tasks/preuve-decision3@sha256:b930eb3bd18f7e242aff67a899626d4dc8adf552aa690497ed4b06b243ce80f0 ; PipelineRun preuve-decision3 : True|Succeeded
+OK   aucune exécution en cours ni en attente de Chains
+TaskRun   preuve-decision3-publier : UID b7ba02ac, signed=true, retries=-
+PipelineRun preuve-decision3 : UID 632c472b, signed=failed, retries=3
+  refus : PUT /v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855.att 403
+  refus : PUT /v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855.att 403
+  refus : PUT /v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855.att 403
+  refus : PUT /v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855.att 403
+  refus : PUT /v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855.att 403
+tag .att : 1 enveloppe(s), invocationId : b7ba02ac
+tag .sig : 1 couche(s)
+signatures Transit (clé chains) depuis la création du PipelineRun : 7
+OK   PipelineRun refusé : signed=failed après 5 tentatives (un PUT .att refusé chacune), seule l'enveloppe du TaskRun dans .att, 7 signatures (2 + 5)
+mesure : COUVERTE 32, ECHEC_SIGNATURE 8, SANS_SUJET 20, SUJET_NON_SIGNE 1
+  SUJET_NON_SIGNE|pipelinerun builds/preuve-decision3|sc-stockage.poc.test:5000/builds/essai-decision3@sha256:c6a9e38aeaa3e02a36cf8977d718c0d45e900f6f247740e6df275e520e684855|signed=failed
+OK   contrôle exécutions/enveloppes : l'objet en échec SUJET_NON_SIGNE, seule anomalie
+## remise en état
+OK   configuration d'origine de Zot remise (empreinte 5806ba5c431d3e29…)
+CronJobs rattrapage et horodatage repris
+OK   poc-build déplace de nouveau le tag témoin (droit update rendu)
+exécutions de la mesure purgées (preuve-decision3 et ses TaskRuns)
+## fin
+OK   aucune exécution en cours ni en attente de Chains
+fin : COUVERTE 31, ECHEC_SIGNATURE 8, SANS_SUJET 20
+OK   fin : aucune anomalie
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+CronJobs rattrapage et horodatage repris

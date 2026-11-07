@@ -880,6 +880,28 @@ Les cinq prédictions sont tenues, V1 et V5 comprises, qui étaient de confiance
 
 **Pod des résolveurs.** Il n'a pas été recréé : même pod, créé le 06/11 à 13:38 UTC, conteneur relancé à 11:23:33 UTC (1 redémarrage). Le démarrage réel d'un nouveau pod des résolveurs reste non mesuré. La jonction d'un nouveau nœud aussi.
 
+## Additif du 07/11/2026, 11:36 UTC : étapes `enveloppes` et `decision3` passées sous H1 à H5, E1 à E5, D1 à D5 et X2 tenues
+
+Passages lancés sur accord du propriétaire (« Oui les 2 »), après le redémarrage des VM, avec `JOURNAL=preuves-h5` et `PIPE_ESSAI` (bundle `sample-app-essai@sha256:c5194859…`, lu sur `j6-porte-en-service`). Prédictions committées avant, au commit d834c13. Journaux : [preuves-h5-enveloppes.log](../08-trust-plane/resultats/preuves-h5-enveloppes.log), 11:34:51 à 11:35:21 UTC, 12 OK, 0 KO ; [preuves-h5-decision3.log](../08-trust-plane/resultats/preuves-h5-decision3.log), 11:35:33 à 11:36:22 UTC, 15 OK, 0 KO ; relevé [resultats/mesures-reelles-x2.log](resultats/mesures-reelles-x2.log).
+
+| Prédiction | Mesuré |
+|---|---|
+| E1 | Code 0, 30 s |
+| E2 | Départ sans anomalie : 31 couvertes, 8 en échec de signature, 20 sans sujet |
+| E3 | `ABSENTE` puis `SUJET_NON_SIGNE`, chacune seule anomalie |
+| E4 | Témoin signé par Chains avec les identifiants injectés : TaskRun et PipelineRun couverts ; tag réécrit : `ABSENTE`, puis `DOUBLE`, puis tag remis sans anomalie |
+| E5 | Fin sans anomalie, 31 couvertes ; image réelle inchangée, 24 enveloppes, provenance `474b3f60` |
+| D1 | Configuration en service identique au dépôt (`5806ba5c…`) |
+| D2 | Tag neuf créé par `poc-build`, déplacement refusé en 403 (journal de Zot), `poc-ecriture` le déplace, `poc-build` le déplace de nouveau après remise |
+| D3 | TaskRun `signed=true` ; PipelineRun `signed=failed`, `retries=3` ; 5 PUT `.att` refusés en 403 ; une enveloppe dans `.att`, celle du TaskRun ; 7 signatures Transit (2 + 5). Mêmes chiffres que le 06/11 |
+| D4 | PipelineRun en échec `SUJET_NON_SIGNE`, seule anomalie ; configuration d'origine remise et vérifiée ; CronJobs repris ; exécutions purgées ; fin sans anomalie |
+| D5 | Image réelle inchangée, 24 enveloppes ; 49 s |
+| X2 | `KyvernoRefusAnormaux` inactive dans Prometheus et absente d'Alertmanager, aucune série `ALERTS` ni refus Kyverno sur 10 min ; Zot `active`, `suspend=false` pour les deux CronJobs, aucun PipelineRun en cours |
+
+Les onze prédictions sont tenues. C'est le premier passage de ces deux étapes après la bascule, S1 et H1 à H5. Le refus du droit `update` par Zot tient toujours avec les identifiants de Chains lus dans OpenBao. Bornes de X2 : le relevé est pris 16 s après la fin de `decision3`, un refus des toutes dernières secondes pourrait ne pas encore être collecté ; et le compteur ne présente plus que 17 séries contre 55 à X1, les pods de Kyverno ayant redémarré avec les VM.
+
+Toujours non couverts sous H1 à H5 : `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan`, le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud et le saut d'un passage manqué du scan.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

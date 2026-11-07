@@ -1,0 +1,18 @@
+# X2, relevé du 07/11/2026 à 11:36:38 UTC, lecture seule de Prometheus, d'Alertmanager, de Zot et du cluster
+fenêtre des deux étapes : 11:34:51 à 11:36:22 UTC (enveloppes puis decision3) ; requêtes sur les 10 dernières minutes
+## état actuel de KyvernoRefusAnormaux
+prometheus : inactive
+alertmanager : absente
+## ALERTS{alertname="KyvernoRefusAnormaux"} sur 10 min (pending ou firing)
+[]
+## refus Kyverno à l'admission sur 10 min (somme des hausses du compteur)
+["0"]
+## séries du compteur présentes
+["17"]
+## après decision3
+configuration de Zot en service : 5806ba5c431d3e29… ; dépôt : 5806ba5c431d3e29…
+zot : active
+declencheurs/rattrapage : suspend=false
+horodatage/horodatage : suspend=false
+PipelineRuns non terminés : 0
+fin du relevé
