@@ -180,3 +180,57 @@ Références : derniers passages le 06/11, de 14:35 à 15:58 UTC, avant H1. `cm_
 
 Hors des étapes :
 - X3 : `KyvernoRefusAnormaux` ne se déclenche pas, et le compteur Kyverno ne monte pas. CronJobs à `suspend=false`, 0 PipelineRun en cours, `porte-temoin` absente à la fin.
+
+## Additif du 07/11/2026, 13:37 UTC : test 6 et `intercepteurs`, prédictions avant passage, aucun accord donné
+
+Demande : « Continue », prise pour une préparation à sec. Rien lancé, rien écrit dans le cluster ni dans Zot. Relevés en lecture seule de 13:34 à 13:36 UTC. Chaque étape écrit dans Zot ou dans le cluster : chacune demande son propre accord.
+
+Commandes, depuis la racine du dépôt, une par accord :
+
+```bash
+DISTRO=rke2 JOURNAL=preuves-h5 T6_FERMES="Supervisor Etcd" mise run confiance:preuves -- test6 </dev/null
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- intercepteurs </dev/null
+```
+
+- `T6_FERMES` est obligatoire. Sans elle, la contre-épreuve attend 9345 et 2379 ouverts (`preuves.sh:795`) et sort en KO dès Supervisor, alors que le pare-feu d'hôte de H4 les ferme toujours. La valeur est celle de `h4_bloque` (`durcissement.sh:349`).
+- `JOURNAL=preuves-h5` écrit `preuves-h5-test6.log` et `preuves-h5-intercepteurs.log`, qui n'existent pas encore. Il n'écrase ni `preuves-test6.log` (06/11, 17:48 UTC, cité par H4b), ni `preuves-intercepteurs.log` (02/11).
+
+Relevés :
+- `builds` : une seule NetworkPolicy, `construction-sans-sortie` (`tekton.dev/task=construire-image`) ; ni ResourceQuota, ni LimitRange.
+- RuntimeClass `kata` : `podFixed` de 250m et 320Mi.
+- Sous-réseau des pods de `sc-build` : `10.42.1.0/24`, celui que `adresse_libre` suppose (`preuves.sh:133`). `10.42.1.250` n'est portée par aucun pod à 13:36 UTC.
+- TaskRuns `preuve-test6-test` et `preuve-test6-contre` du 06/11 présents, réussis.
+- Liaison `tekton-triggers-core-interceptors` : ClusterRole du même nom, sujet `tekton-pipelines:tekton-triggers-core-interceptors`, règle `secrets:get,list,watch`. C'est l'attendu de l'étape.
+- Déploiement des intercepteurs : limites 500m et 256Mi posées par `h5_limites`, image de Zot par digest, `RollingUpdate` à 25 %, révisions 1 et 2.
+
+### Effets à connaître
+
+| Étape | Durée prédite | Écrit | Reste après |
+|---|---|---|---|
+| `test6` | moins de 3 min (88 s le 06/11 à 17:48 UTC) | Zot : bundles poussés dans `tekton/tasks/preuve-test6-contre` et `preuve-test6-test`. Cluster : les deux TaskRuns du 06/11 supprimés puis recréés, deux pods Kata en séquence sur `sc-build`. `tcpdump` sur `enp1s0` de `sc-build` | Deux manifestes de plus dans Zot (`poc-ecriture` ne supprime pas). Deux TaskRuns signés par Chains, sans sujet image, par OpenBao |
+| `intercepteurs` | moins de 3 min (1 min 43 le 02/11) | Liaison retirée puis remise (le trap la remet sur KO). Deux `rollout restart` du déploiement | Deux révisions de plus (3 et 4) : `kubectl rollout undo`, retour prévu de `h5_limites`, reviendrait à la révision 3, encore limitée. Le retour de ce déploiement passerait par l'état sauvé, `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/Deployment-tekton-pipelines-tekton-triggers-core-interceptors.json`, ou par `--to-revision=1` |
+
+### `test6`
+
+Référence : passage du 06/11 de 17:48 à 17:50 UTC sous H1 à H4, avant H5, S1, `h5_roles`, `h5_cilium`, H6 (posée puis retirée) et le redémarrage des VM.
+
+- N1 : TaskRuns admis sous `Deny`, pods Kata privilégiés compris. Les conteneurs de Tekton reçoivent leurs limites de `config-defaults`, l'étape `construire` a les siennes (1 CPU, 1Gi), l'image BuildKit vient de Zot par digest et le compte est `build`. Confiance haute. Preuves : `preuves-h5-test1.log` (même gabarit, sous runc), R4 (construction réelle sous Kata) et `preuves-h5-sec_h5.log` (pod Kata privilégié admis).
+- N2 : deux TaskRuns réussis, `TrustedResourcesVerified=True`. Bundles à digests neufs, différents de `26329a1f…` et `48ce77aa…` : la clé des tâches est ECDSA P-256 (`politique.sh:354`) et l'adresse usurpée est écrite dans le script. Digests non prédits.
+- N3 : adresse usurpée tirée de `.250` à `.200` du `10.42.1.0/24`, contrôlée inutilisée par `t6_inutilisee` avant chaque passage. Probablement `10.42.1.250`, valeur non prédite.
+- N4 : garde-fous tenus pour les deux passages. Label `tekton.dev/task` attendu, pod sous Kata (noyau de l'invité 6.18.56, différent de celui de `sc-build`), eth0 à l'IP du pod, adresse usurpée ajoutée puis retirée.
+- N5 : contre-épreuve comme le 06/11. Zot, Forgejo, API du nœud et API par le service joignables. Supervisor et Etcd refusés par le pare-feu d'hôte. `nc -s` joint Zot. 3 SYN vers `203.0.113.10:443` sur `enp1s0`, source `192.168.161.12`. Aucun flux refusé de l'IP du pod. Zot et Forgejo injoignables depuis l'adresse usurpée, en `INVALID_SOURCE_IP`. Confiance moyenne à haute : Cilium a été redémarré par `h5_cilium` et par celui des VM, mais `kata.sh reseau` a passé ce matin à 11:26 UTC avec Hubble.
+- N6 : `construire-image` voit ses 7 destinations refusées, chacune en `POLICY_DENIED EGRESS` chez l'agent de `sc-build` (l'API par le service apparaît sous `192.168.161.11:6443`). `nc -s` est refusé. Zot et Forgejo sont injoignables depuis l'adresse usurpée, en `INVALID_SOURCE_IP`. Aucun paquet sur `enp1s0`. Le nombre de flux par tentative n'est pas prédit (6 le 06/11).
+- N7 : 0 KO. Image réelle inchangée : nombre d'enveloppes relu par l'étape au début et à la fin (24 à 12:45 UTC, non relu depuis). `KyvernoRefusAnormaux`, `ChainsEchecSignature` et `ChainsMarqueSansSignature` restent inactives.
+
+### `intercepteurs`
+
+Référence : passage du 02/11 de 11:14:50 à 11:16:33 UTC, sous k3s, avant H1 à H5. Les prédictions de l'étape, écrites le 02/11 d'après le code de Triggers v0.37.2, restent valables.
+
+- I1 : liaison et ClusterRole conformes à l'attendu, relevés à 13:36 UTC.
+- I2 : liaison retirée, `can-i list secrets -A` à `no`. Le nouveau pod n'est pas prêt après 90 s, et son journal porte le refus de lister les Secrets « at the cluster scope ».
+- I3 : les deux nouveaux pods sont admis sous `Deny`. Le gabarit porte les limites de `h5_limites`, une image de Zot par digest et le compte `tekton-triggers-core-interceptors`, pas `default`. Ce sera la première admission d'un pod de ce déploiement sous `Deny` : le pod en service, `…-558f59555b-c9qnn`, a été créé le 06/11 à 19:19:59 UTC par `h5_limites`, sous Audit (`Deny` à 19:26 UTC). Le redémarrage des VM n'a fait que relancer son conteneur (`restartCount` 1), sans nouvelle admission. Confiance moyenne à haute.
+- I4 : pendant la fenêtre, l'ancien pod reste en service (`RollingUpdate`, nouveau pod jamais prêt), comme le 02/11 (« 1 old replicas are pending termination »). Les livraisons ne seraient pas perdues. Aucune livraison n'est prévue pendant le passage, ce point n'est donc pas mesuré.
+- I5 : liaison remise, `can-i` à `yes`, nouveau pod prêt, 0 refus dans son journal. `caBundle` des cinq ClusterInterceptors inchangé (longueur 1456 le 02/11 sous k3s ; la valeur sous RKE2 n'est pas prédite).
+- I6 : 0 KO. Conclusion inchangée : borner les intercepteurs par les droits demande de modifier Triggers. La limite est gardée.
+
+Ce que ces deux étapes ne couvrent pas : le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan, la branche « scan daté du futur ». L'étape `test5` reste arrêtée par `gabarit_essai` tant que le gabarit d'essai n'est pas en service ; ses refus sont couverts par `test5_refus`.
