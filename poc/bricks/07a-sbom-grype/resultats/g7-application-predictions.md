@@ -122,3 +122,13 @@ Passage planifié de 09:30 UTC réussi en 2 min 06. Creux de 1 645 Mo à l'écha
 | Reste d'environ 6 Mo/h | 0,04 Mo/h sur 24 h | Non retrouvé |
 
 **Projection, pas une mesure** : creux d'environ 1 552 Mo une fois les plafonds atteints, 807 Mo au-dessus de l'éviction. **Jamais mesuré sous k3s** : le plafond d'audit. Le rejeu RKE2, lancé sur accord du propriétaire, retire ce cluster avant la rotation de 12:50 UTC. Décision sur le disque : aucune, recommandation « ne rien faire », `sc-confiance` passant à 25 Go sous RKE2 (D3 de la 08b).
+
+## Additif du 07/11/2026, 19:56 UTC : le plafond de journald de 282 Mo ne vaut que jusqu'au premier redémarrage
+
+Revue statique menée sur « continue », sans validation du propriétaire. Rien n'a été lu ni écrit dans les VM. Base : [revue-journald-stockage.log](../../08c-durcissement/resultats/revue-journald-stockage.log) de la 08c.
+
+D'après le source de systemd v257.13, journald calcule son plafond une seule fois, au démarrage du processus, à 10 % du système de fichiers.
+- Au premier démarrage d'une VM neuve, la racine de l'image n'est pas encore agrandie (2,874 GiB). Le plafond vaut alors environ 290 Mo, du même ordre que les 282,5 Mo annoncés sous k3s le 05/11.
+- Après un redémarrage, il passe à 10 % du disque. `sc-confiance` est redémarrée depuis le 07/11 à 11:22 UTC et a désormais 25 Go sous RKE2 : journald peut donc y occuper jusqu'à environ 2,5 Go, sous réserve de garder 5 % de place libre (précisé à 19:59 UTC, avant tout push).
+
+Le poste « journald plafonné à 282 Mo » de la projection ne vaut donc plus sous RKE2. Lecture tirée du source, non observée. Aucune note ne change.

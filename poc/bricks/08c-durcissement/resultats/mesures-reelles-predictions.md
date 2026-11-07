@@ -653,3 +653,26 @@ Revue statique menée sur « continue », sans validation du propriétaire. Rien
 - **Lecteurs dans Loki** : `journalisation.sh:391`, compte sur 24 h affiché comme contrôle de présence, qui compte des écritures (chaque mise à jour d'un Event en ajoute une) et non des Events distincts ; `journalisation.sh:496`, témoin J4, fenêtre de 15 min pour une date tronquée à la seconde, tenu.
 - **« 1 sur 918 »** de `l4-evenements-horodatage.log` : commande non archivée, source non établie, non jugé.
 - Lire les Events dans Loki au lieu de kubectl éviterait la TTL : possible, à décider avec le propriétaire.
+
+## Additif du 07/11/2026, 19:56 UTC : perte du journal local de `sc-stockage`, mécanisme probable et prédictions avant la relecture du 08/11
+
+Revue statique menée sur « continue », sans validation du propriétaire. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM. Base : [revue-journald-stockage.log](revue-journald-stockage.log).
+
+**Source de systemd v257.13, version de l'image Debian.**
+- `journal-file.c:4003-4080` : par défaut, journald fixe `max_use` à 10 % du système de fichiers et `max_size` au huitième de `max_use`.
+- Ces valeurs sont fixées au démarrage du processus (`journald-server.c:2665`), sans rechargement.
+- À chaque rotation, journald supprime les archives les plus vieilles, jusqu'à repasser sous la limite (`journal-vacuum.c:291-317`).
+
+**Lecture.**
+- La racine de l'image fait 2,874 GiB avant agrandissement. Au premier démarrage, le 06/11 à 13:28 UTC, le plafond valait donc environ 290 Mo. Deux archives environ ont été supprimées, d'où la tête du 06/11 à 17:03:02 UTC.
+- Les 386,1 M du 07/11 à 17:39 UTC dépassent le maximum permis par ce plafond, 367,9 Mio. Il a donc été levé, au plus tard au redémarrage de 11:22 UTC, vers 10 % de 20 Go.
+- La perte était glissante sous ce plafond, sur une fenêtre d'environ 18 h. Elle s'est arrêtée à sa levée : la tête du 06/11 à 17:03:02 UTC est l'état figé au redémarrage (corrigé à 19:59 UTC, avant tout push : « ponctuelle, pas glissante » contredisait le mécanisme). Lu dans le source et compatible avec les archives, non observé.
+- Non relus : la version installée, les correctifs Debian, l'ordre de growpart et du transfert du journal.
+- Les lignes de 13 h à 16 h du démarrage -1 encore lues restent inexpliquées. Piste : `user-1000.journal`, jamais supprimé.
+
+**Prédictions.**
+- **P1, relecture du 08/11 après la reprise.** La plus vieille archive reste `…-00000000000160aa-00065f9e95c7cfcc` (tête du 06/11 à 17:03:02 UTC). L'occupation dépasse 386,1 M. Une tête avancée réfute le mécanisme.
+- **P2, mesure qui tranche, sur accord du propriétaire seulement.** Au démarrage 0, le message de journald annonce un max de 1,8 à 2,0 G. `dpkg-query -W systemd` donne `257.13-1~deb13u1`.
+- **P3, W8b du 09/11.** Les notifications de `ScanEnRetard` depuis le 08/11 à 11:30 UTC sont encore dans le journal local : « mêmes lignes » que Loki. Confiance haute si P1 tient : pour perdre ces lignes, il faudrait environ 80 Mo/h, cinq fois le rythme moyen observé (15,7 M/h). Elle remplace la confiance moyenne de l'additif de 17:59 UTC, sans réécrire celui-ci.
+
+**Conséquence, sans action.** Depuis le redémarrage du 07/11, journald peut occuper jusqu'à environ 2,5 Go sur `sc-confiance` (25 Go), sous réserve de garder 5 % de place libre ; G7 de la 07a supposait 282 Mo. L'effet sur la marge avant éviction n'est pas mesuré. Fixer `SystemMaxUse` toucherait les VM : décision du propriétaire.

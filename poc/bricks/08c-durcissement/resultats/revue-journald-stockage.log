@@ -1,0 +1,434 @@
+# Revue statique du plafond de journald (brique 08c) : revue commencée le 07/11/2026 à 19:45:55 UTC (première commande), relevé ci-dessous produit à 19:54:55 UTC
+# Menée sur « continue », sans validation du propriétaire. Rien lu ni écrit dans le cluster, Zot ou les VM.
+# Sources : dépôt (journaux archivés), image Debian en cache (lecture locale), source amont de systemd.
+
+## 1. Version de systemd
+manifeste de l'image : debian-13-generic-amd64-20261026-2643.json, contrôlé par SHA512SUMS : debian-13-generic-amd64-20261026-2643.json: OK
+  cloud-guest-utils 0.33-1
+  cloud-init 25.1.4-1+deb13u1
+  cloud-initramfs-growroot 0.18.debian14
+  systemd 257.13-1~deb13u1
+source lu : systemd amont, tag v257.13, fichiers bruts de raw.githubusercontent.com/systemd/systemd/v257.13/ ; correctifs Debian non lus
+  src/libsystemd/sd-journal/journal-file.c  sha256 9534f022e8783dd375365e453c49ca04f9539710930f9ecea24ba12241d53c8c
+  src/journal/journald-server.c  sha256 ae3becd942fc64e1e020c71b540ce9085eb8e75824851f9ba7787704ad67ce12
+  src/journal/journald.c  sha256 a1ba9b53b3f43663fef71efdbff04f0766d45d16c80ffff3615ecabf890ce9db
+  src/libsystemd/sd-journal/journal-vacuum.c  sha256 6625170ae8bf71b432c9cc75cd718237e6402ecdb03660aec302474d1bd82ad0
+version installée sur les VM : non relue (aucune lecture des VM ici)
+
+## 2. Extraits du source (numéros de ligne du fichier)
+### journal-file.c, lignes 56 à 72
+   56  #define MAX_USE_LOWER (1 * U64_MB)                       /* 1 MiB */
+   57  #define MAX_USE_UPPER (4 * U64_GB)                       /* 4 GiB */
+   58  
+   59  /* Those are the lower and upper bounds for the minimal use limit,
+   60   * i.e. how much we'll use even if keep_free suggests otherwise. */
+   61  #define MIN_USE_LOW  (1  * U64_MB)                       /* 1 MiB */
+   62  #define MIN_USE_HIGH (16 * U64_MB)                       /* 16 MiB */
+   63  
+   64  /* This is the upper bound if we deduce max_size from max_use */
+   65  #define MAX_SIZE_UPPER (128 * U64_MB)                    /* 128 MiB */
+   66  
+   67  /* This is the upper bound if we deduce the keep_free value from the file system size */
+   68  #define KEEP_FREE_UPPER (4 * U64_GB)                     /* 4 GiB */
+   69  
+   70  /* This is the keep_free value when we can't determine the system size */
+   71  #define DEFAULT_KEEP_FREE (1 * U64_MB)                   /* 1 MB */
+   72  
+### journal-file.c, lignes 4003 à 4080
+ 4003  
+ 4004  static void journal_default_metrics(JournalMetrics *m, int fd, bool compact) {
+ 4005          struct statvfs ss;
+ 4006          uint64_t fs_size = 0;
+ 4007  
+ 4008          assert(m);
+ 4009          assert(fd >= 0);
+ 4010  
+ 4011          if (fstatvfs(fd, &ss) >= 0)
+ 4012                  fs_size = u64_multiply_safe(ss.f_frsize, ss.f_blocks);
+ 4013          else
+ 4014                  log_debug_errno(errno, "Failed to determine disk size: %m");
+ 4015  
+ 4016          if (m->max_use == UINT64_MAX) {
+ 4017  
+ 4018                  if (fs_size > 0)
+ 4019                          m->max_use = CLAMP(PAGE_ALIGN_U64(fs_size / 10), /* 10% of file system size */
+ 4020                                             MAX_USE_LOWER, MAX_USE_UPPER);
+ 4021                  else
+ 4022                          m->max_use = MAX_USE_LOWER;
+ 4023          } else {
+ 4024                  m->max_use = PAGE_ALIGN_U64(m->max_use);
+ 4025  
+ 4026                  if (m->max_use != 0 && m->max_use < JOURNAL_FILE_SIZE_MIN*2)
+ 4027                          m->max_use = JOURNAL_FILE_SIZE_MIN*2;
+ 4028          }
+ 4029  
+ 4030          if (m->min_use == UINT64_MAX) {
+ 4031                  if (fs_size > 0)
+ 4032                          m->min_use = CLAMP(PAGE_ALIGN_U64(fs_size / 50), /* 2% of file system size */
+ 4033                                             MIN_USE_LOW, MIN_USE_HIGH);
+ 4034                  else
+ 4035                          m->min_use = MIN_USE_LOW;
+ 4036          }
+ 4037  
+ 4038          if (m->min_use > m->max_use)
+ 4039                  m->min_use = m->max_use;
+ 4040  
+ 4041          if (m->max_size == UINT64_MAX)
+ 4042                  m->max_size = MIN(PAGE_ALIGN_U64(m->max_use / 8), /* 8 chunks */
+ 4043                                    MAX_SIZE_UPPER);
+ 4044          else
+ 4045                  m->max_size = PAGE_ALIGN_U64(m->max_size);
+ 4046  
+ 4047          if (compact && m->max_size > JOURNAL_COMPACT_SIZE_MAX)
+ 4048                  m->max_size = JOURNAL_COMPACT_SIZE_MAX;
+ 4049  
+ 4050          if (m->max_size != 0) {
+ 4051                  if (m->max_size < JOURNAL_FILE_SIZE_MIN)
+ 4052                          m->max_size = JOURNAL_FILE_SIZE_MIN;
+ 4053  
+ 4054                  if (m->max_use != 0 && m->max_size*2 > m->max_use)
+ 4055                          m->max_use = m->max_size*2;
+ 4056          }
+ 4057  
+ 4058          if (m->min_size == UINT64_MAX)
+ 4059                  m->min_size = JOURNAL_FILE_SIZE_MIN;
+ 4060          else
+ 4061                  m->min_size = CLAMP(PAGE_ALIGN_U64(m->min_size),
+ 4062                                      JOURNAL_FILE_SIZE_MIN,
+ 4063                                      m->max_size ?: UINT64_MAX);
+ 4064  
+ 4065          if (m->keep_free == UINT64_MAX) {
+ 4066                  if (fs_size > 0)
+ 4067                          m->keep_free = MIN(PAGE_ALIGN_U64(fs_size / 20), /* 5% of file system size */
+ 4068                                             KEEP_FREE_UPPER);
+ 4069                  else
+ 4070                          m->keep_free = DEFAULT_KEEP_FREE;
+ 4071          }
+ 4072  
+ 4073          if (m->n_max_files == UINT64_MAX)
+ 4074                  m->n_max_files = DEFAULT_N_MAX_FILES;
+ 4075  
+ 4076          log_debug("Fixed min_use=%s max_use=%s max_size=%s min_size=%s keep_free=%s n_max_files=%" PRIu64,
+ 4077                    FORMAT_BYTES(m->min_use),
+ 4078                    FORMAT_BYTES(m->max_use),
+ 4079                    FORMAT_BYTES(m->max_size),
+ 4080                    FORMAT_BYTES(m->min_size),
+### journal-file.c, lignes 4242 à 4246
+ 4242          if (journal_file_writable(f)) {
+ 4243                  if (metrics) {
+ 4244                          journal_default_metrics(metrics, f->fd, JOURNAL_HEADER_COMPACT(f->header));
+ 4245                          f->metrics = *metrics;
+ 4246                  } else if (template)
+### journal-file.c, lignes 4535 à 4547
+ 4535  void journal_reset_metrics(JournalMetrics *m) {
+ 4536          assert(m);
+ 4537  
+ 4538          /* Set everything to "pick automatic values". */
+ 4539  
+ 4540          *m = (JournalMetrics) {
+ 4541                  .min_use = UINT64_MAX,
+ 4542                  .max_use = UINT64_MAX,
+ 4543                  .min_size = UINT64_MAX,
+ 4544                  .max_size = UINT64_MAX,
+ 4545                  .keep_free = UINT64_MAX,
+ 4546                  .n_max_files = UINT64_MAX,
+ 4547          };
+### journald-server.c, lignes 148 à 191
+  148  
+  149  static int cache_space_refresh(Server *s, JournalStorage *storage) {
+  150          JournalStorageSpace *space;
+  151          JournalMetrics *metrics;
+  152          uint64_t vfs_used, vfs_avail, avail;
+  153          usec_t ts;
+  154          int r;
+  155  
+  156          assert(s);
+  157  
+  158          metrics = &storage->metrics;
+  159          space = &storage->space;
+  160  
+  161          ts = now(CLOCK_MONOTONIC);
+  162  
+  163          if (space->timestamp != 0 && usec_add(space->timestamp, RECHECK_SPACE_USEC) > ts)
+  164                  return 0;
+  165  
+  166          r = server_determine_path_usage(s, storage->path, &vfs_used, &vfs_avail);
+  167          if (r < 0)
+  168                  return r;
+  169  
+  170          space->vfs_used = vfs_used;
+  171          space->vfs_available = vfs_avail;
+  172  
+  173          avail = LESS_BY(vfs_avail, metrics->keep_free);
+  174  
+  175          space->limit = CLAMP(vfs_used + avail, metrics->min_use, metrics->max_use);
+  176          space->available = LESS_BY(space->limit, vfs_used);
+  177          space->timestamp = ts;
+  178          return 1;
+  179  }
+  180  
+  181  static void patch_min_use(JournalStorage *storage) {
+  182          assert(storage);
+  183  
+  184          /* Let's bump the min_use limit to the current usage on disk. We do
+  185           * this when starting up and first opening the journal files. This way
+  186           * sudden spikes in disk usage will not cause journald to vacuum files
+  187           * without bounds. Note that this means that only a restart of journald
+  188           * will make it reset this value. */
+  189  
+  190          storage->metrics.min_use = MAX(storage->metrics.min_use, storage->space.vfs_used);
+  191  }
+### journald-server.c, lignes 376 à 392
+  376                  r = server_open_journal(
+  377                                  s,
+  378                                  /* reliably= */ true,
+  379                                  fn,
+  380                                  O_RDWR|O_CREAT,
+  381                                  s->seal,
+  382                                  &s->system_storage.metrics,
+  383                                  &s->system_journal);
+  384                  if (r >= 0) {
+  385                          server_add_acls(s->system_journal, 0);
+  386                          (void) cache_space_refresh(s, &s->system_storage);
+  387                          patch_min_use(&s->system_storage);
+  388                  } else {
+  389                          if (!IN_SET(r, -ENOENT, -EROFS))
+  390                                  log_ratelimit_warning_errno(r, JOURNAL_LOG_RATELIMIT,
+  391                                                              "Failed to open system journal: %m");
+  392  
+### journald-server.c, lignes 799 à 818
+  799  static void server_do_vacuum(Server *s, JournalStorage *storage, bool verbose) {
+  800  
+  801          int r;
+  802  
+  803          assert(s);
+  804          assert(storage);
+  805  
+  806          (void) cache_space_refresh(s, storage);
+  807  
+  808          if (verbose)
+  809                  server_space_usage_message(s, storage);
+  810  
+  811          r = journal_directory_vacuum(storage->path, storage->space.limit,
+  812                                       storage->metrics.n_max_files, s->max_retention_usec,
+  813                                       &s->oldest_file_usec, verbose);
+  814          if (r < 0 && r != -ENOENT)
+  815                  log_ratelimit_warning_errno(r, JOURNAL_LOG_RATELIMIT,
+  816                                              "Failed to vacuum %s, ignoring: %m", storage->path);
+  817  
+  818          cache_space_invalidate(&storage->space);
+### journald-server.c, lignes 981 à 991
+  981          if (journal_file_rotate_suggested(f, s->max_file_usec, LOG_DEBUG)) {
+  982                  if (vacuumed) {
+  983                          log_ratelimit_warning(JOURNAL_LOG_RATELIMIT,
+  984                                                "Suppressing rotation, as we already rotated immediately before write attempt. Giving up.");
+  985                          return;
+  986                  }
+  987  
+  988                  log_debug("%s: Journal header limits reached or header out-of-date, rotating.", f->path);
+  989  
+  990                  server_rotate_journal(s, TAKE_PTR(f), uid);
+  991                  server_vacuum(s, /* verbose = */ false);
+### journald-server.c, lignes 1428 à 1437
+ 1428          sd_journal_close(j);
+ 1429  
+ 1430          /* Remove the runtime directory if the all entries are successfully flushed to /var/. */
+ 1431          if (r >= 0) {
+ 1432                  r = rm_rf(s->runtime_storage.path, REMOVE_ROOT);
+ 1433                  if (r < 0)
+ 1434                          log_debug_errno(r, "Failed to remove runtime journal directory %s, ignoring: %m", s->runtime_storage.path);
+ 1435                  else
+ 1436                          log_debug("Removed runtime journal directory %s.", s->runtime_storage.path);
+ 1437  
+### journald-server.c, lignes 2649 à 2669
+ 2649  int server_init(Server *s, const char *namespace) {
+ 2650          const char *native_socket, *syslog_socket, *stdout_socket, *varlink_socket, *e;
+ 2651          _cleanup_fdset_free_ FDSet *fds = NULL;
+ 2652          int n, r, varlink_fd = -EBADF;
+ 2653          bool no_sockets;
+ 2654  
+ 2655          assert(s);
+ 2656  
+ 2657          r = server_set_namespace(s, namespace);
+ 2658          if (r < 0)
+ 2659                  return r;
+ 2660  
+ 2661          /* By default, only read from /dev/kmsg if are the main namespace */
+ 2662          s->read_kmsg = !s->namespace;
+ 2663          s->storage = s->namespace ? STORAGE_PERSISTENT : STORAGE_AUTO;
+ 2664  
+ 2665          journal_reset_metrics(&s->system_storage.metrics);
+ 2666          journal_reset_metrics(&s->runtime_storage.metrics);
+ 2667  
+ 2668          server_load_credentials(s);
+ 2669          server_parse_config_file(s);
+### journal-vacuum.c, lignes 177 à 186
+  177  
+  178                  if (endswith(de->d_name, ".journal")) {
+  179  
+  180                          /* Vacuum archived files. Active files are
+  181                           * left around */
+  182  
+  183                          if (q < 1 + 32 + 1 + 16 + 1 + 16 + 8) {
+  184                                  n_active_files++;
+  185                                  sum += size;
+  186                                  continue;
+### journal-vacuum.c, lignes 291 à 317
+  291                  sum += size;
+  292          }
+  293  
+  294          typesafe_qsort(list, n_list, vacuum_info_compare);
+  295  
+  296          for (i = 0; i < n_list; i++) {
+  297                  uint64_t left;
+  298  
+  299                  left = n_active_files + n_list - i;
+  300  
+  301                  if ((max_retention_usec <= 0 || list[i].realtime >= retention_limit) &&
+  302                      (max_use <= 0 || sum <= max_use) &&
+  303                      (n_max_files <= 0 || left <= n_max_files))
+  304                          break;
+  305  
+  306                  r = unlinkat_deallocate(dirfd(d), list[i].filename, 0);
+  307                  if (r >= 0) {
+  308                          log_full(verbose ? LOG_INFO : LOG_DEBUG, "Deleted archived journal %s/%s (%s).",
+  309                                   directory, list[i].filename, FORMAT_BYTES(list[i].usage));
+  310                          freed += list[i].usage;
+  311  
+  312                          if (list[i].usage < sum)
+  313                                  sum -= list[i].usage;
+  314                          else
+  315                                  sum = 0;
+  316  
+  317                  } else if (r != -ENOENT)
+### appels de journal_reset_metrics et rechargement
+journald-server.c:2665:        journal_reset_metrics(&s->system_storage.metrics);
+journald-server.c:2666:        journal_reset_metrics(&s->runtime_storage.metrics);
+journal-file.c:4535:void journal_reset_metrics(JournalMetrics *m) {
+occurrences de reload, SIGHUP ou sighup dans journald-server.c et journald.c : 0
+
+## 3. Racine de l'image, avant agrandissement (lecture locale de l'image en cache)
+taille virtuelle : 3221225472 octets
+partition 1 : secteurs 262144 à 6289407, 3085959168 octets (2.874 GiB)
+partition 14 : secteurs 2048 à 8191, 3145728 octets (0.003 GiB)
+partition 15 : secteurs 8192 à 262143, 130023424 octets (0.121 GiB)
+ext4 de la partition 1 : 753408 blocs de 4096 octets, 3085959168 octets (2.874 GiB)
+10 % de cette taille : 294.3 MiB ; un huitième de ces 10 % : 36.8 MiB (bornes hautes : f_blocks de statvfs exclut des métadonnées)
+cloud-init : growpart:   mode: auto   devices: ["/"] 
+
+## 4. Faits archivés repris (aucun relevé nouveau)
+- chrono.tsv (08), lignes 3050 à 3052 : VM détruites le 06/11 à 13:28:20 UTC, définies à 13:28:27 (volumes neufs tirés de l'image), joignables en SSH à 13:28:38.
+- chains-echec-signature.log (08c), lignes 282 à 284 : démarrage -1 de sc-stockage (672808fc…) du 06/11 13:28:37 au 07/11 11:20:41 UTC, démarrage 0 depuis le 07/11 11:22:36. Les entrées de 13:28:37 et de 11:20:41 portent le même identifiant : aucun redémarrage entre les deux.
+- redemarrage-vm.log (08), lignes 1 et 28 à 30 : redemarrer.sh du 07/11 à 11:20:38 UTC (vm.sh arreter puis demarrer), trois VM démarrées à 11:22:33.
+- noyau-hotes-releve.log (08c), lignes 15 à 20 : sur sc-stockage, unattended-upgrades a installé le 07/11 de 06:36:00 à 06:36:07 UTC apt, vim et le noyau ; pas systemd. Historique filtré sur unattended-upgrade : une installation par une autre voie n'y figurerait pas.
+- chains-echec-signature.log, lignes 285 à 298 : 386.1M au 07/11 à 17:39:09 UTC (journalctl, unité binaire), 8 archives, system.journal et user-1000.journal ; configuration effective de journald : ForwardToSyslog=yes seul, aucun SystemMaxUse.
+- mêmes lignes 287 à 294, numéro et heure de tête décodés du nom des archives :
+    ligne 287 : entrée 90282, tête 06/11 17:03:02 UTC
+    ligne 288 : entrée 134080, tête 06/11 19:28:27 UTC
+    ligne 289 : entrée 177771, tête 06/11 21:36:01 UTC
+    ligne 290 : entrée 221307, tête 07/11 00:03:04 UTC
+    ligne 291 : entrée 265022, tête 07/11 02:39:01 UTC
+    ligne 292 : entrée 308739, tête 07/11 05:14:02 UTC
+    ligne 293 : entrée 352434, tête 07/11 07:49:02 UTC
+    ligne 294 : entrée 396148, tête 07/11 10:24:02 UTC
+  Environ 43 700 entrées et 2 h 25 à 2 h 36 par archive, toutes du démarrage -1. 90 281 entrées précèdent la plus vieille.
+- même journal, lignes 299 à 302 et 306 : lignes du démarrage -1 encore lues le 06/11 de 13 h à 16 h (319, 276, 1 416, 158), alors que le journal système commence à 17:03:02 ; 6 lignes du récepteur au démarrage -1, la première à 19:26:47.
+- git grep du dépôt (*.sh, *.yaml, *.yml, *.in, *.toml) : aucun vacuum, journald.conf, SystemMaxUse ni rotate.
+- g7-application-predictions.md (07a), ligne 102, commit 131d7b0 : sc-confiance sous k3s, disque de 15 Go, plafond de journald « 282,5 Mo, annoncé par journald » le 05/11. Commande source non archivée. VM créées le 03/11 à 20:31:20 UTC (chrono.tsv, ligne 2594), aucun redémarrage de VM archivé avant le 05/11.
+
+## 5. Lecture, écrite à 19:55 UTC, après les sections 1 à 4
+1. Calcul du plafond (journal-file.c:4003-4080). Par défaut, journald fixe :
+   - max_use à 10 % de la taille du système de fichiers de /var/log/journal (f_blocks de statvfs) ;
+   - max_size, taille d'un fichier avant rotation, au huitième de max_use (128 Mio au plus) ;
+   - keep_free à 5 %.
+   Il les fixe à la première ouverture d'un journal, en ne remplissant que les champs encore « automatiques » (4242-4245). server_init les remet à « automatique » (journald-server.c:2665), et seulement là : v257.13 n'a pas de rechargement. Le plafond reste donc celui calculé au démarrage du processus journald.
+2. Nettoyage. À chaque rotation (journald-server.c:981-991, 811), journald supprime les archives les plus vieilles. Il s'arrête quand la somme de tous les fichiers passe sous la limite, actifs compris (journal-vacuum.c:291-317). Les fichiers au nom court, system.journal et user-1000.journal, sont comptés mais jamais supprimés (177-186).
+3. Premier démarrage. La racine de l'image fait 2,874 GiB : 10 % font au plus 294,3 Mio, et max_size au plus 36,8 Mio. Si journald a ouvert le journal système avant l'agrandissement du système de fichiers (growpart de cloud-init, disque de 20 Go), le plafond du démarrage -1 était d'environ 290 Mo. L'ordre des unités au démarrage n'est pas lu, il est déduit ci-dessous.
+4. Accord avec les archives :
+   a. Des archives ont été supprimées au démarrage -1 : 90 281 entrées avant la plus vieille, soit environ deux archives. Avec 10 % de 20 Go, environ 2 Go, rien n'aurait été supprimé à moins de 0,5 Go occupé. L'autre voie, keep_free, demande moins de 1 Go libre sur sc-stockage : non relu.
+   b. Le 07/11 à 17:39 UTC, l'occupation est de 386,1 M. Sous l'ancien plafond, elle ne dépasse pas la limite plus la croissance des deux fichiers actifs depuis la dernière rotation : au plus 294,3 + 2 × 36,8 = 367,9 Mio. 386,1 dépasse 367,9 : la limite a changé, au plus tard au redémarrage du 07/11 à 11:22 UTC. Réserve : le journal volatil de /run, supprimé après le transfert vers /var (journald-server.c:1430-1432), n'est pas relu.
+   c. sc-confiance sous k3s : 282,5 Mo annoncés sur un disque de 15 Go, sans redémarrage archivé. C'est le même ordre de grandeur que 10 % de la racine de l'image ; l'écart d'environ 4 % peut venir des métadonnées que f_blocks exclut, ce n'est pas vérifié. Corroboration seulement, la source n'est pas archivée.
+   d. Les lignes de 13 h à 16 h du démarrage -1 encore lues ne sont pas expliquées. Piste non vérifiée : user-1000.journal, jamais supprimé (point 2).
+5. Bilan. Selon le mécanisme le plus probable, la perte du journal local de sc-stockage était glissante sous un plafond d'environ 290 Mo. Ce plafond a été calculé au premier démarrage, sur la racine non agrandie de l'image, et donnait une fenêtre d'environ 18 h. La perte s'est arrêtée quand le plafond a été levé vers 10 % de 20 Go, au plus tard au redémarrage du 07/11 à 11:22 UTC. La tête du 06/11 à 17:03:02 est l'état figé à ce redémarrage. (corrigé à 19:59 UTC, avant tout push : « ponctuelle, pas glissante » contredisait le mécanisme).
+   C'est lu dans le source et compatible avec les archives, sans être observé. Limites :
+   - version installée non relue : celle de l'image, et unattended-upgrades n'a pas touché systemd jusqu'au 07/11 à 14:07 UTC ;
+   - correctifs Debian non lus ;
+   - ordre de growpart et du transfert du journal non lu.
+6. Conséquences, sans action :
+   - Un rejeu qui recrée les VM reproduit ce plafond d'environ 290 Mo sur les trois VM jusqu'à leur premier redémarrage. Les 8 archives de sc-stockage ont couvert du 06/11 17:03 au 07/11 11:20 UTC, environ 18 h. Loki n'est pas concerné.
+   - Après redémarrage, le plafond devient 10 % du disque : environ 2 Go sur sc-stockage (20 Go), 2,5 Go sur sc-confiance (25 Go sous RKE2) et 3 Go sur sc-build (30 Go). Journald peut donc occuper jusqu'à ces valeurs, borné aussi par keep_free, 5 % de place libre gardée (journald-server.c:172-174 ; précisé à 19:59 UTC, avant tout push). La projection G7 de la 07a, faite sous k3s, supposait journald borné à 282 Mo sur sc-confiance. Ce n'est plus vrai sous RKE2 depuis le 07/11 à 11:22 UTC. L'effet sur la marge avant éviction n'est pas mesuré.
+   - Fixer SystemMaxUse, ou relancer journald après l'agrandissement, toucherait les VM : la décision revient au propriétaire.
+7. Prédictions, écrites avant tout relevé :
+   - P1, relecture du 08/11 après la reprise : la plus vieille archive du journal système de sc-stockage reste …-00000000000160aa-00065f9e95c7cfcc (tête du 06/11 à 17:03:02 UTC), avec une occupation au-dessus de 386,1 M. Si la tête a avancé, le mécanisme est réfuté.
+   - P2, mesure qui tranche, seulement sur accord du propriétaire : au démarrage 0 de sc-stockage, le message de journald « System Journal (…) is …, max …, … free. » donne un max de 1,8 à 2,0 G, et dpkg-query -W systemd donne 257.13-1~deb13u1.
+   - P3, W8b du 09/11 : les notifications de ScanEnRetard depuis le 08/11 à 11:30 UTC sont encore dans le journal local, d'où « mêmes lignes » que Loki. Confiance haute si P1 tient. Pour les perdre, il faudrait écrire au moins la limite, environ 1,9 Go, en 23 h, soit environ 80 Mo/h. C'est cinq fois le rythme moyen de la fenêtre conservée (386,1 M sur 24,6 h, 15,7 M/h).
+
+## 6. Script du relevé statique (copie)
+    #!/usr/bin/env bash
+    # Revue statique du plafond de journald sur les VM (sc-stockage), sans lecture des VM.
+    set -euo pipefail
+    export LC_ALL=C
+    D=/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/3037736d-8910-46aa-8b19-a8862891a6fb/scratchpad/systemd-257
+    S=/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/3037736d-8910-46aa-8b19-a8862891a6fb/scratchpad/image-debian
+    IMG=$HOME/.cache/supply-chain-poc/08/telechargements/debian/debian-13-generic-amd64-20261026-2643.qcow2
+    M=${IMG%.qcow2}.json
+    ext() { echo "### $1, lignes $2 à $3"; sed -n "$2,$3p" "$D/$1" | nl -ba -v "$2" -w5 -s'  '; }
+    echo "# Revue statique du plafond de journald (brique 08c), commencée le $(date -u '+%d/%m/%Y à %H:%M:%S UTC')"
+    echo "# Menée sur « continue », sans validation du propriétaire. Rien lu ni écrit dans le cluster, Zot ou les VM."
+    echo "# Sources : dépôt (journaux archivés), image Debian en cache (lecture locale), source amont de systemd."
+    echo
+    echo "## 1. Version de systemd"
+    echo "manifeste de l'image : $(basename "$M"), contrôlé par SHA512SUMS : $(cd "$(dirname "$M")" && grep "$(basename "$M")" SHA512SUMS | sha512sum -c - 2>&1)"
+    jq -r '.items[0].data.packages[] | select(.name | test("^(systemd|cloud-init|cloud-initramfs-growroot|cloud-guest-utils)$")) | "  \(.name) \(.version)"' "$M"
+    echo "source lu : systemd amont, tag v257.13, fichiers bruts de raw.githubusercontent.com/systemd/systemd/v257.13/ ; correctifs Debian non lus"
+    for f in journal-file.c journald-server.c journald.c journal-vacuum.c; do
+      case $f in journal-file.c|journal-vacuum.c) p=src/libsystemd/sd-journal/$f ;; *) p=src/journal/$f ;; esac
+      echo "  $p  sha256 $(sha256sum "$D/$f" | cut -d' ' -f1)"
+    done
+    echo "version installée sur les VM : non relue (aucune lecture des VM ici)"
+    echo
+    echo "## 2. Extraits du source (numéros de ligne du fichier)"
+    ext journal-file.c 56 72
+    ext journal-file.c 4003 4080
+    ext journal-file.c 4242 4246
+    ext journal-file.c 4535 4547
+    ext journald-server.c 148 191
+    ext journald-server.c 376 392
+    ext journald-server.c 799 818
+    ext journald-server.c 981 991
+    ext journald-server.c 1428 1437
+    ext journald-server.c 2649 2669
+    ext journal-vacuum.c 177 186
+    ext journal-vacuum.c 291 317
+    echo "### appels de journal_reset_metrics et rechargement"
+    grep -n 'journal_reset_metrics' "$D"/journald-server.c "$D"/journald.c "$D"/journal-file.c | sed "s#$D/##"
+    echo "occurrences de reload, SIGHUP ou sighup dans journald-server.c et journald.c : $(cat "$D"/journald-server.c "$D"/journald.c | grep -ciE 'reload|sighup' || true)"
+    echo
+    echo "## 3. Racine de l'image, avant agrandissement (lecture locale de l'image en cache)"
+    qemu-img info --output=json "$IMG" | jq -r '"taille virtuelle : \(."virtual-size") octets"'
+    mkdir -p "$S"; cd "$S"
+    qemu-img dd -f qcow2 -O raw bs=512 count=34 if="$IMG" of=gpt.raw
+    python3 -I - gpt.raw <<'PY'
+    import struct,sys
+    d=open(sys.argv[1],'rb').read()
+    h=d[512:1024]; assert h[:8]==b'EFI PART'
+    lba,n,sz=struct.unpack('<QII',h[72:88])
+    for i in range(n):
+        e=d[lba*512+i*sz: lba*512+(i+1)*sz]
+        if e[:16]==b'\0'*16: continue
+        first,last=struct.unpack('<QQ',e[32:48])
+        print("partition %d : secteurs %d à %d, %d octets (%.3f GiB)" % (i+1, first, last, (last-first+1)*512, (last-first+1)*512/2**30))
+    PY
+    # qemu-img dd compte count depuis le début de l'image, skip compris
+    qemu-img dd -f qcow2 -O raw bs=512 skip=262146 count=262148 if="$IMG" of=sb.raw
+    python3 -I - sb.raw <<'PY'
+    import struct,sys
+    s=open(sys.argv[1],'rb').read()
+    assert struct.unpack('<H',s[56:58])[0]==0xEF53
+    blo,=struct.unpack('<I',s[4:8]); logbs,=struct.unpack('<I',s[24:28]); bhi,=struct.unpack('<I',s[0x150:0x154])
+    bs=1024<<logbs; n=blo|(bhi<<32)
+    print("ext4 de la partition 1 : %d blocs de %d octets, %d octets (%.3f GiB)" % (n, bs, n*bs, n*bs/2**30))
+    print("10 %% de cette taille : %.1f MiB ; un huitième de ces 10 %% : %.1f MiB (bornes hautes : f_blocks de statvfs exclut des métadonnées)" % (n*bs/10/2**20, n*bs/80/2**20))
+    PY
+    rm -f gpt.raw sb.raw
+    echo "cloud-init : $(grep -A2 '^growpart:' "$OLDPWD/poc/bricks/08-trust-plane/cloud-init/user-data.in" 2>/dev/null | tr '\n' ' ')"

@@ -1064,6 +1064,27 @@ La prédiction : firing jusqu'à environ 10 min après le dernier échec, puis f
 
 Limites lues dans le source, non observées : après un redémarrage d'Alloy, des Events peuvent être perdus ou doublés (position figée au démarrage) ; un arrêt plus long qu'une heure perd les Events expirés. Lire les Events dans Loki plutôt que par kubectl éviterait la TTL : possible, à décider avec le propriétaire. Détail : [revue-alloy-evenements.log](../19b-journalisation/resultats/revue-alloy-evenements.log).
 
+**Additif du 07/11/2026, 19:56 UTC : perte du journal local de `sc-stockage`, mécanisme probable lu dans le source de journald.** Revue statique menée sur « continue », sans validation du propriétaire. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM. Sources : les journaux archivés, l'image Debian en cache et systemd v257.13, la version de l'image.
+
+Selon le mécanisme le plus probable, la perte était **glissante sous le plafond du premier démarrage** (fenêtre d'environ 18 h), puis **arrêtée** au plus tard au redémarrage du 07/11 à 11:22 UTC (corrigé à 19:59 UTC, avant tout push : « ponctuelle, pas glissante » contredisait le mécanisme) :
+- journald fixe son plafond une fois, au démarrage du processus, à 10 % du système de fichiers ;
+- au premier démarrage des VM, la racine de l'image n'était pas encore agrandie (2,874 GiB) : plafond d'environ 290 Mo, d'où la suppression des archives antérieures au 06/11 à 17:03 UTC ;
+- le redémarrage du 07/11 à 11:22 UTC a levé ce plafond au plus tard, vers 10 % de 20 Go. Les 386,1 M occupés à 17:39 UTC dépassent ce que l'ancien plafond permettait (367,9 Mio au plus).
+
+C'est lu dans le source et compatible avec les archives, sans être observé. Restent non relus : la version installée, les correctifs Debian, et l'ordre de growpart et du transfert du journal.
+
+Prédictions écrites avant tout relevé :
+- relecture du 08/11 : la tête du journal reste au 06/11 à 17:03:02 UTC ;
+- W8b : « mêmes lignes », confiance haute si la tête ne bouge pas ;
+- la lecture qui tranche (message de démarrage de journald, `dpkg-query`) demande l'accord du propriétaire.
+
+Conséquences, sans action :
+- un rejeu sur des VM neuves reproduit le plafond d'environ 290 Mo jusqu'au premier redémarrage ;
+- depuis le 07/11, journald peut occuper jusqu'à environ 2,5 Go sur `sc-confiance`, sous réserve de garder 5 % de place libre, et non plus 282 Mo comme le supposait G7 de la 07a ;
+- fixer `SystemMaxUse` toucherait les VM, à décider avec le propriétaire.
+
+Détail : [revue-journald-stockage.log](resultats/revue-journald-stockage.log).
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.
