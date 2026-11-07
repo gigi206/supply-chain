@@ -1,0 +1,18 @@
+# contrôles hors étape de resolveurs_pod, référence 2026-11-07T16:00:55Z, 2026-11-07T16:01:20Z, lecture seule
+## rattrapage
+suspend=false, dernier passage 2026-11-07T16:01:00Z, dernier succès 2026-11-07T16:01:04Z
+rattrapage-29901121 créé 2026-11-07T16:01:00Z, planifié 2026-11-07T16:01:00Z
+premier passage depuis la référence : rattrapage-29901121 : PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+## image réelle
+enveloppes de builds/sample-app@sha256:3a7ca1b1… : 24
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f UID 474b3f60 Succeeded
+PipelineRuns créés depuis la référence : 0
+## alertes actives (Alertmanager de sc-stockage)
+actives : 0
+## bacs à sable des résolveurs sur sc-confiance
+{"pod":"tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh","id":"d6bb1d742ad8f","state":"SANDBOX_READY","createdAt":"2026-11-07T16:00:56Z","attempt":0}
+## pods et CiliumEndpoints des résolveurs
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh","created":"2026-11-07T16:00:56Z","node":"sc-confiance","restarts":0,"ip":"10.42.0.116"}
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh","created":"2026-11-07T16:00:56Z","identity":11808,"ip":"10.42.0.116"}
+## événements PolicyViolation depuis la référence
+0

@@ -1,0 +1,95 @@
+# preuves.sh resolveurs_pod, 2026-11-07T16:00:55Z
+## prédiction (écrite le 07/11/2026 à 15:49 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, V1 à V7)
+- avant : un pod, révision 1, cinq baux tenus par lui (transitions 1), pod du gabarit admis en dry-run au nom de replicaset-controller
+- un seul nouveau pod, même ReplicaSet, sur sc-confiance, créé par replicaset-controller (201 à l'audit), prêt en moins de 30 s,
+  0 redémarrage, même identité Cilium
+- cinq baux rendus à l'arrêt (ReleaseOnCancel), pris par le nouveau pod au plus 25 s après le démarrage de son conteneur, transitions 2
+- journal du nouveau pod : cinq prises de bail, 0 refus des droits ; témoin resolveurs : 0 KO
+OK   pods des résolveurs avant : 1
+OK   révision du déploiement : 1
+  controller.tektonresolverframework.bundleresolver.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:39.010059Z
+  controller.tektonresolverframework.cluster.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:51.670059Z
+  controller.tektonresolverframework.git.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:43.123543Z
+  controller.tektonresolverframework.http.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:40.122161Z
+  controller.tektonresolverframework.hub.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:35.336343Z
+OK   baux : détenteur et transitions : tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1
+OK   pod du gabarit admis en dry-run au nom de replicaset-controller : 1
+suppression demandée à 2026-11-07T16:00:56Z, ancien pod disparu à 2026-11-07T16:00:57Z
+nouveau pod tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh : créé 2026-11-07T16:00:56Z, conteneur démarré 2026-11-07T16:00:56Z, prêt 2026-11-07T16:00:57Z, IP 10.42.0.116
+OK   pods des résolveurs après : 1
+OK   ReplicaSet, nœud, redémarrages du nouveau pod : tekton-pipelines-remote-resolvers-56c4c4d957 sc-confiance 0
+OK   prêt 1 s après sa création
+  controller.tektonresolverframework.bundleresolver.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2 2026-11-07T16:00:57.096195Z
+  controller.tektonresolverframework.cluster.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2 2026-11-07T16:00:57.096251Z
+  controller.tektonresolverframework.git.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2 2026-11-07T16:00:57.096039Z
+  controller.tektonresolverframework.http.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2 2026-11-07T16:00:57.095827Z
+  controller.tektonresolverframework.hub.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2 2026-11-07T16:00:57.096116Z
+OK   baux : détenteur et transitions : tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh 2
+OK   cinq baux pris au plus 1 s après le démarrage du conteneur
+résolutions sans chef : dernière prise de bail 1 s après la suppression demandée (affiché, non contrôlé)
+CronJob rattrapage repris
+OK   révision du déploiement : 1
+OK   identité Cilium du nouveau pod : 11808
+OK   journal du nouveau pod : prises de bail, refus des droits : 5 0
+## audit : créations de pods dans tekton-pipelines-resolvers depuis 2026-11-07T16:00:56Z
+system:serviceaccount:kube-system:replicaset-controller 201
+OK   créations : system:serviceaccount:kube-system:replicaset-controller 201
+OK   événements PolicyViolation depuis 2026-11-07T16:00:56Z : 0
+OK   PipelineRuns créés depuis 2026-11-07T16:00:56Z : 0
+## témoin : étape resolveurs
+Prédiction (écrite le 02/11/2026 avant le premier passage ; décision du propriétaire du 02/11/2026 de borner les résolveurs) :
+- ClusterRole tekton-pipelines-resolvers-resolution-request-updates sans règle sur les Secrets ni les comptes de service
+  (ResolutionRequests et tâches gardées) ; Role et RoleBinding tekton-pipelines-resolvers-lecture dans builds : get seul
+- can-i du compte des résolveurs : list secrets tout le cluster no, get secrets builds yes, get secrets kube-system no, get
+  serviceaccounts builds yes, get serviceaccounts kube-system no, list resolutionrequests tout le cluster yes, get secrets
+  tekton-pipelines-resolvers yes (Role amont, résolveur git désactivé)
+- lectures réelles refusées par les droits au nom des résolveurs : k3s-serving de kube-system, zot-chains de tekton-chains,
+  Secrets d'openbao, comptes de service de kube-system
+- résolution réelle du bundle de la pipeline en service (sans cache) : dans builds, réussie avec le compte de service default
+  (get du compte de service) et avec le Secret zot-images sans compte de service (get du Secret) ; mêmes requêtes dans un
+  espace d'essai preuve-resolveurs : échouées, refus des droits sur le compte de service, puis sur le Secret ; espace supprimé
+- journal des résolveurs depuis le début de l'étape : refus des droits seulement dans preuve-resolveurs
+- audit de l'API : si la politique du nœud journalise les lectures des résolveurs (k3s installé avec la politique du
+  02/11/2026), au moins une lecture dans builds, aucune hors de builds sauf les refus (403) de preuve-resolveurs ; sinon aucune
+  entrée (k3s installé avant)
+- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026
+Prédiction ajoutée (06/11/2026, après le relevé à sec sous H1 à H5, non aveugle) : quatre lecteurs, cilium-operator retiré par
+  h5_cilium ; zot-chains absent depuis S1, son refus porte sur un objet absent ; lecture de signing-secrets refusée aussi
+Sous H1 à H5 : prédictions L1 à L8, écrites le 07/11/2026 (08c-durcissement/resultats/mesures-reelles-predictions.md)
+## droits
+OK   règles du ClusterRole des résolveurs sur secrets ou serviceaccounts : 0
+OK   Role builds/tekton-pipelines-resolvers-lecture : ["secrets,serviceaccounts:get"]
+OK   RoleBinding builds/tekton-pipelines-resolvers-lecture : Role/tekton-pipelines-resolvers-lecture tekton-pipelines-resolvers:tekton-pipelines-resolvers
+OK   can-i des résolveurs : no,yes,no,yes,no,yes,yes
+## lectures réelles au nom des résolveurs
+OK   lecture du Secret kube-system/rke2-serving : refusé (secrets "rke2-serving" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "kube-s)
+OK   lecture du Secret tekton-chains/zot-chains : refusé (secrets "zot-chains" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "tekton-c)
+OK   lecture du Secret tekton-chains/signing-secrets : refusé (secrets "signing-secrets" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in API group "" in the namespace "tek)
+OK   liste des Secrets d'openbao : refusé (secrets is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot list resource "secrets" in API group "" in the namespace "openbao" )
+OK   lecture du compte de service kube-system/default : refusé (serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "serviceaccounts" in API group "" in the namesp)
+## résolutions réelles (bundle de la pipeline en service, sans cache)
+paramètres : [{"name":"bundle","value":"sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e"},{"name":"name","value":"sample-app"},{"name":"kind","value":"pipeline"},{"name":"cache","value":"never"}]
+OK   builds : compte de service default : True
+OK   builds : Secret zot-images sans compte de service : True
+OK   preuve-resolveurs : compte de service default, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-compte": serviceaccounts "default" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "service
+OK   preuve-resolveurs : Secret zot-images sans compte de service, refus des droits : False 1
+  error getting "bundleresolver" "preuve-resolveurs/preuve-resolveurs-secret": secrets "zot-images" is forbidden: User "system:serviceaccount:tekton-pipelines-resolvers:tekton-pipelines-resolvers" cannot get resource "secrets" in 
+OK   espace preuve-resolveurs introuvable (NotFound) : 1
+## journal des résolveurs depuis 2026-11-07T16:00:58Z
+refus des droits : 2
+OK   refus des droits hors de preuve-resolveurs : 0
+## audit de l'API (lectures de Secrets et de comptes de service des résolveurs, depuis l'installation de k3s ; sans --as)
+règle des résolveurs dans la politique d'audit du nœud : 1
+      2   get secrets builds 200 ResponseComplete
+      2   get secrets preuve-resolveurs 403 ResponseComplete
+     16   get serviceaccounts builds 200 ResponseComplete
+      2   get serviceaccounts preuve-resolveurs 403 ResponseComplete
+OK   lectures dans builds (au moins une) : true
+OK   lectures hors de builds, sauf les refus (403) de preuve-resolveurs : 0
+## lecteurs des Secrets de tout le cluster
+  kube-system:generic-garbage-collector
+  kube-system:namespace-controller
+  kube-system:resourcequota-controller
+  tekton-pipelines:tekton-triggers-core-interceptors
+OK   lecteurs : kube-system:generic-garbage-collector,kube-system:namespace-controller,kube-system:resourcequota-controller,tekton-pipelines:tekton-triggers-core-interceptors

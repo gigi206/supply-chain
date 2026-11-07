@@ -1068,6 +1068,32 @@ Les sept prédictions sont tenues. L'attente de 10 s a suffi au cache de l'Event
 
 Toujours non couverts sous H1 à H5 : le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 07/11/2026, 16:01 UTC : nouveau pod des résolveurs passé sous H1 à H5 par `resolveurs_pod`, V1 à V7 tenues
+
+Passage lancé sur accord du propriétaire (« Oui, lance » à « Je lance resolveurs_pod avec ces effets, pire cas compris ? »), de 16:00:55 à 16:01:11 UTC, avec `JOURNAL=preuves-h5`. Étape, effets et prédictions committés avant, au commit `e6eb730` ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 15:49 UTC). Journal : [preuves-h5-resolveurs_pod.log](../08-trust-plane/resultats/preuves-h5-resolveurs_pod.log), 33 OK, 0 KO, code 0. Contrôles hors étape : [resolveurs-pod-hors-etape.log](resultats/resolveurs-pod-hors-etape.log), à 16:01:20 UTC, comparés au relevé d'avant ([resolveurs-pod-avant.log](resultats/resolveurs-pod-avant.log)).
+
+| Prédiction | Mesuré |
+|---|---|
+| V1, avant | Un pod, `…-xsv5n`. Révision 1. Cinq baux tenus par lui, transitions 1. Pod du gabarit admis en dry-run au nom de `replicaset-controller` |
+| V2, admission | Suppression demandée à 16:00:56 UTC, ancien pod disparu à 16:00:57 UTC. Un seul nouveau pod, `…-jgbqh`, du même ReplicaSet `…-56c4c4d957`, sur `sc-confiance`, créé à 16:00:56 UTC. À l'audit, une seule création, par `replicaset-controller`, en 201. 0 `PolicyViolation` |
+| V3, démarrage | Conteneur démarré à 16:00:56 UTC, prêt 1 s après la création, 0 redémarrage. Nouveau CiliumEndpoint, identité 11808 inchangée, IP `10.42.0.116` (`10.42.0.81` avant) |
+| V4, baux | Les cinq passent au nouveau pod, transitions 2. Pris de 16:00:57.0958 à 16:00:57.0963 UTC, au plus 1 s après le démarrage du conteneur et 1 s après la suppression demandée. La remise à l'arrêt (`ReleaseOnCancel`) est mesurée pour la première fois |
+| V5, journal | Cinq « Successfully acquired lease », 0 `is forbidden` avant le témoin |
+| V6, témoin | Étape `resolveurs` comme à 10:29 UTC, 0 KO. Les deux résolutions réussissent dans `builds`, les deux échouent dans `preuve-resolveurs` sur les droits. 2 refus au journal, tous dans `preuve-resolveurs`. Audit : 0 lecture hors de `builds`, refus de `preuve-resolveurs` exceptés. Quatre lecteurs des Secrets, liste inchangée |
+| V7, hors étape | 0 PipelineRun créé. Premier passage du rattrapage après la reprise (`rattrapage-29901121`, 16:01:00 UTC) arrêté à `PRESENT`. Image réelle inchangée, 24 enveloppes, `474b3f60`. 0 alerte. Sur `sc-confiance`, un seul bac à sable des résolveurs, neuf : ceux du 06/11 et de 11:23 UTC ont disparu |
+
+Les sept prédictions sont tenues.
+
+**Écart aux effets annoncés.** Aucun passage du rattrapage n'a été manqué. La suspension a duré quelques secondes, posée après 16:00:55 UTC (début de l'étape) et levée avant 16:00:58 UTC (début du témoin). Elle n'a franchi aucune minute pleine. Le passage annoncé « lancé à la reprise » n'a donc pas eu lieu : le suivant, à 16:01:00 UTC, est un passage ordinaire.
+
+**Ce que la mesure établit.** La passation dure environ 1 s quand l'ancien pod est arrêté proprement. Elle durait 62 à 78 s quand il mourait avec sa VM, comme à 11:23 UTC. Le trou de résolution d'un redéploiement est donc négligeable. Celui d'une panne de nœud ne l'est pas.
+
+**Effet à connaître.** Le pod des résolveurs est désormais `…-jgbqh`. Le déploiement reste à la révision 1 : `kubectl rollout undo` n'est pas concerné.
+
+**Effet sur la couverture.** Le démarrage d'un nouveau pod des résolveurs sort des non couverts.
+
+Toujours non couverts sous H1 à H5 : la jonction d'un nœud, le saut d'un passage manqué du scan (échéance : accord avant le 08/11 à 09:30 UTC) et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
