@@ -90,3 +90,35 @@ Le relevé du 06/11 n'avait présenté les objets de K3 et L4 que dans `bancc` e
 - Borne : `bench-release` (`Deny`, sans sélecteur d'espace) n'a pas refusé ce pod dans `bancc` ni dans `scan` ; sa portée exacte n'a pas été relue.
 
 Les étapes `controleurs` et `resolveurs` citent maintenant K1 à K7 et L1 à L8 dans leur journal.
+
+## Additif du 07/11/2026, 11:22 UTC : `enveloppes` et `decision3`, prédictions avant passage
+
+Accord du propriétaire : « Oui les 2 », pour le redémarrage des VM et pour ces deux étapes. Écrit pendant le redémarrage, avant tout passage de ces étapes sous H1 à H5. Elles passeront après le redémarrage et ses contrôles, l'une après l'autre, `enveloppes` d'abord, comme le 06/11.
+
+Commandes, depuis la racine du dépôt. `PIPE_ESSAI` ne sert qu'à lever la garde de `pr_gabarit` : le gabarit en service n'est pas touché, et chaque étape passe sa propre pipeline signée.
+
+```bash
+DISTRO=rke2 PIPE_ESSAI=<bundle de sample-app-essai, lu sur j6-porte-en-service> JOURNAL=preuves-h5 mise run confiance:preuves -- enveloppes </dev/null
+DISTRO=rke2 PIPE_ESSAI=<idem> JOURNAL=preuves-h5 mise run confiance:preuves -- decision3 </dev/null
+```
+
+Références : derniers passages le 06/11 à 15:13 et 15:14 UTC (`preuves-enveloppes.log`, `preuves-decision3.log`), avant H1, avant la bascule et avant S1. Le dernier PipelineRun créé par l'administrateur dans `builds` (test 7, 20:11 UTC) est antérieur à `h5_roles` et `h5_cilium`. `tekton-controleurs-builds` ne vise que les pods, PVC et StatefulSets des deux contrôleurs, pas un PipelineRun de l'administrateur.
+
+`enveloppes` :
+- E1 : aucun KO, code 0, moins de 3 min (27 s le 06/11).
+- E2 : départ sans anomalie.
+- E3 : témoins logiques comme le 06/11 : `ABSENTE` seule anomalie, puis `SUJET_NON_SIGNE` seule anomalie.
+- E4 : témoin réel signé par Chains, TaskRun `publier` et PipelineRun `COUVERTE`. Tag `.att` réécrit par `poc-ecriture` : TaskRun `ABSENTE`, puis PipelineRun `DOUBLE`, puis tag d'origine remis, les deux `COUVERTE`. **Premier passage sous H5 et S1 d'une signature de Chains hors de l'image réelle**, avec les identifiants injectés.
+- E5 : fin sans anomalie ; image réelle inchangée, 24 enveloppes, dernière provenance `474b3f60`.
+
+`decision3`, sur Zot (configuration modifiée puis remise, Zot redémarré deux fois) :
+- D1 : configuration en service identique à `stockage/zot.json`, sinon arrêt avant toute modification. Confiance moyenne : non relue depuis le 06/11.
+- D2 : témoin direct comme le 06/11 : tag neuf créé par `poc-build`, déplacement refusé en 403, `poc-ecriture` le déplace, `poc-build` le déplace de nouveau après remise.
+- D3 : un objet `signed=true`, l'autre `signed=failed` et `retries=3`, une seule enveloppe dans `.att`, au moins 5 PUT `.att` refusés. Signatures Transit : 2 + N si le PipelineRun échoue, 1 + 2N si c'est le TaskRun. Le 06/11 : PipelineRun en échec, N = 5, 7 signatures. L'ordre n'est pas prédit.
+- D4 : contrôle exécutions/enveloppes : l'objet en échec `SUJET_NON_SIGNE`, seule anomalie ; fin sans anomalie après purge ; configuration d'origine remise ; rattrapage et horodatage repris.
+- D5 : image réelle inchangée, 24 enveloppes. Moins de 3 min (45 s le 06/11), retries de Chains compris.
+
+Hors des étapes :
+- X2 : `KyvernoRefusAnormaux` ne se déclenche pas.
+
+Effets à connaître : de nouvelles images et tags `.att` sur `builds/essai-decision3`, `tekton/tasks` et `tekton/pipelines`, définitifs ; le témoin de `enveloppes` est purgé puis recréé ; les exécutions de `decision3` sont purgées à la fin. Zot est indisponible quelques secondes à chaque redémarrage, CronJobs suspendus pendant ce temps.
