@@ -1016,6 +1016,32 @@ Conséquences :
 
 Toujours non couverts sous H1 à H5 : l'étape `test5` complète, arrêtée par `gabarit_essai` (ses refus sont couverts par `test5_refus`), le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 07/11/2026, 14:55 UTC : `test5_refus` étendue passée sous H1 à H5, T1 à T9 tenues
+
+Passage lancé sur accord du propriétaire (« Oui » à « Je lance test5_refus étendue ? »), de 14:54:53 à 14:54:55 UTC, avec `JOURNAL=preuves-h5`. Extension choisie par le propriétaire (« B ») et prédictions committées avant, au commit `74c97e7` ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 14:43 UTC). Journal : [preuves-h5-test5_refus.log](../08-trust-plane/resultats/preuves-h5-test5_refus.log), 13 OK, 0 KO, code 0. Contrôles hors étape : [test5-refus-extension-hors-etape.log](resultats/test5-refus-extension-hors-etape.log).
+
+**Journal écrasé.** Le passage de 10:40 UTC, cité par l'additif de 10:41 UTC et par la relecture de 14:29 UTC sous le nom `preuves-h5-test5_refus.log`, est maintenant dans [preuves-h5-test5_refus-premier-passage.log](../08-trust-plane/resultats/preuves-h5-test5_refus-premier-passage.log), copié avant le passage.
+
+| Prédiction | Mesuré |
+|---|---|
+| T1 | Gabarit `sample-app` ; PipelineRun de la tête à `Succeeded`, UID `474b3f60` |
+| T2 | HTTP 202 aux 5 livraisons |
+| T3 | 1 refus `no X-Hub-Signature-256 header set`, 2 refus `payload signature check failed`, 3 au total |
+| T4 | Témoin accepté par les intercepteurs, écarté à la création avec `already exists`, même `eventID` |
+| T5 | 0 PipelineRun pour le commit `1111…` et pour le commit jamais livré ; UID de la tête inchangé |
+| T6 | Image réelle inchangée, 24 enveloppes, provenance `474b3f60` |
+| T7 | Rejeu à l'identique (même corps, même signature) : HTTP 202, accepté par les intercepteurs, écarté à la création sous son propre `eventID` ; 2 erreurs `already exists` au total |
+| T8 | 0 ligne « interceptor stopped trigger processing » au journal de l'EventListener |
+| T9 | Les 3 refus sont au journal du pod `…-6894848d5c-xh998`, seule réplique, 0 redémarrage ; témoin et rejeu atteignent la création. Au journal de l'EventListener, 4 lignes hors niveau `info`, toutes `already exists` (deux par livraison), 0 ligne `tls`, `x509` ou `certificate` |
+
+Les neuf prédictions sont tenues. Hors étape : 0 événement `PolicyViolation` depuis 14:54 UTC, 0 alerte active dans Alertmanager. Aucun fichier `autre.secret` ne reste sur disque.
+
+**Effet.** Le lien de l'EventListener vers les intercepteurs est mesuré après le redémarrage des VM et après l'étape `intercepteurs`. Le rejeu à l'identique et l'absence de la ligne de niveau debug sont mesurés sous H1 à H5.
+
+**`test5` complète.** Toutes ses assertions ont maintenant une mesure sous H1 à H5 : le tableau de la relecture de 14:29 UTC ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md)), plus ce passage. Une seule différence reste : la création par une livraison valide est mesurée avec une livraison de Forgejo (R4), pas avec une livraison signée par le script. Le secret et l'intercepteur sont les mêmes. L'étape elle-même reste arrêtée par `gabarit_essai`. La retirer des non couverts est une décision du propriétaire, non prise.
+
+Toujours non couverts sous H1 à H5 : l'étape `test5` complète (voir ci-dessus), le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
