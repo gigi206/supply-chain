@@ -1958,6 +1958,10 @@ etape_decision3() {
   echo "  contrôle exécutions/enveloppes : l'objet en échec SUJET_NON_SIGNE, seule anomalie"
   echo "contraire : les deux signed=true (update inutile) ; les deux failed (montage faux)"
   echo "fin : exécutions de la mesure purgées, aucune anomalie, configuration d'origine en service"
+  echo "observabilité (ajout du 07/11/2026, 18:03 UTC : constats du 06 et du 07/11, 08c-durcissement/resultats/chains-echec-signature.log) : ChainsEchecSignature (A2, critique) en firing,"
+  echo "  watcher_pipelinerun_signing_failures_total{error_type=storage} (ou taskrun) monte de N ; environ 10 min après le dernier refus,"
+  echo "  firing puis resolved au récepteur local ;"
+  echo "  si Prometheus ne collecte pas encore Chains (rejeu complet), l'alerte part à la première collecte (06/11 : 15:32 UTC) ; échec voulu, les compteurs de Chains n'ont pas d'étiquette d'exécution"
   garder avant
   mkdir -p "$T/auth/docker" "$T/auth/build" && chmod 700 "$T/auth"
   auth_zot "$T/auth/docker/config.json"

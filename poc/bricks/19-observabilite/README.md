@@ -355,3 +355,11 @@ O2 (sans `telecharger`) et O3 (`regles deployer`) ont été rejoués sur une pla
 `ScanEnRetard`, `ScanBientotRefuse` et `BaseGrypeVieillie` ajoutées à `alertes.yml`, avec leurs tests et l'incident `a7`. **Rien n'est déployé, `promtool` n'a pas été lancé.** Elles lisent `fraicheur-scan.prom`, servi par `fichiers-metriques` sans changer ni `fichiers.py` ni `prometheus.yml`. Protocole : [`g8-predictions.md`](../07a-sbom-grype/resultats/g8-predictions.md) de la 07a.
 
 **Additif du 05/11/2026, 10:58 UTC** : alertes de fraîcheur déployées, 14 règles, incident `a7` conforme. Journaux : [`g8-regles.log`](resultats/g8-regles.log), [`g8-deployer.log`](resultats/g8-deployer.log), [`g8-deployer-releve.log`](resultats/g8-deployer-releve.log), [`g8-a7.log`](resultats/g8-a7.log).
+
+**Additif du 07/11/2026, 18:04 UTC : A2 annoncée dans les étapes de la 08.** La limite « A2 ne peut pas être filtrée » est confirmée par deux épisodes, relevés dans [chains-echec-signature.log](../08c-durcissement/resultats/chains-echec-signature.log) de la 08c :
+- le 06/11, de 15:34 à 15:41 UTC, à la première collecte de Chains, sur les échecs voulus de J6, J7 et decision3 ;
+- le 07/11, de 11:37 à 11:46 UTC, sur decision3.
+
+Les étapes `preuves.sh decision3`, `politique.sh restreint` et `construction.sh construire` affichent désormais A2 dans leurs prédictions, sur accord du propriétaire. Le récepteur local a bien reçu les notifications du 06/11 (Loki), mais le journal local de `sc-stockage` les a perdues, par un mécanisme non établi.
+
+**Limite d'A2 lue dans le source de Chains v0.29.9** (18:07 UTC, non observée) : `recordError` ne compte que les échecs sur les artefacts TaskRun et PipelineRun. Un échec limité à la signature d'image (OCI) mène à `signed=failed` sans hausse d'aucun compteur. Il échappe donc à A2, et aussi à `ChainsMarqueSansSignature`, puisque l'objet n'est pas marqué signé. Le cas des quatre TaskRuns de l'étape `taches` de J6 (`signed=failed`, type d'échec inconnu) reste non déterminé. Détail dans l'additif de 18:04 UTC des prédictions de la 08c.

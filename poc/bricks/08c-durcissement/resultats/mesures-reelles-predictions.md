@@ -623,3 +623,22 @@ Ajouté sur accord du propriétaire (« Oui, prépare-le »), à sec. Rien n'a �
   - les 6 lignes du 06/11 (3 firing à 15:32:47, 3 resolved à 15:41:47) ne sont que dans Loki, et sortent en CONSTAT ;
   - second essai à 18:01 UTC, depuis le 07/11 à 11:00 UTC : « Loki et journal local : mêmes lignes », la branche que prédit le 09/11.
 - Prédiction ajoutée : le 09/11, Loki et le journal local auront les mêmes lignes de `ScanEnRetard`. Confiance moyenne. Aux relevés de 17:39 et 18:01 UTC, les archives du journal local commencent le 06/11 à 17:03 UTC. Un seul état ne dit pas si la perte est glissante ou ponctuelle : ce n'est pas établi. Corrigé à 18:01 UTC, avant tout push : la première rédaction disait « environ 24 h ». Si les firing du 08/11 manquent au journal local, le CONSTAT de nombre de W8b s'expliquera par Loki.
+
+## Additif du 07/11/2026, 18:04 UTC : A2 prédite dans les étapes decision3, restreint et construire
+
+`ChainsEchecSignature` (A2) est désormais annoncée dans les prédictions affichées par les trois étapes où ces échecs voulus ont été constatés le 06 et le 07/11, sur accord du propriétaire (« Oui, ajoute-la ») :
+- `preuves.sh decision3` : `storage`, une hausse par PUT `.att` refusé ;
+- `politique.sh restreint` (J6) : `payload_creation` sur `j6-sans-restriction-enforce` et `j6-sans-drapeau`, jamais lancés ;
+- `construction.sh construire` (J7) : `payload_creation` sur les PipelineRuns sans Kata et à étiquette, et sur leurs TaskRuns `construire`.
+
+La prédiction : firing jusqu'à environ 10 min après le dernier échec, puis firing et resolved au récepteur local. Dans un rejeu complet, si Prometheus ne collecte pas encore Chains, l'alerte part à la première collecte, comme le 06/11 à 15:32 UTC. La brique 19 annonçait déjà, dans son README, que chaque rejeu de la 08 déclencherait A2. Il manquait la prédiction dans les étapes elles-mêmes : c'est ce qui a manqué à X2 le 07/11. Seuls des `echo` sont ajoutés, aucun contrôle ne change. Rien n'a été lancé. Base : [chains-echec-signature.log](chains-echec-signature.log) de la 08c.
+
+**Cas non déterminé, et limite d'A2 (corrigé à 18:07 UTC, avant tout push, après relecture du conseiller).**
+- **Les quatre TaskRuns de l'étape `taches` de J6** : `j6-non-signee`, `j6-modifiee`, `j6-autre-cle` et `j6-hors-politique`, tous en `signed=failed` avec `retries=3`.
+  - Ils ont été créés de 13:47:48 à 13:48:18 UTC le 06/11. L'étape `chains` de J6 a ensuite redémarré le contrôleur (patch du déploiement, de 13:48:48 à 13:48:50 UTC), avant toute collecte.
+  - Loki n'a aucune ligne de l'ancien pod, donc le type de leur échec est inconnu.
+- **Ce que dit le source de Chains v0.29.9** (`pkg/chains/signing.go`, `recordError`) : seuls les échecs sur les artefacts TaskRun et PipelineRun font monter les compteurs. Un échec limité aux artefacts OCI (signature d'image) mène à `signed=failed` (`HandleRetry`, puis `MarkFailed`) sans hausse d'aucun compteur.
+- **Conséquences :**
+  - lancée seule, l'étape `taches` peut déclencher A2 ou non : ce n'est pas prédit ;
+  - dans un rejeu complet, le redémarrage de l'étape `chains` l'efface ;
+  - plus largement, d'après le source et sans l'avoir observé, A2 ne voit pas un échec de signature limité à l'image, et `ChainsMarqueSansSignature` non plus, puisque l'objet n'est pas marqué signé.

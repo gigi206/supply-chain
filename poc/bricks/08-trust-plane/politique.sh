@@ -605,6 +605,11 @@ etape_restreint() {
   pipe=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "bundle") | .value')
   conf=$REG/tekton/tasks/essai-confiance@$(SSL_CERT_FILE=$P/ca-poc.crt crane digest "$REG_HOTE/tekton/tasks/essai-confiance:essai")
 
+  echo "## prédiction ajoutée (ajout du 07/11/2026, 18:03 UTC : constats du 06 et du 07/11, 08c-durcissement/resultats/chains-echec-signature.log)"
+  echo "observabilité : j6-sans-restriction-enforce et j6-sans-drapeau, jamais lancés, font échouer Chains (payload_creation, « expected"
+  echo "  imageID to be separable by @ ») sur leurs PipelineRuns et TaskRuns : ChainsEchecSignature (A2, critique) en firing jusqu'à"
+  echo "  environ 10 min après le dernier échec, firing puis resolved au récepteur local ;"
+  echo "  si Prometheus ne collecte pas encore Chains (rejeu complet), l'alerte part à la première collecte (06/11 : 15:32 UTC) ; échec voulu, compteurs sans étiquette d'exécution"
   echo "## état de départ"
   kubectl get namespace builds -o json | jq -r '"labels de builds : \(.metadata.labels | to_entries | map(select(.key | startswith("pod-security"))) | map("\(.key)=\(.value)") | join(", ") | if . == "" then "aucun label pod-security (niveau privileged par défaut)" else . end)"'
   echo "set-security-context : $(kubectl get configmap feature-flags -n tekton-pipelines -o jsonpath='{.data.set-security-context}')"

@@ -1039,6 +1039,23 @@ Détail dans [resultats/mesures-reelles-predictions.md](resultats/mesures-reelle
 
 **Additif du 07/11/2026, 17:59 UTC : W8 lit aussi le récepteur dans Loki.** Sur accord du propriétaire (« Oui, prépare-le »), `scan-saut-resolution.sh` compare les notifications de `ScanEnRetard` du journal local de `sc-stockage` à celles de Loki, lues par l'auditeur à travers Grafana. Les OK et KO prédits sont inchangés, et un écart entre les deux sources est un CONSTAT. Essai à sec sur `ChainsEchecSignature` : les lignes du 06/11 perdues localement sont retrouvées dans Loki ([resultats/scan-saut-w8-loki-sec.log](resultats/scan-saut-w8-loki-sec.log)).
 
+**Additif du 07/11/2026, 18:04 UTC : A2 prédite dans les étapes qui font échouer Chains.** `ChainsEchecSignature` (A2) est désormais annoncée dans les prédictions affichées par les trois étapes où ces échecs voulus ont été constatés le 06 et le 07/11, sur accord du propriétaire (« Oui, ajoute-la ») :
+- `preuves.sh decision3` : `storage`, une hausse par PUT `.att` refusé ;
+- `politique.sh restreint` (J6) : `payload_creation` sur `j6-sans-restriction-enforce` et `j6-sans-drapeau`, jamais lancés ;
+- `construction.sh construire` (J7) : `payload_creation` sur les PipelineRuns sans Kata et à étiquette, et sur leurs TaskRuns `construire`.
+
+La prédiction : firing jusqu'à environ 10 min après le dernier échec, puis firing et resolved au récepteur local. Dans un rejeu complet, si Prometheus ne collecte pas encore Chains, l'alerte part à la première collecte, comme le 06/11 à 15:32 UTC. La brique 19 annonçait déjà, dans son README, que chaque rejeu de la 08 déclencherait A2. Il manquait la prédiction dans les étapes elles-mêmes : c'est ce qui a manqué à X2 le 07/11. Seuls des `echo` sont ajoutés, aucun contrôle ne change. Rien n'a été lancé. Base : [chains-echec-signature.log](resultats/chains-echec-signature.log) de la 08c.
+
+**Cas non déterminé, et limite d'A2 (corrigé à 18:07 UTC, avant tout push, après relecture du conseiller).**
+- **Les quatre TaskRuns de l'étape `taches` de J6** : `j6-non-signee`, `j6-modifiee`, `j6-autre-cle` et `j6-hors-politique`, tous en `signed=failed` avec `retries=3`.
+  - Ils ont été créés de 13:47:48 à 13:48:18 UTC le 06/11. L'étape `chains` de J6 a ensuite redémarré le contrôleur (patch du déploiement, de 13:48:48 à 13:48:50 UTC), avant toute collecte.
+  - Loki n'a aucune ligne de l'ancien pod, donc le type de leur échec est inconnu.
+- **Ce que dit le source de Chains v0.29.9** (`pkg/chains/signing.go`, `recordError`) : seuls les échecs sur les artefacts TaskRun et PipelineRun font monter les compteurs. Un échec limité aux artefacts OCI (signature d'image) mène à `signed=failed` (`HandleRetry`, puis `MarkFailed`) sans hausse d'aucun compteur.
+- **Conséquences :**
+  - lancée seule, l'étape `taches` peut déclencher A2 ou non : ce n'est pas prédit ;
+  - dans un rejeu complet, le redémarrage de l'étape `chains` l'efface ;
+  - plus largement, d'après le source et sans l'avoir observé, A2 ne voit pas un échec de signature limité à l'image, et `ChainsMarqueSansSignature` non plus, puisque l'objet n'est pas marqué signé.
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.

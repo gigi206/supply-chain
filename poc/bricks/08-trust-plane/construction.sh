@@ -339,6 +339,10 @@ etape_construire() {
   echo "  (Forgejo injoignable : résolution refusée), publier jamais lancé, aucune écriture de poc-images"
   echo "même PipelineRun sans runtimeClassName : preparer réussi, construire refusé à la création du pod (Pod Security restricted :"
   echo "  privileged), publier jamais lancé, aucune écriture de poc-images"
+  echo "observabilité (ajout du 07/11/2026, 18:03 UTC : constats du 06 et du 07/11, 08c-durcissement/resultats/chains-echec-signature.log) : les PipelineRuns sans Kata et à étiquette"
+  echo "  (annulé), et leurs TaskRuns construire, font échouer Chains (payload_creation) : ChainsEchecSignature (A2, critique) en firing"
+  echo "  jusqu'à environ 10 min après le dernier échec, firing puis resolved au récepteur local ;"
+  echo "  si Prometheus ne collecte pas encore Chains (rejeu complet), l'alerte part à la première collecte (06/11 : 15:32 UTC) ; échec voulu, compteurs sans étiquette d'exécution"
   echo "## politique"
   politique_sans_sortie
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
