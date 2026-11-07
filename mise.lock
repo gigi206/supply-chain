@@ -109,15 +109,15 @@ url = "https://github.com/oras-project/oras/releases/download/v1.3.6/oras_1.3.6_
 url_api = "https://api.github.com/repos/oras-project/oras/releases/assets/673056256"
 
 [[tools."aqua:project-zot/zot"]]
-version = "2.1.22"
+version = "2.1.23"
 backend = "aqua:project-zot/zot"
-specifiers = ["2.1.22"]
+specifiers = ["2.1.23"]
 
 [tools."aqua:project-zot/zot"."platforms.linux-x64"]
-checksum = "sha256:33b9b5bfe05d6788c076de951a01920477dbd6395c330146e23cc2340073e52e"
+checksum = "sha256:1f6bab0b9eee426d0785de701ff510df5c02bdb8d7287494a582634abfc5d638"
 checksum_source = "mise-versions"
-url = "https://github.com/project-zot/zot/releases/download/v2.1.22/zot-linux-amd64"
-url_api = "https://api.github.com/repos/project-zot/zot/releases/assets/616098185"
+url = "https://github.com/project-zot/zot/releases/download/v2.1.23/zot-linux-amd64"
+url_api = "https://api.github.com/repos/project-zot/zot/releases/assets/700158032"
 
 [[tools."aqua:rootless-containers/rootlesskit"]]
 version = "2.3.5"
