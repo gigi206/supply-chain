@@ -420,3 +420,13 @@ KyvernoRefusAnormaux (Prometheus de sc-stockage) :
   ALERTS sur 15 min : []
   refus Kyverno à l admission sur 15 min : ["1.0344839476826984"]
 fin du complément
+
+## Complément du 07/11/2026 à 11:39:28 UTC, passage d'horodatage en échec, lecture seule
+horodatage-29900844 (11:24:04Z) : identifiants, connexion à OpenBao refusée (connection refused), horodater jamais démarré
+dernier passage, horodatage-29900859, lignes autres que DEJA_HORODATEE :
+  JOINT|Zot et TSA, essai 1
+  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
+  REFUSEE|builds/essai-j6-autre-cle|1|signature 8c14908776d3f50f|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+  REFUSEE|builds/essai-j6-autre-sujet|1|signature ea3127a04a620174|failed to verify signature: provided artifact digest does not match any digest in statement
+  FIN|14 image(s), 79 enveloppe(s) : 0 horodatée(s), 77 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
+fin du complément

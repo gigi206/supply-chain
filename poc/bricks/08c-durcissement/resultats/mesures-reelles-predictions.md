@@ -122,3 +122,7 @@ Hors des étapes :
 - X2 : `KyvernoRefusAnormaux` ne se déclenche pas.
 
 Effets à connaître : de nouvelles images et tags `.att` sur `builds/essai-decision3`, `tekton/tasks` et `tekton/pipelines`, définitifs ; le témoin de `enveloppes` est purgé puis recréé ; les exécutions de `decision3` sont purgées à la fin. Zot est indisponible quelques secondes à chaque redémarrage, CronJobs suspendus pendant ce temps.
+
+## Correction du 07/11/2026, 11:38 UTC : E4
+
+E4 annonçait « premier passage sous H5 et S1 d'une signature de Chains hors de l'image réelle ». C'est faux : le 06/11 à 20:11 UTC, après S1 (appliqué à 18:40 UTC) et sous les limites et `Deny` de H5, le test 7 a fait signer `preuve-test7-en-service` par Chains sur `builds/essai-webhook` ([preuves-h5-test7.log](../../08-trust-plane/resultats/preuves-h5-test7.log), « Chains : signé=true »). La nouveauté se limite à un passage postérieur à `h5_roles` (20:36 UTC) et à `h5_cilium`. Le reste de E4, ce qui était attendu du témoin, n'est pas touché, et le résultat mesuré reste tenu.

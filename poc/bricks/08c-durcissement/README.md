@@ -878,6 +878,8 @@ Les cinq prédictions sont tenues, V1 et V5 comprises, qui étaient de confiance
 
 **Non prédit, relevé en complément.** Le passage `horodatage-29900844`, créé à 11:24:04 UTC avant le descellement, échoue : son conteneur `identifiants` sort en erreur à 11:24:37, OpenBao étant encore scellé. Les passages suivants réussissent. Je n'ai pas vérifié s'il avait des enveloppes à traiter. Seuls refus de l'audit depuis le démarrage : 13 `get pods` de `system:node:sc-build` en 403, sur les pods de mesure de `kata.sh` dans `builds`. C'est la même forme que les 403 de nœud déjà relevés à R4 sur `helper-pod`, et la cause exacte n'est toujours pas établie. Aucun 422, aucun refus de `ValidatingAdmissionPolicy`. `KyvernoRefusAnormaux` reste inactive. Prometheus compte 1 refus Kyverno sur 15 min, que j'attribue à la sonde du script sans l'avoir apparié.
 
+**Complément du 07/11/2026, 11:39 UTC.** Vérifié depuis dans [redemarrage-vm.log](../08-trust-plane/resultats/redemarrage-vm.log) : le passage en échec s'est arrêté à la connexion à OpenBao, `horodater` n'a jamais démarré. Le dernier passage relu, `horodatage-29900859`, compte 79 enveloppes : 0 à horodater, 77 déjà horodatées, et les 2 refus et l'anomalie des témoins de J6 (`essai-j6-autre-cle`, `essai-j6-autre-sujet`, `essai-j6-att-illisible`). Aucune enveloppe n'est restée sans horodatage, celles de `enveloppes` et `decision3` comprises.
+
 **Pod des résolveurs.** Il n'a pas été recréé : même pod, créé le 06/11 à 13:38 UTC, conteneur relancé à 11:23:33 UTC (1 redémarrage). Le démarrage réel d'un nouveau pod des résolveurs reste non mesuré. La jonction d'un nouveau nœud aussi.
 
 ## Additif du 07/11/2026, 11:36 UTC : étapes `enveloppes` et `decision3` passées sous H1 à H5, E1 à E5, D1 à D5 et X2 tenues
