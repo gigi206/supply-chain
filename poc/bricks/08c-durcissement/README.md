@@ -904,6 +904,49 @@ Les onze prédictions sont tenues. C'est le premier passage de ces deux étapes 
 
 Toujours non couverts sous H1 à H5 : `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan`, le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud et le saut d'un passage manqué du scan.
 
+## Additif du 07/11/2026, 12:35 UTC : étapes de la porte passées sous H1 à H5, sauf `attseule` en attente de confirmation
+
+Passages lancés sur accord du propriétaire (« Les 5 »), avec `JOURNAL=preuves-h5`, sans `PIPE_ESSAI`. Prédictions committées avant, au commit 3478505. Elles corrigent le tableau soumis au propriétaire : `attseule` écrit un témoin permanent dans `essais-j8/test7`, et attend donc une confirmation. Elle n'a pas été passée.
+
+Journaux :
+- [preuves-h5-controle6.log](../08-trust-plane/resultats/preuves-h5-controle6.log), 12:30:38 à 12:31:04 UTC, 9 OK, 0 KO ;
+- [preuves-h5-controle7.log](../08-trust-plane/resultats/preuves-h5-controle7.log), 12:31:04 à 12:31:31 UTC, 12 OK, 0 KO ;
+- [preuves-h5-reglec.log](../08-trust-plane/resultats/preuves-h5-reglec.log), 12:31:31 à 12:32:40 UTC, 6 OK, 0 KO ;
+- [preuves-h5-temoins_scan.log](../08-trust-plane/resultats/preuves-h5-temoins_scan.log), 12:32:53 à 12:34:40 UTC, 16 OK, 1 KO prédit, code 1 ;
+- relevé [resultats/mesures-reelles-x3.log](resultats/mesures-reelles-x3.log).
+
+| Prédiction | Mesuré |
+|---|---|
+| C6-1 | ConfigMap `porte` réappliquée, identique aux fichiers versionnés, clé de VSA `578dd771…` |
+| C6-2 | C1 `true\|\|trusted_task.tagged`, contrôle 9 `ok` (24/24, 61 bundles), contrôle 6 `ok\|1/1` |
+| C6-3 | C2 en refus, `0/0 VSA` ; C3 : ec et contrôle 9 inchangés, contrôle 6 en refus pour le seuil de signatures |
+| C6-4 | 0 KO, 26 s |
+| C7-1 | ConfigMap identique, clé du scanner `1656a3fa…` |
+| C7-2 | C1 admise, contrôle 7 `ok\|4 énoncé(s)`, Job réussi ; C2 en refus par `scan.scan_present`, Job en échec ; C3 en refus pour le seuil de signatures |
+| C7-3 | 0 KO, code 0, 27 s |
+| R1 | Provenance `474b3f60` reprise (48 818 octets) ; trois témoins neufs, vérifiés avec la clé jetable et refusés avec celle de Chains |
+| R2 | Image réelle sans source : `source_code_reference_provided` seule, `porte.construction_kata` parmi les succès |
+| R3 | `intacte` : R2 plus `subject_build_task_matches` et `porte.fermeture_plateforme` ; `sans-kata` et `runc` : `intacte` plus `porte.construction_kata` seule. Mêmes motifs que le 06/11, mais le TaskRun nommé est maintenant `sample-app-6391fd43…-construire` (provenance du rattrapage) et non plus `j7-sample-app-construire` |
+| R4 | Ligne CONSTAT du succès à vide |
+| R5 | 0 KO, code 0, 69 s ; image réelle inchangée (24 enveloppes, `474b3f60`) ; 15 tags dans `essais-j8/regle-c` |
+| T1 | 14 cas sur 15 comme `g6-temoins.tsv` |
+| T2 | `futur` admis, 1 énoncé ; le script compte 1 écart et sort en code 1, comme prédit |
+| T3 | `g6-reelle` à `true\|\|ok\|ok\|ok`, `porte-temoin` retirée, 107 s |
+| X3 | `KyvernoRefusAnormaux` inactive dans Prometheus et absente d'Alertmanager ; aucune série `ALERTS` ni refus Kyverno sur 10 min ; configuration de Zot `5806ba5c…` identique au dépôt ; `suspend=false` pour les trois CronJobs ; aucun PipelineRun en cours ; `porte-temoin` absente |
+
+15 prédictions sur 16 sont tenues. R3 l'est sur les violations, mais pas sur le libellé du motif : la prédiction disait « mêmes motifs que le 06/11 » sans tenir compte du TaskRun nommé, qui suit la provenance reprise en R1. C'est le premier passage de ces quatre étapes après H1 à H5. Les Jobs de la porte, la ConfigMap `porte-temoin` et les écritures de `poc-ecriture` dans Zot sont admis. Leurs verdicts (succès, violations, contrôles 6, 7 et 9) sont ceux du 06/11, avant H1.
+
+Constats :
+- Les durées tombent à 26 à 107 s, contre 3 à 10 min le 06/11. Le champ 6 de `VERDICT`, durée du conteneur `ec` (`politique.sh:1325`), passe de 61 s (31 s sans source) à 1 ou 2 s : c'est lui qui fait l'écart. La cause de cette baisse n'a pas été relue.
+- `chrono.tsv` n'a pas de ligne « `temoins_scan` fait » : `lancer` s'arrête sur le code 1, comme prédit.
+- `etape_controle6` ne finit pas par `[ "$ko" = 0 ]` : un écart n'y changerait pas le code de sortie. Ses KO se comptent dans le journal. Le script n'est pas modifié.
+
+Bornes :
+- La branche « scan daté du futur » de `scan.rego` n'est plus couverte par les témoins de G6. Le témoin `futur` du 06/11 est daté une heure après sa pose : depuis, il est devenu un scan récent. La couvrir de nouveau demande `plateforme.sh g6_temoins`, qui écrit dans Zot et réécrit `g6-temoins.tsv` et `g6-temoin-cle-publique.pem` ; il faut l'accord du propriétaire.
+- X3 est relevé 8 s après la fin : un refus des toutes dernières secondes pourrait ne pas encore être collecté. Le compteur présente 21 séries (17 à X2).
+
+Toujours non couverts sous H1 à H5 : `attseule` (en attente de confirmation), le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud et le saut d'un passage manqué du scan.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

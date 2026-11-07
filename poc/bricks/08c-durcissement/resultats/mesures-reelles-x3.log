@@ -1,0 +1,19 @@
+# X3, relevé du 07/11/2026 à 12:34:48 UTC, lecture seule de Prometheus, d'Alertmanager, de Zot et du cluster
+fenêtre des étapes : 12:30:38 à 12:34:40 UTC (controle6, controle7, reglec puis temoins_scan) ; requêtes sur les 10 dernières minutes
+## état actuel de KyvernoRefusAnormaux
+prometheus : inactive
+alertmanager : absente
+## ALERTS{alertname="KyvernoRefusAnormaux"} sur 10 min (pending ou firing)
+[]
+## refus Kyverno à l'admission sur 10 min (somme des hausses du compteur)
+["0"]
+## séries du compteur présentes
+["21"]
+## après les étapes
+configuration de Zot en service : 5806ba5c431d3e29… ; dépôt : 5806ba5c431d3e29…
+declencheurs/rattrapage : suspend=false
+horodatage/horodatage : suspend=false
+scan/scan-sample-app : suspend=false
+PipelineRuns non terminés : 0
+ConfigMap porte-temoin : absente
+fin du relevé

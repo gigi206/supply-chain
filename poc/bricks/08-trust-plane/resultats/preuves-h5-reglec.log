@@ -1,0 +1,38 @@
+# preuves.sh reglec, 2026-11-07T12:31:31Z
+## prédiction
+porte (Job de l'espace porte, policy.yaml) : image réelle builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 jugée avec la clé de Chains, verdict de référence V ;
+  porte.construction_kata parmi ses succès (TaskRun construire à runtimeClassName kata dans la spec signée)
+images témoins (essais-j8/regle-c), clé jetable, provenance réelle au sujet réécrit, ConfigMap porte-temoin :
+  intacte : violations de V plus slsa_build_scripted_build.subject_build_task_matches (le digest du témoin n'est pas
+  celui que donne le résultat de la tâche de build, constaté au premier passage), porte.construction_kata parmi les succès ;
+  sans-kata (runtimeClassName retiré du seul TaskRun en contenu, taskRunSpecs gardés à kata) et runc : violations
+  d'intacte plus porte.construction_kata, et rien d'autre (même clé, même structure : seule la règle diffère)
+  depuis D6 (brique 03 ; prédiction du 03/11/2026, déduite de porte.rego, non mesurée) : les trois témoins portent aussi
+  porte.fermeture_plateforme (provenance de la fermeture signée par Chains, vérifiée avec la clé jetable de porte-temoin)
+OK   ConfigMap porte : porte.rego identique au fichier versionné
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+provenance réelle reprise : PipelineRun 474b3f60-bb72-4a62-953b-a2d505165d7c, 48818 octets
+## images témoins
+intacte : essais-j8/regle-c@sha256:b4741bb39b56c47ee3647889a1045549fe319e635b1806164ed87436c4525af5 ; runtimeClassName du TaskRun construire signé : kata ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+sans-kata : essais-j8/regle-c@sha256:1a6dfd67e731795d1c6aeee6f306ba1055ff48fa12c08fcc6e5431b971cd8793 ; runtimeClassName du TaskRun construire signé : absent ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+runc : essais-j8/regle-c@sha256:daff4252bf68a3996114e2f5fab40e7a0b3c51fddfb58d1a8a58e6a1a2565c86 ; runtimeClassName du TaskRun construire signé : runc ; taskRunSpecs : kata
+  sur l'hôte, clé jetable : signature vérifiée, attestation vérifiée ; clé de Chains : refusée
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle de Chains
+## verdicts de la porte
+  VERDICT|reglec-reel|false|slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|1|ok|24/24 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|4 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   réelle : porte.construction_kata parmi les succès
+  VERDICT|reglec-intacte|false|porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/regle-c@sha256:b4741bb39b56c47ee3647889a1045549fe319e635b1806164ed87436c4525af5
+OK   intacte : violations de l'image réelle plus subject_build_task_matches, porte.construction_kata parmi les succès
+  VERDICT|reglec-sans-kata|false|porte.construction_kata,porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/regle-c@sha256:1a6dfd67e731795d1c6aeee6f306ba1055ff48fa12c08fcc6e5431b971cd8793
+OK   sans-kata : refusée, violations d'intacte plus porte.construction_kata seule
+  motif sans-kata : TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire de construire-image : runtimeClassName "" dans la spec signée, kata exigé
+  VERDICT|reglec-runc|false|porte.construction_kata,porte.fermeture_plateforme,slsa_build_scripted_build.subject_build_task_matches,slsa_source_correlated.source_code_reference_provided|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/regle-c|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/regle-c@sha256:daff4252bf68a3996114e2f5fab40e7a0b3c51fddfb58d1a8a58e6a1a2565c86
+OK   runc : refusée, violations d'intacte plus porte.construction_kata seule
+  motif runc : TaskRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f-construire de construire-image : runtimeClassName "runc" dans la spec signée, kata exigé
+## succès à vide : image de la tâche en service (builds/essai-webhook, pipeline sans construire-image)
+  VERDICT|reglec-en-service|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|2|ok|36/36 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+CONSTAT  en-service : porte.construction_kata comptée parmi les succès sans aucun TaskRun de construire-image (succès à vide, comme trusted_task.trusted en J6)
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)

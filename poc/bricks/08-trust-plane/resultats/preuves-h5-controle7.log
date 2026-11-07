@@ -1,0 +1,31 @@
+# preuves.sh controle7, 2026-11-07T12:31:04Z
+## ConfigMap porte : contrôle 7 ajouté (scan-verifier.sh, scan.rego, policy-scan.yaml, clé publique du scanner)
+clé du scanner : 1656a3fa3868d9f4fecc99231b204b1f4b2d47efd0a3b0cfbfe371a61b05c802 (empreinte DER ; depuis le rejeu RKE2, 1f66a3c : 1656a3fa… ; G3 du 05/11 : 8cbcbb4e…)
+OK   ConfigMap porte : scan-verifier.sh, scan.rego, policy-scan.yaml et scanner.pub identiques aux fichiers versionnés
+referrers de l'image : builds/sample-app 0 ; builds/scan/sample-app 4 ; builds/vsa/sample-app 1
+## C1 image réelle, source attendue : admise, contrôles 6 et 9 inchangés
+VERDICT|c7-reelle|true||trusted_task.tagged|2|ok|24/24 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|4 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+    LU|énoncé 88c575313d5f1afc|2026-11-06T15:38:55.193068299Z
+    LU|énoncé 03d474aa816b383a|2026-11-06T15:40:50.276057555Z
+    LU|énoncé 61bb99289c7e2164|2026-11-06T21:30:44.048057925Z
+    LU|énoncé 7387c025c74a881a|2026-11-07T09:31:43.971442246Z
+    LECTURE|4|sc-stockage.poc.test:5000/builds/scan/sample-app|
+OK   C1 ec (success, violations, avertissements) : true||trusted_task.tagged
+OK   C1 contrôle 9 : ok
+OK   C1 contrôle 6 : ok
+OK   C1 contrôle 7 : ok|4 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   C1 Job : 1
+## C2 même digest, autre dépôt (builds/essai-webhook), sans source : aucun scan dans builds/scan/essai-webhook
+VERDICT|c7-sans-scan|false|slsa_source_correlated.attested_source_code_reference,slsa_source_correlated.source_code_reference_provided,slsa_source_version_controlled.materials_format_okay|trusted_task.tagged|1|ok|36/36 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/essai-webhook ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-webhook ; cosign : no matching attestations: 
+    LECTURE|0|sc-stockage.poc.test:5000/builds/scan/essai-webhook|cosign : no matching attestations: 
+OK   C2 contrôle 7 : refus
+OK   C2 règle : scan.scan_present
+OK   C2 Job : 1
+## C3 image réelle, ConfigMap porte-temoin : clé publique de Chains à la place de celle du scanner
+VERDICT|c7-cle-chains|true||trusted_task.tagged|1|ok|24/24 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+ConfigMap porte-temoin retirée
+    LECTURE|0|sc-stockage.poc.test:5000/builds/scan/sample-app|cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   C3 ec et contrôles 9 et 6 inchangés : true||trusted_task.tagged|ok|ok
+OK   C3 contrôle 7 : refus
+OK   C3 motif : signature refusée
+## bilan : 0 écart(s) aux prédictions

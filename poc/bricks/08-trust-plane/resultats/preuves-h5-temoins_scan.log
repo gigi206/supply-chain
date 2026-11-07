@@ -1,0 +1,37 @@
+# preuves.sh temoins_scan, 2026-11-07T12:32:53Z
+ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle du scanner
+VERDICT|g6-propre|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   propre (porte-temoin) : ok, 1 énoncé(s)
+VERDICT|g6-cle-etrangere|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
+OK   cle-etrangere (porte) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-absent|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: 
+OK   absent (porte-temoin) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-kev|false|refus|scan.kev_without_vex ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   kev (porte-temoin) : refus, scan.kev_without_vex, 1 énoncé(s)
+VERDICT|g6-mal|false|refus|scan.malicious ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   mal (porte-temoin) : refus, scan.malicious, 1 énoncé(s)
+VERDICT|g6-vex-expire|false|refus|scan.kev_without_vex ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vex-expire (porte-temoin) : refus, scan.kev_without_vex, 1 énoncé(s)
+VERDICT|g6-vex-valide|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vex-valide (porte-temoin) : ok, 1 énoncé(s)
+VERDICT|g6-vieux|false|refus|scan.scan_recent ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   vieux (porte-temoin) : refus, scan.scan_recent, 1 énoncé(s)
+VERDICT|g6-futur|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+KO   futur (porte-temoin) : prédit refus, scan.scan_recent, 1 énoncé(s) ; obtenu 1 énoncé(s)
+VERDICT|g6-base-vieille|false|refus|scan.base_recente ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   base-vieille (porte-temoin) : refus, scan.base_recente, 1 énoncé(s)
+VERDICT|g6-incomplet|false|refus|scan.forme ; 1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   incomplet (porte-temoin) : refus, scan.forme, 1 énoncé(s)
+VERDICT|g6-autre-digest|false|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan ; cosign : no matching attestations: failed to verify signature: provided artifact digest does not match any digest in statement
+OK   autre-digest (porte-temoin) : refus, scan.scan_present, 0 énoncé(s)
+VERDICT|g6-recent-propre|false|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   recent-propre (porte-temoin) : ok, 2 énoncé(s)
+VERDICT|g6-recent-kev|false|refus|scan.kev_without_vex ; 2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   recent-kev (porte-temoin) : refus, scan.kev_without_vex, 2 énoncé(s)
+VERDICT|g6-illisible|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
+OK   illisible (porte-temoin) : ok, 1 énoncé(s)
+ConfigMap porte-temoin retirée
+## témoin : image réelle, ConfigMap porte
+VERDICT|g6-reelle|true||trusted_task.tagged|2|ok|24/24 enveloppe(s) couverte(s), 61 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|4 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   image réelle admise par les trois contrôles
+## bilan : 1 écart(s) aux prédictions
