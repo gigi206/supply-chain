@@ -1,0 +1,18 @@
+# preuves.sh scan_saut_suspendre, 2026-11-07T16:21:58Z
+## prédiction (écrite le 07/11/2026 à 16:13 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, W1 à W8)
+- avant : planning 30 9 * * *, échéance 3600 s, non suspendu, aucun passage actif ; suspension admise en dry-run ; ScanEnRetard inactive
+- suspension admise (200 au nom de system:admin à l'audit), 0 PolicyViolation ; aucun Job ni événement jusqu'à la reprise
+OK   CronJob du scan : planning, échéance, suspendu, passages actifs : 30 9 * * *|3600|false|0
+dernier passage : 2026-11-07T09:30:00Z
+OK   suspension admise en dry-run serveur : true
+OK   ScanEnRetard : inactive
+suspension demandée à 2026-11-07T16:21:58Z
+OK   CronJob du scan : planning, échéance, suspendu, passages actifs : 30 9 * * *|3600|true|0
+  audit : 2026-11-07T16:21:58.688493Z system:admin 200
+OK   suspension à l'audit (utilisateur, code) : system:admin 200
+OK   événements PolicyViolation depuis 2026-11-07T16:21:58Z : 0
+passage sauté prévu : 2026-11-08T09:30:00Z ; reprise par scan_saut_reprendre après 2026-11-08T10:31:00Z
+dernier referrer du scan : 2026-11-07T09:31:48Z ; ScanEnRetard prévue en pending à 11:31:48 et en firing vers 11:36:48 UTC
+date: opérande supplémentaire 'à'
+date: opérande supplémentaire 'à'
+sans reprise : ScanBientotRefuse le , porte refusée le  UTC au plus tard

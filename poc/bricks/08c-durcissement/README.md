@@ -1094,6 +1094,19 @@ Les sept prédictions sont tenues.
 
 Toujours non couverts sous H1 à H5 : la jonction d'un nœud, le saut d'un passage manqué du scan (échéance : accord avant le 08/11 à 09:30 UTC) et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 07/11/2026, 16:22 UTC : saut d'un passage du scan, première moitié passée (`scan_saut_suspendre`), W1 et W2 tenues
+
+Passage lancé sur accord du propriétaire (« ok » à « suspendre ce soir, puis réveil à 11:40 UTC le 08/11 pour la reprise »), à 16:21:58 UTC, avec `JOURNAL=preuves-h5`. Étapes, effets et prédictions W1 à W8 committés avant, au commit `dbbbd9f` ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 16:15 UTC). Journal : [preuves-h5-scan_saut_suspendre.log](../08-trust-plane/resultats/preuves-h5-scan_saut_suspendre.log).
+
+- W1 et W2 tenues : CronJob `scan-sample-app` suspendu, admis par l'API sous Kyverno en `Deny`. À l'audit, `system:admin` en 200. 0 `PolicyViolation`.
+- Correction de la relecture de 15:38 UTC : à la reprise, aucun événement `MissSchedule` n'est attendu. Le contrôleur v1.35.9 ne l'émet jamais quand une échéance est posée (source lu, [scan-saut-sec.log](resultats/scan-saut-sec.log)). La preuve du saut tient à l'absence de Job et à `lastScheduleTime` inchangé.
+- Passage sauté attendu : le 08/11 à 09:30 UTC. `ScanEnRetard` en firing vers 11:37 UTC, notifiée au seul récepteur local.
+- Reprise par la tâche planifiée `supply-chain-scan-saut-reprise`, le 08/11 à 11:40 UTC. Seule l'étape `scan_saut_reprendre` lui est permise. Passé sa garde horaire, un KO reprend le CronJob par un trap.
+
+**Effet à connaître.** Le CronJob du scan est suspendu jusqu'à la reprise. Si elle n'a pas lieu, la porte refuse `sample-app` le 14/11 vers 09:31 UTC. Retour : `kubectl patch cronjob -n scan scan-sample-app --type merge -p '{"spec":{"suspend":false}}'`.
+
+Toujours non couverts sous H1 à H5 : la jonction d'un nœud, la seconde moitié du saut d'un passage du scan (reprise et alerte, programmées) et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

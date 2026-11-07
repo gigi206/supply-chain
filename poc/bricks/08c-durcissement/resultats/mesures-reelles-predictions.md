@@ -505,3 +505,13 @@ Durée prédite : quelques secondes pour la suspension, environ 45 s pour la rep
 - W4 : début notifié prédit d'abord à 0 à 60 s après les 26 h, corrigé à 300 à 360 s après lecture du source de Prometheus v3.13.5 (complément de 16:18:36 UTC dans [scan-saut-sec.log](scan-saut-sec.log)).
 
 Le principe du trap a été essayé localement, hors cluster : posé dans une fonction appelée dans le tube de `lancer`, il s'exécute à la sortie en KO, et sa sortie va au journal.
+
+## Additif du 07/11/2026, 16:22 UTC : `scan_saut_suspendre` passée sur accord, W1 et W2 tenues, reprise programmée
+
+Accord du propriétaire : « ok », en réponse à la recommandation de suspendre ce soir puis de lancer `scan_saut_reprendre` par un réveil le 08/11 à 11:40 UTC. Les effets et le pire cas avaient été cités dans les deux messages précédents.
+- Passage de 16:21:58 à 16:21:59 UTC, code 0, journal [preuves-h5-scan_saut_suspendre.log](../../08-trust-plane/resultats/preuves-h5-scan_saut_suspendre.log).
+- W1 tenue : `30 9 * * *|3600|false|0`, dernier passage le 07/11 à 09:30 UTC, suspension admise en dry-run, `ScanEnRetard` inactive.
+- W2 tenue : `30 9 * * *|3600|true|0`. À l'audit, une ligne à 16:21:58.688 UTC, `system:admin`, code 200, recopiée dans le journal. 0 `PolicyViolation`.
+- Défaut d'affichage, sans effet sur les contrôles : la dernière ligne (« sans reprise : … ») est sortie vide, avec deux erreurs de `date`, car le format contenant « à » n'était pas cité. Corrigé dans `preuves.sh` après le passage. La ligne rejouée donne : `ScanBientotRefuse` le 12/11 à 09:31:48, porte refusée le 14/11 à 09:31:48 UTC au plus tard.
+- Reprise : tâche planifiée `supply-chain-scan-saut-reprise`, une seule fois, le 08/11/2026 à 11:40 UTC. Elle n'a droit qu'à l'étape `scan_saut_reprendre` : ni Job manuel, ni relance sur KO, ni commit, ni push. Elle rapporte à cette session.
+- Si l'application est fermée à 11:40 UTC, la tâche part à son ouverture suivante. Au-delà de 01:00 UTC le 09/11 environ, l'étape sortira en KO, l'audit ne couvrant plus le passage sauté, et le trap reprendra le CronJob.

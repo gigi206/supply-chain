@@ -3238,8 +3238,8 @@ etape_scan_saut_suspendre() { # brique 08c, première moitié : CronJob du scan 
   echo "passage sauté prévu : $p ; reprise par scan_saut_reprendre après $(date -u -d "@$(($(date -u -d "$p" +%s) + 3660))" +%Y-%m-%dT%H:%M:%SZ)"
   echo "dernier referrer du scan : $(date -u -d "@$r" +%Y-%m-%dT%H:%M:%SZ) ; ScanEnRetard prévue en pending à" \
     "$(date -u -d "@$((r + 26 * 3600))" +%H:%M:%S) et en firing vers $(date -u -d "@$((r + 26 * 3600 + 300))" +%H:%M:%S) UTC"
-  echo "sans reprise : ScanBientotRefuse le $(date -u -d "@$((r + 5 * 86400))" +%d/%m à %H:%M:%S),"\
-    "porte refusée le $(date -u -d "@$((r + 7 * 86400))" +%d/%m à %H:%M:%S) UTC au plus tard"
+  echo "sans reprise : ScanBientotRefuse le $(date -u -d "@$((r + 5 * 86400))" '+%d/%m à %H:%M:%S'),"\
+    "porte refusée le $(date -u -d "@$((r + 7 * 86400))" '+%d/%m à %H:%M:%S') UTC au plus tard"
 }
 
 etape_scan_saut_reprendre() { # brique 08c, seconde moitié : passage sauté constaté, alerte relevée, CronJob du scan repris ; refus
