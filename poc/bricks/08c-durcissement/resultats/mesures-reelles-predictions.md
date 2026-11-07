@@ -691,3 +691,11 @@ Accord : « traite tout », reçu peu avant 20:17:44 UTC. Il répond au message 
   - Le « 06/11 à 17:03:02 UTC » des additifs précédents est la tête des archives système. C'est là que vivent les lignes du récepteur ; P1 et P3 portent sur elles.
 - **Rythme.** De 271,2 M (07/11 à 11:22 UTC) à 418,1 M (20:18 UTC), environ 16 M/h, proche des 15,7 M/h moyens. La confiance haute de P3 tient, sous réserve de P1 au 08/11.
 - Le message de journald du démarrage -1 n'est plus dans le journal (aucune ligne « max ») : le plafond d'environ 290 Mo du premier démarrage reste déduit, non lu.
+
+## Additif du 07/11/2026, 20:45 UTC : décisions du propriétaire sur `SystemMaxUse`, A2 et les Events dans Loki
+
+**Décisions du propriétaire, 07/11/2026, écrites à 20:45 UTC.** La réponse « garde tes recommandations », reçue peu avant 20:44:42 UTC, retient les trois recommandations du message qui suivait le commit 2ed0290 :
+- **`SystemMaxUse` : aucun changement avant le relevé W8 du 09/11.** Une limite vers 500 M nettoierait dès maintenant le journal de `sc-stockage` (418 M, environ 16 M/h) et emporterait les lignes que W8b relit. Après le 09/11, la seule raison de la reconsidérer est la marge disque de `sc-confiance` pour G7 : Loki reste la référence d'audit. Deux points restent non vérifiés : l'effet d'un redémarrage de journald sur les VM en service, et la levée du plafond du premier démarrage par une configuration posée par cloud-init.
+- **A2 : limite acceptée.** Les compteurs d'échec de Chains v0.29.9 n'ont pas d'étiquette : les échecs voulus des essais négatifs ne se filtrent pas. Cette limite est écrite dans le commentaire de la règle et annoncée dans les prédictions des étapes depuis 0f5b964. Rien n'est changé dans Prometheus ni dans Alertmanager.
+- **Events dans Loki : une passe dédiée après le 09/11, avec ses propres prédictions.** Ce n'est pas un simple remplacement : Loki garde une ligne par mise à jour d'Event (`journalisation.sh:391`), donc les comptes changent. Six lectures fondent un verdict sur des Events : `preuves.sh:3184`, `3238`, `3298` et `3304`, `durcissement.sh:270`, `cilium.sh:173`. Les lignes 3298 et 3304 tournent le 08/11 pendant la reprise : aucun script n'est touché avant la fin de W8.
+- La relecture P1 du 08/11 n'a pas d'accord à ce stade : sans accord, P1 sera écrite « non relue ».

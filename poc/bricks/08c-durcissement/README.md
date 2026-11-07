@@ -1092,6 +1092,12 @@ Détail : [revue-journald-stockage.log](resultats/revue-journald-stockage.log).
 
 Détail : [journald-stockage-p1p2.log](resultats/journald-stockage-p1p2.log).
 
+**Décisions du propriétaire, 07/11/2026, écrites à 20:45 UTC.** La réponse « garde tes recommandations », reçue peu avant 20:44:42 UTC, retient les trois recommandations du message qui suivait le commit 2ed0290 :
+- **`SystemMaxUse` : aucun changement avant le relevé W8 du 09/11.** Une limite vers 500 M nettoierait dès maintenant le journal de `sc-stockage` (418 M, environ 16 M/h) et emporterait les lignes que W8b relit. Après le 09/11, la seule raison de la reconsidérer est la marge disque de `sc-confiance` pour G7 : Loki reste la référence d'audit. Deux points restent non vérifiés : l'effet d'un redémarrage de journald sur les VM en service, et la levée du plafond du premier démarrage par une configuration posée par cloud-init.
+- **A2 : limite acceptée.** Les compteurs d'échec de Chains v0.29.9 n'ont pas d'étiquette : les échecs voulus des essais négatifs ne se filtrent pas. Cette limite est écrite dans le commentaire de la règle et annoncée dans les prédictions des étapes depuis 0f5b964. Rien n'est changé dans Prometheus ni dans Alertmanager.
+- **Events dans Loki : une passe dédiée après le 09/11, avec ses propres prédictions.** Ce n'est pas un simple remplacement : Loki garde une ligne par mise à jour d'Event (`journalisation.sh:391`), donc les comptes changent. Six lectures fondent un verdict sur des Events : `preuves.sh:3184`, `3238`, `3298` et `3304`, `durcissement.sh:270`, `cilium.sh:173`. Les lignes 3298 et 3304 tournent le 08/11 pendant la reprise : aucun script n'est touché avant la fin de W8.
+- La relecture P1 du 08/11 n'a pas d'accord à ce stade : sans accord, P1 sera écrite « non relue ».
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.
