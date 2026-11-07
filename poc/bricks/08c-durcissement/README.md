@@ -1017,6 +1017,15 @@ Remplacement, en lecture seule, journal [resultats/n1-refus-audit.log](resultats
 
 Aucun refus d'admission de Kyverno dans la fenêtre de N1. Ne couvre pas les violations du scan d'arrière-plan, que ni l'audit (Events en `level: None`) ni cette métrique ne comptent. « Aucune alerte […] à 14:06:50 UTC » de N7, non archivée non plus, est relue dans Prometheus : 0 série `ALERTS` de 14:03 à 14:07 UTC, données présentes à 14:06:50 UTC (9 séries `up` à 1), historique d'alertes lisible (`ChainsEchecSignature`, `KyvernoRefusAnormaux` et d'autres le 06/11, `OpenBaoScelle` et `CollecteEnPanne` en pending à 11:25 UTC le 07/11, une série `ChainsEchecSignature` en firing avec des points jusqu'au 07/11 à 11:46 UTC). L'état d'Alertmanager à cette heure n'est plus relisible.
 
+**Additif du 07/11/2026, 17:16 UTC : autres lecteurs d'Events revus, aucun défaut.** L'additif de 17:07 UTC ne nommait que `cilium.sh` et `stockage.sh` parmi les autres lecteurs. Les scripts en contiennent sept qui passent par kubectl. Ils ont été revus en statique sur « continue », sans validation du propriétaire. Rien n'a été lancé. Le collecteur d'Events de la 19b (Alloy) n'est pas revu :
+- `cilium.sh:173` à 0 Pulling, tenu : chacun des quinze journaux archivés affiche juste avant « Pulled : 22 », donc des Events vivants à la lecture ;
+- `stockage.sh:234`, `preuves.sh:3147` et `essais-h5-scan.sh:47` : affichages sans `attendu` ;
+- `journalisation.sh:70-71` : compte instantané, prédit comme tel en L1 ;
+- `preuves.sh:3294` (W6 du 08/11) : un CronJob suspendu sort de `syncCronJob` avant le calcul du planning (source de `v1.35.9`, ligne 514). Un `MissSchedule` ne peut donc naître qu'à la reprise, dans la fenêtre de 30 s. Le nettoyage des Jobs (`cleanupFinishedJobs`) tourne lui sans garde et peut émettre `SuccessfulDelete`. Mais l'état relevé à 16:28 UTC (deux Jobs réussis pour une limite de 3, aucun actif) exclut toute suppression à la reprise. Ce point a été corrigé à 17:19 UTC, avant tout push ;
+- `scan-saut-reprise-verif.sh:41` : se déclare déjà non probant.
+
+Détail dans [resultats/mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md). La limite de débit des Events, question posée par l'additif H1 du 06/11, n'est pas traitée ici.
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.

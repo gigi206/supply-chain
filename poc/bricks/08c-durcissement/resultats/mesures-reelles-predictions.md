@@ -578,3 +578,31 @@ Revue en lecture seule des comptes de `PolicyViolation` et de `FailedCreate` arc
 - Limite : les violations du scan d'arrière-plan ne sont pas couvertes.
 - « Aucune alerte » de N7 est relue dans Prometheus : 0 série `ALERTS` sur la fenêtre.
 - Deux passages précédents, avec un compte des refus de Kyverno mal filtré : celui de 17:05:40 UTC, affiché en partie et jamais archivé, et celui de 17:05:51 UTC, dans `n1-refus-audit-premier-passage.log`.
+
+## Additif du 07/11/2026, 17:16 UTC : autres lecteurs d'Events revus, aucun défaut, inventaire de 17:07 UTC incomplet
+
+Revue statique du dépôt, menée sur « continue » sans validation du propriétaire. Rien n'a été lancé ni lu dans le cluster, Zot ou les VM.
+
+- **L'inventaire de 17:07 UTC était incomplet.** Il nommait deux autres lecteurs (`cilium.sh`, `stockage.sh`). Les scripts en contiennent sept qui passent par kubectl, sans compter les comptes de `PolicyViolation` et de `FailedCreate` déjà revus. Recherche : `git grep` de `get events`, `events.k8s.io`, `lastTimestamp`, `eventTime`, `firstTimestamp`, `involvedObject`, `sort-by=…Timestamp` et `kubectl events`, hors `.md`, `.log` et `.tsv`. Les `kubectl describe` (section Events) ne servent qu'au diagnostic d'un KO, jamais à un `attendu`. Le collecteur d'Events de la 19b n'est pas revu (`loki.source.kubernetes_events` d'Alloy, J4) : son traitement des Events qui n'ont que `eventTime` est du code amont.
+- **`cilium.sh:171` et `:173`** (`attendu` « événements Pulling des pods de Cilium » à 0). Aucun filtre de temps, donc le format de l'émetteur, non vérifié, est sans effet. Les quinze journaux archivés affichent, dans la même étape et juste avant, « Pulled : 22 » (« already present on machine »). Les Events de ces pods étaient donc vivants à la lecture : aucun 0 ne vient de l'expiration. Affirmation tenue. Ces passages précèdent tous H1 (06/11, 16:33 UTC) : le dernier commit de chacun de ces journaux date au plus tard de 16:00:27 UTC le 06/11. La question de la limite de débit des Events, posée par l'additif H1 du README, reste entière.
+- **`stockage.sh:234`** : affichage seul, quelques secondes après la création du pod, sans `attendu`.
+- **`preuves.sh:3147`** : diagnostic affiché seulement en KO.
+- **`essais-h5-scan.sh:47`** : affichage seul, à la fin du Job. L'avertissement `UnexpectedJob` annoncé par le README y figure (`durcissement-h5_scan.log`). L'ordre de tri, par `.lastTimestamp`, n'est utilisé nulle part.
+- **`journalisation.sh:70-71`** (prédiction 6 de L1, 1 114 Events, « faux, de peu ») : compte instantané. La prédiction disait déjà « rétention d'une heure ». Inchangé.
+- **`preuves.sh:3294`** (W6, étape `scan_saut_reprendre` du 08/11). Aucun filtre de temps, lecture 30 s après la reprise. Le source de `v1.35.9` est relu (copie de travail, hors dépôt). Pendant la suspension :
+  - `syncCronJob` sort à la garde de suspension (ligne 514), avant le calcul du planning ;
+  - `MissSchedule` (ligne 552) n'est émis qu'après cette garde, donc seulement à la reprise, dans la fenêtre lue.
+
+  D'autres Events peuvent naître sans garde de suspension, à toute synchronisation, reprise comprise. Ce relevé corrige celui de 17:16 UTC, qui n'en citait que trois et ne lisait que `syncCronJob` (corrigé à 17:19 UTC, avant tout push) :
+  - `UnknownTimeZone` (ligne 509), et `UnexpectedJob`, `SawCompletedJob`, `MissingJob` (lignes 447 à 489) dans `syncCronJob` ;
+  - surtout `SuccessfulDelete` ou `FailedDelete` (lignes 751 et 757), émis par `cleanupFinishedJobs`, que `sync` appelle avant `syncCronJob` (ligne 214).
+
+  État archivé après la suspension (`scan-saut-w8-sec.log`, relevé à 16:28 UTC) :
+  - `successfulJobsHistoryLimit` et `failedJobsHistoryLimit` à 3 ;
+  - deux Jobs, réussis tous les deux (`scan-sample-app-h5-manuel` et `scan-sample-app-29900730`), aucun actif ;
+  - fuseau `Etc/UTC`, valide.
+
+  Le nettoyage ne supprimera donc rien à la reprise, et ces Events ne devraient pas naître. W6 tient, à condition qu'aucun Job ne soit créé d'ici là ; l'étape compte d'ailleurs aussi ces créations. Si un `SuccessfulDelete` apparaissait, W6 sortirait en KO sans contredire la lecture sur `MissSchedule`.
+- **`scan-saut-reprise-verif.sh:41`** : se déclare déjà non probant.
+
+Aucune affirmation archivée n'est touchée et aucun script n'est modifié. Toujours non couvert : les violations du scan d'arrière-plan de Kyverno.
