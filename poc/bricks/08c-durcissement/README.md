@@ -795,6 +795,22 @@ Seul autre écart à l'audit : quatre 404 de `kyverno-reports-controller` sur se
 
 Ce passage ne prouve pas le saut d'un passage manqué (`startingDeadlineSeconds`), ni le scan après un redémarrage des VM.
 
+## Additif du 07/11/2026, 10:22 UTC : étape `controleurs` passée sous H1 à H5, K1 à K7 tenues
+
+Passage lancé sur accord du propriétaire (« Oui »), de 10:21:24 à 10:21:46 UTC, avec `JOURNAL=preuves-h5`. Journal : [preuves-h5-controleurs.log](../08-trust-plane/resultats/preuves-h5-controleurs.log), 63 OK et 0 KO, code 0.
+
+| Prédiction | Mesuré |
+|---|---|
+| K1 | 0 KO, code 0 |
+| K2 | 22 essais refusés par les droits ; 0 objet créé, 0 annotation posée |
+| K3 | 2 refus par `ValidatingAdmissionPolicy 'tekton-controleurs-builds'` dans `preuve-controleurs`, un au nom de chaque contrôleur ; témoin administrateur admis. C'est le premier refus réel par ce chemin sous H5 |
+| K4 | 6 comptes de service peuvent créer des pods dans `kube-system` ; le pod `default` est admis pour chacun |
+| K5 | 0 refus de la règle dans `builds` ; 28 pods créés dans `builds` par le contrôleur depuis la pose de la règle |
+| K6 | 0 lecture de Secret hors de `builds`, 0 réponse 403, 0 redémarrage, 0 refus des droits dans les deux journaux |
+| K7 | Espace d'essai introuvable ensuite, `can-i create pods` à `no` pour les deux contrôleurs |
+
+Les sept prédictions sont tenues. L'espace d'essai et ses liaisons temporaires sont supprimés, et le cluster est revenu à son état d'avant. Les lecteurs de Secrets de `kube-system` sont inchangés depuis `h5_cilium` : cinq comptes, dont quatre lisent tout le cluster. X1 sera relevée après les quatre mesures.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
