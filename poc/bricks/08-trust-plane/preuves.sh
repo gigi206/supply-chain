@@ -2467,6 +2467,7 @@ etape_controleurs() {
   echo "  pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle : au moins un, aucun refusé"
   echo "- information : comptes de service qui peuvent lire les Secrets de kube-system ou de tout le cluster (les deux contrôleurs"
   echo "  n'y sont plus)"
+  echo "Sous H1 à H5 : prédictions K1 à K7, écrites le 07/11/2026 (08c-durcissement/resultats/mesures-reelles-predictions.md)"
 
   echo "## règle"
   ba_attendu "ValidatingAdmissionPolicy $REGLE_CTRL (failurePolicy, à jour, avertissements de typage)" \
@@ -2652,6 +2653,7 @@ etape_resolveurs() {
   echo "- lecteurs des Secrets de tout le cluster : le compte des résolveurs n'y est plus ; restent les cinq autres du 02/11/2026"
   echo "Prédiction ajoutée (06/11/2026, après le relevé à sec sous H1 à H5, non aveugle) : quatre lecteurs, cilium-operator retiré par"
   echo "  h5_cilium ; zot-chains absent depuis S1, son refus porte sur un objet absent ; lecture de signing-secrets refusée aussi"
+  echo "Sous H1 à H5 : prédictions L1 à L8, écrites le 07/11/2026 (08c-durcissement/resultats/mesures-reelles-predictions.md)"
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
   echo "## droits"

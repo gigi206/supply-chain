@@ -81,3 +81,12 @@ Hors des étapes, relevé après la dernière :
 ## Ce que ces quatre mesures ne couvrent pas
 
 Démarrage réel d'un nouveau pod des résolveurs, redémarrage des VM, `decision3`, `enveloppes`, verdicts propres de `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan`, test 6 sous limites, `test5` complet, `intercepteurs`.
+
+## Complément du 07/11/2026, 08:52 UTC : admission dans les espaces d'essai, avant tout passage
+
+Le relevé du 06/11 n'avait présenté les objets de K3 et L4 que dans `bancc` et `builds`. Vérifié en lecture seule et en dry-run serveur, K3 et L4 restent telles qu'écrites :
+- L4 : aucune règle Kyverno (`validatingpolicies`, `imagevalidatingpolicies`) ni ValidatingAdmissionPolicy ne vise `resolutionrequests`. Seuls les webhooks de Tekton le font, déjà passés dans `preuve-resolveurs` le 06/11 à 15:25 UTC, avant H1 à H5.
+- K3 : les règles de pods de la 08c traitent `bancc` et un espace neuf de la même façon : sélection par liste d'exclusion, ou par nom pour `default`, `builds` et la zone de confiance. La seule différence est Pod Security : `bancc` est en `privileged`. Le même pod, avec le sélecteur de zone exigé, est admis dans `scan` (`restricted`) en dry-run serveur.
+- Borne : `bench-release` (`Deny`, sans sélecteur d'espace) n'a pas refusé ce pod dans `bancc` ni dans `scan` ; sa portée exacte n'a pas été relue.
+
+Les étapes `controleurs` et `resolveurs` citent maintenant K1 à K7 et L1 à L8 dans leur journal.
