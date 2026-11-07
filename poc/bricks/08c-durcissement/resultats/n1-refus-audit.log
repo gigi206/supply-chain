@@ -1,0 +1,135 @@
+relevé du 07/11/2026 à 17:06:01 UTC, lecture seule (audit de l API sur sc-confiance)
+## fichiers d'audit : premier horodatage du fichier qui couvre la fenêtre
+  audit-2026-11-07T01-27-58.559.log "stageTimestamp":"2026-11-06T23:49:54.354090Z
+  audit-2026-11-07T03-06-08.567.log "stageTimestamp":"2026-11-07T01:27:58.559825Z
+  audit-2026-11-07T04-43-18.568.log "stageTimestamp":"2026-11-07T03:06:08.567302Z
+  audit-2026-11-07T06-22-09.353.log "stageTimestamp":"2026-11-07T04:43:18.568093Z
+  audit-2026-11-07T07-59-20.082.log "stageTimestamp":"2026-11-07T06:22:09.353604Z
+  audit-2026-11-07T09-38-18.788.log "stageTimestamp":"2026-11-07T07:59:20.082655Z
+  audit-2026-11-07T11-13-38.576.log "stageTimestamp":"2026-11-07T09:38:18.788155Z
+  audit-2026-11-07T12-45-44.031.log "stageTimestamp":"2026-11-07T11:13:38.576492Z
+  audit-2026-11-07T14-23-09.553.log "stageTimestamp":"2026-11-07T12:45:44.031080Z
+  audit-2026-11-07T15-59-24.331.log "stageTimestamp":"2026-11-07T14:23:09.552965Z
+  audit.log "stageTimestamp":"2026-11-07T15:59:24.331628Z
+## requêtes terminées entre 14:03:00 et 14:07:00 UTC : 1990
+## codes de réponse
+  4 101
+  1224 200
+  664 201
+  16 403
+  66 404
+  16 409
+## réponses 400, 403, 422 et 5xx, refus d'admission et de droits (heure, utilisateur, verbe, ressource, dry-run, code, message) ; 404 et 409 comptés plus haut
+  14:03:50 system:node:sc-build get pods/preuve-test6-contre-pod 403 pods "preuve-test6-contre-pod" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" in the namespace "builds": no relationship f
+  14:04:43 system:node:sc-build get pods/preuve-test6-test-pod 403 pods "preuve-test6-test-pod" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" in the namespace "builds": no relationship fou
+  14:04:53 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:53 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:04:54 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:54 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:04:56 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:56 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:01 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:01 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:08 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:08 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:27 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:27 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:57 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:57 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+refus d'un webhook de Kyverno (« denied the request » et « kyverno » dans le même message) : 0
+refus d'admission, tous webhooks : 0
+fin 17:06:02 UTC
+
+# script du relevé
+#!/usr/bin/env bash
+# Brique 08c, N1 du 07/11 : refus de l'API entre 14:03:00 et 14:07:00 UTC relus dans l'audit (lecture seule), à la place du compte ad hoc
+# de PolicyViolation de 14:06:50 UTC (filtre sur .lastTimestamp seul, nul sur les Events de Kyverno 1.19.2 : compte à 0 quoi qu'il arrive).
+# Limite : la politique d'audit met les Events en level None ; l'audit montre les requêtes refusées (dry-runs compris), pas les violations
+# émises par le scan d'arrière-plan de Kyverno.
+set -uo pipefail
+export LC_ALL=C
+here=~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane
+cd "$here" || exit 1
+DISTRO=rke2 . ./commun.sh
+date -u '+relevé du %d/%m/%Y à %H:%M:%S UTC, lecture seule (audit de l API sur sc-confiance)'
+echo "## fichiers d'audit : premier horodatage du fichier qui couvre la fenêtre"
+sur sc-confiance "sudo sh -c 'for f in \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort); do printf \"%s \" \"\${f##*/}\"; head -1 \"\$f\" | grep -o \"\\\"stageTimestamp\\\":\\\"[^\\\"]*\" ; done'" </dev/null | sed 's/^/  /'
+audit_api 2026-11-07T14:0 </dev/null | jq -c 'select(.stage == "ResponseComplete" and .requestReceivedTimestamp >= "2026-11-07T14:03:00" and .requestReceivedTimestamp < "2026-11-07T14:07:00")' > "$W/n1-audit.jsonl"
+echo "## requêtes terminées entre 14:03:00 et 14:07:00 UTC : $(grep -c . "$W/n1-audit.jsonl" || true)"
+echo "## codes de réponse"
+jq -r '.responseStatus.code' "$W/n1-audit.jsonl" | sort | uniq -c | sed 's/^ */  /'
+echo "## réponses 400, 403, 422 et 5xx, refus d'admission et de droits (heure, utilisateur, verbe, ressource, dry-run, code, message) ; 404 et 409 comptés plus haut"
+jq -r 'select(.responseStatus.code | IN(400, 403, 422) or . >= 500) | "  \(.requestReceivedTimestamp[11:19]) \(.user.username) \(.verb) \(.objectRef.resource // "-")/\(.objectRef.name // "-")\(if (.requestURI | test("dryRun")) then " (dry-run)" else "" end) \(.responseStatus.code) \(.responseStatus.message // "" | .[0:160])"' "$W/n1-audit.jsonl" | sort
+# premier passage (n1-refus-audit-premier-passage.log) : ce compte prenait tout message contenant « kyverno », 404 des rapports compris
+echo "refus d'un webhook de Kyverno (« denied the request » et « kyverno » dans le même message) : $(jq -r 'select(.responseStatus.code >= 400) | .responseStatus.message // ""' "$W/n1-audit.jsonl" | grep 'denied the request' | grep -c -i 'kyverno' || true)"
+echo "refus d'admission, tous webhooks : $(jq -r 'select(.responseStatus.code >= 400) | .responseStatus.message // ""' "$W/n1-audit.jsonl" | grep -c 'denied the request' || true)"
+rm -f -- "$W/n1-audit.jsonl"
+date -u '+fin %H:%M:%S UTC'
+
+# Complément du 2026-11-07T17:06:24Z, lecture seule : témoin, un refus réel de Kyverno est-il bien à l audit ? Tous les refus « denied » de l audit conservé
+# commande : audit_api denied | jq ResponseComplete, code >= 400 | lignes contenant kyverno
+refus « denied » dans l'audit conservé (depuis 2026-11-06T23:49:54Z) : 3, dont kyverno : 1
+  2026-11-07T11:24:46 system:admin create pods/sonde-kyverno (dry-run) 400 admission webhook "vpol.validate.kyverno.svc-fail-3a646b95" denied the request: Policy zone-confiance failed: zone confiance : nodeSelector zone=confi
+
+# Complément du 2026-11-07T17:06:37Z, lecture seule : N7, série ALERTS de Prometheus (sc-stockage) relue à 14:06:50 UTC et sur 14:03:00 à 14:07:00 UTC
+# commandes : /api/v1/query?query=ALERTS&time=2026-11-07T14:06:50Z ; /api/v1/query_range?query=ALERTS, pas de 15 s
+ALERTS à 14:06:50 UTC : success, 0 série(s)
+ALERTS de 14:03:00 à 14:07:00 UTC : success, 0 série(s)
+témoin : séries ALERTS à 11:36:48 UTC le 07/11 (ScanEnRetard attendue absente, aucune autre attendue) puis maintenant :
+  maintenant : 0 série(s)
+plus ancienne donnée gardée par Prometheus : 2026-11-07T16:00:02Z (tête de la base)
+
+# Complément du 2026-11-07T17:06:47Z, lecture seule. Correction du complément précédent : sa ligne « témoin : séries ALERTS à 11:36:48 UTC » est fausse, aucune requête à cette heure ; seule la requête sans date (maintenant) a été faite. Vrais témoins ci-dessous
+témoin 1, données présentes à 14:06:50 UTC : séries up à cette heure 9, dont à 1 : 9
+témoin 2, alertes passées du 06/11 à 12:00 UTC au 07/11 à maintenant (ALERTS, pas de 60 s) :
+  OpenBaoScelle pending de 2026-11-07T11:25:00Z à 2026-11-07T11:25:00Z, 1 points
+  ChainsEchecSignature firing de 2026-11-06T15:34:00Z à 2026-11-06T15:41:00Z, 8 points
+  ChainsEchecSignature firing de 2026-11-06T15:34:00Z à 2026-11-06T15:41:00Z, 8 points
+  ChainsEchecSignature firing de 2026-11-06T15:34:00Z à 2026-11-07T11:46:00Z, 18 points
+  ChainsMarqueSansSignature pending de 2026-11-06T18:30:00Z à 2026-11-06T18:30:00Z, 1 points
+  KyvernoRefusAnormaux firing de 2026-11-06T15:34:00Z à 2026-11-06T19:31:00Z, 8 points
+  BaseGrypeVieillie firing de 2026-11-06T15:38:00Z à 2026-11-06T15:41:00Z, 4 points
+  BaseGrypeVieillie pending de 2026-11-06T15:34:00Z à 2026-11-06T15:37:00Z, 4 points
+  CollecteEnPanne pending de 2026-11-07T11:25:00Z à 2026-11-07T11:25:00Z, 1 points
+  CollecteEnPanne pending de 2026-11-06T16:42:00Z à 2026-11-06T16:42:00Z, 1 points
+  ScanEnRetard firing de 2026-11-06T15:38:00Z à 2026-11-06T15:41:00Z, 4 points
+  ScanEnRetard pending de 2026-11-06T15:34:00Z à 2026-11-06T15:37:00Z, 4 points
+
+# Complément du 2026-11-07T17:07:01Z, lecture seule : refus d admission de Kyverno comptés par sa métrique kyverno_admission_requests_total{request_allowed="false"} (règle KyvernoRefusAnormaux, brique 19)
+séries de refus à 14:03:00 UTC : 1
+somme des refus à 14:03:00 UTC : ? 1
+somme des refus à 14:07:00 UTC : ? 1
+refus de 14:03:00 à 14:07:00 UTC, increase sur 4 min : ? 0
+requêtes admises sur la même fenêtre (le compteur avance-t-il ?) : ? 106.71710476190475
+témoin, refus de 11:22:00 à 11:28:00 UTC (sonde-kyverno refusée en dry-run à 11:24:46 UTC à l'audit) : ? 0
+
+# Complément du 2026-11-07T17:07:10Z, lecture seule : naissance de la série des refus (pourquoi increase rend 0 au témoin)
+premier point 2026-11-07T11:20:00Z valeur 33 ; dernier point 2026-11-07T14:10:00Z valeur 1 ; valeurs distinctes : 1,33
+# lecture : la série naît après le redémarrage des VM avec la valeur 1 (le refus de la sonde à 11:24:46), increase ne voit pas ce premier
+# incrément ; elle reste à 1 jusqu'à 14:10 UTC : aucun refus d'admission de Kyverno entre la sonde et 14:10 UTC, fenêtre de N1 comprise
+
+# Complément du 2026-11-07T17:07:19Z, lecture seule. Correction des deux lignes « lecture » du complément précédent, écrites avant de voir le résultat : la série existait avant le redémarrage (33), elle n a pas « nu à 1 ». Changements de valeur de 11:20 à 14:10 UTC, pas de 15 s, par instance
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=PipelineRun,resource_namespace=builds,resource_request_operation=create
+  2026-11-07T11:20:00Z 1
+  dernier point 2026-11-07T11:25:30Z 1
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=Pod,resource_namespace=bancc,resource_request_operation=create
+  2026-11-07T11:20:00Z 4
+  dernier point 2026-11-07T11:25:30Z 4
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=Pod,resource_namespace=builds,resource_request_operation=create
+  2026-11-07T11:20:00Z 8
+  dernier point 2026-11-07T11:25:30Z 8
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=Pod,resource_namespace=declencheurs,resource_request_operation=create
+  2026-11-07T11:20:00Z 6
+  dernier point 2026-11-07T11:25:30Z 6
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=Pod,resource_namespace=default,resource_request_operation=create
+  2026-11-07T11:20:00Z 2
+  dernier point 2026-11-07T11:25:30Z 2
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=Pod,resource_namespace=tsa,resource_request_operation=create
+  2026-11-07T11:20:00Z 11
+  2026-11-07T11:25:15Z 1
+  dernier point 2026-11-07T14:10:00Z 1
+série instance=192.168.161.11:6443,job=kyverno,otel_scope_name=kyverno,request_allowed=false,request_webhook=ValidatingWebhookConfiguration,resource_kind=TaskRun,resource_namespace=builds,resource_request_operation=create
+  2026-11-07T11:20:00Z 1
+  dernier point 2026-11-07T11:25:30Z 1
+
+# Lecture du 2026-11-07T17:07:29Z, après les résultats ci-dessus : après le redémarrage des VM (vers 11:25 UTC), seule la série tsa/Pod repart, à 1 (sonde-kyverno, 11:24:46 UTC à l audit) ; elle reste à 1 jusqu à 14:10 UTC et aucune autre série de refus n existe à 14:03 ni à 14:07 UTC. Avec l audit (0 refus « denied » de 14:03 à 14:07 UTC, témoin de 11:24:46 retrouvé), aucun refus d admission de Kyverno dans la fenêtre de N1. Ne couvre pas les violations du scan d arrière-plan (PolicyReports), que ni l audit ni cette métrique ne comptent.

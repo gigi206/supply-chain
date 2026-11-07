@@ -1,0 +1,66 @@
+relevé du 07/11/2026 à 17:05:51 UTC, lecture seule (audit de l API sur sc-confiance)
+## fichiers d'audit : premier horodatage du fichier qui couvre la fenêtre
+  audit-2026-11-07T01-27-58.559.log "stageTimestamp":"2026-11-06T23:49:54.354090Z
+  audit-2026-11-07T03-06-08.567.log "stageTimestamp":"2026-11-07T01:27:58.559825Z
+  audit-2026-11-07T04-43-18.568.log "stageTimestamp":"2026-11-07T03:06:08.567302Z
+  audit-2026-11-07T06-22-09.353.log "stageTimestamp":"2026-11-07T04:43:18.568093Z
+  audit-2026-11-07T07-59-20.082.log "stageTimestamp":"2026-11-07T06:22:09.353604Z
+  audit-2026-11-07T09-38-18.788.log "stageTimestamp":"2026-11-07T07:59:20.082655Z
+  audit-2026-11-07T11-13-38.576.log "stageTimestamp":"2026-11-07T09:38:18.788155Z
+  audit-2026-11-07T12-45-44.031.log "stageTimestamp":"2026-11-07T11:13:38.576492Z
+  audit-2026-11-07T14-23-09.553.log "stageTimestamp":"2026-11-07T12:45:44.031080Z
+  audit-2026-11-07T15-59-24.331.log "stageTimestamp":"2026-11-07T14:23:09.552965Z
+  audit.log "stageTimestamp":"2026-11-07T15:59:24.331628Z
+## requêtes terminées entre 14:03:00 et 14:07:00 UTC : 1990
+## codes de réponse
+  4 101
+  1224 200
+  664 201
+  16 403
+  66 404
+  16 409
+## réponses 400, 403, 422 et 5xx, refus d'admission et de droits (heure, utilisateur, verbe, ressource, dry-run, code, message) ; 404 et 409 comptés plus haut
+  14:03:50 system:node:sc-build get pods/preuve-test6-contre-pod 403 pods "preuve-test6-contre-pod" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" in the namespace "builds": no relationship f
+  14:04:43 system:node:sc-build get pods/preuve-test6-test-pod 403 pods "preuve-test6-test-pod" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" in the namespace "builds": no relationship fou
+  14:04:53 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:53 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:04:54 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:54 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:04:56 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:04:56 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:01 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:01 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:08 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:08 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:27 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:27 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+  14:05:57 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors list secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot list resource "secrets" in API group "" at the clus
+  14:05:57 system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors watch secrets/- 403 secrets is forbidden: User "system:serviceaccount:tekton-pipelines:tekton-triggers-core-interceptors" cannot watch resource "secrets" in API group "" at the clu
+refus d'un webhook de Kyverno (message « denied the request » d'un webhook kyverno) : 29
+refus d'admission, tous webhooks : 0
+fin 17:05:52 UTC
+
+# script du relevé
+#!/usr/bin/env bash
+# Brique 08c, N1 du 07/11 : refus de l'API entre 14:03:00 et 14:07:00 UTC relus dans l'audit (lecture seule), à la place du compte ad hoc
+# de PolicyViolation de 14:06:50 UTC (filtre sur .lastTimestamp seul, nul sur les Events de Kyverno 1.19.2 : compte à 0 quoi qu'il arrive).
+# Limite : la politique d'audit met les Events en level None ; l'audit montre les requêtes refusées (dry-runs compris), pas les violations
+# émises par le scan d'arrière-plan de Kyverno.
+set -uo pipefail
+export LC_ALL=C
+here=~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane
+cd "$here" || exit 1
+DISTRO=rke2 . ./commun.sh
+date -u '+relevé du %d/%m/%Y à %H:%M:%S UTC, lecture seule (audit de l API sur sc-confiance)'
+echo "## fichiers d'audit : premier horodatage du fichier qui couvre la fenêtre"
+sur sc-confiance "sudo sh -c 'for f in \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort); do printf \"%s \" \"\${f##*/}\"; head -1 \"\$f\" | grep -o \"\\\"stageTimestamp\\\":\\\"[^\\\"]*\" ; done'" </dev/null | sed 's/^/  /'
+audit_api 2026-11-07T14:0 </dev/null | jq -c 'select(.stage == "ResponseComplete" and .requestReceivedTimestamp >= "2026-11-07T14:03:00" and .requestReceivedTimestamp < "2026-11-07T14:07:00")' > "$W/n1-audit.jsonl"
+echo "## requêtes terminées entre 14:03:00 et 14:07:00 UTC : $(grep -c . "$W/n1-audit.jsonl" || true)"
+echo "## codes de réponse"
+jq -r '.responseStatus.code' "$W/n1-audit.jsonl" | sort | uniq -c | sed 's/^ */  /'
+echo "## réponses 400, 403, 422 et 5xx, refus d'admission et de droits (heure, utilisateur, verbe, ressource, dry-run, code, message) ; 404 et 409 comptés plus haut"
+jq -r 'select(.responseStatus.code | IN(400, 403, 422) or . >= 500) | "  \(.requestReceivedTimestamp[11:19]) \(.user.username) \(.verb) \(.objectRef.resource // "-")/\(.objectRef.name // "-")\(if (.requestURI | test("dryRun")) then " (dry-run)" else "" end) \(.responseStatus.code) \(.responseStatus.message // "" | .[0:160])"' "$W/n1-audit.jsonl" | sort
+echo "refus d'un webhook de Kyverno (message « denied the request » d'un webhook kyverno) : $(jq -r 'select(.responseStatus.code >= 400) | .responseStatus.message // ""' "$W/n1-audit.jsonl" | grep -c -i 'kyverno' || true)"
+echo "refus d'admission, tous webhooks : $(jq -r 'select(.responseStatus.code >= 400) | .responseStatus.message // ""' "$W/n1-audit.jsonl" | grep -c 'denied the request' || true)"
+rm -f -- "$W/n1-audit.jsonl"
+date -u '+fin %H:%M:%S UTC'

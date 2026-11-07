@@ -565,3 +565,16 @@ Demande « continue » : préparer à sec la lecture du rapport de reprise du 08
   - `ScanEnRetard` et `ScanBientotRefuse` inactives ;
   - 4 referrers, tous de type `https://supply-chain.example/scan/v1`, le dernier créé le 07/11 à 09:31:48 UTC. `AVANT=4` de W8a est confirmé à cette heure. Il sera relu au contre-relevé du 08/11. S'il change, il sera corrigé par un additif daté avant le 09/11 à 09:30 UTC.
 - Non essayé sur des données réelles : la section du récepteur, aucune notification `ScanEnRetard` n'existant encore. L'expression est celle de `scan-saut-resolution.sh`, essayée sur `ChainsEchecSignature` (additif de 16:31 UTC).
+
+## Additif du 07/11/2026, 17:07 UTC : revue des comptes d'Events, N1 du 07/11 sur une source archivée
+
+Revue en lecture seule des comptes de `PolicyViolation` et de `FailedCreate` archivés, suite au constat de 16:53 UTC (Events gardés une heure). Proposée au propriétaire, menée sur « continue » sans qu'il l'ait validée. Les autres lecteurs d'Events (`cilium.sh`, `stockage.sh`) ne sont pas revus :
+- Aucune fenêtre de plus d'une heure. H2 : 4 minutes 20. Comptes hors étape du 07/11 : de 25 s (`resolveurs-pod-hors-etape.log`) à 52 minutes (`resolveurs-pod-sec.log`). Seule exception, l'essai à sec de 16:53 UTC (`PASSAGE` à 09:00 UTC), dont la ligne d'Events se déclare elle-même non probante. Traces des tests : quelques secondes.
+- Un défaut d'une autre nature touche N1 (test 6, 14:03 UTC). Sa phrase « Aucun événement `PolicyViolation` depuis 14:03 UTC » vient d'un compte ad hoc de 14:06:50 UTC :
+  - jamais archivé ;
+  - filtré sur `.lastTimestamp` seul, champ nul sur les Events de Kyverno 1.19.2 (`events.k8s.io/v1`, `eventTime` seul). Le source est lu, l'Event n'a pas été observé. Ce compte valait donc 0 quoi qu'il arrive.
+- N1 reste tenue : l'admission des deux TaskRuns est dans `preuves-h5-test6.log`.
+- Source de remplacement, archivée dans [n1-refus-audit.log](n1-refus-audit.log) : de 14:03 à 14:07 UTC, 0 refus d'admission à l'audit, avec un témoin à 11:24:46 UTC. La métrique des refus de Kyverno reste inchangée à 1 (la sonde).
+- Limite : les violations du scan d'arrière-plan ne sont pas couvertes.
+- « Aucune alerte » de N7 est relue dans Prometheus : 0 série `ALERTS` sur la fenêtre.
+- Deux passages précédents, avec un compte des refus de Kyverno mal filtré : celui de 17:05:40 UTC, affiché en partie et jamais archivé, et celui de 17:05:51 UTC, dans `n1-refus-audit-premier-passage.log`.
