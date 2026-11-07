@@ -606,3 +606,9 @@ Revue statique du dépôt, menée sur « continue » sans validation du proprié
 - **`scan-saut-reprise-verif.sh:41`** : se déclare déjà non probant.
 
 Aucune affirmation archivée n'est touchée et aucun script n'est modifié. Toujours non couvert : les violations du scan d'arrière-plan de Kyverno.
+
+## Additif du 07/11/2026, 17:32 UTC : X2 du 07/11 incomplète, `ChainsEchecSignature` non prédite
+
+Lors de l'étape `decision3` du 07/11, D3 s'est vérifiée : 5 PUT `.att` refusés, entre 11:36:01 et 11:36:14 UTC. Ces refus ont déclenché `ChainsEchecSignature` (A2), en firing de 11:36:07 à 11:46:07 UTC selon le récepteur. X2 ne prédisait que l'inactivité de `KyvernoRefusAnormaux`. L'alerte était pourtant attendue, puisque la règle ne peut pas filtrer les essais négatifs. Constat non prédit, sans défaut de la chaîne : voir [chains-echec-signature.log](chains-echec-signature.log) et le README de la 08c (additif de 17:32 UTC). Même mécanisme le 06/11, de 15:34 à 15:41 UTC, à la reprise de la collecte. Les échecs venaient des essais négatifs j6 et j7 du rejeu et de decision3 ; Loki les attribue un par un. Correction faite à 17:39 UTC, avant tout push.
+
+Risque pour W8b (09/11) : `scan-saut-resolution.sh` lit le récepteur dans le journal local de `sc-stockage`. Celui-ci a perdu ses lignes du 06/11 antérieures à 17:03 UTC, par un mécanisme non établi. Si la perte se reproduit, des firing du 08/11 manqueront : ce serait un CONSTAT sur leur nombre, pas un KO, puisque le resolved est lu le jour même. Lire aussi Loki relève du propriétaire.

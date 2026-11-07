@@ -1,0 +1,333 @@
+# ChainsEchecSignature du 06/11 au 07/11 : relevé en lecture seule, accord du propriétaire (« Oui, examine », 07/11/2026)
+# Hypothèses écrites le 2026-11-07T17:29:37Z, avant toute requête :
+# - la ligne « firing de 2026-11-06T15:34:00Z à 2026-11-07T11:46:00Z, 18 points » de n1-refus-audit.log donne le premier et le dernier point
+#   d'une série à pas de 60 s, pas un épisode continu (il en aurait environ 1 200) : deux épisodes courts sont attendus ;
+# - H-a : chaque épisode vient du second volet de la règle (série apparue depuis moins de 10 min, « unless … offset 10m »)
+#   après un redémarrage des VM ou du contrôleur, sans hausse du compteur d'échecs ;
+# - H-b : un épisode vient d'une vraie hausse du compteur d'échecs (increase > 0), à expliquer par ce qui tournait alors.
+# Script (copie ci-dessous) : chains-alerte.sh, requêtes Prometheus query_range et journal du récepteur local, rien d'écrit.
+    #!/usr/bin/env bash
+    # Relevé en lecture seule de ChainsEchecSignature (06/11 12:00 UTC à maintenant) : Prometheus et récepteur local de sc-stockage.
+    set -euo pipefail
+    K=$HOME/.cache/supply-chain-poc/08/ssh
+    SSHO=(-i "$K/id_ed25519" -o UserKnownHostsFile="$K/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10)
+    DEB=2026-11-06T12:00:00Z
+    FIN=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    plage() { # $1 = PromQL, lu sur l'entrée standard de ssh
+      printf %s "$1" | ssh "${SSHO[@]}" poc@192.168.161.13 \
+        "curl -fsS -G http://127.0.0.1:9090/api/v1/query_range --data-urlencode query@- --data-urlencode start=$DEB --data-urlencode end=$FIN --data-urlencode step=60"
+    }
+    suites() { # séries, puis suites de points consécutifs (pas de 60 s) avec valeurs extrêmes
+      jq -r '.status as $s | if (.data.result | length) == 0 then "  \($s), 0 série" else .data.result[] |
+        (.metric | to_entries | map(select(.key != "__name__")) | map("\(.key)=\(.value)") | join(",")) as $l |
+        (reduce .values[] as $p ([]; if length > 0 and ($p[0] - .[-1][-1][0]) == 60 then .[-1] += [$p] else . + [[$p]] end)) |
+        "  série {\($l)} : \(length) suite(s)", (.[] | "    de \(.[0][0] | todate) à \(.[-1][0] | todate), \(length) points, valeurs \(map(.[1]) | unique | join(" "))")
+      end'
+    }
+    echo "# relevé du $(date -u +%Y-%m-%dT%H:%M:%SZ), lecture seule, Prometheus de sc-stockage (127.0.0.1:9090), de $DEB à $FIN, pas de 60 s"
+    for q in 'ALERTS{alertname="ChainsEchecSignature"}' \
+             'watcher_pipelinerun_signing_failures_total' 'watcher_taskrun_signing_failures_total' \
+             'increase(watcher_pipelinerun_signing_failures_total[10m]) > 0' 'increase(watcher_taskrun_signing_failures_total[10m]) > 0' \
+             'watcher_pipelinerun_signing_failures_total unless watcher_pipelinerun_signing_failures_total offset 10m' \
+             'watcher_taskrun_signing_failures_total unless watcher_taskrun_signing_failures_total offset 10m' \
+             'up{job="chains"} == 0' 'absent(up{job="chains"})' \
+             'watcher_pipelinerun_sign_created_total' 'watcher_taskrun_sign_created_total'; do
+      echo "## $q"
+      plage "$q" | suites
+    done
+    echo "## récepteur local (journal de recepteur-alertes depuis le 06/11 12:00 UTC), notifications ChainsEchecSignature"
+    ssh -n "${SSHO[@]}" poc@192.168.161.13 "sudo journalctl -u recepteur-alertes -o json --no-pager --since '2026-11-06 12:00:00 UTC'" \
+      | jq -r -c 'select(.MESSAGE | type == "string") | (.__REALTIME_TIMESTAMP | tonumber / 1e6 | floor | todate) as $t
+          | (.MESSAGE | fromjson? // empty) | select(.alerte == "ChainsEchecSignature") | "  reçu \($t) : \(.statut), début \(.debut), fin \(.fin // "-")"'
+
+# relevé du 2026-11-07T17:29:37Z, lecture seule, Prometheus de sc-stockage (127.0.0.1:9090), de 2026-11-06T12:00:00Z à 2026-11-07T17:29:37Z, pas de 60 s
+## ALERTS{alertname="ChainsEchecSignature"}
+  série {alerte=A2,alertname=ChainsEchecSignature,alertstate=firing,error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics,severite=critique} : 1 suite(s)
+    de 2026-11-06T15:34:00Z à 2026-11-06T15:41:00Z, 8 points, valeurs 1
+  série {alerte=A2,alertname=ChainsEchecSignature,alertstate=firing,error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/taskrunmetrics,severite=critique} : 1 suite(s)
+    de 2026-11-06T15:34:00Z à 2026-11-06T15:41:00Z, 8 points, valeurs 1
+  série {alerte=A2,alertname=ChainsEchecSignature,alertstate=firing,error_type=storage,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics,severite=critique} : 2 suite(s)
+    de 2026-11-06T15:34:00Z à 2026-11-06T15:41:00Z, 8 points, valeurs 1
+    de 2026-11-07T11:37:00Z à 2026-11-07T11:46:00Z, 10 points, valeurs 1
+## watcher_pipelinerun_signing_failures_total
+  série {error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 1 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T18:39:00Z, 188 points, valeurs 24
+  série {error_type=storage,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 2 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T18:39:00Z, 188 points, valeurs 5
+    de 2026-11-07T11:37:00Z à 2026-11-07T17:29:00Z, 353 points, valeurs 5
+## watcher_taskrun_signing_failures_total
+  série {error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/taskrunmetrics} : 1 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T18:39:00Z, 188 points, valeurs 23
+## increase(watcher_pipelinerun_signing_failures_total[10m]) > 0
+  série {error_type=storage,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 1 suite(s)
+    de 2026-11-07T11:37:00Z à 2026-11-07T11:46:00Z, 10 points, valeurs 4.2105263157894735 4.32998431372549 4.373982222222222 4.431517948717948 4.5099757575757575 4.623303703703703 4.801390476190476 5.121946666666667 5.8699111111111115 8.609733333333335
+## increase(watcher_taskrun_signing_failures_total[10m]) > 0
+  success, 0 série
+## watcher_pipelinerun_signing_failures_total unless watcher_pipelinerun_signing_failures_total offset 10m
+  série {error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 1 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T15:41:00Z, 10 points, valeurs 24
+  série {error_type=storage,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 2 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T15:41:00Z, 10 points, valeurs 5
+    de 2026-11-07T11:37:00Z à 2026-11-07T11:46:00Z, 10 points, valeurs 5
+## watcher_taskrun_signing_failures_total unless watcher_taskrun_signing_failures_total offset 10m
+  série {error_type=payload_creation,instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/taskrunmetrics} : 1 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T15:41:00Z, 10 points, valeurs 23
+## up{job="chains"} == 0
+  série {instance=192.168.161.11:6443,job=chains} : 1 suite(s)
+    de 2026-11-07T11:24:00Z à 2026-11-07T11:25:00Z, 2 points, valeurs 0
+## absent(up{job="chains"})
+  série {job=chains} : 1 suite(s)
+    de 2026-11-06T12:00:00Z à 2026-11-06T15:31:00Z, 212 points, valeurs 1
+## watcher_pipelinerun_sign_created_total
+  série {instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/pipelinerunmetrics} : 4 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T18:39:00Z, 188 points, valeurs 29 30 31
+    de 2026-11-06T18:43:00Z à 2026-11-06T19:20:00Z, 38 points, valeurs 1 2
+    de 2026-11-06T19:23:00Z à 2026-11-07T11:25:00Z, 963 points, valeurs 1 2 3 4 5 6 7 8
+    de 2026-11-07T11:36:00Z à 2026-11-07T17:29:00Z, 354 points, valeurs 1 6 7
+## watcher_taskrun_sign_created_total
+  série {instance=192.168.161.11:6443,job=chains,otel_scope_name=github.com/tektoncd/chains/pkg/taskrunmetrics} : 4 suite(s)
+    de 2026-11-06T15:32:00Z à 2026-11-06T18:39:00Z, 188 points, valeurs 61 62 63 64 67 68 71
+    de 2026-11-06T18:43:00Z à 2026-11-06T19:20:00Z, 38 points, valeurs 4 5 8
+    de 2026-11-06T19:22:00Z à 2026-11-07T11:25:00Z, 964 points, valeurs 1 10 11 13 15 16 19 20 23 24 27 4 5 8
+    de 2026-11-07T11:36:00Z à 2026-11-07T17:29:00Z, 354 points, valeurs 2 4 5 6 8
+## récepteur local (journal de recepteur-alertes depuis le 06/11 12:00 UTC), notifications ChainsEchecSignature
+  reçu 2026-11-07T11:36:17Z : firing, début 2026-11-07T11:36:07.032Z, fin 0001-01-01T00:00:00Z
+  reçu 2026-11-07T11:46:17Z : resolved, début 2026-11-07T11:36:07.032Z, fin 2026-11-07T11:46:07.032Z
+
+# Complément, lecture seule : journaux du contrôleur Chains en service (kubectl logs, lignes contenant les mots de secret écartées). En-tête rétabli à 17:32:11 UTC : le filtre de ces mots avait retiré la ligne d'origine, qui en contenait un et portait l'heure. Relevé fait entre 17:31:27 UTC et cette heure.
+# pod tekton-chains-controller-74657877bf-nc25h, démarré 2026-11-07T11:24:55Z, 0 redémarrage : journaux du 06/11 non lus (pod précédent)
+niveaux : error 15 ; info 496 ; 
+erreurs de signing.go (une par tentative), par exécution et message :
+  2026-11-07T11:36:01.045Z [builds/preuve-decision3] writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3….att: DENIED: requested access to
+  2026-11-07T11:36:04.382Z [builds/preuve-decision3] writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3….att: DENIED: requested access to
+  2026-11-07T11:36:07.739Z [builds/preuve-decision3] writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3….att: DENIED: requested access to
+  2026-11-07T11:36:11.068Z [builds/preuve-decision3] writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3….att: DENIED: requested access to
+  2026-11-07T11:36:14.397Z [builds/preuve-decision3] writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/manifests/sha256-c6a9e38aeaa3….att: DENIED: requested access to
+# Complément, lecture seule : annotations chains.tekton.dev/signed des exécutions présentes dans builds (kubectl get)
+  pipelinerun : 19, dont signed=true 17
+    j7-sample-app-etiquette créé 2026-11-06T14:24:39Z signed=failed retries=3
+    j7-sample-app-sans-kata créé 2026-11-06T14:25:17Z signed=failed retries=3
+  taskrun : 42, dont signed=true 36
+    j6-autre-cle créé 2026-11-06T13:48:09Z signed=failed retries=3
+    j6-hors-politique créé 2026-11-06T13:48:12Z signed=failed retries=3
+    j6-modifiee créé 2026-11-06T13:48:08Z signed=failed retries=3
+    j6-non-signee créé 2026-11-06T13:48:07Z signed=failed retries=3
+    j7-sample-app-etiquette-construire créé 2026-11-06T14:24:49Z signed=failed retries=3
+    j7-sample-app-sans-kata-construire créé 2026-11-06T14:25:26Z signed=failed retries=3
+
+# Lecture, écrite à 17:32:28 UTC, après les données ci-dessus
+1. Il n'y a pas eu d'épisode de 20 h, mais deux épisodes, de 8 et 10 points.
+   - « firing de 15:34 le 06/11 à 11:46 le 07/11, 18 points » donnait le premier et le dernier point.
+   - Le README de la 08c écrit « des points jusqu'au 07/11 à 11:46 », ce qui est exact.
+2. Épisode du 06/11, de 15:34 à 15:41 UTC : trois séries (payload_creation pour les PipelineRuns et les TaskRuns, storage pour les PipelineRuns). Il ne vient que du volet « série apparue » ; increase > 0 reste vide. H-a est tenue.
+   - La collecte de Chains est absente jusqu'à 15:31 (absent(up) à 1), pour une cause non établie ici.
+   - Les séries apparaissent à 15:32, déjà à 24, 23 et 5, et restent constantes jusqu'à 18:39. Aucun échec dans cette fenêtre : tous sont antérieurs à 15:32.
+   - Cohérent avec, sans attribution par objet (journaux du contrôleur du 06/11 non lus) :
+     * les 5 storage : les 5 PUT .att refusés de decision3, le 06/11 à 15:14 UTC (preuves-decision3.log, même N) ;
+     * les payload_creation : les 8 objets signed=failed du rejeu du 06/11, encore présents. Ce sont les essais négatifs j6 (13:48 UTC), ainsi que j7 etiquette, annulé, et j7 sans-kata, refusé par PodSecurity (14:24 à 14:25 UTC). Le contrôle exécutions/enveloppes de rejeu-rke2-sixieme-passage.log les classe en ECHEC_SIGNATURE, sans anomalie.
+     * La répartition de 24 et 23 par objet n'est pas établie.
+3. Épisode du 07/11, firing de 11:37 à 11:46 UTC (le récepteur a reçu le firing à 11:36:07 et le resolved à 11:46:07) : série storage des PipelineRuns seule. Les deux volets jouent : la série est neuve après le redémarrage des VM, et increase > 0. H-b est tenue, la hausse est réelle.
+   - Ce sont les 5 PUT .att refusés de preuve-decision3, de 11:36:01 à 11:36:14 UTC.
+   - C'est l'effet voulu de l'étape decision3, passée sur accord du propriétaire (D3 tenue, preuves-h5-decision3.log).
+   - Constat non prédit : l'alerte elle-même. X2 ne portait que sur KyvernoRefusAnormaux.
+4. Aucun autre échec de signature, du 06/11 à 15:32 jusqu'au relevé :
+   - aucune série d'échec de 18:43 le 06/11 à 11:36 le 07/11 ; le compteur n'existe qu'après un premier échec ;
+   - storage reste à 5 de 11:37 à 17:29 UTC le 07/11, et payload_creation est absente depuis 18:39 le 06/11.
+5. Rien d'anormal dans la chaîne. C'est la limite déjà écrite dans alertes.yml : les compteurs de Chains n'ont pas d'étiquette d'exécution, et les essais négatifs de la 08 ne sont pas filtrables. Chaque passage de decision3, de j6 ou de j7 déclenche A2.
+6. Non examiné : ChainsMarqueSansSignature, en pending sur un point le 06/11 à 18:30 UTC.
+
+# Compléments du 07/11/2026, de 17:34 à 17:39 UTC, lecture seule, après une relecture du conseiller qui contestait deux points de la lecture de 17:32:28 UTC (« aucun autre échec de signature » trop fort ; attribution aux 8 objets signed=failed non vérifiée en arithmétique)
+
+## A. ChainsMarqueSansSignature autour du point pending du 06/11 à 18:30 UTC (script chains-marque.sh, copie ci-dessous)
+    #!/usr/bin/env bash
+    # Complément en lecture seule : ChainsMarqueSansSignature (pending le 06/11 à 18:30 UTC), Prometheus de sc-stockage.
+    set -euo pipefail
+    K=$HOME/.cache/supply-chain-poc/08/ssh
+    SSHO=(-i "$K/id_ed25519" -o UserKnownHostsFile="$K/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10)
+    DEB=2026-11-06T18:00:00Z FIN=2026-11-06T18:50:00Z
+    plage() { printf %s "$1" | ssh "${SSHO[@]}" poc@192.168.161.13 \
+      "curl -fsS -G http://127.0.0.1:9090/api/v1/query_range --data-urlencode query@- --data-urlencode start=$DEB --data-urlencode end=$FIN --data-urlencode step=60"; }
+    echo "# relevé du $(date -u +%Y-%m-%dT%H:%M:%SZ), de $DEB à $FIN, pas de 60 s, valeurs non nulles seulement"
+    for q in 'ALERTS{alertname="ChainsMarqueSansSignature"}' \
+      'increase(watcher_pipelinerun_marked_signed_total[10m]) - increase(watcher_pipelinerun_sign_created_total[10m])' \
+      'increase(watcher_taskrun_marked_signed_total[10m]) - increase(watcher_taskrun_sign_created_total[10m])' \
+      'watcher_pipelinerun_marked_signed_total' 'watcher_pipelinerun_sign_created_total' \
+      'watcher_taskrun_marked_signed_total' 'watcher_taskrun_sign_created_total'; do
+      echo "## $q"
+      plage "$q" | jq -r '.data.result[] | (.metric | del(.__name__, .instance, .job, .otel_scope_name) | tostring) as $l
+        | (.values | map(select(.[1] != "0")) | map("\(.[0] | todate | .[11:16])=\(.[1] | tonumber | . * 100 | round / 100)")) as $v
+        | "  \($l) : \(if ($v | length) == 0 then "toujours 0" else ($v | join(" ")) end)"'
+    done
+# relevé du 2026-11-07T17:34:57Z, de 2026-11-06T18:00:00Z à 2026-11-06T18:50:00Z, pas de 60 s, valeurs non nulles seulement
+## ALERTS{alertname="ChainsMarqueSansSignature"}
+  {"alerte":"A2","alertname":"ChainsMarqueSansSignature","alertstate":"pending","severite":"critique"} : 18:30=1
+## increase(watcher_pipelinerun_marked_signed_total[10m]) - increase(watcher_pipelinerun_sign_created_total[10m])
+  {} : 18:30=1.05 18:43=-1.05
+## increase(watcher_taskrun_marked_signed_total[10m]) - increase(watcher_taskrun_sign_created_total[10m])
+  {} : 18:21=-1.05 18:22=-1.05 18:23=-1.05 18:24=-1.05 18:25=-1.05 18:26=-1.05 18:27=-1.05 18:28=-2.11 18:29=-2.11 18:30=-1.05 18:31=-1.05 18:32=-1.05 18:33=-1.05 18:34=-1.05 18:35=-1.05 18:36=-1.05 18:37=-1.05 18:43=-1.05 18:44=-1.05 18:45=-1.05 18:46=-1.05 18:47=-1.05 18:48=-1.05 18:49=-1.05 18:50=-1.09
+## watcher_pipelinerun_marked_signed_total
+  {} : 18:00=24 18:01=24 18:02=24 18:03=24 18:04=24 18:05=24 18:06=24 18:07=24 18:08=24 18:09=24 18:10=24 18:11=24 18:12=24 18:13=24 18:14=24 18:15=24 18:16=24 18:17=24 18:18=24 18:19=24 18:20=24 18:21=25 18:22=25 18:23=25 18:24=25 18:25=25 18:26=25 18:27=25 18:28=26 18:29=26 18:30=26 18:31=26 18:32=26 18:33=26 18:34=26 18:35=26 18:36=26 18:37=26 18:38=26 18:39=26 18:44=1 18:45=1 18:46=1 18:47=1 18:48=1 18:49=1 18:50=1
+## watcher_pipelinerun_sign_created_total
+  {} : 18:00=29 18:01=29 18:02=29 18:03=29 18:04=29 18:05=29 18:06=29 18:07=29 18:08=29 18:09=29 18:10=29 18:11=29 18:12=29 18:13=29 18:14=29 18:15=29 18:16=29 18:17=29 18:18=29 18:19=29 18:20=29 18:21=30 18:22=30 18:23=30 18:24=30 18:25=30 18:26=30 18:27=30 18:28=31 18:29=31 18:30=31 18:31=31 18:32=31 18:33=31 18:34=31 18:35=31 18:36=31 18:37=31 18:38=31 18:39=31 18:43=1 18:44=1 18:45=1 18:46=1 18:47=1 18:48=1 18:49=1 18:50=1
+## watcher_taskrun_marked_signed_total
+  {} : 18:00=40 18:01=40 18:02=40 18:03=40 18:04=40 18:05=40 18:06=40 18:07=40 18:08=40 18:09=40 18:10=40 18:11=40 18:12=40 18:13=40 18:14=40 18:15=40 18:16=40 18:17=40 18:18=40 18:19=40 18:20=41 18:21=43 18:22=43 18:23=43 18:24=43 18:25=43 18:26=43 18:27=44 18:28=46 18:29=46 18:30=46 18:31=46 18:32=46 18:33=46 18:34=46 18:35=46 18:36=46 18:37=46 18:38=46 18:39=46 18:43=3 18:44=3 18:45=3 18:46=3 18:47=3 18:48=3 18:49=3 18:50=3
+## watcher_taskrun_sign_created_total
+  {} : 18:00=63 18:01=63 18:02=63 18:03=63 18:04=63 18:05=63 18:06=63 18:07=63 18:08=63 18:09=63 18:10=63 18:11=63 18:12=63 18:13=63 18:14=63 18:15=63 18:16=63 18:17=63 18:18=63 18:19=63 18:20=64 18:21=67 18:22=67 18:23=67 18:24=67 18:25=67 18:26=67 18:27=68 18:28=71 18:29=71 18:30=71 18:31=71 18:32=71 18:33=71 18:34=71 18:35=71 18:36=71 18:37=71 18:38=71 18:39=71 18:43=4 18:44=4 18:45=4 18:46=4 18:47=4 18:48=4 18:49=4 18:50=4
+
+## B. Journaux de l'ancien contrôleur Chains dans Loki (script chains-loki.sh, copie ci-dessous, après correction des bornes)
+### premier passage, bornes fausses : 07/11 de 13:28 à 15:35 UTC au lieu du 06/11 (époques recopiées sans vérification), résultat vide, sans valeur
+# relevé du 2026-11-07T17:35:43Z, Loki par Grafana (auditeur), du 2026-11-06T13:28:00Z au 2026-11-06T15:35:00Z
+## démarrages du contrôleur (« Registering 2 controllers ») et prises du bail
+## erreurs de signing.go, par exécution et type (comptes)
+lignes : 0
+## première et dernière erreur
+### second passage, bornes calculées par date -u sur le 06/11
+    #!/usr/bin/env bash
+    # Complément en lecture seule : journaux de l'ancien contrôleur Chains (06/11, 13:28 à 15:35 UTC), lus par l'auditeur à travers Grafana (Loki).
+    set -euo pipefail
+    O8=$HOME/.cache/supply-chain-poc/08
+    grafana() { # expr de 13:28 à 15:35 UTC le 06/11 : « horodatage ligne »
+      local q
+      q=$(jq -nc --arg e "$1" '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 5000, direction: "forward"}],
+        from: "'"$(date -u -d 2026-11-06T13:28:00Z +%s)000"'", to: "'"$(date -u -d 2026-11-06T15:35:00Z +%s)000"'"}')
+      printf 'user = "auditeur:%s"\n' "$(cat "$O8/secrets/grafana-auditeur.password")" \
+        | curl -sS -K - --cacert "$O8/pki/ca-poc.crt" -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q" \
+        | jq -r '.results.A.error // empty, (.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.] / 1000 | floor | todate) \($v[2][.])")'
+    }
+    echo "# relevé du $(date -u +%Y-%m-%dT%H:%M:%SZ), Loki par Grafana (auditeur), du 2026-11-06T13:28:00Z au 2026-11-06T15:35:00Z"
+    B='{espace="tekton-chains"}'
+    echo "## démarrages du contrôleur (« Registering 2 controllers ») et prises du bail"
+    grafana "$B |~ \"Registering 2 controllers|Successfully acquired lease\"" | cut -c1-160
+    echo "## erreurs de signing.go, par exécution et type (comptes)"
+    grafana "$B |= \"chains/signing.go\" |= \"\\\"level\\\":\\\"error\\\"\"" > "$S_OUT"
+    wc -l < "$S_OUT" | sed 's/^/lignes : /'
+    cut -d' ' -f2- "$S_OUT" | jq -R -r 'fromjson? | "\(.["knative.dev/key"] // "-") | \(.msg | gsub("\n";" ") | sub("sha256[-:][0-9a-f]+"; "sha256…") | .[0:90])"' | sort | uniq -c
+    echo "## première et dernière erreur"
+    head -1 "$S_OUT" | cut -c1-21; tail -1 "$S_OUT" | cut -c1-21
+# relevé du 2026-11-07T17:35:55Z, Loki par Grafana (auditeur), du 2026-11-06T13:28:00Z au 2026-11-06T15:35:00Z
+## démarrages du contrôleur (« Registering 2 controllers ») et prises du bail
+2026-11-06T13:48:49Z 2026/11/06 13:48:49 Registering 2 controllers
+2026-11-06T13:49:00Z {"level":"info","ts":"2026-11-06T13:49:00.251Z","logger":"watcher","caller":"leaderelection/leaderelection.go:272","msg":"Successfully acqu
+2026-11-06T13:49:08Z {"level":"info","ts":"2026-11-06T13:49:08.424Z","logger":"watcher","caller":"leaderelection/leaderelection.go:272","msg":"Successfully acqu
+## erreurs de signing.go, par exécution et type (comptes)
+lignes : 52
+      6 builds/j6-sans-drapeau | expected imageID  to be separable by @
+      6 builds/j6-sans-drapeau-publier | expected imageID  to be separable by @
+      6 builds/j6-sans-restriction-enforce | expected imageID  to be separable by @
+      5 builds/j6-sans-restriction-enforce-publier | expected imageID  to be separable by @
+      6 builds/j7-sample-app-etiquette | expected imageID  to be separable by @
+      6 builds/j7-sample-app-etiquette-construire | expected imageID  to be separable by @
+      6 builds/j7-sample-app-sans-kata | expected imageID  to be separable by @
+      6 builds/j7-sample-app-sans-kata-construire | expected imageID  to be separable by @
+      5 builds/preuve-decision3 | writing attestations: PUT https://sc-stockage.poc.test:5000/v2/builds/essai-decision3/mani
+## première et dernière erreur
+2026-11-06T13:50:01Z 
+2026-11-06T15:14:52Z 
+
+## C. Lignes du récepteur local dans Loki, 06/11 (script recepteur-loki.sh, copie ci-dessous)
+    #!/usr/bin/env bash
+    # Complément en lecture seule : lignes du récepteur local (recepteur-alertes.service) dans Loki, 06/11 de 15:20 à 19:40 UTC, lues par l'auditeur à travers Grafana.
+    set -euo pipefail
+    O8=$HOME/.cache/supply-chain-poc/08
+    q=$(jq -nc --arg de "$(date -u -d 2026-11-06T15:20:00Z +%s)000" --arg a "$(date -u -d 2026-11-06T19:40:00Z +%s)000" \
+      '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: "{unite=\"recepteur-alertes.service\"}", queryType: "range", maxLines: 1000, direction: "forward"}], from: $de, to: $a}')
+    echo "# relevé du $(date -u +%Y-%m-%dT%H:%M:%SZ), Loki par Grafana (auditeur), {unite=\"recepteur-alertes.service\"}, 06/11 de 15:20 à 19:40 UTC"
+    printf 'user = "auditeur:%s"\n' "$(cat "$O8/secrets/grafana-auditeur.password")" \
+      | curl -sS -K - --cacert "$O8/pki/ca-poc.crt" -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q" \
+      | jq -r '.results.A.error // empty, (.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.] / 1000 | floor | todate) \($v[2][.])")' \
+      | jq -R -r 'split(" ") as $p | ($p[1:] | join(" ") | fromjson? // null) as $j | if $j then "  \($p[0]) \($j.statut) \($j.alerte) début \($j.debut)" else "  \(.[0:160])" end'
+# relevé du 2026-11-07T17:37:46Z, Loki par Grafana (auditeur), {unite="recepteur-alertes.service"}, 06/11 de 15:20 à 19:40 UTC
+  2026-11-06T15:32:47Z firing ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:32:47Z firing ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:32:47Z firing ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:32:47Z firing KyvernoRefusAnormaux début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:35:01Z firing t4-recepteur-1793979301577823812 début null
+  2026-11-06T15:36:47Z resolved KyvernoRefusAnormaux début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:37:47Z firing BaseGrypeVieillie début 2026-11-06T15:37:37.032Z
+  2026-11-06T15:37:47Z firing ScanEnRetard début 2026-11-06T15:37:37.032Z
+  2026-11-06T15:41:47Z resolved ScanEnRetard début 2026-11-06T15:37:37.032Z
+  2026-11-06T15:41:47Z resolved ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:41:47Z resolved ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:41:47Z resolved ChainsEchecSignature début 2026-11-06T15:32:37.032Z
+  2026-11-06T15:41:47Z resolved BaseGrypeVieillie début 2026-11-06T15:37:37.032Z
+  2026-11-06T19:26:47Z firing KyvernoRefusAnormaux début 2026-11-06T19:26:37.032Z
+  2026-11-06T19:31:47Z resolved KyvernoRefusAnormaux début 2026-11-06T19:26:37.032Z
+
+## D. Notifications d'Alertmanager et journal local de sc-stockage (script notif-journal.sh, copie ci-dessous)
+    #!/usr/bin/env bash
+    # Complément en lecture seule : notifications d'Alertmanager (Prometheus) et journal local de sc-stockage.
+    set -euo pipefail
+    K=$HOME/.cache/supply-chain-poc/08/ssh
+    SSHO=(-i "$K/id_ed25519" -o UserKnownHostsFile="$K/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10)
+    echo "# relevé du $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "## alertmanager_notifications_total{integration=\"webhook\"}, du 06/11 15:20 au 07/11 11:30 UTC, pas de 60 s : changements de valeur"
+    printf %s 'alertmanager_notifications_total{integration="webhook"}' | ssh "${SSHO[@]}" poc@192.168.161.13 \
+      "curl -fsS -G http://127.0.0.1:9090/api/v1/query_range --data-urlencode query@- --data-urlencode start=2026-11-06T15:20:00Z --data-urlencode end=2026-11-07T11:30:00Z --data-urlencode step=60" \
+      | jq -r '.data.result[] | .values | reduce .[] as $p ({p: null, o: []}; if .p != $p[1] then {p: $p[1], o: (.o + ["\($p[0] | todate | .[5:16])=\($p[1])"])} else .p = $p[1] end) | "  " + (.o | join(" "))'
+    echo "## échecs de notification (somme sur les raisons) au 07/11 11:20 UTC"
+    printf %s 'sum(alertmanager_notifications_failed_total{integration="webhook"})' | ssh "${SSHO[@]}" poc@192.168.161.13 \
+      "curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode query@- --data-urlencode time=2026-11-07T11:20:00Z" | jq -r '"  \(.data.result[0].value[1])"'
+    echo "## journal local de sc-stockage : démarrages, archives, lignes par heure le 06/11, lignes du récepteur avant le 07/11"
+    ssh -n "${SSHO[@]}" poc@192.168.161.13 "sudo journalctl --list-boots --no-pager; sudo journalctl --disk-usage; sudo ls /var/log/journal/*/ | sed 's/^/  /'; \
+      systemd-analyze cat-config systemd/journald.conf | grep -v '^#' | grep -v '^\s*\$'; \
+      sudo journalctl -b -1 --no-pager -o short-iso --since '2026-11-06 13:00:00 UTC' --until '2026-11-06 20:00:00 UTC' | cut -c1-13 | sort | uniq -c; \
+      echo \"lignes de recepteur-alertes au démarrage précédent : \$(sudo journalctl -b -1 -u recepteur-alertes --no-pager -o short-iso | grep -c . )\"; \
+      sudo journalctl -b -1 -u recepteur-alertes --no-pager -o short-iso | head -1 | cut -c1-80"
+# relevé du 2026-11-07T17:39:09Z
+## alertmanager_notifications_total{integration="webhook"}, du 06/11 15:20 au 07/11 11:30 UTC, pas de 60 s : changements de valeur
+  11-06T15:31=0 11-06T15:33=2 11-06T15:37=3 11-06T15:38=5 11-06T15:42=8 11-06T19:27=9 11-06T19:32=10 11-07T11:23=0
+## échecs de notification (somme sur les raisons) au 07/11 11:20 UTC
+  0
+## journal local de sc-stockage : démarrages, archives, lignes par heure le 06/11, lignes du récepteur avant le 07/11
+IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
+ -1 672808fc95954f9ea90eb2784c33f4a2 Fri 2026-11-06 13:28:37 UTC Sat 2026-11-07 11:20:41 UTC
+  0 eefb3d10d49b4caba732a351c9ba7293 Sat 2026-11-07 11:22:36 UTC Sat 2026-11-07 17:39:09 UTC
+Archived and active journals take up 386.1M in the file system.
+  system.journal
+  system@dd3b013acda640d9845be635e1927e69-00000000000160aa-00065f9e95c7cfcc.journal
+  system@dd3b013acda640d9845be635e1927e69-0000000000020bc0-00065fa09dd40739.journal
+  system@dd3b013acda640d9845be635e1927e69-000000000002b66b-00065fa2660829f5.journal
+  system@dd3b013acda640d9845be635e1927e69-000000000003607b-00065fa473e88d41.journal
+  system@dd3b013acda640d9845be635e1927e69-0000000000040b3e-00065fa6a1a8a308.journal
+  system@dd3b013acda640d9845be635e1927e69-000000000004b603-00065fa8cc00de3a.journal
+  system@dd3b013acda640d9845be635e1927e69-00000000000560b2-00065faaf65ddcbe.journal
+  system@dd3b013acda640d9845be635e1927e69-0000000000060b74-00065fad20b284f2.journal
+  user-1000.journal
+[Journal]
+[Journal]
+ForwardToSyslog=yes
+    319 2026-11-06T13
+    276 2026-11-06T14
+   1416 2026-11-06T15
+    158 2026-11-06T16
+  13817 2026-11-06T17
+  19271 2026-11-06T18
+  18918 2026-11-06T19
+lignes de recepteur-alertes au démarrage précédent : 6
+2026-11-06T19:26:47+00:00 sc-stockage python3[19847]: {"alerte": "KyvernoRefusAn
+tête de la plus vieille archive du journal système (horodatage hexadécimal du nom de fichier, 00065f9e95c7cfcc) : 2026-11-06T17:03:02Z
+
+## E. Affirmations archivées prises dans les deux fenêtres (06/11 15:32:47 à 15:41:47 UTC, 07/11 11:36:07 à 11:46:07 UTC)
+chrono.tsv : aucune étape de la 08 entre resolveurs fait (06/11 15:25:46) et controle6 (06/11 15:41:19) ; le 07/11, decision3 de 11:35:33 à 11:36:22, puis rien avant 14:54:53
+relevé X2 à 11:36:38 UTC (mesures-reelles-x2.log) : KyvernoRefusAnormaux seule, inactive, exact
+« aucune alerte » du doc 03 (test5, EventListener, résolveurs) : étapes de 10:29 à 10:41, 14:54, 15:24 à 15:25 et 16:00 à 16:01 UTC le 07/11, hors des fenêtres
+grep de inactive, aucune alerte, ALERTS, firing dans les journaux de résultats qui contiennent une heure des fenêtres : seuls des relevés postérieurs de la 08c, qui citent ces épisodes comme historique
+
+# Lecture corrigée, écrite à 17:39:56 UTC après les compléments A à E (la lecture de 17:32:28 UTC est gardée ci-dessus ; ses points 1 et 3 restent valables, les points 2, 4, 5 et 6 sont remplacés)
+2'. Épisode du 06/11 : les 52 échecs (24 + 23 + 5) sont tous dans Loki. Ils viennent du contrôleur démarré à 13:48:49 UTC.
+   - Erreurs payload_creation (« expected imageID to be separable by @ ») : 8 exécutions jamais lancées des essais négatifs de la 08.
+     * j6-sans-drapeau, j6-sans-restriction-enforce et leurs TaskRuns publier : refus de PodSecurity attendu (politique.sh, rejeu-rke2-sixieme-passage.log lignes 1430 et 1432).
+     * j7-sample-app-etiquette, annulé, j7-sample-app-sans-kata, refusé par PodSecurity, et leurs TaskRuns construire.
+     * 6 tentatives chacune, sauf j6-sans-restriction-enforce-publier (5) : 24 pour les PipelineRuns, 23 pour les TaskRuns.
+   - Erreurs storage : les 5 PUT .att refusés de preuve-decision3 le 06/11, la dernière à 15:14:52 UTC.
+   - L'attribution de 17:32:28 UTC aux « 8 objets signed=failed présents » était fausse. j6-non-signee, j6-modifiee, j6-autre-cle et j6-hors-politique sont absents des erreurs de signing.go relevées ; la cause n'est pas établie. Les deux PipelineRuns j6-sans-*, eux, ne sont plus dans le cluster.
+4'. Les compteurs d'échec ne montent pas hors des deux épisodes depuis le 06/11 à 15:32 UTC. Ils ne voient pas l'échec en mode ouvert (alertes.yml), que surveille ChainsMarqueSansSignature.
+   - Sur toute la période, celle-ci n'a qu'un point pending, le 06/11 à 18:30 UTC, jamais passé en firing.
+   - De 18:20 à 18:30 UTC, les PipelineRuns passent de 24 à 26 marqués et de 29 à 31 signatures créées, aux mêmes minutes : c'est un artefact de collecte, que le for: 1m absorbe.
+   - Limites : la règle compare des fenêtres de 10 min, et rien n'était collecté avant 15:32 UTC le 06/11.
+5'. Le chemin de notification fonctionnait le 06/11.
+   - Le récepteur a reçu le firing à 15:32:47 UTC (trois séries ChainsEchecSignature) et le resolved à 15:41:47 UTC ; Loki les garde.
+   - Alertmanager a envoyé 8 notifications webhook de 15:33 à 15:42 UTC, sans aucun échec.
+   - Ces lignes manquent dans le journal local de sc-stockage, dont les archives système ne remontent qu'au 06/11 à 17:03:02 UTC. Les plus anciennes ont été retirées par un mécanisme non établi : aucune limite configurée, 386 Mo occupés.
+   - Conséquence pour W8, le 09/11 : scan-saut-resolution.sh lit le récepteur dans ce journal local. Si la perte se reproduit, des firing du 08/11 manqueront. Ce serait un CONSTAT sur leur nombre (6 prédits), pas un KO, car le resolved du 09/11 est lu le jour même. Lire aussi Loki relève du propriétaire.
+6'. Aucune affirmation archivée n'est contredite par les deux fenêtres (E).
