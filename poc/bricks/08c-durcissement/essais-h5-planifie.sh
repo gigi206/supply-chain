@@ -45,7 +45,8 @@ grafana() { # depuis-epoch-ms : lignes du job lues par l'auditeur à travers Gra
   rm -f -- "$here/resultats/.h5_planifie.cron.json"
   kubectl get jobs -n scan --sort-by=.metadata.creationTimestamp </dev/null
   if [ -z "$JOB" ]; then
-    mapfile -t jobs < <(kubectl get jobs -n scan -o json </dev/null | jq -r --arg u "$uid" '.items[] | select(any(.metadata.ownerReferences[]?; .uid == $u)) | select(.metadata.name != "scan-sample-app-h5-manuel") | .metadata.name')
+    # jobs créés depuis PLAN seulement : successfulJobsHistoryLimit (3) garde ceux des passages précédents (ajout du 07/11/2026, 16:28 UTC)
+    mapfile -t jobs < <(kubectl get jobs -n scan -o json </dev/null | jq -r --arg u "$uid" --arg p "$PLAN" '.items[] | select(any(.metadata.ownerReferences[]?; .uid == $u)) | select(.metadata.name != "scan-sample-app-h5-manuel") | select(.metadata.creationTimestamp >= $p) | .metadata.name')
     note "jobs créés par le planificateur" "${#jobs[@]}" 1
     JOB=${jobs[0]:-}
   fi
@@ -85,8 +86,9 @@ grafana() { # depuis-epoch-ms : lignes du job lues par l'auditeur à travers Gra
   echo "bases archivées : $(curl -fsS --cacert "$O8/pki/ca-poc.crt" "https://192.168.161.13:5000/v2/vulndb/grype/tags/list" </dev/null | jq -c '.tags')"
 
   echo "## P1 et P2, audit de l'API, espace scan, depuis l'heure attendue (créations de jobs et de pods, puis refus)"
+  # borne comparée en secondes : en chaîne, « 09:30:00.1Z » précède « 09:30:00Z » (KO du 07/11, complément de 09:49:54 UTC ; corrigé le 07/11/2026, 16:29 UTC)
   audit=$(ssh "${SSHO[@]}" poc@192.168.161.11 "sudo sh -c 'cat \$(ls -1 /var/lib/rancher/rke2/server/logs/audit*.log | LC_ALL=C sort) | grep -F \"\\\"namespace\\\":\\\"scan\\\"\" || true'" </dev/null \
-    | jq -r --arg de "$(date -ud "@$plan_s" +%FT%TZ)" 'select(.stage == "ResponseComplete" and .requestReceivedTimestamp >= $de)
+    | jq -r --argjson de "$plan_s" 'select(.stage == "ResponseComplete" and (.requestReceivedTimestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) >= $de)
         | (.responseStatus.code // 0) as $c
         | if .verb == "create" and (.objectRef.resource == "jobs" or .objectRef.resource == "pods") and (.objectRef.subresource // "") == "" then "creation \(.user.username) \(.objectRef.resource) \($c)"
           elif $c >= 400 then "refus \(.user.username) \(.verb) \(.objectRef.resource) \(.objectRef.name // "-") \($c) \(.responseStatus.message // "" | .[0:110])"

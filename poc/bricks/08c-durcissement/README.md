@@ -1107,6 +1107,14 @@ Passage lancé sur accord du propriétaire (« ok » à « suspendre ce soir, pu
 
 Toujours non couverts sous H1 à H5 : la jonction d'un nœud, la seconde moitié du saut d'un passage du scan (reprise et alerte, programmées) et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 07/11/2026, 16:34 UTC : `essais-h5-planifie.sh` corrigé, relecture du 07/11 rejouée OK
+
+L'additif de 09:50 UTC disait le script non corrigé. Il l'est désormais, pour le relevé du 09/11 (W8, préparé à sec, non lancé) :
+- la borne de l'audit est comparée en secondes, ce qui lève les deux KO du 07/11 ;
+- seuls les Jobs créés depuis `PLAN` sont retenus, puisque le CronJob en garde trois.
+
+Rejeu en lecture seule à 16:29:45 UTC sur le passage du 07/11 : `bilan : OK`. Le Job et le pod sont créés en 201, sans aucun refus. Journal : [resultats/scan-saut-w8-sec.log](resultats/scan-saut-w8-sec.log). Prédictions W8a et W8b, avec le nouveau `scan-saut-resolution.sh` : [resultats/mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 16:31 UTC.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

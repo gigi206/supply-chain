@@ -1,0 +1,184 @@
+# W8 du saut d'un passage du scan, préparation à sec du relevé du 09/11 (07/11/2026, 16:28 à 16:31 UTC), lecture seule, rien écrit dans le cluster, Zot ni les VM
+
+## 1. Jobs gardés par le CronJob (relevé à 16:28 UTC) : successfulJobsHistoryLimit 3 ; le Job du 07/11 sera encore là le 09/11
+{"s":3,"f":3,"last":"2026-11-07T09:30:00Z","suspend":true}
+scan-sample-app-29900730 2026-11-07T09:30:00Z réussi=1 ; scan-sample-app-h5-manuel 2026-11-06T21:28:51Z réussi=1
+=> essais-h5-planifie.sh compterait 2 jobs du planificateur et relirait jobs[0], celui du 07/11 : filtre creationTimestamp >= PLAN ajouté
+
+## 2. Essai hors ligne du filtre des Jobs (JSON à deux passages, Job manuel et Job d'un autre propriétaire)
+PLAN=2026-11-09T09:30:00Z, nouveau filtre : scan-sample-app-29903610
+PLAN=2026-11-07T09:30:00Z, nouveau filtre : scan-sample-app-29900730,scan-sample-app-29903610
+ancien filtre : scan-sample-app-29900730,scan-sample-app-29903610
+nom attendu le 09/11 : scan-sample-app-29903610
+(la seconde ligne garde les deux Jobs : le JSON essayé contient un Job du 09/11, absent du cluster le 07/11)
+
+## 3. Rejeu de la relecture du 07/11, filtre des Jobs seul corrigé (PLAN=2026-11-07T09:30:00Z AVANT=3), 16:29:07 UTC
+## les deux KO d'audit sont ceux du relevé du 07/11 (complément de 09:49:54 UTC de durcissement-h5_planifie.log) : borne comparée en chaîne, jamais corrigée
+relecture du 07/11/2026 à 16:29:07 UTC
+passage attendu : 2026-11-07T09:30:00Z
+## P1, planificateur
+suspendu : true, dernier planifié : 2026-11-07T09:30:00Z, dernière réussite : 2026-11-07T09:31:52Z, actifs : 0
+OK   dernier passage planifié : 2026-11-07T09:30:00Z
+NAME                        STATUS     COMPLETIONS   DURATION   AGE
+scan-sample-app-h5-manuel   Complete   1/1           2m1s       19h
+scan-sample-app-29900730    Complete   1/1           112s       6h59m
+OK   jobs créés par le planificateur : 1
+job relu : scan-sample-app-29900730
+job créé à 2026-11-07T09:30:00Z, 0 s après l'heure attendue, borne prédite 60 s
+## P3, conteneurs
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-07T09:30:00Z"}
+OK   pods créés par le job : 1
+source code=0 motif=Completed redémarrages=0 2026-11-07T09:30:00Z 2026-11-07T09:30:00Z
+analyser code=0 motif=Completed redémarrages=0 2026-11-07T09:30:01Z 2026-11-07T09:31:44Z
+jetons code=0 motif=Completed redémarrages=0 2026-11-07T09:31:44Z 2026-11-07T09:31:45Z
+attester code=0 motif=Completed redémarrages=0 2026-11-07T09:31:45Z 2026-11-07T09:31:45Z
+publier code=0 motif=Completed redémarrages=0 2026-11-07T09:31:46Z 2026-11-07T09:31:49Z
+revocation code=0 motif=Completed redémarrages=0 2026-11-07T09:31:49Z 2026-11-07T09:31:50Z
+OK   conteneurs terminés avec le code 0 sur 6 : 6
+OK   job réussi : 1
+durée du pod : 110 s, borne prédite 300 s
+OK   revocation, OOM ou redémarrage : 0
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-07, sc-stockage.poc.test:5000/vulndb/grype@sha256:ab1cea192cd9f390ccf071a14e2ea5b1fcf5aa5da4b6939f31fe118a7fd93857, empreinte sha256:f90467f0e784f8f6dd04b9a53588851e4b6fb874a417
+analyser: SBOM|4 composants avec PURL (D1 a), 1 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+analyser: PREDICAT|sha256 4167066d0438fb2c3daf2298405c9b5ddd502c17e43d11388576a078cc653f7d, 103 s en tout
+jetons: identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 3aa829e6dda3bfac786988cb417db2068c9c4
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:ba36f94fbbdbaf29b74418818995216cdbee20af8871772a93b0245bee1c3ee0, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+## P4, Zot
+OK   referrers sur l'image : 4
+bases archivées : ["2026-11-06","2026-11-07"]
+## P1 et P2, audit de l'API, espace scan, depuis l'heure attendue (créations de jobs et de pods, puis refus)
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 301626c0-acc4-42c4-ae35-d34af4bc4223 404 ephemeralreports.reports.kyverno.io "301626c0-acc4-42c4-ae35-d34af4bc4223" not found
+      8 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523 404 ephemeralreports.reports.kyverno.io "3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523" not found
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 5376856f-241d-463d-b06f-a70235e9d398 404 ephemeralreports.reports.kyverno.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 ephemeralreports.reports.kyverno.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+      8 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports d55000b2-ae38-41db-9e90-8be6d0b0c3d4 404 ephemeralreports.reports.kyverno.io "d55000b2-ae38-41db-9e90-8be6d0b0c3d4" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports 5376856f-241d-463d-b06f-a70235e9d398 404 policyreports.wgpolicyk8s.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 policyreports.wgpolicyk8s.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+fin de l'extrait d'audit
+KO   création du job par le planificateur, en 201 : 0, attendu 1
+KO   création du pod par le contrôleur de jobs, en 201 : 0, attendu 1
+OK   refus 403 ou 422 : 0
+301626c0-acc4-42c4-ae35-d34af4bc4223   1     0     0     0
+3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523   1     0     0     0
+5376856f-241d-463d-b06f-a70235e9d398   1     0     0     0
+c739ff91-a7b4-4475-9481-11a3ad78f8d6   1     0     0     0
+d55000b2-ae38-41db-9e90-8be6d0b0c3d4   1     0     0     0
+## P6, Grafana, lu par l'auditeur
+OK   marqueurs SOURCE, SCAN, PUBLIE et les deux révocations lus dans Grafana : 5
+bilan : KO
+fin du relevé 16:29:09 UTC
+
+## 4. Rejeu après correction de la borne (comparée en secondes), 16:29:45 UTC
+relecture du 07/11/2026 à 16:29:45 UTC
+passage attendu : 2026-11-07T09:30:00Z
+## P1, planificateur
+suspendu : true, dernier planifié : 2026-11-07T09:30:00Z, dernière réussite : 2026-11-07T09:31:52Z, actifs : 0
+OK   dernier passage planifié : 2026-11-07T09:30:00Z
+NAME                        STATUS     COMPLETIONS   DURATION   AGE
+scan-sample-app-h5-manuel   Complete   1/1           2m1s       19h
+scan-sample-app-29900730    Complete   1/1           112s       6h59m
+OK   jobs créés par le planificateur : 1
+job relu : scan-sample-app-29900730
+job créé à 2026-11-07T09:30:00Z, 0 s après l'heure attendue, borne prédite 60 s
+## P3, conteneurs
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-07T09:30:00Z"}
+OK   pods créés par le job : 1
+source code=0 motif=Completed redémarrages=0 2026-11-07T09:30:00Z 2026-11-07T09:30:00Z
+analyser code=0 motif=Completed redémarrages=0 2026-11-07T09:30:01Z 2026-11-07T09:31:44Z
+jetons code=0 motif=Completed redémarrages=0 2026-11-07T09:31:44Z 2026-11-07T09:31:45Z
+attester code=0 motif=Completed redémarrages=0 2026-11-07T09:31:45Z 2026-11-07T09:31:45Z
+publier code=0 motif=Completed redémarrages=0 2026-11-07T09:31:46Z 2026-11-07T09:31:49Z
+revocation code=0 motif=Completed redémarrages=0 2026-11-07T09:31:49Z 2026-11-07T09:31:50Z
+OK   conteneurs terminés avec le code 0 sur 6 : 6
+OK   job réussi : 1
+durée du pod : 110 s, borne prédite 300 s
+OK   revocation, OOM ou redémarrage : 0
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-07, sc-stockage.poc.test:5000/vulndb/grype@sha256:ab1cea192cd9f390ccf071a14e2ea5b1fcf5aa5da4b6939f31fe118a7fd93857, empreinte sha256:f90467f0e784f8f6dd04b9a53588851e4b6fb874a417
+analyser: SBOM|4 composants avec PURL (D1 a), 1 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+analyser: PREDICAT|sha256 4167066d0438fb2c3daf2298405c9b5ddd502c17e43d11388576a078cc653f7d, 103 s en tout
+jetons: identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 3aa829e6dda3bfac786988cb417db2068c9c4
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:ba36f94fbbdbaf29b74418818995216cdbee20af8871772a93b0245bee1c3ee0, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+## P4, Zot
+OK   referrers sur l'image : 4
+bases archivées : ["2026-11-06","2026-11-07"]
+## P1 et P2, audit de l'API, espace scan, depuis l'heure attendue (créations de jobs et de pods, puis refus)
+      1 creation system:serviceaccount:kube-system:cronjob-controller jobs 201
+      1 creation system:serviceaccount:kube-system:job-controller pods 201
+      1 refus system:serviceaccount:kube-system:cilium get ciliumendpoints scan-sample-app-29900730-qlsrh 404 ciliumendpoints.cilium.io "scan-sample-app-29900730-qlsrh" not found
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 301626c0-acc4-42c4-ae35-d34af4bc4223 404 ephemeralreports.reports.kyverno.io "301626c0-acc4-42c4-ae35-d34af4bc4223" not found
+      8 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523 404 ephemeralreports.reports.kyverno.io "3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523" not found
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 5376856f-241d-463d-b06f-a70235e9d398 404 ephemeralreports.reports.kyverno.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      9 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 ephemeralreports.reports.kyverno.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+      8 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports d55000b2-ae38-41db-9e90-8be6d0b0c3d4 404 ephemeralreports.reports.kyverno.io "d55000b2-ae38-41db-9e90-8be6d0b0c3d4" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports 5376856f-241d-463d-b06f-a70235e9d398 404 policyreports.wgpolicyk8s.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 policyreports.wgpolicyk8s.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+fin de l'extrait d'audit
+OK   création du job par le planificateur, en 201 : 1
+OK   création du pod par le contrôleur de jobs, en 201 : 1
+OK   refus 403 ou 422 : 0
+301626c0-acc4-42c4-ae35-d34af4bc4223   1     0     0     0
+3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523   1     0     0     0
+5376856f-241d-463d-b06f-a70235e9d398   1     0     0     0
+c739ff91-a7b4-4475-9481-11a3ad78f8d6   1     0     0     0
+d55000b2-ae38-41db-9e90-8be6d0b0c3d4   1     0     0     0
+## P6, Grafana, lu par l'auditeur
+OK   marqueurs SOURCE, SCAN, PUBLIE et les deux révocations lus dans Grafana : 5
+bilan : OK
+fin du relevé 16:29:47 UTC
+
+## 5. scan-saut-resolution.sh, garde réelle (FENETRE=2026-11-07T00:00:00Z), 16:30:50 UTC : CronJob encore suspendu, rien jugé, code 3
+relevé du 07/11/2026 à 16:30:50 UTC
+## prédiction (écrite le 07/11/2026, avant le passage du 09/11, additif W8 de resultats/mesures-reelles-predictions.md)
+- garde : CronJob repris, dernier passage planifié 2026-11-09T09:30:00Z ; sinon rien n'est jugé
+- ScanEnRetard et ScanBientotRefuse inactives ; métrique du dernier referrer après 2026-11-09T09:30:00Z, égale à la date du referrer le plus récent dans Zot
+- récepteur : une seule notification resolved de ScanEnRetard, même début que les firing ; fin 0 à 1020 s après le nouveau referrer
+- firing notifiées : 6 (repeat_interval 4h de 11:36 UTC le 08/11 à la résolution), compte en CONSTAT
+## garde
+suspendu|dernier passage planifié : true|2026-11-07T09:30:00Z
+NON JUGÉ : la reprise n'a pas eu lieu ou le passage de 2026-11-09T09:30:00Z manque ; W8 non relevée
+bilan : non jugé
+
+## 6. Copie de scan-saut-resolution.sh, garde remplacée par l'état actuel et ScanEnRetard par ChainsEchecSignature (seule alerte avec firing et resolved au récepteur depuis le 05/11)
+## PLAN=2026-11-07T09:30:00Z DEPUIS='2026-11-05 00:00:00' ; premier essai, 16:30:50 UTC : 0 ligne lue au récepteur (jq sans -R), défaut corrigé
+## récepteur local, ScanEnRetard depuis 2026-11-05 00:00:00 UTC (reçu à, statut, début, fin)
+firing notifiées : 0
+CONSTAT nombre de firing notifiées différent de 6 (redémarrage d'Alertmanager ou de la VM, ou décalage des répétitions)
+KO   notifications resolved : 0, attendu 1
+KO   débuts distincts (firing et resolved) : 0, attendu 1
+bilan : KO
+fin du relevé 16:30:51 UTC
+## second essai après ajout de -R, 16:30:59 UTC (le CONSTAT de fin est attendu : ChainsEchecSignature n'a rien à voir avec le referrer)
+## Prometheus et Zot
+métrique du dernier referrer : 2026-11-07T09:31:48Z ; referrer de scan le plus récent dans Zot : 2026-11-07T09:31:48Z
+OK   métrique postérieure au passage : oui
+OK   métrique égale au referrer le plus récent de Zot : 1794043908
+OK   ChainsEchecSignature : inactive
+OK   ScanBientotRefuse : inactive
+## récepteur local, ScanEnRetard depuis 2026-11-05 00:00:00 UTC (reçu à, statut, début, fin)
+2026-11-07T11:36:17Z firing 2026-11-07T11:36:07.032Z 0001-01-01T00:00:00Z
+2026-11-07T11:46:17Z resolved 2026-11-07T11:36:07.032Z 2026-11-07T11:46:07.032Z
+firing notifiées : 1
+CONSTAT nombre de firing notifiées différent de 6 (redémarrage d'Alertmanager ou de la VM, ou décalage des répétitions)
+OK   notifications resolved : 1
+OK   débuts distincts (firing et resolved) : 1
+CONSTAT fin de ScanEnRetard 8059 s après le nouveau referrer (prédit : 0 à 1020 s)
+reçue au récepteur 10 s après la fin (affiché, non contrôlé)
+bilan : OK
+fin du relevé 16:31:00 UTC
+
+## 7. Complément du 07/11/2026 à 16:33:33 UTC, lecture seule : précision et délai réel de fraicheur-scan (borne W8b)
+systemctl show fraicheur-scan.timer : AccuracyUSec=1min RandomizedDelayUSec=0 ; dernier déclenchement 16:24:55 UTC, suivant 16:39:55 UTC
+07/11 : passages du service à 09:26:32 (scan 1794000648) et 09:41:32 (scan 1794043908), puis 09:56:32 UTC
+Prometheus, scan_dernier_referrer_timestamp_seconds au pas de 15 s, autour du changement :
+2026-11-07T09:41:30Z 2026-11-06T21:30:48Z
+2026-11-07T09:41:45Z 2026-11-07T09:31:48Z
+délai réel : referrer à 09:31:48, métrique lue à 09:41:45 UTC : 597 s
+pire cas : 900 s (cadence) + 60 s (AccuracySec) + 30 s (collecte) + 30 s (évaluation) = 1020 s, sans marge : borne portée à 1200 s avant tout passage

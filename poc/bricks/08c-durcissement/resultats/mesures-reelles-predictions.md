@@ -515,3 +515,40 @@ Accord du propriétaire : « ok », en réponse à la recommandation de suspendr
 - Défaut d'affichage, sans effet sur les contrôles : la dernière ligne (« sans reprise : … ») est sortie vide, avec deux erreurs de `date`, car le format contenant « à » n'était pas cité. Corrigé dans `preuves.sh` après le passage. La ligne rejouée donne : `ScanBientotRefuse` le 12/11 à 09:31:48, porte refusée le 14/11 à 09:31:48 UTC au plus tard.
 - Reprise : tâche planifiée `supply-chain-scan-saut-reprise`, une seule fois, le 08/11/2026 à 11:40 UTC. Elle n'a droit qu'à l'étape `scan_saut_reprendre` : ni Job manuel, ni relance sur KO, ni commit, ni push. Elle rapporte à cette session.
 - Si l'application est fermée à 11:40 UTC, la tâche part à son ouverture suivante. Au-delà de 01:00 UTC le 09/11 environ, l'étape sortira en KO, l'audit ne couvrant plus le passage sauté, et le trap reprendra le CronJob.
+
+## Additif du 07/11/2026, 16:31 UTC : W8, relevé du 09/11 préparé à sec, bornes avant passage, rien lancé
+
+Demande « continue » : préparer le jalon suivant à sec. Rien n'a été écrit dans le cluster, Zot ni les VM. La ligne W8 de l'additif de 16:15 UTC reste telle quelle. Elle disait le relevé « sans accord à demander » : c'était mon texte, pas celui du propriétaire. Le relevé du 09/11, et toute tâche planifiée qui le lancerait, lui seront soumis comme celui du 07/11. Essais archivés dans [scan-saut-w8-sec.log](scan-saut-w8-sec.log).
+
+**Deux défauts de `essais-h5-planifie.sh`, corrigés avant tout passage le 09/11.**
+- Le CronJob garde trois Jobs réussis (`successfulJobsHistoryLimit`). Le 09/11, le script aurait compté deux Jobs du planificateur, ceux du 07/11 et du 09/11, et relu le premier par ordre de nom, celui du 07/11. Il ne retient désormais que les Jobs créés depuis `PLAN`. Le filtre a été essayé hors ligne sur un JSON à deux passages : il rend le seul `scan-sample-app-29903610`, nom attendu le 09/11.
+- La borne de l'audit était comparée comme une chaîne : `09:30:00.1Z` précède `09:30:00Z`. C'est la cause des deux KO du 07/11, décrite dans le complément de 09:49:54 UTC mais jamais corrigée dans le script. Elle est désormais comparée en secondes.
+- Rejeu de la relecture du 07/11 (`PLAN=2026-11-07T09:30:00Z AVANT=3`), en lecture seule :
+  - à 16:29:07 UTC, filtre seul corrigé : les deux mêmes KO d'audit ;
+  - à 16:29:45 UTC, borne corrigée : `bilan : OK`, 1 création de Job par `cronjob-controller` et 1 création de pod par `job-controller` en 201, 0 refus 403 ou 422, 5 marqueurs dans Grafana.
+
+**Nouveau script `scan-saut-resolution.sh`**, en lecture seule : Prometheus, le journal du récepteur local et Zot sur `sc-stockage`, le CronJob par l'API.
+- Il refuse avant `FENETRE` (le 09/11 à 10:00 UTC) et si son journal existe.
+- Il ne juge rien et sort en code 3 si le CronJob est suspendu ou si le dernier passage planifié n'est pas `PLAN`. W8 dépend de la reprise (W5).
+- Essai à sec à 16:30:50 UTC : le CronJob est encore suspendu, la garde rend « non jugé », code 3.
+- Essai sur une copie, la garde remplacée par l'état actuel et `ScanEnRetard` par `ChainsEchecSignature`, seule alerte du récepteur avec un firing et un resolved depuis le 05/11. Premier essai : 0 ligne lue, car `jq` n'avait pas l'option `-R`. Défaut corrigé, second essai : une notification firing, une resolved, un même début. L'écart de fin y est sans objet.
+
+**Prédictions W8, le 09/11, relevé à partir de 10:00 UTC.**
+- W8a, passage de 09:30 UTC. Commande : `PLAN=2026-11-09T09:30:00Z AVANT=4 JOURNAL=…/resultats/durcissement-h5_planifie-0911.log poc/bricks/08c-durcissement/essais-h5-planifie.sh`. Attendu : P1 à P6 comme le 07/11.
+  - Le Job `scan-sample-app-29903610` est créé au plus 60 s après 09:30 UTC.
+  - 6 conteneurs sortent avec le code 0, le pod tourne au plus 300 s.
+  - 5 referrers sur l'image (4 relevés à 16:27 UTC).
+  - À l'audit : 1 Job créé en 201 par `cronjob-controller`, 1 pod créé en 201 par `job-controller`, 0 refus 403 ou 422.
+  - 5 marqueurs lus dans Grafana.
+  - Le compte de 5 suppose aucun Job manuel d'ici là et aucune suppression par la rétention de Zot, dont la première est attendue le 21/11.
+- W8b, résolution, par `scan-saut-resolution.sh`.
+  - Garde passée : `false|2026-11-09T09:30:00Z`.
+  - La métrique du dernier referrer est postérieure à 09:30 UTC et égale à la date du referrer le plus récent dans Zot.
+  - `ScanEnRetard` et `ScanBientotRefuse` sont inactives.
+  - Au récepteur, une seule notification resolved de `ScanEnRetard`, avec le même début que les firing. Sur les lignes firing, `endsAt` n'est pas une fin, et le script ne le lit pas.
+  - La fin de `ScanEnRetard` tombe 0 à 1200 s après le nouveau referrer, en CONSTAT. La borne additionne `OnUnitActiveSec=15min` de `fraicheur-scan.timer`, sa précision d'une minute, la collecte de 30 s, l'évaluation de 30 s et 120 s de marge. Le 07/11, le délai réel était de 597 s.
+  - Firing notifiées : 6, en CONSTAT. Le firing a lieu vers 11:36:48 UTC le 08/11, puis `repeat_interval` 4h jusqu'à la résolution vers 09:3x UTC le 09/11. Un redémarrage d'Alertmanager ou de la VM changerait ce compte.
+  - Confiance : haute sur les états, moyenne sur le compte des firing.
+- Ce qui n'est pas prouvé ici : l'heure de réception du resolved, affichée sans être contrôlée (`group_interval` 1m).
+
+**Correction avant tout passage** (07/11/2026, 16:34 UTC, avant le push, par amend du commit qui écrivait ces prédictions) : borne de W8b prédite d'abord à 0 à 1020 s, portée à 1200 s. La précision du timer (`AccuracySec` d'une minute) absorbait toute la marge. Relevé en lecture seule à 16:33:33 UTC, complément 7 de [scan-saut-w8-sec.log](scan-saut-w8-sec.log) : délai réel de 597 s le 07/11 entre le referrer et la métrique dans Prometheus.
