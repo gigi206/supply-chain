@@ -811,6 +811,23 @@ Passage lancé sur accord du propriétaire (« Oui »), de 10:21:24 à 10:21:46 
 
 Les sept prédictions sont tenues. L'espace d'essai et ses liaisons temporaires sont supprimés, et le cluster est revenu à son état d'avant. Les lecteurs de Secrets de `kube-system` sont inchangés depuis `h5_cilium` : cinq comptes, dont quatre lisent tout le cluster. X1 sera relevée après les quatre mesures.
 
+## Additif du 07/11/2026, 10:30 UTC : étape `resolveurs` passée sous H1 à H5, L1 à L8 tenues
+
+Passage lancé sur accord du propriétaire (« Oui, resolveurs »), de 10:29:36 à 10:29:47 UTC, avec `JOURNAL=preuves-h5`. Journal : [preuves-h5-resolveurs.log](../08-trust-plane/resultats/preuves-h5-resolveurs.log), 18 OK, 0 KO, code 0. Un complément à la main, en lecture seule, y est ajouté à 10:30 UTC pour L8.
+
+| Prédiction | Mesuré |
+|---|---|
+| L1 | 0 KO, code 0 |
+| L2 | 5 lectures refusées par les droits |
+| L3 | Résolution du bundle en service réussie dans `builds`, une fois par le compte `default`, une fois par le Secret `zot-images`. C'est le premier passage réel sous H5 du chemin du Secret |
+| L4 | 2 résolutions échouées dans `preuve-resolveurs` : refus sur le compte de service, puis sur le Secret |
+| L5 | 2 refus des droits au journal des résolveurs, 0 hors de `preuve-resolveurs` |
+| L6 | `get secrets builds 200` : 1 ; hors de `builds`, seulement les 2 refus 403 de `preuve-resolveurs` |
+| L7 | 4 lecteurs des Secrets de tout le cluster, liste inchangée |
+| L8 | Pod des résolveurs créé le 06/11 à 13:38:02 UTC, 0 redémarrage (complément) |
+
+Les huit prédictions sont tenues. L'espace d'essai est supprimé et il ne reste aucune ResolutionRequest d'essai dans `builds`. Le redémarrage du pod des résolveurs sous H5 n'est toujours pas mesuré.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
