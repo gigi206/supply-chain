@@ -126,3 +126,57 @@ Effets à connaître : de nouvelles images et tags `.att` sur `builds/essai-deci
 ## Correction du 07/11/2026, 11:38 UTC : E4
 
 E4 annonçait « premier passage sous H5 et S1 d'une signature de Chains hors de l'image réelle ». C'est faux : le 06/11 à 20:11 UTC, après S1 (appliqué à 18:40 UTC) et sous les limites et `Deny` de H5, le test 7 a fait signer `preuve-test7-en-service` par Chains sur `builds/essai-webhook` ([preuves-h5-test7.log](../../08-trust-plane/resultats/preuves-h5-test7.log), « Chains : signé=true »). La nouveauté se limite à un passage postérieur à `h5_roles` (20:36 UTC) et à `h5_cilium`. Le reste de E4, ce qui était attendu du témoin, n'est pas touché, et le résultat mesuré reste tenu.
+
+## Additif du 07/11/2026, 12:30 UTC : étapes de la porte, prédictions avant passage
+
+Accord du propriétaire : « Les 5 », pour `controle6`, `controle7`, `attseule`, `reglec` et `temoins_scan` sous H1 à H5. Rien n'a été passé avant ces lignes.
+
+**Correction avant passage.** Le tableau soumis au propriétaire disait de `attseule` : « rien poussé dans Zot d'après le code ». C'est faux. `t7_temoin` (`preuves.sh:989`) pousse un témoin par `crane mutate -t` dans `essais-j8/test7`, puis son tag `.att` signé par une clé jetable. Ces écritures sont définitives. `attseule` attend donc une confirmation du propriétaire, et ne passe pas sur le seul « Les 5 ». Ses prédictions sont écrites ci-dessous quand même.
+
+Commandes, depuis la racine du dépôt :
+
+```bash
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- controle6 controle7 reglec </dev/null
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- temoins_scan </dev/null
+```
+
+`temoins_scan` passe seule et en dernier : sous `set -e`, son code 1 prédit (voir T2) couperait les étapes suivantes, et `chrono.tsv` n'aurait pas sa ligne « fait ».
+
+Valeurs relevées à 12:28 UTC, en lecture anonyme de Zot :
+- referrers de l'image réelle : 0 dans `builds/sample-app`, 4 dans `builds/scan/sample-app`, 1 dans `builds/vsa/sample-app`, 0 dans `builds/scan/essai-webhook` et dans `builds/vsa/essai-webhook` ;
+- enveloppes : 24 sur l'image réelle, 36 sur `builds/essai-webhook` ;
+- dernière provenance de `builds/essai-webhook` : le 06/11 à 20:14:46 UTC, tâche `publier-essai` seule, sans `construire-image` ;
+- tags : 32 dans `essais-j8/test7`, 9 dans `essais-j8/regle-c`.
+
+Références : derniers passages le 06/11, de 14:35 à 15:58 UTC, avant H1. `cm_porte` a déjà réappliqué la ConfigMap `porte` sous `Deny`, dans le test 8 du 06/11 vers 20:20 UTC ([preuves-h5-test8.log](../../08-trust-plane/resultats/preuves-h5-test8.log)). Les Jobs de la porte et `porte-temoin` y ont été admis, comme dans le test 7.
+
+`controle6` :
+- C6-1 : ConfigMap `porte` réappliquée et identique aux fichiers versionnés. Clé de VSA `578dd771…`.
+- C6-2 : C1 `true||trusted_task.tagged`, contrôle 9 `ok` (24/24 enveloppes couvertes ; nombre de bundles non prédit), contrôle 6 `ok|1/1`.
+- C6-3 : C2 en refus, `0/0 VSA` dans `builds/vsa/essai-webhook`. C3 : ec et contrôle 9 inchangés, contrôle 6 en refus, motif de seuil de signatures.
+- C6-4 : 0 KO, moins de 5 min (2 min 53 le 06/11). `controle6` ne finit pas par `[ "$ko" = 0 ]` : son code de sortie ne prouve rien, il faut compter les lignes KO.
+
+`controle7` :
+- C7-1 : ConfigMap `porte` identique aux fichiers versionnés. Clé du scanner `1656a3fa…`.
+- C7-2 : C1 admise, contrôle 7 `ok|4 énoncé(s)`, contrôles 9 et 6 `ok`, Job réussi. C2 : refus par `scan.scan_present`, Job en échec. C3 : refus, motif de seuil de signatures.
+- C7-3 : 0 KO, code 0, moins de 5 min (2 min 54 le 06/11). Le CronJob du scan passe à 09:30 UTC : aucun nouvel énoncé pendant l'étape.
+
+`reglec` (écrit dans Zot avec `poc-ecriture` ; configuration de Zot inchangée depuis le 06/11, `5806ba5c…`) :
+- R1 : provenance reprise, celle du PipelineRun `474b3f60` (07/11, 10:49 UTC). Trois témoins neufs dans `essais-j8/regle-c`, signés par une clé jetable. Sur l'hôte, signature et attestation sont vérifiées avec la clé jetable et refusées avec celle de Chains.
+- R2 : l'image réelle, sans source, est refusée par `slsa_source_correlated.source_code_reference_provided` seule. `porte.construction_kata` figure parmi les succès.
+- R3 : `intacte` porte les violations de R2, plus `subject_build_task_matches` et `porte.fermeture_plateforme`, avec `porte.construction_kata` parmi les succès. `sans-kata` et `runc` portent les violations d'`intacte`, plus `porte.construction_kata` seule, avec les mêmes motifs que le 06/11.
+- R4 : `en-service` produit la ligne CONSTAT du succès à vide (0 TaskRun de `construire-image` dans la dernière provenance).
+- R5 : 0 KO, code 0, moins de 10 min (5 min 39 le 06/11). Image réelle inchangée : 24 enveloppes, dernière provenance `474b3f60`. Six tags de plus dans `essais-j8/regle-c` (15 au total) : `.sig` et `.att` des trois témoins, les trois tags nommés étant déplacés. Confiance moyenne sur ce compte.
+
+`temoins_scan` (témoins de G6 posés le 06/11 à 15:47 UTC, non régénérés : `plateforme.sh g6_temoins` écrit dans Zot et réécrit deux fichiers versionnés, hors de l'accord) :
+- T1 : 14 des 15 cas comme `g6-temoins.tsv`. Les fenêtres de `scan.rego` ne changent pas leur sort : `propre` a moins de 7 jours, `vieux` est daté du 29/10, `vex-expire` a expiré le 05/11, `vex-valide` court jusqu'au 06/12, et l'écart de base de `base-vieille` est fixe, de 4 jours.
+- T2 : **`futur` admis**, contrôle 7 `ok` avec 1 énoncé. Son scan est daté du 06/11 vers 16:47 UTC, une heure après sa pose : cette date est passée depuis environ 20 h, et le témoin n'est plus dans le futur. Le script attend `refus|scan.scan_recent` : il comptera 1 écart et sortira en code 1. C'est prédit ici, ce n'est pas une régression de la porte. La branche « scan daté du futur » n'est donc pas couverte par ce passage.
+- T3 : `g6-reelle` à `true||ok|ok|ok` ; ConfigMap `porte-temoin` posée puis retirée. Moins de 15 min (10 min 27 le 06/11).
+
+`attseule`, si le propriétaire confirme :
+- A1 : un témoin neuf dans `essais-j8/test7`, sans tag `.sig`, avec un tag `.att` de plus.
+- A2 : refusé ; `builtin.image.signature_check`, `porte.fermeture_plateforme`, `porte.image_signature` et `subject_build_task_matches`, comme le 06/11 ; `builtin.attestation.signature_check` absent.
+- A3 : 0 KO, image réelle inchangée.
+
+Hors des étapes :
+- X3 : `KyvernoRefusAnormaux` ne se déclenche pas, et le compteur Kyverno ne monte pas. CronJobs à `suspend=false`, 0 PipelineRun en cours, `porte-temoin` absente à la fin.
