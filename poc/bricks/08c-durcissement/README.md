@@ -862,6 +862,24 @@ Les huit prédictions sont tenues. Le chemin 2 de la bascule, la création par l
 
 Les quatre mesures réelles de `mesures-reelles-predictions.md` sont passées : 109 OK, 0 KO, 29 prédictions sur 29 tenues. Toujours non couverts : le redémarrage des VM et celui du pod des résolveurs, `decision3`, `enveloppes`, `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan`, le test 6 sous limites et `intercepteurs`. L'étape `test5` elle-même reste arrêtée par `gabarit_essai`. Les deux refus qui lui manquaient, l'autre secret et le corps modifié, sont couverts par `test5_refus`.
 
+## Additif du 07/11/2026, 11:34 UTC : redémarrage des trois VM sous H1 à H5, V1 à V5 tenues
+
+Passage lancé sur accord du propriétaire (« Oui les 2 »), de 11:20:38 à 11:32:38 UTC, avec `DISTRO=rke2`. Les journaux que le script écrase ont d'abord été archivés tels qu'au commit 8c98313 (`*-avant-redemarrage-h5.log`, commit d834c13, `kata-temoin` ajouté ensuite). Journaux : [redemarrage-vm.log](../08-trust-plane/resultats/redemarrage-vm.log), 51 OK, 0 KO, code 0, avec un complément à la main en lecture seule ; [kata-reseau.log](../08-trust-plane/resultats/kata-reseau.log), 25 OK, 0 KO.
+
+| Prédiction | Mesuré |
+|---|---|
+| V1, nœuds | Arrêt en 112 s, démarrage en 9 s, trois nouveaux `bootID` et `Ready` en 77 s. Aucun refus de `system:rke2-controller` dans l'audit depuis le démarrage |
+| V2, confiance | Kyverno prêt et refusant à la sonde dès le premier essai ; OpenBao scellé, puis descellé ; même clé Transit, signature d'avant vérifiée ; TSA relancé, jeton OpenBao au 4e essai, jeton témoin vérifié et refusé sur un autre contenu et sur une autre CA |
+| V3, Chains | Pod recréé et prêt ; `identifiants` lit les identifiants Zot au 1er essai et finit par « jeton révoqué » |
+| V4, Kata | Runtime rechargé par containerd sur sc-build, pod témoin admis, noyau de l'invité `6.18.56` |
+| V5, réseau | 25 OK, mêmes constats qu'avant, adresses mises à part : aucune fenêtre en 3 essais runc et Kata, 15 flux `INVALID_SOURCE_IP` pour l'adresse usurpée, trois autres sources refusées, aucun paquet de `203.0.113.10` sur `enp1s0` |
+
+Les cinq prédictions sont tenues, V1 et V5 comprises, qui étaient de confiance moyenne. Les CronJobs `horodatage` et `rattrapage` réussissent un passage après le retour du TSA.
+
+**Non prédit, relevé en complément.** Le passage `horodatage-29900844`, créé à 11:24:04 UTC avant le descellement, échoue : son conteneur `identifiants` sort en erreur à 11:24:37, OpenBao étant encore scellé. Les passages suivants réussissent. Je n'ai pas vérifié s'il avait des enveloppes à traiter. Seuls refus de l'audit depuis le démarrage : 13 `get pods` de `system:node:sc-build` en 403, sur les pods de mesure de `kata.sh` dans `builds`. C'est la même forme que les 403 de nœud déjà relevés à R4 sur `helper-pod`, et la cause exacte n'est toujours pas établie. Aucun 422, aucun refus de `ValidatingAdmissionPolicy`. `KyvernoRefusAnormaux` reste inactive. Prometheus compte 1 refus Kyverno sur 15 min, que j'attribue à la sonde du script sans l'avoir apparié.
+
+**Pod des résolveurs.** Il n'a pas été recréé : même pod, créé le 06/11 à 13:38 UTC, conteneur relancé à 11:23:33 UTC (1 redémarrage). Le démarrage réel d'un nouveau pod des résolveurs reste non mesuré. La jonction d'un nouveau nœud aussi.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
