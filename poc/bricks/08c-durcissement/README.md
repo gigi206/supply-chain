@@ -962,6 +962,20 @@ Les cinq étapes de la porte sont passées sous H1 à H5, avec 18 prédictions t
 
 Toujours non couverts sous H1 à H5 : le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan, et la branche « scan daté du futur » de `scan.rego` (témoins de G6 à refaire).
 
+## Additif du 07/11/2026, 12:55 UTC : cause de la baisse de durée de `ec`, déjà mesurée le 06/11
+
+Correction de l'additif de 12:35, sans réécriture : la phrase « La cause de cette baisse n'a pas été relue » est fausse. La cause est mesurée dans ce README (additif du 06/11/2026, 19:07 UTC, M1) : depuis le commit c299ce8, `SIGSTORE_REKOR_PUBLIC_KEY` est définie dans le conteneur `porte` de `porte-job.yaml`. Elle évite à `ec` v0.10.42 l'appel à `cosign.TrustedRoot()` vers le TUF public, injoignable depuis la porte. Sur l'image réelle, ce conteneur est passé de 61 s à 1 s.
+
+Relecture des journaux archivés (champ 6 de `VERDICT`), sans action sur le cluster :
+
+| Journaux | Champ 6 |
+|---|---|
+| `preuves-reglec-premier-passage.log` (31/10), `preuves-test8-premier-passage.log` et `-deuxieme-passage.log` (01/11) | 30 ou 31 s |
+| `preuves-reglec.log`, `preuves-attseule.log`, `preuves-test8.log`, `preuves-controle6.log`, `preuves-controle7.log`, `preuves-temoins_scan.log` (06/11, 15:40 à 16:58, heure locale des fichiers) | 61 s, 31 s pour `reglec-en-service`, `c6-sans-vsa` et `c7-sans-scan` |
+| `preuves-h5-test8.log` (06/11, après c299ce8) et les cinq journaux `preuves-h5-*` des étapes de la porte (07/11) | 1 ou 2 s |
+
+L'écart entre 31 et 61 s avant c299ce8 n'est pas expliqué ici et ne change aucun verdict. Le point est retiré de la liste des points non couverts.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
