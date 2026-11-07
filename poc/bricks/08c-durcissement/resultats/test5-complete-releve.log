@@ -1,0 +1,16 @@
+# relevé en lecture seule pour test5 complète, 2026-11-07T14:28:33Z, rien écrit dans le cluster ni dans Zot
+## gabarit en service
+pipeline : sample-app
+## PipelineRun de la tête de main
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f créé 2026-11-07T10:48:01Z, Succeeded, déclencheur rattrapage, uid 474b3f60-bb72-4a62-953b-a2d505165d7c
+## pods de l'EventListener et des intercepteurs
+el-forgejo-76596b99b8-wmm97 créé 2026-11-06T19:20:20Z, redémarrages 1, conteneur démarré 2026-11-07T11:23:32Z
+tekton-triggers-core-interceptors-6894848d5c-xh998 créé 2026-11-07T14:06:23Z, redémarrages 0, conteneur démarré 2026-11-07T14:06:23Z
+## EventListener : lignes portant un eventID depuis le démarrage du conteneur (2026-11-07T11:23:32Z)
+lignes : 0
+## intercepteurs : journal depuis le démarrage du pod (2026-11-07T14:06:23Z), niveau et message
+14:06:23 info Starting informers...
+14:06:24 info TLS config: MinVersion=TLS 1.2, CipherSuites=[default], CurvePreferences=[default]
+14:06:24 info Listen and serve on port 8443
+## CronJob rattrapage
+suspend=false, dernier passage 2026-11-07T14:28:00Z

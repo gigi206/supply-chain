@@ -234,3 +234,35 @@ Référence : passage du 02/11 de 11:14:50 à 11:16:33 UTC, sous k3s, avant H1 �
 - I6 : 0 KO. Conclusion inchangée : borner les intercepteurs par les droits demande de modifier Triggers. La limite est gardée.
 
 Ce que ces deux étapes ne couvrent pas : le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan, la branche « scan daté du futur ». L'étape `test5` reste arrêtée par `gabarit_essai` tant que le gabarit d'essai n'est pas en service ; ses refus sont couverts par `test5_refus`.
+
+## Additif du 07/11/2026, 14:29 UTC : `test5` complète, relecture à sec, rien lancé
+
+Demande : « Continue », prise pour une préparation à sec. Rien écrit dans le cluster ni dans Zot, `preuves.sh` inchangé. Relevé en lecture seule de 14:28:33 UTC : [test5-complete-releve.log](test5-complete-releve.log).
+
+**Pas de prédiction pour `etape_test5` telle quelle.** Elle appelle `gabarit_essai` sans condition (`preuves.sh:342`), et le gabarit en service est `sample-app` : KO immédiat, déjà constaté (C7). La garde est justifiée : le commit du témoin est inventé par le script et n'existe pas dans Forgejo, donc la pipeline `sample-app` échouerait à `preparer` et laisserait un PipelineRun `Failed` dans `builds`. La lancer demande l'une de ces voies, chacune sur accord :
+- modifier le script ;
+- remettre le gabarit d'essai (`politique.sh declencheurs`, `commun.sh:103`), puis revenir au gabarit `sample-app` ; mécanisme du retour non relu ;
+- créer un vrai commit dans Forgejo pour le témoin, ce qui déplace la tête de main, constante dans les scripts (`TETE_J2`).
+
+**Couverture des assertions de `test5` sous H1 à H5**, tous ces passages étant postérieurs à S1 (18:39 UTC le 06/11) et à `h5_deny` (19:26 UTC) :
+
+| Assertion de `test5` | Mesure sous H1 à H5 | Journal |
+|---|---|---|
+| HTTP 202 à chaque livraison | 4 livraisons, 4 réponses 202 | `preuves-h5-test5_refus.log` (07/11, 10:40 UTC) |
+| 3 refus de l'intercepteur github, motifs et compte exacts | 1 « no X-Hub-Signature-256 header set », 2 « payload signature check failed », 3 au total | idem |
+| Aucun PipelineRun pour les livraisons refusées | 0 pour `1111…`, 0 pour le commit jamais livré | idem |
+| Création par une livraison valide, construite et signée | Livraison de Forgejo : une création par `el-forgejo`, `Succeeded`, signée par Chains, porte `true` | `preuves-h5-r4-construction_durcie.log` (06/11, 20:56 UTC) |
+| Nouvelle livraison de Forgejo pour la tête : `already exists` | Rejeu par Forgejo refusé à la création | idem |
+| Livraison valide pour un PipelineRun existant : acceptée par les intercepteurs, `already exists` avec son `eventID` | Livraison signée par le script, même `eventID` dans le journal de l'EventListener, UID inchangé | `preuves-h5-test5_refus.log` |
+| Un seul PipelineRun par commit | Idem, plus le chemin 2 | `preuves-h5-test5_refus.log`, `preuves-h5-rattrapage_durci.log` |
+
+Non mesuré sous H1 à H5, à la lettre :
+- **Rejeu à l'identique** d'un corps signé déjà accepté une fois. Mesuré le 06/11 à 14:32 UTC, avant H5 (`preuves-test5.log` de la 08) : rejeu accepté par les intercepteurs, refusé à la création (`already exists`). L'anti-rejeu vient du nom du PipelineRun (J4), comme pour la livraison valide de `test5_refus`. Écart attendu nul sous H5, non mesuré.
+- **Absence de la ligne de niveau debug** « interceptor stopped trigger processing » dans le journal de l'EventListener : `test5` la contrôle, `test5_refus` non.
+
+**Constat du relevé : aucune livraison traitée depuis le redémarrage.** Le conteneur de l'EventListener a redémarré à 11:23:32 UTC, et son journal ne porte aucun `eventID` depuis. Le pod des intercepteurs `…-6894848d5c-xh998`, créé à 14:06:23 UTC par l'étape `intercepteurs`, n'a journalisé que son démarrage. L'appel de l'EventListener vers ce pod n'a donc jamais été mesuré : `caBundle` inchangé (I5), mais aucune livraison.
+
+**Issues soumises au propriétaire, aucune décidée :**
+- **(a)** Retirer « `test5` complète » des non couverts, en renvoyant au tableau ci-dessus. Les deux points à la lettre restent nommés.
+- **(b)** Étendre `test5_refus` : envoyer deux fois le corps du témoin, et contrôler l'absence de la ligne de niveau debug. Mêmes effets que `test5_refus` : rien dans le cluster ni dans Zot, un secret jetable effacé par le trap ; 5 livraisons et 2 erreurs `already exists` dans les journaux. Couvre aussi la première livraison par l'EventListener redémarré et le nouveau pod des intercepteurs. Script modifié et prédictions committées avant le passage, puis accord de passage.
+- **(c)** Rejouer `test5_refus` sans changement : même couverture du redémarrage, sans le rejeu à l'identique ni la ligne de niveau debug.
