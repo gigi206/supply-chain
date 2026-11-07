@@ -1,0 +1,24 @@
+# relevé en lecture seule du noyau des hôtes et des mises à jour automatiques, 2026-11-07T14:07:28Z
+# commandes : uname -r ; date +%Z%z ; systemctl is-enabled unattended-upgrades.service ; /var/log/apt/history.log* filtré sur unattended-upgrade
+== 192.168.161.11
+noyau 6.12.115+deb13.1-amd64, fuseau UTC+0000, démarrage 2026-11-07 11:22:33, unattended-upgrades.service enabled
+2026-11-07 06:25:04 Upgrade: apt:amd64 (3.0.3, 3.0.4), libapt-pkg7.0:amd64 (3.0.3, 3.0.4), apt-utils:amd64 (3.0.3, 3.0.4)
+2026-11-07 06:25:07 Upgrade: vim:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-common:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-tiny:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-runtime:amd64 (2:9.1.1230-2, 2:
+2026-11-07 06:25:10 Install: linux-image-6.12.115+deb13.1-amd64:amd64 (6.12.115-2, automatic)
+2026-11-07 06:25:10 Upgrade: linux-image-amd64:amd64 (6.12.113-1, 6.12.115-2)
+== 192.168.161.12
+noyau 6.12.115+deb13.1-amd64, fuseau UTC+0000, démarrage 2026-11-07 11:22:33, unattended-upgrades.service enabled
+2026-11-07 06:15:17 Upgrade: vim:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-common:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-tiny:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-runtime:amd64 (2:9.1.1230-2, 2:
+2026-11-07 06:15:19 Upgrade: apt:amd64 (3.0.3, 3.0.4), libapt-pkg7.0:amd64 (3.0.3, 3.0.4), apt-utils:amd64 (3.0.3, 3.0.4)
+2026-11-07 06:15:22 Install: linux-image-6.12.115+deb13.1-amd64:amd64 (6.12.115-2, automatic)
+2026-11-07 06:15:22 Upgrade: linux-image-amd64:amd64 (6.12.113-1, 6.12.115-2)
+== 192.168.161.13
+noyau 6.12.115+deb13.1-amd64, fuseau UTC+0000, démarrage 2026-11-07 11:22:33, unattended-upgrades.service enabled
+2026-11-07 06:36:00 Upgrade: apt:amd64 (3.0.3, 3.0.4), libapt-pkg7.0:amd64 (3.0.3, 3.0.4), apt-utils:amd64 (3.0.3, 3.0.4)
+2026-11-07 06:36:03 Upgrade: vim:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-common:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-tiny:amd64 (2:9.1.1230-2, 2:9.1.1230-2+deb13u1), vim-runtime:amd64 (2:9.1.1230-2, 2:
+2026-11-07 06:36:07 Install: linux-image-6.12.115+deb13.1-amd64:amd64 (6.12.115-2, automatic)
+2026-11-07 06:36:07 Upgrade: linux-image-amd64:amd64 (6.12.113-1, 6.12.115-2)
+== référence : noyau des nœuds avant le redémarrage du 07/11
+## bootID)
+sc-build 6.12.113+deb13-amd64
+sc-confiance 6.12.113+deb13-amd64

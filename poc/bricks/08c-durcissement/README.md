@@ -976,6 +976,46 @@ Relecture des journaux archivés (champ 6 de `VERDICT`), sans action sur le clus
 
 L'écart entre 31 et 61 s avant c299ce8 n'est pas expliqué ici et ne change aucun verdict. Le point est retiré de la liste des points non couverts.
 
+## Additif du 07/11/2026, 14:07 UTC : test 6 et `intercepteurs` passés sous H1 à H5, N1 à N7 et I1 à I6 tenues ; noyau des hôtes mis à jour par `unattended-upgrades`
+
+Accord du propriétaire : « 3 », pour les deux étapes. Prédictions committées avant, au commit a0a44bc ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 13:37 UTC). Lancées avec `JOURNAL=preuves-h5`, `T6_FERMES="Supervisor Etcd"` pour le test 6.
+
+Journaux :
+- [preuves-h5-test6.log](../08-trust-plane/resultats/preuves-h5-test6.log) : de 14:03:10 à 14:04:43 UTC, 0 KO, code 0 ;
+- [preuves-h5-intercepteurs.log](../08-trust-plane/resultats/preuves-h5-intercepteurs.log) : de 14:04:52 à 14:06:35 UTC, 0 KO, code 0 ;
+- [noyau-hotes-releve.log](resultats/noyau-hotes-releve.log), à 14:07:28 UTC.
+
+`preuves-test6.log` (06/11, cité par H4b) et `preuves-intercepteurs.log` (02/11) ne sont pas écrasés.
+
+| Prédiction | Mesuré |
+|---|---|
+| N1, admission | Les deux TaskRuns sont admis sous `Deny`, pods Kata privilégiés compris. Aucun événement `PolicyViolation` depuis 14:03 UTC |
+| N2, bundles | `preuve-test6-contre@sha256:6c39ea60…` et `preuve-test6-test@sha256:48115c5c…`, neufs. `TrustedResourcesVerified=True` pour les deux |
+| N3, adresse usurpée | `10.42.1.250`, contrôlée inutilisée avant chaque passage |
+| N4, garde-fous | Labels attendus, pods sous Kata (invité 6.18.56), eth0 à l'IP du pod, adresse ajoutée puis retirée |
+| N5, contre-épreuve | Comme le 06/11 : Zot, Forgejo et les deux voies de l'API joignables ; Supervisor et Etcd refusés par le pare-feu d'hôte ; `nc -s` joint Zot ; 3 SYN sortis par `192.168.161.12` ; 3 flux `INVALID_SOURCE_IP` pour Zot et 3 pour Forgejo |
+| N6, `construire-image` | 7 destinations refusées, 6 flux `POLICY_DENIED EGRESS` chacune, l'API par le service sous `192.168.161.11:6443`. `nc -s` refusé. 3 flux `INVALID_SOURCE_IP` pour Zot et 3 pour Forgejo. 0 paquet sur `enp1s0` |
+| N7 | 0 KO en 93 s. Image réelle inchangée : 24 enveloppes, `474b3f60`. Aucune alerte dans Alertmanager ni dans `ALERTS` de Prometheus à 14:06:50 UTC |
+| I1, liaison | Conforme à l'attendu |
+| I2, liaison retirée | `can-i` à `no`. Nouveau pod `…-5fccdd7c6c-q49tj` non prêt après 90 s. Refus « at the cluster scope » dans son journal |
+| I3, admission | Les deux pods neufs sont admis sous `Deny`. C'est la première admission d'un pod de ce déploiement sous `Deny`. Pod final `…-6894848d5c-xh998`, sur `sc-confiance` |
+| I4, ancien pod | Trois lignes « 1 old replicas are pending termination » au second redémarrage, comme le 02/11. Aucune livraison pendant la fenêtre : la continuité du service n'est pas mesurée |
+| I5, liaison remise | `can-i` à `yes`, pod prêt, 0 refus dans son journal. `caBundle` des cinq ClusterInterceptors inchangé pendant l'étape, de longueur 1448 (1456 sous k3s le 02/11) |
+| I6 | 0 KO en 103 s. Conclusion inchangée : la limite des intercepteurs est gardée |
+
+13 prédictions tenues sur 13.
+
+**Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
+
+**Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.
+
+Conséquences :
+- V1 à V5, le test 6 et les étapes passées depuis 11:22 UTC ont tourné sous ce noyau. Leurs résultats restent valables, mais ils ne comparent pas un même noyau avant et après H5.
+- La règle « Épingle les versions » n'est pas tenue pour les paquets Debian des VM. Rien n'est changé ici : couper `unattended-upgrades` ou épingler le noyau est une action au niveau système des VM, qui demande l'accord du propriétaire.
+- Le noyau de l'invité Kata reste `6.18.56`.
+
+Toujours non couverts sous H1 à H5 : l'étape `test5` complète, arrêtée par `gabarit_essai` (ses refus sont couverts par `test5_refus`), le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
