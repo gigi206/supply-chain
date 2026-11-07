@@ -1042,6 +1042,32 @@ Les neuf prédictions sont tenues. Hors étape : 0 événement `PolicyViolation`
 
 Toujours non couverts sous H1 à H5 : l'étape `test5` complète (voir ci-dessus), le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 07/11/2026, 15:26 UTC : `test5` complète passée sous H1 à H5 par `test5_essai`, U1 à U7 tenues
+
+Passage lancé sur accord du propriétaire (« Oui » à « Je lance test5_essai avec ces effets ? »), de 15:24:48 à 15:25:22 UTC, avec `JOURNAL=preuves-h5` et `PIPE_ESSAI` (`sample-app-essai@sha256:c5194859…`). Étape, effets et prédictions committés avant, au commit `0d8b112` ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 15:20 UTC ; vérification à sec : [test5-essai-sec.log](resultats/test5-essai-sec.log)). Journal : [preuves-h5-test5_essai.log](../08-trust-plane/resultats/preuves-h5-test5_essai.log), 20 OK, 0 KO, code 0. Contrôles hors étape : [test5-essai-hors-etape.log](resultats/test5-essai-hors-etape.log).
+
+| Prédiction | Mesuré |
+|---|---|
+| U1 | Gabarit en service identique au rendu de `gabarit-sample-app.yaml` ; gabarit d'essai appliqué à 15:24:48 UTC |
+| U2 | Toutes les assertions de `test5` tenues. 3 refus de l'intercepteur github. Témoin `sample-app-5d81df78…` créé par l'EventListener sur la pipeline d'essai, `Succeeded`, TaskRun `publier` à lui, TaskRun et PipelineRun signés par Chains. Rejeu à l'identique et nouvelle livraison de Forgejo écartés (`already exists`, chacun sous son `eventID`). Un seul PipelineRun par commit ; aucune ligne de niveau debug |
+| U3 | Un seul PipelineRun créé pendant la fenêtre : le témoin, `sample-app-essai`, `Succeeded` |
+| U4 | Gabarit de la bascule remis à 15:25:22 UTC, spec identique à l'objet sauvé ; rattrapage repris ; UID de la tête inchangé (`474b3f60`) |
+| U5 | Image réelle inchangée, 24 enveloppes, provenance `474b3f60` |
+| U6 | `builds/essai-webhook` : 36 → 38 enveloppes |
+| U7 | 0 événement `PolicyViolation`, 0 alerte active ; au journal de l'EventListener, 4 lignes hors niveau `info`, toutes `already exists`, et 0 ligne `tls`, `x509` ou `certificate` |
+
+Les sept prédictions sont tenues. L'attente de 10 s a suffi au cache de l'EventListener : le témoin a été rendu avec la pipeline d'essai. La durée de propagation elle-même n'est pas mesurée.
+
+**Écarts aux effets annoncés.**
+- Fenêtre sous la pipeline d'essai : 34 s, contre « 40 s à 1 min 30 environ ».
+- Non prédit : le passage du rattrapage planifié à 15:25:00 UTC, manqué pendant la suspension, a été lancé à la reprise (`rattrapage-29901085`, créé à 15:25:22 UTC, `startingDeadlineSeconds` 120). Il s'est arrêté à `PRESENT`, sans création. Il est créé dans la même seconde que la remise du gabarit : leur ordre n'est pas établi.
+
+**Reste après le passage.** Le témoin `sample-app-5d81df78…`, son TaskRun et son pod restent dans `builds`. Ses deux enveloppes restent dans `builds/essai-webhook`, dont la provenance de PipelineRun la plus récente est désormais la sienne.
+
+**Effet sur la couverture.** L'étape `test5` complète est passée sous H1 à H5 : elle sort des non couverts.
+
+Toujours non couverts sous H1 à H5 : le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

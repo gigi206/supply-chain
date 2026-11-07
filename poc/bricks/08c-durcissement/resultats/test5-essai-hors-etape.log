@@ -1,0 +1,19 @@
+# contrôles hors étape après test5_essai (15:24:48 à 15:25:22 UTC), 2026-11-07T15:25:36Z, lecture seule
+## gabarit en service et rattrapage
+bundle : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
+name : sample-app
+rattrapage : suspend=false, dernier passage 2026-11-07T15:25:00Z, dernier succès 2026-11-07T15:25:25Z
+premier passage après la remise : rattrapage-29901085 : PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f 
+## EventListener depuis 15:24:48 : lignes hors niveau info, par motif
+      4 error already exists
+lignes tls, x509 ou certificate : 0
+## pod des intercepteurs
+tekton-triggers-core-interceptors-6894848d5c-xh998, redémarrages 0
+## événements PolicyViolation depuis 15:24
+0
+## alertes actives (Alertmanager de sc-stockage)
+actives : 0
+## complément, 2026-11-07T15:25:49Z : Jobs du rattrapage autour de la fenêtre (passage de 15:25 rattrapé à la reprise, startingDeadlineSeconds 120)
+rattrapage-29901083 créé 2026-11-07T15:23:00Z, planifié 2026-11-07T15:23:00Z
+rattrapage-29901084 créé 2026-11-07T15:24:00Z, planifié 2026-11-07T15:24:00Z
+rattrapage-29901085 créé 2026-11-07T15:25:22Z, planifié 2026-11-07T15:25:00Z

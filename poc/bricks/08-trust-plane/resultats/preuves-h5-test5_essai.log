@@ -1,0 +1,64 @@
+# preuves.sh test5_essai, 2026-11-07T15:24:48Z
+## prédiction de l'enveloppe (écrite le 07/11/2026 à 15:20 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, U1 à U7)
+- gabarit en service identique au rendu de gabarit-sample-app.yaml ; gabarit d'essai admis, en service pendant le passage seulement
+- prédictions de test5 (30/10/2026) tenues : 0 KO ; un seul PipelineRun créé pendant la fenêtre, sur la pipeline d'essai, réussi
+- gabarit de la bascule remis, spec identique ; rattrapage repris ; sample-app-6391fd437f26696847041be3226bbbf633f55a2f inchangé ; image réelle inchangée
+- builds/essai-webhook : deux enveloppes de plus (TaskRun publier et PipelineRun du témoin)
+OK   gabarit en service = gabarit-sample-app.yaml rendu avec pipeline.ref : oui
+OK   gabarit d'essai rendu : TriggerTemplate seule, pipeline sample-app-essai : 1 1
+OK   sample-app-6391fd437f26696847041be3226bbbf633f55a2f : Succeeded
+gabarit d'essai appliqué à 2026-11-07T15:24:48Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- l'EventListener répond HTTP 202 à chaque livraison, avant les intercepteurs : l'émetteur n'apprend rien du refus
+- commit 1111111111111111111111111111111111111111 : livraison non signée, signée avec un autre secret, et corps modifié sous la signature valide d'un
+  autre corps : refusées par l'intercepteur github (FailedPrecondition : une fois « no X-Hub-Signature-256 header set », deux
+  fois « payload signature check failed ») ; aucun PipelineRun. L'EventListener ne journalise ces refus qu'au niveau debug
+  (« interceptor stopped trigger processing », pkg/sink/sink.go de Triggers v0.37.2), absent au niveau info en service : leur
+  trace est le journal des intercepteurs, pas celui de l'EventListener
+- témoin : livraison valide du commit 5d81df78537d1cac44b348b21d3b4f9623101bd8 (propre à ce passage) : PipelineRun sample-app-<commit> créé par
+  l'EventListener, terminé, signé par Chains (TaskRun et PipelineRun)
+- rejeu à l'identique du témoin (même corps, même signature), et nouvelle livraison de Forgejo pour la tête de main (6391fd437f26696847041be3226bbbf633f55a2f,
+  dont le PipelineRun existe) : acceptés par les intercepteurs, puis refusés à la création (« already exists » dans le journal
+  de l'EventListener, avec l'eventID de la livraison rejouée) ; un seul PipelineRun par commit
+- limite connue, non éprouvée ici : l'anti-rejeu dure tant que le PipelineRun existe (J4)
+## livraisons refusées (commit 1111111111111111111111111111111111111111)
+non signée : HTTP 202 {"eventID":"23f2966c-a0a1-4a41-bca0-55fb5fd2babd"}
+autre secret : HTTP 202 {"eventID":"1f1d4646-61bd-4257-846e-4eb13ff546fb"}
+corps modifié (signature valide du corps du témoin) : HTTP 202 {"eventID":"d409a668-efad-442f-8731-e42c85d50413"}
+## témoin : livraison valide (commit 5d81df78537d1cac44b348b21d3b4f9623101bd8)
+valide : HTTP 202 {"eventID":"de850ad7-f1be-42f0-bcce-6d816b5d001f"}
+OK   TaskRun sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8-publier créé par ce PipelineRun (propriétaire 0dc63365-c206-443d-930d-d3f6b90954d7)
+OK   PipelineRun sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8 créé par l'EventListener, Succeeded
+OK   taskrun/sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8-publier signé par Chains
+OK   pipelinerun/sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8 signé par Chains
+## rejeux
+rejeu à l'identique du témoin : HTTP 202 {"eventID":"52211cf8-b2cd-4685-8289-4d15e53905f1"}
+Forgejo, nouvelle livraison pour la tête de main : HTTP 204
+## bilan (PipelineRuns par commit)
+commit 1111111111111111111111111111111111111111 : 0 ; témoin 5d81df78537d1cac44b348b21d3b4f9623101bd8 : 1 ; tête de main 6391fd437f26696847041be3226bbbf633f55a2f : 1
+OK   livraisons non signée, d'un autre secret, à corps modifié : aucun PipelineRun
+OK   rejeux sans effet : un seul PipelineRun par commit
+## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-07T15:24:58Z
+{"t":"15:24:58","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:24:59","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:24:59","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   livraison non signée refusée par l'intercepteur github
+OK   autre secret et corps modifié refusés par l'intercepteur github
+OK   3 refus des intercepteurs, aucun autre (rejeux acceptés par les intercepteurs)
+## trace : EventListener, créations refusées (already exists) depuis 2026-11-07T15:24:58Z
+{"t":"15:25:19","eventID":"52211cf8-b2cd-4685-8289-4d15e53905f1","erreur":"pipelineruns.tekton.dev \"sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8\" already exists"}
+{"t":"15:25:21","eventID":"2077d13f-2f79-47ac-8f2b-21ff4db6d77f","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu du témoin (eventID 52211cf8-b2cd-4685-8289-4d15e53905f1) : PipelineRun sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8 déjà présent
+OK   nouvelle livraison de Forgejo : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent
+OK   EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, non journalisé en service)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+gabarit de la bascule remis à 2026-11-07T15:25:22Z
+CronJob rattrapage repris
+OK   spec de la TriggerTemplate identique à l'objet sauvé : oui
+## PipelineRuns créés depuis 2026-11-07T15:24:48Z (nom, pipeline, issue)
+sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8 sample-app-essai Succeeded
+OK   PipelineRuns créés pendant la fenêtre : 1
+OK   pipeline et issue du témoin : sample-app-essai Succeeded
+OK   UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f : 474b3f60-bb72-4a62-953b-a2d505165d7c
+enveloppes de builds/essai-webhook : 36 → 38 (prédiction : 38)
