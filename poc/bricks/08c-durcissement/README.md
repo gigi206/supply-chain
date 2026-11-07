@@ -774,6 +774,27 @@ Rien lancé, rien écrit dans le cluster ni dans Zot. Prédictions K, L, T, B et
 
 Ajouté à `08-trust-plane/preuves.sh`, jamais lancé : étapes `test5_refus` (livraisons refusées du test 5, rien de construit) et `rattrapage_durci` (chemin 2 de la bascule seul, 2 enveloppes de plus sur l'image réelle). `controleurs` et `resolveurs` retirent maintenant leur espace d'essai après un KO.
 
+## Additif du 07/11/2026, 09:50 UTC : passage planifié du scan relu, P1 à P6 tenues, réserve du planificateur levée
+
+La relecture programmée a lancé une fois `essais-h5-planifie.sh`, de 09:35:17 à 09:35:19 UTC, en lecture seule. Journal : [resultats/durcissement-h5_planifie.log](resultats/durcissement-h5_planifie.log), avec un complément à la main de 09:49 UTC, lui aussi en lecture seule. Rien n'a été écrit dans le cluster ni dans Zot.
+
+**Résultat.** Le planificateur a déclenché `scan-sample-app` sous H1 à H5. H5 est close sur l'admission et l'exécution, planificateur compris. Restent non couverts, inchangés : signature fausse et corps modifié du test 5, test 6 sous limites.
+
+| Prédiction | Mesuré | Verdict |
+|---|---|---|
+| P1, planificateur | `lastScheduleTime` à 2026-11-07T09:30:00Z, un seul job neuf, `scan-sample-app-29900730`, créé 0 s après l'heure, par `system:serviceaccount:kube-system:cronjob-controller` en 201 (complément). Le nom de compte, déduit avant le passage, est maintenant observé | Tenue |
+| P2, admission | Pod créé par `job-controller` en 201 à 09:30:00.17 (complément), 0 refus 403 ou 422 dans `scan` | Tenue |
+| P3, conteneurs | Six conteneurs à 0, aucun redémarrage ni OOM, pod en 110 s, borne 300 s | Tenue |
+| P4, Zot | Referrers 3 → 4 sur `3a7ca1b1`, base `2026-11-07` lue, 5 vulnérabilités, 0 KEV | Tenue |
+| P5, historique | Job manuel `scan-sample-app-h5-manuel` toujours listé à côté du neuf | Tenue |
+| P6, Grafana | Cinq marqueurs lus par l'auditeur | Tenue |
+
+**Bilan du script KO, sur deux contrôles mal écrits.** Les créations du job et du pod portent un horodatage dans la seconde 09:30:00. Le script compare la borne comme une chaîne, et `"…09:30:00.104974Z" >= "…09:30:00Z"` est faux, `.` précédant `Z` en ASCII. Le complément reprend le même extrait d'audit avec une borne à 09:29:00Z : deux créations en 201, aucun refus. Le script n'est pas corrigé : il refuse de repartir dès que son journal existe, et ne sert qu'une fois.
+
+Seul autre écart à l'audit : quatre 404 de `kyverno-reports-controller` sur ses propres rapports, sans lien avec l'admission.
+
+Ce passage ne prouve pas le saut d'un passage manqué (`startingDeadlineSeconds`), ni le scan après un redémarrage des VM.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

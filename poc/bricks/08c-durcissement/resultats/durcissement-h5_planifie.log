@@ -1,0 +1,62 @@
+relecture du 07/11/2026 à 09:35:17 UTC
+passage attendu : 2026-11-07T09:30:00Z
+## P1, planificateur
+suspendu : false, dernier planifié : 2026-11-07T09:30:00Z, dernière réussite : 2026-11-07T09:31:52Z, actifs : 0
+OK   dernier passage planifié : 2026-11-07T09:30:00Z
+NAME                        STATUS     COMPLETIONS   DURATION   AGE
+scan-sample-app-h5-manuel   Complete   1/1           2m1s       12h
+scan-sample-app-29900730    Complete   1/1           112s       5m17s
+OK   jobs créés par le planificateur : 1
+job relu : scan-sample-app-29900730
+job créé à 2026-11-07T09:30:00Z, 0 s après l'heure attendue, borne prédite 60 s
+## P3, conteneurs
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-07T09:30:00Z"}
+OK   pods créés par le job : 1
+source code=0 motif=Completed redémarrages=0 2026-11-07T09:30:00Z 2026-11-07T09:30:00Z
+analyser code=0 motif=Completed redémarrages=0 2026-11-07T09:30:01Z 2026-11-07T09:31:44Z
+jetons code=0 motif=Completed redémarrages=0 2026-11-07T09:31:44Z 2026-11-07T09:31:45Z
+attester code=0 motif=Completed redémarrages=0 2026-11-07T09:31:45Z 2026-11-07T09:31:45Z
+publier code=0 motif=Completed redémarrages=0 2026-11-07T09:31:46Z 2026-11-07T09:31:49Z
+revocation code=0 motif=Completed redémarrages=0 2026-11-07T09:31:49Z 2026-11-07T09:31:50Z
+OK   conteneurs terminés avec le code 0 sur 6 : 6
+OK   job réussi : 1
+durée du pod : 110 s, borne prédite 300 s
+OK   revocation, OOM ou redémarrage : 0
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-07, sc-stockage.poc.test:5000/vulndb/grype@sha256:ab1cea192cd9f390ccf071a14e2ea5b1fcf5aa5da4b6939f31fe118a7fd93857, empreinte sha256:f90467f0e784f8f6dd04b9a53588851e4b6fb874a417
+analyser: SBOM|4 composants avec PURL (D1 a), 1 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+analyser: PREDICAT|sha256 4167066d0438fb2c3daf2298405c9b5ddd502c17e43d11388576a078cc653f7d, 103 s en tout
+jetons: identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 3aa829e6dda3bfac786988cb417db2068c9c4
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:ba36f94fbbdbaf29b74418818995216cdbee20af8871772a93b0245bee1c3ee0, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+## P4, Zot
+OK   referrers sur l'image : 4
+bases archivées : ["2026-11-06","2026-11-07"]
+## P1 et P2, audit de l'API, espace scan, depuis l'heure attendue (créations de jobs et de pods, puis refus)
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 5376856f-241d-463d-b06f-a70235e9d398 404 ephemeralreports.reports.kyverno.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 ephemeralreports.reports.kyverno.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports 5376856f-241d-463d-b06f-a70235e9d398 404 policyreports.wgpolicyk8s.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 policyreports.wgpolicyk8s.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+fin de l'extrait d'audit
+KO   création du job par le planificateur, en 201 : 0, attendu 1
+KO   création du pod par le contrôleur de jobs, en 201 : 0, attendu 1
+OK   refus 403 ou 422 : 0
+301626c0-acc4-42c4-ae35-d34af4bc4223   1     0     0     0
+3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523   1     0     0     0
+5376856f-241d-463d-b06f-a70235e9d398   1     0     0     0
+c739ff91-a7b4-4475-9481-11a3ad78f8d6   1     0     0     0
+d55000b2-ae38-41db-9e90-8be6d0b0c3d4   1     0     0     0
+## P6, Grafana, lu par l'auditeur
+OK   marqueurs SOURCE, SCAN, PUBLIE et les deux révocations lus dans Grafana : 5
+bilan : KO
+fin du relevé 09:35:19 UTC
+
+## Complément du 07/11/2026 à 09:49:54 UTC, relecture à la main, lecture seule
+cause des deux KO de P1 et P2 : la borne est comparée comme une chaîne ; jq rend "2026-11-07T09:30:00.123456Z" >= "2026-11-07T09:30:00Z" : false
+('.' précède 'Z' en ASCII : une requête reçue dans la seconde 09:30:00 est écartée)
+même extrait d'audit, borne élargie à 2026-11-07T09:29:00Z, créations de jobs et de pods dans scan :
+creation 2026-11-07T09:30:00.104974Z system:serviceaccount:kube-system:cronjob-controller jobs scan-sample-app-29900730 201
+creation 2026-11-07T09:30:00.170694Z system:serviceaccount:kube-system:job-controller pods - 201
+fin du complément
