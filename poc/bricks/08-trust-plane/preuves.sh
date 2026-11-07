@@ -3104,6 +3104,86 @@ etape_test5_essai() { # brique 08c : test5 complète sous H1 à H5. Gabarit d'es
   echo "enveloppes de builds/essai-webhook : $e0 → $e1 (prédiction : $((e0 + 2)))"
 }
 
+rp_baux() { # baux d'élection des résolveurs, une ligne par bail : nom, pod détenteur, transitions, prise
+  kubectl get lease -n tekton-pipelines-resolvers -o json \
+    | jq -r '.items[] | "\(.metadata.name) \((.spec.holderIdentity // "") | split("_")[0]) \(.spec.leaseTransitions) \(.spec.acquireTime)"'
+}
+
+etape_resolveurs_pod() { # brique 08c : démarrage d'un nouveau pod des résolveurs sous H1 à H5. Ancien pod supprimé, recréé par son
+  # ReplicaSet (révision du déploiement inchangée) ; rattrapage suspendu jusqu'à la passation des cinq baux, repris par le trap même
+  # sur KO ; témoin : étape resolveurs, appelée après la reprise (son trap remplace celui-ci)
+  local ns=tekton-pipelines-resolvers sel=app.kubernetes.io/component=resolvers p0 rs i0 t0 p1 d
+  echo "## prédiction (écrite le 07/11/2026 à 15:49 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, V1 à V7)"
+  echo "- avant : un pod, révision 1, cinq baux tenus par lui (transitions 1), pod du gabarit admis en dry-run au nom de replicaset-controller"
+  echo "- un seul nouveau pod, même ReplicaSet, sur sc-confiance, créé par replicaset-controller (201 à l'audit), prêt en moins de 30 s,"
+  echo "  0 redémarrage, même identité Cilium"
+  echo "- cinq baux rendus à l'arrêt (ReleaseOnCancel), pris par le nouveau pod au plus 25 s après le démarrage de son conteneur, transitions 2"
+  echo "- journal du nouveau pod : cinq prises de bail, 0 refus des droits ; témoin resolveurs : 0 KO"
+  p0=$(kubectl get pods -n $ns -l $sel -o jsonpath='{.items[*].metadata.name}')
+  ba_attendu "pods des résolveurs avant" "$(wc -w <<< "$p0")" 1
+  rs=${p0%-*}
+  ba_attendu "révision du déploiement" "$(kubectl get deployment -n $ns tekton-pipelines-remote-resolvers \
+    -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}')" 1
+  rp_baux | tee "$T/rp-baux-avant" | sed 's/^/  /'
+  ba_attendu "baux : détenteur et transitions" "$(cut -d' ' -f2,3 "$T/rp-baux-avant" | sort -u | paste -sd,)" "$p0 1"
+  i0=$(kubectl get ciliumendpoint -n $ns "$p0" -o jsonpath='{.status.identity.id}')
+  kubectl get replicaset -n $ns "$rs" -o json \
+    | jq --arg g "$rs-" '{apiVersion: "v1", kind: "Pod", metadata: (.spec.template.metadata + {generateName: $g}), spec: .spec.template.spec}' > "$T/rp-pod.json"
+  ba_attendu "pod du gabarit admis en dry-run au nom de replicaset-controller" "$(kubectl create -n $ns --dry-run=server \
+    --as=system:serviceaccount:kube-system:replicaset-controller -f "$T/rp-pod.json" -o name | grep -c "^pod/$rs-" || true)" 1
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap 'ba_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] || { echo "KO   passage du rattrapage toujours actif" >&2; exit 1; }
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl delete pod -n $ns "$p0" --wait=true >/dev/null
+  echo "suppression demandée à $t0, ancien pod disparu à $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  for _ in $(seq 45); do
+    p1=$(kubectl get pods -n $ns -l $sel -o json | jq -r --arg o "$p0" '[.items[] | select(.metadata.name != $o and .metadata.deletionTimestamp == null)
+      | select(any(.status.conditions[]?; .type == "Ready" and .status == "True")) | .metadata.name] | first // empty')
+    [ -n "$p1" ] && break; sleep 2
+  done
+  if [ -z "$p1" ]; then   # le ReplicaSet réessaie seul : rien à remettre
+    kubectl get events -n $ns --sort-by=.lastTimestamp | tail -20; kubectl describe pods -n $ns -l $sel | grep -vi 'token\|jeton' | tail -40
+    echo "KO   aucun nouveau pod prêt en 90 s" >&2; exit 1
+  fi
+  kubectl get pod -n $ns "$p1" -o json > "$T/rp-pod-neuf.json"
+  jq -r '"nouveau pod \(.metadata.name) : créé \(.metadata.creationTimestamp), conteneur démarré \(.status.containerStatuses[0].state.running.startedAt),"
+    + " prêt \(.status.conditions[] | select(.type == "Ready") | .lastTransitionTime), IP \(.status.podIP)"' "$T/rp-pod-neuf.json"
+  ba_attendu "pods des résolveurs après" "$(kubectl get pods -n $ns -l $sel -o name | wc -l)" 1
+  ba_attendu "ReplicaSet, nœud, redémarrages du nouveau pod" \
+    "$(jq -r '"\(.metadata.ownerReferences[0].name) \(.spec.nodeName) \(.status.containerStatuses[0].restartCount)"' "$T/rp-pod-neuf.json")" "$rs sc-confiance 0"
+  d=$(jq -r '(.status.conditions[] | select(.type == "Ready") | .lastTransitionTime | fromdateiso8601) - (.metadata.creationTimestamp | fromdateiso8601)' "$T/rp-pod-neuf.json")
+  [ "$d" -lt 30 ] && echo "OK   prêt $d s après sa création" || echo "CONSTAT prêt $d s après sa création (prédit : moins de 30 s)"
+  for _ in $(seq 60); do [ "$(rp_baux | cut -d' ' -f2 | sort -u)" = "$p1" ] && break; sleep 2; done
+  rp_baux | tee "$T/rp-baux-apres" | sed 's/^/  /'
+  ba_attendu "baux : détenteur et transitions" "$(cut -d' ' -f2,3 "$T/rp-baux-apres" | sort -u | paste -sd,)" "$p1 2"
+  d=$(jq -rn --rawfile b "$T/rp-baux-apres" --slurpfile p "$T/rp-pod-neuf.json" '($b | split("\n") | map(select(. != "") | split(" ")[3]
+    | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) | max) - ($p[0].status.containerStatuses[0].state.running.startedAt | fromdateiso8601)')
+  [ "$d" -le 25 ] && echo "OK   cinq baux pris au plus $d s après le démarrage du conteneur" \
+    || echo "CONSTAT cinq baux pris $d s après le démarrage du conteneur (prédit : au plus 25 s ; 62 à 78 s sans remise, 07/11 à 11:23 UTC)"
+  echo "résolutions sans chef : dernière prise de bail $(jq -rn --rawfile b "$T/rp-baux-apres" --arg t "$t0" '($b | split("\n") | map(select(. != "")
+    | split(" ")[3] | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) | max) - ($t | fromdateiso8601)') s après la suppression demandée (affiché, non contrôlé)"
+  ba_reprendre
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  ba_attendu "révision du déploiement" "$(kubectl get deployment -n $ns tekton-pipelines-remote-resolvers \
+    -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}')" 1
+  ba_attendu "identité Cilium du nouveau pod" "$(kubectl get ciliumendpoint -n $ns "$p1" -o jsonpath='{.status.identity.id}')" "$i0"
+  kubectl logs -n $ns "$p1" > "$T/rp-journal"
+  ba_attendu "journal du nouveau pod : prises de bail, refus des droits" \
+    "$(grep -c 'Successfully acquired lease' "$T/rp-journal" || true) $(grep -c 'is forbidden' "$T/rp-journal" || true)" "5 0"
+  echo "## audit : créations de pods dans $ns depuis $t0"
+  audit_api replicaset-controller | jq -r --arg ns $ns --arg t "$t0" 'select(.verb == "create" and .objectRef.resource == "pods"
+    and .objectRef.namespace == $ns and (.objectRef.subresource // "") == "" and .stage == "ResponseComplete" and (.requestURI | test("dryRun") | not)
+    and (.requestReceivedTimestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) >= ($t | fromdateiso8601)) | "\(.user.username) \(.responseStatus.code)"' | tee "$T/rp-audit"
+  ba_attendu "créations" "$(paste -sd, "$T/rp-audit")" "system:serviceaccount:kube-system:replicaset-controller 201"
+  ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ba_attendu "PipelineRuns créés depuis $t0" "$(kubectl get pipelinerun -n builds -o json | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  echo "## témoin : étape resolveurs"
+  etape_resolveurs
+}
+
 etape_sec_h5() { # brique 08c, à sec : pods du test 4 et PipelineRun d'essai présentés à l'API en dry-run serveur, décompte du test 8 ; rien de créé
   local c m n b
   [ -n "${PIPE_ESSAI:-}" ] || { echo "KO   PIPE_ESSAI non posé" >&2; exit 1; }

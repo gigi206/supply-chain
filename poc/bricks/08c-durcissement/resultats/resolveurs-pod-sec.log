@@ -1,0 +1,28 @@
+début : 2026-11-07T15:52:15Z
+pods : tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n (1)
+ReplicaSet : tekton-pipelines-remote-resolvers-56c4c4d957
+révision : 1
+  controller.tektonresolverframework.bundleresolver.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:39.010059Z
+  controller.tektonresolverframework.cluster.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:51.670059Z
+  controller.tektonresolverframework.git.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:43.123543Z
+  controller.tektonresolverframework.http.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:40.122161Z
+  controller.tektonresolverframework.hub.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 2026-11-07T11:24:35.336343Z
+baux : tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1 (attendu : tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n 1)
+identité Cilium : 11808
+dry-run replicaset-controller : 1
+pod tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n : créé 2026-11-06T13:38:02Z, conteneur démarré 2026-11-07T11:23:33Z, prêt 2026-11-07T11:23:34Z, IP 10.42.0.81
+ReplicaSet, nœud, redémarrages : tekton-pipelines-remote-resolvers-56c4c4d957 sc-confiance 1
+prêt après création (s) : 78332
+délai des baux sur le pod actuel (précédent de 11:23) : 78 s ; test -le 25 : faux
+journal : 5 0
+filtre d'audit rejoué sur la création de xh998 (tekton-pipelines, depuis 2026-11-07T14:06:00Z) :
+system:serviceaccount:kube-system:replicaset-controller 201
+même filtre, tekton-pipelines-resolvers depuis 2026-11-07T00:00:00Z : [system:admin 201,system:admin 201]
+PolicyViolation depuis 15:00 : 0
+PipelineRuns depuis 15:30 : 0
+rattrapage actif : []
+fin : 2026-11-07T15:52:17Z
+# Complément du 2026-11-07T15:52:36Z : filtre d'audit avec exclusion des requêtes dryRun (preuves.sh corrigé), rejoué en lecture seule
+tekton-pipelines depuis 14:06:00Z : [system:serviceaccount:kube-system:replicaset-controller 201]
+tekton-pipelines-resolvers depuis 00:00:00Z : []
+requêtes dryRun de création de pods dans tekton-pipelines-resolvers aujourd'hui : system:admin system:serviceaccount:kube-system:replicaset-controller 201,system:admin system:serviceaccount:kube-system:replicaset-controller 201

@@ -1,0 +1,47 @@
+# contrôles hors étape de resolveurs_pod, référence 2026-11-07T15:50:00Z, 2026-11-07T15:56:31Z, lecture seule
+## rattrapage
+suspend=false, dernier passage 2026-11-07T15:56:00Z, dernier succès 2026-11-07T15:56:05Z
+rattrapage-29901114 créé 2026-11-07T15:54:00Z, planifié 2026-11-07T15:54:00Z
+rattrapage-29901115 créé 2026-11-07T15:55:00Z, planifié 2026-11-07T15:55:00Z
+rattrapage-29901116 créé 2026-11-07T15:56:00Z, planifié 2026-11-07T15:56:00Z
+premier passage depuis la référence : rattrapage-29901114 : PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+## image réelle
+enveloppes de builds/sample-app@sha256:3a7ca1b1… : 24
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f UID 474b3f60 Succeeded
+PipelineRuns créés depuis la référence : 0
+## alertes actives (Alertmanager de sc-stockage)
+actives : 0
+## bacs à sable des résolveurs sur sc-confiance
+{"pod":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","id":"574f7c6e4f2c4","state":"SANDBOX_READY","createdAt":"2026-11-07T11:23:32Z","attempt":1}
+{"pod":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","id":"c10e28fac42b1","state":"SANDBOX_NOTREADY","createdAt":"2026-11-06T13:38:02Z","attempt":0}
+## pods et CiliumEndpoints des résolveurs
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","created":"2026-11-06T13:38:02Z","node":"sc-confiance","restarts":1,"ip":"10.42.0.81"}
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","created":"2026-11-07T11:23:32Z","identity":11808,"ip":"10.42.0.81"}
+## événements PolicyViolation depuis la référence
+0
+
+# script des contrôles (identique pour le relevé d'après)
+# Contrôles hors étape de resolveurs_pod (V7), lecture seule. Argument : heure de référence RFC 3339 (début du passage)
+set -uo pipefail
+export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
+t=$1; ns=tekton-pipelines-resolvers
+S="-i $HOME/.cache/supply-chain-poc/08/ssh/id_ed25519 -o UserKnownHostsFile=$HOME/.cache/supply-chain-poc/08/ssh/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10"
+echo "# contrôles hors étape de resolveurs_pod, référence $t, $(date -u +%FT%TZ), lecture seule"
+echo "## rattrapage"
+kubectl get cronjob -n declencheurs rattrapage -o json </dev/null | jq -r '"suspend=\(.spec.suspend), dernier passage \(.status.lastScheduleTime), dernier succès \(.status.lastSuccessfulTime)"'
+kubectl get jobs -n declencheurs -o json </dev/null | jq -r --arg t "$t" '.items[] | select(.metadata.creationTimestamp >= $t) | "\(.metadata.name) créé \(.metadata.creationTimestamp), planifié \(.metadata.annotations["batch.kubernetes.io/cronjob-scheduled-timestamp"] // "?")"'
+j=$(kubectl get jobs -n declencheurs -o json </dev/null | jq -r --arg t "$t" '[.items[] | select(.metadata.creationTimestamp >= $t)] | sort_by(.metadata.creationTimestamp) | first | .metadata.name // empty')
+[ -n "$j" ] && echo "premier passage depuis la référence : $j : $(kubectl logs -n declencheurs "job/$j" </dev/null 2>/dev/null | grep -vi 'token\|jeton' | tail -1 | cut -c1-160)"
+echo "## image réelle"
+echo "enveloppes de builds/sample-app@sha256:3a7ca1b1… : $(cosign download attestation --registry-cacert $HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt 192.168.161.13:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 2>/dev/null | grep -c . || true)"
+kubectl get pipelinerun -n builds -o json </dev/null | jq -r '.items[] | select(.metadata.name | startswith("sample-app-6391fd43")) | "\(.metadata.name) UID \(.metadata.uid[0:8]) \(.status.conditions[0].reason)"'
+echo "PipelineRuns créés depuis la référence : $(kubectl get pipelinerun -n builds -o json </dev/null | jq --arg t "$t" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')"
+echo "## alertes actives (Alertmanager de sc-stockage)"
+echo "actives : $(timeout 30 ssh -n $S poc@192.168.161.13 'curl -s http://127.0.0.1:9093/api/v2/alerts?active=true' | jq 'length')"
+echo "## bacs à sable des résolveurs sur sc-confiance"
+timeout 30 ssh -n $S poc@192.168.161.11 'sudo -n env CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml /var/lib/rancher/rke2/bin/crictl pods --name remote-resolvers -o json' | jq -c '.items[] | {pod: .metadata.name, id: .id[0:13], state, createdAt: (.createdAt|tonumber/1e9|floor|todate), attempt: .metadata.attempt}'
+echo "## pods et CiliumEndpoints des résolveurs"
+kubectl get pods -n $ns -o json </dev/null | jq -c '.items[] | {name: .metadata.name, created: .metadata.creationTimestamp, node: .spec.nodeName, restarts: .status.containerStatuses[0].restartCount, ip: .status.podIP}'
+kubectl get ciliumendpoints -n $ns -o json </dev/null | jq -c '.items[] | {name: .metadata.name, created: .metadata.creationTimestamp, identity: .status.identity.id, ip: .status.networking.addressing[0].ipv4}'
+echo "## événements PolicyViolation depuis la référence"
+kubectl get events -A --field-selector reason=PolicyViolation -o json </dev/null | jq --arg t "$t" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length'

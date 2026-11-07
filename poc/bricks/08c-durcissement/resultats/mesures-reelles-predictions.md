@@ -379,3 +379,64 @@ Demande : « Continue », après le push de 71d3b11. Aucun accord de mesure n'es
 - Il n'y a pas de variante le jour même avec `rattrapage` : il tourne chaque minute, et le passage manqué le plus récent a toujours moins de 60 s, sous ses 120 s. Le contrôleur le lance donc à la reprise, comme constaté à 15:25:22 UTC. Ce mécanisme relève du contrôleur des CronJobs, pas de H1 à H5.
 
 **4. Jonction d'un nœud.** Elle demande une nouvelle VM ou une réinstallation de l'agent RKE2 : c'est une action système, soumise à accord préalable. Rien n'est préparé.
+
+## Additif du 07/11/2026, 15:49 UTC : nouveau pod des résolveurs, étape `resolveurs_pod`, effets et prédictions avant passage, aucun accord de passage donné
+
+Choix du propriétaire : « Résolveurs ». L'étape est écrite après ces lignes et n'a jamais été lancée.
+
+**Vérifié à sec avant d'écrire**, en lecture seule, de 15:40 à 15:49 UTC. Les expressions de l'étape ont été rejouées sur l'état actuel de 15:52:15 à 15:52:36 UTC ([resolveurs-pod-sec.log](resolveurs-pod-sec.log)) :
+- Un pod bâti sur le gabarit du ReplicaSet `…-56c4c4d957` est admis en dry-run serveur, au nom de l'administrateur comme de `system:serviceaccount:kube-system:replicaset-controller`. Limites 1 CPU et 4 Gi. 0 événement `PolicyViolation` dans le cluster.
+- `terminationGracePeriodSeconds` vaut 30, et il n'y a aucune sonde.
+- L'audit de l'API journalise la création des pods par le contrôleur des ReplicaSets. Celle de `…-xh998` y figure à 14:06:23 UTC, en 201. L'assertion sur l'audit est donc tenable. Le filtre de l'étape, rejoué sur cette création, rend `replicaset-controller 201`. L'audit enregistre aussi les dry-runs, au nom de `system:admin` emprunté : deux aujourd'hui dans `tekton-pipelines-resolvers`, ceux de cette vérification. Le filtre les exclut (`dryRun` dans `requestURI`), ajout fait à 15:52 UTC, avant tout passage.
+- Depuis le redémarrage de 11:23 UTC : 0 ligne `is forbidden` au journal des résolveurs. Dans l'audit, 0 lecture de Secret ou de compte de service hors de `builds`, refus de `preuve-resolveurs` exceptés. Le démarrage d'un conteneur ne fait donc pas échouer les contrôles de l'étape `resolveurs`.
+- Baux : `config-leader-election-resolvers` est vide. Les valeurs par défaut de knative.dev/pkg (`39ebae2ee2dc`, déclaré par le `go.mod` de tektoncd/pipeline v1.15.5) sont donc en vigueur : durée 60 s, renouvellement 40 s, nouvel essai toutes les 10 s.
+  - `ReleaseOnCancel: true` (`leaderelection/context.go`).
+  - `cmd/resolvers/main.go` part de `signals.NewContext()`, que SIGTERM annule.
+  - Un `delete pod` doit donc rendre les cinq baux. Ce n'est pas encore mesuré ici.
+- Précédent, l'autre branche : au redémarrage des VM, l'ancien processus est mort sans rendre ses baux. Le conteneur a démarré à 11:23:33 UTC et a pris les baux de 11:24:35 à 11:24:51 UTC, soit 62 à 78 s plus tard (`leaseTransitions` à 1).
+
+**Commande** (sur accord, pas avant) :
+
+```
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- resolveurs_pod </dev/null
+```
+
+**Déroulé.**
+1. Relevé de l'état avant, puis dry-run.
+2. Rattrapage suspendu, avec un trap qui le reprend même sur KO.
+3. `kubectl delete pod --wait=true` sur l'ancien pod. Le ReplicaSet le recrée sur le même gabarit.
+4. Attente du nouveau pod prêt, puis des cinq baux.
+5. Rattrapage repris, puis contrôles.
+6. Témoin : l'étape `resolveurs`, appelée dans l'étape. Son trap remplace celui de l'étape, d'où la reprise du rattrapage avant l'appel. Le journal `preuves-h5-resolveurs.log` de 10:29 UTC n'est pas réécrit.
+
+Sur KO avant que le pod soit prêt, l'étape écrit dans son journal les événements de l'espace, dont les `FailedCreate` qui portent le motif d'un refus, et la fin du `describe` des pods, puis sort. Le trap reprend le rattrapage. Après un simple retard, aucun retour n'est nécessaire : le ReplicaSet réessaie seul.
+
+**Pire cas.** La création réelle est refusée de façon durable, par Kyverno en `Deny` ou par une VAP, ou le conteneur ne démarre pas. Il n'y a alors plus de résolveur : aucun PipelineRun neuf ne se résout jusqu'à une intervention, et l'étape sort en KO au bout de 90 s en laissant ce trou. Probabilité faible : le dry-run au nom de `replicaset-controller` passe, et le conteneur a démarré sous H1 à H5 à 11:23 UTC. Retour existant au README de la 08c : `h2_kyverno` pour repasser Kyverno en Audit, à décider avec le propriétaire selon le motif.
+
+**Effets.**
+- Le pod `…-xsv5n` est supprimé. Pendant la passation, une résolution attendrait le nouveau chef.
+- Le rattrapage est suspendu pendant la fenêtre. Un passage est lancé à la reprise et s'arrête à `PRESENT`.
+- La révision 1 du déploiement ne change pas.
+- L'étape `resolveurs` crée puis supprime l'espace `preuve-resolveurs` et deux ResolutionRequests dans `builds`.
+- Nouveau journal `preuves-h5-resolveurs_pod.log`, ligne dans `chrono.tsv`.
+
+**Ajouts au script après ces prédictions, avant tout passage** (07/11/2026, 15:52 et 15:55 UTC) : exclusion des requêtes `dryRun` dans le filtre d'audit, et une ligne affichée, non contrôlée, qui donne le trou réel de la passation : dernière prise de bail moins l'heure de la suppression demandée.
+
+**Contrôles hors étape, à lancer juste après le passage** dans `resolveurs-pod-hors-etape.log`. Ils sont relevés une première fois avant, à titre de référence ([resolveurs-pod-avant.log](resolveurs-pod-avant.log)) :
+- premier passage du rattrapage après la reprise, arrêté à `PRESENT` ;
+- image réelle : nombre d'enveloppes (24 attendues), provenance `474b3f60` inchangée ;
+- alertes actives dans Alertmanager (0 attendue) ;
+- `crictl pods` sur `sc-confiance` : bacs à sable des résolveurs, celui de 11:23 UTC disparu, un seul neuf prêt ;
+- CiliumEndpoint du nouveau pod : identité et IP ;
+- événements `PolicyViolation` depuis le passage.
+
+**Prédictions.**
+- V1, avant : un seul pod, `…-xsv5n`. Révision 1. Cinq baux tenus par lui, `leaseTransitions` à 1. Admis en dry-run au nom du contrôleur des ReplicaSets. Confiance haute (vérifié à sec).
+- V2, admission : un seul nouveau pod, du même ReplicaSet, sur `sc-confiance`. Sa création par `replicaset-controller` est à l'audit en 201. 0 refus, 0 `PolicyViolation` depuis la suppression. Confiance haute.
+- V3, démarrage : nouveau pod prêt moins de 30 s après sa création, 0 redémarrage. Nouveau CiliumEndpoint, même identité 11808. L'IP est affichée, pas contrôlée. Confiance haute pour le délai et l'identité.
+- V4, baux : les cinq passent au nouveau pod, `leaseTransitions` de 1 à 2. Ils sont pris au plus 25 s après le démarrage de son conteneur (un nouvel essai de 10 s, gigue de client-go comprise). Confiance moyenne : la remise à l'arrêt est lue dans le code, jamais mesurée ici. Si les baux n'étaient pas rendus, le délai serait de 60 à 82 s, comme à 11:23. L'étape l'écrirait en CONSTAT, sans KO.
+- V5, journal du nouveau pod : cinq « Successfully acquired lease », 0 `is forbidden` avant le témoin.
+- V6, témoin : l'étape `resolveurs` passe comme à 10:29 UTC, 0 KO. Les lectures hors de `builds` restent à 0 à l'audit.
+- V7, hors étape : 0 PipelineRun créé pendant la fenêtre. Rattrapage `PRESENT` à la reprise. Image réelle inchangée, 24 enveloppes, `474b3f60`. 0 alerte.
+
+Durée prédite : moins de 2 min, dont environ 11 s pour l'étape `resolveurs`.
