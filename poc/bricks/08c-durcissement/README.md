@@ -828,6 +828,21 @@ Passage lancé sur accord du propriétaire (« Oui, resolveurs »), de 10:29:36 
 
 Les huit prédictions sont tenues. L'espace d'essai est supprimé et il ne reste aucune ResolutionRequest d'essai dans `builds`. Le redémarrage du pod des résolveurs sous H5 n'est toujours pas mesuré.
 
+## Additif du 07/11/2026, 10:41 UTC : étape `test5_refus` passée sous H1 à H5, T1 à T6 tenues
+
+Passage lancé sur accord du propriétaire (« Ok » à « Je lance test5_refus ? »), de 10:40:57 à 10:40:59 UTC, avec `JOURNAL=preuves-h5`. C'est le premier passage de cette étape. Journal : [preuves-h5-test5_refus.log](../08-trust-plane/resultats/preuves-h5-test5_refus.log), 10 OK, 0 KO, code 0.
+
+| Prédiction | Mesuré |
+|---|---|
+| T1 | Gabarit `sample-app` ; PipelineRun de la tête à `Succeeded` |
+| T2 | HTTP 202 aux 4 livraisons |
+| T3 | 1 refus `no X-Hub-Signature-256 header set`, 2 refus `payload signature check failed`, 3 refus des intercepteurs au total |
+| T4 | Témoin accepté par les intercepteurs, puis écarté à la création avec `already exists`, même `eventID` |
+| T5 | 0 PipelineRun pour le commit `1111…` et pour le commit jamais livré ; UID de la tête inchangé, `d1860207` |
+| T6 | Image réelle inchangée, 22 enveloppes |
+
+Les six prédictions sont tenues. Le test 5 est donc couvert sous H1 à H5 pour une livraison signée avec un autre secret et pour un corps modifié, refus qui n'avaient jamais été mesurés. La livraison non signée l'avait déjà été. Aucun fichier `autre.secret` ne reste sur disque.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

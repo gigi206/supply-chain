@@ -1,0 +1,30 @@
+# preuves.sh test5_refus, 2026-11-07T10:40:58Z
+## prédiction (écrite le 07/11/2026, avant le premier passage, resultats/mesures-reelles-predictions.md de la 08c, T1 à T6)
+- gabarit en service : pipeline sample-app ; sample-app-6391fd437f26696847041be3226bbbf633f55a2f présent et réussi
+- commit 1111111111111111111111111111111111111111 : livraison non signée, autre secret, corps modifié : HTTP 202 ; refus de l'intercepteur github (une fois
+  « no X-Hub-Signature-256 header set », deux fois « payload signature check failed ») ; aucun PipelineRun
+- témoin : livraison valide de la tête de main : acceptée par les intercepteurs, refusée à la création (already exists, même eventID)
+- 3 refus des intercepteurs, aucun autre ; UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f inchangé ; image réelle inchangée
+OK   gabarit en service : sample-app
+OK   sample-app-6391fd437f26696847041be3226bbbf633f55a2f : Succeeded
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 22 enveloppes, dernière provenance de PipelineRun : d1860207-1d60-4b33-b8b4-a7ddb766bcda (2026-11-06T21:44:05Z)
+## livraisons refusées (commit 1111111111111111111111111111111111111111)
+non signée : HTTP 202 {"eventID":"725ade5a-13ae-438c-bb48-41f28b36ee1a"}
+autre secret : HTTP 202 {"eventID":"58ec099a-66a1-42ed-98de-5f335f35d888"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"051420b9-cdb6-41bf-8909-0fe3e21f0ad3"}
+## témoin : livraison valide de la tête de main (6391fd437f26696847041be3226bbbf633f55a2f)
+valide : HTTP 202 {"eventID":"c0cde858-144c-438e-aba8-93a34c89b77a"}
+{"t":"10:40:58","eventID":"c0cde858-144c-438e-aba8-93a34c89b77a","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   témoin (eventID c0cde858-144c-438e-aba8-93a34c89b77a) accepté par les intercepteurs, sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent
+## bilan
+OK   PipelineRuns du commit 1111111111111111111111111111111111111111 : 0
+OK   PipelineRuns du commit 3527e5a37681d932679215c3e3a9fac4585cc47d : 0
+OK   UID de sample-app-6391fd437f26696847041be3226bbbf633f55a2f : d1860207-1d60-4b33-b8b4-a7ddb766bcda
+## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-07T10:40:58Z
+{"t":"10:40:58","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"10:40:58","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"10:40:58","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   refus « no X-Hub-Signature-256 header set » : 1
+OK   refus « payload signature check failed » : 2
+OK   refus des intercepteurs, tous motifs : 3
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 22 enveloppes, dernière provenance de PipelineRun : d1860207-1d60-4b33-b8b4-a7ddb766bcda (2026-11-06T21:44:05Z)
