@@ -1,0 +1,50 @@
+# Relevé à sec des quatre non couverts sous H1 à H5, lecture seule, rien écrit dans le cluster ni dans Zot
+début : 2026-11-07T15:38:49Z
+## 1. pod des résolveurs
+{"revision":"1","generation":1,"replicas":1,"strategy":{"maxSurge":"25%","maxUnavailable":"25%"},"nodeSelector":{"zone":"confiance"},"image":"sc-stockage.poc.test:5000/amont/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d@sha256:12ac0727361182c3f440199ebf1ae73bb151633870f6284eb2146693a80075a6","imagePullPolicy":"IfNotPresent","imagePullSecrets":null,"resources":{"limits":{"cpu":"1","memory":"4Gi"},"requests":{"cpu":"100m","memory":"100Mi"}},"readinessProbe":null,"livenessProbe":null,"volumes":[{"name":"ca-poc","configMap":"ca-poc"},{"name":"tmp-clone-volume","configMap":null}]}
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","node":"sc-confiance","created":"2026-11-06T13:38:02Z","restarts":1,"started":"2026-11-07T11:23:33Z","ready":true}
+NAME           STATUS   ROLES                AGE   VERSION          ZONE
+sc-build       Ready    <none>               26h   v1.35.9+rke2r1   build
+sc-confiance   Ready    control-plane,etcd   26h   v1.35.9+rke2r1   confiance
+sc-stockage    Ready    <none>               26h   v1.35.9+rke2r1   stockage
+baux d'élection (détenteur abrégé) :
+controller.tektonresolverframework.bundleresolver.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n durée 60
+controller.tektonresolverframework.cluster.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n durée 60
+controller.tektonresolverframework.git.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n durée 60
+controller.tektonresolverframework.http.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n durée 60
+controller.tektonresolverframework.hub.00-of-01 tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n durée 60
+config-leader-election-resolvers, data hors _example : {}
+image en cache sur 192.168.161.11 :
+sc-stockage.poc.test:5000/amont/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d           <none>                                                12ac072736118       68b6d1388a92b       73.1MB
+sc-stockage.poc.test:5000/amont/tektoncd/triggers/interceptors-3176d6a3f314c3655b30bfd36e421dd5        <none>                                                cef0f4936b68b       6c8b85f9d0895       40.7MB
+image en cache sur 192.168.161.12 :
+aucune
+image en cache sur 192.168.161.13 :
+aucune
+précédent : pod des intercepteurs (nouveau pod sous H1 à H5, même nœud, image en cache)
+{"name":"tekton-triggers-core-interceptors-6894848d5c-xh998","node":"sc-confiance","created":"2026-11-07T14:06:23Z","ready":{"status":"True","lastTransitionTime":"2026-11-07T14:06:35Z"},"restarts":0}
+ResolutionRequests restantes dans builds : 63
+## 2. scan daté du futur
+15:_derive := 300000000000 # écart d'horloge toléré entre le scanner et la porte : 5 min
+1150:  (cd "$T/auth" && COSIGN_PASSWORD= cosign generate-key-pair --output-key-prefix temoin > /dev/null 2>&1)
+1161:  propre | dater '1 hour' 'now' > "$j/futur.json"
+1235:  cp "$T/auth/temoin.pub" "$T/temoin.pub"
+1257:  cp "$T/auth/temoin.pub" "$R/g6-temoin-cle-publique.pem"
+1259:  "$R8/preuves.sh" temoins_scan || c=$?
+## 3. passage manqué du scan
+{"ns":"declencheurs","name":"rattrapage","schedule":"* * * * *","startingDeadlineSeconds":120,"suspend":false,"lastScheduleTime":"2026-11-07T15:38:00Z","lastSuccessfulTime":"2026-11-07T15:38:04Z"}
+{"ns":"horodatage","name":"horodatage","schedule":"* * * * *","startingDeadlineSeconds":120,"suspend":false,"lastScheduleTime":"2026-11-07T15:38:00Z","lastSuccessfulTime":"2026-11-07T15:38:07Z"}
+{"ns":"scan","name":"scan-sample-app","schedule":"30 9 * * *","startingDeadlineSeconds":3600,"suspend":false,"lastScheduleTime":"2026-11-07T09:30:00Z","lastSuccessfulTime":"2026-11-07T09:31:52Z"}
+78:      - alert: ScanEnRetard
+79-        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds)
+80-        for: 5m
+## 4. jonction d'un nœud : rien relevé (nouvelle VM ou réinstallation de l'agent RKE2, action système)
+fin : 2026-11-07T15:38:50Z
+# Complément du 2026-11-07T15:40:59Z, lecture seule (sortie recopiée de la commande lancée à cette heure)
+## bac à sable et endpoint du pod des résolveurs (crictl pods sur 192.168.161.11, CiliumEndpoint)
+{"id":"574f7c6e4f2c4","state":"SANDBOX_READY","createdAt":"2026-11-07T11:23:32Z","attempt":1}
+{"id":"c10e28fac42b1","state":"SANDBOX_NOTREADY","createdAt":"2026-11-06T13:38:02Z","attempt":0}
+{"name":"tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n","created":"2026-11-07T11:23:32Z","id":11808,"ip":"10.42.0.81"}
+{"podIP":"10.42.0.81","uid":"fcd0a785"}
+## dernier referrer du scan dans Prometheus (192.168.161.13, 127.0.0.1:9090)
+{"metric":{"__name__":"scan_dernier_referrer_timestamp_seconds","depot":"builds/scan/sample-app","instance":"127.0.0.1:9101","job":"fichiers"},"v":"2026-11-07T09:31:48Z"}

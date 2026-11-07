@@ -345,3 +345,37 @@ Sur KO, le trap remet le gabarit et reprend le rattrapage. Un PipelineRun `Faile
 - U7 : hors étape, 0 événement `PolicyViolation`, 0 alerte active, 0 ligne `tls`, `x509` ou `certificate` au journal de l'EventListener.
 
 Durée prédite : moins de 1 min 30 (test5 entre 18 et 20 s du 30/10 au 03/11, plus 10 s d'attente et la suspension du rattrapage).
+
+## Additif du 07/11/2026, 15:38 UTC : les quatre non couverts restants, relecture à sec, rien lancé
+
+Demande : « Continue », après le push de 71d3b11. Aucun accord de mesure n'est donné. Le relevé est fait en lecture seule de 15:38:49 à 15:38:50 UTC ([non-couverts-releve.log](non-couverts-releve.log)). Rien n'est écrit dans le cluster, dans Zot ni sur les VM, et `preuves.sh` n'est pas modifié. Chaque point demande son propre accord, avec des effets différents.
+
+**1. Démarrage d'un nouveau pod des résolveurs.** Une grande partie est déjà exercée sous H1 à H5 (complément de 15:40:59 UTC au relevé). Au redémarrage des VM, kubelet a recréé le bac à sable du pod `…-xsv5n` à 11:23:32 UTC (tentative 1 ; celui du 06/11 est `NOTREADY`), et son CiliumEndpoint date de la même seconde (identité 11808, IP `10.42.0.81` conservée). Le démarrage réel, le montage de `ca-poc` sous `readOnlyRootFilesystem`, le contexte `restricted` et l'endpoint Cilium sont donc passés sous H1 à H5. Restent propres à un nouveau pod : l'admission réelle d'un nouvel objet Pod (A4 ne l'a vue qu'en dry-run), l'ordonnancement et la passation des baux d'élection. L'identité Cilium vient des labels : un nouveau pod aurait la même, seuls l'endpoint et l'IP changeraient.
+- Déploiement `tekton-pipelines-remote-resolvers` : révision 1, une réplique, `nodeSelector` `zone: confiance`, donc seul `sc-confiance` convient. Limites 1 CPU et 4 Gi. Aucune sonde de disponibilité ni de vie.
+- Image en `IfNotPresent`, en cache sur `sc-confiance` seulement. Un nouveau pod ne tirera pas l'image : le tirage depuis Zot sous H1 à H5 reste hors de cette mesure. Le précédent des intercepteurs est dans le même cas.
+- Pod actuel `…-xsv5n`, créé le 06/11 à 13:38:02 UTC, conteneur relancé au redémarrage des VM (11:23:33 UTC). Il n'est jamais repassé par l'admission sous H1 à H5.
+- Cinq baux d'élection, tous tenus par `…-xsv5n`, durée 60 s. Si l'ancien pod ne les rend pas en s'arrêtant, le nouveau attend jusqu'à 60 s avant de résoudre. Non vérifié.
+- Précédent : le pod des intercepteurs `…-xh998`, créé à 14:06:23 UTC par l'étape `intercepteurs` (I3), prêt à 14:06:35 UTC, sur `sc-confiance`, image en cache. C'est un autre déploiement : il ne couvre pas les résolveurs. Ses 12 s jusqu'à Ready ne valent pas non plus pour eux : sans sonde, leur Ready sera quasi immédiat. Le délai qui compte est la passation des baux, à mesurer.
+- Voie possible : `kubectl delete pod` plutôt que `rollout restart`. Le ReplicaSet recrée le pod sur le même gabarit, et le déploiement reste à sa révision 1. Avec `rollout restart`, l'historique change, comme pour les intercepteurs.
+- Témoin après redémarrage : l'étape `resolveurs` (L1 à L8, 10:29 UTC). Elle résout le bundle en service dans `builds` et attend deux refus dans `preuve-resolveurs`. L8 lit l'heure de création du pod et changera donc de valeur.
+- Effet : pendant la fenêtre, une résolution attendrait le nouveau chef. Le rattrapage s'arrête à `PRESENT` tant que la tête de main est construite. Le suspendre, sur le modèle de `test5_essai`, ne protège que contre un push pendant la fenêtre.
+
+**2. Branche « scan daté du futur » de `scan.rego`.**
+- La tolérance d'horloge est de 5 min (`_derive`, ligne 15). Le témoin `futur` est daté une heure après sa pose. Il reste donc dans le futur pendant 55 min, puis la branche n'est plus couverte.
+- `g6_temoins` lance `preuves.sh temoins_scan` aussitôt après les témoins (`plateforme.sh:1259`). Le contrôle suit donc dans la fenêtre, sous le même accord.
+- `temoins()` crée une nouvelle paire de clés à chaque passage (`plateforme.sh:1150`), puis la clé privée est effacée par le trap. On ne peut pas reposer `futur` seul : `g6-temoin-cle-publique.pem` et `g6-temoins.tsv` sont réécrits, et `essais-h5-figees.sh:105` lit ces digests.
+- Écritures dans Zot : 14 images témoins et 16 publications de scan, illisible compris (boucle `temoins`, `plateforme.sh:1167` à 1181).
+- Écritures dans le cluster : ConfigMap `porte-temoin` posée puis retirée, un Job de la porte par cas dans `porte` (`juger`, `politique.sh:1299`), plus celui de l'image réelle. `g6_temoins` entier a duré 11 min 36 le 04/11 : il tient dans la fenêtre de 55 min.
+- Fichiers réécrits et cités ailleurs, à copier avant le passage : `preuves-temoins_scan.log` (`g6_temoins` lance `preuves.sh` sans `JOURNAL`, sauf s'il est exporté ; cité par `g6-predictions.md` et le README de la 08c), `g6_temoins.log` et `g6_temoins.copie.log` (cités par `g6-predictions.md`), `g6-temoins.tsv` et `g6-temoin-cle-publique.pem` (cités par `g6-predictions.md`, le README de la 08c et ce fichier). `preuves-h5-temoins_scan.log` n'est pas touché.
+- Question de cadrage, laissée au propriétaire : la logique est couverte par `test_scan_du_futur` et `test_ecart_horloge_tolere` (`scan_test.rego`). La porte sous H1 à H5 est couverte par `temoins_scan` sur les autres cas. Faut-il quand même le rejeu, avec écriture dans Zot ?
+- Une date très lointaine, un an par exemple, rendrait le témoin durable. Ce serait une modification de `plateforme.sh`, non faite.
+
+**3. Saut d'un passage manqué du scan.**
+- `scan-sample-app` : `30 9 * * *`, `startingDeadlineSeconds` 3600. Dernier passage le 07/11 à 09:30, réussi à 09:31:52 UTC. Rien n'est mesurable avant le 08/11 à 09:30 UTC. Échéance : l'accord et la suspension doivent précéder le 08/11 à 09:30 UTC, sinon le point glisse d'un jour.
+- Mesure possible : suspendre avant 09:30 UTC, reprendre après 10:30 UTC.
+- Comportement attendu du contrôleur, lu dans `pkg/controller/cronjob/cronjob_controllerv2.go` (branche `release-1.35`) : si l'heure prévue plus `startingDeadlineSeconds` est passée, il ne crée pas de job. Il émet un événement `Warning` `MissSchedule` (« Missed scheduled time to start a job: … »). Un événement ne vit qu'une heure par défaut (`--event-ttl`, non relevé sur ce cluster) : il faut le relever aussitôt.
+- Reprendre entre 09:30 et 10:30 UTC montrerait au contraire le lancement en retard.
+- Effet à annoncer : `ScanEnRetard` (avertissement, 26 h, `for: 5m`) se déclencherait vers 11:37 UTC le 08/11. Le dernier referrer lu dans Prometheus date de 09:31:48 UTC (complément de 15:40:59 UTC) : seuil franchi à 11:31:48 UTC, plus 5 min. C'est à la fois un effet et une mesure de plus.
+- Il n'y a pas de variante le jour même avec `rattrapage` : il tourne chaque minute, et le passage manqué le plus récent a toujours moins de 60 s, sous ses 120 s. Le contrôleur le lance donc à la reprise, comme constaté à 15:25:22 UTC. Ce mécanisme relève du contrôleur des CronJobs, pas de H1 à H5.
+
+**4. Jonction d'un nœud.** Elle demande une nouvelle VM ou une réinstallation de l'agent RKE2 : c'est une action système, soumise à accord préalable. Rien n'est préparé.
