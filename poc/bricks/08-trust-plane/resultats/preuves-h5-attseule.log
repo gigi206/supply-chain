@@ -1,0 +1,20 @@
+# preuves.sh attseule, 2026-11-07T12:45:34Z
+## prédiction (étape séparée du test 7 : le rejouer remettrait des provenances permanentes sur builds/essai-webhook)
+témoin att-seule (essais-j8/test7, ConfigMap porte-temoin, source attendue) : provenance réelle listée au sujet réécrit, tag .att signé
+  par une clé jetable, aucun tag .sig (Chains reste en mode dsse : la porte doit refuser une attestation valide sans signature) ;
+  refusée, builtin.image.signature_check présent, builtin.attestation.signature_check absent (l'attestation est valide) ;
+  ensemble complet relevé (ec évalue-t-il les règles quand une seule des deux vérifications échoue : non lu)
+non couvert : le format bundle de cosign v3 (referrers), qui faisait passer l'attaque au banc C ; Chains est en mode dsse
+OK   ConfigMap porte : porte.rego identique au fichier versionné
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)
+att-seule : essais-j8/test7@sha256:c115f910ad2d7d2c84439047d7c56e310abdfbe0f9d4530daf8022af4e703c09 (aucun tag .sig) ; enveloppes dans l'ordre des couches : L (construire-image 66a9f298, finishedOn 2026-11-07T10:49:00Z)
+  sur l'hôte, clé jetable : signature REFUSÉE, enveloppes vérifiées : 1 ; clé de Chains : refusée
+tags du témoin : .att
+  VERDICT|t7-att-seule|false|builtin.image.signature_check,porte.fermeture_plateforme,porte.image_signature,slsa_build_scripted_build.subject_build_task_matches|trusted_task.tagged|1|refus|0/1 enveloppe(s) couverte(s), 0 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles ; cosign : no matching attestations: |refus|image hors de builds/ : essais-j8/test7|refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans - ; image sans digest sha256, hors de builds/ ou dans un dépôt d'attestations : sc-stockage.poc.test:5000/essais-j8/test7@sha256:c115f910ad2d7d2c84439047d7c56e310abdfbe0f9d4530daf8022af4e703c09
+OK   att-seule : refusée par builtin.image.signature_check, attestation acceptée ; violations : builtin.image.signature_check,porte.fermeture_plateforme,porte.image_signature,slsa_build_scripted_build.subject_build_task_matches
+  motif : builtin.image.signature_check : Image signature check failed: no signatures found
+  motif : porte.fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd : aucune provenance de 
+  motif : porte.image_signature : aucune signature d'image (seulement des attestations)
+  motif : slsa_build_scripted_build.subject_build_task_matches : The attestation subject, "sc-stockage.poc.test:5000/essais-j8/test7@sha256:c115f910ad2d7d2c84439047d7c56e310abdfbe0f9d4530daf8022af4e703c09", does not match any
+ConfigMap porte-temoin retirée ; clé jetable effacée avec ~/.cache/supply-chain-poc/08/travail/preuves/auth à la sortie
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 24 enveloppes, dernière provenance de PipelineRun : 474b3f60-bb72-4a62-953b-a2d505165d7c (2026-11-07T10:49:00Z)

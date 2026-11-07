@@ -947,6 +947,21 @@ Bornes :
 
 Toujours non couverts sous H1 à H5 : `attseule` (en attente de confirmation), le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud et le saut d'un passage manqué du scan.
 
+## Additif du 07/11/2026, 12:46 UTC : étape `attseule` passée sous H1 à H5, A1 à A3 tenues
+
+Passage lancé sur confirmation du propriétaire (« attseule, puis push si tout tient »), avec `JOURNAL=preuves-h5`. Prédictions committées avant, au commit 3478505. Journal : [preuves-h5-attseule.log](../08-trust-plane/resultats/preuves-h5-attseule.log), 12:45:34 à 12:45:47 UTC, 3 OK, 0 KO ; relevé en complément de [resultats/mesures-reelles-x3.log](resultats/mesures-reelles-x3.log), à 12:45:58 UTC.
+
+| Prédiction | Mesuré |
+|---|---|
+| A1 | Témoin neuf `essais-j8/test7@sha256:c115f910…`, sans tag `.sig` ; 33 tags contre 32 avant, le tag `.att` seul en plus |
+| A2 | Refusé : `builtin.image.signature_check`, `porte.fermeture_plateforme`, `porte.image_signature` et `subject_build_task_matches`, comme le 06/11 ; `builtin.attestation.signature_check` absent |
+| A3 | 0 KO, code 0, 13 s ; image réelle inchangée (24 enveloppes, `474b3f60`) |
+| X3, complément | `KyvernoRefusAnormaux` inactive et absente d'Alertmanager, aucun refus Kyverno sur 5 min, Zot `5806ba5c…` inchangé, CronJobs actifs, aucun PipelineRun en cours, `porte-temoin` absente |
+
+Les cinq étapes de la porte sont passées sous H1 à H5, avec 18 prédictions tenues sur 19 (R3 tenue sur les violations, pas sur le libellé du motif). Durée du conteneur `ec` : 1 s, comme dans les quatre autres étapes.
+
+Toujours non couverts sous H1 à H5 : le test 6 sous limites, `intercepteurs`, l'étape `test5` complète, le démarrage d'un nouveau pod des résolveurs, la jonction d'un nœud, le saut d'un passage manqué du scan, et la branche « scan daté du futur » de `scan.rego` (témoins de G6 à refaire).
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
