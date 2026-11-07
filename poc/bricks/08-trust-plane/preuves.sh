@@ -2531,6 +2531,7 @@ etape_controleurs() {
     kubectl get pod -n "$D_LP_NS" "$lp" -o json; kubectl get statefulset -n openbao openbao -o json; } | jq -s '[.[].metadata.annotations // {} | has("preuve-controleurs")] | map(select(.)) | length')" 0
 
   echo "## règle en seconde barrière : espace d'essai preuve-controleurs, droits de locataire rendus par une liaison temporaire"
+  trap 'kubectl delete namespace preuve-controleurs --ignore-not-found --wait=false >/dev/null 2>&1 || true; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT   # ni espace ni liaison temporaire après un KO
   kubectl create namespace preuve-controleurs >/dev/null
   attendre_sa preuve-controleurs
   for c in tekton-pipelines:tekton-pipelines-controller tekton-chains:tekton-chains-controller; do
@@ -2550,6 +2551,7 @@ etape_controleurs() {
   kubectl create --dry-run=server -f "$T/ct-pod-essai.json" >/dev/null 2>&1 && echo "OK   témoin : même pod admis au nom de l'administrateur (dry-run serveur)" \
     || { echo "KO   témoin administrateur refusé dans preuve-controleurs" >&2; k=1; }
   kubectl delete namespace preuve-controleurs --wait=true >/dev/null
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
   ba_attendu "espace preuve-controleurs et ses liaisons temporaires introuvables (NotFound)" "$(kubectl get namespace preuve-controleurs 2>&1 | grep -c NotFound || true)" 1
   for u in "$CONTROLEUR" "$CHAINS"; do
     ba_attendu "${u##*:} : can-i create pods dans preuve-controleurs (après suppression)" "$(kubectl auth can-i create pods -n preuve-controleurs --as "$u" 2>/dev/null || true)" no
@@ -2677,6 +2679,8 @@ etape_resolveurs() {
   echo "## résolutions réelles (bundle de la pipeline en service, sans cache)"
   p=$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -c '.spec.resourcetemplates[0].spec.pipelineRef.params + [{name: "cache", value: "never"}]')
   echo "paramètres : $p"
+  trap 'kubectl delete resolutionrequest -n builds preuve-resolveurs-compte preuve-resolveurs-secret --ignore-not-found >/dev/null 2>&1 || true
+    kubectl delete namespace preuve-resolveurs --ignore-not-found --wait=false >/dev/null 2>&1 || true; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT   # rien de restant après un KO
   kubectl create namespace preuve-resolveurs >/dev/null
   attendre_sa preuve-resolveurs
   for ns in builds preuve-resolveurs; do
@@ -2689,6 +2693,7 @@ etape_resolveurs() {
   done
   kubectl delete resolutionrequest -n builds preuve-resolveurs-compte preuve-resolveurs-secret >/dev/null
   kubectl delete namespace preuve-resolveurs --wait=true >/dev/null
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
   ba_attendu "espace preuve-resolveurs introuvable (NotFound)" "$(kubectl get namespace preuve-resolveurs 2>&1 | grep -c NotFound || true)" 1
 
   echo "## journal des résolveurs depuis $t0"
@@ -2932,6 +2937,103 @@ etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule s
   n=$(kubectl logs -n tekton-pipelines deploy/tekton-triggers-core-interceptors --since-time="$t0" | grep -c 'no X-Hub-Signature-256 header set' || true)
   [ "$n" -ge 1 ] && echo "OK   livraison non signée refusée par l'intercepteur github" || { echo "KO   aucun refus de signature" >&2; exit 1; }
   ba_attendu "PipelineRun du commit non signé" "$(kubectl get pipelinerun -n builds sample-app-1111111111111111111111111111111111111111 --no-headers 2>/dev/null | wc -l)" 0
+  echo "durée du PipelineRun : $(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | .[1] - .[0]') s"
+  ee_calme
+  ee_controle fin
+  [ -z "$(ee_anomalies fin)" ] && echo "OK   fin : aucune anomalie" || { ee_anomalies fin | sed 's/^/  /'; echo "KO   fin : anomalies" >&2; exit 1; }
+  e1=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  ba_attendu "enveloppes de Chains sur $APP" "$e0 → $e1" "$e0 → $((e0 + 2))"
+  echo "$APP : $(etat_app)"
+}
+
+etape_test5_refus() { # brique 08c, gabarit basculé : livraisons refusées du test 5 ; le témoin vise la tête de main, déjà construite (un commit neuf
+  # échouerait à preparer) ; rien de construit, image réelle inchangée
+  local t0 faux=1111111111111111111111111111111111111111 neuf u0 ev c
+  echo "## prédiction (écrite le 07/11/2026, avant le premier passage, resultats/mesures-reelles-predictions.md de la 08c, T1 à T6)"
+  echo "- gabarit en service : pipeline sample-app ; $BA_PR présent et réussi"
+  echo "- commit $faux : livraison non signée, autre secret, corps modifié : HTTP 202 ; refus de l'intercepteur github (une fois"
+  echo "  « no X-Hub-Signature-256 header set », deux fois « payload signature check failed ») ; aucun PipelineRun"
+  echo "- témoin : livraison valide de la tête de main : acceptée par les intercepteurs, refusée à la création (already exists, même eventID)"
+  echo "- 3 refus des intercepteurs, aucun autre ; UID de $BA_PR inchangé ; image réelle inchangée"
+  ba_attendu "gabarit en service" "$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value')" sample-app
+  ba_attendu "$BA_PR" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.status.conditions[0].reason}')" Succeeded   # sinon le témoin construirait
+  u0=$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')
+  garder avant
+  EL_NS=declencheurs
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  neuf=$(printf 'preuves.sh test5_refus %s' "$t0" | sha1sum | cut -c1-40)   # jamais livré : sa signature valide sert au corps modifié
+  rm -rf "$T/webhook" "$T/auth" && (umask 077 && mkdir -p "$T/webhook" "$T/auth")
+  echo "## livraisons refusées (commit $faux)"
+  corps_push "$faux" b.json; envoyer "non signée" "$T/webhook/b.json" ""
+  corps_push "$faux" c.json
+  (umask 077 && openssl rand -hex 32 | tr -d '\n' > "$T/webhook/autre.secret")
+  envoyer "autre secret" "$T/webhook/c.json" "$(python3 -I -c 'import hashlib, hmac, sys; print(hmac.new(open(sys.argv[1], "rb").read(), open(sys.argv[2], "rb").read(), hashlib.sha256).hexdigest())' "$T/webhook/autre.secret" "$T/webhook/c.json")"
+  corps_push "$neuf" e.json; corps_push "$faux" d.json
+  envoyer "corps modifié (signature valide d'un autre corps)" "$T/webhook/d.json" "$(hmac_corps "$T/webhook/e.json")"
+  echo "## témoin : livraison valide de la tête de main ($TETE_J2)"
+  corps_push "$TETE_J2" v.json
+  envoyer "valide" "$T/webhook/v.json" "$(hmac_corps "$T/webhook/v.json")"
+  ev=$(jq -r .eventID "$T/webhook/reponse")
+  for _ in $(seq 30); do
+    el_existe "$t0" > "$T/webhook/existe"
+    grep -F "\"eventID\":\"$ev\"" "$T/webhook/existe" >/dev/null && break
+    sleep 2
+  done
+  cat "$T/webhook/existe"
+  grep -F "\"eventID\":\"$ev\"" "$T/webhook/existe" | grep -F "$BA_PR\\\" already exists" >/dev/null \
+    && echo "OK   témoin (eventID $ev) accepté par les intercepteurs, $BA_PR déjà présent" || { echo "KO   témoin absent du journal de l'EventListener" >&2; exit 1; }
+  echo "## bilan"
+  ba_attendu "PipelineRuns du commit $faux" "$(nb_pr "$faux")" 0
+  ba_attendu "PipelineRuns du commit $neuf" "$(nb_pr "$neuf")" 0
+  ba_attendu "UID de $BA_PR" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')" "$u0"
+  echo "## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis $t0"
+  kubectl logs -n tekton-pipelines deploy/tekton-triggers-core-interceptors --since-time="$t0" \
+    | jq -Rc 'fromjson? | select((.msg // "") | test("Continue:false")) | {t: (.ts | todate | .[11:19]), refus: (.msg | capture("Code:(?<code>[A-Za-z]+) Message:(?<message>[^}]*)"))}' \
+    | tee "$T/webhook/refus"
+  ba_attendu "refus « no X-Hub-Signature-256 header set »" "$(grep -c '"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"' "$T/webhook/refus" || true)" 1
+  ba_attendu "refus « payload signature check failed »" "$(grep -c '"code":"FailedPrecondition","message":"payload signature check failed"' "$T/webhook/refus" || true)" 2
+  c=$(grep -c . "$T/webhook/refus" || true)
+  ba_attendu "refus des intercepteurs, tous motifs" "$c" 3
+  garder apres
+}
+
+etape_rattrapage_durci() { # brique 08c, sous H1 à H5 : chemin 2 de la bascule seul, gabarit en service inchangé ; purge le PipelineRun de la tête
+  local t0 e0 e1 n j
+  [ -s "$W/construction/pipeline.ref" ] || { echo "KO   pipeline sample-app non publiée" >&2; exit 1; }
+  BA_PIPE=$(cat "$W/construction/pipeline.ref")
+  echo "## prédiction (écrite le 07/11/2026, avant le premier passage, resultats/mesures-reelles-predictions.md de la 08c, B1 à B7)"
+  echo "- $BA_PR purgé, CronJob rattrapage repris, aucune livraison : PipelineRun créé par declencheurs:rattrapage (une création, 201) ;"
+  echo "  réussi, pod construire sous Kata sur sc-build ; IMAGE_DIGEST $APP_DIGEST ; spec identique à celle de $BA_J7, bundle masqué"
+  echo "- Chains signe ; porte (source $SAMPLE_APP@$TETE_J2) admise, contrôle 9 ok ; provenance la plus récente = ce PipelineRun"
+  echo "- une seule ligne CREE dans les journaux des passages ; deux enveloppes de plus ; aucune anomalie exécutions/enveloppes"
+  ba_spec "$BA_J7" > "$T/ba-j7.spec"
+  (umask 077 && mkdir -p "$T/auth")
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap 'ba_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] || { echo "KO   passage du rattrapage toujours actif" >&2; exit 1; }
+  ee_calme
+  ee_controle depart
+  [ -z "$(ee_anomalies depart)" ] && echo "OK   départ : aucune anomalie" || { ee_anomalies depart | sed 's/^/  /'; echo "KO   départ : anomalies" >&2; exit 1; }
+  couverture > /dev/null
+  BA_O0=$(wc -l < "$T/orphelins")
+  BA_SRC=$(jq -nc --arg u "$BA_URL" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
+  e0=$(cosign download attestation --registry-cacert "$P/ca-poc.crt" "$REG_HOTE/$APP" 2>/dev/null | grep -c . || true)
+  echo "$APP : $(etat_app)"
+  purger_pr "$BA_PR"
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  ba_reprendre
+  for _ in $(seq 180); do kubectl get pipelinerun -n builds "$BA_PR" > /dev/null 2>&1 && break; sleep 1; done
+  : > "$T/rattrapage-passages.log"   # journaux relevés dès que le PipelineRun existe : voir etape_bascule
+  for j in $(kubectl get jobs -n declencheurs -o json | jq -r --arg t "$t0" '[.items[] | select(any(.metadata.ownerReferences[]?; .kind == "CronJob"
+      and .name == "rattrapage") and .metadata.creationTimestamp >= $t)] | sort_by(.metadata.creationTimestamp) | .[].metadata.name'); do
+    kubectl wait -n declencheurs "job/$j" --for=condition=complete --timeout=120s > /dev/null || true
+    journal_rattrapage "$j" | sed "s/^/$j/"
+    sed "s/^/$j /" "$T/rattrapage.log" >> "$T/rattrapage-passages.log"
+  done
+  ba_chemin rattrapage rattrapage declencheurs:rattrapage "$t0"
+  n=$(grep -c " CREE|builds/$BA_PR|commit $TETE_J2|depot $BA_URL$" "$T/rattrapage-passages.log" || true)
+  ba_attendu "rattrapage : créations de $BA_PR dans les journaux des passages depuis la reprise" "$n" 1
   echo "durée du PipelineRun : $(kubectl get pipelinerun -n builds "$BA_PR" -o json | jq -r '[.status.startTime, .status.completionTime] | map(fromdateiso8601) | .[1] - .[0]') s"
   ee_calme
   ee_controle fin

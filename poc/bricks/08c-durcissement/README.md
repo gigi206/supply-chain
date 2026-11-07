@@ -768,6 +768,12 @@ Bornes :
 - Le dry-run D prouve l'admission, pas la création par le binaire `rattrapage` sous H5. Son passage de chaque minute s'arrête à `PRESENT`.
 - `essais-h5-figees.sh` n'est pas à relancer tel quel : ses valeurs fausses restent telles qu'elles ont été prédites.
 
+## Additif du 07/11/2026, 08:48 UTC : mesures réelles restantes, préparées à sec
+
+Rien lancé, rien écrit dans le cluster ni dans Zot. Prédictions K, L, T, B et X, effets à connaître et commandes : `resultats/mesures-reelles-predictions.md`, committés avant tout passage. Chaque mesure demande son accord, après la relecture du scan de 09:30 UTC.
+
+Ajouté à `08-trust-plane/preuves.sh`, jamais lancé : étapes `test5_refus` (livraisons refusées du test 5, rien de construit) et `rattrapage_durci` (chemin 2 de la bascule seul, 2 enveloppes de plus sur l'image réelle). `controleurs` et `resolveurs` retirent maintenant leur espace d'essai après un KO.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
