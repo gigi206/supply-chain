@@ -2,6 +2,9 @@
 # Brique 08c, W8 du saut d'un passage du scan : résolution de ScanEnRetard après le passage du 09/11 (resultats/mesures-reelles-predictions.md,
 # additif du 07/11/2026 à 16:31 UTC). Le passage lui-même est relu par essais-h5-planifie.sh (PLAN=2026-11-09T09:30:00Z AVANT=4).
 # Lecture seule : Prometheus, le journal du récepteur local et Zot sur sc-stockage, le CronJob par l'API ; rien d'écrit hors du journal.
+# Ajout du 07/11/2026, 17:58 UTC, avant le passage (accord du propriétaire : « Oui, prépare-le ») : les notifications du récepteur sont aussi
+# lues dans Loki, par l'auditeur à travers Grafana. Le journal local de sc-stockage a perdu ses lignes du 06/11 antérieures à 17:03 UTC
+# (chains-echec-signature.log). Loki est affiché et comparé au journal local, sans changer les OK et KO prédits.
 # Refuse avant FENETRE et si le journal existe ; ne juge rien si le CronJob est suspendu ou si le passage de PLAN n'a pas eu lieu.
 # Usage (racine du dépôt) : poc/bricks/08c-durcissement/scan-saut-resolution.sh   (journal : resultats/scan-saut-w8_resolution.log)
 set -uo pipefail
@@ -30,6 +33,7 @@ regle() { stockage "curl -fsS 'http://127.0.0.1:9090/api/v1/rules?type=alert'" |
   echo "- ScanEnRetard et ScanBientotRefuse inactives ; métrique du dernier referrer après $PLAN, égale à la date du referrer le plus récent dans Zot"
   echo "- récepteur : une seule notification resolved de ScanEnRetard, même début que les firing ; fin 0 à 1200 s après le nouveau referrer"
   echo "- firing notifiées : 6 (repeat_interval 4h de 11:36 UTC le 08/11 à la résolution), compte en CONSTAT"
+  echo "- ajout du 07/11/2026, 17:58 UTC, avant le passage : mêmes notifications dans Loki ; un écart avec le journal local est un CONSTAT"
 
   echo "## garde"
   etat=$(kubectl get cronjob -n scan scan-sample-app -o json </dev/null | jq -r '"\(.spec.suspend // false)|\(.status.lastScheduleTime // "aucun")"')
@@ -69,7 +73,22 @@ regle() { stockage "curl -fsS 'http://127.0.0.1:9090/api/v1/rules?type=alert'" |
       || echo "CONSTAT fin de ScanEnRetard $d s après le nouveau referrer (prédit : 0 à 1200 s)"
     echo "reçue au récepteur $(( $(date -ud "$(awk '$2 == "resolved" {print $1; exit}' "$here/resultats/.w8_recepteur")" +%s) - $(date -ud "$fin" +%s) )) s après la fin (affiché, non contrôlé)"
   fi
-  rm -f -- "$here/resultats/.w8_recepteur"
+
+  echo "## récepteur dans Loki ({unite=\"recepteur-alertes.service\"}, auditeur à travers Grafana), ScanEnRetard depuis $DEPUIS UTC"
+  q=$(jq -nc --arg e '{unite="recepteur-alertes.service"} |= "ScanEnRetard"' --arg de "$(date -ud "$DEPUIS" +%s)000" --arg a "$(date -u +%s)000" \
+    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 1000, direction: "forward"}], from: $de, to: $a}')
+  printf 'user = "auditeur:%s"\n' "$(cat "$O8/secrets/grafana-auditeur.password")" \
+    | curl -sS -K - --cacert "$O8/pki/ca-poc.crt" -X POST -H 'Content-Type: application/json' "https://192.168.161.13:3001/api/ds/query" -d "$q" \
+    | jq -r '(.results.A.error // empty | "ERREUR Loki : \(.)"), (.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.])\t\($v[2][.])")' \
+    | jq -R -r 'if startswith("ERREUR") then . else split("\t") as $p | ($p[0] | tonumber / 1000 | floor) as $t | ($p[1:] | join("\t") | fromjson? // empty)
+        | select(.alerte == "ScanEnRetard") | "\($t | todate) \(.statut) \(.debut) \(.fin)" end' | sort > "$here/resultats/.w8_loki"
+  cat "$here/resultats/.w8_loki"
+  echo "Loki : firing $(grep -c ' firing ' "$here/resultats/.w8_loki" || true), resolved $(grep -c ' resolved ' "$here/resultats/.w8_loki" || true)"
+  if sort "$here/resultats/.w8_recepteur" | cmp -s - "$here/resultats/.w8_loki"; then echo "Loki et journal local : mêmes lignes"
+  else echo "CONSTAT Loki et journal local diffèrent (lignes présentes d'un seul côté ci-dessous, < journal local, > Loki)"
+    diff <(sort "$here/resultats/.w8_recepteur") "$here/resultats/.w8_loki" | grep '^[<>]' || true
+  fi
+  rm -f -- "$here/resultats/.w8_recepteur" "$here/resultats/.w8_loki"
 
   [ "$ko" = 0 ] && echo "bilan : OK" || echo "bilan : KO"
   date -u '+fin du relevé %H:%M:%S UTC'

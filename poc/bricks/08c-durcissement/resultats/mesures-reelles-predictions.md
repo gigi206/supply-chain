@@ -612,3 +612,14 @@ Aucune affirmation archivée n'est touchée et aucun script n'est modifié. Touj
 Lors de l'étape `decision3` du 07/11, D3 s'est vérifiée : 5 PUT `.att` refusés, entre 11:36:01 et 11:36:14 UTC. Ces refus ont déclenché `ChainsEchecSignature` (A2), en firing de 11:36:07 à 11:46:07 UTC selon le récepteur. X2 ne prédisait que l'inactivité de `KyvernoRefusAnormaux`. L'alerte était pourtant attendue, puisque la règle ne peut pas filtrer les essais négatifs. Constat non prédit, sans défaut de la chaîne : voir [chains-echec-signature.log](chains-echec-signature.log) et le README de la 08c (additif de 17:32 UTC). Même mécanisme le 06/11, de 15:34 à 15:41 UTC, à la reprise de la collecte. Les échecs venaient des essais négatifs j6 et j7 du rejeu et de decision3 ; Loki les attribue un par un. Correction faite à 17:39 UTC, avant tout push.
 
 Risque pour W8b (09/11) : `scan-saut-resolution.sh` lit le récepteur dans le journal local de `sc-stockage`. Celui-ci a perdu ses lignes du 06/11 antérieures à 17:03 UTC, par un mécanisme non établi. Si la perte se reproduit, des firing du 08/11 manqueront : ce serait un CONSTAT sur leur nombre, pas un KO, puisque le resolved est lu le jour même. Lire aussi Loki relève du propriétaire.
+
+## Additif du 07/11/2026, 17:59 UTC : W8b lit aussi le récepteur dans Loki, avant le passage
+
+Ajouté sur accord du propriétaire (« Oui, prépare-le »), à sec. Rien n'a été lancé dans le cluster, Zot ou les VM.
+- `scan-saut-resolution.sh` lit maintenant les notifications de `ScanEnRetard` à deux endroits : dans le journal local de `sc-stockage`, comme avant, et dans Loki, par l'auditeur à travers Grafana (`{unite="recepteur-alertes.service"}`).
+- Les OK et KO de W8b sont inchangés : ils restent jugés sur le journal local. Loki est affiché, avec ses comptes. Un écart entre les deux sources est un CONSTAT.
+- Essai sur une copie, à 17:59 UTC, avec la garde remplacée et `ChainsEchecSignature` à la place de `ScanEnRetard`, depuis le 06/11 à 15:00 UTC ([scan-saut-w8-loki-sec.log](scan-saut-w8-loki-sec.log)) :
+  - les lignes du 07/11 sont identiques des deux côtés ;
+  - les 6 lignes du 06/11 (3 firing à 15:32:47, 3 resolved à 15:41:47) ne sont que dans Loki, et sortent en CONSTAT ;
+  - second essai à 18:01 UTC, depuis le 07/11 à 11:00 UTC : « Loki et journal local : mêmes lignes », la branche que prédit le 09/11.
+- Prédiction ajoutée : le 09/11, Loki et le journal local auront les mêmes lignes de `ScanEnRetard`. Confiance moyenne. Aux relevés de 17:39 et 18:01 UTC, les archives du journal local commencent le 06/11 à 17:03 UTC. Un seul état ne dit pas si la perte est glissante ou ponctuelle : ce n'est pas établi. Corrigé à 18:01 UTC, avant tout push : la première rédaction disait « environ 24 h ». Si les firing du 08/11 manquent au journal local, le CONSTAT de nombre de W8b s'expliquera par Loki.

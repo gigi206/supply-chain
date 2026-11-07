@@ -1037,6 +1037,8 @@ Détail dans [resultats/mesures-reelles-predictions.md](resultats/mesures-reelle
 - Aucune affirmation archivée n'est prise dans les deux fenêtres.
 - C'est la limite déjà écrite dans `alertes.yml` : les compteurs de Chains n'ont pas d'étiquette d'exécution, et chaque passage de decision3, de j6 ou de j7 déclenche A2. Toute suite (prédire A2 à chaque essai négatif, ou autre) relève du propriétaire.
 
+**Additif du 07/11/2026, 17:59 UTC : W8 lit aussi le récepteur dans Loki.** Sur accord du propriétaire (« Oui, prépare-le »), `scan-saut-resolution.sh` compare les notifications de `ScanEnRetard` du journal local de `sc-stockage` à celles de Loki, lues par l'auditeur à travers Grafana. Les OK et KO prédits sont inchangés, et un écart entre les deux sources est un CONSTAT. Essai à sec sur `ChainsEchecSignature` : les lignes du 06/11 perdues localement sont retrouvées dans Loki ([resultats/scan-saut-w8-loki-sec.log](resultats/scan-saut-w8-loki-sec.log)).
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.
