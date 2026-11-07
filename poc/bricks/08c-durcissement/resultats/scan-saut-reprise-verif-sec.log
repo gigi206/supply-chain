@@ -1,0 +1,22 @@
+contre-relevé du 07/11/2026 à 16:53:23 UTC, lecture seule
+## journal de l'étape (KO, CONSTAT, bilan, audit, début notifié)
+journal absent : poc/bricks/08-trust-plane/resultats/preuves-h5-scan_saut_reprendre.log
+## chrono.tsv
+aucune ligne scan_saut_reprendre
+## état réel
+suspendu true ; dernier passage 2026-11-07T09:30:00Z ; actifs 0
+Jobs du scan créés depuis 2026-11-07T09:00:00Z : 1
+audit depuis 2026-11-07T09:00:00Z, créations de Jobs dans scan (heure utilisateur code) :
+  2026-11-07T09:30:00.104974Z system:serviceaccount:kube-system:cronjob-controller 201
+audit depuis 2026-11-07T09:00:00Z, patchs du CronJob du scan (heure utilisateur code) :
+  2026-11-07T16:21:58.688493Z system:admin 200
+Events (une heure seulement, non probants au-delà) : du CronJob dans scan 0 ; PolicyViolation depuis 2026-11-07T09:00:00Z 0
+ScanEnRetard : inactive (attendue firing jusqu'au referrer du 09/11) ; ScanBientotRefuse : inactive
+## récepteur local, ScanEnRetard depuis 2026-11-07T09:00:00Z (reçu à, statut, début)
+## referrers de l'image (AVANT du relevé du 09/11 : compte de essais-h5-planifie.sh, tous types)
+  2026-11-06T15:39:00Z https://supply-chain.example/scan/v1
+  2026-11-06T15:40:55Z https://supply-chain.example/scan/v1
+  2026-11-06T21:30:48Z https://supply-chain.example/scan/v1
+  2026-11-07T09:31:48Z https://supply-chain.example/scan/v1
+referrers : 4
+fin 16:53:25 UTC

@@ -552,3 +552,16 @@ Demande « continue » : préparer le jalon suivant à sec. Rien n'a été écri
 - Ce qui n'est pas prouvé ici : l'heure de réception du resolved, affichée sans être contrôlée (`group_interval` 1m).
 
 **Correction avant tout passage** (07/11/2026, 16:34 UTC, avant le push, par amend du commit qui écrivait ces prédictions) : borne de W8b prédite d'abord à 0 à 1020 s, portée à 1200 s. La précision du timer (`AccuracySec` d'une minute) absorbait toute la marge. Relevé en lecture seule à 16:33:33 UTC, complément 7 de [scan-saut-w8-sec.log](scan-saut-w8-sec.log) : délai réel de 597 s le 07/11 entre le referrer et la métrique dans Prometheus.
+
+## Additif du 07/11/2026, 16:53 UTC : contre-relevé de la reprise du 08/11 préparé à sec, rien lancé
+
+Demande « continue » : préparer à sec la lecture du rapport de reprise du 08/11. Le rapport de la tâche planifiée est une information, pas une preuve. Rien n'a été écrit dans le cluster, Zot ni les VM, aucune tâche planifiée n'a été créée.
+- Nouveau script `scan-saut-reprise-verif.sh`, en lecture seule. Il relit le journal de `scan_saut_reprendre` et `chrono.tsv`, puis l'état réel : CronJob, Jobs, audit de l'API, alertes, récepteur local, referrers de l'image. Il refuse si son journal existe. Il sera lancé par la session principale après le rapport, journal `scan-saut-reprise-verif.log`.
+- Les Events ne vivent qu'une heure. Relevé à 16:52:25 UTC : le plus vieil Event a été créé à 11:34:08 UTC, mais mis à jour pour la dernière fois à 15:52:03 UTC. Un compte d'Events lu plus d'une heure après la reprise ne prouve donc rien. W6 et W7 tiennent à l'étape elle-même, qui compte 30 s après la reprise. Le contre-relevé affiche les Events comme non probants et lit l'audit à leur place pour les Jobs et le CronJob.
+- Essai à sec à 16:53:23 UTC, avec `PASSAGE=2026-11-07T09:00:00Z` pour exercer l'audit, dans [scan-saut-reprise-verif-sec.log](scan-saut-reprise-verif-sec.log), code 0 :
+  - journal de l'étape et lignes de `chrono.tsv` absents, comme attendu avant la reprise ;
+  - CronJob suspendu, dernier passage le 07/11 à 09:30 UTC ;
+  - à l'audit, la création du Job du 07/11 à 09:30:00.104 UTC par `cronjob-controller` en 201, et la suspension à 16:21:58.688 UTC par `system:admin` en 200 ;
+  - `ScanEnRetard` et `ScanBientotRefuse` inactives ;
+  - 4 referrers, tous de type `https://supply-chain.example/scan/v1`, le dernier créé le 07/11 à 09:31:48 UTC. `AVANT=4` de W8a est confirmé à cette heure. Il sera relu au contre-relevé du 08/11. S'il change, il sera corrigé par un additif daté avant le 09/11 à 09:30 UTC.
+- Non essayé sur des données réelles : la section du récepteur, aucune notification `ScanEnRetard` n'existant encore. L'expression est celle de `scan-saut-resolution.sh`, essayée sur `ChainsEchecSignature` (additif de 16:31 UTC).
