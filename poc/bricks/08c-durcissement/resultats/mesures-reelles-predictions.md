@@ -440,3 +440,68 @@ Sur KO avant que le pod soit prêt, l'étape écrit dans son journal les événe
 - V7, hors étape : 0 PipelineRun créé pendant la fenêtre. Rattrapage `PRESENT` à la reprise. Image réelle inchangée, 24 enveloppes, `474b3f60`. 0 alerte.
 
 Durée prédite : moins de 2 min, dont environ 11 s pour l'étape `resolveurs`.
+
+## Additif du 07/11/2026, 16:15 UTC : saut d'un passage du scan, étapes `scan_saut_suspendre` et `scan_saut_reprendre`, effets et prédictions avant passage, aucun accord de passage donné
+
+Demande : « continue ». Les deux étapes sont écrites après ces lignes et n'ont jamais été lancées. Rien n'a été modifié dans le cluster : seulement des lectures et deux dry-runs serveur de la suspension.
+
+**Correction du point 3 de l'additif de 15:38 UTC.** Ce point annonçait, à la reprise, un événement `Warning` `MissSchedule`. C'est faux pour ce CronJob. Le source lu cette fois est celui de la version du cluster : `v1.35.9`, empreintes dans [scan-saut-sec.log](scan-saut-sec.log).
+- `mostRecentScheduleTime` (`utils.go`, lignes 106 à 113) remonte le point de départ à « maintenant moins `startingDeadlineSeconds` » quand une échéance est posée.
+- Le passage retenu est donc toujours postérieur à cette borne. La condition `tooLate` (`cronjob_controllerv2.go`, lignes 546 à 552) ne peut pas être vraie, et `MissSchedule` n'est jamais émis avec une échéance.
+- Repris à 11:38 UTC, le contrôleur cherche les passages après 10:38 UTC. Il n'en trouve aucun avant le 09/11 à 09:30 UTC. Il ne crée ni Job ni événement, et `lastScheduleTime` reste au 07/11 à 09:30 UTC.
+- Suspendu, il rend la main avant tout calcul (lignes 514 à 517).
+- La preuve du saut n'est donc pas un événement. Elle tient en trois relevés : aucun Job, aucune création de Job à l'audit, et `lastScheduleTime` inchangé.
+
+**Vérifié à sec** de 16:06 à 16:15 UTC ([scan-saut-sec.log](scan-saut-sec.log), complété par la vérification des expressions des étapes) :
+- CronJob `scan-sample-app` :
+  - planning `30 9 * * *`, `timeZone` `Etc/UTC`, échéance 3600 s, `Forbid`, `activeDeadlineSeconds` 1800 ;
+  - non suspendu, aucun passage actif ;
+  - dernier passage le 07/11 à 09:30 UTC.
+- La suspension est admise en dry-run serveur, avec 0 `PolicyViolation`.
+- La porte exige un scan de 7 jours au plus (`scan_age_max_jours: 7` dans la ConfigMap `porte/porte`, en service). La base de Grype vient d'un timer systemd séparé (`base-grype.timer`, 08:00 UTC) : `BaseGrypeVieillie` n'est pas touchée.
+- Alertmanager a un seul récepteur, le webhook local `127.0.0.1:9095` (`recepteur-alertes`, journal de l'unité). Aucune notification ne sort de `sc-stockage`.
+- L'audit de l'API garde les patchs des CronJobs et les créations de Jobs. Son historique ne remonte qu'à environ 16 h 25 : dix fichiers de 100 Mo, le plus ancien commençait le 06/11 à 23:49:54 UTC. La ligne de la suspension aura donc tourné avant la reprise : le journal de `scan_saut_suspendre` en garde la copie. La reprise vérifie que l'audit couvre encore le passage sauté.
+- Seuls le CronJob et des Jobs lancés à la main écrivent des referrers dans `builds/scan/sample-app`. Aucune pipeline n'y écrit.
+- Dernier referrer : 07/11 à 09:31:48 UTC. `ScanEnRetard` (évaluée toutes les 30 s) passe en pending le 08/11 à 11:31:48 UTC et en firing vers 11:36:48 UTC.
+
+**Commandes** (sur accord, pas avant ; deux accords distincts) :
+
+```
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- scan_saut_suspendre </dev/null
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- scan_saut_reprendre </dev/null
+```
+
+**Calendrier.**
+- `scan_saut_suspendre` : à tout moment avant le 08/11 à 09:25 UTC. Elle refuse entre 09:25 et 10:31 UTC, quand le passage du jour tourne ou peut encore être lancé. Ce soir convient aussi bien que demain matin : le CronJob ne tourne qu'à 09:30.
+- `scan_saut_reprendre` : le 08/11 entre 11:38 UTC (après le firing attendu) et vers 01:00 UTC le 09/11, marge comprise. Au-delà, l'audit (environ 16 h 25 d'historique, selon son volume) ne couvre plus le passage sauté de 09:30 UTC, et l'étape sort en KO. Elle refuse sans rien toucher avant 10:31 UTC, car le passage serait alors lancé en retard. Entre 10:31 et 11:38 UTC, elle reprend sans juger l'alerte.
+- Passé cette garde, tout KO de `scan_saut_reprendre` reprend le CronJob par un trap : un contrôle raté ne laisse pas sauter le passage du 09/11.
+
+**Effets.**
+- Aucun scan le 08/11 : un referrer de moins dans `builds/scan/sample-app`. La tâche planifiée du 21/11 compte les referrers sans en prédire le nombre, et les scans quotidiens suivants restent.
+- `ScanEnRetard` (avertissement) passe en firing le 08/11 vers 11:37 UTC. Elle est notifiée au récepteur local et visible dans Grafana. Elle reste active jusqu'au referrer suivant, le 09/11 vers 09:32 UTC. Un Job manuel (`kubectl create job --from=cronjob/scan-sample-app`) l'éteindrait plus tôt : il demande un accord séparé et n'est pas compris ici.
+- Deux patchs du CronJob, à l'audit au nom de `system:admin`. Deux journaux (`preuves-h5-scan_saut_suspendre.log`, `preuves-h5-scan_saut_reprendre.log`) et quatre lignes dans `chrono.tsv`.
+- Rien d'autre n'est touché : rattrapage, horodatage, porte et Zot.
+
+**Pire cas : la reprise n'a pas lieu.** Plus aucun scan ne tourne.
+- `ScanBientotRefuse` (critique) se déclenche le 12/11 à 09:31:48 UTC.
+- La porte refuse `sample-app` à partir du 14/11 vers 09:31 UTC, `scannedAt` précédant de peu le referrer. Les pods en service ne sont pas touchés : la porte juge les publications.
+- Retour : `kubectl patch cronjob -n scan scan-sample-app --type merge -p '{"spec":{"suspend":false}}'`, ou l'étape `scan_saut_reprendre`.
+
+**Prédictions.**
+- W1, avant la suspension : `30 9 * * *|3600|false|0`, admise en dry-run, `ScanEnRetard` inactive. Confiance haute (vérifié à sec).
+- W2, suspension : admise, `suspend` à `true`, à l'audit en 200 au nom de `system:admin`, 0 `PolicyViolation`. Confiance haute.
+- W3, passage de 09:30 UTC le 08/11 : aucun Job, aucune création de Job à l'audit depuis 09:30 UTC. `lastScheduleTime` reste à 2026-11-07T09:30:00Z. Confiance haute (lignes 514 à 517).
+- W4, alerte : `ScanEnRetard` en firing. Le début notifié au récepteur local tombe 300 à 360 s après le 08/11 à 11:31:48 UTC. Prometheus v3.13.5, en service sur `sc-stockage`, envoie `StartsAt: alert.FiredAt` (`rules/manager.go`, ligne 478), et `FiredAt` est posé au passage en firing (`rules/alerting.go`, ligne 528), 300 s après `activeAt`, sur la grille des évaluations de 30 s. Empreintes : `manager.go` `0c5ae466…`, `alerting.go` `98880efc…`. L'`activeAt` du pending est affiché, pas contrôlé. Il y a au moins une notification firing : une seule si la reprise a lieu moins de 4 h après le firing (`repeat_interval`). `ScanBientotRefuse` reste inactive. Confiance haute.
+- W5, reprise : admise en 200 au nom de `system:admin`, `suspend` à `false`, aucun passage actif.
+- W6, après la reprise : 30 s plus tard, aucun Job depuis 09:30 UTC, `lastScheduleTime` inchangé, 0 événement de CronJob dans `scan`, `MissSchedule` compris. Confiance haute, sur le source de `v1.35.9`. Un `MissSchedule` ou un Job lancé à la reprise contredirait la lecture du source, et l'étape sortirait en KO.
+- W7 : 0 `PolicyViolation` depuis la reprise.
+- W8, le 09/11 : le passage de 09:30 UTC a lieu normalement, et `ScanEnRetard` se résout après le referrer suivant. Le relevé est hors étape, sans accord à demander (lecture seule).
+
+Durée prédite : quelques secondes pour la suspension, environ 45 s pour la reprise (dont 30 s d'attente).
+
+**Corrections avant tout passage** (07/11/2026, 16:18 UTC, avant le push, par amend du commit qui écrivait ces prédictions) :
+- trap de reprise dans `scan_saut_reprendre` ;
+- fenêtre de reprise bornée par l'historique de l'audit (09:25 UTC le 09/11 annoncé d'abord) ;
+- W4 : début notifié prédit d'abord à 0 à 60 s après les 26 h, corrigé à 300 à 360 s après lecture du source de Prometheus v3.13.5 (complément de 16:18:36 UTC dans [scan-saut-sec.log](scan-saut-sec.log)).
+
+Le principe du trap a été essayé localement, hors cluster : posé dans une fonction appelée dans le tube de `lancer`, il s'exécute à la sortie en KO, et sa sortie va au journal.

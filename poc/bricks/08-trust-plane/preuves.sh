@@ -3184,6 +3184,124 @@ etape_resolveurs_pod() { # brique 08c : démarrage d'un nouveau pod des résolve
   etape_resolveurs
 }
 
+# Saut d'un passage du scan sous H1 à H5 (brique 08c) : CronJob scan-sample-app suspendu avant son passage de 09:30 UTC, repris
+# plus de startingDeadlineSeconds (3600 s) après. Contrôleur des CronJobs v1.35.9 (resultats/scan-saut-sec.log de la 08c) : suspendu,
+# il rend la main avant tout calcul ; repris, il relève le plus ancien passage admissible à « maintenant - 3600 s », ne voit donc plus
+# le passage sauté, et ne crée ni Job ni événement (MissSchedule n'est pas atteignable avec une échéance).
+ss_etat() { # CronJob du scan : « planning|échéance|suspendu|passages actifs »
+  kubectl get cronjob -n scan scan-sample-app -o json \
+    | jq -r '"\(.spec.schedule)|\(.spec.startingDeadlineSeconds)|\(.spec.suspend // false)|\(.status.active // [] | length)"'
+}
+ss_dernier() { kubectl get cronjob -n scan scan-sample-app -o jsonpath='{.status.lastScheduleTime}'; }
+ss_alerte() { # nom : état de la règle d'alerte dans Prometheus (sc-stockage) : inactive, pending, firing
+  sur sc-stockage "curl -fsS 'http://127.0.0.1:9090/api/v1/rules?type=alert'" \
+    | jq -r --arg n "$1" '[.data.groups[].rules[] | select(.name == $n) | .state] | first // "absente"'
+}
+ss_audit() { # verbe ressource instant : requêtes sur le CronJob du scan ou ses Jobs depuis l'instant, dry-runs exclus ;
+  # « heure utilisateur code », une ligne par requête
+  audit_api scan-sample-app | jq -r --arg v "$1" --arg r "$2" --arg t "$3" 'select(.verb == $v and .objectRef.resource == $r
+    and .objectRef.namespace == "scan" and .stage == "ResponseComplete" and (.requestURI | test("dryRun") | not)
+    and (.requestReceivedTimestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) >= ($t | fromdateiso8601))
+    | "\(.requestReceivedTimestamp) \(.user.username) \(.responseStatus.code)"'
+}
+
+ss_reprendre() { # CronJob du scan repris ; idempotent (trap EXIT de scan_saut_reprendre)
+  kubectl patch cronjob -n scan scan-sample-app --type merge -p '{"spec":{"suspend":false}}' >/dev/null
+  echo "CronJob du scan repris"
+}
+
+etape_scan_saut_suspendre() { # brique 08c, première moitié : CronJob du scan suspendu avant son prochain passage, laissé suspendu
+  # (pas de trap : la mesure est le passage sauté). Reprise par scan_saut_reprendre, plus d'une heure après ce passage
+  local h p t0 r
+  echo "## prédiction (écrite le 07/11/2026 à 16:13 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, W1 à W8)"
+  echo "- avant : planning 30 9 * * *, échéance 3600 s, non suspendu, aucun passage actif ; suspension admise en dry-run ; ScanEnRetard inactive"
+  echo "- suspension admise (200 au nom de system:admin à l'audit), 0 PolicyViolation ; aucun Job ni événement jusqu'à la reprise"
+  h=$(date -u +%H%M)
+  [[ "$h" < 0925 || "$h" > 1031 ]] || { echo "KO   $h UTC : passage du jour en cours ou encore rattrapable, rien suspendu" >&2; exit 1; }
+  if [[ "$h" < 0930 ]]; then p=$(date -u +%Y-%m-%dT09:30:00Z); else p=$(date -u -d tomorrow +%Y-%m-%dT09:30:00Z); fi
+  ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|false|0"
+  echo "dernier passage : $(ss_dernier)"
+  ba_attendu "suspension admise en dry-run serveur" "$(kubectl patch cronjob -n scan scan-sample-app --type merge \
+    -p '{"spec":{"suspend":true}}' --dry-run=server -o jsonpath='{.spec.suspend}')" true
+  ba_attendu "ScanEnRetard" "$(ss_alerte ScanEnRetard)" inactive
+  t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl patch cronjob -n scan scan-sample-app --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  echo "suspension demandée à $t0"
+  ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|true|0"
+  for _ in $(seq 10); do r=$(ss_audit patch cronjobs "$t0"); [ -n "$r" ] && break; sleep 1; done
+  echo "$r" | sed 's/^/  audit : /'   # l'audit ne garde qu'environ 16 h (dix fichiers de 100 Mo) : ce journal en garde la copie
+  ba_attendu "suspension à l'audit (utilisateur, code)" "$(cut -d' ' -f2- <<< "$r" | paste -sd,)" "system:admin 200"
+  ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  r=$(sur sc-stockage "curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode query=scan_dernier_referrer_timestamp_seconds" \
+    | jq -r '.data.result[0].value[1] | tonumber | floor')
+  echo "passage sauté prévu : $p ; reprise par scan_saut_reprendre après $(date -u -d "@$(($(date -u -d "$p" +%s) + 3660))" +%Y-%m-%dT%H:%M:%SZ)"
+  echo "dernier referrer du scan : $(date -u -d "@$r" +%Y-%m-%dT%H:%M:%SZ) ; ScanEnRetard prévue en pending à" \
+    "$(date -u -d "@$((r + 26 * 3600))" +%H:%M:%S) et en firing vers $(date -u -d "@$((r + 26 * 3600 + 300))" +%H:%M:%S) UTC"
+  echo "sans reprise : ScanBientotRefuse le $(date -u -d "@$((r + 5 * 86400))" +%d/%m à %H:%M:%S),"\
+    "porte refusée le $(date -u -d "@$((r + 7 * 86400))" +%d/%m à %H:%M:%S) UTC au plus tard"
+}
+
+etape_scan_saut_reprendre() { # brique 08c, seconde moitié : passage sauté constaté, alerte relevée, CronJob du scan repris ; refus
+  # sans rien toucher si l'échéance du dernier passage de 09:30 UTC n'est pas passée d'une minute (il serait lancé en retard) ;
+  # passé cette garde, tout KO reprend le CronJob (trap), sans quoi le passage suivant serait sauté lui aussi
+  local h p e0 n r a t1
+  echo "## prédiction (écrite le 07/11/2026 à 16:13 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, W1 à W8)"
+  echo "- avant : suspendu, aucun Job créé depuis le passage sauté (Kubernetes et audit), dernier passage inchangé"
+  echo "- ScanEnRetard en firing, notifiée au récepteur local avec un début (FiredAt) 300 à 360 s après les 26 h ; ScanBientotRefuse inactive"
+  echo "- reprise admise (200 au nom de system:admin) ; ni Job, ni événement du CronJob (pas de MissSchedule), dernier passage inchangé"
+  h=$(date -u +%H%M)
+  if [[ "$h" < 0930 ]]; then p=$(date -u -d yesterday +%Y-%m-%dT09:30:00Z); else p=$(date -u +%Y-%m-%dT09:30:00Z); fi
+  n=$(date -u +%s)
+  [ "$n" -ge $(($(date -u -d "$p" +%s) + 3660)) ] \
+    || { echo "KO   reprise trop tôt : échéance du passage de $p non passée d'une minute ; CronJob laissé suspendu" >&2; exit 1; }
+  trap 'ss_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT   # remplace le piège du script : nettoyage repris
+  ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|true|0"
+  e0=$(ss_dernier)
+  [[ "$e0" < "$p" ]] || { echo "KO   dernier passage $e0 : le passage de $p n'a pas été sauté" >&2; exit 1; }
+  echo "passage sauté : $p ; dernier passage : $e0"
+  a=$(sur sc-confiance "sudo sh -c 'head -1 \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort | head -1)'" | jq -r '.requestReceivedTimestamp')
+  [[ "$a" < "$p" ]] || { echo "KO   audit conservé depuis $a seulement, après $p" >&2; exit 1; }
+  echo "audit conservé depuis $a"
+  ba_attendu "Jobs du scan créés depuis $p" "$(kubectl get job -n scan -o json | jq --arg t "$p" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ba_attendu "créations de Jobs dans scan à l'audit depuis $p" "$(ss_audit create jobs "$p" | grep -c . || true)" 0
+  r=$(sur sc-stockage "curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode query=scan_dernier_referrer_timestamp_seconds" \
+    | jq -r '.data.result[0].value[1] | tonumber | floor')
+  echo "dernier referrer du scan : $(date -u -d "@$r" +%Y-%m-%dT%H:%M:%SZ)"
+  if [ "$n" -ge $((r + 26 * 3600 + 300 + 60)) ]; then
+    ba_attendu "ScanEnRetard" "$(ss_alerte ScanEnRetard)" firing
+    echo "ScanEnRetard active (pending) depuis $(sur sc-stockage "curl -fsS 'http://127.0.0.1:9090/api/v1/rules?type=alert'" \
+      | jq -r '[.data.groups[].rules[] | select(.name == "ScanEnRetard") | .alerts[]?.activeAt] | first // "?"') (affiché, non contrôlé)"
+    sur sc-stockage "sudo journalctl -u recepteur-alertes -o cat --no-pager --since '$(date -u -d "$p" '+%Y-%m-%d %H:%M:%S') UTC'" \
+      | jq -R -c 'fromjson? | select(.alerte == "ScanEnRetard") | {statut, debut, severite: .etiquettes.severite}' | tee "$T/ss-recepteur"
+    ba_attendu "notification firing de ScanEnRetard au récepteur local" "$([ "$(grep -c '"statut":"firing"' "$T/ss-recepteur" || true)" -ge 1 ] && echo oui || echo non)" oui
+    a=$(jq -rn --rawfile f "$T/ss-recepteur" --argjson r "$r" '($f | split("\n") | map(select(. != "") | fromjson) | first | .debut
+      | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) - ($r + 26 * 3600)')
+    [ "$a" -ge 300 ] && [ "$a" -le 360 ] && echo "OK   début notifié de ScanEnRetard $a s après les 26 h" \
+      || echo "CONSTAT début notifié de ScanEnRetard $a s après les 26 h (prédit : 300 à 360 s, StartsAt = FiredAt)"
+  else
+    echo "ScanEnRetard non jugée : $(ss_alerte ScanEnRetard), firing attendue vers $(date -u -d "@$((r + 26 * 3600 + 300))" +%H:%M:%S) UTC"
+  fi
+  ba_attendu "ScanBientotRefuse" "$(ss_alerte ScanBientotRefuse)" inactive
+  t1=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  ss_reprendre
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  echo "reprise demandée à $t1"
+  sleep 30   # le contrôleur remet le CronJob en file dès sa modification (updateCronJob) : 30 s couvrent son passage
+  ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|false|0"
+  ba_attendu "dernier passage" "$(ss_dernier)" "$e0"
+  ba_attendu "Jobs du scan créés depuis $p" "$(kubectl get job -n scan -o json | jq --arg t "$p" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ba_attendu "événements du CronJob du scan (MissSchedule compris)" "$(kubectl get events -n scan -o json \
+    | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length')" 0
+  r=$(ss_audit patch cronjobs "$t1")
+  echo "$r" | sed 's/^/  audit : /'
+  ba_attendu "reprise à l'audit (utilisateur, code)" "$(cut -d' ' -f2- <<< "$r" | paste -sd,)" "system:admin 200"
+  ba_attendu "créations de Jobs dans scan à l'audit depuis $p" "$(ss_audit create jobs "$p" | grep -c . || true)" 0
+  ba_attendu "événements PolicyViolation depuis $t1" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t1" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  echo "prochain passage : $(date -u -d "@$(($(date -u -d "$p" +%s) + 86400))" +%Y-%m-%dT%H:%M:%SZ) ; ScanEnRetard reste active jusqu'au referrer suivant"
+}
+
 etape_sec_h5() { # brique 08c, à sec : pods du test 4 et PipelineRun d'essai présentés à l'API en dry-run serveur, décompte du test 8 ; rien de créé
   local c m n b
   [ -n "${PIPE_ESSAI:-}" ] || { echo "KO   PIPE_ESSAI non posé" >&2; exit 1; }

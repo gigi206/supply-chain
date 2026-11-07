@@ -1,0 +1,312 @@
+# Relevé à sec du saut d'un passage du scan, 2026-11-07T16:11:47Z, lecture seule (un dry-run serveur, rien d'écrit)
+## version du cluster et source du contrôleur des CronJobs lu (raw.githubusercontent.com/kubernetes/kubernetes/<version>/pkg/controller/cronjob/)
+serveur v1.35.9+rke2r1
+source lu au tag v1.35.9
+02d99bfe1d6dcddcb37c5e2a68173405db6b5f00644786d8dbc15b8576086b06  cronjob_controllerv2.go
+2d51a33edd46280cf87661cea05973a98fd75c2e884375a9d6463539dd9f2de3  utils.go
+### cronjob_controllerv2.go, lignes 514-517 (suspension : retour sans requeue, avant tout calcul)
+	if cronJob.Spec.Suspend != nil && *cronJob.Spec.Suspend {
+		logger.V(4).Info("Not starting job because the cron is suspended", "cronjob", klog.KObj(cronJob))
+		return nil, updateStatus, nil
+	}
+### cronjob_controllerv2.go, lignes 528-562 (passage le plus récent, échéance, MissSchedule)
+	scheduledTime, err := nextScheduleTime(logger, cronJob, now, sched, jm.recorder)
+	if err != nil {
+		// this is likely a user error in defining the spec value
+		// we should log the error and not reconcile this cronjob until an update to spec
+		logger.V(2).Info("Invalid schedule", "cronjob", klog.KObj(cronJob), "schedule", cronJob.Spec.Schedule, "err", err)
+		jm.recorder.Eventf(cronJob, corev1.EventTypeWarning, "InvalidSchedule", "invalid schedule: %s : %s", cronJob.Spec.Schedule, err)
+		return nil, updateStatus, nil
+	}
+	if scheduledTime == nil {
+		// no unmet start time, return cj,.
+		// The only time this should happen is if queue is filled after restart.
+		// Otherwise, the queue is always suppose to trigger sync function at the time of
+		// the scheduled time, that will give atleast 1 unmet time schedule
+		logger.V(4).Info("No unmet start times", "cronjob", klog.KObj(cronJob))
+		t := nextScheduleTimeDuration(cronJob, now, sched)
+		return t, updateStatus, nil
+	}
+
+	tooLate := false
+	if cronJob.Spec.StartingDeadlineSeconds != nil {
+		tooLate = scheduledTime.Add(time.Second * time.Duration(*cronJob.Spec.StartingDeadlineSeconds)).Before(now)
+	}
+	if tooLate {
+		logger.V(4).Info("Missed starting window", "cronjob", klog.KObj(cronJob))
+		jm.recorder.Eventf(cronJob, corev1.EventTypeWarning, "MissSchedule", "Missed scheduled time to start a job: %s", scheduledTime.UTC().Format(time.RFC1123Z))
+
+		// TODO: Since we don't set LastScheduleTime when not scheduling, we are going to keep noticing
+		// the miss every cycle.  In order to avoid sending multiple events, and to avoid processing
+		// the cj again and again, we could set a Status.LastMissedTime when we notice a miss.
+		// Then, when we call getRecentUnmetScheduleTimes, we can take max(creationTimestamp,
+		// Status.LastScheduleTime, Status.LastMissedTime), and then so we won't generate
+		// and event the next time we process it, and also so the user looking at the status
+		// can see easily that there was a missed execution.
+		t := nextScheduleTimeDuration(cronJob, now, sched)
+		return t, updateStatus, nil
+### utils.go, lignes 100-123 (mostRecentScheduleTime : earliestTime relevé à now - startingDeadlineSeconds)
+func mostRecentScheduleTime(cj *batchv1.CronJob, now time.Time, schedule cron.Schedule, includeStartingDeadlineSeconds bool) (time.Time, *time.Time, missedSchedulesType, error) {
+	earliestTime := cj.ObjectMeta.CreationTimestamp.Time
+	missedSchedules := noneMissed
+	if cj.Status.LastScheduleTime != nil {
+		earliestTime = cj.Status.LastScheduleTime.Time
+	}
+	if includeStartingDeadlineSeconds && cj.Spec.StartingDeadlineSeconds != nil {
+		// controller is not going to schedule anything below this point
+		schedulingDeadline := now.Add(-time.Second * time.Duration(*cj.Spec.StartingDeadlineSeconds))
+
+		if schedulingDeadline.After(earliestTime) {
+			earliestTime = schedulingDeadline
+		}
+	}
+
+	t1 := schedule.Next(earliestTime)
+	t2 := schedule.Next(t1)
+
+	if now.Before(t1) {
+		return earliestTime, nil, missedSchedules, nil
+	}
+	if now.Before(t2) {
+		return earliestTime, &t1, missedSchedules, nil
+	}
+### utils.go, lignes 207-223 (nextScheduleTime appelle mostRecentScheduleTime avec l'échéance)
+// nextScheduleTime returns the time.Time of the next schedule after the last scheduled
+// and before now, or nil if no unmet schedule times, and an error.
+// If there are too many (>100) unstarted times, it will also record a warning.
+func nextScheduleTime(logger klog.Logger, cj *batchv1.CronJob, now time.Time, schedule cron.Schedule, recorder record.EventRecorder) (*time.Time, error) {
+	_, mostRecentTime, missedSchedules, err := mostRecentScheduleTime(cj, now, schedule, true)
+
+	if mostRecentTime == nil || mostRecentTime.After(now) {
+		return nil, err
+	}
+
+	if missedSchedules == manyMissed {
+		recorder.Eventf(cj, corev1.EventTypeWarning, "TooManyMissedTimes", "too many missed start times. Set or decrease .spec.startingDeadlineSeconds or check clock skew")
+		logger.Info("too many missed times", "cronjob", klog.KObj(cj))
+	}
+
+	return mostRecentTime, err
+}
+### cronjob_controllerv2.go, lignes 414-420 (modification hors planning : remis en file aussitôt)
+	// other parameters changed, requeue this now and if this gets triggered
+	// within deadline, sync loop will work on the CJ otherwise updates will be handled
+	// during the next schedule
+	// TODO: need to handle the change of spec.JobTemplate.metadata.labels explicitly
+	//   to cleanup jobs with old labels
+	jm.enqueueController(curr)
+}
+## CronJob scan-sample-app et ses Jobs
+{"schedule":"30 9 * * *","timeZone":"Etc/UTC","deadline":3600,"suspend":false,"concurrency":"Forbid","succesGardes":3,"echecsGardes":3,"activeDeadline":1800,"last":"2026-11-07T09:30:00Z","ok":"2026-11-07T09:31:52Z","active":0,"gen":2}
+scan-sample-app-29900730 2026-11-07T09:30:00Z réussi=1
+scan-sample-app-h5-manuel 2026-11-06T21:28:51Z réussi=1
+événements dans scan : 0
+## dry-run serveur de la suspension (au nom de l'administrateur)
+{"suspend":true,"gen":3}
+PolicyViolation dans le cluster : 0
+## audit de l'API sur sc-confiance : fichiers (étendue de l'historique), patchs de CronJobs et créations de Jobs dans scan
+2026-11-07T01:27:58 audit-2026-11-07T01-27-58.559.log 104855100
+2026-11-07T03:06:08 audit-2026-11-07T03-06-08.567.log 104812942
+2026-11-07T04:43:18 audit-2026-11-07T04-43-18.568.log 104855363
+2026-11-07T06:22:09 audit-2026-11-07T06-22-09.353.log 104856522
+2026-11-07T07:59:20 audit-2026-11-07T07-59-20.082.log 104856331
+2026-11-07T09:38:18 audit-2026-11-07T09-38-18.788.log 104856268
+2026-11-07T11:13:38 audit-2026-11-07T11-13-38.576.log 104838851
+2026-11-07T12:45:44 audit-2026-11-07T12-45-44.031.log 104856577
+2026-11-07T14:23:09 audit-2026-11-07T14-23-09.553.log 104856615
+2026-11-07T15:59:24 audit-2026-11-07T15-59-24.331.log 104856211
+2026-11-07T16:11:49 audit.log 13800831
+{"t":"2026-11-07T09:30:00.104974Z","v":"create","r":"jobs","ns":"scan","n":"scan-sample-app-29900730","u":"system:serviceaccount:kube-system:cronjob-controller","c":201,"dry":false}
+{"t":"2026-11-07T10:47:42.817966Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T10:47:46.039297Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T10:50:22.588234Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:35:34.148847Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:35:34.196900Z","v":"patch","r":"cronjobs","ns":"horodatage","n":"horodatage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:36:18.957409Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:36:19.017223Z","v":"patch","r":"cronjobs","ns":"horodatage","n":"horodatage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:36:22.141143Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T11:36:22.184721Z","v":"patch","r":"cronjobs","ns":"horodatage","n":"horodatage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T15:24:48.606285Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T15:25:22.229271Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T16:00:55.953822Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T16:00:57.646050Z","v":"patch","r":"cronjobs","ns":"declencheurs","n":"rattrapage","u":"system:admin","c":200,"dry":false}
+{"t":"2026-11-07T16:08:14.415782Z","v":"patch","r":"cronjobs","ns":"scan","n":"scan-sample-app","u":"system:admin","c":200,"dry":true}
+{"t":"2026-11-07T16:11:17.595138Z","v":"patch","r":"cronjobs","ns":"scan","n":"scan-sample-app","u":"system:admin","c":200,"dry":true}
+{"t":"2026-11-07T16:11:48.604744Z","v":"patch","r":"cronjobs","ns":"scan","n":"scan-sample-app","u":"system:admin","c":200,"dry":true}
+## Prometheus et Alertmanager sur sc-stockage
+{"g":"poc-supply-chain","interval":30,"r":[{"n":"ScanEnRetard","state":"inactive","dur":300,"q":"time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds)"},{"n":"ScanBientotRefuse","state":"inactive","dur":0,"q":"time() - scan_dernier_referrer_timestamp_seconds > 5 * 86400"},{"n":"BaseGrypeVieillie","state":"inactive","dur":300,"q":"time() - base_grype_construite_timestamp_seconds > 2 * 86400 or absent(base_grype_construite_timestamp_seconds)"}]}
+{"m":"scan_dernier_referrer_timestamp_seconds","d":"builds/scan/sample-app","v":"2026-11-07T09:31:48Z"}
+{"m":"base_grype_construite_timestamp_seconds","d":"vulndb/grype","v":"2026-11-07T06:18:48Z"}
+alertes actives dans Alertmanager : []
+récepteurs d'Alertmanager (noms et types ; l'adresse est masquée par l'API, http://127.0.0.1:9095/alerte dans poc/bricks/19-observabilite/config/alertmanager.yml) :
+route:
+  receiver: recepteur-local
+- name: recepteur-local
+  webhook_configs:
+dernières lignes du récepteur local (journal de recepteur-alertes) :
+{"statut":"firing","alerte":"ChainsEchecSignature","debut":"2026-11-07T11:36:07.032Z"}
+{"statut":"resolved","alerte":"ChainsEchecSignature","debut":"2026-11-07T11:36:07.032Z"}
+## ConfigMap porte/porte : seuils de la porte
+      scan_age_max_jours: 7
+      base_age_max_jours: 3
+fin : 2026-11-07T16:12:09Z
+
+# Complément : vérification à sec des expressions des étapes scan_saut_suspendre et scan_saut_reprendre (sortie recopiée de la commande lancée à l'heure de sa première ligne)
+# vérification à sec des expressions de scan_saut_suspendre et scan_saut_reprendre, 2026-11-07T16:15:00Z, lecture seule (un dry-run serveur)
+D_ETAT=/var/lib/rancher/rke2
+ss_etat : 30 9 * * *|3600|false|0
+ss_dernier : 2026-11-07T09:30:00Z
+ScanEnRetard : inactive ; ScanBientotRefuse : inactive ; Inexistante : absente
+dry-run : true
+ss_audit patch cronjobs depuis 2026-11-07T16:00:00Z (dry-runs exclus) : []
+ss_audit create jobs depuis 2026-11-07T09:00:00Z : [2026-11-07T09:30:00.104974Z system:serviceaccount:kube-system:cronjob-controller 201]
+ss_audit create jobs depuis 2026-11-07T09:31:00Z : compte 0
+ss_audit patch cronjobs depuis 2026-11-07T00:00:00Z sur rattrapage (motif du filtre essayé, autre espace) :      10 system:admin 200
+audit conservé depuis 2026-11-06T23:49:54.352517Z
+referrer 1794043908 = 2026-11-07T09:31:48Z ; pending 2026-11-08T11:31:48 ; firing 2026-11-08T11:36:48
+ScanBientotRefuse 12/11 à 09:31:48 ; porte 14/11 à 09:31:48
+Jobs depuis 2026-11-07T09:00:00Z : 1
+événements de CronJob dans scan : 0
+## récepteur depuis le 07/11 09:30 (filtre essayé sur ChainsEchecSignature)
+{"statut":"firing","debut":"2026-11-07T11:36:07.032Z","severite":"critique"}
+{"statut":"resolved","debut":"2026-11-07T11:36:07.032Z","severite":"critique"}
+firing ≥ 1 : oui
+écart du début à 11:36:00 : 7 s
+## gardes horaires (h → suspendre admis ou refusé ; passage visé par reprendre)
+h=0000 suspendre:admis reprendre:veille-09:30
+h=0924 suspendre:admis reprendre:veille-09:30
+h=0925 suspendre:refus reprendre:veille-09:30
+h=0930 suspendre:refus reprendre:jour-09:30
+h=1031 suspendre:refus reprendre:jour-09:30
+h=1032 suspendre:admis reprendre:jour-09:30
+h=1138 suspendre:admis reprendre:jour-09:30
+h=2359 suspendre:admis reprendre:jour-09:30
+reprise permise dès 2026-11-08T10:31:00Z ; prochain passage 2026-11-09T09:30:00Z
+tomorrow : 2026-11-08T09:30:00Z ; yesterday : 2026-11-06T09:30:00Z
+PolicyViolation : 0
+fin : 2026-11-07T16:15:05Z
+
+# Script du relevé ci-dessus (scan-saut-sec.sh)
+#!/usr/bin/env bash
+# Relevé à sec du saut d'un passage du scan (lecture seule, un dry-run serveur) ; sortie recopiée dans resultats/scan-saut-sec.log
+set -euo pipefail
+export KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml
+SO=(-i "$HOME/.cache/supply-chain-poc/08/ssh/id_ed25519" -o "UserKnownHostsFile=$HOME/.cache/supply-chain-poc/08/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10)
+K=/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/3037736d-8910-46aa-8b19-a8862891a6fb/scratchpad/k8s-cron
+echo "# Relevé à sec du saut d'un passage du scan, $(date -u +%Y-%m-%dT%H:%M:%SZ), lecture seule (un dry-run serveur, rien d'écrit)"
+echo "## version du cluster et source du contrôleur des CronJobs lu (raw.githubusercontent.com/kubernetes/kubernetes/<version>/pkg/controller/cronjob/)"
+kubectl version -o json </dev/null | jq -r '"serveur \(.serverVersion.gitVersion)"'
+echo "source lu au tag $(cat $K/version)"
+(cd $K && sha256sum cronjob_controllerv2.go utils.go)
+echo "### cronjob_controllerv2.go, lignes 514-517 (suspension : retour sans requeue, avant tout calcul)"
+sed -n 514,517p $K/cronjob_controllerv2.go
+echo "### cronjob_controllerv2.go, lignes 528-562 (passage le plus récent, échéance, MissSchedule)"
+sed -n 528,562p $K/cronjob_controllerv2.go
+echo "### utils.go, lignes 100-123 (mostRecentScheduleTime : earliestTime relevé à now - startingDeadlineSeconds)"
+sed -n 100,123p $K/utils.go
+echo "### utils.go, lignes 207-223 (nextScheduleTime appelle mostRecentScheduleTime avec l'échéance)"
+sed -n 207,223p $K/utils.go
+echo "### cronjob_controllerv2.go, lignes 414-420 (modification hors planning : remis en file aussitôt)"
+sed -n 414,420p $K/cronjob_controllerv2.go
+echo "## CronJob scan-sample-app et ses Jobs"
+kubectl get cronjob -n scan scan-sample-app -o json </dev/null | jq -c '{schedule:.spec.schedule,timeZone:.spec.timeZone,deadline:.spec.startingDeadlineSeconds,suspend:.spec.suspend,concurrency:.spec.concurrencyPolicy,succesGardes:.spec.successfulJobsHistoryLimit,echecsGardes:.spec.failedJobsHistoryLimit,activeDeadline:.spec.jobTemplate.spec.activeDeadlineSeconds,last:.status.lastScheduleTime,ok:.status.lastSuccessfulTime,active:(.status.active//[]|length),gen:.metadata.generation}'
+kubectl get job -n scan -o json </dev/null | jq -r '.items[] | "\(.metadata.name) \(.metadata.creationTimestamp) réussi=\(.status.succeeded)"'
+echo "événements dans scan : $(kubectl get events -n scan -o name </dev/null | wc -l)"
+echo "## dry-run serveur de la suspension (au nom de l'administrateur)"
+kubectl patch cronjob -n scan scan-sample-app --type=merge -p '{"spec":{"suspend":true}}' --dry-run=server -o json </dev/null | jq -c '{suspend:.spec.suspend,gen:.metadata.generation}'
+echo "PolicyViolation dans le cluster : $(kubectl get events -A --field-selector reason=PolicyViolation -o name </dev/null | wc -l)"
+echo "## audit de l'API sur sc-confiance : fichiers (étendue de l'historique), patchs de CronJobs et créations de Jobs dans scan"
+ssh -n "${SO[@]}" poc@192.168.161.11 'sudo -n ls -l --time-style=+%FT%T /var/lib/rancher/rke2/server/logs/' | awk 'NF>5 {print $6, $7, $5}'
+ssh -n "${SO[@]}" poc@192.168.161.11 'sudo -n sh -c "cat \$(ls -1 /var/lib/rancher/rke2/server/logs/audit*.log | LC_ALL=C sort)"' \
+  | jq -R -c 'fromjson? | select(.stage=="ResponseComplete" and ((.objectRef.resource=="cronjobs" and .verb=="patch") or (.objectRef.resource=="jobs" and .verb=="create" and .objectRef.namespace=="scan"))) | {t:.requestReceivedTimestamp,v:.verb,r:.objectRef.resource,ns:.objectRef.namespace,n:(.objectRef.name // ""),u:.user.username,c:.responseStatus.code,dry:(.requestURI|test("dryRun"))}'
+echo "## Prometheus et Alertmanager sur sc-stockage"
+ssh -n "${SO[@]}" poc@192.168.161.13 'curl -fsS http://127.0.0.1:9090/api/v1/rules?type=alert' \
+  | jq -c '.data.groups[] | {g:.name,interval:.interval,r:[.rules[]|select(.name|test("^Scan|^BaseGrype"))|{n:.name,state,dur:.duration,q:.query}]} | select(.r|length>0)'
+ssh -n "${SO[@]}" poc@192.168.161.13 'curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode "query={__name__=~\"scan_dernier_referrer_timestamp_seconds|base_grype_construite_timestamp_seconds\"}"' \
+  | jq -c '.data.result[] | {m:.metric.__name__,d:.metric.depot,v:(.value[1]|tonumber|todate)}'
+echo "alertes actives dans Alertmanager : $(ssh -n "${SO[@]}" poc@192.168.161.13 'curl -fsS http://127.0.0.1:9093/api/v2/alerts' | jq -c '[.[] | .labels.alertname]')"
+echo "récepteurs d'Alertmanager (noms et types ; l'adresse est masquée par l'API, http://127.0.0.1:9095/alerte dans poc/bricks/19-observabilite/config/alertmanager.yml) :"
+ssh -n "${SO[@]}" poc@192.168.161.13 'curl -fsS http://127.0.0.1:9093/api/v2/status' | jq -r '.config.original' | grep -E '^- name:|^  [a-z_]+_configs:|^  receiver:|^route:' || true
+echo "dernières lignes du récepteur local (journal de recepteur-alertes) :"
+ssh -n "${SO[@]}" poc@192.168.161.13 'sudo -n journalctl -u recepteur-alertes -o cat -n 3 --no-pager' | jq -R -c 'fromjson? | {statut,alerte,debut}' || true
+echo "## ConfigMap porte/porte : seuils de la porte"
+kubectl get cm -n porte porte -o json </dev/null | jq -r '.data["policy-scan.yaml"]' | grep -E 'age_max' || true
+echo "fin : $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+# Script de la vérification des expressions (ss-sec.sh, lancé depuis poc/bricks/08-trust-plane avec DISTRO=rke2)
+#!/usr/bin/env bash
+# Vérification à sec des expressions de scan_saut_suspendre et scan_saut_reprendre (lecture seule, un dry-run serveur).
+# À lancer depuis poc/bricks/08-trust-plane avec DISTRO=rke2 et </dev/null (ssh lit l'entrée standard).
+set -euo pipefail
+here=$PWD
+. ./commun.sh
+T=$(mktemp -d /tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/3037736d-8910-46aa-8b19-a8862891a6fb/scratchpad/ssT.XXXX)
+eval "$(sed -n '/^ss_etat() {/,/^}/p;/^ss_dernier() {/p;/^ss_alerte() {/,/^}/p;/^ss_audit() {/,/^}/p' preuves.sh)"
+echo "# vérification à sec des expressions de scan_saut_suspendre et scan_saut_reprendre, $(date -u +%Y-%m-%dT%H:%M:%SZ), lecture seule (un dry-run serveur)"
+echo "D_ETAT=$D_ETAT"
+echo "ss_etat : $(ss_etat)"
+echo "ss_dernier : $(ss_dernier)"
+echo "ScanEnRetard : $(ss_alerte ScanEnRetard) ; ScanBientotRefuse : $(ss_alerte ScanBientotRefuse) ; Inexistante : $(ss_alerte Inexistante)"
+echo "dry-run : $(kubectl patch cronjob -n scan scan-sample-app --type merge -p '{"spec":{"suspend":true}}' --dry-run=server -o jsonpath='{.spec.suspend}')"
+echo "ss_audit patch cronjobs depuis 2026-11-07T16:00:00Z (dry-runs exclus) : [$(ss_audit patch cronjobs 2026-11-07T16:00:00Z | paste -sd,)]"
+echo "ss_audit create jobs depuis 2026-11-07T09:00:00Z : [$(ss_audit create jobs 2026-11-07T09:00:00Z | paste -sd,)]"
+echo "ss_audit create jobs depuis 2026-11-07T09:31:00Z : compte $(ss_audit create jobs 2026-11-07T09:31:00Z | grep -c . || true)"
+echo "ss_audit patch cronjobs depuis 2026-11-07T00:00:00Z sur rattrapage (motif du filtre essayé, autre espace) : $(audit_api rattrapage | jq -r 'select(.verb == "patch" and .objectRef.resource == "cronjobs" and .stage == "ResponseComplete" and (.requestURI | test("dryRun") | not)) | "\(.user.username) \(.responseStatus.code)"' | sort | uniq -c | paste -sd,)"
+a=$(sur sc-confiance "sudo sh -c 'head -1 \$(ls -1 $D_ETAT/server/logs/audit*.log | LC_ALL=C sort | head -1)'" | jq -r '.requestReceivedTimestamp')
+echo "audit conservé depuis $a"
+r=$(sur sc-stockage "curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode query=scan_dernier_referrer_timestamp_seconds" | jq -r '.data.result[0].value[1] | tonumber | floor')
+echo "referrer $r = $(date -u -d "@$r" +%Y-%m-%dT%H:%M:%SZ) ; pending $(date -u -d "@$((r + 26 * 3600))" +%FT%T) ; firing $(date -u -d "@$((r + 26 * 3600 + 300))" +%FT%T)"
+echo "ScanBientotRefuse $(date -u -d "@$((r + 5 * 86400))" +'%d/%m à %H:%M:%S') ; porte $(date -u -d "@$((r + 7 * 86400))" +'%d/%m à %H:%M:%S')"
+echo "Jobs depuis 2026-11-07T09:00:00Z : $(kubectl get job -n scan -o json | jq --arg t 2026-11-07T09:00:00Z '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')"
+echo "événements de CronJob dans scan : $(kubectl get events -n scan -o json | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length')"
+echo "## récepteur depuis le 07/11 09:30 (filtre essayé sur ChainsEchecSignature)"
+sur sc-stockage "sudo journalctl -u recepteur-alertes -o cat --no-pager --since '2026-11-07 09:30:00 UTC'" \
+  | jq -R -c 'fromjson? | select(.alerte == "ChainsEchecSignature") | {statut, debut, severite: .etiquettes.severite}' | tee "$T/ss-recepteur"
+echo "firing ≥ 1 : $([ "$(grep -c '"statut":"firing"' "$T/ss-recepteur" || true)" -ge 1 ] && echo oui || echo non)"
+echo "écart du début à 11:36:00 : $(jq -rn --rawfile f "$T/ss-recepteur" --argjson r "$(date -u -d 2026-11-07T11:36:00Z +%s)" '($f | split("\n") | map(select(. != "") | fromjson) | first | .debut | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) - $r') s"
+echo "## gardes horaires (h → suspendre admis ou refusé ; passage visé par reprendre)"
+for h in 0000 0924 0925 0930 1031 1032 1138 2359; do
+  s=$([[ "$h" < 0925 || "$h" > 1031 ]] && echo admis || echo refus)
+  echo "h=$h suspendre:$s reprendre:$([[ "$h" < 0930 ]] && echo veille-09:30 || echo jour-09:30)"
+done
+p=2026-11-08T09:30:00Z
+echo "reprise permise dès $(date -u -d "@$(($(date -u -d "$p" +%s) + 3660))" +%Y-%m-%dT%H:%M:%SZ) ; prochain passage $(date -u -d "@$(($(date -u -d "$p" +%s) + 86400))" +%Y-%m-%dT%H:%M:%SZ)"
+echo "tomorrow : $(date -u -d tomorrow +%Y-%m-%dT09:30:00Z) ; yesterday : $(date -u -d yesterday +%Y-%m-%dT09:30:00Z)"
+echo "PolicyViolation : $(kubectl get events -A --field-selector reason=PolicyViolation -o json | jq '[.items[]] | length')"
+echo "fin : $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+rm -r -- "${T:?}"
+
+# Complément du 2026-11-07T16:18:36Z : StartsAt envoyé par Prometheus (lecture seule)
+Prometheus en service : 3.13.5 f497435984d1ca1d84cda5ed309387ac2eb1f8f6
+source lu : raw.githubusercontent.com/prometheus/prometheus/v3.13.5/rules/
+0c5ae4665d3e434597b793616b5a9f580cdd631a6a85f7d6527dbc5aa9e5de60  manager.go
+98880efced4f19b7560fa9f44de35735f7bc49d2a2e08419a5869113c2a90542  alerting.go
+### rules/manager.go, lignes 470-482
+
+// SendAlerts implements the rules.NotifyFunc for a Notifier.
+func SendAlerts(s Sender, externalURL string) NotifyFunc {
+	return func(_ context.Context, expr string, alerts ...*Alert) {
+		var res []*notifier.Alert
+
+		for _, alert := range alerts {
+			a := &notifier.Alert{
+				StartsAt:     alert.FiredAt,
+				Labels:       alert.Labels,
+				Annotations:  alert.Annotations,
+				GeneratorURL: externalURL + strutil.TableLinkForExpression(expr),
+			}
+### rules/alerting.go, lignes 524-536
+		numActivePending++
+
+		if a.State == StatePending && ts.Sub(a.ActiveAt) >= r.holdDuration {
+			a.State = StateFiring
+			a.FiredAt = ts
+		}
+
+		// If the alert is firing and the active time is less than the new hold duration, set the state to pending.
+		if a.State == StateFiring && ts.Sub(a.ActiveAt) < r.holdDuration {
+			a.State = StatePending
+			a.FiredAt = time.Time{}
+			a.LastSentAt = time.Time{}
+			a.KeepFiringSince = time.Time{}
+### activeAt de ScanEnRetard (expression de l'étape) : ?
