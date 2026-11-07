@@ -642,3 +642,14 @@ La prédiction : firing jusqu'à environ 10 min après le dernier échec, puis f
   - lancée seule, l'étape `taches` peut déclencher A2 ou non : ce n'est pas prédit ;
   - dans un rejeu complet, le redémarrage de l'étape `chains` l'efface ;
   - plus largement, d'après le source et sans l'avoir observé, A2 ne voit pas un échec de signature limité à l'image, et `ChainsMarqueSansSignature` non plus, puisque l'objet n'est pas marqué signé.
+
+## Additif du 07/11/2026, 18:18 UTC : collecteur d'Events de la 19b (Alloy) revu, aucun défaut
+
+Revue statique menée sur « continue », sans validation du propriétaire. Rien lu dans le cluster, Zot ou les VM. L'additif de 17:16 UTC laissait ce lecteur de côté. Base : [revue-alloy-evenements.log](../../19b-journalisation/resultats/revue-alloy-evenements.log) (source d'Alloy v1.21.3, f2108cd, copie intacte ; version installée sur `sc-stockage` au rejeu du 06/11 à 15:31 UTC, `rejeu-rke2.log`, ajouté à 18:20 UTC, avant tout push).
+- **Horodatage** : `eventTimestamp` prend `series.lastObservedTime`, sinon `lastTimestamp`, sinon `eventTime`. Les Events de Kyverno 1.19.2 (`eventTime` seul) sont donc collectés. Le défaut du filtre sur `.lastTimestamp` seul (additif de 17:07 UTC) ne touche pas Alloy. Non vérifié dans Loki.
+- **TTL d'une heure** : Alloy écrit chaque Event à sa réception, avec l'heure de l'Event. La TTL ne touche que les Events émis plus d'une heure avant la reprise d'Alloy après un arrêt (corrigé à 18:20 UTC, avant tout push : « émis pendant un arrêt de plus d'une heure » était inexact, ceux de la dernière heure sont rattrapés).
+- **Témoin du deuxième passage L4** : sans aucun horodatage, il est ignoré par la garde de la ligne 204 (heure zéro jamais postérieure à la position). Le « jamais collecté » archivé est expliqué.
+- **Positions au redémarrage** (lu, non observé) : la position est figée au démarrage et vaut l'heure du dernier Event envoyé, pas de la plus grande. Un redémarrage d'Alloy peut donc perdre des Events non encore vus, ou en doubler.
+- **Lecteurs dans Loki** : `journalisation.sh:391`, compte sur 24 h affiché comme contrôle de présence, qui compte des écritures (chaque mise à jour d'un Event en ajoute une) et non des Events distincts ; `journalisation.sh:496`, témoin J4, fenêtre de 15 min pour une date tronquée à la seconde, tenu.
+- **« 1 sur 918 »** de `l4-evenements-horodatage.log` : commande non archivée, source non établie, non jugé.
+- Lire les Events dans Loki au lieu de kubectl éviterait la TTL : possible, à décider avec le propriétaire.

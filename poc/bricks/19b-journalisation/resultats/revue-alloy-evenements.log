@@ -1,0 +1,171 @@
+revue statique du 07/11/2026, commencée à 18:17:35 UTC (menée sur « continue », sans validation du propriétaire ; rien lu dans le cluster, Zot ou les VM)
+## objet : collecteur d'Events de la 19b (config/alloy/stockage/evenements.alloy, loki.source.kubernetes_events), dernier lecteur d'Events non revu par l'additif du 07/11/2026 17:16 UTC (5377df5)
+## version déployée, d'après un journal archivé : resultats/constat-grpc-relais.log ligne 12
+# Version : alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+## copie locale du source (~/.cache/supply-chain-poc/alloy-src/alloy)
+git describe --tags --dirty : v1.21.3
+commit : f2108cd783accbd491b24843484c33abba6da52a Wed Oct 28 16:56:30 2026 +0000
+git status --porcelain (vide = copie intacte) : []
+## internal/component/loki/source/kubernetes_events/event_controller.go, lignes 148-158 (onAdd) et 160-178 (onUpdate)
+   148	
+   149	func (ctrl *eventController) onAdd(ctx context.Context, obj any) {
+   150		event, ok := obj.(*corev1.Event)
+   151		if !ok {
+   152			ctrl.opts.Log.Warn("received an event for a non-Event Kind", "type", fmt.Sprintf("%T", obj))
+   153			return
+   154		}
+   155		err := ctrl.handleEvent(ctx, event)
+   156		if err != nil {
+   157			ctrl.opts.Log.Error("error handling event", "err", err)
+   158		}
+   159	}
+   160	
+   161	func (ctrl *eventController) onUpdate(ctx context.Context, oldObj, newObj any) {
+   162		oldEvent, ok := oldObj.(*corev1.Event)
+   163		if !ok {
+   164			ctrl.opts.Log.Warn("received an event for a non-Event Kind", "type", fmt.Sprintf("%T", oldObj))
+   165			return
+   166		}
+   167		newEvent, ok := newObj.(*corev1.Event)
+   168		if !ok {
+   169			ctrl.opts.Log.Warn("received an event for a non-Event Kind", "type", fmt.Sprintf("%T", newObj))
+   170			return
+   171		}
+   172	
+   173		if oldEvent.GetResourceVersion() == newEvent.GetResourceVersion() {
+   174			ctrl.opts.Log.Debug("resource version didn't change, ignoring call to onUpdate", "resource version", newEvent.GetResourceVersion())
+   175			return
+   176		}
+   177	
+   178		err := ctrl.handleEvent(ctx, newEvent)
+## internal/component/loki/source/kubernetes_events/event_controller.go, lignes 189-229 (handleEvent)
+   189	func (ctrl *eventController) handleEvent(ctx context.Context, event *corev1.Event) error {
+   190		eventTs := eventTimestamp(event)
+   191	
+   192		// Events don't have any ordering guarantees, so we can't rely on comparing
+   193		// the timestamp of this event to any other event received.
+   194		//
+   195		// We use a best-effort attempt to not re-deliver any events we've already
+   196		// logged by checking the timestamp from when the worker started. This may
+   197		// still cause us to drop some events in between recreating workers, but it
+   198		// minimizes risk.
+   199		//
+   200		// TODO(rfratto): a longer term solution would be to track timestamps for
+   201		// each involved object (or something similar), but that solution would need
+   202		// to make sure to not leak those timestamps, and find a way to recognize
+   203		// that involved objects have been deleted.
+   204		if !eventTs.After(ctrl.initTimestamp) {
+   205			return nil
+   206		}
+   207	
+   208		lset, msg, err := ctrl.parseEvent(event)
+   209		if err != nil {
+   210			return err
+   211		}
+   212	
+   213		entry := loki.NewEntry(lset, push.Entry{
+   214			Timestamp: eventTs,
+   215			Line:      msg,
+   216		})
+   217	
+   218		select {
+   219		case <-ctx.Done():
+   220			return ctx.Err()
+   221		case ctrl.handler.Chan() <- entry:
+   222			// Update position offset only after it's been sent to the next set of
+   223			// components.
+   224			ctrl.opts.Positions.Put(ctrl.positionsKey, "", eventTs.UnixMicro())
+   225			return nil
+   226		}
+   227	}
+   228	
+   229	func (ctrl *eventController) parseEvent(event *corev1.Event) (model.LabelSet, string, error) {
+## internal/component/loki/source/kubernetes_events/event_controller.go, lignes 47-65 (position lue au démarrage du contrôleur)
+    47	}
+    48	
+    49	func newEventController(opts eventControllerOptions) *eventController {
+    50		var key string
+    51		if opts.Namespace == "" {
+    52			key = positions.CursorKey("events")
+    53		} else {
+    54			key = positions.CursorKey("events-" + opts.Namespace)
+    55		}
+    56	
+    57		lastTimestamp, _ := opts.Positions.Get(key, "")
+    58	
+    59		return &eventController{
+    60			opts:          opts,
+    61			handler:       loki.NewEntryHandler(opts.Receiver.Chan(), func() {}),
+    62			positionsKey:  key,
+    63			initTimestamp: time.UnixMicro(lastTimestamp),
+    64		}
+    65	}
+## internal/component/loki/source/kubernetes_events/event_controller.go, lignes 316-324 (eventTimestamp)
+   316	func eventTimestamp(event *corev1.Event) time.Time {
+   317		if event.Series != nil && !event.Series.LastObservedTime.IsZero() {
+   318			return event.Series.LastObservedTime.Time
+   319		}
+   320		if !event.LastTimestamp.IsZero() {
+   321			return event.LastTimestamp.Time
+   322		}
+   323		return event.EventTime.Time
+   324	}
+## fichier de positions : poc/bricks/19b-journalisation/systemd/alloy.service
+19:ExecStart=/usr/local/bin/alloy run --server.http.listen-addr=127.0.0.1:12345 --storage.path=/var/lib/alloy --disable-reporting /etc/alloy/config
+22:StateDirectory=alloy
+23:StateDirectoryMode=0750
+## lecteurs de ces Events dans Loki (git grep evenements-k8s, hors journaux)
+poc/bricks/19b-journalisation/config/alloy/stockage/evenements.alloy:4:  job_name   = "evenements-k8s"
+poc/bricks/19b-journalisation/config/alloy/stockage/evenements.alloy:18:    values = {source = "evenements-k8s"}
+poc/bricks/19b-journalisation/journalisation.sh:391:           '{noeud="sc-confiance", source="audit-k8s"}' '{source="evenements-k8s"}' \
+poc/bricks/19b-journalisation/journalisation.sh:496:  temoin "J4 événements" '{source="evenements-k8s"}' "$m"
+## fenêtre du témoin J4 : poc/bricks/19b-journalisation/journalisation.sh, vu_grafana
+224:  q=$(jq -nc '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: "{source=\"controle-l2\"}", queryType: "range"}], from: "now-15m", to: "now"}')
+445:  q=$(jq -nc --arg e "$1 |= \"$2\"" '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: 10}], from: "now-15m", to: "now"}')
+490:lastTimestamp: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+fin de la collecte 18:17:35 UTC
+
+## complément de 18:18:20 UTC : internal/component/loki/source/kubernetes_events/event_controller.go, lignes 236-240 (parseEvent)
+   236	
+   237		obj := event.InvolvedObject
+   238		if obj.Name == "" {
+   239			return nil, "", fmt.Errorf("no involved object for event")
+   240		}
+
+## lecture, écrite à 18:18:20 UTC, après la collecte ci-dessus (lu dans le source et les scripts, rien observé dans Loki)
+1. Horodatage (eventTimestamp, 316-324) : Series.LastObservedTime, sinon LastTimestamp, sinon EventTime. Les Events de
+   Kyverno 1.19.2 (events.k8s.io/v1, eventTime seul : additif du 07/11 17:07 UTC) sont donc datés par eventTime et passent
+   le filtre de la ligne 204. Le défaut des lecteurs kubectl filtrés sur .lastTimestamp seul ne touche pas Alloy.
+   Non vérifié dans Loki : ce serait une mesure réelle.
+2. Durée de vie d'une heure des Events : Alloy suit le flux (onAdd, onUpdate) et écrit chaque Event dans Loki à sa réception
+   (ligne 214 : horodatage de la ligne Loki = heure de l'Event, pas heure d'ingestion). La TTL ne touche pas ce qui est déjà
+   écrit. Un arrêt d'Alloy plus long que la TTL perd les Events expirés entre-temps (reprise par la liste initiale de
+   l'informateur : comportement de client-go, non relu ici).
+3. Témoin sans horodatage du deuxième passage L4 (l4-temoins-deuxieme-passage.log) : eventTimestamp rend l'heure zéro, qui
+   n'est jamais postérieure à initTimestamp (ligne 204, initTimestamp vaut au moins l'epoch, lignes 57 et 63) : l'Event est
+   ignoré sans message. C'est l'explication du « jamais collecté » archivé.
+4. Positions : initTimestamp est lu une fois au démarrage du contrôleur (57, 63), puis figé ; la position écrite est l'heure
+   du dernier Event envoyé (224), pas la plus grande. Après un redémarrage d'Alloy sur sc-stockage, tout Event daté au plus
+   de cette position est ignoré, même jamais envoyé ; et comme les Events arrivent sans ordre, la position peut reculer, d'où
+   des doublons possibles. Le commentaire amont (193-203) le reconnaît. Fichier conservé dans /var/lib/alloy (StateDirectory).
+   Lu dans le source, non observé.
+5. Mises à jour (onUpdate, 160-178) : chaque changement de resourceVersion (hausse de count ou de series) écrit une ligne de
+   plus. Le compte sur 24 h de journalisation.sh:391 compte donc des écritures, pas des Events distincts : il est affiché
+   comme contrôle de présence, sans attendu chiffré, et ne doit pas être lu comme un nombre d'Events.
+6. Event sans involvedObject.name : erreur « no involved object for event » (239), rien envoyé. Un Event refusé par
+   EventRateLimit (429, H1) n'existe pas et n'est pas collecté.
+7. Lecteurs dans Loki : journalisation.sh:391 (point 5) et :496 (témoin J4). Le témoin J4 met lastTimestamp à la seconde
+   (ligne 490) ; vu_grafana lit de now-15m à now (ligne 445) : marge de 15 min, point tenu (J4 lu en 2 s, l4-temoins.log).
+8. « 1 sur 918 » de l4-evenements-horodatage.log : la commande n'est pas archivée, seul le résultat l'est. Sa source
+   (kubectl ou Loki) n'est pas établie ; hors périmètre, non jugé.
+Bilan : aucun défaut chez les lecteurs. Limites lues dans le source, non observées : positions au redémarrage (perte ou
+doublons), arrêt d'Alloy plus long que la TTL, Event sans heure ou sans objet. Lire les Events dans Loki au lieu de kubectl
+éviterait la TTL d'une heure : possible, à décider avec le propriétaire.
+fin de la lecture 18:18:20 UTC
+
+## complément de 18:20:45 UTC, avant tout push : version déployée
+L'en-tête cite constat-grpc-relais.log (03/11), antérieur au rejeu de zéro sous RKE2, qui a réinstallé Alloy. Dernière
+installation archivée (git grep « journalisation.sh … alloy, 2026-11- » dans les journaux) : poc/bricks/08-trust-plane/resultats/
+rejeu-rke2.log, « # journalisation.sh alloy, 2026-11-06T15:31:00Z », section sc-stockage, ligne 631 :
+alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
+Même version et même révision que le source lu. Lecture inchangée.

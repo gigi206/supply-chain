@@ -1056,6 +1056,14 @@ La prédiction : firing jusqu'à environ 10 min après le dernier échec, puis f
   - dans un rejeu complet, le redémarrage de l'étape `chains` l'efface ;
   - plus largement, d'après le source et sans l'avoir observé, A2 ne voit pas un échec de signature limité à l'image, et `ChainsMarqueSansSignature` non plus, puisque l'objet n'est pas marqué signé.
 
+**Additif du 07/11/2026, 18:18 UTC : collecteur d'Events de la 19b (Alloy) revu, aucun défaut.** Revue statique menée sur « continue », sans validation du propriétaire, rien lu dans le cluster, Zot ou les VM ; c'était le lecteur laissé de côté à 17:16 UTC. Source d'Alloy v1.21.3 (f2108cd, version installée sur `sc-stockage` au dernier rejeu, `rejeu-rke2.log` du 06/11 à 15:31 UTC ; `constat-grpc-relais.log` du 03/11 cité d'abord, corrigé à 18:20 UTC, avant tout push) :
+- les Events de Kyverno, datés par `eventTime` seul, sont collectés : Alloy se rabat sur `EventTime` quand `lastTimestamp` est nul ;
+- la durée de vie d'une heure ne touche pas ce qu'Alloy a déjà écrit dans Loki ;
+- le témoin sans horodatage du deuxième passage L4 est ignoré par le source, ce qui explique le « jamais collecté » archivé ;
+- le témoin J4 lit de `now-15m` à `now` : sa date tronquée à la seconde ne le fait pas sortir de la fenêtre.
+
+Limites lues dans le source, non observées : après un redémarrage d'Alloy, des Events peuvent être perdus ou doublés (position figée au démarrage) ; un arrêt plus long qu'une heure perd les Events expirés. Lire les Events dans Loki plutôt que par kubectl éviterait la TTL : possible, à décider avec le propriétaire. Détail : [revue-alloy-evenements.log](../19b-journalisation/resultats/revue-alloy-evenements.log).
+
 **Effet à connaître.** Le déploiement `tekton-triggers-core-interceptors` est à sa révision 4. `kubectl rollout undo` ne rend plus son état d'avant H5. Le retour de `h5_limites` passe par `--to-revision=1` ou par l'état sauvé dans `~/.cache/supply-chain-poc/08/travail/durcissement/h5-avant/`.
 
 **Constat non prédit : le noyau des trois VM a changé sans décision.** `sc-build` était en `6.12.113+deb13-amd64` le 06/11 à 17:48 UTC (`preuves-test6.log`). Le relevé de 14:07 UTC donne `6.12.115+deb13.1-amd64` sur les trois VM. `unattended-upgrades` est actif sur les trois. Le 07/11, de 06:15 à 06:36 UTC, il a installé ce noyau, `apt` 3.0.4 et `vim`, sans redémarrer. Le redémarrage des VM de 11:20 UTC l'a chargé.

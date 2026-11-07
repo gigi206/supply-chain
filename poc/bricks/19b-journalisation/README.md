@@ -604,3 +604,11 @@ neuve, sans KO : [`rejeu-complet.log`](../08-trust-plane/resultats/rejeu-complet
   donc été sautées, de même que L1, `muette` et L7.
 - **ÉCART de l'export de `secrets`** : 174 468 lignes exportées pour 174 437 comptées par Loki. C'est le même ordre d'écart
   qu'au premier passage du 02/11 (326 597 pour 326 558).
+
+## Additif du 07/11/2026, 18:18 UTC : `evenements.alloy` revu en statique, aucun défaut
+
+Revue menée sur « continue », sans validation du propriétaire, rien lu dans le cluster, Zot ou les VM. Elle complète la revue des lecteurs d'Events de la 08c (TTL d'une heure, `lastTimestamp` nul chez Kyverno). Source d'Alloy v1.21.3 lu : [revue-alloy-evenements.log](resultats/revue-alloy-evenements.log).
+- Les Events datés par `eventTime` seul (Kyverno) sont collectés ; un Event sans aucun horodatage est ignoré sans message, ce qui explique le deuxième passage L4.
+- Le compte sur 24 h de `controle_l3` (ligne 391) compte des écritures : chaque mise à jour d'un Event en ajoute une.
+- Le témoin J4 lit sur 15 min : sa date tronquée à la seconde ne le fait pas manquer.
+- Limites lues dans le source, non observées : après un redémarrage d'Alloy, des Events peuvent être perdus ou doublés (position figée au démarrage, heure du dernier envoyé) ; un arrêt de plus d'une heure perd les Events expirés.
