@@ -843,6 +843,25 @@ Passage lancé sur accord du propriétaire (« Ok » à « Je lance test5_refus 
 
 Les six prédictions sont tenues. Le test 5 est donc couvert sous H1 à H5 pour une livraison signée avec un autre secret et pour un corps modifié, refus qui n'avaient jamais été mesurés. La livraison non signée l'avait déjà été. Aucun fichier `autre.secret` ne reste sur disque.
 
+## Additif du 07/11/2026, 10:51 UTC : étape `rattrapage_durci` passée sous H1 à H5, B1 à B7 et X1 tenues
+
+Passage lancé sur accord du propriétaire (« Oui »), de 10:47:42 à 10:50:22 UTC, avec `JOURNAL=preuves-h5`. C'est le premier passage de cette étape. Journal : [preuves-h5-rattrapage_durci.log](../08-trust-plane/resultats/preuves-h5-rattrapage_durci.log), 18 OK, 0 KO, code 0. Un complément à la main, en lecture seule, y est ajouté pour B7. X1 a son propre relevé, [resultats/mesures-reelles-x1.log](resultats/mesures-reelles-x1.log).
+
+| Prédiction | Mesuré |
+|---|---|
+| B1 | PipelineRun de la tête créé par `declencheurs:rattrapage` : une création, en 201, label d'origine `rattrapage`. C'est la première création réelle par le rattrapage depuis `h5_deny` |
+| B2 | `Succeeded` en 59 s ; `construire` sous Kata sur sc-build ; digest `3a7ca1b1…` ; spec identique à `j7-sample-app`, bundle masqué ; trois TaskRuns `TrustedResourcesVerified=True` |
+| B3 | Une seule ligne `CREE` dans les passages depuis la reprise |
+| B4 | Chains signe les trois TaskRuns ; enveloppes 22 → 24 |
+| B5 | Porte `true`, aucune violation, contrôle 9 à 24/24, VSA 1/1 ; provenance la plus récente : ce PipelineRun (`474b3f60`) |
+| B6 | Aucune anomalie entre exécutions et enveloppes, au départ comme à la fin |
+| B7 | CronJob repris (`suspend=false`) ; les passages de 10:49 et 10:50 UTC s'arrêtent à `PRESENT` (complément) |
+| X1 | `KyvernoRefusAnormaux` inactive dans Prometheus et absente d'Alertmanager ; aucune série `ALERTS` sur 35 min ; 0 refus Kyverno à l'admission sur la fenêtre, avec 55 séries du compteur collectées |
+
+Les huit prédictions sont tenues. Le chemin 2 de la bascule, la création par le rattrapage, est maintenant mesuré sous H1 à H5. Un seul `CONSTAT` au journal, hors prédictions B : `poc-images` a réécrit une fois le manifeste de l'image, qui existait déjà. Le même compte, 1, apparaît à R4 ([preuves-h5-r4-construction_durcie.log](../08-trust-plane/resultats/preuves-h5-r4-construction_durcie.log)) et à la construction de S1. Le verdict porte l'avertissement `trusted_task.tagged` (1), comme à R4.
+
+Les quatre mesures réelles de `mesures-reelles-predictions.md` sont passées : 109 OK, 0 KO, 29 prédictions sur 29 tenues. Toujours non couverts : le redémarrage des VM et celui du pod des résolveurs, `decision3`, `enveloppes`, `reglec`, `attseule`, `controle6`, `controle7`, `temoins_scan`, le test 6 sous limites et `intercepteurs`. L'étape `test5` elle-même reste arrêtée par `gabarit_essai`. Les deux refus qui lui manquaient, l'autre secret et le corps modifié, sont couverts par `test5_refus`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

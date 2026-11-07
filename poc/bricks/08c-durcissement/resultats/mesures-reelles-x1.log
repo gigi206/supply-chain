@@ -1,0 +1,12 @@
+# X1, relevé du 07/11/2026 à 10:50:52 UTC, lecture seule de Prometheus et d'Alertmanager sur sc-stockage
+fenêtre des quatre mesures : 10:21:24 à 10:50:22 UTC (chrono.tsv) ; requêtes sur les 35 dernières minutes
+## état actuel de KyvernoRefusAnormaux
+prometheus : inactive
+alertmanager : absente
+## ALERTS{alertname="KyvernoRefusAnormaux"} sur 35 min (pending ou firing)
+[]
+## refus Kyverno à l'admission sur 35 min (somme des hausses du compteur)
+["0"]
+## séries du compteur présentes (contrôle que la métrique est collectée)
+["55"]
+fin du relevé
