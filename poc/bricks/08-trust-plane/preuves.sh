@@ -2949,14 +2949,18 @@ etape_construction_durcie() { # brique 08c, après H4 : chemin 1 de la bascule s
 }
 
 etape_test5_refus() { # brique 08c, gabarit basculé : livraisons refusées du test 5 ; le témoin vise la tête de main, déjà construite (un commit neuf
-  # échouerait à preparer) ; rien de construit, image réelle inchangée
-  local t0 faux=1111111111111111111111111111111111111111 neuf u0 ev c
+  # échouerait à preparer), puis il est rejoué à l'identique (même corps, même signature) ; rien de construit, image réelle inchangée
+  local t0 faux=1111111111111111111111111111111111111111 neuf u0 ev ev_r sig_v c
   echo "## prédiction (écrite le 07/11/2026, avant le premier passage, resultats/mesures-reelles-predictions.md de la 08c, T1 à T6)"
   echo "- gabarit en service : pipeline sample-app ; $BA_PR présent et réussi"
   echo "- commit $faux : livraison non signée, autre secret, corps modifié : HTTP 202 ; refus de l'intercepteur github (une fois"
   echo "  « no X-Hub-Signature-256 header set », deux fois « payload signature check failed ») ; aucun PipelineRun"
   echo "- témoin : livraison valide de la tête de main : acceptée par les intercepteurs, refusée à la création (already exists, même eventID)"
   echo "- 3 refus des intercepteurs, aucun autre ; UID de $BA_PR inchangé ; image réelle inchangée"
+  echo "## prédiction de l'extension (écrite le 07/11/2026 à 14:43 UTC, avant son premier passage, même fichier, T7 à T9)"
+  echo "- rejeu à l'identique du témoin (même corps, même signature) : HTTP 202, accepté par les intercepteurs, refusé à la création"
+  echo "  (already exists) sous son propre eventID ; 2 erreurs « already exists » au total"
+  echo "- EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, journal en info)"
   ba_attendu "gabarit en service" "$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -r '.spec.resourcetemplates[0].spec.pipelineRef.params[] | select(.name == "name") | .value')" sample-app
   ba_attendu "$BA_PR" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.status.conditions[0].reason}')" Succeeded   # sinon le témoin construirait
   u0=$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')
@@ -2974,16 +2978,22 @@ etape_test5_refus() { # brique 08c, gabarit basculé : livraisons refusées du t
   envoyer "corps modifié (signature valide d'un autre corps)" "$T/webhook/d.json" "$(hmac_corps "$T/webhook/e.json")"
   echo "## témoin : livraison valide de la tête de main ($TETE_J2)"
   corps_push "$TETE_J2" v.json
-  envoyer "valide" "$T/webhook/v.json" "$(hmac_corps "$T/webhook/v.json")"
+  sig_v=$(hmac_corps "$T/webhook/v.json")
+  envoyer "valide" "$T/webhook/v.json" "$sig_v"
   ev=$(jq -r .eventID "$T/webhook/reponse")
+  envoyer "rejeu à l'identique du témoin (même corps, même signature)" "$T/webhook/v.json" "$sig_v"
+  ev_r=$(jq -r .eventID "$T/webhook/reponse")
   for _ in $(seq 30); do
     el_existe "$t0" > "$T/webhook/existe"
-    grep -F "\"eventID\":\"$ev\"" "$T/webhook/existe" >/dev/null && break
+    grep -F "\"eventID\":\"$ev\"" "$T/webhook/existe" >/dev/null && grep -F "\"eventID\":\"$ev_r\"" "$T/webhook/existe" >/dev/null && break
     sleep 2
   done
   cat "$T/webhook/existe"
   grep -F "\"eventID\":\"$ev\"" "$T/webhook/existe" | grep -F "$BA_PR\\\" already exists" >/dev/null \
     && echo "OK   témoin (eventID $ev) accepté par les intercepteurs, $BA_PR déjà présent" || { echo "KO   témoin absent du journal de l'EventListener" >&2; exit 1; }
+  [ "$ev_r" != "$ev" ] && grep -F "\"eventID\":\"$ev_r\"" "$T/webhook/existe" | grep -F "$BA_PR\\\" already exists" >/dev/null \
+    && echo "OK   rejeu à l'identique (eventID $ev_r) accepté par les intercepteurs, $BA_PR déjà présent" || { echo "KO   rejeu à l'identique absent du journal de l'EventListener" >&2; exit 1; }
+  ba_attendu "erreurs « already exists » de l'EventListener depuis $t0" "$(grep -c . "$T/webhook/existe" || true)" 2
   echo "## bilan"
   ba_attendu "PipelineRuns du commit $faux" "$(nb_pr "$faux")" 0
   ba_attendu "PipelineRuns du commit $neuf" "$(nb_pr "$neuf")" 0
@@ -2996,6 +3006,9 @@ etape_test5_refus() { # brique 08c, gabarit basculé : livraisons refusées du t
   ba_attendu "refus « payload signature check failed »" "$(grep -c '"code":"FailedPrecondition","message":"payload signature check failed"' "$T/webhook/refus" || true)" 2
   c=$(grep -c . "$T/webhook/refus" || true)
   ba_attendu "refus des intercepteurs, tous motifs" "$c" 3
+  c=$(kubectl logs -n "$EL_NS" deploy/el-forgejo --since-time="$t0" | grep -c 'interceptor stopped trigger processing' || true)
+  [ "$c" = 0 ] && echo "OK   EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, non journalisé en service)" \
+    || echo "CONSTAT EventListener : $c ligne(s) « interceptor stopped trigger processing » (prédiction : aucune)"
   garder apres
 }
 

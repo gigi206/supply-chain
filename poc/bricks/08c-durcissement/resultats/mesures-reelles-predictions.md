@@ -266,3 +266,33 @@ Non mesuré sous H1 à H5, à la lettre :
 - **(a)** Retirer « `test5` complète » des non couverts, en renvoyant au tableau ci-dessus. Les deux points à la lettre restent nommés.
 - **(b)** Étendre `test5_refus` : envoyer deux fois le corps du témoin, et contrôler l'absence de la ligne de niveau debug. Mêmes effets que `test5_refus` : rien dans le cluster ni dans Zot, un secret jetable effacé par le trap ; 5 livraisons et 2 erreurs `already exists` dans les journaux. Couvre aussi la première livraison par l'EventListener redémarré et le nouveau pod des intercepteurs. Script modifié et prédictions committées avant le passage, puis accord de passage.
 - **(c)** Rejouer `test5_refus` sans changement : même couverture du redémarrage, sans le rejeu à l'identique ni la ligne de niveau debug.
+
+## Additif du 07/11/2026, 14:43 UTC : extension de `test5_refus`, issue (b), prédictions avant passage, aucun accord de passage donné
+
+Choix du propriétaire : « B ». `preuves.sh` modifié, rien lancé, rien écrit dans le cluster ni dans Zot.
+
+**Changement de l'étape.** Après le témoin, le même corps est renvoyé avec la même signature, sous un nouvel en-tête `X-GitHub-Delivery`, comme le rejeu de `test5` le 06/11. Puis l'étape contrôle le journal de l'EventListener. Ajouts :
+- l'`eventID` du rejeu, distinct de celui du témoin, porte l'erreur `already exists` ;
+- 2 erreurs `already exists` au total depuis le début de l'étape (KO sinon) ;
+- la ligne de niveau debug « interceptor stopped trigger processing » est comptée. En cas d'écart, l'étape écrit un `CONSTAT` sans sortir en KO, comme `test5`.
+
+Commande, depuis la racine du dépôt :
+
+```bash
+DISTRO=rke2 JOURNAL=preuves-h5 mise run confiance:preuves -- test5_refus </dev/null
+```
+
+**Effets.** Mêmes effets que `test5_refus` : rien dans le cluster ni dans Zot, un secret jetable en local, effacé par le trap. Restent après le passage : 5 livraisons, 3 refus dans le journal des intercepteurs, 2 erreurs `already exists` dans celui de l'EventListener. Durée prédite : moins de 1 min (2 s le 07/11 à 10:40 UTC). Le journal `preuves-h5-test5_refus.log` sera écrasé : celui de 10:40 UTC est copié dans ce commit en `preuves-h5-test5_refus-premier-passage.log` de la 08.
+
+**Prédictions.** Relevé de référence : [test5-complete-releve.log](test5-complete-releve.log) (14:28:33 UTC). Niveau de journal de l'EventListener lu avant 14:43 UTC, en lecture seule : `info`, dans `K_LOGGING_CONFIG` du déploiement `el-forgejo` et dans `config-logging-triggers` (`loglevel.eventlistener=info`).
+
+T1 à T6 restent valables, avec deux précisions :
+- T1 : le PipelineRun de la tête est `sample-app-6391fd43…`, UID `474b3f60…`, recréé par le rattrapage à 10:48 UTC.
+- T6 : image réelle inchangée, 24 enveloppes (relevé du test 6 à 14:03 UTC, `preuves-h5-test6.log`).
+
+Prédictions ajoutées :
+- T7 : le rejeu à l'identique reçoit HTTP 202 et passe les intercepteurs. Il est refusé à la création (`already exists`), sous un `eventID` distinct de celui du témoin. 2 erreurs `already exists` au total. Confiance haute : même chemin qu'au témoin, et rejeu mesuré le 06/11 avant H5.
+- T8 : 0 ligne « interceptor stopped trigger processing ». Confiance haute, d'après le niveau de journal relevé.
+- T9 : première livraison traitée par l'EventListener redémarré à 11:23:32 UTC et par le pod des intercepteurs `…-6894848d5c-xh998` (créé à 14:06:23 UTC, seule réplique). Les 3 refus de T3 apparaissent dans le journal de ce pod, et le témoin comme le rejeu atteignent la création. Confiance moyenne à haute : `caBundle` inchangé (I5), mais l'appel de l'EventListener vers ce pod n'a jamais été mesuré.
+
+Sur KO : aucun état à défaire. Un KO de T9 (refus absents, ou erreur TLS au journal de l'EventListener) viserait le lien entre l'EventListener et les intercepteurs depuis l'étape `intercepteurs`, et demanderait une décision avant toute autre livraison.
