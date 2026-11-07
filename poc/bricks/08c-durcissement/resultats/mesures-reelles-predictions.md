@@ -296,3 +296,52 @@ Prédictions ajoutées :
 - T9 : première livraison traitée par l'EventListener redémarré à 11:23:32 UTC et par le pod des intercepteurs `…-6894848d5c-xh998` (créé à 14:06:23 UTC, seule réplique). Les 3 refus de T3 apparaissent dans le journal de ce pod, et le témoin comme le rejeu atteignent la création. Confiance moyenne à haute : `caBundle` inchangé (I5), mais l'appel de l'EventListener vers ce pod n'a jamais été mesuré.
 
 Sur KO : aucun état à défaire. Un KO de T9 (refus absents, ou erreur TLS au journal de l'EventListener) viserait le lien entre l'EventListener et les intercepteurs depuis l'étape `intercepteurs`, et demanderait une décision avant toute autre livraison.
+
+## Additif du 07/11/2026, 15:20 UTC : `test5` complète par l'étape `test5_essai`, effets et prédictions avant passage, aucun accord de passage donné
+
+Demande du propriétaire : « Ben fais le tourner, non ? », prise pour une préparation. Le passage remplace le gabarit en service et écrit dans Zot : il attend un accord qui cite ces effets. Nouvelle étape `test5_essai` dans `preuves.sh`, jamais lancée.
+
+**Voie retenue : gabarit d'essai remis le temps du passage, TriggerTemplate seule.** `politique.sh declencheurs` n'est pas utilisé : il recrée aussi des PipelineRuns de J6 et réapplique l'EventListener. Un vrai commit dans Forgejo déplacerait la tête de main. L'étape :
+1. vérifie que le gabarit en service est identique au rendu de `gabarit-sample-app.yaml` avec `pipeline.ref` ;
+2. suspend le rattrapage, puis pose le trap : gabarit de la bascule remis et rattrapage repris, même sur KO ;
+3. applique la seule TriggerTemplate de `declencheurs.yaml`, rendue avec `PIPE_ESSAI`, et attend 10 s le cache de l'EventListener ;
+4. lance `etape_test5` sans changement ;
+5. remet le gabarit de la bascule et reprend le rattrapage. Elle contrôle que la spec est identique à l'objet sauvé (KO sinon), qu'un seul PipelineRun a été créé pendant la fenêtre, que l'UID de la tête est inchangé et que l'image réelle n'a pas bougé.
+
+Commande, depuis la racine du dépôt :
+
+```bash
+DISTRO=rke2 PIPE_ESSAI=sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:c51948595fc675ca5c1fae6a814faadca2d06663b49aba7cc202dcb30c8aca58 JOURNAL=preuves-h5 mise run confiance:preuves -- test5_essai </dev/null
+```
+
+`PIPE_ESSAI` est lu sur `j6-porte-en-service`.
+
+**Vérifié à sec, rien créé** (dry-run serveur et lecture seule), journal [test5-essai-sec.log](test5-essai-sec.log), de 15:21:47 à 15:21:48 UTC :
+- TriggerTemplate en service : un seul gestionnaire de champs, `kubectl` (`Apply`, 06/11 à 15:15:01 UTC). La spec fusionnée par `apply --server-side` du gabarit d'essai est identique au fichier : ni `workspaces` ni `taskRunSpecs` ne restent ;
+- TriggerTemplate d'essai admise, et PipelineRun rendu depuis la spec fusionnée admis au nom de `el-forgejo`, comme celui du gabarit en service ;
+- `gabarit-sample-app.yaml` rendu avec `pipeline.ref` (`sample-app@sha256:02c05736…`) : spec identique au gabarit en service ;
+- aucune fonction appelée par `etape_test5` ne pose de trap ;
+- état : 36 enveloppes sur `builds/essai-webhook@3a7ca1b1…`, 24 sur l'image réelle ; 11 PipelineRuns de la pipeline d'essai dans `builds`, le plus récent `preuve-enveloppes` (07/11, 11:34 UTC).
+
+**Effets à connaître.**
+
+| Quoi | Effet | Reste après |
+|---|---|---|
+| Gabarit en service | Pipeline d'essai pendant 40 s à 1 min 30 environ. Un vrai push sur `main` pendant cette fenêtre construirait avec la pipeline d'essai, et son commit serait ensuite écarté (`already exists`) | Gabarit de la bascule, même spec ; `managedFields` et `resourceVersion` changés |
+| Rattrapage | Suspendu pendant la fenêtre | Repris |
+| `builds` | PipelineRun `sample-app-<commit inventé>`, son TaskRun `publier` et son pod (runc, pas de tâche `construire`) | Laissés, comme le témoin du 06/11 (`sample-app-45a76111…`) |
+| Zot | `publier-essai` réécrit le manifeste de `builds/essai-webhook` (même digest). Chains ajoute ses enveloppes au tag `.att` | Enveloppes définitives. La provenance de PipelineRun la plus récente de `essai-webhook` devient celle du témoin, à la place de `preuve-test7-hors-liste`. Bundles d'horodatage sur ce dépôt : non relu |
+| Journaux | 5 livraisons, une nouvelle livraison de Forgejo, 3 refus des intercepteurs, 2 `already exists` | Nouveau journal `preuves-h5-test5_essai.log` ; `chrono.tsv` |
+
+Sur KO, le trap remet le gabarit et reprend le rattrapage. Un PipelineRun `Failed` peut rester dans `builds`, à purger sur accord.
+
+**Prédictions.**
+- U1 : gabarit en service identique au rendu de `gabarit-sample-app.yaml` ; gabarit d'essai appliqué, admis. Confiance haute (vérifié à sec).
+- U2 : les prédictions de `test5` (30/10/2026) sont tenues, 0 KO. 3 refus de l'intercepteur github. Le témoin est créé par l'EventListener sur la pipeline d'essai, réussit, et son TaskRun et son PipelineRun sont signés par Chains. Le rejeu à l'identique et la nouvelle livraison de Forgejo sont écartés (`already exists`). Un seul PipelineRun par commit, aucune ligne de niveau debug. Confiance moyenne à haute. Risque principal : le cache de l'EventListener rendrait encore le témoin avec la pipeline `sample-app` après 10 s. Le témoin échouerait alors à `preparer`, `non_repris` sortirait en KO et un PipelineRun `Failed` resterait. Durée de propagation non mesurée.
+- U3 : un seul PipelineRun créé pendant la fenêtre, `sample-app-essai`, `Succeeded`.
+- U4 : gabarit de la bascule remis, spec identique à l'objet sauvé ; rattrapage repris ; UID de la tête inchangé (`474b3f60`).
+- U5 : image réelle inchangée, 24 enveloppes, provenance `474b3f60`.
+- U6 : `builds/essai-webhook` passe de 36 à 38 enveloppes (TaskRun `publier` et PipelineRun du témoin). Confiance moyenne : ce décompte n'a jamais été relevé pour ce chemin. Affiché, pas contrôlé.
+- U7 : hors étape, 0 événement `PolicyViolation`, 0 alerte active, 0 ligne `tls`, `x509` ou `certificate` au journal de l'EventListener.
+
+Durée prédite : moins de 1 min 30 (test5 entre 18 et 20 s du 30/10 au 03/11, plus 10 s d'attente et la suspension du rattrapage).

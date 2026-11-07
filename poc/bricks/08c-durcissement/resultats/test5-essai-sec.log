@@ -1,0 +1,35 @@
+# test5_essai, vérification à sec (lecture seule et dry-run serveur, rien créé), début 2026-11-07T15:21:47Z
+PIPE_ESSAI lu sur j6-porte-en-service : sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:c51948595fc675ca5c1fae6a814faadca2d06663b49aba7cc202dcb30c8aca58
+## gestionnaires de champs de la TriggerTemplate en service
+kubectl Apply 2026-11-06T15:15:01Z spec : .,f:params,f:resourcetemplates
+## gabarit d'essai rendu (TriggerTemplate seule) : fusion par apply --server-side en dry-run serveur
+documents : 1 ; pipeline sample-app-essai : 1
+admise (dry-run serveur)
+spec fusionnée identique au fichier
+PipelineRun rendu : workspaces absent, taskRunSpecs absent
+PipelineRun d'essai au nom de el-forgejo : pipelinerun.tekton.dev/sample-app-f7012864ac188621e03f6b7b410af6c40cfc5de1 created (server dry run)
+témoin, PipelineRun du gabarit en service, même compte : pipelinerun.tekton.dev/sample-app-f7012864ac188621e03f6b7b410af6c40cfc5de1 created (server dry run)
+PipelineRun sample-app-f7012864ac188621e03f6b7b410af6c40cfc5de1 présent après les dry-runs : 0
+## remise : gabarit-sample-app.yaml rendu avec pipeline.ref
+pipeline.ref : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e
+spec rendue identique au gabarit en service
+## état
+gabarit en service : sample-app
+tête : Succeeded, uid 474b3f60-bb72-4a62-953b-a2d505165d7c
+enveloppes builds/essai-webhook : 36
+enveloppes builds/sample-app : 24
+PipelineRuns de la pipeline d'essai dans builds : 11, le plus récent : preuve-enveloppes 2026-11-07T11:34:59Z
+## fonctions appelées par etape_test5 : trap
+garder : 0 trap
+pr_attendre : 0 trap
+signe_attendre : 0 trap
+non_repris : 0 trap
+forgejo_livrer : 0 trap
+el_existe : 0 trap
+corps_push : 0 trap
+envoyer : 0 trap
+hmac_corps : 0 trap
+nb_pr : 0 trap
+el_url : 0 trap
+etape_test5 : 0 trap
+# fin 2026-11-07T15:21:48Z

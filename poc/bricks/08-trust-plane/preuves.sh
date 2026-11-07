@@ -3058,6 +3058,52 @@ etape_rattrapage_durci() { # brique 08c, sous H1 à H5 : chemin 2 de la bascule 
   echo "$APP : $(etat_app)"
 }
 
+etape_test5_essai() { # brique 08c : test5 complète sous H1 à H5. Gabarit d'essai de J6 remis le temps du passage (TriggerTemplate seule,
+  # rendue avec PIPE_ESSAI), rattrapage suspendu ; gabarit de la bascule (gabarit-sample-app.yaml, pipeline.ref) remis par le trap,
+  # même sur KO, puis comparé à l'objet sauvé. Le témoin de test5 (commit inventé) reste dans builds, ses enveloppes dans essai-webhook
+  local t_g e0 e1 u0
+  [ -n "${PIPE_ESSAI:-}" ] || { echo "KO   PIPE_ESSAI non posé" >&2; exit 1; }
+  [ -s "$W/construction/pipeline.ref" ] || { echo "KO   pipeline sample-app non publiée" >&2; exit 1; }
+  echo "## prédiction de l'enveloppe (écrite le 07/11/2026 à 15:20 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, U1 à U7)"
+  echo "- gabarit en service identique au rendu de gabarit-sample-app.yaml ; gabarit d'essai admis, en service pendant le passage seulement"
+  echo "- prédictions de test5 (30/10/2026) tenues : 0 KO ; un seul PipelineRun créé pendant la fenêtre, sur la pipeline d'essai, réussi"
+  echo "- gabarit de la bascule remis, spec identique ; rattrapage repris ; $BA_PR inchangé ; image réelle inchangée"
+  echo "- builds/essai-webhook : deux enveloppes de plus (TaskRun publier et PipelineRun du témoin)"
+  sed "s#@PIPELINE@#$(cat "$W/construction/pipeline.ref")#" "$here/politique/gabarit-sample-app.yaml" > "$T/tt-service.yaml"
+  kubectl get triggertemplate -n declencheurs sample-app -o json | jq -S .spec > "$T/tt-service.spec"
+  ba_attendu "gabarit en service = gabarit-sample-app.yaml rendu avec pipeline.ref" \
+    "$(kubectl apply --server-side --dry-run=server -o json -f "$T/tt-service.yaml" | jq -S .spec | cmp -s - "$T/tt-service.spec" && echo oui || echo non)" oui
+  sed "s#@PIPELINE@#$PIPE_ESSAI#" "$here/politique/declencheurs.yaml" | awk 'BEGIN {RS = "\n---\n"} /kind: TriggerTemplate/ {print}' > "$T/tt-essai.yaml"
+  ba_attendu "gabarit d'essai rendu : TriggerTemplate seule, pipeline sample-app-essai" \
+    "$(grep -c '^kind: ' "$T/tt-essai.yaml") $(grep -c '^          value: sample-app-essai$' "$T/tt-essai.yaml")" "1 1"
+  ba_attendu "$BA_PR" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.status.conditions[0].reason}')" Succeeded
+  u0=$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')
+  e0=$(nb_enveloppes "builds/essai-webhook@$APP_DIGEST")
+  kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":true}}' >/dev/null
+  trap 'kubectl apply --server-side -f "$T/tt-service.yaml" >/dev/null; echo "gabarit de la bascule remis (trap)"; ba_reprendre; rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  for _ in $(seq 60); do [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] && break; sleep 2; done
+  [ -z "$(kubectl get cronjob -n declencheurs rattrapage -o jsonpath='{.status.active}')" ] || { echo "KO   passage du rattrapage toujours actif" >&2; exit 1; }
+  t_g=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  kubectl apply --server-side -f "$T/tt-essai.yaml" >/dev/null
+  echo "gabarit d'essai appliqué à $t_g"
+  sleep 10   # cache de l'EventListener (informer de TriggerTemplates) ; durée de propagation non mesurée
+  etape_test5
+  kubectl apply --server-side -f "$T/tt-service.yaml" >/dev/null
+  echo "gabarit de la bascule remis à $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
+  ba_reprendre
+  ba_attendu "spec de la TriggerTemplate identique à l'objet sauvé" \
+    "$(kubectl get triggertemplate -n declencheurs sample-app -o json | jq -S .spec | cmp -s - "$T/tt-service.spec" && echo oui || echo non)" oui
+  echo "## PipelineRuns créés depuis $t_g (nom, pipeline, issue)"
+  kubectl get pipelinerun -n builds -o json | jq -r --arg t "$t_g" '.items[] | select(.metadata.creationTimestamp >= $t)
+    | "\(.metadata.name) \(.spec.pipelineRef.params[] | select(.name == "name") | .value) \(.status.conditions[0].reason)"' | tee "$T/pr-fenetre"
+  ba_attendu "PipelineRuns créés pendant la fenêtre" "$(grep -c . "$T/pr-fenetre" || true)" 1
+  ba_attendu "pipeline et issue du témoin" "$(cut -d' ' -f2- "$T/pr-fenetre")" "sample-app-essai Succeeded"
+  ba_attendu "UID de $BA_PR" "$(kubectl get pipelinerun -n builds "$BA_PR" -o jsonpath='{.metadata.uid}')" "$u0"
+  e1=$(nb_enveloppes "builds/essai-webhook@$APP_DIGEST")
+  echo "enveloppes de builds/essai-webhook : $e0 → $e1 (prédiction : $((e0 + 2)))"
+}
+
 etape_sec_h5() { # brique 08c, à sec : pods du test 4 et PipelineRun d'essai présentés à l'API en dry-run serveur, décompte du test 8 ; rien de créé
   local c m n b
   [ -n "${PIPE_ESSAI:-}" ] || { echo "KO   PIPE_ESSAI non posé" >&2; exit 1; }
