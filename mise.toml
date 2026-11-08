@@ -24,7 +24,7 @@ node = "22.22.0"                                # interface de sample-app (banc 
 "aqua:tektoncd/cli" = "0.46.2"                   # tkn : brique 08, J6 (Trusted Resources, bundles Tekton) ; sha256 seulement (accord du propriétaire)
 "aqua:anchore/syft" = "1.38.0"
 "aqua:anchore/grype" = "0.104.1"
-"github:conforma/cli" = { version = "0.10.42", asset_pattern = "ec_linux_amd64", bin = "ec" }
+"github:conforma/cli" = { version = "v0.10.51", asset_pattern = "ec_linux_amd64", bin = "ec" }
 "aqua:kubernetes-sigs/kind" = "0.33.0"          # banc A1 (Konflux)
 "aqua:kubernetes/kubernetes/kubectl" = "1.35.10" # brique 08 : k3s v1.35.9 (écart de version toléré : ±1) ; banc A1 (kind v1.37.0) mesuré en 1.37.2
 "aqua:helm/helm" = "4.3.1"                       # brique 08 : Cilium installé depuis l'hôte (option (b) du propriétaire, 01/11/2026) ; tarball vérifié en plus par GPG (clé 208DD36E… du fichier KEYS au tag)
