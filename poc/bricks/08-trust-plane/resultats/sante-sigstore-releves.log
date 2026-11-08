@@ -1,0 +1,139 @@
+# sante-sigstore.sh releves, 2026-11-08T14:53:41Z
+Relevé du 2026-11-08 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| Rekor (v1) | sigstore/rekor | signature | non | 8.6 | 2026-11-07 | 10 | 8 | 10 | 1 |
+| Rekor v2 (rekor-tiles) | sigstore/rekor-tiles | signature | non | 8 | 2026-11-07 | 10 | 0 | 10 | 6 |
+| Fulcio | sigstore/fulcio | signature | non | 8.4 | 2026-11-07 | 10 | 8 | 10 | 2 |
+## sigstore/rekor (relevé à 14:53:42 UTC)
+nom final sigstore/rekor, archivé false, licence Apache-2.0, dernier push 2026-11-07
+dernière release : v1.5.5 du 2026-10-21
+releases récentes : v1.5.5 (2026-10-21), v1.5.4 (2026-08-20), v1.5.3 (2026-07-02), v1.5.2 (2026-05-26), v1.5.1 (2026-03-09), v1.5.0 (2026-01-22)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  rekor-cli-darwin-amd64-keyless.sigstore.json
+  rekor-cli-darwin-amd64.sigstore.json
+  rekor-cli-darwin-amd64_1.5.5_darwin_amd64.sbom.json
+  rekor-cli-darwin-arm64-keyless.sigstore.json
+  rekor-cli-darwin-arm64.sigstore.json
+  rekor-cli-darwin-arm64_1.5.5_darwin_arm64.sbom.json
+  rekor-cli-linux-amd64-keyless.sigstore.json
+  rekor-cli-linux-amd64.sigstore.json
+  rekor-cli-linux-amd64_1.5.5_linux_amd64.sbom.json
+  rekor-cli-linux-arm-keyless.sigstore.json
+  rekor-cli-linux-arm.sigstore.json
+  rekor-cli-linux-arm64-keyless.sigstore.json
+  rekor-cli-linux-arm64.sigstore.json
+  rekor-cli-linux-arm64_1.5.5_linux_arm64.sbom.json
+  rekor-cli-linux-arm_1.5.5_linux_armv7.sbom.json
+  rekor-cli-linux-ppc64le-keyless.sigstore.json
+  rekor-cli-linux-ppc64le.sigstore.json
+  rekor-cli-linux-ppc64le_1.5.5_linux_ppc64le.sbom.json
+  rekor-cli-linux-s390x-keyless.sigstore.json
+  rekor-cli-linux-s390x.sigstore.json
+  rekor-cli-linux-s390x_1.5.5_linux_s390x.sbom.json
+  rekor-cli-windows-amd64.exe-keyless.sigstore.json
+  rekor-cli-windows-amd64.exe.sigstore.json
+  rekor-cli-windows-amd64.exe_1.5.5_windows_amd64.sbom.json
+  rekor-server-linux-amd64-keyless.sigstore.json
+  rekor-server-linux-amd64.sigstore.json
+  rekor-server-linux-amd64_1.5.5_linux_amd64.sbom.json
+  rekor-server-linux-arm-keyless.sigstore.json
+  rekor-server-linux-arm.sigstore.json
+  rekor-server-linux-arm64-keyless.sigstore.json
+  rekor-server-linux-arm64.sigstore.json
+  rekor-server-linux-arm64_1.5.5_linux_arm64.sbom.json
+  rekor-server-linux-arm_1.5.5_linux_armv7.sbom.json
+  rekor-server-linux-ppc64le-keyless.sigstore.json
+  rekor-server-linux-ppc64le.sigstore.json
+  rekor-server-linux-ppc64le_1.5.5_linux_ppc64le.sbom.json
+  rekor-server-linux-s390x-keyless.sigstore.json
+  rekor-server-linux-s390x.sigstore.json
+  rekor-server-linux-s390x_1.5.5_linux_s390x.sbom.json
+  rekor_checksums.txt
+  rekor_checksums.txt-keyless.sigstore.json
+commits depuis 2026-08-10T00:00:00Z : 121 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       17 bobcallaway	users.noreply.github.com
+        4 Hayden-IO	users.noreply.github.com
+        2 loosebazooka	google.com
+        1 stgrace	hotmail.com
+        1 rdimitrov	stacklok.com
+        1 cpanato	gmail.com
+        1 arpitjain099	users.noreply.github.com
+        1 anithapriyanatarajan	users.noreply.github.com
+fusionneurs des 100 dernières PR : Hayden-IO 6, bobcallaway 65, cpanato 29
+SECURITY.md : absent du dépôt (politique de l'organisation sigstore non relue)
+avis publiés : 5 ; depuis un an : 3
+  GHSA-47q9-m4ww-924m 2026-05-26 high OOM condition due to Unbounded gzip decompression in Alpine APK parsing
+  GHSA-4c4x-jm2x-pf9j 2026-01-22 medium Server-Side Request Forgery (SSRF) via provided public key URL
+  GHSA-273p-m2cw-6833 2026-01-22 medium COSE v0.0.1 entry type nil pointer dereference in Canonicalize via empty Message
+  GHSA-frqx-jfcm-6jjr 2023-05-26 medium malformed proposed intoto v0.0.2 entries can cause a panic
+## sigstore/rekor-tiles (relevé à 14:53:48 UTC)
+nom final sigstore/rekor-tiles, archivé false, licence Apache-2.0, dernier push 2026-11-06
+dernière release : v2.4.1 du 2026-10-30
+releases récentes : v2.4.1 (2026-10-30), v2.4.0 (2026-10-26), v2.3.0 (2026-06-10), v2.2.1 (2026-02-19), v2.2.0 (2026-02-06), v2.1.0 (2026-01-16)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  rekor-server-aws-darwin-amd64_2.4.1_darwin_amd64.sbom.json
+  rekor-server-aws-darwin-arm64_2.4.1_darwin_arm64.sbom.json
+  rekor-server-aws-linux-amd64_2.4.1_linux_amd64.sbom.json
+  rekor-server-aws-linux-arm64_2.4.1_linux_arm64.sbom.json
+  rekor-server-gcp-darwin-amd64_2.4.1_darwin_amd64.sbom.json
+  rekor-server-gcp-darwin-arm64_2.4.1_darwin_arm64.sbom.json
+  rekor-server-gcp-linux-amd64_2.4.1_linux_amd64.sbom.json
+  rekor-server-gcp-linux-arm64_2.4.1_linux_arm64.sbom.json
+  rekor-server-gcpcloudsql-darwin-amd64_2.4.1_darwin_amd64.sbom.json
+  rekor-server-gcpcloudsql-darwin-arm64_2.4.1_darwin_arm64.sbom.json
+  rekor-server-gcpcloudsql-linux-amd64_2.4.1_linux_amd64.sbom.json
+  rekor-server-gcpcloudsql-linux-arm64_2.4.1_linux_arm64.sbom.json
+  rekor-server-posix-darwin-amd64_2.4.1_darwin_amd64.sbom.json
+  rekor-server-posix-darwin-arm64_2.4.1_darwin_arm64.sbom.json
+  rekor-server-posix-linux-amd64_2.4.1_linux_amd64.sbom.json
+  rekor-server-posix-linux-arm64_2.4.1_linux_arm64.sbom.json
+  rekor-tiles_checksums.txt
+commits depuis 2026-08-10T00:00:00Z : 128 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       17 Hayden-IO	users.noreply.github.com
+        5 jku	google.com
+        3 loosebazooka	google.com
+        2 nellshamrell	gmail.com
+        2 AlCutter	google.com
+        1 rdimitrov	stacklok.com
+        1 codysoyland	chainguard.dev
+        1 bobcallaway	users.noreply.github.com
+fusionneurs des 100 dernières PR : Hayden-IO 27, bobcallaway 2, cmurphy 9, cpanato 10, jku 47, loosebazooka 5
+SECURITY.md : absent du dépôt (politique de l'organisation sigstore non relue)
+avis publiés : 0 ; depuis un an : 0
+## sigstore/fulcio (relevé à 14:53:54 UTC)
+nom final sigstore/fulcio, archivé false, licence Apache-2.0, dernier push 2026-11-06
+dernière release : v1.9.1 du 2026-10-21
+releases récentes : v1.9.1 (2026-10-21), v1.9.0 (2026-10-05), v1.8.8 (2026-07-08), v1.8.7 (2026-05-29), v1.8.6 (2026-05-26), v1.8.5 (2026-01-12)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  fulcio-linux-amd64-keyless.sigstore.json
+  fulcio-linux-amd64.sigstore.json
+  fulcio-linux-amd64_1.9.1_linux_amd64.sbom.json
+  fulcio-linux-arm-keyless.sigstore.json
+  fulcio-linux-arm.sigstore.json
+  fulcio-linux-arm64-keyless.sigstore.json
+  fulcio-linux-arm64.sigstore.json
+  fulcio-linux-arm64_1.9.1_linux_arm64.sbom.json
+  fulcio-linux-arm_1.9.1_linux_armv7.sbom.json
+  fulcio-linux-ppc64le-keyless.sigstore.json
+  fulcio-linux-ppc64le.sigstore.json
+  fulcio-linux-ppc64le_1.9.1_linux_ppc64le.sbom.json
+  fulcio-linux-s390x-keyless.sigstore.json
+  fulcio-linux-s390x.sigstore.json
+  fulcio-linux-s390x_1.9.1_linux_s390x.sbom.json
+  fulcio_checksums.txt
+  fulcio_checksums.txt-keyless.sigstore.json
+commits depuis 2026-08-10T00:00:00Z : 68 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       12 Hayden-IO	users.noreply.github.com
+        2 anithapriyanatarajan	users.noreply.github.com
+        1 cpanato	gmail.com
+        1 bobcallaway	users.noreply.github.com
+        1 arpitjain099	users.noreply.github.com
+fusionneurs des 100 dernières PR : Hayden-IO 51, bobcallaway 30, cpanato 19
+SECURITY.md : absent du dépôt (politique de l'organisation sigstore non relue)
+avis publiés : 4 ; depuis un an : 4
+  GHSA-55r8-p8r6-2f8m 2026-10-05 medium Blind SSRF with JWKS lookup for meta issuers
+  GHSA-f5mr-q85p-6hh6 2026-05-26 high  OIDC Discovery Redirect Following Allows SSRF and JWKS Substitution for Meta-Issuer Paths, with Kubernetes Service-Account Token Leakage
+  GHSA-59jp-pj84-45mr 2026-01-12 medium Server-Side Request Forgery (SSRF) via MetaIssuer Regex Bypass
+  GHSA-f83f-xpx7-ffpw 2025-12-04 high Excessive memory allocation during token parsing

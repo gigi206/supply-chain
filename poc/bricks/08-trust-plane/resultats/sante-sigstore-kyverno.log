@@ -1,0 +1,50 @@
+# sante-sigstore.sh kyverno, 2026-11-08T14:53:25Z
+## tickets (relevé à 14:53:25 UTC)
+#17109 issue open, fusionnée non, mise à jour 2026-09-27T01:01:24Z : [Bug] ImageValidatingPolicy: verifyAttestationSignatures ignores insecureIgnoreTlog for key/KMS attestors (attestation-path counterpart of #16435 / #16298)
+#18054 issue open, fusionnée non, mise à jour 2026-10-29T12:38:02Z : ImageValidatingPolicy: attestation verification fails with `insecureIgnoreTlog: true`, while signature verification succeeds
+#17217 PR open, fusionnée non, mise à jour 2026-11-04T12:43:48Z : fix(ivpol): honor insecureIgnoreTlog/insecureIgnoreSCT in attestation verification
+#16048 PR open, fusionnée non, mise à jour 2026-07-28T15:11:31Z : fix(ivpol): merge user-provided TSA chain into TrustedMaterial for bundle verification
+PR #17217 : base main, brouillon false, mergeable_state clean, tête 0eeb901a3a64
+## releases (relevé à 14:53:28 UTC)
+v1.20.0-rc.1 du 2026-11-02, préversion true
+v1.19.2 du 2026-10-20, préversion false
+v1.19.2-rc.5 du 2026-10-20, préversion true
+v1.19.2-rc3 du 2026-10-17, préversion true
+## SHA de blob sous pkg/image/verifiers/ivpol/cosign
+### v1.19.2 (relevé à 14:53:29 UTC)
+  00e9967c0e4cdada5685cfb925791a7d469b1037 opts.go
+  54ce02b619fcec83d5cd9cf55604cc064ffcd7da verifier.go
+### v1.20.0-rc.1 (relevé à 14:53:30 UTC)
+  c750133e8063251288fff842b21449e4c9697792 opts.go
+  46b9ee05d32e6544ef25c57744b9f939657bf75e timestamp.go
+  aab58bae5f03a36da03e1daa4fed82e5bb823f93 verifier.go
+### main (relevé à 14:53:31 UTC)
+  c750133e8063251288fff842b21449e4c9697792 opts.go
+  46b9ee05d32e6544ef25c57744b9f939657bf75e timestamp.go
+  aab58bae5f03a36da03e1daa4fed82e5bb823f93 verifier.go
+## lignes clés, v1.19.2
+- raccourci sans infrastructure Sigstore (clé et insecureIgnoreTlog) :
+    opts.go:90:	skipSigstoreInfra := keyOrCert && ignoreTlog
+- chaîne TSA ajoutée seulement si un matériel de confiance existe (défaut du plantage, J5) :
+    opts.go:176:			if opts.TrustedMaterial != nil && len(roots) > 0 {
+- chemin des attestations : lecture de insecureIgnoreTlog dans VerifyAttestationSignature (#17109) :
+    longueur de la fonction : 63 lignes ; mentions de IgnoreTlog : 0
+    dans la fonction, ligne 28:		sigs, verified, err = cosign.VerifyImageAttestations(ctx, image.NameRef(), cOpts)
+## lignes clés, v1.20.0-rc.1
+- raccourci sans infrastructure Sigstore (clé et insecureIgnoreTlog) :
+    opts.go:93:	skipSigstoreInfra := keyOrCert && ignoreTlog
+- chaîne TSA ajoutée seulement si un matériel de confiance existe (défaut du plantage, J5) :
+    opts.go:181:			if opts.TrustedMaterial != nil && len(roots) > 0 {
+- chemin des attestations : lecture de insecureIgnoreTlog dans VerifyAttestationSignature (#17109) :
+    longueur de la fonction : 110 lignes ; mentions de IgnoreTlog : 0
+    dans la fonction, ligne 30:		sigs, verified, err = cosign.VerifyImageAttestations(ctx, image.NameRef(), cOpts)
+## lignes clés, main
+- raccourci sans infrastructure Sigstore (clé et insecureIgnoreTlog) :
+    opts.go:93:	skipSigstoreInfra := keyOrCert && ignoreTlog
+- chaîne TSA ajoutée seulement si un matériel de confiance existe (défaut du plantage, J5) :
+    opts.go:181:			if opts.TrustedMaterial != nil && len(roots) > 0 {
+- chemin des attestations : lecture de insecureIgnoreTlog dans VerifyAttestationSignature (#17109) :
+    longueur de la fonction : 110 lignes ; mentions de IgnoreTlog : 0
+    dans la fonction, ligne 30:		sigs, verified, err = cosign.VerifyImageAttestations(ctx, image.NameRef(), cOpts)
+## non évalué
+- v1.20.0-rc.1 ajoute timestamp.go (tri des attestations par horodatage signé) : touche le constat « Kyverno ne choisit pas la provenance jugée », non lu ici

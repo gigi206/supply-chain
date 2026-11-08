@@ -1,0 +1,35 @@
+# sante-sigstore.sh sources, 2026-11-08T14:53:32Z
+## Kyverno v1.19.2 : vérification avec journal (relevé à 14:53:32 UTC)
+- initialisation TUF appelée hors du raccourci, avant la racine de confiance en ligne (resolveTrustedMaterial) :
+    opts.go:119:	if !skipSigstoreInfra {
+    opts.go:125:		trust, err = initTUFAndFetch(ctx, att.TUF)
+    opts.go:144:		trustedMaterial, err := resolveTrustedMaterial(att, trust.trustedRoot)
+    opts.go:357:	mirror := tuf.DefaultRemoteRoot
+    opts.go:382:		if err := tufInitializeFn(ctx, mirror, rootBytes); err != nil {
+    opts.go:525:	opts := sigstoreTuf.DefaultOptions().WithContext(ctx)
+    opts.go:548:	targetBytes, err := client.GetTarget("trusted_root.json")
+- clé publique d'un Rekor auto-hébergé acceptée sans TUF (getRekor) :
+    opts.go:483:			return nil, nil, nil, fmt.Errorf("rekor URL must be provided")
+    opts.go:489:		if ctlog.RekorPubKey == "" {
+    opts.go:494:			if err := key.AddTransparencyLogPubKey([]byte(ctlog.RekorPubKey), tuf.Active); err != nil {
+## sigstore-go v1.3.0 (go.mod de Kyverno v1.19.2) : options par défaut du client TUF
+    options.go:32:	DefaultMirror = "https://tuf-repo-cdn.sigstore.dev"
+    options.go:49:	CacheValidity int
+    options.go:56:	ForceCache bool
+    dans DefaultOptions, ligne 12:	opts.RepositoryBaseURL = DefaultMirror
+- mise à jour en ligne sauf cache forcé ou encore valide :
+    client.go:107:		return c.Refresh()
+    client.go:110:	if c.opts.ForceCache {
+    client.go:112:	} else if c.opts.CacheValidity > 0 {
+    client.go:127:	return c.Refresh()
+## Tekton Chains v0.29.9 : client de transparence
+    go.mod :	github.com/sigstore/cosign/v2 v2.6.5
+    go.mod :	github.com/sigstore/rekor v1.5.4
+    go.mod :	github.com/sigstore/sigstore-go v1.2.1 // indirect
+    rekor.go:22:	rc "github.com/sigstore/rekor/pkg/client"
+    rekor.go:23:	"github.com/sigstore/rekor/pkg/generated/client"
+    rekor.go:24:	"github.com/sigstore/rekor/pkg/generated/models"
+    rekor.go:45:func (r *rekor) UploadTlog(ctx context.Context, signer signing.Signer, signature, rawPayload []byte, cert, payloadFormat string) (*models.LogEntryAnon, error) {
+- preuve rangée dans l'attestation (.att en dsse, entrée intégrée en sigstore-bundle) :
+    attestation.go:115:		attOpts = append(attOpts, static.WithBundle(req.Bundle.RekorBundle))
+    attestation.go:179:	bundleBytes, err := cbundle.MakeNewBundle(pubKey, req.Bundle.RekorEntry, req.Bundle.Content, req.Bundle.Signature, signerBytes, timestampBytes)

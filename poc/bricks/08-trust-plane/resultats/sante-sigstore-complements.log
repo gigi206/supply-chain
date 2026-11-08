@@ -1,0 +1,56 @@
+# sante-sigstore.sh complements, 2026-11-08T14:56:36Z
+## Kyverno v1.19.2 : ordre des appels dans checkOptions (relevé à 14:56:36 UTC)
+  checkOptions : 194 lignes ; lignes relatives au début de la fonction :
+    12:			return nil, err
+    35:	if !skipSigstoreInfra {
+    41:		trust, err = initTUFAndFetch(ctx, att.TUF)
+    43:			return nil, err
+    46:		rekorClient, rekorPubKeys, ctlogPubKey, err := getRekor(ctx, att.CTLog, trust.rekorPubKeys, trust.ctlogPubKeys)
+    60:		trustedMaterial, err := resolveTrustedMaterial(att, trust.trustedRoot)
+    118:			return nil, err
+  VerifyImageSignature : 65 lignes, mentions de IgnoreTlog ou ignoreTlog : 2
+  VerifyAttestationSignature : 63 lignes, mentions de IgnoreTlog ou ignoreTlog : 0
+## Kyverno v1.20.0-rc.1 : ordre des appels dans checkOptions (relevé à 14:56:37 UTC)
+  checkOptions : 198 lignes ; lignes relatives au début de la fonction :
+    14:			return nil, err
+    39:	if !skipSigstoreInfra {
+    45:		trust, err = initTUFAndFetch(ctx, att.TUF)
+    47:			return nil, err
+    50:		rekorClient, rekorPubKeys, ctlogPubKey, err := getRekor(ctx, att.CTLog, trust.rekorPubKeys, trust.ctlogPubKeys)
+    64:		trustedMaterial, err := resolveTrustedMaterial(att, trust.trustedRoot)
+    122:			return nil, err
+  VerifyImageSignature : 65 lignes, mentions de IgnoreTlog ou ignoreTlog : 2
+  VerifyAttestationSignature : 110 lignes, mentions de IgnoreTlog ou ignoreTlog : 0
+## politique de sécurité de l'organisation sigstore (relevé à 14:56:37 UTC)
+SECURITY.md de sigstore/.github : présent, 10764 octets
+  Sigstore is a growing community of volunteers, users, and vendors. The Sigstore community has adopted this security disclosures and response policy to ensure we responsibly handle critical issues.
+  ## Reporting a vulnerability
+  Send the vulnerability disclosure to security@sigstore.dev. The Security Response Committee will acknowledge the report within 24 hours.
+  The SRC are responsible for organizing the entire response including internal communication and external disclosure, but will need help from relevant maintainers to successfully run this process.
+  - Infra: Create a security advisory and temporary fork for the fix team to work on the issue
+  - Disclosure: Handle public messaging around the vulnerability, by documenting the issue (how to upgrade, list affected versions, draft an advisory notice)
+## commits depuis 2026-08-10T00:00:00Z, humains et robots séparés
+  sigstore/rekor : 121 commits, dont robots 93, humains 28
+  sigstore/rekor-tiles : 128 commits, dont robots 96, humains 32
+  sigstore/fulcio : 68 commits, dont robots 51, humains 17
+  google/trillian : 15 commits, dont robots 11, humains 4
+## Rekor v1 : état annoncé et dépendances du serveur (relevé à 14:56:42 UTC)
+  README.md:27:Rekor v1 is in maintenance mode.
+  README.md:32:[Trillian-Tessera](https://github.com/transparency-dev/trillian-tessera).
+  README.md:37:As we near a V2 release, we plan to merge the rekor-tiles codebase into this repository.
+  go.mod:28:	github.com/go-sql-driver/mysql v1.10.1
+  go.mod:33:	github.com/google/trillian v1.8.0
+  go.mod:39:	github.com/redis/go-redis/v9 v9.23.0
+## Chains : client de transparence sur main (relevé à 14:56:42 UTC)
+  go.mod (main) :	github.com/sigstore/rekor v1.5.4
+## google/trillian (dépendance du serveur Rekor v1, relevé à 14:56:43 UTC)
+| Trillian | google/trillian | signature | non | 8.4 | 2026-11-07 | 10 | -1 | 10 | 5 |
+archivé false, licence Apache-2.0, dernier push 2026-11-02
+dernière release : v1.8.0 du 2026-09-21
+fusionneurs des 100 dernières PR : AlCutter 6, mhutchinson 33, phbnf 18, roger2hk 43
+  README.md:9:> Trillian is in maintenance mode.
+  README.md:11:> and are better supported by [Tessera](https://github.com/transparency-dev/tessera).
+  README.md:12:> We recommend that any new log operators first try Tessera.
+## limites
+- fichiers .sigstore.json des releases : présence relevée, signatures non vérifiées ; images des projets non relues
+- passage obligatoire par le TUF lu en v1.19.2 et v1.20.0-rc.1 seulement ; employeurs des fusionneurs non établis (adresses noreply)
