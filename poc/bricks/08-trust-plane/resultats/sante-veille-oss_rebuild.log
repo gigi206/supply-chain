@@ -1,0 +1,73 @@
+# sante-veille.sh oss_rebuild, 2026-11-08T19:59:10Z
+Relevé du 2026-11-08 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| OSS Rebuild | google/oss-rebuild | reproductibilité | non | n/d | — | — | — | — | — |
+## google/oss-rebuild (relevé à 19:59:10 UTC)
+API Scorecard : HTTP 404
+nom final google/oss-rebuild, archivé false, licence Apache-2.0, dernier push 2026-11-06, branche main
+releases : 0 ; tags : 0
+commits depuis 2026-08-10T00:00:00Z : 519, dont robots 0 ; auteurs humains (compte, domaine de l'adresse) :
+      448 msuozzo	google.com
+       39 pohlarized	users.noreply.github.com
+       19 MarlinDiary	aucklanduni.ac.nz
+        8 wbxyz	google.com
+        2 spencerschrock	google.com
+        1 snu5mumr1k	gmail.com
+        1 rksharma-owg	owasp.org
+        1 gtystahl	users.noreply.github.com
+commits par mois depuis le 2025-11-08 (tous auteurs) : 2025-11 36, 2025-12 51, 2026-01 27, 2026-02 20, 2026-03 38, 2026-04 106, 2026-05 48, 2026-06 34, 2026-07 42, 2026-08 80, 2026-09 62, 2026-10 265, 2026-11 139, 
+auteurs humains sur un an : msuozzo 717, wbxyz 116, MarlinDiary 42, pohlarized 39, spencerschrock 13, gtystahl 3, elliott-wen 2, arpitjain099 2, 
+100 dernières PR fusionnées, du 2026-11-03 au 2026-11-06 :
+  auteurs : msuozzo 99, pohlarized 1
+  fusionneurs : msuozzo 99, pohlarized 1
+PR ouvertes : 107
+SECURITY.md : absent du dépôt
+avis publiés : 0
+## documentation et code au commit 733f4df0c0f7421e9d08ba280978c28bd16f8f2c (relevé à 19:59:27 UTC)
+- CONTRIBUTING.md, CLA :
+    7:### Sign our Contributor License Agreement
+    10:[Contributor License Agreement](https://cla.developers.google.com/about) (CLA).
+    18:Visit <https://cla.developers.google.com/> to see your current agreements or to
+- README.md, écosystèmes, installation, couverture, authentification :
+    30:- npm (JavaScript/TypeScript)
+    31:- PyPI (Python)
+    32:- Crates.io (Rust)
+    34:While complete coverage is the aim, only the most popular packages within each
+    42:$ go run github.com/google/oss-rebuild/cmd/oss-rebuild@latest --help
+    45:$ go install github.com/google/oss-rebuild/cmd/oss-rebuild@latest
+    87:Anonymous authentication is not supported so an [ADC credential](https://cloud.google.com/docs/authentication/set-up-adc-local-dev-environment) must be prese
+    96:To disable signature verification and skip the requirement for KMS access use: `--verify=false`.
+- pkg/rebuild (répertoires) : cratesio debian flow maven meta npm oci pypi rebuild rubygems schema stability target
+- bucket public gs://google-rebuild-attestations, préfixes de premier niveau (liste anonyme) : cratesio/ npm/ pypi/
+- docs/content/hosts/Google.md, stockage et clé :
+    12:attestations under a [CC0](https://creativecommons.org/public-domain/cc0/)
+    17:- Attestation storage URI: gs://google-rebuild-attestations/
+    18:- Signing key URI:
+- docs/content/storage.md, accès et vérification :
+    16:gs://{bucket}/{ecosystem}/{package}/{version}/{artifact}/rebuild.intoto.jsonl
+    57:By default, the instance storage bucket is public and can be used without GCP authentication.
+    65:gcloud storage cat gs://google-rebuild-attestations/pypi/absl-py/2.0.0/absl_py-2.0.0-py3-none-any.whl/rebuild.intoto.jsonl
+    70:All attestations are signed using a host-specific KMS key. The `oss-rebuild` CLI verifies attestation signatures by default using a builtin version of the Google instance key.
+- cmd/oss-rebuild/verify.go et main.go, clés embarquées et vérification en ligne :
+    verify.go:34:	PublicKey: mustParsePKIX(`-----BEGIN PUBLIC KEY-----
+    verify.go:40:	Algorithm: kmspb.CryptoKeyVersion_EC_SIGN_P256_SHA256,
+    verify.go:49:var embeddedKeys []key = []key{ossRebuildKey, ossRebuildLegacyKey}
+    verify.go:78:	kc, err := kms.NewKeyManagementClient(ctx)
+    main.go:35:	verify       = flag.Bool("verify", true, "whether to verify rebuild attestation signatures")
+    main.go:36:	verifyWith   = flag.String("verify-with", strings.Join([]string{ossRebuildKey.ID, ossRebuildLegacyKey.ID}, ","), "comma-separated list of key URIs used to verify rebuild attestation signatures")
+    main.go:37:	verifyOnline = flag.Bool("verify-online", false, "whether to always fetch --verify-with key contents, ignoring embedded contents")
+- deployments (hébergement d'une instance) :
+    providers.tf:15:      source  = "google"
+    providers.tf:20:provider "google" {
+    README.md:8:- _OpenTofu_: [install guide](https://opentofu.org/docs/intro/install)
+    README.md:41:$ terraform apply -var-file=foo-rebuilder.tfvars
+    README.md:59:Cloud Run ingress to load balancers and forbids unauthenticated access:
+    ressources google_* dans services.tf et platform.tf : "google_storage_bucket" 13, "google_project_service" 11, "google_firestore_index" 7, "google_cloud_scheduler_job" 5, "google_pubsub_subscription" 3, "google_compute_firewall" 3, "google_pubsub_topic" 2, "google_firestore_field" 2, 
+- docs/content/stabilizers.md, équivalence :
+    16:bit-for-bit identical reproduction but, in practice, rebuilds often produce
+    22:our abstraction for evaluating artifacts' functional equivalence.
+    46:For example, one stabilizer might zeroe timestamps, another normalizes file
+## limites
+- lu, rien installé ni exécuté ; aucune attestation téléchargée ni vérifiée ; couverture réelle des paquets non mesurée ; employeurs non vérifiés

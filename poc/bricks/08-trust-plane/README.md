@@ -2054,8 +2054,46 @@ Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools
   - 80 des 100 dernières fusions faites par un même compte, et aucune fusion depuis le 09/09/2026 ;
   - 27 PR dependabot ouvertes. Ma réponse précédente au propriétaire disait « une dizaine » : c'était faux ;
   - le projet passe en « Risqué » le 27/07/2027 s'il ne publie pas de nouvelle release.
-  - **Ce qu'il apporterait** : seule la détection de paquets malveillants recoupe GuardDog et malicious-packages. La vérification de provenance des paquets PyPI, npm et Go n'est pas couverte chez nous (OSS Rebuild reste une option au doc 00) ; c'est la seule capacité nouvelle de Macaron, et elle ne change pas son verdict vu la baisse d'activité. (Corrigé à 18:16 UTC, avant tout push : la première version disait ces deux capacités « déjà couvertes », ce qui était faux pour la provenance.)
+  - **Ce qu'il apporterait** : seule la détection de paquets malveillants recoupe GuardDog et malicious-packages. La vérification de provenance des paquets PyPI, npm et Go n'est pas couverte chez nous (OSS Rebuild reste une option au doc 00 ; additif de 20:06 UTC : OSS Rebuild est depuis passé en « Risqué », voir plus bas) ; c'est la seule capacité nouvelle de Macaron, et elle ne change pas son verdict vu la baisse d'activité. (Corrigé à 18:16 UTC, avant tout push : la première version disait ces deux capacités « déjà couvertes », ce qui était faux pour la provenance.)
 - **Non vérifié** :
   - les employeurs (seuls les domaines des adresses ont été lus) ;
   - les 9 fichiers de la release v0.25.0 de Macaron (aucun n'a un nom de signature ou de provenance) ;
   - le besoin de réseau de Macaron (une seule mention de l'API GitHub dans `docs/source/index.rst`).
+
+## Veille : OSS Rebuild (08/11/2026, relevé de 19:59:10 à 20:01:34 UTC)
+
+Demande du propriétaire : « Et regarde https://github.com/google/oss-rebuild ». Les lectures exploratoires d'avant 19:59 UTC sont restées dans la sortie de Bash, non archivées. Le script les a refaites : [`sante-veille.sh`](sante-veille.sh), étapes `oss_rebuild` ([journal](resultats/sante-veille-oss_rebuild.log)) et `oss_rebuild_complements` ([journal](resultats/sante-veille-oss_rebuild_complements.log)). Lecture publique seulement : API GitHub, API Scorecard et liste anonyme du bucket public des attestations. Rien n'a été installé ni exécuté, et rien n'a été lu ni écrit dans Zot, le cluster ou les VM.
+
+- **Verdict : « Risqué », décision du propriétaire** (« Risqué » en réponse à « J'archive ce relevé […] avec quel verdict ? »). Le projet n'a **aucune release ni aucun tag** depuis la création du dépôt, le 22/05/2024. La règle du doc 04 (« aucune release depuis plus de 12 mois ») s'applique à la lettre. Il est donc interdit : le CLI comme la consommation des attestations publiées par Google. Le second point est une interprétation : le service de données fait partie du projet.
+- **Santé** :
+  - très actif : 519 commits en 90 jours, aucun de robot ;
+  - mais un même compte à adresse google.com a écrit 448 de ces commits et fusionné 99 des 100 dernières PR (employeur non vérifié, approbations non lues) ;
+  - CLA Google et un seul éditeur ;
+  - installation par `@latest`, sans binaire signé ;
+  - Scorecard n/d (404) ;
+  - pas de SECURITY.md dans le dépôt, mais celui de l'organisation google existe.
+- **Ce qu'il fait** :
+  - Google reconstruit les paquets et compare le résultat au paquet publié. La comparaison est **fonctionnelle**, après des « stabilisateurs » qui normalisent par exemple les horodatages et l'ordre des fichiers. Elle n'est **pas au bit près**. Leur propre doc parle d'un signal faible.
+  - L'instance publique ne publie que pour `cratesio/ npm/ pypi/` (liste anonyme du bucket), et seulement pour les paquets les plus populaires. Son code contient aussi debian, maven, rubygems et oci. **Go n'est pas couvert.**
+  - Le déploiement n'existe que sur Google Cloud : Terraform, fournisseur `google`, avec Firestore, Pub/Sub, Cloud Scheduler et GCS.
+  - **Vérification des signatures** : les attestations sont signées par une clé KMS P-256 de Google. D'après le code (`main.go` l. 125 à 160), le CLI vérifie avec les clés publiques embarquées et n'appelle KMS que pour les clés non embarquées ou avec `--verify-online`. Son README dit au contraire qu'un identifiant GCP est obligatoire. C'est lu dans le code, pas exécuté.
+- **Non mesuré** : la couverture de nos propres dépendances npm et PyPI. Interroger le bucket enverrait leurs noms à Google.
+
+## Idées à retenir des projets écartés (08/11/2026)
+
+Question du propriétaire : « Mais peut être que dans chacun des projets écartés il y a des idées à retenir? ». Le relevé couvre promo-tools, Macaron et OSS Rebuild, c'est-à-dire les trois dernières questions. Il **ne couvre pas** Rekor, Fulcio et Trillian, examinés le même jour ([section plus haut](#évaluation-à-sec-de-fulcio-et-rekor-08112026-1445-à-1457-utc)), ni les autres projets écartés des docs 00 et 04 (portée corrigée à 20:08 UTC, avant tout push). Les lignes qui portent les idées sont archivées par l'étape `idees` ([journal](resultats/sante-veille-idees.log)), avec en complément les journaux [documents](resultats/sante-veille-documents.log) et [oss_rebuild](resultats/sante-veille-oss_rebuild.log). Ce sont des **pistes de conception, aucune décision**. On ne reprend aucun code de ces projets : seulement des idées.
+
+- **promo-tools** (écarté pour usage : pas de Zot) :
+  1. **Un espace « livré » séparé**, alimenté seulement après le verdict. Chez eux, le promoteur évalue la politique, copie l'image par digest et ne recopie que les attestations acceptées. Chez nous, le build écrit déjà dans `artifacts/<projet>/` avant la porte (`docs/02`, l. 113 et 174), puis la porte y attache son verdict, « release ou rejet » (l. 124 et 185). `docs/02` ne décrit pas de dépôt distinct pour la release (relu à 20:08 UTC, avant tout push, l. 100 à 126 et 166 à 182). Pour un consommateur, un dépôt où rien n'entre sans verdict positif serait plus simple à juger.
+  2. **Une seule attestation à vérifier pour l'utilisateur**. Chez eux, c'est une VSA du promoteur qui résume les autres (« Users verify that one summary »). Notre verdict de porte pourrait jouer ce rôle s'il prenait la forme d'une VSA, avec `inputAttestations` listant les attestations jugées. Le format actuel du verdict n'a pas été relu pour cette note.
+  3. **Un enregistrement de promotion signé**, avec un prédicat dédié : qui a fait entrer quel digest, depuis quel manifeste et à quel commit.
+  4. **Des droits séparés dans les manifestes** : la liste des images se modifie en PR, tandis que la liste des registres, plus sensible, reste réservée à quelques propriétaires.
+  5. **Un contrôle a posteriori** (`sigcheck`) qui vérifie, et répare, les signatures et attestations manquantes sur le registre de production. Chez nous, ce serait un audit périodique de Zot.
+- **Macaron** (« Option », activité en baisse) :
+  1. **Une VSA par dépendance tierce**, après nos contrôles d'ingestion, comme le fait GDK.
+  2. **Retrouver le dépôt et le commit** d'un artefact publié (« source finder »), pour relier chaque dépendance archivée à sa source.
+- **OSS Rebuild** (« Risqué ») :
+  1. **Des stabilisateurs nommés**, chacun une fonction pure, composés dans un ordre déclaré. Ils pourraient servir à **classer** les écarts du replay montrés par diffoscope (bénins ou suspects) dans le diagnostic, **sans changer le verdict** : l'exigence B1 reste le bit à bit (`docs/01`, l. 10).
+  2. **Deux attestations distinctes** : comment on a reconstruit (`Rebuild`), puis ce qu'on a constaté (`ArtifactEquivalence`). Notre VSA de replay pourrait séparer la recette du résultat.
+  3. **Une recette de reconstruction rejouable par n'importe qui**, publiée avec l'attestation (chez eux, un Dockerfile).
+  4. **Un rangement prévisible des attestations** par écosystème, paquet, version et artefact.

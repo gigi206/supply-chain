@@ -1,0 +1,33 @@
+# sante-veille.sh idees, 2026-11-08T20:06:50Z
+## kubernetes-sigs/promo-tools au commit 9815d7308f585535c93d3804df88f567dbe83833 (relevé à 20:06:51 UTC)
+- README.md, contrôle et réparation a posteriori :
+    73:  sigcheck    Check and repair image signatures and promotion attestations
+- docs/image-promotion.md, séparation des droits dans les manifestes :
+    53:2 separate YAML files. In practice, thin manifests are preferred because they
+    56:whereas the more sensitive `registries` field remains tightly controlled by a
+    57:handful of owners.
+- docs/verification-summaries.md, politique avant copie, recopie filtrée, VSA unique pour l'utilisateur :
+    7:policy, and at which SLSA build level. Users verify that one summary instead of
+    44:   jobs evaluate the staging attestations of the digest against the policy.
+    45:4. The promoter copies the image by digest, signs it, records the promotion,
+    46:   copies the attestations the policy accepted, and writes the summary with
+    90:- `inputAttestations`: the staging attestations the policy accepted, by
+## oracle/macaron au commit 862d044fedd533827b5f6be2257a426bcce1551b (relevé à 20:06:53 UTC)
+    33:- **Reproducible build** through static analysis of build scripts. Macaron enables **rebuilding packages from source** and **comparing to released artifacts** to detect discrepancies, and therefore
+    34:- **Accurate repository and commit detection** for released artifacts, improving traceability and trust ([tutorial](https://oracle.github.io/macaron/pages/tutorials/source_finder.html)).
+    57:Macaron is integrated into the [Graal Development Kit (GDK)](https://graal.cloud/gdk/), where it is used to generate **Verification Summary Attestations** for each artifact. This helps GDK users va
+## google/oss-rebuild au commit 733f4df0c0f7421e9d08ba280978c28bd16f8f2c (relevé à 20:06:54 UTC)
+- deux attestations par artefact (docs/content/storage.md) :
+    13:Attestations are organized hierarchically within their storage bucket:
+    26:1. A [rebuild attestation](builds/Rebuild@v0.1.md) describing the build process
+    27:2. An [artifact equivalence attestation](builds/ArtifactEquivalence@v0.1.md) verifying the rebuilt content matches upstream
+- recette de reconstruction rejouable (README.md) :
+    63:To view the dockerfile, use the `--output=dockerfile` option. This can be
+    67:$ oss-rebuild get pypi absl-py 2.0.0 --output=dockerfile | docker run $(docker buildx build -q -)
+- stabilisateurs (docs/content/stabilizers.md) :
+    32:By normalizing the lowest-risk variations, we dramatically increase our
+    45:Each stabilizer is a pure function, handling a small, focused transformation.
+    54:The full stabilization process is simply the composition of all configured stabilizers:
+- prédicats (docs/content/builds) :
+    Rebuild@v0.1.md:10:# `Rebuild` Build Type
+    ArtifactEquivalence@v0.1.md:9:# `ArtifactEquivalence` Build Type

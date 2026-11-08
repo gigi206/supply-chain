@@ -1,0 +1,42 @@
+# sante-veille.sh oss_rebuild_complements, 2026-11-08T20:01:34Z
+## google/oss-rebuild (relevé à 20:01:34 UTC)
+créé le 2024-05-22, dernier push 2026-11-06
+premier commit de la branche par défaut : 2024-12-23 (le plus récent avant le 01/01/2025)
+SECURITY.md de google/.github : présent, 402 octets
+## cmd/oss-rebuild/main.go au commit 733f4df0c0f7421e9d08ba280978c28bd16f8f2c, lignes 125 à 160 (choix entre clés embarquées et KMS)
+    				return errors.Wrap(err, "initializing GCS store")
+    			}
+    			var verifiers []dsse.Verifier
+    			if !*verify {
+    				verifiers = append(verifiers, &trustAllVerifier{})
+    			} else {
+    				keysToAdd := slices.DeleteFunc(strings.Split(*verifyWith, ","), func(s string) bool { return s == "" })
+    				var keysAdded []string
+    				if !*verifyOnline {
+    					for _, key := range embeddedKeys {
+    						if !slices.Contains(keysToAdd, key.ID) {
+    							continue
+    						}
+    						verifiers = append(verifiers, &keyVerifier{key})
+    						keysAdded = append(keysAdded, key.ID)
+    					}
+    				}
+    				for _, uri := range keysToAdd {
+    					if slices.Contains(keysAdded, uri) {
+    						continue
+    					}
+    					switch {
+    					case strings.HasPrefix(uri, kmsV1API), strings.HasPrefix(uri, gcpKMSScheme):
+    						verifier, err := makeKMSVerifier(ctx, uri)
+    						if err != nil {
+    							return err
+    						}
+    						// Add verifiers for both new (gcpkms://) and legacy (https://) keyid formats
+    						verifiers = append(verifiers, verifier)
+    						legacyVerifier := kmsdsse.NewLegacyKeyIDVerifier(verifier.(*kmsdsse.CloudKMSSignerVerifier))
+    						verifiers = append(verifiers, legacyVerifier)
+    					default:
+    						return errors.Errorf("unsupported key URI: %s", uri)
+    					}
+    					keysAdded = append(keysAdded, uri)
+    				}
