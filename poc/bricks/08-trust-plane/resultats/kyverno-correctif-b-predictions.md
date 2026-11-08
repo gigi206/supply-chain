@@ -60,3 +60,7 @@ Les cas, la politique (`ivpol` de `commun.sh`) et le pod sont ceux de J6 (`polit
 - **Garde** : entrée standard fermée sur chaque `kyverno apply`.
 - **Compilation** : l'étape `construire` a été lancée à 16:03 UTC. Elle est locale et n'a rien lu dans Zot ([journal](kyverno-correctif-construire.log)). L'avoir rangée dans la « préparation à sec » accordée est une **interprétation**.
 - **Volume du passage** : environ 3 × 8 × 2 appels du CLI, une vérification cosign et 6 lectures de referrers, en lectures anonymes. Cela fait quelques centaines de lignes d'audit dans le journal de sc-stockage (environ 15 Mo/h d'après P1), sans effet attendu sur W8 ni sur P3.
+
+## Résultat (additif du 08/11/2026, 16:38 UTC)
+
+Passage du 08/11/2026 à 16:38:13 UTC ([journal](kyverno-correctif-cli.log)) : les trois témoins bloquants tiennent ; **24 cas sur 24 conformes**, 0 KO, 0 CONSTAT ; les motifs des CLI corrigés sont ceux annoncés, y compris pour `j5-tsa-etrangere` (« certificate embedded in the TSR does not match »). Prédictions tenues.

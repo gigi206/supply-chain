@@ -1,0 +1,83 @@
+# kyverno-correctif.sh cli, 2026-11-08T16:38:13Z
+## préalables (lecture anonyme de Zot)
+horodatage/bundles : 63 referrer(s)
+essais-j5/sans-jeton : 1 referrer(s)
+essais-j5/jeton-altere : 1 referrer(s)
+essais-j5/autre-signature : 1 referrer(s)
+essais-j5/tsa-etrangere : 1 referrer(s)
+essais-j5/aucun : 0 referrer(s)
+OK   chaîne TSA identique à resultats/tsa-chaine.pem
+## témoins bloquants
+OK   cosign v3.1.4 accepte le bundle valide de horodatage/bundles avec son jeton (référence de J5)
+OK   CLI officiel, j5-temoin : PASS
+## CLI officiel 1.19.2 : ~/.local/share/mise/installs/aqua-kyverno-kyverno/1.19.2/kyverno (sha256 dd492a230e3f7c68, Git commit ID: e63308f1e16c05cd009ac4864)
+OK   j5-temoin : PASS
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-valide : ERREUR
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+OK   j5-sans-jeton : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)"
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-aucun-bundle : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: "
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-altere : ERREUR
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+OK   j5-autre-signature : ERREUR
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+OK   j5-tsa-etrangere : ERREUR
+     evaluation returned an internal error, not a resource refusal error="internal error: runtime error: invalid memory address or nil pointer dereference"
+     nil pointer dans la sortie verbeuse : 1
+OK   j5-att-historique : FAIL
+     image verification failed error="cosign bundle verification failed"
+     nil pointer dans la sortie verbeuse : 0
+## CLI main corrigé : ~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-main-v2 (sha256 afd69baae540bb81, Git commit ID: 2be1bc3fe3b4150501caac2c9)
+OK   j5-temoin : PASS
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-valide : PASS
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-sans-jeton : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)"
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-aucun-bundle : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: "
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-altere : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestam
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-autre-signature : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match"
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-tsa-etrangere : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-att-historique : FAIL
+     image verification failed error="cosign bundle verification failed"
+     nil pointer dans la sortie verbeuse : 0
+## CLI v1.19.2 corrigé : ~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-v1.19.2-v2 (sha256 d8b7713cd376dae5, Git commit ID: e63308f1e16c05cd009ac4864)
+OK   j5-temoin : PASS
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-valide : PASS
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-sans-jeton : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)"
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-aucun-bundle : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: "
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-jeton-altere : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error parsing response into Timestam
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-autre-signature : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match"
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-tsa-etrangere : FAIL
+     image verification failed error="failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: certificate embedded in the TSR does
+     nil pointer dans la sortie verbeuse : 0
+OK   j5-att-historique : FAIL
+     image verification failed error="cosign bundle verification failed"
+     nil pointer dans la sortie verbeuse : 0
+bilan : OK

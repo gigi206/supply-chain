@@ -2010,3 +2010,24 @@ Tests ajoutés par le v2 : `TestCertificateAttestor_TSACertChain_SigstoreBundle`
 - **deux attestations horodatées** (tri de `timestamp.go` sur main) : pas de panic, vérifiées.
 
 Bilan : sans le correctif, 9 panics sur 28 tests, sur main comme sur v1.19.2 ; avec, 28 sur 28, 0 panic ; paquet `ivpol/cosign` complet avec `-race` sans échec sur les deux ([`j main`](kyverno-correctif/j-paquet-cosign-main.log), [`j v1.19.2`](kyverno-correctif/j-paquet-cosign-v1.19.2.log)). Reste non couvert : jeton embarquant le certificat de la TSA (étape B), golangci-lint, admission (étape C).
+
+### Correctif Kyverno, étape B : CLI corrigés sur les vrais bundles de J5 (08/11/2026, 16:38 UTC)
+
+Accord du propriétaire : « Oui » à « Je lance le passage de l'étape B (lecture seule de Zot) : oui ou pas maintenant ? » (effets et pire cas cités). Lecture anonyme de Zot depuis l'hôte seulement : rien écrit dans Zot, le cluster ou les VM, rien publié. Script [`kyverno-correctif.sh`](kyverno-correctif.sh) `cli`, [journal](resultats/kyverno-correctif-cli.log), [prédictions](resultats/kyverno-correctif-b-predictions.md) commitées avant le passage (`69cf35a`, additif `3d15708`).
+
+- **Témoins bloquants tenus** : dépôts de J5 présents (`horodatage/bundles` 63 referrers, chaque `essais-j5/*` 1, `essais-j5/aucun` 0) ; chaîne TSA identique à l'archive ; cosign v3.1.4 accepte le bundle valide avec son jeton ; CLI officiel PASS sur `j5-temoin`.
+- **24 cas sur 24 conformes aux prédictions, 0 KO, 0 CONSTAT** :
+
+| Cas | CLI officiel 1.19.2 | CLI main corrigé | CLI v1.19.2 corrigé | Motif des CLI corrigés |
+|---|---|---|---|---|
+| `j5-temoin` | PASS | PASS | PASS | — |
+| `j5-jeton-valide` | ERREUR (nil pointer) | **PASS** | **PASS** | — |
+| `j5-sans-jeton` | FAIL | FAIL | FAIL | `threshold not met` (0 < 1) |
+| `j5-aucun-bundle` | FAIL | FAIL | FAIL | aucune attestation |
+| `j5-jeton-altere` | ERREUR (nil pointer) | **FAIL** | **FAIL** | `error parsing response into Timestamp` (ECDSA) |
+| `j5-autre-signature` | ERREUR (nil pointer) | **FAIL** | **FAIL** | `hashed messages don't match` |
+| `j5-tsa-etrangere` | ERREUR (nil pointer) | **FAIL** | **FAIL** | `certificate embedded in the TSR does not match…` |
+| `j5-att-historique` | FAIL | FAIL | FAIL | `cosign bundle verification failed` (#17109, non touché) |
+
+- **Lecture** : sur nos artefacts réels, dont le jeton embarque le certificat de la TSA, le correctif v2 rend au contrôle 9 de Kyverno le comportement de cosign en J5 : même acceptation, mêmes trois refus avec les mêmes motifs, plus aucune « internal error ». Prédiction de confiance moyenne sur `j5-tsa-etrangere` tenue, motif compris. « nil pointer » dans la sortie verbeuse : 4 cas avec le CLI officiel, 0 avec les CLI corrigés.
+- **Non couvert** : l'admission (étape C, après W8 ; parité CLI et admission mesurée en J6 sur 25 décisions sur 25) ; golangci-lint. Le ticket ou la PR chez Kyverno restent à décider, avec validation du texte exact.
