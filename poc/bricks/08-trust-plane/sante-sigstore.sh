@@ -146,6 +146,31 @@ etape_complements() {
   echo "- passage obligatoire par le TUF lu en v1.19.2 et v1.20.0-rc.1 seulement ; employeurs des fusionneurs non établis (adresses noreply)"
 }
 
+# Ajout du 08/11/2026 vers 15:10 UTC, questions du propriétaire : « Il y a donc un soucis si chains se base sur quelque chose en
+# maintenance mode » et « pour Fulcio, si on met par exemple un keycloak ou autre ? ».
+etape_fulcio() {
+  mkdir -p "$T/fulcio"
+  echo "## dépendance de notre Chains à Rekor v1 (relevé à $(date -u +%H:%M:%S) UTC)"
+  echo "- transparence dans la configuration du dépôt (non relue dans le cluster) :"
+  grep -n -E 'transparency' "$here/tekton/chains/chains-config.yaml" | sed 's/^/    tekton\/chains\/chains-config.yaml:/'
+  echo "- dernière valeur relevée dans un rejeu archivé :"
+  grep -H -n -E '^transparency\.enabled' "$R"/rejeu-*.log | sed "s#^$R/#    resultats/#" | tail -1
+  echo "- client Rekor v1 compilé dans Chains (go.mod, v0.29.9 et main) :"
+  for t in v0.29.9 main; do brut tektoncd/chains go.mod "$t" | grep -E '^\s*github\.com/sigstore/rekor ' | sed "s/^/    $t :/"; done
+  echo "## Fulcio v1.9.1 : options du serveur (relevé à $(date -u +%H:%M:%S) UTC)"
+  brut sigstore/fulcio cmd/app/serve.go v1.9.1 > "$T/fulcio/serve.go"
+  brut sigstore/fulcio pkg/config/config.go v1.9.1 > "$T/fulcio/config.go"
+  grep -n -E 'Flags\(\)\.String\("(ca|ct-log-url|kms-resource)"|if logURL := viper\.GetString\("ct-log-url"\); logURL != ""' "$T/fulcio/serve.go" | cut -c1-200 | sed 's/^/    serve.go:/'
+  echo "- types d'émetteurs OIDC acceptés :"
+  grep -n -E '^\s*IssuerType[A-Za-z]+ += "' "$T/fulcio/config.go" | sed 's/^/    config.go:/'
+  echo "## Chains v0.29.9 : signataire Fulcio"
+  brut tektoncd/chains pkg/chains/signing/x509/x509.go v0.29.9 > "$T/fulcio/x509.go"
+  grep -n -E 'if cfg\.Signers\.X509\.FulcioEnabled|if cfg\.IdentityTokenFile != ""|FilesystemTokenPath = cfg\.IdentityTokenFile|tok, err = p\.Provide' "$T/fulcio/x509.go" | sed 's/^/    x509.go:/'
+  brut tektoncd/chains pkg/config/config.go v0.29.9 | grep -n -E '"signers\.x509\.(fulcio\.[a-z]+|identity\.token\.file|tuf\.mirror\.url)"' | sed 's/^/    config.go:/'
+  echo "## limites"
+  echo "- non lus : le besoin de Rekor ou d'un horodatage pour vérifier un certificat Fulcio de courte durée dans Chains, ec et Kyverno ; Keycloak non audité (doc 04)"
+}
+
 for e in "$@"; do
   echo "# sante-sigstore.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/sante-sigstore-$e.log"
   "etape_$e" 2>&1 | sed -u "s#$HOME#~#g" | tee -a "$R/sante-sigstore-$e.log"

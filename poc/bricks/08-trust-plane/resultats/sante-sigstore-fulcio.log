@@ -1,0 +1,40 @@
+# sante-sigstore.sh fulcio, 2026-11-08T15:02:46Z
+## dépendance de notre Chains à Rekor v1 (relevé à 15:02:46 UTC)
+- transparence dans la configuration du dépôt (non relue dans le cluster) :
+    tekton/chains/chains-config.yaml:28:  transparency.enabled: "false"
+- dernière valeur relevée dans un rejeu archivé :
+    resultats/rejeu-rke2-troisieme-passage.log:711:transparency.enabled = false
+- client Rekor v1 compilé dans Chains (go.mod, v0.29.9 et main) :
+    v0.29.9 :	github.com/sigstore/rekor v1.5.4
+    main :	github.com/sigstore/rekor v1.5.4
+## Fulcio v1.9.1 : options du serveur (relevé à 15:02:47 UTC)
+    serve.go:97:	cmd.Flags().String("ca", "", "googleca | tinkca | pkcs11ca | fileca | kmsca | ephemeralca (for testing)")
+    serve.go:102:	cmd.Flags().String("ct-log-url", "http://localhost:6962/test", "host and path (with log prefix at the end) to the ct log")
+    serve.go:111:	cmd.Flags().String("kms-resource", "", "KMS key resource path. Must be prefixed with awskms://, azurekms://, gcpkms://, or hashivault://")
+    serve.go:366:	if logURL := viper.GetString("ct-log-url"); logURL != "" {
+- types d'émetteurs OIDC acceptés :
+    config.go:446:	IssuerTypeBuildkiteJob      = "buildkite-job"
+    config.go:447:	IssuerTypeEmail             = "email"
+    config.go:448:	IssuerTypeGithubWorkflow    = "github-workflow"
+    config.go:449:	IssuerTypeCodefreshWorkflow = "codefresh-workflow"
+    config.go:450:	IssuerTypeGitLabPipeline    = "gitlab-pipeline"
+    config.go:451:	IssuerTypeChainguard        = "chainguard-identity"
+    config.go:452:	IssuerTypeKubernetes        = "kubernetes"
+    config.go:453:	IssuerTypeSpiffe            = "spiffe"
+    config.go:454:	IssuerTypeURI               = "uri"
+    config.go:455:	IssuerTypeUsername          = "username"
+    config.go:456:	IssuerTypeCIProvider        = "ci-provider"
+## Chains v0.29.9 : signataire Fulcio
+    x509.go:59:	if cfg.Signers.X509.FulcioEnabled {
+    x509.go:74:	if cfg.IdentityTokenFile != "" {
+    x509.go:75:		FilesystemTokenPath = cfg.IdentityTokenFile
+    x509.go:89:	if cfg.IdentityTokenFile != "" {
+    x509.go:104:		tok, err = p.Provide(ctx, defaultOIDCClientID)
+    config.go:220:	x509SignerFulcioEnabled     = "signers.x509.fulcio.enabled"
+    config.go:221:	x509SignerFulcioAddr        = "signers.x509.fulcio.address"
+    config.go:222:	x509SignerFulcioOIDCIssuer  = "signers.x509.fulcio.issuer"
+    config.go:223:	x509SignerFulcioProvider    = "signers.x509.fulcio.provider"
+    config.go:224:	x509SignerIdentityTokenFile = "signers.x509.identity.token.file"
+    config.go:225:	x509SignerTUFMirrorURL      = "signers.x509.tuf.mirror.url"
+## limites
+- non lus : le besoin de Rekor ou d'un horodatage pour vérifier un certificat Fulcio de courte durée dans Chains, ec et Kyverno ; Keycloak non audité (doc 04)
