@@ -1,0 +1,57 @@
+package cosign
+
+import (
+	"context"
+	"encoding/pem"
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/go-logr/logr"
+	"github.com/kyverno/api/api/policies.kyverno.io/v1beta1"
+	protobundle "github.com/sigstore/protobuf-specs/gen/pb-go/bundle/v1"
+	protocommon "github.com/sigstore/protobuf-specs/gen/pb-go/common/v1"
+	"github.com/sigstore/sigstore-go/pkg/root"
+	"github.com/sigstore/sigstore-go/pkg/sign"
+	"github.com/sigstore/sigstore-go/pkg/testing/ca"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+// A key-signed Sigstore bundle carrying a genuine RFC 3161 timestamp, verified by a
+// key attestor with ctlog.tsaCertChain and insecureIgnoreTlog: panics on main.
+func TestRepro_KeyAttestor_TSACertChain_TimestampedBundle(t *testing.T) {
+	tsa, err := ca.NewVirtualSigstore()
+	require.NoError(t, err)
+	repo, _ := newBundleRegistry(t)
+	subject := pushSubject(t, repo, "subject")
+	img := fetchTestImage(t, repo.Tag("subject").String())
+
+	kp, err := sign.NewEphemeralKeypair(nil)
+	require.NoError(t, err)
+	statement := fmt.Sprintf(`{"_type":"https://in-toto.io/Statement/v1","predicateType":"https://example.com/predicate","subject":[{"name":"subject","digest":{"sha256":%q}}],"predicate":{}}`, subject.Digest.Hex)
+	pb, err := sign.Bundle(&sign.DSSEData{Data: []byte(statement), PayloadType: "application/vnd.in-toto+json"}, kp, sign.BundleOptions{})
+	require.NoError(t, err)
+	tsr, err := tsa.TimestampResponse(pb.GetDsseEnvelope().GetSignatures()[0].GetSig())
+	require.NoError(t, err)
+	pb.VerificationMaterial.TimestampVerificationData = &protobundle.TimestampVerificationData{
+		Rfc3161Timestamps: []*protocommon.RFC3161SignedTimestamp{{SignedTimestamp: tsr}},
+	}
+	raw, err := protojson.Marshal(pb)
+	require.NoError(t, err)
+	pushReferrer(t, repo, subject, raw, testBundleMediaType, testBundleMediaType)
+	pubPEM, err := kp.GetPublicKeyPem()
+	require.NoError(t, err)
+
+	authority := tsa.TimestampingAuthorities()[0].(*root.SigstoreTimestampingAuthority)
+	var chain strings.Builder
+	for _, c := range append(append(authority.Intermediates[:0:0], authority.Leaf), append(authority.Intermediates, authority.Root)...) {
+		require.NoError(t, pem.Encode(&chain, &pem.Block{Type: "CERTIFICATE", Bytes: c.Raw}))
+	}
+	attestor := &v1beta1.Attestor{Name: "signer", Cosign: &v1beta1.Cosign{
+		Key:   &v1beta1.Key{Data: pubPEM},
+		CTLog: &v1beta1.CTLog{InsecureIgnoreTlog: true, TSACertChain: chain.String()},
+	}}
+
+	require.NoError(t, NewVerifier(nil, logr.Discard()).VerifyImageSignature(context.TODO(), img, attestor))
+}
