@@ -1,0 +1,28 @@
+# preuves.sh scan_saut_reprendre, 2026-11-08T11:40:43Z
+## prédiction (écrite le 07/11/2026 à 16:13 UTC, avant son premier passage, resultats/mesures-reelles-predictions.md de la 08c, W1 à W8)
+- avant : suspendu, aucun Job créé depuis le passage sauté (Kubernetes et audit), dernier passage inchangé
+- ScanEnRetard en firing, notifiée au récepteur local avec un début (FiredAt) 300 à 360 s après les 26 h ; ScanBientotRefuse inactive
+- reprise admise (200 au nom de system:admin) ; ni Job, ni événement du CronJob (pas de MissSchedule), dernier passage inchangé
+OK   CronJob du scan : planning, échéance, suspendu, passages actifs : 30 9 * * *|3600|true|0
+passage sauté : 2026-11-08T09:30:00Z ; dernier passage : 2026-11-07T09:30:00Z
+audit conservé depuis 2026-11-07T19:14:34.323170Z
+OK   Jobs du scan créés depuis 2026-11-08T09:30:00Z : 0
+OK   créations de Jobs dans scan à l'audit depuis 2026-11-08T09:30:00Z : 0
+dernier referrer du scan : 2026-11-07T09:31:48Z
+OK   ScanEnRetard : firing
+ScanEnRetard active (pending) depuis 2026-11-08T11:32:07.032691222Z (affiché, non contrôlé)
+{"statut":"firing","debut":"2026-11-08T11:37:07.032Z","severite":"avertissement"}
+OK   notification firing de ScanEnRetard au récepteur local : oui
+OK   début notifié de ScanEnRetard 319 s après les 26 h
+OK   ScanBientotRefuse : inactive
+CronJob du scan repris
+reprise demandée à 2026-11-08T11:40:44Z
+OK   CronJob du scan : planning, échéance, suspendu, passages actifs : 30 9 * * *|3600|false|0
+OK   dernier passage : 2026-11-07T09:30:00Z
+OK   Jobs du scan créés depuis 2026-11-08T09:30:00Z : 0
+OK   événements du CronJob du scan (MissSchedule compris) : 0
+  audit : 2026-11-08T11:40:44.958669Z system:admin 200
+OK   reprise à l'audit (utilisateur, code) : system:admin 200
+OK   créations de Jobs dans scan à l'audit depuis 2026-11-08T09:30:00Z : 0
+OK   événements PolicyViolation depuis 2026-11-08T11:40:44Z : 0
+prochain passage : 2026-11-09T09:30:00Z ; ScanEnRetard reste active jusqu'au referrer suivant

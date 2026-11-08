@@ -1,0 +1,61 @@
+# Relecture P1 du journal local de sc-stockage (brique 08c), le 08/11/2026, en lecture seule, sur accord du propriétaire
+# Accord : « Oui », reçu le 08/11/2026 peu avant 12:04:29 UTC, en réponse à « Je lance les deux, ou le contre-relevé seul ? » (question du message ; la boîte de l'application portait « Je lance le contre-relevé et la relecture P1 ? »), compris comme : les deux (précisé à 12:07 UTC, avant tout push)
+# (même session ssh en lecture seule que le 07/11 à 20:18 UTC, rien d'écrit sur la VM ; pire cas : une ligne de session dans l'audit).
+# Même script que journald-stockage-p1p2.log, inchangé (copie en section 3). Aucun MESSAGE affiché hors des lignes de systemd-journald
+# contenant « max » ; sortie filtrée par grep -viE 'jeton|token' (lignes éventuellement retirées non comptées ; toutes les sections présentes, jusqu'à « fin »).
+
+## 1. Sortie brute
+relevé du 08/11/2026 à 12:04:36 UTC
+## version de systemd
+systemd	257.13-1~deb13u1
+## fichiers du journal persistant (taille en octets, nom)
+109051904 system.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-00000000000160aa-00065f9e95c7cfcc.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-0000000000020bc0-00065fa09dd40739.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-000000000002b66b-00065fa2660829f5.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-000000000003607b-00065fa473e88d41.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-0000000000040b3e-00065fa6a1a8a308.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-000000000004b603-00065fa8cc00de3a.journal
+37031936 system@dd3b013acda640d9845be635e1927e69-00000000000560b2-00065faaf65ddcbe.journal
+41943040 system@dd3b013acda640d9845be635e1927e69-0000000000060b74-00065fad20b284f2.journal
+134217728 system@dd3b013acda640d9845be635e1927e69-000000000006b81b-00065fae7ba5f005.journal
+134217728 system@dd3b013acda640d9845be635e1927e69-0000000000093f58-00065fb5a9da8b9c.journal
+8388608 user-1000.journal
+## journalctl --disk-usage
+Archived and active journals take up 650.1M in the file system.
+## tête du journal (entrée la plus ancienne : horodatage et numéro de séquence seulement)
+{"__SEQNUM_ID":"dd3b013acda640d9845be635e1927e69","__SEQNUM":"974","_BOOT_ID":"672808fc95954f9ea90eb2784c33f4a2","__REALTIME_TIMESTAMP":"1793971717682230","__MONOTONIC_TIMESTAMP":"9827432","__CURSOR":"s=dd3b013acda640d9845be635e1927e69;i=3ce;b=672808fc95954f9ea90eb2784c33f4a2;m=95f468;t=65f9b96f83436;x=afbd9a5cc9cff9ea"}
+## messages de journald contenant max, démarrage 0
+2026-11-07T11:22:36+00:00 sc-stockage systemd-journald[319]: Runtime Journal (/run/log/journal/56d33d4cd65a47a995716f98d1100aa9) is 7.4M, max 59.3M, 51.9M free.
+2026-11-07T11:22:36+00:00 sc-stockage systemd-journald[319]: System Journal (/var/log/journal/56d33d4cd65a47a995716f98d1100aa9) is 271.2M, max 1.9G, 1.6G free.
+## messages de journald contenant max, démarrage -1
+fin
+fin du relevé 12:04:37 UTC
+
+## 2. Calculs locaux (sans la VM), le 08/11/2026 à 12:04:44 UTC
+nouvelles archives depuis le 07/11 à 20:18 UTC, d'après leur nom :
+  000000000006b81b-00065fae7ba5f005  seq  440347  2026-11-07 12:01:03 UTC
+  0000000000093f58-00065fb5a9da8b9c  seq  606040  2026-11-07 20:35:03 UTC
+occupation : 418.1M (07/11 20:18:00 UTC) puis 650.1M (08/11 12:04:36 UTC), soit 232 M en 15 h 47 min, environ 14,7 M/h
+plus vieille archive système : …-00000000000160aa-00065f9e95c7cfcc (06/11 17:03:02 UTC), inchangée ; entrée la plus ancienne pour journalctl inchangée (974, 06/11 13:28:37 UTC)
+
+## 3. Copie du script (scratchpad/p1p2-stockage.sh)
+#!/usr/bin/env bash
+# Lecture seule de P1 (tête du journal local de sc-stockage) et P2 (plafond annoncé par journald au démarrage 0, version de systemd).
+# Une seule session ssh. Aucun MESSAGE affiché hors des lignes de journald contenant « max ». Filtre jeton|token en sortie.
+set -uo pipefail
+export LC_ALL=C
+O8=$HOME/.cache/supply-chain-poc/08
+SSHO=(-n -i "$O8/ssh/id_ed25519" -o "UserKnownHostsFile=$O8/ssh/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10)
+date -u '+relevé du %d/%m/%Y à %H:%M:%S UTC'
+ssh "${SSHO[@]}" poc@192.168.161.13 'sudo sh -c "
+echo \"## version de systemd\"; dpkg-query -W systemd
+echo \"## fichiers du journal persistant (taille en octets, nom)\"; for f in /var/log/journal/*/*; do echo \"\$(stat -c %s \"\$f\") \$(basename \"\$f\")\"; done
+echo \"## journalctl --disk-usage\"; journalctl --disk-usage
+echo \"## tête du journal (entrée la plus ancienne : horodatage et numéro de séquence seulement)\"
+journalctl -o json --no-pager --output-fields=__REALTIME_TIMESTAMP,__SEQNUM 2>/dev/null | head -1
+echo \"## messages de journald contenant max, démarrage 0\"; journalctl -b 0 -t systemd-journald -o short-iso --no-pager | grep -i max
+echo \"## messages de journald contenant max, démarrage -1\"; journalctl -b -1 -t systemd-journald -o short-iso --no-pager | grep -i max
+echo \"fin\"
+"' </dev/null 2>&1 | grep -viE 'jeton|token'
+date -u '+fin du relevé %H:%M:%S UTC'

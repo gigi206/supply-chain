@@ -1208,6 +1208,17 @@ L'additif de 09:50 UTC disait le script non corrigé. Il l'est désormais, pour 
 
 Rejeu en lecture seule à 16:29:45 UTC sur le passage du 07/11 : `bilan : OK`. Le Job et le pod sont créés en 201, sans aucun refus. Journal : [resultats/scan-saut-w8-sec.log](resultats/scan-saut-w8-sec.log). Prédictions W8a et W8b, avec le nouveau `scan-saut-resolution.sh` : [resultats/mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 16:31 UTC.
 
+## Additif du 08/11/2026, 12:05 UTC : saut d'un passage du scan, seconde moitié passée (`scan_saut_reprendre`), W3 à W7 tenues
+
+L'étape a été passée par la tâche planifiée `supply-chain-scan-saut-reprise` à 11:40:43 UTC : 14 OK, 0 KO. Le contre-relevé en lecture seule de 12:04:29 UTC, fait sur accord du propriétaire, confirme ses faits. Détail : [mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 12:05 UTC.
+- Le passage du 08/11 à 09:30 UTC a bien été sauté : aucun Job, aucune création à l'audit. `ScanEnRetard` a été notifiée au récepteur local avec un début 319 s après les 26 h (prédit : 300 à 360 s).
+- La reprise est admise en 200 au nom de `system:admin`, et `suspend` vaut `false`. Elle n'a lancé aucun Job et produit aucun événement de CronJob ni aucune `PolicyViolation`.
+- Les referrers de l'image sont toujours 4 : `AVANT=4` du relevé du 09/11 est confirmé. P1, relue sur le même accord, tient : la plus vieille archive système de `sc-stockage` n'a pas bougé, avec 650.1M occupés.
+
+**Effet à connaître.** `ScanEnRetard` reste en firing jusqu'au referrer du passage du 09/11 à 09:30 UTC ; elle est répétée toutes les 4 h au récepteur local.
+
+Toujours non couverts sous H1 à H5 : la jonction d'un nœud, la résolution de l'alerte après le passage du 09/11 (W8, relevé à prévoir avec l'accord du propriétaire) et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

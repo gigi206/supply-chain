@@ -1,0 +1,29 @@
+contre-relevé du 08/11/2026 à 12:04:29 UTC, lecture seule
+## journal de l'étape (KO, CONSTAT, bilan, audit, début notifié)
+- avant : suspendu, aucun Job créé depuis le passage sauté (Kubernetes et audit), dernier passage inchangé
+passage sauté : 2026-11-08T09:30:00Z ; dernier passage : 2026-11-07T09:30:00Z
+ScanEnRetard active (pending) depuis 2026-11-08T11:32:07.032691222Z (affiché, non contrôlé)
+OK   début notifié de ScanEnRetard 319 s après les 26 h
+reprise demandée à 2026-11-08T11:40:44Z
+  audit : 2026-11-08T11:40:44.958669Z system:admin 200
+OK : 14 ; KO : 0 ; CONSTAT : 0
+## chrono.tsv
+J8 scan_saut_reprendre	2026-11-08T11:40:43Z	
+J8 scan_saut_reprendre fait	2026-11-08T11:41:16Z	
+## état réel
+suspendu false ; dernier passage 2026-11-07T09:30:00Z ; actifs 0
+Jobs du scan créés depuis 2026-11-08T09:30:00Z : 0
+audit depuis 2026-11-08T09:30:00Z, créations de Jobs dans scan (heure utilisateur code) :
+audit depuis 2026-11-08T09:30:00Z, patchs du CronJob du scan (heure utilisateur code) :
+  2026-11-08T11:40:44.958669Z system:admin 200
+Events (une heure seulement, non probants au-delà) : du CronJob dans scan 0 ; PolicyViolation depuis 2026-11-08T09:30:00Z 0
+ScanEnRetard : firing (attendue firing jusqu'au referrer du 09/11) ; ScanBientotRefuse : inactive
+## récepteur local, ScanEnRetard depuis 2026-11-08T09:30:00Z (reçu à, statut, début)
+2026-11-08T11:37:17Z firing 2026-11-08T11:37:07.032Z
+## referrers de l'image (AVANT du relevé du 09/11 : compte de essais-h5-planifie.sh, tous types)
+  2026-11-06T15:39:00Z https://supply-chain.example/scan/v1
+  2026-11-06T15:40:55Z https://supply-chain.example/scan/v1
+  2026-11-06T21:30:48Z https://supply-chain.example/scan/v1
+  2026-11-07T09:31:48Z https://supply-chain.example/scan/v1
+referrers : 4
+fin 12:04:31 UTC

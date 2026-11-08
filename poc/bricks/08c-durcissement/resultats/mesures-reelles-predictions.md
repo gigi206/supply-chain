@@ -699,3 +699,22 @@ Accord : « traite tout », reçu peu avant 20:17:44 UTC. Il répond au message 
 - **A2 : limite acceptée.** Les compteurs d'échec de Chains v0.29.9 n'ont pas d'étiquette : les échecs voulus des essais négatifs ne se filtrent pas. Cette limite est écrite dans le commentaire de la règle et annoncée dans les prédictions des étapes depuis 0f5b964. Rien n'est changé dans Prometheus ni dans Alertmanager.
 - **Events dans Loki : une passe dédiée après le 09/11, avec ses propres prédictions.** Ce n'est pas un simple remplacement : Loki garde une ligne par mise à jour d'Event (`journalisation.sh:391`), donc les comptes changent. Six lectures fondent un verdict sur des Events : `preuves.sh:3184`, `3238`, `3298` et `3304`, `durcissement.sh:270`, `cilium.sh:173`. Les lignes 3298 et 3304 tournent le 08/11 pendant la reprise : aucun script n'est touché avant la fin de W8.
 - La relecture P1 du 08/11 n'a pas d'accord à ce stade : sans accord, P1 sera écrite « non relue ».
+
+## Additif du 08/11/2026, 12:05 UTC : `scan_saut_reprendre` passée par la tâche planifiée, W3 à W7 tenues ; P1 tenue
+
+La tâche `supply-chain-scan-saut-reprise` (accord du 07/11 vers 16:21 UTC) a lancé l'étape à 11:40:43 UTC ; elle s'est terminée à 11:41:16 UTC avec 14 OK, 0 KO et 0 CONSTAT. Journal : [preuves-h5-scan_saut_reprendre.log](../../08-trust-plane/resultats/preuves-h5-scan_saut_reprendre.log). Le contre-relevé en lecture seule, à 12:04:29 UTC, sur accord du propriétaire (« Oui » à « Je lance les deux, ou le contre-relevé seul ? », compris comme : les deux ; précisé à 12:07 UTC, avant tout push), retrouve les mêmes faits : [scan-saut-reprise-verif.log](scan-saut-reprise-verif.log).
+- **W3 tenue.** 0 Job et 0 création de Job à l'audit depuis le 08/11 à 09:30 UTC. Le dernier passage reste le 07/11 à 09:30:00 UTC.
+- **W4 tenue.** `ScanEnRetard` est en firing, en pending depuis 11:32:07 UTC (affiché). Le récepteur local a reçu un seul firing à 11:37:17 UTC, avec un début notifié à 11:37:07 UTC, soit 319 s après les 26 h (prédit : 300 à 360 s). `ScanBientotRefuse` est inactive.
+- **W5 tenue.** Reprise à 11:40:44 UTC : à l'audit, `system:admin` en 200 ; `suspend` à `false`, aucun passage actif, encore vrai au contre-relevé.
+- **W6 tenue.** Après la reprise : dernier passage inchangé, 0 Job, 0 événement du CronJob, `MissSchedule` compris.
+- **W7 tenue.** 0 `PolicyViolation` depuis la reprise.
+- **Referrers de l'image : 4 au contre-relevé**, les mêmes que le 07/11 à 16:27 UTC. Le dernier date du 07/11 à 09:31:48 UTC. `AVANT=4` de W8a est confirmé.
+- **P1 tenue** (additif du 07/11, 19:56 UTC), relue à 12:04:36 UTC sur le même accord : [journald-stockage-p1-0811.log](journald-stockage-p1-0811.log). La plus vieille archive système reste `…-00000000000160aa-00065f9e95c7cfcc` (06/11 à 17:03:02 UTC), et l'occupation vaut 650.1M (plus de 386,1 M).
+  - Deux archives de 128 Mio sont apparues : leurs têtes datent du 07/11 à 12:01:03 et à 20:35:03 UTC.
+  - Le rythme est d'environ 14,7 M/h depuis le 07/11 à 20:18 UTC.
+  - Le mécanisme n'est pas réfuté, et la confiance haute de P3 tient pour le 09/11.
+- **Ce que le relevé ne prouve pas.**
+  - Que le passage du 09/11 à 09:30 UTC aura lieu et que l'alerte se résoudra : c'est W8, relevé le 09/11.
+  - Les comptes d'Events du contre-relevé, lus 24 min après la reprise : ils ne couvrent que l'heure de la TTL. W6 et W7 se jugent sur l'étape et sur l'audit.
+  - Le rapport de la tâche n'est qu'une information : tout ce qui précède vient des journaux.
+
