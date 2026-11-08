@@ -43,7 +43,7 @@ etape_construire() {
 
 cli() { # binaire politique pod : décision (PASS, FAIL, ERREUR), code de sortie et motif (même analyse que politique.sh)
   local c=0
-  SSL_CERT_FILE=$P/ca-poc.crt "$1" apply "$2" --resource "$3" --policy-report --output-format json > "$T/cli.json" 2> "$T/cli.err" || c=$?
+  SSL_CERT_FILE=$P/ca-poc.crt "$1" apply "$2" --resource "$3" --policy-report --output-format json < /dev/null > "$T/cli.json" 2> "$T/cli.err" || c=$?
   python3 -I -c 'import json,re,sys
 t = re.sub(r"\x1b\[[0-9;]*m", "", open(sys.argv[1]).read())
 i = t.find("{")
@@ -55,20 +55,27 @@ print(res + "\t" + msg[:160])' "$T/cli.json" "$c"
 }
 
 motif() { # binaire politique pod : motif de vérification d'image relevé en mode verbeux (affiché, non jugé)
-  SSL_CERT_FILE=$P/ca-poc.crt "$1" apply "$2" --resource "$3" -v 6 > "$T/v6.out" 2>&1 || true
+  SSL_CERT_FILE=$P/ca-poc.crt "$1" apply "$2" --resource "$3" -v 6 < /dev/null > "$T/v6.out" 2>&1 || true
   sed 's/\x1b\[[0-9;]*m//g' "$T/v6.out" | grep -o -E '(image verification failed|evaluation returned an internal error)[^"]*error="[^"]*"' | sort -u | head -2 | cut -c1-260
   echo "nil pointer dans la sortie verbeuse : $(grep -c 'nil pointer' "$T/v6.out")"
 }
 
 etape_cli() {
-  local d n c e r v ko=0 x a
+  local d n c e r v ko=0 x a officiel cosign
+  # Ajout du 08/11/2026 vers 16:10 UTC, avant tout passage, sur relecture du conseiller : binaires résolus depuis le dépôt
+  # (mise which échoue hors du dépôt), témoins bloquants (cosign et CLI officiel) et INDÉTERMINÉ classé en CONSTAT.
+  officiel=$(cd "$repo" && mise which kyverno 2>/dev/null) || officiel=
+  cosign=$(cd "$repo" && mise which cosign 2>/dev/null) || cosign=
+  [ -x "$officiel" ] && [ -x "$cosign" ] || { echo "NON JUGÉ : kyverno ($officiel) ou cosign ($cosign) introuvable"; exit 3; }
   echo "## préalables (lecture anonyme de Zot)"
   for d in "$DEPOT_BUNDLES" essais-j5/sans-jeton essais-j5/jeton-altere essais-j5/autre-signature essais-j5/tsa-etrangere essais-j5/aucun; do
     n=$(curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$d/referrers/$APP_DIGEST" 2>/dev/null | jq '.manifests | length' 2>/dev/null) || n="illisible"
     echo "$d : ${n:-illisible} referrer(s)"
     case "$d" in essais-j5/aucun) ;; *) [ "$n" != illisible ] && [ "$n" -ge 1 ] 2>/dev/null || { echo "NON JUGÉ : $d sans bundle, rien évalué"; exit 3; } ;; esac
   done
-  for x in "$R/chains-cle-publique.pem" "$P/tsa-chaine.pem" "$P/ca-poc.crt"; do [ -s "$x" ] || { echo "NON JUGÉ : $x absent"; exit 3; }; done
+  for x in "$R/chains-cle-publique.pem" "$P/tsa-chaine.pem" "$P/ca-poc.crt" "$P/tsa-racine-confiance.json"; do [ -s "$x" ] || { echo "NON JUGÉ : $x absent"; exit 3; }; done
+  [ "$(sha256sum < "$P/tsa-chaine.pem")" = "$(sha256sum < "$R/tsa-chaine.pem")" ] && echo "OK   chaîne TSA identique à resultats/tsa-chaine.pem" \
+    || { echo "NON JUGÉ : chaîne TSA différente de resultats/tsa-chaine.pem"; exit 3; }
   cat > "$T/pod.yaml" <<EOF
 apiVersion: v1
 kind: Pod
@@ -83,14 +90,25 @@ EOF
     "j5-sans-jeton|essais-j5/sans-jeton|$P/tsa-chaine.pem|FAIL|FAIL" "j5-aucun-bundle|essais-j5/aucun|$P/tsa-chaine.pem|FAIL|FAIL" \
     "j5-jeton-altere|essais-j5/jeton-altere|$P/tsa-chaine.pem|ERREUR|FAIL" "j5-autre-signature|essais-j5/autre-signature|$P/tsa-chaine.pem|ERREUR|FAIL" \
     "j5-tsa-etrangere|essais-j5/tsa-etrangere|$P/tsa-chaine.pem|ERREUR|FAIL" "j5-att-historique|||FAIL|FAIL" > "$T/cas.txt"
-  for a in "officiel 1.19.2|$(mise which kyverno 2>/dev/null || command -v kyverno)|4" "main corrigé|$B/kyverno-main-v2|5" "v1.19.2 corrigé|$B/kyverno-v1.19.2-v2|5"; do
+  echo "## témoins bloquants"
+  if COSIGN_REPOSITORY=$REG_HOTE/$DEPOT_BUNDLES "$cosign" verify-attestation --key "$R/chains-cle-publique.pem" --insecure-ignore-tlog \
+      --use-signed-timestamps --trusted-root "$P/tsa-racine-confiance.json" --type slsaprovenance1 --registry-cacert "$P/ca-poc.crt" \
+      "$REG_HOTE/builds/essai-signature@$APP_DIGEST" < /dev/null > "$T/cosign.out" 2>&1; then
+    echo "OK   cosign v3.1.4 accepte le bundle valide de $DEPOT_BUNDLES avec son jeton (référence de J5)"
+  else echo "NON JUGÉ : cosign refuse le bundle valide ($(grep -m1 '^Error: ' "$T/cosign.out" | cut -c1-160))"; exit 3; fi
+  ivpol "$DEPOT_BUNDLES" "" j5-temoin > "$T/temoin.yaml"
+  r=$(cli "$officiel" "$T/temoin.yaml" "$T/pod.yaml")
+  [ "${r%%$'\t'*}" = PASS ] && echo "OK   CLI officiel, j5-temoin : PASS" || { echo "NON JUGÉ : CLI officiel, j5-temoin ${r%%$'\t'*} (${r#*$'\t'})"; exit 3; }
+  for a in "officiel 1.19.2|$officiel|4" "main corrigé|$B/kyverno-main-v2|5" "v1.19.2 corrigé|$B/kyverno-v1.19.2-v2|5"; do
     IFS='|' read -r n x c <<< "$a"
     echo "## CLI $n : $x (sha256 $(sha256sum "$x" | cut -c1-16), $("$x" version 2>/dev/null | grep -m1 'Git commit' | cut -c1-40))"
     while IFS='|' read -r d r v e1 e2; do
       e=$([ "$c" = 4 ] && echo "$e1" || echo "$e2")
       ivpol "$r" "$v" "$d" > "$T/$d.yaml"
       r=$(cli "$x" "$T/$d.yaml" "$T/pod.yaml")
-      if [ "${r%%$'\t'*}" = "$e" ]; then echo "OK   $d : ${r%%$'\t'*}"; else echo "KO   $d : ${r%%$'\t'*}, attendu $e (${r#*$'\t'})"; ko=1; fi
+      if [ "${r%%$'\t'*}" = "$e" ]; then echo "OK   $d : ${r%%$'\t'*}"
+      elif [ "${r%%$'\t'*}" = INDÉTERMINÉ ]; then echo "CONSTAT $d : sortie du CLI non reconnue, attendu $e ($(head -c 200 "$T/cli.err" | tr '\n' ' '))"
+      else echo "KO   $d : ${r%%$'\t'*}, attendu $e (${r#*$'\t'})"; ko=1; fi
       motif "$x" "$T/$d.yaml" "$T/pod.yaml" | sed 's/^/     /'
     done < "$T/cas.txt"
   done

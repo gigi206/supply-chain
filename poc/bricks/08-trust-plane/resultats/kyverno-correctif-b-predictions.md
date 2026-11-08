@@ -44,3 +44,19 @@ Les cas, la politique (`ivpol` de `commun.sh`) et le pod sont ceux de J6 (`polit
 - **Effets** : lectures anonymes de Zot depuis l'hôte (referrers, manifestes, bundles) ; des lignes dans le journal d'audit de Zot. Rien n'est écrit dans Zot, le cluster ou les VM. Les fichiers temporaires vont sous `~/.cache/supply-chain-poc/08/travail/kyverno-correctif/`.
 - **Pire cas** : dépôts absents ou Zot injoignable, donc NON JUGÉ, sans écriture.
 - **Non couvert** : l'admission, prévue pour l'étape C, après W8.
+
+## Additif du 08/11/2026, 16:09 UTC, avant tout passage de `cli` (relecture du conseiller)
+
+> Heure du titre corrigée à 16:09 UTC, avant tout push : 16:12 avait été écrite par anticipation, l'heure relevée juste avant l'écriture était 16:09:33.
+
+- **Témoins bloquants ajoutés** :
+  - la chaîne `tsa-chaine.pem` du cache doit être identique à [`tsa-chaine.pem`](tsa-chaine.pem) ; c'est le cas en local, sha256 `e18e1214…`, archivée par `1f66a3c` le 06/11/2026 ;
+  - cosign v3.1.4 doit accepter le bundle valide de `horodatage/bundles` avec son jeton (référence de J5, `verif_cosign` de `tsa.sh`) ;
+  - le CLI officiel doit donner PASS sur `j5-temoin`.
+  - Sinon, l'étape s'arrête en **NON JUGÉ** (code 3) avant tout jugement. Un KO des CLI corrigés reste ainsi imputable au correctif.
+- **Prédiction ajoutée** : les trois témoins tiennent.
+- **Sortie non reconnue** (`INDÉTERMINÉ`) : classée en CONSTAT, pas en KO, comme annoncé au § Confiance.
+  - Vérifié en local, sans Zot : les trois CLI acceptent `--policy-report` et `--output-format json` et rendent le même `summary` sur une ValidatingPolicy triviale (pass 1, code 0 ; fail 1, code 1).
+- **Garde** : entrée standard fermée sur chaque `kyverno apply`.
+- **Compilation** : l'étape `construire` a été lancée à 16:03 UTC. Elle est locale et n'a rien lu dans Zot ([journal](kyverno-correctif-construire.log)). L'avoir rangée dans la « préparation à sec » accordée est une **interprétation**.
+- **Volume du passage** : environ 3 × 8 × 2 appels du CLI, une vérification cosign et 6 lectures de referrers, en lectures anonymes. Cela fait quelques centaines de lignes d'audit dans le journal de sc-stockage (environ 15 Mo/h d'après P1), sans effet attendu sur W8 ni sur P3.
