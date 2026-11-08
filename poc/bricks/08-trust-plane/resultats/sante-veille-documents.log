@@ -1,0 +1,49 @@
+# sante-veille.sh documents, 2026-11-08T18:13:59Z
+## kubernetes-sigs/promo-tools au commit 9815d7308f585535c93d3804df88f567dbe83833 (relevé à 18:14:00 UTC)
+- docs/image-promotion.md, registres acceptés :
+    7:Registry inventory reads use crane's Google-specific extensions
+    8:([`pkg/v1/google`][ggcr-google]), which rely on the GCR/Artifact Registry
+    9:tags-list API, so the promoter does not work with arbitrary OCI-compliant
+    201:use the Google-specific `google.Walk`/`google.List` API directly) nor to
+    876:[ggcr-google]: https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/google
+- docs/verification-summaries.md, identités de signature et prédicats :
+    73:| Signature | none, cosign `sha256-<digest>.sig` tag | `krel-trust@k8s-releng-prod.iam.gserviceaccount.com` | images promoted with a tag, and the platform manifests of such an index |
+    74:| [Promotion record](promotion-predicate.md) | `https://k8s.io/promo-tools/promotion/v1` | `krel-trust@k8s-releng-prod.iam.gserviceaccount.com` | every digest the promoter manifest lists, not the p
+    76:| Verification summary | `https://slsa.dev/verification_summary/v1` | `promoter-summaries@k8s-releng-prod.iam.gserviceaccount.com` | every promoted digest, platform manifests included |
+    221:  --type https://slsa.dev/verification_summary/v1 \
+    222:  --certificate-identity promoter-summaries@k8s-releng-prod.iam.gserviceaccount.com \
+    234:  --predicate-type https://slsa.dev/verification_summary/v1 \
+    238:  --verifier 'https://k8s.io/promo-tools/verifier/v1=sigstore::https://accounts.google.com::promoter-summaries@k8s-releng-prod.iam.gserviceaccount.com' \
+    245:`promoter-summaries@k8s-releng-prod.iam.gserviceaccount.com`, and the image
+    247:`krel-trust@k8s-releng-prod.iam.gserviceaccount.com`. Only the production
+    271:- Only `k8s-infra-image-promotion@k8s-artifacts-prod.iam.gserviceaccount.com`
+- go.mod, dépendances cloud et Sigstore :
+    6:	cloud.google.com/go/containeranalysis v0.21.1
+    7:	cloud.google.com/go/iam v1.15.1
+    8:	cloud.google.com/go/storage v1.70.0
+    9:	github.com/aws/aws-sdk-go-v2 v1.47.5
+    12:	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.6
+    20:	github.com/sigstore/cosign/v3 v3.1.4
+    23:	github.com/sigstore/sigstore-go v1.4.0
+    32:	google.golang.org/api v0.310.0
+    59:	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
+- README.md, installation :
+    44:go install sigs.k8s.io/promo-tools/v4/cmd/kpromo@<tag>
+    55:go install ./cmd/kpromo/...
+## oracle/macaron au commit 862d044fedd533827b5f6be2257a426bcce1551b (relevé à 18:14:02 UTC)
+- README.md, capacités et outils de build :
+    30:- **Attestation verification** for third-party and internal artifacts across major ecosystems like PyPI, npm, and Go, enabling automated provenance validatio
+    31:- **Detection of malicious or suspicious packages** in popular ecosystems using customizable heuristics ([tutorial](https://oracle.github.io/macaron/pages/tu
+    32:- **Detection of vulnerable GitHub Actions**, which is increasingly important due to recent real-world incidents like [tj-actions/changed-files](https://www.
+    33:- **Reproducible build** through static analysis of build scripts. Macaron enables **rebuilding packages from source** and **comparing to released artifacts*
+    34:- **Accurate repository and commit detection** for released artifacts, improving traceability and trust ([tutorial](https://oracle.github.io/macaron/pages/tu
+    49:- **Java**: Maven, Gradle  
+    50:- **Python**: pip, Poetry  
+    51:- **JavaScript**: npm, Yarn  
+    52:- **Go**
+    53:- **Docker**
+    57:Macaron is integrated into the [Graal Development Kit (GDK)](https://graal.cloud/gdk/), where it is used to generate **Verification Summary Attestations** fo
+- docs/source/index.rst, mentions de l'API GitHub, d'un jeton ou du mode hors ligne (comptage, non interprété) :
+    lignes : 137 ; « GitHub API » : 1 ; « GITHUB_TOKEN » : 0 ; « offline » : 0
+## limites
+- lu, rien essayé : promo-tools n'a pas été lancé contre Zot ; le besoin de réseau de Macaron n'est pas établi au-delà de ces mentions

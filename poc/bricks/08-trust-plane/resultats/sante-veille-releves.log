@@ -1,0 +1,72 @@
+# sante-veille.sh releves, 2026-11-08T18:13:36Z
+Relevé du 2026-11-08 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| promo-tools (kpromo) | kubernetes-sigs/promo-tools | distribution | non | n/d | — | — | — | — | — |
+| Macaron | oracle/macaron | analyse SLSA | non | 6.9 | 2026-11-02 | 5 | 0 | 6 | 1 |
+## kubernetes-sigs/promo-tools (relevé à 18:13:36 UTC)
+API Scorecard : HTTP 404
+nom final kubernetes-sigs/promo-tools, archivé false, licence Apache-2.0, dernier push 2026-11-06, branche main
+dernière release : v4.8.1 du 2026-11-03, 0 fichiers attachés
+releases depuis le 2025-11-08 : v4.8.1 (2026-11-03, 0 fichiers), v4.8.0 (2026-10-28, 0 fichiers), v4.7.1 (2026-10-06, 0 fichiers), v4.7.0 (2026-10-02, 0 fichiers), v4.6.0 (2026-09-17, 0 fichiers), v4.5.1 (2026-06-05, 0 fichiers), v4.5.0 (2026-05-04, 0 fichiers), v4.4.1 (2026-03-30, 0 fichiers), v4.4.0 (2026-03-04, 0 fichiers), v4.3.0 (2026-02-25, 0 fichiers), v4.2.0 (2026-02-24, 0 fichiers), v4.1.0 (2025-11-16, 0 fichiers)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  aucun
+commits depuis 2026-08-10T00:00:00Z : 245, dont robots 190 ; auteurs humains (compte, domaine de l'adresse) :
+       47 saschagrunert	redhat.com
+        2 puerco	carabiner.dev
+        2 cpanato	gmail.com
+        2 Xiaoyu-hub	163.com
+        1 xmudrii	gmail.com
+        1 chimanjain	gmail.com
+commits par mois depuis le 2025-11-08 (tous auteurs) : 2025-11 28, 2025-12 8, 2026-01 20, 2026-02 109, 2026-03 100, 2026-04 57, 2026-05 41, 2026-06 36, 2026-07 46, 2026-08 60, 2026-09 94, 2026-10 85, 2026-11 23, 
+auteurs humains sur un an : saschagrunert 110, puerco 19, cpanato 5, Xiaoyu-hub 2, xmudrii 1, dims 1, chimanjain 1, Iceber 1, 
+dernier commit de chaque auteur humain principal sur un an :
+  saschagrunert : 2026-11
+  puerco : 2026-08
+  cpanato : 2026-09
+100 dernières PR fusionnées, du 2026-08-31 au 2026-11-06 :
+  auteurs : app/dependabot 53, saschagrunert 44, Xiaoyu-hub 1, cpanato 1, xmudrii 1
+  fusionneurs : app/kubernetes-prow 100
+PR ouvertes : 3, dont dependabot 0 (la plus ancienne de dependabot : -)
+SECURITY.md : absent du dépôt
+avis publiés : 0 ; depuis un an : 0
+## oracle/macaron (relevé à 18:13:50 UTC)
+API Scorecard : HTTP 200
+nom final oracle/macaron, archivé false, licence UPL-1.0, dernier push 2026-10-30, branche main
+dernière release : v0.25.0 du 2026-07-26, 9 fichiers attachés
+releases depuis le 2025-11-08 : v0.25.0 (2026-07-26, 9 fichiers), v0.24.0 (2026-04-24, 8 fichiers), v0.23.0 (2026-03-31, 8 fichiers), v0.22.0 (2026-02-25, 8 fichiers), v0.21.0 (2026-02-23, 8 fichiers), v0.20.0 (2025-12-04, 8 fichiers), v0.19.0 (2025-11-17, 8 fichiers)
+fichiers de la dernière release liés aux signatures et à la provenance :
+  macaron-0.25.0-py3-none-linux_x86_64-sbom-go.json
+  macaron-0.25.0-py3-none-linux_x86_64-sbom.json
+  macaron-0.25.0-sbom-docker.json
+commits depuis 2026-08-10T00:00:00Z : 3, dont robots 2 ; auteurs humains (compte, domaine de l'adresse) :
+        1 lenamonj	users.noreply.github.com
+commits par mois depuis le 2025-11-08 (tous auteurs) : 2025-11 11, 2025-12 11, 2026-01 5, 2026-02 15, 2026-03 14, 2026-04 18, 2026-05 5, 2026-06 5, 2026-07 9, 2026-08 4, 2026-09 3, 
+auteurs humains sur un an : behnazh-w 48, AbhinavPradeep 16, jenstroeger 9, - 8, nicallen 3, Demolus13 3, RuchitAgrawal 2, lenamonj 1, 
+dernier commit de chaque auteur humain principal sur un an :
+  behnazh-w : 2026-08
+  AbhinavPradeep : 2026-07
+  jenstroeger : 2026-07
+100 dernières PR fusionnées, du 2025-10-24 au 2026-09-09 :
+  auteurs : behnazh-w 49, AbhinavPradeep 17, app/dependabot 10, jenstroeger 9, art1f1c3R 7, nicallen 3, Demolus13 2, RuchitAgrawal 2, lenamonj 1
+  fusionneurs : behnazh-w 80, AbhinavPradeep 9, art1f1c3R 6, nicallen 3, app/dependabot 2
+PR ouvertes : 48, dont dependabot 27 (la plus ancienne de dependabot : 2026-03-30)
+SECURITY.md : SECURITY.md
+avis publiés : 0 ; depuis un an : 0
+## kubernetes-sigs/promo-tools : OWNERS (approbateurs et relecteurs, alias de SIG Release)
+  approvers:
+  - sig-release-leads
+  - release-engineering-approvers
+  - promo-tools-approvers
+  reviewers:
+  - release-engineering-reviewers
+  - promo-tools-reviewers
+  labels:
+  - sig/release
+  - area/artifacts
+  - area/release-eng
+## kubernetes-sigs/promo-tools : politique de sécurité de l'organisation kubernetes-sigs
+SECURITY.md de kubernetes-sigs/.github : présent, 1069 octets
+## limites
+- employeurs non vérifiés (domaines des adresses seulement) ; signatures des fichiers attachés aux releases non vérifiées

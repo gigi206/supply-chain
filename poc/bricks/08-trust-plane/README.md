@@ -2037,3 +2037,25 @@ Accord du propriétaire : « Oui » à « Je lance le passage de l'étape B (lec
 Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le formulaire web (modèle « Bug Report: CLI »), après deux relectures du conseiller ; URL donnée par le propriétaire à 17:21 UTC : https://github.com/kyverno/kyverno/issues/18525. Relevé à 17:21:28 UTC : ouverte, étiquettes `bug`, `type:cli`, `triage`, 0 commentaire. Texte publié archivé ([`issue-18525-publiee.md`](kyverno-correctif/issue-18525-publiee.md)) : titre et champs identiques au texte validé (champ « Kyverno logs » identique aux blancs près), deux cases cochées par le propriétaire, divulgation de l'aide de l'IA présente. Reproducteur : [`repro_tsa_test.go.txt`](kyverno-correctif/repro_tsa_test.go.txt) (journaux `k1`, `k2`).
 
 **Suite** : la PR attend que les mainteneurs retirent l'étiquette `triage` (règle 4 de leur politique IA) ; avant elle, regrouper les tests, golangci-lint (accord pour le téléchargement), identité DCO, fork `gigi206/kyverno` (action publique), chacun avec l'accord du propriétaire. Étape C (admission) : après W8.
+
+## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
+
+Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.
+
+- **promo-tools : écarté comme outil, gardé comme référence de conception.**
+  - **Pourquoi il est écarté** : `docs/image-promotion.md` (l. 7 à 9, commit `9815d7308f58`) dit que l'inventaire passe par les extensions Google de crane et que le promoteur ne fonctionne pas avec n'importe quel registre OCI. Il ne marcherait donc pas avec Zot. C'est lu, pas essayé.
+  - **Ses autres dépendances** : il dépend aussi de GCP et d'AWS (`go.mod`), signe avec des comptes de service GCP (`*.iam.gserviceaccount.com`) et tourne dans Prow.
+  - **Ce qui manque pour nos règles** : aucun fichier n'est attaché à ses releases (installation par `go install`). Il n'y a donc rien à vérifier par empreinte ou par signature.
+  - **Ce qu'on retient comme modèle** : la promotion par digest d'après un manifeste relu ; la politique de provenance évaluée avant la copie ; la recopie des seules attestations acceptées ; l'enregistrement de promotion signé (prédicat `https://k8s.io/promo-tools/promotion/v1`) ; la VSA signée par le promoteur.
+  - **Ce qui diffère chez nous** : `docs/02` n'a pas d'étape de staging vers la production. La VSA vient du replay, et la porte Conforma juge.
+- **Macaron : verdict inchangé** (« Option » au doc 00, « À surveiller, hors chemin critique » au doc 04), mais son activité baisse :
+  - 3 commits en 90 jours, dont 2 de dependabot ;
+  - aucun commit en octobre ni en novembre ;
+  - 80 des 100 dernières fusions faites par un même compte, et aucune fusion depuis le 09/09/2026 ;
+  - 27 PR dependabot ouvertes. Ma réponse précédente au propriétaire disait « une dizaine » : c'était faux ;
+  - le projet passe en « Risqué » le 27/07/2027 s'il ne publie pas de nouvelle release.
+  - **Ce qu'il apporterait** : seule la détection de paquets malveillants recoupe GuardDog et malicious-packages. La vérification de provenance des paquets PyPI, npm et Go n'est pas couverte chez nous (OSS Rebuild reste une option au doc 00) ; c'est la seule capacité nouvelle de Macaron, et elle ne change pas son verdict vu la baisse d'activité. (Corrigé à 18:16 UTC, avant tout push : la première version disait ces deux capacités « déjà couvertes », ce qui était faux pour la provenance.)
+- **Non vérifié** :
+  - les employeurs (seuls les domaines des adresses ont été lus) ;
+  - les 9 fichiers de la release v0.25.0 de Macaron (aucun n'a un nom de signature ou de provenance) ;
+  - le besoin de réseau de Macaron (une seule mention de l'API GitHub dans `docs/source/index.rst`).
