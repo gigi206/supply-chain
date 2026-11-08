@@ -1,0 +1,17 @@
+# kyverno-correctif.sh construire, 2026-11-08T16:03:34Z
+## main (go1.27.3)
+OK   tête 2be1bc3fe3b4150501caac2c95ee58039824cdce
+OK   correctif v2 présent (patch final applicable à l'envers)
+OK   construit : ~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-main-v2
+sha256 afd69baae540bb81e7a4a94f2f71fa690bb0c6c3e73853d4cea4c0e40004d9d9
+  Version: v0.0.0-20261108123453-2be1bc3fe3b4+dirty
+  Time: 2026-11-08T12:34:53Z
+  Git commit ID: 2be1bc3fe3b4150501caac2c95ee58039824cdce
+## v1.19.2 (go1.26.10)
+OK   tête e63308f1e16c05cd009ac4864be6ec25c66b49be
+OK   correctif v2 présent (patch final applicable à l'envers)
+OK   construit : ~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-v1.19.2-v2
+sha256 d8b7713cd376dae5eedb60fae22028c6dd58cbf7393335fc0180056eb719e472
+  Version: v1.19.2+dirty
+  Time: 2026-10-20T22:13:49Z
+  Git commit ID: e63308f1e16c05cd009ac4864be6ec25c66b49be
