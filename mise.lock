@@ -120,14 +120,14 @@ url = "https://github.com/project-zot/zot/releases/download/v2.1.22/zot-linux-am
 url_api = "https://api.github.com/repos/project-zot/zot/releases/assets/616098185"
 
 [[tools."aqua:rootless-containers/rootlesskit"]]
-version = "2.3.5"
+version = "2.3.6"
 backend = "aqua:rootless-containers/rootlesskit"
-specifiers = ["2.3.5"]
+specifiers = ["2.3.6"]
 
 [tools."aqua:rootless-containers/rootlesskit"."platforms.linux-x64"]
-checksum = "sha256:118208e25becd144ee7317c172fc9decce7b16174d5c1bbf80f1d1d0eacc6b5f"
-url = "https://github.com/rootless-containers/rootlesskit/releases/download/v2.3.5/rootlesskit-x86_64.tar.gz"
-url_api = "https://api.github.com/repos/rootless-containers/rootlesskit/releases/assets/252821626"
+checksum = "sha256:afc52e9fa2f7a2d4bb692f675cf3d2f70f3a184f02593e8b18cfbbbc34cbfd41"
+url = "https://github.com/rootless-containers/rootlesskit/releases/download/v2.3.6/rootlesskit-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/rootless-containers/rootlesskit/releases/assets/330033021"
 provenance = "github-attestations"
 
 [[tools."aqua:sigstore/cosign"]]
