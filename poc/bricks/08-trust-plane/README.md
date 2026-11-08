@@ -2031,3 +2031,9 @@ Accord du propriétaire : « Oui » à « Je lance le passage de l'étape B (lec
 
 - **Lecture** : sur nos artefacts réels, dont le jeton embarque le certificat de la TSA, le correctif v2 rend au contrôle 9 de Kyverno le comportement de cosign en J5 : même acceptation, mêmes trois refus avec les mêmes motifs, plus aucune « internal error ». Prédiction de confiance moyenne sur `j5-tsa-etrangere` tenue, motif compris. « nil pointer » dans la sortie verbeuse : 4 cas avec le CLI officiel, 0 avec les CLI corrigés.
 - **Non couvert** : l'admission (étape C, après W8 ; parité CLI et admission mesurée en J6 sur 25 décisions sur 25) ; golangci-lint. Le ticket ou la PR chez Kyverno restent à décider, avec validation du texte exact.
+
+### Issue publiée chez Kyverno : kyverno/kyverno#18525 (08/11/2026, 17:20:55 UTC)
+
+Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le formulaire web (modèle « Bug Report: CLI »), après deux relectures du conseiller ; URL donnée par le propriétaire à 17:21 UTC : https://github.com/kyverno/kyverno/issues/18525. Relevé à 17:21:28 UTC : ouverte, étiquettes `bug`, `type:cli`, `triage`, 0 commentaire. Texte publié archivé ([`issue-18525-publiee.md`](kyverno-correctif/issue-18525-publiee.md)) : titre et champs identiques au texte validé (champ « Kyverno logs » identique aux blancs près), deux cases cochées par le propriétaire, divulgation de l'aide de l'IA présente. Reproducteur : [`repro_tsa_test.go.txt`](kyverno-correctif/repro_tsa_test.go.txt) (journaux `k1`, `k2`).
+
+**Suite** : la PR attend que les mainteneurs retirent l'étiquette `triage` (règle 4 de leur politique IA) ; avant elle, regrouper les tests, golangci-lint (accord pour le téléchargement), identité DCO, fork `gigi206/kyverno` (action publique), chacun avec l'accord du propriétaire. Étape C (admission) : après W8.
