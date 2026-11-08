@@ -1960,3 +1960,29 @@ Demande du propriétaire : « Vérifie d'abord en détails le code source de kyv
 - **Gravité, lue** : sous `Deny`, une erreur de règle refuse (`handler.go`, `validationResponse`) et `failurePolicy` n'est lu ni par le webhook ni par le moteur : pas de contournement. Sous `Audit`, l'image est admise comme pour tout échec, mais le rapport dit « error » au lieu de « fail ». Le panic est rattrapé en « internal error » (journaux de J5 et J6). Bug de fonctionnement, pas de sécurité, d'après cette lecture.
 - **Correction plausible** (non écrite) : dans `checkOptions`, quand la chaîne TSA est fournie et que `TrustedMaterial` est nil, construire un `TrustedMaterial` réduit à cette TSA (le type `tsaTrustedMaterial` existe déjà), ou refuser la configuration avec une erreur claire comme cosign.
 - **Corrections de ce README, datées** : le constat de J5 attribue l'enveloppe nil à cosign v3.1.4 ; c'est cosign v3.1.2 qui est embarqué par Kyverno 1.19.2 (code identique). La phrase « le correctif en brouillon #16048 ne couvre que le chemin keyless » reste vraie, mais l'équivalent a été fusionné par #16800 ; #16048 est en conflit (`dirty`). Dans `sante-sigstore-fulcio.log`, l'étiquette « dernière valeur relevée » désigne le dernier journal de rejeu par ordre alphabétique, pas le plus récent.
+
+### Correctif du plantage de `tsaCertChain`, validé en local (08/11/2026, 15:25 à 15:37 UTC, étape A)
+
+Accord du propriétaire : « Oui », en réponse à « Je lance l'étape A maintenant, ou pas maintenant ? » (patch et tests en local, sans cluster ni Zot ; effets et pire cas cités). Demandes associées : « Il faut valider le correctif en local de bout en bout avant de le proposer », « Et écrire les tests pour que ça ne se reproduise plus ». Rien installé (Go 1.27.3 et 1.26.10 déjà en cache, vérifiés par sum.golang.org), rien publié, rien lu ni écrit dans le cluster, Zot ou les VM. Fichiers : [`kyverno-correctif/`](kyverno-correctif/).
+
+- **Sources** : Kyverno main `2be1bc3fe3b4` (Go 1.27.3) et v1.19.2 `e63308f1e16c` (Go 1.26.10), clonés dans le cache, SHA vérifiés ; `GOTOOLCHAIN=local`, `GOFLAGS=-mod=readonly`, `GOSUMDB=sum.golang.org` ([`env.sh.txt`](kyverno-correctif/env.sh.txt)) ; modules : 3,5 Go dans le cache.
+- **Correctif** ([`correctif.patch`](kyverno-correctif/correctif.patch), sha256 `ad025f72…`, applicable tel quel sur main et sur v1.19.2) : dans `checkOptions`, un attestor **à clé** dont le `TrustedMaterial` est nil (journal ignoré) reçoit un matériel réduit à la TSA configurée, comme l'exige le CLI cosign (`--trusted-root`) ; une chaîne sans racine est refusée avec une erreur claire. Le cas déjà fusionné par #16800 (racine existante) est factorisé, sans changement. Les attestors **à certificat** gardent leurs options : un matériel réduit à la TSA ferait vérifier leur chaîne de certificats contre lui.
+- **Tests de non-régression** (fichier `tsa_key_attestor_test.go` du patch), sans réseau, avec la TSA virtuelle de sigstore-go (`pkg/testing/ca`), sur les deux chemins (signature d'image et attestation) d'un bundle v0.3 signé par clé et poussé dans un registre en mémoire :
+
+| Cas | Sans correctif (main et v1.19.2) | Avec correctif (main et v1.19.2) |
+|---|---|---|
+| jeton valide de la TSA configurée | **panic** (nil pointer, `tsa.go:93`) | accepté |
+| jeton altéré | **panic** | refusé : `x509: ECDSA verification failure` |
+| jeton d'une autre signature | **panic** | refusé : `hashed messages don't match` |
+| jeton d'une TSA étrangère | **panic** | refusé : `x509: ECDSA verification failure` |
+| sans jeton | refusé (`threshold not met`) | refusé, inchangé |
+| sans `tsaCertChain`, bundle avec jeton | accepté | accepté, inchangé |
+| `checkOptions`, clé et chaîne TSA : matériel réduit à la TSA | échec (nil) | conforme |
+| `checkOptions`, chaîne sans racine | échec (aucune erreur) | erreur claire |
+| `checkOptions`, attestor à certificat et chaîne TSA | `TrustedMaterial` nil | inchangé |
+| `TestCheckOptions_KeyBased_AirGapped` (existant) | conforme | conforme |
+
+  Journaux définitifs : [`b1`](kyverno-correctif/b1-sans-correctif-main.log), [`b2`](kyverno-correctif/b2-avec-correctif-main.log), [`d1`](kyverno-correctif/d1-sans-correctif-v1.19.2.log), [`d2`](kyverno-correctif/d2-avec-correctif-v1.19.2.log). Mêmes cas qu'en J5 et J6, mêmes motifs que cosign en J5, sauf la TSA étrangère (cosign : « certificate embedded in the TSR does not match », la TSA virtuelle n'embarquant pas son certificat).
+- **Régression** (`go test -race` sur `./pkg/image/...` et `./pkg/cel/policies/ivpol/...`, avec le correctif) : main 9 paquets sur 9 ([`c1`](kyverno-correctif/c1-regression-main.log)), v1.19.2 10 sur 10 ([`c2`](kyverno-correctif/c2-regression-v1.19.2.log)).
+- **Passages ratés** : premier essai de 15:28, préparation en échec sur le Go 1.24.7 de mise (GOROOT, corrigé dans `env.sh`) : **son journal a été écrasé** par le passage suivant, qui le cite en en-tête ; `a1` (15:29, le fichier de test n'était pas dans le clone, seul l'ancien test a tourné ; constat ajouté au journal) ; `a2` (15:30, test non compilé : `TimestampVerificationData` est dans `bundle/v1`) ; `a3` à `a5` : premiers passages avec des motifs attendus plus lâches, resserrés ensuite.
+- **Non couvert** : signature au format historique (`.sig`, `.att`) avec une clé et une chaîne TSA, non construite dans les tests ; lu dans cosign v3.1.3 (`VerifyRFC3161Timestamp`) : avec le matériel réduit, la même TSA est vérifiée par `VerifySignedTimestamp` au lieu des champs historiques. **Changement de comportement à signaler dans la PR** : une chaîne TSA sans racine, sur un attestor à clé hors ligne, était acceptée à la configuration ; elle est désormais refusée (l'API exige la racine). golangci-lint non passé (binaire à télécharger, sans accord). Étape B (CLI corrigé sur les bundles de J5 dans Zot) et étape C (admission) : non faites, chacune demande son accord.

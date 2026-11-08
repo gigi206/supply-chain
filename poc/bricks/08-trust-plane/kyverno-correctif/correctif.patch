@@ -1,0 +1,309 @@
+diff --git a/pkg/image/verifiers/ivpol/cosign/opts.go b/pkg/image/verifiers/ivpol/cosign/opts.go
+index c750133..93078b6 100644
+--- a/pkg/image/verifiers/ivpol/cosign/opts.go
++++ b/pkg/image/verifiers/ivpol/cosign/opts.go
+@@ -76,6 +76,21 @@ func (t tsaTrustedMaterial) TimestampingAuthorities() []root.TimestampingAuthori
+ 	return []root.TimestampingAuthority{t.timestampingAuthority}
+ }
+ 
++// tsaTrustedMaterials returns one trusted material per TSA root, each holding
++// only that timestamp authority.
++func tsaTrustedMaterials(roots, intermediates []*x509.Certificate, leaf *x509.Certificate) []root.TrustedMaterial {
++	materials := make([]root.TrustedMaterial, 0, len(roots))
++	for _, tsaRoot := range roots {
++		tsa := &root.SigstoreTimestampingAuthority{
++			Root:          tsaRoot,
++			Intermediates: intermediates,
++			Leaf:          leaf,
++		}
++		materials = append(materials, tsaTrustedMaterial{BaseTrustedMaterial: &root.BaseTrustedMaterial{}, timestampingAuthority: tsa})
++	}
++	return materials
++}
++
+ // countPEMCertBlocks returns the number of CERTIFICATE PEM blocks in the input
+ // using a cheap byte scan, so we can reject oversized chains before doing the
+ // expensive PEM/ASN.1 parsing work.
+@@ -178,17 +193,21 @@ func checkOptions(ctx context.Context, att *v1beta1.Cosign, baseROpts []remote.O
+ 			opts.TSAIntermediateCertificates = intermediates
+ 			opts.TSARootCertificates = roots
+ 			opts.UseSignedTimestamps = true
+-			if opts.TrustedMaterial != nil && len(roots) > 0 {
+-				trustedMaterials := root.TrustedMaterialCollection{opts.TrustedMaterial}
+-				for _, tsaRoot := range roots {
+-					tsa := &root.SigstoreTimestampingAuthority{
+-						Root:          tsaRoot,
+-						Intermediates: intermediates,
+-						Leaf:          opts.TSACertificate,
+-					}
+-					trustedMaterials = append(trustedMaterials, tsaTrustedMaterial{BaseTrustedMaterial: &root.BaseTrustedMaterial{}, timestampingAuthority: tsa})
++			switch {
++			case opts.TrustedMaterial != nil && len(roots) > 0:
++				opts.TrustedMaterial = append(root.TrustedMaterialCollection{opts.TrustedMaterial}, tsaTrustedMaterials(roots, intermediates, opts.TSACertificate)...)
++			case opts.TrustedMaterial == nil && att.Key != nil:
++				// Key attestors with the transparency log ignored skip the Sigstore
++				// infrastructure, so there is no trusted root to merge into. cosign
++				// verifies Sigstore bundles (v0.3) against TrustedMaterial only and
++				// ignores the TSA* fields set above; with a nil TrustedMaterial,
++				// sigstore-go dereferences it as soon as a bundle carries an RFC 3161
++				// timestamp. Give such attestors a trusted material holding only the
++				// configured TSA, as cosign's CLI requires (--trusted-root).
++				if len(roots) == 0 {
++					return nil, fmt.Errorf("TSA certificate chain must contain the root CA certificate")
+ 				}
+-				opts.TrustedMaterial = trustedMaterials
++				opts.TrustedMaterial = root.TrustedMaterialCollection(tsaTrustedMaterials(roots, intermediates, opts.TSACertificate))
+ 			}
+ 		}
+ 	}
+diff --git a/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go b/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+new file mode 100644
+index 0000000..70d95d8
+--- /dev/null
++++ b/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+@@ -0,0 +1,245 @@
++package cosign
++
++import (
++	"context"
++	"crypto/x509"
++	"encoding/pem"
++	"fmt"
++	"strings"
++	"testing"
++
++	"github.com/go-logr/logr"
++	"github.com/kyverno/api/api/policies.kyverno.io/v1beta1"
++	protobundle "github.com/sigstore/protobuf-specs/gen/pb-go/bundle/v1"
++	protocommon "github.com/sigstore/protobuf-specs/gen/pb-go/common/v1"
++	"github.com/sigstore/sigstore-go/pkg/root"
++	"github.com/sigstore/sigstore-go/pkg/sign"
++	"github.com/sigstore/sigstore-go/pkg/testing/ca"
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++	"google.golang.org/protobuf/encoding/protojson"
++)
++
++// Key attestors that ignore the transparency log and set ctlog.tsaCertChain
++// verify Sigstore bundles (v0.3) carrying an RFC 3161 timestamp from that TSA.
++// Before the fix, checkOptions left TrustedMaterial nil on this path, cosign
++// ignored the TSA* fields for Sigstore bundles, and sigstore-go dereferenced
++// the nil TrustedMaterial as soon as a bundle carried a timestamp: every such
++// bundle, genuine or forged, panicked instead of being verified.
++
++const tsaTestPredicateType = "https://example.com/predicate"
++
++// tsaChainPEM returns the PEM chain (leaf, intermediates, root) of the
++// virtual TSA, in the form ctlog.tsaCertChain expects.
++func tsaChainPEM(t *testing.T, vs *ca.VirtualSigstore) string {
++	t.Helper()
++	tsas := vs.TimestampingAuthorities()
++	require.Len(t, tsas, 1)
++	tsa, ok := tsas[0].(*root.SigstoreTimestampingAuthority)
++	require.True(t, ok)
++	var b strings.Builder
++	for _, c := range append(append([]*x509.Certificate{tsa.Leaf}, tsa.Intermediates...), tsa.Root) {
++		require.NoError(t, pem.Encode(&b, &pem.Block{Type: "CERTIFICATE", Bytes: c.Raw}))
++	}
++	return b.String()
++}
++
++// timestampFn returns the RFC 3161 response to embed in a bundle whose DSSE
++// signature is sig, or nil for a bundle without timestamp.
++type timestampFn func(t *testing.T, sig []byte) []byte
++
++// signV3BundleWithTimestamp builds a key-signed v0.3 bundle like signV3Bundle,
++// then embeds the timestamp returned by ts (if any) in its verification
++// material.
++func signV3BundleWithTimestamp(t *testing.T, subjectDigestHex string, ts timestampFn) ([]byte, string) {
++	t.Helper()
++	kp, err := sign.NewEphemeralKeypair(nil)
++	require.NoError(t, err)
++	statement := fmt.Sprintf(
++		`{"_type":"https://in-toto.io/Statement/v1","predicateType":%q,"subject":[{"name":"subject","digest":{"sha256":%q}}],"predicate":{}}`,
++		tsaTestPredicateType, subjectDigestHex,
++	)
++	pb, err := sign.Bundle(&sign.DSSEData{Data: []byte(statement), PayloadType: "application/vnd.in-toto+json"}, kp, sign.BundleOptions{})
++	require.NoError(t, err)
++	if ts != nil {
++		if tsr := ts(t, pb.GetDsseEnvelope().GetSignatures()[0].GetSig()); tsr != nil {
++			pb.VerificationMaterial.TimestampVerificationData = &protobundle.TimestampVerificationData{
++				Rfc3161Timestamps: []*protocommon.RFC3161SignedTimestamp{{SignedTimestamp: tsr}},
++			}
++		}
++	}
++	raw, err := protojson.Marshal(pb)
++	require.NoError(t, err)
++	pubPEM, err := kp.GetPublicKeyPem()
++	require.NoError(t, err)
++	return raw, pubPEM
++}
++
++func timestampBy(vs *ca.VirtualSigstore) timestampFn {
++	return func(t *testing.T, sig []byte) []byte {
++		t.Helper()
++		tsr, err := vs.TimestampResponse(sig)
++		require.NoError(t, err)
++		return tsr
++	}
++}
++
++func tsaKeyAttestor(pubPEM, chain string) *v1beta1.Cosign {
++	att := keyAttestorFor(pubPEM)
++	att.CTLog.TSACertChain = chain
++	return att
++}
++
++// verifyBothPaths runs the image-signature and the attestation paths on the
++// same bundle and returns their errors. A panic fails the test.
++func verifyBothPaths(t *testing.T, ts timestampFn, chain func(t *testing.T) string) (error, error) {
++	t.Helper()
++	repo, _ := newBundleRegistry(t)
++	subject := pushSubject(t, repo, "subject")
++	img := fetchTestImage(t, repo.Tag("subject").String())
++	bundleJSON, pubPEM := signV3BundleWithTimestamp(t, subject.Digest.Hex, ts)
++	pushReferrer(t, repo, subject, bundleJSON, testBundleMediaType, testBundleMediaType)
++
++	v := NewVerifier(nil, logr.Discard())
++	cosignAtt := keyAttestorFor(pubPEM)
++	if chain != nil {
++		cosignAtt = tsaKeyAttestor(pubPEM, chain(t))
++	}
++	attestor := &v1beta1.Attestor{Name: "test", Cosign: cosignAtt}
++	attestation := &v1beta1.Attestation{Name: "test", InToto: &v1beta1.InToto{Type: tsaTestPredicateType}}
++
++	var sigErr, attErr error
++	require.NotPanics(t, func() { sigErr = v.VerifyImageSignature(context.TODO(), img, attestor) }, "image signature path")
++	require.NotPanics(t, func() { attErr = v.VerifyAttestationSignature(context.TODO(), img, attestation, attestor) }, "attestation path")
++	return sigErr, attErr
++}
++
++func TestKeyAttestor_TSACertChain_SigstoreBundle(t *testing.T) {
++	tsa, err := ca.NewVirtualSigstore()
++	require.NoError(t, err)
++	foreign, err := ca.NewVirtualSigstore()
++	require.NoError(t, err)
++	chainOf := func(vs *ca.VirtualSigstore) func(t *testing.T) string {
++		return func(t *testing.T) string { return tsaChainPEM(t, vs) }
++	}
++
++	tests := []struct {
++		name    string
++		ts      timestampFn
++		chain   func(t *testing.T) string
++		wantErr string // empty: both paths verify
++	}{
++		{
++			name:  "genuine timestamp from the configured TSA",
++			ts:    timestampBy(tsa),
++			chain: chainOf(tsa),
++		},
++		{
++			name: "tampered timestamp",
++			ts: func(t *testing.T, sig []byte) []byte {
++				tsr := timestampBy(tsa)(t, sig)
++				tsr[len(tsr)-1] ^= 0xff
++				return tsr
++			},
++			chain:   chainOf(tsa),
++			wantErr: "ECDSA verification failure",
++		},
++		{
++			name: "timestamp over another signature",
++			ts: func(t *testing.T, _ []byte) []byte {
++				return timestampBy(tsa)(t, []byte("another signature"))
++			},
++			chain:   chainOf(tsa),
++			wantErr: "hashed messages don't match",
++		},
++		{
++			name:    "timestamp from a foreign TSA",
++			ts:      timestampBy(foreign),
++			chain:   chainOf(tsa),
++			wantErr: "ECDSA verification failure",
++		},
++		{
++			name:    "no timestamp",
++			ts:      nil,
++			chain:   chainOf(tsa),
++			wantErr: "threshold not met for verified signed timestamps",
++		},
++		{
++			// Unchanged behaviour: without tsaCertChain no timestamp is required
++			// nor checked, even when the bundle carries one.
++			name:  "no tsaCertChain, bundle with timestamp",
++			ts:    timestampBy(tsa),
++			chain: nil,
++		},
++	}
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			sigErr, attErr := verifyBothPaths(t, tt.ts, tt.chain)
++			t.Logf("image signature path: %v", sigErr)
++			t.Logf("attestation path: %v", attErr)
++			if tt.wantErr == "" {
++				assert.NoError(t, sigErr, "image signature path")
++				assert.NoError(t, attErr, "attestation path")
++				return
++			}
++			for path, err := range map[string]error{"image signature path": sigErr, "attestation path": attErr} {
++				require.Error(t, err, path)
++				assert.NotContains(t, err.Error(), "nil pointer", path)
++				assert.Contains(t, err.Error(), tt.wantErr, path)
++			}
++		})
++	}
++}
++
++func TestCheckOptions_KeyBased_TSACertChain_TrustedMaterial(t *testing.T) {
++	tsa, err := ca.NewVirtualSigstore()
++	require.NoError(t, err)
++	baseROpts, baseNOpts := baseOpts()
++
++	opts, err := checkOptions(context.Background(), tsaKeyAttestor(testPublicKey, tsaChainPEM(t, tsa)), baseROpts, baseNOpts, nil)
++	require.NoError(t, err)
++	assert.True(t, opts.UseSignedTimestamps)
++	require.NotNil(t, opts.TrustedMaterial, "a key attestor with a TSA chain needs trusted material for Sigstore bundles")
++	tsas := opts.TrustedMaterial.TimestampingAuthorities()
++	require.Len(t, tsas, 1)
++	configured, ok := tsas[0].(*root.SigstoreTimestampingAuthority)
++	require.True(t, ok)
++	require.Len(t, opts.TSARootCertificates, 1)
++	assert.True(t, configured.Root.Equal(opts.TSARootCertificates[0]))
++	assert.Empty(t, opts.TrustedMaterial.FulcioCertificateAuthorities(), "only the TSA is trusted")
++	assert.Empty(t, opts.TrustedMaterial.RekorLogs(), "only the TSA is trusted")
++	assert.Empty(t, opts.TrustedMaterial.CTLogs(), "only the TSA is trusted")
++}
++
++func TestCheckOptions_KeyBased_TSACertChain_WithoutRoot(t *testing.T) {
++	tsa, err := ca.NewVirtualSigstore()
++	require.NoError(t, err)
++	tsaRoot := tsa.TimestampingAuthorities()[0].(*root.SigstoreTimestampingAuthority)
++	var leafOnly strings.Builder
++	require.NoError(t, pem.Encode(&leafOnly, &pem.Block{Type: "CERTIFICATE", Bytes: tsaRoot.Leaf.Raw}))
++	baseROpts, baseNOpts := baseOpts()
++
++	_, err = checkOptions(context.Background(), tsaKeyAttestor(testPublicKey, leafOnly.String()), baseROpts, baseNOpts, nil)
++	require.Error(t, err)
++	assert.Contains(t, err.Error(), "root CA certificate")
++}
++
++// Certificate attestors keep their previous options: a TSA-only trusted
++// material would make cosign verify their certificate chain against it.
++func TestCheckOptions_CertificateBased_TSACertChain_Unchanged(t *testing.T) {
++	tsa, err := ca.NewVirtualSigstore()
++	require.NoError(t, err)
++	leaf := tsa.TimestampingAuthorities()[0].(*root.SigstoreTimestampingAuthority).Leaf
++	var certPEM strings.Builder
++	require.NoError(t, pem.Encode(&certPEM, &pem.Block{Type: "CERTIFICATE", Bytes: leaf.Raw}))
++	baseROpts, baseNOpts := baseOpts()
++
++	att := &v1beta1.Cosign{
++		Certificate: &v1beta1.Certificate{Certificate: &v1beta1.StringOrExpression{Value: certPEM.String()}},
++		CTLog:       &v1beta1.CTLog{InsecureIgnoreTlog: true, InsecureIgnoreSCT: true, TSACertChain: tsaChainPEM(t, tsa)},
++	}
++	opts, err := checkOptions(context.Background(), att, baseROpts, baseNOpts, nil)
++	require.NoError(t, err)
++	assert.True(t, opts.UseSignedTimestamps)
++	assert.Nil(t, opts.TrustedMaterial)
++}

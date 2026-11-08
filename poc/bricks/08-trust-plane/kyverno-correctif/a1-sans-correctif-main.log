@@ -1,0 +1,7 @@
+== sans correctif, main 2be1bc3fe3b4, go1.27.3, 15:29:01 UTC (premier passage du 15:28 en échec de préparation : GOROOT de mise 1.24.7, corrigé)
+=== RUN   TestCheckOptions_KeyBased_AirGapped
+--- PASS: TestCheckOptions_KeyBased_AirGapped (0.00s)
+PASS
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	1.073s
+code 0
+CONSTAT (noté à 15:30:07 UTC) : passage invalide, le fichier tsa_key_attestor_test.go n'était pas dans le clone ; seul TestCheckOptions_KeyBased_AirGapped a tourné

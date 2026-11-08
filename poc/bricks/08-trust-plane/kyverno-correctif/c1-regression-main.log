@@ -1,0 +1,12 @@
+== régression avec correctif, main 2be1bc3fe3b4, go1.27.3, 15:31:34 UTC ; paquets ./pkg/image/... et ./pkg/cel/policies/ivpol/...
+ok  	github.com/kyverno/kyverno/pkg/image/verification/cache	1.338s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/credentials	1.159s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/evaluator	11.514s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/variables	1.072s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers	2.422s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	95.478s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/notary	17.715s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/autogen	1.022s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/engine	14.110s
+code 0
+fin 15:33:37 UTC

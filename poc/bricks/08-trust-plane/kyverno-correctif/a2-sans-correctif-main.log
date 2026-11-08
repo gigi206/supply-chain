@@ -1,0 +1,6 @@
+== sans correctif, main 2be1bc3fe3b4, go1.27.3, 15:30:07 UTC, opts.go intact : oui
+# github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign [github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.test]
+pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:65:69: undefined: protocommon.TimestampVerificationData
+FAIL	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign [build failed]
+FAIL
+code 1
