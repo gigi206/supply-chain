@@ -1,0 +1,49 @@
+# sante-sigstore.sh bogue_tsa, 2026-11-08T15:10:20Z
+versions embarquées par Kyverno v1.19.2 (go.mod) : cosign v3.1.2, sigstore-go v1.3.0
+## 1. Kyverno v1.19.2, opts.go : clé et insecureIgnoreTlog donnent un TrustedMaterial nil, la chaîne TSA va dans les champs historiques (relevé à 15:10:23 UTC)
+    opts.go:90:	skipSigstoreInfra := keyOrCert && ignoreTlog
+    opts.go:119:	if !skipSigstoreInfra {
+    opts.go:148:		opts.TrustedMaterial = trustedMaterial
+    opts.go:171:				opts.TSACertificate = leaves[0]
+    opts.go:174:			opts.TSARootCertificates = roots
+    opts.go:175:			opts.UseSignedTimestamps = true
+    opts.go:176:			if opts.TrustedMaterial != nil && len(roots) > 0 {
+    opts.go:186:				opts.TrustedMaterial = trustedMaterials
+## 2. Kyverno v1.19.2, verifier.go : un bundle au nouveau format part vers cosign.VerifyNewBundle
+    verifier.go:54:	cOpts.NewBundleFormat = len(bundles) > 0
+    verifier.go:189:		if _, err := cosign.VerifyNewBundle(ctx, &coCopy, artifactPolicyOption, bundle); err != nil {
+## 3. Kyverno v1.19.2, tests : ce cas est voulu (« AirGapped »), mais aucun test ne vérifie un jeton avec une clé
+    opts_test.go:865:			name:             "TSACertChain provided enables UseSignedTimestamps",
+    opts_test.go:907:func TestCheckOptions_Keyless_TSACertChainTrustedMaterial(t *testing.T) {
+    opts_test.go:927:	require.NotNil(t, opts.TrustedMaterial)
+    opts_test.go:937:func TestCheckOptions_KeyBased_AirGapped(t *testing.T) {
+    opts_test.go:960:	assert.Nil(t, opts.TrustedMaterial)
+## 4. cosign v3.1.2 : TrustedMaterial exclut les champs TSA historiques ; le chemin du nouveau format ne lit que TrustedMaterial
+    verify.go:102:	// TrustedMaterial contains trusted metadata for all Sigstore services. It is exclusive with RekorPubKeys, RootCerts, IntermediateCerts, CTLogPubKeys, and the TSA* cert fields.
+    verify.go:181:type verifyTrustedMaterial struct {
+    verify.go:182:	root.TrustedMaterial
+    verify.go:233:	vTrustedMaterial := &verifyTrustedMaterial{TrustedMaterial: co.TrustedMaterial}
+    verify.go:265:		verifierOptions = append(verifierOptions, verify.WithSignedTimestamps(1))
+    verify_bundle.go:34:	trustedMaterial, verifierOptions, policyOptions, err := coCopy.verificationOptions()
+    verify_bundle.go:38:	verifier, err := verify.NewVerifier(trustedMaterial, verifierOptions...)
+    verify_bundle.go:42:	return verifier.Verify(bundle, verify.NewPolicy(artifactPolicyOption, policyOptions...))
+- champs historiques lus seulement par la vérification des jetons du format historique :
+    verify.go:1408:	case co.TSARootCertificates == nil && co.TrustedMaterial == nil:
+    verify.go:1454:			TSACertificate: co.TSACertificate,
+    verify.go:1456:			Roots:          co.TSARootCertificates,
+## 5. sigstore-go v1.3.0 : appel sur le TrustedMaterial nil, seulement si un jeton est présent
+    signed_entity.go:878:	if v.config.requireSignedTimestamps {
+    signed_entity.go:879:		verifiedSignedTimestamps, err := VerifySignedTimestampWithThreshold(entity, v.trustedMaterial, v.config.signedTimestampThreshold)
+    tsa.go:46:	for _, timestamp := range signedTimestamps {
+    tsa.go:93:	timestampAuthorities := trustedMaterial.TimestampingAuthorities()
+## 6. état actuel
+- cosign v3.1.4 (dernière release) : verifyTrustedMaterial sans garde sur TimestampingAuthorities :
+    verify.go:195:type verifyTrustedMaterial struct {
+    verify.go:200:func (v *verifyTrustedMaterial) PublicKeyVerifier(hint string) (root.TimeConstrainedVerifier, error) {
+- PR #16048 (relevé à 15:10:24 UTC), fichiers :
+    pkg/image/verifiers/ivpol/cosign/opts.go
+    pkg/image/verifiers/ivpol/cosign/tsa_trusted_material.go
+    pkg/image/verifiers/ivpol/cosign/tsa_trusted_material_test.go
+## 7. documentation (kyverno/website, branche par défaut)
+    image-validating-policy.mdx:115:          tsaCertChain:
+    image-validating-policy.mdx:120:          insecureIgnoreTlog: false # Skip TLog verification (for testing only)

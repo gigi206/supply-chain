@@ -1,0 +1,46 @@
+# sante-sigstore.sh bogue_tsa_complements, 2026-11-08T15:14:20Z
+## 1. dépendances de Kyverno sur main et en v1.20.0-rc.1 (relevé à 15:14:20 UTC)
+    v1.20.0-rc.1 :	github.com/sigstore/cosign/v3 v3.1.3
+    v1.20.0-rc.1 :	github.com/sigstore/sigstore-go v1.3.0
+    main :	github.com/sigstore/cosign/v3 v3.1.3
+    main :	github.com/sigstore/sigstore-go v1.3.0
+- cosign v3.1.3 (main de Kyverno) :
+    verify.go:195:type verifyTrustedMaterial struct {
+    verify.go:196:	root.TrustedMaterial
+    verify.go:200:func (v *verifyTrustedMaterial) PublicKeyVerifier(hint string) (root.TimeConstrainedVerifier, error) {
+    verify.go:247:	vTrustedMaterial := &verifyTrustedMaterial{TrustedMaterial: co.TrustedMaterial}
+- sigstore-go v1.4.0 (dernière release) :
+    tsa.go:93:	timestampAuthorities := trustedMaterial.TimestampingAuthorities()
+## 2. modèle du CLI cosign v3.1.2 : chaîne TSA refusée hors de --trusted-root pour un bundle au nouveau format
+    common.go:55:		"TSACertChainPath":     "TSA certificate chain path may only be provided using --trusted-root",
+    common.go:66:	if co.TrustedMaterial == nil && !verifyOfflineWithKey {
+    common.go:67:		return fmt.Errorf("trusted root is required when using new bundle format")
+    common.go:414:	return (keyRef != "" || certRef != "" || sk) && co.IgnoreTlog && !co.UseSignedTimestamps
+## 3. admission (Kyverno v1.19.2) : une erreur de règle refuse sous Deny ; failurePolicy n'y est pas lu
+    validationResponse, ligne 5:		if policy.Actions.Has(admissionregistrationv1.Deny) {
+    validationResponse, ligne 9:			case engineapi.RuleStatusError:
+    validationResponse, ligne 10:				errs = append(errs, fmt.Errorf("Policy %s error: %s", policy.Policy.GetName(), policy.Result.Message()))
+    validationResponse, ligne 13:		if policy.Actions.Has(admissionregistrationv1.Warn) {
+    validationResponse, ligne 17:			case engineapi.RuleStatusError:
+    mentions de failurePolicy : handler.go 0, engine.go 1 (commentaire seulement)
+    engine.go:571:			response.Result = *engineapi.RuleError("evaluation", engineapi.ImageVerify, "failed to evaluate policy", err, nil)
+- J6 (resultats/politique-parite.log) : refus à l'admission constaté, motif de Kyverno tronqué par l'avertissement PodSecurity affiché en tête :
+    48:ÉCART j5-jeton-valide : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memor
+    51:ÉCART j5-jeton-altere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memor
+    52:ÉCART j5-autre-signature : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid me
+    53:ÉCART j5-tsa-etrangere : CLI ERREUR (code 1) (failed to evaluate policy: internal error: runtime error: invalid memo
+## 4. historique : raccourci par clé (#16298) puis chaîne TSA fusionnée seulement pour le chemin avec racine (#16800)
+- aa8aecbe3e85 2026-07-06 fix(ivpol): fix: add CTLog configuration support for key/certificate-based attestors and skip Sigstore infrastructure initialization for air-gapped key-based verification (#16298) :
+    +	skipSigstoreInfra := keyOrCert && ignoreTlog
+- a425f4f37c04 2026-07-28 fix: close image verification parity gaps (#16800) :
+    +type tsaTrustedMaterial struct {
+    +			if opts.TrustedMaterial != nil && len(roots) > 0 {
+- PR #16048 : open, créée 2026-05-08, mergeable_state dirty ; fusion de la chaîne TSA dans la racine issue du TUF :
+    +		opts.TrustedMaterial, err = mergeTSAIntoTrustedMaterial(trustedRoot, opts.TSACertificate, opts.TSAIntermediateCertificates, opts.TSARootCertificates)
+## 5. autres tests de Kyverno v1.19.2 sous pkg/image/verifiers/ivpol/cosign : chaîne TSA avec une clé
+    bundle_verify_test.go : mentions de TSACertChain 0, de UseSignedTimestamps 2
+    verifier_test.go : mentions de TSACertChain 0, de UseSignedTimestamps 4
+    opts_integration_test.go : mentions de TSACertChain 0, de UseSignedTimestamps 0
+- tests chainsaw (recherche de code GitHub, branche par défaut seulement) :
+## limites
+- lu, non reproduit sur la rc.1 ni sur main ; reproduit en J5 et J6 sur la 1.19.2 seulement

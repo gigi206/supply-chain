@@ -171,6 +171,88 @@ etape_fulcio() {
   echo "- non lus : le besoin de Rekor ou d'un horodatage pour vérifier un certificat Fulcio de courte durée dans Chains, ec et Kyverno ; Keycloak non audité (doc 04)"
 }
 
+# Ajout du 08/11/2026 vers 15:20 UTC, demande du propriétaire : « Vérifie d'abord en détails le code source de kyverno pour notre bug
+# voir si c'est réellement un bug ». Chemin complet du plantage de J5 (clé, insecureIgnoreTlog, tsaCertChain, bundle au nouveau format).
+etape_bogue_tsa() {
+  local K=pkg/image/verifiers/ivpol/cosign c sg
+  mkdir -p "$T/bogue"
+  sg=$(brut kyverno/kyverno go.mod v1.19.2 | awk '$1 == "github.com/sigstore/sigstore-go" {print $2}')
+  c=$(brut kyverno/kyverno go.mod v1.19.2 | awk '$1 == "github.com/sigstore/cosign/v3" {print $2}')
+  echo "versions embarquées par Kyverno v1.19.2 (go.mod) : cosign $c, sigstore-go $sg"
+  brut kyverno/kyverno "$K/opts.go" v1.19.2 > "$T/bogue/opts.go"
+  brut kyverno/kyverno "$K/verifier.go" v1.19.2 > "$T/bogue/verifier.go"
+  brut kyverno/kyverno "$K/opts_test.go" v1.19.2 > "$T/bogue/opts_test.go"
+  brut sigstore/cosign pkg/cosign/verify.go "$c" > "$T/bogue/verify.go"
+  brut sigstore/cosign pkg/cosign/verify_bundle.go "$c" > "$T/bogue/verify_bundle.go"
+  brut sigstore/sigstore-go pkg/verify/tsa.go "$sg" > "$T/bogue/tsa.go"
+  brut sigstore/sigstore-go pkg/verify/signed_entity.go "$sg" > "$T/bogue/signed_entity.go"
+  echo "## 1. Kyverno v1.19.2, opts.go : clé et insecureIgnoreTlog donnent un TrustedMaterial nil, la chaîne TSA va dans les champs historiques (relevé à $(date -u +%H:%M:%S) UTC)"
+  grep -n -E 'skipSigstoreInfra :?= |if !skipSigstoreInfra \{|opts\.TrustedMaterial = trustedMaterial|opts\.TSACertificate = leaves\[0\]|opts\.TSARootCertificates = roots|opts\.UseSignedTimestamps = true|if opts\.TrustedMaterial != nil && len\(roots\) > 0' "$T/bogue/opts.go" | sed 's/^/    opts.go:/'
+  echo "## 2. Kyverno v1.19.2, verifier.go : un bundle au nouveau format part vers cosign.VerifyNewBundle"
+  grep -n -E 'cOpts\.NewBundleFormat = len\(bundles\) > 0|cosign\.VerifyNewBundle\(ctx, &coCopy' "$T/bogue/verifier.go" | sed 's/^/    verifier.go:/'
+  echo "## 3. Kyverno v1.19.2, tests : ce cas est voulu (« AirGapped »), mais aucun test ne vérifie un jeton avec une clé"
+  grep -n -E '^func Test(CheckOptions_KeyBased_AirGapped|CheckOptions_Keyless_TSACertChainTrustedMaterial)|name: +"TSACertChain provided enables UseSignedTimestamps"|assert\.Nil\(t, opts\.TrustedMaterial\)|require\.NotNil\(t, opts\.TrustedMaterial\)' "$T/bogue/opts_test.go" | sed 's/^/    opts_test.go:/'
+  echo "## 4. cosign $c : TrustedMaterial exclut les champs TSA historiques ; le chemin du nouveau format ne lit que TrustedMaterial"
+  grep -n -E 'TrustedMaterial contains trusted metadata.*exclusive with|^type verifyTrustedMaterial struct|^	root\.TrustedMaterial$|vTrustedMaterial := &verifyTrustedMaterial\{TrustedMaterial: co\.TrustedMaterial\}|verifierOptions = append\(verifierOptions, verify\.WithSignedTimestamps\(1\)\)' "$T/bogue/verify.go" | cut -c1-200 | sed 's/^/    verify.go:/'
+  grep -n -E 'coCopy\.verificationOptions\(\)|verify\.NewVerifier\(trustedMaterial|verifier\.Verify\(bundle' "$T/bogue/verify_bundle.go" | sed 's/^/    verify_bundle.go:/'
+  echo "- champs historiques lus seulement par la vérification des jetons du format historique :"
+  grep -n -E 'case co\.TSARootCertificates == nil && co\.TrustedMaterial == nil|TSACertificate: co\.TSACertificate|Roots: +co\.TSARootCertificates' "$T/bogue/verify.go" | sed 's/^/    verify.go:/'
+  echo "## 5. sigstore-go $sg : appel sur le TrustedMaterial nil, seulement si un jeton est présent"
+  grep -n -E 'if v\.config\.requireSignedTimestamps \{|VerifySignedTimestampWithThreshold\(entity, v\.trustedMaterial' "$T/bogue/signed_entity.go" | sed 's/^/    signed_entity.go:/'
+  grep -n -E 'for _, timestamp := range signedTimestamps \{|timestampAuthorities := trustedMaterial\.TimestampingAuthorities\(\)' "$T/bogue/tsa.go" | sed 's/^/    tsa.go:/'
+  echo "## 6. état actuel"
+  for c in v3.1.4; do
+    echo "- cosign $c (dernière release) : verifyTrustedMaterial sans garde sur TimestampingAuthorities :"
+    brut sigstore/cosign pkg/cosign/verify.go "$c" | grep -n -E '^type verifyTrustedMaterial struct|^func \(v \*verifyTrustedMaterial\) [A-Za-z]+' | sed 's/^/    verify.go:/'
+  done
+  echo "- PR #16048 (relevé à $(date -u +%H:%M:%S) UTC), fichiers :"
+  gh api repos/kyverno/kyverno/pulls/16048/files --jq '.[] | "    \(.filename)"'
+  echo "## 7. documentation (kyverno/website, branche par défaut)"
+  gh api repos/kyverno/website/contents/src/content/docs/docs/policy-types/image-validating-policy.mdx -H 'Accept: application/vnd.github.raw' | grep -n -E 'tsaCertChain:|insecureIgnoreTlog: false' | sed 's/^/    image-validating-policy.mdx:/'
+}
+
+# Ajout du 08/11/2026 vers 15:30 UTC, sur relecture du conseiller : compléments à bogue_tsa, journal à part (bogue_tsa n'est pas réécrit).
+etape_bogue_tsa_complements() {
+  local K=pkg/image/verifiers/ivpol/cosign t c sg f
+  mkdir -p "$T/bogue2"
+  echo "## 1. dépendances de Kyverno sur main et en v1.20.0-rc.1 (relevé à $(date -u +%H:%M:%S) UTC)"
+  for t in v1.20.0-rc.1 main; do brut kyverno/kyverno go.mod "$t" | grep -E '^\s*github\.com/sigstore/(cosign/v3|sigstore-go) ' | sed "s/^/    $t :/"; done
+  c=$(brut kyverno/kyverno go.mod main | awk '$1 == "github.com/sigstore/cosign/v3" {print $2}')
+  sg=$(gh api repos/sigstore/sigstore-go/releases/latest --jq .tag_name)
+  echo "- cosign $c (main de Kyverno) :"
+  brut sigstore/cosign pkg/cosign/verify.go "$c" | grep -n -E '^type verifyTrustedMaterial struct|^	root\.TrustedMaterial$|^func \(v \*verifyTrustedMaterial\) [A-Za-z]+|vTrustedMaterial := &verifyTrustedMaterial\{TrustedMaterial: co\.TrustedMaterial\}' | sed 's/^/    verify.go:/'
+  echo "- sigstore-go $sg (dernière release) :"
+  brut sigstore/sigstore-go pkg/verify/tsa.go "$sg" | grep -n -E 'timestampAuthorities := trustedMaterial\.TimestampingAuthorities\(\)|trustedMaterial == nil' | sed 's/^/    tsa.go:/'
+  echo "## 2. modèle du CLI cosign v3.1.2 : chaîne TSA refusée hors de --trusted-root pour un bundle au nouveau format"
+  brut sigstore/cosign cmd/cosign/cli/verify/common.go v3.1.2 > "$T/bogue2/common.go"
+  grep -n -E '"TSACertChainPath": +"TSA certificate chain path may only be provided using --trusted-root"|if co\.TrustedMaterial == nil && !verifyOfflineWithKey \{|return fmt\.Errorf\("trusted root is required when using new bundle format"\)|return \(keyRef != "" \|\| certRef != "" \|\| sk\) && co\.IgnoreTlog && !co\.UseSignedTimestamps' "$T/bogue2/common.go" | sed 's/^/    common.go:/'
+  echo "## 3. admission (Kyverno v1.19.2) : une erreur de règle refuse sous Deny ; failurePolicy n'y est pas lu"
+  brut kyverno/kyverno pkg/webhooks/resource/ivpol/handler.go v1.19.2 > "$T/bogue2/handler.go"
+  brut kyverno/kyverno pkg/cel/policies/ivpol/engine/engine.go v1.19.2 > "$T/bogue2/engine.go"
+  awk '/^func \(h \*handler\) validationResponse/{f=1} f; f && /^}/{exit}' "$T/bogue2/handler.go" > "$T/bogue2/vr.go"
+  grep -n -E 'policy\.Actions\.Has\(admissionregistrationv1\.(Deny|Warn)\)|case engineapi\.RuleStatusError:|errs = append\(errs, fmt\.Errorf\("Policy %s error' "$T/bogue2/vr.go" | sed 's/^/    validationResponse, ligne /'
+  echo "    mentions de failurePolicy : handler.go $(grep -c -i 'failurepolicy' "$T/bogue2/handler.go" || true), engine.go $(grep -c -i 'failurepolicy' "$T/bogue2/engine.go" || true) (commentaire seulement)"
+  grep -n -E 'RuleError\("evaluation", engineapi\.ImageVerify, "failed to evaluate policy"' "$T/bogue2/engine.go" | sed 's/^/    engine.go:/'
+  echo "- J6 (resultats/politique-parite.log) : refus à l'admission constaté, motif de Kyverno tronqué par l'avertissement PodSecurity affiché en tête :"
+  grep -n -E '^ÉCART j5-' "$R/politique-parite.log" | cut -c1-120 | sed 's/^/    /'
+  echo "## 4. historique : raccourci par clé (#16298) puis chaîne TSA fusionnée seulement pour le chemin avec racine (#16800)"
+  for f in aa8aecbe3e85 a425f4f37c04; do
+    echo "- $(gh api "repos/kyverno/kyverno/commits/$f" --jq '"\(.sha[0:12]) \(.commit.author.date[0:10]) \(.commit.message | split("\n")[0])"') :"
+    gh api "repos/kyverno/kyverno/commits/$f" --jq '.files[] | select(.filename == "pkg/image/verifiers/ivpol/cosign/opts.go") | .patch' | grep -E '^\+.*(skipSigstoreInfra :?=|type tsaTrustedMaterial struct|if opts\.TrustedMaterial != nil && len\(roots\) > 0)' | sed 's/^/    /'
+  done
+  echo "- PR #16048 : $(gh api repos/kyverno/kyverno/pulls/16048 --jq '"\(.state), créée \(.created_at[0:10]), mergeable_state \(.mergeable_state)"') ; fusion de la chaîne TSA dans la racine issue du TUF :"
+  gh api repos/kyverno/kyverno/pulls/16048/files --jq '.[] | select(.filename | endswith("cosign/opts.go")) | .patch' | grep -E '^\+.*mergeTSAIntoTrustedMaterial\(trustedRoot' | sed 's/^/    /'
+  echo "## 5. autres tests de Kyverno v1.19.2 sous $K : chaîne TSA avec une clé"
+  for f in bundle_verify_test.go verifier_test.go opts_integration_test.go; do
+    brut kyverno/kyverno "$K/$f" v1.19.2 > "$T/bogue2/$f"
+    echo "    $f : mentions de TSACertChain $(grep -c 'TSACertChain' "$T/bogue2/$f" || true), de UseSignedTimestamps $(grep -c 'UseSignedTimestamps' "$T/bogue2/$f" || true)"
+  done
+  echo "- tests chainsaw (recherche de code GitHub, branche par défaut seulement) :"
+  gh api 'search/code?q=tsaCertChain+repo:kyverno/kyverno+path:test' --jq '.items[] | "    \(.path)"' 2>&1 | head -10
+  echo "## limites"
+  echo "- lu, non reproduit sur la rc.1 ni sur main ; reproduit en J5 et J6 sur la 1.19.2 seulement"
+}
+
 for e in "$@"; do
   echo "# sante-sigstore.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/sante-sigstore-$e.log"
   "etape_$e" 2>&1 | sed -u "s#$HOME#~#g" | tee -a "$R/sante-sigstore-$e.log"
