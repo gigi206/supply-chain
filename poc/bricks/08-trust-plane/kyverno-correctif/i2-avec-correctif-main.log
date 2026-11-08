@@ -1,0 +1,751 @@
+== tests complets (v2 + 3 cas), avec correctif, main 2be1bc3fe3b4, go1.27.3, 15:50:08 UTC, tests sha256 a08d5dc7f83b6c9e, correctif v2 appliqué : oui
+=== RUN   TestCheckOptions_TSACertChainTooManyIntermediates
+--- PASS: TestCheckOptions_TSACertChainTooManyIntermediates (0.17s)
+=== RUN   TestCheckOptions_TSACertChainAtLimit
+--- PASS: TestCheckOptions_TSACertChainAtLimit (0.08s)
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps/TSACertChain_provided_enables_UseSignedTimestamps
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps/empty_TSACertChain_does_not_enable_UseSignedTimestamps
+--- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps (0.00s)
+    --- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps/TSACertChain_provided_enables_UseSignedTimestamps (0.00s)
+    --- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps/empty_TSACertChain_does_not_enable_UseSignedTimestamps (0.00s)
+=== RUN   TestCheckOptions_Keyless_TSACertChainTrustedMaterial
+--- PASS: TestCheckOptions_Keyless_TSACertChainTrustedMaterial (0.00s)
+=== RUN   TestCheckOptions_KeyBased_AirGapped
+--- PASS: TestCheckOptions_KeyBased_AirGapped (0.00s)
+=== RUN   TestCertificateAttestor_TSACertChain_SigstoreBundle
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:dd6ee87c5dff847f7ed79cda861c15bfac068e00ee33f0f870d1dc1dbb166479 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:7b67c346b230fbce87f4cd6beab400de50e8104f515da5a1e3f3fca886d7d00c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/4508433510672966425
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6068776759134222614
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/4508433510672966425?digest=sha256%3Add6ee87c5dff847f7ed79cda861c15bfac068e00ee33f0f870d1dc1dbb166479
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6068776759134222614?digest=sha256%3A7b67c346b230fbce87f4cd6beab400de50e8104f515da5a1e3f3fca886d7d00c
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:7b67c346b230fbce87f4cd6beab400de50e8104f515da5a1e3f3fca886d7d00c
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:9850b08e721d03ddd3798bccab2e97ab9e7fc94f70e38b1b2bc1b5503718a361 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/2659463516494936475
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/2659463516494936475?digest=sha256%3A9850b08e721d03ddd3798bccab2e97ab9e7fc94f70e38b1b2bc1b5503718a361
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7992949800652176643
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7992949800652176643?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256:0392f1530c228ef70701ffca59963fb028df2e700fa9dfedc0063492b5b6ff0b
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:aba18d9bc2d9c8f2a33d609ef59a8e6f659056f7c48c1ce9ca6cd4ed61658908
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:aba18d9bc2d9c8f2a33d609ef59a8e6f659056f7c48c1ce9ca6cd4ed61658908
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256:0392f1530c228ef70701ffca59963fb028df2e700fa9dfedc0063492b5b6ff0b
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:9850b08e721d03ddd3798bccab2e97ab9e7fc94f70e38b1b2bc1b5503718a361
+    tsa_extra_test.go:82: certificate attestor, genuine timestamp: <nil>
+--- PASS: TestCertificateAttestor_TSACertChain_SigstoreBundle (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/genuine_timestamp
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:9dd8f8a2365071919f6259f3058f72932368d3e2616fc6794b308feca83c85e2 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:f0b64a3ae69b876e78f1ab8964e5f431f189b4dbd27294888a0bf0bb33f9f693 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6607641064381752708
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6356262953616603105
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6607641064381752708?digest=sha256%3A9dd8f8a2365071919f6259f3058f72932368d3e2616fc6794b308feca83c85e2
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6356262953616603105?digest=sha256%3Af0b64a3ae69b876e78f1ab8964e5f431f189b4dbd27294888a0bf0bb33f9f693
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-7acd38acee1526a3674eb3e4b948194673a0b491d360eee2df8b3f823bb8eae4.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/sha256-7acd38acee1526a3674eb3e4b948194673a0b491d360eee2df8b3f823bb8eae4.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:b28f635f330c01127c62c5c5b1767037fffa057d342e4fb45cddae05a6890a8f 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:953d248ffa3573df8a3f0ef21790d79b9b7c46bf5f0755f55e836cfaa3aa6144 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/8699578000983642295
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/1488473843521042206
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/8699578000983642295?digest=sha256%3Ab28f635f330c01127c62c5c5b1767037fffa057d342e4fb45cddae05a6890a8f
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/1488473843521042206?digest=sha256%3A953d248ffa3573df8a3f0ef21790d79b9b7c46bf5f0755f55e836cfaa3aa6144
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256-7acd38acee1526a3674eb3e4b948194673a0b491d360eee2df8b3f823bb8eae4.sig
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:f0b64a3ae69b876e78f1ab8964e5f431f189b4dbd27294888a0bf0bb33f9f693
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:7acd38acee1526a3674eb3e4b948194673a0b491d360eee2df8b3f823bb8eae4
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-7acd38acee1526a3674eb3e4b948194673a0b491d360eee2df8b3f823bb8eae4.sig
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:b28f635f330c01127c62c5c5b1767037fffa057d342e4fb45cddae05a6890a8f
+    tsa_extra_test.go:155: v2 signature: <nil>
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/tampered_timestamp
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:56a322a8da5182cf800365b974c55ad9b488c27776fa20f773be546cb4e74a21 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:b84d45d0b9a66d6dd0fe4f6756fe1d63f0f8e94f78c806a39a1236f1237fafc6 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/1243089046080805102
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7829097413095024677
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/1243089046080805102?digest=sha256%3A56a322a8da5182cf800365b974c55ad9b488c27776fa20f773be546cb4e74a21
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7829097413095024677?digest=sha256%3Ab84d45d0b9a66d6dd0fe4f6756fe1d63f0f8e94f78c806a39a1236f1237fafc6
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-a100062468b0ff74c6e24a7947d0f8e8d57bcde82c62015a65de6ea573d28e3c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/sha256-a100062468b0ff74c6e24a7947d0f8e8d57bcde82c62015a65de6ea573d28e3c.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:10e721063b5c44093ff88ba0d5eb5fb244c6cd4683ca27e4eb2e7d26841a375d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:16cfe238c3a27dbab7d5781e616d04087c955940037863c39a57736e853e2dd1 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7450325411709915060
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/2552174253029069220
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7450325411709915060?digest=sha256%3A10e721063b5c44093ff88ba0d5eb5fb244c6cd4683ca27e4eb2e7d26841a375d
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/2552174253029069220?digest=sha256%3A16cfe238c3a27dbab7d5781e616d04087c955940037863c39a57736e853e2dd1
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256-a100062468b0ff74c6e24a7947d0f8e8d57bcde82c62015a65de6ea573d28e3c.sig
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:b84d45d0b9a66d6dd0fe4f6756fe1d63f0f8e94f78c806a39a1236f1237fafc6
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:a100062468b0ff74c6e24a7947d0f8e8d57bcde82c62015a65de6ea573d28e3c
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-a100062468b0ff74c6e24a7947d0f8e8d57bcde82c62015a65de6ea573d28e3c.sig
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:10e721063b5c44093ff88ba0d5eb5fb244c6cd4683ca27e4eb2e7d26841a375d
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: error while verifying signature: x509: ECDSA verification failure
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/timestamp_over_another_signature
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:d8027f49a0a5db4918dd1d8984dfd6042cc6fa7f041d0ffe677a47519a1d4f45 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:dad2f532ca2d8ae5dc568f92cc5caa52d1ef12463c35e33fe8a3849c131b7e07 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/2787147544517965190
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/388487692153392975
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/2787147544517965190?digest=sha256%3Ad8027f49a0a5db4918dd1d8984dfd6042cc6fa7f041d0ffe677a47519a1d4f45
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/388487692153392975?digest=sha256%3Adad2f532ca2d8ae5dc568f92cc5caa52d1ef12463c35e33fe8a3849c131b7e07
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-dbda5481f1a06d2173575ce5a5249bb3cc1729180d186643601b47d2322c2eb0.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/sha256-dbda5481f1a06d2173575ce5a5249bb3cc1729180d186643601b47d2322c2eb0.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:3ba59a06404e259364d44e431fe28333dba81535bc747bbb2cd2085550ed940a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:238daa796c8294c41748c695875004e6790cf86de4c5e9101059d82d40782c5b 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/5966752090933282878
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7605975342872358665
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/5966752090933282878?digest=sha256%3A3ba59a06404e259364d44e431fe28333dba81535bc747bbb2cd2085550ed940a
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7605975342872358665?digest=sha256%3A238daa796c8294c41748c695875004e6790cf86de4c5e9101059d82d40782c5b
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256-dbda5481f1a06d2173575ce5a5249bb3cc1729180d186643601b47d2322c2eb0.sig
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:dad2f532ca2d8ae5dc568f92cc5caa52d1ef12463c35e33fe8a3849c131b7e07
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:dbda5481f1a06d2173575ce5a5249bb3cc1729180d186643601b47d2322c2eb0
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-dbda5481f1a06d2173575ce5a5249bb3cc1729180d186643601b47d2322c2eb0.sig
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:3ba59a06404e259364d44e431fe28333dba81535bc747bbb2cd2085550ed940a
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: hashed messages don't match
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/timestamp_from_a_foreign_TSA
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:ce231e01d4c4b5275f96d0ff9dcc0cea3585c276b4e9af336c198f22578cc06f 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:dbd704539b7acc4f1f566bc14375a620785c96cc348565a89d734e40605d83d5 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/2908432223982006343
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/788273548702620438
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/2908432223982006343?digest=sha256%3Ace231e01d4c4b5275f96d0ff9dcc0cea3585c276b4e9af336c198f22578cc06f
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/788273548702620438?digest=sha256%3Adbd704539b7acc4f1f566bc14375a620785c96cc348565a89d734e40605d83d5
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-86cb8496b95a1f497d0d0d17be4f4a2d30393607585bb7d9d4a2ff4bd3ad105f.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/sha256-86cb8496b95a1f497d0d0d17be4f4a2d30393607585bb7d9d4a2ff4bd3ad105f.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:56b0a519277f21fe91437141cc6118a79d53a5a5eb9ae74cf82926af7a982cae 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:d0df71e371d90cd8d297840a9526223f087d41c1d989df4bebec34607cf6f796 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/438379612440394995
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7863933061168610865
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/438379612440394995?digest=sha256%3A56b0a519277f21fe91437141cc6118a79d53a5a5eb9ae74cf82926af7a982cae
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7863933061168610865?digest=sha256%3Ad0df71e371d90cd8d297840a9526223f087d41c1d989df4bebec34607cf6f796
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256-86cb8496b95a1f497d0d0d17be4f4a2d30393607585bb7d9d4a2ff4bd3ad105f.sig
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:dbd704539b7acc4f1f566bc14375a620785c96cc348565a89d734e40605d83d5
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:86cb8496b95a1f497d0d0d17be4f4a2d30393607585bb7d9d4a2ff4bd3ad105f
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256-86cb8496b95a1f497d0d0d17be4f4a2d30393607585bb7d9d4a2ff4bd3ad105f.sig
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:56b0a519277f21fe91437141cc6118a79d53a5a5eb9ae74cf82926af7a982cae
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: error while verifying signature: x509: ECDSA verification failure
+--- PASS: TestKeyAttestor_TSACertChain_V2Signature (0.11s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/genuine_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/tampered_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/timestamp_over_another_signature (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/timestamp_from_a_foreign_TSA (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_SeparateRepository
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:41629d0ce47b67a6a70bf3e86f44d4a969e9c7add36b528cf3d1e3b6b09bb749 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:413f50e0569edeac4aaba8559fd6a8bf0cd4885ec23ca41a7ef1702bb3514761 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/783713505223907335
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/5309564597466619061
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/783713505223907335?digest=sha256%3A41629d0ce47b67a6a70bf3e86f44d4a969e9c7add36b528cf3d1e3b6b09bb749
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/5309564597466619061?digest=sha256%3A413f50e0569edeac4aaba8559fd6a8bf0cd4885ec23ca41a7ef1702bb3514761
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:413f50e0569edeac4aaba8559fd6a8bf0cd4885ec23ca41a7ef1702bb3514761
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/bundles/blobs/sha256:e44010a029835bd76fc5df5b1e408695424418e39ee627148363a0d93f2c70f0 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/bundles/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/bundles/blobs/uploads/4258145609153326532
+2026/11/08 16:50:13 PUT /v2/test/bundles/blobs/uploads/4258145609153326532?digest=sha256%3Ae44010a029835bd76fc5df5b1e408695424418e39ee627148363a0d93f2c70f0
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/bundles/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/bundles/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/bundles/blobs/uploads/2967611858846722735
+2026/11/08 16:50:13 PUT /v2/test/bundles/blobs/uploads/2967611858846722735?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 PUT /v2/test/bundles/manifests/sha256:a4471f6298c00267cf8670aeb5d9f595215389d4934c34d96dfe5e738e49d735
+2026/11/08 16:50:13 GET /v2/test/bundles/referrers/sha256:1fb60cd5dfda4ac41018c81d6fc92aa9399238a9d2d1c7237ce01adf0a4a61a4
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/referrers/sha256:1fb60cd5dfda4ac41018c81d6fc92aa9399238a9d2d1c7237ce01adf0a4a61a4
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/manifests/sha256:a4471f6298c00267cf8670aeb5d9f595215389d4934c34d96dfe5e738e49d735
+2026/11/08 16:50:13 GET /v2/test/bundles/blobs/sha256:e44010a029835bd76fc5df5b1e408695424418e39ee627148363a0d93f2c70f0
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/referrers/sha256:1fb60cd5dfda4ac41018c81d6fc92aa9399238a9d2d1c7237ce01adf0a4a61a4
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/manifests/sha256:a4471f6298c00267cf8670aeb5d9f595215389d4934c34d96dfe5e738e49d735
+2026/11/08 16:50:13 GET /v2/test/bundles/blobs/sha256:e44010a029835bd76fc5df5b1e408695424418e39ee627148363a0d93f2c70f0
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/referrers/sha256:1fb60cd5dfda4ac41018c81d6fc92aa9399238a9d2d1c7237ce01adf0a4a61a4
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/bundles/manifests/sha256:a4471f6298c00267cf8670aeb5d9f595215389d4934c34d96dfe5e738e49d735
+2026/11/08 16:50:13 GET /v2/test/bundles/blobs/sha256:e44010a029835bd76fc5df5b1e408695424418e39ee627148363a0d93f2c70f0
+    tsa_extra_test.go:200: separate repository: image signature path: <nil> ; attestation path: <nil>
+--- PASS: TestKeyAttestor_TSACertChain_SeparateRepository (0.05s)
+=== RUN   TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:c6c3e4fd760f1ca8dc59dcc02120d0109322dec0234e272a19bd50f75db4c19e 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:8be1058d2f0b4708de7607d0613e4ad9155b65217e95cb68ea1e499ed1049288 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6429911007202403765
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/8445908741027362539
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6429911007202403765?digest=sha256%3Ac6c3e4fd760f1ca8dc59dcc02120d0109322dec0234e272a19bd50f75db4c19e
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/8445908741027362539?digest=sha256%3A8be1058d2f0b4708de7607d0613e4ad9155b65217e95cb68ea1e499ed1049288
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:8be1058d2f0b4708de7607d0613e4ad9155b65217e95cb68ea1e499ed1049288
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:5c4fd8b24cadc0f9ff16121a96c3d73df466a2b27ef99341dedb683fd70577b0 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/8463561725365687208
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/8463561725365687208?digest=sha256%3A5c4fd8b24cadc0f9ff16121a96c3d73df466a2b27ef99341dedb683fd70577b0
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/7958947460838547656
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/7958947460838547656?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/sha256:73913102e59edc2eaab9f21fae8cce7c3cf80cbfcca21d5e28a053fb21c21b19
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:307f477fe2b8eb9e0e9248a7aa4b146a8f44b2adee3970c12f14f3d12a788306
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/referrers/sha256:307f477fe2b8eb9e0e9248a7aa4b146a8f44b2adee3970c12f14f3d12a788306
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/sha256:73913102e59edc2eaab9f21fae8cce7c3cf80cbfcca21d5e28a053fb21c21b19
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:5c4fd8b24cadc0f9ff16121a96c3d73df466a2b27ef99341dedb683fd70577b0
+    tsa_extra_test.go:264: certificate with chain, genuine timestamp: <nil>
+--- PASS: TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_TwoTimestampedAttestations
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:298cfad5405f7e760945e3392c9ba78fac902b8f930fdf870f731ed01e4f498c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:12d8577e0f07a547062f2c42450308ab48d9e9d942091edc3eedf3f3f85281e8 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6660601913764193154
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/6897319033794849821
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6660601913764193154?digest=sha256%3A298cfad5405f7e760945e3392c9ba78fac902b8f930fdf870f731ed01e4f498c
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/6897319033794849821?digest=sha256%3A12d8577e0f07a547062f2c42450308ab48d9e9d942091edc3eedf3f3f85281e8
+2026/11/08 16:50:13 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:13 GET /v2/test/img/blobs/sha256:12d8577e0f07a547062f2c42450308ab48d9e9d942091edc3eedf3f3f85281e8
+2026/11/08 16:50:13 GET /v2/
+2026/11/08 16:50:13 HEAD /v2/test/img/blobs/sha256:55af7fa13680f0a415922052e7a2e8d4183f2168dd4e8186b3036227f74f221f 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:13 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:13 PATCH /v2/test/img/blobs/uploads/1118216502872829411
+2026/11/08 16:50:13 PUT /v2/test/img/blobs/uploads/1118216502872829411?digest=sha256%3A55af7fa13680f0a415922052e7a2e8d4183f2168dd4e8186b3036227f74f221f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/4148941046311656160
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/4148941046311656160?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:34721c4d828143c06ef3ec3bb53b950c00939d109e6c286adfc6a7b951670bde
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:b92747cd2fa91446ebe2772cf159c30b23178a05b62113b886373859b0e60a49
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:7304f575214d1ef6fd8203d6f89ce1f0b98c64dbf57480aef3ea49fade12979b 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2182211507809978424
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2182211507809978424?digest=sha256%3A7304f575214d1ef6fd8203d6f89ce1f0b98c64dbf57480aef3ea49fade12979b
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:c81f1c0190a36d092c9b4ede32a90b2fa78cd448e227eef6e645fad01de15a6a
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:b92747cd2fa91446ebe2772cf159c30b23178a05b62113b886373859b0e60a49
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:b92747cd2fa91446ebe2772cf159c30b23178a05b62113b886373859b0e60a49
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:c81f1c0190a36d092c9b4ede32a90b2fa78cd448e227eef6e645fad01de15a6a
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:7304f575214d1ef6fd8203d6f89ce1f0b98c64dbf57480aef3ea49fade12979b
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:34721c4d828143c06ef3ec3bb53b950c00939d109e6c286adfc6a7b951670bde
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:55af7fa13680f0a415922052e7a2e8d4183f2168dd4e8186b3036227f74f221f
+    tsa_extra_test.go:298: two timestamped attestations: <nil>
+--- PASS: TestKeyAttestor_TSACertChain_TwoTimestampedAttestations (0.04s)
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/genuine_timestamp_from_the_configured_TSA
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:04cf80dc90fbcca1d41171d0618b098bc5e63accffbce4970fc72a6ee78d3c6a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:d83f94a55a1e96b3667f9baaa3da9ed2cac4425949649e3dbb2ae8ae6802781d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7705972050054869781
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2220749886819796201
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7705972050054869781?digest=sha256%3A04cf80dc90fbcca1d41171d0618b098bc5e63accffbce4970fc72a6ee78d3c6a
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2220749886819796201?digest=sha256%3Ad83f94a55a1e96b3667f9baaa3da9ed2cac4425949649e3dbb2ae8ae6802781d
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:d83f94a55a1e96b3667f9baaa3da9ed2cac4425949649e3dbb2ae8ae6802781d
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:4a57cc93338f3c4c74145d7b82ca15d67f8509101435c20e723edd1063d70320 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/9008363209150573979
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/9008363209150573979?digest=sha256%3A4a57cc93338f3c4c74145d7b82ca15d67f8509101435c20e723edd1063d70320
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/8925648119253857814
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/8925648119253857814?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:46322c4f5f94e6d73206fa595cce104d233832efab0cf0f1eea5b87743cbaf3d
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:e30168dcad08dbb9ba7e0561519b382d7ecc571dce52eaa741ec5f01c124b85f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:e30168dcad08dbb9ba7e0561519b382d7ecc571dce52eaa741ec5f01c124b85f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:46322c4f5f94e6d73206fa595cce104d233832efab0cf0f1eea5b87743cbaf3d
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:4a57cc93338f3c4c74145d7b82ca15d67f8509101435c20e723edd1063d70320
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:e30168dcad08dbb9ba7e0561519b382d7ecc571dce52eaa741ec5f01c124b85f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:46322c4f5f94e6d73206fa595cce104d233832efab0cf0f1eea5b87743cbaf3d
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:4a57cc93338f3c4c74145d7b82ca15d67f8509101435c20e723edd1063d70320
+    tsa_key_attestor_test.go:178: image signature path: <nil>
+    tsa_key_attestor_test.go:179: attestation path: <nil>
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/tampered_timestamp
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:9f1fd7def46f46e84900f5b810cd42e4d6f9cecfb26aa4402f37108ada733142 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:40ed5ff815ca3e82ae33525c2c4a6b79fd6a10f67299dfcadcb3429aae95e22e 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7995286260286563126
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2022422409120776323
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7995286260286563126?digest=sha256%3A9f1fd7def46f46e84900f5b810cd42e4d6f9cecfb26aa4402f37108ada733142
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2022422409120776323?digest=sha256%3A40ed5ff815ca3e82ae33525c2c4a6b79fd6a10f67299dfcadcb3429aae95e22e
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:40ed5ff815ca3e82ae33525c2c4a6b79fd6a10f67299dfcadcb3429aae95e22e
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:8bf2a0682e0ee3c697044886a0561a9d9c2c50e15d0289e894def79b0a091091 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/5710460597854232019
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/5710460597854232019?digest=sha256%3A8bf2a0682e0ee3c697044886a0561a9d9c2c50e15d0289e894def79b0a091091
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7829559673663393183
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7829559673663393183?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:41b0b1bf344453721c90251f1848230c57136b7f75217ab315907cf9bce2ada4
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:bc679f34d49b366e9ad9866ca1168295640c3c0a430ef62ab95a1f0336af2773
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:bc679f34d49b366e9ad9866ca1168295640c3c0a430ef62ab95a1f0336af2773
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:41b0b1bf344453721c90251f1848230c57136b7f75217ab315907cf9bce2ada4
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:8bf2a0682e0ee3c697044886a0561a9d9c2c50e15d0289e894def79b0a091091
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:bc679f34d49b366e9ad9866ca1168295640c3c0a430ef62ab95a1f0336af2773
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:41b0b1bf344453721c90251f1848230c57136b7f75217ab315907cf9bce2ada4
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:8bf2a0682e0ee3c697044886a0561a9d9c2c50e15d0289e894def79b0a091091
+    tsa_key_attestor_test.go:178: image signature path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error while verifying signature: x509: ECDSA verification failure
+    tsa_key_attestor_test.go:179: attestation path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error while verifying signature: x509: ECDSA verification failure
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_over_another_signature
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:dcf945b5ccc4109551d9cc45e93601739be3938b14ad8e5f548dcee4e0dce68b 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:2611aa6a80071a732e874dc0fcf7a20f62ba3caf73b4d3e9428718636786259d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/8878941718964549644
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/4712943157656510066
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/8878941718964549644?digest=sha256%3Adcf945b5ccc4109551d9cc45e93601739be3938b14ad8e5f548dcee4e0dce68b
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/4712943157656510066?digest=sha256%3A2611aa6a80071a732e874dc0fcf7a20f62ba3caf73b4d3e9428718636786259d
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:2611aa6a80071a732e874dc0fcf7a20f62ba3caf73b4d3e9428718636786259d
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:04b4d8b3af2ddc1ba21dd7a1ab44bae2eaa703678dae163fdd415bcc6fa30c36 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/832885291391871201
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/832885291391871201?digest=sha256%3A04b4d8b3af2ddc1ba21dd7a1ab44bae2eaa703678dae163fdd415bcc6fa30c36
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/3493895196105298299
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/3493895196105298299?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:10f9aec1fbf3009d1cd153644e25fb4d05f624f6b5eb69ac59edf6f8ad0abfea
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:f648f90472d87f9e5ab280024026046cb42666683551c5e0d4577a482202c31f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:f648f90472d87f9e5ab280024026046cb42666683551c5e0d4577a482202c31f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:10f9aec1fbf3009d1cd153644e25fb4d05f624f6b5eb69ac59edf6f8ad0abfea
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:04b4d8b3af2ddc1ba21dd7a1ab44bae2eaa703678dae163fdd415bcc6fa30c36
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:f648f90472d87f9e5ab280024026046cb42666683551c5e0d4577a482202c31f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:10f9aec1fbf3009d1cd153644e25fb4d05f624f6b5eb69ac59edf6f8ad0abfea
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:04b4d8b3af2ddc1ba21dd7a1ab44bae2eaa703678dae163fdd415bcc6fa30c36
+    tsa_key_attestor_test.go:178: image signature path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
+    tsa_key_attestor_test.go:179: attestation path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: hashed messages don't match
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_from_a_foreign_TSA
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:8ddc83f65934ba0b0c9397b16862990416d529ccfa17c9b8a73ec09b05ce797e 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:7537fce32be79253f270aaa07363ce0a7bcec1c6f6049d83430a7e375ef8738d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2434289067844208972
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/3568402304207209013
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2434289067844208972?digest=sha256%3A8ddc83f65934ba0b0c9397b16862990416d529ccfa17c9b8a73ec09b05ce797e
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/3568402304207209013?digest=sha256%3A7537fce32be79253f270aaa07363ce0a7bcec1c6f6049d83430a7e375ef8738d
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:7537fce32be79253f270aaa07363ce0a7bcec1c6f6049d83430a7e375ef8738d
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:ba20ff820bc97310775ea86cb74dcf90d6a9c412667f4c046ce4b476796b5119 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2214927657436731318
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2214927657436731318?digest=sha256%3Aba20ff820bc97310775ea86cb74dcf90d6a9c412667f4c046ce4b476796b5119
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7246244230337780883
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7246244230337780883?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:80dda7537490b014d835c6e1029ba66dd4496f2ab0fab4bfee77ccfd68a40a56
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:95af13bfff8eefad5d8f1785592e1e9a7b08a701711ffe0e8dfccbb4d882e287
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:95af13bfff8eefad5d8f1785592e1e9a7b08a701711ffe0e8dfccbb4d882e287
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:80dda7537490b014d835c6e1029ba66dd4496f2ab0fab4bfee77ccfd68a40a56
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:ba20ff820bc97310775ea86cb74dcf90d6a9c412667f4c046ce4b476796b5119
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:95af13bfff8eefad5d8f1785592e1e9a7b08a701711ffe0e8dfccbb4d882e287
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:80dda7537490b014d835c6e1029ba66dd4496f2ab0fab4bfee77ccfd68a40a56
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:ba20ff820bc97310775ea86cb74dcf90d6a9c412667f4c046ce4b476796b5119
+    tsa_key_attestor_test.go:178: image signature path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error while verifying signature: x509: ECDSA verification failure
+    tsa_key_attestor_test.go:179: attestation path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: unable to verify signed timestamps: error while verifying signature: x509: ECDSA verification failure
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/no_timestamp
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:395a47214192c6983066ba22b57592ae57f72e07a1a7c0292a100373155006c1 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:87b160a1c2980f92c86074351219d84a630d08ed912a0a23497c02ead2370895 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7986032382956715944
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1568624174471419232
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7986032382956715944?digest=sha256%3A395a47214192c6983066ba22b57592ae57f72e07a1a7c0292a100373155006c1
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1568624174471419232?digest=sha256%3A87b160a1c2980f92c86074351219d84a630d08ed912a0a23497c02ead2370895
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:87b160a1c2980f92c86074351219d84a630d08ed912a0a23497c02ead2370895
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:92e135759aced64efc547d454b5fc467ec2ea9a6f38fece6d5329c627d6a9817 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1989575713665469120
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1989575713665469120?digest=sha256%3A92e135759aced64efc547d454b5fc467ec2ea9a6f38fece6d5329c627d6a9817
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/4119234241973372940
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/4119234241973372940?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:a3ed55a306b3755b500bb98e31786b5ee3ee6e386e759af82317b1a975ace85d
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:4a18bd34edb6734795b14cfa77d9570c7d6172e9a6c264a23557442afaddfccd
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:4a18bd34edb6734795b14cfa77d9570c7d6172e9a6c264a23557442afaddfccd
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:a3ed55a306b3755b500bb98e31786b5ee3ee6e386e759af82317b1a975ace85d
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:92e135759aced64efc547d454b5fc467ec2ea9a6f38fece6d5329c627d6a9817
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:4a18bd34edb6734795b14cfa77d9570c7d6172e9a6c264a23557442afaddfccd
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:a3ed55a306b3755b500bb98e31786b5ee3ee6e386e759af82317b1a975ace85d
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:92e135759aced64efc547d454b5fc467ec2ea9a6f38fece6d5329c627d6a9817
+    tsa_key_attestor_test.go:178: image signature path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+    tsa_key_attestor_test.go:179: attestation path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/no_tsaCertChain,_bundle_with_timestamp
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:922b17f5fd976ae88efa6e261d7773eba66abaca3062214df34c1d6fad32bee9 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:ce094a5a0164602d7412448398b4b635f160b64cd397ce0f378bfcc0279cff82 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/6486786522211606716
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7760880143247574987
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/6486786522211606716?digest=sha256%3A922b17f5fd976ae88efa6e261d7773eba66abaca3062214df34c1d6fad32bee9
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7760880143247574987?digest=sha256%3Ace094a5a0164602d7412448398b4b635f160b64cd397ce0f378bfcc0279cff82
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:ce094a5a0164602d7412448398b4b635f160b64cd397ce0f378bfcc0279cff82
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:1f556904c7ab2660ccf6adcd57a881b8ea7c5fc6c46d9ff29c248891cd7ff5aa 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/54717793076978259
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/54717793076978259?digest=sha256%3A1f556904c7ab2660ccf6adcd57a881b8ea7c5fc6c46d9ff29c248891cd7ff5aa
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/3527847713478167264
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/3527847713478167264?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:d65dc1f26d6cadfec63173fc4f834aa3f88d81a8a134f814f3c0611fd8ce7b3b
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:7e19c57543e8a033160733638eb6eacc64873cfb17356045517e547676f40e1a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:7e19c57543e8a033160733638eb6eacc64873cfb17356045517e547676f40e1a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:d65dc1f26d6cadfec63173fc4f834aa3f88d81a8a134f814f3c0611fd8ce7b3b
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:1f556904c7ab2660ccf6adcd57a881b8ea7c5fc6c46d9ff29c248891cd7ff5aa
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:7e19c57543e8a033160733638eb6eacc64873cfb17356045517e547676f40e1a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:d65dc1f26d6cadfec63173fc4f834aa3f88d81a8a134f814f3c0611fd8ce7b3b
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:1f556904c7ab2660ccf6adcd57a881b8ea7c5fc6c46d9ff29c248891cd7ff5aa
+    tsa_key_attestor_test.go:178: image signature path: <nil>
+    tsa_key_attestor_test.go:179: attestation path: <nil>
+--- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle (0.19s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/genuine_timestamp_from_the_configured_TSA (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/tampered_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_over_another_signature (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_from_a_foreign_TSA (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/no_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/no_tsaCertChain,_bundle_with_timestamp (0.03s)
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/sigstore_bundle
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:601ee81751de798e9723e146a4c20db17ef02f6f79930289562d209fb6a5dc49 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:aa0d94510ca3f3c7b05048b042badeb618fa65faca312e7d28a221d2ebede4a4 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/5191869488751312981
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/2307594116184920820
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/5191869488751312981?digest=sha256%3A601ee81751de798e9723e146a4c20db17ef02f6f79930289562d209fb6a5dc49
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/2307594116184920820?digest=sha256%3Aaa0d94510ca3f3c7b05048b042badeb618fa65faca312e7d28a221d2ebede4a4
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:d88a998ae2cf78d5e619d8ea2f2839c0c65f0d118497bf6f895671011adc0330 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/4887072981785322003
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/4887072981785322003?digest=sha256%3Ad88a998ae2cf78d5e619d8ea2f2839c0c65f0d118497bf6f895671011adc0330
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1687216320786842434
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1687216320786842434?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:513819b821a26eaf555d7f70a327ef957a5a6f46a93f157323564862c4cbc07f
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:03fabfc690129b53a72752a109d614eb0635d0fbf4d15684ccbf903d675350c2
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:aa0d94510ca3f3c7b05048b042badeb618fa65faca312e7d28a221d2ebede4a4
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:03fabfc690129b53a72752a109d614eb0635d0fbf4d15684ccbf903d675350c2
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:513819b821a26eaf555d7f70a327ef957a5a6f46a93f157323564862c4cbc07f
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:d88a998ae2cf78d5e619d8ea2f2839c0c65f0d118497bf6f895671011adc0330
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/v2_signature
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:26033e1638e8ceca36af74443f615c84547f9ca809351b5fc168f98faefe224a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:1ddaa807234172da28cc7a4a9ac6b718eee6d1cd3d95baf48c911ef18ccc4602 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/833002497280783384
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1102398664948087494
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/833002497280783384?digest=sha256%3A26033e1638e8ceca36af74443f615c84547f9ca809351b5fc168f98faefe224a
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1102398664948087494?digest=sha256%3A1ddaa807234172da28cc7a4a9ac6b718eee6d1cd3d95baf48c911ef18ccc4602
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256-ad430b7e5f490d63c21b541e9c7b198de492a3d55603b05a6c2d561fc60ed642.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/sha256-ad430b7e5f490d63c21b541e9c7b198de492a3d55603b05a6c2d561fc60ed642.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:272af8f9f513c6e8f091e9fb4aed5e793981b35c27de5b06243bdf692d441e7a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:d23275a6feb5dc79b10f4832222b8c22b71b996daa6deabcb2f0dfd15362506d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1388925651411376814
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/7632180400762401684
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1388925651411376814?digest=sha256%3A272af8f9f513c6e8f091e9fb4aed5e793981b35c27de5b06243bdf692d441e7a
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/7632180400762401684?digest=sha256%3Ad23275a6feb5dc79b10f4832222b8c22b71b996daa6deabcb2f0dfd15362506d
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256-ad430b7e5f490d63c21b541e9c7b198de492a3d55603b05a6c2d561fc60ed642.sig
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:1ddaa807234172da28cc7a4a9ac6b718eee6d1cd3d95baf48c911ef18ccc4602
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:ad430b7e5f490d63c21b541e9c7b198de492a3d55603b05a6c2d561fc60ed642
+--- PASS: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial (0.05s)
+    --- PASS: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/sigstore_bundle (0.02s)
+    --- PASS: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/v2_signature (0.02s)
+=== RUN   TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:1067d54429e8174572d1adfe12b90b14bc64200d3a0f623252f9f99c37b862b1 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:5211a1cf602ba999aa1060705f33aef3995d87ea9c01bbc2a0ea8cd1fd673b2f 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/595191023223426905
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/586319327057626408
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/595191023223426905?digest=sha256%3A1067d54429e8174572d1adfe12b90b14bc64200d3a0f623252f9f99c37b862b1
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/586319327057626408?digest=sha256%3A5211a1cf602ba999aa1060705f33aef3995d87ea9c01bbc2a0ea8cd1fd673b2f
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:5211a1cf602ba999aa1060705f33aef3995d87ea9c01bbc2a0ea8cd1fd673b2f
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:ad6451f99640bb4118444698eadaa4dab2a3b9c9d2116f296a51d1e91297082d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/1860663476667490256
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/1860663476667490256?digest=sha256%3Aad6451f99640bb4118444698eadaa4dab2a3b9c9d2116f296a51d1e91297082d
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:14 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:14 PATCH /v2/test/img/blobs/uploads/4767063221893923003
+2026/11/08 16:50:14 PUT /v2/test/img/blobs/uploads/4767063221893923003?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 PUT /v2/test/img/manifests/sha256:bea9d9764eb49772556be0b10eb6fe8a3e12430ad0a8e0ad18023aa1b142d090
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:66605a7b0d647e5989b2cafd904f83c87025c41acc344b56a7318b4c412d36b7
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:66605a7b0d647e5989b2cafd904f83c87025c41acc344b56a7318b4c412d36b7
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:bea9d9764eb49772556be0b10eb6fe8a3e12430ad0a8e0ad18023aa1b142d090
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:ad6451f99640bb4118444698eadaa4dab2a3b9c9d2116f296a51d1e91297082d
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/referrers/sha256:66605a7b0d647e5989b2cafd904f83c87025c41acc344b56a7318b4c412d36b7
+2026/11/08 16:50:14 GET /v2/
+2026/11/08 16:50:14 GET /v2/test/img/manifests/sha256:bea9d9764eb49772556be0b10eb6fe8a3e12430ad0a8e0ad18023aa1b142d090
+2026/11/08 16:50:14 GET /v2/test/img/blobs/sha256:ad6451f99640bb4118444698eadaa4dab2a3b9c9d2116f296a51d1e91297082d
+    tsa_key_attestor_test.go:247: image signature path: failed to build cosign verification opts: verifying Sigstore bundles with signed timestamps requires the TSA root CA certificate in ctlog.tsaCertChain
+    tsa_key_attestor_test.go:248: attestation path: failed to build cosign verification opts: verifying Sigstore bundles with signed timestamps requires the TSA root CA certificate in ctlog.tsaCertChain
+--- PASS: TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle (0.03s)
+=== RUN   TestCheckOptions_CertificateBased_TSACertChain_Unchanged
+--- PASS: TestCheckOptions_CertificateBased_TSACertChain_Unchanged (0.00s)
+PASS
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	1.841s
+code 0

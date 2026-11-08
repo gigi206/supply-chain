@@ -1,0 +1,1117 @@
+== tests complets (v2 + 3 cas), sans correctif, v1.19.2 e63308f1e16c, go1.26.10, 15:50:15 UTC, tests sha256 a08d5dc7f83b6c9e, correctif v2 appliqué : non
+=== RUN   TestCheckOptions_TSACertChainTooManyIntermediates
+--- PASS: TestCheckOptions_TSACertChainTooManyIntermediates (0.08s)
+=== RUN   TestCheckOptions_TSACertChainAtLimit
+--- PASS: TestCheckOptions_TSACertChainAtLimit (0.16s)
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps/TSACertChain_provided_enables_UseSignedTimestamps
+=== RUN   TestCheckOptions_TSACertChain_UseSignedTimestamps/empty_TSACertChain_does_not_enable_UseSignedTimestamps
+--- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps (0.00s)
+    --- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps/TSACertChain_provided_enables_UseSignedTimestamps (0.00s)
+    --- PASS: TestCheckOptions_TSACertChain_UseSignedTimestamps/empty_TSACertChain_does_not_enable_UseSignedTimestamps (0.00s)
+=== RUN   TestCheckOptions_Keyless_TSACertChainTrustedMaterial
+--- PASS: TestCheckOptions_Keyless_TSACertChainTrustedMaterial (0.00s)
+=== RUN   TestCheckOptions_KeyBased_AirGapped
+--- PASS: TestCheckOptions_KeyBased_AirGapped (0.00s)
+=== RUN   TestCertificateAttestor_TSACertChain_SigstoreBundle
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:ab66c75d32e8a7b7a28f84f7eb7ce7d8320b2de0ca1a0974ded42527d438dedf 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:1787d38cb23f88afd7547f94aa5b82a26258f17255cd490ff596fb64885aa0be 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8524856364915433494
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/495484487579411436
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/495484487579411436?digest=sha256%3A1787d38cb23f88afd7547f94aa5b82a26258f17255cd490ff596fb64885aa0be
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8524856364915433494?digest=sha256%3Aab66c75d32e8a7b7a28f84f7eb7ce7d8320b2de0ca1a0974ded42527d438dedf
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:1787d38cb23f88afd7547f94aa5b82a26258f17255cd490ff596fb64885aa0be
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:54b2097c8b3ee4db46e03e18a5609e14e93c3c7870b3d8035b39df516b296f08 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/3906254749591347411
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/3906254749591347411?digest=sha256%3A54b2097c8b3ee4db46e03e18a5609e14e93c3c7870b3d8035b39df516b296f08
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2733956265846785736
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2733956265846785736?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:fa3f37d8a9f94b447094ab06fa8c3e8c84e73b7960c08b49fc228917050618f2
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:147305887f63f5d9e0e2d3e7ede109239a20b028ad301c637390a77d2a2de2b2
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:147305887f63f5d9e0e2d3e7ede109239a20b028ad301c637390a77d2a2de2b2
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:fa3f37d8a9f94b447094ab06fa8c3e8c84e73b7960c08b49fc228917050618f2
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:54b2097c8b3ee4db46e03e18a5609e14e93c3c7870b3d8035b39df516b296f08
+    tsa_extra_test.go:81: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:81
+        	Error:      	func (assert.PanicTestFunc)(0x5eb9140) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 53 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc0000ef900)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc00021b900, 0x258, 0x258}, {0xc0004b1590, 0x46, 0x48}, {0x6da1520, 0xc0000ef900})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc0003f9be0}, {0x6da1520, 0xc0000ef900})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc0003f9be0}, {0x6da1520, 0xc0000ef900}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc000399030, {0x6daa8a0, 0xc0003f9be0}, {0xa4ac720, 0x0, 0xc000752360?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc000399030, {0x6daa8a0, 0xc0003f9be0}, {0xc000acb9e0?, {0xc0006821c0?, 0xc000752a00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc00089ac87?, 0x40?}, 0xc000752e38, 0xc000acb9e0, {0x6daa8a0, 0xc0003f9be0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc0004feb60, {0xc0006821b8, 0x1, 0xc000b92800?}, 0xc00036cd20)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc000672210, {0x6d98cb0, 0xa4ac720}, 0xc000126000, 0xc000b927c0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestCertificateAttestor_TSACertChain_SigstoreBundle.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:81 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc000672270)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000552908}, 0xc000672270, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000552908}, 0xc000672270, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestCertificateAttestor_TSACertChain_SigstoreBundle(0xc000552908)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:81 +0x1529
+        	            	testing.tRunner(0xc000552908, 0x6d3cb30)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 1
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestCertificateAttestor_TSACertChain_SigstoreBundle
+--- FAIL: TestCertificateAttestor_TSACertChain_SigstoreBundle (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/genuine_timestamp
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:1c5dddc0b744f2c83547395999b13287f6557d839055c90f64bc8c139203fdd8 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:5e6cea73b6fba6effe447434bb1beaecf4fb92f15155e6bba719852d956bd7df 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2752504062267567629
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7201565203315908043
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2752504062267567629?digest=sha256%3A1c5dddc0b744f2c83547395999b13287f6557d839055c90f64bc8c139203fdd8
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7201565203315908043?digest=sha256%3A5e6cea73b6fba6effe447434bb1beaecf4fb92f15155e6bba719852d956bd7df
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-5232518c6d01cede090148a20dc8114e37af55f976ab50fcc8b6a484769f0c27.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/sha256-5232518c6d01cede090148a20dc8114e37af55f976ab50fcc8b6a484769f0c27.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:faf6d7e2a524cdd1caf4de6f23deaacd9bbc77de5d2d05bfab2c2f32ad899002 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:8c76b6c233cd18a1a9b9039410ba5762335e20a64a0ba9409a402c86ee55f3a9 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6288710577532379028
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5384130293270616266
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6288710577532379028?digest=sha256%3Afaf6d7e2a524cdd1caf4de6f23deaacd9bbc77de5d2d05bfab2c2f32ad899002
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5384130293270616266?digest=sha256%3A8c76b6c233cd18a1a9b9039410ba5762335e20a64a0ba9409a402c86ee55f3a9
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256-5232518c6d01cede090148a20dc8114e37af55f976ab50fcc8b6a484769f0c27.sig
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:5e6cea73b6fba6effe447434bb1beaecf4fb92f15155e6bba719852d956bd7df
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:5232518c6d01cede090148a20dc8114e37af55f976ab50fcc8b6a484769f0c27
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-5232518c6d01cede090148a20dc8114e37af55f976ab50fcc8b6a484769f0c27.sig
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:faf6d7e2a524cdd1caf4de6f23deaacd9bbc77de5d2d05bfab2c2f32ad899002
+    tsa_extra_test.go:155: v2 signature: <nil>
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/tampered_timestamp
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:31f9690209948905a408434508a9be43abb7f91379becfe587540e9bdaf24a27 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:e9dfce57c0fcc9bb88815e4ac4a9d2de910c8a0e8d2c185302ad1f000959775c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/217459113673865663
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6131978524901724970
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/217459113673865663?digest=sha256%3A31f9690209948905a408434508a9be43abb7f91379becfe587540e9bdaf24a27
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6131978524901724970?digest=sha256%3Ae9dfce57c0fcc9bb88815e4ac4a9d2de910c8a0e8d2c185302ad1f000959775c
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-9c749053d8c8d37e257340db0759b9c2b70628b3ff43a24af5136bdaf275e85d.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/sha256-9c749053d8c8d37e257340db0759b9c2b70628b3ff43a24af5136bdaf275e85d.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:6cfbee49bd6461de50e562de6400f607def8e4d3300b4f987c60dfc2d8dec8ed 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:ec5d59605318dee41000d65a346e240ee6381101207d3a3847eba035e9a58dce 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5256711261538647135
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6752497929568386076
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5256711261538647135?digest=sha256%3A6cfbee49bd6461de50e562de6400f607def8e4d3300b4f987c60dfc2d8dec8ed
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6752497929568386076?digest=sha256%3Aec5d59605318dee41000d65a346e240ee6381101207d3a3847eba035e9a58dce
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256-9c749053d8c8d37e257340db0759b9c2b70628b3ff43a24af5136bdaf275e85d.sig
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:31f9690209948905a408434508a9be43abb7f91379becfe587540e9bdaf24a27
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:9c749053d8c8d37e257340db0759b9c2b70628b3ff43a24af5136bdaf275e85d
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-9c749053d8c8d37e257340db0759b9c2b70628b3ff43a24af5136bdaf275e85d.sig
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:ec5d59605318dee41000d65a346e240ee6381101207d3a3847eba035e9a58dce
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: error while verifying signature: x509: ECDSA verification failure
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/timestamp_over_another_signature
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:4baac6ba3d9216fba99ee183fef866d5dfd9ce5af43338c0babef5b831cd15f1 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:d478dd5a9b3587ebd0e6c2408c12b91dd18b08a63975674c949a0d31b471ce8f 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4136385162637726514
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/1321932788514841440
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4136385162637726514?digest=sha256%3A4baac6ba3d9216fba99ee183fef866d5dfd9ce5af43338c0babef5b831cd15f1
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/1321932788514841440?digest=sha256%3Ad478dd5a9b3587ebd0e6c2408c12b91dd18b08a63975674c949a0d31b471ce8f
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-3676c4178aa500591454d3b9dcd3ee6c927670a7e47bcca1d35e6fde2f537ef6.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/sha256-3676c4178aa500591454d3b9dcd3ee6c927670a7e47bcca1d35e6fde2f537ef6.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:c5c5d925f0d671464976f43b14fc06634a8876e6317ecffea9676293a565791c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:47e6000e0c4fd34cf8fbf8fa80713144c06c9b6d71e9c2196eea3f798863d210 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/3812492617908419526
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4171436731659588600
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/3812492617908419526?digest=sha256%3Ac5c5d925f0d671464976f43b14fc06634a8876e6317ecffea9676293a565791c
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4171436731659588600?digest=sha256%3A47e6000e0c4fd34cf8fbf8fa80713144c06c9b6d71e9c2196eea3f798863d210
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256-3676c4178aa500591454d3b9dcd3ee6c927670a7e47bcca1d35e6fde2f537ef6.sig
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:d478dd5a9b3587ebd0e6c2408c12b91dd18b08a63975674c949a0d31b471ce8f
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:3676c4178aa500591454d3b9dcd3ee6c927670a7e47bcca1d35e6fde2f537ef6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-3676c4178aa500591454d3b9dcd3ee6c927670a7e47bcca1d35e6fde2f537ef6.sig
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:c5c5d925f0d671464976f43b14fc06634a8876e6317ecffea9676293a565791c
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: hashed messages don't match
+=== RUN   TestKeyAttestor_TSACertChain_V2Signature/timestamp_from_a_foreign_TSA
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:4fefa267ac07bb6427792cb5a96286ae3e1ab48351e7cb9be268700538c64344 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:ba0342838fc94c3f6ebca04c55e3595151161f2680d5e9105de80eb362aab5da 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/586260620040559636
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5863423816330193550
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/586260620040559636?digest=sha256%3A4fefa267ac07bb6427792cb5a96286ae3e1ab48351e7cb9be268700538c64344
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5863423816330193550?digest=sha256%3Aba0342838fc94c3f6ebca04c55e3595151161f2680d5e9105de80eb362aab5da
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-ca07a2aaeca64ae41e3320aaabfd5638649295fad2b15e35fd1c003dca4b779e.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/sha256-ca07a2aaeca64ae41e3320aaabfd5638649295fad2b15e35fd1c003dca4b779e.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:576221594abdad7734b407b7042c73c939c926185a9df5b942171665cadefd5e 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:0099726501593b5dab3b02f16a95dd0e6a9cc859af042acf80a12aa1147f087c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6558690326617999360
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7616844582503609200
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6558690326617999360?digest=sha256%3A576221594abdad7734b407b7042c73c939c926185a9df5b942171665cadefd5e
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7616844582503609200?digest=sha256%3A0099726501593b5dab3b02f16a95dd0e6a9cc859af042acf80a12aa1147f087c
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256-ca07a2aaeca64ae41e3320aaabfd5638649295fad2b15e35fd1c003dca4b779e.sig
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:ba0342838fc94c3f6ebca04c55e3595151161f2680d5e9105de80eb362aab5da
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:ca07a2aaeca64ae41e3320aaabfd5638649295fad2b15e35fd1c003dca4b779e
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-ca07a2aaeca64ae41e3320aaabfd5638649295fad2b15e35fd1c003dca4b779e.sig
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:576221594abdad7734b407b7042c73c939c926185a9df5b942171665cadefd5e
+    tsa_extra_test.go:155: v2 signature: failed to verify cosign signatures: no matching signatures: unable to verify RFC3161 timestamp bundle: error while verifying signature: x509: ECDSA verification failure
+--- PASS: TestKeyAttestor_TSACertChain_V2Signature (0.11s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/genuine_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/tampered_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/timestamp_over_another_signature (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_V2Signature/timestamp_from_a_foreign_TSA (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_SeparateRepository
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:932c438ee461d7b5177bb35b7ad1cf55baeaf2c63fe0a8f9a9f2280985605f1a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:50c472295f3167959549182420b6549f64de779c7cb68c4a325584aa60ee4549 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8206324640240341642
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8626554968824128247
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8206324640240341642?digest=sha256%3A932c438ee461d7b5177bb35b7ad1cf55baeaf2c63fe0a8f9a9f2280985605f1a
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8626554968824128247?digest=sha256%3A50c472295f3167959549182420b6549f64de779c7cb68c4a325584aa60ee4549
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:50c472295f3167959549182420b6549f64de779c7cb68c4a325584aa60ee4549
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/bundles/blobs/sha256:8c6ca4bbd3244ef9eb4ca5a61d47914dbb32c7fb81960f938119da2346a1e1ab 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/bundles/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/bundles/blobs/uploads/4215016164813803054
+2026/11/08 16:50:20 PUT /v2/test/bundles/blobs/uploads/4215016164813803054?digest=sha256%3A8c6ca4bbd3244ef9eb4ca5a61d47914dbb32c7fb81960f938119da2346a1e1ab
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/bundles/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/bundles/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/bundles/blobs/uploads/3154301517898969207
+2026/11/08 16:50:20 PUT /v2/test/bundles/blobs/uploads/3154301517898969207?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/bundles/manifests/sha256:9e687381bc6857de9c3740d064a14367351e2ad59339d32b24a5aab617abce14
+2026/11/08 16:50:20 GET /v2/test/bundles/referrers/sha256:86b2eeec45c72c443e0c42ba2a98fef9f26651063c9065228919b199e8cab319
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/bundles/referrers/sha256:86b2eeec45c72c443e0c42ba2a98fef9f26651063c9065228919b199e8cab319
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/bundles/manifests/sha256:9e687381bc6857de9c3740d064a14367351e2ad59339d32b24a5aab617abce14
+2026/11/08 16:50:20 GET /v2/test/bundles/blobs/sha256:8c6ca4bbd3244ef9eb4ca5a61d47914dbb32c7fb81960f938119da2346a1e1ab
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/bundles/referrers/sha256:86b2eeec45c72c443e0c42ba2a98fef9f26651063c9065228919b199e8cab319
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/bundles/manifests/sha256:9e687381bc6857de9c3740d064a14367351e2ad59339d32b24a5aab617abce14
+2026/11/08 16:50:20 GET /v2/test/bundles/blobs/sha256:8c6ca4bbd3244ef9eb4ca5a61d47914dbb32c7fb81960f938119da2346a1e1ab
+    tsa_extra_test.go:198: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:198
+        	Error:      	func (assert.PanicTestFunc)(0x5ebccc0) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 570 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc0009d2a20)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc0007d2c80, 0x258, 0x258}, {0xc000613630, 0x46, 0x48}, {0x6da1520, 0xc0009d2a20})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000371a30}, {0x6da1520, 0xc0009d2a20})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000371a30}, {0x6da1520, 0xc0009d2a20}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc00039a3f0, {0x6daa8a0, 0xc000371a30}, {0xa4ac720, 0x0, 0xc0009de9b8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc00039a3f0, {0x6daa8a0, 0xc000371a30}, {0xc00072ecf0?, {0xc000a02150?, 0xc0009df100?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc000b8e8c7?, 0x40?}, 0xc0009df490, 0xc00072ecf0, {0x6daa8a0, 0xc000371a30})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc0004ffba0, {0xc000a02148, 0x1, 0xc000e982c0?}, 0xc000b92600)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc000c70810, {0x6d98cb0, 0xa4ac720}, 0xc000000000, 0xc0000ef400)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SeparateRepository.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:198 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc00079e120)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341b08}, 0xc00079e120, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341b08}, 0xc00079e120, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SeparateRepository(0xc000341b08)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:198 +0xf53
+        	            	testing.tRunner(0xc000341b08, 0x6d3cc98)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 1
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_SeparateRepository
+--- FAIL: TestKeyAttestor_TSACertChain_SeparateRepository (0.03s)
+=== RUN   TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:450fb9ad512afed806dd935a96df5c4757caa95f6690c208fa8eaac82786e1f9 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:3f82d9cd11676fdf653781c2a7ed5f478438e67a2d730d62b070f91f10647242 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/963306228327754638
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4426720681390144235
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/963306228327754638?digest=sha256%3A450fb9ad512afed806dd935a96df5c4757caa95f6690c208fa8eaac82786e1f9
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4426720681390144235?digest=sha256%3A3f82d9cd11676fdf653781c2a7ed5f478438e67a2d730d62b070f91f10647242
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:3f82d9cd11676fdf653781c2a7ed5f478438e67a2d730d62b070f91f10647242
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:fae1cbfd9c2012481b372080a5bdbf38a93a313eb1399eadc25cf1c695857464 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8783563347984693387
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8783563347984693387?digest=sha256%3Afae1cbfd9c2012481b372080a5bdbf38a93a313eb1399eadc25cf1c695857464
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8074962025777164983
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8074962025777164983?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:1d05af005bf0764de8dfbcc821be6ee4101a63420588d0e8c9436a5b1018e87d
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:d716a5dd42bf66baa4b2966b1a7f3a995171c91ca78cd05d3632421c4c7b9b9e
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:d716a5dd42bf66baa4b2966b1a7f3a995171c91ca78cd05d3632421c4c7b9b9e
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:1d05af005bf0764de8dfbcc821be6ee4101a63420588d0e8c9436a5b1018e87d
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:fae1cbfd9c2012481b372080a5bdbf38a93a313eb1399eadc25cf1c695857464
+    tsa_extra_test.go:263: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:263
+        	Error:      	func (assert.PanicTestFunc)(0x5ebea20) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 705 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc00036ce80)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc0007d6500, 0x257, 0x257}, {0xc000b8f680, 0x47, 0x48}, {0x6da1520, 0xc00036ce80})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc0009a9170}, {0x6da1520, 0xc00036ce80})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc0009a9170}, {0x6da1520, 0xc00036ce80}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc0000fb110, {0x6daa8a0, 0xc0009a9170}, {0xa4ac720, 0x0, 0xc0007e7d70?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc0000fb110, {0x6daa8a0, 0xc0009a9170}, {0xc0006336b0?, {0xc000582208?, 0xc0007e8500?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc0007af137?, 0x40?}, 0xc0007e8848, 0xc0006336b0, {0x6daa8a0, 0xc0009a9170})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc000694b60, {0xc0005821f0, 0x1, 0xc0009d31c0?}, 0xc000e98460)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc0009a2f30, {0x6d98cb0, 0xa4ac720}, 0xc000000000, 0xc0009d3160)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:263 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc0009a2f60)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341208}, 0xc0009a2f60, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341208}, 0xc0009a2f60, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle(0xc000341208)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:263 +0x1a89
+        	            	testing.tRunner(0xc000341208, 0x6d3cb48)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 1
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle
+--- FAIL: TestCertificateWithChainAttestor_TSACertChain_SigstoreBundle (0.03s)
+=== RUN   TestKeyAttestor_TSACertChain_TwoTimestampedAttestations
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:dca286906fbf3d0c84ed799df81817507f4717bd8ade2eadd151574c14f7fcb5 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:4790d9d6e303db850597878021e72aa92001d7d54bfbac5e0a7bf9104a154870 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5155194112798046335
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8859022944559514269
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5155194112798046335?digest=sha256%3Adca286906fbf3d0c84ed799df81817507f4717bd8ade2eadd151574c14f7fcb5
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8859022944559514269?digest=sha256%3A4790d9d6e303db850597878021e72aa92001d7d54bfbac5e0a7bf9104a154870
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:4790d9d6e303db850597878021e72aa92001d7d54bfbac5e0a7bf9104a154870
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:cb544a43d05d09db49e12c597c18ca831ddc4770e8f4916c2a34e2ad9217cccb 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/923218904698685741
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/923218904698685741?digest=sha256%3Acb544a43d05d09db49e12c597c18ca831ddc4770e8f4916c2a34e2ad9217cccb
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5283414494826822281
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5283414494826822281?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:d712b2640713c44ca3b69118282ca0405504d30d530699c5124ca91ad9f75af3
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:be20fedf3949af57d307b2ef10c525c92577d7a66ceb44eff4cf72dcb3a8cbf0
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:7a3db6a48d1233f7ce7340e62f5e7bd92343bea89dd04f33f606d5ff711c3673 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4592867230048727738
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4592867230048727738?digest=sha256%3A7a3db6a48d1233f7ce7340e62f5e7bd92343bea89dd04f33f606d5ff711c3673
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:8ad5e09a7f05c60894142e896f42dc5d0efe29c0ac8792c46fe76a808dbf32d1
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:be20fedf3949af57d307b2ef10c525c92577d7a66ceb44eff4cf72dcb3a8cbf0
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:be20fedf3949af57d307b2ef10c525c92577d7a66ceb44eff4cf72dcb3a8cbf0
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:8ad5e09a7f05c60894142e896f42dc5d0efe29c0ac8792c46fe76a808dbf32d1
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:7a3db6a48d1233f7ce7340e62f5e7bd92343bea89dd04f33f606d5ff711c3673
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:d712b2640713c44ca3b69118282ca0405504d30d530699c5124ca91ad9f75af3
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:cb544a43d05d09db49e12c597c18ca831ddc4770e8f4916c2a34e2ad9217cccb
+    tsa_extra_test.go:297: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:297
+        	Error:      	func (assert.PanicTestFunc)(0x5ebfe60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 808 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc000c845c0)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc0007d2000, 0x259, 0x259}, {0xc0004b0c30, 0x48, 0x48}, {0x6da1520, 0xc000c845c0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000c6e550}, {0x6da1520, 0xc000c845c0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000c6e550}, {0x6da1520, 0xc000c845c0}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc0002c1030, {0x6daa8a0, 0xc000c6e550}, {0xa4ac720, 0x0, 0xc0000828f8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc0002c1030, {0x6daa8a0, 0xc000c6e550}, {0xc000f01620?, {0xc0008060b8?, 0xc000083000?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc0004b02d7?, 0x40?}, 0xc0000833d0, 0xc000f01620, {0x6daa8a0, 0xc000c6e550})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc0004feea0, {0xc000c6e7f0, 0x2, 0xc0000efda0?}, 0xc000c84020)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyAttestationSignature(0xc000acb350, {0x6d98cb0, 0xa4ac720}, 0xc000000000, 0xc0000efd60, 0xc0000efd40)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:339 +0xaf3
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_TwoTimestampedAttestations.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:297 +0x70
+        	            	github.com/stretchr/testify/assert.didPanic(0xc000acb3b0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000a8a008}, 0xc000acb3b0, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000a8a008}, 0xc000acb3b0, {0x0, 0x0, 0x0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_TwoTimestampedAttestations(0xc000a8a008)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go:297 +0x1249
+        	            	testing.tRunner(0xc000a8a008, 0x6d3cca8)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 1
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_TwoTimestampedAttestations
+--- FAIL: TestKeyAttestor_TSACertChain_TwoTimestampedAttestations (0.04s)
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/genuine_timestamp_from_the_configured_TSA
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:276b922a523238bc7a5870bf2c4ee059feeba4f141df1135b774e41c10a049d4 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:633d2579b5e5d7168d5572359e47886b9d1c460029cacd6208a14dbf7a6ef547 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2954281556218961942
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7448132234786022166
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2954281556218961942?digest=sha256%3A276b922a523238bc7a5870bf2c4ee059feeba4f141df1135b774e41c10a049d4
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7448132234786022166?digest=sha256%3A633d2579b5e5d7168d5572359e47886b9d1c460029cacd6208a14dbf7a6ef547
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:276b922a523238bc7a5870bf2c4ee059feeba4f141df1135b774e41c10a049d4
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:d885a49922a4cac91178a4c76a85331673b68ffb63355c00e9320bc97d2c17d3 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7794506758197307046
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7794506758197307046?digest=sha256%3Ad885a49922a4cac91178a4c76a85331673b68ffb63355c00e9320bc97d2c17d3
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2503534889817591170
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2503534889817591170?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:6cea1a98da60df402cbf0ffab16777c0fd4f613df8fb0bcb8f202683fc897c38
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:c671f36c09f4db0b51d8a0ed62d6a98e6fee6d5c90ca4bbf85aad11f765e17d6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:c671f36c09f4db0b51d8a0ed62d6a98e6fee6d5c90ca4bbf85aad11f765e17d6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:6cea1a98da60df402cbf0ffab16777c0fd4f613df8fb0bcb8f202683fc897c38
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:d885a49922a4cac91178a4c76a85331673b68ffb63355c00e9320bc97d2c17d3
+    tsa_key_attestor_test.go:177: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112
+        	            				~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177
+        	Error:      	func (assert.PanicTestFunc)(0x5ec1d60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 932 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc0009d26c0)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc0009fe000, 0x258, 0x258}, {0xc0007aeb40, 0x46, 0x48}, {0x6da1520, 0xc0009d26c0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000d95230}, {0x6da1520, 0xc0009d26c0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000d95230}, {0x6da1520, 0xc0009d26c0}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc0004b5960, {0x6daa8a0, 0xc000d95230}, {0xa4ac720, 0x0, 0xc0004a67a8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc0004b5960, {0x6daa8a0, 0xc000d95230}, {0xc0001663c0?, {0xc000806108?, 0xc0004a6f00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc000064fa7?, 0x40?}, 0xc0004a7280, 0xc0001663c0, {0x6daa8a0, 0xc000d95230})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc000694b60, {0xc000806100, 0x1, 0xc00036cf00?}, 0xc00036d280)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc000c829f0, {0x6d98cb0, 0xa4ac720}, 0xc000126000, 0xc00036cec0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc000c82a20)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341208}, 0xc000c82a20, {0xc0004a7b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341208}, 0xc000c82a20, {0xc0004a7b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths(0xc000341208, 0xc000d946c0, 0xc000d946d0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0xe2f
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SigstoreBundle.func4(0xc000341208)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177 +0x57
+        	            	testing.tRunner(0xc000341208, 0xc0004479c0)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 931
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_SigstoreBundle/genuine_timestamp_from_the_configured_TSA
+        	Messages:   	image signature path
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/tampered_timestamp
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:e59d1e1c0b6b88b6354426056f38d5b81e57f64782f88379735f8e7265b6dd0b 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:90634326c544e45821b08a906bc20164adf892db6f28ec545d0786ef4741b6f7 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6331028916958825202
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5873754100640962253
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6331028916958825202?digest=sha256%3Ae59d1e1c0b6b88b6354426056f38d5b81e57f64782f88379735f8e7265b6dd0b
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5873754100640962253?digest=sha256%3A90634326c544e45821b08a906bc20164adf892db6f28ec545d0786ef4741b6f7
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:90634326c544e45821b08a906bc20164adf892db6f28ec545d0786ef4741b6f7
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:d5ce7ab3081ac06b198c08a2407d774da6f152f5b4fcb33dbc03ec083c6d9277 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7193920670804287094
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7193920670804287094?digest=sha256%3Ad5ce7ab3081ac06b198c08a2407d774da6f152f5b4fcb33dbc03ec083c6d9277
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/404507498762336450
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/404507498762336450?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:216b1de865512021420635bf20e0bfe3d22fa1fc320a7c81428109a037b4e423
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:ed02eb639ea0d72ae49647038bcd2a50229c07214359ecfe26d18628de16ae24
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:ed02eb639ea0d72ae49647038bcd2a50229c07214359ecfe26d18628de16ae24
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:216b1de865512021420635bf20e0bfe3d22fa1fc320a7c81428109a037b4e423
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:d5ce7ab3081ac06b198c08a2407d774da6f152f5b4fcb33dbc03ec083c6d9277
+    tsa_key_attestor_test.go:177: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112
+        	            				~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177
+        	Error:      	func (assert.PanicTestFunc)(0x5ec1d60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 972 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc0003f3100)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc000994000, 0x259, 0x259}, {0xc000b8e140, 0x47, 0x48}, {0x6da1520, 0xc0003f3100})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000a800f0}, {0x6da1520, 0xc0003f3100})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000a800f0}, {0x6da1520, 0xc0003f3100}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc00039a380, {0x6daa8a0, 0xc000a800f0}, {0xa4ac720, 0x0, 0xc0004a27a8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc00039a380, {0x6daa8a0, 0xc000a800f0}, {0xc000759ec0?, {0xc00010a450?, 0xc0004a2f00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc0007af4a7?, 0x40?}, 0xc0004a3280, 0xc000759ec0, {0x6daa8a0, 0xc000a800f0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc000694b60, {0xc00010a440, 0x1, 0xc000c84aa0?}, 0xc000c84d80)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc000c823c0, {0x6d98cb0, 0xa4ac720}, 0xc000000900, 0xc000c84a60)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc000c823f0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341b08}, 0xc000c823f0, {0xc0004a3b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341b08}, 0xc000c823f0, {0xc0004a3b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths(0xc000341b08, 0xc000d94740, 0xc000d946e0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0xe2f
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SigstoreBundle.func4(0xc000341b08)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177 +0x57
+        	            	testing.tRunner(0xc000341b08, 0xc000998840)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 931
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_SigstoreBundle/tampered_timestamp
+        	Messages:   	image signature path
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_over_another_signature
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:63d92809de1137248e1fbc08c90a5f949c50db350bc8527637108ddc55855f8d 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:d42b6ba1a7fe9be6e32f8350a20e095ccaf6c8c26276b1ceb1ef22a20a3cb621 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2312829774426283370
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/3210175018903868896
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2312829774426283370?digest=sha256%3Ad42b6ba1a7fe9be6e32f8350a20e095ccaf6c8c26276b1ceb1ef22a20a3cb621
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/3210175018903868896?digest=sha256%3A63d92809de1137248e1fbc08c90a5f949c50db350bc8527637108ddc55855f8d
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:d42b6ba1a7fe9be6e32f8350a20e095ccaf6c8c26276b1ceb1ef22a20a3cb621
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:99929c6bd7d0cacdbc5410705ee6dd2c6afd4db11407727544eeb8accc436efb 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/3647625450511185915
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/3647625450511185915?digest=sha256%3A99929c6bd7d0cacdbc5410705ee6dd2c6afd4db11407727544eeb8accc436efb
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2099574921513874108
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2099574921513874108?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:2bc4c7949a89c589d5a1ea9c86375c383c5bf44e89ce4286524921b8f395b692
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:f60a1e33967108ae72ed609bc4055e09ab3817a4301f344dd7ad9f699d84fb4b
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:f60a1e33967108ae72ed609bc4055e09ab3817a4301f344dd7ad9f699d84fb4b
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:2bc4c7949a89c589d5a1ea9c86375c383c5bf44e89ce4286524921b8f395b692
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:99929c6bd7d0cacdbc5410705ee6dd2c6afd4db11407727544eeb8accc436efb
+    tsa_key_attestor_test.go:177: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112
+        	            				~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177
+        	Error:      	func (assert.PanicTestFunc)(0x5ec1d60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 1125 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc00036ce60)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc000994500, 0x25a, 0x25a}, {0xc0004b1590, 0x46, 0x48}, {0x6da1520, 0xc00036ce60})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000c6ee30}, {0x6da1520, 0xc00036ce60})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000c6ee30}, {0x6da1520, 0xc00036ce60}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc0000fb030, {0x6daa8a0, 0xc000c6ee30}, {0xa4ac720, 0x0, 0xc0001467a8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc0000fb030, {0x6daa8a0, 0xc000c6ee30}, {0xc0007aa510?, {0xc0000063e0?, 0xc000146f00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc0004b0737?, 0x40?}, 0xc000147280, 0xc0007aa510, {0x6daa8a0, 0xc000c6ee30})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc000616000, {0xc0000063d0, 0x1, 0xc0009d2120?}, 0xc00036c8e0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc00079fd40, {0x6d98cb0, 0xa4ac720}, 0xc000000000, 0xc0009d20e0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc00079fd70)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341208}, 0xc00079fd70, {0xc000147b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341208}, 0xc00079fd70, {0xc000147b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths(0xc000341208, 0xc000d94750, 0xc000d946f0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0xe2f
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SigstoreBundle.func4(0xc000341208)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177 +0x57
+        	            	testing.tRunner(0xc000341208, 0xc000c6c300)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 931
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_over_another_signature
+        	Messages:   	image signature path
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_from_a_foreign_TSA
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:495994b244399a6fee9e89b540e258976bb1f3fa3d62bcf92962fba633443d81 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:6897fe43b58cbe7f009821ce96a3f0a1d2a2774a074483851d509a0058acc7ba 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6518173441895393913
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8531441984442811958
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6518173441895393913?digest=sha256%3A495994b244399a6fee9e89b540e258976bb1f3fa3d62bcf92962fba633443d81
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8531441984442811958?digest=sha256%3A6897fe43b58cbe7f009821ce96a3f0a1d2a2774a074483851d509a0058acc7ba
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:6897fe43b58cbe7f009821ce96a3f0a1d2a2774a074483851d509a0058acc7ba
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:733f6c9da29cb3b98c4ec236a74649cc75e6e05125e7d46c0cdf839625a813ec 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7001948412934737581
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7001948412934737581?digest=sha256%3A733f6c9da29cb3b98c4ec236a74649cc75e6e05125e7d46c0cdf839625a813ec
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8665743014962312914
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8665743014962312914?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:28fe1f17bf7ed23a82a40efc7705a5586cf551eee4267e277b5bd8a40951ada0
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:e0790d3e4fdedd2f3ce37c795686515e3964456f3fda4901a8cd830bec1749aa
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:e0790d3e4fdedd2f3ce37c795686515e3964456f3fda4901a8cd830bec1749aa
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:28fe1f17bf7ed23a82a40efc7705a5586cf551eee4267e277b5bd8a40951ada0
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:733f6c9da29cb3b98c4ec236a74649cc75e6e05125e7d46c0cdf839625a813ec
+    tsa_key_attestor_test.go:177: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112
+        	            				~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177
+        	Error:      	func (assert.PanicTestFunc)(0x5ec1d60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 1191 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc000c848a0)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc00021aa00, 0x259, 0x259}, {0xc0007aeaf0, 0x47, 0x48}, {0x6da1520, 0xc000c848a0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000370940}, {0x6da1520, 0xc000c848a0})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000370940}, {0x6da1520, 0xc000c848a0}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc000714a10, {0x6daa8a0, 0xc000370940}, {0xa4ac720, 0x0, 0xc0001427a8?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc000714a10, {0x6daa8a0, 0xc000370940}, {0xc000f01350?, {0xc000a020f0?, 0xc000142f00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc000612ff7?, 0x40?}, 0xc000143280, 0xc000f01350, {0x6daa8a0, 0xc000370940})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc0004c49c0, {0xc000a020e8, 0x1, 0xc0009d2ca0?}, 0xc0009d3340)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc00055d650, {0x6d98cb0, 0xa4ac720}, 0xc000000000, 0xc0009d2c60)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc00055d860)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc000341b08}, 0xc00055d860, {0xc000143b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc000341b08}, 0xc00055d860, {0xc000143b68, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths(0xc000341b08, 0xc000d94700, 0xc000d94710)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0xe2f
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChain_SigstoreBundle.func4(0xc000341b08)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:177 +0x57
+        	            	testing.tRunner(0xc000341b08, 0xc000f0eb80)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 931
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_from_a_foreign_TSA
+        	Messages:   	image signature path
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/no_timestamp
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:8bfc1d2da8fe1513ab69473c016af290a3aab34396f5ba6dcdb7f23e83b96377 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:b89282e94b650ac8b0ed9b6a72a95f7bcf63c8bfd0d719377fad747111b2ce7e 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4918842736122183543
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2729575033108259413
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4918842736122183543?digest=sha256%3A8bfc1d2da8fe1513ab69473c016af290a3aab34396f5ba6dcdb7f23e83b96377
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2729575033108259413?digest=sha256%3Ab89282e94b650ac8b0ed9b6a72a95f7bcf63c8bfd0d719377fad747111b2ce7e
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:8bfc1d2da8fe1513ab69473c016af290a3aab34396f5ba6dcdb7f23e83b96377
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:0f4a98b5a086db04e3532393ddf1942f4336e2c5fe17d9a34c47624f131b7d2c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/629573716154663817
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/629573716154663817?digest=sha256%3A0f4a98b5a086db04e3532393ddf1942f4336e2c5fe17d9a34c47624f131b7d2c
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/4180465753794156296
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/4180465753794156296?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:8f3920fe729b316f03e27548cf466248ff71e00513930ed6da8155b39e536c1d
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:708ac5477952612c4ec0112f9c6d2b1a99feac3c6c3f7e1d51986fdbf9c746a6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:708ac5477952612c4ec0112f9c6d2b1a99feac3c6c3f7e1d51986fdbf9c746a6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:8f3920fe729b316f03e27548cf466248ff71e00513930ed6da8155b39e536c1d
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:0f4a98b5a086db04e3532393ddf1942f4336e2c5fe17d9a34c47624f131b7d2c
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:708ac5477952612c4ec0112f9c6d2b1a99feac3c6c3f7e1d51986fdbf9c746a6
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:8f3920fe729b316f03e27548cf466248ff71e00513930ed6da8155b39e536c1d
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:0f4a98b5a086db04e3532393ddf1942f4336e2c5fe17d9a34c47624f131b7d2c
+    tsa_key_attestor_test.go:178: image signature path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+    tsa_key_attestor_test.go:179: attestation path: failed to verify cosign signatures: no matching attestations: failed to verify timestamps: threshold not met for verified signed timestamps: 0 < 1; error: %!w(<nil>)
+=== RUN   TestKeyAttestor_TSACertChain_SigstoreBundle/no_tsaCertChain,_bundle_with_timestamp
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:6aeb9169dcf9cc7de11c4de497f72ed53fcc27ea13cfd0b6f1d1bd5abb242e44 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:1ec505c03fcebdbe9573fa23ea9a1e5a50f55008933e2f7a498cba2e612d9fcc 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7529311628236423388
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6247773223506330502
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7529311628236423388?digest=sha256%3A1ec505c03fcebdbe9573fa23ea9a1e5a50f55008933e2f7a498cba2e612d9fcc
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6247773223506330502?digest=sha256%3A6aeb9169dcf9cc7de11c4de497f72ed53fcc27ea13cfd0b6f1d1bd5abb242e44
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:1ec505c03fcebdbe9573fa23ea9a1e5a50f55008933e2f7a498cba2e612d9fcc
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:b18cfbf06bd6688246edc471833f40fa05d55d9cfebbf72527c8401be69377dc 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/2194674704975901183
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/2194674704975901183?digest=sha256%3Ab18cfbf06bd6688246edc471833f40fa05d55d9cfebbf72527c8401be69377dc
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8208537084067093057
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8208537084067093057?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:a7d29a47ed4b10ba65078a8a785e2f0c4698fff9462611853cfc52735ca033c7
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:fba40a95fc734aa0cde16f21320345e087ab51e11a59e9420a8e3fde6904107d
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:fba40a95fc734aa0cde16f21320345e087ab51e11a59e9420a8e3fde6904107d
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:a7d29a47ed4b10ba65078a8a785e2f0c4698fff9462611853cfc52735ca033c7
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:b18cfbf06bd6688246edc471833f40fa05d55d9cfebbf72527c8401be69377dc
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:fba40a95fc734aa0cde16f21320345e087ab51e11a59e9420a8e3fde6904107d
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:a7d29a47ed4b10ba65078a8a785e2f0c4698fff9462611853cfc52735ca033c7
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:b18cfbf06bd6688246edc471833f40fa05d55d9cfebbf72527c8401be69377dc
+    tsa_key_attestor_test.go:178: image signature path: <nil>
+    tsa_key_attestor_test.go:179: attestation path: <nil>
+--- FAIL: TestKeyAttestor_TSACertChain_SigstoreBundle (0.16s)
+    --- FAIL: TestKeyAttestor_TSACertChain_SigstoreBundle/genuine_timestamp_from_the_configured_TSA (0.02s)
+    --- FAIL: TestKeyAttestor_TSACertChain_SigstoreBundle/tampered_timestamp (0.02s)
+    --- FAIL: TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_over_another_signature (0.02s)
+    --- FAIL: TestKeyAttestor_TSACertChain_SigstoreBundle/timestamp_from_a_foreign_TSA (0.02s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/no_timestamp (0.03s)
+    --- PASS: TestKeyAttestor_TSACertChain_SigstoreBundle/no_tsaCertChain,_bundle_with_timestamp (0.03s)
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/sigstore_bundle
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:0ddee9d58eb9fd51c4c66c8616f207f486bcc9db5aa26958f22b6d481009e21c 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:342b52ed36f50b8a75fb499e3a042c5ea9103592125e6ab024cb3882dfb162ad 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/189110745440469939
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/8919338190108905100
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/189110745440469939?digest=sha256%3A0ddee9d58eb9fd51c4c66c8616f207f486bcc9db5aa26958f22b6d481009e21c
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/8919338190108905100?digest=sha256%3A342b52ed36f50b8a75fb499e3a042c5ea9103592125e6ab024cb3882dfb162ad
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:b7c69f6c712d315165f717de6dd59b34c7a770e748e567ab0e0a26a5b05e6550 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7531616800812751005
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7531616800812751005?digest=sha256%3Ab7c69f6c712d315165f717de6dd59b34c7a770e748e567ab0e0a26a5b05e6550
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7004564464385173838
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7004564464385173838?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:1aacdc89ac2e6c91d6fe53c40dbc080d95accf4c185d6a4b5e3d58e63e92adc4
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:a9c9059bc7f58bc1672ac5dca68d078edaa636b332202d065d216d752c0acd0c
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:342b52ed36f50b8a75fb499e3a042c5ea9103592125e6ab024cb3882dfb162ad
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:a9c9059bc7f58bc1672ac5dca68d078edaa636b332202d065d216d752c0acd0c
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:1aacdc89ac2e6c91d6fe53c40dbc080d95accf4c185d6a4b5e3d58e63e92adc4
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:b7c69f6c712d315165f717de6dd59b34c7a770e748e567ab0e0a26a5b05e6550
+    tsa_key_attestor_test.go:212: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:212
+        	Error:      	Expected value not to be nil.
+        	Test:       	TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/sigstore_bundle
+        	Messages:   	Sigstore bundles are verified against TrustedMaterial only
+=== RUN   TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/v2_signature
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:3c4501e8cb2e3e0a18d153b6fc8f6ba78bd8b862aca049105a409aa288800ae5 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:b9ec3244ed14b1aed647fe87399fc40fef51634b09cb67262599c81ba874b5ab 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6458377508326766095
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6578716186616377645
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6458377508326766095?digest=sha256%3A3c4501e8cb2e3e0a18d153b6fc8f6ba78bd8b862aca049105a409aa288800ae5
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6578716186616377645?digest=sha256%3Ab9ec3244ed14b1aed647fe87399fc40fef51634b09cb67262599c81ba874b5ab
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256-f1204097eb83ab97dae4c5d96e5341b0224ce9bc2266f73126b668cd4ecd7ee0.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/sha256-f1204097eb83ab97dae4c5d96e5341b0224ce9bc2266f73126b668cd4ecd7ee0.sig 404 MANIFEST_UNKNOWN Unknown manifest
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:534653bbb29fcc30d6637168788e186ce37ed80d1eccd3c344a10868ef40b6a1 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:fea8994e4ce8c6013c7b0689d791a0138e29f5d36dde80725b741fedb7334325 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7642092075228369028
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7676904095901057440
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7642092075228369028?digest=sha256%3A534653bbb29fcc30d6637168788e186ce37ed80d1eccd3c344a10868ef40b6a1
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7676904095901057440?digest=sha256%3Afea8994e4ce8c6013c7b0689d791a0138e29f5d36dde80725b741fedb7334325
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256-f1204097eb83ab97dae4c5d96e5341b0224ce9bc2266f73126b668cd4ecd7ee0.sig
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:b9ec3244ed14b1aed647fe87399fc40fef51634b09cb67262599c81ba874b5ab
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:f1204097eb83ab97dae4c5d96e5341b0224ce9bc2266f73126b668cd4ecd7ee0
+--- FAIL: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial (0.04s)
+    --- FAIL: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/sigstore_bundle (0.02s)
+    --- PASS: TestBuildCheckOpts_KeyBased_TSACertChain_TrustedMaterial/v2_signature (0.02s)
+=== RUN   TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:79843e80efc4558d5275c2216aa97242f6b73dd44b70301c624522cbb58174cf 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:3b09ab875253f54892e0d5a55782178b111f52c480dbe6fcefb6458737d06189 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/442762031683558729
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/7386557709542223298
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/7386557709542223298?digest=sha256%3A3b09ab875253f54892e0d5a55782178b111f52c480dbe6fcefb6458737d06189
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/442762031683558729?digest=sha256%3A79843e80efc4558d5275c2216aa97242f6b73dd44b70301c624522cbb58174cf
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:3b09ab875253f54892e0d5a55782178b111f52c480dbe6fcefb6458737d06189
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:b23fcfeaf96d1d5849a81bf512af2c05634e1a3fa188f78b610505b95be523ae 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/6468642241136444683
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/6468642241136444683?digest=sha256%3Ab23fcfeaf96d1d5849a81bf512af2c05634e1a3fa188f78b610505b95be523ae
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/08 16:50:20 POST /v2/test/img/blobs/uploads/
+2026/11/08 16:50:20 PATCH /v2/test/img/blobs/uploads/5596655140084187118
+2026/11/08 16:50:20 PUT /v2/test/img/blobs/uploads/5596655140084187118?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 PUT /v2/test/img/manifests/sha256:fe41a0db550cbe69ea386197e19a24b2683bef873085d2e22c5bf2cec37511bd
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:370c98cc92f4aea5c938de97d59e6df8af9cf0489820568684badabbc59f3032
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/subject
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/referrers/sha256:370c98cc92f4aea5c938de97d59e6df8af9cf0489820568684badabbc59f3032
+2026/11/08 16:50:20 GET /v2/
+2026/11/08 16:50:20 GET /v2/test/img/manifests/sha256:fe41a0db550cbe69ea386197e19a24b2683bef873085d2e22c5bf2cec37511bd
+2026/11/08 16:50:20 GET /v2/test/img/blobs/sha256:b23fcfeaf96d1d5849a81bf512af2c05634e1a3fa188f78b610505b95be523ae
+    tsa_key_attestor_test.go:246: 
+        	Error Trace:	~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112
+        	            				~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:246
+        	Error:      	func (assert.PanicTestFunc)(0x5ec1d60) should not panic
+        	            		Panic value:	runtime error: invalid memory address or nil pointer dereference
+        	            		Panic stack:	goroutine 1553 [running]:
+        	            	runtime/debug.Stack()
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/debug/stack.go:26 +0x68
+        	            	github.com/stretchr/testify/assert.didPanic.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1286 +0x9f
+        	            	panic({0x649ffc0?, 0x93bfc90?})
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/runtime/panic.go:860 +0x13a
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.(*verifyTrustedMaterial).TimestampingAuthorities(0xc0002b4f00)
+        	            		<autogenerated>:1 +0x35
+        	            	github.com/sigstore/sigstore-go/pkg/verify.verifySignedTimestamp({0xc000944c80, 0x259, 0x259}, {0xc0004b1ea0, 0x47, 0x48}, {0x6da1520, 0xc0002b4f00})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:93 +0x82
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestamp({0x6daa8a0, 0xc000d94c90}, {0x6da1520, 0xc0002b4f00})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:47 +0x36c
+        	            	github.com/sigstore/sigstore-go/pkg/verify.VerifySignedTimestampWithThreshold({0x6daa8a0, 0xc000d94c90}, {0x6da1520, 0xc0002b4f00}, 0x1)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/tsa.go:82 +0x77
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).VerifyObserverTimestamps(0xc0003995e0, {0x6daa8a0, 0xc000d94c90}, {0xa4ac720, 0x0, 0xc0008c6730?})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:879 +0xe5
+        	            	github.com/sigstore/sigstore-go/pkg/verify.(*Verifier).Verify(0xc0003995e0, {0x6daa8a0, 0xc000d94c90}, {0xc000a6faa0?, {0xc0005821a8?, 0xc0008c6e00?, 0x4?}})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/sigstore-go@v1.3.0/pkg/verify/signed_entity.go:637 +0x325
+        	            	github.com/sigstore/cosign/v3/pkg/cosign.VerifyNewBundle({0xc000b8f637?, 0x40?}, 0xc0008c7208, 0xc000a6faa0, {0x6daa8a0, 0xc000d94c90})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/sigstore/cosign/v3@v3.1.2/pkg/cosign/verify_bundle.go:42 +0x155
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBundles({0x6d98cb0, 0xa4ac720}, 0xc000616000, {0xc0005821a0, 0x1, 0xc0009d2540?}, 0xc0009d2840)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:189 +0x3f2
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.(*Verifier).VerifyImageSignature(0xc000167dd0, {0x6d98cb0, 0xa4ac720}, 0xc000126000, 0xc0009d24e0)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/verifier.go:275 +0x805
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths.func1()
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0x67
+        	            	github.com/stretchr/testify/assert.didPanic(0xc000167e00)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1291 +0xd4
+        	            	github.com/stretchr/testify/assert.NotPanics({0x6d63760, 0xc0008f6248}, 0xc000167e00, {0xc0008c7af0, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/assert/assertions.go:1362 +0xa5
+        	            	github.com/stretchr/testify/require.NotPanics({0x6d7c6a8, 0xc0008f6248}, 0xc000167e00, {0xc0008c7af0, 0x1, 0x1})
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/gomodcache/github.com/stretchr/testify@v1.11.1/require/require.go:1711 +0xb4
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.verifyBothPaths(0xc0008f6248, 0xc0008c7dd0, 0xc0008c7e90)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:112 +0xe2f
+        	            	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign.TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle(0xc0008f6248)
+        	            		~/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2/pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go:246 +0x314
+        	            	testing.tRunner(0xc0008f6248, 0x6d3cc90)
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2036 +0x21d
+        	            	created by testing.(*T).Run in goroutine 1
+        	            		~/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/src/testing/testing.go:2101 +0xb13
+        	Test:       	TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle
+        	Messages:   	image signature path
+--- FAIL: TestKeyAttestor_TSACertChainWithoutRoot_SigstoreBundle (0.03s)
+=== RUN   TestCheckOptions_CertificateBased_TSACertChain_Unchanged
+--- PASS: TestCheckOptions_CertificateBased_TSACertChain_Unchanged (0.00s)
+FAIL
+FAIL	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	0.768s
+FAIL
+code 1

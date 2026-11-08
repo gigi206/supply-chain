@@ -1,0 +1,3 @@
+== paquet ivpol/cosign complet, correctif v2 et tests complets, v1.19.2 e63308f1e16c, go1.26.10, 15:52:21 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	97.733s
+code 0
