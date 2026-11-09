@@ -1352,3 +1352,22 @@ Rien n'a été lu ni écrit dans le cluster, Loki, Grafana ou les VM. Journal : 
 **Ce qui reste vrai de l'additif de 23:29 UTC.** Les limites (rien de vérifié sur le vrai Loki) et les points ouverts (règle de verdict à confirmer, passage en lecture seule sur accord, push) sont inchangés. S'y ajoute l'hypothèse du témoin, à mesurer lors du passage en lecture seule.
 
 **Temps du chantier** : environ 8 h 25 à 23:34 UTC, pour 4 h estimées. Le créneau, ouvert à 23:18:59 UTC, a duré environ 16 min.
+
+## Additif du 09/11/2026, 23:36 UTC : ce que la suite d'E4 change vraiment, contrôle par contrôle ; temps corrigé (corrigé à 23:36 UTC, avant tout push)
+
+Sur relecture du conseiller ; rien lu ni écrit dans le cluster, Loki ou les VM. Les additifs de 23:23 et 23:34 UTC ne sont pas réécrits.
+
+**Prédiction fausse de 23:23 UTC pour Cilium.** « Sur le cluster en service, jugés si le témoin est vu » ne vaut pas pour `cilium.sh verifier`. Sa fenêtre s'ouvre à la plus ancienne création des pods de Cilium. Ces pods sont antérieurs au dernier démarrage d'Alloy, le 09/11 à 17:05:19 UTC (`evenements-redemarrage.log`). Les additifs de 23:23 et 23:29 UTC disaient 17:08, qui est l'heure de l'additif sur le rétablissement, pas celle du redémarrage. Le contrôle du démarrage d'Alloy rend donc « non jugé », et le compte de kubectl sans borne décide, faux KO compris. Il ne sera jugé par Loki qu'après une recréation des pods postérieure au démarrage d'Alloy, par exemple `cilium.sh appliquer` sur le cluster en service.
+
+**Ce que la suite d'E4 apporte, déduit du code et de l'ordre de `rejeu.sh`, non mesuré.**
+
+| Contrôle | Cluster en service | Rejeu de zéro |
+|---|---|---|
+| `scan_saut_suspendre`, les deux de `scan_saut_reprendre` | jugés par Loki si le témoin est vu | jugés si lancés après la 19 et la 19b |
+| `resolveurs_pod` | jugé si le témoin est vu | non jugé (passe en J8, avant la 19 et la 19b) |
+| `cilium.sh verifier` | jugé seulement après une recréation des pods postérieure au démarrage d'Alloy | jamais jugé (passe juste après J1) |
+| `h2_releve` | non jugé tant que H2 n'est pas rejouée après le démarrage d'Alloy | idem |
+
+Là où Loki ne juge pas, le verdict reste celui de l'ancienne lecture par kubectl, défaut de TTL compris.
+
+**Temps corrigé.** L'additif de 23:34 UTC disait « environ 8 h 25 » et « environ 16 min ». Le créneau a couru de 23:18:59 à 23:34 UTC, soit environ 15 min ; le chantier totalise donc environ 8 h 20 pour 4 h estimées, et environ 8 h 25 à 23:36 UTC.
