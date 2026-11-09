@@ -1135,3 +1135,8 @@ Si P2 ou P4 échoue, l'essai ne prouve rien et l'application reste bloquée.
 Propositions 1 à 4 de l'additif de 17:29 inchangées, toujours en attente.
 
 **Corrigé à 22:12 UTC, avant tout push.** Le motif du témoin promtool venait seulement du faux `promtool`. Il est maintenant lu dans `cmd/promtool/unittest.go` au tag v3.13.5, la version épinglée par `observabilite.sh` : chaque échec s'écrit `alertname: <nom>, time: <eval_time>`, et `eval_time` est un `model.Duration`, donc `6m`. Le témoin exige désormais exactement un échec, celui d'`EvenementsMuets` à `6m`. Raisonnement, non mesuré : sans la branche `absent`, seul le cas « compteur jamais créé » devrait échouer, car le compteur figé déclenche encore l'alerte par `increase`, et les cas « compteur qui avance » et « Alloy arrêté » attendent le silence. Neuvième cas hors cluster, deux échecs dans la sortie du témoin : rejeté, code 1. Les neuf cas sont conformes ; journal complété par un additif. P2 devient : le témoin promtool est refusé sur le seul cas de 6 min.
+
+
+## Additif du 09/11/2026, 22:23 UTC : décision du propriétaire sur le dépassement de (a)
+
+Question posée à 22:12 UTC : « Faut-il continuer (a) ? », avec deux choix, continuer avec 1 h de plus, ou arrêter. Première réponse : « A », ambiguë (première option, ou « Arrêter »), donc rien lancé. Réponse suivante : « Continuer ». Décision : (a) continue, avec 1 h de travail actif de plus à partir de 22:23 UTC, pour l'essai réel, l'application dans l'ordre imposé, la vérification en lecture seule, le doc 03 et les README. Cette décision n'est pas un accord pour l'essai réel ni pour l'application, qui gardent chacun le leur.
