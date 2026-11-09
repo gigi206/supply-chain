@@ -1,0 +1,12 @@
+# Relevé en lecture publique de kyverno/kyverno#18525, à l'accord du propriétaire (« Oui, archive »)
+# Rejoue les trois lectures de la tâche planifiée supply-chain-kyverno-18525-releve-0911 (passage du 09/11/2026, 12:00:45 UTC)
+# début : 2026-11-09T12:11:13Z
+## issue
+{"assignees":[],"comments":0,"labels":["bug","type:cli","triage"],"milestone":null,"state":"open","state_reason":null,"updated_at":"2026-11-08T17:20:55Z"}
+## chronologie
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"bug","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"type:cli","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"triage","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:22:49Z","event":"referenced","label":null,"source":null}
+## commentaires
+# fin : 2026-11-09T12:11:14Z

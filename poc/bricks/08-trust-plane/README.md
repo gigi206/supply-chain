@@ -2038,6 +2038,12 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 **Suite** : la PR attend que les mainteneurs retirent l'étiquette `triage` (règle 4 de leur politique IA) ; avant elle, regrouper les tests, golangci-lint (accord pour le téléchargement), identité DCO, fork `gigi206/kyverno` (action publique), chacun avec l'accord du propriétaire. Étape C (admission) : après W8.
 
+**Additif du 09/11/2026, 12:11 UTC : relevé de l'issue, rien n'a bougé.** La tâche planifiée `supply-chain-kyverno-18525-releve-0911` a fait un relevé en lecture publique seule, démarré à 12:00:45 UTC et relevé à 12:00:51 UTC. Son rapport n'existe que dans sa session. Les trois mêmes lectures ont été rejouées de 12:11:13 à 12:11:14 UTC, sur l'accord du propriétaire (« Oui, archive »), et donnent le même résultat. Journal : [`kyverno-issue-18525-releve-0911.log`](resultats/kyverno-issue-18525-releve-0911.log).
+- L'issue est ouverte, sans personne assigné ni jalon. Sa dernière mise à jour est sa publication (08/11, 17:20:55 UTC).
+- Étiquettes `bug`, `type:cli` et `triage`, toutes posées par `gigi206` le 08/11 à 17:20:57 UTC. **`triage` n'a pas été retirée.**
+- 0 commentaire, donc aucune question en attente. Aucune issue ni PR liée : le seul événement `referenced` (08/11, 17:22:49 UTC) vient de notre commit `b84261b`.
+- **Pour la PR** : elle ne peut pas encore être proposée. La suite décrite ci-dessus est inchangée.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
