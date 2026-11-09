@@ -612,3 +612,5 @@ Revue menée sur « continue », sans validation du propriétaire, rien lu dans 
 - Le compte sur 24 h de `controle_l3` (ligne 391) compte des écritures : chaque mise à jour d'un Event en ajoute une.
 - Le témoin J4 lit sur 15 min : sa date tronquée à la seconde ne le fait pas manquer.
 - Limites lues dans le source, non observées : après un redémarrage d'Alloy, des Events peuvent être perdus ou doublés (position figée au démarrage, heure du dernier envoyé) ; un arrêt de plus d'une heure perd les Events expirés.
+
+**Additif du 09/11/2026, 17:32 UTC (chantier des Events, README de la 08c) : `config/alloy/stockage/evenements.alloy` modifié dans le dépôt, non déployé.** Le compteur `stage.metrics` (`loki_process_custom_evenements_lignes_total`) attend l'essai `evenements.sh essai_alerte`, puis une application avec l'accord du propriétaire. D'ici là, le dépôt et `sc-stockage` divergent : un `journalisation.sh installer` ou un rejeu le poserait sans décision.

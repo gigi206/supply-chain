@@ -1068,7 +1068,7 @@ Sa classe est **`connection refused`**. Au démarrage d'Alloy de `sc-stockage`, 
 
 ## Additif du 09/11/2026, 17:29 UTC : remède durable (a), alerte EvenementsMuets préparée à sec, non essayée ni appliquée
 
-**Décision du propriétaire.** Question posée : « que recommande l'advisor ? ». La recommandation transmise était (a), une alerte sur l'absence de lignes d'Events ; (b) tel quel était déconseillé ; (c) restait possible en plus, sur accord explicite. Le propriétaire a répondu « Oui, prépare (a) ». Rien n'a été lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM depuis la vérification de 17:08 UTC.
+**Décision du propriétaire.** Il a demandé « que recommande l'advisor ? ». La recommandation transmise était (a), une alerte sur l'absence de lignes d'Events ; (b) tel quel était déconseillé ; (c) restait possible en plus, sur accord explicite. À la question « Je prépare l'alerte (a) à sec ? », il a répondu « Oui, prépare (a) » (citation corrigée à 17:32 UTC, avant tout push). Rien n'a été lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM depuis la vérification de 17:08 UTC.
 
 **Lu dans le source d'Alloy v1.21.3** (`internal/component/loki/process/stages/metric.go` et `metric/counters.go`) :
 - `stage.metrics` crée un compteur nommé `loki_process_custom_` suivi du nom donné ;
@@ -1085,7 +1085,7 @@ Conséquence : une règle « le compteur n'augmente plus » seule resterait muet
   - Second cas : compteur absent alors qu'Alloy répond.
   - Si Alloy est arrêté, c'est `CollecteEnPanne` qui sonne.
 - `alertes-tests.yml` : quatre cas `promtool`.
-  - Compteur figé à 10 min : rien à 24 et 29 min, alerte à 31 min.
+  - Compteur figé à 10 min : rien à 23 min ni à 28 min, alerte à 29 min. Corrigé à 17:32 UTC, avant tout push : les instants d'abord écrits (24, 29, 31 min) étaient décalés d'une minute, puisque `0+60x10` vaut 600 dès 10 min ; l'assertion « rien à 29 min » aurait échoué.
   - Compteur qui avance : rien.
   - Compteur jamais créé, Alloy répond : alerte à 6 min.
   - Alloy arrêté : `EvenementsMuets` se tait, `CollecteEnPanne` sonne.
@@ -1095,11 +1095,12 @@ Conséquence : une règle « le compteur n'augmente plus » seule resterait muet
 
 **Prédictions de l'essai, avant tout passage** :
 - `promtool check rules` réussit ;
-- `promtool test rules` réussit, cas existants compris ; confiance moyenne sur les bornes de 24, 29 et 31 min, à cause de la fenêtre ouverte à gauche de Prometheus 3 ;
+- `promtool test rules` réussit, cas existants compris ; confiance moyenne sur les bornes de 23, 28 et 29 min, à cause de la fenêtre ouverte à gauche de Prometheus 3 (corrigé à 17:32 UTC, avant tout push) ;
 - `alloy validate` accepte la configuration ; confiance moyenne : `stage.metrics` n'a jamais été validé dans ce dépôt.
 
 **Propositions en attente du propriétaire** :
 1. **`evenements.sh essai_alerte`.** Effets : un répertoire temporaire dans `/tmp` de `sc-stockage`, retiré ensuite ; aucun service touché. Pire cas : un répertoire temporaire laissé si la commande est interrompue.
-2. **Application, après un essai réussi**, avec son propre accord. Elle consiste à poser `evenements.alloy` sur `sc-stockage`, valider, redémarrer Alloy, puis `observabilite.sh deployer`, qui pose `alertes.yml` et redémarre Prometheus. On vérifie ensuite en lecture seule que le compteur avance et que l'alerte est inactive. Effets : deux redémarrages, chacun coupant quelques secondes de collecte ou d'évaluation des alertes.
+2. **Application, après un essai réussi**, avec son propre accord. L'ordre est imposé : poser `evenements.alloy` sur `sc-stockage`, valider, redémarrer Alloy ; lire la série du compteur dans Prometheus ; seulement ensuite `observabilite.sh deployer`, qui pose `alertes.yml` et redémarre Prometheus. Une règle déployée avant que Prometheus voie le compteur déclencherait une fausse alerte critique 5 min plus tard (ordre ajouté à 17:32 UTC, avant tout push). On vérifie ensuite en lecture seule que le compteur avance et que l'alerte est inactive. Effets : deux redémarrages, chacun coupant quelques secondes de collecte ou d'évaluation des alertes.
+   - **Point à relire sur la vraie série**, ajouté à 17:32 UTC. D'après le source, `stage.metrics` reprend les étiquettes de la ligne (`recordCounter(..., e.Labels, ...)`) : le compteur porterait `job="evenements-k8s"`. Le bloc `job_name: alloy` de `prometheus.yml` ne pose pas `honor_labels` ; Prometheus renommerait donc ces étiquettes en `exported_job`, et `{job="alloy"}` correspondrait. Avec `honor_labels: true`, la branche `absent` sonnerait en permanence.
 3. **Périmètre et estimation du chantier** : 2 h 51 min écoulées depuis 14:38:26 UTC, attentes comprises. Estimation proposée pour (a) : 1 h de plus, essai, application et vérification comprises. Le doublement est à surveiller.
 4. **Suite d'E4** : modifier les six contrôles, avec un témoin fondé sur la présence de lignes (le même compteur peut servir).

@@ -409,8 +409,8 @@ tests:
         exp_alerts:
           - exp_labels: {alerte: loki, severite: critique}
 
-  # Events muets (chantier des Events, 08c) : compteur qui avance jusqu'à 10 min puis figé ; Alloy répond. Prometheus 3 : à 24 min, la
-  # fenêtre (9m, 24m] voit encore 540 ; à 25 min, (10m, 25m] ne voit que 600, en attente ; déclenchée à 30 min.
+  # Events muets (chantier des Events, 08c) : compteur qui avance jusqu'à 10 min (600 à 10 min) puis figé ; Alloy répond. Prometheus 3 :
+  # à 23 min, la fenêtre (8m, 23m] voit encore 540 ; à 24 min, (9m, 24m] ne voit que 600, en attente ; déclenchée à 29 min.
   - interval: 1m
     input_series:
       - series: 'loki_process_custom_evenements_lignes_total{job="alloy", instance="local", namespace="horodatage"}'
@@ -418,13 +418,13 @@ tests:
       - series: 'up{job="alloy", instance="local"}'
         values: '1x40'
     alert_rule_test:
-      - eval_time: 24m
+      - eval_time: 23m
+        alertname: EvenementsMuets
+        exp_alerts: []
+      - eval_time: 28m
         alertname: EvenementsMuets
         exp_alerts: []
       - eval_time: 29m
-        alertname: EvenementsMuets
-        exp_alerts: []
-      - eval_time: 31m
         alertname: EvenementsMuets
         exp_alerts:
           - exp_labels: {alerte: muette, severite: critique, source: evenements-k8s}
