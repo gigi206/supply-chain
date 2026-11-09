@@ -897,11 +897,15 @@ Rien n'est lancé.
 | R3, R4, R5, R7 | 0 | 0, non jugés : aucune ligne `evenements-k8s` dans leur fenêtre, et précondition non remplie | Non jugés ; **non prédit** : E3 était attendu présent |
 | R8 | 0 | 0, non jugé : Alloy a démarré après le début de la fenêtre ; témoin E3 : au moins 1000 lignes (réponse tronquée, lues depuis le 06/11 à 11:00) | Non jugé, comme prédit à 14:46 UTC |
 
-**Constat, mesuré.** Les quatre fenêtres postérieures au démarrage d'Alloy du 07/11 (07/11 à 16:00:56 et 16:21:58, 08/11 à 11:40:44, 09/11 à 09:30:00, cinq minutes chacune) ne contiennent **aucune** ligne `{source="evenements-k8s"}`. Les deux fenêtres du 06/11 en contiennent (99 lignes pour R1 et R2, au moins 1000 sur R8).
+**Constat, mesuré.** Les quatre fenêtres postérieures au démarrage d'Alloy du 07/11 (07/11 à 16:00:56 et 16:21:58, 08/11 à 11:40:44, 09/11 à 09:30:00, cinq minutes chacune) ne contiennent **aucune** ligne `{source="evenements-k8s"}`. La fenêtre du 06/11 de R1 et R2 en contient 99. La fenêtre de R8 va du 06/11 au 09/11 : ses 1000 lignes (réponse tronquée) sont les premières, lues depuis le 06/11 à 11:00 ; elles ne disent rien des jours suivants (corrigé à 16:24 UTC, avant tout push). Borne mesurée : des lignes jusqu'au 06/11 à 16:53:29, aucune dans les fenêtres lues à partir du 07/11 à 16:00:56.
 
 **Pourquoi R6 ne peut pas être un 0 réel.** D'après `durcissement-h5_planifie-0911.log` (relecture du 09/11 à 10:40:42 UTC), le CronJob du scan a créé le Job `scan-sample-app-29903610` à 09:30:00. Son pod a tourné sur `sc-confiance` de 09:30:00 à 09:31:54, et le Job a réussi. Des Events (création du Job, ordonnancement et conteneurs du pod) sont donc attendus dans la fenêtre. Ce point est déduit du fonctionnement de Kubernetes ; ces Events n'ont pas été relus.
 
-**Hypothèse, non vérifiée.** La collecte des Events par Alloy (`loki.source.kubernetes_events`, `evenements.alloy`) ne livre plus rien depuis le redémarrage des VM du 07/11, alors que le service `alloy` est actif. La cause n'est pas connue. Si l'hypothèse se confirme, l'exigence d'audit (« tout consultable dans Grafana ») n'est pas tenue pour les Events depuis le 07/11, et le chantier doit réparer la collecte avant de modifier les six contrôles.
+**Deux hypothèses, non départagées** (corrigé à 16:24 UTC, avant tout push : une seule était écrite) :
+- (H-a) la collecte par Alloy (`loki.source.kubernetes_events`, `evenements.alloy`) ne livre plus rien, alors que le service `alloy` est actif ;
+- (H-b) l'API n'enregistre plus d'Events.
+
+Le moment de l'arrêt, sa cause et le composant en faute ne sont pas établis. Recherche locale faite à 16:24 UTC : aucun journal archivé daté d'après le 07/11 à 11:22:39 ne montre un Event présent dans l'API, puisque toutes les lectures kubectl archivées comptent 0. Cette recherche ne départage donc pas les deux hypothèses. Des Jobs `rattrapage` ont été créés le 07/11 à 15:23:00 et 15:24:00 (`test5-essai-hors-etape.log`), ce qui produit normalement des Events ; ces Events n'ont pas été relus. Si l'hypothèse se confirme, l'exigence d'audit (« tout consultable dans Grafana ») n'est pas tenue pour les Events depuis le 07/11, et le chantier doit réparer la collecte avant de modifier les six contrôles.
 
 **Ce que le relevé ne permet pas de dire** :
 - l'heure de la dernière ligne `evenements-k8s` ;
