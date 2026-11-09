@@ -151,3 +151,33 @@ Une politique d'essai mal bornée refuserait aussi des pods réels. Le témoin C
 **Ce que C ne prouvera pas, inchangé** : le background et les rapports, la tenue dans la durée, et un redémarrage avec l'image corrigée.
 
 **Estimation** : aucune n'est fixée. Je propose 4 h (script et passage), à valider par le propriétaire avant tout passage.
+
+## Additif du 09/11/2026, 13:39 UTC : décisions de cadrage, go1.26.9 installé, binaire officiel reproduit au bit près
+
+**Réponses du propriétaire** aux quatre questions de 13:18 UTC :
+- **Image laissée dans Zot** sous `essais/kyverno-correctif` : « 2 ok ».
+- **Estimation de 4 h** : « 4 ok ».
+- **Construction** : il a demandé « ben installe cette version via mise ? », à propos de go1.26.9. Je lui ai proposé ensuite une tâche mise jumelle de go1.26.10 et le témoin de reproduction au bit près, effets et pire cas compris. Il a répondu : « on fait le plus complet ».
+- **Interprétation de « on fait le plus complet »**, écrite ici :
+  - question 1 : oui, installer go1.26.9 et faire le témoin ;
+  - question 2 : les 8 cas `j5-*` **et** les 17 cas du banc C.
+
+  Les 30 cas d'admission de J6 restent hors du périmètre : ils ne passent pas par le code corrigé. Le banc ajoute environ 1 h : estimation proposée 5 h, à confirmer avant le passage. La signature d'essai reste retirée.
+
+**go1.26.9 installé** par la tâche `outils:go-1.26.9` de `mise.toml`, jumelle de `outils:go-toolchain`. C'est le module `golang.org/toolchain@v0.0.1-go1.26.9.linux-amd64`, vérifié par `sum.golang.org`, installé dans `~/.cache/supply-chain-poc/outils/gomodcache`, rien au niveau système.
+
+**Témoin : le binaire officiel du contrôleur d'admission v1.19.2 est reproduit au bit près** ([`kyverno-correctif-c-reproduction.log`](kyverno-correctif-c-reproduction.log), 13:39:42 UTC).
+- Construit depuis un clone local à `e63308f1e16c`, sans le correctif, avec go1.26.9 :
+  - `-trimpath` ;
+  - `-ldflags "-s -w -X …/pkg/version.BuildVersion=v1.19.2"` ;
+  - `CGO_ENABLED=0` ;
+  - modules du cache, hors ligne.
+- **sha256 `7913082b…`**, identique à celui du binaire extrait de l'image officielle (couche `29e1273f…` du manifeste amd64 `6f0c5200…`).
+- Condition : un fichier non suivi, vide, dans l'arbre. Il reproduit `vcs.modified=true` et la version `v1.19.2+dirty` enregistrés dans le binaire officiel. Arbre propre : sha256 `b36353ea…`, seule différence attendue.
+- Le premier essai dans un `git worktree` n'a enregistré aucune information VCS, sans erreur, même avec `-buildvcs=true`. Cause non cherchée : un clone local a été utilisé à la place.
+
+**Conséquence pour C7.** Le binaire corrigé sera construit de la même façon, avec go1.26.9, depuis le clone qui porte le correctif v2 (arbre modifié, donc `v1.19.2+dirty` aussi). Le correctif est alors le seul écart avec le binaire officiel, et ce point est désormais mesuré. L'écart go1.26.10 de 13:18 UTC disparaît. C7 est réécrite :
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| C7 | Binaire corrigé construit avec go1.26.9 et les mêmes réglages ; l'image poussée en contient le même sha256 ; base, `kodata`, point d'entrée et utilisateur identiques au manifeste `6f0c5200…` | Haute |

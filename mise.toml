@@ -76,6 +76,14 @@ GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.27.3 GOPROXY=https://proxy.g
 "$POC_OUTILS/gomodcache/golang.org/toolchain@v0.0.1-go1.27.3.linux-amd64/bin/go" version
 '''
 
+[tasks."outils:go-1.26.9"]
+description = "Go 1.26.9 comme module golang.org/toolchain, vérifié par sum.golang.org (brique 08, étape C du correctif Kyverno : chaîne du binaire officiel v1.19.2, accord du propriétaire le 09/11/2026)"
+run = '''
+set -eu
+GOMODCACHE="$POC_OUTILS/gomodcache" GOTOOLCHAIN=go1.26.9 GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org go version
+"$POC_OUTILS/gomodcache/golang.org/toolchain@v0.0.1-go1.26.9.linux-amd64/bin/go" version
+'''
+
 [tasks."outils:yarn"]
 description = "yarn 4.18.0 par corepack (Node de mise), sha512 du packageManager de Traefik v3.7.17 contrôlé par corepack, dans $POC_OUTILS/corepack (brique 03, F1)"
 run = '''

@@ -1,0 +1,23 @@
+# Étape C du correctif Kyverno : témoin de reproduction au bit près du binaire officiel du contrôleur d'admission v1.19.2
+# local seulement : clone local du cache, chaîne go1.26.9 (tâche mise outils:go-1.26.9, module golang.org/toolchain vérifié par sum.golang.org), modules du cache hors ligne ; rien lu ni écrit dans Zot, le cluster ou les VM
+# relevé : 2026-11-09T13:39:42Z
+## chaîne
+go version go1.26.9 linux/amd64
+## arbre : clone local de /home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/v1.19.2 (sans le correctif), tête et étiquettes
+e63308f1e16c05cd009ac4864be6ec25c66b49be
+kyverno-chart-3.9.2 kyverno-policies-chart-3.9.2 v1.19.2 
+état avant : 0 fichier(s) modifié(s) ou non suivi(s)
+## construction : go build -trimpath -ldflags "-s -w -X github.com/kyverno/kyverno/pkg/version.BuildVersion=v1.19.2" ./cmd/kyverno
+##   GOTOOLCHAIN=local GOFLAGS=-mod=readonly GOPROXY=off CGO_ENABLED=0 ; « sale » : un fichier non suivi vide (.temoin-arbre-modifie), hors du code compilé, pour reproduire vcs.modified=true du binaire officiel
+construit (propre)
+sha256 propre : b36353eada9a8470a728c5454670f8375b3ce36bed1793e082deceedc4e718f3
+	mod	github.com/kyverno/kyverno	v1.19.2	
+	build	vcs.modified=false
+construit (sale)
+sha256 sale : 7913082b95920ca27f3490a80c5fe63fc5b0b894d2aab5791e16b2a1f044f7b3
+	mod	github.com/kyverno/kyverno	v1.19.2+dirty	
+	build	vcs.modified=true
+état après : 0 fichier(s) modifié(s) ou non suivi(s)
+sha256 officiel (extrait de la couche sha256:29e1273f… du manifeste amd64 sha256:6f0c5200…) : 7913082b95920ca27f3490a80c5fe63fc5b0b894d2aab5791e16b2a1f044f7b3
+OK   binaire « sale » identique au bit près au binaire officiel
+CONSTAT binaire « propre » différent (attendu : version v1.19.2 au lieu de v1.19.2+dirty, vcs.modified=false)

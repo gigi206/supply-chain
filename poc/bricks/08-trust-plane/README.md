@@ -2060,6 +2060,8 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
 - Image laissée dans Zot sous `essais/` : `poc-ecriture` ne peut pas supprimer.
 - Périmètre proposé : les 8 cas `j5-*` seulement. Prédictions C7 à C13, aucune estimation fixée (4 h proposées).
 
+**Additif du 09/11/2026, 13:39 UTC : binaire officiel du contrôleur d'admission v1.19.2 reproduit au bit près.** La chaîne go1.26.9 a été installée par une tâche mise, vérifiée par `sum.golang.org`, sur la demande du propriétaire. Le binaire, compilé hors ligne depuis `e63308f1e16c`, a le même sha256 que celui de l'image officielle : `7913082b…` ([journal](resultats/kyverno-correctif-c-reproduction.log)). Le binaire corrigé sera construit de la même façon : le correctif sera le seul écart. Le propriétaire a accepté que l'image reste dans Zot et l'estimation de 4 h. « On fait le plus complet » est compris ainsi : les 8 cas `j5-*` et les 17 cas du banc C, estimation proposée 5 h.
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.
