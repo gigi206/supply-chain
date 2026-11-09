@@ -119,6 +119,10 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/politique.sh"   # fonctions de J6 et commun.sh ; les étapes de politique.sh ne sont pas lancées
+# Ajout du 09/11/2026 vers 14:27 UTC, non exécuté sur le cluster : les étapes de politique.sh restaient définies, donc
+# « preuves.sh admission » (ou porte, parite…) lançait l'étape de J6 sous le journal preuves-<étape>.log, et l'usage les listait.
+# Retirées ici, comme dans bascule.sh (brique 03) ; seules les étapes de J8 ci-dessous sont appelables.
+for f in $(declare -F | awk '$3 ~ /^etape_/ {print $3}'); do unset -f "$f"; done
 T=$W/preuves
 trap 'rm -rf "$T/auth" "$T/webhook" "$W/refus.out"' EXIT
 mkdir -p "$T"

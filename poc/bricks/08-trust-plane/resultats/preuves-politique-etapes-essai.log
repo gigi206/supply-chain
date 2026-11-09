@@ -1,0 +1,122 @@
+# Brique 08 : essai hors cluster du retrait des étapes de politique.sh dans preuves.sh (09/11/2026, passage de 14:28:35 UTC).
+# Travail local : rien lu ni écrit dans le cluster, Zot ou les VM. Le vrai preuves.sh (corrigé) et celui de HEAD 1ae184d (avant)
+# tournent sous env -i, HOME et CONFIANCE_DIR dans un dossier jetable (W, S, O, KUBECONFIG en dépendent, commun.sh lignes 6 à 12),
+# PATH réduit à de faux outils qui journalisent leurs appels et échouent, puis /usr/bin et /bin. Seuls sont lancés l'usage (sans
+# argument) et les 13 noms d'étapes de politique.sh : lancer refuse avant toute étape et avant chrono (commun.sh:331-332).
+# Avant correction, seul l'usage est lancé : un nom d'étape de J6 aurait réellement lancé l'étape.
+# Limites : les 30 étapes de J8 ne sont pas lancées (leur présence n'est prouvée que par l'usage) ; resultats/ est comparé par son
+# listage (noms, tailles, dates), git status par son empreinte.
+# Chemin du dossier personnel remplacé par ~ (aucune occurrence dans les sorties).
+
+## essai.sh (v2)
+#!/usr/bin/env bash
+# Essai hors cluster du retrait des étapes de politique.sh dans preuves.sh. HOME et CONFIANCE_DIR dans un dossier jetable,
+# PATH réduit à de faux outils (kubectl, ssh, scp, curl, oras, cosign, crane, helm, mise, jq, yq) qui journalisent leurs appels
+# et échouent, puis /usr/bin et /bin. Aucun appel attendu.
+set -u
+export LC_ALL=C
+A=$1                                 # dossier de la brique 08
+D=$(mktemp -d); trap 'rm -rf "$D"' EXIT
+mkdir -p "$D/bin" "$D/home" "$D/o"
+for o in kubectl ssh scp curl oras cosign crane helm mise jq yq; do
+  printf '#!/bin/sh\necho "%s $*" >> "%s/appels"\nexit 1\n' "$o" "$D" > "$D/bin/$o"; chmod +x "$D/bin/$o"
+done
+: > "$D/appels"
+env_essai() { env -i HOME="$D/home" CONFIANCE_DIR="$D/o" PATH="$D/bin:/usr/bin:/bin" LANG=C.UTF-8 "$@"; }
+avant_r=$(ls -la --time-style=full-iso "$A/resultats" | sha256sum | cut -c1-16)
+avant_g=$(git -C "$A" status --porcelain | sha256sum | cut -c1-16)
+
+echo "# date : $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "# preuves.sh (sha256) : $(sha256sum < "$A/preuves.sh" | cut -c1-64)"
+echo "# preuves.sh de HEAD $(git -C "$A" rev-parse --short HEAD) (sha256) : $(git -C "$A" show HEAD:./preuves.sh | sha256sum | cut -c1-64)"
+liste() { sed -n 's/^usage : [^ ]* //p' | tr -d '…' | tr '|' '\n' | sort; }
+echo "## avant : preuves.sh de HEAD sans argument (usage seul, aucune étape lancée)"
+git -C "$A" show HEAD:./preuves.sh > "$D/preuves-head.sh"   # 283 Ko : trop long pour un argument de bash -c (v1, code 126)
+# sourcé avec $0 = chemin réel de preuves.sh (here, usage) et sans paramètre positionnel restant
+env_essai bash -c 'f=$1; shift; . "$f"' "$A/preuves.sh" "$D/preuves-head.sh" > "$D/u0" 2>&1 </dev/null; echo "code : $?"
+liste < "$D/u0" > "$D/l0"; echo "étapes listées : $(wc -l < "$D/l0")"
+echo "## après : preuves.sh corrigé sans argument"
+env_essai bash "$A/preuves.sh" > "$D/u1" 2>&1 </dev/null; echo "code : $?"
+liste < "$D/u1" > "$D/l1"; echo "étapes listées : $(wc -l < "$D/l1")"
+grep -o '^etape_[a-z_0-9]*' "$A/preuves.sh" | sed 's/^etape_//' | sort -u > "$D/j8"
+grep -o '^etape_[a-z_0-9]*' "$A/politique.sh" | sed 's/^etape_//' | sort -u > "$D/j6"
+echo "étapes de J8 définies dans preuves.sh : $(wc -l < "$D/j8") ; de J6 dans politique.sh : $(wc -l < "$D/j6")"
+echo "avant, listées et de J6 : $(comm -12 "$D/l0" "$D/j6" | wc -l) ; listées et de J8 : $(comm -12 "$D/l0" "$D/j8" | wc -l)"
+echo "après, listées et de J6 : $(comm -12 "$D/l1" "$D/j6" | wc -l) ; liste identique aux étapes de J8 : $(cmp -s "$D/l1" "$D/j8" && echo oui || echo non)"
+for e in $(cat "$D/j6"); do
+  env_essai bash "$A/preuves.sh" "$e" > "$D/o-$e" 2>&1 </dev/null; c=$?
+  printf 'après, preuves.sh %-13s code %s : %s\n' "$e" "$c" "$(cat "$D/o-$e")"
+done
+echo "## relevés"
+echo "appels aux faux outils : $(wc -l < "$D/appels")"; cat "$D/appels"
+echo "resultats/ inchangé : $([ "$(ls -la --time-style=full-iso "$A/resultats" | sha256sum | cut -c1-16)" = "$avant_r" ] && echo oui || echo non)"
+echo "git status inchangé : $([ "$(git -C "$A" status --porcelain | sha256sum | cut -c1-16)" = "$avant_g" ] && echo oui || echo non)"
+echo "fichiers créés sous HOME et CONFIANCE_DIR jetables :"; (cd "$D" && find home o -type f | sort)
+
+## sortie du passage de 14:28:35 UTC
+# date : 2026-11-09T14:28:35Z
+# preuves.sh (sha256) : 19985b98c93d8782e9c0380a349a507b9370a1dfd6e281dbc6340947b1966260
+# preuves.sh de HEAD 1ae184d (sha256) : b1bd4d7e6d73f6eda7210532a1e33500e3bd0ec72a795f9e36d6ca0e74b9d372
+## avant : preuves.sh de HEAD sans argument (usage seul, aucune étape lancée)
+code : 2
+étapes listées : 43
+## après : preuves.sh corrigé sans argument
+code : 2
+étapes listées : 30
+étapes de J8 définies dans preuves.sh : 30 ; de J6 dans politique.sh : 13
+avant, listées et de J6 : 13 ; listées et de J8 : 30
+après, listées et de J6 : 0 ; liste identique aux étapes de J8 : oui
+après, preuves.sh admission     code 2 : étape inconnue : admission
+après, preuves.sh chains        code 2 : étape inconnue : chains
+après, preuves.sh declencheurs  code 2 : étape inconnue : declencheurs
+après, preuves.sh droits        code 2 : étape inconnue : droits
+après, preuves.sh horodatage    code 2 : étape inconnue : horodatage
+après, preuves.sh image         code 2 : étape inconnue : image
+après, preuves.sh installer     code 2 : étape inconnue : installer
+après, preuves.sh parite        code 2 : étape inconnue : parite
+après, preuves.sh porte         code 2 : étape inconnue : porte
+après, preuves.sh posture       code 2 : étape inconnue : posture
+après, preuves.sh rattrapage    code 2 : étape inconnue : rattrapage
+après, preuves.sh restreint     code 2 : étape inconnue : restreint
+après, preuves.sh taches        code 2 : étape inconnue : taches
+## relevés
+appels aux faux outils : 0
+resultats/ inchangé : oui
+git status inchangé : oui
+fichiers créés sous HOME et CONFIANCE_DIR jetables :
+
+## v1 du harnais (différence : HEAD passé en argument de bash -c, 283 Ko, au-delà de la limite d'un argument, 131072 octets : code 126,
+## aucun usage lu ; corrigé en v2 par un source d'une copie). Limite vérifiée à 14:29 UTC (PAGESIZE 4096) : un argument de
+## 131071 caractères passe à bash -c, un de 131072 est refusé (« liste d'arguments trop longue »). Ligne de la v1 :
+#   env_essai bash -c "$(git -C "$A" show HEAD:./preuves.sh)" "$A/preuves.sh" > "$D/u0" 2>&1 </dev/null; echo "code : $?"
+## sortie de la v1 (14:28:17 UTC)
+# date : 2026-11-09T14:28:17Z
+# preuves.sh (sha256) : 19985b98c93d8782e9c0380a349a507b9370a1dfd6e281dbc6340947b1966260
+# preuves.sh de HEAD 1ae184d (sha256) : b1bd4d7e6d73f6eda7210532a1e33500e3bd0ec72a795f9e36d6ca0e74b9d372
+## avant : preuves.sh de HEAD sans argument (usage seul, aucune étape lancée)
+code : 126
+étapes listées : 0
+## après : preuves.sh corrigé sans argument
+code : 2
+étapes listées : 30
+étapes de J8 définies dans preuves.sh : 30 ; de J6 dans politique.sh : 13
+avant, listées et de J6 : 0 ; listées et de J8 : 0
+après, listées et de J6 : 0 ; liste identique aux étapes de J8 : oui
+après, preuves.sh admission     code 2 : étape inconnue : admission
+après, preuves.sh chains        code 2 : étape inconnue : chains
+après, preuves.sh declencheurs  code 2 : étape inconnue : declencheurs
+après, preuves.sh droits        code 2 : étape inconnue : droits
+après, preuves.sh horodatage    code 2 : étape inconnue : horodatage
+après, preuves.sh image         code 2 : étape inconnue : image
+après, preuves.sh installer     code 2 : étape inconnue : installer
+après, preuves.sh parite        code 2 : étape inconnue : parite
+après, preuves.sh porte         code 2 : étape inconnue : porte
+après, preuves.sh posture       code 2 : étape inconnue : posture
+après, preuves.sh rattrapage    code 2 : étape inconnue : rattrapage
+après, preuves.sh restreint     code 2 : étape inconnue : restreint
+après, preuves.sh taches        code 2 : étape inconnue : taches
+## relevés
+appels aux faux outils : 0
+resultats/ inchangé : oui
+git status inchangé : oui
+fichiers créés sous HOME et CONFIANCE_DIR jetables :
