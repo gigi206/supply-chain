@@ -718,3 +718,33 @@ La tâche `supply-chain-scan-saut-reprise` (accord du 07/11 vers 16:21 UTC) a la
   - Les comptes d'Events du contre-relevé, lus 24 min après la reprise : ils ne couvrent que l'heure de la TTL. W6 et W7 se jugent sur l'étape et sur l'audit.
   - Le rapport de la tâche n'est qu'une information : tout ce qui précède vient des journaux.
 
+
+## Additif du 09/11/2026, 10:51 UTC : W8 relevé par la tâche planifiée, W8a et W8b tenues ; P3 tenue
+
+La tâche `supply-chain-scan-saut-releve-0911`, accordée le 08/11 peu avant 12:09:50 UTC (« 2 oui »), a démarré à 10:40:30 UTC. Elle a lancé les deux scripts en lecture seule, et les deux journaux concluent `bilan : OK`, sans KO ni CONSTAT. Le rapport de la tâche n'est qu'une information : tout ce qui suit vient des journaux, lus par la session principale.
+
+**W8a tenue**, relecture de 10:40:42 UTC : [durcissement-h5_planifie-0911.log](durcissement-h5_planifie-0911.log).
+- CronJob non suspendu, dernier passage planifié le 09/11 à 09:30:00 UTC, aucun Job actif.
+- Job `scan-sample-app-29903610`, le nom attendu, créé 0 s après 09:30 UTC (prédit : au plus 60 s). C'est le seul Job du planificateur retenu depuis `PLAN`.
+- 6 conteneurs sur 6 sortis avec le code 0, sans OOM ni redémarrage ; pod de 114 s (prédit : au plus 300 s), sur `sc-confiance`.
+- 5 referrers sur l'image (prédit : 5, 4 avant le passage).
+- Audit depuis 09:30 UTC : 1 Job créé en 201 par `cronjob-controller`, 1 pod créé en 201 par `job-controller`, 0 refus 403 ou 422 (prédit : 1, 1 et 0). Les seuls refus affichés sont des 404 de lecture (`ciliumendpoints` de Cilium, `ephemeralreports` et `policyreports` de Kyverno), hors du contrôle.
+- 5 marqueurs lus dans Grafana par le compte auditeur (prédit : 5).
+
+**W8b tenue**, relevé de 10:40:50 UTC : [scan-saut-w8_resolution.log](scan-saut-w8_resolution.log).
+- Garde passée : `false|2026-11-09T09:30:00Z`.
+- Métrique du dernier referrer : 09:31:52 UTC, postérieure au passage et égale au referrer de scan le plus récent dans Zot.
+- `ScanEnRetard` et `ScanBientotRefuse` inactives.
+- Au récepteur local : une seule notification resolved, reçue à 09:41:22 UTC, avec le même début que les firing (08/11 à 11:37:07 UTC).
+- Fin de `ScanEnRetard` 555 s après le nouveau referrer (prédit : 0 à 1200 s ; 597 s le 07/11).
+- Firing notifiées : 6, comme prédit (confiance moyenne), de 11:37:17 UTC le 08/11 à 07:37:22 UTC le 09/11, toutes les 4 h. Cette régularité est compatible avec l'absence de redémarrage d'Alertmanager : déduit, non relu.
+- Resolved reçue 15 s après la fin : affiché, non contrôlé.
+
+**P3 tenue** (additif du 07/11, 19:56 UTC) : Loki, lu par l'auditeur à travers Grafana, a les 7 mêmes lignes que le journal local (6 firing, 1 resolved) : « Loki et journal local : mêmes lignes ». Le journal local de `sc-stockage` n'a pas perdu les notifications depuis le 08/11 à 11:30 UTC.
+
+**Ce que le relevé ne prouve pas.**
+- Le comportement d'un passage sauté plus long que 26 h, ou de deux passages sautés de suite : non essayé.
+- L'heure de réception du resolved (`group_interval` 1m) : affichée seulement.
+- La tenue du journal local de `sc-stockage` au-delà du 09/11 : `SystemMaxUse` reste à reconsidérer après W8, selon la décision du 07/11 à 20:45 UTC.
+
+Le saut d'un passage du scan (W1 à W8) est entièrement passé.

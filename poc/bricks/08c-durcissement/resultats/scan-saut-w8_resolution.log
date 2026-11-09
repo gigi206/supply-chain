@@ -1,0 +1,40 @@
+relevé du 09/11/2026 à 10:40:50 UTC
+## prédiction (écrite le 07/11/2026, avant le passage du 09/11, additif W8 de resultats/mesures-reelles-predictions.md)
+- garde : CronJob repris, dernier passage planifié 2026-11-09T09:30:00Z ; sinon rien n'est jugé
+- ScanEnRetard et ScanBientotRefuse inactives ; métrique du dernier referrer après 2026-11-09T09:30:00Z, égale à la date du referrer le plus récent dans Zot
+- récepteur : une seule notification resolved de ScanEnRetard, même début que les firing ; fin 0 à 1200 s après le nouveau referrer
+- firing notifiées : 6 (repeat_interval 4h de 11:36 UTC le 08/11 à la résolution), compte en CONSTAT
+- ajout du 07/11/2026, 17:58 UTC, avant le passage : mêmes notifications dans Loki ; un écart avec le journal local est un CONSTAT
+## garde
+suspendu|dernier passage planifié : false|2026-11-09T09:30:00Z
+## Prometheus et Zot
+métrique du dernier referrer : 2026-11-09T09:31:52Z ; referrer de scan le plus récent dans Zot : 2026-11-09T09:31:52Z
+OK   métrique postérieure au passage : oui
+OK   métrique égale au referrer le plus récent de Zot : 1794216712
+OK   ScanEnRetard : inactive
+OK   ScanBientotRefuse : inactive
+## récepteur local, ScanEnRetard depuis 2026-11-08 11:30:00 UTC (reçu à, statut, début, fin)
+2026-11-08T11:37:17Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T15:37:17Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T19:37:18Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T23:37:19Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T03:37:20Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T07:37:22Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T09:41:22Z resolved 2026-11-08T11:37:07.032Z 2026-11-09T09:41:07.032Z
+firing notifiées : 6
+OK   notifications resolved : 1
+OK   débuts distincts (firing et resolved) : 1
+OK   fin de ScanEnRetard 555 s après le nouveau referrer
+reçue au récepteur 15 s après la fin (affiché, non contrôlé)
+## récepteur dans Loki ({unite="recepteur-alertes.service"}, auditeur à travers Grafana), ScanEnRetard depuis 2026-11-08 11:30:00 UTC
+2026-11-08T11:37:17Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T15:37:17Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T19:37:18Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-08T23:37:19Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T03:37:20Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T07:37:22Z firing 2026-11-08T11:37:07.032Z 0001-01-01T00:00:00Z
+2026-11-09T09:41:22Z resolved 2026-11-08T11:37:07.032Z 2026-11-09T09:41:07.032Z
+Loki : firing 6, resolved 1
+Loki et journal local : mêmes lignes
+bilan : OK
+fin du relevé 10:40:51 UTC

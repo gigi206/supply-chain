@@ -1,0 +1,65 @@
+relecture du 09/11/2026 à 10:40:42 UTC
+passage attendu : 2026-11-09T09:30:00Z
+## P1, planificateur
+suspendu : false, dernier planifié : 2026-11-09T09:30:00Z, dernière réussite : 2026-11-09T09:31:57Z, actifs : 0
+OK   dernier passage planifié : 2026-11-09T09:30:00Z
+NAME                        STATUS     COMPLETIONS   DURATION   AGE
+scan-sample-app-h5-manuel   Complete   1/1           2m1s       2d13h
+scan-sample-app-29900730    Complete   1/1           112s       2d1h
+scan-sample-app-29903610    Complete   1/1           117s       70m
+OK   jobs créés par le planificateur : 1
+job relu : scan-sample-app-29903610
+job créé à 2026-11-09T09:30:00Z, 0 s après l'heure attendue, borne prédite 60 s
+## P3, conteneurs
+{"noeud":"sc-confiance","phase":"Succeeded","debut":"2026-11-09T09:30:00Z"}
+OK   pods créés par le job : 1
+source code=0 motif=Completed redémarrages=0 2026-11-09T09:30:00Z 2026-11-09T09:30:01Z
+analyser code=0 motif=Completed redémarrages=0 2026-11-09T09:30:01Z 2026-11-09T09:31:48Z
+jetons code=0 motif=Completed redémarrages=0 2026-11-09T09:31:49Z 2026-11-09T09:31:49Z
+attester code=0 motif=Completed redémarrages=0 2026-11-09T09:31:50Z 2026-11-09T09:31:50Z
+publier code=0 motif=Completed redémarrages=0 2026-11-09T09:31:51Z 2026-11-09T09:31:53Z
+revocation code=0 motif=Completed redémarrages=0 2026-11-09T09:31:54Z 2026-11-09T09:31:54Z
+OK   conteneurs terminés avec le code 0 sur 6 : 6
+OK   job réussi : 1
+durée du pod : 114 s, borne prédite 300 s
+OK   revocation, OOM ou redémarrage : 0
+source: SOURCE|commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77, essai 1, 12 fichiers
+analyser: BASE|2026-11-08, sc-stockage.poc.test:5000/vulndb/grype@sha256:23f60d2e35282cf72ea8a2112d198d00d3479d60b721d95ed2ffd15a81bb63b7, empreinte sha256:dcca24722e16c2bcf4a542a3f7fdd2147baf9215c17b
+analyser: SBOM|4 composants avec PURL (D1 a), 2 s
+analyser: SCAN|sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, 5 vulnérabilités, 0 KEV, 1 s
+analyser: PREDICAT|sha256 39dc148e22957b70f2a55cdb57df4da1c6859a69e3851df49afeefacc10aabc0, 107 s en tout
+jetons: identifiants Zot lus dans OpenBao (rôle scan-zot) ; jeton révoqué
+attester: ATTESTATION|sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1, bundle sha256 eed0fffb749aa6d8a06ee964e59035eb6c228
+publier: PUBLIE|sc-stockage.poc.test:5000/builds/scan/sample-app@sha256:9b19c3d8f26a95bbcf22f7537307dd45d3201487d678fca34ff8855e49e36964, referrer de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473
+revocation: jeton du rôle scanner révoqué ; identifiants et jeton effacés
+## P4, Zot
+OK   referrers sur l'image : 5
+bases archivées : ["2026-11-06","2026-11-07","2026-11-08"]
+## P1 et P2, audit de l'API, espace scan, depuis l'heure attendue (créations de jobs et de pods, puis refus)
+      1 creation system:serviceaccount:kube-system:cronjob-controller jobs 201
+      1 creation system:serviceaccount:kube-system:job-controller pods 201
+      1 refus system:serviceaccount:kube-system:cilium get ciliumendpoints scan-sample-app-29903610-jp6pg 404 ciliumendpoints.cilium.io "scan-sample-app-29903610-jp6pg" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 301626c0-acc4-42c4-ae35-d34af4bc4223 404 ephemeralreports.reports.kyverno.io "301626c0-acc4-42c4-ae35-d34af4bc4223" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523 404 ephemeralreports.reports.kyverno.io "3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 5376856f-241d-463d-b06f-a70235e9d398 404 ephemeralreports.reports.kyverno.io "5376856f-241d-463d-b06f-a70235e9d398" not found
+      2 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports 9d548221-3868-4bdc-ab54-572c3a997f05 404 ephemeralreports.reports.kyverno.io "9d548221-3868-4bdc-ab54-572c3a997f05" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports c739ff91-a7b4-4475-9481-11a3ad78f8d6 404 ephemeralreports.reports.kyverno.io "c739ff91-a7b4-4475-9481-11a3ad78f8d6" not found
+      2 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports cfa55355-aa65-45f1-84c1-28120f6a0922 404 ephemeralreports.reports.kyverno.io "cfa55355-aa65-45f1-84c1-28120f6a0922" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get ephemeralreports d55000b2-ae38-41db-9e90-8be6d0b0c3d4 404 ephemeralreports.reports.kyverno.io "d55000b2-ae38-41db-9e90-8be6d0b0c3d4" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports 9d548221-3868-4bdc-ab54-572c3a997f05 404 policyreports.wgpolicyk8s.io "9d548221-3868-4bdc-ab54-572c3a997f05" not found
+      1 refus system:serviceaccount:kyverno:kyverno-reports-controller get policyreports cfa55355-aa65-45f1-84c1-28120f6a0922 404 policyreports.wgpolicyk8s.io "cfa55355-aa65-45f1-84c1-28120f6a0922" not found
+fin de l'extrait d'audit
+OK   création du job par le planificateur, en 201 : 1
+OK   création du pod par le contrôleur de jobs, en 201 : 1
+OK   refus 403 ou 422 : 0
+301626c0-acc4-42c4-ae35-d34af4bc4223   1     0     0     0
+3fc0fee8-ceb2-42ad-88c3-c6bf2bf24523   1     0     0     0
+5376856f-241d-463d-b06f-a70235e9d398   1     0     0     0
+9d548221-3868-4bdc-ab54-572c3a997f05   1     0     0     0
+c739ff91-a7b4-4475-9481-11a3ad78f8d6   1     0     0     0
+cfa55355-aa65-45f1-84c1-28120f6a0922   1     0     0     0
+d55000b2-ae38-41db-9e90-8be6d0b0c3d4   1     0     0     0
+## P6, Grafana, lu par l'auditeur
+OK   marqueurs SOURCE, SCAN, PUBLIE et les deux révocations lus dans Grafana : 5
+bilan : OK
+fin du relevé 10:40:44 UTC

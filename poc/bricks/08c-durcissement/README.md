@@ -1219,6 +1219,16 @@ L'étape a été passée par la tâche planifiée `supply-chain-scan-saut-repris
 
 Toujours non couverts sous H1 à H5 : la jonction d'un nœud, la résolution de l'alerte après le passage du 09/11 (W8, relevé à prévoir avec l'accord du propriétaire) et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 09/11/2026, 10:51 UTC : saut d'un passage du scan, W8 tenue, essai complet
+
+La tâche planifiée `supply-chain-scan-saut-releve-0911`, accordée le 08/11 par le propriétaire, a relu en lecture seule le passage du 09/11 à 09:30 UTC et la fin de l'alerte, à 10:40:42 et 10:40:50 UTC. Les deux journaux concluent `bilan : OK` : [durcissement-h5_planifie-0911.log](resultats/durcissement-h5_planifie-0911.log), [scan-saut-w8_resolution.log](resultats/scan-saut-w8_resolution.log). Détail et comparaison aux prédictions : [mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 10:51 UTC.
+- W8a : le premier passage après la reprise a lieu à l'heure (Job créé 0 s après 09:30 UTC, pod de 114 s, 6 conteneurs en code 0). L'attestation de scan est publiée, l'image a 5 referrers, l'audit montre 0 refus 403 ou 422.
+- W8b : `ScanEnRetard` s'est résolue 555 s après le nouveau referrer (prédit : 0 à 1200 s). Le récepteur local a reçu 6 firing puis 1 resolved, et Loki a les mêmes lignes (P3 tenue).
+
+**Effet à connaître.** `ScanEnRetard` n'est plus active ; le CronJob du scan tourne normalement.
+
+Toujours non couverts sous H1 à H5 : la jonction d'un nœud et la branche « scan daté du futur » de `scan.rego`.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.
