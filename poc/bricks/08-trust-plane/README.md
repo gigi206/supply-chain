@@ -2038,6 +2038,16 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 **Suite** : la PR attend que les mainteneurs retirent l'étiquette `triage` (règle 4 de leur politique IA) ; avant elle, regrouper les tests, golangci-lint (accord pour le téléchargement), identité DCO, fork `gigi206/kyverno` (action publique), chacun avec l'accord du propriétaire. Étape C (admission) : après W8.
 
+### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
+
+Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
+- **Décision C0 du propriétaire, préalable à tout passage** : d'où vient l'image corrigée du contrôleur d'admission.
+  - (a) Image d'essai construite sur l'hôte, poussée dans Zot sous `essais/`, retirée dans le même passage.
+  - (b) Image construite par notre chaîne, hors de l'estimation.
+  - (c) Attendre une release de Kyverno.
+  - Toute image construite par nous est sans release signée de l'éditeur, contre le critère du doc 04, §1.
+- Pire cas pour (a) : le contrôleur d'admission ne démarre pas, et ses webhooks en `failurePolicy: Fail` refusent les créations de pods jusqu'au retour. D'où la suspension de `horodatage` et `rattrapage` et une garde horaire autour de 09:30 UTC et du 21/11.
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.
