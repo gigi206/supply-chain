@@ -284,8 +284,9 @@ promtool --version | head -1
 if promtool check rules alertes.yml && promtool test rules alertes-tests.yml; then echo "règles : vérifiées, tests passés"; else echo "règles : échec"; r=1; fi
 mkdir faux-regles && cp alertes-tests.yml faux-regles/ && mv alertes.yml.faux faux-regles/alertes.yml
 o=$(cd faux-regles && promtool test rules alertes-tests.yml 2>&1); v=$?
-if [ "$v" != 0 ] && printf "%s\n" "$o" | grep -q "alertname: EvenementsMuets"; then echo "témoin promtool (règle sans absent) : refusé, attendu"
-else echo "témoin promtool (règle sans absent) : non refusé (code $v)"; r=1; fi
+if [ "$v" != 0 ] && [ "$(printf "%s\n" "$o" | grep -c "alertname:")" = 1 ] && printf "%s\n" "$o" | grep -q "alertname: EvenementsMuets, time: 6m,"
+then echo "témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu"
+else echo "témoin promtool (règle sans absent) : pas le refus attendu (code $v)"; printf "%s\n" "$o" | grep "alertname:"; r=1; fi
 mkdir config && mv ./*.alloy config/ && o=$(/usr/local/bin/alloy validate config 2>&1); v=$?; printf "%s\n" "$o" | tail -5
 if [ "$v" = 0 ]; then echo "configuration valide"; else echo "configuration refusée (code $v)"; r=1; fi
 mkdir faux-alloy && cp config/*.alloy faux-alloy/ && mv evenements.alloy.faux faux-alloy/evenements.alloy

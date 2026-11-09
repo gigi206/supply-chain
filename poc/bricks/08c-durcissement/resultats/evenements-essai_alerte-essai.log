@@ -93,3 +93,106 @@
   alloy validate : 
   restes : distant essai-evenements ; local essai-alerte ; journal, mots « jeton|token|secret » : 0
 dépôt : git status et resultats/ inchangés
+
+# Additif du 09/11/2026, 22:12 UTC, avant tout push : témoin promtool resserré (format des échecs lu dans cmd/promtool/unittest.go au tag
+# v3.13.5, la version épinglée : « alertname: %s, time: %s », EvalTime de type model.Duration, donc « 6m ») ; le témoin exige exactement
+# un échec, celui de EvenementsMuets à 6m. Neuvième cas : deux échecs dans la sortie du témoin, qui doit être rejeté. Harnais repassé :
+# date : 2026-11-09T22:11:57Z ; sha256 de evenements.sh : 9459f6b975bb8b77243efe3b457f4716560645930123966070a004e9fce91430
+# chemins k3s dans commun/ et stockage/ (sed de journalisation.sh) : 0
+## ok-rke2 (rke2 )
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 0
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## ok-k3s (k3s )
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 0
+  jeu envoyé : conforme à journalisation.sh (9 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## check-ko (rke2 ESSAI_CHECK_KO=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : échec
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## test-ko (rke2 ESSAI_TEST_KO=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : échec
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## validate-ko (rke2 ESSAI_VALIDATE_KO=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  Error: faux refus
+  configuration refusée (code 1)
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## temoin-promtool-accepte (rke2 ESSAI_TEMOIN_P_ACCEPTE=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : pas le refus attendu (code 0)
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## temoin-promtool-deux-echecs (rke2 ESSAI_TEMOIN_P_DEUX=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : pas le refus attendu (code 1)
+  configuration valide
+  témoin alloy (attribut inconnu) : refusé, attendu
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## temoin-alloy-accepte (rke2 ESSAI_TEMOIN_A_ACCEPTE=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  règles : vérifiées, tests passés
+  témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+  configuration valide
+  témoin alloy (attribut inconnu) : non refusé (code 0)
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : essai-evenements:alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-regles:alertes-tests.yml alertes.yml
+  alloy validate : config:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy|faux-alloy:audit-zot.alloy evenements.alloy journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  restes : distant  ; local  ; journal, mots « jeton|token|secret » : 0
+## scp-ko (rke2 ESSAI_SCP_KO=1)
+  ## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+  code : 1
+  jeu envoyé : conforme à journalisation.sh (10 fichiers)
+  promtool test : 
+  alloy validate : 
+  restes : distant essai-evenements ; local essai-alerte ; journal, mots « jeton|token|secret » : 0
+dépôt : git status et resultats/ inchangés
