@@ -1262,6 +1262,8 @@ Ce n'est ni une borne basse ni une borne haute. Le compte ignore le travail fait
 
 **Chantier des Events dans Loki, ouvert à part.** C'est la « passe dédiée après le 09/11 » décidée le 07/11 ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 20:45 UTC). Le propriétaire a répondu « 2 ok » à « Les Events deviennent un chantier à part, avec E1 à E4 tels que je les recommande et E3 obligatoire ? ». Décisions et précondition : même fichier, additif de 13:11 UTC. Aucune estimation n'est fixée : elle sera proposée au propriétaire avant tout passage. Le relevé R1 à R8 des Events demande son propre accord.
 
+- **Additif du 09/11/2026, 14:46 UTC** : le relevé R1 à R8 est préparé à sec, non lancé. Le script est `evenements.sh releve`, et son essai hors cluster `resultats/evenements-releve-essai.log`. Fenêtres, verdicts et limite de E3 (R2 et R8 prédits non jugés si Alloy a démarré le 07/11) : additif de 14:46 UTC de [mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md). Le chantier a commencé à 14:42:02 UTC. L'estimation proposée, 4 h, n'est pas validée.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

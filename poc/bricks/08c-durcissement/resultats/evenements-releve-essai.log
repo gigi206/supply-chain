@@ -1,0 +1,327 @@
+# Essai hors cluster de evenements.sh releve (09/11/2026, 14:45:52 UTC), avant tout passage : rien lu ni écrit dans le cluster, Loki, Grafana ou les VM.
+# Copie du script, de commun.sh, de distro.sh et des journaux archivés cités, dans un dépôt git jetable ; env -i, HOME et CONFIANCE_DIR jetables,
+# faux mot de passe ; faux curl (réponses de Grafana : lignes, aucune trame, erreur de Loki, HTTP 500, 1000 lignes), faux ssh et faux kubectl
+# qui consignent leurs appels. Limites : les réponses de Grafana sont fabriquées sur la forme lue par g1_grafana (07a) et scan-saut-resolution.sh
+# (08c), jamais une vraie réponse ; le format des dates de systemd (« Sat 2026-11-07 12:22:01 CET ») est supposé, non relu sur sc-stockage.
+# Le chemin du dossier personnel est remplacé par ~.
+
+## essai.sh
+#!/usr/bin/env bash
+# Harnais hors cluster de evenements.sh releve : copie du script dans un dépôt jetable, faux curl, ssh et kubectl qui consignent leurs appels.
+set -uo pipefail
+D=${0%/*}
+SRC=~/Documents/git/github/gigi206/supply-chain/poc/bricks
+avant=$(cd "$SRC/.." && git status --porcelain </dev/null | md5sum; ls "$SRC/08c-durcissement/resultats" | md5sum)
+echo "# date : $(date -u +%FT%TZ) ; sha256 de evenements.sh : $(sha256sum "$SRC/08c-durcissement/evenements.sh" | cut -c1-64)"
+run() { # nom env…
+  local n=$1; shift
+  local A=$D/$n; rm -rf "$A"; mkdir -p "$A/repo/poc/bricks/08c-durcissement/resultats" "$A/repo/poc/bricks/08-trust-plane/resultats" "$A/home" "$A/conf/secrets" "$A/conf/pki" "$A/conf/ssh"
+  cp "$SRC/08c-durcissement/evenements.sh" "$A/repo/poc/bricks/08c-durcissement/"
+  cp "$SRC/08c-durcissement/resultats/durcissement-h2_releve.log" "$A/repo/poc/bricks/08c-durcissement/resultats/"
+  cp "$SRC/08-trust-plane/commun.sh" "$SRC/08-trust-plane/distro.sh" "$A/repo/poc/bricks/08-trust-plane/"
+  cp "$SRC"/08-trust-plane/resultats/{preuves-h5-resolveurs_pod.log,preuves-h5-scan_saut_suspendre.log,preuves-h5-scan_saut_reprendre.log,rejeu-rke2-sixieme-passage.log} "$A/repo/poc/bricks/08-trust-plane/resultats/"
+  git -C "$A/repo" init -q
+  printf 'FAUX-MDP' > "$A/conf/secrets/grafana-auditeur.password"; : > "$A/conf/pki/ca-poc.crt"
+  ( cd "$A/repo" && env -i PATH="$D/bin:/usr/bin:/bin" HOME="$A/home" CONFIANCE_DIR="$A/conf" ESSAI_LOG="$A/appels" "$@" \
+      bash poc/bricks/08c-durcissement/evenements.sh releve > "$A/sortie" 2>&1; echo "code : $?" >> "$A/sortie" )
+  echo "## $n ($*)"
+  grep -E '^(OK|KO|NJ) |^## (bilan|précondition)|^code|^KO   démarrage' "$A/sortie" | sed 's/^/  /'
+  echo "  appels : curl $(grep -c '^curl' "$A/appels" || true), ssh $(grep -c '^ssh' "$A/appels" || true), kubectl $(grep -c '^kubectl' "$A/appels" || true) ; mot de passe en argument : $(grep -c 'mdp_en_argument=True' "$A/appels" || true)"
+  echo "  commandes ssh : $(grep '^ssh' "$A/appels" | cut -f2 | sort -u | paste -sd'|')"
+  echo "  journal : mot de passe, jeton, token ou msg (« secret ») : $(grep -c -i -E 'FAUX-MDP|jeton|token|secret' "$A/repo/poc/bricks/08c-durcissement/resultats/evenements-releve.log" || true) ; travail restant : $(ls -A "$A/conf/travail" | paste -sd, -)"
+}
+run normal ESSAI_MODE=normal
+run alloy-ancien ESSAI_MODE=normal "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+run r1-faible ESSAI_MODE=normal ESSAI_R1=10 "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+run tronque ESSAI_MODE=tronque "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+run erreur ESSAI_MODE=erreur
+run http500 ESSAI_MODE=http500
+run temoin-vide ESSAI_MODE=normal ESSAI_TEMOIN=0 "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+run zeros-faux ESSAI_MODE=tout "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+run alloy-vide ESSAI_MODE=normal ESSAI_ALLOY=
+run lignes-sans-e3 ESSAI_MODE=tout
+run lignes-r1-faible ESSAI_MODE=tout ESSAI_R1=10 "ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET"
+apres=$(cd "$SRC/.." && git status --porcelain </dev/null | md5sum; ls "$SRC/08c-durcissement/resultats" | md5sum)
+[ "$avant" = "$apres" ] && echo "dépôt : git status et resultats/ inchangés" || echo "dépôt : CHANGÉ"
+
+## faux curl (bin/curl)
+#!/usr/bin/env python3
+import sys,json,os
+a=sys.argv[1:]; out=None; data=None
+for i,x in enumerate(a):
+    if x=='-o': out=a[i+1]
+    if x=='-d': data=a[i+1]
+cfg=sys.stdin.read()
+log=os.environ['ESSAI_LOG']
+q=json.loads(data); e=q['queries'][0]['expr']; de=int(q['from'])//1000; to=int(q['to'])//1000
+open(log,'a').write('curl\t%s\t%d\t%d\tmdp_en_argument=%s\n'%(e,de,to, any('FAUX-MDP' in x for x in a)))
+mode=os.environ.get('ESSAI_MODE','normal')
+import datetime
+def ts(s): return int(datetime.datetime.fromisoformat(s.replace('Z','+00:00')).timestamp())
+R1=ts('2026-11-06T16:49:02Z'); R6=ts('2026-11-09T09:30:00Z')
+n=0
+if mode=='http500': print('500',end=''); open(out,'w').write('{}'); sys.exit(0)
+if mode=='erreur': json.dump({'results':{'A':{'error':'parse error','status':400}}},open(out,'w')); print('200',end=''); sys.exit(0)
+if e=='{source="evenements-k8s"}': n=int(os.environ.get('ESSAI_TEMOIN','5'))
+elif 'PolicyViolation' in e and de==R1: n=int(os.environ.get('ESSAI_R1','40'))
+elif 'kind="CronJob"' in e and de==R6: n=1
+elif mode=='tout' : n=2
+if mode=='tronque' and 'PolicyViolation' in e and de==R1: n=1000
+lines=[json.dumps({'name':'p%d'%i,'kind':'Pod','reason':'X','msg':'secret token jeton','count':1}) for i in range(n)]
+frames=[{'data':{'values':[[{}]*n,[ (de+i)*1000 for i in range(n)],lines]}}] if n else []
+json.dump({'results':{'A':{'frames':frames,'status':200}}},open(out,'w')); print('200',end='')
+
+## faux ssh (bin/ssh)
+#!/usr/bin/env bash
+printf 'ssh\t%s\n' "${*: -1}" >> "$ESSAI_LOG"
+case "${*: -1}" in
+  *ActiveEnterTimestamp*) echo "${ESSAI_ALLOY-Sat 2026-11-07 12:22:01 CET}" ;;
+  *is-active*) echo active ;;
+  *) echo "appel inattendu" >&2; exit 9 ;;
+esac
+
+## faux kubectl (bin/kubectl)
+#!/usr/bin/env bash
+printf "kubectl\t%s\n" "$*" >> "$ESSAI_LOG"; exit 9
+
+## sortie
+# date : 2026-11-09T14:45:52Z ; sha256 de evenements.sh : f9f19363daa75c0a5c865b6e7e28314683f0794a64d826ee61efc001518443dc
+## normal (ESSAI_MODE=normal)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+  OK   R3 : 0 lignes (attendu : 0)
+  OK   R4 : 0 lignes (attendu : 0)
+  OK   R5 : 0 lignes (attendu : 0)
+  OK   R7 : 0 lignes (attendu : 0)
+  NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+  ## bilan : R1 OK, R2 NJ, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## alloy-ancien (ESSAI_MODE=normal ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  OK   R2 : 0 lignes (attendu : 0)
+  OK   R3 : 0 lignes (attendu : 0)
+  OK   R4 : 0 lignes (attendu : 0)
+  OK   R5 : 0 lignes (attendu : 0)
+  OK   R7 : 0 lignes (attendu : 0)
+  OK   R8 : 0 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 OK, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 OK
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## r1-faible (ESSAI_MODE=normal ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  KO   R1 : 10 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 KO, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R3 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R4 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R5 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R7 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R8 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  ## bilan : R1 KO, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## tronque (ESSAI_MODE=tronque ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  NJ   R1 : réponse tronquée à 1000 lignes
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 NJ, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R3 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R4 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R5 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R7 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R8 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## erreur (ESSAI_MODE=erreur)
+  NJ   R1 : requête en erreur
+  NJ   R6 : requête en erreur
+  ## précondition non remplie : R1 NJ, R6 NJ ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : requête en erreur
+  NJ   R3 : requête en erreur
+  NJ   R4 : requête en erreur
+  NJ   R5 : requête en erreur
+  NJ   R7 : requête en erreur
+  NJ   R8 : requête en erreur
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## http500 (ESSAI_MODE=http500)
+  NJ   R1 : requête en erreur
+  NJ   R6 : requête en erreur
+  ## précondition non remplie : R1 NJ, R6 NJ ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : requête en erreur
+  NJ   R3 : requête en erreur
+  NJ   R4 : requête en erreur
+  NJ   R5 : requête en erreur
+  NJ   R7 : requête en erreur
+  NJ   R8 : requête en erreur
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## temoin-vide (ESSAI_MODE=normal ESSAI_TEMOIN=0 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R3 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R4 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R5 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R7 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+  ## bilan : R1 OK, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## zeros-faux (ESSAI_MODE=tout ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## alloy-vide (ESSAI_MODE=normal ESSAI_ALLOY=)
+  KO   démarrage d'Alloy illisible sur sc-stockage : relevé arrêté
+  code : 1
+  appels : curl 0, ssh 1, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## lignes-sans-e3 (ESSAI_MODE=tout)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## lignes-r1-faible (ESSAI_MODE=tout ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  KO   R1 : 10 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 KO, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 KO, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+dépôt : git status et resultats/ inchangés
+
+## journal complet du scénario normal (evenements-releve.log du dépôt jetable)
+# evenements.sh releve, 2026-11-09T14:45:52Z
+## Alloy de sc-stockage (affiché, E3) : actif depuis 2026-11-07T11:22:01Z, active
+  fin des fenêtres ouvertes (R8) : 2026-11-09T14:45:52Z
+## R1, témoin positif de R2 (h2_releve)
+  fenêtre : 2026-11-06T16:49:02Z à 2026-11-06T16:53:29Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : durcissement-h2_releve.log : événements PolicyViolation depuis H2 : 32
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré le 2026-11-07T11:22:01Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 40
+  première : 2026-11-06T16:49:02Z, dernière : 2026-11-06T16:49:41Z
+    1 Pod p9 X count=1
+    1 Pod p8 X count=1
+    1 Pod p7 X count=1
+    1 Pod p6 X count=1
+    1 Pod p5 X count=1
+    1 Pod p4 X count=1
+    1 Pod p39 X count=1
+    1 Pod p38 X count=1
+    1 Pod p37 X count=1
+    1 Pod p36 X count=1
+    1 Pod p35 X count=1
+    1 Pod p34 X count=1
+    1 Pod p33 X count=1
+    1 Pod p32 X count=1
+    1 Pod p31 X count=1
+OK   R1 : 40 lignes (attendu : >=32)
+## R6, témoin positif de R5, passage planifié du 09/11
+  fenêtre : 2026-11-09T09:30:00Z à 2026-11-09T09:35:00Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré avant la fenêtre et pas depuis
+  lignes (E2 : des lignes, pas des Events) : 1
+  première : 2026-11-09T09:30:00Z, dernière : 2026-11-09T09:30:00Z
+    1 Pod p0 X count=1
+OK   R6 : 1 lignes (attendu : >=1)
+## précondition remplie : R1 OK, R6 OK
+## R2, durcissement.sh:270, FailedCreate depuis H2
+  fenêtre : 2026-11-06T16:49:02Z à 2026-11-06T16:53:29Z ; requête : {source="evenements-k8s"} | json | reason="FailedCreate"
+  kubectl (archivé, E1) : durcissement-h2_releve.log : OK   événements FailedCreate depuis H2 : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré le 2026-11-07T11:22:01Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+## R3, preuves.sh:3188 (3184 dans les prédictions), resolveurs_pod
+  fenêtre : 2026-11-07T16:00:56Z à 2026-11-07T16:05:56Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-resolveurs_pod.log : OK   événements PolicyViolation depuis 2026-11-07T16:00:56Z : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré avant la fenêtre et pas depuis
+  lignes (E2 : des lignes, pas des Events) : 0
+OK   R3 : 0 lignes (attendu : 0)
+## R4, preuves.sh:3242 (3238), scan_saut_suspendre
+  fenêtre : 2026-11-07T16:21:58Z à 2026-11-07T16:26:58Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_suspendre.log : OK   événements PolicyViolation depuis 2026-11-07T16:21:58Z : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré avant la fenêtre et pas depuis
+  lignes (E2 : des lignes, pas des Events) : 0
+OK   R4 : 0 lignes (attendu : 0)
+## R5, preuves.sh:3302 (3298), CronJob du scan à la reprise
+  fenêtre : 2026-11-08T11:40:44Z à 2026-11-08T11:45:44Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_reprendre.log : OK   événements du CronJob du scan (MissSchedule compris) : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré avant la fenêtre et pas depuis
+  lignes (E2 : des lignes, pas des Events) : 0
+OK   R5 : 0 lignes (attendu : 0)
+## R7, preuves.sh:3308 (3304), scan_saut_reprendre
+  fenêtre : 2026-11-08T11:40:44Z à 2026-11-08T11:45:44Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_reprendre.log : OK   événements PolicyViolation depuis 2026-11-08T11:40:44Z : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré avant la fenêtre et pas depuis
+  lignes (E2 : des lignes, pas des Events) : 0
+OK   R7 : 0 lignes (attendu : 0)
+## R8, cilium.sh:173, Pulling des pods de Cilium
+  fenêtre : 2026-11-06T11:00:00Z à 2026-11-09T14:45:52Z ; requête : {source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | reason="Pulling" | name=~"cilium.*"
+  kubectl (archivé, E1) : rejeu-rke2-sixieme-passage.log : OK   événements Pulling des pods de Cilium : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 5
+  E3 : Alloy démarré le 2026-11-07T11:22:01Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+## bilan : R1 OK, R2 NJ, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 NJ
+  ce que R ne prouve pas : verdicts des étapes rejouées avec Loki ; effet d'un redémarrage d'Alloy pendant une étape ; délai
+  d'ingestion ; Events sans aucun horodatage, écartés par Alloy (1 sur 918 en L4 de la 19b)

@@ -838,3 +838,30 @@ Point commun : les six attendent 0. Un 0 dans Loki ne prouve rien si la collecte
 **Précondition du relevé, écrite avant tout passage.** R1 et R6 sont les deux témoins positifs. Si R1 ou R6 échoue, aucun 0 de R2 à R5, R7 et R8 ne compte : ils sont écrits non jugés, et la requête ou la collecte est à reprendre avant toute conclusion. R1 ne vaut que pour R2 (même fenêtre) ; R6 que pour R5 (même filtre) ; R3, R4, R7 et R8 n'ont pas de témoin positif dans leur fenêtre et reposent sur E3 seul.
 
 **Estimation** : aucune n'est fixée à cette heure ; elle sera proposée au propriétaire avant tout passage.
+
+## Additif du 09/11/2026, 14:46 UTC : relevé R1 à R8 des Events préparé à sec, non lancé
+
+Travail local, rien lu ni écrit dans le cluster, Loki, Grafana, Zot ou les VM. Le propriétaire a choisi « Chantier des Events » parmi les décisions ouvertes. Ce choix ouvre le chantier : il ne valide pas l'estimation et ne vaut pas accord pour le relevé.
+
+- **Début du chantier** : 14:42:02 UTC, heure relevée par `date -u` au début du travail. **Estimation proposée** : 4 h, non validée ; le seuil de décision (2×) serait atteint à 8 h.
+- **Commande** : `mise exec -- poc/bricks/08c-durcissement/evenements.sh releve`, journal `resultats/evenements-releve.log`. Le script est rangé dans la 08c, close, parce que les décisions et les prédictions du chantier y sont ; le propriétaire peut le déplacer.
+- **Lu dans le source d'Alloy v1.21.3** (version épinglée par la 19b, `internal/component/loki/source/kubernetes_events/event_controller.go` au tag) :
+  - chaque ligne est horodatée par `series.lastObservedTime`, à défaut `lastTimestamp`, à défaut `eventTime` ; kubectl, dans `durcissement.sh:270`, prenait `lastTimestamp // eventTime` : un Event en série peut tomber d'un côté différent de la borne ;
+  - chaque mise à jour d'un Event (nouvelle `resourceVersion`) donne une nouvelle ligne ; une suppression n'en donne pas ;
+  - au démarrage, Alloy écarte les Events dont l'horodatage n'est pas postérieur à la dernière position enregistrée ; un Event sans aucun horodatage est donc toujours écarté (1 sur 918 en L4 de la 19b, `l4-evenements-horodatage.log`). Un 0 dans Loki ne couvre pas ces Events ;
+  - champs JSON utilisés : `kind`, `name` (objet concerné), `reason`, `count` ; étiquettes `namespace`, `job`, `instance`, plus `source` posée par `evenements.alloy`.
+- **Fenêtres exactes, bornées des deux côtés** (la fonction `grafana_lignes` de la 07a, qui lit jusqu'à l'instant présent, n'est pas reprise) :
+  - R1 et R2 : 06/11, 16:49:02 à 16:53:29. 16:49:02 est le `t0` de `h2_releve`, début de `h2_kyverno` (`durcissement.sh:250`, première ligne de `durcissement-h2_kyverno.log`) ; kubectl a compté les 32 Events à `h2_releve`, lancé à 16:53:22. La fenêtre couvre donc la population du contrôle d'origine ;
+  - R3 : 07/11, 16:00:56 à 16:05:56 ; R4 : 16:21:58 à 16:26:58 ; R5 et R7 : 08/11, 11:40:44 à 11:45:44 ; R6 : 09/11, 09:30:00 à 09:35:00 ;
+  - R8 : 06/11, 11:00:00 jusqu'à l'heure du passage. Le filtre ajoute `kind="Pod"`, comme `cilium.sh:173`.
+- **Numéros de ligne** : depuis le commit `3791082`, les contrôles de `preuves.sh` sont 4 lignes plus bas (3188, 3242, 3302, 3308 au lieu de 3184, 3238, 3298, 3304).
+- **Verdicts écrits avant le passage** :
+  - une réponse en erreur ou qui atteint `maxLines` (1000) est **non jugée**, jamais un compte ;
+  - le témoin E3 et le contrôle passent par la même fonction de lecture ;
+  - un compte non nul reste **KO**, même sans témoin E3 ou si la précondition n'est pas remplie : une ligne trouvée est une preuve ;
+  - seuls les 0 dépendent du témoin E3 et de la précondition ; la précondition est appliquée telle qu'écrite à 13:11 UTC : si R1 ou R6 n'est pas OK, tous les 0 de R2 à R5, R7 et R8 sont non jugés ;
+  - **interprétation soumise au propriétaire** : E3 porte sur les contrôles attendus à 0. Pour les témoins positifs R1 et R6, un compte atteint prouve la collecte dans la fenêtre ; E3 y est affiché, sans effet sur le verdict.
+- **Limite de E3 (b), relevée avant le passage** : `ActiveEnterTimestamp` ne donne que le dernier démarrage d'Alloy. Une fenêtre qui commence avant ce démarrage n'est pas jugeable, puisque les redémarrages antérieurs sont inconnus. Si Alloy a démarré au redémarrage des VM du 07/11, vers 11:22 UTC, **R2 et R8 sont prédits non jugés par construction**. R3 à R7 restent jugeables si Alloy n'a pas redémarré depuis. Une autre source d'historique (par exemple `journalctl -u alloy` sur `sc-stockage`) changerait E3 ; c'est au propriétaire de la choisir, elle n'est pas utilisée.
+- **Essai hors cluster** (`resultats/evenements-releve-essai.log`) : onze scénarios avec de faux `curl`, `ssh` et `kubectl` ; chaque scénario rend le bilan attendu. Aucun appel à kubectl ; le ssh se limite à `systemctl show -p ActiveEnterTimestamp --value alloy` et `systemctl is-active alloy` ; le mot de passe n'est jamais passé en argument ; aucun mot de passe ni champ `msg` dans le journal ; `resultats/` et `git status` du dépôt sont inchangés. Limites : les réponses de Grafana sont fabriquées sur la forme déjà lue dans le dépôt ; le format de date de systemd est supposé.
+- **Effets du passage** : 16 requêtes `POST /api/ds/query` de l'auditeur à Grafana (un témoin E3 et un contrôle par fenêtre), en lecture ; 2 commandes ssh en lecture sur `sc-stockage`. Rien n'est écrit dans le cluster, Loki, Grafana ou les VM. Le journal est local.
+- **Pire cas** : quelques requêtes de plus dans les journaux de Grafana et de Loki. Les deux requêtes de R8 portent sur trois jours et chargent un peu `sc-stockage` pendant quelques secondes.
