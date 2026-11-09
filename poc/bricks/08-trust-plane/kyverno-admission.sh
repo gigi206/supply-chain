@@ -342,8 +342,18 @@ etape_passage() {
   REF_ESSAI=$REG/$DEPOT_ESSAI@$d
   REF_OFF=$(kubectl get deployment -n kyverno "$DEP" -o jsonpath='{.spec.template.spec.containers[?(@.name=="kyverno")].image}')
   [ "$REF_OFF" = "$REG/amont/kyverno/kyverno@$OFF_INDEX" ] && echo "OK   image en service officielle : $REF_OFF" || { echo "NON JUGÉ : image en service $REF_OFF"; exit 3; }
-  n=$(kubectl get imagevalidatingpolicies -o name | wc -l)
-  [ "$n" = 0 ] || { echo "NON JUGÉ : $n politique(s) d'images déjà présente(s)"; exit 3; }
+  # Ajout du 09/11/2026 vers 13:56 UTC, après les témoins : bench-release, chargée par la parité de J6 le 06/11 à 13:47:07 UTC
+  # et jamais retirée par politique.sh (glob sur l'adresse de l'hôte, sans effet sur les pods réels), est archivée puis retirée ;
+  # toute autre politique d'images présente arrête le passage.
+  kubectl get imagevalidatingpolicies -o json < /dev/null | jq -r '.items[] | "\(.metadata.name) \(.metadata.creationTimestamp)"' > "$T/ivpols"
+  if grep -qvx 'bench-release 2026-11-06T13:47:07Z' "$T/ivpols"; then echo "NON JUGÉ : politique(s) d'images inattendue(s) : $(tr '\n' ' ' < "$T/ivpols")"; exit 3; fi
+  if [ -s "$T/ivpols" ]; then
+    kubectl get imagevalidatingpolicy bench-release -o json < /dev/null | jq 'del(.metadata.managedFields, .metadata.uid, .metadata.resourceVersion, .metadata.generation, .status)' \
+      > "$R/kyverno-admission-bench-release-j6.json"
+    kubectl delete imagevalidatingpolicy bench-release --wait=true < /dev/null >/dev/null && echo "OK   bench-release de J6 archivée (kyverno-admission-bench-release-j6.json) puis retirée"
+  fi
+  n=$(kubectl get imagevalidatingpolicies -o name < /dev/null | wc -l)
+  [ "$n" = 0 ] || { echo "NON JUGÉ : $n politique(s) d'images encore présente(s)"; exit 3; }
   NS_CREE=non
   TSV=$R/kyverno-admission-passage.tsv
   printf 'phase\tcas\tattendu\tadmission\terreur interne\tmotif\n' > "$TSV"

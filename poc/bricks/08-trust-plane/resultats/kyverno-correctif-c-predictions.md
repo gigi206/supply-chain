@@ -248,3 +248,26 @@ Accord du propriétaire : « Oui, lance image », en réponse à « Je lance l'�
 - binaire relu dans la couche poussée identique au binaire construit (`2b36652a…`).
 
 La copie des identifiants de `poc-ecriture` a été retirée à la sortie (répertoire vide, vérifié). Rien n'a été lu ni écrit dans le cluster. L'image reste dans Zot, comme accepté.
+
+## Additif du 09/11/2026, 13:54 UTC : étape `temoins` passée, une politique de J6 restée chargée
+
+Accord du propriétaire : « Oui, lance temoins », en réponse à « Je lance l'étape temoins (lecture seule du cluster) ? ». Effets et pire cas donnés juste avant. Passage à 13:53:59 UTC ([`kyverno-admission-temoins.log`](kyverno-admission-temoins.log)), bilan : OK. Rien n'a été créé ni modifié.
+- **Contrôleur d'admission** : image officielle `c8c4dd09…`, en spec comme en `imageID`. 1 réplique, sur `sc-confiance`. `RollingUpdate`, `maxSurge: 1`, `maxUnavailable: 40%`. **Aucun PodDisruptionBudget** dans `kyverno`. L'étiquette `app.kubernetes.io/component=admission-controller` est présente.
+- **Webhooks** : en `Fail`, sauf `kyverno-ttl-validating-webhook-cfg` et `kyverno-verify-mutating-webhook-cfg` (`Ignore`).
+- **Espaces** :
+  - `bancc` existe, avec `pod-security.kubernetes.io/enforce: privileged` (décision D10 de la 08b, J6). Le passage ne le créera ni ne le retirera ;
+  - `horodatage` est en `restricted`.
+- **Pods témoins**, sans politique d'essai, en dry-run serveur : admis dans `horodatage` et dans `bancc`. Les règles de la 08c et de J6 ne les refusent pas.
+- **CronJobs** `horodatage` et `rattrapage` actifs, dernier passage à 13:53:00 UTC.
+- **Zot** :
+  - `horodatage/bundles` : 63 referrers ;
+  - `essais-j5/sans-jeton`, `jeton-altere`, `autre-signature` et `tsa-etrangere` : 1 chacun ;
+  - `essais-j5/aucun` : 0 ;
+  - les 17 images du banc C sont présentes, ainsi que l'image corrigée.
+
+**Écart : 1 `ImageValidatingPolicy` déjà présente, pour 0 attendue.** L'étape l'affiche sans la juger, d'où le bilan OK. C'est `bench-release`, créée le 06/11/2026 à 13:47:07 UTC par la parité de J6 (`politique.sh parite`), qui ne la retire jamais (relu dans le script). Elle est en `Deny`, sans borne d'espace, sur `192.168.161.13:5000/bench/*`, une adresse qu'aucun pod réel n'utilise. Elle est donc restée sans effet depuis trois jours, ce qui est déduit et non mesuré.
+
+**Conséquences pour le passage :**
+- Le pire cas se confirme plus doux qu'écrit à 13:18 UTC : 1 réplique et `maxSurge: 1`. L'absence de PDB ne joue pas dans une mise à jour progressive.
+- Le script est modifié avant tout passage (ajout de 13:56 UTC dans `kyverno-admission.sh`). Si `bench-release` du 06/11 est la seule politique d'images présente, il l'archive dans `kyverno-admission-bench-release-j6.json`, puis la retire avant toute autre action. Toute autre politique arrête le passage. Elle n'est pas remise à la fin : c'était un reste de J6. Ce retrait fait partie de l'accord du passage.
+- Défaut de `politique.sh parite` : la politique du banc n'est pas retirée à la fin de l'étape. Il n'est pas corrigé ici et reste à décider.

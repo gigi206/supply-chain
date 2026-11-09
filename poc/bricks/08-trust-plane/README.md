@@ -2066,6 +2066,8 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
 
 **Additif du 09/11/2026, 13:53 UTC : étape `image` passée, C7 tenue.** Accord du propriétaire : « Oui, lance image ». L'image corrigée `essais/kyverno-correctif@sha256:eec37159…` a les 3 couches, le point d'entrée et l'utilisateur de l'officielle, et le binaire construit ([journal](resultats/kyverno-admission-image.log)). Il reste `temoins` et `passage`, chacun avec son accord.
 
+**Additif du 09/11/2026, 13:54 UTC : étape `temoins` passée** ([journal](resultats/kyverno-admission-temoins.log)). Image officielle en service, 1 réplique, aucun PDB, pods témoins admis, Zot complet. Écart : la politique `bench-release` de la parité de J6 (06/11) est restée chargée, car `politique.sh parite` ne la retire pas. Elle est sans effet sur les pods réels (adresse de l'hôte). Le passage l'archivera puis la retirera, avec son accord.
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.
