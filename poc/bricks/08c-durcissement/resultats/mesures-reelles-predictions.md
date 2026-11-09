@@ -865,3 +865,19 @@ Travail local, rien lu ni écrit dans le cluster, Loki, Grafana, Zot ou les VM. 
 - **Essai hors cluster** (`resultats/evenements-releve-essai.log`) : onze scénarios avec de faux `curl`, `ssh` et `kubectl` ; chaque scénario rend le bilan attendu. Aucun appel à kubectl ; le ssh se limite à `systemctl show -p ActiveEnterTimestamp --value alloy` et `systemctl is-active alloy` ; le mot de passe n'est jamais passé en argument ; aucun mot de passe ni champ `msg` dans le journal ; `resultats/` et `git status` du dépôt sont inchangés. Limites : les réponses de Grafana sont fabriquées sur la forme déjà lue dans le dépôt ; le format de date de systemd est supposé.
 - **Effets du passage** : 16 requêtes `POST /api/ds/query` de l'auditeur à Grafana (un témoin E3 et un contrôle par fenêtre), en lecture ; 2 commandes ssh en lecture sur `sc-stockage`. Rien n'est écrit dans le cluster, Loki, Grafana ou les VM. Le journal est local.
 - **Pire cas** : quelques requêtes de plus dans les journaux de Grafana et de Loki. Les deux requêtes de R8 portent sur trois jours et chargent un peu `sc-stockage` pendant quelques secondes.
+
+## Additif du 09/11/2026, 15:46 UTC : lecture des témoins positifs tranchée, (a)
+
+Le propriétaire a répondu « (a) compte seul » à « Quelle lecture des témoins positifs R1 et R6 retenez-vous ? ». Les options proposées étaient :
+- (a) un compte atteint prouve la collecte dans la fenêtre ; E3 est affiché sans effet sur le verdict ;
+- (b) lecture stricte, avec `journalctl -u alloy` comme source de E3 ;
+- (c) lecture stricte, sans autre source.
+
+L'interprétation de l'additif de 14:46 UTC devient donc une décision. `evenements.sh` l'applique déjà, et le script n'est pas modifié. R2 et R8 restent prédits non jugés si Alloy a démarré après le début de leur fenêtre.
+
+Cette réponse ne porte que sur cette question. Restent sans réponse à cette heure :
+- l'estimation de 4 h ;
+- l'accord pour le relevé ;
+- le push de `dd12881` et `67a88ee`.
+
+Rien n'est lancé.
