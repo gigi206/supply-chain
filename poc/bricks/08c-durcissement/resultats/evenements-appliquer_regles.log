@@ -1,0 +1,24 @@
+# evenements.sh appliquer_regles, 2026-11-09T22:41:07Z
+alertes.yml en place : version d'avant (a), sha256 a0bca63313428f290d84f4b31b64e6312b3b3372519abee9df9c8aff0de693a3
+# observabilite.sh deployer, 2026-11-09T22:41:08Z
+active
+  /etc/prometheus/regles/alertes.yml	OpenBaoScelle	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ChainsEchecSignature	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ChainsMarqueSansSignature	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ReplayNonBitIdentique	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	MiroirEnRetard	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	KyvernoRefusAnormaux	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	CertificatExpireBientot	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanEnRetard	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	ScanBientotRefuse	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	BaseGrypeVieillie	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	DisqueStockagePlein	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	SourceMuette	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	EvenementsMuets	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	LokiInjoignable	unknown	unknown
+  /etc/prometheus/regles/alertes.yml	CollecteEnPanne	unknown	unknown
+## 90 s (trois évaluations) puis état de EvenementsMuets
+  règle : ok inactive 
+  alertes en cours dans Prometheus : 0
+  alertes dans Alertmanager : 0
+## bilan : EvenementsMuets déployée, saine, inactive

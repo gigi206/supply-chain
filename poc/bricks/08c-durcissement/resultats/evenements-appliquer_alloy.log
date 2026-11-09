@@ -1,0 +1,17 @@
+# evenements.sh appliquer_alloy, 2026-11-09T22:37:07Z
+## sha256 de evenements.alloy : c8f657c274b4ea8f9c07c002bb150685e96119cd549089b7f8a3244f51f84ee5
+evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+avant : séries du compteur dans /metrics d'alloy : 0
+copie de sauvegarde : /etc/alloy/evenements.alloy.avant-a, sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+configuration d'alloy (copie) valide
+## alloy : nouveau evenements.alloy, rechargement par SIGHUP (pid 97737)
+alloy : active, pid 97737, compteur dans /metrics après 57 s au plus
+## composant des Events après rechargement, API locale d'Alloy
+  santé : healthy, component evaluated, depuis 2026-11-09T22:37:07.885618639Z
+## Prometheus : série du compteur, job alloy (collecte toutes les 30 s), attente jusqu'à 120 s
+  {"__name__":"loki_process_custom_evenements_lignes_total","component_id":"loki.process.evenements","component_path":"/","exported_instance":"loki.source.kubernetes_events.evenements","exported_job":"evenements-k8s","instance":"127.0.0.1:12345","job":"alloy","namespace":"declencheurs","source":"evenements-k8s"}
+  {"__name__":"loki_process_custom_evenements_lignes_total","component_id":"loki.process.evenements","component_path":"/","exported_instance":"loki.source.kubernetes_events.evenements","exported_job":"evenements-k8s","instance":"127.0.0.1:12345","job":"alloy","namespace":"horodatage","source":"evenements-k8s"}
+## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)
+  increase sur 15 min : 51.84439444444445
+## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+OK   expression vide : la règle ne sonnerait pas

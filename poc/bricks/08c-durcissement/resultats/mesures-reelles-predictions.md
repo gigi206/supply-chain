@@ -1192,3 +1192,18 @@ Rien lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM. Travail 
 - Alloy refuse la nouvelle configuration au rechargement : il garde l'ancienne, et le retour arrière est automatique.
 - Prometheus ne redémarre pas : plus d'alertes jusqu'à une réparation manuelle. `deployer` le signale par `systemctl is-active`.
 - Fausse alerte critique : la porte de l'expression vide la rend peu probable. Elle n'atteindrait que le récepteur local.
+
+
+## Additif du 09/11/2026, 22:43 UTC : application de (a), AP1 à AP5 tenues, alerte EvenementsMuets en service
+
+Accord du propriétaire : « Oui » à « Je lance l'application sur sc-stockage ? ». Passage de 22:37:07 à 22:42:44 UTC, code 0 : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/evenements.sh appliquer_alloy appliquer_regles`. Journaux `resultats/evenements-appliquer_alloy.log`, `resultats/evenements-appliquer_regles.log`, `19-observabilite/resultats/evenements-deployer.log`, `chrono.tsv`.
+
+- **AP1 tenue** : versions d'avant (a) en place, `evenements.alloy` c9c50133… et `alertes.yml` a0bca633…. Copie de sauvegarde `/etc/alloy/evenements.alloy.avant-a`, même empreinte.
+- **AP2 tenue, de justesse** : copie valide ; compteur dans `/metrics` d'Alloy au bout de 57 s au plus, pour une prédiction à moins de 60 s. Le PID 97737 est resté le même : rechargement par SIGHUP, sans redémarrage. Seule l'apparition du compteur, donc de lignes, montre que l'observateur tourne. La santé `healthy` du composant ne le prouve pas : c'est la leçon du 07/11.
+- **AP3 tenue** : deux séries dans Prometheus, une par espace de noms ayant produit des Events (`declencheurs` et `horodatage`). Étiquettes : `job="alloy"`, `instance="127.0.0.1:12345"`, `exported_job="evenements-k8s"`, `exported_instance="loki.source.kubernetes_events.evenements"`, `component_id="loki.process.evenements"`, `component_path="/"`, `namespace`, `source`. Le point à relire de 17:32 est confirmé : sans `honor_labels`, `job` et `instance` de la ligne deviennent `exported_*`, et `{job="alloy"}` correspond.
+- **AP4 tenue** : `increase` sur 15 min de 51,8 ; expression d'`EvenementsMuets` vide sur le vrai Prometheus.
+- **AP5 tenue** : Prometheus `active` après `deployer`, 15 règles chargées ; au bout de 90 s, `EvenementsMuets` est `ok inactive`, sans aucune alerte dans Prometheus ni dans Alertmanager.
+
+**Bilan du remède (a)** : la panne du 07/11 (observateur en échec au démarrage, composant `healthy`, aucune ligne) déclencherait désormais `EvenementsMuets`, par la branche `absent`, 5 min après qu'Alloy répond. Une collecte qui s'arrête en cours de route la déclencherait 15 min plus 5 min après la dernière ligne. Ce dernier point est vérifié par `promtool` seulement ; aucun incident n'a été simulé sur le vrai système. Le dépôt et `sc-stockage` sont de nouveau alignés pour ces deux fichiers. Limite inchangée : une suspension des CronJobs par minute ferait sonner l'alerte à tort.
+
+**Temps** : de 22:23 à 22:43 UTC, dans l'heure accordée. Il reste ouvert : la suite d'E4, l'issue chez Alloy (action publique), le défaut `validate && …` de `journalisation.sh` (L6), et le push.
