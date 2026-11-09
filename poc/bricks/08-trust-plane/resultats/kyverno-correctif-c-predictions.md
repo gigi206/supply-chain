@@ -271,3 +271,45 @@ Accord du propriétaire : « Oui, lance temoins », en réponse à « Je lance l
 - Le pire cas se confirme plus doux qu'écrit à 13:18 UTC : 1 réplique et `maxSurge: 1`. L'absence de PDB ne joue pas dans une mise à jour progressive.
 - Le script est modifié avant tout passage (ajout de 13:56 UTC dans `kyverno-admission.sh`). Si `bench-release` du 06/11 est la seule politique d'images présente, il l'archive dans `kyverno-admission-bench-release-j6.json`, puis la retire avant toute autre action. Toute autre politique arrête le passage. Elle n'est pas remise à la fin : c'était un reste de J6. Ce retrait fait partie de l'accord du passage.
 - Défaut de `politique.sh parite` : la politique du banc n'est pas retirée à la fin de l'étape. Il n'est pas corrigé ici et reste à décider.
+
+## Additif du 09/11/2026, 13:58 UTC : passage fait, C8 à C13 tenues, le correctif v2 fonctionne à l'admission
+
+**Accord du propriétaire** : « Oui, lance le passage », en réponse à « Je lance le passage (cluster, en arrière-plan) ? ». Les effets, arrêts et pire cas avaient été donnés juste avant, retrait de `bench-release` de J6 compris.
+
+**Passage** : de 13:55:25 à 13:58:15 UTC, en arrière-plan, code 0, bilan OK.
+- Journal : [`kyverno-admission-passage.log`](kyverno-admission-passage.log).
+- Tableau des 75 présentations : [`kyverno-admission-passage.tsv`](kyverno-admission-passage.tsv).
+- `bench-release` de J6 archivée dans [`kyverno-admission-bench-release-j6.json`](kyverno-admission-bench-release-j6.json), qui contient les clés publiques du banc et aucune clé privée (vérifié), puis retirée.
+
+| Phase | Image | Cas conformes | Erreurs internes |
+|---|---|---|---|
+| avant | officielle `c8c4dd09…` | 25 sur 25 | 4 : `j5-jeton-valide`, `j5-jeton-altere`, `j5-autre-signature`, `j5-tsa-etrangere` |
+| corrigée | `essais/kyverno-correctif@eec37159…` | 25 sur 25 | **0** |
+| après | officielle `c8c4dd09…` | 25 sur 25 | les 4 mêmes |
+
+| # | Résultat |
+|---|---|
+| C7 | Tenue à l'étape `image` (13:53 UTC) |
+| C8 | **Tenue** : à chacune des 27 politiques chargées (8 cas `j5-*` et `bench-release`, dans les trois phases), le même pod hors de `bancc` est admis. Le témoin du banc porte sur `c1-unsigned`, un cas refusé dans `bancc` |
+| C9 | **Tenue** : `j5-temoin` admis. `j5-jeton-valide` refusé par une erreur interne (« Policy j5-jeton-valide error: failed to evaluate policy »), comme `jeton-altere`, `autre-signature` et `tsa-etrangere`. `sans-jeton`, `aucun-bundle` et `att-historique` sont refusés par la règle (« Policy … failed: C9 : provenance sans horodatage RFC 3161 valide »). Zot est lu par Kyverno sous H4, par le nom du registre |
+| C10 | **Tenue** : avec l'image corrigée, `j5-temoin` et **`j5-jeton-valide` admis** |
+| C11 | **Tenue** : les 6 autres sont refusés par la règle (« failed: C9 : … »), sans erreur interne. Les trois falsifications passent d'« error » à « failed ». `j5-att-historique` reste refusé (kyverno#17109, hors du correctif) |
+| C12 | **Tenue** : 0 `FailedCreate` sur le cluster de 13:55:25 à 13:57:58 UTC ; chaque bascule terminée sans attente du webhook (0 s) |
+| C13 | **Tenue** : `imageID` officiel `c8c4dd09…` après le retour ; décisions d'après identiques à celles d'avant, erreurs internes comprises |
+| Banc C | **Tenu** dans les trois phases : `ok` et `c7-kev-vex-ok` admis, 15 refus attribués à `bench-release`, aucune erreur interne |
+
+**Retrait contrôlé** : aucune politique d'images restante. CronJobs repris, puis `horodatage-29903878` et `rattrapage-29903877` réussis. `bancc`, présent avant le passage, est laissé tel quel.
+
+**Lecture.** Le correctif v2 rend au contrôle 9, à l'admission, le comportement de cosign en J5 :
+- le jeton valide est accepté ;
+- les falsifications sont refusées par la règle, et non plus par une erreur interne.
+
+Il ne change rien d'autre sur les 25 cas, et le retour à l'image officielle redonne exactement l'état d'avant. Le refus de `j5-jeton-valide` par l'image officielle, à l'admission, est mesuré pour la première fois sous H5.
+
+**Non prouvé, inchangé** :
+- le background et les rapports ;
+- la tenue dans la durée ;
+- un redémarrage avec l'image corrigée ;
+- golangci-lint.
+
+L'image corrigée n'est plus en service : l'admission du PoC reste celle de la release officielle, et le contrôle 9 est toujours jugé par cosign à la porte.

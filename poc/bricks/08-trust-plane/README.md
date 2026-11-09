@@ -2068,6 +2068,15 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
 
 **Additif du 09/11/2026, 13:54 UTC : étape `temoins` passée** ([journal](resultats/kyverno-admission-temoins.log)). Image officielle en service, 1 réplique, aucun PDB, pods témoins admis, Zot complet. Écart : la politique `bench-release` de la parité de J6 (06/11) est restée chargée, car `politique.sh parite` ne la retire pas. Elle est sans effet sur les pods réels (adresse de l'hôte). Le passage l'archivera puis la retirera, avec son accord.
 
+**Additif du 09/11/2026, 13:58 UTC : étape C passée, le correctif v2 fonctionne à l'admission.** Accord du propriétaire : « Oui, lance le passage ». Passage de 13:55:25 à 13:58:15 UTC, bilan OK ([journal](resultats/kyverno-admission-passage.log), [tableau](resultats/kyverno-admission-passage.tsv)).
+- Image officielle, avant puis après : 25 cas sur 25 conformes, dont 4 refus par erreur interne. `j5-jeton-valide` reste refusé.
+- Image corrigée : 25 sur 25, **`j5-jeton-valide` admis**, falsifications refusées par la règle, 0 erreur interne.
+- Banc C inchangé, bornage tenu à chaque politique, 0 `FailedCreate`, retour vérifié, CronJobs repris et réussis.
+- C7 à C13 tenues.
+- `bench-release` de J6 archivée puis retirée.
+
+L'image corrigée n'est plus en service. Non prouvé : background, rapports, durée, redémarrage.
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.

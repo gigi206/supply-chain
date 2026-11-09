@@ -1,0 +1,147 @@
+{
+  "apiVersion": "policies.kyverno.io/v1",
+  "kind": "ImageValidatingPolicy",
+  "metadata": {
+    "annotations": {
+      "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"policies.kyverno.io/v1\",\"kind\":\"ImageValidatingPolicy\",\"metadata\":{\"annotations\":{},\"name\":\"bench-release\"},\"spec\":{\"attestations\":[{\"intoto\":{\"type\":\"https://sigstore.dev/cosign/sign/v1\"},\"name\":\"sig\"},{\"intoto\":{\"type\":\"https://slsa.dev/provenance/v1\"},\"name\":\"prov\"},{\"intoto\":{\"type\":\"https://slsa.dev/verification_summary/v1\"},\"name\":\"vsa\"},{\"intoto\":{\"type\":\"https://supply-chain.example/scan/v1\"},\"name\":\"scan\"},{\"intoto\":{\"type\":\"https://supply-chain.example/licences/v1\"},\"name\":\"lic\"}],\"attestors\":[{\"cosign\":{\"ctlog\":{\"insecureIgnoreTlog\":true},\"key\":{\"data\":\"-----BEGIN PUBLIC KEY-----\\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEt537OBLku+jd4Uf3GfsTjwGeCsLF\\n5qEz+eh8/UpXItWOdSaxaPFmAoWtV4/pW4hroe/auIW3gOW6ww5XiIe7LA==\\n-----END PUBLIC KEY-----\\n\"}},\"name\":\"chains\"},{\"cosign\":{\"ctlog\":{\"insecureIgnoreTlog\":true},\"key\":{\"data\":\"-----BEGIN PUBLIC KEY-----\\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE485k26aU/kTihtoKyERGq3PbZ+NF\\nBmCJrDa2wsqKIYszFrR+US2AyfGoEOKU40W6sbznMTvAIqCXQhK3eyZogw==\\n-----END PUBLIC KEY-----\\n\"}},\"name\":\"vsa\"}],\"credentials\":{\"allowInsecureRegistry\":true},\"matchConstraints\":{\"resourceRules\":[{\"apiGroups\":[\"\"],\"apiVersions\":[\"v1\"],\"operations\":[\"CREATE\"],\"resources\":[\"pods\"]}]},\"matchImageReferences\":[{\"glob\":\"192.168.161.13:5000/bench/*\"}],\"validationActions\":[\"Deny\"],\"validations\":[{\"expression\":\"images.containers.map(i, verifyImageSignatures(i, [attestors.chains])).all(e, e \\u003e 0) \\u0026\\u0026 images.containers.map(i, verifyAttestationSignatures(i, attestations.sig, [attestors.chains])).all(e, e \\u003e 0)\",\"message\":\"C1 : signature de l'image absente ou invalide\"},{\"expression\":\"images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e \\u003e 0) \\u0026\\u0026 images.containers.all(i, extractPayload(i, attestations.prov).predicate.runDetails.builder.id == variables.builderId)\",\"message\":\"C2 : provenance absente, mal signée ou builder inattendu\"},{\"expression\":\"images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.externalParameters.git.url.startsWith('forgejo.example/workspace/'))\",\"message\":\"C3 : source non autorisée\"},{\"expression\":\"images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,\\n  has(d.digest) \\u0026\\u0026 size(d.digest) \\u003e 0\\n  \\u0026\\u0026 (d.uri.startsWith('oci://zot.example/') || d.uri.startsWith('git+forgejo.example/workspace/'))))\",\"message\":\"C4 : dépendance non épinglée ou d'origine non autorisée\"},{\"expression\":\"images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,\\n  !d.uri.startsWith('oci://zot.example/tekton/tasks/') || d.digest.sha256 in variables.trustedTasks))\",\"message\":\"C5 : tâche Tekton non autorisée\"},{\"expression\":\"images.containers.map(i, verifyAttestationSignatures(i, attestations.vsa, [attestors.vsa])).all(e, e \\u003e 0) \\u0026\\u0026 images.containers.all(i, extractPayload(i, attestations.vsa).predicate.verificationResult == 'PASSED'\\n  \\u0026\\u0026 extractPayload(i, attestations.vsa).predicate.verifier.id == 'https://supply-chain.example/replay')\",\"message\":\"C6 : VSA de replay absente, mal signée ou en échec\"},{\"expression\":\"images.containers.map(i, verifyAttestationSignatures(i, attestations.scan, [attestors.chains])).all(e, e \\u003e 0) \\u0026\\u0026 images.containers.all(i, size(extractPayload(i, attestations.scan).predicate.malicious) == 0\\n  \\u0026\\u0026 extractPayload(i, attestations.scan).predicate.vulnerabilities.all(v, !v.kev\\n    || (has(v.vex) \\u0026\\u0026 v.vex.status in ['not_affected', 'fixed'] \\u0026\\u0026 timestamp(v.vex.expires) \\u003e time.now())))\",\"message\":\"C7/C10 : KEV sans VEX valide, VEX expiré ou paquet malveillant\"},{\"expression\":\"images.containers.map(i, verifyAttestationSignatures(i, attestations.lic, [attestors.chains])).all(e, e \\u003e 0) \\u0026\\u0026 images.containers.all(i, extractPayload(i, attestations.lic).predicate.violations.error == 0)\",\"message\":\"C8 : violation de licence ERROR\"}],\"variables\":[{\"expression\":\"'https://supply-chain.example/builders/tekton-chains@v1'\",\"name\":\"builderId\"},{\"expression\":\"['1111111111111111111111111111111111111111111111111111111111111111']\",\"name\":\"trustedTasks\"}]}}\n"
+    },
+    "creationTimestamp": "2026-11-06T13:47:07Z",
+    "name": "bench-release"
+  },
+  "spec": {
+    "attestations": [
+      {
+        "intoto": {
+          "type": "https://sigstore.dev/cosign/sign/v1"
+        },
+        "name": "sig"
+      },
+      {
+        "intoto": {
+          "type": "https://slsa.dev/provenance/v1"
+        },
+        "name": "prov"
+      },
+      {
+        "intoto": {
+          "type": "https://slsa.dev/verification_summary/v1"
+        },
+        "name": "vsa"
+      },
+      {
+        "intoto": {
+          "type": "https://supply-chain.example/scan/v1"
+        },
+        "name": "scan"
+      },
+      {
+        "intoto": {
+          "type": "https://supply-chain.example/licences/v1"
+        },
+        "name": "lic"
+      }
+    ],
+    "attestors": [
+      {
+        "cosign": {
+          "ctlog": {
+            "insecureIgnoreTlog": true
+          },
+          "key": {
+            "data": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEt537OBLku+jd4Uf3GfsTjwGeCsLF\n5qEz+eh8/UpXItWOdSaxaPFmAoWtV4/pW4hroe/auIW3gOW6ww5XiIe7LA==\n-----END PUBLIC KEY-----\n"
+          }
+        },
+        "name": "chains"
+      },
+      {
+        "cosign": {
+          "ctlog": {
+            "insecureIgnoreTlog": true
+          },
+          "key": {
+            "data": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE485k26aU/kTihtoKyERGq3PbZ+NF\nBmCJrDa2wsqKIYszFrR+US2AyfGoEOKU40W6sbznMTvAIqCXQhK3eyZogw==\n-----END PUBLIC KEY-----\n"
+          }
+        },
+        "name": "vsa"
+      }
+    ],
+    "credentials": {
+      "allowInsecureRegistry": true
+    },
+    "matchConstraints": {
+      "resourceRules": [
+        {
+          "apiGroups": [
+            ""
+          ],
+          "apiVersions": [
+            "v1"
+          ],
+          "operations": [
+            "CREATE"
+          ],
+          "resources": [
+            "pods"
+          ]
+        }
+      ]
+    },
+    "matchImageReferences": [
+      {
+        "glob": "192.168.161.13:5000/bench/*"
+      }
+    ],
+    "validationActions": [
+      "Deny"
+    ],
+    "validationConfigurations": {
+      "mutateDigest": true,
+      "required": true,
+      "verifyDigest": true
+    },
+    "validations": [
+      {
+        "expression": "images.containers.map(i, verifyImageSignatures(i, [attestors.chains])).all(e, e > 0) && images.containers.map(i, verifyAttestationSignatures(i, attestations.sig, [attestors.chains])).all(e, e > 0)",
+        "message": "C1 : signature de l'image absente ou invalide"
+      },
+      {
+        "expression": "images.containers.map(i, verifyAttestationSignatures(i, attestations.prov, [attestors.chains])).all(e, e > 0) && images.containers.all(i, extractPayload(i, attestations.prov).predicate.runDetails.builder.id == variables.builderId)",
+        "message": "C2 : provenance absente, mal signée ou builder inattendu"
+      },
+      {
+        "expression": "images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.externalParameters.git.url.startsWith('forgejo.example/workspace/'))",
+        "message": "C3 : source non autorisée"
+      },
+      {
+        "expression": "images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,\n  has(d.digest) && size(d.digest) > 0\n  && (d.uri.startsWith('oci://zot.example/') || d.uri.startsWith('git+forgejo.example/workspace/'))))",
+        "message": "C4 : dépendance non épinglée ou d'origine non autorisée"
+      },
+      {
+        "expression": "images.containers.all(i, extractPayload(i, attestations.prov).predicate.buildDefinition.resolvedDependencies.all(d,\n  !d.uri.startsWith('oci://zot.example/tekton/tasks/') || d.digest.sha256 in variables.trustedTasks))",
+        "message": "C5 : tâche Tekton non autorisée"
+      },
+      {
+        "expression": "images.containers.map(i, verifyAttestationSignatures(i, attestations.vsa, [attestors.vsa])).all(e, e > 0) && images.containers.all(i, extractPayload(i, attestations.vsa).predicate.verificationResult == 'PASSED'\n  && extractPayload(i, attestations.vsa).predicate.verifier.id == 'https://supply-chain.example/replay')",
+        "message": "C6 : VSA de replay absente, mal signée ou en échec"
+      },
+      {
+        "expression": "images.containers.map(i, verifyAttestationSignatures(i, attestations.scan, [attestors.chains])).all(e, e > 0) && images.containers.all(i, size(extractPayload(i, attestations.scan).predicate.malicious) == 0\n  && extractPayload(i, attestations.scan).predicate.vulnerabilities.all(v, !v.kev\n    || (has(v.vex) && v.vex.status in ['not_affected', 'fixed'] && timestamp(v.vex.expires) > time.now())))",
+        "message": "C7/C10 : KEV sans VEX valide, VEX expiré ou paquet malveillant"
+      },
+      {
+        "expression": "images.containers.map(i, verifyAttestationSignatures(i, attestations.lic, [attestors.chains])).all(e, e > 0) && images.containers.all(i, extractPayload(i, attestations.lic).predicate.violations.error == 0)",
+        "message": "C8 : violation de licence ERROR"
+      }
+    ],
+    "variables": [
+      {
+        "expression": "'https://supply-chain.example/builders/tekton-chains@v1'",
+        "name": "builderId"
+      },
+      {
+        "expression": "['1111111111111111111111111111111111111111111111111111111111111111']",
+        "name": "trustedTasks"
+      }
+    ]
+  }
+}

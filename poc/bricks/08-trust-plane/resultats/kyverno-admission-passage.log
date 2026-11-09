@@ -1,0 +1,116 @@
+# kyverno-admission.sh passage, 2026-11-09T13:55:25Z
+OK   garde horaire (13:55 UTC)
+OK   image en service officielle : sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
+OK   bench-release de J6 archivée (kyverno-admission-bench-release-j6.json) puis retirée
+## suspension de horodatage et rattrapage (2026-11-09T13:55:25Z)
+## avant : 8 cas j5
+OK   j5-temoin : PASS (attendu PASS) ; erreur interne : non
+OK   j5-jeton-valide : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-sans-jeton : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-aucun-bundle : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-jeton-altere : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-autre-signature : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-tsa-etrangere : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-att-historique : FAIL (attendu FAIL) ; erreur interne : non
+## avant : 17 cas du banc C
+OK   ok : PASS (attendu PASS) ; erreur interne : non
+OK   c1-unsigned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c1-rogue : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-no-prov : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-bad-builder : FAIL (attendu FAIL) ; erreur interne : non
+OK   c3-bad-source : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-unpinned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-external-dep : FAIL (attendu FAIL) ; erreur interne : non
+OK   c5-untrusted-task : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-no-vsa : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-failed : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-wrong-key : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev-vex-ok : PASS (attendu PASS) ; erreur interne : non
+OK   c7-mal : FAIL (attendu FAIL) ; erreur interne : non
+OK   c8-licence : FAIL (attendu FAIL) ; erreur interne : non
+OK   c10-vex-expired : FAIL (attendu FAIL) ; erreur interne : non
+OK   condition de bascule : j5-temoin admis, j5-sans-jeton refusé et attribué
+## bascule : sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e (13:55:51 UTC)
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+deployment "kyverno-admission-controller" successfully rolled out
+  kyverno-admission-controller-5946f47655-xbh6l sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e
+OK   tous les pods sur sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e
+OK   webhook à l'écoute (0 s)
+## corrigee : 8 cas j5
+OK   j5-temoin : PASS (attendu PASS) ; erreur interne : non
+OK   j5-jeton-valide : PASS (attendu PASS) ; erreur interne : non
+OK   j5-sans-jeton : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-aucun-bundle : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-jeton-altere : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-autre-signature : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-tsa-etrangere : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-att-historique : FAIL (attendu FAIL) ; erreur interne : non
+## corrigee : 17 cas du banc C
+OK   ok : PASS (attendu PASS) ; erreur interne : non
+OK   c1-unsigned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c1-rogue : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-no-prov : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-bad-builder : FAIL (attendu FAIL) ; erreur interne : non
+OK   c3-bad-source : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-unpinned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-external-dep : FAIL (attendu FAIL) ; erreur interne : non
+OK   c5-untrusted-task : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-no-vsa : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-failed : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-wrong-key : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev-vex-ok : PASS (attendu PASS) ; erreur interne : non
+OK   c7-mal : FAIL (attendu FAIL) ; erreur interne : non
+OK   c8-licence : FAIL (attendu FAIL) ; erreur interne : non
+OK   c10-vex-expired : FAIL (attendu FAIL) ; erreur interne : non
+## bascule : sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955 (13:56:55 UTC)
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "kyverno-admission-controller" rollout to finish: 1 old replicas are pending termination...
+deployment "kyverno-admission-controller" successfully rolled out
+  kyverno-admission-controller-6b78f498b9-q76mt sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
+OK   tous les pods sur sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
+OK   webhook à l'écoute (0 s)
+## apres : 8 cas j5
+OK   j5-temoin : PASS (attendu PASS) ; erreur interne : non
+OK   j5-jeton-valide : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-sans-jeton : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-aucun-bundle : FAIL (attendu FAIL) ; erreur interne : non
+OK   j5-jeton-altere : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-autre-signature : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-tsa-etrangere : FAIL (attendu FAIL) ; erreur interne : oui
+OK   j5-att-historique : FAIL (attendu FAIL) ; erreur interne : non
+## apres : 17 cas du banc C
+OK   ok : PASS (attendu PASS) ; erreur interne : non
+OK   c1-unsigned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c1-rogue : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-no-prov : FAIL (attendu FAIL) ; erreur interne : non
+OK   c2-bad-builder : FAIL (attendu FAIL) ; erreur interne : non
+OK   c3-bad-source : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-unpinned : FAIL (attendu FAIL) ; erreur interne : non
+OK   c4-external-dep : FAIL (attendu FAIL) ; erreur interne : non
+OK   c5-untrusted-task : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-no-vsa : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-failed : FAIL (attendu FAIL) ; erreur interne : non
+OK   c6-vsa-wrong-key : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev : FAIL (attendu FAIL) ; erreur interne : non
+OK   c7-kev-vex-ok : PASS (attendu PASS) ; erreur interne : non
+OK   c7-mal : FAIL (attendu FAIL) ; erreur interne : non
+OK   c8-licence : FAIL (attendu FAIL) ; erreur interne : non
+OK   c10-vex-expired : FAIL (attendu FAIL) ; erreur interne : non
+## C13 : retour identique à avant
+OK   décisions après le retour identiques à celles d'avant
+## retrait (13:57:58 UTC)
+No resources found
+CronJobs repris
+## contrôle du retrait
+OK   aucune politique d'images
+## C12 : créations refusées pendant le passage (2026-11-09T13:55:25Z à 2026-11-09T13:57:58Z)
+OK   0 FailedCreate
+## reprise : un passage réussi de chaque CronJob
+OK   horodatage : horodatage-29903878 réussi
+OK   rattrapage : rattrapage-29903877 réussi
+bilan : OK
