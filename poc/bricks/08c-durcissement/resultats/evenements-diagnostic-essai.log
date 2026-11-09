@@ -1,0 +1,192 @@
+# Essai hors cluster de evenements.sh diagnostic (09/11/2026, 16:31:40 UTC), avant tout passage : rien lu ni écrit dans le cluster, Loki,
+# Grafana ou les VM. Mêmes faux outils que evenements-releve-essai.log, complétés : réponse de Grafana avec trois lignes d'Alloy (une erreur
+# dont le texte contient « token », pour essayer le masque), faux ssh qui rend un état de composant ou un échec de connexion. Limites : la forme
+# de la réponse de l'API d'Alloy et du journal d'Alloy dans Loki est fabriquée d'après le source au tag v1.21.3, jamais vue en vrai ;
+# le faux curl ignore maxLines. Le relevé (essai.sh) est repassé sur le même script : mêmes bilans.
+
+## essai-diag.sh
+#!/usr/bin/env bash
+# Harnais hors cluster de evenements.sh diagnostic : mêmes faux outils que essai.sh.
+set -uo pipefail
+D=${0%/*}
+SRC=~/Documents/git/github/gigi206/supply-chain/poc/bricks
+avant=$(cd "$SRC/.." && git status --porcelain </dev/null | md5sum; ls "$SRC/08c-durcissement/resultats" | md5sum)
+echo "# date : $(date -u +%FT%TZ) ; sha256 de evenements.sh : $(sha256sum "$SRC/08c-durcissement/evenements.sh" | cut -c1-64)"
+run() {
+  local n=$1; shift
+  local A=$D/diag-$n; rm -rf "$A"; mkdir -p "$A/repo/poc/bricks/08c-durcissement/resultats" "$A/repo/poc/bricks/08-trust-plane/resultats" "$A/home" "$A/conf/secrets" "$A/conf/pki" "$A/conf/ssh"
+  cp "$SRC/08c-durcissement/evenements.sh" "$A/repo/poc/bricks/08c-durcissement/"
+  cp "$SRC/08-trust-plane/commun.sh" "$SRC/08-trust-plane/distro.sh" "$A/repo/poc/bricks/08-trust-plane/"
+  git -C "$A/repo" init -q
+  printf 'FAUX-MDP' > "$A/conf/secrets/grafana-auditeur.password"; : > "$A/conf/pki/ca-poc.crt"
+  ( cd "$A/repo" && env -i PATH="$D/bin:/usr/bin:/bin" HOME="$A/home" CONFIANCE_DIR="$A/conf" ESSAI_LOG="$A/appels" "$@" \
+      bash poc/bricks/08c-durcissement/evenements.sh diagnostic > "$A/sortie" 2>&1; echo "code : $?" >> "$A/sortie" )
+  echo "## $n ($*)"; sed 's/^/  /' "$A/repo/poc/bricks/08c-durcissement/resultats/evenements-diagnostic.log"; tail -1 "$A/sortie" | sed 's/^/  /'
+  echo "  appels : curl $(grep -c '^curl' "$A/appels" || true), ssh $(grep -c '^ssh' "$A/appels" || true), kubectl $(grep -c '^kubectl' "$A/appels" || true) ; mot de passe en argument : $(grep -c 'mdp_en_argument=True' "$A/appels" || true)"
+  echo "  commandes ssh : $(grep '^ssh' "$A/appels" | cut -f2 | sort -u | paste -sd'|')"
+  echo "  journal : FAUX-MDP, jeton, token : $(grep -c -i -E 'FAUX-MDP|jeton|token' "$A/repo/poc/bricks/08c-durcissement/resultats/evenements-diagnostic.log" || true) ; travail restant : $(ls -A "$A/conf/travail" | paste -sd, -)"
+}
+run normal ESSAI_MODE=normal
+run d-ko ESSAI_MODE=normal ESSAI_D_KO=1
+run erreur ESSAI_MODE=erreur
+apres=$(cd "$SRC/.." && git status --porcelain </dev/null | md5sum; ls "$SRC/08c-durcissement/resultats" | md5sum)
+[ "$avant" = "$apres" ] && echo "dépôt : git status et resultats/ inchangés" || echo "dépôt : CHANGÉ"
+
+## faux curl (bin/curl)
+#!/usr/bin/env python3
+import sys,json,os
+a=sys.argv[1:]; out=None; data=None
+for i,x in enumerate(a):
+    if x=='-o': out=a[i+1]
+    if x=='-d': data=a[i+1]
+cfg=sys.stdin.read()
+log=os.environ['ESSAI_LOG']
+q=json.loads(data); e=q['queries'][0]['expr']; de=int(q['from'])//1000; to=int(q['to'])//1000
+open(log,'a').write('curl\t%s\t%d\t%d\tmdp_en_argument=%s\n'%(e,de,to, any('FAUX-MDP' in x for x in a)))
+mode=os.environ.get('ESSAI_MODE','normal')
+import datetime
+def ts(s): return int(datetime.datetime.fromisoformat(s.replace('Z','+00:00')).timestamp())
+R1=ts('2026-11-06T16:49:02Z'); R6=ts('2026-11-09T09:30:00Z')
+n=0
+if mode=='http500': print('500',end=''); open(out,'w').write('{}'); sys.exit(0)
+if mode=='erreur': json.dump({'results':{'A':{'error':'parse error','status':400}}},open(out,'w')); print('200',end=''); sys.exit(0)
+if 'alloy.service' in e and 'kubernetes_events' in e:
+    lines=['ts=2026-11-07T11:22:40Z level=info msg="watching events for namespace" component_path=/ component_id=loki.source.kubernetes_events.evenements namespace=""',
+           'ts=2026-11-07T11:22:41Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="Get https://x: open /etc/alloy/secrets/k8s.token: Unauthorized"',
+           'ts=2026-11-07T11:22:42Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused"']
+    n=len(lines)
+    frames=[{'data':{'values':[[{}]*n,[ (de+i)*1000 for i in range(n)],lines]}}]
+    json.dump({'results':{'A':{'frames':frames}}},open(out,'w')); print('200',end=''); sys.exit(0)
+if e=='{source="evenements-k8s"}': n=int(os.environ.get('ESSAI_TEMOIN','5'))
+elif 'PolicyViolation' in e and de==R1: n=int(os.environ.get('ESSAI_R1','40'))
+elif 'kind="CronJob"' in e and de==R6: n=1
+elif mode=='tout' : n=2
+if mode=='tronque' and 'PolicyViolation' in e and de==R1: n=1000
+lines=[json.dumps({'name':'p%d'%i,'kind':'Pod','reason':'X','msg':'secret token jeton','count':1}) for i in range(n)]
+frames=[{'data':{'values':[[{}]*n,[ (de+i)*1000 for i in range(n)],lines]}}] if n else []
+json.dump({'results':{'A':{'frames':frames,'status':200}}},open(out,'w')); print('200',end='')
+
+## faux ssh (bin/ssh)
+#!/usr/bin/env bash
+printf 'ssh\t%s\n' "${*: -1}" >> "$ESSAI_LOG"
+case "${*: -1}" in
+  *ActiveEnterTimestamp*) echo "${ESSAI_ALLOY-Sat 2026-11-07 12:22:01 CET}" ;;
+  *is-active*) echo active ;;
+  *12345/api/v0/web/components*) [ -n "${ESSAI_D_KO:-}" ] && { echo "curl: (7) Failed to connect" >&2; exit 7; }; echo '{"health":{"state":"healthy","message":"started component","updatedTime":"2026-11-07T11:22:40Z"},"arguments":{"bearer_token_file":"/etc/alloy/secrets/k8s.token"},"debugInfo":[{"name":"event_controller","type":"block","body":[{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-07T11:20:00Z"}}]}]}' ;;
+  *date\ -u*) date -u +%Y-%m-%dT%H:%M:%SZ ;;
+  *) echo "appel inattendu" >&2; exit 9 ;;
+esac
+
+## sortie du diagnostic
+# date : 2026-11-09T16:31:40Z ; sha256 de evenements.sh : df7c34a5211c5312a6d2e4c4a4ad9ce1797985062b4ff83e7635168d7c28f8e8
+## normal (ESSAI_MODE=normal)
+  # evenements.sh diagnostic, 2026-11-09T16:31:40Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T16:31:40Z (sens backward, maxLines 1)
+    (a) : dernière ligne à 2026-11-06T16:53:33Z
+      1 Pod p4 X count=1
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 5
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    (b) lignes du journal de sc-stockage : 0 (ok)
+    (b) lignes evenements-k8s, même fenêtre : 5 (ok)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (ok)
+    (c) lignes du composant des Events : 3 (ok)
+      1 2026-11-07T11:00 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets, classe : Unauthorized
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused"
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+    (d) santé : healthy, started component, depuis 2026-11-07T11:22:40Z
+    (d) état de débogage (namespace, last_event_timestamp) :
+      [{"name":"event_controller","type":"block","body":[{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-07T11:20:00Z"}}]}]
+    (d) heure de la VM au moment de la lecture : 2026-11-09T16:31:40Z
+  fin du diagnostic 16:31:40 UTC
+  code : 0
+  appels : curl 6, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements|date -u +%Y-%m-%dT%H:%M:%SZ
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+## d-ko (ESSAI_MODE=normal ESSAI_D_KO=1)
+  # evenements.sh diagnostic, 2026-11-09T16:31:40Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T16:31:40Z (sens backward, maxLines 1)
+    (a) : dernière ligne à 2026-11-06T16:53:33Z
+      1 Pod p4 X count=1
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 5
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    (b) lignes du journal de sc-stockage : 0 (ok)
+    (b) lignes evenements-k8s, même fenêtre : 5 (ok)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (ok)
+    (c) lignes du composant des Events : 3 (ok)
+      1 2026-11-07T11:00 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets, classe : Unauthorized
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused"
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+  NJ   (d) : lecture impossible (Failed to connect)
+  fin du diagnostic 16:31:41 UTC
+  code : 0
+  appels : curl 6, ssh 1, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+## erreur (ESSAI_MODE=erreur)
+  # evenements.sh diagnostic, 2026-11-09T16:31:41Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T16:31:41Z (sens backward, maxLines 1)
+    requête : erreur de Loki : parse error
+  NJ   (a) : requête en erreur
+    requête : erreur de Loki : parse error
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 0 (requête en erreur)
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    requête : erreur de Loki : parse error
+    (b) lignes du journal de sc-stockage : 0 (erreur)
+    requête : erreur de Loki : parse error
+    (b) lignes evenements-k8s, même fenêtre : 0 (erreur)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    requête : erreur de Loki : parse error
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (erreur)
+    requête : erreur de Loki : parse error
+    (c) lignes du composant des Events : 0 (erreur)
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+    (d) santé : healthy, started component, depuis 2026-11-07T11:22:40Z
+    (d) état de débogage (namespace, last_event_timestamp) :
+      [{"name":"event_controller","type":"block","body":[{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-07T11:20:00Z"}}]}]
+    (d) heure de la VM au moment de la lecture : 2026-11-09T16:31:41Z
+  fin du diagnostic 16:31:41 UTC
+  code : 0
+  appels : curl 6, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements|date -u +%Y-%m-%dT%H:%M:%SZ
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+dépôt : git status et resultats/ inchangés
+
+## sortie du relevé repassé (essai.sh)
+# date : 2026-11-09T16:31:41Z ; sha256 de evenements.sh : df7c34a5211c5312a6d2e4c4a4ad9ce1797985062b4ff83e7635168d7c28f8e8
+## normal (ESSAI_MODE=normal)
+  ## bilan : R1 OK, R2 NJ, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 NJ
+  code : 0
+## alloy-ancien (ESSAI_MODE=normal ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 OK, R2 OK, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 OK
+  code : 0
+## r1-faible (ESSAI_MODE=normal ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 KO, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 1
+## tronque (ESSAI_MODE=tronque ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+## erreur (ESSAI_MODE=erreur)
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+## http500 (ESSAI_MODE=http500)
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+## temoin-vide (ESSAI_MODE=normal ESSAI_TEMOIN=0 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 OK, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+## zeros-faux (ESSAI_MODE=tout ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+## alloy-vide (ESSAI_MODE=normal ESSAI_ALLOY=)
+  code : 1
+## lignes-sans-e3 (ESSAI_MODE=tout)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+## lignes-r1-faible (ESSAI_MODE=tout ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  ## bilan : R1 KO, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+dépôt : git status et resultats/ inchangés

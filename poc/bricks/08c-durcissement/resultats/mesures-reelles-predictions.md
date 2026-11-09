@@ -915,3 +915,34 @@ Le moment de l'arrêt, sa cause et le composant en faute ne sont pas établis. R
 Le relevé ne lisait que des fenêtres de cinq minutes. Un diagnostic demande d'autres lectures, chacune soumise à l'accord du propriétaire.
 
 **Temps** : 1 h 43 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises. L'estimation de 4 h n'est pas validée, et elle ne couvrait pas une réparation de la collecte.
+
+## Additif du 09/11/2026, 16:32 UTC : diagnostic (a) à (d) des Events, prédictions avant le passage
+
+**Accord du propriétaire.** Il a répondu « Oui, (a) à (d) » à « Je lance le diagnostic en lecture seule, (a) à (d) ? ». La proposition citait les effets et le pire cas.
+
+**Commande** : `mise exec -- poc/bricks/08c-durcissement/evenements.sh diagnostic`, journal `resultats/evenements-diagnostic.log`.
+
+**Effets du passage** : 6 requêtes de l'auditeur à travers Grafana, en lecture seule, et 2 commandes par ssh sur `sc-stockage` : `curl` de l'API locale d'Alloy (`127.0.0.1:12345`, route `/api/v0/web/components/<id>` lue dans le source au tag v1.21.3) et `date -u`. Rien n'est écrit et rien n'est redémarré.
+
+**Essai hors cluster** : `resultats/evenements-diagnostic-essai.log`.
+
+**Ce qui est affiché** :
+- le journal d'Alloy n'est affiché que réduit à `level`, `msg`, `component_id` et `err` ;
+- une erreur qui contient « jeton » ou « token » n'est affichée que par sa classe ;
+- les lignes du journal de `sc-stockage` sont comptées, jamais affichées.
+
+**Prédictions, avant le passage :**
+
+| # | Lecture | Prédit | Confiance |
+|---|---|---|---|
+| (a) | Dernière ligne `evenements-k8s` après le 06/11 à 16:53:29 | Entre le 06/11 à 16:53:29 et le 07/11 à 11:22:39 : la collecte s'est arrêtée à l'extinction des VM du 07/11, et pas plus tard | Moyenne |
+| (a) | Lignes `evenements-k8s` depuis le démarrage d'Alloy (07/11, 11:22:39) | 0 | Moyenne |
+| (b) | Lignes du journal de `sc-stockage` dans la fenêtre de R6 | Au moins 1 : Alloy écrit encore dans Loki, seul le composant des Events est en cause, ce qui écarte la panne de toute la sortie (H-a restreinte au composant) | Haute |
+| (c) | Lignes d'`alloy.service` depuis le 07/11 à 11:00 | Au moins 1 (messages de démarrage) | Haute |
+| (c) | Lignes du composant des Events | Au moins la ligne « watching events for namespace » au démarrage. Erreur éventuelle : classe inconnue, candidats « failed to start informers », refus de connexion à l'API au démarrage, `Unauthorized` | Basse |
+| (d) | Santé du composant | `healthy` : le source ne remonte pas d'erreur de l'informer dans la santé | Basse |
+| (d) | `last_event_timestamp` | Égal, à la seconde près, à la dernière ligne lue en (a). Une valeur postérieure à l'heure de la VM soutiendrait l'hypothèse d'une position enregistrée en avance, qui écarte les Events sans erreur | Moyenne |
+
+**Ce que le diagnostic ne dira pas** :
+- si l'API enregistre encore des Events (H-b) : seule l'option (e), non accordée, le dirait ;
+- la cause, si le journal d'Alloy est muet.

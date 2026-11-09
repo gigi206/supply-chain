@@ -4,6 +4,9 @@
 #   releve  R1 à R8 sur les fenêtres déjà archivées (E4 (a)) : lignes {source="evenements-k8s"} lues par l'auditeur à travers Grafana,
 #           témoin passif E3 (b) par fenêtre (une ligne evenements-k8s, démarrage d'Alloy lu par ssh sur sc-stockage), comptes de kubectl
 #           archivés affichés (E1 (a)) ; n'écrit rien dans le cluster, Loki, Grafana ni les VM ; accord du propriétaire avant tout passage
+#   diagnostic (a) dernière ligne evenements-k8s ; (b) journal de sc-stockage dans la fenêtre de R6 ; (c) lignes du composant des Events dans
+#           le journal d'alloy.service (classe d'erreur seulement) ; (d) santé et position du composant, API locale d'Alloy lue par ssh ;
+#           lecture seule, rien redémarré ; accord du propriétaire (« Oui, (a) à (d) », 09/11/2026)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
 set -euo pipefail
@@ -21,12 +24,12 @@ ko=0
 # Lignes d'Events lues par l'auditeur à travers Grafana, sur une fenêtre bornée des deux côtés (Alloy v1.21.3 horodate chaque ligne
 # avec series.lastObservedTime, à défaut lastTimestamp, à défaut eventTime ; source lue au tag, event_controller.go).
 # Rend dans $etat : ok, erreur ou tronque ; $n : nombre de lignes ; $T/lignes : « horodatage<TAB>ligne », trié.
-loki_lignes() { # requête depuis jusqu'à (RFC 3339)
-  local q c de a
+loki_lignes() { # requête depuis jusqu'à (RFC 3339) [sens : forward ou backward] [maxLines]
+  local q c de a s=${4:-forward} m=${5:-$MAXL}
   de=$(date -ud "$2" +%s)000
   a=$(date -ud "$3" +%s)000
-  q=$(jq -nc --arg e "$1" --arg de "$de" --arg a "$a" --argjson m "$MAXL" \
-    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: $m, direction: "forward"}], from: $de, to: $a}')
+  q=$(jq -nc --arg e "$1" --arg de "$de" --arg a "$a" --argjson m "$m" --arg s "$s" \
+    '{queries: [{refId: "A", datasource: {uid: "loki"}, expr: $e, queryType: "range", maxLines: $m, direction: $s}], from: $de, to: $a}')
   c=$(printf 'user = "auditeur:%s"\n' "$(cat "$S/grafana-auditeur.password")" \
     | curl -sS -K - --cacert "$P/ca-poc.crt" -o "$T/reponse.json" -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
       "$GRAFANA/api/ds/query" -d "$q") || c=000
@@ -40,7 +43,7 @@ loki_lignes() { # requête depuis jusqu'à (RFC 3339)
   jq -r '.results.A.frames[]? | .data.values as $v | range(0; ($v[2] // []) | length) | "\($v[1][.] / 1000 | floor | todate)\t\($v[2][.])"' \
     "$T/reponse.json" | sort > "$T/lignes"
   n=$(grep -c . "$T/lignes" || true)
-  if [ "$n" -ge "$MAXL" ]; then etat=tronque; else etat=ok; fi
+  if [ "$n" -ge "$m" ]; then etat=tronque; else etat=ok; fi
   return 0
 }
 
@@ -133,6 +136,60 @@ etape_releve() {
   echo "  ce que R ne prouve pas : verdicts des étapes rejouées avec Loki ; effet d'un redémarrage d'Alloy pendant une étape ; délai"
   echo "  d'ingestion ; Events sans aucun horodatage, écartés par Alloy (1 sur 918 en L4 de la 19b)"
   return $ko
+}
+
+# Lignes logfmt d'Alloy réduites à : horodatage, level, msg, component_id, et err seulement si elle ne contient ni jeton ni token ; sinon,
+# relecture ciblée de la ligne masquée qui n'affiche que la classe d'erreur reconnue.
+classes() {
+  local CL='Unauthorized|Forbidden|connection refused|no such host|i/o timeout|deadline exceeded|x509[^"]*|EOF|context canceled|no route to host|TLS handshake[^"]*|certificate[^"]*'
+  while IFS=$'\t' read -r h l; do
+    lv=$(grep -o -E 'level=[a-z]+' <<< "$l" | head -1 || true)
+    ms=$(grep -o -E 'msg="[^"]*"' <<< "$l" | head -1 || true)
+    ci=$(grep -o -E 'component_id=[^ ]+' <<< "$l" | head -1 || true)
+    er=$(grep -o -E 'err="[^"]*"' <<< "$l" | head -1 || true)
+    if [ -n "$er" ] && grep -q -i -E 'jeton|token' <<< "$er"; then
+      er="err masquée par le filtre des secrets, classe : $(grep -o -i -E "$CL" <<< "$er" | head -1 || true)"
+    fi
+    printf '%s %s %s %s %s\n' "${h:0:16}" "$lv" "$ms" "$ci" "${er:0:200}"
+  done < "$T/lignes"
+}
+
+etape_diagnostic() {
+  local fin d0=2026-11-06T16:53:29Z da=2026-11-07T11:00:00Z r
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/evenements"' EXIT   # réponses de Grafana et de l'API d'Alloy jamais archivées
+  fin=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  echo "## (a) dernière ligne {source=\"evenements-k8s\"} entre $d0 et $fin (sens backward, maxLines 1)"
+  loki_lignes '{source="evenements-k8s"}' "$d0" "$fin" backward 1
+  case $etat in
+    erreur) echo "NJ   (a) : requête en erreur" ;;
+    *) if [ "$n" = 0 ]; then echo "  (a) : aucune ligne après $d0"
+       else echo "  (a) : dernière ligne à $(tail -1 "$T/lignes" | cut -f1)"; tail -1 "$T/lignes" > "$T/l1" && mv "$T/l1" "$T/lignes"; resume 1; fi ;;
+  esac
+  loki_lignes '{source="evenements-k8s"}' 2026-11-07T11:22:39Z "$fin"
+  echo "  (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : $n$([ "$etat" = tronque ] && echo " (au moins)")$([ "$etat" = erreur ] && echo " (requête en erreur)")"
+  echo "## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)"
+  loki_lignes '{noeud="sc-stockage", source="journal"}' 2026-11-09T09:30:00Z 2026-11-09T09:35:00Z
+  echo "  (b) lignes du journal de sc-stockage : $n ($etat)"
+  loki_lignes '{source="evenements-k8s"}' 2026-11-09T09:30:00Z 2026-11-09T09:35:00Z
+  echo "  (b) lignes evenements-k8s, même fenêtre : $n ($etat)"
+  echo "## (c) journal d'alloy.service de sc-stockage depuis $da, lignes du composant des Events"
+  loki_lignes '{noeud="sc-stockage", unite="alloy.service"}' "$da" "$fin"
+  echo "  (c) lignes d'alloy.service depuis $da : $n ($etat)"
+  loki_lignes '{noeud="sc-stockage", unite="alloy.service"} |~ "kubernetes_events|evenements|informer|event watcher|non-Event"' "$da" "$fin"
+  echo "  (c) lignes du composant des Events : $n ($etat)"
+  [ "$n" -gt 0 ] && classes | uniq -c -f1 | head -40 | sed 's/^ */    /'
+  echo "## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage"
+  if r=$(sur sc-stockage "curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements" </dev/null 2>"$T/ssh.err"); then
+    printf '%s' "$r" > "$T/composant.json"
+    jq -r '"  (d) santé : \(.health.state // "-"), \(.health.message // "-"), depuis \(.health.updatedTime // "-")"' "$T/composant.json" | grep -v -i -E 'jeton|token' || true
+    echo "  (d) état de débogage (namespace, last_event_timestamp) :"
+    jq -c '.debugInfo // "absent"' "$T/composant.json" | grep -v -i -E 'jeton|token' | sed 's/^/    /' || true
+    echo "  (d) heure de la VM au moment de la lecture : $(sur sc-stockage 'date -u +%Y-%m-%dT%H:%M:%SZ' </dev/null)"
+  else
+    echo "NJ   (d) : lecture impossible ($(grep -o -i -E 'Connection refused|Failed to connect|404|not found|timed out' "$T/ssh.err" | head -1 || true))"
+  fi
+  date -u '+fin du diagnostic %H:%M:%S UTC'
 }
 
 lancer evenements events "$@"
