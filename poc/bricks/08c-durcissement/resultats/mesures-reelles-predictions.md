@@ -1211,3 +1211,55 @@ Accord du propriétaire : « Oui » à « Je lance l'application sur sc-stockage
 ## Additif du 09/11/2026, 22:55 UTC : défaut L6 corrigé en local
 
 Le défaut `validate && …` d'`etape_grpc_tls` de `journalisation.sh`, signalé à 22:30, est corrigé dans le dépôt, non déployé (accord : « Le point 3 maintenant : Corriger le défaut L6 de journalisation.sh en local »). Détail et essai hors cluster : README de la 19b, additif de 22:54 UTC, et `19b-journalisation/resultats/l6-validate-essai-local.log`. Même motif ligne 362 (`etape_alloy`), non modifié, à décider. Restent ouverts dans la liste de 22:43 : la suite d'E4 et l'issue chez Alloy ; le push des commits jusqu'à 56bb78d a été fait à 22:51 UTC.
+
+## Additif du 09/11/2026, 23:23 UTC : suite d'E4 des Events, accord, conception et prédictions avant tout essai
+
+**Accord du propriétaire.** À « Je lance la suite d'E4 à sec, avec un créneau de 2 h ? », réponse : « Oui on a toute la nuit, tu peux y aller, je vais me coucher donc avance jusqu'au bout de e4 ». Interprétation, écrite avant tout travail :
+- créneau ouvert à 23:18:59 UTC, 2 h, prolongeable cette nuit pour finir la partie à sec d'E4 (« on a toute la nuit ») ;
+- périmètre : la partie à sec seulement, c'est-à-dire la modification des six contrôles, les essais hors cluster, les journaux, les README, le doc 03 et des commits locaux ; rien n'est lu ni écrit dans le cluster, Loki, Grafana, Prometheus, Zot ou les VM, même en lecture ;
+- non couverts : le passage des requêtes, en lecture seule, sur de vraies fenêtres postérieures au rétablissement de la collecte (09/11, 17:08 UTC), que la proposition soumettait à un accord séparé ; le push.
+
+Temps du chantier avant ce créneau : 8 h 05 pour 4 h estimées.
+
+**Lignes actuelles des six contrôles** (elles ont bougé depuis le 07/11) : `preuves.sh:3188` (`resolveurs_pod`), `:3242` (`scan_saut_suspendre`), `:3302` (`scan_saut_reprendre`, Events du CronJob ; `:3298` est désormais le `sleep 30`), `:3308` (`scan_saut_reprendre`, `PolicyViolation`), `durcissement.sh:270` (`h2_releve`), `08-trust-plane/cilium.sh:173` (`verifier`).
+
+**Conception.**
+- Nouveau fichier `08c-durcissement/evenements-loki.sh`, chargé par `preuves.sh`, `durcissement.sh` et `cilium.sh`. `commun.sh` et `evenements.sh` ne changent pas : `evenements.sh` garde l'empreinte de ses passages archivés. La lecture de Loki à travers Grafana est donc dupliquée, adaptée.
+- Fonction `ev_juge libellé requête depuis compte-kubectl`, appelée hors de `$(…)`. Elle pose `EV_N` et `EV_SOURCE` ; chaque script garde son propre `attendu` ou `ba_attendu` sur `EV_N`, donc sa façon de traiter un KO (sortie immédiate ou `ko=1`). Aucun `trap` ; les réponses de Grafana sont retirées après chaque appel ; ni réponse ni champ `msg` archivés.
+- Témoin E3 (b), passif, trois conditions :
+  1. mot de passe de l'auditeur présent ;
+  2. au moins une ligne `{source="evenements-k8s"}` horodatée après l'instant du contrôle, attendue au plus `EV_ATTENTE` = 120 s, interrogée toutes les 10 s : la collecte a dépassé l'instant du contrôle, ce qui borne le retard d'ingestion ;
+  3. dernier démarrage d'Alloy de `sc-stockage` antérieur au début de la fenêtre, lu après l'attente.
+  La fenêtre de compte va du début à l'instant où le témoin est vu.
+- **Règle de verdict : lecture d'E1 (a) pour les cas que la décision ne tranche pas (interprétation, à confirmer par le propriétaire).**
+  - Loki rend au moins une ligne (réponse tronquée comprise) : KO sur le compte de Loki, témoin ou non.
+  - Loki 0, témoin présent, kubectl 0 : OK, verdict de Loki.
+  - Loki 0, témoin présent, kubectl au moins 1 : une ligne vue par kubectl manque à Loki, qui ne peut donc pas juger cette fenêtre ; verdict de kubectl, KO. E1 (a) en faisait un CONSTAT ; lu ainsi parce que Loki ne donne le verdict que s'il peut juger.
+  - Loki non jugé (témoin absent, Alloy redémarré dans la fenêtre ou démarrage illisible, requête en erreur, mot de passe absent, Grafana injoignable) : verdict de kubectl, comme avant, avec la raison affichée. Le nouveau code n'est jamais plus faible que l'ancien.
+- Requêtes : celles de R2 à R8, telles qu'écrites dans `evenements.sh`. Seule la forme `| json | reason="PolicyViolation"` a rendu des lignes sur des données réelles (R1). Les filtres `namespace`, `kind` et `name` de R5 et R8 n'ont jamais été vérifiés sur des lignes réelles.
+- Débuts de fenêtre : `t0` pour `resolveurs_pod` et `scan_saut_suspendre` ; `t1`, la reprise, pour les deux contrôles de `scan_saut_reprendre` (la lecture des Events du CronJob n'avait aucune borne) ; H2, lu dans le journal archivé, pour `h2_releve` ; la plus ancienne création des pods de Cilium pour `cilium.sh`.
+
+**Prédictions des essais hors cluster** (fragments extraits, faux `curl`, `sur`, `kubectl` et `sleep`) :
+- P1 : Loki 0, témoin vu, Alloy démarré avant, kubectl 0 : OK, source Loki.
+- P2 : Loki 2 lignes : KO.
+- P3 : témoin jamais vu : 12 attentes de 10 s, puis verdict de kubectl ; kubectl 0 : OK, « Loki non jugé ».
+- P4 : Alloy démarré dans la fenêtre : Loki non jugé, verdict de kubectl.
+- P5 : réponse HTTP 500 : Loki non jugé, verdict de kubectl.
+- P6 : mot de passe absent : Loki non jugé, sans aucun appel à `curl` ni à `ssh`.
+- P7 : démarrage d'Alloy illisible (vide) : Loki non jugé.
+- P8 : kubectl 1, Loki 0, témoin vu : KO.
+- P9 : réponse tronquée (`maxLines` atteint) : KO.
+- P10, non-régression : Loki injoignable, chacun des six rend le même verdict que l'ancien code sur la même entrée kubectl (0 : OK ; 3 : KO), avec la même façon de sortir que le script d'origine.
+- P11 : `shellcheck` sans avertissement nouveau ; aucune sortie inattendue sous `set -euo pipefail`.
+- P12 : rien de laissé dans le répertoire de travail après chaque appel ; les `trap` des scripts ne sont pas touchés.
+
+**Prédictions pour de futurs passages réels, non vérifiables cette nuit** :
+- `cilium.sh verifier` et `resolveurs_pod`, dans un rejeu de zéro, passent avant `19 (O2)` et `19b (L3)` : Loki non jugé (mot de passe absent ou Grafana injoignable), verdict de kubectl comme avant. Sur le cluster en service, jugés si le témoin est vu.
+- `h2_releve` : H2 (06/11) est antérieur au dernier démarrage d'Alloy (09/11, 17:08 UTC) : Loki non jugé, verdict de kubectl, tant qu'Alloy n'a pas tourné sans redémarrage depuis H2.
+- `scan_saut_*` : témoin vu en moins de 120 s, si `rattrapage` et `horodatage` produisent des Events chaque minute (non relu ; en AP2, le compteur est apparu en 57 s au plus).
+- Coût : jusqu'à 120 s par contrôle ; la fenêtre élargie peut compter un `PolicyViolation` sans lien, risque déjà noté pour R3 et R4.
+
+**Limites, écrites d'avance.**
+- Là où Loki ne juge pas, le défaut de TTL n'est pas levé.
+- Un rechargement d'Alloy par SIGHUP ne change pas `ActiveEnterTimestamp` : son effet sur la collecte des Events n'est pas vu par le témoin.
+- Autres lectures d'Events, non touchées : `kyverno-admission.sh:386` (un contrôle compté), `preuves.sh:219` et `:259`, `politique.sh:480`, `stockage.sh:234`, `scan-saut-reprise-verif.sh:41`, `essais-h5-scan.sh:47`, `durcissement.sh:271` (affiché seulement), `journalisation.sh:70` et `:71`.
