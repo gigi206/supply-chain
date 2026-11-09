@@ -989,3 +989,19 @@ Explication probable du premier échec, déduite et non vérifiée : l'API de `s
 **Observation sur E3.** La moitié « Alloy non redémarré » du témoin E3 n'aurait rien détecté : `alloy` était actif, jamais redémarré, et le composant restait `healthy`. Seule la condition « au moins une ligne `evenements-k8s` dans la fenêtre » a révélé la panne. Pour la modification des six contrôles, un témoin fondé sur la présence de lignes est nécessaire ; l'état systemd et la santé du composant ne suffisent pas. La décision sur E3 reste au propriétaire.
 
 **Temps** : 1 h 55 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises.
+
+## Additif du 09/11/2026, 17:01 UTC : classe de l'erreur lue, refus de connexion à l'API
+
+**Accord du propriétaire** : « Oui, relis la classe », en réponse à « Je relis la classe de l'erreur (evenements.sh classe, une requête) ? ».
+
+**Passage** : commande lancée à 17:01:41 UTC, code 0, journal `resultats/evenements-classe.log`. Une seule requête de l'auditeur, sur le 07/11 de 11:00 à 12:00 ; rien n'a été écrit.
+
+**Mesuré.** Les 8 lignes sont celles du diagnostic. L'erreur entière est :
+
+`failed to configure informers: failed to get server groups: Get "https://192.168.161.11:6443/api": dial tcp 192.168.161.11:6443: connect: connection refused`
+
+Sa classe est **`connection refused`**. Au démarrage d'Alloy de `sc-stockage`, le 07/11 à 11:22, rien n'écoutait encore sur le port 6443 de l'API de `sc-confiance`. L'explication donnée à 16:33 UTC (« API pas encore prête ») est donc mesurée pour ce démarrage. Ce n'est ni une erreur de jeton ni une erreur de certificat.
+
+**Conséquences, écrites avant toute action.**
+- D'après le source, un redémarrage d'Alloy recrée l'observateur. L'API répond aujourd'hui, comme le montrent les lectures kubectl de la journée. Un redémarrage devrait donc rétablir la collecte. C'est une prédiction, non vérifiée.
+- Si rien ne change, l'arrêt se reproduira à chaque démarrage d'Alloy de `sc-stockage` antérieur à l'écoute de l'API.

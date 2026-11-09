@@ -1,0 +1,10 @@
+# evenements.sh classe, 2026-11-09T17:01:41Z
+## (c) relue : journal d'alloy.service de sc-stockage, composant des Events, 07/11 de 11:00 à 12:00
+  lignes : 8 (ok)
+    1 2026-11-07T11:20 level=info msg="stopping watcher for events" component_id=loki.source.kubernetes_events.evenements 
+    2 2026-11-07T11:20 level=info msg="node exited without error"  
+    2 2026-11-07T11:22 level=info msg="finished node evaluation"  
+    1 2026-11-07T11:22 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+    1 2026-11-07T11:22 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="failed to configure informers: failed to get server groups: Get \"https://192.168.161.11:6443/api\": dial tcp 192.168.161.11:6443: connect: connection refused" ; classe : connection refused
+    1 2026-11-07T11:22 level=info msg="stopping watcher for events" component_id=loki.source.kubernetes_events.evenements 
+fin de la relecture 17:01:41 UTC
