@@ -134,3 +134,105 @@ groupe term, dix passages : RuntimeClass retirée une fois exactement 10 sur 10,
   code du processus : 129
 groupe hup, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
 # appels autres que apply et delete de runtimeclass, sur tous les passages : 0
+
+# Additif, 2026-11-09T14:17:21Z, sur relecture du conseiller : preuves citées plus haut, archivées ici.
+## v1 du harnais (écartée), essai-adm-v1.sh
+#!/usr/bin/env bash
+# Essai hors cluster du piège ajouté à etape_admission (politique.sh) : lignes du piège, de la boucle des cas et du rétablissement
+# extraites telles quelles du script (de « RC_ESSAI= » au « trap - INT TERM HUP ») ; kubectl, cli et comparer remplacés par des
+# fonctions ; structure de lancer (commun.sh) : { …; } 2>&1 | sed | tee ; usage : essai-adm.sh mode distro script
+set -euo pipefail
+mode=$1 DISTRO=$2 src=$3
+T=$ESSAI_T; W=$T; TSV_PARITE=$T/tsv; here=/nulle-part
+mkdir -p "$T/adm" "$T/auth/docker"; : > "$T/auth/docker/config.json"
+kubectl() { echo "kubectl $*" >> "$T/appels"; [ "${1:-}" != apply ] || cat > /dev/null; }
+cli() { printf 'PASS\tmotif'; }
+comparer() {
+  case "$mode" in
+    erreur) echo "admission : commande en échec sous set -e"; false ;;
+    int) echo "INT au groupe"; kill -INT 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    term) echo "TERM au groupe"; kill -TERM 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    hup) echo "HUP au groupe"; kill -HUP 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    *) echo "OK   $1" ;;
+  esac
+}
+case "$mode" in ko) printf 'cas-ko\tFAIL\tnon\tCLI seul\n' > "$T/adm/cas.tsv" ;; *) printf 'cas-1\tPASS\toui\t-\n' > "$T/adm/cas.tsv" ;; esac
+trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+eval "etape_admission() {
+local c e a desc r
+$(sed -n '/^  RC_ESSAI=$/,/^  trap - INT TERM HUP$/p' "$src")
+echo \"fin de l'étape\"
+}"
+c=0; { echo "# étape admission ($mode, $DISTRO)"; etape_admission; } 2>&1 | sed -u 's/^/  /' || c=$?
+echo "  code de l'étape : $c"
+echo "  appels à kubectl : $(paste -sd';' "$T/appels" 2>/dev/null || echo aucun)"
+echo "  identifiants encore présents : $([ -e "$T/auth" ] && echo oui || echo non)"
+## v1, sortie du passage de 2026-11-09T14:14:14Z (lignes « Complété » et « raccroché » retirées)
+# date : 2026-11-09T14:14:14Z
+# lignes extraites de politique.sh (sha256 du script : 433ad5da883ccc72a708978dc326fc2c6636678a53162c7c597782e94c985f6a)
+# plage : 451-471
+  # étape admission (ok, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  OK   cas-1
+  fin de l'étape
+  code de l'étape : 0
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (ko, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  KO   cas-ko : CLI PASS (attendu FAIL)
+  nettoyage : RuntimeClass témoin crun retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (erreur, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  admission : commande en échec sous set -e
+  fin de l'étape
+  code de l'étape : 0
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (ok, k3s)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  OK   cas-1
+  fin de l'étape
+  code de l'étape : 0
+  appels à kubectl : aucun
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (ko, k3s)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  KO   cas-ko : CLI PASS (attendu FAIL)
+  code de l'étape : 1
+  appels à kubectl : aucun
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (int, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  INT au groupe
+  code de l'étape : 130
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 0
+groupe int, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+  # étape admission (term, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  code du processus : 143
+groupe term, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+  # étape admission (hup, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  HUP au groupe
+  code du processus : 129
+groupe hup, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+# appels autres que apply et delete de runtimeclass, sur tous les passages : 0
+## set -e après le « || » final de politique.sh:1677 ([ "${BASH_SOURCE[0]}" != "$0" ] || lancer politique J6 "$@"), essai-ou-final.sh
+set -euo pipefail
+etape() { echo avant; false; echo "après : set -e inopérant"; }
+lancer() { { etape; } 2>&1 | sed -u 's/^/  /'; echo "lancer continue"; }
+[ "${BASH_SOURCE[0]}" != "$0" ] || lancer
+## sortie (attendu : « avant », puis arrêt ; ni « après », ni « lancer continue »)
+  avant
+code : 1
