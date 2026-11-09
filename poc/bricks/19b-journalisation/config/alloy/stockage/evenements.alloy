@@ -17,5 +17,17 @@ loki.process "evenements" {
   stage.static_labels {
     values = {source = "evenements-k8s"}
   }
+  // Chantier des Events (README de la 08c, 09/11/2026) : compteur des lignes transmises, lu par Prometheus (job alloy) pour
+  // l'alerte EvenementsMuets. Nom complet : loki_process_custom_evenements_lignes_total (préfixe par défaut de stage.metrics,
+  // source au tag v1.21.3). max_idle_duration long : par défaut (5 min), la série disparaîtrait après 5 min sans ligne.
+  stage.metrics {
+    metric.counter {
+      name              = "evenements_lignes_total"
+      description       = "Lignes d'Events Kubernetes transmises à Loki"
+      match_all         = true
+      action            = "inc"
+      max_idle_duration = "720h"
+    }
+  }
   forward_to = [loki.write.sortie.receiver]
 }

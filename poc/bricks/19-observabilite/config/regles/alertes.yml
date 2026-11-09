@@ -117,6 +117,19 @@ groups:
           alerte: muette
           severite: critique
 
+      # Events muets (chantier des Events, README de la 08c, 09/11/2026) : aucune ligne evenements-k8s transmise à Loki par Alloy de
+      # sc-stockage depuis 15 min, ou compteur absent alors qu'Alloy répond. Le second cas est la panne du 07/11 : observateur en échec
+      # au démarrage, composant healthy, aucune ligne, donc aucun compteur. Alloy arrêté : up == 0, c'est CollecteEnPanne qui sonne.
+      # Suppose une source régulière d'Events (CronJob horodatage, chaque minute) : une suspension des CronJobs par minute (H5)
+      # la ferait sonner à tort. Compteur : stage.metrics de loki.process "evenements" (evenements.alloy de la 19b).
+      - alert: EvenementsMuets
+        expr: sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+        for: 5m
+        labels:
+          alerte: muette
+          severite: critique
+          source: evenements-k8s
+
       # Loki injoignable ou en refus (brique 19b, L4) : aucun envoi réussi d'Alloy de sc-stockage vers Loki depuis 5 min, alors
       # qu'il envoie en continu (son journal, le relais, les événements).
       - alert: LokiInjoignable

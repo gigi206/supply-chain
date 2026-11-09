@@ -10,6 +10,8 @@
 #   classe  relecture de (c) seule (accord : « Oui, relis la classe »)
 #   redemarrage systemctl restart alloy sur sc-stockage, démarrage relevé avant et après (accord : « Oui, redémarre Alloy »)
 #   verification lecture seule, après redemarrage : lignes evenements-k8s, journal du composant, santé et position
+#   essai_alerte à sec sur sc-stockage, dans /tmp/essai-evenements retiré ensuite : promtool check et test de alertes.yml (19) avec
+#           EvenementsMuets, alloy validate de la configuration de sc-stockage (19b) avec le compteur ; aucun service touché (accord)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
 set -euo pipefail
@@ -252,6 +254,21 @@ etape_verification() { # lecture seule, quelques minutes après redemarrage
   else echo "  lecture de l'API d'Alloy impossible"; fi
   [ "$v" = 0 ] && echo "## bilan : collecte des Events rétablie" || echo "## bilan : collecte non rétablie"
   return $v
+}
+
+etape_essai_alerte() {
+  local d=$W/essai-alerte rg=$here/../19-observabilite/config/regles c=$here/../19b-journalisation/config/alloy
+  rm -rf -- "${d:?}" && mkdir -p "$d"
+  cp "$rg/alertes.yml" "$rg/alertes-tests.yml" "$c/commun"/*.alloy "$c/stockage"/*.alloy "$d/"
+  [ "$DISTRO" = k3s ] || cp "$here/../08b-rke2/config/alloy/journaux-rke2.alloy" "$d/"   # même jeu que journalisation.sh installer
+  echo "## fichiers essayés : $(cd "$d" && ls | paste -sd' ' -)"
+  echo "## sha256 de evenements.alloy : $(sha256sum "$d/evenements.alloy" | cut -c1-64) ; de alertes.yml : $(sha256sum "$d/alertes.yml" | cut -c1-64)"
+  copier sc-stockage /tmp/essai-evenements "$d"/*
+  rm -rf -- "${d:?}"
+  sur sc-stockage 'cd /tmp/essai-evenements && promtool --version | head -1 && promtool check rules alertes.yml && promtool test rules alertes-tests.yml; r=$?
+mkdir config && mv ./*.alloy config/ && o=$(/usr/local/bin/alloy validate config 2>&1); v=$?; printf "%s\n" "$o" | tail -5
+if [ "$v" = 0 ]; then echo "configuration valide"; else echo "configuration refusée (code $v)"; r=1; fi
+cd / && rm -rf /tmp/essai-evenements; exit $r' </dev/null
 }
 
 lancer evenements events "$@"

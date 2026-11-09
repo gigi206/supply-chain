@@ -1065,3 +1065,41 @@ Sa classe est **`connection refused`**. Au démarrage d'Alloy de `sc-stockage`, 
 - La suite d'E4 : modifier les six contrôles, et choisir leur témoin.
 
 **Temps** : 2 h 30 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises.
+
+## Additif du 09/11/2026, 17:29 UTC : remède durable (a), alerte EvenementsMuets préparée à sec, non essayée ni appliquée
+
+**Décision du propriétaire.** Question posée : « que recommande l'advisor ? ». La recommandation transmise était (a), une alerte sur l'absence de lignes d'Events ; (b) tel quel était déconseillé ; (c) restait possible en plus, sur accord explicite. Le propriétaire a répondu « Oui, prépare (a) ». Rien n'a été lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM depuis la vérification de 17:08 UTC.
+
+**Lu dans le source d'Alloy v1.21.3** (`internal/component/loki/process/stages/metric.go` et `metric/counters.go`) :
+- `stage.metrics` crée un compteur nommé `loki_process_custom_` suivi du nom donné ;
+- `match_all = true` avec `action = "inc"` compte chaque ligne ;
+- `max_idle_duration` vaut 5 min par défaut : la série disparaît après 5 min sans ligne, et elle n'existe pas tant qu'aucune ligne n'est passée.
+
+Conséquence : une règle « le compteur n'augmente plus » seule resterait muette dans le cas du 07/11, où aucune ligne n'est jamais passée. La règle traite donc aussi l'absence du compteur.
+
+**Modifications préparées, non appliquées :**
+- `19b-journalisation/config/alloy/stockage/evenements.alloy` : `stage.metrics` dans `loki.process "evenements"`, compteur `evenements_lignes_total` (nom complet `loki_process_custom_evenements_lignes_total`), `max_idle_duration = "720h"`.
+- `19-observabilite/config/regles/alertes.yml` : règle `EvenementsMuets`, déclenchée dans deux cas. Elle porte les étiquettes `alerte: muette`, `severite: critique`, `source: evenements-k8s`.
+  - Expression : `sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))`, avec `for: 5m`.
+  - Premier cas : aucune ligne depuis 15 min.
+  - Second cas : compteur absent alors qu'Alloy répond.
+  - Si Alloy est arrêté, c'est `CollecteEnPanne` qui sonne.
+- `alertes-tests.yml` : quatre cas `promtool`.
+  - Compteur figé à 10 min : rien à 24 et 29 min, alerte à 31 min.
+  - Compteur qui avance : rien.
+  - Compteur jamais créé, Alloy répond : alerte à 6 min.
+  - Alloy arrêté : `EvenementsMuets` se tait, `CollecteEnPanne` sonne.
+- `evenements.sh essai_alerte` : copie dans `/tmp/essai-evenements` de `sc-stockage`, `promtool check rules` et `promtool test rules`, `alloy validate` du jeu de configuration de `sc-stockage` (commun, stockage, `journaux-rke2.alloy`), puis retrait du répertoire. L'étape n'a pas été essayée hors cluster : `promtool` et `alloy` sont absents de l'hôte. YAML des règles et des tests validé par `yq`.
+
+**Limite de l'alerte.** Elle suppose une source régulière d'Events, aujourd'hui le CronJob `horodatage` chaque minute. Une suspension des CronJobs par minute, comme en H5, la ferait sonner à tort. Le délai choisi est de 15 min sans ligne, plus 5 min de `for`.
+
+**Prédictions de l'essai, avant tout passage** :
+- `promtool check rules` réussit ;
+- `promtool test rules` réussit, cas existants compris ; confiance moyenne sur les bornes de 24, 29 et 31 min, à cause de la fenêtre ouverte à gauche de Prometheus 3 ;
+- `alloy validate` accepte la configuration ; confiance moyenne : `stage.metrics` n'a jamais été validé dans ce dépôt.
+
+**Propositions en attente du propriétaire** :
+1. **`evenements.sh essai_alerte`.** Effets : un répertoire temporaire dans `/tmp` de `sc-stockage`, retiré ensuite ; aucun service touché. Pire cas : un répertoire temporaire laissé si la commande est interrompue.
+2. **Application, après un essai réussi**, avec son propre accord. Elle consiste à poser `evenements.alloy` sur `sc-stockage`, valider, redémarrer Alloy, puis `observabilite.sh deployer`, qui pose `alertes.yml` et redémarre Prometheus. On vérifie ensuite en lecture seule que le compteur avance et que l'alerte est inactive. Effets : deux redémarrages, chacun coupant quelques secondes de collecte ou d'évaluation des alertes.
+3. **Périmètre et estimation du chantier** : 2 h 51 min écoulées depuis 14:38:26 UTC, attentes comprises. Estimation proposée pour (a) : 1 h de plus, essai, application et vérification comprises. Le doublement est à surveiller.
+4. **Suite d'E4** : modifier les six contrôles, avec un témoin fondé sur la présence de lignes (le même compteur peut servir).
