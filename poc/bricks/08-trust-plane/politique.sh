@@ -445,6 +445,15 @@ etape_admission() {
   echo "ValidatingAdmissionPolicy natives générées par Kyverno : $(kubectl get validatingadmissionpolicies -o name 2>/dev/null | grep -c . || true)"
   # Sous RKE2, rke2-runtimeclasses est désactivé (compte helm-* lié à cluster-admin) : sans crun, l'API refuserait pod-privilegie-crun avant
   # Kyverno, et le cas ne mesurerait plus que pods-isolation reconnaît Kata par son nom. Classe témoin, le temps des cas ; aucun pod créé.
+  # Ajout du 09/11/2026 vers 14:13 UTC, non exécuté (aucun passage depuis) : un KO (exit 1 ci-dessous), une erreur ou un signal
+  # pendant les cas laissait crun en place. Le piège la retire à toute sortie (exit, erreur, INT, TERM, HUP) et garde le retrait des
+  # identifiants du piège global ; il est rétabli après les cas (même modèle que parite). Essai : resultats/politique-admission-piege-essai.log.
+  RC_ESSAI=
+  trap '[ -z "${RC_ESSAI:-}" ] || { echo "nettoyage : RuntimeClass témoin $RC_ESSAI retirée à la sortie"
+    kubectl delete runtimeclass "$RC_ESSAI" --ignore-not-found </dev/null >/dev/null 2>&1 || true; }
+    rm -rf "$T/auth" "$W/refus.out"' EXIT
+  trap 'exit 130' INT TERM HUP
+  [ "$DISTRO" != rke2 ] || RC_ESSAI=crun
   [ "$DISTRO" != rke2 ] || printf 'apiVersion: node.k8s.io/v1\nkind: RuntimeClass\nmetadata: {name: crun}\nhandler: crun\n' | kubectl apply -f - >/dev/null
   echo "## $(wc -l < "$T/adm/cas.tsv") cas, CLI puis admission (dry-run serveur)"
   while IFS=$'\t' read -r c e a desc; do
@@ -457,6 +466,9 @@ etape_admission() {
     fi
   done < "$T/adm/cas.tsv"
   [ "$DISTRO" != rke2 ] || kubectl delete runtimeclass crun --ignore-not-found >/dev/null
+  RC_ESSAI=
+  trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+  trap - INT TERM HUP
   echo "## synthèse"
   awk -F'\t' 'NR > 1 && $4 != "-" { n++; split($3, c, " "); if (c[1] == $4) p++; else printf "  écart : %s (CLI %s, admission %s)\n", $1, $3, $4 }
     END { printf "parité CLI / admission : %d cas sur %d\n", p, n }' "$TSV_PARITE"

@@ -1,0 +1,136 @@
+# Essai hors cluster du piège ajouté à etape_admission (politique.sh), passage de 2026-11-09T14:15:03Z
+# Aucun cluster, Zot ni VM : kubectl, cli et comparer remplacés par des fonctions ; kubectl note ses appels dans $T/appels.
+# Les lignes testées sont extraites du script par sed (de « RC_ESSAI= » au « trap - INT TERM HUP »), pas recopiées.
+# Signaux envoyés à tout le groupe (kill -SIG 0, sous setsid), comme un vrai Ctrl-C : sed et tee meurent aussi, d'où des
+# journaux d'étape tronqués en INT, TERM et HUP ; la mesure est le fichier des appels du faux kubectl. Le « code de l'étape »
+# affiché par le parent n'a pas de sens quand le parent est tué (TERM, HUP) : seul le « code du processus » compte.
+# Première version du harnais (14:14:14Z) écartée : la ligne de lancer y était suivie de « || c=$? », ce qui rend set -e
+# inopérant dans le sous-shell ; le mode erreur continuait après l'échec (« fin de l'étape », code 0). lancer (commun.sh:335)
+# n'a pas de « || » : la v2 le reprend tel quel. L'essai de parite (politique-parite-piege-essai.log) avait ce même « || »,
+# mais son échec était la dernière commande de l'étape : sortie 1 et piège quand même ; l'arrêt sous set -e au milieu
+# de l'étape n'est vérifié qu'ici.
+# Chemin du dossier personnel remplacé par ~ (comme lancer). Lignes de contrôle des tâches de bash (« Complété », « raccroché ») retirées de la sortie ci-dessous.
+## essai-adm.sh
+#!/usr/bin/env bash
+# Essai hors cluster du piège ajouté à etape_admission (politique.sh) : lignes du piège, de la boucle des cas et du rétablissement
+# extraites telles quelles du script (de « RC_ESSAI= » au « trap - INT TERM HUP ») ; kubectl, cli et comparer remplacés par des
+# fonctions ; structure de lancer (commun.sh) : { …; } 2>&1 | sed | tee ; usage : essai-adm.sh mode distro script
+set -euo pipefail
+mode=$1 DISTRO=$2 src=$3
+T=$ESSAI_T; W=$T; TSV_PARITE=$T/tsv; here=/nulle-part
+mkdir -p "$T/adm" "$T/auth/docker"; : > "$T/auth/docker/config.json"
+kubectl() { echo "kubectl $*" >> "$T/appels"; [ "${1:-}" != apply ] || cat > /dev/null; }
+cli() { printf 'PASS\tmotif'; }
+comparer() {
+  case "$mode" in
+    erreur) echo "admission : commande en échec sous set -e"; false ;;
+    int) echo "INT au groupe"; kill -INT 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    term) echo "TERM au groupe"; kill -TERM 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    hup) echo "HUP au groupe"; kill -HUP 0; sleep 1; echo "ne doit pas s'afficher" ;;
+    *) echo "OK   $1" ;;
+  esac
+}
+case "$mode" in ko) printf 'cas-ko\tFAIL\tnon\tCLI seul\n' > "$T/adm/cas.tsv" ;; *) printf 'cas-1\tPASS\toui\t-\n' > "$T/adm/cas.tsv" ;; esac
+# v2 : le parent ne fait que le relevé (son retrait des identifiants n'est pas ce qu'on mesure) ; la ligne de lancer est reprise
+# sans « || » : un « || » rend set -e inopérant dans le sous-shell (défaut de la v1, mode erreur) ; pipefail donne le code de l'étape.
+trap 'c=$?; cat "$T/journal" 2>/dev/null; echo "  code de l'"'"'étape : $c"
+  echo "  appels à kubectl : $(paste -sd";" "$T/appels" 2>/dev/null || echo aucun)"
+  echo "  identifiants encore présents : $([ -e "$T/auth" ] && echo oui || echo non)"' EXIT
+eval "etape_admission() {
+local c e a desc r
+$(sed -n '/^  RC_ESSAI=$/,/^  trap - INT TERM HUP$/p' "$src")
+echo \"fin de l'étape\"
+}"
+{ echo "# étape admission ($mode, $DISTRO)"; etape_admission; } 2>&1 | sed -u 's/^/  /' | tee "$T/journal" > /dev/null
+## lancer-essais.sh
+#!/usr/bin/env bash
+set -uo pipefail
+d=$(cd "$(dirname "$0")" && pwd); src=~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/politique.sh
+un() { # mode distro dossier
+  rm -rf "$3"; mkdir -p "$3"
+  ESSAI_T=$3 setsid bash "$d/essai-adm.sh" "$1" "$2" "$src" > "$3.out" 2>&1 < /dev/null; echo "  code du processus : $?" >> "$3.out"
+}
+echo "# date : $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "# lignes extraites de politique.sh (sha256 du script : $(sha256sum < "$src" | cut -c1-64))"
+sed -n '/^  RC_ESSAI=$/,/^  trap - INT TERM HUP$/=' "$src" | sed -n '1p;$p' | paste -sd- | sed 's/^/# plage : /'
+for m in ok ko erreur; do un "$m" rke2 "$d/s-$m"; cat "$d/s-$m.out"; done
+un ok k3s "$d/s-ok-k3s"; cat "$d/s-ok-k3s.out"
+un ko k3s "$d/s-ko-k3s"; cat "$d/s-ko-k3s.out"
+for s in int term hup; do
+  un "$s" rke2 "$d/s-$s"; cat "$d/s-$s.out"
+  r=0 i=0
+  for n in $(seq 10); do
+    un "$s" rke2 "$d/r-$s-$n"
+    [ "$(grep -c 'delete runtimeclass crun' "$d/r-$s-$n/appels")" = 1 ] && r=$((r + 1))
+    [ -e "$d/r-$s-$n/auth" ] && i=$((i + 1))
+  done
+  echo "groupe $s, dix passages : RuntimeClass retirée une fois exactement $r sur 10, identifiants restants $i sur 10"
+done
+echo "# appels autres que apply et delete de runtimeclass, sur tous les passages : $(cat "$d"/s-*/appels "$d"/r-*/appels 2>/dev/null | grep -vcE '^kubectl (apply -f -|delete runtimeclass crun --ignore-not-found)$')"
+## sortie
+# date : 2026-11-09T14:15:03Z
+# lignes extraites de politique.sh (sha256 du script : 433ad5da883ccc72a708978dc326fc2c6636678a53162c7c597782e94c985f6a)
+# plage : 451-471
+  # étape admission (ok, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  OK   cas-1
+  fin de l'étape
+  code de l'étape : 0
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (ko, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  KO   cas-ko : CLI PASS (attendu FAIL)
+  nettoyage : RuntimeClass témoin crun retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 1
+  # étape admission (erreur, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  admission : commande en échec sous set -e
+  nettoyage : RuntimeClass témoin crun retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 1
+  # étape admission (ok, k3s)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  OK   cas-1
+  fin de l'étape
+  code de l'étape : 0
+  appels à kubectl : aucun
+  identifiants encore présents : non
+  code du processus : 0
+  # étape admission (ko, k3s)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  KO   cas-ko : CLI PASS (attendu FAIL)
+  code de l'étape : 1
+  appels à kubectl : aucun
+  identifiants encore présents : non
+  code du processus : 1
+  # étape admission (int, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  code de l'étape : 130
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 130
+groupe int, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+  # étape admission (term, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  TERM au groupe
+  code de l'étape : 0
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 143
+groupe term, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+  # étape admission (hup, rke2)
+  ## 1 cas, CLI puis admission (dry-run serveur)
+  code de l'étape : 0
+/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/3037736d-8910-46aa-8b19-a8862891a6fb/scratchpad/trap-test-adm/essai-adm.sh : ligne 2 : 2531610 Termine 130                { echo "# étape admission ($mode, $DISTRO)"; etape_admission; } 2>&1
+  appels à kubectl : kubectl apply -f -;kubectl delete runtimeclass crun --ignore-not-found
+  identifiants encore présents : non
+  code du processus : 129
+groupe hup, dix passages : RuntimeClass retirée une fois exactement 10 sur 10, identifiants restants 0 sur 10
+# appels autres que apply et delete de runtimeclass, sur tous les passages : 0
