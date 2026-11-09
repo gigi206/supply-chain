@@ -724,7 +724,13 @@ cp -p /etc/alloy/config/relais.alloy /etc/alloy/relais.alloy.avant-l6   # hors d
 echo "copies de sauvegarde : /etc/loki/loki.yaml.avant-l6, /etc/alloy/relais.alloy.avant-l6"
 /usr/local/bin/loki -config.file=loki.yaml -verify-config 2>&1 | tail -1
 mkdir -m 0750 alloy-config && cp /etc/alloy/config/*.alloy alloy-config/ && cp relais.alloy alloy-config/
-/usr/local/bin/alloy validate alloy-config && echo "configuration d'alloy (copie) valide"
+# Pas de « validate && echo » : sous set -e, un échec dans une liste && n'arrête pas le script (défaut trouvé le 09/11 par l'essai
+# hors cluster d'evenements.sh de la 08c, corrigé ici le 09/11).
+if ! /usr/local/bin/alloy validate alloy-config; then
+  echo "KO   configuration d'alloy (copie) refusée : loki.yaml et relais.alloy en place inchangés, Alloy et Loki non touchés"
+  cd / && rm -rf /tmp/grpc-tls; exit 1
+fi
+echo "configuration d'alloy (copie) valide"
 echo "## alloy : nouveau relais.alloy, rechargement par SIGHUP (pid $(systemctl show -p MainPID --value alloy))"
 install -m 0640 -g alloy relais.alloy /etc/alloy/config/relais.alloy
 systemctl kill -s HUP alloy

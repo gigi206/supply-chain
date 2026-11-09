@@ -1,0 +1,17 @@
+# Essai hors cluster de la correction du défaut « validate && echo » d'etape_grpc_tls (L6), journalisation.sh
+# date : 2026-11-09T22:54:01Z ; rien lu ni écrit dans le cluster, Loki, Zot ou les VM
+# avant : journalisation.sh de 56bb78d, sha256 48ca9cca1a1e8cbca5ce6380ec1d934749802a83b21c0802373337252608eb88
+# après : journalisation.sh modifié, sha256 bd0cdb2e42c54819625509d82ff3968edaab1b6e6215f83facf115039ef23b99
+# méthode : fragment du script distant, de « mkdir -m 0750 alloy-config » jusqu'avant « echo "## alloy : nouveau relais.alloy »,
+# lancé sous set -euo pipefail ; chemins /usr/local/bin/alloy, /tmp/grpc-tls et /etc/alloy/config réécrits vers le dossier d'essai ;
+# faux alloy qui rend le code demandé (1 : configuration refusée, 0 : acceptée) ; « suite » = la ligne qui suit le fragment est atteinte
+# (dans le vrai script : installation de relais.alloy, SIGHUP d'Alloy, puis redémarrage de Loki)
+avant  validate=1  code=0  suite=oui  dossier /tmp/grpc-tls restant=oui
+avant  validate=0  code=0  suite=oui  dossier /tmp/grpc-tls restant=oui
+apres  validate=1  code=1  suite=non  dossier /tmp/grpc-tls restant=non
+    KO   configuration d'alloy (copie) refusée : loki.yaml et relais.alloy en place inchangés, Alloy et Loki non touchés
+apres  validate=0  code=0  suite=oui  dossier /tmp/grpc-tls restant=oui
+# attendu : avant/validate=1 poursuit (défaut reproduit) ; apres/validate=1 s'arrête en code 1 et retire le dossier ;
+# validate=0 poursuit dans les deux cas (le dossier est retiré plus loin dans le vrai script, hors du fragment)
+# shellcheck : 11 avertissements avant, 11 après, identiques (comparaison sans numéros de ligne)
+# même motif non modifié : ligne 362, etape_alloy (installation d'Alloy sur les trois VM) : à décider
