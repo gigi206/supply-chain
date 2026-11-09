@@ -7,11 +7,13 @@
 # La lecture de Loki à travers Grafana reprend celle d'evenements.sh, laissé inchangé (empreinte de ses passages archivés).
 #
 # Règle de verdict (lecture d'E1 (a) pour les cas que la décision ne tranche pas) : Loki ne décide que s'il peut juger.
-#   - au moins une ligne dans Loki (réponse tronquée comprise) : le compte de Loki décide, donc KO ;
-#   - 0 ligne, témoin E3 vu, kubectl 0 : verdict de Loki, OK ;
-#   - 0 ligne, témoin vu, kubectl au moins 1 : une ligne manque à Loki, qui ne juge donc pas : le compte de kubectl décide, KO ;
+#   - au moins une ligne dans Loki (réponse tronquée comprise) : le compte de Loki décide, donc KO ; le compte est demandé dès que le
+#     mot de passe est présent et le début lisible, même quand une autre raison empêche de juger (corrigé le 09/11/2026 à 23:32 UTC) ;
+#   - 0 ligne, témoin E3 vu, kubectl borné au même début 0 : verdict de Loki, OK ;
+#   - 0 ligne, témoin vu, kubectl borné au moins 1 : une ligne de la fenêtre manque à Loki, qui ne juge donc pas : KO ;
 #   - Loki non jugé (témoin absent, Alloy démarré dans la fenêtre ou démarrage illisible, requête en erreur, mot de passe absent) :
-#     le compte de kubectl décide, comme avant le chantier.
+#     le compte de kubectl d'origine, sans borne s'il n'en avait pas, décide comme avant le chantier.
+# Hypothèse, non mesurée : une ligne postérieure au contrôle indique que la collecte a rattrapé les lignes de la fenêtre.
 # Le script appelant garde son attendu ou ba_attendu sur EV_N : sa façon de traiter un KO ne change pas.
 
 EV_GRAFANA=${EV_GRAFANA:-https://192.168.161.13:3001}
@@ -61,27 +63,36 @@ ev_resume() {
     | sort | uniq -c | sort -rn | head -10 | grep -v -i -E 'jeton|token' | sed 's/^ */    /' || true
 }
 
-# ev_juge libellé requête début(RFC 3339) compte-kubectl : pose EV_N (le compte qui décide) et EV_SOURCE (d'où il vient).
-# À appeler hors de $(…), puis : attendu "libellé ($EV_SOURCE)" "$EV_N" 0.
+# Events lus par kubectl (liste JSON sur l'entrée) retenus par un filtre jq et horodatés, à la seconde, à partir d'un début, sur
+# l'horodatage qu'Alloy donne à la ligne (series.lastObservedTime, lastTimestamp, eventTime), à défaut la création de l'Event.
+ev_borne() { # filtre-jq début(RFC 3339)
+  jq --arg t "$2" "[.items[] | select($1)
+    | select(((.series.lastObservedTime // .lastTimestamp // .eventTime // .metadata.creationTimestamp // \"\")[0:19]) >= (\$t[0:19]))] | length"
+}
+
+# ev_juge libellé requête début(RFC 3339) compte-kubectl [compte-kubectl-borné] : pose EV_N (le compte qui décide) et EV_SOURCE.
+# Le compte borné (au même début que Loki) sert quand Loki juge ; le compte d'origine, quand Loki ne juge pas. Sans le cinquième
+# argument, les deux sont égaux (contrôles déjà bornés). À appeler hors de $(…), puis : attendu "libellé ($EV_SOURCE)" "$EV_N" 0.
 ev_juge() {
-  local lib=$1 req=$2 nk=$4 de="" tc vu="" fin d0="" d1="" raison="" nl=0 tr="" i
+  local lib=$1 req=$2 nk=$4 nb=${5-$4} de="" tc vu="" fin d0="" d1="" raison="" nl=0 tr="" i compte=0
   EV_N=$nk; EV_SOURCE=""
   tc=$(date -u +%s)
-  echo "## $lib : Loki (E1 (a)) depuis $3, kubectl : ${nk:-vide}"
+  echo "## $lib : Loki (E1 (a)) depuis $3, kubectl : ${nk:-vide}, borné au même début : ${nb:-vide}"
   de=$(date -ud "$3" +%s 2>/dev/null) || de=""
   if [ -z "$de" ]; then raison="début de fenêtre illisible ($3)"
   elif [ ! -r "$S/grafana-auditeur.password" ]; then raison="mot de passe de l'auditeur absent"
   else
+    compte=1
     d0=$(ev_alloy_debut)
     if [ -z "$d0" ]; then raison="démarrage d'Alloy illisible sur sc-stockage"
     elif [ "$d0" -ge "$de" ]; then raison="Alloy démarré le $(date -ud "@$d0" +%Y-%m-%dT%H:%M:%SZ), après le début de la fenêtre"
     fi
   fi
-  if [ -z "$raison" ]; then
+  if [ "$compte" = 1 ]; then
     EV_T=$W/ev-loki
     rm -rf -- "${EV_T:?}" && (umask 077 && mkdir -p "$EV_T")
-    # E3 (b) : une ligne evenements-k8s horodatée après l'instant du contrôle montre que la collecte l'a dépassé
-    for ((i = 0; ; i++)); do
+    # E3 (b) : une ligne evenements-k8s horodatée après l'instant du contrôle montre que la collecte l'a dépassé (hypothèse ci-dessus)
+    [ -n "$raison" ] || for ((i = 0; ; i++)); do
       ev_requete '{source="evenements-k8s"}' "$tc" "$(($(date -u +%s) + 1))" 1
       if [ "$ev_etat" = erreur ]; then raison="témoin illisible ($ev_err)"; break; fi
       if [ "$ev_n" -ge 1 ]; then vu=$(date -u +%s); break; fi
@@ -109,10 +120,10 @@ ev_juge() {
     EV_N=$nl; EV_SOURCE="Loki, $nl ligne(s)$tr"
   elif [ -n "$raison" ]; then
     EV_SOURCE="kubectl, Loki non jugé : $raison"
-  elif [ "$nk" != 0 ]; then
-    EV_SOURCE="kubectl, ${nk:-vide} absent(s) de Loki, qui ne juge donc pas cette fenêtre"
+  elif [ "$nb" != 0 ]; then
+    EV_N=$nb; EV_SOURCE="kubectl, ${nb:-vide} dans la fenêtre, absent(s) de Loki, qui ne juge donc pas cette fenêtre"
   else
-    EV_N=0; EV_SOURCE="Loki, témoin E3 vu, kubectl 0"
+    EV_N=0; EV_SOURCE="Loki, témoin E3 vu, kubectl 0 dans la fenêtre$([ "$nk" = "$nb" ] || echo ", ${nk:-vide} sans borne")"
   fi
   return 0
 }

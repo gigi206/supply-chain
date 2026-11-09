@@ -3304,8 +3304,10 @@ etape_scan_saut_reprendre() { # brique 08c, seconde moitié : passage sauté con
   ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|false|0"
   ba_attendu "dernier passage" "$(ss_dernier)" "$e0"
   ba_attendu "Jobs du scan créés depuis $p" "$(kubectl get job -n scan -o json | jq --arg t "$p" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
-  ev_k=$(kubectl get events -n scan -o json | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length') || true
-  ev_juge "événements du CronJob du scan (MissSchedule compris) depuis la reprise" "$EV_CRONJOB_SCAN" "$t1" "$ev_k"   # E4 (08c)
+  ev_j=$(kubectl get events -n scan -o json) || true
+  ev_k=$(jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length' <<< "$ev_j") || true
+  ev_b=$(ev_borne '.involvedObject.kind == "CronJob"' "$t1" <<< "$ev_j") || true   # même début que Loki (corrigé à 23:32 UTC)
+  ev_juge "événements du CronJob du scan (MissSchedule compris) depuis la reprise" "$EV_CRONJOB_SCAN" "$t1" "$ev_k" "$ev_b"   # E4
   ba_attendu "événements du CronJob du scan (MissSchedule compris) ($EV_SOURCE)" "$EV_N" 0
   r=$(ss_audit patch cronjobs "$t1")
   echo "$r" | sed 's/^/  audit : /'

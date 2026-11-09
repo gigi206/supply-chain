@@ -1,0 +1,290 @@
+# Chantier des Events, suite d'E4, correction de 23:32 UTC (compte de kubectl borné au même début que Loki ; compte de Loki demandé dès
+# que le mot de passe est là) : essai hors cluster (2026-11-09T23:34:35Z). Rien lu ni écrit dans le cluster, Loki, Grafana ou les VM.
+# Prédictions P13 à P17 : mesures-reelles-predictions.md, additif du 09/11/2026 à 23:31 UTC (commit 0aaa9f8). Premier essai : evenements-e4-essai-local.log.
+## empreintes (sha256)
+  après : 5a1a8fd570e61a422427d3782804a5bd16be19f7002ced694e6e900e8fdf86ea  poc/bricks/08c-durcissement/evenements-loki.sh
+  après : 23a6e9cdc84ca9e188acf8c2c2d45df2a3ca26ec52660cdf6d5303ab74a05e24  poc/bricks/08-trust-plane/preuves.sh
+  après : 6c52ce63e3ac4700434df08377461463b7c2c39abd2f1dd616477559bd208130  poc/bricks/08-trust-plane/cilium.sh
+  après : 3eb2036f94f15b640d9b3068d1bb7f186d226523d956e945c5b955940b5aff05  poc/bricks/08c-durcissement/durcissement.sh
+  84563c6 (v84) : a88447a3603acc9ed1f0ce4ac5fa04cb4376bacc39f4ebc2372e223367e6c17e  evenements-loki.sh
+## fragments (avant = bfd7443, après = arbre de travail, v84 = 84563c6)
+### resolveurs_pod, avant
+      ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+### resolveurs_pod, après
+      ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+      ev_juge "événements PolicyViolation depuis $t0" "$EV_PV" "$t0" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+      ba_attendu "événements PolicyViolation depuis $t0 ($EV_SOURCE)" "$EV_N" 0
+### scan_saut_suspendre, avant
+      ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+### scan_saut_suspendre, après
+      ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+      ev_juge "événements PolicyViolation depuis $t0" "$EV_PV" "$t0" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+      ba_attendu "événements PolicyViolation depuis $t0 ($EV_SOURCE)" "$EV_N" 0
+### reprendre_cronjob, avant
+      ba_attendu "événements du CronJob du scan (MissSchedule compris)" "$(kubectl get events -n scan -o json \
+        | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length')" 0
+### reprendre_cronjob, après
+      ev_j=$(kubectl get events -n scan -o json) || true
+      ev_k=$(jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length' <<< "$ev_j") || true
+      ev_b=$(ev_borne '.involvedObject.kind == "CronJob"' "$t1" <<< "$ev_j") || true   # même début que Loki (corrigé à 23:32 UTC)
+      ev_juge "événements du CronJob du scan (MissSchedule compris) depuis la reprise" "$EV_CRONJOB_SCAN" "$t1" "$ev_k" "$ev_b"   # E4
+      ba_attendu "événements du CronJob du scan (MissSchedule compris) ($EV_SOURCE)" "$EV_N" 0
+### reprendre_pv, avant
+      ba_attendu "événements PolicyViolation depuis $t1" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t1" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+### reprendre_pv, après
+      ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+        | jq --arg t "$t1" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+      ev_juge "événements PolicyViolation depuis $t1" "$EV_PV" "$t1" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+      ba_attendu "événements PolicyViolation depuis $t1 ($EV_SOURCE)" "$EV_N" 0
+### h2_releve, avant
+      attendu "événements FailedCreate depuis H2" "$(kubectl get events -A --field-selector reason=FailedCreate -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length')" 0
+### h2_releve, après
+      ev_k=$(kubectl get events -A --field-selector reason=FailedCreate -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length') || true
+      ev_juge "événements FailedCreate depuis H2" "$EV_FAILEDCREATE" "$t0" "$ev_k"   # chantier des Events, E4 : Loki, sinon kubectl
+      attendu "événements FailedCreate depuis H2 ($EV_SOURCE)" "$EV_N" 0
+### cilium, avant
+      attendu "événements Pulling des pods de Cilium" "$(kubectl -n kube-system get events -o json | jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length')" 0
+### cilium, après
+      ev_j=$(kubectl -n kube-system get events -o json) || true
+      ev_k=$(jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length' <<< "$ev_j") || true
+      # fenêtre bornée au déploiement : plus ancienne création des pods de Cilium (chantier des Events, E4, brique 08c ; borne de kubectl
+      # au même début, corrigé à 23:32 UTC)
+      ev_d=$(jq -r '[.[].metadata.creationTimestamp] | min // ""' "$T/pods.json") || true
+      ev_b=$(ev_borne '.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling"' "$ev_d" <<< "$ev_j") || true
+      ev_juge "événements Pulling des pods de Cilium" "$EV_PULLING_CILIUM" "$ev_d" "$ev_k" "$ev_b"
+      attendu "événements Pulling des pods de Cilium ($EV_SOURCE)" "$EV_N" 0
+### reprendre_cronjob, v84
+      ev_k=$(kubectl get events -n scan -o json | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length') || true
+      ev_juge "événements du CronJob du scan (MissSchedule compris) depuis la reprise" "$EV_CRONJOB_SCAN" "$t1" "$ev_k"   # E4 (08c)
+      ba_attendu "événements du CronJob du scan (MissSchedule compris) ($EV_SOURCE)" "$EV_N" 0
+### cilium, v84
+      ev_k=$(kubectl -n kube-system get events -o json | jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length') || true
+      # fenêtre bornée au déploiement : plus ancienne création des pods de Cilium (chantier des Events, E4, brique 08c)
+      ev_juge "événements Pulling des pods de Cilium" "$EV_PULLING_CILIUM" "$(jq -r '[.[].metadata.creationTimestamp] | min // ""' "$T/pods.json")" "$ev_k"
+      attendu "événements Pulling des pods de Cilium ($EV_SOURCE)" "$EV_N" 0
+## banc : essai.sh
+    #!/usr/bin/env bash
+    # essai.sh <contrôle> <avant|apres> : fragment du script d'origine, avec faux curl, ssh, kubectl et sleep ; scénario dans ESS_*
+    set -euo pipefail
+    export LC_ALL=C
+    D=$(cd "$(dirname "$0")" && pwd)
+    c=$1 v=$2
+    B=$ESS_BASE; rm -rf "$B"; mkdir -p "$B/s" "$B/p" "$B/w" "$B/t"
+    S=$B/s P=$B/p W=$B/w T=$B/t O=$B
+    APPELS=$B/appels; : > "$APPELS"
+    [ "${ESS_MDP:-1}" = 1 ] && printf 'faux-mot-de-passe\n' > "$S/grafana-auditeur.password"
+    declare -A IP=([sc-stockage]=192.0.2.13); SSH_OPTS=()
+    ko=0
+    t0=$(date -u -d '-30 sec' +%Y-%m-%dT%H:%M:%SZ); t1=$t0
+    printf '[{"metadata":{"creationTimestamp":"%s"}},{"metadata":{"creationTimestamp":"%s"}}]\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$t0" > "$T/pods.json"
+    echo 0 > "$B/n-temoin"; echo 0 > "$B/n-ssh"
+    
+    curl() {
+      local o="" d="" a cfg e m de to n i k
+      while [ $# -gt 0 ]; do case $1 in -o) o=$2; shift 2 ;; -d) d=$2; shift 2 ;; *) shift ;; esac; done
+      cfg=$(cat); case $cfg in 'user = "auditeur:'*) ;; *) echo "curl : configuration inattendue" >&2; return 2 ;; esac
+      e=$(jq -r '.queries[0].expr' <<< "$d"); m=$(jq -r '.queries[0].maxLines' <<< "$d"); de=$(jq -r .from <<< "$d"); to=$(jq -r .to <<< "$d")
+      if [ "${ESS_HTTP:-200}" = 000 ]; then echo "curl expr=$e (injoignable)" >> "$APPELS"; printf 000; return 7; fi
+      if [ "$e" = '{source="evenements-k8s"}' ] && [ "$m" = 1 ]; then
+        k=$(( $(cat "$B/n-temoin") + 1 )); echo "$k" > "$B/n-temoin"
+        n=$([ "${ESS_TEMOIN:-1}" != 0 ] && [ "$k" -ge "${ESS_TEMOIN:-1}" ] && echo 1 || echo 0)
+        echo "curl témoin n°$k de=$de a=$to -> $n" >> "$APPELS"
+      else
+        n=${ESS_LOKI_N:-0}; [ "$n" -le "$m" ] || n=$m
+        echo "curl compte expr=$e de=$de a=$to max=$m -> $n" >> "$APPELS"
+      fi
+      if [ "${ESS_HTTP:-200}" != 200 ]; then printf '{"message":"x"}' > "$o"; printf '%s' "$ESS_HTTP"; return 0; fi
+      jq -nc --argjson n "$n" '{results: {A: {frames: [{data: {values: [[range(0; $n) | {}], [range(0; $n) | 1762732800000 + .], [range(0; $n) | ({kind: "Pod", name: "x", reason: "PolicyViolation", count: 1, msg: "SECRET-NE-PAS-AFFICHER"} | tojson)]]}}]}}}' > "$o"
+      printf 200
+    }
+    ssh() {
+      local k; k=$(( $(cat "$B/n-ssh") + 1 )); echo "$k" > "$B/n-ssh"; echo "ssh n°$k" >> "$APPELS"
+      if [ "$k" -ge 2 ] && [ -n "${ESS_ALLOY2+x}" ]; then printf '%s\n' "$ESS_ALLOY2"; else printf '%s\n' "${ESS_ALLOY-Sat 2000-01-01 00:00:00 UTC}"; fi
+    }
+    sleep() { echo "sleep $1" >> "$APPELS"; }
+    kubectl() {
+      local kind=CronJob name=x reason=Normal a="$*"
+      case $a in *kube-system*) kind=Pod name=cilium-abc reason=Pulling ;; *reason=PolicyViolation*) reason=PolicyViolation ;; *reason=FailedCreate*) reason=FailedCreate ;; esac
+      echo "kubectl $a" >> "$APPELS"
+      # ESS_KUBE_N Events datés de 2099 (dans toute fenêtre), ESS_KUBE_AVANT datés de 2000 (avant toute fenêtre, ajouté à 23:33 UTC)
+      jq -nc --argjson n "${ESS_KUBE_N:-0}" --argjson av "${ESS_KUBE_AVANT:-0}" --arg k "$kind" --arg nm "$name" --arg r "$reason" \
+        '{items: ([range(0; $n) | "2099-01-01T00:00:00Z"] + [range(0; $av) | "2000-01-01T00:00:00Z"] | map({metadata: {creationTimestamp: .},
+          lastTimestamp: ., involvedObject: {kind: $k, name: $nm}, reason: $r}))}'
+    }
+    case $c in h2_releve) . "$D/def-durcissement.sh" ;; cilium) . "$D/def-cilium.sh" ;; *) . "$D/def-preuves.sh" ;; esac
+    [ "$v" = avant ] || . "$ESS_LIB"
+    EV_ATTENTE=${ESS_ATTENTE:-120}
+    trap_avant=$(trap -p)
+    . "$D/$c.$v"
+    echo "fin du fragment, ko=$ko"
+    [ "$(trap -p)" = "$trap_avant" ] && echo "trap inchangé" || echo "TRAP CHANGÉ"
+    [ -e "$W/ev-loki" ] && echo "ev-loki LAISSÉ" || echo "ev-loki absent"
+## banc : lancer.sh
+    #!/usr/bin/env bash
+    # lancer.sh : P1 à P12 et la non-régression P10 ; une ligne de bilan par passage
+    set -uo pipefail
+    export LC_ALL=C   # corrigé à 23:28 UTC : date factice de P4 écrite en français (« lun. »), illisible par date -d
+    D=$(cd "$(dirname "$0")" && pwd)
+    export ESS_LIB=$1 ESS_BASE=$D/base
+    passe() { # nom attendu(OK|KO) code-attendu contrôle version [VAR=valeur…]
+      local nom=$1 att=$2 catt=$3 c=$4 v=$5 out code verdict
+      shift 5
+      out=$(env "$@" "$D/essai.sh" "$c" "$v" 2>&1 </dev/null); code=$?
+      verdict=$(grep -o -E '^(OK|KO)   ' <<< "$out" | head -1 | tr -d ' ')
+      [ "$c" = h2_releve ] && grep -q 'ko=1' <<< "$out" && verdict=KO
+      printf '%s\n' "$out" > "$D/sorties/$nom.out"; cp "$ESS_BASE/appels" "$D/sorties/$nom.appels" 2>/dev/null || true
+      local bilan=conforme
+      [ "$verdict" = "$att" ] && [ "$code" = "$catt" ] || bilan=ÉCART
+      grep -q 'SECRET-NE-PAS-AFFICHER\|faux-mot-de-passe' <<< "$out" && bilan="$bilan, FUITE"
+      grep -q 'TRAP CHANGÉ\|ev-loki LAISSÉ' <<< "$out" && bilan="$bilan, RESTE"
+      printf '%-34s %-19s %-7s verdict %-2s code %-3s | %s | %s\n' "$nom" "$c" "$v" "${verdict:--}" "$code" "$bilan" \
+        "$(grep -E '^(OK|KO)   ' <<< "$out" | head -1 | cut -c1-150)"
+    }
+    rm -rf "$D/sorties"; mkdir -p "$D/sorties"
+    echo "# P1 à P9, P12 sur resolveurs_pod (après)"
+    passe P1-loki0-temoin-kube0      OK 0 resolveurs_pod apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0
+    passe P2-loki2                   KO 1 resolveurs_pod apres ESS_TEMOIN=1 ESS_LOKI_N=2 ESS_KUBE_N=0
+    passe P3-temoin-jamais-kube0     OK 0 resolveurs_pod apres ESS_TEMOIN=0 ESS_LOKI_N=0 ESS_KUBE_N=0
+    passe P3b-temoin-jamais-kube3    KO 1 resolveurs_pod apres ESS_TEMOIN=0 ESS_LOKI_N=0 ESS_KUBE_N=3
+    passe P3c-temoin-3e-appel        OK 0 resolveurs_pod apres ESS_TEMOIN=3 ESS_LOKI_N=0 ESS_KUBE_N=0
+    passe P4-alloy-redemarre         OK 0 resolveurs_pod apres ESS_ALLOY="$(date -u '+%a %Y-%m-%d %H:%M:%S UTC')" ESS_KUBE_N=0
+    passe P4b-alloy-redemarre-kube3  KO 1 resolveurs_pod apres ESS_ALLOY="$(date -u '+%a %Y-%m-%d %H:%M:%S UTC')" ESS_KUBE_N=3
+    passe P4c-alloy-change-pendant   OK 0 resolveurs_pod apres ESS_ALLOY2="$(date -u '+%a %Y-%m-%d %H:%M:%S UTC')" ESS_KUBE_N=0
+    passe P5-http500-kube0           OK 0 resolveurs_pod apres ESS_HTTP=500 ESS_KUBE_N=0
+    passe P5b-http500-kube3          KO 1 resolveurs_pod apres ESS_HTTP=500 ESS_KUBE_N=3
+    passe P6-sans-mdp-kube0          OK 0 resolveurs_pod apres ESS_MDP=0 ESS_KUBE_N=0
+    passe P7-alloy-illisible         OK 0 resolveurs_pod apres ESS_ALLOY= ESS_KUBE_N=0
+    passe P8-kube1-loki0-temoin      KO 1 resolveurs_pod apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=1
+    passe P9-tronque                 KO 1 resolveurs_pod apres ESS_TEMOIN=1 ESS_LOKI_N=5000 ESS_KUBE_N=0
+    passe P9b-loki2-sans-temoin      KO 1 resolveurs_pod apres ESS_TEMOIN=0 ESS_LOKI_N=2 ESS_KUBE_N=0
+    echo "# P10 : Loki injoignable, avant et après, kubectl 0 puis 3"
+    for c in resolveurs_pod scan_saut_suspendre reprendre_cronjob reprendre_pv h2_releve cilium; do
+      for k in 0 3; do
+        if [ "$k" = 0 ]; then a=OK; else a=KO; fi
+        if [ "$c" = h2_releve ]; then ca=0; elif [ "$k" = 0 ]; then ca=0; else ca=1; fi
+        for v in avant apres; do passe "P10-$c-k$k-$v" "$a" "$ca" "$c" "$v" ESS_HTTP=000 ESS_KUBE_N=$k; done
+      done
+    done
+    echo "# chacun des six jugé par Loki (après) : Loki 0 et témoin, puis Loki 1"
+    for c in resolveurs_pod scan_saut_suspendre reprendre_cronjob reprendre_pv h2_releve cilium; do
+      if [ "$c" = h2_releve ]; then ca=0; else ca=1; fi
+      passe "J-$c-loki0" OK 0 "$c" apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0
+      passe "J-$c-loki1" KO "$ca" "$c" apres ESS_TEMOIN=1 ESS_LOKI_N=1 ESS_KUBE_N=0
+    done
+    echo "# correction de 23:32 UTC : P13 à P17, et code de 84563c6 (v84) sur P13 et P14"
+    passe P13-cronjob-avant-t1             OK 0 reprendre_cronjob apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0 ESS_KUBE_AVANT=2
+    passe P13-v84-cronjob-avant-t1         KO 1 reprendre_cronjob v84 ESS_LIB=$D/v84/evenements-loki.sh ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0 ESS_KUBE_AVANT=2
+    passe P14-cilium-avant-pods            OK 0 cilium apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0 ESS_KUBE_AVANT=2
+    passe P14-v84-cilium-avant-pods        KO 1 cilium v84 ESS_LIB=$D/v84/evenements-loki.sh ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=0 ESS_KUBE_AVANT=2
+    passe P15-cronjob-apres-t1-loki0       KO 1 reprendre_cronjob apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=1
+    passe P15b-cilium-apres-pods-loki0     KO 1 cilium apres ESS_TEMOIN=1 ESS_LOKI_N=0 ESS_KUBE_N=1
+    passe P16-alloy-apres-debut-loki2      KO 1 resolveurs_pod apres ESS_ALLOY="$(date -u '+%a %Y-%m-%d %H:%M:%S UTC')" ESS_LOKI_N=2 ESS_KUBE_N=0
+    passe P17-sans-mdp-kube0               OK 0 resolveurs_pod apres ESS_MDP=0 ESS_KUBE_N=0
+    echo "# P10 bis : Loki injoignable, Events antérieurs à la fenêtre seulement (2), avant et après"
+    for c in reprendre_cronjob cilium resolveurs_pod; do
+      if [ "$c" = resolveurs_pod ]; then a=OK; ca=0; else a=KO; ca=1; fi
+      for v in avant apres; do passe "P10b-$c-av2-$v" "$a" "$ca" "$c" "$v" ESS_HTTP=000 ESS_KUBE_N=0 ESS_KUBE_AVANT=2; done
+    done
+## bilan, bibliothèque corrigée
+# P1 à P9, P12 sur resolveurs_pod (après)
+P1-loki0-temoin-kube0              resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:36Z (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+P2-loki2                           resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:36Z (Loki, 2 ligne(s)) : 2 (attendu : 0)
+P3-temoin-jamais-kube0             resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:36Z (kubectl, Loki non jugé : aucune ligne evenements-k8s dans les 120 s qui suivent le con
+P3b-temoin-jamais-kube3            resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:36Z (kubectl, Loki non jugé : aucune ligne evenements-k8s dans les 120 s qui suivent le con
+P3c-temoin-3e-appel                resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+P4-alloy-redemarre                 resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : Alloy démarré le 2026-11-09T23:34:07Z, après le début de 
+P4b-alloy-redemarre-kube3          resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : Alloy démarré le 2026-11-09T23:34:07Z, après le début de 
+P4c-alloy-change-pendant           resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : démarrage d'Alloy changé pendant la lecture (1794267247)) :
+P5-http500-kube0                   resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : témoin illisible (HTTP 500)) : 0
+P5b-http500-kube3                  resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : témoin illisible (HTTP 500)) : 3 (attendu : 0)
+P6-sans-mdp-kube0                  resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : mot de passe de l'auditeur absent) : 0
+P7-alloy-illisible                 resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, Loki non jugé : démarrage d'Alloy illisible sur sc-stockage) : 0
+P8-kube1-loki0-temoin              resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:37Z (kubectl, 1 dans la fenêtre, absent(s) de Loki, qui ne juge donc pas cette fenêtre) : 
+P9-tronque                         resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:37Z (Loki, 1000 ligne(s) au moins) : 1000 (attendu : 0)
+P9b-loki2-sans-temoin              resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:37Z (Loki, 2 ligne(s)) : 2 (attendu : 0)
+# P10 : Loki injoignable, avant et après, kubectl 0 puis 3
+P10-resolveurs_pod-k0-avant        resolveurs_pod      avant   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 0
+P10-resolveurs_pod-k0-apres        resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-resolveurs_pod-k3-avant        resolveurs_pod      avant   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 3 (attendu : 0)
+P10-resolveurs_pod-k3-apres        resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:38Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+P10-scan_saut_suspendre-k0-avant   scan_saut_suspendre avant   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 0
+P10-scan_saut_suspendre-k0-apres   scan_saut_suspendre apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-scan_saut_suspendre-k3-avant   scan_saut_suspendre avant   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 3 (attendu : 0)
+P10-scan_saut_suspendre-k3-apres   scan_saut_suspendre apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:38Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+P10-reprendre_cronjob-k0-avant     reprendre_cronjob   avant   verdict OK code 0   | conforme | OK   événements du CronJob du scan (MissSchedule compris) : 0
+P10-reprendre_cronjob-k0-apres     reprendre_cronjob   apres   verdict OK code 0   | conforme | OK   événements du CronJob du scan (MissSchedule compris) (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-reprendre_cronjob-k3-avant     reprendre_cronjob   avant   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) : 3 (attendu : 0)
+P10-reprendre_cronjob-k3-apres     reprendre_cronjob   apres   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+P10-reprendre_pv-k0-avant          reprendre_pv        avant   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 0
+P10-reprendre_pv-k0-apres          reprendre_pv        apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:38Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-reprendre_pv-k3-avant          reprendre_pv        avant   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:38Z : 3 (attendu : 0)
+P10-reprendre_pv-k3-apres          reprendre_pv        apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:39Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+P10-h2_releve-k0-avant             h2_releve           avant   verdict OK code 0   | conforme | OK   événements FailedCreate depuis H2 : 0
+P10-h2_releve-k0-apres             h2_releve           apres   verdict OK code 0   | conforme | OK   événements FailedCreate depuis H2 (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-h2_releve-k3-avant             h2_releve           avant   verdict KO code 0   | conforme | KO   événements FailedCreate depuis H2 : 3 (attendu : 0)
+P10-h2_releve-k3-apres             h2_releve           apres   verdict KO code 0   | conforme | KO   événements FailedCreate depuis H2 (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+P10-cilium-k0-avant                cilium              avant   verdict OK code 0   | conforme | OK   événements Pulling des pods de Cilium : 0
+P10-cilium-k0-apres                cilium              apres   verdict OK code 0   | conforme | OK   événements Pulling des pods de Cilium (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+P10-cilium-k3-avant                cilium              avant   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium : 3 (attendu : 0)
+P10-cilium-k3-apres                cilium              apres   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 3 (attendu : 0)
+# chacun des six jugé par Loki (après) : Loki 0 et témoin, puis Loki 1
+J-resolveurs_pod-loki0             resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:39Z (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-resolveurs_pod-loki1             resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:39Z (Loki, 1 ligne(s)) : 1 (attendu : 0)
+J-scan_saut_suspendre-loki0        scan_saut_suspendre apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:39Z (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-scan_saut_suspendre-loki1        scan_saut_suspendre apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:39Z (Loki, 1 ligne(s)) : 1 (attendu : 0)
+J-reprendre_cronjob-loki0          reprendre_cronjob   apres   verdict OK code 0   | conforme | OK   événements du CronJob du scan (MissSchedule compris) (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-reprendre_cronjob-loki1          reprendre_cronjob   apres   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) (Loki, 1 ligne(s)) : 1 (attendu : 0)
+J-reprendre_pv-loki0               reprendre_pv        apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:40Z (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-reprendre_pv-loki1               reprendre_pv        apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:40Z (Loki, 1 ligne(s)) : 1 (attendu : 0)
+J-h2_releve-loki0                  h2_releve           apres   verdict OK code 0   | conforme | OK   événements FailedCreate depuis H2 (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-h2_releve-loki1                  h2_releve           apres   verdict KO code 0   | conforme | KO   événements FailedCreate depuis H2 (Loki, 1 ligne(s)) : 1 (attendu : 0)
+J-cilium-loki0                     cilium              apres   verdict OK code 0   | conforme | OK   événements Pulling des pods de Cilium (Loki, témoin E3 vu, kubectl 0 dans la fenêtre) : 0
+J-cilium-loki1                     cilium              apres   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium (Loki, 1 ligne(s)) : 1 (attendu : 0)
+# correction de 23:32 UTC : P13 à P17, et code de 84563c6 (v84) sur P13 et P14
+P13-cronjob-avant-t1               reprendre_cronjob   apres   verdict OK code 0   | conforme | OK   événements du CronJob du scan (MissSchedule compris) (Loki, témoin E3 vu, kubectl 0 dans la fenêtre, 2 sans borne) : 0
+P13-v84-cronjob-avant-t1           reprendre_cronjob   v84     verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) (kubectl, 2 absent(s) de Loki, qui ne juge donc pas cette fenêtre) : 2 (attendu : 0)
+P14-cilium-avant-pods              cilium              apres   verdict OK code 0   | conforme | OK   événements Pulling des pods de Cilium (Loki, témoin E3 vu, kubectl 0 dans la fenêtre, 2 sans borne) : 0
+P14-v84-cilium-avant-pods          cilium              v84     verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium (kubectl, 2 absent(s) de Loki, qui ne juge donc pas cette fenêtre) : 2 (attendu : 0)
+P15-cronjob-apres-t1-loki0         reprendre_cronjob   apres   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) (kubectl, 1 dans la fenêtre, absent(s) de Loki, qui ne juge donc pas cette fenêtre) : 1 
+P15b-cilium-apres-pods-loki0       cilium              apres   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium (kubectl, 1 dans la fenêtre, absent(s) de Loki, qui ne juge donc pas cette fenêtre) : 1 (attendu : 0)
+P16-alloy-apres-debut-loki2        resolveurs_pod      apres   verdict KO code 1   | conforme | KO   événements PolicyViolation depuis 2026-11-09T23:33:41Z (Loki, 2 ligne(s)) : 2 (attendu : 0)
+P17-sans-mdp-kube0                 resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:41Z (kubectl, Loki non jugé : mot de passe de l'auditeur absent) : 0
+# P10 bis : Loki injoignable, Events antérieurs à la fenêtre seulement (2), avant et après
+P10b-reprendre_cronjob-av2-avant   reprendre_cronjob   avant   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) : 2 (attendu : 0)
+P10b-reprendre_cronjob-av2-apres   reprendre_cronjob   apres   verdict KO code 1   | conforme | KO   événements du CronJob du scan (MissSchedule compris) (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 2 (attendu : 0)
+P10b-cilium-av2-avant              cilium              avant   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium : 2 (attendu : 0)
+P10b-cilium-av2-apres              cilium              apres   verdict KO code 1   | conforme | KO   événements Pulling des pods de Cilium (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 2 (attendu : 0)
+P10b-resolveurs_pod-av2-avant      resolveurs_pod      avant   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:41Z : 0
+P10b-resolveurs_pod-av2-apres      resolveurs_pod      apres   verdict OK code 0   | conforme | OK   événements PolicyViolation depuis 2026-11-09T23:33:41Z (kubectl, Loki non jugé : témoin illisible (HTTP 000)) : 0
+## appels de P16 (témoin : 0 interrogation) et P17
+    kubectl get events -A --field-selector reason=PolicyViolation -o json
+    ssh n°1
+    curl compte expr={source="evenements-k8s"} | json | reason="PolicyViolation" de=1794267221000 a=1794267252000 max=1000 -> 2
+    --
+    kubectl get events -A --field-selector reason=PolicyViolation -o json
+### sortie complète de P13
+    ## événements du CronJob du scan (MissSchedule compris) depuis la reprise : Loki (E1 (a)) depuis 2026-11-09T23:33:40Z, kubectl : 2, borné au même début : 0
+      E3 : ligne evenements-k8s postérieure au contrôle vue après 0 s
+      Loki : 0 ligne(s) de 23:33:40 à 23:34:10 UTC ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+    OK   événements du CronJob du scan (MissSchedule compris) (Loki, témoin E3 vu, kubectl 0 dans la fenêtre, 2 sans borne) : 0
+    fin du fragment, ko=0
+    trap inchangé
+    ev-loki absent
+## témoins négatifs du banc : bibliothèque corrigée faussée, passages signalés attendus au moins 1
+  M1-sans-branche-kubectl : 3 signalé(s) : P8-kube1-loki0-temoin P15-cronjob-apres-t1-loki0 P15b-cilium-apres-pods-loki0
+  M2-compte-loki-ignore : 10 signalé(s) : P2-loki2 P9-tronque P9b-loki2-sans-temoin J-resolveurs_pod-loki1 J-scan_saut_suspendre-loki1 J-reprendre_cronjob-loki1 J-reprendre_pv-loki1 J-h2_releve-loki1 J-cilium-loki1 P16-alloy-apres-debut-loki2
+  M3-repertoire-laisse : 24 signalé(s) : P1-loki0-temoin-kube0 P3-temoin-jamais-kube0 P3c-temoin-3e-appel P4-alloy-redemarre P4c-alloy-change-pendant P5-http500-kube0 P7-alloy-illisible P10-resolveurs_pod-k0-apres P10-scan_saut_suspendre-k0-apres P10-reprendre_cronjob-k0-apres P10-reprendre_pv-k0-apres P10-h2_releve-k0-apres P10-h2_releve-k3-apres P10-cilium-k0-apres J-resolveurs_pod-loki0 J-scan_saut_suspendre-loki0 J-reprendre_cronjob-loki0 J-reprendre_pv-loki0 J-h2_releve-loki0 J-h2_releve-loki1 J-cilium-loki0 P13-cronjob-avant-t1 P14-cilium-avant-pods P10b-resolveurs_pod-av2-apres
+  M4-msg-affiche : 10 signalé(s) : P2-loki2 P9-tronque P9b-loki2-sans-temoin J-resolveurs_pod-loki1 J-scan_saut_suspendre-loki1 J-reprendre_cronjob-loki1 J-reprendre_pv-loki1 J-h2_releve-loki1 J-cilium-loki1 P16-alloy-apres-debut-loki2
+  M5-borne-ignoree : 2 signalé(s) : P13-cronjob-avant-t1 P14-cilium-avant-pods
+  M6-compte-seulement-si-juge : 1 signalé(s) : P16-alloy-apres-debut-loki2
+## shellcheck 0.11.0, sans numéros de ligne, bfd7443 et après correction
+  preuves.sh : avant 172, après 172, différence : 0
+  cilium.sh : avant 6, après 6, différence : 0
+  durcissement.sh : avant 19, après 19, différence : 0
+  evenements-loki.sh : 0 avertissement
+## fin : 2026-11-09T23:34:35Z

@@ -171,9 +171,13 @@ etape_verifier() {
   attendu "digests des images en cours" "$n" "$(printf '%s\n' "${AMD64[cilium]}" "${AMD64[operator-generic]}" | sort | paste -sd,)"
   kubectl -n kube-system get events -o json | jq -r '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")))
     | select(.reason == "Pulled" or .reason == "Pulling")] | group_by(.reason) | map("\(.[0].reason) : \(length), \(.[0].message | .[0:120])") | .[]'
-  ev_k=$(kubectl -n kube-system get events -o json | jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length') || true
-  # fenêtre bornée au déploiement : plus ancienne création des pods de Cilium (chantier des Events, E4, brique 08c)
-  ev_juge "événements Pulling des pods de Cilium" "$EV_PULLING_CILIUM" "$(jq -r '[.[].metadata.creationTimestamp] | min // ""' "$T/pods.json")" "$ev_k"
+  ev_j=$(kubectl -n kube-system get events -o json) || true
+  ev_k=$(jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length' <<< "$ev_j") || true
+  # fenêtre bornée au déploiement : plus ancienne création des pods de Cilium (chantier des Events, E4, brique 08c ; borne de kubectl
+  # au même début, corrigé à 23:32 UTC)
+  ev_d=$(jq -r '[.[].metadata.creationTimestamp] | min // ""' "$T/pods.json") || true
+  ev_b=$(ev_borne '.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling"' "$ev_d" <<< "$ev_j") || true
+  ev_juge "événements Pulling des pods de Cilium" "$EV_PULLING_CILIUM" "$ev_d" "$ev_k" "$ev_b"
   attendu "événements Pulling des pods de Cilium ($EV_SOURCE)" "$EV_N" 0
   echo "## adresses"
   for n in sc-confiance sc-build sc-stockage; do

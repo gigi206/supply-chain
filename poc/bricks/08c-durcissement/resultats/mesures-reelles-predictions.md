@@ -1322,3 +1322,33 @@ Rien n'a été lu ni écrit dans le cluster, Loki, Grafana ou les VM. Les additi
 **Hypothèse à écrire comme telle (point 3 du conseiller).** « Une ligne postérieure au contrôle borne le retard d'ingestion » est une hypothèse, pas un fait. Le `lastTimestamp` d'un Event peut précéder sa réception par l'observateur d'Alloy, et une ligne d'un objet n'atteste pas que les lignes des autres objets sont déjà dans Loki. À mesurer lors du passage en lecture seule.
 
 **Temps du chantier** : 8 h 05 avant ce créneau, plus le créneau ouvert à 23:18:59 UTC, soit environ 8 h 20 à 23:31 UTC pour 4 h estimées.
+
+## Additif du 09/11/2026, 23:34 UTC : correction de 23:32 UTC appliquée, P13 à P17 tenues, avant tout push
+
+Rien n'a été lu ni écrit dans le cluster, Loki, Grafana ou les VM. Journal : [evenements-e4-borne-essai-local.log](evenements-e4-borne-essai-local.log). Le premier journal, `evenements-e4-essai-local.log`, est gardé tel quel.
+
+**Modifications.**
+- `evenements-loki.sh` :
+  - nouvelle fonction `ev_borne` (compte de kubectl borné, à la seconde, sur l'horodatage qu'Alloy donne à la ligne) ;
+  - cinquième argument facultatif d'`ev_juge` ;
+  - compte de Loki demandé dès que le mot de passe est présent et le début lisible, sans attendre le témoin si une autre raison empêche de juger ;
+  - en-tête corrigé, hypothèse du témoin écrite comme telle.
+- `preuves.sh` (3307 à 3311) et `cilium.sh` (174 à 181) : les Events sont lus une fois par kubectl, puis comptés deux fois, sans borne et au même début que Loki.
+- Les quatre contrôles déjà bornés ne changent pas.
+
+**Résultats : 65 passages, 65 conformes**, dont les 51 du premier essai, inchangés.
+- P13 tenue : 2 Events du CronJob antérieurs à `t1`, Loki 0, témoin vu : OK, jugé par Loki. Avec le code de `84563c6`, KO, comme prédit.
+- P14 tenue : même cas pour Cilium : OK ; KO avec `84563c6`.
+- P15 tenue : un Event après le début, absent de Loki : KO, pour le CronJob comme pour Cilium.
+- P16 tenue : Alloy démarré après le début, Loki 2 lignes : KO, sans aucune interrogation du témoin.
+- P17 tenue : mot de passe absent, aucun appel à `curl` ni à `ssh`.
+- P10 bis : Loki injoignable, seulement des Events antérieurs à la fenêtre ; le nouveau code rend le même verdict que `bfd7443` pour le CronJob, Cilium et `resolveurs_pod`. Pour le CronJob et Cilium, c'est donc encore le faux KO de l'ancien code : il ne disparaît que si Loki peut juger.
+- Six bibliothèques faussées, toutes repérées :
+  - les quatre du premier essai : 3, 10, 24 et 10 passages ;
+  - la borne ignorée : 2 passages, P13 et P14 ;
+  - le compte de Loki limité aux cas jugés : 1 passage, P16.
+- `shellcheck` 0.11.0 : sans différence sur les trois scripts par rapport à `bfd7443`, aucun avertissement sur `evenements-loki.sh`.
+
+**Ce qui reste vrai de l'additif de 23:29 UTC.** Les limites (rien de vérifié sur le vrai Loki) et les points ouverts (règle de verdict à confirmer, passage en lecture seule sur accord, push) sont inchangés. S'y ajoute l'hypothèse du témoin, à mesurer lors du passage en lecture seule.
+
+**Temps du chantier** : environ 8 h 25 à 23:34 UTC, pour 4 h estimées. Le créneau, ouvert à 23:18:59 UTC, a duré environ 16 min.
