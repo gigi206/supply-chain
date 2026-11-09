@@ -1263,3 +1263,35 @@ Temps du chantier avant ce créneau : 8 h 05 pour 4 h estimées.
 - Là où Loki ne juge pas, le défaut de TTL n'est pas levé.
 - Un rechargement d'Alloy par SIGHUP ne change pas `ActiveEnterTimestamp` : son effet sur la collecte des Events n'est pas vu par le témoin.
 - Autres lectures d'Events, non touchées : `kyverno-admission.sh:386` (un contrôle compté), `preuves.sh:219` et `:259`, `politique.sh:480`, `stockage.sh:234`, `scan-saut-reprise-verif.sh:41`, `essais-h5-scan.sh:47`, `durcissement.sh:271` (affiché seulement), `journalisation.sh:70` et `:71`.
+
+## Additif du 09/11/2026, 23:29 UTC : suite d'E4, six contrôles modifiés, essai hors cluster conforme
+
+Dans le créneau ouvert à 23:18:59 UTC, sur l'accord de 23:23 UTC. Rien n'a été lu ni écrit dans le cluster, Loki, Grafana, Prometheus, Zot ou les VM. Journal : [evenements-e4-essai-local.log](evenements-e4-essai-local.log).
+
+**Modifications.**
+- Nouveau fichier `evenements-loki.sh` (fonction `ev_juge`, témoin E3 (b) avec attente bornée, règle de verdict de l'additif de 23:23 UTC).
+- `preuves.sh` : chargement du fichier (ligne 122) ; contrôles de `resolveurs_pod` (3189 à 3192), `scan_saut_suspendre` (3245 à 3248), `scan_saut_reprendre` (Events du CronJob, 3307 à 3309 ; `PolicyViolation`, 3314 à 3317).
+- `durcissement.sh` : chargement (ligne 35) ; contrôle de `h2_releve` (271 à 273). La ligne `PolicyViolation` affichée seulement (274) n'est pas touchée.
+- `08-trust-plane/cilium.sh` : chargement (ligne 28) ; contrôle `Pulling` (174 à 177), fenêtre ouverte à la plus ancienne création des pods de Cilium.
+
+**Essai hors cluster : 51 passages, 51 conformes.**
+- P1 à P9 tenues, sur `resolveurs_pod`, avec des variantes : kubectl 3 quand Loki ne juge pas (KO), témoin vu au 3e appel (OK, jugé par Loki), démarrage d'Alloy changé pendant la lecture (non jugé), Loki 2 lignes sans témoin (KO).
+- P3 : 13 interrogations du témoin et 12 attentes de 10 s, comme prédit. P6 : aucun appel à `curl` ni à `ssh`.
+- P10 tenue : Loki injoignable, chacun des six rend le même verdict et le même code de sortie que l'ancien fragment, extrait de `bfd7443`, sur kubectl 0 (OK) et 3 (KO). `h2_releve` garde sa sémantique (`ko=1`, code 0).
+- Chacun des six jugé par Loki : 0 ligne et témoin vu donne OK ; 1 ligne donne KO.
+- P11 tenue : `shellcheck` 0.11.0 sans différence sur les trois scripts (172, 6 et 19 avertissements avant et après, sans numéros de ligne) ; `evenements-loki.sh` sans avertissement, SC2034 désactivé dans le fichier. Aucune sortie inattendue sous `set -euo pipefail`.
+- P12 tenue : répertoire `ev-loki` absent et `trap` inchangé après chaque passage ; ni le champ `msg` ni le mot de passe factice dans aucune sortie.
+- Témoins négatifs du banc : quatre bibliothèques faussées (branche kubectl retirée, compte de Loki ignoré, répertoire laissé, `msg` affiché) sont repérées par 1, 9, 19 et 9 passages.
+- Défaut du banc, pas de la bibliothèque : au premier passage, P4 donnait « démarrage illisible » au lieu de « démarré après le début de la fenêtre ». La date factice était écrite en français par le lanceur. `LC_ALL=C` a été ajouté au lanceur, la bibliothèque n'a pas changé, et le journal archive le second passage.
+
+**Ce que l'essai ne prouve pas.**
+- Le fonctionnement sur le vrai Grafana et le vrai Loki : forme réelle des réponses, filtres `namespace`, `kind` et `name` de `EV_CRONJOB_SCAN` et `EV_PULLING_CILIUM` jamais vérifiés sur des lignes réelles, délai réel du témoin.
+- Les verdicts des étapes rejouées, qui écrivent dans le cluster.
+- Le format réel d'`ActiveEnterTimestamp` n'est pas rejoué ici ; `evenements.sh` l'a lu avec `date -ud` le 09/11 sans erreur.
+
+**Reste ouvert, chacun sur accord du propriétaire.**
+- Confirmer la règle de verdict (lecture d'E1 (a)) : une ligne vue par kubectl et absente de Loki donne KO, et Loki non jugé laisse le verdict à kubectl.
+- Passer les quatre requêtes, en lecture seule, sur des fenêtres postérieures au 09/11 à 17:08 UTC, pour vérifier les filtres et le délai du témoin.
+- Push des commits.
+
+**Temps** : de 23:18:59 UTC à 23:29 UTC pour cette partie, dans le créneau de 2 h.

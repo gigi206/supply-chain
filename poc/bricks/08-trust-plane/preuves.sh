@@ -119,6 +119,7 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/politique.sh"   # fonctions de J6 et commun.sh ; les étapes de politique.sh ne sont pas lancées
+. "$here/../08c-durcissement/evenements-loki.sh"   # chantier des Events, E4 : six contrôles lus dans Loki (brique 08c)
 # Ajout du 09/11/2026 vers 14:27 UTC, non exécuté sur le cluster : les étapes de politique.sh restaient définies, donc
 # « preuves.sh admission » (ou porte, parite…) lançait l'étape de J6 sous le journal preuves-<étape>.log, et l'usage les listait.
 # Retirées ici, comme dans bascule.sh (brique 03) ; seules les étapes de J8 ci-dessous sont appelables.
@@ -3185,8 +3186,10 @@ etape_resolveurs_pod() { # brique 08c : démarrage d'un nouveau pod des résolve
     and .objectRef.namespace == $ns and (.objectRef.subresource // "") == "" and .stage == "ResponseComplete" and (.requestURI | test("dryRun") | not)
     and (.requestReceivedTimestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) >= ($t | fromdateiso8601)) | "\(.user.username) \(.responseStatus.code)"' | tee "$T/rp-audit"
   ba_attendu "créations" "$(paste -sd, "$T/rp-audit")" "system:serviceaccount:kube-system:replicaset-controller 201"
-  ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
-    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+  ev_juge "événements PolicyViolation depuis $t0" "$EV_PV" "$t0" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+  ba_attendu "événements PolicyViolation depuis $t0 ($EV_SOURCE)" "$EV_N" 0
   ba_attendu "PipelineRuns créés depuis $t0" "$(kubectl get pipelinerun -n builds -o json | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
   echo "## témoin : étape resolveurs"
   etape_resolveurs
@@ -3239,8 +3242,10 @@ etape_scan_saut_suspendre() { # brique 08c, première moitié : CronJob du scan 
   for _ in $(seq 10); do r=$(ss_audit patch cronjobs "$t0"); [ -n "$r" ] && break; sleep 1; done
   echo "$r" | sed 's/^/  audit : /'   # l'audit ne garde qu'environ 16 h (dix fichiers de 100 Mo) : ce journal en garde la copie
   ba_attendu "suspension à l'audit (utilisateur, code)" "$(cut -d' ' -f2- <<< "$r" | paste -sd,)" "system:admin 200"
-  ba_attendu "événements PolicyViolation depuis $t0" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
-    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+  ev_juge "événements PolicyViolation depuis $t0" "$EV_PV" "$t0" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+  ba_attendu "événements PolicyViolation depuis $t0 ($EV_SOURCE)" "$EV_N" 0
   r=$(sur sc-stockage "curl -fsS -G http://127.0.0.1:9090/api/v1/query --data-urlencode query=scan_dernier_referrer_timestamp_seconds" \
     | jq -r '.data.result[0].value[1] | tonumber | floor')
   echo "passage sauté prévu : $p ; reprise par scan_saut_reprendre après $(date -u -d "@$(($(date -u -d "$p" +%s) + 3660))" +%Y-%m-%dT%H:%M:%SZ)"
@@ -3299,14 +3304,17 @@ etape_scan_saut_reprendre() { # brique 08c, seconde moitié : passage sauté con
   ba_attendu "CronJob du scan : planning, échéance, suspendu, passages actifs" "$(ss_etat)" "30 9 * * *|3600|false|0"
   ba_attendu "dernier passage" "$(ss_dernier)" "$e0"
   ba_attendu "Jobs du scan créés depuis $p" "$(kubectl get job -n scan -o json | jq --arg t "$p" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
-  ba_attendu "événements du CronJob du scan (MissSchedule compris)" "$(kubectl get events -n scan -o json \
-    | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length')" 0
+  ev_k=$(kubectl get events -n scan -o json | jq '[.items[] | select(.involvedObject.kind == "CronJob")] | length') || true
+  ev_juge "événements du CronJob du scan (MissSchedule compris) depuis la reprise" "$EV_CRONJOB_SCAN" "$t1" "$ev_k"   # E4 (08c)
+  ba_attendu "événements du CronJob du scan (MissSchedule compris) ($EV_SOURCE)" "$EV_N" 0
   r=$(ss_audit patch cronjobs "$t1")
   echo "$r" | sed 's/^/  audit : /'
   ba_attendu "reprise à l'audit (utilisateur, code)" "$(cut -d' ' -f2- <<< "$r" | paste -sd,)" "system:admin 200"
   ba_attendu "créations de Jobs dans scan à l'audit depuis $p" "$(ss_audit create jobs "$p" | grep -c . || true)" 0
-  ba_attendu "événements PolicyViolation depuis $t1" "$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
-    | jq --arg t "$t1" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length')" 0
+  ev_k=$(kubectl get events -A --field-selector reason=PolicyViolation -o json \
+    | jq --arg t "$t1" '[.items[] | select(.metadata.creationTimestamp >= $t)] | length') || true
+  ev_juge "événements PolicyViolation depuis $t1" "$EV_PV" "$t1" "$ev_k"   # chantier des Events, E4 (08c) : Loki, sinon kubectl
+  ba_attendu "événements PolicyViolation depuis $t1 ($EV_SOURCE)" "$EV_N" 0
   echo "prochain passage : $(date -u -d "@$(($(date -u -d "$p" +%s) + 86400))" +%Y-%m-%dT%H:%M:%SZ) ; ScanEnRetard reste active jusqu'au referrer suivant"
 }
 

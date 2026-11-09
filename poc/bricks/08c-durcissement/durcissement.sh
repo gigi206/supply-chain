@@ -32,6 +32,7 @@ export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
 b08=$here/../08-trust-plane
 . "$b08/commun.sh"
+. "$here/evenements-loki.sh"   # chantier des Events, E4 : contrôle de h2_releve lu dans Loki
 C=$here/config
 B08=$here/../08b-rke2/config
 A08B=$B08/audit-policy.yaml
@@ -267,7 +268,9 @@ etape_h2_releve() { # écarts des règles : pas de balayage de fond, donc les po
   echo "## rien de refusé depuis H2"
   kubectl get jobs -A -o json | jq -r --arg t "$t0" '[.items[] | select(.metadata.creationTimestamp > $t)] | group_by(.metadata.namespace)
     | map("  \(.[0].metadata.namespace) : \(length) Job(s) créé(s) depuis H2, \([.[] | select(.status.succeeded == 1)] | length) réussi(s)") | .[]'
-  attendu "événements FailedCreate depuis H2" "$(kubectl get events -A --field-selector reason=FailedCreate -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length')" 0
+  ev_k=$(kubectl get events -A --field-selector reason=FailedCreate -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length') || true
+  ev_juge "événements FailedCreate depuis H2" "$EV_FAILEDCREATE" "$t0" "$ev_k"   # chantier des Events, E4 : Loki, sinon kubectl
+  attendu "événements FailedCreate depuis H2 ($EV_SOURCE)" "$EV_N" 0
   echo "événements PolicyViolation depuis H2 : $(kubectl get events -A --field-selector reason=PolicyViolation -o json | jq --arg t "$t0" '[.items[] | select((.lastTimestamp // .eventTime) > $t)] | length')"
   [ "$ko" = 0 ] || { echo "KO   h2_releve" >&2; exit 1; }
   echo "RÉSULTAT : relevé fait"

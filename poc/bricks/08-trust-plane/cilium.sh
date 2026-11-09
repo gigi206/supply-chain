@@ -25,6 +25,7 @@ export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/commun.sh"
+. "$here/../08c-durcissement/evenements-loki.sh"   # chantier des Events, E4 (brique 08c) : contrôle Pulling lu dans Loki
 CILIUM_VER=1.20.4
 CHART=quay.io/cilium/charts/cilium
 CHART_MANIFESTE=sha256:712e1f65bf30533d117d1996ac3ace3efdb2521302d31ee887b1e45806bd6b64
@@ -170,7 +171,10 @@ etape_verifier() {
   attendu "digests des images en cours" "$n" "$(printf '%s\n' "${AMD64[cilium]}" "${AMD64[operator-generic]}" | sort | paste -sd,)"
   kubectl -n kube-system get events -o json | jq -r '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")))
     | select(.reason == "Pulled" or .reason == "Pulling")] | group_by(.reason) | map("\(.[0].reason) : \(length), \(.[0].message | .[0:120])") | .[]'
-  attendu "événements Pulling des pods de Cilium" "$(kubectl -n kube-system get events -o json | jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length')" 0
+  ev_k=$(kubectl -n kube-system get events -o json | jq '[.items[] | select(.involvedObject.kind == "Pod" and (.involvedObject.name | test("^cilium")) and .reason == "Pulling")] | length') || true
+  # fenêtre bornée au déploiement : plus ancienne création des pods de Cilium (chantier des Events, E4, brique 08c)
+  ev_juge "événements Pulling des pods de Cilium" "$EV_PULLING_CILIUM" "$(jq -r '[.[].metadata.creationTimestamp] | min // ""' "$T/pods.json")" "$ev_k"
+  attendu "événements Pulling des pods de Cilium ($EV_SOURCE)" "$EV_N" 0
   echo "## adresses"
   for n in sc-confiance sc-build sc-stockage; do
     attendu "podCIDRs de $n (CiliumNode / k3s)" "$(kubectl get ciliumnode "$n" -o jsonpath='{.spec.ipam.podCIDRs}')" "$(kubectl get node "$n" -o jsonpath='{.spec.podCIDRs}')"
