@@ -1,0 +1,12 @@
+# kyverno-admission.sh image, 2026-11-09T13:53:13Z
+## base : 192.168.161.13:5000/amont/kyverno/kyverno@sha256:6f0c520054d863a4a3df53ac7bb67d571d20421b77b99809013a62ec5f1d5947 (manifeste amd64 de l'index sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955)
+OK   manifeste de base lu, digest conforme
+## envoi : 192.168.161.13:5000/essais/kyverno-correctif:v1.19.2-v2 (poc-ecriture)
+image corrigée : sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159789d9ab1cf75adc69db6589e09f0f96d4718a31508c6a3047ca70d8e
+## contrôles de l'image poussée
+OK   4 couches (3 officielles et la couche ajoutée)
+OK   trois premières couches identiques à l'officielle (base, kodata, binaire officiel masqué)
+OK   point d'entrée, utilisateur, environnement identiques : {"Entrypoint":["/ko-app/kyverno"],"User":"65532"}
+OK   binaire de la couche ajoutée identique au binaire construit
+digest écrit dans ~/Documents/git/github/gigi206/supply-chain/poc/bricks/08-trust-plane/resultats/kyverno-admission-image.digest
+bilan : OK

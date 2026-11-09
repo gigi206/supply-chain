@@ -235,3 +235,16 @@ kubectl delete imagevalidatingpolicy -l poc.test/essai=kyverno-admission
 ```
 
 Retirer aussi l'espace `bancc`, s'il n'existait pas avant le passage.
+
+## Additif du 09/11/2026, 13:53 UTC : étape `image` passée, C7 tenue
+
+Accord du propriétaire : « Oui, lance image », en réponse à « Je lance l'étape image (écriture dans Zot) ? ». Les effets et le pire cas avaient été donnés juste avant. Le passage a eu lieu à 13:53:13 UTC ([`kyverno-admission-image.log`](kyverno-admission-image.log)). Bilan : OK.
+
+**Image corrigée** : `sc-stockage.poc.test:5000/essais/kyverno-correctif@sha256:eec37159…`, étiquette `v1.19.2-v2`, poussée par `poc-ecriture`. Son digest est dans [`kyverno-admission-image.digest`](kyverno-admission-image.digest).
+
+**C7 tenue** :
+- 4 couches, dont les 3 premières identiques à celles du manifeste officiel `6f0c5200…` ;
+- point d'entrée `/ko-app/kyverno` et utilisateur 65532 identiques, environnement identique ;
+- binaire relu dans la couche poussée identique au binaire construit (`2b36652a…`).
+
+La copie des identifiants de `poc-ecriture` a été retirée à la sortie (répertoire vide, vérifié). Rien n'a été lu ni écrit dans le cluster. L'image reste dans Zot, comme accepté.
