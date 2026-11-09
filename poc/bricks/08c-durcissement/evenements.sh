@@ -7,6 +7,9 @@
 #   diagnostic (a) dernière ligne evenements-k8s ; (b) journal de sc-stockage dans la fenêtre de R6 ; (c) lignes du composant des Events dans
 #           le journal d'alloy.service (classe d'erreur seulement) ; (d) santé et position du composant, API locale d'Alloy lue par ssh ;
 #           lecture seule, rien redémarré ; accord du propriétaire (« Oui, (a) à (d) », 09/11/2026)
+#   classe  relecture de (c) seule (accord : « Oui, relis la classe »)
+#   redemarrage systemctl restart alloy sur sc-stockage, démarrage relevé avant et après (accord : « Oui, redémarre Alloy »)
+#   verification lecture seule, après redemarrage : lignes evenements-k8s, journal du composant, santé et position
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
 set -euo pipefail
@@ -203,6 +206,52 @@ etape_classe() { # relecture de (c) seule : classe de l'erreur du composant des 
   echo "  lignes : $n ($etat)"
   [ "$n" -gt 0 ] && classes | uniq -c -f1 | head -40 | sed 's/^ */    /'
   date -u '+fin de la relecture %H:%M:%S UTC'
+}
+
+alloy_debut() { sur sc-stockage "systemctl show -p ActiveEnterTimestamp --value alloy" </dev/null; }
+
+etape_redemarrage() { # modification de sc-stockage, accord du propriétaire (« Oui, redémarre Alloy », 09/11/2026)
+  local a0 a1 t
+  a0=$(alloy_debut)
+  [ -n "$a0" ] || { echo "KO   démarrage d'Alloy illisible : rien redémarré"; return 1; }
+  echo "## avant : Alloy actif depuis $(date -ud "$a0" +%Y-%m-%dT%H:%M:%SZ)"
+  t=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  echo "## systemctl restart alloy sur sc-stockage, demandé à $t"
+  sur sc-stockage "sudo systemctl restart alloy" </dev/null
+  a1=$(alloy_debut)
+  echo "## après : Alloy actif depuis $(date -ud "$a1" +%Y-%m-%dT%H:%M:%SZ), $(sur sc-stockage 'systemctl is-active alloy' </dev/null || true)"
+  if [ "$(date -ud "$a1" +%s)" -gt "$(date -ud "$a0" +%s)" ]; then echo "OK   Alloy redémarré"; else echo "KO   Alloy non redémarré"; return 1; fi
+}
+
+etape_verification() { # lecture seule, quelques minutes après redemarrage
+  local d de fin r v=0
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/evenements"' EXIT
+  fin=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  d=$(date -ud "$(alloy_debut)" +%Y-%m-%dT%H:%M:%SZ)
+  de=$(date -ud "$d - 65 minutes" +%Y-%m-%dT%H:%M:%SZ)
+  echo "## Alloy actif depuis $d ; lecture à $fin"
+  echo "## journal d'alloy.service, composant des Events, depuis $d"
+  loki_lignes '{noeud="sc-stockage", unite="alloy.service"} |~ "kubernetes_events|evenements|informer|event watcher|non-Event"' "$d" "$fin"
+  echo "  lignes : $n ($etat)"
+  [ "$n" -gt 0 ] && classes | uniq -c -f1 | head -40 | sed 's/^ */    /'
+  if [ "$etat" = ok ] && grep -q 'watching events for namespace' "$T/lignes" && ! grep -q -E 'event watcher exited with error|failed to start informers' "$T/lignes"
+  then echo "OK   observateur démarré, sans erreur"; else echo "KO   observateur : démarrage absent ou en erreur ($etat)"; v=1; fi
+  echo "## lignes evenements-k8s de $de (démarrage − 65 min) à $fin"
+  loki_lignes '{source="evenements-k8s"}' "$de" "$fin"
+  echo "  lignes : $n ($etat)$([ "$n" -gt 0 ] && echo ", première $(head -1 "$T/lignes" | cut -f1), dernière $(tail -1 "$T/lignes" | cut -f1)")"
+  [ "$n" -gt 0 ] && resume 10
+  if [ "$etat" != erreur ] && [ "$n" -ge 1 ]; then echo "OK   lignes d'Events reçues"; else echo "KO   aucune ligne d'Event ($etat)"; v=1; fi
+  loki_lignes '{source="evenements-k8s"}' "$d" "$fin"
+  echo "  dont horodatées après le démarrage (affiché, non jugé) : $n ($etat)"
+  echo "## composant, API locale d'Alloy"
+  if r=$(sur sc-stockage "curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements" </dev/null 2>/dev/null); then
+    printf '%s' "$r" > "$T/composant.json"
+    jq -r '"  santé : \(.health.state // "-"), \(.health.message // "-"), depuis \(.health.updatedTime // "-")"' "$T/composant.json" | grep -v -i -E 'jeton|token' || true
+    jq -c '.debugInfo // "absent"' "$T/composant.json" | grep -v -i -E 'jeton|token' | sed 's/^/  /' || true
+  else echo "  lecture de l'API d'Alloy impossible"; fi
+  [ "$v" = 0 ] && echo "## bilan : collecte des Events rétablie" || echo "## bilan : collecte non rétablie"
+  return $v
 }
 
 lancer evenements events "$@"

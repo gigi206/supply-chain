@@ -1005,3 +1005,31 @@ Sa classe est **`connection refused`**. Au démarrage d'Alloy de `sc-stockage`, 
 **Conséquences, écrites avant toute action.**
 - D'après le source, un redémarrage d'Alloy recrée l'observateur. L'API répond aujourd'hui, comme le montrent les lectures kubectl de la journée. Un redémarrage devrait donc rétablir la collecte. C'est une prédiction, non vérifiée.
 - Si rien ne change, l'arrêt se reproduira à chaque démarrage d'Alloy de `sc-stockage` antérieur à l'écoute de l'API.
+
+## Additif du 09/11/2026, 17:05 UTC : redémarrage d'Alloy de sc-stockage, prédictions avant l'action
+
+**Accord du propriétaire.** Réponse : « Oui, redémarre Alloy ». Question posée : « Je redémarre Alloy sur sc-stockage puis je vérifie les nouvelles lignes d'Events ? ». La proposition citait les effets et le pire cas :
+- effets : interruption de quelques secondes de toute la collecte de `sc-stockage`, relais compris, et reprise depuis la position de 11:20:08 ;
+- pire cas : perte, jamais mesurée, de lignes relayées pendant l'interruption, ou nouvel échec.
+
+**Commandes**
+- `mise exec -- poc/bricks/08c-durcissement/evenements.sh redemarrage` : `sudo systemctl restart alloy` sur `sc-stockage`, avec le démarrage relevé avant et après.
+- Quelques minutes plus tard, `evenements.sh verification`, en lecture seule. Elle fait 3 requêtes de l'auditeur et 2 commandes ssh : `ActiveEnterTimestamp` et l'API locale d'Alloy.
+- Essai hors cluster : additif de 17:05 UTC de `resultats/evenements-diagnostic-essai.log`.
+
+**Prédictions, avant l'action :**
+
+| # | Prédit | Confiance |
+|---|---|---|
+| P1 | `ActiveEnterTimestamp` postérieur à celui du 07/11, service `active` | Haute |
+| P2 | Journal d'`alloy.service` depuis le redémarrage : « watching events for namespace », sans « event watcher exited with error » ni « failed to start informers » | Haute : l'API répond aujourd'hui |
+| P3 | Santé `healthy` ; `last_event_timestamp` postérieur au 07/11 à 11:20:08 | Haute pour la santé, moyenne pour la position (il faut au moins un Event postérieur à la position, encore présent dans l'API) |
+| P4 | Au moins 1 ligne `evenements-k8s` entre le redémarrage moins 65 min et la vérification. Au démarrage, l'observateur relit les Events encore présents dans l'API (durée de vie d'une heure) ; leurs lignes portent leur propre horodatage, antérieur au redémarrage. | Moyenne : (H-b), l'enregistrement par l'API, n'a pas été lu |
+| P5 | Lignes horodatées après le redémarrage : affichées, non prédites | — |
+
+**Verdict « collecte rétablie »** : P2 et P4 tenues.
+
+**Limites**
+- Loki peut refuser une ligne trop en retard sur la plus récente de son flux. Cette limite n'a pas été relue dans la configuration de la 19b, et une partie des Events relus pourrait manquer.
+- Les Events expirés depuis le 07/11 restent perdus.
+- Les pertes du relais pendant le redémarrage ne sont pas mesurées par ces étapes.
