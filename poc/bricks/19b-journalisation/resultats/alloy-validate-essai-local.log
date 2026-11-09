@@ -1,0 +1,16 @@
+# Essai hors cluster de la correction du défaut « validate && echo » d'etape_alloy (ligne 362), journalisation.sh
+# date : 2026-11-09T22:57:32Z ; rien lu ni écrit dans le cluster, Loki, Zot ou les VM
+# avant : journalisation.sh de ed54995, sha256 bd0cdb2e42c54819625509d82ff3968edaab1b6e6215f83facf115039ef23b99
+# après : journalisation.sh modifié, sha256 d515463c5a0ea751f8bae3068fc16a85a8dee3cabb03ae39b18c7137b0a621dd
+# méthode : fragment du script distant, de « /usr/local/bin/alloy --version » à « systemctl is-active alloy » inclus, lancé sous
+# set -euo pipefail ; le fragment ne contient ni $ ni accent grave, donc le heredoc non protégé le transmet tel quel ;
+# faux alloy (validate rend le code demandé), faux systemctl et faux sleep qui notent leurs appels ;
+# le faux « systemctl is-active » répond toujours active, donc le code 0 de « avant, validate=1 » ne dit rien du vrai is-active
+avant  validate=1  code=0  appels : systemctl daemon-reload;systemctl enable alloy;systemctl restart alloy;sleep 5;systemctl is-active alloy
+avant  validate=0  code=0  appels : systemctl daemon-reload;systemctl enable alloy;systemctl restart alloy;sleep 5;systemctl is-active alloy
+apres  validate=1  code=1  appels : aucun
+    KO   configuration d'alloy refusée : Alloy ni redémarré ni rechargé, mais binaire, service et /etc/alloy/config déjà remplacés
+apres  validate=0  code=0  appels : systemctl daemon-reload;systemctl enable alloy;systemctl restart alloy;sleep 5;systemctl is-active alloy
+# attendu : avant/validate=1 redémarre Alloy avec la configuration refusée (défaut reproduit) ; apres/validate=1 s'arrête en
+# code 1 sans aucun appel à systemctl ; validate=0 : mêmes appels avant et après
+# shellcheck : 11 avertissements avant, 11 après, identiques (comparaison sans numéros de ligne)

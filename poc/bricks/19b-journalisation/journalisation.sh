@@ -359,7 +359,12 @@ fi
 install -m 0644 alloy.service /etc/systemd/system/alloy.service
 cd / && rm -rf /tmp/alloy-installation
 /usr/local/bin/alloy --version | head -1
-/usr/local/bin/alloy validate /etc/alloy/config && echo "configuration valide"
+# Pas de « validate && echo » : sous set -e, un échec dans une liste && n'arrête pas le script (même correction qu'etape_grpc_tls).
+if ! /usr/local/bin/alloy validate /etc/alloy/config; then
+  echo "KO   configuration d'alloy refusée : Alloy ni redémarré ni rechargé, mais binaire, service et /etc/alloy/config déjà remplacés"
+  exit 1
+fi
+echo "configuration valide"
 systemctl daemon-reload
 systemctl enable alloy 2>&1
 systemctl restart alloy
