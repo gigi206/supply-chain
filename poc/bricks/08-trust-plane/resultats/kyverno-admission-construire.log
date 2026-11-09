@@ -1,0 +1,18 @@
+# kyverno-admission.sh construire, 2026-11-09T13:52:05Z
+OK   tête e63308f1e16c
+OK   correctif v2 présent (patch final applicable à l'envers)
+fichiers modifiés ou non suivis : 4 (arbre « sale », comme le binaire officiel)
+go version go1.26.9 linux/amd64
+OK   construit : ~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-admission-v1.19.2-v2
+~/.cache/supply-chain-poc/08/kyverno-correctif/bin/kyverno-admission-v1.19.2-v2: go1.26.9
+	mod	github.com/kyverno/kyverno	v1.19.2+dirty	
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	vcs.revision=e63308f1e16c05cd009ac4864be6ec25c66b49be
+	build	vcs.modified=true
+sha256 corrigé : 2b36652a98c380f0b97fee5236c7006e26f004db55bd5cc600856b136294067f
+OK   différent du binaire officiel (7913082b95920ca27f3490a80c5fe63fc5b0b894d2aab5791e16b2a1f044f7b3)
+  dr-xr-xr-x 0/0               0 1970-01-01 01:00 ko-app/
+  -r-xr-xr-x 0/0       141267106 1970-01-01 01:00 ko-app/kyverno
+sha256 couche (non compressée) : ee53788edc1a2a6b21d85caadfc454a332f4f2d7341fdb5b504ef55845574c6e
+bilan : OK

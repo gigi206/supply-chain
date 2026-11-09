@@ -181,3 +181,57 @@ Une politique d'essai mal bornée refuserait aussi des pods réels. Le témoin C
 | # | Prédiction | Confiance |
 |---|---|---|
 | C7 | Binaire corrigé construit avec go1.26.9 et les mêmes réglages ; l'image poussée en contient le même sha256 ; base, `kodata`, point d'entrée et utilisateur identiques au manifeste `6f0c5200…` | Haute |
+
+## Additif du 09/11/2026, 13:52 UTC : estimation, script écrit à sec, binaire corrigé construit, prédictions complétées avant tout passage
+
+**Estimation : 5 h.** Le propriétaire a répondu « Oui, 5 h » à « L'estimation passe à 5 h avec le banc C ? ». Le compte part de l'additif de 13:18 UTC (décision C0) et se fait par la méthode du 09/11 pour la 08c : écarts d'au plus 1 h entre commits qui touchent l'étape C. Une décision s'impose à partir de 10 h.
+
+**Script : [`kyverno-admission.sh`](../kyverno-admission.sh)**, écrit à sec et relu par le conseiller avant tout passage. Il a quatre étapes :
+
+| Étape | Effets | Accord |
+|---|---|---|
+| `construire` | Local, hors ligne | **Faite**, 13:52:05 UTC, voir ci-dessous |
+| `image` | Lecture anonyme du manifeste officiel dans Zot ; écriture de `essais/kyverno-correctif:v1.19.2-v2` par `poc-ecriture`, environ 48 Mo compressés ; l'image reste | À demander |
+| `temoins` | Lecture seule du cluster et de Zot ; deux pods témoins présentés en dry-run serveur (un refus produirait un Event `PolicyViolation`) | À demander |
+| `passage` | CronJobs suspendus, `bancc` créé s'il manque, politiques d'essai, deux bascules du contrôleur d'admission ; tout est retiré et contrôlé | À demander, lancé en arrière-plan (10 à 20 min estimées) |
+
+**`construire`, faite** ([`kyverno-admission-construire.log`](kyverno-admission-construire.log)). Le binaire corrigé est construit avec go1.26.9 et les réglages du témoin de reproduction :
+- version `v1.19.2+dirty`, `vcs.modified=true`, révision `e63308f1e16c` ;
+- sha256 `2b36652a…`, différent de l'officiel `7913082b…` ;
+- taille identique : 141 267 106 octets.
+
+La couche contient `ko-app/` et `ko-app/kyverno`, en 0555, propriétaire 0:0. La couche officielle écrit le chemin `/ko-app/kyverno`, avec une barre en tête : les deux désignent le même fichier dans l'image. Ce point sera contrôlé par `image`, qui relit le binaire de la couche poussée.
+
+**Prédictions complétées, avant tout passage.**
+- **Banc C**, 17 cas, dans les trois phases (officielle avant, corrigée, officielle après) : décisions de J6 inchangées. `ok` et `c7-kev-vex-ok` sont admis, les 15 autres refusés par `bench-release`. Confiance moyenne : le pod d'essai change (limites, sans jeton, conforme à restricted), et les images sont désormais désignées par le nom du registre.
+- **Ce qui est jugé, et ce qui est seulement affiché** :
+  - **jugés**, une erreur est KO :
+    - la décision de chaque cas ;
+    - l'absence d'erreur interne avec l'image corrigée (C11) ;
+    - le bornage (C8) ;
+    - la condition de bascule ;
+    - C13 (décisions d'après égales à celles d'avant) ;
+    - le retrait ;
+    - C12, écrit comme 0 `FailedCreate` sur tout le cluster pendant le passage ;
+    - un passage réussi de chaque CronJob après la reprise ;
+  - **affichés, non jugés** :
+    - l'erreur interne avec l'image officielle, annoncée par C9 ;
+    - les motifs de l'étape B (C11 : la décision est jugée, le texte est affiché) ;
+    - un refus du webhook sans motif reconnaissable (`INATTRIBUÉ`). Il est classé CONSTAT quand un refus est attendu : la forme du message d'une erreur interne à l'admission n'a jamais été relue.
+- **Arrêts immédiats**, retrait assuré par le trap :
+  - bornage KO ;
+  - politique jamais prête ;
+  - avant la bascule, `j5-temoin` non admis ou `j5-sans-jeton` non refusé et attribué. Cela couvre Kyverno qui ne joindrait pas Zot sous H4 ;
+  - bascule ou retour qui échoue.
+- **Pire cas, probablement plus doux qu'écrit à 13:18 UTC** : avec 1 réplique, `maxSurge: 1` et `maxUnavailable: 40 %` (arrondi à 0), l'ancien pod continue de servir tant que le nouveau n'est pas prêt. Ce n'est pas relu dans le cluster : les témoins donneront le nombre de répliques.
+
+**Reprise manuelle**, si le passage est interrompu sans que le trap tourne, par exemple si l'hôte s'arrête :
+
+```
+kubectl set image -n kyverno deployment/kyverno-admission-controller kyverno=sc-stockage.poc.test:5000/amont/kyverno/kyverno@sha256:c8c4dd09e720d2cd7fd24ca73ac28e46651001372f988e0cba3f2f612f04b955
+kubectl patch cronjob -n horodatage horodatage --type merge -p '{"spec":{"suspend":false}}'
+kubectl patch cronjob -n declencheurs rattrapage --type merge -p '{"spec":{"suspend":false}}'
+kubectl delete imagevalidatingpolicy -l poc.test/essai=kyverno-admission
+```
+
+Retirer aussi l'espace `bancc`, s'il n'existait pas avant le passage.
