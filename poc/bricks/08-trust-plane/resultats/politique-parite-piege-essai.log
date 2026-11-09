@@ -76,3 +76,24 @@ echo "  identifiants encore présents : $([ -e "$T/auth" ] && echo oui || echo n
   code de l'étape : 130
   appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
   identifiants encore présents : non
+
+# Additif, 2026-11-09T14:09:22Z : signaux envoyés à tout le groupe de processus (comme un vrai Ctrl-C : sed et tee de lancer meurent aussi)
+# Même script, deux changements : kill -SIG 0 au lieu de kill -SIG $BASHPID ; T fixé par ESSAI_T pour lire après coup le fichier
+# appels du faux kubectl (le parent meurt avant d'afficher sur TERM et HUP). Chaque cas lancé sous setsid, dix fois.
+## différences avec le script ci-dessus
+6c6
+< T=$(mktemp -d); W=$T
+---
+> T=$ESSAI_T; W=$T
+19,21c19,21
+<     int) echo "INT reçu"; kill -INT $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+<     term) echo "TERM reçu"; kill -TERM $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+<     hup) echo "HUP reçu"; kill -HUP $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+---
+>     int) echo "INT reçu"; kill -INT 0; sleep 1; echo "ne doit pas s'afficher" ;;
+>     term) echo "TERM reçu"; kill -TERM 0; sleep 1; echo "ne doit pas s'afficher" ;;
+>     hup) echo "HUP reçu"; kill -HUP 0; sleep 1; echo "ne doit pas s'afficher" ;;
+## résultat (fichier appels et présence de $T/auth, relevés après les dix passages)
+groupe int : retrait de la politique 10 sur 10, identifiants restants 0 sur 10
+groupe term : retrait de la politique 10 sur 10, identifiants restants 0 sur 10
+groupe hup : retrait de la politique 10 sur 10, identifiants restants 0 sur 10
