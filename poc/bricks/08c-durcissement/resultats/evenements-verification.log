@@ -1,0 +1,26 @@
+# evenements.sh verification, 2026-11-09T17:08:44Z
+## Alloy actif depuis 2026-11-09T17:05:19Z ; lecture à 2026-11-09T17:08:44Z
+## journal d'alloy.service, composant des Events, depuis 2026-11-09T17:05:19Z
+  lignes : 5 (ok)
+    2 2026-11-09T17:05 level=info msg="node exited without error"  
+    2 2026-11-09T17:05 level=info msg="finished node evaluation"  
+    1 2026-11-09T17:05 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+OK   observateur démarré, sans erreur
+## lignes evenements-k8s de 2026-11-09T16:00:19Z (démarrage − 65 min) à 2026-11-09T17:08:44Z
+  lignes : 948 (ok), première 2026-11-09T16:05:07Z, dernière 2026-11-09T17:08:07Z
+    2 Pod horodatage-29904068-mhrxk Started count=1
+    2 Pod horodatage-29904068-mhrxk Pulled count=1
+    2 Pod horodatage-29904068-mhrxk Created count=1
+    2 Pod horodatage-29904067-z98fd Started count=1
+    2 Pod horodatage-29904067-z98fd Pulled count=1
+    2 Pod horodatage-29904067-z98fd Created count=1
+    2 Pod horodatage-29904066-9r9p5 Started count=1
+    2 Pod horodatage-29904066-9r9p5 Pulled count=1
+    2 Pod horodatage-29904066-9r9p5 Created count=1
+    2 Pod horodatage-29904065-tj8wv Started count=1
+OK   lignes d'Events reçues
+  dont horodatées après le démarrage (affiché, non jugé) : 45 (ok)
+## composant, API locale d'Alloy
+  santé : healthy, started component, depuis 2026-11-09T17:05:19.962807178Z
+  [{"name":"event_controller","type":"block","body":[{"name":"namespace","type":"attr","value":{"type":"string","value":""}},{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-09T17:08:07Z"}}]}]
+## bilan : collecte des Events rétablie

@@ -1,0 +1,5 @@
+# evenements.sh redemarrage, 2026-11-09T17:05:19Z
+## avant : Alloy actif depuis 2026-11-07T11:22:39Z
+## systemctl restart alloy sur sc-stockage, demandé à 2026-11-09T17:05:19Z
+## après : Alloy actif depuis 2026-11-09T17:05:19Z, active
+OK   Alloy redémarré

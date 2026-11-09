@@ -1033,3 +1033,35 @@ Sa classe est **`connection refused`**. Au démarrage d'Alloy de `sc-stockage`, 
 - Loki peut refuser une ligne trop en retard sur la plus récente de son flux. Cette limite n'a pas été relue dans la configuration de la 19b, et une partie des Events relus pourrait manquer.
 - Les Events expirés depuis le 07/11 restent perdus.
 - Les pertes du relais pendant le redémarrage ne sont pas mesurées par ces étapes.
+
+## Additif du 09/11/2026, 17:08 UTC : Alloy de sc-stockage redémarré, collecte des Events rétablie
+
+**Redémarrage** : 09/11 à 17:05:19 UTC (`resultats/evenements-redemarrage.log`). Alloy était actif depuis le 07/11 à 11:22:39 ; il est actif depuis le 09/11 à 17:05:19, état `active`. Seul `sudo systemctl restart alloy` a été lancé, aucune autre modification.
+
+**Vérification** : à 17:08:44 UTC, en lecture seule (`resultats/evenements-verification.log`).
+
+| # | Prédit | Mesuré | Lecture |
+|---|---|---|---|
+| P1 | Démarrage postérieur à celui du 07/11, service `active` | 17:05:19, `active` | Tenue |
+| P2 | « watching events for namespace » sans erreur | 5 lignes du composant depuis 17:05:19 : démarrage de l'observateur, aucune erreur | Tenue |
+| P3 | Santé `healthy`, position postérieure au 07/11 à 11:20:08 | `healthy` depuis 17:05:19.96 ; `last_event_timestamp` 2026-11-09T17:08:07Z | Tenue |
+| P4 | Au moins 1 ligne entre 16:00:19 et la vérification | 948 lignes, de 16:05:07 à 17:08:07 | Tenue |
+| P5 | Affiché | 45 lignes horodatées après le redémarrage | — |
+
+**Verdict : collecte des Events rétablie.** P2 et P4 sont tenues.
+
+**Ce que la vérification établit en plus**
+- L'API enregistre des Events : l'hypothèse (H-b) est écartée pour la période relue, depuis 16:05.
+- Les Events de `horodatage` reviennent chaque minute.
+- Chaque Event de pod affiché paraît en double (par exemple `Started` deux fois pour un même pod). Ce point n'est pas interprété : deux conteneurs par pod, ou deux lignes par Event, sans vérification.
+
+**Ce qui est perdu.** Les Events du 07/11 à 11:20:08 au 09/11 vers 16:05 ne sont pas dans Loki. Ils ont expiré de l'API, dont la première ligne relue date de 16:05:07, et ne sont pas récupérables.
+
+**Pertes du relais pendant le redémarrage** : non mesurées.
+
+**Ce qui reste à décider par le propriétaire**
+- Le remède durable : alerte sur l'absence de lignes `evenements-k8s`, ordre de démarrage d'Alloy après l'API, issue chez Alloy (action publique). Sans lui, la panne reviendra au prochain démarrage d'Alloy de `sc-stockage` antérieur à l'écoute de l'API.
+- Le périmètre et l'estimation du chantier.
+- La suite d'E4 : modifier les six contrôles, et choisir leur témoin.
+
+**Temps** : 2 h 30 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises.
