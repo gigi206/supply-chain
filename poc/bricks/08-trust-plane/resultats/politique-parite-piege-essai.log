@@ -1,0 +1,78 @@
+# Essai hors cluster du piège ajouté à etape_parite (politique.sh), 2026-11-09T14:07:15Z
+# Aucun cluster, Zot ni VM : kubectl remplacé par une fonction qui note ses appels. Pièges extraits tels quels de politique.sh.
+# Limite : les signaux sont envoyés au seul sous-shell de l'étape (kill $BASHPID), pas au groupe de processus comme un vrai Ctrl-C.
+## script
+#!/usr/bin/env bash
+# Essai hors cluster du piège ajouté à etape_parite (politique.sh) : pièges copiés tels quels du script, kubectl remplacé par une
+# fonction qui affiche ses arguments, T et W dans un répertoire temporaire ; structure de lancer (commun.sh) : { …; } | sed | tee.
+set -euo pipefail
+kubectl() { echo "kubectl $*" >> "$T/appels"; }
+T=$(mktemp -d); W=$T
+trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+etape_parite() {
+  mkdir -p "$T/auth/docker"; : > "$T/auth/docker/config.json"
+  POL_ESSAI=
+  trap '[ -z "${POL_ESSAI:-}" ] || { echo "nettoyage : politique d'"'"'essai $POL_ESSAI retirée à la sortie"
+    kubectl delete imagevalidatingpolicy "$POL_ESSAI" --ignore-not-found --wait=false </dev/null >/dev/null 2>&1 || true; }
+    rm -rf "$T/auth" "$W/refus.out"' EXIT
+  trap 'exit 130' INT TERM HUP
+  POL_ESSAI=bench-release
+  case "$1" in
+    exit1) echo "charger : politique jamais prête, exit 1"; exit 1 ;;
+    erreur) echo "commande en échec sous set -e"; false ;;
+    int) echo "INT reçu"; kill -INT $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+    term) echo "TERM reçu"; kill -TERM $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+    hup) echo "HUP reçu"; kill -HUP $BASHPID; sleep 1; echo "ne doit pas s'afficher" ;;
+    j5) POL_ESSAI=; POL_ESSAI=j5-jeton-altere; echo "cas J5 en cours, exit 1"; exit 1 ;;
+    ok) POL_ESSAI=; echo "fin normale"
+    trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+    trap - INT TERM HUP
+      ;;
+  esac
+}
+c=0; { echo "# étape parite ($1)"; etape_parite "$1"; } 2>&1 | sed -u 's/^/  /' || c=$?
+echo "  code de l'étape : $c"
+echo "  appels à kubectl : $(cat "$T/appels" 2>/dev/null || echo aucun)"
+echo "  identifiants encore présents : $([ -e "$T/auth" ] && echo oui || echo non)"
+## sortie (ok, exit1, erreur, j5, int, term, hup)
+  # étape parite (ok)
+  fin normale
+  code de l'étape : 0
+  appels à kubectl : aucun
+  identifiants encore présents : non
+  # étape parite (exit1)
+  charger : politique jamais prête, exit 1
+  nettoyage : politique d'essai bench-release retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
+  identifiants encore présents : non
+  # étape parite (erreur)
+  commande en échec sous set -e
+  nettoyage : politique d'essai bench-release retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
+  identifiants encore présents : non
+  # étape parite (j5)
+  cas J5 en cours, exit 1
+  nettoyage : politique d'essai j5-jeton-altere retirée à la sortie
+  code de l'étape : 1
+  appels à kubectl : kubectl delete imagevalidatingpolicy j5-jeton-altere --ignore-not-found --wait=false
+  identifiants encore présents : non
+  # étape parite (int)
+  INT reçu
+  nettoyage : politique d'essai bench-release retirée à la sortie
+  code de l'étape : 130
+  appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
+  identifiants encore présents : non
+  # étape parite (term)
+  TERM reçu
+  nettoyage : politique d'essai bench-release retirée à la sortie
+  code de l'étape : 130
+  appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
+  identifiants encore présents : non
+  # étape parite (hup)
+  HUP reçu
+  nettoyage : politique d'essai bench-release retirée à la sortie
+  code de l'étape : 130
+  appels à kubectl : kubectl delete imagevalidatingpolicy bench-release --ignore-not-found --wait=false
+  identifiants encore présents : non

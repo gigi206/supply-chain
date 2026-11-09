@@ -247,6 +247,15 @@ etape_parite() {
   attendre_sa "$NS_ESSAI"
   mkdir -p "$T/auth/docker" && chmod 700 "$T/auth"
   auth_zot "$T/auth/docker/config.json"
+  # Ajout du 09/11/2026 vers 14:06 UTC, non exécuté (aucun passage depuis) : l'étape laissait bench-release chargée (constatée par
+  # kyverno-admission.sh temoins le 09/11, retirée au passage de l'étape C), et une politique j5-* en cas d'arrêt. Le piège retire la
+  # politique d'essai en cours à toute sortie (exit, erreur, INT, TERM, HUP) et garde le retrait des identifiants du piège global ;
+  # il est rétabli en fin d'étape (même modèle que restreint). Comportement du piège sous lancer : resultats/politique-parite-piege-essai.log.
+  POL_ESSAI=
+  trap '[ -z "${POL_ESSAI:-}" ] || { echo "nettoyage : politique d'"'"'essai $POL_ESSAI retirée à la sortie"
+    kubectl delete imagevalidatingpolicy "$POL_ESSAI" --ignore-not-found --wait=false </dev/null >/dev/null 2>&1 || true; }
+    rm -rf "$T/auth" "$W/refus.out"' EXIT
+  trap 'exit 130' INT TERM HUP
   echo "## banc C : 17 cas poussés dans Zot ($REG_HOTE/bench/), clés de test du banc"
   rm -rf "$T/banc"
   WORKDIR=$T/banc REG=$REG_HOTE DOCKER_CONFIG=$T/auth/docker SSL_CERT_FILE=$P/ca-poc.crt "$BANC/setup.sh" | sed 's/@sha256:\(.\{12\}\).*/@sha256:\1…/'
@@ -259,6 +268,7 @@ PY
   sed -i "s#glob: \"localhost:5000/\*\"#glob: \"$REG_HOTE/bench/*\"#" "$T/banc/ivpol.yaml"
   diff <(sed -n '/^spec:/,$p' "$BANC/kyverno/ivpol.tmpl.yaml") <(sed -n '/^spec:/,$p' "$T/banc/ivpol.yaml") | grep '^[<>]' | grep -v -e '^> \{12\}' -e '__\(CHAINS\|VSA\)_PUB__' \
     | sed 's/^/  écart avec le modèle du banc : /' || true
+  POL_ESSAI=bench-release
   charger "$T/banc/ivpol.yaml" bench-release
   # Preuve que l'admission évalue bien en dry-run : un cas refusé du banc doit l'être aussi par l'API.
   ref=$(awk -F'\t' '$1 == "c1-unsigned" {print $3}' "$T/banc/images.tsv")
@@ -270,6 +280,9 @@ PY
     sed "s|__CASE__|$c|; s|__REF__|$ref|; s|namespace: default|namespace: $NS_ESSAI|" "$BANC/kyverno/pod.tmpl.yaml" > "$T/pod-$c.yaml"
     comparer "$c" "$e" "$T/banc/ivpol.yaml" "$T/pod-$c.yaml"
   done < "$T/banc/images.tsv"
+  kubectl delete imagevalidatingpolicy bench-release --wait=true >/dev/null
+  POL_ESSAI=
+  echo "OK   bench-release retirée (politique d'essai du banc, sans borne d'espace)"
 
   echo "## J5 : contrôle 9, attestor à clé sans journal ; une politique par variante (pas de cache partagé entre variantes)"
   cat > "$T/pod-j5.yaml" <<EOF
@@ -287,10 +300,14 @@ EOF
     "j5-tsa-etrangere|FAIL|essais-j5/tsa-etrangere|$P/tsa-chaine.pem" "j5-att-historique|PASS||" > "$T/cas-j5.txt"
   while IFS='|' read -r c e r v; do
     ivpol "$r" "$v" "$c" > "$T/$c.yaml"
+    POL_ESSAI=$c
     charger "$T/$c.yaml" "$c"
     comparer "$c" "$e" "$T/$c.yaml" "$T/pod-j5.yaml"
     kubectl delete imagevalidatingpolicy "$c" --wait=true >/dev/null
+    POL_ESSAI=
   done < "$T/cas-j5.txt"
+  trap 'rm -rf "$T/auth" "$W/refus.out"' EXIT
+  trap - INT TERM HUP
   echo "## synthèse"
   # Décision d'une porte : admis si et seulement si PASS (CLI : code 0 ; admission : requête acceptée).
   awk -F'\t' 'NR > 1 { n++; split($3, c, " "); if (c[1] == $4) p++; else printf "  écart de libellé : %s (CLI %s, admission %s)\n", $1, $3, $4;

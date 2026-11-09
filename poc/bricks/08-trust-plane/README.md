@@ -2078,6 +2078,13 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
 
 L'image corrigée n'est plus en service. Non prouvé : background, rapports, durée, redémarrage.
 
+**Additif du 09/11/2026, 14:07 UTC : `politique.sh parite` corrigé à sec, non exécuté.** Travail local seulement : rien lu ni écrit dans le cluster, Zot ou les VM.
+- L'étape retire désormais `bench-release` après les 17 cas du banc, avant les cas `j5-*`.
+- Un piège retire la politique d'essai en cours (`bench-release` ou le cas `j5-*`) à toute sortie : `exit`, erreur, INT, TERM, HUP. Il garde le retrait des identifiants de Zot du piège global, puis il est rétabli en fin d'étape, comme dans `restreint`.
+- Essai hors cluster, avec les pièges copiés tels quels et `kubectl` remplacé par une fonction : les sept sorties retirent la politique attendue et les identifiants ([journal](resultats/politique-parite-piege-essai.log)). Limite : les signaux visent le seul sous-shell de l'étape, pas tout le groupe comme un vrai Ctrl-C.
+- [`politique-parite.log`](resultats/politique-parite.log) et `.tsv` restent ceux du 06/11/2026 (13:43:55 UTC), produits par la version d'avant. `lancer` ne refuse pas un journal existant : un nouveau passage les réécrirait, et demande l'accord du propriétaire (écriture dans Zot et le cluster).
+- Constats, non corrigés : `admission` laisse la RuntimeClass témoin `crun` si un cas sort en KO. Les ValidatingPolicy d'`admission.yaml` restent chargées, comme voulu (règles en service).
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.
