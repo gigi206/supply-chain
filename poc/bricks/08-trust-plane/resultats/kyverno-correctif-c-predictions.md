@@ -57,3 +57,18 @@ Toute image corrigée est construite par nous. Elle n'a ni release signée ni pr
 **Pire cas** : le contrôleur d'admission ne démarre pas avec l'image corrigée. Avec `failurePolicy: Fail` sur ses webhooks, toute création de pod dans le champ de Kyverno est alors refusée jusqu'au retour, qui reste possible puisque l'espace `kyverno` est exclu. Un passage du scan ou de la tâche du 21/11 dans cette fenêtre échouerait : c'est l'objet de la garde horaire.
 
 **Ce que C ne prouvera pas** : le comportement du background et des rapports, la tenue dans la durée et un redémarrage avec l'image corrigée. Une release officielle de Kyverno contenant le correctif reste attendue (issue #18525 à suivre).
+
+## Correction du 09/11/2026, 11:10 UTC, avant tout push : le pod d'essai de J6 tomberait sous les règles de H5
+
+Ce point a été relevé à la relecture du conseiller, puis vérifié dans le dépôt. Les prédictions C1 à C6 ci-dessus restent écrites telles quelles, mais ne valent pas en l'état.
+- Le pod d'essai de J6 (`poc/benchmarks/kyverno-seul/kyverno/pod.tmpl.yaml`) n'a ni limites ni compte dédié. Il est présenté dans l'espace `bancc`, qui ne figure pas dans les exclusions des 4 règles de la 08c, en `Deny` depuis H5. `limites-obligatoires` le refuserait, et sans doute `jeton-compte-default` (jeton du compte `default` monté par défaut), quel que soit le correctif. C2 ne pourrait jamais montrer `j5-jeton-valide` admis, et C1 et C4 perdraient leur sens.
+- La parité et les 30 cas d'admission de J6 datent du 06/11 à 13:43 UTC, sous RKE2 mais avant H1 à H5. Ils n'ont pas été rejoués depuis. Le tableau de J6 ne peut donc pas servir de base à C4.
+
+**Ce qui change, toujours à sec, à confirmer avec C0 :**
+- Pod d'essai de C : celui de J6, avec des limites et `automountServiceAccountToken: false`, pour que seule la règle d'images de Kyverno juge. Sinon, `bancc` serait ajouté aux exclusions des 4 règles le temps du passage : c'est une modification du cluster, moins bonne.
+- Étape 2 du protocole : la parité et les 30 cas d'admission sont rejoués avec l'image officielle le même jour, avec le même pod. C4 se compare à cette base, non à J6.
+- Effets ajoutés :
+  - la politique d'images de J6 (`ivpol` de `commun.sh`) est créée dans le cluster, bornée à `bancc` ;
+  - l'espace `bancc` est créé s'il n'existe plus ;
+  - les deux sont retirés à la fin, et leur retrait est contrôlé.
+- C1 : avant la bascule, avec le pod corrigé, `j5-temoin` est admis. Confiance moyenne : ce pod n'a jamais été présenté sous H5.
