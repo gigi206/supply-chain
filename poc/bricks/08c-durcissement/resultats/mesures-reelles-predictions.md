@@ -1207,3 +1207,7 @@ Accord du propriétaire : « Oui » à « Je lance l'application sur sc-stockage
 **Bilan du remède (a)** : la panne du 07/11 (observateur en échec au démarrage, composant `healthy`, aucune ligne) déclencherait désormais `EvenementsMuets`, par la branche `absent`, 5 min après qu'Alloy répond. Une collecte qui s'arrête en cours de route la déclencherait 15 min plus 5 min après la dernière ligne. Ce dernier point est vérifié par `promtool` seulement ; aucun incident n'a été simulé sur le vrai système. Le dépôt et `sc-stockage` sont de nouveau alignés pour ces deux fichiers. Limite inchangée : une suspension des CronJobs par minute ferait sonner l'alerte à tort.
 
 **Temps** : de 22:23 à 22:43 UTC, dans l'heure accordée. Il reste ouvert : la suite d'E4, l'issue chez Alloy (action publique), le défaut `validate && …` de `journalisation.sh` (L6), et le push.
+
+## Additif du 09/11/2026, 22:55 UTC : défaut L6 corrigé en local
+
+Le défaut `validate && …` d'`etape_grpc_tls` de `journalisation.sh`, signalé à 22:30, est corrigé dans le dépôt, non déployé (accord : « Le point 3 maintenant : Corriger le défaut L6 de journalisation.sh en local »). Détail et essai hors cluster : README de la 19b, additif de 22:54 UTC, et `19b-journalisation/resultats/l6-validate-essai-local.log`. Même motif ligne 362 (`etape_alloy`), non modifié, à décider. Restent ouverts dans la liste de 22:43 : la suite d'E4 et l'issue chez Alloy ; le push des commits jusqu'à 56bb78d a été fait à 22:51 UTC.
