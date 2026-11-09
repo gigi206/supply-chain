@@ -1233,6 +1233,35 @@ Toujours non couverts sous H1 à H5 : la jonction d'un nœud et la branche « sc
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec ; rien n'est lu ni écrit dans le cluster, Loki, Zot ou les VM, et aucun script n'est modifié. Les six contrôles qui jugent sur des Events attendent tous 0. Pour deux d'entre eux, `preuves.sh:3298` et `08-trust-plane/cilium.sh:173`, la lecture n'a aucune borne de temps (corrigé à 11:10 UTC, avant tout push : la phrase disait que les deux rendent 0 dès que les Events ont expiré). `cilium.sh:173` rend 0 dès que les Events ont expiré. `preuves.sh:3298`, lancé 30 s après la reprise, compte aussi la dernière heure d'avant, d'où un risque de faux KO. Quatre décisions sont à prendre (E1 à E4) : rôle de Loki, unité de compte, témoin de vie de la collecte, ordre. Viennent ensuite huit prédictions d'un relevé en lecture seule sur les fenêtres archivées. Détail : [mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 11:05 UTC.
 
+## Additif du 09/11/2026, 13:11 UTC : clôture de la brique, décision du propriétaire
+
+**Décision.** Le propriétaire a répondu « 1 ok » à la question « Je clos la 08c par un additif dans son README et dans le doc 03, documentation seulement, et je commite en local ? ». Cette question suivait l'avis du conseiller : décider tout de suite, sans attendre la borne des 20 h, que rien ne signalerait. Rien n'est lu ni écrit dans le cluster, Zot ou les VM.
+
+**Temps passé.** Estimation : 10 h, hors plan des secrets. Le temps est mesuré par les écarts d'au plus 1 h entre commits successifs qui touchent la brique, depuis le premier commit du 05/11 à 20:39:41 UTC ([`temps-08c-0911.log`](resultats/temps-08c-0911.log), relevé à 13:11:03 UTC) :
+- 17,3 h sur 88 commits ;
+- 17,0 h sur 79 commits sans S1, en retirant les sujets qui citent S1.
+
+Ce n'est ni une borne basse ni une borne haute. Le compte ignore le travail fait entre deux commits espacés de plus d'1 h, et il compte les attentes entre commits rapprochés. Le dépassement de l'estimation est d'au moins 1,7×, et la règle des 2× ne se juge pas plus finement avec cette mesure. La clôture la rend sans objet.
+
+**Seuil, critère par critère.**
+
+| Critère | État | Preuve |
+|---|---|---|
+| Les 8 tests négatifs repassent, cluster durci | **Tenu** | `h5_tests`, 06/11, 20:09:59 à 20:20:47 UTC, code 0 (additif de 20:21 UTC) ; test 6 et `intercepteurs` (07/11, 14:07 UTC) ; `test5_refus` étendue (14:55 UTC) ; `test5` complète par `test5_essai` (15:26 UTC) |
+| La porte et les contrôles 6 et 7 repassent | **Tenu** | Étapes de la porte, dont `controle6` et `controle7` (07/11, 12:35 UTC) ; `attseule` (12:46 UTC) |
+| Tous les ports d'hôte non listés sont refusés | **Tenu sur les ports essayés seulement** | H4 (06/11, 17:48 UTC, [`durcissement-h4_bloque.log`](resultats/durcissement-h4_bloque.log)) : Supervisor 9345 et etcd 2379 refusés par le pare-feu d'hôte à une tâche signée ; test 6 sous H1 à H5 (07/11, 14:07 UTC) : 7 destinations refusées à `construire-image`. Aucun balayage des ports non listés : le critère n'est pas prouvé à la lettre |
+| Aucune règle Kyverno en Audit à la fin | **Tenu au 06/11, non relu au 09/11** | Neuf règles en `Deny` relevées le 06/11 à 20:21 UTC, après `h5_tests`. Une relecture serait une mesure, à accorder ; elle n'est pas faite |
+
+**Non couverts à la clôture**, écrits pour ne pas être perdus :
+- la jonction d'un nœud ;
+- la branche « scan daté du futur » de `scan.rego` ;
+- le balayage des ports d'hôte non listés ;
+- les contrôles sur Events : `preuves.sh:3298` peut rendre un faux KO (il compte l'heure d'avant la reprise) ; `08-trust-plane/cilium.sh:173` rend 0 dès que les Events ont expiré, une réussite vide. Ils partent dans le chantier des Events ci-dessous ;
+- S1 : OIDC de Zot reporté ; secrets restants à rouvrir, avec l'Agent Injector d'OpenBao comme candidat, sans passage au doc 04 pour l'instant ;
+- H6 (WireGuard) : mesurée puis retirée ; rotation des clés et mode strict en entrée jamais essayés.
+
+**Chantier des Events dans Loki, ouvert à part.** C'est la « passe dédiée après le 09/11 » décidée le 07/11 ([mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 20:45 UTC). Le propriétaire a répondu « 2 ok » à « Les Events deviennent un chantier à part, avec E1 à E4 tels que je les recommande et E3 obligatoire ? ». Décisions et précondition : même fichier, additif de 13:11 UTC. Aucune estimation n'est fixée : elle sera proposée au propriétaire avant tout passage. Le relevé R1 à R8 des Events demande son propre accord.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

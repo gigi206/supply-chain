@@ -1,0 +1,11 @@
+# Temps passé sur la 08c, estimé par les écarts d'au plus 1 h entre commits successifs (lecture locale de git, rien d'autre)
+# relevé : 2026-11-09T13:11:03Z ; HEAD aa9a9a9
+# commande : git log --since='2026-11-05T20:00:00Z' --format='%at %s' -- poc/bricks/08c-durcissement
+## 1. tous les commits qui touchent poc/bricks/08c-durcissement
+commits : 88 ; somme des écarts d au plus 1 h : 62252 s, soit 17.3 h
+## 2. sans les commits dont le sujet cite S1 (motif : \bS1)
+commits : 79 ; somme des écarts d au plus 1 h : 61232 s, soit 17.0 h
+## dernier puis premier commit (git log avec TZ=UTC0)
+2026-11-09T11:10:14Z 7f85cb7
+2026-11-05T20:39:41Z c6ed3df
+# lecture : ni borne basse ni borne haute. Le compte 1 inclut S1 (hors estimation) ; le compte 2 retire les sujets qui citent S1, au risque d'en oublier ou d'en retirer à tort. Les deux ignorent le travail fait entre deux commits espacés de plus d'1 h et comptent le temps d'attente (relevés planifiés, tâches) entre commits rapprochés.

@@ -825,3 +825,16 @@ Point commun : les six attendent 0. Un 0 dans Loki ne prouve rien si la collecte
   - que les étapes rejouées avec Loki rendraient les mêmes verdicts ;
   - l'effet d'un redémarrage d'Alloy pendant une étape ;
   - le délai d'ingestion d'un Event : sa mesure demanderait un témoin écrit, option (a) de E3.
+
+## Additif du 09/11/2026, 13:11 UTC : Events dans Loki, décisions E1 à E4 des Events prises, précondition du relevé écrite avant tout passage
+
+**Décision du propriétaire.** Il a répondu « 2 ok » à « Les Events deviennent un chantier à part, avec E1 à E4 tels que je les recommande et E3 obligatoire ? ». Ce chantier est la passe dédiée décidée le 07/11 (additif de 20:45 UTC). La 08c est close (README, additif de 13:11 UTC). Les libellés E1 à E4 et R1 à R8 ci-dessous sont ceux des Events, additif de 11:05 UTC, distincts des E1 à E5 et R3, R4 de la 08c.
+
+- **E1 des Events** : (a). Loki donne le verdict, la lecture par kubectl reste affichée ; un écart entre les deux est un CONSTAT.
+- **E2 des Events** : compter des lignes, et le dire dans le libellé.
+- **E3 des Events** : (b), témoin passif, **obligatoire**. Au moins une ligne `evenements-k8s` dans la fenêtre, et Alloy de `sc-stockage` non redémarré dans la fenêtre d'après `ActiveEnterTimestamp`. Sinon, le contrôle est **non jugé**, jamais OK.
+- **E4 des Events** : (a). D'abord le relevé R1 à R8 en lecture seule, sur son propre accord ; ensuite la modification des six contrôles.
+
+**Précondition du relevé, écrite avant tout passage.** R1 et R6 sont les deux témoins positifs. Si R1 ou R6 échoue, aucun 0 de R2 à R5, R7 et R8 ne compte : ils sont écrits non jugés, et la requête ou la collecte est à reprendre avant toute conclusion. R1 ne vaut que pour R2 (même fenêtre) ; R6 que pour R5 (même filtre) ; R3, R4, R7 et R8 n'ont pas de témoin positif dans leur fenêtre et reposent sur E3 seul.
+
+**Estimation** : aucune n'est fixée à cette heure ; elle sera proposée au propriétaire avant tout passage.

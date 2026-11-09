@@ -78,6 +78,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 06/11/2026, 16:00 UTC** : passage de zéro sous RKE2 fait, avec un arrêt à `J8 (contrôleurs)` et une reprise, écart accepté par le propriétaire (« Reprends à J8 »). 0 KO sur le reste, [bilan de la 08b](../../poc/bricks/08b-rke2/README.md). Les journaux de la 08 portent désormais les mesures RKE2 : les liens de cet ADR vers des mesures k3s réécrites sont épinglés au commit `d357f4d`.
 
+> **Additif du 09/11/2026, 13:11 UTC** : [brique 08c](../../poc/bricks/08c-durcissement/README.md) close par décision du propriétaire, documentation seulement. Aucune note ne change. Seuil tenu sur les 8 tests, la porte et les contrôles 6 et 7 sous RKE2 durci H1 à H5 ; ports d'hôte tenus sur les ports essayés seulement, sans balayage. Non couverts écrits dans le README de la brique, dont la jonction d'un nœud et H6 (WireGuard), retirée après mesure.
+
 ## Conséquences
 
 - La brique 08 ne démarre qu'une fois l'infrastructure fixée. L'administrateur du replay doit être nommé **avant la brique 10** : la brique 08 ne touche ni au domaine de replay ni à la clé de VSA (verrou levé par le propriétaire le 29/10/2026).
