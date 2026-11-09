@@ -14,15 +14,15 @@ url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1
 url_api = "https://api.github.com/repos/anchore/grype/releases/assets/320300525"
 
 [[tools."aqua:anchore/syft"]]
-version = "1.38.0"
+version = "1.57.0"
 backend = "aqua:anchore/syft"
-specifiers = ["1.38.0"]
+specifiers = ["1.57.0"]
 
 [tools."aqua:anchore/syft"."platforms.linux-x64"]
-checksum = "sha256:bc664debb00db1b9b4b9dae4ba1a29d99621e33b641b94b78b9048374b812a3d"
-checksum_source = "mise-versions"
-url = "https://github.com/anchore/syft/releases/download/v1.38.0/syft_1.38.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/anchore/syft/releases/assets/317550678"
+checksum = "sha256:9c077a7d43029b3b13e98a8db720661e700c4d58db6352153a06395ae4a2a704"
+url = "https://github.com/anchore/syft/releases/download/v1.57.0/syft_1.57.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/anchore/syft/releases/assets/714762081"
+provenance = "cosign"
 
 [[tools."aqua:google/go-containerregistry"]]
 version = "0.20.6"
