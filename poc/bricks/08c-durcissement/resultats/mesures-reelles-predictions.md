@@ -1140,3 +1140,19 @@ Propositions 1 à 4 de l'additif de 17:29 inchangées, toujours en attente.
 ## Additif du 09/11/2026, 22:23 UTC : décision du propriétaire sur le dépassement de (a)
 
 Question posée à 22:12 UTC : « Faut-il continuer (a) ? », avec deux choix, continuer avec 1 h de plus, ou arrêter. Première réponse : « A », ambiguë (première option, ou « Arrêter »), donc rien lancé. Réponse suivante : « Continuer ». Décision : (a) continue, avec 1 h de travail actif de plus à partir de 22:23 UTC, pour l'essai réel, l'application dans l'ordre imposé, la vérification en lecture seule, le doc 03 et les README. Cette décision n'est pas un accord pour l'essai réel ni pour l'application, qui gardent chacun le leur.
+
+
+## Additif du 09/11/2026, 22:25 UTC : essai réel d'`essai_alerte` sur `sc-stockage`, P1 à P5 tenues
+
+Accord du propriétaire : « Oui » à « Je lance l'essai réel sur sc-stockage ? » (22:23 UTC). Passage de 22:24:34 à 22:24:51 UTC : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/evenements.sh essai_alerte`. Seule écriture : `/tmp/essai-evenements` sur `sc-stockage`, retiré par le script. Aucun service touché, rien déployé. Journal `resultats/evenements-essai_alerte.log`, `chrono.tsv`.
+
+- Empreintes essayées : `evenements.alloy` c8f657c2…84ee5, `alertes.yml` 9568502c…ba19e.
+- P1 tenue : `promtool` 3.13.5, `check rules` sur 15 règles, puis `test rules` : SUCCESS, cas existants et quatre nouveaux compris. Les bornes de 23, 28 et 29 min tiennent.
+- P2 tenue : la règle sans la branche `absent` est refusée sur le seul cas `EvenementsMuets` à 6 min.
+- P3 tenue : `alloy validate` accepte la configuration de `sc-stockage` avec le compteur.
+- P4 tenue : l'attribut inconnu est refusé (`unrecognized attribute name "inconnu"`).
+- P5 tenue pour le code, 0. Le retrait du répertoire est fait par le script, qui n'en vérifie pas le résultat ; pas de lecture séparée.
+
+Ce que l'essai établit : la règle et ses tests sont justes pour `promtool` 3.13.5, et la configuration est acceptée par Alloy 1.21.3. Ce qu'il n'établit pas : le nom et les étiquettes de la vraie série dans Prometheus (`exported_job`), à lire à l'étape 2 de l'application.
+
+**Proposition suivante, en attente** : l'application dans l'ordre imposé (proposition 2 de l'additif de 17:29), avec son propre accord.

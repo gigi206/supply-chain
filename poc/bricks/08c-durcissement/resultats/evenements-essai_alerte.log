@@ -1,0 +1,14 @@
+# evenements.sh essai_alerte, 2026-11-09T22:24:34Z
+## fichiers essayés : alertes-tests.yml alertes.yml alertes.yml.faux audit-zot.alloy evenements.alloy evenements.alloy.faux journal.alloy journaux-rke2.alloy relais.alloy sortie.alloy
+## sha256 de evenements.alloy : c8f657c274b4ea8f9c07c002bb150685e96119cd549089b7f8a3244f51f84ee5 ; de alertes.yml : 9568502ccbb6d3136eb0f4749abbc17da9bfeb89b9bdfecd26f50e7258bba19e
+promtool, version 3.13.5 (branch: HEAD, revision: f497435984d1ca1d84cda5ed309387ac2eb1f8f6)
+Checking alertes.yml
+  SUCCESS: 15 rules found
+
+  SUCCESS
+
+règles : vérifiées, tests passés
+témoin promtool (règle sans absent) : refusé sur le seul cas de 6 min, attendu
+
+configuration valide
+témoin alloy (attribut inconnu) : refusé, attendu
