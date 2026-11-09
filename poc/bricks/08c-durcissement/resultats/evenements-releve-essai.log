@@ -325,3 +325,166 @@ NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
 ## bilan : R1 OK, R2 NJ, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 NJ
   ce que R ne prouve pas : verdicts des étapes rejouées avec Loki ; effet d'un redémarrage d'Alloy pendant une étape ; délai
   d'ingestion ; Events sans aucun horodatage, écartés par Alloy (1 sur 918 en L4 de la 19b)
+
+# Additif du 09/11/2026, 14:49 UTC, avant tout push, sur relecture du conseiller : la référence kubectl de R8 (E1, affichée, sans effet
+# sur les verdicts) pointait rejeu-rke2-sixieme-passage.log (06/11, 13:28) ; elle pointe cilium-verifier.log (06/11, 13:32:30), dernier
+# passage archivé du contrôle. essai.sh copie ce journal à la place. Second passage du harnais, même scénarios, mêmes bilans.
+## sortie du second passage
+# date : 2026-11-09T14:49:31Z ; sha256 de evenements.sh : 2b9f89f96b1bf00f27d57e69844d22adf797ebf8b12b5dcd20d8e8df718547e0
+## normal (ESSAI_MODE=normal)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+  OK   R3 : 0 lignes (attendu : 0)
+  OK   R4 : 0 lignes (attendu : 0)
+  OK   R5 : 0 lignes (attendu : 0)
+  OK   R7 : 0 lignes (attendu : 0)
+  NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+  ## bilan : R1 OK, R2 NJ, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## alloy-ancien (ESSAI_MODE=normal ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  OK   R2 : 0 lignes (attendu : 0)
+  OK   R3 : 0 lignes (attendu : 0)
+  OK   R4 : 0 lignes (attendu : 0)
+  OK   R5 : 0 lignes (attendu : 0)
+  OK   R7 : 0 lignes (attendu : 0)
+  OK   R8 : 0 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 OK, R3 OK, R4 OK, R5 OK, R6 OK, R7 OK, R8 OK
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## r1-faible (ESSAI_MODE=normal ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  KO   R1 : 10 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 KO, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R3 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R4 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R5 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R7 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  NJ   R8 : 0 lignes (attendu : 0), précondition non remplie (R1 KO, R6 OK)
+  ## bilan : R1 KO, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## tronque (ESSAI_MODE=tronque ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  NJ   R1 : réponse tronquée à 1000 lignes
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 NJ, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R3 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R4 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R5 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R7 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  NJ   R8 : 0 lignes (attendu : 0), précondition non remplie (R1 NJ, R6 OK)
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## erreur (ESSAI_MODE=erreur)
+  NJ   R1 : requête en erreur
+  NJ   R6 : requête en erreur
+  ## précondition non remplie : R1 NJ, R6 NJ ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : requête en erreur
+  NJ   R3 : requête en erreur
+  NJ   R4 : requête en erreur
+  NJ   R5 : requête en erreur
+  NJ   R7 : requête en erreur
+  NJ   R8 : requête en erreur
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## http500 (ESSAI_MODE=http500)
+  NJ   R1 : requête en erreur
+  NJ   R6 : requête en erreur
+  ## précondition non remplie : R1 NJ, R6 NJ ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  NJ   R2 : requête en erreur
+  NJ   R3 : requête en erreur
+  NJ   R4 : requête en erreur
+  NJ   R5 : requête en erreur
+  NJ   R7 : requête en erreur
+  NJ   R8 : requête en erreur
+  ## bilan : R1 NJ, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 NJ, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## temoin-vide (ESSAI_MODE=normal ESSAI_TEMOIN=0 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R3 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R4 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R5 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R7 : 0 lignes (attendu : 0), témoin E3 absent
+  NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+  ## bilan : R1 OK, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 OK, R7 NJ, R8 NJ
+  code : 0
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## zeros-faux (ESSAI_MODE=tout ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## alloy-vide (ESSAI_MODE=normal ESSAI_ALLOY=)
+  KO   démarrage d'Alloy illisible sur sc-stockage : relevé arrêté
+  code : 1
+  appels : curl 0, ssh 1, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## lignes-sans-e3 (ESSAI_MODE=tout)
+  OK   R1 : 40 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition remplie : R1 OK, R6 OK
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 OK, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+## lignes-r1-faible (ESSAI_MODE=tout ESSAI_R1=10 ESSAI_ALLOY=Wed 2026-11-04 10:00:00 CET)
+  KO   R1 : 10 lignes (attendu : >=32)
+  OK   R6 : 1 lignes (attendu : >=1)
+  ## précondition non remplie : R1 KO, R6 OK ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+  KO   R2 : 2 lignes (attendu : 0)
+  KO   R3 : 2 lignes (attendu : 0)
+  KO   R4 : 2 lignes (attendu : 0)
+  KO   R5 : 2 lignes (attendu : 0)
+  KO   R7 : 2 lignes (attendu : 0)
+  KO   R8 : 2 lignes (attendu : 0)
+  ## bilan : R1 KO, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
+  code : 1
+  appels : curl 16, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : systemctl is-active alloy|systemctl show -p ActiveEnterTimestamp --value alloy
+  journal : mot de passe, jeton, token ou msg (« secret ») : 0 ; travail restant : 
+dépôt : git status et resultats/ inchangés

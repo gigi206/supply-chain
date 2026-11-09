@@ -127,7 +127,7 @@ etape_releve() {
     "$R08/preuves-h5-scan_saut_reprendre.log" 'événements PolicyViolation depuis'
   controle R8 "cilium.sh:173, Pulling des pods de Cilium" \
     '{source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | reason="Pulling" | name=~"cilium.*"' \
-    2026-11-06T11:00:00Z "$fin" 0 "$R08/rejeu-rke2-sixieme-passage.log" 'événements Pulling des pods de Cilium'
+    2026-11-06T11:00:00Z "$fin" 0 "$R08/cilium-verifier.log" 'événements Pulling des pods de Cilium'   # dernier passage archivé, 06/11 à 13:32:30
 
   echo "## bilan : $(for c in R1 R2 R3 R4 R5 R6 R7 R8; do printf '%s %s, ' "$c" "${V[$c]}"; done | sed 's/, $//')"
   echo "  ce que R ne prouve pas : verdicts des étapes rejouées avec Loki ; effet d'un redémarrage d'Alloy pendant une étape ; délai"

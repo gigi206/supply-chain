@@ -843,7 +843,7 @@ Point commun : les six attendent 0. Un 0 dans Loki ne prouve rien si la collecte
 
 Travail local, rien lu ni écrit dans le cluster, Loki, Grafana, Zot ou les VM. Le propriétaire a choisi « Chantier des Events » parmi les décisions ouvertes. Ce choix ouvre le chantier : il ne valide pas l'estimation et ne vaut pas accord pour le relevé.
 
-- **Début du chantier** : 14:42:02 UTC, heure relevée par `date -u` au début du travail. **Estimation proposée** : 4 h, non validée ; le seuil de décision (2×) serait atteint à 8 h.
+- **Début du chantier** : entre 14:38:26 et 14:42:02 UTC, compté depuis 14:38:26 (corrigé à 14:49 UTC, avant tout push : 14:42:02 avait été relevée après plusieurs minutes de recherche ; 14:38:26 est la dernière heure relevée avant le choix du propriétaire, à la lecture de l'issue #18525). **Estimation proposée** : 4 h, non validée ; le seuil de décision (2×) serait atteint à 8 h.
 - **Commande** : `mise exec -- poc/bricks/08c-durcissement/evenements.sh releve`, journal `resultats/evenements-releve.log`. Le script est rangé dans la 08c, close, parce que les décisions et les prédictions du chantier y sont ; le propriétaire peut le déplacer.
 - **Lu dans le source d'Alloy v1.21.3** (version épinglée par la 19b, `internal/component/loki/source/kubernetes_events/event_controller.go` au tag) :
   - chaque ligne est horodatée par `series.lastObservedTime`, à défaut `lastTimestamp`, à défaut `eventTime` ; kubectl, dans `durcissement.sh:270`, prenait `lastTimestamp // eventTime` : un Event en série peut tomber d'un côté différent de la borne ;
@@ -853,7 +853,7 @@ Travail local, rien lu ni écrit dans le cluster, Loki, Grafana, Zot ou les VM. 
 - **Fenêtres exactes, bornées des deux côtés** (la fonction `grafana_lignes` de la 07a, qui lit jusqu'à l'instant présent, n'est pas reprise) :
   - R1 et R2 : 06/11, 16:49:02 à 16:53:29. 16:49:02 est le `t0` de `h2_releve`, début de `h2_kyverno` (`durcissement.sh:250`, première ligne de `durcissement-h2_kyverno.log`) ; kubectl a compté les 32 Events à `h2_releve`, lancé à 16:53:22. La fenêtre couvre donc la population du contrôle d'origine ;
   - R3 : 07/11, 16:00:56 à 16:05:56 ; R4 : 16:21:58 à 16:26:58 ; R5 et R7 : 08/11, 11:40:44 à 11:45:44 ; R6 : 09/11, 09:30:00 à 09:35:00 ;
-  - R8 : 06/11, 11:00:00 jusqu'à l'heure du passage. Le filtre ajoute `kind="Pod"`, comme `cilium.sh:173`.
+  - R8 : 06/11, 11:00:00 jusqu'à l'heure du passage. Le filtre ajoute `kind="Pod"`, comme `cilium.sh:173`. Lecture par kubectl affichée : `cilium-verifier.log`, dernier passage archivé du contrôle, 06/11 à 13:32:30 (corrigé à 14:49 UTC, avant tout push : `rejeu-rke2-sixieme-passage.log`, 13:28, pris dans une liste non triée ; essai repassé, mêmes bilans).
 - **Numéros de ligne** : depuis le commit `3791082`, les contrôles de `preuves.sh` sont 4 lignes plus bas (3188, 3242, 3302, 3308 au lieu de 3184, 3238, 3298, 3304).
 - **Verdicts écrits avant le passage** :
   - une réponse en erreur ou qui atteint `maxLines` (1000) est **non jugée**, jamais un compte ;
