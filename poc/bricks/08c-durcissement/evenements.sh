@@ -11,7 +11,8 @@
 #   redemarrage systemctl restart alloy sur sc-stockage, démarrage relevé avant et après (accord : « Oui, redémarre Alloy »)
 #   verification lecture seule, après redemarrage : lignes evenements-k8s, journal du composant, santé et position
 #   essai_alerte à sec sur sc-stockage, dans /tmp/essai-evenements retiré ensuite : promtool check et test de alertes.yml (19) avec
-#           EvenementsMuets, alloy validate de la configuration de sc-stockage (19b) avec le compteur ; aucun service touché (accord)
+#           EvenementsMuets, alloy validate de la configuration de sc-stockage (19b) avec le compteur, et deux témoins négatifs qui
+#           doivent être refusés (règle sans la branche absent, attribut inconnu dans metric.counter) ; aucun service touché (accord)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
 set -euo pipefail
@@ -256,18 +257,41 @@ etape_verification() { # lecture seule, quelques minutes après redemarrage
   return $v
 }
 
-etape_essai_alerte() {
+etape_essai_alerte() { # à sec sur sc-stockage, accord à part ; deux témoins négatifs : un « valide » ne vaut que si un cas faux est refusé
   local d=$W/essai-alerte rg=$here/../19-observabilite/config/regles c=$here/../19b-journalisation/config/alloy
   rm -rf -- "${d:?}" && mkdir -p "$d"
   cp "$rg/alertes.yml" "$rg/alertes-tests.yml" "$c/commun"/*.alloy "$c/stockage"/*.alloy "$d/"
   [ "$DISTRO" = k3s ] || cp "$here/../08b-rke2/config/alloy/journaux-rke2.alloy" "$d/"   # même jeu que journalisation.sh installer
+  # Témoins : règle sans la branche absent (le cas « compteur absent, up = 1 » doit échouer) ; attribut inconnu dans metric.counter.
+  python3 -I - "$d" <<'PY'
+import sys
+d = sys.argv[1]
+def muter(src, dst, avant, apres):
+    t = open(f"{d}/{src}", encoding="utf-8").read()
+    assert t.count(avant) == 1, f"motif absent ou multiple dans {src}"
+    open(f"{d}/{dst}", "w", encoding="utf-8").write(t.replace(avant, apres))
+muter("alertes.yml", "alertes.yml.faux",
+      ' or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))', '')
+muter("evenements.alloy", "evenements.alloy.faux", '      action            = "inc"\n',
+      '      action            = "inc"\n      inconnu           = "x"\n')
+PY
   echo "## fichiers essayés : $(cd "$d" && ls | paste -sd' ' -)"
   echo "## sha256 de evenements.alloy : $(sha256sum "$d/evenements.alloy" | cut -c1-64) ; de alertes.yml : $(sha256sum "$d/alertes.yml" | cut -c1-64)"
   copier sc-stockage /tmp/essai-evenements "$d"/*
   rm -rf -- "${d:?}"
-  sur sc-stockage 'cd /tmp/essai-evenements && promtool --version | head -1 && promtool check rules alertes.yml && promtool test rules alertes-tests.yml; r=$?
+  sur sc-stockage 'cd /tmp/essai-evenements || exit 1; r=0
+promtool --version | head -1
+if promtool check rules alertes.yml && promtool test rules alertes-tests.yml; then echo "règles : vérifiées, tests passés"; else echo "règles : échec"; r=1; fi
+mkdir faux-regles && cp alertes-tests.yml faux-regles/ && mv alertes.yml.faux faux-regles/alertes.yml
+o=$(cd faux-regles && promtool test rules alertes-tests.yml 2>&1); v=$?
+if [ "$v" != 0 ] && printf "%s\n" "$o" | grep -q "alertname: EvenementsMuets"; then echo "témoin promtool (règle sans absent) : refusé, attendu"
+else echo "témoin promtool (règle sans absent) : non refusé (code $v)"; r=1; fi
 mkdir config && mv ./*.alloy config/ && o=$(/usr/local/bin/alloy validate config 2>&1); v=$?; printf "%s\n" "$o" | tail -5
 if [ "$v" = 0 ]; then echo "configuration valide"; else echo "configuration refusée (code $v)"; r=1; fi
+mkdir faux-alloy && cp config/*.alloy faux-alloy/ && mv evenements.alloy.faux faux-alloy/evenements.alloy
+o=$(/usr/local/bin/alloy validate faux-alloy 2>&1); v=$?
+if [ "$v" != 0 ] && printf "%s\n" "$o" | grep -q "unrecognized attribute name \"inconnu\""; then echo "témoin alloy (attribut inconnu) : refusé, attendu"
+else echo "témoin alloy (attribut inconnu) : non refusé (code $v)"; printf "%s\n" "$o" | tail -5; r=1; fi
 cd / && rm -rf /tmp/essai-evenements; exit $r' </dev/null
 }
 

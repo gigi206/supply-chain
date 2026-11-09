@@ -1104,3 +1104,32 @@ Conséquence : une règle « le compteur n'augmente plus » seule resterait muet
    - **Point à relire sur la vraie série**, ajouté à 17:32 UTC. D'après le source, `stage.metrics` reprend les étiquettes de la ligne (`recordCounter(..., e.Labels, ...)`) : le compteur porterait `job="evenements-k8s"`. Le bloc `job_name: alloy` de `prometheus.yml` ne pose pas `honor_labels` ; Prometheus renommerait donc ces étiquettes en `exported_job`, et `{job="alloy"}` correspondrait. Avec `honor_labels: true`, la branche `absent` sonnerait en permanence.
 3. **Périmètre et estimation du chantier** : 2 h 51 min écoulées depuis 14:38:26 UTC, attentes comprises. Estimation proposée pour (a) : 1 h de plus, essai, application et vérification comprises. Le doublement est à surveiller.
 4. **Suite d'E4** : modifier les six contrôles, avec un témoin fondé sur la présence de lignes (le même compteur peut servir).
+
+
+## Additif du 09/11/2026, 22:10 UTC : essai hors cluster d'`essai_alerte`, deux témoins négatifs ajoutés
+
+Rien lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM. Après la reprise (« continue », qui n'est pas un accord), seul le travail local a été fait.
+
+**Témoins négatifs ajoutés à `essai_alerte`**, sur relecture du conseiller : un « valide » ou un « tests passés » ne vaut que si l'outil refuse un cas faux.
+- Règle mutée, sans la branche `absent(...)` (`alertes.yml.faux`) : `promtool test rules` doit échouer, avec `EvenementsMuets` dans sa sortie (cas « compteur jamais créé, Alloy répond »).
+- `evenements.alloy` muté, avec un attribut `inconnu` dans `metric.counter` (`evenements.alloy.faux`) : `alloy validate` doit le refuser avec `unrecognized attribute name "inconnu"`.
+- Les mutations sont faites en local par `python3 -I`, avec un contrôle qu'elles s'appliquent une seule fois. Les fichiers `.faux` n'entrent pas dans le répertoire validé (`mv ./*.alloy config/` ne les prend pas : constaté dans l'essai).
+
+**Ce que valide `alloy validate`**, lu au tag v1.21.3 (`internal/validator/validate.go`, `graph.go`, cas de test `invalid_properties` et `invalid_stage_multiline`) : `typecheck.Block` sur chaque composant, qui refuse un attribut inconnu ; les valeurs des stages de `loki.process` sont aussi contrôlées (expression régulière invalide refusée). Ce n'est donc pas une simple vérification de syntaxe. L'unité `alloy.service` ne passe ni `--stability.level` ni `--feature` : `validate` sans option est cohérent avec le service.
+
+**Essai hors cluster** : `resultats/evenements-essai_alerte-essai.log`. Les huit cas donnent ce qui est attendu.
+- rke2 et k3s : code 0 ; jeu envoyé conforme à `journalisation.sh` (10 et 9 fichiers) ; `alloy validate` reçoit seulement les `.alloy`.
+- Chaque échec (check, test, validate, témoin accepté) : code 1, message explicite.
+- Échec de `scp` : code 1 ; restent un répertoire vide `/tmp/essai-evenements` sur la VM et la copie locale `$W/essai-alerte` (fichiers du dépôt, aucun secret). C'est le pire cas annoncé à 17:29, complété par la copie locale.
+
+**Prédictions du passage réel, écrites avant tout passage** :
+- P1 : `promtool check rules` et `promtool test rules` réussissent, cas existants et quatre nouveaux compris ; confiance moyenne sur les bornes de 23, 28 et 29 min.
+- P2 : le témoin promtool est refusé, `EvenementsMuets` dans la sortie.
+- P3 : `alloy validate` accepte la configuration ; confiance moyenne.
+- P4 : le témoin alloy est refusé, `unrecognized attribute name "inconnu"`.
+- P5 : code 0, et `/tmp/essai-evenements` retiré.
+Si P2 ou P4 échoue, l'essai ne prouve rien et l'application reste bloquée.
+
+**Temps** : 7 h 31 min d'horloge depuis 14:38:26 UTC, attentes du propriétaire comprises. L'heure de plus proposée à 17:29 pour (a) est dépassée sans avoir été validée, et l'estimation initiale de 4 h ne l'a jamais été. Reste pour (a) : l'essai réel, l'application dans l'ordre imposé, la vérification en lecture seule, le doc 03 et les README.
+
+Propositions 1 à 4 de l'additif de 17:29 inchangées, toujours en attente.
