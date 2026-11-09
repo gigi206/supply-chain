@@ -2072,6 +2072,7 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
 - Image officielle, avant puis après : 25 cas sur 25 conformes, dont 4 refus par erreur interne. `j5-jeton-valide` reste refusé.
 - Image corrigée : 25 sur 25, **`j5-jeton-valide` admis**, falsifications refusées par la règle, 0 erreur interne.
 - Banc C inchangé, bornage tenu à chaque politique, 0 `FailedCreate`, retour vérifié, CronJobs repris et réussis.
+  - *Correction de 14:00 UTC, avant tout push* : le bornage repose sur 23 témoins discriminants sur 27. Les 0 `FailedCreate` sont sans témoin, donc non informatifs, car aucune création réelle dans le champ de Kyverno n'est attestée pendant la fenêtre.
 - C7 à C13 tenues.
 - `bench-release` de J6 archivée puis retirée.
 

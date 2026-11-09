@@ -313,3 +313,14 @@ Il ne change rien d'autre sur les 25 cas, et le retour à l'image officielle red
 - golangci-lint.
 
 L'image corrigée n'est plus en service : l'admission du PoC reste celle de la release officielle, et le contrôle 9 est toujours jugé par cosign à la porte.
+
+## Correction du 09/11/2026, 14:00 UTC, avant tout push : C12 sans témoin, C8 précisée
+
+Ce point a été relevé à la relecture du conseiller. Le tableau de 13:58 UTC reste écrit tel quel ; ces deux lectures le remplacent.
+- **C12 : tenue sans témoin, 0 non informatif.**
+  - Les CronJobs `horodatage` et `rattrapage` étaient suspendus. Le seul pod créé pendant la fenêtre est celui du contrôleur d'admission, dans `kyverno`, un espace exclu des webhooks.
+  - Aucune création réelle de pod dans le champ de Kyverno n'est attestée de 13:55:25 à 13:57:58 UTC. Les 0 `FailedCreate` relevés ne prouvent donc pas qu'aucune création n'a été refusée.
+  - C'est la règle retenue le même jour pour les Events (E3 des Events) : un 0 sans témoin n'est pas jugé.
+  - Une relecture de l'audit dans Loki pour cette fenêtre le trancherait. C'est une mesure, soumise à l'accord du propriétaire.
+- **C8 : 27 témoins, dont 23 discriminants.** Le pod hors de `bancc` ne prouve le bornage que si la politique refuse ce même cas dans `bancc`. `j5-temoin`, dans les trois phases, et `j5-jeton-valide` avec l'image corrigée admettent le pod de toute façon. Les 23 autres témoins portent la preuve, dont `bench-release` sur `c1-unsigned` dans chaque phase.
+- **Dépendances de `bench-release`**, relues dans `poc/` et `docs/` : seule l'étape `parite` de `politique.sh` la crée. Aucune étape de vérification, aucun rejeu ni aucun témoin ne compte les `ImageValidatingPolicy` ni ne l'attend. Son retrait n'a pas d'autre effet connu.
