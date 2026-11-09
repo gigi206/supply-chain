@@ -1229,6 +1229,10 @@ La tâche planifiée `supply-chain-scan-saut-releve-0911`, accordée le 08/11 pa
 
 Toujours non couverts sous H1 à H5 : la jonction d'un nœud et la branche « scan daté du futur » de `scan.rego`.
 
+## Additif du 09/11/2026, 11:05 UTC : Events dans Loki, analyse à sec et décisions à prendre
+
+Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec ; rien n'est lu ni écrit dans le cluster, Loki, Zot ou les VM, et aucun script n'est modifié. Les six contrôles qui jugent sur des Events attendent tous 0. Pour deux d'entre eux, `preuves.sh:3298` et `08-trust-plane/cilium.sh:173`, la lecture n'a aucune borne de temps et rend 0 dès que les Events ont expiré. Quatre décisions sont à prendre (E1 à E4) : rôle de Loki, unité de compte, témoin de vie de la collecte, ordre. Viennent ensuite huit prédictions d'un relevé en lecture seule sur les fenêtres archivées. Détail : [mesures-reelles-predictions.md](resultats/mesures-reelles-predictions.md), additif de 11:05 UTC.
+
 ## À auditer avant toute décision
 
 Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kata, qui pourrait contourner le blocage virtio-fs. Aucun n'entre dans cette brique sans passage au doc 04.

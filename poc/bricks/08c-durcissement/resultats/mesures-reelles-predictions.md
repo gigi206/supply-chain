@@ -748,3 +748,80 @@ La tâche `supply-chain-scan-saut-releve-0911`, accordée le 08/11 peu avant 12:
 - La tenue du journal local de `sc-stockage` au-delà du 09/11 : `SystemMaxUse` reste à reconsidérer après W8, selon la décision du 07/11 à 20:45 UTC.
 
 Le saut d'un passage du scan (W1 à W8) est entièrement passé.
+
+## Additif du 09/11/2026, 11:05 UTC : Events dans Loki, analyse à sec, décisions à prendre et prédictions d'un relevé, rien lancé
+
+Accord : « traite tout, non ? », en réponse à la proposition de trois travaux à sec, sans effet sur le cluster, Zot ou les VM. Je le comprends comme : les trois, à sec. Rien n'a été lu ni écrit dans le cluster, Loki, Prometheus, Zot ou les VM. Seul le source public d'Alloy v1.21.3 a été relu sur GitHub (`internal/component/loki/source/kubernetes_events/event_controller.go`). Aucun script n'est modifié : la forme des contrôles dépend des décisions E1 à E4 ci-dessous.
+
+**Ce qu'Alloy écrit dans Loki, d'après son source.** Cela complète la revue du 07/11 à 18:18 UTC.
+- Étiquettes : `namespace`, celui de l'objet concerné ; `job` et `instance` ; et `source="evenements-k8s"`, posée par `evenements.alloy`.
+- Ligne JSON :
+  - `name` et `kind` de l'objet concerné, pas de l'Event ;
+  - `reason`, `type`, `count`, `msg`, `eventRV`, `sourcecomponent`, `reportingcontroller`, etc.
+  - Ni le nom de l'Event ni son `creationTimestamp` n'y figurent.
+- Horodatage de la ligne : `series.lastObservedTime` s'il existe, sinon `lastTimestamp`, sinon `eventTime`.
+- Une ligne par création, puis une par mise à jour qui change la `resourceVersion`. Un Event répété donne donc plusieurs lignes.
+- Ligne ignorée si son horodatage ne dépasse pas la position enregistrée au démarrage du collecteur. D'où les pertes ou doublons possibles après un redémarrage d'Alloy, déjà notés le 07/11.
+- Rétention de Loki : `retention_period: 720h` (`19b-journalisation/config/loki.yaml`). Les fenêtres du 06/11 au 08/11 restent lisibles jusqu'au 06/12 environ.
+
+**Les six contrôles, relus dans le dépôt (lignes inchangées depuis le 07/11).**
+
+| Contrôle | Lecture actuelle | Défaut propre à kubectl | Avec Loki |
+|---|---|---|---|
+| `preuves.sh:3184`, `resolveurs_pod` | `PolicyViolation` dont `creationTimestamp` ≥ t0, attendu 0 | Un Event plus ancien que t0, répété après t0, n'est pas compté | Toute ligne datée après t0 compte, répétition comprise : plus strict |
+| `preuves.sh:3238`, `scan_saut_suspendre` | Idem | Idem | Idem |
+| `preuves.sh:3298`, `scan_saut_reprendre` | Events du CronJob dans `scan`, **sans borne de temps**, attendu 0 | Compte ce qui reste de la dernière heure, avant comme après la reprise | Fenêtre bornée à partir de la reprise |
+| `preuves.sh:3304`, `scan_saut_reprendre` | `PolicyViolation` après t1, attendu 0 | Comme 3184 | Comme 3184 |
+| `durcissement.sh:270`, `h2_releve` | `FailedCreate` dont `lastTimestamp // eventTime` > t0, attendu 0 | Un relevé lancé plus d'une heure après H2 rend 0 quoi qu'il soit arrivé | La TTL ne joue plus |
+| `08-trust-plane/cilium.sh:173` | `Pulling` des pods `cilium*` de `kube-system`, **sans borne**, attendu 0 | Passée une heure après le démarrage des pods, rend 0 quoi qu'il soit arrivé | Fenêtre bornée au déploiement des pods |
+
+Point commun : les six attendent 0. Un 0 dans Loki ne prouve rien si la collecte ne tournait pas. Il faut donc un témoin de vie (E3).
+
+**Décisions à prendre par le propriétaire, avec mes recommandations.**
+- **E1, rôle de Loki.**
+  - (a) Loki donne le verdict, et la lecture par kubectl reste affichée ; un écart entre les deux est un CONSTAT, comme pour W8b.
+  - (b) Loki seul.
+  - (c) Double verdict.
+  - Recommandé : (a). Il garde la comparaison sans faire échouer une étape sur la TTL.
+- **E2, unité de compte.**
+  - Des lignes, pas des Events : l'identité de l'Event n'est pas dans la ligne, la reconstruire serait fragile.
+  - Pour des contrôles attendus à 0, l'unité ne change pas le verdict.
+  - Recommandé : compter les lignes et le dire dans le libellé.
+- **E3, témoin de vie de la collecte.**
+  - (a) Le script crée un Event témoin et le retrouve, comme J4 de la 19b. Cela écrit dans le cluster.
+  - (b) Témoin passif, sans rien écrire :
+    - au moins une ligne `evenements-k8s` dans la fenêtre (`rattrapage` et `horodatage` en produisent chaque minute, non relu) ;
+    - Alloy de `sc-stockage` non redémarré dans la fenêtre, d'après `ActiveEnterTimestamp` lu par ssh ;
+    - sinon, non jugé.
+  - Recommandé : (b).
+- **E4, ordre.**
+  - (a) D'abord un relevé en lecture seule sur les fenêtres déjà archivées (prédictions R1 à R8), pour régler les requêtes et mesurer l'écart avec kubectl. Ensuite seulement, la modification des six contrôles, sans rejouer les étapes, qui écrivent dans le cluster.
+  - (b) Modifier tout de suite.
+  - Recommandé : (a).
+
+**Prédictions du relevé R, avant tout passage.**
+- Commande à écrire après les décisions.
+- Effets : lecture de Loki par l'auditeur à travers Grafana ; en option une session ssh sur `sc-stockage`, en lecture seule. Rien n'est écrit.
+- Pire cas : quelques requêtes de plus dans les journaux de Grafana et de Loki.
+- Requêtes :
+  - de forme `{source="evenements-k8s"} | json | reason="…"` ;
+  - avec le filtre `namespace` ou `kind` selon le contrôle ;
+  - comptées sur une fenêtre de 5 minutes à partir de l'heure de départ archivée.
+- Cette fenêtre déborde l'instant du contrôle d'origine : une ligne venue après lui serait un CONSTAT, pas une réfutation.
+
+| # | Fenêtre (UTC) | Attendu | Confiance |
+|---|---|---|---|
+| R1, témoin positif | 06/11, 16:49:02 à 16:53:29 (`h2_releve`), `PolicyViolation` | Au moins 32 lignes, puisque kubectl y comptait 32 Events | Moyenne : collecte non vérifiée ce jour-là |
+| R2, `durcissement.sh:270` | Même fenêtre, `FailedCreate` | 0 | Haute |
+| R3, `preuves.sh:3184` | 07/11 dès 16:00:56, `PolicyViolation` | 0 | Moyenne : d'autres pods ont pu en produire dans les 5 minutes |
+| R4, `preuves.sh:3238` | 07/11 dès 16:21:58, `PolicyViolation` | 0 | Moyenne, même raison |
+| R5, `preuves.sh:3298` | 08/11 dès 11:40:44, `namespace="scan"`, `kind="CronJob"` | 0 | Haute |
+| R6, témoin positif de R5 | 09/11 dès 09:30:00, même filtre | Au moins 1 ligne, création du Job par le contrôleur ; motif exact non relu dans le source | Moyenne |
+| R7, `preuves.sh:3304` | 08/11 dès 11:40:44, `PolicyViolation` | 0 | Moyenne |
+| R8, `cilium.sh:173` | 06/11, 11:00 au 09/11, `namespace="kube-system"`, `reason="Pulling"`, `name=~"cilium.*"` | 0 : les images sont dans le cache de containerd, « already present on machine » au rejeu du 06/11 | Moyenne : pods recréés à H3, `h5_cilium`, H6 et au redémarrage des VM |
+
+- Affiché, non jugé : le dernier démarrage d'Alloy sur `sc-stockage`. Prédit : au redémarrage des VM du 07/11, vers 11:22 UTC. R1, R2 et R8 sont donc antérieurs ou à cheval.
+- Ce que R ne prouvera pas :
+  - que les étapes rejouées avec Loki rendraient les mêmes verdicts ;
+  - l'effet d'un redémarrage d'Alloy pendant une étape ;
+  - le délai d'ingestion d'un Event : sa mesure demanderait un témoin écrit, option (a) de E3.
