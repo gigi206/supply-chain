@@ -1,0 +1,73 @@
+# evenements.sh releve, 2026-11-09T16:21:25Z
+## Alloy de sc-stockage (affiché, E3) : actif depuis 2026-11-07T11:22:39Z, active
+  fin des fenêtres ouvertes (R8) : 2026-11-09T16:21:25Z
+## R1, témoin positif de R2 (h2_releve)
+  fenêtre : 2026-11-06T16:49:02Z à 2026-11-06T16:53:29Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : durcissement-h2_releve.log : événements PolicyViolation depuis H2 : 32
+  E3 : lignes evenements-k8s dans la fenêtre : 99
+  E3 : Alloy démarré le 2026-11-07T11:22:39Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 32
+  première : 2026-11-06T16:50:00Z, dernière : 2026-11-06T16:53:00Z
+    16 ValidatingPolicy limites-obligatoires PolicyViolation count=-
+    1 Pod rattrapage-29899733-6mlb9 PolicyViolation count=-
+    1 Pod rattrapage-29899732-2hxw9 PolicyViolation count=-
+    1 Pod rattrapage-29899731-plpzq PolicyViolation count=-
+    1 Pod rattrapage-29899730-xjgb2 PolicyViolation count=-
+    1 Pod horodatage-29899733-mgpbp PolicyViolation count=-
+    1 Pod horodatage-29899732-jr7pg PolicyViolation count=-
+    1 Pod horodatage-29899731-24zwf PolicyViolation count=-
+    1 Pod horodatage-29899730-nz6fs PolicyViolation count=-
+    1 Job rattrapage-29899733 PolicyViolation count=-
+    1 Job rattrapage-29899732 PolicyViolation count=-
+    1 Job rattrapage-29899731 PolicyViolation count=-
+    1 Job rattrapage-29899730 PolicyViolation count=-
+    1 Job horodatage-29899733 PolicyViolation count=-
+    1 Job horodatage-29899732 PolicyViolation count=-
+OK   R1 : 32 lignes (attendu : >=32)
+## R6, témoin positif de R5, passage planifié du 09/11
+  fenêtre : 2026-11-09T09:30:00Z à 2026-11-09T09:35:00Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  E3 : aucune ligne evenements-k8s dans la fenêtre
+  lignes (E2 : des lignes, pas des Events) : 0
+KO   R6 : 0 lignes (attendu : >=1)
+## précondition non remplie : R1 OK, R6 KO ; les 0 de R2 à R5, R7 et R8 sont écrits non jugés
+## R2, durcissement.sh:270, FailedCreate depuis H2
+  fenêtre : 2026-11-06T16:49:02Z à 2026-11-06T16:53:29Z ; requête : {source="evenements-k8s"} | json | reason="FailedCreate"
+  kubectl (archivé, E1) : durcissement-h2_releve.log : OK   événements FailedCreate depuis H2 : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 99
+  E3 : Alloy démarré le 2026-11-07T11:22:39Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R2 : 0 lignes (attendu : 0), témoin E3 absent
+## R3, preuves.sh:3188 (3184 dans les prédictions), resolveurs_pod
+  fenêtre : 2026-11-07T16:00:56Z à 2026-11-07T16:05:56Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-resolveurs_pod.log : OK   événements PolicyViolation depuis 2026-11-07T16:00:56Z : 0
+  E3 : aucune ligne evenements-k8s dans la fenêtre
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R3 : 0 lignes (attendu : 0), témoin E3 absent
+## R4, preuves.sh:3242 (3238), scan_saut_suspendre
+  fenêtre : 2026-11-07T16:21:58Z à 2026-11-07T16:26:58Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_suspendre.log : OK   événements PolicyViolation depuis 2026-11-07T16:21:58Z : 0
+  E3 : aucune ligne evenements-k8s dans la fenêtre
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R4 : 0 lignes (attendu : 0), témoin E3 absent
+## R5, preuves.sh:3302 (3298), CronJob du scan à la reprise
+  fenêtre : 2026-11-08T11:40:44Z à 2026-11-08T11:45:44Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_reprendre.log : OK   événements du CronJob du scan (MissSchedule compris) : 0
+  E3 : aucune ligne evenements-k8s dans la fenêtre
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R5 : 0 lignes (attendu : 0), témoin E3 absent
+## R7, preuves.sh:3308 (3304), scan_saut_reprendre
+  fenêtre : 2026-11-08T11:40:44Z à 2026-11-08T11:45:44Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  kubectl (archivé, E1) : preuves-h5-scan_saut_reprendre.log : OK   événements PolicyViolation depuis 2026-11-08T11:40:44Z : 0
+  E3 : aucune ligne evenements-k8s dans la fenêtre
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R7 : 0 lignes (attendu : 0), témoin E3 absent
+## R8, cilium.sh:173, Pulling des pods de Cilium
+  fenêtre : 2026-11-06T11:00:00Z à 2026-11-09T16:21:25Z ; requête : {source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | reason="Pulling" | name=~"cilium.*"
+  kubectl (archivé, E1) : cilium-verifier.log : OK   événements Pulling des pods de Cilium : 0
+  E3 : lignes evenements-k8s dans la fenêtre : 1000 (au moins)
+  E3 : Alloy démarré le 2026-11-07T11:22:39Z, après le début de la fenêtre : redémarrages antérieurs inconnus
+  lignes (E2 : des lignes, pas des Events) : 0
+NJ   R8 : 0 lignes (attendu : 0), témoin E3 absent
+## bilan : R1 OK, R2 NJ, R3 NJ, R4 NJ, R5 NJ, R6 KO, R7 NJ, R8 NJ
+  ce que R ne prouve pas : verdicts des étapes rejouées avec Loki ; effet d'un redémarrage d'Alloy pendant une étape ; délai
+  d'ingestion ; Events sans aucun horodatage, écartés par Alloy (1 sur 918 en L4 de la 19b)

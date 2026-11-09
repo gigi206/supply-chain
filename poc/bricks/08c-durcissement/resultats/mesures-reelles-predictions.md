@@ -881,3 +881,33 @@ Cette réponse ne porte que sur cette question. Restent sans réponse à cette h
 - le push de `dd12881` et `67a88ee`.
 
 Rien n'est lancé.
+
+## Additif du 09/11/2026, 16:22 UTC : résultat du relevé R1 à R8 des Events, précondition non remplie, constat de collecte
+
+**Accord du propriétaire.** Il a répondu « Oui, lance le relevé » à « Je lance le relevé evenements.sh releve ? ». La proposition citait les effets et le pire cas (additif de 14:46 UTC). Commande lancée de 16:21:25 à 16:21:27 UTC, code 1, journal `resultats/evenements-releve.log`. Seules les 16 requêtes de l'auditeur et les 2 lectures `systemctl` prévues ont été faites ; rien n'a été écrit dans le cluster, Loki, Grafana ou les VM.
+
+**Bilan : R1 OK, R6 KO, R2 à R5, R7 et R8 non jugés.**
+
+| # | Prédit | Mesuré | Lecture |
+|---|---|---|---|
+| Démarrage d'Alloy | Vers 11:22 UTC le 07/11 | 07/11, 11:22:39 UTC | Tenue |
+| R1, témoin positif | Au moins 32 lignes | 32 lignes, de 16:50:00 à 16:53:00 ; témoin E3 : 99 lignes `evenements-k8s` | Tenue ; autant de lignes que d'Events comptés par kubectl |
+| R6, témoin positif | Au moins 1 ligne | 0 ligne ; témoin E3 : **aucune ligne `evenements-k8s` dans la fenêtre** | **Réfutée** |
+| R2 | 0 | 0, non jugé : Alloy a démarré après le début de la fenêtre | Non jugé, comme prédit à 14:46 UTC |
+| R3, R4, R5, R7 | 0 | 0, non jugés : aucune ligne `evenements-k8s` dans leur fenêtre, et précondition non remplie | Non jugés ; **non prédit** : E3 était attendu présent |
+| R8 | 0 | 0, non jugé : Alloy a démarré après le début de la fenêtre ; témoin E3 : au moins 1000 lignes (réponse tronquée, lues depuis le 06/11 à 11:00) | Non jugé, comme prédit à 14:46 UTC |
+
+**Constat, mesuré.** Les quatre fenêtres postérieures au démarrage d'Alloy du 07/11 (07/11 à 16:00:56 et 16:21:58, 08/11 à 11:40:44, 09/11 à 09:30:00, cinq minutes chacune) ne contiennent **aucune** ligne `{source="evenements-k8s"}`. Les deux fenêtres du 06/11 en contiennent (99 lignes pour R1 et R2, au moins 1000 sur R8).
+
+**Pourquoi R6 ne peut pas être un 0 réel.** D'après `durcissement-h5_planifie-0911.log` (relecture du 09/11 à 10:40:42 UTC), le CronJob du scan a créé le Job `scan-sample-app-29903610` à 09:30:00. Son pod a tourné sur `sc-confiance` de 09:30:00 à 09:31:54, et le Job a réussi. Des Events (création du Job, ordonnancement et conteneurs du pod) sont donc attendus dans la fenêtre. Ce point est déduit du fonctionnement de Kubernetes ; ces Events n'ont pas été relus.
+
+**Hypothèse, non vérifiée.** La collecte des Events par Alloy (`loki.source.kubernetes_events`, `evenements.alloy`) ne livre plus rien depuis le redémarrage des VM du 07/11, alors que le service `alloy` est actif. La cause n'est pas connue. Si l'hypothèse se confirme, l'exigence d'audit (« tout consultable dans Grafana ») n'est pas tenue pour les Events depuis le 07/11, et le chantier doit réparer la collecte avant de modifier les six contrôles.
+
+**Ce que le relevé ne permet pas de dire** :
+- l'heure de la dernière ligne `evenements-k8s` ;
+- si la collecte s'est arrêtée au démarrage du 07/11 ou plus tard ;
+- la cause.
+
+Le relevé ne lisait que des fenêtres de cinq minutes. Un diagnostic demande d'autres lectures, chacune soumise à l'accord du propriétaire.
+
+**Temps** : 1 h 43 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises. L'estimation de 4 h n'est pas validée, et elle ne couvrait pas une réparation de la collecte.
