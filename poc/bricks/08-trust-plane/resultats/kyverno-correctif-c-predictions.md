@@ -72,3 +72,82 @@ Ce point a été relevé à la relecture du conseiller, puis vérifié dans le d
   - l'espace `bancc` est créé s'il n'existe plus ;
   - les deux sont retirés à la fin, et leur retrait est contrôlé.
 - C1 : avant la bascule, avec le pod corrigé, `j5-temoin` est admis. Confiance moyenne : ce pod n'a jamais été présenté sous H5.
+
+## Additif du 09/11/2026, 13:18 UTC : décision C0, option (a), et protocole révisé, à sec
+
+**Décision du propriétaire.** Il a répondu « (i) passage borné » à « Pour C0, que retenez-vous ? ». Le choix proposé était : (i), le passage (a), limité au temps de la mesure ; (ii), garder l'image corrigée en service ; ou attendre. Il avait d'abord écrit : « non attendre nous ralentirait : il vaut mieux avancer avec, non ? ». J'avais alors rappelé que l'attente ne ralentit pas le PoC : le contrôle 9 est vérifié par cosign dans la porte (README de la 08, décision du 29/10). Le choix vaut pour le passage, pas pour une estimation ni pour les accords de chaque effet.
+
+Rien n'est construit, téléchargé, poussé ni appliqué. Relevés locaux archivés : [`kyverno-correctif-c-sec.log`](kyverno-correctif-c-sec.log).
+
+### Construction : interprétation, sans téléchargement
+
+Le protocole (a) prévoyait ko et une image de base téléchargés. Les relevés locaux montrent qu'on peut s'en passer. C'est un écart au protocole accepté : je l'écris comme une interprétation, soumise au propriétaire.
+- **Image officielle**, déjà dans le cache OCI local : manifeste amd64 `sha256:6f0c5200…` de l'index `c8c4dd09…`. Elle a trois couches :
+  - la base apko ;
+  - `kodata` ;
+  - le binaire `/ko-app/kyverno`.
+
+  Point d'entrée `/ko-app/kyverno`, utilisateur 65532.
+- **Binaire officiel** (`go version -m`) :
+  - go1.26.9, `-trimpath`, `CGO_ENABLED=0`, amd64 v1 ;
+  - `vcs.revision=e63308f1e16c`, `vcs.modified=true`, 333 dépendances.
+
+  `-ldflags` n'est pas enregistré, sans doute à cause de `-trimpath` (non vérifié dans le source de Go). Le Makefile de v1.19.2 donne `-s -w -X …/pkg/version.BuildVersion=$(VERSION)`.
+- **Binaire corrigé** : `./cmd/kyverno` du clone v1.19.2 (`e63308f1e16c` et le correctif v2, deux fichiers sous `pkg/image/verifiers/ivpol/cosign/`).
+  - Construit hors ligne : `GOPROXY=off`, modules du cache vérifiés contre `go.sum` (« all modules verified »), `go list -deps` complet.
+  - Mêmes réglages que le binaire officiel, avec `-ldflags "-s -w -X github.com/kyverno/kyverno/pkg/version.BuildVersion=v1.19.2"`.
+  - **Écart connu** : la chaîne Go est go1.26.10 (cache), au lieu de go1.26.9. Prendre go1.26.9 demanderait un téléchargement : à décider.
+- **Image corrigée** : `crane append` (go-containerregistry v0.20.6, déjà épinglé dans `mise.toml`), sur le manifeste amd64 officiel par digest, d'une couche qui contient `ko-app/kyverno` en mode 0755, propriétaire 0:0.
+  - Base, `kodata`, point d'entrée et utilisateur restent identiques. Le binaire officiel reste dans l'image, masqué par la couche ajoutée.
+  - Le contrôle compare le binaire extrait de l'image poussée au binaire construit.
+- **Signature par une clé d'essai : retirée.** L'espace `kyverno` est exclu des règles de la 08c, et aucune `ImageValidatingPolicy` ne vérifie les images de cet espace : la signature ne serait jugée par personne. L'image d'essai est désignée par son digest, relevé au moment de l'envoi.
+
+### Ce que le passage (a) écrirait dans Zot
+
+- Écriture sous `essais/kyverno-correctif` par `poc-ecriture`, le compte de l'hôte qui écrit dans tous les dépôts. Lecture anonyme : le kubelet peut tirer l'image.
+- **`poc-ecriture` n'a pas le droit de supprimer** (`stockage.sh`, refus vérifié à la mise en place). L'image reste donc dans Zot après le passage. Effet à accepter, ou à retirer par un autre moyen à décider.
+
+### Découvertes sous H5, en plus de la correction de 11:10
+
+- **Le pod de J6 serait aussi refusé par `images-zot-par-digest`.** Son image est désignée par l'adresse de l'hôte (`192.168.161.13:5000/…`). La règle exige `sc-stockage.poc.test:5000/` et un digest, et `bancc` n'en est pas exclu.
+- **La politique d'images de J6 n'est bornée que par l'image** (`glob: "192.168.161.13:5000/*"`), pas par l'espace. Avec le nom `sc-stockage.poc.test:5000`, elle viserait tous les pods réels du cluster, et refuserait tous ceux qui n'ont pas de bundle valide.
+- **Révision** : la politique de C est bornée deux fois :
+  - par l'espace (`namespaceSelector` sur `bancc`) ;
+  - par l'image (`glob` sur `sc-stockage.poc.test:5000/builds/essai-signature*`).
+
+  Le dépôt des bundles est désigné par le même nom. Témoin juste après sa création : un pod ordinaire hors de `bancc` (dry-run serveur) reste admis. Sinon, la politique est retirée sur-le-champ et le passage s'arrête KO.
+- **Non relu : la joignabilité de Zot depuis les pods de Kyverno sous H4.** En J6, sous k3s, Kyverno lisait Zot par l'adresse de l'hôte. Depuis H4, le pare-feu d'hôte protège Zot, et aucune vérification d'image par l'admission n'a tourné. Le témoin `j5-temoin` avec l'image officielle le dira : s'il échoue sur une erreur réseau, le passage s'arrête avant toute bascule.
+- **Chaque refus est attribué** : le script exige le nom de la politique d'essai dans le message de refus. Un refus par une règle de la 08c est KO pour la mesure, jamais le refus attendu.
+
+### Périmètre proposé, réduit
+
+- **Gardés** : les 8 cas `j5-*`, avec l'image officielle puis avec l'image corrigée, puis de nouveau avec l'image officielle.
+- **Retirés, proposition** :
+  - les 30 cas d'admission de J6 : ils jugent des `ValidatingPolicy`, un chemin que le correctif ne touche pas ;
+  - les 17 cas du banc C : ils exigent une écriture de plus dans Zot (`bench/`), avec un pod de banc qui ne passe plus sous H5.
+
+  La non-régression du chemin `ivpol` reste couverte par `j5-temoin`, `j5-att-historique` et les 6 refus, et en CLI par l'étape B (24 cas sur 24).
+
+### Prédictions du passage révisé, avant tout passage
+
+C1 à C6 restent écrites ci-dessus, sans valeur en l'état (correction de 11:10). Les prédictions suivantes les remplacent pour ce protocole.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| C7 | Construction : binaire construit hors ligne ; l'image poussée en contient le même sha256 ; base, `kodata`, point d'entrée et utilisateur identiques au manifeste `6f0c5200…` | Haute |
+| C8 | Politique d'essai bornée : le pod ordinaire hors de `bancc` est admis | Haute |
+| C9 | Image officielle, avant : `j5-temoin` admis ; `j5-jeton-valide` refusé avec une erreur interne (« nil pointer ») ; les 6 autres refusés, par la politique d'essai | Moyenne : Zot n'a pas été lu depuis Kyverno sous H4, ni avec ce nom |
+| C10 | Image corrigée : `j5-temoin` et `j5-jeton-valide` admis | Moyenne |
+| C11 | Image corrigée : les 6 autres refusés par la politique d'essai, sans erreur interne, avec les motifs de l'étape B | Moyenne |
+| C12 | Aucune création de pod réelle refusée pendant les deux bascules, CronJobs `horodatage` et `rattrapage` suspendus ; 0 `FailedCreate` | Moyenne : nombre de répliques non relu |
+| C13 | Retour : `imageID` officiel `c8c4dd09…`, et C9 rejouée à l'identique | Haute |
+
+**Pire cas.** Les webhooks de Kyverno sont en `failurePolicy: Fail`. Si le contrôleur d'admission ne démarre pas avec l'image corrigée, toute création de pod dans le champ de Kyverno est refusée jusqu'au retour. Le retour reste possible, puisque l'espace `kyverno` est exclu. D'où la garde horaire du protocole :
+- hors de 09:20 à 09:45 UTC ;
+- hors du 21/11, de 15:30 à 16:30 UTC.
+
+Une politique d'essai mal bornée refuserait aussi des pods réels. Le témoin C8 l'arrête dans la seconde.
+
+**Ce que C ne prouvera pas, inchangé** : le background et les rapports, la tenue dans la durée, et un redémarrage avec l'image corrigée.
+
+**Estimation** : aucune n'est fixée. Je propose 4 h (script et passage), à valider par le propriétaire avant tout passage.

@@ -2054,6 +2054,12 @@ Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec.
   - Toute image construite par nous est sans release signée de l'éditeur, contre le critère du doc 04, §1.
 - Pire cas pour (a) : le contrôleur d'admission ne démarre pas, et ses webhooks en `failurePolicy: Fail` refusent les créations de pods jusqu'au retour. D'où la suspension de `horodatage` et `rattrapage` et une garde horaire autour de 09:30 UTC et du 21/11.
 
+**Additif du 09/11/2026, 13:18 UTC : décision C0, option (a), « (i) passage borné », protocole révisé à sec.** Rien n'est construit, téléchargé, poussé ni appliqué ([relevés locaux](resultats/kyverno-correctif-c-sec.log)). Détail : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md), additif de 13:18 UTC.
+- Construction sans téléchargement, soumise au propriétaire : binaire `./cmd/kyverno` construit hors ligne (modules vérifiés), puis ajouté par `crane append` sur le manifeste amd64 officiel. Écart connu : go1.26.10 au lieu de go1.26.9. Pas de signature d'essai : personne ne la jugerait.
+- Sous H5, le pod de J6 serait aussi refusé par `images-zot-par-digest`. La politique d'essai de J6 n'était bornée que par l'image : elle serait désormais bornée par l'espace et par l'image, avec un témoin juste après sa création.
+- Image laissée dans Zot sous `essais/` : `poc-ecriture` ne peut pas supprimer.
+- Périmètre proposé : les 8 cas `j5-*` seulement. Prédictions C7 à C13, aucune estimation fixée (4 h proposées).
+
 ## Veille : promo-tools et Macaron (08/11/2026, relevé de 18:13:36 à 18:14:02 UTC)
 
 Question du propriétaire : « Et https://github.com/kubernetes-sigs/promo-tools et https://github.com/oracle/macaron seraient des solutions pertinentes? ». Une première lecture faite à 18:08 UTC est restée dans la sortie de Bash, non archivée. Le relevé a ensuite été refait et archivé sur accord du propriétaire (« Oui » à « J'archive ce relevé (journal + additifs datés au doc 00 et au doc 04 […]) : oui ou pas maintenant ? »). Il a été fait par [`sante-veille.sh`](sante-veille.sh) ([relevés](resultats/sante-veille-releves.log), [documents](resultats/sante-veille-documents.log)), en lecture publique seulement : rien d'installé, rien lu ni écrit dans Zot, le cluster ou les VM.

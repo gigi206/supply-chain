@@ -1,0 +1,36 @@
+# Étape C du correctif Kyverno, relevés à sec (lecture locale seulement : cache OCI, clone v1.19.2, cache des modules ; rien téléchargé, rien lu ni écrit dans Zot, le cluster ou les VM)
+# relevé : 2026-11-09T13:18:52Z
+## image officielle du contrôleur d'admission, manifeste amd64 de l'index sha256:c8c4dd09… (cache OCI local)
+manifeste amd64 sha256:6f0c520054d863a4a3df53ac7bb67d571d20421b77b99809013a62ec5f1d5947
+Entrypoint ['/ko-app/kyverno'] ; User 65532
+couche sha256:0980437f2d8c3033618d594b435abda84c7eb3dc4bef81104a34afb2c51028f2 303699 | apko | This is an apko single-layer image
+couche sha256:5fac7d110919dd92f1bf6bf731f63f35e7814cc0144a5fef30d41e068f44b4f2 5643 | ko | kodata contents, at $KO_DATA_PATH
+couche sha256:29e1273fd60e5d890a8a99fc3d9109aa8595c4ceafba2abeec1d1b0365f8cc8c 47627268 | ko | go build output, at /ko-app/kyverno
+## binaire officiel /ko-app/kyverno (extrait de la troisième couche) : go version -m, hors lignes dep
+<extrait>/ko-app/kyverno: go1.26.9
+	path	github.com/kyverno/kyverno/cmd/kyverno
+	mod	github.com/kyverno/kyverno	v1.19.2+dirty	
+	=>	github.com/kyverno/pod-security-admission	v0.0.0-20261015135348-40bb0fb141a9	h1:a60yPq4EC9s0l68R/s1tXwxy1QP5sxXD7k0XDXcmWoY=
+	
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=linux
+	build	GOAMD64=v1
+	build	vcs=git
+	build	vcs.revision=e63308f1e16c05cd009ac4864be6ec25c66b49be
+	build	vcs.time=2026-10-20T22:13:49Z
+	build	vcs.modified=true
+dépendances listées : 333
+sha256 du binaire officiel : 7913082b95920ca27f3490a80c5fe63fc5b0b894d2aab5791e16b2a1f044f7b3
+## clone v1.19.2 : tête et fichiers modifiés
+tête e63308f1e16c05cd009ac4864be6ec25c66b49be
+ M pkg/image/verifiers/ivpol/cosign/opts.go
+ M pkg/image/verifiers/ivpol/cosign/verifier.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+## modules de ./cmd/kyverno hors ligne (GOPROXY=off, GOFLAGS=-mod=readonly, chaîne go1.26.10 du cache)
+OK   go list -deps ./cmd/kyverno : tous les paquets en cache
+go mod verify : all modules verified
