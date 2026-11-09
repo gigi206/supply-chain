@@ -957,7 +957,7 @@ Commande lancée de 16:32:20 à 16:32:21 UTC, code 0, journal `resultats/eveneme
 | (a) lignes depuis le démarrage | 0 | 0 | Tenue |
 | (b) journal de `sc-stockage`, fenêtre de R6 | Au moins 1 | Au moins 1000 (réponse tronquée) ; `evenements-k8s` : 0 | Tenue : Alloy écrit encore dans Loki |
 | (c) lignes d'`alloy.service` | Au moins 1 | 77 depuis le 07/11 à 11:00 | Tenue |
-| (c) composant des Events | Ligne de démarrage et erreur de classe inconnue | 11:20 : « stopping watcher for events » (arrêt des VM) ; 11:22 : « watching events for namespace », puis `level=error` « event watcher exited with error », `failed to configure informers: failed to get server groups: Get "…`, puis « stopping watcher for events » | Tenue en partie : la fin du message, qui porte la classe (adresse, refus, délai), est coupée à 200 caractères par le script et n'a pas été lue |
+| (c) composant des Events | Ligne de démarrage et erreur de classe inconnue | 11:20 : « stopping watcher for events » (arrêt des VM) ; 11:22 : « watching events for namespace », puis `level=error` « event watcher exited with error », `failed to configure informers: failed to get server groups: Get "…`, puis « stopping watcher for events » | Tenue en partie : la fin du message, qui porte la classe (adresse, refus, délai), n'a pas été lue. Elle n'est pas coupée à 200 caractères, comme écrit d'abord : l'extraction `err="[^"]*"` du script s'arrête au premier guillemet échappé, `Get \"`, vers le 75ᵉ caractère. Le masque `jeton|token` n'a porté que sur ce début ; la suite n'a pas été affichée, sans fuite (corrigé à 17:00 UTC, avant tout push) |
 | (d) santé | `healthy` | `healthy`, « started component », depuis le 07/11 à 11:22:41 | Tenue |
 | (d) `last_event_timestamp` | Égal à (a) | 2026-11-07T11:20:08Z, égal à (a) ; heure de la VM à la lecture : 16:32:21 | Tenue : position en retard, pas en avance ; l'hypothèse d'une position en avance est écartée |
 
@@ -971,7 +971,7 @@ Commande lancée de 16:32:20 à 16:32:21 UTC, code 0, journal `resultats/eveneme
 Explication probable du premier échec, déduite et non vérifiée : l'API de `sc-confiance` n'était pas encore prête quand Alloy de `sc-stockage` a redémarré, deux minutes après l'arrêt.
 
 **Ce qui reste non établi** :
-- la classe exacte de l'erreur (fin du message non lue) ;
+- la classe exacte de l'erreur (fin du message non lue, voir la correction de 17:00 UTC dans le tableau). Elle décide du remède : un refus de connexion ou un délai se répare par un redémarrage d'Alloy ; `Unauthorized`, `x509` ou une erreur de jeton feraient échouer le redémarrage de la même façon ;
 - (H-b), l'enregistrement par l'API : il n'a pas été lu, mais il n'est plus nécessaire pour expliquer l'absence de lignes ;
 - pourquoi aucune alerte n'a signalé cette source muette depuis le 07/11 : non relu.
 
@@ -979,6 +979,13 @@ Explication probable du premier échec, déduite et non vérifiée : l'API de `s
 
 **Conséquences.**
 - Aucun Event n'est consultable dans Grafana du 07/11 à 11:20:08 jusqu'à une relance. Ceux de cette période qui ont expiré de l'API (durée de vie d'une heure) sont perdus.
-- Le même arrêt se reproduira à chaque redémarrage de `sc-stockage` qui précède la disponibilité de l'API, par exemple à chaque rejeu ou redémarrage des VM.
+- Si l'explication par l'API pas encore prête se confirme, le même arrêt se reproduirait à chaque redémarrage de `sc-stockage` qui précède la disponibilité de l'API, par exemple à chaque rejeu ou redémarrage des VM (formulation rendue conditionnelle à 17:00 UTC, avant tout push).
+
+**Lectures locales, 17:00 UTC, sans accès au cluster.**
+- Le jeton du collecteur vient du Secret `alloy-evenements-jeton`, de type `kubernetes.io/service-account-token` (`19b-journalisation/cluster/evenements.yaml`, `journalisation.sh:288`), donc sans durée de vie fixée. Valeur non lue.
+- L'alerte `SourceMuette` (`19-observabilite/config/regles/alertes.yml`) ne surveille que le relais de `sc-confiance` et `sc-build` et le journal de `sc-stockage`, pas `evenements-k8s`. C'est pourquoi aucune alerte n'a signalé la panne.
+- Les pertes d'un redémarrage d'Alloy de `sc-stockage`, qui porte aussi le relais, n'ont jamais été mesurées : L6 a mesuré les pertes du relais gRPC, pas d'un redémarrage.
+
+**Observation sur E3.** La moitié « Alloy non redémarré » du témoin E3 n'aurait rien détecté : `alloy` était actif, jamais redémarré, et le composant restait `healthy`. Seule la condition « au moins une ligne `evenements-k8s` dans la fenêtre » a révélé la panne. Pour la modification des six contrôles, un témoin fondé sur la présence de lignes est nécessaire ; l'état systemd et la santé du composant ne suffisent pas. La décision sur E3 reste au propriétaire.
 
 **Temps** : 1 h 55 min écoulées depuis 14:38:26 UTC, attentes de réponse comprises.

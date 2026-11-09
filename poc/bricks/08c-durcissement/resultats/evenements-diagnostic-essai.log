@@ -190,3 +190,139 @@ dépôt : git status et resultats/ inchangés
   ## bilan : R1 KO, R2 KO, R3 KO, R4 KO, R5 KO, R6 OK, R7 KO, R8 KO
   code : 1
 dépôt : git status et resultats/ inchangés
+
+# Additif du 09/11/2026, 17:00 UTC, après le passage du diagnostic, sur relecture du conseiller : l'extraction de err dans classes()
+# ('err="[^"]*"') s'arrêtait au premier guillemet échappé ; au passage de 16:32 UTC, le message s'est donc arrêté à « Get \" » et le masque
+# jeton|token n'a porté que sur ce début (la suite n'a pas été affichée, aucune fuite). Corrigé : guillemets échappés compris, masque
+# appliqué à la ligne entière, classe affichée ; nouvelle étape classe (relecture de (c) seule, une requête). Harnais complété de deux
+# lignes à guillemets échappés, dont une où « token » n'apparaît qu'après le guillemet. Second passage :
+## faux curl (bin/curl), complété
+#!/usr/bin/env python3
+import sys,json,os
+a=sys.argv[1:]; out=None; data=None
+for i,x in enumerate(a):
+    if x=='-o': out=a[i+1]
+    if x=='-d': data=a[i+1]
+cfg=sys.stdin.read()
+log=os.environ['ESSAI_LOG']
+q=json.loads(data); e=q['queries'][0]['expr']; de=int(q['from'])//1000; to=int(q['to'])//1000
+open(log,'a').write('curl\t%s\t%d\t%d\tmdp_en_argument=%s\n'%(e,de,to, any('FAUX-MDP' in x for x in a)))
+mode=os.environ.get('ESSAI_MODE','normal')
+import datetime
+def ts(s): return int(datetime.datetime.fromisoformat(s.replace('Z','+00:00')).timestamp())
+R1=ts('2026-11-06T16:49:02Z'); R6=ts('2026-11-09T09:30:00Z')
+n=0
+if mode=='http500': print('500',end=''); open(out,'w').write('{}'); sys.exit(0)
+if mode=='erreur': json.dump({'results':{'A':{'error':'parse error','status':400}}},open(out,'w')); print('200',end=''); sys.exit(0)
+if 'alloy.service' in e and 'kubernetes_events' in e:
+    lines=['ts=2026-11-07T11:22:40Z level=info msg="watching events for namespace" component_path=/ component_id=loki.source.kubernetes_events.evenements namespace=""',
+           'ts=2026-11-07T11:22:41Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="Get https://x: open /etc/alloy/secrets/k8s.token: Unauthorized"',
+           'ts=2026-11-07T11:22:42Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused"',
+           'ts=2026-11-07T11:22:43Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="failed to configure informers: failed to get server groups: Get \\"https://192.168.161.11:6443/api\\": dial tcp 192.168.161.11:6443: connect: connection refused"',
+           'ts=2026-11-07T11:22:44Z level=error msg="event watcher exited with error" component_path=/ component_id=loki.source.kubernetes_events.evenements err="Get \\"https://x/api\\": open /etc/alloy/secrets/k8s.token: permission denied"']
+    n=len(lines)
+    frames=[{'data':{'values':[[{}]*n,[ (de+i)*1000 for i in range(n)],lines]}}]
+    json.dump({'results':{'A':{'frames':frames}}},open(out,'w')); print('200',end=''); sys.exit(0)
+if e=='{source="evenements-k8s"}': n=int(os.environ.get('ESSAI_TEMOIN','5'))
+elif 'PolicyViolation' in e and de==R1: n=int(os.environ.get('ESSAI_R1','40'))
+elif 'kind="CronJob"' in e and de==R6: n=1
+elif mode=='tout' : n=2
+if mode=='tronque' and 'PolicyViolation' in e and de==R1: n=1000
+lines=[json.dumps({'name':'p%d'%i,'kind':'Pod','reason':'X','msg':'secret token jeton','count':1}) for i in range(n)]
+frames=[{'data':{'values':[[{}]*n,[ (de+i)*1000 for i in range(n)],lines]}}] if n else []
+json.dump({'results':{'A':{'frames':frames,'status':200}}},open(out,'w')); print('200',end='')
+## sortie
+# date : 2026-11-09T17:00:28Z ; sha256 de evenements.sh : 2fb4f01718812ff39ff0101a9d65b9f346ff2218c0437e40fc35689742df630d
+## normal (ESSAI_MODE=normal)
+  # evenements.sh diagnostic, 2026-11-09T17:00:28Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T17:00:28Z (sens backward, maxLines 1)
+    (a) : dernière ligne à 2026-11-06T16:53:33Z
+      1 Pod p4 X count=1
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 5
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    (b) lignes du journal de sc-stockage : 0 (ok)
+    (b) lignes evenements-k8s, même fenêtre : 5 (ok)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (ok)
+    (c) lignes du composant des Events : 5 (ok)
+      1 2026-11-07T11:00 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : Unauthorized
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="failed to configure informers: failed to get server groups: Get \"https://192.168.161.11:6443/api\": dial tcp 192.168.161.11:6443: connect: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : permission denied
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+    (d) santé : healthy, started component, depuis 2026-11-07T11:22:40Z
+    (d) état de débogage (namespace, last_event_timestamp) :
+      [{"name":"event_controller","type":"block","body":[{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-07T11:20:00Z"}}]}]
+    (d) heure de la VM au moment de la lecture : 2026-11-09T17:00:29Z
+  fin du diagnostic 17:00:29 UTC
+  code : 0
+  appels : curl 6, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements|date -u +%Y-%m-%dT%H:%M:%SZ
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+## d-ko (ESSAI_MODE=normal ESSAI_D_KO=1)
+  # evenements.sh diagnostic, 2026-11-09T17:00:29Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T17:00:29Z (sens backward, maxLines 1)
+    (a) : dernière ligne à 2026-11-06T16:53:33Z
+      1 Pod p4 X count=1
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 5
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    (b) lignes du journal de sc-stockage : 0 (ok)
+    (b) lignes evenements-k8s, même fenêtre : 5 (ok)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (ok)
+    (c) lignes du composant des Events : 5 (ok)
+      1 2026-11-07T11:00 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : Unauthorized
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="failed to configure informers: failed to get server groups: Get \"https://192.168.161.11:6443/api\": dial tcp 192.168.161.11:6443: connect: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : permission denied
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+  NJ   (d) : lecture impossible (Failed to connect)
+  fin du diagnostic 17:00:29 UTC
+  code : 0
+  appels : curl 6, ssh 1, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+## erreur (ESSAI_MODE=erreur)
+  # evenements.sh diagnostic, 2026-11-09T17:00:29Z
+  ## (a) dernière ligne {source="evenements-k8s"} entre 2026-11-06T16:53:29Z et 2026-11-09T17:00:29Z (sens backward, maxLines 1)
+    requête : erreur de Loki : parse error
+  NJ   (a) : requête en erreur
+    requête : erreur de Loki : parse error
+    (a) lignes evenements-k8s depuis le démarrage d'Alloy (07/11, 11:22:39) : 0 (requête en erreur)
+  ## (b) Alloy écrit-il encore dans Loki ? fenêtre de R6 (09/11, 09:30:00 à 09:35:00), comptes seulement (MESSAGE non affiché)
+    requête : erreur de Loki : parse error
+    (b) lignes du journal de sc-stockage : 0 (erreur)
+    requête : erreur de Loki : parse error
+    (b) lignes evenements-k8s, même fenêtre : 0 (erreur)
+  ## (c) journal d'alloy.service de sc-stockage depuis 2026-11-07T11:00:00Z, lignes du composant des Events
+    requête : erreur de Loki : parse error
+    (c) lignes d'alloy.service depuis 2026-11-07T11:00:00Z : 0 (erreur)
+    requête : erreur de Loki : parse error
+    (c) lignes du composant des Events : 0 (erreur)
+  ## (d) composant loki.source.kubernetes_events.evenements, API locale d'Alloy (127.0.0.1:12345) lue par ssh sur sc-stockage
+    (d) santé : healthy, started component, depuis 2026-11-07T11:22:40Z
+    (d) état de débogage (namespace, last_event_timestamp) :
+      [{"name":"event_controller","type":"block","body":[{"name":"last_event_timestamp","type":"attr","value":{"type":"string","value":"2026-11-07T11:20:00Z"}}]}]
+    (d) heure de la VM au moment de la lecture : 2026-11-09T17:00:29Z
+  fin du diagnostic 17:00:29 UTC
+  code : 0
+  appels : curl 6, ssh 2, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements|date -u +%Y-%m-%dT%H:%M:%SZ
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+## classe (ESSAI_MODE=normal)
+  # evenements.sh classe, 2026-11-09T17:00:29Z
+  ## (c) relue : journal d'alloy.service de sc-stockage, composant des Events, 07/11 de 11:00 à 12:00
+    lignes : 5 (ok)
+      1 2026-11-07T11:00 level=info msg="watching events for namespace" component_id=loki.source.kubernetes_events.evenements 
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : Unauthorized
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="dial tcp: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err="failed to configure informers: failed to get server groups: Get \"https://192.168.161.11:6443/api\": dial tcp 192.168.161.11:6443: connect: connection refused" ; classe : connection refused
+      1 2026-11-07T11:00 level=error msg="event watcher exited with error" component_id=loki.source.kubernetes_events.evenements err masquée par le filtre des secrets ; classe : permission denied
+  fin de la relecture 17:00:29 UTC
+  code : 0
+  appels : curl 1, ssh 0, kubectl 0 ; mot de passe en argument : 0
+  commandes ssh : 
+  journal : FAUX-MDP, jeton, token : 0 ; travail restant : 
+dépôt : git status et resultats/ inchangés

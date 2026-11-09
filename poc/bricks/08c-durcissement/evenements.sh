@@ -138,19 +138,21 @@ etape_releve() {
   return $ko
 }
 
-# Lignes logfmt d'Alloy réduites à : horodatage, level, msg, component_id, et err seulement si elle ne contient ni jeton ni token ; sinon,
-# relecture ciblée de la ligne masquée qui n'affiche que la classe d'erreur reconnue.
+# Lignes logfmt d'Alloy réduites à : horodatage, level, msg, component_id, err (guillemets échappés compris, 300 caractères) et sa classe
+# reconnue ; si la ligne entière contient jeton ou token, err n'est pas affichée, seulement sa classe. Corrigé le 09/11/2026 après le
+# diagnostic de 16:32 UTC : l'extraction s'arrêtait au premier guillemet échappé de err, et le masque ne portait que sur ce début.
 classes() {
-  local CL='Unauthorized|Forbidden|connection refused|no such host|i/o timeout|deadline exceeded|x509[^"]*|EOF|context canceled|no route to host|TLS handshake[^"]*|certificate[^"]*'
+  local CL='Unauthorized|Forbidden|connection refused|no such host|i/o timeout|deadline exceeded|x509[^"]*|EOF|context canceled|no route to host|TLS handshake[^"]*|certificate[^"]*|permission denied|server misbehaving|service unavailable'
   while IFS=$'\t' read -r h l; do
     lv=$(grep -o -E 'level=[a-z]+' <<< "$l" | head -1 || true)
     ms=$(grep -o -E 'msg="[^"]*"' <<< "$l" | head -1 || true)
     ci=$(grep -o -E 'component_id=[^ ]+' <<< "$l" | head -1 || true)
-    er=$(grep -o -E 'err="[^"]*"' <<< "$l" | head -1 || true)
-    if [ -n "$er" ] && grep -q -i -E 'jeton|token' <<< "$er"; then
-      er="err masquée par le filtre des secrets, classe : $(grep -o -i -E "$CL" <<< "$er" | head -1 || true)"
-    fi
-    printf '%s %s %s %s %s\n' "${h:0:16}" "$lv" "$ms" "$ci" "${er:0:200}"
+    er=$(grep -o -E 'err="([^"\\]|\\.)*"' <<< "$l" | head -1 || true)
+    cl=$(grep -o -i -E "$CL" <<< "$er" | sort -u | paste -sd, - || true)
+    if [ -n "$er" ] && grep -q -i -E 'jeton|token' <<< "$l"; then er="err masquée par le filtre des secrets"; else er=${er:0:300}; fi
+    [ -n "$cl" ] && er="$er ; classe : $cl"
+    [ -z "$cl" ] && [ -n "$er" ] && er="$er ; classe : non reconnue"
+    printf '%s %s %s %s %s\n' "${h:0:16}" "$lv" "$ms" "$ci" "$er"
   done < "$T/lignes"
 }
 
@@ -190,6 +192,17 @@ etape_diagnostic() {
     echo "NJ   (d) : lecture impossible ($(grep -o -i -E 'Connection refused|Failed to connect|404|not found|timed out' "$T/ssh.err" | head -1 || true))"
   fi
   date -u '+fin du diagnostic %H:%M:%S UTC'
+}
+
+etape_classe() { # relecture de (c) seule : classe de l'erreur du composant des Events au démarrage du 07/11 (accord à part)
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/evenements"' EXIT
+  echo "## (c) relue : journal d'alloy.service de sc-stockage, composant des Events, 07/11 de 11:00 à 12:00"
+  loki_lignes '{noeud="sc-stockage", unite="alloy.service"} |~ "kubernetes_events|evenements|informer|event watcher|non-Event"' \
+    2026-11-07T11:00:00Z 2026-11-07T12:00:00Z
+  echo "  lignes : $n ($etat)"
+  [ "$n" -gt 0 ] && classes | uniq -c -f1 | head -40 | sed 's/^ */    /'
+  date -u '+fin de la relecture %H:%M:%S UTC'
 }
 
 lancer evenements events "$@"
