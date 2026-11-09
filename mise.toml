@@ -22,7 +22,7 @@ node = "22.22.0"                                # interface de sample-app (banc 
 "aqua:sigstore/cosign" = "3.1.4"
 "aqua:kyverno/kyverno" = "1.19.2"
 "aqua:tektoncd/cli" = "0.46.2"                   # tkn : brique 08, J6 (Trusted Resources, bundles Tekton) ; sha256 seulement (accord du propriétaire)
-"aqua:anchore/syft" = "1.38.0"
+"aqua:anchore/syft" = "1.57.0"
 "aqua:anchore/grype" = "0.104.1"
 "github:conforma/cli" = { version = "0.10.42", asset_pattern = "ec_linux_amd64", bin = "ec" }
 "aqua:kubernetes-sigs/kind" = "0.33.0"          # banc A1 (Konflux)
