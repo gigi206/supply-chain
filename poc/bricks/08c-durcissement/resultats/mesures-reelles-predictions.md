@@ -1295,3 +1295,30 @@ Dans le créneau ouvert à 23:18:59 UTC, sur l'accord de 23:23 UTC. Rien n'a ét
 - Push des commits.
 
 **Temps** : de 23:18:59 UTC à 23:29 UTC pour cette partie, dans le créneau de 2 h.
+
+## Additif du 09/11/2026, 23:31 UTC : relecture du conseiller, deux défauts de la suite d'E4 avant tout push, prédictions de la correction
+
+Rien n'a été lu ni écrit dans le cluster, Loki, Grafana ou les VM. Les additifs de 23:23 et 23:29 UTC ne sont pas réécrits ; ils sont corrigés ici.
+
+**Défaut 1, mesuré par relecture du code, pas par le banc.** Pour les Events du CronJob du scan (`preuves.sh:3307`) et pour `Pulling` de Cilium (`cilium.sh:174`), le compte de kubectl n'a toujours aucune borne de temps, alors que Loki ne lit qu'à partir de la reprise (`t1`) ou de la création des pods. Un Event antérieur au début de la fenêtre, encore dans la TTL d'une heure, donne donc « absent de Loki », puis KO. C'est le faux KO que le tableau du 07/11 voulait lever pour l'ancienne ligne 3298. Le banc ne pouvait pas le voir : son faux kubectl datait tous les Events de 2099. L'additif de 23:29 UTC (« E4 faite ») en dit donc trop pour ces deux contrôles.
+
+**Défaut 2, de texte.** « Loki rend au moins une ligne : KO, témoin ou non » (en-tête de `evenements-loki.sh`, additif de 23:23 UTC, deux messages de commit) n'est vrai que si la requête de compte part. Quand une raison précoce empêche de juger (mot de passe absent, démarrage d'Alloy illisible ou postérieur au début de la fenêtre, début illisible), le compte n'était pas demandé. Ce n'était pas plus faible qu'avant, mais le texte était faux.
+
+**Correction prévue (option (a) du conseiller).**
+- `ev_juge` prend un cinquième argument facultatif : le compte de kubectl borné au même début que Loki, sur l'horodatage qu'Alloy donne à la ligne (`series.lastObservedTime`, à défaut `lastTimestamp`, à défaut `eventTime`, à défaut `metadata.creationTimestamp`, comparés à la seconde). Sans cinquième argument, il vaut le quatrième.
+- Quand Loki juge, c'est ce compte borné qui est comparé à Loki ; quand Loki ne juge pas, le compte d'origine, sans borne, décide comme avant.
+- Le compte est demandé dès que le mot de passe est présent et le début lisible, même si une raison précoce empêche de juger (dans ce cas, sans attendre le témoin). Toute ligne trouvée donne alors KO.
+- Les quatre contrôles de `PolicyViolation` et `FailedCreate` sont déjà bornés au même début : ils ne changent pas.
+
+**Prédictions de la correction, avant tout essai.**
+- P13 : `reprendre_cronjob`, 2 Events du CronJob avant `t1`, aucun après, Loki 0, témoin vu : OK, jugé par Loki. Code de `84563c6` : KO.
+- P14 : même cas pour `cilium` (Events `Pulling` antérieurs à la création des pods) : OK. Code de `84563c6` : KO.
+- P15 : `reprendre_cronjob`, 1 Event après `t1`, Loki 0, témoin vu : KO, vu par kubectl dans la fenêtre.
+- P16 : Alloy démarré après le début de la fenêtre, Loki 2 lignes : KO sur le compte de Loki, sans aucune interrogation du témoin.
+- P17 : mot de passe absent : aucun appel à `curl` ni à `ssh`, comme P6.
+- Les 51 passages précédents rendent le même bilan. Les quatre bibliothèques faussées restent repérées. `shellcheck` reste inchangé.
+- P10 reste tenue : Loki injoignable, mêmes verdicts que `bfd7443`, puisque le compte sans borne décide alors.
+
+**Hypothèse à écrire comme telle (point 3 du conseiller).** « Une ligne postérieure au contrôle borne le retard d'ingestion » est une hypothèse, pas un fait. Le `lastTimestamp` d'un Event peut précéder sa réception par l'observateur d'Alloy, et une ligne d'un objet n'atteste pas que les lignes des autres objets sont déjà dans Loki. À mesurer lors du passage en lecture seule.
+
+**Temps du chantier** : 8 h 05 avant ce créneau, plus le créneau ouvert à 23:18:59 UTC, soit environ 8 h 20 à 23:31 UTC pour 4 h estimées.
