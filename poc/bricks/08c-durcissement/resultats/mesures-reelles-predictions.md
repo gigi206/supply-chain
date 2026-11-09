@@ -1156,3 +1156,39 @@ Accord du propriétaire : « Oui » à « Je lance l'essai réel sur sc-stockage
 Ce que l'essai établit : la règle et ses tests sont justes pour `promtool` 3.13.5, et la configuration est acceptée par Alloy 1.21.3. Ce qu'il n'établit pas : le nom et les étiquettes de la vraie série dans Prometheus (`exported_job`), à lire à l'étape 2 de l'application.
 
 **Proposition suivante, en attente** : l'application dans l'ordre imposé (proposition 2 de l'additif de 17:29), avec son propre accord.
+
+
+## Additif du 09/11/2026, 22:30 UTC : application de (a) préparée à sec, prédictions avant tout passage
+
+Rien lu ni écrit dans le cluster, Loki, Prometheus, Grafana ou les VM. Travail compté dans l'heure accordée à 22:23 UTC.
+
+**Deux étapes, à lancer ensemble** : `DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/evenements.sh appliquer_alloy appliquer_regles`. La seconde ne tourne que si la première réussit.
+- `appliquer_alloy` :
+  1. Contrôle que `evenements.alloy` en place est la version d'avant (a) (5fbb0b5~1). Sinon, rien n'est modifié.
+  2. Copie de sauvegarde `/etc/alloy/evenements.alloy.avant-a`, hors de `config/`.
+  3. `alloy validate` de la configuration en place, avec le nouveau fichier, sur une copie.
+  4. Installation, puis rechargement d'Alloy par SIGHUP. Pas de redémarrage, comme en L6.
+  5. Attente du compteur dans `/metrics` d'Alloy, 120 s au plus. Sinon, retour arrière automatique : ancien fichier et nouveau SIGHUP.
+  6. Santé du composant des Events.
+  7. **Porte** : attente de la série dans Prometheus avec `job="alloy"` (120 s au plus), 180 s d'historique, puis évaluation de l'expression d'`EvenementsMuets` sur le vrai Prometheus. Elle doit être vide, sinon les règles ne sont pas déployées.
+- `appliquer_regles` :
+  1. Contrôle que `alertes.yml` en place est la version d'avant (a). Sinon, rien n'est déployé.
+  2. `JALON=evenements observabilite.sh deployer` : `alertes.yml` installé, Prometheus redémarré. Journal `19-observabilite/resultats/evenements-deployer.log`.
+  3. Après 90 s : état de la règle et alertes dans Prometheus et Alertmanager.
+- `yq`, absent de `mise.toml`, est remplacé par `python3 -I` pour lire l'expression.
+
+**Essai hors cluster** : `resultats/evenements-appliquer-essai.log`. Huit cas conformes : nominal, `evenements.alloy` divergent, rechargement sans compteur (retour arrière), validation refusée, série absente de Prometheus, expression non vide, `alertes.yml` divergent, alerte `pending` après déploiement. **Défaut trouvé par l'essai et corrigé** : `alloy validate copie && echo …` n'arrêtait pas le script sous `set -e` ; un refus aurait laissé installer le fichier. Le même motif existe dans `etape_grpc_tls` de `journalisation.sh` (L6, déjà passée) : signalé, non modifié.
+
+**Prédictions du passage réel** :
+- AP1 : les deux fichiers en place sont les versions d'avant (a) : `evenements.alloy` c9c50133…, `alertes.yml` a0bca633…. Confiance moyenne : rien n'a été relu sur la VM depuis le rejeu RKE2.
+- AP2 : copie valide ; compteur dans `/metrics` en moins de 60 s, car le CronJob `horodatage` produit des Events chaque minute ; composant `healthy`.
+- AP3 : série dans Prometheus en moins de 60 s, avec `job="alloy"` et `exported_job="evenements-k8s"`, une série par espace de noms. Confiance moyenne sur les étiquettes exactes : `component_id` et `exported_instance` sont possibles.
+- AP4 : `increase` sur 15 min supérieur à 0 ; expression vide.
+- AP5 : Prometheus `active` ; `EvenementsMuets` `ok inactive` ; aucune alerte dans Prometheus ni dans Alertmanager.
+
+**Effets** : un rechargement d'Alloy par SIGHUP (le relais n'est pas modifié) ; un redémarrage de Prometheus, avec quelques secondes sans collecte ni évaluation, et les `for:` en cours remis à zéro ; une copie de sauvegarde laissée dans `/etc/alloy`. Les notifications ne vont qu'au récepteur local.
+
+**Pire cas** :
+- Alloy refuse la nouvelle configuration au rechargement : il garde l'ancienne, et le retour arrière est automatique.
+- Prometheus ne redémarre pas : plus d'alertes jusqu'à une réparation manuelle. `deployer` le signale par `systemctl is-active`.
+- Fausse alerte critique : la porte de l'expression vide la rend peu probable. Elle n'atteindrait que le récepteur local.

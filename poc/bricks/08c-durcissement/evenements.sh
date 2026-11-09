@@ -13,6 +13,9 @@
 #   essai_alerte à sec sur sc-stockage, dans /tmp/essai-evenements retiré ensuite : promtool check et test de alertes.yml (19) avec
 #           EvenementsMuets, alloy validate de la configuration de sc-stockage (19b) avec le compteur, et deux témoins négatifs qui
 #           doivent être refusés (règle sans la branche absent, attribut inconnu dans metric.counter) ; aucun service touché (accord)
+#   appliquer_alloy evenements.alloy avec le compteur posé sur sc-stockage (copie de sauvegarde, validation sur copie, SIGHUP, retour
+#           arrière si le compteur n'apparaît pas), puis porte : série vue par Prometheus et expression de EvenementsMuets vide (accord)
+#   appliquer_regles observabilite.sh deployer (alertes.yml, redémarrage de Prometheus), puis état de la règle : saine, inactive (accord)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
 set -euo pipefail
@@ -294,6 +297,92 @@ o=$(/usr/local/bin/alloy validate faux-alloy 2>&1); v=$?
 if [ "$v" != 0 ] && printf "%s\n" "$o" | grep -q "unrecognized attribute name \"inconnu\""; then echo "témoin alloy (attribut inconnu) : refusé, attendu"
 else echo "témoin alloy (attribut inconnu) : non refusé (code $v)"; printf "%s\n" "$o" | tail -5; r=1; fi
 cd / && rm -rf /tmp/essai-evenements; exit $r' </dev/null
+}
+
+prom() { # expression PromQL sans apostrophe : réponse JSON de l'API de Prometheus de sc-stockage (lecture)
+  sur sc-stockage "curl -s -G http://127.0.0.1:9090/api/v1/query --data-urlencode 'query=$1'" </dev/null
+}
+COMPTEUR=loki_process_custom_evenements_lignes_total
+AVANT_A=5fbb0b5~1   # dernier commit avant le remède (a) : versions attendues en place sur sc-stockage avant l'application
+avant_a() { git -C "$repo" show "$AVANT_A:poc/bricks/$1" | sha256sum | cut -c1-64; }
+
+etape_appliquer_alloy() { # accord à part : compteur posé dans Alloy de sc-stockage par SIGHUP, retour arrière automatique ;
+  # porte de appliquer_regles : série vue par Prometheus (job alloy) et expression de EvenementsMuets vide sur le Prometheus réel
+  local c=$here/../19b-journalisation/config/alloy/stockage/evenements.alloy e n i
+  e=$(python3 -I - "$here/../19-observabilite/config/regles/alertes.yml" <<'PY'
+import re, sys   # yq n'est pas déclaré dans mise.toml : expression lue par la bibliothèque standard, une seule occurrence exigée
+m = re.findall(r"^ *- alert: EvenementsMuets\n *expr: (.+)$", open(sys.argv[1], encoding="utf-8").read(), re.M)
+assert len(m) == 1, "EvenementsMuets : expression introuvable ou multiple"
+print(m[0])
+PY
+)
+  [ -n "$e" ] || { echo "KO   expression de EvenementsMuets introuvable" >&2; return 1; }
+  echo "## sha256 de evenements.alloy : $(sha256sum "$c" | cut -c1-64)"
+  copier sc-stockage /tmp/alloy-evenements "$c"
+  sur sc-stockage sudo bash -s -- "$(avant_a 19b-journalisation/config/alloy/stockage/evenements.alloy)" <<'EOS'
+set -euo pipefail
+cd /tmp/alloy-evenements
+h=$(sha256sum /etc/alloy/config/evenements.alloy | cut -c1-64)
+if [ "$h" != "$1" ]; then
+  echo "KO   evenements.alloy en place ($h) différent de la version d'avant (a) ($1) : rien modifié"; cd / && rm -rf /tmp/alloy-evenements; exit 1
+fi
+echo "evenements.alloy en place : version d'avant (a), sha256 $h"
+compteur() { curl -s http://127.0.0.1:12345/metrics | grep -c '^loki_process_custom_evenements_lignes_total' || true; }
+echo "avant : séries du compteur dans /metrics d'alloy : $(compteur)"
+cp -p /etc/alloy/config/evenements.alloy /etc/alloy/evenements.alloy.avant-a   # hors de config/ : alloy charge tous les *.alloy
+echo "copie de sauvegarde : /etc/alloy/evenements.alloy.avant-a, sha256 $(sha256sum /etc/alloy/evenements.alloy.avant-a | cut -c1-64)"
+mkdir -m 0750 copie && cp /etc/alloy/config/*.alloy copie/ && cp evenements.alloy copie/
+# Pas de « validate && echo » : sous set -e, un échec dans une liste && n'arrête pas le script (trouvé par l'essai hors cluster).
+if ! /usr/local/bin/alloy validate copie; then echo "KO   configuration d'alloy (copie) refusée : rien modifié"; cd / && rm -rf /tmp/alloy-evenements; exit 1; fi
+echo "configuration d'alloy (copie) valide"
+pid=$(systemctl show -p MainPID --value alloy)
+install -m 0640 -g alloy evenements.alloy /etc/alloy/config/evenements.alloy
+cd / && rm -rf /tmp/alloy-evenements
+echo "## alloy : nouveau evenements.alloy, rechargement par SIGHUP (pid $pid)"
+systemctl kill -s HUP alloy
+for i in $(seq 40); do [ "$(compteur)" -gt 0 ] && break; sleep 3; done
+if [ "$(compteur)" -eq 0 ]; then
+  echo "KO   compteur absent de /metrics d'alloy 120 s après le rechargement : retour arrière"
+  install -m 0640 -g alloy /etc/alloy/evenements.alloy.avant-a /etc/alloy/config/evenements.alloy; systemctl kill -s HUP alloy; exit 1
+fi
+echo "alloy : $(systemctl is-active alloy), pid $(systemctl show -p MainPID --value alloy), compteur dans /metrics après $((i * 3)) s au plus"
+EOS
+  echo "## composant des Events après rechargement, API locale d'Alloy"
+  sur sc-stockage "curl -fsS http://127.0.0.1:12345/api/v0/web/components/loki.source.kubernetes_events.evenements" </dev/null 2>/dev/null \
+    | jq -r '"  santé : \(.health.state // "-"), \(.health.message // "-"), depuis \(.health.updatedTime // "-")"' | grep -v -i -E 'jeton|token' || true
+  echo "## Prometheus : série du compteur, job alloy (collecte toutes les 30 s), attente jusqu'à 120 s"
+  for i in $(seq 24); do
+    n=$(prom "count($COMPTEUR{job=\"alloy\"})" | jq -r '.data.result[0].value[1] // "0"')
+    [ "$n" != 0 ] && break; sleep 5
+  done
+  [ "$n" != 0 ] || { echo "KO   série absente de Prometheus après 120 s : règles non déployées"; return 1; }
+  prom "$COMPTEUR" | jq -c '.data.result[] | .metric' | sed 's/^/  /'
+  echo "## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)"
+  sleep 180
+  prom "sum(increase($COMPTEUR{job=\"alloy\"}[15m]))" | jq -r '"  increase sur 15 min : \(.data.result[0].value[1] // "aucun résultat")"'
+  echo "## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : $e"
+  n=$(prom "$e" | jq -r 'if .status != "success" then "erreur" else (.data.result | length | tostring) end')
+  if [ "$n" = 0 ]; then echo "OK   expression vide : la règle ne sonnerait pas"
+  else echo "KO   expression non vide ou en erreur ($n) : règles non déployées"; return 1; fi
+}
+
+etape_appliquer_regles() { # accord à part, après appliquer_alloy : observabilite.sh deployer (journal evenements-deployer.log de la 19),
+  # puis état de EvenementsMuets lu dans Prometheus et Alertmanager après trois évaluations
+  local r h a
+  a=$(avant_a 19-observabilite/config/regles/alertes.yml)
+  h=$(sur sc-stockage "sudo sha256sum /etc/prometheus/regles/alertes.yml" </dev/null | cut -c1-64)
+  [ "$h" = "$a" ] || { echo "KO   alertes.yml en place ($h) différent de la version d'avant (a) ($a) : rien déployé"; return 1; }
+  echo "alertes.yml en place : version d'avant (a), sha256 $h"
+  JALON=evenements bash "$here/../19-observabilite/observabilite.sh" deployer
+  echo "## 90 s (trois évaluations) puis état de EvenementsMuets"
+  sleep 90
+  r=$(sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/rules" </dev/null \
+    | jq -r '[.data.groups[].rules[] | select(.name == "EvenementsMuets")] | if length == 0 then "absente" else .[0] | "\(.health) \(.state) \(.lastError // "")" end')
+  echo "  règle : $r"
+  echo "  alertes en cours dans Prometheus : $(sur sc-stockage "curl -s http://127.0.0.1:9090/api/v1/alerts" </dev/null | jq -r '[.data.alerts[] | select(.labels.alertname == "EvenementsMuets") | .state] | length')"
+  echo "  alertes dans Alertmanager : $(sur sc-stockage "curl -s http://127.0.0.1:9093/api/v2/alerts" </dev/null | jq -r '[.[] | select(.labels.alertname == "EvenementsMuets")] | length')"
+  if [ "${r% }" = "ok inactive" ]; then echo "## bilan : EvenementsMuets déployée, saine, inactive"
+  else echo "## bilan : EvenementsMuets pas dans l'état attendu ($r)"; return 1; fi
 }
 
 lancer evenements events "$@"

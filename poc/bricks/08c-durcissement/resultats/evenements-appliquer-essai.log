@@ -1,0 +1,109 @@
+# Essai hors cluster de evenements.sh appliquer_alloy et appliquer_regles (09/11/2026, 22:30 UTC), avant tout passage : rien lu ni écrit
+# dans le cluster, Loki, Prometheus, Grafana ou les VM. Faux ssh (arguments après l'hôte joints, comme ssh), scp et sleep ; les scripts
+# « distants » tournent en local dans une fausse VM (chemins /etc/alloy, /etc/prometheus, /tmp récrits), avec de faux systemctl, curl,
+# alloy, install et sudo ; état initial de la fausse VM : evenements.alloy et alertes.yml de 5fbb0b5~1. Huit cas. Limites : réponses de
+# Prometheus et d'Alloy fabriquées ; observabilite.sh deployer tourne pour de vrai contre les faux outils.
+# Défaut trouvé et corrigé avant ce passage : « alloy validate copie && echo » n'arrêtait pas le script sous set -e en cas de refus.
+# date : 2026-11-09T22:29:40Z ; sha256 de evenements.sh : ad89562068be3673c3cfdf429263b8485e6884704ac741d96838e312279ef2bc
+## nominal (appliquer_alloy appliquer_regles ; )
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  alloy : active, pid 1234, compteur dans /metrics après 3 s au plus
+    santé : healthy, started component, depuis 2026-11-09T22:40:00Z
+    {"__name__":"loki_process_custom_evenements_lignes_total","job":"alloy","instance":"127.0.0.1:12345","exported_job":"evenements-k8s","namespace":"horodatage"}
+  ## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)
+    increase sur 15 min : 42
+  ## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+  OK   expression vide : la règle ne sonnerait pas
+  alertes.yml en place : version d'avant (a), sha256 a0bca63313428f290d84f4b31b64e6312b3b3372519abee9df9c8aff0de693a3
+    règle : ok inactive 
+  ## bilan : EvenementsMuets déployée, saine, inactive
+  code : 0
+  evenements.alloy : remplacé (2 compteur) ; sauvegarde : 1
+  alertes.yml : remplacé (1 EvenementsMuets) ; restarts prometheus : 1 ; SIGHUP : 1
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 1
+## alloy-divergent (appliquer_alloy appliquer_regles ; alloy divergent )
+  KO   evenements.alloy en place (0dd82a4b66efafb8c0ed5764ca027273603d1ba917ce149060822eab4d745e10) différent de la version d'avant (a) (c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757) : rien modifié
+  code : 1
+  evenements.alloy : inchangé ; sauvegarde : 0
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 0
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## rechargement-ko (appliquer_alloy appliquer_regles ; ESSAI_RELOAD_KO=1)
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  KO   compteur absent de /metrics d'alloy 120 s après le rechargement : retour arrière
+  code : 1
+  evenements.alloy : inchangé ; sauvegarde : 1
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 2
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## validation-ko (appliquer_alloy appliquer_regles ; ESSAI_VALIDATE_KO=1)
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  KO   configuration d'alloy (copie) refusée : rien modifié
+  code : 1
+  evenements.alloy : inchangé ; sauvegarde : 1
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 0
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## prometheus-sans-serie (appliquer_alloy appliquer_regles ; ESSAI_PROM_ABSENT=1)
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  alloy : active, pid 1234, compteur dans /metrics après 3 s au plus
+    santé : healthy, started component, depuis 2026-11-09T22:40:00Z
+  KO   série absente de Prometheus après 120 s : règles non déployées
+  code : 1
+  evenements.alloy : remplacé (2 compteur) ; sauvegarde : 1
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 1
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## expression-non-vide (appliquer_alloy appliquer_regles ; ESSAI_EXPR_NONVIDE=1)
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  alloy : active, pid 1234, compteur dans /metrics après 3 s au plus
+    santé : healthy, started component, depuis 2026-11-09T22:40:00Z
+    {"__name__":"loki_process_custom_evenements_lignes_total","job":"alloy","instance":"127.0.0.1:12345","exported_job":"evenements-k8s","namespace":"horodatage"}
+  ## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)
+    increase sur 15 min : 0
+  ## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+  KO   expression non vide ou en erreur (1) : règles non déployées
+  code : 1
+  evenements.alloy : remplacé (2 compteur) ; sauvegarde : 1
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 1
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## regles-divergentes (appliquer_alloy appliquer_regles ; règles divergentes )
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  alloy : active, pid 1234, compteur dans /metrics après 3 s au plus
+    santé : healthy, started component, depuis 2026-11-09T22:40:00Z
+    {"__name__":"loki_process_custom_evenements_lignes_total","job":"alloy","instance":"127.0.0.1:12345","exported_job":"evenements-k8s","namespace":"horodatage"}
+  ## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)
+    increase sur 15 min : 42
+  ## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+  OK   expression vide : la règle ne sonnerait pas
+  KO   alertes.yml en place (451b2f5c02d3f31800221c2592f13a1dad3411ac7ff70675ccfacd764c81aca0) différent de la version d'avant (a) (a0bca63313428f290d84f4b31b64e6312b3b3372519abee9df9c8aff0de693a3) : rien déployé
+  code : 1
+  evenements.alloy : remplacé (2 compteur) ; sauvegarde : 1
+  alertes.yml : inchangé ; restarts prometheus : 0 ; SIGHUP : 1
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 0
+## alerte-pending (appliquer_alloy appliquer_regles ; ESSAI_ETAT=pending)
+  evenements.alloy en place : version d'avant (a), sha256 c9c50133d1369cb07686b9289dbd77fbb5410ebe9dbb5be103285e3ca2422757
+  avant : séries du compteur dans /metrics d'alloy : 0
+  configuration d'alloy (copie) valide
+  alloy : active, pid 1234, compteur dans /metrics après 3 s au plus
+    santé : healthy, started component, depuis 2026-11-09T22:40:00Z
+    {"__name__":"loki_process_custom_evenements_lignes_total","job":"alloy","instance":"127.0.0.1:12345","exported_job":"evenements-k8s","namespace":"horodatage"}
+  ## 180 s d'historique avant d'évaluer la règle (increase sur 15 min d'une série neuve)
+    increase sur 15 min : 42
+  ## expression de EvenementsMuets sur le Prometheus réel (règle non déployée) : sum(increase(loki_process_custom_evenements_lignes_total{job="alloy"}[15m])) == 0 or (absent(loki_process_custom_evenements_lignes_total{job="alloy"}) and on() (up{job="alloy"} == 1))
+  OK   expression vide : la règle ne sonnerait pas
+  alertes.yml en place : version d'avant (a), sha256 a0bca63313428f290d84f4b31b64e6312b3b3372519abee9df9c8aff0de693a3
+    règle : ok pending 
+  ## bilan : EvenementsMuets pas dans l'état attendu (ok pending )
+  code : 1
+  evenements.alloy : remplacé (2 compteur) ; sauvegarde : 1
+  alertes.yml : remplacé (1 EvenementsMuets) ; restarts prometheus : 1 ; SIGHUP : 1
+  restes /tmp de la VM :  ; journal, jeton|token : 0 ; journal de la 19 : 1
+dépôt : git status et resultats/ inchangés
