@@ -140,3 +140,14 @@ Heure d'alerte. Le métrique vaut la date du referrer, et `time()` avance à cha
 | B4 | `g8_reprendre` : job de rattrapage réussi en 2 à 3 min (G7 : 121 s), nouveau referrer, alerte résolue en moins de 2 min après la mesure forcée | moyenne : le délai de résolution n'a été mesuré qu'en a7, sur un fichier d'essai |
 | B5 | Le passage planifié du 12/11 à 09:30 a lieu normalement | haute |
 
+*Corrigé à 12:41 UTC, avant tout push, sur relecture du conseiller* (additif de 12:38 UTC) :
+- **Garde de `g8_reprendre`.** Avec `startingDeadlineSeconds: 3600`, une reprise entre 10:00 et 10:30 UTC aurait fait lancer par le contrôleur le passage manqué de 09:30, en même temps que le rattrapage : deux scans sur `sc-confiance`. L'étape refuse donc avant référence + 26 h + 15 min, et de 09:00 à 10:35 UTC. Passé ce point, elle reprend le CronJob même si l'alerte manque : le KO est consigné, et le CronJob ne reste jamais suspendu.
+- **Garde de `g8_suspendre`** : si une alerte de scan est déjà active, ou si Prometheus est illisible, rien n'est suspendu.
+- **Effet ajouté.** `kubectl patch` prend `spec.suspend` à son compte. Un `apply --server-side` de `g7_periodique`, par exemple à une reprise de `rejeu.sh` à J8, ne remettrait pas ce champ à `false` : seuls `g8_reprendre` ou un autre `patch` le font. `g8_suspendre` affiche les gestionnaires de champs, sans autre contenu.
+- **Dates de repli si la reprise n'a pas lieu**, pour une référence vers le 10/11 à 09:31 UTC :
+  - `ScanBientotRefuse` le 15/11 vers 09:31 UTC ;
+  - refus par la porte le 17/11 vers 09:31 UTC.
+
+  Ces dates sont des calculs. `g8_suspendre` affiche les dates exactes.
+- **Heures écrites à la main.** Le message du commit `646de0a` porte 12:37 alors que `date -u` donnait 12:36 ; son titre a été corrigé dans `dfd83d9`. Les heures des additifs sont désormais produites par le script qui les écrit.
+

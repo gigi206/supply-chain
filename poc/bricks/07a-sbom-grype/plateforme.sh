@@ -1669,13 +1669,17 @@ alertes_scan() { # alertes actives ScanEnRetard et ScanBientotRefuse, lues dans 
 }
 
 etape_g8_suspendre() { # ACCORD DU PROPRIÉTAIRE : suspend le CronJob ; additif du 10/11/2026
-  local s
+  local s a
   [ "$(date -u +%H)" != 09 ] || { echo "KO   09:00 à 10:00 UTC : un passage peut être en cours, rien suspendu"; return 1; }
   s=$(derniere_analyse)
   echo "dernier referrer de scan : $(date -ud "@$s" +%Y-%m-%dT%H:%M:%SZ)"
-  echo "alertes de scan actives : $(alertes_scan)"
+  a=$(alertes_scan) || { echo "KO   Prometheus illisible, rien suspendu"; return 1; }
+  [ -z "$a" ] || { echo "KO   alerte de scan déjà active ($a) : l'essai ne prouverait rien, rien suspendu"; return 1; }
+  ok "aucune alerte de scan active"
   kubectl patch cronjob -n scan "$CRON_SCAN" --type=merge -p '{"spec":{"suspend":true}}'
   attendu "CronJob suspendu" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.suspend}')" true
+  # kubectl patch prend spec.suspend à son compte : un apply --server-side de g7_periodique (rejeu.sh) ne le remettrait pas à false.
+  echo "gestionnaires de champs du CronJob : $(kubectl get cronjob -n scan "$CRON_SCAN" --show-managed-fields -o json | jq -c '[.metadata.managedFields[] | "\(.manager)/\(.operation)"]')"
   echo "ScanEnRetard prédite en attente vers $(date -ud "@$((s + 26 * 3600))" +%Y-%m-%dT%H:%M:%SZ), déclenchée vers $(date -ud "@$((s + 26 * 3600 + 300))" +%Y-%m-%dT%H:%M:%SZ) (évaluation toutes les 30 s)"
   echo "porte : scan refusé à partir de $(date -ud "@$((s + 7 * 86400))" +%Y-%m-%dT%H:%M:%SZ) ; ScanBientotRefuse à partir de $(date -ud "@$((s + 5 * 86400))" +%Y-%m-%dT%H:%M:%SZ)"
   return $ko
@@ -1685,8 +1689,12 @@ etape_g8_reprendre() { # ACCORD DU PROPRIÉTAIRE : relève l'alerte, reprend le 
   local d=${IMAGE#*@} s0 s1 de etat="" a="" i n
   T=$W/g8-reprendre
   rm -rf -- "${T:?}" && mkdir -p "$T"
-  [ "$(date -u +%H)" != 09 ] || { echo "KO   09:00 à 10:00 UTC : rien fait"; return 1; }
   s0=$(derniere_analyse); de=$(date -u +%s)
+  # Pas avant l'alerte prédite (référence + 26 h + 5 min, plus 10 min de marge), ni de 09:00 à 10:35 UTC : à la reprise, le contrôleur
+  # lancerait le passage manqué de 09:30 (startingDeadlineSeconds 3600) en même temps que le rattrapage, deux scans sur sc-confiance.
+  [ "$de" -ge $((s0 + 26 * 3600 + 900)) ] || { echo "KO   trop tôt : pas avant $(date -ud "@$((s0 + 26 * 3600 + 900))" +%Y-%m-%dT%H:%M:%SZ), rien fait"; return 1; }
+  case $(date -u +%H%M) in 09??|10[0-2]?|103[0-4]) echo "KO   09:00 à 10:35 UTC : rien fait"; return 1 ;; esac
+  # Passé ce point, le CronJob est repris même si l'alerte manque : les KO sont consignés, jamais de CronJob laissé suspendu.
   echo "dernier referrer de scan avant reprise : $(date -ud "@$s0" +%Y-%m-%dT%H:%M:%SZ), âge $(( (de - s0) / 60 )) min"
   attendu "CronJob encore suspendu" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.suspend}')" true
   attendu "alertes de scan avant reprise" "$(alertes_scan)" "ScanEnRetard=firing"
