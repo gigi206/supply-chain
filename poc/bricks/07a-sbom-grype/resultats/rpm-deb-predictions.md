@@ -39,7 +39,7 @@ Le script a été exécuté le 10/11/2026 à 12:33:01 UTC, en moins d'une minute
 - Le rôle des entrées non affectées d'Alma n'est pas mesuré. Il faudrait une version qu'Alma a corrigée avant Red Hat ; aucune n'a été cherchée.
 - **Sans `distro=` dans le PURL, aucune vulnérabilité n'est trouvée. L'échec est silencieux.** Les SBOM des rpm et des deb devront donc porter ce qualificatif, et la porte devra refuser un SBOM de paquet qui ne le porte pas.
 
-## Additif du 10/11/2026, 12:37 UTC : « sans avertissement » non mesuré ; prédictions S1 et S2, écrites avant exécution
+## Additif du 10/11/2026, 12:36 UTC : « sans avertissement » non mesuré ; prédictions S1 et S2, écrites avant exécution
 
 Sur relecture du conseiller, avant tout push. Le script lance Grype avec `-q`, qui coupe tous ses journaux, et les fichiers `.err` sont vides. « Sans aucun avertissement » n'est donc **pas mesuré**. Le job réel (`politique/scanner.sh`, ligne 75) appelle aussi Grype avec `-q`.
 
@@ -51,4 +51,15 @@ Deux cas sont rejoués sur l'hôte seul, hors réseau, sans `-q` et avec `-vv`. 
 |---|---|---|---|
 | S1 | `rocky-sans-distro`, avec `-vv` | 0 correspondance, et aucune ligne `WARN` ou `ERROR` sur l'absence de distribution. Au mieux une ligne `DEBUG` ou `INFO` | faible |
 | S2 | Même PURL sans `distro=`, avec `--distro rocky:9.7` | 48 correspondances, comme R1 : la ligne de commande rattrape un SBOM incomplet | moyenne |
+
+*Corrigé à 12:37 UTC, avant tout push* : le titre de l'additif ci-dessus portait 12:37 alors que `date -u` donnait 12:36. Le titre est corrigé.
+
+### Résultat de S1 et S2 (12:37:05 UTC, [`rpm-deb-sans-distro.log`](rpm-deb-sans-distro.log))
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| S1 | 0 correspondance, code 0, mais **une ligne `WARN`** : Grype n'a pas pu déterminer la distribution de certains paquets, des vulnérabilités peuvent manquer, et il propose `--distro`. Le journal compte 19 lignes DEBUG, 5 INFO et 1 WARN | **réfutée** |
+| S2 | 48 correspondances, les mêmes identifiants que `rocky-vieux`, toutes dans l'espace `redhat:distro:redhat:9` | tenue |
+
+**Lecture corrigée.** Grype prévient bien : l'échec n'est silencieux qu'avec `-q`, que le job réel utilise, et le code de sortie reste 0. La phrase « sans aucun avertissement » du résultat ci-dessus, du README et de la doc 03 est donc fausse ; elle valait seulement pour une exécution en `-q`. `--distro` rattrape un PURL sans qualificatif.
 

@@ -273,3 +273,9 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
 - Grype peut donc servir de scanner unique sur EL, avec deux limites : les errata propres à Rocky ne sont pas utilisés, et le rôle des données d'Alma n'est pas mesuré.
 - Le push de 12:31:42 UTC est consigné : accord « 1 oui », commits `884670b..3d5980e`, contrôle des secrets OK sur 5 fichiers dans une copie temporaire retirée ensuite, branche distante identique à la locale. *J'avais annoncé 6 fichiers ; le contrôle en a compté 5.*
 
+*Corrigé à 12:37 UTC, avant tout push, sur relecture du conseiller* (additif de 12:33 UTC et message du commit `d77bbef`) :
+- **« Sans aucun avertissement » est faux.** Grype écrit une ligne `WARN` quand il ne connaît pas la distribution, mais `-q` la supprime, et le job réel (`politique/scanner.sh`) utilise `-q`. Le code de sortie reste 0. `--distro rocky:9.7` rattrape un PURL sans qualificatif : 48 correspondances, comme avec `distro=` (S1 réfutée, S2 tenue : [résultat](resultats/rpm-deb-predictions.md)).
+- **« Grype peut servir de scanner unique sur EL » va trop loin.** L'essai montre seulement que la correspondance fonctionne quand la distribution est fournie. Pour les briques 05 et 06, une question reste ouverte et n'est pas mesurée : Syft, sur un `.rpm` ou un `.deb` isolé produit par mock ou sbuild, sans `/etc/os-release`, émet-il `distro=` ?
+- **« La porte devra refuser » n'est pas une décision.** C'est une proposition au propriétaire, notée **D14** : pour un SBOM de paquets rpm ou deb, la porte refuse un scan dont la `distro` est vide, ou le job passe `--distro` explicitement. À trancher quand les briques 05 et 06 produiront des paquets.
+- **Interprétation de « dans l'ordre que tu veux »** (réponse du propriétaire à « lesquelles de a, b et c ») : c est accordé, car il ne touche que l'hôte, et l'ordre m'est laissé. a et b touchent une VM et le cluster : ils attendent chacun un accord nommé.
+

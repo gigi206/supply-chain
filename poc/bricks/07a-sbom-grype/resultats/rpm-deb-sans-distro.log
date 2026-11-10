@@ -1,0 +1,120 @@
+# S1 et S2, 2026-11-10T12:37:05Z, grype 0.104.1, hors réseau, sans -q
+## S1 : grype -vv purl:rocky-sans-distro.purl ; journal de grype (stderr), lignes filtrées jeton|token
+code 0
+  [0000]  INFO grype version: 0.104.1
+  [0000] DEBUG config:
+    log:
+        quiet: false
+        level: debug
+        file: ""
+    dev:
+        profile: none
+    output:
+        - json
+    file: /home/gigi/.cache/supply-chain-poc/07a/rpmdeb/s1.json
+    pretty: false
+    distro: ""
+    add-cpes-if-none: false
+    output-template-file: ""
+    check-for-app-update: false
+    only-fixed: false
+    only-notfixed: false
+    ignore-states: ""
+    platform: ""
+    search:
+        scope: squashed
+        unindexed-archives: false
+        indexed-archives: true
+    ignore: []
+    exclude: []
+    external-sources:
+        enable: false
+        maven:
+            search-upstream: true
+            base-url: https://search.maven.org/solrsearch/select
+            rate-limit: 300ms
+    match:
+        java:
+            using-cpes: false
+        jvm:
+            using-cpes: true
+        dotnet:
+            using-cpes: false
+        golang:
+            using-cpes: false
+            always-use-cpe-for-stdlib: true
+            allow-main-module-pseudo-version-comparison: false
+        javascript:
+            using-cpes: false
+        python:
+            using-cpes: false
+        ruby:
+            using-cpes: false
+        rust:
+            using-cpes: false
+        stock:
+            using-cpes: true
+    fail-on-severity: ""
+    registry:
+        insecure-skip-tls-verify: false
+        insecure-use-http: false
+        auth: []
+        ca-cert: ""
+    show-suppressed: false
+    by-cve: false
+    sort-by: risk
+    name: ""
+    default-image-pull-source: ""
+    from: []
+    vex-documents: []
+    vex-add: []
+    match-upstream-kernel-headers: false
+    fix-channel:
+        redhat-eus:
+            apply: auto
+            versions: '>= 8.0'
+    timestamp: true
+    db:
+        cache-dir: /home/gigi/.cache/supply-chain-poc/07a/g0/dbcache
+        update-url: https://grype.anchore.io/databases
+        ca-cert: ""
+        auto-update: false
+        validate-by-hash-on-start: true
+        validate-age: false
+        max-allowed-built-age: 120h0m0s
+        require-update-check: false
+        update-available-timeout: 30s
+        update-download-timeout: 5m0s
+        max-update-check-frequency: 2h0m0s
+    exp: {}
+    dev:
+        db:
+            debug: false
+  [0000] DEBUG gathering packages
+  [0000] DEBUG loading DB
+  [0000] DEBUG skipping db update
+  [0000] DEBUG no CPEs for package: Pkg(name="openssl" version="1:3.5.5-3.el9" type="rpm" id="a4a0216c62be4297")
+  [0000]  INFO gathered packages packages=1 time=1.742717ms
+  [0000]  INFO loaded DB status=valid time=524.429355ms
+  [0000] DEBUG ├── schema=v6.1.10
+  [0000] DEBUG ├── built=2026-11-04T06:20:59Z
+  [0000] DEBUG ├── from=manual import
+  [0000] DEBUG └── path=/home/gigi/.cache/supply-chain-poc/07a/g0/dbcache/6/vulnerability.db
+  [0000]  WARN Unable to determine the OS distribution of some packages. This may result in missing vulnerabilities. You may specify a distro using: --distro <distro>:<version>
+  [0000]  INFO found 0 vulnerability matches across 1 packages
+  [0000] DEBUG   ├── fixed: 0
+  [0000] DEBUG   ├── ignored: 0 (due to user-provided rule)
+  [0000] DEBUG   ├── dropped: 0 (due to hard-coded correction)
+  [0000] DEBUG   └── matched: 0
+  [0000] DEBUG       ├── unknown: 0
+  [0000] DEBUG       ├── negligible: 0
+  [0000] DEBUG       ├── low: 0
+  [0000] DEBUG       ├── medium: 0
+  [0000] DEBUG       ├── high: 0
+  [0000] DEBUG       └── critical: 0
+  [0000]  INFO found vulnerability matches time=109.041µs
+niveaux :  19 DEBUG, 5 INFO, 1 WARN
+correspondances : 0
+## S2 : grype --distro rocky:9.7 purl:rocky-sans-distro.purl
+code 0
+correspondances : 48 ; distro : {"name":"rockylinux","version":"9.7","idLike":["rockylinux"]} ; espaces : ["redhat:distro:redhat:9"] ; mêmes identifiants que rocky-vieux : oui
