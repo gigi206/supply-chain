@@ -1,0 +1,25 @@
+# sortie-builds.sh avant, 2026-11-10T13:52:20Z
+### sortie-sans-label (label tekton.dev/task : -)
+     DNS snapshot.debian.org : résolu (199.232.170.132)
+     DNS sc-stockage.poc.test : résolu (192.168.161.13)
+     snapshot.debian.org en 80 : joint (HTTP 200)
+     proxy.golang.org en 443 : joint (HTTP 200)
+     API de RKE2 : joint (HTTP 401)
+     Zot : joint (HTTP 200)
+     Forgejo : joint
+### sortie-prefetch (label tekton.dev/task : prefetch-gomod)
+     DNS snapshot.debian.org : résolu (199.232.170.132)
+     DNS sc-stockage.poc.test : résolu (192.168.161.13)
+     snapshot.debian.org en 80 : refusé (URLError)
+     proxy.golang.org en 443 : joint (HTTP 200)
+     API de RKE2 : refusé (URLError)
+     Zot : refusé (URLError)
+     Forgejo : joint
+### sortie-construire (label tekton.dev/task : construire-image)
+     DNS snapshot.debian.org : échec (gaierror)
+     DNS sc-stockage.poc.test : échec (gaierror)
+     snapshot.debian.org en 80 : refusé (URLError)
+     proxy.golang.org en 443 : refusé (URLError)
+     API de RKE2 : refusé (URLError)
+     Zot : refusé (URLError)
+     Forgejo : refusé

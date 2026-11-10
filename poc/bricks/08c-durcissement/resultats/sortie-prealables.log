@@ -1,0 +1,9 @@
+# sortie-builds.sh prealables, 2026-11-10T13:52:16Z
+agents Cilium : quay.io/cilium/cilium:v1.20.4@sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+enable-ipv6 : false ; policy-cidr-match-mode : nodes ; enable-policy : default
+## invariants avant la règle (l'invariant à sortie CIDR est vide tant qu'aucun refus n'existe)
+politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   règle builds-sans-internet absente

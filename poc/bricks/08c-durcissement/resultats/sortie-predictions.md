@@ -181,3 +181,64 @@ Si elle est présente :
 **Séquence proposée** : `prealables`, `avant`, `appliquer`, `apres`, `bout_en_bout`, `test6`. La règle reste en place. Le critère de retrait reste le même, avec en plus « T4 en échec ».
 
 **Estimation** : environ 45 min, test 6 compris.
+
+## Résultat du passage (10/11/2026, de 13:52:16 à 14:01 UTC, accord : « Oui, lance-le »)
+
+Journaux :
+- [`sortie-prealables.log`](sortie-prealables.log), [`sortie-avant.log`](sortie-avant.log), [`sortie-appliquer.log`](sortie-appliquer.log), [`sortie-apres.log`](sortie-apres.log) ;
+- [`sortie-bout_en_bout.log`](sortie-bout_en_bout.log) et [`sortie-construction_durcie-preuves.log`](sortie-construction_durcie-preuves.log) ;
+- [`sortie-test6-premier-passage.log`](sortie-test6-premier-passage.log) et [`sortie-test6-premier-passage-preuves.log`](sortie-test6-premier-passage-preuves.log).
+
+**La règle `builds-sans-internet` est en place depuis 13:55:03 UTC.**
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| Q1 | Agents `v1.20.4`, `enable-ipv6` à `false`, `policy-cidr-match-mode` à `nodes`. Politiques : `construction-sans-sortie` et `prefetch-sortie`. Invariants OK, règle absente | tenue |
+| Q2 | Sans label : DNS résolu, snapshot joint (200), proxy.golang.org joint (200), API jointe (401), Zot joint, **en 200 et non en 401**, Forgejo joint | tenue (écart de code sur Zot, sans effet) |
+| Q3 | prefetch-gomod : DNS résolu, 443 public joint, snapshot en 80, API et Zot refusés, Forgejo joint | tenue |
+| Q4 | construire-image : tout refusé, DNS compris | tenue |
+| Q5 | Règle valide pour Cilium. Les trois invariants sont OK, et les politiques de `builds` sont maintenant au nombre de trois | tenue |
+| Q6 | Sans label : **snapshot en 80 et proxy.golang.org en 443 refusés** ; DNS, API (401), Zot et Forgejo toujours joints | tenue |
+| Q7 | prefetch-gomod : identique à Q3 | tenue |
+| Q8 | construire-image : identique à Q4 | tenue |
+| Q9 | PipelineRun de la tête de main réussi en 54 s par le webhook. Image `3a7ca1b1` inchangée. Porte : `true`. Enveloppes de Chains : 24 → 26. Rejeu et livraison non signée refusés. Aucune anomalie. CronJob `rattrapage` repris | tenue |
+| T1 à T4 | Le test 6 s'arrête dans la contre-épreuve sur « Supervisor FERME » (code 1). **Défaut d'invocation** : l'étape `test6` ne passait pas `T6_FERMES="Supervisor Etcd"`, que la 08c documente comme obligatoire sous le pare-feu d'hôte de H4 (`mesures-reelles-predictions.md`, invocation du 07/11). `192.168.161.11:9345` est une adresse privée, que la règle ne touche pas | **T4 en échec** ; T1 et T3 non évaluées ; T2 partielle (Zot, Forgejo et les deux voies de l'API joignables) |
+
+**Relevés du passage interrompu**, lus sur l'hôte dans `…/08/travail/preuves` : ce sont des relevés, pas des verdicts.
+- Aucun SYN vers `203.0.113.10` sur `enp1s0`.
+- 3 SYN du témoin de capture vers `203.0.113.11:443`, source `192.168.161.12`.
+- 6 flux `POLICY_DENY` `EGRESS` vers `203.0.113.10:443` depuis l'IP de la contre-épreuve.
+- Le pod témoin est passé en `Succeeded`.
+
+**Effets déjà produits par ce passage**
+- Le bundle `tekton/tasks/preuve-test6-contre` réécrit dans Zot (définitif).
+- Un TaskRun signé par Chains.
+- Le pod témoin.
+- Le tcpdump, arrêté par `t6_passage` et borné par `timeout 600`.
+
+Le journal `preuves-test6.log` de la 08 a été sauvé puis remis à l'identique : git ne le voit pas modifié.
+
+## Critère de retrait : rempli à la lettre, règle maintenue (écrit à 14:04 UTC)
+
+Le critère commité disait « T4 en échec », et T4 est en échec. **La règle reste en place en attendant la décision du propriétaire.** Motif :
+- l'échec vient de l'invocation, pas de la règle : adresse privée, et même KO documenté sans la règle ;
+- Q5 à Q9 sont tenues.
+
+## Relance du seul `test6`, corrigée : prédictions (écrites à 14:04 UTC, avant toute exécution), NON LANCÉE
+
+**Correction de `sortie-builds.sh`**
+- `test6` passe `T6_FERMES="Supervisor Etcd"` (vérifié : une affectation devant une fonction de bash atteint le processus enfant).
+- `preuves()` utilise `JOURNAL` de `preuves.sh` et ne touche plus aux journaux de la 08.
+
+L'état réseau est celui de H5 : H6 (WireGuard) a été retirée après sa mesure. Le dernier test 6 réussi est `preuves-h5-test6.log` du 07/11.
+
+Les effets sont les mêmes que pour le premier passage de `test6`.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| T1 | `construire-image` : toutes les destinations injoignables. Vers `EXTERNE`, le motif est `POLICY_DENY` | moyenne pour le motif |
+| T2 | Contre-épreuve : Zot, Forgejo et les deux voies de l'API joignables ; Supervisor et Etcd refusés par le pare-feu d'hôte, comme en H4b ; aucun SYN vers `EXTERNE` ; au moins un flux `POLICY_DENY` | haute, d'après les relevés du passage interrompu |
+| T3 | Témoin de capture : au moins un SYN vers `203.0.113.11:443` sur `enp1s0` | haute, même raison |
+| T4 | Autres contrôles inchangés (adresse usurpée, rien ne sort du nœud). Code 0 | moyenne |
+
+Push de `bc0f352..3006992` : toujours en attente d'un oui.

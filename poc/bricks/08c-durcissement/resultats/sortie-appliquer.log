@@ -1,0 +1,7 @@
+# sortie-builds.sh appliquer, 2026-11-10T13:55:03Z
+kubectl : ciliumnetworkpolicy.cilium.io/builds-sans-internet created
+OK   règle valide pour Cilium : True
+politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 

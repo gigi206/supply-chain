@@ -108,18 +108,20 @@ etape_appliquer() {
   invariants
 }
 etape_apres() { temoins apres; }
-preuves() { # étape de ../08-trust-plane/preuves.sh : journal de la 08 sauvé puis remis, celui de ce passage archivé ici
-  local j=$b08/resultats/preuves-$1.log rc=0
-  cp "$j" "$T/preuves-$1.sauve"
-  trap 'cp "$T/preuves-$1.sauve" "$j"' EXIT
-  "$b08/preuves.sh" "$1" > /dev/null 2>&1 || rc=$?
-  grep -i -v -E 'jeton|token' "$j" > "$R/sortie-$1-preuves.log"
-  cp "$T/preuves-$1.sauve" "$j"; trap - EXIT
-  grep -E '^(OK|KO)|durée du PipelineRun|builds-sans-internet' "$R/sortie-$1-preuves.log"
+preuves() { # étape de ../08-trust-plane/preuves.sh ; JOURNAL de preuves.sh (lancer "${JOURNAL:-preuves}") : journal écrit sous un
+  # nom neuf dans la 08, puis archivé ici, sans toucher aux journaux de la 08. Corrigé le 10/11/2026 : le premier passage de test6
+  # sauvait et remettait le journal de la 08, et n'avait pas T6_FERMES (voir sortie-predictions.md)
+  local j=$b08/resultats/sortie-tmp-$1.log rc=0
+  rm -f "$j"
+  JOURNAL=sortie-tmp "$b08/preuves.sh" "$1" > /dev/null 2>&1 || rc=$?
+  grep -i -v -E 'jeton|token' "$j" > "$R/sortie-$1-preuves.log"; rm -f "$j"
+  grep -E '^(OK|KO)|durée du PipelineRun|builds-sans-internet|témoin de capture' "$R/sortie-$1-preuves.log"
   attendu "preuves.sh $1, code de sortie" "$rc" 0
 }
 etape_bout_en_bout() { preuves construction_durcie; }
-etape_test6() { preuves test6; }   # option (ii) : attentes du test 6 sous builds-sans-internet (preuves.sh, 10/11/2026)
+# T6_FERMES : obligatoire sous le pare-feu d'hôte de H4 (Supervisor et Etcd fermés à tout pod), comme en H5
+# (mesures-reelles-predictions.md, invocation du 07/11/2026 ; H6 retirée depuis)
+etape_test6() { T6_FERMES="Supervisor Etcd" preuves test6; }
 etape_retirer() {
   kubectl delete -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
   temoins retrait

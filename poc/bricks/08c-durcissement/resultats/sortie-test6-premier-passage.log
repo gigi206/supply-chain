@@ -1,0 +1,16 @@
+# sortie-builds.sh test6, 2026-11-10T14:00:37Z
+builds-sans-internet (08c) : présente : 203.0.113.10 refusé avec POLICY_DENIED ou POLICY_DENY ; contre-épreuve sans sortie vers 203.0.113.10 (POLICY_DENY), témoin de capture vers 203.0.113.11 par un pod au label prefetch-gomod
+OK   interface enp1s0 présente sur sc-build (noyau 6.12.116+deb13-amd64)
+CiliumNetworkPolicy de builds au lancement : builds-sans-internet prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+OK   TaskRun preuve-test6-contre terminé (Succeeded, TrustedResourcesVerified=True)
+OK   contre : label tekton.dev/task=preuve-test6-temoin sur le pod
+OK   contre : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.116+deb13-amd64)
+OK   contre : adresse de eth0 dans l'invité = IP du pod (10.42.1.209)
+OK   contre : 10.42.1.250 ajoutée puis retirée de eth0 (root dans l'invité)
+OK   contre-épreuve : Zot joignable
+OK   contre-épreuve : Forgejo joignable
+OK   contre-épreuve : API-noeud joignable
+OK   contre-épreuve : API-service joignable
+KO   contre-épreuve : Supervisor FERME (nc ou réseau du pod inutilisable : le test ne prouverait rien)
+KO   preuves.sh test6, code de sortie : 1 (attendu : 0)

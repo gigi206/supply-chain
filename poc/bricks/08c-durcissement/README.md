@@ -1351,3 +1351,19 @@ La réponse du propriétaire, « (a), avec (ii) », est consignée comme le choi
 - Un témoin de capture passe par un pod au label `prefetch-gomod`.
 
 **Nouvelle étape `test6`** dans `sortie-builds.sh`, avec les prédictions T1 à T4 dans [`resultats/sortie-predictions.md`](resultats/sortie-predictions.md).
+
+## Additif du 10/11/2026, 14:04 UTC : builds-sans-internet appliquée, test 6 à relancer
+
+Passage de 13:52 à 14:01 UTC, sur l'accord « Oui, lance-le ». Détail dans les [résultats](resultats/sortie-predictions.md).
+
+**Ce qui est fait**
+- **La règle est en place depuis 13:55:03 UTC.** Q1 à Q9 sont tenues.
+- Un pod de `builds` sans label ne joint plus Internet. Il joint toujours le DNS, l'API, Zot et Forgejo.
+- `prefetch-gomod` garde son 443 public.
+- Le PipelineRun de bout en bout réussit (image `3a7ca1b1`, porte `true`).
+
+**Test 6 en KO**, par défaut d'invocation de mon étape (`T6_FERMES` absent), pas à cause de la règle.
+
+**Critère de retrait rempli à la lettre**, mais la règle est maintenue en attendant la décision du propriétaire.
+
+**Relance du seul `test6`, corrigée, NON LANCÉE.**
