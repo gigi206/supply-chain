@@ -215,10 +215,10 @@ etape_reseau() {
   [ -n "$PREFETCH_DIGEST" ] || { echo "KO   PREFETCH_DIGEST non épinglé (étape image)" >&2; exit 1; }
   kubectl apply -f "$POLITIQUE" > /dev/null && echo "CiliumNetworkPolicy prefetch-sortie appliquée"
   echo "## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod"
-  n=$( { kubectl get networkpolicy -n builds -o json | jq -r '.items[] | select((.spec.podSelector.matchLabels // {}) as $m | ($m | length) == 0
-           or $m["tekton.dev/task"] == "prefetch-gomod") | "NetworkPolicy \(.metadata.name)"'
-         kubectl get ciliumnetworkpolicy -n builds -o json | jq -r '.items[] | select((.spec.endpointSelector.matchLabels // {}) as $m | ($m | length) == 0
-           or $m["tekton.dev/task"] == "prefetch-gomod") | "CiliumNetworkPolicy \(.metadata.name)"'; } | sort | paste -sd' ' -)
+  # évaluateur commun (selecteurs.jq, 10/11/2026) : matchLabels et matchExpressions, NetworkPolicy et CiliumNetworkPolicy
+  n=$( { kubectl get networkpolicy -n builds -o json; kubectl get ciliumnetworkpolicy -n builds -o json; } \
+         | jq -r -L "$here" 'include "selecteurs"; .items[] | .kind //= "" | select(selectionne({"tekton.dev/task": "prefetch-gomod"})) | nom' \
+         | sort | paste -sd' ' -)
   attendu "politiques qui sélectionnent ces pods" "$n" "CiliumNetworkPolicy prefetch-sortie"
   for n in f2-sonde-avec f2-sonde-sans; do kubectl delete pod -n builds "$n" --ignore-not-found --wait=true > /dev/null; done
   sonde f2-sonde-avec avec; sonde f2-sonde-sans sans

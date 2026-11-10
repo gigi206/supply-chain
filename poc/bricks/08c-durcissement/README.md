@@ -1311,3 +1311,24 @@ Kubescape, NeuVector, Tetragon (brique 17), et l'essai du runtime en bloc de Kat
   - **Zot** n'est pas redémarré par H1 : service systemd de `sc-stockage`, hors de `rke2-agent`. La tâche du 21/11 ne bouge pas.
 
 Estimation : 10 h, hors plan des secrets. Une décision s'impose à partir de 20 h.
+
+## Additif du 10/11/2026, 13:40 UTC : sortie Internet des pods de builds, option (a) préparée, NON APPLIQUÉE
+
+Origine : le constat P3 de la brique 06. Le propriétaire a répondu « Oui, prépare-le », consigné comme une interprétation.
+
+**Préparé**
+- [`sortie-builds.sh`](sortie-builds.sh) ;
+- la règle [`builds-sans-internet`](politiques/cilium-sortie/builds-sans-internet.yaml), qui refuse les adresses publiques à tout pod de `builds` sauf `prefetch-gomod`, sans aucune autorisation ;
+- les [prédictions Q1 à Q10](resultats/sortie-predictions.md).
+
+**Évaluateur commun des sélecteurs** : [`selecteurs.jq`](../08-trust-plane/selecteurs.jq), branché sur les invariants de `prefetch.sh` et de `construction.sh`.
+
+**Ce que (a) ne ferme pas** : l'API de RKE2, OpenBao, sc-stockage sur tous ses ports, le DNS.
+
+**Option (b)** : un vrai refus par défaut avec une autorisation par tâche. Elle est décrite, non préparée.
+
+**Choix entre (a) et (b)** : au propriétaire.
+
+**Lecture du cluster faite sans accord** : à 13:32:37 UTC, consignée.
+
+**Push de 13:31:36 UTC** : consigné.

@@ -318,6 +318,11 @@ politique_sans_sortie() { # construction-sans-sortie posée ; invariant d'union 
     "$(jq -r '[.items[] | select(.spec.podSelector.matchLabels["tekton.dev/task"] == "construire-image" and (.spec.policyTypes | sort) == ["Egress", "Ingress"])] | length' "$T/netpol.json")" 1
   attendu "politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient)" \
     "$(jq -r '[.items[] | select(((.spec.egress // []) | length) > 0 or ((.spec.ingress // []) | length) > 0)] | length' "$T/netpol.json")" 0
+  # ajouté le 10/11/2026 (08c, builds-sans-internet) : les CiliumNetworkPolicy s'additionnent aussi ; aucune ne doit autoriser de
+  # trafic à un pod de construire-image (évaluateur commun selecteurs.jq, matchExpressions compris ; les règles de refus n'autorisent rien)
+  kubectl get ciliumnetworkpolicy -n builds -o json > "$T/cnp.json"
+  attendu "CiliumNetworkPolicy de builds qui sélectionnent les pods de construire-image et autorisent du trafic" \
+    "$(jq -r -L "$here" 'include "selecteurs"; [.items[] | .kind = "CiliumNetworkPolicy" | select(selectionne({"tekton.dev/task": "construire-image"}) and autorise) | nom] | join(", ")' "$T/cnp.json")" ""
 }
 
 etape_construire() {
