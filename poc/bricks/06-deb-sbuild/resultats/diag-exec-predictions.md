@@ -492,3 +492,32 @@ Accord : « Oui », à 20:24:19 UTC (transcription), en réponse à « Je lance 
 
 **Lecture** : la chaîne d'un `kubectl exec` vers un pod de sc-build est kubectl, puis kube-apiserver, puis le proxy CONNECT du superviseur (rke2-server), puis le tunnel `remotedialer` jusqu'à rke2-agent, puis kubelet, puis containerd. Containerd est mis hors de cause par la bisection. Kubelet ne relaie plus rien pendant le blocage, d'après sa pile. Le poste est hors de cause par l'étape amont. **Le maillon fautif est donc kube-apiserver ou le tunnel du superviseur RKE2.** Le tunnel, propre à RKE2 et k3s, est le suspect principal, **sans preuve directe** : ni lui ni l'apiserver ne sont observables à la verbosité actuelle.
 
+## Étape local : préparée à sec (20:30 UTC), NON LANCÉE
+
+Demande : « Prépare », à 20:28:45 UTC (transcription), en réponse à « Je prépare un exec vers un pod de sc-confiance, sans le tunnel ? ».
+
+**Code lu**, hors du dépôt : k3s au commit `58877f27`, celui que fixe le `go.mod` de RKE2 `v1.35.9+rke2r1`.
+- `pkg/daemons/control/tunnel.go` (`dialBackend`) : le proxy CONNECT du superviseur joint **en direct** le kubelet du nœud qui porte le superviseur. Pour un autre nœud, il passe par la session `remotedialer` de son agent.
+- `pkg/daemons/control/proxy/proxy.go` (`Proxy`) : dans les deux cas, le relais copie chaque sens à part, avec une mémoire de 32 Kio. À la première fin ou erreur d'un des deux sens, il ferme les deux connexions.
+
+Un exec vers un pod de sc-confiance garde donc kubectl, l'apiserver et `proxy.Proxy`, mais **retire la session `remotedialer`**.
+
+**Le pod d'essai**
+- Placement : espace `default`, `kubernetes.io/hostname: sc-confiance`. La règle `zone-build` tient les pods de `builds` à sc-build.
+- Profil : runc `restricted`, UID 1000, sans compte de service monté.
+- Mémoire : 1 Gio, tmpfs de 512 Mio.
+- Image : l'image d'essai de s1b.
+
+**Admission** : le script l'essaie d'abord à blanc (`--dry-run=server`). En cas de refus, il s'arrête sans rien lancer.
+
+**Mesure** : un seul exec, le même que plus haut (lecture lente de 128 Mio, délai de 150 s), par le kubectl de l'hôte. Le pod est supprimé à la fin.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| L0 | Le pod est admis dans `default` et démarre sur sc-confiance | moyenne : règles de l'espace `default` non relues en entier |
+| L1 | L'exec passe, code 0, tout reçu : la session `remotedialer` est le maillon | faible |
+
+**Lecture prévue**
+- **L1 passe** : le maillon est le tunnel `remotedialer`, entre rke2-server et rke2-agent.
+- **L1 bloque** : le maillon est kube-apiserver ou `proxy.Proxy` ; on ne peut pas encore départager les deux.
+

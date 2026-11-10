@@ -465,4 +465,34 @@ etape_tunnel() {
   done
 }
 
+# Étape local (préparée à sec le 10/11/2026 à 20:30 UTC, NON LANCÉE) : sous RKE2, kube-apiserver joint kubelet par le proxy
+# CONNECT du superviseur (127.0.0.1:9345). D'après le code de k3s embarqué par RKE2 v1.35.9+rke2r1 (k3s 58877f27,
+# pkg/daemons/control/tunnel.go, dialBackend), le kubelet du nœud du superviseur est joint en direct, sans session remotedialer ;
+# celui de sc-build passe par la session de l'agent. Les deux passent par proxy.Proxy. Pod runc restricted sur sc-confiance
+# (espace default : les pods de builds sont tenus à sc-build par zone-build), mémoire réduite ; admission essayée à blanc
+# d'abord ; même exec à lecture lente de 128 Mio par le kubectl de l'hôte, délai de 150 s.
+etape_local() {
+  local f n rc=0 t0 ns=default
+  jq -n --arg i "$IMAGE" '{apiVersion: "v1", kind: "Pod", metadata: {name: "diag-exec-local", namespace: "default"},
+    spec: {restartPolicy: "Never", automountServiceAccountToken: false, nodeSelector: {"kubernetes.io/hostname": "sc-confiance"},
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, runAsGroup: 1000, seccompProfile: {type: "RuntimeDefault"}},
+      volumes: [{name: "w", emptyDir: {medium: "Memory", sizeLimit: "512Mi"}}],
+      containers: [{name: "diag", image: $i, command: ["sleep", "7200"],
+        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}},
+        resources: {requests: {cpu: "500m", memory: "1Gi"}, limits: {cpu: "1", memory: "1Gi"}},
+        volumeMounts: [{name: "w", mountPath: "/w"}]}]}}' > "$T/diag-exec-local.json"
+  kubectl create --dry-run=server -f "$T/diag-exec-local.json" </dev/null > "$T/admis.out" 2>&1 \
+    || { grep -a -i -v -E 'jeton|token' "$T/admis.out" | head -c 600; echo; echo "KO   pod d'essai refusé à l'admission : rien lancé" >&2; exit 1; }
+  echo "admission à blanc : admis"
+  kubectl delete pod -n "$ns" diag-exec-local --ignore-not-found --wait=true </dev/null >/dev/null
+  kubectl create -f "$T/diag-exec-local.json" </dev/null >/dev/null
+  kubectl wait -n "$ns" pod/diag-exec-local --for=condition=Ready --timeout=300s </dev/null >/dev/null \
+    || { kubectl delete pod -n "$ns" diag-exec-local --wait=false </dev/null >/dev/null; echo "KO   pod non prêt" >&2; exit 1; }
+  echo "### diag-exec-local (runc, uid 1000, nœud $(kubectl get pod -n "$ns" diag-exec-local -o jsonpath='{.spec.nodeName}' </dev/null)) : prêt à $(heure) UTC"
+  f=$(alea 128); n=$(stat -c %s "$f"); t0=$(ms)
+  timeout 150 kubectl exec -i -n "$ns" diag-exec-local -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" || rc=$?
+  echo "L1 sc-confiance, sans tunnel : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(kubectl exec -n "$ns" diag-exec-local -- stat -c %s /w/croise </dev/null 2>/dev/null || echo '?')"
+  kubectl delete pod -n "$ns" diag-exec-local --wait=false </dev/null >/dev/null; echo "pod diag-exec-local supprimé"
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
