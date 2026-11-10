@@ -160,3 +160,64 @@ Les horloges des trois machines concordent à 0,31 s près, aller-retour ssh com
 Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kata, sur un passage à 512 Mio. **Non vérifié** : les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part.
 
 **Correction du 10/11/2026, 21:02 UTC, avant push** : formulations resserrées dans ce fichier, les README de la 06 et de la 08b, l'ADR 0001 et les prédictions de S3. Les écarts de moins d'une demi-seconde entre les relevés des VM et l'heure de l'hôte sont du même ordre que l'incertitude d'horloge (0,3 s) : seuls restent affirmés les 0 avant et après, et la connexion vue pendant l'exec. La mise hors de cause de Kata à 512 Mio repose sur un seul passage. Aucun verdict ne change.
+
+## Passage Tekton après le changement : préparé à sec le 10/11/2026 à 21:08 UTC, NON LANCÉ
+
+**Push consigné** : `1e7533d..58fd6c1`, de 21:03:20 à 21:03:22 UTC, code 0. Il porte 4 commits (`365d21e`, `e021351`, `c9245f9`, `58fd6c1`). Le contrôle des secrets a porté sur 12 fichiers, sans rien trouver. Accord : « Oui, pousse », à 21:03:05 UTC (transcription).
+
+**« continue »**, à 21:05:08 UTC (transcription), est consigné comme une **interprétation** : la permission de préparer à sec, pas un accord de lancement. Rien n'a été lancé sur le cluster, Zot ni les VM.
+
+### Choix du passage
+
+Il s'agit de [`preuves.sh construction_durcie`](../../08-trust-plane/preuves.sh), tel quel, que la 08c lance sous le nom `bout_en_bout`. C'est le seul passage Tekton de bout en bout déjà mesuré sous RKE2 :
+- livraison du webhook par Forgejo, EventListener, PipelineRun de la tête de main ;
+- `construire` sous Kata sur sc-build ;
+- signature par Chains, jugement par la porte ;
+- refus d'une livraison non signée et d'un rejeu.
+
+La dernière mesure date du 10/11/2026 à 13:58:01 UTC, avant le changement, en mode `agent` : [`sortie-construction_durcie-preuves.log`](../../08c-durcissement/resultats/sortie-construction_durcie-preuves.log). Les compteurs ont bougé d'un passage à l'autre, donc les prédictions sont relatives au départ du passage, pas recopiées.
+
+**Ce que ce passage teste réellement** : surtout l'absence de régression après le redémarrage de rke2-server de 20:43 UTC. Le pipeline, Chains, les webhooks et Kyverno passent par l'apiserver et par des Services, chemin que ce changement ne touche pas (lecture du 20:41 UTC ci-dessus). Relu dans le dépôt, sans lecture du cluster :
+- **lectures de journaux** : les `kubectl logs` du passage visent `el-forgejo` (`el_existe`), `tekton-triggers-core-interceptors` et le Job de la porte (`juger`). Les trois tournent en zone confiance : `politique/declencheurs.yaml`, `tekton/kustomization-interceptors.yaml` et `politique/porte-job.yaml` posent `zone: confiance`, label de sc-confiance (`config/sc-confiance.yaml`). Ils passent donc par le kubelet de sc-confiance, **pas par celui de sc-build**. Avant le changement, ce chemin local passait-il par le tunnel ? Non lu ;
+- **aucun `kubectl exec`** dans `etape_construction_durcie` ni dans les fonctions qu'elle appelle (`ba_chemin`, `ee_calme`, `ee_controle`, `couverture`, `juger`, `forgejo_livrer`, `el_existe`, `purger_pr`, `envoyer`) ;
+- **résultats des tâches** : Tekton v1.15.5 les lit dans le message de fin du conteneur. Le `release.yaml` épinglé vaut `results-from: "termination-message"`, et rien dans `tekton/` ni `tekton.sh` ne change ce réglage. Le contrôleur ne lit donc pas de journaux de pod sur sc-build.
+
+### Effets, dont des écritures définitives
+
+Ce passage n'est pas une lecture :
+- le CronJob `rattrapage` est suspendu, puis repris par le `trap` ;
+- le PipelineRun de la tête de main est purgé, puis reconstruit par le webhook. Le manifeste de l'image existe déjà, au même digest ;
+- **Zot, définitif** : deux enveloppes de Chains de plus sur `builds/sample-app@sha256:3a7ca1b1…`. Le passage d'horodatage ajoute aussi des bundles. Le Job de la porte ne fait que lire la VSA (`builds/vsa/`) et les énoncés de scan (`builds/scan/`), d'après `politique/porte-job.yaml` ;
+- une ligne ajoutée à `chrono.tsv` de la 08.
+
+**Préalable vérifié à sec** : `travail/construction/pipeline.ref` existe et n'est pas vide (`test -s`, contenu non lu).
+
+### Prédictions
+
+| # | Prédit | Confiance |
+|---|---|---|
+| T1 | Code de sortie 0, aucune ligne `KO` | moyenne-haute : chemin inchangé, mais premier passage après un redémarrage de l'apiserver (une course a déjà été vue juste après un redémarrage, le 06/11 à 14:09 UTC) |
+| T2 | Compteurs de départ et de fin identiques (`COUVERTE`, `ECHEC_SIGNATURE`, `SANS_SUJET`), aucune anomalie ni au départ ni à la fin | moyenne-haute |
+| T3 | PipelineRun `True\|Succeeded`, trois TaskRun en `Succeeded` avec `TrustedResourcesVerified=True`. `preparer` et `publier` sur sc-build sans runtimeClassName, `construire` sur sc-build en `kata`. `IMAGE_DIGEST=sha256:3a7ca1b1…` | moyenne-haute |
+| T4 | Enveloppes de Chains : e0 → e0 + 2. Verdict de la porte `true\|\|ok`. La provenance de PipelineRun la plus récente est celle du nouveau PipelineRun | moyenne-haute |
+| T5 | Rejeu refusé à la création (« already exists »), livraison non signée refusée par l'intercepteur github, aucun PipelineRun du commit `1111…` | moyenne-haute |
+| T6 | Durée du PipelineRun entre 40 et 120 s (54 s, 56 s et 95 s mesurés) | moyenne |
+
+Si T1 échoue, la cause reste à lire avant toute conclusion : un échec ne désignerait pas en soi le changement de mode.
+
+**Ce que ces mesures ne couvrent pas** :
+- le chemin de l'apiserver vers le kubelet de sc-build, qu'aucun appel de ce passage n'emprunte. Il est couvert à part par l'exec de 20:56 UTC (E5) ;
+- les métriques ;
+- `sortie-builds.sh`, dont la correction de DESTINATIONS n'est toujours pas rejouée.
+
+### Commande prévue, sur accord nommé
+
+Sous bash, pour relever le code de sortie. Le journal est écrit sous un nom neuf, puis archivé sous `preuves-egress-construction_durcie.log` sans les lignes `jeton|token`, comme le fait la 08c. Les journaux existants de la 08 et de la 08c ne sont pas touchés.
+
+```
+bash -c 'd=poc/bricks/08-trust-plane/resultats; DISTRO=rke2 JOURNAL=egress-tmp timeout 840 mise exec -- poc/bricks/08-trust-plane/preuves.sh construction_durcie </dev/null; echo "rc $?"; grep -i -v -E "jeton|token" $d/egress-tmp-construction_durcie.log > $d/preuves-egress-construction_durcie.log && rm $d/egress-tmp-construction_durcie.log'
+```
+
+**Estimation** : 2 à 5 min (passage de 13:58 UTC : 54 s de PipelineRun). Une décision avec le propriétaire serait demandée au-delà de 10 min.
+
+Si `timeout` coupe le passage à 840 s, la reprise du CronJob `rattrapage` par le `trap` n'est pas garantie (non vérifiée) : son état `suspend` sera relu et signalé au propriétaire, sans le changer.
