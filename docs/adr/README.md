@@ -9,6 +9,7 @@
 | 0004 | Vulnérabilités et VEX (OpenVEX ou CSAF) | À rédiger | Phase 3 |
 | 0005 | Licences (politique ORT et DT, curations) | À rédiger | Phase 3 |
 | 0006 | Archive WORM (Ceph hors cluster ou S3 Object Lock compliance) | À rédiger | Fin de 2c (brique 15) |
+| [0007](0007-constructions-agnostiques.md) | Constructions indépendantes du langage et du format de sortie (binaires, rpm, deb, image) ; code source du projet jamais modifié, sauf branche ou tag custom | **Proposé** (exigence du propriétaire du 10/11/2026) | Conception à mesurer : prefetch par écosystème, porte générique |
 
 ## Gabarit
 
