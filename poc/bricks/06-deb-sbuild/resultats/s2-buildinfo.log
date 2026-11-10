@@ -1,0 +1,18 @@
+# s2.sh buildinfo, 2026-11-10T15:50:39Z
+## instantané 20261105T000000Z, revérifié hors ligne
+OK   signataires d'InRelease (clés primaires) : 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4 B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+InRelease : sha256 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675, Sat, 12 Sep 2026 07:55:41 UTC
+OK   Packages.xz contrôlé par InRelease : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+## .buildinfo reconstitué depuis resultats/s1b-relance-sbuild.log
+OK   sha256 du .buildinfo (.changes du journal) : a2d1a419c5c8e3c13a5552e4d17ed6ea09fa027bf7e8d6454e21d5bb506bc175
+OK   deb décrit par le .buildinfo (deb de s1b) : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+## Installed-Build-Depends contre Packages
+Installed-Build-Depends : 162 paquets, 162 distincts
+OK   présents une fois dans Packages (amd64 ou all) : 162 sur 162
+fermeture attendue : 162 fichiers, 193978008 octets ; amd64 129, all 33
+     plus gros : golang-1.24-go_1.24.4-1_amd64.deb 28672232 octets
+     plus gros : gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb 21389968 octets
+     plus gros : golang-1.24-src_1.24.4-1_all.deb 21182488 octets
+     plus gros : g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb 12114812 octets
+     plus gros : libnode115_20.19.2+dfsg-1+deb13u2_amd64.deb 12113428 octets
+liste attendue archivée : resultats/s2-fermeture-attendue.txt (fichier sha256 taille)

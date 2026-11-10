@@ -60,3 +60,23 @@ Le propriétaire a répondu « continue » à 15:43:21 UTC (transcription), apr�
 - que sbuild construit depuis cette fermeture, hors ligne : c'est S3 ;
 - la déduplication entre deux fermetures ;
 - le caractère bit-identique du deb.
+
+## Résultat de l'étape buildinfo (10/11/2026, 15:50:39 à 15:50:41 UTC, hôte seul, sous `unshare -rn`)
+
+Lancée sous bash, code de sortie relevé : **0**. Journal : [`s2-buildinfo.log`](s2-buildinfo.log). Aucune interface hors `lo` dans l'espace réseau de l'étape.
+
+| # | Résultat |
+|---|---|
+| Q1 | **Tenue.** Trois signataires épinglés, `Packages.xz` conforme à `InRelease` (`7778d3e3…`) |
+| Q2 | **Tenue.** 162 paquets, 162 distincts, tous présents une seule fois dans `Packages` à la version exacte |
+| Q3 | **Tenue.** Fermeture attendue : 162 fichiers, 193 978 008 octets (129 amd64, 33 all). Plus gros : `golang-1.24-go` (28,7 Mo) |
+
+Déjà observés avant les prédictions, refaits par l'étape : `.buildinfo` de sha256 `a2d1a419…`, deb décrit `0b489d43…`.
+
+**Archivés**
+- [`s2-sample-app_1.0.0-1_amd64.buildinfo`](s2-sample-app_1.0.0-1_amd64.buildinfo) : le `.buildinfo` reconstitué ;
+- [`s2-fermeture-attendue.txt`](s2-fermeture-attendue.txt) : fichier du pool, sha256 et taille de chaque paquet.
+
+**Non lancées** : `racine`, `fermeture` et `restauration`. Chacune attend un accord nommé.
+
+Push consigné : 14:45:31 UTC, `145f67a..4072aee`, 17 fichiers contrôlés, aucun secret.

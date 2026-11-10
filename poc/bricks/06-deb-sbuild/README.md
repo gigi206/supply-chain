@@ -198,3 +198,15 @@ Passage `PREFIXE=s1c s1.sh racine` de 14:36 à 14:41 UTC, sur l'accord « Oui, l
 - chroot : `440ba93b…`, comme en s1.
 
 C'est un premier indice de reproductibilité pour S2, pas sa preuve.
+
+## Additif du 10/11/2026, 15:51 UTC : S2 préparé, étape hors ligne tenue
+
+[`s2.sh`](s2.sh) et les [prédictions Q1 à Q12](resultats/s2-predictions.md) ont été écrits et commités avant toute exécution.
+
+**Le `.buildinfo` de sample-app est retrouvé sans nouveau build.** sbuild l'imprime dans son journal, archivé en s1b. L'étape `buildinfo` le reconstitue à l'octet près (`a2d1a419…`, l'empreinte du `.changes`).
+
+Ses 162 paquets sont tous dans l'instantané, à la version exacte. La fermeture attendue fait 194 Mo, en 162 fichiers. L'étape a tourné sur l'hôte seul, hors ligne, avec le code 0.
+
+**Non lancé** : le chroot `buildd` construit deux fois, le téléchargement de la fermeture, son envoi dans Zot et sa restauration. Chaque étape attend un accord nommé.
+
+**Non mesurable en S2** : la déduplication entre deux fermetures, car il n'en existe qu'une.
