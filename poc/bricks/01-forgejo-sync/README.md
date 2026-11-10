@@ -478,3 +478,5 @@ Aucune décision n'est prise. Rien n'a été lu ni écrit dans Forgejo, le clust
 - comment les clients récupèrent-ils la version custom : depuis notre Zot, depuis leur propre registre, ou sous forme de paquets rpm ou deb ?
 - un patch peut-il être propre à un seul client ?
 - faut-il ouvrir une brique, avec une estimation ?
+
+**Additif du 10/11/2026, 12:04 UTC : un patch peut viser 1 à n clients.** Réponse du propriétaire, verbatim : « oui un patch peut être pour 1 à n clients ». Conséquence, à concevoir et non décidée : chaque build custom doit pouvoir dire à quels clients il est destiné, par exemple dans le nom du dépôt Zot ou de la branche, dans les annotations, ou dans la VSA. La livraison aux clients et l'ouverture d'une brique restent à préciser.
