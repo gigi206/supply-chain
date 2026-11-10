@@ -841,3 +841,19 @@ Ce n'est un accord pour aucune mesure ni aucune écriture.
 - Format, une ligne par paquet : nom, version, architecture, sha256, taille, chemin dans le pool.
 
 **Limite** : la liste reproduit ce que S1 et S2 ont installé. Elle ne prouve pas qu'apt, hors ligne, résoudra le même ensemble depuis le miroir partiel. Ce sera une prédiction de S4a.
+
+## Additif du 10/11/2026, 22:58 UTC : prédictions de S4a écrites, NON LANCÉ
+
+Les [prédictions A1 à A17](resultats/s4a-predictions.md) sont écrites et commitées avant le script, les tâches et toute exécution. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+
+**Vérifié à sec avant de les écrire**, sur l'hôte et dans le dépôt :
+- les appels exacts de mmdebstrap (`s1.sh` pour la racine, `s2.sh` pour le chroot) et `SOURCE_DATE_EPOCH=1789199741` ;
+- `Acquire-By-Hash: yes` dans l'InRelease ;
+- le `Packages` de l'hôte, égal à `xz -dc Packages.xz` ;
+- `apt-helper`, `sqv`, `xz` et le crochet `file-mirror-automount` dans la racine de S1 ;
+- la syntaxe d'`apt-helper download-file` dans apt 3.0.3 ;
+- la double publication, réussie en F2 avec un compte en création seule.
+
+**Risques principaux** : `prefetch-deb` en non root (A4), la complétude des 20 paquets de l'amorce (A6) et la vérification de l'InRelease d'un miroir `file://` (A7). Les trois sont des prédictions moyennes.
+
+**Reste à écrire, à sec** : `s4a.sh`, les tâches `prefetch-deb` et `construire-builder`, la pipeline `builder-sbuild` et la NetworkPolicy `builder-sans-sortie`. Chaque étape qui touche Zot ou le cluster attendra son accord nommé.
