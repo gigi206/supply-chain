@@ -43,7 +43,8 @@ trusted_tasks:
   # même image d'amorce, sans aucune entrée ni sortie réseau (NetworkPolicy builder-sans-sortie), miroir lu en lecture seule et
   # revérifié, image sbuild-debian13 en layout OCI écrit à la main. Tâche privilégiée : acceptée par la porte dans toute
   # provenance qu'elle juge, comme construire-image. Version corrigée le 10/11/2026 (mmdebstrap installé par apt-get install
-  # hors ligne, journaux complets en échec, points de montage du miroir retirés) ; remplace de18e9cf, retirée de la liste
-  # (dpkg -i groupé : échec du premier passage, pré-dépendances de python3)
+  # de fichiers locaux sans --no-download, journaux complets en échec, points de montage du miroir retirés) ; remplace
+  # 49173846 (--no-download : chemin d'un .deb local resté relatif, échec du second passage) et de18e9cf (dpkg -i groupé :
+  # pré-dépendances de python3, échec du premier passage), toutes deux retirées de la liste
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
-    - ref: sha256:49173846d1f3f67b373246ce84b240d1efc4fa073642cbac63a0043d8ba38c49
+    - ref: sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
