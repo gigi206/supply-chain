@@ -1395,3 +1395,15 @@ Le propriétaire a répondu « celui que tu veux ». Je consigne cette réponse 
 **E0 tenue** (`deb_sec`, hôte seul, hors réseau) : invariants OK sur les politiques du dépôt, et la contre-épreuve détecte l'oubli du `NotIn`.
 
 **Brique 05 non traitée** : M1 n'a pas de script, ses sorties ne sont pas connues. `dl.rockylinux.org` partage l'adresse de Fastly relevée ci-dessus.
+
+## Additif du 10/11/2026, 14:28 UTC : invariant des labels exclus, E0 bis tenue
+
+**Trou relevé par le conseiller.** Dans le dépôt, `builds-sans-internet` exclut `prefetch-deb`. Si on le posait seul, un pod `prefetch-deb` aurait tout Internet sans qu'aucun invariant ne le voie.
+
+**Correctif** : `invariants()` exige maintenant que chaque label exclu d'un refus soit couvert par une politique de sortie dédiée.
+
+**E0 bis tenue** (14:28:02 UTC, hors réseau) : la contre-épreuve signale `tekton.dev/task=prefetch-deb` quand `prefetch-deb-sortie` manque.
+
+**Conséquence** : `builds-sans-internet` et `prefetch-deb-sortie` vont **ensemble**, dans le cluster comme dans tout rejeu.
+
+**Relevé DNS archivé** ([journal](resultats/sortie-deb-dns.log)) : l'adresse de Fastly partagée par `snapshot.debian.org` et `dl.rockylinux.org` est passée de 199.232.170.132 (14:19 UTC) à 151.101.122.132 (14:28 UTC).

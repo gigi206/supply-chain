@@ -70,7 +70,7 @@ invariants() { # [source : politiques (cluster, par défaut) | politiques_depot]
   attendu "politiques à sortie CIDR dont les pods seraient aussi sous un refus" "$(sel "$SOUS_REFUS")" ""
   attendu "labels exclus d'un refus sans politique de sortie dédiée" "$(sel "$EXCLUS_SANS_SORTIE")" ""
 }
-# Ajouté le 10/11/2026 à 14:28 UTC (relecture du conseiller) : un label exclu d'un refus (NotIn) que ne sélectionne aucune politique à
+# Ajouté le 10/11/2026 à 14:27 UTC (relecture du conseiller ; heure corrigée à 14:28 UTC, avant tout push : la ligne portait 14:28) : un label exclu d'un refus (NotIn) que ne sélectionne aucune politique à
 # règles egress et refus par défaut en sortie aurait tout Internet sans bruit (cas : builds-sans-internet du dépôt posé seul, sans
 # prefetch-deb-sortie). enableDefaultDeny.egress absent vaut vrai dans Cilium dès qu'une règle egress existe ; seul false l'écarte.
 EXCLUS_SANS_SORTIE='. as $tout | [.items[] | select((.spec.egressDeny // []) | length > 0) | (selecteur.matchExpressions // [])[]

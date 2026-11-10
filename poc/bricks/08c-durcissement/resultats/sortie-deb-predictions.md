@@ -59,7 +59,7 @@ Lancé sous `unshare -rn`, dans un espace réseau vide : aucune requête au clus
 
 **Push précédent**, consigné ici : le 10/11/2026 à 14:08:34 UTC, `bc0f352..145f67a`, contrôle des secrets OK sur 22 fichiers.
 
-## Additif du 10/11/2026, 14:29 UTC : invariant des labels exclus ; prédiction E0 bis, écrite avant exécution
+## Additif du 10/11/2026, 14:27 UTC : invariant des labels exclus ; prédiction E0 bis, écrite avant exécution
 
 **Trou relevé par le conseiller, sur relecture.**
 - Dans le dépôt, `builds-sans-internet` exclut désormais `prefetch-deb`. L'étape `appliquer` ne pose que ce fichier.
@@ -85,3 +85,20 @@ Lancé sous `unshare -rn`, dans un espace réseau vide : aucune requête au clus
 - **Préparation** : de 14:19 UTC (relevé DNS) à 14:23:36 UTC (commit).
 - **14:25** n'a jamais été relevé.
 - **E0** : partie à 14:23:47 UTC, après ce commit.
+
+*Corrigé à 14:28 UTC, avant tout push* : le titre de l'additif ci-dessus portait 14:29 UTC. Il a été écrit à 14:27:54 UTC et commité à 14:27:55 UTC (f16a88b), d'où le titre corrigé. Le commentaire de `sortie-builds.sh` portait 14:28 ; il est corrigé de même. La mention « Corrigé à 14:29 UTC » sur l'heure de c980b47, plus haut, est fausse de même : cette correction a été écrite à 14:27 UTC. Elle est laissée telle quelle, car elle est déjà commitée.
+
+### Résultat de E0 bis (14:28:02 UTC, journal [`sortie-deb_sec.log`](sortie-deb_sec.log))
+
+Lancé sous `unshare -rn`. Code 0. **E0 bis tenue.**
+- Les lignes d'E0 sont identiques.
+- La ligne « labels exclus d'un refus sans politique de sortie dédiée » est vide.
+- Seconde contre-épreuve : sans `prefetch-deb-sortie`, l'invariant signale `tekton.dev/task=prefetch-deb`.
+
+Ce passage a réécrit le journal d'E0. Celui-ci est remis sous [`sortie-deb_sec-e0.log`](sortie-deb_sec-e0.log), à partir d'une copie prise avant le passage. Le lien du résultat d'E0 mène donc désormais au journal d'E0 bis.
+
+### Relevé DNS archivé (14:28:10 UTC, [`sortie-deb-dns.log`](sortie-deb-dns.log))
+
+- `snapshot.debian.org` et `dl.rockylinux.org` sont résolus vers **151.101.122.132**, toujours par les CNAME de Fastly. À 14:19 UTC, c'était 199.232.170.132.
+- L'adresse est donc **partagée entre les deux hôtes, et elle change en quelques minutes**. Une /32 aurait été à la fois trop large et instable.
+- `dl.fedoraproject.org` reste résolu vers 38.145.32.22 à .24.

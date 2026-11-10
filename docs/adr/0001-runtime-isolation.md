@@ -92,6 +92,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 10/11/2026, 14:24 UTC** : sortie dédiée de la brique 06 préparée à sec ([prédictions](../../poc/bricks/08c-durcissement/resultats/sortie-deb-predictions.md)), non appliquée. Seuls les pods au label `tekton.dev/task=prefetch-deb` sortiraient, vers le DNS et vers les adresses publiques en 80. Ce label est exclu de `builds-sans-internet`. La ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 10/11/2026, 14:28 UTC** : la règle de refus et la sortie dédiée doivent être posées ensemble, sinon le label exclu n'aurait aucune règle. Un invariant le vérifie désormais (E0 bis tenue, hors réseau). La ligne d'isolation de cet ADR n'est pas modifiée.
+
 > **Additif du 09/11/2026, 13:11 UTC** : [brique 08c](../../poc/bricks/08c-durcissement/README.md) close par décision du propriétaire, documentation seulement. Aucune note ne change. Seuil tenu sur les 8 tests, la porte et les contrôles 6 et 7 sous RKE2 durci H1 à H5 ; ports d'hôte tenus sur les ports essayés seulement, sans balayage. Non couverts écrits dans le README de la brique, dont la jonction d'un nœud et H6 (WireGuard), retirée après mesure.
 
 ## Conséquences

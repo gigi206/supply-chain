@@ -1,0 +1,10 @@
+# relevé DNS depuis l'hôte (résolveur du système), 2026-11-10T14:28:10Z
+## snapshot.debian.org
+getent ahostsv4 : 151.101.122.132 
+dig +short A : debian.map.fastlydns.net. 151.101.122.132 
+## dl.rockylinux.org
+getent ahostsv4 : 151.101.122.132 
+dig +short A : dualstack.dl.map.rockylinux.org. rockylinux.map.fastlydns.net. 151.101.122.132 
+## dl.fedoraproject.org
+getent ahostsv4 : 38.145.32.22 38.145.32.23 38.145.32.24 
+dig +short A : 38.145.32.22 38.145.32.23 38.145.32.24 
