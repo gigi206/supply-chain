@@ -1444,3 +1444,8 @@ L'additif de 09:40 UTC indiquait « environ 40 min » pour la phase en lecture s
 - passage en tâche de fond, sans travail actif : 3 min 16 s.
 
 La phase en lecture seule a donc pris environ 25 min de travail actif, contre 1 h proposée. Le chantier des Events totalise environ 8 h 50 pour 4 h estimées.
+
+## Additif du 10/11/2026, 10:03 UTC : push de 09:45:06 UTC consigné
+
+- « Oui, pousse » au push. Contrôle des secrets sur les 6 fichiers touchés par les 4 commits, dans une copie de travail temporaire retirée ensuite : OK. Push à 09:45:06 UTC, `7473ea2..c8fe842` ; branche distante identique à la branche locale.
+- Rien d'autre sur le chantier des Events depuis : aucune requête, aucun passage. Le travail de 10:03 UTC porte sur la 19b (README de la 19b).

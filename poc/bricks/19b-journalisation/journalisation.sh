@@ -340,6 +340,7 @@ etape_alloy() {
     rm -rf "${D:?}"
     sur "$v" sudo bash -s <<EOS
 set -euo pipefail
+trap 'cd / && rm -rf /tmp/alloy-installation' EXIT   # toute sortie, en échec comprise, retire les clés et le jeton copiés (10/11/2026)
 cd /tmp/alloy-installation && tar -xf alloy-installation.tar
 printf '%s  %s\n' "$ALLOY_SHA" "$ALLOY_ARCHIVE" | sha256sum -c
 python3 -c 'import zipfile; zipfile.ZipFile("$ALLOY_ARCHIVE").extract("alloy-linux-amd64")'
@@ -713,6 +714,7 @@ etape_grpc_tls() { # copies de sauvegarde ; validation sur copie ; Alloy recharg
   date +%s > "$W/l6-debut"   # début de la fenêtre de l'étape pertes_grpc
   sur sc-stockage sudo bash -s <<'EOS'
 set -euo pipefail
+trap 'cd / && rm -rf /tmp/grpc-tls' EXIT   # toute sortie, en échec comprise, retire loki-interne.key (10/11/2026)
 cd /tmp/grpc-tls
 alloy_pret() { # 3511 et 3512 sur la boucle locale, aucun port d'alloy sur toutes les interfaces
   local l; l=$(ss -ltnpH | grep 'users:(("alloy"' | awk '{print $4}')

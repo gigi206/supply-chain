@@ -1,0 +1,42 @@
+# Essai hors cluster du nettoyage par trap d'etape_alloy (/tmp/alloy-installation) et d'etape_grpc_tls (/tmp/grpc-tls), journalisation.sh
+# date : 2026-11-10T10:02:39Z ; rien lu ni écrit dans le cluster, Loki, Zot ou les VM ; accord du propriétaire : « Nettoyer les deux » (10/11/2026)
+# avant : journalisation.sh de c8fe842, sha256 d515463c5a0ea751f8bae3068fc16a85a8dee3cabb03ae39b18c7137b0a621dd
+# après : journalisation.sh modifié, sha256 f226b7c39dc8689ef08c5fddc82247be4095456159c8f794641c43cadd0ebb73
+# méthode : corps entier du heredoc distant de chaque étape, lancé par bash -s ; /usr/local/bin, /tmp et /etc réécrits vers le dossier
+# d'essai en une passe ; ALLOY_SHA et ALLOY_ARCHIVE remplacés par des valeurs factices (heredoc non cité d'etape_alloy) ; faux
+# systemctl, ss, curl, journalctl, sleep, id, useradd, install, sha256sum, python3, loki et alloy, qui rendent le code demandé ;
+# install et systemctl journalisent leurs appels, comparés avant et après ; « restant » = le dossier copié existe à la sortie
+avant  alloy  empreinte refusée (sha256sum -c)               code=1  dossier /tmp/alloy-installation restant=oui
+apres  alloy  empreinte refusée (sha256sum -c)               code=1  dossier /tmp/alloy-installation restant=non
+       appels à install et systemctl : 0 avant, 0 après, identiques
+avant  alloy  installation de client.key en échec            code=1  dossier /tmp/alloy-installation restant=oui
+apres  alloy  installation de client.key en échec            code=1  dossier /tmp/alloy-installation restant=non
+       appels à install et systemctl : 5 avant, 5 après, identiques
+avant  alloy  configuration refusée (validate)               code=1  dossier /tmp/alloy-installation restant=non
+       KO   configuration d'alloy refusée : Alloy ni redémarré ni rechargé, mais binaire, service et /etc/alloy/config déjà remplacés
+apres  alloy  configuration refusée (validate)               code=1  dossier /tmp/alloy-installation restant=non
+       KO   configuration d'alloy refusée : Alloy ni redémarré ni rechargé, mais binaire, service et /etc/alloy/config déjà remplacés
+       appels à install et systemctl : 10 avant, 10 après, identiques
+avant  alloy  nominal                                        code=0  dossier /tmp/alloy-installation restant=non
+apres  alloy  nominal                                        code=0  dossier /tmp/alloy-installation restant=non
+       appels à install et systemctl : 14 avant, 14 après, identiques
+avant  grpc   loki -verify-config en échec                   code=1  dossier /tmp/grpc-tls restant=oui
+apres  grpc   loki -verify-config en échec                   code=1  dossier /tmp/grpc-tls restant=non
+       appels à install et systemctl : 2 avant, 2 après, identiques
+avant  grpc   configuration refusée (validate)               code=1  dossier /tmp/grpc-tls restant=non
+       KO   configuration d'alloy (copie) refusée : loki.yaml et relais.alloy en place inchangés, Alloy et Loki non touchés
+apres  grpc   configuration refusée (validate)               code=1  dossier /tmp/grpc-tls restant=non
+       KO   configuration d'alloy (copie) refusée : loki.yaml et relais.alloy en place inchangés, Alloy et Loki non touchés
+       appels à install et systemctl : 2 avant, 2 après, identiques
+avant  grpc   relais non rechargé : retour arrière d'Alloy   code=1  dossier /tmp/grpc-tls restant=oui
+       KO   relais non rechargé en 30 s : retour arrière
+apres  grpc   relais non rechargé : retour arrière d'Alloy   code=1  dossier /tmp/grpc-tls restant=non
+       KO   relais non rechargé en 30 s : retour arrière
+       appels à install et systemctl : 7 avant, 7 après, identiques
+avant  grpc   nominal                                        code=0  dossier /tmp/grpc-tls restant=non
+apres  grpc   nominal                                        code=0  dossier /tmp/grpc-tls restant=non
+       appels à install et systemctl : 10 avant, 10 après, identiques
+# attendu : chaque sortie en échec qui laissait le dossier avant le retire après ; codes de sortie, messages KO et appels à
+# install et systemctl identiques avant et après ; sorties nominales et refus de validate inchangés (dossier déjà retiré avant)
+# non essayé : retour arrière de Loki (« loki pas prêt en 180 s ») : /tmp/grpc-tls y est déjà retiré avant le redémarrage, avant comme après
+# shellcheck : 11 avertissements avant, 11 après, identiques (comparaison sans numéros de ligne)
