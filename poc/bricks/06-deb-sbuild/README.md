@@ -922,3 +922,13 @@ Lancée de 23:12:21 à 23:13:52 UTC, sur l'accord « Oui, lance pipeline ». Cod
 **Réfutée : A6.** Le `dpkg -i` groupé ne respecte pas les pré-dépendances de `python3-minimal` et de `python3`, relevées dans `Packages`. Ce n'est pas un manque de paquet. La correction change `construire-builder`, ce qui demande de la signer à nouveau, de réviser la liste revue et de republier la pipeline. Elle attend un accord.
 
 Rien n'a été publié dans `builds/builders/` : la tâche `publier` n'a pas tourné.
+
+## Additif du 10/11/2026, 23:19 UTC : `taches` relancée en `SIGNER=1` avec la tâche corrigée
+
+Lancée à 23:17:20 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal : [`s4a-taches.log`](resultats/s4a-taches.log).
+
+- **`construire-builder` corrigée** : signée de nouveau, bundle `tekton/tasks/construire-builder@sha256:49173846…`.
+- **`prefetch-deb` re-signée par erreur.** Son contenu n'avait pas changé, mais le script re-signait tout en `SIGNER=1`. Elle a pris un nouveau digest, `9fa81ae9…`, poussé dans Zot. Ce bundle reste hors de la liste revue et ne sert pas.
+  - La signature versionnée déjà acceptée a été restaurée depuis git, pour garder `4dac0609`.
+  - Le script ne re-signe plus une tâche inchangée (correction à sec, non rejouée).
+- **Diff de `taches.yml` préparé, NON COMMITÉ** : `49173846` remplace `de18e9cf`, qui est retirée de la liste comme version cassée. `prefetch-deb` reste à `4dac0609`. Il attend la revue du propriétaire.

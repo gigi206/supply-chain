@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/signature: MEYCIQCVDJDYcNGXGzsmLipktSfAE2Zk6r918a/J9oADHhMIRwIhAJdJFne8QIMEv0SHMPrINxVYurydyjF6zAMPNSawSANt
+    tekton.dev/signature: MEUCIQCk2DyS6FHzGppKisevZA2bpBzZCbSwGN5y+tlSQ4mV+AIgcoa++XUdYUAzSJEQ+ozMMj/GRgOCcTRda5MZYwS1txo=
   name: construire-builder
 spec:
   params:
@@ -83,12 +83,14 @@ spec:
         n=$((n + 1))
       done <<< "$LISTE"
       echo "miroir revérifié : InRelease $INRELEASE, 2 index, $n paquets"
-      # mmdebstrap dans l'amorce, par dpkg -i
+      # mmdebstrap dans l'amorce, par apt hors ligne (corrigé le 10/11/2026 après le premier passage : un dpkg -i groupé ne
+      # satisfait pas les pré-dépendances de python3-minimal et de python3 ; apt les ordonne, comme en S1, sans rien télécharger)
       a=()
       for p in $AMORCE_PAQUETS; do a+=("$e/$p"); done
       t=$(date +%s)
-      dpkg -i "${a[@]}" > /w/dpkg.log 2>&1 || { tail -n 20 /w/dpkg.log >&2; echo "dpkg -i : échec" >&2; exit 1; }
-      echo "dpkg -i de ${#a[@]} paquets : rc 0 en $(($(date +%s) - t)) s ; $(mmdebstrap --version 2>&1)"
+      apt-get install -y --no-install-recommends --no-download "${a[@]}" > /w/apt-amorce.log 2>&1 \
+        || { tail -n 200 /w/apt-amorce.log >&2; echo "apt-get install des paquets de l'amorce : échec" >&2; exit 1; }
+      echo "apt-get install hors ligne de ${#a[@]} paquets : rc 0 en $(($(date +%s) - t)) s ; $(grep -E '^[0-9]+ (upgraded|mis à jour)' /w/apt-amorce.log) ; $(mmdebstrap --version 2>&1)"
       export SOURCE_DATE_EPOCH=$SDE TMPDIR=/w
       src="deb [check-valid-until=no] file://$e trixie main"
       finale="deb [check-valid-until=no] $INSTANTANE trixie main"
@@ -101,9 +103,11 @@ spec:
           --customize-hook='echo sbuild > "$1/etc/hostname"' \
           --customize-hook=': > "$1/etc/resolv.conf"' \
           --customize-hook="echo '$finale' > \"\$1/etc/apt/sources.list\"" \
+          --customize-hook="cd \"\$1\" && { rmdir -p '${e#/}' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }" \
           trixie "/w/$n.tar" "$src" > "/w/mm-$n.log" 2>&1 || r=$?
         echo "mmdebstrap $n : rc $r en $(($(date +%s) - t)) s, $(stat -c %s "/w/$n.tar" 2> /dev/null) octets, sha256 $(sha256sum < "/w/$n.tar" 2> /dev/null | cut -c1-64)"
-        [ $r = 0 ] || { grep -i -E "error|E:|W:|failed" "/w/mm-$n.log" | head -n 10 >&2; exit 1; }
+        grep -E '^(W:|E:)|bind-mounting|unmounting|points de montage' "/w/mm-$n.log" | head -n 20 || true
+        [ $r = 0 ] || { tail -n 200 "/w/mm-$n.log" >&2; exit 1; }
         pic "après $n"
       }
       mm racine minbase --include="$INCLURE" \

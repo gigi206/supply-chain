@@ -132,7 +132,11 @@ FIN
 signer_tache() { # nom : signature versionnée dans builder/, bundle, liste revue de la 08
   local n=$1 v=$B/$1.signee.yaml r
   tkn task sign "$T/$n.yaml" -K "$S/taches.key" -f "$T/$n-signee.yaml" > /dev/null
-  if [ -n "${SIGNER:-}" ]; then cp "$T/$n-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans builder/$n.signee.yaml"; fi
+  # SIGNER=1 ne re-signe que si le gabarit rendu diffère de la signature versionnée (corrigé le 10/11/2026 à 23:18 UTC : la relance
+  # de 23:17:20 UTC avait re-signé prefetch-deb inchangée, nouveau digest 9fa81ae9 inutilisé, signature versionnée restaurée)
+  if [ -n "${SIGNER:-}" ] && ! { [ -s "$v" ] && cmp -s <(grep -v 'tekton.dev/signature:' "$T/$n-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v"); }; then
+    cp "$T/$n-signee.yaml" "$v"; echo "SIGNER : nouvelle signature dans builder/$n.signee.yaml"
+  fi
   [ -s "$v" ] || { echo "KO   signature versionnée absente : SIGNER=1, puis revue de la liste" >&2; exit 1; }
   cmp -s <(grep -v 'tekton.dev/signature:' "$T/$n-signee.yaml") <(grep -v 'tekton.dev/signature:' "$v") \
     && echo "OK   $n : signature versionnée conforme au gabarit rendu, signature exceptée" \
