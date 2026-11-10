@@ -475,3 +475,20 @@ Accord : « Oui », à 20:09:19 UTC (transcription), en réponse à « Je lance 
 
 **Lecture prévue** : si T1 tient, le tunnel est le seul maillon de la chaîne qui n'a pas encore été observé. Pour le confirmer, il faudrait une mesure qui le contourne, et la seule qui se présente est de changer le mode du sélecteur. Ce serait un changement de la plateforme, à décider avec le propriétaire.
 
+## Résultat de l'étape tunnel (10/11/2026, 20:24:26 à 20:27:04 UTC)
+
+Accord : « Oui », à 20:24:19 UTC (transcription), en réponse à « Je lance l'étape tunnel ? Oui ou non ». Lancée sous bash, code **0**. Journal : [`diag-exec-tunnel.log`](diag-exec-tunnel.log). Le pod est supprimé.
+
+| # | Résultat |
+|---|---|
+| T1 | **Tenue** |
+| T2 | **Tenue** (2 connexions) |
+| T3 | **Tenue** |
+
+**Étape tunnel** (20:24:26 à 20:27:04 UTC, code 0 ; pod runc, 128 Mio lus lentement, exec en code 124, tout reçu) :
+- **sélecteur de sortie de kube-apiserver** (`/var/lib/rancher/rke2/server/etc/egress-selector-config.yaml`) : la sélection `cluster` passe par un proxy **HTTP CONNECT vers `https://127.0.0.1:9345`**, le superviseur de RKE2. Le fichier ne contient que des chemins de certificats, aucune valeur ;
+- **2 connexions établies de sc-build vers 9345**, les mêmes avant, pendant et après le blocage : c'est le tunnel durable de l'agent ;
+- **journaux de rke2-server et rke2-agent muets** dans la fenêtre, pour les mots cherchés.
+
+**Lecture** : la chaîne d'un `kubectl exec` vers un pod de sc-build est kubectl, puis kube-apiserver, puis le proxy CONNECT du superviseur (rke2-server), puis le tunnel `remotedialer` jusqu'à rke2-agent, puis kubelet, puis containerd. Containerd est mis hors de cause par la bisection. Kubelet ne relaie plus rien pendant le blocage, d'après sa pile. Le poste est hors de cause par l'étape amont. **Le maillon fautif est donc kube-apiserver ou le tunnel du superviseur RKE2.** Le tunnel, propre à RKE2 et k3s, est le suspect principal, **sans preuve directe** : ni lui ni l'apiserver ne sont observables à la verbosité actuelle.
+

@@ -1,0 +1,12 @@
+# diag-exec-kata.sh tunnel, 2026-11-10T20:24:26Z
+## sélecteur de sortie de kube-apiserver : /var/lib/rancher/rke2/server/etc/egress-selector-config.yaml
+     {"kind":"EgressSelectorConfiguration","apiVersion":"apiserver.k8s.io/v1beta1","egressSelections":[{"name":"cluster","connection":{"proxyProtocol":"HTTPConnect","transport":{"tcp":{"url":"https://127.0.0.1:9345","tlsConfig":{"caBundle":"/var/lib/rancher/rke2/server/tls/server-ca.crt","clientKey":"/var/lib/rancher/rke2/server/tls/client-kube-apiserver.key","clientCert":"/var/lib/rancher/rke2/server/tls/client-kube-apiserver.crt"}}}}}]}
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 20:24:28 UTC
+avant : sc-confiance, :9345 établies depuis 192.168.161.12 : 2
+pendant, 45 s après le lancement ; reçus dans le pod : 134217728
+pendant : sc-confiance, :9345 établies depuis 192.168.161.12 : 2
+exec : code 124 en 150010 ms
+apres : sc-confiance, :9345 établies depuis 192.168.161.12 : 2
+pod diag-exec-kata supprimé
+### journal de rke2-server (sc-confiance), 2026-11-10 20:24:28 à 2026-11-10 20:27:03 UTC
+### journal de rke2-agent (sc-build), 2026-11-10 20:24:28 à 2026-11-10 20:27:03 UTC
