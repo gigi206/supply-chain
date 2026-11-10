@@ -896,3 +896,16 @@ Lancée de 23:10:15 à 23:10:18 UTC, sur l'accord « Oui, lance taches ». Code 
 - La pipeline est signée et publiée : `tekton/pipelines/builder-sbuild@sha256:26683852…`.
 
 **Non lancé** : `reseau`, `pipeline`, `provenance` et `comparaison`. Chaque étape attend un accord nommé. La prochaine est `reseau` : la NetworkPolicy `builder-sans-sortie` posée dans `builds`.
+
+## Additif du 10/11/2026, 23:12 UTC : étape `reseau` de S4a tenue
+
+Lancée à 23:11:49 UTC, sur l'accord « Oui, lance reseau ». Code 0. Journal : [`s4a-reseau.log`](resultats/s4a-reseau.log).
+
+**A3 : tenue.** La NetworkPolicy `builder-sans-sortie` est posée dans `builds`, à côté de `construction-sans-sortie`. Trois contrôles :
+- elle est la seule à sélectionner `construire-builder`, en entrée comme en sortie ;
+- aucune NetworkPolicy de `builds` n'autorise de trafic ;
+- aucune CiliumNetworkPolicy de `builds` n'autorise de trafic vers `construire-builder` (liste vide).
+
+**À noter** : l'efficacité de la politique n'est pas encore mesurée. Ce sont les témoins d'A9, dans l'étape `pipeline`, qui la mesureront.
+
+**Non lancé** : `pipeline`, `provenance` et `comparaison`. Chaque étape attend un accord nommé.
