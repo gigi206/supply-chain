@@ -602,3 +602,22 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - **Question ouverte, le runtime de la tâche.** `prefetch-gomod` tourne sous runc, en `restricted`. En S1 et S2, le pod `prefetch-deb` était Kata et privilégié, parce qu'il construisait aussi la racine par `mmdebstrap`. Il reste à mesurer si `apt-get download` seul passe en `restricted`, sans root.
 
 **Choix encore ouverts** : la source de la liste (nouveau, ci-dessus), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
+
+## Additif du 10/11/2026, 21:41 UTC : source de la liste, et origine du packaging (lu dans le dépôt, à sec)
+
+**Réponse du propriétaire** (21:40:33 UTC) : « ok ».
+- Elle suivait l'avis du conseiller que je venais de relayer, et ma phrase : « Si tu suis cet avis, réponds […] par « Verrou dans sample-app » ».
+- **Interprétation consignée** : le « ok » est lu comme le choix d'un verrou versionné. Ce n'est pas un accord de mesure.
+- Format proposé, pas encore décidé : les `Installed-Build-Depends` et la date de l'instantané, avec éventuellement le sha256 de chaque paquet. Le `.buildinfo` brut est exclu : son champ `Checksums-Sha256` décrit le deb de s1b.
+- **Limite** : mettre le verrou à jour demande un build en réseau hors de la plateforme, comme `go.sum`.
+
+**Origine du packaging.** Ce point était absent de la carte. Vérifié dans le dépôt, sauf mention contraire :
+- `debian/` vit dans ce dépôt, sous `poc/packaging/debian`, **pas dans `poc/sample-app`**.
+- Le `.dsc` de S1 à S3 est produit sur l'hôte par `poc/packaging/sources.sh` (`mise run packaging:sources`). L'archive contient les sources de `poc/sample-app` (git archive), les modules Go vendus, vérifiés par `go.sum`, et `web/node_modules/marked`, vérifié par l'intégrité du lockfile. Le script en sort le paquet source.
+- `debian/rules` construit hors ligne (`GOFLAGS=-mod=vendor`) et refait `web/dist` lui-même, au lieu de le prendre par digest comme la voie image.
+- L'arbre de `workspace/sample-app` dans Forgejo était égal à `poc/sample-app` au commit de J2 (`construction.sh`, ligne 65), donc sans `debian/`. **À vérifier** : son contenu au commit de tête actuel, par une lecture de Forgejo.
+
+**Conséquences pour S4**
+- Une pipeline déclenchée par le webhook construit depuis le commit poussé. Le packaging (`debian/`) et le verrou doivent donc entrer dans `workspace/sample-app`, à moins d'une autre voie.
+- Ce serait une écriture dans Forgejo. Un commit sur `main` relance aussi la pipeline image, qui écrit des enveloppes définitives dans Zot : il faut un accord nommé.
+- **Seconde fermeture.** Le build deb a besoin des modules Go et de `marked`. Dans la plateforme, les modules Go viennent de la fermeture `prefetch-gomod` (D6). La pipeline deb dépendrait donc de **deux** fermetures, gomod et deb, et la règle `fermeture_plateforme` devrait admettre les deux. Pour `marked`, la source dans la plateforme reste à établir : la voie image prend `web/dist` par digest.
