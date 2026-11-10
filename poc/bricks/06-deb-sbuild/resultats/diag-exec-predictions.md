@@ -234,3 +234,26 @@ Accord : « Oui », à 19:41:04 UTC (transcription), en réponse à « Je lance 
 
 Tous les octets sont reçus dans les trois cas. **containerd, son serveur de flux CRI et le shim ne sont pas en cause** : la même lecture lente, qui bloque par `kubectl exec`, passe par `crictl exec` (crictl 1.35.0, containerd 2.2.7-k3s1). **Le maillon fautif est en amont, dans kubelet, l'apiserver ou kubectl**, et leur relais du flux. Il n'est pas encore identifié.
 
+## Étape amont : préparée à sec (19:44 UTC), NON LANCÉE
+
+Demande : « Prépare », à 19:43:19 UTC (transcription).
+
+**Mise en place**
+- Un pod runc `restricted`, et le même exec qu'en `croise` (a) : 128 Mio, lecture lente dans le pod, délai de 150 s.
+- **C1** : kubectl de l'hôte. C'est le témoin de la fenêtre.
+- **C2** : kubectl de sc-confiance (`D_KUBECTL` de `distro.sh` : binaire de RKE2 et `rke2.yaml`, utilisé et jamais lu), avec 128 Mio tirés de `/dev/urandom` sur sc-confiance. C2 retire de la chaîne le poste, son réseau vers les VM et le client de l'hôte (1.35.10). Il garde l'apiserver et kubelet.
+- **Journaux de la fenêtre** : kubelet sur sc-build (`kubelet.log` de RKE2) et kube-apiserver sur sc-confiance (`/var/log/pods`). On garde les lignes qui citent exec, flux, websocket, spdy, upgrade, proxy, timeout ou stdin. Les lignes `jeton|token` sont retirées, et chaque ligne est coupée à 300 caractères.
+- Rien n'est écrit sur les VM.
+
+**Essais à sec** : les deux filtres de fenêtre ont tourné sur l'hôte sous `dash`, sur de faux journaux au format de klog et des journaux de pods de CRI. Seules les lignes de la fenêtre et du jour sont gardées.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| C1 | bloque au délai, tous les octets reçus | haute (`croise`) |
+| C2 | bloque aussi : le maillon est dans l'apiserver ou kubelet, pas sur le poste | faible |
+| C3 | aucune prédiction sur les journaux : la verbosité de kubelet et de l'apiserver n'est pas connue | — |
+
+**Lecture prévue**
+- **C2 passe** : le maillon est sur le poste. C'est soit kubectl 1.35.10, soit le réseau entre l'hôte et les VM.
+- **C2 bloque** : le maillon est dans l'apiserver ou kubelet. Les journaux diront peut-être lequel.
+

@@ -248,4 +248,48 @@ BISECTION
   pod_retirer "$POD"
 }
 
+# Étape amont (préparée à sec le 10/11/2026 à 19:44 UTC, NON LANCÉE) : la bisection met containerd hors de cause (crictl exec et
+# ctr task exec passent avec lecture lente). Pod runc restricted ; même exec à lecture lente de 128 Mio (délai de 150 s) :
+#   C1  kubectl de l'hôte (témoin dans la fenêtre : bloque d'après croise)
+#   C2  kubectl de sc-confiance (D_KUBECTL : binaire de RKE2 et rke2.yaml, jamais lu), 128 Mio tirés de /dev/urandom sur
+#       sc-confiance : retire le poste, son réseau et le client de l'hôte
+# Puis lecture, dans la fenêtre de la mesure, du journal de kubelet sur sc-build et de celui de kube-apiserver sur sc-confiance
+# (lignes qui citent exec, flux, websocket, spdy, upgrade, proxy, timeout ou stdin ; jeton|token retirés ; 300 caractères au plus).
+# Rien n'est écrit sur les VM.
+etape_amont() {
+  local f n t0 rc d fin
+  croise_pod - "$RESTREINT"
+  f=$(alea 128); n=$(stat -c %s "$f")
+  d=$(date -u +'%Y-%m-%dT%H:%M:%S')
+  echo "## C1 kubectl de l'hôte, lecture lente"
+  rc=0; t0=$(ms)
+  timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" || rc=$?
+  echo "C1 : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/croise)"
+  kubectl exec -n builds "$POD" -- rm -f /w/croise </dev/null || true
+  echo "## C2 kubectl de sc-confiance, lecture lente"
+  { printf 'K=%q\nP=%q\nL=%q\n' "$D_KUBECTL" "$POD" "$LECTEUR_LENT"
+     cat <<'AMONT'
+t0=$(date +%s%N); rc=0
+head -c 134217728 /dev/urandom | timeout 150 $K exec -i -n builds "$P" -- sh -c "$L" > /dev/null 2>&1 || rc=$?
+echo "C2 : 134217728 octets, code $rc en $(( ($(date +%s%N) - t0) / 1000000 )) ms ; kubectl de sc-confiance : $($K version --client 2>/dev/null | head -1)"
+AMONT
+  } | sur sc-confiance "sudo sh -s" 2>&1 | grep -a -i -v -E 'jeton|token' || true
+  echo "     reçus dans le pod : $(recu /w/croise)"
+  fin=$(date -u +'%Y-%m-%dT%H:%M:%S')
+  pod_retirer "$POD"
+  echo "## journaux, fenêtre $d à $fin UTC (VM en UTC : journal système relevé en +00:00 à l'étape noeud)"
+  echo "### kubelet (sc-build, $D_ETAT/agent/logs/kubelet.log)"
+  sur sc-build "sudo sh -s '$d' '$fin'" 2>/dev/null <<'KUBELET' | grep -a -i -v -E 'jeton|token' | cut -c1-300 || true
+d=$(echo "$1" | cut -c12-19); f=$(echo "$2" | cut -c12-19); j=$(echo "$1" | cut -c6-7)$(echo "$1" | cut -c9-10)
+awk -v d="$d" -v f="$f" -v j="$j" 'substr($1, 2, 4) == j { t = substr($2, 1, 8); if (t >= d && t <= f) print }' /var/lib/rancher/rke2/agent/logs/kubelet.log \
+  | grep -i -E 'exec|stream|websocket|spdy|upgrade|proxy|timeout|stdin' | tail -n 200
+KUBELET
+  echo "### kube-apiserver (sc-confiance, /var/log/pods)"
+  sur sc-confiance "sudo sh -s '$d' '$fin'" 2>/dev/null <<'APISERVER' | grep -a -i -v -E 'jeton|token' | cut -c1-300 || true
+for f in /var/log/pods/kube-system_kube-apiserver-*/kube-apiserver/*.log; do
+  awk -v d="$1" -v f="$2" '{ t = substr($1, 1, 19); if (t >= d && t <= f) print }' "$f"
+done | grep -i -E 'exec|stream|websocket|spdy|upgrade|proxy|timeout|stdin' | tail -n 200
+APISERVER
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
