@@ -1,0 +1,7 @@
+# diag-exec-kata.sh kubelet, 2026-11-10T19:58:33Z
+certificat client vers kubelet dans les arguments de kube-apiserver : /var/lib/rancher/rke2/server/tls/client-kube-apiserver.crt ; clé : présente/var/lib/rancher/rke2/server/tls/client-kube-apiserver.key
+fichiers utilisés : /var/lib/rancher/rke2/server/tls/client-kube-apiserver.crt et la clé associée (non affichée) ; python : Python 3.13.5
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 19:58:35 UTC
+K rapide : code 1 en 8 ms ; réponse : HTTP/1.1 403 Forbidden ; reçus dans le pod : ?
+K lent : code 1 en 5 ms ; réponse : HTTP/1.1 403 Forbidden ; reçus dans le pod : ?
+pod diag-exec-kata supprimé

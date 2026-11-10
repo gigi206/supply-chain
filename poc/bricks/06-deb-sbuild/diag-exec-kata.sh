@@ -303,7 +303,8 @@ etape_kubelet() {
   local cert cle m r
   cert=$(args_apiserver | sed -n 's/^--kubelet-client-certificate=//p' | head -1)
   cle=$(args_apiserver | sed -n 's/^--kubelet-client-key=//p' | head -1)
-  echo "certificat client vers kubelet dans les arguments de kube-apiserver : ${cert:-absent} ; clé : ${cle:+présente}${cle:-absente}"
+  # Corrigé à 19:59 UTC, NON REJOUÉ : la forme ${cle:+…}${cle:-…} affichait aussi le chemin de la clé (un chemin, pas son contenu)
+  echo "certificat client vers kubelet dans les arguments de kube-apiserver : ${cert:-absent} ; clé : $([ -n "$cle" ] && echo présente || echo absente)"
   cert=${cert:-$D_ETAT/server/tls/client-kube-apiserver.crt}; cle=${cle:-$D_ETAT/server/tls/client-kube-apiserver.key}
   sur sc-confiance "sudo test -r '$cert' && sudo test -r '$cle'" </dev/null \
     || { echo "KO   certificat ou clé illisible sur sc-confiance : $cert" >&2; exit 1; }

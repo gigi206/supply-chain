@@ -88,7 +88,13 @@ def principal(hote, port, espace, pod, conteneur, mode, octets, cert, cle, delai
         rep += lire_exact(s, 1)
     ligne = rep.split(b'\r\n', 1)[0].decode(errors='replace')
     if ' 101 ' not in ligne:
-        print(f'code 1 en {int((time.monotonic() - t0) * 1000)} ms ; réponse : {ligne}')
+        # Corrigé à 19:59 UTC, NON REJOUÉ : corps de la réponse ajouté (300 caractères au plus), pour lire le motif d'un refus
+        s.settimeout(5)
+        try:
+            corps = s.recv(4096).decode(errors='replace').replace('\r', ' ').replace('\n', ' ')[:300]
+        except (socket.timeout, OSError):
+            corps = ''
+        print(f'code 1 en {int((time.monotonic() - t0) * 1000)} ms ; réponse : {ligne} ; corps : {corps}')
         return 1
     envoyes, morceau = 0, 65536
     try:

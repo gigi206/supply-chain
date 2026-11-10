@@ -346,3 +346,9 @@ Détail : [diagnostic](resultats/diag-exec-predictions.md).
 **Le poste, son réseau vers les VM et sa version de kubectl sont hors de cause. Avec la bisection, le maillon est situé dans l'apiserver ou kubelet**, dans leur relais du flux d'exec, entre kubectl et le serveur de flux de containerd. Les journaux de kubelet et de kube-apiserver de la fenêtre ne disent rien de cet exec à leur verbosité actuelle. Kubelet n'a écrit qu'une ligne, sur la durée de démarrage du pod, sans rapport.
 
 Détail : [diagnostic](resultats/diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 19:59 UTC : étape kubelet du diagnostic, refusée par kubelet
+
+**Étape kubelet** (19:58:33 à 19:58:35 UTC, code 0 du script) : **kubelet refuse les deux exec directs, `HTTP/1.1 403 Forbidden`**, en 8 et 5 ms, avant tout transfert. K2, le témoin, échoue ; K1 ne dit donc rien. Le maillon reste situé dans l'apiserver ou kubelet, sans être tranché. Le motif du refus n'a pas été lu, car le client n'affichait que la ligne de statut. Hypothèse non vérifiée : une autorisation de kubelet différente pour un exec par WebSocket (GET), alors que l'apiserver l'atteint autrement.
+
+Détail : [diagnostic](resultats/diag-exec-predictions.md).

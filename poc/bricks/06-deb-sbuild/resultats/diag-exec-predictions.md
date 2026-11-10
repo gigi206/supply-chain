@@ -320,3 +320,24 @@ Demande : « Prépare l'exec », à 19:54:00 UTC (transcription), en réponse à
 - **K1 passe** : le maillon est l'apiserver.
 - **K2 échoue** : le client est en cause, et rien ne peut être lu de K1.
 
+## Résultat de l'étape kubelet (10/11/2026, 19:58:33 à 19:58:35 UTC)
+
+Accord : « Oui », à 19:58:29 UTC (transcription), en réponse à « Je lance l'étape kubelet ? ». Lancée sous bash, code **0** ; le script ne s'arrête pas sur un refus. Journal : [`diag-exec-kubelet.log`](diag-exec-kubelet.log). Le pod est supprimé.
+
+**Relevés**
+- Arguments de kube-apiserver : `--kubelet-client-certificate=/var/lib/rancher/rke2/server/tls/client-kube-apiserver.crt` et sa clé.
+- Python 3.13.5 sur sc-confiance.
+
+| # | Résultat |
+|---|---|
+| K2 | **Réfutée.** `403 Forbidden` en 8 ms, rien de transmis |
+| K1 | **Non mesurable.** `403 Forbidden` en 5 ms |
+
+**Étape kubelet** (19:58:33 à 19:58:35 UTC, code 0 du script) : **kubelet refuse les deux exec directs, `HTTP/1.1 403 Forbidden`**, en 8 et 5 ms, avant tout transfert. K2, le témoin, échoue ; K1 ne dit donc rien. Le maillon reste situé dans l'apiserver ou kubelet, sans être tranché. Le motif du refus n'a pas été lu, car le client n'affichait que la ligne de statut. Hypothèse non vérifiée : une autorisation de kubelet différente pour un exec par WebSocket (GET), alors que l'apiserver l'atteint autrement.
+
+**Défaut du script**
+- Le journal affiche le **chemin** de la clé, pas son contenu : la forme `${cle:+présente}${cle:-absente}` imprime aussi la valeur.
+- Corrigé à 19:59 UTC, NON REJOUÉ. Le journal archivé n'est pas modifié.
+
+**Corrigé à sec, NON REJOUÉ** : le client affiche aussi le corps de la réponse (300 caractères au plus), pour lire le motif d'un refus.
+
