@@ -35,6 +35,9 @@ CLES="B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8 04B54C3CDCA79751B16BC6B5225629DF7
 V_SBUILD=0.89.3+deb13u4
 V_MMDEBSTRAP=1.5.7-1+deb13u1
 V_UIDMAP=1:4.17.4-2
+V_IPROUTE2=6.15.0-1   # « Recommends » de sbuild, absent au premier passage : sbuild-usernsexec lance ip link set lo up
+PREFIXE=${PREFIXE:-s1}   # s1b : second passage (iproute2), journaux à part
+GARDER_CHROOT=${GARDER_CHROOT:-0}   # 1 : chroot de sbuild du premier passage réutilisé, pas reconstruit
 AMORCE_DIGEST=sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392   # trixie-20261104-slim, amd64 (audit du 05/11)
 AMORCE=$REG/amont/library/debian@$AMORCE_DIGEST
 DEPOT_ESSAI=essais-06/sbuild-debian13
@@ -156,11 +159,11 @@ mm() { # nom variante paquets [crochets…] : archive /w/<nom>.tar ; empreintes 
   echo "mmdebstrap $n : rc $r en $(($(date +%s) - t)) s, $(stat -c %s /w/$n.tar 2>/dev/null) octets, sha256 $(sha256sum < /w/$n.tar 2>/dev/null | cut -c1-64)"
   [ $r = 0 ] || grep -i -E "error|E:|failed" /w/mm-$n.log | head -n 5
 }
-mm racine minbase sbuild=@V_SBUILD@,libsbuild-perl=@V_SBUILD@,mmdebstrap=@V_MMDEBSTRAP@,uidmap=@V_UIDMAP@ \
+mm racine minbase sbuild=@V_SBUILD@,libsbuild-perl=@V_SBUILD@,mmdebstrap=@V_MMDEBSTRAP@,uidmap=@V_UIDMAP@@IPROUTE2@ \
   --customize-hook="chroot \"\$1\" useradd -m -u 1000 -U -s /bin/sh constructeur" \
   --customize-hook="echo constructeur:100000:65536 > \"\$1\"/etc/subuid" \
   --customize-hook="echo constructeur:100000:65536 > \"\$1\"/etc/subgid"
-mm chroot buildd debhelper,golang-go,nodejs
+[ @GARDER_CHROOT@ = 1 ] || mm chroot buildd debhelper,golang-go,nodejs
 '
 
 controle_debs() { # journal : chaque « deb <origine> <fichier> <sha256> » comparé au Packages vérifié sur l'hôte
@@ -191,10 +194,15 @@ etape_racine() {
   pod_spec s1-racine kata "$AMORCE" 0 "$PRIVILEGIE"
   pod_demarrer s1-racine
   sed -e "s|@SOURCE@|$SOURCE_LISTE|g" -e "s|@V_SBUILD@|$V_SBUILD|g" -e "s|@V_MMDEBSTRAP@|$V_MMDEBSTRAP|g" \
-    -e "s|@V_UIDMAP@|$V_UIDMAP|g" -e "s|@SDE@|$s|g" <<<"$RACINE" | dans s1-racine racine
+    -e "s|@V_UIDMAP@|$V_UIDMAP|g" -e "s|@SDE@|$s|g" -e "s|@GARDER_CHROOT@|$GARDER_CHROOT|g" \
+    -e "s|@IPROUTE2@|$([ "$PREFIXE" = s1 ] || echo ",iproute2=$V_IPROUTE2")|g" <<<"$RACINE" | dans s1-racine racine
   attendu "InRelease lu par apt dans le pod = InRelease vérifié sur l'hôte" "$(champ racine InRelease | sed 's/^sha256 //')" "$(cat "$T/inrelease.sha256")"
   controle_debs "$T/racine.log" || echo "ÉCART empreintes des .deb : voir ci-dessus (apt les a déjà contrôlées contre Packages)"
   for f in racine chroot; do
+    if [ "$f" = chroot ] && [ "$GARDER_CHROOT" = 1 ]; then
+      attendu "chroot du premier passage, réutilisé" "$(sha256sum < "$T/chroot.tar" | cut -c1-64)" 440ba93bf3e42cd5b9d401db8b74227d77805bcae05c973ca516b7de1407b315
+      continue
+    fi
     s=$(sed -n "s/^mmdebstrap $f : rc 0 .*sha256 \([0-9a-f]\{64\}\)$/\1/p" "$T/racine.log")
     [ -n "$s" ] || { pod_retirer s1-racine; echo "KO   mmdebstrap $f" >&2; exit 1; }
     kubectl exec -n builds s1-racine -- cat "/w/$f.tar" </dev/null > "$T/$f.tar"
@@ -210,11 +218,11 @@ etape_image() {
   cp "$T/chroot.tar" "$T/couche-chroot/opt/sbuild/trixie-amd64.tar"
   tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime --mtime=@0 \
     --owner=0 --group=0 --numeric-owner -C "$T/couche-chroot" -cf "$T/couche-chroot.tar" opt
-  zot crane append --oci-empty-base -f "$T/racine.tar" -f "$T/couche-chroot.tar" -t "$REG_HOTE/$DEPOT_ESSAI:s1" >/dev/null 2>"$T/crane.err" \
+  zot crane append --oci-empty-base -f "$T/racine.tar" -f "$T/couche-chroot.tar" -t "$REG_HOTE/$DEPOT_ESSAI:$PREFIXE" >/dev/null 2>"$T/crane.err" \
     || { cat "$T/crane.err" >&2; exit 1; }
-  zot crane mutate "$REG_HOTE/$DEPOT_ESSAI:s1" --set-platform linux/amd64 -t "$REG_HOTE/$DEPOT_ESSAI:s1" \
+  zot crane mutate "$REG_HOTE/$DEPOT_ESSAI:$PREFIXE" --set-platform linux/amd64 -t "$REG_HOTE/$DEPOT_ESSAI:$PREFIXE" \
     -e PATH=/usr/sbin:/usr/bin:/sbin:/bin -e HOME=/w/home >/dev/null 2>"$T/crane.err" || { cat "$T/crane.err" >&2; exit 1; }
-  d=$(zot crane digest "$REG_HOTE/$DEPOT_ESSAI:s1")
+  d=$(zot crane digest "$REG_HOTE/$DEPOT_ESSAI:$PREFIXE")
   echo "$d" > "$T/image.digest"
   zot crane manifest "$REG_HOTE/$DEPOT_ESSAI@$d" | jq -r '.layers[] | "couche \(.digest) \(.size) octets"'
   echo "image d'essai : $REG/$DEPOT_ESSAI@$d"
@@ -273,9 +281,9 @@ etape_relance() {
     | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
   kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
   sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" relance
-  kubectl exec -n builds "$n" -- sh -c 'ls /w/sortie; cat /w/sortie/*.build' </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/s1-relance-sbuild.log" || true
-  echo "journal de sbuild : $(wc -l < "$R/s1-relance-sbuild.log") lignes, resultats/s1-relance-sbuild.log"
+  kubectl exec -n builds "$n" -- sh -c 'ls /w/sortie; cat /w/sortie/*.build' </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-relance-sbuild.log" || true
+  echo "journal de sbuild : $(wc -l < "$R/$PREFIXE-relance-sbuild.log") lignes, resultats/$PREFIXE-relance-sbuild.log"
   pod_retirer "$n"
 }
 
-lancer s1 "06 S1" "$@"
+lancer "$PREFIXE" "06 S1" "$@"

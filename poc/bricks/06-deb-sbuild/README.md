@@ -137,3 +137,14 @@ S1 a été exécuté de 13:04 à 13:11 UTC, sur l'accord « Oui, lance S1 ». D�
 **Relance préparée, NON LANCÉE** : étape `relance` du script, prédictions RL1 à RL3, accord nommé attendu.
 
 Push de 12:50:22 UTC (`f4eecab..9e8e1a3`, 6 fichiers) consigné, car il manquait à l'additif de 13:03.
+
+## Additif du 10/11/2026, 13:24 UTC : cause de l'échec de sbuild trouvée ; second passage s1b préparé, NON LANCÉ
+
+La relance a eu lieu à 13:22 UTC, sur l'accord « Oui, relance ». RL1 et RL2 sont tenues, RL3 est réfutée.
+
+**Cause** : `ip` manque dans l'image. sbuild ne fait que recommander `iproute2`, et mmdebstrap n'installe pas les recommandations. C'est un défaut de préparation, pas une limite de Kata.
+
+**Second passage `s1b`, NON LANCÉ** : `iproute2=6.15.0-1` est ajouté, et le chroot du premier passage est réutilisé.
+- Nouvelle image : `essais-06/sbuild-debian13:s1b`.
+- Prédictions B1 à B4 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md).
+- Accord nommé attendu.

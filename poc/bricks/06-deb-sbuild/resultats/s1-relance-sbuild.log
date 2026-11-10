@@ -1,0 +1,554 @@
+sample-app_1.0.0-1_amd64-2026-11-10T13:22:08Z.build
+sample-app_1.0.0-1_amd64.build
+sbuild (Debian sbuild) 0.89.3+deb13u4 (28 December 2025) on s1-kata-privilegie
+
++==============================================================================+
+| sample-app 1.0.0-1 (amd64)                   Tue, 10 Nov 2026 13:22:08 +0000 |
++==============================================================================+
+
+Package: sample-app
+Version: 1.0.0-1
+Source Version: 1.0.0-1
+Distribution: trixie
+Machine Architecture: amd64
+Host Architecture: amd64
+Build Architecture: amd64
+Build Type: binary
+
+I: No tarballs found in /w/home/.cache/sbuild
+I: Unpacking /opt/sbuild/trixie-amd64.tar to /w/tmp.sbuild.daOGKTLgcd...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up the chroot...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Creating chroot session...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up log color...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up apt archive...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Fetch source files                           Tue, 10 Nov 2026 13:22:30 +0000 |
++------------------------------------------------------------------------------+
+
+
+Local sources
+-------------
+
+/w/src/sample-app_1.0.0-1.dsc exists in /w/src; copying to chroot
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Install package build dependencies           Tue, 10 Nov 2026 13:22:34 +0000 |
++------------------------------------------------------------------------------+
+
+
+Setup apt archive
+-----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Merged Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+Filtered Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-nJ7nFx/apt_archive/sbuild-build-depends-main-dummy.deb'.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Ign:1 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ InRelease
+Get:2 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Release [609 B]
+Ign:3 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Release.gpg
+Get:4 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Sources [632 B]
+Get:5 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Packages [671 B]
+Fetched 1912 B in 0s (0 B/s)
+Reading package lists...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+
+Install main build dependencies (apt-based resolver)
+----------------------------------------------------
+
+Installing build dependencies
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  sbuild-build-depends-main-dummy
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 880 B of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [880 B]
+Fetched 880 B in 0s (0 B/s)
+Selecting previously unselected package sbuild-build-depends-main-dummy.
+(Reading database ... 30228 files and directories currently installed.)
+Preparing to unpack .../sbuild-build-depends-main-dummy_0.invalid.0_amd64.deb ...
+Unpacking sbuild-build-depends-main-dummy (0.invalid.0) ...
+Setting up sbuild-build-depends-main-dummy (0.invalid.0) ...
+
++------------------------------------------------------------------------------+
+| Check architectures                          Tue, 10 Nov 2026 13:22:48 +0000 |
++------------------------------------------------------------------------------+
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Arch check ok (amd64 included in amd64)
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Build environment                            Tue, 10 Nov 2026 13:22:50 +0000 |
++------------------------------------------------------------------------------+
+
+Kernel: Linux 6.18.56 #1 SMP Fri Oct 16 18:41:32 UTC 2026 amd64 (x86_64)
+Toolchain package versions: binutils_2.44-3 dpkg-dev_1.22.22 g++-14_14.2.0-19 gcc-14_14.2.0-19 libc6-dev_2.41-12+deb13u4 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 linux-libc-dev_6.12.107-1
+Package versions: apt_3.0.3 autoconf_2.72-3.1 automake_1:1.17-4 autopoint_0.23.1-2 autotools-dev_20240727.1 base-files_13.8+deb13u7 base-passwd_3.6.7 bash_5.2.37-2+b10 binutils_2.44-3 binutils-common_2.44-3 binutils-x86-64-linux-gnu_2.44-3 bsdextrautils_2.41.5-0+deb13u1 bsdutils_1:2.41.5-0+deb13u1 build-essential_12.12 bzip2_1.0.8-6 coreutils_9.7-3 cpp_4:14.2.0-1 cpp-14_14.2.0-19 cpp-14-x86-64-linux-gnu_14.2.0-19 cpp-x86-64-linux-gnu_4:14.2.0-1 dash_0.5.12-12 debconf_1.5.91 debhelper_13.24.2 debian-archive-keyring_2025.1 debianutils_5.23.2 dh-autoreconf_20 dh-strip-nondeterminism_1.14.1-2 diffutils_1:3.10-4 dpkg_1.22.22 dpkg-dev_1.22.22 dwz_0.15-1+b1 file_1:5.46-5 findutils_4.10.0-3 g++_4:14.2.0-1 g++-14_14.2.0-19 g++-14-x86-64-linux-gnu_14.2.0-19 g++-x86-64-linux-gnu_4:14.2.0-1 gcc_4:14.2.0-1 gcc-14_14.2.0-19 gcc-14-base_14.2.0-19 gcc-14-x86-64-linux-gnu_14.2.0-19 gcc-x86-64-linux-gnu_4:14.2.0-1 gettext_0.23.1-2 gettext-base_0.23.1-2 golang-1.24-go_1.24.4-1 golang-1.24-src_1.24.4-1 golang-go_2:1.24~2 golang-src_2:1.24~2 grep_3.11-4 groff-base_1.23.0-9 gzip_1.13-1+deb13u1 hostname_3.25 init-system-helpers_1.69~deb13u1 intltool-debian_0.35.0+20060710.6 libacl1_2.3.2-2+b1 libapt-pkg7.0_3.0.3 libarchive-zip-perl_1.68-1 libasan8_14.2.0-19 libatomic1_14.2.0-19 libattr1_1:2.5.2-3 libaudit-common_1:4.0.2-2+deb13u1 libaudit1_1:4.0.2-2+deb13u1 libbinutils_2.44-3 libblkid1_2.41.5-0+deb13u1 libbrotli1_1.1.0-2+b7 libbz2-1.0_1.0.8-6 libc-bin_2.41-12+deb13u4 libc-dev-bin_2.41-12+deb13u4 libc6_2.41-12+deb13u4 libc6-dev_2.41-12+deb13u4 libcap-ng0_0.8.5-4+b1 libcap2_1:2.75-10+deb13u1+b3 libcares2_1.34.5-1+deb13u1 libcc1-0_14.2.0-19 libcrypt-dev_1:4.4.38-1 libcrypt1_1:4.4.38-1 libctf-nobfd0_2.44-3 libctf0_2.44-3 libdb5.3t64_5.3.28+dfsg2-9 libdebconfclient0_0.280 libdebhelper-perl_13.24.2 libdpkg-perl_1.22.22 libelf1t64_0.192-4 libfile-stripnondeterminism-perl_1.14.1-2 libgcc-14-dev_14.2.0-19 libgcc-s1_14.2.0-19 libgdbm-compat4t64_1.24-2 libgdbm6t64_1.24-2 libgmp10_2:6.3.0+dfsg-3 libgomp1_14.2.0-19 libgprofng0_2.44-3 libhogweed6t64_3.10.1-1 libhwasan0_14.2.0-19 libicu76_76.1-4 libisl23_0.27-1 libitm1_14.2.0-19 libjansson4_2.14-2+b3 liblastlog2-2_2.41.5-0+deb13u1 liblsan0_14.2.0-19 liblz4-1_1.10.0-4 liblzma5_5.8.1-1+deb13u1 libmagic-mgc_1:5.46-5 libmagic1t64_1:5.46-5 libmd0_1.1.0-2+b1 libmount1_2.41.5-0+deb13u1 libmpc3_1.3.1-1+b3 libmpfr6_4.2.2-1 libnettle8t64_3.10.1-1 libnghttp2-14_1.64.0-1.1+deb13u1 libnode115_20.19.2+dfsg-1+deb13u2 libpam-modules_1.7.0-5 libpam-modules-bin_1.7.0-5 libpam-runtime_1.7.0-5 libpam0g_1.7.0-5 libpcre2-8-0_10.46-1~deb13u2 libperl5.40_5.40.1-6+deb13u1 libpipeline1_1.5.8-1 libquadmath0_14.2.0-19 libseccomp2_2.6.0-2 libselinux1_3.8.1-1 libsframe1_2.44-3 libsmartcols1_2.41.5-0+deb13u1 libsqlite3-0_3.46.1-7+deb13u2 libssl3t64_3.5.7-1~deb13u2 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 libsystemd0_257.13-1~deb13u1 libtinfo6_6.5+20250216-2 libtool_2.5.4-4 libtsan2_14.2.0-19 libubsan1_14.2.0-19 libuchardet0_0.0.8-1+b2 libudev1_257.13-1~deb13u1 libunistring5_1.3-2 libuuid1_2.41.5-0+deb13u1 libuv1t64_1.50.0-2 libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3 libxxhash0_0.8.3-2 libzstd1_1.5.7+dfsg-1 linux-libc-dev_6.12.107-1 m4_1.4.19-8 make_4.4.1-2 man-db_2.13.1-1 mawk_1.3.4.20250131-1 ncurses-base_6.5+20250216-2 ncurses-bin_6.5+20250216-2 node-acorn_8.8.1+ds+~cs25.17.7-2 node-balanced-match_2.0.0-1 node-brace-expansion_2.0.1+~1.1.0-2 node-cjs-module-lexer_1.2.3+dfsg-1 node-corepack_0.24.0-5 node-minimatch_9.0.3-6 node-undici_7.3.0+dfsg1+~cs24.12.11-1 node-xtend_4.0.2-3 nodejs_20.19.2+dfsg-1+deb13u2 openssl-provider-legacy_3.5.7-1~deb13u2 patch_2.8-2 perl_5.40.1-6+deb13u1 perl-base_5.40.1-6+deb13u1 perl-modules-5.40_5.40.1-6+deb13u1 po-debconf_1.0.21+nmu1 rpcsvc-proto_1.4.3-1 sbuild-build-depends-main-dummy_0.invalid.0 sed_4.9-2+deb13u1 sensible-utils_0.0.25 sqv_1.3.0-3+b2 sysvinit-utils_3.14-4 tar_1.35+dfsg-3.1 util-linux_2.41.5-0+deb13u1 xz-utils_5.8.1-1+deb13u1 zlib1g_1:1.3.dfsg+really1.3.1-1+b1
+
++------------------------------------------------------------------------------+
+| Build                                        Tue, 10 Nov 2026 13:22:50 +0000 |
++------------------------------------------------------------------------------+
+
+
+Unpack source
+-------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Format: 3.0 (quilt)
+Source: sample-app
+Binary: sample-app
+Architecture: amd64
+Version: 1.0.0-1
+Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Homepage: https://github.com/gigi206/supply-chain
+Standards-Version: 4.7.2
+Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs
+Package-List:
+ sample-app deb web optional arch=amd64
+Checksums-Sha1:
+ bb82fa04323cd37593a7ad7e006e378675a0b9d7 140171 sample-app_1.0.0.orig.tar.gz
+ fad7c06f2a86ee7003be29ce6c9437d0184df98a 2684 sample-app_1.0.0-1.debian.tar.xz
+Checksums-Sha256:
+ 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb 140171 sample-app_1.0.0.orig.tar.gz
+ 863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f 2684 sample-app_1.0.0-1.debian.tar.xz
+Files:
+ 0bc092f45d47735f99c2859d94c64e57 140171 sample-app_1.0.0.orig.tar.gz
+ 4e097315ef31a7004b3c3015ece08684 2684 sample-app_1.0.0-1.debian.tar.xz
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-source: warning: extracting unsigned source package (sample-app_1.0.0-1.dsc)
+dpkg-source: info: extracting sample-app in /build/reproducible-path/sample-app-1.0.0
+dpkg-source: info: unpacking sample-app_1.0.0.orig.tar.gz
+dpkg-source: info: unpacking sample-app_1.0.0-1.debian.tar.xz
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+Check disk space
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Sufficient free space for build
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+User Environment
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+APT_CONFIG=/var/lib/sbuild/apt.conf
+HOME=/sbuild-nonexistent
+LC_ALL=C.UTF-8
+LOGNAME=sbuild
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+SHELL=/bin/sh
+USER=sbuild
+
+dpkg-buildpackage
+-----------------
+
+Command: dpkg-buildpackage --sanitize-env -us -uc -b
+Can't exec "ip": No such file or directory at /usr/libexec/sbuild-usernsexec line 410.
+W: 'ip link set lo up' failed -- do you have the package iproute2 installed on the host outside the chroot?
+failed running ip: No such file or directory at /usr/libexec/sbuild-usernsexec line 413.
+--------------------------------------------------------------------------------
+Build finished at 2026-11-10T13:22:55Z
+
+Finished
+--------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Cleanup                                      Tue, 10 Nov 2026 13:22:56 +0000 |
++------------------------------------------------------------------------------+
+
+Purging /build/reproducible-path
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Not cleaning session: cloned chroot in use
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+E: Build failure (dpkg-buildpackage died with exit 2)
+
++------------------------------------------------------------------------------+
+| Summary                                      Tue, 10 Nov 2026 13:22:59 +0000 |
++------------------------------------------------------------------------------+
+
+Build Architecture: amd64
+Build Type: binary
+Build-Space: 668
+Build-Time: 1
+Distribution: trixie
+Fail-Stage: build
+Host Architecture: amd64
+Install-Time: 14
+Job: /w/src/sample-app_1.0.0-1.dsc
+Machine Architecture: amd64
+Package: sample-app
+Package-Time: 47
+Source-Version: 1.0.0-1
+Space: 668
+Status: attempted
+Version: 1.0.0-1
+--------------------------------------------------------------------------------
+Finished at 2026-11-10T13:22:55Z
+Build needed 00:00:47, 668k disk space
+sbuild (Debian sbuild) 0.89.3+deb13u4 (28 December 2025) on s1-kata-privilegie
+
++==============================================================================+
+| sample-app 1.0.0-1 (amd64)                   Tue, 10 Nov 2026 13:22:08 +0000 |
++==============================================================================+
+
+Package: sample-app
+Version: 1.0.0-1
+Source Version: 1.0.0-1
+Distribution: trixie
+Machine Architecture: amd64
+Host Architecture: amd64
+Build Architecture: amd64
+Build Type: binary
+
+I: No tarballs found in /w/home/.cache/sbuild
+I: Unpacking /opt/sbuild/trixie-amd64.tar to /w/tmp.sbuild.daOGKTLgcd...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up the chroot...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Creating chroot session...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up log color...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up apt archive...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Fetch source files                           Tue, 10 Nov 2026 13:22:30 +0000 |
++------------------------------------------------------------------------------+
+
+
+Local sources
+-------------
+
+/w/src/sample-app_1.0.0-1.dsc exists in /w/src; copying to chroot
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Install package build dependencies           Tue, 10 Nov 2026 13:22:34 +0000 |
++------------------------------------------------------------------------------+
+
+
+Setup apt archive
+-----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Merged Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+Filtered Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-nJ7nFx/apt_archive/sbuild-build-depends-main-dummy.deb'.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Ign:1 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ InRelease
+Get:2 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Release [609 B]
+Ign:3 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Release.gpg
+Get:4 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Sources [632 B]
+Get:5 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ Packages [671 B]
+Fetched 1912 B in 0s (0 B/s)
+Reading package lists...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+
+Install main build dependencies (apt-based resolver)
+----------------------------------------------------
+
+Installing build dependencies
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  sbuild-build-depends-main-dummy
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 880 B of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 copy:/build/reproducible-path/resolver-nJ7nFx/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [880 B]
+Fetched 880 B in 0s (0 B/s)
+Selecting previously unselected package sbuild-build-depends-main-dummy.
+(Reading database ... 30228 files and directories currently installed.)
+Preparing to unpack .../sbuild-build-depends-main-dummy_0.invalid.0_amd64.deb ...
+Unpacking sbuild-build-depends-main-dummy (0.invalid.0) ...
+Setting up sbuild-build-depends-main-dummy (0.invalid.0) ...
+
++------------------------------------------------------------------------------+
+| Check architectures                          Tue, 10 Nov 2026 13:22:48 +0000 |
++------------------------------------------------------------------------------+
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Arch check ok (amd64 included in amd64)
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Build environment                            Tue, 10 Nov 2026 13:22:50 +0000 |
++------------------------------------------------------------------------------+
+
+Kernel: Linux 6.18.56 #1 SMP Fri Oct 16 18:41:32 UTC 2026 amd64 (x86_64)
+Toolchain package versions: binutils_2.44-3 dpkg-dev_1.22.22 g++-14_14.2.0-19 gcc-14_14.2.0-19 libc6-dev_2.41-12+deb13u4 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 linux-libc-dev_6.12.107-1
+Package versions: apt_3.0.3 autoconf_2.72-3.1 automake_1:1.17-4 autopoint_0.23.1-2 autotools-dev_20240727.1 base-files_13.8+deb13u7 base-passwd_3.6.7 bash_5.2.37-2+b10 binutils_2.44-3 binutils-common_2.44-3 binutils-x86-64-linux-gnu_2.44-3 bsdextrautils_2.41.5-0+deb13u1 bsdutils_1:2.41.5-0+deb13u1 build-essential_12.12 bzip2_1.0.8-6 coreutils_9.7-3 cpp_4:14.2.0-1 cpp-14_14.2.0-19 cpp-14-x86-64-linux-gnu_14.2.0-19 cpp-x86-64-linux-gnu_4:14.2.0-1 dash_0.5.12-12 debconf_1.5.91 debhelper_13.24.2 debian-archive-keyring_2025.1 debianutils_5.23.2 dh-autoreconf_20 dh-strip-nondeterminism_1.14.1-2 diffutils_1:3.10-4 dpkg_1.22.22 dpkg-dev_1.22.22 dwz_0.15-1+b1 file_1:5.46-5 findutils_4.10.0-3 g++_4:14.2.0-1 g++-14_14.2.0-19 g++-14-x86-64-linux-gnu_14.2.0-19 g++-x86-64-linux-gnu_4:14.2.0-1 gcc_4:14.2.0-1 gcc-14_14.2.0-19 gcc-14-base_14.2.0-19 gcc-14-x86-64-linux-gnu_14.2.0-19 gcc-x86-64-linux-gnu_4:14.2.0-1 gettext_0.23.1-2 gettext-base_0.23.1-2 golang-1.24-go_1.24.4-1 golang-1.24-src_1.24.4-1 golang-go_2:1.24~2 golang-src_2:1.24~2 grep_3.11-4 groff-base_1.23.0-9 gzip_1.13-1+deb13u1 hostname_3.25 init-system-helpers_1.69~deb13u1 intltool-debian_0.35.0+20060710.6 libacl1_2.3.2-2+b1 libapt-pkg7.0_3.0.3 libarchive-zip-perl_1.68-1 libasan8_14.2.0-19 libatomic1_14.2.0-19 libattr1_1:2.5.2-3 libaudit-common_1:4.0.2-2+deb13u1 libaudit1_1:4.0.2-2+deb13u1 libbinutils_2.44-3 libblkid1_2.41.5-0+deb13u1 libbrotli1_1.1.0-2+b7 libbz2-1.0_1.0.8-6 libc-bin_2.41-12+deb13u4 libc-dev-bin_2.41-12+deb13u4 libc6_2.41-12+deb13u4 libc6-dev_2.41-12+deb13u4 libcap-ng0_0.8.5-4+b1 libcap2_1:2.75-10+deb13u1+b3 libcares2_1.34.5-1+deb13u1 libcc1-0_14.2.0-19 libcrypt-dev_1:4.4.38-1 libcrypt1_1:4.4.38-1 libctf-nobfd0_2.44-3 libctf0_2.44-3 libdb5.3t64_5.3.28+dfsg2-9 libdebconfclient0_0.280 libdebhelper-perl_13.24.2 libdpkg-perl_1.22.22 libelf1t64_0.192-4 libfile-stripnondeterminism-perl_1.14.1-2 libgcc-14-dev_14.2.0-19 libgcc-s1_14.2.0-19 libgdbm-compat4t64_1.24-2 libgdbm6t64_1.24-2 libgmp10_2:6.3.0+dfsg-3 libgomp1_14.2.0-19 libgprofng0_2.44-3 libhogweed6t64_3.10.1-1 libhwasan0_14.2.0-19 libicu76_76.1-4 libisl23_0.27-1 libitm1_14.2.0-19 libjansson4_2.14-2+b3 liblastlog2-2_2.41.5-0+deb13u1 liblsan0_14.2.0-19 liblz4-1_1.10.0-4 liblzma5_5.8.1-1+deb13u1 libmagic-mgc_1:5.46-5 libmagic1t64_1:5.46-5 libmd0_1.1.0-2+b1 libmount1_2.41.5-0+deb13u1 libmpc3_1.3.1-1+b3 libmpfr6_4.2.2-1 libnettle8t64_3.10.1-1 libnghttp2-14_1.64.0-1.1+deb13u1 libnode115_20.19.2+dfsg-1+deb13u2 libpam-modules_1.7.0-5 libpam-modules-bin_1.7.0-5 libpam-runtime_1.7.0-5 libpam0g_1.7.0-5 libpcre2-8-0_10.46-1~deb13u2 libperl5.40_5.40.1-6+deb13u1 libpipeline1_1.5.8-1 libquadmath0_14.2.0-19 libseccomp2_2.6.0-2 libselinux1_3.8.1-1 libsframe1_2.44-3 libsmartcols1_2.41.5-0+deb13u1 libsqlite3-0_3.46.1-7+deb13u2 libssl3t64_3.5.7-1~deb13u2 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 libsystemd0_257.13-1~deb13u1 libtinfo6_6.5+20250216-2 libtool_2.5.4-4 libtsan2_14.2.0-19 libubsan1_14.2.0-19 libuchardet0_0.0.8-1+b2 libudev1_257.13-1~deb13u1 libunistring5_1.3-2 libuuid1_2.41.5-0+deb13u1 libuv1t64_1.50.0-2 libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3 libxxhash0_0.8.3-2 libzstd1_1.5.7+dfsg-1 linux-libc-dev_6.12.107-1 m4_1.4.19-8 make_4.4.1-2 man-db_2.13.1-1 mawk_1.3.4.20250131-1 ncurses-base_6.5+20250216-2 ncurses-bin_6.5+20250216-2 node-acorn_8.8.1+ds+~cs25.17.7-2 node-balanced-match_2.0.0-1 node-brace-expansion_2.0.1+~1.1.0-2 node-cjs-module-lexer_1.2.3+dfsg-1 node-corepack_0.24.0-5 node-minimatch_9.0.3-6 node-undici_7.3.0+dfsg1+~cs24.12.11-1 node-xtend_4.0.2-3 nodejs_20.19.2+dfsg-1+deb13u2 openssl-provider-legacy_3.5.7-1~deb13u2 patch_2.8-2 perl_5.40.1-6+deb13u1 perl-base_5.40.1-6+deb13u1 perl-modules-5.40_5.40.1-6+deb13u1 po-debconf_1.0.21+nmu1 rpcsvc-proto_1.4.3-1 sbuild-build-depends-main-dummy_0.invalid.0 sed_4.9-2+deb13u1 sensible-utils_0.0.25 sqv_1.3.0-3+b2 sysvinit-utils_3.14-4 tar_1.35+dfsg-3.1 util-linux_2.41.5-0+deb13u1 xz-utils_5.8.1-1+deb13u1 zlib1g_1:1.3.dfsg+really1.3.1-1+b1
+
++------------------------------------------------------------------------------+
+| Build                                        Tue, 10 Nov 2026 13:22:50 +0000 |
++------------------------------------------------------------------------------+
+
+
+Unpack source
+-------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Format: 3.0 (quilt)
+Source: sample-app
+Binary: sample-app
+Architecture: amd64
+Version: 1.0.0-1
+Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Homepage: https://github.com/gigi206/supply-chain
+Standards-Version: 4.7.2
+Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs
+Package-List:
+ sample-app deb web optional arch=amd64
+Checksums-Sha1:
+ bb82fa04323cd37593a7ad7e006e378675a0b9d7 140171 sample-app_1.0.0.orig.tar.gz
+ fad7c06f2a86ee7003be29ce6c9437d0184df98a 2684 sample-app_1.0.0-1.debian.tar.xz
+Checksums-Sha256:
+ 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb 140171 sample-app_1.0.0.orig.tar.gz
+ 863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f 2684 sample-app_1.0.0-1.debian.tar.xz
+Files:
+ 0bc092f45d47735f99c2859d94c64e57 140171 sample-app_1.0.0.orig.tar.gz
+ 4e097315ef31a7004b3c3015ece08684 2684 sample-app_1.0.0-1.debian.tar.xz
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-source: warning: extracting unsigned source package (sample-app_1.0.0-1.dsc)
+dpkg-source: info: extracting sample-app in /build/reproducible-path/sample-app-1.0.0
+dpkg-source: info: unpacking sample-app_1.0.0.orig.tar.gz
+dpkg-source: info: unpacking sample-app_1.0.0-1.debian.tar.xz
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+Check disk space
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Sufficient free space for build
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+User Environment
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+APT_CONFIG=/var/lib/sbuild/apt.conf
+HOME=/sbuild-nonexistent
+LC_ALL=C.UTF-8
+LOGNAME=sbuild
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+SHELL=/bin/sh
+USER=sbuild
+
+dpkg-buildpackage
+-----------------
+
+Command: dpkg-buildpackage --sanitize-env -us -uc -b
+Can't exec "ip": No such file or directory at /usr/libexec/sbuild-usernsexec line 410.
+W: 'ip link set lo up' failed -- do you have the package iproute2 installed on the host outside the chroot?
+failed running ip: No such file or directory at /usr/libexec/sbuild-usernsexec line 413.
+--------------------------------------------------------------------------------
+Build finished at 2026-11-10T13:22:55Z
+
+Finished
+--------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Cleanup                                      Tue, 10 Nov 2026 13:22:56 +0000 |
++------------------------------------------------------------------------------+
+
+Purging /build/reproducible-path
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Not cleaning session: cloned chroot in use
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+E: Build failure (dpkg-buildpackage died with exit 2)
+
++------------------------------------------------------------------------------+
+| Summary                                      Tue, 10 Nov 2026 13:22:59 +0000 |
++------------------------------------------------------------------------------+
+
+Build Architecture: amd64
+Build Type: binary
+Build-Space: 668
+Build-Time: 1
+Distribution: trixie
+Fail-Stage: build
+Host Architecture: amd64
+Install-Time: 14
+Job: /w/src/sample-app_1.0.0-1.dsc
+Machine Architecture: amd64
+Package: sample-app
+Package-Time: 47
+Source-Version: 1.0.0-1
+Space: 668
+Status: attempted
+Version: 1.0.0-1
+--------------------------------------------------------------------------------
+Finished at 2026-11-10T13:22:55Z
+Build needed 00:00:47, 668k disk space

@@ -1,0 +1,27 @@
+# s1.sh relance, 2026-11-10T13:22:02Z
+image : sc-stockage.poc.test:5000/essais-06/sbuild-debian13@sha256:1475738b58d99e87431dd8465239c69b4506648cd0a7511886204662501d7b3f
+### s1-kata-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}) : prêt
+     uid : 1000
+     CapEff:	0000000000000000
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     montage / : virtiofs rw,nodev,relatime
+     montage /w : tmpfs rw,relatime
+     /usr/bin/newuidmap : -rwsr-xr-x root
+     /usr/bin/newgidmap : -rwsr-xr-x root
+     subuid : constructeur:100000:65536
+     subgid : constructeur:100000:65536
+     unshare map-auto : rc 0 uid_map :  0 100000 65536
+     sources livrées : rc 0 sample-app_1.0.0.orig.tar.gz: OK sample-app_1.0.0-1.dsc: OK sample-app_1.0.0-1.debian.tar.xz: OK
+     sbuild : rc 2 en 52 s
+     The Debian buildds switched to the "unshare" backend and sbuild will default to it in the future.
+     To start using "unshare" add this to your `~/.config/sbuild/config.pl`:
+     	$chroot_mode = "unshare";
+     If you want to keep the old "schroot" mode even in the future, add the following to your `~/.config/sbuild/config.pl`:
+     	$chroot_mode = "schroot";
+     	$schroot = "schroot";
+     E: Build failure (dpkg-buildpackage died with exit 2)
+     (code de l'exec : 0)
+journal de sbuild : 554 lignes, resultats/s1-relance-sbuild.log
+pod s1-kata-privilegie supprimé

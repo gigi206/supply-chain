@@ -107,3 +107,35 @@ Ce script modifié n'est pas celui qu'a accordé « Oui, lance S1 ». La relance
 | RL1 | `unshare --user --map-auto` réussit de nouveau | haute |
 | RL2 | sbuild échoue de nouveau, avec le code 2 : rien n'a changé | haute |
 | RL3 | Le journal `.build` nomme la commande en échec. C'est une commande de `debian/rules` (`dh` ou une surcharge), pas la mise en place du chroot | moyenne |
+
+### Résultat de la relance (13:22:02 UTC, accord : « Oui, relance » ; [`s1-relance.log`](s1-relance.log), [`s1-relance-sbuild.log`](s1-relance-sbuild.log))
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| RL1 | `unshare --user --map-auto` rc 0, `uid_map 0 100000 65536` | tenue |
+| RL2 | sbuild rc 2 en 52 s, même message | tenue |
+| RL3 | L'échec est dans la mise en place du réseau par sbuild, avant `dpkg-buildpackage`. `sbuild-usernsexec` ne trouve pas `ip` (« Can't exec "ip": No such file or directory », ligne 410) pour `ip link set lo up`. Build-Time 1 s | **réfutée** |
+
+**Cause mesurée** : `iproute2` n'est pas dans l'image. Ce n'est qu'une recommandation de sbuild, que mmdebstrap n'installe pas (« Recommends: … uidmap, mmdebstrap (>= 1.4.0), iproute2 » dans le `Packages` vérifié). uidmap et mmdebstrap avaient été inclus à la main, mais pas iproute2. **Défaut de préparation, pas une limite de Kata.**
+
+Autre ligne relevée : « cannot bind-mount /dev/console as it does not exist outside the chroot », répétée. C'est un avertissement, qui n'arrête rien.
+
+## Second passage `s1b` (iproute2) : prédictions (écrites le 10/11/2026 à 13:24 UTC, avant toute exécution), NON LANCÉ
+
+Ce que fait le script :
+- **Racine** : il la reconstruit avec `iproute2=6.15.0-1`, version présente dans le `Packages` vérifié.
+- **Chroot de sbuild** : il réutilise celui du premier passage (`GARDER_CHROOT=1`), contrôlé par son sha256 `440ba93b…`.
+- **Image** : il la pousse dans Zot sous `essais-06/sbuild-debian13:s1b`. **C'est une nouvelle écriture définitive**, d'environ 130 Mo si la couche du chroot est reprise à l'identique.
+- **Relance** : il rejoue l'essai Kata privilégié seul.
+- **Journaux** : ils vont dans `s1b-*.log`, et ceux du premier passage ne sont pas réécrits.
+
+Les effets sont un pod Kata root pour mmdebstrap, un pod Kata pour l'essai et cette écriture dans Zot. Ils attendent un accord nommé.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| B1 | `racine` : `iproute2` installé ; les empreintes de tous les .deb sont conformes au `Packages` vérifié | haute |
+| B2 | `image` : couche du chroot identique au premier passage (`sha256:1744236b…`), puisque l'archive est la même, le tar déterministe et la compression de crane sans date. Seule la couche de la racine change | moyenne |
+| B3 | `relance` : `ip link set lo up` réussit ; sbuild construit sample-app, statut `successful`, un deb dont le sha256 est relevé | moyenne |
+| B4 | L'avertissement `/dev/console` reste, sans effet sur le build | haute |
+
+Pas de prédiction sur l'égalité du deb avec celui d'OBS (`0b489d43…`).
