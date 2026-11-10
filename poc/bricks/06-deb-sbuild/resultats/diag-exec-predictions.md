@@ -580,3 +580,10 @@ Accord : « Oui », à 20:33:57 UTC (transcription), en réponse à « Je lance 
 - essayer une autre version de RKE2 ;
 - en rester à la règle d'exploitation : pas de gros fichier par l'entrée standard de `kubectl exec` vers un pod d'un nœud agent. Les morceaux de 64 Mio passent.
 
+**Précisions à la conclusion (20:38 UTC)**
+- **Le suspect est le chemin par la session `remotedialer`, pas `remotedialer` seul.** `proxy.Proxy` est commun aux deux cas, mais il relaie une connexion TCP locale vers sc-confiance et une connexion `remotedialer` vers sc-build. Sa façon de traiter la fin et la fermeture d'une connexion `remotedialer` reste aussi suspecte que `remotedialer`. Les deux fichiers en cause (`tunnel.go`, `proxy.go`) sont dans k3s.
+- **Le contournement du tunnel sur sc-confiance est déduit du code, non observé.** Il repose sur l'égalité entre le nom du nœud et `ServerNodeName`. Pour le confirmer, il faudrait relever par `ss`, sur sc-confiance pendant l'exec, une connexion locale vers :10250. C'est proposé, non lancé.
+- **Versions** : le `go.mod` de RKE2 `v1.35.9+rke2r1` ne remplace ni k3s ni remotedialer (aucune directive `replace` pour eux). Elles valent pour le code relu, à condition que le binaire déployé soit bien ce tag, comme l'a mesuré la 08b.
+- **En amont, lu sans action publique**, sans lien établi avec ce cas :
+  - k3s `b3b26bce` (15/10/2026), « Fix goroutine leak in the proxy » : postérieur au commit embarqué ; il corrige une goroutine restée bloquée sur un canal non tamponné de `proxy.Proxy`, pas la fermeture qui nous bloque, à première lecture ;
+  - remotedialer : versions `v0.6.1` (16/04/2026) et `v0.6.2` (06/11/2026), postérieures à celle embarquée, sans commit lu qui traite ce cas.

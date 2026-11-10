@@ -316,3 +316,16 @@ Décision du propriétaire : « Reprends à J8 », reprise de 15:25 à 15:59 UTC
 **Résultats** : les journaux suivis des briques portent désormais les mesures RKE2. Les versions k3s restent dans l'historique, dernier commit `d357f4d`, rejeu `complet` dans `f3cb8ad`. Les liens de l'ADR 0001 sont épinglés à `d357f4d` ; ceux des README des briques ne le sont pas, ils affichent donc du RKE2 sous un texte k3s.
 
 **Replanifié** : `supply-chain-g7-premiere-suppression`, du 19/11 au 21/11/2026, 16:00 UTC. Zot a redémarré le 06/11 à 15:14:56 UTC et le plus ancien blob de `builds/scan` date du même jour à 15:39 UTC. Les 336 h expirent le 20/11 à 15:39, juste après le balayage du 20/11 ; premier balayage utile attendu le 21/11 vers 15:15 UTC. Calcul, pas une mesure : un redémarrage de Zot le déplacerait.
+
+## Additif du 10/11/2026, 20:38 UTC : `kubectl exec` et le tunnel du superviseur (diagnostic de la brique 06)
+
+**Chemin vers kubelet.** kube-apiserver joint kubelet par un proxy HTTP CONNECT vers le superviseur (`https://127.0.0.1:9345`, sélection `cluster` de `egress-selector-config.yaml`). Le superviseur passe ensuite par la session `remotedialer` de l'agent du nœud visé. Pour son propre nœud, d'après le code de k3s, il joint kubelet en direct.
+
+**Défaut constaté.** Un `kubectl exec` dont l'entrée attend dans la chaîne, parce que le pod lit moins vite qu'elle n'arrive (128 Mio lus à environ 10 Mio/s), ne rend pas la main vers un pod de sc-build, alors que le processus a fini et que tout est reçu. Le même exec vers un pod de sc-confiance passe en 13,4 s.
+
+**Cause située** sur le chemin par la session `remotedialer`. C'est une preuve par différence ; le mécanisme exact n'est pas identifié.
+
+**Contournement** : morceaux de 64 Mio au plus par exec. Tekton n'est pas concerné, car il ne passe pas de données par `exec`.
+
+Détail : [diagnostic de la 06](../06-deb-sbuild/resultats/diag-exec-predictions.md).
+

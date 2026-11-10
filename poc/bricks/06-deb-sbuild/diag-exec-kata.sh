@@ -16,6 +16,10 @@
 #              journal système qui citent kata, le shim, l'exec ou les E/S (run_io_copy, wait, exit, CloseIO, stdin), lignes
 #              jeton|token retirées, 300 caractères au plus ; rien n'est modifié sur la VM
 # Rien n'est écrit dans Zot ni sur les VM.
+# Additif du 10/11/2026, 20:38 UTC : étapes croise, bisection, amont, kubelet (deux passages), pile, connexions, tunnel et local
+# (deux passages, le second dans l'espace diag créé puis supprimé) lancées sur accord, voir resultats/diag-exec-predictions.md.
+# Kata est hors de cause malgré le nom du script (gardé pour les liens) : le maillon fautif est le chemin par la session
+# remotedialer du tunnel de l'agent RKE2 ; les mentions « NON LANCÉE » des étapes datent de leur préparation.
 # Additif du 10/11/2026, 18:47 UTC : étapes pod (18:27 UTC), releve et noeud (18:41 à 18:43 UTC) lancées, code 0 ; étape croise
 # ajoutée à sec, NON LANCÉE (resultats/diag-exec-predictions.md) :
 #   croise     (a) pod runc restricted, 128 Mio envoyés à plein débit, lus dans le pod à environ 10 Mio/s (dd de 1 Mio avec
