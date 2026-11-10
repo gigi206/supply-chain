@@ -98,6 +98,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 10/11/2026, 14:41 UTC** : l'étape `racine` de la brique 06 repasse en pod Kata privilégié au label `prefetch-deb`. Ses archives sont identiques à celles de S1. La ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 10/11/2026, 15:58 UTC** : l'étape `racine` de S2 de la brique 06 tient dans le même cadre : pod Kata privilégié, root, au label `prefetch-deb` (15:53:52 à 15:57:40 UTC). Il construit deux fois le chroot de sbuild, sans dépendances, et télécharge la fermeture du `.buildinfo`. La ligne d'isolation de cet ADR n'est pas modifiée.
+
 > **Additif du 09/11/2026, 13:11 UTC** : [brique 08c](../../poc/bricks/08c-durcissement/README.md) close par décision du propriétaire, documentation seulement. Aucune note ne change. Seuil tenu sur les 8 tests, la porte et les contrôles 6 et 7 sous RKE2 durci H1 à H5 ; ports d'hôte tenus sur les ports essayés seulement, sans balayage. Non couverts écrits dans le README de la brique, dont la jonction d'un nœud et H6 (WireGuard), retirée après mesure.
 
 ## Conséquences

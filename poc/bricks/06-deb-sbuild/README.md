@@ -210,3 +210,15 @@ Ses 162 paquets sont tous dans l'instantané, à la version exacte. La fermeture
 **Non lancé** : le chroot `buildd` construit deux fois, le téléchargement de la fermeture, son envoi dans Zot et sa restauration. Chaque étape attend un accord nommé.
 
 **Non mesurable en S2** : la déduplication entre deux fermetures, car il n'en existe qu'une.
+
+## Additif du 10/11/2026, 15:58 UTC : étape racine de S2 tenue
+
+Passage de 15:53:52 à 15:57:40 UTC, sur l'accord « Oui, lance racine ». Code 0. Journal : [`s2-racine.log`](resultats/s2-racine.log).
+
+**Le chroot `buildd` sans dépendances (D2 a) sort identique sur deux constructions** : `e0b1f37c…`, 509 Mo. Les deux ont été faites dans le même pod, coup sur coup.
+
+**La fermeture du `.buildinfo` est téléchargée et conforme** : 162 .deb, 194 Mo, chacun identique à `Packages`. Elle est sur l'hôte, pas encore dans Zot.
+
+**Reste** :
+- l'envoi dans Zot et la restauration par digest, sur accord ;
+- puis S3 : deux builds hors ligne depuis la fermeture restaurée.

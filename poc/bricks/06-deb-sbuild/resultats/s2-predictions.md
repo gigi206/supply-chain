@@ -95,3 +95,19 @@ Push consigné : 14:45:31 UTC, `145f67a..4072aee`, 17 fichiers contrôlés, aucu
 **Précisions de périmètre**
 - **Q5** : `chroot-a` et `chroot-b` sont construits dans le même pod, coup sur coup. C'est plus faible que deux pods, ou que l'écart de 1 h 30 entre s1 et s1c. Q5 tenue ne prouvera que cela.
 - **Déduplication** : la configuration de Zot (`08-trust-plane/stockage/zot.json`) porte `"dedupe": true`. La condition nécessaire de S2 (couche = sha256 du contenu) s'appuie sur ce réglage. La déduplication réelle entre deux fermetures reste non mesurée.
+
+## Résultat de l'étape racine (10/11/2026, 15:53:52 à 15:57:40 UTC, accord du propriétaire : « Oui, lance racine », 15:53:46 UTC)
+
+Lancée sous bash, code de sortie relevé : **0**. Journal : [`s2-racine.log`](s2-racine.log). Le pod `s2-racine` est supprimé (`NotFound` à 15:57 UTC).
+
+| # | Résultat |
+|---|---|
+| Q4 | **Tenue.** `apt-get update` rc 0 en 4 s ; `InRelease` du pod identique à celui de l'hôte (`0584fba3…`) |
+| Q5 | **Tenue**, dans la limite écrite (même pod, coup sur coup) : `chroot-a` et `chroot-b` identiques, `e0b1f37c…`, 508 546 560 octets, 54 s et 52 s. L'archive rapatriée a la même empreinte |
+| Q6 | **Tenue.** `apt-get download` rc 0 en 19 s ; 162 fichiers, 193 978 008 octets ; après renommage de l'époque, empreintes identiques à la liste attendue. Un seul avertissement relevé (`head -n 5` des lignes `W:`), celui prévu : téléchargement hors du bac à sable de `_apt` |
+| Q7 | **Tenue.** 308 .deb conformes à `Packages` sur 308 : amorce 20, `chroot-a` 63, `chroot-b` 63, fermeture 162 |
+| Q8 | **Tenue.** 3 min 48 s ; tmpfs suffisant, aucune erreur d'espace |
+
+**Non prédit** : le chroot `buildd` sans dépendances pèse 509 Mo, contre 920 Mo pour le chroot de S1, qui préinstallait debhelper, golang-go et nodejs.
+
+**Reste à lancer** : `fermeture` et `restauration`, qui attendent un accord nommé et la réponse sur le nom du dépôt.
