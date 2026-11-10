@@ -823,3 +823,21 @@ La tâche Kata devra écrire ce layout et émettre le digest en résultat.
 - La mémoire de la tâche Kata. En S1, un tmpfs de 4 Gio sur 6 Gio contenait la racine et le chroot. Il faudra en plus le miroir, ou le lire depuis le PVC, et écrire le layout dans le PVC.
 
 **Questions ouvertes** : les choix 1 à 4, avec la recommandation 2 révisée, et le push.
+
+## Additif du 10/11/2026, 22:54 UTC : décision du propriétaire sur S4a, et liste complète du constructeur (hôte, hors ligne)
+
+**Décision du propriétaire** (22:52:55 UTC) : « Oui, retiens-les ». Les quatre recommandations validées par le conseiller (note de 22:51 UTC) sont retenues :
+1. publication dans `builds/builders/sbuild-debian13`, par `publier-image` inchangée ;
+2. une tâche runc restreinte `prefetch-deb` qui télécharge et vérifie, puis une tâche Kata privilégiée sans aucune sortie qui lance mmdebstrap sur le miroir partiel ;
+3. mmdebstrap installé par `dpkg -i` dans l'amorce `debian:trixie-20261104-slim`, fixée par digest ;
+4. layout OCI écrit à la main, couches non compressées, un seul manifeste.
+
+Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Liste complète du constructeur** : [`builder/paquets.txt`](builder/paquets.txt), 199 paquets, 133 065 812 octets. Elle a été tirée sur l'hôte, hors ligne, sans toucher au cluster ni à Zot :
+- les paquets `install ok installed` du `var/lib/dpkg/status` de la racine de S1 (`f8f221ca…`, 166 paquets) et du chroot de S2 (`e0b1f37c…`, 122 paquets) ;
+- les 20 lignes `deb amorce` de [`s1c-racine.log`](resultats/s1c-racine.log), retrouvées par leur sha256 ;
+- chaque paquet, rapproché par nom, version et architecture du `Packages` de l'instantané `20261105T000000Z`. Ce `Packages` a été contrôlé en S1 : InRelease `0584fba3…` signé par les trois clés épinglées, puis `Packages.xz` contrôlé par InRelease ([`s1-prealables.log`](resultats/s1-prealables.log)). **Aucun paquet manquant.**
+- Format, une ligne par paquet : nom, version, architecture, sha256, taille, chemin dans le pool.
+
+**Limite** : la liste reproduit ce que S1 et S2 ont installé. Elle ne prouve pas qu'apt, hors ligne, résoudra le même ensemble depuis le miroir partiel. Ce sera une prédiction de S4a.
