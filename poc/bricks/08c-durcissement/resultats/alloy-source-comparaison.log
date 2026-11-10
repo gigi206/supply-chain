@@ -1,0 +1,60 @@
+# Comparaison publique du source d'Alloy, lecture seule par gh api (accord : « Oui, consigne », 10/11/2026)
+# Début : 2026-11-10T11:02:38Z
+## Versions publiées (gh release list -R grafana/alloy -L 3)
+v1.22.0-rc.0	Pre-release	v1.22.0-rc.0	2026-11-05T21:52:05Z
+v1.21.3	Latest	v1.21.3	2026-10-28T18:32:15Z
+v1.21.2		v1.21.2	2026-10-22T23:47:12Z
+## main : cbdd9bfd97139011f0ee40cc5c1965edf4701ca4 2026-11-09T18:15:28Z
+## Empreintes git (blob) des fichiers du chemin de relance, aux trois références
+internal/component/loki/source/reconcile.go
+  v1.21.3       5d3e74d5ec9777ca41cb916fabcd6e5c5ca866ff
+  v1.22.0-rc.0  5d3e74d5ec9777ca41cb916fabcd6e5c5ca866ff
+  main          5d3e74d5ec9777ca41cb916fabcd6e5c5ca866ff
+internal/component/loki/source/scheduler.go
+  v1.21.3       53a03fe71f60587eecc531d0049bdb45350a3765
+  v1.22.0-rc.0  53a03fe71f60587eecc531d0049bdb45350a3765
+  main          53a03fe71f60587eecc531d0049bdb45350a3765
+internal/component/loki/source/kubernetes_events/event_controller.go
+  v1.21.3       9b31c181d69c596cf2da824c4e2be0e8088349e2
+  v1.22.0-rc.0  9b31c181d69c596cf2da824c4e2be0e8088349e2
+  main          9b31c181d69c596cf2da824c4e2be0e8088349e2
+internal/component/loki/source/kubernetes_events/kubernetes_events.go
+  v1.21.3       c32b980ca215c4691409618281d3f139e3da7924
+  v1.22.0-rc.0  78cf56d330b3b5b704cb1a5b017d629d31dc0875
+  main          78cf56d330b3b5b704cb1a5b017d629d31dc0875
+internal/component/common/kubernetes/kubernetes.go
+  v1.21.3       8149d101420d9bddc27ade0a943404dd0461eea6
+  v1.22.0-rc.0  8149d101420d9bddc27ade0a943404dd0461eea6
+  main          8149d101420d9bddc27ade0a943404dd0461eea6
+## Seul fichier différent : kubernetes_events.go, diff v1.21.3 -> v1.22.0-rc.0
+--- v1.21.3
++++ v1.22.0-rc.0
+@@ -108,8 +108,7 @@
+ 		return nil, err
+ 	}
+ 	positionsFile, err := positions.New(o.Logger, positions.Config{
+-		SyncPeriod:    10 * time.Second,
+-		PositionsFile: filepath.Join(o.DataPath, "positions.yml"),
++		Path: filepath.Join(o.DataPath, "positions.yml"),
+ 	})
+ 	if err != nil {
+ 		return nil, err
+## Dernier commit sur ce fichier avant rc.0
+3e237ac99 2026-11-04T19:42:07Z chore: Cleanup positions package (#7645)
+## Définition de NewSourceWithRetry (gh search code)
+internal/component/loki/source/scheduler.go
+## PR sur le composant (gh search prs, toutes)
+### « kubernetes_events »
+#5717 open 2026-07-27 feat: Add `key_mode` config option for position tracking
+#6759 closed 2026-10-22 fix: Loki components not handling new labels of targets
+#6204 open 2026-08-20 feat: Migrate loki pipeline to single entry consumer
+#6761 closed 2026-10-22 fix(loki.source.docker): Updates in target labels are now taken into account
+#6223 merged 2026-06-19 chore: Migrate loki source components to slog
+#6433 merged 2026-06-23 chore: Slog migration 
+#5821 merged 2026-04-03 fix(loki.enrich): Use shared loki functions and fix locking
+#6451 merged 2026-07-01 chore: Finish up slog migration
+#5830 merged 2026-04-04 fix(loki): Make drain forward entries with fallback timeout
+#4901 merged 2025-12-18 chore: move position from common/loki to an internal package for loki source
+#5702 merged 2026-03-25 feat(loki.write): Add loki pipeline latency metric
+### « kubernetes events retry »
+## Fin : 2026-11-10T11:03:01Z

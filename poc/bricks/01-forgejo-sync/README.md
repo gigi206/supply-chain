@@ -434,3 +434,22 @@ S2 à S4 et S6 ont été rejouées sur une plateforme neuve, sans KO :
 - S5 a été sautée, ainsi que `reverification`, `retrait`, `refspec` et `niveaux`.
 - **Raison de S5 (déduite du code, non mesurée)** : la règle D6 de la 03 refuserait l'image du fork, qui n'a pas de fermeture
   propre. Son étape `porte` est de plus écrite en dur sur `3a7ca1b1`.
+
+## Additif du 10/11/2026, 11:03 UTC : la « brique `-custom` » est B7, donc cette brique (S5)
+
+**Accord du propriétaire** : « Oui, consigne ». Rien n'a été lu ni écrit dans Forgejo, le cluster, Zot ou les VM : relecture du dépôt seulement.
+
+**Définition du propriétaire, verbatim** : « -custom, c'est une branche ou un tag pour rebuild un custom patch et ainsi pouvoir le publier ».
+
+Le libellé « brique `-custom` » venait de ma propre liste de points ouverts, écrite dans une session précédente. Ce besoin n'est pas une brique à part : c'est l'exigence B7 (doc 01), couverte ici par S5, branche custom construite et admise par la porte le 02/11/2026.
+
+**Écarts relevés dans le dépôt, à décider.**
+- **Un tag ne déclenche aucun build.** Le filtre du déclencheur ne prend que `refs/heads/custom/` ([`declencheur.sh:89`](declencheur.sh)). Or B7 n'impose pas de motif et cite `custom-*` en exemple.
+- **S5 est sautée au rejeu depuis le 03/11.** La règle D6 de la 03 refuserait l'image du fork, qui n'a pas de fermeture propre. C'est déduit du code, pas mesuré (additif du 03/11, 22:43 UTC).
+- **L'étape `porte` de S5 est écrite en dur** sur l'image `3a7ca1b1`.
+
+**Questions au propriétaire** :
+- que veut dire « publier » : image poussée dans Zot et admise par la porte, ou publication ailleurs ?
+- faut-il ouvrir un chantier, avec une estimation ?
+
+Aucune décision n'est prise.

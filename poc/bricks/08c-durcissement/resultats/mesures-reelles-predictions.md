@@ -1503,3 +1503,23 @@ Dans tous les cas, l'issue chez Alloy est le seul remède durable : elle demande
 Cela précise l'additif du 09/11, ligne 969 (« avant un rechargement ou un redémarrage d'Alloy ») : un rechargement ne suffit que si le bloc `client` change. Le rechargement par SIGHUP du 09/11 à 22:37 UTC n'est pas en cause : l'observateur tournait depuis le redémarrage de 17:05 UTC. Pour le remède (b), il faut donc un `systemctl restart alloy`, pas un `reload`. C'est déjà la forme de (b1).
 
 **Correction amont possible, très courte.** Le même paquet fournit `source.NewSourceWithRetry`, une relance avec délai croissant, que `loki.source.file` utilise (`MinBackoff` 1 s, `MaxBackoff` 10 s, `file.go:416`). Il suffirait d'enrober de la même façon l'`eventController` créé dans `reconcile()`. Le brouillon d'issue le propose, sans avoir été envoyé ([`issue-alloy-brouillon.md`](issue-alloy-brouillon.md)). Une PR serait une action publique : elle demande l'accord du propriétaire.
+
+## Additif du 10/11/2026, 11:03 UTC : version d'Alloy, rien n'a été testé hors de v1.21.3
+
+**Accord du propriétaire** : « Oui, consigne ». Question posée : « tu as bien testé avec la dernière version d'alloy ? ». Rien n'a été lu ni écrit dans le cluster, Loki ou les VM. Lectures publiques de `grafana/alloy` par `gh api` et `gh search` : [`alloy-source-comparaison.log`](alloy-source-comparaison.log).
+
+**Réponse : non.** Aucun Alloy n'a été lancé pour reproduire le défaut. La seule observation est la panne du 07/11, survenue par accident en v1.21.3. Cette version est la dernière stable. La seule plus récente est la pré-version `v1.22.0-rc.0`, du 05/11/2026.
+
+**Comparaison du source, v1.21.3, v1.22.0-rc.0 et `main` (`cbdd9bfd`).**
+- `reconcile.go`, `scheduler.go` (qui définit `NewSourceWithRetry`), `event_controller.go` et `common/kubernetes/kubernetes.go` sont identiques dans les trois.
+- `kubernetes_events.go` change en rc.0, uniquement par le nettoyage des positions (#7645), sans rapport avec le défaut.
+- Le chemin de relance est donc inchangé, mais le fichier ne l'est pas. Les additifs de 10:27 et de 10:43 disaient « identique sur ce point » : c'est exact pour le chemin de relance, non pour le fichier entier.
+- Deux recherches de PR, toutes états confondus, ne trouvent aucun correctif en cours. Les recherches précédentes ne portaient que sur les issues.
+
+**Conséquence pour l'issue, à décider.** La rubrique « Steps to reproduce » du brouillon n'a jamais été jouée. Avant l'envoi, deux options :
+- la reformuler en « ce qui s'est passé » ;
+- reproduire avec rc.0. Il faut pour cela un accord pour télécharger et lancer la pré-version, vérifiée par empreinte et signature, avec l'API ouverte seulement après le démarrage d'Alloy. Rien n'est lancé.
+
+Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`](issue-alloy-brouillon.md).
+
+**Push consigné** : 10:44:22 UTC, `1179d7e..0234dc6`. Les secrets des 7 fichiers touchés ont été contrôlés avant, avec le script de la copie de travail temporaire, retirée ensuite : OK. La branche distante est identique à la locale.

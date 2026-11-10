@@ -20,6 +20,14 @@ L'adresse de l'API et les noms internes sont retirés du texte.
 - aucun réglage ne permet de le relancer ;
 - la correction possible par `NewSourceWithRetry`.
 
+*Additif du 10/11/2026, 11:03 UTC* (accord du propriétaire : « Oui, consigne », après sa question « tu as bien testé avec la dernière version d'alloy ? ») :
+- **Aucun test n'a été fait sur une autre version que v1.21.3.** Aucun Alloy n'a été lancé pour reproduire le défaut. La seule observation est la panne du 07/11, survenue par accident en v1.21.3, qui est la dernière version stable. La seule plus récente est la pré-version `v1.22.0-rc.0` (05/11/2026).
+- Le source a été comparé en `v1.21.3`, en `v1.22.0-rc.0` et sur `main` (`cbdd9bfd`) : [`alloy-source-comparaison.log`](alloy-source-comparaison.log). `reconcile.go`, `scheduler.go` (où est défini `NewSourceWithRetry`), `event_controller.go` et `common/kubernetes/kubernetes.go` sont identiques dans les trois. `kubernetes_events.go` change en rc.0, mais seulement par le nettoyage des positions (#7645), sans rapport. **Le chemin de relance est inchangé ; le fichier ne l'est pas.** Le titre de la section « Analysis » est corrigé dans ce sens.
+- Les recherches d'avant 10:43 ne portaient que sur les issues. Deux recherches de PR (« kubernetes_events » et « kubernetes events retry », toutes, ouvertes comme fusionnées) ne trouvent aucun correctif de ce défaut.
+- **La rubrique « Steps to reproduce » n'a jamais été jouée** : elle décrit la panne du 07/11, pas une reproduction délibérée. Avant tout envoi, il faut une décision du propriétaire :
+  - la reformuler en « ce qui s'est passé » ;
+  - ou faire une reproduction avec rc.0, sur accord : téléchargement vérifié par empreinte et signature, puis API ouverte seulement après le démarrage d'Alloy. Non lancée.
+
 ---
 
 **Title:** `loki.source.kubernetes_events`: event watcher never retries after a startup error, component stays healthy
@@ -50,7 +58,7 @@ One of the following:
 - the watcher retries with a backoff, as client-go informers do once they are running;
 - or the component reports itself unhealthy while no watcher is running, so the failure can be alerted on.
 
-**Analysis (source at v1.21.3, unchanged on main at cbdd9bf)**
+**Analysis (source at v1.21.3; the retry path is unchanged in v1.22.0-rc.0 and on main at cbdd9bf)**
 
 - `eventController.Run` (`internal/component/loki/source/kubernetes_events/event_controller.go`) logs `event watcher exited with error` and returns.
 - Controllers are only (re)created by `Component.reconcile()`. It is called from `Update()` (configuration change) and from `NotifyClusterChange()`, which returns early unless clustering is enabled.
