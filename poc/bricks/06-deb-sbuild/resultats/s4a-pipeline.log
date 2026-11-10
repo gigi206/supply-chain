@@ -1,31 +1,31 @@
-# s4a.sh pipeline, 2026-11-10T23:12:21Z
-## s4a-builder-1 créé à 23:12:22 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:266838525c5da94abc80d3e71d88959a58449c14308a2d27aacc4dc89188f89d)
+# s4a.sh pipeline, 2026-11-10T23:18:52Z
+## s4a-builder-1 créé à 23:18:52 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:3066d2f0ec3265faddffe49ce79a1f8f046fe5f7d4731c1ce481cb5c24924fff)
 ### TaskRun s4a-builder-1-construire (StepFailed), pod s4a-builder-1-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
-     Setting up readline-common (8.2-6) ...
-     Setting up libgdbm-compat4t64:amd64 (1.24-2) ...
-     Setting up libperl5.40:amd64 (5.40.1-6+deb13u1) ...
-     Setting up libreadline8t64:amd64 (8.2-6) ...
-     Setting up perl (5.40.1-6+deb13u1) ...
-     Setting up libpython3.13-stdlib:amd64 (3.13.5-2+deb13u5) ...
-     Setting up python3.13 (3.13.5-2+deb13u5) ...
-     Setting up libpython3-stdlib:amd64 (3.13.5-1) ...
-     Processing triggers for libc-bin (2.41-12+deb13u4) ...
-     Errors were encountered while processing:
-      /workspace/entrees/pool/main/p/python3-defaults/python3-minimal_3.13.5-1_amd64.deb
-      /workspace/entrees/pool/main/p/python3-defaults/python3_3.13.5-1_amd64.deb
-      mmdebstrap
-     dpkg -i : échec
-     2026/11/10 23:12:54 Entrypoint initialization
-     2026/11/10 23:12:54 Decoded script /tekton/scripts/script-0-t4cjz
+       qemu-user-static squashfs-tools-ng ncompress bzip2 lzop lz4 xz-utils zstd
+       libterm-readline-gnu-perl | libterm-readline-perl-perl make
+       libtap-harness-archive-perl python3-doc python3-tk python3-venv
+       python3.13-venv python3.13-doc binutils binfmt-support readline-doc
+     Recommended packages:
+       libgpm2 arch-test gpg libdistro-info-perl libdpkg-perl uidmap
+       ca-certificates
+     The following NEW packages will be installed:
+       libexpat1 libffi8 libgdbm-compat4t64 libgdbm6t64 libncursesw6 libperl5.40
+       libpython3-stdlib libpython3.13-minimal libpython3.13-stdlib libreadline8t64
+       media-types mmdebstrap netbase perl perl-modules-5.40 python3
+       python3-minimal python3.13 python3.13-minimal readline-common
+     0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
+     After this operation, 76.5 MB of additional disk space will be used.
+     E: Internal Error, Pathname to install is not absolute 'libexpat1_2.8.3-1~deb13u1_amd64.deb'
+     apt-get install des paquets de l'amorce : échec
 OK   A12 s4a-builder-1-construire : runtimeClassName : kata
 OK   A12 s4a-builder-1-construire : nœud : sc-build
 ### TaskRun s4a-builder-1-prefetch (Succeeded), pod s4a-builder-1-prefetch-pod sur sc-build, runtimeClassName , tekton.dev/task prefetch-deb
+     2026/11/10 23:18:57 Decoded script /tekton/scripts/script-0-fsbtz
      uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
      index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
      index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
-     miroir : 199 paquets, 133065812 octets, en 19 s
-     2026/11/10 23:12:26 Entrypoint initialization
-     2026/11/10 23:12:26 Decoded script /tekton/scripts/script-0-h2847
+     miroir : 199 paquets, 133065812 octets, en 10 s
+     2026/11/10 23:18:56 Entrypoint initialization
 OK   A12 s4a-builder-1-prefetch : runtimeClassName : 
 OK   A12 s4a-builder-1-prefetch : nœud : sc-build
 KO   PipelineRun s4a-builder-1 : False|Failed (attendu : True|Succeeded)

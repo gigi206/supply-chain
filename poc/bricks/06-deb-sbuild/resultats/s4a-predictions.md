@@ -169,3 +169,14 @@ Le journal complet du TaskRun en échec est archivé : [`s4a-builder-1-construir
 **Liste revue** : `de18e9cf` (version cassée et privilégiée) sera retirée dans le même diff que l'ajout de la nouvelle version, comme « Retirer 403ccbd8 » en F3 de la 03. `prefetch-deb` (`4dac0609`) est inchangée.
 
 **Rejoué sur l'hôte** : `prealables`, code 0.
+
+## Résultats de l'étape `pipeline`, second passage (10/11/2026, 23:18:52 à 23:20:05 UTC, accord « Oui, relance pipeline »)
+
+Code 1. `s4a-builder-1` a échoué dans `construire`, et `s4a-builder-2` n'a pas été créé. Journal : [`s4a-pipeline.log`](s4a-pipeline.log). Journal complet du TaskRun : [`s4a-builder-1-construire-echec-2.log`](s4a-builder-1-construire-echec-2.log).
+
+- **A4, A5, A9 et A12 : tenues de nouveau.** Miroir téléchargé en 10 s, témoins en échec, runc pour `prefetch` et Kata pour `construire`.
+- **A6 bis, volet complétude : tenu.** apt résout les 20 paquets depuis les seuls fichiers locaux : « 20 newly installed », sans aucune dépendance manquante. **La liste de l'amorce est complète.**
+- **A6 bis, volet installation : réfuté.** apt s'arrête sur une erreur interne : `Pathname to install is not absolute 'libexpat1_2.8.3-1~deb13u1_amd64.deb'`.
+  - Cause, lue dans apt 3.0.3 (`apt-pkg/acquire-item.cc`, `pkgAcqArchive`) : pour un `.deb` local, le chemin absolu ne remplace le nom généré (`nom_version_arch.deb`) que dans `Done()`, après le passage de la méthode `file`.
+  - Avec `--no-download`, la file d'acquisition ne tourne pas, et le nom reste relatif. C'est exactement le nom de l'erreur.
+- **Non atteintes** : A7, A8, A10, A11 et A13.

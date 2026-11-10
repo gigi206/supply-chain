@@ -1,0 +1,31 @@
+2026/11/10 23:19:15 Entrypoint initialization
+2026/11/10 23:19:16 Decoded script /tekton/scripts/script-0-pcsl5
+invité : 3 vCPU, 6119664 kB ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+témoin DNS snapshot.debian.org : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+miroir revérifié : InRelease 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675, 2 index, 199 paquets
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Suggested packages:
+  gdbm-l10n sensible-utils apt-transport-tor apt-utils binfmt-support
+  | systemd ca-certificates debootstrap distro-info-data dpkg-dev fakechroot
+  fakeroot genext2fs e2fsprogs libarchive13 perl-doc qemu-user
+  qemu-user-static squashfs-tools-ng ncompress bzip2 lzop lz4 xz-utils zstd
+  libterm-readline-gnu-perl | libterm-readline-perl-perl make
+  libtap-harness-archive-perl python3-doc python3-tk python3-venv
+  python3.13-venv python3.13-doc binutils binfmt-support readline-doc
+Recommended packages:
+  libgpm2 arch-test gpg libdistro-info-perl libdpkg-perl uidmap
+  ca-certificates
+The following NEW packages will be installed:
+  libexpat1 libffi8 libgdbm-compat4t64 libgdbm6t64 libncursesw6 libperl5.40
+  libpython3-stdlib libpython3.13-minimal libpython3.13-stdlib libreadline8t64
+  media-types mmdebstrap netbase perl perl-modules-5.40 python3
+  python3-minimal python3.13 python3.13-minimal readline-common
+0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
+After this operation, 76.5 MB of additional disk space will be used.
+E: Internal Error, Pathname to install is not absolute 'libexpat1_2.8.3-1~deb13u1_amd64.deb'
+apt-get install des paquets de l'amorce : échec

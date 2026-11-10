@@ -942,3 +942,11 @@ Lancée à 23:17:20 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal
 - La pipeline est signée et publiée : `tekton/pipelines/builder-sbuild@sha256:3066d2f0…`.
 
 **Non lancé** : le second passage de `pipeline`. Il attend un accord, car le script a été modifié depuis le dernier.
+
+## Additif du 10/11/2026, 23:22 UTC : second passage de `pipeline`, échec sur `--no-download` ; liste de l'amorce complète
+
+Lancé de 23:18:52 à 23:20:05 UTC, sur l'accord « Oui, relance pipeline ». Code 1. Rien n'a été publié. Détail : [prédictions et résultats](resultats/s4a-predictions.md).
+
+- **La liste des 20 paquets de l'amorce est complète.** apt les résout depuis les seuls fichiers locaux, sans dépendance manquante.
+- **Échec** : erreur interne d'apt avec `--no-download`. La cause est lue dans le code d'apt 3.0.3 : le chemin d'un `.deb` local n'est rendu absolu qu'après le passage de la méthode `file`, que `--no-download` empêche.
+- **Correction proposée** : retirer `--no-download`. Les fichiers locaux passent alors par la méthode `file`, qui copie sans réseau. Le réseau reste coupé par `builder-sans-sortie` (A9 tenue deux fois). Cela demande une nouvelle signature de `construire-builder`, une revue de la liste et un accord.
