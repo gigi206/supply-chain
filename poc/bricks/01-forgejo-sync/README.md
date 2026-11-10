@@ -455,3 +455,26 @@ Ce que le dépôt couvre déjà : l'exigence B7 (doc 01), avec S5 : une branche 
 - faut-il ouvrir un chantier, avec une estimation ?
 
 Aucune décision n'est prise.
+
+## Additif du 10/11/2026, 11:34 UTC : `-custom` pour des clients, la version doit se distinguer de l'officielle
+
+**Réponse du propriétaire, verbatim** : « -custom sur un dépôt avec un patch ou un tag permet de créer des patch et de rebuild avec ce patch pour des clients : du coup doit faire apparaitre que ce n'est plus l'officiel mais custom peut être pour differencier ? ». Deux éléments sont nouveaux :
+- la version custom est destinée **à des clients** ;
+- elle doit **apparaître comme non officielle**.
+
+Aucune décision n'est prise. Rien n'a été lu ni écrit dans Forgejo, le cluster, Zot ou les VM : lectures publiques seulement, et `dpkg` sur l'hôte.
+
+**Pistes pour distinguer une version custom, à décider :**
+- **Dépôt Zot distinct.** S5 le fait déjà (`builds/sample-app-sync`).
+- **Provenance et VSA** dont la source est la branche ou le tag du fork, au commit exact. Une porte peut refuser une version custom là où l'officielle est exigée, et inversement.
+- **Annotations OCI** de version, de source et de révision, posées sur l'image.
+- **Suffixe de version.** Contraintes vérifiées :
+  - un tag OCI ne peut pas contenir `+`. La grammaire est `[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}` (`opencontainers/distribution-spec`, `spec.md`, commit `4f7750b2e` du 14/08/2026) ;
+  - en semver, une pré-version passe avant la version normale : `1.0.0-alpha < 1.0.0` (`semver/semver`, `semver.md`, commit `d58db1686`, règle de priorité). Un suffixe `-custom.1` serait donc classé *avant* l'officielle ;
+  - pour un paquet deb, `dpkg --compare-versions` (dpkg 1.23.7, sur l'hôte) classe `1.2-3+custom1` après `1.2-3`, et `1.2-3~custom1` avant ;
+  - non vérifié : le comportement de Renovate face à ces suffixes, et l'équivalent pour rpm.
+
+**Questions au propriétaire :**
+- comment les clients récupèrent-ils la version custom : depuis notre Zot, depuis leur propre registre, ou sous forme de paquets rpm ou deb ?
+- un patch peut-il être propre à un seul client ?
+- faut-il ouvrir une brique, avec une estimation ?
