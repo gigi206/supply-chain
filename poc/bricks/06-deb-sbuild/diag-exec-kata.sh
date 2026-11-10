@@ -509,4 +509,62 @@ etape_local() {
   echo "L1 sc-confiance, sans tunnel : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(kubectl exec -n "$ns" diag-exec-local -- stat -c %s /w/croise </dev/null 2>/dev/null || echo '?')"
 }
 
+# Étape direct (préparée à sec le 10/11/2026 à 20:53 UTC, NON LANCÉE), après egress-selector-mode: disabled (brique 08b) : E5 de
+# resultats/egress-selector-predictions.md (08b) n'a pas été mesurée, le relevé unique de l'étape connexions tombant à 45 s, après
+# la fin de l'exec (environ 13 s). Même charge que croise (a) : pod runc restricted, 128 Mio lus lentement (LECTEUR_LENT), délai de
+# 150 s, trois essais dans le même pod. Pour chaque essai, deux échantillonneurs lancés 3 s avant l'exec, une session ssh chacun
+# (sudo sh -s, script par l'entrée standard), 80 relevés espacés de 0,5 s (environ 40 s) : sur sc-confiance, connexions établies
+# vers l'InternalIP de sc-build:10250 ; sur sc-build, connexions établies sur :10250 depuis sc-confiance. ss -Htn, adresses et
+# ports seulement, sans -p ; rien n'est écrit sur les VM. L'InternalIP de sc-build est lue sur le nœud, pas supposée ; l'argument
+# --kubelet-preferred-address-types de kube-apiserver est affiché. Relevés bruts gardés dans resultats/diag-exec-direct-releves.tsv.
+ECHANTILLONNEUR='set -f
+case $1 in
+  apiserver) f="dst $2:10250" ;;
+  kubelet) f="( sport = :10250 ) dst $2" ;;
+  *) exit 2 ;;
+esac
+i=0
+while [ $i -lt $3 ]; do
+  echo "$(date -u +%H:%M:%S.%N | cut -c1-12) $(ss -Htn state established $f | wc -l)"
+  i=$((i + 1)); sleep 0.5
+done'
+
+direct_resume() { # fichier côté
+  awk -v c="$2" '{ n++; if (n == 1) d = $1; f = $1; if ($2 > 0) { k++; if (k == 1) p = $1; q = $1; if ($2 > m) m = $2 } }
+    END { printf "     %s : %d relevés de %s à %s ; non nuls : %d", c, n, d, f, k;
+      if (k) printf ", de %s à %s, au plus %d connexion(s)", p, q, m; printf "\n" }' "$1"
+}
+
+etape_direct() {
+  local ip f n essai rc t0 debut fin p1 p2 c
+  ip=$(kubectl get node sc-build -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}' </dev/null)
+  [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "KO   InternalIP de sc-build illisible" >&2; exit 1; }
+  echo "sc-build : InternalIP $ip ; adresse du dépôt ${IP[sc-build]}"
+  echo "kube-apiserver : $(args_apiserver | grep -E '^--(kubelet-preferred-address-types|egress-selector-config-file)=' | tr '\n' ' ')"
+  echo "horloges : hôte $(date -u +%H:%M:%S.%N | cut -c1-12), sc-confiance $(sur sc-confiance 'date -u +%H:%M:%S.%N' </dev/null | cut -c1-12), sc-build $(sur sc-build 'date -u +%H:%M:%S.%N' </dev/null | cut -c1-12) UTC (aller-retour ssh compris)"
+  croise_pod - "$RESTREINT"
+  f=$(alea 128); n=$(stat -c %s "$f")
+  printf 'essai\tcôté\theure\tconnexions\n' > "$R/diag-exec-direct-releves.tsv"
+  for essai in 1 2 3; do
+    echo "## essai $essai"
+    kubectl exec -n builds "$POD" -- rm -f /w/croise </dev/null || true
+    printf '%s\n' "$ECHANTILLONNEUR" | sur sc-confiance "sudo sh -s apiserver $ip 80" > "$T/direct-$essai-apiserver.txt" 2>/dev/null &
+    p1=$!
+    printf '%s\n' "$ECHANTILLONNEUR" | sur sc-build "sudo sh -s kubelet ${IP[sc-confiance]} 80" > "$T/direct-$essai-kubelet.txt" 2>/dev/null &
+    p2=$!
+    sleep 3
+    rc=0; debut=$(date -u +%H:%M:%S.%N | cut -c1-12); t0=$(ms)
+    timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" || rc=$?
+    fin=$(date -u +%H:%M:%S.%N | cut -c1-12)
+    echo "exec : $n octets, code $rc en $(( $(ms) - t0 )) ms, de $debut à $fin UTC (hôte) ; reçus dans le pod : $(recu /w/croise) ; sha256 $([ "$(kubectl exec -n builds "$POD" -- sha256sum /w/croise </dev/null | cut -c1-64)" = "$(sha256sum < "$f" | cut -c1-64)" ] && echo conforme || echo "non conforme")"
+    wait "$p1" || true
+    wait "$p2" || true
+    for c in apiserver kubelet; do
+      direct_resume "$T/direct-$essai-$c.txt" "$c"
+      awk -v e="$essai" -v c="$c" '{ printf "%s\t%s\t%s\t%s\n", e, c, $1, $2 }' "$T/direct-$essai-$c.txt" >> "$R/diag-exec-direct-releves.tsv"
+    done
+  done
+  pod_retirer "$POD"
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"

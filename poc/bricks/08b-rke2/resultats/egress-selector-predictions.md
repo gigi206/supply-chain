@@ -81,3 +81,54 @@ Accord : « Oui, vérifie », à 20:44:57 UTC (transcription). Lancée sous bash
 
 Cela confirme, par l'effet, que le maillon fautif était sur le chemin par le proxy du superviseur et le tunnel de l'agent RKE2. **Non vérifié** : le chemin direct pendant l'exec (E5, relevé trop tardif), un gros exec sous Kata (512 Mio), et les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio de `s3.sh` reste valable, mais n'est plus forcément nécessaire.
 
+## Additif du 10/11/2026, 20:53 UTC : push, puis vérification complémentaire préparée à sec (NON LANCÉE)
+
+**Push** : `fc4afa3..1e7533d` poussé entre 20:48:15 et 20:48:18 UTC, sur l'accord « Oui, pousse » : 36 commits. Avant le push, contrôle des secrets dans un worktree temporaire, sur 43 fichiers : aucun secret trouvé.
+
+**Interprétation** : le message « continue », à 20:50:11 UTC (transcription), n'est pas un accord. Il est consigné comme une permission de préparer à sec, sans lecture du cluster ni lancement.
+
+### Ce qui est préparé
+
+**Étape `direct`**, ajoutée à [`diag-exec-kata.sh`](../../06-deb-sbuild/diag-exec-kata.sh) (brique 06) ; les étapes déjà lancées ne changent pas :
+- **But** : mesurer E5, manquée par le relevé unique à 45 s de l'étape `connexions`.
+- **Charge** : la même que `croise` (a), pour que les résultats restent comparables : pod runc restricted, 128 Mio lus lentement, délai de 150 s, **trois essais**.
+- **Échantillonnage** : pour chaque essai, deux échantillonneurs démarrent 3 s avant l'exec, chacun dans une seule session ssh. Ils font 80 relevés, un toutes les 0,5 s, soit environ 40 s :
+  - sur sc-confiance, les connexions établies vers l'InternalIP de sc-build:10250 ;
+  - sur sc-build, les connexions établies sur :10250 depuis sc-confiance.
+- **Relevés** : `ss -Htn` seulement, adresses et ports, sans `-p`. Rien n'est écrit sur les VM. Les relevés bruts sont gardés dans `diag-exec-direct-releves.tsv`.
+- **Adresses lues, pas supposées** : l'InternalIP de sc-build est lue sur le nœud. L'argument `--kubelet-preferred-address-types` de kube-apiserver est affiché, ainsi que les heures de l'hôte et des deux VM.
+- **Essai à sec**, sur la machine hôte : les deux filtres `ss` comptent bien une connexion locale réelle, et le résumé est juste sur des relevés fictifs.
+
+**Kata à 512 Mio : la sonde de S3 est rejouée telle quelle**, sans modifier [`s3.sh`](../../06-deb-sbuild/s3.sh) :
+- même déroulé qu'à 18:02 UTC, avec un pod Kata privilégié puis un pod runc témoin ;
+- tailles de 1, 8, 64 et 512 Mio, à plein débit, par WebSocket ; la copie n'est refaite en SPDY qu'en cas d'échec.
+
+La sonde écrit `s3-sonde.log`, qui est la seule trace du blocage à 512 Mio et que les notes et l'ADR 0001 citent. Pour ne pas la perdre, la commande prévue procède en deux temps :
+1. le nouveau journal est renommé `s3-sonde-direct.log` aussitôt après le lancement ;
+2. l'ancien est restauré depuis git.
+
+Les liens existants restent ainsi justes, sans réécrire de texte.
+
+### Prédictions
+
+| # | Prédit | Confiance |
+|---|---|---|
+| D1 | L'InternalIP de sc-build vaut 192.168.161.12, l'adresse vers laquelle les relevés de 20:46 UTC filtraient | haute |
+| D2 | `direct` : sur les trois essais, code 0 en 10 à 20 s ; 134 217 728 octets reçus, sha256 conforme | moyenne-haute : un seul essai mesuré jusqu'ici |
+| D3 (E5) | Dans chaque essai, au moins un relevé sur sc-confiance montre une connexion établie vers sc-build:10250 pendant l'exec, et autant côté sc-build depuis sc-confiance. Les premiers relevés, avant l'exec, sont à 0 | moyenne |
+| D4 | Les derniers relevés, quelques secondes après la fin de l'exec, reviennent à 0 | moyenne |
+| D5 | Sonde : sous Kata, les quatre tailles passent par WebSocket, en code 0 et sha256 conforme ; 512 Mio en moins de 120 s ; aucune copie en SPDY | moyenne : Kata a été mis hors de cause par comparaison, jamais par un passage de 512 Mio |
+| D6 | Sonde : sous runc, les quatre tailles passent, comme à 18:02 UTC | haute |
+
+Si D3 échoue alors que D2 tient, l'exec passerait par un chemin non identifié, et la lecture de la cause serait à revoir.
+
+**Ce que ces mesures ne couvrent pas** :
+- les pipelines Tekton après ce changement, laissés au choix du propriétaire ;
+- `sortie-builds.sh`, dont la correction de DESTINATIONS n'est toujours pas rejouée.
+
+### Commandes prévues, chacune sur accord nommé
+
+```
+bash -c 'DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/diag-exec-kata.sh direct; echo "rc $?"'
+bash -c 'DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s3.sh sonde; echo "rc $?"; d=poc/bricks/06-deb-sbuild/resultats; mv $d/s3-sonde.log $d/s3-sonde-direct.log && git checkout -- $d/s3-sonde.log'
+```
