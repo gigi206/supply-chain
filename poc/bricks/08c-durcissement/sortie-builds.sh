@@ -109,9 +109,14 @@ for nom, url, c in [("snapshot.debian.org en 80", "http://snapshot.debian.org/ar
         print(f"{nom} : joint (HTTP {e.code})")
     except Exception as e:
         print(f"{nom} : refusé ({type(e).__name__})")
-g = subprocess.run(["git", "-c", "http.sslCAInfo=/etc/ca-poc/ca.crt", "ls-remote", "https://sc-stockage.poc.test:3000/workspace/sample-app.git", "HEAD"],
-                   capture_output=True, text=True, timeout=30)
-print("Forgejo : " + ("joint" if g.returncode == 0 else "refusé"))'
+# Corrigé le 10/11/2026 à 14:35 UTC : TimeoutExpired n'\''était pas rattrapé (témoin prefetch-deb de deb_temoins, 14:29 UTC : code 1,
+# pod laissé en place) ; un délai dépassé est un refus, comme pour les autres destinations
+try:
+    g = subprocess.run(["git", "-c", "http.sslCAInfo=/etc/ca-poc/ca.crt", "ls-remote", "https://sc-stockage.poc.test:3000/workspace/sample-app.git", "HEAD"],
+                       capture_output=True, text=True, timeout=30)
+    print("Forgejo : " + ("joint" if g.returncode == 0 else "refusé"))
+except subprocess.TimeoutExpired:
+    print("Forgejo : refusé (TimeoutExpired)")'
 
 TEMOINS=("sans-label -" "prefetch prefetch-gomod" "construire construire-image")
 temoins() { # libellé : un pod par entrée de TEMOINS (nom label), une ligne par destination

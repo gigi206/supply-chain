@@ -102,3 +102,39 @@ Ce passage a réécrit le journal d'E0. Celui-ci est remis sous [`sortie-deb_sec
 - `snapshot.debian.org` et `dl.rockylinux.org` sont résolus vers **151.101.122.132**, toujours par les CNAME de Fastly. À 14:19 UTC, c'était 199.232.170.132.
 - L'adresse est donc **partagée entre les deux hôtes, et elle change en quelques minutes**. Une /32 aurait été à la fois trop large et instable.
 - `dl.fedoraproject.org` reste résolu vers 38.145.32.22 à .24.
+
+## Résultat de E1 et E2 (accord du propriétaire : « Oui, lance E1-E2 »)
+
+Script à la version `17b4287`. Journaux : [`sortie-deb_appliquer.log`](sortie-deb_appliquer.log) et [`sortie-deb_temoins.log`](sortie-deb_temoins.log).
+- **E1** : de 14:29:39 UTC, code 0.
+- **E2** : de 14:29:45 à 14:33:34 UTC, **code 1**.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| E1 | État de départ conforme : `NotIn` à `["prefetch-gomod"]`, `prefetch-deb-sortie` absente. Les deux politiques sont valides pour Cilium, et le `NotIn` passe à `["prefetch-gomod","prefetch-deb"]`. Les invariants du cluster sont tous OK : celui des labels exclus est vide, `prefetch-deb` est sélectionné par `prefetch-deb-sortie` seule, et un pod sans label par `builds-sans-internet` seule | tenue |
+| E2, trois témoins existants | Identiques à `sortie-apres.log` de 13:55 UTC, hors adresses résolues par le DNS | tenue |
+| E2, témoin `prefetch-deb` | DNS résolu pour les deux noms. `snapshot.debian.org` en 80 : **joint (HTTP 200)**. `proxy.golang.org` en 443, API de RKE2 et Zot : refusés (`URLError`). Forgejo : `git ls-remote` a dépassé son délai de 30 s, **sans connexion établie** | tenue sur le fond, voir l'écart |
+
+**Écart, dû au script des témoins.**
+- Le `TimeoutExpired` de `git` n'était pas rattrapé dans `DESTINATIONS` : Python a fini en erreur, puis l'étape s'est arrêtée en code 1.
+- Le pod de test `sortie-deb` est donc resté en place. Je l'ai supprimé à 14:34 UTC ; aucun pod `sortie-` ne reste dans `builds`.
+- Les trois témoins précédents n'avaient pas rencontré ce cas : Forgejo leur répondait, ou les refusait sans délai.
+- Corrigé à sec à 14:35 UTC : un délai dépassé s'affiche désormais « refusé (TimeoutExpired) ». **Cette correction n'est pas rejouée.**
+- Pendant la vérification de syntaxe, mon contrôle a chargé tout le script hors de son répertoire. `commun.sh` n'a pas été trouvé, et rien n'a été créé ni lancé.
+
+**Critère de retrait non rempli.**
+- Le témoin `prefetch-deb` ne joint ni Zot, ni Forgejo, ni l'API, ni le 443 public.
+- Les trois témoins existants sont inchangés.
+- **Les deux politiques restent en place.**
+
+**Constat sur le DNS** : `snapshot.debian.org` a été résolu en trois adresses de Fastly selon le pod, en quelques minutes : 151.101.122.132, 199.232.82.132 et 199.232.170.132. Cela confirme qu'une /32 ne pouvait pas convenir.
+
+**Durée** :
+- de 14:29:39 à 14:34:24 UTC (suppression du pod), soit 5 min ;
+- 15 min étaient estimées pour E1 et E2.
+
+**Reste** :
+- E3 (`PREFIXE=s1c s1.sh racine`), qui demande un accord distinct ;
+- la question du rejeu.
+
+**Correction** : le message du commit `f16a88b` dit aussi « ajouté à 14:29 UTC », alors que le commit est de 14:27:55 UTC. Je le note ici, car ce message ne sera pas réécrit.

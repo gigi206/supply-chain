@@ -1407,3 +1407,23 @@ Le propriétaire a répondu « celui que tu veux ». Je consigne cette réponse 
 **Conséquence** : `builds-sans-internet` et `prefetch-deb-sortie` vont **ensemble**, dans le cluster comme dans tout rejeu.
 
 **Relevé DNS archivé** ([journal](resultats/sortie-deb-dns.log)) : l'adresse de Fastly partagée par `snapshot.debian.org` et `dl.rockylinux.org` est passée de 199.232.170.132 (14:19 UTC) à 151.101.122.132 (14:28 UTC).
+
+## Additif du 10/11/2026, 14:35 UTC : prefetch-deb-sortie en service
+
+E1 et E2 ont été lancés de 14:29 à 14:34 UTC, sur l'accord « Oui, lance E1-E2 ». Détail dans les [résultats](resultats/sortie-deb-predictions.md).
+
+**Les deux politiques sont posées.**
+- `builds-sans-internet` exclut maintenant `prefetch-gomod` et `prefetch-deb`.
+- `prefetch-deb-sortie` ne laisse sortir que vers le DNS et le port 80 public.
+- Les invariants du cluster sont OK.
+
+**Témoin `prefetch-deb`**
+- Il joint `snapshot.debian.org` en 80.
+- Il ne joint ni `proxy.golang.org` en 443, ni l'API, ni Zot, ni Forgejo : pour Forgejo, le délai est dépassé.
+- Les trois autres témoins sont inchangés depuis 13:55 UTC.
+
+**Écart, dû au script des témoins** : le délai dépassé de `git` n'était pas rattrapé. L'étape a fini en code 1, et le pod de test est resté en place jusqu'à ce que je le supprime à 14:34 UTC. Le script est corrigé à sec, sans être rejoué.
+
+**Reste**
+- E3, un passage réel de `06/s1.sh racine` avec le label, qui demande un accord distinct.
+- Le rejeu de zéro : les deux politiques doivent y aller ensemble.

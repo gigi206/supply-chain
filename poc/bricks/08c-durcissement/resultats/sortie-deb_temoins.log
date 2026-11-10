@@ -1,0 +1,49 @@
+# sortie-builds.sh deb_temoins, 2026-11-10T14:29:45Z
+### sortie-sans-label (label tekton.dev/task : -)
+     DNS snapshot.debian.org : résolu (151.101.122.132)
+     DNS sc-stockage.poc.test : résolu (192.168.161.13)
+     snapshot.debian.org en 80 : refusé (URLError)
+     proxy.golang.org en 443 : refusé (URLError)
+     API de RKE2 : joint (HTTP 401)
+     Zot : joint (HTTP 200)
+     Forgejo : joint
+### sortie-prefetch (label tekton.dev/task : prefetch-gomod)
+     DNS snapshot.debian.org : résolu (199.232.82.132)
+     DNS sc-stockage.poc.test : résolu (192.168.161.13)
+     snapshot.debian.org en 80 : refusé (URLError)
+     proxy.golang.org en 443 : joint (HTTP 200)
+     API de RKE2 : refusé (URLError)
+     Zot : refusé (URLError)
+     Forgejo : joint
+### sortie-construire (label tekton.dev/task : construire-image)
+     DNS snapshot.debian.org : échec (gaierror)
+     DNS sc-stockage.poc.test : échec (gaierror)
+     snapshot.debian.org en 80 : refusé (URLError)
+     proxy.golang.org en 443 : refusé (URLError)
+     API de RKE2 : refusé (URLError)
+     Zot : refusé (URLError)
+     Forgejo : refusé
+### sortie-deb (label tekton.dev/task : prefetch-deb)
+     DNS snapshot.debian.org : résolu (199.232.170.132)
+     DNS sc-stockage.poc.test : résolu (192.168.161.13)
+     snapshot.debian.org en 80 : joint (HTTP 200)
+     proxy.golang.org en 443 : refusé (URLError)
+     API de RKE2 : refusé (URLError)
+     Zot : refusé (URLError)
+     Traceback (most recent call last):
+       File "<stdin>", line 18, in <module>
+       File "/nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12/lib/python3.13/subprocess.py", line 556, in run
+         stdout, stderr = process.communicate(input, timeout=timeout)
+                          ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+       File "/nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12/lib/python3.13/subprocess.py", line 1222, in communicate
+         stdout, stderr = self._communicate(input, endtime, timeout)
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+       File "/nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12/lib/python3.13/subprocess.py", line 2155, in _communicate
+         self._check_timeout(endtime, orig_timeout, stdout, stderr)
+         ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       File "/nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12/lib/python3.13/subprocess.py", line 1269, in _check_timeout
+         raise TimeoutExpired(
+         ...<2 lines>...
+                 stderr=b''.join(stderr_seq) if stderr_seq else None)
+     subprocess.TimeoutExpired: Command '['git', '-c', 'http.sslCAInfo=/etc/ca-poc/ca.crt', 'ls-remote', 'https://sc-stockage.poc.test:3000/workspace/sample-app.git', 'HEAD']' timed out after 30 seconds
+     command terminated with exit code 1
