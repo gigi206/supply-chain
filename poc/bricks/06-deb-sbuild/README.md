@@ -315,3 +315,13 @@ Diagnostic ([prédictions et résultats](resultats/diag-exec-predictions.md)) :
 **Le blocage est en aval du shim**, dans la remontée de la fin de l'exec vers kubectl : containerd, kubelet ou apiserver. La cause n'est pas connue. Deux tests croisés sont préparés à sec : runc avec une lecture lente dans le pod, et Kata avec un envoi lent.
 
 Script : [`diag-exec-kata.sh`](diag-exec-kata.sh). Étapes `pod`, `releve` et `noeud` lancées sur accord, code 0 ; étape `croise` NON LANCÉE.
+
+## Additif du 10/11/2026, 18:59 UTC : étape croise du diagnostic, Kata hors de cause
+
+Étape `croise` (18:54:38 à 18:58:13 UTC, code 0) :
+- **(a) runc, lecture lente dans le pod** : code 124 au délai de 150 s, alors que les 134 217 728 octets sont reçus et que le sha256 est conforme. **Le blocage se reproduit hors de Kata.**
+- **(b) Kata, envoi lent** (environ 5 Mio/s) : **code 0 en 26,6 s**, tout reçu.
+
+**Kata n'est pas la cause.** L'exec ne rend pas la main quand une grande quantité de données d'entrée attend dans la chaîne de flux (kubectl, apiserver, kubelet, containerd) parce que le pod la lit moins vite qu'elle n'arrive. Le processus finit, et la fin de l'exec ne remonte pas. Kata n'y joue que par son débit plus faible (environ 10 Mo/s), qui crée cette attente. Le maillon exact de la chaîne n'est pas identifié. Aucun ticket Kubernetes, containerd ou Kata trouvé ne décrit ce cas.
+
+Détail : [diagnostic](resultats/diag-exec-predictions.md).

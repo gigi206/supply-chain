@@ -167,3 +167,22 @@ Pour l'exec `204b7a67…` :
 
 La bisection sur le nœud (`crictl exec`, puis `ctr task exec`) viendra ensuite, selon le résultat, avec un accord à part.
 
+## Résultat de l'étape croise (10/11/2026, 18:54:38 à 18:58:13 UTC)
+
+Accord : « Continue la prochaine étape », à 18:54:30 UTC (transcription). La réponse est **consignée comme une interprétation** : un accord sur l'étape `croise`, la seule proposée dans la question précédente. Lancée sous bash, code **0**. Journal : [`diag-exec-croise.log`](diag-exec-croise.log). Les deux pods sont supprimés ; plus aucun à 18:58:23 UTC.
+
+| # | Résultat |
+|---|---|
+| G8 | **Tenue.** (a) runc avec lecture lente : code 124 au délai de 150 s ; 134 217 728 octets reçus, sha256 conforme |
+| G9 | **Tenue.** (b) Kata avec envoi lent : code 0 en 26,6 s, tout reçu |
+
+**Étape `croise`** (18:54:38 à 18:58:13 UTC, code 0) :
+- **(a) runc, lecture lente dans le pod** : code 124 au délai de 150 s, alors que les 134 217 728 octets sont reçus et que le sha256 est conforme. **Le blocage se reproduit hors de Kata.**
+- **(b) Kata, envoi lent** (environ 5 Mio/s) : **code 0 en 26,6 s**, tout reçu.
+
+**Kata n'est pas la cause.** L'exec ne rend pas la main quand une grande quantité de données d'entrée attend dans la chaîne de flux (kubectl, apiserver, kubelet, containerd) parce que le pod la lit moins vite qu'elle n'arrive. Le processus finit, et la fin de l'exec ne remonte pas. Kata n'y joue que par son débit plus faible (environ 10 Mo/s), qui crée cette attente. Le maillon exact de la chaîne n'est pas identifié. Aucun ticket Kubernetes, containerd ou Kata trouvé ne décrit ce cas.
+
+**Recherche** : aucun ticket ne correspond exactement à ce cas. Les plus proches (Kubernetes #112834 et #124571, sur des données perdues dans un exec) ne décrivent pas un exec qui ne rend pas la main.
+
+**Suite possible** : une bisection sur le nœud, avec un accord à part. `crictl exec` contourne l'apiserver et kubelet ; `ctr task exec` contourne en plus CRI.
+
