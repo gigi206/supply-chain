@@ -15,6 +15,11 @@ L'adresse de l'API et les noms internes sont retirés du texte.
 
 *Corrigé à 10:29 UTC, avant tout push, sur relecture du conseiller* : le texte disait que l'API « answered normally » pendant toute la panne. Ce n'est pas mesuré en continu : on sait seulement que les nœuds étaient `Ready` 77 s après le démarrage des VM (V1 du 07/11) et que les lectures kubectl ont réussi le 09/11. La phrase dit maintenant cela.
 
+*Additif du 10/11/2026, 10:43 UTC* : sur la question du propriétaire (« regarde le code source : il y a peut-être une option ou configuration, non ? »), le source de `v1.21.3` a été relu, cette fois avec `scheduler.go`, `reconcile.go` et `file.go`. Trois éléments ont été ajoutés au texte :
+- un rechargement ne recrée pas l'observateur ;
+- aucun réglage ne permet de le relancer ;
+- la correction possible par `NewSourceWithRetry`.
+
 ---
 
 **Title:** `loki.source.kubernetes_events`: event watcher never retries after a startup error, component stays healthy
@@ -50,6 +55,12 @@ One of the following:
 - `eventController.Run` (`internal/component/loki/source/kubernetes_events/event_controller.go`) logs `event watcher exited with error` and returns.
 - Controllers are only (re)created by `Component.reconcile()`. It is called from `Update()` (configuration change) and from `NotifyClusterChange()`, which returns early unless clustering is enabled.
 - So, without clustering, nothing restarts a watcher whose `Run` has returned, and `CurrentHealth` does not reflect it.
+- A configuration reload does not help either. `source.Scheduler` keeps the exited source in its map, so `Reconcile` sees the key as already scheduled (`s.Contains(key)`) and does not recreate it. Only a change of the `client` block, which calls `scheduler.Reset()`, or a restart of Alloy brings the watcher back.
+- There is no argument to tune this. `informerSyncTimeout` (10 min) is hard-coded, and it does not apply here anyway: discovery failed immediately with `connection refused`.
+
+**Possible fix**
+
+The same package already provides `source.NewSourceWithRetry`, which `loki.source.file` uses (`MinBackoff: 1s`, `MaxBackoff: 10s`). Wrapping the `eventController` returned in `reconcile()` the same way would retry the watcher with a backoff until the context is cancelled. Reporting the component as unhealthy while no watcher runs would also help alerting.
 
 A similar non-recovering state was fixed for `mimir.rules.kubernetes` in 1.22.0 (#6339). #233 is related (startup failure on a large number of events), but it is about the startup timeout, not about the missing retry. #274 (component failure not reflected in metrics) is also related.
 

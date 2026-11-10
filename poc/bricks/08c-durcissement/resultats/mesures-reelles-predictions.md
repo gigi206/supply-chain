@@ -1485,3 +1485,21 @@ Les décisions elles-mêmes, et l'envoi de l'issue (action publique), restent au
 - **(b4) Rien de plus que l'alerte**, avec une relance à la main, décrite dans le README de la 19b.
 
 Dans tous les cas, l'issue chez Alloy est le seul remède durable : elle demande une relance avec délai croissant, ou un état `unhealthy`.
+
+## Additif du 10/11/2026, 10:43 UTC : aucun réglage d'Alloy ne relance l'observateur, et un rechargement ne suffit pas
+
+**Accord du propriétaire** : « Oui, consigne », après la question « regarde le code source : il y a peut-être une option ou configuration, non ? ». Lecture publique du source d'Alloy au tag `v1.21.3`, par `gh api`. Rien n'a été lu ni écrit dans le cluster, Loki ou les VM. Ce sont des lectures du code, pas des mesures.
+
+**Aucun réglage.**
+- `loki.source.kubernetes_events` n'accepte que `forward_to`, `job_name`, `namespaces`, `log_format`, `client` et `clustering` (`kubernetes_events.go`, `Arguments`).
+- Le bloc `client` ne prend que `api_server`, `kubeconfig_file` et les réglages HTTP (`common/kubernetes/kubernetes.go`).
+- Le délai `informerSyncTimeout` (10 min) est écrit en dur. Il ne joue pas ici : la découverte a échoué tout de suite, par `connection refused` (additif du 09/11 à 17:01 UTC).
+- Aucun autre composant d'Alloy ne lit les Events : il n'y a pas de récepteur `k8s_events` sous `otelcol/receiver`.
+
+**Un rechargement ne recrée pas l'observateur.** `source.Scheduler` garde dans sa table la source dont `Run` a rendu la main. Au rechargement, `Reconcile` trouve la clé (`s.Contains(key)`) et ne recrée rien. Seuls deux cas recréent l'observateur :
+- un changement du bloc `client`, qui appelle `scheduler.Reset()` ;
+- un redémarrage d'Alloy.
+
+Cela précise l'additif du 09/11, ligne 969 (« avant un rechargement ou un redémarrage d'Alloy ») : un rechargement ne suffit que si le bloc `client` change. Le rechargement par SIGHUP du 09/11 à 22:37 UTC n'est pas en cause : l'observateur tournait depuis le redémarrage de 17:05 UTC. Pour le remède (b), il faut donc un `systemctl restart alloy`, pas un `reload`. C'est déjà la forme de (b1).
+
+**Correction amont possible, très courte.** Le même paquet fournit `source.NewSourceWithRetry`, une relance avec délai croissant, que `loki.source.file` utilise (`MinBackoff` 1 s, `MaxBackoff` 10 s, `file.go:416`). Il suffirait d'enrober de la même façon l'`eventController` créé dans `reconcile()`. Le brouillon d'issue le propose, sans avoir été envoyé ([`issue-alloy-brouillon.md`](issue-alloy-brouillon.md)). Une PR serait une action publique : elle demande l'accord du propriétaire.
