@@ -262,3 +262,5 @@ Tous les octets sont reçus dans les trois cas. **containerd, son serveur de flu
 
 **Additif du 10/11/2026, 20:38 UTC, à la décision RKE2 de cet ADR.** Un `kubectl exec` qui envoie à un pod d'un nœud agent plus de données qu'il n'en lit (au-delà d'environ 64 à 128 Mio en attente) ne rend pas la main. Le maillon fautif est le chemin par le tunnel de l'agent RKE2 (`remotedialer` et `proxy.Proxy`), d'après une preuve par différence ([diagnostic](../../poc/bricks/06-deb-sbuild/resultats/diag-exec-predictions.md)). Cela ne remet pas en cause RKE2 ; c'est une contrainte d'exploitation.
 
+**Additif du 10/11/2026, 20:41 UTC : décision du propriétaire sur le tunnel de RKE2.** « on ne veut pas du proxy avec cilium », consigné comme une interprétation : `egress-selector-mode: disabled` sur le server, pour que kube-apiserver joigne kubelet en direct. **Préparé à sec, NON APPLIQUÉ** ([prédictions](../../poc/bricks/08b-rke2/resultats/egress-selector-predictions.md)).
+

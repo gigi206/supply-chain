@@ -329,3 +329,14 @@ Décision du propriétaire : « Reprends à J8 », reprise de 15:25 à 15:59 UTC
 
 Détail : [diagnostic de la 06](../06-deb-sbuild/resultats/diag-exec-predictions.md).
 
+## Additif du 10/11/2026, 20:41 UTC : `egress-selector-mode: disabled` préparé à sec, NON APPLIQUÉ
+
+**Décision du propriétaire** : « on ne veut pas du proxy avec cilium ». `config/sc-confiance.yaml` reçoit `egress-selector-mode: disabled`.
+
+Le script [`egress-selector.sh`](egress-selector.sh) a trois étapes :
+- **`avant`** : vérifie, par sha256, que la configuration en place est celle du dépôt ;
+- **`appliquer`** : pose la nouvelle configuration et redémarre rke2-server ;
+- **`retour`** : revient à la configuration précédente.
+
+Prérequis vérifiés dans le dépôt : kubelet et Cilium (remplacement de kube-proxy) sur sc-confiance, 10250 ouvert entre nœuds. Prédictions E1 à E5 : [`egress-selector-predictions.md`](resultats/egress-selector-predictions.md). Chaque étape attend un accord nommé.
+

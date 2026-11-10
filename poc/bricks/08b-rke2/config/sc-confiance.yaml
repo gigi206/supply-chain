@@ -13,6 +13,10 @@ profile: cis
 cni: none
 ingress-controller: none
 disable-kube-proxy: true
+# Additif du 10/11/2026, 20:40 UTC (décision du propriétaire : « on ne veut pas du proxy avec cilium »), NON APPLIQUÉ : sans tunnel de
+# l'agent ni proxy CONNECT du superviseur pour joindre kubelet ; kube-apiserver le joint en direct (10250 ouvert entre nœuds par
+# hote-commun de la 08c). Cause : kubectl exec bloqué sur le chemin remotedialer (brique 06, resultats/diag-exec-predictions.md).
+egress-selector-mode: disabled
 disable:
   - rke2-coredns
   - rke2-metrics-server
