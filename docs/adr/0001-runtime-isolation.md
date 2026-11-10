@@ -229,3 +229,9 @@ Le choix de Kata n'est pas en cause pour ce point. La règle d'exploitation devi
 
 Tous les octets sont reçus dans les trois cas. **containerd, son serveur de flux CRI et le shim ne sont pas en cause** : la même lecture lente, qui bloque par `kubectl exec`, passe par `crictl exec` (crictl 1.35.0, containerd 2.2.7-k3s1). **Le maillon fautif est en amont, dans kubelet, l'apiserver ou kubectl**, et leur relais du flux. Il n'est pas encore identifié.
 
+**Additif du 10/11/2026, 19:53 UTC : transfert par `kubectl exec`, étape amont.** **Étape amont** (19:47:37 à 19:52:40 UTC, code 0 ; pod runc, 128 Mio lus lentement dans le pod) :
+- **C1** (kubectl de l'hôte, 1.35.10) : code 124 au délai de 150 s, tout reçu ;
+- **C2** (kubectl de sc-confiance, 1.35.9+rke2r1, données tirées sur sc-confiance) : **code 124 au délai, tout reçu**.
+
+**Le poste, son réseau vers les VM et sa version de kubectl sont hors de cause. Avec la bisection, le maillon est situé dans l'apiserver ou kubelet**, dans leur relais du flux d'exec, entre kubectl et le serveur de flux de containerd. Les journaux de kubelet et de kube-apiserver de la fenêtre ne disent rien de cet exec à leur verbosité actuelle. Kubelet n'a écrit qu'une ligne, sur la durée de démarrage du pod, sans rapport.
+

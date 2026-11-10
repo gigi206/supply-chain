@@ -1,0 +1,12 @@
+# diag-exec-kata.sh amont, 2026-11-10T19:47:37Z
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 19:47:38 UTC
+## C1 kubectl de l'hôte, lecture lente
+C1 : 134217728 octets, code 124 en 150009 ms ; reçus dans le pod : 134217728
+## C2 kubectl de sc-confiance, lecture lente
+C2 : 134217728 octets, code 124 en 150003 ms ; kubectl de sc-confiance : Client Version: v1.35.9+rke2r1
+     reçus dans le pod : 134217728
+pod diag-exec-kata supprimé
+## journaux, fenêtre 2026-11-10T19:47:38 à 2026-11-10T19:52:39 UTC (VM en UTC : journal système relevé en +00:00 à l'étape noeud)
+### kubelet (sc-build, /var/lib/rancher/rke2/agent/logs/kubelet.log)
+I1110 19:52:39.670126     919 pod_startup_latency_tracker.go:148] "Observed pod startup duration" pod="builds/diag-exec-kata" podStartSLOduration=302.670108754 podStartE2EDuration="5m2.670108754s" totalImagesPullingTime="0s" totalInitContainerRuntime="0s" isStatefulPod=false podCreationTimestamp="20
+### kube-apiserver (sc-confiance, /var/log/pods)

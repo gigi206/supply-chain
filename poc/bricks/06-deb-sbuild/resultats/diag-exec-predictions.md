@@ -257,3 +257,25 @@ Demande : « Prépare », à 19:43:19 UTC (transcription).
 - **C2 passe** : le maillon est sur le poste. C'est soit kubectl 1.35.10, soit le réseau entre l'hôte et les VM.
 - **C2 bloque** : le maillon est dans l'apiserver ou kubelet. Les journaux diront peut-être lequel.
 
+## Résultat de l'étape amont (10/11/2026, 19:47:37 à 19:52:40 UTC)
+
+Accord : « Oui », à 19:47:30 UTC (transcription), en réponse à « Je lance l'étape amont ? ». Lancée sous bash, code **0**. Journal : [`diag-exec-amont.log`](diag-exec-amont.log). Le pod est supprimé.
+
+| # | Résultat |
+|---|---|
+| C1 | **Tenue.** Code 124 au délai, 134 217 728 octets reçus |
+| C2 | **Tenue.** Code 124 au délai, 134 217 728 octets reçus |
+| C3 | Aucune ligne utile dans les journaux de kubelet et de kube-apiserver pour la fenêtre |
+
+**Étape amont** (19:47:37 à 19:52:40 UTC, code 0 ; pod runc, 128 Mio lus lentement dans le pod) :
+- **C1** (kubectl de l'hôte, 1.35.10) : code 124 au délai de 150 s, tout reçu ;
+- **C2** (kubectl de sc-confiance, 1.35.9+rke2r1, données tirées sur sc-confiance) : **code 124 au délai, tout reçu**.
+
+**Le poste, son réseau vers les VM et sa version de kubectl sont hors de cause. Avec la bisection, le maillon est situé dans l'apiserver ou kubelet**, dans leur relais du flux d'exec, entre kubectl et le serveur de flux de containerd. Les journaux de kubelet et de kube-apiserver de la fenêtre ne disent rien de cet exec à leur verbosité actuelle. Kubelet n'a écrit qu'une ligne, sur la durée de démarrage du pod, sans rapport.
+
+**Pour aller plus loin** :
+- appeler l'API d'exec de kubelet directement, sans l'apiserver. Il faudrait le certificat client de l'apiserver vers kubelet, un secret à utiliser sans le lire ;
+- ou monter la verbosité des journaux. C'est un changement de la plateforme.
+
+L'une et l'autre demandent une décision du propriétaire.
+
