@@ -58,3 +58,30 @@ Lancé sous `unshare -rn`, dans un espace réseau vide : aucune requête au clus
 **Portée** : ce passage ne lit que le dépôt. Il ne prouve ni l'état du cluster, ni le comportement de Cilium ; c'est l'objet de E1 et E2. **E1 à E4 ne sont pas lancées.**
 
 **Push précédent**, consigné ici : le 10/11/2026 à 14:08:34 UTC, `bc0f352..145f67a`, contrôle des secrets OK sur 22 fichiers.
+
+## Additif du 10/11/2026, 14:29 UTC : invariant des labels exclus ; prédiction E0 bis, écrite avant exécution
+
+**Trou relevé par le conseiller, sur relecture.**
+- Dans le dépôt, `builds-sans-internet` exclut désormais `prefetch-deb`. L'étape `appliquer` ne pose que ce fichier.
+- Si on la relance, ou si un rejeu pose cette règle sans `prefetch-deb-sortie`, un pod `prefetch-deb` n'est sélectionné par aucune politique. Il a alors tout Internet, tous ports compris, et les invariants passent quand même.
+- Le pod `racine` de `06/s1.sh` porte ce label : il serait le premier exposé.
+- Le même cas se produit après `deb_retirer` suivi d'`appliquer`.
+
+**Correctif**
+- `invariants()` vérifie désormais chaque label exclu d'un refus (`NotIn` d'une politique à `egressDeny`). Ce label doit être sélectionné par au moins une politique qui a des règles `egress`, avec `enableDefaultDeny.egress` différent de `false`.
+- `deb_sec` ajoute une seconde contre-épreuve.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| E0 bis | `deb_sec` sous `unshare -rn` : les mêmes lignes qu'en E0, plus « labels exclus d'un refus sans politique de sortie dédiée » vide. La seconde contre-épreuve, sans `prefetch-deb-sortie`, signale `tekton.dev/task=prefetch-deb`. Code 0 | haute |
+
+**Dans le cluster, non lancé** :
+- avant `deb_appliquer`, le nouvel invariant devrait être vide, puisque `prefetch-gomod` est couvert par `prefetch-sortie` ;
+- `prealables`, sans aucun refus, donne aussi un résultat vide.
+
+**shellcheck** : une remarque `SC2016` de plus, de niveau info, sur la nouvelle variable jq. Les guillemets simples y sont voulus.
+
+*Corrigé à 14:29 UTC, avant tout push* : le message du commit c980b47 donne « 14:20 à 14:25 UTC ».
+- **Préparation** : de 14:19 UTC (relevé DNS) à 14:23:36 UTC (commit).
+- **14:25** n'a jamais été relevé.
+- **E0** : partie à 14:23:47 UTC, après ce commit.

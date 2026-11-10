@@ -68,7 +68,15 @@ invariants() { # [source : politiques (cluster, par défaut) | politiques_depot]
   # toute politique qui autorise une sortie par CIDR : ses matchLabels (seul sélecteur employé par ces règles) ne doivent pas être
   # retenus par une politique de refus de builds ; sinon le refus l'emporte sans bruit (deny.rst)
   attendu "politiques à sortie CIDR dont les pods seraient aussi sous un refus" "$(sel "$SOUS_REFUS")" ""
+  attendu "labels exclus d'un refus sans politique de sortie dédiée" "$(sel "$EXCLUS_SANS_SORTIE")" ""
 }
+# Ajouté le 10/11/2026 à 14:28 UTC (relecture du conseiller) : un label exclu d'un refus (NotIn) que ne sélectionne aucune politique à
+# règles egress et refus par défaut en sortie aurait tout Internet sans bruit (cas : builds-sans-internet du dépôt posé seul, sans
+# prefetch-deb-sortie). enableDefaultDeny.egress absent vaut vrai dans Cilium dès qu'une règle egress existe ; seul false l'écarte.
+EXCLUS_SANS_SORTIE='. as $tout | [.items[] | select((.spec.egressDeny // []) | length > 0) | (selecteur.matchExpressions // [])[]
+  | select(.operator == "NotIn") | .key as $k | .values[] | {($k): .}] | unique | [.[] | . as $l
+  | select(any($tout.items[]; ((.spec.egress // []) | length > 0) and .spec.enableDefaultDeny.egress != false and selectionne($l)) | not)
+  | to_entries[0] | "\(.key)=\(.value)"] | join(", ")'
 SOUS_REFUS='. as $tout | [.items[] | select(sortie_cidr) | (selecteur.matchLabels // {}) as $l | nom as $n
   | select(any($tout.items[]; ((.spec.egressDeny // []) | length > 0) and selectionne($l))) | $n] | join(", ")'
 invariants_deb() { # source : politiques | politiques_depot
@@ -170,6 +178,10 @@ etape_deb_sec() {
   jq '(.items[] | select(.metadata.name == "builds-sans-internet") | .spec.endpointSelector.matchExpressions[0].values) = ["prefetch-gomod"]' \
     "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
   attendu "politiques à sortie CIDR sous un refus, NotIn d'origine" "$(sel "$SOUS_REFUS")" "CiliumNetworkPolicy prefetch-deb-sortie"
+  echo "## contre-épreuve : builds-sans-internet du dépôt sans prefetch-deb-sortie, l'invariant des labels exclus doit signaler prefetch-deb"
+  politiques_depot
+  jq '.items |= map(select(.metadata.name != "prefetch-deb-sortie"))' "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "labels exclus d'un refus sans politique de sortie dédiée, sans prefetch-deb-sortie" "$(sel "$EXCLUS_SANS_SORTIE")" "tekton.dev/task=prefetch-deb"
 }
 etape_deb_appliquer() {
   attendu "NotIn de builds-sans-internet avant" "$(notin)" '["prefetch-gomod"]'
