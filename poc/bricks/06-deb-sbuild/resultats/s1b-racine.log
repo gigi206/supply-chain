@@ -1,0 +1,141 @@
+# s1.sh racine, 2026-11-10T13:24:34Z
+### s1-racine (runtimeClassName kata, uid 0, contexte {"privileged":true,"allowPrivilegeEscalation":true}) : prêt
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; /w : tmpfs
+     apt-get update : rc 0 en 4 s, 2 ligne(s) Get
+     InRelease : sha256 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+     installation de mmdebstrap : rc 0 en 13 s ; mmdebstrap 1.5.7
+     deb amorce libexpat1_2.8.3-1~deb13u1_amd64.deb 38abe0e710a07688e9c149d74536e67cfee0364bdb64dd6d644c32a1cfad389f
+     deb amorce libffi8_3.4.8-2_amd64.deb 0ebdc340de33333639c3c63874cd4b15ac2e83dfa1ef3053b7eefaf4919f4f68
+     deb amorce libgdbm-compat4t64_1.24-2_amd64.deb 2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01
+     deb amorce libgdbm6t64_1.24-2_amd64.deb e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc
+     deb amorce libncursesw6_6.5+20250216-2_amd64.deb 47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7
+     deb amorce libperl5.40_5.40.1-6+deb13u1_amd64.deb e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273
+     deb amorce libpython3-stdlib_3.13.5-1_amd64.deb 7e142ed64a81ccdd39714f213467bd365736ef341adb2be11be981f638b9175f
+     deb amorce libpython3.13-minimal_3.13.5-2+deb13u5_amd64.deb a4aa6a9a8c77f87bfe545e1d14ec42c001d189ace90e3aa75deec882b39dee49
+     deb amorce libpython3.13-stdlib_3.13.5-2+deb13u5_amd64.deb db161322a3481d2c0c3b9a3b9a03c3ab0e2b1718f54b88755fb4a3f939165b84
+     deb amorce libreadline8t64_8.2-6_amd64.deb eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967
+     deb amorce media-types_13.0.0_all.deb 0788e4b0b72db1bcf74a19cb24c3511e7770ad0b341f0f30e361701c3072f53e
+     deb amorce mmdebstrap_1.5.7-1+deb13u1_all.deb df731ee92b0ad40f9618b8b1c98c2e90635224f6b21c0905dab65ca099c8fe14
+     deb amorce netbase_6.5_all.deb 76bafa92947ebd37b0a6f9ec6570412041f56edebc1c66d323731216d318471e
+     deb amorce perl-modules-5.40_5.40.1-6+deb13u1_all.deb 4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce
+     deb amorce perl_5.40.1-6+deb13u1_amd64.deb ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd
+     deb amorce python3-minimal_3.13.5-1_amd64.deb a5d2371bebf3689f676e3f3bae800371bcc4392a8a51269e23d528249b399615
+     deb amorce python3.13-minimal_3.13.5-2+deb13u5_amd64.deb c1fda9e7b1bf15b2fa75a238d8a8710e142fe14c722fc650c5fc614f078c9073
+     deb amorce python3.13_3.13.5-2+deb13u5_amd64.deb 460c1fd72845516ac3ce9d1686916f3ab2e4c86f8a9746e14d26243a47e2b98d
+     deb amorce python3_3.13.5-1_amd64.deb c1388174dc7140e6c19a6dd39f8a0dcb38a835cd66c65644e0dded43d5223cb0
+     deb amorce readline-common_8.2-6_all.deb f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9
+     deb racine adduser_3.152_all.deb e50984d2e1ef6300e3fd51303839842189a077b10cb5cadff1923df10c61c493
+     deb racine apt-utils_3.0.3_amd64.deb 679daae89a4f3a514e17de6efb7a6125fd727eb4999cdbaeacd8bab118b8ee69
+     deb racine apt_3.0.3_amd64.deb 55e341fbe92d7502c98faf1b3c235393ea0744db119cf2173603e965b658aef4
+     deb racine binutils-common_2.44-3_amd64.deb 002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9
+     deb racine binutils-x86-64-linux-gnu_2.44-3_amd64.deb e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53
+     deb racine binutils_2.44-3_amd64.deb 6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb
+     deb racine bzip2_1.0.8-6_amd64.deb 6b5fbe71f0fc41e85919bc4b3c514e6c47577c5005dbf1f5af6e4a49cc221aab
+     deb racine debian-archive-keyring_2025.1_all.deb 9ea7778e443144ca490668737a8ab22dd3e748bb99e805e22ec055abeb3c7fac
+     deb racine dirmngr_2.4.7-21+deb13u1+b5_amd64.deb 385b4689f43678dbd097ada002ec19733179777ac2a6c0229ae292cae17f0833
+     deb racine dpkg-dev_1.22.22_all.deb 6d4020421740a70e1fb9c41b07f8bb8306d93aef6fea1a8ce11a1f839921f414
+     deb racine gnupg-l10n_2.4.7-21+deb13u1_all.deb 65c0b5b06123f81f08cfa9b0be313cbc9cf6255c550d70eabd8b175ce8928a35
+     deb racine gnupg_2.4.7-21+deb13u1_all.deb e68f0fd24a7a62f1112ae3e442564e134f21040492f11d1aefa7b18de93ebf6e
+     deb racine gpg-agent_2.4.7-21+deb13u1+b5_amd64.deb ebc440c05dd5c5ba35f0b0035d7653866ce26c47c826ffbb5a3440773f28da03
+     deb racine gpg_2.4.7-21+deb13u1+b5_amd64.deb 3aeedf3d223e5e6aff08f03227af6ce308f4317472609f383350fd2ec20d33ae
+     deb racine gpgconf_2.4.7-21+deb13u1+b5_amd64.deb 14668f3f4847d2544bdff03c2ca8dbdd2fe0ad1bc7ded00941db291954c60f1b
+     deb racine gpgsm_2.4.7-21+deb13u1+b5_amd64.deb 092f4675a1810ca7b51a1d53595f9e0c3ab65210c15805749e91030769e2301b
+     deb racine iproute2_6.15.0-1_amd64.deb 7b2dcade4a83ded723fcab21c5a53c47f29352c9c5e1661a089a1e481b3fb48a
+     deb racine libapt-pkg7.0_3.0.3_amd64.deb fdcc9f780c7de466c7f0038e6e242c73cb63c8f9fe2781a3185a2c810984ab0a
+     deb racine libassuan9_3.0.2-2_amd64.deb 9d78ef8f016e7f24b5e20d1ce91939fe0f1f897e5f9059793201e930ded7eb8e
+     deb racine libbinutils_2.44-3_amd64.deb 4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679
+     deb racine libbpf1_1%3a1.5.0-3_amd64.deb 04c96ead3024888d80d08c8d08cc8cf4589f4614627acc69519f87ffb5adc1c2
+     deb racine libbsd0_0.12.2-2_amd64.deb e5a85986fa6bec3307ab1bc860736b478b331882bc45e17675a7bdf88eecb43a
+     deb racine libcap2-bin_1%3a2.75-10+deb13u1+b3_amd64.deb 6404b8ee315ce3eb8e273981650e419ff0e91aed5213d4975a6895f98944ea80
+     deb racine libclass-data-inheritable-perl_0.10-1_all.deb 363776352e02e2a4423997d1f03a815194bf69c391fb5d460e3327f244d0b635
+     deb racine libcom-err2_1.47.2-3+b12_amd64.deb bd43e020b8fed399db3eebf098111f10fba4c436fff99ccad72cc7e27c9764ec
+     deb racine libctf-nobfd0_2.44-3_amd64.deb e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657
+     deb racine libctf0_2.44-3_amd64.deb 120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5
+     deb racine libdevel-stacktrace-perl_2.0500-1_all.deb 34f9d4bb6f73e4a7d2af533a04ca1ce7de8dfdab4d9af3d201a8d1c552261607
+     deb racine libdpkg-perl_1.22.22_all.deb b41eaeb4879091023f8c1a058510844a244d3d0bd0f437e0e05d58213e36fd9f
+     deb racine libelf1t64_0.192-4_amd64.deb 94497b7e17b6f574a0605b380d454e20d3f01a9c63b70c2a2263f679d30053e1
+     deb racine libemail-date-format-perl_1.008-1_all.deb 2337200c360f282dd5a973c0f20ac005f3e138510723ed7bfc740abed43f1886
+     deb racine libexception-class-perl_1.45-1_all.deb 2a334645983bfadc0522651c6d86999ebb9b37cf10588ef5b6631c40e045bd1c
+     deb racine libexpat1_2.8.3-1~deb13u1_amd64.deb 38abe0e710a07688e9c149d74536e67cfee0364bdb64dd6d644c32a1cfad389f
+     deb racine libffi8_3.4.8-2_amd64.deb 0ebdc340de33333639c3c63874cd4b15ac2e83dfa1ef3053b7eefaf4919f4f68
+     deb racine libfilesys-df-perl_0.92-7+b4_amd64.deb 9090a48bafa583628386eb8f36c9f1e3ad5fa14e96c1f4f104c1c7515887112e
+     deb racine libgcrypt20_1.11.0-7+deb13u1_amd64.deb f0eb41f8cb40896e0822e9ab65611e8383c12b721c76c54764f744abb4a8c247
+     deb racine libgdbm-compat4t64_1.24-2_amd64.deb 2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01
+     deb racine libgdbm6t64_1.24-2_amd64.deb e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc
+     deb racine libgnutls30t64_3.8.9-3+deb13u4_amd64.deb 18a8bdfd91c7e3bcb01719d55a2b56849c7160b34f1f52b1c4fdfdd41bf1352b
+     deb racine libgpg-error0_1.51-4_amd64.deb 22b95570fd41c113ef6f5651563b4d748292844baab1278a46eb940c1dec2322
+     deb racine libgprofng0_2.44-3_amd64.deb 0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648
+     deb racine libgssapi-krb5-2_1.21.3-5+deb13u1_amd64.deb 30847c1fde4240567d7ed3aeab4f655dd591203758b857e85e824045aae70299
+     deb racine libhogweed6t64_3.10.1-1_amd64.deb b059ed155115ac09da295322de48ee1ed58ef5fa45edcc9e12ff0e94636ef25f
+     deb racine libidn2-0_2.3.8-2_amd64.deb 90b039bcdc4578f8e1c4935adf8dbb525e36a164deefdbbb8c45bac347d48278
+     deb racine libio-socket-ssl-perl_2.089-1_all.deb 9fe58e2dd2847896e380f9fb26b5344d62cab21d8390598912e485ceedb30f00
+     deb racine libjansson4_2.14-2+b3_amd64.deb 60707a62fe6c1228c3389b12a13ca4efd76defc5532473e547a29e99cf7d2a6e
+     deb racine libk5crypto3_1.21.3-5+deb13u1_amd64.deb 7da07ee674b47f1f0be7cc89317c25310086a1f1761217d0f72e6ae2c5a69b84
+     deb racine libkeyutils1_1.6.3-6_amd64.deb 0b11ad17be0300b63ad4eeb4c6450fed24d34b7b740f23e5363dcb29ee6d5eba
+     deb racine libkrb5-3_1.21.3-5+deb13u1_amd64.deb 47d71d6a7f2e59b9bae5f89602397594805113b95889ad18fa703cd53abafc97
+     deb racine libkrb5support0_1.21.3-5+deb13u1_amd64.deb 3a0acd8b37955c0e102c756b52c97df2a31f67b96453c35dab70df218d309117
+     deb racine libksba8_1.6.7-2+b1_amd64.deb 45bc1bfaf41a5e1136b1c1f58c495a950888da33a617de24202f3568e45b9572
+     deb racine libldap2_2.6.10+dfsg-1_amd64.deb 60069e4a550ca890113fa89d3001417781b18e146ec5d637d31e368dec9909bd
+     deb racine liblz4-1_1.10.0-4_amd64.deb c31ec4c7c82755a38b2f3fe066fc0c5518cc91a601a268fbcd19bdacb1f22e1e
+     deb racine libmailtools-perl_2.22-1_all.deb 5f357d31747638132da12d432b3fc3a52a979221fab40de0d6d5334aa23b070d
+     deb racine libmime-lite-perl_3.033-2_all.deb e31e25580a6efa762fa47c5b8534618d117cbbaf2c8301e22006fdd37898fae1
+     deb racine libmnl0_1.0.5-3_amd64.deb 4ec9c1096e0b954e3bdb03a62314ee7f49999045d3d55be3e4ded520ffc9baf5
+     deb racine libncursesw6_6.5+20250216-2_amd64.deb 47baa2e11579583654583a066b69bd5a5d2f22423081f707ed6c0c3ba6d538b7
+     deb racine libnet-smtp-ssl-perl_1.04-2_all.deb 7688f64b65c9679449790e8bcdbbed849269caf3b607c7b39c447be10db177c5
+     deb racine libnet-ssleay-perl_1.94-3_amd64.deb fc67b418ec1ed7277902702791c91b3023eb488d7c01029f0cc2acfdfdebd13a
+     deb racine libnettle8t64_3.10.1-1_amd64.deb 1b03d4a9cd9c8143ba50fe6396f36937e901a317d492d179f4596862c1731cfe
+     deb racine libnpth0t64_1.8-3_amd64.deb 37d489976ef91ca0165a7789a7a7ac5923ee3cfadf316ac3e87582e15d0523d7
+     deb racine libp11-kit0_0.25.5-3_amd64.deb 784bf2063e166c8bc851a32623b74ebd85c499043a9d57c5bbd64fa63447f45a
+     deb racine libperl5.40_5.40.1-6+deb13u1_amd64.deb e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273
+     deb racine libpython3-stdlib_3.13.5-1_amd64.deb 7e142ed64a81ccdd39714f213467bd365736ef341adb2be11be981f638b9175f
+     deb racine libpython3.13-minimal_3.13.5-2+deb13u5_amd64.deb a4aa6a9a8c77f87bfe545e1d14ec42c001d189ace90e3aa75deec882b39dee49
+     deb racine libpython3.13-stdlib_3.13.5-2+deb13u5_amd64.deb db161322a3481d2c0c3b9a3b9a03c3ab0e2b1718f54b88755fb4a3f939165b84
+     deb racine libreadline8t64_8.2-6_amd64.deb eeadf2b5e755c9f183883feea2d9b5b28560284275d5f54d3e55d0923b1d0967
+     deb racine libsasl2-2_2.1.28+dfsg1-9_amd64.deb 66e49d7ae026811b49a0050f18b0325960a2625ffd1ff60d91b7844a815fa9d2
+     deb racine libsasl2-modules-db_2.1.28+dfsg1-9_amd64.deb a5c38659fbd62c33c6d9bfa2be43e75a572d1818531aad32dd74d0a58cc4bd19
+     deb racine libsbuild-perl_0.89.3+deb13u4_all.deb 483c2ad62c4dd8e9b47a9dde938b084841679ed4f575ba6154f1f35d6805e8f1
+     deb racine libseccomp2_2.6.0-2_amd64.deb 89d5138e05fb6a86b9afd8b54dc0fb4b14f4c27c05e6c5f767c2132bdf808531
+     deb racine libsemanage-common_3.8.1-1_all.deb 65375d886749c236bd1da4d9990b7c2469d2fe66019a28e5614f6814376d3dcb
+     deb racine libsemanage2_3.8.1-1_amd64.deb f97da7505d17ad3bdd8fc56302256df7e158e5e0d8b02cb766654199cbc406a9
+     deb racine libsepol2_3.8.1-1_amd64.deb 3595d2d3a6d24695e7953f4f00cdfe6974c9242d9a8dfee8998e77fbf7b2ba09
+     deb racine libsframe1_2.44-3_amd64.deb 38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f
+     deb racine libstdc++6_14.2.0-19_amd64.deb ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0
+     deb racine libsubid5_1%3a4.17.4-2_amd64.deb 4d4faef8143c117a055a9041a7e99f8ba014c420a9b6e2fef5c693482581a204
+     deb racine libtasn1-6_4.20.0-2+deb13u1_amd64.deb 23fec6e06583ce2bad9b2c04c9b485e90440e259b1abf8677cd80d3ce60831ad
+     deb racine libtimedate-perl_2.3300-2_all.deb 8e36723da883c2975d83199e7f4b5331e291881372fde944b0d56660965f38bb
+     deb racine libtirpc-common_1.3.6+ds-1_all.deb 300f582e2c9151a8d329568c705cadc76252c417147312fe331c4560d2c7a6c3
+     deb racine libtirpc3t64_1.3.6+ds-1_amd64.deb ef4536c09bf5063554310e22d586ae90990100ba66d2fe7c35660e9e658913b6
+     deb racine libunistring5_1.3-2_amd64.deb 6dd3490bef06ea1096f32d10766b7e016cf579bfae8451d1b7df15ce05b8aa46
+     deb racine libxtables12_1.8.11-2_amd64.deb 4de5aa59faef5e98d6ba9f5f521a915be5641f224f597862f8d29e8319e8db16
+     deb racine libxxhash0_0.8.3-2_amd64.deb 81da7064d56fc044f5db4bb3c1e80ff50a4986dcbbf80d958eeca565b44c157f
+     deb racine login.defs_1%3a4.17.4-2_all.deb b4bbb8242cbf5588de7aafeb9d578a3dee1db2891f444ab454fd30bd80ccf2b4
+     deb racine login_1%3a4.16.0-2+really2.41.5-0+deb13u1_amd64.deb 8fc5869532a73d577c4abb5ed917e048bbd72148702ea1dcadd3817064f3e887
+     deb racine make_4.4.1-2_amd64.deb 70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6
+     deb racine media-types_13.0.0_all.deb 0788e4b0b72db1bcf74a19cb24c3511e7770ad0b341f0f30e361701c3072f53e
+     deb racine mmdebstrap_1.5.7-1+deb13u1_all.deb df731ee92b0ad40f9618b8b1c98c2e90635224f6b21c0905dab65ca099c8fe14
+     deb racine mount_2.41.5-0+deb13u1_amd64.deb eb70a615114ac40123768beb20e302554d5cb7edb33290be7e418ebe1075c878
+     deb racine netbase_6.5_all.deb 76bafa92947ebd37b0a6f9ec6570412041f56edebc1c66d323731216d318471e
+     deb racine passwd_1%3a4.17.4-2_amd64.deb c5eaef41c6947d2888fa3462f787a7e02158b997bd0119154283f425ba57b8b8
+     deb racine patch_2.8-2_amd64.deb 80c46a0085b33acc74bf451fddb6a70cb43d4ebcc4a873aec04d8d0a63ffc630
+     deb racine perl-modules-5.40_5.40.1-6+deb13u1_all.deb 4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce
+     deb racine perl-openssl-defaults_7+b2_amd64.deb e1d601fe96d5465a90042b49921b2086347a2e2111705972ba415ce9f9f3a871
+     deb racine perl_5.40.1-6+deb13u1_amd64.deb ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd
+     deb racine pinentry-curses_1.3.1-2_amd64.deb aed82cd9cc92b8a37f1332f951737f549595a3126aa609e632f9205d95405efc
+     deb racine python3-minimal_3.13.5-1_amd64.deb a5d2371bebf3689f676e3f3bae800371bcc4392a8a51269e23d528249b399615
+     deb racine python3.13-minimal_3.13.5-2+deb13u5_amd64.deb c1fda9e7b1bf15b2fa75a238d8a8710e142fe14c722fc650c5fc614f078c9073
+     deb racine python3.13_3.13.5-2+deb13u5_amd64.deb 460c1fd72845516ac3ce9d1686916f3ab2e4c86f8a9746e14d26243a47e2b98d
+     deb racine python3_3.13.5-1_amd64.deb c1388174dc7140e6c19a6dd39f8a0dcb38a835cd66c65644e0dded43d5223cb0
+     deb racine readline-common_8.2-6_all.deb f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9
+     deb racine sbuild_0.89.3+deb13u4_all.deb 544ca6dc2201741bb639a2ab52664d7d181e35877feecb743d54b80c55eb0b3f
+     deb racine sqv_1.3.0-3+b2_amd64.deb 97760aa17acceee0cace13d9edbed781d891b43e0dec0d6ddc4bd5e4c3ac65aa
+     deb racine tzdata_2026c-0+deb13u1_all.deb 813b9bbbe14ccda2b24617b8bade0ade4d745957e75921766c153d249886bd4c
+     deb racine uidmap_1%3a4.17.4-2_amd64.deb a017182d42a32ca241cd830a59153488e1f65ae6e31a760014575878044a9d2d
+     deb racine xz-utils_5.8.1-1+deb13u1_amd64.deb 9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217
+     mmdebstrap racine : rc 0 en 52 s, 344634880 octets, sha256 f8f221cadb6fe64ad6b3cf3a4baf6464ffe860d0cca80691dc3a47739381ca44
+     (code de l'exec : 0)
+OK   InRelease lu par apt dans le pod = InRelease vérifié sur l'hôte : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+paquets contrôlés : amorce 20, racine 107
+OK   sha256 des .deb conformes au Packages vérifié : 127 sur 127
+OK   archive racine rapatriée : f8f221cadb6fe64ad6b3cf3a4baf6464ffe860d0cca80691dc3a47739381ca44
+OK   chroot du premier passage, réutilisé : 440ba93bf3e42cd5b9d401db8b74227d77805bcae05c973ca516b7de1407b315
+pod s1-racine supprimé

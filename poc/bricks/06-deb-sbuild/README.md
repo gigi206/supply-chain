@@ -148,3 +148,21 @@ La relance a eu lieu à 13:22 UTC, sur l'accord « Oui, relance ». RL1 et RL2 s
 - Nouvelle image : `essais-06/sbuild-debian13:s1b`.
 - Prédictions B1 à B4 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md).
 - Accord nommé attendu.
+
+## Additif du 10/11/2026, 13:29 UTC : S1 clos, mode retenu sbuild unshare en pod Kata privilégié
+
+Le second passage `s1b` a été exécuté de 13:24 à 13:28 UTC, sur l'accord « Oui, lance s1b ». B1 à B4 sont tenues ; détail dans les [prédictions et résultats](resultats/s1-predictions.md).
+
+**Résultat**
+- sbuild construit sample-app en 79 s.
+- **Le deb (`0b489d43…`) est identique, octet pour octet, à celui d'OBS.** Aucune prédiction n'avait été faite sur ce point.
+
+**Mode retenu** : `sbuild --chroot-mode=unshare` dans un pod Kata privilégié (D1 a), sous l'UID 1000.
+
+**Écartés** : D1 (b), et les replis 1 à 3.
+
+**Image d'essai** : `essais-06/sbuild-debian13@sha256:d8041f9c…`. Elle contient iproute2 en plus de sbuild, mmdebstrap et uidmap.
+
+**Reste**
+- S2 : fermeture D2 (a), constructions reproductibles, image sous `builders/`.
+- Le constat P3, une sortie http d'un pod de `builds` sans label, à soumettre au propriétaire.

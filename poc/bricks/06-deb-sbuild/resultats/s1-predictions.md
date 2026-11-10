@@ -139,3 +139,40 @@ Les effets sont un pod Kata root pour mmdebstrap, un pod Kata pour l'essai et ce
 | B4 | L'avertissement `/dev/console` reste, sans effet sur le build | haute |
 
 Pas de prédiction sur l'égalité du deb avec celui d'OBS (`0b489d43…`).
+
+### Résultat de s1b (13:24:34 à 13:28 UTC, accord : « Oui, lance s1b »)
+
+Journaux : [`s1b-racine.log`](s1b-racine.log), [`s1b-image.log`](s1b-image.log), [`s1b-relance.log`](s1b-relance.log) et [`s1b-relance-sbuild.log`](s1b-relance-sbuild.log).
+
+**Écrit dans Zot, de façon définitive** : `essais-06/sbuild-debian13@sha256:d8041f9cf7254a1e73523dc1b01e4065c0c9f9f4e7f8c9dc4e3c5fd656f495a1`, avec le tag `s1b`. Seule une nouvelle couche de 132,3 Mo a été poussée.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| B1 | `iproute2_6.15.0-1` installé, avec sa dépendance `libcap2-bin`. 127 .deb (amorce 20, racine 107), tous conformes au `Packages` vérifié | tenue |
+| B2 | Couche du chroot identique au premier passage (`sha256:1744236b…`). La couche de la racine change (`sha256:0afc00f4…`) | tenue |
+| B3 | sbuild rc 0 en 79 s, statut `successful`, Build-Time 20 s. Un seul deb : `sample-app_1.0.0-1_amd64.deb`, sha256 `0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5`, mesuré dans le pod et repris par les `.changes` | tenue |
+| B4 | 222 lignes `cannot bind-mount /dev/console`, sans effet sur le statut | tenue |
+
+**Fait sans prédiction** : le deb est **identique, octet pour octet, à celui d'OBS** (`0b489d43…`). Le même `.dsc` a été construit avec les mêmes versions de Go, de nodejs et de debhelper, dans deux constructeurs différents : sbuild en mode unshare sous Kata, et OBS.
+
+## Conclusion de S1 (écrite le 10/11/2026 à 13:29 UTC)
+
+**Mode retenu : `sbuild --chroot-mode=unshare` dans un pod Kata privilégié (D1 a), sous un compte non root (UID 1000).**
+
+**Pourquoi ce mode**
+- `newuidmap` et `newgidmap` agissent par leur bit setuid, car `/` est monté sans `nosuid` dans l'invité.
+- Le réseau est coupé par sbuild pendant le build.
+
+**Ce qui est écarté**
+- **D1 (b)** : `newuidmap` y échoue, avec EPERM sur `uid_map` (cause non diagnostiquée).
+- **Les replis 1 à 3 du README** : sans objet.
+
+**Ce que l'image doit contenir** : `iproute2` en plus de sbuild, mmdebstrap et uidmap.
+
+**Reste pour S2 et la suite**
+- La fermeture D2 (a). Ici, le chroot portait déjà les dépendances de build.
+- La reproductibilité de la racine et du chroot.
+- La place de l'image sous `builders/`.
+- Le constat P3 (sortie http d'un pod de `builds` sans label), soumis au propriétaire.
+
+**Durée** : de 12:53 à 13:29 UTC, préparation, trois exécutions et consignation comprises, pour 0,5 pw prévue (P11 tenue).

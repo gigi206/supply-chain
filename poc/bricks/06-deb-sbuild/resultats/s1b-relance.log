@@ -1,0 +1,21 @@
+# s1.sh relance, 2026-11-10T13:26:44Z
+image : sc-stockage.poc.test:5000/essais-06/sbuild-debian13@sha256:d8041f9cf7254a1e73523dc1b01e4065c0c9f9f4e7f8c9dc4e3c5fd656f495a1
+### s1-kata-privilegie (runtimeClassName kata, uid 1000, contexte {"privileged":true,"allowPrivilegeEscalation":true}) : prêt
+     uid : 1000
+     CapEff:	0000000000000000
+     CapBnd:	000001ffffffffff
+     NoNewPrivs:	0
+     Seccomp:	0
+     montage / : virtiofs rw,nodev,relatime
+     montage /w : tmpfs rw,relatime
+     /usr/bin/newuidmap : -rwsr-xr-x root
+     /usr/bin/newgidmap : -rwsr-xr-x root
+     subuid : constructeur:100000:65536
+     subgid : constructeur:100000:65536
+     unshare map-auto : rc 0 uid_map :  0 100000 65536
+     sources livrées : rc 0 sample-app_1.0.0.orig.tar.gz: OK sample-app_1.0.0-1.dsc: OK sample-app_1.0.0-1.debian.tar.xz: OK
+     sbuild : rc 0 en 79 s
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+     (code de l'exec : 0)
+journal de sbuild : 1207 lignes, resultats/s1b-relance-sbuild.log
+pod s1-kata-privilegie supprimé
