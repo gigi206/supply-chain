@@ -46,3 +46,8 @@ Résultat : pour un projet Go + npm, une partie des dépendances échappe déjà
 ### Plan de sortie
 
 Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier par couche. Elles ne dépendent pas de l'outil de prefetch, qui peut être remplacé écosystème par écosystème, par Hermeto ou par le vendoring natif scripté (doc 04).
+
+**Additif du 10/11/2026, 23:40 UTC : premier prefetch deb mesuré** (brique 06, S4a, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4a-predictions.md)).
+- **Mesuré** : la tâche `prefetch-deb` tourne en runc restreint, sans root ni secret. Sa sortie se limite au DNS et au port 80 public. Elle télécharge par `apt-helper` une liste épinglée, contrôlée par l'InRelease (sha256 fixé par la pipeline signée), puis par les index et par le sha256 de chaque paquet. Elle sert ici à l'image de build ; sa provenance nomme l'InRelease.
+- **Non mesuré** : le refus d'un hash faux (test négatif prévu en S5) et l'usage de la tâche pour une fermeture de construction (S4b).
+- **La porte reste limitée à `prefetch-gomod`**, et la règle générique à N fermetures n'est pas écrite.

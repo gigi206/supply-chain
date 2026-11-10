@@ -1007,3 +1007,13 @@ Troisième passage de `pipeline`, de 23:26:12 à 23:31:47 UTC, sur l'accord « O
 - La porte ne juge pas cette pipeline.
 
 **Suite, selon l'ordre décidé** : S4c (packaging et verrou). L'ADR 0007 conteste « web/dist par digest », sur lequel S4c repose : il faut d'abord que le propriétaire tranche.
+
+## Note datée du 10/11/2026, 23:40 UTC : bilan de S4a corrigé, effort de la brique revu
+
+**Correction** : le bilan de S4a compte à tort A4 et A7 comme pleinement tenues. Ni le refus d'un hash faux ni la vérification de la signature de l'InRelease ne sont mesurés. Trois tests négatifs s'ajoutent à S5 : hash faux, `.deb` altéré, InRelease au mauvais sha256. Détail : [prédictions](resultats/s4a-predictions.md).
+
+**Effort, revu après S4a comme annoncé à 22:14 UTC.** Les chiffres viennent de `git log` sur `poc/bricks/06-deb-sbuild` :
+- 90 commits sur deux jours de calendrier : 2 le 05/11 et 88 le 10/11, ce dernier jour de 12:14 à 23:38 UTC environ ;
+- environ 1,5 jour de travail effectif, soit à peu près 0,3 pw.
+
+Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucune décision n'est due. La projection de 1 à 1,5 pw pour la brique entière tient, avec S4c, S4b, S4d et S5 encore à faire. Elle reste fragile, car S4c dépend d'une décision ouverte par l'ADR 0007.

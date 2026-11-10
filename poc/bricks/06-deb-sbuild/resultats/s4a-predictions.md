@@ -258,3 +258,16 @@ Il a fallu deux corrections de `construire-builder`, chacune signée de nouveau 
 - `--no-download` retiré.
 
 **La plateforme construit l'image de build sbuild sans réseau et de façon reproductible** : `builds/builders/sbuild-debian13@sha256:749d746c…`. Sa provenance, signée par Chains, nomme l'amorce, l'InRelease de l'instantané et les tâches revues.
+
+## Note datée du 10/11/2026, 23:40 UTC : le bilan de S4a surestime deux prédictions
+
+Le bilan ci-dessus dit « toutes tenues sauf A6 ». C'est trop fort, et ce bilan n'est pas réécrit. La formulation juste :
+- **A6** : réfutée, puis corrigée par A6 ter.
+- **A4** : tenue pour le téléchargement sans root. **Non mesurée** pour le refus d'un hash faux par `apt-helper`. Le passage montre seulement que les bons hashes sont acceptés. Le contrôle `sha256sum` de `tele()`, après chaque téléchargement, couvre le risque, mais la propriété annoncée n'est pas mesurée.
+- **A7** : tenue pour la construction depuis le miroir `file://`. **Non mesurée** pour la vérification de la signature de l'InRelease, qui n'est que déduite.
+- **A10** : tenue par `memory.peak` seulement.
+
+**Tests négatifs à ajouter à S5** :
+- un hash faux passé à `apt-helper` ;
+- un `.deb` altéré dans le miroir ;
+- un InRelease au mauvais sha256.
