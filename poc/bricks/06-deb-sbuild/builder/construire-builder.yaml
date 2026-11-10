@@ -14,7 +14,8 @@
 #   - layout OCI écrit à la main (choix 4) : couche 1 = l'archive racine telle quelle, couche 2 = le chroot sous
 #     opt/sbuild/trixie-amd64.tar (même commande tar que s1.sh, etape_image), couches non compressées, un seul manifeste ;
 #     image.tar dans le workspace sortie, que publier-image (inchangée) pousse ; DIGEST_CONSTRUIT en résultat ;
-#   - témoin TCP vers l'instantané (nom et adresse de Fastly relevée le 10/11/2026) : il doit échouer.
+#   - témoins qui doivent échouer : DNS, Zot (5000) et Forgejo (3000) de sc-stockage, que builds-sans-internet seule laisserait
+#     ouverts, et l'adresse de Fastly de l'instantané en 80 (relevée le 10/11/2026) ; pic du tmpfs échantillonné chaque seconde.
 # @AMORCE@ : s4a.sh taches. Signée une fois, versionnée (construire-builder.signee.yaml), digest dans la liste revue.
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -88,10 +89,19 @@ spec:
       case $SDE in *[!0-9]*|"") echo "SOURCE_DATE_EPOCH invalide" >&2; exit 1 ;; esac
       echo "invité : $(nproc) vCPU, $(awk '/MemTotal/ {print $2}' /proc/meminfo) kB ; /w : $(awk '$2 == "/w" {print $3}' /proc/mounts) ; entrees : $(awk -v p="$e" '$2 == p {print $3, $4}' /proc/mounts), écriture refusée"
       pic() { echo "tmpfs /w : $(du -sm /w | cut -f1) Mo ($1)"; }
-      # Témoin : aucune sortie réseau (nom, puis adresse)
-      for c in snapshot.debian.org 199.232.170.132; do
-        if timeout 10 bash -c "exec 3<>/dev/tcp/$c/80" 2> /dev/null; then echo "KO   $c:80 joint" >&2; exit 1; fi
-        echo "témoin $c:80 : refusé ou injoignable (attendu)"
+      # Échantillonneur du pic (A10) : taille de /w toutes les secondes, dans /tmp (hors du tmpfs mesuré)
+      ( while :; do du -sm /w 2> /dev/null | cut -f1; sleep 1; done ) > /tmp/pic.txt &
+      ech=$!
+      trap 'kill $ech 2> /dev/null || true' EXIT
+      # Témoins (A9) : aucune sortie réseau. builds-sans-internet seule laisse ouverts le DNS, Zot et Forgejo : ces cibles
+      # distinguent builder-sans-sortie de son absence ; l'adresse publique est gardée. Code relevé (124 : délai).
+      r=0; timeout 10 getent hosts snapshot.debian.org > /dev/null 2>&1 || r=$?
+      [ $r != 0 ] || { echo "KO   DNS résolu (snapshot.debian.org)" >&2; exit 1; }
+      echo "témoin DNS snapshot.debian.org : échec, code $r (attendu)"
+      for c in 192.168.161.13/5000 192.168.161.13/3000 199.232.170.132/80; do
+        r=0; timeout 10 bash -c "exec 3<>/dev/tcp/$c" 2> /dev/null || r=$?
+        [ $r != 0 ] || { echo "KO   $c joint" >&2; exit 1; }
+        echo "témoin TCP $c : échec, code $r (attendu)"
       done
       # Revérification du miroir
       [ "$(sha256sum < "$e/dists/trixie/InRelease" | cut -c1-64)" = "$INRELEASE" ] || { echo "InRelease du miroir différent" >&2; exit 1; }
@@ -165,4 +175,6 @@ spec:
       t=$(date +%s)
       tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$L" -cf "$o/image.tar" oci-layout index.json blobs
       echo "image.tar : $(stat -c %s "$o/image.tar") octets en $(($(date +%s) - t)) s"
+      kill $ech 2> /dev/null || true
+      echo "pic du tmpfs /w : $(sort -n /tmp/pic.txt | tail -n 1) Mo sur $(grep -c . /tmp/pic.txt) relevés ; memory.peak du cgroup : $(cat /sys/fs/cgroup/memory.peak 2> /dev/null || echo absent)"
       printf 'sha256:%s' "${man% *}" > $(results.DIGEST_CONSTRUIT.path)

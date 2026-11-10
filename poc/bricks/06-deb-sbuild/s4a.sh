@@ -208,7 +208,12 @@ etape_pipeline() {
       kubectl logs -n builds "$p" --all-containers < /dev/null 2>&1 | grep -viE 'jeton|token' > "$T/$t.log" || true
       echo "### TaskRun $t ($(kubectl get taskrun -n builds "$t" -o jsonpath='{.status.conditions[0].reason}' < /dev/null)), pod $p sur $(
         kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName {.spec.runtimeClassName}, tekton.dev/task {.metadata.labels.tekton\.dev/task}' < /dev/null 2> /dev/null)"
-      grep -vE '^\s*$' "$T/$t.log" | tail -n 14 | sed 's/^/     /'
+      grep -vE '^\s*$' "$T/$t.log" | tail -n 16 | sed 's/^/     /'
+      case $(kubectl get pod -n builds "$p" -o jsonpath='{.metadata.labels.tekton\.dev/task}' < /dev/null) in
+        construire-builder) attendu "A12 $t : runtimeClassName" "$(kubectl get pod -n builds "$p" -o jsonpath='{.spec.runtimeClassName}' < /dev/null)" kata ;;
+        *) attendu "A12 $t : runtimeClassName" "$(kubectl get pod -n builds "$p" -o jsonpath='{.spec.runtimeClassName}' < /dev/null)" "" ;;
+      esac
+      attendu "A12 $t : nœud" "$(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}' < /dev/null)" sc-build
     done
     attendu "PipelineRun $pr" "$(cut -d'|' -f1,2 <<< "$r")" "True|Succeeded"
     d=$(kubectl get pipelinerun -n builds "$pr" -o json < /dev/null | jq -r '.status.results[] | select(.name == "IMAGE_DIGEST") | .value')
@@ -257,7 +262,8 @@ etape_comparaison() {
   attendu "couche racine : sha256 de l'archive" "sha256:$(sha256sum < "$c/racine.tar" | cut -c1-64)" "$l1"
   attendu "couche du chroot : sha256 de l'archive" "sha256:$(sha256sum < "$c/couche2.tar" | cut -c1-64)" "$l2"
   tar -xf "$c/couche2.tar" -C "$c/couche2" opt/sbuild/trixie-amd64.tar
-  echo "chroot intérieur : sha256 $(sha256sum < "$c/couche2/opt/sbuild/trixie-amd64.tar" | cut -c1-64) (à comparer au journal de construire)"
+  attendu "A16 chroot intérieur égal au journal de construire" "$(sha256sum < "$c/couche2/opt/sbuild/trixie-amd64.tar" | cut -c1-64)" \
+    "$(sed -n 's/.*chroot intérieur sha256 \([0-9a-f]\{64\}\).*/\1/p' "$T/s4a-builder-1-construire.log" | head -1)"
   for x in racine:"$c/racine.tar":"$S1RACINE" chroot:"$c/couche2/opt/sbuild/trixie-amd64.tar":"$S2CHROOT"; do
     IFS=: read -r n a ref <<< "$x"
     tar -xOf "$a" ./var/lib/dpkg/status > "$c/status-$n"; tar -xOf "$ref" ./var/lib/dpkg/status > "$c/status-$n-ref"
@@ -266,7 +272,8 @@ etape_comparaison() {
     echo "$n : hostname « $(tar -xOf "$a" ./etc/hostname) », resolv.conf $(tar -tvf "$a" ./etc/resolv.conf | awk '{print $3}') octets, sources.list « $(tar -xOf "$a" ./etc/apt/sources.list | head -1) », listes d'apt : $(tar -tf "$a" | grep -c '^\./var/lib/apt/lists/[^/]*_' || true)"
     attendu "$n : égalité bit à bit avec la référence (non attendue, A14)" "$(cmp -s "$a" "$ref" && echo égale || echo différente)" différente
   done
-  grep -E '^(sbuild|libsbuild-perl|mmdebstrap|uidmap|iproute2) ' "$c/installes-racine" | sed 's/^/     /'
+  attendu "A17 versions des paquets inclus" "$(grep -E '^(sbuild|libsbuild-perl|mmdebstrap|uidmap|iproute2) ' "$c/installes-racine" | awk '{print $1 "=" $2}' | sort | paste -sd,)" \
+    "$(tr ',' '\n' <<< "$INCLURE" | sort | paste -sd,)"
   attendu "compte constructeur" "$(tar -xOf "$c/racine.tar" ./etc/passwd | awk -F: '$1 == "constructeur" {print $3 ":" $4}')" 1000:1000
   attendu "subuid" "$(tar -xOf "$c/racine.tar" ./etc/subuid)" constructeur:100000:65536
   attendu "subgid" "$(tar -xOf "$c/racine.tar" ./etc/subgid)" constructeur:100000:65536

@@ -109,3 +109,27 @@ PipelineRun : compte `build`, podTemplate du gabarit `sample-app`, `taskRunSpecs
 - les trois YAML se lisent ;
 - la liste rendue dans la pipeline est identique, pour `prefetch` comme pour `construire` ;
 - aucune variable ne reste dans le rendu.
+
+## Note datée du 10/11/2026, 23:09 UTC : relecture du conseiller avant `taches`, prédictions précisées (rien lancé)
+
+Le conseiller a relu S4a écrit à sec. Deux corrections ont été faites dans `construire-builder.yaml` avant toute signature, et trois relevés deviennent des contrôles dans `s4a.sh`. Cette note précise les prédictions sans réécrire celles du haut.
+
+**A9 précisée.** Les deux témoins du haut (nom et adresse de Fastly en 80) échoueraient aussi sans `builder-sans-sortie`, à cause de `builds-sans-internet`. Ils ne prouvaient donc pas la politique. Témoins ajoutés, qui doivent tous échouer :
+- le DNS seul (`getent hosts snapshot.debian.org`) ;
+- Zot (`192.168.161.13:5000`) ;
+- Forgejo (`192.168.161.13:3000`).
+
+`builds-sans-internet` seule laisse ces trois cibles ouvertes. L'adresse publique est gardée, et le code d'échec est relevé (124 pour un délai).
+
+**A10 précisée.** Le relevé après chaque appel de mmdebstrap manquait le pic réel, pendant la construction du chroot. Un échantillonneur relève maintenant `du -sm /w` chaque seconde, dans `/tmp`, et la tâche imprime le maximum et `memory.peak` du cgroup s'il existe. Prédiction inchangée : pic sous 4 Gio.
+
+**A11 précisée.** `publier-image` n'a pas de `resources`. Tekton lui applique donc les valeurs par défaut de la 08c (`tekton-defauts.yaml`) : limite de 512 Mio de mémoire et de 1 CPU, sans limite d'`ephemeral-storage`. Aucun `LimitRange` n'est versionné pour `builds`. Elle déballera environ 860 Mo dans un `emptyDir` sur disque, ce que la voie image n'a jamais fait à cette taille. Prédiction moyenne : réussite, le cache de pages étant récupérable. Un échec par manque de mémoire remettrait en cause « `publier-image` inchangée », et ce choix reviendrait au propriétaire.
+
+**A12, A16 et A17 deviennent des contrôles** (`attendu`) :
+- A12 : `runtimeClassName` vide pour `prefetch-deb` et `publier-image`, `kata` pour `construire-builder`, nœud sc-build ;
+- A16 : sha256 du chroot intérieur égal à celui du journal de `construire` ;
+- A17 : versions des cinq paquets inclus égales à `INCLURE`.
+
+**Fait à signaler à la revue de `taches.yml`.** Ce fichier est la liste `trusted_tasks` de la porte (`porte/policy.yaml`). Y inscrire `construire-builder`, tâche privilégiée et root, la rend acceptable dans toute provenance que la porte juge, pas seulement dans `builder-sbuild`. Il en va de même pour `prefetch-deb`.
+
+**Pour S4d, non bloquant.** Les listes d'apt sont maintenant nettoyées dans le chroot. Les `--chroot-setup-commands` de S3 suppriment deux listes par leur nom exact : il faudra vérifier si elles échouent sur des fichiers absents.
