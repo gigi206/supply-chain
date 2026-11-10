@@ -1,0 +1,11 @@
+# sortie-builds.sh deb_sec, 2026-11-10T14:23:47Z
+## invariants sur les politiques du dépôt (aucune lecture du cluster)
+OK   politiques lues dans le dépôt (kind et namespace builds) : 4
+politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy prefetch-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+## contre-épreuve : NotIn d'origine ([prefetch-gomod]), l'invariant de sortie CIDR doit signaler prefetch-deb-sortie
+OK   politiques à sortie CIDR sous un refus, NotIn d'origine : CiliumNetworkPolicy prefetch-deb-sortie

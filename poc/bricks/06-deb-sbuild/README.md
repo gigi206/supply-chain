@@ -172,3 +172,9 @@ Le second passage `s1b` a été exécuté de 13:24 à 13:28 UTC, sur l'accord «
 - **Égalité avec OBS** : elle porte sur les 64 caractères de l'empreinte, comparés au journal `build-1/construire.log` d'OBS.
 - **Fichiers non rapatriés** : le `.deb`, le `.buildinfo` et les `.changes` sont restés dans le pod ; la prochaine étape devra copier `/w/sortie`.
 - **ADR 0001** : additif ajouté.
+
+## Additif du 10/11/2026, 14:24 UTC : étape racine de s1.sh sous builds-sans-internet
+
+Depuis 13:55:03 UTC, la règle `builds-sans-internet` de la 08c refuse Internet aux pods de `builds` sans label. Le pod `racine` de `s1.sh` en est un : l'étape ne joindrait plus `snapshot.debian.org`. C'est déduit du témoin sans label de la 08c, pas mesuré sur `racine`.
+
+`s1.sh` pose désormais `tekton.dev/task=prefetch-deb` sur ce pod, et sur sa spec du dry-run d'admission. La sortie dédiée `prefetch-deb-sortie` est préparée à sec dans la [08c](../08c-durcissement/resultats/sortie-deb-predictions.md), **non appliquée**. Tant qu'elle ne l'est pas, `racine` reste cassée. S2 a le même besoin.

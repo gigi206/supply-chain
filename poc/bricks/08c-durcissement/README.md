@@ -1375,3 +1375,23 @@ La relance de `test6` (14:05 UTC, « Oui, relance test6 ») tient T1 à T4, sans
 **La règle reste en place.**
 
 **Reste à décider** : l'intégration au rejeu de zéro, les sorties dédiées des briques 05 et 06, et l'option (b).
+
+## Additif du 10/11/2026, 14:24 UTC : sortie dédiée de la brique 06 préparée à sec
+
+Le propriétaire a répondu « celui que tu veux ». Je consigne cette réponse comme **délégation du choix de la suite**, pas comme accord sur le cluster. Détail dans les [prédictions et résultats](resultats/sortie-deb-predictions.md).
+
+**Intégration au rejeu de zéro écartée pour l'instant.** Le reste de la 08c n'est pas non plus dans `rejeu.sh` (additif de H5 ci-dessus). Ajouter cette seule règle changerait le contrat du rejeu ; la question revient au propriétaire.
+
+**Ce qui est préparé, RIEN APPLIQUÉ**
+- [`prefetch-deb-sortie`](politiques/cilium-sortie/prefetch-deb-sortie.yaml) : DNS et adresses publiques en 80 seulement, refus par défaut, label `tekton.dev/task=prefetch-deb`.
+- `prefetch-deb` est ajouté au `NotIn` de `builds-sans-internet`, dans le dépôt seulement.
+- `06/s1.sh` met ce label sur le pod `racine`. Depuis 13:55:03 UTC, cette étape ne joindrait plus l'instantané Debian : c'est déduit du témoin sans label, pas mesuré.
+- `sortie-builds.sh` reçoit 4 étapes : `deb_sec`, `deb_appliquer`, `deb_temoins` et `deb_retirer`.
+
+**Pourquoi le port 80 vers tout le public**
+- `toFQDNs` est écarté, puisque `l7Proxy` vaut `false`.
+- Une adresse /32 ne nommerait pas l'hôte : à 14:19 UTC, `snapshot.debian.org` et `dl.rockylinux.org` sont résolus vers la même adresse de Fastly.
+
+**E0 tenue** (`deb_sec`, hôte seul, hors réseau) : invariants OK sur les politiques du dépôt, et la contre-épreuve détecte l'oubli du `NotIn`.
+
+**Brique 05 non traitée** : M1 n'a pas de script, ses sorties ne sont pas connues. `dl.rockylinux.org` partage l'adresse de Fastly relevée ci-dessus.

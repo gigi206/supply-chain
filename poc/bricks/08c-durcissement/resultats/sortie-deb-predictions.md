@@ -46,3 +46,15 @@ Une /32 ne désignerait donc pas l'hôte. Elle désignerait un nœud de Fastly p
 Le fichier du dépôt garde `prefetch-deb` dans le `NotIn` même après E4. Un `sortie-builds.sh appliquer` relancé poserait donc cette version.
 
 **Critère de retrait** : si le témoin `prefetch-deb` joint Zot, Forgejo, l'API ou `proxy.golang.org` en 443, ou si l'un des trois témoins existants change, je lance `deb_retirer` et je consigne.
+
+## Résultat de E0 (14:23:47 UTC, journal [`sortie-deb_sec.log`](sortie-deb_sec.log))
+
+Lancé sous `unshare -rn`, dans un espace réseau vide : aucune requête au cluster n'était possible. Code 0. **E0 tenue.**
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| E0 | 4 politiques lues dans le dépôt. `prefetch-gomod` est sélectionné par `prefetch-sortie` seule, `prefetch-deb` par `prefetch-deb-sortie` seule, et un pod sans label par `builds-sans-internet` seule. Aucune politique n'autorise de trafic à `construire-image`, et aucune politique à sortie CIDR n'est sous un refus. Contre-épreuve : avec le `NotIn` d'origine, l'invariant signale `CiliumNetworkPolicy prefetch-deb-sortie` | tenue |
+
+**Portée** : ce passage ne lit que le dépôt. Il ne prouve ni l'état du cluster, ni le comportement de Cilium ; c'est l'objet de E1 et E2. **E1 à E4 ne sont pas lancées.**
+
+**Push précédent**, consigné ici : le 10/11/2026 à 14:08:34 UTC, `bc0f352..145f67a`, contrôle des secrets OK sur 22 fichiers.
