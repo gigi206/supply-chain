@@ -8,6 +8,8 @@
 # (exemple intercept-all-dns de la même page). Plages privées exceptées : les mêmes que prefetch-sortie.
 # Ne ferme PAS : l'API de RKE2, OpenBao et les services du cluster, sc-stockage sur tous ses ports, le DNS (voir le README).
 # Hors du répertoire cilium/, appliqué en bloc par durcissement.sh : posé seulement par sortie-builds.sh appliquer.
+# Additif du 10/11/2026, 14:20 UTC : appliquée depuis 13:55:03 UTC. prefetch-deb ajouté au NotIn à sec, NON APPLIQUÉ (sortie
+# dédiée de la brique 06, prefetch-deb-sortie.yaml ; étape deb_appliquer de sortie-builds.sh, sur accord).
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -19,7 +21,7 @@ spec:
     matchExpressions:
     - key: tekton.dev/task
       operator: NotIn
-      values: [prefetch-gomod]
+      values: [prefetch-gomod, prefetch-deb]
   enableDefaultDeny:
     ingress: false
     egress: false

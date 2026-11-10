@@ -1,0 +1,47 @@
+# Brique 08c, sortie dédiée de la brique 06 (préparée à sec le 10/11/2026 à 14:20 UTC, NON APPLIQUÉE ; prédictions :
+# resultats/sortie-deb-predictions.md). Seule sortie des pods au label tekton.dev/task=prefetch-deb : l'étape racine de
+# 06/s1.sh (apt et mmdebstrap sur l'instantané de snapshot.debian.org, en http) et, plus tard, la résolution de S2. Aucune entrée.
+# Sur le modèle de prefetch-sortie (08-trust-plane/politique/prefetch-sortie.yaml) : toFQDNs écarté (l7Proxy: false, décision du
+# propriétaire du 03/11/2026) ; une adresse /32 ne nommerait pas l'hôte (relevé du 10/11/2026, 14:19 UTC, depuis l'hôte :
+# snapshot.debian.org et dl.rockylinux.org résolus vers la même adresse de Fastly, 199.232.170.132), d'où les adresses publiques
+# en 80 seulement. Intégrité : InRelease signé (3 clés de ftp-master épinglées dans s1.sh) et sha256 de Packages ; http seul,
+# l'amorce n'ayant pas de certificats. Limite : un pod compromis pourrait envoyer des données vers une adresse publique en 80.
+# Pas de Zot, de Forgejo ni d'API : l'image est tirée par le kubelet, et s1.sh rapatrie les archives par kubectl exec.
+# Le refus builds-sans-internet l'emporterait sur cette autorisation (deny.rst) : prefetch-deb doit figurer dans son NotIn.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prefetch-deb-sortie
+  namespace: builds
+spec:
+  description: "builds : prefetch-deb, DNS et adresses publiques en 80 seulement"
+  endpointSelector:
+    matchLabels:
+      tekton.dev/task: prefetch-deb
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress: []
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 169.254.0.0/16
+      - 127.0.0.0/8
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP

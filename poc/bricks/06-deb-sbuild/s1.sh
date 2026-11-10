@@ -56,9 +56,13 @@ zot() { DOCKER_CONFIG=$T/docker SSL_CERT_FILE=$P/ca-poc.crt "$@"; }
 attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
 champ() { sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$T/$1.log" | head -1; }   # journal libellé : valeur
 
-pod_spec() { # nom runtimeClass|- image uid contexte-JSON : pod de builds qui attend, tmpfs /w, limites, zone build
-  jq -n --arg n "$1" --arg rc "$2" --arg i "$3" --argjson u "$4" --argjson sc "$5" --argjson l "$LIMITES" --arg t "$TMPFS" '{
-    apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds"},
+# Label (6e argument, ajouté à sec le 10/11/2026 à 14:20 UTC, NON REJOUÉ) : depuis 13:55:03 UTC, builds-sans-internet (08c) refuse
+# les adresses publiques à tout pod de builds hors des labels exclus ; l'étape racine, sans label, ne joindrait plus l'instantané
+# (déduit du témoin sans label de 08c/sortie-builds.sh apres, non mesuré sur racine). Avec tekton.dev/task=prefetch-deb, elle n'a que
+# prefetch-deb-sortie (DNS, public en 80), une fois posée par sortie-builds.sh deb_appliquer. Même label dans le dry-run d'admission.
+pod_spec() { # nom runtimeClass|- image uid contexte-JSON [label tekton.dev/task] : pod de builds qui attend, tmpfs /w, limites, zone build
+  jq -n --arg n "$1" --arg rc "$2" --arg i "$3" --argjson u "$4" --argjson sc "$5" --argjson l "$LIMITES" --arg t "$TMPFS" --arg lb "${6:-}" '{
+    apiVersion: "v1", kind: "Pod", metadata: ({name: $n, namespace: "builds"} + (if $lb == "" then {} else {labels: {"tekton.dev/task": $lb}} end)),
     spec: ({restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
       tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
       securityContext: {runAsNonRoot: ($u != 0), runAsUser: $u, runAsGroup: $u, seccompProfile: {type: "RuntimeDefault"}},
@@ -91,7 +95,7 @@ etape_prealables() {
   args_apiserver | grep -x -- "--admission-control-config-file=$D_CONF/pod-security.yaml" >/dev/null \
     && echo "OK   kube-apiserver lit $D_CONF/pod-security.yaml" || { echo "KO   exemption de kata absente" >&2; exit 1; }
   echo "## admission en dry-run serveur (image d'amorce pour les quatre specs : les règles ne lisent que la forme de la référence)"
-  pod_spec s1-racine kata "$AMORCE" 0 "$PRIVILEGIE"
+  pod_spec s1-racine kata "$AMORCE" 0 "$PRIVILEGIE" prefetch-deb
   pod_spec s1-kata-privilegie kata "$AMORCE" 1000 "$PRIVILEGIE"
   pod_spec s1-kata-escalade kata "$AMORCE" 1000 "$ESCALADE"
   pod_spec s1-runc-restreint - "$AMORCE" 1000 "$RESTREINT"
@@ -191,7 +195,7 @@ etape_racine() {
   local s f
   [ -s "$T/inrelease.sha256" ] && [ -s "$T/Packages" ] || { echo "KO   lancer d'abord l'étape prealables" >&2; exit 1; }
   s=$(date -u -d "$(sed -n 's/^Date: //p' "$T/hote/InRelease")" +%s)
-  pod_spec s1-racine kata "$AMORCE" 0 "$PRIVILEGIE"
+  pod_spec s1-racine kata "$AMORCE" 0 "$PRIVILEGIE" prefetch-deb
   pod_demarrer s1-racine
   sed -e "s|@SOURCE@|$SOURCE_LISTE|g" -e "s|@V_SBUILD@|$V_SBUILD|g" -e "s|@V_MMDEBSTRAP@|$V_MMDEBSTRAP|g" \
     -e "s|@V_UIDMAP@|$V_UIDMAP|g" -e "s|@SDE@|$s|g" -e "s|@GARDER_CHROOT@|$GARDER_CHROOT|g" \

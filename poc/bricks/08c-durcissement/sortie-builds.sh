@@ -16,6 +16,15 @@
 #   test6       test 6 de la 08 rejoué sous la règle (option (ii) : POLICY_DENY admis vers EXTERNE, contre-épreuve sans sortie vers
 #               EXTERNE, témoin de capture par un pod brut au label prefetch-gomod) ; journal archivé ici (sortie-test6-preuves.log)
 #   retirer     règle supprimée ; témoin : le pod sans label rejoint snapshot.debian.org
+# Sortie dédiée de la brique 06 (ajoutée à sec le 10/11/2026 à 14:20 UTC, NON APPLIQUÉE ; prédictions : resultats/sortie-deb-predictions.md) :
+#   deb_sec       hôte seul, aucune lecture du cluster : politiques de builds lues dans le dépôt (construction-sans-sortie, prefetch-sortie,
+#                 builds-sans-internet avec prefetch-deb dans son NotIn, prefetch-deb-sortie), invariants ; contre-épreuve : avec le NotIn
+#                 d'origine, l'invariant de sortie CIDR doit signaler prefetch-deb-sortie
+#   deb_appliquer (accord) état de départ contrôlé (NotIn [prefetch-gomod], prefetch-deb-sortie absente) ; prefetch-deb-sortie puis
+#                 builds-sans-internet posées ; invariants dans le cluster
+#   deb_temoins   les trois témoins, plus un quatrième au label prefetch-deb : DNS et snapshot.debian.org en 80 seulement
+#   deb_retirer   (accord) NotIn d'origine d'abord (un pod prefetch-deb sans politique aurait tout Internet), puis prefetch-deb-sortie
+#                 supprimée ; invariants
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh <étape>…   (journal : resultats/sortie-<étape>.log)
 set -euo pipefail
@@ -25,6 +34,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 b08=$here/../08-trust-plane
 . "$b08/commun.sh"
 REGLE=$here/politiques/cilium-sortie/builds-sans-internet.yaml
+REGLE_DEB=$here/politiques/cilium-sortie/prefetch-deb-sortie.yaml
 IMAGE=$REG/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc   # prefetch.sh (03)
 LIMITES='{"cpu": "500m", "memory": "256Mi"}'
 T=$W/sortie-builds
@@ -34,9 +44,22 @@ attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (atte
 politiques() { { kubectl get networkpolicy -n builds -o json </dev/null; kubectl get ciliumnetworkpolicy -n builds -o json </dev/null; } \
   | jq -s '{items: ([.[].items[]])}' > "$T/politiques.json"; }
 sel() { jq -r -L "$b08" "include \"selecteurs\"; $1" "$T/politiques.json"; }   # filtre jq sur les politiques de builds
+DEPOT_POL=("$b08/politique/construction-sans-sortie.yaml" "$b08/politique/prefetch-sortie.yaml" "$REGLE" "$REGLE_DEB")
+politiques_depot() { # mêmes politiques, lues dans le dépôt : YAML vers JSON par le moteur de gabarits de Helm (helm template, hors ligne,
+  # comme audit_json de durcissement.sh), sans lecture du cluster. Inventaire du cluster relevé à 13:55 UTC (sortie-appliquer.log) :
+  # construction-sans-sortie, prefetch-sortie, builds-sans-internet
+  local f i=0
+  rm -rf -- "${T:?}/c"; mkdir -p "$T/c/templates"
+  printf 'apiVersion: v2\nname: c\nversion: 0.0.1\n' > "$T/c/Chart.yaml"
+  for f in "${DEPOT_POL[@]}"; do i=$((i + 1)); cp "$f" "$T/c/p$i.yaml"; done
+  # shellcheck disable=SC2016
+  printf '%s\n' '{{ range $p, $_ := .Files.Glob "p*.yaml" }}{{ ($.Files.Get $p | fromYaml) | toJson }}' '{{ end }}' > "$T/c/templates/p.yaml"
+  helm template c "$T/c" | sed -n '/^{/p' | jq -s '{items: .}' > "$T/politiques.json"
+  attendu "politiques lues dans le dépôt (kind et namespace builds)" "$(jq '[.items[] | select(.kind and .metadata.namespace == "builds")] | length' "$T/politiques.json")" "${#DEPOT_POL[@]}"
+}
 
-invariants() {
-  politiques
+invariants() { # [source : politiques (cluster, par défaut) | politiques_depot]
+  "${1:-politiques}"
   echo "politiques de builds : $(sel '[.items[] | nom] | join(", ")')"
   attendu "politiques qui sélectionnent un pod de prefetch-gomod" \
     "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "prefetch-gomod"})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy prefetch-sortie"
@@ -44,10 +67,22 @@ invariants() {
     "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "construire-image"}) and autorise) | nom] | join(", ")')" ""
   # toute politique qui autorise une sortie par CIDR : ses matchLabels (seul sélecteur employé par ces règles) ne doivent pas être
   # retenus par une politique de refus de builds ; sinon le refus l'emporte sans bruit (deny.rst)
-  attendu "politiques à sortie CIDR dont les pods seraient aussi sous un refus" \
-    "$(sel '. as $tout | [.items[] | select(sortie_cidr) | (selecteur.matchLabels // {}) as $l | nom as $n
-         | select(any($tout.items[]; ((.spec.egressDeny // []) | length > 0) and selectionne($l))) | $n] | join(", ")')" ""
+  attendu "politiques à sortie CIDR dont les pods seraient aussi sous un refus" "$(sel "$SOUS_REFUS")" ""
 }
+SOUS_REFUS='. as $tout | [.items[] | select(sortie_cidr) | (selecteur.matchLabels // {}) as $l | nom as $n
+  | select(any($tout.items[]; ((.spec.egressDeny // []) | length > 0) and selectionne($l))) | $n] | join(", ")'
+invariants_deb() { # source : politiques | politiques_depot
+  invariants "$1"
+  attendu "politiques qui sélectionnent un pod de prefetch-deb" \
+    "$(sel '[.items[] | select(selectionne({"tekton.dev/task": "prefetch-deb"})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy prefetch-deb-sortie"
+  attendu "politiques qui sélectionnent un pod de builds sans label" \
+    "$(sel '[.items[] | select(selectionne({})) | nom] | sort | join(", ")')" "CiliumNetworkPolicy builds-sans-internet"
+}
+valide() { # nom de CiliumNetworkPolicy de builds : condition Valid à True, attendue jusqu'à 60 s
+  for _ in $(seq 30); do [ "$(kubectl get cnp -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Valid")].status}' </dev/null 2>/dev/null)" = True ] && break; sleep 2; done
+  attendu "$1 valide pour Cilium" "$(kubectl get cnp -n builds "$1" -o jsonpath='{.status.conditions[?(@.type=="Valid")].status}' </dev/null)" True
+}
+notin() { kubectl get cnp -n builds builds-sans-internet -o json </dev/null | jq -c '.spec.endpointSelector.matchExpressions[0].values'; }
 
 DESTINATIONS='import socket, ssl, subprocess, urllib.request
 ctx = ssl.create_default_context()
@@ -70,9 +105,10 @@ g = subprocess.run(["git", "-c", "http.sslCAInfo=/etc/ca-poc/ca.crt", "ls-remote
                    capture_output=True, text=True, timeout=30)
 print("Forgejo : " + ("joint" if g.returncode == 0 else "refusé"))'
 
-temoins() { # libellé : trois pods, une ligne par destination
-  local n l
-  for p in "sans-label -" "prefetch prefetch-gomod" "construire construire-image"; do
+TEMOINS=("sans-label -" "prefetch prefetch-gomod" "construire construire-image")
+temoins() { # libellé : un pod par entrée de TEMOINS (nom label), une ligne par destination
+  local n l p
+  for p in "${TEMOINS[@]}"; do
     n=sortie-${p%% *}; l=${p#* }
     jq -n --arg n "$n" --arg l "$l" --arg i "$IMAGE" --argjson r "$LIMITES" '{apiVersion: "v1", kind: "Pod",
       metadata: ({name: $n, namespace: "builds"} + (if $l == "-" then {} else {labels: {"tekton.dev/task": $l}} end)),
@@ -125,6 +161,32 @@ etape_test6() { T6_FERMES="Supervisor Etcd" preuves test6; }
 etape_retirer() {
   kubectl delete -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
   temoins retrait
+}
+
+etape_deb_sec() {
+  echo "## invariants sur les politiques du dépôt (aucune lecture du cluster)"
+  invariants_deb politiques_depot
+  echo "## contre-épreuve : NotIn d'origine ([prefetch-gomod]), l'invariant de sortie CIDR doit signaler prefetch-deb-sortie"
+  jq '(.items[] | select(.metadata.name == "builds-sans-internet") | .spec.endpointSelector.matchExpressions[0].values) = ["prefetch-gomod"]' \
+    "$T/politiques.json" > "$T/politiques.tmp" && mv "$T/politiques.tmp" "$T/politiques.json"
+  attendu "politiques à sortie CIDR sous un refus, NotIn d'origine" "$(sel "$SOUS_REFUS")" "CiliumNetworkPolicy prefetch-deb-sortie"
+}
+etape_deb_appliquer() {
+  attendu "NotIn de builds-sans-internet avant" "$(notin)" '["prefetch-gomod"]'
+  kubectl get cnp -n builds prefetch-deb-sortie </dev/null >/dev/null 2>&1 && { echo "KO   prefetch-deb-sortie déjà posée" >&2; exit 1; } || echo "OK   prefetch-deb-sortie absente"
+  kubectl apply -f "$REGLE_DEB" </dev/null | sed 's/^/kubectl : /'
+  valide prefetch-deb-sortie
+  kubectl apply -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
+  valide builds-sans-internet
+  attendu "NotIn de builds-sans-internet après" "$(notin)" '["prefetch-gomod","prefetch-deb"]'
+  invariants_deb politiques
+}
+etape_deb_temoins() { TEMOINS+=("deb prefetch-deb"); temoins deb; }
+etape_deb_retirer() {
+  kubectl patch cnp -n builds builds-sans-internet --type=json </dev/null -p '[{"op": "test", "path": "/spec/endpointSelector/matchExpressions/0/values", "value": ["prefetch-gomod", "prefetch-deb"]}, {"op": "replace", "path": "/spec/endpointSelector/matchExpressions/0/values", "value": ["prefetch-gomod"]}]' | sed 's/^/kubectl : /'
+  attendu "NotIn de builds-sans-internet" "$(notin)" '["prefetch-gomod"]'
+  kubectl delete -f "$REGLE_DEB" </dev/null | sed 's/^/kubectl : /'
+  invariants
 }
 
 lancer sortie "08c sortie de builds" "$@"
