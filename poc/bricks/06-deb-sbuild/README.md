@@ -528,3 +528,21 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 6. **Image de build sous `builders/`.** Il faut décider qui la construit et la pousse dans Zot : l'hôte, ou une pipeline. Dans les deux cas, c'est une écriture dans Zot. L'échéance D4 tombe le 09/12/2026.
 
 **S5** : la liste des tests existe (M5 de la 05) : fermeture altérée, sortie réseau pendant le build, pod privilégié hors Kata, rejeu de zéro. S5 n'appelle donc aucun choix de plus.
+
+## Additif du 10/11/2026, 21:33 UTC : décision sur la forme de la pipeline, et ce qu'elle touche (lu dans le dépôt, à sec)
+
+**Décision du propriétaire** (21:32:22 UTC) : « Pipeline deb à part ». Elle tranche le choix 1 de la note de 21:25 UTC. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Correction de la formulation du choix 1** : « sous le même gabarit » ne tient pas. Le rattrapage (`politique/rattrapage/main.go`, ligne 198) refuse tout gabarit qui contient autre chose qu'un seul PipelineRun. Une pipeline deb à part demande donc **son propre gabarit**, derrière le même webhook.
+
+**Pièces touchées**, chacune vérifiée dans le dépôt sauf mention contraire :
+- **Gabarit** : une TriggerTemplate `sample-app-deb` dans `declencheurs`, sur le modèle de `gabarit-sample-app.yaml`. Paramètres `commit` et `depot` seulement. Un PipelineRun `sample-app-deb-<commit>` dans `builds`, dont le nom fournit l'anti-rejeu. Construction sur `zone: build`, sous Kata.
+- **EventListener** : un second trigger à côté de `sample-app-push` (`tekton/webhook.yaml`). Mêmes intercepteurs, même filtre, même dépôt Forgejo, qu'exige D6. Il faut vérifier, au moment de l'écrire, si les droits de `el-forgejo` couvrent déjà un second gabarit.
+- **Rattrapage** : il est paramétré par `GABARIT` (ligne 135). Il faut un second CronJob, avec `GABARIT=declencheurs/sample-app-deb`, sans changer le code.
+- **Pipeline** : une Pipeline `sample-app-deb` signée et publiée en bundle, avec ses tâches signées : préparer, construire sous sbuild, publier. Plus la pipeline `prefetch-deb` (choix 4). Chaque digest s'ajoute à `porte/taches.yml`.
+- **Porte**
+  - `porte-job.yaml` juge une référence d'image (`ec validate image --image @IMAGE@`).
+  - **À vérifier** : `ec` accepte-t-il comme « image » un artefact ORAS, c'est-à-dire un manifeste qui n'est pas une image ? Il n'est pas établi que la fermeture de la voie image ait jamais été jugée ainsi. Le vérifier demande un Job dans `porte`, donc un accord nommé.
+  - `porte.rego` est à étendre à la voie deb (point 11).
+
+**Choix encore ouverts** (numérotation de la note de 21:25 UTC) : 2 (sujet signé et critère), 3 (dépôt de sortie), 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
