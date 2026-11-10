@@ -279,3 +279,44 @@ Accord : « Oui », à 19:47:30 UTC (transcription), en réponse à « Je lance 
 
 L'une et l'autre demandent une décision du propriétaire.
 
+## Étape kubelet : préparée à sec (19:56 UTC), NON LANCÉE
+
+Demande : « Prépare l'exec », à 19:54:00 UTC (transcription), en réponse à « exec direct sur kubelet, ou journaux plus détaillés ».
+
+### Mise en place
+
+**Client.** L'exec passe directement par l'API de kubelet de sc-build, port 10250, sans apiserver. Il part de sc-confiance avec [`diag-exec-kubelet.py`](../diag-exec-kubelet.py) :
+- client WebSocket `v5.channel.k8s.io`, écrit pour l'occasion, bibliothèque standard de Python seule. **Rien n'est installé.**
+- script passé par l'entrée standard de ssh ; rien n'est écrit sur la VM.
+
+**Identité.** Le client prend celle de l'apiserver auprès de kubelet : son certificat client.
+- Les chemins sont lus dans les arguments de kube-apiserver. À défaut, ce sont les chemins par défaut de RKE2 (`server/tls/client-kube-apiserver.crt` et `.key`).
+- Le script vérifie que ces fichiers sont lisibles. Il les utilise pour le TLS, sans jamais les afficher.
+
+**Vérification du certificat de kubelet.** Comme l'apiserver, le client ne vérifie pas le certificat de kubelet. Le contrôle CIS 1.2.5 est en échec dans `rke2-cis.log` (08b) : `--kubelet-certificate-authority` n'est pas posé.
+
+**Mesures.** Un pod runc `restricted`. Deux exec de 128 Mio tirés sur sc-confiance, chacun avec un délai de 150 s :
+- **K2** : lecture rapide. C'est le témoin du client.
+- **K1** : lecture lente, la même commande qu'en `croise`, `bisection` et `amont`.
+
+**Prérequis supposé, à vérifier au lancement** : python3 sur sc-confiance. cloud-init, qui configure ces VM, est écrit en Python ; le script relève la version.
+
+### Essais à sec, sur l'hôte
+
+- Les trames WebSocket se décodent à l'identique pour 0, 1, 125, 126, 65 535, 65 536 et 70 000 octets.
+- Les 128 Mio de trames se préparent à environ 227 Mio/s, bien plus vite que la lecture lente du pod (environ 10 Mio/s) : le client reste un producteur rapide, comme kubectl.
+- L'échange avec un vrai kubelet n'est pas essayé.
+
+### Prédictions
+
+| # | Prédit | Confiance |
+|---|---|---|
+| K2 | passe, code 0, statut `Success`, tout reçu | moyenne : premier usage du client |
+| K1 | bloque au délai, tous les octets reçus : le maillon est dans le relais de kubelet | faible |
+
+### Lecture prévue
+
+- **K1 bloque** : le maillon est kubelet, c'est-à-dire son relais vers le serveur de flux de containerd. `crictl exec` passe sans ce relais (B1).
+- **K1 passe** : le maillon est l'apiserver.
+- **K2 échoue** : le client est en cause, et rien ne peut être lu de K1.
+

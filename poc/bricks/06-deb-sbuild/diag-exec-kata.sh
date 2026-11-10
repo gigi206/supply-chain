@@ -292,4 +292,30 @@ done | grep -i -E 'exec|stream|websocket|spdy|upgrade|proxy|timeout|stdin' | tai
 APISERVER
 }
 
+# Étape kubelet (préparée à sec le 10/11/2026 à 19:55 UTC, NON LANCÉE) : l'étape amont situe le blocage dans l'apiserver ou
+# kubelet. Exec direct sur l'API de kubelet de sc-build (port 10250), sans apiserver, depuis sc-confiance, par diag-exec-kubelet.py
+# (WebSocket v5.channel.k8s.io, bibliothèque standard ; script par l'entrée standard de ssh, rien d'écrit sur la VM) avec le
+# certificat client de l'apiserver vers kubelet (chemins lus dans les arguments de kube-apiserver, sinon chemins par défaut de
+# RKE2 ; fichiers utilisés, jamais affichés). Pod runc restricted ; 128 Mio tirés sur sc-confiance, délai de 150 s :
+#   K2  lecture rapide (témoin : le client fonctionne)
+#   K1  lecture lente (même commande que croise, amont et bisection)
+etape_kubelet() {
+  local cert cle m r
+  cert=$(args_apiserver | sed -n 's/^--kubelet-client-certificate=//p' | head -1)
+  cle=$(args_apiserver | sed -n 's/^--kubelet-client-key=//p' | head -1)
+  echo "certificat client vers kubelet dans les arguments de kube-apiserver : ${cert:-absent} ; clé : ${cle:+présente}${cle:-absente}"
+  cert=${cert:-$D_ETAT/server/tls/client-kube-apiserver.crt}; cle=${cle:-$D_ETAT/server/tls/client-kube-apiserver.key}
+  sur sc-confiance "sudo test -r '$cert' && sudo test -r '$cle'" </dev/null \
+    || { echo "KO   certificat ou clé illisible sur sc-confiance : $cert" >&2; exit 1; }
+  echo "fichiers utilisés : $cert et la clé associée (non affichée) ; python : $(sur sc-confiance 'python3 --version' </dev/null 2>&1)"
+  croise_pod - "$RESTREINT"
+  for m in rapide lent; do
+    r=$(sur sc-confiance "sudo python3 -I - ${IP[sc-build]} 10250 builds $POD diag $m 134217728 '$cert' '$cle' 150" < "$here/diag-exec-kubelet.py" 2>&1 \
+      | grep -a -i -v -E 'jeton|token' | tail -n 3 || true)
+    echo "K $m : $r ; reçus dans le pod : $(recu /w/k)"
+    kubectl exec -n builds "$POD" -- rm -f /w/k </dev/null || true
+  done
+  pod_retirer "$POD"
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
