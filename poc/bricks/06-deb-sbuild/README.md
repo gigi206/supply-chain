@@ -871,3 +871,15 @@ Les [prédictions A1 à A17](resultats/s4a-predictions.md) sont écrites et comm
 **L'étape `taches`** se fera en deux passes :
 1. `SIGNER=1` : signatures, bundles dans Zot, puis diff de `politique/porte/taches.yml` (08) soumis au propriétaire ;
 2. une seconde passe, une fois la liste acceptée.
+
+## Additif du 10/11/2026, 23:11 UTC : étape `taches` de S4a, première passe (`SIGNER=1`)
+
+Lancée de 23:10:15 à 23:10:18 UTC, sur l'accord « Oui, lance taches ». Code 0. Journal : [`s4a-taches.log`](resultats/s4a-taches.log).
+
+**A2, première passe : tenue.**
+- `prefetch-deb` et `construire-builder` sont signées par `tkn` 0.46.2 avec la clé des tâches. La clé n'a pas été affichée.
+- Leurs signatures sont versionnées dans `builder/*.signee.yaml`.
+- Leurs bundles sont publiés dans Zot avec `poc-ecriture` : `tekton/tasks/prefetch-deb@sha256:4dac0609…` et `tekton/tasks/construire-builder@sha256:de18e9cf…`.
+- Les deux digests sont absents de la liste revue, comme prévu. La pipeline n'est ni signée ni publiée tant que la liste n'est pas acceptée.
+
+**Diff de `politique/porte/taches.yml` (08) préparé, NON COMMITÉ** : deux entrées ajoutées à la fin, chacune avec son commentaire. Il attend la revue du propriétaire. Ce fichier est la liste `trusted_tasks` de la porte : `construire-builder`, tâche privilégiée et root, y deviendrait acceptable dans toute provenance que la porte juge.

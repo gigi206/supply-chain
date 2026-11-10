@@ -1,0 +1,93 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIQDJBETMN7tE90c5lLkTbgpjP1+Xg3HTuBpxaOt1RraGjAIgYXlx35uwEoZeWmZKFQ/vTHTQJPHdst8ItG6cDS6m3ks=
+  name: prefetch-deb
+spec:
+  params:
+  - name: instantane
+    type: string
+  - name: inrelease
+    type: string
+  - name: liste
+    type: string
+  results:
+  - name: INSTANTANE_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /tmp
+      name: tmp
+  steps:
+  - env:
+    - name: INSTANTANE
+      value: $(params.instantane)
+    - name: INRELEASE
+      value: $(params.inrelease)
+    - name: LISTE
+      value: $(params.liste)
+    - name: HOME
+      value: /tmp
+    image: sc-stockage.poc.test:5000/amont/library/debian@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+    name: prefetch
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      export LC_ALL=C
+      case $INSTANTANE in http://snapshot.debian.org/archive/debian/[0-9]*T[0-9]*Z) ;; *) echo "instantané invalide : $INSTANTANE" >&2; exit 1 ;; esac
+      case $INRELEASE in *[!0-9a-f]*) echo "sha256 de l'InRelease invalide" >&2; exit 1 ;; esac
+      [ ${#INRELEASE} = 64 ] || { echo "sha256 de l'InRelease invalide" >&2; exit 1; }
+      m=$(workspaces.sortie.path)/miroir
+      [ ! -e "$m" ] || { echo "workspace déjà rempli : $m" >&2; exit 1; }
+      h=/usr/lib/apt/apt-helper
+      [ -x "$h" ] || { echo "apt-helper absent de l'image" >&2; exit 1; }
+      tele() { # chemin-relatif sha256 taille : téléchargé par apt-helper avec son hash, puis revérifié
+        mkdir -p "$m/${1%/*}"
+        "$h" -o Debug::NoLocking=1 download-file "$INSTANTANE/$1" "$m/$1" "SHA256:$2" > /tmp/dl.log 2>&1 \
+          || { tail -n 5 /tmp/dl.log >&2; echo "téléchargement refusé : $1" >&2; exit 1; }
+        [ "$(sha256sum < "$m/$1" | cut -c1-64)" = "$2" ] || { echo "sha256 différent : $1" >&2; exit 1; }
+        [ -z "$3" ] || [ "$(stat -c %s "$m/$1")" = "$3" ] || { echo "taille différente : $1" >&2; exit 1; }
+      }
+      echo "$(id) ; $(apt-get --version | head -1) ; instantané $INSTANTANE"
+      t=$(date +%s)
+      tele dists/trixie/InRelease "$INRELEASE" ""
+      for f in main/binary-amd64/Packages.xz main/i18n/Translation-en.xz; do
+        l=$(awk -v f="$f" '/^SHA256:/ {s = 1; next} /^[^ ]/ {s = 0} s && $3 == f {print $1, $2}' "$m/dists/trixie/InRelease")
+        [ -n "$l" ] || { echo "index absent de l'InRelease : $f" >&2; exit 1; }
+        tele "dists/trixie/$f" "${l% *}" "${l#* }"
+        mkdir -p "$m/dists/trixie/${f%/*}/by-hash/SHA256"
+        cp "$m/dists/trixie/$f" "$m/dists/trixie/${f%/*}/by-hash/SHA256/${l% *}"
+        echo "index $f : sha256 ${l% *}, ${l#* } octets (InRelease)"
+      done
+      n=0
+      printf '%s\n' "$LISTE" > /tmp/liste
+      while read -r s z p; do
+        [ -n "$s" ] || continue
+        case $p in pool/main/*.deb) ;; *) echo "chemin hors du pool : $p" >&2; exit 1 ;; esac
+        case $p in *..*) echo "chemin invalide : $p" >&2; exit 1 ;; esac
+        tele "$p" "$s" "$z"
+        n=$((n + 1))
+      done < /tmp/liste
+      echo "miroir : $n paquets, $(find "$m/pool" -type f -name '*.deb' -printf '%s\n' | awk '{s += $1} END {print s}') octets, en $(($(date +%s) - t)) s"
+      printf '{"uri":"%s/dists/trixie/InRelease","digest":"sha256:%s"}' "$INSTANTANE" "$INRELEASE" > $(results.INSTANTANE_ARTIFACT_INPUTS.path)
+  volumes:
+  - emptyDir: {}
+    name: tmp
+  workspaces:
+  - name: sortie
