@@ -147,3 +147,25 @@ Code 1. `s4a-builder-1` a échoué dans `construire`, et `s4a-builder-2` n'a pas
   - Un `dpkg -i` groupé déballe tout avant de configurer, et ne satisfait donc pas ces pré-dépendances. C'est un défaut d'ordre, pas de complétude.
   - Le journal ne cite aucun autre paquet manquant, mais le `dpkg.log` complet du pod n'est pas rapatrié : il n'en reste que les 20 dernières lignes.
 - **Non atteintes** : A7, A8, A10, A11 et A13.
+
+## Note datée du 10/11/2026, 23:16 UTC : correction de `construire-builder` après le premier passage (à sec, validée par le conseiller, NON SIGNÉE)
+
+Le journal complet du TaskRun en échec est archivé : [`s4a-builder-1-construire-echec.log`](s4a-builder-1-construire-echec.log), lignes `jeton` et `token` filtrées.
+
+**Corrections dans `construire-builder.yaml`**, groupées pour ne signer qu'une fois :
+1. **Installation de mmdebstrap** : `apt-get install -y --no-install-recommends --no-download` remplace le `dpkg -i` groupé. apt ordonne les pré-dépendances, comme en S1, et n'a rien à télécharger.
+2. **Journaux complets en cas d'échec** : les 200 dernières lignes du journal d'apt et de chaque mmdebstrap, au lieu d'un filtre de 10 à 20 lignes. Les lignes `W:`, `E:` et celles du crochet de montage sont toujours imprimées.
+3. **Points de montage du miroir.** Le crochet `file-mirror-automount` de mmdebstrap 1.5.7 a été lu dans la racine de S1, aux fichiers `setup00.sh` et `customize00.sh`. Il crée `workspace/entrees` dans la cible pour y monter le miroir, le démonte en personnalisation, puis laisse ces répertoires vides. Un crochet les retire désormais. S'il échoue, il l'écrit sans arrêter la construction, et l'étape `comparaison` contrôle leur absence.
+
+**Lecture du crochet, pour A7.**
+- Il lit les dépôts par `apt-get indextargets` (`REPO_URI`). Les options entre crochets de la ligne `deb` sont donc analysées par apt, pas par le crochet.
+- Il monte en `ro,bind`. Le montage depuis un virtiofs en lecture seule n'est pas mesuré.
+
+**Prédictions ajoutées, non mesurées**
+- **A6 bis.** `apt-get install` hors ligne des 20 paquets réussit sans téléchargement. Si un paquet manque, apt échoue en nommant la dépendance non satisfaite, ce qui tranche enfin la complétude de la liste. Prédiction moyenne à forte.
+- **A7, inchangée** : prédiction moyenne.
+- **A18.** Ni la racine ni le chroot ne contiennent `workspace/`.
+
+**Liste revue** : `de18e9cf` (version cassée et privilégiée) sera retirée dans le même diff que l'ajout de la nouvelle version, comme « Retirer 403ccbd8 » en F3 de la 03. `prefetch-deb` (`4dac0609`) est inchangée.
+
+**Rejoué sur l'hôte** : `prealables`, code 0.

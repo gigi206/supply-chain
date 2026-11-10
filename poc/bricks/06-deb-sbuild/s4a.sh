@@ -274,6 +274,9 @@ etape_comparaison() {
   done
   attendu "A17 versions des paquets inclus" "$(grep -E '^(sbuild|libsbuild-perl|mmdebstrap|uidmap|iproute2) ' "$c/installes-racine" | awk '{print $1 "=" $2}' | sort | paste -sd,)" \
     "$(tr ',' '\n' <<< "$INCLURE" | sort | paste -sd,)"
+  for x in racine:"$c/racine.tar" chroot:"$c/couche2/opt/sbuild/trixie-amd64.tar"; do
+    attendu "${x%%:*} : sans point de montage du miroir (workspace/)" "$(tar -tf "${x#*:}" | grep -c '^\./workspace' || true)" 0
+  done
   attendu "compte constructeur" "$(tar -xOf "$c/racine.tar" ./etc/passwd | awk -F: '$1 == "constructeur" {print $3 ":" $4}')" 1000:1000
   attendu "subuid" "$(tar -xOf "$c/racine.tar" ./etc/subuid)" constructeur:100000:65536
   attendu "subgid" "$(tar -xOf "$c/racine.tar" ./etc/subgid)" constructeur:100000:65536
