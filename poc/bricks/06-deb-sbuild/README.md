@@ -956,3 +956,11 @@ Lancé de 23:18:52 à 23:20:05 UTC, sur l'accord « Oui, relance pipeline ». Co
 La correction est validée par le conseiller. Avant de signer, trois contrôles nouveaux sur l'hôte passent dans `prealables` (code 0) : syntaxe des scripts de tâche, arguments de mmdebstrap, et layout OCI sur des archives factices, lu comme le fait `publier-image`. Détail : [prédictions](resultats/s4a-predictions.md).
 
 **Reste** : `taches` en `SIGNER=1`, puis la revue de la liste (le nouveau digest remplace `49173846`), la seconde passe et `pipeline`. Chaque étape attend son accord.
+
+## Additif du 10/11/2026, 23:26 UTC : `taches` relancée en `SIGNER=1` (sans `--no-download`)
+
+Lancée à 23:25:02 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal : [`s4a-taches.log`](resultats/s4a-taches.log).
+
+- **Correctif de `SIGNER=1` tenu**, rejoué pour la première fois : `prefetch-deb` reste à `4dac0609`, sans nouvelle signature.
+- **`construire-builder` signée de nouveau** : `tekton/tasks/construire-builder@sha256:746c2e11…`.
+- **Diff de `taches.yml` préparé, NON COMMITÉ** : `746c2e11` remplace `49173846`, retirée comme version cassée. Il attend la revue du propriétaire.
