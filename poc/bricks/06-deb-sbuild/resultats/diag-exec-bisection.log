@@ -1,0 +1,8 @@
+# diag-exec-kata.sh bisection, 2026-11-10T19:41:09Z
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 19:41:10 UTC
+conteneur : ccc77cda3233…
+crictl : crictl version v1.35.0 ; ctr : ctr github.com/k3s-io/containerd v2.2.7-k3s1
+B1 crictl exec, lecture lente : code 0 en 13273 ms ; reçus dans le pod : 134217728 sur 134217728
+B2 crictl exec, lecture rapide : code 0 en 387 ms ; reçus dans le pod : 134217728 sur 134217728
+B3 ctr task exec, lecture lente : code 0 en 13393 ms ; reçus dans le pod : 134217728 sur 134217728
+pod diag-exec-kata supprimé

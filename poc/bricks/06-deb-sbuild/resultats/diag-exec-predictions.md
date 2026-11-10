@@ -217,3 +217,20 @@ Demande : « Prépare », à 19:37:09 UTC (transcription), en réponse à la que
 - **B1 passe** : le maillon est dans kubelet, l'apiserver ou kubectl.
 - **B3 bloque aussi** : le maillon est dans containerd, sous CRI, ou dans le shim runc.
 
+## Résultat de l'étape bisection (10/11/2026, 19:41:09 à 19:41:38 UTC)
+
+Accord : « Oui », à 19:41:04 UTC (transcription), en réponse à « Je lance la bisection ? ». Lancée sous bash, code **0**. Journal : [`diag-exec-bisection.log`](diag-exec-bisection.log). Le pod est supprimé ; plus aucun pod `diag` ensuite.
+
+| # | Résultat |
+|---|---|
+| B1 | **Réfutée.** `crictl exec` avec lecture lente : code 0 en 13 273 ms, 134 217 728 octets reçus |
+| B2 | **Tenue.** Code 0 en 387 ms |
+| B3 | **Tenue.** `ctr task exec` avec lecture lente : code 0 en 13 393 ms |
+
+**Bisection sur le nœud** (19:41:09 à 19:41:38 UTC, code 0 ; pod runc, 128 Mio tirés de `/dev/urandom` sur sc-build) :
+- **B1** : `crictl exec`, lecture lente, **code 0 en 13,3 s** ;
+- **B2** : `crictl exec`, lecture rapide, code 0 en 0,4 s ;
+- **B3** : `ctr task exec`, lecture lente, code 0 en 13,4 s.
+
+Tous les octets sont reçus dans les trois cas. **containerd, son serveur de flux CRI et le shim ne sont pas en cause** : la même lecture lente, qui bloque par `kubectl exec`, passe par `crictl exec` (crictl 1.35.0, containerd 2.2.7-k3s1). **Le maillon fautif est en amont, dans kubelet, l'apiserver ou kubectl**, et leur relais du flux. Il n'est pas encore identifié.
+

@@ -222,3 +222,10 @@ Diagnostic ([prédictions et résultats](../../poc/bricks/06-deb-sbuild/resultat
 
 Le choix de Kata n'est pas en cause pour ce point. La règle d'exploitation devient générale : ne pas faire passer un gros fichier par l'entrée standard de `kubectl exec` vers un pod qui le lit lentement, quel que soit le runtime.
 
+**Additif du 10/11/2026, 19:42 UTC : transfert par `kubectl exec`, bisection.** **Bisection sur le nœud** (19:41:09 à 19:41:38 UTC, code 0 ; pod runc, 128 Mio tirés de `/dev/urandom` sur sc-build) :
+- **B1** : `crictl exec`, lecture lente, **code 0 en 13,3 s** ;
+- **B2** : `crictl exec`, lecture rapide, code 0 en 0,4 s ;
+- **B3** : `ctr task exec`, lecture lente, code 0 en 13,4 s.
+
+Tous les octets sont reçus dans les trois cas. **containerd, son serveur de flux CRI et le shim ne sont pas en cause** : la même lecture lente, qui bloque par `kubectl exec`, passe par `crictl exec` (crictl 1.35.0, containerd 2.2.7-k3s1). **Le maillon fautif est en amont, dans kubelet, l'apiserver ou kubectl**, et leur relais du flux. Il n'est pas encore identifié.
+
