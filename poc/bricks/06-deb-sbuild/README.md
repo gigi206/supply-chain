@@ -674,3 +674,9 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - Ordre proposé, à confirmer : S4a (`builders/`), S4c (packaging et verrou), S4b (`prefetch-deb`), puis S4d.
 
 **Questions ouvertes** : cet ordre, la source de `marked` dans la plateforme, et le push des commits de la 06.
+
+## Additif du 10/11/2026, 22:21 UTC : décision sur l'ordre des jalons de S4
+
+**Décision du propriétaire** (22:21:12 UTC) : « Oui, cet ordre ». S4 se déroule dans cet ordre : **S4a** (`builders/`), **S4c** (packaging et verrou), **S4b** (`prefetch-deb`), **S4d** (`sample-app-deb`), puis **S5**. Ce n'est un accord pour aucune mesure ni aucune écriture : chaque jalon sera préparé à sec, avec ses prédictions commitées avant tout lancement, puis attendra un accord nommé.
+
+**Questions ouvertes** : la source de `marked` dans la plateforme, à trancher avant S4c, puisque l'artefact de packaging en dépend si `debian/rules` change ; et le push des commits de la 06.
