@@ -264,4 +264,57 @@ PY
   [ "$ECARTS" = 0 ]
 }
 
+# Sonde (préparée à sec le 10/11/2026 à 18:01 UTC, NON LANCÉE), choisie par le propriétaire (« Diagnostic d'abord ») après deux
+# blocages de la copie du chroot vers le pod : copies de fichiers aléatoires de 1, 8, 64 et 512 Mio par l'entrée standard de
+# kubectl exec (head -c, délai de 120 s), dans un pod Kata privilégié (forme des builds) puis un pod runc en restricted, UID 1000,
+# sans label, image d'essai de s1b ; par taille : code, durée, octets reçus dans le pod, sha256 dans le pod ; tailles suivantes
+# sautées après le premier échec d'un pod ; à la première taille en échec, même copie avec KUBECTL_REMOTE_COMMAND_WEBSOCKETS=false
+# (SPDY au lieu de WebSocket). Prédictions D1 à D5 : resultats/s3-predictions.md.
+RESTREINT='{"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}}'
+TAILLES_MIO="1 8 64 512"
+
+sonde_copie() { # pod fichier variante(websocket|spdy) : 0 si la copie aboutit, conforme
+  local n f=$2 v=$3 rc=0 t0 dt recu sha="-" cible ok=1
+  n=$(stat -c %s "$f"); cible=/w/sonde-$n-$v
+  t0=$(date +%s%N)
+  if [ "$v" = spdy ]; then
+    KUBECTL_REMOTE_COMMAND_WEBSOCKETS=false timeout 120 kubectl exec -i -n builds "$1" -- sh -c "head -c $n > $cible" < "$f" 2>"$T/sonde.err" || rc=$?
+  else
+    timeout 120 kubectl exec -i -n builds "$1" -- sh -c "head -c $n > $cible" < "$f" 2>"$T/sonde.err" || rc=$?
+  fi
+  dt=$(( ($(date +%s%N) - t0) / 1000000 ))
+  recu=$(kubectl exec -n builds "$1" -- stat -c %s "$cible" </dev/null 2>/dev/null || echo "?")
+  [ "$recu" = "$n" ] && sha=$(kubectl exec -n builds "$1" -- sha256sum "$cible" </dev/null | cut -c1-64)
+  [ "$rc" = 0 ] && [ "$sha" = "$(sha256sum < "$f" | cut -c1-64)" ] && ok=0
+  echo "sonde $1 $v $n octets : code $rc en $dt ms ; reçus dans le pod : $recu ; sha256 $([ $ok = 0 ] && echo conforme || echo "non conforme ou non lu") $(grep -i -v -E 'jeton|token' "$T/sonde.err" | head -c 200 | tr '\n' ' ')"
+  kubectl exec -n builds "$1" -- rm -f "$cible" </dev/null || true
+  return $ok
+}
+
+etape_sonde() {
+  local e p rt sc m f echec
+  mkdir -p "$T/sonde"
+  echo "kubectl : $(kubectl version --client 2>/dev/null | head -1)"
+  for m in $TAILLES_MIO; do
+    f=$T/sonde/alea-$m.bin
+    [ -s "$f" ] || head -c $((m * 1048576)) /dev/urandom > "$f"
+  done
+  for e in "s3-sonde-kata kata $PRIVILEGIE" "s3-sonde-runc - $RESTREINT"; do
+    read -r p rt sc <<<"$e"
+    pod_spec "$p" "$rt" "$IMAGE" 1000 "$sc"
+    pod_demarrer "$p"
+    echec=""
+    for m in $TAILLES_MIO; do
+      sonde_copie "$p" "$T/sonde/alea-$m.bin" websocket || { echec=$m; break; }
+    done
+    if [ -n "$echec" ]; then
+      echo "premier échec de $p : $echec Mio ; tailles suivantes sautées ; même copie en SPDY :"
+      sonde_copie "$p" "$T/sonde/alea-$echec.bin" spdy || true
+    else
+      echo "$p : toutes les tailles passent"
+    fi
+    pod_retirer "$p"
+  done
+}
+
 lancer s3 "06 S3" "$@"

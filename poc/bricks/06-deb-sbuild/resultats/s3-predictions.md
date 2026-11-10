@@ -151,3 +151,28 @@ Accord : « Oui », à 17:44:23 UTC (transcription), en réponse à « je rejoue
 
 *Corrigé à 17:56 UTC, avant tout push* : « Les copies réussies jusqu'ici dans ce sens ne dépassaient pas 4 ko » est faux, et n'avait pas été mesuré. En S1 (`essais` et `relance`), l'archive tar des sources de sample-app est passée par l'entrée standard de `kubectl exec`. Ses trois fichiers font 140 171, 2 684 et 919 octets (relevé sur l'hôte à 17:56 UTC). Le plus gros transfert réussi dans ce sens fait donc environ 144 ko, contre 509 Mo pour le chroot. Le seuil d'échec reste inconnu.
 
+## Sonde du transfert vers le pod : préparée à sec (18:01 UTC), NON LANCÉE
+
+**Choix du propriétaire** : « Diagnostic d'abord » (transcription), parmi l'image d'essai (A), la copie par morceaux (B), la restauration par oras (C) et le diagnostic. Cette réponse est consignée comme une interprétation : elle désigne la voie, et le lancement attend un accord nommé.
+
+**Étape `sonde` de `s3.sh`**
+- Fichiers aléatoires de 1, 8, 64 et 512 Mio, créés sur l'hôte.
+- Chacun est copié par l'entrée standard de `kubectl exec`, avec `head -c` dans le pod et un délai de 120 s.
+- Par copie, on relève : le code, la durée, les octets reçus dans le pod et le sha256 dans le pod.
+- Deux pods, l'un après l'autre, UID 1000, sans label, image d'essai de s1b :
+  - Kata privilégié, la forme des builds ;
+  - runc en `restricted`, déjà admis en S1.
+- Dans chaque pod, les tailles s'arrêtent au premier échec. La taille en échec est alors recopiée avec `KUBECTL_REMOTE_COMMAND_WEBSOCKETS=false`, en SPDY au lieu de WebSocket.
+- kubectl client 1.35.10, serveur 1.35.9 (RKE2).
+- Durée maximale d'environ 20 min, chaque pod supprimé à la fin. Rien n'est écrit dans Zot.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| D1 | 1 Mio passe dans les deux pods, sha256 conforme | haute : 144 ko sont passés en S1 |
+| D2 | Dans le pod Kata, une taille entre 8 et 512 Mio échoue au délai, avec moins d'octets reçus qu'envoyés | moyenne : deux blocages à 509 Mo, seuil inconnu |
+| D3 | Dans le pod runc, les quatre tailles passent | faible : le blocage peut venir du chemin apiserver, kubelet et conteneur, commun aux deux, plutôt que de Kata |
+| D4 | En SPDY, la taille en échec passe | faible |
+| D5 | Aucun pod ne reste après l'étape | haute |
+
+**Ce que la sonde ne dira pas** : la cause exacte. Elle localise le blocage (taille, runtime, protocole) sans lire les journaux de kubelet, de containerd ou de Kata.
+
