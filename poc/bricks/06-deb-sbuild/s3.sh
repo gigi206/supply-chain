@@ -20,6 +20,8 @@
 #   comparaison  hôte seul, hors ligne : sha256 des deux deb ; Installed-Build-Depends des deux .buildinfo contre celui de S2 ;
 #                champs différents entre les .buildinfo ; adresses des lignes Get des journaux ; paquets installés par sbuild
 #                contre la simulation
+# Additif du 10/11/2026, 18:47 UTC : simulation, restauration, sonde, builds (troisième passage, par morceaux) et comparaison
+# lancés, code 0 ; S3 tenu (resultats/s3-predictions.md). Les mentions « NON LANCÉ » plus bas datent de la préparation.
 # Hors S3 : diffoscope (absent de l'hôte et de l'image : son installation se demande au propriétaire) ; image sous builders/ ;
 # Tekton, Chains et deb dans Zot (S4) ; tests négatifs (S5).
 # Retrait : rien d'écrit dans Zot ; pods supprimés à la fin de chaque build.

@@ -143,3 +143,27 @@ Pour l'exec `204b7a67…` :
   - pourquoi elle dépend de la quantité sous Kata.
 - **Bruit relevé, sans lien établi** : `failed to connect agent-log` à 18:41:20. Le shim n'a pas joint le port de journal de l'agent (1025). Le journal de l'agent n'est donc pas transmis.
 
+## Additif du 18:48 UTC : correction de lecture, et étape croise préparée à sec, NON LANCÉE
+
+**Correction de lecture** : « le blocage est propre à Kata » n'est pas établi. La comparaison runc/Kata change deux choses à la fois, le runtime et la vitesse de lecture du pod (environ 150 Mo/s sous runc, 10 Mo/s sous Kata). Sous Kata, kubectl a tout envoyé bien avant que le pod ait tout lu, et des centaines de Mo restent en attente dans la chaîne. Ce cas n'a jamais été mesuré sous runc. De même, « la quantité compte, pas la durée » est trop fort : l'envoi lent ne portait que sur 32 Mio, sous les 64 Mio qui passent. **La règle d'exploitation reste vraie** : sous Kata, un gros fichier ne passe pas par l'entrée standard de `kubectl exec`.
+
+**Étape `croise`**, un seul exec par mesure, 128 Mio, délai de 150 s :
+- **(a)** pod runc `restricted`, envoi à plein débit. Le pod lit lentement : 128 fois `dd bs=1M count=1 iflag=fullblock` suivi de `sleep 0.1`, soit environ 10 Mio/s.
+- **(b)** pod Kata, envoi lent : 1 Mio toutes les 0,2 s, soit environ 5 Mio/s, sous le débit du pod. Le pod lit à plein débit (`head -c`).
+
+**Vérifications hors ligne**
+- `racine.tar` (`f8f221ca…`) contient GNU coreutils 9.7-3 (`dd`, `sleep`, `timeout`).
+- La boucle de lecture a été essayée sur l'hôte sur 8 Mio, avec le `dd` de l'hôte : octets identiques.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| G8 | (a) bloque au délai sous runc, tous les octets reçus : la quantité en attente suffit, hors de Kata | faible |
+| G9 | (b) passe sous Kata, code 0 : sans données en attente, 128 Mio ne bloquent pas | faible |
+
+**Lecture prévue**
+- **G8 et G9 tenues** : la cause est la quantité de données en attente dans la chaîne de flux, et Kata n'y joue que par sa lenteur.
+- **G8 réfutée et G9 tenue** : il faut à la fois Kata et des données en attente.
+- **G9 réfutée** : c'est la taille totale sous Kata qui compte.
+
+La bisection sur le nœud (`crictl exec`, puis `ctr task exec`) viendra ensuite, selon le résultat, avec un accord à part.
+

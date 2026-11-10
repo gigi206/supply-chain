@@ -303,3 +303,15 @@ Builds lancés de 18:11:00 à 18:23:23 UTC, sur l'accord « Oui, lance builds »
 
 **Reste** : S4 (Tekton, Chains, deb dans Zot) et S5. L'incident de copie vers un pod Kata est à diagnostiquer, à la demande du propriétaire.
 
+## Additif du 10/11/2026, 18:48 UTC : diagnostic du blocage de `kubectl exec` sous Kata, et correction de lecture
+
+**Correction de lecture** : « le blocage est propre à Kata » n'est pas établi. La comparaison runc/Kata change deux choses à la fois, le runtime et la vitesse de lecture du pod (environ 150 Mo/s sous runc, 10 Mo/s sous Kata). Sous Kata, kubectl a tout envoyé bien avant que le pod ait tout lu, et des centaines de Mo restent en attente dans la chaîne. Ce cas n'a jamais été mesuré sous runc. De même, « la quantité compte, pas la durée » est trop fort : l'envoi lent ne portait que sur 32 Mio, sous les 64 Mio qui passent. **La règle d'exploitation reste vraie** : sous Kata, un gros fichier ne passe pas par l'entrée standard de `kubectl exec`.
+
+Diagnostic ([prédictions et résultats](resultats/diag-exec-predictions.md)) :
+- **seuil** : entre 64 et 128 Mio par exec sous Kata ;
+- **processus** : au bout de 60 s, le processus de l'exec est fini dans le pod ;
+- **shim** : son journal sur sc-build montre qu'il a tout fait en 13 s. Il a transmis les 128 Mio, vu la fin du processus en code 0 et émis `TaskExit` ; containerd note « stdin closed » à la même seconde.
+
+**Le blocage est en aval du shim**, dans la remontée de la fin de l'exec vers kubectl : containerd, kubelet ou apiserver. La cause n'est pas connue. Deux tests croisés sont préparés à sec : runc avec une lecture lente dans le pod, et Kata avec un envoi lent.
+
+Script : [`diag-exec-kata.sh`](diag-exec-kata.sh). Étapes `pod`, `releve` et `noeud` lancées sur accord, code 0 ; étape `croise` NON LANCÉE.

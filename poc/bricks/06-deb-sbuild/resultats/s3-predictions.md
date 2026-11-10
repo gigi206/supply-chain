@@ -260,3 +260,8 @@ R2 à R10, R12 et R13 sont inchangées. **R11 est précisée** : la limite de 5 
 
 L'incident de copie reste ouvert. Le propriétaire a demandé « il faut trouver ce qu'il se passe » (18:21:02 UTC) : un diagnostic est préparé à part.
 
+## Additif du 10/11/2026, 18:48 UTC : correction de lecture de la sonde
+
+**Correction de lecture** : « le blocage est propre à Kata » n'est pas établi. La comparaison runc/Kata change deux choses à la fois, le runtime et la vitesse de lecture du pod (environ 150 Mo/s sous runc, 10 Mo/s sous Kata). Sous Kata, kubectl a tout envoyé bien avant que le pod ait tout lu, et des centaines de Mo restent en attente dans la chaîne. Ce cas n'a jamais été mesuré sous runc. De même, « la quantité compte, pas la durée » est trop fort : l'envoi lent ne portait que sur 32 Mio, sous les 64 Mio qui passent. **La règle d'exploitation reste vraie** : sous Kata, un gros fichier ne passe pas par l'entrée standard de `kubectl exec`.
+
+Le diagnostic qui a suivi est dans [`diag-exec-predictions.md`](diag-exec-predictions.md).

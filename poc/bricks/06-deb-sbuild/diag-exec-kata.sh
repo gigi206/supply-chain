@@ -16,6 +16,12 @@
 #              journal système qui citent kata, le shim, l'exec ou les E/S (run_io_copy, wait, exit, CloseIO, stdin), lignes
 #              jeton|token retirées, 300 caractères au plus ; rien n'est modifié sur la VM
 # Rien n'est écrit dans Zot ni sur les VM.
+# Additif du 10/11/2026, 18:47 UTC : étapes pod (18:27 UTC), releve et noeud (18:41 à 18:43 UTC) lancées, code 0 ; étape croise
+# ajoutée à sec, NON LANCÉE (resultats/diag-exec-predictions.md) :
+#   croise     (a) pod runc restricted, 128 Mio envoyés à plein débit, lus dans le pod à environ 10 Mio/s (dd de 1 Mio avec
+#              iflag=fullblock, puis sleep 0.1, 128 fois) : un consommateur lent suffit-il à bloquer hors de Kata ?
+#              (b) pod Kata, 128 Mio envoyés à environ 5 Mio/s (1 Mio toutes les 0,2 s), sous le débit du pod : la taille totale
+#              bloque-t-elle sans données en attente dans la chaîne ? Un seul exec par mesure, délai de 150 s.
 #
 # Usage (racine du dépôt, sous bash pour relever le code) :
 #   DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/diag-exec-kata.sh <étape>…   (journal : resultats/diag-exec-<étape>.log)
@@ -170,6 +176,38 @@ journalctl --since "$(echo "$D" | tr T ' ') UTC" --until "$(echo "$F" | tr T ' '
   | grep -i -E 'kata|shim|run_io|wait process|exit|closeio|stdin' | tail -n 400
 NOEUD
   grep -i -v -E 'jeton|token' "$T/noeud.brut" | cut -c1-300
+}
+
+RESTREINT='{"allowPrivilegeEscalation": false, "capabilities": {"drop": ["ALL"]}}'
+LECTEUR_LENT='for i in $(seq 1 128); do dd bs=1M count=1 iflag=fullblock status=none || exit 1; sleep 0.1; done > /w/croise'
+
+croise_pod() { # runtimeClass|- contexte : pod $POD prêt
+  pod_spec "$POD" "$1" "$IMAGE" 1000 "$2"
+  [ "$1" = - ] && jq 'del(.spec.runtimeClassName)' "$T/$POD.json" > "$T/$POD.json.tmp" && mv "$T/$POD.json.tmp" "$T/$POD.json"
+  kubectl delete pod -n builds "$POD" --ignore-not-found --wait=true </dev/null >/dev/null
+  kubectl create -f "$T/$POD.json" </dev/null >/dev/null
+  kubectl wait -n builds "pod/$POD" --for=condition=Ready --timeout=300s </dev/null >/dev/null \
+    || { pod_retirer "$POD"; echo "KO   pod non prêt" >&2; exit 1; }
+  echo "### $POD (runtimeClassName $(jq -r '.spec.runtimeClassName // "-"' "$T/$POD.json"), uid 1000, sans label) : prêt à $(heure) UTC"
+}
+
+etape_croise() {
+  local f n t0 rc k
+  f=$(alea 128); n=$(stat -c %s "$f")
+  echo "## (a) runc restricted, envoi à plein débit, lecture lente dans le pod"
+  croise_pod - "$RESTREINT"
+  rc=0; t0=$(ms)
+  timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" || rc=$?
+  echo "(a) : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/croise) ; sha256 $([ "$(kubectl exec -n builds "$POD" -- sha256sum /w/croise </dev/null | cut -c1-64)" = "$(sha256sum < "$f" | cut -c1-64)" ] && echo conforme || echo "non conforme")"
+  pod_retirer "$POD"
+  kubectl wait -n builds "pod/$POD" --for=delete --timeout=120s </dev/null >/dev/null || true
+  echo "## (b) Kata, envoi lent (1 Mio toutes les 0,2 s), lecture à plein débit"
+  croise_pod kata "$PRIVILEGIE"
+  rc=0; t0=$(ms)
+  { for ((k = 0; k < 128; k++)); do dd if="$f" bs=1M skip=$k count=1 status=none; sleep 0.2; done; } \
+    | timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "head -c $n > /w/croise" 2>"$T/err" || rc=$?
+  echo "(b) : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/croise)"
+  pod_retirer "$POD"
 }
 
 lancer diag-exec "06 diagnostic exec Kata" "$@"
