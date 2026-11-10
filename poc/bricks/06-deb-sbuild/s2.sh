@@ -19,6 +19,7 @@
 # Hors S2 : S3 (deux builds hors ligne depuis la fermeture restaurée) ; image sous builders/ (étape à part, accord à part) ;
 # déduplication entre deux fermetures (il n'en existe qu'une : voir les prédictions).
 # Retrait : Zot n'autorise pas la suppression ; le dépôt de la fermeture est définitif.
+# Additif du 10/11/2026, 15:53 UTC : étape buildinfo lancée à 15:50:39 UTC (code 0) ; racine, fermeture et restauration NON LANCÉES.
 #
 # Usage (racine du dépôt, sous bash pour relever le code) :
 #   DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s2.sh <étape>…   (journal : resultats/s2-<étape>.log)

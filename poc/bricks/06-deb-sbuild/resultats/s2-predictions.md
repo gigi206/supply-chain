@@ -80,3 +80,18 @@ Déjà observés avant les prédictions, refaits par l'étape : `.buildinfo` de 
 **Non lancées** : `racine`, `fermeture` et `restauration`. Chacune attend un accord nommé.
 
 Push consigné : 14:45:31 UTC, `145f67a..4072aee`, 17 fichiers contrôlés, aucun secret.
+
+## Additif du 10/11/2026, 15:53 UTC, avant tout push et avant tout lancement de `racine`
+
+*Corrigé à 15:53 UTC, avant tout push* : « vers 15:46 UTC », dans les lectures faites avant les prédictions, n'a pas été relevé. Les bornes mesurées sont 15:43:21 UTC (« continue », transcription) et 15:47:17 UTC (premier relevé d'heure par Python). La reconstitution a eu lieu **entre 15:43:21 et 15:47:17 UTC**.
+
+**Test à sec avant lancement, hôte seul, sous `unshare -rn`** : le renommage de l'étape `racine`.
+- Pour chacun des 162 paquets, j'ai construit le nom que donne `apt-get download` : `nom_version_arch.deb`, avec le `:` de l'époque écrit `%3a`.
+- Cette forme est supposée. Elle s'appuie sur le motif de `controle_debs` dans `s1.sh`, qui l'a rencontrée sur des .deb réels.
+- J'ai appliqué à ces noms le `sed` exact de `etape_racine`.
+- **Résultat : 22 noms à époque, 0 écart avec la liste attendue.**
+- Q6 reste écrite telle quelle.
+
+**Précisions de périmètre**
+- **Q5** : `chroot-a` et `chroot-b` sont construits dans le même pod, coup sur coup. C'est plus faible que deux pods, ou que l'écart de 1 h 30 entre s1 et s1c. Q5 tenue ne prouvera que cela.
+- **Déduplication** : la configuration de Zot (`08-trust-plane/stockage/zot.json`) porte `"dedupe": true`. La condition nécessaire de S2 (couche = sha256 du contenu) s'appuie sur ce réglage. La déduplication réelle entre deux fermetures reste non mesurée.
