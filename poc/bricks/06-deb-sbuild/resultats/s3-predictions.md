@@ -99,3 +99,13 @@ L'en-tête du script, commité en `5525180`, affirmait des prédictions « écri
 |---|---|---|---|
 | R13 | comparaison | Chaque journal de sbuild contient une fois `Finished running` pour chacune des deux commandes de neutralisation | haute si R4 |
 
+## Résultat de l'étape restauration (10/11/2026, 16:49:42 à 16:49:43 UTC)
+
+Accord : « Oui, lance restauration », à 16:49:38 UTC (transcription). Lancée sous bash, code de sortie relevé : **0**. Journal : [`s3-restauration.log`](s3-restauration.log).
+
+| # | Résultat |
+|---|---|
+| R1 | **Tenue.** Deux pulls par digest de `deps/sample-app/deb-buildinfo@sha256:3a0e54ae…`, chacun dans un répertoire vide : 162 fichiers chacun, empreintes identiques à la liste attendue |
+
+Lecture seule dans Zot ; rien n'y est écrit. **`builds` et `comparaison` ne sont pas lancées.** Les questions 1 et 2 restent ouvertes. `builds` attend un accord nommé.
+

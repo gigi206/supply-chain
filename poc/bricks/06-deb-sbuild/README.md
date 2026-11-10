@@ -256,3 +256,12 @@ Le propriétaire a répondu « continue » à 16:36:51 UTC. Cette réponse n'aut
 **Non lancé** : la restauration et les deux builds. Chaque étape attend un accord nommé. Deux questions sont posées : le chroot de S2 copié dans `/w` plutôt qu'une nouvelle image, et la neutralisation des sources.
 
 Push de 16:32:36 UTC (`4072aee..fc4afa3`, 13 fichiers) consigné.
+
+## Additif du 10/11/2026, 16:49 UTC : restauration de S3 tenue
+
+L'étape `restauration` a tourné de 16:49:42 à 16:49:43 UTC, sur l'accord « Oui, lance restauration ». Code 0. Journal : [`s3-restauration.log`](resultats/s3-restauration.log).
+
+Les deux pulls par digest de la fermeture de S2 redonnent chacun 162 fichiers. Les empreintes sont identiques à la liste attendue (R1).
+
+**Non lancés** : les deux builds et la comparaison. Ils attendent un accord nommé, et les questions sur le chroot et la neutralisation des sources restent ouvertes.
+
