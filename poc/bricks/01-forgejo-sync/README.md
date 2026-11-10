@@ -437,11 +437,13 @@ S2 à S4 et S6 ont été rejouées sur une plateforme neuve, sans KO :
 
 ## Additif du 10/11/2026, 11:03 UTC : la « brique `-custom` » est B7, donc cette brique (S5)
 
-**Accord du propriétaire** : « Oui, consigne ». Rien n'a été lu ni écrit dans Forgejo, le cluster, Zot ou les VM : relecture du dépôt seulement.
+**Accord du propriétaire** : « Oui, consigne », en réponse à « Je consigne ces constats dans le brouillon et les prédictions ? ». **Interprétation** : « ces constats » comprenait ceux sur `-custom`, consignés ici. Rien n'a été lu ni écrit dans Forgejo, le cluster, Zot ou les VM : relecture du dépôt seulement.
 
 **Définition du propriétaire, verbatim** : « -custom, c'est une branche ou un tag pour rebuild un custom patch et ainsi pouvoir le publier ».
 
-Le libellé « brique `-custom` » venait de ma propre liste de points ouverts, écrite dans une session précédente. Ce besoin n'est pas une brique à part : c'est l'exigence B7 (doc 01), couverte ici par S5, branche custom construite et admise par la porte le 02/11/2026.
+*Corrigé à 11:07 UTC, avant tout push, sur relecture du conseiller* : le texte disait que le libellé venait de ma propre liste. C'est faux. Le terme vient du propriétaire, le 09/11/2026 à 13:33 UTC, à propos du binaire corrigé de Kyverno (go1.26.9) : « maintenir une branche -custom qu'on build ». Je l'avais alors repris comme une brique à ouvrir ou non, « composant amont patché, reconstruit par la chaîne ». Le texte disait aussi que ce besoin n'était pas une brique à part. C'est une interprétation, pas un fait.
+
+Ce que le dépôt couvre déjà : l'exigence B7 (doc 01), avec S5 : une branche custom construite et admise par la porte le 02/11/2026. Cette mécanique ne porte que sur `sample-app`. Le cas d'école du propriétaire est un composant amont, Kyverno corrigé, reconstruit par notre chaîne puis publié. Ce cas n'est pas couvert : l'image corrigée de l'étape C (09/11) a été construite sur l'hôte, hors de la chaîne. Ouvrir ou non une brique reste à décider.
 
 **Écarts relevés dans le dépôt, à décider.**
 - **Un tag ne déclenche aucun build.** Le filtre du déclencheur ne prend que `refs/heads/custom/` ([`declencheur.sh:89`](declencheur.sh)). Or B7 n'impose pas de motif et cite `custom-*` en exemple.
