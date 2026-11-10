@@ -416,3 +416,25 @@ Accord : « Oui », à 20:04:41 UTC (transcription), en réponse à « Je lance 
 
 **Lecture** : à 45 s, le processus est fini et kubelet ne relaie plus rien pour cet exec. Sa part semble achevée. Par élimination avec la bisection (containerd hors de cause) et l'étape amont (poste hors de cause), **le maillon probable est kube-apiserver**, qui garde l'exec ouvert vers kubectl. **Ce n'est pas prouvé** : la pile de l'apiserver manque, et les goroutines de kubelet pendant le transfert lui-même (avant 15 s) n'ont pas été relevées.
 
+## Étape connexions : préparée à sec (20:08 UTC), NON LANCÉE
+
+**Pourquoi cette étape** : la pile de l'apiserver est indisponible. Activer son profilage serait un changement de la plateforme, et ce n'est pas proposé ici. Cette étape relève donc l'état des connexions TCP établies, en adresses et ports seulement (`ss -tn`, sans contenu). Rien n'est changé ni écrit sur les VM.
+
+**Connexions relevées** :
+- sur sc-build : celles de kubelet sur le port 10250 venant de sc-confiance ;
+- sur sc-confiance : celles de kube-apiserver vers sc-build:10250, et celles reçues sur 6443 ;
+- sur l'hôte : celles du processus kubectl de l'exec.
+
+**Trois moments** : avant, pendant (à 45 s), après le délai. Ils encadrent le même exec à lecture lente de 128 Mio, dans un pod runc.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| N1 | Pendant le blocage, aucune connexion de plus entre l'apiserver et kubelet par rapport à avant (la part de kubelet est finie), alors que le kubectl de l'exec garde sa connexion vers 6443 | moyenne (d'après la pile de kubelet) |
+| N2 | Code 124, tous les octets reçus | haute |
+
+**Lecture prévue**
+- **N1 tenue** : l'apiserver garde ouverte la connexion avec kubectl après la fermeture du côté de kubelet. C'est le maillon, prouvé au niveau des connexions.
+- **Une connexion de plus vers kubelet pendant le blocage** : le côté de kubelet reste ouvert, sans goroutine de relais, et la question reste ouverte.
+
+**Limite** : les connexions de l'apiserver vers kubelet servent aussi à d'autres requêtes, comme les journaux et les métriques. La différence entre les moments peut donc être brouillée.
+

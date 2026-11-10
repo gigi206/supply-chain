@@ -387,4 +387,40 @@ for c in ('kubelet', 'apiserver'):
 PILE
 }
 
+# Étape connexions (préparée à sec le 10/11/2026 à 20:08 UTC, NON LANCÉE) : la pile de kubelet ne montre plus aucun relais
+# pendant le blocage ; celle de l'apiserver est indisponible (profilage coupé). Relevé des connexions TCP établies, sans rien
+# changer : sur sc-build, celles de kubelet sur le port 10250 venant de sc-confiance (apiserver) ; sur sc-confiance, celles de
+# kube-apiserver vers sc-build:10250 et celles reçues sur 6443 depuis l'hôte ; sur l'hôte, celles du processus kubectl de l'exec.
+# Trois moments (avant, pendant à 45 s, après le délai) autour du même exec à lecture lente de 128 Mio dans un pod runc.
+# Adresses et ports seulement (ss -tn, sans -p ni contenu) ; rien n'est écrit sur les VM.
+connexions_releve() { # moment [pid de kubectl]
+  echo "### $1"
+  echo "sc-build, kubelet :10250 depuis ${IP[sc-confiance]} : $(sur sc-build "sudo ss -Htn state established '( sport = :10250 )' dst ${IP[sc-confiance]}" </dev/null 2>/dev/null | wc -l)"
+  echo "sc-confiance, vers ${IP[sc-build]}:10250 : $(sur sc-confiance "sudo ss -Htn state established dst ${IP[sc-build]}:10250" </dev/null 2>/dev/null | wc -l)"
+  echo "sc-confiance, :6443 reçues : $(sur sc-confiance "sudo ss -Htn state established '( sport = :6443 )'" </dev/null 2>/dev/null | wc -l)"
+  if [ -n "${2:-}" ] && [ -d "/proc/$2" ]; then
+    echo "hôte, sockets TCP du kubectl de l'exec (pid $2) : $(find "/proc/$2/fd" -lname 'socket:*' 2>/dev/null | wc -l) ; $(ss -Htnp 2>/dev/null | grep -c "pid=$2," ) établie(s)"
+  elif [ -n "${2:-}" ]; then
+    echo "hôte, kubectl de l'exec : terminé"
+  fi
+}
+
+etape_connexions() {
+  local f pid rc=0 t0 k
+  croise_pod - "$RESTREINT"
+  connexions_releve avant
+  f=$(alea 128); t0=$(ms)
+  timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" &
+  pid=$!
+  sleep 45
+  k=$(pgrep -P "$pid" -x kubectl || true)
+  echo "pendant, $(( ($(ms) - t0) / 1000 )) s après le lancement ; reçus dans le pod : $(recu /w/croise)"
+  connexions_releve pendant "$k"
+  wait "$pid" || rc=$?
+  echo "exec : code $rc en $(( $(ms) - t0 )) ms"
+  sleep 5
+  connexions_releve apres
+  pod_retirer "$POD"
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
