@@ -266,4 +266,8 @@ Journaux : [`sortie-test6.log`](sortie-test6.log) et [`sortie-test6-preuves.log`
 - **Sorties dédiées** : S2 de la 06 (instantané Debian) et M1 de la 05 (`vault` de Rocky) en auront besoin, avec chacune un label ajouté à l'exclusion. Ce sera une décision du propriétaire, le moment venu.
 - **Option (b)** : toujours ouverte. Elle fermerait l'API de RKE2, OpenBao, sc-stockage hors de Zot et Forgejo, et le DNS.
 
-**Durée** : de 13:33 à 14:07 UTC, préparation, deux passages de `test6` et consignation compris, pour 45 min estimées. C'est moins de 2× l'estimation.
+**Durée**
+- **Tout compris** : de 13:32 à 14:07 UTC, soit 35 min. Cela couvre la préparation à partir de « Oui, prépare-le » (13:32:24 UTC, dans la transcription), deux passages de `test6` et la consignation.
+- **Passage seul** : de 13:52 à 14:07 UTC, soit 15 min, pour 45 min estimées.
+
+*Corrigé à 14:07 UTC, avant tout push* : le bilan donnait 13:33 comme heure de départ. L'heure relevée dans la transcription est 13:32:24 UTC, et la durée du passage seul est maintenant distinguée.
