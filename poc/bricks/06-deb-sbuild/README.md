@@ -680,3 +680,20 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 **Décision du propriétaire** (22:21:12 UTC) : « Oui, cet ordre ». S4 se déroule dans cet ordre : **S4a** (`builders/`), **S4c** (packaging et verrou), **S4b** (`prefetch-deb`), **S4d** (`sample-app-deb`), puis **S5**. Ce n'est un accord pour aucune mesure ni aucune écriture : chaque jalon sera préparé à sec, avec ses prédictions commitées avant tout lancement, puis attendra un accord nommé.
 
 **Questions ouvertes** : la source de `marked` dans la plateforme, à trancher avant S4c, puisque l'artefact de packaging en dépend si `debian/rules` change ; et le push des commits de la 06.
+
+## Additif du 10/11/2026, 22:30 UTC : push consigné ; décision sur `marked`, et ce qu'elle change (lu dans le dépôt, à sec)
+
+**Push consigné** : `57b76be..3eb8489`, de 22:25:37 à 22:25:39 UTC. Il contient 12 commits, tous sur ce README. Avant l'envoi, ce fichier a été contrôlé dans un worktree temporaire, sans aucun secret trouvé. Accord : « Oui, pousse ».
+
+**Décision du propriétaire** (22:30:32 UTC) : « web/dist par digest ». La pipeline deb prend `web/dist` par digest, comme la voie image (`entrees/sample-app/web-dist`, `construction.sh`, ligne 53). Node reste hors de la chaîne. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Ce que la décision change**, vérifié dans le dépôt, à faire en S4c :
+- `debian/rules` lance `node build.mjs` dans `override_dh_auto_build`, et `override_dh_auto_clean` supprime `web/dist`. Les deux sont à changer.
+  - La construction ne doit plus lancer Node.
+  - Le nettoyage ne doit plus effacer un `web/dist` livré. Le nettoyage du paquet source, que sbuild peut lancer avant la construction, l'effacerait. **À mesurer.**
+- `main.go` embarque `web/dist` à la compilation (`//go:embed all:web/dist`). `web/dist` doit donc être présent dans l'arbre source avant `go build`.
+- `debian/control` déclare `nodejs` dans `Build-Depends`, et la fermeture de S2 le contient. Le retirer change les `Installed-Build-Depends`, donc le verrou et la fermeture.
+- **Effet** : le deb de S4 ne sera pas celui de S1 à S3, car ses entrées changent. La comparaison bit à bit sera refaite en S4d ou en S5, entre deux constructions de la nouvelle voie.
+- Ces changements touchent `poc/packaging`, qui sert aussi à la brique 05 (rpm), via `sources.sh` et le spec. **À vérifier en S4c** : séparer le paquet source de la plateforme de celui de l'hôte, ou les changer ensemble.
+
+**Questions ouvertes** : aucune avant la préparation de S4a.
