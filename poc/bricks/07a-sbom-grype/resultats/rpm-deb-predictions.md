@@ -22,4 +22,19 @@ Si R1 échoue, la question « Grype comme scanner unique sur EL » reste ouverte
 
 ## Résultat
 
-(à écrire après l'exécution, sans réécrire ce qui précède)
+Le script a été exécuté le 10/11/2026 à 12:33:01 UTC, en moins d'une minute. Code 0. **R1 à R6 sont tenues.** Journaux : [`rpm-deb-hors-ligne.log`](rpm-deb-hors-ligne.log) et [`rpm-deb-hors-ligne-complement.log`](rpm-deb-hors-ligne-complement.log).
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| R1 | 48 correspondances, CVE-2026-9076 présente. Toutes viennent de l'espace `redhat:distro:redhat:9`, en `exact-direct-match`, avec la distribution cherchée `rockylinux 9.7` | tenue |
+| R2 | 20 correspondances, CVE-2026-9076 et CVE-2026-84782 absentes. Restent 19 `not-fixed` (dont CVE-2026-84784) et 1 `wont-fix` | tenue |
+| R3 | 48 correspondances, les mêmes identifiants que R1 ; aucun identifiant ALSA. La distribution cherchée est `redhat 9.7`, et non `almalinux` | tenue |
+| R4 | 38 correspondances, toutes de l'espace `debian:distro:debian:13`, CVE-2026-9076 présente | tenue |
+| R5 | 0 correspondance sans `distro=` | tenue |
+| R6 | L'entrée `purl:` est acceptée, code 0 sur les 5 cas | tenue |
+
+**Lecture**
+- Un rpm de Rocky ou d'AlmaLinux est jugé sur les données de Red Hat. Debian 13 est jugé sur ses propres données.
+- Les rpm de Rocky ne sont **pas** comparés aux errata de Rocky : la base n'en contient pas.
+- Le rôle des entrées non affectées d'Alma n'est pas mesuré. Il faudrait une version qu'Alma a corrigée avant Red Hat ; aucune n'a été cherchée.
+- **Sans `distro=` dans le PURL, aucune vulnérabilité n'est trouvée. L'échec est silencieux.** Les SBOM des rpm et des deb devront donc porter ce qualificatif, et la porte devra refuser un SBOM de paquet qui ne le porte pas.

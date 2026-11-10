@@ -266,3 +266,10 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
   - contrôle des secrets OK sur 7 fichiers, dans une copie de travail temporaire retirée ensuite ;
   - branche distante identique à la locale.
 
+**Additif du 10/11/2026, 12:33 UTC : rpm et deb hors ligne, R1 à R6 tenues** ([prédictions et résultat](resultats/rpm-deb-predictions.md)). Choix du propriétaire : « dans l'ordre que tu veux » pour a, b et c ; c passe en premier. Grype 0.104.1 a tourné sur l'hôte seul, hors réseau, sur la base du 04/11, avec des PURL synthétiques d'openssl. Aucun téléchargement ; rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+- Rocky 9.7 et AlmaLinux 9.7 sont jugés sur les données de Red Hat 9 (`redhat:distro:redhat:9`), avec les mêmes 48 vulnérabilités. La version corrigée en garde 20, toutes sans correction publiée par Red Hat.
+- Debian 13 est jugé sur ses propres données (38 vulnérabilités).
+- **Sans `distro=`, aucune vulnérabilité n'est trouvée, sans aucun avertissement.** Les SBOM de paquets devront porter ce qualificatif, et la porte devra refuser ceux qui ne l'ont pas. Ce point est à reprendre quand les briques 05 et 06 produiront des paquets.
+- Grype peut donc servir de scanner unique sur EL, avec deux limites : les errata propres à Rocky ne sont pas utilisés, et le rôle des données d'Alma n'est pas mesuré.
+- Le push de 12:31:42 UTC est consigné : accord « 1 oui », commits `884670b..3d5980e`, contrôle des secrets OK sur 5 fichiers dans une copie temporaire retirée ensuite, branche distante identique à la locale. *J'avais annoncé 6 fichiers ; le contrôle en a compté 5.*
+

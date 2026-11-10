@@ -1,0 +1,11 @@
+# complément, 2026-11-10T12:33:21Z : sorties JSON de rpm-deb-hors-ligne.sh relues (~/.cache/supply-chain-poc/07a/rpmdeb), lecture seule
+rocky-vieux états de correction : {'fixed': 28, 'not-fixed': 19, 'wont-fix': 1} ; CVE-2026-84784 : présente ; CVE-2026-84782 : présente ; identifiants ALSA : 0
+rocky-corrige états de correction : {'not-fixed': 19, 'wont-fix': 1} ; CVE-2026-84784 : présente ; CVE-2026-84782 : absente ; identifiants ALSA : 0
+alma-vieux états de correction : {'fixed': 28, 'not-fixed': 19, 'wont-fix': 1} ; CVE-2026-84784 : présente ; CVE-2026-84782 : présente ; identifiants ALSA : 0
+debian-vieux états de correction : {'fixed': 38} ; CVE-2026-84784 : présente ; CVE-2026-84782 : présente ; identifiants ALSA : 0
+rocky-vieux et alma-vieux : mêmes identifiants
+## espaces et types de correspondance, sur toutes les correspondances
+rocky-vieux ['redhat:distro:redhat:9'] ['exact-direct-match']
+rocky-corrige ['redhat:distro:redhat:9'] ['exact-direct-match']
+alma-vieux ['redhat:distro:redhat:9'] ['exact-direct-match']
+debian-vieux ['debian:distro:debian:13'] ['exact-direct-match']
