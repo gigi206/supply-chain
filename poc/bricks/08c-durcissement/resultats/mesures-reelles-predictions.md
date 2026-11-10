@@ -1523,3 +1523,28 @@ Cela précise l'additif du 09/11, ligne 969 (« avant un rechargement ou un red�
 Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`](issue-alloy-brouillon.md).
 
 **Push consigné** : 10:44:22 UTC, `1179d7e..0234dc6`. Les secrets des 7 fichiers touchés ont été contrôlés avant, avec le script de la copie de travail temporaire, retirée ensuite : OK. La branche distante est identique à la locale.
+
+## Additif du 10/11/2026, 11:11 UTC : remède (b1) retenu, écrit dans `redemarrer.sh` en local, prédictions du premier passage
+
+**Décision du propriétaire, verbatim** : « ok pour 1 b1 pour le moment ». **Interprétation** de « pour le moment » : (b1) est provisoire, jusqu'au correctif amont ; (b2) à (b4) ne sont pas retenues et restent ouvertes. Rien n'a été lu ni écrit dans le cluster, Loki ou les VM. `redemarrer.sh` redémarre les trois VM : son lancement demande un accord à part. Il n'a pas été lancé.
+
+**Ce qui est écrit** ([`redemarrer.sh`](../../08-trust-plane/redemarrer.sh), fonction `alloy_evenements`, entre les marqueurs `debut-b1` et `fin-b1`) :
+- une fois les trois nœuds réenregistrés et `Ready`, avant Cilium, `systemctl restart alloy` sur `sc-stockage` ;
+- le démarrage d'Alloy (`ActiveEnterTimestamp`) doit avancer, sinon KO ;
+- témoin positif, choisi sur avis du conseiller : la valeur du compteur `loki_process_custom_evenements_lignes_total`. Il repart de zéro à la relance. Il est lu sur `127.0.0.1:12345/metrics` de `sc-stockage`, toutes les 5 s, pendant 5 min au plus. Il est posé par la configuration commitée de la 19b (`evenements.alloy`), et ne dépend ni de Loki, ni d'un identifiant, ni d'OpenBao ;
+- dans le même temps, `journalctl -u alloy` depuis la relance est lu : une ligne `event watcher exited with error` ou `failed to start informers` donne KO, même si le compteur avance. Seul le compte de ces lignes est affiché ;
+- « watching events » seul ne suffit pas. Le 07/11, cette ligne précédait l'erreur : la prendre pour témoin aurait donné un faux OK ;
+- un KO est différé en fin de script : il ne bloque ni le descellement d'OpenBao ni le reste. Sans Alloy sur `sc-stockage` (19b non posée), rien n'est relancé.
+
+**Essai hors cluster** ([`b1-essai-local.log`](b1-essai-local.log)) : faux `sur`, aucun ssh. 10 cas sur 10 conformes, dont la séquence du 07/11 (KO), le compteur à 0 ou absent pendant 5 min (KO), la relance refusée ou sans effet (KO), le nominal (OK). `bash -n` OK, avis de shellcheck identiques avant et après.
+
+**Estimation** : 1 h. Préparation faite en environ 20 min ; reste un passage réel (`redemarrer.sh`, environ 20 min) et sa lecture. Un dépassement de 2 h déclenche une décision avec le propriétaire.
+
+**Prédictions du premier passage réel, écrites avant tout passage** :
+- B1-1 : Alloy de `sc-stockage` relancé après le réenregistrement des trois nœuds ; son démarrage avance.
+- B1-2 : compteur > 0 en moins de 1 min après la relance. Le redémarrage des VM crée de nombreux Events (pods recréés). Le plafond de 5 min n'est pas atteint.
+- B1-3 : aucune ligne d'erreur de l'observateur depuis la relance.
+- B1-4 : les autres contrôles de `redemarrer.sh` gardent leurs verdicts habituels ; la relance n'en change aucun.
+- Non jugé, affiché seulement si mesuré : les lignes du relais des deux autres VM perdues pendant la relance d'Alloy. Ces pertes n'ont jamais été mesurées.
+
+**Limite connue** : un démarrage des VM hors de `redemarrer.sh` n'est couvert que par l'alerte `EvenementsMuets` (remède (a)).

@@ -13,6 +13,10 @@
 #   (bêta) relus dans chaque agent ; en fin de script, la mesure réseau de référence (kata.sh reseau : fenêtre, usurpations).
 #   S1 de la 08c : si le contrôleur de Chains lit ses identifiants dans OpenBao (conteneur identifiants), pod recréé après le
 #   descellement, comme celui du TSA. Sous RKE2 : DISTRO=rke2. Préparé à sec le 06/11/2026, jamais lancé sous H1 à H5.
+#   Remède (b1) des Events (décision du propriétaire, « ok pour 1 b1 pour le moment », 10/11/2026) : une fois les nœuds Ready,
+#   Alloy de sc-stockage est relancé, car Alloy v1.21.3 ne relance jamais l'observateur des Events après une erreur au démarrage
+#   (API pas encore à l'écoute). Témoin : compteur de lignes d'Events transmises > 0 après la relance, sans erreur de
+#   l'observateur dans le journal d'alloy. Un KO est différé en fin de script : il ne bloque ni OpenBao ni le reste.
 #
 # Usage (racine du dépôt) : mise run confiance:redemarrer   (journal : resultats/redemarrage-vm.log)
 set -euo pipefail
@@ -43,6 +47,34 @@ prets() { # espace : chaque pod hors jobs passé Ready après l'arrêt ($arret) 
 }
 
 
+# Remède (b1) des Events, entre les marqueurs ci-dessous (essai hors cluster : 08c, resultats/b1-essai-local.log).
+# debut-b1
+alloy_debut() { sur sc-stockage "systemctl show -p ActiveEnterTimestamp --value alloy" </dev/null || true; }
+alloy_evenements() { # relance Alloy de sc-stockage ; rend 0 si des lignes d'Events sont transmises après la relance, 1 sinon
+  local a0 a1 e n=0 err=0
+  sur sc-stockage "systemctl cat alloy" </dev/null >/dev/null 2>&1 || { echo "--   Alloy absent de sc-stockage (19b non posée) : rien relancé"; return 0; }
+  a0=$(alloy_debut)
+  sur sc-stockage "sudo systemctl restart alloy" </dev/null || { echo "KO   relance d'Alloy refusée" >&2; return 1; }
+  a1=$(alloy_debut)
+  if [ -z "$a1" ] || { [ -n "$a0" ] && [ "$(date -ud "$a1" +%s)" -le "$(date -ud "$a0" +%s)" ]; }; then
+    echo "KO   Alloy non relancé (actif depuis ${a1:-?}, avant ${a0:-?})" >&2; return 1
+  fi
+  e=$(date -ud "$a1" +%s)
+  echo "Alloy relancé, actif depuis $(date -ud "@$e" +%Y-%m-%dT%H:%M:%SZ)"
+  for _ in $(seq 60); do   # 5 min au plus ; le compteur repart de zéro à la relance
+    n=$(sur sc-stockage "curl -s http://127.0.0.1:12345/metrics" </dev/null \
+      | awk '$1 ~ /^loki_process_custom_evenements_lignes_total/ {s += $NF} END {print (s > 0) ? int(s) : 0}' || true)
+    err=$(sur sc-stockage "sudo journalctl -u alloy --since @$e -o cat" </dev/null \
+      | grep -c -E 'event watcher exited with error|failed to start informers' || true)
+    [ "${err:-0}" -gt 0 ] || [ "${n:-0}" -gt 0 ] && break
+    sleep 5
+  done
+  if [ "${err:-0}" -gt 0 ]; then echo "KO   observateur des Events en erreur après la relance ($err ligne(s) d'erreur)" >&2; return 1; fi
+  if [ "${n:-0}" -gt 0 ]; then echo "OK   Events transmis après la relance ($n ligne(s) au compteur)"; return 0; fi
+  echo "KO   aucune ligne d'Event transmise 5 min après la relance" >&2; return 1
+}
+# fin-b1
+
 mise run confiance:openbao -- deverrouiller temoin   # descellé d'abord : rejouable après un arrêt
 avant=$(boot)
 arret=$(date -u +%Y-%m-%dT%H:%M:%SZ)   # aucun pod ne peut passer Ready entre l'arrêt et le démarrage : marge d'horloge
@@ -67,6 +99,9 @@ done
 echo "## durée $(( $(date +%s) - t )) s : trois nœuds réenregistrés (nouveau bootID) et Ready"
 for vm in sc-confiance sc-build sc-stockage; do echo "$vm : démarré à $(sur "$vm" 'uptime -s')"; done
 kubectl get nodes -o wide -L zone
+echo "## Alloy de sc-stockage (remède (b1) des Events), avant Cilium : un KO est différé en fin de script"
+alloy_ko=0
+alloy_evenements || alloy_ko=1
 
 if [ "$(reseau)" = cilium ]; then
   echo "## Cilium (J7, option 1b), avant les autres contrôles"
@@ -134,3 +169,4 @@ if [ "$(reseau)" = cilium ]; then
   mise run confiance:kata -- reseau
 fi
 kubectl get pods -A -o wide
+[ "$alloy_ko" = 0 ] || { echo "KO   Events : collecte non rétablie après la relance d'Alloy (voir plus haut) ; l'alerte EvenementsMuets reste le filet" >&2; exit 1; }

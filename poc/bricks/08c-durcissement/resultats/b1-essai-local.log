@@ -1,0 +1,19 @@
+# Essai hors cluster du remède (b1) des Events dans redemarrer.sh (08), 2026-11-10T11:11:05Z
+# Décision du propriétaire : « ok pour 1 b1 pour le moment » (10/11/2026). Aucun ssh, rien lu ni écrit dans le cluster, Loki ou les VM.
+# La fonction alloy_evenements, extraite entre les marqueurs debut-b1 et fin-b1, tourne avec un faux « sur » et un faux « sleep ».
+# Harnais (hors dépôt) : sha256 87aaaf0acc4f23e2330ed641c46f58751c3934da59be644b54da9582836ac3f6
+## redemarrer.sh : sha256 avant (HEAD) cc719991a5ec69787b8a0fd47b240e85ff30ca714183f0e381e576ad0263bb78, après 927daf9c19e5800c498a45570ddc74907b05a2f511e923c6d7ec930b5281f338
+## bash -n : OK
+## shellcheck -x, avis par code : avant 2 SC1091, 7 SC2015 ; après 2 SC1091, 7 SC2015
+## cas
+OK   nominal : compteur à 12, observateur démarré                code=0 (attendu 0) | OK   Events transmis après la relance (12 ligne(s) au compteur) | relances=1, lectures du compteur=1
+OK   séquence du 07/11 : watching puis erreur, série absente      code=1 (attendu 1) | KO   observateur des Events en erreur après la relance (1 ligne(s) d'erreur) | relances=1, lectures du compteur=1
+OK   séquence du 07/11 avec un compteur à 3 (erreur prioritaire)  code=1 (attendu 1) | KO   observateur des Events en erreur après la relance (1 ligne(s) d'erreur) | relances=1, lectures du compteur=1
+OK   compteur à 0 pendant 5 min, aucune erreur                     code=1 (attendu 1) | KO   aucune ligne d'Event transmise 5 min après la relance | relances=1, lectures du compteur=60
+OK   série absente pendant 5 min, aucune erreur                    code=1 (attendu 1) | KO   aucune ligne d'Event transmise 5 min après la relance | relances=1, lectures du compteur=60
+OK   relance refusée par systemctl                                 code=1 (attendu 1) | KO   relance d'Alloy refusée | relances=1, lectures du compteur=0
+OK   démarrage inchangé après la relance                         code=1 (attendu 1) | KO   Alloy non relancé (actif depuis Sat 2026-11-07 11:22:39 UTC, avant Sat 2026-11-07 11:22:39 UTC) | relances=1, lectures du compteur=0
+OK   démarrage illisible après la relance                         code=1 (attendu 1) | KO   Alloy non relancé (actif depuis ?, avant Sat 2026-11-07 11:22:39 UTC) | relances=1, lectures du compteur=0
+OK   Alloy absent de sc-stockage (19b non posée)                   code=0 (attendu 0) | --   Alloy absent de sc-stockage (19b non posée) : rien relancé | relances=0, lectures du compteur=0
+OK   compteur en notation flottante (1.2e+01)                       code=0 (attendu 0) | OK   Events transmis après la relance (12 ligne(s) au compteur) | relances=1, lectures du compteur=1
+## fin 2026-11-10T11:11:06Z
