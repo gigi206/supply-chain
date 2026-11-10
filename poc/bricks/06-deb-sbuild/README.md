@@ -621,3 +621,46 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - Une pipeline déclenchée par le webhook construit depuis le commit poussé. Le packaging (`debian/`) et le verrou doivent donc entrer dans `workspace/sample-app`, à moins d'une autre voie.
 - Ce serait une écriture dans Forgejo. Un commit sur `main` relance aussi la pipeline image, qui écrit des enveloppes définitives dans Zot : il faut un accord nommé.
 - **Seconde fermeture.** Le build deb a besoin des modules Go et de `marked`. Dans la plateforme, les modules Go viennent de la fermeture `prefetch-gomod` (D6). La pipeline deb dépendrait donc de **deux** fermetures, gomod et deb, et la règle `fermeture_plateforme` devrait admettre les deux. Pour `marked`, la source dans la plateforme reste à établir : la voie image prend `web/dist` par digest.
+
+## Additif du 10/11/2026, 22:14 UTC : quatre décisions groupées, deux conflits, découpage de S4 en jalons (à sec)
+
+**Décisions du propriétaire** (22:12:03 UTC, heure du résultat de la question groupée, tirée du jsonl). Aucune ne vaut accord de mesure.
+1. **Packaging hors du dépôt** : `debian/` est fixé par digest dans la pipeline signée, comme `web/dist` pour la voie image. `sample-app` reste inchangé. Ce n'était pas ma recommandation.
+2. **Modules Go tirés de la fermeture `prefetch-gomod`** (D6) : la porte doit admettre deux fermetures, gomod et deb.
+3. **Coupure réseau** : une politique Cilium dédiée à la construction deb. `construction-sans-sortie` reste intacte.
+4. **`builders/` construit par une pipeline de la plateforme** (image sbuild et chroot), et non poussé par l'hôte. Ce n'était pas ma recommandation. Le texte de l'option disait : « chantier à part, hors de S4 ».
+
+**Conflit 1 : l'emplacement du verrou.**
+- L'additif de 21:41 UTC lit le « ok » comme un verrou dans `sample-app`.
+- La décision 1 laisse `sample-app` inchangé et fige `debian/` par digest. Or les `Installed-Build-Depends` découlent de `debian/control` : un verrou dans `sample-app` et un `debian/` figé ailleurs peuvent diverger.
+- La décision de 22:12 affaiblit donc mon interprétation de 21:41, qui n'est pas réécrite. **Question** : le verrou va-t-il dans le même artefact que `debian/` ? Je le recommande.
+
+**Conflit 2 : l'ordre des chantiers.** S4 ne peut pas tourner avant la pipeline de `builders/`. **Question** : l'ordre est-il bien `builders/` d'abord ?
+
+**Précédents relevés dans le dépôt**
+- **`web/dist`** a été poussé depuis l'hôte, sous `entrees/sample-app/web-dist` (`construction.sh`, lignes 53 à 58 et 145), avec le compte d'écriture. Le packaging traité « comme `web/dist` » hérite donc d'une écriture dans Zot par l'hôte, et de son accord nommé.
+- **`porte.rego`** ne juge la provenance ni de `BUILDER` ni de `WEB_DIST` : aucune occurrence. L'image produite par la pipeline de `builders/` aura donc une provenance que la porte ne consomme pas. C'est acceptable, mais à savoir. L'étendre serait un ajout.
+- **Date du paquet.** D'après le commentaire de la ligne 26 de `sources.sh`, la date de `debian/changelog` doit égaler celle du dernier commit de `poc/sample-app`. Un `debian/` figé fige donc la version (`1.0.0-1`) et la date du changelog, d'où dpkg tire `SOURCE_DATE_EPOCH`, pour tous les commits.
+  - C'est une limite de la décision 1 ; je la consigne.
+  - Le `.dsc` est assemblé aujourd'hui par `sources.sh` sur l'hôte. Dans la plateforme, une tâche devra l'assembler, ce qui est un nouveau travail.
+- **Réseau de la pipeline `builders/`** : elle fait tourner `mmdebstrap` et a besoin de l'instantané, comme la racine de S1. Le nom `prefetch-deb` est déjà pris par la fermeture. Il faut donc une sortie Cilium de plus, ou un élargissement de `prefetch-deb-sortie`, avec le `NotIn` de `builds-sans-internet`. C'est un changement du cluster de plus.
+
+**Découpage proposé, sans prédictions** :
+
+| Jalon | Contenu | Écrit dans | Accord |
+|---|---|---|---|
+| S4a | Pipeline `builders/` : image sbuild et chroot par `mmdebstrap`, signés par Chains | Zot (bundles, images), cluster (sortie Cilium, gabarit) | nommé, pour chaque écriture |
+| S4b | Pipeline `prefetch-deb` : liste du verrou, InRelease vérifié, `.deb` contrôlés, puis `publier-fermeture` inchangée | Zot (bundles, fermeture), `porte/taches.yml` | nommé |
+| S4c | Artefact de packaging (`debian/`, verrou), publié par l'hôte comme `web/dist` | Zot | nommé |
+| S4d | Pipeline `sample-app-deb` : préparer (deux fermetures, packaging, `.dsc`), construire sous Kata, ORAS, `publier-image` inchangée ; second trigger, second rattrapage, politique Cilium dédiée, porte étendue | Zot, cluster | nommé |
+| S5 | Tests négatifs de M5 de la 05, rejeu de zéro | cluster, Zot | nommé |
+
+**Estimation**, fondée sur les dates des commits, pas de mémoire.
+- Durées archivées des jalons comparables :
+  - F2 et F3 de la 03 (couple prefetch et publication, chaîne préparer, construire, publier pour une fermeture) : 03/11, de 16:15 à 19:34 UTC, 17 commits ;
+  - J7 de la 08 (première chaîne complète) : commits sur 7 jours, du 29/10 au 07/11, 51 commits, rejeux compris.
+- Travail fait sur la 06 : environ une journée.
+- Projection pour S4a à S5 : 3 à 6 jours de travail. La brique atteindrait donc environ **1 à 1,5 pw**, sous l'estimation de 2 pw et loin du seuil de 4 pw.
+- Cette projection est fragile : J7 a duré plus d'une semaine de calendrier. Je la vérifierai à la fin de S4a.
+
+**Questions ouvertes** : l'emplacement du verrou, l'ordre (`builders/` d'abord), la source de `marked` dans la plateforme (la voie image prend `web/dist` par digest), et le push des commits de la 06.
