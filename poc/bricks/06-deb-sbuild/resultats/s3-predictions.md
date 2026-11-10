@@ -109,3 +109,27 @@ Accord : « Oui, lance restauration », à 16:49:38 UTC (transcription). Lancée
 
 Lecture seule dans Zot ; rien n'y est écrit. **`builds` et `comparaison` ne sont pas lancées.** Les questions 1 et 2 restent ouvertes. `builds` attend un accord nommé.
 
+## Étape builds, premier passage (10/11/2026, 16:52:09 UTC) : bloqué sur la copie du chroot, arrêté
+
+Accord : « Oui, lance builds », à 16:51:59 UTC (transcription). La réponse ne disait rien des questions 1 et 2. Elle est consignée comme une interprétation, annoncée avant le lancement : un accord sur le chroot copié dans `/w` et sur la neutralisation des sources, tels qu'ils sont dans le script.
+
+**Ce qui s'est passé** : le pod `s3-build-1` (Kata privilégié, sans label) a été prêt à 16:52 UTC. La copie du chroot par `kubectl exec -i … sh -c 'cat > /w/chroot.tar'` ne s'est pas terminée. À 17:42:00 UTC, le processus kubectl tournait depuis 2985 s. Côté hôte, il avait lu les 508 546 560 octets du fichier (position de son entrée standard) et écrit environ 509,7 Mo sur sa connexion.
+
+La cause probable est que la fin de l'entrée standard n'est jamais parvenue à `cat` dans le pod. C'est **supposé, non vérifié** : vérifier aurait demandé une lecture dans le pod. Ce mode de copie a marché en S2 pour un fichier de 3,7 ko.
+
+**Arrêt** : sur la réponse « Ok » (17:41:54 UTC, transcription) à « J'arrête l'étape et je supprime le pod s3-build-1 ? », consignée comme une interprétation (arrêt et nettoyage seulement, pas de rejeu) :
+- kubectl local terminé à 17:42:00 UTC ; script arrêté en code 143 ;
+- pod supprimé à 17:42:07 UTC.
+
+Journal : [`s3-builds-1.log`](s3-builds-1.log).
+
+**Aucune prédiction n'est mesurée.** sbuild n'a pas démarré, le build 2 et la comparaison n'ont pas tourné. R11 est déjà compromise sur la durée de ce passage, mais elle porte sur un build qui aboutit.
+
+**Correction à sec, à 17:43 UTC, NON REJOUÉE** :
+- chaque copie lit dans le pod le nombre d'octets exact (`head -c`), sous un délai de 600 s ;
+- la taille écrite dans le pod est comparée à celle de l'hôte, et le pod est supprimé en cas d'écart ;
+- les arborescences passent par une archive tar faite sur l'hôte ;
+- l'exécution de sbuild est bornée à 1800 s.
+
+Le rejeu de `builds` demande un nouvel accord, puisque le script a changé.
+

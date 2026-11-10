@@ -75,14 +75,28 @@ pod_demarrer() {
   echo "### $1 ($(jq -r '"runtimeClassName \(.spec.runtimeClassName // "-"), uid \(.spec.securityContext.runAsUser), label \(.metadata.labels["tekton.dev/task"] // "-")"' "$T/$1.json")) : prêt"
 }
 
-dans() {
+dans() { # délai de 1800 s ajouté avec copier (même correction, NON REJOUÉ)
   local rc=0
-  kubectl exec -i -n builds "$1" -- sh -s > "$T/$2.log" 2>&1 || rc=$?
+  timeout 1800 kubectl exec -i -n builds "$1" -- sh -s > "$T/$2.log" 2>&1 || rc=$?
   sed 's/^/     /' "$T/$2.log"
   echo "     (code de l'exec : $rc)"
 }
 
 pod_retirer() { kubectl delete pod -n builds "$1" --wait=false </dev/null >/dev/null; echo "pod $1 supprimé"; }
+
+# Corrigé à 17:42 UTC le 10/11/2026, NON REJOUÉ : au premier passage (16:52 UTC), « cat > /w/chroot.tar » ne s'est pas terminé dans
+# le pod en 2985 s (relevé à 17:42:00 UTC), alors que kubectl avait lu les 508 546 560 octets du fichier (fin de flux de l'entrée standard jamais
+# reçue, supposé, non vérifié dans le pod) ; étape arrêtée à 17:42 UTC, pod supprimé. Chaque copie lit désormais le nombre
+# d'octets exact (head -c), sous un délai de 600 s, et la taille écrite dans le pod est comparée ; les arborescences passent
+# par une archive tar faite sur l'hôte.
+copier() { # pod fichier-hôte chemin-pod
+  local n; n=$(stat -c %s "$2")
+  timeout 600 kubectl exec -i -n builds "$1" -- sh -c "head -c $n > $3" < "$2" \
+    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} dans $1" >&2; exit 1; }
+  local e; e=$(kubectl exec -n builds "$1" -- stat -c %s "$3" </dev/null)
+  [ "$e" = "$n" ] && echo "OK   copie de ${2##*/} dans le pod : $n octets" \
+    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : $e octets dans le pod (attendu : $n)" >&2; exit 1; }
+}
 
 conforme() { # répertoire : « fichier sha256 » de chaque fichier, comparé à la liste attendue de S2
   local d=$1
@@ -183,12 +197,15 @@ etape_builds() {
     p=s3-build-$n s=/w/b$n/sortie
     pod_spec "$p" kata "$IMAGE" 1000 "$PRIVILEGIE"
     pod_demarrer "$p"
-    kubectl exec -i -n builds "$p" -- sh -c 'cat > /w/chroot.tar' < "$T2/chroot.tar"
-    tar -C "$T/restauree-$n" -cf - . | kubectl exec -i -n builds "$p" -- sh -c 'mkdir -p /w/fermeture && tar -xf - -C /w/fermeture'
-    kubectl exec -i -n builds "$p" -- sh -c 'cat > /w/fermeture.sha256' < "$T/fermeture.sha256"
-    tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
-      | kubectl exec -i -n builds "$p" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
-    kubectl exec -i -n builds "$p" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T1/SHA256SUMS.s1"
+    copier "$p" "$T2/chroot.tar" /w/chroot.tar
+    tar -C "$T/restauree-$n" -cf "$T/fermeture-$n.tar" .
+    copier "$p" "$T/fermeture-$n.tar" /w/fermeture.tar
+    copier "$p" "$T/fermeture.sha256" /w/fermeture.sha256
+    tar -C "$PKG" -cf "$T/sources.tar" sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC"
+    copier "$p" "$T/sources.tar" /w/sources.tar
+    copier "$p" "$T1/SHA256SUMS.s1" /w/SHA256SUMS.s1
+    kubectl exec -n builds "$p" -- sh -c 'mkdir -p /w/fermeture /w/src && tar -xf /w/fermeture.tar -C /w/fermeture && tar -xf /w/sources.tar -C /w/src && mv /w/SHA256SUMS.s1 /w/src/ && rm /w/fermeture.tar /w/sources.tar' </dev/null \
+      || { pod_retirer "$p"; echo "KO   déballage dans $p" >&2; exit 1; }
     sed -e "s|@DSC@|$DSC|g" -e "s|@SORTIE@|$s|g" -e "s|@LISTES@|$LISTES|g" <<<"$BUILD" | dans "$p" "build-$n"
     rm -rf -- "${T:?}/build-$n" && mkdir -p "$T/build-$n"
     kubectl exec -n builds "$p" -- tar -C "$s" -cf - . </dev/null | tar -xf - -C "$T/build-$n" || true

@@ -265,3 +265,11 @@ Les deux pulls par digest de la fermeture de S2 redonnent chacun 162 fichiers. L
 
 **Non lancés** : les deux builds et la comparaison. Ils attendent un accord nommé, et les questions sur le chroot et la neutralisation des sources restent ouvertes.
 
+## Additif du 10/11/2026, 17:43 UTC : builds de S3 bloqués sur la copie du chroot, arrêtés, script corrigé à sec
+
+Lancés à 16:52:09 UTC sur l'accord « Oui, lance builds ». Le pod `s3-build-1` était prêt, mais la copie du chroot (509 Mo) par `kubectl exec -i … cat` ne s'est jamais terminée, alors que kubectl avait lu tout le fichier.
+
+- Étape arrêtée à 17:42 UTC et pod supprimé, sur la réponse « Ok ».
+- Aucun build n'a tourné. Journal : [`s3-builds-1.log`](resultats/s3-builds-1.log).
+- **Correction à sec, NON REJOUÉE** : copies à nombre d'octets exact (`head -c`), délai, taille comparée dans le pod. Un nouvel accord est attendu. Détails : [prédictions de S3](resultats/s3-predictions.md).
+
