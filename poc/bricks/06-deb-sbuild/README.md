@@ -883,3 +883,16 @@ Lancée de 23:10:15 à 23:10:18 UTC, sur l'accord « Oui, lance taches ». Code 
 - Les deux digests sont absents de la liste revue, comme prévu. La pipeline n'est ni signée ni publiée tant que la liste n'est pas acceptée.
 
 **Diff de `politique/porte/taches.yml` (08) préparé, NON COMMITÉ** : deux entrées ajoutées à la fin, chacune avec son commentaire. Il attend la revue du propriétaire. Ce fichier est la liste `trusted_tasks` de la porte : `construire-builder`, tâche privilégiée et root, y deviendrait acceptable dans toute provenance que la porte juge.
+
+## Additif du 10/11/2026, 23:12 UTC : liste revue acceptée, seconde passe de `taches` tenue
+
+**Décision du propriétaire** : « Accepter ». Le diff de `taches.yml` est commité tel que soumis (`96b7bbd`). Ma demande annonçait aussi la seconde passe ; la réponse vaut donc accord pour celle-ci.
+
+**Seconde passe** de 23:11:17 à 23:11:19 UTC, code 0. Journal : [`s4a-taches.log`](resultats/s4a-taches.log). Il remplace celui de la première passe, qui reste dans `1eb4ed6`.
+
+**A2 : tenue.**
+- Les deux tâches sont conformes à leur signature versionnée.
+- Leurs digests sont maintenant dans la liste revue.
+- La pipeline est signée et publiée : `tekton/pipelines/builder-sbuild@sha256:26683852…`.
+
+**Non lancé** : `reseau`, `pipeline`, `provenance` et `comparaison`. Chaque étape attend un accord nommé. La prochaine est `reseau` : la NetworkPolicy `builder-sans-sortie` posée dans `builds`.
