@@ -94,7 +94,7 @@ etape_pod() {
 
   echo "## instantane (512 Mio, délai de 240 s, relevé à 100 s)"
   f=$(alea 512); n=$(stat -c %s "$f"); rc=0
-  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-debut"
+  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-instantane-debut"
   t0=$(ms)
   timeout 240 kubectl exec -i -n builds "$POD" -- sh -c "head -c $n > /w/instantane" < "$f" 2>"$T/err-instantane" &
   pid=$!
@@ -110,14 +110,53 @@ etape_pod() {
   fi
   wait "$pid" || rc=$?
   echo "instantane : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/instantane) $(grep -i -v -E 'jeton|token' "$T/err-instantane" | head -c 200 | tr '\n' ' ')"
-  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-fin"
-  echo "fenêtre gardée pour l'étape noeud : $(cat "$T/fenetre-debut") à $(cat "$T/fenetre-fin") UTC"
+  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-instantane-fin"
+  echo "fenêtre gardée pour l'étape noeud : $(cat "$T/fenetre-instantane-debut") à $(cat "$T/fenetre-instantane-fin") UTC"
+  pod_retirer "$POD"
+}
+
+# Étape releve (ajoutée à sec le 10/11/2026 à 18:39 UTC, NON LANCÉE) : G4 non mesurée par l'étape pod (filtre grep sans -a,
+# sortie tronquée). 128 Mio (bloque, mesuré) en arrière-plan, délai de 120 s ; à 60 s, relevé brut gardé puis affiché par grep -a :
+# processus du pod (pid, état, ligne de commande, descripteurs 0 à 2), taille du fichier, entrée standard de kubectl sur l'hôte.
+PROCESSUS_FD='for p in /proc/[0-9]*; do
+  [ -r "$p/cmdline" ] || continue
+  c=$(tr "\0" " " < "$p/cmdline" | tr -cd "[:print:]"); [ -n "$c" ] || continue
+  echo "     processus ${p#/proc/} état $(awk "{print \$3}" "$p/stat") : $c"
+  for d in 0 1 2; do echo "       fd $d -> $(readlink "$p/fd/$d" 2>&1 | tr -cd "[:print:]")"; done
+done'
+
+etape_releve() {
+  local f n t0 pid rc=0 k
+  pod_spec "$POD" kata "$IMAGE" 1000 "$PRIVILEGIE"
+  kubectl delete pod -n builds "$POD" --ignore-not-found --wait=true </dev/null >/dev/null
+  kubectl create -f "$T/$POD.json" </dev/null >/dev/null
+  kubectl wait -n builds "pod/$POD" --for=condition=Ready --timeout=300s </dev/null >/dev/null \
+    || { pod_retirer "$POD"; echo "KO   pod non prêt" >&2; exit 1; }
+  echo "### $POD (kata, uid 1000, sans label) : prêt à $(heure) UTC"
+  f=$(alea 128); n=$(stat -c %s "$f")
+  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-releve-debut"
+  t0=$(ms)
+  timeout 120 kubectl exec -i -n builds "$POD" -- sh -c "head -c $n > /w/releve" < "$f" 2>"$T/err-releve" &
+  pid=$!
+  sleep 60
+  echo "relevé à $(heure) UTC, $(( ($(ms) - t0) / 1000 )) s après le lancement :"
+  echo "     fichier dans le pod : $(recu /w/releve) octets sur $n"
+  kubectl exec -n builds "$POD" -- sh -c "$PROCESSUS_FD" </dev/null > "$T/releve.brut" 2>&1 || true
+  grep -a -i -v -E 'jeton|token' "$T/releve.brut" || true
+  k=$(pgrep -P "$pid" -x kubectl || true)
+  [ -n "$k" ] && echo "     kubectl (hôte, pid $k) : entrée standard $(readlink "/proc/$k/fd/0" 2>/dev/null | sed "s|$T/||") ; $(head -1 "/proc/$k/fdinfo/0" 2>/dev/null)" \
+    || echo "     kubectl (hôte) : déjà terminé"
+  wait "$pid" || rc=$?
+  echo "releve : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/releve)"
+  date -u +'%Y-%m-%d %H:%M:%S' > "$T/fenetre-releve-fin"
+  echo "fenêtre gardée pour l'étape noeud (FENETRE=releve) : $(cat "$T/fenetre-releve-debut") à $(cat "$T/fenetre-releve-fin") UTC"
   pod_retirer "$POD"
 }
 
 etape_noeud() {
   local d f
-  d=$(cat "$T/fenetre-debut" 2>/dev/null) && f=$(cat "$T/fenetre-fin" 2>/dev/null) || { echo "KO   lancer d'abord l'étape pod" >&2; exit 1; }
+  local w=${FENETRE:-instantane}   # instantane (étape pod) ou releve (étape releve)
+  d=$(cat "$T/fenetre-$w-debut" 2>/dev/null) && f=$(cat "$T/fenetre-$w-fin" 2>/dev/null) || { echo "KO   fenêtre $w absente" >&2; exit 1; }
   echo "## sc-build, fenêtre $d à $f UTC (lignes jeton|token retirées, 300 caractères au plus)"
   # Heures de containerd.log : champ time="…Z" (UTC, comparé en texte) ; journal système lu en UTC. Script envoyé par l'entrée
   # standard de ssh (sh -s), sans secret ; sortie filtrée sur l'hôte.

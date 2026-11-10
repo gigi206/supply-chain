@@ -62,3 +62,47 @@ Le blocage est entre le shim Kata et l'agent, ou entre containerd et le shim. So
 - activer le mode débug de Kata, ce qui serait un changement de la plateforme ;
 - lire les journaux de l'agent dans l'invité ;
 - ouvrir un ticket chez Kata. Ce serait une action publique, à décider avec le propriétaire.
+
+## Résultat de l'étape pod (10/11/2026, 18:27:44 à 18:38:22 UTC)
+
+Accord : « Oui, lance pod », à 18:27:39 UTC (transcription). Lancée sous bash, code de sortie relevé : **0**. Journal : [`diag-exec-pod.log`](diag-exec-pod.log). Pod Kata prêt à 18:27:49 UTC, supprimé à la fin, absent à 18:38:27 UTC.
+
+| Mesure | Résultat |
+|---|---|
+| 128 Mio à plein débit | code 124 au délai de 150 s ; **134 217 728 octets reçus** (tout) |
+| 256 Mio à plein débit | code 124 au délai de 150 s ; **268 435 456 octets reçus** (tout) |
+| 32 Mio en 32 envois espacés de 2,8 s | **code 0** en 89,9 s ; tout reçu |
+| 512 Mio, relevé à 100 s (18:36:02 UTC) | fichier complet dans le pod ; kubectl vivant sur l'hôte, entrée standard ouverte en fin de fichier ; code final 124 au délai de 240 s, tout reçu |
+
+| # | Résultat |
+|---|---|
+| G1 | **Réfutée.** 128 Mio bloque déjà. Le seuil se situe entre 64 Mio (passé en S3) et 128 Mio |
+| G2 | **Tenue.** 256 Mio échoue au délai, avec tous les octets reçus |
+| G3 | **Tenue.** 32 Mio étalés sur 90 s passent : la durée seule ne bloque pas, la quantité si |
+| G4 | **Non mesurée, défaut du script.** Seule la première ligne s'est affichée (`processus 1 état S : sleep 7200`). Le filtre `grep -v` a vu un octet non textuel et a remplacé la suite par « binary file matches » : il fallait `grep -a`. On ne sait donc pas si `head` et le `sh` de l'exec vivaient encore |
+| G5 | **Tenue.** kubectl vivant à 100 s, entrée standard ouverte en fin de fichier (position 536 870 912), code final 124 |
+
+**Lecture, à ce stade**
+- Le blocage dépend de la **quantité de données par exec**, entre 64 et 128 Mio, et non de la durée.
+- Les octets arrivent toujours en entier : c'est la fin de l'exec qui ne remonte pas.
+- La fenêtre de l'étape `noeud` est gardée : de 18:34:22 à 18:38:22 UTC.
+
+## Étape releve : préparée à sec (18:39 UTC), NON LANCÉE
+
+L'étape `releve` corrige G4. Elle copie 128 Mio en arrière-plan ; cette taille bloque, c'est mesuré. Le délai est de 120 s.
+
+À 60 s, l'étape relève :
+- dans le pod : la taille du fichier, et pour chaque processus son pid, son état, sa ligne de commande et ses descripteurs 0 à 2 ;
+- sur l'hôte : l'entrée standard de kubectl.
+
+Le relevé brut est gardé sur l'hôte et affiché avec `grep -a`. Le relevé des processus a été essayé sur l'hôte seul, sur ses propres processus. Le pod est supprimé à la fin.
+
+**Cause probable de la troncature** : les lignes contiennent « état », en UTF-8. Le script tourne sous `LC_ALL=C`, où GNU grep traite les octets non ASCII comme binaires. Ce n'est pas vérifié sur le relevé perdu. Le nouveau relevé retire les caractères non imprimables des lignes de commande.
+
+L'étape `noeud` prend désormais sa fenêtre par `FENETRE` : `instantane`, la mesure de 512 Mio (18:34:22 à 18:38:22 UTC, par défaut), ou `releve`.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| G4 (releve) | À 60 s, le fichier est complet (134 217 728 octets) ; `head` et le `sh` de l'exec n'existent plus dans le pod ; seuls `sleep` et le shell du relevé restent | moyenne |
+| G7 | kubectl vivant à 60 s, entrée standard en fin de fichier ; code final 124 | haute (G5) |
+

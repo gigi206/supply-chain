@@ -1,0 +1,16 @@
+# diag-exec-kata.sh pod, 2026-11-10T18:27:44Z
+### diag-exec-kata (kata, uid 1000, sans label) : prêt à 18:27:49 UTC ; kubectl : Client Version: v1.35.10
+## taille (plein débit, un exec par copie, délai de 150 s)
+taille-128 : 134217728 octets, code 124 en 150009 ms ; reçus dans le pod : 134217728 
+taille-256 : 268435456 octets, code 124 en 150009 ms ; reçus dans le pod : 268435456 
+## duree (32 Mio en 32 envois de 1 Mio espacés de 2,8 s, un seul exec, délai de 150 s)
+duree : 33554432 octets, code 0 en 89877 ms ; reçus dans le pod : 33554432 
+## instantane (512 Mio, délai de 240 s, relevé à 100 s)
+relevé à 18:36:02 UTC, 100 s après le lancement :
+     fichier dans le pod : 536870912 octets sur 536870912
+     processus 1 état S : sleep 7200 
+grep: (standard input): binary file matches
+     kubectl (hôte, pid 3382574) : entrée standard alea-512.bin ; pos:	536870912
+instantane : 536870912 octets, code 124 en 240016 ms ; reçus dans le pod : 536870912 
+fenêtre gardée pour l'étape noeud : 2026-11-10 18:34:22 à 2026-11-10 18:38:22 UTC
+pod diag-exec-kata supprimé
