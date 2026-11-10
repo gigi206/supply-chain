@@ -81,6 +81,8 @@
 #   g8_grafana  journal de fraicheur-scan et notifications de l'incident a7 lus par l'auditeur (19b)
 #   g8_filtre   ACCORD DU PROPRIÉTAIRE : filtre réseau de fraicheur-scan sur sc-stockage, propriétés de l'unité réelle relues, puis trois connexions
 #               depuis une unité transitoire (même utilisateur, mêmes filtres), et contre-épreuve sans filtre ; rien n'est laissé installé
+#   g8_suspendre ACCORD DU PROPRIÉTAIRE : CronJob scan-sample-app suspendu (essai b : réaction à un scan manquant) ; heure d'alerte prédite
+#   g8_reprendre ACCORD DU PROPRIÉTAIRE : alerte ScanEnRetard relevée, CronJob repris, un passage de rattrapage, alerte résolue
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1657,11 +1659,67 @@ for c in sys.argv[1:]:
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,84p "$0"; exit 2; }
+derniere_analyse() { # date (s) du referrer de scan le plus récent de l'image, lue en anonyme dans Zot depuis l'hôte (comme g8_metriques)
+  curl -fsS --cacert "$P/ca-poc.crt" "https://$REG_HOTE/v2/$DEPOT_SCAN/referrers/${IMAGE#*@}" | jq -r --arg p "$PREDICAT_SCAN" \
+    '[.manifests[] | select(.annotations["dev.sigstore.bundle.predicateType"] == $p) | .annotations["org.opencontainers.image.created"] | fromdate] | max'
+}
+alertes_scan() { # alertes actives ScanEnRetard et ScanBientotRefuse, lues dans Prometheus sur sc-stockage
+  sur "curl -s -G http://127.0.0.1:9090/api/v1/query --data-urlencode 'query=ALERTS{alertname=~\"ScanEnRetard|ScanBientotRefuse\"}'" \
+    | jq -r '[.data.result[] | "\(.metric.alertname)=\(.metric.alertstate)"] | sort | join(" ")'
+}
+
+etape_g8_suspendre() { # ACCORD DU PROPRIÉTAIRE : suspend le CronJob ; additif du 10/11/2026
+  local s
+  [ "$(date -u +%H)" != 09 ] || { echo "KO   09:00 à 10:00 UTC : un passage peut être en cours, rien suspendu"; return 1; }
+  s=$(derniere_analyse)
+  echo "dernier referrer de scan : $(date -ud "@$s" +%Y-%m-%dT%H:%M:%SZ)"
+  echo "alertes de scan actives : $(alertes_scan)"
+  kubectl patch cronjob -n scan "$CRON_SCAN" --type=merge -p '{"spec":{"suspend":true}}'
+  attendu "CronJob suspendu" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.suspend}')" true
+  echo "ScanEnRetard prédite en attente vers $(date -ud "@$((s + 26 * 3600))" +%Y-%m-%dT%H:%M:%SZ), déclenchée vers $(date -ud "@$((s + 26 * 3600 + 300))" +%Y-%m-%dT%H:%M:%SZ) (évaluation toutes les 30 s)"
+  echo "porte : scan refusé à partir de $(date -ud "@$((s + 7 * 86400))" +%Y-%m-%dT%H:%M:%SZ) ; ScanBientotRefuse à partir de $(date -ud "@$((s + 5 * 86400))" +%Y-%m-%dT%H:%M:%SZ)"
+  return $ko
+}
+
+etape_g8_reprendre() { # ACCORD DU PROPRIÉTAIRE : relève l'alerte, reprend le CronJob, lance un rattrapage et attend la résolution
+  local d=${IMAGE#*@} s0 s1 de etat="" a="" i n
+  T=$W/g8-reprendre
+  rm -rf -- "${T:?}" && mkdir -p "$T"
+  [ "$(date -u +%H)" != 09 ] || { echo "KO   09:00 à 10:00 UTC : rien fait"; return 1; }
+  s0=$(derniere_analyse); de=$(date -u +%s)
+  echo "dernier referrer de scan avant reprise : $(date -ud "@$s0" +%Y-%m-%dT%H:%M:%SZ), âge $(( (de - s0) / 60 )) min"
+  attendu "CronJob encore suspendu" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.suspend}')" true
+  attendu "alertes de scan avant reprise" "$(alertes_scan)" "ScanEnRetard=firing"
+  echo "## notifications ScanEnRetard reçues depuis 24 h (récepteur de la 19, sc-stockage)"
+  sur "sudo journalctl -u recepteur-alertes --since '-24h' -o cat --no-pager" | grep -v -i -E 'jeton|token' | grep 'ScanEnRetard' > "$T/n.txt" || true
+  sed 's/^/  /' "$T/n.txt"
+  n=$(grep -c '"statut": "firing"' "$T/n.txt" || true)
+  [ "${n:-0}" -ge 1 ] && ok "notification firing de ScanEnRetard reçue ($n)" || { echo "KO   aucune notification firing de ScanEnRetard"; ko=1; }
+  kubectl patch cronjob -n scan "$CRON_SCAN" --type=merge -p '{"spec":{"suspend":false}}'
+  attendu "CronJob repris" "$(kubectl get cronjob -n scan "$CRON_SCAN" -o jsonpath='{.spec.suspend}')" false
+  kubectl create job -n scan g8-rattrapage --from="cronjob/$CRON_SCAN"
+  for _ in $(seq 120); do
+    etat=$(kubectl get job -n scan g8-rattrapage -o jsonpath='{.status.succeeded}/{.status.failed}')
+    case $etat in 1/*|*/1) break ;; esac
+    sleep 5
+  done
+  attendu "job de rattrapage" "${etat%%/*}" 1
+  s1=$(derniere_analyse)
+  [ "$s1" -gt "$s0" ] && ok "nouveau referrer : $(date -ud "@$s1" +%Y-%m-%dT%H:%M:%SZ)" || { echo "KO   pas de nouveau referrer"; ko=1; }
+  sur "sudo systemctl start fraicheur-scan.service"   # mesure tout de suite, sans attendre le timer (15 min)
+  for i in $(seq 40); do a=$(alertes_scan); [ -z "$a" ] && break; sleep 15; done
+  attendu "alertes de scan après rattrapage" "$a" ""
+  echo "résolue en $(( i * 15 )) s au plus après la mesure"
+  kubectl delete job -n scan g8-rattrapage --wait=false >/dev/null
+  rm -rf -- "${T:?}"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,86p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana|g8_metriques|g8_grafana|g8_filtre) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana|g8_metriques|g8_grafana|g8_filtre|g8_suspendre|g8_reprendre) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"

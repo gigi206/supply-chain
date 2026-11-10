@@ -111,3 +111,32 @@ Les cibles interdites sont joignables sans le filtre : la contre-épreuve le mon
 | F2 | Avec filtre : Zot `ok` ; Prometheus et l'API `EPERM`, refus immédiat par le filtre BPF du cgroup, sans délai d'attente | haute pour le refus, moyenne pour le code `EPERM` |
 | F3 | Sans filtre : les trois cibles `ok` | moyenne : l'accès de `sc-stockage` à l'API est déduit d'Alloy, qui la lit, mais il n'est pas mesuré depuis un compte système |
 
+## Additif du 10/11/2026, 12:38 UTC : essai b (réaction à un scan manquant), prédictions écrites avant toute exécution, NON LANCÉ
+
+Cet essai touche le cluster : il attend un accord nommé. Il prouve la réaction à un **scan manquant**, pas à un Job en échec. Pour l'alerte, les deux cas sont identiques : elle ne lit que la date du dernier referrer dans Zot.
+
+**Étapes**
+- `plateforme.sh g8_suspendre` : refusée entre 09:00 et 10:00 UTC. Elle lit le dernier referrer, suspend le CronJob `scan-sample-app` et affiche l'heure d'alerte prédite.
+- `plateforme.sh g8_reprendre` : à lancer le lendemain, après l'alerte. Elle vérifie que l'alerte est active et que sa notification est arrivée. Puis elle reprend le CronJob, lance un passage de rattrapage (`g8-rattrapage`) et force une mesure de `fraicheur-scan`. Enfin, elle attend que l'alerte se résolve.
+
+**Calendrier proposé**
+- Suspension le 10/11 dès l'accord, ce qui saute le passage du 11/11 à 09:30.
+- Reprise le 11/11 vers 12:15 UTC.
+
+**Effets**
+- Un passage quotidien en moins.
+- L'âge du scan monte à environ 27 h. La porte refuse à 7 jours et `ScanBientotRefuse` part à 5 jours : ni l'une ni l'autre n'est atteinte.
+- La rétention de `builds/scan` se fonde sur l'âge (336 h) : l'échéance du 21/11 ne bouge pas.
+- Deux notifications (firing, puis resolved) sont écrites dans le journal du récepteur, et donc dans Grafana.
+- Si la reprise n'est pas faite, le CronJob reste suspendu : `ScanBientotRefuse` part au bout de 5 jours, et la porte refuse l'image au bout de 7 jours.
+
+Heure d'alerte. Le métrique vaut la date du referrer, et `time()` avance à chaque évaluation, toutes les 30 s. L'expression devient donc vraie à référence + 26 h, quels que soient la période du timer et l'intervalle de collecte. La référence est le dernier referrer, lu par `g8_suspendre` : les jours précédents, il datait de 09:31 à 09:32 UTC.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| B1 | `g8_suspendre` : un seul referrer du 10/11, vers 09:31 UTC ; aucune alerte de scan active ; `suspend=true` | haute |
+| B2 | `ScanEnRetard` en attente à référence + 26 h (11/11 vers 11:32 UTC) et déclenchée 5 min plus tard (vers 11:37), à 30 s près | haute |
+| B3 | Une notification firing de `ScanEnRetard` dans le journal du récepteur avant 12:15 UTC ; `ScanBientotRefuse` inactive | haute |
+| B4 | `g8_reprendre` : job de rattrapage réussi en 2 à 3 min (G7 : 121 s), nouveau referrer, alerte résolue en moins de 2 min après la mesure forcée | moyenne : le délai de résolution n'a été mesuré qu'en a7, sur un fichier d'essai |
+| B5 | Le passage planifié du 12/11 à 09:30 a lieu normalement | haute |
+
