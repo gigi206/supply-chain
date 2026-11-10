@@ -340,3 +340,12 @@ Le script [`egress-selector.sh`](egress-selector.sh) a trois étapes :
 
 Prérequis vérifiés dans le dépôt : kubelet et Cilium (remplacement de kube-proxy) sur sc-confiance, 10250 ouvert entre nœuds. Prédictions E1 à E5 : [`egress-selector-predictions.md`](resultats/egress-selector-predictions.md). Chaque étape attend un accord nommé.
 
+## Additif du 10/11/2026, 20:44 UTC : `egress-selector-mode: disabled` appliqué
+
+**`egress-selector-mode: disabled` appliqué** (20:43:00 à 20:43:59 UTC, code 0) :
+- configuration en place identique, avant la pose, à la version versionnée de `1227858` (`0d327c84…`) ; ancien sélecteur en HTTP CONNECT vers `127.0.0.1:9345` ;
+- rke2-server redémarré (retour de la commande à 20:43:43 UTC) ; `/readyz` à 20:43:58 UTC ; trois nœuds Ready ;
+- **argument `--egress-selector-config-file` absent** du manifeste de kube-apiserver. Le pod en cours, démarré à 20:43:18 UTC, après le début de la pose, n'a aucun argument de sélecteur.
+
+Kube-apiserver joint désormais kubelet sans le proxy du superviseur ni le tunnel de l'agent. **Non encore mesuré** : l'exec à lecture lente vers sc-build et la connexion directe vers 10250 (E4, E5).
+

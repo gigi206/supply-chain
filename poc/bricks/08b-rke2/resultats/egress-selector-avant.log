@@ -1,0 +1,4 @@
+# egress-selector.sh avant, 2026-11-10T20:42:53Z
+OK   config.yaml en place = version versionnée de 1227858 (0d327c8410de8355cba2c7818a31c48a602a30167e70a165f52188c94161a858)
+sélecteur de sortie de kube-apiserver : /var/lib/rancher/rke2/server/etc/egress-selector-config.yaml
+     {"kind":"EgressSelectorConfiguration","apiVersion":"apiserver.k8s.io/v1beta1","egressSelections":[{"name":"cluster","connection":{"proxyProtocol":"HTTPConnect","transport":{"tcp":{"url":"https://127.0.0.1:9345","tlsConfig":{"caBundle":"/var/lib/rancher/rke2/server/tls/server-ca.crt","clientKey":"/var/lib/rancher/rke2/server/tls/client-kube-apiserver.key","clientCert":"/var/lib/rancher/rke2/server/tls/client-kube-apiserver.crt"}}}}}]}
