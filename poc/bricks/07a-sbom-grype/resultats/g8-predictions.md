@@ -177,3 +177,9 @@ Accords du propriétaire : « 1 oui » pour a, « 2 oui » pour b, « 3 tâche p
 
 J'ai annoncé « jamais essayé » en me fiant au README de la 07a, sans chercher dans la 08c. Le « vrai CronJob en échec pas essayé » de la 07a et de la doc 03 est donc dépassé depuis le 08/11, pour la réaction à un scan manquant. **Le CronJob reste suspendu** en attendant la décision du propriétaire. Rien n'est perdu avant le passage du 11/11 à 09:30 UTC.
 
+**Additif du 10/11/2026, 12:49 UTC : CronJob repris** (décision du propriétaire : « Oui, reprends-le » ; journal : [`g8_reprise-immediate.log`](g8_reprise-immediate.log)).
+- À 12:49:35 UTC, `suspend` est repassé de `true` à `false` par `kubectl patch`. Aucun job n'est actif, et le dernier passage planifié reste celui du 10/11 à 09:30 UTC.
+- Aucun passage n'a été manqué. Le prochain est attendu le 11/11 à 09:30 UTC.
+- L'essai b s'arrête là, sans B2 à B5. `g8_reprendre` n'est pas lancée, et aucune tâche planifiée n'a été créée.
+- `spec.suspend` reste attribué au gestionnaire `kubectl-patch`, avec la valeur `false`.
+

@@ -284,3 +284,4 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
 - La réaction à un scan manquant était déjà prouvée sous RKE2 du 07 au 09/11, dans la 08c (W1 à W8). La mention « vrai CronJob en échec pas essayé » de cette brique était donc dépassée.
 - `scan-sample-app` est suspendu depuis le 10/11 à 12:46:40 UTC, en attendant la décision du propriétaire.
 
+**Additif du 10/11/2026, 12:49 UTC** : sur la décision du propriétaire (« Oui, reprends-le »), `scan-sample-app` a été repris à 12:49:35 UTC. Aucun passage n'a été manqué ; le prochain est attendu le 11/11 à 09:30 UTC ([détail](resultats/g8-predictions.md)).
