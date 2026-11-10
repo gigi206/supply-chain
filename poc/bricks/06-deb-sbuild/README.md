@@ -466,3 +466,23 @@ Détail et prédictions D1 à D6 : [`egress-selector-predictions.md`](../08b-rke
 9. **Porte** : à vérifier. `porte.rego` ne juge peut-être pas une pipeline dont le sujet n'est pas une image.
 
 **Reste** : S4 et S5. Leur ordre face aux autres points ouverts est une question posée au propriétaire. Rien n'est écrit pour S4, ni tâche, ni script, ni prédiction.
+
+## Complément du 10/11/2026, 21:20 UTC : deux dépendances de S4 absentes de la carte, et un point resserré
+
+Relevé dans le dépôt, à sec. Rien n'est lancé.
+
+- **Point 2 resserré** : vérifié. `DESTINATIONS` ne sert que dans la fonction `temoins()` de `sortie-builds.sh`.
+- **10. Admission d'un pod Kata privilégié lancé par Tekton** : vérifié dans `politique/admission.yaml`.
+  - Le test 4 n'autorise un conteneur privilégié que si `runtimeClassName == 'kata'`, quel que soit le nom de la tâche. Une tâche sbuild sous Kata passerait donc sans changer cette politique.
+  - En revanche, `construction-sans-sortie.yaml`, qui interdit toute sortie, ne sélectionne que `tekton.dev/task: construire-image`.
+  - Une tâche de construction deb sous un autre nom tomberait sous `builds-sans-internet` (aucune adresse publique, mais Zot et Forgejo restent joignables, d'après les témoins de la 08c). Pour avoir la même coupure que la voie image, il faut la renommer ou ajouter une politique de Cilium : c'est un changement du cluster, qui demande un accord nommé.
+- **11. Provenance de la fermeture** : vérifié dans `porte/porte.rego`, règle `fermeture_plateforme`.
+  - Depuis la décision D6 de la 03 (03/11/2026), la porte exige que la fermeture d'une construction vienne de la pipeline de prefetch de la plateforme.
+  - Les tâches doivent être exactement `prefetch-gomod` et `publier-fermeture`, et le sujet doit être sous `builds/fermetures/`.
+  - La règle ne s'applique qu'aux provenances qui contiennent `preparer-entrees` ou `construire-image`.
+  - Conséquences :
+    - (a) la fermeture deb de S2, poussée depuis l'hôte sous `deps/`, n'a aucune provenance, et la porte la refuserait ;
+    - (b) une pipeline deb qui réutilise `preparer-entrees` serait refusée, parce que la règle attend `prefetch-gomod` ;
+    - (c) une pipeline deb sous d'autres noms de tâches échapperait à la règle sans rien refuser (succès à vide) : c'est un trou, pas une acceptation.
+  - S4 comprend donc vraisemblablement une pipeline `prefetch-deb`. La tâche doit garder exactement ce nom, que sélectionne `prefetch-deb-sortie`. Il faut aussi étendre `porte.rego` à la voie deb, avec ses cas de test dans `porte_test.rego`.
+- **Renvoi** : le push `58fd6c1..57b76be` portait sur la 08b et la 06 ; il est consigné dans l'additif précédent de ce README.
