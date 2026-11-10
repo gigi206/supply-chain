@@ -363,3 +363,14 @@ Détail : [diagnostic](resultats/diag-exec-predictions.md).
 **Lecture** : à 45 s, le processus est fini et kubelet ne relaie plus rien pour cet exec. Sa part semble achevée. Par élimination avec la bisection (containerd hors de cause) et l'étape amont (poste hors de cause), **le maillon probable est kube-apiserver**, qui garde l'exec ouvert vers kubectl. **Ce n'est pas prouvé** : la pile de l'apiserver manque, et les goroutines de kubelet pendant le transfert lui-même (avant 15 s) n'ont pas été relevées.
 
 Détail : [diagnostic](resultats/diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 20:13 UTC : connexions pendant le blocage, tunnel de RKE2 suspecté
+
+**Étape connexions** (20:09:24 à 20:12:01 UTC, code 0 ; pod runc, 128 Mio lus lentement, exec en code 124) :
+- **aucune connexion directe entre kube-apiserver et kubelet** (sc-confiance vers sc-build:10250) : 0 avant, 0 pendant, 0 après ;
+- connexions reçues sur 6443 : 44 avant, **46 pendant**, 44 après ;
+- **sur l'hôte, le kubectl de l'exec garde 2 connexions établies pendant le blocage**.
+
+**Lecture** : l'apiserver ne joint pas kubelet en direct. Sous RKE2, il passe vraisemblablement par le **tunnel de l'agent** : le sélecteur de sortie (« egress selector »), relayé par `remotedialer` entre rke2-server (port 9345 du superviseur) et rke2-agent. **Ce n'est pas vérifié** : ni la configuration du sélecteur, ni les journaux de rke2-server et rke2-agent n'ont été lus. Ce tunnel est un maillon de plus, propre à RKE2 et k3s, entre l'apiserver et kubelet. Il est **le nouveau suspect** : la pile de kubelet est vide de relais, et le relais de l'apiserver n'est pas observable.
+
+Détail : [diagnostic](resultats/diag-exec-predictions.md).

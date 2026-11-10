@@ -438,3 +438,23 @@ Accord : « Oui », à 20:04:41 UTC (transcription), en réponse à « Je lance 
 
 **Limite** : les connexions de l'apiserver vers kubelet servent aussi à d'autres requêtes, comme les journaux et les métriques. La différence entre les moments peut donc être brouillée.
 
+## Résultat de l'étape connexions (10/11/2026, 20:09:24 à 20:12:01 UTC)
+
+Accord : « Oui », à 20:09:19 UTC (transcription), en réponse à « Je lance l'étape connexions ? Oui ou non ». Lancée sous bash, code **0**. Journal : [`diag-exec-connexions.log`](diag-exec-connexions.log). Le pod est supprimé.
+
+| # | Résultat |
+|---|---|
+| N1 | **Tenue en apparence, mais mal posée.** Aucune connexion de plus entre l'apiserver et kubelet pendant le blocage, car il n'y en a **aucune**, à aucun moment ; le kubectl de l'exec garde ses connexions vers 6443 |
+| N2 | **Tenue.** Code 124 |
+
+**Étape connexions** (20:09:24 à 20:12:01 UTC, code 0 ; pod runc, 128 Mio lus lentement, exec en code 124) :
+- **aucune connexion directe entre kube-apiserver et kubelet** (sc-confiance vers sc-build:10250) : 0 avant, 0 pendant, 0 après ;
+- connexions reçues sur 6443 : 44 avant, **46 pendant**, 44 après ;
+- **sur l'hôte, le kubectl de l'exec garde 2 connexions établies pendant le blocage**.
+
+**Lecture** : l'apiserver ne joint pas kubelet en direct. Sous RKE2, il passe vraisemblablement par le **tunnel de l'agent** : le sélecteur de sortie (« egress selector »), relayé par `remotedialer` entre rke2-server (port 9345 du superviseur) et rke2-agent. **Ce n'est pas vérifié** : ni la configuration du sélecteur, ni les journaux de rke2-server et rke2-agent n'ont été lus. Ce tunnel est un maillon de plus, propre à RKE2 et k3s, entre l'apiserver et kubelet. Il est **le nouveau suspect** : la pile de kubelet est vide de relais, et le relais de l'apiserver n'est pas observable.
+
+**Recherche** : aucun ticket ne décrit ce cas avec k3s, RKE2 ou `remotedialer`. Deux sources s'en rapprochent :
+- le ticket Kubernetes [#13394](https://issues.k8s.io/13394), ancien, sur un `kubectl exec -i` alimenté par un tube qui ne se termine pas ;
+- une note de CoreWeave, qui attribue des blocages d'exec au tunnel entre l'apiserver et kubelet (Konnectivity, un autre tunnel).
+
