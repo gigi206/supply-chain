@@ -2,7 +2,9 @@
 # Brique 06, jalon S3 (préparé à sec le 10/11/2026 après le « continue » de 16:36:51 UTC ; simulation lancée à 16:44:06 UTC,
 # code 0 ; restauration, builds et comparaison NON LANCÉES) : deux builds de sample-app par sbuild,
 # sans accès à l'instantané, depuis la fermeture de S2 restaurée par digest, dans le chroot buildd sans dépendances de S2 (D2 a).
-# Prédictions : resultats/s3-predictions.md, écrites et commitées avant toute exécution.
+# Prédictions : resultats/s3-predictions.md, écrites et commitées avant toute exécution de restauration, builds et comparaison.
+# Corrigé à 16:48 UTC, avant tout push et tout lancement : l'étape simulation a tourné (16:44:06 UTC) AVANT l'écriture des
+# prédictions (16:45 UTC) ; elle ne porte aucune prédiction, ses résultats y sont classés « déjà observés ».
 #   simulation   hôte seul, hors ligne (apt sous unshare -rn) : apt de l'hôte simule l'installation des dépendances de build de
 #                sample-app (paquet factice : Build-Depends et build-essential, comme le paquet factice de sbuild) sur l'état dpkg
 #                du chroot de S2, avec la fermeture pour seule source ; paquets simulés comparés à Installed-Build-Depends
@@ -198,6 +200,11 @@ etape_builds() {
   done
 }
 
+# Corrigé à 16:48 UTC, avant tout lancement : mesures sans arrêt au premier écart (code final 1 s'il y en a un) ; lignes apt
+# Get, Hit, Ign et Err en http ou https comptées, plus seulement Get ; présence des deux commandes de neutralisation vérifiée.
+ECARTS=0
+mesure() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "ÉCART $1 : $2 (attendu : $3)"; ECARTS=$((ECARTS + 1)); }; }
+
 etape_comparaison() {
   local n a b
   for n in 1 2; do [ -s "$R/s3-build-$n.buildinfo" ] || { echo "KO   lancer d'abord l'étape builds" >&2; exit 1; }; done
@@ -205,9 +212,10 @@ etape_comparaison() {
   b=$(sha256sum < "$T/build-2/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)
   echo "deb du build 1 : $a"
   echo "deb du build 2 : $b"
-  [ "$a" = "$b" ] && echo "OK   deb identiques sur les deux builds" || echo "ÉCART deb différents : diffoscope à demander au propriétaire (deb gardés dans $T/build-1 et $T/build-2)"
+  mesure "deb identiques sur les deux builds" "$b" "$a"
+  [ "$a" = "$b" ] || echo "     diffoscope à demander au propriétaire (deb gardés dans $T/build-1 et $T/build-2)"
   [ "$a" = "$DEB_S1" ] && echo "deb égal à celui de s1b et d'OBS (0b489d43…)" || echo "deb différent de celui de s1b et d'OBS (0b489d43…)"
-  python3 -I - "$BUILDINFO_S2" "$R/s3-build-1.buildinfo" "$R/s3-build-2.buildinfo" <<'PY'
+  python3 -I - "$BUILDINFO_S2" "$R/s3-build-1.buildinfo" "$R/s3-build-2.buildinfo" > "$T/buildinfo.cmp" <<'PY' || true
 import re, sys
 def champs(f):
     t = open(f, encoding='utf-8').read()
@@ -222,15 +230,21 @@ for nom, x, y in (('build 1 et build 2', b1, b2), ('S2 (s1b) et build 1', s2, b1
     diff = sorted(k for k in set(x) | set(y) if x.get(k) != y.get(k))
     print(f'champs différents entre {nom} : {", ".join(diff) or "aucun"}')
 PY
+  cat "$T/buildinfo.cmp"
+  ECARTS=$((ECARTS + $(grep -c '^ÉCART' "$T/buildinfo.cmp" || true)))
   for n in 1 2; do
     echo "## journal du build $n"
     echo "lignes Get : $(grep -c -E '^Get:' "$R/s3-build-$n-sbuild.log") ; méthodes : $(grep -E '^Get:' "$R/s3-build-$n-sbuild.log" | awk '{print $2}' | sed 's/:.*//' | sort | uniq -c | awk '{print $2 " " $1}' | paste -sd' ')"
-    attendu "lignes Get en http ou https" "$(grep -c -E '^Get:[0-9]+ https?:' "$R/s3-build-$n-sbuild.log" || true)" 0
+    mesure "lignes apt Get, Hit, Ign ou Err en http ou https" "$(grep -c -E '^(Get|Hit|Ign|Err):[0-9]+ https?:' "$R/s3-build-$n-sbuild.log" || true)" 0
+    mesure "neutralisation : sources.list vidé" "$(grep -c -F "Finished running 'truncate -s 0 /etc/apt/sources.list'" "$R/s3-build-$n-sbuild.log" || true)" 1
+    mesure "neutralisation : listes de l'instantané retirées" "$(grep -c -F "Finished running 'rm -f $LISTES" "$R/s3-build-$n-sbuild.log" || true)" 1
     grep -E '^Setting up [^ ]+ \(' "$R/s3-build-$n-sbuild.log" | grep -v sbuild-build-depends | sed -E 's/^Setting up ([^ ]+) \(([^)]+)\).*/\1=\2/' | sed 's/:amd64=/=/' | sort -u > "$T/installes-$n.v"
     echo "paquets installés par sbuild (hors paquet factice) : $(wc -l < "$T/installes-$n.v")"
-    attendu "installés par sbuild = simulés (nom=version)" "$(diff "$T/installes-$n.v" "$R/s3-simules.txt" | grep -c '^[<>]' || true)" 0
+    mesure "installés par sbuild = simulés (nom=version), lignes d'écart" "$(diff "$T/installes-$n.v" "$R/s3-simules.txt" | grep -c '^[<>]' || true)" 0
     grep -E '^(Status|Build-Time|Package-Time|Build-Space):' "$R/s3-build-$n-sbuild.log" | paste -sd' '
   done
+  echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
 }
 
 lancer s3 "06 S3" "$@"

@@ -80,3 +80,22 @@ Une première simulation, à la main dans le répertoire de travail de la sessio
 1. **Chroot de S3.** Le script copie le chroot de S2 dans `/w` et garde l'image de s1b, dont le chroot embarqué reste inutilisé. Aucune écriture dans Zot. L'autre voie est une nouvelle image d'essai, avec ce chroot à sa place, et une écriture définitive dans Zot. Je recommande la copie dans `/w` pour S3, et l'image sous `builders/` pour S4.
 2. **Sources de l'instantané neutralisées dans le chroot** pendant le build, par `--chroot-setup-commands`. La fermeture devient ainsi la seule source d'apt. Cela vous convient-il ?
 3. **Accords nommés** : `restauration` (lecture dans Zot), puis `builds` (deux pods Kata privilégiés, sans label).
+
+## Additif du 10/11/2026, 16:49 UTC : ordre de la simulation et corrections du script, avant tout push et tout lancement
+
+**Ordre.** L'étape `simulation` de `s3.sh` a tourné à 16:44:06 UTC, **avant** l'écriture de ces prédictions, terminée à 16:45 UTC. Elle ne porte donc aucune prédiction : ses résultats sont classés plus haut en « déjà observés ».
+
+L'en-tête du script, commité en `5525180`, affirmait des prédictions « écrites et commitées avant toute exécution ». C'était faux pour cette étape. L'en-tête est corrigé : l'affirmation vaut pour `restauration`, `builds` et `comparaison`.
+
+**Lu en plus dans `Build.pm`, hors ligne**
+- Le bloc qui ajoute de lui-même une source `deb-src` (« Automatically adding to EXTRA_REPOSITORIES ») ne sert que si sbuild tire les sources par apt. Ici, il reçoit un fichier `.dsc` (branche `DSC Base =~ m/\.dsc$/`) : aucune source n'est ajoutée après la neutralisation.
+- Le contrôle d'architecture des paquets de `--extra-package` ne fait qu'avertir. Les 162 paquets sont `amd64` ou `all`.
+
+**Script corrigé**, toujours avant tout lancement :
+- **`comparaison` ne s'arrête plus au premier écart.** Chaque mesure s'imprime `OK` ou `ÉCART`, et le code final est 1 s'il y a eu au moins un écart.
+- **R5 compte désormais toutes les lignes apt Get, Hit, Ign et Err en http ou https**, pas seulement Get. Une tentative réseau échouée s'écrit `Err:` ou `Ign:`.
+
+| # | Étape | Prédit | Confiance |
+|---|---|---|---|
+| R13 | comparaison | Chaque journal de sbuild contient une fois `Finished running` pour chacune des deux commandes de neutralisation | haute si R4 |
+
