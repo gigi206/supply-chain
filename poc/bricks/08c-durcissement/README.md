@@ -1427,3 +1427,11 @@ E1 et E2 ont été lancés de 14:29 à 14:34 UTC, sur l'accord « Oui, lance E1-
 **Reste**
 - E3, un passage réel de `06/s1.sh racine` avec le label, qui demande un accord distinct.
 - Le rejeu de zéro : les deux politiques doivent y aller ensemble.
+
+## Additif du 10/11/2026, 14:41 UTC : E3 tenue
+
+`06/s1.sh racine` repasse dans un pod Kata au label `prefetch-deb`, sur l'accord « Oui, lance E3 ». Détail dans les [résultats](resultats/sortie-deb-predictions.md).
+
+Les archives sont identiques, octet pour octet, à celles de s1 et s1b.
+
+**Reste** : la question du rejeu de zéro, où les deux politiques doivent aller ensemble.

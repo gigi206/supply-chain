@@ -138,3 +138,22 @@ Script à la version `17b4287`. Journaux : [`sortie-deb_appliquer.log`](sortie-d
 - la question du rejeu.
 
 **Correction** : le message du commit `f16a88b` dit aussi « ajouté à 14:29 UTC », alors que le commit est de 14:27:55 UTC. Je le note ici, car ce message ne sera pas réécrit.
+
+## Résultat de E3 (14:36:07 à 14:41:05 UTC, accord du propriétaire : « Oui, lance E3 »)
+
+Passage `PREFIXE=s1c 06/s1.sh racine`. Journal : [`s1c-racine.log`](../../06-deb-sbuild/resultats/s1c-racine.log).
+- Le pod portait bien `tekton.dev/task=prefetch-deb`, d'après sa spec relue.
+- Le journal ne contient aucun KO, et le pod a été supprimé par l'étape.
+- **Code de sortie non relevé** : mon shell est zsh, où `PIPESTATUS` est vide. Le code 0 est déduit de la ligne « 06 S1 racine fait » de `chrono.tsv`, que `lancer` n'écrit qu'après une étape réussie.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| E3 | Pod Kata privilégié, root. `apt-get update` à rc 0 en 4 s, InRelease identique à celui de l'hôte (`0584fba3…`). `mmdebstrap` racine et chroot à rc 0, en 62 s et 77 s. 238 `.deb` conformes au Packages vérifié. Archives rapatriées | tenue |
+| E3b | Archive `racine` : `f8f221ca…`, **identique à celle de s1b**, octet pour octet (344 634 880 octets) | tenue |
+
+**Non prédit** : le chroot reconstruit (`440ba93b…`, 920 000 000 octets) est identique à celui de s1, construit de 13:04:51 à 13:09:34 UTC (chrono.tsv de la 06). Deux `mmdebstrap` du même instantané, avec le même `SOURCE_DATE_EPOCH`, donnent donc la même archive, pour la racine comme pour le chroot. C'est un premier indice pour S2, mais pas la preuve de S2 : S2 demande deux constructions comparées dans son propre protocole.
+
+**Bilan**
+- `racine` repasse sous `builds-sans-internet`, grâce à la sortie dédiée. La déduction « cassée sans le label » n'a pas été mesurée, et je ne l'ai pas cherché.
+- **Durée** : 5 min pour E3, contre 20 min estimées.
+- **Reste** : la question du rejeu, et le push de `145f67a..HEAD`.

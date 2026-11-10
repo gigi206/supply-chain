@@ -186,3 +186,15 @@ Depuis 14:29 UTC, `prefetch-deb-sortie` est en service dans la [08c](../08c-durc
 Un témoin runc au label `prefetch-deb` joint `snapshot.debian.org` en 80, et rien d'autre parmi les destinations testées. L'étape `racine` de `s1.sh` devrait donc repasser.
 
 **Ce n'est pas mesuré** sur `racine` elle-même, dans un pod Kata : c'est E3, qui demande un accord distinct.
+
+## Additif du 10/11/2026, 14:41 UTC : étape racine rejouée avec le label (E3 de la 08c)
+
+Passage `PREFIXE=s1c s1.sh racine` de 14:36 à 14:41 UTC, sur l'accord « Oui, lance E3 ». Journal : [`s1c-racine.log`](resultats/s1c-racine.log).
+
+**L'étape repasse sous `builds-sans-internet`**, grâce à `prefetch-deb-sortie`. L'InRelease est identique à celui de l'hôte, et les 238 `.deb` sont conformes.
+
+**Archives identiques aux passages précédents, octet pour octet**
+- racine : `f8f221ca…`, comme en s1b ;
+- chroot : `440ba93b…`, comme en s1.
+
+C'est un premier indice de reproductibilité pour S2, pas sa preuve.
