@@ -1585,3 +1585,23 @@ Accord : « 7 ok ». `DISTRO=rke2 mise run confiance:redemarrer`, de 11:20:20 à
 **Décision du propriétaire sur l'issue chez Alloy**, verbatim : « on fera ça tout à la fin du projet si besoin : pour le moment c'est non bloquant ? ». Consigné comme report à la fin du projet. Réponse : oui, ce n'est pas bloquant. L'alerte (a) et la relance (b1) couvrent la panne ; l'issue ne vise que le remède durable.
 
 **Push consigné** : 11:14:37 UTC, `0234dc6..4f8ab8e`. Contrôle des secrets OK sur les 9 fichiers touchés, avec le script de la copie de travail temporaire, retirée ensuite. Branche distante identique à la locale.
+
+## Additif du 10/11/2026, 12:17 UTC : lecture du journal d'Alloy au boot du 10/11, prédictions avant lecture
+
+**Accord du propriétaire** : « 1 oui », en réponse à « Je lis le journal du démarrage d'Alloy, selon ce protocole : oui ou non ? », sur l'avis du conseiller. Le protocole est le suivant :
+- lecture seule par ssh de `journalctl -u alloy -b 0` sur `sc-stockage`, du boot (`uptime -s` : 2026-11-10 11:21:57) jusqu'à 11:23:27 UTC, juste avant la relance de b1 ;
+- ce qui est affiché : les comptes par motif dans les lignes du composant des Events, avec leurs premières et dernières heures, sans aucune ligne brute, après un filtre `jeton|token` ;
+- étape `boot` d'[`evenements.sh`](../evenements.sh), écrite pour cela. Son journal porte un nom neuf, `evenements-boot.log`, et n'écrase donc aucun journal archivé.
+
+Le passage par ssh plutôt que par Loki a deux raisons : une réponse de Grafana ne s'archive pas, et rien ne prouve que les lignes du boot sont arrivées dans Loki.
+
+**Pourquoi.** Le passage réel de b1 montre que les Events arrivent après la relance. Il ne montre pas que b1 a réparé une vraie panne. Cette lecture le tranche.
+
+**Prédictions, écrites avant la lecture :**
+- **L1** : un seul démarrage d'Alloy dans la fenêtre, à quelques secondes du boot. Confiance haute.
+- **L2** : l'observateur des Events échoue à ce premier démarrage, avec au moins une ligne `event watcher exited with error` et `failed to configure informers` liée à `connection refused`. C'est la séquence du 07/11 : l'API de `sc-confiance` démarre en même temps, et les nœuds n'étaient `Ready` que 80 s après le démarrage des VM. Confiance moyenne : si l'API a répondu avant la découverte d'Alloy, l'observateur a démarré normalement.
+- **L3** : si L2 se vérifie, aucune ligne `watching events for namespace` après l'erreur, jusqu'à la relance de 11:23:27. Cela confirmerait l'absence de nouvelle tentative en v1.21.3. Confiance haute.
+
+**Lecture des issues possibles.**
+- Si L2 se vérifie, b1 a réparé une panne réelle. C'est aussi une reproduction en v1.21.3, utile à l'issue reportée.
+- Sinon, la relance n'avait rien à réparer cette fois, et B1 ne prouve que l'absence d'effet nuisible.

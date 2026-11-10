@@ -15,6 +15,8 @@
 #           doivent être refusés (règle sans la branche absent, attribut inconnu dans metric.counter) ; aucun service touché (accord)
 #   appliquer_alloy evenements.alloy avec le compteur posé sur sc-stockage (copie de sauvegarde, validation sur copie, SIGHUP, retour
 #           arrière si le compteur n'apparaît pas), puis porte : série vue par Prometheus et expression de EvenementsMuets vide (accord)
+#   boot    lecture seule par ssh (accord : « 1 oui », 10/11/2026) : journal d'alloy.service de sc-stockage, boot courant jusqu'à
+#           FIN_BOOT (UTC) ; comptes par motif dans les lignes du composant des Events, premières et dernières heures, aucune ligne brute
 #   appliquer_regles observabilite.sh deployer (alertes.yml, redémarrage de Prometheus), puis état de la règle : saine, inactive (accord)
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/08c-durcissement/evenements.sh releve   (journal : resultats/evenements-releve.log)
@@ -383,6 +385,25 @@ etape_appliquer_regles() { # accord à part, après appliquer_alloy : observabil
   echo "  alertes dans Alertmanager : $(sur sc-stockage "curl -s http://127.0.0.1:9093/api/v2/alerts" </dev/null | jq -r '[.[] | select(.labels.alertname == "EvenementsMuets")] | length')"
   if [ "${r% }" = "ok inactive" ]; then echo "## bilan : EvenementsMuets déployée, saine, inactive"
   else echo "## bilan : EvenementsMuets pas dans l'état attendu ($r)"; return 1; fi
+}
+
+etape_boot() { # lecture seule par ssh : le premier démarrage d'Alloy après le boot a-t-il perdu l'observateur des Events (07/11) ?
+  local fin=${FIN_BOOT:?FIN_BOOT requis, heure UTC « AAAA-MM-JJ HH:MM:SS »} m n
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$W/evenements"' EXIT
+  echo "## sc-stockage : système démarré à $(sur sc-stockage 'uptime -s' </dev/null) (heure de la VM : $(sur sc-stockage 'date +%Z' </dev/null))"
+  echo "## fenêtre : boot courant (-b 0) jusqu'à $fin UTC, journal d'alloy.service"
+  sur sc-stockage "sudo journalctl -u alloy -b 0 --until '$fin UTC' -o short-iso" </dev/null 2>/dev/null | grep -v -i -E 'jeton|token' > "$T/j" || true
+  grep -F 'kubernetes_events' "$T/j" > "$T/k" || true
+  echo "  lignes dans la fenêtre : $(wc -l < "$T/j"), dont du composant des Events : $(wc -l < "$T/k")"
+  n=$(grep -c -E 'Started (alloy\.service|.*[Aa]lloy)' "$T/j" || true)
+  echo "  démarrages d'Alloy (Started) : $n$([ "$n" -gt 0 ] && echo ", premier $(grep -E 'Started (alloy\.service|.*[Aa]lloy)' "$T/j" | head -1 | cut -d' ' -f1)")"
+  for m in 'watching events for namespace' 'event watcher exited with error' 'failed to configure informers' 'connection refused' 'stopping watcher for events'; do
+    n=$(grep -c -F "$m" "$T/k" || true)
+    printf '  %-32s %3s' "$m" "$n"
+    [ "$n" -gt 0 ] && printf '   première %s, dernière %s' "$(grep -F "$m" "$T/k" | head -1 | cut -d' ' -f1)" "$(grep -F "$m" "$T/k" | tail -1 | cut -d' ' -f1)"
+    echo
+  done
 }
 
 lancer evenements events "$@"
