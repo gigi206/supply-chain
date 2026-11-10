@@ -517,6 +517,8 @@ etape_local() {
 # vers l'InternalIP de sc-build:10250 ; sur sc-build, connexions établies sur :10250 depuis sc-confiance. ss -Htn, adresses et
 # ports seulement, sans -p ; rien n'est écrit sur les VM. L'InternalIP de sc-build est lue sur le nœud, pas supposée ; l'argument
 # --kubelet-preferred-address-types de kube-apiserver est affiché. Relevés bruts gardés dans resultats/diag-exec-direct-releves.tsv.
+# Corrigé à 20:55 UTC le 10/11/2026, NON LANCÉ : l'InternalIP de sc-confiance est lue sur le nœud elle aussi, pour le filtre côté
+# kubelet (au lieu de l'adresse du dépôt), comme celle de sc-build côté apiserver.
 ECHANTILLONNEUR='set -f
 case $1 in
   apiserver) f="dst $2:10250" ;;
@@ -536,10 +538,13 @@ direct_resume() { # fichier côté
 }
 
 etape_direct() {
-  local ip f n essai rc t0 debut fin p1 p2 c
+  local ip src f n essai rc t0 debut fin p1 p2 c
   ip=$(kubectl get node sc-build -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}' </dev/null)
   [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "KO   InternalIP de sc-build illisible" >&2; exit 1; }
+  src=$(kubectl get node sc-confiance -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}' </dev/null)
+  [[ "$src" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "KO   InternalIP de sc-confiance illisible" >&2; exit 1; }
   echo "sc-build : InternalIP $ip ; adresse du dépôt ${IP[sc-build]}"
+  echo "sc-confiance : InternalIP $src ; adresse du dépôt ${IP[sc-confiance]}"
   echo "kube-apiserver : $(args_apiserver | grep -E '^--(kubelet-preferred-address-types|egress-selector-config-file)=' | tr '\n' ' ')"
   echo "horloges : hôte $(date -u +%H:%M:%S.%N | cut -c1-12), sc-confiance $(sur sc-confiance 'date -u +%H:%M:%S.%N' </dev/null | cut -c1-12), sc-build $(sur sc-build 'date -u +%H:%M:%S.%N' </dev/null | cut -c1-12) UTC (aller-retour ssh compris)"
   croise_pod - "$RESTREINT"
@@ -550,7 +555,7 @@ etape_direct() {
     kubectl exec -n builds "$POD" -- rm -f /w/croise </dev/null || true
     printf '%s\n' "$ECHANTILLONNEUR" | sur sc-confiance "sudo sh -s apiserver $ip 80" > "$T/direct-$essai-apiserver.txt" 2>/dev/null &
     p1=$!
-    printf '%s\n' "$ECHANTILLONNEUR" | sur sc-build "sudo sh -s kubelet ${IP[sc-confiance]} 80" > "$T/direct-$essai-kubelet.txt" 2>/dev/null &
+    printf '%s\n' "$ECHANTILLONNEUR" | sur sc-build "sudo sh -s kubelet $src 80" > "$T/direct-$essai-kubelet.txt" 2>/dev/null &
     p2=$!
     sleep 3
     rc=0; debut=$(date -u +%H:%M:%S.%N | cut -c1-12); t0=$(ms)

@@ -132,3 +132,5 @@ Si D3 échoue alors que D2 tient, l'exec passerait par un chemin non identifié,
 bash -c 'DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/diag-exec-kata.sh direct; echo "rc $?"'
 bash -c 'DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s3.sh sonde; echo "rc $?"; d=poc/bricks/06-deb-sbuild/resultats; mv $d/s3-sonde.log $d/s3-sonde-direct.log && git checkout -- $d/s3-sonde.log'
 ```
+
+**Correction du 10/11/2026, 20:55 UTC, avant tout lancement** : côté sc-build, le filtre utilisait l'adresse de sc-confiance tirée du dépôt. Il utilise désormais l'InternalIP de sc-confiance lue sur le nœud, comme pour sc-build. Si les deux adresses avaient différé, D3 aurait été ambiguë : une connexion vue côté apiserver, aucune côté kubelet. Les prédictions ne changent pas.

@@ -599,3 +599,13 @@ Décision du propriétaire : « on ne veut pas du proxy avec cilium ». `egress-
 
 Cela confirme, par l'effet, que le maillon fautif était sur le chemin par le proxy du superviseur et le tunnel de l'agent RKE2. **Non vérifié** : le chemin direct pendant l'exec (E5, relevé trop tardif), un gros exec sous Kata (512 Mio), et les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio de `s3.sh` reste valable, mais n'est plus forcément nécessaire.
 
+## Additif du 10/11/2026, 20:55 UTC : liens vers des journaux remplacés
+
+Le 10/11/2026 à 20:45 UTC, la vérification après `egress-selector-mode: disabled` a rejoué les étapes `croise` et `connexions`. Leurs journaux d'avant ont été copiés sous `-agent`, et les nouveaux ont pris le nom d'origine. Deux liens de ce fichier, écrits avant ce remplacement, pointent donc maintenant vers les passages d'après le changement, qui réussissent :
+
+| Section | Lien écrit | Mesure citée par le texte |
+|---|---|---|
+| Résultat de l'étape croise (18:54:38 à 18:58:13 UTC) | `diag-exec-croise.log` | [`diag-exec-croise-agent.log`](diag-exec-croise-agent.log) |
+| Résultat de l'étape connexions (20:09:24 à 20:12:01 UTC) | `diag-exec-connexions.log` | [`diag-exec-connexions-agent.log`](diag-exec-connexions-agent.log) |
+
+Aucun autre lien vers ces deux journaux n'existe dans les fichiers `.md` du dépôt, en dehors des prédictions de la brique 08b, écrites après le remplacement. Pour la sonde de S3, à rejouer, la commande prévue garde l'ancien journal sous son nom et range le nouveau sous `s3-sonde-direct.log` (voir [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md)).
