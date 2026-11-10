@@ -1340,3 +1340,14 @@ Origine : le constat P3 de la brique 06. Le propriétaire a répondu « Oui, pr�
   - Décisions (i) et (ii) au propriétaire.
 - **`bout_en_bout`** : ses effets sont listés (Zot et CronJob `rattrapage`).
 - **Limite du label** : elle se réduit à l'administrateur et aux tâches signées, puisque Tekton réécrit `tekton.dev/task`. Détail dans les [prédictions](resultats/sortie-predictions.md).
+
+## Additif du 10/11/2026, 13:49 UTC : option (a) choisie avec (ii), test 6 adapté, NON LANCÉ
+
+La réponse du propriétaire, « (a), avec (ii) », est consignée comme le choix de l'option ; l'accord sur le passage reste à recevoir.
+
+**Test 6 de `preuves.sh` adapté**
+- `POLICY_DENY` est admis vers l'adresse externe.
+- La contre-épreuve n'a plus de sortie Internet.
+- Un témoin de capture passe par un pod au label `prefetch-gomod`.
+
+**Nouvelle étape `test6`** dans `sortie-builds.sh`, avec les prédictions T1 à T4 dans [`resultats/sortie-predictions.md`](resultats/sortie-predictions.md).

@@ -135,6 +135,8 @@ APP=builds/sample-app@$APP_DIGEST
 BUILDKIT=$REG/amont/moby/buildkit@sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b   # construction.sh
 USURPEE=10.42.1.250     # adresse du sous-réseau des pods de sc-build, inutilisée (kata.sh ; contrôlé avant l'essai)
 EXTERNE=203.0.113.10    # adresse de documentation (RFC 5737), hors du cluster (kata.sh)
+EXTERNE_TEMOIN=203.0.113.11   # test 6, option (ii) de la 08c (10/11/2026) : sortie du témoin de capture, distincte de EXTERNE
+T6_TEMOIN_IMAGE=$REG/amont/rancher/mirrored-library-busybox@sha256:ad9fa4d07136a83e69a54ef00102f579d04eba431932de3b0f098cc5d5948f9f   # kata.sh
 case " $* " in *" test6 "*) USURPEE=$(adresse_libre "${USURPEE%.*}") ;; esac   # une seule adresse par passage, tirage de Cilium (kata.sh)
 
 etat_app() { # enveloppes de Chains sur l'image réelle, et provenance de PipelineRun la plus récente (seule jugée par les règles de tâches de la porte)
@@ -673,11 +675,13 @@ t6_passage() { # passage (test|contre) nom-de-la-tâche : bundle, TaskRun sous K
     "$here/politique/taches/taskrun.yaml" | awk '{print} /^  podTemplate:$/ {print "    runtimeClassName: kata"}' > "$T/tr-$tr.yaml"
   kubectl delete taskrun -n builds "$tr" --ignore-not-found --wait=true >/dev/null
   echo "NetworkPolicy de builds au lancement : $(kubectl get netpol -n builds -o json | jq -r '.items[] | "\(.metadata.name) (\(.spec.podSelector.matchLabels | to_entries | map(.key + "=" + .value) | join(",")))"' | paste -sd' ')"
+  echo "CiliumNetworkPolicy de builds au lancement : $(kubectl get cnp -n builds -o name | sed 's#.*/##' | paste -sd' ')"
   t6_inutilisee "$USURPEE"
-  capture "$T/t6-$pa-enp1s0.txt" 600 -i enp1s0 host "$EXTERNE" or host "$USURPEE"
+  capture "$T/t6-$pa-enp1s0.txt" 600 -i enp1s0 host "$EXTERNE" or host "$USURPEE" or host "$EXTERNE_TEMOIN"
   t0=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   creer "$T/tr-$tr.yaml" || { echo "KO   TaskRun refusé : $(cat "$T/creer.out")" >&2; exit 1; }
   v=$(issue taskrun "$tr")
+  [ "$pa" = contre ] && [ "$T6_REFUS_INTERNET" = 1 ] && t6_temoin_capture
   hubble_refus sc-build "$t0" --ip "$USURPEE" > "$T/t6-$pa-hubble-usurpee.txt" || true
   sur sc-build "sudo pkill -INT -x tcpdump" || true
   wait "$CAPTURE" || true
@@ -696,6 +700,24 @@ t6_passage() { # passage (test|contre) nom-de-la-tâche : bundle, TaskRun sous K
   grep -E 'packets (captured|received)' "$T/t6-$pa-enp1s0.txt" | sed 's/^/  tcpdump enp1s0 : /' || true
 }
 
+t6_temoin_capture() { # option (ii) de la 08c : sous builds-sans-internet, la contre-épreuve ne sort plus vers $EXTERNE ; un pod brut
+  # au label prefetch-gomod (exclu de la règle, sortie 443 publique par prefetch-sortie) envoie un SYN vers $EXTERNE_TEMOIN:443
+  # pendant la capture : la capture verrait une sortie du nœud
+  jq -n --arg i "$T6_TEMOIN_IMAGE" --arg h "$EXTERNE_TEMOIN" '{apiVersion: "v1", kind: "Pod",
+    metadata: {name: "preuve-test6-capture", namespace: "builds", labels: {"tekton.dev/task": "prefetch-gomod"}},
+    spec: {restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
+      tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, seccompProfile: {type: "RuntimeDefault"}},
+      containers: [{name: "c", image: $i, command: ["sh", "-c", ("nc -w 3 " + $h + " 443 < /dev/null; true")],
+        resources: {requests: {cpu: "50m", memory: "16Mi"}, limits: {cpu: "100m", memory: "32Mi"}},
+        securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}}}]}}' > "$T/t6-capture-pod.json"
+  kubectl delete pod -n builds preuve-test6-capture --ignore-not-found --wait=true >/dev/null
+  kubectl create -f "$T/t6-capture-pod.json" >/dev/null
+  for _ in $(seq 60); do case $(kubectl get pod -n builds preuve-test6-capture -o jsonpath='{.status.phase}') in Succeeded|Failed) break ;; esac; sleep 1; done
+  echo "témoin de capture (pod brut, label prefetch-gomod) : phase $(kubectl get pod -n builds preuve-test6-capture -o jsonpath='{.status.phase}')"
+  kubectl delete pod -n builds preuve-test6-capture --wait=false >/dev/null
+}
+
 t6_garde_fous() { # passage label-attendu : le pod mesuré est bien celui qu'on croit (label, Kata, adresse)
   local pa=$1 l ip
   l=$(jq -r '.metadata.labels["tekton.dev/task"] // "-"' "$T/t6-$pa-pod.json")
@@ -709,8 +731,11 @@ t6_garde_fous() { # passage label-attendu : le pod mesuré est bien celui qu'on 
 }
 
 etape_test6() {
-  local a c l r h t v n ko=0
+  local a c l r h t v n m mo q ko=0
   garder avant
+  # option (ii) de la 08c (décision du propriétaire du 10/11/2026, « (a), avec (ii) ») : règle builds-sans-internet présente ou non
+  T6_REFUS_INTERNET=$(kubectl get cnp -n builds builds-sans-internet -o name 2>/dev/null | grep -c . || true)
+  echo "builds-sans-internet (08c) : $([ "$T6_REFUS_INTERNET" = 1 ] && echo "présente : $EXTERNE refusé avec POLICY_DENIED ou POLICY_DENY ; contre-épreuve sans sortie vers $EXTERNE (POLICY_DENY), témoin de capture vers $EXTERNE_TEMOIN par un pod au label prefetch-gomod" || echo "absente : attentes d'origine")"
   echo "## prédiction (écrite le 31/10/2026, avant le premier passage), contrôle par contrôle"
   echo "- objet : vérifier sur un TaskRun réel les deux contrôles réseau de la zone build, retenus par le propriétaire le"
   echo "  30/10/2026 : la NetworkPolicy construction-sans-sortie (aucune entrée ni sortie pour les pods qui portent"
@@ -805,8 +830,20 @@ EOF
   [ "$(grep '^LIEE|' "$T/t6-contre.log" | cut -d'|' -f5)" = OUVERT ] && echo "OK   contre-épreuve : nc lié à l'IP du pod (-s) joint Zot" \
     || { echo "KO   contre-épreuve : nc -s inutilisable" >&2; exit 1; }
   n=$(grep -cE "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" || true)
-  [ "$n" -ge 1 ] && echo "OK   contre-épreuve : $n SYN vers $EXTERNE:443 sur enp1s0 (source $(grep -E "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" | sed -E 's/.* IP ([0-9.]+)\.[0-9]+ > .*/\1/' | sort -u | paste -sd,))" \
-    || { echo "KO   contre-épreuve : aucun SYN vers $EXTERNE sur enp1s0 (la capture ne verrait pas une sortie)" >&2; exit 1; }
+  if [ "$T6_REFUS_INTERNET" = 1 ]; then   # option (ii) de la 08c : la contre-épreuve est elle-même sous builds-sans-internet
+    q=$(grep -cE "> ${EXTERNE_TEMOIN//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" || true)
+    [ "$q" -ge 1 ] && echo "OK   contre-épreuve : témoin de capture, $q SYN vers $EXTERNE_TEMOIN:443 sur enp1s0 (la capture verrait une sortie)" \
+      || { echo "KO   contre-épreuve : aucun SYN du témoin vers $EXTERNE_TEMOIN sur enp1s0 (la capture ne verrait pas une sortie)" >&2; exit 1; }
+    [ "$n" = 0 ] && echo "OK   contre-épreuve : aucun SYN vers $EXTERNE:443 sur enp1s0 (builds-sans-internet)" \
+      || { echo "KO   contre-épreuve : $n SYN vers $EXTERNE:443 sur enp1s0 malgré builds-sans-internet" >&2; ko=1; }
+    q=$(awk -v h="$EXTERNE:443" '$4 == h && $6 == "POLICY_DENY" && $7 == "EGRESS"' "$T/t6-contre-hubble-propre.txt" | grep -c . || true)
+    [ "$q" -ge 1 ] && echo "OK   contre-épreuve : $q flux POLICY_DENY EGRESS vers $EXTERNE:443 (refus de builds-sans-internet)" \
+      || { echo "KO   contre-épreuve : aucun flux POLICY_DENY vers $EXTERNE:443" >&2; ko=1; }
+    sed -i -E "/ ${EXTERNE//./\\.}:443 SYN POLICY_DENY EGRESS$/d" "$T/t6-contre-hubble-propre.txt"
+  else
+    [ "$n" -ge 1 ] && echo "OK   contre-épreuve : $n SYN vers $EXTERNE:443 sur enp1s0 (source $(grep -E "> ${EXTERNE//./\\.}\.443: Flags \[S\]," "$T/t6-contre-enp1s0.txt" | sed -E 's/.* IP ([0-9.]+)\.[0-9]+ > .*/\1/' | sort -u | paste -sd,))" \
+      || { echo "KO   contre-épreuve : aucun SYN vers $EXTERNE sur enp1s0 (la capture ne verrait pas une sortie)" >&2; exit 1; }
+  fi
   [ -z "${T6_FERMES:-}" ] || sed -i -E '/192\.168\.161\.11:(9345|2379) /d' "$T/t6-contre-hubble-propre.txt"
   [ ! -s "$T/t6-contre-hubble-propre.txt" ] && echo "OK   contre-épreuve : aucun flux refusé de l'IP du pod" \
     || { echo "KO   contre-épreuve : flux refusés de l'IP du pod" >&2; ko=1; }
@@ -829,14 +866,16 @@ EOF
   for c in $T6_DESTINATIONS; do
     l=${c%%:*}; r=${c#*:}
     IFS='|' read -r t v < <(grep "^PROPRE|$l|" "$T/t6-test.log" | cut -d'|' -f4-)
-    awk -v ip="$(t6_ligne test IP)" -v t="$t" 'function s(x) {split(substr(x, 1, 8), a, ":"); return a[1] * 3600 + a[2] * 60 + a[3]}
-      $2 == ip && $5 == "SYN" && $6 == "POLICY_DENIED" && $7 == "EGRESS" && s($1) >= s(t) && s($1) < s(t) + 4 {print $4}' \
+    m=POLICY_DENIED; [ "$l" = Externe ] && [ "$T6_REFUS_INTERNET" = 1 ] && m='POLICY_DENIED|POLICY_DENY'   # option (ii) de la 08c
+    awk -v ip="$(t6_ligne test IP)" -v t="$t" -v m="$m" 'function s(x) {split(substr(x, 1, 8), a, ":"); return a[1] * 3600 + a[2] * 60 + a[3]}
+      $2 == ip && $5 == "SYN" && $6 ~ ("^(" m ")$") && $7 == "EGRESS" && s($1) >= s(t) && s($1) < s(t) + 4 {print $4 " " $6}' \
       "$T/t6-test-hubble-propre.txt" > "$T/t6-fenetre.txt"
     n=$(grep -c . "$T/t6-fenetre.txt" || true)
-    h=$(sort -u "$T/t6-fenetre.txt" | paste -sd' ')
+    h=$(cut -d' ' -f1 "$T/t6-fenetre.txt" | sort -u | paste -sd' ')
+    mo=$(cut -d' ' -f2 "$T/t6-fenetre.txt" | sort -u | paste -sd,)
     [ "$l" = API-service ] && r=$a
-    [ "$v" = FERME ] && [ "$n" -ge 1 ] && [ "$h" = "$r" ] && echo "OK   1. $l (${c#*:}, tentative à $t) injoignable, $n flux POLICY_DENIED EGRESS vers $h" \
-      || { echo "KO   1. $l (${c#*:}, tentative à $t) : $v, $n flux POLICY_DENIED EGRESS vers « $h » (attendu $r)" >&2; ko=1; }
+    [ "$v" = FERME ] && [ "$n" -ge 1 ] && [ "$h" = "$r" ] && echo "OK   1. $l (${c#*:}, tentative à $t) injoignable, $n flux ${mo:-?} EGRESS vers $h" \
+      || { echo "KO   1. $l (${c#*:}, tentative à $t) : $v, $n flux $m EGRESS vers « $h » (attendu $r)" >&2; ko=1; }
   done
   [ "$(grep '^LIEE|' "$T/t6-test.log" | cut -d'|' -f5)" = FERME ] && echo "OK   1. nc lié à l'IP du pod : Zot injoignable" || { echo "KO   1. nc -s : Zot joint" >&2; ko=1; }
   for l in Zot Forgejo; do

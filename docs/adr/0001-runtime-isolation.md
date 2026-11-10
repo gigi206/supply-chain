@@ -84,6 +84,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 10/11/2026, 13:40 UTC** : à la suite du constat P3 de la brique 06, l'option (a) est préparée à sec dans la [brique 08c](../../poc/bricks/08c-durcissement/resultats/sortie-predictions.md), NON APPLIQUÉE : refus pur des adresses publiques pour les pods de `builds`, sauf `prefetch-gomod`. Elle ne ferme ni l'API de RKE2 (ouverte aux pods par `hote-confiance`), ni OpenBao, ni sc-stockage, ni le DNS. L'option (b), un vrai refus par défaut avec une autorisation par tâche, est décrite. Le choix revient au propriétaire. La ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 10/11/2026, 13:49 UTC** : décision du propriétaire, « (a), avec (ii) ». Le refus d'Internet devient une propriété de l'espace `builds`, et plus seulement de la construction. Le test 6 est adapté en conséquence. Rien n'est encore appliqué. La ligne d'isolation de cet ADR n'est pas modifiée.
+
 > **Additif du 09/11/2026, 13:11 UTC** : [brique 08c](../../poc/bricks/08c-durcissement/README.md) close par décision du propriétaire, documentation seulement. Aucune note ne change. Seuil tenu sur les 8 tests, la porte et les contrôles 6 et 7 sous RKE2 durci H1 à H5 ; ports d'hôte tenus sur les ports essayés seulement, sans balayage. Non couverts écrits dans le README de la brique, dont la jonction d'un nœud et H6 (WireGuard), retirée après mesure.
 
 ## Conséquences

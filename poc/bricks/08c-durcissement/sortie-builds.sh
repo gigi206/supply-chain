@@ -12,7 +12,9 @@
 #               autorise une sortie par CIDR sélectionne des labels exclus du refus
 #   apres       mêmes témoins, règle en place
 #   bout_en_bout  vrai PipelineRun de la tête de main par le chemin du webhook (../08-trust-plane/preuves.sh construction_durcie) ;
-#               journal de la 08 sauvé puis remis, celui de ce passage archivé ici (resultats/sortie-bout_en_bout-preuves.log)
+#               journal de la 08 sauvé puis remis, celui de ce passage archivé ici (resultats/sortie-construction_durcie-preuves.log)
+#   test6       test 6 de la 08 rejoué sous la règle (option (ii) : POLICY_DENY admis vers EXTERNE, contre-épreuve sans sortie vers
+#               EXTERNE, témoin de capture par un pod brut au label prefetch-gomod) ; journal archivé ici (sortie-test6-preuves.log)
 #   retirer     règle supprimée ; témoin : le pod sans label rejoint snapshot.debian.org
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh <étape>…   (journal : resultats/sortie-<étape>.log)
@@ -106,17 +108,18 @@ etape_appliquer() {
   invariants
 }
 etape_apres() { temoins apres; }
-etape_bout_en_bout() {
-  local j=$b08/resultats/preuves-construction_durcie.log
-  cp "$j" "$T/construction_durcie.sauve"
-  trap 'cp "$T/construction_durcie.sauve" "$j"' EXIT
-  local rc=0
-  "$b08/preuves.sh" construction_durcie > /dev/null 2>&1 || rc=$?
-  grep -i -v -E 'jeton|token' "$j" > "$R/sortie-bout_en_bout-preuves.log"
-  cp "$T/construction_durcie.sauve" "$j"; trap - EXIT
-  grep -E '^(OK|KO)|durée du PipelineRun' "$R/sortie-bout_en_bout-preuves.log"
-  attendu "preuves.sh construction_durcie, code de sortie" "$rc" 0
+preuves() { # étape de ../08-trust-plane/preuves.sh : journal de la 08 sauvé puis remis, celui de ce passage archivé ici
+  local j=$b08/resultats/preuves-$1.log rc=0
+  cp "$j" "$T/preuves-$1.sauve"
+  trap 'cp "$T/preuves-$1.sauve" "$j"' EXIT
+  "$b08/preuves.sh" "$1" > /dev/null 2>&1 || rc=$?
+  grep -i -v -E 'jeton|token' "$j" > "$R/sortie-$1-preuves.log"
+  cp "$T/preuves-$1.sauve" "$j"; trap - EXIT
+  grep -E '^(OK|KO)|durée du PipelineRun|builds-sans-internet' "$R/sortie-$1-preuves.log"
+  attendu "preuves.sh $1, code de sortie" "$rc" 0
 }
+etape_bout_en_bout() { preuves construction_durcie; }
+etape_test6() { preuves test6; }   # option (ii) : attentes du test 6 sous builds-sans-internet (preuves.sh, 10/11/2026)
 etape_retirer() {
   kubectl delete -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
   temoins retrait

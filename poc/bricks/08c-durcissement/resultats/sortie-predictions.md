@@ -138,3 +138,46 @@ Le contrôleur de Tekton v1.15.5 réécrit `tekton.dev/task` au nom de la tâche
 - **Critère de retrait** : `retirer` n'est lancé que si Q9 échoue, ou si Q6 montre Zot ou Forgejo coupés. Q10 devient conditionnelle.
 - **Le test 6** n'est pas dans cette séquence : sa mise à jour suit la décision (i) ou (ii).
 - **Estimation** : environ 30 min de passage, dont 5 à 10 min de PipelineRun. Décision avec le propriétaire au-delà d'1 h.
+
+## Décision du propriétaire (10/11/2026) et option (ii) préparée (13:49 UTC), NON LANCÉ
+
+**Réponse** : « (a), avec (ii) ».
+- Elle est consignée comme le **choix de l'option (a) et de la mise à jour du test 6**.
+- Elle ne vaut pas accord sur le passage. Les effets listés plus haut attendent un accord nommé.
+- Le push de `bc0f352..1c41d2c` n'a pas reçu de oui.
+
+**(ii) dans [`preuves.sh`](../../08-trust-plane/preuves.sh), étape `test6`** : le test lit la présence de `builds-sans-internet`.
+
+Si la règle est absente, les attentes d'origine restent inchangées.
+
+Si elle est présente :
+- **construire-image** : vers `EXTERNE` (`203.0.113.10:443`), le motif admis est `POLICY_DENIED` ou `POLICY_DENY`. Le motif mesuré est affiché.
+- **Contre-épreuve** :
+  - aucun SYN vers `EXTERNE` sur `enp1s0` ;
+  - au moins un flux `POLICY_DENY` `EGRESS` vers `EXTERNE:443` ;
+  - ces flux attendus sont retirés avant le contrôle « aucun flux refusé de l'IP du pod ».
+- **Témoin de capture**, qui remplace la sortie de la contre-épreuve : pendant la capture, un pod brut au label `prefetch-gomod`, image busybox par digest, envoie un SYN vers `EXTERNE_TEMOIN` (`203.0.113.11:443`, adresse de documentation). La capture de `enp1s0` filtre aussi cette adresse.
+
+**Vérifications hors cluster**
+- Les filtres `awk` et `sed` ont été éprouvés sur des lignes synthétiques au format de `hubble_refus`.
+- `bash -n` passe.
+- shellcheck donne 8 avertissements avant comme après, tous préexistants.
+
+**Nouvelle étape `test6`** dans `sortie-builds.sh`. Elle rejoue le test sous la règle ; le journal de la 08 est sauvé puis remis, et celui du passage est archivé ici. `bout_en_bout` archive désormais dans `sortie-construction_durcie-preuves.log`.
+
+**Effets de `test6`**, en plus de ceux du passage :
+- deux bundles `tekton/tasks/preuve-test6-*` réécrits dans Zot (définitif) ;
+- deux TaskRuns sous Kata, signés par Chains ;
+- un tcpdump de 600 s au plus sur sc-build ;
+- le pod témoin de capture.
+
+| # | Étape | Prédit | Confiance |
+|---|---|---|---|
+| T1 | test6, construire-image | Toutes les destinations sont injoignables. Vers `EXTERNE`, le motif est `POLICY_DENY` (le refus explicite l'emporte) | moyenne pour le motif |
+| T2 | test6, contre-épreuve | Zot, Forgejo et les deux voies de l'API sont joignables. Vers `EXTERNE` : aucun SYN sur `enp1s0`, au moins un flux `POLICY_DENY` | moyenne |
+| T3 | test6, témoin de capture | Au moins un SYN vers `203.0.113.11:443` sur `enp1s0` : `prefetch-sortie` laisse passer le 443 public, et le nœud masque la source | moyenne : le chiffrement WireGuard du nœud (H6) ne couvre que le CIDR des pods |
+| T4 | test6 | Les autres contrôles du test sont inchangés : adresse usurpée, `INVALID_SOURCE_IP`, rien ne sort du nœud. Code 0 | moyenne |
+
+**Séquence proposée** : `prealables`, `avant`, `appliquer`, `apres`, `bout_en_bout`, `test6`. La règle reste en place. Le critère de retrait reste le même, avec en plus « T4 en échec ».
+
+**Estimation** : environ 45 min, test 6 compris.
