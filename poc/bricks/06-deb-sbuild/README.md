@@ -909,3 +909,16 @@ Lancée à 23:11:49 UTC, sur l'accord « Oui, lance reseau ». Code 0. Journal :
 **À noter** : l'efficacité de la politique n'est pas encore mesurée. Ce sont les témoins d'A9, dans l'étape `pipeline`, qui la mesureront.
 
 **Non lancé** : `pipeline`, `provenance` et `comparaison`. Chaque étape attend un accord nommé.
+
+## Additif du 10/11/2026, 23:15 UTC : étape `pipeline` de S4a, premier passage en échec sur `dpkg -i`
+
+Lancée de 23:12:21 à 23:13:52 UTC, sur l'accord « Oui, lance pipeline ». Code 1. Le premier PipelineRun a échoué dans `construire-builder`, et le second n'a pas été créé. Détail : [prédictions et résultats](resultats/s4a-predictions.md).
+
+**Tenues**
+- **A4** : téléchargement par `apt-helper`, en runc et sans root, des 199 paquets en 19 s.
+- **A9** : les quatre témoins échouent (DNS, Zot, Forgejo, Fastly). La politique `builder-sans-sortie` est donc efficace.
+- **A12** : runc pour le téléchargement, Kata pour la construction, toutes deux sur sc-build.
+
+**Réfutée : A6.** Le `dpkg -i` groupé ne respecte pas les pré-dépendances de `python3-minimal` et de `python3`, relevées dans `Packages`. Ce n'est pas un manque de paquet. La correction change `construire-builder`, ce qui demande de la signer à nouveau, de réviser la liste revue et de republier la pipeline. Elle attend un accord.
+
+Rien n'a été publié dans `builds/builders/` : la tâche `publier` n'a pas tourné.

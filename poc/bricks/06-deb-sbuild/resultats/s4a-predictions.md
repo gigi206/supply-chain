@@ -133,3 +133,17 @@ Le conseiller a relu S4a écrit à sec. Deux corrections ont été faites dans `
 **Fait à signaler à la revue de `taches.yml`.** Ce fichier est la liste `trusted_tasks` de la porte (`porte/policy.yaml`). Y inscrire `construire-builder`, tâche privilégiée et root, la rend acceptable dans toute provenance que la porte juge, pas seulement dans `builder-sbuild`. Il en va de même pour `prefetch-deb`.
 
 **Pour S4d, non bloquant.** Les listes d'apt sont maintenant nettoyées dans le chroot. Les `--chroot-setup-commands` de S3 suppriment deux listes par leur nom exact : il faudra vérifier si elles échouent sur des fichiers absents.
+
+## Résultats de l'étape `pipeline`, premier passage (10/11/2026, 23:12:21 à 23:13:52 UTC, accord « Oui, lance pipeline »)
+
+Code 1. `s4a-builder-1` a échoué dans `construire`, et `s4a-builder-2` n'a pas été créé. Journal : [`s4a-pipeline.log`](s4a-pipeline.log).
+
+- **A4 : tenue.** `prefetch-deb` a tourné en runc, sous l'UID 65532, sans root. apt de l'amorce est en 3.0.4. Les 2 index et les 199 paquets ont été téléchargés et vérifiés en 19 s.
+- **A5 : tenue** pour ce qui est relevé. Le miroir compte 199 paquets (133 065 812 octets) et a été revérifié dans `construire` : InRelease, 2 index, 199 paquets.
+- **A9 : tenue.** Les quatre témoins de `construire-builder` échouent par délai (code 124) : DNS, Zot en 5000, Forgejo en 3000, Fastly en 80. `builder-sans-sortie` coupe donc aussi ce que `builds-sans-internet` laisse ouvert.
+- **A12 : tenue** pour les deux pods : `prefetch` sous runc, `construire` sous Kata, tous deux sur sc-build. Le workspace d'entrée est en virtiofs, monté en lecture seule, et l'écriture y est refusée.
+- **A6 : réfutée.** `dpkg -i` des 20 paquets laisse `python3-minimal`, `python3` et `mmdebstrap` non configurés.
+  - Cause, lue dans le `Packages` contrôlé : `python3-minimal` a une pré-dépendance sur `python3.13-minimal`, et `python3` en a une sur `python3-minimal`.
+  - Un `dpkg -i` groupé déballe tout avant de configurer, et ne satisfait donc pas ces pré-dépendances. C'est un défaut d'ordre, pas de complétude.
+  - Le journal ne cite aucun autre paquet manquant, mais le `dpkg.log` complet du pod n'est pas rapatrié : il n'en reste que les 20 dernières lignes.
+- **Non atteintes** : A7, A8, A10, A11 et A13.
