@@ -166,3 +166,9 @@ Le second passage `s1b` a été exécuté de 13:24 à 13:28 UTC, sur l'accord «
 **Reste**
 - S2 : fermeture D2 (a), constructions reproductibles, image sous `builders/`.
 - Le constat P3, une sortie http d'un pod de `builds` sans label, à soumettre au propriétaire.
+
+*Corrigé à 13:30 UTC, avant tout push* :
+- **Coupure du réseau** : elle vient du manuel de sbuild et n'est pas mesurée (test négatif prévu en S5).
+- **Égalité avec OBS** : elle porte sur les 64 caractères de l'empreinte, comparés au journal `build-1/construire.log` d'OBS.
+- **Fichiers non rapatriés** : le `.deb`, le `.buildinfo` et les `.changes` sont restés dans le pod ; la prochaine étape devra copier `/w/sortie`.
+- **ADR 0001** : additif ajouté.

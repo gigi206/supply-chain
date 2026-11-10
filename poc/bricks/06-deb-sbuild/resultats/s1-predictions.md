@@ -153,7 +153,7 @@ Journaux : [`s1b-racine.log`](s1b-racine.log), [`s1b-image.log`](s1b-image.log),
 | B3 | sbuild rc 0 en 79 s, statut `successful`, Build-Time 20 s. Un seul deb : `sample-app_1.0.0-1_amd64.deb`, sha256 `0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5`, mesuré dans le pod et repris par les `.changes` | tenue |
 | B4 | 222 lignes `cannot bind-mount /dev/console`, sans effet sur le statut | tenue |
 
-**Fait sans prédiction** : le deb est **identique, octet pour octet, à celui d'OBS** (`0b489d43…`). Le même `.dsc` a été construit avec les mêmes versions de Go, de nodejs et de debhelper, dans deux constructeurs différents : sbuild en mode unshare sous Kata, et OBS.
+**Fait sans prédiction** : le deb est **identique, octet pour octet, à celui d'OBS** (`0b489d43…`). Les 64 caractères sont comparés à `0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5`, relevé pour OBS dans [`build-1/construire.log`](../../../benchmarks/obs/resultats/build-1/construire.log), ligne 77, et dans [`build-5/horsligne.log`](../../../benchmarks/obs/resultats/build-5/horsligne.log). Le même `.dsc` a été construit avec les mêmes versions de Go, de nodejs et de debhelper, dans deux constructeurs différents : sbuild en mode unshare sous Kata, et OBS.
 
 ## Conclusion de S1 (écrite le 10/11/2026 à 13:29 UTC)
 
@@ -161,7 +161,7 @@ Journaux : [`s1b-racine.log`](s1b-racine.log), [`s1b-image.log`](s1b-image.log),
 
 **Pourquoi ce mode**
 - `newuidmap` et `newgidmap` agissent par leur bit setuid, car `/` est monté sans `nosuid` dans l'invité.
-- Le réseau est coupé par sbuild pendant le build.
+- Le réseau serait coupé par sbuild pendant le build : c'est ce que dit son manuel (`--no-enable-network`, actif par défaut en mode unshare), **pas une mesure**. sbuild a seulement lancé `ip link set lo up` dans son propre espace. Le test négatif « sortie réseau pendant le build » est prévu en S5.
 
 **Ce qui est écarté**
 - **D1 (b)** : `newuidmap` y échoue, avec EPERM sur `uid_map` (cause non diagnostiquée).
@@ -176,3 +176,8 @@ Journaux : [`s1b-racine.log`](s1b-racine.log), [`s1b-image.log`](s1b-image.log),
 - Le constat P3 (sortie http d'un pod de `builds` sans label), soumis au propriétaire.
 
 **Durée** : de 12:53 à 13:29 UTC, préparation, trois exécutions et consignation comprises, pour 0,5 pw prévue (P11 tenue).
+
+*Corrigé à 13:30 UTC, avant tout push, sur relecture du conseiller* :
+- **Coupure du réseau** : la conclusion la présentait comme mesurée. Elle vient du manuel de sbuild, et le texte le dit maintenant.
+- **Égalité avec OBS** : l'empreinte complète du deb est comparée, avec les journaux d'OBS qui la portent.
+- **Fichiers non rapatriés** : le `.deb`, le `.buildinfo` et les `.changes` sont restés dans le pod ; seul le journal `.build` a été copié. La prochaine étape devra copier `/w/sortie` avant de supprimer le pod. Deux besoins en dépendent : la question de la 07a (Syft indique-t-il `distro=` sur un deb isolé ?) et la résolution de S2 depuis un `.buildinfo`.
