@@ -180,3 +180,26 @@ Code 1. `s4a-builder-1` a échoué dans `construire`, et `s4a-builder-2` n'a pas
   - Cause, lue dans apt 3.0.3 (`apt-pkg/acquire-item.cc`, `pkgAcqArchive`) : pour un `.deb` local, le chemin absolu ne remplace le nom généré (`nom_version_arch.deb`) que dans `Done()`, après le passage de la méthode `file`.
   - Avec `--no-download`, la file d'acquisition ne tourne pas, et le nom reste relatif. C'est exactement le nom de l'erreur.
 - **Non atteintes** : A7, A8, A10, A11 et A13.
+
+## Note datée du 10/11/2026, 23:24 UTC : `--no-download` retiré (validé par le conseiller), contrôles ajoutés sur l'hôte, NON SIGNÉ
+
+**Correction** : `apt-get install -y --no-install-recommends` sur les 20 chemins absolus du miroir, sans `--no-download`. Les fichiers locaux passent par la méthode `file`, sans réseau, et `Done()` rend leur chemin absolu. Il n'existe aucune liste, donc aucune autre source.
+
+**Contrôles ajoutés à `prealables`**, sur l'hôte seul ([`s4a-prealables.log`](s4a-prealables.log), code 0 à 23:24:20 UTC) :
+- syntaxe des scripts rendus : `bash -n` pour `construire-builder`, `sh -n` pour `prefetch-deb` ; aucune variable Tekton restante ;
+- arguments exacts de mmdebstrap, relevés par une fonction `mm` lancée avec un mmdebstrap factice :
+  - `--hook-dir` passe avant les crochets, et le retrait des points de montage vient en dernier ;
+  - le crochet `sources.list` et la source `file://` ont la bonne forme ;
+- la section du layout, lancée sur deux archives factices :
+  - chaque blob a pour nom son sha256 ;
+  - le manifeste et la configuration se lisent avec `jq`, et les tailles sont exactes ;
+  - les `diff_ids` égalent les digests des couches ;
+  - la couche 1 est l'archive racine telle quelle, et la couche 2 porte `opt/sbuild/trixie-amd64.tar` ;
+  - le `sed` de `publier-image` lit dans `index.json` une seule ligne, égale au digest rendu.
+
+**Prédictions ajoutées**
+- **A6 ter** : `apt-get install` des 20 fichiers locaux réussit. Un avertissement « unsandboxed » sur la méthode `file` serait bénin.
+- **Correctif de `SIGNER=1`, rejoué pour la première fois** : `prefetch-deb` reste à `4dac0609`, sans ligne « nouvelle signature ».
+- **Liste revue** : le nouveau digest de `construire-builder` remplace `49173846`, retirée comme version cassée.
+
+**Si le troisième passage échoue dans mmdebstrap (A7)**, je ne lancerai pas de quatrième cycle à l'aveugle. Je proposerai un pod d'essai comme en S1, pour itérer sur mmdebstrap sans signer de nouveau, après validation par le conseiller.

@@ -120,6 +120,7 @@ FIN
   rendre "$REG/tekton/tasks/prefetch-deb@sha256:$(printf '0%.0s' {1..64})" "$REG/tekton/tasks/construire-builder@sha256:$(printf '0%.0s' {1..64})" \
     "$PUBLIER"
   echo "OK   gabarits rendus sans variable restante (refs factices) : $(wc -c < "$T/builder-sbuild.yaml") octets pour la pipeline"
+  essais_hote
   for f in prefetch-deb construire-builder builder-sbuild; do
     attendu "$f : YAML lisible par yq, nom" "$(yq -e '.metadata.name' "$T/$f.yaml")" "$f"
   done
@@ -127,6 +128,58 @@ FIN
     "$(yq '.spec.tasks[0].params[2].value' "$T/builder-sbuild.yaml" | grep -c .) $(yq '.spec.tasks[1].params[2].value' "$T/builder-sbuild.yaml" | grep -c .)" "199 199"
   attendu "liste rendue identique à la liste" "$(yq '.spec.tasks[0].params[2].value' "$T/builder-sbuild.yaml" | sed '/^$/d' | cmp - "$T/liste.txt" && echo identique)" identique
   yq '.spec.tasks[1].params[] | select(.name != "liste") | "     " + .name + " = " + (.value | tostring)' "$T/builder-sbuild.yaml" | cut -c1-200
+}
+
+essais_hote() { # hôte seul (ajouté le 10/11/2026 après le second passage) : syntaxe des scripts de tâche, arguments de mmdebstrap
+  # (fonction mm avec un mmdebstrap factice), section du layout sur deux archives factices, lue ensuite comme publier-image
+  local x=$T/essais d
+  rm -rf "$x"; mkdir -p "$x/w" "$x/o" "$x/e"
+  yq '.spec.steps[0].script' "$T/construire-builder.yaml" | sed -e "s#\$(workspaces.entrees.path)#$x/e#g" -e "s#\$(workspaces.sortie.path)#$x/o#g" \
+    -e "s#\$(results.DIGEST_CONSTRUIT.path)#$x/digest#g" > "$x/construire.sh"
+  yq '.spec.steps[0].script' "$T/prefetch-deb.yaml" | sed -e "s#\$(workspaces.sortie.path)#$x/o#g" \
+    -e "s#\$(results.INSTANTANE_ARTIFACT_INPUTS.path)#$x/res#g" > "$x/prefetch.sh"
+  attendu "construire-builder : syntaxe bash du script" "$(bash -n "$x/construire.sh" 2>&1 && echo OK)" OK
+  attendu "prefetch-deb : syntaxe sh du script" "$(sh -n "$x/prefetch.sh" 2>&1 && echo OK)" OK
+  attendu "construire-builder : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/construire.sh" || true)" 0
+  # mm avec un mmdebstrap factice : un argument par ligne
+  { echo 'set -euo pipefail'; echo "e=$x/e"; echo "INSTANTANE=$INSTANTANE"; echo "INCLURE=$INCLURE"
+    echo 'mmdebstrap() { local a n=x; for a; do case $a in *.tar) n=${a##*/} ;; esac; done; printf "%s\n" "$@" > "$W_/args-$n"; : > "${@: -2:1}"; }'
+    echo 'pic() { :; }'
+    sed -n '/^src=/,/^finale=/p' "$x/construire.sh"
+    sed -n '/^mm() {/,/^}/p' "$x/construire.sh"
+    sed -n '/^mm racine/,/^mm chroot buildd/p' "$x/construire.sh"
+  } | sed "s#/w/#@W@/#g; s#@W@#$x/w#g" > "$x/mm.sh"
+  (cd "$x" && W_=$x/w bash "$x/mm.sh" > "$x/mm.out" 2>&1) || { cat "$x/mm.out" >&2; echo "KO   fonction mm" >&2; exit 1; }
+  for d in racine chroot; do
+    [ -s "$x/w/args-$d.tar" ] || { echo "KO   arguments de mmdebstrap ($d) non relevés" >&2; exit 1; }
+    echo "## arguments de mmdebstrap ($d)"; sed 's/^/     /' "$x/w/args-$d.tar"
+  done
+  f=$x/w/args-racine.tar
+  attendu "racine : --hook-dir avant les crochets" "$(grep -n -- '--hook-dir\|--customize-hook' "$f" | head -1 | cut -d: -f2- | cut -c1-10)" "--hook-dir"
+  attendu "racine : retrait des points de montage en dernier crochet" "$(grep -- '--customize-hook' "$f" | tail -1 | grep -c "rmdir -p '${x#/}/e'" || true)" 1
+  attendu "racine : crochet sources.list" "$(grep -c -- "--customize-hook=echo 'deb \[check-valid-until=no\] $INSTANTANE trixie main' > \"\$1/etc/apt/sources.list\"" "$f")" 1
+  attendu "racine : source du miroir" "$(tail -1 "$f")" "deb [check-valid-until=no] file://$x/e trixie main"
+  # section du layout sur deux archives factices
+  mkdir -p "$x/fx/r" "$x/fx/c"; echo racine > "$x/fx/r/a"; echo chroot > "$x/fx/c/b"
+  tar -C "$x/fx/r" -cf "$x/w/racine.tar" a; tar -C "$x/fx/c" -cf "$x/w/chroot.tar" b
+  local r1; r1=$(sha256sum < "$x/w/racine.tar" | cut -c1-64)
+  : > "$x/pic.txt"
+  { echo 'set -euo pipefail'; echo "o=$x/o"; echo 'pic() { :; }'; echo 'sleep 120 & ech=$!'
+    sed -n '/^c=\$(sha256sum < \/w\/chroot.tar/,/^printf .sha256:%s/p' "$x/construire.sh"
+  } | sed "s#/tmp/pic.txt#$x/pic.txt#g; s#/w/#@W@/#g; s#/w\b#@W@#g; s#@W@#$x/w#g" > "$x/layout.sh"
+  bash "$x/layout.sh" > "$x/layout.out" 2>&1 || { cat "$x/layout.out" >&2; echo "KO   section du layout" >&2; exit 1; }
+  sed 's/^/     /' "$x/layout.out"
+  mkdir -p "$x/lu"; tar -xf "$x/o/image.tar" -C "$x/lu"
+  d=$(sed -n 's/.*"digest": *"\(sha256:[0-9a-f]\{64\}\)".*/\1/p' "$x/lu/index.json")   # sed de publier-image
+  attendu "index.json lu comme publier-image : une ligne, égale au résultat" "$(wc -l <<< "$d") $d" "1 $(cat "$x/digest")"
+  for b in "$x"/lu/blobs/sha256/*; do [ "$(sha256sum < "$b" | cut -c1-64)" = "${b##*/}" ] || { echo "KO   blob ${b##*/}" >&2; exit 1; }; done
+  echo "OK   chaque blob a pour nom son sha256 ($(ls "$x/lu/blobs/sha256" | wc -l) blobs)"
+  m=$x/lu/blobs/sha256/${d#sha256:}
+  attendu "manifeste et configuration lisibles par jq" "$(jq -e . "$m" > /dev/null && jq -e . "$x/lu/blobs/sha256/$(jq -r '.config.digest' "$m" | cut -d: -f2)" > /dev/null && echo oui)" oui
+  attendu "diff_ids égaux aux digests des couches" "$(jq -c '.rootfs.diff_ids' "$x/lu/blobs/sha256/$(jq -r '.config.digest' "$m" | cut -d: -f2)")" "$(jq -c '[.layers[].digest]' "$m")"
+  attendu "tailles exactes" "$(jq -r '[.config, .layers[]] | map((.size | tostring) + " " + .digest) | .[]' "$m" | while read -r s h; do [ "$(stat -c %s "$x/lu/blobs/sha256/${h#sha256:}")" = "$s" ] || echo x; done | grep -c x || true)" 0
+  attendu "couche 1 = archive racine factice, telle quelle" "$(jq -r '.layers[0].digest' "$m")" "sha256:$r1"
+  attendu "couche 2 : chroot sous opt/sbuild/trixie-amd64.tar" "$(tar -tf "$x/lu/blobs/sha256/$(jq -r '.layers[1].digest' "$m" | cut -d: -f2)" | grep -c '^opt/sbuild/trixie-amd64.tar$')" 1
 }
 
 signer_tache() { # nom : signature versionnée dans builder/, bundle, liste revue de la 08

@@ -1,10 +1,55 @@
-# s4a.sh prealables, 2026-11-10T23:16:24Z
+# s4a.sh prealables, 2026-11-10T23:24:20Z
 OK   Packages égal à xz -dc Packages.xz : égal
 OK   liste rapprochée de Packages : 199 paquets, 0 écart(s)
 OK   paquets dans la liste : 199
 OK   octets de la liste : 133065812
 OK   paquets de l'amorce retrouvés dans la liste : 20
 OK   gabarits rendus sans variable restante (refs factices) : 58116 octets pour la pipeline
+OK   construire-builder : syntaxe bash du script : OK
+OK   prefetch-deb : syntaxe sh du script : OK
+OK   construire-builder : variables Tekton restantes : 0
+## arguments de mmdebstrap (racine)
+     --mode=root
+     --variant=minbase
+     --format=tar
+     --hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount
+     --include=sbuild=0.89.3+deb13u4,libsbuild-perl=0.89.3+deb13u4,mmdebstrap=1.5.7-1+deb13u1,uidmap=1:4.17.4-2,iproute2=6.15.0-1
+     --customize-hook=chroot "$1" useradd -m -u 1000 -U -s /bin/sh constructeur
+     --customize-hook=echo constructeur:100000:65536 > "$1/etc/subuid"
+     --customize-hook=echo constructeur:100000:65536 > "$1/etc/subgid"
+     --customize-hook=echo sbuild > "$1/etc/hostname"
+     --customize-hook=: > "$1/etc/resolv.conf"
+     --customize-hook=echo 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main' > "$1/etc/apt/sources.list"
+     --customize-hook=cd "$1" && { rmdir -p 'home/gigi/.cache/supply-chain-poc/08/travail/s4a-06/essais/e' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }
+     trixie
+     ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w/racine.tar
+     deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+## arguments de mmdebstrap (chroot)
+     --mode=root
+     --variant=buildd
+     --format=tar
+     --hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount
+     --customize-hook=echo sbuild > "$1/etc/hostname"
+     --customize-hook=: > "$1/etc/resolv.conf"
+     --customize-hook=echo 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main' > "$1/etc/apt/sources.list"
+     --customize-hook=cd "$1" && { rmdir -p 'home/gigi/.cache/supply-chain-poc/08/travail/s4a-06/essais/e' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }
+     trixie
+     ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w/chroot.tar
+     deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+OK   racine : --hook-dir avant les crochets : --hook-dir
+OK   racine : retrait des points de montage en dernier crochet : 1
+OK   racine : crochet sources.list : 1
+OK   racine : source du miroir : deb [check-valid-until=no] file://~/.cache/supply-chain-poc/08/travail/s4a-06/essais/e trixie main
+     couche racine sha256:291a4409f3c6219da61999b8bedb16ffbef56fa26c31af0d511c53f67ef50de9 (10240 octets) ; couche du chroot sha256:e2f1e8aa5b9dd15620eaa26d9a2a98bcfa53476530b919a4dfb22062a1e3411d (20480 octets), chroot intérieur sha256 b6921e08e775191ad3d6d6f67a80c2d4db73bb270419a16448e44ce94a7462ad ; configuration sha256:f4c4a8d0ab1f35a1eb3877fb5317bcc2935ea55549c7b50fe2421c014ea57f54 ; manifeste sha256:f74c90211c66397c275b1bc06fe6967f55f8f7e0416cb0aeb6a30ca36e4d52b3
+     image.tar : 40960 octets en 0 s
+     pic du tmpfs ~/.cache/supply-chain-poc/08/travail/s4a-06/essais/w :  Mo sur 0 relevés ; memory.peak du cgroup : absent
+OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:f74c90211c66397c275b1bc06fe6967f55f8f7e0416cb0aeb6a30ca36e4d52b3
+OK   chaque blob a pour nom son sha256 (4 blobs)
+OK   manifeste et configuration lisibles par jq : oui
+OK   diff_ids égaux aux digests des couches : ["sha256:291a4409f3c6219da61999b8bedb16ffbef56fa26c31af0d511c53f67ef50de9","sha256:e2f1e8aa5b9dd15620eaa26d9a2a98bcfa53476530b919a4dfb22062a1e3411d"]
+OK   tailles exactes : 0
+OK   couche 1 = archive racine factice, telle quelle : sha256:291a4409f3c6219da61999b8bedb16ffbef56fa26c31af0d511c53f67ef50de9
+OK   couche 2 : chroot sous opt/sbuild/trixie-amd64.tar : 1
 OK   prefetch-deb : YAML lisible par yq, nom : prefetch-deb
 OK   construire-builder : YAML lisible par yq, nom : construire-builder
 OK   builder-sbuild : YAML lisible par yq, nom : builder-sbuild

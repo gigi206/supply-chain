@@ -4,7 +4,7 @@
 # (runtimeClassName posé par le PipelineRun) ; l'identifiant d'écriture de Zot n'y entre jamais (publier-image pousse le layout).
 #   - entrées : le miroir partiel écrit par prefetch-deb, monté en lecture seule (sous-dossier miroir du PVC) ; revérifié ici
 #     (sha256 de l'InRelease fixé par la pipeline, index selon l'InRelease, chaque paquet selon la liste) ;
-#   - mmdebstrap 1.5.7 installé dans l'amorce (choix 3 du propriétaire) par apt-get install hors ligne (--no-download ; dpkg -i
+#   - mmdebstrap 1.5.7 installé dans l'amorce (choix 3 du propriétaire) par apt-get install de fichiers locaux (sans réseau ; dpkg -i
 #     groupé écarté après le premier passage : pré-dépendances de python3), depuis les paquets du miroir listés en
 #     paramètre (lignes « deb amorce » de S1, s1c-racine.log) ;
 #   - racine : mêmes options que s1.sh (fonction mm, variante minbase, paquets épinglés, compte constructeur 1000, subuid et
@@ -120,11 +120,13 @@ spec:
       done <<< "$LISTE"
       echo "miroir revérifié : InRelease $INRELEASE, 2 index, $n paquets"
       # mmdebstrap dans l'amorce, par apt hors ligne (corrigé le 10/11/2026 après le premier passage : un dpkg -i groupé ne
-      # satisfait pas les pré-dépendances de python3-minimal et de python3 ; apt les ordonne, comme en S1, sans rien télécharger)
+      # satisfait pas les pré-dépendances de python3-minimal et de python3 ; apt les ordonne, comme en S1). Sans --no-download
+      # (second passage du 10/11/2026 : avec lui, le chemin d'un .deb local reste relatif, apt 3.0.3, pkgAcqArchive::Done) : les
+      # fichiers locaux passent par la méthode file, sans réseau ; aucune liste, donc aucune autre source.
       a=()
       for p in $AMORCE_PAQUETS; do a+=("$e/$p"); done
       t=$(date +%s)
-      apt-get install -y --no-install-recommends --no-download "${a[@]}" > /w/apt-amorce.log 2>&1 \
+      apt-get install -y --no-install-recommends "${a[@]}" > /w/apt-amorce.log 2>&1 \
         || { tail -n 200 /w/apt-amorce.log >&2; echo "apt-get install des paquets de l'amorce : échec" >&2; exit 1; }
       echo "apt-get install hors ligne de ${#a[@]} paquets : rc 0 en $(($(date +%s) - t)) s ; $(grep -E '^[0-9]+ (upgraded|mis à jour)' /w/apt-amorce.log) ; $(mmdebstrap --version 2>&1)"
       export SOURCE_DATE_EPOCH=$SDE TMPDIR=/w
