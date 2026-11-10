@@ -326,4 +326,65 @@ awk -v d="$1" -v j="$2" 'substr($1, 2, 4) == j && substr($2, 1, 8) >= d' /var/li
 KREFUS
 }
 
+# Étape pile (préparée à sec le 10/11/2026 à 20:03 UTC, NON LANCÉE) : l'exec direct sur kubelet (client maison) est mis de côté
+# (403, corps vide : on diagnostiquait le client). Relevés de goroutines par le kubectl standard, en simple GET, sans secret lu :
+# kubelet de sc-build par le proxy de nœud (/debug/pprof/goroutine?debug=2) et kube-apiserver (/debug/pprof/goroutine?debug=2,
+# si --profiling est actif : CIS 1.2.15 en échec dans 08b/resultats/rke2-cis.log). Trois moments : avant l'exec, pendant (exec à
+# lecture lente de 128 Mio dans un pod runc, relevé à 45 s, processus déjà fini vers 15 s), après (fin du délai de 150 s).
+# Piles brutes gardées dans $T (hors dépôt) ; archivé : seulement les goroutines dont la pile cite le relais de flux, avec leur
+# état et leur durée d'attente, et la différence entre les moments.
+PILE_MOTIF='remotecommand|httpstream|spdy|wsstream|websocket|proxy\.|streaming|UpgradeAware|Translator|portforward|exec'
+
+pile_releve() { # moment : piles de kubelet et de l'apiserver dans $T/pile-<composant>-<moment>.txt
+  local c u
+  for c in kubelet apiserver; do
+    [ "$c" = kubelet ] && u="/api/v1/nodes/sc-build/proxy/debug/pprof/goroutine?debug=2" || u="/debug/pprof/goroutine?debug=2"
+    if kubectl get --raw "$u" </dev/null > "$T/pile-$c-$1.txt" 2>"$T/pile-err"; then
+      echo "pile $c $1 : $(grep -c '^goroutine ' "$T/pile-$c-$1.txt") goroutines"
+    else
+      echo "pile $c $1 : indisponible ($(grep -a -i -v -E 'jeton|token' "$T/pile-err" | head -c 200 | tr '\n' ' '))"; : > "$T/pile-$c-$1.txt"
+    fi
+  done
+}
+
+etape_pile() {
+  local f n pid rc=0 t0
+  croise_pod - "$RESTREINT"
+  pile_releve avant
+  f=$(alea 128); n=$(stat -c %s "$f"); t0=$(ms)
+  timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" &
+  pid=$!
+  sleep 45
+  echo "relevé pendant, $(( ($(ms) - t0) / 1000 )) s après le lancement ; reçus dans le pod : $(recu /w/croise)"
+  pile_releve pendant
+  wait "$pid" || rc=$?
+  echo "exec : code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(recu /w/croise)"
+  sleep 5
+  pile_releve apres
+  pod_retirer "$POD"
+  python3 -I - "$T" "$PILE_MOTIF" <<'PILE' | grep -a -i -v -E 'jeton|token'
+import re, sys
+T, motif = sys.argv[1], re.compile(sys.argv[2])
+def blocs(c, m):
+    try: t = open(f'{T}/pile-{c}-{m}.txt', encoding='utf-8', errors='replace').read()
+    except OSError: return {}
+    r = {}
+    for b in t.split('\n\n'):
+        l = b.strip().split('\n')
+        if not l or not l[0].startswith('goroutine ') or not motif.search(b): continue
+        fonctions = [re.sub(r'\([^()]*\)$', '', x) for x in l[1:] if x and not x.startswith('\t')][:12]
+        sig = ' <- '.join(fonctions)
+        etat = re.search(r'\[(.*)\]', l[0]); etat = etat.group(1) if etat else '?'
+        r.setdefault(sig, []).append(etat)
+    return r
+for c in ('kubelet', 'apiserver'):
+    a, p, z = (blocs(c, m) for m in ('avant', 'pendant', 'apres'))
+    print(f'## {c} : goroutines du relais de flux : avant {sum(map(len, a.values()))}, pendant {sum(map(len, p.values()))}, après {sum(map(len, z.values()))}')
+    for sig, etats in p.items():
+        if sig not in a:
+            print(f'pendant seulement{" (encore après)" if sig in z else ""} : {len(etats)} × [{"; ".join(sorted(set(etats)))}]')
+            print(f'     {sig[:900]}')
+PILE
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"

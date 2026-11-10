@@ -361,3 +361,41 @@ Accord : « Oui », à 19:58:29 UTC (transcription), en réponse à « Je lance 
 |---|---|---|
 | K3 | Le journal de kubelet ou les en-têtes donnent le motif du 403 | faible : rien ne dit que kubelet journalise ce refus à sa verbosité actuelle |
 
+## Étape pile : préparée à sec (20:04 UTC), NON LANCÉE
+
+### Exec direct sur kubelet mis de côté
+
+Deux 403 en moins de 10 ms, avec un corps vide. Cette branche testait surtout le client maison et l'identité empruntée à l'apiserver. Même réglée, elle aurait gardé un client différent de kubectl. La variante « en-têtes et journal de kubelet » reste commitée, NON LANCÉE, comme repli.
+
+### Ce que fait l'étape
+
+Elle relève les goroutines en cours avec le kubectl standard, en simple GET, sans client maison, sans secret lu et sans changement de la plateforme :
+- **kubelet de sc-build**, par le proxy de nœud (`/api/v1/nodes/sc-build/proxy/debug/pprof/goroutine?debug=2`) ;
+- **kube-apiserver** (`/debug/pprof/goroutine?debug=2`), si le profilage est actif.
+
+Trois moments, dans un pod runc, avec un exec de 128 Mio à lecture lente :
+- **avant** l'exec ;
+- **pendant**, à 45 s : le processus est fini vers 15 s, et l'exec est pendu ;
+- **après** la fin du délai de 150 s.
+
+Les piles brutes restent dans le répertoire de travail, hors du dépôt. Le journal n'archive que les goroutines dont la pile cite le relais de flux (remotecommand, httpstream, spdy, websocket, proxy, streaming, UpgradeAware, Translator, exec), avec leur état, leur durée d'attente et la différence entre les moments.
+
+### Vérifications hors ligne
+
+- Profilage :
+  - **apiserver** : le contrôle CIS 1.2.15 (`--profiling` à false) est en échec dans `08b-rke2/resultats/rke2-cis.log`, donc le profilage est probablement actif ;
+  - **kubelet** : non relevé. Le script dira si la pile est disponible.
+- L'analyse a été essayée sur de fausses piles. Une goroutine présente seulement « pendant » ressort avec sa durée d'attente et sa chaîne d'appels.
+
+### Prédictions
+
+| # | Prédit | Confiance |
+|---|---|---|
+| P1 | Les piles de kubelet et de l'apiserver sont disponibles | moyenne |
+| P2 | Pendant le blocage, une goroutine du relais de flux, absente avant et après, attend **dans kubelet** depuis plus de 20 s | faible |
+| P3 | L'exec finit en code 124, avec tous les octets reçus, comme en `croise` et `amont` | haute |
+
+### Lecture prévue
+
+Le composant qui garde une goroutine du relais de flux en attente pendant le blocage, et seulement pendant, est le maillon. Sa chaîne d'appels dit où elle attend.
+
