@@ -385,3 +385,7 @@ Détail : [diagnostic](resultats/diag-exec-predictions.md).
 **Lecture** : la chaîne d'un `kubectl exec` vers un pod de sc-build est kubectl, puis kube-apiserver, puis le proxy CONNECT du superviseur (rke2-server), puis le tunnel `remotedialer` jusqu'à rke2-agent, puis kubelet, puis containerd. Containerd est mis hors de cause par la bisection. Kubelet ne relaie plus rien pendant le blocage, d'après sa pile. Le poste est hors de cause par l'étape amont. **Le maillon fautif est donc kube-apiserver ou le tunnel du superviseur RKE2.** Le tunnel, propre à RKE2 et k3s, est le suspect principal, **sans preuve directe** : ni lui ni l'apiserver ne sont observables à la verbosité actuelle.
 
 Détail : [diagnostic](resultats/diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 20:31 UTC : étape local refusée à l'admission
+
+Un pod d'essai sur sc-confiance devait retirer le tunnel `remotedialer` de la chaîne. Le code de k3s inclus dans RKE2 1.35.9 joint en direct le kubelet du nœud du superviseur. L'admission à blanc (20:31 UTC, « Oui ») a été refusée par la règle `espace-default-interdit` : rien n'a été lancé. Il faudrait un espace de la zone confiance ou un espace dédié, ce qui relève d'une décision du propriétaire. Détail : [diagnostic](resultats/diag-exec-predictions.md).

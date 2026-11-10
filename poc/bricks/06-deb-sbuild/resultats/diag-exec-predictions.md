@@ -521,3 +521,18 @@ Un exec vers un pod de sc-confiance garde donc kubectl, l'apiserver et `proxy.Pr
 - **L1 passe** : le maillon est le tunnel `remotedialer`, entre rke2-server et rke2-agent.
 - **L1 bloque** : le maillon est kube-apiserver ou `proxy.Proxy` ; on ne peut pas encore départager les deux.
 
+## Résultat de l'étape local (10/11/2026, 20:31:14 UTC)
+
+Accord : « Oui », à 20:31:09 UTC (transcription), en réponse à « Je lance l'étape local ? Oui ou non ». Lancée sous bash, **code 1**. Journal : [`diag-exec-local.log`](diag-exec-local.log).
+
+| # | Résultat |
+|---|---|
+| L0 | **Réfutée.** L'admission à blanc est refusée par la règle Kyverno `espace-default-interdit` (« aucun pod dans l'espace default ») de la 08c |
+| L1 | **Non mesurée.** Rien n'a été lancé : le script s'arrête sur le refus, comme prévu |
+
+**Pour faire tourner ce pod sur sc-confiance**, il faut un autre espace :
+- soit un **espace de la zone confiance**, comme `scan`, où `zone-confiance` impose `zone=confiance`. Un pod d'essai y côtoierait des comptes sensibles ;
+- soit un **espace dédié**, à créer. C'est un changement du cluster.
+
+L'un et l'autre sont des décisions du propriétaire.
+
