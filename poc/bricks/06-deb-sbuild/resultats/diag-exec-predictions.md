@@ -563,3 +563,20 @@ La lecture prévue est inchangée :
 - **L1 passe** : le maillon est `remotedialer` ;
 - **L1 bloque** : le maillon est kube-apiserver ou `proxy.Proxy`.
 
+## Résultat de l'étape local avec l'espace diag (10/11/2026, 20:34:03 à 20:35:15 UTC)
+
+Accord : « Oui », à 20:33:57 UTC (transcription), en réponse à « Je lance l'étape local ? Oui ou non ». Lancée sous bash, code **0**. Journaux : le premier passage refusé est renommé [`diag-exec-local-1.log`](diag-exec-local-1.log), ce passage est [`diag-exec-local.log`](diag-exec-local.log).
+
+| # | Résultat |
+|---|---|
+| L0 | **Tenue.** Espace et pod admis à blanc puis créés ; pod prêt sur sc-confiance à 20:34:19 UTC |
+| L1 | **Tenue.** Code 0 en 13 437 ms, 134 217 728 octets reçus |
+| L2 | **Tenue.** Espace `diag` supprimé, absent à 20:35:15 UTC |
+
+**Conclusion du diagnostic.** Un `kubectl exec` dont l'entrée attend dans la chaîne, parce que le pod lit moins vite qu'elle n'arrive, ne rend pas la main sur sc-build, bien que le processus ait fini et que tout soit reçu. Le même exec vers un pod de sc-confiance passe en 13,4 s (étape local, 20:34 UTC). Pour ce pod, d'après le code de k3s inclus dans RKE2 v1.35.9+rke2r1, le superviseur joint kubelet en direct, sans la session `remotedialer`. Kubectl, kube-apiserver et le relais `proxy.Proxy` du superviseur sont communs aux deux cas. Containerd et le shim sont hors de cause (bisection), kubelet ne relaie plus rien pendant le blocage (pile), et le poste est hors de cause (étape amont). **Le maillon fautif est le tunnel `remotedialer` entre rke2-server et rke2-agent** (remotedialer `v0.6.0-rc.1.0.20250916111157-f160aa32568d`, d'après le `go.mod` de RKE2). Kata n'y joue que par son débit plus faible, qui crée l'attente. **Limites** : c'est une preuve par différence, sur un essai par chemin. Le mécanisme exact dans `remotedialer` n'est pas identifié. Les deux nœuds diffèrent aussi par d'autres points que le tunnel, sans rôle connu dans un exec.
+
+**Suites possibles, à décider avec le propriétaire** :
+- signaler le cas en amont, chez RKE2, k3s ou remotedialer. C'est une action publique ;
+- essayer une autre version de RKE2 ;
+- en rester à la règle d'exploitation : pas de gros fichier par l'entrée standard de `kubectl exec` vers un pod d'un nœud agent. Les morceaux de 64 Mio passent.
+

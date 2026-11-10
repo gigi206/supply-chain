@@ -389,3 +389,9 @@ Détail : [diagnostic](resultats/diag-exec-predictions.md).
 ## Additif du 10/11/2026, 20:31 UTC : étape local refusée à l'admission
 
 Un pod d'essai sur sc-confiance devait retirer le tunnel `remotedialer` de la chaîne. Le code de k3s inclus dans RKE2 1.35.9 joint en direct le kubelet du nœud du superviseur. L'admission à blanc (20:31 UTC, « Oui ») a été refusée par la règle `espace-default-interdit` : rien n'a été lancé. Il faudrait un espace de la zone confiance ou un espace dédié, ce qui relève d'une décision du propriétaire. Détail : [diagnostic](resultats/diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 20:35 UTC : cause du blocage de `kubectl exec` trouvée, le tunnel de RKE2
+
+**Conclusion du diagnostic.** Un `kubectl exec` dont l'entrée attend dans la chaîne, parce que le pod lit moins vite qu'elle n'arrive, ne rend pas la main sur sc-build, bien que le processus ait fini et que tout soit reçu. Le même exec vers un pod de sc-confiance passe en 13,4 s (étape local, 20:34 UTC). Pour ce pod, d'après le code de k3s inclus dans RKE2 v1.35.9+rke2r1, le superviseur joint kubelet en direct, sans la session `remotedialer`. Kubectl, kube-apiserver et le relais `proxy.Proxy` du superviseur sont communs aux deux cas. Containerd et le shim sont hors de cause (bisection), kubelet ne relaie plus rien pendant le blocage (pile), et le poste est hors de cause (étape amont). **Le maillon fautif est le tunnel `remotedialer` entre rke2-server et rke2-agent** (remotedialer `v0.6.0-rc.1.0.20250916111157-f160aa32568d`, d'après le `go.mod` de RKE2). Kata n'y joue que par son débit plus faible, qui crée l'attente. **Limites** : c'est une preuve par différence, sur un essai par chemin. Le mécanisme exact dans `remotedialer` n'est pas identifié. Les deux nœuds diffèrent aussi par d'autres points que le tunnel, sans rôle connu dans un exec.
+
+Détail : [diagnostic](resultats/diag-exec-predictions.md).

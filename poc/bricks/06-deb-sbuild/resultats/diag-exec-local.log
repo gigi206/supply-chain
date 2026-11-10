@@ -1,4 +1,7 @@
-# diag-exec-kata.sh local, 2026-11-10T20:31:14Z
-Error from server: error when creating "~/.cache/supply-chain-poc/08/travail/diag-exec/diag-exec-local.json": admission webhook "vpol.validate.kyverno.svc-fail-bb40264c" denied the request: Policy espace-default-interdit failed: durcissement : aucun pod dans l'espace default
-
-KO   pod d'essai refusé à l'admission : rien lancé
+# diag-exec-kata.sh local, 2026-11-10T20:34:03Z
+espace diag : admis à blanc
+espace diag créé à 20:34:03 UTC
+pod d'essai : admis à blanc
+### diag-exec-local (runc, uid 1000, nœud sc-confiance) : prêt à 20:34:19 UTC
+L1 sc-confiance, sans tunnel : 134217728 octets, code 0 en 13437 ms ; reçus dans le pod : 134217728
+espace diag supprimé (demande envoyée)
