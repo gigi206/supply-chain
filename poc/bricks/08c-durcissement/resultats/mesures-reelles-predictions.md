@@ -1449,3 +1449,14 @@ La phase en lecture seule a donc pris environ 25 min de travail actif, contre 1 
 
 - « Oui, pousse » au push. Contrôle des secrets sur les 6 fichiers touchés par les 4 commits, dans une copie de travail temporaire retirée ensuite : OK. Push à 09:45:06 UTC, `7473ea2..c8fe842` ; branche distante identique à la branche locale.
 - Rien d'autre sur le chantier des Events depuis : aucune requête, aucun passage. Le travail de 10:03 UTC porte sur la 19b (README de la 19b).
+
+## Additif du 10/11/2026, 10:16 UTC : chantier des Events clos, push de 10:05:48 UTC consigné
+
+- Push de 10:05:48 UTC, sur un « Oui, pousse » : `c8fe842..6767ce4`. Le contrôle des secrets a porté sur les 5 fichiers touchés, dans une copie de travail temporaire retirée ensuite : OK. La branche distante est identique à la branche locale. Une première passe annonçait 0 fichier : le script lancé était celui du dépôt principal, qui se place dans son propre dossier. Relancé depuis la copie, il a contrôlé les 5 fichiers.
+- Clôture du chantier, sur l'accord « go » donné à la recommandation du conseiller, à environ 8 h 50 pour 4 h estimées (total de l'additif de 09:42 UTC ; le travail de 10:03 UTC porte sur la 19b).
+- Reportés au prochain rejeu, sans passage dédié :
+  - les témoins positifs de `reason="Pulling"` et d'`EV_FAILEDCREATE`. Le filtrage lui-même a des lignes réelles : par `kind` (V1), par `kind` et `name=~` (V3) et par `reason` (V5). Seules ces deux valeurs n'ont jamais été vues. Un filtre qui ne trouverait rien ne donne pas de faux OK : si kubectl voit l'Event dans la fenêtre, `ev_juge` rend son compte, donc KO (`evenements-loki.sh`, lignes 123 et 124) ;
+  - les verdicts réels des six contrôles, au prochain passage de leurs étapes.
+- La seconde lecture de Loki est retirée de la liste, faute de question à trancher.
+- Restent à décider avec le propriétaire : l'ordre de démarrage d'Alloy après l'API (remède (b)) et l'issue chez Alloy (action publique). Les deux portent sur la même panne : Alloy de `sc-stockage` démarré avant que l'API écoute.
+- Rien lu ni écrit dans le cluster, Loki ou les VM pour cet additif.
