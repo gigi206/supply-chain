@@ -341,3 +341,23 @@ Accord : « Oui », à 19:58:29 UTC (transcription), en réponse à « Je lance 
 
 **Corrigé à sec, NON REJOUÉ** : le client affiche aussi le corps de la réponse (300 caractères au plus), pour lire le motif d'un refus.
 
+## Étape kubelet, rejeu (10/11/2026, 20:00:41 à 20:00:43 UTC)
+
+**Accord** : « Je veux trouver d'où vient le soucis », à 20:00:33 UTC (transcription), en réponse à « Je rejoue l'étape kubelet pour lire le motif du 403, ou on arrête ? ». La réponse est consignée comme une **interprétation** : un accord sur ce seul rejeu.
+
+**Exécution** : sous bash, code **0**.
+
+**Journaux** : le premier passage est renommé [`diag-exec-kubelet-1.log`](diag-exec-kubelet-1.log), le rejeu est [`diag-exec-kubelet.log`](diag-exec-kubelet.log).
+
+**Résultat** : de nouveau `403 Forbidden`, en 5 et 4 ms, **avec un corps de réponse vide**. Un refus d'autorisation de kubelet donne d'ordinaire un motif dans le corps : celui-ci vient peut-être d'un autre contrôle. C'est **non vérifié**.
+
+## Préparé à sec (20:01 UTC), NON LANCÉ
+
+- Le client affiche aussi les en-têtes de la réponse.
+- L'étape `kubelet` lit en plus le journal de kubelet sur sc-build, depuis le début de l'étape. Elle garde les lignes qui citent un refus, une autorisation, un exec, un upgrade, un websocket ou 403, sans les jetons, 400 caractères au plus.
+- Le filtre a été essayé sous `dash` sur un faux journal.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| K3 | Le journal de kubelet ou les en-têtes donnent le motif du 403 | faible : rien ne dit que kubelet journalise ce refus à sa verbosité actuelle |
+

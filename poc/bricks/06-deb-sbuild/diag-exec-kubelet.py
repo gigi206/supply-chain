@@ -94,7 +94,9 @@ def principal(hote, port, espace, pod, conteneur, mode, octets, cert, cle, delai
             corps = s.recv(4096).decode(errors='replace').replace('\r', ' ').replace('\n', ' ')[:300]
         except (socket.timeout, OSError):
             corps = ''
-        print(f'code 1 en {int((time.monotonic() - t0) * 1000)} ms ; réponse : {ligne} ; corps : {corps}')
+        # Corrigé à 20:01 UTC, NON REJOUÉ : en-têtes de la réponse ajoutés (corps vide au rejeu de 20:00 UTC)
+        entetes = ' | '.join(x.decode(errors='replace') for x in rep.split(b'\r\n')[1:] if x)[:300]
+        print(f'code 1 en {int((time.monotonic() - t0) * 1000)} ms ; réponse : {ligne} ; en-têtes : {entetes} ; corps : {corps}')
         return 1
     envoyes, morceau = 0, 65536
     try:

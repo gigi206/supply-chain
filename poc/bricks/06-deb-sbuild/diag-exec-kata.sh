@@ -300,7 +300,8 @@ APISERVER
 #   K2  lecture rapide (témoin : le client fonctionne)
 #   K1  lecture lente (même commande que croise, amont et bisection)
 etape_kubelet() {
-  local cert cle m r
+  local cert cle m r d
+  d=$(date -u +%H:%M:%S)
   cert=$(args_apiserver | sed -n 's/^--kubelet-client-certificate=//p' | head -1)
   cle=$(args_apiserver | sed -n 's/^--kubelet-client-key=//p' | head -1)
   # Corrigé à 19:59 UTC, NON REJOUÉ : la forme ${cle:+…}${cle:-…} affichait aussi le chemin de la clé (un chemin, pas son contenu)
@@ -317,6 +318,12 @@ etape_kubelet() {
     kubectl exec -n builds "$POD" -- rm -f /w/k </dev/null || true
   done
   pod_retirer "$POD"
+  # Ajouté à 20:01 UTC, NON REJOUÉ : journal de kubelet sur sc-build pendant l'étape (refus, autorisation, exec, upgrade)
+  echo "### kubelet (sc-build), de $d à $(date -u +%H:%M:%S) UTC"
+  sur sc-build "sudo sh -s '$d' '$(date -u +%m%d)'" 2>/dev/null <<'KREFUS' | grep -a -i -v -E 'jeton|token' | cut -c1-400 || true
+awk -v d="$1" -v j="$2" 'substr($1, 2, 4) == j && substr($2, 1, 8) >= d' /var/lib/rancher/rke2/agent/logs/kubelet.log \
+  | grep -i -E 'forbidden|authoriz|exec|upgrade|websocket|403|denied' | tail -n 50
+KREFUS
 }
 
 lancer diag-exec "06 diagnostic exec Kata" "$@"
