@@ -425,3 +425,44 @@ Cela confirme, par l'effet, que le maillon fautif était sur le chemin par le pr
 Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kata, sur un passage à 512 Mio. **Non vérifié** : les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part.
 
 Détail et prédictions D1 à D6 : [`egress-selector-predictions.md`](../08b-rke2/resultats/egress-selector-predictions.md).
+
+## Additif du 10/11/2026, 21:19 UTC : carte des dépendances de S4, préparée à sec, rien lancé
+
+**Push consigné** : `58fd6c1..57b76be`, de 21:14:41 à 21:14:42 UTC. Il contient 3 commits (`b08d5f7`, `28b812e`, `57b76be`). Avant l'envoi, 6 fichiers ont été contrôlés dans un worktree temporaire, sans aucun secret trouvé. Accord : « Oui, pousse ».
+
+**Interprétation** : je consigne le « continue » de 21:15:41 UTC comme une permission de préparer à sec, pas comme un accord. Ce tour n'a rien écrit dans Zot, ni dans le cluster, ni sur les VM.
+
+**Effort de la brique**
+- Commits sur `poc/bricks/06-deb-sbuild` : 2 le 05/11, puis 54 le 10/11, de 12:14:44 à 21:02:39 UTC.
+- Ce total comprend le diagnostic de l'exec sous Kata, de 18:27 à 21:00 UTC, qui a débordé sur la 08b.
+- L'estimation est de 2 pw, avec une décision à 4 pw. Le travail fait reste loin des deux seuils : aucune décision n'est requise.
+
+**Carte des dépendances de S4.** Chaque point est marqué « vérifié dans le dépôt » ou « à vérifier ».
+
+1. **Sortie réseau de `prefetch-deb`** : vérifié dans le dépôt. Elle est appliquée depuis E1 (14:29:39 UTC), et E3 est tenue ([08c](../08c-durcissement/resultats/sortie-deb-predictions.md)). Correction de lecture : la phrase « non appliquée » de l'additif sur la sortie dédiée date d'avant E1. Elle n'est plus vraie, et elle n'est pas réécrite.
+2. **Correction `TimeoutExpired` de `sortie-builds.sh`** (14:35 UTC, non rejouée) : vérifié dans le dépôt. Elle ne touche que `DESTINATIONS`, et seule l'étape des témoins s'en sert. Elle ne bloque pas S4.
+3. **ORAS** : vérifié dans le dépôt. Il est classé « Sain » au doc 04, `oras` 1.3.6 est épinglé dans `mise.toml`, et S2 s'en est déjà servi depuis l'hôte.
+4. **Sujet signé par Chains (v0.29.9)**
+   - Vérifié dans le dépôt : il existe un précédent. `publier-fermeture` émet `IMAGE_URL` et `IMAGE_DIGEST`, et Chains signe l'artefact ORAS.
+   - Conséquence : par cette voie, le sujet signé est le digest du manifeste OCI qui porte le deb, pas le sha256 du fichier `.deb`. Le lien entre les deux passe par la couche du manifeste.
+   - À vérifier dans le code de Chains v0.29.9, pas de mémoire : un résultat `*_ARTIFACT_OUTPUTS` permettrait-il un sujet au sha256 du deb ?
+5. **Fermeture dans `resolvedDependencies`**
+   - Vérifié dans le dépôt : `preparer-entrees` déclare `FERMETURE_ARTIFACT_INPUTS` (uri et digest). La même forme convient pour `deps/sample-app/deb-buildinfo@sha256:3a0e54ae…`.
+   - À vérifier : sa présence dans la provenance de la PipelineRun pour ce cas.
+6. **Dépôt de sortie dans Zot** : vérifié dans `stockage/zot.json`.
+   - `artifacts/sample-app/deb`, prévu au tableau de S4, tombe sous `**`, où seul `poc-ecriture` écrit.
+   - Une tâche de publication demande donc soit un dépôt sous `builds/**`, avec un compte qui a déjà la création seule, soit une règle et un compte nouveaux.
+   - La seconde voie est un changement de Zot : elle demande un accord nommé.
+7. **Chroot et image de build**
+   - Vérifié dans le dépôt : en S3, le chroot de S2 (`e0b1f37c…`) passe de l'hôte au pod par `kubectl exec`. Il n'est pas dans Zot.
+   - L'image est une image d'essai (`essais-06/sbuild-debian13:s1b`), pas encore sous `builders/`.
+   - Dans une pipeline, les deux doivent venir de Zot par digest, ce qui veut dire écrire dans Zot, donc un accord nommé.
+   - L'image de base garde son verdict D4 : « À surveiller », avec une échéance au 09/12/2026.
+8. **Politique** : vérifié dans le dépôt.
+   - Chaque nouvelle tâche est un fichier signé dans `politique/taches/`, et son digest s'ajoute à `porte/taches.yml`, relu par le propriétaire.
+   - Le motif de `verification-policy.yaml` couvre déjà `tekton/(tasks|pipelines)/…`.
+   - Les cas de `posture/`, le gabarit et les déclencheurs sont à revoir.
+   - Signer et publier des bundles, c'est écrire dans Zot : il faut un accord nommé, et `taches.key` n'est jamais lue.
+9. **Porte** : à vérifier. `porte.rego` ne juge peut-être pas une pipeline dont le sujet n'est pas une image.
+
+**Reste** : S4 et S5. Leur ordre face aux autres points ouverts est une question posée au propriétaire. Rien n'est écrit pour S4, ni tâche, ni script, ni prédiction.
