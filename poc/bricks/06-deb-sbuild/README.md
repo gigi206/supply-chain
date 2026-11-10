@@ -99,3 +99,19 @@ Décision du propriétaire : « Briques 05 et 06 : je recommande (a) pour D1 à 
 - **D4 (a)** : base produite par mmdebstrap depuis l'instantané.
 
 **Aucun jalon n'est lancé.** S1 et chaque jalon suivant demandent un accord à part.
+
+## Additif du 10/11/2026, 13:03 UTC : S1 préparé, NON LANCÉ
+
+Le propriétaire a choisi « S1 de la 06 ». Cette réponse est consignée comme une interprétation : elle désigne le jalon, et les effets précis attendent un accord nommé.
+
+- Script : [`s1.sh`](s1.sh), avec les étapes `prealables`, `amorce`, `racine`, `image` et `essais`.
+- Prédictions P1 à P11 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md), écrites avant toute exécution.
+
+Rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+
+**Lu sur l'hôte** :
+- le manuel de sbuild au tag : le repli 2 se ferait en mode `sudo` ou `autopkgtest`, sans coupure du réseau par sbuild ;
+- les signataires de l'instantané, avec les clés de ftp-master ;
+- les versions épinglées dans `Packages`.
+
+**D4 (a)** : la racine de l'image vient de mmdebstrap, et `debian:trixie-20261104-slim` ne sert que d'amorce. L'image d'essai va dans `essais-06/`, et `builders/` attend S2.
