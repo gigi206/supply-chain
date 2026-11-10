@@ -131,3 +131,26 @@ Lancé sous bash, `s2.sh fermeture restauration`. **Code de sortie relevé : 1.*
 **Cause** : une erreur du script, et non de la fermeture. L'option `--no-tty` n'a pas été vérifiée pour cette sous-commande ; l'aide locale d'oras, lue ensuite sous `unshare -rn`, le confirme.
 
 **Corrigé à sec à 16:25 UTC, NON REJOUÉ** : l'option est retirée de `manifest fetch`. Le script modifié n'est pas couvert par l'accord de 16:23. Le rejeu de `fermeture restauration` renverrait le même contenu (même digest attendu, mêmes tags), et demande un nouvel accord.
+
+## Résultat du rejeu de fermeture et restauration (10/11/2026, 16:31:17 à 16:31:20 UTC, accord : « Oui, rejoue-les », 16:31:11 UTC)
+
+Lancé sous bash, avec le script corrigé à 16:25 UTC. **Code de sortie relevé : 0.** Journaux : [`s2-fermeture.log`](s2-fermeture.log) et [`s2-restauration.log`](s2-restauration.log).
+
+| # | Résultat |
+|---|---|
+| Q9 | **Tenue de nouveau.** Deux envois, même digest qu'au premier passage : `sha256:3a0e54ae…`. Rien de nouveau n'est écrit dans Zot |
+| Q10 | **Tenue.** 162 couches ; la liste « titre, digest » des couches est identique à la liste « fichier, SHA256 de `Packages` » (empreinte des deux listes triées : `f78d0495…`) |
+| Q11 | **Tenue.** Pull par digest dans un répertoire vide : 162 fichiers, tous identiques à la liste attendue. Durée sous la seconde selon `chrono.tsv`, qui ne compte que les secondes |
+| Q12 | **Tenue, au même compte que S1** : de 15:43:21 (« continue ») à 16:31 UTC, préparation, trois accords et consignation compris, pour 0,5 pw prévue |
+
+**Bilan de S2 face au jalon du README**
+- Archive du chroot construite deux fois, même empreinte : **oui**, dans le même pod.
+- Résolution depuis un `.buildinfo` : **oui**, celui de s1b, retrouvé dans le journal archivé.
+- Fermeture dans Zot sous `deps/sample-app/deb-buildinfo`, restaurable : **oui**, par digest.
+- Déduplication mesurée : **non**. Seule la condition nécessaire est mesurée (couche = SHA256 du paquet, `dedupe: true` dans Zot). Il n'existe qu'une fermeture.
+
+**Suite** : S3, deux builds hors ligne depuis la fermeture restaurée, avec le chroot `e0b1f37c…`. Il faudra :
+- un dépôt apt local construit dans le pod ;
+- une nouvelle image d'essai portant ce chroot.
+
+Ce n'est pas préparé.

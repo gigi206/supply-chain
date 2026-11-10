@@ -1,0 +1,3 @@
+# s2.sh restauration, 2026-11-10T16:31:20Z
+restaurée depuis sc-stockage.poc.test:5000/deps/sample-app/deb-buildinfo@sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b
+OK   ~/.cache/supply-chain-poc/08/travail/s2-06/restauree : 162 fichiers, empreintes identiques à la liste attendue

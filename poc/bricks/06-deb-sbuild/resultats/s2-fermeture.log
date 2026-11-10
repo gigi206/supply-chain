@@ -1,0 +1,6 @@
+# s2.sh fermeture, 2026-11-10T16:31:17Z
+OK   ~/.cache/supply-chain-poc/08/travail/s2-06/fermeture : 162 fichiers, empreintes identiques à la liste attendue
+fermeture : sc-stockage.poc.test:5000/deps/sample-app/deb-buildinfo@sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b
+OK   digest du second envoi : sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b
+OK   couches du manifeste : 162
+OK   digest de chaque couche = SHA256 de Packages (fichier par fichier) : f78d0495058f9ada2bb398f927cc9bbcc71a8eca55f091441f21141497f1735e

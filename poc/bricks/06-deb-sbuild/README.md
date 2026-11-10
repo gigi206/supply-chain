@@ -230,3 +230,13 @@ La fermeture est écrite dans Zot, sous `deps/sample-app/deb-buildinfo@sha256:3a
 L'étape s'est ensuite arrêtée en code 1, sur une option refusée par `oras manifest fetch`. Le contrôle des couches et la restauration n'ont pas tourné.
 
 Le script est corrigé à sec, **non rejoué**. Le rejeu attend un nouvel accord. Détails : [prédictions de S2](resultats/s2-predictions.md).
+
+## Additif du 10/11/2026, 16:31 UTC : S2 tenu, sauf la déduplication
+
+Rejeu de `fermeture restauration` de 16:31:17 à 16:31:20 UTC, sur l'accord « Oui, rejoue-les ». Code 0.
+
+**La fermeture est restaurable** : `deps/sample-app/deb-buildinfo@sha256:3a0e54ae…` (même digest qu'au premier passage), 162 couches. Le digest de chaque couche est le SHA256 du paquet dans `Packages`. La restauration par digest redonne les 162 fichiers, identiques à la liste attendue.
+
+**Jalon S2** : chroot reproductible, résolution depuis le `.buildinfo`, fermeture dans Zot et restauration, **tenus**. **La déduplication entre deux fermetures n'est pas mesurée** : il n'en existe qu'une.
+
+**Reste** : S3, non préparé.
