@@ -238,3 +238,21 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
 **G8 préparé à sec le 05/11/2026 (10:40 UTC, rien appliqué)** : alerte de fraîcheur, à soumettre au propriétaire. Prometheus ne voit pas l'état des Jobs ; un timer sur `sc-stockage` mesurera donc ce que la porte exige, la date du dernier referrer de scan et celle de la base, lues en anonyme dans Zot. Trois alertes : `ScanEnRetard`, `ScanBientotRefuse`, `BaseGrypeVieillie`. Script testé depuis l'hôte (nominal, sans referrer, Zot injoignable, 404) ; `promtool` pas encore lancé. Décisions D11 à D13, ordre et effets : [`resultats/g8-predictions.md`](resultats/g8-predictions.md).
 
 **G8 appliqué le 05/11/2026 (10:50 à 10:58 UTC, décisions D11 à D13 du propriétaire, « 1a, 2a, 3a, 4a, 5a »)** : timer `fraicheur-scan` en service, 3 alertes déployées, incident simulé conforme (3 déclenchées, 3 résolues, 6 notifications lues dans Grafana). Un écart de lecture, sans effet sur les règles. Reste à relever le passage du 06/11 ; ni un vrai CronJob en échec, ni le blocage réseau de l'unité, ni `rejeu.sh` n'ont été essayés. Une alerte ne sort pas du PoC : elle se lit dans Grafana. Détail : [`resultats/g8-predictions.md`](resultats/g8-predictions.md).
+
+**Additif du 10/11/2026, 12:26 UTC : `rejeu.sh` rejoué sous RKE2, et relevé de la base pour rpm/deb.** Le propriétaire a choisi « 2 », poursuivre le scan. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM : ce sont des lectures de journaux archivés et de la base importée en G0, sur l'hôte.
+
+- **`rejeu.sh` a été rejoué.** L'affirmation « pas rejoué » ci-dessus, et celle de la ligne Scan de doc 03, sont périmées depuis le 06/11/2026. Les deux reprises à J8 sous RKE2 ont joué toutes les étapes de la 07a (G1, G2, G3, G4, passage périodique, G8, G6), avec 0 KO dans chaque journal :
+  - 12:34 UTC : [`rejeu-rke2-reprise-j8.log`](../08-trust-plane/resultats/rejeu-rke2-reprise-j8.log) ;
+  - 15:25 UTC : [`rejeu-rke2.log`](../08-trust-plane/resultats/rejeu-rke2.log).
+
+  Ces reprises sont déjà consignées dans la [08b](../08b-rke2/README.md), mais pas ici. G6 apparaît deux fois parce qu'il y a eu deux reprises. Ce n'est pas un rejeu de zéro : les étapes d'avant J8 ont été sautées.
+- **Toujours pas prouvé** :
+  - le blocage réseau de l'unité `fraicheur-scan` ;
+  - la réaction à un vrai CronJob en échec ;
+  - le scan des rpm et des deb, parce que les briques 05 et 06 n'ont encore produit aucun paquet dans la plateforme.
+- **Relevé de la base pour rpm/deb**, sur la base du 04/11 importée en G0, en lecture seule : [`rpm-deb-releve-base.log`](resultats/rpm-deb-releve-base.log).
+  - Il n'y a aucun fournisseur Rocky ; `rhel`, `alma` et `debian` sont présents.
+  - La base remplace `rocky` et `rockylinux` par `rhel`. Un rpm de Rocky serait donc jugé sur les données de Red Hat.
+  - Debian 13 (trixie) a 60 293 entrées affectées ; Red Hat 9, 31 401.
+  - AlmaLinux 9 n'a aucune entrée affectée. C'est non expliqué.
+  - Le traitement de cet alias par Grype 0.104.1 n'a pas été lu dans son source : la question « Grype comme scanner unique sur EL » reste ouverte.
