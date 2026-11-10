@@ -1,0 +1,10 @@
+# complément 2026-11-10T12:29:14Z base ~/.cache/supply-chain-poc/07a/g0/dbcache/6/vulnerability.db
+## affected_package_handles : almalinux, redhat 9 et debian 13, version mineure vide
+('debian', '13', 60293)
+('redhat', '9', 31401)
+## unaffected_package_handles : almalinux, redhat 9 et debian 13, version mineure vide
+('almalinux', '9', 27493)
+('debian', '13', 6001)
+('redhat', '9', 27368)
+## noms d'OS contenant rhel ou rocky : []
+## tous les noms d'OS : ['almalinux', 'alpine', 'amazonlinux', 'archlinux', 'azurelinux', 'chainguard', 'debian', 'echo', 'fedora', 'hummingbird', 'mariner', 'minimos', 'oraclelinux', 'photon', 'redhat', 'secureos', 'sles', 'ubuntu', 'wolfi']

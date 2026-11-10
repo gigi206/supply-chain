@@ -256,3 +256,13 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
   - Debian 13 (trixie) a 60 293 entrées affectées ; Red Hat 9, 31 401.
   - AlmaLinux 9 n'a aucune entrée affectée. C'est non expliqué.
   - Le traitement de cet alias par Grype 0.104.1 n'a pas été lu dans son source : la question « Grype comme scanner unique sur EL » reste ouverte.
+
+*Corrigé à 12:29 UTC, avant tout push, sur relecture du conseiller* :
+- **« Un rpm de Rocky serait jugé sur les données de Red Hat » n'est pas établi.** La base remplace `rocky` par `rhel`, mais aucune ligne d'OS ne s'appelle `rhel` : celles de Red Hat s'appellent `redhat` ([complément](resultats/rpm-deb-releve-base-complement.log)). La chaîne `rocky` → `rhel` → `redhat` n'est pas vérifiée : il reste à voir ce que fait Grype 0.104.1.
+- **AlmaLinux 9 est expliqué en partie.** Il n'a aucune entrée affectée, mais il a 27 493 entrées non affectées (versions corrigées). Les données d'Alma sont donc rangées autrement que celles de Red Hat (31 401 affectées, 27 368 non affectées). Leur effet sur un scan n'est pas mesuré.
+- **Push du 10/11/2026 à 12:20:25 UTC**, oublié dans l'additif de 12:26 :
+  - accord : « Oui » ;
+  - commits `0aa1a3c..884670b` ;
+  - contrôle des secrets OK sur 7 fichiers, dans une copie de travail temporaire retirée ensuite ;
+  - branche distante identique à la locale.
+

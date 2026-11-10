@@ -1623,3 +1623,8 @@ Accord : « 1 oui ». Lecture seule par ssh, à 12:17:49 UTC : `DISTRO=rke2 FIN_
 - `connection refused` n'est compté que dans les lignes du composant des Events. Des refus de `loki.write` vers Loki, encore au démarrage, ne sont pas comptés ici.
 
 **Push consigné** : 12:16:56 UTC, `a9f2efa..0aa1a3c`. Contrôle des secrets OK sur les 5 fichiers touchés, avec le script de la copie de travail temporaire, retirée ensuite. Branche distante identique à la locale.
+
+## Additif du 10/11/2026, 12:29 UTC : temps de (b1)
+
+Estimation : 1 h (additif de 11:11 UTC, ci-dessus). D'après les heures des additifs, le travail actif va d'environ 11:03 à 11:35 UTC (écriture, essai hors cluster, passage réel, consignation), plus 12:17 à 12:18 UTC pour la lecture du boot. Cela fait environ 35 min, sous l'estimation et loin du seuil de 2 h. Les bornes exactes du journal de la session n'ont pas été relevées.
+
