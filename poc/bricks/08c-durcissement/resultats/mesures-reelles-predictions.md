@@ -1605,3 +1605,21 @@ Le passage par ssh plutôt que par Loki a deux raisons : une réponse de Grafana
 **Lecture des issues possibles.**
 - Si L2 se vérifie, b1 a réparé une panne réelle. C'est aussi une reproduction en v1.21.3, utile à l'issue reportée.
 - Sinon, la relance n'avait rien à réparer cette fois, et B1 ne prouve que l'absence d'effet nuisible.
+
+## Additif du 10/11/2026, 12:18 UTC : lecture du boot du 10/11, L1 à L3 tenues, la panne du 07/11 s'est reproduite
+
+Accord : « 1 oui ». Lecture seule par ssh, à 12:17:49 UTC : `DISTRO=rke2 FIN_BOOT='2026-11-10 11:23:27' evenements.sh boot`. Journal : [`evenements-boot.log`](evenements-boot.log). Rien n'a été écrit dans le cluster, Loki ou les VM. Aucune ligne brute n'est affichée.
+
+| Prédiction | Mesuré |
+|---|---|
+| L1, un seul démarrage | `sc-stockage` a démarré à 11:21:57 UTC (heure de la VM : UTC), et Alloy à 11:22:01. Un seul démarrage dans la fenêtre. **Tenue** |
+| L2, échec de l'observateur | À 11:22:04 UTC, une ligne `watching events for namespace`, puis une ligne `event watcher exited with error` avec `failed to configure informers` et `connection refused`, puis `stopping watcher for events`. **Tenue** |
+| L3, aucune reprise | Aucune autre ligne `watching events for namespace` après l'erreur, jusqu'à la relance de b1 à 11:23:27 UTC, soit 83 s. **Tenue** |
+
+**Lecture.**
+- La séquence du 07/11 s'est reproduite à l'identique au redémarrage des VM du 10/11. Ce n'était donc pas un accident : elle se produit quand Alloy démarre 4 s après le boot, alors que l'API n'écoute pas encore. L'observateur échoue 3 s plus tard.
+- **b1 a réparé une panne réelle.** Sans la relance de 11:23:27, l'observateur serait resté arrêté jusqu'au prochain redémarrage d'Alloy, comme le 07/11 pendant 54 h, avec l'alerte comme seul filet.
+- Pour l'issue chez Alloy, reportée à la fin du projet, la rubrique « Steps to reproduce » repose maintenant sur deux occurrences en v1.21.3 : le 07/11 et le 10/11. C'est toujours la même configuration, pas une reproduction minimale isolée. La reformuler reste à décider au moment de l'envoi.
+- `connection refused` n'est compté que dans les lignes du composant des Events. Des refus de `loki.write` vers Loki, encore au démarrage, ne sont pas comptés ici.
+
+**Push consigné** : 12:16:56 UTC, `a9f2efa..0aa1a3c`. Contrôle des secrets OK sur les 5 fichiers touchés, avec le script de la copie de travail temporaire, retirée ensuite. Branche distante identique à la locale.

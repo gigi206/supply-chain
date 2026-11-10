@@ -28,6 +28,8 @@ L'adresse de l'API et les noms internes sont retirés du texte.
   - la reformuler en « ce qui s'est passé » ;
   - ou faire une reproduction avec rc.0, sur accord : téléchargement vérifié par empreinte et signature, puis API ouverte seulement après le démarrage d'Alloy. Non lancée.
 
+*Additif du 10/11/2026, 12:18 UTC* : la séquence s'est reproduite au redémarrage des VM du 10/11, toujours en v1.21.3 ([`evenements-boot.log`](evenements-boot.log)). Alloy a démarré à 11:22:01 UTC. L'observateur a échoué à 11:22:04 sur `connection refused`, sans reprendre jusqu'à la relance de 11:23:27. Il y a donc deux occurrences dans la même configuration, mais toujours pas de reproduction minimale isolée. L'envoi est reporté à la fin du projet, sur décision du propriétaire. Le texte anglais n'est pas modifié.
+
 ---
 
 **Title:** `loki.source.kubernetes_events`: event watcher never retries after a startup error, component stays healthy

@@ -1,0 +1,10 @@
+# evenements.sh boot, 2026-11-10T12:17:49Z
+## sc-stockage : système démarré à 2026-11-10 11:21:57 (heure de la VM : UTC)
+## fenêtre : boot courant (-b 0) jusqu'à 2026-11-10 11:23:27 UTC, journal d'alloy.service
+  lignes dans la fenêtre : 45, dont du composant des Events : 4
+  démarrages d'Alloy (Started) : 1, premier 2026-11-10T11:22:01+00:00
+  watching events for namespace      1   première 2026-11-10T11:22:04+00:00, dernière 2026-11-10T11:22:04+00:00
+  event watcher exited with error    1   première 2026-11-10T11:22:04+00:00, dernière 2026-11-10T11:22:04+00:00
+  failed to configure informers      1   première 2026-11-10T11:22:04+00:00, dernière 2026-11-10T11:22:04+00:00
+  connection refused                 1   première 2026-11-10T11:22:04+00:00, dernière 2026-11-10T11:22:04+00:00
+  stopping watcher for events        1   première 2026-11-10T11:22:04+00:00, dernière 2026-11-10T11:22:04+00:00
