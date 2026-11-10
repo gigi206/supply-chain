@@ -42,6 +42,8 @@ trusted_tasks:
   # Brique 06, S4a : 06-deb-sbuild/builder/construire-builder.signee.yaml, pod Kata privilégié en root (mmdebstrap --mode=root),
   # même image d'amorce, sans aucune entrée ni sortie réseau (NetworkPolicy builder-sans-sortie), miroir lu en lecture seule et
   # revérifié, image sbuild-debian13 en layout OCI écrit à la main. Tâche privilégiée : acceptée par la porte dans toute
-  # provenance qu'elle juge, comme construire-image
+  # provenance qu'elle juge, comme construire-image. Version corrigée le 10/11/2026 (mmdebstrap installé par apt-get install
+  # hors ligne, journaux complets en échec, points de montage du miroir retirés) ; remplace de18e9cf, retirée de la liste
+  # (dpkg -i groupé : échec du premier passage, pré-dépendances de python3)
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
-    - ref: sha256:de18e9cfe4c955e0b1407418620bfe39214a1d873b32dc333e416b1cc4b6a7c3
+    - ref: sha256:49173846d1f3f67b373246ce84b240d1efc4fa073642cbac63a0043d8ba38c49
