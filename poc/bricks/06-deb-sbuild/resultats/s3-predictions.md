@@ -273,4 +273,4 @@ Accord : « 3, les deux », à 20:56:34 UTC (transcription). `s3.sh sonde` rejou
 - **Kata : 512 Mio en code 0 en 54,8 s, sha256 conforme** ; à 18:02 UTC, la même copie ne rendait pas la main en 120 s, en WebSocket comme en SPDY ;
 - runc : 512 Mio en 3,3 s, comme avant (3,6 s).
 
-Le blocage de la sonde ne venait pas de Kata mais du chemin par le tunnel de l'agent RKE2, retiré par `egress-selector-mode: disabled` (08b). Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part. Prédictions D5 et D6 : [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md).
+Sur ce passage, le blocage de la sonde ne venait pas de Kata mais du chemin par le tunnel de l'agent RKE2, retiré par `egress-selector-mode: disabled` (08b). Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part. Prédictions D5 et D6 : [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md).

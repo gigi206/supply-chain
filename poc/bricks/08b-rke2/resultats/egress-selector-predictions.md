@@ -143,8 +143,8 @@ Accord : « 3, les deux », à 20:56:34 UTC (transcription), en réponse aux cho
 |---|---|
 | D1 | **Tenue.** InternalIP de sc-build 192.168.161.12, de sc-confiance 192.168.161.11, identiques au dépôt ; `--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname` |
 | D2 | **Tenue.** Trois essais en code 0, en 13 298, 13 277 et 13 286 ms ; 134 217 728 octets reçus, sha256 conforme |
-| D3 (E5) | **Tenue.** Dans chaque essai, 26 relevés sur 80 à une connexion, des deux côtés. Le premier tombe 0,15 à 0,19 s après le lancement de l'exec (heure de l'hôte) ; tous les relevés d'avant sont à 0 |
-| D4 | **Tenue.** Dernier relevé non nul 0,4 s avant la fin de l'exec vue de l'hôte, puis 0 jusqu'à la fin, environ 24 s plus tard |
+| D3 (E5) | **Tenue.** Dans chaque essai, 26 relevés sur 80 à une connexion, des deux côtés. Le premier tombe 0,15 à 0,19 s après le lancement de l'exec (heure de l'hôte), écart inférieur à l'incertitude d'horloge (0,3 s) ; tous les relevés d'avant sont à 0 |
+| D4 | **Tenue.** Dernier relevé non nul 0,4 s avant la fin de l'exec vue de l'hôte, à l'incertitude d'horloge près (0,3 s), puis 0 jusqu'à la fin, environ 24 s plus tard |
 | D5 | **Tenue.** Kata : 1, 8, 64 et 512 Mio en code 0, sha256 conforme ; 512 Mio en 54 820 ms ; aucune copie en SPDY |
 | D6 | **Tenue.** runc : les quatre tailles en code 0 ; 512 Mio en 3 269 ms |
 
@@ -153,8 +153,10 @@ Les horloges des trois machines concordent à 0,31 s près, aller-retour ssh com
 **E5 est tenue** : avec `egress-selector-mode: disabled`, kube-apiserver ouvre une connexion directe vers kubelet pour chaque exec, et elle ne dure que le temps de l'exec.
 
 **Vérification complémentaire** (10/11/2026, 20:56:42 à 21:00:36 UTC, accord : « 3, les deux », code 0 à chaque commande) :
-- **chemin direct observé (E5)** : pendant chacun des trois exec à lecture lente de 128 Mio vers sc-build, une connexion de sc-confiance vers sc-build:10250, vue des deux côtés, et une seule. Elle apparaît moins de 0,2 s après le lancement et disparaît à la fin de l'exec. Les relevés avant et après sont à 0 ;
+- **chemin direct observé (E5)** : pendant chacun des trois exec à lecture lente de 128 Mio vers sc-build, une connexion de sc-confiance vers sc-build:10250, vue des deux côtés, et une seule. Elle est vue à chaque relevé pendant l'exec, à l'incertitude d'horloge près (0,3 s) ; les relevés des 3 s d'avant et des 24 s d'après sont à 0 ;
 - **exec à lecture lente vers sc-build : 3 sur 3** en code 0, 13,3 s chacun, sha256 conforme ;
 - **Kata, 512 Mio à plein débit (sonde de S3 rejouée telle quelle) : code 0 en 54,8 s, sha256 conforme.** À 18:02 UTC, la même copie ne rendait pas la main en 120 s. runc : 512 Mio en 3,3 s.
 
-Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kata. **Non vérifié** : les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part.
+Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kata, sur un passage à 512 Mio. **Non vérifié** : les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part.
+
+**Correction du 10/11/2026, 21:02 UTC, avant push** : formulations resserrées dans ce fichier, les README de la 06 et de la 08b, l'ADR 0001 et les prédictions de S3. Les écarts de moins d'une demi-seconde entre les relevés des VM et l'heure de l'hôte sont du même ordre que l'incertitude d'horloge (0,3 s) : seuls restent affirmés les 0 avant et après, et la connexion vue pendant l'exec. La mise hors de cause de Kata à 512 Mio repose sur un seul passage. Aucun verdict ne change.
