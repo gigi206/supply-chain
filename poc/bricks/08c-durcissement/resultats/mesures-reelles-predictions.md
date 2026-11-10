@@ -1371,3 +1371,29 @@ Sur relecture du conseiller ; rien lu ni écrit dans le cluster, Loki ou les VM.
 Là où Loki ne juge pas, le verdict reste celui de l'ancienne lecture par kubectl, défaut de TTL compris.
 
 **Temps corrigé.** L'additif de 23:34 UTC disait « environ 8 h 25 » et « environ 16 min ». Le créneau a couru de 23:18:59 à 23:34 UTC, soit environ 15 min ; le chantier totalise donc environ 8 h 20 pour 4 h estimées, et environ 8 h 25 à 23:36 UTC.
+
+## Additif du 10/11/2026, 08:35 UTC : push fait, passage en lecture seule des requêtes d'E4 préparé, prédictions V0 à V9 avant tout passage
+
+**Accords du propriétaire**, réponses aux trois questions de la nuit :
+- « 1 c'est à dire ? explique moi simplement » : la règle de verdict n'est pas confirmée ; une explication lui est due, rien ne change en attendant.
+- « 2 ok » au passage en lecture seule. La proposition en citait les effets (requêtes de l'auditeur à travers Grafana, un `systemctl show` par ssh sur `sc-stockage`, rien d'écrit) et le pire cas (quelques lignes de plus dans les journaux de Grafana et de Loki). Le chantier est au-delà de 2× : estimation proposée pour ce passage, 1 h de travail actif, attente du passage du scan non comprise.
+- « 3 ok » au push. Contrôle des secrets sur les 10 fichiers touchés par les 5 commits, dans une copie de travail temporaire retirée ensuite : OK. Push à 08:33:36 UTC, `5381c11..7473ea2` ; branche distante identique à la branche locale.
+
+**Script** : `evenements-e4-releve.sh`, étape `e4_releve`, journal `resultats/evenements-e4_releve.log`. Nouveau fichier, `evenements.sh` et `evenements-loki.sh` inchangés. Aucune lecture par kubectl : elle n'était pas dans les effets annoncés. Essai hors cluster avec faux `curl`, `ssh` et `sleep` : passage nominal en code 0 ; passage sans témoin ni ligne du scan en KO, avec 60 attentes par essai du témoin ; champ `msg` jamais affiché ; répertoire de travail retiré.
+
+**Lancement** : après 09:35 UTC, pour que la fenêtre du passage du scan de 09:30 UTC soit close.
+
+**Prédictions, avant tout passage.**
+
+| # | Mesure | Attendu | Confiance |
+|---|---|---|---|
+| V0 | Dernier démarrage d'Alloy de `sc-stockage` | 2026-11-09T17:05:19Z (le SIGHUP de 22:37 UTC ne le change pas) | Haute |
+| V1 | `EV_CRONJOB_SCAN`, 10/11 de 09:30:00 à 09:35:00 | Au moins 1 ligne (création du Job par le contrôleur des CronJobs) | Moyenne : motif exact jamais relu sur une ligne réelle ; c'est la prédiction R6, réfutée le 09/11 par la panne de collecte |
+| V2 | Toutes les lignes de l'espace `scan`, même fenêtre | Affiché, non jugé | — |
+| V3 | Filtres `kind="Pod"` et `name=~"cilium.*"` sans `reason`, du 06/11 à 11:00 au 07/11 à 11:22:39 | Au moins 1 ligne (pods de Cilium recréés le 06/11) | Moyenne : collecte du 06/11 vue seulement par R1 et par la réponse tronquée de R8 |
+| V4 | `EV_PULLING_CILIUM`, même fenêtre | 0 (« already present on machine » au rejeu du 06/11) | Moyenne |
+| V5 | `EV_PV`, fenêtre de R1 | Au moins 32 lignes, comme R1 | Haute : rétention de 720 h |
+| V6 | Les quatre requêtes depuis le démarrage d'Alloy | Affiché, non jugé | — |
+| V7 à V9 | Témoin E3, trois essais | Ligne `evenements-k8s` postérieure au départ vue en 75 s au plus (le CronJob `horodatage` produit des Events chaque minute) ; fenêtre des 120 s d'avant inchangée 30 s après le témoin | Moyenne pour le délai ; moyenne pour le rattrapage, qui est l'hypothèse écrite à 23:31 UTC |
+
+**Ce que le passage ne prouvera pas** : les verdicts des six contrôles dans les étapes rejouées ; le comportement sur des Events `PolicyViolation` ou `FailedCreate` réels après le démarrage d'Alloy, s'il n'y en a pas ; le rattrapage au-delà de trois essais.
