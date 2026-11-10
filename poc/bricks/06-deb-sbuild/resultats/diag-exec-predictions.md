@@ -536,3 +536,30 @@ Accord : « Oui », à 20:31:09 UTC (transcription), en réponse à « Je lance 
 
 L'un et l'autre sont des décisions du propriétaire.
 
+## Étape local, avec un espace dédié : préparée à sec (20:33 UTC), NON LANCÉE
+
+Choix du propriétaire : « Diag », à 20:32:45 UTC (transcription), parmi l'espace dédié `diag`, un espace de la zone confiance et l'arrêt.
+
+**Changement du cluster, borné à l'étape**
+- L'étape crée l'espace `diag`, avec Pod Security `restricted` (`enforce` et `enforce-version: latest`).
+- Elle le supprime à la fin, même en cas d'échec (piège de sortie).
+- Elle s'arrête si l'espace existe déjà.
+- L'admission de l'espace puis celle du pod sont d'abord essayées à blanc.
+
+**Règles relues**
+- Aucune règle Kyverno du dépôt ne porte sur les espaces.
+- Le pod respecte les règles de durcissement de la 08c : limites posées, image du Zot par digest, compte `default` sans jeton monté.
+- Il respecte aussi `pods-isolation` (runc, non privilégié) et Pod Security `restricted`.
+
+**Mesure** : celle de l'étape local d'origine, un exec à lecture lente de 128 Mio vers un pod de sc-confiance, sans `remotedialer`.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| L0 | L'espace et le pod sont admis, et le pod démarre sur sc-confiance | moyenne |
+| L1 | L'exec passe, code 0, tout reçu : la session `remotedialer` est le maillon | faible |
+| L2 | L'espace `diag` est supprimé à la fin | haute |
+
+La lecture prévue est inchangée :
+- **L1 passe** : le maillon est `remotedialer` ;
+- **L1 bloque** : le maillon est kube-apiserver ou `proxy.Proxy`.
+

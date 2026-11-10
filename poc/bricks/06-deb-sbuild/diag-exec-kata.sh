@@ -472,8 +472,13 @@ etape_tunnel() {
 # (espace default : les pods de builds sont tenus à sc-build par zone-build), mémoire réduite ; admission essayée à blanc
 # d'abord ; même exec à lecture lente de 128 Mio par le kubectl de l'hôte, délai de 150 s.
 etape_local() {
-  local f n rc=0 t0 ns=default
-  jq -n --arg i "$IMAGE" '{apiVersion: "v1", kind: "Pod", metadata: {name: "diag-exec-local", namespace: "default"},
+  # Corrigé à 20:33 UTC le 10/11/2026, NON REJOUÉ : l'espace default est refusé (espace-default-interdit, 20:31 UTC) ; choix du
+  # propriétaire : « Diag ». Espace dédié diag (Pod Security restricted), créé pour l'étape et supprimé à la fin, même en cas
+  # d'échec ; admission de l'espace et du pod essayée à blanc d'abord.
+  local f n rc=0 t0 ns=diag
+  jq -n '{apiVersion: "v1", kind: "Namespace", metadata: {name: "diag", labels: {"pod-security.kubernetes.io/enforce": "restricted",
+    "pod-security.kubernetes.io/enforce-version": "latest"}}}' > "$T/diag-ns.json"
+  jq -n --arg i "$IMAGE" '{apiVersion: "v1", kind: "Pod", metadata: {name: "diag-exec-local", namespace: "diag"},
     spec: {restartPolicy: "Never", automountServiceAccountToken: false, nodeSelector: {"kubernetes.io/hostname": "sc-confiance"},
       securityContext: {runAsNonRoot: true, runAsUser: 1000, runAsGroup: 1000, seccompProfile: {type: "RuntimeDefault"}},
       volumes: [{name: "w", emptyDir: {medium: "Memory", sizeLimit: "512Mi"}}],
@@ -481,18 +486,23 @@ etape_local() {
         securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}},
         resources: {requests: {cpu: "500m", memory: "1Gi"}, limits: {cpu: "1", memory: "1Gi"}},
         volumeMounts: [{name: "w", mountPath: "/w"}]}]}}' > "$T/diag-exec-local.json"
+  kubectl get namespace diag </dev/null >/dev/null 2>&1 && { echo "KO   l'espace diag existe déjà : rien lancé" >&2; exit 1; }
+  kubectl create --dry-run=server -f "$T/diag-ns.json" </dev/null > "$T/admis.out" 2>&1 \
+    || { grep -a -i -v -E 'jeton|token' "$T/admis.out" | head -c 600; echo; echo "KO   espace diag refusé : rien lancé" >&2; exit 1; }
+  echo "espace diag : admis à blanc"
+  kubectl create -f "$T/diag-ns.json" </dev/null >/dev/null
+  trap 'kubectl delete namespace diag --wait=false </dev/null >/dev/null 2>&1; echo "espace diag supprimé (demande envoyée)"' EXIT
+  echo "espace diag créé à $(heure) UTC"
   kubectl create --dry-run=server -f "$T/diag-exec-local.json" </dev/null > "$T/admis.out" 2>&1 \
-    || { grep -a -i -v -E 'jeton|token' "$T/admis.out" | head -c 600; echo; echo "KO   pod d'essai refusé à l'admission : rien lancé" >&2; exit 1; }
-  echo "admission à blanc : admis"
-  kubectl delete pod -n "$ns" diag-exec-local --ignore-not-found --wait=true </dev/null >/dev/null
+    || { grep -a -i -v -E 'jeton|token' "$T/admis.out" | head -c 600; echo; echo "KO   pod d'essai refusé à l'admission" >&2; exit 1; }
+  echo "pod d'essai : admis à blanc"
   kubectl create -f "$T/diag-exec-local.json" </dev/null >/dev/null
   kubectl wait -n "$ns" pod/diag-exec-local --for=condition=Ready --timeout=300s </dev/null >/dev/null \
-    || { kubectl delete pod -n "$ns" diag-exec-local --wait=false </dev/null >/dev/null; echo "KO   pod non prêt" >&2; exit 1; }
+    || { echo "KO   pod non prêt" >&2; exit 1; }
   echo "### diag-exec-local (runc, uid 1000, nœud $(kubectl get pod -n "$ns" diag-exec-local -o jsonpath='{.spec.nodeName}' </dev/null)) : prêt à $(heure) UTC"
   f=$(alea 128); n=$(stat -c %s "$f"); t0=$(ms)
   timeout 150 kubectl exec -i -n "$ns" diag-exec-local -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" || rc=$?
   echo "L1 sc-confiance, sans tunnel : $n octets, code $rc en $(( $(ms) - t0 )) ms ; reçus dans le pod : $(kubectl exec -n "$ns" diag-exec-local -- stat -c %s /w/croise </dev/null 2>/dev/null || echo '?')"
-  kubectl delete pod -n "$ns" diag-exec-local --wait=false </dev/null >/dev/null; echo "pod diag-exec-local supprimé"
 }
 
 lancer diag-exec "06 diagnostic exec Kata" "$@"
