@@ -13,6 +13,8 @@ Une recherche par `gh search issues` sur `grafana/alloy` (« kubernetes_events r
 
 L'adresse de l'API et les noms internes sont retirés du texte.
 
+*Corrigé à 10:29 UTC, avant tout push, sur relecture du conseiller* : le texte disait que l'API « answered normally » pendant toute la panne. Ce n'est pas mesuré en continu : on sait seulement que les nœuds étaient `Ready` 77 s après le démarrage des VM (V1 du 07/11) et que les lectures kubectl ont réussi le 09/11. La phrase dit maintenant cela.
+
 ---
 
 **Title:** `loki.source.kubernetes_events`: event watcher never retries after a startup error, component stays healthy
@@ -35,7 +37,7 @@ level=error msg="event watcher exited with error" component_id=loki.source.kuber
 level=info  msg="stopping watcher for events" component_id=loki.source.kubernetes_events.evenements
 ```
 
-After this, the component's health was `healthy` ("started component") the whole time. Not a single event line reached Loki in about 54 hours, although the API server answered normally during that period. A plain `systemctl restart alloy` restored collection immediately.
+After this, the component's health was `healthy` ("started component") the whole time. Not a single event line reached Loki in about 54 hours, although the API server was back shortly after the reboot (all nodes Ready 77 s after the VMs started), and kubectl queries against it succeeded on the last day of that period. A plain `systemctl restart alloy` restored collection immediately.
 
 **Expected**
 
