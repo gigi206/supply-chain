@@ -511,3 +511,20 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 **Encore à vérifier** : le point 9 (porte pour un sujet non image) devient « à étendre » d'après le point 11. Rien d'autre n'est ouvert dans la carte.
 
 **Rien d'écrit pour S4** : aucune tâche, aucun script, aucune prédiction. Trois choix de conception attendent le propriétaire : le sujet, le dépôt de sortie et la pipeline `prefetch-deb`.
+
+## Note datée du 10/11/2026, 21:25 UTC : deux corrections à l'additif de 21:23 UTC, et la liste complète des choix
+
+**Correction 1 : origine du refus de `oci://`.** L'additif de 21:23 UTC range parmi les lectures de Chains le refus d'un `uri` préfixé `oci://`. Ce refus n'est pas dans Chains : il vient de l'analyse des noms de go-containerregistry. Je l'ai vérifié depuis dans le code vendu par Chains v0.29.9 (`go-containerregistry` v0.21.9, `pkg/name`).
+- `NewDigest` passe par `NewTag` ou par `NewRepository`.
+- Dans `oci://sc-stockage.poc.test:5000/…`, la première partie (`oci:`) est prise pour le registre. Le reste contient `:`, qui n'est pas dans `repositoryChars`.
+- Ce refus a donc été lu dans le code, mais pas exécuté.
+
+**Correction 2 : il reste plus de choix ouverts que je ne l'ai écrit.** « Rien d'autre n'est ouvert » et « trois choix » étaient trop courts. Choix du propriétaire avant d'écrire S4 :
+1. **Forme de la pipeline.** Soit une pipeline deb à part, sous le même gabarit et le même webhook ; soit des tâches ajoutées à `sample-app`. Ce choix décide de ce qu'il faut changer dans le gabarit, dans les déclencheurs et dans la porte. La porte juge par PipelineRun, et D6 exige que la construction et la fermeture viennent du même dépôt Forgejo.
+2. **Sujet signé.** Le manifeste OCI est cohérent avec la porte, mais il ne couvre le `.deb` que par le digest de couche qu'il porte. Le critère de S4 dit « Sujet deb signé » : c'est au propriétaire de dire si ce lien indirect le satisfait.
+3. **Dépôt de sortie dans Zot.** Soit `builds/**` avec un compte qui existe déjà et n'a que le droit de créer, soit une règle et un compte nouveaux.
+4. **Pipeline `prefetch-deb`.** Elle découle de D6 et demande d'étendre `porte.rego`.
+5. **Coupure réseau de la construction deb.** Soit la tâche reprend la politique `construction-sans-sortie`, en la renommant ; soit une nouvelle politique de Cilium la couvre. Les deux voies changent le cluster.
+6. **Image de build sous `builders/`.** Il faut décider qui la construit et la pousse dans Zot : l'hôte, ou une pipeline. Dans les deux cas, c'est une écriture dans Zot. L'échéance D4 tombe le 09/12/2026.
+
+**S5** : la liste des tests existe (M5 de la 05) : fermeture altérée, sortie réseau pendant le build, pod privilégié hors Kata, rejeu de zéro. S5 n'appelle donc aucun choix de plus.
