@@ -1,0 +1,127 @@
+# diag-exec-kata.sh noeud, 2026-11-10T18:43:19Z
+## sc-build, fenêtre 2026-11-10 18:41:12 à 2026-11-10 18:43:12 UTC (lignes jeton|token retirées, 300 caractères au plus)
+### containerd.log de RKE2
+time="2026-11-10T18:41:25.814007986Z" level=info msg="Container exec \"204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf\" stdin closed"
+time="2026-11-10T18:43:12.196932706Z" level=info msg="received container exit event container_id:\"31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6\"  id:\"31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6\"  pid:16913  exit_status:137  exited_at:{seconds:1794336192}"
+time="2026-11-10T18:43:12.199015947Z" level=info msg="shim disconnected" id=31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6 namespace=k8s.io
+time="2026-11-10T18:43:12.199031908Z" level=info msg="cleaning up after shim disconnected" id=31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6 namespace=k8s.io
+time="2026-11-10T18:43:12.199036343Z" level=info msg="cleaning up dead shim" id=31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6 namespace=k8s.io
+time="2026-11-10T18:43:12.209323745Z" level=info msg="Container to stop \"31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6\" must be in running or unknown state, current state \"CONTAINER_EXITED\""
+time="2026-11-10T18:43:12.397460388Z" level=info msg="received sandbox exit event container_id:\"2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f\"  id:\"2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f\"  exit_status:137  exited_at:{seconds:1794336192}" monitor_name=
+time="2026-11-10T18:43:12.398560919Z" level=info msg="shim disconnected" id=2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f namespace=k8s.io
+time="2026-11-10T18:43:12.398579851Z" level=info msg="cleaning up after shim disconnected" id=2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f namespace=k8s.io
+time="2026-11-10T18:43:12.398587667Z" level=info msg="cleaning up dead shim" id=2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f namespace=k8s.io
+time="2026-11-10T18:43:12.401352645Z" level=info msg="received sandbox container exit event sandbox_id:\"2a345bd5e8536e409215a28f441fab4f631c526a2093eb65067d5ed37bab958f\"  exit_status:137  exited_at:{seconds:1794336192}" monitor_name=criService
+### journal système
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: start io and wait
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: new shim io stdin Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/2548606093/204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf-stdin") stdout Some("/run/k
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: open stdin "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/2548606093/204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf-stdin"
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/2548606093/204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf-stdout")
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/2548606093/204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf-stdout")
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/2548606093/204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf-stderr")
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/254
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/254
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: run_io_copy[Stdin] starts
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: run_io_copy[Stdout] starts
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: run_io_copy[Stderr] starts
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: start run io wait
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: begin wait group io
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:41:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:41:13+00:00 sc-build alloy[743]: ts=2026-11-10T18:41:13.369671337Z level=info msg="start tailing file" component_path=/ component_id=loki.source.file.pods component=tailer path=/var/log/pods/builds_diag-exec-kata_36a4cbfd-cf27-496c-9d91-b1a185cb6935/diag/0.log
+2026-11-10T18:41:20+00:00 sc-build kata[16896]: failed to connect agent-log, err: vsock: failed to connect to Vsock { vsock_cid: 1147738940, port: 1025 } within 10s (attempts=25), last_err=Some(failed to connect to cid: 1147738940 port: 1025
+                                                   2: <std::thread::lifecycle::spawn_unchecked<<tokio::runtime::blocking::pool::Spawner>::spawn_thread::{closure#0}, ()>::{closure#1} as core::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+                                                   7: <std::thread::lifecycle::spawn_unchecked<<tokio::runtime::blocking::pool::Spawner>::spawn_thread::{closure#0}, ()>::{closure#1} as core::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: run_io_copy[Stdin]: stop to copy stream length 134217728
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: run_io_copy[Stdout]: stop to copy stream length 0
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: run_io_copy[Stderr]: stop to copy stream length 0
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end wait group for io
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: begin wait process
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end wait process exit code 0
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: begin to stop process
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: signal_process: init process is already gone, treat it as stopped
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336085, tv_nsec: 826962297 }) }
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end io wait thread
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336085, tv_nsec: 826962297 }) }
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: container process exited with ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336085, tv_nsec: 826962297 }) }
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: receive action Event(TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: get event TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "204b7a679012c31fab0e679c2c6e6d5187a5ebd36aa2ce53dc8e0db6283c17bf", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp { seconds:
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: process has already stopped, skipping signal
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:41:25+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336085, tv_nsec: 826962297 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start io and wait
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: new shim io stdin None stdout Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/3606893757/53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4-stdout") stderr
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/3606893757/53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4-stdout")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/3606893757/53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4-stdout")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/3606893757/53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4-stderr")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/360
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/360
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stdout] starts
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stderr] starts
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start run io wait
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait group io
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stderr]: stop to copy stream length 0
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stdout]: stop to copy stream length 10
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait group for io
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait process exit code 0
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin to stop process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: signal_process: init process is already gone, treat it as stopped
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 122009647 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end io wait thread
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 122009647 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: container process exited with ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 122009647 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: receive action Event(TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get event TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "53899d294fa6ad892bace1987ccf63b18c502960698aa49ba92b3aecd2a064d4", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp { seconds:
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: process has already stopped, skipping signal
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 122009647 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start io and wait
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: new shim io stdin None stdout Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/1745875862/13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2-stdout") stderr
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/1745875862/13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2-stdout")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/1745875862/13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2-stdout")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get url for Some("/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/1745875862/13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2-stderr")
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/174
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get fd for Some(Url { scheme: "fifo", cannot_be_a_base: false, username: "", password: None, host: None, port: None, path: "/run/k3s/containerd/io.containerd.grpc.v1.cri/containers/31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6/io/174
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stdout] starts
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stderr] starts
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start run io wait
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait group io
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stderr]: stop to copy stream length 0
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: run_io_copy[Stdout]: stop to copy stream length 546
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait group for io
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait process exit code 0
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin to stop process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: signal_process: init process is already gone, treat it as stopped
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end io wait thread
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 329712216 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 329712216 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: container process exited with ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 329712216 }) }
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: receive action Event(TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: get event TaskExit { container_id: "31d2767eccf50d6e1c4504da33d62d4e68285f51b2474a49b4bfe547d35e5de6", id: "13dbf4c996153f2b23a6a6f0ccb98fd2f32e91568862ce05217c55a5646ad8d2", pid: 16913, exit_status: 0, exited_at: MessageField(Some(Timestamp { seconds:
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: process has already stopped, skipping signal
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: start wait process
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: begin wait exit
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: end wait exited
+2026-11-10T18:42:12+00:00 sc-build kata[16896]: wait process exit status ProcessExitStatus { exit_code: 0, exit_time: Some(SystemTime { tv_sec: 1794336132, tv_nsec: 329712216 }) }

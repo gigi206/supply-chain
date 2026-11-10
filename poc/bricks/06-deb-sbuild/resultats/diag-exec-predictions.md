@@ -106,3 +106,40 @@ L'étape `noeud` prend désormais sa fenêtre par `FENETRE` : `instantane`, la m
 | G4 (releve) | À 60 s, le fichier est complet (134 217 728 octets) ; `head` et le `sh` de l'exec n'existent plus dans le pod ; seuls `sleep` et le shell du relevé restent | moyenne |
 | G7 | kubectl vivant à 60 s, entrée standard en fin de fichier ; code final 124 | haute (G5) |
 
+## Résultat des étapes releve et noeud (10/11/2026, 18:41:06 à 18:43:19 UTC)
+
+Accord : « Oui, releve puis noeud », à 18:41:01 UTC (transcription). Les deux étapes sont lancées sous bash, code **0** chacune. Journaux : [`diag-exec-releve.log`](diag-exec-releve.log) et [`diag-exec-noeud.log`](diag-exec-noeud.log) (fenêtre de 18:41:12 à 18:43:12 UTC).
+
+### releve (128 Mio, relevé à 60 s, 18:42:12 UTC)
+
+- Le fichier est complet dans le pod : 134 217 728 octets.
+- Il ne reste que deux processus dans le conteneur : `sleep 7200` (pid 1) et le `sh` du relevé lui-même (pid 5). **Le `sh` et le `head` de l'exec ont disparu.**
+- kubectl est vivant sur l'hôte, entrée standard en fin de fichier. Il sort en code 124 au délai de 120 s.
+
+| # | Résultat |
+|---|---|
+| G4 | **Tenue** : le processus de l'exec est fini, et l'exec ne rend pas la main |
+| G7 | **Tenue** |
+
+### noeud (journal système de sc-build, identifiant `kata`, et `containerd.log` de RKE2)
+
+Pour l'exec `204b7a67…` :
+- **18:41:12** : le shim ouvre les FIFO et lance ses copies stdin, stdout et stderr.
+- **18:41:25** :
+  - `run_io_copy[Stdin]: stop to copy stream length 134217728` : le shim a passé les 128 Mio à l'agent, en 13 s ;
+  - les copies stdout et stderr se terminent (longueur 0) ; `end wait group for io` ;
+  - `end wait process exit code 0` ;
+  - le shim émet `TaskExit` pour cet exec, avec le statut 0 ;
+  - à la même seconde, containerd écrit `Container exec "204b7a67…" stdin closed`.
+- Aucune ligne de containerd au niveau info sur cet exec ensuite, jusqu'à la suppression du pod à 18:43:12.
+
+**G6** : aucune prédiction n'avait été faite. Le journal du shim est au niveau info et suffit à suivre l'exec.
+
+**Lecture**
+- **Le shim Kata et l'agent ont fini leur travail en 13 s.** Données transmises, processus fini, fin signalée à containerd.
+- **Le blocage est en aval du shim**, dans la remontée de la fin de l'exec : flux de containerd (serveur de flux de CRI), kubelet, apiserver ou kubectl. Les 107 s suivantes n'ont laissé aucune trace au niveau info.
+- **Ce qui reste inexpliqué** :
+  - pourquoi la même remontée passe sous runc à 512 Mio ;
+  - pourquoi elle dépend de la quantité sous Kata.
+- **Bruit relevé, sans lien établi** : `failed to connect agent-log` à 18:41:20. Le shim n'a pas joint le port de journal de l'agent (1025). Le journal de l'agent n'est donc pas transmis.
+
