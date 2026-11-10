@@ -1434,3 +1434,13 @@ Suite possible, à décider plus tard sur accord séparé : si les essais V7 à 
 - **Ce que ce passage ne couvre pas.** Il ne rejoue aucun des six contrôles. Leurs verdicts dans les étapes réelles restent à relever au prochain passage de ces étapes, avec la portée de l'additif de 23:36 UTC.
 
 **Temps.** Le passage a duré 3 min 16 s. Dans le journal de la session, aucune activité entre le 09/11 vers 23:40 et le 10/11 à 08:33 UTC. Le travail actif du matin va de 08:33 à 08:50 UTC (réponse du propriétaire, préparation, règle de verdict), puis de 09:39 UTC à la consignation, soit environ 40 min pour la phase en lecture seule, contre 1 h proposée. Le chantier des Events totalise environ 9 h 05 pour 4 h estimées.
+
+## Additif du 10/11/2026, 09:42 UTC : temps de l'additif de 09:40 UTC corrigé (corrigé à 09:42 UTC, avant tout push, sur relecture du conseiller)
+
+L'additif de 09:40 UTC indiquait « environ 40 min » pour la phase en lecture seule et « environ 9 h 05 » pour le chantier. Ces chiffres ne découlent pas des intervalles qu'il cite et sont surévalués d'environ 15 min. Les bornes du journal de la session donnent :
+- dernière activité de la nuit : 23:37:28 UTC ;
+- activité du matin : de 08:33:12 à 08:51:06 UTC (18 min) ;
+- reprise : 09:39:37 UTC, jusqu'à cette correction (environ 6 min) ;
+- passage en tâche de fond, sans travail actif : 3 min 16 s.
+
+La phase en lecture seule a donc pris environ 25 min de travail actif, contre 1 h proposée. Le chantier des Events totalise environ 8 h 50 pour 4 h estimées.
