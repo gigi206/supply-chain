@@ -204,3 +204,23 @@ En SPDY, sous Kata, 512 Mio donne aussi le code 124 au délai, avec les 536 870 
 - **Taille sûre mesurée sous Kata : 64 Mio**, sur un seul essai. Le seuil se situe entre 64 et 512 Mio.
 - **Les deux passages de `builds` s'expliquent probablement de la même façon** : le chroot (509 Mo) était sans doute arrivé, et c'est l'exec qui ne rendait pas la main. Ce n'est pas mesuré pour ces passages.
 
+## Copie par morceaux de 64 Mio : préparée à sec (18:10 UTC), NON LANCÉE
+
+Choix du propriétaire : « Morceaux de 64 Mio », à 18:09:41 UTC (transcription), contre l'image d'essai (A).
+
+**`copier` de `s3.sh`**
+- Chaque fichier passe en morceaux de 64 Mio au plus : `dd` sur l'hôte, puis `head -c` ajouté au fichier dans le pod, avec un délai de 120 s par morceau.
+- La taille cumulée est relevée dans le pod après chaque morceau.
+- Le sha256 du fichier entier est comparé dans le pod à la fin.
+- En cas d'écart, le pod est supprimé et l'étape s'arrête.
+- Il faut 8 morceaux pour le chroot (508 546 560 octets) et environ 3 pour l'archive de la fermeture. Les autres fichiers tiennent en un seul.
+
+La logique de découpage a été essayée sur l'hôte seul, avec des morceaux de 1 Mio : tailles de 1, 1 048 576, 3 670 017 et 4 194 304 octets, reconstituées avec un sha256 identique. Ce n'est pas une mesure dans un pod.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| E1 | Tous les morceaux passent sous Kata, avec le code 0, chacun en moins de 15 s ; tailles cumulées et sha256 conformes | moyenne : 64 Mio n'est passé qu'une fois, depuis un fichier et non depuis un tube |
+| E2 | Les copies d'un pod prennent moins de 3 min au total (environ 9 Mo/s mesurés sous Kata) | moyenne |
+
+R2 à R10, R12 et R13 sont inchangées. **R11 est précisée** : la limite de 5 min par build exclut les copies, que mesure E2.
+

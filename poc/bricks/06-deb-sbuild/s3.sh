@@ -89,13 +89,27 @@ pod_retirer() { kubectl delete pod -n builds "$1" --wait=false </dev/null >/dev/
 # reçue, supposé, non vérifié dans le pod) ; étape arrêtée à 17:42 UTC, pod supprimé. Chaque copie lit désormais le nombre
 # d'octets exact (head -c), sous un délai de 600 s, et la taille écrite dans le pod est comparée ; les arborescences passent
 # par une archive tar faite sur l'hôte.
+# Corrigé à 18:10 UTC le 10/11/2026, NON REJOUÉ, après la sonde (18:02 UTC) : sous Kata, 64 Mio passent par l'entrée standard de
+# kubectl exec, mais à 512 Mio l'exec ne rend pas la main (octets reçus) ; choix du propriétaire : « Morceaux de 64 Mio ».
+# Chaque fichier passe en morceaux de 64 Mio au plus (dd sur l'hôte, head -c ajouté au fichier dans le pod, délai de 120 s par
+# morceau) ; taille cumulée relevée dans le pod après chaque morceau ; sha256 du fichier entier comparé dans le pod à la fin.
+MORCEAU_MIO=64
 copier() { # pod fichier-hôte chemin-pod
-  local n; n=$(stat -c %s "$2")
-  timeout 600 kubectl exec -i -n builds "$1" -- sh -c "head -c $n > $3" < "$2" \
-    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} dans $1" >&2; exit 1; }
-  local e; e=$(kubectl exec -n builds "$1" -- stat -c %s "$3" </dev/null)
-  [ "$e" = "$n" ] && echo "OK   copie de ${2##*/} dans le pod : $n octets" \
-    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : $e octets dans le pod (attendu : $n)" >&2; exit 1; }
+  local n i k e m=$((MORCEAU_MIO * 1048576)) nb
+  n=$(stat -c %s "$2"); nb=$(( (n + m - 1) / m )); [ "$nb" -gt 0 ] || nb=1
+  kubectl exec -n builds "$1" -- sh -c ": > $3" </dev/null
+  for ((i = 0; i < nb; i++)); do
+    k=$(( n - i * m < m ? n - i * m : m ))
+    dd if="$2" bs=1M skip=$((i * MORCEAU_MIO)) count=$MORCEAU_MIO status=none \
+      | timeout 120 kubectl exec -i -n builds "$1" -- sh -c "head -c $k >> $3" \
+      || { pod_retirer "$1"; echo "KO   copie de ${2##*/}, morceau $((i + 1)) sur $nb" >&2; exit 1; }
+    e=$(kubectl exec -n builds "$1" -- stat -c %s "$3" </dev/null)
+    [ "$e" = "$(( i * m + k ))" ] \
+      || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : $e octets après le morceau $((i + 1)) (attendu : $(( i * m + k )))" >&2; exit 1; }
+  done
+  e=$(kubectl exec -n builds "$1" -- sha256sum "$3" </dev/null | cut -c1-64)
+  [ "$e" = "$(sha256sum < "$2" | cut -c1-64)" ] && echo "OK   copie de ${2##*/} dans le pod : $n octets en $nb morceau(x), sha256 conforme" \
+    || { pod_retirer "$1"; echo "KO   copie de ${2##*/} : sha256 dans le pod $e" >&2; exit 1; }
 }
 
 conforme() { # répertoire : « fichier sha256 » de chaque fichier, comparé à la liste attendue de S2
