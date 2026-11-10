@@ -1553,3 +1553,15 @@ Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`
 - **Faux OK sur un ssh en échec.** Le premier test, `systemctl cat alloy`, ne distinguait pas une unité absente d'un ssh en échec (code 255, VM injoignable). Dans ce cas, la fonction annonçait « Alloy absent », rendait 0, et le KO différé ne se déclenchait jamais. Le test lit maintenant `systemctl list-unit-files alloy.service --no-legend || true`. Le `|| true` côté distant est nécessaire : `list-unit-files` rend 1 pour une unité absente (vérifié sur l'hôte). Seul un échec de ssh rend donc un code non nul, et il donne KO. Une sortie vide veut dire « absent ». Cas ajouté à l'essai : 11 cas sur 11 conformes, journal régénéré.
 - **B1-4 n'était pas réfutable** (« verdicts habituels », sans référence). Il est maintenant ancré sur le journal du 07/11/2026.
 - **Appelants** : seule la tâche `confiance:redemarrer` lance `redemarrer.sh`. `rejeu.sh` ne l'appelle pas. Le `exit 1` final n'arrête donc aucune chaîne.
+
+## Additif du 10/11/2026, 11:20 UTC : passage réel de (b1) accordé, prédictions complétées avant le lancement
+
+**Accord du propriétaire, verbatim** : « 7 ok », en réponse à « b1 : accord pour le passage réel, c'est-à-dire redémarrer les trois VM ? ». Lancement prévu : `DISTRO=rke2 mise run confiance:redemarrer`, en arrière-plan.
+
+**Journaux réécrits, archivés avant** sous `*-avant-b1.log` dans `resultats/` de la 08 : `redemarrage-vm`, `kata-reseau`, `kata-temoin`, `openbao-deverrouiller`, `openbao-temoin`, `openbao-controle`, `tsa-temoin`. `chrono.tsv` reçoit des lignes en plus. La référence de B1-4 devient donc `redemarrage-vm-avant-b1.log` (passage du 07/11/2026).
+
+**Prédictions complétées** :
+- **B1-4, chiffrée** : 52 lignes `OK` dans `redemarrage-vm.log` (les 51 du 07/11 plus celle de b1), 0 `KO`, code 0. Confiance moyenne : les sous-scripts comptent des lignes `OK` qui peuvent varier.
+- **Non jugé, probable** : comme le 07/11, un passage du CronJob `horodatage` créé avant le descellement d'OpenBao échoue ; les suivants réussissent.
+- **Non jugé, `EvenementsMuets`** (`for: 5m`). Au démarrage, Alloy de `sc-stockage` repart, et le compteur est absent jusqu'à la première ligne. Si l'observateur échoue au boot comme le 07/11, l'expression est vraie (compteur absent, `up` à 1) jusqu'à la première ligne après la relance de b1. Celle-ci suit les nœuds `Ready` (77 s le 07/11). Prédiction : `pending` possible, `firing` peu probable, car la fenêtre est sous les 5 min. Affiché seulement si lu.
+- **Non jugé** : l'observateur échoue-t-il au boot, avant la relance ? C'est la séquence du 07/11. Ce n'est pas lu sans accord à part.
