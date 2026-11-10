@@ -1,0 +1,20 @@
+# plateforme.sh g8_filtre, 2026-11-10T12:46:23Z
+## propriétés de l'unité réelle
+IPAddressAllow=192.168.161.13/32
+IPAddressDeny=::/0 0.0.0.0/0
+RestrictAddressFamilies=AF_INET AF_UNIX
+User=fraicheur-scan
+OK   IPAddressAllow de l'unité réelle : 192.168.161.13/32
+KO   IPAddressDeny de l'unité réelle : ::/0 0.0.0.0/0 (attendu : 0.0.0.0/0 ::/0)
+OK   utilisateur de l'unité réelle : fraicheur-scan
+## avec les filtres de l'unité (unité transitoire, utilisateur fraicheur-scan)
+  127.0.0.1:9090 TimeoutError
+  192.168.161.11:6443 TimeoutError
+  192.168.161.13:5000 ok
+KO   avec filtre : 127.0.0.1:9090 TimeoutError;192.168.161.11:6443 TimeoutError;192.168.161.13:5000 ok (attendu : 127.0.0.1:9090 EPERM;192.168.161.11:6443 EPERM;192.168.161.13:5000 ok)
+## contre-épreuve : même programme, même utilisateur, sans filtre
+  127.0.0.1:9090 ok
+  192.168.161.11:6443 ok
+  192.168.161.13:5000 ok
+OK   sans filtre : 127.0.0.1:9090 ok;192.168.161.11:6443 ok;192.168.161.13:5000 ok
+# fin 2026-11-10T12:46:33Z, code 1

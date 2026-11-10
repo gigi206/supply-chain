@@ -151,3 +151,29 @@ Heure d'alerte. Le métrique vaut la date du referrer, et `time()` avance à cha
   Ces dates sont des calculs. `g8_suspendre` affiche les dates exactes.
 - **Heures écrites à la main.** Le message du commit `646de0a` porte 12:37 alors que `date -u` donnait 12:36 ; son titre a été corrigé dans `dfd83d9`. Les heures des additifs sont désormais produites par le script qui les écrit.
 
+## Additif du 10/11/2026, 12:47 UTC : essai a passé, essai b suspendu puis arrêté (doublon)
+
+Accords du propriétaire : « 1 oui » pour a, « 2 oui » pour b, « 3 tâche planifiée » pour la reprise, « 4 oui » pour le push.
+
+**Push de 12:46:19 UTC** : `3d5980e..f4eecab`. Contrôle des secrets OK sur 9 fichiers, dans une copie temporaire retirée ensuite. Branche distante identique à la locale.
+
+**Essai a** (`g8_filtre`, 12:46:23 à 12:46:33 UTC, code 1 dû à deux écarts de forme ; journal : [`g8_filtre.log`](g8_filtre.log)). **Le filtre réseau de `fraicheur-scan` est prouvé** : Zot passe, Prometheus en local et l'API de RKE2 sont bloqués avec les filtres de l'unité, et les trois passent sans eux, sous le même utilisateur.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| F1 | `IPAddressAllow=192.168.161.13/32` et `User=fraicheur-scan` conformes. `IPAddressDeny` s'affiche `::/0 0.0.0.0/0`, et non `0.0.0.0/0 ::/0` : même contenu, dans un autre ordre | réfutée sur la forme seulement |
+| F2 | Zot `ok`. Prometheus et l'API répondent par un dépassement du délai de 5 s (`TimeoutError`), pas par un refus immédiat `EPERM` : le filtre BPF jette les paquets sans erreur au `connect`. L'effet est le même : aucune connexion | tenue pour le blocage, réfutée pour la forme du refus |
+| F3 | Les trois cibles `ok` sans filtre | tenue |
+
+**Essai b** (`g8_suspendre`, 12:46:40 UTC, code 0 ; journal : [`g8_suspendre.log`](g8_suspendre.log)).
+- B1 est tenue :
+  - dernier referrer à 09:31:53 UTC, aucune alerte active ;
+  - `suspend=true` ;
+  - gestionnaires `kubectl/Apply`, `kube-controller-manager/Update` et `kubectl-patch/Update`.
+- Le nombre de referrers du 10/11 n'a pas été compté.
+- L'étape prédit `ScanEnRetard` déclenchée le 11/11 vers 11:36:53 UTC.
+
+**Puis l'essai a été arrêté, avant la création de la tâche planifiée : c'est un doublon.** Le même essai a déjà été mené sous RKE2, du 07 au 09/11, dans la 08c : `scan_saut_suspendre` et `scan_saut_reprendre`, prédictions W1 à W8, toutes tenues. `ScanEnRetard` s'est déclenchée le 08/11 et sa notification est arrivée à 11:37:17 UTC. La reprise est passée par une tâche planifiée, et la résolution a été relevée le 09/11 (voir les additifs du 07/11 à 16:15 UTC, du 08/11 à 12:05 UTC et du 09/11 à 10:51 UTC dans [`mesures-reelles-predictions.md`](../../08c-durcissement/resultats/mesures-reelles-predictions.md)).
+
+J'ai annoncé « jamais essayé » en me fiant au README de la 07a, sans chercher dans la 08c. Le « vrai CronJob en échec pas essayé » de la 07a et de la doc 03 est donc dépassé depuis le 08/11, pour la réaction à un scan manquant. **Le CronJob reste suspendu** en attendant la décision du propriétaire. Rien n'est perdu avant le passage du 11/11 à 09:30 UTC.
+

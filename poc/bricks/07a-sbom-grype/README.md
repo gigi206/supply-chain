@@ -279,3 +279,8 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
 - **« La porte devra refuser » n'est pas une décision.** C'est une proposition au propriétaire, notée **D14** : pour un SBOM de paquets rpm ou deb, la porte refuse un scan dont la `distro` est vide, ou le job passe `--distro` explicitement. À trancher quand les briques 05 et 06 produiront des paquets.
 - **Interprétation de « dans l'ordre que tu veux »** (réponse du propriétaire à « lesquelles de a, b et c ») : c est accordé, car il ne touche que l'hôte, et l'ordre m'est laissé. a et b touchent une VM et le cluster : ils attendent chacun un accord nommé.
 
+**Additif du 10/11/2026, 12:47 UTC : filtre réseau de `fraicheur-scan` prouvé ; essai du scan manquant arrêté, car c'est un doublon de la 08c** ([détail](resultats/g8-predictions.md)).
+- Avec les filtres de l'unité, Zot passe ; Prometheus et l'API de RKE2 sont bloqués. Sans les filtres, les trois cibles passent. Il y a deux écarts de forme : l'ordre d'affichage de `IPAddressDeny`, et un blocage par dépassement de délai au lieu d'`EPERM`.
+- La réaction à un scan manquant était déjà prouvée sous RKE2 du 07 au 09/11, dans la 08c (W1 à W8). La mention « vrai CronJob en échec pas essayé » de cette brique était donc dépassée.
+- `scan-sample-app` est suspendu depuis le 10/11 à 12:46:40 UTC, en attendant la décision du propriétaire.
+

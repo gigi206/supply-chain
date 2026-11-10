@@ -1,0 +1,9 @@
+# plateforme.sh g8_suspendre, 2026-11-10T12:46:40Z
+dernier referrer de scan : 2026-11-10T09:31:53Z
+OK   aucune alerte de scan active
+cronjob.batch/scan-sample-app patched
+OK   CronJob suspendu : true
+gestionnaires de champs du CronJob : ["kubectl/Apply","kube-controller-manager/Update","kubectl-patch/Update"]
+ScanEnRetard prédite en attente vers 2026-11-11T11:31:53Z, déclenchée vers 2026-11-11T11:36:53Z (évaluation toutes les 30 s)
+porte : scan refusé à partir de 2026-11-17T09:31:53Z ; ScanBientotRefuse à partir de 2026-11-15T09:31:53Z
+# fin 2026-11-10T12:46:40Z, code 0
