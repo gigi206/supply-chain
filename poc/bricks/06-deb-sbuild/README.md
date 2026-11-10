@@ -932,3 +932,13 @@ Lancée à 23:17:20 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal
   - La signature versionnée déjà acceptée a été restaurée depuis git, pour garder `4dac0609`.
   - Le script ne re-signe plus une tâche inchangée (correction à sec, non rejouée).
 - **Diff de `taches.yml` préparé, NON COMMITÉ** : `49173846` remplace `de18e9cf`, qui est retirée de la liste comme version cassée. `prefetch-deb` reste à `4dac0609`. Il attend la revue du propriétaire.
+
+## Additif du 10/11/2026, 23:19 UTC : liste revue acceptée, seconde passe de `taches` tenue (tâche corrigée)
+
+**Décision du propriétaire** : « Accepter ». Le diff est commité tel que soumis (`3673760`) : `49173846` remplace `de18e9cf`, qui est retirée de la liste.
+
+**Seconde passe** à 23:18:19 UTC, code 0.
+- `prefetch-deb` reste à `4dac0609` et `construire-builder` passe à `49173846`. Les deux sont conformes à leur signature versionnée et inscrites dans la liste revue.
+- La pipeline est signée et publiée : `tekton/pipelines/builder-sbuild@sha256:3066d2f0…`.
+
+**Non lancé** : le second passage de `pipeline`. Il attend un accord, car le script a été modifié depuis le dernier.

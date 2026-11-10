@@ -1,11 +1,10 @@
-# s4a.sh taches, 2026-11-10T23:17:20Z
+# s4a.sh taches, 2026-11-10T23:18:19Z
 ## tâches (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-SIGNER : nouvelle signature dans builder/prefetch-deb.signee.yaml
 OK   prefetch-deb : signature versionnée conforme au gabarit rendu, signature exceptée
-SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb@sha256:9fa81ae90bdeb0da1d64868bbe962b5e9a3752c78eb118d6538818874a36b9ca
+OK   prefetch-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb@sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-SIGNER : nouvelle signature dans builder/construire-builder.signee.yaml
 OK   construire-builder : signature versionnée conforme au gabarit rendu, signature exceptée
-SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/construire-builder@sha256:49173846d1f3f67b373246ce84b240d1efc4fa073642cbac63a0043d8ba38c49
-SIGNER : pipeline non signée tant que la liste revue n'a pas été acceptée
+OK   construire-builder dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-builder@sha256:49173846d1f3f67b373246ce84b240d1efc4fa073642cbac63a0043d8ba38c49
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:3066d2f0ec3265faddffe49ce79a1f8f046fe5f7d4731c1ce481cb5c24924fff
