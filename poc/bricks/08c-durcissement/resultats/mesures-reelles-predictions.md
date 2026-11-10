@@ -1460,3 +1460,28 @@ La phase en lecture seule a donc pris environ 25 min de travail actif, contre 1 
 - La seconde lecture de Loki est retirée de la liste, faute de question à trancher.
 - Restent à décider avec le propriétaire : l'ordre de démarrage d'Alloy après l'API (remède (b)) et l'issue chez Alloy (action publique). Les deux portent sur la même panne : Alloy de `sc-stockage` démarré avant que l'API écoute.
 - Rien lu ni écrit dans le cluster, Loki ou les VM pour cet additif.
+
+## Additif du 10/11/2026, 10:27 UTC : remède (b) et issue chez Alloy préparés à sec, à décider
+
+**Accord et interprétation.** Le propriétaire a répondu « il faut tout traiter » à la question de l'ordre des décisions de conception. J'en ai retenu ce qui suit, consigné comme interprétation :
+- je choisis l'ordre ;
+- je prépare chaque décision en local ;
+- je rédige l'issue chez Alloy sans l'envoyer.
+
+Les décisions elles-mêmes, et l'envoi de l'issue (action publique), restent au propriétaire. Estimation de la préparation : 45 min. Rien n'a été lu ni écrit dans le cluster, Loki ou les VM. Lectures publiques seulement : versions, CHANGELOG, source et issues de `grafana/alloy`, par `gh api` et `gh search`.
+
+**Correction d'une phrase dite au propriétaire à 10:23 UTC.** J'avais écrit que le remède (b) conditionnait le prochain rejeu. C'est faux. `rejeu.sh` lance l'étape `alloy` (L3, ligne 121) après l'installation de RKE2, quand l'API écoute déjà. L'exposition est au démarrage des VM : la panne du 07/11 suit le redémarrage des trois VM par `redemarrer.sh` (README de la 08c, additif du 07/11 à 11:34 UTC), Alloy de `sc-stockage` ayant démarré à 11:22:39 UTC.
+
+**Ce que dit l'amont, lu le 10/11/2026 vers 10:25 UTC.**
+- Le source de `loki.source.kubernetes_events` est identique sur ce point en `v1.21.3` et sur `main` (commit `cbdd9bfd`). `eventController.Run` journalise l'erreur et rend la main. `reconcile()` n'est appelé que par `Update()` et par `NotifyClusterChange()`, qui sort aussitôt sans clustering. Nos configurations d'Alloy n'activent pas le clustering.
+- Le CHANGELOG de `v1.22.0-rc.0` (05/11/2026) ne corrige pas ce composant. Il corrige un état similaire pour `mimir.rules.kubernetes` (#6339).
+- Quatre recherches d'issues ne trouvent rien sur ce défaut. Voisines : #233 (close) et #274 (ouverte).
+- Brouillon de l'issue, **non envoyé** : [`issue-alloy-brouillon.md`](issue-alloy-brouillon.md).
+
+**Remède (b), options.** Toutes portent sur `sc-stockage`. Le remède (a), l'alerte `EvenementsMuets`, reste en place dans chaque cas.
+- **(b1) Relance d'Alloy dans le chemin de démarrage existant**, recommandée. Après tout démarrage des VM, il faut déjà desceller OpenBao, ce que fait `redemarrer.sh`. Le script ajouterait, une fois les nœuds `Ready`, un `systemctl restart alloy` sur `sc-stockage`, puis attendrait une ligne `evenements-k8s` postérieure. Pour : un seul endroit, aucun délai imposé au relais, ce qui couvre le cas mesuré. Contre : un démarrage des VM hors de ce chemin n'est couvert que par l'alerte. Les pertes du relais pendant un redémarrage d'Alloy n'ont jamais été mesurées.
+- **(b2) Attente de l'API avant le démarrage d'Alloy**, par une unité systemd d'appoint avec `ExecStartPre` borné (par exemple 10 min), puis démarrage dans tous les cas. Pour : couvre tout démarrage. Contre : tout Alloy de `sc-stockage` attend, le relais des deux autres VM et le journal local compris. Une API qui écoute ne garantit pas une découverte réussie.
+- **(b3) Instance d'Alloy séparée pour les Events**, avec l'attente de (b2). Pour : le relais n'attend plus. Contre : une seconde unité, une seconde configuration et un second port de métriques, à maintenir jusqu'au correctif amont.
+- **(b4) Rien de plus que l'alerte**, avec une relance à la main, décrite dans le README de la 19b.
+
+Dans tous les cas, l'issue chez Alloy est le seul remède durable : elle demande une relance avec délai croissant, ou un état `unhealthy`.
