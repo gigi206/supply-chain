@@ -87,3 +87,27 @@ Après l'incident : aucune alerte active. **Volume dans Zot** (relevé) : 12 lig
 **Toujours pas prouvé** : le blocage réseau de l'unité (le filtre est en place et Zot passe, aucune sortie interdite n'a été essayée) ; la réaction à un vrai CronJob en échec ; `rejeu.sh`, pas rejoué. Une alerte ne sort toujours pas du PoC : il faut la lire dans Grafana.
 
 **Additif du 06/11/2026, 10:00 UTC, prédiction 6 tenue** ([journal](g7-passage-2026-11-06.log)) : scan à +86 416 s, base à +86 453 s, `ALERTS` vide sur 22 h, 3 règles `ok` et `inactive`. La fenêtre commence le 05/11 à 11:49 UTC, après l'incident a7 ; 10:58 à 11:49 UTC, relu à part, est vide.
+
+## Additif du 10/11/2026, 12:34 UTC : essai du filtre réseau (a), prédictions écrites avant toute exécution, NON LANCÉ
+
+Le propriétaire a choisi « dans l'ordre que tu veux » pour a, b et c. Cette étape touche `sc-stockage` : elle attend un accord nommé.
+
+**L'étape** : `plateforme.sh g8_filtre`. Elle n'installe rien. Elle fait trois choses :
+- elle relit les propriétés de l'unité réelle (`systemctl show`) ;
+- elle lance deux unités transitoires (`systemd-run --collect`) sous l'utilisateur `fraicheur-scan`, avec le même programme Python de connexion TCP. Seule la première porte les filtres de l'unité (`IPAddressDeny=any`, `IPAddressAllow=192.168.161.13`, `RestrictAddressFamilies`) ;
+- elle tente trois cibles : Zot (`192.168.161.13:5000`, autorisé), Prometheus en local (`127.0.0.1:9090`, interdit) et l'API de RKE2 sur `sc-confiance` (`192.168.161.11:6443`, interdite).
+
+Les cibles interdites sont joignables sans le filtre : la contre-épreuve le montre. Un refus prouve donc bien le filtre, et non une cible absente.
+
+**Effets** :
+- deux unités `run-u*.service` apparaissent un instant dans le journal de `sc-stockage`, et donc dans Loki ;
+- trois connexions TCP sans requête sont ouvertes vers Zot, Prometheus et l'API ;
+- rien ne reste ensuite ;
+- durée inférieure à 1 min.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| F1 | Unité réelle : `IPAddressAllow=192.168.161.13/32`, `IPAddressDeny=0.0.0.0/0 ::/0`, `User=fraicheur-scan` | moyenne : forme d'affichage de `systemctl show` non relevée |
+| F2 | Avec filtre : Zot `ok` ; Prometheus et l'API `EPERM`, refus immédiat par le filtre BPF du cgroup, sans délai d'attente | haute pour le refus, moyenne pour le code `EPERM` |
+| F3 | Sans filtre : les trois cibles `ok` | moyenne : l'accès de `sc-stockage` à l'API est déduit d'Alloy, qui la lit, mais il n'est pas mesuré depuis un compte système |
+

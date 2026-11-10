@@ -79,6 +79,8 @@
 # G8 (alerte de fraîcheur ; règles et incident simulé : observabilite.sh regles deployer a7) :
 #   g8_metriques ACCORD DU PROPRIÉTAIRE : compte et timer fraicheur-scan sur sc-stockage, métriques comparées à une lecture de Zot depuis l'hôte
 #   g8_grafana  journal de fraicheur-scan et notifications de l'incident a7 lus par l'auditeur (19b)
+#   g8_filtre   ACCORD DU PROPRIÉTAIRE : filtre réseau de fraicheur-scan sur sc-stockage, propriétés de l'unité réelle relues, puis trois connexions
+#               depuis une unité transitoire (même utilisateur, mêmes filtres), et contre-épreuve sans filtre ; rien n'est laissé installé
 # Usage (racine du dépôt, outils de mise.toml) : mise exec -- poc/bricks/07a-sbom-grype/plateforme.sh <étape>…
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -1627,11 +1629,39 @@ etape_g8_grafana() {
   return $ko
 }
 
-[ $# -ge 1 ] || { sed -n 2,82p "$0"; exit 2; }
+etape_g8_filtre() { # ACCORD DU PROPRIÉTAIRE : unités transitoires sur sc-stockage, rien d'installé ; additif du 10/11/2026
+  local cibles="192.168.161.13:5000 127.0.0.1:9090 192.168.161.11:6443" avec sans
+  echo "## propriétés de l'unité réelle"
+  sur "systemctl show fraicheur-scan.service -p User -p IPAddressDeny -p IPAddressAllow -p RestrictAddressFamilies" | sort | tee "$W/g8-filtre-proprietes"
+  attendu "IPAddressAllow de l'unité réelle" "$(sed -n 's/^IPAddressAllow=//p' "$W/g8-filtre-proprietes")" "192.168.161.13/32"
+  attendu "IPAddressDeny de l'unité réelle" "$(sed -n 's/^IPAddressDeny=//p' "$W/g8-filtre-proprietes")" "0.0.0.0/0 ::/0"
+  attendu "utilisateur de l'unité réelle" "$(sed -n 's/^User=//p' "$W/g8-filtre-proprietes")" "fraicheur-scan"
+  # Programme de connexion : une ligne par cible, « cible ok » ou « cible errno-nom ».
+  local prog='import errno, socket, sys
+for c in sys.argv[1:]:
+    h, p = c.rsplit(":", 1)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(5)
+    try: s.connect((h, int(p))); print(c, "ok")
+    except OSError as e: print(c, errno.errorcode.get(e.errno, type(e).__name__))
+    finally: s.close()'
+  echo "## avec les filtres de l'unité (unité transitoire, utilisateur fraicheur-scan)"
+  avec=$(sur "sudo systemd-run --wait --pipe --quiet --collect -p User=fraicheur-scan -p IPAddressDeny=any -p IPAddressAllow=192.168.161.13 \
+    -p 'RestrictAddressFamilies=AF_INET AF_UNIX' python3 -I -c '$prog' $cibles" | sort)
+  echo "$avec" | sed 's/^/  /'
+  attendu "avec filtre" "$(echo "$avec" | paste -sd';')" "127.0.0.1:9090 EPERM;192.168.161.11:6443 EPERM;192.168.161.13:5000 ok"
+  echo "## contre-épreuve : même programme, même utilisateur, sans filtre"
+  sans=$(sur "sudo systemd-run --wait --pipe --quiet --collect -p User=fraicheur-scan python3 -I -c '$prog' $cibles" | sort)
+  echo "$sans" | sed 's/^/  /'
+  attendu "sans filtre" "$(echo "$sans" | paste -sd';')" "127.0.0.1:9090 ok;192.168.161.11:6443 ok;192.168.161.13:5000 ok"
+  rm -f "$W/g8-filtre-proprietes"
+  return $ko
+}
+
+[ $# -ge 1 ] || { sed -n 2,84p "$0"; exit 2; }
 mkdir -p "$R" "$W"
 for e in "$@"; do
   case $e in
-    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana|g8_metriques|g8_grafana) ;;
+    g0|g1_oras|g1_droits|g1_base|g1_essai|g1_grafana|g2_telecharger|g2_verifier|g2_image|g3_cluster|g3_openbao|g3_essais|g3_cosign|g3_grafana|g4_scan|g4_verifier|g4_grafana|g5_regles|g5_sec|g5_porte|g5_grafana|g6_sec|g6_sec_ns|g6_temoins|g7_sec|g7_zot|g7_balayage|g7_retention|g7_periodique|g7_grafana|g8_metriques|g8_grafana|g8_filtre) ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
   echo "# plateforme.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$R/$e.log"
