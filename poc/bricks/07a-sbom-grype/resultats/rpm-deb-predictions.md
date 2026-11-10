@@ -38,3 +38,17 @@ Le script a été exécuté le 10/11/2026 à 12:33:01 UTC, en moins d'une minute
 - Les rpm de Rocky ne sont **pas** comparés aux errata de Rocky : la base n'en contient pas.
 - Le rôle des entrées non affectées d'Alma n'est pas mesuré. Il faudrait une version qu'Alma a corrigée avant Red Hat ; aucune n'a été cherchée.
 - **Sans `distro=` dans le PURL, aucune vulnérabilité n'est trouvée. L'échec est silencieux.** Les SBOM des rpm et des deb devront donc porter ce qualificatif, et la porte devra refuser un SBOM de paquet qui ne le porte pas.
+
+## Additif du 10/11/2026, 12:37 UTC : « sans avertissement » non mesuré ; prédictions S1 et S2, écrites avant exécution
+
+Sur relecture du conseiller, avant tout push. Le script lance Grype avec `-q`, qui coupe tous ses journaux, et les fichiers `.err` sont vides. « Sans aucun avertissement » n'est donc **pas mesuré**. Le job réel (`politique/scanner.sh`, ligne 75) appelle aussi Grype avec `-q`.
+
+Fait relevé dans les sorties de G0, déjà présentes : le scan réel de sample-app a une `distro` vide. C'est attendu, puisque l'image part de `FROM scratch` et que ses paquets sont des modules Go, jugés sans distribution.
+
+Deux cas sont rejoués sur l'hôte seul, hors réseau, sans `-q` et avec `-vv`. Journal neuf : `rpm-deb-sans-distro.log`.
+
+| # | Cas | Prédit | Confiance |
+|---|---|---|---|
+| S1 | `rocky-sans-distro`, avec `-vv` | 0 correspondance, et aucune ligne `WARN` ou `ERROR` sur l'absence de distribution. Au mieux une ligne `DEBUG` ou `INFO` | faible |
+| S2 | Même PURL sans `distro=`, avec `--distro rocky:9.7` | 48 correspondances, comme R1 : la ligne de commande rattrape un SBOM incomplet | moyenne |
+
