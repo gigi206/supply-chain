@@ -486,3 +486,28 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
     - (c) une pipeline deb sous d'autres noms de tâches échapperait à la règle sans rien refuser (succès à vide) : c'est un trou, pas une acceptation.
   - S4 comprend donc vraisemblablement une pipeline `prefetch-deb`. La tâche doit garder exactement ce nom, que sélectionne `prefetch-deb-sortie`. Il faut aussi étendre `porte.rego` à la voie deb, avec ses cas de test dans `porte_test.rego`.
 - **Renvoi** : le push `58fd6c1..57b76be` portait sur la 08b et la 06 ; il est consigné dans l'additif précédent de ce README.
+
+## Additif du 10/11/2026, 21:23 UTC : décision d'ordre ; deux points « à vérifier » de la carte tranchés par lecture, à sec
+
+**Décision du propriétaire** (21:22:16 UTC) : « S4 et S5 d'abord ». S4 et S5 passent avant les autres points ouverts. Cette réponse fixe l'ordre seulement : elle ne vaut accord pour aucune mesure ni aucune écriture dans Zot.
+
+**Point 4, sujet signé par Chains**
+- Lu dans le code de Chains v0.29.9 : sources locales au tag `v0.29.9`, commit `89219ea5`.
+- Ce qui est lu :
+  - Un résultat `*_ARTIFACT_OUTPUTS` (objet `uri`, `digest`, `isBuildArtifact: "true"`) devient un sujet (`extract.go`). Il entre aussi dans les cibles OCI à signer, dès que `uri` et `digest` ne sont pas vides (`signable.go`, `hasImageRequirements`).
+  - Avec `storage: oci` et l'encodage `dsse` du PoC, l'attestation est écrite pour chaque sujet dans le dépôt OCI nommé par `uri`, sous la référence `uri@sha256:<digest>` (`legacy.go`).
+  - Quand aucun manifeste n'a ce digest, le stockeur se replie sur `SignedUnknown` (`attestation.go`).
+  - Un `uri` préfixé `oci://` ne passerait pas `name.NewDigest`. Le préfixe est accepté pour les entrées, mais pas pour les sorties.
+- Conséquences, déduites du code et non mesurées :
+  - Un sujet au sha256 du `.deb` est possible : son attestation serait accrochée à un digest qu'aucun manifeste ne porte.
+  - La porte lit l'image par son digest (`input.image`, règle `image_signature`), et elle ne trouverait rien à ce digest.
+  - Le sujet « manifeste OCI qui porte le deb » est celui du précédent `publier-fermeture`. C'est le seul cohérent avec la porte actuelle. Le sha256 du `.deb` reste lisible dans le descripteur de la couche, et dans le `.buildinfo` joint.
+
+**Point 5, fermeture dans `resolvedDependencies`**
+- Mesuré pour la voie image : F3 de la 03 ([f3-predictions.md](../03-deps-closure/resultats/f3-predictions.md)), avec `builds/fermetures/sample-app@74c265e7` dans `resolvedDependencies`.
+- Lu dans le code : tout résultat dont le nom finit par `ARTIFACT_INPUTS` devient une dépendance (`RetrieveMaterialsFromStructuredResults`). Le mécanisme ne dépend donc pas du type de paquet.
+- Non mesuré pour le deb.
+
+**Encore à vérifier** : le point 9 (porte pour un sujet non image) devient « à étendre » d'après le point 11. Rien d'autre n'est ouvert dans la carte.
+
+**Rien d'écrit pour S4** : aucune tâche, aucun script, aucune prédiction. Trois choix de conception attendent le propriétaire : le sujet, le dépôt de sortie et la pipeline `prefetch-deb`.
