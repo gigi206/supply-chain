@@ -1,0 +1,26 @@
+# Essai hors cluster du trap de nettoyage d'etape_installer (journalisation.sh, L2), 2026-11-10T10:21:49Z
+# Accord du propriétaire : « 2 oui » à « Je corrige etape_installer de la même façon, en local seulement ? » (10/11/2026).
+# Rien lu ni écrit dans le cluster, Loki, Grafana, Zot ou les VM. Harnais dans le scratchpad de la session, non archivé.
+# Méthode : corps du heredoc distant (non cité) extrait de chaque version et développé par bash lui-même (set -u) avec des
+# valeurs factices ; chemins /usr/local/bin/, /usr/local/lib/, /tmp/, /etc/ et /opt/ réécrits en une seule passe vers le
+# dossier d'essai ; faux binaires (sha256sum, install, tar, systemctl, python3, loki, curl…) rendant les codes demandés ;
+# /tmp/journalisation-installation garni de 20 fichiers factices portant les noms copiés par l'étape.
+# avant : journalisation.sh de 1179d7e, sha256 f226b7c3…dd0ebb73 ; après : copie de travail, sha256 71ec5f4a…e698f491.
+# Les appels comptés sont ceux des faux install, tar et systemctl, comparés ligne à ligne entre les deux versions.
+avant  empreinte refusée (sha256sum -c)                    code=1  dossier /tmp/journalisation-installation restant=oui
+apres  empreinte refusée (sha256sum -c)                    code=1  dossier /tmp/journalisation-installation restant=non
+       appels à install, tar et systemctl : 0 avant, 0 après, identiques
+avant  installation de loki.key en échec                   code=1  dossier /tmp/journalisation-installation restant=oui
+apres  installation de loki.key en échec                   code=1  dossier /tmp/journalisation-installation restant=non
+       appels à install, tar et systemctl : 4 avant, 4 après, identiques
+avant  installation du mot de passe de Grafana en échec    code=1  dossier /tmp/journalisation-installation restant=oui
+apres  installation du mot de passe de Grafana en échec    code=1  dossier /tmp/journalisation-installation restant=non
+       appels à install, tar et systemctl : 13 avant, 13 après, identiques
+avant  installation des unités systemd en échec            code=1  dossier /tmp/journalisation-installation restant=oui
+apres  installation des unités systemd en échec            code=1  dossier /tmp/journalisation-installation restant=non
+       appels à install, tar et systemctl : 15 avant, 15 après, identiques
+avant  nominal                                             code=0  dossier /tmp/journalisation-installation restant=non
+apres  nominal                                             code=0  dossier /tmp/journalisation-installation restant=non
+       appels à install, tar et systemctl : 23 avant, 23 après, identiques
+# shellcheck (mise exec -- shellcheck -f gcc, positions retirées) : 11 avertissements avant, 11 après, identiques.
+# Non essayés : une coupure de la session ssh pendant le script ; les sorties après le rm -rf nominal (systemctl, attente de Grafana), où le dossier est déjà retiré.

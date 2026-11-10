@@ -151,6 +151,7 @@ etape_installer() {
   rm -rf "${D:?}"
   sur sc-stockage sudo bash -s <<EOS
 set -euo pipefail
+trap 'cd / && rm -rf /tmp/journalisation-installation' EXIT   # toute sortie, en échec comprise, retire les clés et le mot de passe copiés (10/11/2026)
 cd /tmp/journalisation-installation
 printf '%s  %s\n%s  %s\n' "$LOKI_SHA" "$LOKI_ARCHIVE" "$GRAFANA_SHA" "$GRAFANA_ARCHIVE" | sha256sum -c
 echo "ports 3001, 3100, 9096 avant installation : \$(ss -ltn | awk '{print \$4}' | grep -cE ':(3001|3100|9096)\$' || true) écoute(s)"
