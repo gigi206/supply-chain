@@ -56,3 +56,54 @@ Le propriétaire a répondu « S1 de la 06 » à la proposition de jalon. Cette 
 | P11 | durée | S1 coûte au plus 0,5 pw, préparation comprise (commencée à 12:53 UTC le 10/11, heure de la réponse « S1 de la 06 » dans la transcription). Brique estimée à 2 pw, décision à 4 pw | moyenne |
 
 Pas de prédiction sur l'égalité du deb avec celui d'OBS (`0b489d43…`) : l'égalité n'est pas exigée (prédiction 2 du README).
+
+## Résultat (exécuté le 10/11/2026 de 13:04:34 à 13:11 UTC, accord du propriétaire : « Oui, lance S1 »)
+
+Journaux :
+- [`s1-prealables.log`](s1-prealables.log), [`s1-amorce.log`](s1-amorce.log) et [`s1-racine.log`](s1-racine.log) ;
+- [`s1-image.log`](s1-image.log) et [`s1-essais.log`](s1-essais.log).
+
+Toutes les étapes ont rendu le code 0. Les quatre pods ont été supprimés.
+
+**Écrit dans Zot, de façon définitive**
+- `amont/library/debian@sha256:7378260c…` ;
+- `essais-06/sbuild-debian13@sha256:1475738b58d99e87431dd8465239c69b4506648cd0a7511886204662501d7b3f`, en deux couches compressées de 128,6 Mo et 348,9 Mo. C'est moins que les 1,5 Go prévus, car crane compresse les couches.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| P1 | Exemption de kata lue ; quatre specs admises en dry-run ; sources conformes ; trois signataires épinglés ; versions présentes ; 5 791 Mo libres sous `/` de sc-stockage | tenue |
+| P2 | Amorce copiée, digest `7378260c…` relu dans Zot | tenue |
+| P3 | `apt-get update` réussit en 5 s depuis un pod de `builds` sans label, en http, port 80, vers `snapshot.debian.org`. **Constat** : rien ne coupe cette sortie pour un pod de `builds` sans politique dédiée. Seuls ce port et cet hôte sont mesurés. Aucune politique n'a été changée | tenue |
+| P4 | `InRelease` du pod : `0584fba3…`, identique à celui vérifié sur l'hôte | tenue |
+| P5 | Racine : 336 Mo en 54 s. Chroot : 920 Mo en 69 s. Invité de 3 vCPU et 6 Go | tenue |
+| P6 | Empreintes relevées pour 224 .deb (amorce 20, racine 93, chroot 111), toutes conformes au `Packages` vérifié | tenue |
+| P7 | Kata privilégié, UID 1000 : NoNewPrivs 0 ; `/` en `virtiofs rw,nodev`, **sans `nosuid`** ; `newuidmap` et `newgidmap` en `-rwsr-xr-x root`. `unshare --user --map-auto` réussit : `uid_map 0 100000 65536` | tenue ; **prédiction 3 du README réfutée** |
+| P8 | `sbuild` sort avec le code 2 en 57 s, sur « Build failure (dpkg-buildpackage died with exit 2) ». Le détail est resté dans le journal `.build` du pod, supprimé sans copie : défaut du script | **réfutée** |
+| P9 | Kata avec escalade (D1 b) : NoNewPrivs 0, bounding set `a80425fb`. **`newuidmap` échoue** : « write to uid_map failed: Operation not permitted ». sbuild n'est pas lancé. Cause non diagnostiquée | **réfutée** (échec plus tôt que prédit) |
+| P10 | runc restreint : NoNewPrivs 1, Seccomp 2. `unshare` échoue dès la création de l'espace utilisateur (« unshare failed: Operation not permitted ») : `newuidmap` n'est jamais appelé | **tenue sur l'issue, motif réfuté** |
+| P11 | 21 min, de 12:53 à 13:14 UTC, préparation et consignation comprises | tenue à ce stade |
+
+**Lecture**
+- **Le risque principal de la 06 est levé pour D1 (a).** Dans un pod Kata privilégié, `/` est monté sans `nosuid`, et le setuid de `newuidmap` agit. Le mode `unshare` de sbuild y dispose donc de ses deux binaires.
+- Les replis 1 à 3 du README deviennent sans objet pour `newuidmap`. Ils ne seront pas lancés.
+- **D1 (b) est écarté** : `newuidmap` échoue hors privilégié. D1 (a) reste.
+- **Déduction, non mesurée** : la mise en place du chroot et des dépendances par sbuild a réussi, puisque sbuild n'appelle `dpkg-buildpackage` qu'après ces étapes. Ce qui a échoué dans le build n'est pas connu.
+
+**Diagnostic statique de P8**, sur l'hôte seul, sans rien exécuter des archives :
+- le chroot porte Go `go1.24.4` (`/usr/lib/go-1.24/VERSION`) ;
+- `go.mod` demande `go 1.24`, et `vendor/modules.txt` contient chi v5.2.3, `go 1.20` ;
+- OBS a construit le même `.dsc` avec golang-1.24-go 1.24.4, nodejs 20.19.2+dfsg-1+deb13u2 et debhelper 13.24.2 ([`_buildenv`](../../../benchmarks/obs/resultats/build-v1/debian_13/_buildenv)), les mêmes versions que ce chroot. **L'hypothèse d'une incompatibilité de versions ne tient pas.**
+
+**Push oublié dans l'additif de 13:03** : le push de 12:50:22 UTC (`f4eecab..9e8e1a3`, contrôle des secrets OK sur 6 fichiers) n'y était pas consigné. Il l'est ici.
+
+## Relance du seul essai Kata privilégié : prédictions (écrites le 10/11/2026 à 13:14 UTC, avant toute exécution), NON LANCÉE
+
+Le script a une nouvelle étape, `relance`. Elle rejoue la même sonde dans le seul pod Kata privilégié, puis copie le journal `.build` de sbuild dans `s1-relance-sbuild.log`, sans les lignes `jeton|token`, avant de supprimer le pod.
+
+Ce script modifié n'est pas celui qu'a accordé « Oui, lance S1 ». La relance attend donc un accord nommé.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| RL1 | `unshare --user --map-auto` réussit de nouveau | haute |
+| RL2 | sbuild échoue de nouveau, avec le code 2 : rien n'a changé | haute |
+| RL3 | Le journal `.build` nomme la commande en échec. C'est une commande de `debian/rules` (`dh` ou une surcharge), pas la mise en place du chroot | moyenne |

@@ -259,4 +259,23 @@ etape_essais() {
   done
 }
 
+# Relance (préparée à 13:14 UTC le 10/11/2026, après l'échec de sbuild en essais) : seul le pod Kata privilégié, même sonde ;
+# le journal .build de sbuild est copié sur l'hôte avant la suppression du pod (resultats/s1-relance-sbuild.log, lignes
+# jeton|token retirées).
+etape_relance() {
+  local d img n=s1-kata-privilegie
+  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
+  img=$REG/$DEPOT_ESSAI@$d
+  echo "image : $img"
+  pod_spec "$n" kata "$img" 1000 "$PRIVILEGIE"
+  pod_demarrer "$n"
+  tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
+    | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
+  kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
+  sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" relance
+  kubectl exec -n builds "$n" -- sh -c 'ls /w/sortie; cat /w/sortie/*.build' </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/s1-relance-sbuild.log" || true
+  echo "journal de sbuild : $(wc -l < "$R/s1-relance-sbuild.log") lignes, resultats/s1-relance-sbuild.log"
+  pod_retirer "$n"
+}
+
 lancer s1 "06 S1" "$@"
