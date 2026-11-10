@@ -580,3 +580,25 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - Condition : la construction deb doit livrer un `image.tar` contenant le manifeste ORAS (`.deb` et `.buildinfo`), avec son digest. Reste à décider où tourne `oras push --oci-layout` : dans l'image de build, ou dans une petite tâche runc entre la construction et la publication.
 
 **Choix encore ouverts** : 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
+
+## Additif du 10/11/2026, 21:36 UTC : décision sur `prefetch-deb`, ce qu'elle permet et ce qu'elle laisse ouvert (lu dans le dépôt, à sec)
+
+**Décision du propriétaire** (21:36:13 UTC) : « Oui, selon D6 ». Elle tranche le choix 4 de la note de 21:25 UTC : une pipeline `prefetch-deb` dans la plateforme, avec la porte étendue à la voie deb. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Réutiliser `publier-fermeture` telle quelle** : c'est possible d'après son script, lu, non mesuré.
+- Elle publie chaque fichier de `sortie/fermeture/`, sauf `bom.json`, un fichier par couche, triés, avec une date fixe. Elle pousse dans `builds/fermetures/**` avec le compte `poc-fermetures`, par digest seulement.
+- Rien dans le script n'est propre à Go. Son digest approuvé reste `7fa92ad3`.
+- La règle `fermeture_plateforme` attend déjà `publier-fermeture` ; seul `prefetch-gomod` est à généraliser en « `prefetch-gomod` ou `prefetch-deb` ».
+- Le type d'artefact est le même que pour Go (`deps-closure.v1`). Il ne permet donc pas de distinguer une fermeture deb d'une fermeture Go : la porte devra les distinguer par la tâche de prefetch.
+- **Non établi** : que le digest obtenu égale celui de S2 (`3a0e54ae…`, poussé par `closure.sh`). La convention est la même, mais la comparaison n'a pas été faite.
+
+**La tâche `prefetch-deb` est à écrire.**
+- Son nom est fixé par `prefetch-deb-sortie`, qui sélectionne `tekton.dev/task=prefetch-deb`.
+- En S2, la chaîne était : InRelease de l'instantané vérifié par `gpgv`, puis Packages contrôlé par InRelease, puis liste attendue tirée du `.buildinfo`, puis `apt-get download` dans un pod, puis `.deb` contrôlés contre Packages.
+- **Question ouverte, la source de la liste.** En S2, le `.buildinfo` venait du journal du build en réseau de s1b. Dans la plateforme, `prefetch-gomod` lit un fichier de verrouillage du dépôt (`go.sum`). Pour le deb, il faut choisir :
+  - (a) un `.buildinfo`, ou une liste équivalente, versionné dans `sample-app` comme fichier de verrouillage ;
+  - (b) une résolution des `Build-Depends` sur l'instantané, dans la tâche elle-même.
+  - (a) suit le modèle de Go et de S2 ; (b) déplace la résolution dans la plateforme.
+- **Question ouverte, le runtime de la tâche.** `prefetch-gomod` tourne sous runc, en `restricted`. En S1 et S2, le pod `prefetch-deb` était Kata et privilégié, parce qu'il construisait aussi la racine par `mmdebstrap`. Il reste à mesurer si `apt-get download` seul passe en `restricted`, sans root.
+
+**Choix encore ouverts** : la source de la liste (nouveau, ci-dessus), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
