@@ -1565,3 +1565,23 @@ Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`
 - **Non jugé, probable** : comme le 07/11, un passage du CronJob `horodatage` créé avant le descellement d'OpenBao échoue ; les suivants réussissent.
 - **Non jugé, `EvenementsMuets`** (`for: 5m`). Au démarrage, Alloy de `sc-stockage` repart, et le compteur est absent jusqu'à la première ligne. Si l'observateur échoue au boot comme le 07/11, l'expression est vraie (compteur absent, `up` à 1) jusqu'à la première ligne après la relance de b1. Celle-ci suit les nœuds `Ready` (77 s le 07/11). Prédiction : `pending` possible, `firing` peu probable, car la fenêtre est sous les 5 min. Affiché seulement si lu.
 - **Non jugé** : l'observateur échoue-t-il au boot, avant la relance ? C'est la séquence du 07/11. Ce n'est pas lu sans accord à part.
+
+## Additif du 10/11/2026, 11:32 UTC : passage réel de (b1), B1-1 à B1-4 tenues
+
+Accord : « 7 ok ». `DISTRO=rke2 mise run confiance:redemarrer`, de 11:20:20 à 11:31:38 UTC, code 0. Journal : [`redemarrage-vm.log`](../../08-trust-plane/resultats/redemarrage-vm.log) de la 08, 52 `OK`, 0 `KO`. Référence : `redemarrage-vm-avant-b1.log`, passage du 07/11.
+
+| Prédiction | Mesuré |
+|---|---|
+| B1-1, relance | Arrêt en 94 s, démarrage en 9 s, trois nœuds réenregistrés et `Ready` en 80 s. Alloy de `sc-stockage` est relancé ensuite : actif depuis 11:23:27 UTC, démarrage avancé. **Tenue** |
+| B1-2, compteur > 0 en moins de 1 min | 249 lignes au compteur au moment du contrôle. Le délai exact n'est pas journalisé. Il est borné par le chrono : l'étape suivante horodatée (`J3 deverrouiller`) part à 11:24:17 UTC, donc le contrôle a conclu en 50 s au plus après la relance. **Tenue** |
+| B1-3, aucune erreur de l'observateur | Aucune ligne `event watcher exited with error` ni `failed to start informers` dans le journal d'alloy depuis la relance, au moment du contrôle. Rien n'a été relu après. **Tenue** |
+| B1-4, autres contrôles | Mêmes 51 contrôles `OK` que le 07/11, chiffres et empreintes mis à part, plus celui de b1 : 52 `OK`, 0 `KO`, code 0. Sous-journaux identiques en comptes : `kata-reseau` 25/0, `kata-temoin` 2/0, `openbao-controle` 3/0, `tsa-temoin` 4/0. **Tenue** |
+
+**Non jugés.**
+- Comme prévu, le passage `horodatage-29905163`, créé avant le descellement d'OpenBao, est en `Init:Error`. Les passages suivants (`29905169`, `29905170`, `29905171`) sont `Completed`.
+- `EvenementsMuets` n'a pas été lue.
+- L'échec de l'observateur au boot, avant la relance, n'a pas été lu. Le lire suppose de relire le journal d'alloy de `sc-stockage` depuis le boot : il faut un accord à part. Ce serait la reproduction de la séquence du 07/11 en v1.21.3, utile à l'issue.
+
+**Décision du propriétaire sur l'issue chez Alloy**, verbatim : « on fera ça tout à la fin du projet si besoin : pour le moment c'est non bloquant ? ». Consigné comme report à la fin du projet. Réponse : oui, ce n'est pas bloquant. L'alerte (a) et la relance (b1) couvrent la panne ; l'issue ne vise que le remède durable.
+
+**Push consigné** : 11:14:37 UTC, `0234dc6..4f8ab8e`. Contrôle des secrets OK sur les 9 fichiers touchés, avec le script de la copie de travail temporaire, retirée ensuite. Branche distante identique à la locale.

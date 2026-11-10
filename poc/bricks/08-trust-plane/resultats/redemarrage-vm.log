@@ -1,8 +1,8 @@
-# redemarrer.sh, 2026-11-07T11:20:38Z
+# redemarrer.sh, 2026-11-10T11:20:20Z
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller temoin
-# openbao.sh deverrouiller, 2026-11-07T11:20:38Z
+# openbao.sh deverrouiller, 2026-11-10T11:20:20Z
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
-# openbao.sh temoin, 2026-11-07T11:20:38Z
+# openbao.sh temoin, 2026-11-10T11:20:21Z
 témoin : message signé par la clé chains ; empreinte de la clé publique a7ca8ce8d133aa9b… ; {"latest_version":1,"exportable":false}
 [confiance:vm] $ poc/bricks/08-trust-plane/vm.sh arreter
 Domain 'sc-confiance' is being shutdown
@@ -13,7 +13,7 @@ Domain 'sc-stockage' is being shutdown
 
 Network supply-chain-poc destroyed
 
-## durée 112 s : mise run confiance:vm -- arreter
+## durée 94 s : mise run confiance:vm -- arreter
 [confiance:vm] $ poc/bricks/08-trust-plane/vm.sh demarrer
 Network supply-chain-poc started
 
@@ -24,14 +24,17 @@ Domain 'sc-build' started
 Domain 'sc-stockage' started
 
 ## durée 9 s : mise run confiance:vm -- demarrer
-## durée 77 s : trois nœuds réenregistrés (nouveau bootID) et Ready
-sc-confiance : démarré à 2026-11-07 11:22:33
-sc-build : démarré à 2026-11-07 11:22:33
-sc-stockage : démarré à 2026-11-07 11:22:33
-NAME           STATUS   ROLES                AGE   VERSION          INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION           CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>               21h   v1.35.9+rke2r1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.115+deb13.1-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane,etcd   21h   v1.35.9+rke2r1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.115+deb13.1-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>               21h   v1.35.9+rke2r1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.115+deb13.1-amd64   containerd://2.2.7-k3s1   stockage
+## durée 80 s : trois nœuds réenregistrés (nouveau bootID) et Ready
+sc-confiance : démarré à 2026-11-10 11:21:57
+sc-build : démarré à 2026-11-10 11:21:57
+sc-stockage : démarré à 2026-11-10 11:21:57
+NAME           STATUS   ROLES                AGE     VERSION          INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>               3d21h   v1.35.9+rke2r1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.116+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane,etcd   3d21h   v1.35.9+rke2r1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.116+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>               3d21h   v1.35.9+rke2r1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.116+deb13-amd64   containerd://2.2.7-k3s1   stockage
+## Alloy de sc-stockage (remède (b1) des Events), avant Cilium : un KO est différé en fin de script
+Alloy relancé, actif depuis 2026-11-10T11:23:27Z
+OK   Events transmis après la relance (249 ligne(s) au compteur)
 ## Cilium (J7, option 1b), avant les autres contrôles
 prédiction (écrite le 30/10/2026, avant le premier redémarrage des VM sous Cilium) : agents (3/3) et opérateur prêts
 depuis le redémarrage ; cilium-dbg status OK et policy-cidr-match-mode nodes relu par chacun des trois agents ;
@@ -49,30 +52,31 @@ OK   Forgejo : workspace/sample-app, main = 6391fd437f26696847041be3226bbbf633f5
 OK   kyverno : 4 pod(s) prêts depuis le redémarrage
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
 ## OpenBao
-après redémarrage : {"initialized":true,"sealed":true} ; redémarrages du conteneur : 1
+après redémarrage : {"initialized":true,"sealed":true} ; redémarrages du conteneur : 2
 OK   OpenBao scellé après le redémarrage des VM
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh deverrouiller controle
-# openbao.sh deverrouiller, 2026-11-07T11:24:46Z
+# openbao.sh deverrouiller, 2026-11-10T11:24:17Z
 {"sealed":false,"t":1,"n":1,"progress":0}
 {"initialized":true,"sealed":false,"version":"2.7.2","storage_type":"raft","ha_enabled":true}
-# openbao.sh controle, 2026-11-07T11:24:49Z
+# openbao.sh controle, 2026-11-10T11:24:24Z
 OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 ## TSA (J5) : nouveau jeton OpenBao au démarrage du pod, une fois OpenBao descellé
+Waiting for deployment "timestamp-authority" rollout to finish: 0 of 1 updated replicas are available...
+Waiting for deployment "timestamp-authority" rollout to finish: 0 of 1 updated replicas are available...
 deployment "timestamp-authority" successfully rolled out
-Found 2 pods, using pod/timestamp-authority-5c5f65646-s7w9f
-jeton OpenBao obtenu (rôle tsa, essai 4)
+jeton OpenBao obtenu (rôle tsa, essai 1)
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-11-07T11:24:50Z
+# tsa.sh temoin, 2026-11-10T11:24:27Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-07 11:24:51 +0000 UTC
+Artifact timestamped at 2026-11-10 11:24:28 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 7 11:24:51 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x38E8905646B8EA0F1CB612F59DE88071EAB48B4B TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 10 11:24:28 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x6DF98268C3EE943159DD1E2B8E35B9C0018CC88F TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
@@ -84,14 +88,14 @@ OK   tekton-pipelines : 6 pod(s) prêts depuis le redémarrage
 OK   tekton-pipelines-resolvers : 1 pod(s) prêts depuis le redémarrage
 OK   tekton-chains : 1 pod(s) prêts depuis le redémarrage
 OK   declencheurs : 1 pod(s) prêts depuis le redémarrage
-## CronJobs (J6) : un passage réussi de chacun, créé après le retour du TSA (2026-11-07T11:25:00Z)
-passage horodatage-29900846 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 74 ; Defaulted 1 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
+## CronJobs (J6) : un passage réussi de chacun, créé après le retour du TSA (2026-11-10T11:24:35Z)
+passage horodatage-29905165 : ATTESTATIONS_ILLISIBLES 1 ; DEJA_HORODATEE 79 ; Defaulted 1 ; FIN 1 ; JOINT 1 ; REFUSEE 2 ; 
 OK   horodatage/horodatage : passage réussi après le retour du TSA
-passage rattrapage-29900846 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
+passage rattrapage-29905165 : JOINT 1 ; PRESENT 1 ; TETE 1 ; 
 OK   declencheurs/rattrapage : passage réussi après le retour du TSA
 ## Kata (J7)
 [confiance:kata] $ poc/bricks/08-trust-plane/kata.sh temoin
-# kata.sh temoin, 2026-11-07T11:26:08Z
+# kata.sh temoin, 2026-11-10T11:25:08Z
 OK   runtime kata chargé par containerd sur sc-build
 exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape exemption)
 ### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 5 s après la création
@@ -109,7 +113,7 @@ exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape 
 OK   pod Kata : noyau de l'invité 6.18.56
 ## Réseau des pods après le redémarrage (Cilium) : mesure de référence (journal resultats/kata-reseau.log)
 [confiance:kata] $ poc/bricks/08-trust-plane/kata.sh reseau
-# kata.sh reseau, 2026-11-07T11:26:16Z
+# kata.sh reseau, 2026-11-10T11:25:17Z
 ## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)
 - la politique ne sélectionne que les pods de mesure (label app=sonde-reseau-j7) ;
 - fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,
@@ -136,33 +140,7 @@ OK   pas de politique sonde-reseau-j7 résiduelle
 Cilium : OK ; enable-policy default ; routing-mode native
 NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=sonde-reseau-j7
 ## fenêtre de démarrage, trois essais alternés runc et Kata
-### j7-reseau-runc-1 : IP 10.42.1.195, nœud sc-build, conteneur lancé 1 s après la création
-      0 ms : Zot FERME ; Forgejo OUVERT
-   1510 ms : Zot FERME ; Forgejo OUVERT
-   3010 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
-  OUVERT Forgejo 192.168.161.13:3000
-  FERME Zot 192.168.161.13:5000
-  FERME SSH-stockage 192.168.161.13:22
-  FERME API-noeud 192.168.161.11:6443
-  FERME API-service 10.43.0.1:443
-  FERME kubelet-local 192.168.161.12:10250
-  FERME kubelet-confiance 192.168.161.11:10250
-OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-1 : IP 10.42.1.217, nœud sc-build, conteneur lancé 5 s après la création
-      0 ms : Zot FERME ; Forgejo OUVERT
-   1550 ms : Zot FERME ; Forgejo OUVERT
-   3080 ms : Zot FERME ; Forgejo OUVERT
-  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
-  OUVERT Forgejo 192.168.161.13:3000
-  FERME Zot 192.168.161.13:5000
-  FERME SSH-stockage 192.168.161.13:22
-  FERME API-noeud 192.168.161.11:6443
-  FERME API-service 10.43.0.1:443
-  FERME kubelet-local 192.168.161.12:10250
-  FERME kubelet-confiance 192.168.161.11:10250
-OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-2 : IP 10.42.1.65, nœud sc-build, conteneur lancé 0 s après la création
+### j7-reseau-runc-1 : IP 10.42.1.188, nœud sc-build, conteneur lancé 1 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
    1500 ms : Zot FERME ; Forgejo OUVERT
    3010 ms : Zot FERME ; Forgejo OUVERT
@@ -174,8 +152,34 @@ OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
   FERME API-service 10.43.0.1:443
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-1 : IP 10.42.1.145, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1570 ms : Zot FERME ; Forgejo OUVERT
+   3100 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-runc-2 : IP 10.42.1.205, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3000 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-2 : IP 10.42.1.27, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-kata-2 : IP 10.42.1.110, nœud sc-build, conteneur lancé 4 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
    1550 ms : Zot FERME ; Forgejo OUVERT
    3080 ms : Zot FERME ; Forgejo OUVERT
@@ -188,8 +192,8 @@ OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-runc-3 : IP 10.42.1.194, nœud sc-build, conteneur lancé 0 s après la création
-      0 ms : Zot FERME ; Forgejo OUVERT
+### j7-reseau-runc-3 : IP 10.42.1.132, nœud sc-build, conteneur lancé 0 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
    1510 ms : Zot FERME ; Forgejo OUVERT
    3010 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
@@ -201,10 +205,10 @@ OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
   FERME kubelet-local 192.168.161.12:10250
   FERME kubelet-confiance 192.168.161.11:10250
 OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
-### j7-reseau-kata-3 : IP 10.42.1.31, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-kata-3 : IP 10.42.1.124, nœud sc-build, conteneur lancé 4 s après la création
       0 ms : Zot FERME ; Forgejo OUVERT
-   1560 ms : Zot FERME ; Forgejo OUVERT
-   3090 ms : Zot FERME ; Forgejo OUVERT
+   1550 ms : Zot FERME ; Forgejo OUVERT
+   3080 ms : Zot FERME ; Forgejo OUVERT
   Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
   OUVERT Forgejo 192.168.161.13:3000
   FERME Zot 192.168.161.13:5000
@@ -217,43 +221,43 @@ OK   kata-3 : une fois la règle posée, Forgejo seul ouvert
 OK   runc : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
 OK   kata : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
 ## trace Hubble sur sc-build (agent Cilium du nœud)
-### j7-reseau-trace-runc : IP 10.42.1.244, nœud sc-build, conteneur lancé 0 s après la création
+### j7-reseau-trace-runc : IP 10.42.1.68, nœud sc-build, conteneur lancé 1 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-  Hubble : 11:29:07.964 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:07.964 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:09.966 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:09.966 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:11.968 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:11.968 10.42.1.244 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-OK   runc (10.42.1.244) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+  Hubble : 11:28:08.158 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:08.158 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:10.160 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:10.160 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:12.162 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:12.162 10.42.1.68 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   runc (10.42.1.68) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
 ### j7-reseau-trace-kata : IP 10.42.1.29, nœud sc-build, conteneur lancé 5 s après la création
   TRACE|1|FERME
   TRACE|2|FERME
   TRACE|3|FERME
-  Hubble : 11:29:12.173 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:12.173 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:14.195 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:14.195 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:16.215 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble : 11:29:16.215 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:12.387 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:12.388 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:14.415 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:14.415 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:16.441 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:28:16.441 10.42.1.29 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
 OK   kata (10.42.1.29) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
 ## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)
-### j7-reseau-temoin-runc : IP 10.42.1.253, nœud sc-build, conteneur lancé 1 s après la création
+### j7-reseau-temoin-runc : IP 10.42.1.241, nœud sc-build, conteneur lancé 0 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   runc restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
-### j7-reseau-temoin-kata : IP 10.42.1.35, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-temoin-kata : IP 10.42.1.211, nœud sc-build, conteneur lancé 5 s après la création
   AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
   LIAISON|refusée|nc: bind: Cannot assign requested address
 OK   kata restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
 ## usurpation d'adresse source : pod Kata privilégié
 OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
-### j7-reseau-usurpation : IP 10.42.1.42, nœud sc-build, conteneur lancé 4 s après la création
+### j7-reseau-usurpation : IP 10.42.1.22, nœud sc-build, conteneur lancé 5 s après la création
   AVANT|Zot|FERME
   AVANT|Forgejo|OUVERT
-  ADRESSES|10.42.1.42/32 10.42.1.250/32 
+  ADRESSES|10.42.1.22/32 10.42.1.250/32 
   USURPEE|Zot|192.168.161.13:5000|FERME
   USURPEE|SSH-stockage|192.168.161.13:22|FERME
   USURPEE|API-noeud|192.168.161.11:6443|FERME
@@ -261,65 +265,65 @@ OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Ciliu
   ECHANGE|Zot|
   APRES|Zot|FERME
   FIN
-  Hubble (IP du pod) : 11:29:58.793 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:29:58.793 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:29:59.812 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:29:59.812 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:00.836 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:00.836 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:16.925 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:16.926 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:17.956 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:17.956 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:18.980 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (IP du pod) : 11:30:18.980 10.42.1.42 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
-  Hubble (10.42.1.250) : 11:30:01.849 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:02.852 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:03.876 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:04.862 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:05.892 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:06.916 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:07.872 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:08.900 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:09.924 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:10.882 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:11.908 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:12.932 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:13.908 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:14.916 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.250) : 11:30:15.940 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (IP du pod) : 11:28:58.106 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:28:58.106 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:28:59.111 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:28:59.111 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:00.135 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:00.135 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:16.240 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:16.240 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:17.255 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:17.255 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:18.279 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:29:18.279 10.42.1.22 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (10.42.1.250) : 11:29:01.162 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:02.183 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:03.207 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:04.172 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:05.191 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:06.215 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:07.182 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:08.199 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:09.223 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:10.192 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:11.207 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:12.231 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:13.222 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:14.247 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:29:15.271 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
   tcpdump : 15 packets captured
   tcpdump : 16 packets received by filter
 OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert
-OK   Hubble : 12 flux refusés du pod (10.42.1.42) vers Zot, ceux du témoin
+OK   Hubble : 12 flux refusés du pod (10.42.1.22) vers Zot, ceux du témoin
 OK   avec 10.42.1.250, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)
 OK   avec 10.42.1.250, aucune réponse de Zot
 OK   Hubble : 15 flux de 10.42.1.250 refusés, motif(s) INVALID_SOURCE_IP
   capture -i any sur sc-build : 2 SYN distinct(s) de 10.42.1.250 vers Zot, 0 ligne(s) SYN-ACK en retour
 ## usurpation : autres sources (IP d'un pod témoin du nœud, CIDR d'un autre nœud, adresse externe)
-OK   pod témoin 10.42.1.138 sur sc-build ; 10.42.0.250 inutilisée
-### j7-reseau-sources : IP 10.42.1.113, nœud sc-build, conteneur lancé 4 s après la création
-  SOURCE|10.42.1.138|Zot|FERME
-  SOURCE|10.42.1.138|Forgejo|FERME
+OK   pod témoin 10.42.1.98 sur sc-build ; 10.42.0.250 inutilisée
+### j7-reseau-sources : IP 10.42.1.7, nœud sc-build, conteneur lancé 4 s après la création
+  SOURCE|10.42.1.98|Zot|FERME
+  SOURCE|10.42.1.98|Forgejo|FERME
   SOURCE|10.42.0.250|Zot|FERME
   SOURCE|10.42.0.250|Forgejo|FERME
   SOURCE|203.0.113.10|Zot|FERME
   SOURCE|203.0.113.10|Forgejo|FERME
   FIN
-  Hubble (10.42.1.138) : 11:31:02.794 10.42.1.138 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.138) : 11:31:03.825 10.42.1.138 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.138) : 11:31:04.849 10.42.1.138 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.1.138) : 11:31:05.806 10.42.1.138 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
-OK   source 10.42.1.138 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
-  Hubble (10.42.0.250) : 11:31:08.837 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 11:31:09.841 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 11:31:10.865 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (10.42.0.250) : 11:31:11.847 10.42.0.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.98) : 11:30:01.993 10.42.1.98 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.98) : 11:30:03.010 10.42.1.98 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.98) : 11:30:04.034 10.42.1.98 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.98) : 11:30:05.006 10.42.1.98 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+OK   source 10.42.1.98 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
+  Hubble (10.42.0.250) : 11:30:08.035 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:30:09.058 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:30:10.082 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:30:11.047 10.42.0.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
 OK   source 10.42.0.250 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
-  Hubble (203.0.113.10) : 11:31:14.872 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 11:31:15.889 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 11:31:16.913 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
-  Hubble (203.0.113.10) : 11:31:17.883 203.0.113.10 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:30:14.072 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:30:15.074 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:30:16.098 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:30:17.084 203.0.113.10 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
 OK   source 203.0.113.10 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
   tcpdump enp1s0 : 0 packets captured
   tcpdump enp1s0 : 0 packets received by filter
@@ -327,106 +331,75 @@ OK   aucun paquet de 203.0.113.10 sur enp1s0 de sc-build : rien ne sort du nœud
 ## retrait
 OK   NetworkPolicy et pods de mesure retirés
 NAMESPACE                    NAME                                                              READY   STATUS       RESTARTS        AGE     IP               NODE           NOMINATED NODE   READINESS GATES
-builds                       essai-signature-pod                                               0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       f2-prefetch-1-prefetch-pod                                        0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       f2-prefetch-1-publier-pod                                         0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       f2-prefetch-2-prefetch-pod                                        0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       f2-prefetch-2-publier-pod                                         0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-porte-en-service-publier-pod                                   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-porte-hors-liste-publier-pod                                   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-porte-slsa-publier-pod                                         0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-porte-version-non-listee-publier-pod                           0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-restreint-confiance-pod                                        0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j6-signee-pod                                                     0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-ancienne-construire-pod                             0/3     Error        0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-construire-pod                                      0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-etiquette-preparer-pod                              0/2     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-preparer-pod                                        0/2     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-publier-pod                                         0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       j7-sample-app-sans-kata-preparer-pod                              0/2     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       preuve-enveloppes-publier-pod                                     0/1     Completed    0               20h     <none>           sc-build       <none>           <none>
-builds                       preuve-test1-pod                                                  0/1     Completed    0               15h     <none>           sc-build       <none>           <none>
-builds                       preuve-test7-en-service-publier-pod                               0/1     Completed    0               15h     <none>           sc-build       <none>           <none>
-builds                       preuve-test7-hors-liste-publier-pod                               0/1     Completed    0               15h     <none>           sc-build       <none>           <none>
-builds                       sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier-pod   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       sample-app-2222222222222222222222222222222222222222-publier-pod   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       sample-app-45a761114a675d332e4cfff6fd4c4f69a8804426-publier-pod   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-builds                       sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod   0/2     Completed    0               44m     <none>           sc-build       <none>           <none>
-builds                       sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod   0/1     Completed    0               43m     <none>           sc-build       <none>           <none>
-builds                       sample-app-6391fd437f2669687e9b7cc76faf05b526d9bfccede94a6c-pod   0/1     Completed    0               44m     <none>           sc-build       <none>           <none>
-builds                       sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod   0/1     Completed    0               21h     <none>           sc-build       <none>           <none>
-declencheurs                 el-forgejo-76596b99b8-wmm97                                       1/1     Running      1 (9m53s ago)   16h     10.42.0.175      sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29900850-2wt2h                                         0/1     Completed    0               2m38s   10.42.0.19       sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29900851-r78nv                                         0/1     Completed    0               98s     10.42.0.106      sc-confiance   <none>           <none>
-declencheurs                 rattrapage-29900852-4v2np                                         0/1     Completed    0               38s     10.42.0.1        sc-confiance   <none>           <none>
-horodatage                   h-essai-signature-8vw57                                           0/1     Completed    0               21h     <none>           sc-confiance   <none>           <none>
-horodatage                   h-essai-webhook-fs5j8                                             0/1     Completed    0               21h     <none>           sc-confiance   <none>           <none>
-horodatage                   horodatage-29900844-jvjdd                                         0/1     Init:Error   0               8m34s   10.42.0.194      sc-confiance   <none>           <none>
-horodatage                   horodatage-29900850-kqwhn                                         0/1     Completed    0               2m38s   10.42.0.240      sc-confiance   <none>           <none>
-horodatage                   horodatage-29900851-b67x9                                         0/1     Completed    0               98s     10.42.0.8        sc-confiance   <none>           <none>
-horodatage                   horodatage-29900852-g8bpk                                         0/1     Completed    0               38s     10.42.0.126      sc-confiance   <none>           <none>
-horodatage                   j5-temoin                                                         0/1     Completed    0               7m48s   10.42.0.60       sc-confiance   <none>           <none>
-kube-system                  cilium-2jp87                                                      1/1     Running      1 (8m50s ago)   13h     192.168.161.13   sc-stockage    <none>           <none>
-kube-system                  cilium-2ljkw                                                      1/1     Running      1 (8m47s ago)   13h     192.168.161.12   sc-build       <none>           <none>
-kube-system                  cilium-nkrmv                                                      1/1     Running      1 (9m53s ago)   13h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  cilium-operator-868f58cb49-gpd7z                                  1/1     Running      1 (9m53s ago)   13h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  cloud-controller-manager-sc-confiance                             1/1     Running      4 (9m46s ago)   22h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  etcd-sc-confiance                                                 1/1     Running      1               22h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  kube-apiserver-sc-confiance                                       1/1     Running      3               18h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  kube-controller-manager-sc-confiance                              1/1     Running      5 (9m46s ago)   22h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  kube-scheduler-sc-confiance                                       1/1     Running      3 (9m53s ago)   22h     192.168.161.11   sc-confiance   <none>           <none>
-kube-system                  rke2-coredns-rke2-coredns-746f455775-qrhr8                        1/1     Running      1 (9m53s ago)   22h     10.42.0.89       sc-confiance   <none>           <none>
-kube-system                  rke2-coredns-rke2-coredns-746f455775-xd5kl                        1/1     Running      1 (8m50s ago)   22h     10.42.3.45       sc-stockage    <none>           <none>
-kube-system                  rke2-coredns-rke2-coredns-autoscaler-6f55765d86-fvdbh             1/1     Running      1 (9m53s ago)   22h     10.42.0.103      sc-confiance   <none>           <none>
-kube-system                  rke2-metrics-server-64f78bff7d-wxdhq                              1/1     Running      1 (9m53s ago)   22h     10.42.0.52       sc-confiance   <none>           <none>
-kyverno                      kyverno-admission-controller-6b78f498b9-wdj9c                     1/1     Running      3 (9m53s ago)   21h     10.42.0.93       sc-confiance   <none>           <none>
-kyverno                      kyverno-background-controller-76bd696776-jf8v9                    1/1     Running      3 (9m53s ago)   21h     10.42.0.82       sc-confiance   <none>           <none>
-kyverno                      kyverno-cleanup-controller-5647df8554-8l6c9                       1/1     Running      3 (9m53s ago)   21h     10.42.0.136      sc-confiance   <none>           <none>
-kyverno                      kyverno-reports-controller-7696b58bd5-gw9l5                       1/1     Running      3 (9m53s ago)   21h     10.42.0.216      sc-confiance   <none>           <none>
-local-path-storage           local-path-provisioner-645d46d5df-s9s5c                           1/1     Running      1 (9m53s ago)   22h     10.42.0.36       sc-confiance   <none>           <none>
-openbao                      openbao-0                                                         1/1     Running      1 (9m53s ago)   16h     10.42.0.177      sc-confiance   <none>           <none>
-porte                        porte-ba-rattrapage-22rf5                                         0/3     Completed    0               42m     <none>           sc-confiance   <none>           <none>
-scan                         scan-sample-app-29900730-qlsrh                                    0/1     Completed    0               122m    <none>           sc-confiance   <none>           <none>
-scan                         scan-sample-app-h5-manuel-tkhh2                                   0/1     Completed    0               14h     <none>           sc-confiance   <none>           <none>
-tekton-chains                tekton-chains-controller-74657877bf-nc25h                         1/1     Running      0               7m44s   10.42.0.37       sc-confiance   <none>           <none>
-tekton-pipelines-resolvers   tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n                1/1     Running      1 (9m53s ago)   21h     10.42.0.81       sc-confiance   <none>           <none>
-tekton-pipelines             tekton-events-controller-56d956d45f-jjzmg                         1/1     Running      1 (9m53s ago)   16h     10.42.0.101      sc-confiance   <none>           <none>
-tekton-pipelines             tekton-pipelines-controller-5777f5879c-lvsjs                      1/1     Running      1 (9m53s ago)   16h     10.42.0.118      sc-confiance   <none>           <none>
-tekton-pipelines             tekton-pipelines-webhook-5fccc89bd5-5tlqd                         1/1     Running      1 (9m53s ago)   21h     10.42.0.32       sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-controller-8468cdbfd7-j7kh6                       1/1     Running      1 (9m53s ago)   14h     10.42.0.51       sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-core-interceptors-558f59555b-c9qnn                1/1     Running      1 (9m53s ago)   16h     10.42.0.143      sc-confiance   <none>           <none>
-tekton-pipelines             tekton-triggers-webhook-5cfc49d4d8-mdvr5                          1/1     Running      1 (9m53s ago)   14h     10.42.0.206      sc-confiance   <none>           <none>
-tsa                          timestamp-authority-5c5f65646-fgn7t                               2/2     Running      0               7m48s   10.42.0.45       sc-confiance   <none>           <none>
-
-## Complément du 07/11/2026 à 11:33:31 UTC, relevé à la main après le passage, lecture seule
-horodatage-29900844, créé à 11:24:04Z avant le descellement d'OpenBao : conteneur identifiants en échec, job en échec ; passages suivants :
-  horodatage-29900844 créé 2026-11-07T11:24:04Z réussis=0 échecs=1
-  horodatage-29900851 créé 2026-11-07T11:31:00Z réussis=1 échecs=0
-  horodatage-29900852 créé 2026-11-07T11:32:00Z réussis=1 échecs=0
-  horodatage-29900853 créé 2026-11-07T11:33:00Z réussis=1 échecs=0
-pod des résolveurs, même pod qu'avant (pas de nouvelle création) :
-  tekton-pipelines-remote-resolvers-56c4c4d957-xsv5n créé 2026-11-06T13:38:02Z, redémarrages 1, conteneur relancé 2026-11-07T11:23:33Z
-refus 403 ou 422 dans l'audit de l'API depuis 2026-11-07T11:22:33Z (démarrage des VM), par compte, verbe, ressource, espace et code :
-        3 system:node:sc-build get pods builds 403 pods "j7-reseau-temoin-kata" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group
-        2 system:node:sc-build get pods builds 403 pods "j7-reseau-trace-runc" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group 
-        2 system:node:sc-build get pods builds 403 pods "j7-reseau-kata-2" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" i
-        2 system:node:sc-build get pods builds 403 pods "j7-kata" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" in the nam
-        1 system:node:sc-build get pods builds 403 pods "j7-reseau-temoin-runc" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group
-        1 system:node:sc-build get pods builds 403 pods "j7-reseau-runc-1" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" i
-        1 system:node:sc-build get pods builds 403 pods "j7-reseau-kata-3" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" i
-        1 system:node:sc-build get pods builds 403 pods "j7-reseau-kata-1" is forbidden: User "system:node:sc-build" cannot get resource "pods" in API group "" i
-KyvernoRefusAnormaux (Prometheus de sc-stockage) :
-  état : inactive
-  ALERTS sur 15 min : []
-  refus Kyverno à l admission sur 15 min : ["1.0344839476826984"]
-fin du complément
-
-## Complément du 07/11/2026 à 11:39:28 UTC, passage d'horodatage en échec, lecture seule
-horodatage-29900844 (11:24:04Z) : identifiants, connexion à OpenBao refusée (connection refused), horodater jamais démarré
-dernier passage, horodatage-29900859, lignes autres que DEJA_HORODATEE :
-  JOINT|Zot et TSA, essai 1
-  ATTESTATIONS_ILLISIBLES|builds/essai-j6-att-illisible|unmarshaling payload: invalid character 'p' looking for beginning of value
-  REFUSEE|builds/essai-j6-autre-cle|1|signature 8c14908776d3f50f|failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, Expected 1
-  REFUSEE|builds/essai-j6-autre-sujet|1|signature ea3127a04a620174|failed to verify signature: provided artifact digest does not match any digest in statement
-  FIN|14 image(s), 79 enveloppe(s) : 0 horodatée(s), 77 déjà, 2 refusée(s), 1 anomalie(s)|sc-stockage.poc.test:5000 (builds) → sc-stockage.poc.test:5000/horodatage/bundles
-fin du complément
+builds                       essai-signature-pod                                               0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       f2-prefetch-1-prefetch-pod                                        0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       f2-prefetch-1-publier-pod                                         0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       f2-prefetch-2-prefetch-pod                                        0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       f2-prefetch-2-publier-pod                                         0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-porte-en-service-publier-pod                                   0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-porte-hors-liste-publier-pod                                   0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-porte-slsa-publier-pod                                         0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-porte-version-non-listee-publier-pod                           0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-restreint-confiance-pod                                        0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j6-signee-pod                                                     0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-ancienne-construire-pod                             0/3     Error        0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-construire-pod                                      0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-etiquette-preparer-pod                              0/2     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-preparer-pod                                        0/2     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-publier-pod                                         0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       j7-sample-app-sans-kata-preparer-pod                              0/2     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       preuve-enveloppes-publier-pod                                     0/1     Completed    0               2d23h   <none>           sc-build       <none>           <none>
+builds                       preuve-test1-pod                                                  0/1     Completed    0               3d15h   <none>           sc-build       <none>           <none>
+builds                       preuve-test7-en-service-publier-pod                               0/1     Completed    0               3d15h   <none>           sc-build       <none>           <none>
+builds                       preuve-test7-hors-liste-publier-pod                               0/1     Completed    0               3d15h   <none>           sc-build       <none>           <none>
+builds                       sample-app-1e290e1d443a1edd70d2dfd799ada3e397aa70a6-publier-pod   0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       sample-app-2222222222222222222222222222222222222222-publier-pod   0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+builds                       sample-app-45a761114a675d332e4cfff6fd4c4f69a8804426-publier-pod   0/1     Completed    0               3d20h   <none>           sc-build       <none>           <none>
+builds                       sample-app-5d81df78537d1cac44b348b21d3b4f9623101bd8-publier-pod   0/1     Completed    0               2d20h   <none>           sc-build       <none>           <none>
+builds                       sample-app-6391fd437f266968098c5f85f9943f8a395a7e95013c25b2-pod   0/2     Completed    0               3d      <none>           sc-build       <none>           <none>
+builds                       sample-app-6391fd437f26696847041be3226bbbf633f55a2f-publier-pod   0/1     Completed    0               3d      <none>           sc-build       <none>           <none>
+builds                       sample-app-6391fd437f2669687e9b7cc76faf05b526d9bfccede94a6c-pod   0/1     Completed    0               3d      <none>           sc-build       <none>           <none>
+builds                       sample-app-e537a1db653dde7dd1f051921b0e9c1eab7a2b01-publier-pod   0/1     Completed    0               3d21h   <none>           sc-build       <none>           <none>
+declencheurs                 el-forgejo-76596b99b8-wmm97                                       1/1     Running      2 (9m28s ago)   3d16h   10.42.0.31       sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29905169-z6vbm                                         0/1     Completed    0               2m38s   10.42.0.156      sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29905170-7gklr                                         0/1     Completed    0               98s     10.42.0.71       sc-confiance   <none>           <none>
+declencheurs                 rattrapage-29905171-8tdlm                                         0/1     Completed    0               38s     10.42.0.56       sc-confiance   <none>           <none>
+horodatage                   h-essai-signature-8vw57                                           0/1     Completed    0               3d21h   <none>           sc-confiance   <none>           <none>
+horodatage                   h-essai-webhook-fs5j8                                             0/1     Completed    0               3d21h   <none>           sc-confiance   <none>           <none>
+horodatage                   horodatage-29900844-jvjdd                                         0/1     Init:Error   0               3d      <none>           sc-confiance   <none>           <none>
+horodatage                   horodatage-29905163-4xrbg                                         0/1     Init:Error   0               8m31s   10.42.0.144      sc-confiance   <none>           <none>
+horodatage                   horodatage-29905169-q5qj6                                         0/1     Completed    0               2m38s   10.42.0.133      sc-confiance   <none>           <none>
+horodatage                   horodatage-29905170-hj5pr                                         0/1     Completed    0               98s     10.42.0.200      sc-confiance   <none>           <none>
+horodatage                   horodatage-29905171-gmdx5                                         0/1     Completed    0               38s     10.42.0.238      sc-confiance   <none>           <none>
+horodatage                   j5-temoin                                                         0/1     Completed    0               7m11s   10.42.0.102      sc-confiance   <none>           <none>
+kube-system                  cilium-2jp87                                                      1/1     Running      2 (8m18s ago)   3d13h   192.168.161.13   sc-stockage    <none>           <none>
+kube-system                  cilium-2ljkw                                                      1/1     Running      2 (8m25s ago)   3d13h   192.168.161.12   sc-build       <none>           <none>
+kube-system                  cilium-nkrmv                                                      1/1     Running      2 (9m28s ago)   3d13h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  cilium-operator-868f58cb49-gpd7z                                  1/1     Running      2 (9m28s ago)   3d13h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  cloud-controller-manager-sc-confiance                             1/1     Running      6 (9m22s ago)   3d22h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  etcd-sc-confiance                                                 1/1     Running      2               3d22h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  kube-apiserver-sc-confiance                                       1/1     Running      4               3d18h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  kube-controller-manager-sc-confiance                              1/1     Running      7 (9m23s ago)   3d22h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  kube-scheduler-sc-confiance                                       1/1     Running      4 (9m28s ago)   3d22h   192.168.161.11   sc-confiance   <none>           <none>
+kube-system                  rke2-coredns-rke2-coredns-746f455775-qrhr8                        1/1     Running      2 (9m28s ago)   3d22h   10.42.0.130      sc-confiance   <none>           <none>
+kube-system                  rke2-coredns-rke2-coredns-746f455775-xd5kl                        1/1     Running      2 (8m18s ago)   3d21h   10.42.3.111      sc-stockage    <none>           <none>
+kube-system                  rke2-coredns-rke2-coredns-autoscaler-6f55765d86-fvdbh             1/1     Running      2 (9m28s ago)   3d22h   10.42.0.132      sc-confiance   <none>           <none>
+kube-system                  rke2-metrics-server-64f78bff7d-wxdhq                              1/1     Running      2 (9m28s ago)   3d22h   10.42.0.92       sc-confiance   <none>           <none>
+kyverno                      kyverno-admission-controller-6b78f498b9-q76mt                     1/1     Running      1 (9m28s ago)   21h     10.42.0.189      sc-confiance   <none>           <none>
+kyverno                      kyverno-background-controller-76bd696776-jf8v9                    1/1     Running      4 (9m28s ago)   3d21h   10.42.0.188      sc-confiance   <none>           <none>
+kyverno                      kyverno-cleanup-controller-5647df8554-8l6c9                       1/1     Running      4 (9m28s ago)   3d21h   10.42.0.251      sc-confiance   <none>           <none>
+kyverno                      kyverno-reports-controller-7696b58bd5-gw9l5                       1/1     Running      4 (9m28s ago)   3d21h   10.42.0.64       sc-confiance   <none>           <none>
+local-path-storage           local-path-provisioner-645d46d5df-s9s5c                           1/1     Running      2 (9m28s ago)   3d22h   10.42.0.37       sc-confiance   <none>           <none>
+openbao                      openbao-0                                                         1/1     Running      2 (9m28s ago)   3d16h   10.42.0.111      sc-confiance   <none>           <none>
+scan                         scan-sample-app-29900730-qlsrh                                    0/1     Completed    0               3d2h    <none>           sc-confiance   <none>           <none>
+scan                         scan-sample-app-29903610-jp6pg                                    0/1     Completed    0               26h     <none>           sc-confiance   <none>           <none>
+scan                         scan-sample-app-29905050-8v2ct                                    0/1     Completed    0               121m    <none>           sc-confiance   <none>           <none>
+tekton-chains                tekton-chains-controller-74657877bf-2pjps                         1/1     Running      0               7m7s    10.42.0.115      sc-confiance   <none>           <none>
+tekton-pipelines-resolvers   tekton-pipelines-remote-resolvers-56c4c4d957-jgbqh                1/1     Running      1 (9m28s ago)   2d19h   10.42.0.131      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-events-controller-56d956d45f-jjzmg                         1/1     Running      2 (9m28s ago)   3d16h   10.42.0.182      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-controller-5777f5879c-lvsjs                      1/1     Running      2 (9m28s ago)   3d16h   10.42.0.45       sc-confiance   <none>           <none>
+tekton-pipelines             tekton-pipelines-webhook-5fccc89bd5-5tlqd                         1/1     Running      2 (9m28s ago)   3d21h   10.42.0.12       sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-controller-8468cdbfd7-j7kh6                       1/1     Running      2 (9m28s ago)   3d14h   10.42.0.84       sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-core-interceptors-6894848d5c-xh998                1/1     Running      1 (9m28s ago)   2d21h   10.42.0.129      sc-confiance   <none>           <none>
+tekton-pipelines             tekton-triggers-webhook-5cfc49d4d8-mdvr5                          1/1     Running      2 (9m28s ago)   3d14h   10.42.0.199      sc-confiance   <none>           <none>
+tsa                          timestamp-authority-5c5f65646-pf9s7                               2/2     Running      0               7m14s   10.42.0.168      sc-confiance   <none>           <none>
