@@ -1,0 +1,38 @@
+# s3.sh builds, 2026-11-10T18:11:00Z
+OK   chroot de S2 : e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+OK   ~/.cache/supply-chain-poc/08/travail/s3-06/restauree-1 : 162 fichiers, empreintes identiques à la liste attendue
+### s3-build-1 (runtimeClassName kata, uid 1000, label -) : prêt
+OK   copie de chroot.tar dans le pod : 508546560 octets en 8 morceau(x), sha256 conforme
+OK   copie de fermeture-1.tar dans le pod : 194109440 octets en 3 morceau(x), sha256 conforme
+OK   copie de fermeture.sha256 dans le pod : 15952 octets en 1 morceau(x), sha256 conforme
+OK   copie de sources.tar dans le pod : 153600 octets en 1 morceau(x), sha256 conforme
+OK   copie de SHA256SUMS.s1 dans le pod : 283 octets en 1 morceau(x), sha256 conforme
+     invité : 6.18.56, 3 vCPU ; uid 1000 ; /w : tmpfs
+     chroot : sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+     fermeture revérifiée dans le pod : rc 0 (162 fichiers) 
+     sources livrées : rc 0 sample-app_1.0.0.orig.tar.gz: OK sample-app_1.0.0-1.dsc: OK sample-app_1.0.0-1.debian.tar.xz: OK
+     témoin DNS snapshot.debian.org : rc 0
+     témoin TCP snapshot.debian.org:80 (10 s) : rc 124 
+     sbuild : rc 0 en 272 s
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+     (code de l'exec : 0)
+pod s3-build-1 supprimé
+journal de sbuild : 1564 lignes, resultats/s3-build-1-sbuild.log
+OK   ~/.cache/supply-chain-poc/08/travail/s3-06/restauree-2 : 162 fichiers, empreintes identiques à la liste attendue
+### s3-build-2 (runtimeClassName kata, uid 1000, label -) : prêt
+OK   copie de chroot.tar dans le pod : 508546560 octets en 8 morceau(x), sha256 conforme
+OK   copie de fermeture-2.tar dans le pod : 194109440 octets en 3 morceau(x), sha256 conforme
+OK   copie de fermeture.sha256 dans le pod : 15952 octets en 1 morceau(x), sha256 conforme
+OK   copie de sources.tar dans le pod : 153600 octets en 1 morceau(x), sha256 conforme
+OK   copie de SHA256SUMS.s1 dans le pod : 283 octets en 1 morceau(x), sha256 conforme
+     invité : 6.18.56, 3 vCPU ; uid 1000 ; /w : tmpfs
+     chroot : sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+     fermeture revérifiée dans le pod : rc 0 (162 fichiers) 
+     sources livrées : rc 0 sample-app_1.0.0.orig.tar.gz: OK sample-app_1.0.0-1.dsc: OK sample-app_1.0.0-1.debian.tar.xz: OK
+     témoin DNS snapshot.debian.org : rc 0
+     témoin TCP snapshot.debian.org:80 (10 s) : rc 124 
+     sbuild : rc 0 en 274 s
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+     (code de l'exec : 0)
+pod s3-build-2 supprimé
+journal de sbuild : 1564 lignes, resultats/s3-build-2-sbuild.log

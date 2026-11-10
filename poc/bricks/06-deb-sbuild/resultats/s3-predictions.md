@@ -224,3 +224,39 @@ La logique de découpage a été essayée sur l'hôte seul, avec des morceaux de
 
 R2 à R10, R12 et R13 sont inchangées. **R11 est précisée** : la limite de 5 min par build exclut les copies, que mesure E2.
 
+## Résultat des builds et de la comparaison (10/11/2026, 18:11:00 à 18:23:43 UTC)
+
+**Builds, troisième passage**
+- Accord : « Oui, lance builds », à 18:10:54 UTC (transcription).
+- De 18:11:00 à 18:23:23 UTC, lancés sous bash, code **0**.
+- Journaux : [`s3-builds.log`](s3-builds.log), [`s3-build-1-sbuild.log`](s3-build-1-sbuild.log), [`s3-build-2-sbuild.log`](s3-build-2-sbuild.log). `.buildinfo` : [build 1](s3-build-1.buildinfo), [build 2](s3-build-2.buildinfo).
+
+**Comparaison** : sur l'hôte seul, à 18:23:43 UTC, code **0**, aucun écart. Journal : [`s3-comparaison.log`](s3-comparaison.log).
+
+| # | Résultat |
+|---|---|
+| E1 | **Tenue.** Toutes les copies passent sous Kata, morceau par morceau : chroot en 8 morceaux, archive de la fermeture en 3, le reste en 1. Tailles cumulées et sha256 conformes, dans les deux pods |
+| E2 | **Tenue, d'après les heures relevées.** L'étape commence à 18:11:00 UTC. L'exec de build du pod 1 tournait depuis 124 s à 18:14:29 UTC, donc depuis environ 18:12:25. Démarrage du pod et copies ont pris moins de 90 s |
+| R2 | **Tenue.** Dans chaque pod : chroot `e0b1f37c…`, fermeture revérifiée (rc 0, 162 fichiers), sources conformes |
+| R3 | **Tenue, code 124 compris.** DNS rc 0 ; TCP vers `snapshot.debian.org:80` rc 124 (délai de 10 s), dans les deux pods |
+| R4 | **Tenue.** sbuild rc 0 sur les deux builds, en 272 s et 274 s |
+| R5 | **Tenue.** Aucune ligne apt Get, Hit, Ign ou Err en http ou https. 55 lignes `Get` par build : 51 `file`, 4 `copy` |
+| R6 | **Tenue.** 48 paquets installés par sbuild dans chaque build, identiques à la simulation (nom et version) |
+| R7 | **Tenue.** Les deux deb sont identiques |
+| R8 | **Tenue.** Le deb est `0b489d43…`, celui de s1b et d'OBS |
+| R9 | **Tenue.** Installed-Build-Depends des deux `.buildinfo` identique à celui de S2 (s1b) |
+| R10 | **Tenue.** Seul `Build-Date` diffère, entre les deux builds comme entre s1b et le build 1 |
+| R11 | **Tenue.** Chaque build dure moins de 5 min hors copies (272 et 274 s). Package-Time de 262 et 264 s, contre 69 s en s1b, où les dépendances étaient préinstallées. Le tmpfs a suffi |
+| R12 | **Tenue.** S3 est passé de la préparation (16:36 UTC) aux builds réussis (18:23 UTC) en moins d'une demi-journée, incidents de copie compris |
+| R13 | **Tenue.** Une ligne `Finished running` pour chacune des deux commandes de neutralisation, dans chaque journal |
+
+**Jalon S3 tenu.**
+- Deux builds sans accès à l'instantané, depuis la fermeture restaurée par digest, donnent le même deb, octet pour octet : `0b489d43…`.
+- C'est aussi le deb d'OBS et de s1b.
+
+**Limites, telles qu'écrites avant le lancement**
+- Le chemin de build est le même (`/build/reproducible-path`), et les deux pods sont sur le même nœud.
+- La coupure du réseau par sbuild pendant la compilation n'est pas testée : c'est S5.
+
+L'incident de copie reste ouvert. Le propriétaire a demandé « il faut trouver ce qu'il se passe » (18:21:02 UTC) : un diagnostic est préparé à part.
+

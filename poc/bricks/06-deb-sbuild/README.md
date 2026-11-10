@@ -289,3 +289,17 @@ Sonde lancée de 18:02 à 18:06 UTC, sur l'accord « Oui, lance la sonde ». Cod
 
 **Builds de S3** : toujours non lancés. La voie de transfert est à décider.
 
+## Additif du 10/11/2026, 18:24 UTC : S3 tenu
+
+Builds lancés de 18:11:00 à 18:23:23 UTC, sur l'accord « Oui, lance builds », copie par morceaux de 64 Mio. Code 0. Comparaison sur l'hôte : code 0, aucun écart. Détail : [prédictions et résultats](resultats/s3-predictions.md).
+
+**Deux builds par sbuild, en pods Kata privilégiés sans accès à l'instantané, depuis la fermeture de S2 restaurée par digest : même deb, `0b489d43…`, octet pour octet.** C'est aussi celui d'OBS et de s1b.
+- Les 48 paquets installés viennent tous de la fermeture. Aucune requête http, et les sources de l'instantané sont neutralisées dans le chroot.
+- Le test TCP vers l'instantané échoue (code 124) dans les deux pods.
+- Installed-Build-Depends est identique à celui de s1b. Seul `Build-Date` diffère entre les `.buildinfo`.
+- sbuild tourne en 272 et 274 s.
+
+**Limites** : même chemin de build (`/build/reproducible-path`), même nœud. La coupure du réseau par sbuild est laissée à S5.
+
+**Reste** : S4 (Tekton, Chains, deb dans Zot) et S5. L'incident de copie vers un pod Kata est à diagnostiquer, à la demande du propriétaire.
+

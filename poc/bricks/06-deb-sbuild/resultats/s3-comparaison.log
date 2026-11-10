@@ -1,0 +1,26 @@
+# s3.sh comparaison, 2026-11-10T18:23:43Z
+deb du build 1 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+deb du build 2 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   deb identiques sur les deux builds : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+deb égal à celui de s1b et d'OBS (0b489d43…)
+OK   Installed-Build-Depends du build 1 identique à celui de S2 (s1b)
+OK   Installed-Build-Depends du build 2 identique à celui de S2 (s1b)
+champs différents entre build 1 et build 2 : Build-Date
+champs différents entre S2 (s1b) et build 1 : Build-Date
+## journal du build 1
+lignes Get : 55 ; méthodes : copy 4 file 51
+OK   lignes apt Get, Hit, Ign ou Err en http ou https : 0
+OK   neutralisation : sources.list vidé : 1
+OK   neutralisation : listes de l'instantané retirées : 1
+paquets installés par sbuild (hors paquet factice) : 48
+OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
+Build-Space: 102336 Build-Time: 19 Package-Time: 262 Status: successful
+## journal du build 2
+lignes Get : 55 ; méthodes : copy 4 file 51
+OK   lignes apt Get, Hit, Ign ou Err en http ou https : 0
+OK   neutralisation : sources.list vidé : 1
+OK   neutralisation : listes de l'instantané retirées : 1
+paquets installés par sbuild (hors paquet factice) : 48
+OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
+Build-Space: 102336 Build-Time: 20 Package-Time: 264 Status: successful
+écarts : 0

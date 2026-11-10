@@ -202,3 +202,6 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 - **Kata 4.3.1** (privilégié) : jusqu'à 64 Mio, cela passe (7,2 s, environ 9 Mo/s). À 512 Mio, le pod reçoit tout le fichier, mais l'exec ne se termine pas en 120 s, en WebSocket comme en SPDY.
 
 La cause n'est pas diagnostiquée. **Conséquence** : sous Kata, un gros fichier ne doit pas passer par l'entrée standard de `kubectl exec`. Par l'image (containerd), une couche de 349 Mo compressés a été tirée sans problème en S1. Le chemin de Tekton n'est pas concerné, car il ne passe pas par `exec`.
+
+**Additif du 10/11/2026, 18:24 UTC : sbuild sous Kata, S3 de la brique 06 tenu** ([résultats](../../poc/bricks/06-deb-sbuild/resultats/s3-predictions.md)). Deux builds par `sbuild --chroot-mode=unshare` en pods Kata privilégiés sans label, depuis la fermeture restaurée, donnent le même deb octet pour octet, en 272 et 274 s. Dans ces pods, une connexion TCP vers une adresse publique échoue (code 124 au délai de 10 s), ce qui confirme la règle `builds-sans-internet`. Rien de nouveau sur l'isolation au-delà du transfert par `kubectl exec`, consigné plus haut.
+

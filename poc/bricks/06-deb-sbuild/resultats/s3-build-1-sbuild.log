@@ -1,0 +1,1564 @@
+sbuild (Debian sbuild) 0.89.3+deb13u4 (28 December 2025) on s3-build-1
+
++==============================================================================+
+| sample-app 1.0.0-1 (amd64)                   Tue, 10 Nov 2026 18:12:38 +0000 |
++==============================================================================+
+
+Package: sample-app
+Version: 1.0.0-1
+Source Version: 1.0.0-1
+Distribution: trixie
+Machine Architecture: amd64
+Host Architecture: amd64
+Build Architecture: amd64
+Build Type: binary
+
+I: No tarballs found in /w/home/.cache/sbuild
+I: Unpacking /w/chroot.tar to /w/tmp.sbuild.3G193YaKpA...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up the chroot...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Creating chroot session...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+I: Setting up log color...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Chroot Setup Commands                        Tue, 10 Nov 2026 18:12:49 +0000 |
++------------------------------------------------------------------------------+
+
+
+truncate -s 0 /etc/apt/sources.list
+-----------------------------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+I: Finished running 'truncate -s 0 /etc/apt/sources.list'.
+
+rm -f /var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie_InRelease /var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie_main_binary-amd64_Packages
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+I: Finished running 'rm -f /var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie_InRelease /var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie_main_binary-amd64_Packages'.
+
+Finished processing commands.
+--------------------------------------------------------------------------------
+I: Setting up apt archive...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmd0_1.1.0-2+b1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/autoconf_2.72-3.1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libdebhelper-perl_13.24.2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/golang-go_1.24~2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/bsdutils_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/base-passwd_3.6.7_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/patch_2.8-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/binutils_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/debhelper_13.24.2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcc1-0_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/nodejs_20.19.2+dfsg-1+deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/perl_5.40.1-6+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/bash_5.2.37-2+b10_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/binutils-x86-64-linux-gnu_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gcc-x86-64-linux-gnu_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpipeline1_1.5.8-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/autotools-dev_20240727.1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcap-ng0_0.8.5-4+b1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gettext-base_0.23.1-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libelf1t64_0.192-4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/sed_4.9-2+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libc6-dev_2.41-12+deb13u4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libattr1_2.5.2-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libudev1_257.13-1~deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/rpcsvc-proto_1.4.3-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/sysvinit-utils_3.14-4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libbinutils_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/perl-modules-5.40_5.40.1-6+deb13u1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/openssl-provider-legacy_3.5.7-1~deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/intltool-debian_0.35.0+20060710.6_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/liblzma5_5.8.1-1+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/init-system-helpers_1.69~deb13u1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/golang-1.24-src_1.24.4-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/g++-14_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libuv1t64_1.50.0-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/file_5.46-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libnode115_20.19.2+dfsg-1+deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/binutils-common_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/po-debconf_1.0.21+nmu1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgdbm-compat4t64_1.24-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/util-linux_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/coreutils_9.7-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpam-runtime_1.7.0-5_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-corepack_0.24.0-5_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/groff-base_1.23.0-9_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libbz2-1.0_1.0.8-6_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libaudit-common_4.0.2-2+deb13u1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgmp10_6.3.0+dfsg-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/xz-utils_5.8.1-1+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dpkg-dev_1.22.22_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libctf0_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgprofng0_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libhwasan0_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-xtend_4.0.2-3_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcrypt1_4.4.38-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpam-modules_1.7.0-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libjansson4_2.14-2+b3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmpc3_1.3.1-1+b3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libstdc++6_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmagic-mgc_5.46-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libatomic1_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libisl23_0.27-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/base-files_13.8+deb13u7_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/autopoint_0.23.1-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/hostname_3.25_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/man-db_2.13.1-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/diffutils_3.10-4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dh-autoreconf_20_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/cpp_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/cpp-14_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libaudit1_4.0.2-2+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libc6_2.41-12+deb13u4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/automake_1.17-4_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-brace-expansion_2.0.1+~1.1.0-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libicu76_76.1-4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-acorn_8.8.1+ds+~cs25.17.7-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libstdc++-14-dev_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgdbm6t64_1.24-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libquadmath0_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gcc-14-base_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libubsan1_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/g++_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmpfr6_4.2.2-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcares2_1.34.5-1+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dwz_0.15-1+b1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgcc-14-dev_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/golang-src_1.24~2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libc-bin_2.41-12+deb13u4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/debconf_1.5.91_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/grep_3.11-4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libdebconfclient0_0.280_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libunistring5_1.3-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libblkid1_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/ncurses-bin_6.5+20250216-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/tar_1.35+dfsg-3.1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libdpkg-perl_1.22.22_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libdb5.3t64_5.3.28+dfsg2-9_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-cjs-module-lexer_1.2.3+dfsg-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libperl5.40_5.40.1-6+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/liblsan0_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/ncurses-base_6.5+20250216-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/debianutils_5.23.2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libselinux1_3.8.1-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/golang-1.24-go_1.24.4-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/cpp-x86-64-linux-gnu_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/bzip2_1.0.8-6_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-undici_7.3.0+dfsg1+~cs24.12.11-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libsmartcols1_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/m4_1.4.19-8_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libsqlite3-0_3.46.1-7+deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libbrotli1_1.1.0-2+b7_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmount1_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/findutils_4.10.0-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libuuid1_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpam-modules-bin_1.7.0-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gettext_0.23.1-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libitm1_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dpkg_1.22.22_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/linux-libc-dev_6.12.107-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcap2_2.75-10+deb13u1+b3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gcc-14_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/sensible-utils_0.0.25_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libuchardet0_0.0.8-1+b2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/perl-base_5.40.1-6+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgomp1_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-minimatch_9.0.3-6_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/make_4.4.1-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libarchive-zip-perl_1.68-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libzstd1_1.5.7+dfsg-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/liblastlog2-2_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libgcc-s1_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libsystemd0_257.13-1~deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libtsan2_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libctf-nobfd0_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libmagic1t64_5.46-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gzip_1.13-1+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/mawk_1.3.4.20250131-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libtool_2.5.4-4_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libtinfo6_6.5+20250216-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dh-strip-nondeterminism_1.14.1-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/node-balanced-match_2.0.0-1_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libcrypt-dev_4.4.38-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libacl1_2.3.2-2+b1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/dash_0.5.12-12_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libseccomp2_2.6.0-2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/build-essential_12.12_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libfile-stripnondeterminism-perl_1.14.1-2_all.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/zlib1g_1.3.dfsg+really1.3.1-1+b1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libc-dev-bin_2.41-12+deb13u4_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpcre2-8-0_10.46-1~deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/gcc_14.2.0-1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libssl3t64_3.5.7-1~deb13u2_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libsframe1_2.44-3_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libpam0g_1.7.0-5_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/bsdextrautils_2.41.5-0+deb13u1_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Copying /w/fermeture/libasan8_14.2.0-19_amd64.deb to /sbuild-unshare-dummy-location...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Fetch source files                           Tue, 10 Nov 2026 18:16:01 +0000 |
++------------------------------------------------------------------------------+
+
+
+Local sources
+-------------
+
+/w/src/sample-app_1.0.0-1.dsc exists in /w/src; copying to chroot
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Install package build dependencies           Tue, 10 Nov 2026 18:16:06 +0000 |
++------------------------------------------------------------------------------+
+
+
+Setup apt archive
+-----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Merged Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+Filtered Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs, build-essential
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-Gwafnx/apt_archive/sbuild-build-depends-main-dummy.deb'.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Ign:1 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ InRelease
+Get:2 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Release [609 B]
+Ign:3 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Release.gpg
+Get:4 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Sources [632 B]
+Get:5 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Packages [671 B]
+Fetched 1912 B in 0s (0 B/s)
+Reading package lists...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Ign:1 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ InRelease
+Get:2 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release [612 B]
+Get:2 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release [612 B]
+Ign:3 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release.gpg
+Get:4 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Packages [174 kB]
+Reading package lists...
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+
+Install main build dependencies (apt-based resolver)
+----------------------------------------------------
+
+Installing build dependencies
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  autoconf automake autopoint autotools-dev bsdextrautils debhelper
+  dh-autoreconf dh-strip-nondeterminism dwz file gettext gettext-base
+  golang-1.24-go golang-1.24-src golang-go golang-src groff-base
+  intltool-debian libarchive-zip-perl libbrotli1 libcares2 libdebhelper-perl
+  libelf1t64 libfile-stripnondeterminism-perl libicu76 libmagic-mgc
+  libmagic1t64 libnghttp2-14 libnode115 libpipeline1 libtool libuchardet0
+  libunistring5 libuv1t64 libxml2 m4 man-db node-acorn node-balanced-match
+  node-brace-expansion node-cjs-module-lexer node-corepack node-minimatch
+  node-undici node-xtend nodejs po-debconf sensible-utils
+Suggested packages:
+  autoconf-archive gnu-standards autoconf-doc dh-make gettext-doc
+  libasprintf-dev libgettextpo-dev gnulib-l10n bzr | brz ca-certificates git
+  mercurial subversion groff libtool-doc gfortran | fortran95-compiler gcj-jdk
+  m4-doc apparmor less www-browser npm libmail-box-perl
+Recommended packages:
+  curl | wget | lynx pkgconf libarchive-cpio-perl libltdl-dev ca-certificates
+  nodejs-doc libmail-sendmail-perl
+The following NEW packages will be installed:
+  autoconf automake autopoint autotools-dev bsdextrautils debhelper
+  dh-autoreconf dh-strip-nondeterminism dwz file gettext gettext-base
+  golang-1.24-go golang-1.24-src golang-go golang-src groff-base
+  intltool-debian libarchive-zip-perl libbrotli1 libcares2 libdebhelper-perl
+  libelf1t64 libfile-stripnondeterminism-perl libicu76 libmagic-mgc
+  libmagic1t64 libnghttp2-14 libnode115 libpipeline1 libtool libuchardet0
+  libunistring5 libuv1t64 libxml2 m4 man-db node-acorn node-balanced-match
+  node-brace-expansion node-cjs-module-lexer node-corepack node-minimatch
+  node-undici node-xtend nodejs po-debconf sbuild-build-depends-main-dummy
+  sensible-utils
+0 upgraded, 49 newly installed, 0 to remove and 0 not upgraded.
+Need to get 880 B/85.3 MB of archives.
+After this operation, 406 MB of additional disk space will be used.
+Get:1 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ sensible-utils 0.0.25 [25.0 kB]
+Get:2 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [880 B]
+Get:3 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libuchardet0 0.0.8-1+b2 [68.9 kB]
+Get:4 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ groff-base 1.23.0-9 [1187 kB]
+Get:5 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ bsdextrautils 2.41.5-0+deb13u1 [94.8 kB]
+Get:6 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libpipeline1 1.5.8-1 [42.0 kB]
+Get:7 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ man-db 2.13.1-1 [1469 kB]
+Get:8 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libmagic-mgc 1:5.46-5 [338 kB]
+Get:9 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libmagic1t64 1:5.46-5 [109 kB]
+Get:10 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ file 1:5.46-5 [43.6 kB]
+Get:11 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ gettext-base 0.23.1-2 [243 kB]
+Get:12 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ m4 1.4.19-8 [294 kB]
+Get:13 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autoconf 2.72-3.1 [494 kB]
+Get:14 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autotools-dev 20240727.1 [60.2 kB]
+Get:15 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ automake 1:1.17-4 [862 kB]
+Get:16 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autopoint 0.23.1-2 [770 kB]
+Get:17 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libdebhelper-perl 13.24.2 [90.9 kB]
+Get:18 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libtool 2.5.4-4 [539 kB]
+Get:19 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dh-autoreconf 20 [17.1 kB]
+Get:20 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libarchive-zip-perl 1.68-1 [104 kB]
+Get:21 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libfile-stripnondeterminism-perl 1.14.1-2 [19.7 kB]
+Get:22 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dh-strip-nondeterminism 1.14.1-2 [8620 B]
+Get:23 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libelf1t64 0.192-4 [189 kB]
+Get:24 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dwz 0.15-1+b1 [110 kB]
+Get:25 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libunistring5 1.3-2 [477 kB]
+Get:26 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libxml2 2.12.7+dfsg+really2.9.14-2.1+deb13u3 [700 kB]
+Get:27 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ gettext 0.23.1-2 [1680 kB]
+Get:28 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ intltool-debian 0.35.0+20060710.6 [22.9 kB]
+Get:29 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ po-debconf 1.0.21+nmu1 [248 kB]
+Get:30 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ debhelper 13.24.2 [919 kB]
+Get:31 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-1.24-src 1.24.4-1 [21.2 MB]
+Get:32 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-1.24-go 1.24.4-1 [28.7 MB]
+Get:33 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-src 2:1.24~2 [5136 B]
+Get:34 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-go 2:1.24~2 [44.3 kB]
+Get:35 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libbrotli1 1.1.0-2+b7 [307 kB]
+Get:36 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libcares2 1.34.5-1+deb13u1 [98.3 kB]
+Get:37 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libicu76 76.1-4 [9722 kB]
+Get:38 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libnghttp2-14 1.64.0-1.1+deb13u1 [76.2 kB]
+Get:39 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libuv1t64 1.50.0-2 [154 kB]
+Get:40 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-xtend 4.0.2-3 [3932 B]
+Get:41 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-corepack 0.24.0-5 [712 kB]
+Get:42 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ nodejs 20.19.2+dfsg-1+deb13u2 [353 kB]
+Get:43 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-acorn 8.8.1+ds+~cs25.17.7-2 [128 kB]
+Get:44 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-cjs-module-lexer 1.2.3+dfsg-1 [30.6 kB]
+Get:45 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-balanced-match 2.0.0-1 [4872 B]
+Get:46 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-brace-expansion 2.0.1+~1.1.0-2 [8012 B]
+Get:47 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-minimatch 9.0.3-6 [76.8 kB]
+Get:48 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-undici 7.3.0+dfsg1+~cs24.12.11-1 [333 kB]
+Get:49 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libnode115 20.19.2+dfsg-1+deb13u2 [12.1 MB]
+Preconfiguring packages ...
+Fetched 880 B in 0s (2246 B/s)
+Selecting previously unselected package sensible-utils.
+(Reading database ... 11806 files and directories currently installed.)
+Preparing to unpack .../00-sensible-utils_0.0.25_all.deb ...
+Unpacking sensible-utils (0.0.25) ...
+Selecting previously unselected package libuchardet0:amd64.
+Preparing to unpack .../01-libuchardet0_0.0.8-1+b2_amd64.deb ...
+Unpacking libuchardet0:amd64 (0.0.8-1+b2) ...
+Selecting previously unselected package groff-base.
+Preparing to unpack .../02-groff-base_1.23.0-9_amd64.deb ...
+Unpacking groff-base (1.23.0-9) ...
+Selecting previously unselected package bsdextrautils.
+Preparing to unpack .../03-bsdextrautils_2.41.5-0+deb13u1_amd64.deb ...
+Unpacking bsdextrautils (2.41.5-0+deb13u1) ...
+Selecting previously unselected package libpipeline1:amd64.
+Preparing to unpack .../04-libpipeline1_1.5.8-1_amd64.deb ...
+Unpacking libpipeline1:amd64 (1.5.8-1) ...
+Selecting previously unselected package man-db.
+Preparing to unpack .../05-man-db_2.13.1-1_amd64.deb ...
+Unpacking man-db (2.13.1-1) ...
+Selecting previously unselected package libmagic-mgc.
+Preparing to unpack .../06-libmagic-mgc_5.46-5_amd64.deb ...
+Unpacking libmagic-mgc (1:5.46-5) ...
+Selecting previously unselected package libmagic1t64:amd64.
+Preparing to unpack .../07-libmagic1t64_5.46-5_amd64.deb ...
+Unpacking libmagic1t64:amd64 (1:5.46-5) ...
+Selecting previously unselected package file.
+Preparing to unpack .../08-file_5.46-5_amd64.deb ...
+Unpacking file (1:5.46-5) ...
+Selecting previously unselected package gettext-base.
+Preparing to unpack .../09-gettext-base_0.23.1-2_amd64.deb ...
+Unpacking gettext-base (0.23.1-2) ...
+Selecting previously unselected package m4.
+Preparing to unpack .../10-m4_1.4.19-8_amd64.deb ...
+Unpacking m4 (1.4.19-8) ...
+Selecting previously unselected package autoconf.
+Preparing to unpack .../11-autoconf_2.72-3.1_all.deb ...
+Unpacking autoconf (2.72-3.1) ...
+Selecting previously unselected package autotools-dev.
+Preparing to unpack .../12-autotools-dev_20240727.1_all.deb ...
+Unpacking autotools-dev (20240727.1) ...
+Selecting previously unselected package automake.
+Preparing to unpack .../13-automake_1.17-4_all.deb ...
+Unpacking automake (1:1.17-4) ...
+Selecting previously unselected package autopoint.
+Preparing to unpack .../14-autopoint_0.23.1-2_all.deb ...
+Unpacking autopoint (0.23.1-2) ...
+Selecting previously unselected package libdebhelper-perl.
+Preparing to unpack .../15-libdebhelper-perl_13.24.2_all.deb ...
+Unpacking libdebhelper-perl (13.24.2) ...
+Selecting previously unselected package libtool.
+Preparing to unpack .../16-libtool_2.5.4-4_all.deb ...
+Unpacking libtool (2.5.4-4) ...
+Selecting previously unselected package dh-autoreconf.
+Preparing to unpack .../17-dh-autoreconf_20_all.deb ...
+Unpacking dh-autoreconf (20) ...
+Selecting previously unselected package libarchive-zip-perl.
+Preparing to unpack .../18-libarchive-zip-perl_1.68-1_all.deb ...
+Unpacking libarchive-zip-perl (1.68-1) ...
+Selecting previously unselected package libfile-stripnondeterminism-perl.
+Preparing to unpack .../19-libfile-stripnondeterminism-perl_1.14.1-2_all.deb ...
+Unpacking libfile-stripnondeterminism-perl (1.14.1-2) ...
+Selecting previously unselected package dh-strip-nondeterminism.
+Preparing to unpack .../20-dh-strip-nondeterminism_1.14.1-2_all.deb ...
+Unpacking dh-strip-nondeterminism (1.14.1-2) ...
+Selecting previously unselected package libelf1t64:amd64.
+Preparing to unpack .../21-libelf1t64_0.192-4_amd64.deb ...
+Unpacking libelf1t64:amd64 (0.192-4) ...
+Selecting previously unselected package dwz.
+Preparing to unpack .../22-dwz_0.15-1+b1_amd64.deb ...
+Unpacking dwz (0.15-1+b1) ...
+Selecting previously unselected package libunistring5:amd64.
+Preparing to unpack .../23-libunistring5_1.3-2_amd64.deb ...
+Unpacking libunistring5:amd64 (1.3-2) ...
+Selecting previously unselected package libxml2:amd64.
+Preparing to unpack .../24-libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3_amd64.deb ...
+Unpacking libxml2:amd64 (2.12.7+dfsg+really2.9.14-2.1+deb13u3) ...
+Selecting previously unselected package gettext.
+Preparing to unpack .../25-gettext_0.23.1-2_amd64.deb ...
+Unpacking gettext (0.23.1-2) ...
+Selecting previously unselected package intltool-debian.
+Preparing to unpack .../26-intltool-debian_0.35.0+20060710.6_all.deb ...
+Unpacking intltool-debian (0.35.0+20060710.6) ...
+Selecting previously unselected package po-debconf.
+Preparing to unpack .../27-po-debconf_1.0.21+nmu1_all.deb ...
+Unpacking po-debconf (1.0.21+nmu1) ...
+Selecting previously unselected package debhelper.
+Preparing to unpack .../28-debhelper_13.24.2_all.deb ...
+Unpacking debhelper (13.24.2) ...
+Selecting previously unselected package golang-1.24-src.
+Preparing to unpack .../29-golang-1.24-src_1.24.4-1_all.deb ...
+Unpacking golang-1.24-src (1.24.4-1) ...
+Selecting previously unselected package golang-1.24-go.
+Preparing to unpack .../30-golang-1.24-go_1.24.4-1_amd64.deb ...
+Unpacking golang-1.24-go (1.24.4-1) ...
+Selecting previously unselected package golang-src.
+Preparing to unpack .../31-golang-src_1.24~2_all.deb ...
+Unpacking golang-src (2:1.24~2) ...
+Selecting previously unselected package golang-go:amd64.
+Preparing to unpack .../32-golang-go_1.24~2_amd64.deb ...
+Unpacking golang-go:amd64 (2:1.24~2) ...
+Selecting previously unselected package libbrotli1:amd64.
+Preparing to unpack .../33-libbrotli1_1.1.0-2+b7_amd64.deb ...
+Unpacking libbrotli1:amd64 (1.1.0-2+b7) ...
+Selecting previously unselected package libcares2:amd64.
+Preparing to unpack .../34-libcares2_1.34.5-1+deb13u1_amd64.deb ...
+Unpacking libcares2:amd64 (1.34.5-1+deb13u1) ...
+Selecting previously unselected package libicu76:amd64.
+Preparing to unpack .../35-libicu76_76.1-4_amd64.deb ...
+Unpacking libicu76:amd64 (76.1-4) ...
+Selecting previously unselected package libnghttp2-14:amd64.
+Preparing to unpack .../36-libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb ...
+Unpacking libnghttp2-14:amd64 (1.64.0-1.1+deb13u1) ...
+Selecting previously unselected package libuv1t64:amd64.
+Preparing to unpack .../37-libuv1t64_1.50.0-2_amd64.deb ...
+Unpacking libuv1t64:amd64 (1.50.0-2) ...
+Selecting previously unselected package node-xtend.
+Preparing to unpack .../38-node-xtend_4.0.2-3_all.deb ...
+Unpacking node-xtend (4.0.2-3) ...
+Selecting previously unselected package node-corepack.
+Preparing to unpack .../39-node-corepack_0.24.0-5_all.deb ...
+Unpacking node-corepack (0.24.0-5) ...
+Selecting previously unselected package nodejs.
+Preparing to unpack .../40-nodejs_20.19.2+dfsg-1+deb13u2_amd64.deb ...
+Unpacking nodejs (20.19.2+dfsg-1+deb13u2) ...
+Selecting previously unselected package node-acorn.
+Preparing to unpack .../41-node-acorn_8.8.1+ds+~cs25.17.7-2_all.deb ...
+Unpacking node-acorn (8.8.1+ds+~cs25.17.7-2) ...
+Selecting previously unselected package node-cjs-module-lexer.
+Preparing to unpack .../42-node-cjs-module-lexer_1.2.3+dfsg-1_all.deb ...
+Unpacking node-cjs-module-lexer (1.2.3+dfsg-1) ...
+Selecting previously unselected package node-balanced-match.
+Preparing to unpack .../43-node-balanced-match_2.0.0-1_all.deb ...
+Unpacking node-balanced-match (2.0.0-1) ...
+Selecting previously unselected package node-brace-expansion.
+Preparing to unpack .../44-node-brace-expansion_2.0.1+~1.1.0-2_all.deb ...
+Unpacking node-brace-expansion (2.0.1+~1.1.0-2) ...
+Selecting previously unselected package node-minimatch.
+Preparing to unpack .../45-node-minimatch_9.0.3-6_all.deb ...
+Unpacking node-minimatch (9.0.3-6) ...
+Selecting previously unselected package node-undici.
+Preparing to unpack .../46-node-undici_7.3.0+dfsg1+~cs24.12.11-1_all.deb ...
+Unpacking node-undici (7.3.0+dfsg1+~cs24.12.11-1) ...
+Selecting previously unselected package libnode115:amd64.
+Preparing to unpack .../47-libnode115_20.19.2+dfsg-1+deb13u2_amd64.deb ...
+Unpacking libnode115:amd64 (20.19.2+dfsg-1+deb13u2) ...
+Selecting previously unselected package sbuild-build-depends-main-dummy.
+Preparing to unpack .../48-sbuild-build-depends-main-dummy_0.invalid.0_amd64.deb ...
+Unpacking sbuild-build-depends-main-dummy (0.invalid.0) ...
+Setting up golang-1.24-src (1.24.4-1) ...
+Setting up libpipeline1:amd64 (1.5.8-1) ...
+Setting up bsdextrautils (2.41.5-0+deb13u1) ...
+Setting up libmagic-mgc (1:5.46-5) ...
+Setting up libarchive-zip-perl (1.68-1) ...
+Setting up libdebhelper-perl (13.24.2) ...
+Setting up libbrotli1:amd64 (1.1.0-2+b7) ...
+Setting up libuv1t64:amd64 (1.50.0-2) ...
+Setting up libmagic1t64:amd64 (1:5.46-5) ...
+Setting up libnghttp2-14:amd64 (1.64.0-1.1+deb13u1) ...
+Setting up gettext-base (0.23.1-2) ...
+Setting up m4 (1.4.19-8) ...
+Setting up node-cjs-module-lexer (1.2.3+dfsg-1) ...
+Setting up file (1:5.46-5) ...
+Setting up libelf1t64:amd64 (0.192-4) ...
+Setting up autotools-dev (20240727.1) ...
+Setting up node-balanced-match (2.0.0-1) ...
+Setting up node-brace-expansion (2.0.1+~1.1.0-2) ...
+Setting up libunistring5:amd64 (1.3-2) ...
+Setting up libcares2:amd64 (1.34.5-1+deb13u1) ...
+Setting up autopoint (0.23.1-2) ...
+Setting up golang-1.24-go (1.24.4-1) ...
+Setting up autoconf (2.72-3.1) ...
+Setting up node-undici (7.3.0+dfsg1+~cs24.12.11-1) ...
+Setting up dwz (0.15-1+b1) ...
+Setting up sensible-utils (0.0.25) ...
+Setting up libuchardet0:amd64 (0.0.8-1+b2) ...
+Setting up libicu76:amd64 (76.1-4) ...
+Setting up node-minimatch (9.0.3-6) ...
+Setting up node-xtend (4.0.2-3) ...
+Setting up golang-src (2:1.24~2) ...
+Setting up libxml2:amd64 (2.12.7+dfsg+really2.9.14-2.1+deb13u3) ...
+Setting up automake (1:1.17-4) ...
+update-alternatives: using /usr/bin/automake-1.17 to provide /usr/bin/automake (automake) in auto mode
+Setting up libfile-stripnondeterminism-perl (1.14.1-2) ...
+Setting up gettext (0.23.1-2) ...
+Setting up libtool (2.5.4-4) ...
+Setting up golang-go:amd64 (2:1.24~2) ...
+Setting up intltool-debian (0.35.0+20060710.6) ...
+Setting up dh-autoreconf (20) ...
+Setting up dh-strip-nondeterminism (1.14.1-2) ...
+Setting up groff-base (1.23.0-9) ...
+Setting up po-debconf (1.0.21+nmu1) ...
+Setting up man-db (2.13.1-1) ...
+Not building database; man-db/auto-update is not 'true'.
+Setting up debhelper (13.24.2) ...
+Setting up node-acorn (8.8.1+ds+~cs25.17.7-2) ...
+Setting up node-corepack (0.24.0-5) ...
+Setting up libnode115:amd64 (20.19.2+dfsg-1+deb13u2) ...
+Setting up nodejs (20.19.2+dfsg-1+deb13u2) ...
+update-alternatives: using /usr/bin/nodejs to provide /usr/bin/js (js) in auto mode
+Setting up sbuild-build-depends-main-dummy (0.invalid.0) ...
+Processing triggers for libc-bin (2.41-12+deb13u4) ...
+
++------------------------------------------------------------------------------+
+| Check architectures                          Tue, 10 Nov 2026 18:16:25 +0000 |
++------------------------------------------------------------------------------+
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Arch check ok (amd64 included in amd64)
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Build environment                            Tue, 10 Nov 2026 18:16:37 +0000 |
++------------------------------------------------------------------------------+
+
+Kernel: Linux 6.18.56 #1 SMP Fri Oct 16 18:41:32 UTC 2026 amd64 (x86_64)
+Toolchain package versions: binutils_2.44-3 dpkg-dev_1.22.22 g++-14_14.2.0-19 gcc-14_14.2.0-19 libc6-dev_2.41-12+deb13u4 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 linux-libc-dev_6.12.107-1
+Package versions: apt_3.0.3 autoconf_2.72-3.1 automake_1:1.17-4 autopoint_0.23.1-2 autotools-dev_20240727.1 base-files_13.8+deb13u7 base-passwd_3.6.7 bash_5.2.37-2+b10 binutils_2.44-3 binutils-common_2.44-3 binutils-x86-64-linux-gnu_2.44-3 bsdextrautils_2.41.5-0+deb13u1 bsdutils_1:2.41.5-0+deb13u1 build-essential_12.12 bzip2_1.0.8-6 coreutils_9.7-3 cpp_4:14.2.0-1 cpp-14_14.2.0-19 cpp-14-x86-64-linux-gnu_14.2.0-19 cpp-x86-64-linux-gnu_4:14.2.0-1 dash_0.5.12-12 debconf_1.5.91 debhelper_13.24.2 debian-archive-keyring_2025.1 debianutils_5.23.2 dh-autoreconf_20 dh-strip-nondeterminism_1.14.1-2 diffutils_1:3.10-4 dpkg_1.22.22 dpkg-dev_1.22.22 dwz_0.15-1+b1 file_1:5.46-5 findutils_4.10.0-3 g++_4:14.2.0-1 g++-14_14.2.0-19 g++-14-x86-64-linux-gnu_14.2.0-19 g++-x86-64-linux-gnu_4:14.2.0-1 gcc_4:14.2.0-1 gcc-14_14.2.0-19 gcc-14-base_14.2.0-19 gcc-14-x86-64-linux-gnu_14.2.0-19 gcc-x86-64-linux-gnu_4:14.2.0-1 gettext_0.23.1-2 gettext-base_0.23.1-2 golang-1.24-go_1.24.4-1 golang-1.24-src_1.24.4-1 golang-go_2:1.24~2 golang-src_2:1.24~2 grep_3.11-4 groff-base_1.23.0-9 gzip_1.13-1+deb13u1 hostname_3.25 init-system-helpers_1.69~deb13u1 intltool-debian_0.35.0+20060710.6 libacl1_2.3.2-2+b1 libapt-pkg7.0_3.0.3 libarchive-zip-perl_1.68-1 libasan8_14.2.0-19 libatomic1_14.2.0-19 libattr1_1:2.5.2-3 libaudit-common_1:4.0.2-2+deb13u1 libaudit1_1:4.0.2-2+deb13u1 libbinutils_2.44-3 libblkid1_2.41.5-0+deb13u1 libbrotli1_1.1.0-2+b7 libbz2-1.0_1.0.8-6 libc-bin_2.41-12+deb13u4 libc-dev-bin_2.41-12+deb13u4 libc6_2.41-12+deb13u4 libc6-dev_2.41-12+deb13u4 libcap-ng0_0.8.5-4+b1 libcap2_1:2.75-10+deb13u1+b3 libcares2_1.34.5-1+deb13u1 libcc1-0_14.2.0-19 libcrypt-dev_1:4.4.38-1 libcrypt1_1:4.4.38-1 libctf-nobfd0_2.44-3 libctf0_2.44-3 libdb5.3t64_5.3.28+dfsg2-9 libdebconfclient0_0.280 libdebhelper-perl_13.24.2 libdpkg-perl_1.22.22 libelf1t64_0.192-4 libfile-stripnondeterminism-perl_1.14.1-2 libgcc-14-dev_14.2.0-19 libgcc-s1_14.2.0-19 libgdbm-compat4t64_1.24-2 libgdbm6t64_1.24-2 libgmp10_2:6.3.0+dfsg-3 libgomp1_14.2.0-19 libgprofng0_2.44-3 libhogweed6t64_3.10.1-1 libhwasan0_14.2.0-19 libicu76_76.1-4 libisl23_0.27-1 libitm1_14.2.0-19 libjansson4_2.14-2+b3 liblastlog2-2_2.41.5-0+deb13u1 liblsan0_14.2.0-19 liblz4-1_1.10.0-4 liblzma5_5.8.1-1+deb13u1 libmagic-mgc_1:5.46-5 libmagic1t64_1:5.46-5 libmd0_1.1.0-2+b1 libmount1_2.41.5-0+deb13u1 libmpc3_1.3.1-1+b3 libmpfr6_4.2.2-1 libnettle8t64_3.10.1-1 libnghttp2-14_1.64.0-1.1+deb13u1 libnode115_20.19.2+dfsg-1+deb13u2 libpam-modules_1.7.0-5 libpam-modules-bin_1.7.0-5 libpam-runtime_1.7.0-5 libpam0g_1.7.0-5 libpcre2-8-0_10.46-1~deb13u2 libperl5.40_5.40.1-6+deb13u1 libpipeline1_1.5.8-1 libquadmath0_14.2.0-19 libseccomp2_2.6.0-2 libselinux1_3.8.1-1 libsframe1_2.44-3 libsmartcols1_2.41.5-0+deb13u1 libsqlite3-0_3.46.1-7+deb13u2 libssl3t64_3.5.7-1~deb13u2 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 libsystemd0_257.13-1~deb13u1 libtinfo6_6.5+20250216-2 libtool_2.5.4-4 libtsan2_14.2.0-19 libubsan1_14.2.0-19 libuchardet0_0.0.8-1+b2 libudev1_257.13-1~deb13u1 libunistring5_1.3-2 libuuid1_2.41.5-0+deb13u1 libuv1t64_1.50.0-2 libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3 libxxhash0_0.8.3-2 libzstd1_1.5.7+dfsg-1 linux-libc-dev_6.12.107-1 m4_1.4.19-8 make_4.4.1-2 man-db_2.13.1-1 mawk_1.3.4.20250131-1 ncurses-base_6.5+20250216-2 ncurses-bin_6.5+20250216-2 node-acorn_8.8.1+ds+~cs25.17.7-2 node-balanced-match_2.0.0-1 node-brace-expansion_2.0.1+~1.1.0-2 node-cjs-module-lexer_1.2.3+dfsg-1 node-corepack_0.24.0-5 node-minimatch_9.0.3-6 node-undici_7.3.0+dfsg1+~cs24.12.11-1 node-xtend_4.0.2-3 nodejs_20.19.2+dfsg-1+deb13u2 openssl-provider-legacy_3.5.7-1~deb13u2 patch_2.8-2 perl_5.40.1-6+deb13u1 perl-base_5.40.1-6+deb13u1 perl-modules-5.40_5.40.1-6+deb13u1 po-debconf_1.0.21+nmu1 rpcsvc-proto_1.4.3-1 sbuild-build-depends-main-dummy_0.invalid.0 sed_4.9-2+deb13u1 sensible-utils_0.0.25 sqv_1.3.0-3+b2 sysvinit-utils_3.14-4 tar_1.35+dfsg-3.1 util-linux_2.41.5-0+deb13u1 xz-utils_5.8.1-1+deb13u1 zlib1g_1:1.3.dfsg+really1.3.1-1+b1
+
++------------------------------------------------------------------------------+
+| Build                                        Tue, 10 Nov 2026 18:16:37 +0000 |
++------------------------------------------------------------------------------+
+
+
+Unpack source
+-------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Format: 3.0 (quilt)
+Source: sample-app
+Binary: sample-app
+Architecture: amd64
+Version: 1.0.0-1
+Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Homepage: https://github.com/gigi206/supply-chain
+Standards-Version: 4.7.2
+Build-Depends: debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs
+Package-List:
+ sample-app deb web optional arch=amd64
+Checksums-Sha1:
+ bb82fa04323cd37593a7ad7e006e378675a0b9d7 140171 sample-app_1.0.0.orig.tar.gz
+ fad7c06f2a86ee7003be29ce6c9437d0184df98a 2684 sample-app_1.0.0-1.debian.tar.xz
+Checksums-Sha256:
+ 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb 140171 sample-app_1.0.0.orig.tar.gz
+ 863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f 2684 sample-app_1.0.0-1.debian.tar.xz
+Files:
+ 0bc092f45d47735f99c2859d94c64e57 140171 sample-app_1.0.0.orig.tar.gz
+ 4e097315ef31a7004b3c3015ece08684 2684 sample-app_1.0.0-1.debian.tar.xz
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-source: warning: extracting unsigned source package (sample-app_1.0.0-1.dsc)
+dpkg-source: info: extracting sample-app in /build/reproducible-path/sample-app-1.0.0
+dpkg-source: info: unpacking sample-app_1.0.0.orig.tar.gz
+dpkg-source: info: unpacking sample-app_1.0.0-1.debian.tar.xz
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+Check disk space
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Sufficient free space for build
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+User Environment
+----------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+APT_CONFIG=/var/lib/sbuild/apt.conf
+HOME=/sbuild-nonexistent
+LC_ALL=C.UTF-8
+LOGNAME=sbuild
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+SHELL=/bin/sh
+USER=sbuild
+
+dpkg-buildpackage
+-----------------
+
+Command: dpkg-buildpackage --sanitize-env -us -uc -b
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+dpkg-buildpackage: info: source package sample-app
+dpkg-buildpackage: info: source version 1.0.0-1
+dpkg-buildpackage: info: source distribution trixie
+dpkg-buildpackage: info: source changed by Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+ dpkg-source --before-build .
+dpkg-buildpackage: info: host architecture amd64
+ debian/rules clean
+dh clean
+   debian/rules override_dh_auto_clean
+make[1]: Entering directory '/build/reproducible-path/sample-app-1.0.0'
+rm -rf web/dist sample-app .gocache .gopath
+make[1]: Leaving directory '/build/reproducible-path/sample-app-1.0.0'
+   dh_clean
+ debian/rules binary
+dh binary
+   dh_update_autotools_config
+   dh_autoreconf
+   debian/rules override_dh_auto_build
+make[1]: Entering directory '/build/reproducible-path/sample-app-1.0.0'
+cd web && node build.mjs
+go build -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o sample-app .
+make[1]: Leaving directory '/build/reproducible-path/sample-app-1.0.0'
+   create-stamp debian/debhelper-build-stamp
+   dh_prep
+   debian/rules override_dh_auto_install
+make[1]: Entering directory '/build/reproducible-path/sample-app-1.0.0'
+install -Dm0755 sample-app debian/sample-app/usr/bin/sample-app
+make[1]: Leaving directory '/build/reproducible-path/sample-app-1.0.0'
+   dh_installdocs
+   dh_installchangelogs
+   dh_perl
+   dh_link
+   dh_strip_nondeterminism
+   dh_compress
+   dh_fixperms
+   dh_missing
+   dh_strip -a
+   dh_makeshlibs -a
+   dh_shlibdeps -a
+   dh_installdeb
+   dh_gencontrol
+   dh_md5sums
+   dh_builddeb
+dpkg-deb: building package 'sample-app' in '../sample-app_1.0.0-1_amd64.deb'.
+ dpkg-genbuildinfo --build=binary -O../sample-app_1.0.0-1_amd64.buildinfo
+ dpkg-genchanges --build=binary -O../sample-app_1.0.0-1_amd64.changes
+dpkg-genchanges: info: binary-only upload (no source code included)
+ dpkg-source --after-build .
+dpkg-buildpackage: info: binary-only upload (no source included)
+--------------------------------------------------------------------------------
+Build finished at 2026-11-10T18:17:00Z
+
+Finished
+--------
+
+I: Built successfully
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Changes                                      Tue, 10 Nov 2026 18:17:02 +0000 |
++------------------------------------------------------------------------------+
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
+sample-app_1.0.0-1_amd64.changes:
+---------------------------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Format: 1.8
+Date: Wed, 28 Oct 2026 23:19:26 +0000
+Source: sample-app
+Binary: sample-app
+Architecture: amd64
+Version: 1.0.0-1
+Distribution: trixie
+Urgency: medium
+Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Changed-By: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+Description:
+ sample-app - application de démonstration de la plateforme supply-chain
+Changes:
+ sample-app (1.0.0-1) trixie; urgency=medium
+ .
+   * Paquet du banc A2 (OBS) et des briques 05 et 06.
+Checksums-Sha1:
+ 799f4b35047410e7a4a4a590a40d2197923ca95c 5415 sample-app_1.0.0-1_amd64.buildinfo
+ 3b7226d9e53314d09fc6f626bbd25f0e24f920c9 1952080 sample-app_1.0.0-1_amd64.deb
+Checksums-Sha256:
+ ccb924192f7a7b7d4aa4a25039792fb328d9260aa7a0f5335db9606e56aaf4bb 5415 sample-app_1.0.0-1_amd64.buildinfo
+ 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
+Files:
+ 57f5a8187b206a2d8a04d8f5ed26a485 5415 web optional sample-app_1.0.0-1_amd64.buildinfo
+ 7e578a62b1e949fab8445c62eb2b26de 1952080 web optional sample-app_1.0.0-1_amd64.deb
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Buildinfo                                    Tue, 10 Nov 2026 18:17:04 +0000 |
++------------------------------------------------------------------------------+
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Format: 1.0
+Source: sample-app
+Binary: sample-app
+Architecture: amd64
+Version: 1.0.0-1
+Checksums-Md5:
+ 7e578a62b1e949fab8445c62eb2b26de 1952080 sample-app_1.0.0-1_amd64.deb
+Checksums-Sha1:
+ 3b7226d9e53314d09fc6f626bbd25f0e24f920c9 1952080 sample-app_1.0.0-1_amd64.deb
+Checksums-Sha256:
+ 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
+Build-Origin: Debian
+Build-Architecture: amd64
+Build-Date: Tue, 10 Nov 2026 18:16:59 +0000
+Build-Path: /build/reproducible-path/sample-app-1.0.0
+Installed-Build-Depends:
+ autoconf (= 2.72-3.1),
+ automake (= 1:1.17-4),
+ autopoint (= 0.23.1-2),
+ autotools-dev (= 20240727.1),
+ base-files (= 13.8+deb13u7),
+ base-passwd (= 3.6.7),
+ bash (= 5.2.37-2+b10),
+ binutils (= 2.44-3),
+ binutils-common (= 2.44-3),
+ binutils-x86-64-linux-gnu (= 2.44-3),
+ bsdextrautils (= 2.41.5-0+deb13u1),
+ bsdutils (= 1:2.41.5-0+deb13u1),
+ build-essential (= 12.12),
+ bzip2 (= 1.0.8-6),
+ coreutils (= 9.7-3),
+ cpp (= 4:14.2.0-1),
+ cpp-14 (= 14.2.0-19),
+ cpp-14-x86-64-linux-gnu (= 14.2.0-19),
+ cpp-x86-64-linux-gnu (= 4:14.2.0-1),
+ dash (= 0.5.12-12),
+ debconf (= 1.5.91),
+ debhelper (= 13.24.2),
+ debianutils (= 5.23.2),
+ dh-autoreconf (= 20),
+ dh-strip-nondeterminism (= 1.14.1-2),
+ diffutils (= 1:3.10-4),
+ dpkg (= 1.22.22),
+ dpkg-dev (= 1.22.22),
+ dwz (= 0.15-1+b1),
+ file (= 1:5.46-5),
+ findutils (= 4.10.0-3),
+ g++ (= 4:14.2.0-1),
+ g++-14 (= 14.2.0-19),
+ g++-14-x86-64-linux-gnu (= 14.2.0-19),
+ g++-x86-64-linux-gnu (= 4:14.2.0-1),
+ gcc (= 4:14.2.0-1),
+ gcc-14 (= 14.2.0-19),
+ gcc-14-base (= 14.2.0-19),
+ gcc-14-x86-64-linux-gnu (= 14.2.0-19),
+ gcc-x86-64-linux-gnu (= 4:14.2.0-1),
+ gettext (= 0.23.1-2),
+ gettext-base (= 0.23.1-2),
+ golang-1.24-go (= 1.24.4-1),
+ golang-1.24-src (= 1.24.4-1),
+ golang-go (= 2:1.24~2),
+ golang-src (= 2:1.24~2),
+ grep (= 3.11-4),
+ groff-base (= 1.23.0-9),
+ gzip (= 1.13-1+deb13u1),
+ hostname (= 3.25),
+ init-system-helpers (= 1.69~deb13u1),
+ intltool-debian (= 0.35.0+20060710.6),
+ libacl1 (= 2.3.2-2+b1),
+ libarchive-zip-perl (= 1.68-1),
+ libasan8 (= 14.2.0-19),
+ libatomic1 (= 14.2.0-19),
+ libattr1 (= 1:2.5.2-3),
+ libaudit-common (= 1:4.0.2-2+deb13u1),
+ libaudit1 (= 1:4.0.2-2+deb13u1),
+ libbinutils (= 2.44-3),
+ libblkid1 (= 2.41.5-0+deb13u1),
+ libbrotli1 (= 1.1.0-2+b7),
+ libbz2-1.0 (= 1.0.8-6),
+ libc-bin (= 2.41-12+deb13u4),
+ libc-dev-bin (= 2.41-12+deb13u4),
+ libc6 (= 2.41-12+deb13u4),
+ libc6-dev (= 2.41-12+deb13u4),
+ libcap-ng0 (= 0.8.5-4+b1),
+ libcap2 (= 1:2.75-10+deb13u1+b3),
+ libcares2 (= 1.34.5-1+deb13u1),
+ libcc1-0 (= 14.2.0-19),
+ libcrypt-dev (= 1:4.4.38-1),
+ libcrypt1 (= 1:4.4.38-1),
+ libctf-nobfd0 (= 2.44-3),
+ libctf0 (= 2.44-3),
+ libdb5.3t64 (= 5.3.28+dfsg2-9),
+ libdebconfclient0 (= 0.280),
+ libdebhelper-perl (= 13.24.2),
+ libdpkg-perl (= 1.22.22),
+ libelf1t64 (= 0.192-4),
+ libfile-stripnondeterminism-perl (= 1.14.1-2),
+ libgcc-14-dev (= 14.2.0-19),
+ libgcc-s1 (= 14.2.0-19),
+ libgdbm-compat4t64 (= 1.24-2),
+ libgdbm6t64 (= 1.24-2),
+ libgmp10 (= 2:6.3.0+dfsg-3),
+ libgomp1 (= 14.2.0-19),
+ libgprofng0 (= 2.44-3),
+ libhwasan0 (= 14.2.0-19),
+ libicu76 (= 76.1-4),
+ libisl23 (= 0.27-1),
+ libitm1 (= 14.2.0-19),
+ libjansson4 (= 2.14-2+b3),
+ liblastlog2-2 (= 2.41.5-0+deb13u1),
+ liblsan0 (= 14.2.0-19),
+ liblzma5 (= 5.8.1-1+deb13u1),
+ libmagic-mgc (= 1:5.46-5),
+ libmagic1t64 (= 1:5.46-5),
+ libmd0 (= 1.1.0-2+b1),
+ libmount1 (= 2.41.5-0+deb13u1),
+ libmpc3 (= 1.3.1-1+b3),
+ libmpfr6 (= 4.2.2-1),
+ libnghttp2-14 (= 1.64.0-1.1+deb13u1),
+ libnode115 (= 20.19.2+dfsg-1+deb13u2),
+ libpam-modules (= 1.7.0-5),
+ libpam-modules-bin (= 1.7.0-5),
+ libpam-runtime (= 1.7.0-5),
+ libpam0g (= 1.7.0-5),
+ libpcre2-8-0 (= 10.46-1~deb13u2),
+ libperl5.40 (= 5.40.1-6+deb13u1),
+ libpipeline1 (= 1.5.8-1),
+ libquadmath0 (= 14.2.0-19),
+ libseccomp2 (= 2.6.0-2),
+ libselinux1 (= 3.8.1-1),
+ libsframe1 (= 2.44-3),
+ libsmartcols1 (= 2.41.5-0+deb13u1),
+ libsqlite3-0 (= 3.46.1-7+deb13u2),
+ libssl3t64 (= 3.5.7-1~deb13u2),
+ libstdc++-14-dev (= 14.2.0-19),
+ libstdc++6 (= 14.2.0-19),
+ libsystemd0 (= 257.13-1~deb13u1),
+ libtinfo6 (= 6.5+20250216-2),
+ libtool (= 2.5.4-4),
+ libtsan2 (= 14.2.0-19),
+ libubsan1 (= 14.2.0-19),
+ libuchardet0 (= 0.0.8-1+b2),
+ libudev1 (= 257.13-1~deb13u1),
+ libunistring5 (= 1.3-2),
+ libuuid1 (= 2.41.5-0+deb13u1),
+ libuv1t64 (= 1.50.0-2),
+ libxml2 (= 2.12.7+dfsg+really2.9.14-2.1+deb13u3),
+ libzstd1 (= 1.5.7+dfsg-1),
+ linux-libc-dev (= 6.12.107-1),
+ m4 (= 1.4.19-8),
+ make (= 4.4.1-2),
+ man-db (= 2.13.1-1),
+ mawk (= 1.3.4.20250131-1),
+ ncurses-base (= 6.5+20250216-2),
+ ncurses-bin (= 6.5+20250216-2),
+ node-acorn (= 8.8.1+ds+~cs25.17.7-2),
+ node-balanced-match (= 2.0.0-1),
+ node-brace-expansion (= 2.0.1+~1.1.0-2),
+ node-cjs-module-lexer (= 1.2.3+dfsg-1),
+ node-corepack (= 0.24.0-5),
+ node-minimatch (= 9.0.3-6),
+ node-undici (= 7.3.0+dfsg1+~cs24.12.11-1),
+ node-xtend (= 4.0.2-3),
+ nodejs (= 20.19.2+dfsg-1+deb13u2),
+ openssl-provider-legacy (= 3.5.7-1~deb13u2),
+ patch (= 2.8-2),
+ perl (= 5.40.1-6+deb13u1),
+ perl-base (= 5.40.1-6+deb13u1),
+ perl-modules-5.40 (= 5.40.1-6+deb13u1),
+ po-debconf (= 1.0.21+nmu1),
+ rpcsvc-proto (= 1.4.3-1),
+ sed (= 4.9-2+deb13u1),
+ sensible-utils (= 0.0.25),
+ sysvinit-utils (= 3.14-4),
+ tar (= 1.35+dfsg-3.1),
+ util-linux (= 2.41.5-0+deb13u1),
+ xz-utils (= 5.8.1-1+deb13u1),
+ zlib1g (= 1:1.3.dfsg+really1.3.1-1+b1)
+Environment:
+ DEB_BUILD_OPTIONS="parallel=3"
+ LANG="C.UTF-8"
+ LC_COLLATE="C.UTF-8"
+ LC_CTYPE="C.UTF-8"
+ SOURCE_DATE_EPOCH="1793229566"
+
+
++------------------------------------------------------------------------------+
+| Package contents                             Tue, 10 Nov 2026 18:17:04 +0000 |
++------------------------------------------------------------------------------+
+
+
+sample-app_1.0.0-1_amd64.deb
+----------------------------
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+ new Debian package, version 2.0.
+ size 1952080 bytes: control archive=628 bytes.
+     403 bytes,    11 lines      control
+     201 bytes,     3 lines      md5sums
+ Package: sample-app
+ Version: 1.0.0-1
+ Architecture: amd64
+ Maintainer: Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>
+ Installed-Size: 5780
+ Section: web
+ Priority: optional
+ Homepage: https://github.com/gigi206/supply-chain
+ Description: application de démonstration de la plateforme supply-chain
+  Binaire Go qui sert une interface web construite avec npm et embarquée à la
+  compilation.
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./usr/
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./usr/bin/
+-rwxr-xr-x root/root   5906320 2026-10-28 23:19 ./usr/bin/sample-app
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./usr/share/
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./usr/share/doc/
+drwxr-xr-x root/root         0 2026-10-28 23:19 ./usr/share/doc/sample-app/
+-rw-r--r-- root/root       180 2026-10-28 23:19 ./usr/share/doc/sample-app/changelog.Debian.gz
+-rw-r--r-- root/root      3333 2026-10-28 23:19 ./usr/share/doc/sample-app/copyright
+
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Post Build                                   Tue, 10 Nov 2026 18:17:06 +0000 |
++------------------------------------------------------------------------------+
+
+
++------------------------------------------------------------------------------+
+| Cleanup                                      Tue, 10 Nov 2026 18:17:06 +0000 |
++------------------------------------------------------------------------------+
+
+Purging /build/reproducible-path
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+Not cleaning session: cloned chroot in use
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
+
++------------------------------------------------------------------------------+
+| Summary                                      Tue, 10 Nov 2026 18:17:09 +0000 |
++------------------------------------------------------------------------------+
+
+Build Architecture: amd64
+Build Type: binary
+Build-Space: 102336
+Build-Time: 19
+Distribution: trixie
+Host Architecture: amd64
+Install-Time: 19
+Job: /w/src/sample-app_1.0.0-1.dsc
+Machine Architecture: amd64
+Package: sample-app
+Package-Time: 262
+Source-Version: 1.0.0-1
+Space: 102336
+Status: successful
+Version: 1.0.0-1
+--------------------------------------------------------------------------------
+Finished at 2026-11-10T18:17:00Z
+Build needed 00:04:22, 102336k disk space
