@@ -1397,3 +1397,11 @@ Là où Loki ne juge pas, le verdict reste celui de l'ancienne lecture par kubec
 | V7 à V9 | Témoin E3, trois essais | Ligne `evenements-k8s` postérieure au départ vue en 75 s au plus (le CronJob `horodatage` produit des Events chaque minute) ; fenêtre des 120 s d'avant inchangée 30 s après le témoin | Moyenne pour le délai ; moyenne pour le rattrapage, qui est l'hypothèse écrite à 23:31 UTC |
 
 **Ce que le passage ne prouvera pas** : les verdicts des six contrôles dans les étapes rejouées ; le comportement sur des Events `PolicyViolation` ou `FailedCreate` réels après le démarrage d'Alloy, s'il n'y en a pas ; le rattrapage au-delà de trois essais.
+
+## Additif du 10/11/2026, 08:45 UTC : règle de verdict confirmée par le propriétaire
+
+Question posée : « Situation A, ligne vue par kubectl et absente de Loki : échec ou simple constat ? », après une explication en deux situations et la recommandation du conseiller (échec). Réponse : « on suit l'advisor ». Décision : **échec**. Une ligne vue par kubectl dans la fenêtre, absente de Loki, fait échouer le contrôle. C'est ce que fait `evenements-loki.sh` depuis 23:32 UTC le 09/11 : le code ne change pas. Cette décision complète E1 (a), dont le texte en faisait un CONSTAT.
+
+La situation B ne demandait pas de décision : quand Loki ne peut pas juger, c'est la lecture par kubectl qui décide, comme avant.
+
+Suite possible, à décider plus tard sur accord séparé : si les essais V7 à V9 réfutent le rattrapage, ajouter une seconde lecture de Loki après un court délai avant de conclure à l'échec.
