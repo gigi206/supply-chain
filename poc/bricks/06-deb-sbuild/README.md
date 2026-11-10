@@ -752,3 +752,36 @@ Le propriétaire a répondu « continue » après la clôture de 22:30 UTC. Je l
 **Rien d'écrit pour S4a** au-delà de cette carte : ni tâche, ni script, ni prédiction. Les prédictions dépendent des choix 1 à 4, et le push de `fc155b7` attend toujours un oui.
 
 **Questions ouvertes** : les choix 1 à 4 ci-dessus.
+
+## Note datée du 10/11/2026, 22:47 UTC : trois corrections à la carte de S4a (`d42ad99`), vérifiées sur l'hôte
+
+Vérifié sur les archives de S1 et S2 gardées sur l'hôte (`$W/s1-06`, `$W/s2-06`) et dans les journaux, sans toucher au cluster.
+
+**Correction 1 : les listes des journaux sont incomplètes.**
+- `base-files`, `bash`, `dpkg` et `libc6` n'apparaissent dans aucune ligne `deb racine`, `deb chroot-a` ni `deb amorce`.
+- Les lignes `deb racine` sont 107, alors que le `var/lib/dpkg/status` de `racine.tar` (`f8f221ca…`) compte 166 entrées `Package:`.
+- Les lignes `deb chroot-a` sont 63, alors que le status du chroot de S2 (`e0b1f37c…`) en compte 122.
+- Cause probable, non vérifiée dans le code : mmdebstrap retire du cache les `.deb` essentiels après leur installation (`essential/unlink`), avant que le crochet ne liste le cache.
+- Le « 238 sur 238 » de S1 ne couvrait donc que les paquets listés.
+- **Conséquence pour le choix 2 (b)** : un miroir partiel bâti sur ces listes ne suffirait pas. La liste complète peut se tirer sur l'hôte, hors ligne, du `dpkg/status` des archives (paquet, version, architecture), puis se vérifier contre le `Packages` signé. Ce travail reste à faire à sec, avant les prédictions. La recommandation 2 (b) tient, avec cette liste.
+
+**Correction 2 : `/etc/hostname` est le nom du pod.**
+- Il vaut `s1-racine` dans les deux archives de S1, et `s2-racine` dans le chroot de S2. `etc/resolv.conf` fait 102 octets dans les trois archives.
+- L'égalité bit à bit entre s1b et s1c s'explique donc aussi par un pod de même nom, et celle des deux chroots de S2 par un seul pod.
+- Dans une pipeline, le nom du pod change à chaque TaskRun. **L'égalité entre deux exécutions n'est pas attendue sans un crochet qui fixe `etc/hostname` et `etc/resolv.conf`**, ce que le manuel prévoit.
+- Ce crochet écarte aussi toute égalité avec `f8f221ca` et `e0b1f37c`.
+- Cela vaut pour 2 (a) comme pour 2 (b). « Déjà mesuré », dans le choix 2 (a), ne couvre pas des pods de noms différents.
+
+**Correction 3 : le digest de couche du chroot ne se compare pas à `e0b1f37c`.**
+- En S1 (`s1.sh`, `etape_image`), le chroot entre dans l'image comme fichier `opt/sbuild/trixie-amd64.tar`, à l'intérieur d'une couche qui l'enveloppe.
+- Seule la couche racine est l'archive de mmdebstrap elle-même. Pour le chroot, la comparaison porte sur le sha256 du fichier intérieur.
+- La recommandation 4 (a) tient : couches non compressées, digest de la couche racine égal au sha256 de l'archive racine, et sha256 du chroot lu dans l'image.
+
+**À vérifier, non bloquant** : la présence de `gpgv` (ou de `sqv`) dans l'amorce slim, pour la tâche runc de 2 (b).
+
+**Forme des prédictions, une fois les choix faits** :
+- deux exécutions de la pipeline, bit à bit, avec le crochet de `hostname` et de `resolv.conf` ;
+- `dpkg/status` égal à celui de s1c (racine) et de S2 (chroot), hors champs liés au nom d'hôte ;
+- couche racine égale au sha256 de l'archive racine.
+
+**Questions ouvertes** : les choix 1 à 4 de la carte, et le push.
