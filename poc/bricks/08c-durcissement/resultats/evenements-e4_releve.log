@@ -1,0 +1,90 @@
+# evenements-e4-releve.sh e4_releve, 2026-11-10T09:36:16Z
+## V0, démarrage d'Alloy de sc-stockage : 2026-11-09T17:05:19Z (prédit : 2026-11-09T17:05:19Z) ; lecture à 2026-11-10T09:36:16Z
+OK   V0
+## V1, témoin positif de EV_CRONJOB_SCAN, passage du scan du 10/11
+  fenêtre : 2026-11-10T09:30:00Z à 2026-11-10T09:35:00Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  lignes : 3
+  première : 2026-11-10T09:30:00Z, dernière : 2026-11-10T09:31:57Z
+    1 CronJob scan-sample-app SuccessfulDelete count=1
+    1 CronJob scan-sample-app SuccessfulCreate count=1
+    1 CronJob scan-sample-app SawCompletedJob count=1
+OK   V1 : 3 (attendu : >=1)
+## V2, toutes les lignes de l'espace scan, même fenêtre
+  fenêtre : 2026-11-10T09:30:00Z à 2026-11-10T09:35:00Z ; requête : {source="evenements-k8s", namespace="scan"}
+  lignes : 24
+  première : 2026-11-10T09:30:00Z, dernière : 2026-11-10T09:31:57Z
+    6 Pod scan-sample-app-29905050-8v2ct Started count=1
+    6 Pod scan-sample-app-29905050-8v2ct Pulled count=1
+    6 Pod scan-sample-app-29905050-8v2ct Created count=1
+    1 Pod scan-sample-app-29905050-8v2ct Scheduled count=1
+    1 Job scan-sample-app-29905050 SuccessfulCreate count=1
+    1 Job scan-sample-app-29905050 Completed count=1
+    1 CronJob scan-sample-app SuccessfulDelete count=1
+    1 CronJob scan-sample-app SuccessfulCreate count=1
+    1 CronJob scan-sample-app SawCompletedJob count=1
+     V2 : affiché, non jugé
+## V3, témoin positif des filtres kind et name de EV_PULLING_CILIUM (sans reason)
+  fenêtre : 2026-11-06T11:00:00Z à 2026-11-07T11:22:39Z ; requête : {source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | name=~"cilium.*"
+  lignes : 384
+  première : 2026-11-06T16:41:04Z, dernière : 2026-11-06T21:50:21Z
+    7 Pod cilium-vs4tm Started count=1
+    7 Pod cilium-vs4tm Pulled count=1
+    7 Pod cilium-vs4tm Created count=1
+    7 Pod cilium-nkrmv Started count=1
+    7 Pod cilium-nkrmv Pulled count=1
+    7 Pod cilium-nkrmv Created count=1
+    7 Pod cilium-j478v Started count=1
+    7 Pod cilium-j478v Pulled count=1
+    7 Pod cilium-j478v Created count=1
+    7 Pod cilium-gxk2n Started count=1
+OK   V3 : 384 (attendu : >=1)
+## V4, EV_PULLING_CILIUM, même fenêtre (R8 non jugé le 09/11)
+  fenêtre : 2026-11-06T11:00:00Z à 2026-11-07T11:22:39Z ; requête : {source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | reason="Pulling" | name=~"cilium.*"
+  lignes : 0
+OK   V4 : 0 (attendu : 0)
+## V5, EV_PV, fenêtre de R1 rejouée
+  fenêtre : 2026-11-06T16:49:02Z à 2026-11-06T16:53:29Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  lignes : 32
+  première : 2026-11-06T16:50:00Z, dernière : 2026-11-06T16:53:00Z
+    16 ValidatingPolicy limites-obligatoires PolicyViolation count=-
+    1 Pod rattrapage-29899733-6mlb9 PolicyViolation count=-
+    1 Pod rattrapage-29899732-2hxw9 PolicyViolation count=-
+    1 Pod rattrapage-29899731-plpzq PolicyViolation count=-
+    1 Pod rattrapage-29899730-xjgb2 PolicyViolation count=-
+    1 Pod horodatage-29899733-mgpbp PolicyViolation count=-
+    1 Pod horodatage-29899732-jr7pg PolicyViolation count=-
+    1 Pod horodatage-29899731-24zwf PolicyViolation count=-
+    1 Pod horodatage-29899730-nz6fs PolicyViolation count=-
+    1 Job rattrapage-29899733 PolicyViolation count=-
+OK   V5 : 32 (attendu : >=32)
+## V6 EV_PV, depuis le démarrage d'Alloy
+  fenêtre : 2026-11-09T17:05:19Z à 2026-11-10T09:36:16Z ; requête : {source="evenements-k8s"} | json | reason="PolicyViolation"
+  lignes : 0
+     V6 EV_PV : affiché, non jugé
+## V6 EV_FAILEDCREATE, depuis le démarrage d'Alloy
+  fenêtre : 2026-11-09T17:05:19Z à 2026-11-10T09:36:16Z ; requête : {source="evenements-k8s"} | json | reason="FailedCreate"
+  lignes : 0
+     V6 EV_FAILEDCREATE : affiché, non jugé
+## V6 EV_CRONJOB_SCAN, depuis le démarrage d'Alloy
+  fenêtre : 2026-11-09T17:05:19Z à 2026-11-10T09:36:16Z ; requête : {source="evenements-k8s", namespace="scan"} | json | kind="CronJob"
+  lignes : 3
+  première : 2026-11-10T09:30:00Z, dernière : 2026-11-10T09:31:57Z
+    1 CronJob scan-sample-app SuccessfulDelete count=1
+    1 CronJob scan-sample-app SuccessfulCreate count=1
+    1 CronJob scan-sample-app SawCompletedJob count=1
+     V6 EV_CRONJOB_SCAN : affiché, non jugé
+## V6 EV_PULLING_CILIUM, depuis le démarrage d'Alloy
+  fenêtre : 2026-11-09T17:05:19Z à 2026-11-10T09:36:16Z ; requête : {source="evenements-k8s", namespace="kube-system"} | json | kind="Pod" | reason="Pulling" | name=~"cilium.*"
+  lignes : 0
+     V6 EV_PULLING_CILIUM : affiché, non jugé
+## V7 à V9, témoin E3 et hypothèse du rattrapage, trois essais
+  témoin 1 : départ 09:36:17, vu après 45 s ; 120 s d'avant : 31 lignes au témoin, 31 lignes 30 s après
+OK   témoin 1 : délai 45 s (attendu : au plus 75 s)
+OK   rattrapage 1 : fenêtre d'avant inchangée (31)
+  témoin 2 : départ 09:37:32, vu après 29 s ; 120 s d'avant : 30 lignes au témoin, 30 lignes 30 s après
+OK   témoin 2 : délai 29 s (attendu : au plus 75 s)
+OK   rattrapage 2 : fenêtre d'avant inchangée (30)
+  témoin 3 : départ 09:38:31, vu après 30 s ; 120 s d'avant : 30 lignes au témoin, 30 lignes 30 s après
+OK   témoin 3 : délai 30 s (attendu : au plus 75 s)
+OK   rattrapage 3 : fenêtre d'avant inchangée (30)
+## bilan : toutes les prédictions jugées tenues

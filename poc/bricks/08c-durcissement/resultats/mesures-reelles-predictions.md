@@ -1405,3 +1405,32 @@ Question posée : « Situation A, ligne vue par kubectl et absente de Loki : éc
 La situation B ne demandait pas de décision : quand Loki ne peut pas juger, c'est la lecture par kubectl qui décide, comme avant.
 
 Suite possible, à décider plus tard sur accord séparé : si les essais V7 à V9 réfutent le rattrapage, ajouter une seconde lecture de Loki après un court délai avant de conclure à l'échec.
+
+## Additif du 10/11/2026, 09:40 UTC : passage en lecture seule d'E4 fait, prédictions V0 à V9 tenues
+
+**Passage** : tâche de fond lancée après l'accord « 2 ok », de 09:36:16 à 09:39:32 UTC, code 0. Journal : [evenements-e4_releve.log](evenements-e4_releve.log), bilan « toutes les prédictions jugées tenues ». Effets : requêtes de l'auditeur à travers Grafana et un `systemctl show` sur `sc-stockage`. Aucune lecture par kubectl. Rien d'écrit dans le cluster, Loki, Grafana ou les VM, hors les lignes que ces requêtes laissent dans les journaux de Grafana et de Loki. Le champ `msg` n'est pas dans le journal, et les réponses de Grafana n'ont pas été archivées.
+
+**Requêtes envoyées** : au plus 69, sous le pire cas annoncé d'environ 190. Le script ne les compte pas, c'est une borne : 9 comptes (V1 à V6), 6 comptes de fenêtre pour le rattrapage, et au plus 54 interrogations du témoin. Une interrogation part au plus toutes les 2 s : au plus 23, 15 et 16 pour des délais de 45, 29 et 30 s.
+
+| # | Attendu | Mesuré | Tenue ? |
+|---|---|---|---|
+| V0 | 2026-11-09T17:05:19Z | 2026-11-09T17:05:19Z | Oui |
+| V1 | `EV_CRONJOB_SCAN` : au moins 1 ligne | 3 lignes, de 09:30:00 à 09:31:57 : `SuccessfulCreate`, `SawCompletedJob`, `SuccessfulDelete` du CronJob `scan-sample-app` | Oui |
+| V2 | Affiché | 24 lignes de l'espace `scan` (Pod, Job et CronJob du passage de 09:30) | — |
+| V3 | Filtres `kind` et `name` sans `reason` : au moins 1 ligne | 384 lignes, du 06/11 à 16:41:04 au 06/11 à 21:50:21 | Oui |
+| V4 | `EV_PULLING_CILIUM` : 0 | 0 | Oui |
+| V5 | `EV_PV`, fenêtre de R1 : au moins 32 lignes | 32 | Oui |
+| V6 | Affiché | Depuis le démarrage d'Alloy : `EV_PV` 0, `EV_FAILEDCREATE` 0, `EV_CRONJOB_SCAN` 3 (les lignes de V1), `EV_PULLING_CILIUM` 0 | — |
+| V7 | Témoin en 75 s au plus ; fenêtre d'avant inchangée | 45 s ; 31 puis 31 lignes | Oui |
+| V8 | Idem | 29 s ; 30 puis 30 lignes | Oui |
+| V9 | Idem | 30 s ; 30 puis 30 lignes | Oui |
+
+**Lecture.**
+- **Premières lignes réelles pour `EV_CRONJOB_SCAN`.** Ce filtre trouve désormais des lignes réelles (V1). La prédiction R6, réfutée le 09/11 par la panne de collecte, tient donc sur le passage du 10/11.
+- **Pas de témoin positif pour `reason="Pulling"` et `EV_FAILEDCREATE`.** V4 et V6 rendent 0. Le filtre `kind`/`name` de Cilium trouve bien des lignes (V3). La forme `reason="…"` trouve des lignes réelles avec `PolicyViolation` (V5). Mais rien ne montre qu'elle en trouve avec `Pulling` ou `FailedCreate` : un 0 de ces deux requêtes ne distingue pas « aucun Event » d'une valeur jamais émise sous ce nom. Les 10 lignes de résumé les plus fréquentes de V3 ne portent que les raisons `Started`, `Pulled` et `Created`. Cela va dans le sens d'images déjà présentes. Ce n'est pas une preuve : le résumé est limité à 10 lignes.
+- **Aucune ligne réelle depuis le redémarrage d'Alloy pour `PolicyViolation` et `FailedCreate`** (V6). Le comportement de ces deux requêtes sur des Events réels postérieurs au 09/11 à 17:05:19 UTC reste donc non mesuré, comme annoncé à 08:35 UTC.
+- **Témoin E3.** Il a été vu en 29 à 45 s, sous les 75 s prédites et sous l'attente de 120 s de `ev_juge`. Ce délai dépend aussi de l'activité du cluster, c'est-à-dire du prochain Event, et pas seulement de l'acheminement.
+- **Rattrapage.** Lors des trois essais, aucune ligne de la fenêtre des 120 s d'avant n'est arrivée après le témoin. L'hypothèse de 23:31 UTC est soutenue sur ces trois essais, sans être prouvée en général : charge plus forte, redémarrage d'Alloy. La seconde lecture de Loki envisagée à 08:45 UTC n'est pas appelée par ces résultats. Elle reste une suite possible, sur accord séparé.
+- **Ce que ce passage ne couvre pas.** Il ne rejoue aucun des six contrôles. Leurs verdicts dans les étapes réelles restent à relever au prochain passage de ces étapes, avec la portée de l'additif de 23:36 UTC.
+
+**Temps.** Le passage a duré 3 min 16 s. Dans le journal de la session, aucune activité entre le 09/11 vers 23:40 et le 10/11 à 08:33 UTC. Le travail actif du matin va de 08:33 à 08:50 UTC (réponse du propriétaire, préparation, règle de verdict), puis de 09:39 UTC à la consignation, soit environ 40 min pour la phase en lecture seule, contre 1 h proposée. Le chantier des Events totalise environ 9 h 05 pour 4 h estimées.
