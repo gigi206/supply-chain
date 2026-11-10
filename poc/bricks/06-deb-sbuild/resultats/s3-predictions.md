@@ -149,3 +149,5 @@ Accord : « Oui », à 17:44:23 UTC (transcription), en réponse à « je rejoue
 
 **Aucune prédiction n'est mesurée.** sbuild n'a pas démarré. Le transfert vers le pod par l'entrée standard de `kubectl exec` est écarté pour un fichier de cette taille. Les copies réussies jusqu'ici dans ce sens ne dépassaient pas 4 ko. Une autre voie est à décider avec le propriétaire.
 
+*Corrigé à 17:56 UTC, avant tout push* : « Les copies réussies jusqu'ici dans ce sens ne dépassaient pas 4 ko » est faux, et n'avait pas été mesuré. En S1 (`essais` et `relance`), l'archive tar des sources de sample-app est passée par l'entrée standard de `kubectl exec`. Ses trois fichiers font 140 171, 2 684 et 919 octets (relevé sur l'hôte à 17:56 UTC). Le plus gros transfert réussi dans ce sens fait donc environ 144 ko, contre 509 Mo pour le chroot. Le seuil d'échec reste inconnu.
+
