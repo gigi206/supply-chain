@@ -279,3 +279,13 @@ Le rejeu a été lancé à 17:44:28 UTC, sur l'accord « Oui ». Il s'est bloqu�
 
 **Aucun build n'a tourné.** Le transfert vers le pod par l'entrée standard de `kubectl exec` est écarté pour 509 Mo. Une autre voie est à décider.
 
+## Additif du 10/11/2026, 18:07 UTC : sonde du transfert vers le pod, blocage propre à Kata
+
+Sonde lancée de 18:02 à 18:06 UTC, sur l'accord « Oui, lance la sonde ». Code 0. Journal : [`s3-sonde.log`](resultats/s3-sonde.log).
+
+**Sous runc**, 1, 8, 64 et 512 Mio passent par l'entrée standard de `kubectl exec` ; 512 Mio en 3,6 s.
+
+**Sous Kata**, 1 à 64 Mio passent (64 Mio en 7,2 s). À 512 Mio, le pod reçoit tout le fichier, mais `kubectl exec` ne rend pas la main avant le délai de 120 s, en WebSocket comme en SPDY. La cause n'est pas diagnostiquée. Détails : [prédictions de S3](resultats/s3-predictions.md).
+
+**Builds de S3** : toujours non lancés. La voie de transfert est à décider.
+

@@ -153,7 +153,7 @@ Accord : « Oui », à 17:44:23 UTC (transcription), en réponse à « je rejoue
 
 ## Sonde du transfert vers le pod : préparée à sec (18:01 UTC), NON LANCÉE
 
-**Choix du propriétaire** : « Diagnostic d'abord » (transcription), parmi l'image d'essai (A), la copie par morceaux (B), la restauration par oras (C) et le diagnostic. Cette réponse est consignée comme une interprétation : elle désigne la voie, et le lancement attend un accord nommé.
+**Choix du propriétaire** : « Diagnostic d'abord », à 18:00:21 UTC (transcription), parmi l'image d'essai (A), la copie par morceaux (B), la restauration par oras (C) et le diagnostic. Cette réponse est consignée comme une interprétation : elle désigne la voie, et le lancement attend un accord nommé.
 
 **Étape `sonde` de `s3.sh`**
 - Fichiers aléatoires de 1, 8, 64 et 512 Mio, créés sur l'hôte.
@@ -175,4 +175,32 @@ Accord : « Oui », à 17:44:23 UTC (transcription), en réponse à « je rejoue
 | D5 | Aucun pod ne reste après l'étape | haute |
 
 **Ce que la sonde ne dira pas** : la cause exacte. Elle localise le blocage (taille, runtime, protocole) sans lire les journaux de kubelet, de containerd ou de Kata.
+
+## Résultat de la sonde (10/11/2026, 18:02:04 à 18:06:32 UTC)
+
+Accord : « Oui, lance la sonde », à 18:01:59 UTC (transcription). Lancée sous bash, code de sortie relevé : **0**. Journal : [`s3-sonde.log`](s3-sonde.log).
+
+| Copie | Kata privilégié (WebSocket) | runc `restricted` (WebSocket) |
+|---|---|---|
+| 1 Mio | code 0, 242 ms, conforme | code 0, 101 ms, conforme |
+| 8 Mio | code 0, 1 023 ms, conforme | code 0, 114 ms, conforme |
+| 64 Mio | code 0, 7 196 ms, conforme | code 0, 505 ms, conforme |
+| 512 Mio | **code 124** au délai de 120 s ; **536 870 912 octets reçus dans le pod** | code 0, 3 593 ms, conforme |
+
+En SPDY, sous Kata, 512 Mio donne aussi le code 124 au délai, avec les 536 870 912 octets reçus.
+
+| # | Résultat |
+|---|---|
+| D1 | **Tenue** dans les deux pods |
+| D2 | **Tenue en partie.** Sous Kata, 64 Mio passe et 512 Mio échoue au délai. **Réfutée sur les octets** : le pod a reçu le fichier entier, ce qui n'avait pas été prédit |
+| D3 | **Tenue.** Les quatre tailles passent sous runc ; 512 Mio en 3,6 s |
+| D4 | **Réfutée.** SPDY échoue de la même façon |
+| D5 | **Tenue.** Le pod runc, supprimé sans attente par le script, a disparu à 18:07:03 UTC, après le délai de grâce. Plus aucun pod `s3-` |
+
+**Lecture**
+- **Le blocage est propre à Kata.** Sous runc, sur le même nœud, avec la même image et le même chemin apiserver et kubelet, 512 Mio passe en 3,6 s.
+- **Sous Kata, les octets arrivent, mais `kubectl exec` ne se termine pas.** Le protocole (WebSocket ou SPDY) n'y change rien. Je n'ai mesuré ni la fin de `head` dans le pod, ni l'heure d'arrivée du dernier octet : la cause reste inconnue. Elle est à chercher entre le shim Kata et l'agent dans l'invité, sans lecture de leurs journaux à ce stade.
+- **Débit sous Kata** : 64 Mio en 7,2 s, environ 9 Mo/s, contre environ 150 Mo/s sous runc à 512 Mio.
+- **Taille sûre mesurée sous Kata : 64 Mio**, sur un seul essai. Le seuil se situe entre 64 et 512 Mio.
+- **Les deux passages de `builds` s'expliquent probablement de la même façon** : le chroot (509 Mo) était sans doute arrivé, et c'est l'exec qui ne rendait pas la main. Ce n'est pas mesuré pour ces passages.
 

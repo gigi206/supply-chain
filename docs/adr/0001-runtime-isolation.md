@@ -196,3 +196,9 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
   - Contre-épreuve : la même tâche, renommée, joint Zot, Forgejo et l'API, et sa sortie vers l'adresse externe se voit sur `enp1s0`. L'usurpation y reste refusée, donc la vérification d'adresse source de Cilium tient seule, sans la politique.
   - Le premier passage, archivé, attendait l'adresse du service dans Hubble. J7 l'avait pourtant déjà mesurée traduite avant la politique.
   - **Limite** : la politique ne ferme la sortie qu'aux pods des tâches nommées `construire-image`. Toute autre tâche signée par la clé des tâches garde sa sortie (mesuré par la contre-épreuve) ; seule la porte la refuse ensuite, hors de la liste revue. La vérification d'adresse source vaut pour tous les pods.
+
+**Additif du 10/11/2026, 18:07 UTC : transfert par `kubectl exec` vers un pod Kata** (brique 06, S3, [sonde](../../poc/bricks/06-deb-sbuild/resultats/s3-sonde.log), [lecture](../../poc/bricks/06-deb-sbuild/resultats/s3-predictions.md)). Même nœud `sc-build`, même image, fichiers aléatoires envoyés par l'entrée standard de `kubectl exec` :
+- **runc** (`restricted`) : 1, 8, 64 et 512 Mio passent ; 512 Mio en 3,6 s.
+- **Kata 4.3.1** (privilégié) : jusqu'à 64 Mio, cela passe (7,2 s, environ 9 Mo/s). À 512 Mio, le pod reçoit tout le fichier, mais l'exec ne se termine pas en 120 s, en WebSocket comme en SPDY.
+
+La cause n'est pas diagnostiquée. **Conséquence** : sous Kata, un gros fichier ne doit pas passer par l'entrée standard de `kubectl exec`. Par l'image (containerd), une couche de 349 Mo compressés a été tirée sans problème en S1. Le chemin de Tekton n'est pas concerné, car il ne passe pas par `exec`.
