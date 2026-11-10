@@ -785,3 +785,5 @@ Vérifié sur les archives de S1 et S2 gardées sur l'hôte (`$W/s1-06`, `$W/s2-
 - couche racine égale au sha256 de l'archive racine.
 
 **Questions ouvertes** : les choix 1 à 4 de la carte, et le push.
+
+*Corrigé à 22:39 UTC* : la note « 22:47 UTC » ci-dessus a été écrite et commitée (`1febbf4`) à 22:39 UTC (horloge de l'hôte, `date -u` relevé à 22:39:25). L'heure de son titre et de son message de commit est fausse ; le contenu est inchangé.
