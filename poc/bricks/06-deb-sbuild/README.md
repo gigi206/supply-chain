@@ -1017,3 +1017,17 @@ Troisième passage de `pipeline`, de 23:26:12 à 23:31:47 UTC, sur l'accord « O
 - environ 1,5 jour de travail effectif, soit à peu près 0,3 pw.
 
 Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucune décision n'est due. La projection de 1 à 1,5 pw pour la brique entière tient, avec S4c, S4b, S4d et S5 encore à faire. Elle reste fragile, car S4c dépend d'une décision ouverte par l'ADR 0007.
+
+## Additif du 10/11/2026, 23:52 UTC : push consigné, et décision du propriétaire sur le processus
+
+**Push** de 23:40:42 à 23:40:44 UTC : `3eb8489..44cbe06`, 27 commits, 24 fichiers. Les secrets ont été contrôlés dans un worktree temporaire : aucun secret trouvé. Accord : « Oui, pousse ».
+
+**Décision du propriétaire** (23:50:00 UTC, « ok je suis l'advisor ») : il adopte les leviers recommandés par le conseiller pour alléger le processus. Rien ne change pour L3, pour B5 ni pour les mesures des grilles.
+- **(e)** Toute nouvelle tâche privilégiée est d'abord mise au point dans un pod d'essai, sur le modèle de S1, avec un accord par pod. Elle n'est signée qu'une fois au point. Sur S4a, ce levier aurait évité 6 des 11 accords et deux bundles cassés.
+- **(a)** Un additif par jalon. Chaque décision laisse une ligne datée dans le message de commit au moment où elle est prise.
+- **(b)** Un accord par jalon, seulement pour les étapes en lecture ou réversibles. Restent soumis à un accord à part :
+  - les écritures dans Zot, qui sont définitives ;
+  - la revue de `taches.yml` ;
+  - tout script modifié.
+- **(d)** Des contrôles sur l'hôte avant chaque signature.
+- **(c) est refusé** : pas d'image d'outils construite avec le réseau.
