@@ -186,3 +186,34 @@ Accord : « Continue la prochaine étape », à 18:54:30 UTC (transcription). La
 
 **Suite possible** : une bisection sur le nœud, avec un accord à part. `crictl exec` contourne l'apiserver et kubelet ; `ctr task exec` contourne en plus CRI.
 
+## Étape bisection : préparée à sec (19:38 UTC), NON LANCÉE
+
+Demande : « Prépare », à 19:37:09 UTC (transcription), en réponse à la question sur la bisection sur le nœud.
+
+**Mise en place**
+- Un pod runc `restricted` : l'étape `croise` a montré que runc reproduit le blocage.
+- Sur la VM sc-build : ssh, `sudo sh -s`, script passé par l'entrée standard de ssh. Aucun fichier n'est écrit sur la VM.
+- Trois exec dans le conteneur du pod, chacun avec 128 Mio tirés de `/dev/urandom` sur le nœud et un délai de 150 s :
+
+| Mesure | Chemin | Lecture dans le pod |
+|---|---|---|
+| B1 | `crictl exec -i` : serveur de flux CRI de containerd, sans apiserver ni kubelet | lente (128 × 1 Mio, `sleep 0.1`) |
+| B2 | `crictl exec -i` (témoin) | rapide (`head -c`) |
+| B3 | `ctr -n k8s.io task exec` : API de tâches de containerd et FIFO, sans CRI | lente |
+
+- Après chaque exec, on relève les octets reçus, puis on supprime le fichier. Le pod est supprimé à la fin.
+- Outils et socket repris de `08-trust-plane/distro.sh` (variante RKE2), passés tels quels au script distant.
+
+**Essai à sec** : le script distant a tourné sur l'hôte sous `dash`, avec des `crictl` et `ctr` factices, 2 Mio et 2 envois. Les trois mesures se sont déroulées, et la quantité reçue a été relevée.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| B2 | passe, code 0 | haute : lecture rapide, comme à 512 Mio sous runc |
+| B1 | bloque au délai, tous les octets reçus : le maillon est dans le serveur de flux CRI de containerd ou en dessous | faible |
+| B3 | passe, code 0 : le chemin des tâches de containerd et des FIFO n'est pas en cause | moyenne |
+
+**Lecture prévue**
+- **B1 bloque et B3 passe** : le maillon est le serveur de flux CRI de containerd.
+- **B1 passe** : le maillon est dans kubelet, l'apiserver ou kubectl.
+- **B3 bloque aussi** : le maillon est dans containerd, sous CRI, ou dans le shim runc.
+

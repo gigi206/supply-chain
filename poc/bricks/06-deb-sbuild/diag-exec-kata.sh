@@ -210,4 +210,42 @@ etape_croise() {
   pod_retirer "$POD"
 }
 
+# Étape bisection (préparée à sec le 10/11/2026 à 19:37 UTC, NON LANCÉE) : l'étape croise met Kata hors de cause (runc, pod qui lit
+# lentement 128 Mio : l'exec ne rend pas la main). Pod runc restricted, puis, sur la VM sc-build (ssh, sudo sh -s, script par l'entrée
+# standard de ssh, aucun fichier écrit sur la VM), trois exec dans son conteneur, 128 Mio tirés de /dev/urandom sur le nœud, délai de
+# 150 s chacun :
+#   B1  crictl exec -i, lecture lente (contourne apiserver et kubelet, garde le serveur de flux CRI de containerd)
+#   B2  crictl exec -i, lecture rapide (témoin)
+#   B3  ctr -n k8s.io task exec, lecture lente (contourne aussi CRI : API de tâches de containerd et FIFO)
+# Octets reçus relevés après chaque exec, fichier supprimé ; pod supprimé à la fin.
+etape_bisection() {
+  local id
+  croise_pod - "$RESTREINT"
+  id=$(kubectl get pod -n builds "$POD" -o jsonpath='{.status.containerStatuses[0].containerID}' </dev/null)
+  id=${id#containerd://}
+  [[ "$id" =~ ^[0-9a-f]{64}$ ]] || { pod_retirer "$POD"; echo "KO   identifiant de conteneur illisible" >&2; exit 1; }
+  echo "conteneur : ${id:0:12}…"
+  { printf 'CRICTL=%q\nCTR=%q\nID=%q\n' "$D_CRICTL" "$D_CTR" "$id"
+     cat <<'BISECTION'
+N=134217728
+LENT='for i in $(seq 1 128); do dd bs=1M count=1 iflag=fullblock status=none || exit 1; sleep 0.1; done > /w/b'
+RAPIDE="head -c $N > /w/b"
+mesure() { # libellé, puis la commande d'exec
+  l=$1; shift
+  t0=$(date +%s%N); rc=0
+  head -c $N /dev/urandom | timeout 150 "$@" > /dev/null 2>&1 || rc=$?
+  d=$(( ($(date +%s%N) - t0) / 1000000 ))
+  r=$($CRICTL exec "$ID" stat -c %s /w/b 2>/dev/null || echo "?")
+  echo "$l : code $rc en $d ms ; reçus dans le pod : $r sur $N"
+  $CRICTL exec "$ID" rm -f /w/b > /dev/null 2>&1 || true
+}
+echo "crictl : $($CRICTL --version 2>&1 | head -1) ; ctr : $($CTR --version 2>&1 | head -1)"
+mesure "B1 crictl exec, lecture lente" $CRICTL exec -i "$ID" sh -c "$LENT"
+mesure "B2 crictl exec, lecture rapide" $CRICTL exec -i "$ID" sh -c "$RAPIDE"
+mesure "B3 ctr task exec, lecture lente" $CTR -n k8s.io task exec --exec-id "diag-b3-$(date +%s)" "$ID" sh -c "$LENT"
+BISECTION
+  } | sur sc-build "sudo sh -s" 2>&1 | grep -a -i -v -E 'jeton|token' || true
+  pod_retirer "$POD"
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
