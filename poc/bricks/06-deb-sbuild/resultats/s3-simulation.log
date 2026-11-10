@@ -1,0 +1,10 @@
+# s3.sh simulation, 2026-11-10T16:44:06Z
+OK   chroot de S2 : e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+paragraphes de la fermeture : 162 ; Build-Depends du .dsc : debhelper-compat (= 13), golang-go (>= 2:1.24~), nodejs
+apt de l'hôte : apt 3.2.1 (amd64) (celui du chroot : 3.0.3)
+interfaces : lo:
+chroot de S2 : 122 paquets ; Installed-Build-Depends : 162 ; simulés : 48
+Installed-Build-Depends déjà dans le chroot (nom et version) : 114
+OK   Installed-Build-Depends ni dans le chroot ni simulés : 
+OK   simulés hors Installed-Build-Depends : 
+liste simulée archivée : resultats/s3-simules.txt (nom=version)

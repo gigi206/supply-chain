@@ -240,3 +240,19 @@ Rejeu de `fermeture restauration` de 16:31:17 à 16:31:20 UTC, sur l'accord « O
 **Jalon S2** : chroot reproductible, résolution depuis le `.buildinfo`, fermeture dans Zot et restauration, **tenus**. **La déduplication entre deux fermetures n'est pas mesurée** : il n'en existe qu'une.
 
 **Reste** : S3, non préparé.
+
+## Additif du 10/11/2026, 16:45 UTC : S3 préparé, NON LANCÉ
+
+Le propriétaire a répondu « continue » à 16:36:51 UTC. Cette réponse n'autorise rien sur le cluster, Zot ou les VM : seule la préparation à sec est engagée.
+
+[`s3.sh`](s3.sh) et les [prédictions R1 à R12](resultats/s3-predictions.md) sont écrits avant toute exécution dans le cluster ou Zot.
+
+**Mécanisme, lu dans le code de sbuild 0.89.3** : `--extra-package=/w/fermeture` sert la fermeture restaurée comme dépôt local du chroot. Deux précautions s'ajoutent :
+- **Les sources de l'instantané sont neutralisées dans le chroot**, par `--chroot-setup-commands`, car le chroot de S2 les garde. Sans cela, apt pourrait prendre les paquets sur l'instantané plutôt que dans la fermeture.
+- **Pod sans label**, sous `builds-sans-internet`, avec un témoin TCP qui doit échouer. sbuild ne coupe le réseau que pendant `dpkg-buildpackage`, pas pendant l'installation des dépendances.
+
+**Simulation hors ligne sur l'hôte, code 0** ([journal](resultats/s3-simulation.log)) : depuis la fermeture seule, apt installe 48 paquets. Avec les 114 du chroot, cela fait exactement les 162 de Installed-Build-Depends.
+
+**Non lancé** : la restauration et les deux builds. Chaque étape attend un accord nommé. Deux questions sont posées : le chroot de S2 copié dans `/w` plutôt qu'une nouvelle image, et la neutralisation des sources.
+
+Push de 16:32:36 UTC (`4072aee..fc4afa3`, 13 fichiers) consigné.
