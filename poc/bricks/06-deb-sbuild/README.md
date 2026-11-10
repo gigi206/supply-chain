@@ -988,3 +988,22 @@ Troisième passage de `pipeline`, de 23:26:12 à 23:31:47 UTC, sur l'accord « O
 - L'échantillonneur du tmpfs sous-estime le pic. `memory.peak` fait foi.
 
 **Reste pour S4a** : `provenance` (A15) et `comparaison` (A8, A14, A16 à A18). Ce sont des lectures dans Zot, puis des contrôles sur l'hôte, sur accord.
+
+## Additif du 10/11/2026, 23:39 UTC : S4a tenu
+
+`provenance` et `comparaison` ont tourné de 23:37:20 à 23:37:24 UTC, sur l'accord « Oui, lance-les ». Code 0. A8 et A14 à A18 sont tenues. Bilan : [prédictions et résultats](resultats/s4a-predictions.md).
+
+**L'image de build `builds/builders/sbuild-debian13@sha256:749d746c…` est construite par la plateforme**, et cette construction a les propriétés suivantes :
+- elle est reproductible : deux exécutions donnent le même digest ;
+- elle se fait sans réseau ;
+- elle est signée par Chains, et sa provenance nomme l'amorce, l'InRelease de l'instantané (`0584fba3…`) et les tâches revues ;
+- l'image contient les mêmes paquets que la racine de S1 et le chroot de S2.
+
+**Effort de S4a** : de 22:37 à 23:39 UTC, en comptant la carte, les décisions, trois cycles de signature et trois passages de `pipeline`.
+
+**Limites**
+- La vérification de la signature de l'InRelease du miroir par apt est déduite, pas mesurée. Le test négatif est prévu en S5.
+- L'échantillonneur du tmpfs sous-estime le pic.
+- La porte ne juge pas cette pipeline.
+
+**Suite, selon l'ordre décidé** : S4c (packaging et verrou). L'ADR 0007 conteste « web/dist par digest », sur lequel S4c repose : il faut d'abord que le propriétaire tranche.

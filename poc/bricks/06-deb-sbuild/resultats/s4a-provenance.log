@@ -1,0 +1,19 @@
+# s4a.sh provenance, 2026-11-10T23:37:20Z
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   enveloppes du PipelineRun s4a-builder-1 : 1
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+  - oci://sc-stockage.poc.test:5000/amont/library/debian sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-builder sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result http://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/InRelease sha256:0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   sujet : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   amorce : sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+OK   InRelease : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   tâche prefetch-deb (bundle) : sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+OK   tâche construire-builder (bundle) : sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)

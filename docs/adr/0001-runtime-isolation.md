@@ -292,3 +292,8 @@ Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kat
 - aucune anomalie, prédictions T1 à T6 tenues.
 
 C'est une vérification de non-régression, sur un passage. Le chemin direct vers le kubelet de sc-build reste couvert à part par E5. Les métriques ne sont pas vérifiées. Détail : [`egress-selector-predictions.md`](../../poc/bricks/08b-rke2/resultats/egress-selector-predictions.md).
+
+**Additif du 10/11/2026, 23:39 UTC : construction privilégiée sous Kata dans une pipeline, sans réseau** (brique 06, S4a, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4a-predictions.md)). La tâche `construire-builder` lance `mmdebstrap --mode=root` dans un pod Kata privilégié et root. Une NetworkPolicy lui coupe toute entrée et toute sortie : DNS, Zot, Forgejo et adresse publique échouent par délai.
+- **Entrées** : un miroir partiel en lecture seule (virtiofs), préparé par une tâche runc restreinte.
+- **Mesures** : pic mémoire de l'invité d'environ 1,7 Gio sur 6, et image reproductible sur deux exécutions.
+- **Conséquence pour cet ADR** : le schéma « entrées préparées en runc, construction privilégiée sous Kata sans réseau, publication en runc » de la voie image (construire-image) s'applique aussi à une construction par mmdebstrap.

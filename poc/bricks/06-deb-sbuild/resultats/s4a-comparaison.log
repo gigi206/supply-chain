@@ -1,0 +1,19 @@
+# s4a.sh comparaison, 2026-11-10T23:37:21Z
+OK   digest du manifeste relu : sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   configuration : {"architecture":"amd64","os":"linux","env":["PATH=/usr/sbin:/usr/bin:/sbin:/bin","HOME=/w/home"]}
+OK   diff_ids égaux aux digests des couches : ["sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242","sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064"]
+OK   couche racine : sha256 de l'archive : sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242
+OK   couche du chroot : sha256 de l'archive : sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064
+OK   A16 chroot intérieur égal au journal de construire : aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+OK   racine : paquets installés égaux à la référence (166) : égaux
+racine : hostname « sbuild », resolv.conf 0 octets, sources.list « deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main », listes d'apt : 0
+OK   racine : égalité bit à bit avec la référence (non attendue, A14) : différente
+OK   chroot : paquets installés égaux à la référence (122) : égaux
+chroot : hostname « sbuild », resolv.conf 0 octets, sources.list « deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z trixie main », listes d'apt : 0
+OK   chroot : égalité bit à bit avec la référence (non attendue, A14) : différente
+OK   A17 versions des paquets inclus : iproute2=6.15.0-1,libsbuild-perl=0.89.3+deb13u4,mmdebstrap=1.5.7-1+deb13u1,sbuild=0.89.3+deb13u4,uidmap=1:4.17.4-2
+OK   racine : sans point de montage du miroir (workspace/) : 0
+OK   chroot : sans point de montage du miroir (workspace/) : 0
+OK   compte constructeur : 1000:1000
+OK   subuid : constructeur:100000:65536
+OK   subgid : constructeur:100000:65536

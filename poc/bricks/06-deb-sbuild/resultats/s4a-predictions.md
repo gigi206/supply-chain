@@ -225,3 +225,36 @@ Code 0. Les deux PipelineRuns ont réussi. Journal : [`s4a-pipeline.log`](s4a-pi
   - Chroot intérieur `aec1c7a9…`, 451 786 240 octets ; couche du chroot `1029232e…`.
   - La seconde publication réussit, comme en F2. Chains signe les deux PipelineRuns.
 - **Non mesurées encore** : A8, A14, A16, A17 et A18 (étape `comparaison`) ; A15 (étape `provenance`).
+
+## Résultats des étapes `provenance` et `comparaison` (10/11/2026, 23:37:20 à 23:37:24 UTC, accord « Oui, lance-les »)
+
+Code 0. Journaux : [`s4a-provenance.log`](s4a-provenance.log) et [`s4a-comparaison.log`](s4a-comparaison.log).
+
+- **A15 : tenue.**
+  - cosign trouve 4 enveloppes valides sur `749d746c…`, avec la clé de Chains : les deux PipelineRuns et les deux TaskRuns `publier`, comme en F2.
+  - Une seule enveloppe vient de `s4a-builder-1`. Son sujet est `builds/builders/sbuild-debian13@sha256:749d746c…`, et son `buildType` est `slsa-tekton`.
+  - `resolvedDependencies` contient :
+    - la pipeline `a9d48331` ;
+    - les bundles `prefetch-deb` `4dac0609`, `construire-builder` `746c2e11` et `publier-image` `d21931f3` ;
+    - l'amorce `amont/library/debian@7378260c` ;
+    - l'image d'outils `c7bebae2` ;
+    - **l'InRelease de l'instantané, `0584fba3…`**, par le résultat `INSTANTANE_ARTIFACT_INPUTS`.
+  - Une autre clé est refusée (« no matching attestations »).
+- **A16 : tenue.**
+  - Le manifeste relu a bien le digest attendu, et la configuration est `linux/amd64` avec `PATH` et `HOME=/w/home`.
+  - Les `diff_ids` égalent les digests des couches, et chaque couche est le sha256 de son archive.
+  - Le chroot intérieur (`aec1c7a9…`) est égal au journal de `construire`.
+- **A8 : tenue.** Les paquets installés (nom, version, architecture) sont égaux à ceux de la racine de S1 (166) et du chroot de S2 (122).
+- **A14 : tenue.** Les deux archives diffèrent de celles de S1 et S2, comme prévu. `hostname` vaut `sbuild`, `resolv.conf` est vide, `sources.list` pointe vers l'instantané, et il n'y a aucune liste d'apt.
+- **A17 : tenue.** sbuild et libsbuild-perl sont en 0.89.3+deb13u4, mmdebstrap en 1.5.7-1+deb13u1, uidmap en 1:4.17.4-2 et iproute2 en 6.15.0-1. Le compte `constructeur` est en 1000:1000, avec `subuid` et `subgid` à 100000:65536.
+- **A18 : tenue.** Ni la racine ni le chroot ne contiennent `workspace/`.
+
+## Bilan de S4a
+
+**Toutes les prédictions sont tenues au troisième passage, sauf A6** (`dpkg -i` groupé), réfutée puis corrigée par A6 ter. A10 n'est tenue que par `memory.peak`, l'échantillonneur sous-estimant le pic.
+
+Il a fallu deux corrections de `construire-builder`, chacune signée de nouveau et revue :
+- `dpkg -i` remplacé par apt ;
+- `--no-download` retiré.
+
+**La plateforme construit l'image de build sbuild sans réseau et de façon reproductible** : `builds/builders/sbuild-debian13@sha256:749d746c…`. Sa provenance, signée par Chains, nomme l'amorce, l'InRelease de l'instantané et les tâches revues.
