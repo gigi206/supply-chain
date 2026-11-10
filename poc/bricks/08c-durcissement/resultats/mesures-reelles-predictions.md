@@ -1536,7 +1536,7 @@ Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`
 - « watching events » seul ne suffit pas. Le 07/11, cette ligne précédait l'erreur : la prendre pour témoin aurait donné un faux OK ;
 - un KO est différé en fin de script : il ne bloque ni le descellement d'OpenBao ni le reste. Sans Alloy sur `sc-stockage` (19b non posée), rien n'est relancé.
 
-**Essai hors cluster** ([`b1-essai-local.log`](b1-essai-local.log)) : faux `sur`, aucun ssh. 10 cas sur 10 conformes, dont la séquence du 07/11 (KO), le compteur à 0 ou absent pendant 5 min (KO), la relance refusée ou sans effet (KO), le nominal (OK). `bash -n` OK, avis de shellcheck identiques avant et après.
+**Essai hors cluster** ([`b1-essai-local.log`](b1-essai-local.log)) : faux `sur`, aucun ssh. 11 cas sur 11 conformes (après la correction ci-dessous), dont la séquence du 07/11 (KO), le compteur à 0 ou absent pendant 5 min (KO), la relance refusée ou sans effet (KO), le nominal (OK). `bash -n` OK, avis de shellcheck identiques avant et après.
 
 **Estimation** : 1 h. Préparation faite en environ 20 min ; reste un passage réel (`redemarrer.sh`, environ 20 min) et sa lecture. Un dépassement de 2 h déclenche une décision avec le propriétaire.
 
@@ -1544,7 +1544,12 @@ Le brouillon, toujours non envoyé, est complété : [`issue-alloy-brouillon.md`
 - B1-1 : Alloy de `sc-stockage` relancé après le réenregistrement des trois nœuds ; son démarrage avance.
 - B1-2 : compteur > 0 en moins de 1 min après la relance. Le redémarrage des VM crée de nombreux Events (pods recréés). Le plafond de 5 min n'est pas atteint.
 - B1-3 : aucune ligne d'erreur de l'observateur depuis la relance.
-- B1-4 : les autres contrôles de `redemarrer.sh` gardent leurs verdicts habituels ; la relance n'en change aucun.
+- B1-4 : les autres contrôles de `redemarrer.sh` gardent les verdicts du dernier passage archivé, `resultats/redemarrage-vm.log` de la 08 (07/11/2026, 11:20:38 UTC, 51 lignes `OK`, 0 `KO`) : mêmes contrôles `OK`, plus les lignes de b1.
 - Non jugé, affiché seulement si mesuré : les lignes du relais des deux autres VM perdues pendant la relance d'Alloy. Ces pertes n'ont jamais été mesurées.
 
 **Limite connue** : un démarrage des VM hors de `redemarrer.sh` n'est couvert que par l'alerte `EvenementsMuets` (remède (a)).
+
+*Corrigé à 11:13 UTC, avant tout push, sur relecture du conseiller* :
+- **Faux OK sur un ssh en échec.** Le premier test, `systemctl cat alloy`, ne distinguait pas une unité absente d'un ssh en échec (code 255, VM injoignable). Dans ce cas, la fonction annonçait « Alloy absent », rendait 0, et le KO différé ne se déclenchait jamais. Le test lit maintenant `systemctl list-unit-files alloy.service --no-legend || true`. Le `|| true` côté distant est nécessaire : `list-unit-files` rend 1 pour une unité absente (vérifié sur l'hôte). Seul un échec de ssh rend donc un code non nul, et il donne KO. Une sortie vide veut dire « absent ». Cas ajouté à l'essai : 11 cas sur 11 conformes, journal régénéré.
+- **B1-4 n'était pas réfutable** (« verdicts habituels », sans référence). Il est maintenant ancré sur le journal du 07/11/2026.
+- **Appelants** : seule la tâche `confiance:redemarrer` lance `redemarrer.sh`. `rejeu.sh` ne l'appelle pas. Le `exit 1` final n'arrête donc aucune chaîne.

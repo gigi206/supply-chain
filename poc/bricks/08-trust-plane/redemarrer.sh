@@ -51,8 +51,11 @@ prets() { # espace : chaque pod hors jobs passé Ready après l'arrêt ($arret) 
 # debut-b1
 alloy_debut() { sur sc-stockage "systemctl show -p ActiveEnterTimestamp --value alloy" </dev/null || true; }
 alloy_evenements() { # relance Alloy de sc-stockage ; rend 0 si des lignes d'Events sont transmises après la relance, 1 sinon
-  local a0 a1 e n=0 err=0
-  sur sc-stockage "systemctl cat alloy" </dev/null >/dev/null 2>&1 || { echo "--   Alloy absent de sc-stockage (19b non posée) : rien relancé"; return 0; }
+  local a0 a1 e u r=0 n=0 err=0
+  # « || true » côté distant : list-unit-files rend 1 pour une unité absente ; seul un échec de ssh (255) reste un code non nul
+  u=$(sur sc-stockage "systemctl list-unit-files alloy.service --no-legend || true" </dev/null 2>/dev/null) || r=$?
+  [ "$r" = 0 ] || { echo "KO   sc-stockage injoignable : unité alloy illisible (code $r), rien relancé" >&2; return 1; }
+  [ -n "$u" ] || { echo "--   Alloy absent de sc-stockage (19b non posée) : rien relancé"; return 0; }
   a0=$(alloy_debut)
   sur sc-stockage "sudo systemctl restart alloy" </dev/null || { echo "KO   relance d'Alloy refusée" >&2; return 1; }
   a1=$(alloy_debut)
