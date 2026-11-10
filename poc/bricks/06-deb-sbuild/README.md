@@ -559,3 +559,24 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 **Lecture du critère** : le critère « Sujet deb signé » est rempli par ce lien indirect. C'est mon interprétation de la réponse : la réponse ne le dit pas en toutes lettres. Les prédictions de S4 vérifieront le lien : sha256 du `.deb` égal au digest de la couche, et manifeste égal au sujet.
 
 **Choix encore ouverts** : 3 (dépôt de sortie), 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
+
+## Additif du 10/11/2026, 21:35 UTC : décision sur le dépôt de sortie, et ce qu'elle permet (lu dans le dépôt, à sec)
+
+**Décision du propriétaire** (21:34:43 UTC) : « builds/**, compte existant ». Elle tranche le choix 3 de la note de 21:25 UTC. Ce n'est un accord pour aucune mesure ni aucune écriture, et Zot ne change pas.
+
+**Compte** : `poc-images`, vérifié dans `stockage/zot.json` et `publier-image.yaml`.
+- Son secret est `zot-images`, dans `builds`.
+- Il crée par digest sous `builds/**`, mais ne pose ni tag, ni mise à jour, ni suppression.
+- `builds/fermetures/**` et `builds/scan/**` ont leurs propres règles.
+
+**Dépôt proposé** : `builds/sample-app-deb`, à côté de l'image `builds/sample-app`. C'est une proposition, pas une décision.
+
+**Réutiliser `publier-image` telle quelle**
+- Possible d'après son script, lu, non mesuré.
+  - La tâche extrait `image.tar`, un layout OCI, du workspace `sortie`. Elle compare le digest de l'index au paramètre `digest`.
+  - Elle pousse par `oras cp --from-oci-layout`, puis relit le manifeste en lecture anonyme. Elle émet `IMAGE_URL` et `IMAGE_DIGEST`.
+  - Rien dans ce script ne suppose que le manifeste soit une image.
+- Ce que ça éviterait : aucune nouvelle tâche de publication, et le secret `zot-images` reste monté par une seule tâche signée, qui garde son digest approuvé `d21931f3`.
+- Condition : la construction deb doit livrer un `image.tar` contenant le manifeste ORAS (`.deb` et `.buildinfo`), avec son digest. Reste à décider où tourne `oras push --oci-layout` : dans l'image de build, ou dans une petite tâche runc entre la construction et la publication.
+
+**Choix encore ouverts** : 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
