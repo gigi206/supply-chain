@@ -787,3 +787,39 @@ Vérifié sur les archives de S1 et S2 gardées sur l'hôte (`$W/s1-06`, `$W/s2-
 **Questions ouvertes** : les choix 1 à 4 de la carte, et le push.
 
 *Corrigé à 22:39 UTC* : la note « 22:47 UTC » ci-dessus a été écrite et commitée (`1febbf4`) à 22:39 UTC (horloge de l'hôte, `date -u` relevé à 22:39:25). L'heure de son titre et de son message de commit est fausse ; le contenu est inchangé.
+
+## Note datée du 10/11/2026, 22:51 UTC : recommandations de S4a revues par le conseiller, contrôles en lecture seule
+
+Le propriétaire a demandé que le conseiller valide les recommandations de S4a avant de les lui présenter. Le conseiller a demandé trois contrôles, faits en lecture seule sur le dépôt et l'hôte. Il a aussi révisé la recommandation 2. Cette note corrige la carte de 22:37 UTC et la note de 22:39 UTC sans les réécrire.
+
+**Recommandation 1 (`builds/builders/sbuild-debian13`) : confirmée par trois lectures.**
+- **Rétention de Zot** (`stockage/zot.json`) : `builds/**` relève de la règle `**`, avec `deleteUntagged: false`. Seul `builds/scan/**` perd ses référents. Une image poussée par digest, sans tag, n'est donc pas supprimée par la rétention.
+- **Admission** : la règle `images-zot-par-digest` de la 08c exige une image du Zot du PoC, par digest, sans liste de dépôts. Aucune politique ne vérifie de signature d'image d'étape dans `builds`.
+- **`publier-image`** refuse tout dépôt hors de `sc-stockage.poc.test:5000/builds/`. `builders/` exigerait donc, en plus de la règle de Zot, une autre tâche ou une tâche modifiée, avec un nouveau digest approuvé.
+
+**Exigences de `publier-image`, relues dans son script** :
+- `image.tar` à la racine du workspace ;
+- un `index.json` où le champ `digest` n'apparaît qu'une fois, donc un seul manifeste ;
+- un digest reçu en paramètre, égal à celui de l'index.
+
+La tâche Kata devra écrire ce layout et émettre le digest en résultat.
+
+**Recommandation 2 révisée : la tâche runc de téléchargement s'appelle `prefetch-deb`.**
+- La raison du « nom autre que `prefetch-deb` » (additif de 22:14 UTC, et carte de 22:37 UTC) supposait une tâche privilégiée avec réseau, comme la racine de S1. En 2 (b), la tâche qui a le réseau est une tâche runc restreinte qui télécharge une liste épinglée et la vérifie : c'est exactement le rôle de `prefetch-deb` en S4b, seule la liste change.
+- Rien dans D6 ne réserve ce nom : `fermeture_plateforme` ne vise que `prefetch-gomod`, et seulement en présence de `preparer-entrees` ou de `construire-image`. **« Réservé à la fermeture par D6 », dans la carte de 22:37 UTC, est faux.**
+- `prefetch-deb-sortie` est appliquée depuis 14:29 UTC, et `prefetch-deb` figure déjà dans le `NotIn` de `builds-sans-internet`. **Il ne reste qu'un changement Cilium au lieu de deux** : une politique sans sortie pour la tâche Kata.
+- La même tâche servirait à S4a et à S4b, ce qui réduit S4b et suit le principe « un prefetch par écosystème » de l'ADR 0007.
+
+**Recommandation 3 (`dpkg -i` dans l'amorce) : tenue, complétude non confirmée.**
+- Les 20 lignes `deb amorce` viennent d'`apt-get install` avec `Keep-Downloaded-Packages`, sans `essential/unlink`. Elles sont donc vraisemblablement complètes par rapport à l'amorce.
+- Le `install.log` du pod n'a pas été rapatrié, ce qui empêche de confirmer. Le confirmer sur l'amorce elle-même demanderait de la lire dans Zot, ce que je n'ai pas fait.
+- **À mettre en prédiction** : `dpkg -i` hors ligne de ces 20 paquets réussit.
+
+**Recommandation 4 (layout OCI à la main) : tenue**, avec les exigences de `publier-image` ci-dessus.
+
+**Risques non mesurés, à prédire en premier**
+- Le téléchargement en runc restreint, non root, depuis l'amorce slim, qui n'a ni curl ni wget. Il faudrait passer par apt, avec des répertoires `Dir::*` détournés et sans verrou.
+- La présence de `gpgv` ou de `sqv` dans l'amorce, et l'origine du trousseau.
+- La mémoire de la tâche Kata. En S1, un tmpfs de 4 Gio sur 6 Gio contenait la racine et le chroot. Il faudra en plus le miroir, ou le lire depuis le PVC, et écrire le layout dans le PVC.
+
+**Questions ouvertes** : les choix 1 à 4, avec la recommandation 2 révisée, et le push.
