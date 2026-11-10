@@ -1,0 +1,7 @@
+# s3.sh builds, 2026-11-10T17:44:28Z
+OK   chroot de S2 : e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+OK   ~/.cache/supply-chain-poc/08/travail/s3-06/restauree-1 : 162 fichiers, empreintes identiques à la liste attendue
+### s3-build-1 (runtimeClassName kata, uid 1000, label -) : prêt
+Terminated                 timeout 600 kubectl exec -i -n builds "$1" -- sh -c "head -c $n > $3" < "$2"
+pod s3-build-1 supprimé
+KO   copie de chroot.tar dans s3-build-1

@@ -133,3 +133,19 @@ Journal : [`s3-builds-1.log`](s3-builds-1.log).
 
 Le rejeu de `builds` demande un nouvel accord, puisque le script a changé.
 
+## Étape builds, deuxième passage (10/11/2026, 17:44:28 UTC) : même blocage, arrêté
+
+Accord : « Oui », à 17:44:23 UTC (transcription), en réponse à « je rejoue l'étape builds avec les copies corrigées ? ». Journal : [`s3-builds-2.log`](s3-builds-2.log).
+
+**Même blocage, sur la même copie.**
+- Le pod `s3-build-1` était prêt.
+- À 17:52:48 UTC, `kubectl exec -i … sh -c 'head -c 508546560 > /w/chroot.tar'` tournait depuis 494 s.
+- Côté hôte, kubectl avait lu les 508 546 560 octets et écrit environ 509,7 Mo sur sa connexion.
+- `head -c` n'a pas besoin de fin de flux. **L'hypothèse du premier passage, une fin de flux non reçue, tombe donc.** Reste, supposé et non vérifié : les octets envoyés n'arrivent pas tous dans le pod, ou n'y sont pas écrits.
+
+**Arrêt** : sur « Arrête et propose » (17:53:40 UTC), kubectl local terminé à 17:53:47 UTC, avant le délai de 600 s.
+- Le script a supprimé le pod lui-même et s'est arrêté en code 1 (« KO copie de chroot.tar »).
+- Le pod était absent à 17:53:51 UTC.
+
+**Aucune prédiction n'est mesurée.** sbuild n'a pas démarré. Le transfert vers le pod par l'entrée standard de `kubectl exec` est écarté pour un fichier de cette taille. Les copies réussies jusqu'ici dans ce sens ne dépassaient pas 4 ko. Une autre voie est à décider avec le propriétaire.
+

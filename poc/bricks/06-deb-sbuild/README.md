@@ -273,3 +273,9 @@ Lancés à 16:52:09 UTC sur l'accord « Oui, lance builds ». Le pod `s3-build-1
 - Aucun build n'a tourné. Journal : [`s3-builds-1.log`](resultats/s3-builds-1.log).
 - **Correction à sec, NON REJOUÉE** : copies à nombre d'octets exact (`head -c`), délai, taille comparée dans le pod. Un nouvel accord est attendu. Détails : [prédictions de S3](resultats/s3-predictions.md).
 
+## Additif du 10/11/2026, 17:54 UTC : rejeu des builds de S3, même blocage, arrêté
+
+Le rejeu a été lancé à 17:44:28 UTC, sur l'accord « Oui ». Il s'est bloqué à la même copie du chroot, cette fois avec `head -c`, qui ne dépend pas de la fin de flux. L'étape a été arrêtée à 17:53 UTC, sur « Arrête et propose ». Le pod a été supprimé par le script. Journal : [`s3-builds-2.log`](resultats/s3-builds-2.log).
+
+**Aucun build n'a tourné.** Le transfert vers le pod par l'entrée standard de `kubectl exec` est écarté pour 509 Mo. Une autre voie est à décider.
+
