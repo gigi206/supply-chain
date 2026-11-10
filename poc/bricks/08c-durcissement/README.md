@@ -1332,3 +1332,11 @@ Origine : le constat P3 de la brique 06. Le propriétaire a répondu « Oui, pr�
 **Lecture du cluster faite sans accord** : à 13:32:37 UTC, consignée.
 
 **Push de 13:31:36 UTC** : consigné.
+
+*Corrigé à 13:43 UTC, avant tout push* :
+- **Test 6** : l'option (a) le ferait échouer à deux endroits.
+  - Pour `construire-image`, le flux passerait en `POLICY_DENY` au lieu de `POLICY_DENIED`.
+  - La contre-épreuve ne verrait plus sa sortie vers `203.0.113.10:443`.
+  - Décisions (i) et (ii) au propriétaire.
+- **`bout_en_bout`** : ses effets sont listés (Zot et CronJob `rattrapage`).
+- **Limite du label** : elle se réduit à l'administrateur et aux tâches signées, puisque Tekton réécrit `tekton.dev/task`. Détail dans les [prédictions](resultats/sortie-predictions.md).

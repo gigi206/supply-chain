@@ -82,3 +82,59 @@ Deux contrôles l'utilisent désormais :
 - Les essais de J6 et les briques 05 et 06 : chacune aura besoin d'une sortie dédiée vers son dépôt (instantané Debian pour S2, `vault` de Rocky pour M1 et M2), donc d'un label ajouté à l'exclusion. Ce sera une décision du propriétaire, le moment venu.
 
 **Intégration** : la règle n'est pas dans le rejeu de zéro, et le prochain rejeu ne la reposerait pas. Son intégration est à décider avec son application.
+
+## Corrigé à 13:43 UTC, avant tout push, sur relecture du conseiller (lectures du dépôt seulement)
+
+### 1. L'option (a) ferait échouer le test 6 de `preuves.sh`, rejoué à chaque rejeu
+
+Le test 6 vise `EXTERNE=203.0.113.10:443` (`T6_DESTINATIONS`, ligne 654), une adresse publique de documentation.
+
+**Pour la tâche `construire-image`**
+- Le test exige un flux `POLICY_DENIED` en `EGRESS` (lignes 833 à 839).
+- Or `builds-sans-internet` sélectionne aussi ces pods, et un refus l'emporte. Dans `api/v1/flow/flow.proto` de Cilium 1.20.4, le refus explicite a son propre motif, `POLICY_DENY = 181`, distinct de `POLICY_DENIED = 133`.
+- Prédit, si (a) est appliquée telle quelle : **KO**, flux en `POLICY_DENY`. Confiance moyenne : l'ordre d'évaluation entre ce refus et le refus par défaut de `construction-sans-sortie` n'est pas lu.
+
+**Pour la contre-épreuve `preuve-test6-temoin`**
+- Le test exige des SYN vers `EXTERNE:443` sur `enp1s0` de sc-build (ligne 807).
+- Ce pod porte un autre label, donc `builds-sans-internet` le sélectionne et coupe cette sortie.
+- Prédit : **KO**. Confiance haute.
+
+**Deux décisions sur ce point, au propriétaire**
+- (i) Exclure aussi `construire-image` de la règle. Le test garde `POLICY_DENIED`, mais on perd la défense en profondeur si `construction-sans-sortie` disparaissait.
+- (ii) Revoir les attentes du test 6 :
+  - accepter `POLICY_DENY` ;
+  - prouver la non-sélection de la contre-épreuve par une destination privée (Zot ou Forgejo joints), et non plus par `EXTERNE`.
+
+Le refus d'Internet devient alors une propriété de `builds`, plus seulement de la construction.
+
+Aucun autre contrôle trouvé ne compte les politiques de `builds` ni ne juge un motif de rejet vers une adresse publique :
+- `kata.sh`, `buildkit.sh` et `releve-secrets.sh` ne lisent que les NetworkPolicy de Kubernetes ;
+- les tests 1 et 6 jugent OpenBao, Zot, Forgejo et l'API, toutes des adresses privées.
+
+### 2. `bout_en_bout` : ses effets
+
+`preuves.sh construction_durcie` n'est pas une lecture. Il :
+- suspend puis reprend le CronJob `rattrapage` ;
+- purge le PipelineRun de la tête de main ;
+- demande une livraison de test à Forgejo ;
+- reconstruit l'image ;
+- fait écrire deux enveloppes de Chains de plus dans Zot (définitif) ;
+- fait juger par la porte la provenance la plus récente ;
+- ajoute une ligne au `chrono.tsv` de la 08, qui est commité.
+
+L'environnement de `mise exec` suffit : celui de `mise.toml` est global (`[env]`), et la tâche `confiance:preuves` n'en ajoute pas.
+
+### 3. La limite du label est plus étroite qu'écrit
+
+Le contrôleur de Tekton v1.15.5 réécrit `tekton.dev/task` au nom de la tâche résolue, celle du bundle signé. C'est mesuré en J7 : le créateur avait imposé `autre` par `taskRunSpecs[].metadata`, et le pod a gardé `construire-image` (README de la 08, « Sélection des pods »).
+
+**L'auteur d'un PipelineRun ne peut donc pas imposer `prefetch-gomod`.** Seuls échappent au refus :
+- celui qui crée un pod brut dans `builds`, c'est-à-dire l'administrateur du cluster (les opérateurs n'ont que la lecture) ;
+- une tâche signée nommée `prefetch-gomod`, qui doit figurer dans la liste revue.
+
+### 4. Séquence, critère de retrait, estimation
+
+- **Séquence prévue** : `prealables`, `avant`, `appliquer`, `apres`, `bout_en_bout`. **La règle reste en place à la fin.**
+- **Critère de retrait** : `retirer` n'est lancé que si Q9 échoue, ou si Q6 montre Zot ou Forgejo coupés. Q10 devient conditionnelle.
+- **Le test 6** n'est pas dans cette séquence : sa mise à jour suit la décision (i) ou (ii).
+- **Estimation** : environ 30 min de passage, dont 5 à 10 min de PipelineRun. Décision avec le propriétaire au-delà d'1 h.
