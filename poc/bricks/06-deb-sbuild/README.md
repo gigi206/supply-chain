@@ -546,3 +546,16 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
   - `porte.rego` est à étendre à la voie deb (point 11).
 
 **Choix encore ouverts** (numérotation de la note de 21:25 UTC) : 2 (sujet signé et critère), 3 (dépôt de sortie), 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
+
+## Additif du 10/11/2026, 21:33 UTC : décision sur le sujet signé
+
+**Décision du propriétaire** (21:33:33 UTC) : « Manifeste OCI ». Elle tranche le choix 2 de la note de 21:25 UTC. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Ce que la décision fixe**
+- Le sujet de la provenance de `sample-app-deb` est le manifeste OCI qui porte le `.deb`, publié par ORAS, comme dans le précédent `publier-fermeture`.
+- La tâche de publication émet `IMAGE_URL` (un dépôt sans préfixe `oci://`) et `IMAGE_DIGEST`.
+- Le `.deb` est couvert par le digest de sa couche dans ce manifeste. Le `.buildinfo` est joint au même manifeste, comme le demande S4.
+
+**Lecture du critère** : le critère « Sujet deb signé » est rempli par ce lien indirect. C'est mon interprétation de la réponse : la réponse ne le dit pas en toutes lettres. Les prédictions de S4 vérifieront le lien : sha256 du `.deb` égal au digest de la couche, et manifeste égal au sujet.
+
+**Choix encore ouverts** : 3 (dépôt de sortie), 4 (`prefetch-deb`), 5 (coupure réseau), 6 (image sous `builders/`). Le push des commits de la 06 attend aussi un oui.
