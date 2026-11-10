@@ -222,3 +222,11 @@ Passage de 15:53:52 à 15:57:40 UTC, sur l'accord « Oui, lance racine ». Code 
 **Reste** :
 - l'envoi dans Zot et la restauration par digest, sur accord ;
 - puis S3 : deux builds hors ligne depuis la fermeture restaurée.
+
+## Additif du 10/11/2026, 16:25 UTC : fermeture dans Zot, étape arrêtée en code 1
+
+La fermeture est écrite dans Zot, sous `deps/sample-app/deb-buildinfo@sha256:3a0e54ae…` (tags `s2` et `s2-bis`), sur l'accord « Oui, lance-les ». Le second envoi a donné le même digest.
+
+L'étape s'est ensuite arrêtée en code 1, sur une option refusée par `oras manifest fetch`. Le contrôle des couches et la restauration n'ont pas tourné.
+
+Le script est corrigé à sec, **non rejoué**. Le rejeu attend un nouvel accord. Détails : [prédictions de S2](resultats/s2-predictions.md).

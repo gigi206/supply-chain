@@ -230,7 +230,8 @@ etape_fermeture() {
   attendu "digest du second envoi" "${r2#*@}" "${r1#*@}"
   d=${r1#*@}; echo "$d" > "$T/fermeture.digest"
   # shellcheck disable=SC2046
-  oras manifest fetch $(oras_zot) --no-tty "$REG_HOTE/$DEPOT_FERMETURE@$d" > "$T/manifest.json"
+  # Corrigé à 16:25 UTC le 10/11/2026, NON REJOUÉ : oras 1.3.6 refuse --no-tty pour manifest fetch (« unknown flag », 16:23 UTC)
+  oras manifest fetch $(oras_zot) "$REG_HOTE/$DEPOT_FERMETURE@$d" > "$T/manifest.json"
   attendu "couches du manifeste" "$(jq '.layers | length' "$T/manifest.json")" "$(wc -l < "$T/fermeture.attendue")"
   attendu "digest de chaque couche = SHA256 de Packages (fichier par fichier)" \
     "$(jq -r '.layers[] | "\(.annotations["org.opencontainers.image.title"]) \(.digest | ltrimstr("sha256:"))"' "$T/manifest.json" | sort | sha256sum | cut -c1-64)" \

@@ -111,3 +111,23 @@ Lancée sous bash, code de sortie relevé : **0**. Journal : [`s2-racine.log`](s
 **Non prédit** : le chroot `buildd` sans dépendances pèse 509 Mo, contre 920 Mo pour le chroot de S1, qui préinstallait debhelper, golang-go et nodejs.
 
 **Reste à lancer** : `fermeture` et `restauration`, qui attendent un accord nommé et la réponse sur le nom du dépôt.
+
+## Résultat de l'étape fermeture, premier passage (10/11/2026, 16:23:43 UTC, accord : « Oui, lance-les », 16:23:36 UTC)
+
+L'accord répond à la question « Lancez-vous fermeture et restauration sous deps/sample-app/deb-buildinfo ? ». Il couvre donc les deux étapes et le nom du dépôt.
+
+Lancé sous bash, `s2.sh fermeture restauration`. **Code de sortie relevé : 1.** Journal : [`s2-fermeture-1.log`](s2-fermeture-1.log), renommé pour ne pas être écrasé.
+
+**Écrit dans Zot, définitif**
+- `deps/sample-app/deb-buildinfo:s2` et `:s2-bis`
+- même digest : `sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b`
+
+| # | Résultat |
+|---|---|
+| Q9 | **Tenue.** Le second envoi donne le même digest que le premier |
+| Q10 | **Non mesurée.** Le contrôle du manifeste a échoué avant de lire les couches : oras 1.3.6 refuse `--no-tty` pour `manifest fetch` (« unknown flag ») |
+| Q11 | **Non lancée.** `lancer` s'arrête à la première étape en échec |
+
+**Cause** : une erreur du script, et non de la fermeture. L'option `--no-tty` n'a pas été vérifiée pour cette sous-commande ; l'aide locale d'oras, lue ensuite sous `unshare -rn`, le confirme.
+
+**Corrigé à sec à 16:25 UTC, NON REJOUÉ** : l'option est retirée de `manifest fetch`. Le script modifié n'est pas couvert par l'accord de 16:23. Le rejeu de `fermeture restauration` renverrait le même contenu (même digest attendu, mêmes tags), et demande un nouvel accord.
