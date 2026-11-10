@@ -89,3 +89,13 @@ L'image de base Debian de `builders/sbuild-debian13` n'est pas auditée au doc 0
 - **Hors du seuil** : scan et licences du deb (07a, 13a), signature OpenPGP (09), replay séparé (10).
 - **sbuild de stable** : 0.89.3 contre 0.91.10 en amont. Choix d'épinglage cohérent avec le doc 04, à revoir à chaque version mineure de Debian.
 - **`snapshot.debian.org`** n'est lu qu'à la résolution : à partir de S3, seule la fermeture compte.
+
+## Additif du 10/11/2026, 12:14 UTC : D1 à D4 décidées, option (a) partout
+
+Décision du propriétaire : « Briques 05 et 06 : je recommande (a) pour D1 à D4. Tu valides ? », réponse « oui ». Rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+- **D1 (a)** : pod Kata privilégié (voie A). La clause reste : si un pod Kata non privilégié passe en S1, (b) redevient à examiner.
+- **D2 (a)** : dépôt apt local construit depuis les paquets du `.buildinfo`, archivés fichier par fichier dans Zot.
+- **D3 (a)** : instantané daté de `snapshot.debian.org` pour la résolution.
+- **D4 (a)** : base produite par mmdebstrap depuis l'instantané.
+
+**Aucun jalon n'est lancé.** S1 et chaque jalon suivant demandent un accord à part.

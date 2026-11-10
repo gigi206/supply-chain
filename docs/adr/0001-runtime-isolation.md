@@ -74,6 +74,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 05/11/2026, 22:37 UTC** : audit au doc 04 de podman, skopeo et des images de base, rien installé, aucun verdict « Risqué ». La plage amont d'un avis critique sur `podman run` couvre le podman de Rocky 9.7 et 9.8 ; mock n'emploie pas `podman run`, d'après son code au tag. Rien n'est mesuré sous Kata : la ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 10/11/2026, 12:14 UTC** : D1 des briques [05](../../poc/bricks/05-rpm-mock/README.md) et [06](../../poc/bricks/06-deb-sbuild/README.md) décidée en (a) par le propriétaire : mock et sbuild en pod Kata privilégié (voie A), aucun pod privilégié hors Kata. Pour la 06, (b) (Kata non privilégié) redevient à examiner si S1 le permet. Aucun jalon n'est lancé.
+
 > **Additif du 06/11/2026, 13:10 UTC** : RKE2 v1.35.9+rke2r1 mesuré dans le PoC en profil `cis`, [bilan de la 08b](../../poc/bricks/08b-rke2/README.md) : image `3a7ca1b1`, 8 tests négatifs, test 6 et anti-usurpation sous `kubeProxyReplacement=true`, 0 compte de service lié à `cluster-admin`. Chaque étape passe, pas encore d'un seul tenant : décision non confirmée tant que le passage complet de zéro n'est pas fait.
 
 > **Additif du 06/11/2026, 16:00 UTC** : passage de zéro sous RKE2 fait, avec un arrêt à `J8 (contrôleurs)` et une reprise, écart accepté par le propriétaire (« Reprends à J8 »). 0 KO sur le reste, [bilan de la 08b](../../poc/bricks/08b-rke2/README.md). Les journaux de la 08 portent désormais les mesures RKE2 : les liens de cet ADR vers des mesures k3s réécrites sont épinglés au commit `d357f4d`.

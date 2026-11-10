@@ -94,3 +94,13 @@ Chaque jalon demande un accord. Une étape à la fois, pour qu'un échec soit at
 - **Hors du seuil** : scan et licences du rpm (07a, 13a), signature OpenPGP (09), replay dans le domaine séparé (10). `tools/index` et la porte devront connaître les sujets non-image ; ce travail n'est pas chiffré ici.
 - **Root de l'invité** : comme mesuré en 03 F3, un volume `readOnly` peut être remonté en écriture depuis un pod Kata privilégié. L'intégrité des entrées repose sur les empreintes.
 - **Rocky 9.7 figé** : choix de reproductibilité du PoC, pas une recommandation pour la plateforme finale.
+
+## Additif du 10/11/2026, 12:14 UTC : D1 à D4 décidées, option (a) partout
+
+Décision du propriétaire : « Briques 05 et 06 : je recommande (a) pour D1 à D4. Tu valides ? », réponse « oui ». Rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+- **D1 (a)** : mock en pod Kata privilégié (voie A). « 0 pod privilégié sur l'hôte » se lit comme le test 4 de la 08 : aucun pod privilégié hors Kata.
+- **D2 (a)** : rpm de `vault/rocky/9.7`, en `baseurl` fixes.
+- **D3 (a)** : résolution sur l'hôte d'abord, puis dans Tekton en M4.
+- **D4 (a)** : outillage sur Rocky 9.8 par digest (mock, podman, skopeo), cible en `vault/9.7`.
+
+**Aucun jalon n'est lancé.** S1 et chaque jalon suivant demandent un accord à part.
