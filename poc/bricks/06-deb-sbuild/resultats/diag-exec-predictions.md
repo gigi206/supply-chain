@@ -458,3 +458,20 @@ Accord : « Oui », à 20:09:19 UTC (transcription), en réponse à « Je lance 
 - le ticket Kubernetes [#13394](https://issues.k8s.io/13394), ancien, sur un `kubectl exec -i` alimenté par un tube qui ne se termine pas ;
 - une note de CoreWeave, qui attribue des blocages d'exec au tunnel entre l'apiserver et kubelet (Konnectivity, un autre tunnel).
 
+## Étape tunnel : préparée à sec (20:13 UTC), NON LANCÉE
+
+**Lectures** :
+1. l'argument `--egress-selector-config-file` de kube-apiserver et le contenu de ce fichier. C'est une configuration ; aucun secret n'y est attendu, et les lignes `jeton|token` sont retirées ;
+2. les connexions établies vers le port 9345 du superviseur depuis sc-build, avant, pendant et après le blocage ;
+3. les journaux de rke2-server (sc-confiance) et de rke2-agent (sc-build) dans la fenêtre. On garde les lignes qui citent le tunnel, `remotedialer`, un proxy, le sélecteur de sortie, 10250, un flux, une connexion, une erreur ou un délai. Les lignes `jeton|token` sont retirées, et chaque ligne est coupée à 300 caractères.
+
+**Blocage** : le même exec à lecture lente de 128 Mio, dans un pod runc. Rien n'est changé ni écrit sur les VM.
+
+| # | Prédit | Confiance |
+|---|---|---|
+| T1 | kube-apiserver a un sélecteur de sortie : le trafic vers kubelet passe par le tunnel du superviseur (port 9345) | moyenne : aucune connexion directe relevée |
+| T2 | Une connexion durable de sc-build vers 9345, la même avant, pendant et après | moyenne |
+| T3 | Les journaux de rke2-server et rke2-agent ne disent rien de cet exec à leur verbosité actuelle | moyenne |
+
+**Lecture prévue** : si T1 tient, le tunnel est le seul maillon de la chaîne qui n'a pas encore été observé. Pour le confirmer, il faudrait une mesure qui le contourne, et la seule qui se présente est de changer le mode du sélecteur. Ce serait un changement de la plateforme, à décider avec le propriétaire.
+

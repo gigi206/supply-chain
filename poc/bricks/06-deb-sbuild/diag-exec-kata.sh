@@ -423,4 +423,46 @@ etape_connexions() {
   pod_retirer "$POD"
 }
 
+# Étape tunnel (préparée à sec le 10/11/2026 à 20:13 UTC, NON LANCÉE) : l'étape connexions ne montre aucune connexion directe de
+# kube-apiserver vers kubelet. Vérifie le passage par le tunnel de l'agent RKE2 et le relève pendant un blocage :
+#   1. argument --egress-selector-config-file de kube-apiserver et contenu de ce fichier (configuration, sans secret attendu ;
+#      lignes jeton|token retirées)
+#   2. connexions établies vers le port 9345 du superviseur (sc-confiance) depuis sc-build, avant, pendant et après
+#   3. exec à lecture lente de 128 Mio dans un pod runc (délai de 150 s)
+#   4. journaux de rke2-server (sc-confiance) et rke2-agent (sc-build) dans la fenêtre : lignes qui citent tunnel, remotedialer,
+#      proxy, egress, 10250, stream, connexion, erreur ou délai ; jeton|token retirés ; 300 caractères au plus
+# Rien n'est changé ni écrit sur les VM.
+tunnel_releve() {
+  echo "$1 : sc-confiance, :9345 établies depuis ${IP[sc-build]} : $(sur sc-confiance "sudo ss -Htn state established '( sport = :9345 )' dst ${IP[sc-build]}" </dev/null 2>/dev/null | wc -l)"
+}
+
+etape_tunnel() {
+  local e f pid rc=0 t0 d fin
+  e=$(args_apiserver | sed -n 's/^--egress-selector-config-file=//p' | head -1)
+  echo "## sélecteur de sortie de kube-apiserver : ${e:-argument absent}"
+  [ -n "$e" ] && sur sc-confiance "sudo cat '$e'" </dev/null 2>/dev/null | grep -a -i -v -E 'jeton|token' | sed 's/^/     /'
+  croise_pod - "$RESTREINT"
+  d=$(date -u +'%Y-%m-%d %H:%M:%S')
+  tunnel_releve avant
+  f=$(alea 128); t0=$(ms)
+  timeout 150 kubectl exec -i -n builds "$POD" -- sh -c "$LECTEUR_LENT" < "$f" 2>"$T/err" &
+  pid=$!
+  sleep 45
+  echo "pendant, $(( ($(ms) - t0) / 1000 )) s après le lancement ; reçus dans le pod : $(recu /w/croise)"
+  tunnel_releve pendant
+  wait "$pid" || rc=$?
+  echo "exec : code $rc en $(( $(ms) - t0 )) ms"
+  sleep 5
+  tunnel_releve apres
+  pod_retirer "$POD"
+  fin=$(date -u +'%Y-%m-%d %H:%M:%S')
+  for v in "sc-confiance $D_SERVEUR" "sc-build $D_AGENT"; do
+    set -- $v
+    echo "### journal de $2 ($1), $d à $fin UTC"
+    sur "$1" "sudo journalctl -u $2 --since '$d UTC' --until '$fin UTC' -o short-iso --no-pager" </dev/null 2>/dev/null \
+      | grep -a -i -E 'tunnel|remotedialer|proxy|egress|10250|stream|connect|error|erreur|timeout|closed' \
+      | grep -a -i -v -E 'jeton|token' | cut -c1-300 | tail -n 100 || true
+  done
+}
+
 lancer diag-exec "06 diagnostic exec Kata" "$@"
