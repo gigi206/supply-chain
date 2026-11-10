@@ -265,3 +265,12 @@ L'incident de copie reste ouvert. Le propriétaire a demandé « il faut trouver
 **Correction de lecture** : « le blocage est propre à Kata » n'est pas établi. La comparaison runc/Kata change deux choses à la fois, le runtime et la vitesse de lecture du pod (environ 150 Mo/s sous runc, 10 Mo/s sous Kata). Sous Kata, kubectl a tout envoyé bien avant que le pod ait tout lu, et des centaines de Mo restent en attente dans la chaîne. Ce cas n'a jamais été mesuré sous runc. De même, « la quantité compte, pas la durée » est trop fort : l'envoi lent ne portait que sur 32 Mio, sous les 64 Mio qui passent. **La règle d'exploitation reste vraie** : sous Kata, un gros fichier ne passe pas par l'entrée standard de `kubectl exec`.
 
 Le diagnostic qui a suivi est dans [`diag-exec-predictions.md`](diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 21:01 UTC : sonde rejouée après le retrait du tunnel (08b)
+
+Accord : « 3, les deux », à 20:56:34 UTC (transcription). `s3.sh sonde` rejouée sans modification de 20:58:47 à 21:00:36 UTC, code 0. Nouveau journal : [`s3-sonde-direct.log`](s3-sonde-direct.log) ; [`s3-sonde.log`](s3-sonde.log) garde la mesure de 18:02 UTC, restaurée depuis git.
+
+- **Kata : 512 Mio en code 0 en 54,8 s, sha256 conforme** ; à 18:02 UTC, la même copie ne rendait pas la main en 120 s, en WebSocket comme en SPDY ;
+- runc : 512 Mio en 3,3 s, comme avant (3,6 s).
+
+Le blocage de la sonde ne venait pas de Kata mais du chemin par le tunnel de l'agent RKE2, retiré par `egress-selector-mode: disabled` (08b). Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part. Prédictions D5 et D6 : [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md).

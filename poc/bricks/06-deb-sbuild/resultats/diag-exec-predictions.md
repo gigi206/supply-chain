@@ -609,3 +609,7 @@ Le 10/11/2026 à 20:45 UTC, la vérification après `egress-selector-mode: disab
 | Résultat de l'étape connexions (20:09:24 à 20:12:01 UTC) | `diag-exec-connexions.log` | [`diag-exec-connexions-agent.log`](diag-exec-connexions-agent.log) |
 
 Aucun autre lien vers ces deux journaux n'existe dans les fichiers `.md` du dépôt, en dehors des prédictions de la brique 08b, écrites après le remplacement. Pour la sonde de S3, à rejouer, la commande prévue garde l'ancien journal sous son nom et range le nouveau sous `s3-sonde-direct.log` (voir [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md)).
+
+## Additif du 10/11/2026, 21:01 UTC : étape direct lancée
+
+Accord : « 3, les deux », à 20:56:34 UTC (transcription). Étape `direct` lancée de 20:56:42 à 20:58:47 UTC, code 0 ([`diag-exec-direct.log`](diag-exec-direct.log)). Trois exec à lecture lente de 128 Mio vers sc-build en code 0, 13,3 s chacun ; pendant chacun, une connexion directe de sc-confiance vers sc-build:10250, vue des deux côtés. Prédictions et résultats : [`egress-selector-predictions.md`](../../08b-rke2/resultats/egress-selector-predictions.md) (D1 à D4).

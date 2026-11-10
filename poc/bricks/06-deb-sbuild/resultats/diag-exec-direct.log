@@ -1,0 +1,19 @@
+# diag-exec-kata.sh direct, 2026-11-10T20:56:42Z
+sc-build : InternalIP 192.168.161.12 ; adresse du dépôt 192.168.161.12
+sc-confiance : InternalIP 192.168.161.11 ; adresse du dépôt 192.168.161.11
+kube-apiserver : --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname 
+horloges : hôte 20:56:43.202, sc-confiance 20:56:43.313, sc-build 20:56:43.507 UTC (aller-retour ssh compris)
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 20:56:44 UTC
+## essai 1
+exec : 134217728 octets, code 0 en 13298 ms, de 20:56:47.934 à 20:57:01.232 UTC (hôte) ; reçus dans le pod : 134217728 ; sha256 conforme
+     apiserver : 80 relevés de 20:56:45.046 à 20:57:25.216 ; non nuls : 26, de 20:56:48.093 à 20:57:00.813, au plus 1 connexion(s)
+     kubelet : 80 relevés de 20:56:45.071 à 20:57:25.209 ; non nuls : 26, de 20:56:48.119 à 20:57:00.826, au plus 1 connexion(s)
+## essai 2
+exec : 134217728 octets, code 0 en 13277 ms, de 20:57:28.825 à 20:57:42.102 UTC (hôte) ; reçus dans le pod : 134217728 ; sha256 conforme
+     apiserver : 80 relevés de 20:57:25.927 à 20:58:06.098 ; non nuls : 26, de 20:57:28.978 à 20:57:41.699, au plus 1 connexion(s)
+     kubelet : 80 relevés de 20:57:25.950 à 20:58:06.081 ; non nuls : 26, de 20:57:28.996 à 20:57:41.697, au plus 1 connexion(s)
+## essai 3
+exec : 134217728 octets, code 0 en 13286 ms, de 20:58:09.704 à 20:58:22.990 UTC (hôte) ; reçus dans le pod : 134217728 ; sha256 conforme
+     apiserver : 80 relevés de 20:58:06.823 à 20:58:46.971 ; non nuls : 26, de 20:58:09.870 à 20:58:22.582, au plus 1 connexion(s)
+     kubelet : 80 relevés de 20:58:06.819 à 20:58:46.942 ; non nuls : 26, de 20:58:09.865 à 20:58:22.565, au plus 1 connexion(s)
+pod diag-exec-kata supprimé

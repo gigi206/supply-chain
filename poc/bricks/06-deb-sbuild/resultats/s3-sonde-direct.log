@@ -1,0 +1,16 @@
+# s3.sh sonde, 2026-11-10T20:58:47Z
+kubectl : Client Version: v1.35.10
+### s3-sonde-kata (runtimeClassName kata, uid 1000, label -) : prêt
+sonde s3-sonde-kata websocket 1048576 octets : code 0 en 246 ms ; reçus dans le pod : 1048576 ; sha256 conforme 
+sonde s3-sonde-kata websocket 8388608 octets : code 0 en 1014 ms ; reçus dans le pod : 8388608 ; sha256 conforme 
+sonde s3-sonde-kata websocket 67108864 octets : code 0 en 6924 ms ; reçus dans le pod : 67108864 ; sha256 conforme 
+sonde s3-sonde-kata websocket 536870912 octets : code 0 en 54820 ms ; reçus dans le pod : 536870912 ; sha256 conforme 
+s3-sonde-kata : toutes les tailles passent
+pod s3-sonde-kata supprimé
+### s3-sonde-runc (runtimeClassName -, uid 1000, label -) : prêt
+sonde s3-sonde-runc websocket 1048576 octets : code 0 en 91 ms ; reçus dans le pod : 1048576 ; sha256 conforme 
+sonde s3-sonde-runc websocket 8388608 octets : code 0 en 116 ms ; reçus dans le pod : 8388608 ; sha256 conforme 
+sonde s3-sonde-runc websocket 67108864 octets : code 0 en 439 ms ; reçus dans le pod : 67108864 ; sha256 conforme 
+sonde s3-sonde-runc websocket 536870912 octets : code 0 en 3269 ms ; reçus dans le pod : 536870912 ; sha256 conforme 
+s3-sonde-runc : toutes les tailles passent
+pod s3-sonde-runc supprimé
