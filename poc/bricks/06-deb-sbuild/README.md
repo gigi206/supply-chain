@@ -697,3 +697,58 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - Ces changements touchent `poc/packaging`, qui sert aussi à la brique 05 (rpm), via `sources.sh` et le spec. **À vérifier en S4c** : séparer le paquet source de la plateforme de celui de l'hôte, ou les changer ensemble.
 
 **Questions ouvertes** : aucune avant la préparation de S4a.
+
+## Additif du 10/11/2026, 22:37 UTC : carte de S4a (pipeline `builders/`), à sec, rien lancé
+
+Le propriétaire a répondu « continue » après la clôture de 22:30 UTC. Je le lis comme une permission de préparer S4a à sec, pas comme un accord de mesure ni d'écriture. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM.
+
+**Vérifié dans le dépôt et sur l'hôte**
+- **Comptes de Zot** (`stockage/zot.json`, règles lues sans les secrets) : `builders/**` n'a pas de règle propre. Seul `poc-ecriture` y écrit, par `**`. `builds/**` admet `poc-images` (création seule) et `poc-build`.
+- **Compte de Chains** : `poc-build` (`politique/chains-zot.yaml`). Chains ne pourrait donc écrire ni `.sig` ni `.att` sous `builders/**` sans changer Zot.
+- **Image d'outils** `plateforme/outils-horodatage` (`tsa.sh image`) : base cosign, plus `oras` 1.3.6 et `timestamp-cli`. **Pas de `crane`** : l'assemblage de S1 (`crane append` sur l'hôte) ne se transpose pas tel quel.
+- **Création des PipelineRun hors webhook** : `prefetch.sh` de la 03 les crée depuis l'hôte (`kubectl create`, fonction `pr_f2`). La VerificationPolicy `taches-plateforme` (mode `enforce`) exige des tâches et pipelines signées sous `tekton/(tasks|pipelines)/`.
+- **Appel de mmdebstrap en S1** (`s1.sh`, ligne 158) : `--skip=cleanup/apt/lists`. Les listes d'apt de l'instantané restent donc dans l'archive `racine`, et leurs noms de fichiers dérivent de l'URL du miroir.
+- **Listes épinglables** : les journaux donnent chaque `.deb` avec son sha256. Ce sont les lignes `deb amorce` et `deb racine` de [`s1c-racine.log`](resultats/s1c-racine.log), et `deb chroot-a` de [`s2-racine.log`](resultats/s2-racine.log).
+- **Manuel de mmdebstrap 1.5.7** (lu au tag, sur la forge de l'auteur) :
+  - un miroir donné comme fichier voit son contenu écrit dans le `sources.list` de la cible ;
+  - `--customize-hook` tourne avant le nettoyage final ;
+  - `SOURCE_DATE_EPOCH` rend le résultat reproductible « avec les mêmes options et le même contenu de miroir » ;
+  - `resolv.conf` et `hostname` de l'hôte sont copiés dans la cible ;
+  - le manuel ne dit pas si apt vérifie encore l'InRelease d'un miroir `file://`. **À mesurer.**
+
+**Contenu de l'image, un fait et non un choix** : la racine de s1b et s1c (`f8f221ca…`, iproute2 compris), plus le chroot `buildd` de S2 (D2 a, `e0b1f37c…`). C'est ce chroot que S3 a utilisé, et non celui de S1 (`440ba93b…`), qui a les dépendances de build préinstallées.
+
+**Choix ouverts, avec ma recommandation**
+1. **Destination dans Zot.**
+   - (a) `builds/builders/sbuild-debian13` : Zot, `publier-image` et Chains restent inchangés. **Recommandé.**
+   - (b) `builders/sbuild-debian13`, le nom du README et de l'ADR : il faut une règle nouvelle dans `zot.json` pour `poc-images` et `poc-build`, donc un changement de Zot.
+   - (c) `plateforme/…` : précédent de `builder-go-voie-d`, mais poussé par l'hôte, et sans compte de création pour la pipeline.
+2. **Réseau du constructeur privilégié.**
+   - (a) Comme S1 et S2 : une seule tâche Kata privilégiée, root, ouverte vers les adresses publiques en 80. C'est déjà mesuré, mais cela contredit l'option 3 de la voie image, où la construction n'a aucune sortie.
+   - (b) Deux tâches :
+     - une tâche runc restreinte télécharge les listes épinglées, vérifie l'InRelease par gpgv avec les clés de ftp-master et le sha256 de chaque `.deb` contre `Packages`, puis reconstitue un miroir partiel (`dists/` et `pool/`) ;
+     - une tâche Kata privilégiée, **sans aucune sortie**, lance mmdebstrap sur ce miroir.
+     
+     **Recommandé.**
+   - Dans les deux cas, il faut une sortie Cilium dédiée en 80 sous un nom de tâche neuf, car `prefetch-deb` est réservé à la fermeture par D6. Ce nom doit aussi entrer dans le `NotIn` de `builds-sans-internet`.
+   - En (b), il faut en plus que la tâche Kata soit couverte par une politique sans sortie. Aujourd'hui, `construction-sans-sortie` ne sélectionne que `construire-image` ; sinon, sc-stockage, l'API et les services internes resteraient joignables.
+   - Ce sont deux changements du cluster, chacun avec son accord.
+   - **Effet sur les prédictions en (b)** : le miroir `file://` change le `sources.list` et les noms des listes d'apt. L'égalité bit à bit avec `f8f221ca` n'est donc pas attendue, même si un crochet réécrit le `sources.list` : il faudrait aussi nettoyer les listes, que S1 garde, ce qui est une autre différence. Les prédictions compareraient alors l'état de dpkg avec celui de s1c, et deux exécutions de la pipeline entre elles, bit à bit.
+3. **Origine de mmdebstrap dans la tâche hors ligne** (question de confiance).
+   - (a) `dpkg -i` des `.deb` de la liste `deb amorce`, téléchargés et vérifiés par la tâche runc, dans l'amorce `debian:trixie-20261104-slim` par digest. C'est fidèle à D4 (a). **Recommandé.**
+   - (b) L'image `essais-06/sbuild-debian13:s1b`, qui n'a aucune provenance.
+   - (c) Plus tard, l'image `builders/` précédente : auto-hébergement.
+4. **Assemblage de l'image.**
+   - (a) Layout OCI écrit à la main dans la tâche Kata (tar, JSON et sha256), avec des couches non compressées. Chaque couche est alors l'archive de mmdebstrap elle-même : **son digest se compare directement à `f8f221ca` et `e0b1f37c`**. `publier-image` le pousse sans changement. **Recommandé.**
+   - (b) BuildKit (`FROM scratch`, `ADD`), avec une image déjà approuvée : la couche serait réécrite, et ce lien de comparaison se perd.
+
+**Points fixés sans choix, à consigner**
+- **Créateur du PipelineRun** : un script de l'hôte, comme `prefetch.sh`. Il n'y a ni webhook ni rattrapage, puisqu'aucun commit de Forgejo n'est en jeu.
+- **Signature** : pipeline et tâches signées, publiées en bundles sous `tekton/`, digests ajoutés à `porte/taches.yml`.
+- **Entrées de la provenance** : l'amorce, l'InRelease et les listes sont émis en résultats `*_ARTIFACT_INPUTS`, que Chains range dans `resolvedDependencies`. C'est lu dans le code, non mesuré.
+- **La porte ne juge pas cette pipeline.** `fermeture_plateforme` ne s'y applique pas, car aucun de ses noms de tâches n'y figure : c'est un succès à vide, comme relevé pour la voie deb au point 11.
+- **Effort** : S4a ajoute deux tâches, une pipeline, un script et deux politiques. La projection de 1 à 1,5 pw tient, mais son haut devient plus probable.
+
+**Rien d'écrit pour S4a** au-delà de cette carte : ni tâche, ni script, ni prédiction. Les prédictions dépendent des choix 1 à 4, et le push de `fc155b7` attend toujours un oui.
+
+**Questions ouvertes** : les choix 1 à 4 ci-dessus.
