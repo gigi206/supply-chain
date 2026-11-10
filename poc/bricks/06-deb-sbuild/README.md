@@ -964,3 +964,11 @@ Lancée à 23:25:02 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal
 - **Correctif de `SIGNER=1` tenu**, rejoué pour la première fois : `prefetch-deb` reste à `4dac0609`, sans nouvelle signature.
 - **`construire-builder` signée de nouveau** : `tekton/tasks/construire-builder@sha256:746c2e11…`.
 - **Diff de `taches.yml` préparé, NON COMMITÉ** : `746c2e11` remplace `49173846`, retirée comme version cassée. Il attend la revue du propriétaire.
+
+## Additif du 10/11/2026, 23:26 UTC : liste acceptée, seconde passe de `taches` tenue (sans `--no-download`)
+
+**Décision du propriétaire** : « Accepter ». Le diff est commité tel que soumis (`9705337`) : `746c2e11` remplace `49173846`.
+
+**Seconde passe** à 23:25:42 UTC, code 0. `prefetch-deb` (`4dac0609`) et `construire-builder` (`746c2e11`) sont conformes à leur signature et inscrites dans la liste revue. La pipeline est publiée sous `tekton/pipelines/builder-sbuild@sha256:a9d48331…`.
+
+**Non lancé** : le troisième passage de `pipeline`, qui attend un accord.
