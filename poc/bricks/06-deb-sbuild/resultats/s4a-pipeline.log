@@ -1,31 +1,78 @@
-# s4a.sh pipeline, 2026-11-10T23:18:52Z
-## s4a-builder-1 créé à 23:18:52 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:3066d2f0ec3265faddffe49ce79a1f8f046fe5f7d4731c1ce481cb5c24924fff)
-### TaskRun s4a-builder-1-construire (StepFailed), pod s4a-builder-1-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
-       qemu-user-static squashfs-tools-ng ncompress bzip2 lzop lz4 xz-utils zstd
-       libterm-readline-gnu-perl | libterm-readline-perl-perl make
-       libtap-harness-archive-perl python3-doc python3-tk python3-venv
-       python3.13-venv python3.13-doc binutils binfmt-support readline-doc
-     Recommended packages:
-       libgpm2 arch-test gpg libdistro-info-perl libdpkg-perl uidmap
-       ca-certificates
-     The following NEW packages will be installed:
-       libexpat1 libffi8 libgdbm-compat4t64 libgdbm6t64 libncursesw6 libperl5.40
-       libpython3-stdlib libpython3.13-minimal libpython3.13-stdlib libreadline8t64
-       media-types mmdebstrap netbase perl perl-modules-5.40 python3
-       python3-minimal python3.13 python3.13-minimal readline-common
-     0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
-     After this operation, 76.5 MB of additional disk space will be used.
-     E: Internal Error, Pathname to install is not absolute 'libexpat1_2.8.3-1~deb13u1_amd64.deb'
-     apt-get install des paquets de l'amorce : échec
+# s4a.sh pipeline, 2026-11-10T23:26:12Z
+## s4a-builder-1 créé à 23:26:13 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b)
+### TaskRun s4a-builder-1-construire (Succeeded), pod s4a-builder-1-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
+     mmdebstrap racine : rc 0 en 22 s, 287874560 octets, sha256 999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.OkCsODtvie
+     tmpfs /w : 275 Mo (après racine)
+     mmdebstrap chroot : rc 0 en 21 s, 451786240 octets, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.a2pENW_BeP
+     tmpfs /w : 706 Mo (après chroot)
+     tmpfs /w : 1137 Mo (couche du chroot écrite)
+     couche racine sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242 (287874560 octets) ; couche du chroot sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets), chroot intérieur sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086 ; configuration sha256:e08eaf6c4935552d3c82c7eb45b29223f8dc29c4044c2ee35a994221d5976893 ; manifeste sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+     image.tar : 739676160 octets en 12 s
+     pic du tmpfs /w : 395 Mo sur 65 relevés ; memory.peak du cgroup : 1801986048
 OK   A12 s4a-builder-1-construire : runtimeClassName : kata
 OK   A12 s4a-builder-1-construire : nœud : sc-build
 ### TaskRun s4a-builder-1-prefetch (Succeeded), pod s4a-builder-1-prefetch-pod sur sc-build, runtimeClassName , tekton.dev/task prefetch-deb
-     2026/11/10 23:18:57 Decoded script /tekton/scripts/script-0-fsbtz
+     2026/11/10 23:26:17 Entrypoint initialization
+     2026/11/10 23:26:17 Decoded script /tekton/scripts/script-0-k7gkr
      uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
      index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
      index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
-     miroir : 199 paquets, 133065812 octets, en 10 s
-     2026/11/10 23:18:56 Entrypoint initialization
+     miroir : 199 paquets, 133065812 octets, en 17 s
 OK   A12 s4a-builder-1-prefetch : runtimeClassName : 
 OK   A12 s4a-builder-1-prefetch : nœud : sc-build
-KO   PipelineRun s4a-builder-1 : False|Failed (attendu : True|Succeeded)
+### TaskRun s4a-builder-1-publier (Succeeded), pod s4a-builder-1-publier-pod sur sc-build, runtimeClassName , tekton.dev/task publier-image
+     2026/11/10 23:28:47 Decoded script /tekton/scripts/script-0-t4dcf
+     publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590 (relue en lecture anonyme)
+     2026/11/10 23:28:46 Entrypoint initialization
+OK   A12 s4a-builder-1-publier : runtimeClassName : 
+OK   A12 s4a-builder-1-publier : nœud : sc-build
+OK   PipelineRun s4a-builder-1 : True|Succeeded
+image publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   PipelineRun s4a-builder-1 signé par Chains : true
+## s4a-builder-2 créé à 23:29:06 (sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b)
+### TaskRun s4a-builder-2-construire (Succeeded), pod s4a-builder-2-construire-pod sur sc-build, runtimeClassName kata, tekton.dev/task construire-builder
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.udn0gnN0NK
+     tmpfs /w : 275 Mo (après racine)
+     mmdebstrap chroot : rc 0 en 21 s, 451786240 octets, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+     W: gpg --version failed: cannot infer signed-by value
+     bind-mounting /workspace/entrees/ into the chroot
+     unmounting the following mountpoints:
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.0RKKt0eMBU
+     tmpfs /w : 706 Mo (après chroot)
+     tmpfs /w : 1137 Mo (couche du chroot écrite)
+     couche racine sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242 (287874560 octets) ; couche du chroot sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets), chroot intérieur sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086 ; configuration sha256:e08eaf6c4935552d3c82c7eb45b29223f8dc29c4044c2ee35a994221d5976893 ; manifeste sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+     image.tar : 739676160 octets en 10 s
+     pic du tmpfs /w : 401 Mo sur 65 relevés ; memory.peak du cgroup : 1800704000
+     2026/11/10 23:29:37 Entrypoint initialization
+     2026/11/10 23:29:38 Decoded script /tekton/scripts/script-0-d5s44
+OK   A12 s4a-builder-2-construire : runtimeClassName : kata
+OK   A12 s4a-builder-2-construire : nœud : sc-build
+### TaskRun s4a-builder-2-prefetch (Succeeded), pod s4a-builder-2-prefetch-pod sur sc-build, runtimeClassName , tekton.dev/task prefetch-deb
+     2026/11/10 23:29:11 Entrypoint initialization
+     2026/11/10 23:29:12 Decoded script /tekton/scripts/script-0-lcflc
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 199 paquets, 133065812 octets, en 17 s
+OK   A12 s4a-builder-2-prefetch : runtimeClassName : 
+OK   A12 s4a-builder-2-prefetch : nœud : sc-build
+### TaskRun s4a-builder-2-publier (Succeeded), pod s4a-builder-2-publier-pod sur sc-build, runtimeClassName , tekton.dev/task publier-image
+     2026/11/10 23:31:36 Entrypoint initialization
+     2026/11/10 23:31:37 Decoded script /tekton/scripts/script-0-7mbrs
+     publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590 (relue en lecture anonyme)
+OK   A12 s4a-builder-2-publier : runtimeClassName : 
+OK   A12 s4a-builder-2-publier : nœud : sc-build
+OK   PipelineRun s4a-builder-2 : True|Succeeded
+image publiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   PipelineRun s4a-builder-2 signé par Chains : true
+OK   même digest pour les deux exécutions : sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590

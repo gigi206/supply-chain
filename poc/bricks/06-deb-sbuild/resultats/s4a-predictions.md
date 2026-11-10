@@ -203,3 +203,25 @@ Code 1. `s4a-builder-1` a échoué dans `construire`, et `s4a-builder-2` n'a pas
 - **Liste revue** : le nouveau digest de `construire-builder` remplace `49173846`, retirée comme version cassée.
 
 **Si le troisième passage échoue dans mmdebstrap (A7)**, je ne lancerai pas de quatrième cycle à l'aveugle. Je proposerai un pod d'essai comme en S1, pour itérer sur mmdebstrap sans signer de nouveau, après validation par le conseiller.
+
+## Résultats de l'étape `pipeline`, troisième passage (10/11/2026, 23:26:12 à 23:31:47 UTC, accord « Oui, relance pipeline »)
+
+Code 0. Les deux PipelineRuns ont réussi. Journal : [`s4a-pipeline.log`](s4a-pipeline.log). Pipeline `a9d48331`, `construire-builder` `746c2e11`, `prefetch-deb` `4dac0609`.
+
+- **A4, A5 : tenues.** 199 paquets téléchargés et vérifiés en 17 s, à chaque exécution.
+- **A6 ter : tenue.** `apt-get install` des 20 fichiers locaux réussit en 13 s : 20 paquets installés, mmdebstrap 1.5.7.
+- **A7 : tenue.** mmdebstrap construit la racine en 22 s et le chroot en 21 s, depuis le miroir `file://`, sans réseau. Le crochet monte puis démonte `/workspace/entrees/`, et le message « points de montage non retirés » n'apparaît pas.
+  - Avertissement de mmdebstrap : `gpg --version failed: cannot infer signed-by value`. gpg est absent de l'amorce.
+  - apt a pourtant accepté le dépôt. Or apt refuse un dépôt `file://` non signé sans `trusted=yes`, ce que la ligne ne porte pas. L'InRelease a donc été vérifié, vraisemblablement par `sqv` avec le trousseau de l'amorce. C'est une déduction, pas une mesure directe : un test négatif avec un InRelease altéré est prévu en S5.
+- **A9 : tenue.** Les témoins échouent.
+- **A10 : tenue pour la mémoire, mesure du tmpfs imparfaite.**
+  - `memory.peak` du cgroup de l'invité vaut 1 801 986 048 et 1 800 704 000 octets (environ 1,7 Gio), sous la limite de 6 Gio. Le pod n'a pas été tué.
+  - Le relevé ponctuel du tmpfs atteint 1 137 Mo après l'écriture de la couche du chroot.
+  - L'échantillonneur, lui, ne donne que 401 Mo au plus, sur 65 relevés. Il sous-estime le pic : le relevé ponctuel le contredit. Cause probable, non vérifiée : `du` parcourt les montages internes de mmdebstrap (`proc`, `sys`, miroir), lentement et partiellement. **C'est `memory.peak` qui fait foi.**
+- **A11 : tenue.** `publier-image`, inchangée et sous sa limite par défaut de 512 Mio, publie un `image.tar` de 739 676 160 octets et relit le digest en lecture anonyme.
+- **A12 : tenue** pour les six pods : runc pour `prefetch` et `publier`, Kata pour `construire`, tous sur sc-build.
+- **A13 : tenue.** **Les deux exécutions donnent le même digest : `builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590`.**
+  - Couche racine `999a0ae4…`, 287 874 560 octets, identique dans les deux exécutions.
+  - Chroot intérieur `aec1c7a9…`, 451 786 240 octets ; couche du chroot `1029232e…`.
+  - La seconde publication réussit, comme en F2. Chains signe les deux PipelineRuns.
+- **Non mesurées encore** : A8, A14, A16, A17 et A18 (étape `comparaison`) ; A15 (étape `provenance`).

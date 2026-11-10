@@ -972,3 +972,19 @@ Lancée à 23:25:02 UTC, sur l'accord « Oui, relance taches ». Code 0. Journal
 **Seconde passe** à 23:25:42 UTC, code 0. `prefetch-deb` (`4dac0609`) et `construire-builder` (`746c2e11`) sont conformes à leur signature et inscrites dans la liste revue. La pipeline est publiée sous `tekton/pipelines/builder-sbuild@sha256:a9d48331…`.
 
 **Non lancé** : le troisième passage de `pipeline`, qui attend un accord.
+
+## Additif du 10/11/2026, 23:33 UTC : S4a, pipeline `builders/` tenue, image reproductible
+
+Troisième passage de `pipeline`, de 23:26:12 à 23:31:47 UTC, sur l'accord « Oui, relance pipeline ». Code 0. Détail : [prédictions et résultats](resultats/s4a-predictions.md).
+
+**La plateforme construit l'image de build sbuild sans réseau, la publie et la signe. Deux exécutions donnent le même digest :** `builds/builders/sbuild-debian13@sha256:749d746c…`.
+- Téléchargement vérifié en runc, sans root, en 17 s.
+- Construction en Kata, sans aucune sortie réseau : apt installe mmdebstrap en 13 s, puis mmdebstrap construit la racine en 22 s et le chroot en 21 s.
+- Publication de 740 Mo par `publier-image`, inchangée.
+- Pic mémoire de l'invité : environ 1,7 Gio sur 6.
+
+**Réserves**
+- La vérification de l'InRelease du miroir par apt est déduite (dépôt accepté sans `trusted=yes`), pas mesurée. Le test négatif est prévu en S5.
+- L'échantillonneur du tmpfs sous-estime le pic. `memory.peak` fait foi.
+
+**Reste pour S4a** : `provenance` (A15) et `comparaison` (A8, A14, A16 à A18). Ce sont des lectures dans Zot, puis des contrôles sur l'hôte, sur accord.
