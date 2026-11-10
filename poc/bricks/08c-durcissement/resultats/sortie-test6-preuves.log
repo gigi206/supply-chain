@@ -1,0 +1,195 @@
+# preuves.sh test6, 2026-11-10T14:05:07Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 26 enveloppes, dernière provenance de PipelineRun : d1cbb01f-7988-4993-914b-9f339333d84a (2026-11-10T13:59:03Z)
+builds-sans-internet (08c) : présente : 203.0.113.10 refusé avec POLICY_DENIED ou POLICY_DENY ; contre-épreuve sans sortie vers 203.0.113.10 (POLICY_DENY), témoin de capture vers 203.0.113.11 par un pod au label prefetch-gomod
+## prédiction (écrite le 31/10/2026, avant le premier passage), contrôle par contrôle
+- objet : vérifier sur un TaskRun réel les deux contrôles réseau de la zone build, retenus par le propriétaire le
+  30/10/2026 : la NetworkPolicy construction-sans-sortie (aucune entrée ni sortie pour les pods qui portent
+  tekton.dev/task=construire-image) et la vérification d'adresse source de Cilium 1.20.4. Les mesures de kata.sh reseau
+  portaient sur des pods de mesure et une politique de mesure ; ici, la politique réelle et le label posé par Tekton
+- véhicule : tâche de vérification signée par la clé des tâches, du nom construire-image, publiée sous tekton/tasks/preuve-test6
+  (jamais dans la liste revue de la porte : la porte refuserait toute provenance qui la cite) ; étape construire, image
+  BuildKit de la construction réelle, privilégiée et root dans l'invité Kata, comme la vraie ; ni workspace, ni volume, ni
+  résultat : Chains ne rattache rien à une image ; gabarit de pod du PipelineRun réel (taskRunTemplate du TriggerTemplate,
+  plus runtimeClassName kata, comme taskRunSpecs). Elle modélise du code qui sortirait du bac à sable de BuildKit
+- garde-fous relevés sur le pod : label tekton.dev/task=construire-image posé par le contrôleur de Tekton pour un TaskRun
+  autonome (mesuré jusqu'ici pour un PipelineRun), pod sous Kata (noyau de l'invité différent de celui de sc-build), eth0
+  de l'invité à l'IP du pod, adresse 10.42.1.250 ajoutée puis retirée
+- 1. avec l'IP du pod : Zot, Forgejo, API du nœud, API par le service (10.43.0.1:443) et 203.0.113.10 injoignables ; chez
+  l'agent de sc-build, au moins un flux refusé par tentative, motif POLICY_DENIED, sens EGRESS (au test 1, le refus était
+  à l'entrée d'OpenBao, sur sc-confiance). Compte par tentative : flux de l'IP du pod dans les 4 s qui suivent l'heure de la
+  tentative, notée par l'étape. Corrigé après le premier passage (preuves-test6-premier-passage.log), qui attendait l'API par
+  le service sous 10.43.0.1:443 : Hubble la montre sous l'adresse traduite, l'extrémité du service kubernetes, comme la
+  mesure de Cilium de J7 l'avait établi (adresse de service traduite avant la politique ; README, « Mesure de Cilium »)
+- 2. avec 10.42.1.250 (adresse inutilisée du sous-réseau des pods de sc-build) : Zot et Forgejo injoignables ; au moins un flux
+  refusé par tentative, motif INVALID_SOURCE_IP (sens non exigé : INGRESS en J7) ; aucun paquet sur enp1s0
+- 3. rien ne sort du nœud : aucun paquet de ou vers 203.0.113.10 ni de 10.42.1.250 sur enp1s0 de sc-build pendant le passage
+- contre-épreuve, même YAML et même image, seul le nom de la tâche change (preuve-test6-temoin, label différent, que la
+  politique ne sélectionne pas) : Zot, Forgejo et les deux voies de l'API joignables, nc lié à l'IP du pod (-s) joignable,
+  SYN vers 203.0.113.10 vus sur enp1s0 (sortie masquée par le nœud) et aucun flux refusé de l'IP du pod ; avec 10.42.1.250, tout
+  refusé, INVALID_SOURCE_IP : le contrôle d'adresse source tient seul, sans la politique. Sans cette contre-épreuve, un
+  nc qui ne marcherait pas ferait passer le test à tort : elle conditionne la conclusion
+- passages en séquence (mémoire de sc-build) ; l'étape sort toujours en 0
+- résidus : bundles tekton/tasks/preuve-test6-test et preuve-test6-contre dans Zot (poc-ecriture ne supprime pas) ; deux
+  TaskRuns signés par Chains sans sujet image, dont un de tâche construire-image (contrôle exécutions/enveloppes)
+OK   interface enp1s0 présente sur sc-build (noyau 6.12.116+deb13-amd64)
+## contre-épreuve d'abord : tâche preuve-test6-temoin, non sélectionnée par construction-sans-sortie
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test6-contre : sha256:ed52efc9efc5870c161da529ebaf8060859d79a3ac0d64d8b257534d4cc796f1 (tâche preuve-test6-temoin)
+NetworkPolicy de builds au lancement : construction-sans-sortie (tekton.dev/task=construire-image)
+CiliumNetworkPolicy de builds au lancement : builds-sans-internet prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+témoin de capture (pod brut, label prefetch-gomod) : phase Succeeded
+OK   TaskRun preuve-test6-contre terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape construire (pod preuve-test6-contre-pod)
+  NOYAU|6.18.56
+  IP|10.42.1.82
+  NC|/bin/busybox
+  PROPRE|Zot|192.168.161.13:5000|14:05:18|OUVERT
+  PROPRE|Forgejo|192.168.161.13:3000|14:05:19|OUVERT
+  PROPRE|API-noeud|192.168.161.11:6443|14:05:20|OUVERT
+  PROPRE|API-service|10.43.0.1:443|14:05:21|OUVERT
+  PROPRE|Externe|203.0.113.10:443|14:05:22|FERME
+  PROPRE|Supervisor|192.168.161.11:9345|14:05:26|FERME
+  PROPRE|Etcd|192.168.161.11:2379|14:05:30|FERME
+  LIEE|Zot|192.168.161.13:5000|14:05:34|OUVERT
+  AJOUT|accepté
+  USURPEE|Zot|192.168.161.13:5000|14:05:34|FERME
+  USURPEE|Forgejo|192.168.161.13:3000|14:05:38|FERME
+  RETRAIT|accepté
+  FIN
+pod : nœud sc-build, runtimeClassName kata, IP 10.42.1.82, tekton.dev/task=preuve-test6-temoin, étape privileged=true uid 0
+Hubble de sc-build depuis 2026-11-10T14:05:10Z, flux refusés de l'IP du pod :
+  14:05:22.181 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:05:22.181 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:05:23.184 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:05:23.184 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:05:24.208 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:05:24.208 10.42.1.82 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+Hubble de sc-build depuis 2026-11-10T14:05:10Z, flux refusés de 10.42.1.250 :
+  14:05:34.234 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:05:35.248 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:05:36.272 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:05:38.249 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  14:05:39.280 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  14:05:40.304 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  tcpdump enp1s0 : 3 packets captured
+  tcpdump enp1s0 : 3 packets received by filter
+## contre-épreuve : mesures
+OK   contre : label tekton.dev/task=preuve-test6-temoin sur le pod
+OK   contre : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.116+deb13-amd64)
+OK   contre : adresse de eth0 dans l'invité = IP du pod (10.42.1.82)
+OK   contre : 10.42.1.250 ajoutée puis retirée de eth0 (root dans l'invité)
+OK   contre-épreuve : Zot joignable
+OK   contre-épreuve : Forgejo joignable
+OK   contre-épreuve : API-noeud joignable
+OK   contre-épreuve : API-service joignable
+OK   contre-épreuve : Supervisor refusé par le pare-feu d'hôte
+OK   contre-épreuve : Etcd refusé par le pare-feu d'hôte
+OK   contre-épreuve : nc lié à l'IP du pod (-s) joint Zot
+OK   contre-épreuve : témoin de capture, 3 SYN vers 203.0.113.11:443 sur enp1s0 (la capture verrait une sortie)
+OK   contre-épreuve : aucun SYN vers 203.0.113.10:443 sur enp1s0 (builds-sans-internet)
+OK   contre-épreuve : 6 flux POLICY_DENY EGRESS vers 203.0.113.10:443 (refus de builds-sans-internet)
+OK   contre-épreuve : aucun flux refusé de l'IP du pod
+OK   contre-épreuve : Zot injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP (contrôle d'adresse source seul)
+OK   contre-épreuve : Forgejo injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP (contrôle d'adresse source seul)
+## test : tâche construire-image (sélectionnée par construction-sans-sortie)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test6-test : sha256:65ee189fb97d3db956177ad8092f5ddb7bf176b24a9ac2035348ae3f95d83014 (tâche construire-image)
+NetworkPolicy de builds au lancement : construction-sans-sortie (tekton.dev/task=construire-image)
+CiliumNetworkPolicy de builds au lancement : builds-sans-internet prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+OK   TaskRun preuve-test6-test terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape construire (pod preuve-test6-test-pod)
+  NOYAU|6.18.56
+  IP|10.42.1.131
+  NC|/bin/busybox
+  PROPRE|Zot|192.168.161.13:5000|14:06:01|FERME
+  PROPRE|Forgejo|192.168.161.13:3000|14:06:05|FERME
+  PROPRE|API-noeud|192.168.161.11:6443|14:06:09|FERME
+  PROPRE|API-service|10.43.0.1:443|14:06:13|FERME
+  PROPRE|Externe|203.0.113.10:443|14:06:17|FERME
+  PROPRE|Supervisor|192.168.161.11:9345|14:06:21|FERME
+  PROPRE|Etcd|192.168.161.11:2379|14:06:25|FERME
+  LIEE|Zot|192.168.161.13:5000|14:06:29|FERME
+  AJOUT|accepté
+  USURPEE|Zot|192.168.161.13:5000|14:06:32|FERME
+  USURPEE|Forgejo|192.168.161.13:3000|14:06:36|FERME
+  RETRAIT|accepté
+  FIN
+pod : nœud sc-build, runtimeClassName kata, IP 10.42.1.131, tekton.dev/task=construire-image, étape privileged=true uid 0
+Hubble de sc-build depuis 2026-11-10T14:05:53Z, flux refusés de l'IP du pod :
+  14:06:01.310 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:01.310 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:02.313 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:02.313 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:03.337 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:03.337 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:05.323 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:05.323 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:06.345 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:06.345 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:07.369 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:07.369 10.42.1.131 > 192.168.161.13:3000 SYN POLICY_DENIED EGRESS
+  14:06:09.335 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:09.335 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:10.345 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:10.345 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:11.369 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:11.369 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:13.349 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:13.349 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:14.377 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:14.377 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:15.401 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:15.401 10.42.1.131 > 192.168.161.11:6443 SYN POLICY_DENIED EGRESS
+  14:06:17.361 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:17.361 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:18.377 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:18.377 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:19.401 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:19.401 10.42.1.131 > 203.0.113.10:443 SYN POLICY_DENY EGRESS
+  14:06:21.372 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:21.372 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:22.377 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:22.377 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:23.401 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:23.401 10.42.1.131 > 192.168.161.11:9345 SYN POLICY_DENIED EGRESS
+  14:06:25.383 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:25.383 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:26.409 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:26.409 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:27.433 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:27.433 10.42.1.131 > 192.168.161.11:2379 SYN POLICY_DENIED EGRESS
+  14:06:29.395 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:29.395 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:30.409 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:30.409 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:31.433 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  14:06:31.433 10.42.1.131 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+Hubble de sc-build depuis 2026-11-10T14:05:53Z, flux refusés de 10.42.1.250 :
+  14:06:32.407 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:06:33.417 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:06:34.441 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  14:06:36.418 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  14:06:37.449 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  14:06:38.473 10.42.1.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+  tcpdump enp1s0 : 0 packets captured
+  tcpdump enp1s0 : 0 packets received by filter
+## test : mesures
+OK   test : label tekton.dev/task=construire-image sur le pod
+OK   test : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.116+deb13-amd64)
+OK   test : adresse de eth0 dans l'invité = IP du pod (10.42.1.131)
+OK   test : 10.42.1.250 ajoutée puis retirée de eth0 (root dans l'invité)
+extrémités du service kubernetes : 192.168.161.11:6443
+OK   1. Zot (192.168.161.13:5000, tentative à 14:06:01) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.13:5000
+OK   1. Forgejo (192.168.161.13:3000, tentative à 14:06:05) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.13:3000
+OK   1. API-noeud (192.168.161.11:6443, tentative à 14:06:09) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:6443
+OK   1. API-service (10.43.0.1:443, tentative à 14:06:13) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:6443
+OK   1. Externe (203.0.113.10:443, tentative à 14:06:17) injoignable, 6 flux POLICY_DENY EGRESS vers 203.0.113.10:443
+OK   1. Supervisor (192.168.161.11:9345, tentative à 14:06:21) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:9345
+OK   1. Etcd (192.168.161.11:2379, tentative à 14:06:25) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:2379
+OK   1. nc lié à l'IP du pod : Zot injoignable
+OK   2. Zot injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP
+OK   2. Forgejo injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP
+OK   3. aucun paquet de ou vers 203.0.113.10 ni de 10.42.1.250 sur enp1s0 de sc-build
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 26 enveloppes, dernière provenance de PipelineRun : d1cbb01f-7988-4993-914b-9f339333d84a (2026-11-10T13:59:03Z)

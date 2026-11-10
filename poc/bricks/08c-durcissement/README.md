@@ -1367,3 +1367,11 @@ Passage de 13:52 à 14:01 UTC, sur l'accord « Oui, lance-le ». Détail dans le
 **Critère de retrait rempli à la lettre**, mais la règle est maintenue en attendant la décision du propriétaire.
 
 **Relance du seul `test6`, corrigée, NON LANCÉE.**
+
+## Additif du 10/11/2026, 14:07 UTC : test 6 tenu sous builds-sans-internet, option (a) en service
+
+La relance de `test6` (14:05 UTC, « Oui, relance test6 ») tient T1 à T4, sans KO. Vers l'adresse externe, le motif mesuré est `POLICY_DENY`. La contre-épreuve n'a plus de sortie Internet, et le témoin de capture voit sa sortie. Détail dans les [résultats](resultats/sortie-predictions.md).
+
+**La règle reste en place.**
+
+**Reste à décider** : l'intégration au rejeu de zéro, les sorties dédiées des briques 05 et 06, et l'option (b).

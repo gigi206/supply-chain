@@ -242,3 +242,28 @@ Les effets sont les mêmes que pour le premier passage de `test6`.
 | T4 | Autres contrôles inchangés (adresse usurpée, rien ne sort du nœud). Code 0 | moyenne |
 
 Push de `bc0f352..3006992` : toujours en attente d'un oui.
+
+### Résultat de la relance de `test6` (14:05:06 UTC, accord : « Oui, relance test6 »)
+
+Journaux : [`sortie-test6.log`](sortie-test6.log) et [`sortie-test6-preuves.log`](sortie-test6-preuves.log). Code 0, aucun KO. Aucun journal de la 08 n'a été touché.
+
+| # | Mesuré | Verdict |
+|---|---|---|
+| T1 | `construire-image` : les 7 destinations sont injoignables. Vers `203.0.113.10:443`, on relève **6 flux `POLICY_DENY` `EGRESS`** : le refus explicite l'emporte. Vers les autres destinations, toujours `POLICY_DENIED` | tenue |
+| T2 | Contre-épreuve : Zot, Forgejo et les deux voies de l'API sont joignables. Supervisor et Etcd sont refusés par le pare-feu d'hôte. Aucun SYN vers `203.0.113.10` sur `enp1s0`, et 6 flux `POLICY_DENY` vers lui. Aucun autre flux refusé | tenue |
+| T3 | Témoin de capture : 3 SYN vers `203.0.113.11:443` sur `enp1s0`. La capture verrait une sortie | tenue |
+| T4 | Adresse usurpée refusée (`INVALID_SOURCE_IP`). Rien ne sort du nœud. `builds/sample-app@3a7ca1b1` est inchangée (26 enveloppes). Code 0 | tenue |
+
+## Bilan (écrit le 10/11/2026 à 14:07 UTC)
+
+**L'option (a) est en service.**
+- `builds-sans-internet` refuse Internet à tout pod de `builds`, sauf `prefetch-gomod`.
+- La construction de bout en bout et le test 6, adapté par (ii), passent sous la règle.
+- Le critère de retrait n'est plus rempli : T4 est tenue à la relance. La règle reste.
+
+**Reste à décider**
+- **Intégration au rejeu de zéro** : sans elle, le prochain rejeu ne repose pas la règle. Ce rejeu fait passer le test 6 par `preuves.sh`, où (ii) s'adapte à la présence ou à l'absence de la règle.
+- **Sorties dédiées** : S2 de la 06 (instantané Debian) et M1 de la 05 (`vault` de Rocky) en auront besoin, avec chacune un label ajouté à l'exclusion. Ce sera une décision du propriétaire, le moment venu.
+- **Option (b)** : toujours ouverte. Elle fermerait l'API de RKE2, OpenBao, sc-stockage hors de Zot et Forgejo, et le DNS.
+
+**Durée** : de 13:33 à 14:07 UTC, préparation, deux passages de `test6` et consignation compris, pour 45 min estimées. C'est moins de 2× l'estimation.

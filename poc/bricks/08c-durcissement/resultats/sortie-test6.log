@@ -1,0 +1,44 @@
+# sortie-builds.sh test6, 2026-11-10T14:05:06Z
+builds-sans-internet (08c) : présente : 203.0.113.10 refusé avec POLICY_DENIED ou POLICY_DENY ; contre-épreuve sans sortie vers 203.0.113.10 (POLICY_DENY), témoin de capture vers 203.0.113.11 par un pod au label prefetch-gomod
+OK   interface enp1s0 présente sur sc-build (noyau 6.12.116+deb13-amd64)
+CiliumNetworkPolicy de builds au lancement : builds-sans-internet prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+témoin de capture (pod brut, label prefetch-gomod) : phase Succeeded
+OK   TaskRun preuve-test6-contre terminé (Succeeded, TrustedResourcesVerified=True)
+OK   contre : label tekton.dev/task=preuve-test6-temoin sur le pod
+OK   contre : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.116+deb13-amd64)
+OK   contre : adresse de eth0 dans l'invité = IP du pod (10.42.1.82)
+OK   contre : 10.42.1.250 ajoutée puis retirée de eth0 (root dans l'invité)
+OK   contre-épreuve : Zot joignable
+OK   contre-épreuve : Forgejo joignable
+OK   contre-épreuve : API-noeud joignable
+OK   contre-épreuve : API-service joignable
+OK   contre-épreuve : Supervisor refusé par le pare-feu d'hôte
+OK   contre-épreuve : Etcd refusé par le pare-feu d'hôte
+OK   contre-épreuve : nc lié à l'IP du pod (-s) joint Zot
+OK   contre-épreuve : témoin de capture, 3 SYN vers 203.0.113.11:443 sur enp1s0 (la capture verrait une sortie)
+OK   contre-épreuve : aucun SYN vers 203.0.113.10:443 sur enp1s0 (builds-sans-internet)
+OK   contre-épreuve : 6 flux POLICY_DENY EGRESS vers 203.0.113.10:443 (refus de builds-sans-internet)
+OK   contre-épreuve : aucun flux refusé de l'IP du pod
+OK   contre-épreuve : Zot injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP (contrôle d'adresse source seul)
+OK   contre-épreuve : Forgejo injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP (contrôle d'adresse source seul)
+CiliumNetworkPolicy de builds au lancement : builds-sans-internet prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+OK   TaskRun preuve-test6-test terminé (Succeeded, TrustedResourcesVerified=True)
+OK   test : label tekton.dev/task=construire-image sur le pod
+OK   test : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.116+deb13-amd64)
+OK   test : adresse de eth0 dans l'invité = IP du pod (10.42.1.131)
+OK   test : 10.42.1.250 ajoutée puis retirée de eth0 (root dans l'invité)
+OK   1. Zot (192.168.161.13:5000, tentative à 14:06:01) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.13:5000
+OK   1. Forgejo (192.168.161.13:3000, tentative à 14:06:05) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.13:3000
+OK   1. API-noeud (192.168.161.11:6443, tentative à 14:06:09) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:6443
+OK   1. API-service (10.43.0.1:443, tentative à 14:06:13) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:6443
+OK   1. Externe (203.0.113.10:443, tentative à 14:06:17) injoignable, 6 flux POLICY_DENY EGRESS vers 203.0.113.10:443
+OK   1. Supervisor (192.168.161.11:9345, tentative à 14:06:21) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:9345
+OK   1. Etcd (192.168.161.11:2379, tentative à 14:06:25) injoignable, 6 flux POLICY_DENIED EGRESS vers 192.168.161.11:2379
+OK   1. nc lié à l'IP du pod : Zot injoignable
+OK   2. Zot injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP
+OK   2. Forgejo injoignable depuis 10.42.1.250, 3 flux INVALID_SOURCE_IP
+OK   3. aucun paquet de ou vers 203.0.113.10 ni de 10.42.1.250 sur enp1s0 de sc-build
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 26 enveloppes, dernière provenance de PipelineRun : d1cbb01f-7988-4993-914b-9f339333d84a (2026-11-10T13:59:03Z)
+OK   preuves.sh test6, code de sortie : 0

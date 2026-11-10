@@ -88,6 +88,8 @@ Les outils de packaging (mock, sbuild unshare, Buildah, BuildKit rootless) deman
 
 > **Additif du 10/11/2026, 14:04 UTC** : `builds-sans-internet` appliquée à 13:55 UTC ([résultats](../../poc/bricks/08c-durcissement/resultats/sortie-predictions.md)). Les pods de `builds` sans label ne joignent plus Internet, et la construction de bout en bout est inchangée (`3a7ca1b1`). Le test 6 sous la règle reste à rejouer, car le premier passage a échoué par défaut d'invocation. La ligne d'isolation de cet ADR n'est pas modifiée.
 
+> **Additif du 10/11/2026, 14:07 UTC** : le test 6 passe sous `builds-sans-internet`. La construction sous Kata est refusée partout ; vers l'adresse externe, le motif est le refus explicite (`POLICY_DENY`). L'option (a) est en service ; son intégration au rejeu de zéro reste à décider. La ligne d'isolation de cet ADR n'est pas modifiée.
+
 > **Additif du 09/11/2026, 13:11 UTC** : [brique 08c](../../poc/bricks/08c-durcissement/README.md) close par décision du propriétaire, documentation seulement. Aucune note ne change. Seuil tenu sur les 8 tests, la porte et les contrôles 6 et 7 sous RKE2 durci H1 à H5 ; ports d'hôte tenus sur les ports essayés seulement, sans balayage. Non couverts écrits dans le README de la brique, dont la jonction d'un nœud et H6 (WireGuard), retirée après mesure.
 
 ## Conséquences
