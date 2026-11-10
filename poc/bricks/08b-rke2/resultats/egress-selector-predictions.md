@@ -226,3 +226,20 @@ Si `timeout` coupe le passage à 840 s, la reprise du CronJob `rattrapage` par l
 - **Chaîne d'appels entière** : 48 fonctions de `preuves.sh`, `politique.sh` et `commun.sh` sont atteintes depuis `etape_construction_durcie`, parmi lesquelles `passage`, `couverte`, `creations`, `signe`, `ba_fin`, `prov_pr`, `origine`, et l'intérieur de `ee_calme` et `ee_controle`. Elles ne lisent que les trois mêmes cibles par `kubectl logs` : `el-forgejo`, les intercepteurs et le Job de la porte, tous en zone confiance. Aucune ne fait d'exec. La phrase « qu'aucun appel de ce passage n'emprunte » tient donc.
 - **Correction** : « c'est le seul passage Tekton de bout en bout déjà mesuré sous RKE2 » est faux. Les rejeux RKE2 ont construit sample-app en J7 : 7 lignes de PipelineRun réussi dans `rejeu-rke2-cinquieme-passage.log` et dans `rejeu-rke2-reprise-j7.log`, 14 dans `rejeu-rke2-sixieme-passage.log`. Ce qui reste vrai : c'est le passage **le plus récent** par le chemin du webhook.
 - **Estimation fondée sur la mesure** : `chrono.tsv` de la 08 garde 8 passages complets de `construction_durcie`, chacun avec son début et sa ligne `fait`. Les 7 du 06/11 et celui du 10/11 à 13:58 UTC durent **de 100 à 199 s**. Un neuvième départ, le 06/11 à 18:14:50 UTC, n'a pas de ligne `fait`. L'estimation devient **2 à 4 min**. La décision avec le propriétaire est demandée au-delà de **8 min**, soit 2× l'estimation, au lieu de 10 min. Le `timeout 840` (14 min) laisse de la marge au-delà de ce seuil. La commande ne change pas.
+
+## Résultats du passage Tekton (10/11/2026, 21:11:26 à 21:13:30 UTC)
+
+Accord : « Oui, lance », à 21:11:05 UTC (transcription), en réponse à la question « Je lance le passage Tekton (2 à 4 min, écritures définitives dans Zot) ? ». Code **0**. Journal : [`preuves-egress-construction_durcie.log`](../../08-trust-plane/resultats/preuves-egress-construction_durcie.log), 45 lignes, aucune retirée par le filtre `jeton|token`. Une ligne de début et une ligne `fait` sont ajoutées à `chrono.tsv` de la 08.
+
+**Écart à la commande commitée** : le premier envoi, à 21:11 UTC, a été arrêté **avant toute exécution** par une protection de Claude Code contre les `rm` placés dans un `bash -c`. Rien n'a tourné. La commande relancée est identique jusqu'au filtrage. Le fichier temporaire `egress-tmp-construction_durcie.log` est ensuite **déplacé** dans le scratchpad de la session au lieu d'être supprimé. La mesure n'en est pas affectée.
+
+| # | Résultat |
+|---|---|
+| T1 | **Tenue.** Code 0, aucune ligne `KO` |
+| T2 | **Tenue.** Départ et fin : `COUVERTE 33, ECHEC_SIGNATURE 8, SANS_SUJET 20`, aucune anomalie |
+| T3 | **Tenue.** PipelineRun `True\|Succeeded`. Trois TaskRun en `Succeeded`, avec `TrustedResourcesVerified=True`. `preparer` et `publier` tournent sur sc-build sans runtimeClassName, `construire` sur sc-build en `kata`. `IMAGE_DIGEST=sha256:3a7ca1b1…`, spec identique à celle de J7 |
+| T4 | **Tenue.** Enveloppes de Chains : 26 → 28. Verdict `true\|\|ok`, 28/28 enveloppes couvertes et 67 bundles vérifiés. La provenance la plus récente est celle du nouveau PipelineRun (`35e2d798…`) |
+| T5 | **Tenue.** Le rejeu est refusé à la création (« already exists »), la livraison non signée est refusée par l'intercepteur github, et aucun PipelineRun n'existe pour le commit `1111…` |
+| T6 | **Tenue.** PipelineRun en 52 s. Passage complet en 124 s, dans l'estimation de 2 à 4 min |
+
+**Aucune régression des pipelines Tekton** après `egress-selector-mode: disabled` et le redémarrage de rke2-server, sur un passage. Comme prévu, ce passage ne mesure pas le chemin de l'apiserver vers le kubelet de sc-build : ce chemin est couvert par E5. Les journaux lus par `kubectl logs` viennent tous de pods de sc-confiance, et leur lecture a réussi. Les métriques restent non vérifiées.

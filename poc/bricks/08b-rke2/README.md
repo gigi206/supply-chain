@@ -368,3 +368,11 @@ Cela confirme, par l'effet, que le maillon fautif était sur le chemin par le pr
 Le blocage de S3 venait donc du chemin par le tunnel de l'agent RKE2, pas de Kata, sur un passage à 512 Mio. **Non vérifié** : les pipelines Tekton après ce changement. Le découpage en morceaux de 64 Mio reste dans `s3.sh` ; le retirer serait un changement à part.
 
 Détail et prédictions D1 à D6 : [`egress-selector-predictions.md`](resultats/egress-selector-predictions.md).
+
+**Additif du 10/11/2026, 21:14 UTC : pipelines Tekton revérifiées.** Le passage de bout en bout `preuves.sh construction_durcie` a tourné de 21:11:26 à 21:13:30 UTC, accord : « Oui, lance », code 0 :
+- webhook Forgejo, PipelineRun de la tête de main réussi en 52 s, `construire` sous Kata sur sc-build ;
+- Chains a signé (26 → 28 enveloppes), verdict de la porte `true||ok` ;
+- refus du rejeu et de la livraison non signée ;
+- aucune anomalie, prédictions T1 à T6 tenues.
+
+C'est une vérification de non-régression, sur un passage. Le chemin direct vers le kubelet de sc-build reste couvert à part par E5. Les métriques ne sont pas vérifiées. Détail : [`egress-selector-predictions.md`](resultats/egress-selector-predictions.md).
