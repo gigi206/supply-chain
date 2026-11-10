@@ -664,3 +664,13 @@ Relevé dans le dépôt, à sec. Rien n'est lancé.
 - Cette projection est fragile : J7 a duré plus d'une semaine de calendrier. Je la vérifierai à la fin de S4a.
 
 **Questions ouvertes** : l'emplacement du verrou, l'ordre (`builders/` d'abord), la source de `marked` dans la plateforme (la voie image prend `web/dist` par digest), et le push des commits de la 06.
+
+## Additif du 10/11/2026, 22:20 UTC : décision sur l'emplacement du verrou
+
+**Décision du propriétaire** (22:20:23 UTC) : « Oui, avec debian/ ». Ce n'est un accord pour aucune mesure ni aucune écriture.
+- Le verrou (`Installed-Build-Depends` et date de l'instantané, avec éventuellement le sha256 de chaque paquet) est placé dans le même artefact que `debian/`, publié par l'hôte (S4c).
+- Le conflit 1 de l'additif de 22:14 UTC est levé. L'interprétation de 21:41 UTC (« verrou dans `sample-app` ») est remplacée par cette décision ; elle n'est pas réécrite.
+- **Conséquence pour S4b** : `prefetch-deb` lit sa liste dans l'artefact de packaging, fixé par digest dans sa pipeline signée, et non dans le commit de `sample-app`. S4c doit donc précéder S4b.
+- Ordre proposé, à confirmer : S4a (`builders/`), S4c (packaging et verrou), S4b (`prefetch-deb`), puis S4d.
+
+**Questions ouvertes** : cet ordre, la source de `marked` dans la plateforme, et le push des commits de la 06.
