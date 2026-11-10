@@ -33,3 +33,15 @@ trusted_tasks:
   # digest dans builds/fermetures/** seulement) ; émet IMAGE_URL et IMAGE_DIGEST pour que Chains signe la fermeture
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture:
     - ref: sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+  # Brique 06, S4a (décision du propriétaire du 10/11/2026, 22:52:55 UTC) : 06-deb-sbuild/builder/prefetch-deb.signee.yaml, pod
+  # runc restreint (UID 65532) sans secret, image debian:trixie-20261104-slim par digest (amont/library/debian@7378260c) ;
+  # sortie limitée par la CiliumNetworkPolicy prefetch-deb-sortie de la 08c (DNS, adresses publiques en 80) ; téléchargement par
+  # apt-helper avec le hash attendu (InRelease épinglé, index selon l'InRelease, paquets selon la liste fixée par la pipeline)
+  oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb:
+    - ref: sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+  # Brique 06, S4a : 06-deb-sbuild/builder/construire-builder.signee.yaml, pod Kata privilégié en root (mmdebstrap --mode=root),
+  # même image d'amorce, sans aucune entrée ni sortie réseau (NetworkPolicy builder-sans-sortie), miroir lu en lecture seule et
+  # revérifié, image sbuild-debian13 en layout OCI écrit à la main. Tâche privilégiée : acceptée par la porte dans toute
+  # provenance qu'elle juge, comme construire-image
+  oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
+    - ref: sha256:de18e9cfe4c955e0b1407418620bfe39214a1d873b32dc333e416b1cc4b6a7c3
