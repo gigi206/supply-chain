@@ -1,0 +1,18 @@
+# Brique 06, S4a (décision du propriétaire du 10/11/2026, 22:52:55 UTC, recommandation 2 révisée) : aucune entrée ni sortie pour
+# les pods de la tâche construire-builder (Kata privilégié, root). Sur le modèle de construction-sans-sortie (08-trust-plane) :
+# sélection par tekton.dev/task, que le contrôleur de Tekton réécrit avec le nom de la tâche résolue ; aucune règle, donc rien
+# d'autorisé. L'invariant de la 08 (aucune politique de builds n'autorise de trafic) reste vrai. builds-sans-internet (08c) et
+# son NotIn sont inchangés : son refus des adresses publiques s'ajoute à ce refus total.
+# Posée par s4a.sh reseau, sur accord.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: builder-sans-sortie
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/task: construire-builder
+  policyTypes:
+  - Ingress
+  - Egress

@@ -93,3 +93,19 @@ PipelineRun : compte `build`, podTemplate du gabarit `sample-app`, `taskRunSpecs
 - Un `.deb` altéré dans le miroir, et un InRelease au mauvais sha256 : tests négatifs de S5.
 - La porte ne juge pas cette pipeline : `fermeture_plateforme` ne s'y applique pas, succès à vide.
 - `prefetch-deb` lira en S4b sa liste dans le workspace, posée par une tâche qui lit Zot ; en S4a, elle la reçoit en paramètre fixé par la pipeline.
+
+## Note datée du 10/11/2026, 23:03 UTC
+
+**Correction d'heure** : l'en-tête annonce une rédaction « de 22:58 à 23:10 UTC ». Le fichier a été écrit et commité à 22:58 UTC (`7b7e5d8`). « 23:10 » était une estimation, pas une heure relevée.
+
+**Résultat de l'étape `prealables`** (hôte seul, sans accord, comme prévu) : de 23:02:39 à 23:03 UTC, deux passages en échec puis un passage au code 0. Journal du dernier passage : [`s4a-prealables.log`](s4a-prealables.log).
+- **Premier échec (23:02:39 UTC)** : `PyYAML` est absent de l'hôte, et le contrôle des YAML a été sauté.
+- **Deuxième échec (23:03:04 UTC)** : yq a refusé la pipeline rendue. Le rendu remplaçait aussi le `@LISTE@` cité dans le commentaire d'en-tête. Le script a été corrigé : seules les lignes hors commentaire sont rendues, et la lecture par yq est désormais contrôlée.
+- **Dernier passage** : le contrôle de la liste échouait sur le saut de ligne final ajouté par yq. Après correction, code 0.
+
+**A1 : tenue.** Ce que le dernier passage établit :
+- les 199 paquets sont rapprochés du `Packages` contrôlé, sans écart ;
+- les 20 paquets de l'amorce sont retrouvés dans la liste ;
+- les trois YAML se lisent ;
+- la liste rendue dans la pipeline est identique, pour `prefetch` comme pour `construire` ;
+- aucune variable ne reste dans le rendu.

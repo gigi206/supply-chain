@@ -1,0 +1,168 @@
+# Brique 06, S4a (décision du propriétaire du 10/11/2026, 22:52:55 UTC) : construction de l'image sbuild-debian13 par mmdebstrap,
+# sans aucune entrée ni sortie réseau (NetworkPolicy builder-sans-sortie, qui sélectionne les pods de cette tâche par
+# tekton.dev/task). Pod Kata privilégié, root (mmdebstrap --mode=root, comme la racine de S1) : il n'est admis que sous Kata
+# (runtimeClassName posé par le PipelineRun) ; l'identifiant d'écriture de Zot n'y entre jamais (publier-image pousse le layout).
+#   - entrées : le miroir partiel écrit par prefetch-deb, monté en lecture seule (sous-dossier miroir du PVC) ; revérifié ici
+#     (sha256 de l'InRelease fixé par la pipeline, index selon l'InRelease, chaque paquet selon la liste) ;
+#   - mmdebstrap 1.5.7 installé par dpkg -i dans l'amorce (choix 3 du propriétaire), depuis les paquets du miroir listés en
+#     paramètre (lignes « deb amorce » de S1, s1c-racine.log) ;
+#   - racine : mêmes options que s1.sh (fonction mm, variante minbase, paquets épinglés, compte constructeur 1000, subuid et
+#     subgid) ; chroot : mêmes options que s2.sh (variante buildd, sans --include, D2 a) ; SOURCE_DATE_EPOCH fixé par la pipeline ;
+#   - écarts voulus avec S1 et S2 (resultats/s4a-predictions.md) : miroir file:// (crochet file-mirror-automount de mmdebstrap) ;
+#     etc/hostname fixé à « sbuild » et etc/resolv.conf vidé (le manuel de mmdebstrap 1.5.7 les dit copiés de l'hôte, et le nom
+#     du pod change à chaque TaskRun) ; etc/apt/sources.list réécrit à la ligne de l'instantané de S1 ; listes d'apt nettoyées ;
+#   - layout OCI écrit à la main (choix 4) : couche 1 = l'archive racine telle quelle, couche 2 = le chroot sous
+#     opt/sbuild/trixie-amd64.tar (même commande tar que s1.sh, etape_image), couches non compressées, un seul manifeste ;
+#     image.tar dans le workspace sortie, que publier-image (inchangée) pousse ; DIGEST_CONSTRUIT en résultat ;
+#   - témoin TCP vers l'instantané (nom et adresse de Fastly relevée le 10/11/2026) : il doit échouer.
+# @AMORCE@ : s4a.sh taches. Signée une fois, versionnée (construire-builder.signee.yaml), digest dans la liste revue.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: construire-builder
+spec:
+  params:
+  - name: instantane
+    type: string
+  - name: inrelease
+    type: string
+  - name: liste
+    type: string
+  - name: amorce
+    type: string
+  - name: sde
+    type: string
+  - name: inclure
+    type: string
+  workspaces:
+  - name: entrees
+    readOnly: true
+  - name: sortie
+  results:
+  - name: DIGEST_CONSTRUIT
+    type: string
+  volumes:
+  - name: w
+    emptyDir:
+      medium: Memory
+      sizeLimit: 4Gi
+  steps:
+  - name: construire
+    image: @AMORCE@
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+      runAsUser: 0
+      runAsNonRoot: false
+    resources:
+      requests:
+        cpu: "2"
+        memory: 6Gi
+      limits:
+        cpu: "2"
+        memory: 6Gi
+    volumeMounts:
+    - name: w
+      mountPath: /w
+    env:
+    - name: INSTANTANE
+      value: $(params.instantane)
+    - name: INRELEASE
+      value: $(params.inrelease)
+    - name: LISTE
+      value: $(params.liste)
+    - name: AMORCE_PAQUETS
+      value: $(params.amorce)
+    - name: SDE
+      value: $(params.sde)
+    - name: INCLURE
+      value: $(params.inclure)
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      export LC_ALL=C
+      umask 022
+      e=$(workspaces.entrees.path)
+      o=$(workspaces.sortie.path)
+      ! touch "$e/.ecriture" 2> /dev/null || { echo "workspace entrees inscriptible" >&2; exit 1; }
+      case $SDE in *[!0-9]*|"") echo "SOURCE_DATE_EPOCH invalide" >&2; exit 1 ;; esac
+      echo "invité : $(nproc) vCPU, $(awk '/MemTotal/ {print $2}' /proc/meminfo) kB ; /w : $(awk '$2 == "/w" {print $3}' /proc/mounts) ; entrees : $(awk -v p="$e" '$2 == p {print $3, $4}' /proc/mounts), écriture refusée"
+      pic() { echo "tmpfs /w : $(du -sm /w | cut -f1) Mo ($1)"; }
+      # Témoin : aucune sortie réseau (nom, puis adresse)
+      for c in snapshot.debian.org 199.232.170.132; do
+        if timeout 10 bash -c "exec 3<>/dev/tcp/$c/80" 2> /dev/null; then echo "KO   $c:80 joint" >&2; exit 1; fi
+        echo "témoin $c:80 : refusé ou injoignable (attendu)"
+      done
+      # Revérification du miroir
+      [ "$(sha256sum < "$e/dists/trixie/InRelease" | cut -c1-64)" = "$INRELEASE" ] || { echo "InRelease du miroir différent" >&2; exit 1; }
+      for f in main/binary-amd64/Packages.xz main/i18n/Translation-en.xz; do
+        l=$(awk -v f="$f" '/^SHA256:/ {s = 1; next} /^[^ ]/ {s = 0} s && $3 == f {print $1}' "$e/dists/trixie/InRelease")
+        [ "$(sha256sum < "$e/dists/trixie/$f" | cut -c1-64)" = "$l" ] || { echo "index altéré : $f" >&2; exit 1; }
+        [ "$(sha256sum < "$e/dists/trixie/${f%/*}/by-hash/SHA256/$l" | cut -c1-64)" = "$l" ] || { echo "index by-hash altéré : $f" >&2; exit 1; }
+      done
+      n=0
+      while read -r s z p; do
+        [ -n "$s" ] || continue
+        [ "$(sha256sum < "$e/$p" | cut -c1-64)" = "$s" ] || { echo "paquet altéré : $p" >&2; exit 1; }
+        n=$((n + 1))
+      done <<< "$LISTE"
+      echo "miroir revérifié : InRelease $INRELEASE, 2 index, $n paquets"
+      # mmdebstrap dans l'amorce, par dpkg -i
+      a=()
+      for p in $AMORCE_PAQUETS; do a+=("$e/$p"); done
+      t=$(date +%s)
+      dpkg -i "${a[@]}" > /w/dpkg.log 2>&1 || { tail -n 20 /w/dpkg.log >&2; echo "dpkg -i : échec" >&2; exit 1; }
+      echo "dpkg -i de ${#a[@]} paquets : rc 0 en $(($(date +%s) - t)) s ; $(mmdebstrap --version 2>&1)"
+      export SOURCE_DATE_EPOCH=$SDE TMPDIR=/w
+      src="deb [check-valid-until=no] file://$e trixie main"
+      finale="deb [check-valid-until=no] $INSTANTANE trixie main"
+      mm() { # nom variante [options…] : archive /w/<nom>.tar
+        local n=$1 v=$2 r t; shift 2
+        t=$(date +%s)
+        r=0
+        mmdebstrap --mode=root --variant="$v" --format=tar \
+          --hook-dir=/usr/share/mmdebstrap/hooks/file-mirror-automount "$@" \
+          --customize-hook='echo sbuild > "$1/etc/hostname"' \
+          --customize-hook=': > "$1/etc/resolv.conf"' \
+          --customize-hook="echo '$finale' > \"\$1/etc/apt/sources.list\"" \
+          trixie "/w/$n.tar" "$src" > "/w/mm-$n.log" 2>&1 || r=$?
+        echo "mmdebstrap $n : rc $r en $(($(date +%s) - t)) s, $(stat -c %s "/w/$n.tar" 2> /dev/null) octets, sha256 $(sha256sum < "/w/$n.tar" 2> /dev/null | cut -c1-64)"
+        [ $r = 0 ] || { grep -i -E "error|E:|W:|failed" "/w/mm-$n.log" | head -n 10 >&2; exit 1; }
+        pic "après $n"
+      }
+      mm racine minbase --include="$INCLURE" \
+        --customize-hook='chroot "$1" useradd -m -u 1000 -U -s /bin/sh constructeur' \
+        --customize-hook='echo constructeur:100000:65536 > "$1/etc/subuid"' \
+        --customize-hook='echo constructeur:100000:65536 > "$1/etc/subgid"'
+      mm chroot buildd
+      c=$(sha256sum < /w/chroot.tar | cut -c1-64)
+      # Couche 2 : le chroot sous opt/sbuild (même commande que s1.sh, etape_image)
+      mkdir -p /w/cc/opt/sbuild
+      mv /w/chroot.tar /w/cc/opt/sbuild/trixie-amd64.tar
+      chmod 0644 /w/cc/opt/sbuild/trixie-amd64.tar
+      tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime --mtime=@0 \
+        --owner=0 --group=0 --numeric-owner -C /w/cc -cf /w/couche-chroot.tar opt
+      pic "couche du chroot écrite"
+      rm -rf /w/cc
+      # Layout OCI à la main : couches non compressées, un seul manifeste
+      L=/w/layout
+      mkdir -p "$L/blobs/sha256"
+      l1=$(sha256sum < /w/racine.tar | cut -c1-64); s1=$(stat -c %s /w/racine.tar)
+      l2=$(sha256sum < /w/couche-chroot.tar | cut -c1-64); s2=$(stat -c %s /w/couche-chroot.tar)
+      mv /w/racine.tar "$L/blobs/sha256/$l1"
+      mv /w/couche-chroot.tar "$L/blobs/sha256/$l2"
+      blob() { # contenu : blob JSON écrit, « sha256 taille » sur la sortie
+        local h
+        h=$(printf '%s' "$1" | sha256sum | cut -c1-64)
+        printf '%s' "$1" > "$L/blobs/sha256/$h"
+        echo "$h ${#1}"
+      }
+      cfg=$(blob '{"architecture":"amd64","config":{"Env":["PATH=/usr/sbin:/usr/bin:/sbin:/bin","HOME=/w/home"]},"os":"linux","rootfs":{"type":"layers","diff_ids":["sha256:'"$l1"'","sha256:'"$l2"'"]}}')
+      man=$(blob '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","config":{"mediaType":"application/vnd.oci.image.config.v1+json","digest":"sha256:'"${cfg% *}"'","size":'"${cfg#* }"'},"layers":[{"mediaType":"application/vnd.oci.image.layer.v1.tar","digest":"sha256:'"$l1"'","size":'"$s1"'},{"mediaType":"application/vnd.oci.image.layer.v1.tar","digest":"sha256:'"$l2"'","size":'"$s2"'}]}')
+      printf '%s' '{"imageLayoutVersion":"1.0.0"}' > "$L/oci-layout"
+      printf '%s' '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":"application/vnd.oci.image.manifest.v1+json","digest":"sha256:'"${man% *}"'","size":'"${man#* }"'}]}' > "$L/index.json"
+      echo "couche racine sha256:$l1 ($s1 octets) ; couche du chroot sha256:$l2 ($s2 octets), chroot intérieur sha256 $c ; configuration sha256:${cfg% *} ; manifeste sha256:${man% *}"
+      t=$(date +%s)
+      tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$L" -cf "$o/image.tar" oci-layout index.json blobs
+      echo "image.tar : $(stat -c %s "$o/image.tar") octets en $(($(date +%s) - t)) s"
+      printf 'sha256:%s' "${man% *}" > $(results.DIGEST_CONSTRUIT.path)

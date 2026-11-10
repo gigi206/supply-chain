@@ -857,3 +857,17 @@ Les [prédictions A1 à A17](resultats/s4a-predictions.md) sont écrites et comm
 **Risques principaux** : `prefetch-deb` en non root (A4), la complétude des 20 paquets de l'amorce (A6) et la vérification de l'InRelease d'un miroir `file://` (A7). Les trois sont des prédictions moyennes.
 
 **Reste à écrire, à sec** : `s4a.sh`, les tâches `prefetch-deb` et `construire-builder`, la pipeline `builder-sbuild` et la NetworkPolicy `builder-sans-sortie`. Chaque étape qui touche Zot ou le cluster attendra son accord nommé.
+
+## Additif du 10/11/2026, 23:03 UTC : S4a écrit à sec, A1 tenue, NON LANCÉ au-delà de l'hôte
+
+**Écrit à sec**, sans rien lancer dans le cluster ni dans Zot :
+- le script [`s4a.sh`](s4a.sh) ;
+- dans [`builder/`](builder/), la tâche `prefetch-deb` (runc, `apt-helper` avec les hashes), la tâche `construire-builder` (Kata privilégiée, mmdebstrap sur un miroir `file://`, layout OCI écrit à la main), la pipeline `builder-sbuild` et la NetworkPolicy `builder-sans-sortie`.
+
+**Étape `prealables`** : elle tourne sur l'hôte seul, donc sans accord. Elle a rendu le code 0 au troisième passage, après deux corrections du script (détail dans les [prédictions](resultats/s4a-predictions.md)). **A1 est tenue.**
+
+**Non lancé** : `taches`, `reseau`, `pipeline`, `provenance` et `comparaison`. Chaque étape attend un accord nommé.
+
+**L'étape `taches`** se fera en deux passes :
+1. `SIGNER=1` : signatures, bundles dans Zot, puis diff de `politique/porte/taches.yml` (08) soumis au propriétaire ;
+2. une seconde passe, une fois la liste acceptée.

@@ -1,0 +1,17 @@
+# s4a.sh prealables, 2026-11-10T23:03:11Z
+OK   Packages égal à xz -dc Packages.xz : égal
+OK   liste rapprochée de Packages : 199 paquets, 0 écart(s)
+OK   paquets dans la liste : 199
+OK   octets de la liste : 133065812
+OK   paquets de l'amorce retrouvés dans la liste : 20
+OK   gabarits rendus sans variable restante (refs factices) : 58116 octets pour la pipeline
+OK   prefetch-deb : YAML lisible par yq, nom : prefetch-deb
+OK   construire-builder : YAML lisible par yq, nom : construire-builder
+OK   builder-sbuild : YAML lisible par yq, nom : builder-sbuild
+OK   liste rendue dans la pipeline (prefetch, puis construire) : 199 199
+OK   liste rendue identique à la liste : identique
+     instantane = http://snapshot.debian.org/archive/debian/20261105T000000Z
+     inrelease = 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+     amorce = pool/main/e/expat/libexpat1_2.8.3-1~deb13u1_amd64.deb pool/main/libf/libffi/libffi8_3.4.8-2_amd64.deb pool/main/g/gdbm/libgdbm-compat4t64_1.24-2_amd64.deb pool/main/g/gdbm/libgdbm6t64_1.
+     sde = 1789199741
+     inclure = sbuild=0.89.3+deb13u4,libsbuild-perl=0.89.3+deb13u4,mmdebstrap=1.5.7-1+deb13u1,uidmap=1:4.17.4-2,iproute2=6.15.0-1

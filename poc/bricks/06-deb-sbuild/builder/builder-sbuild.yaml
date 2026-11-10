@@ -1,0 +1,95 @@
+# Brique 06, S4a (décision du propriétaire du 10/11/2026, 22:52:55 UTC) : pipeline de la plateforme qui construit l'image de build
+# sbuild-debian13 et la publie dans builds/builders/sbuild-debian13. Signée par la clé des tâches et publiée en bundle
+# (tekton/pipelines/builder-sbuild) ; ses tâches sont tirées de leurs bundles signés, épinglés par digest. Toutes ses entrées sont
+# fixées ici (instantané, sha256 de l'InRelease, liste des paquets, paquets de l'amorce, SOURCE_DATE_EPOCH, paquets inclus,
+# dépôt de sortie) : la signature de la pipeline couvre ces choix, que le créateur du PipelineRun ne peut pas changer. Le créateur
+# (s4a.sh, depuis l'hôte : ni webhook ni rattrapage, aucun commit de Forgejo en jeu) fournit le workspace sortie (PVC) et le
+# runtimeClassName de la tâche construire (taskRunSpecs). Un seul workspace, lié par sous-dossier (comme sample-app) : prefetch
+# écrit miroir/, construire le lit en lecture seule et écrit image/, publier lit image/.
+# @PREFETCH_DEB@, @CONSTRUIRE_BUILDER@, @PUBLIER@, @INSTANTANE@, @INRELEASE@, @LISTE@, @AMORCE_PAQUETS@, @SDE@, @INCLURE@,
+# @IMAGE@ : s4a.sh taches.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: builder-sbuild
+spec:
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH_DEB@
+      - name: name
+        value: prefetch-deb
+      - name: kind
+        value: task
+    params:
+    - name: instantane
+      value: @INSTANTANE@
+    - name: inrelease
+      value: @INRELEASE@
+    - name: liste
+      value: |
+@LISTE@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: construire
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE_BUILDER@
+      - name: name
+        value: construire-builder
+      - name: kind
+        value: task
+    params:
+    - name: instantane
+      value: @INSTANTANE@
+    - name: inrelease
+      value: @INRELEASE@
+    - name: liste
+      value: |
+@LISTE@
+    - name: amorce
+      value: @AMORCE_PAQUETS@
+    - name: sde
+      value: "@SDE@"
+    - name: inclure
+      value: @INCLURE@
+    workspaces:
+    - name: entrees
+      workspace: sortie
+      subPath: miroir
+    - name: sortie
+      workspace: sortie
+      subPath: image
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER@
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+    params:
+    - name: image
+      value: @IMAGE@
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: image
