@@ -352,3 +352,14 @@ Détail : [diagnostic](resultats/diag-exec-predictions.md).
 **Étape kubelet** (19:58:33 à 19:58:35 UTC, code 0 du script) : **kubelet refuse les deux exec directs, `HTTP/1.1 403 Forbidden`**, en 8 et 5 ms, avant tout transfert. K2, le témoin, échoue ; K1 ne dit donc rien. Le maillon reste situé dans l'apiserver ou kubelet, sans être tranché. Le motif du refus n'a pas été lu, car le client n'affichait que la ligne de statut. Hypothèse non vérifiée : une autorisation de kubelet différente pour un exec par WebSocket (GET), alors que l'apiserver l'atteint autrement.
 
 Détail : [diagnostic](resultats/diag-exec-predictions.md).
+
+## Additif du 10/11/2026, 20:08 UTC : piles de goroutines pendant le blocage
+
+**Étape pile** (20:04:45 à 20:07:22 UTC, code 0 ; pod runc, 128 Mio lus lentement, exec en code 124, tout reçu) :
+- **pile de kubelet disponible**, 224, 225 et 225 goroutines avant, pendant et après ;
+- **pile de kube-apiserver indisponible** (`NotFound`) : son profilage est coupé. Le contrôle CIS 1.2.15 de la 08b en échec ne voulait donc pas dire profilage actif ;
+- **pendant le blocage, kubelet n'a aucune goroutine de relais de flux en plus** : 11 avant, 11 pendant, 11 après, aux mêmes chaînes d'appels. Toutes piles confondues, la seule goroutine en plus est une tâche de statistiques de volumes (`volumeStatCalculator`), sans rapport.
+
+**Lecture** : à 45 s, le processus est fini et kubelet ne relaie plus rien pour cet exec. Sa part semble achevée. Par élimination avec la bisection (containerd hors de cause) et l'étape amont (poste hors de cause), **le maillon probable est kube-apiserver**, qui garde l'exec ouvert vers kubectl. **Ce n'est pas prouvé** : la pile de l'apiserver manque, et les goroutines de kubelet pendant le transfert lui-même (avant 15 s) n'ont pas été relevées.
+
+Détail : [diagnostic](resultats/diag-exec-predictions.md).

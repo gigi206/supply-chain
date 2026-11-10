@@ -399,3 +399,20 @@ Les piles brutes restent dans le répertoire de travail, hors du dépôt. Le jou
 
 Le composant qui garde une goroutine du relais de flux en attente pendant le blocage, et seulement pendant, est le maillon. Sa chaîne d'appels dit où elle attend.
 
+## Résultat de l'étape pile (10/11/2026, 20:04:45 à 20:07:22 UTC)
+
+Accord : « Oui », à 20:04:41 UTC (transcription), en réponse à « Je lance l'étape pile ? Merci de répondre oui ou non ». Lancée sous bash, code **0**. Journal : [`diag-exec-pile.log`](diag-exec-pile.log). Les piles brutes restent hors du dépôt. Le pod est supprimé.
+
+| # | Résultat |
+|---|---|
+| P1 | **Tenue pour kubelet, réfutée pour l'apiserver** (`NotFound`, profilage coupé) |
+| P2 | **Réfutée.** Aucune goroutine de relais en attente dans kubelet pendant le blocage |
+| P3 | **Tenue.** Code 124, 134 217 728 octets reçus |
+
+**Étape pile** (20:04:45 à 20:07:22 UTC, code 0 ; pod runc, 128 Mio lus lentement, exec en code 124, tout reçu) :
+- **pile de kubelet disponible**, 224, 225 et 225 goroutines avant, pendant et après ;
+- **pile de kube-apiserver indisponible** (`NotFound`) : son profilage est coupé. Le contrôle CIS 1.2.15 de la 08b en échec ne voulait donc pas dire profilage actif ;
+- **pendant le blocage, kubelet n'a aucune goroutine de relais de flux en plus** : 11 avant, 11 pendant, 11 après, aux mêmes chaînes d'appels. Toutes piles confondues, la seule goroutine en plus est une tâche de statistiques de volumes (`volumeStatCalculator`), sans rapport.
+
+**Lecture** : à 45 s, le processus est fini et kubelet ne relaie plus rien pour cet exec. Sa part semble achevée. Par élimination avec la bisection (containerd hors de cause) et l'étape amont (poste hors de cause), **le maillon probable est kube-apiserver**, qui garde l'exec ouvert vers kubectl. **Ce n'est pas prouvé** : la pile de l'apiserver manque, et les goroutines de kubelet pendant le transfert lui-même (avant 15 s) n'ont pas été relevées.
+

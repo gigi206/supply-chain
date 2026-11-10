@@ -1,0 +1,13 @@
+# diag-exec-kata.sh pile, 2026-11-10T20:04:45Z
+### diag-exec-kata (runtimeClassName -, uid 1000, sans label) : prêt à 20:04:47 UTC
+pile kubelet avant : 224 goroutines
+pile apiserver avant : indisponible (Error from server (NotFound): the server could not find the requested resource )
+relevé pendant, 45 s après le lancement ; reçus dans le pod : 134217728
+pile kubelet pendant : 225 goroutines
+pile apiserver pendant : indisponible (Error from server (NotFound): the server could not find the requested resource )
+exec : code 124 en 150010 ms ; reçus dans le pod : 134217728
+pile kubelet apres : 225 goroutines
+pile apiserver apres : indisponible (Error from server (NotFound): the server could not find the requested resource )
+pod diag-exec-kata supprimé
+## kubelet : goroutines du relais de flux : avant 11, pendant 11, après 11
+## apiserver : goroutines du relais de flux : avant 0, pendant 0, après 0
