@@ -56,3 +56,21 @@ Deux fermetures, publiées par `publier-fermeture` (brique 03, inchangée) sous 
 - **Sortie de `prefetch-gomod`** : un pod compromis pourrait toujours envoyer le code cloné vers une adresse publique en 443. C'est la limite consignée en F2, et la version 2 ne la change pas.
 - **Nom trompeur** : `prefetch-gomod` produit aussi npm (additif de 16:48 UTC, ADR 0007).
 - **Deux digests de `prefetch-gomod` dans la liste revue** : la porte accepte les deux, sous la même règle `_prefetch`.
+
+## Résultats de l'étape `prealables` (11/11/2026, 16:56:14 UTC, hôte seul, hors ligne)
+
+Journal : [`s4b-prealables.log`](s4b-prealables.log), 37 lignes OK, aucune KO. Étape lancée sans accord, comme prévu ci-dessus.
+
+**Heures** :
+- les prédictions ont été commitées à 16:53:09 UTC (`614b41b`). L'en-tête, « entre 16:52 et 16:58 UTC », est donc trop large ;
+- `s4b.sh` a été corrigé avant tout lancement (`96252d3`, 16:56:10 UTC) : les essais tirent les scripts des versions signées de la 08, car les gabarits non rendus ne sont pas lisibles par `yq`.
+
+| N° | Résultat |
+|---|---|
+| B1 | **Tenue.** Verrou tiré du layout de S4c par digest, égal à celui du dépôt ; liste de 162 lignes, 193 978 008 octets |
+| B2 | **Tenue.** Trois gabarits rendus et nommés ; `paquets` sans valeur par défaut ; liste rendue identique ; sous-dossiers `["fermeture",null]` ; demande rendue égale |
+| B3 | **Tenue.** `sh -n` passe. 2 lignes de la version 1 signée (`5e7e5662`) sont changées : la ligne des versions et l'appel d'Hermeto |
+| B4 | **Tenue.** Le contrôle tiré du gabarit rendu admet l'arbre de `sample-app` (« 1 paquet(s) », lockfileVersion 3) et la demande gomod seule. Il refuse les 17 cas altérés, dont `registry.yarnpkg.com`, l'hôte préfixe et `npm-shrinkwrap.json` lu d'abord. Défaut d'affichage seulement : la ligne « gomod . : admis », écrite avant le refus, est capturée après lui et laisse « admis) » sur la ligne suivante |
+| B5 | **Tenue.** La section de `publier-fermeture` signée, avec oras 1.3.6, donne 7 couches et 7 titres distincts. Deux paires de couches ont le même contenu sous deux titres. Les noms avec `+` et `~` passent. Une seconde poussée, depuis une autre copie, donne le même digest (`81291ea4`) |
+
+Restent B6 à B16, qui attendent des accords nommés.

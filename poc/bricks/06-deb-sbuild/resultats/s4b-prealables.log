@@ -1,0 +1,125 @@
+# s4b.sh prealables, 2026-11-11T16:56:14Z
+## artefact de packaging (layout local de S4c, tiré par digest)
+OK   verrou tiré égal au verrou du dépôt : égal
+OK   liste : lignes, octets : 162 193978008
+## gabarits rendus (refs factices)
+OK   liste rendue dans la pipeline deb, identique à la liste : identique
+OK   pipeline deb : subPath de prefetch, racine pour publier : ["fermeture",null]
+OK   demande Hermeto rendue dans la pipeline sources : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+OK   prefetch-gomod : YAML lisible par yq, nom : prefetch-gomod
+OK   prefetch-deb-sample-app : YAML lisible par yq, nom : prefetch-deb-sample-app
+OK   prefetch-sources-sample-app : YAML lisible par yq, nom : prefetch-sources-sample-app
+OK   prefetch-gomod v2 : paramètre paquets sans valeur par défaut : false
+## prefetch-gomod : version 2 et version 1 (script)
+OK   v2 : syntaxe sh du script : OK
+     < echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT"
+     < hermeto fetch-deps --source /tmp/depot --output "$f" '{"type": "gomod"}'
+     > python3 -I - /tmp/depot "$PAQUETS" <<'FIN'
+     > import json, os, sys
+     > src, demande = sys.argv[1:]
+     > def refus(m):
+     >     print('refusé : ' + m, file=sys.stderr); sys.exit(1)
+     > try:
+     >     d = json.loads(demande)
+     > except ValueError:
+     >     refus('demande Hermeto illisible')
+     > if not isinstance(d, list) or not d:
+     >     refus('demande Hermeto : liste non vide attendue')
+     > vus = set()
+     > for p in d:
+     >     if not isinstance(p, dict) or not set(p) <= {'type', 'path'}:
+     >         refus(f'entrée non admise : {p!r}')
+     >     t, c = p.get('type'), p.get('path', '.')
+     >     if t not in ('gomod', 'npm'):
+     >         refus(f'type non admis : {t!r}')
+     >     if not isinstance(c, str) or not c or c.startswith('/') or '..' in c.split('/'):
+     >         refus(f'chemin non admis : {c!r}')
+     >     if (t, os.path.normpath(c)) in vus:
+     >         refus(f'entrée en double : {p!r}')
+     >     vus.add((t, os.path.normpath(c)))
+     >     if t != 'npm':
+     >         print(f'{t} {c} : admis')
+     >         continue
+     >     r = os.path.join(src, c)
+     >     if os.path.islink(r) or not os.path.isdir(r):
+     >         refus(f'npm {c} : répertoire absent ou lien')
+     >     for nom in ('npm-shrinkwrap.json', 'package-lock.json'):   # ordre d'Hermeto 0.64.0 (npm/resolver.py)
+     >         v = os.path.join(r, nom)
+     >         if os.path.lexists(v):
+     >             break
+     >     else:
+     >         refus(f'npm {c} : aucun lockfile')
+     >     if os.path.islink(v):
+     >         refus(f'npm {c} : {nom} est un lien')
+     >     try:
+     >         l = json.load(open(v, encoding='utf-8'))
+     >     except ValueError:
+     >         refus(f'npm {c} : {nom} illisible')
+     >     if l.get('lockfileVersion') not in (2, 3):
+     >         refus(f'npm {c} : lockfileVersion {l.get("lockfileVersion")!r}, 2 ou 3 attendu')
+     >     paquets = l.get('packages')
+     >     if not isinstance(paquets, dict) or '' not in paquets:
+     >         refus(f'npm {c} : section packages absente ou sans racine')
+     >     n = 0
+     >     for k, e in paquets.items():
+     >         if k == '':
+     >             continue
+     >         if not isinstance(e, dict) or e.get('link'):
+     >             refus(f'npm {c} : entrée {k} : lien ou forme inattendue')
+     >         u, i = e.get('resolved'), e.get('integrity')
+     >         if not isinstance(u, str) or not u.startswith('https://registry.npmjs.org/'):
+     >             refus(f'npm {c} : entrée {k} : resolved {u!r} hors de https://registry.npmjs.org/')
+     >         if not isinstance(i, str) or not i.startswith('sha512-'):
+     >             refus(f'npm {c} : entrée {k} : integrity sha512 absente')
+     >         n += 1
+     >     print(f'npm {c} : {nom}, lockfileVersion {l["lockfileVersion"]}, {n} paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512')
+     > FIN
+     > echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT ; demande $PAQUETS"
+     > hermeto fetch-deps --source /tmp/depot --output "$f" "$PAQUETS"
+OK   v1 et v2 : lignes de v1 changées (version des outils, appel d'Hermeto) : 2
+## contrôle npm de la v2 (tiré du gabarit rendu), sur l'arbre de sample-app et sur des cas altérés
+OK   contrôle : syntaxe Python
+OK   arbre de sample-app (celui du commit 6391fd437f26696847041be3226bbbf633f55a2f) : 30e808ffa327288c656ddda7b6fafe4005234b77
+OK   cas positif (demande de la pipeline) : npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
+OK   cas positif (gomod seul) : gomod . : admis
+OK   refusé : autre hôte en https (npm web : entrée node_modules/marked : resolved 'https://evil.example/marked/-/marked-16.4.1.tgz' hors de htt
+admis)
+OK   refusé : registry.yarnpkg.com (admis par Hermeto) (npm web : entrée node_modules/marked : resolved 'https://registry.yarnpkg.com/marked/-/marked-16.4.1.tgz' hor
+admis)
+OK   refusé : hôte préfixe (registry.npmjs.org.evil.example) (npm web : entrée node_modules/marked : resolved 'https://registry.npmjs.org.evil.example/marked/-/marked-16.4
+admis)
+OK   refusé : dépendance git (npm web : entrée node_modules/marked : resolved 'git+https://github.com/markedjs/marked.git#abc' hors de http
+admis)
+OK   refusé : integrity absente (npm web : entrée node_modules/marked : integrity sha512 absente
+admis)
+OK   refusé : integrity sha1 (npm web : entrée node_modules/marked : integrity sha512 absente
+admis)
+OK   refusé : resolved absent (paquet groupé) (npm web : entrée node_modules/marked : resolved None hors de https://registry.npmjs.org/
+admis)
+OK   refusé : entrée link (npm web : entrée node_modules/x : lien ou forme inattendue
+admis)
+OK   refusé : lockfileVersion 1 (npm web : lockfileVersion 1, 2 ou 3 attendu
+admis)
+OK   refusé : npm-shrinkwrap.json lu avant package-lock.json (npm web : entrée node_modules/marked : resolved 'https://evil.example/m.tgz' hors de https://registry.npmjs.o
+admis)
+OK   refusé : chemin ../ (chemin non admis : '../web')
+OK   refusé : chemin absolu (chemin non admis : '/tmp')
+OK   refusé : type pip (type non admis : 'pip')
+OK   refusé : forme objet (packages et flags) (demande Hermeto : liste non vide attendue)
+OK   refusé : clé en plus (entrée non admise : {'type': 'gomod', 'flags': ['x']})
+OK   refusé : entrée en double (entrée en double : {'type': 'gomod', 'path': './'}
+admis)
+OK   refusé : demande vide (demande Hermeto : liste non vide attendue)
+## publier-fermeture : section oras push --oci-layout sur un faux miroir
+OK   section extraite : cd, boucle find, oras push : 3
+OK   digest du manifeste : sha256:81291ea48f828c617a28d9a222a678ceed9c2736a4fa7051479d5276b4ab3aff
+     miroir/dists/trixie/InRelease 5e95c0c40be9
+     miroir/dists/trixie/main/binary-amd64/Packages.xz f816b480f871
+     miroir/dists/trixie/main/binary-amd64/by-hash/SHA256/f816b480f87144ec4de5862adf028ff66cc6964250325d53fd22bf8922824b6f f816b480f871
+     miroir/dists/trixie/main/i18n/Translation-en.xz e40405cd8ba0
+     miroir/dists/trixie/main/i18n/by-hash/SHA256/e40405cd8ba072e3532032ea440e0308947bb52420f0011b23919842e9528fd6 e40405cd8ba0
+     miroir/pool/main/a/a/golang-go_1.24~2_amd64.deb 456232c3c874
+     miroir/pool/main/g/gcc/g++-14_14.2.0-19_amd64.deb bfe99fdf3c4e
+OK   couches : nombre, titres distincts (7 fichiers hors bom.json) : 7 7
+OK   couches de même contenu sous deux titres (index et by-hash) : 2
+OK   seconde poussée, autre copie : même digest : sha256:81291ea48f828c617a28d9a222a678ceed9c2736a4fa7051479d5276b4ab3aff
