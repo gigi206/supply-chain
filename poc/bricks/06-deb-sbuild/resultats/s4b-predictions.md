@@ -86,3 +86,12 @@ Question du propriétaire : « Comment fermer ce risque ? ». Chaîne relue dans
 La prédiction B9 n'est pas réécrite. Cette note ne la remplace pas : seule l'exécution de `deb` la tranchera.
 
 **Correction d'heure** : la note titrée « 17:05 UTC » a été écrite à 17:21 UTC et commitée à 17:21:43 UTC (`7a163f2`).
+
+## Note datée du 11/11/2026, 17:24 UTC : B9, preuve tirée de S4a (avis du conseiller demandé par le propriétaire)
+
+- **Le pod auxiliaire de local-path tourne en root** : la section `helperPod.yaml` du manifeste en cache (`9781b39c`) n'a ni `securityContext` ni `runAsUser`. Le manifeste entier n'en contient aucun (relevé par `grep`), et l'image est `busybox`. La racine de chaque volume appartient donc à root.
+- **S4a a déjà écrit en UID 65532 à la racine d'un tel volume** : `prefetch-deb` tournait en UID 65532 (`stepTemplate`), sans `fsGroup` dans le `podTemplate` de `s4a.sh`, avec un workspace sans `subPath` dans `builder-sbuild`. Elle a écrit `miroir/` : « miroir : 199 paquets » dans [`s4a-pipeline.log`](s4a-pipeline.log), lignes 28 et 66.
+- Puisque la racine appartient à root, cette écriture prouve que son mode donne l'écriture aux autres. Elle le prouve dans ce cluster, sous la ConfigMap en service le 10/11 vers 23:37 UTC, et pas seulement d'après le manifeste. Le kubelet recopie ce mode sur le `subPath` (additif de 16:48 UTC).
+- **Seule hypothèse ouverte** : une dérive de la ConfigMap depuis S4a. La relire n'apporterait pas plus que cette preuve, car elle ne montre que le script, pas le mode réel. Avis du conseiller : lancer sans cette lecture.
+
+B9 n'est pas réécrite. Seule l'exécution de `deb` la tranchera.
