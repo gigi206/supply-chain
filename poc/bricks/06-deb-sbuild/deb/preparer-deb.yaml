@@ -16,6 +16,9 @@
 # Le .dsc n'est pas assemblé ici (décision du propriétaire du 11/11/2026, 17:54:35 UTC) : seule l'image de build a dpkg-dev.
 # Signée une fois, versionnée (preparer-deb.signee.yaml), digest dans la liste revue (politique/porte/taches.yml de la 08).
 # @PREFETCH@ (git, go 1.26.10, python3), @OUTILS@ (oras) : s4d.sh.
+# Corrigé le 11/11/2026 après le premier PipelineRun (s4d-deb-1, 19:28 UTC : « could not create work tree dir '/tmp/depot':
+# Permission denied ») : /tmp de l'image de prefetch appartient à root en 0755 (lu dans sa couche ; 1777 dans l'image d'outils).
+# Un emptyDir est monté sur /tmp pour toutes les étapes, comme dans prefetch-gomod.
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -64,6 +67,8 @@ spec:
   - name: ca-poc
     configMap:
       name: ca-poc
+  - name: tmp
+    emptyDir: {}
   stepTemplate:
     securityContext:
       runAsUser: 65532
@@ -75,6 +80,8 @@ spec:
     - name: ca-poc
       mountPath: /etc/ca-poc
       readOnly: true
+    - name: tmp
+      mountPath: /tmp
   steps:
   - name: sources
     image: @PREFETCH@

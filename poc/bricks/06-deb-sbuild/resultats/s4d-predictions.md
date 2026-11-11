@@ -122,3 +122,13 @@ Prédictions ajoutées pour `busybox_outils` :
   Toutes deux sont signalées absentes de la liste revue ; la pipeline n'est pas signée.
 - L'ajout des deux digests à `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
 
+## Résultats du 11/11/2026, 19:29 UTC : taches, puis pipeline en échec au premier PipelineRun
+
+**Accord du propriétaire** (19:27:55 UTC) : « Oui, lance-les », donné à la question « Je lance taches, puis pipeline ? ». Avant, à 19:27:06 UTC, « Oui, commite-le » pour l'ajout relu à la liste revue (`3836bde`).
+
+- **D11 : tenue** (`taches`, 19:28:01 UTC, code 0, [journal](s4d-taches.log)). Les deux tâches sont dans la liste revue. La pipeline est signée et son bundle poussé : `tekton/pipelines/sample-app-deb@sha256:83455f46d1ccc16db8708d402226a192ae52975983afa7c114f28f6fe5c4376e`.
+- **D12 : réfutée au premier passage** (`pipeline`, 19:28:08 UTC, code 1, [journal](s4d-pipeline.log)). Le TaskRun `s4d-deb-1-preparer` échoue dès l'étape `sources` : `fatal: could not create work tree dir '/tmp/depot': Permission denied`. `construire` et `publier` n'ont pas tourné, `s4d-deb-2` n'a pas été créé, et rien n'a été publié sous `builds/sample-app-deb`.
+- **Cause, lue dans les couches des images** : `/tmp` de l'image de prefetch (`68e0ae70`) appartient à root, en 0755 ; celui de l'image d'outils est en 1777. `prefetch-gomod` monte un emptyDir sur `/tmp`, et je ne l'avais pas repris dans `preparer-deb`. Les contrôles sur l'hôte ne l'ont pas vu : ils jouent les scripts avec un `/tmp` de l'hôte, et le pod d'essai ne visait que `construire-deb`, la tâche privilégiée.
+- **Correction, à sec** : un emptyDir est monté sur `/tmp` pour toutes les étapes de `preparer-deb`, et `prealables` exige ce montage (rejouée à 19:29:07 UTC, code 0). La tâche corrigée a un autre digest : il faut la re-signer (`SIGNER=1 taches`), puis remplacer `b310c262` par le nouveau digest dans la liste revue.
+- **Coût** : le bundle `tekton/tasks/preparer-deb@sha256:b310c262…` reste dans Zot, inutilisable, faute de droit de suppression. Il sera retiré de la liste revue.
+

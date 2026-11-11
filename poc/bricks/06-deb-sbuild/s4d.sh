@@ -137,6 +137,10 @@ etape_prealables() {
   attendu "preparer-deb : étapes" "$(yq '[.spec.steps[].name] | join(" ")' "$T/preparer-deb.yaml")" "sources entrees assemblage"
   attendu "construire-deb : image de build, UID, privilégiée" \
     "$(yq '.spec.steps[0] | .image + " " + (.securityContext.runAsUser | tostring) + " " + (.securityContext.privileged | tostring)' "$T/construire-deb.yaml")" "$BUILDER 1000 true"
+  # Ajouté le 11/11/2026 après l'échec de s4d-deb-1 (/tmp de l'image de prefetch en 0755, root) : chaque étape de preparer-deb doit
+  # avoir /tmp en emptyDir, ou une image dont /tmp est en 1777
+  attendu "preparer-deb : emptyDir monté sur /tmp pour toutes les étapes" \
+    "$(yq '[.spec.volumes[] | select(.name == "tmp") | has("emptyDir")] + [.spec.stepTemplate.volumeMounts[] | select(.mountPath == "/tmp") | .name] | join(" ")' "$T/preparer-deb.yaml")" "true tmp"
   attendu "construire-deb : workspace entrees en lecture seule" "$(yq '.spec.workspaces[] | select(.name == "entrees") | .readOnly' "$T/construire-deb.yaml")" true
   echo "## syntaxe des scripts"
   for a in sources entrees assemblage; do

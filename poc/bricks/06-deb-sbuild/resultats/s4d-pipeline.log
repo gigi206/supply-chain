@@ -1,0 +1,13 @@
+# s4d.sh pipeline, 2026-11-11T19:28:08Z
+## s4d-deb-1 créé à 19:28:09 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:83455f46d1ccc16db8708d402226a192ae52975983afa7c114f28f6fe5c4376e)
+### TaskRun s4d-deb-1-preparer (StepFailed), pod s4d-deb-1-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
+     2026/11/11 19:28:18 Skipping step because a previous step failed
+     2026/11/11 19:28:18 Skipping step because a previous step failed
+     2026/11/11 19:28:14 Entrypoint initialization
+     2026/11/11 19:28:15 Decoded script /tekton/scripts/script-0-zx9gn
+     2026/11/11 19:28:15 Decoded script /tekton/scripts/script-1-w9bb4
+     2026/11/11 19:28:15 Decoded script /tekton/scripts/script-2-lhlg7
+     fatal: could not create work tree dir '/tmp/depot': Permission denied
+OK   s4d-deb-1-preparer : runtimeClassName : 
+OK   s4d-deb-1-preparer : nœud : sc-build
+KO   PipelineRun s4d-deb-1 : False|Failed (attendu : True|Succeeded)
