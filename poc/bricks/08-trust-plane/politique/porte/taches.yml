@@ -53,3 +53,19 @@ trusted_tasks:
   # pré-dépendances de python3, échec du premier passage), toutes deux retirées de la liste
   oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
     - ref: sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+  # Brique 06, S4d1 (décisions du propriétaire du 11/11/2026, 17:54:35 UTC) : 06-deb-sbuild/deb/preparer-deb.signee.yaml, pod runc
+  # restreint (UID 65532) sans secret, images d'outils plateforme/outils-prefetch@68e0ae70 et plateforme/outils-horodatage@c7bebae2 ;
+  # sortie limitée par builds-sans-internet de la 08c (adresses privées : Forgejo, Zot). Clone le commit ; tire par digest la
+  # fermeture deb, la fermeture applicative et l'artefact de packaging fixés par la pipeline sample-app-deb ; confronte la fermeture
+  # deb au verrou ; reconstitue vendor/ (go mod vendor, GOPROXY=off) et marked (integrity du lockfile) ; déclare ses entrées à Chains
+  oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-deb:
+    - ref: sha256:b310c262a6a730824d7df6314a52a74fbd600d468709ea7bd1f7a3a50ab6540d
+  # Brique 06, S4d1 : 06-deb-sbuild/deb/construire-deb.signee.yaml, pod Kata privilégié, sbuild en UID 1000 (--chroot-mode=unshare),
+  # image de build builds/builders/sbuild-debian13@749d746c (S4a) ; sans aucune entrée ni sortie réseau (NetworkPolicy
+  # construction-deb-sans-sortie) ; entrées en lecture seule, fermeture revérifiée contre le verrou, dépendances de build prises
+  # dans la fermeture seule ; artefact : le deb seul, en manifeste d'image OCI que publier-image pousse. Mise au point dans un pod
+  # d'essai avant signature (levier e ; essai du 11/11/2026, 18:25:55 à 18:32:04 UTC : deb 0b489d43, celui d'OBS, S1 et S3).
+  # Tâche privilégiée : la porte ne connaît pas encore son nom (règle construction_kata) ; elle sera étendue en S4d2, avant tout
+  # trigger
+  oci://sc-stockage.poc.test:5000/tekton/tasks/construire-deb:
+    - ref: sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
