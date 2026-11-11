@@ -1,0 +1,61 @@
+# Brique 06, S4b (décision du propriétaire du 11/11/2026, 16:42:27 UTC, choix A) : pipeline de la plateforme qui produit la fermeture
+# deb de sample-app (dépendances de construction du paquet) et la publie sous builds/fermetures/. Signée par la clé des tâches et
+# publiée en bundle (tekton/pipelines/prefetch-deb-sample-app) ; ses deux tâches sont celles de la liste revue, inchangées et tirées
+# de leurs bundles signés : prefetch-deb (S4a) et publier-fermeture (brique 03). Toutes les entrées sont fixées ici, et couvertes par
+# la signature : instantané, sha256 de l'InRelease, liste (colonnes 4 à 6 du verrou poc/packaging/verrou-deb.txt, lu par l'hôte dans
+# l'artefact de packaging tiré par digest : s4b.sh), dépôt de la fermeture. Le créateur du PipelineRun ne fournit que le workspace.
+# Un seul workspace : prefetch-deb y est lié par le sous-dossier fermeture (elle écrit fermeture/miroir/), publier-fermeture à la
+# racine (elle publie fermeture/). La fermeture contient donc miroir/dists/... et miroir/pool/... ; aucune tâche n'est modifiée.
+# @PREFETCH_DEB@, @PUBLIER_FERMETURE@, @INSTANTANE@, @INRELEASE@, @LISTE@, @DEPOT_FERMETURE@ : s4b.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prefetch-deb-sample-app
+spec:
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH_DEB@
+      - name: name
+        value: prefetch-deb
+      - name: kind
+        value: task
+    params:
+    - name: instantane
+      value: @INSTANTANE@
+    - name: inrelease
+      value: @INRELEASE@
+    - name: liste
+      value: |
+@LISTE@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: fermeture
+  - name: publier
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER_FERMETURE@
+      - name: name
+        value: publier-fermeture
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: @DEPOT_FERMETURE@
+    workspaces:
+    - name: sortie
+      workspace: sortie

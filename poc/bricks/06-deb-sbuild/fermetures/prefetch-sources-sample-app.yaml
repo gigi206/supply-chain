@@ -1,0 +1,63 @@
+# Brique 06, S4b (décision du propriétaire du 11/11/2026, 16:42:27 UTC, choix N1 et fermeture combinée) : pipeline de la plateforme
+# qui produit la fermeture applicative de sample-app pour le deb (modules Go et paquets npm, en un seul appel à Hermeto) et la publie
+# sous builds/fermetures/. Signée par la clé des tâches et publiée en bundle (tekton/pipelines/prefetch-sources-sample-app) ; ses
+# tâches sont tirées de leurs bundles signés : prefetch-gomod en version 2 (fermetures/prefetch-gomod.yaml) et publier-fermeture
+# (brique 03). La demande Hermeto et le dépôt de la fermeture sont fixés ici, et couverts par la signature. Le créateur du
+# PipelineRun fournit le commit, le dépôt de Forgejo et le workspace, comme pour prefetch-sample-app (brique 03), qui reste celle de
+# la voie image (prefetch-gomod en version 1, gomod seul).
+# @PREFETCH_GOMOD@, @PUBLIER_FERMETURE@, @PAQUETS@, @DEPOT_FERMETURE@ : s4b.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prefetch-sources-sample-app
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: prefetch
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREFETCH_GOMOD@
+      - name: name
+        value: prefetch-gomod
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    - name: paquets
+      value: '@PAQUETS@'
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: publier
+    runAfter: [prefetch]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER_FERMETURE@
+      - name: name
+        value: publier-fermeture
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: @DEPOT_FERMETURE@
+    workspaces:
+    - name: sortie
+      workspace: sortie
