@@ -1193,3 +1193,10 @@ Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 U
 **Durée** : environ 2 h 15, de 17:44 à 19:58 UTC. La brique reste sous son estimation de 2 pw, au bas de la fourchette de la carte pour S4d1 (1 à 2 jours).
 
 **Suite, selon le découpage décidé** : S4d2 (porte étendue : plusieurs fermetures, Kata pour `construire-deb`, préparation du deb, jugement d'un artefact deb, VSA et scan), puis S4d3 (trigger et rattrapage), puis S5.
+
+## Additif du 11/11/2026, 19:59 UTC : push consigné
+
+**Push** de 19:58:52 à 19:58:53 UTC : `cdf4c9b..66b68da`, 18 commits, 33 fichiers, en avance rapide. Accord : « Oui, pousse ». Il contient les deux modifications relues de `politique/porte/taches.yml` de la 08 (`3836bde`, `cc4b8dd`, `c5da4c4`).
+
+**Contrôle des secrets**, dans un worktree temporaire, avec le script de la copie : « fichiers : 33 », égal au nombre de fichiers qui diffèrent d'origin ; aucun secret trouvé.
+
