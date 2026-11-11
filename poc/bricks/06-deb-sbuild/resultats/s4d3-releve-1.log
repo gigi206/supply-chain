@@ -1,0 +1,331 @@
+# Brique 06, S4d3 : relevé de l'état déployé, lecture seule (accord « Oui, les deux », 11/11/2026, 20:35:01 UTC)
+début : 2026-11-11T20:36:05Z
+## objets de declencheurs
+cronjob.batch/rattrapage
+eventlistener.triggers.tekton.dev/forgejo
+rolebinding.rbac.authorization.k8s.io/el-forgejo
+rolebinding.rbac.authorization.k8s.io/rattrapage
+role.rbac.authorization.k8s.io/el-forgejo
+role.rbac.authorization.k8s.io/rattrapage
+serviceaccount/default
+serviceaccount/el-forgejo
+serviceaccount/rattrapage
+triggertemplate.triggers.tekton.dev/sample-app
+## TriggerTemplate sample-app
+bundle=sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:02c05736ea49fe3b2d7b8d105ddd75f5f0e9c55f00560b39710699d10bbe4d6e name=sample-app kind=pipeline
+jq: error (at <stdin>:11): Cannot iterate over null (null)
+jq: error (at <stdin>:19): Cannot iterate over null (null)
+jq: error (at <stdin>:71): Cannot iterate over null (null)
+jq: error (at <stdin>:91): Cannot iterate over null (null)
+jq: error (at <stdin>:114): Cannot iterate over null (null)
+jq: error (at <stdin>:133): Cannot iterate over null (null)
+jq: error (at <stdin>:154): Cannot iterate over null (null)
+jq: error (at <stdin>:174): Cannot iterate over null (null)
+jq: error (at <stdin>:254): Cannot iterate over null (null)
+jq: error (at <stdin>:332): Cannot iterate over null (null)
+OK   gabarit en service contre gabarit-sample-app.yaml (bascule de J8), bundle masqué : identique au dépôt
+gabarit en service ≠ gabarit d'essai de declencheurs.yaml
+## EventListener forgejo
+jq: error (at <stdin>:11): Cannot iterate over null (null)
+jq: error (at <stdin>:19): Cannot iterate over null (null)
+jq: error (at <stdin>:71): Cannot iterate over null (null)
+jq: error (at <stdin>:91): Cannot iterate over null (null)
+jq: error (at <stdin>:114): Cannot iterate over null (null)
+jq: error (at <stdin>:133): Cannot iterate over null (null)
+jq: error (at <stdin>:154): Cannot iterate over null (null)
+jq: error (at <stdin>:174): Cannot iterate over null (null)
+jq: error (at <stdin>:254): Cannot iterate over null (null)
+jq: error (at <stdin>:332): Cannot iterate over null (null)
+ÉCART spec de l'EventListener :
+     1,89d0
+     < {
+     <   "namespaceSelector": {},
+     <   "resources": {
+     <     "kubernetesResource": {
+     <       "serviceType": "NodePort",
+     <       "spec": {
+     <         "template": {
+     <           "metadata": {},
+     <           "spec": {
+     <             "containers": [
+     <               {
+     <                 "name": "",
+     <                 "resources": {
+     <                   "limits": {
+     <                     "cpu": "250m",
+     <                     "memory": "128Mi"
+     <                   },
+     <                   "requests": {
+     <                     "cpu": "10m",
+     <                     "memory": "32Mi"
+     <                   }
+     <                 }
+     <               }
+     <             ],
+     <             "nodeSelector": {
+     <               "zone": "confiance"
+     <             }
+     <           }
+     <         }
+     <       }
+     <     }
+     <   },
+     <   "serviceAccountName": "el-forgejo",
+     <   "triggers": [
+     <     {
+     <       "bindings": [
+     <         {
+     <           "kind": "TriggerBinding",
+     <           "name": "commit",
+     <           "value": "$(body.after)"
+     <         },
+     <         {
+     <           "kind": "TriggerBinding",
+     <           "name": "depot",
+     <           "value": "$(body.repository.clone_url)"
+     <         }
+     <       ],
+     <       "interceptors": [
+     <         {
+     <           "params": [
+     <             {
+     <               "name": "secretRef",
+     <               "value": {
+     <                 "secretKey": "secret",
+     <                 "secretName": "forgejo-webhook"
+     <               }
+     <             },
+     <             {
+     <               "name": "eventTypes",
+     <               "value": [
+     <                 "push"
+     <               ]
+     <             }
+     <           ],
+     <           "ref": {
+     <             "kind": "ClusterInterceptor",
+     <             "name": "github"
+     <           }
+     <         },
+     <         {
+     <           "params": [
+     <             {
+     <               "name": "filter",
+     <               "value": "body.ref == 'refs/heads/main' && body.repository.full_name == 'workspace/sample-app' && body.after.matches('^[0-9a-f]{40}$')"
+     <             }
+     <           ],
+     <           "ref": {
+     <             "kind": "ClusterInterceptor",
+     <             "name": "cel"
+     <           }
+     <         }
+     <       ],
+     <       "name": "sample-app-push",
+     <       "template": {
+     <         "ref": "sample-app"
+     <       }
+     <     }
+     <   ]
+     < }
+conditions : Available=True Deployment=True Progressing=True Ready=True Service=True
+pod el-forgejo-76596b99b8-wmm97 : Running, nœud sc-confiance, compte el-forgejo
+pod rattrapage-29907154-wzfpl : Succeeded, nœud sc-confiance, compte rattrapage
+pod rattrapage-29907155-n8n2m : Succeeded, nœud sc-confiance, compte rattrapage
+pod rattrapage-29907156-ldx5j : Succeeded, nœud sc-confiance, compte rattrapage
+## rattrapage
+jq: error (at <stdin>:9): Cannot iterate over null (null)
+jq: error (at <stdin>:33): Cannot iterate over null (null)
+jq: error (at <stdin>:53): Cannot iterate over null (null)
+jq: error (at <stdin>:75): Cannot iterate over null (null)
+jq: error (at <stdin>:95): Cannot iterate over null (null)
+jq: error (at <stdin>:173): Cannot iterate over null (null)
+jq: error (at <stdin>:307): Cannot iterate over null (null)
+ÉCART Role rattrapage :
+     1,16d0
+     < [
+     <   {
+     <     "apiGroups": [
+     <       "triggers.tekton.dev"
+     <     ],
+     <     "resourceNames": [
+     <       "sample-app"
+     <     ],
+     <     "resources": [
+     <       "triggertemplates"
+     <     ],
+     <     "verbs": [
+     <       "get"
+     <     ]
+     <   }
+     < ]
+jq: error (at <stdin>:9): Cannot iterate over null (null)
+jq: error (at <stdin>:33): Cannot iterate over null (null)
+jq: error (at <stdin>:53): Cannot iterate over null (null)
+jq: error (at <stdin>:75): Cannot iterate over null (null)
+jq: error (at <stdin>:95): Cannot iterate over null (null)
+jq: error (at <stdin>:173): Cannot iterate over null (null)
+jq: error (at <stdin>:307): Cannot iterate over null (null)
+ÉCART Role rattrapage-pipelineruns (builds) :
+     1,14d0
+     < [
+     <   {
+     <     "apiGroups": [
+     <       "tekton.dev"
+     <     ],
+     <     "resources": [
+     <       "pipelineruns"
+     <     ],
+     <     "verbs": [
+     <       "get",
+     <       "create"
+     <     ]
+     <   }
+     < ]
+jq: error (at <stdin>:9): Cannot iterate over null (null)
+jq: error (at <stdin>:33): Cannot iterate over null (null)
+jq: error (at <stdin>:53): Cannot iterate over null (null)
+jq: error (at <stdin>:75): Cannot iterate over null (null)
+jq: error (at <stdin>:95): Cannot iterate over null (null)
+jq: error (at <stdin>:173): Cannot iterate over null (null)
+jq: error (at <stdin>:307): Cannot iterate over null (null)
+ÉCART NetworkPolicy rattrapage :
+     1,69d0
+     < {
+     <   "egress": [
+     <     {
+     <       "ports": [
+     <         {
+     <           "port": 53,
+     <           "protocol": "UDP"
+     <         },
+     <         {
+     <           "port": 53,
+     <           "protocol": "TCP"
+     <         }
+     <       ],
+     <       "to": [
+     <         {
+     <           "namespaceSelector": {
+     <             "matchLabels": {
+     <               "kubernetes.io/metadata.name": "kube-system"
+     <             }
+     <           },
+     <           "podSelector": {
+     <             "matchLabels": {
+     <               "k8s-app": "kube-dns"
+     <             }
+     <           }
+     <         }
+     <       ]
+     <     },
+     <     {
+     <       "ports": [
+     <         {
+     <           "port": 3000,
+     <           "protocol": "TCP"
+     <         }
+     <       ],
+     <       "to": [
+     <         {
+     <           "ipBlock": {
+     <             "cidr": "192.168.161.13/32"
+     <           }
+     <         }
+     <       ]
+     <     },
+     <     {
+     <       "ports": [
+     <         {
+     <           "port": 6443,
+     <           "protocol": "TCP"
+     <         }
+     <       ],
+     <       "to": [
+     <         {
+     <           "ipBlock": {
+     <             "cidr": "192.168.161.11/32"
+     <           }
+     <         }
+     <       ]
+     <     }
+     <   ],
+     <   "podSelector": {
+     <     "matchLabels": {
+     <       "app": "rattrapage"
+     <     }
+     <   },
+     <   "policyTypes": [
+     <     "Ingress",
+     <     "Egress"
+     <   ]
+     < }
+jq: error (at <stdin>:9): Cannot iterate over null (null)
+jq: error (at <stdin>:33): Cannot iterate over null (null)
+jq: error (at <stdin>:53): Cannot iterate over null (null)
+jq: error (at <stdin>:75): Cannot iterate over null (null)
+jq: error (at <stdin>:95): Cannot iterate over null (null)
+jq: error (at <stdin>:173): Cannot iterate over null (null)
+jq: error (at <stdin>:307): Cannot iterate over null (null)
+ÉCART CronJob rattrapage (calendrier, suspension, compte, labels, env, commande) :
+     1,38d0
+     < {
+     <   "commande": [
+     <     "/rattrapage"
+     <   ],
+     <   "compte": "rattrapage",
+     <   "concurrence": "Forbid",
+     <   "env": [
+     <     {
+     <       "name": "FORGEJO",
+     <       "value": "https://sc-stockage.poc.test:3000"
+     <     },
+     <     {
+     <       "name": "CA_FORGEJO",
+     <       "value": "/etc/rattrapage/ca-poc.crt"
+     <     },
+     <     {
+     <       "name": "DEPOT",
+     <       "value": "workspace/sample-app"
+     <     },
+     <     {
+     <       "name": "BRANCHE",
+     <       "value": "main"
+     <     },
+     <     {
+     <       "name": "GABARIT",
+     <       "value": "declencheurs/sample-app"
+     <     },
+     <     {
+     <       "name": "ESPACE",
+     <       "value": "builds"
+     <     }
+     <   ],
+     <   "labels": {
+     <     "app": "rattrapage"
+     <   },
+     <   "schedule": "* * * * *",
+     <   "suspend": false
+     < }
+image : sc-stockage.poc.test:5000/plateforme/rattrapage@sha256:c3992728ff77d2d7b412626ab2c34de8d84154bb384aae572042b9aabe0e3c03 ; dernier passage : 2026-11-11T20:36:00Z ; dernier succès : 2026-11-11T20:36:03Z
+97:RATTRAPAGE_DIGEST=sha256:c3992728ff77d2d7b412626ab2c34de8d84154bb384aae572042b9aabe0e3c03   # base vide, une couche, linux/amd64, utilisa
+dernier passage rattrapage-29907156 :
+     JOINT|Forgejo et API, essai 1
+     TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+     PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+## Forgejo
+tête de main : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   tête = COMMIT de s4d.sh (6391fd43)
+## PipelineRuns de builds
+s4d-deb-1 : créé 2026-11-11T19:41:24Z, Succeeded, origine hôte, pipeline sample-app-deb @82c8373d7259…, signé=true
+s4d-deb-2 : créé 2026-11-11T19:48:56Z, Succeeded, origine hôte, pipeline sample-app-deb @82c8373d7259…, signé=true
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : créé 2026-11-10T21:11:30Z, Succeeded, origine forgejo, pipeline sample-app @02c05736ea49…, signé=true
+sample-app-6391fd437f26696847041be3226bbbf633f55a2f : présent
+PipelineRuns de builds en cours : 0
+## bundle de la pipeline deb
+bundle de s4d-deb-2 : tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5
+OK   bundle présent dans Zot, même digest
+OK   bundle = 82c8373d (README de la 06, S4d1)
+pipeline.ref de S4d1 : non vide
+## nœud sc-build
+allouable : cpu 6, mémoire 10189552Ki
+fin : 2026-11-11T20:36:06Z

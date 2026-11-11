@@ -1,0 +1,14 @@
+# Brique 06, S4d3 : relevé, second passage (comparaisons au dépôt corrigées : documents multiples lus avec jq -s ; s4d3-releve-1.log)
+début : 2026-11-11T20:36:28Z
+objets rendus : declencheurs.yaml 10, rattrapage.yaml 7
+OK   gabarit en service ≠ gabarit d'essai de declencheurs.yaml (bascule de J8 en service)
+OK   spec de l'EventListener (défauts du serveur retirés : namespaceSelector vide, kind des bindings, conteneur et metadata vides du gabarit) : identique au dépôt
+[{"name":"","resources":{"limits":{"cpu":"250m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"32Mi"}}}]
+jq: error (at <stdin>:143): Cannot iterate over null (null)
+OK   Role declencheurs/rattrapage : identique au dépôt
+OK   Role builds/rattrapage-pipelineruns : identique au dépôt
+ÉCART NetworkPolicy declencheurs/rattrapage :
+     59a60
+     >   "ingress": [],
+OK   CronJob rattrapage (calendrier, suspension, compte, labels, env, commande, volumes, securityContext) : identique au dépôt
+fin : 2026-11-11T20:36:28Z

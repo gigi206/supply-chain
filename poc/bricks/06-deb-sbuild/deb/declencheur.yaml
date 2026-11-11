@@ -1,0 +1,249 @@
+# Brique 06, S4d3 (décision du propriétaire du 11/11/2026, 20:35:01 UTC : « Oui, les deux ») : le deb de sample-app sur les deux
+# chemins de déclenchement de la 08. Posé par s4d3.sh deployer, sur accord. @PIPELINE@ : bundle signé de sample-app-deb (S4d1),
+# épinglé par digest ; @RATTRAPAGE@ : image du rattrapage de la 08 (politique.sh, RATTRAPAGE_DIGEST), inchangée.
+#   - TriggerTemplate sample-app-deb : forme de s4d.sh pr_json (workspace sortie en PVC, podTemplate du gabarit sample-app, Kata
+#     pour la seule tâche construire). Paramètres commit et depot, seuls admis par le rattrapage (politique/rattrapage/main.go),
+#     nom dérivé du commit (anti-rejeu de J4).
+#   - Trigger sample-app-deb-push, sélectionné par le labelSelector de l'EventListener forgejo (politique/declencheurs.yaml de la
+#     08). Chaque trigger exécute ses propres intercepteurs (Triggers v0.37.2, pkg/sink/sink.go : t.Spec.Interceptors) : ceux du
+#     trigger sample-app-push sont recopiés à l'identique (HMAC du secret forgejo-webhook de declencheurs, push ; filtre CEL).
+#   - Compte rattrapage-deb : lecture du seul gabarit sample-app-deb ; dans builds, lecture et création de PipelineRuns ; CronJob
+#     rattrapage-deb, même image et même binaire que rattrapage, label app: rattrapage (NetworkPolicy rattrapage de la 08) et
+#     ConfigMap rattrapage (CA du PoC) de la 08. Appliqué suspendu : s4d3.sh chemins le reprend.
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: sample-app-deb
+  namespace: declencheurs
+spec:
+  params:
+  - name: commit
+  - name: depot
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      name: sample-app-deb-$(tt.params.commit)
+      namespace: builds
+    spec:
+      pipelineRef:
+        resolver: bundles
+        params:
+        - name: bundle
+          value: @PIPELINE@
+        - name: name
+          value: sample-app-deb
+        - name: kind
+          value: pipeline
+      params:
+      - name: commit
+        value: $(tt.params.commit)
+      - name: depot
+        value: $(tt.params.depot)
+      workspaces:
+      - name: sortie
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 1Gi
+      taskRunTemplate:
+        serviceAccountName: build
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+      taskRunSpecs:
+      - pipelineTaskName: construire
+        podTemplate:
+          nodeSelector:
+            zone: build
+          tolerations:
+          - key: zone
+            operator: Equal
+            value: build
+            effect: NoSchedule
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          runtimeClassName: kata
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: sample-app-deb-push
+  namespace: declencheurs
+  labels:
+    poc.test/ecouteur: forgejo
+spec:
+  interceptors:
+  - ref:
+      name: github
+      kind: ClusterInterceptor
+    params:
+    - name: secretRef
+      value:
+        secretName: forgejo-webhook
+        secretKey: secret
+    - name: eventTypes
+      value: [push]
+  - ref:
+      name: cel
+      kind: ClusterInterceptor
+    params:
+    - name: filter
+      value: "body.ref == 'refs/heads/main' && body.repository.full_name == 'workspace/sample-app' && body.after.matches('^[0-9a-f]{40}$')"
+  bindings:
+  - name: commit
+    value: $(body.after)
+  - name: depot
+    value: $(body.repository.clone_url)
+  template:
+    ref: sample-app-deb
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rattrapage-deb
+  namespace: declencheurs
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rattrapage-deb
+  namespace: declencheurs
+rules:
+- apiGroups: [triggers.tekton.dev]
+  resources: [triggertemplates]
+  resourceNames: [sample-app-deb]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rattrapage-deb
+  namespace: declencheurs
+subjects:
+- kind: ServiceAccount
+  name: rattrapage-deb
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rattrapage-deb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rattrapage-deb-pipelineruns
+  namespace: builds
+rules:
+- apiGroups: [tekton.dev]
+  resources: [pipelineruns]
+  verbs: [get, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rattrapage-deb-pipelineruns
+  namespace: builds
+subjects:
+- kind: ServiceAccount
+  name: rattrapage-deb
+  namespace: declencheurs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rattrapage-deb-pipelineruns
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rattrapage-deb
+  namespace: declencheurs
+spec:
+  suspend: true
+  schedule: "* * * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app: rattrapage
+        spec:
+          serviceAccountName: rattrapage-deb
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          restartPolicy: Never
+          nodeSelector:
+            zone: confiance
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: rattrapage
+            image: @RATTRAPAGE@
+            command: [/rattrapage]
+            env:
+            - name: FORGEJO
+              value: https://sc-stockage.poc.test:3000
+            - name: CA_FORGEJO
+              value: /etc/rattrapage/ca-poc.crt
+            - name: DEPOT
+              value: workspace/sample-app
+            - name: BRANCHE
+              value: main
+            - name: GABARIT
+              value: declencheurs/sample-app-deb
+            - name: ESPACE
+              value: builds
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+            volumeMounts:
+            - name: config
+              mountPath: /etc/rattrapage
+              readOnly: true
+            - name: jeton
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+          volumes:
+          - name: config
+            configMap:
+              name: rattrapage
+          - name: jeton
+            projected:
+              sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 600
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                  - key: ca.crt
+                    path: ca.crt

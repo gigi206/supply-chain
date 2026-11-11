@@ -1366,3 +1366,27 @@ Sur `builds/sample-app-deb@sha256:039949f9…`, `ec` réussit, sans violation, a
 2. **Le relevé en lecture seule**, avant d'écrire les prédictions.
 3. **La limite des commits incompatibles** avec les fermetures épinglées, inscrite en dette.
 
+## Additif du 11/11/2026, 20:41 UTC : décision S4d3, relevé et préparation à sec
+
+**Décision du propriétaire** (11/11/2026, 20:35:01 UTC) : « Oui, les deux ». La forme de la carte est retenue, et le relevé en lecture seule est fait avant les prédictions. La question 3, sur la limite des commits incompatibles, n'a pas reçu de réponse. J'applique ma recommandation : la limite est inscrite en dette.
+
+**Relevé** (20:36:05 à 20:36:28 UTC, [`s4d3-releve-1.log`](resultats/s4d3-releve-1.log), [`s4d3-releve-2.log`](resultats/s4d3-releve-2.log)) :
+- l'état déployé des déclencheurs et du rattrapage est celui du dépôt ;
+- la tête de main est `6391fd43…`, et `sample-app-6391fd43…` existe : le chemin 1 ne relancera pas la construction de l'image ;
+- aucun PipelineRun `sample-app-deb-*` n'existe.
+
+Le premier passage montrait de faux écarts, dus à ma comparaison (documents multiples lus sans `jq -s`). Le second passage les corrige.
+
+**Préparé à sec** : rien n'est lancé.
+- `politique/declencheurs.yaml` (08) : un `labelSelector` sur l'EventListener. C'est la seule modification d'un fichier de la 08 ; elle est à relire.
+- [`deb/declencheur.yaml`](deb/declencheur.yaml) : gabarit `sample-app-deb`, Trigger `sample-app-deb-push`, compte, droits et CronJob `rattrapage-deb` (appliqué suspendu).
+- [`s4d3.sh`](s4d3.sh), cinq étapes :
+  - `prealables` : lecture seule ;
+  - `deployer` : écrit dans le cluster, de façon réversible ;
+  - `chemins` : écrit dans le cluster et dans Zot, par Chains ;
+  - `porte` ;
+  - `retirer`, au choix du propriétaire seulement.
+- [Prédictions T1 à T14](resultats/s4d3-predictions.md).
+
+Contrôles sur l'hôte : `bash -n` et `shellcheck` sans remarque. Je n'ai pas pu relire la règle de troncature des noms des TaskRuns : T9 est donc en confiance moyenne.
+

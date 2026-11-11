@@ -154,6 +154,13 @@ metadata:
   namespace: declencheurs
 spec:
   serviceAccountName: el-forgejo
+  # Brique 06, S4d3 (décision du propriétaire du 11/11/2026, 20:35:01 UTC) : en plus du trigger en ligne, les objets Trigger de
+  # declencheurs qui portent ce label (Triggers v0.37.2, pkg/sink/sink.go : selectTriggers, puis merge avec les triggers en
+  # ligne ; chaque trigger exécute ses propres intercepteurs). Le trigger du deb (06-deb-sbuild/deb/declencheur.yaml) vit avec
+  # sa brique : la 08 ne référence aucun gabarit de la 06. Sans objet Trigger labellisé, rien ne change.
+  labelSelector:
+    matchLabels:
+      poc.test/ecouteur: forgejo
   triggers:
   - name: sample-app-push
     interceptors:
