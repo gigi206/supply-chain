@@ -1069,3 +1069,7 @@ Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucun
 
 **Suite, selon l'ordre décidé** : S4b (`prefetch-deb` pour la fermeture deb, et la fermeture npm par la plateforme), à préparer à sec.
 
+
+## Additif du 11/11/2026, 16:31 UTC : push consigné
+
+**Push** de 16:30:26 à 16:30:28 UTC : `44cbe06..7b57ca7`, 6 commits, 9 fichiers, en avance rapide. Avant l'envoi, les secrets ont été contrôlés dans un worktree temporaire : aucun secret trouvé. Accord : « Oui, pousse ».
