@@ -115,7 +115,7 @@ etape_prealables() {
   attendu "prefetch-gomod v2 : paramètre paquets sans valeur par défaut" "$(yq '.spec.params[] | select(.name == "paquets") | has("default")' "$T/prefetch-gomod.yaml")" false
   echo "## prefetch-gomod : version 2 et version 1 (script)"
   yq '.spec.steps[0].script' "$T/prefetch-gomod.yaml" > "$x/v2.sh"
-  sed "s#@PREFETCH@#$PREFETCH_IMAGE#g" "$here/politique/taches/prefetch-gomod.yaml" | yq '.spec.steps[0].script' > "$x/v1.sh"
+  yq '.spec.steps[0].script' "$here/politique/taches/prefetch-gomod.signee.yaml" > "$x/v1.sh"   # v1 signée (5e7e5662)
   attendu "v2 : syntaxe sh du script" "$(sh -n "$x/v2.sh" 2>&1 && echo OK)" OK
   diff "$x/v1.sh" "$x/v2.sh" | grep '^[<>]' | cut -c1-150 | sed 's/^/     /' || true
   attendu "v1 et v2 : lignes de v1 changées (version des outils, appel d'Hermeto)" "$(diff "$x/v1.sh" "$x/v2.sh" | grep -c '^<' || true)" 2
@@ -168,7 +168,7 @@ FIN
   echo deb1 > "$m/pool/main/g/gcc/g++-14_14.2.0-19_amd64.deb"; echo deb2 > "$m/pool/main/a/a/golang-go_1.24~2_amd64.deb"
   echo bom > "$x/pf/fermeture/bom.json"
   { echo 'set -eu'; echo "f=$x/pf/fermeture"
-    yq '.spec.steps[0].script' "$here/politique/taches/publier-fermeture.yaml" | sed -n '/^cd "\$f"$/,/^  --annotation/p' | sed "s#/layout/f:#$x/pf/layout:#"
+    yq '.spec.steps[0].script' "$here/politique/taches/publier-fermeture.signee.yaml" | sed -n '/^cd "\$f"$/,/^  --annotation/p' | sed "s#/layout/f:#$x/pf/layout:#"
     echo 'echo "$d"'; } > "$x/pf/publier.sh"
   attendu "section extraite : cd, boucle find, oras push" "$(grep -c '^cd "$f"$\|find . -type f\|oras push' "$x/pf/publier.sh")" 3
   s=$(sh "$x/pf/publier.sh" 2>&1 | tail -1)
