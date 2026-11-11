@@ -1,4 +1,4 @@
-# s5.sh sbuild, 2026-11-11T21:30:42Z
+# s5.sh sbuild, 2026-11-11T21:35:39Z
 ## debian/rules du paquet témoin
      #!/usr/bin/make -f
      build build-arch build-indep:
@@ -11,10 +11,12 @@
      clean:
      	rm -rf debian/tmp debian/files
 ## N6 : pod d'essai Kata (image de build, UID 1000), sans label tekton.dev/task
-pod s5-sbuild créé à 21:30:42
+pod s5-sbuild créé à 21:35:39
 pod s5-sbuild prêt sur sc-build, runtimeClassName « kata »
      pod|0
      sbuild|0
+     journaux|1
+OK   N6 : journal .build de sbuild : 1
 OK   N6 témoin : connexion TCP à Zot depuis le pod (code) : 0
 ÉCART N6 : debian/rules exécuté sous sbuild (lignes) : 0 (attendu : 1)
 ÉCART N6 : connexion TCP à Zot depuis debian/rules sous sbuild (échec) :  (attendu : 1)

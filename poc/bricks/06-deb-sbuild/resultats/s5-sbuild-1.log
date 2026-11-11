@@ -1,0 +1,24 @@
+# s5.sh sbuild, 2026-11-11T21:30:42Z
+## debian/rules du paquet témoin
+     #!/usr/bin/make -f
+     build build-arch build-indep:
+     	@r=0; timeout 10 bash -c 'exec 3<>/dev/tcp/192.168.161.13/5000' 2>/dev/null || r=$$?; echo "S5-RESEAU|regles|$$r"
+     	@echo "S5-RESEAU|interfaces|$$(awk -F: 'NR > 2 {gsub(/ /, "", $$1); printf "%s ", $$1}' /proc/net/dev)"
+     binary binary-arch binary-indep:
+     	mkdir -p debian/tmp/DEBIAN
+     	dpkg-gencontrol -ps5-reseau -Pdebian/tmp
+     	dpkg-deb --root-owner-group --build debian/tmp ..
+     clean:
+     	rm -rf debian/tmp debian/files
+## N6 : pod d'essai Kata (image de build, UID 1000), sans label tekton.dev/task
+pod s5-sbuild créé à 21:30:42
+pod s5-sbuild prêt sur sc-build, runtimeClassName « kata »
+     pod|0
+     sbuild|0
+OK   N6 témoin : connexion TCP à Zot depuis le pod (code) : 0
+ÉCART N6 : debian/rules exécuté sous sbuild (lignes) : 0 (attendu : 1)
+ÉCART N6 : connexion TCP à Zot depuis debian/rules sous sbuild (échec) :  (attendu : 1)
+ÉCART N6 : interfaces vues par debian/rules :  (attendu : lo)
+     sbuild : code 0 (le paquet témoin peut échouer sans changer la mesure)
+pod s5-sbuild supprimé
+KO   3 écart(s)

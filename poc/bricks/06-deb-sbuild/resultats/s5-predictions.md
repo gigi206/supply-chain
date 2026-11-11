@@ -108,3 +108,19 @@ Carte : README, additif de 21:13 UTC. Script : [`s5.sh`](../s5.sh).
 - **Chains** : l'annotation `chains.tekton.dev/signed` vaut `true` sur les 7 TaskRuns. Le comptage des enveloppes (P18) se fait à l'étape `porte`.
 
 **Erreur de prédiction commune** : j'ai écrit `False|Failed` pour un TaskRun en échec. Tekton donne `False|StepFailed` quand une étape sort en erreur. Le script n'est pas modifié pour ce libellé. Les étapes à venir (`fermeture`) produiront le même écart, qui ne touche pas la barrière mesurée.
+
+---
+## Suite (11/11/2026, de 21:34:26 à 21:37:30 UTC, accord « Oui, les deux »)
+
+- **P4 : tenue.** Les fermetures `a549729d…` et `b27225cf…` sont dans Zot sous `entrees/sample-app-deb/fermeture-alteree`, relues en lecture anonyme (`s5-zot.log`).
+- **P17, second passage : toujours non mesurée, par une autre erreur de ma part** (`s5-sbuild-2.log`, journal `s5-sbuild-build.log`). Le journal `.build` est bien lu, et sbuild y écrit `Status: successful`. Mais avec `Rules-Requires-Root: no`, `dpkg-buildpackage -b` n'appelle que `debian/rules clean` puis `binary` (l. 240 et 242), et la cible `build`, qui porte la mesure, n'est jamais appelée. Le premier passage est archivé sous `s5-sbuild-1.log`.
+- **P12 à P14, premier passage de `fermeture` : non atteintes, par une erreur de mon script** (`s5-fermeture-1.log`).
+  - Les paramètres de `preparer` sont recopiés de la pipeline, et `commit` et `depot` y valent `$(params.commit)` et `$(params.depot)`. Un TaskRun isolé ne les résout pas.
+  - Les trois TaskRuns s'arrêtent dans la première étape, sur « commit invalide », avant tout tirage : l'échec est fermé et rien n'est construit.
+  - Mon rendu sur l'hôte utilisait des paramètres factices et ne pouvait pas voir ce défaut. Le relevé de `prealables` ne comparait que les noms des paramètres.
+
+**Corrections faites à sec dans `s5.sh`** :
+- **`figer`** remplace les deux variables par les valeurs du gabarit en service (commit `6391fd43…`, dépôt de Forgejo) et exige qu'aucune variable ne reste. `fermeture` retire d'abord les objets de N5 du premier passage, puis refait l'admission à blanc.
+- **`debian/rules`** : la cible `binary` dépend de `build`. Joué sur l'hôte par `dpkg-buildpackage --sanitize-env -us -uc -b` (code 0), `clean` puis `binary` exécute bien les lignes de mesure. La connexion réussit depuis l'hôte, ce qui est attendu hors de sbuild.
+
+`kata` n'est pas lancé, car il dépend du témoin de N5. `porte` et `retirer` non plus.

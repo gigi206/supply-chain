@@ -85,6 +85,14 @@ AMORCE=$REG/amont/library/debian@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84e
 params() { # fichier-pipeline tâche-de-pipeline : paramètres de cette tâche (tableau JSON name/value)
   jq -c --arg t "$2" '.spec.tasks[] | select(.name == $t) | .params' "$1"
 }
+figer() { # fichier-TaskRun : paramètres de la pipeline ($(params.commit), $(params.depot)) remplacés par les valeurs que leur donne
+  # le gabarit en service (commit de main, dépôt de Forgejo), comme pour s4d-deb-1 et S4d3. Ajouté le 11/11/2026 après le premier
+  # passage de fermeture (21:37:08 UTC, « commit invalide : $(params.commit) » : un TaskRun isolé ne résout pas les variables de
+  # la pipeline dont ses paramètres sont recopiés).
+  jq --arg c "$TETE_J2" --arg u "$URL" '.spec.params |= map(.value |= (if . == "$(params.commit)" then $c elif . == "$(params.depot)" then $u else . end))' \
+    "$1" > "$1.n" && mv "$1.n" "$1"
+  attendu "${1##*/} : variables de pipeline restantes" "$(grep -c '\$(params\.' "$1" || true)" 0
+}
 
 # --- objets rendus ------------------------------------------------------------------------------------------------------------
 ZONE='{"nodeSelector": {"zone": "build"}, "tolerations": [{"key": "zone", "operator": "Equal", "value": "build", "effect": "NoSchedule"}],
@@ -285,6 +293,7 @@ rendre_tout() { # tous les TaskRuns, PVC et pods de S5a dans $T (refs des fermet
   tr_json s5-n7-hors-kata construire-deb '[]' "$(ws_pvc entrees s5-entrees entrees sortie s5-entrees image-hors-kata)" -
   tr_json s5-n7-kata construire-deb '[]' "$(ws_pvc entrees s5-entrees entrees sortie s5-entrees image-kata)" kata
   pod_json s5-sbuild "$BUILDER" kata -
+  for f in "$T"/tr-s5-n5-*.json; do figer "$f"; done
 }
 
 etape_zot() {
@@ -409,7 +418,13 @@ FIN
 etape_fermeture() {
   local r c
   [ -s "$T/tr-s5-n5-temoin.json" ] || { echo "KO   lancer d'abord prealables" >&2; exit 1; }
-  attendu "PVC s5-entrees absent (sinon : étape retirer)" "$(kubectl get pvc -n builds s5-entrees -o name < /dev/null 2>/dev/null || echo absent)" absent
+  # Ajouté le 11/11/2026 après le premier passage (21:37:08 UTC) : TaskRuns de N5 et PVC s5-entrees de ce passage retirés, paramètres
+  # figés, admission à blanc refaite
+  kubectl delete taskrun -n builds s5-n5-temoin s5-n5-paquet-modifie s5-n5-paquet-en-trop --ignore-not-found --wait=true < /dev/null > /dev/null
+  kubectl delete pvc -n builds s5-entrees --ignore-not-found --wait=true < /dev/null > /dev/null
+  attendu "PVC s5-entrees absent" "$(kubectl get pvc -n builds s5-entrees -o name < /dev/null 2>/dev/null || echo absent)" absent
+  for f in "$T"/tr-s5-n5-*.json; do figer "$f"; a_blanc "$f"; done
+  mesure "N5 : commit et dépôt" "$(jq -r '.spec.params | map(select(.name == "commit" or .name == "depot") | .value) | join(" ")' "$T/tr-s5-n5-temoin.json")" "$URL $TETE_J2"
   echo "## N5 témoin : preparer-deb sur la vraie fermeture (PVC s5-entrees, gardé pour N7)"
   kubectl apply -f "$T/pvc-s5-entrees.json" < /dev/null > /dev/null
   r=$(tr_lancer s5-n5-temoin); tr_journal s5-n5-temoin 6
@@ -449,6 +464,8 @@ etape_kata() {
 }
 
 paquet_reseau() { # $T/paquet/s5-reseau-1.0 : paquet source natif minimal ; debian/rules essaie une connexion TCP à Zot pendant build
+  # Corrigé le 11/11/2026 après le second passage (21:35:39 UTC) : avec Rules-Requires-Root: no, dpkg-buildpackage -b n'appelle
+  # que clean puis binary (journal .build, l. 240 et 242) ; binary dépend désormais de build. Joué sur l'hôte par dpkg-buildpackage.
   local d=$T/paquet/s5-reseau-1.0
   rm -rf "$T/paquet" && mkdir -p "$d/debian/source"
   echo '3.0 (native)' > "$d/debian/source/format"
@@ -475,7 +492,7 @@ FIN
   printf '%s\n' '#!/usr/bin/make -f' 'build build-arch build-indep:' \
     "	@r=0; timeout 10 bash -c 'exec 3<>/dev/tcp/$ZOT_IP/5000' 2>/dev/null || r=\$\$?; echo \"S5-RESEAU|regles|\$\$r\"" \
     "	@echo \"S5-RESEAU|interfaces|\$\$(awk -F: 'NR > 2 {gsub(/ /, \"\", \$\$1); printf \"%s \", \$\$1}' /proc/net/dev)\"" \
-    'binary binary-arch binary-indep:' \
+    'binary binary-arch binary-indep: build' \
     '	mkdir -p debian/tmp/DEBIAN' \
     '	dpkg-gencontrol -ps5-reseau -Pdebian/tmp' \
     '	dpkg-deb --root-owner-group --build debian/tmp ..' \
