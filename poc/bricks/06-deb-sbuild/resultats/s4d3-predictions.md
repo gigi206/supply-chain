@@ -60,4 +60,14 @@ Le premier passage contient de faux écarts, dus à ma commande de comparaison :
 
 ## Résultats
 
-(à remplir après les lancements)
+**`prealables`, premier passage** (accord « Oui, lance-les » ; de 20:42:37 UTC à l'arrêt, avant toute écriture ; [`s4d3-prealables-1.log`](s4d3-prealables-1.log)).
+
+L'étape s'est arrêtée sur un écart : `deployer` n'a pas été lancé.
+
+- **T1 et T3 sont tenues** : huit objets, exigences de `main.go`, EventListener, dépendances de la 08, bundle et liste revue.
+- **T2 est en écart, du fait de ma comparaison.** Intercepteurs et liaisons sont identiques. Le CronJob diffère sur deux défauts que le serveur pose et que je n'avais pas retirés :
+  - le champ déprécié `serviceAccount`, copie de `serviceAccountName` ;
+  - un `jobTemplate.metadata` vide (`{}`), absent du rendu.
+
+  Le CronJob lui-même est conforme.
+- **Correction de `s4d3.sh`** : les deux défauts sont retirés, avec une note datée. Contrôles sur l'hôte : `bash -n` et `shellcheck` sans remarque. Le filtre corrigé a été essayé par une lecture du CronJob en service : identique hors nom, compte, `GABARIT` et suspension.

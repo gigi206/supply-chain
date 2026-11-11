@@ -161,9 +161,13 @@ etape_prealables() {
   else sed 's/^/     /' "$T/trigger.diff"; echo "ÉCART intercepteurs ou liaisons différents"; ECARTS=$((ECARTS + 1)); fi
   mesure "label du Trigger" "$(jq -c '.[] | select(.kind == "Trigger") | .metadata.labels' "$T/declencheur.json")" '{"poc.test/ecouteur":"forgejo"}'
   echo "## CronJob rattrapage-deb contre rattrapage en service (hors nom, compte, GABARIT et suspension)"
-  a='.spec | .jobTemplate.spec.template.spec |= (del(.serviceAccountName) | .containers[0].env |= map(select(.name != "GABARIT")))
+  # Corrigé le 11/11/2026 après le premier passage (20:42:37 UTC, arrêt avant toute écriture) : le serveur pose aussi le champ
+  # déprécié serviceAccount (copie de serviceAccountName) et un jobTemplate.metadata vide ({}), absent du rendu (null).
+  a='.spec | .jobTemplate.spec.template.spec |= (del(.serviceAccountName, .serviceAccount) | .containers[0].env |= map(select(.name != "GABARIT")))
     | del(.suspend) | walk(if type == "object" then del(.defaultMode, .terminationMessagePath, .terminationMessagePolicy, .imagePullPolicy,
-      .dnsPolicy, .schedulerName, .terminationGracePeriodSeconds, .resources) else . end) | .jobTemplate.spec.template.metadata |= del(.creationTimestamp) | .jobTemplate.metadata |= del(.creationTimestamp)'
+      .dnsPolicy, .schedulerName, .terminationGracePeriodSeconds, .resources) else . end)
+    | .jobTemplate.spec.template.metadata = ((.jobTemplate.spec.template.metadata // {}) | del(.creationTimestamp))
+    | .jobTemplate.metadata = ((.jobTemplate.metadata // {}) | del(.creationTimestamp))'
   kubectl get cronjob -n declencheurs rattrapage -o json | jq -S "$a" > "$T/cj-service.json"
   jq -S ".[] | select(.kind == \"CronJob\") | $a" "$T/declencheur.json" > "$T/cj-deb.json"
   if diff "$T/cj-service.json" "$T/cj-deb.json" > "$T/cj.diff"; then echo "OK   CronJob identique hors nom, compte, GABARIT et suspension (image comprise)"
