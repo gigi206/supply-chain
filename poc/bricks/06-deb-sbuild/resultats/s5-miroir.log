@@ -1,0 +1,78 @@
+# s5.sh miroir, 2026-11-11T21:25:57Z
+OK   PVC s5-miroir absent (sinon : étape retirer) : absent
+## N3 : miroir complet sur le PVC s5-miroir
+TaskRun s5-n3-prefetch créé à 21:25:58
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 199 paquets, 133065812 octets, en 18 s
+     2026/11/11 21:26:02 Entrypoint initialization
+OK   N3 prefetch : TaskRun : True|Succeeded
+## pod d'essai runc (amorce, UID 65532) : copies altérées par liens durs
+pod s5-miroir-essai créé à 21:26:25
+pod s5-miroir-essai prêt sur sc-build, runtimeClassName «  »
+     miroir : InRelease 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675 140421 ; pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb 15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583 1200
+     miroir-deb : InRelease 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675 140421 ; pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb fd301410cdf3f451f1a152d33dfc02020fadd46ccc9721b04de52bad6b33354a 1200
+     miroir-inrelease : InRelease 445e6c6c1f8ea87b396329b7f8c61183b7b2b7f38bb88458f394a06fa4ed2629 140421 ; pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb 15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583 1200
+     lignes Origin : 1 altérée, 1 intacte
+OK   miroir intact : paquet témoin au sha256 de la liste : 15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583
+OK   miroir-deb : paquet témoin altéré, même taille : 1|1200
+OK   miroir-inrelease : InRelease altéré, même taille : 1|1
+## N3 : construire-builder sous Kata sur chaque copie
+TaskRun s5-n3-deb créé à 21:26:27
+     invité : 3 vCPU, 6119664 kB ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     témoin DNS snapshot.debian.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     paquet altéré : pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb
+ÉCART N3 .deb altéré : TaskRun : False|StepFailed (attendu : False|Failed)
+OK   N3 .deb altéré : refus par la revérification (« paquet altéré ») : 1
+OK   N3 .deb altéré : ni miroir revérifié ni apt lancé : 0|0
+TaskRun s5-n3-inrelease créé à 21:27:20
+     invité : 3 vCPU, 6119664 kB ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
+     témoin DNS snapshot.debian.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     InRelease du miroir différent
+ÉCART N3 InRelease altéré : TaskRun : False|StepFailed (attendu : False|Failed)
+OK   N3 InRelease altéré : refus par la revérification : 1
+OK   N3 : pods sous Kata (tekton.dev/task|nœud|runtime) : construire-builder|sc-build|kata construire-builder|sc-build|kata
+## N3 témoin : construire-builder sur le miroir intact (rien n'est publié)
+TaskRun s5-n3-intact créé à 21:28:12
+     I: running --customize-hook in shell: sh -c 'cd "$1" && { rmdir -p 'workspace/entrees' 2> /dev/null || echo 'W: points de montage du miroir non retirés'; }' exec /w/mmdebstrap.vAXpexyQH8
+     tmpfs /w : 706 Mo (après chroot)
+     tmpfs /w : 1137 Mo (couche du chroot écrite)
+     couche racine sha256:999a0ae4593639e7a46e9290911151704588b9086a625d1659f0d35c397bd242 (287874560 octets) ; couche du chroot sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets), chro
+     image.tar : 739676160 octets en 8 s
+     pic du tmpfs /w : 395 Mo sur 70 relevés ; memory.peak du cgroup : 1798508544
+OK   N3 témoin : TaskRun : True|Succeeded
+OK   N3 témoin : DIGEST_CONSTRUIT (image de S4a) : sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+## N4 : apt seul, dans le pod d'essai, sur les trois miroirs (file:, sans trusted=yes)
+     miroir|update|0|1
+     miroir|download|0|1
+     miroir-inrelease|update|100|0
+     miroir-inrelease|apt|Err:1 file:/m/miroir-inrelease trixie InRelease
+     miroir-inrelease|apt|  Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Message has been manipulated Verifying signature:            Message has been manipulated Verif
+     miroir-inrelease|apt|W: OpenPGP signature verification failed: file:/m/miroir-inrelease trixie InRelease: Sub-process /usr/bin/sqv returned an error code (1), error message is: Verifying signature:            Message has 
+     miroir-inrelease|apt|E: The repository 'file:/m/miroir-inrelease trixie InRelease' is not signed.
+     miroir-deb|update|0|1
+     miroir-deb|download|100|0
+     miroir-deb|apt|  Hash Sum mismatch
+     miroir-deb|apt|  Hashes of expected file:
+     miroir-deb|apt|  Hashes of received file:
+     miroir-deb|apt|E: Failed to fetch file:/m/miroir-deb/pool/main/g/gcc-defaults/g%2b%2b-x86-64-linux-gnu_14.2.0-1_amd64.deb  Hash Sum mismatch
+     miroir-deb|apt|   Hashes of expected file:
+     miroir-deb|apt|   Hashes of received file:
+OK   N4 témoin, miroir intact : update (code|index Packages) : 0|1
+OK   N4 témoin, miroir intact : téléchargement du paquet témoin (code|fichiers) : 0|1
+OK   N4 InRelease altéré : update refusé, aucun index (code non nul|index) : 1|0
+OK   N4 .deb altéré : index acceptés : 0|1
+OK   N4 .deb altéré : téléchargement refusé, aucun fichier (code non nul|fichiers) : 1|0
+OK   N4 .deb altéré : message « Hash Sum mismatch » : oui
+pod s5-miroir-essai supprimé
+     s5-n3-prefetch : chains.tekton.dev/signed « true »
+     s5-n3-deb : chains.tekton.dev/signed « true »
+     s5-n3-inrelease : chains.tekton.dev/signed « true »
+     s5-n3-intact : chains.tekton.dev/signed « true »
+KO   2 écart(s)

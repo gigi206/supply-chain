@@ -1,0 +1,43 @@
+# s5.sh prefetch, 2026-11-11T21:25:20Z
+## N1 témoin : un paquet, bon sha256 (pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb)
+TaskRun s5-n1-temoin créé à 21:25:20
+     2026/11/11 21:25:21 Entrypoint initialization
+     2026/11/11 21:25:22 Decoded script /tekton/scripts/script-0-s5rmf
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 1 paquets, 1200 octets, en 0 s
+OK   N1 témoin : TaskRun : True|Succeeded
+OK   N1 témoin : pod (tekton.dev/task|nœud|runtime) : prefetch-deb|sc-build|-
+OK   N1 témoin : miroir d'un paquet : 1
+## N1 : même paquet, sha256 faux (dernier chiffre changé)
+TaskRun s5-n1-faux créé à 21:25:27
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+        Hashes of received file:
+         - SHA256:15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583
+         - Filesize:1200 [weak]
+        Last modification reported: Thu, 10 Oct 2024 14:57:56 +0000
+     E: Download Failed
+     téléchargement refusé : pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb
+ÉCART N1 hash faux : TaskRun : False|StepFailed (attendu : False|Failed)
+OK   N1 hash faux : refus par apt-helper (« téléchargement refusé ») : 1
+OK   N1 hash faux : contrôle du shell non atteint (« sha256 différent ») : 0
+ÉCART N1 hash faux : message d'apt-helper « Hash Sum mismatch » : non (attendu : oui)
+## N2 : InRelease au mauvais sha256 (premier chiffre changé)
+TaskRun s5-n2-inrelease créé à 21:25:33
+     2026/11/11 21:25:35 Decoded script /tekton/scripts/script-0-qpc7p
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+        Hashes of received file:
+         - SHA256:0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+         - Filesize:140421 [weak]
+        Last modification reported: Sat, 12 Sep 2026 08:14:01 +0000
+     E: Download Failed
+     téléchargement refusé : dists/trixie/InRelease
+ÉCART N2 : TaskRun : False|StepFailed (attendu : False|Failed)
+OK   N2 : refus par apt-helper sur l'InRelease : 1
+OK   N2 : aucun index ni paquet téléchargé : 0
+     s5-n1-temoin : chains.tekton.dev/signed « true »
+     s5-n1-faux : chains.tekton.dev/signed « true »
+     s5-n2-inrelease : chains.tekton.dev/signed « true »
+KO   3 écart(s)

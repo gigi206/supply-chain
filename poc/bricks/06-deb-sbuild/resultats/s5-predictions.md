@@ -79,3 +79,32 @@ Carte : README, additif de 21:13 UTC. Script : [`s5.sh`](../s5.sh).
 - Le rejeu de zéro : c'est S5b.
 - Une altération du blob dans le stockage de Zot : le refus d'oras est mesuré par la brique 03 (« mismatched digest »).
 - La coupure du réseau au niveau du pod de construction : elle est mesurée à chaque construction par les témoins de `construire-deb` et de `construire-builder`, et S5a ne la compte pas.
+
+---
+## Résultats partiels (11/11/2026, de 21:25:12 à 21:31 UTC, accord « Oui, lance S5a »)
+
+Étapes `prealables`, `prefetch`, `miroir` et `sbuild`. Rien n'est écrit dans Zot : l'étape `zot` attend son accord nommé. Journaux : `s5-prealables.log`, `s5-prefetch.log`, `s5-miroir.log`, `s5-sbuild.log`.
+
+- **P1 à P3 : tenues.**
+  - Les quatre tâches sont dans la liste revue, et la liste de `builder-sbuild` égale `paquets.txt`.
+  - Les 16 objets sont admis à blanc ; le pod de N6 n'est rendu qu'au lancement.
+  - Enveloppes de départ : deb 8, sample-app 28, fermeture 4, image de build 4.
+- **P5 : tenue.** Le pod du TaskRun isolé porte `tekton.dev/task: prefetch-deb`, et le témoin télécharge son paquet.
+- **P6 : barrière tenue, libellés réfutés.** C'est `apt-helper` qui refuse le hash faux (« E: Download Failed », « téléchargement refusé »), et le `sha256sum` du shell n'est pas atteint. **A4 est donc mesurée.** Les libellés sont réfutés de deux façons :
+  - la raison du TaskRun est `StepFailed`, pas `Failed` ;
+  - « Hash Sum mismatch » n'est pas dans les 5 dernières lignes que la tâche garde du journal d'`apt-helper`.
+- **P7 : tenue**, même barrière, aucun index téléchargé. Même écart de raison (`StepFailed`).
+- **P8 : tenue.** 199 paquets en 18 s. Les copies altérées ont la même taille que l'original, et le miroir intact est inchangé.
+- **P9 : tenue.** Sous Kata, la revérification refuse « paquet altéré : pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb » et « InRelease du miroir différent ». Ni mmdebstrap ni apt ne sont lancés, et les quatre témoins réseau de la tâche échouent (code 124). Même écart de raison.
+- **P10 : tenue.** `DIGEST_CONSTRUIT` = `sha256:749d746c…`, le digest de S4a, depuis un TaskRun isolé ; `memory.peak` vaut 1,8 Gio.
+- **P11 : tenue. La réserve de A7 est levée.** apt 3.0.4 de l'amorce, sans root, depuis `file:` et sans `trusted=yes` :
+  - miroir intact : index puis téléchargement acceptés ;
+  - InRelease altéré : sqv refuse (« Message has been manipulated »), puis « The repository … is not signed », code 100, aucun index ;
+  - `.deb` altéré : index acceptés, puis « Hash Sum mismatch » au téléchargement, code 100, aucun fichier.
+- **P17 : non mesurée, par une erreur de mon script.**
+  - Le témoin tient : depuis le pod d'essai Kata, la connexion TCP à Zot réussit (code 0).
+  - sbuild rend le code 0, mais les lignes de `debian/rules` ne sont pas dans `/w/sbuild.out`. sbuild écrit le journal de construction dans le fichier `.build` horodaté de `--build-dir`, ce que `s3.sh` savait déjà (l. 229 et 230).
+  - N6 n'est donc ni tenue ni réfutée. La correction lit `/w/sortie/*Z.build`, et elle demande un accord.
+- **Chains** : l'annotation `chains.tekton.dev/signed` vaut `true` sur les 7 TaskRuns. Le comptage des enveloppes (P18) se fait à l'étape `porte`.
+
+**Erreur de prédiction commune** : j'ai écrit `False|Failed` pour un TaskRun en échec. Tekton donne `False|StepFailed` quand une étape sort en erreur. Le script n'est pas modifié pour ce libellé. Les étapes à venir (`fermeture`) produiront le même écart, qui ne touche pas la barrière mesurée.

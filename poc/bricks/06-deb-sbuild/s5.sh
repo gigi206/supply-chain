@@ -506,12 +506,17 @@ sbuild --chroot-mode=unshare --chroot=/opt/sbuild/trixie-amd64.tar --dist=trixie
   --no-apt-distupgrade --no-run-lintian --no-run-autopkgtest --no-run-piuparts --no-source-only-changes --build-dir=/w/sortie \
   "--chroot-setup-commands=truncate -s 0 /etc/apt/sources.list" /w/src/s5-reseau_1.0.dsc > /w/sbuild.out 2>&1 || s=$?
 echo "sbuild|$s"
-grep '^S5-RESEAU|' /w/sbuild.out | sed 's/^S5-RESEAU|//'
+# Corrigé le 11/11/2026 après le premier passage (21:30:42 UTC, sbuild en code 0, aucune ligne de debian/rules dans sbuild.out) :
+# sbuild écrit le journal de construction dans le fichier .build horodaté de --build-dir (s3.sh, l. 229 et 230), pas sur sa sortie.
+echo "journaux|$(find /w/sortie -maxdepth 1 -type f -name '*Z.build' | wc -l)"
+grep -h '^S5-RESEAU|' /w/sortie/*Z.build | sed 's/^S5-RESEAU|//'
 [ $s = 0 ] || tail -n 25 /w/sbuild.out
 FIN
   } > "$T/sbuild.sh"
   pod_script s5-sbuild "$T/sbuild.sh" "$T/sbuild.log" || true
+  kubectl exec -n builds s5-sbuild -- sh -c 'cat /w/sortie/*Z.build' < /dev/null 2>&1 | filtre > "$R/s5-sbuild-build.log"   # comme s1.sh
   sed 's/^/     /' "$T/sbuild.log" | cut -c1-220
+  mesure "N6 : journal .build de sbuild" "$(awk -F'|' '$1 == "journaux" {print $2}' "$T/sbuild.log")" 1
   mesure "N6 témoin : connexion TCP à Zot depuis le pod (code)" "$(awk -F'|' '$1 == "pod" {print $2}' "$T/sbuild.log")" 0
   mesure "N6 : debian/rules exécuté sous sbuild (lignes)" "$(grep -c '^regles|' "$T/sbuild.log" || true)" 1
   mesure "N6 : connexion TCP à Zot depuis debian/rules sous sbuild (échec)" "$(awk -F'|' '$1 == "regles" {print ($2 != 0)}' "$T/sbuild.log")" 1
