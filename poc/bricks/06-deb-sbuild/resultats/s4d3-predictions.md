@@ -102,3 +102,14 @@ C'est la leçon de S4d2a sous une autre forme. Un état déployé peut venir d'u
 - par une lecture, le CronJob corrigé est identique à `rattrapage`, ressources comprises, hors nom, compte, `GABARIT` et suspension ;
 - à blanc côté serveur (dry-run), il est admis.
 
+**`retirer`, `prealables` (troisième passage) et `deployer` (second passage)** (accord « Oui, lance-les » ; de 20:46:48 à 20:47:28 UTC) :
+- **`retirer`** ([`s4d3-retirer.log`](s4d3-retirer.log)) : les sept objets appliqués sont supprimés. Le `labelSelector` reste, sans objet Trigger.
+- **`prealables`** ([`s4d3-prealables-3.log`](s4d3-prealables-3.log)) : T1 à T3 tenues. Le CronJob est identique à `rattrapage`, ressources comprises.
+- **`deployer`** ([`s4d3-deployer.log`](s4d3-deployer.log)) : **T4 à T7 tenues**.
+  - **T4** : les huit objets sont appliqués. Le pod de l'EventListener est inchangé (`el-forgejo-76596b99b8-wmm97`). `rattrapage-deb` est suspendu, `rattrapage` ne l'est pas.
+  - **T5** : les sept droits mesurés sont conformes.
+  - **T6** : le PipelineRun du gabarit est admis à blanc au nom de `el-forgejo` et de `rattrapage-deb`. Sa spec admise est identique à celle de `s4d-deb-1`.
+  - **T7** : trois livraisons du commit fictif, chacune reçue avec un HTTP 202. Elles donnent six refus de l'intercepteur github : deux « no X-Hub-Signature-256 header set » et quatre « payload signature check failed ». Aucun PipelineRun n'est créé. Le Trigger du deb vérifie donc bien lui-même le HMAC.
+
+Le journal du deuxième passage de `prealables` (20:44:19 UTC) a été écrasé par le troisième. Je l'ai restauré depuis le commit `c4be8f4` sous son nom, `s4d3-prealables.log` ; le troisième passage est archivé dans `s4d3-prealables-3.log`.
+

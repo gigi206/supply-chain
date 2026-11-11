@@ -1,0 +1,45 @@
+# s4d3.sh deployer, 2026-11-11T20:46:56Z
+## départ
+OK   objets Trigger de declencheurs : 0
+pod de l'EventListener : el-forgejo-76596b99b8-wmm97
+## EventListener : labelSelector (document EventListener de declencheurs.yaml de la 08, seul)
+OK   labelSelector en service : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## declencheur.yaml
+triggertemplate.triggers.tekton.dev/sample-app-deb serverside-applied
+trigger.triggers.tekton.dev/sample-app-deb-push serverside-applied
+serviceaccount/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+cronjob.batch/rattrapage-deb serverside-applied
+OK   pod de l'EventListener inchangé (aucun redémarrage) : el-forgejo-76596b99b8-wmm97
+OK   CronJob rattrapage-deb suspendu : true
+OK   CronJob rattrapage repris (inchangé) : false
+## droits (kubectl auth can-i)
+OK   rattrapage-deb : get triggertemplate sample-app-deb : yes
+OK   rattrapage-deb : get triggertemplate sample-app : no
+OK   rattrapage-deb : create pipelineruns dans builds : yes
+OK   rattrapage-deb : delete pipelineruns dans builds : no
+OK   rattrapage-deb : get secrets dans declencheurs : no
+OK   rattrapage : get triggertemplate sample-app-deb : no
+OK   el-forgejo : list triggers dans declencheurs : yes
+## PipelineRun du gabarit, à blanc
+OK   au nom de el-forgejo : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+OK   au nom de rattrapage-deb : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+## livraisons refusées (commit fictif 1111111111111111111111111111111111111111), adressées directement à l'EventListener
+non signée : HTTP 202 {"eventID":"2d48eea0-2134-4bbc-9f60-cfd4234cf208"}
+autre secret : HTTP 202 {"eventID":"94aab405-3e15-485c-8f7d-5d1be7474ae7"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"68f427fc-3c01-4f6f-bd78-2ff39d97ec96"}
+{"t":"20:47:07","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"20:47:07","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"20:47:08","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"20:47:08","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"20:47:08","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"20:47:08","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   refus « no X-Hub-Signature-256 header set » (un par trigger) : 2
+OK   refus « payload signature check failed » (deux livraisons, deux triggers) : 4
+OK   refus des intercepteurs, en tout : 6
+OK   PipelineRuns du commit fictif : 0

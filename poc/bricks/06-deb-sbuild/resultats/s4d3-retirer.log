@@ -1,0 +1,9 @@
+# s4d3.sh retirer, 2026-11-11T20:46:48Z
+triggertemplate.triggers.tekton.dev "sample-app-deb" deleted from declencheurs namespace
+trigger.triggers.tekton.dev "sample-app-deb-push" deleted from declencheurs namespace
+serviceaccount "rattrapage-deb" deleted from declencheurs namespace
+role.rbac.authorization.k8s.io "rattrapage-deb" deleted from declencheurs namespace
+rolebinding.rbac.authorization.k8s.io "rattrapage-deb" deleted from declencheurs namespace
+role.rbac.authorization.k8s.io "rattrapage-deb-pipelineruns" deleted from builds namespace
+rolebinding.rbac.authorization.k8s.io "rattrapage-deb-pipelineruns" deleted from builds namespace
+labelSelector laissé : {"matchLabels":{"poc.test/ecouteur":"forgejo"}} (aucun objet Trigger : 0)

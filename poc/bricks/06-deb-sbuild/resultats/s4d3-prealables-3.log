@@ -1,0 +1,27 @@
+# s4d3.sh prealables, 2026-11-11T20:46:48Z
+## gabarit rendu
+OK   objets de declencheur.yaml : CronJob/rattrapage-deb Role/rattrapage-deb Role/rattrapage-deb-pipelineruns RoleBinding/rattrapage-deb RoleBinding/rattrapage-deb-pipelineruns ServiceAccount/rattrapage-deb Trigger/sample-app-deb-push TriggerTemplate/sample-app-deb
+## exigences de main.go sur le gabarit (paramètres commit et depot, une ressource, PipelineRun v1 de builds nommé <gabarit>-<commit>)
+OK   paramètres : commit,depot
+OK   ressources : 1
+OK   PipelineRun rendu (apiVersion kind espace/nom) : tekton.dev/v1 PipelineRun builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f
+## Trigger sample-app-deb-push contre le trigger en ligne en service (intercepteurs et liaisons)
+OK   intercepteurs et liaisons identiques
+OK   label du Trigger : {"poc.test/ecouteur":"forgejo"}
+## CronJob rattrapage-deb contre rattrapage en service (hors nom, compte, GABARIT et suspension)
+OK   CronJob identique hors nom, compte, GABARIT et suspension (image comprise)
+OK   compte, GABARIT, suspension : rattrapage-deb declencheurs/sample-app-deb true
+## EventListener du dépôt contre celui en service
+OK   identiques hors labelSelector
+OK   labelSelector du dépôt : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## dépendances de la 08 en service
+OK   ConfigMap declencheurs/rattrapage : configmap/rattrapage
+OK   secret declencheurs/forgejo-webhook (nom seul) : secret/forgejo-webhook
+OK   NetworkPolicy builds/construction-deb-sans-sortie : networkpolicy.networking.k8s.io/construction-deb-sans-sortie
+OK   objets Trigger de declencheurs : 0
+OK   TriggerTemplate sample-app-deb : absente
+## bundle de la pipeline deb
+OK   bundle dans Zot : sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5
+OK   tâche preparer dans la liste revue : tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+OK   tâche construire dans la liste revue : tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
