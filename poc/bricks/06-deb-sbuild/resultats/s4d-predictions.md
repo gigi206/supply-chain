@@ -94,3 +94,21 @@ Prédictions ajoutées pour `busybox_outils` :
 |---|---|---|---|
 | D16 | busybox_outils | L'image d'outils est tirée au digest `c7bebae2` et contient un busybox. Sous ses seuls applets, la confrontation admet la fermeture (162 paquets) et refuse un paquet en plus et un paquet altéré | haute : mêmes applets que ceux de `preparer-entrees` et `vsa.sh`, qui tournent dans cette image |
 
+## Résultats du 11/11/2026, 18:32 UTC : busybox_outils, reseau et essai
+
+**Accord du propriétaire** (18:25:34 UTC) : « Ok », donné à la question « Je lance busybox_outils, reseau et essai ? ». Trois étapes, toutes en code 0 ([busybox_outils](s4d-busybox_outils.log), [reseau](s4d-reseau.log), [essai](s4d-essai.log), [journal du script dans le pod](s4d-essai-construire.log)).
+
+- **D16 : tenue** (18:25:41 UTC). L'image d'outils est tirée au digest `c7bebae2`. Son busybox est `/busybox/busybox`, BusyBox v1.37.0 (sha256 `62035898…`), avec 399 applets. Sous ses seuls applets, la confrontation admet les 162 paquets, et refuse un paquet en plus et un paquet altéré.
+- **D1 : tenue** (18:25:50 UTC). `construction-deb-sans-sortie` est posée et elle seule sélectionne `construire-deb`, en entrée et en sortie. Aucune NetworkPolicy de `builds` n'autorise de trafic, et aucune CiliumNetworkPolicy n'en autorise à `construire-deb`.
+- **Essai**, de 18:25:55 à 18:32:04 UTC :
+  - **D2 : tenue.** Le pod est admis et prêt sur sc-build, sous Kata (invité 6.18.56, 3 vCPU), avec l'image de build de S4a tirée par digest : premier lancement de cette image comme image de pod, sans incident.
+  - **D3 : tenue.** `entrees.tar` arrive en 4 morceaux, sha256 conforme.
+  - **D4 : tenue.** Les quatre témoins réseau échouent, tous par délai (code 124).
+  - **D5 : tenue.** 162 paquets revérifiés et copiés.
+  - **D6 : tenue, y compris pour les parties à confiance faible.** L'archive amont est `07521c1e`, le `.dsc` `7f9cf5d3` et le `.debian.tar.xz` `f0e5cfc8`, les mêmes que sur l'hôte, malgré des versions de gzip, dpkg-dev et xz différentes.
+  - **D7 : tenue.** sbuild réussit en UID 1000 en 276 s, sans aucune ligne apt en http(s).
+  - **D8 : tenue.** **Le deb est `0b489d438370ddb6…`**, celui d'OBS, de S1 et de S3. Le changement des modes de `debian/` n'a donc pas d'effet sur le deb.
+  - **D9 : tenue.** L'artefact a le digest attendu, `039949f9…` ; `image.tar` est lu comme le lit `publier-image`.
+  - **En plus** : les `Installed-Build-Depends` du `.buildinfo` de l'essai sont égaux au verrou (162 paquets, nom et version, aucun écart). `Build-Path` vaut `/build/reproducible-path/sample-app-1.0.0`.
+- **Défaut de formulation du journal de l'essai** : la ligne « invité » affiche « écriture refusée » après le type de montage des entrées. C'est un texte fixe du script, et non une mesure : dans l'essai, le contrôle de lecture seule est remplacé (première ligne du journal), et `/e` est monté `rw`. La lecture seule ne sera mesurée que dans la pipeline (D12).
+

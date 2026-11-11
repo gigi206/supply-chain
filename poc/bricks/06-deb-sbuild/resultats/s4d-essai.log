@@ -1,0 +1,49 @@
+# s4d.sh essai, 2026-11-11T18:25:55Z
+OK   script d'essai : variables Tekton restantes : 0
+OK   script d'essai : ligne de lecture seule remplacée : 1
+pod s4d-essai créé à 18:25:55 (image sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590)
+pod prêt sur sc-build, runtimeClassName kata
+OK   copie de entrees.tar dans le pod : 227266560 octets en 4 morceau(x), sha256 conforme
+OK   copie de construire.sh dans le pod : 5615 octets en 1 morceau(x), sha256 conforme
+## script de construire-deb dans le pod (18:26:41)
+fin à 18:32:04
+     (essai : lecture seule des entrées non testée)
+     invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 1000, gid 1000 ; /w : tmpfs ; entrees : virtiofs rw,nodev,relatime, écriture refusée
+     témoin DNS snapshot.debian.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
+     paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e
+     sbuild : rc 0 en 276 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+     ----- sample-app_1.0.0-1_amd64.buildinfo -----
+     Format: 1.0
+     Source: sample-app
+     Binary: sample-app
+     Architecture: amd64
+     Version: 1.0.0-1
+     Checksums-Md5:
+     Checksums-Sha1:
+     Checksums-Sha256:
+     Build-Origin: Debian
+     Build-Architecture: amd64
+     Build-Date: Wed, 11 Nov 2026 18:31:53 +0000
+     Build-Path: /build/reproducible-path/sample-app-1.0.0
+     Environment:
+      DEB_BUILD_OPTIONS="parallel=3"
+      LANG="C.UTF-8"
+      LC_COLLATE="C.UTF-8"
+      LC_CTYPE="C.UTF-8"
+      SOURCE_DATE_EPOCH="1793229566"
+     ----- fin du .buildinfo -----
+     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b11
+     image.tar : 1966080 octets
+     (code de l'exec : 0 ; journal complet : resultats/s4d-essai-construire.log)
+OK   dernière ligne du script atteinte (image.tar) : 1
+OK   image.tar rapatrié (sha256 dans le pod) : 9dc07425dd3e7470c64b6d9a004ff1b743a3edf7813c094da852af70d02e46b8
+pod s4d-essai supprimé
+OK   index.json lu comme publier-image : égal au résultat : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   deb construit dans le pod d'essai : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   digest de l'artefact : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+écarts : 0

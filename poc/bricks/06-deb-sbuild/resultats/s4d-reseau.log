@@ -1,0 +1,5 @@
+# s4d.sh reseau, 2026-11-11T18:25:50Z
+NetworkPolicy de builds : builder-sans-sortie, construction-deb-sans-sortie, construction-sans-sortie
+OK   politiques qui sélectionnent construire-deb, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic : 0
+OK   CiliumNetworkPolicy de builds qui sélectionnent construire-deb et autorisent du trafic : 

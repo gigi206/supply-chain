@@ -1,0 +1,7 @@
+# s4d.sh busybox_outils, 2026-11-11T18:25:41Z
+OK   image d'outils tirée par digest (manifeste) : sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+busybox de l'image d'outils : /./busybox/busybox (couche 61ea958ebee1), sha256 6203589853db19ddb3ee95feaa707b73e1037d022379765a6ca973fc341b4672
+     BusyBox v1.37.0 (2024-09-26 21:31:42 UTC) multi-call binary. ; 399 applets
+OK   confrontation sous le busybox de l'image d'outils : fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+OK   refusé sous busybox : paquet en plus (pool : 163 fichiers, 162 dans le verrou)
+OK   refusé sous busybox : paquet altéré (paquet différent du verrou : pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb)
