@@ -1,0 +1,18 @@
+echec ⟹ _constructions := {"construire-image", "construire-deb"} ⟹ _constructions := {"construire-image"}
+echec ⟹ _tache(task, nom) if tekton.task_ref(task).name == nom ⟹ _tache(task, nom) if false
+echec ⟹ split(b, "@")[0] == sprintf("sc-stockage.poc.test:5000/tekton/tasks/%s", [nom]) ⟹ false
+echec ⟹ "preparer-entrees": {"FERMETURE_ARTIFACT_INPUTS": "gomod"}, ⟹ "preparer-entrees": {"FERMETURE_ARTIFACT_INPUTS": "deb"},
+echec ⟹ "FERMETURE_DEB_ARTIFACT_INPUTS": "deb", "FERMETURE_SOURCES_ARTIFACT_INPUTS": "gomod" ⟹ "FERMETURE_SOURCES_ARTIFACT_INPUTS": "gomod"
+echec ⟹ "FERMETURE_DEB_ARTIFACT_INPUTS": "deb", "FERMETURE_SOURCES_ARTIFACT_INPUTS": "gomod" ⟹ "FERMETURE_DEB_ARTIFACT_INPUTS": "deb"
+echec ⟹ "FERMETURE_DEB_ARTIFACT_INPUTS": "deb", "FERMETURE_SOURCES_ARTIFACT_INPUTS": "gomod" ⟹ "FERMETURE_DEB_ARTIFACT_INPUTS": "gomod", "FERMETURE_SOURCES_ARTIFACT_INPUTS": "deb"
+echec ⟹ "forme": forme, ⟹ "forme": "gomod",
+echec ⟹ count(_fermetures) == 0 ⟹ 
+echec ⟹ not _lue(nom, resultat) ⟹ 
+survit ⟹ f.preparation == nom ⟹ 
+echec ⟹ f.resultat == resultat ⟹ 
+echec ⟹ f.forme == "gomod" ⟹ 
+echec ⟹ f.forme == "deb" ⟹ 
+echec ⟹ tekton.task_ref(q).name == "prefetch-deb" ⟹ 
+echec ⟹ _appariement := {"construire-deb": "preparer-deb"} ⟹ _appariement := {}
+echec ⟹ _tache(task, construction) ⟹ 
+echec ⟹ not _presente(preparation) ⟹ 

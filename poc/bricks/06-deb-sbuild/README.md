@@ -1249,3 +1249,21 @@ Avec eux, S4d2 dépasserait sa fourchette, sans approcher le seuil de la brique 
 2. **Appariement dans la voie image** (`construire-image` ⇒ `preparer-entrees`) : l'ajouter en S4d2a, avec la non-régression sur sample-app, ou le laisser hors périmètre. **Ma recommandation** : le laisser hors périmètre et l'inscrire comme dette, pour que S4d2a ne change pas le comportement de la voie image.
 3. **Contrôle 7 du deb** : un mode deb du scanner (extraction de `data.tar`, puis `syft dir:`, à mesurer d'abord), ou un écart à l'ADR 0000 §4 pour le deb. Rien n'est à trancher avant le jalon séparé, si la question 1 est retenue.
 4. **Contrôle 6 du deb** : un replay du deb dans le domaine de la brique 10 (installation de sbuild ou de mmdebstrap dans `sc-replay`, sous ton accord), ou un écart à l'ADR. Même remarque.
+
+## Additif du 11/11/2026, 20:17 UTC : décision S4d2a, préparation à sec
+
+**Décision du propriétaire** (11/11/2026, 20:08:42 UTC) : « Oui, S4d2a ». S4d2a étend la porte à la voie deb avant S4d3. Les contrôles 6 et 7 du deb passent dans un jalon séparé ; d'ici là, ils refusent le deb (échec fermé). Les questions 2 à 4 n'ont pas reçu de réponse. Pour la 2, j'applique ma recommandation, qui ne change rien : la voie image n'est pas appariée. Les questions 3 et 4 attendent le jalon séparé. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Préparé, rien lancé** :
+- `porte.rego` de la 08 : Kata pour `construire-deb` ; fermetures typées par le nom du résultat ; préparation complète ; règle neuve `preparation_appariee`.
+- `porte_test.rego` : 18 tests de la voie deb, avec les digests et les noms de résultats des provenances réelles de S4d1 et de S4b.
+- [`s4d2.sh`](s4d2.sh), qui ajoute trois étapes :
+  - `regle` : tests et mutations, sur l'hôte ;
+  - `reel` : règles évaluées sur les provenances réelles du deb et de sample-app, et témoins, sur l'hôte avec lecture anonyme de Zot ;
+  - `porte` : ConfigMap et trois Jobs de la porte, dans le cluster.
+- [Prédictions E1 à E11](resultats/s4d2-predictions.md).
+
+**Dette inscrite** :
+- l'artefact de packaging, poussé depuis l'hôte, n'est pas jugé par la porte ;
+- la provenance de l'image de build `sbuild-debian13` non plus ;
+- la voie image n'est pas appariée (`construire-image` et `preparer-entrees`).

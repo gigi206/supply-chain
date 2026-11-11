@@ -36,7 +36,8 @@ deny contains {"code": "porte.image_signature", "msg": "aucune signature d'image
 # title: Construction sous Kata, lue dans le TaskRun signé
 # description: >-
 #   Option (c) des internalParameters (décision du propriétaire du 30/10/2026) : la porte juge un fait du TaskRun exécuté,
-#   pas une déclaration. Chaque TaskRun de construire-image (nom de la tâche ou dépôt de son bundle) en contenu de
+#   pas une déclaration. Chaque TaskRun de construction (construire-image ; construire-deb depuis la brique 06, S4d2a, décision
+#   du propriétaire du 11/11/2026, 20:08:42 UTC ; nom de la tâche ou dépôt de son bundle) en contenu de
 #   resolvedDependencies doit porter spec.podTemplate.runtimeClassName kata. Les taskRunSpecs des paramètres externes,
 #   déclaration du créateur du PipelineRun, ne comptent pas. Un runtimeClassName venu d'un default-pod-template ou d'une
 #   mutation n'est pas dans la spec : refusé. Sans TaskRun de construire-image, la règle ne refuse rien (succès à vide).
@@ -47,15 +48,24 @@ deny contains {"code": "porte.construction_kata", "msg": msg} if {
 	_construction(task)
 	rc := object.get(task, ["spec", "podTemplate", "runtimeClassName"], "")
 	rc != "kata"
-	msg := sprintf("TaskRun %s de construire-image : runtimeClassName %q dans la spec signée, kata exigé",
+	msg := sprintf("TaskRun %s de construction : runtimeClassName %q dans la spec signée, kata exigé",
 		[object.get(task, ["metadata", "name"], "?"), rc])
 }
 
-_construction(task) if tekton.task_ref(task).name == "construire-image"
+_constructions := {"construire-image", "construire-deb"}
 
 _construction(task) if {
+	some n in _constructions
+	_tache(task, n)
+}
+
+# Une tâche est désignée par son nom ou par le dépôt de son bundle (l'un des deux suffit : un bundle de construire-deb chargé
+# sous un autre nom reste une construction).
+_tache(task, nom) if tekton.task_ref(task).name == nom
+
+_tache(task, nom) if {
 	b := object.get(tekton.task_ref(task), "bundle", "")
-	split(b, "@")[0] == "sc-stockage.poc.test:5000/tekton/tasks/construire-image"
+	split(b, "@")[0] == sprintf("sc-stockage.poc.test:5000/tekton/tasks/%s", [nom])
 }
 
 # METADATA
@@ -68,37 +78,58 @@ _construction(task) if {
 #   celle d'un PipelineRun : slsa-tekton, builder.id autorisé, sujet égal à la fermeture sous builds/fermetures/, tâches
 #   exactement prefetch-gomod et publier-fermeture, toutes deux dans la liste revue, digest publié par publier-fermeture, même
 #   dépôt Forgejo que la construction. Une attestation de TaskRun seule (publier-fermeture lancée hors de la pipeline) ne
-#   suffit pas. La règle ne s'applique qu'aux provenances qui contiennent preparer-entrees ou construire-image.
+#   suffit pas. La règle ne s'applique qu'aux provenances qui contiennent une préparation ou une construction.
+#   Brique 06, S4d2a (décision du propriétaire du 11/11/2026, 20:08:42 UTC) : la voie deb a une préparation, preparer-deb, et deux
+#   fermetures, chacune typée par le nom de son résultat. FERMETURE_DEB_ARTIFACT_INPUTS n'est prouvée que par une pipeline
+#   prefetch-deb et publier-fermeture (sans git : prefetch-deb n'a pas de source) ; FERMETURE_SOURCES_ARTIFACT_INPUTS, comme
+#   FERMETURE_ARTIFACT_INPUTS de preparer-entrees, que par prefetch-gomod et publier-fermeture, même dépôt Forgejo. Chaque
+#   résultat attendu d'une préparation doit être présent et prouvé : une préparation qui n'en émet qu'une partie est refusée.
+#   Hors du jugement (dette inscrite dans le README de la 06) : l'artefact de packaging (PACKAGING_ARTIFACT_INPUTS, poussé depuis
+#   l'hôte sous entrees/, comme web/dist) et la provenance de l'image de build de construire-deb.
 # custom:
 #   short_name: fermeture_plateforme
 deny contains {"code": "porte.fermeture_plateforme", "msg": msg} if {
 	some task in lib.tasks_from_pipelinerun
 	_construction_ou_preparation(task)
 	count(_fermetures) == 0
-	msg := "construction sans fermeture lisible dans le résultat FERMETURE_ARTIFACT_INPUTS de preparer-entrees"
+	msg := "construction sans fermeture lisible dans les résultats de sa préparation"
+}
+
+deny contains {"code": "porte.fermeture_plateforme", "msg": msg} if {
+	some task in lib.tasks_from_pipelinerun
+	some nom, resultats in _attendues
+	_tache(task, nom)
+	some resultat, _ in resultats
+	not _lue(nom, resultat)
+	msg := sprintf("préparation %s sans fermeture lisible dans le résultat %s", [nom, resultat])
 }
 
 deny contains {"code": "porte.fermeture_plateforme", "msg": msg} if {
 	some f in _fermetures
 	not _fermeture_prouvee(f)
-	msg := sprintf("fermeture %s : aucune provenance de la pipeline de prefetch de la plateforme (%s)", [f.ref, _motif(f)])
+	msg := sprintf("fermeture %s (%s) : aucune provenance de la pipeline de prefetch %s de la plateforme (%s)",
+		[f.ref, f.resultat, f.forme, _motif(f)])
 }
 
 _construction_ou_preparation(task) if _construction(task)
 
-_construction_ou_preparation(task) if _preparation(task)
+_construction_ou_preparation(task) if {
+	some nom, _ in _attendues
+	_tache(task, nom)
+}
 
-_preparation(task) if tekton.task_ref(task).name == "preparer-entrees"
-
-_preparation(task) if {
-	b := object.get(tekton.task_ref(task), "bundle", "")
-	split(b, "@")[0] == "sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees"
+# Résultats de fermeture attendus de chaque préparation, et forme de la pipeline qui doit les prouver
+_attendues := {
+	"preparer-entrees": {"FERMETURE_ARTIFACT_INPUTS": "gomod"},
+	"preparer-deb": {"FERMETURE_DEB_ARTIFACT_INPUTS": "deb", "FERMETURE_SOURCES_ARTIFACT_INPUTS": "gomod"},
 }
 
 _fermetures contains f if {
 	some task in lib.tasks_from_pipelinerun
-	_preparation(task)
-	r := tekton.task_result(task, "FERMETURE_ARTIFACT_INPUTS")
+	some nom, resultats in _attendues
+	_tache(task, nom)
+	some resultat, forme in resultats
+	r := tekton.task_result(task, resultat)
 	startswith(r.uri, "oci://")
 	regex.match(`^sha256:[0-9a-f]{64}$`, r.digest)
 	depot := substring(r.uri, 6, -1)
@@ -107,7 +138,16 @@ _fermetures contains f if {
 		"depot": depot,
 		"digest": r.digest,
 		"git": tekton.task_result(task, "CHAINS-GIT_URL"),
+		"forme": forme,
+		"preparation": nom,
+		"resultat": resultat,
 	}
+}
+
+_lue(nom, resultat) if {
+	some f in _fermetures
+	f.preparation == nom
+	f.resultat == resultat
 }
 
 _verification(ref) := ec.sigstore.verify_attestation(ref, sigstore.opts)
@@ -133,8 +173,18 @@ _prefetch(st, f) if {
 	tekton.task_result(p, "IMAGE_URL") == f.depot
 	tekton.task_result(p, "IMAGE_DIGEST") == f.digest
 	some q in taches
+	_forme(q, f)
+}
+
+_forme(q, f) if {
+	f.forme == "gomod"
 	tekton.task_ref(q).name == "prefetch-gomod"
 	tekton.task_result(q, "CHAINS-GIT_URL") == f.git
+}
+
+_forme(q, f) if {
+	f.forme == "deb"
+	tekton.task_ref(q).name == "prefetch-deb"
 }
 
 _motif(f) := m if {
@@ -143,3 +193,27 @@ _motif(f) := m if {
 	e := concat(" ; ", object.get(v, "errors", []))
 	m := substring(sprintf("%d provenance(s) vérifiée(s) par la clé de Chains, aucune conforme ; erreurs : %s", [n, e]), 0, 400)
 } else := "vérification sans résultat"
+
+# METADATA
+# title: Construction deb préparée par sa tâche
+# description: >-
+#   Brique 06, S4d2a (décision du propriétaire du 11/11/2026, 20:08:42 UTC) : une provenance qui contient construire-deb doit
+#   contenir preparer-deb, seule préparation dont la porte sait juger les deux fermetures du deb. Sans elle, fermeture_plateforme
+#   pourrait être satisfaite par une autre préparation. La voie image n'est pas appariée (construire-image et preparer-entrees) :
+#   hors périmètre de S4d2a, dette inscrite dans le README de la 06.
+# custom:
+#   short_name: preparation_appariee
+deny contains {"code": "porte.preparation_appariee", "msg": msg} if {
+	some task in lib.tasks_from_pipelinerun
+	some construction, preparation in _appariement
+	_tache(task, construction)
+	not _presente(preparation)
+	msg := sprintf("%s sans %s dans la même provenance", [construction, preparation])
+}
+
+_appariement := {"construire-deb": "preparer-deb"}
+
+_presente(nom) if {
+	some task in lib.tasks_from_pipelinerun
+	_tache(task, nom)
+}
