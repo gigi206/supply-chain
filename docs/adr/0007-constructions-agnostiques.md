@@ -72,3 +72,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 **Additif du 11/11/2026, 19:58 UTC : S4d1 mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4d-predictions.md)).
 - **Mesuré** : la fermeture deb est confrontée au verrou dans la plateforme (`preparer-deb`), qui consomme deux fermetures (deb et applicative) et un artefact de packaging, tous tirés par digest et déclarés à Chains. La construction ne prend ses dépendances que dans ces fermetures, sans réseau, et rend le même deb que l'hôte et OBS.
 - **Non mesuré** : la règle de porte à N fermetures (S4d2), le refus d'une archive altérée dans la plateforme (S5).
+
+**Additif du 11/11/2026, 20:24 UTC : S4d2a mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4d2-predictions.md)).
+- **Mesuré** : la porte de release juge une construction à plusieurs fermetures. Chaque fermeture est typée par le nom du résultat qui la déclare, et prouvée par la pipeline de prefetch de sa forme : `prefetch-deb` sans git pour le deb, `prefetch-gomod` avec le même dépôt Forgejo pour les sources. Chaque résultat attendu de la préparation est exigé.
+- **Conséquence pour la règle générique** : une nouvelle forme de fermeture demande une entrée dans `_attendues` et une branche de `_forme` dans `porte.rego`. Le nom des tâches reste écrit en dur.
+- **Non mesuré** : VSA et scan d'un deb (jalon séparé), le refus d'une archive altérée dans la plateforme (S5).

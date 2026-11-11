@@ -1267,3 +1267,34 @@ Avec eux, S4d2 dépasserait sa fourchette, sans approcher le seuil de la brique 
 - l'artefact de packaging, poussé depuis l'hôte, n'est pas jugé par la porte ;
 - la provenance de l'image de build `sbuild-debian13` non plus ;
 - la voie image n'est pas appariée (`construire-image` et `preparer-entrees`).
+
+## Additif du 11/11/2026, 20:24 UTC : S4d2a tenu
+
+**S4d2a tenu**, de la carte (20:03 UTC, sur « continue ») au troisième passage de `porte` (20:23:28 UTC). Les prédictions E1 à E11 sont tenues ([prédictions et résultats](resultats/s4d2-predictions.md)). **La porte de release juge désormais le deb** :
+- Kata est exigé pour `construire-deb` ;
+- les deux fermetures doivent être prouvées par leurs pipelines de la plateforme, chacune selon sa forme ;
+- `preparer-deb` est appariée à `construire-deb`.
+
+Sur `builds/sample-app-deb@sha256:039949f9…`, `ec` réussit, sans violation, avec les cinq règles du PoC parmi les succès et un horodatage complet. Le Job de la porte échoue, comme décidé : VSA et scan refusent le deb. L'image sample-app garde le verdict du 07/11.
+
+**Décisions et accords du jalon** :
+- « Oui, S4d2a » (20:08:42 UTC) ;
+- « Oui, lance-les » (`regle` et `reel`) ;
+- « Oui, relance-la » (`regle`, test corrigé) ;
+- trois fois « Oui, lance porte » ou « Oui, relance porte ». Le deuxième accord porte aussi sur le déploiement de la liste versionnée.
+
+**Écarts** :
+- **Un test sur 39** ne couvrait pas la correspondance par dépôt du bundle : la bibliothèque prend le nom de la tâche dans le label `tekton.dev/task`. Le test est corrigé, la règle n'a pas changé.
+- **La liste revue déployée** était celle du 03/11 (`b1e5ef4`) : les cinq tâches des briques 06 n'avaient jamais été déployées. La carte de 20:07 UTC décrivait un « succès à vide » de la porte. C'était vrai des règles `porte.*`, faux de la porte entière : `trusted_task` refusait déjà le deb (E8 révisée, puis mesurée).
+- **Deux défauts du script** : le contrôle de la liste, puis `diff` dans un tube. Les deux arrêts ont eu lieu avant toute écriture.
+- **Une erreur d'heure**, corrigée par une ligne datée.
+
+**Dette inscrite** :
+- l'artefact de packaging, poussé depuis l'hôte, n'est pas jugé par la porte ;
+- la provenance de l'image de build `sbuild-debian13` non plus ;
+- la voie image n'est pas appariée ;
+- le commentaire de `construire-deb` dans `taches.yml` de la 08 est devenu faux. Il est corrigé par une note datée, sans réécrire le fichier.
+
+**Durée** : environ 20 minutes de travail, de 20:03 à 20:24 UTC, au bas de la fourchette de S4d2 (0,5 à 1,5 jour). La brique reste à environ 0,4 pw.
+
+**Suite, selon le découpage décidé** : S4d3 (second trigger et second rattrapage), puis S5. Les contrôles 6 et 7 du deb passent dans un jalon séparé ; les questions 3 et 4 de la carte restent ouvertes.

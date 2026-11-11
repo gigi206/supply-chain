@@ -100,3 +100,38 @@ Il s'est arrêté juste après, sans message. Rien n'a été écrit : `porte.reg
 **Cause, dans le script** : la ligne qui affiche les ajouts faisait passer `diff` dans un tube. `diff` rend 1 quand les listes diffèrent ; avec `pipefail`, `set -e` arrête l'étape en silence. C'est un défaut de la correction de 20:21 UTC, que je n'avais vérifiée que pour la syntaxe.
 
 **Correction** : la sortie de `diff` est écrite dans un fichier, hors du tube, puis relue. Les prédictions ne changent pas.
+
+**Correction datée (11/11/2026, 20:24 UTC)** : la note titrée « 20:23 UTC » a en réalité été écrite à 20:22:30 UTC (heure lue par `date -u` juste avant le commit `4117099`).
+
+## Résultats de `porte` (troisième passage, 11/11/2026, 20:23:01 à 20:23:28 UTC, accord « Oui, relance porte »)
+
+[Journal](s4d2-porte-3.log). Contrôles préalables tenus : `porte.rego` en service est celui de `a7c7405`, la liste en service celle de `b1e5ef4`, cinq entrées ajoutées et aucune retirée.
+
+**E8 tenue, dans sa version révisée de 20:21 UTC.** Le deb jugé par la porte en service donne :
+- `ec` en échec, avec `trusted_task.trusted` comme seule violation et `trusted_task.tagged` en avertissement ;
+- horodatage complet ;
+- VSA refusée (0 retenue dans `builds/vsa/sample-app-deb`) et scan refusé (`scan.scan_present`).
+
+**La porte en service ne laissait donc pas passer le deb**, puisque ses tâches ne figuraient pas dans la liste déployée. Le succès à vide ne concernait que les règles `porte.*`.
+
+**E9 tenue** : la ConfigMap `porte` est mise à jour, et `porte.rego` comme `taches.yml` en service sont égaux aux fichiers versionnés (`f16c81ac…` et `cdac17f1…`).
+
+**E10 tenue.** Le deb jugé par la porte étendue (`VERDICT|s4d2-deb`) donne :
+- `ec` en succès, sans violation, avec `trusted_task.tagged` en avertissement ;
+- parmi les succès, `porte.construction_kata`, `porte.fermeture_plateforme`, `porte.image_signature`, `porte.preparation_appariee` et `porte.taches_vues` ;
+- horodatage complet : 4 enveloppes sur 4 couvertes ;
+- VSA et scan refusés.
+
+Le Job de la porte échoue donc, en échec fermé, comme décidé pour S4d2a. Les deux inconnues de E10 sont levées : le CronJob d'horodatage tourne, et Chains a signé l'image du deb. Aucune règle de `@slsa3` ne refuse un artefact dont la seule couche est un `.deb`.
+
+**E11 tenue** : sample-app jugée par la porte étendue (`VERDICT|s4d2-reelle`) donne le même verdict que `c7-reelle` :
+- succès, sans violation, `trusted_task.tagged` en avertissement ;
+- horodatage complet (28 enveloppes sur 28) ;
+- VSA retenue (1 sur 1) et scan admis (7 énoncés vérifiés).
+
+**Bilan de S4d2a : E1 à E11 tenues, E2 au second passage de `regle`, et E8 et E9 dans leur version révisée de 20:21 UTC.** Écarts :
+- un test ne couvrait pas la correspondance par bundle ; il a été corrigé ;
+- la liste déployée datait du 03/11, ce que la carte n'avait pas vu, d'où la révision de E8 et E9 avant mesure ;
+- deux défauts du script, tous deux arrêtés avant toute écriture.
+
+**Note datée sur un commentaire devenu faux** : dans `politique/porte/taches.yml` de la 08, le commentaire de `construire-deb` dit que la porte « ne connaît pas encore son nom » et qu'elle « sera étendue en S4d2 ». C'est faux depuis 20:23 UTC. Le fichier n'est pas réécrit : le modifier changerait la liste déployée.

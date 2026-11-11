@@ -1,0 +1,50 @@
+# s4d2.sh porte, 2026-11-11T20:23:01Z
+OK   porte.rego en service égal à celui du commit a7c7405 : 53b01702e899fddd36bf031a1f4b74c6ea1cefebca5752d149a14676475bf78c
+OK   taches.yml en service égal à celui du commit b1e5ef4 : 44e7fdb0b14c813a74bcbf6ac84ea23b61aa9db27907299bcb97ba65e62fbeb8
+entrées de la liste versionnée absentes de la liste en service :
+        - ref: sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+      oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb:
+        - ref: sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+      oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
+        - ref: sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+      oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-deb:
+        - ref: sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+      oci://sc-stockage.poc.test:5000/tekton/tasks/construire-deb:
+        - ref: sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+OK   entrées retirées par la liste versionnée : 0
+## deb, porte en service (prédictions révisées à 20:21 UTC : ec en échec par trusted_task, tâches du deb absentes de la liste en service ; VSA et scan refusés)
+VERDICT|s4d2-deb-avant|false|trusted_task.trusted|trusted_task.tagged|2|ok|4/4 enveloppe(s) couverte(s), 4 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb ; cosign : no matching attestations: 
+    vsa : VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: 
+    scan-verifier : LECTURE|0|sc-stockage.poc.test:5000/builds/scan/sample-app-deb|cosign : no matching attestations: 
+OK   deb avant : succès de ec : false
+OK   deb avant : violations : trusted_task.trusted
+OK   deb avant : VSA : refus
+OK   deb avant : scan : refus
+## ConfigMap porte mise à jour (porte.rego de S4d2a et liste versionnée)
+OK   porte.rego en service égal au fichier versionné : f16c81acc094b3f2fa8036baf3a734fef4ab6b7c3fd29129a4cac4e9480b8398
+OK   taches.yml en service égal au fichier versionné : cdac17f17549350b8dd01ef61cd16af062cc422851803d3a0a6306200196b920
+## deb, porte étendue (prédictions : ec en succès sans violation ; horodatage complet ; VSA et scan refusés)
+VERDICT|s4d2-deb|true||trusted_task.tagged|2|ok|4/4 enveloppe(s) couverte(s), 4 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb ; cosign : no matching attestations: 
+    horodatage : COUVERTE|signature 7c72a3dc051f8eae
+    horodatage : COUVERTE|signature e86a49476ed2a210
+    horodatage : COUVERTE|signature 31d2e1652060907f
+    horodatage : COUVERTE|signature 10f81cd1fa33cd55
+    horodatage : HORODATAGE|ok|4/4 enveloppe(s) couverte(s), 4 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles
+    vsa : VSA|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: 
+    scan-verifier : LECTURE|0|sc-stockage.poc.test:5000/builds/scan/sample-app-deb|cosign : no matching attestations: 
+    succès porte.* : porte.construction_kata,porte.fermeture_plateforme,porte.image_signature,porte.preparation_appariee,porte.taches_vues
+OK   deb : succès de ec : true
+OK   deb : violations : 
+OK   deb : avertissements : trusted_task.tagged
+OK   deb : horodatage : ok
+OK   deb : VSA : refus
+OK   deb : scan : refus
+OK   deb : règles du PoC parmi les succès : porte.construction_kata,porte.fermeture_plateforme,porte.image_signature,porte.preparation_appariee,porte.taches_vues
+## image sample-app, porte étendue (non-régression ; prédiction : verdict de c7-reelle, 07/11/2026)
+VERDICT|s4d2-reelle|true||trusted_task.tagged|2|ok|28/28 enveloppe(s) couverte(s), 67 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|7 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   sample-app : succès de ec : true
+OK   sample-app : violations : 
+OK   sample-app : avertissements : trusted_task.tagged
+OK   sample-app : horodatage : ok
+OK   sample-app : VSA : ok
+OK   sample-app : scan : ok
