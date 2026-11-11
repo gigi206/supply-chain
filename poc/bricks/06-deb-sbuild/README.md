@@ -1390,3 +1390,36 @@ Le premier passage montrait de faux écarts, dus à ma comparaison (documents mu
 
 Contrôles sur l'hôte : `bash -n` et `shellcheck` sans remarque. Je n'ai pas pu relire la règle de troncature des noms des TaskRuns : T9 est donc en confiance moyenne.
 
+## Additif du 11/11/2026, 21:05 UTC : S4d3 tenu
+
+**S4d3 tenu**, de la carte (« continue », 20:27:23 UTC) au bilan (21:04:32 UTC) : T1 à T14 ([prédictions et résultats](resultats/s4d3-predictions.md)).
+
+**Le deb de sample-app est branché sur les deux chemins de déclenchement de la plateforme** :
+- **Livraison du webhook de Forgejo** : l'EventListener `forgejo` sélectionne désormais par label le Trigger `sample-app-deb-push`, qui fait son propre contrôle du HMAC. Trois livraisons mal signées ont donné six refus et aucun PipelineRun.
+- **Rattrapage** : le CronJob `rattrapage-deb` utilise la même image et le même binaire que celui de l'image, sous son propre compte. Il ne peut lire que le gabarit `sample-app-deb`.
+- **Résultat** : par chacun des deux chemins, `sample-app-deb-6391fd43…` construit le deb `039949f9…`, avec la spec de S4d1 et `construire` sous Kata. Chains le signe.
+- **Porte** : elle juge la provenance la plus récente, sans violation ; l'horodatage couvre 8 enveloppes sur 8. VSA et scan refusent, comme décidé. sample-app est inchangé.
+
+**Décisions et accords du jalon** (lignes datées dans les commits) :
+- « Oui, les deux » (20:35:01 UTC) : la forme, et le relevé avant les prédictions ;
+- puis les lancements : « Oui, lance-les », « Oui, relance-les », « Oui, lance-les » (`retirer`, `prealables`, `deployer`), « Oui, lance-les » (`chemins`, `porte`).
+
+**Écarts** :
+- **Deux défauts de mes comparaisons** :
+  - deux défauts du serveur non retirés ;
+  - les ressources, retirées à tort.
+
+  Le second a caché le refus du CronJob par `limites-obligatoires` de la 08c : la 08c pose les limites de `rattrapage` par patch, et elles sont absentes de `rattrapage.yaml`.
+- **Correction** : les limites de `limites.tsv` sont ajoutées au CronJob du deb. Ensuite, `retirer` puis un nouveau déploiement.
+- Aucun arrêt n'a touché Zot.
+
+**Dette et limites inscrites** :
+- le trigger construit tout commit de main avec les fermetures et le packaging épinglés. Un commit qui change `go.mod` échoue dans `preparer-deb` (échec fermé), et `debian/` vient de l'artefact ;
+- rejouer isolément une étape de la 08 qui pousse des commits d'essai lance aussi le deb. Remèdes : `s4d3.sh retirer`, ou suspendre `rattrapage-deb` ;
+- deux constructions Kata simultanées sur sc-build ne sont pas mesurées ;
+- `durcissement.sh` de la 08c suspend `rattrapage` pendant ses redémarrages, mais pas `rattrapage-deb`.
+
+**Durée** : environ 40 minutes, de 20:27 à 21:05 UTC, sous l'estimation de S4d3 (environ 0,5 jour). La brique reste à environ 0,4 pw.
+
+**Suite, selon le découpage décidé** : S5 (archive altérée, hash faux, InRelease altéré). Les contrôles 6 et 7 du deb attendent leur jalon séparé ; les questions 3 et 4 de la carte de S4d2 restent ouvertes.
+

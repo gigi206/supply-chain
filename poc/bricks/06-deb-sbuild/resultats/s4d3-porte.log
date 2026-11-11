@@ -1,0 +1,18 @@
+# s4d3.sh porte, 2026-11-11T21:03:58Z
+OK   PipelineRuns en cours dans builds : 0
+passage d'horodatage horodatage-29907184
+OK   provenance de PipelineRun la plus récente de builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e (seule jugée) : 454728c5-59a8-45e1-b972-549d343aadac
+## deb (prédictions : ec en succès sans violation ; horodatage 8/8 ; VSA et scan refusés, Job en échec, comme décidé)
+VERDICT|s4d3-deb|true||trusted_task.tagged|2|ok|8/8 enveloppe(s) couverte(s), 8 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb ; cosign : no matching attestations: 
+OK   deb : succès de ec : true
+OK   deb : violations : 
+OK   deb : avertissements : trusted_task.tagged
+OK   deb : horodatage : ok|8/8
+OK   deb : VSA : refus
+OK   deb : scan : refus
+OK   deb : règles du PoC parmi les succès : porte.construction_kata,porte.fermeture_plateforme,porte.image_signature,porte.preparation_appariee,porte.taches_vues
+## image sample-app (non-régression ; prédiction : verdict de s4d2-reelle)
+VERDICT|s4d3-reelle|true||trusted_task.tagged|2|ok|28/28 enveloppe(s) couverte(s), 67 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|7 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   sample-app : succès, violations, avertissements : true||trusted_task.tagged
+OK   sample-app : horodatage : ok|28/28
+OK   sample-app : VSA, scan : ok|ok

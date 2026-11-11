@@ -113,3 +113,33 @@ C'est la leçon de S4d2a sous une autre forme. Un état déployé peut venir d'u
 
 Le journal du deuxième passage de `prealables` (20:44:19 UTC) a été écrasé par le troisième. Je l'ai restauré depuis le commit `c4be8f4` sous son nom, `s4d3-prealables.log` ; le troisième passage est archivé dans `s4d3-prealables-3.log`.
 
+**`chemins`** (accord « Oui, lance-les » ; de 20:48:58 à 21:03:48 UTC ; [`s4d3-chemins.log`](s4d3-chemins.log)) : **T8 à T12 tenues**.
+- **T8, chemin 1** : la livraison de Forgejo répond HTTP 204. `sample-app-deb-6391fd43…` est créé à 20:49:00 UTC, une seule fois, par `declencheurs:el-forgejo`, et réussit. Sa spec est celle de `s4d-deb-1`. `construire` tourne sous Kata sur sc-build. Il produit `IMAGE_DIGEST` `039949f9…`, et Chains signe les trois TaskRuns et le PipelineRun. Le trigger de l'image répond « already exists » pour `sample-app-6391fd43…`.
+- **T9, noms raccourcis** : `publier` garde son nom complet (63 caractères). Ceux de `preparer` et de `construire` sont ramenés à 63 caractères par Tekton, et sont les mêmes aux deux chemins.
+- **T10, chemin 2** : un seul CREE, au premier passage après la reprise (`rattrapage-deb-29907176`). Le PipelineRun est créé à 20:56:35 UTC par `declencheurs:rattrapage-deb`, avec le label du rattrapage. Les mesures sont celles du chemin 1 ; la spec est identique, l'UID différent. Le rattrapage de l'image répond PRESENT.
+- **T11, rejeu** : deux « already exists », un par trigger, et l'UID ne change pas.
+- **T12, enveloppes** : 4 → 8 sur le deb, 28 → 28 sur `sample-app`.
+
+**`porte`** (de 21:03:58 à 21:04:32 UTC ; [`s4d3-porte.log`](s4d3-porte.log)) : **T13 et T14 tenues**.
+- **T13, deb** : la provenance jugée est celle du chemin 2 (`454728c5…`). `ec` réussit sans violation, avec `trusted_task.tagged` en avertissement. L'horodatage couvre 8 enveloppes sur 8, et les cinq règles `porte.*` réussissent. VSA et scan refusent, comme décidé.
+- **T14, sample-app** : `true`, aucune violation, horodatage 28/28, VSA et scan admis : le même verdict qu'en S4d2a.
+
+## Bilan
+
+**S4d3 est tenu : T1 à T14.** Le deb de sample-app est branché sur les deux chemins de déclenchement de la plateforme :
+- la livraison du webhook de Forgejo, qui passe par l'EventListener et un Trigger sélectionné par label, avec son propre contrôle du HMAC ;
+- le rattrapage par un CronJob, avec la même image et le même binaire que celui de l'image.
+
+Par les deux chemins, la plateforme construit le même deb (`039949f9…`) avec la même spec que S4d1. Chains signe chaque construction, et la porte juge la plus récente.
+
+**Écarts** : deux arrêts, dus à mes comparaisons. Aucun n'a touché Zot.
+- `prealables` s'est arrêté sur deux défauts du serveur que ma comparaison gardait.
+- `deployer` a été refusé par Kyverno à mi-déploiement, parce que ma comparaison retirait les ressources. Je l'ai réparé avec `retirer`.
+
+La leçon est notée : un objet copié se compare à l'objet en service, et on ne retire un champ d'une comparaison qu'en sachant qui le pose.
+
+**Hors de S4d3** :
+- deux constructions Kata simultanées après un vrai push ;
+- les contrôles 6 et 7 du deb ;
+- S5.
+

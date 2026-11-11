@@ -77,3 +77,12 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Mesuré** : la porte de release juge une construction à plusieurs fermetures. Chaque fermeture est typée par le nom du résultat qui la déclare, et prouvée par la pipeline de prefetch de sa forme : `prefetch-deb` sans git pour le deb, `prefetch-gomod` avec le même dépôt Forgejo pour les sources. Chaque résultat attendu de la préparation est exigé.
 - **Conséquence pour la règle générique** : une nouvelle forme de fermeture demande une entrée dans `_attendues` et une branche de `_forme` dans `porte.rego`. Le nom des tâches reste écrit en dur.
 - **Non mesuré** : VSA et scan d'un deb (jalon séparé), le refus d'une archive altérée dans la plateforme (S5).
+
+**Additif du 11/11/2026, 21:05 UTC : S4d3 mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4d3-predictions.md)).
+- **Mesuré** : une seconde forme de construction s'ajoute aux déclencheurs sans toucher à ceux de la première, ni au code du rattrapage.
+  - Un Trigger est sélectionné par label, avec ses propres intercepteurs.
+  - Un gabarit est créé, avec les seuls paramètres `commit` et `depot`.
+  - Un CronJob reprend le binaire du rattrapage, sous son propre compte.
+- **Conséquence pour la règle générique** : chaque nouvelle forme apporte son gabarit, son Trigger et son CronJob. L'EventListener et `main.go` restent communs. Le CronJob doit reprendre les correctifs que la 08c pose par patch : les limites en sont un.
+- **Non mesuré** : deux constructions simultanées d'un même push, VSA et scan d'un deb (jalon séparé), et le refus d'une archive altérée dans la plateforme (S5).
+
