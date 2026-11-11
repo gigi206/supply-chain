@@ -67,3 +67,22 @@ C5 à C7 attendent l'étape `publier`, sur accord nommé.
 - **Heure fausse dans l'en-tête** : « vers 16:45 UTC » est faux. Les prédictions ont été écrites entre la décision (16:19:27 UTC) et leur commit `defdd02` (16:25:24 UTC, `git log -1 --format=%cI`). L'étape `verrou` a commencé ensuite, à 16:25:30 UTC. L'ordre « prédictions commitées, puis exécution » est donc respecté.
 - **Droits de `poc-ecriture`**, lus dans `poc/bricks/08-trust-plane/stockage/zot.json` (configuration du dépôt, pas celle relue sur la VM) : `read`, `create` et `update` sur `**`. Le dépôt `entrees/sample-app/packaging-deb` est donc couvert, sans droit de suppression.
 - **Correction pour S4b** : l'en-tête de `s4c.sh` dit que `prefetch-deb` « lira » le verrou. Ce n'est pas vrai en l'état. La tâche reçoit sa liste en paramètre de la pipeline signée (`@LISTE@` dans `builder-sbuild.yaml`), et sa sortie (`prefetch-deb-sortie`) n'autorise que le DNS et le port 80 public : elle ne peut pas lire Zot. La carte de S4b devra dire comment le verrou arrive jusqu'à la tâche, et comment la provenance garde le digest de l'artefact. Le contenu de l'artefact de S4c n'en dépend pas.
+
+## Résultats de l'étape `publier` (11/11/2026, 16:27:54 UTC, accord « Oui, lance publier »)
+
+Journal : [`s4c-publier.log`](s4c-publier.log). Écriture définitive dans Zot, compte `poc-ecriture`. La copie locale des secrets (`auth/`) a été effacée en fin d'étape (contrôlé : répertoire absent).
+
+| N° | Résultat |
+|---|---|
+| C5 | **Tenue.** Deux poussées vers `entrees/sample-app/packaging-deb:s4c`, même digest, égal au digest local : `sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51` |
+| C6 | **Tenue.** Les 6 fichiers tirés par digest dans un répertoire vide sont égaux, par sha256, à ceux du dépôt |
+| C7 | **Tenue.** `debian/rules` est tiré en 644 (775 dans la copie de travail, 755 dans git) : oras ne garde pas le bit d'exécution. S4d devra le rétablir, ou appeler `make -f debian/rules` |
+
+**Référence pour la suite** : `sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51`.
+
+**Bilan de S4c** : C1 à C7 tenues, sans réserve. L'artefact de packaging du deb est dans Zot, figé par digest, avec `debian/` inchangé et le verrou de 162 paquets.
+
+**Limites** : le transport du verrou jusqu'à `prefetch-deb` reste à concevoir en S4b (note de 16:28 UTC). La porte ne juge pas cet artefact.
+
+**Correction d'heure** : la note titrée « 16:28 UTC » a été commitée à 16:27:27 UTC (`43fa5db`), avant l'étape `publier`.
+

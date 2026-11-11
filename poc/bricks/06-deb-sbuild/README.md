@@ -1049,3 +1049,23 @@ Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucun
 - **Côté plateforme**, une tâche de prefetch doit produire la fermeture npm : nouvelle signature, revue de `taches.yml`, et porte à adapter si la fermeture change de tâche (nom écrit en dur, `porte.rego`, lignes 69 à 74).
 
 **Questions ouvertes** : la carte de S4c, à préparer à sec ; le push de `dd99196`.
+
+## Additif du 11/11/2026, 16:30 UTC : S4c tenu
+
+**Ce qui est publié** : l'artefact de packaging du deb, `entrees/sample-app/packaging-deb@sha256:c1719b13…`. Il contient `poc/packaging/debian/` inchangé et le verrou [`poc/packaging/verrou-deb.txt`](../../packaging/verrou-deb.txt) : 162 paquets, au format de `builder/paquets.txt`. Détail : [prédictions et résultats](resultats/s4c-predictions.md).
+
+**Ce qui s'est passé**
+- **Choix validés par le conseiller** : `debian/rules` reste en mode vendor ; la configuration d'Hermeto et le choix de la tâche npm passent en S4b.
+- **Prédictions** commitées à 16:25:24 UTC (`defdd02`).
+- **Étape `verrou`** (16:25:30 UTC, hôte seul, sans accord) : C1 à C4 tenues. Le verrou est tiré des `Installed-Build-Depends` de S2, rapprochés du `Packages` contrôlé par l'InRelease `0584fba3…`. Il est égal à la fermeture de S2.
+- **Étape `publier`** (16:27:54 UTC, accord « Oui, lance publier ») : C5 à C7 tenues. Le même digest est obtenu en local et dans Zot, et les fichiers tirés par digest sont égaux à ceux du dépôt.
+
+**Ce qu'il faudra traiter ensuite**
+- `debian/rules` perd son bit d'exécution par oras : à rétablir en S4d.
+- `prefetch-deb` reçoit sa liste en paramètre et ne peut pas lire Zot. Le transport du verrou, et la trace de son digest dans la provenance, sont à concevoir dans la carte de S4b.
+- Corrections faites par notes datées : l'heure de l'en-tête des prédictions, et le tableau présenté avant la décision.
+
+**Effort** : de 16:19 à 16:30 UTC, deux accords (la décision et `publier`).
+
+**Suite, selon l'ordre décidé** : S4b (`prefetch-deb` pour la fermeture deb, et la fermeture npm par la plateforme), à préparer à sec.
+

@@ -1,0 +1,6 @@
+# s4c.sh publier, 2026-11-11T16:27:54Z
+OK   C5 deux poussées dans Zot, même digest : sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   C5 digest Zot égal au digest local : sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   C6 fichiers tirés par digest égaux au dépôt : 0ca347a6a9371166dd83978c74eef0386e6f42d2f7446be82d253ad406d5a983
+C7 mode de debian/rules tiré : 644 (dans le dépôt : 775)
+PACKAGING_DEB=sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
