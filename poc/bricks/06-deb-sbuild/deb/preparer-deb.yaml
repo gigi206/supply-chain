@@ -19,6 +19,8 @@
 # Corrigé le 11/11/2026 après le premier PipelineRun (s4d-deb-1, 19:28 UTC : « could not create work tree dir '/tmp/depot':
 # Permission denied ») : /tmp de l'image de prefetch appartient à root en 0755 (lu dans sa couche ; 1777 dans l'image d'outils).
 # Un emptyDir est monté sur /tmp pour toutes les étapes, comme dans prefetch-gomod.
+# Corrigé le 11/11/2026 après le second PipelineRun (19:32 UTC : « cp: can't stat '…/entrees/deps/gomod/pkg/mod' ») : la fermeture
+# applicative porte déjà deps/ à sa racine ; elle est tirée sous entrees/sources, et lue sous sources/deps/.
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -125,9 +127,9 @@ spec:
       export HOME=/tmp
       e=$(workspaces.sortie.path)/entrees
       oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/fermeture" "$FERMETURE_DEB" > /dev/null
-      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/deps" "$FERMETURE_SOURCES" > /dev/null
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/sources" "$FERMETURE_SOURCES" > /dev/null
       oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/packaging" "$PACKAGING" > /dev/null
-      echo "fermeture deb : $(find "$e/fermeture" -type f | wc -l) fichiers ; fermeture applicative : $(find "$e/deps" -type f | wc -l) fichiers ; packaging : $(find "$e/packaging" -type f | wc -l) fichiers"
+      echo "fermeture deb : $(find "$e/fermeture" -type f | wc -l) fichiers ; fermeture applicative : $(find "$e/sources" -type f | wc -l) fichiers ; packaging : $(find "$e/packaging" -type f | wc -l) fichiers"
       # Confrontation de la fermeture deb au verrou (colonnes 4 à 6 : sha256, taille, chemin sous miroir/)
       v=$e/packaging/verrou-deb.txt
       [ -s "$v" ] || { echo "verrou absent de l'artefact de packaging" >&2; exit 1; }
@@ -157,11 +159,11 @@ spec:
       e=$(workspaces.sortie.path)/entrees
       export HOME=/tmp GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod GOMODCACHE=/tmp/gomod GOCACHE=/tmp/gocache CGO_ENABLED=0
       # vendor/ : cache de modules copié hors du workspace (go y extrait les modules en lecture seule)
-      cp -r "$e/deps/gomod/pkg/mod" /tmp/gomod
+      cp -r "$e/sources/deps/gomod/pkg/mod" /tmp/gomod
       (cd "$e/src" && go mod vendor && go mod verify)
       echo "$(go version) : vendor/ reconstitué, $(find "$e/src/vendor" -type f | wc -l) fichiers"
       # marked : integrity du lockfile, puis extraction (premier composant retiré, comme tar --strip-components=1)
-      python3 -I - "$e/src/web/package-lock.json" "$e/deps/npm" "$e/src/web/node_modules/marked" <<'FIN'
+      python3 -I - "$e/src/web/package-lock.json" "$e/sources/deps/npm" "$e/src/web/node_modules/marked" <<'FIN'
       import base64, hashlib, json, os, sys, tarfile
       lock, npm, dst = sys.argv[1:]
       p = json.load(open(lock, encoding='utf-8'))['packages']['node_modules/marked']
@@ -188,5 +190,5 @@ spec:
       cp "$e/packaging/verrou-deb.txt" "$e/verrou-deb.txt"
       find "$e/debian" -type f -exec chmod 0644 {} \;
       chmod 0755 "$e/debian/rules"
-      rm -rf "$e/deps" "$e/packaging"
+      rm -rf "$e/sources" "$e/packaging"
       echo "entrées prêtes : src ($(find "$e/src" -type f | wc -l) fichiers), debian ($(find "$e/debian" -type f | wc -l) fichiers), fermeture deb, verrou"

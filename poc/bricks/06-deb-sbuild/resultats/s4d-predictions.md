@@ -149,3 +149,21 @@ Prédictions ajoutées pour `busybox_outils` :
 - **Leçon, avec le premier échec** : les deux défauts viennent du même écart. `prealables` imite l'environnement de la tâche (`/tmp` de l'hôte, copies `cp`) au lieu de l'exécuter, et le pod d'essai ne visait que `construire-deb`.
 - **Bundles désormais inutilisables dans Zot**, sans droit de suppression : `tekton/tasks/preparer-deb@5f0ca26b`, `tekton/pipelines/sample-app-deb@83455f46` et `@c43988a8`. Avec `b310c262`, cela fait quatre.
 
+## Note datée du 11/11/2026, 19:45 UTC : correction de preparer-deb et pod d'essai de la préparation, à sec
+
+Avis du conseiller après le second échec : une troisième simulation sur l'hôte ne refermerait pas l'écart, le pod d'essai (levier e) doit couvrir aussi `preparer-deb` avant la troisième signature. Rien n'a été lancé depuis le second échec.
+
+- **Correction de `preparer-deb`** : la fermeture applicative est tirée sous `entrees/sources` (racine de l'artefact) et lue sous `sources/deps/`. Dans `prealables`, chaque copie de l'hôte est désormais la racine d'un `oras pull`. `prealables` est rejouée à 19:44 UTC environ (code 0) ; les entrées obtenues sont inchangées en contenu. Le sha256 d'`entrees.tar` change (`c2dcc982…`), car l'archive porte les dates des fichiers recréés.
+- **Écriture en UID 1000 sous Tekton**, lue sans exécution dans la spec du pod `s4d-deb-1-preparer-pod` et dans le source de Tekton v1.15.5 :
+  - tous les volumes `tekton-internal-*` sont des emptyDir (`/tekton/run/<i>`, `/tekton/results`, `/tekton/home`), sauf `downward` ;
+  - les scripts sont créés par `touch` puis `chmod +x` ;
+  - `entrypoint` est copié en mode `0311` (`cmd/entrypoint/subcommands/cp.go`) : exécutable par tout UID, sans droit de lecture, ce qui suffit pour un binaire Go statique.
+  `construire-deb` n'a donc pas à changer. C'est une déduction ; D12 la mesurera.
+- **Étape ajoutée, `essai_preparer`** : un pod runc restreint, avec le label `tekton.dev/task: preparer-deb`. Les trois étapes y sont des initContainers, avec leurs images, leurs scripts rendus et les montages de la tâche (`ca-poc`, emptyDir sur `/tmp`). Le pod fait un vrai clone de Forgejo et de vrais pulls dans Zot, aux digests de la pipeline. Rien n'est écrit dans Zot.
+
+| N° | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| D17 | essai_preparer | Le pod est admis et ses trois étapes finissent en code 0. Les résultats sont `CHAINS-GIT_URL` et `CHAINS-GIT_COMMIT` du dépôt et du commit, et les trois `*_ARTIFACT_INPUTS` aux digests fixés. L'arbre `entrees/` est égal, en contenu, modes et types, à celui de `prealables`. L'essai de `construire-deb` (deb `0b489d43`) vaut donc pour la préparation réelle | moyenne : premier pod nu à initContainers et ConfigMap dans `builds` ; `/tmp` et `sources/` corrigés |
+
+**Suite, si D17 est tenue** : `SIGNER=1 taches` (troisième version de `preparer-deb`), revue de `taches.yml`, puis `taches` et `pipeline`.
+

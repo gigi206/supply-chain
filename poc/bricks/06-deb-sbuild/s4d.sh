@@ -9,6 +9,10 @@
 #               (confrontation au verrou, avec cas altérés ; assemblage sous unshare -rn) et arbre obtenu comparé à l'archive de
 #               sources.sh ; sections de construire-deb jouées sur l'hôte : paquet source comparé à celui de sources.sh, layout
 #               écrit avec le deb de S3 (0b489d43), d'où le digest attendu de l'artefact ; entrees.tar pour le pod d'essai
+#   essai_preparer cluster (levier e étendu, ajouté le 11/11/2026 après deux PipelineRuns en échec dans preparer-deb) : pod runc
+#               restreint, label tekton.dev/task preparer-deb ; les trois étapes de preparer-deb en initContainers, avec leurs images,
+#               leurs scripts rendus et les montages de la tâche ; vrai clone de Forgejo et vrais pulls dans Zot ; résultats lus ;
+#               arbre entrees/ comparé à celui de prealables (contenu, modes, types) ; pod supprimé
 #   busybox_outils lecture dans Zot : image d'outils tirée par digest ; confrontation rejouée sous son busybox, avec deux cas
 #               altérés
 #   reseau      cluster : NetworkPolicy construction-deb-sans-sortie ; invariants (une seule politique sélectionne construire-deb,
@@ -110,11 +114,13 @@ script_etape() { # fichier-rendu nom-d'étape : script de l'étape
   yq ".spec.steps[] | select(.name == \"$2\") | .script" "$1"
 }
 
-entrees_hote() { # répertoire entrees : comme les tirerait l'étape entrees (copies par digest de S4b), avant assemblage
+entrees_hote() { # répertoire entrees : comme les tirerait l'étape entrees (copies par digest de S4b), avant assemblage. Chaque copie est
+  # la racine d'un oras pull, jamais l'un de ses sous-dossiers (corrigé le 11/11/2026 après le second PipelineRun : la copie de
+  # sources/deps masquait le deps/ de la racine de la fermeture applicative)
   mkdir -p "$1/src"
   git -C "$repo" archive HEAD:poc/sample-app | tar -x -C "$1/src"
   cp -a "$S4B/comparaison/deb" "$1/fermeture"
-  cp -a "$S4B/comparaison/sources/deps" "$1/deps"
+  cp -a "$S4B/comparaison/sources" "$1/sources"
   cp -a "$S4B/packaging" "$1/packaging"
 }
 bb_liens() { # busybox répertoire : un lien par applet vers ce busybox (PATH sans aucun outil de l'hôte)
@@ -181,7 +187,7 @@ etape_prealables() {
   sed -e "s#\$(workspaces.sortie.path)#$x/ws#g" -e "s#/tmp/#$x/tmp/#g" "$x/preparer-assemblage.sh" > "$x/assemblage.sh"
   attendu "assemblage : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/assemblage.sh" || true)" 0
   unshare -rn env -i HOME="$x/tmp" PATH="$GO:$(dirname "$(command -v python3)"):/usr/bin:/bin" sh "$x/assemblage.sh" 2>&1 | sed 's/^/     /'
-  [ -d "$e/debian" ] && [ ! -e "$e/deps" ] || { echo "KO   assemblage incomplet" >&2; exit 1; }
+  [ -d "$e/debian" ] && [ ! -e "$e/sources" ] && [ ! -e "$e/packaging" ] || { echo "KO   assemblage incomplet" >&2; exit 1; }
   rm -rf "$x/arch"; mkdir -p "$x/arch"; tar -xzf "$PKG/sample-app-1.0.0.tar.gz" -C "$x/arch"
   attendu "archive de sources.sh (S1 à S3)" "$(sha256sum < "$PKG/sample-app-1.0.0.tar.gz" | cut -c1-64)" 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
   attendu "entrees/src égal à l'arbre de l'archive (contenu)" "$(diff -r "$x/arch/sample-app-1.0.0" "$e/src" > "$x/src.diff" && echo égal || echo différent)" égal
@@ -375,6 +381,77 @@ etape_essai() {
   mesure "digest de l'artefact" "$d" "$(cat "$T/digest-attendu")"
   echo "écarts : $ECARTS"
   [ "$ECARTS" = 0 ]
+}
+
+liste_arbre() { # (sur l'entrée : rien) dans le répertoire courant : empreinte de chaque fichier, puis mode, type et chemin de chaque
+  # objet ; mêmes commandes dans le pod (busybox) et sur l'hôte (GNU)
+  echo 'find . -type f | xargs sha256sum | sort -k2; find . | xargs stat -c "%a %F %n" | sort -k3'
+}
+
+etape_essai_preparer() {
+  local p=s4d-essai-preparer x=$T/essai-preparer a c r
+  [ -d "$T/essais/ws/entrees" ] || { echo "KO   lancer d'abord prealables" >&2; exit 1; }
+  rm -rf "$x"; mkdir -p "$x"
+  rendre_taches
+  for a in sources entrees assemblage; do
+    script_etape "$T/preparer-deb.yaml" "$a" | sed -e 's#\$(workspaces.sortie.path)#/workspace/sortie#g' \
+      -e 's#\$(results\.\([A-Z_-]*\)\.path)#/resultats/\1#g' > "$x/$a.sh"
+    attendu "script $a : variables Tekton restantes" "$(grep -c '\$(\(params\|workspaces\|results\)\.' "$x/$a.sh" || true)" 0
+  done
+  attendu "images des étapes (gabarit rendu)" "$(yq '[.spec.steps[].image] | join(" ")' "$T/preparer-deb.yaml")" "$PREFETCH_IMAGE $OUTILS_IMAGE $PREFETCH_IMAGE"
+  # Pod : contexte et montages de preparer-deb (stepTemplate, volumes) ; un initContainer par étape, script passé à l'interpréteur
+  # de son shebang ; conteneur final : liste de l'arbre et résultats, dans son journal
+  jq -n --arg n "$p" --arg pi "$PREFETCH_IMAGE" --arg oi "$OUTILS_IMAGE" --arg depot "$DEPOT_GIT" --arg commit "$COMMIT" \
+    --arg fd "$FERMETURE_DEB" --arg fs "$FERMETURE_SOURCES" --arg pk "$PACKAGING" \
+    --rawfile s1 "$x/sources.sh" --rawfile s2 "$x/entrees.sh" --rawfile s3 "$x/assemblage.sh" --arg liste "$(liste_arbre)" '
+    {runAsUser: 65532, runAsNonRoot: true, allowPrivilegeEscalation: false, capabilities: {drop: ["ALL"]}} as $sc
+    | [{name: "ca-poc", mountPath: "/etc/ca-poc", readOnly: true}, {name: "tmp", mountPath: "/tmp"},
+       {name: "sortie", mountPath: "/workspace/sortie"}, {name: "resultats", mountPath: "/resultats"}] as $vm
+    | {requests: {cpu: "100m", memory: "128Mi"}, limits: {cpu: "1", memory: "1Gi"}} as $res
+    | {apiVersion: "v1", kind: "Pod", metadata: {name: $n, namespace: "builds", labels: {"tekton.dev/task": "preparer-deb"}},
+      spec: {restartPolicy: "Never", serviceAccountName: "build", automountServiceAccountToken: false, nodeSelector: {zone: "build"},
+        tolerations: [{key: "zone", operator: "Equal", value: "build", effect: "NoSchedule"}],
+        securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: "RuntimeDefault"}},
+        volumes: [{name: "ca-poc", configMap: {name: "ca-poc"}}, {name: "tmp", emptyDir: {}}, {name: "sortie", emptyDir: {}}, {name: "resultats", emptyDir: {}}],
+        initContainers: [
+          {name: "sources", image: $pi, command: ["/bin/sh", "-c", $s1], env: [{name: "DEPOT", value: $depot}, {name: "COMMIT", value: $commit}],
+            securityContext: $sc, volumeMounts: $vm, resources: $res},
+          {name: "entrees", image: $oi, command: ["/busybox/sh", "-c", $s2],
+            env: [{name: "FERMETURE_DEB", value: $fd}, {name: "FERMETURE_SOURCES", value: $fs}, {name: "PACKAGING", value: $pk}],
+            securityContext: $sc, volumeMounts: $vm, resources: $res},
+          {name: "assemblage", image: $pi, command: ["/bin/sh", "-c", $s3], securityContext: $sc, volumeMounts: $vm, resources: $res}],
+        containers: [{name: "liste", image: $oi, securityContext: $sc, volumeMounts: $vm, resources: $res,
+          command: ["/busybox/sh", "-c", ("set -eu; for f in /resultats/*; do echo \"résultat ${f##*/} : $(cat \"$f\")\"; done; cd /workspace/sortie/entrees; echo ----- liste -----; " + $liste + "; echo ----- fin de la liste -----")]}]}}' > "$x/pod.json"
+  trap 'kubectl delete pod -n builds s4d-essai-preparer --ignore-not-found --wait=false < /dev/null > /dev/null 2>&1 || true' EXIT
+  kubectl delete pod -n builds "$p" --ignore-not-found --wait=true < /dev/null > /dev/null
+  kubectl create -f "$x/pod.json" < /dev/null > /dev/null
+  echo "pod $p créé à $(date -u +%H:%M:%S)"
+  r=""
+  for _ in $(seq 300); do
+    r=$(kubectl get pod -n builds "$p" -o jsonpath='{.status.phase}' < /dev/null)
+    case $r in Succeeded|Failed) break ;; esac; sleep 2
+  done
+  echo "pod $p : $r à $(date -u +%H:%M:%S), sur $(kubectl get pod -n builds "$p" -o jsonpath='{.spec.nodeName}, runtimeClassName « {.spec.runtimeClassName} »' < /dev/null)"
+  for c in sources entrees assemblage liste; do
+    kubectl logs -n builds "$p" -c "$c" < /dev/null 2>&1 | grep -viE 'jeton|token' > "$x/$c.log" || true
+    echo "### $c (code $(kubectl get pod -n builds "$p" -o json < /dev/null | jq -r --arg c "$c" '[.status.initContainerStatuses[]?, .status.containerStatuses[]?] | map(select(.name == $c)) | .[0].state.terminated.exitCode // "-"'))"
+    if [ "$c" = liste ]; then grep -v -e '^-----' -e '^[0-9a-f]\{64\} ' -e '^[0-7]\{3,4\} ' "$x/$c.log" | sed 's/^/     /' || true
+    else sed 's/^/     /' "$x/$c.log" | tail -n 12; fi
+  done
+  cat "$x"/{sources,entrees,assemblage,liste}.log > "$R/s4d-essai-preparer-pod.log"
+  kubectl delete pod -n builds "$p" --wait=false < /dev/null > /dev/null; echo "pod $p supprimé"
+  attendu "pod d'essai de preparer-deb" "$r" Succeeded
+  attendu "résultat CHAINS-GIT_URL" "$(sed -n 's/^résultat CHAINS-GIT_URL : //p' "$x/liste.log")" "$DEPOT_GIT"
+  attendu "résultat CHAINS-GIT_COMMIT" "$(sed -n 's/^résultat CHAINS-GIT_COMMIT : //p' "$x/liste.log")" "$COMMIT"
+  for a in "FERMETURE_DEB $FERMETURE_DEB" "FERMETURE_SOURCES $FERMETURE_SOURCES" "PACKAGING $PACKAGING"; do
+    set -- $a
+    attendu "résultat $1_ARTIFACT_INPUTS" "$(sed -n "s/^résultat $1_ARTIFACT_INPUTS : //p" "$x/liste.log")" "{\"uri\":\"oci://${2%@*}\",\"digest\":\"${2#*@}\"}"
+  done
+  sed -n '/^----- liste -----$/,/^----- fin de la liste -----$/p' "$x/liste.log" | sed '1d;$d' > "$x/arbre-pod.txt"
+  (cd "$T/essais/ws/entrees" && sh -c "$(liste_arbre)") > "$x/arbre-hote.txt"
+  echo "arbre entrees/ : $(grep -c '^[0-9a-f]\{64\} ' "$x/arbre-pod.txt") fichiers dans le pod, $(grep -c '^[0-9a-f]\{64\} ' "$x/arbre-hote.txt") dans prealables"
+  diff "$x/arbre-hote.txt" "$x/arbre-pod.txt" | head -n 20 | sed 's/^/     /' || true
+  attendu "arbre entrees/ du pod égal à celui de prealables (contenu, modes, types)" "$(cmp -s "$x/arbre-hote.txt" "$x/arbre-pod.txt" && echo égal || echo différent)" égal
 }
 
 signer_tache() { # nom : signature versionnée dans deb/, bundle (tag s4d), liste revue de la 08 (comme s4b.sh)
