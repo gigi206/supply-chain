@@ -1,0 +1,11 @@
+# s4d.sh taches, 2026-11-11T19:25:33Z
+## tâches (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+SIGNER : nouvelle signature dans deb/preparer-deb.signee.yaml
+OK   preparer-deb : signature versionnée conforme au gabarit rendu, signature exceptée
+SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/preparer-deb@sha256:b310c262a6a730824d7df6314a52a74fbd600d468709ea7bd1f7a3a50ab6540d
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+SIGNER : nouvelle signature dans deb/construire-deb.signee.yaml
+OK   construire-deb : signature versionnée conforme au gabarit rendu, signature exceptée
+SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+SIGNER : pipeline non signée tant que la liste revue n'a pas été acceptée

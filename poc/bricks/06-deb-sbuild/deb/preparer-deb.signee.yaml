@@ -1,0 +1,174 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCID/+q7VWAhIw8tbggdnoRfKML1xt4usJdWWpuMgdseACAiEAsov/Jh5zbtcIRowXvb5RucDuFFvv6IJ5kd6Z742i2jI=
+  name: preparer-deb
+spec:
+  params:
+  - name: depot
+    type: string
+  - name: commit
+    type: string
+  - name: fermeture-deb
+    type: string
+  - name: fermeture-sources
+    type: string
+  - name: packaging
+    type: string
+  results:
+  - name: CHAINS-GIT_URL
+    type: string
+  - name: CHAINS-GIT_COMMIT
+    type: string
+  - name: FERMETURE_DEB_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: FERMETURE_SOURCES_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  - name: PACKAGING_ARTIFACT_INPUTS
+    properties:
+      digest:
+        type: string
+      uri:
+        type: string
+    type: object
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    - name: COMMIT
+      value: $(params.commit)
+    image: sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+    name: sources
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      case $COMMIT in *[!0-9a-f]*) echo "commit invalide : $COMMIT" >&2; exit 1 ;; esac
+      [ ${#COMMIT} = 40 ] || { echo "commit invalide : $COMMIT" >&2; exit 1; }
+      case $DEPOT in https://sc-stockage.poc.test:3000/*.git) ;; *) echo "dépôt hors de Forgejo : $DEPOT" >&2; exit 1 ;; esac
+      e=$(workspaces.sortie.path)/entrees
+      [ ! -e "$e" ] || { echo "workspace déjà rempli : $e" >&2; exit 1; }
+      export HOME=/tmp GIT_CONFIG_NOSYSTEM=1 GIT_SSL_CAINFO=/etc/ca-poc/ca.crt GIT_TERMINAL_PROMPT=0
+      git clone --quiet --no-checkout "$DEPOT" /tmp/depot
+      git -C /tmp/depot checkout --quiet --detach "$COMMIT"
+      [ "$(git -C /tmp/depot rev-parse HEAD)" = "$COMMIT" ] || { echo "HEAD différent du commit demandé" >&2; exit 1; }
+      echo "$(git --version) ; commit $COMMIT, arbre $(git -C /tmp/depot rev-parse 'HEAD^{tree}')"
+      mkdir -p "$e/src"
+      git -C /tmp/depot archive --format=tar HEAD | tar -xf - -C "$e/src"
+      printf '%s' "$DEPOT" > $(results.CHAINS-GIT_URL.path)
+      printf '%s' "$COMMIT" > $(results.CHAINS-GIT_COMMIT.path)
+  - env:
+    - name: FERMETURE_DEB
+      value: $(params.fermeture-deb)
+    - name: FERMETURE_SOURCES
+      value: $(params.fermeture-sources)
+    - name: PACKAGING
+      value: $(params.packaging)
+    image: sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+    name: entrees
+    resources: {}
+    script: |
+      #!/busybox/sh
+      set -eu
+      for r in "$FERMETURE_DEB" "$FERMETURE_SOURCES" "$PACKAGING"; do
+        case $r in sc-stockage.poc.test:5000/*@sha256:*) ;; *) echo "référence hors de Zot ou sans digest : $r" >&2; exit 1 ;; esac
+      done
+      export HOME=/tmp
+      e=$(workspaces.sortie.path)/entrees
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/fermeture" "$FERMETURE_DEB" > /dev/null
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/deps" "$FERMETURE_SOURCES" > /dev/null
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/packaging" "$PACKAGING" > /dev/null
+      echo "fermeture deb : $(find "$e/fermeture" -type f | wc -l) fichiers ; fermeture applicative : $(find "$e/deps" -type f | wc -l) fichiers ; packaging : $(find "$e/packaging" -type f | wc -l) fichiers"
+      # Confrontation de la fermeture deb au verrou (colonnes 4 à 6 : sha256, taille, chemin sous miroir/)
+      v=$e/packaging/verrou-deb.txt
+      [ -s "$v" ] || { echo "verrou absent de l'artefact de packaging" >&2; exit 1; }
+      m=$e/fermeture/miroir
+      grep -v '^#' "$v" | grep . > /tmp/verrou
+      n=0
+      while read -r _ _ _ s z p; do
+        case $p in pool/*.deb) ;; *) echo "chemin du verrou non admis : $p" >&2; exit 1 ;; esac
+        case $p in *..*) echo "chemin du verrou non admis : $p" >&2; exit 1 ;; esac
+        [ -f "$m/$p" ] && [ ! -L "$m/$p" ] || { echo "paquet du verrou absent de la fermeture : $p" >&2; exit 1; }
+        [ "$(sha256sum < "$m/$p" | cut -c1-64)" = "$s" ] || { echo "paquet différent du verrou : $p" >&2; exit 1; }
+        [ "$(($(wc -c < "$m/$p")))" = "$z" ] || { echo "taille différente du verrou : $p" >&2; exit 1; }
+        n=$((n + 1))
+      done < /tmp/verrou
+      [ "$n" -gt 0 ] || { echo "verrou vide" >&2; exit 1; }
+      [ "$(find "$m/pool" -type f | wc -l)" = "$n" ] || { echo "pool : $(find "$m/pool" -type f | wc -l) fichiers, $n dans le verrou" >&2; exit 1; }
+      [ -z "$(find "$m/pool" ! -type f ! -type d)" ] || { echo "pool : objet qui n'est ni fichier ni répertoire" >&2; exit 1; }
+      echo "fermeture deb confrontée au verrou : $n paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool"
+      printf '{"uri":"oci://%s","digest":"%s"}' "${FERMETURE_DEB%@*}" "${FERMETURE_DEB#*@}" > $(results.FERMETURE_DEB_ARTIFACT_INPUTS.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${FERMETURE_SOURCES%@*}" "${FERMETURE_SOURCES#*@}" > $(results.FERMETURE_SOURCES_ARTIFACT_INPUTS.path)
+      printf '{"uri":"oci://%s","digest":"%s"}' "${PACKAGING%@*}" "${PACKAGING#*@}" > $(results.PACKAGING_ARTIFACT_INPUTS.path)
+  - image: sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+    name: assemblage
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      e=$(workspaces.sortie.path)/entrees
+      export HOME=/tmp GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod GOMODCACHE=/tmp/gomod GOCACHE=/tmp/gocache CGO_ENABLED=0
+      # vendor/ : cache de modules copié hors du workspace (go y extrait les modules en lecture seule)
+      cp -r "$e/deps/gomod/pkg/mod" /tmp/gomod
+      (cd "$e/src" && go mod vendor && go mod verify)
+      echo "$(go version) : vendor/ reconstitué, $(find "$e/src/vendor" -type f | wc -l) fichiers"
+      # marked : integrity du lockfile, puis extraction (premier composant retiré, comme tar --strip-components=1)
+      python3 -I - "$e/src/web/package-lock.json" "$e/deps/npm" "$e/src/web/node_modules/marked" <<'FIN'
+      import base64, hashlib, json, os, sys, tarfile
+      lock, npm, dst = sys.argv[1:]
+      p = json.load(open(lock, encoding='utf-8'))['packages']['node_modules/marked']
+      a = os.path.join(npm, 'marked-' + p['version'] + '.tgz')
+      calc = 'sha512-' + base64.b64encode(hashlib.sha512(open(a, 'rb').read()).digest()).decode()
+      if calc != p['integrity']:
+          sys.exit(f'integrity de {os.path.basename(a)} différente du lockfile')
+      os.makedirs(dst)
+      with tarfile.open(a) as t:
+          m = []
+          for x in t.getmembers():
+              n = x.name.split('/', 1)
+              if n == ['package', ''] and x.isdir():
+                  continue
+              if len(n) < 2 or n[0] != 'package' or not n[1]:
+                  sys.exit(f'membre inattendu dans {os.path.basename(a)} : {x.name}')
+              x.name = n[1]
+              m.append(x)
+          t.extractall(dst, members=m, filter='data')
+      print(f'marked {p["version"]} : integrity conforme au lockfile, {len(m)} membres extraits')
+      FIN
+      # debian/ et verrou ; rules exécutable (seul fichier en 100755 dans git, mode perdu par oras)
+      cp -r "$e/packaging/debian" "$e/debian"
+      cp "$e/packaging/verrou-deb.txt" "$e/verrou-deb.txt"
+      find "$e/debian" -type f -exec chmod 0644 {} \;
+      chmod 0755 "$e/debian/rules"
+      rm -rf "$e/deps" "$e/packaging"
+      echo "entrées prêtes : src ($(find "$e/src" -type f | wc -l) fichiers), debian ($(find "$e/debian" -type f | wc -l) fichiers), fermeture deb, verrou"
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  workspaces:
+  - name: sortie

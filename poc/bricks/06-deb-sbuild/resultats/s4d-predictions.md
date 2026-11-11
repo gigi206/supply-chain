@@ -112,3 +112,13 @@ Prédictions ajoutées pour `busybox_outils` :
   - **En plus** : les `Installed-Build-Depends` du `.buildinfo` de l'essai sont égaux au verrou (162 paquets, nom et version, aucun écart). `Build-Path` vaut `/build/reproducible-path/sample-app-1.0.0`.
 - **Défaut de formulation du journal de l'essai** : la ligne « invité » affiche « écriture refusée » après le type de montage des entrées. C'est un texte fixe du script, et non une mesure : dans l'essai, le contrôle de lecture seule est remplacé (première ligne du journal), et `/e` est monté `rw`. La lecture seule ne sera mesurée que dans la pipeline (D12).
 
+## Résultat du 11/11/2026, 19:25 UTC : SIGNER=1 taches
+
+**Accord du propriétaire** (19:25:26 UTC) : « Oui, lance-la ». Étape en code 0 à 19:25:33 UTC ([journal](s4d-taches-signer.log) ; `chrono.tsv` la note « taches »).
+
+- **D10 : tenue.** `preparer-deb` et `construire-deb` sont signées par tkn, versionnées dans [`deb/`](../deb/), et leurs bundles sont poussés dans Zot :
+  - `tekton/tasks/preparer-deb@sha256:b310c262a6a730824d7df6314a52a74fbd600d468709ea7bd1f7a3a50ab6540d` ;
+  - `tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a`.
+  Toutes deux sont signalées absentes de la liste revue ; la pipeline n'est pas signée.
+- L'ajout des deux digests à `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
+
