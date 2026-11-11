@@ -4,10 +4,13 @@
 # packaging de S4c, et le publie dans builds/sample-app-deb. Prédictions : resultats/s4d-predictions.md, écrites et commitées avant
 # toute étape qui touche le cluster ou Zot. Chaque étape qui écrit dans Zot ou le cluster attend un accord nommé.
 #   prealables  hôte seul, hors ligne : gabarits rendus (refs factices), lisibles, scripts de tâche sans erreur de syntaxe ;
+#               sections de preparer-deb rejouées aussi sous le busybox de l'image de prefetch (layout local) ;
 #               sections de preparer-deb jouées sur les copies des fermetures et de l'artefact de packaging tirées en S4b
 #               (confrontation au verrou, avec cas altérés ; assemblage sous unshare -rn) et arbre obtenu comparé à l'archive de
 #               sources.sh ; sections de construire-deb jouées sur l'hôte : paquet source comparé à celui de sources.sh, layout
 #               écrit avec le deb de S3 (0b489d43), d'où le digest attendu de l'artefact ; entrees.tar pour le pod d'essai
+#   busybox_outils lecture dans Zot : image d'outils tirée par digest ; confrontation rejouée sous son busybox, avec deux cas
+#               altérés
 #   reseau      cluster : NetworkPolicy construction-deb-sans-sortie ; invariants (une seule politique sélectionne construire-deb,
 #               en entrée et en sortie ; aucune NetworkPolicy de builds n'autorise de trafic ; aucune CiliumNetworkPolicy de builds
 #               n'autorise de trafic à construire-deb)
@@ -55,6 +58,8 @@ DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
 DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # OBS, S1, S3
 GO=$HOME/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/bin   # même version que l'image de prefetch
 LISTE_REVUE=$here/politique/porte/taches.yml
+LAYOUT_PREFETCH=$HOME/.cache/supply-chain-poc/03/f2/layout   # layout de l'image de prefetch (prefetch.sh image, brique 03), 68e0ae70
+BUSYBOX_PREFETCH=49227c027f9b972f929780d60ee486dee5948ea7042cb7ab400690bb104418bc   # bin/busybox de cette image (BusyBox v1.36.1)
 FACTICE=sha256:$(printf '0%.0s' {1..64})
 LIMITES='{"cpu": "2", "memory": "6Gi"}'
 MORCEAU_MIO=64
@@ -105,6 +110,20 @@ script_etape() { # fichier-rendu nom-d'étape : script de l'étape
   yq ".spec.steps[] | select(.name == \"$2\") | .script" "$1"
 }
 
+entrees_hote() { # répertoire entrees : comme les tirerait l'étape entrees (copies par digest de S4b), avant assemblage
+  mkdir -p "$1/src"
+  git -C "$repo" archive HEAD:poc/sample-app | tar -x -C "$1/src"
+  cp -a "$S4B/comparaison/deb" "$1/fermeture"
+  cp -a "$S4B/comparaison/sources/deps" "$1/deps"
+  cp -a "$S4B/packaging" "$1/packaging"
+}
+bb_liens() { # busybox répertoire : un lien par applet vers ce busybox (PATH sans aucun outil de l'hôte)
+  local a
+  rm -rf "$2"; mkdir -p "$2"; cp "$1" "$2/busybox"; chmod 0755 "$2/busybox"
+  for a in $("$2/busybox" --list); do [ "$a" = busybox ] || ln -s busybox "$2/$a"; done
+}
+modes() { (cd "$1" && find . -printf '%m %y %P\n' | sort); }
+
 etape_prealables() {
   local x=$T/essais e a s
   chmod -R u+w "$x" 2> /dev/null || true   # cache de modules de go en lecture seule
@@ -131,12 +150,8 @@ etape_prealables() {
 
   echo "## preparer-deb, sur l'hôte : entrées comme les tirerait l'étape entrees (copies par digest de S4b)"
   e=$x/ws/entrees
-  mkdir -p "$e/src"
   attendu "arbre de poc/sample-app (celui du commit $COMMIT)" "$(git -C "$repo" rev-parse HEAD:poc/sample-app)" 30e808ffa327288c656ddda7b6fafe4005234b77
-  git -C "$repo" archive HEAD:poc/sample-app | tar -x -C "$e/src"
-  cp -a "$S4B/comparaison/deb" "$e/fermeture"
-  cp -a "$S4B/comparaison/sources/deps" "$e/deps"
-  cp -a "$S4B/packaging" "$e/packaging"
+  entrees_hote "$e"
   attendu "debian/rules dans l'artefact tiré (mode perdu par oras)" "$(stat -c %a "$e/packaging/debian/rules")" 644
   # Section de confrontation de l'étape entrees, jouée telle quelle (busybox remplacé par les outils de l'hôte)
   { echo 'set -eu'; echo 'e=$1'
@@ -170,6 +185,28 @@ etape_prealables() {
   attendu "entrees/debian : modes" "$(cd "$e/debian" && find . -type f -printf '%m %P\n' | sort | paste -sd,)" "644 changelog,644 control,644 copyright,644 source/format,755 rules"
   attendu "entrees/verrou-deb.txt égal au verrou du dépôt" "$(cmp -s "$e/verrou-deb.txt" "$repo/poc/packaging/verrou-deb.txt" && echo égal || echo différent)" égal
   attendu "entrees : contenu de premier niveau" "$(ls "$e" | paste -sd' ')" "debian fermeture src verrou-deb.txt"
+
+  # Ajouté le 11/11/2026 avant tout lancement (avis du conseiller) : les sections ont tourné sous dash et les outils GNU ; dans la
+  # pipeline, elles tournent sous busybox. Rejouées ici avec le busybox de l'image de prefetch (étapes sources et assemblage), seul
+  # dans le PATH avec go et python3 ; l'étape entrees, sous le busybox de l'image d'outils, l'est par busybox_outils (lecture Zot).
+  echo "## preparer-deb sous le busybox de l'image de prefetch (applets seuls, plus go et python3)"
+  a=$(jq -r '.manifests[0].digest' "$LAYOUT_PREFETCH/index.json")
+  attendu "layout local de l'image de prefetch" "$a" "${PREFETCH_IMAGE#*@}"
+  a=$(jq -r '.layers[].digest' "$LAYOUT_PREFETCH/blobs/sha256/${a#sha256:}" | while read -r s; do
+    if tar -tzf "$LAYOUT_PREFETCH/blobs/sha256/${s#sha256:}" 2> /dev/null | grep -x bin/busybox > /dev/null; then echo "$s"; fi; done)
+  tar -xzOf "$LAYOUT_PREFETCH/blobs/sha256/${a#sha256:}" bin/busybox > "$x/busybox-prefetch"
+  attendu "bin/busybox de l'image (couche ${a:7:12})" "$(sha256sum < "$x/busybox-prefetch" | cut -c1-64)" "$BUSYBOX_PREFETCH"
+  bb_liens "$x/busybox-prefetch" "$x/bb"
+  echo "     $("$x/bb/busybox" | head -1) ; $(ls "$x/bb" | wc -l) applets"
+  f=$x/ws-bb/entrees
+  entrees_hote "$f"
+  r=$(env -i PATH="$x/bb" "$x/bb/sh" "$x/confrontation.sh" "$f")
+  attendu "confrontation sous busybox" "$r" "fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool"
+  sed -e "s#\$(workspaces.sortie.path)#$x/ws-bb#g" -e "s#/tmp/#$x/tmp-bb/#g" "$x/preparer-assemblage.sh" > "$x/assemblage-bb.sh"
+  mkdir -p "$x/tmp-bb"
+  unshare -rn env -i HOME="$x/tmp-bb" PATH="$(dirname "$(command -v python3)"):$GO:$x/bb" "$x/bb/sh" "$x/assemblage-bb.sh" 2>&1 | sed 's/^/     /'
+  attendu "entrees obtenues sous busybox et sous les outils de l'hôte : contenu" "$(diff -r "$e" "$f" > /dev/null && echo égal || echo différent)" égal
+  attendu "entrees obtenues sous busybox et sous les outils de l'hôte : modes et types" "$(cmp -s <(modes "$e") <(modes "$f") && echo égal || echo différent)" égal
 
   echo "## construire-deb, sur l'hôte : paquet source (section du script, outils de l'hôte)"
   rm -rf "$x/w"; mkdir -p "$x/w"
@@ -213,6 +250,35 @@ etape_prealables() {
   echo "## entrées du pod d'essai"
   tar -C "$e" --sort=name -cf "$T/entrees.tar" debian fermeture src verrou-deb.txt
   echo "entrees.tar : $(stat -c %s "$T/entrees.tar") octets, sha256 $(sha256sum < "$T/entrees.tar" | cut -c1-64)"
+}
+
+etape_busybox_outils() { # lecture dans Zot : image d'outils (étape entrees de preparer-deb) tirée par digest ; section de
+  # confrontation rejouée sous son busybox, applets seuls (ajouté le 11/11/2026 avant tout lancement, avis du conseiller)
+  local x=$T/essais l=$T/outils-layout m s a f
+  [ -s "$x/confrontation.sh" ] && [ -d "$x/ws-bb/entrees" ] || { echo "KO   lancer d'abord prealables" >&2; exit 1; }
+  rm -rf "$l"
+  oras cp --no-tty --from-ca-file "$P/ca-poc.crt" "${OUTILS_IMAGE/$REG/$REG_HOTE}" --to-oci-layout "$l:o" > /dev/null
+  m=$l/blobs/sha256/${OUTILS_DIGEST#sha256:}
+  attendu "image d'outils tirée par digest (manifeste)" "sha256:$(sha256sum < "$m" | cut -c1-64)" "$OUTILS_DIGEST"
+  for s in $(jq -r '.layers[].digest' "$m"); do
+    a=$(tar -tvzf "$l/blobs/sha256/${s#sha256:}" 2> /dev/null | awk '$1 ~ /^-/ && $NF ~ /(^|\/)busybox$/ {print $NF}' | head -1)
+    [ -z "$a" ] || { tar -xzOf "$l/blobs/sha256/${s#sha256:}" "$a" > "$x/busybox-outils"; echo "busybox de l'image d'outils : /$a (couche ${s:7:12}), sha256 $(sha256sum < "$x/busybox-outils" | cut -c1-64)"; break; }
+  done
+  [ -s "$x/busybox-outils" ] || { echo "KO   busybox introuvable dans l'image d'outils" >&2; exit 1; }
+  bb_liens "$x/busybox-outils" "$x/bb-outils"
+  echo "     $("$x/bb-outils/busybox" | head -1) ; $(ls "$x/bb-outils" | wc -l) applets"
+  f=$x/bbo/entrees
+  rm -rf "$x/bbo"; mkdir -p "$x/bbo"
+  entrees_hote "$f"
+  attendu "confrontation sous le busybox de l'image d'outils" "$(env -i PATH="$x/bb-outils" "$x/bb-outils/sh" "$x/confrontation.sh" "$f")" \
+    "fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool"
+  a=$f/fermeture/miroir/pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb
+  cp "$a" "${a%/*}/autre_1_amd64.deb"
+  r=$(env -i PATH="$x/bb-outils" "$x/bb-outils/sh" "$x/confrontation.sh" "$f" 2>&1) && { echo "KO   accepté : paquet en plus : $r" >&2; exit 1; }
+  echo "OK   refusé sous busybox : paquet en plus ($(tail -1 <<< "$r"))"
+  rm "${a%/*}/autre_1_amd64.deb"; printf x | dd of="$a" bs=1 seek=100 conv=notrunc status=none
+  r=$(env -i PATH="$x/bb-outils" "$x/bb-outils/sh" "$x/confrontation.sh" "$f" 2>&1) && { echo "KO   accepté : paquet altéré : $r" >&2; exit 1; }
+  echo "OK   refusé sous busybox : paquet altéré ($(tail -1 <<< "$r"))"
 }
 
 etape_reseau() {
@@ -270,6 +336,10 @@ etape_essai() {
         resources: {requests: $l, limits: $l},
         volumeMounts: [{name: "w", mountPath: "/w"}, {name: "e", mountPath: "/e"}, {name: "o", mountPath: "/o"}]}]}}' > "$x/pod.json"
   kubectl delete pod -n builds "$p" --ignore-not-found --wait=true < /dev/null > /dev/null
+  # Pod supprimé même en cas d'échec (corrigé le 11/11/2026 avant tout lancement, avis du conseiller : une sortie en erreur après sa
+  # création le laissait vivre jusqu'à deux heures). Piège posé ici : l'étape tourne dans le sous-shell de lancer (commun.sh), qui
+  # n'hérite pas du piège global.
+  trap 'kubectl delete pod -n builds s4d-essai --ignore-not-found --wait=false < /dev/null > /dev/null 2>&1 || true' EXIT
   kubectl create -f "$x/pod.json" < /dev/null > /dev/null
   echo "pod $p créé à $(date -u +%H:%M:%S) (image $BUILDER)"
   kubectl wait -n builds "pod/$p" --for=condition=Ready --timeout=300s < /dev/null > /dev/null \
@@ -278,11 +348,16 @@ etape_essai() {
   copier_pod "$p" "$T/entrees.tar" /e/entrees.tar
   kubectl exec -n builds "$p" -- sh -c 'tar -xf /e/entrees.tar -C /e && rm /e/entrees.tar' < /dev/null \
     || { pod_retirer "$p"; echo "KO   déballage des entrées" >&2; exit 1; }
+  # Le script est un fichier dans le pod, comme sous Tekton, et rien n'arrive sur son entrée standard (corrigé le 11/11/2026 avant
+  # tout lancement, avis du conseiller : par bash -s, un processus fils qui lit l'entrée standard avalerait la suite du script)
+  copier_pod "$p" "$x/construire.sh" /w/construire.sh
   echo "## script de construire-deb dans le pod ($(date -u +%H:%M:%S))"
-  timeout 1800 kubectl exec -i -n builds "$p" -- bash -s < "$x/construire.sh" > "$x/construire.log" 2>&1 || rc=$?
+  timeout 1800 kubectl exec -n builds "$p" -- bash /w/construire.sh < /dev/null > "$x/construire.log" 2>&1 || rc=$?
+  echo "fin à $(date -u +%H:%M:%S)"
   grep -viE 'jeton|token' "$x/construire.log" > "$R/s4d-essai-construire.log" || true
   grep -v -e '^Installed-Build-Depends:' -e '^ [a-z0-9]' "$R/s4d-essai-construire.log" | cut -c1-220 | sed 's/^/     /'
   echo "     (code de l'exec : $rc ; journal complet : resultats/s4d-essai-construire.log)"
+  attendu "dernière ligne du script atteinte (image.tar)" "$(grep -c '^image.tar : [0-9]* octets$' "$x/construire.log" || true)" 1
   if [ $rc = 0 ]; then
     kubectl exec -n builds "$p" -- cat /o/image.tar < /dev/null > "$x/image.tar"
     attendu "image.tar rapatrié (sha256 dans le pod)" "$(sha256sum < "$x/image.tar" | cut -c1-64)" "$(kubectl exec -n builds "$p" -- sha256sum /o/image.tar < /dev/null | cut -c1-64)"
@@ -295,6 +370,7 @@ etape_essai() {
   mesure "deb construit dans le pod d'essai" "$(tar -xOf "$x/lu/blobs/sha256/$(jq -r '.layers[0].digest' "$x/lu/blobs/sha256/${d#sha256:}" | cut -d: -f2)" | sha256sum | cut -c1-64)" "$DEB_SHA"
   mesure "digest de l'artefact" "$d" "$(cat "$T/digest-attendu")"
   echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
 }
 
 signer_tache() { # nom : signature versionnée dans deb/, bundle (tag s4d), liste revue de la 08 (comme s4b.sh)
@@ -382,6 +458,7 @@ etape_pipeline() {
   mesure "deux exécutions, même artefact" "$(cat "$T/deb-2.digest")" "$(cat "$T/deb-1.digest")"
   mesure "artefact égal au digest attendu (prealables)" "$(cat "$T/deb-1.digest")" "$(cat "$T/digest-attendu")"
   echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
 }
 
 etape_comparaison() {
@@ -403,6 +480,7 @@ etape_comparaison() {
       "$(diff "$c/ibd-$i.v" <(awk '{print $1 "=" $2}' "$repo/poc/packaging/verrou-deb.txt" | sort) | grep -c '^[<>]' || true)" 0
   done
   echo "écarts : $ECARTS"
+  [ "$ECARTS" = 0 ]
 }
 
 etape_provenance() {

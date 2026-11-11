@@ -73,3 +73,24 @@ Ce qui est observé :
 - **D2, D7, D12** : la tâche `construire-deb` est la première en UID 1000 sous Tekton (les répertoires de Tekton et le workspace sortie doivent être inscriptibles), et la première à lancer l'image de S4a.
 - **D8** : si le deb diffère, le `.buildinfo` (dans le journal) et une comparaison de contenu (sans diffoscope, absent de l'hôte) diront où.
 - **Effort** : S4d1 est le plus gros des trois sous-jalons. L'estimation de la carte (1 à 2 jours) sera relevée à la fin.
+
+## Note datée du 11/11/2026, 18:11 UTC : relecture du conseiller, corrections avant tout lancement
+
+Relecture du conseiller après le commit des prédictions (`7f2a3c2`). Rien n'a été lancé dans le cluster ni dans Zot.
+
+- **D15, motif de la confiance faux** : trois `*_ARTIFACT_INPUTS` dans une tâche ont déjà été mesurés. `preparer-entrees` en émet trois (fermeture, `web/dist`, image de build), et les rejeux de la 08 les montrent dans `resolvedDependencies` (par exemple `08-trust-plane/resultats/rejeu-complet-partie-4.log`, lignes 225 à 228). La confiance reste moyenne, pour une autre raison : ce sont trois noms neufs, et l'image de build n'est plus une entrée déclarée mais l'image d'une étape (forme mesurée en S4b pour l'image de prefetch, B15).
+- **`s4d.sh`, étape `essai`, corrigée** :
+  - le script passe dans le pod comme fichier (`/w/construire.sh`), lancé sans entrée standard, comme sous Tekton. Par `bash -s`, un processus fils qui lit l'entrée standard aurait avalé la suite du script, et l'essai aurait paru réussi ;
+  - un témoin exige la dernière ligne du script (`image.tar : … octets`) ;
+  - un piège supprime le pod d'essai à toute sortie de l'étape ;
+  - les étapes `essai`, `pipeline` et `comparaison` rendent le code 1 s'il y a un écart.
+- **`prealables` étendue, rejouée** (deux passages, de 18:10:57 à 18:11:19 UTC, code 0 au second ; le premier s'est arrêté sur la recherche de la couche de busybox, corrigée) : les sections de `preparer-deb` sont rejouées sous le busybox de l'image de prefetch (`49227c02`, BusyBox v1.36.1, tiré du layout local `68e0ae70`), avec ses seuls applets plus `go` et `python3`. La confrontation passe, et l'assemblage donne des entrées égales en contenu, en modes et en types à celles des outils de l'hôte.
+- **Étape ajoutée, `busybox_outils`** (lecture dans Zot) : l'image d'outils (`c7bebae2`), qui fait tourner l'étape `entrees`, n'a pas de copie locale. L'étape la tire par digest, en extrait le busybox, et y rejoue la confrontation avec deux cas altérés. Elle n'est pas lancée.
+- **Accords** : `busybox_outils` (lecture), `reseau` et `essai` (réversibles) peuvent être groupés sous un seul accord nommé (leviers b et e).
+
+Prédictions ajoutées pour `busybox_outils` :
+
+| N° | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| D16 | busybox_outils | L'image d'outils est tirée au digest `c7bebae2` et contient un busybox. Sous ses seuls applets, la confrontation admet la fermeture (162 paquets) et refuse un paquet en plus et un paquet altéré | haute : mêmes applets que ceux de `preparer-entrees` et `vsa.sh`, qui tournent dans cette image |
+

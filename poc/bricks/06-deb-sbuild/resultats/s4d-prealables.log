@@ -1,4 +1,4 @@
-# s4d.sh prealables, 2026-11-11T18:03:59Z
+# s4d.sh prealables, 2026-11-11T18:11:10Z
 ## gabarits rendus (refs factices)
 OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
 OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
@@ -38,6 +38,17 @@ OK   entrees/debian égal à poc/packaging/debian (contenu) : égal
 OK   entrees/debian : modes : 644 changelog,644 control,644 copyright,644 source/format,755 rules
 OK   entrees/verrou-deb.txt égal au verrou du dépôt : égal
 OK   entrees : contenu de premier niveau : debian fermeture src verrou-deb.txt
+## preparer-deb sous le busybox de l'image de prefetch (applets seuls, plus go et python3)
+OK   layout local de l'image de prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   bin/busybox de l'image (couche ae7c62ca50cd) : 49227c027f9b972f929780d60ee486dee5948ea7042cb7ab400690bb104418bc
+     BusyBox v1.36.1 () multi-call binary. ; 396 applets
+OK   confrontation sous busybox : fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+OK   entrees obtenues sous busybox et sous les outils de l'hôte : contenu : égal
+OK   entrees obtenues sous busybox et sous les outils de l'hôte : modes et types : égal
 ## construire-deb, sur l'hôte : paquet source (section du script, outils de l'hôte)
 OK   section du paquet source extraite (début, dpkg-source, fin) : 3
      paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
@@ -56,4 +67,4 @@ OK   couche : le deb seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app_
 OK   deb de la couche égal au deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
 digest attendu de l'artefact, si le deb est 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 et le tar de l'image de build écrit la même couche : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
 ## entrées du pod d'essai
-entrees.tar : 227266560 octets, sha256 c40640902fa209ff7a674a8dd5ac419420b79be9628694cf30a9c0f098682300
+entrees.tar : 227266560 octets, sha256 e9e2168edf48adee5474e1d370994bb2ddec3a37c63dc7d16ab3ddd8ca450093
