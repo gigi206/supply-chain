@@ -1298,3 +1298,71 @@ Sur `builds/sample-app-deb@sha256:039949f9…`, `ec` réussit, sans violation, a
 **Durée** : environ 20 minutes de travail, de 20:03 à 20:24 UTC, au bas de la fourchette de S4d2 (0,5 à 1,5 jour). La brique reste à environ 0,4 pw.
 
 **Suite, selon le découpage décidé** : S4d3 (second trigger et second rattrapage), puis S5. Les contrôles 6 et 7 du deb passent dans un jalon séparé ; les questions 3 et 4 de la carte restent ouvertes.
+
+## Additif du 11/11/2026, 20:33 UTC : carte de S4d3, à sec, rien lancé
+
+**Carte de S4d3**, préparée sur « continue » : rien n'a été lancé ni lu dans le cluster. Objet : brancher le deb sur les deux chemins de déclenchement de la 08, la livraison du webhook de Forgejo et le rattrapage.
+
+**Ce que montre le dépôt**
+- **EventListener `forgejo`** (`politique/declencheurs.yaml` de la 08, J6) : un seul trigger en ligne, `sample-app-push`, avec ses intercepteurs. L'intercepteur github vérifie le HMAC du secret `forgejo-webhook` et l'événement push ; le filtre CEL vérifie la branche main, le dépôt et un commit de 40 caractères. Selon le dépôt, le gabarit en service est celui de la bascule de J8 (`politique/gabarit-sample-app.yaml`) ; ce n'est pas relevé dans le cluster.
+- **Rattrapage** (`politique/rattrapage.yaml`, `politique/rattrapage/main.go`) : chaque minute, un CronJob lit la tête de main et crée `<gabarit>-<commit>` depuis une seule TriggerTemplate (variable `GABARIT`). Son Role ne lit que `sample-app`. `main.go` exige :
+  - les paramètres `commit` et `depot`, et eux seuls ;
+  - une seule ressource : un PipelineRun `tekton.dev/v1` dans builds, nommé `<gabarit>-<commit>`.
+- **La pipeline `sample-app-deb`** prend exactement `commit` et `depot` (`s4d.sh`, `pr_json`). `main.go` sert donc sans changement pour un gabarit `sample-app-deb` : ni nouveau binaire, ni nouvelle image.
+- **Triggers v0.37.2**, lu dans le code (`pkg/apis/triggers/v1beta1/event_listener_types.go`, `pkg/sink/sink.go`) :
+  - `spec.triggers` est une liste atomique ;
+  - avec un `labelSelector`, l'EventListener ajoute à ses triggers en ligne les objets Trigger de son espace qui portent ces labels ;
+  - chaque trigger exécute ses propres intercepteurs (`t.Spec.Interceptors`), dans l'espace du trigger.
+
+**Forme proposée**
+1. **`politique/declencheurs.yaml` (08)** : l'EventListener reçoit un `labelSelector`. C'est la seule modification d'un fichier de la 08, relue à part. Elle va dans le dépôt, pas dans un simple apply de la 06 : `politique.sh declencheurs` réapplique ce fichier en server-side, et un sélecteur posé d'ailleurs disparaîtrait au rejeu. Ce serait la dérive de S4d2a, construite d'avance.
+2. **`deb/declencheur.yaml` (06)**, appliqué par l'étape de S4d3 :
+   - **TriggerTemplate `sample-app-deb`** : paramètres `commit` et `depot`, PipelineRun `sample-app-deb-$(tt.params.commit)` dans builds. Elle reprend la forme de `pr_json` : workspace `sortie` en PVC, `taskRunTemplate`, Kata pour la seule tâche `construire` (sinon `porte.construction_kata` refuse). Bundle : `pipeline.ref` de S4d1 ;
+   - **Trigger `sample-app-deb-push`**, labellisé pour l'EventListener, avec ses propres intercepteurs github et CEL, recopiés de `sample-app-push`. Sans eux, n'importe quel POST au NodePort lancerait une construction du deb, avec un commit et un dépôt tirés d'un corps non signé ;
+   - **compte `rattrapage-deb`** : un Role qui ne lit que le gabarit `sample-app-deb`, et un RoleBinding dans builds (get et create de PipelineRuns) ;
+   - **CronJob `rattrapage-deb`** : même image épinglée, `GABARIT=declencheurs/sample-app-deb`, label `app: rattrapage` (la NetworkPolicy existante le couvre). Il est appliqué suspendu. Avec un compte à part, l'audit de l'API distingue les deux rattrapages.
+3. **Étape `s4d3.sh`**, sur le modèle de `preuves.sh bascule` :
+   - essai à blanc du gabarit ;
+   - chemin 1 : livraison de Forgejo ;
+   - chemin 2 : rattrapage repris ;
+   - rejeu de la livraison ;
+   - livraisons sans signature et à mauvaise signature (aides `envoyer` et `hmac_corps` de `commun.sh`) ;
+   - porte sur le deb.
+
+**Relevé à faire avant les prédictions** (lecture seule ; leçon de S4d2a : l'état déployé se relève pendant la carte) :
+- la TriggerTemplate, l'EventListener, le Role et le CronJob `rattrapage` en service, comparés au dépôt, avec l'état de suspension du CronJob ;
+- la tête de main dans Forgejo, comparée à `COMMIT` de `s4d.sh` (`6391fd43`) ;
+- la présence de `sample-app-6391fd43…`. S'il est absent, le chemin 1 lancerait aussi la construction de l'image : deux constructions Kata en même temps sur sc-build (non mesuré), et des enveloppes de plus sur `builds/sample-app` ;
+- les PipelineRuns `sample-app-deb-*` existants ;
+- le bundle de la pipeline deb dans Zot, comparé à `pipeline.ref` de S4d1.
+
+**Prédictions esquissées**, à écrire et commiter après le relevé :
+- **à blanc** : le PipelineRun rendu est admis au nom de `el-forgejo` et de `rattrapage-deb` ;
+- **chemin 1** : une seule création, par `el-forgejo`. Le PipelineRun réussit, avec `construire` sous Kata sur sc-build ; `IMAGE_DIGEST` vaut `039949f9…` (mêmes entrées qu'en S4d1) ; Chains le signe. Le trigger de l'image répond « already exists » si son PipelineRun existe ;
+- **chemin 2** : une création par `rattrapage-deb`, même spec, autre UID. Le rattrapage de l'image répond PRESENT ;
+- **rejeu** : « already exists », même UID ;
+- **livraison sans signature ou à mauvaise signature** : refusée par l'intercepteur github du trigger deb, aucun `sample-app-deb-*` créé ;
+- **porte sur le deb** :
+  - `ec` réussit sans violation, et la provenance jugée est celle du chemin 2 ;
+  - VSA et scan refusent, comme décidé ;
+- **sample-app** : enveloppes et verdict inchangés, si son PipelineRun existe ;
+- **noms des TaskRuns** : `sample-app-deb-<commit>` a 55 caractères. Avec `-preparer` ou `-construire`, le nom d'un TaskRun enfant dépasse 63 caractères, et Tekton le raccourcit avec un hash ; `-publier` tient juste. Les scripts sélectionnent par label.
+
+**Limites et effets croisés**
+- **Commits incompatibles** : le trigger construit tout commit de main, avec les fermetures et l'artefact de packaging épinglés dans la pipeline signée.
+  - Un commit qui change `go.mod` échoue dans `preparer-deb` : l'échec est fermé.
+  - Un changement de `debian/` dans le dépôt n'est pas pris en compte : le packaging vient de l'artefact.
+  - Dette à inscrire.
+- **Rejeux isolés de la 08** : après S4d3, rejouer une étape de la 08 qui pousse des commits d'essai lancera aussi la construction du deb pour ces commits, par l'EventListener et par `rattrapage-deb`. C'est le cas de `politique.sh rattrapage` de J6, avec ses commits c1 et c2. Un rejeu depuis zéro n'est pas touché, puisque la 08 passe avant la 06. Proposition : l'écrire comme limite, et donner à l'étape de S4d3 un moyen de suspendre `rattrapage-deb`.
+- **Deux constructions Kata simultanées** sur sc-build, après un vrai push : non mesurées dans S4d3.
+
+**Effort** : environ 0,5 jour, comme estimé dans la carte de S4d.
+
+**Questions au propriétaire**
+1. **La forme.**
+   - Elle comprend : un Trigger à part, sélectionné par label, avec ses propres intercepteurs ; un `labelSelector` ajouté à l'EventListener dans `declencheurs.yaml` de la 08 ; un compte `rattrapage-deb` ; `main.go` et l'image du rattrapage inchangés.
+   - Alternative : un second trigger en ligne dans `declencheurs.yaml`. C'est plus simple, mais la 08 référencerait un gabarit de la 06, absent tant que la 06 n'est pas rejouée.
+   - **Ma recommandation** : la forme proposée.
+2. **Le relevé en lecture seule**, avant d'écrire les prédictions.
+3. **La limite des commits incompatibles** avec les fermetures épinglées, inscrite en dette.
+
