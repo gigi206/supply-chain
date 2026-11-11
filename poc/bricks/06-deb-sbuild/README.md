@@ -1091,3 +1091,17 @@ Avec A, c'est l'hôte qui lit l'artefact de packaging, et non la plateforme. La 
 - **Provenance** : la provenance de F2 (`~/.cache/supply-chain-poc/03/f2/prov.json`) contient les paramètres de chaque TaskRun dans `resolvedDependencies`. Pour un paramètre long, comme la liste de 162 lignes, ce n'est encore qu'une prédiction de S4b.
 - **npm dans Hermeto 0.64.0** : il accepte toute URL `https` ou `git` d'un lockfile. Une dépendance du registre sans `integrity` n'y est que signalée, pas refusée. Il lit `npm-shrinkwrap.json` avant `package-lock.json`. D'où le contrôle de la version 2.
 - **`subPath`** : le kubelet v1.35.0 crée un dossier de `subPath` absent avec le mode de la racine du volume (`GetMode`, puis `Fchmod`), sans changer son propriétaire (`pkg/kubelet/kubelet_pods.go` et `pkg/volume/util/subpath/subpath_linux.go`, lus sur GitHub). Qu'un pod en UID 65532 puisse y écrire dépend donc du mode de la racine du PVC local-path : c'est une prédiction de S4b.
+
+## Additif du 11/11/2026, 17:37 UTC : S4b tenu
+
+**S4b tenu**, de 16:56:14 à 17:36:58 UTC, avec les accords nommés de chaque étape : B1 à B16 ([prédictions et résultats](resultats/s4b-predictions.md)). Les deux fermetures de construction du deb sont produites par la plateforme, signées par Chains, et reproduites deux fois au même digest :
+- **fermeture deb** : pipeline `prefetch-deb-sample-app` (`86e70b7f`), avec `prefetch-deb` et `publier-fermeture` inchangées. Fermeture `builds/fermetures/sample-app-deb@sha256:bb7599a2…` : 162 `.deb`, InRelease et index, pool égal au verrou ;
+- **fermeture applicative** : pipeline `prefetch-sources-sample-app` (`0ebd1cb8`), avec `prefetch-gomod` en version 2 (`170bef53`, ajoutée à la liste revue après relecture, `915e14e`) et `publier-fermeture`. Fermeture `builds/fermetures/sample-app-sources@sha256:50dc73f7…` : modules Go égaux à ceux de F2, et `marked-16.4.1.tgz` conforme à l'integrity du lockfile.
+
+**Décisions et accords du jalon** (lignes datées dans les commits) : « A, N1, combinée » (16:42:27 UTC) ; avis du conseiller sur B9, demandé par le propriétaire ; « Oui, lance taches_deb et deb » ; « Oui, lance-la » (`SIGNER=1 taches_sources`) ; « Oui, commite-le » (liste revue) ; « Oui, lance-les » (`taches_sources` et `sources`, puis `comparaison` et `provenance`).
+
+**Écarts et constats** : B14 a deux entrées `project_files` (`package-lock.json` et `package.json`) au lieu d'une ; `publier-fermeture` journalise une erreur sur `bom.json` absent pour la fermeture deb ; le `bom.json` d'Hermeto, non publié, change d'une exécution à l'autre ; deux titres de notes ont été datés à tort, et corrigés par des lignes datées.
+
+**Durée** : S4b a pris environ une heure, de la reprise par « continue » (16:32:02 UTC, lue dans la transcription) au bilan. La brique reste sous son estimation de 2 pw.
+
+**Suite, selon l'ordre décidé** : S4d (pipeline `sample-app-deb` : confronter la fermeture deb au verrou, reconstituer `vendor/` et `web/node_modules/marked`, rétablir le bit d'exécution de `debian/rules`, porte à plusieurs fermetures), puis S5.

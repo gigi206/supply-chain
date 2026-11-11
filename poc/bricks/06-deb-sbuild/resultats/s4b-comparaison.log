@@ -1,0 +1,35 @@
+# s4b.sh comparaison, 2026-11-11T17:36:55Z
+## fermeture deb
+OK   fichiers (162 .deb, InRelease, 2 index, 2 copies by-hash) : 167 162
+OK   InRelease : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   main/binary-amd64/Packages.xz selon l'InRelease (sha256 taille) : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498 9678380
+OK   main/binary-amd64/Packages.xz : copie by-hash : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+OK   main/i18n/Translation-en.xz selon l'InRelease (sha256 taille) : 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251 6485704
+OK   main/i18n/Translation-en.xz : copie by-hash : 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251
+OK   pool égal à la liste (sha256 taille chemin), octets : 5685ffcd773fc9d1ca0322f47e138e8cb31c82ace4c67934f62948c1208b0adc 193978008
+## fermeture applicative (sources)
+     8ccac6fe17a3497c 1736 .build-config.json
+     f55b521b30ea1133 7 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/list
+     bf888f335d726619 186 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.info
+     e3b0c44298fc1c14 0 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.lock
+     a8921a2ecd771d34 149 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.mod
+     4d7cceff13549438 111305 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.zip
+     dc3399fcb9d6e23d 47 deps/gomod/pkg/mod/cache/download/github.com/go-chi/chi/v5/@v/v5.2.3.ziphash
+     9144f0e2a4cea783 107451 deps/npm/marked-16.4.1.tgz
+OK   fichiers (6 gomod, 1 npm, .build-config.json) : 8 6 1
+OK   fichiers gomod égaux à ceux de F2 (même commit) : e310dd4e46826c5e05c8a6b18e8112e1a8e9cc354b2b96ff520ff42525026cba
+OK   archive npm : sha512 égal à l'integrity du lockfile : sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==
+## .build-config.json : fermeture applicative et F2 (gomod seul)
+     24c24,33
+     <   "project_files": []
+     ---
+     >   "project_files": [
+     >     {
+     >       "abspath": "/tmp/depot/web/package-lock.json",
+     >       "template": "{\n  \"name\": \"sample-app-web\",\n  \"version\": \"1.0.0\",\n  \"lockfileVersion\": 3,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"sample-app-web\",\n      \"version\": \"1.0.0\",\n      \"license\": \"Apache-2.0\",\n      \"dependencies\": {\n        \"marked\": \"16.4.1\"\n      }\n    },\n    \"node_modules/marked\": {\n      \"version\": \"16.4.1\",\n      \"resolved\": \"file://${output_dir}/deps/npm/marked-16.4.1.tgz\",\n      \"integrity\": \"sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==\",\n      \"license\": \"MIT\",\n      \"bin\": {\n        \"marked\": \"bin/marked.js\"\n      },\n      \"engines\": {\n        \"node\": \">= 20\"\n      }\n    }\n  }\n}\n"
+     >     },
+     >     {
+     >       "abspath": "/tmp/depot/web/package.json",
+     >       "template": "{\n  \"name\": \"sample-app-web\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"description\": \"Interface web de sample-app (construite sans bundler natif pour rester herm\\u00e9tique).\",\n  \"license\": \"Apache-2.0\",\n  \"scripts\": {\n    \"build\": \"node build.mjs\"\n  },\n  \"dependencies\": {\n    \"marked\": \"16.4.1\"\n  }\n}\n"
+     >     }
+     >   ]

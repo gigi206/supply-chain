@@ -1,0 +1,36 @@
+# s4b.sh provenance, 2026-11-11T17:36:57Z
+## provenance de s4b-deb-1
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   enveloppes du PipelineRun s4b-deb-1 : 1
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app sha256:86e70b7fd45a2f471ed7264b48e73394b756ed358693747a70c5a3c04205cba8
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+  - oci://sc-stockage.poc.test:5000/amont/library/debian sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result http://snapshot.debian.org/archive/debian/20261105T000000Z/dists/trixie/InRelease sha256:0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   tâches dans la provenance : prefetch-deb publier-fermeture
+OK   InRelease : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   paramètre liste du TaskRun prefetch-deb, égal à la liste du verrou : a63fe5fc7494d641c9c281b0ee9318807597cc7c35e5d7c7a087459c89de50aa
+## provenance de s4b-sources-1
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   enveloppes du PipelineRun s4b-sources-1 : 1
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app sha256:0ebd1cb86107f7933e1c8cefc186bfc4b85c2fc2b0f401bb831d93ca0eace546
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   tâches dans la provenance : prefetch-gomod publier-fermeture
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   image d'outils du prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   tâche prefetch-gomod v2 (bundle) : sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+OK   paramètre paquets du TaskRun prefetch-gomod : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)

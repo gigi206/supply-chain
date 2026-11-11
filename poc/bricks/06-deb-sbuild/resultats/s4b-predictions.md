@@ -139,3 +139,34 @@ Journaux : [`s4b-taches_sources.log`](s4b-taches_sources.log) et [`s4b-sources.l
 **Constat** : le `bom.json` d'Hermeto, journalisé mais non publié, diffère d'une exécution à l'autre (empreintes `849f…` puis `63e4…`). La fermeture publiée n'en dépend pas. La cause n'est pas relevée : le fichier n'est pas conservé.
 
 Restent B12 à B16 : `comparaison` et `provenance`, en lecture.
+
+**Corrections de la section précédente** (texte commité dans `992de65`) :
+- « Le liste revue » doit se lire « La liste revue » ;
+- la fin de `sources` est à 17:35:31 UTC (`chrono.tsv`), et non « 17:35:30 UTC environ ».
+
+## Résultats des étapes `comparaison` et `provenance` (11/11/2026, 17:36:55 et 17:36:57 UTC, accord « Oui, lance-les »)
+
+Journaux : [`s4b-comparaison.log`](s4b-comparaison.log), 10 OK, et [`s4b-provenance.log`](s4b-provenance.log), 17 OK. Aucune KO, lecture seule.
+
+| N° | Résultat |
+|---|---|
+| B12 | **Tenue.** Fermeture deb : 167 fichiers, dont 162 `.deb`. InRelease `0584fba3`. `Packages.xz` (`7778d3e3`, 9 678 380 octets) et `Translation-en.xz` (`800dd225`, 6 485 704 octets) conformes à l'InRelease, chacun avec sa copie `by-hash`. Pool égal à la liste (sha256, taille, chemin), 193 978 008 octets |
+| B13 | **Tenue.** Fermeture applicative : 8 fichiers, dont 6 gomod et 1 npm, plus `.build-config.json`. Fichiers gomod égaux, par sha256, à ceux de F2. Le sha512 de `deps/npm/marked-16.4.1.tgz` (107 451 octets) est égal à l'integrity du lockfile |
+| B14 | **Tenue, avec un écart.** Le `.build-config.json` diffère de celui de F2 par `project_files`, mais il contient **deux** entrées, pas une : `web/package-lock.json` et `web/package.json`. Ce sont des gabarits complets de ces fichiers, avec leur chemin dans le pod (`/tmp/depot/web/…`), qu'Hermeto prévoit de réécrire (`inject-files`). La fermeture embarque donc une copie de ces deux fichiers sources |
+| B15 | **Tenue.** P1 : provenance vérifiée par cosign (4 enveloppes, 1 de `s4b-deb-1`). Sujet égal à la fermeture deb, buildType `slsa-tekton`. `resolvedDependencies` contient la pipeline `86e70b7f`, les tâches `prefetch-deb` (`4dac0609`) et `publier-fermeture` (`7fa92ad3`), leurs images et l'InRelease `0584fba3`. **Le paramètre `liste` du TaskRun `prefetch-deb`, lu dans le contenu de la provenance, est égal à la liste du verrou** (162 lignes) |
+| B16 | **Tenue.** P2 : source `sha1:6391fd43`, image d'outils `68e0ae70`, pipeline `0ebd1cb8`, tâche `prefetch-gomod` version 2 (`170bef53`). Le paramètre `paquets` est lu dans le contenu du TaskRun. Une autre clé est refusée |
+
+## Bilan de S4b (17:37 UTC)
+
+**B1 à B16 tenues.** Seul écart : B14 a deux entrées `project_files` au lieu d'une. Les deux fermetures de construction du deb sont produites par la plateforme, signées par Chains et reproduites deux fois au même digest :
+- **deb** : `builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290` ;
+- **applicative** (gomod et npm) : `builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21`.
+
+**Ce qui est mesuré pour la première fois** : npm entre dans la chaîne par la plateforme ; une liste longue fixée par la pipeline signée se relit dans la provenance ; un pod en UID 65532 écrit dans un `subPath` créé par le kubelet ; `publier-fermeture` publie des couches de même contenu sous deux titres.
+
+**Limites et suites** :
+- la plateforme ne confronte pas encore la fermeture deb au verrou de l'artefact de packaging : c'est pour S4d (décision A) ;
+- la porte ne juge pas ces fermetures : sa règle doit passer à plusieurs fermetures en S4d. `_prefetch` exige aussi `CHAINS-GIT_URL`, que la fermeture deb n'a pas ;
+- `publier-fermeture` journalise une erreur sur `bom.json` absent pour la fermeture deb, et le `bom.json` d'Hermeto change d'une exécution à l'autre (non publié) ;
+- la fermeture applicative embarque une copie de `package.json` et `package-lock.json` dans `.build-config.json` (B14) ;
+- le refus d'une archive npm ou d'un `.deb` altérés dans la plateforme reste à mesurer en S5.

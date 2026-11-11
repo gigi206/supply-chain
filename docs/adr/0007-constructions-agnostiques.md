@@ -63,3 +63,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Le verrou deb est lu par l'hôte** : la liste est inscrite dans la pipeline signée au rendu, et la plateforme ne lit pas l'artefact de packaging en S4b. La confrontation de la fermeture deb au verrou est reportée à S4d.
 - **Le nom `prefetch-gomod` devient trompeur** : sa version 2 produit aussi npm. Le renommage est reporté à la règle de porte générique.
 - **Non mesuré** : tout ce qui précède. Les prédictions de S4b seront commitées avant toute exécution.
+
+**Additif du 11/11/2026, 17:37 UTC : S4b mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4b-predictions.md)).
+- **Mesuré** : une fermeture applicative gomod et npm, produite par un seul appel à Hermeto dans la plateforme (`prefetch-gomod` version 2, lockfile npm contrôlé avant Hermeto), et une fermeture deb, produite par `prefetch-deb` sur la liste du verrou. Toutes deux sont publiées par `publier-fermeture`, signées par Chains et reproductibles au digest près.
+- **Le point « gestionnaires couverts » est mesuré pour npm** dans la plateforme, sans Node dans l'image d'outils.
+- **Non mesuré** : la règle de porte à N fermetures, la confrontation de la fermeture deb au verrou à la construction (S4d), et le refus d'une archive altérée dans la plateforme (S5).
