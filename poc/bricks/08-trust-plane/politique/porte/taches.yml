@@ -57,9 +57,12 @@ trusted_tasks:
   # restreint (UID 65532) sans secret, images d'outils plateforme/outils-prefetch@68e0ae70 et plateforme/outils-horodatage@c7bebae2 ;
   # sortie limitée par builds-sans-internet de la 08c (adresses privées : Forgejo, Zot). Clone le commit ; tire par digest la
   # fermeture deb, la fermeture applicative et l'artefact de packaging fixés par la pipeline sample-app-deb ; confronte la fermeture
-  # deb au verrou ; reconstitue vendor/ (go mod vendor, GOPROXY=off) et marked (integrity du lockfile) ; déclare ses entrées à Chains
+  # deb au verrou ; reconstitue vendor/ (go mod vendor, GOPROXY=off) et marked (integrity du lockfile) ; déclare ses entrées à Chains.
+  # Version corrigée le 11/11/2026 (emptyDir monté sur /tmp, comme prefetch-gomod : /tmp de l'image de prefetch appartient à root en
+  # 0755) ; remplace b310c262 (premier PipelineRun s4d-deb-1 en échec, « could not create work tree dir '/tmp/depot' »), retirée de
+  # la liste
   oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-deb:
-    - ref: sha256:b310c262a6a730824d7df6314a52a74fbd600d468709ea7bd1f7a3a50ab6540d
+    - ref: sha256:5f0ca26bd273e005753fce846672436873d481bc460a237a15f26a2dc4576cd6
   # Brique 06, S4d1 : 06-deb-sbuild/deb/construire-deb.signee.yaml, pod Kata privilégié, sbuild en UID 1000 (--chroot-mode=unshare),
   # image de build builds/builders/sbuild-debian13@749d746c (S4a) ; sans aucune entrée ni sortie réseau (NetworkPolicy
   # construction-deb-sans-sortie) ; entrées en lecture seule, fermeture revérifiée contre le verrou, dépendances de build prises
