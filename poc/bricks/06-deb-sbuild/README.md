@@ -1114,3 +1114,66 @@ Avec A, c'est l'hôte qui lit l'artefact de packaging, et non la plateforme. La 
 - **Premier contrôle sans valeur** (17:39:46 UTC) : j'ai appelé `tools/secrets-depot.sh` par le chemin du dépôt principal. Le script se place à la racine de son propre dépôt (`cd "$(dirname "$0")/.."`). Il a donc examiné l'arbre principal, qui était propre (« fichiers : 0 »), et non le worktree.
 - **Contrôle refait** avec la copie du worktree : « fichiers : 20 ».
 - **Pushs précédents** : relus dans la transcription, ils appelaient tous la copie du worktree.
+
+## Additif du 11/11/2026, 17:51 UTC : carte de S4d, à sec, rien lancé
+
+Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 UTC, lu dans la transcription). Je le lis comme une permission de préparer S4d à sec, pas comme un accord de mesure ni d'écriture. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM. La carte a été relue par le conseiller avant les contrôles ci-dessous.
+
+**Contrôles sur l'hôte, hors ligne**, sur les copies des fermetures tirées par digest en S4b (étape `comparaison`) :
+- **`vendor/`** : Go 1.26.10, celui de l'image `outils-prefetch`, lance `go mod vendor` sous `unshare -rn`, avec `GOPROXY=off` et un `GOMODCACHE` copié de la fermeture `sample-app-sources@50dc73f7`. Le résultat est identique au `vendor/` de l'archive de `sources.sh` (`07521c1e…`, faite avec Go 1.24.7), et `go mod verify` passe.
+- **`marked`** : `marked-16.4.1.tgz` de la même fermeture a l'integrity du lockfile. Extrait avec `--strip-components=1`, il donne un `web/node_modules` identique.
+- **Arbre entier** (commit `3da431db` de `poc/sample-app`, plus `vendor/` et `marked`) : mêmes chemins et même contenu que l'archive. Les modes ne diffèrent que par le umask de l'hôte (002), que l'archive neutralise (`--mode=go-w,a+rX`).
+- **`debian/`** : seul `rules` est en 100755 (`git ls-files -s`). C'est le seul bit d'exécution à rétablir.
+- **`dpkg-dev`** 1.22.22 est dans `builder/paquets.txt` : le `.dsc` peut être assemblé dans le pod de construction.
+- **Chroot de l'image S4a** (`aec1c7a9…`, différent de `e0b1f37c` utilisé en S3) : `sources.list` pointe vers l'instantané et il n'y a aucune liste d'apt (A14). La neutralisation de S3 se réduit donc à vider `sources.list` ; la suppression des listes n'a plus d'objet.
+- **Image S4a** : sa configuration a été vérifiée en S4a (`diff_ids`, `linux/amd64`, `HOME=/w/home`), mais elle n'a jamais été lancée comme image de pod. Le pod d'essai sera son premier lancement.
+- **Sortie réseau** : `builds-sans-internet` (08c) n'exempte que `prefetch-gomod` et `prefetch-deb`. Une tâche de préparation neuve n'a donc que les adresses privées (Forgejo, Zot), comme `preparer-entrees`.
+
+**Conséquence** : la prédiction centrale est fondée. Le deb de S4d devrait être `0b489d43…`, celui d'OBS, de S1 et de S3 : mêmes sources, même `vendor/`, même `marked`, même `debian/`, mêmes paquets de build (verrou égal à la fermeture de S2). Ce qui change : le chroot (`hostname`, `resolv.conf`), et la construction par une tâche Tekton.
+
+**Découpage proposé**. La carte de 22:14 UTC présentait S4d comme un seul jalon ; je propose trois sous-jalons, dans cet ordre :
+
+| Jalon | Contenu | Écrit dans | Accord |
+|---|---|---|---|
+| S4d1 | Pipeline `sample-app-deb`, lancée depuis l'hôte comme S4a et S4b : `preparer-deb`, `construire-deb`, `publier-image` inchangée | Zot (bundles, artefact), cluster (NetworkPolicy), `porte/taches.yml` | nommé, par écriture |
+| S4d2 | Porte étendue : plusieurs fermetures, Kata pour `construire-deb`, préparation du deb, jugement d'un artefact deb | Zot (VSA), cluster (porte) | nommé |
+| S4d3 | Second trigger et second rattrapage | cluster | nommé |
+
+**Contrainte d'ordre** : dans `porte.rego`, `_construction` ne connaît que `construire-image`, `_preparation` que `preparer-entrees`, et `_prefetch` exige `prefetch-gomod`, `publier-fermeture` et `CHAINS-GIT_URL`. Avec deux tâches neuves, `construction_kata` et `fermeture_plateforme` réussiraient à vide : un deb jugé par la porte actuelle passerait sans contrôle de Kata ni de fermeture. Aucun trigger ne sera donc branché avant la porte étendue.
+
+**Forme proposée de S4d1**
+1. **`preparer-deb`**, pod runc restreint (UID 65532), sans secret :
+   - le commit est cloné depuis Forgejo et exporté, comme dans `preparer-entrees` ;
+   - les deux fermetures et l'artefact de packaging (`c1719b13`) sont tirés par digest, fixés dans la pipeline signée ;
+   - la fermeture deb est confrontée au verrou : InRelease `0584fba3…`, et exactement les 162 `.deb` du verrou (sha256, taille, chemin), rien de plus ;
+   - `vendor/` est reconstitué par `go mod vendor` (image `outils-prefetch`, `GOPROXY=off`), puis `go mod verify` ;
+   - `marked` est extrait après contrôle de l'integrity, et `debian/` copié avec le bit d'exécution de `rules` ;
+   - à Chains : `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT`, et un résultat `*_ARTIFACT_INPUTS` par entrée (deux fermetures, packaging, image de build), sous des noms distincts.
+2. **`construire-deb`**, pod Kata privilégié :
+   - image de build `builds/builders/sbuild-debian13@749d746c`, par digest ;
+   - workspace d'entrées en lecture seule ; travail sur un emptyDir en mémoire ;
+   - le pool est revérifié contre le verrou ;
+   - l'archive amont est assemblée avec la commande `tar` de `sources.sh`, à la date de `dpkg-parsechangelog -STimestamp`, puis le `.dsc` par `dpkg-source -b`. **Écart avec la carte de 22:14 UTC**, qui plaçait le `.dsc` dans la préparation : seule l'image de build a `dpkg-dev`, ce qui évite une image de plus ;
+   - sbuild en UID 1000, `--chroot-mode=unshare`, avec le chroot de l'image, `--extra-package` sur le pool, et `sources.list` vidé ;
+   - aucune entrée ni sortie réseau : NetworkPolicy `construction-deb-sans-sortie`, sans règle, sur le modèle de `builder-sans-sortie` ;
+   - l'artefact sort en manifeste d'image OCI écrit à la main, comme en S4a, pour que `publier-image` et `ec validate image` fonctionnent sans changement.
+3. **`publier-image`**, inchangée (`d21931f3…`), vers `builds/sample-app-deb`.
+
+**Processus** : pod d'essai de `construire-deb` avant toute signature (levier e) ; deux tâches neuves, donc `SIGNER=1` puis une revue de `taches.yml` dans un commit à part, deux accords distincts ; la NetworkPolicy est une écriture dans le cluster, sous accord nommé.
+
+**Déjà listé pour la suite**
+- S4d2 :
+  - une forme de fermeture deb pour `_prefetch` (`prefetch-deb` et `publier-fermeture`, sans git) ;
+  - `porte_test.rego` à étendre ;
+  - `porte-job` exige la VSA de replay (brique 10) et le scan (07a), qui échoueront pour un deb : décision à prendre ;
+  - `ec validate image` sur l'artefact deb, non mesuré.
+- S4d3 : `rattrapage.yaml` a `resourceNames: [sample-app]`, et `main.go` ne lit qu'un gabarit.
+
+**Effort** : la brique en est à environ 0,35 pw (0,3 pw au bilan de S4a, puis S4c et S4b en environ une heure et demie). Estimation de S4d : 2 à 4 jours de travail (S4d1 de 1 à 2, S4d2 de 0,5 à 1,5, S4d3 environ 0,5), donc une brique d'environ 0,8 à 1,2 pw avec S5, sous l'estimation de 2 pw et loin du seuil de 4 pw. C'est une estimation : J7, de taille comparable, a duré 7 jours de calendrier.
+
+**Questions au propriétaire**
+1. Le découpage S4d1, S4d2, S4d3, avec la porte avant le trigger.
+2. Le contenu de l'artefact signé. S3 a mesuré que seul `Build-Date` diffère entre deux `.buildinfo`, ce qui rend le choix structurant :
+   - (a) le deb seul : le digest de l'artefact est reproductible, et la porte juge un digest stable. Le `.buildinfo` reste dans le journal du TaskRun et dans les résultats. **Ma recommandation** ;
+   - (b) le deb et le `.buildinfo` : la reproductibilité se juge sur le sha256 du deb, et le digest de l'artefact change à chaque exécution.
+3. L'assemblage du `.dsc` dans le pod de construction, au lieu de la préparation.
