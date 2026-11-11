@@ -15,7 +15,12 @@
 #               main ; chemin 2, PipelineRun purgé, CronJob rattrapage-deb repris ; rejeu de la livraison ; enveloppes comptées
 #   porte       cluster : Job de la porte sur le deb (provenance jugée : celle du chemin 2), puis sur l'image sample-app
 #   retirer     cluster, au choix du propriétaire seulement : objets de declencheur.yaml retirés (le labelSelector reste, sans
-#               effet sans objet Trigger labellisé) ; rien n'est retiré de Zot
+#               effet sans objet Trigger labellisé) ; rien n'est retiré de Zot. Ajouté à sec le 11/11/2026 (S5b, NON LANCÉ) : PipelineRun
+#               sample-app-deb-<tête> purgé aussi (chemins l'exige absent) ; sans effet sur un cluster neuf, d'où son emploi en tête
+#               de l'étape du rejeu (reprise après un passage partiel)
+# Modifié à sec le 11/11/2026 pour le rejeu de zéro (S5b, NON LANCÉ) : PIPE_DEB lu dans pipeline.ref de s4d.sh taches (le bundle
+# de pipeline change à chaque signature, ECDSA : s4a.sh, commentaire de bundle) ; compteurs d'horodatage de porte relatifs
+# (« n/n », n > 0) au lieu de 8/8 et 28/28, cumuls de l'ancien cluster.
 # Aucun secret en argument de commande : le jeton de Forgejo et le secret du webhook sont lus dans des fichiers.
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s4d3.sh <étape>…   (journal : resultats/s4d3-<étape>.log)
@@ -34,7 +39,9 @@ EL=system:serviceaccount:declencheurs:el-forgejo
 RD=system:serviceaccount:declencheurs:rattrapage-deb
 RI=system:serviceaccount:declencheurs:rattrapage
 
-PIPE_DEB=$REG/tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5   # S4d1
+# S4d1 : $REG/tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5 (pipeline.ref du 11/11)
+PIPE_DEB=$(cat "$W/s4d-06/pipeline.ref" 2>/dev/null || true)
+[[ $PIPE_DEB =~ ^$REG/tekton/pipelines/sample-app-deb@sha256:[0-9a-f]{64}$ ]] || { echo "KO   pipeline.ref de s4d.sh taches absent ou invalide : $PIPE_DEB" >&2; exit 1; }
 DEB_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e                                     # S4d1
 DEB=builds/sample-app-deb@$DEB_DIGEST
 APP=builds/sample-app@$APP_DIGEST
@@ -49,6 +56,8 @@ ECARTS=0
 mesure() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "ÉCART $1 : $2 (attendu : $3)"; ECARTS=$((ECARTS + 1)); }; }
 champ() { cut -d'|' -f"$2" <<< "$1"; }
 ecarts() { [ "$ECARTS" = 0 ] || { echo "KO   $ECARTS écart(s)" >&2; exit 1; }; }
+toutes() { # champ 8 d'un verdict de la porte : « toutes » si son premier mot vaut n/n avec n > 0, sinon ce premier mot
+  awk '{split($1, a, "/"); print (a[1] == a[2] && a[1] > 0 && a[1] ~ /^[0-9]+$/) ? "toutes" : $1}' <<< "$1"; }
 
 rendre() { # declencheur.yaml rendu dans $T/declencheur.yaml ; objets (JSON, un tableau) dans $T/declencheur.json
   sed -e "s#@PIPELINE@#$PIPE_DEB#" -e "s#@RATTRAPAGE@#$REG/$RATTRAPAGE@$RATTRAPAGE_DIGEST#" "$h06/deb/declencheur.yaml" > "$T/declencheur.yaml"
@@ -325,12 +334,12 @@ etape_porte() {
   echo "passage d'horodatage $j"
   mesure "provenance de PipelineRun la plus récente de $DEB (seule jugée)" \
     "$(prov_pr "$DEB" | jq -sr 'max_by(.predicate.runDetails.metadata.finishedOn).predicate.runDetails.metadata.invocationId')" "$(cat "$T/uid-chemin-2")"
-  echo "## deb (prédictions : ec en succès sans violation ; horodatage 8/8 ; VSA et scan refusés, Job en échec, comme décidé)"
+  echo "## deb (prédictions : ec en succès sans violation ; horodatage n/n ; VSA et scan refusés, Job en échec, comme décidé)"
   v=$(juger s4d3-deb "$REG/$DEB" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
   mesure "deb : succès de ec" "$(champ "$v" 3)" true
   mesure "deb : violations" "$(champ "$v" 4)" ""
   mesure "deb : avertissements" "$(champ "$v" 5)" trusted_task.tagged
-  mesure "deb : horodatage" "$(champ "$v" 7)|$(champ "$v" 8 | cut -d' ' -f1)" "ok|8/8"
+  mesure "deb : horodatage, enveloppes toutes couvertes ($(champ "$v" 8 | cut -d' ' -f1))" "$(champ "$v" 7)|$(toutes "$(champ "$v" 8)")" "ok|toutes"
   mesure "deb : VSA" "$(champ "$v" 9)" refus
   mesure "deb : scan" "$(champ "$v" 11)" refus
   mesure "deb : règles du PoC parmi les succès" "$(jq -r '[.components[] | .successes[]? | .metadata.code | select(startswith("porte."))] | unique | join(",")' "$T/porte-s4d3-deb.json")" \
@@ -338,7 +347,7 @@ etape_porte() {
   echo "## image sample-app (non-régression ; prédiction : verdict de s4d2-reelle)"
   v=$(juger s4d3-reelle "$REG/$APP" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
   mesure "sample-app : succès, violations, avertissements" "$(champ "$v" 3)|$(champ "$v" 4)|$(champ "$v" 5)" "true||trusted_task.tagged"
-  mesure "sample-app : horodatage" "$(champ "$v" 7)|$(champ "$v" 8 | cut -d' ' -f1)" "ok|28/28"
+  mesure "sample-app : horodatage, enveloppes toutes couvertes ($(champ "$v" 8 | cut -d' ' -f1))" "$(champ "$v" 7)|$(toutes "$(champ "$v" 8)")" "ok|toutes"
   mesure "sample-app : VSA, scan" "$(champ "$v" 9)|$(champ "$v" 11)" "ok|ok"
   ecarts
 }
@@ -346,6 +355,8 @@ etape_porte() {
 etape_retirer() {
   rendre
   kubectl delete -f "$T/declencheur.yaml" --ignore-not-found --wait=true
+  purger_pr "$PR_DEB"
+  echo "PipelineRun $PR_DEB : $(kubectl get pipelinerun -n builds "$PR_DEB" -o name 2>/dev/null || echo absent)"
   echo "labelSelector laissé : $(kubectl get eventlistener -n declencheurs forgejo -o jsonpath='{.spec.labelSelector}') (aucun objet Trigger : $(kubectl get triggers.triggers.tekton.dev -n declencheurs -o name | wc -l))"
 }
 

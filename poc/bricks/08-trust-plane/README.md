@@ -2316,3 +2316,28 @@ Dernier rejeu complet : 6 809 s jusqu'à « J8 (helm-cilium) » (`rejeu-rke2-six
 5. `s4d3.sh retirer` : purge de `sample-app-deb-<tête>`.
 
 Chaque modification sera contrôlée sur l'hôte avec les valeurs réelles, puis accompagnée des prédictions du rejeu.
+
+**Additif du 11/11/2026, 23:10 UTC : cinq modifications préparées à sec, NON LANCÉES** (« Oui, prépare-les »).
+- [`rejeu.sh`](rejeu.sh) : blocs 08c et 06 après la VSA et avant `fuites`, sous RKE2 et Cilium seulement ; « J8 (résolveurs) » déplacée dans le bloc 08c ; `s4d3 porte` seulement avec `POUSSER_VSA=1` ; ligne de la 08d ; en-tête sur `DEPUIS=`.
+- [`sortie-builds.sh`](../08c-durcissement/sortie-builds.sh) : étape `rejeu`. Elle pose `prefetch-deb-sortie`, puis `builds-sans-internet`, sans exiger les états de départ ; invariants dans le cluster.
+- [`s4d3.sh`](../06-deb-sbuild/s4d3.sh) :
+  - `PIPE_DEB` lu dans `$W/s4d-06/pipeline.ref` ; KO s'il manque ou n'a pas la forme attendue ;
+  - compteurs d'horodatage de la porte remplacés par « toutes couvertes » (n/n, n > 0) ;
+  - `retirer` purge aussi `sample-app-deb-<tête>`.
+
+**Contrôles sur l'hôte**, valeurs réelles, aucune lecture du cluster :
+- les 31 étapes appelées par les blocs existent dans leurs scripts ;
+- `bash -n` passe sur les trois scripts ; shellcheck 0.11.0 ne relève aucun avertissement nouveau (0, 4 et 3 types, avant comme après) ;
+- `toutes` sur les cinq verdicts réels de S4d2 et S4d3 (4/4, 8/8, 28/28) rend « toutes » ; sur les témoins 3/4, 0/0, vide et a/a, il rend la valeur telle quelle ;
+- le test de `PIPE_DEB` accepte le `pipeline.ref` réel (`82c8373d`) et refuse le vide, une référence par tag et un autre bundle de pipeline ;
+- les deux politiques de sortie du dépôt sont inchangées depuis leur application du 10/11 (dernier commit à 14:23 UTC, application à 14:29 UTC).
+
+**Non vérifié** :
+- `rejeu.sh` n'a pas tourné : il commence par détruire les VM ;
+- `sortie-builds.sh rejeu`, `s4d3 retirer` et la nouvelle porte n'ont pas tourné sur un cluster.
+
+**Incident, sans perte.** Pendant les contrôles, une commande mal écrite a lancé `git stash` et mis les trois scripts modifiés de côté. Ils ont été restaurés aussitôt par `git stash pop`. Le diff est revenu identique : 3 fichiers, 71 lignes ajoutées et 7 retirées. Aucune autre commande n'a tourné entre les deux.
+
+**Prédictions** A1 à D3, écrites avant tout lancement : [`resultats/s5b-predictions.md`](resultats/s5b-predictions.md).
+
+**Lancement** : après la tâche du 21/11/2026 à 16:00 UTC, sur accord nommé. Commande : `DISTRO=rke2 POUSSER_VSA=1 mise run confiance:rejeu -- s5b`. Elle détruit les VM ; le push de la VSA demande son propre accord.

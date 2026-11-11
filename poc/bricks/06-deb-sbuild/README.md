@@ -1561,3 +1561,15 @@ La carte du rejeu de zéro (S5b) est écrite dans le README de la [08](../08-tru
 
 **Correction** : dans `docs/03-validation-briques.md` (commit `afa9bfe`), un « ; » manque avant « S5a de la 06 tenu », à la fin de la phrase de S4d3.
 
+## Additif du 11/11/2026, 23:10 UTC : S5b préparé à sec, NON LANCÉ
+
+Le bloc 06 de `rejeu.sh` comprend `s1 amorce`, `s4c verrou publier`, `s4a prealables taches reseau pipeline`, `s4b prealables taches_deb taches_sources deb sources comparaison` et `s4d reseau taches pipeline`. Il se termine par `s4d3 retirer prealables deployer chemins porte`, où `porte` ne tourne qu'avec `POUSSER_VSA=1`.
+
+Trois changements dans [`s4d3.sh`](s4d3.sh) :
+- `PIPE_DEB` est lu dans `pipeline.ref` ;
+- les compteurs d'horodatage de la porte sont relatifs ;
+- `retirer` purge aussi le PipelineRun deb.
+
+`s5.sh` garde ses valeurs en dur : il n'est pas dans le rejeu.
+
+Détail et prédictions : README de la [08](../08-trust-plane/README.md), section « Rejeu de zéro S5b ».

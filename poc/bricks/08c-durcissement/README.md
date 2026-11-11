@@ -1435,3 +1435,11 @@ E1 et E2 ont été lancés de 14:29 à 14:34 UTC, sur l'accord « Oui, lance E1-
 Les archives sont identiques, octet pour octet, à celles de s1 et s1b.
 
 **Reste** : la question du rejeu de zéro, où les deux politiques doivent aller ensemble.
+
+## Additif du 11/11/2026, 23:10 UTC : rejeu de zéro S5b, préparé à sec, NON LANCÉ
+
+Le bloc 08c entre dans `rejeu.sh`, après la VSA et avant `fuites` : `h1_api`, `h4_bloque`, S1 (`s1_source`, `s1_chains`, `s1_copies`), `h5_limites`, `h5_deny`, `h5_roles`, puis la nouvelle étape `sortie-builds.sh rejeu`. Cette étape pose `prefetch-deb-sortie` puis `builds-sans-internet` sans exiger d'état de départ.
+
+La phrase « `rejeu.sh` n'est pas concerné » (effets de H1) ne vaut plus pour « J8 (résolveurs) », déplacée après le bloc.
+
+Carte, relevés, contrôles et prédictions : README de la [08](../08-trust-plane/README.md), section « Rejeu de zéro S5b ».

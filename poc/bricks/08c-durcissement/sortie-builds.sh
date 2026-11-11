@@ -25,6 +25,10 @@
 #   deb_temoins   les trois témoins, plus un quatrième au label prefetch-deb : DNS et snapshot.debian.org en 80 seulement
 #   deb_retirer   (accord) NotIn d'origine d'abord (un pod prefetch-deb sans politique aurait tout Internet), puis prefetch-deb-sortie
 #                 supprimée ; invariants
+# Rejeu de zéro (S5b de la 06, ajouté à sec le 11/11/2026, NON LANCÉ) :
+#   rejeu         état d'arrivée de appliquer puis deb_appliquer, sans exiger leurs états de départ (absents d'un cluster neuf) :
+#                 prefetch-deb-sortie d'abord (un pod prefetch-deb exclu du refus sans politique dédiée aurait tout Internet),
+#                 puis builds-sans-internet ; invariants dans le cluster ; relançable (kubectl apply)
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/08c-durcissement/sortie-builds.sh <étape>…   (journal : resultats/sortie-<étape>.log)
 set -euo pipefail
@@ -206,4 +210,12 @@ etape_deb_retirer() {
   invariants
 }
 
+etape_rejeu() {
+  kubectl apply -f "$REGLE_DEB" </dev/null | sed 's/^/kubectl : /'
+  valide prefetch-deb-sortie
+  kubectl apply -f "$REGLE" </dev/null | sed 's/^/kubectl : /'
+  valide builds-sans-internet
+  attendu "NotIn de builds-sans-internet" "$(notin)" '["prefetch-gomod","prefetch-deb"]'
+  invariants_deb politiques
+}
 lancer sortie "08c sortie de builds" "$@"

@@ -31,6 +31,15 @@
 # témoins signés après le contrôle 6 (C1 de controle7 attend les contrôles 6 et 9 à ok). Rien ne s'y oppose plus tôt dans le
 # rejeu : un Job de la porte sans scan échoue sur le conteneur scan, mais les tests de J6 et de J8 ne lisent que les champs de
 # VERDICT, dont le champ 3 reste celui de ec ; seul controle7 regarde l'état du Job. J2 pose zot.json avec la rétention (D7 b).
+# Additif du 11/11/2026 : S5b de la 06 (rejeu de zéro, jalon de plateforme ; décisions du propriétaire « 1 ok » à « 3 ok » ; carte et
+# relevés : README de la 08, section « Rejeu de zéro S5b »), à sec, PAS ENCORE REJOUÉ. Après la VSA et avant fuites, sous RKE2 et
+# Cilium seulement, dans l'ordre historique : bloc 08c (durcissement : H1, H4, S1, H5 limites, Deny, rôles ; sortie des builds par
+# l'étape rejeu de sortie-builds.sh), « J8 (résolveurs) » déplacée après le bloc (elle attend les 4 lecteurs de Secrets sans
+# cilium-operator, que seule la 08c donne ; le chemin k3s ne la rejoue plus), puis bloc 06 (étapes durables de S1 amorce, S4c, S4a,
+# S4b, S4d, S4d3 ; S4d3 commence par retirer, sans effet sur un cluster neuf, pour la reprise). La 08d n'a rien installé.
+# DEPUIS= : une reprise à une étape antérieure au bloc 08c, la 08c une fois appliquée, casse (kata.sh exemption reposerait le
+# fichier Pod Security sans EventRateLimit, politique.sh chains refuserait le volume de S1, les limites de H5 seraient effacées) :
+# rejeu complet dans ce cas.
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
@@ -102,9 +111,8 @@ etape "J8 (tests)" mise run confiance:preuves -- test2 test4 test5 test3 test1 t
 etape "J8 (bascule)" mise run confiance:preuves -- bascule
 [ "$RESEAU" != cilium ] || etape "J8 (helm-cilium)" mise run confiance:preuves -- helm_cilium
 etape "J8 (contrôleurs)" mise run confiance:preuves -- controleurs
-# Résolveurs bornés à builds (02/11/2026) : après la bascule, l'étape résout le bundle du gabarit en service.
+# Résolveurs bornés à builds (02/11/2026) : déplacée après le bloc 08c le 11/11/2026 (S5b), voir plus bas.
 # preuves.sh intercepteurs n'est pas rejoué (mesure ponctuelle : retire et remet une liaison).
-etape "J8 (résolveurs)" mise run confiance:preuves -- resolveurs
 # Briques 01, 19 et 19b (choix « b » du propriétaire du 03/11/2026), après la bascule : la 01 avant la 19 (groupe synchro de
 # fichiers-metriques) ; la 19 installée avant la 19b (répertoires et Prometheus que L2 attend) ; cibles et règles de la 19 après
 # Alloy (job alloy de prometheus.yml) ; tout avant fuites, qui contrôle aussi leurs jetons. Les journaux d'étapes des briques sont
@@ -147,6 +155,39 @@ if [ "${POUSSER_VSA:-}" = 1 ]; then
 else
   echo "## 10 pousser_vsa, J8 controle6, controle7 et 07a g6_temoins : sautés (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de VSA)"
 fi
+# S5b (11/11/2026, à sec) : blocs 08c et 06, dans l'ordre historique (la 06 a tourné entièrement sous la 08c).
+if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
+  b08c=$here/../08c-durcissement
+  b06=$here/../06-deb-sbuild
+  # Exclues : verifier, h2_*, h3_*, flux*, *_sec, h5_cilium (dans h4_bloque), h5_tests, h6* (WireGuard retiré), s1_retrait,
+  # evenements.sh (compteur et alerte posés par 19b L3 et 19 O3), relevés et essais.
+  etape "08c (H1)" mise exec -- "$b08c/durcissement.sh" h1_api
+  etape "08c (H4)" mise exec -- "$b08c/durcissement.sh" h4_bloque
+  etape "08c (S1)" mise exec -- "$b08c/secrets.sh" s1_source s1_chains s1_copies
+  etape "08c (H5, limites)" mise exec -- "$b08c/durcissement.sh" h5_limites
+  etape "08c (H5, Deny)" mise exec -- "$b08c/durcissement.sh" h5_deny
+  etape "08c (H5, rôles)" mise exec -- "$b08c/durcissement.sh" h5_roles
+  etape "08c (sortie des builds)" mise exec -- "$b08c/sortie-builds.sh" rejeu
+  # Résolveurs bornés à builds (02/11/2026) : après la bascule et après H4 (tls.secretSync coupé : 4 lecteurs de Secrets)
+  etape "J8 (résolveurs)" mise run confiance:preuves -- resolveurs
+  # Exclues : S1 sauf amorce, S2, S3 (mesures ; leurs fichiers de l'hôte, $W/s1-06 à s3-06, sont gardés et relus), s4a
+  # comparaison, s4b provenance, s4d prealables (digest-attendu gardé dans $W), essais, provenance, comparaison, S4d2, S5a,
+  # diag-exec-kata.sh.
+  etape "06 (S1, amorce)" mise exec -- "$b06/s1.sh" amorce
+  etape "06 (S4c)" mise exec -- "$b06/s4c.sh" verrou publier
+  etape "06 (S4a)" mise exec -- "$b06/s4a.sh" prealables taches reseau pipeline
+  etape "06 (S4b)" mise exec -- "$b06/s4b.sh" prealables taches_deb taches_sources deb sources comparaison
+  etape "06 (S4d)" mise exec -- "$b06/s4d.sh" reseau taches pipeline
+  if [ "${POUSSER_VSA:-}" = 1 ]; then
+    etape "06 (S4d3)" mise exec -- "$b06/s4d3.sh" retirer prealables deployer chemins porte
+  else
+    etape "06 (S4d3)" mise exec -- "$b06/s4d3.sh" retirer prealables deployer chemins
+    echo "## 06 s4d3 porte : sautée (POUSSER_VSA=1 absent : elle attend la VSA de sample-app à ok)"
+  fi
+else
+  echo "## 08c, J8 (résolveurs) et 06 : sautés (DISTRO=$DISTRO, RESEAU=$RESEAU ; RKE2 et Cilium seulement)"
+fi
+echo "## 08d : rien à rejouer (relevés seuls, rien installé ; cert-manager lié à l'exposition de services, D7)"
 etape fuites mise run confiance:fuites -- "$lib"
 [ "$DISTRO" = k3s ] || etape "08b (CIS)" mise exec -- "$here/../08b-rke2/rke2.sh" cis
 echo "## durée totale : $(( $(date +%s) - t0 )) s"
