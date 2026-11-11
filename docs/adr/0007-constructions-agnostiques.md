@@ -51,3 +51,8 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Mesuré** : la tâche `prefetch-deb` tourne en runc restreint, sans root ni secret. Sa sortie se limite au DNS et au port 80 public. Elle télécharge par `apt-helper` une liste épinglée, contrôlée par l'InRelease (sha256 fixé par la pipeline signée), puis par les index et par le sha256 de chaque paquet. Elle sert ici à l'image de build ; sa provenance nomme l'InRelease.
 - **Non mesuré** : le refus d'un hash faux (test négatif prévu en S5) et l'usage de la tâche pour une fermeture de construction (S4b).
 - **La porte reste limitée à `prefetch-gomod`**, et la règle générique à N fermetures n'est pas écrite.
+
+**Additif du 11/11/2026, 16:20 UTC : `marked` par la plateforme pour le deb** (brique 06, [README](../../poc/bricks/06-deb-sbuild/README.md)).
+- **Décision du propriétaire** (16:19:27 UTC) : « npm par la plateforme », pour le deb. Elle remplace, pour le deb, « web/dist par digest » (10/11/2026, 22:30 UTC). La voie image de la 08 garde `web/dist` par digest : la dette reste ouverte.
+- **Vérifié dans le code d'Hermeto 0.64.0** : le fetch npm ne lance aucune commande externe, donc ni `node` ni `npm`. Le point « gestionnaires couverts » est donc tranché pour npm. Hermeto traite gomod et npm en un seul appel, mesuré sur l'hôte (banc nix), pas encore dans la plateforme.
+- **Non mesuré** : la fermeture npm produite par une tâche de la plateforme, et la règle de porte à N fermetures.

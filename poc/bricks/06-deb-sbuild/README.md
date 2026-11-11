@@ -1031,3 +1031,21 @@ Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucun
   - tout script modifié.
 - **(d)** Des contrôles sur l'hôte avant chaque signature.
 - **(c) est refusé** : pas d'image d'outils construite avec le réseau.
+
+## Additif du 11/11/2026, 16:20 UTC : décision du propriétaire sur la source de `marked` pour le deb
+
+**Vérifications faites avant la question**, en lecture seule, sans réseau ni installation :
+- **Hermeto 0.64.0 n'a pas besoin de Node pour npm.** Le module `core/package_managers/javascript/npm` du venv installé par mise (`mise.toml`, tâche `outils:hermeto`) n'importe ni `run_cmd`, ni `subprocess`, et n'appelle pas `which`. Il lit le lockfile et télécharge par `aiohttp`. L'image de prefetch, sans Node (`Dockerfile.prefetch` de la 03), convient donc telle quelle.
+- **Node est déjà dans la fermeture deb de S2**, sous l'InRelease signé : `nodejs` 20.19.2+dfsg-1+deb13u2 (sha256 `3e2d151f…`) et `libnode115` de même version (`resultats/s2-fermeture-attendue.txt`, `resultats/s2-sample-app_1.0.0-1_amd64.buildinfo`).
+- **Seul `marked` vient de l'hôte** (`poc/packaging/sources.sh`, lignes 39 à 48). `build.mjs` n'a besoin que de `node` et de `marked` sur disque, pas du binaire npm.
+- **Mesure archivée** : le banc nix (`poc/benchmarks/nix/reference/hermeto.sh`, lignes 36 et 37) passe gomod et npm en un seul appel à Hermeto 0.64.0 sur sample-app ; l'archive npm altérée y est refusée (T3). Limite : c'était sur l'hôte, pas dans une tâche de la plateforme.
+- **Sortie réseau** : `prefetch-sortie` (08) autorise déjà le port 443 vers les adresses publiques, donc le registre npm, mais seulement pour les pods de `prefetch-gomod`.
+
+**Décision du propriétaire** (11/11/2026, 16:19:27 UTC) : « npm par la plateforme ». La question portait sur le deb : la fermeture npm du deb sera produite par la plateforme. La voie image de la 08 garde `web/dist` par digest ; c'est la dette déjà notée par l'ADR 0007. Pour le deb, cette décision remplace celle de 22:30 UTC (« web/dist par digest »), qui n'est pas réécrite. Ce n'est un accord pour aucune mesure ni aucune écriture.
+
+**Ce que la décision change**, vérifié dans le dépôt :
+- La liste de 22:30 UTC tombe : `debian/control` garde `nodejs`, `debian/rules` garde `node build.mjs`, et le verrou tiré de S2 ne change pas.
+- **Correction** de ce que j'ai présenté avant la décision (« `debian/` inchangé ») : ce n'est vrai que sous condition. `debian/rules` construit avec `GOFLAGS=-mod=vendor` et `GOPROXY=off`, depuis l'archive de `sources.sh`, qui contient `vendor/` et `web/node_modules/marked`. Dans la plateforme, il faut donc soit que la préparation (S4d) reconstitue `vendor/` depuis la fermeture gomod et `web/node_modules/marked` depuis la fermeture npm, soit que `debian/rules` passe en mode module. Le mode module change le binaire (banc nix, B-1 : hash `h1:` inscrit dans les métadonnées). À trancher dans la carte de S4c.
+- **Côté plateforme**, une tâche de prefetch doit produire la fermeture npm : nouvelle signature, revue de `taches.yml`, et porte à adapter si la fermeture change de tâche (nom écrit en dur, `porte.rego`, lignes 69 à 74).
+
+**Questions ouvertes** : la carte de S4c, à préparer à sec ; le push de `dd99196`.
