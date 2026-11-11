@@ -132,3 +132,10 @@ Prédictions ajoutées pour `busybox_outils` :
 - **Correction, à sec** : un emptyDir est monté sur `/tmp` pour toutes les étapes de `preparer-deb`, et `prealables` exige ce montage (rejouée à 19:29:07 UTC, code 0). La tâche corrigée a un autre digest : il faut la re-signer (`SIGNER=1 taches`), puis remplacer `b310c262` par le nouveau digest dans la liste revue.
 - **Coût** : le bundle `tekton/tasks/preparer-deb@sha256:b310c262…` reste dans Zot, inutilisable, faute de droit de suppression. Il sera retiré de la liste revue.
 
+## Résultat du 11/11/2026, 19:30 UTC : re-signature de preparer-deb
+
+**Accord du propriétaire** (19:30:00 UTC) : « Oui, re-signe ». `SIGNER=1 taches` à 19:30:07 UTC, code 0 ([journal](s4d-taches-signer-2.log)).
+- `preparer-deb` corrigée est signée, versionnée et poussée : `tekton/tasks/preparer-deb@sha256:5f0ca26bd273e005753fce846672436873d481bc460a237a15f26a2dc4576cd6`.
+- `construire-deb` est inchangée : sa signature versionnée est conforme et son bundle reste `3726ff0b`, déjà dans la liste revue.
+- Le remplacement de `b310c262` par `5f0ca26b` dans `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
+

@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/signature: MEUCID/+q7VWAhIw8tbggdnoRfKML1xt4usJdWWpuMgdseACAiEAsov/Jh5zbtcIRowXvb5RucDuFFvv6IJ5kd6Z742i2jI=
+    tekton.dev/signature: MEQCIH6lZ6S0mXPe5l7trQn6DpoAENFzrxhSVTM3yW/OnAeSAiB19pFyJyJ+ujRm8PhWcV2TYUjeUffKvD+AWMzFdd3jXg==
   name: preparer-deb
 spec:
   params:
@@ -55,6 +55,8 @@ spec:
     - mountPath: /etc/ca-poc
       name: ca-poc
       readOnly: true
+    - mountPath: /tmp
+      name: tmp
   steps:
   - env:
     - name: DEPOT
@@ -170,5 +172,7 @@ spec:
   - configMap:
       name: ca-poc
     name: ca-poc
+  - emptyDir: {}
+    name: tmp
   workspaces:
   - name: sortie
