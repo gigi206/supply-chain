@@ -1423,3 +1423,59 @@ Contrôles sur l'hôte : `bash -n` et `shellcheck` sans remarque. Je n'ai pas pu
 
 **Suite, selon le découpage décidé** : S5 (archive altérée, hash faux, InRelease altéré). Les contrôles 6 et 7 du deb attendent leur jalon séparé ; les questions 3 et 4 de la carte de S4d2 restent ouvertes.
 
+## Additif du 11/11/2026, 21:13 UTC : carte de S5, à sec (rien lancé, rien écrit dans Zot)
+
+**Inventaire de S5**, relevé dans ce README :
+- M5 de la 05, repris en S5 (tableau des jalons) : fermeture altérée, sortie réseau pendant le build, pod privilégié hors Kata, rejeu de zéro ;
+- note datée de 23:40 UTC (10/11) : hash faux passé à `apt-helper`, `.deb` altéré dans le miroir, InRelease au mauvais sha256 ;
+- coupure du réseau par sbuild lui-même, « laissée à S5 » (bilan de S3) ;
+- vérification de la signature de l'InRelease par apt, encore déduite (réserve de A7, S4a).
+
+La comparaison bit à bit de la nouvelle voie, annoncée « en S4d ou en S5 », est déjà faite : S4d1 a donné deux fois `039949f9…`, avec le deb `0b489d43…`, puis S4d3 deux fois de plus. Elle ne revient pas dans S5.
+
+**Ce que chaque test mesure.** Le piège est de compter comme mesurée une barrière que le test n'atteint pas. Plusieurs couches se suivent :
+- `prefetch-deb` : `apt-helper` reçoit le sha256 attendu, puis le shell recalcule le sha256 (`tele`) ;
+- `construire-builder` : la tâche revérifie le miroir (l. 109 et suivantes) **avant** mmdebstrap, puis apt vérifie l'InRelease et les paquets ;
+- `preparer-deb` : la fermeture deb est confrontée au verrou, puis `construire-deb` revérifie chaque sha256. **apt ne protège pas ici** : sbuild prend les paquets par `--extra-package`, sans aucun contrôle de hash, comme les paquets natifs de yarn dans la 03.
+
+| # | Test | Mécanisme | Barrière qui doit refuser | Témoin accepté | Écriture dans Zot |
+|---|---|---|---|---|---|
+| N1 | Hash faux | TaskRun isolé de `prefetch-deb` (bundle de la liste revue), un paquet au sha256 faux | `apt-helper` (« téléchargement refusé ») ; si c'est « sha256 différent », c'est le shell qui rattrape et A4 reste non mesurée | même TaskRun, bon sha256 | non |
+| N2 | InRelease au mauvais sha256 | même TaskRun, paramètre `inrelease` faux | `apt-helper`, sur l'épinglage ; apt ne lit jamais l'InRelease ici, donc A7 n'est pas levée | N1 témoin | non |
+| N3 | Miroir altéré après le prefetch | `prefetch-deb` complet sur un PVC, copies altérées par un pod runc (un `.deb`, l'InRelease), puis `construire-builder` sous Kata sur chaque copie | revérification de la tâche, avant mmdebstrap | `construire-builder` sur la copie intacte, digest attendu `749d746c…` (rien n'est publié) | non |
+| N4 | Signature de l'InRelease et hash des paquets par apt seul (réserve de A7) | pod d'essai runc (amorce, UID 65532) : `apt-get update` puis téléchargement depuis `file://`, sans `trusted=yes`, sur des copies qui contournent l'épinglage | apt : signature invalide ; hash différent | miroir intact accepté | non |
+| N5 | Fermeture deb altérée | TaskRun isolé de `preparer-deb` sur deux fermetures altérées (un `.deb` modifié ; un fichier de plus dans le pool) | confrontation au verrou : « paquet différent du verrou » ; « pool : 163 fichiers, 162 dans le verrou » | même TaskRun sur la vraie fermeture `bb7599a2…` | **oui** (question 2) |
+| N6 | Coupure du réseau par sbuild | pod d'essai Kata (image de build, UID 1000), hors de `construction-deb-sans-sortie` : connexion TCP à Zot depuis le pod, puis depuis `debian/rules` d'un paquet minimal construit par sbuild `--chroot-mode=unshare` | sbuild (espace de noms réseau réduit à `lo`) | la même connexion depuis le pod réussit | non |
+| N7 | Pod privilégié hors Kata | TaskRun isolé de `construire-deb` sans `runtimeClassName`, sur le PVC du témoin de N5 | Pod Security `restricted` (403) avant Kyverno, puis `PodAdmissionFailed`, comme au test 4 de la 08 | même TaskRun sous Kata : deb `0b489d43…`, digest `039949f9…` (rien n'est publié) | non |
+
+N6 mesure la seule coupure par sbuild. La coupure au niveau du pod est déjà mesurée à chaque construction, par les témoins de `construire-deb`. S5 ne compte pas l'une pour l'autre.
+
+**Invariance** : avant et après S5, la porte garde le même verdict et le même nombre d'enveloppes : 8 sur le deb, 28 sur sample-app. Chains stocke en `oci` sur le sujet. Aucun TaskRun de S5 ne publie d'image : il n'a donc pas de sujet. Le précédent de S4d3 (4 enveloppes de plus par PipelineRun de trois TaskRuns) ne dit pas lesquelles. C'est une prédiction, à mesurer.
+
+**Mécanisme, lu dans le dépôt** : la règle `tekton-references` (`politique/admission.yaml`) admet un TaskRun qui référence un bundle `tekton/tasks/…@sha256` avec le compte `build` et un workspace PVC ou emptyDir. Les quatre tâches sont déjà signées et revues. Il n'y a donc aucune nouvelle signature ni revue de `taches.yml`.
+
+**À vérifier au relevé, avant toute prédiction ferme** :
+- le label `tekton.dev/task: prefetch-deb` sur le pod d'un TaskRun isolé : sans lui, `prefetch-deb-sortie` ne s'applique pas et le téléchargement échoue ;
+- un `--dry-run=server` de chaque objet neuf (leçon de S4d3) ;
+- les valeurs des paramètres, prises dans les pipelines signées et non recopiées à la main.
+
+**Effets à connaître** :
+- environ 200 Mo téléchargés depuis l'instantané, comme en S4a ;
+- deux PVC et trois pods dans `builds`, retirés à la fin ;
+- rien n'est poussé sur Forgejo : un commit sur main lancerait les deux triggers ;
+- seule écriture possible dans Zot : N5 en (a).
+
+**Rejeu de zéro.** `rejeu.sh` de la 08 date du 05/11/2026. Il n'a aucune étape de la 06, ni de la 08c, ni de la 08d (relevé par grep). Rejouer de zéro aujourd'hui veut dire :
+- intégrer d'abord tout ce qui a été fait depuis, sous RKE2 ;
+- recréer les VM.
+
+Ce travail dépasse très probablement 2× l'estimation de S5 : la règle de décision s'applique.
+
+**Questions au propriétaire**
+1. **Découpage.** Ma recommandation : **S5a**, les tests N1 à N7, maintenant ; **S5b**, le rejeu de zéro, en jalon de plateforme à part, avec sa propre carte et sa propre estimation. Rien ne change dans `rejeu.sh` avant ta réponse.
+2. **Fermeture altérée (N5).**
+   - (a) Deux fermetures altérées poussées depuis l'hôte sous `entrees/sample-app-deb/`, avec le compte `poc-ecriture`, comme F3 de la 03. La fermeture compte 167 couches, une par fichier : chaque variante n'ajoute qu'un blob et un manifeste. L'écriture est définitive, et chaque poussée demande un accord nommé. **Ma recommandation.**
+   - (b) Un pod d'essai rejoue le contrôle sur une copie altérée en local, sans écriture. Il teste le script, pas la tâche signée.
+3. **Pods d'essai N4 et N6.** Ma recommandation : les garder dans S5a, car ce sont les deux propriétés encore déduites. Sinon, la réserve de A7 et la coupure par sbuild restent ouvertes et inscrites.
+
+**Estimation de S5a** : une demi-journée, sur le modèle de S4d3. La brique est à environ 0,4 pw.
