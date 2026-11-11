@@ -1,40 +1,47 @@
-# s5.sh fermeture, 2026-11-11T21:37:08Z
-OK   PVC s5-entrees absent (sinon : étape retirer) : absent
+# s5.sh fermeture, 2026-11-11T21:40:40Z
+OK   PVC s5-entrees absent : absent
+OK   tr-s5-n5-paquet-en-trop.json : variables de pipeline restantes : 0
+OK   admis à blanc : tr-s5-n5-paquet-en-trop.json
+OK   tr-s5-n5-paquet-modifie.json : variables de pipeline restantes : 0
+OK   admis à blanc : tr-s5-n5-paquet-modifie.json
+OK   tr-s5-n5-temoin.json : variables de pipeline restantes : 0
+OK   admis à blanc : tr-s5-n5-temoin.json
+OK   N5 : commit et dépôt : https://sc-stockage.poc.test:3000/workspace/sample-app.git 6391fd437f26696847041be3226bbbf633f55a2f
 ## N5 témoin : preparer-deb sur la vraie fermeture (PVC s5-entrees, gardé pour N7)
-TaskRun s5-n5-temoin créé à 21:37:08
-     2026/11/11 21:37:14 Decoded script /tekton/scripts/script-1-lrdw9
-     2026/11/11 21:37:14 Decoded script /tekton/scripts/script-2-c9tb6
-     commit invalide : $(params.commit)
-     2026/11/11 21:37:17 Skipping step because a previous step failed
-     2026/11/11 21:37:17 Skipping step because a previous step failed
-     2026/11/11 21:37:13 Entrypoint initialization
-ÉCART N5 témoin : TaskRun : False|StepFailed (attendu : True|Succeeded)
-ÉCART N5 témoin : confrontation au verrou : 0 (attendu : 1)
+TaskRun s5-n5-temoin créé à 21:40:41
+     2026/11/11 21:40:46 Decoded script /tekton/scripts/script-0-kfwh5
+     2026/11/11 21:40:46 Decoded script /tekton/scripts/script-1-nzpw6
+     2026/11/11 21:40:46 Decoded script /tekton/scripts/script-2-n26kj
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+OK   N5 témoin : TaskRun : True|Succeeded
+OK   N5 témoin : confrontation au verrou : 1
 OK   paquet-modifie dans Zot (étape zot) : sha256:a549729dbe28cb238b172e860f92d6d0a4089d4338591e02dc4ae6ac68118835
 ## N5 : preparer-deb sur la fermeture paquet-modifie
-TaskRun s5-n5-paquet-modifie créé à 21:37:19
-     2026/11/11 21:37:21 Decoded script /tekton/scripts/script-0-g77fw
-     2026/11/11 21:37:21 Decoded script /tekton/scripts/script-1-8vzg7
-     2026/11/11 21:37:21 Decoded script /tekton/scripts/script-2-j7d6q
-     commit invalide : $(params.commit)
-     2026/11/11 21:37:24 Skipping step because a previous step failed
-     2026/11/11 21:37:24 Skipping step because a previous step failed
+TaskRun s5-n5-paquet-modifie créé à 21:40:54
+     2026/11/11 21:40:55 Decoded script /tekton/scripts/script-1-fpl26
+     2026/11/11 21:40:55 Decoded script /tekton/scripts/script-2-prhm4
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     paquet différent du verrou : pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb
+     2026/11/11 21:41:01 Skipping step because a previous step failed
 ÉCART N5 paquet-modifie : TaskRun : False|StepFailed (attendu : False|Failed)
-ÉCART N5 paquet-modifie : tirage par digest réussi (oras) : 0 (attendu : 1)
+OK   N5 paquet-modifie : tirage par digest réussi (oras) : 1
 OK   paquet-en-trop dans Zot (étape zot) : sha256:b27225cf454aa4ef0131bb7cf9a3ddb03235f9085d71f25c1961587eaa9f5aad
 ## N5 : preparer-deb sur la fermeture paquet-en-trop
-TaskRun s5-n5-paquet-en-trop créé à 21:37:26
-     2026/11/11 21:37:27 Decoded script /tekton/scripts/script-0-8zdrh
-     2026/11/11 21:37:27 Decoded script /tekton/scripts/script-1-lwd6g
-     2026/11/11 21:37:27 Decoded script /tekton/scripts/script-2-mbw8z
-     commit invalide : $(params.commit)
-     2026/11/11 21:37:30 Skipping step because a previous step failed
-     2026/11/11 21:37:30 Skipping step because a previous step failed
+TaskRun s5-n5-paquet-en-trop créé à 21:41:02
+     pool : 163 fichiers, 162 dans le verrou
+     2026/11/11 21:41:13 Skipping step because a previous step failed
+     2026/11/11 21:41:03 Entrypoint initialization
+     2026/11/11 21:41:04 Decoded script /tekton/scripts/script-0-mfqgh
+     2026/11/11 21:41:04 Decoded script /tekton/scripts/script-1-2m6c6
+     2026/11/11 21:41:04 Decoded script /tekton/scripts/script-2-ctffn
 ÉCART N5 paquet-en-trop : TaskRun : False|StepFailed (attendu : False|Failed)
-ÉCART N5 paquet-en-trop : tirage par digest réussi (oras) : 0 (attendu : 1)
-ÉCART N5 paquet-modifie : refus par la confrontation au verrou : 0 (attendu : 1)
-ÉCART N5 paquet-en-trop : refus par la confrontation au verrou : 0 (attendu : 1)
+OK   N5 paquet-en-trop : tirage par digest réussi (oras) : 1
+OK   N5 paquet-modifie : refus par la confrontation au verrou : 1
+OK   N5 paquet-en-trop : refus par la confrontation au verrou : 1
      s5-n5-temoin : chains.tekton.dev/signed « true »
      s5-n5-paquet-modifie : chains.tekton.dev/signed « true »
      s5-n5-paquet-en-trop : chains.tekton.dev/signed « true »
-KO   8 écart(s)
+KO   2 écart(s)

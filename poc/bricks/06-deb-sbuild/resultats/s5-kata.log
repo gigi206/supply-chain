@@ -1,0 +1,25 @@
+# s5.sh kata, 2026-11-11T21:41:19Z
+OK   N5 témoin réussi (entrées sur s5-entrees) : Succeeded
+## N7 : construire-deb sans runtimeClassName
+TaskRun s5-n7-hors-kata créé à 21:41:19
+     message : pods "s5-n7-hors-kata-pod" is forbidden: violates PodSecurity "restricted:latest": privileged (container "step-construire" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "step-construire" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "step-construire" must set securityContext.capabilities.drop=["ALL"]) 
+OK   N7 hors Kata : TaskRun : False|PodAdmissionFailed
+OK   N7 hors Kata : refus de Pod Security restricted (privileged) : 1
+OK   N7 hors Kata : aucun pod : 
+## N7 témoin : construire-deb sous Kata (rien n'est publié)
+TaskRun s5-n7-kata créé à 21:41:21
+      DEB_BUILD_OPTIONS="parallel=3"
+      LANG="C.UTF-8"
+      LC_COLLATE="C.UTF-8"
+      LC_CTYPE="C.UTF-8"
+      SOURCE_DATE_EPOCH="1793229566"
+     ----- fin du .buildinfo -----
+     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b11
+     image.tar : 1966080 octets
+OK   N7 témoin : TaskRun : True|Succeeded
+OK   N7 témoin : pod (tekton.dev/task|nœud|runtime) : construire-deb|sc-build|kata
+ÉCART N7 témoin : deb de S1, S3 et S4d : sample-a (attendu : 0b489d43)
+OK   N7 témoin : DIGEST_CONSTRUIT : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+     s5-n7-hors-kata : chains.tekton.dev/signed « failed »
+     s5-n7-kata : chains.tekton.dev/signed « true »
+KO   1 écart(s)

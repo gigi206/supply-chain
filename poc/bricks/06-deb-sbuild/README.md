@@ -1512,3 +1512,45 @@ Les paramètres sont pris dans les pipelines signées, exportées de Zot.
 - **Kata** : deux constructions sur sc-build, l'une après l'autre (`construire-builder` puis `construire-deb`, 6 Gio chacune), sans publication.
 - **Cluster** : 2 PVC, 2 pods d'essai et 13 TaskRuns, retirés par `retirer`.
 - **Forgejo** : rien n'y est poussé.
+
+## Additif du 11/11/2026, 21:52 UTC : S5a tenu
+
+Tests négatifs N1 à N7 de 21:25:12 à 21:50:33 UTC ([prédictions et résultats](resultats/s5-predictions.md)). **Toutes les barrières prédites refusent, et chaque témoin est accepté. Deux propriétés qui n'étaient que déduites sont désormais mesurées.**
+
+| # | Altération | Barrière qui refuse | Témoin accepté |
+|---|---|---|---|
+| N1 | Hash faux d'un paquet | `apt-helper` dans `prefetch-deb`, avant le shell : **A4 mesurée** | même paquet, bon hash |
+| N2 | InRelease au mauvais sha256 | `apt-helper`, sur l'épinglage | N1 |
+| N3 | `.deb` ou InRelease altéré dans le miroir | revérification de `construire-builder`, avant apt | miroir intact : image `749d746c…`, celle de S4a |
+| N4 | les mêmes, apt seul | sqv : « Message has been manipulated » ; apt : « Hash Sum mismatch » : **réserve de A7 levée** | miroir intact |
+| N5 | fermeture deb altérée (paquet modifié, fichier en trop) | confrontation au verrou de `preparer-deb` ; oras tire sans rien voir | vraie fermeture |
+| N6 | connexion réseau pendant la construction | sbuild `--chroot-mode=unshare` : seule `lo`, échec immédiat | même connexion depuis le pod : réussie |
+| N7 | `construire-deb` sans Kata | Pod Security `restricted`, `PodAdmissionFailed`, aucun pod | sous Kata : deb `0b489d43…`, `039949f9…` |
+
+**Invariance** :
+- aucune enveloppe nouvelle sur le deb, sample-app, la fermeture ni l'image de build ;
+- la porte garde les verdicts de S4d3 ;
+- Chains annote les TaskRuns isolés, mais n'écrit rien dans Zot sans sujet.
+
+**Décisions et accords du jalon** :
+- « Oui, les trois » (21:14:51 UTC) : découpage S5a/S5b, poussée dans Zot, pods d'essai ;
+- « Oui, lance S5a » ;
+- « Oui, les deux » : poussée dans Zot et relance de `sbuild` ;
+- « Oui, relance la suite ».
+
+**Écarts** : trois erreurs de mon script ont fait relancer `sbuild` deux fois et `fermeture` une fois, toujours en échec fermé :
+- le journal de sbuild était lu sur la sortie au lieu du fichier `.build` ;
+- la cible `build` n'était pas appelée par `dpkg-buildpackage -b` ;
+- les variables de la pipeline n'étaient pas résolues dans un TaskRun isolé.
+
+S'y ajoutent une extraction fausse dans une mesure et deux libellés mal prédits. **Leçon** : un contrôle sur l'hôte prend les valeurs réelles et rejoue l'outil réel.
+
+**Écrit dans Zot, définitif** : `entrees/sample-app-deb/fermeture-alteree`, tags `paquet-modifie` (`a549729d…`) et `paquet-en-trop` (`b27225cf…`).
+
+**Limites** :
+- **Dépendances de sbuild** : apt ne protège pas les dépendances de build, que sbuild prend par `--extra-package`. La confrontation au verrou est la seule barrière, doublée par `construire-deb`.
+- **TaskRuns isolés** : la plateforme admet un TaskRun isolé d'une tâche signée, avec des paramètres libres. La porte ne juge que les PipelineRuns, et un TaskRun isolé ne publie rien.
+
+**Durée** : environ 40 minutes, de la carte (21:13 UTC) au bilan. La brique est à environ 0,45 pw, sous l'estimation de 2 pw.
+
+**Suite** : S5b, le rejeu de zéro, est un jalon de plateforme qui demande d'abord d'intégrer la 06, la 08c et la 08d à `rejeu.sh`. Les contrôles 6 et 7 du deb ont leur jalon séparé, et les questions 3 et 4 de la carte de S4d2 restent ouvertes.

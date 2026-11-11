@@ -124,3 +124,38 @@ Carte : README, additif de 21:13 UTC. Script : [`s5.sh`](../s5.sh).
 - **`debian/rules`** : la cible `binary` dépend de `build`. Joué sur l'hôte par `dpkg-buildpackage --sanitize-env -us -uc -b` (code 0), `clean` puis `binary` exécute bien les lignes de mesure. La connexion réussit depuis l'hôte, ce qui est attendu hors de sbuild.
 
 `kata` n'est pas lancé, car il dépend du témoin de N5. `porte` et `retirer` non plus.
+
+---
+## Bilan (11/11/2026, de 21:40:40 à 21:50:33 UTC, accord « Oui, relance la suite »)
+
+Journaux : `s5-fermeture.log` (premier passage : `s5-fermeture-1.log`), `s5-kata.log`, `s5-sbuild.log` (passages précédents : `s5-sbuild-1.log` et `s5-sbuild-2.log`, journal `.build` : `s5-sbuild-build.log`, précédent `s5-sbuild-build-2.log`), `s5-porte.log`, `s5-retirer.log`, `chrono.tsv`.
+
+- **P12 : tenue.** `preparer-deb` sur la vraie fermeture, par un TaskRun isolé : clone de `6391fd43…` (arbre `30e808ff…`), trois tirages par digest, « 162 paquets, sha256, taille et chemin identiques ».
+- **P13 : tenue.** La fermeture `paquet-modifie` est tirée par digest sans erreur : oras ne voit rien, puisque le manifeste est cohérent. Elle est ensuite refusée : « paquet différent du verrou : pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb ». Même écart de raison (`StepFailed`).
+- **P14 : tenue.** La fermeture `paquet-en-trop` est tirée, puis refusée : « pool : 163 fichiers, 162 dans le verrou ». Même écart de raison.
+- **P15 : tenue.** Sans Kata : `False|PodAdmissionFailed`, « violates PodSecurity "restricted:latest": privileged… », aucun pod. Chains annote ce TaskRun `failed`.
+- **P16 : tenue.** Sous Kata, sur sc-build : deb `0b489d43…` (1952080 octets) et `DIGEST_CONSTRUIT` = `sha256:039949f9…`.
+  - Une mesure du script affiche un écart (« sample-a ») : mon extraction prenait le nom du fichier au lieu de son empreinte.
+  - La ligne du journal porte bien `sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6…`. L'écart vient du script ; le résultat est conforme.
+- **P17 : tenue, au troisième passage.**
+  - Depuis le pod d'essai Kata, la connexion TCP à Zot réussit (code 0).
+  - Depuis `debian/rules`, sous sbuild `--chroot-mode=unshare`, elle échoue aussitôt (code 1, sans délai d'attente), et la seule interface visible est `lo`. **La coupure du réseau par sbuild est mesurée.**
+- **P18 : tenue.**
+  - Enveloppes inchangées : deb 8, sample-app 28, fermeture 4, image de build 4.
+  - Chains annote `signed: true` sur les TaskRuns réussis ou échoués, mais n'écrit rien dans Zot : sans `IMAGE_URL`/`IMAGE_DIGEST`, il n'a pas de sujet.
+- **P19 : tenue.**
+  - La provenance jugée du deb reste celle du chemin 2 de S4d3 (`454728c5…`).
+  - Verdict du deb : `ec` sans violation, horodatage 8/8, VSA et scan refusés.
+  - Verdict de sample-app : horodatage 28/28, VSA et scan ok.
+- **`retirer`** : 12 TaskRuns et 2 PVC supprimés, aucun objet `s5` restant. Les deux fermetures altérées restent dans Zot.
+
+**Toutes les barrières prédites ont refusé, et chaque témoin a été accepté.** Les écarts sont :
+- **trois erreurs de mon script**, qui ont fait relancer `sbuild` deux fois et `fermeture` une fois, toujours en échec fermé :
+  - journal de sbuild lu sur la sortie au lieu du fichier `.build` ;
+  - cible `build` non appelée par `dpkg-buildpackage -b` ;
+  - variables de la pipeline non résolues dans un TaskRun isolé ;
+- **une extraction fausse dans une mesure** (P16) ;
+- **un libellé de raison mal prédit** : `StepFailed` au lieu de `Failed`, six fois ;
+- **le libellé d'`apt-helper` absent** des cinq lignes gardées (P6).
+
+**Leçon** : un contrôle sur l'hôte doit utiliser les valeurs réelles, pas des valeurs factices, et rejouer l'outil réel (`dpkg-buildpackage`) plutôt que la cible seule. Les deux premières erreurs auraient été vues sur l'hôte.

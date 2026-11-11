@@ -1,7 +1,7 @@
 sbuild (Debian sbuild) 0.89.3+deb13u4 (28 December 2025) on s5-sbuild
 
 +==============================================================================+
-| s5-reseau 1.0 (amd64)                        Wed, 11 Nov 2026 21:35:46 +0000 |
+| s5-reseau 1.0 (amd64)                        Wed, 11 Nov 2026 21:48:37 +0000 |
 +==============================================================================+
 
 Package: s5-reseau
@@ -14,7 +14,7 @@ Build Architecture: amd64
 Build Type: binary
 
 I: No tarballs found in /w/home/.cache/sbuild
-I: Unpacking /opt/sbuild/trixie-amd64.tar to /w/tmp.sbuild.YO_7IlJHLG...
+I: Unpacking /opt/sbuild/trixie-amd64.tar to /w/tmp.sbuild.GuaHCYQzkg...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 I: Setting up the chroot...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -38,7 +38,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Chroot Setup Commands                        Wed, 11 Nov 2026 21:36:04 +0000 |
+| Chroot Setup Commands                        Wed, 11 Nov 2026 21:48:53 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -62,7 +62,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Fetch source files                           Wed, 11 Nov 2026 21:36:10 +0000 |
+| Fetch source files                           Wed, 11 Nov 2026 21:48:57 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -81,7 +81,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Install package build dependencies           Wed, 11 Nov 2026 21:36:14 +0000 |
+| Install package build dependencies           Wed, 11 Nov 2026 21:49:02 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -106,7 +106,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
-dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-dEb5AE/apt_archive/sbuild-build-depends-main-dummy.deb'.
+dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-WuHY24/apt_archive/sbuild-build-depends-main-dummy.deb'.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -118,11 +118,11 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
-Ign:1 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ InRelease
-Get:2 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ Release [609 B]
-Ign:3 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ Release.gpg
-Get:4 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ Sources [575 B]
-Get:5 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ Packages [614 B]
+Ign:1 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ InRelease
+Get:2 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ Release [609 B]
+Ign:3 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ Release.gpg
+Get:4 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ Sources [575 B]
+Get:5 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ Packages [614 B]
 Fetched 1798 B in 0s (0 B/s)
 Reading package lists...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -143,7 +143,7 @@ The following NEW packages will be installed:
 0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
 Need to get 836 B of archives.
 After this operation, 0 B of additional disk space will be used.
-Get:1 copy:/build/reproducible-path/resolver-dEb5AE/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [836 B]
+Get:1 copy:/build/reproducible-path/resolver-WuHY24/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [836 B]
 Fetched 836 B in 0s (0 B/s)
 Selecting previously unselected package sbuild-build-depends-main-dummy.
 (Reading database ... 11806 files and directories currently installed.)
@@ -152,7 +152,7 @@ Unpacking sbuild-build-depends-main-dummy (0.invalid.0) ...
 Setting up sbuild-build-depends-main-dummy (0.invalid.0) ...
 
 +------------------------------------------------------------------------------+
-| Check architectures                          Wed, 11 Nov 2026 21:36:32 +0000 |
+| Check architectures                          Wed, 11 Nov 2026 21:49:17 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -161,7 +161,7 @@ Arch check ok (amd64 included in any)
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Build environment                            Wed, 11 Nov 2026 21:36:33 +0000 |
+| Build environment                            Wed, 11 Nov 2026 21:49:19 +0000 |
 +------------------------------------------------------------------------------+
 
 Kernel: Linux 6.18.56 #1 SMP Fri Oct 16 18:41:32 UTC 2026 amd64 (x86_64)
@@ -169,7 +169,7 @@ Toolchain package versions: binutils_2.44-3 dpkg-dev_1.22.22 g++-14_14.2.0-19 gc
 Package versions: apt_3.0.3 base-files_13.8+deb13u7 base-passwd_3.6.7 bash_5.2.37-2+b10 binutils_2.44-3 binutils-common_2.44-3 binutils-x86-64-linux-gnu_2.44-3 bsdutils_1:2.41.5-0+deb13u1 build-essential_12.12 bzip2_1.0.8-6 coreutils_9.7-3 cpp_4:14.2.0-1 cpp-14_14.2.0-19 cpp-14-x86-64-linux-gnu_14.2.0-19 cpp-x86-64-linux-gnu_4:14.2.0-1 dash_0.5.12-12 debconf_1.5.91 debian-archive-keyring_2025.1 debianutils_5.23.2 diffutils_1:3.10-4 dpkg_1.22.22 dpkg-dev_1.22.22 findutils_4.10.0-3 g++_4:14.2.0-1 g++-14_14.2.0-19 g++-14-x86-64-linux-gnu_14.2.0-19 g++-x86-64-linux-gnu_4:14.2.0-1 gcc_4:14.2.0-1 gcc-14_14.2.0-19 gcc-14-base_14.2.0-19 gcc-14-x86-64-linux-gnu_14.2.0-19 gcc-x86-64-linux-gnu_4:14.2.0-1 grep_3.11-4 gzip_1.13-1+deb13u1 hostname_3.25 init-system-helpers_1.69~deb13u1 libacl1_2.3.2-2+b1 libapt-pkg7.0_3.0.3 libasan8_14.2.0-19 libatomic1_14.2.0-19 libattr1_1:2.5.2-3 libaudit-common_1:4.0.2-2+deb13u1 libaudit1_1:4.0.2-2+deb13u1 libbinutils_2.44-3 libblkid1_2.41.5-0+deb13u1 libbz2-1.0_1.0.8-6 libc-bin_2.41-12+deb13u4 libc-dev-bin_2.41-12+deb13u4 libc6_2.41-12+deb13u4 libc6-dev_2.41-12+deb13u4 libcap-ng0_0.8.5-4+b1 libcap2_1:2.75-10+deb13u1+b3 libcc1-0_14.2.0-19 libcrypt-dev_1:4.4.38-1 libcrypt1_1:4.4.38-1 libctf-nobfd0_2.44-3 libctf0_2.44-3 libdb5.3t64_5.3.28+dfsg2-9 libdebconfclient0_0.280 libdpkg-perl_1.22.22 libgcc-14-dev_14.2.0-19 libgcc-s1_14.2.0-19 libgdbm-compat4t64_1.24-2 libgdbm6t64_1.24-2 libgmp10_2:6.3.0+dfsg-3 libgomp1_14.2.0-19 libgprofng0_2.44-3 libhogweed6t64_3.10.1-1 libhwasan0_14.2.0-19 libisl23_0.27-1 libitm1_14.2.0-19 libjansson4_2.14-2+b3 liblastlog2-2_2.41.5-0+deb13u1 liblsan0_14.2.0-19 liblz4-1_1.10.0-4 liblzma5_5.8.1-1+deb13u1 libmd0_1.1.0-2+b1 libmount1_2.41.5-0+deb13u1 libmpc3_1.3.1-1+b3 libmpfr6_4.2.2-1 libnettle8t64_3.10.1-1 libpam-modules_1.7.0-5 libpam-modules-bin_1.7.0-5 libpam-runtime_1.7.0-5 libpam0g_1.7.0-5 libpcre2-8-0_10.46-1~deb13u2 libperl5.40_5.40.1-6+deb13u1 libquadmath0_14.2.0-19 libseccomp2_2.6.0-2 libselinux1_3.8.1-1 libsframe1_2.44-3 libsmartcols1_2.41.5-0+deb13u1 libsqlite3-0_3.46.1-7+deb13u2 libssl3t64_3.5.7-1~deb13u2 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 libsystemd0_257.13-1~deb13u1 libtinfo6_6.5+20250216-2 libtsan2_14.2.0-19 libubsan1_14.2.0-19 libudev1_257.13-1~deb13u1 libuuid1_2.41.5-0+deb13u1 libxxhash0_0.8.3-2 libzstd1_1.5.7+dfsg-1 linux-libc-dev_6.12.107-1 make_4.4.1-2 mawk_1.3.4.20250131-1 ncurses-base_6.5+20250216-2 ncurses-bin_6.5+20250216-2 openssl-provider-legacy_3.5.7-1~deb13u2 patch_2.8-2 perl_5.40.1-6+deb13u1 perl-base_5.40.1-6+deb13u1 perl-modules-5.40_5.40.1-6+deb13u1 rpcsvc-proto_1.4.3-1 sbuild-build-depends-main-dummy_0.invalid.0 sed_4.9-2+deb13u1 sqv_1.3.0-3+b2 sysvinit-utils_3.14-4 tar_1.35+dfsg-3.1 util-linux_2.41.5-0+deb13u1 xz-utils_5.8.1-1+deb13u1 zlib1g_1:1.3.dfsg+really1.3.1-1+b1
 
 +------------------------------------------------------------------------------+
-| Build                                        Wed, 11 Nov 2026 21:36:33 +0000 |
+| Build                                        Wed, 11 Nov 2026 21:49:19 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -188,11 +188,11 @@ Standards-Version: 4.7.0
 Package-List:
  s5-reseau deb misc optional arch=any
 Checksums-Sha1:
- ddbe59aaf9d4f5489107177bb3659140972e98bf 836 s5-reseau_1.0.tar.xz
+ 5da745688efd99e2640e8c4c1f3a6e601ffb6a1a 840 s5-reseau_1.0.tar.xz
 Checksums-Sha256:
- 4d93638ddd0e1898f8157a92d2e7ba1f8f45dda12e0420e5e9a07c4718c78822 836 s5-reseau_1.0.tar.xz
+ a03d060c786afb6b334146bdf1739ad9e32265103949f8f29c1c55709dd9c2a2 840 s5-reseau_1.0.tar.xz
 Files:
- acc68a035aa856daa40de960c5860ebb 836 s5-reseau_1.0.tar.xz
+ f2473c23ba1c7e328e724adc024a15da 840 s5-reseau_1.0.tar.xz
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -240,6 +240,8 @@ dpkg-buildpackage: info: host architecture amd64
  debian/rules clean
 rm -rf debian/tmp debian/files
  debian/rules binary
+S5-RESEAU|regles|1
+S5-RESEAU|interfaces|lo 
 mkdir -p debian/tmp/DEBIAN
 dpkg-gencontrol -ps5-reseau -Pdebian/tmp
 dpkg-deb --root-owner-group --build debian/tmp ..
@@ -250,7 +252,7 @@ dpkg-genchanges: info: binary-only upload (no source code included)
  dpkg-source --after-build .
 dpkg-buildpackage: info: binary-only upload (no source included)
 --------------------------------------------------------------------------------
-Build finished at 2026-11-11T21:36:42Z
+Build finished at 2026-11-11T21:49:27Z
 
 Finished
 --------
@@ -263,7 +265,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Changes                                      Wed, 11 Nov 2026 21:36:44 +0000 |
+| Changes                                      Wed, 11 Nov 2026 21:49:29 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -289,20 +291,20 @@ Changes:
  .
    * Témoin de S5a.
 Checksums-Sha1:
- 2468f725ca5d41de16f1f9fa6ad12d15d9c7acab 3904 s5-reseau_1.0_amd64.buildinfo
+ 13e8f799538986e673f9107a298114a3696400db 3904 s5-reseau_1.0_amd64.buildinfo
  a8797fe249c248e877820126566edd4f646eaa10 732 s5-reseau_1.0_amd64.deb
 Checksums-Sha256:
- 5797dca68e0b231c64ac4a7ec529caa06dcac4ac6dd9a00c19e2aa470bfacf61 3904 s5-reseau_1.0_amd64.buildinfo
+ 43022511b42644c76a329c67e285d3253dd2783ade5e2f6066ecf3a21121e8ca 3904 s5-reseau_1.0_amd64.buildinfo
  5e321654c1221fe41b9a5b03dc600dc4e3cb7037b3397c223d92a689f6b1055d 732 s5-reseau_1.0_amd64.deb
 Files:
- f985c6eb01fcee8da8599cd853c6903d 3904 misc optional s5-reseau_1.0_amd64.buildinfo
+ 6a1967f887f0d9eeebefefbd8ad2a998 3904 misc optional s5-reseau_1.0_amd64.buildinfo
  ff1f44a4c9642aa2ec3b47306c9580a5 732 misc optional s5-reseau_1.0_amd64.deb
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Buildinfo                                    Wed, 11 Nov 2026 21:36:47 +0000 |
+| Buildinfo                                    Wed, 11 Nov 2026 21:49:32 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -319,7 +321,7 @@ Checksums-Sha256:
  5e321654c1221fe41b9a5b03dc600dc4e3cb7037b3397c223d92a689f6b1055d 732 s5-reseau_1.0_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Wed, 11 Nov 2026 21:36:41 +0000
+Build-Date: Wed, 11 Nov 2026 21:49:27 +0000
 Build-Path: /build/reproducible-path/s5-reseau-1.0
 Installed-Build-Depends:
  base-files (= 13.8+deb13u7),
@@ -444,7 +446,7 @@ Environment:
 
 
 +------------------------------------------------------------------------------+
-| Package contents                             Wed, 11 Nov 2026 21:36:47 +0000 |
+| Package contents                             Wed, 11 Nov 2026 21:49:32 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -474,12 +476,12 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Post Build                                   Wed, 11 Nov 2026 21:36:51 +0000 |
+| Post Build                                   Wed, 11 Nov 2026 21:49:35 +0000 |
 +------------------------------------------------------------------------------+
 
 
 +------------------------------------------------------------------------------+
-| Cleanup                                      Wed, 11 Nov 2026 21:36:51 +0000 |
+| Cleanup                                      Wed, 11 Nov 2026 21:49:35 +0000 |
 +------------------------------------------------------------------------------+
 
 Purging /build/reproducible-path
@@ -492,7 +494,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Summary                                      Wed, 11 Nov 2026 21:36:54 +0000 |
+| Summary                                      Wed, 11 Nov 2026 21:49:38 +0000 |
 +------------------------------------------------------------------------------+
 
 Build Architecture: amd64
@@ -501,15 +503,15 @@ Build-Space: 32
 Build-Time: 3
 Distribution: trixie
 Host Architecture: amd64
-Install-Time: 18
+Install-Time: 15
 Job: /w/src/s5-reseau_1.0.dsc
 Machine Architecture: amd64
 Package: s5-reseau
-Package-Time: 56
+Package-Time: 50
 Source-Version: 1.0
 Space: 32
 Status: successful
 Version: 1.0
 --------------------------------------------------------------------------------
-Finished at 2026-11-11T21:36:42Z
-Build needed 00:00:56, 32k disk space
+Finished at 2026-11-11T21:49:27Z
+Build needed 00:00:50, 32k disk space

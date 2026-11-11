@@ -86,3 +86,13 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Conséquence pour la règle générique** : chaque nouvelle forme apporte son gabarit, son Trigger et son CronJob. L'EventListener et `main.go` restent communs. Le CronJob doit reprendre les correctifs que la 08c pose par patch : les limites en sont un.
 - **Non mesuré** : deux constructions simultanées d'un même push, VSA et scan d'un deb (jalon séparé), et le refus d'une archive altérée dans la plateforme (S5).
 
+
+**Additif du 11/11/2026, 21:52 UTC : S5a mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s5-predictions.md)).
+- **Mesuré** : la construction deb refuse une archive altérée à chaque niveau.
+  - Au téléchargement, `apt-helper` refuse un hash faux.
+  - Dans le miroir, la tâche le revérifie, puis apt contrôle la signature de l'InRelease et le hash des paquets.
+  - Dans la fermeture, la confrontation au verrou refuse un paquet modifié ou un fichier en trop.
+
+  Sous sbuild unshare, la construction n'a aucun réseau. Hors Kata, la tâche privilégiée est refusée.
+- **Conséquence pour la règle générique** : un gestionnaire dont l'outil de construction ne vérifie pas les hash (sbuild et `--extra-package`, comme les paquets natifs de yarn) doit être confronté à un verrou dans la tâche de préparation. Le tirage par digest ne suffit pas, puisqu'il accepte une fermeture cohérente mais différente.
+- **Non mesuré** : le rejeu de zéro (S5b, jalon de plateforme), VSA et scan d'un deb (jalon séparé).

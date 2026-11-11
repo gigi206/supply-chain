@@ -1,0 +1,16 @@
+# s5.sh retirer, 2026-11-11T21:50:32Z
+taskrun.tekton.dev "s5-n1-faux" deleted from builds namespace
+taskrun.tekton.dev "s5-n1-temoin" deleted from builds namespace
+taskrun.tekton.dev "s5-n2-inrelease" deleted from builds namespace
+taskrun.tekton.dev "s5-n3-deb" deleted from builds namespace
+taskrun.tekton.dev "s5-n3-inrelease" deleted from builds namespace
+taskrun.tekton.dev "s5-n3-intact" deleted from builds namespace
+taskrun.tekton.dev "s5-n3-prefetch" deleted from builds namespace
+taskrun.tekton.dev "s5-n5-paquet-en-trop" deleted from builds namespace
+taskrun.tekton.dev "s5-n5-paquet-modifie" deleted from builds namespace
+taskrun.tekton.dev "s5-n5-temoin" deleted from builds namespace
+taskrun.tekton.dev "s5-n7-hors-kata" deleted from builds namespace
+taskrun.tekton.dev "s5-n7-kata" deleted from builds namespace
+persistentvolumeclaim "s5-entrees" deleted from builds namespace
+persistentvolumeclaim "s5-miroir" deleted from builds namespace
+objets s5 restants dans builds : 0 (rien n'est retiré de Zot)
