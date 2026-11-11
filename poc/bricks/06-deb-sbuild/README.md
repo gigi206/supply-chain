@@ -1200,3 +1200,5 @@ Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 U
 
 **Contrôle des secrets**, dans un worktree temporaire, avec le script de la copie : « fichiers : 33 », égal au nombre de fichiers qui diffèrent d'origin ; aucun secret trouvé.
 
+**Correction datée du 11/11/2026, 19:59 UTC** : l'additif ci-dessus (`f153c92`) annonce « les deux modifications relues » de `taches.yml` en citant trois commits. Il y en a trois, toutes relues : ajout des deux tâches (`3836bde`), puis deux remplacements du digest de `preparer-deb` (`cc4b8dd`, `c5da4c4`).
+
