@@ -1554,3 +1554,10 @@ S'y ajoutent une extraction fausse dans une mesure et deux libellés mal prédit
 **Durée** : environ 40 minutes, de la carte (21:13 UTC) au bilan. La brique est à environ 0,45 pw, sous l'estimation de 2 pw.
 
 **Suite** : S5b, le rejeu de zéro, est un jalon de plateforme qui demande d'abord d'intégrer la 06, la 08c et la 08d à `rejeu.sh`. Les contrôles 6 et 7 du deb ont leur jalon séparé, et les questions 3 et 4 de la carte de S4d2 restent ouvertes.
+
+## Additif du 11/11/2026, 22:09 UTC : carte de S5b à sec
+
+La carte du rejeu de zéro (S5b) est écrite dans le README de la [08](../08-trust-plane/README.md), section « Rejeu de zéro S5b », puisque c'est un jalon de plateforme. Rien lancé, rien modifié. Bloc 06 proposé : `s1 amorce`, `s4c`, `s4a`, `s4b`, `s4d` (étapes durables seulement), puis `s4d3` avec `PIPE_DEB` lu dans `pipeline.ref` et des compteurs de porte relatifs.
+
+**Correction** : dans `docs/03-validation-briques.md` (commit `afa9bfe`), un « ; » manque avant « S5a de la 06 tenu », à la fin de la phrase de S4d3.
+

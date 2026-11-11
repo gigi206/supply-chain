@@ -2169,3 +2169,76 @@ Question du propriétaire : « Mais peut être que dans chacun des projets écar
 Décision du propriétaire : « ok pour 1 b1 pour le moment ». [`redemarrer.sh`](redemarrer.sh) relance Alloy de `sc-stockage` une fois les trois nœuds `Ready`, avant Cilium. Alloy v1.21.3 ne relance jamais l'observateur des Events après une erreur au démarrage. Témoin : le compteur de lignes d'Events transmises dépasse 0 après la relance, sans erreur de l'observateur dans le journal d'alloy. Un KO est différé en fin de script. L'essai hors cluster est conforme, 11 cas sur 11. Le passage réel n'est pas lancé : il redémarre les VM et demande un accord à part. Détail : brique 08c, additif de 11:11 UTC de [`mesures-reelles-predictions.md`](../08c-durcissement/resultats/mesures-reelles-predictions.md).
 
 **Additif du 10/11/2026, 11:32 UTC : premier passage réel.** Le passage du 10/11 réécrit `redemarrage-vm.log`, `kata-reseau.log`, `kata-temoin.log`, `openbao-deverrouiller.log`, `openbao-temoin.log`, `openbao-controle.log` et `tsa-temoin.log`. Les versions d'avant sont archivées en `*-avant-b1.log`. Il s'est déroulé de 11:20:20 à 11:31:38 UTC, avec le code 0 : 52 `OK`, 0 `KO`. On y retrouve les 51 contrôles du 07/11 et celui de b1 : Alloy relancé, 249 lignes d'Events transmises. Détail : brique 08c, additif de 11:32 UTC des prédictions.
+
+## Rejeu de zéro S5b : carte à sec (11/11/2026, 22:09 UTC, après « continue »)
+
+Jalon de plateforme décidé le 11/11/2026 à 21:14:51 UTC (« Oui, les trois », README de la [06](../06-deb-sbuild/README.md)) : intégrer la 06, la 08c et la 08d à [`rejeu.sh`](rejeu.sh), puis rejouer de zéro. **Rien lancé, rien modifié** : ni `rejeu.sh`, ni aucun script, ni le cluster, ni Zot. Inventaire en lecture seule des scripts et des README de la 06 et de la 08c ; les points décisifs ci-dessous sont relus dans le code.
+
+### Constats
+
+1. **`rejeu.sh` échouerait déjà, sans rien ajouter, à « J8 (résolveurs) ».** `preuves.sh:2770-2771` attend 4 lecteurs des Secrets du cluster, sans `cilium-operator` : c'est l'état après H5 de la 08c, qui coupe `tls.secretSync` ([`config/valeurs-cilium.yaml`](../08c-durcissement/config/valeurs-cilium.yaml), posé par `h4_bloque`, `durcissement.sh:344`). Les valeurs de Cilium de la 08 et de la 08b ne règlent pas `secretSync` (grep vide) : une installation neuve donne 5 lecteurs, comme le relevé du 06/11 (`resultats/preuves-resolveurs.log:54`). La phrase « `rejeu.sh` n'est pas concerné » de la 08c (README, effets de H1) ne vaut plus pour cette étape.
+2. **La 08d n'a rien installé** : `analyse.sh` lit l'API et rend le chart en local. D7 lie cert-manager à l'exposition de services, hors du rejeu (README de la [08d](../08d-cert-manager/README.md), additif de 21:02 UTC du 05/11). Rien à intégrer : une ligne `echo` le dira dans `rejeu.sh`.
+3. **`egress-selector-mode: disabled` (08b) est déjà dans le rejeu** : clé dans `08b-rke2/config/sc-confiance.yaml:19`, posée comme `config.yaml` par `rke2.sh installer` (`rke2.sh:96`).
+4. **La 06 a tourné entièrement sous la 08c** (H1 à H5 du 06/11, S1, sortie de builds du 10/11). `s4d3.sh prealables` compare le CronJob `rattrapage-deb` à `rattrapage` limites comprises, limites posées par `h5_limites` : sans la 08c, écart (`s4d3.sh:162-176`).
+5. **Rien de la 06 n'est appliqué par une étape actuelle**, sauf ce qu'elle a écrit dans les fichiers de la 08 : `politique/porte/taches.yml`, `porte.rego` (repris par `cm_porte` dans « J6 (suite) ») et le `labelSelector` de `politique/declencheurs.yaml` (repris par J6). Pipelines, tâches signées, NetworkPolicy, Trigger et CronJob `rattrapage-deb` ne sont posés que par les scripts de la 06.
+6. **Rien de la 08c n'est appliqué par une étape actuelle** : ni appoints RKE2, ni politiques Cilium, ni règles Kyverno, ni limites, ni chemins OpenBao de S1. Seuls le compteur d'Events (19b, L3) et l'alerte `EvenementsMuets` (19, O3) sont déjà dans le rejeu.
+7. **Conflit de calendrier** : la tâche planifiée du 21/11/2026 à 16:00 UTC relève la première suppression réelle de la rétention de Zot (07a, G7, délai de 336 h). Un rejeu avant cette date recrée Zot et repousse cette suppression de 14 jours après le rejeu : la mesure du 21/11 serait perdue.
+
+### Ordre proposé : l'ordre historique
+
+Étapes actuelles jusqu'au bloc 07a et VSA inclus, puis **bloc 08c**, puis **bloc 06**, puis `fuites` et « 08b (CIS) ». Raisons : `h5_limites` doit suivre le CronJob du scan (07a, `g7_periodique`) ; `h5_deny` doit suivre les derniers pods sans limites (`g6_temoins`) ; la 06 suppose la 08c (constat 4). Les deux blocs ne tournent que sous `DISTRO=rke2` et `RESEAU=cilium` (`exige_rke2`).
+
+**Bloc 08c**
+
+| # | Étape | Effet | Écart à l'historique |
+|---|---|---|---|
+| 1 | `durcissement.sh h1_api` (enchaîne `h1_controle`) | appoints RKE2, EventRateLimit, kubelet ; redémarre server et agents | Aucun. Après `kata.sh exemption` (J7), jamais avant |
+| 2 | `durcissement.sh h4_bloque` | politiques Cilium du répertoire (dont `intercepteurs-declencheurs`), pare-feu d'hôte, `secretSync` coupé, test 6 avec `T6_FERMES` | Jamais fait sans `h3_audit` avant |
+| 3 | `secrets.sh s1_source s1_chains s1_copies` | chemins `kv/` et rôle `chains-zot` dans OpenBao, Chains injecté, Secret `zot-chains` retiré | Aucun |
+| 4 | `durcissement.sh h5_limites` | 13 correctifs de `limites.tsv`, `config-defaults` ; OpenBao redémarré et descellé | Aucun |
+| 5 | `durcissement.sh h5_deny` | 4 règles en `Deny` | Jamais fait sans H2 en Audit avant ; l'étape n'en dépend pas dans le code |
+| 6 | `durcissement.sh h5_roles` | 2 règles natives et leurs liaisons ; redémarre Triggers et l'agent de `sc-build` | Version corrigée du témoin jamais passée : premier passage réel |
+| 7 | `sortie-builds.sh` **étape neuve** | `prefetch-deb-sortie` puis `builds-sans-internet` à deux valeurs | `appliquer` et `deb_appliquer` exigent des états intermédiaires (`sortie-builds.sh:192-193`) : à écrire |
+| 8 | « J8 (résolveurs) » déplacée ici | contrôle des 4 lecteurs | Mesurée sous H5 le 07/11 |
+
+Exclus : `verifier`, `h2_*`, `h3_*`, `flux*`, les étapes `*_sec`, `h5_cilium` (déjà dans `h4_bloque`, et son contrôle « avant » échouerait, `durcissement.sh:692`), `h6*` (WireGuard mesuré puis retiré), `h5_tests`, `s1_retrait`, tout `evenements.sh` (`appliquer_*` verrouillé sur l'ancienne version, état déjà posé par la 19b et la 19), les relevés et essais.
+
+**Bloc 06** (variante A : même hôte, caches de l'hôte gardés, comme les téléchargements et la CA du reste du rejeu ; fichiers lus présents dans `$W`, relevé de 22:05 UTC)
+
+| # | Étape | Produit attendu (mesuré en S4) |
+|---|---|---|
+| 1 | `s1.sh amorce` | `amont/library/debian@sha256:7378260c…`, depuis le cache OCI |
+| 2 | `s4c.sh verrou publier` | `entrees/sample-app/packaging-deb@sha256:c1719b13…` |
+| 3 | `s4a.sh prealables taches reseau pipeline` | `builds/builders/sbuild-debian13@sha256:749d746c…`, deux fois |
+| 4 | `s4b.sh taches_deb taches_sources deb sources comparaison` | fermetures `bb7599a2…` (deb) et `50dc73f7…` (Go et npm) |
+| 5 | `s4d.sh reseau taches pipeline` | `builds/sample-app-deb@sha256:039949f9…`, deux fois, deb `0b489d43…` |
+| 6 | `s4d3.sh prealables deployer chemins` | Trigger, TriggerTemplate, CronJob `rattrapage-deb` repris ; chemin 2 au même digest |
+| 7 | `s4d3.sh porte`, compteurs adaptés | porte : deb jugé sans violation, sample-app inchangée |
+
+Exclus : S1 sauf `amorce`, S2, S3, `s4a comparaison`, `s4b provenance`, `s4d prealables`, essais, `provenance` et `comparaison`, S4d2 (`porte` exige l'état d'avant, son effet passe par `cm_porte` en J6), `s4d3 retirer`, S5a, `diag-exec-kata.sh`.
+
+**Modifications de scripts à préparer** (aucune faite) :
+- `rejeu.sh` : les deux blocs, « J8 (résolveurs) » déplacée, l'`echo` de la 08d ;
+- `sortie-builds.sh` : étape neuve pour poser les deux politiques sur un cluster neuf ;
+- `s4d3.sh` : `PIPE_DEB` lu dans `$W/s4d-06/pipeline.ref` au lieu du digest en dur (`s4d3.sh:37`) ; la reproductibilité du bundle de pipeline devient une prédiction, pas une condition ;
+- `s4d3.sh porte` : compteurs `8/8` et `28/28` en dur (`s4d3.sh:333, 341`) remplacés par « couvertes = total ».
+
+### Dépendances et limites
+
+- **Externes** : snapshot.debian.org (S4a, S4b), proxy Go et npm (fermeture `sources` : `50dc73f7` peut changer si l'amont bouge). docker.io seulement si le cache OCI manquait.
+- **Perdu au démontage, accepté** (D22 (d) de la 19b) : Loki, Grafana, Zot (dont les fermetures altérées de S5a), la VSA ; avec `POUSSER_VSA=1`, la VSA est re-poussée (accord à part).
+- **Variante B (hôte neuf)** hors de ce jalon : elle demanderait toute la chaîne S1 à S3 et `packaging:sources`.
+- **Reprise par `DEPUIS=`** à une étape antérieure au bloc 08c, sur un cluster durci : casse `kata.sh exemption`, `politique.sh chains` et efface les limites. À écrire dans l'usage.
+
+### Durée et estimation
+
+Dernier rejeu complet : 6 809 s jusqu'à « J8 (helm-cilium) » (`rejeu-rke2-sixieme-passage.log`), puis 2 021 s de reprise (`rejeu-rke2.log`), soit environ 2 h 27. Bloc 08c : environ 20 min (déduit des journaux de la 08c, test 6 compris). Bloc 06 : environ 25 min (`chrono.tsv` de la 06 : 335 s pour S4a, 194 s pour S4b, 890 s pour les chemins de S4d3, S4d non relevé). Total prévu : environ 3 h 15 d'exécution.
+
+**Estimation de S5b** : une journée, préparation à sec et contrôles sur l'hôte compris (quatre scripts modifiés). Une décision s'impose à partir de deux jours.
+
+### Questions au propriétaire
+
+1. **Ordre et périmètre** : étapes actuelles, puis 08c, puis 06 en variante A, comme ci-dessus. Recommandé.
+2. **« J8 (résolveurs) »** : (a) la déplacer après le bloc 08c, seule option mesurée, **recommandée** ; (b) couper `secretSync` dès l'installation, ce qui modifie la 08b, non mesuré ; (c) faire détecter l'état par `preuves.sh`.
+3. **Calendrier** : lancer après la tâche du 21/11/2026 à 16:00 UTC, **recommandé**, ou avant en renonçant à cette mesure (tâche à désactiver).
+4. **Préparation** : accord pour écrire à sec les quatre modifications, avec contrôles sur l'hôte et prédictions. Le lancement, destructif, demandera son propre accord nommé.
