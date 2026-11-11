@@ -63,3 +63,9 @@ Prédictions écrites le 11/11/2026 à 20:17 UTC, avant tout lancement. Script :
   | Sans `preparer-deb` | `fermeture_plateforme` et `preparation_appariee` | |
 
 - **E7** : avec les règles en service (`a7c7405`), aucun code, ni sur le deb réel ni sur le témoin hors Kata. C'est le succès à vide décrit par la carte, désormais mesuré.
+
+**`regle`, second passage** (20:19:52 UTC, accord « Oui, relance-la », [journal](s4d2-regle-2.log)), avec le test corrigé et la règle inchangée :
+- `ec opa test` passe 39 tests sur 39.
+- Les 18 mutations sont conformes à l'annonce : 17 font échouer au moins un test, et `f.preparation == nom` survit comme prévu. Remplacer par `false` la correspondance par dépôt du bundle fait maintenant échouer `test_deb_bundle_sous_autre_nom_hors_kata_refuse`.
+
+**E2 tenue au second passage**, après correction du test.
