@@ -1202,3 +1202,50 @@ Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 U
 
 **Correction datée du 11/11/2026, 19:59 UTC** : l'additif ci-dessus (`f153c92`) annonce « les deux modifications relues » de `taches.yml` en citant trois commits. Il y en a trois, toutes relues : ajout des deux tâches (`3836bde`), puis deux remplacements du digest de `preparer-deb` (`cc4b8dd`, `c5da4c4`).
 
+## Additif du 11/11/2026, 20:07 UTC : carte de S4d2, à sec, rien lancé
+
+Rédigée sur « continue » (cadre : préparer sans rien lancer), après relecture de `porte.rego`, `porte-job.yaml`, `juger` (`politique.sh` de la 08), `vsa.sh`, `scan-verifier.sh` et `scanner.sh` (07a), et avis du conseiller. Aucune écriture dans le cluster ni dans Zot.
+
+**Vérifié pendant la carte**, en lecture seule :
+- **Provenance réelle de S4d1** (`prov.json` du PipelineRun `s4d-deb-1`, vérifiée en D15) : `preparer` émet `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT`, `FERMETURE_DEB_ARTIFACT_INPUTS`, `FERMETURE_SOURCES_ARTIFACT_INPUTS` et `PACKAGING_ARTIFACT_INPUTS` ; `construire` porte `runtimeClassName` `kata` dans sa spec ; `publier` émet `IMAGE_URL` et `IMAGE_DIGEST`.
+- **Provenances des fermetures** (S4b) : celle de la fermeture deb n'a que `prefetch-deb` (résultat `INSTANTANE_ARTIFACT_INPUTS`, InRelease `0584fba3…`) et `publier-fermeture`, **sans git** ; celle de la fermeture applicative a `prefetch-gomod` (version 2) avec `CHAINS-GIT_URL` égal à celui de `preparer-deb`, et `publier-fermeture`.
+- **Porte actuelle** : `_construction` ne connaît que `construire-image`, `_preparation` que `preparer-entrees`, `_fermetures` ne lit que `FERMETURE_ARTIFACT_INPUTS`, et `_prefetch` exige `prefetch-gomod`. Sur la provenance de S4d1, `construction_kata` et `fermeture_plateforme` réussissent donc à vide. `trusted_task` voit les trois tâches, toutes dans la liste revue.
+- **Contrôle 9 (horodatage)** : le CronJob de la 08 parcourt tous les dépôts sous `builds/`, donc `builds/sample-app-deb`. Prédiction à mesurer, pas un fait.
+- **Contrôles 6 et 7** : `vsa.sh` lit `builds/vsa/sample-app-deb` et `scan-verifier.sh` lit `builds/scan/sample-app-deb`. Les deux sont vides : la porte refuse le deb aujourd'hui, en échec fermé.
+- **syft 1.38** (`syft cataloger list`, hors réseau) : `deb-archive-cataloger` n'a pas l'étiquette `image`, il ne tourne donc pas par défaut sur `oci-dir:`. Il ne lirait de toute façon que les métadonnées déclarées du deb, pas les modules Go du binaire. Un scan utile du deb suppose d'extraire `data.tar`, puis `syft dir:` : à mesurer.
+- **Replay (brique 10)** : FIN_BUILD + 24 h, domaine séparé, VM `sc-replay` sans sbuild ni mmdebstrap. Rejouer le deb demanderait une installation de paquets dans cette VM.
+
+**Forme proposée de la règle étendue** (`porte.rego`), chaque point avec ses tests :
+1. **Kata** : `_construction` reconnaît `construire-deb`, par son nom et par le dépôt de son bundle, sur le modèle de `construire-image`.
+2. **Fermetures typées par le nom du résultat** :
+   - `FERMETURE_DEB_ARTIFACT_INPUTS` n'est prouvée que par la forme deb : exactement `prefetch-deb` et `publier-fermeture`, toutes deux revues, sujet et `IMAGE_URL`/`IMAGE_DIGEST` égaux, sans git ;
+   - `FERMETURE_SOURCES_ARTIFACT_INPUTS`, comme l'actuel `FERMETURE_ARTIFACT_INPUTS`, n'est prouvée que par la forme gomod, avec `CHAINS-GIT_URL` égal à celui de la préparation.
+
+   Un test « fermetures permutées » doit être refusé.
+3. **Préparation complète** : `preparer-deb` exige les deux types, chacun présent et prouvé. La règle actuelle ne refuse que si aucune fermeture n'est lue. Tests : résultat deb absent, résultat sources absent.
+4. **Appariement** : une provenance qui contient `construire-deb` sans `preparer-deb` est refusée. Le même appariement pour `construire-image` ⇒ `preparer-entrees` changerait la voie image : question 2.
+5. **Hors du jugement, à inscrire comme dette** :
+   - `PACKAGING_ARTIFACT_INPUTS`, poussé depuis l'hôte sous `entrees/`, sans provenance de la plateforme, comme `web/dist` dans la voie image ;
+   - la provenance de l'image de build `sbuild-debian13` : son digest n'est revu qu'à travers `taches.yml`, comme image d'étape de `construire-deb`.
+
+**Vérification prévue** (prédictions commitées avant tout lancement) :
+- **Sur l'hôte, sans accord** : `ec opa check` et `ec opa test` ; les 21 tests actuels de `porte_test.rego` gardés ; fixtures deb tirées des vraies provenances de S4d1 et de S4b, pas d'une forme imaginée ; mutations sur le modèle de `g5_regles` de la 07a (chaque condition retirée tour à tour fait échouer au moins un test) ; règle neuve évaluée sur l'énoncé réel de S4d1 (levier d).
+- **Dans le cluster, sous accord nommé** :
+  - mise à jour de la ConfigMap `porte`, commune aux deux voies ;
+  - Job de la porte sur `builds/sample-app-deb@sha256:039949f9…`. Prédiction : `ec` en succès, sans violation, `trusted_task.tagged` en avertissement comme pour sample-app ; horodatage complet ; VSA et scan refusés. `@slsa3` n'a jamais jugé un artefact dont la seule couche contient un `.deb`. Les règles `slsa_source_correlated`, qui refusent une provenance sans source (`c7-sans-scan`, même journal), devraient passer : la provenance de S4d1 nomme le commit. Si une règle de la collection refuse le deb, je m'arrête et je reviens avec la règle et son motif, sans l'exclure ;
+  - Job de la porte sur l'image sample-app, en non-régression. Prédiction : verdict identique au dernier archivé pour l'image réelle (`c7-reelle` dans `preuves-h5-controle7.log` de la 08, 07/11/2026 : succès, `trusted_task.tagged`, horodatage, VSA et scan admis).
+- **Témoins négatifs**, par des énoncés modifiés évalués sur l'hôte : `construire-deb` hors Kata, fermeture deb absente, fermetures permutées.
+
+**Accords à prévoir** : la mise à jour de la ConfigMap (écriture dans le cluster) ; le script de S4d2 (neuf, ou `s4d.sh` étendu), qui appelle `juger` de la 08 ; toute modification de `politique.sh` ou de `porte-job.yaml`, accord à part.
+
+**Effort** : la règle, ses tests, la ConfigMap et les deux jugements tiennent dans le bas de la fourchette de S4d2 (0,5 jour). Les contrôles 6 et 7 du deb n'y tiennent pas :
+- le mode deb du scanner (07a) est un script modifié, avec une mesure à faire, soit 0,5 à 1 jour ;
+- le replay du deb (brique 10) demande une installation dans la VM, plus l'attente de 24 h, soit 1 à 2 jours.
+
+Avec eux, S4d2 dépasserait sa fourchette, sans approcher le seuil de la brique (4 pw ; elle en est à environ 0,4 pw).
+
+**Questions au propriétaire**
+1. **Découpage.** S4d2a : la règle étendue et le jugement du deb, contrôles 6 et 7 en refus (échec fermé), avant S4d3. Les contrôles 6 et 7 du deb passent dans un jalon séparé, après S4d3 ou avec S5. **Ma recommandation** : la porte ne réussit plus à vide sur le deb, et rien n'est publié tant que 6 et 7 refusent.
+2. **Appariement dans la voie image** (`construire-image` ⇒ `preparer-entrees`) : l'ajouter en S4d2a, avec la non-régression sur sample-app, ou le laisser hors périmètre. **Ma recommandation** : le laisser hors périmètre et l'inscrire comme dette, pour que S4d2a ne change pas le comportement de la voie image.
+3. **Contrôle 7 du deb** : un mode deb du scanner (extraction de `data.tar`, puis `syft dir:`, à mesurer d'abord), ou un écart à l'ADR 0000 §4 pour le deb. Rien n'est à trancher avant le jalon séparé, si la question 1 est retenue.
+4. **Contrôle 6 du deb** : un replay du deb dans le domaine de la brique 10 (installation de sbuild ou de mmdebstrap dans `sc-replay`, sous ton accord), ou un écart à l'ADR. Même remarque.
