@@ -1,0 +1,132 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/signature: MEUCIFonK3Go/ATKrJk53XiUPpEuxGU49M1pCoXJ/0ck7m5AAiEA0t+bp1ojlhVTSsCeHop8ELEQhzUViZsUrwY5VZhxkxY=
+  name: prefetch-gomod
+spec:
+  params:
+  - name: depot
+    type: string
+  - name: commit
+    type: string
+  - name: paquets
+    type: string
+  results:
+  - name: CHAINS-GIT_URL
+    type: string
+  - name: CHAINS-GIT_COMMIT
+    type: string
+  stepTemplate:
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 65532
+    volumeMounts:
+    - mountPath: /etc/ca-poc
+      name: ca-poc
+      readOnly: true
+    - mountPath: /tmp
+      name: tmp
+  steps:
+  - env:
+    - name: DEPOT
+      value: $(params.depot)
+    - name: COMMIT
+      value: $(params.commit)
+    - name: PAQUETS
+      value: $(params.paquets)
+    - name: HERMETO_GOMOD__PROXY_URL
+      value: https://proxy.golang.org
+    image: sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+    name: prefetch
+    resources: {}
+    script: |
+      #!/bin/sh
+      set -eu
+      case $COMMIT in *[!0-9a-f]*) echo "commit invalide : $COMMIT" >&2; exit 1 ;; esac
+      [ ${#COMMIT} = 40 ] || { echo "commit invalide : $COMMIT" >&2; exit 1; }
+      case $DEPOT in https://sc-stockage.poc.test:3000/*.git) ;; *) echo "dépôt hors de Forgejo : $DEPOT" >&2; exit 1 ;; esac
+      f=$(workspaces.sortie.path)/fermeture
+      [ ! -e "$f" ] || { echo "workspace déjà rempli : $f" >&2; exit 1; }
+      export HOME=/tmp GIT_CONFIG_NOSYSTEM=1 GIT_SSL_CAINFO=/etc/ca-poc/ca.crt GIT_TERMINAL_PROMPT=0
+      git clone --quiet --no-checkout "$DEPOT" /tmp/depot
+      git -C /tmp/depot checkout --quiet --detach "$COMMIT"
+      [ "$(git -C /tmp/depot rev-parse HEAD)" = "$COMMIT" ] || { echo "HEAD différent du commit demandé" >&2; exit 1; }
+      python3 -I - /tmp/depot "$PAQUETS" <<'FIN'
+      import json, os, sys
+      src, demande = sys.argv[1:]
+      def refus(m):
+          print('refusé : ' + m, file=sys.stderr); sys.exit(1)
+      try:
+          d = json.loads(demande)
+      except ValueError:
+          refus('demande Hermeto illisible')
+      if not isinstance(d, list) or not d:
+          refus('demande Hermeto : liste non vide attendue')
+      vus = set()
+      for p in d:
+          if not isinstance(p, dict) or not set(p) <= {'type', 'path'}:
+              refus(f'entrée non admise : {p!r}')
+          t, c = p.get('type'), p.get('path', '.')
+          if t not in ('gomod', 'npm'):
+              refus(f'type non admis : {t!r}')
+          if not isinstance(c, str) or not c or c.startswith('/') or '..' in c.split('/'):
+              refus(f'chemin non admis : {c!r}')
+          if (t, os.path.normpath(c)) in vus:
+              refus(f'entrée en double : {p!r}')
+          vus.add((t, os.path.normpath(c)))
+          if t != 'npm':
+              print(f'{t} {c} : admis')
+              continue
+          r = os.path.join(src, c)
+          if os.path.islink(r) or not os.path.isdir(r):
+              refus(f'npm {c} : répertoire absent ou lien')
+          for nom in ('npm-shrinkwrap.json', 'package-lock.json'):   # ordre d'Hermeto 0.64.0 (npm/resolver.py)
+              v = os.path.join(r, nom)
+              if os.path.lexists(v):
+                  break
+          else:
+              refus(f'npm {c} : aucun lockfile')
+          if os.path.islink(v):
+              refus(f'npm {c} : {nom} est un lien')
+          try:
+              l = json.load(open(v, encoding='utf-8'))
+          except ValueError:
+              refus(f'npm {c} : {nom} illisible')
+          if l.get('lockfileVersion') not in (2, 3):
+              refus(f'npm {c} : lockfileVersion {l.get("lockfileVersion")!r}, 2 ou 3 attendu')
+          paquets = l.get('packages')
+          if not isinstance(paquets, dict) or '' not in paquets:
+              refus(f'npm {c} : section packages absente ou sans racine')
+          n = 0
+          for k, e in paquets.items():
+              if k == '':
+                  continue
+              if not isinstance(e, dict) or e.get('link'):
+                  refus(f'npm {c} : entrée {k} : lien ou forme inattendue')
+              u, i = e.get('resolved'), e.get('integrity')
+              if not isinstance(u, str) or not u.startswith('https://registry.npmjs.org/'):
+                  refus(f'npm {c} : entrée {k} : resolved {u!r} hors de https://registry.npmjs.org/')
+              if not isinstance(i, str) or not i.startswith('sha512-'):
+                  refus(f'npm {c} : entrée {k} : integrity sha512 absente')
+              n += 1
+          print(f'npm {c} : {nom}, lockfileVersion {l["lockfileVersion"]}, {n} paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512')
+      FIN
+      echo "$(hermeto --version | head -1) ; $(go version) ; $(git --version) ; commit $COMMIT ; demande $PAQUETS"
+      hermeto fetch-deps --source /tmp/depot --output "$f" "$PAQUETS"
+      echo "fermeture : $(find "$f/deps" -type f | wc -l) fichiers, $(du -sk "$f/deps" | cut -f1) Kio"
+      printf '%s' "$DEPOT" > $(results.CHAINS-GIT_URL.path)
+      printf '%s' "$COMMIT" > $(results.CHAINS-GIT_COMMIT.path)
+  volumes:
+  - configMap:
+      name: ca-poc
+    name: ca-poc
+  - emptyDir: {}
+    name: tmp
+  workspaces:
+  - name: sortie

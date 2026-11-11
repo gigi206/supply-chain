@@ -113,3 +113,13 @@ Journaux : [`s4b-taches_deb.log`](s4b-taches_deb.log) et [`s4b-deb.log`](s4b-deb
 - La tâche n'est pas modifiée (décision A). Le message est trompeur pour une fermeture sans Hermeto : à reprendre avec la règle de porte générique (S4d).
 
 Restent B7, B11 à B16 : `SIGNER=1 taches_sources`, revue de la liste, `taches_sources`, `sources`, puis `comparaison` et `provenance`.
+
+## Résultats de l'étape `SIGNER=1 taches_sources` (11/11/2026, 17:31:56 UTC, accord « Oui, lance-la »)
+
+Journal : [`s4b-taches_sources.log`](s4b-taches_sources.log). Écriture définitive dans Zot : le bundle de la version 2, sous le tag `s4b`.
+
+| N° | Résultat |
+|---|---|
+| B7 | **Tenue.** La version 2 est signée, et sa signature versionnée est [`fermetures/prefetch-gomod.signee.yaml`](../fermetures/prefetch-gomod.signee.yaml), conforme au gabarit rendu, signature exceptée. Bundle : `tekton/tasks/prefetch-gomod@sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f`, différent de la version 1 (`5e7e5662`). P2 n'est pas signée tant que la liste revue n'est pas acceptée |
+
+L'ajout du digest à `politique/porte/taches.yml` de la 08 attend la relecture du propriétaire. Il n'est pas commité.
