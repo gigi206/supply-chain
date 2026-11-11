@@ -95,3 +95,21 @@ La prédiction B9 n'est pas réécrite. Cette note ne la remplace pas : seule l'
 - **Seule hypothèse ouverte** : une dérive de la ConfigMap depuis S4a. La relire n'apporterait pas plus que cette preuve, car elle ne montre que le script, pas le mode réel. Avis du conseiller : lancer sans cette lecture.
 
 B9 n'est pas réécrite. Seule l'exécution de `deb` la tranchera.
+
+## Résultats des étapes `taches_deb` et `deb` (11/11/2026, de 17:28:42 à 17:31:06 UTC, accord « Oui, lance taches_deb et deb »)
+
+Journaux : [`s4b-taches_deb.log`](s4b-taches_deb.log) et [`s4b-deb.log`](s4b-deb.log). Écritures définitives dans Zot : le bundle de P1 et la fermeture deb.
+
+| N° | Résultat |
+|---|---|
+| B6 | **Tenue.** L'artefact de packaging relu dans Zot, en lecture anonyme, donne un verrou égal à celui du dépôt et la même liste (162 lignes, 193 978 008 octets). P1 est signée et poussée : `tekton/pipelines/prefetch-deb-sample-app@sha256:86e70b7fd45a2f471ed7264b48e73394b756ed358693747a70c5a3c04205cba8` |
+| B8 | **Tenue.** Deux PipelineRuns réussis (`s4b-deb-1` et `s4b-deb-2`). Les pods tournent en runc (`runtimeClassName` vide) sur `sc-build`, avec les labels `prefetch-deb` et `publier-fermeture`. `prefetch-deb` affiche « miroir : 162 paquets, 193978008 octets », en 20 s puis 12 s. Les index sont conformes à l'InRelease : `Packages.xz` `7778d3e3`, `Translation-en.xz` `800dd225` |
+| B9 | **Tenue.** `prefetch-deb`, en UID 65532, a écrit `miroir/` dans le sous-dossier `fermeture` créé par le kubelet (notes de 17:05, en fait 17:21, et de 17:24 UTC) |
+| B10 | **Tenue.** Même fermeture pour les deux exécutions : `builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290`, 167 couches, relue en lecture anonyme. Chains a signé les deux PipelineRuns |
+
+**Constat, non prévu** : `publier-fermeture` affiche « can't open bom.json: no such file », puis « SBOM de Hermeto non publié : » sans empreinte.
+- Cause : la tâche calcule l'empreinte du `bom.json` d'Hermeto pour la journaliser. Une fermeture deb n'en a pas.
+- L'erreur vient d'une substitution de commande dans un `echo`, ce qui ne fait pas échouer `set -eu`. La publication et les résultats ne sont pas touchés.
+- La tâche n'est pas modifiée (décision A). Le message est trompeur pour une fermeture sans Hermeto : à reprendre avec la règle de porte générique (S4d).
+
+Restent B7, B11 à B16 : `SIGNER=1 taches_sources`, revue de la liste, `taches_sources`, `sources`, puis `comparaison` et `provenance`.

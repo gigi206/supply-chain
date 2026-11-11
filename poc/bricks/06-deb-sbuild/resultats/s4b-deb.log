@@ -1,0 +1,34 @@
+# s4b.sh deb, 2026-11-11T17:28:47Z
+## s4b-deb-1 créé à 17:28:48 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:86e70b7fd45a2f471ed7264b48e73394b756ed358693747a70c5a3c04205cba8)
+### TaskRun s4b-deb-1-prefetch (Succeeded), pod s4b-deb-1-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-deb
+     2026/11/11 17:28:53 Entrypoint initialization
+     2026/11/11 17:28:53 Decoded script /tekton/scripts/script-0-pzz6h
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 162 paquets, 193978008 octets, en 20 s
+### TaskRun s4b-deb-1-publier (Succeeded), pod s4b-deb-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/11 17:29:17 Entrypoint initialization
+     2026/11/11 17:29:18 Decoded script /tekton/scripts/script-0-bdp4x
+     /tekton/scripts/script-0-bdp4x: line 17: can't open bom.json: no such file
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (167 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+OK   PipelineRun s4b-deb-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   PipelineRun s4b-deb-1 signé par Chains : true
+## s4b-deb-2 créé à 17:30:29 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-deb-sample-app@sha256:86e70b7fd45a2f471ed7264b48e73394b756ed358693747a70c5a3c04205cba8)
+### TaskRun s4b-deb-2-prefetch (Succeeded), pod s4b-deb-2-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-deb
+     2026/11/11 17:30:34 Entrypoint initialization
+     2026/11/11 17:30:35 Decoded script /tekton/scripts/script-0-pklmr
+     uid=65532 gid=65532 groups=65532 ; apt 3.0.4 (amd64) ; instantané http://snapshot.debian.org/archive/debian/20261105T000000Z
+     index main/binary-amd64/Packages.xz : sha256 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498, 9678380 octets (InRelease)
+     index main/i18n/Translation-en.xz : sha256 800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251, 6485704 octets (InRelease)
+     miroir : 162 paquets, 193978008 octets, en 12 s
+### TaskRun s4b-deb-2-publier (Succeeded), pod s4b-deb-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
+     2026/11/11 17:30:53 Decoded script /tekton/scripts/script-0-hjl5p
+     /tekton/scripts/script-0-hjl5p: line 17: can't open bom.json: no such file
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (167 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 
+     2026/11/11 17:30:53 Entrypoint initialization
+OK   PipelineRun s4b-deb-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   PipelineRun s4b-deb-2 signé par Chains : true
+OK   deux exécutions, même fermeture : sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
