@@ -68,3 +68,7 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Mesuré** : une fermeture applicative gomod et npm, produite par un seul appel à Hermeto dans la plateforme (`prefetch-gomod` version 2, lockfile npm contrôlé avant Hermeto), et une fermeture deb, produite par `prefetch-deb` sur la liste du verrou. Toutes deux sont publiées par `publier-fermeture`, signées par Chains et reproductibles au digest près.
 - **Le point « gestionnaires couverts » est mesuré pour npm** dans la plateforme, sans Node dans l'image d'outils.
 - **Non mesuré** : la règle de porte à N fermetures, la confrontation de la fermeture deb au verrou à la construction (S4d), et le refus d'une archive altérée dans la plateforme (S5).
+
+**Additif du 11/11/2026, 19:58 UTC : S4d1 mesuré** (brique 06, [résultats](../../poc/bricks/06-deb-sbuild/resultats/s4d-predictions.md)).
+- **Mesuré** : la fermeture deb est confrontée au verrou dans la plateforme (`preparer-deb`), qui consomme deux fermetures (deb et applicative) et un artefact de packaging, tous tirés par digest et déclarés à Chains. La construction ne prend ses dépendances que dans ces fermetures, sans réseau, et rend le même deb que l'hôte et OBS.
+- **Non mesuré** : la règle de porte à N fermetures (S4d2), le refus d'une archive altérée dans la plateforme (S5).

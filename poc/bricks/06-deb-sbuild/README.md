@@ -1179,3 +1179,17 @@ Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 U
 3. L'assemblage du `.dsc` dans le pod de construction, au lieu de la préparation.
 
 **Décision du propriétaire** (11/11/2026, 17:54:35 UTC) : « Oui, retiens-les ». Sont retenus : le découpage S4d1, S4d2, S4d3, avec la porte avant le trigger ; le deb seul dans l'artefact signé (a) ; l'assemblage du `.dsc` dans le pod de construction. Ce n'est un accord pour aucune mesure ni aucune écriture : S4d1 sera préparé à sec, avec ses prédictions commitées avant tout lancement.
+
+## Additif du 11/11/2026, 19:58 UTC : S4d1 tenu
+
+**S4d1 tenu**, de la carte (« Continue », 17:44:27 UTC) au bilan (19:57:28 UTC), avec les accords nommés de chaque étape : D1 à D17 ([prédictions et résultats](resultats/s4d-predictions.md)). **La plateforme construit le deb de sample-app de bout en bout** : la pipeline signée `sample-app-deb` (`82c8373d`) enchaîne `preparer-deb` (runc ; clone, trois artefacts tirés par digest, fermeture deb confrontée au verrou, `vendor/` et `marked` reconstitués), `construire-deb` (Kata, sbuild en UID 1000, entrées en lecture seule, aucune sortie réseau) et `publier-image` inchangée. Elle publie `builds/sample-app-deb@sha256:039949f9…`, même digest aux deux exécutions et digest calculé à l'avance sur l'hôte ; le deb est `0b489d43…`, celui d'OBS, de S1 et de S3. Chains signe, et la provenance nomme le commit, les deux fermetures, l'artefact de packaging, l'image de build et les tâches revues.
+
+**Décisions et accords du jalon** (lignes datées dans les commits) : « Oui, retiens-les » (17:54:35 UTC : découpage S4d1, S4d2, S4d3 ; deb seul ; `.dsc` dans le pod de construction) ; « Ok » (`busybox_outils`, `reseau`, `essai`) ; trois cycles de signature, de relecture de `taches.yml` et de lancement de la pipeline ; « Oui, lance-le » (`essai_preparer`) ; « Oui, lance-les » (`comparaison`, `provenance`).
+
+**Écarts** : deux PipelineRuns en échec dans `preparer-deb`, de même origine (les contrôles sur l'hôte imitaient l'environnement de la tâche, et le pod d'essai ne couvrait que la tâche privilégiée) ; corrigés par un pod d'essai de la préparation. Quatre bundles inutilisables restent dans Zot (`preparer-deb` `b310c262` et `5f0ca26b`, pipeline `83455f46` et `c43988a8`). **Leçon pour la suite** : le levier (e) s'applique à toute tâche neuve, privilégiée ou non, avant sa signature.
+
+**Constat** : le `.debian.tar.xz` de `sources.sh` portait le umask de l'hôte (664) ; celui de la plateforme a les modes de git. Le `.dsc` change, pas le deb.
+
+**Durée** : environ 2 h 15, de 17:44 à 19:58 UTC. La brique reste sous son estimation de 2 pw, au bas de la fourchette de la carte pour S4d1 (1 à 2 jours).
+
+**Suite, selon le découpage décidé** : S4d2 (porte étendue : plusieurs fermetures, Kata pour `construire-deb`, préparation du deb, jugement d'un artefact deb, VSA et scan), puis S4d3 (trigger et rattrapage), puis S5.

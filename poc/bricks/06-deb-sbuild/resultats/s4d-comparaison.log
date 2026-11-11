@@ -1,0 +1,10 @@
+# s4d.sh comparaison, 2026-11-11T19:57:27Z
+OK   artefact 1 : manifeste relu au digest publié : 039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   artefact 1 : une couche, le deb seul : 1 sample-app_1.0.0-1_amd64.deb
+OK   artefact 1 : deb égal à celui d'OBS, S1 et S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   artefact 1 : Installed-Build-Depends égaux au verrou (nom=version), lignes d'écart : 0
+OK   artefact 2 : manifeste relu au digest publié : 039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   artefact 2 : une couche, le deb seul : 1 sample-app_1.0.0-1_amd64.deb
+OK   artefact 2 : deb égal à celui d'OBS, S1 et S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   artefact 2 : Installed-Build-Depends égaux au verrou (nom=version), lignes d'écart : 0
+écarts : 0

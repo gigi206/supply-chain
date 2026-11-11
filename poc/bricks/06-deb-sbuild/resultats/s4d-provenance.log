@@ -1,0 +1,26 @@
+# s4d.sh provenance, 2026-11-11T19:57:27Z
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   enveloppes du PipelineRun s4d-deb-1 : 1
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+  - oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+  inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+  inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+  inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   sujet : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   entrée sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb : sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   entrée sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources : sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   entrée sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb : sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   entrée sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 : sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+OK   tâches dans la provenance : construire-deb preparer-deb publier-image
+OK   TaskRun de construire-deb : runtimeClassName kata dans la spec signée : kata
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)

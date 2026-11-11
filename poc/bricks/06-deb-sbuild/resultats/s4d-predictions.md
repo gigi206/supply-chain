@@ -193,3 +193,27 @@ Avis du conseiller après le second échec : une troisième simulation sur l'hô
 - **D13 : tenue.** Les deux exécutions publient **`builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e`**, le digest calculé sur l'hôte en `prealables`. Chains signe les deux PipelineRuns.
 - **Constats** : dans les deux constructions, le deb est `0b489d43…`, l'archive amont `07521c1e` et le `.dsc` `7f9cf5d3`, comme dans l'essai. sbuild met 361 s puis 339 s, sans aucune ligne apt en http(s).
 
+## Résultats du 11/11/2026, 19:57 UTC : comparaison et provenance ; bilan de S4d1
+
+**Accord du propriétaire** (19:57:21 UTC) : « Oui, lance-les ». Étapes à 19:57:27 UTC, code 0 ([comparaison](s4d-comparaison.log), [provenance](s4d-provenance.log)).
+
+- **D14 : tenue.** Les deux artefacts, tirés par digest, ont un manifeste au digest publié et une seule couche, qui contient le deb seul : `0b489d43…`. Les `Installed-Build-Depends` des deux `.buildinfo` sont égaux au verrou (162 paquets, nom et version).
+- **D15 : tenue.** `cosign verify-attestation` valide 4 enveloppes sur l'artefact, dont une pour `s4d-deb-1`. Elle porte :
+  - sujet `builds/sample-app-deb@sha256:039949f9…`, `buildType` `slsa-tekton` ;
+  - source `git+…/sample-app.git` au commit `6391fd43` ;
+  - fermeture deb `bb7599a2`, fermeture applicative `50dc73f7` et artefact de packaging `c1719b13`, en entrées déclarées ;
+  - image de build `749d746c`, comme image d'étape de `construire-deb` ;
+  - la pipeline `82c8373d` et les trois tâches, `preparer-deb` `588617b8`, `construire-deb` `3726ff0b`, `publier-image` `d21931f3` ;
+  - `runtimeClassName: kata` dans la spec signée du TaskRun de `construire-deb`.
+  Une autre clé est refusée.
+
+### Bilan de S4d1
+
+**S4d1 est tenu : D1 à D17**, avec deux réfutations de D12 aux deux premiers passages, corrigées. **La plateforme construit le deb de sample-app de bout en bout**, sous Kata, sans réseau, depuis les fermetures qu'elle a produites et confrontées au verrou. Elle publie `builds/sample-app-deb@sha256:039949f9…`, le même digest aux deux exécutions et le digest calculé à l'avance sur l'hôte. Le deb est `0b489d43…`, celui d'OBS, de S1 et de S3. La provenance signée nomme toutes les entrées.
+
+**Écarts et coûts**
+- Deux PipelineRuns en échec dans `preparer-deb` (`/tmp` de l'image de prefetch non inscriptible ; fermeture applicative tirée un niveau trop bas). Même origine : les contrôles sur l'hôte imitaient l'environnement de la tâche, et le pod d'essai ne visait que la tâche privilégiée. Corrigé en étendant le pod d'essai à `preparer-deb` (D17).
+- Quatre bundles inutilisables restent dans Zot : `tekton/tasks/preparer-deb@b310c262` et `@5f0ca26b`, `tekton/pipelines/sample-app-deb@83455f46` et `@c43988a8`. Ils sont retirés de la liste revue, ou n'y ont jamais été.
+- Deux heures fausses dans une note, et un journal effacé par un renommage, corrigés.
+
+**Ce que S4d1 ne couvre pas** : la porte ne juge pas encore cet artefact (S4d2) ; aucun trigger n'est branché (S4d3) ; les tests négatifs (archive altérée, hash faux, InRelease altéré) restent pour S5.
