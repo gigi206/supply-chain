@@ -163,9 +163,12 @@ etape_prealables() {
   echo "## CronJob rattrapage-deb contre rattrapage en service (hors nom, compte, GABARIT et suspension)"
   # Corrigé le 11/11/2026 après le premier passage (20:42:37 UTC, arrêt avant toute écriture) : le serveur pose aussi le champ
   # déprécié serviceAccount (copie de serviceAccountName) et un jobTemplate.metadata vide ({}), absent du rendu (null).
+  # Corrigé le 11/11/2026 après le premier passage de deployer (20:44:25 UTC) : les ressources ne sont plus retirées de la
+  # comparaison. Celles de rattrapage sont posées par la 08c (limites.tsv, par patch), absentes de rattrapage.yaml : les retirer
+  # avait caché que le CronJob du deb, sans limites, serait refusé par limites-obligatoires.
   a='.spec | .jobTemplate.spec.template.spec |= (del(.serviceAccountName, .serviceAccount) | .containers[0].env |= map(select(.name != "GABARIT")))
     | del(.suspend) | walk(if type == "object" then del(.defaultMode, .terminationMessagePath, .terminationMessagePolicy, .imagePullPolicy,
-      .dnsPolicy, .schedulerName, .terminationGracePeriodSeconds, .resources) else . end)
+      .dnsPolicy, .schedulerName, .terminationGracePeriodSeconds) else . end)
     | .jobTemplate.spec.template.metadata = ((.jobTemplate.spec.template.metadata // {}) | del(.creationTimestamp))
     | .jobTemplate.metadata = ((.jobTemplate.metadata // {}) | del(.creationTimestamp))'
   kubectl get cronjob -n declencheurs rattrapage -o json | jq -S "$a" > "$T/cj-service.json"
@@ -177,7 +180,8 @@ etape_prealables() {
   echo "## EventListener du dépôt contre celui en service"
   el_depot | jq -S '.spec' > "$T/el-depot.json"
   el_service > "$T/el-service.json"
-  if diff "$T/el-service.json" <(jq -S 'del(.labelSelector)' "$T/el-depot.json") > "$T/el.diff"; then echo "OK   identiques hors labelSelector"
+  # Corrigé le 11/11/2026 après le premier passage de deployer (20:44:25 UTC), qui a posé le labelSelector : retiré des deux côtés.
+  if diff <(jq -S 'del(.labelSelector)' "$T/el-service.json") <(jq -S 'del(.labelSelector)' "$T/el-depot.json") > "$T/el.diff"; then echo "OK   identiques hors labelSelector"
   else sed 's/^/     /' "$T/el.diff"; echo "ÉCART EventListener en service différent du dépôt hors labelSelector"; ECARTS=$((ECARTS + 1)); fi
   mesure "labelSelector du dépôt" "$(jq -c '.labelSelector' "$T/el-depot.json")" '{"matchLabels":{"poc.test/ecouteur":"forgejo"}}'
   echo "## dépendances de la 08 en service"
@@ -202,7 +206,7 @@ etape_deployer() {
   echo "## départ"
   el_service > "$T/el-service.json"
   el_depot | jq -S '.spec' > "$T/el-depot.json"
-  diff "$T/el-service.json" <(jq -S 'del(.labelSelector)' "$T/el-depot.json") > /dev/null || { echo "KO   EventListener en service différent du dépôt hors labelSelector (étape prealables)" >&2; exit 1; }
+  diff <(jq -S 'del(.labelSelector)' "$T/el-service.json") <(jq -S 'del(.labelSelector)' "$T/el-depot.json") > /dev/null || { echo "KO   EventListener en service différent du dépôt hors labelSelector (étape prealables)" >&2; exit 1; }
   attendu "objets Trigger de declencheurs" "$(kubectl get triggers.triggers.tekton.dev -n declencheurs -o name | wc -l)" 0
   p0=$(kubectl get pods -n declencheurs -l eventlistener=forgejo -o jsonpath='{.items[*].metadata.name}')
   echo "pod de l'EventListener : $p0"

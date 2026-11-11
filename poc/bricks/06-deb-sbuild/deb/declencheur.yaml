@@ -207,6 +207,16 @@ spec:
           - name: rattrapage
             image: @RATTRAPAGE@
             command: [/rattrapage]
+            # Ajouté le 11/11/2026 après le premier passage de deployer (20:44:25 UTC) : limites-obligatoires (08c, H5, en Deny)
+            # refuse un conteneur sans limites. Valeurs de la ligne rattrapage de 08c-durcissement/politiques/limites.tsv, posées
+            # sur rattrapage par patch (durcissement.sh h5_limites), même binaire et même travail.
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                cpu: 100m
+                memory: 64Mi
             env:
             - name: FORGEJO
               value: https://sc-stockage.poc.test:3000

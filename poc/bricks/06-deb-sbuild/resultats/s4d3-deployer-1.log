@@ -1,0 +1,15 @@
+# s4d3.sh deployer, 2026-11-11T20:44:24Z
+## départ
+OK   objets Trigger de declencheurs : 0
+pod de l'EventListener : el-forgejo-76596b99b8-wmm97
+## EventListener : labelSelector (document EventListener de declencheurs.yaml de la 08, seul)
+OK   labelSelector en service : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## declencheur.yaml
+triggertemplate.triggers.tekton.dev/sample-app-deb serverside-applied
+trigger.triggers.tekton.dev/sample-app-deb-push serverside-applied
+serviceaccount/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+Error from server: admission webhook "vpol.validate.kyverno.svc-fail-b220f2cf" denied the request: Policy limites-obligatoires failed: durcissement : limites de mémoire et de CPU obligatoires

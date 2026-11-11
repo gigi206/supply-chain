@@ -71,3 +71,34 @@ L'étape s'est arrêtée sur un écart : `deployer` n'a pas été lancé.
 
   Le CronJob lui-même est conforme.
 - **Correction de `s4d3.sh`** : les deux défauts sont retirés, avec une note datée. Contrôles sur l'hôte : `bash -n` et `shellcheck` sans remarque. Le filtre corrigé a été essayé par une lecture du CronJob en service : identique hors nom, compte, `GABARIT` et suspension.
+
+**`prealables`, second passage** (accord « Oui, relance-les » ; 20:44:19 UTC ; [`s4d3-prealables.log`](s4d3-prealables.log)) : T1 à T3 tenues, aucun écart.
+
+**`deployer`, premier passage** (20:44:24 à 20:44:25 UTC ; [`s4d3-deployer-1.log`](s4d3-deployer-1.log)) : arrêté par Kyverno sur le CronJob.
+- **Appliqués** :
+  - le `labelSelector` de l'EventListener ;
+  - le gabarit `sample-app-deb` et le Trigger `sample-app-deb-push` ;
+  - le compte, les deux Roles et les deux RoleBindings de `rattrapage-deb`.
+- **Refusé** : le CronJob `rattrapage-deb`, par la politique `limites-obligatoires` de la 08c (H5, en Deny) : « limites de mémoire et de CPU obligatoires ».
+- **État relevé après l'arrêt** ([`s4d3-etat-apres-deployer-1.log`](s4d3-etat-apres-deployer-1.log)) :
+  - l'EventListener est prêt, sur le même pod, et garde les limites posées par la 08c ;
+  - aucun PipelineRun `sample-app-deb-*` n'existe ;
+  - le Trigger du deb est en service. Aucun push n'est attendu : Forgejo n'est touché que par les scripts.
+
+**Cause** : les limites de `rattrapage` ne sont pas dans `rattrapage.yaml`. La 08c les pose par patch (`politiques/limites.tsv`, `durcissement.sh h5_limites`). Je les ai manquées deux fois :
+- le relevé ne comparait pas les ressources ;
+- le filtre de `prealables` les retirait, comme un défaut du serveur.
+
+C'est la leçon de S4d2a sous une autre forme. Un état déployé peut venir d'une autre brique que celle du fichier ; on ne retire pas un champ d'une comparaison sans savoir qui le pose.
+
+**Corrections**, chacune avec une note datée :
+- `deb/declencheur.yaml` : limites et requêtes de la ligne `rattrapage` de `limites.tsv` (10m et 16Mi demandés, 100m et 64Mi au plus) ;
+- `s4d3.sh` :
+  - les ressources ne sont plus retirées de la comparaison du CronJob ;
+  - le `labelSelector`, désormais en service, est retiré des deux côtés dans les contrôles de départ de `prealables` et de `deployer`.
+
+**Vérifié avant de relancer** :
+- `bash -n` et `shellcheck` ne signalent rien ;
+- par une lecture, le CronJob corrigé est identique à `rattrapage`, ressources comprises, hors nom, compte, `GABARIT` et suspension ;
+- à blanc côté serveur (dry-run), il est admis.
+

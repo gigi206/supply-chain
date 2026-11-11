@@ -1,0 +1,22 @@
+# Brique 06, S4d3 : état après l'arrêt de deployer (lecture seule), 2026-11-11T20:45:03Z
+cronjob.batch/rattrapage
+rolebinding.rbac.authorization.k8s.io/el-forgejo
+rolebinding.rbac.authorization.k8s.io/rattrapage
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb
+role.rbac.authorization.k8s.io/el-forgejo
+role.rbac.authorization.k8s.io/rattrapage
+role.rbac.authorization.k8s.io/rattrapage-deb
+serviceaccount/default
+serviceaccount/el-forgejo
+serviceaccount/rattrapage
+serviceaccount/rattrapage-deb
+triggertemplate.triggers.tekton.dev/sample-app
+triggertemplate.triggers.tekton.dev/sample-app-deb
+trigger.triggers.tekton.dev/sample-app-deb-push
+role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns
+role.rbac.authorization.k8s.io/rattrapage-pipelineruns
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns
+rolebinding.rbac.authorization.k8s.io/rattrapage-pipelineruns
+{"labelSelector":{"matchLabels":{"poc.test/ecouteur":"forgejo"}},"limites":{"limits":{"cpu":"250m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"32Mi"}},"conditions":["Available=True","Deployment=True","Progressing=True","Ready=True","Service=True"]}
+pod el-forgejo-76596b99b8-wmm97 : Running, redémarrages 2, limites {"cpu":"250m","memory":"128Mi"}
+PipelineRuns sample-app-deb-* : 0
