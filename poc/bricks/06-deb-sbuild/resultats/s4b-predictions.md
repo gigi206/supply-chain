@@ -84,3 +84,5 @@ Question du propriétaire : « Comment fermer ce risque ? ». Chaîne relue dans
 - **Ce qui reste supposé** : que la ConfigMap `local-path-config` en service soit celle du manifeste rendu, sans dérive depuis son application. Ce n'est pas relu dans le cluster. Une lecture de cette ConfigMap fermerait ce dernier point, sans aucune écriture.
 
 La prédiction B9 n'est pas réécrite. Cette note ne la remplace pas : seule l'exécution de `deb` la tranchera.
+
+**Correction d'heure** : la note titrée « 17:05 UTC » a été écrite à 17:21 UTC et commitée à 17:21:43 UTC (`7a163f2`).
