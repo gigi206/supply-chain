@@ -184,3 +184,12 @@ Avis du conseiller après le second échec : une troisième simulation sur l'hô
 - `construire-deb` est inchangée (`3726ff0b`).
 - Le remplacement de `5f0ca26b` par `588617b8` dans `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
 
+## Résultats du 11/11/2026, 19:56 UTC : troisième passage de taches et pipeline, tenus
+
+**Accords du propriétaire** : « Oui, commite-le » (liste revue avec `preparer-deb@588617b8`, `c5da4c4`), puis « Oui, lance-les » (19:41:09 UTC). Journaux du troisième passage : [taches](s4d-taches-3.log), [pipeline](s4d-pipeline-3.log), journaux de `construire` ([1](s4d-pipeline-1-construire.log), [2](s4d-pipeline-2-construire.log)).
+
+- **`taches`** (19:41:19 UTC, code 0) : pipeline re-signée avec `preparer-deb@588617b8`, bundle `tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5`.
+- **D12 : tenue au troisième passage** (`pipeline`, de 19:41:24 à 19:56:04 UTC, code 0). Les deux PipelineRuns réussissent. `preparer` et `publier` tournent en runc, `construire` sous Kata, tous sur sc-build. Dans `construire`, l'étape en UID 1000 s'exécute sous Tekton (la déduction de la note de 19:38 UTC est confirmée). Les entrées sont montées `ro` (virtiofs), et l'écriture d'essai y est refusée. Les quatre témoins réseau échouent.
+- **D13 : tenue.** Les deux exécutions publient **`builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e`**, le digest calculé sur l'hôte en `prealables`. Chains signe les deux PipelineRuns.
+- **Constats** : dans les deux constructions, le deb est `0b489d43…`, l'archive amont `07521c1e` et le `.dsc` `7f9cf5d3`, comme dans l'essai. sbuild met 361 s puis 339 s, sans aucune ligne apt en http(s).
+
