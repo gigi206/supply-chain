@@ -179,8 +179,11 @@ etape_porte() {
   attendu "taches.yml en service égal à celui du commit b1e5ef4" "$(sha256sum < "$T/taches-avant.yml" | cut -c1-64)" \
     "$(git -C "$repo" show b1e5ef4:poc/bricks/08-trust-plane/politique/porte/taches.yml < /dev/null | sha256sum | cut -c1-64)"
   echo "entrées de la liste versionnée absentes de la liste en service :"
-  diff <(grep -E '^ *- ref:|^  oci://' "$T/taches-avant.yml") <(grep -E '^ *- ref:|^  oci://' "$P08/taches.yml") | sed -n 's/^> /    /p'
-  attendu "entrées retirées par la liste versionnée" "$(diff <(grep -E '^ *- ref:|^  oci://' "$T/taches-avant.yml") <(grep -E '^ *- ref:|^  oci://' "$P08/taches.yml") | grep -c '^<' || true)" 0
+  # diff rend 1 quand les listes diffèrent : sorti du tube, sinon pipefail et set -e arrêtent l'étape sans message (second passage,
+  # 20:22:00 UTC, arrêté là, avant toute écriture)
+  { diff <(grep -E '^ *- ref:|^  oci://' "$T/taches-avant.yml") <(grep -E '^ *- ref:|^  oci://' "$P08/taches.yml") || true; } > "$T/taches.diff"
+  sed -n 's/^> /    /p' "$T/taches.diff"
+  attendu "entrées retirées par la liste versionnée" "$(grep -c '^<' "$T/taches.diff" || true)" 0
   echo "## deb, porte en service (prédictions révisées à 20:21 UTC : ec en échec par trusted_task, tâches du deb absentes de la liste en service ; VSA et scan refusés)"
   v=$(juger s4d2-deb-avant "$REG/$DEB" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
   for c in vsa scan-verifier; do sed "s/^/    $c : /" "$T/porte-s4d2-deb-avant.$c"; done

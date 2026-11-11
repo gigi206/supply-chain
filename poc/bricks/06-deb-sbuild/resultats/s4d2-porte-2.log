@@ -1,0 +1,13 @@
+# s4d2.sh porte, 2026-11-11T20:22:00Z
+OK   porte.rego en service égal à celui du commit a7c7405 : 53b01702e899fddd36bf031a1f4b74c6ea1cefebca5752d149a14676475bf78c
+OK   taches.yml en service égal à celui du commit b1e5ef4 : 44e7fdb0b14c813a74bcbf6ac84ea23b61aa9db27907299bcb97ba65e62fbeb8
+entrées de la liste versionnée absentes de la liste en service :
+        - ref: sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+      oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-deb:
+        - ref: sha256:4dac0609a5d1d980501f4f08cdeb0916912b4f3accd9cf56fea456a399e793a5
+      oci://sc-stockage.poc.test:5000/tekton/tasks/construire-builder:
+        - ref: sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
+      oci://sc-stockage.poc.test:5000/tekton/tasks/preparer-deb:
+        - ref: sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+      oci://sc-stockage.poc.test:5000/tekton/tasks/construire-deb:
+        - ref: sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a

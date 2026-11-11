@@ -88,3 +88,15 @@ Prédictions écrites le 11/11/2026 à 20:17 UTC, avant tout lancement. Script :
 - le retour arrière remet les deux fichiers enregistrés.
 
 E10 et E11 restent inchangées.
+
+## Note du 11/11/2026, 20:23 UTC : second passage de `porte` arrêté avant toute écriture, par un défaut du script corrigé
+
+**Arrêt** : le second passage (20:22:00 UTC, accord « Oui, relance porte », [journal](s4d2-porte-2.log)) a tenu les deux contrôles préalables :
+- `porte.rego` en service est celui de `a7c7405` ;
+- la liste en service est celle de `b1e5ef4`, et les cinq ajouts sont affichés.
+
+Il s'est arrêté juste après, sans message. Rien n'a été écrit : `porte.rego` en service est toujours `53b01702…`, et aucun Job n'a été créé (vérifié après l'arrêt).
+
+**Cause, dans le script** : la ligne qui affiche les ajouts faisait passer `diff` dans un tube. `diff` rend 1 quand les listes diffèrent ; avec `pipefail`, `set -e` arrête l'étape en silence. C'est un défaut de la correction de 20:21 UTC, que je n'avais vérifiée que pour la syntaxe.
+
+**Correction** : la sortie de `diff` est écrite dans un fichier, hors du tube, puis relue. Les prédictions ne changent pas.
