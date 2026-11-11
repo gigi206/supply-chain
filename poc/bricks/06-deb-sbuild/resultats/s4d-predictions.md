@@ -167,3 +167,5 @@ Avis du conseiller après le second échec : une troisième simulation sur l'hô
 
 **Suite, si D17 est tenue** : `SIGNER=1 taches` (troisième version de `preparer-deb`), revue de `taches.yml`, puis `taches` et `pipeline`.
 
+**Correction datée du 11/11/2026, 19:38 UTC** : la note précédente, commitée à 19:38:31 UTC (`d80e9d8`), porte deux heures fausses, écrites sans les relire. Son titre aurait dû dire 19:38 UTC, et non 19:45 UTC. `prealables` a tourné de 19:38:01 à 19:38:10 UTC (`chrono.tsv`), et non vers 19:44 UTC.
+
