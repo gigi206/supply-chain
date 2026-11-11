@@ -1105,3 +1105,12 @@ Avec A, c'est l'hôte qui lit l'artefact de packaging, et non la plateforme. La 
 **Durée** : S4b a pris environ une heure, de la reprise par « continue » (16:32:02 UTC, lue dans la transcription) au bilan. La brique reste sous son estimation de 2 pw.
 
 **Suite, selon l'ordre décidé** : S4d (pipeline `sample-app-deb` : confronter la fermeture deb au verrou, reconstituer `vendor/` et `web/node_modules/marked`, rétablir le bit d'exécution de `debian/rules`, porte à plusieurs fermetures), puis S5.
+
+## Additif du 11/11/2026, 17:40 UTC : push consigné
+
+**Push** de 17:40:22 à 17:40:24 UTC : `7b57ca7..cdf4c9b`, 14 commits, 20 fichiers, en avance rapide. Accord : « Oui, pousse ». Il contient la modification relue de `politique/porte/taches.yml` de la 08 (`915e14e`).
+
+**Contrôle des secrets**, dans un worktree temporaire : aucun secret dans les 20 fichiers qui diffèrent d'origin.
+- **Premier contrôle sans valeur** (17:39:46 UTC) : j'ai appelé `tools/secrets-depot.sh` par le chemin du dépôt principal. Le script se place à la racine de son propre dépôt (`cd "$(dirname "$0")/.."`). Il a donc examiné l'arbre principal, qui était propre (« fichiers : 0 »), et non le worktree.
+- **Contrôle refait** avec la copie du worktree : « fichiers : 20 ».
+- **Pushs précédents** : relus dans la transcription, ils appelaient tous la copie du worktree.
