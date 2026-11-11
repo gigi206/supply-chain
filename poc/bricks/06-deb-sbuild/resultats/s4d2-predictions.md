@@ -40,3 +40,26 @@ Prédictions écrites le 11/11/2026 à 20:17 UTC, avant tout lancement. Script :
 
 - `regle` et `reel` : script neuf, sur l'hôte. `reel` lit Zot en anonyme. Aucune écriture.
 - `porte` : deux Jobs de la porte et une écriture dans le cluster (la ConfigMap). Comme la ConfigMap est commune aux deux voies, cette étape a son propre accord.
+
+## Résultats de `regle` et `reel` (11/11/2026, accord « Oui, lance-les »)
+
+**`regle`** (20:18:11 UTC, [journal](s4d2-regle-1.log)) :
+- **E1 tenue** : `ec opa check` ne signale aucune erreur ; `ec opa test` passe 39 tests sur 39.
+- **E2 non tenue** : 17 des 18 mutations sont conformes à l'annonce, et `f.preparation == nom` survit comme prévu. En revanche, quand on remplace par `false` la correspondance par dépôt du bundle, aucun test n'échoue.
+  - **Cause, dans le test et non dans la règle** : la bibliothèque prend le nom de la tâche dans le label `tekton.dev/task`, avant le paramètre `name` (`lib/tekton/refs.rego`, `_ref_name`). `test_deb_bundle_sous_autre_nom_hors_kata_refuse` ne changeait que le paramètre ; le label désignait donc encore `construire-deb`, et la correspondance par nom suffisait.
+  - **Correction** : le test change maintenant aussi le label. `regle` est à relancer avec un nouvel accord, puisque le fichier de tests a changé. La règle n'a pas changé.
+
+**`reel`** (20:18:38 à 20:18:49 UTC, [journal](s4d2-reel.log)) : **E3 à E7 tenues**.
+- **E3** : la provenance la plus récente du deb (PipelineRun `s4d-deb-2`, 19:55:56 UTC) ne donne aucun code `porte.*`. La règle y lit les deux fermetures, typées `deb` et `gomod`. Pour chacune, la vraie fonction vérifie 4 provenances, et au moins une est conforme.
+- **E4** : avec une autre clé, aucune provenance n'est vérifiée, et la porte refuse les deux fermetures par `porte.fermeture_plateforme`. Le message nomme le résultat et la forme attendue.
+- **E5** : sur l'image sample-app (plus récent des 14 PipelineRuns : 10/11/2026, 21:12:22 UTC), aucun code `porte.*`. La fermeture de F2 est vérifiée.
+- **E6**, les quatre témoins, chacun refusé par le code prévu :
+
+  | Témoin | Code | Message |
+  |---|---|---|
+  | Hors Kata | `construction_kata` | `TaskRun s4d-deb-2-construire de construction` |
+  | Sans fermeture deb | `fermeture_plateforme` | « préparation preparer-deb sans fermeture lisible dans le résultat FERMETURE_DEB_ARTIFACT_INPUTS » |
+  | Fermetures permutées | `fermeture_plateforme` | chaque fermeture est refusée pour la forme de l'autre |
+  | Sans `preparer-deb` | `fermeture_plateforme` et `preparation_appariee` | |
+
+- **E7** : avec les règles en service (`a7c7405`), aucun code, ni sur le deb réel ni sur le témoin hors Kata. C'est le succès à vide décrit par la carte, désormais mesuré.

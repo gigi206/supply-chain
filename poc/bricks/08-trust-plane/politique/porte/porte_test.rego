@@ -361,9 +361,14 @@ test_deb_runc_refuse if {
 	"porte.construction_kata" in _codes(_juge_deb(a))
 }
 
-# Bundle de construire-deb chargé sous un autre nom : reste une construction
+# Bundle de construire-deb chargé sous un autre nom : reste une construction. La bibliothèque lit le nom dans le label
+# tekton.dev/task avant le paramètre name (lib/tekton/refs.rego, _ref_name) : les deux sont changés. Corrigé le 11/11/2026 après
+# s4d2.sh regle (20:18 UTC) : seul le paramètre était changé, et la mutation de la correspondance par bundle survivait.
 test_deb_bundle_sous_autre_nom_hors_kata_refuse if {
-	c := json.patch(_constr("construire-deb", _construire_deb, ""), [{"op": "replace", "path": "/spec/taskRef/params/1/value", "value": "autre"}])
+	c := json.patch(_constr("construire-deb", _construire_deb, ""), [
+		{"op": "replace", "path": "/spec/taskRef/params/1/value", "value": "autre"},
+		{"op": "replace", "path": "/metadata/labels/tekton.dev~1task", "value": "autre"},
+	])
 	"porte.construction_kata" in _codes(_juge_deb([_deb([_prep_deb(_resultats_deb), c, _publier_deb])]))
 }
 
