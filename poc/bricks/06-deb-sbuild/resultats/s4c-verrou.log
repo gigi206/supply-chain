@@ -1,0 +1,18 @@
+# s4c.sh verrou, 2026-11-11T16:25:30Z
+OK   C1 InRelease (sha256 de S1) : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
+OK   C1 Packages.xz conforme à l'InRelease (sha256 taille) : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498 9678380
+OK   C1 Packages égal à xz -dc Packages.xz : égal
+OK   C2 Installed-Build-Depends (nombre, distincts) : 162 162
+OK   C2 verrou rapproché de Packages : 162 paquets, 0 absent(s), 0 en double
+verrou écrit : poc/packaging/verrou-deb.txt
+OK   C3 verrou égal à la fermeture de S2 (fichier sha256 taille) : fd1c5fe7c7d0395d04113709ae565d870e2a33291c83f2f3d71f0511c84af468
+verrou : 162 paquets, 193978008 octets, sha256 89d648b50bcf3864102726bb0bf06713b3888566fa4313b5d0c85877695ce7ca
+artefact : debian/changelog debian/control debian/copyright debian/rules debian/source/format verrou-deb.txt
+     b6e8ecf36f4b106f4dc1d8efadbda9582271be995b3f8949800494f34a3fb8ed  debian/changelog
+     100a5421f62545f4da97d48f2f9ff34ed57af86a13531caae9e58a0f9dc0f6f4  debian/control
+     20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2  debian/copyright
+     8458fdd6c3e02e22ff20d013aed2928c0264c41107e220355275e3af4fc177bf  debian/rules
+     1be7080d72e6b566df3e236ce2c55efdfbbb8fa1c972d825e5b672ff8773be1a  debian/source/format
+     89d648b50bcf3864102726bb0bf06713b3888566fa4313b5d0c85877695ce7ca  verrou-deb.txt
+OK   C4 deux poussées locales, même digest : sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+digest attendu dans Zot : sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51

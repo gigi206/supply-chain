@@ -48,3 +48,16 @@ Un artefact OCI de packaging, publié par l'hôte comme `web/dist` (`constructio
 - Le verrou reproduit ce que S2 a installé. Il ne prouve pas que sbuild, hors ligne, résoudra le même ensemble depuis un miroir partiel construit sur ce verrou : ce sera une prédiction de S4d.
 - La version (`1.0.0-1`) et la date de `debian/changelog` sont figées pour tous les commits : c'est la limite consignée à 22:14 UTC.
 - La porte ne juge pas l'artefact de packaging, pas plus qu'elle ne juge `web/dist` aujourd'hui.
+
+## Résultats de l'étape `verrou` (11/11/2026, 16:25:30 UTC, hôte seul, hors ligne)
+
+Journal : [`s4c-verrou.log`](s4c-verrou.log). Lancée sans accord, comme prévu ci-dessus (hôte seul).
+
+| N° | Résultat |
+|---|---|
+| C1 | **Tenue.** InRelease `0584fba3…` ; `Packages.xz` `7778d3e3…`, 9 678 380 octets, conforme à l'InRelease ; `Packages` égal à `xz -dc Packages.xz` |
+| C2 | **Tenue.** 162 `Installed-Build-Depends` distincts, tous trouvés une seule fois dans `Packages`, 0 absent, 0 en double |
+| C3 | **Tenue.** Le verrou, ramené à « fichier sha256 taille », est égal à `s2-fermeture-attendue.txt`. Les 22 paquets à époque (par exemple `automake 1:1.17-4`, `golang-go 2:1.24~2`) ont bien un nom de fichier sans époque. Verrou : 162 paquets, 193 978 008 octets, sha256 `89d648b5…`. `nodejs` et `libnode115` 20.19.2+dfsg-1+deb13u2 y sont |
+| C4 | **Tenue.** Deux layouts OCI locaux, même digest : `sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51`. C'est le digest attendu dans Zot (C5) |
+
+C5 à C7 attendent l'étape `publier`, sur accord nommé.
