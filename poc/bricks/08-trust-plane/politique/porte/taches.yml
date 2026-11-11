@@ -29,6 +29,11 @@ trusted_tasks:
   # (adresses publiques en 443, Forgejo, DNS), proxy Go imposé (proxy.golang.org seul)
   oci://sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod:
     - ref: sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+    # Brique 06, S4b (décision du propriétaire du 11/11/2026, 16:42:27 UTC : « A, N1, combinée ») : version 2, même nom,
+    # 06-deb-sbuild/fermetures/prefetch-gomod.signee.yaml ; même image d'outils, même pod et même sortie que la version 1
+    # (qui reste celle de la voie image) ; demande Hermeto reçue de la pipeline signée (paramètre paquets, sans défaut ; types
+    # gomod et npm) ; lockfile npm contrôlé avant Hermeto (registre https://registry.npmjs.org/ et integrity sha512 exigés)
+    - ref: sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
   # Brique 03, F2 : politique/taches/publier-fermeture.signee.yaml, pod runc restreint, compte Zot poc-fermetures (création par
   # digest dans builds/fermetures/** seulement) ; émet IMAGE_URL et IMAGE_DIGEST pour que Chains signe la fermeture
   oci://sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture:
