@@ -1,0 +1,14 @@
+# s4d.sh pipeline, 2026-11-11T19:32:51Z
+## s4d-deb-1 créé à 19:32:51 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:c43988a8abf0a3a7377229e7b6e3b38b8182d4fa772002d452550334424e877a)
+### TaskRun s4d-deb-1-preparer (StepFailed), pod s4d-deb-1-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
+     2026/11/11 19:32:57 Entrypoint initialization
+     2026/11/11 19:32:58 Decoded script /tekton/scripts/script-0-8zm6j
+     2026/11/11 19:32:58 Decoded script /tekton/scripts/script-1-9pxh9
+     2026/11/11 19:32:58 Decoded script /tekton/scripts/script-2-6w74w
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+     cp: can't stat '/workspace/sortie/entrees/deps/gomod/pkg/mod': No such file or directory
+OK   s4d-deb-1-preparer : runtimeClassName : 
+OK   s4d-deb-1-preparer : nœud : sc-build
+KO   PipelineRun s4d-deb-1 : False|Failed (attendu : True|Succeeded)

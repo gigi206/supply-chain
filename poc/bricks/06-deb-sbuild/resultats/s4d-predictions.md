@@ -139,3 +139,13 @@ Prédictions ajoutées pour `busybox_outils` :
 - `construire-deb` est inchangée : sa signature versionnée est conforme et son bundle reste `3726ff0b`, déjà dans la liste revue.
 - Le remplacement de `b310c262` par `5f0ca26b` dans `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
 
+## Résultats du 11/11/2026, 19:33 UTC : second passage de taches et pipeline, nouvel échec dans preparer-deb
+
+**Accords du propriétaire** : « Oui, commite-le » (remplacement relu dans la liste revue, `cc4b8dd`), puis « Oui, lance-les » (19:32:33 UTC). Journaux du second passage : [taches](s4d-taches-2.log), [pipeline](s4d-pipeline-2.log). Ceux du premier passage gardent leur nom.
+
+- **`taches`** (19:32:39 UTC, code 0) : la pipeline est re-signée avec `preparer-deb@5f0ca26b`, bundle `tekton/pipelines/sample-app-deb@sha256:c43988a8abf0a3a7377229e7b6e3b38b8182d4fa772002d452550334424e877a`.
+- **D12 : réfutée au second passage** (`pipeline`, 19:32:51 UTC, code 1). Dans `s4d-deb-1-preparer`, l'étape `sources` passe (git 2.51.2, commit `6391fd43`, arbre `30e808ff`). L'étape `entrees` passe aussi : trois artefacts tirés (167, 8 et 6 fichiers), confrontation au verrou réussie (162 paquets). L'étape `assemblage` échoue : `cp: can't stat '/workspace/sortie/entrees/deps/gomod/pkg/mod'`. Rien n'est publié, et `s4d-deb-2` n'est pas créé.
+- **Cause** : la fermeture applicative porte déjà un dossier `deps/` à sa racine (`deps/gomod`, `deps/npm`, `.build-config.json`). Tirée par `oras pull -o "$e/deps"`, elle donne `entrees/deps/deps/gomod`. La simulation de `prealables` copiait `comparaison/sources/deps` (un sous-dossier) au lieu de la racine de l'artefact, et masquait donc l'erreur.
+- **Leçon, avec le premier échec** : les deux défauts viennent du même écart. `prealables` imite l'environnement de la tâche (`/tmp` de l'hôte, copies `cp`) au lieu de l'exécuter, et le pod d'essai ne visait que `construire-deb`.
+- **Bundles désormais inutilisables dans Zot**, sans droit de suppression : `tekton/tasks/preparer-deb@5f0ca26b`, `tekton/pipelines/sample-app-deb@83455f46` et `@c43988a8`. Avec `b310c262`, cela fait quatre.
+
