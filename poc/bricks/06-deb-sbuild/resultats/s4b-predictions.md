@@ -123,3 +123,19 @@ Journal : [`s4b-taches_sources.log`](s4b-taches_sources.log). Écriture définit
 | B7 | **Tenue.** La version 2 est signée, et sa signature versionnée est [`fermetures/prefetch-gomod.signee.yaml`](../fermetures/prefetch-gomod.signee.yaml), conforme au gabarit rendu, signature exceptée. Bundle : `tekton/tasks/prefetch-gomod@sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f`, différent de la version 1 (`5e7e5662`). P2 n'est pas signée tant que la liste revue n'est pas acceptée |
 
 L'ajout du digest à `politique/porte/taches.yml` de la 08 attend la relecture du propriétaire. Il n'est pas commité.
+
+## Résultats des étapes `taches_sources` et `sources` (11/11/2026, de 17:34:28 à 17:35:30 UTC environ, accord « Oui, lance-les »)
+
+Journaux : [`s4b-taches_sources.log`](s4b-taches_sources.log) et [`s4b-sources.log`](s4b-sources.log). Écritures définitives dans Zot : le bundle de P2 et la fermeture applicative. Le liste revue avait été acceptée et commitée auparavant (`915e14e`, « Oui, commite-le »).
+
+**Journal écrasé, puis restauré** : la seconde passe de `taches_sources` a réécrit `s4b-taches_sources.log`. La passe `SIGNER=1` (17:31:56 UTC), commitée dans `23b87c2`, est restaurée telle quelle sous [`s4b-taches_sources-signer.log`](s4b-taches_sources-signer.log).
+
+- **`taches_sources`** : la version 2 est dans la liste revue et distincte de la version 1. P2 est signée : `tekton/pipelines/prefetch-sources-sample-app@sha256:0ebd1cb86107f7933e1c8cefc186bfc4b85c2fc2b0f401bb831d93ca0eace546`.
+
+| N° | Résultat |
+|---|---|
+| B11 | **Tenue.** Deux PipelineRuns réussis (`s4b-sources-1`, `s4b-sources-2`), pods en runc sur `sc-build`. Le journal de `prefetch-gomod` affiche « gomod . : admis », puis la ligne du contrôle npm (« 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512 »), puis la demande. Hermeto vérifie le hash de `marked-16.4.1.tgz`. npm est passé par `prefetch-sortie` sans changement de Cilium. Même fermeture pour les deux exécutions : `builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21`, 8 couches. Chains a signé les deux PipelineRuns |
+
+**Constat** : le `bom.json` d'Hermeto, journalisé mais non publié, diffère d'une exécution à l'autre (empreintes `849f…` puis `63e4…`). La fermeture publiée n'en dépend pas. La cause n'est pas relevée : le fichier n'est pas conservé.
+
+Restent B12 à B16 : `comparaison` et `provenance`, en lecture.

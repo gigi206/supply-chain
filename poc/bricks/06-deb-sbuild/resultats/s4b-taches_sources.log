@@ -1,7 +1,10 @@
-# s4b.sh taches_sources, 2026-11-11T17:31:56Z
+# s4b.sh taches_sources, 2026-11-11T17:34:28Z
 ## prefetch-gomod v2 (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-SIGNER : nouvelle signature dans fermetures/prefetch-gomod.signee.yaml
 OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
-SIGNER : à ajouter à politique/porte/taches.yml (08) après revue du propriétaire : sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod@sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
-SIGNER : pipeline non signée tant que la liste revue n'a pas été acceptée
+OK   prefetch-gomod dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod@sha256:170bef538a89e585326a64618a443460e88d663b2d3a761b535daf531bafa00f
+OK   v2 distincte de la version 1 de la voie image (5e7e5662)
+## pipeline prefetch-sources-sample-app
+OK   demande Hermeto rendue dans la pipeline sources : [{"type": "gomod"}, {"type": "npm", "path": "web"}]
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:0ebd1cb86107f7933e1c8cefc186bfc4b85c2fc2b0f401bb831d93ca0eace546
