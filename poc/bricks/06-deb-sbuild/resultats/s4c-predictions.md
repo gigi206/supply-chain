@@ -92,3 +92,5 @@ Journal : [`s4c-publier.log`](s4c-publier.log). Écriture définitive dans Zot, 
 - **Argument inexact** dans « Choix de conception » : étendre `prefetch-gomod` « toucherait une tâche signée dont dépend la voie image de la 08 ». Une nouvelle version signée a un autre digest. La pipeline `prefetch-sample-app` de la voie image épingle sa tâche par digest (`@PREFETCH_TACHE@`, `prefetch.sh taches` de la 03). Elle resterait donc sur la version actuelle (`5e7e5662`), tant qu'elle n'est pas elle-même re-signée.
 - **Ce qui reste vrai** : étendre `prefetch-gomod` n'évite pas la porte à plusieurs fermetures en S4d. De plus, la règle `_prefetch` exige `CHAINS-GIT_URL`, qu'une fermeture deb n'aura pas.
 - Le choix de la tâche npm est présenté au propriétaire dans la carte de S4b. Rien n'est décidé ici.
+
+**Correction d'heure** : la note titrée « 16:38 UTC » a été commitée à 16:37:45 UTC (`3f29d74`).

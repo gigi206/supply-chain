@@ -56,3 +56,10 @@ Les fermetures restent des artefacts OCI ordinaires dans Zot, avec un fichier pa
 - **Décision du propriétaire** (16:19:27 UTC) : « npm par la plateforme », pour le deb. Elle remplace, pour le deb, « web/dist par digest » (10/11/2026, 22:30 UTC). La voie image de la 08 garde `web/dist` par digest : la dette reste ouverte.
 - **Vérifié dans le code d'Hermeto 0.64.0** : le fetch npm ne lance aucune commande externe, donc ni `node` ni `npm`. Le point « gestionnaires couverts » est donc tranché pour npm. Hermeto traite gomod et npm en un seul appel, mesuré sur l'hôte (banc nix), pas encore dans la plateforme.
 - **Non mesuré** : la fermeture npm produite par une tâche de la plateforme, et la règle de porte à N fermetures.
+
+**Additif du 11/11/2026, 16:48 UTC : choix de S4b** (brique 06, [README](../../poc/bricks/06-deb-sbuild/README.md)).
+- **Décision du propriétaire** (16:42:27 UTC) : « A, N1, combinée ».
+- **Écart au principe « chaque écosystème déclaré par le projet donne une fermeture »** : gomod et npm donnent une seule fermeture applicative, en un seul appel à Hermeto. Le principe devient « une fermeture par appel de prefetch », avec un ou plusieurs écosystèmes.
+- **Le verrou deb est lu par l'hôte** : la liste est inscrite dans la pipeline signée au rendu, et la plateforme ne lit pas l'artefact de packaging en S4b. La confrontation de la fermeture deb au verrou est reportée à S4d.
+- **Le nom `prefetch-gomod` devient trompeur** : sa version 2 produit aussi npm. Le renommage est reporté à la règle de porte générique.
+- **Non mesuré** : tout ce qui précède. Les prédictions de S4b seront commitées avant toute exécution.

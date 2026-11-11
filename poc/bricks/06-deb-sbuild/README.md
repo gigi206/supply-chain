@@ -1073,3 +1073,21 @@ Le total reste sous l'estimation de 2 pw, et très loin du seuil de 4 pw : aucun
 ## Additif du 11/11/2026, 16:31 UTC : push consigné
 
 **Push** de 16:30:26 à 16:30:28 UTC : `44cbe06..7b57ca7`, 6 commits, 9 fichiers, en avance rapide. Avant l'envoi, les secrets ont été contrôlés dans un worktree temporaire : aucun secret trouvé. Accord : « Oui, pousse ».
+
+## Additif du 11/11/2026, 16:48 UTC : décisions pour S4b
+
+**Décision du propriétaire** (16:42:27 UTC) : « A, N1, combinée ». Ce n'est un accord pour aucune mesure ni aucune écriture.
+- **A, transport du verrou** : l'hôte tire l'artefact de packaging par digest (`c1719b13`). Les colonnes 4 à 6 du verrou (sha256, taille, chemin) sont inscrites dans le gabarit de la pipeline de la fermeture deb, avant sa signature, comme en S4a. `prefetch-deb` (`4dac0609`) et `publier-fermeture` (`7fa92ad3`) ne changent pas.
+- **N1, tâche npm** : une version 2 de `prefetch-gomod`, sous le même nom, dans un gabarit neuf de la 06. Elle reçoit la demande Hermeto de la pipeline signée, et contrôle le lockfile npm avant Hermeto. La 08 reste en version 1 (`5e7e5662`) : son gabarit et sa signature versionnée ne sont pas touchés.
+- **Fermeture applicative combinée** : un seul appel à Hermeto pour gomod et npm. Elle produit une fermeture applicative, plus la fermeture deb : la porte en jugera deux en S4d.
+
+**Ce que A remplace**, sans réécrire les textes commités :
+- la conséquence de l'additif de 22:20 UTC (« `prefetch-deb` lit sa liste dans l'artefact de packaging ») ;
+- la ligne de l'en-tête de `builder/prefetch-deb.yaml` : « S4b : la liste viendra du verrou par le workspace ».
+
+Avec A, c'est l'hôte qui lit l'artefact de packaging, et non la plateforme. La plateforme ne confrontera la fermeture deb au verrou qu'en S4d, par une tâche qui reste à écrire.
+
+**Vérifié hors ligne pendant la carte** :
+- **Provenance** : la provenance de F2 (`~/.cache/supply-chain-poc/03/f2/prov.json`) contient les paramètres de chaque TaskRun dans `resolvedDependencies`. Pour un paramètre long, comme la liste de 162 lignes, ce n'est encore qu'une prédiction de S4b.
+- **npm dans Hermeto 0.64.0** : il accepte toute URL `https` ou `git` d'un lockfile. Une dépendance du registre sans `integrity` n'y est que signalée, pas refusée. Il lit `npm-shrinkwrap.json` avant `package-lock.json`. D'où le contrôle de la version 2.
+- **`subPath`** : le kubelet v1.35.0 crée un dossier de `subPath` absent avec le mode de la racine du volume (`GetMode`, puis `Fchmod`), sans changer son propriétaire (`pkg/kubelet/kubelet_pods.go` et `pkg/volume/util/subpath/subpath_linux.go`, lus sur GitHub). Qu'un pod en UID 65532 puisse y écrire dépend donc du mode de la racine du PVC local-path : c'est une prédiction de S4b.
