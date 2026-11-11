@@ -177,3 +177,10 @@ Avis du conseiller après le second échec : une troisième simulation sur l'hô
 - **Résultats** : `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT` et les trois `*_ARTIFACT_INPUTS` sont exactement ceux attendus.
 - **L'arbre `entrees/` du pod est égal à celui de `prealables`** : 214 fichiers, même contenu, mêmes modes et mêmes types. L'essai de `construire-deb` (deb `0b489d43`, artefact `039949f9`), fait sur l'arbre de `prealables`, vaut donc pour ce que produit la préparation réelle.
 
+## Résultat du 11/11/2026, 19:40 UTC : troisième signature de preparer-deb
+
+**Accord du propriétaire** (19:40:05 UTC) : « Oui, re-signe ». `SIGNER=1 taches` à 19:40:13 UTC, code 0 ([journal](s4d-taches-signer-3.log)).
+- `preparer-deb` est signée, versionnée et poussée : `tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492`. C'est la version jouée dans le pod d'essai (D17).
+- `construire-deb` est inchangée (`3726ff0b`).
+- Le remplacement de `5f0ca26b` par `588617b8` dans `politique/porte/taches.yml` (08) est préparé, non commité, en attente de relecture.
+

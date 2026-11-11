@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   annotations:
-    tekton.dev/signature: MEQCIH6lZ6S0mXPe5l7trQn6DpoAENFzrxhSVTM3yW/OnAeSAiB19pFyJyJ+ujRm8PhWcV2TYUjeUffKvD+AWMzFdd3jXg==
+    tekton.dev/signature: MEUCIQCdHwc9b7bHn+1utoHRTySM/3GtdJmiN29i7ZKcY6L4xwIgUd2o5DZ6+MR63FMJjsxfdzdB8+OndGVUVVcNMGpJNMc=
   name: preparer-deb
 spec:
   params:
@@ -102,9 +102,9 @@ spec:
       export HOME=/tmp
       e=$(workspaces.sortie.path)/entrees
       oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/fermeture" "$FERMETURE_DEB" > /dev/null
-      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/deps" "$FERMETURE_SOURCES" > /dev/null
+      oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/sources" "$FERMETURE_SOURCES" > /dev/null
       oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/packaging" "$PACKAGING" > /dev/null
-      echo "fermeture deb : $(find "$e/fermeture" -type f | wc -l) fichiers ; fermeture applicative : $(find "$e/deps" -type f | wc -l) fichiers ; packaging : $(find "$e/packaging" -type f | wc -l) fichiers"
+      echo "fermeture deb : $(find "$e/fermeture" -type f | wc -l) fichiers ; fermeture applicative : $(find "$e/sources" -type f | wc -l) fichiers ; packaging : $(find "$e/packaging" -type f | wc -l) fichiers"
       # Confrontation de la fermeture deb au verrou (colonnes 4 à 6 : sha256, taille, chemin sous miroir/)
       v=$e/packaging/verrou-deb.txt
       [ -s "$v" ] || { echo "verrou absent de l'artefact de packaging" >&2; exit 1; }
@@ -135,11 +135,11 @@ spec:
       e=$(workspaces.sortie.path)/entrees
       export HOME=/tmp GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod GOMODCACHE=/tmp/gomod GOCACHE=/tmp/gocache CGO_ENABLED=0
       # vendor/ : cache de modules copié hors du workspace (go y extrait les modules en lecture seule)
-      cp -r "$e/deps/gomod/pkg/mod" /tmp/gomod
+      cp -r "$e/sources/deps/gomod/pkg/mod" /tmp/gomod
       (cd "$e/src" && go mod vendor && go mod verify)
       echo "$(go version) : vendor/ reconstitué, $(find "$e/src/vendor" -type f | wc -l) fichiers"
       # marked : integrity du lockfile, puis extraction (premier composant retiré, comme tar --strip-components=1)
-      python3 -I - "$e/src/web/package-lock.json" "$e/deps/npm" "$e/src/web/node_modules/marked" <<'FIN'
+      python3 -I - "$e/src/web/package-lock.json" "$e/sources/deps/npm" "$e/src/web/node_modules/marked" <<'FIN'
       import base64, hashlib, json, os, sys, tarfile
       lock, npm, dst = sys.argv[1:]
       p = json.load(open(lock, encoding='utf-8'))['packages']['node_modules/marked']
@@ -166,7 +166,7 @@ spec:
       cp "$e/packaging/verrou-deb.txt" "$e/verrou-deb.txt"
       find "$e/debian" -type f -exec chmod 0644 {} \;
       chmod 0755 "$e/debian/rules"
-      rm -rf "$e/deps" "$e/packaging"
+      rm -rf "$e/sources" "$e/packaging"
       echo "entrées prêtes : src ($(find "$e/src" -type f | wc -l) fichiers), debian ($(find "$e/debian" -type f | wc -l) fichiers), fermeture deb, verrou"
   volumes:
   - configMap:
