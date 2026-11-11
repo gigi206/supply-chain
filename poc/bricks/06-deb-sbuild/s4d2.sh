@@ -14,8 +14,9 @@
 #           fermetures permutées, sans preparer-deb)
 #   porte   cluster : Job de la porte sur le deb avant la mise à jour (ConfigMap en service) ; ConfigMap porte mise à jour
 #           (cm_porte de la 08 : porte.rego et taches.yml versionnés) ; Job de la porte sur le deb, puis sur l'image sample-app
-#           (non-régression). Retour arrière : ConfigMap remise avec le porte.rego enregistré avant la mise à jour
-#           ($T/porte-avant.rego, égal à celui du commit a7c7405), au choix du propriétaire.
+#           (non-régression). Retour arrière : ConfigMap remise avec porte.rego et taches.yml enregistrés avant la mise à jour
+#           ($T/porte-avant.rego, égal à celui du commit a7c7405 ; $T/taches-avant.yml, égal à celui de b1e5ef4), au choix du
+#           propriétaire.
 #
 # Usage (racine du dépôt) : DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s4d2.sh <étape>…   (journal : resultats/s4d2-<étape>.log)
 set -euo pipefail
@@ -172,17 +173,25 @@ etape_porte() {
   kubectl get configmap -n porte porte -o jsonpath='{.data.taches\.yml}' > "$T/taches-avant.yml"
   attendu "porte.rego en service égal à celui du commit a7c7405" \
     "$(sha256sum < "$T/porte-avant.rego" | cut -c1-64)" "$(git -C "$repo" show a7c7405:poc/bricks/08-trust-plane/politique/porte/porte.rego < /dev/null | sha256sum | cut -c1-64)"
-  attendu "taches.yml en service égal au fichier versionné" "$(sha256sum < "$T/taches-avant.yml" | cut -c1-64)" "$(sha256sum < "$P08/taches.yml" | cut -c1-64)"
-  echo "## deb, porte en service (prédictions : ec en succès sans violation, succès à vide des règles du PoC ; VSA et scan refusés)"
+  # Corrigé le 11/11/2026 après le premier passage (20:20:44 UTC, arrêt avant toute écriture) : la liste en service est celle de
+  # b1e5ef4 (F3, 03/11/2026), sans les cinq ajouts relus des briques 06 (prefetch-gomod v2, prefetch-deb, construire-builder,
+  # preparer-deb, construire-deb). cm_porte déploie porte.rego ET la liste versionnée.
+  attendu "taches.yml en service égal à celui du commit b1e5ef4" "$(sha256sum < "$T/taches-avant.yml" | cut -c1-64)" \
+    "$(git -C "$repo" show b1e5ef4:poc/bricks/08-trust-plane/politique/porte/taches.yml < /dev/null | sha256sum | cut -c1-64)"
+  echo "entrées de la liste versionnée absentes de la liste en service :"
+  diff <(grep -E '^ *- ref:|^  oci://' "$T/taches-avant.yml") <(grep -E '^ *- ref:|^  oci://' "$P08/taches.yml") | sed -n 's/^> /    /p'
+  attendu "entrées retirées par la liste versionnée" "$(diff <(grep -E '^ *- ref:|^  oci://' "$T/taches-avant.yml") <(grep -E '^ *- ref:|^  oci://' "$P08/taches.yml") | grep -c '^<' || true)" 0
+  echo "## deb, porte en service (prédictions révisées à 20:21 UTC : ec en échec par trusted_task, tâches du deb absentes de la liste en service ; VSA et scan refusés)"
   v=$(juger s4d2-deb-avant "$REG/$DEB" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
   for c in vsa scan-verifier; do sed "s/^/    $c : /" "$T/porte-s4d2-deb-avant.$c"; done
-  mesure "deb avant : succès de ec" "$(champ "$v" 3)" true
-  mesure "deb avant : violations" "$(champ "$v" 4)" ""
+  mesure "deb avant : succès de ec" "$(champ "$v" 3)" false
+  mesure "deb avant : violations" "$(champ "$v" 4)" trusted_task.trusted
   mesure "deb avant : VSA" "$(champ "$v" 9)" refus
   mesure "deb avant : scan" "$(champ "$v" 11)" refus
-  echo "## ConfigMap porte mise à jour (porte.rego de S4d2a, liste revue inchangée)"
+  echo "## ConfigMap porte mise à jour (porte.rego de S4d2a et liste versionnée)"
   R=$R08 cm_porte
   attendu "porte.rego en service égal au fichier versionné" "$(kubectl get configmap -n porte porte -o jsonpath='{.data.porte\.rego}' | sha256sum | cut -c1-64)" "$(sha256sum < "$P08/porte.rego" | cut -c1-64)"
+  attendu "taches.yml en service égal au fichier versionné" "$(kubectl get configmap -n porte porte -o jsonpath='{.data.taches\.yml}' | sha256sum | cut -c1-64)" "$(sha256sum < "$P08/taches.yml" | cut -c1-64)"
   echo "## deb, porte étendue (prédictions : ec en succès sans violation ; horodatage complet ; VSA et scan refusés)"
   v=$(juger s4d2-deb "$REG/$DEB" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
   for c in horodatage vsa scan-verifier; do sed "s/^/    $c : /" "$T/porte-s4d2-deb.$c"; done

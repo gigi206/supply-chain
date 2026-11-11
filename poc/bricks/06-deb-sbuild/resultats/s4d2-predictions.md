@@ -69,3 +69,22 @@ Prédictions écrites le 11/11/2026 à 20:17 UTC, avant tout lancement. Script :
 - Les 18 mutations sont conformes à l'annonce : 17 font échouer au moins un test, et `f.preparation == nom` survit comme prévu. Remplacer par `false` la correspondance par dépôt du bundle fait maintenant échouer `test_deb_bundle_sous_autre_nom_hors_kata_refuse`.
 
 **E2 tenue au second passage**, après correction du test.
+
+## Note du 11/11/2026, 20:21 UTC : premier passage de `porte` arrêté avant toute écriture, E8 et E9 révisées
+
+**Arrêt** : le premier passage de `porte` (20:20:44 UTC, accord « Oui, lance porte », [journal](s4d2-porte-1.log)) s'est arrêté au contrôle préalable, avant tout Job et toute écriture.
+- `porte.rego` en service est bien celui de `a7c7405`.
+- En revanche, `taches.yml` en service n'est pas le fichier versionné : c'est celui de `b1e5ef4` (brique 03, F3, 03/11/2026). La ConfigMap n'a pas été redéployée depuis.
+- Il manque à la liste en service les cinq entrées ajoutées depuis, toutes relues par le propriétaire : `prefetch-gomod` en version 2 (`170bef53`), `prefetch-deb` (`4dac0609`), `construire-builder` (`746c2e11`), `preparer-deb` (`588617b8`) et `construire-deb` (`3726ff0b`). Aucune entrée n'a été retirée.
+
+**Ce qui était faux dans la carte et les prédictions** :
+- **Ce que la porte en service fait du deb** : seules les règles `porte.*` réussissent à vide (E7, mesurée sur l'hôte). La porte en service, elle, devrait refuser le deb par `trusted_task`, puisque ses tâches ne figurent pas dans la liste déployée. La carte de 20:07 UTC ne l'avait pas vu.
+- **E8** (« `ec` en succès sans violation ») devient : `ec` en échec, avec `trusted_task.trusted` en violation ; VSA et scan refusés. Confiance moyenne : d'autres règles de `@slsa3` pourraient s'ajouter.
+- **E9** (« liste revue inchangée ») devient : `cm_porte` déploie `porte.rego` et la liste versionnée, soit les cinq ajouts relus. Ce second déploiement sort de l'accord « Oui, lance porte » et en demande un nouveau.
+
+**Script corrigé** :
+- le contrôle préalable attend désormais la liste de `b1e5ef4`, affiche les entrées ajoutées et exige qu'aucune ne soit retirée ;
+- après la mise à jour, il vérifie que `porte.rego` et `taches.yml` en service sont ceux du dépôt ;
+- le retour arrière remet les deux fichiers enregistrés.
+
+E10 et E11 restent inchangées.
