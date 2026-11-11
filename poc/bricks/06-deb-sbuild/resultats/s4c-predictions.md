@@ -61,3 +61,9 @@ Journal : [`s4c-verrou.log`](s4c-verrou.log). Lancée sans accord, comme prévu 
 | C4 | **Tenue.** Deux layouts OCI locaux, même digest : `sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51`. C'est le digest attendu dans Zot (C5) |
 
 C5 à C7 attendent l'étape `publier`, sur accord nommé.
+
+## Note datée du 11/11/2026, 16:28 UTC : heure de l'en-tête, droits dans Zot, lecture du verrou en S4b
+
+- **Heure fausse dans l'en-tête** : « vers 16:45 UTC » est faux. Les prédictions ont été écrites entre la décision (16:19:27 UTC) et leur commit `defdd02` (16:25:24 UTC, `git log -1 --format=%cI`). L'étape `verrou` a commencé ensuite, à 16:25:30 UTC. L'ordre « prédictions commitées, puis exécution » est donc respecté.
+- **Droits de `poc-ecriture`**, lus dans `poc/bricks/08-trust-plane/stockage/zot.json` (configuration du dépôt, pas celle relue sur la VM) : `read`, `create` et `update` sur `**`. Le dépôt `entrees/sample-app/packaging-deb` est donc couvert, sans droit de suppression.
+- **Correction pour S4b** : l'en-tête de `s4c.sh` dit que `prefetch-deb` « lira » le verrou. Ce n'est pas vrai en l'état. La tâche reçoit sa liste en paramètre de la pipeline signée (`@LISTE@` dans `builder-sbuild.yaml`), et sa sortie (`prefetch-deb-sortie`) n'autorise que le DNS et le port 80 public : elle ne peut pas lire Zot. La carte de S4b devra dire comment le verrou arrive jusqu'à la tâche, et comment la provenance garde le digest de l'artefact. Le contenu de l'artefact de S4c n'en dépend pas.
