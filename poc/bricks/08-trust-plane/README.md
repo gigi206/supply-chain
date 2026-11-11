@@ -2242,3 +2242,77 @@ Dernier rejeu complet : 6 809 s jusqu'à « J8 (helm-cilium) » (`rejeu-rke2-six
 2. **« J8 (résolveurs) »** : (a) la déplacer après le bloc 08c, seule option mesurée, **recommandée** ; (b) couper `secretSync` dès l'installation, ce qui modifie la 08b, non mesuré ; (c) faire détecter l'état par `preuves.sh`.
 3. **Calendrier** : lancer après la tâche du 21/11/2026 à 16:00 UTC, **recommandé**, ou avant en renonçant à cette mesure (tâche à désactiver).
 4. **Préparation** : accord pour écrire à sec les quatre modifications, avec contrôles sur l'hôte et prédictions. Le lancement, destructif, demandera son propre accord nommé.
+
+**Additif du 11/11/2026, 22:44 UTC : décisions du propriétaire et quatre trous relevés par le conseiller.** Réponses « 1 ok », « 2 ok », « 3 ok » à trois questions :
+- **Questions de la carte** : les quatre recommandations sont retenues. L'ordre est : étapes actuelles, puis 08c, puis 06 en variante A. « J8 (résolveurs) » passe après le bloc 08c, option (a). Le lancement vient après la tâche du 21/11/2026 à 16:00 UTC. Les quatre modifications sont préparées à sec.
+- **Quatre trous à fermer** pendant la préparation, avant tout lancement :
+  1. dérive des étapes actuelles depuis le rejeu de référence du 06/11 (`1f66a3c`), par relevé de chaque attendu modifié ;
+  2. digests épinglés dans les tâches signées de la 06, à vérifier reproduits par un rejeu, ainsi que le commit lu par `s4b sources` dans un Forgejo neuf et les poussées sur `workspace/sample-app` avant `s4d3 chemins` ;
+  3. `POUSSER_VSA` ;
+  4. reprise de chaque étape neuve seule après un passage partiel, et nombre de passages supposé par l'estimation.
+
+  Accord pour faire les relevés 1, 2 et 4 en lecture seule, sur le dépôt et les journaux, sans toucher au cluster.
+- **`POUSSER_VSA`** : « 3 ok » répond à « rejeu avec la VSA re-poussée, qui demande un accord pour ce push, ou attendu rendu conditionnel ? ». Je le comprends comme la première option : rejeu avec `POUSSER_VSA=1`. Le push de la VSA garde son accord nommé au lancement. Si cette lecture est fausse, l'attendu de `s4d3 porte` devient conditionnel.
+
+  Pourquoi `s4d3 porte` l'impose : l'étape attend `ok` pour la VSA et pour le scan de sample-app.
+- **Le conseiller ajoute** :
+  - placer « J8 (résolveurs) » dans le bloc réservé à RKE2, ou écrire que le chemin k3s n'est plus rejouable ;
+  - reprendre les cas `reglec` et `slsa`, jamais rejoués avec `porte.rego` étendu par la 06. L'inventaire de la 06 les avait signalés ; la carte les avait omis.
+
+**Additif du 11/11/2026, 23:01 UTC : relevés 1, 2 et 4 faits à sec.** Ils lisent le dépôt (git, code) et les journaux archivés. Rien n'a été lancé, et ni le cluster, ni Zot, ni les VM n'ont été lus. Deux agents de lecture ont fait les relevés 1 et 2 ; j'ai relu leurs points décisifs dans le code. J'ai fait le relevé 4 moi-même.
+
+*Relevé 1 : ce qui a changé depuis la référence `1f66a3c`.*
+- `rejeu.sh`, `rke2.sh`, `vm.sh`, `stockage.sh`, `tekton.sh`, `fuites.sh`, `replay.sh`, `observabilite.sh` et les scripts de la 01 sont inchangés.
+- **Une seule dérive fait échouer une installation neuve** : « J8 (résolveurs) », déjà connue (constat 1).
+- **Passent, d'après les journaux** :
+  - `porte.rego` et `taches.yml` étendus par la 06 : la porte, avec ces deux fichiers identiques à HEAD, admet sample-app sans violation (`06-deb-sbuild/resultats/s4d2-porte-3.log:44`) ;
+  - les limites des pods d'essai (`preuves.sh` test 4, `kata.sh reseau`) ;
+  - `alertes.yml` (promtool) ;
+  - `evenements.alloy` (validé en service).
+- **Passent, d'après le code seulement**, sans passage depuis leur réécriture :
+  - les témoins de la porte sous le nouveau `porte.rego` (`reglec`, `slsa`, `attseule`, `decision3`) : `preparation_appariee` ne se déclenche que là où l'ancienne règle se déclenchait, et le cas `slsa` ne voit aucune tâche ;
+  - le test 6 sans `builds-sans-internet` : il revient au chemin d'origine, que les quatre passages du 10/11 n'ont pas suivi ;
+  - le test 8 en `n >= 2` ;
+  - les pièges de `parite` et `admission` ;
+  - la lecture par `evenements-loki.sh` à l'étape Cilium, quand Grafana n'existe pas encore : elle retombe sur kubectl, cas couvert par l'essai local ;
+  - le `labelSelector` de l'EventListener ;
+  - l'évaluateur de sélecteurs.
+- **Inconnu** : `egress-selector-mode: disabled` n'a été appliqué qu'en place, le 10/11. Il n'a jamais été posé à l'installation, avant que Cilium soit prêt. C'est une prédiction du rejeu.
+
+*Relevé 2 : digests, commit et poussées.*
+- **Images épinglées dans les tâches signées de la 06** :
+  - `outils-prefetch@68e0ae70` et `outils-horodatage@c7bebae2` sont reproduits par les deux rejeux de zéro, celui du 03/11 (k3s) et celui du 06/11 (RKE2) ;
+  - `publier-image d21931f3`, `publier-fermeture 7fa92ad3`, `prefetch-gomod` v1 `5e7e5662`, l'image `rattrapage c3992728`, la porte `e77994c2` et `3a7ca1b1` le sont aussi ;
+  - l'amorce `7378260c` n'est produite que par `s1.sh amorce`, qui doit donc être dans le bloc 06.
+- **Bundles de tâches de la 06** (`4dac0609`, `746c2e11`, `170bef53`, `588617b8`, `3726ff0b`) : jamais rejoués de zéro. Ils sont poussés depuis les fichiers signés versionnés, avec la même fonction que les bundles reproduits : je prédis les mêmes digests. **Aucune nouvelle signature ni relecture de `taches.yml` n'est attendue.**
+- **Bundles de pipeline** : ils changent à chaque signature, parce que la signature ECDSA n'est pas déterministe (`s4a.sh:188-189`). C'est mesuré : trois digests de `sample-app-deb` dans `s4d-taches*.log`, deux de sample-app entre les parties du 03/11. `PIPE_DEB` en dur casse donc à coup sûr (modification déjà prévue).
+- **Commit `6391fd43`** : posé par J2 (`stockage.sh:327-331`), avec auteur et dates fixes, à partir de l'arbre `30e808ff`, égal à `HEAD:poc/sample-app` aujourd'hui. Reproduit par les rejeux du 03/11 et du 06/11 (`rejeu-rke2-sixieme-passage.log:441`). Condition : ne pas modifier `poc/sample-app` avant le rejeu.
+- **Poussées sur `workspace/sample-app`** : seule « J6 (suite) » pousse, puis remet `TETE_J2`. La poussée de la 01 est refusée, et ni la 19, ni la 19b, ni la 07a, ni la 08c ne poussent. La tête vaut `TETE_J2` avant `s4d3 chemins` (lu pour les étapes actuelles, déduit pour la 08c).
+- **Déclenchement imprévu du deb** : impossible avant `s4d3 deployer`, puisque le Trigger n'existe pas encore. Après `chemins`, le CronJob `rattrapage-deb` reste actif : rien ne doit purger ni livrer ensuite. `fuites` et CIS ne le font pas.
+- **Porte de `s4d3`** :
+  - VSA `ok` : vient seulement de `10 pousser_vsa`, d'où `POUSSER_VSA=1` ;
+  - scan `ok` : vient de `g4_scan` et de `g7_periodique`, sans condition, mais dépend de l'âge du scan et de la base grype au moment du jugement ;
+  - `28/28` pour sample-app : un cumul de l'ancien cluster, quand la référence n'en avait que 6/6 au contrôle 6. Il casse à coup sûr, d'où les compteurs relatifs déjà prévus ;
+  - `8/8` pour le deb : ne tient que pour la séquence exacte de deux passages de `s4d pipeline` puis deux de `chemins`.
+
+*Relevé 4 : relancer seule chaque étape neuve.*
+- **Se relancent seules** :
+  - `h1_api`, `h4_bloque` (`apply --server-side`), `s1_source`, `s1_chains`, `s1_copies` (aucune garde d'état préalable), `h5_limites` (refuse si un PipelineRun est en cours), `h5_deny` et `h5_roles` (le contrôle « avant » lit RBAC, inchangé par la règle). Chaque relance redémarre de nouveau ce qu'elle redémarre ;
+  - `s1 amorce`, `s4c`, `s4a`, `s4b`, `s4d` (`purger_pr` avant chaque PipelineRun ; seuls les bundles de pipeline changent).
+- **Ne se relancent pas seules** :
+  - `s4d3 prealables` et `s4d3 deployer` exigent 0 Trigger et aucune TriggerTemplate (`s4d3.sh:191-192`, `:210`) ;
+  - `s4d3 chemins` exige que `sample-app-deb-<tête>` soit absent et `rattrapage-deb` suspendu (`s4d3.sh:263-266`).
+
+  Remède à préparer : l'étape du rejeu commence par `s4d3 retirer`, sans effet sur un cluster neuf, et par une purge de `sample-app-deb-<tête>`. `retirer` ne la fait pas aujourd'hui : cinquième modification.
+- **`DEPUIS=`** : une reprise à une étape postérieure au début du bloc 08c fonctionne. Une reprise antérieure, une fois la 08c appliquée, casse (carte, limites) : il faut alors un rejeu complet.
+
+**Estimation révisée** : une journée, en supposant un passage complet (environ 3 h 15) et au plus trois reprises dans les blocs neufs (environ 30 min chacune). Un second passage complet ferait sortir de la journée. Pour comparaison, le rejeu du 03/11 a pris cinq parties et trois correctifs, celui du 06/11 six passages et une reprise. La règle des 2× s'applique à partir de deux jours.
+
+**Modifications à préparer à sec**, sur l'accord « 1 ok » :
+1. `rejeu.sh` : blocs 08c et 06 sous RKE2 et Cilium, « J8 (résolveurs) » déplacée dans le bloc 08c, `echo` de la 08d, usage de `DEPUIS=` ;
+2. `sortie-builds.sh` : étape neuve qui pose les deux politiques sur un cluster neuf ;
+3. `s4d3.sh` : `PIPE_DEB` lu dans `pipeline.ref` ;
+4. `s4d3.sh porte` : compteurs relatifs ;
+5. `s4d3.sh retirer` : purge de `sample-app-deb-<tête>`.
+
+Chaque modification sera contrôlée sur l'hôte avec les valeurs réelles, puis accompagnée des prédictions du rejeu.
