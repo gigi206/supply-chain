@@ -1,0 +1,596 @@
+git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+all modules verified
+go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+résultat FERMETURE_DEB_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb","digest":"sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290"}
+résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb","digest":"sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51"}
+----- liste -----
+b6e8ecf36f4b106f4dc1d8efadbda9582271be995b3f8949800494f34a3fb8ed  ./debian/changelog
+100a5421f62545f4da97d48f2f9ff34ed57af86a13531caae9e58a0f9dc0f6f4  ./debian/control
+20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2  ./debian/copyright
+8458fdd6c3e02e22ff20d013aed2928c0264c41107e220355275e3af4fc177bf  ./debian/rules
+1be7080d72e6b566df3e236ce2c55efdfbbb8fa1c972d825e5b672ff8773be1a  ./debian/source/format
+0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675  ./fermeture/miroir/dists/trixie/InRelease
+7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498  ./fermeture/miroir/dists/trixie/main/binary-amd64/Packages.xz
+7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498  ./fermeture/miroir/dists/trixie/main/binary-amd64/by-hash/SHA256/7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251  ./fermeture/miroir/dists/trixie/main/i18n/Translation-en.xz
+800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251  ./fermeture/miroir/dists/trixie/main/i18n/by-hash/SHA256/800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251
+08074f01e384bc07c0c2d79a58cf4a6523f71cf75d1808101c79617656c9a39d  ./fermeture/miroir/pool/main/a/acl/libacl1_2.3.2-2+b1_amd64.deb
+5c6814cf6536892b3a93cc72a0a3792beb0d3f6be3d69f499ca7d764583479a9  ./fermeture/miroir/pool/main/a/acorn/node-acorn_8.8.1+ds+~cs25.17.7-2_all.deb
+606b5ee12ea2786be607a17f40c1fb5e65c76ceaff66665bdf8f8c6c1b71d1fb  ./fermeture/miroir/pool/main/a/attr/libattr1_2.5.2-3_amd64.deb
+b9d32e5ff04fd747aacb7d6b3ebbbbf734ddefb2f1695f0b1b2a4b5e51b1052e  ./fermeture/miroir/pool/main/a/audit/libaudit-common_4.0.2-2+deb13u1_all.deb
+3d1dd3f031a56f01b747e2acc0e14575212580e6fa63d800c44cb0a31f1edfd7  ./fermeture/miroir/pool/main/a/audit/libaudit1_4.0.2-2+deb13u1_amd64.deb
+0de76b647b0afb6c7934999aaefeb463656c147672464a367df1019969e77af3  ./fermeture/miroir/pool/main/a/autoconf/autoconf_2.72-3.1_all.deb
+8d4b172d4ff8070789c54b48a95585b53e4c65faeb07a2ae52da16cb364df635  ./fermeture/miroir/pool/main/a/automake-1.17/automake_1.17-4_all.deb
+d07d476c1fcd713ed04695f25ac290c3ae2317e6fd974ad6b2168e3be1c795c3  ./fermeture/miroir/pool/main/a/autotools-dev/autotools-dev_20240727.1_all.deb
+fcd42bb5cb63f7bfc4326a92541247872206d60a192fdff65ca14eb83ed408b9  ./fermeture/miroir/pool/main/b/base-files/base-files_13.8+deb13u7_amd64.deb
+cf31c6956ab5f65815d9d9ea1615c4f78ecd2893c31119658248a4756cee83e7  ./fermeture/miroir/pool/main/b/base-passwd/base-passwd_3.6.7_amd64.deb
+2fd7b04f1b7caa29c4e683f5216e6af354a41e3cdcf6e75394d7cda680f9ab82  ./fermeture/miroir/pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb
+002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9  ./fermeture/miroir/pool/main/b/binutils/binutils-common_2.44-3_amd64.deb
+e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53  ./fermeture/miroir/pool/main/b/binutils/binutils-x86-64-linux-gnu_2.44-3_amd64.deb
+6bc08c02539ba53b5e748142397144c499f9b20b5fa9bb56431545db124addeb  ./fermeture/miroir/pool/main/b/binutils/binutils_2.44-3_amd64.deb
+4f4664c8a8f0ad0c8631c39fab02e3d8d86ccc6f4436a1d59f059dbcb0492679  ./fermeture/miroir/pool/main/b/binutils/libbinutils_2.44-3_amd64.deb
+e280b2be3db6e584500e865c251605b95c346767d87ccb2524e44992048fc657  ./fermeture/miroir/pool/main/b/binutils/libctf-nobfd0_2.44-3_amd64.deb
+120cafcd93132a276fa92a8fb4cf39b23d14e5a3e348f4f5580638d71ca95ac5  ./fermeture/miroir/pool/main/b/binutils/libctf0_2.44-3_amd64.deb
+0d36d0bde85c467ac6735dded08e19dd30ae1369e3908b9eb48ccc0d6ff66648  ./fermeture/miroir/pool/main/b/binutils/libgprofng0_2.44-3_amd64.deb
+38f625dfdc582717029ac3a3e97c51d994ec2e7a0e9b230c6b44e40d1276311f  ./fermeture/miroir/pool/main/b/binutils/libsframe1_2.44-3_amd64.deb
+0fb79f88db210afbd69282ab9649e525f393ec6950ca34da1a6b359250b8d7db  ./fermeture/miroir/pool/main/b/brotli/libbrotli1_1.1.0-2+b7_amd64.deb
+a45159aebea0d98d6652ac5a56b7fff164a7733a7dc736b9f8715ca504519d3a  ./fermeture/miroir/pool/main/b/build-essential/build-essential_12.12_amd64.deb
+6b5fbe71f0fc41e85919bc4b3c514e6c47577c5005dbf1f5af6e4a49cc221aab  ./fermeture/miroir/pool/main/b/bzip2/bzip2_1.0.8-6_amd64.deb
+cba4cda04244b5e481bb15524bc3c983a7d1b6f330013b9b381706a2fcb65310  ./fermeture/miroir/pool/main/b/bzip2/libbz2-1.0_1.0.8-6_amd64.deb
+5034a2c34ea4730797df1a5f6a0ec142d7d09ce6923c06e167f08ad2e69a4218  ./fermeture/miroir/pool/main/c/c-ares/libcares2_1.34.5-1+deb13u1_amd64.deb
+25acadc8b394bc86d05df16e70975e523f8f839a7d8d6d5e22c1cafdcef741aa  ./fermeture/miroir/pool/main/c/cdebconf/libdebconfclient0_0.280_amd64.deb
+1299ab6f9389a288eb2f5f3dd222c26cc777b9a2d5ecb6ee4cbd340cebcdada2  ./fermeture/miroir/pool/main/c/coreutils/coreutils_9.7-3_amd64.deb
+a8902cb6d8650134764a25fb80aec8589d858ef71ece1680a62e84816c37bb04  ./fermeture/miroir/pool/main/d/dash/dash_0.5.12-12_amd64.deb
+18d02510ee78b67e4504ba050176797a200ff24214a7cd318082ab60ad7bf3fc  ./fermeture/miroir/pool/main/d/db5.3/libdb5.3t64_5.3.28+dfsg2-9_amd64.deb
+1ddc7e6c5925f748eefb7ca811d98e049f18c158bb21fbc7e122262ce6011e49  ./fermeture/miroir/pool/main/d/debconf/debconf_1.5.91_all.deb
+04ba78ad4363df4f47cac2667dcca7a4bfe520625af5799ec1ede3cb6551f6fc  ./fermeture/miroir/pool/main/d/debhelper/debhelper_13.24.2_all.deb
+1e1ab830223bcfe92ce61dd7e4d5a7db9cd439275a2c0ed7bf714a99813b8a7f  ./fermeture/miroir/pool/main/d/debhelper/libdebhelper-perl_13.24.2_all.deb
+720e43fda316676076498b4224ad3318049deafe60cc7c601011048de03ee97d  ./fermeture/miroir/pool/main/d/debianutils/debianutils_5.23.2_amd64.deb
+9527d06ee13195c48718a2580d7262883344a5ecc7a77b48c3b7aa70086a0125  ./fermeture/miroir/pool/main/d/dh-autoreconf/dh-autoreconf_20_all.deb
+d3412669f7ae53ba895c3a509620ea7494ec1a36faa204c5215442ced381a479  ./fermeture/miroir/pool/main/d/diffutils/diffutils_3.10-4_amd64.deb
+6d4020421740a70e1fb9c41b07f8bb8306d93aef6fea1a8ce11a1f839921f414  ./fermeture/miroir/pool/main/d/dpkg/dpkg-dev_1.22.22_all.deb
+3e800c6d75e8e709007ed1c356e5fa8509a75c1694fb0a1183709abc9cfdc1f3  ./fermeture/miroir/pool/main/d/dpkg/dpkg_1.22.22_amd64.deb
+b41eaeb4879091023f8c1a058510844a244d3d0bd0f437e0e05d58213e36fd9f  ./fermeture/miroir/pool/main/d/dpkg/libdpkg-perl_1.22.22_all.deb
+ad9f7205d8b951a7456511b9c8ed24b4a3571c403ef4e328400c96b31784dd15  ./fermeture/miroir/pool/main/d/dwz/dwz_0.15-1+b1_amd64.deb
+94497b7e17b6f574a0605b380d454e20d3f01a9c63b70c2a2263f679d30053e1  ./fermeture/miroir/pool/main/e/elfutils/libelf1t64_0.192-4_amd64.deb
+5b980b02a7d91aab9cb50c65ac7e059678a36d36ed626ec52506442f4501a1a7  ./fermeture/miroir/pool/main/f/file/file_5.46-5_amd64.deb
+1368da7c4c7dd10fb2f9ee3ed8a70801650c0c1d249a4076af15e2ddfbb14b46  ./fermeture/miroir/pool/main/f/file/libmagic-mgc_5.46-5_amd64.deb
+53f653873216b135570b42c423ea93825c008ac464780b4578e80ee424237a4e  ./fermeture/miroir/pool/main/f/file/libmagic1t64_5.46-5_amd64.deb
+3edf02b016456b6a98cefdbab99c5ce6f829b786f63affe970badea221aecfc7  ./fermeture/miroir/pool/main/f/findutils/findutils_4.10.0-3_amd64.deb
+ef274b5379f5f97fc71619d39ecc84d039d3e184570d207b909c90afaa5d79e0  ./fermeture/miroir/pool/main/g/gcc-14/cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+3bae5fe03c56c6d021900ab4fb79e35c6f75eee72a73fccc6f28a39db559d6a0  ./fermeture/miroir/pool/main/g/gcc-14/cpp-14_14.2.0-19_amd64.deb
+c66b009fedd340520279d1af2f91d0668e9f64f0c08fe62179ca1c75e556be58  ./fermeture/miroir/pool/main/g/gcc-14/g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+4706ab29eab3d81e93582b45b229fdedc71f1eec3071996a448cf2c8beb83f3a  ./fermeture/miroir/pool/main/g/gcc-14/g++-14_14.2.0-19_amd64.deb
+5b6825de4263824b78c4c51f6476414f3b4e89c2ab63e81dc8b9b5501e867cf6  ./fermeture/miroir/pool/main/g/gcc-14/gcc-14-base_14.2.0-19_amd64.deb
+a17ef039f1ba482051c3efb5c2c24070002e60dd0bd09fd456ec31481a11b725  ./fermeture/miroir/pool/main/g/gcc-14/gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+21500408b5019d8d29f70ce58488e2eea469a1adb4b5fd7db45e819b5efcac4e  ./fermeture/miroir/pool/main/g/gcc-14/gcc-14_14.2.0-19_amd64.deb
+771899ade7310fe31aa538a509354c33d62bbe4e408b4e5fc1e513988dc42645  ./fermeture/miroir/pool/main/g/gcc-14/libasan8_14.2.0-19_amd64.deb
+212b399aae2f7299203d261a57e49372e09565a9a5ea971905f94a3960366c05  ./fermeture/miroir/pool/main/g/gcc-14/libatomic1_14.2.0-19_amd64.deb
+2d587e3bfba4aec701946b7ba0c1640b97b6d8dd0a34ba1c70ae85261ecedefa  ./fermeture/miroir/pool/main/g/gcc-14/libcc1-0_14.2.0-19_amd64.deb
+ca6f2d36d96b19b3eb71405b0b80134d8c89380b02204a2512e5c58ceb090628  ./fermeture/miroir/pool/main/g/gcc-14/libgcc-14-dev_14.2.0-19_amd64.deb
+3c71917b490d1a17aed43196a2787a256ecf060526cdb20216a74bedc061b150  ./fermeture/miroir/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_amd64.deb
+72b7a1a33c48f3195efeb044111b34ae684b1e640bb6495c832443b798601cd5  ./fermeture/miroir/pool/main/g/gcc-14/libgomp1_14.2.0-19_amd64.deb
+2cdaf797cad8ac30a964ab081370682dd065ae1b0305a0be9d8e0e14cd0657d7  ./fermeture/miroir/pool/main/g/gcc-14/libhwasan0_14.2.0-19_amd64.deb
+febdb3c528cde1a3abe952e17a1d3cfa7ccaca5b6f506d983d34385dad199490  ./fermeture/miroir/pool/main/g/gcc-14/libitm1_14.2.0-19_amd64.deb
+a0df07da76287a45e665d584363dc2a6a1c4e240aee41b8bbc0f67cdff97cd68  ./fermeture/miroir/pool/main/g/gcc-14/liblsan0_14.2.0-19_amd64.deb
+f5b51cf0ece3ec3bb7494d0cdbff3ce715ae00cfb2b6ed787f7db91319d64a7b  ./fermeture/miroir/pool/main/g/gcc-14/libquadmath0_14.2.0-19_amd64.deb
+4b962fac5f1af0bd8b1b3f97e0f47b9d8e9a79e88802143f00ebfbd78ad87a7b  ./fermeture/miroir/pool/main/g/gcc-14/libstdc++-14-dev_14.2.0-19_amd64.deb
+ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0  ./fermeture/miroir/pool/main/g/gcc-14/libstdc++6_14.2.0-19_amd64.deb
+529d7f68227d16975076c5f842e8b687faea1b5df8e0dcf62e436d5402844ca5  ./fermeture/miroir/pool/main/g/gcc-14/libtsan2_14.2.0-19_amd64.deb
+9205a1bef7d6a52ffc06548e0cde169ff303e688c12d9be3a98f734449077e22  ./fermeture/miroir/pool/main/g/gcc-14/libubsan1_14.2.0-19_amd64.deb
+d902f484e38bce59e82efc0df2fe20139a0932ca759ecafdfe6e5b6c72238eb8  ./fermeture/miroir/pool/main/g/gcc-defaults/cpp-x86-64-linux-gnu_14.2.0-1_amd64.deb
+a6ba40550aadec80437813e0fce5516574945ff40e72306a5b378c03af3a6544  ./fermeture/miroir/pool/main/g/gcc-defaults/cpp_14.2.0-1_amd64.deb
+15e10fc3948ec76be8d51b23e75ad9df9c39588c94f1f47059cee02c117c7583  ./fermeture/miroir/pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb
+f86661c021ab2acb39ceb87315e7c2d4d420fdadc19945d5d589f3953410445c  ./fermeture/miroir/pool/main/g/gcc-defaults/g++_14.2.0-1_amd64.deb
+04c28c2760b0094b3d7758154ac095303dd00599b63ebad4086a325b607308b7  ./fermeture/miroir/pool/main/g/gcc-defaults/gcc-x86-64-linux-gnu_14.2.0-1_amd64.deb
+eee65c41a441c57c05f754ced1b9d093956966a1c7da9938c3ec00d3dc2f905d  ./fermeture/miroir/pool/main/g/gcc-defaults/gcc_14.2.0-1_amd64.deb
+2cbd43cf2dfbf57ff48188b5d79d29cf7ea8f0dedaa61ab0bcc02eceff50ea01  ./fermeture/miroir/pool/main/g/gdbm/libgdbm-compat4t64_1.24-2_amd64.deb
+e7b42c68c391e278733adb3c1efdacd24d660862bd7bac0efbc10a91e5696dfc  ./fermeture/miroir/pool/main/g/gdbm/libgdbm6t64_1.24-2_amd64.deb
+18696c3e02f2be55be0096ea510b2d82e602a47fc746ae41c91bbe680b06a569  ./fermeture/miroir/pool/main/g/gettext/autopoint_0.23.1-2_all.deb
+1a3dfadd661520ff01d379fd89cd0d49972a5a775d490609f1712134ee3d62ca  ./fermeture/miroir/pool/main/g/gettext/gettext-base_0.23.1-2_amd64.deb
+25293e75989db79a1d4a6b942674b0e7243da54a0985f8d9df1b345d255d262b  ./fermeture/miroir/pool/main/g/gettext/gettext_0.23.1-2_amd64.deb
+dc8c79647fe3a5f37f72a400414f70263d0212f010ff2c09f990e30d91e38d1c  ./fermeture/miroir/pool/main/g/glibc/libc-bin_2.41-12+deb13u4_amd64.deb
+2c21175d6a8283ed566d154c0c0bc06f60836e53b0b9e1f74c14eac586b68c24  ./fermeture/miroir/pool/main/g/glibc/libc-dev-bin_2.41-12+deb13u4_amd64.deb
+1fda734dabcd80b77266a09ab62b0f1e3e16d8091db62899890b2200745632a2  ./fermeture/miroir/pool/main/g/glibc/libc6-dev_2.41-12+deb13u4_amd64.deb
+967aa62605721081c3eb2a17650611a792aa802d76a6511d1840242623d204c9  ./fermeture/miroir/pool/main/g/glibc/libc6_2.41-12+deb13u4_amd64.deb
+d0d0265eb01770f17afd0f7c8c0622f80479dcfbbe13653a0debeec61464e622  ./fermeture/miroir/pool/main/g/gmp/libgmp10_6.3.0+dfsg-3_amd64.deb
+93c6c109bbc0f1d55523282a16739d10634499c04f6d066a6aa58b67b687a44f  ./fermeture/miroir/pool/main/g/golang-1.24/golang-1.24-go_1.24.4-1_amd64.deb
+c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1  ./fermeture/miroir/pool/main/g/golang-1.24/golang-1.24-src_1.24.4-1_all.deb
+884c2158ecd8ed3205bdaf70bbb3a3afe03c48298c6cd527d86a6ddf2c7e8f5a  ./fermeture/miroir/pool/main/g/golang-defaults/golang-go_1.24~2_amd64.deb
+e1cc08319df53c17b7468d1136bc39154d06734601b144a07dba81181fae8016  ./fermeture/miroir/pool/main/g/golang-defaults/golang-src_1.24~2_all.deb
+2d78ed07d86a530ebf538f05cb2415f37c8daf908596bc32fc2563cc7e88c55a  ./fermeture/miroir/pool/main/g/grep/grep_3.11-4_amd64.deb
+cb13bd856be0837d683377d618f2c0cc9b56b4abb2a821aafe33baf2b8ac215c  ./fermeture/miroir/pool/main/g/groff/groff-base_1.23.0-9_amd64.deb
+74cf12212beee4ab8d473bdc0107abf9e8cef737492198e2f4944a19f142b0ac  ./fermeture/miroir/pool/main/g/gzip/gzip_1.13-1+deb13u1_amd64.deb
+9c2a27e5d4d87137211fe46631b05b2ee8892ec76aae926304e4485ba02e1015  ./fermeture/miroir/pool/main/h/hostname/hostname_3.25_amd64.deb
+c1bf762996de9ecba9b9d871e4928a8090f023a3e9e7fa3240b3d90f892a01dc  ./fermeture/miroir/pool/main/i/icu/libicu76_76.1-4_amd64.deb
+addf78073e1cbc5a5508937e11d2571055e29835e00ee8fab52a66775649378f  ./fermeture/miroir/pool/main/i/init-system-helpers/init-system-helpers_1.69~deb13u1_all.deb
+058900c66cbc0d8b60139bdecc9a06cb9c3b479a03117354a78e5fa72aecd90c  ./fermeture/miroir/pool/main/i/intltool-debian/intltool-debian_0.35.0+20060710.6_all.deb
+ac8518042e81c00de1effb72bba7e88ac4ecd488f7ea8b9e3ebc63159cb53b35  ./fermeture/miroir/pool/main/i/isl/libisl23_0.27-1_amd64.deb
+60707a62fe6c1228c3389b12a13ca4efd76defc5532473e547a29e99cf7d2a6e  ./fermeture/miroir/pool/main/j/jansson/libjansson4_2.14-2+b3_amd64.deb
+dc68dd53c7356598d005866da0d19d7bd33af2a62971aced624cdf04492902b4  ./fermeture/miroir/pool/main/l/linux/linux-libc-dev_6.12.107-1_all.deb
+d1006344c2b897e2ffd1a60c5423f60e9d5c15f701e72c3d60b08b684608cff8  ./fermeture/miroir/pool/main/liba/libarchive-zip-perl/libarchive-zip-perl_1.68-1_all.deb
+20a9e4b0619a3eb2566338223bed135dde5a601eaa2f8fdd5f20b94506addcac  ./fermeture/miroir/pool/main/libc/libcap-ng/libcap-ng0_0.8.5-4+b1_amd64.deb
+89fc4d34fc7a28ad6f0fcd0c561ab253b9dedf6f77f5a000b47c276c8295bf67  ./fermeture/miroir/pool/main/libc/libcap2/libcap2_2.75-10+deb13u1+b3_amd64.deb
+7244ec3839b61fac0c1884fe08aaa040f26e8f1f35f1f5d3482eacefd30d1b44  ./fermeture/miroir/pool/main/libm/libmd/libmd0_1.1.0-2+b1_amd64.deb
+edf2aadc18f204a3ebbda0ca2797bf0d1fe8f6534ac1b2c23195561eec87a796  ./fermeture/miroir/pool/main/libp/libpipeline/libpipeline1_1.5.8-1_amd64.deb
+89d5138e05fb6a86b9afd8b54dc0fb4b14f4c27c05e6c5f767c2132bdf808531  ./fermeture/miroir/pool/main/libs/libseccomp/libseccomp2_2.6.0-2_amd64.deb
+68bb8d32bd8d6d7d2f5952a169db03d1484b46ae1e52abccdec42a19dccea5d5  ./fermeture/miroir/pool/main/libs/libselinux/libselinux1_3.8.1-1_amd64.deb
+be5361a8c1fce2758c3e19608bf97393d5f3afdb7e926aeb83e2818355bd885f  ./fermeture/miroir/pool/main/libt/libtool/libtool_2.5.4-4_all.deb
+6dd3490bef06ea1096f32d10766b7e016cf579bfae8451d1b7df15ce05b8aa46  ./fermeture/miroir/pool/main/libu/libunistring/libunistring5_1.3-2_amd64.deb
+5fec8035002e0c745b64d1c5b3e1dc42790d1a77574315b976cf3e4aab9ddc0a  ./fermeture/miroir/pool/main/libu/libuv1/libuv1t64_1.50.0-2_amd64.deb
+98e2333aea8d64ca68f9b75c16256d3a05492fd8f9e6dba96adbc6f19e4f5a09  ./fermeture/miroir/pool/main/libx/libxcrypt/libcrypt-dev_4.4.38-1_amd64.deb
+0ebc144d662e3197982d1bf3a7b8b35ca845e54c68811de0328b1f0d7c67585c  ./fermeture/miroir/pool/main/libx/libxcrypt/libcrypt1_4.4.38-1_amd64.deb
+e0c6b63ce4602a036a526f60fe5e6c1586710688058d98fc1001b9b3147b7efd  ./fermeture/miroir/pool/main/libx/libxml2/libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3_amd64.deb
+2f6a2aeacfc925eba8b00ac9139bc4bfccf8cacb09eb93de067074b26948eef9  ./fermeture/miroir/pool/main/libz/libzstd/libzstd1_1.5.7+dfsg-1_amd64.deb
+221b3e224708c1da2a1a88b6824380593579b2254ae7d914afa14cbd5d343334  ./fermeture/miroir/pool/main/m/m4/m4_1.4.19-8_amd64.deb
+70a9709e665383b06068ccd423d62ea191b65355f318a25565dbf324b254cec6  ./fermeture/miroir/pool/main/m/make-dfsg/make_4.4.1-2_amd64.deb
+d5a407221a0d59845484b5343a37ec6374102e949353e4b158eaa2cbaf27aa5a  ./fermeture/miroir/pool/main/m/man-db/man-db_2.13.1-1_amd64.deb
+ade14470c4dff8921bca6ca8b1ea20eadc0f2178b48caff3c74534b17a633292  ./fermeture/miroir/pool/main/m/mawk/mawk_1.3.4.20250131-1_amd64.deb
+2af0a5c128e03694a41c0b011bd8a958b7297436cdb3a15ddad7866dae8c300b  ./fermeture/miroir/pool/main/m/mpclib3/libmpc3_1.3.1-1+b3_amd64.deb
+75dddce11dabc7fc543712c33dc27b7f2ee66a111763eb5eac654d010b42cd92  ./fermeture/miroir/pool/main/m/mpfr4/libmpfr6_4.2.2-1_amd64.deb
+8b9f6a7983e9418564e48a627518de4c03917b56efe68d7f3e93bd8fffa1cc10  ./fermeture/miroir/pool/main/n/ncurses/libtinfo6_6.5+20250216-2_amd64.deb
+190e775260a38973c415a36ae99f33ad1b37ea6ca99929d7c5d53843fc23e914  ./fermeture/miroir/pool/main/n/ncurses/ncurses-base_6.5+20250216-2_all.deb
+40a525f4761e9ed4b8adcd1783cb9a6467ff8008215ae99b3597825bdefc61e4  ./fermeture/miroir/pool/main/n/ncurses/ncurses-bin_6.5+20250216-2_amd64.deb
+896cb217537c09251fb909b8541349010ac279d802d871e98c06a62a2c67ce2c  ./fermeture/miroir/pool/main/n/nghttp2/libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb
+98a1c466bff6baf6780c4b765ec665e684424bf7907439939b5fb1160ede039c  ./fermeture/miroir/pool/main/n/node-balanced-match/node-balanced-match_2.0.0-1_all.deb
+c06d940bf95617cfd5c5ccbf0bf2ea864f41f36f317f21b4c8b21a3bf9668821  ./fermeture/miroir/pool/main/n/node-brace-expansion/node-brace-expansion_2.0.1+~1.1.0-2_all.deb
+db5edbd534306c633cd8c0639adb9fc723ec5c6961eee9f9721475db74474959  ./fermeture/miroir/pool/main/n/node-cjs-module-lexer/node-cjs-module-lexer_1.2.3+dfsg-1_all.deb
+76fc252799fe76c1dcd63d95cc556e11d5ac226902cf41c1963a2a45f830efa0  ./fermeture/miroir/pool/main/n/node-corepack/node-corepack_0.24.0-5_all.deb
+732998416eadffcdbf4e7e697200eb28d42963d1540fff2a3b485b5499805db6  ./fermeture/miroir/pool/main/n/node-minimatch/node-minimatch_9.0.3-6_all.deb
+7f10cf9c79cf4dae6c1117ca1c8181d2d4d184b82bbd59dd0eeec554994161c4  ./fermeture/miroir/pool/main/n/node-undici/node-undici_7.3.0+dfsg1+~cs24.12.11-1_all.deb
+c64e37fbea40de012b59adbfa61e703b52c12713f34cbfd2d4049ebcc549f270  ./fermeture/miroir/pool/main/n/node-xtend/node-xtend_4.0.2-3_all.deb
+76e19950d6f79d4a3fcba700573fad26df377169ea3fad6a3cefa2ba6a629911  ./fermeture/miroir/pool/main/n/nodejs/libnode115_20.19.2+dfsg-1+deb13u2_amd64.deb
+3e2d151f46ae1f1ab644fa6d11d85e7cf30d9aa182935bc16b99bf9888be8a85  ./fermeture/miroir/pool/main/n/nodejs/nodejs_20.19.2+dfsg-1+deb13u2_amd64.deb
+916f7f40b34a06e6ebfaefcdab331bff458328411da672598f126a760472467d  ./fermeture/miroir/pool/main/o/openssl/libssl3t64_3.5.7-1~deb13u2_amd64.deb
+f155c8191ae6d41da73d792f4182680aeafeb85c3dd223934ee9fdd115c4f1fa  ./fermeture/miroir/pool/main/o/openssl/openssl-provider-legacy_3.5.7-1~deb13u2_amd64.deb
+cc72066d008444317738e8e931d6131b301466b4e2dd5ef5baa75fb1a45d61a7  ./fermeture/miroir/pool/main/p/pam/libpam-modules-bin_1.7.0-5_amd64.deb
+9679ade117f8775ac0471f48a92652ab8e8dcda4e2ff06de75158cded9cfd83c  ./fermeture/miroir/pool/main/p/pam/libpam-modules_1.7.0-5_amd64.deb
+b02792c9ed6174db695a653b95ef3629fdac3a73ba1eff1754ab161b5711bfbf  ./fermeture/miroir/pool/main/p/pam/libpam-runtime_1.7.0-5_all.deb
+4f5bde27d8df2de6ea8990319b42d9974f56a3ba9907ce7296fd0f8964fc9fb1  ./fermeture/miroir/pool/main/p/pam/libpam0g_1.7.0-5_amd64.deb
+80c46a0085b33acc74bf451fddb6a70cb43d4ebcc4a873aec04d8d0a63ffc630  ./fermeture/miroir/pool/main/p/patch/patch_2.8-2_amd64.deb
+1252b96a5bc44bb5db982bef8eb18e54f5047cede2aff641bce4f8e1edb91c3e  ./fermeture/miroir/pool/main/p/pcre2/libpcre2-8-0_10.46-1~deb13u2_amd64.deb
+e44777ff47ad248d1debd57e1f96ab5e89061a341008ae39880ba3b5fc15f273  ./fermeture/miroir/pool/main/p/perl/libperl5.40_5.40.1-6+deb13u1_amd64.deb
+b795464137a0f4d443fc9284f4b93e883fb83883cb533adf300ac660807a352a  ./fermeture/miroir/pool/main/p/perl/perl-base_5.40.1-6+deb13u1_amd64.deb
+4c46cdd8f3135aa1c95f07e817f8e5d9be590687441ac1c27e3a8c49400f35ce  ./fermeture/miroir/pool/main/p/perl/perl-modules-5.40_5.40.1-6+deb13u1_all.deb
+ef145c247787d6f40dcdefd5b417502484827cde0d555998c17fd5b27ec1e1dd  ./fermeture/miroir/pool/main/p/perl/perl_5.40.1-6+deb13u1_amd64.deb
+613e31942c17b582e8c76db1077240f177f2f67bad22e5f4f8e5bee523d6f54b  ./fermeture/miroir/pool/main/p/po-debconf/po-debconf_1.0.21+nmu1_all.deb
+32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3  ./fermeture/miroir/pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.3-1_amd64.deb
+7071270ed4f6adda55bc4f926347fb847bacaffbdee3dff917bc6006ed7e3775  ./fermeture/miroir/pool/main/s/sed/sed_4.9-2+deb13u1_amd64.deb
+873a9b73c3478cc3148cdbf5cc2084949a0a8e4fa16131d1cbc895d2f1f3470e  ./fermeture/miroir/pool/main/s/sensible-utils/sensible-utils_0.0.25_all.deb
+0a459adaffd901109f7811ab65f58e7a957b4907d05539cf3d1184efdcde0468  ./fermeture/miroir/pool/main/s/sqlite3/libsqlite3-0_3.46.1-7+deb13u2_amd64.deb
+caadb7094d10f933619f1261fe1e31c86460992b7d2685d2596f15f848d1a174  ./fermeture/miroir/pool/main/s/strip-nondeterminism/dh-strip-nondeterminism_1.14.1-2_all.deb
+d03b28625a443b749e449d146bf99ef5419eb05ecbff256a71069a25de1549cf  ./fermeture/miroir/pool/main/s/strip-nondeterminism/libfile-stripnondeterminism-perl_1.14.1-2_all.deb
+ab0d4127b5e46e6f8c015a1db15a62ba9ae274cdefa150083adf90ada0600ea1  ./fermeture/miroir/pool/main/s/systemd/libsystemd0_257.13-1~deb13u1_amd64.deb
+5d41c284f5a93b05bc7d648b61a02dd2bb9ff05b2261ad1a8b7d96044a0cfa88  ./fermeture/miroir/pool/main/s/systemd/libudev1_257.13-1~deb13u1_amd64.deb
+c7e957360dff89675b491e501b00047cf750695178cabab167c92fc260d358ec  ./fermeture/miroir/pool/main/s/sysvinit/sysvinit-utils_3.14-4_amd64.deb
+214c02e1aa291076a3147b8a4c4cae02fadf4c67df629186e3e313726faef1de  ./fermeture/miroir/pool/main/t/tar/tar_1.35+dfsg-3.1_amd64.deb
+eb772a1649d900ac46ffeab61a8b911e81d571f88ef5dcd0eed9aad5b45b003e  ./fermeture/miroir/pool/main/u/uchardet/libuchardet0_0.0.8-1+b2_amd64.deb
+bf9888552d2f5dac61a3d434252af30a7619bfad1152d2a3c73bcf4b3be74526  ./fermeture/miroir/pool/main/u/util-linux/bsdextrautils_2.41.5-0+deb13u1_amd64.deb
+d935a5102752a1108bdf1e815c89a84ac88d1949bf049a784178f946a09b14da  ./fermeture/miroir/pool/main/u/util-linux/bsdutils_2.41.5-0+deb13u1_amd64.deb
+81535f3c2c0efc732965907c8749103a0a26377c761622c9ce39b4c92dcde52f  ./fermeture/miroir/pool/main/u/util-linux/libblkid1_2.41.5-0+deb13u1_amd64.deb
+abb76aecbf51479e6e193873dfddaa1b88667dc0b1db82a11286a67550ba1557  ./fermeture/miroir/pool/main/u/util-linux/liblastlog2-2_2.41.5-0+deb13u1_amd64.deb
+6d00f45f2e80e078e906e3eedecd3ba6913e39fef49bff361ee583f17f00ec05  ./fermeture/miroir/pool/main/u/util-linux/libmount1_2.41.5-0+deb13u1_amd64.deb
+d96bac9c8805685f2734885098a214b82950da6ebb182c27a6b7a124a0323392  ./fermeture/miroir/pool/main/u/util-linux/libsmartcols1_2.41.5-0+deb13u1_amd64.deb
+c1bf4c4c3ff48c57fabf93307dfb56996b60cfa33927afc4158b5db36fb2721e  ./fermeture/miroir/pool/main/u/util-linux/libuuid1_2.41.5-0+deb13u1_amd64.deb
+7d5b1176cc3d8cc6b290b3ec17af458f362d9200845f30da22057a8198744430  ./fermeture/miroir/pool/main/u/util-linux/util-linux_2.41.5-0+deb13u1_amd64.deb
+1cfcc6e0dc36f438a79b6e2189facdb9d150b08f57d190a60e01c98075c7f896  ./fermeture/miroir/pool/main/x/xz-utils/liblzma5_5.8.1-1+deb13u1_amd64.deb
+9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217  ./fermeture/miroir/pool/main/x/xz-utils/xz-utils_5.8.1-1+deb13u1_amd64.deb
+015be740d6236ad114582dea500c1d907f29e16d6db00566ca32fb68d71ac90d  ./fermeture/miroir/pool/main/z/zlib/zlib1g_1.3.dfsg+really1.3.1-1+b1_amd64.deb
+b6f3c6a11e349965cf944912f2d868e06acfcf57350673e32e64b08768f557ad  ./src/.gitignore
+074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff  ./src/LICENSES/Apache-2.0.txt
+7f4a8b977473d410038ea8107806a9c2ef91f070dd23dee3817bd423282c11ec  ./src/README.md
+58cc61fe165725e06c4b2734413fae82073bad807690b9f99d2482334683509c  ./src/REUSE.toml
+26085d4086d5e70bb89668f5614b53b404c1baf057dc120e3196d4c1919c8c5e  ./src/go.mod
+4287858b5a26193e956121259679e31c96ae07eb3f2a486623641c22496bacce  ./src/go.sum
+ecf1d641878540c4bdd3028e878e6b851fbbbc6646a81c5bb6c5955611b163f9  ./src/main.go
+785f18e2ac99c66b81d8d185aa1a65cfe4f39b12bef24c1f8037d85840490929  ./src/vendor/github.com/go-chi/chi/v5/.gitignore
+65c419049d2e6efc04b110426e4b5efc628a4ee6b8f080092f25a0dbbb35f071  ./src/vendor/github.com/go-chi/chi/v5/CHANGELOG.md
+961da16c4fcec58d600fd49cc6ab0dd632d143646d4fcb2f5b1818fb0197fbe7  ./src/vendor/github.com/go-chi/chi/v5/CONTRIBUTING.md
+a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647  ./src/vendor/github.com/go-chi/chi/v5/LICENSE
+b343163c9d40108d37c7e5fe73e3c1d8f39c2acf26de5d1d227a1be2770205ad  ./src/vendor/github.com/go-chi/chi/v5/Makefile
+ef6ed94a615b29c4161b9898955e602404655049a68ddf46066bda30e3f297c9  ./src/vendor/github.com/go-chi/chi/v5/README.md
+c5f181d947996aebd888182fb8dccf6e7026690e701b5e5ca50b288b4a2cf5c3  ./src/vendor/github.com/go-chi/chi/v5/SECURITY.md
+8c22d7bbc23f4b4d46ded5ef721a9c3a173031fa2c2c9a7b48c46c2b07e8bd80  ./src/vendor/github.com/go-chi/chi/v5/chain.go
+3eaf980c6907f98497be9ec759ae601510f799656fd0663c2c3e202ba4fc5ec9  ./src/vendor/github.com/go-chi/chi/v5/chi.go
+bf1f093c84b276cc4790a23014f37abc92f85c0e4f5f6ed4830a233a29628916  ./src/vendor/github.com/go-chi/chi/v5/context.go
+c403e4f0c9c5c20c49faa9019380ac2599a66e359a23843f4b1d50d8a7704ee9  ./src/vendor/github.com/go-chi/chi/v5/mux.go
+05827f643e0153ca95763474a707f2e656c4d4a3d016cefb52a8ee92fa483a0c  ./src/vendor/github.com/go-chi/chi/v5/path_value.go
+cb2f0c7c6c29de7566124accf9dfaf6bd863c85e925db6cc12c56f213e1e7d3c  ./src/vendor/github.com/go-chi/chi/v5/path_value_fallback.go
+f4055b0a67d02cc86ca8fd2a0e62dc36bbfa8cebc27dece9d912c4809c9ebbb6  ./src/vendor/github.com/go-chi/chi/v5/pattern.go
+299a995467b45dc679c810c00ad080c91390481d02037361114b8e71056964b6  ./src/vendor/github.com/go-chi/chi/v5/pattern_fallback.go
+a7dfa11d4570e3684c83c26d126935a27d20c80d55b834f563696ae7cdb8eb60  ./src/vendor/github.com/go-chi/chi/v5/tree.go
+f858a6de1d23a4a6ebfa5030012de79e11d70393d3eb3be1cb169bf2f46f5f47  ./src/vendor/modules.txt
+103c3272f59ea2740f25b7360475fa8f96120dd0d211fae2f6a46e344adc0595  ./src/web/build.mjs
+8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c  ./src/web/node_modules/marked/LICENSE.md
+3a214cf9e4d03493e1bd75fbafb8bc39a4c94b18e30fa3204a943cb48c23dd69  ./src/web/node_modules/marked/README.md
+9c00640137feb9f0410f00119a1cacd2f5b53cc6ba91816e890643785279dc95  ./src/web/node_modules/marked/bin/main.js
+e4ec45ee17631a5f3a837b98580f8ad47686181c7e4aaf24ecd9de7231357920  ./src/web/node_modules/marked/bin/marked.js
+7dcb8433fd192c5f9612bd13252c5390b25417e22d6a7c18039976b24603331e  ./src/web/node_modules/marked/lib/marked.d.ts
+d9c4e080c4467814be6f5671c65eeb5bac2815e81e1d838406a744e89e3611eb  ./src/web/node_modules/marked/lib/marked.esm.js
+ece396fde4a3cf5ac8cbc4e467e0c71dbc79c8707ce03d24dfc0f54e7a84e63c  ./src/web/node_modules/marked/lib/marked.esm.js.map
+aced561246e2cf95f6a7007310a73c2edfc86e2ee136ae0c11a59f9ac8fee097  ./src/web/node_modules/marked/lib/marked.umd.js
+d1ad3177387e56cf6f7d2dfb08acae2b648d73e16a52c80f6edc79f7be4c68f9  ./src/web/node_modules/marked/lib/marked.umd.js.map
+198f189bd029f6e7c85d2d9e38ab520fbd8040cafd8be33bbd0ac548f3a9c3c1  ./src/web/node_modules/marked/man/marked.1
+356fded5d8067b9e2e4e0aa4deb6b612393b1cdb6dba53167fedd13c53bd4f1e  ./src/web/node_modules/marked/man/marked.1.md
+601a804931b82e378f2e8a5070c6f236156b9adf3534b0193e7c09183ea76b23  ./src/web/node_modules/marked/package.json
+ae98d90756bad103494d00227b256580c8cda5436f0a55be879b148da278a238  ./src/web/package-lock.json
+2d37c48ded96348c23bc402376625f2838d9dab64fe007ba18d95588e6de9ae9  ./src/web/package.json
+38d739f7a31b5d633e8c8010e0e035cb4cc553c4d811e2649c070065a02bd388  ./src/web/src/README.md
+ddf49ccd00607aa57ec678a739da4b5aa11de5e313bd329b1c60794690f29d48  ./src/web/src/index.html
+89d648b50bcf3864102726bb0bf06713b3888566fa4313b5d0c85877695ce7ca  ./verrou-deb.txt
+755 directory .
+755 directory ./debian
+755 directory ./debian/source
+755 directory ./fermeture
+755 directory ./fermeture/miroir
+755 directory ./fermeture/miroir/dists
+755 directory ./fermeture/miroir/dists/trixie
+755 directory ./fermeture/miroir/dists/trixie/main
+755 directory ./fermeture/miroir/dists/trixie/main/binary-amd64
+755 directory ./fermeture/miroir/dists/trixie/main/binary-amd64/by-hash
+755 directory ./fermeture/miroir/dists/trixie/main/binary-amd64/by-hash/SHA256
+755 directory ./fermeture/miroir/dists/trixie/main/i18n
+755 directory ./fermeture/miroir/dists/trixie/main/i18n/by-hash
+755 directory ./fermeture/miroir/dists/trixie/main/i18n/by-hash/SHA256
+755 directory ./fermeture/miroir/pool
+755 directory ./fermeture/miroir/pool/main
+755 directory ./fermeture/miroir/pool/main/a
+755 directory ./fermeture/miroir/pool/main/a/acl
+755 directory ./fermeture/miroir/pool/main/a/acorn
+755 directory ./fermeture/miroir/pool/main/a/attr
+755 directory ./fermeture/miroir/pool/main/a/audit
+755 directory ./fermeture/miroir/pool/main/a/autoconf
+755 directory ./fermeture/miroir/pool/main/a/automake-1.17
+755 directory ./fermeture/miroir/pool/main/a/autotools-dev
+755 directory ./fermeture/miroir/pool/main/b
+755 directory ./fermeture/miroir/pool/main/b/base-files
+755 directory ./fermeture/miroir/pool/main/b/base-passwd
+755 directory ./fermeture/miroir/pool/main/b/bash
+755 directory ./fermeture/miroir/pool/main/b/binutils
+755 directory ./fermeture/miroir/pool/main/b/brotli
+755 directory ./fermeture/miroir/pool/main/b/build-essential
+755 directory ./fermeture/miroir/pool/main/b/bzip2
+755 directory ./fermeture/miroir/pool/main/c
+755 directory ./fermeture/miroir/pool/main/c/c-ares
+755 directory ./fermeture/miroir/pool/main/c/cdebconf
+755 directory ./fermeture/miroir/pool/main/c/coreutils
+755 directory ./fermeture/miroir/pool/main/d
+755 directory ./fermeture/miroir/pool/main/d/dash
+755 directory ./fermeture/miroir/pool/main/d/db5.3
+755 directory ./fermeture/miroir/pool/main/d/debconf
+755 directory ./fermeture/miroir/pool/main/d/debhelper
+755 directory ./fermeture/miroir/pool/main/d/debianutils
+755 directory ./fermeture/miroir/pool/main/d/dh-autoreconf
+755 directory ./fermeture/miroir/pool/main/d/diffutils
+755 directory ./fermeture/miroir/pool/main/d/dpkg
+755 directory ./fermeture/miroir/pool/main/d/dwz
+755 directory ./fermeture/miroir/pool/main/e
+755 directory ./fermeture/miroir/pool/main/e/elfutils
+755 directory ./fermeture/miroir/pool/main/f
+755 directory ./fermeture/miroir/pool/main/f/file
+755 directory ./fermeture/miroir/pool/main/f/findutils
+755 directory ./fermeture/miroir/pool/main/g
+755 directory ./fermeture/miroir/pool/main/g/gcc-14
+755 directory ./fermeture/miroir/pool/main/g/gcc-defaults
+755 directory ./fermeture/miroir/pool/main/g/gdbm
+755 directory ./fermeture/miroir/pool/main/g/gettext
+755 directory ./fermeture/miroir/pool/main/g/glibc
+755 directory ./fermeture/miroir/pool/main/g/gmp
+755 directory ./fermeture/miroir/pool/main/g/golang-1.24
+755 directory ./fermeture/miroir/pool/main/g/golang-defaults
+755 directory ./fermeture/miroir/pool/main/g/grep
+755 directory ./fermeture/miroir/pool/main/g/groff
+755 directory ./fermeture/miroir/pool/main/g/gzip
+755 directory ./fermeture/miroir/pool/main/h
+755 directory ./fermeture/miroir/pool/main/h/hostname
+755 directory ./fermeture/miroir/pool/main/i
+755 directory ./fermeture/miroir/pool/main/i/icu
+755 directory ./fermeture/miroir/pool/main/i/init-system-helpers
+755 directory ./fermeture/miroir/pool/main/i/intltool-debian
+755 directory ./fermeture/miroir/pool/main/i/isl
+755 directory ./fermeture/miroir/pool/main/j
+755 directory ./fermeture/miroir/pool/main/j/jansson
+755 directory ./fermeture/miroir/pool/main/l
+755 directory ./fermeture/miroir/pool/main/l/linux
+755 directory ./fermeture/miroir/pool/main/liba
+755 directory ./fermeture/miroir/pool/main/liba/libarchive-zip-perl
+755 directory ./fermeture/miroir/pool/main/libc
+755 directory ./fermeture/miroir/pool/main/libc/libcap-ng
+755 directory ./fermeture/miroir/pool/main/libc/libcap2
+755 directory ./fermeture/miroir/pool/main/libm
+755 directory ./fermeture/miroir/pool/main/libm/libmd
+755 directory ./fermeture/miroir/pool/main/libp
+755 directory ./fermeture/miroir/pool/main/libp/libpipeline
+755 directory ./fermeture/miroir/pool/main/libs
+755 directory ./fermeture/miroir/pool/main/libs/libseccomp
+755 directory ./fermeture/miroir/pool/main/libs/libselinux
+755 directory ./fermeture/miroir/pool/main/libt
+755 directory ./fermeture/miroir/pool/main/libt/libtool
+755 directory ./fermeture/miroir/pool/main/libu
+755 directory ./fermeture/miroir/pool/main/libu/libunistring
+755 directory ./fermeture/miroir/pool/main/libu/libuv1
+755 directory ./fermeture/miroir/pool/main/libx
+755 directory ./fermeture/miroir/pool/main/libx/libxcrypt
+755 directory ./fermeture/miroir/pool/main/libx/libxml2
+755 directory ./fermeture/miroir/pool/main/libz
+755 directory ./fermeture/miroir/pool/main/libz/libzstd
+755 directory ./fermeture/miroir/pool/main/m
+755 directory ./fermeture/miroir/pool/main/m/m4
+755 directory ./fermeture/miroir/pool/main/m/make-dfsg
+755 directory ./fermeture/miroir/pool/main/m/man-db
+755 directory ./fermeture/miroir/pool/main/m/mawk
+755 directory ./fermeture/miroir/pool/main/m/mpclib3
+755 directory ./fermeture/miroir/pool/main/m/mpfr4
+755 directory ./fermeture/miroir/pool/main/n
+755 directory ./fermeture/miroir/pool/main/n/ncurses
+755 directory ./fermeture/miroir/pool/main/n/nghttp2
+755 directory ./fermeture/miroir/pool/main/n/node-balanced-match
+755 directory ./fermeture/miroir/pool/main/n/node-brace-expansion
+755 directory ./fermeture/miroir/pool/main/n/node-cjs-module-lexer
+755 directory ./fermeture/miroir/pool/main/n/node-corepack
+755 directory ./fermeture/miroir/pool/main/n/node-minimatch
+755 directory ./fermeture/miroir/pool/main/n/node-undici
+755 directory ./fermeture/miroir/pool/main/n/node-xtend
+755 directory ./fermeture/miroir/pool/main/n/nodejs
+755 directory ./fermeture/miroir/pool/main/o
+755 directory ./fermeture/miroir/pool/main/o/openssl
+755 directory ./fermeture/miroir/pool/main/p
+755 directory ./fermeture/miroir/pool/main/p/pam
+755 directory ./fermeture/miroir/pool/main/p/patch
+755 directory ./fermeture/miroir/pool/main/p/pcre2
+755 directory ./fermeture/miroir/pool/main/p/perl
+755 directory ./fermeture/miroir/pool/main/p/po-debconf
+755 directory ./fermeture/miroir/pool/main/r
+755 directory ./fermeture/miroir/pool/main/r/rpcsvc-proto
+755 directory ./fermeture/miroir/pool/main/s
+755 directory ./fermeture/miroir/pool/main/s/sed
+755 directory ./fermeture/miroir/pool/main/s/sensible-utils
+755 directory ./fermeture/miroir/pool/main/s/sqlite3
+755 directory ./fermeture/miroir/pool/main/s/strip-nondeterminism
+755 directory ./fermeture/miroir/pool/main/s/systemd
+755 directory ./fermeture/miroir/pool/main/s/sysvinit
+755 directory ./fermeture/miroir/pool/main/t
+755 directory ./fermeture/miroir/pool/main/t/tar
+755 directory ./fermeture/miroir/pool/main/u
+755 directory ./fermeture/miroir/pool/main/u/uchardet
+755 directory ./fermeture/miroir/pool/main/u/util-linux
+755 directory ./fermeture/miroir/pool/main/x
+755 directory ./fermeture/miroir/pool/main/x/xz-utils
+755 directory ./fermeture/miroir/pool/main/z
+755 directory ./fermeture/miroir/pool/main/z/zlib
+755 directory ./src
+755 directory ./src/LICENSES
+755 directory ./src/vendor
+755 directory ./src/vendor/github.com
+755 directory ./src/vendor/github.com/go-chi
+755 directory ./src/vendor/github.com/go-chi/chi
+755 directory ./src/vendor/github.com/go-chi/chi/v5
+755 directory ./src/web
+755 directory ./src/web/node_modules
+755 directory ./src/web/node_modules/marked
+755 directory ./src/web/node_modules/marked/bin
+755 directory ./src/web/node_modules/marked/lib
+755 directory ./src/web/node_modules/marked/man
+755 directory ./src/web/src
+644 regular file ./debian/changelog
+644 regular file ./debian/control
+644 regular file ./debian/copyright
+755 regular file ./debian/rules
+644 regular file ./debian/source/format
+644 regular file ./fermeture/miroir/dists/trixie/InRelease
+644 regular file ./fermeture/miroir/dists/trixie/main/binary-amd64/Packages.xz
+644 regular file ./fermeture/miroir/dists/trixie/main/binary-amd64/by-hash/SHA256/7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+644 regular file ./fermeture/miroir/dists/trixie/main/i18n/Translation-en.xz
+644 regular file ./fermeture/miroir/dists/trixie/main/i18n/by-hash/SHA256/800dd225bc6fabe4dfc0b039c7b33a8f0cd52309d34dc69a24959daa31af6251
+644 regular file ./fermeture/miroir/pool/main/a/acl/libacl1_2.3.2-2+b1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/a/acorn/node-acorn_8.8.1+ds+~cs25.17.7-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/a/attr/libattr1_2.5.2-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/a/audit/libaudit-common_4.0.2-2+deb13u1_all.deb
+644 regular file ./fermeture/miroir/pool/main/a/audit/libaudit1_4.0.2-2+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/a/autoconf/autoconf_2.72-3.1_all.deb
+644 regular file ./fermeture/miroir/pool/main/a/automake-1.17/automake_1.17-4_all.deb
+644 regular file ./fermeture/miroir/pool/main/a/autotools-dev/autotools-dev_20240727.1_all.deb
+644 regular file ./fermeture/miroir/pool/main/b/base-files/base-files_13.8+deb13u7_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/base-passwd/base-passwd_3.6.7_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/binutils-common_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/binutils-x86-64-linux-gnu_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/binutils_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/libbinutils_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/libctf-nobfd0_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/libctf0_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/libgprofng0_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/binutils/libsframe1_2.44-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/brotli/libbrotli1_1.1.0-2+b7_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/build-essential/build-essential_12.12_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/bzip2/bzip2_1.0.8-6_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/b/bzip2/libbz2-1.0_1.0.8-6_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/c/c-ares/libcares2_1.34.5-1+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/c/cdebconf/libdebconfclient0_0.280_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/c/coreutils/coreutils_9.7-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/dash/dash_0.5.12-12_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/db5.3/libdb5.3t64_5.3.28+dfsg2-9_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/debconf/debconf_1.5.91_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/debhelper/debhelper_13.24.2_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/debhelper/libdebhelper-perl_13.24.2_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/debianutils/debianutils_5.23.2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/dh-autoreconf/dh-autoreconf_20_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/diffutils/diffutils_3.10-4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/dpkg/dpkg-dev_1.22.22_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/dpkg/dpkg_1.22.22_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/d/dpkg/libdpkg-perl_1.22.22_all.deb
+644 regular file ./fermeture/miroir/pool/main/d/dwz/dwz_0.15-1+b1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/e/elfutils/libelf1t64_0.192-4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/f/file/file_5.46-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/f/file/libmagic-mgc_5.46-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/f/file/libmagic1t64_5.46-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/f/findutils/findutils_4.10.0-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/cpp-14_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/g++-14_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/gcc-14-base_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/gcc-14_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libasan8_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libatomic1_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libcc1-0_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libgcc-14-dev_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libgomp1_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libhwasan0_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libitm1_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/liblsan0_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libquadmath0_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libstdc++-14-dev_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libstdc++6_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libtsan2_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-14/libubsan1_14.2.0-19_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/cpp-x86-64-linux-gnu_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/cpp_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/g++-x86-64-linux-gnu_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/g++_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/gcc-x86-64-linux-gnu_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gcc-defaults/gcc_14.2.0-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gdbm/libgdbm-compat4t64_1.24-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gdbm/libgdbm6t64_1.24-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gettext/autopoint_0.23.1-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/g/gettext/gettext-base_0.23.1-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gettext/gettext_0.23.1-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/glibc/libc-bin_2.41-12+deb13u4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/glibc/libc-dev-bin_2.41-12+deb13u4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/glibc/libc6-dev_2.41-12+deb13u4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/glibc/libc6_2.41-12+deb13u4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gmp/libgmp10_6.3.0+dfsg-3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/golang-1.24/golang-1.24-go_1.24.4-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/golang-1.24/golang-1.24-src_1.24.4-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/g/golang-defaults/golang-go_1.24~2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/golang-defaults/golang-src_1.24~2_all.deb
+644 regular file ./fermeture/miroir/pool/main/g/grep/grep_3.11-4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/groff/groff-base_1.23.0-9_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/g/gzip/gzip_1.13-1+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/h/hostname/hostname_3.25_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/i/icu/libicu76_76.1-4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/i/init-system-helpers/init-system-helpers_1.69~deb13u1_all.deb
+644 regular file ./fermeture/miroir/pool/main/i/intltool-debian/intltool-debian_0.35.0+20060710.6_all.deb
+644 regular file ./fermeture/miroir/pool/main/i/isl/libisl23_0.27-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/j/jansson/libjansson4_2.14-2+b3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/l/linux/linux-libc-dev_6.12.107-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/liba/libarchive-zip-perl/libarchive-zip-perl_1.68-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/libc/libcap-ng/libcap-ng0_0.8.5-4+b1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libc/libcap2/libcap2_2.75-10+deb13u1+b3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libm/libmd/libmd0_1.1.0-2+b1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libp/libpipeline/libpipeline1_1.5.8-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libs/libseccomp/libseccomp2_2.6.0-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libs/libselinux/libselinux1_3.8.1-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libt/libtool/libtool_2.5.4-4_all.deb
+644 regular file ./fermeture/miroir/pool/main/libu/libunistring/libunistring5_1.3-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libu/libuv1/libuv1t64_1.50.0-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libx/libxcrypt/libcrypt-dev_4.4.38-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libx/libxcrypt/libcrypt1_4.4.38-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libx/libxml2/libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/libz/libzstd/libzstd1_1.5.7+dfsg-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/m4/m4_1.4.19-8_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/make-dfsg/make_4.4.1-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/man-db/man-db_2.13.1-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/mawk/mawk_1.3.4.20250131-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/mpclib3/libmpc3_1.3.1-1+b3_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/m/mpfr4/libmpfr6_4.2.2-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/n/ncurses/libtinfo6_6.5+20250216-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/n/ncurses/ncurses-base_6.5+20250216-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/ncurses/ncurses-bin_6.5+20250216-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/n/nghttp2/libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-balanced-match/node-balanced-match_2.0.0-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-brace-expansion/node-brace-expansion_2.0.1+~1.1.0-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-cjs-module-lexer/node-cjs-module-lexer_1.2.3+dfsg-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-corepack/node-corepack_0.24.0-5_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-minimatch/node-minimatch_9.0.3-6_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-undici/node-undici_7.3.0+dfsg1+~cs24.12.11-1_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/node-xtend/node-xtend_4.0.2-3_all.deb
+644 regular file ./fermeture/miroir/pool/main/n/nodejs/libnode115_20.19.2+dfsg-1+deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/n/nodejs/nodejs_20.19.2+dfsg-1+deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/o/openssl/libssl3t64_3.5.7-1~deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/o/openssl/openssl-provider-legacy_3.5.7-1~deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/pam/libpam-modules-bin_1.7.0-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/pam/libpam-modules_1.7.0-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/pam/libpam-runtime_1.7.0-5_all.deb
+644 regular file ./fermeture/miroir/pool/main/p/pam/libpam0g_1.7.0-5_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/patch/patch_2.8-2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/pcre2/libpcre2-8-0_10.46-1~deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/perl/libperl5.40_5.40.1-6+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/perl/perl-base_5.40.1-6+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/perl/perl-modules-5.40_5.40.1-6+deb13u1_all.deb
+644 regular file ./fermeture/miroir/pool/main/p/perl/perl_5.40.1-6+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/p/po-debconf/po-debconf_1.0.21+nmu1_all.deb
+644 regular file ./fermeture/miroir/pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.3-1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/s/sed/sed_4.9-2+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/s/sensible-utils/sensible-utils_0.0.25_all.deb
+644 regular file ./fermeture/miroir/pool/main/s/sqlite3/libsqlite3-0_3.46.1-7+deb13u2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/s/strip-nondeterminism/dh-strip-nondeterminism_1.14.1-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/s/strip-nondeterminism/libfile-stripnondeterminism-perl_1.14.1-2_all.deb
+644 regular file ./fermeture/miroir/pool/main/s/systemd/libsystemd0_257.13-1~deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/s/systemd/libudev1_257.13-1~deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/s/sysvinit/sysvinit-utils_3.14-4_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/t/tar/tar_1.35+dfsg-3.1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/uchardet/libuchardet0_0.0.8-1+b2_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/bsdextrautils_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/bsdutils_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/libblkid1_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/liblastlog2-2_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/libmount1_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/libsmartcols1_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/libuuid1_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/u/util-linux/util-linux_2.41.5-0+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/x/xz-utils/liblzma5_5.8.1-1+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/x/xz-utils/xz-utils_5.8.1-1+deb13u1_amd64.deb
+644 regular file ./fermeture/miroir/pool/main/z/zlib/zlib1g_1.3.dfsg+really1.3.1-1+b1_amd64.deb
+644 regular file ./src/.gitignore
+644 regular file ./src/LICENSES/Apache-2.0.txt
+644 regular file ./src/README.md
+644 regular file ./src/REUSE.toml
+644 regular file ./src/go.mod
+644 regular file ./src/go.sum
+644 regular file ./src/main.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/.gitignore
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/CHANGELOG.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/CONTRIBUTING.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/LICENSE
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/Makefile
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/README.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/SECURITY.md
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/chain.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/chi.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/context.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/mux.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/path_value.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/path_value_fallback.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/pattern.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/pattern_fallback.go
+644 regular file ./src/vendor/github.com/go-chi/chi/v5/tree.go
+644 regular file ./src/vendor/modules.txt
+644 regular file ./src/web/build.mjs
+644 regular file ./src/web/node_modules/marked/LICENSE.md
+644 regular file ./src/web/node_modules/marked/README.md
+644 regular file ./src/web/node_modules/marked/bin/main.js
+755 regular file ./src/web/node_modules/marked/bin/marked.js
+644 regular file ./src/web/node_modules/marked/lib/marked.d.ts
+644 regular file ./src/web/node_modules/marked/lib/marked.esm.js
+644 regular file ./src/web/node_modules/marked/lib/marked.esm.js.map
+644 regular file ./src/web/node_modules/marked/lib/marked.umd.js
+644 regular file ./src/web/node_modules/marked/lib/marked.umd.js.map
+644 regular file ./src/web/node_modules/marked/man/marked.1
+644 regular file ./src/web/node_modules/marked/man/marked.1.md
+644 regular file ./src/web/node_modules/marked/package.json
+644 regular file ./src/web/package-lock.json
+644 regular file ./src/web/package.json
+644 regular file ./src/web/src/README.md
+644 regular file ./src/web/src/index.html
+644 regular file ./verrou-deb.txt
+----- fin de la liste -----

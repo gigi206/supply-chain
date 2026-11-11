@@ -1,0 +1,32 @@
+# s4d.sh essai_preparer, 2026-11-11T19:39:18Z
+OK   script sources : variables Tekton restantes : 0
+OK   script entrees : variables Tekton restantes : 0
+OK   script assemblage : variables Tekton restantes : 0
+OK   images des étapes (gabarit rendu) : sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+pod s4d-essai-preparer créé à 19:39:18
+pod s4d-essai-preparer : Succeeded à 19:39:31, sur sc-build, runtimeClassName «  »
+### sources (code 0)
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+### entrees (code 0)
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+### assemblage (code 0)
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+### liste (code 0)
+     résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+     résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+     résultat FERMETURE_DEB_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb","digest":"sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290"}
+     résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+     résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb","digest":"sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51"}
+pod s4d-essai-preparer supprimé
+OK   pod d'essai de preparer-deb : Succeeded
+OK   résultat CHAINS-GIT_URL : https://sc-stockage.poc.test:3000/workspace/sample-app.git
+OK   résultat CHAINS-GIT_COMMIT : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   résultat FERMETURE_DEB_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb","digest":"sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290"}
+OK   résultat FERMETURE_SOURCES_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources","digest":"sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21"}
+OK   résultat PACKAGING_ARTIFACT_INPUTS : {"uri":"oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb","digest":"sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51"}
+arbre entrees/ : 214 fichiers dans le pod, 214 dans prealables
+OK   arbre entrees/ du pod égal à celui de prealables (contenu, modes, types) : égal

@@ -169,3 +169,11 @@ Avis du conseiller après le second échec : une troisième simulation sur l'hô
 
 **Correction datée du 11/11/2026, 19:38 UTC** : la note précédente, commitée à 19:38:31 UTC (`d80e9d8`), porte deux heures fausses, écrites sans les relire. Son titre aurait dû dire 19:38 UTC, et non 19:45 UTC. `prealables` a tourné de 19:38:01 à 19:38:10 UTC (`chrono.tsv`), et non vers 19:44 UTC.
 
+## Résultat du 11/11/2026, 19:39 UTC : essai_preparer
+
+**Accord du propriétaire** (19:39:12 UTC) : « Oui, lance-le ». Étape de 19:39:18 à 19:39:31 UTC environ, code 0 ([journal](s4d-essai_preparer.log), [journaux du pod](s4d-essai-preparer-pod.log)).
+
+- **D17 : tenue.** Le pod est admis, en runc sur sc-build. Ses trois étapes finissent en code 0 : clone du commit `6391fd43` (arbre `30e808ff`), trois artefacts tirés (167, 8 et 6 fichiers), confrontation au verrou (162 paquets), `vendor/` (17 fichiers, `go mod verify`) et `marked` (integrity conforme).
+- **Résultats** : `CHAINS-GIT_URL`, `CHAINS-GIT_COMMIT` et les trois `*_ARTIFACT_INPUTS` sont exactement ceux attendus.
+- **L'arbre `entrees/` du pod est égal à celui de `prealables`** : 214 fichiers, même contenu, mêmes modes et mêmes types. L'essai de `construire-deb` (deb `0b489d43`, artefact `039949f9`), fait sur l'arbre de `prealables`, vaut donc pour ce que produit la préparation réelle.
+
