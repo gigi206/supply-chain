@@ -74,3 +74,13 @@ Journal : [`s4b-prealables.log`](s4b-prealables.log), 37 lignes OK, aucune KO. �
 | B5 | **Tenue.** La section de `publier-fermeture` signée, avec oras 1.3.6, donne 7 couches et 7 titres distincts. Deux paires de couches ont le même contenu sous deux titres. Les noms avec `+` et `~` passent. Une seconde poussée, depuis une autre copie, donne le même digest (`81291ea4`) |
 
 Restent B6 à B16, qui attendent des accords nommés.
+
+## Note datée du 11/11/2026, 17:05 UTC : B9 étayée hors ligne (confiance de la prédiction inchangée)
+
+Question du propriétaire : « Comment fermer ce risque ? ». Chaîne relue dans le dépôt et le cache, sans cluster :
+- **Manifeste de local-path** v0.0.37, tel que téléchargé et épinglé par la 08b : `~/.cache/supply-chain-poc/08b/telechargements/local-path-storage.yaml`, sha256 `9781b39c`, égal à `LP_MANIFESTE_SHA` de `rke2.sh`. Son script `setup` crée chaque volume par `mkdir -m 0777 -p "$VOL_DIR"`. Le mode s'applique au dernier composant, le dossier du volume, sans dépendre de l'umask.
+- **`rendre_local_path`** de `rke2.sh` ne change que le chemin des volumes et les deux images. Le script `setup` est appliqué tel quel.
+- **Kubelet v1.35.0** : le dossier du `subPath` reçoit le mode de la racine du volume (`GetMode`), créé par `Mkdirat` puis `Fchmod`, donc lui aussi sans umask (additif de 16:48 UTC). Il appartient à root, en 0777 : l'UID 65532 peut y créer `miroir/`.
+- **Ce qui reste supposé** : que la ConfigMap `local-path-config` en service soit celle du manifeste rendu, sans dérive depuis son application. Ce n'est pas relu dans le cluster. Une lecture de cette ConfigMap fermerait ce dernier point, sans aucune écriture.
+
+La prédiction B9 n'est pas réécrite. Cette note ne la remplace pas : seule l'exécution de `deb` la tranchera.
