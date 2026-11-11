@@ -1,0 +1,89 @@
+# Brique 06, S4d1 (décisions du propriétaire du 11/11/2026, 17:54:35 UTC : « Oui, retiens-les ») : pipeline de construction du deb
+# de sample-app, signée par la clé des tâches et publiée en bundle (tekton/pipelines/sample-app-deb). Ses tâches sont tirées de
+# leurs bundles signés, épinglés par digest, et ses entrées hors du dépôt sont fixées ici par digest : fermeture deb et
+# fermeture applicative (S4b), artefact de packaging (S4c, debian/ et verrou). La signature de la pipeline couvre ces choix, que
+# le créateur du PipelineRun ne peut pas changer. Le créateur fournit le commit, le dépôt de Forgejo, le workspace sortie (PVC)
+# et le runtimeClassName de la tâche construire (taskRunSpecs). En S4d1, le créateur est s4d.sh, depuis l'hôte : ni webhook ni
+# rattrapage tant que la porte n'est pas étendue (S4d2 avant S4d3, décision du 11/11/2026, 17:54:35 UTC).
+# Un seul workspace, lié par sous-dossier, comme sample-app (brique 03, F3) : preparer écrit entrees/ à la racine ; construire lit
+# entrees/ en lecture seule et écrit image/ ; publier lit image/.
+# @PREPARER@, @CONSTRUIRE@, @PUBLIER@, @FERMETURE_DEB@, @FERMETURE_SOURCES@, @PACKAGING@, @IMAGE@ : s4d.sh.
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: sample-app-deb
+spec:
+  params:
+  - name: commit
+    type: string
+  - name: depot
+    type: string
+  workspaces:
+  - name: sortie
+  results:
+  - name: IMAGE_URL
+    value: $(tasks.publier.results.IMAGE_URL)
+  - name: IMAGE_DIGEST
+    value: $(tasks.publier.results.IMAGE_DIGEST)
+  tasks:
+  - name: preparer
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PREPARER@
+      - name: name
+        value: preparer-deb
+      - name: kind
+        value: task
+    params:
+    - name: depot
+      value: $(params.depot)
+    - name: commit
+      value: $(params.commit)
+    - name: fermeture-deb
+      value: @FERMETURE_DEB@
+    - name: fermeture-sources
+      value: @FERMETURE_SOURCES@
+    - name: packaging
+      value: @PACKAGING@
+    workspaces:
+    - name: sortie
+      workspace: sortie
+  - name: construire
+    runAfter: [preparer]
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @CONSTRUIRE@
+      - name: name
+        value: construire-deb
+      - name: kind
+        value: task
+    workspaces:
+    - name: entrees
+      workspace: sortie
+      subPath: entrees
+    - name: sortie
+      workspace: sortie
+      subPath: image
+  - name: publier
+    taskRef:
+      resolver: bundles
+      params:
+      - name: bundle
+        value: @PUBLIER@
+      - name: name
+        value: publier-image
+      - name: kind
+        value: task
+    params:
+    - name: image
+      value: @IMAGE@
+    - name: digest
+      value: $(tasks.construire.results.DIGEST_CONSTRUIT)
+    workspaces:
+    - name: sortie
+      workspace: sortie
+      subPath: image

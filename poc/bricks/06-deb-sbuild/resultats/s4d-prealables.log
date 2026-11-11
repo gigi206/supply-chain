@@ -1,0 +1,59 @@
+# s4d.sh prealables, 2026-11-11T18:03:59Z
+## gabarits rendus (refs factices)
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   preparer-deb : YAML lisible par yq, nom : preparer-deb
+OK   construire-deb : YAML lisible par yq, nom : construire-deb
+OK   sample-app-deb : YAML lisible par yq, nom : sample-app-deb
+OK   preparer-deb : étapes : sources entrees assemblage
+OK   construire-deb : image de build, UID, privilégiée : sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590 1000 true
+OK   construire-deb : workspace entrees en lecture seule : true
+## syntaxe des scripts
+OK   preparer-deb sources : syntaxe sh : OK
+OK   preparer-deb entrees : syntaxe sh : OK
+OK   preparer-deb assemblage : syntaxe sh : OK
+OK   preparer-deb assemblage : syntaxe Python
+OK   construire-deb : syntaxe bash : OK
+## preparer-deb, sur l'hôte : entrées comme les tirerait l'étape entrees (copies par digest de S4b)
+OK   arbre de poc/sample-app (celui du commit 6391fd437f26696847041be3226bbbf633f55a2f) : 30e808ffa327288c656ddda7b6fafe4005234b77
+OK   debian/rules dans l'artefact tiré (mode perdu par oras) : 644
+OK   section de confrontation extraite (début, boucle, fin) : 3
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+OK   refusé : paquet altéré (un octet) (paquet différent du verrou : pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb)
+OK   refusé : paquet retiré (paquet du verrou absent de la fermeture : pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb)
+OK   refusé : paquet en plus dans le pool (pool : 163 fichiers, 162 dans le verrou)
+OK   refusé : paquet remplacé par un lien (paquet du verrou absent de la fermeture : pool/main/b/bash/bash_5.2.37-2+b10_amd64.deb)
+OK   refusé : chemin du verrou avec .. (chemin du verrou non admis : pool/../pool/main/a/autoconf/autoconf_2.72-3.1_all.deb)
+OK   refusé : chemin du verrou hors de pool/ (chemin du verrou non admis : dists/trixie/InRelease)
+OK   refusé : verrou vide (verrou absent de l'artefact de packaging)
+## preparer-deb, sur l'hôte : étape assemblage jouée sous unshare -rn (go go1.26.10)
+OK   assemblage : variables Tekton restantes : 0
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+OK   archive de sources.sh (S1 à S3) : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   entrees/src égal à l'arbre de l'archive (contenu) : égal
+OK   entrees/debian égal à poc/packaging/debian (contenu) : égal
+OK   entrees/debian : modes : 644 changelog,644 control,644 copyright,644 source/format,755 rules
+OK   entrees/verrou-deb.txt égal au verrou du dépôt : égal
+OK   entrees : contenu de premier niveau : debian fermeture src verrou-deb.txt
+## construire-deb, sur l'hôte : paquet source (section du script, outils de l'hôte)
+OK   section du paquet source extraite (début, dpkg-source, fin) : 3
+     paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
+OK   sample-app_1.0.0.orig.tar.gz égal à celui de sources.sh : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
+OK   sample-app_1.0.0-1.debian.tar.xz : mêmes membres, tailles et dates que celui de sources.sh, groupe sans écriture : 19413b89a108a050a312d34a07f231224023e84630b251da6b8145c642731211
+     (sur l'hôte : sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489, .dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sources.sh : sample-app_1.0.0-1.dsc 9050679ed60032a2 ; sample-app_1.0.0-1.debian.tar.xz 863cf4da65a7efa5 ; )
+## construire-deb, sur l'hôte : layout écrit avec le deb de S3 (section du script), lu comme publier-image
+OK   deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   section du layout extraite (début, fin) : 2
+     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+     image.tar : 1966080 octets
+OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   chaque blob a pour nom son sha256 (3 blobs)
+OK   diff_ids égaux aux digests des couches : ["sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06"]
+OK   couche : le deb seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app_1.0.0-1_amd64.deb
+OK   deb de la couche égal au deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+digest attendu de l'artefact, si le deb est 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 et le tar de l'image de build écrit la même couche : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+## entrées du pod d'essai
+entrees.tar : 227266560 octets, sha256 c40640902fa209ff7a674a8dd5ac419420b79be9628694cf30a9c0f098682300

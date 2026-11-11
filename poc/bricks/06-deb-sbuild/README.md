@@ -1177,3 +1177,5 @@ Le propriétaire a répondu « Continue » après la clôture de S4b (17:44:27 U
    - (a) le deb seul : le digest de l'artefact est reproductible, et la porte juge un digest stable. Le `.buildinfo` reste dans le journal du TaskRun et dans les résultats. **Ma recommandation** ;
    - (b) le deb et le `.buildinfo` : la reproductibilité se juge sur le sha256 du deb, et le digest de l'artefact change à chaque exécution.
 3. L'assemblage du `.dsc` dans le pod de construction, au lieu de la préparation.
+
+**Décision du propriétaire** (11/11/2026, 17:54:35 UTC) : « Oui, retiens-les ». Sont retenus : le découpage S4d1, S4d2, S4d3, avec la porte avant le trigger ; le deb seul dans l'artefact signé (a) ; l'assemblage du `.dsc` dans le pod de construction. Ce n'est un accord pour aucune mesure ni aucune écriture : S4d1 sera préparé à sec, avec ses prédictions commitées avant tout lancement.

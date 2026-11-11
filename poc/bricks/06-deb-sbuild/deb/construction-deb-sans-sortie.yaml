@@ -1,0 +1,17 @@
+# Brique 06, S4d1 (décisions du propriétaire du 11/11/2026, 17:54:35 UTC) : aucune entrée ni sortie pour les pods de la tâche
+# construire-deb (Kata privilégié). Sur le modèle de construction-sans-sortie (08) et de builder-sans-sortie (S4a) : sélection
+# par tekton.dev/task, que le contrôleur de Tekton réécrit avec le nom de la tâche résolue ; aucune règle, donc rien d'autorisé.
+# L'invariant de la 08 (aucune politique de builds n'autorise de trafic) reste vrai. builds-sans-internet (08c) et son NotIn sont
+# inchangés : son refus des adresses publiques s'ajoute à ce refus total. Posée par s4d.sh reseau, sur accord.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: construction-deb-sans-sortie
+  namespace: builds
+spec:
+  podSelector:
+    matchLabels:
+      tekton.dev/task: construire-deb
+  policyTypes:
+  - Ingress
+  - Egress

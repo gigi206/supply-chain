@@ -1,0 +1,141 @@
+# Brique 06, S4d1 (décisions du propriétaire du 11/11/2026, 17:54:35 UTC : « Oui, retiens-les ») : construction du deb de
+# sample-app par sbuild, sans aucune entrée ni sortie réseau (NetworkPolicy construction-deb-sans-sortie, qui sélectionne les pods
+# de cette tâche par tekton.dev/task). Pod Kata privilégié, sbuild en UID 1000 (compte constructeur de l'image, subuid et subgid),
+# --chroot-mode=unshare, comme S1 à S3 : il n'est admis que sous Kata (runtimeClassName posé par le PipelineRun) ; l'identifiant
+# d'écriture de Zot n'y entre jamais (publier-image pousse le layout).
+#   - image : celle de build publiée par la plateforme en S4a (builds/builders/sbuild-debian13, par digest), qui porte le chroot
+#     buildd sous /opt/sbuild/trixie-amd64.tar ; Chains l'inscrit dans resolvedDependencies comme image d'étape ;
+#   - entrées préparées par preparer-deb (pod runc) dans le workspace entrees, monté en lecture seule (sous-dossier du PVC) :
+#     arbre amont (sources du commit, vendor/, marked), debian/, verrou et fermeture deb ; une écriture est essayée et refusée ;
+#   - fermeture revérifiée ici contre le verrou (sha256 de chaque paquet), puis copiée à plat dans /w/fermeture pour
+#     --extra-package ; sources.list du chroot vidé avant la mise en place d'apt (le chroot de S4a n'a aucune liste d'apt) :
+#     sbuild ne peut prendre les dépendances de build que dans la fermeture ;
+#   - paquet source assemblé ici (décision du propriétaire du 11/11/2026, 17:54:35 UTC : seule cette image a dpkg-dev) : archive
+#     amont par la commande tar de poc/packaging/sources.sh, à la date de debian/changelog (dpkg-parsechangelog -STimestamp, égale
+#     au SOURCE_DATE_EPOCH de sources.sh), puis dpkg-source -b ;
+#   - artefact signé : le deb seul (décision (a) du propriétaire du 11/11/2026, 17:54:35 UTC), en manifeste d'image OCI écrit à la
+#     main comme en S4a (configuration d'image, une couche tar non compressée qui contient le .deb), pour que publier-image
+#     (inchangée) et ec validate image fonctionnent sans changement ; le .buildinfo reste dans le journal du TaskRun ;
+#   - travail sur un emptyDir en mémoire (/w) ; témoins réseau qui doivent échouer, comme construire-builder.
+# @BUILDER@ : s4d.sh. Signée une fois, versionnée (construire-deb.signee.yaml), digest dans la liste revue de la 08.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: construire-deb
+spec:
+  workspaces:
+  - name: entrees
+    readOnly: true
+  - name: sortie
+  results:
+  - name: DIGEST_CONSTRUIT
+    type: string
+  volumes:
+  - name: w
+    emptyDir:
+      medium: Memory
+      sizeLimit: 4Gi
+  steps:
+  - name: construire
+    image: @BUILDER@
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "2"
+        memory: 6Gi
+      limits:
+        cpu: "2"
+        memory: 6Gi
+    volumeMounts:
+    - name: w
+      mountPath: /w
+    script: |
+      #!/bin/bash
+      set -euo pipefail
+      export LC_ALL=C
+      umask 022
+      e=$(workspaces.entrees.path)
+      o=$(workspaces.sortie.path)
+      ! touch "$e/.ecriture" 2> /dev/null || { echo "workspace entrees inscriptible" >&2; exit 1; }
+      echo "invité : $(uname -r), $(nproc) vCPU, $(awk '/MemTotal/ {print $2}' /proc/meminfo) kB ; uid $(id -u), gid $(id -g) ; /w : $(awk '$2 == "/w" {print $3}' /proc/mounts) ; entrees : $(awk -v p="$e" '$2 == p {print $3, $4}' /proc/mounts), écriture refusée"
+      # Témoins : aucune sortie réseau (mêmes cibles que construire-builder). Code relevé (124 : délai).
+      r=0; timeout 10 getent hosts snapshot.debian.org > /dev/null 2>&1 || r=$?
+      [ $r != 0 ] || { echo "KO   DNS résolu (snapshot.debian.org)" >&2; exit 1; }
+      echo "témoin DNS snapshot.debian.org : échec, code $r (attendu)"
+      for c in 192.168.161.13/5000 192.168.161.13/3000 199.232.170.132/80; do
+        r=0; timeout 10 bash -c "exec 3<>/dev/tcp/$c" 2> /dev/null || r=$?
+        [ $r != 0 ] || { echo "KO   $c joint" >&2; exit 1; }
+        echo "témoin TCP $c : échec, code $r (attendu)"
+      done
+      # Fermeture revérifiée contre le verrou (colonnes 4 à 6), copiée à plat pour --extra-package
+      mkdir -p /w/fermeture
+      n=0
+      while read -r _ _ _ s z p; do
+        case $p in pool/*.deb) ;; *) echo "chemin du verrou non admis : $p" >&2; exit 1 ;; esac
+        case $p in *..*) echo "chemin du verrou non admis : $p" >&2; exit 1 ;; esac
+        [ "$(sha256sum < "$e/fermeture/miroir/$p" | cut -c1-64)" = "$s" ] || { echo "paquet différent du verrou : $p" >&2; exit 1; }
+        [ ! -e "/w/fermeture/${p##*/}" ] || { echo "nom de paquet en double : ${p##*/}" >&2; exit 1; }
+        cp "$e/fermeture/miroir/$p" /w/fermeture/
+        n=$((n + 1))
+      done < <(grep -v '^#' "$e/verrou-deb.txt" | grep .)
+      [ "$(find "$e/fermeture/miroir/pool" -type f | wc -l)" = "$n" ] || { echo "pool différent du verrou" >&2; exit 1; }
+      echo "fermeture revérifiée contre le verrou : $n paquets, copiés dans /w/fermeture"
+      # Paquet source : archive amont (commande tar de sources.sh), debian/, dpkg-source -b
+      c=$e/debian/changelog
+      src=$(dpkg-parsechangelog -l "$c" -SSource); ver=$(dpkg-parsechangelog -l "$c" -SVersion); sde=$(dpkg-parsechangelog -l "$c" -STimestamp)
+      amont=${ver%-*}
+      mkdir -p /w/src
+      cp -a "$e/src" "/w/src/$src-$amont"
+      tar -C /w/src --sort=name --mtime="@$sde" --owner=0 --group=0 --numeric-owner --mode=go-w,a+rX \
+        --format=gnu -cf - "$src-$amont" | gzip -n -9 > "/w/src/${src}_$amont.orig.tar.gz"
+      cp -a "$e/debian" "/w/src/$src-$amont/debian"
+      (cd /w/src && SOURCE_DATE_EPOCH=$sde dpkg-source -q -b "$src-$amont" > /dev/null)
+      dsc=/w/src/${src}_$ver.dsc
+      echo "paquet source $src $ver (SOURCE_DATE_EPOCH $sde) : $(cd /w/src && for f in "${src}_$amont.orig.tar.gz" "${dsc##*/}" "${src}_$ver.debian.tar.xz"; do echo -n "$f $(sha256sum < "$f" | cut -c1-64) ; "; done)"
+      # sbuild hors ligne, dépendances de build prises dans la fermeture seule
+      mkdir -p /w/home /w/sortie
+      export TMPDIR=/w HOME=/w/home
+      t=$(date +%s); r=0
+      sbuild --chroot-mode=unshare --chroot=/opt/sbuild/trixie-amd64.tar --dist=trixie --arch=amd64 --no-apt-update --no-apt-upgrade \
+        --no-apt-distupgrade --no-run-lintian --no-run-autopkgtest --no-run-piuparts --no-source-only-changes --build-dir=/w/sortie \
+        --extra-package=/w/fermeture \
+        "--chroot-setup-commands=truncate -s 0 /etc/apt/sources.list" \
+        "$dsc" > /w/sbuild.out 2>&1 || r=$?
+      echo "sbuild : rc $r en $(($(date +%s) - t)) s ; lignes apt Get, Hit, Ign ou Err en http(s) : $(grep -cE '^(Get|Hit|Ign|Err):[0-9]+ https?://' /w/sbuild.out || true)"
+      [ $r = 0 ] || { tail -n 80 /w/sbuild.out >&2; echo "sbuild en échec" >&2; exit 1; }
+      shopt -s nullglob
+      d=(/w/sortie/*.deb)
+      [ ${#d[@]} = 1 ] || { echo "${#d[@]} deb produits, 1 attendu" >&2; exit 1; }
+      deb=${d[0]}
+      echo "deb produit : ${deb##*/} $(sha256sum < "$deb" | cut -c1-64) ($(stat -c %s "$deb") octets)"
+      b=(/w/sortie/*.buildinfo)
+      [ ${#b[@]} = 1 ] || { echo "${#b[@]} .buildinfo, 1 attendu" >&2; exit 1; }
+      echo "----- ${b[0]##*/} -----"; cat "${b[0]}"; echo "----- fin du .buildinfo -----"
+      # Layout OCI à la main : configuration d'image, une couche tar non compressée qui contient le .deb seul
+      L=/w/layout
+      mkdir -p "$L/blobs/sha256" /w/cc
+      cp "$deb" /w/cc/
+      chmod 0644 "/w/cc/${deb##*/}"
+      tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime --mtime=@0 \
+        --owner=0 --group=0 --numeric-owner -C /w/cc -cf /w/couche.tar "${deb##*/}"
+      l=$(sha256sum < /w/couche.tar | cut -c1-64); s=$(stat -c %s /w/couche.tar)
+      mv /w/couche.tar "$L/blobs/sha256/$l"
+      blob() { # contenu : blob JSON écrit, « sha256 taille » sur la sortie
+        local h
+        h=$(printf '%s' "$1" | sha256sum | cut -c1-64)
+        printf '%s' "$1" > "$L/blobs/sha256/$h"
+        echo "$h ${#1}"
+      }
+      cfg=$(blob '{"architecture":"amd64","os":"linux","rootfs":{"type":"layers","diff_ids":["sha256:'"$l"'"]}}')
+      man=$(blob '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","config":{"mediaType":"application/vnd.oci.image.config.v1+json","digest":"sha256:'"${cfg% *}"'","size":'"${cfg#* }"'},"layers":[{"mediaType":"application/vnd.oci.image.layer.v1.tar","digest":"sha256:'"$l"'","size":'"$s"'}]}')
+      printf '%s' '{"imageLayoutVersion":"1.0.0"}' > "$L/oci-layout"
+      printf '%s' '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":"application/vnd.oci.image.manifest.v1+json","digest":"sha256:'"${man% *}"'","size":'"${man#* }"'}]}' > "$L/index.json"
+      echo "couche sha256:$l ($s octets) ; configuration sha256:${cfg% *} ; manifeste sha256:${man% *}"
+      tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$L" -cf "$o/image.tar" oci-layout index.json blobs
+      echo "image.tar : $(stat -c %s "$o/image.tar") octets"
+      printf 'sha256:%s' "${man% *}" > $(results.DIGEST_CONSTRUIT.path)
