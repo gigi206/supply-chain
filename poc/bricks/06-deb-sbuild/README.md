@@ -1479,3 +1479,36 @@ Ce travail dépasse très probablement 2× l'estimation de S5 : la règle de dé
 3. **Pods d'essai N4 et N6.** Ma recommandation : les garder dans S5a, car ce sont les deux propriétés encore déduites. Sinon, la réserve de A7 et la coupure par sbuild restent ouvertes et inscrites.
 
 **Estimation de S5a** : une demi-journée, sur le modèle de S4d3. La brique est à environ 0,4 pw.
+
+## Additif du 11/11/2026, 21:25 UTC : décision sur S5, préparation de S5a à sec
+
+**Décision du propriétaire** (21:14:51 UTC) : « Oui, les trois ».
+- **Découpage** : S5a, les tests négatifs N1 à N7 ; S5b, le rejeu de zéro, en jalon de plateforme à part. Rien ne change dans `rejeu.sh`.
+- **Fermeture altérée** : poussée dans Zot sous `entrees/sample-app-deb/fermeture-alteree`, avec un accord nommé à part.
+- **Pods d'essai N4 et N6** : gardés dans S5a.
+
+Ce n'est un accord pour aucun lancement.
+
+**Préparé** : [`s5.sh`](s5.sh) et les [prédictions](resultats/s5-predictions.md) P1 à P19.
+
+Les étapes, dans l'ordre :
+- `prealables` : lecture et admission à blanc côté serveur ;
+- `zot` : la seule écriture ;
+- `prefetch`, `miroir`, `fermeture` (après `zot`), `kata`, `sbuild` ;
+- `porte` : contrôle d'invariance ;
+- `retirer`.
+
+Les paramètres sont pris dans les pipelines signées, exportées de Zot.
+
+**Contrôles sur l'hôte** (hors ligne) :
+- **Fermeture intacte** : la copie de S4b, poussée en layout local par la commande de `publier-fermeture`, redonne exactement `bb7599a2…`.
+- **Fermetures altérées** : `a549729d…` (un paquet modifié) et `b27225cf…` (un fichier en trop) n'ajoutent chacune qu'une couche.
+- **Paquet témoin de N6** : son `debian/rules` s'exécute.
+- **Objets** : le rendu des 17 objets est conforme.
+
+**Effets à connaître** :
+- **Zot** : deux manifestes et deux blobs (1200 et 34 octets), définitifs.
+- **Instantané** : environ 200 Mo téléchargés, comme en S4a.
+- **Kata** : deux constructions sur sc-build, l'une après l'autre (`construire-builder` puis `construire-deb`, 6 Gio chacune), sans publication.
+- **Cluster** : 2 PVC, 2 pods d'essai et 13 TaskRuns, retirés par `retirer`.
+- **Forgejo** : rien n'y est poussé.
