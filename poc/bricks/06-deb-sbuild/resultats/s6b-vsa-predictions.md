@@ -120,3 +120,14 @@ Journal : `s6b-vsa_essai.log`. sha256 transportés, égaux côté hôte et côt�
 - `vsa_deb.py` : `34799510…`, la version « Bit identique seul ».
 
 **Le push de la VSA dans Zot est préparé à sec** : étapes `pousser_vsa` et `lire_vsa` de `s6b.sh`, prédictions dans [`s6b-pousser-predictions.md`](s6b-pousser-predictions.md). Elles viennent après S5b. Les étapes `rebuild` et `vsa` ne changent pas : le diff de `s6b.sh` n'ajoute que deux fonctions, quatre constantes, trois fonctions d'appui (`hors_zot` et `connexions`, reprises de la 10, et `anon`, la lecture anonyme), l'en-tête et la ligne d'usage.
+
+## Résultats de `vsa` (12/11/2026, 21:20:08 à 21:20:10 UTC), code 0
+
+Accord : « Oui, lance vsa » à « Je lance vsa ? », lancement le 12/11/2026 à 21:20:08 UTC (`chrono.tsv`). Journal : `s6b-vsa.log`. HEAD `c66202e` ; politique figée à `97ae561`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| S1 | **Tenue** | 15 `OK`, 0 `KO`. Énoncé : sujet `builds/sample-app-deb` (`039949f9…`), `timeVerified` `2026-11-12T21:06:14Z` (`fin_deb` de `rebuild` : `2026-11-12T21:06:14Z`), `policy` au commit `97ae561` (sha256 `6cc94a50…`), `inputAttestations` `856a4270…`, `verifiedLevels` `['POC_REPLAY_BIT_IDENTIQUE']` ; `verifier.version` : sbuild `0.89.3+deb13u4`, mmdebstrap `1.5.7-1+deb13u1`, dpkg-dev `1.22.22`, `go1.26.10` ; `verifier_deb.py` `7498fdad…`, `rebuild_deb.sh` `55ebf681…`, `vsa_deb.py` `34799510…`, égaux aux fichiers de HEAD `c66202e` |
+| S2 | **Tenue** | `signing-config sans service : code 0 ; {'mediaType': 'application/vnd.dev.sigstore.signingconfig.v0.2+json', 'rekorTlogConfig': {}, 'tsaConfig': {}}` ; `attest-blob : code 0` ; `verify-blob-attestation, clé du domaine : code 0 ; Verified OK` ; tlog `None`, horodatage `None`, énoncé du bundle identique à `enonce.json` ; sha256 lus dans la VM égaux aux copies archivées : énoncé `80e58b43…`, bundle `0a427031…` (2607 octets ; bundle non affiché) |
+
+**Conséquence** : la VSA du deb est signée par la clé du domaine, hors réseau, et archivée dans `resultats/` (`s6b-vsa-enonce.json`, `s6b-vsa.bundle.json`). Rien n'est poussé dans Zot. Suite : S5b le 13/11, puis `pousser_vsa` et `lire_vsa`, chacun sur accord.

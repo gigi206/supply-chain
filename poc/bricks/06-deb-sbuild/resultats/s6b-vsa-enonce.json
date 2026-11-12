@@ -1,0 +1,47 @@
+{
+ "_type": "https://in-toto.io/Statement/v1",
+ "subject": [
+  {
+   "name": "sc-stockage.poc.test:5000/builds/sample-app-deb",
+   "digest": {
+    "sha256": "039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e"
+   }
+  }
+ ],
+ "predicateType": "https://slsa.dev/verification_summary/v1",
+ "predicate": {
+  "verifier": {
+   "id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1",
+   "version": {
+    "sbuild": "0.89.3+deb13u4",
+    "mmdebstrap": "1.5.7-1+deb13u1",
+    "dpkg-dev": "1.22.22",
+    "go": "go1.26.10",
+    "verifier_deb.py": "7498fdaddefe4b210dfcf9040d76087986aa453716048c646b2aa9ac00b2a7a8",
+    "rebuild_deb.sh": "55ebf681c2b71bd777cb444e9a4f44ddb735a02a3d97a52ef3cc7ffc32ad2ec6",
+    "vsa_deb.py": "347995103fdd0562d2409d7cbd7df89161916a26a8a45b03555b0468ef989563"
+   }
+  },
+  "timeVerified": "2026-11-12T21:06:14Z",
+  "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e",
+  "policy": {
+   "uri": "https://github.com/gigi206/supply-chain/blob/97ae561de9e9eccb296fcba09fbbc351988ecf1b/poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md",
+   "digest": {
+    "sha256": "6cc94a50ea8ca34c90485cc3eccb72e3484aeedd45e308bf1593ead0c547804b"
+   }
+  },
+  "inputAttestations": [
+   {
+    "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:856a42709c3a949b6eacd6d578d76c81db53b999948e14f77965f15aea946ff2",
+    "digest": {
+     "sha256": "856a42709c3a949b6eacd6d578d76c81db53b999948e14f77965f15aea946ff2"
+    }
+   }
+  ],
+  "verificationResult": "PASSED",
+  "verifiedLevels": [
+   "POC_REPLAY_BIT_IDENTIQUE"
+  ],
+  "slsaVersion": "1.2"
+ }
+}

@@ -1970,3 +1970,7 @@ Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédic
 **Additif du 12/11/2026, 21:04 UTC : `rebuild`, deb reconstruit dans `sc-replay`, lien coupé, identique.** Lancé à 21:04:45 UTC (« Oui, lance rebuild » à « Je lance rebuild ? »), lien coupé de 21:04:46 à 21:09:46 UTC, code 0 ([journal](resultats/s6b-rebuild.log), [résultats](resultats/s6b-rejeu-predictions.md)).
 - Deb `0b489d43…` (1 952 080 octets), manifeste `039949f9…`, égal au sujet de la provenance : `verdict=PASSED`. Sortie de la VM inchangée pendant la coupure ; rebuild fini avant le rétablissement du lien. **Le contrôle 6 du deb est valable hors ligne.**
 - **Reste** : la vérification d'avant push et un seul push, avec ton « oui » ; puis `vsa`, sur accord nommé ; puis S5b, le 13/11.
+
+**Additif du 12/11/2026, 21:20 UTC : `vsa`, VSA du deb signée par la clé du domaine.** Lancée à 21:20:08 UTC (« Oui, lance vsa » à « Je lance vsa ? »), code 0 ([journal](resultats/s6b-vsa.log), [résultats](resultats/s6b-vsa-predictions.md)).
+- Énoncé `POC_REPLAY_BIT_IDENTIQUE` seul, `timeVerified` `2026-11-12T21:06:14Z`, politique au commit `97ae561` ; signé dans la VM, sous `unshare -rn`, sans tlog ni horodatage ; [énoncé](resultats/s6b-vsa-enonce.json) et bundle archivés. **Rien n'est poussé dans Zot.**
+- **Reste** : S5b le 13/11, sur accord ; puis `pousser_vsa` et `lire_vsa`, chacun sur accord.
