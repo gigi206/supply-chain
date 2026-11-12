@@ -179,3 +179,56 @@ Lecture complémentaire de l'archive en cache, sans réseau, sha256 inchangé : 
 - **N5r :** `config.py:855` monte le **dépôt hors ligne** en `/hermetic_repo`, et non le bootstrap.
 - **Référence du bootstrap :** `hôte/dépôt`, sans tag et sans port, passe aussi, pas seulement `hôte/dépôt:tag`.
 - **`sigmd5` :** c'est un MD5. Le comparer au verrou n'est qu'un contrôle de cohérence. **Le contrôle réel est `rpm -K` avec la clé Rocky `21CB256A…`**, et M2 sera conçu autour de lui.
+
+## Additif du 12/11/2026, à partir de 15:11:15 UTC : faisabilité de la voie 2, lue dans les journaux archivés ; étape `releve3` préparée à sec, NON LANCÉE
+
+Après « continue ». **Ce n'est pas une décision** : la voie reste à choisir par le propriétaire. Tout ce qui suit est lu dans [`m2-releve2.log`](m2-releve2.log) et [`sante-signatures.log`](sante-signatures.log) ; rien n'est mesuré, rien n'est essayé.
+
+**Q1. `mock-hermetic-repo` peut-il servir sans son étape d'image ?** (`mock-hermetic-repo.py:177` à `:202`)
+- `_main` télécharge d'abord tous les rpm, lance `createrepo_c`, puis appelle `prepare_image` en dernier, sans condition.
+- Avec notre référence, le dépôt serait donc construit, puis l'outil finirait en erreur à l'étape d'image (`check_output`, exception non rattrapée).
+- Cette erreur ne se distingue pas d'une autre par le code de sortie. Lancer l'outil en tolérant son échec n'est donc pas une voie sûre.
+- Hypothèse, non vérifiée dans le source de skopeo : la référence coupée `sc-stockage.poc.test@sha256:…` n'a pas de `/`, et la règle de normalisation des noms Docker en ferait `docker.io/library/sc-stockage.poc.test`. skopeo tenterait alors de joindre Docker Hub.
+- **Conséquence : la voie 2 remplace `mock-hermetic-repo` en entier**, pas seulement son étape d'image. L'outil se réduit à trois gestes, tous lus : télécharger chaque URL du verrou, `createrepo_c --compatibility`, copier l'image. M2 doit de toute façon ajouter `rpm -K` entre le premier et le deuxième.
+
+**Q2. Quel digest le mode hermétique affirme-t-il ?**
+- `config.py:864` impose `bootstrap_image_assert_digest` = `image_digest` du verrou.
+- `image_digest` vient de `get_oci_digest` (`podman.py:200` à `:214`). Son commentaire parle d'un digest des couches du RootFS, identique pour toute image aux mêmes couches dans le même ordre. Pour une image `dir:`, il est lu sur l'image chargée puis étiquetée (`_tagged_id`).
+- Si c'est bien le cas, une copie qui garde les couches le reproduit. Mais le corps de `podman_get_oci_digest` et le chargement d'un dossier `dir:` ne sont pas dans les journaux : c'est l'objet de `releve3`.
+- `pull_digest` est autre chose : le `.Digest` de `podman image inspect` (`podman.py:266`), digest du manifeste tiré. Il ne sert qu'à nommer le dossier.
+
+**Q3. `ee90dc0e…` est-il un index ?** Non, d'après ce qui est déjà archivé.
+- `sante-signatures.log` (05/11) : l'index de `rockylinux:9.7` est `53f4c6dc…`, et `ee90dc0e…` est son manifeste amd64.
+- `s1.sh:218` et `:220` copient ce manifeste dans Zot par ce digest, et le vérifient.
+- Une copie par `ee90dc0e…` ne passe donc par aucun index : `--override-arch` est sans objet. `--preserve-digests` reste à mettre, comme le fait `prepare_image`.
+- Que le `pull_digest` du verrou vaille `ee90dc0e…` est une prédiction. L'étape `verrou` de S1 la tranchera.
+
+**Q4. Quel dossier `config.py:846` attend-il ?**
+- `<dépôt hors ligne>/sc-stockage.poc.test@sha256:<pull_digest>`, passé en `dir:`.
+- `pull_digest` n'existe qu'une fois le verrou calculé par l'étape `verrou` de S1.
+
+**Ce que la voie 2 demanderait** (rien n'est écrit) :
+1. télécharger les rpm du verrou ;
+2. `rpm -K` avec la clé Rocky, puis comparer les `sigmd5` au verrou ;
+3. `createrepo_c --compatibility` ;
+4. `skopeo copy --preserve-digests` de la référence entière vers le dossier de Q4.
+
+Rien que S5b rejoue n'est touché, et mock reste le rpm signé d'EPEL. Le prix : un outil de mock remplacé par nos propres étapes, écart à documenter.
+
+### Étape `releve3` ([`m2.sh`](../m2.sh)), accord nommé nécessaire avant de la lancer
+
+- Hôte seul, sans réseau : même archive, sha256 contrôlé. Elle archive :
+  - `podman.py` entier, avec son nombre de lignes ;
+  - les usages de `bootstrap_image_assert_digest`, de `dir:` et `oci-archive`, de `bootstrap_image_fallback` et `bootstrap_image_skip_pull` ;
+  - toutes les coupures `split(':')` et `split(":")` du code Python ;
+  - tous les usages de `hermetic_build` et `offline_local_repository`.
+- Puis elle efface les sources.
+- Les filtres ont été essayés sur une entrée synthétique. `bash -n` passe, et shellcheck ne relève aucun avertissement (seulement les notes de niveau info déjà présentes).
+
+| # | Prédiction | Confiance | Si elle tombe |
+|---|---|---|---|
+| R1r | sha256 identique, étape de moins de 5 s, aucune commande réseau | Haute | Arrêt : archive changée sous `~/.cache` |
+| R2r | `podman_get_oci_digest` tire un sha256 des couches du RootFS : une copie qui garde les couches reproduit `image_digest` | Moyenne | Si le digest dépend du manifeste, la copie doit être exacte : `--preserve-digests` devient indispensable, et à vérifier par mesure |
+| R3r | Une image `dir:` est chargée sans réseau, puis étiquetée | Moyenne | Si un accès réseau reste possible, la voie 2 doit le couper |
+| R4r | `bootstrap_image_assert_digest` n'est comparé qu'à un seul endroit, et un écart arrête le build | Haute | Si l'écart est seulement journalisé, le contrôle du digest passe à notre charge |
+| R5r | Aucune autre coupure `split(':')` d'une référence d'image que les deux déjà vues | Moyenne | Toute autre coupure sur le chemin de M3 s'ajoute aux obstacles de la voie 2 |

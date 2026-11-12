@@ -14,9 +14,15 @@
 #               1.1.0), ce qu'exige une image de bootstrap « prête » (buildroot.py, podman.py), ce qu'impose le mode hermétique
 #               (config.py 805 à 875), téléchargement et contrôles de mock-hermetic-repo ; puis sources effacées.
 #               Prédictions : resultats/m2-predictions.md, section releve2.
+#   releve3     hôte seul, sans réseau (ajouté à sec le 12/11/2026 à partir de 15:11:15 UTC, NON LANCÉ) : même archive, sha256
+#               contrôlé ; archive au journal ce que la voie 2 (dossier dir: du bootstrap préparé par nous) doit savoir : podman.py
+#               entier (calcul de image_digest, chargement d'une image dir:), usages de bootstrap_image_assert_digest et de dir:,
+#               toutes les coupures split(':') du code Python, usages de hermetic_build ; puis sources effacées.
+#               Prédictions : resultats/m2-predictions.md, section releve3.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve3  (journal : resultats/m2-releve3.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -95,6 +101,28 @@ etape_releve2() {
   plage "mock-hermetic-repo.py" mock/py/mock-hermetic-repo.py 1 210
   echo "## documentation : image de bootstrap et signatures"
   ( cd "$T/mock-src" && grep -n -i -E 'bootstrap|ready|gpg|signat|checksum|sha256' docs/feature-hermetic-builds.md docs/Plugin-BuildrootLock.md 2>/dev/null ) | cut -c1-220 | sed 's/^/  /' || true
+  rm -rf -- "${T:?}/mock-src"
+  echo "sources effacées ; archive gardée sous ~/.cache"
+}
+
+etape_releve3() {
+  local a=$T/mock.tar.gz s
+  echo "## archive du tag $MOCK_TAG gardée par releve (aucun accès réseau)"
+  [ -f "$a" ] || { echo "KO   archive absente : $a (lancer releve d'abord)" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  rm -rf -- "${T:?}/mock-src"; mkdir "$T/mock-src"
+  tar -xzf "$a" -C "$T/mock-src" --strip-components=1
+  echo "## image de bootstrap : digest affirmé et chargement d'un dossier dir:"
+  echo "### taille de podman.py : $(wc -l < "$T/mock-src/mock/py/mockbuild/podman.py") lignes"
+  plage "podman.py entier" mock/py/mockbuild/podman.py 1 2000
+  lignes "bootstrap_image_assert_digest, dans tout le code Python" 'bootstrap_image_assert_digest' mock/py
+  lignes "images dir: et oci-archive:, dans tout le code Python" 'dir:|oci-archive' mock/py
+  lignes "bootstrap_image_fallback et bootstrap_image_skip_pull" 'bootstrap_image_(fallback|skip_pull)' mock/py
+  echo "## coupures de références d'image"
+  lignes "split(':') et split(\":\"), dans tout le code Python" "split\\(['\"]:['\"]" mock/py
+  echo "## mode hermétique : tous les usages"
+  lignes "hermetic_build et offline_local_repository" 'hermetic_build|offline_local_repository' mock/py
   rm -rf -- "${T:?}/mock-src"
   echo "sources effacées ; archive gardée sous ~/.cache"
 }

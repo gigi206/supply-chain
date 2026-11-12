@@ -204,3 +204,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - `rocky-9.tpl` (mock-core-configs 45.2, la version épinglée) est dans l'archive et n'en pose aucune, pas plus que `s1.sh`. **La mesure de V1 ne peut donc pas être trompée** : la phrase de l'additif précédent est retirée ;
 - l'ajout à l'étape `verrou` reste proposé, comme observation directe ;
 - le contrôle réel des rpm est `rpm -K` avec la clé Rocky. Le `sigmd5` n'est qu'un contrôle de cohérence.
+
+**Additif du 12/11/2026, à partir de 15:11:15 UTC : faisabilité de la voie 2 lue, étape `releve3` ajoutée à `m2.sh` (après « continue »), NON LANCÉE.** C'est une lecture, pas un résultat ; aucune voie n'est choisie ([détail](resultats/m2-predictions.md)).
+- `mock-hermetic-repo` construit le dépôt avant de copier l'image, puis échouerait sur notre référence : la voie 2 le remplacerait en entier (téléchargement, `rpm -K`, `createrepo_c`, `skopeo copy`).
+- `ee90dc0e…` est le manifeste amd64, pas un index : une copie par ce digest n'a pas besoin de `--override-arch`.
+- `releve3` lira, sans réseau, comment mock calcule le digest affirmé et charge une image `dir:`. Prédictions R1r à R5r ; elle attend un accord nommé.
