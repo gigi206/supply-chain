@@ -1,4 +1,4 @@
-# banc paquets.sh modules, 2026-11-12T20:43:17Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8c715e903349227df827570dc693a0547ead03178be763b40d59f335fee2e56b, go version go1.24.7 linux/amd64
+# banc paquets.sh modules, 2026-11-12T20:47:32Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8d4bb025b680a37c435d3fabb739a2171743fd46aec70d736b87a70d92916ba3, go version go1.24.7 linux/amd64
 ## lecture des informations de build : paquets.py contre go version -m
 paquets.py modules (nominal) : code 0
 OK   path, mod et dep identiques à go version -m (3 lignes)

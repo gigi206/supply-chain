@@ -436,3 +436,13 @@ refusé ; paquet présent gardé ; paquet sans fonction et paquet à fonction se
 - L5 : nombre de paquets indexés dans la source journalisé, non prédit (strictement positif).
 
 Lancement : sur accord nommé seulement, après la séquence de ce soir (`rebuild`, push, `vsa`).
+
+*Note datée du 12/11/2026, écrite à 20:48:14 UTC* : relecture du conseiller après `fa31c7c`. **Trou corrigé** : en DEP-5, `*` traverse les `/`,
+donc `src/<pq>/*` couvre aussi les sous-paquets ; `classer()` ne cherchait que « \0<pq>. ». Avec `--lies` seulement (l'étude `noms` ne
+change pas), un motif dont le dernier élément contient `*` est gardé si « \0<pq>/ » est dans le binaire. **L1 n'est pas touchée** : dans
+[`paquets-stdlib.log`](paquets-stdlib.log), les motifs de `FreeBSD` (`src/debug/elf/elf.go`, `src/cmd/link/internal/ld/elf.go`) et de `MPEG`
+(`src/image/jpeg/idct.go`) nomment des fichiers ; les autres paragraphes non liés sont `cmd`, `testdata` ou `debian/`. Banc complété :
+11 cas, 11 OK (sous-paquet présent sous un parent absent : gardé ; motif `cmd` et fichier d'un paquet présent, forme du paragraphe `X11` :
+gardé ; paragraphe écarté et traduction appliquée ensemble, forme du vrai passage : code 0) ; les quatre autres bancs rejoués, mêmes
+lignes. **À dire au propriétaire** : le prédicat de `lies` porte, sous le purl du paquet entier, une expression filtrée ; rien dans le
+prédicat ne le marque (le journal seul le dit). La question nommée de `lies` citera le SHA final de `paquets.sh`.

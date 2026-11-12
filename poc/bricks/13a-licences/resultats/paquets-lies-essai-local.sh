@@ -31,10 +31,13 @@ S = "./usr/share/go-1.24/src/"
 sources = [(S + "debug/elf/file.go", b"package elf\n\nfunc Open() {\n}\n"),
            (S + "internal/goarch/goarch.go", b"package goarch\n\nconst PtrSize = 8\n"),
            (S + "internal/arm/x_arm64.go", b"package arm\n\nfunc F() {\n}\n"),
-           (S + "fmt/print.go", b"package fmt\n\nfunc Println() {\n}\n")]
+           (S + "fmt/print.go", b"package fmt\n\nfunc Println() {\n}\n"),
+           (S + "internal/x.go", b"package internal\n\nfunc F() {\n}\n")]
+go = "Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n\nFiles: *\nCopyright: 2026 x\nLicense: Go\n"
 cr = {"absent": en + par("src/debug/elf/*"), "present": en + par("src/fmt/*"), "sans-fonction": en + par("src/internal/goarch/*"),
       "autre-arch": en + par("src/internal/arm/*"), "cmd": en + par("src/cmd/x/* debian/*"), "defaut": en + par("src/debug/elf/*", ""),
-      "vide": en + par("src/debug/elf/*")}.get(cas, "")
+      "vide": en + par("src/debug/elf/*"), "sous-paquet": en + par("src/internal/*"),
+      "mixte": en + par("src/cmd/x/* src/fmt/print.go"), "traduction": go + par("src/debug/elf/*") + "\nLicense: Go\n texte go\n"}.get(cas, "")
 if cas == "vide":
     sources = []
 def tarxz(e):
@@ -57,10 +60,12 @@ open(out, "wb").write(o)
 EOP
 }
 fabriquer "$H/app.deb" essai 1.0-1 app "$H/essai"
-echo '[]' > "$H/trad.json"
-essai() { # cas cas-du-copyright étape code-attendu motif-attendu
-  local cas=$1 src=$H/$1-src.deb s1 s2 rc x
+essai() { # cas cas-du-copyright étape code-attendu motif-attendu [preuve : traduction Go revue]
+  local cas=$1 src=$H/$1-src.deb s1 s2 rc x h
   fabriquer "$src" golang-1.24-src "$AM-1" "$2"
+  h=$(printf 'Go\ntexte go' | sha256sum | cut -c1-64)
+  if [ "${6:-}" = preuve ]; then printf '[{"paquet": "golang-1.24-src", "version": "%s", "nom": "Go", "texte_sha256": "%s", "expression": "BSD-3-Clause", "raison": "banc", "revue": "banc"}]\n' "$AM-1" "$h"
+  else echo '[]'; fi > "$H/trad.json"
   s1=$(sha256sum < "$H/app.deb" | cut -c1-64); s2=$(sha256sum < "$src" | cut -c1-64)
   printf 'golang-1.24-src %s all %s 1 pool/main/g/x/golang-1.24-src.deb\n' "$AM-1" "$s2" > "$H/verrou.txt"
   printf 'Installed-Build-Depends:\n golang-1.24-src (= %s),\n' "$AM-1" > "$H/bi.txt"
@@ -77,7 +82,7 @@ essai() { # cas cas-du-copyright étape code-attendu motif-attendu
   rc=0; DEB=$H/app.deb SRC=$src bash "$H/paquets.sh" "$3" > "$H/$cas.log" 2>&1 || rc=$?
   if [ "$rc" = "$4" ] && grep -qE -- "$5" "$H/$cas.log" && ! grep -q '^Traceback' "$H/$cas.log"; then echo "OK   $cas : code $rc, « $5 »"
   else echo "KO   $cas : code $rc (attendu $4), motif « $5 »"; fi
-  grep -E '^(OK|KO|REFUS|bilan|pkg:|licences\.py|Files|écarté|gardé|  motif|## règle)|^ +(ok|error|warning) ' "$H/$cas.log" | sed "s#$H#<banc>#g; s/^/     /"
+  grep -E '^(OK|KO|REFUS|bilan|pkg:|licences\.py|Files|écarté|gardé|  motif|## règle|traduction)|^ +(ok|error|warning) ' "$H/$cas.log" | sed "s#$H#<banc>#g; s/^/     /"
 }
 essai l-absent absent lies 0 '^écarté : paragraphe 3 \(FreeBSD\)'
 essai l-sans-option absent stdlib 1 '^KO   verdict non conforme'
@@ -86,5 +91,8 @@ essai l-sans-fonction sans-fonction lies 1 'internal/goarch : 0, absence non pro
 essai l-autre-arch autre-arch lies 1 'internal/arm : 0, absence non probante'
 essai l-cmd cmd lies 0 '^écartés : 1 sur 2 paragraphe'
 essai l-defaut defaut lies 1 '^REFUS : 1 défaut\(s\) : paragraphe 3 : champ\(s\) manquant\(s\) : copyright'
+essai l-sous-paquet sous-paquet lies 1 'internal : 0, sous-paquets : [1-9]'
+essai l-mixte mixte lies 1 '^  motif : src/fmt/print.go \(fmt : [1-9]'
+essai l-traduction traduction lies 0 '^traduction Go -> BSD-3-Clause : appliquée' preuve
 essai l-vide vide lies 1 '^REFUS : règle des paragraphes non liés : aucun paquet de la source indexé'
 echo "chrono.tsv du banc : $(wc -l < "$H/res/chrono.tsv") lignes ; fichiers de 13a touchés : $(git -C "$D" status --porcelain -- poc/bricks/13a-licences/resultats/chrono.tsv poc/bricks/13a-licences/resultats/paquets-lies.log poc/bricks/13a-licences/resultats/paquets-lies.licences.json | wc -l)"

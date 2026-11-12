@@ -1,4 +1,4 @@
-# banc paquets.sh noms, 2026-11-12T20:43:30Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8c715e903349227df827570dc693a0547ead03178be763b40d59f335fee2e56b, go version go1.24.7 linux/amd64
+# banc paquets.sh noms, 2026-11-12T20:47:46Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8d4bb025b680a37c435d3fabb739a2171743fd46aec70d736b87a70d92916ba3, go version go1.24.7 linux/amd64
 OK   n-nominal : code 0, « ^  motif lié : src/image/png/reader.go \(image/png : [1-9][0-9]*\)$ »
      OK   sha256 du deb épinglé : 455328d043ed525b7b1bab224f28c5522dc4ed5ed1ca3f4fb8c231b7fb3449b3
      OK   sha256 du paquet de Go épinglé : 9af85dc610af5770ca08a547571b77137fdbd1ff5fdf67ecfd54de103d3d2047

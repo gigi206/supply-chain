@@ -441,7 +441,10 @@ def classer(p, b, idx=None):
         else:
             pq = x[4:].rsplit("/", 1)[0]
             n = b.count(b"\x00" + (pq + ".").encode())
-            if idx is None or n > 0:
+            ns = b.count(b"\x00" + (pq + "/").encode()) if idx is not None and "*" in x.rsplit("/", 1)[1] else 0
+            if ns:   # règle seule : en DEP-5, * traverse les /, le motif couvre les sous-paquets
+                classes.append((x, f"{pq} : {n}, sous-paquets : {ns}", True))
+            elif idx is None or n > 0:
                 classes.append((x, f"{pq} : {n}", n > 0))
             elif not idx.get(pq):
                 classes.append((x, f"{pq} : 0, absence non probante ({'aucune fonction à corps hors contrainte' if pq in idx else 'paquet absent de la source'})", True))

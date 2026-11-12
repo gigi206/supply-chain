@@ -1,4 +1,4 @@
-# banc paquets.sh stdlib, 2026-11-12T20:43:24Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8c715e903349227df827570dc693a0547ead03178be763b40d59f335fee2e56b, go version go1.24.7 linux/amd64
+# banc paquets.sh stdlib, 2026-11-12T20:47:40Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8d4bb025b680a37c435d3fabb739a2171743fd46aec70d736b87a70d92916ba3, go version go1.24.7 linux/amd64
 version de Go du binaire d essai : go1.24.7
 OK   s-nominal : code 0, « ^bilan : bibliothèque standard déclarée »
      OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
