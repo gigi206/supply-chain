@@ -1912,3 +1912,16 @@ Préparée après « Oui, prépare-la », sur le modèle de R5 de la brique 10 (
 - **Rangement** : la porte fixe déjà `builds/vsa/sample-app-deb`.
 - **Une question te revient** : faut-il revendiquer `SLSA_BUILD_LEVEL_3` pour un deb construit dans un pod Kata privilégié ([notes de relecture](rejeu/politique-replay-deb.md)) ?
 
+## Additif du 12/11/2026, 10:57 UTC : essai de la VSA du deb tenu, rien de signé
+
+`vsa_essai` a tourné à 10:56:55 UTC, sur ton accord « Oui, lance-le », avec le code 0 ([résultats](resultats/s6b-vsa-predictions.md)).
+- `vsa_deb.py` a tourné hors réseau dans la VM sur le résultat de la répétition. Il a revérifié le bundle horodaté de `454728c5` et construit tout l'énoncé.
+- **Il a refusé sur exactement les trois conditions attendues** : lien établi au départ et à la fin, et délai de 24 h non atteint. Aucun énoncé n'a été écrit.
+- La clé du domaine est présente ; elle n'a pas été lue.
+
+**Pour finir le contrôle 6** :
+1. ta relecture de la politique, et ta réponse sur `SLSA_BUILD_LEVEL_3` ;
+2. `rebuild` ce soir, à partir de 21:03:37 UTC ;
+3. un push ;
+4. `vsa`.
+

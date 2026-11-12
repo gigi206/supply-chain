@@ -1,0 +1,68 @@
+# s6b.sh vsa_essai, 2026-11-12T10:56:55Z
+4d5b4ec5f56d0564d7071df7847b512cad2e1d5774d128bdbf07fe0fb3ea3602  politique-replay-deb.md
+2b353a7c080ab321dc59712c3d7a28669c1f0867e61abd548621905b7006f867  vsa_deb.py
+2b353a7c080ab321dc59712c3d7a28669c1f0867e61abd548621905b7006f867  vsa_deb.py
+4d5b4ec5f56d0564d7071df7847b512cad2e1d5774d128bdbf07fe0fb3ea3602  politique-replay-deb.md
+## vsa_deb.py (dans la VM, unshare -rn), sur le résultat de la répétition
+## vérification des entrées (~/s6b/r3/verifie.txt)
+OK   verifier_deb.py sans KO : ko=0
+## résultat de la reconstruction (~/s6b/r4/resultat.txt)
+OK   verdict de rebuild_deb.sh : PASSED
+OK   manifeste reconstruit : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   sortie de rebuild_deb.sh : code 0
+KO   lien coupé au départ (porteuse à 0) : {'porteuse_enp1s0': '1'}
+KO   lien toujours coupé à la fin : enp1s0=1 
+## provenance : bundle horodaté de l'invocation, revérifié ici
+OK   racine de confiance de la TSA construite ici
+OK   bundles de l'invocation 454728c5-59a8-45e1-b972-549d343aadac parmi 8 : ['bundle-21edfa0ca581bad6']
+OK   signature de Chains et jeton de la TSA du bundle (cosign verify-blob-attestation)
+OK   énoncé identique à la provenance vérifiée par verifier_deb.py
+## politique, sections 1 et 3 (niveaux et délai)
+OK   _type et predicateType
+OK   builder.id
+OK   buildType
+OK   sujet de la provenance
+KO   timeVerified 2026-11-12T10:44:05Z au moins 24 h après finishedOn 2026-11-11T21:03:37Z
+{
+ "verifier": {
+  "id": "https://supply-chain.example/verifiers/replay-poc-administrateur-unique@v1",
+  "version": {
+   "sbuild": "0.89.3+deb13u4",
+   "mmdebstrap": "1.5.7-1+deb13u1",
+   "dpkg-dev": "1.22.22",
+   "go": "go1.26.10",
+   "verifier_deb.py": "7498fdaddefe4b210dfcf9040d76087986aa453716048c646b2aa9ac00b2a7a8",
+   "rebuild_deb.sh": "1422b13d7c7890680a25e816e329eb4402b915b0cf5cd62c26e357ddbb49ecc9",
+   "vsa_deb.py": "2b353a7c080ab321dc59712c3d7a28669c1f0867e61abd548621905b7006f867"
+  }
+ },
+ "timeVerified": "2026-11-12T10:44:05Z",
+ "resourceUri": "oci://sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e",
+ "policy": {
+  "uri": "essai-non-figee",
+  "digest": {
+   "sha256": "4d5b4ec5f56d0564d7071df7847b512cad2e1d5774d128bdbf07fe0fb3ea3602"
+  }
+ },
+ "inputAttestations": [
+  {
+   "uri": "oci://sc-stockage.poc.test:5000/horodatage/bundles@sha256:856a42709c3a949b6eacd6d578d76c81db53b999948e14f77965f15aea946ff2",
+   "digest": {
+    "sha256": "856a42709c3a949b6eacd6d578d76c81db53b999948e14f77965f15aea946ff2"
+   }
+  }
+ ],
+ "verificationResult": "PASSED",
+ "verifiedLevels": [
+  "SLSA_BUILD_LEVEL_3",
+  "POC_REPLAY_BIT_IDENTIQUE"
+ ],
+ "slsaVersion": "1.2"
+}
+REFUS : 3 condition(s) manquante(s), aucun énoncé écrit
+code 1
+aucun énoncé
+présent, non lu : /home/replay/vsa/cosign.key
+présent, non lu : /home/replay/vsa/cosign.pub
+présent, non lu : /home/replay/vsa/mot-de-passe
+bilan : refus attendu (3 KO : lien établi au départ et à la fin, délai), énoncé construit mais non écrit, clé présente

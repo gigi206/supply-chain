@@ -85,3 +85,17 @@ Les prédictions ci-dessus ont été commitées dans `1b36f83`, à 10:50:25 UTC.
 - **E4.** Les trois fichiers de la clé sont présents (`test -s`). Confiance haute : la VSA de l'image a été signée avec eux en R5.
 - **E3 révisée.** Bilan : « refus attendu (3 KO …), énoncé construit mais non écrit, clé présente ».
 
+## Résultats de `vsa_essai` (12/11/2026, 10:56:55 à 10:56:56 UTC, accord « Oui, lance-le »), code 0, rien de signé
+
+Journal : `s6b-vsa_essai.log`. sha256 transportés, égaux côté hôte et côté VM : `vsa_deb.py` `2b353a7c…`, politique (projet) `4d5b4ec5…`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| E1 | **Tenue** | Deux fichiers transportés, sha256 égaux |
+| E2 | **Tenue** | `OK` : `verifie.txt`, verdict `PASSED`, manifeste `039949f9`, sortie 0, racine de la TSA, bundle unique de `454728c5` (`bundle-21edfa0ca581bad6`), signature de Chains et jeton de la TSA **sous `unshare -rn`**, énoncé identique à `provenance.json`, section 1. **Exactement trois `KO`** : porteuse à 1 au départ, porteuse à 1 à la fin, `timeVerified 2026-11-12T10:44:05Z` à moins de 24 h de `2026-11-11T21:03:37Z`. « REFUS : 3 condition(s) manquante(s), aucun énoncé écrit », code 1 ; aucun `enonce.json`. |
+| E2 bis | **Tenue** | Prédicat construit : `PASSED` ; sbuild `0.89.3+deb13u4`, mmdebstrap `1.5.7-1+deb13u1`, dpkg-dev `1.22.22`, `go1.26.10` ; sha256 de `verifier_deb.py` (`7498fdad…`), de la copie de répétition de `rebuild_deb.sh` (`1422b13d…`) et de `vsa_deb.py` (`2b353a7c…`) ; `policy.uri` `essai-non-figee` ; `inputAttestations` : manifeste du bundle, `sha256:856a4270…` |
+| E3 | **Tenue** | Bilan « refus attendu (3 KO …), énoncé construit mais non écrit, clé présente » ; rien n'est signé |
+| E4 | **Tenue** | `cosign.key`, `cosign.pub` et `mot-de-passe` présents (`test -s`), non lus |
+
+**Conséquence** : tout le chemin de `vsa_deb.py` a tourné dans la VM, hors réseau, sans rien écrire. Avec le résultat de `rebuild` lien coupé et après le délai, les trois conditions refusées ici doivent tenir. `vsa` n'aura plus qu'à signer.
+
