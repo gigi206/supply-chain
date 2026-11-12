@@ -2341,3 +2341,17 @@ Chaque modification sera contrôlée sur l'hôte avec les valeurs réelles, puis
 **Prédictions** A1 à D3, écrites avant tout lancement : [`resultats/s5b-predictions.md`](resultats/s5b-predictions.md).
 
 **Lancement** : après la tâche du 21/11/2026 à 16:00 UTC, sur accord nommé. Commande : `DISTRO=rke2 POUSSER_VSA=1 mise run confiance:rejeu -- s5b`. Elle détruit les VM ; le push de la VSA demande son propre accord.
+
+### Additif du 12/11/2026 (à partir de 14:04:51 UTC) : S5b avancé, décision du propriétaire « Oui, avance S5b », RIEN LANCÉ
+
+Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et replanifier la mesure G7. Réponse : « Oui, avance S5b ». La ligne « Lancement : après la tâche du 21/11/2026 à 16:00 UTC » ci-dessus est remplacée par celle-ci.
+
+- **Lancement** : à partir du 13/11/2026, après l'étape `vsa` de la brique 06 (`s6b.sh vsa`, prévue ce soir), sur accord nommé. Commande inchangée : `DISTRO=rke2 POUSSER_VSA=1 mise run confiance:rejeu -- s5b`. Le push de la VSA garde son propre accord.
+- **Pourquoi pas avant la VSA du deb** : `vm.sh` (l. 24) ne détruit que `sc-confiance`, `sc-build` et `sc-stockage`, pas `sc-replay`, et `rebuild` et `vsa` tournent hors ligne dans `sc-replay`. Un rejeu en même temps que le rebuild n'a pas été mesuré : il est écarté par prudence, pas par une mesure.
+- **Mesure G7 (07a)** : repoussée, pas perdue. La tâche planifiée `supply-chain-g7-premiere-suppression` (21/11/2026, 16:00 UTC) suppose le Zot redémarré le 06/11 à 15:14:56 UTC ; après S5b, ses chiffres et sa prédiction ne valent plus. Par calcul, sans mesure : avec S5b le 13/11, la première suppression possible tombe 336 h après le plus ancien blob de `builds/scan/**` du nouveau Zot, soit vers le 27/11.
+- **Replanification, dans cet ordre** :
+  1. au lancement de S5b, la tâche du 21/11 est désactivée ;
+  2. après S5b, relevé en lecture seule de `ActiveEnterTimestamp` de `zot.service` et de la date du plus ancien blob de `builds/scan/**` ;
+  3. prédiction réécrite et commitée avant la nouvelle date, en tenant compte de `builds/scan/sample-app-deb` si S6a l'a créé (point 8 de la carte de S6 de la 06) ;
+  4. tâche replanifiée à la date calculée, avec cette prédiction.
+- Rien n'a été lancé ni modifié dans le cluster, Zot, les VM ou les tâches planifiées.
