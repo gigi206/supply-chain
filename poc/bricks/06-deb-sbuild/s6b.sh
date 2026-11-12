@@ -61,8 +61,23 @@
 #       C4  témoin négatif : mmdebstrap, variante essential, avec signed-by sur un trousseau qui ne porte pas les clés de trixie
 #           (clés retirées du paquet, sinon un fichier vide) : doit échouer, sur la signature
 #
-# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4|sqv|installer|trousseau|chroot
-#   (journal : resultats/s6b-<étape>.log)
+#   Rejeu du deb (préparé le 12/11/2026 à partir de 10:33:26 UTC, après « Oui, prépare-les » ; modèle : R3 et R4 de la brique 10) :
+#   transporter  ACCORD NOMMÉ. SUR L'HÔTE, transport non fiable : copies anonymes (oras) du layout du deb, de son tag .att, de
+#           ses bundles horodatés et des entrées de la provenance 454728c5 (décision 1 du 12/11/2026), lues sans vérification,
+#           dans un layout OCI ; manifeste seul de l'image de build ; bundle git de toutes les références de Forgejo ; ancres
+#           de confiance de la 08 ; verifier_deb.py. Le tout copié dans /home/replay/s6b/r3, vidé d'abord.
+#   verifier  ACCORD NOMMÉ. DANS LA VM : rejeu/verifier_deb.py (bundles horodatés vérifiés hors réseau, provenance extraite,
+#           politique section 1, digests des entrées, commit, lignes clés de la recette, Go, chroot du domaine comparé à la
+#           couche de l'image de build déclarée, heures). Écrit provenance.json, recette/ et verifie.txt.
+#   repetition  ACCORD NOMMÉ. Lien ÉTABLI, non comptée : copie de rejeu/rebuild_deb.sh sans l'attente ni le refus de porteuse,
+#           lancée par systemd-run --uid=replay --wait.
+#   rebuild  ACCORD NOMMÉ. Pas avant finishedOn + 24 h (lu dans verifie.txt). rejeu/rebuild_deb.sh lancé détaché
+#           (systemd-run --uid=replay), lien de la VM coupé aussitôt (virsh domif-setlink down), compteurs relus après la
+#           coupure et avant le rétablissement (ATTENTE_HORS_LIGNE s) ; résultat lu après le rétablissement, valable seulement
+#           s'il a fini avant.
+#
+# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh <étape>
+#   étapes : releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 h06=$(cd "$(dirname "$0")" && pwd)
@@ -83,6 +98,12 @@ PACKAGES_XZ=7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498    
 SDE=1789199741                                                                  # s4a.sh : Date de l'InRelease
 CHROOT_SHA=aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086      # s4a-pipeline.log : chroot de 749d746c
 CHROOT_TAILLE=451786240
+DEB_SUJET=builds/sample-app-deb@$DEB_DIGEST
+INVOCATION=454728c5-59a8-45e1-b972-549d343aadac      # décision 1 du propriétaire du 12/11/2026 (s6b-releve.log, H1)
+URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp   # identifiant de la TSA (replay.sh de la 10)
+R08=$h06/../08-trust-plane/resultats                  # clé publique de Chains et chaîne de la TSA (comme s4d2.sh)
+VM=sc-replay
+ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}       # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 EPINGLES="mmdebstrap=1.5.7-1+deb13u1 sbuild=0.89.3+deb13u4 libsbuild-perl=0.89.3+deb13u4 uidmap=1:4.17.4-2"   # V3 du relevé
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
 SSH_DIR=$HOME/.cache/supply-chain-poc/10/ssh
@@ -461,7 +482,127 @@ EOS
   echo "listes de référence gardées sur l'hôte : ${T/#$HOME/~}/ref"
 }
 
-case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1) ;; *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot" >&2; exit 2 ;; esac
+v() { virsh -c qemu:///system "$@"; }
+
+etape_transporter() { # SUR L'HÔTE, transport non fiable (modèle : etape_transporter de la 10, R3) : la VM vérifie tout
+  local x=${T:?}/transport t n nom ref
+  rm -rf -- "${x:?}" && mkdir -p "$x/layout" && chmod 0700 "$x"
+  oc() { oras copy --from-ca-file "$CA" "$ZOT/$1" --to-oci-layout "$x/layout:$2" > /dev/null && echo "copié : $1 -> $2"; }
+  oc "$DEB_SUJET" sujet
+  oc "${DEB_SUJET%@*}:${DEB_DIGEST/:/-}.att" att
+  n=0
+  for t in $(oras repo tags --ca-file "$CA" "$ZOT/horodatage/bundles" | grep "^${DEB_DIGEST#sha256:}-"); do
+    n=$((n + 1)); oc "horodatage/bundles:$t" "bundle-${t##*-}"
+  done
+  echo "bundles horodatés du deb : $n"
+  # digests des entrées lus dans la provenance NON vérifiée de l'invocation retenue (transport seulement ; la VM vérifie)
+  for t in $(oras manifest fetch --ca-file "$CA" "$ZOT/${DEB_SUJET%@*}:${DEB_DIGEST/:/-}.att" \
+             | python3 -I -c 'import json,sys; print(" ".join(x["digest"] for x in json.load(sys.stdin)["layers"]))'); do
+    oras blob fetch --ca-file "$CA" --output - "$ZOT/${DEB_SUJET%@*}@$t" | python3 -I -c '
+import base64, json, sys
+e = json.loads(base64.b64decode(json.load(sys.stdin)["payload"]))
+if e["predicate"]["runDetails"]["metadata"].get("invocationId") != sys.argv[1]:
+    sys.exit()
+noms = {"tekton/tasks/construire-deb": "construire-deb", "tekton/tasks/preparer-deb": "preparer-deb",
+        "builds/builders/sbuild-debian13": "sbuild-debian13", "plateforme/outils-prefetch": "outils-prefetch",
+        "builds/fermetures/sample-app-deb": "fermeture-deb", "builds/fermetures/sample-app-sources": "fermeture-sources",
+        "entrees/sample-app/packaging-deb": "packaging"}
+for d in e["predicate"]["buildDefinition"]["resolvedDependencies"]:
+    u = d.get("uri", "").removeprefix("oci://").replace("sc-stockage.poc.test:5000/", "")
+    if u in noms and "sha256" in d.get("digest", {}):
+        print(noms[u], u + "@sha256:" + d["digest"]["sha256"])' "$INVOCATION" >> "$x/entrees.txt"
+  done
+  echo "entrées lues (non vérifiées) : $(wc -l < "$x/entrees.txt")"
+  while read -r nom ref; do
+    if [ "$nom" = sbuild-debian13 ]; then   # image de build : manifeste seul (le chroot est reconstruit dans le domaine)
+      oras manifest fetch --ca-file "$CA" "$ZOT/$ref" > "$x/sbuild-debian13.manifeste.json" && echo "manifeste seul : $ref"
+    else
+      oc "$ref" "$nom"
+    fi
+  done < "$x/entrees.txt"
+  rm -f "$x/entrees.txt"
+  GIT_TERMINAL_PROMPT=0 git -c http.sslCAInfo="$CA" clone -q --mirror "https://${ZOT%:*}:3000/workspace/sample-app.git" "$x/git" < /dev/null
+  git -C "$x/git" bundle create -q "$x/sample-app.bundle" --all < /dev/null && rm -rf -- "${x:?}/git"
+  echo "bundle git : $(du -h "$x/sample-app.bundle" | cut -f1) (toutes les références)"
+  cp "$R08/chains-cle-publique.pem" "$x/chains.pub"
+  cp "$R08/tsa-chaine.pem" "$x/tsa-chaine.pem"
+  cp "$h06/rejeu/verifier_deb.py" "$x/"
+  ( cd "$x" && sha256sum chains.pub tsa-chaine.pem sample-app.bundle sbuild-debian13.manifeste.json verifier_deb.py \
+      && tar -cf r3.tar layout chains.pub tsa-chaine.pem sample-app.bundle sbuild-debian13.manifeste.json verifier_deb.py )
+  echo "archive transportée : $(du -h "$x/r3.tar" | cut -f1)"
+  sur 'rm -rf -- /home/replay/s6b/r3 && mkdir -m 0700 /home/replay/s6b/r3'
+  scp -q "${SSH_OPTS[@]}" "$x/r3.tar" "replay@$VM_IP:/home/replay/s6b/r3/" < /dev/null
+  sur 'cd /home/replay/s6b/r3 && tar -xf r3.tar && rm r3.tar && du -sh /home/replay/s6b/r3 | cut -f1 | sed "s/^/taille dans la VM : /"'
+  rm -rf -- "${x:?}"
+}
+
+etape_verifier() { # DANS LA VM (verifier_deb.py, transporté ; son sha256 est journalisé)
+  sur "cd /home/replay/s6b/r3 && sha256sum verifier_deb.py && python3 -I verifier_deb.py '$DEB_SUJET' '$INVOCATION' '$URL_TSA' /home/replay/s6b/trixie-amd64.tar"
+}
+
+transporter_r4() { # rebuild_deb.sh (ou sa copie de répétition) copié dans ~/s6b/r4 de la VM, vidé d'abord
+  sur 'rm -rf -- /home/replay/s6b/r4 && mkdir -m 0700 /home/replay/s6b/r4'
+  scp -q "${SSH_OPTS[@]}" "$1" "replay@$VM_IP:/home/replay/s6b/r4/rebuild_deb.sh" < /dev/null
+  echo "rebuild_deb.sh transporté : sha256 local $(sha256sum < "$1" | cut -c1-64) ; dans la VM $(sur 'sha256sum < /home/replay/s6b/r4/rebuild_deb.sh | cut -c1-64')"
+}
+
+etape_repetition() { # lien ÉTABLI, non comptée (comme la répétition de R4) : copie sans l'attente de 20 s ni le refus de porteuse
+  local c=$T/rebuild-repetition.sh
+  sed -e '/^sleep 20 /d' -e '/non coupé"; exit 1; }$/d' "$h06/rejeu/rebuild_deb.sh" > "$c"
+  echo "## lignes retirées de rejeu/rebuild_deb.sh"; { diff "$h06/rejeu/rebuild_deb.sh" "$c" || true; } | sed -n 's/^< /  /p'
+  [ "$(diff "$h06/rejeu/rebuild_deb.sh" "$c" | grep -c '^[<>]')" = 2 ] || { echo "REFUS : copie inattendue"; exit 1; }
+  transporter_r4 "$c"; rm -f -- "${c:?}"
+  sur 'sudo systemd-run --unit=s6b-repetition --collect --wait --property=Type=exec --uid=replay --gid=replay /bin/bash /home/replay/s6b/r4/rebuild_deb.sh' 2>&1 | tail -4 || true
+  echo "## résultat (écrit dans la VM)"; sur 'cat /home/replay/s6b/r4/resultat.txt'
+  echo "## journal (fin)"; sur 'tail -25 /home/replay/s6b/r4/rebuild.log'
+}
+
+etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas avant finishedOn + 24 h (vsa.py)
+  local iface s0 s1 s2 e1 e2 coupe retabli fin fo
+  fo=$(sur "sed -n 's/^finishedOn=//p' /home/replay/s6b/r3/verifie.txt")
+  [ -n "$fo" ] || { echo "REFUS : finishedOn absent de verifie.txt (étape verifier)"; exit 1; }
+  if [ "$(date -u +%s)" -lt $(( $(date -u -d "$fo" +%s) + 86400 )) ]; then
+    echo "REFUS : moins de 24 h depuis la fin du build ($fo, provenance vérifiée)"; exit 1
+  fi
+  echo "## délai : $(( ($(date -u +%s) - $(date -u -d "$fo" +%s)) / 60 )) min depuis la fin du build ($fo)"
+  transporter_r4 "$h06/rejeu/rebuild_deb.sh"
+  iface=$(v domiflist "$VM" | awk '$3 == "supply-chain-replay" {print $1}')
+  [ -n "$iface" ] || { echo "REFUS : interface de $VM sur supply-chain-replay introuvable"; exit 1; }
+  echo "## interface de $VM côté hôte : $iface"
+  st() { v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}'; }
+  sortie() { v domifstat "$VM" "$iface" | awk '$2 ~ /^tx_(bytes|packets)$/ {printf "%s=%s ", $2, $3}'; }
+  s0=$(st)
+  sur 'sudo systemd-run --unit=s6b-rebuild --collect --property=Type=exec --uid=replay --gid=replay /bin/bash /home/replay/s6b/r4/rebuild_deb.sh' 2>&1 | tail -1
+  # shellcheck disable=SC2064   # développement à la pose, voulu (la VM ne reste jamais coupée sans surveillance)
+  trap "v domif-setlink '$VM' '$iface' up > /dev/null 2>&1 || true" EXIT
+  v domif-setlink "$VM" "$iface" down > /dev/null
+  coupe=$(date -u +%FT%TZ)
+  s1=$(st); e1=$(sortie)
+  echo "lien coupé à $coupe ($(v domif-getlink "$VM" "$iface" | awk '{print $NF}'))"
+  echo "compteurs avant le lancement : $s0"
+  echo "compteurs juste après la coupure : $s1"
+  sleep "$ATTENTE_HORS_LIGNE"
+  s2=$(st); e2=$(sortie)
+  echo "compteurs juste avant le rétablissement ($ATTENTE_HORS_LIGNE s plus tard) : $s2"
+  [ "$e1" = "$e2" ] && echo "OK   sortie de la VM inchangée pendant la coupure ($e2)" || echo "KO   la VM a émis pendant la coupure : $e1 -> $e2"
+  v domif-setlink "$VM" "$iface" up > /dev/null
+  retabli=$(date -u +%FT%TZ)
+  echo "lien rétabli à $retabli"
+  for _ in $(seq 60); do sur true 2> /dev/null && break; sleep 2; done
+  echo "## sortie de rebuild_deb.sh : $(sur "sed -n 's/^sortie=//p' /home/replay/s6b/r4/resultat.txt" || true)"
+  echo "## résultat (écrit dans la VM)"
+  sur 'cat /home/replay/s6b/r4/resultat.txt'
+  fin=$(sur "sed -n 's/^fin=//p' /home/replay/s6b/r4/resultat.txt")
+  if [ -n "$fin" ] && [ "$(date -u -d "$fin" +%s)" -lt "$(date -u -d "$retabli" +%s)" ]; then
+    echo "OK   rebuild terminé ($fin) avant le rétablissement du lien ($retabli)"
+  else
+    echo "KO   rebuild non terminé avant le rétablissement du lien ($retabli) : résultat non valable hors ligne"
+  fi
+  echo "## journal (fin)"; sur 'tail -25 /home/replay/s6b/r4/rebuild.log'
+}
+
+case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1) ;;
+  *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild" >&2; exit 2 ;; esac
 chrono "S6b $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
 chrono "S6b $1 fait"

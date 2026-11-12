@@ -1858,3 +1858,17 @@ Lancés sur ton accord « Oui, lance les deux » ([résultats](resultats/s6b-chr
 
 **Suite du contrôle 6** (à préparer à sec) : transporter la fermeture deb `bb7599a2` (216 Mio), les sources et le packaging dans `sc-replay` ; lancer sbuild lien coupé ; comparer le deb à `0b489d43`.
 
+## Additif du 12/11/2026, 10:35 UTC : transport, vérification et reconstruction du deb dans `sc-replay`, préparés à sec, rien lancé
+
+Préparés après « Oui, prépare-les », sur le modèle de R3 et R4 de la brique 10 ([prédictions](resultats/s6b-rejeu-predictions.md)). Il y a quatre étapes nouvelles de [`s6b.sh`](s6b.sh) et deux outils de la VM, sous [`rejeu/`](rejeu/). Chaque étape attend ton accord nommé.
+
+1. **`transporter`** (hôte, transport non fiable) copie le layout du deb, ses bundles horodatés et les entrées de la provenance `454728c5`, le manifeste seul de l'image de build, un bundle git et les ancres de la 08.
+2. **`verifier`** (VM) vérifie les bundles horodatés hors réseau, puis la provenance, les digests, le commit, 15 lignes clés des recettes signées et la version de Go. Il **rattache le chroot du domaine à la couche de l'image de build `749d746c`**.
+3. **`repetition`** reconstruit lien établi, sans être comptée.
+4. **`rebuild`** reconstruit **lien coupé**. Elle n'est pas possible avant le 12/11/2026 à 21:03:37 UTC (24 h après `finishedOn`). Critère : manifeste reconstruit = `039949f9`.
+
+**Contrôles faits sur l'hôte**, hors réseau :
+- la lecture des entrées sur les provenances du relevé H1 ;
+- les lignes clés sur les tâches signées ;
+- le rangement du chroot sur la copie de la plateforme, qui redonne la couche `1029232e…`. Ce dernier contrôle a trouvé un défaut, corrigé avant tout lancement : les modes des répertoires dépendaient de l'umask.
+
