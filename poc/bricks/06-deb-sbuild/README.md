@@ -1777,3 +1777,20 @@ L'additif précédent est de 09:42:08 UTC (commit `844bf9e`), et non de 09:41 : 
 
 **Reste avant la reconstruction** : préparer à sec l'installation dans `sc-replay` (les quatre versions épinglées, sans recommandés) et le témoin `sqv`. L'installation attend un accord nommé.
 
+## Additif du 12/11/2026, 09:52 UTC : témoin `sqv` et installation dans `sc-replay`, préparés à sec, rien lancé
+
+Préparés après « Oui, prépare-les » : deux étapes nouvelles de [`s6b.sh`](s6b.sh), avec leurs [prédictions](resultats/s6b-installation-predictions.md). Chacune attend ton accord nommé.
+
+- **`sqv`** : le témoin de signature que V4c n'a pas pu faire.
+  - Il tourne dans la VM seule, sans sudo, et n'installe rien.
+  - `sqv`, le vérificateur qu'apt utilise dans la VM, contrôle l'InRelease de l'instantané avec le trousseau de la VM, en exigeant un puis trois signataires. Le message extrait doit porter le sha256 de Packages.xz contrôlé en S1.
+  - Une copie altérée doit être refusée. Sur l'hôte, `gpgv` refuse la même altération.
+- **`installer`** : l'installation système.
+  - mmdebstrap, sbuild, libsbuild-perl et uidmap, aux versions épinglées, sans recommandés, et sans `apt-get update`.
+  - Les quatre `.deb` sont d'abord seulement téléchargés. Leurs sha256 sont comparés à `builder/paquets.txt` **avant toute installation** ; un écart arrête tout.
+  - Puis l'installation depuis le cache, et un bilan : versions, paquets nouveaux (44 prédits), services actifs, cache vidé.
+
+Commandes, dans cet ordre :
+- `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh sqv`
+- `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh installer`
+

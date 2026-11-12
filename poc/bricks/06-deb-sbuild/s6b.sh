@@ -25,8 +25,25 @@
 #           sha256 comparé à celui de S1
 #       V4c signature de cet InRelease vérifiée par gpgv avec le trousseau debian-archive-keyring de la VM, indépendant de la
 #           plateforme et des clés de ftp-master lues par S1 ; signataires (clés primaires) comparés à ceux de S1
+#   sqv     ACCORD NOMMÉ DU PROPRIÉTAIRE (ajoutée le 12/11/2026, écrite avant 09:51:20 UTC, après « Oui, prépare-les »). Témoin de signature de
+#           l'InRelease avec sqv, le vérificateur qu'apt utilise dans la VM, et le trousseau de la VM. VM seule, sans sudo, rien
+#           d'installé ; seule écriture, un dossier temporaire supprimé à la fin. Syntaxe tirée de sqv(1) de trixie
+#           (--cleartext, --output obligatoire, -n : nombre de certificats distincts exigés) ; sqv --help est journalisé.
+#       S1  InRelease lu comme en V4b, sha256 comparé à celui de S1
+#       S2  sqv -n 1, puis -n 3 (les trois signataires de S1) : codes de sortie ; message extrait : sa ligne Packages.xz
+#           porte le sha256 contrôlé en S1
+#       S3  témoin négatif : une copie dont un chiffre de la ligne Date: est changé doit être refusée (code non nul)
+#   installer  ACCORD NOMMÉ DU PROPRIÉTAIRE (installation système dans sc-replay). Décision du 12/11/2026, 08:50:32 UTC, point 3 :
+#           mmdebstrap, sbuild, libsbuild-perl et uidmap par apt, versions épinglées, sans recommandés. Pas d'apt-get update : les
+#           listes sont celles du relevé de 09:23:13 UTC, où les candidats sont égaux à l'instantané.
+#       I1  apt-get clean, puis téléchargement seul (--download-only) des quatre paquets épinglés et de leurs dépendances
+#       I2  sha256 des quatre .deb téléchargés comparés à builder/paquets.txt (liste de la plateforme, lue sur l'hôte) AVANT
+#           toute installation ; un écart arrête tout et vide le cache
+#       I3  installation depuis le cache (rien de plus à télécharger) ; avertissements et erreurs d'apt
+#       I4  versions installées égales aux épinglées ; paquets nouveaux (nom et version) ; nombre de paquets avant et après ;
+#           services actifs avant et après ; mmdebstrap --version, sbuild --version, newuidmap et newgidmap ; cache vidé
 #
-# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4   (journal : resultats/s6b-<étape>.log)
+# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4|sqv|installer   (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 h06=$(cd "$(dirname "$0")" && pwd)
@@ -43,6 +60,8 @@ entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812
 INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z            # s4a.sh, s4b.sh
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675       # s1-prealables.log : signataires vérifiés
 CLES="B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4"  # s1.sh
+PACKAGES_XZ=7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498     # s1-prealables.log : Packages.xz contrôlé par InRelease
+EPINGLES="mmdebstrap=1.5.7-1+deb13u1 sbuild=0.89.3+deb13u4 libsbuild-perl=0.89.3+deb13u4 uidmap=1:4.17.4-2"   # V3 du relevé
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
 SSH_DIR=$HOME/.cache/supply-chain-poc/10/ssh
 # IdentitiesOnly : seule la clé du domaine est proposée (premier passage du 12/11/2026, 09:16 UTC : « Too many authentication
@@ -176,7 +195,100 @@ fi
 EOS
 }
 
-case "${1:-}:$#" in releve:1|v4:1) ;; *) echo "usage : $0 releve|v4" >&2; exit 2 ;; esac
+etape_sqv() {
+  echo "## S1 à S3 : signature de l'InRelease par sqv, trousseau de sc-replay (sans sudo, rien d'installé)"
+  sur bash -s "$INSTANTANE" "$INRELEASE" "$PACKAGES_XZ" <<'EOS'
+set -euo pipefail
+export LC_ALL=C
+d=$(mktemp -d); trap 'rm -rf -- "$d"' EXIT
+k=/usr/share/keyrings/debian-archive-keyring.pgp
+echo "$(sqv --version 2>&1) ; trousseau $k : sha256 $(sha256sum < "$k" | cut -c1-64)"
+echo "--- sqv --help"; sqv --help 2>&1 | sed 's/^/  /'; echo "---"
+echo "## S1 : InRelease"
+curl -fsSL --proto-redir =http,https --max-redirs 5 --max-time 60 -o "$d/InRelease" "$1/dists/trixie/InRelease"
+s=$(sha256sum < "$d/InRelease" | cut -c1-64)
+[ "$s" = "$2" ] && echo "OK   sha256 identique à celui de S1" || { echo "KO   sha256 $s (attendu : $2)"; exit 1; }
+echo "## S2 : sqv --cleartext"
+for n in 1 3; do
+  r=0; sqv --keyring "$k" --cleartext -n "$n" --output "$d/message-$n" "$d/InRelease" > "$d/sortie-$n" 2>&1 || r=$?
+  echo "sqv -n $n : code $r ; sortie :"; sed 's/^/  /' "$d/sortie-$n"
+done
+if [ -s "$d/message-3" ]; then
+  echo "message extrait (-n 3) : $(wc -l < "$d/message-3") lignes, $(grep -c '^-----BEGIN PGP' "$d/message-3" || true) ligne(s) BEGIN PGP"
+  l=$(awk '/^SHA256:/ {f = 1; next} /^[A-Z]/ {f = 0} f && $3 == "main/binary-amd64/Packages.xz" {print $1}' "$d/message-3")
+  [ "$l" = "$3" ] && echo "OK   Packages.xz du message extrait : sha256 de S1" || echo "KO   Packages.xz du message extrait : ${l:-absent} (attendu : $3)"
+else
+  echo "message extrait (-n 3) : absent ou vide"
+fi
+echo "## S3 : témoin négatif (un chiffre de la ligne Date: changé)"
+sed '0,/^Date: /s/^\(Date: [A-Za-z]*, \)1/\12/' "$d/InRelease" > "$d/InRelease.altere"
+echo "lignes différentes : $(diff "$d/InRelease" "$d/InRelease.altere" | grep -c '^>' || true) ; $(grep -m1 '^Date:' "$d/InRelease.altere")"
+r=0; sqv --keyring "$k" --cleartext -n 1 --output "$d/message-altere" "$d/InRelease.altere" > "$d/sortie-altere" 2>&1 || r=$?
+echo "sqv -n 1 sur la copie altérée : code $r ; sortie :"; sed 's/^/  /' "$d/sortie-altere"
+[ $r != 0 ] && echo "OK   copie altérée refusée" || echo "KO   copie altérée ACCEPTÉE"
+EOS
+}
+
+etape_installer() {
+  local a p v
+  a=""
+  for p in $EPINGLES; do   # sha256 attendus, tirés de la liste de la plateforme
+    v=$(awk -v n="${p%%=*}" -v v="${p#*=}" '$1 == n && $2 == v {print $4}' "$h06/builder/paquets.txt")
+    [ ${#v} = 64 ] || { echo "KO   ${p%%=*} ${p#*=} absent de builder/paquets.txt" >&2; exit 1; }
+    a="$a${a:+,}$p=$v"
+  done
+  echo "## I1 à I4 : installation dans sc-replay, versions épinglées, sans recommandés"
+  echo "attendus (builder/paquets.txt) : ${a//,/ ; }"
+  sur sudo bash -s "${EPINGLES// /,}" "$a" <<'EOS'
+set -euo pipefail
+export LC_ALL=C DEBIAN_FRONTEND=noninteractive
+d=$(mktemp -d); trap 'rm -rf -- "$d"' EXIT
+IFS=, read -ra epingles <<< "$1"; IFS=, read -ra attendus <<< "$2"
+dpkg-query -W -f='${db:Status-Abbrev} ${Package} ${Version}\n' | awk '$1 == "ii" {print $2, $3}' | sort > "$d/avant"
+systemctl list-units --type=service --state=running --no-legend --plain | awk '{print $1}' | sort > "$d/services-avant"
+echo "avant : $(wc -l < "$d/avant") paquets installés, $(wc -l < "$d/services-avant") services actifs"
+echo "## I1 : téléchargement seul"
+apt-get clean
+r=0; apt-get install --download-only --no-install-recommends -y "${epingles[@]}" > "$d/apt-dl" 2>&1 || r=$?
+grep -E '^(Need to get|[0-9]+ upgraded|W:|E:)' "$d/apt-dl" || true
+[ $r = 0 ] || { echo "KO   téléchargement : code $r"; tail -5 "$d/apt-dl"; apt-get clean; exit 1; }
+echo "$(ls /var/cache/apt/archives/*.deb | wc -l) .deb dans le cache"
+echo "## I2 : sha256 des quatre .deb épinglés, comparés à builder/paquets.txt, avant installation"
+ko=0
+for x in "${attendus[@]}"; do
+  n=${x%%=*}; r=${x#*=}; v=${r%=*}; h=${r##*=}; t=""
+  for f in /var/cache/apt/archives/*.deb; do
+    [ "$(dpkg-deb -f "$f" Package)" = "$n" ] && [ "$(dpkg-deb -f "$f" Version)" = "$v" ] && t="$t $f"
+  done
+  set -- $t
+  if [ $# != 1 ]; then echo "KO   $n $v : $# fichier(s) dans le cache"; ko=1; continue; fi
+  s=$(sha256sum < "$1" | cut -c1-64)
+  [ "$s" = "$h" ] && echo "OK   $n $v : sha256 $s" || { echo "KO   $n $v : sha256 $s (attendu : $h)"; ko=1; }
+done
+[ $ko = 0 ] || { echo "KO   écart : rien d'installé, cache vidé"; apt-get clean; exit 1; }
+echo "## I3 : installation depuis le cache"
+r=0; apt-get install --no-install-recommends -y "${epingles[@]}" > "$d/apt-in" 2>&1 || r=$?
+grep -E '^(Need to get|[0-9]+ upgraded|W:|E:)' "$d/apt-in" || true
+[ $r = 0 ] || { echo "KO   installation : code $r"; tail -5 "$d/apt-in"; exit 1; }
+echo "## I4 : état après"
+for x in "${epingles[@]}"; do
+  n=${x%%=*}; v=${x#*=}; s=$(dpkg-query -W -f='${db:Status-Abbrev}${Version}' "$n" 2>/dev/null || true)
+  [ "$s" = "ii $v" ] && echo "OK   $n $v installé" || echo "KO   $n : ${s:-inconnu} (attendu : ii $v)"
+done
+dpkg-query -W -f='${db:Status-Abbrev} ${Package} ${Version}\n' | awk '$1 == "ii" {print $2, $3}' | sort > "$d/apres"
+systemctl list-units --type=service --state=running --no-legend --plain | awk '{print $1}' | sort > "$d/services-apres"
+echo "après : $(wc -l < "$d/apres") paquets installés ; nouveaux : $(comm -13 "$d/avant" "$d/apres" | wc -l) ; disparus ou changés : $(comm -23 "$d/avant" "$d/apres" | wc -l)"
+comm -13 "$d/avant" "$d/apres" | sed 's/^/  + /'
+comm -23 "$d/avant" "$d/apres" | sed 's/^/  - /'
+echo "services actifs après : $(wc -l < "$d/services-apres") ; nouveaux : $(comm -13 "$d/services-avant" "$d/services-apres" | paste -sd' ')"
+echo "$(mmdebstrap --version 2>&1 | head -1) ; $(sbuild --version 2>&1 | head -1)"
+ls -l /usr/bin/newuidmap /usr/bin/newgidmap
+apt-get clean
+echo "cache vidé : $(ls /var/cache/apt/archives/*.deb 2>/dev/null | wc -l) .deb"
+EOS
+}
+
+case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1) ;; *) echo "usage : $0 releve|v4|sqv|installer" >&2; exit 2 ;; esac
 chrono "S6b $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
 chrono "S6b $1 fait"
