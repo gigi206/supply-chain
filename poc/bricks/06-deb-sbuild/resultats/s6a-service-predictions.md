@@ -98,3 +98,32 @@ Relecture du conseiller, sur trois points que `bash -n` ne voit pas :
   L'attente `/1` sans `pousser_vsa`, et `1/` avec, est donc conservée.
 
 Le script corrigé demande le même accord nommé que la version précédente, aucune n'ayant tourné.
+
+## Additif du 12/11/2026 (à partir de 13:04:25 UTC, après « continue ») : étape `grafana`, NON LANCÉE
+
+La limite « Journaux du job du deb dans Grafana » ci-dessus est levée à sec par une quatrième étape de [`s6a.sh`](../s6a.sh), sur le même accord nommé que les trois autres. Elle suit l'exigence d'audit du propriétaire du 02/11/2026 : tout doit être consultable dans Grafana.
+
+**Ce qu'elle fait.** Elle ne fait que lire, en auditeur, à travers Grafana, avec `grafana_lignes` de la 07a reprise telle quelle :
+- les journaux des pods `s6a-manuel-*` dans l'espace `scan`, depuis le début de `periodique` ;
+- la signature `transit/sign/scanner` dans l'audit d'OpenBao, et le poussage de `poc-scan` dans `builds/scan/sample-app-deb` dans l'audit de Zot ;
+- le journal de `fraicheur-scan.service` sur `sc-stockage`, depuis le début de `fraicheur`.
+
+Les lignes du job sont affichées sans celles qui contiennent `jeton` ou `token`. Les lignes d'audit sont comptées, jamais affichées. Les réponses de Grafana restent dans `~/.cache/supply-chain-poc/06/s6a/grafana` et sont effacées en fin d'étape, même en cas d'échec : aucune n'est archivée.
+
+**Préalables.**
+- `periodique` et `fraicheur` doivent finir sur `bilan : tout OK`.
+- Aucun passage planifié de `scan-sample-app` ni de `scan-sample-app-deb` ne doit avoir eu lieu depuis le début de `periodique`. Sinon, l'étape refuse : sa signature et son poussage se mêleraient à ceux de `s6a-manuel`.
+- L'étape se lance donc juste après `fraicheur`, avant 09:30 UTC le lendemain. Elle s'insère entre les points 4 et 5 de l'ordre ci-dessus :
+
+  `mise exec -- poc/bricks/06-deb-sbuild/s6a.sh grafana`
+
+| # | Étape | Prédiction | Confiance |
+|---|---|---|---|
+| Q10 | `grafana` | Visibles dans Grafana : `SOURCE|`, `BASE|`, `DEB|` avec le sha256 `0b489d43…`, `ARTEFACT|deb`, `SCAN|`, `ATTESTATION|`, `PUBLIE|`, et la révocation du jeton du scanner. La ligne `PUBLIE|` est égale à celle du journal de `periodique`. Au moins une ligne d'audit d'OpenBao pour la signature. Un poussage de manifeste par `poc-scan` dans l'audit de Zot. Une ligne `scan builds/scan/sample-app=… builds/scan/sample-app-deb=…, base …` du journal de `fraicheur-scan`. Ni le mot de passe de `poc-scan` ni son encodage docker dans les réponses. Toutes les requêtes en HTTP 200 | Haute : mêmes requêtes que `g7_grafana` et `g8_grafana` de la 07a, qui ont passé ; seuls le nom du pod, le dépôt et le motif de la fraîcheur changent |
+
+**Contrôles à sec faits.**
+- `bash -n` de `s6a.sh`.
+- Hors réseau, sur une réponse simulée de Grafana : extraction des lignes par le filtre `jq` de `grafana_lignes`, motif de la ligne de fraîcheur, ligne `PUBLIE|`, et date tirée de l'en-tête du journal.
+- Aucun appel à Grafana, ni au cluster.
+
+**Limite.** Le contrôle des identifiants de `poc-scan` dans les réponses est fait sans tube. Sous `pipefail`, `cat … | grep -q` peut rendre faux quand `grep` trouve, à cause du SIGPIPE de `cat`. Le contrôle aurait alors conclu à l'absence d'une fuite présente. `g7_grafana` (07a) utilise ce tube : c'est consigné ici, sans correction, puisque la 07a est rejouée par S5b telle quelle.

@@ -27,8 +27,13 @@
 #               (fraicheur-scan.service.d/s6a-deb.conf, SCANS), unité de la 07a inchangée ; séries comparées à Zot et à Prometheus.
 #   porte       cluster (DISTRO=rke2) : Job de la porte sur le deb, juger de politique.sh (08) comme l'étape porte de s4d3.sh ;
 #               scan attendu ok ; VSA attendue ok seulement si builds/vsa/sample-app-deb porte un referrer du deb (pousser_vsa).
+# Ajouté à sec le 12/11/2026, à partir de 13:04:25 UTC (après « continue »), NON LANCÉ, même cadre et même accord nommé :
+#   grafana     lectures seules, par l'auditeur à travers Grafana (comme g7_grafana et g8_grafana de la 07a), après periodique et
+#               fraicheur réussis et avant tout passage planifié : journaux du job s6a-manuel, signature dans l'audit d'OpenBao,
+#               poussage dans l'audit de Zot, journal de fraicheur-scan avec les deux dépôts ; identifiants de poc-scan absents des
+#               réponses. Rien n'est écrit hors du journal de l'étape ; les réponses de Grafana sont effacées en fin d'étape.
 #
-# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6a.sh releve|essai|periodique|fraicheur|porte
+# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6a.sh releve|essai|periodique|fraicheur|porte|grafana
 #   (porte : DISTRO=rke2 devant ; journal : resultats/s6a-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -455,9 +460,73 @@ etape_porte() ( # ACCORD NOMMÉ, DISTRO=rke2, après periodique (et pousser_vsa 
   ecarts
 )
 
+# Lecture par l'auditeur à travers Grafana : grafana_lignes de la 07a, reprise telle quelle (elle lit $S8 et $P, et pose ko=1 sur un
+# HTTP autre que 200)
+eval "$(sed -n '/^grafana_lignes() {/,/^}/p' "$P07/plateforme.sh")"
+
+etape_grafana() { # ACCORD NOMMÉ, après periodique et fraicheur : lectures seules (comme g7_grafana et g8_grafana de la 07a)
+  local de df c l m i ko=0 P=$O8/pki S8=$O8/secrets
+  T=$HOME/.cache/supply-chain-poc/06/s6a/grafana
+  rm -rf -- "${T:?}" && (umask 077 && mkdir -p "$T")
+  trap 'rm -rf -- "$HOME/.cache/supply-chain-poc/06/s6a/grafana"' EXIT   # réponses et motifs supprimés même en cas d'échec
+  echo "## préalables"
+  for c in periodique fraicheur; do
+    grep -q '^bilan : tout OK$' "$R/s6a-$c.log" 2>/dev/null || { echo "KO   étape $c non réussie (resultats/s6a-$c.log)" >&2; exit 1; }
+  done
+  de=$(date -ud "$(sed -n '1s/.*, //p' "$R/s6a-periodique.log")" +%s)
+  df=$(date -ud "$(sed -n '1s/.*, //p' "$R/s6a-fraicheur.log")" +%s)
+  echo "periodique à partir de $(date -ud "@$de" +%FT%TZ), fraicheur à partir de $(date -ud "@$df" +%FT%TZ)"
+  # Un passage planifié depuis periodique ajouterait sa signature et son poussage aux lectures d'OpenBao et de Zot : refus.
+  for c in scan-sample-app "$CRON_DEB"; do
+    l=$(kubectl get cronjob -n scan "$c" -o jsonpath='{.status.lastScheduleTime}' </dev/null)
+    { [ -z "$l" ] || [ "$(date -ud "$l" +%s)" -lt "$de" ]; } \
+      || { echo "KO   passage planifié de $c à $l, après periodique : lectures d'OpenBao et de Zot non rattachables au seul $JOB_DEB" >&2; exit 1; }
+  done
+  echo "OK   aucun passage planifié depuis periodique (scan-sample-app, $CRON_DEB)"
+
+  echo "## journaux du passage $JOB_DEB, lus par l'auditeur (Loki ingère avec quelques secondes de retard)"
+  for i in $(seq 30); do
+    grafana_lignes "{espace=\"scan\", pod=~\"$JOB_DEB-.*\"}" "$de" "$T/job.json" "$T/job.txt"
+    grep -q '^PUBLIE|' "$T/job.txt" && grep -q 'jeton du rôle scanner révoqué' "$T/job.txt" && break
+    sleep 2
+  done
+  echo "$(wc -l < "$T/job.txt") ligne(s) après $i essai(s) ; $(grep -ciE 'jeton|token' "$T/job.txt" || true) filtrée(s) à l'affichage (jeton|token)"
+  grep -viE 'jeton|token' "$T/job.txt" | sed 's/^/  /' || true
+  for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
+    'jeton du rôle scanner révoqué'; do
+    mesure "visible dans Grafana : ${m%%, sha256*}" "$(grep -q -- "$m" "$T/job.txt" && echo oui || echo non)" oui
+  done
+  mesure "PUBLIE dans Grafana égal au journal de periodique" "$(sed -n 's/^PUBLIE|//p' "$T/job.txt")" \
+    "$(sed -n 's/^  PUBLIE|//p' "$R/s6a-periodique.log")"
+
+  echo "## audit d'OpenBao et de Zot, lus par l'auditeur"
+  grafana_lignes '{espace="openbao"} |= "transit/sign/scanner"' "$de" "$T/bao.json" "$T/bao.txt"
+  mesure "signature du scanner dans l'audit d'OpenBao, visible dans Grafana" "$([ -s "$T/bao.txt" ] && echo oui || echo non)" oui
+  echo "  $(wc -l < "$T/bao.txt") ligne(s) d'audit (non affichées)"
+  grafana_lignes "{noeud=\"sc-stockage\", source=\"audit-zot\"} |= \"$DEPOT_SCAN_DEB\" |= \"poc-scan\"" "$de" "$T/zot.json" "$T/zot.txt"
+  mesure "poussage par poc-scan dans $DEPOT_SCAN_DEB, visible dans Grafana" "$(grep -q 'manifests' "$T/zot.txt" && echo oui || echo non)" oui
+
+  echo "## journal de fraicheur-scan, lu par l'auditeur"
+  for i in $(seq 30); do
+    grafana_lignes '{noeud="sc-stockage", source="journal", unite="fraicheur-scan.service"}' "$df" "$T/f.json" "$T/f.txt"
+    grep -q '^scan builds/scan/sample-app=[0-9]* builds/scan/sample-app-deb=[0-9]*, base [0-9]*$' "$T/f.txt" && break
+    sleep 2
+  done
+  sed 's/^/  /' "$T/f.txt"
+  mesure "mesures des deux dépôts visibles dans Grafana" \
+    "$(grep -q '^scan builds/scan/sample-app=[0-9]* builds/scan/sample-app-deb=[0-9]*, base [0-9]*$' "$T/f.txt" && echo oui || echo non)" oui
+
+  echo "## identifiants de poc-scan absents des réponses"
+  { cat "$S8/zot-poc-scan.password"; echo; printf 'poc-scan:%s' "$(cat "$S8/zot-poc-scan.password")" | base64 -w0; echo; } > "$T/motifs"
+  mesure "mot de passe de poc-scan ou son encodage docker dans les réponses de Grafana" \
+    "$(grep -q -F -f "$T/motifs" "$T"/*.json && echo oui || echo non)" non   # sans tube : sous pipefail, un SIGPIPE de cat donnerait « non »
+  mesure "requêtes de l'auditeur en HTTP 200" "$([ "$ko" = 0 ] && echo oui || echo non)" oui
+  ecarts
+}
+
 case "${1:-}:$#" in
-  releve:1|essai:1|periodique:1|fraicheur:1|porte:1) ;;
-  *) echo "usage : $0 releve|essai|periodique|fraicheur|porte" >&2; exit 2 ;;
+  releve:1|essai:1|periodique:1|fraicheur:1|porte:1|grafana:1) ;;
+  *) echo "usage : $0 releve|essai|periodique|fraicheur|porte|grafana" >&2; exit 2 ;;
 esac
 chrono "S6a $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6a-$1.log"

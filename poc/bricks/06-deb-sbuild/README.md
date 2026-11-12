@@ -1962,3 +1962,5 @@ Prédictions : [`resultats/s6b-pousser-predictions.md`](resultats/s6b-pousser-pr
   - `porte` lance la porte sur le deb, avec un scan `ok` attendu.
 
 Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédictions et limites : [`resultats/s6a-service-predictions.md`](resultats/s6a-service-predictions.md). La principale limite est que `rejeu.sh` n'intègre pas S6.
+
+**Additif du 12/11/2026 (à partir de 13:04:25 UTC, après « continue ») : lecture du contrôle 7 du deb dans Grafana préparée à sec, rien lancé.** Une quatrième étape de [`s6a.sh`](s6a.sh), `grafana`, lit en auditeur, à travers Grafana, ce que `periodique` et `fraicheur` ont produit : les journaux du job, la signature dans l'audit d'OpenBao, le poussage dans l'audit de Zot et le journal de `fraicheur-scan` avec les deux dépôts. Elle ne fait que lire, et vient juste après `fraicheur`, avant tout passage planifié. Prédiction : Q10 de [`resultats/s6a-service-predictions.md`](resultats/s6a-service-predictions.md).
