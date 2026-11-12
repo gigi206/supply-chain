@@ -6,6 +6,8 @@
 # (et comparé au dépôt) au lieu d'être écrit en dur ; dossier absent ou find en échec signalés par un KO, au lieu d'un arrêt muet.
 # Corrigé à sec le 12/11/2026 à partir de 15:52:35 UTC, NON LANCÉ, avant tout accord : zot.service doit être actif, et un
 # ActiveEnterTimestamp vide est refusé (date -u -d '' rend minuit du jour avec le code 0, donc un calcul faux sans message).
+# Corrigé à sec le 12/11/2026 à partir de 16:13:25 UTC, NON LANCÉ, avant tout accord : une première suppression possible au plus tard
+# au démarrage de Zot (k ≤ 0) est refusée ; un balayage au démarrage n'a jamais été mesuré, le calcul rendait un balayage passé.
 #   releve   sc-stockage, lecture seule (ssh, sudo pour lire le rootDirectory de Zot) : démarrage de zot.service, configuration de rétention et de
 #            gc lue sur la VM et comparée au dépôt ; par dépôt de builds/scan/** et pour vulndb/grype : nombre de blobs, plus ancien et
 #            plus récent (date de modification) ; calcul, sans mesure, de la première suppression possible (plus ancien blob de
@@ -76,6 +78,7 @@ PY
   s=$(cat "$T/demarrage.s")
   echo "première suppression possible : $(date -u -d "@$((o + $(duree_s "$d")))" +%Y-%m-%dT%H:%M:%SZ) (plus ancien blob + $d)"
   k=$(( (o + $(duree_s "$d") - s + $(duree_s "$g") - 1) / $(duree_s "$g") ))
+  [ $((o + $(duree_s "$d"))) -gt "$s" ] || { echo "KO   première suppression possible ($(date -u -d "@$((o + $(duree_s "$d")))" +%Y-%m-%dT%H:%M:%SZ)) au plus tard au démarrage de Zot ($(date -u -d "@$s" +%Y-%m-%dT%H:%M:%SZ)) : un balayage au démarrage n'est pas mesuré, rien à calculer" >&2; exit 1; }
   b=$(( s + k * $(duree_s "$g") ))
   echo "premier balayage qui la suit : $(date -u -d "@$b" +%Y-%m-%dT%H:%M:%SZ) (démarrage + $k × $g)"
   echo "heure proposée pour la tâche : $(date -u -d "@$((b + MARGE_S))" +%Y-%m-%dT%H:%M:%SZ) (balayage + $((MARGE_S / 60)) min)"
