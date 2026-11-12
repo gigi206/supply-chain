@@ -1709,3 +1709,13 @@ Le second passage, lancé à 09:19:10 UTC sur ton accord « Oui, relance-le », 
 
 Le relevé 1 de S6b, partie VM, attend toujours ton accord.
 
+## Additif du 12/11/2026, 09:23 UTC : relevé 1 de S6b tenu, sauf V4
+
+Le second passage a tourné de 09:23:13 à 09:23:15 UTC, sur ton accord « Oui, lance S6b », en code 0 ([résultats](resultats/s6b-predictions.md)).
+
+- Dans `sc-replay` : 13 Go libres et 5,4 Go de mémoire disponibles. Les espaces de noms sans privilège et les subuid de `replay` sont en place. Rien n'est installé.
+- Les candidats apt de mmdebstrap, sbuild et uidmap sont exactement les versions de l'instantané. Sans recommandés, apt ajouterait 44 paquets (prédit : au plus 40), pour 55 Mo.
+- V4 n'est pas jugée : l'instantané répond par une redirection 302, que mon script n'a pas suivie.
+
+**Questions ouvertes**, avant l'installation dans `sc-replay` : la provenance à retenir parmi les quatre, la source des paquets du chroot, et V4 à remesurer.
+

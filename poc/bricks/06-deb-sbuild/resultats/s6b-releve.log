@@ -1,0 +1,124 @@
+# s6b.sh releve, 2026-11-12T09:23:13Z
+## H1 : provenances du deb (tag .att, lecture anonyme, signatures NON vérifiées ici)
+OK   digest du manifeste lu : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+couche 4e3c3ed012ab : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId d6970f74-15f3-4414-a66b-03a134913601 ; startedOn 2026-11-11T19:48:41Z ; finishedOn 2026-11-11T19:48:48Z ; 2 entrées résolues
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+couche 4382ba49cc7d : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId b9d4881e-af56-4950-ac1a-9e85e774ead8 ; startedOn 2026-11-11T19:41:24Z ; finishedOn 2026-11-11T19:48:48Z ; 11 entrées résolues
+    sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:82c8373d7259
+    sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b83825
+    oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+    sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116c
+    oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cd
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04
+    oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:c1719b133236
+couche 3fe630f610e3 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId 2507cd26-f5b8-487f-bb90-6fa4d5d4d3cf ; startedOn 2026-11-11T19:55:49Z ; finishedOn 2026-11-11T19:55:56Z ; 2 entrées résolues
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+couche cbf409a4e9e9 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId 629b6bb1-9a9f-45a6-a3bb-e4e9650f6a65 ; startedOn 2026-11-11T19:48:57Z ; finishedOn 2026-11-11T19:55:56Z ; 11 entrées résolues
+    sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:82c8373d7259
+    sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b83825
+    oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+    sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116c
+    oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cd
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04
+    oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:c1719b133236
+couche 06e46299d225 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId 9dbf4a16-1b78-4dfb-9533-cfd0e6324ee8 ; startedOn 2026-11-11T20:56:19Z ; finishedOn 2026-11-11T20:56:26Z ; 2 entrées résolues
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+couche 008b41de5874 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId b0e14893-06a2-4ea4-8a1b-0e67e4d30fe6 ; startedOn 2026-11-11T20:49:00Z ; finishedOn 2026-11-11T20:56:26Z ; 11 entrées résolues
+    sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:82c8373d7259
+    sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b83825
+    oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+    sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116c
+    oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cd
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04
+    oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:c1719b133236
+couche de7abe1f9106 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId ee1d3cca-91b0-4e52-9f9e-66bde8628360 ; startedOn 2026-11-11T21:03:31Z ; finishedOn 2026-11-11T21:03:37Z ; 2 entrées résolues
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+couche e2268cf4c590 : https://slsa.dev/provenance/v1 ; sujets ['039949f9']
+  invocationId 454728c5-59a8-45e1-b972-549d343aadac ; startedOn 2026-11-11T20:56:35Z ; finishedOn 2026-11-11T21:03:37Z ; 11 entrées résolues
+    sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb sha256:82c8373d7259
+    sc-stockage.poc.test:5000/tekton/tasks/preparer-deb sha256:588617b83825
+    oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5
+    oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33
+    sc-stockage.poc.test:5000/tekton/tasks/construire-deb sha256:3726ff0b116c
+    oci://sc-stockage.poc.test:5000/builds/builders/sbuild-debian13 sha256:749d746cc9e1
+    sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b
+    git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb sha256:bb7599a2e1cd
+    oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources sha256:50dc73f72d04
+    oci://sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb sha256:c1719b133236
+8 couche(s) dans le tag .att
+## H2 : layout du deb reconstruit à partir des octets du deb (hors réseau, tar (GNU tar) 1.35)
+OK   sha256 du deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets)
+OK   manifeste reconstruit identique, octet à octet, à celui de Zot
+digest reconstruit : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+## H3 : entrées à transporter dans le domaine (manifestes)
+builds/fermetures/sample-app-deb@bb7599a2 : 167 couche(s), 226446597 octets, artifactType application/vnd.supply-chain.deps-closure.v1
+builds/fermetures/sample-app-sources@50dc73f7 : 8 couche(s), 220881 octets, artifactType application/vnd.supply-chain.deps-closure.v1
+entrees/sample-app/packaging-deb@c1719b13 : 6 couche(s), 29805 octets, artifactType application/vnd.supply-chain.packaging-deb.v1
+## V1 à V4 : sc-replay
+## V1 : ressources
+sc-replay : 4 vCPU ; mémoire 5931 Mo, 5444 disponibles ; / 19953M dont 13306M libres ; Debian GNU/Linux 13 (trixie) ; noyau 6.12.113+deb13-amd64
+paquets installés : 339 ; déjà là : libsbuild-perl ;
+## V2 : espaces de noms sans privilège, subuid et subgid
+/proc/sys/kernel/unprivileged_userns_clone = 1
+/proc/sys/user/max_user_namespaces = 23555
+/proc/sys/kernel/apparmor_restrict_unprivileged_userns : absent
+subuid replay : 1 ligne(s) ; subgid replay : 1 ligne(s)
+/etc/subuid:replay:100000:65536
+/etc/subgid:replay:100000:65536
+## V3 : apt (listes mises à jour ; rien installé)
+Fetched 910 kB in 0s (2404 kB/s)
+mmdebstrap:
+  Installed: (none)
+  Candidate: 1.5.7-1+deb13u1
+sbuild:
+  Installed: (none)
+  Candidate: 0.89.3+deb13u4
+libsbuild-perl:
+  Installed: (none)
+  Candidate: 0.89.3+deb13u4
+uidmap:
+  Installed: (none)
+  Candidate: 1:4.17.4-2
+apt-get install --assume-no : code 1 (1 attendu : réponse non)
+The following NEW packages will be installed:
+  binutils binutils-common binutils-x86-64-linux-gnu bzip2 dirmngr dpkg-dev
+  gnupg gnupg-l10n gpg gpg-agent gpgconf gpgsm libassuan9 libbinutils
+  libclass-data-inheritable-perl libctf-nobfd0 libctf0
+  libdevel-stacktrace-perl libdpkg-perl libemail-date-format-perl
+  libexception-class-perl libfilesys-df-perl libgcrypt20 libgpg-error0
+  libgprofng0 libio-socket-ssl-perl libjansson4 libksba8 libmailtools-perl
+  libmime-lite-perl libnet-smtp-ssl-perl libnet-ssleay-perl libnpth0t64
+  libsbuild-perl libsframe1 libsubid5 libtimedate-perl make mmdebstrap patch
+  perl-openssl-defaults pinentry-curses sbuild uidmap
+0 upgraded, 44 newly installed, 0 to remove and 1 not upgraded.
+Need to get 13.8 MB of archives.
+After this operation, 55.3 MB of additional disk space will be used.
+paquets installés après : 339
+## V4 : instantané Debian depuis la VM
+InRelease de l'instantané : HTTP 302, sha256 2774284c5d6dacbe8ebdd7acc1855561818dd6d25055d799860d7bc8fe05ed89
+DIFFÉRENT de celui de S1

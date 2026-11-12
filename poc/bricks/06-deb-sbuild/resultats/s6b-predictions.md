@@ -81,3 +81,19 @@ Lancé par le propriétaire depuis le terminal. Journal : `s6b-releve-premier-pa
 - **Une provenance à retenir parmi quatre.** `vsa.py` en désigne une par son `invocationId`, comme `INVOCATION` pour l'image. Les quatre ont les mêmes entrées, donc la recette est la même. Le choix reste à faire avec toi. Le plus simple est la première, `b9d4881e` (S4d1), ou la dernière, `454728c5` (S4d3, rattrapage).
 - **Ce qu'il faut reproduire.** H2 montre que `PASSED` ne dépend plus que de la reproduction du deb `0b489d43` dans le domaine. Le layout s'en déduit.
 
+## Second passage (12/11/2026, 09:23:13 à 09:23:15 UTC, accord « Oui, lance S6b »), code 0
+
+Journal : `s6b-releve.log`. H1 est identique au premier passage, ligne à ligne, et H2 et H3 donnent les mêmes valeurs.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| V1 | **Tenue** | 4 vCPU ; 5 931 Mo de mémoire, dont 5 444 disponibles ; `/` de 19 953 Mo, dont **13 306 Mo libres** ; Debian 13 (trixie), noyau 6.12.113+deb13 ; 339 paquets. mmdebstrap et sbuild absents. Le script affiche « déjà là : libsbuild-perl » sans version : dpkg connaît le nom, mais le paquet n'est pas installé (`apt-cache policy` : `Installed: (none)`). C'est un défaut d'affichage de mon script. |
+| V2 | **Tenue** | `unprivileged_userns_clone` = 1, `max_user_namespaces` = 23555, pas de restriction AppArmor (fichier absent). `replay:100000:65536` dans `/etc/subuid` et dans `/etc/subgid`. |
+| V3 | **Tenue, sauf le nombre de paquets (réfuté)** | `apt-get update` sans avertissement (910 kB). Candidats **identiques à l'instantané du 05/11** : mmdebstrap `1.5.7-1+deb13u1`, sbuild et `libsbuild-perl` `0.89.3+deb13u4`, uidmap `1:4.17.4-2`. `--assume-no` : code 1. Sans recommandés, **44 paquets nouveaux** (prédit : 5 à 40), 13,8 Mo à télécharger, 55,3 Mo sur le disque. Parmi eux : `dpkg-dev`, binutils, make, patch, gnupg, gpg-agent, dirmngr, et les modules Perl de sbuild. 339 paquets avant et après : rien d'installé. Apt signale aussi un paquet déjà installé à mettre à jour (« 1 not upgraded ») ; il n'est pas touché. |
+| V4 | **Non jugée** (défaut du relevé) | L'URL de l'InRelease répond **HTTP 302**. Mon script n'a pas suivi la redirection (`curl` sans `-L`) : le sha256 `2774284c…` est celui de la page de redirection, pas celui de l'InRelease. La redirection est visible ; la joignabilité de l'instantané et l'identité de l'InRelease ne sont pas mesurées. La cible de la redirection n'est pas relevée : snapshot.debian.org pourrait renvoyer vers l'horodatage réel le plus proche ou vers https. |
+
+**Conséquences pour l'installation** (pas encore demandée)
+- Les versions à épingler sont celles de l'instantané, que l'image de build de la plateforme utilise aussi : `mmdebstrap=1.5.7-1+deb13u1`, `sbuild=0.89.3+deb13u4`, `libsbuild-perl=0.89.3+deb13u4`, `uidmap=1:4.17.4-2`. Elles s'épinglent comme en R2, sur les paquets demandés ; les 40 dépendances suivent les candidats de trixie.
+- 55,3 Mo sur 13 306 Mo libres. Il reste à prévoir le chroot (509 Mo en S2), la fermeture (216 Mio), le build et ses copies : quelques Go au plus.
+- Les espaces de noms sans privilège et les subuid sont en place pour `sbuild --chroot-mode=unshare` sous le compte `replay`. Il n'y a rien à changer au système.
+
