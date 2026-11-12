@@ -5,6 +5,8 @@
 # Ne vaut qu'avec prefetch-rpm ajouté au NotIn de builds-sans-internet (08c) : sans cela, son egressDeny l'emporte sur toute
 # autorisation publique. Ordre d'application, comme pour le deb : cette politique d'abord, le NotIn ensuite ; retrait dans l'ordre
 # inverse. Après S5b seulement : builds-sans-internet est rejoué par S5b.
+# Additif du 12/11/2026, 14:30 UTC : retenue par le propriétaire (« Oui, prépare-la » : 443 et Zot) ; intégration préparée dans
+# ../s1-sortie-rpm.patch (sortie-builds.sh rpm_appliquer), NON APPLIQUÉE ; prédictions : ../resultats/s1-sortie-predictions.md.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
