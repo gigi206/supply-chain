@@ -158,3 +158,18 @@ Journal : `s6b-repetition.log`. Deux lignes retirées de la copie, comme prévu.
 
 **Conséquence** : la reconstruction indépendante du deb tient. Il reste `rebuild`, lien coupé, possible à partir du 12/11/2026 à 21:03:37 UTC, pour que le contrôle 6 soit valable hors ligne et que `vsa.py` accepte le délai.
 
+### `rebuild` : 21:04:45 à 21:09:48 UTC, lien coupé 21:04:46 -> 21:09:46 (`ATTENTE_HORS_LIGNE=300`) ; code 0, `bilan : PASSED, lien coupé, fini avant le rétablissement`
+
+Accord : « Oui, lance rebuild » à « Je lance rebuild ? », lancement le 12/11/2026 à 21:04:45 UTC (`chrono.tsv`). Journal : `s6b-rebuild.log`. sha256 de la copie transportée : `55ebf681…`, identique côté hôte et côté VM.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| R0 | Non éprouvée | Lancé après l'heure : la garde des lignes 586 à 588 de `s6b.sh` n'a pas refusé ; délai journalisé : 1441 min depuis la fin du build. Le refus avant l'heure n'a jamais été déclenché. |
+| R1 | **Tenue** | porteuse au départ : `porteuse_enp1s0=0` ; à la fin : `enp1s0=0` ; côté hôte : `OK   sortie de la VM inchangée pendant la coupure (tx_bytes=4611256 tx_packets=42675 )` ; côté invité : `enp1s0 tx_packets=42675 tx_bytes=4611256` au départ, `enp1s0 tx_packets=42675 tx_bytes=4611256` à la fin |
+| R2 | **Tenue** | deb `0b489d43…` (1 952 080 octets), couche `12dd5c42…`, manifeste `039949f9…`, sujet de la provenance `039949f9…` : `verdict=PASSED` ; sbuild : code 0 en 64 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0 |
+| R3 | **Tenue** | `OK   rebuild terminé (2026-11-12T21:06:14Z) avant le rétablissement du lien (2026-11-12T21:09:46Z)` |
+| P5 | **Tenue** | Second passage : le nettoyage en root de `transporter_r4` est passé, et la copie a été transportée. |
+
+Note : les prédictions parlaient de 1 200 s de coupure ; elle a été de 300 s, avec `ATTENTE_HORS_LIGNE`, proposé dans `s6b-vsa-predictions.md`, et accepté avec la commande.
+
+**Conséquence** : le contrôle 6 du deb est valable hors ligne. Restent la vérification et le push, avec ton « oui », puis `vsa`, sur accord nommé.

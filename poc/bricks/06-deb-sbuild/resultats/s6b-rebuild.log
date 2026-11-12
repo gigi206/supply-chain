@@ -1,0 +1,71 @@
+# s6b.sh rebuild, 2026-11-12T21:04:45Z
+## délai : 1441 min depuis la fin du build (2026-11-11T21:03:37Z)
+rebuild_deb.sh transporté : sha256 local 55ebf681c2b71bd777cb444e9a4f44ddb735a02a3d97a52ef3cc7ffc32ad2ec6 ; dans la VM 55ebf681c2b71bd777cb444e9a4f44ddb735a02a3d97a52ef3cc7ffc32ad2ec6
+## interface de sc-replay côté hôte : vnet124
+en cas d'arrêt de ce script lien coupé : virsh -c qemu:///system domif-setlink sc-replay vnet124 up
+Running as unit: s6b-rebuild.service; invocation ID: 52b6d7b4f55f495fa0138a5f7d2d2546
+lien coupé à 2026-11-12T21:04:46Z (down)
+compteurs avant le lancement : rx_bytes=1482943918 rx_packets=521981 rx_errs=0 rx_drop=0 tx_bytes=4606099 tx_packets=42655 tx_errs=0 tx_drop=0 = 
+compteurs juste après la coupure : rx_bytes=1482949536 rx_packets=522003 rx_errs=0 rx_drop=0 tx_bytes=4611256 tx_packets=42675 tx_errs=0 tx_drop=0 = 
+compteurs juste avant le rétablissement (300 s plus tard) : rx_bytes=1482969222 rx_packets=522175 rx_errs=0 rx_drop=0 tx_bytes=4611256 tx_packets=42675 tx_errs=0 tx_drop=0 = 
+OK   sortie de la VM inchangée pendant la coupure (tx_bytes=4611256 tx_packets=42675 )
+lien rétabli à 2026-11-12T21:09:46Z
+## sortie de rebuild_deb.sh : code 0
+## résultat (écrit dans la VM)
+debut=2026-11-12T21:04:46Z
+compte=replay (1000)
+porteuse_enp1s0=0
+sortie_invite_debut=enp1s0 tx_packets=42675 tx_bytes=4611256 
+entree_construire-deb=OK 3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+entree_preparer-deb=OK 588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+entree_fermeture-deb=OK bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+entree_fermeture-sources=OK 50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+entree_packaging=OK c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+chroot=OK aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+arbre=/var/tmp 1777 root;/var/tmp/s6b-r4 755 replay;/var/tmp/s6b-r4/e 755 replay
+entrees=commit 6391fd437f26696847041be3226bbbf633f55a2f ; fermeture deb 167 fichiers ; fermeture applicative 8 fichiers ; packaging 6 fichiers
+verrou=162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+vendor=go1.26.10 : 17 fichiers
+marked=marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+preparation=src 41 fichiers, debian 5 fichiers
+fermeture=162 paquets copiés à plat
+paquet_source=sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
+sbuild=code 0 en 64 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+deb=sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+couche=sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets)
+manifeste_reconstruit=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+sujet_provenance=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+verdict=PASSED
+fin_deb=2026-11-12T21:06:14Z
+sortie_invite_fin=enp1s0 tx_packets=42675 tx_bytes=4611256 
+porteuse_fin=enp1s0=0 
+fin=2026-11-12T21:06:14Z
+sortie=code 0
+OK   rebuild terminé (2026-11-12T21:06:14Z) avant le rétablissement du lien (2026-11-12T21:09:46Z)
+## journal (fin)
+ po-debconf (= 1.0.21+nmu1),
+ rpcsvc-proto (= 1.4.3-1),
+ sed (= 4.9-2+deb13u1),
+ sensible-utils (= 0.0.25),
+ sysvinit-utils (= 3.14-4),
+ tar (= 1.35+dfsg-3.1),
+ util-linux (= 2.41.5-0+deb13u1),
+ xz-utils (= 5.8.1-1+deb13u1),
+ zlib1g (= 1:1.3.dfsg+really1.3.1-1+b1)
+Environment:
+ DEB_BUILD_OPTIONS="parallel=4"
+ LANG="C.UTF-8"
+ LC_COLLATE="C.UTF-8"
+ LC_CTYPE="C.UTF-8"
+ SOURCE_DATE_EPOCH="1793229566"
+----- fin du .buildinfo -----
+couche=sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets)
+manifeste_reconstruit=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+sujet_provenance=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+verdict=PASSED
+fin_deb=2026-11-12T21:06:14Z
+sortie_invite_fin=enp1s0 tx_packets=42675 tx_bytes=4611256 
+porteuse_fin=enp1s0=0 
+fin=2026-11-12T21:06:14Z
+sortie=code 0
+bilan : PASSED, lien coupé, fini avant le rétablissement
