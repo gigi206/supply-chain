@@ -397,3 +397,42 @@ après `vsa`, avec ses prédictions et son banc.
 copyright de golang-1.24-src ? » ; réponse du propriétaire : « Oui, je valide ». Inscrite dans `traductions-dep5.json` (champ `revue`),
 preuve inchangée (`75fce626…`). `stdlib` n'est pas relancée : sans la règle des paragraphes non liés (à préparer après `vsa`), elle
 s'arrêterait encore sur `FreeBSD`.
+
+## Étape `lies` : règle des paragraphes non liés (préparée à sec le 12/11/2026, « Oui, prépare-les », écrit à 20:44:11 UTC), NON LANCÉE
+
+Préparée avant `vsa`, à la demande du propriétaire (« il nous reste encore 25 minutes pour continuer sur les licences »), au lieu
+d'après `vsa` comme annoncé plus haut. [`paquets.sh`](../paquets.sh) `lies` = l'étape `stdlib` avec `paquets.py --lies` ; prédicat
+`paquets-lies.licences.json`, journal `paquets-lies.log`. Sans `--lies`, rien ne change : les bancs `deb`, `modules`, `stdlib` et `noms`
+rejoués sur le nouveau code rendent les mêmes lignes (seul l'en-tête change, empreintes des scripts).
+
+**Règle.** Un paragraphe Files du copyright de Go est écarté de l'expression seulement si chacun de ses motifs est probant contre :
+`debian/` (empaquetage), `src/cmd/` (cmd), `/testdata/`, ou paquet `src/<pq>` absent du binaire (« \0<pq>. ») dont la source dans le
+paquet (`./usr/share/go-1.24/src/<pq>/`) a au moins une fonction à corps dans un `.go` hors `_test.go`, sans `//go:build` ni suffixe
+d'OS ou d'architecture. Tout le reste est gardé : joker, motif hors `src/`, paquet présent, absence non probante (paquet sans fonction,
+fonctions seulement sous contrainte de build, paquet absent de la source). Un défaut DEP-5 reste un défaut dans un paragraphe écarté.
+Chaque paragraphe écarté est journalisé avec tous ses motifs ; chaque paragraphe gardé avec les motifs qui le gardent. Aucun paquet
+indexé dans la source : refus. Le classement des motifs est une seule fonction (`classer`), partagée avec l'étude `noms`.
+
+**Ce que c'est.** Une lecture du binaire par le projet, pas une règle de Debian : le copyright décrit le paquet source. Le prédicat ne
+porte que l'expression ; la liste des paragraphes écartés est dans le journal archivé, pas dans le prédicat.
+
+**Limites.** Présence au paquet, pas au fichier (un paragraphe gardé peut ne couvrir que des fichiers d'une autre architecture : `X11`).
+Fonction à corps cherchée par une ligne `func … {` : une fonction intégrée partout n'a pas de symbole, mais son paquet en a d'autres
+s'il en a une à corps non intégrée ; le cas d'un paquet dont toutes les fonctions sont intégrées reste possible et n'est pas mesuré.
+
+**Banc hors réseau** [`paquets-lies-essai-local.sh`](paquets-lies-essai-local.sh) (lancé sans accord nommé, comme les précédents ;
+8 cas, 8 OK, [journal](paquets-lies-essai-local.log)) : paquet absent avec fonction écarté (code 0) ; même deb par `stdlib` sans la règle
+refusé ; paquet présent gardé ; paquet sans fonction et paquet à fonction seulement `_arm64` gardés (« absence non probante ») ; `cmd` et
+`debian/` écartés ; défaut DEP-5 dans un paragraphe écarté refusé ; source sans paquet refusée.
+
+**Prédictions** (classement de `noms` : paragraphes 2, 3, 8 et 9 liés ; 4 à 7 et 10 à 15 non liés) :
+- L1 : `écartés : 10 sur 14 paragraphe(s) Files` (4, 5, 6, 7, 10, 11, 12, 13, 14, 15) ; gardés : 2, 3, 8, 9. Confiance moyenne : l'absence
+  probante de `debug/elf` (`FreeBSD`) et `image/jpeg` (`MPEG`) n'est pas mesurée sur la vraie source ; si l'une est non probante, son
+  paragraphe est gardé et L3 tombe.
+- L2 : traductions `Go` -> `BSD-3-Clause` et `X11` -> `MIT` appliquées (preuves `6ce83989…` et `75fce626…`, revues inscrites).
+- L3 : `pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause`.
+- L4 : `licences.py` : 0 erreur, 0 NOASSERTION, 0 invalide, deux composants ; composant du deb inchangé
+  (`Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)`) ; témoin refusé ; code 0 et ligne « fait » dans `chrono.tsv`.
+- L5 : nombre de paquets indexés dans la source journalisé, non prédit (strictement positif).
+
+Lancement : sur accord nommé seulement, après la séquence de ce soir (`rebuild`, push, `vsa`).

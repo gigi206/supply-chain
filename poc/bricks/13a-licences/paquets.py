@@ -130,7 +130,7 @@ def texte_licence(p):
     return p["license"][0] + "\n" + "\n".join(p["license"][1])
 
 
-def analyser(texte, souple=False, trad=None):
+def analyser(texte, souple=False, trad=None, ecarter=None):
     """(expression du paquet ou NOASSERTION, lignes de journal) ; Refus sur un DEP-5 mal formé.
 
     souple=False (modes deb et dep5, mesurés) : refus au premier défaut ; Files et Copyright exigés sur leur première ligne.
@@ -187,6 +187,9 @@ def analyser(texte, souple=False, trad=None):
         if appliquees:
             expr = " ".join(f"({appliquees[m]})" if m in appliquees and " " in appliquees[m] else appliquees.get(m, m) for m in expr.split())
         fichiers = " ".join([p["files"][0]] + p["files"][1])
+        if ecarter and k in ecarter:   # défauts DEP-5 déjà vérifiés plus haut : l'écart ne touche que l'expression
+            j.append(f"Files {fichiers[:120]} : License « {p['license'][0]} » -> {expr} ÉCARTÉ (paragraphe {k} non lié)")
+            continue
         j.append(f"Files {fichiers[:120] if souple else fichiers} : License « {p['license'][0]} » -> {expr}")
         exprs.append(f"({expr})" if " " in expr else expr)
     if defauts:
@@ -321,18 +324,19 @@ def statuts(expr, spdx, politique):
     return out
 
 
-def stdlib(deb, src, trad=None, spdx=None, politique=None):
+def stdlib(deb, src, trad=None, spdx=None, politique=None, lies=False):
     """Composants du SBOM (deb, puis paquet source de la bibliothèque standard) ; Refus sur toute incohérence."""
     ctl, ms = lire_deb(deb)
     nom = ctl["package"]
-    versions = set()
+    versions, bins = set(), []
     with tarfile.open(fileobj=io.BytesIO(ms[2][1]), mode="r:xz") as t:
         for m in t.getmembers():
             if m.name.startswith("./usr/bin/") and m.isfile():
                 f = t.extractfile(m)
                 if f is None:
                     raise Refus(f"{m.name} : illisible")
-                v, _ = infos_build(f.read())
+                bins.append(f.read())
+                v, _ = infos_build(bins[-1])
                 print(f"binaire {m.name} : {v}")
                 versions.add(v)
     if len(versions) != 1:
@@ -346,6 +350,32 @@ def stdlib(deb, src, trad=None, spdx=None, politique=None):
     if "go" + amont != go:
         raise Refus(f"version amont {amont} du paquet, {go} dans le binaire")
     print(f"OK   {go} du binaire = version amont {amont} de {sctl['package']}")
+    ecartes = set()
+    if lies:   # règle des paragraphes non liés : un seul binaire, chaque motif probant contre, sinon gardé
+        if len(bins) != 1:
+            raise Refus(f"règle des paragraphes non liés : {len(bins)} binaire(s) dans ./usr/bin, 1 attendu")
+        idx = index_source(sms[2][1])
+        if not idx:
+            raise Refus("règle des paragraphes non liés : aucun paquet de la source indexé")
+        print(f"## règle des paragraphes non liés : {len(idx)} paquet(s) dans la source, {sum(idx.values())} à absence probante possible")
+        ps = paragraphes(fichier_tar(sms[2][1], f"./usr/share/doc/{sctl['package']}/copyright").decode("utf-8"))
+        nf = 0
+        for k, p in enumerate(ps[1:], 2):
+            if "files" not in p:
+                continue
+            nf += 1
+            cl = classer(p, bins[0], idx)
+            if not any(c[2] for c in cl):
+                ecartes.add(k)
+                print(f"écarté : paragraphe {k} ({p.get('license', ('', []))[0]}) ; {len(cl)} motif(s)")
+                for x, c, _ in cl:
+                    print(f"  motif : {x} ({c})")
+            else:   # gardé : les motifs qui le gardent, entiers
+                print(f"gardé : paragraphe {k} ({p.get('license', ('', []))[0]}) ; {sum(c[2] for c in cl)} motif(s) qui le gardent sur {len(cl)}")
+                for x, c, g in cl:
+                    if g:
+                        print(f"  motif : {x} ({c})")
+        print(f"écartés : {len(ecartes)} sur {nf} paragraphe(s) Files")
     comps = []
     for n, c, v, a, membres in ((nom, None, ctl["version"], ctl["architecture"], ms),
                                 (sctl["package"], None, sctl["version"], sctl["architecture"], sms)):
@@ -353,7 +383,8 @@ def stdlib(deb, src, trad=None, spdx=None, politique=None):
         print(f"## copyright de {n} : sha256 {hashlib.sha256(cr).hexdigest()} ({len(cr)} octets)")
         try:
             expr, j = analyser(cr.decode("utf-8"), souple=(n != nom),
-                               trad={e["nom"]: e for e in (trad or []) if e["paquet"] == n and e["version"] == v} if n != nom else None)
+                               trad={e["nom"]: e for e in (trad or []) if e["paquet"] == n and e["version"] == v} if n != nom else None,
+                               ecarter=ecartes if n != nom else None)
         except Refus as e:
             for l in getattr(e, "journal", []):
                 print(l)
@@ -367,6 +398,56 @@ def stdlib(deb, src, trad=None, spdx=None, politique=None):
                 print(l)
         comps += sbom(purl, n, v, expr)["components"]
     return {"bomFormat": "CycloneDX", "specVersion": "1.6", "components": comps}
+
+
+SUFFIXES = {"aix", "android", "darwin", "dragonfly", "freebsd", "hurd", "illumos", "ios", "js", "linux", "nacl", "netbsd",
+            "openbsd", "plan9", "solaris", "wasip1", "windows", "zos", "386", "amd64", "arm", "arm64", "loong64", "mips",
+            "mipsle", "mips64", "mips64le", "ppc64", "ppc64le", "riscv64", "s390x", "sparc64", "wasm", "unix"}
+
+
+def index_source(data_tar):
+    """{paquet : True si un .go hors _test.go, sans contrainte de build ni suffixe d'OS ou d'architecture, a une fonction à corps}."""
+    idx = {}
+    with tarfile.open(fileobj=io.BytesIO(data_tar), mode="r:xz") as t:
+        for m in t.getmembers():
+            r = re.fullmatch(r"\./usr/(?:share|lib)/go-\d+\.\d+/src/(.+)/([^/]+)\.go", m.name)
+            if not r or not m.isfile() or r.group(2).endswith("_test"):
+                continue
+            pq, base = r.groups()
+            idx.setdefault(pq, False)
+            if set(base.split("_")[1:]) & SUFFIXES:
+                continue
+            f = t.extractfile(m)
+            x = f.read().decode("utf-8", "replace") if f else ""
+            if re.search(r"^//go:build ", x, re.M):
+                continue
+            if re.search(r"^func [^\n]*\{\s*$", x, re.M):
+                idx[pq] = True
+    return idx
+
+
+def classer(p, b, idx=None):
+    """[(motif, classe, garde)] ; idx=None : classement de l'étude noms ; idx donné : l'absence n'écarte que si elle est probante."""
+    classes = []
+    for x in " ".join([p["files"][0]] + p["files"][1]).split():
+        if x.startswith("debian/"):
+            classes.append((x, "empaquetage", False))
+        elif x.startswith("src/cmd/"):
+            classes.append((x, "cmd", False))
+        elif "/testdata/" in x:
+            classes.append((x, "testdata", False))
+        elif x == "*" or not x.startswith("src/") or "*" in x.rsplit("/", 1)[0]:
+            classes.append((x, "indéterminé", True))
+        else:
+            pq = x[4:].rsplit("/", 1)[0]
+            n = b.count(b"\x00" + (pq + ".").encode())
+            if idx is None or n > 0:
+                classes.append((x, f"{pq} : {n}", n > 0))
+            elif not idx.get(pq):
+                classes.append((x, f"{pq} : 0, absence non probante ({'aucune fonction à corps hors contrainte' if pq in idx else 'paquet absent de la source'})", True))
+            else:
+                classes.append((x, f"{pq} : 0, absence probante", False))
+    return classes
 
 
 CANDIDATS = {"FreeBSD": ["BSD-2-Clause-FreeBSD", "BSD-2-Clause-Views", "BSD-2-Clause"], "BSD-3-clause-svgpan": ["BSD-3-Clause"],
@@ -411,20 +492,7 @@ def etude_noms(deb, src, details):
         if "files" not in p:
             continue
         lic = p.get("license", ("", []))[0]
-        classes = []
-        for x in " ".join([p["files"][0]] + p["files"][1]).split():
-            if x.startswith("debian/"):
-                classes.append((x, "empaquetage", False))
-            elif x.startswith("src/cmd/"):
-                classes.append((x, "cmd", False))
-            elif "/testdata/" in x:
-                classes.append((x, "testdata", False))
-            elif x == "*" or not x.startswith("src/") or "*" in x.rsplit("/", 1)[0]:
-                classes.append((x, "indéterminé", True))
-            else:
-                pq = x[4:].rsplit("/", 1)[0]
-                n = b.count(b"\x00" + (pq + ".").encode())
-                classes.append((x, f"{pq} : {n}", n > 0))
+        classes = classer(p, b)
         lie = any(c[2] for c in classes)
         lies.setdefault(lic, []).append(lie)
         resume = " ; ".join(sorted({c[1] if ":" not in c[1] else c[1] for c in classes}))
@@ -475,6 +543,7 @@ def main(argv=None):
     p.add_argument("--traductions", help="mode stdlib : traductions par nom, revues, liées au texte (JSON)")
     p.add_argument("--spdx", help="mode stdlib : licenses.json, pour journaliser le statut de chaque nom")
     p.add_argument("--policy", help="mode stdlib : politique, pour le même statut")
+    p.add_argument("--lies", action="store_true", help="mode stdlib : écarter les paragraphes Files non liés au binaire")
     p.add_argument("--spdx-details", help="mode noms : dossier details de la liste SPDX")
     a = p.parse_args(argv)
     try:
@@ -496,7 +565,7 @@ def main(argv=None):
             trad = json.load(open(a.traductions, encoding="utf-8")) if a.traductions else None
             spdx = json.load(open(a.spdx, encoding="utf-8")) if a.spdx else None
             pol = json.load(open(a.policy, encoding="utf-8")) if a.policy else None
-            json.dump(stdlib(b, src, trad, spdx, pol), open(a.sbom, "w"), indent=1)
+            json.dump(stdlib(b, src, trad, spdx, pol, a.lies), open(a.sbom, "w"), indent=1)
             return 0
         if a.mode == "deb":
             ms = membres_ar(b)

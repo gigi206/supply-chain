@@ -116,3 +116,10 @@ leurs textes aux textes SPDX candidats ; aucun verdict. Banc hors réseau tenu (
 
 **Traduction `X11` -> `MIT` préparée, NON APPLIQUÉE** (« Oui, prépare-les ») : seconde entrée de [`traductions-dep5.json`](traductions-dep5.json), liée au texte
 (`75fce626…`), en attente de revue. La règle qui écarterait les paragraphes non liés n'est pas préparée ce soir.
+
+*Additif du 12/11/2026* : traduction `X11` -> `MIT` revue par le propriétaire (« Oui, je valide », inscrite à 20:33:23 UTC). **Étape `lies`
+préparée à sec, NON LANCÉE** : `stdlib` avec la règle des paragraphes non liés (`paquets.py --lies`) ; un paragraphe n'est écarté que si
+chacun de ses motifs est probant contre (empaquetage, cmd, testdata, paquet absent du binaire dont la source a une fonction à corps) ;
+lecture du binaire par le projet, pas une règle de Debian. Banc hors réseau : 8 cas, 8 OK ; autres bancs inchangés. Prédictions L1 à L5
+dans [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md) (10 paragraphes écartés sur 14, expression `BSD-3-Clause AND MIT AND
+BSD-3-Clause AND BSD-3-Clause`). Lancement sur accord nommé, après `vsa`.

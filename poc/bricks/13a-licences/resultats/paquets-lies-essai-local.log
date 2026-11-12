@@ -1,0 +1,164 @@
+# banc paquets.sh lies, 2026-11-12T20:43:03Z, paquets.sh 180e8fcba18f50c681fae3fdce6e564eed24bb5e36375564adaddea7256be0d1, paquets.py 8c715e903349227df827570dc693a0547ead03178be763b40d59f335fee2e56b, go version go1.24.7 linux/amd64
+version de Go du binaire d essai : go1.24.7
+OK   l-absent : code 0, « ^écarté : paragraphe 3 \(FreeBSD\) »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 4275646e6d5a06f4e5202ff435c66e0fe40c24184fa842ab285d1b270134487c
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     écarté : paragraphe 3 (FreeBSD) ; 1 motif(s)
+       motif : src/debug/elf/* (debug/elf : 0, absence probante)
+     écartés : 1 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/debug/elf/* : License « FreeBSD » -> FreeBSD ÉCARTÉ (paragraphe 3 non lié)
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          ok       pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-Clause
+     OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-lies.licences.json)
+     bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
+OK   l-sans-option : code 1, « ^KO   verdict non conforme »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 4275646e6d5a06f4e5202ff435c66e0fe40c24184fa842ab285d1b270134487c
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/debug/elf/* : License « FreeBSD » -> FreeBSD
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          error    pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD ; expression invalide : identifiant SPDX inconnu : FreeBSD
+     KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-stdlib.licences.json)
+     bilan : KO
+OK   l-present : code 1, « ^KO   verdict non conforme »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 392a8c65c07f4872545f6e7eb7b44f89875be71d4b00fd51bae5d69490b82496
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     gardé : paragraphe 3 (FreeBSD) ; 1 motif(s) qui le gardent sur 1
+       motif : src/fmt/* (fmt : 49)
+     écartés : 0 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/fmt/* : License « FreeBSD » -> FreeBSD
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          error    pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD ; expression invalide : identifiant SPDX inconnu : FreeBSD
+     KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-lies.licences.json)
+     bilan : KO
+OK   l-sans-fonction : code 1, « internal/goarch : 0, absence non probante »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 11faa67079e91c420ee3071f4c6ea0d1f2ba804d86626dbb87143421464e2c0c
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     gardé : paragraphe 3 (FreeBSD) ; 1 motif(s) qui le gardent sur 1
+       motif : src/internal/goarch/* (internal/goarch : 0, absence non probante (aucune fonction à corps hors contrainte))
+     écartés : 0 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/internal/goarch/* : License « FreeBSD » -> FreeBSD
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          error    pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD ; expression invalide : identifiant SPDX inconnu : FreeBSD
+     KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-lies.licences.json)
+     bilan : KO
+OK   l-autre-arch : code 1, « internal/arm : 0, absence non probante »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 1bcd076827eb205ae2dd2fe8be80dd3c8612aa092207f48d35671649f0019c2f
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     gardé : paragraphe 3 (FreeBSD) ; 1 motif(s) qui le gardent sur 1
+       motif : src/internal/arm/* (internal/arm : 0, absence non probante (aucune fonction à corps hors contrainte))
+     écartés : 0 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/internal/arm/* : License « FreeBSD » -> FreeBSD
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          error    pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause AND FreeBSD ; expression invalide : identifiant SPDX inconnu : FreeBSD
+     KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-lies.licences.json)
+     bilan : KO
+OK   l-cmd : code 0, « ^écartés : 1 sur 2 paragraphe »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 0ce9aafa5a89cb728c365e07614ec08b817748837832ecaa3b21e85f909a4d33
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     écarté : paragraphe 3 (FreeBSD) ; 2 motif(s)
+       motif : src/cmd/x/* (cmd)
+       motif : debian/* (empaquetage)
+     écartés : 1 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/cmd/x/* debian/* : License « FreeBSD » -> FreeBSD ÉCARTÉ (paragraphe 3 non lié)
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          ok       pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-Clause
+     OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-lies.licences.json)
+     bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
+OK   l-defaut : code 1, « ^REFUS : 1 défaut\(s\) : paragraphe 3 : champ\(s\) manquant\(s\) : copyright »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : e539e0d746b1754fec140fc346f118c94b3d8377ba75830d7c76820f40139ba6
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     ## règle des paragraphes non liés : 4 paquet(s) dans la source, 2 à absence probante possible
+     gardé : paragraphe 2 (BSD-3-clause) ; 1 motif(s) qui le gardent sur 1
+       motif : * (indéterminé)
+     écarté : paragraphe 3 (FreeBSD) ; 1 motif(s)
+       motif : src/debug/elf/* (debug/elf : 0, absence probante)
+     écartés : 1 sur 2 paragraphe(s) Files
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     Files src/debug/elf/* : License « FreeBSD » -> DÉFAUT : paragraphe 3 : champ(s) manquant(s) : copyright
+     REFUS : 1 défaut(s) : paragraphe 3 : champ(s) manquant(s) : copyright
+     KO   paquets.py stdlib : code 1
+OK   l-vide : code 1, « ^REFUS : règle des paragraphes non liés : aucun paquet de la source indexé »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 3f4f3aa9bdf6fb55be981d10514a6c945dda1ec1a75c7e59a1598757830693be
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     REFUS : règle des paragraphes non liés : aucun paquet de la source indexé
+     KO   paquets.py stdlib : code 1
+chrono.tsv du banc : 10 lignes ; fichiers de 13a touchés : 0

@@ -25,11 +25,17 @@
 #         (empaquetage, cmd, testdata, ou paquet cherché dans le binaire par « \0<paquet>. ») et compare les textes des noms hors
 #         SPDX ou hors politique aux textes SPDX candidats ; témoins : runtime et fmt présents, cmd/link/internal/ld absent. Aucun
 #         SBOM ni verdict : une étude pour décision.
+#   lies     (ajoutée à sec le 12/11/2026, « Oui, prépare-les », NON LANCÉE) : l étape stdlib avec la règle des paragraphes non
+#         liés (paquets.py --lies) ; un paragraphe Files du copyright de Go n est écarté de l expression que si chacun de ses motifs
+#         est probant contre (empaquetage, cmd, testdata, ou paquet absent du binaire dont la source a une fonction à corps hors
+#         contrainte de build) ; tout le reste est gardé ; chaque paragraphe écarté journalisé avec ses motifs. Lecture du binaire
+#         par le projet, pas une règle de Debian (le copyright décrit le paquet source). Prédicat : paquets-lies.licences.json.
 #   Hors de ces étapes : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
 # Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb       (journal : resultats/paquets-deb.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh modules   (journal : resultats/paquets-modules.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh stdlib    (journal : resultats/paquets-stdlib.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh noms      (journal : resultats/paquets-noms.log)
+#         mise exec -- poc/bricks/13a-licences/paquets.sh lies      (journal : resultats/paquets-lies.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -161,7 +167,7 @@ EOP
   echo "bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé"
 }
 
-etape_stdlib() {
+stdlib_commun() { # nom (prédicat resultats/paquets-<nom>.licences.json) [--lies]
   local s rc
   rm -rf -- "${T:?}" && mkdir -p "$T" && chmod 0700 "$T"
   echo "paquets.py : $(sha256sum < "$here/paquets.py" | cut -c1-64) ; licences.py : $(sha256sum < "$here/licences.py" | cut -c1-64) ; politique : $(sha256sum < "$here/policy.json" | cut -c1-64)"
@@ -182,16 +188,19 @@ etape_stdlib() {
   echo "## deb et paquet de Go"
   echo "traductions : $(sha256sum < "$here/traductions-dep5.json" | cut -c1-64) (traductions-dep5.json)"
   rc=0; python3 -I "$here/paquets.py" stdlib "$DEB" "$SRC" --sbom "$T/stdlib.sbom.json" --traductions "$here/traductions-dep5.json" \
-    --spdx "$SPDX/licenses.json" --policy "$here/policy.json" || rc=$?
+    --spdx "$SPDX/licenses.json" --policy "$here/policy.json" ${2:+"$2"} || rc=$?
   [ "$rc" = 0 ] || { echo "KO   paquets.py stdlib : code $rc"; rm -rf -- "${T:?}"; exit 1; }
   echo "## verdict (licences.py, deux composants)"
-  rc=0; juger "$T/stdlib.sbom.json" "$R/paquets-stdlib.licences.json" || rc=$?
-  if [ "$rc" = 0 ] && python3 -I -c 'import json, sys; d = json.load(open(sys.argv[1])); sys.exit(0 if d["violations"]["error"] == 0 and d["noassertion"] == 0 and d["invalid"] == 0 and len(d["components"]) == 2 else 1)' "$R/paquets-stdlib.licences.json"; then
-    echo "OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-stdlib.licences.json)"
-  else echo "KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-stdlib.licences.json)"; ko=1; fi
+  rc=0; juger "$T/stdlib.sbom.json" "$R/paquets-$1.licences.json" || rc=$?
+  if [ "$rc" = 0 ] && python3 -I -c 'import json, sys; d = json.load(open(sys.argv[1])); sys.exit(0 if d["violations"]["error"] == 0 and d["noassertion"] == 0 and d["invalid"] == 0 and len(d["components"]) == 2 else 1)' "$R/paquets-$1.licences.json"; then
+    echo "OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-$1.licences.json)"
+  else echo "KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-$1.licences.json)"; ko=1; fi
   rm -rf -- "${T:?}"
   [ "$ko" = 0 ] && echo "bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé" || { echo "bilan : KO"; exit 1; }
 }
+
+etape_stdlib() { stdlib_commun stdlib; }
+etape_lies() { stdlib_commun lies --lies; }
 
 etape_noms() {
   local s rc
@@ -209,7 +218,7 @@ etape_noms() {
   echo "bilan : étude écrite (aucun verdict)"
 }
 
-[ $# -gt 0 ] || { echo "usage : $0 deb|modules|stdlib|noms" >&2; exit 2; }
+[ $# -gt 0 ] || { echo "usage : $0 deb|modules|stdlib|noms|lies" >&2; exit 2; }
 for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
 for e in "$@"; do
   chrono "13a paquets $e"
