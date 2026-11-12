@@ -192,3 +192,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Hôte seul, sans réseau : elle relit l'archive de mock gardée par `releve`, sha256 contrôlé, et archive des plages entières de lignes.
 - Elle tranche les points que `releve` a laissés ouverts : options recopiées dans le verrou (macros d'OBS), champs par paquet, exigences d'une image de bootstrap prête, contrôles de signature de `mock-hermetic-repo` et du mode hermétique.
 - Prédictions N1r à N6r : [`resultats/m2-predictions.md`](resultats/m2-predictions.md). Elle attend un accord nommé.
+
+**Résultat de `releve2`, le 12/11/2026 à 14:54:25 UTC (« Oui, lance releve2 »)** : code 0, 0 KO, archive inchangée ([journal](resultats/m2-releve2.log), [résultats](resultats/m2-predictions.md)).
+- **N2r tombe** : le verrou recopie `macros` et le mode hermétique les réapplique. Les macros d'OBS passeraient donc. V4 de S1 devrait tomber.
+- **Signatures et sommes des rpm** : ni `mock-hermetic-repo` ni le mode hermétique ne les contrôlent. En M2, `rpm -K` et la comparaison des `sigmd5` sont à notre charge.
+- **Non prévu, lu et non mesuré** : la référence du bootstrap est coupée au premier « : » (`config.py:844`, `mock-hermetic-repo.py:138`). Notre `sc-stockage.poc.test:5000/…@sha256:…` ferait échouer M2 et M3. Quatre voies sont à décider. `--calculate-build-dependencies`, et donc S1, n'est pas concerné.
+- **Non prévu, lu** : une image « prête » est traitée comme non prête si une option de modules ou `chroot_additional_packages` est posée, mais le verrou enregistre quand même `True`. La mesure de V1 peut donc tromper. Un ajout à l'étape `verrou` est proposé, sur accord.

@@ -112,3 +112,44 @@ Une étape nouvelle : **accord nommé nécessaire avant de la lancer**. Les filt
 - **sur V1 et V2** : N4r dirait si `rockylinux:9.7` brut a une chance, ou s'il faut proposer tout de suite une image de bootstrap construite par notre chaîne (décision du propriétaire) ;
 - **sur V3 et V4** : N2r et N3r fixeraient la forme du verrou attendu ;
 - **sur la configuration de l'étape `essais`** : rien, tant que S1 reste en mode non hermétique.
+
+## Résultat de `releve2`, le 12/11/2026 à 14:54:25 UTC (chrono.tsv : début et fin dans la même seconde ; accord « Oui, lance releve2 »)
+
+Journal : [`m2-releve2.log`](m2-releve2.log), 580 lignes. Code 0, 0 KO. sha256 de l'archive identique (`3c034916…3e4d88`). Sources lues, jamais exécutées, puis effacées. Résultats écrits à partir de 14:55:26 UTC.
+
+| # | Résultat |
+|---|---|
+| N1r | **Tenue** : sha256 identique, moins d'une seconde. L'étape ne contient aucune commande réseau. |
+| N2r | **Tombée sur `macros`.**<br>- La liste est bien fixe (`buildroot_lock.py:82` à `:98`) : `target_arch`, `legal_host_arches`, `dist`, `package_manager`, `bootstrap_image`, `bootstrap_image_ready` et **`macros`** (commentaire de `:95` : garder par exemple `%vendor`).<br>- En mode hermétique, `config.py:830` réapplique au build toute la section `config` du verrou (`update_config_from_dict`).<br>- Les macros d'OBS de notre configuration passeraient donc par le verrou. C'est à vérifier sur un verrou réel. |
+| N3r | **Tenue.** Champs par rpm, tous exigés par le schéma 1.1.0 : `name`, `arch`, `license`, `version`, `release`, `epoch`, `sigmd5`, `signature` et `url`. Champs exigés du bootstrap : `image_digest`, `pull_digest`, `architecture` et `id`. |
+| N4r | **Tenue.**<br>- Le code ne vérifie aucun outil dans une image « prête » : `buildroot.py:1170` porte un TODO, faute d'heuristique. Le commentaire de `:1179` cite des images ubi8, qui ont `dnf builddep` d'origine.<br>- **Non prévu :** une image marquée prête est quand même traitée comme non prête si l'une de ces options est posée : `module_enable`, `module_install`, `module_setup_commands` ou `chroot_additional_packages` (`:1182` à `:1191`). Le message est alors seulement écrit dans `root.log`.<br>- Le verrou recopie la valeur configurée (`buildroot_lock.py:99`, `:100`), et non l'état effectif. |
+| N5r | **Tenue.** Ce que fait le mode hermétique, ligne par ligne de `config.py` :<br>- `:830` : il reprend la configuration du verrou ;<br>- `:837` : il exige `repodata` dans le dépôt hors ligne ;<br>- `:844` à `:847` : il prend le bootstrap dans ce dépôt, sous `dir:` et par `pull_digest` ;<br>- `:855` : il le monte en `/hermetic_repo` ;<br>- `:860` : il installe tout le dépôt (`install *`) ;<br>- `:864` : il impose le digest `image_digest` à l'image (portée de la ligne 862) ;<br>- `:868` : il interdit tout repli sur l'installation de dnf.<br>Il ne vérifie aucune signature. L'architecture vient de `target_arch`, recopiée depuis le verrou. |
+| N6r | **Tenue, et plus fort que prévu.** `mock-hermetic-repo` écrit le fichier dès que le code HTTP vaut 200 (`:78` à `:83`). Il ne vérifie ni GPG, ni somme, ni le `sigmd5` ou la `signature` que porte le verrou. |
+
+## Constat non prévu : la référence de l'image de bootstrap est coupée au premier « : »
+
+Ce constat vient de la lecture du code. **Il n'est pas mesuré.**
+
+- `config.py:844` et `mock-hermetic-repo.py:138` font tous deux `bootstrap_image.split(':')[0]`, puis ajoutent `@<pull_digest>`. Le but : retirer un tag.
+- La référence de S1, `BOOT`, vaut `sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:ee90dc0e…`.
+- Coupée au premier « : », il en reste `sc-stockage.poc.test`. `skopeo sync` recevrait donc `sc-stockage.poc.test@sha256:…`, sans dépôt.
+- Même sans port, une référence par digest (`…/rockylinux@sha256:…`) donnerait `…/rockylinux@sha256@sha256:…`.
+- **Conséquence :** tant que notre registre est sur le port 5000, ou que l'image est désignée par son digest, `mock-hermetic-repo` (M2) et `--hermetic-build` (M3) échoueraient. Seule une référence de la forme `hôte/dépôt:tag`, sans port, passe.
+- `--calculate-build-dependencies` n'est pas concerné : il tire l'image par podman, avec la référence entière. **L'étape `verrou` de S1 n'est donc pas bloquée** par ce constat.
+
+## Conséquences pour S1, M2 et M3, sans décision
+
+- **V4 de S1 devrait tomber.** Elle prédit que les macros ne sont pas recopiées. La prédiction reste telle qu'elle a été commitée ; le verrou réel tranchera.
+- **V1 de S1 : sa mesure peut tromper.**
+  - Si `rocky-9.tpl` (paquet mock-core-configs, absent de cette archive) pose l'une des quatre options de N4r, le calcul passera alors que l'image est jugée non prête. Le verrou enregistrera quand même `True`.
+  - La sonde ne garde que les 200 dernières lignes de `root.log`, et le message de mock peut tomber avant.
+  - Ajouter à l'étape `verrou` la recherche de « Not updating bootstrap chroot » et de « Package management in bootstrap » dans tout `root.log` le dirait. C'est une modification de `s1.sh` : elle attend un accord.
+- **Signatures et sommes : entièrement à notre charge en M2.** Ni `mock-hermetic-repo` ni le mode hermétique ne les contrôlent. Il faudra, avant tout build :
+  - `rpm -K` avec la clé Rocky `21CB256A…` sur chaque rpm téléchargé ;
+  - une comparaison du `sigmd5` de chaque rpm avec celui du verrou.
+- **Référence du bootstrap en M2 et M3 : quatre voies, à décider.**
+  1. Servir l'image sans port, sous un tag. Cela touche Zot ou le réseau de la 08.
+  2. Préparer nous-mêmes le dossier `dir:` attendu par `config.py:846`, avec `skopeo copy` par digest, au lieu de `prepare_image`. Le chemin serait celui que donne la coupure.
+  3. Signaler le défaut chez mock. Action publique : ton accord est nécessaire.
+  4. Corriger mock localement, ce qui écarte le rpm signé d'EPEL.
+  Aucune voie n'est essayée.

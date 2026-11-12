@@ -1,0 +1,580 @@
+# m2.sh releve2, 2026-11-12T14:54:25Z
+## archive du tag mock-6.9-1 gardée par releve (aucun accès réseau)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+## verrou : options recopiées et champs par paquet
+### plugin buildroot_lock (mock/py/mockbuild/plugins/buildroot_lock.py, lignes 1 à 140)
+  1: """
+  2: Produce a lockfile for the prepared buildroot by Mock.  Once available, we
+  3: should use the DNF built-in command from DNF5:
+  4: https://github.com/rpm-software-management/dnf5/issues/833
+  5: """
+  6: 
+  7: import json
+  8: import os
+  9: 
+  10: from mockbuild.podman import Podman, PodmanError
+  11: from mockbuild.installed_packages import query_packages, query_packages_location
+  12: 
+  13: requires_api_version = "1.1"
+  14: 
+  15: 
+  16: def init(plugins, conf, buildroot):
+  17:     """ The obligatory plugin entry point """
+  18:     BuildrootLockfile(plugins, conf, buildroot)
+  19: 
+  20: 
+  21: class BuildrootLockfile:
+  22:     """ Produces buildroot_lock.json file in resultdir """
+  23:     def __init__(self, plugins, conf, buildroot):
+  24:         self.buildroot = buildroot
+  25:         self.state = buildroot.state
+  26:         self.conf = conf
+  27:         self.inst_done = False
+  28:         plugins.add_hook("postdeps", self.produce_lockfile)
+  29: 
+  30:     def produce_lockfile(self):
+  31:         """
+  32:         Upon a request ('produce_lockfile' option set True), generate
+  33:         the mock-build-environment.json file in resultdir.  The file describes
+  34:         the Mock build environment, and the way to reproduce it.
+  35:         """
+  36: 
+  37:         filename = "buildroot_lock.json"
+  38:         statename = "Generating the buildroot lockfile: " + filename
+  39:         try:
+  40:             with self.buildroot.uid_manager:
+  41:                 self.state.start(statename)
+  42:                 out_file = os.path.join(self.buildroot.resultdir, filename)
+  43:                 chrootpath = self.buildroot.make_chroot_path()
+  44: 
+  45:                 # Ḿimic the Koji Content Generator metadata fields:
+  46:                 # https://docs.pagure.org/koji/content_generator_metadata/#buildroots
+  47:                 #
+  48:                 # The query_packages() method below sorts its output according
+  49:                 # to _values_ of the queried RPM headers, so keep name-arch pair
+  50:                 # first to have the output sorted reasonably.
+  51:                 query_fields = ["name", "arch", "license", "version", "release",
+  52:                                 "epoch", "sigmd5", "signature"]
+  53: 
+  54:                 def _executor(cmd):
+  55:                     with self.buildroot.uid_manager.elevated_privileges():
+  56:                         out, _ = self.buildroot.doOutChroot(cmd,
+  57:                                                             returnOutput=True,
+  58:                                                             returnStderr=False)
+  59:                         return out
+  60: 
+  61:                 packages = query_packages(query_fields, chrootpath, _executor)
+  62:                 query_packages_location(packages, chrootpath, _executor,
+  63:                                         dnf_cmd=self.buildroot.pkg_manager.command)
+  64: 
+  65:                 data = {
+  66:                     # Try to semver.  The future Mock versions (the tool) should
+  67:                     # be able to read older Minor versions of the same Major.
+  68:                     # Anytime we break this assumption, bump the Major.  IOW,
+  69:                     # the latest Mock implementing with Major == 1 can read any
+  70:                     # version from the 1.Y.Z range.  Mock implementing v2.Y.Z
+  71:                     # no longer reads v1.Y.Z variants.
+  72:                     "version": "1.1.0",
+  73:                     "buildroot": {
+  74:                         "rpms": packages,
+  75:                     },
+  76:                     # Try to keep this as minimal as possible.  If possible,
+  77:                     # implement the config options as DEFAULTS in the
+  78:                     # hermetic-build.cfg, or in the
+  79:                     # process_hermetic_build_config() method.
+  80:                     "config": {}
+  81:                 }
+  82:                 for cfg_option in [
+  83:                     # These are hard-coded in the configuration file, but we
+  84:                     # work with a single-config-for-all-arches now.
+  85:                     "target_arch",
+  86:                     "legal_host_arches",
+  87:                     "dist",
+  88:                     "package_manager",
+  89:                     # At this point, we only support hermetic builds iff
+  90:                     # bootstrap_image_ready=True, so these two options are
+  91:                     # useful for implementing "assertion" in the
+  92:                     # process_hermetic_build_config() method.
+  93:                     "bootstrap_image",
+  94:                     "bootstrap_image_ready",
+  95:                     # Macros need to be inherited, e.g., to keep the original
+  96:                     # %vendor tag specification, or %_host_cpu hacks.
+  97:                     "macros",
+  98:                 ]:
+  99:                     if cfg_option in self.buildroot.config:
+  100:                         data["config"][cfg_option] = self.buildroot.config[cfg_option]
+  101: 
+  102:                 # The 'bootstrap' field is omitted when 'use_bootstrap_image'
+  103:                 # is False.  Consequently, we cannot perform a subsequent
+  104:                 # hermetic build using this lockfile.
+  105:                 if self.buildroot.config["use_bootstrap_image"]:
+  106:                     with self.buildroot.uid_manager.elevated_privileges():
+  107:                         try:
+  108:                             podman = Podman(self.buildroot,
+  109:                                             data["config"]["bootstrap_image"])
+  110:                             data["bootstrap"] = podman.inspect_hermetic_metadata()
+  111:                             data["bootstrap"]["image_digest"] = podman.get_oci_digest()
+  112:                         except PodmanError:
+  113:                             data["bootstrap"] = {}
+  114: 
+  115:                 with open(out_file, "w", encoding="utf-8") as fdlist:
+  116:                     fdlist.write(json.dumps(data, indent=4, sort_keys=True) + "\n")
+  117:         finally:
+  118:             self.state.finish(statename)
+### schéma 1.1.0 : propriétés déclarées (chemins jq)
+  properties.version
+  properties.buildroot
+  properties.buildroot.properties.rpms
+  properties.buildroot.properties.rpms.items.properties.arch
+  properties.buildroot.properties.rpms.items.properties.epoch
+  properties.buildroot.properties.rpms.items.properties.license
+  properties.buildroot.properties.rpms.items.properties.name
+  properties.buildroot.properties.rpms.items.properties.release
+  properties.buildroot.properties.rpms.items.properties.sigmd5
+  properties.buildroot.properties.rpms.items.properties.signature
+  properties.buildroot.properties.rpms.items.properties.url
+  properties.buildroot.properties.rpms.items.properties.version
+  properties.bootstrap
+  properties.bootstrap.properties.image_digest
+  properties.bootstrap.properties.pull_digest
+  properties.bootstrap.properties.architecture
+  properties.bootstrap.properties.id
+  properties.config
+### schéma 1.1.0 : propriétés exigées
+  buildroot, config, version
+  rpms
+  arch, epoch, license, name, release, sigmd5, signature, url, version
+  image_digest, pull_digest, architecture, id
+## image de bootstrap prête
+### buildroot.py autour de bootstrap_image_ready (mock/py/mockbuild/buildroot.py, lignes 1150 à 1205)
+  1150:                 file_util.rmtree(self.rootdir, selinux=self.selinux)
+  1151:             file_util.rmtree(self.basedir, selinux=self.selinux)
+  1152:         self.chroot_was_initialized = False
+  1153:         self.plugins.call_hooks('postclean')
+  1154:         # intentionally we do not call bootstrap hook here - it does not have sense
+  1155: 
+  1156:     @property
+  1157:     def uses_bootstrap_image(self):
+  1158:         return self.is_bootstrap and self.use_chroot_image
+  1159: 
+  1160:     @property
+  1161:     def bootstrap_image_is_ready(self):
+  1162:         """
+  1163:         True if bootstrap image is in use, bootstrap_image_ready==True, and no
+  1164:         config_opts field is set that would invalidate the bootstrap
+  1165:         "readiness" state.
+  1166:         """
+  1167:         if not self.uses_bootstrap_image:
+  1168:             return False
+  1169: 
+  1170:         # TODO(praiskup): Can we have heuristic for checking if extracted
+  1171:         # buildroot is ready?
+  1172: 
+  1173:         # All the options checked here were copied from the corresponding
+  1174:         # `bootstrap_` prefixed config option.
+  1175:         if not self.config['image_ready']:
+  1176:             self.root_log.info("Bootstrap image not marked ready")
+  1177:             return False
+  1178: 
+  1179:         # Per configuration, we think that image is ready-made (e.g. ubi8 images
+  1180:         # have the 'dnf builddep' command available by default).  But there
+  1181:         # still might be reasons to do some updates.
+  1182:         for check_option in [
+  1183:             "module_enable", "module_install", "module_setup_commands",
+  1184:             "chroot_additional_packages"
+  1185:         ]:
+  1186:             if self.config.get(check_option):
+  1187:                 self.root_log.info(
+  1188:                     f"Package management in bootstrap (from image) is going to "
+  1189:                     f"be updated because config_opts['{check_option}'] is set."
+  1190:                 )
+  1191:                 return False
+  1192: 
+  1193:         self.root_log.info("Not updating bootstrap chroot, "
+  1194:                            "bootstrap_image_ready=True")
+  1195:         return True
+  1196: 
+  1197:     @traceLog()
+  1198:     def install_as_root(self, *deps):
+  1199:         """ Becomes root user and calls self.install() """
+  1200:         try:
+  1201:             self.uid_manager.becomeUser(0, 0)
+  1202:             self.install(*deps)
+  1203:         finally:
+  1204:             self.uid_manager.restorePrivs()
+  1205: 
+### podman.py : inspect_hermetic_metadata et get_oci_digest
+  200:     def get_oci_digest(self):
+  201:         """
+  202:         Get sha256 digest of RootFS layers. This must be identical for
+  203:         all images containing same order of layers, thus it can be used
+  204:         as the check that we've loaded same image.
+  205:         """
+  206:         the_image = self.image
+  207:         if the_image.startswith("oci-archive:") or the_image.startswith("dir:"):
+  208:             # We can't query digest from tarball directly, but note
+  209:             # the image needs to be tagged first!
+  210:             the_image = self._tagged_id
+  211:         digest = podman_get_oci_digest(the_image, logger=getLog())
+  212:         if digest is None:
+  213:             raise PodmanError(f"Getting OCI digest for image {self.image} failed")
+  214:         return digest
+  215: 
+  262:     def inspect_hermetic_metadata(self):
+  263:         """
+  264:         Get the image metadata needed for the subsequent hermetic build.
+  265:         """
+  266:         get_query = '{"pull_digest": "{{ .Digest }}", "id": "{{.Id}}", "architecture": "{{ .Architecture }}"}'
+  267:         getLog().info("Reading image %s from %s", get_query, self.image)
+  268:         cmd = ["podman", "image", "inspect", "--format", get_query, self.image]
+  269:         res = subprocess.run(cmd, env=self.buildroot.env,
+  270:                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+  271:                              check=True)
+  272:         return json.loads(res.stdout.decode("utf-8").strip())
+  273: 
+  274: 
+### site-defaults.cfg, options du mode hermétique (mock/docs/site-defaults.cfg, lignes 740 à 790)
+  740: #config_opts['ssl_extra_certs'] = ['/etc/pki/tls/certs/client.crt', '/etc/pki/tls/certs/',
+  741: #                                  '/etc/pki/tls/private/client_nopass.key.crt', '/etc/pki/tls/private/']
+  742: 
+  743: # user_agent string to identify HTTP request to repositories
+  744: # config_opts['user_agent'] = "Mock ({{ root }}; {{ target_arch }})"
+  745: 
+  746: # Seccomp (Linux kernel security facility) isn't utilized by Mock, but is
+  747: # utilized by systemd-nspawn and Podman (both tools are used by Mock in
+  748: # multiple places).  The list of seccomp rules (syscall allow-lists) maintained
+  749: # in those tools is often different across distributions or even versions.
+  750: # Because Mock does cross-distribution builds, "host" distro rules are not
+  751: # often applicable on the "target" distribution.  To not complicate things, and
+  752: # because by design Mock doesn't have to fully isolate, we disable seccomp for
+  753: # those containerization tools by default.
+  754: #config_opts["seccomp"] = False
+  755: 
+  756: # Mock code can go into a relatively deep recursion (e.g. when doing chroot
+  757: # cleanup via the recursive rmtree() calls).  Use this config option to
+  758: # override the default Mock's stack call limit (5000).
+  759: #config_opts["recursion_limit"] = 5000
+  760: 
+  761: # Mock internals used by the --calculated-build-dependencies and
+  762: # --hermetic-build options.  Please do not set these options in Mock
+  763: # configuration files.
+  764: # config_opts["calculatedeps"] = None
+  765: # config_opts["hermetic_build"] = False
+  766: 
+  767: # List of usernames (strings) that will be pre-created in buildroot.  The UID
+  768: # and GID in-chroot is going to be the same as on-host.  This option is for
+  769: # example useful for the 'pesign' use-cases that both (a) bind-mount
+  770: # pesign-owned socket-files into the chroot and (b) install the
+  771: # 'BuildRequires: pesign' package which would overwrite the ownership of the
+  772: # socket file.  See https://github.com/rpm-software-management/mock/issues/1091
+  773: #config_opts["copy_host_users"] = []
+  774: 
+  775: # Whether to use host's shadow-utils to provision users and groups in the
+  776: # buildroot, which we normally want to do because host shadow-utils are
+  777: # newer and more flexible than buildroot ones. However, there is an issue in shadow-utils
+  778: # where even using the --prefix (or, even --root if we did it that way) option, the host
+  779: # config will "leak" into the chroot. This is not an issue if the configs are
+  780: # effectively the same between host and buildroot, but will cause problems if, for
+  781: # example, the host is configured to use FreeIPA-provided subids.
+  782: # See https://github.com/shadow-maint/shadow/issues/897
+  783: # config_opts["use_host_shadow_utils"] = True
+  784: 
+  785: # Configure the "--root" or "--prefix" string here based on the host's
+  786: # shadow-utils version.  shadow-utils 4.19.0+ features a fixed "--root" option,
+  787: # which Mock prefers over "--prefix" due to better isolation.  For older
+  788: # systems (broken --root option), we fall-back at least to "--prefix".
+  789: #config_opts["shadow_utils_isolation_option"] = "--prefix"
+  790: 
+## ce qu'impose le mode hermétique
+### config.py, process_hermetic_build_config (mock/py/mockbuild/config.py, lignes 805 à 875)
+  805:         config_opts[key] = value
+  806: 
+  807: 
+  808: def process_hermetic_build_config(cmdline_opts, config_opts):
+  809:     """
+  810:     Read the lockfile file generated by the previous
+  811:     --calculate-build-dependencies run, and adjust the current set of options
+  812:     in CONFIG_OPTS.
+  813:     """
+  814: 
+  815:     if not cmdline_opts.hermetic_build:
+  816:         return
+  817: 
+  818:     config_opts["hermetic_build"] = True
+  819: 
+  820:     json_conf, repo_reference = cmdline_opts.hermetic_build
+  821:     with open(json_conf, "r", encoding="utf-8") as fd:
+  822:         data = json.load(fd)
+  823: 
+  824:     if not data["config"].get("bootstrap_image_ready"):
+  825:         raise exception.BadCmdline(
+  826:             f"The file {json_conf} did not record the bootstrap_image_ready=True "
+  827:             "config which means we are not able to prepare the bootstrap chroot "
+  828:             "in a hermetic mode.")
+  829: 
+  830:     update_config_from_dict(config_opts, data["config"])
+  831: 
+  832:     final_offline_repo = repo_reference
+  833:     file_pfx = "file://"
+  834:     if final_offline_repo.startswith(file_pfx):
+  835:         final_offline_repo = final_offline_repo[len(file_pfx):]
+  836:     final_offline_repo = os.path.abspath(final_offline_repo)
+  837:     if not os.path.exists(os.path.join(final_offline_repo, "repodata")):
+  838:         raise exception.BadCmdline(
+  839:             f"The {repo_reference} doesn't seem to be a valid "
+  840:             "offline RPM repository (RPM metadata not found)")
+  841: 
+  842:     # Use the offline image for bootstrapping.
+  843:     # skopeo (currently) can't live with tag + sha, so strip the tag
+  844:     image_pullspec = data['config']['bootstrap_image'].split(':')[0]
+  845:     image_pullspec += "@" + data['bootstrap']['pull_digest']
+  846:     bootstrap_dir = os.path.join(final_offline_repo, image_pullspec)
+  847:     config_opts["bootstrap_image"] = f"dir:{bootstrap_dir}"
+  848: 
+  849:     config_opts["offline_local_repository"] = final_offline_repo
+  850: 
+  851:     # Provide build access to buildroot packages solving same issue as
+  852:     # https://lists.fedorahosted.org/archives/list/koji-devel@lists.fedorahosted.org/thread/ZIBY53JAURLT3QRBBJIJJ7EZWLZDE3TI/
+  853:     # keepcache=1 for local repos work only in dnf5 not dnf4
+  854:     config_opts['plugin_conf']['bind_mount_enable'] = True
+  855:     config_opts['plugin_conf']['bind_mount_opts']['dirs'].append((final_offline_repo, '/hermetic_repo' ))
+  856: 
+  857:     # We install all the packages at once (for now?).  We could inherit the
+  858:     # command from the previous "online" run, but it often employs a group
+  859:     # installation command - and we have no groups in the offline repo.
+  860:     config_opts["chroot_setup_cmd"] = "install *"
+  861: 
+  862:     # With hermetic builds, we always assert that we are reproducing the build
+  863:     # with the same image.
+  864:     config_opts["bootstrap_image_assert_digest"] = data["bootstrap"]["image_digest"]
+  865: 
+  866:     # It doesn't make sense to fallback to `dnf install dnf --installroot ...`,
+  867:     # we simply don't have DNF stack pre-downloaded in offline_local_repository.
+  868:     config_opts["bootstrap_image_fallback"] = False
+  869: 
+  870: 
+  871: @traceLog()
+  872: def nice_root_alias_error(name, alias_name, arch, no_configs, log):
+  873:     """
+  874:     The epel-8 configs (and others in future) will be replaced with more
+  875:     specific alternatives.  This is the way to inform user about alternatives.
+## mock-hermetic-repo : téléchargement et contrôles
+### mock-hermetic-repo.py (mock/py/mock-hermetic-repo.py, lignes 1 à 210)
+  1: #! /usr/bin/python3
+  2: 
+  3: """
+  4: Take the JSON provided by Mock, download corresponding RPMs, and put them into
+  5: an RPM repository.
+  6: """
+  7: 
+  8: # pylint: disable=invalid-name
+  9: 
+  10: import argparse
+  11: import concurrent.futures
+  12: import json
+  13: import logging
+  14: import os
+  15: import shutil
+  16: import subprocess
+  17: import sys
+  18: 
+  19: from urllib.parse import quote, urlparse
+  20: from requests.adapters import HTTPAdapter
+  21: from requests.packages.urllib3.util.retry import Retry
+  22: 
+  23: import requests
+  24: 
+  25: logging.basicConfig(level=logging.DEBUG)
+  26: log = logging.getLogger(__name__)
+  27: 
+  28: 
+  29: def request_with_retry(retries=5, backoff_factor=0.3,
+  30:                        status_forcelist=(500, 502, 503, 504, 408, 429), session=None):
+  31:     """
+  32:     Wrapper for requests Session with default retries
+  33: 
+  34:     Converted from koji:
+  35:     https://pagure.io/koji/blob/fccf4fa3f990ca454a411c8a699e693f4e5b0ac8/f/koji/__init__.py#_2004
+  36:     originally stolen from
+  37:     https://www.peterbe.com/plog/best-practice-with-retries-with-requests
+  38:     """
+  39:     session = session or requests.Session()
+  40:     retry = Retry(total=retries, read=retries, connect=retries,
+  41:                   backoff_factor=backoff_factor,
+  42:                   status_forcelist=status_forcelist)
+  43:     adapter = HTTPAdapter(max_retries=retry)
+  44:     session.mount('http://', adapter)
+  45:     session.mount('https://', adapter)
+  46:     return session
+  47: 
+  48: 
+  49: def download_file(url, outputdir, client_auth_map):
+  50:     """
+  51:     Download a single file (pool worker)
+  52:     """
+  53:     basename = os.path.basename(url)
+  54:     file_name = os.path.join(outputdir, basename)
+  55:     dirname = os.path.dirname(url)
+  56: 
+  57:     # basename often contains '+' character, e.g., g++ package, url-encode it
+  58:     url = dirname + "/" + quote(basename)
+  59:     log.info("Downloading %s", url)
+  60: 
+  61:     try:
+  62:         parsed = urlparse(url)
+  63:         host_with_port = parsed.netloc
+  64:         host_only = parsed.hostname or host_with_port
+  65: 
+  66:         cert_arg = None
+  67:         # Prefer exact host:port mapping, then hostname-only
+  68:         mapping_value = client_auth_map.get(host_with_port) or client_auth_map.get(host_only)
+  69:         if mapping_value:
+  70:             cert_path, key_path = mapping_value
+  71:             cert_arg = (cert_path, key_path) if key_path else cert_path
+  72: 
+  73:         session = request_with_retry()
+  74:         request_kwargs = {"stream": True, "timeout": 60}
+  75:         if cert_arg is not None:
+  76:             request_kwargs["cert"] = cert_arg
+  77: 
+  78:         with session.get(url, **request_kwargs) as response:
+  79:             if response.status_code != 200:
+  80:                 return False
+  81:             with open(file_name, "wb") as fd:
+  82:                 shutil.copyfileobj(response.raw, fd)
+  83:             return True
+  84:     except:  # noqa: E722
+  85:         log.exception("Exception raised for %s", url)
+  86:         raise
+  87: 
+  88: 
+  89: def _argparser():
+  90:     parser = argparse.ArgumentParser(
+  91:         prog='mock-hermetic-repo',
+  92:         description=(
+  93:             "Prepare a repository for a `mock --hermetic-build` build. "
+  94:             "Given a Mock buildroot \"lockfile\"\n\n"
+  95:             "  a) create an output repo directory,\n"
+  96:             "  b) download and place all the necessary RPM files there,\n"
+  97:             "  c) create a local RPM repository there (run createrepo), and\n"
+  98:             "  d) dump there also the previously used bootstrap image as "
+  99:             "a tarball.\n\n"
+  100:             "Lockfile is a buildroot_lock.json file from Mock's "
+  101:             "result directory; it is a JSON file generated by the "
+  102:             "--calculate-build-dependencies option/buildroot_lock "
+  103:             "plugin."),
+  104:         formatter_class=argparse.RawTextHelpFormatter,
+  105:     )
+  106:     parser.add_argument("--lockfile", required=True,
+  107:                         help=(
+  108:                             "Select buildroot_lock.json filename on your system, "
+  109:                             "typically located in the Mock's result directory "
+  110:                             "upon the --calculate-build-dependencies mode "
+  111:                             "execution."))
+  112:     parser.add_argument("--output-repo", required=True,
+  113:                         help=(
+  114:                             "Download RPMs into this directory, and then run "
+  115:                             "/bin/createrepo_c utility there to populate the "
+  116:                             "RPM repo metadata."))
+  117:     parser.add_argument("--client-cert-for", dest="client_cert_for",
+  118:                         action="append", nargs='+', metavar="HOST CERT [KEY]",
+  119:                         help=(
+  120:                             "Register a client certificate (and optional key) to use for a "
+  121:                             "specific host. Repeatable. Usage: \n"
+  122:                             "  --client-cert-for HOST CERT [KEY]"))
+  123:     return parser
+  124: 
+  125: 
+  126: def prepare_image(image_specification, bootstrap_data, outputdir):
+  127:     """
+  128:     Store the tarball into the same directory where the RPMs are
+  129:     """
+  130:     # --scoped - it is better to refer will full repo name instead of just tag@sha
+  131:     #            also it matches with full pullspec from config's bootstrap_image
+  132:     # --preserve-digests - it is not needed for most images, but some could end with
+  133:     #            modified digests (semantically identical copy, but modified digest,
+  134:     #            e.g. embedded docker reference for v1 images), so better safe than sorry
+  135:     pull_cmd = ["skopeo", "sync", "--src", "docker", "--dest", "dir",
+  136:                 "--scoped", "--preserve-digests"]
+  137:     # skopeo (currently) can't live with tag + sha, so strip the tag
+  138:     image_specification = image_specification.split(':')[0]
+  139:     if "architecture" in bootstrap_data:
+  140:         pull_cmd += ["--override-arch", bootstrap_data["architecture"]]
+  141:     if "pull_digest" in bootstrap_data:
+  142:         image_specification +=  "@" + bootstrap_data["pull_digest"]
+  143:     pull_cmd += [image_specification, outputdir]
+  144:     log.info("Pulling like: %s", ' '.join(pull_cmd))
+  145:     subprocess.check_output(pull_cmd)
+  146: 
+  147: 
+  148: def _main():
+  149:     options = _argparser().parse_args()
+  150: 
+  151:     # Build host -> (cert_path, key_path|None) mapping
+  152:     client_auth_map = {}
+  153:     if getattr(options, "client_cert_for", None):
+  154:         for parts in options.client_cert_for:
+  155:             if len(parts) < 2 or len(parts) > 3:
+  156:                 log.error("Invalid --client-cert-for usage (expected: --client-cert-for HOST CERT [KEY]) -> %s", parts)
+  157:                 sys.exit(2)
+  158:             host = parts[0]
+  159:             cert_path = parts[1]
+  160:             key_path = parts[2] if len(parts) == 3 else None
+  161:             if not cert_path:
+  162:                 log.error("Invalid --client-cert-for value for %s (missing CERT path)", host)
+  163:                 sys.exit(2)
+  164:             if not os.path.isfile(cert_path):
+  165:                 log.error("Client certificate file does not exist for %s: %s", host, cert_path)
+  166:                 sys.exit(2)
+  167:             if key_path and not os.path.isfile(key_path):
+  168:                 log.error("Client key file does not exist for %s: %s", host, key_path)
+  169:                 sys.exit(2)
+  170:             # Log registration without printing key path
+  171:             if key_path:
+  172:                 log.info("Registering client certificate for %s: cert=%s (key provided)", host, cert_path)
+  173:             else:
+  174:                 log.info("Registering client certificate for %s: cert=%s", host, cert_path)
+  175:             client_auth_map[host] = (cert_path, key_path)
+  176: 
+  177:     with open(options.lockfile, "r", encoding="utf-8") as fd:
+  178:         data = json.load(fd)
+  179: 
+  180:     try:
+  181:         os.makedirs(options.output_repo)
+  182:     except FileExistsError:
+  183:         pass
+  184: 
+  185:     failed = False
+  186:     urls = [i["url"] for i in data["buildroot"]["rpms"]]
+  187:     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+  188:         for i, out in zip(urls, executor.map(download_file,
+  189:                                              urls,
+  190:                                              [options.output_repo for _ in urls],
+  191:                                              [client_auth_map for _ in urls])):
+  192:             if out is False:
+  193:                 log.error("Download failed: %s", i)
+  194:                 failed = True
+  195:     if failed:
+  196:         log.error("RPM deps downloading failed")
+  197:         sys.exit(1)
+  198: 
+  199:     subprocess.check_call(["createrepo_c", "--compatibility", options.output_repo])
+  200: 
+  201:     prepare_image(data["config"]["bootstrap_image"], data["bootstrap"],
+  202:                   options.output_repo)
+  203: 
+  204: 
+  205: if __name__ == "__main__":
+  206:     _main()
+## documentation : image de bootstrap et signatures
+  docs/feature-hermetic-builds.md:21:    # we'll create a local repository with pre-fetched RPMs/bootstrap
+  docs/feature-hermetic-builds.md:30:    # create a local RPM repository (+ download bootstrap image)
+  docs/feature-hermetic-builds.md:89:need network access [to obtain the appropriate bootstrap
+  docs/feature-hermetic-builds.md:90:tooling](Feature-bootstrap).
+  docs/feature-hermetic-builds.md:159:process—dependencies are already installed!
+  docs/feature-hermetic-builds.md:181:  the [Bootstrap Image feature](Feature-container-for-bootstrap).  This allows
+  docs/feature-hermetic-builds.md:182:  us to easily abstract the bootstrap preparation tasks, which would otherwise
+  docs/feature-hermetic-builds.md:185:  For now, we also require the Bootstrap Image to be *ready*.  This simplifies
+  docs/feature-hermetic-builds.md:187:  packages to install into) needed for bootstrap preparation.
+  docs/Plugin-BuildrootLock.md:13:installed RPMs, bootstrap image info, etc.) and a set of Mock configuration
+sources effacées ; archive gardée sous ~/.cache
