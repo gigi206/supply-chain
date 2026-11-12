@@ -172,3 +172,45 @@ Les deux notes précédentes, et mon message au propriétaire après `2c2a8ba`, 
 Aucun n'est dans le rejeu. Le seul effet sur un rejeu reste celui déjà consigné plus haut : une fois `s6a-alertes-deb.patch` commité, l'étape O3 du rejeu déploie des règles qui attendent la série du deb, et `ScanEnRetard` reste active par `absent()` pour ce dépôt. Cela relève de la décision à prendre sur l'intégration de S6 dans `rejeu.sh`.
 
 Rien n'a été lancé. Aucun fichier n'est modifié, sauf celui-ci.
+
+## Note datée du 12/11/2026 (à partir de 13:22:55 UTC, après « continue ») : `promtool` sur une copie détachée, préparé à sec, et témoin du deb laissé en question
+
+**Correctifs non appliqués, vérifié.** Pour chacun des trois correctifs, `git apply --check` passe sur `cda8d55` et `git apply -R --check` échoue : aucun n'est appliqué, et tous s'appliquent encore. Le rejeu de S5b déploie donc, à l'étape O3, les règles actuelles, sans le deb.
+
+**`promtool` avant S5b (Q7), préparé à sec, non lancé.** Appliquer `s6a-alertes-deb.patch` dans l'arbre avant S5b ferait garder `ScanEnRetard` active au rejeu (voir plus haut) : ce n'est pas la forme retenue. Le correctif est appliqué seulement dans une copie détachée, comme pour `verif-push`, et c'est le script de la copie qui tourne :
+
+```bash
+bash <<'EOS'
+set -euo pipefail
+cd /home/gigi/Documents/git/github/gigi206/supply-chain
+C=/tmp/claude-1000/-home-gigi-Documents-git-github-gigi206-supply-chain/8e4ef563-ec63-44dd-b5a2-5f0729c4e8b2/scratchpad/promtool-s6a
+git worktree add -q --detach "$C" HEAD </dev/null
+git -C "$C" apply poc/bricks/06-deb-sbuild/s6a-alertes-deb.patch </dev/null
+JALON=s6a mise exec -- "$C/poc/bricks/19-observabilite/observabilite.sh" regles || echo "code $?"
+cp "$C/poc/bricks/19-observabilite/resultats/s6a-regles.log" poc/bricks/06-deb-sbuild/resultats/s6a-promtool.log
+git worktree remove --force "$C" </dev/null && git worktree prune </dev/null
+EOS
+```
+
+- `mise exec` part de la racine du dépôt, pour l'environnement ; `observabilite.sh` lit ses règles d'après son propre chemin (`here`), donc celles de la copie corrigée.
+- Ce que l'étape touche : `/tmp/regles-test` sur `sc-stockage`, créé puis effacé par l'étape elle-même. Ni Prometheus, ni ses règles, ni le cluster, ni Zot : `deployer` n'est pas lancé. S5b recrée de toute façon `sc-stockage`.
+- `JALON=s6a` : le journal de la copie s'appelle `s6a-regles.log` et n'écrase aucun journal de la 19. Il est recopié en `resultats/s6a-promtool.log`.
+
+| N° | Prédiction | Confiance |
+|---|---|---|
+| P1 | `promtool, version 3.13.5`, comme dans `o3-regles.log` | Haute |
+| P2 | `check rules` : `SUCCESS: 14 rules found`. Le correctif change l'expression de `ScanEnRetard` sans ajouter de règle | Haute |
+| P3 | `test rules` : `SUCCESS`, y compris le groupe neuf (seul le dépôt du deb déclenche, à 6 min) | Moyenne : jamais lancé |
+| P4 | Code 0, arbre principal inchangé (`git status` propre hors le journal recopié) | Haute |
+
+En cas d'échec de P3, le correctif est repris avant S5b par un nouveau commit, et la prédiction Q7 tient compte de l'écart. Le journal recopié est commité avant le push de ce soir, jamais entre ce push et `vsa`.
+
+**Témoin d'un scan manquant pour le deb : non transposable tel quel.** `g8_suspendre` et `g8_reprendre` (07a, plateforme.sh:1671-1727) ne se reprennent pas en changeant un nom :
+- `alertes_scan` lit l'état de `ScanEnRetard` sur tous les dépôts : il faudrait le filtrer par `depot`, sinon une alerte de l'image passerait pour celle du deb ;
+- les fenêtres d'interdiction sont celles du passage de 09:30 ; celui du deb est à 11:15 UTC ;
+- l'essai suspend le CronJob au moins 26 h 15 min, ce qui retarde la porte du deb d'autant.
+
+C'est une question au propriétaire : faire ce témoin après S6a, ou garder le test de règle comme seul témoin.
+
+**`rejeu.sh` et S6.** La décision ne bloque rien avant S5b, puisque les correctifs ne sont pas appliqués. Elle est à prendre avant le premier rejeu qui suit l'application des correctifs de S6a.
+
