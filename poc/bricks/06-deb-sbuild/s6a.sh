@@ -318,7 +318,12 @@ etape_periodique() { # ACCORD NOMMÉ, après S5b et le relevé du 21/11 : écrit
   if [ "${S6A_SEC:-}" = 1 ]; then ecarts; echo "S6A_SEC=1 : rien d'écrit"; return 0; fi
   [ "$ECARTS" = 0 ] || { echo "KO   écart(s) avant toute écriture" >&2; exit 1; }
   hors_fenetre
-  kubectl get job -n scan "$JOB_DEB" -o name </dev/null 2>/dev/null | grep -q . && { echo "KO   job $JOB_DEB déjà présent" >&2; exit 1; }
+  # corrigé avant tout lancement, après ffbdb87 : un job terminé d'un passage interrompu est retiré, seul un job actif fait refuser
+  if kubectl get job -n scan "$JOB_DEB" -o name </dev/null 2>/dev/null | grep -q .; then
+    [ -z "$(kubectl get job -n scan "$JOB_DEB" -o jsonpath='{.status.active}' </dev/null)" ] || { echo "KO   job $JOB_DEB encore actif" >&2; exit 1; }
+    kubectl delete job -n scan "$JOB_DEB" --wait=true </dev/null >/dev/null
+    echo "job $JOB_DEB terminé d'un passage précédent : supprimé (ses journaux sont dans Loki)"
+  fi
 
   echo "## ConfigMap scan-config (comme cm_scan de la 07a), scanner.sh corrigé"
   kubectl create configmap scan-config -n scan --from-file=ca-poc.crt="$CA" --from-file=scanner.sh="$P07/politique/scanner.sh" \
@@ -334,8 +339,9 @@ etape_periodique() { # ACCORD NOMMÉ, après S5b et le relevé du 21/11 : écrit
   debut=$(date +%s)
   for _ in $(seq 380); do
     etat=$(kubectl get job -n scan "$JOB_DEB" -o jsonpath='{.status.succeeded}/{.status.failed}' </dev/null)
-    libre=$(ssh "${SSH8[@]}" poc@192.168.161.11 "df -m --output=avail / | tail -1" | tr -d ' ')
-    [ "$libre" -lt "$mini" ] && mini=$libre
+    # corrigé avant tout lancement, après ffbdb87 : une lecture de place ratée (SSH) n'arrête plus l'étape
+    libre=$(ssh "${SSH8[@]}" poc@192.168.161.11 "df -m --output=avail / | tail -1" 2>/dev/null | tr -d ' ' || true)
+    case $libre in ''|*[!0-9]*) ;; *) [ "$libre" -lt "$mini" ] && mini=$libre ;; esac
     case $etat in 1/*|*/1) break ;; esac
     sleep 5
   done

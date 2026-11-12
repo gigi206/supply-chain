@@ -84,3 +84,17 @@ Le sujet du scan est nommé `sample-app-deb` (`@NOM_IMAGE@`). `scan.rego` ne jug
 - **Témoin de scan manquant** pour le deb, sur le modèle de `g8_suspendre` et `g8_reprendre` : non préparé. Le test de règle neuf est le seul témoin.
 - **Digest du deb.** Si S5b ne reproduit pas `039949f9`, chaque étape refuse sans rien écrire, et la suite est à décider.
 - **Effet sur l'image.** `scan-config` porte ensuite le `scanner.sh` corrigé, et le scan de `sample-app` de 09:30 passe aussi par le plancher. E4 de l'essai montre qu'il le tient, avec 2 PURL versionnées.
+
+## Note datée du 12/11/2026 (corrigé avant tout lancement, après le commit `ffbdb87` de 13:57:37 heure de Paris, 12:57:37 UTC)
+
+Relecture du conseiller, sur trois points que `bash -n` ne voit pas :
+- **`periodique` n'était pas relançable.** Tout arrêt après la création du job `s6a-manuel` le laissait en place, et l'étape refusait ensuite de démarrer. Désormais, un `s6a-manuel` terminé est supprimé au départ ; seul un job encore actif fait refuser. Un second passage publie un second referrer : Q4 se lit alors en relatif, « avant plus un ».
+- **Lecture de la place sur `sc-confiance`.** Une coupure SSH pendant l'attente arrêtait l'étape sous `set -e`, après les écritures. La lecture ratée est maintenant ignorée, et le minimum ne retient que des nombres.
+- **Q9, Job de la porte en échec quand la VSA est refusée.** C'est établi, et non plus supposé :
+  - `vsa.sh` sort en code 1 sur un refus (`politique/porte/vsa.sh`, ligne 47, dans la 08) ;
+  - `vsa` est un conteneur principal du Job, avec `backoffLimit: 0` et `restartPolicy: Never` ;
+  - l'en-tête de `porte-job.yaml`, lignes 13 et 14, dit que le Job ne réussit que si `horodatage`, `vsa` et `scan` réussissent.
+
+  L'attente `/1` sans `pousser_vsa`, et `1/` avec, est donc conservée.
+
+Le script corrigé demande le même accord nommé que la version précédente, aucune n'ayant tourné.
