@@ -1845,3 +1845,16 @@ Commandes, dans cet ordre :
 
 L'appui de C2 est plus faible que je ne l'avais écrit : aucune reproduction du chroot d'un jour à l'autre n'est mesurée. Les commandes ne changent pas.
 
+## Additif du 12/11/2026, 10:27 UTC : trousseau et chroot tenus, chroot de la plateforme reproduit dans `sc-replay`
+
+Lancés sur ton accord « Oui, lance les deux » ([résultats](resultats/s6b-chroot-predictions.md)).
+
+- **`trousseau`** (10:24:58 UTC, code 0) : `debian-archive-keyring.gpg` est un lien vers le `.pgp` qu'a lu `sqv`. `dpkg -V` est propre, et `sqv` donne les trois signataires de S1 avec le `.gpg`. L'écart est levé.
+- **`chroot`** (10:25:03 à 10:26:08 UTC, code 0) : mmdebstrap a tourné 52 s dans `sc-replay` depuis l'instantané, sans avertissement.
+  - **Le chroot est identique, octet pour octet, à celui de l'image de build de la plateforme** (`aec1c7a9…`, 451 786 240 octets), avec les mêmes 12 515 entrées et les mêmes attributs.
+  - Les 63 `.deb` téléchargés et les 122 paquets installés sont ceux de la plateforme.
+  - Le témoin négatif est refusé par apt, sur la signature, avec **`/usr/bin/sqv`** : c'est maintenant mesuré.
+- **Mon erreur** : les valeurs de référence de ma note de 10:19 étaient calculées dans ma locale, et non avec `LC_ALL=C`. L'étape, elle, a tourné avec `LC_ALL=C` des deux côtés ; recalculées ainsi, les valeurs concordent.
+
+**Suite du contrôle 6** (à préparer à sec) : transporter la fermeture deb `bb7599a2` (216 Mio), les sources et le packaging dans `sc-replay` ; lancer sbuild lien coupé ; comparer le deb à `0b489d43`.
+

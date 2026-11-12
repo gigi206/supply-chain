@@ -92,3 +92,41 @@ Les dates de l'archive ne sont pas toutes ramenées à `SOURCE_DATE_EPOCH` : 2 5
 
 **Lancement** : en arrière-plan sur l'hôte, pour qu'une fin de délai de l'outil ne coupe pas ssh. Une coupure laisserait mmdebstrap tourner seul dans la VM, sans C1 à C4.
 
+## Résultats (12/11/2026, accord « Oui, lance les deux »)
+
+### `trousseau` : 10:24:58 UTC, code 0, `bilan : tout OK`
+
+Journal : `s6b-trousseau.log`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| K1 | **Tenue** | `debian-archive-keyring` `ii 2025.1`. **`debian-archive-keyring.gpg` est un lien symbolique** (26 octets) vers `debian-archive-keyring.pgp`, un fichier de 55 918 octets ; les deux donnent le sha256 `506b815c…`. Le paquet fournit chaque trousseau en `.pgp` et en `.gpg`, dont `debian-archive-removed-keys`. `dpkg -V` : aucune ligne. |
+| K2 | **Tenue** | InRelease : sha256 de S1. `sqv -n 3` avec le `.gpg` : code 0, et les trois signataires de S1. |
+
+**L'écart relevé après `sqv` est levé** : le fichier qu'apt nomme et celui que le témoin `sqv` a lu sont le même fichier.
+
+### `chroot` : 10:25:03 à 10:26:08 UTC, code 0, `bilan : tout OK`
+
+Journal : `s6b-chroot.log`, 123 lignes. Lancé en arrière-plan sur l'hôte. Aucune ligne `jeton|token`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| Réf. | **Tenue** | La copie du chroot de la plateforme a le sha256 `aec1c7a9…`. Ses listes, calculées par l'étape : 122 paquets installés (`74c3eded…`), 12 515 noms (`49f3aa9a…`), détail `20d2f4b7…`. GNU tar 1.35 sur l'hôte comme dans la VM. |
+| Modes | **Tenue** | `/home/replay` est en **700**, ce qui justifie la correction du dossier temporaire. `/home/replay/s6b` 755 root, `/var/tmp` 1777, `/var/tmp/s6b-mm` 755 root. Aucune ligne « unsandboxed » ni `_apt`. |
+| C0 | **Tenue** | mmdebstrap 1.5.7, code 0, « success in 52.4743 seconds ». Le journal de mmdebstrap (80 lignes) n'a **aucune ligne `W:` ni `E:`**. |
+| C1 | **Tenue** | **63 `.deb`** dans le cache au moment des crochets, comme S2, **tous dans `builder/paquets.txt` par leur sha256** |
+| C2 | **Tenue** | **451 786 240 octets, sha256 `aec1c7a9…` : identique, octet pour octet, au chroot de la plateforme.** La liste des noms (12 515 entrées) et la liste détaillée (modes, propriétaires, tailles, dates) sont identiques aussi. |
+| C3 | **Tenue** | 122 paquets installés, tous dans `builder/paquets.txt`, **identiques à ceux du chroot de la plateforme**, noms et versions |
+| C4 | **Tenue** | Le trousseau du témoin est `debian-archive-removed-keys.gpg`. Code 25. apt : « Sub-process /usr/bin/sqv returned an error code (1) … Missing key 4CB50190207B4758A3F73A796ED0E7B82643E131 … Missing key B8E5F13176D2A7A75220028078DBA3BC47EF2265 », puis « The repository … is not signed », puis « mmdebstrap failed to run ». |
+| Effets | **Tenus** | Restent dans `/home/replay/s6b` : `trixie-amd64.tar`, `mm-chroot.log`, `mm-temoin.log`, `noms.txt`, `detail.txt` et `installes.txt`. Le dossier temporaire et l'archive du témoin sont supprimés. Le disque libre passe de 13 363 à 12 930 Mo. Aucune écriture dans le cluster ni dans Zot. |
+
+**Un fait mesuré au passage** : C4 montre qu'**apt vérifie l'InRelease avec `/usr/bin/sqv`**, et qu'il refuse quand le trousseau donné par `signed-by` n'a pas les clés. L'étape `sqv` l'avait seulement déduit. Les empreintes de clés manquantes ne sont pas celles des clés primaires de S1, et je n'ai pas relevé à quelles clés elles appartiennent : des sous-clés de signature, probablement.
+
+**Erreur dans mes valeurs de référence d'avant le lancement** (note datée de 10:19:14) : `0ba5075e…` pour les paquets installés et `35fe9780…` pour le détail ont été calculés **sans `LC_ALL=C`**, dans la locale `fr_FR.UTF-8` de mon shell. La locale change l'ordre de `sort` et l'affichage de `tar -tv`. Recalculées avec `LC_ALL=C`, comme dans l'étape, elles donnent `74c3eded…` et `20d2f4b7…`, les valeurs de l'étape. L'hôte et la VM ont tous deux tourné avec `LC_ALL=C`, et la comparaison de l'étape est donc valable. La liste des noms, qui n'est pas triée, a le même sha256 dans les deux locales.
+
+**Conséquences**
+- **Le chroot de l'image de build `749d746c` est reproduit dans le domaine**, indépendamment de la plateforme. Les octets viennent de l'instantané, et ils sont vérifiés par `sqv` avec le trousseau de la VM. Ce sont les mêmes octets que ceux de la plateforme, construits le 10/11 dans un pod Kata depuis un miroir `file://`.
+- **C'est la première reproduction du chroot d'un jour à l'autre et d'un environnement à l'autre.**
+- Pour sbuild, le chroot est à `/home/replay/s6b/trixie-amd64.tar`, au compte `replay`.
+- **La suite** : transporter la fermeture deb `bb7599a2`, les sources et le packaging, lancer sbuild lien coupé, puis comparer le deb à `0b489d43`.
+

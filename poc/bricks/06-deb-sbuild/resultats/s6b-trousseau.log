@@ -1,0 +1,37 @@
+# s6b.sh trousseau, 2026-11-12T10:24:58Z
+## K1 et K2 : trousseau Debian de sc-replay (sans sudo, rien d'installé)
+## K1 : fichiers
+paquet : ii 2025.1
+  /usr/share/keyrings/debian-archive-bookworm-automatic.pgp
+  /usr/share/keyrings/debian-archive-bookworm-security-automatic.pgp
+  /usr/share/keyrings/debian-archive-bookworm-stable.pgp
+  /usr/share/keyrings/debian-archive-bullseye-automatic.pgp
+  /usr/share/keyrings/debian-archive-bullseye-security-automatic.pgp
+  /usr/share/keyrings/debian-archive-bullseye-stable.pgp
+  /usr/share/keyrings/debian-archive-keyring.pgp
+  /usr/share/keyrings/debian-archive-removed-keys.pgp
+  /usr/share/keyrings/debian-archive-trixie-automatic.pgp
+  /usr/share/keyrings/debian-archive-trixie-security-automatic.pgp
+  /usr/share/keyrings/debian-archive-trixie-stable.pgp
+  /usr/share/keyrings/debian-archive-bookworm-automatic.gpg
+  /usr/share/keyrings/debian-archive-bookworm-security-automatic.gpg
+  /usr/share/keyrings/debian-archive-bookworm-stable.gpg
+  /usr/share/keyrings/debian-archive-bullseye-automatic.gpg
+  /usr/share/keyrings/debian-archive-bullseye-security-automatic.gpg
+  /usr/share/keyrings/debian-archive-bullseye-stable.gpg
+  /usr/share/keyrings/debian-archive-keyring.gpg
+  /usr/share/keyrings/debian-archive-removed-keys.gpg
+  /usr/share/keyrings/debian-archive-trixie-automatic.gpg
+  /usr/share/keyrings/debian-archive-trixie-security-automatic.gpg
+  /usr/share/keyrings/debian-archive-trixie-stable.gpg
+/usr/share/keyrings/debian-archive-keyring.gpg : symbolic link, 26 octets ; cible /usr/share/keyrings/debian-archive-keyring.pgp ; sha256 506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017
+/usr/share/keyrings/debian-archive-keyring.pgp : regular file, 55918 octets ; cible /usr/share/keyrings/debian-archive-keyring.pgp ; sha256 506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017
+OK   dpkg -V debian-archive-keyring : aucune ligne
+## K2 : sqv avec le .gpg
+OK   InRelease : sha256 de S1
+sqv -n 3 (.gpg) : code 0 ; sortie :
+  04B54C3CDCA79751B16BC6B5225629DF75B188BD
+  41587F7DB8C774BCCF131416762F67A0B2C39DE4
+  B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+OK   .gpg : les trois signataires de S1
+bilan : tout OK
