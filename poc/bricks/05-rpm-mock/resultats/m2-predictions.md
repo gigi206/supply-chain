@@ -153,3 +153,29 @@ Ce constat vient de la lecture du code. **Il n'est pas mesuré.**
   3. Signaler le défaut chez mock. Action publique : ton accord est nécessaire.
   4. Corriger mock localement, ce qui écarte le rpm signé d'EPEL.
   Aucune voie n'est essayée.
+
+## Correction du 12/11/2026, écrite à partir de 14:57:37 UTC, après relecture du conseiller
+
+Deux affirmations du résultat ci-dessus sont fausses ou n'étaient pas vérifiées. Le texte au-dessus n'est pas réécrit.
+
+Lecture complémentaire de l'archive en cache, sans réseau, sha256 inchangé : [`m2-releve2-complement.log`](m2-releve2-complement.log).
+
+**1. Les options qui rendent une image « non prête » portent le préfixe `bootstrap_`.**
+- Le commentaire de `buildroot.py:1173` le disait déjà : ces options sont copiées depuis leur forme `bootstrap_`. `mock.py:811` à `:819` retire ce préfixe pour le bootstrap.
+- `config.py:347` à `:350` les initialise à vide, pour que le bootstrap n'hérite pas des options du buildroot.
+- Ce qui annule « prête » est donc `bootstrap_module_enable`, `bootstrap_module_install`, `bootstrap_module_setup_commands` ou `bootstrap_chroot_additional_packages`. Les options du buildroot de même nom n'y sont pour rien. N4r et sa partie « non prévu » sont corrigées en ce sens.
+
+**2. `rocky-9.tpl` est bien dans l'archive, contrairement à ce qui était écrit.**
+- mock-core-configs y est en version 45.2, celle épinglée par S1 (`45.2-1.el9`).
+- `rocky-9.tpl` ne pose que `bootstrap_image` (remplacé par notre configuration), et `rocky-9-x86_64.cfg` aucune option du bootstrap.
+- `s1.sh` ne pose aucune des quatre options : seulement `use_bootstrap_image`, `bootstrap_image` et `bootstrap_image_ready` (lignes 329 à 331).
+- **Donc la mesure de V1 ne peut pas être trompée** par le gabarit ni par notre configuration. La phrase « V1 de S1 : sa mesure peut tromper » est retirée.
+
+**L'ajout proposé à l'étape `verrou` reste utile, comme observation directe et toujours sur accord :**
+- chercher « Not updating bootstrap chroot » et « Package management in bootstrap » dans tout `root.log` ;
+- élargir le `--debug-config` de la sonde aux quatre options `bootstrap_*`.
+
+**3. Trois précisions.**
+- **N5r :** `config.py:855` monte le **dépôt hors ligne** en `/hermetic_repo`, et non le bootstrap.
+- **Référence du bootstrap :** `hôte/dépôt`, sans tag et sans port, passe aussi, pas seulement `hôte/dépôt:tag`.
+- **`sigmd5` :** c'est un MD5. Le comparer au verrou n'est qu'un contrôle de cohérence. **Le contrôle réel est `rpm -K` avec la clé Rocky `21CB256A…`**, et M2 sera conçu autour de lui.

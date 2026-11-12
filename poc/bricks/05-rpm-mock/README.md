@@ -198,3 +198,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - **Signatures et sommes des rpm** : ni `mock-hermetic-repo` ni le mode hermétique ne les contrôlent. En M2, `rpm -K` et la comparaison des `sigmd5` sont à notre charge.
 - **Non prévu, lu et non mesuré** : la référence du bootstrap est coupée au premier « : » (`config.py:844`, `mock-hermetic-repo.py:138`). Notre `sc-stockage.poc.test:5000/…@sha256:…` ferait échouer M2 et M3. Quatre voies sont à décider. `--calculate-build-dependencies`, et donc S1, n'est pas concerné.
 - **Non prévu, lu** : une image « prête » est traitée comme non prête si une option de modules ou `chroot_additional_packages` est posée, mais le verrou enregistre quand même `True`. La mesure de V1 peut donc tromper. Un ajout à l'étape `verrou` est proposé, sur accord.
+
+**Correction du 12/11/2026, écrite à partir de 14:57:37 UTC, après relecture du conseiller** ([détail](resultats/m2-predictions.md), [journal](resultats/m2-releve2-complement.log)) :
+- les options qui annulent « prête » sont les options `bootstrap_*` (`mock.py:811` à `:819`), pas celles du buildroot ;
+- `rocky-9.tpl` (mock-core-configs 45.2, la version épinglée) est dans l'archive et n'en pose aucune, pas plus que `s1.sh`. **La mesure de V1 ne peut donc pas être trompée** : la phrase de l'additif précédent est retirée ;
+- l'ajout à l'étape `verrou` reste proposé, comme observation directe ;
+- le contrôle réel des rpm est `rpm -K` avec la clé Rocky. Le `sigmd5` n'est qu'un contrôle de cohérence.

@@ -1,0 +1,25 @@
+# complément de releve2 (lecture de l'archive en cache, sans réseau, après relecture du conseiller), 2026-11-12T14:57:50Z
+sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+## retrait du préfixe bootstrap_ (mock/py/mock.py, lignes 811 à 819)
+  811:         # override configs for bootstrap_*
+  812:         for option in list(bootstrap_buildroot.config.keys()):
+  813:             # options that are not related to bootstrap chroot config_opts
+  814:             dont_copy = ["bootstrap_image"]
+  815:             prefix = "bootstrap_"
+  816:             if option.startswith(prefix) and option not in dont_copy:
+  817:                 bootstrap_option = option[len(prefix):]
+  818:                 bootstrap_buildroot.config[bootstrap_option] = bootstrap_buildroot.config[option]
+  819:                 del bootstrap_buildroot.config[option]
+## valeurs par défaut des options bootstrap_ (mock/py/mockbuild/config.py, lignes 345 à 350)
+  345:     # Initialize all the bootstrap configuration (bootstrap_ prefixed) we don't
+  346:     # want to automatically inherit from the target buildroot configuration.
+  347:     config_opts['bootstrap_chroot_additional_packages'] = []
+  348:     config_opts['bootstrap_module_enable'] = []
+  349:     config_opts['bootstrap_module_install'] = []
+  350:     config_opts['bootstrap_module_setup_commands'] = []
+## mock-core-configs dans l'archive
+  6:Version:    45.2
+  7:Release:    1%{?dist}
+## rocky-9.tpl et rocky-9-x86_64.cfg : lignes bootstrap, module, chroot_additional, macros
+  templates/rocky-9.tpl:6:config_opts['bootstrap_image'] = 'quay.io/rockylinux/rockylinux:9'
+  templates/rocky-9.tpl:26:module_platform_id=platform:el9
