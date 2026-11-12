@@ -1,0 +1,174 @@
+# m2.sh releve7, 2026-11-12T17:54:37Z
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : 21CB256AE16FC54C6E652949702D426D350D275D
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : 21CB256AE16FC54C6E652949702D426D350D275D
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 21 noms : bash bzip2 coreutils cpio diffutils redhat-release findutils gawk glibc-minimal-langpack grep gzip info patch redhat-rpm-config rpm-build sed tar unzip util-linux which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 60 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+       60 /9.8/extras/
+URL sans segment reconnu : 0
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+18 dossiers : ../ AppStream/ BaseOS/ CRB/ HighAvailability/ NFV/ RT/ ResilientStorage/ SAP/ SAPHANA/ devel/ extras/ images/ isos/ live/ metadata/ plus/ security/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-BaseOS : repomd.xml sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (21469219 octets)
+vault-BaseOS : 2160 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-AppStream : repomd.xml sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (2315831 octets)
+vault-AppStream : 8708 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-CRB : repomd.xml sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+OK   vault-CRB : primary (gz) conforme à repomd.xml (657804 octets)
+vault-CRB : 2653 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+OK   vault-extras : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+vault-extras : repomd.xml sha256 54ec0c5362c12097f0eb495aff9b4618171f6a67c458d8da4aaa69adc23c40c1
+OK   vault-extras : primary (gz) conforme à repomd.xml (11763 octets)
+vault-extras : 58 paquets dans le primary
+## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)
+OK   pub9-extras : repomd.xml signé par 21CB256AE16FC54C6E652949702D426D350D275D
+pub9-extras : repomd.xml sha256 73457f0a7e557dfd89c9191556d2d7f957288e45b8008bfcf05b2a93133ae0d2
+OK   pub9-extras : primary (gz) conforme à repomd.xml (11942 octets)
+pub9-extras : 59 paquets dans le primary
+## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)
+noms distincts dans BaseOS, AppStream et CRB 9.7 : 7402 ; noms de chroot_setup_cmd : 21
+### vault-extras : 58 paquets
+  anaconda-live 0:34.25.7.6-1.el9_7.rocky.0.5.x86_64
+  centos-release-ceph-pacific 0:1.0-2.el9.noarch
+  centos-release-ceph-quincy 0:1.0-2.el9.noarch
+  centos-release-ceph-reef 0:1.0-1.el9.noarch
+  centos-release-ceph-squid 0:1.0-1.el9.noarch
+  centos-release-cloud 0:1-1.el9.noarch
+  centos-release-gluster10 0:1.0-2.el9.noarch
+  centos-release-gluster11 0:1.0-1.el9.noarch
+  centos-release-gluster9 0:1.0-2.el9.noarch
+  centos-release-kmods 0:9-14.el9.x86_64
+  centos-release-kmods-kernel 0:9-5.el9.x86_64
+  centos-release-messaging 0:1-4.el9.noarch
+  centos-release-nfs-ganesha4 0:1.0-2.el9.noarch
+  centos-release-nfs-ganesha5 0:1.0-1.el9.noarch
+  centos-release-nfv-common 0:1-6.el9.noarch
+  centos-release-nfv-openvswitch 0:1-6.el9.noarch
+  centos-release-okd-4.13 0:1-1.el9.noarch
+  centos-release-okd-4.14 0:1-1.el9.noarch
+  centos-release-okd-4.15 0:1-1.el9.noarch
+  centos-release-okd-4.16 0:1-1.el9.noarch
+  centos-release-openstack-antelope 0:1-5.el9.noarch
+  centos-release-openstack-bobcat 0:1-2.el9.noarch
+  centos-release-openstack-caracal 0:1-2.el9.noarch
+  centos-release-openstack-dalmatian 0:1-1.el9.noarch
+  centos-release-openstack-epoxy 0:1-1.el9.noarch
+  centos-release-openstack-yoga 0:1-3.el9.noarch
+  centos-release-openstack-zed 0:1-3.el9.noarch
+  centos-release-opstools 0:1-12.el9.noarch
+  centos-release-ovirt45 0:9.2-1.el9.noarch
+  centos-release-rabbitmq-38 0:1-4.el9.noarch
+  centos-release-samba414 0:1.0-1.el9.noarch
+  centos-release-samba415 0:1.0-1.el9.noarch
+  centos-release-samba416 0:1.0-1.el9.noarch
+  centos-release-samba417 0:1.0-1.el9.0.1.noarch
+  centos-release-samba418 0:1.0-1.el9.noarch
+  centos-release-samba419 0:1.0-1.el9.noarch
+  centos-release-samba420 0:1.0-1.el9.noarch
+  centos-release-samba421 0:1.0-1.el9.noarch
+  centos-release-samba422 0:1.0-1.el9.noarch
+  centos-release-samba423 0:1.0-1.el9.noarch
+  centos-release-storage-common 0:2-5.el9.noarch
+  centos-release-virt-common 0:1-4.el9.noarch
+  elrepo-release 0:9.5-1.el9.noarch
+  epel-release 0:9-10.el9.noarch
+  epel-release 0:9-7.el9.noarch
+  livesys-scripts 0:0.4.3-2.el9.noarch
+  rocky-backgrounds-compat 0:90.16-1.el9.noarch
+  rocky-backgrounds-kde 0:90.16-1.el9.noarch
+  rocky-release-cloud 0:9-4.el9.noarch
+  rocky-release-core 0:9-1.el9.noarch
+  rocky-release-fasttrack 0:9-1.el9.noarch
+  rocky-release-hpc 0:9-1.el9.noarch
+  rocky-release-kernel 0:9-3.el9.noarch
+  rocky-release-security 0:9-4.el9.noarch
+  rpaste 0:0.4.1-1.el9.x86_64
+  rpmfusion-free-release 0:9-1.noarch
+  rpmfusion-free-release-tainted 0:9-1.noarch
+  update-motd 0:0.1-2.el9.noarch
+noms de chroot_setup_cmd qui sont des paquets de vault-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par vault-extras : aucun
+paquets de vault-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+### pub9-extras : 59 paquets
+  anaconda-live 0:34.25.7.14-1.el9.rocky.0.6.x86_64
+  centos-release-ceph-pacific 0:1.0-2.el9.noarch
+  centos-release-ceph-quincy 0:1.0-2.el9.noarch
+  centos-release-ceph-reef 0:1.0-1.el9.noarch
+  centos-release-ceph-squid 0:1.0-1.el9.noarch
+  centos-release-cloud 0:1-1.el9.noarch
+  centos-release-gluster10 0:1.0-2.el9.noarch
+  centos-release-gluster11 0:1.0-1.el9.noarch
+  centos-release-gluster9 0:1.0-2.el9.noarch
+  centos-release-kmods 0:9-14.el9.x86_64
+  centos-release-kmods-kernel 0:9-5.el9.x86_64
+  centos-release-messaging 0:1-4.el9.noarch
+  centos-release-nfs-ganesha4 0:1.0-2.el9.noarch
+  centos-release-nfs-ganesha5 0:1.0-1.el9.noarch
+  centos-release-nfv-common 0:1-6.el9.noarch
+  centos-release-nfv-openvswitch 0:1-6.el9.noarch
+  centos-release-okd-4.13 0:1-1.el9.noarch
+  centos-release-okd-4.14 0:1-1.el9.noarch
+  centos-release-okd-4.15 0:1-1.el9.noarch
+  centos-release-okd-4.16 0:1-1.el9.noarch
+  centos-release-openstack-antelope 0:1-5.el9.noarch
+  centos-release-openstack-bobcat 0:1-2.el9.noarch
+  centos-release-openstack-caracal 0:1-2.el9.noarch
+  centos-release-openstack-dalmatian 0:1-1.el9.noarch
+  centos-release-openstack-epoxy 0:1-1.el9.noarch
+  centos-release-openstack-yoga 0:1-3.el9.noarch
+  centos-release-openstack-zed 0:1-3.el9.noarch
+  centos-release-opstools 0:1-12.el9.noarch
+  centos-release-ovirt45 0:9.2-1.el9.noarch
+  centos-release-rabbitmq-38 0:1-4.el9.noarch
+  centos-release-samba414 0:1.0-1.el9.noarch
+  centos-release-samba415 0:1.0-1.el9.noarch
+  centos-release-samba416 0:1.0-1.el9.noarch
+  centos-release-samba417 0:1.0-1.el9.0.1.noarch
+  centos-release-samba418 0:1.0-1.el9.noarch
+  centos-release-samba419 0:1.0-1.el9.noarch
+  centos-release-samba420 0:1.0-1.el9.noarch
+  centos-release-samba421 0:1.0-1.el9.noarch
+  centos-release-samba422 0:1.0-1.el9.noarch
+  centos-release-samba423 0:1.0-1.el9.noarch
+  centos-release-storage-common 0:2-5.el9.noarch
+  centos-release-virt-common 0:1-4.el9.noarch
+  elrepo-release 0:9.5-1.el9.noarch
+  epel-release 0:9-10.el9.noarch
+  livesys-scripts 0:0.4.3-2.el9.noarch
+  rocky-backgrounds-compat 0:90.17-1.el9.noarch
+  rocky-backgrounds-kde 0:90.17-1.el9.noarch
+  rocky-release-cloud 0:9-4.el9.noarch
+  rocky-release-core 0:9-1.el9.noarch
+  rocky-release-fasttrack 0:9-1.el9.noarch
+  rocky-release-hpc 0:9-1.el9.noarch
+  rocky-release-kernel 0:9-3.el9.noarch
+  rocky-release-security 0:9-4.el9.noarch
+  rocky-release-storage-squid 0:9-8.el9.noarch
+  rocky-release-storage-tentacle 0:9-8.el9.noarch
+  rpaste 0:0.4.1-1.el9.x86_64
+  rpmfusion-free-release 0:9-1.noarch
+  rpmfusion-free-release-tainted 0:9-1.noarch
+  update-motd 0:0.1-2.el9.noarch
+noms de chroot_setup_cmd qui sont des paquets de pub9-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par pub9-extras : aucun
+paquets de pub9-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+noms seulement dans vault-extras : aucun
+noms seulement dans pub9-extras : rocky-release-storage-squid rocky-release-storage-tentacle
+fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache

@@ -549,3 +549,25 @@ Après « continue », sur relecture du conseiller. **Hôte seul, réseau, lectu
 - **les miroirs eux-mêmes.** Seule l'origine `dl.rockylinux.org` est lue ; un miroir peut être en retard ;
 - les groupes (comps) et les modules, non lus ;
 - que faire d'`extras` : la décision reste la tienne, après S5b. Cette étape ne la prépare par aucune recommandation.
+
+## Passage de `releve7`, le 12/11/2026 à 17:54:37 UTC (« Oui » à « Je lance releve7 ? »), code 0
+
+Fin à 17:54:46 UTC (`chrono.tsv`). Résultats écrits à partir de 17:55:24 UTC. Journal : [m2-releve7.log](m2-releve7.log), 174 lignes, sha256 de l'archive conforme, témoin altéré refusé, fichiers effacés.
+
+| # | Résultat |
+|---|---|
+| Y1 | **Tenue.** Clé de Rocky à l'empreinte `21CB256AE16FC54C6E652949702D426D350D275D`. Les `repomd.xml` de BaseOS, AppStream et CRB 9.7 sont signés par elle, et ces trois `repomd.xml` ont les mêmes sha256 que dans [s1-hote.log](s1-hote.log). Primary en `.gz` : BaseOS 2160 paquets (21 469 219 octets), AppStream 8708 (2 315 831 octets), CRB 2653 (657 804 octets) ; 7402 noms distincts. Chaque primary est égal à la somme de son `repomd.xml` signé ; l'écart de taille entre BaseOS et AppStream n'est pas expliqué |
+| Y2 | **Tenue.** Le mirrorlist d'`extras-9` répond HTTP 200 avec 60 URL, toutes en `/9.8/extras/` ; aucune en `/9.7/` |
+| Y3 | **Tenue.** `vault/rocky/9.7/` liste 18 entrées, `../` comprise, soit 17 dossiers, dont `extras/` en minuscules, une seule fois. Son `repomd.xml` est signé par la clé de Rocky ; primary conforme, en `.gz` |
+| Y4 | **Tenue.** L'`extras` de vault 9.7 compte 58 paquets, 57 noms (`epel-release` en deux versions). 51 noms sont des `*-release` de dépôts tiers ou de SIG (`centos-release-*`, `rocky-release-*`, `epel-release`, `elrepo-release`, `rpmfusion-free-release*`). Les 6 autres : `anaconda-live`, `livesys-scripts`, `rocky-backgrounds-compat`, `rocky-backgrounds-kde`, `rpaste`, `update-motd` |
+| Y5 | **Tenue.** Aucun des 21 noms de `chroot_setup_cmd` n'est un paquet ni un provides de l'un ou l'autre `extras` |
+| Y6 | **Tenue.** Aucun paquet de l'un ou l'autre `extras` n'a un nom présent dans BaseOS, AppStream ou CRB 9.7 |
+| Y7 | **Tenue.** `pub/rocky/9/extras` existe, signé par la clé de Rocky, 59 paquets. Il a deux noms de plus que l'`extras` de vault 9.7 (`rocky-release-storage-squid`, `rocky-release-storage-tentacle`) et aucun de moins. Des versions diffèrent aussi (`anaconda-live`, `rocky-backgrounds-*`), et `epel-release` n'y est qu'en une version |
+
+**Ce que cela dit, sans décision** :
+- **Ce que voit S1 aujourd'hui** : par le mirrorlist, l'`extras` de 9.8, qui bouge avec la version courante de Rocky, et non un dépôt figé.
+- **Un `extras` figé existe** : `vault/rocky/9.7/extras`, signé par la même clé que les trois dépôts déjà épinglés.
+- **Par nom**, aucun paquet que mock installe d'office ne vient d'`extras`, et aucun nom d'`extras` n'est aussi dans BaseOS, AppStream ou CRB 9.7. Une dépendance indirecte qu'`extras` serait seul à satisfaire n'est pas exclue : le premier verrou réel, ou le `root.log`, le dira.
+- **`pub/rocky/9/extras` et les `/9.8/extras/` des miroirs ne sont pas comparés.** La liste de 59 paquets est celle de l'origine, sous `/9/` ; que les miroirs servent la même chose n'est pas mesuré.
+- **V1 reste de confiance moyenne.** Le contenu d'`extras` est maintenant lu ; le comportement de dnf avec `--installroot` sans `--config`, le binaire de dnf choisi à l'exécution et le `$releasever` effectif de l'appel du verrou ne le sont pas.
+- Que faire d'`extras` reste ta décision, après S5b ; `s1.sh` ne change pas d'ici là.

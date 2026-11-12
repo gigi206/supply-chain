@@ -70,6 +70,8 @@
 #               après un KO qui arrête l'étape : ils restent alors sous ~/.cache jusqu'au passage suivant. Primary en .gz,
 #               .xz ou .bz2 (Rocky 9.8 : .gz, s1-hote.log ; vault 9.7 non lu), somme sha256 exigée.
 #               Prédictions : resultats/m2-predictions.md, section releve7. Banc hors réseau : resultats/m2-releve7-essai-local.sh.
+#               Lancé le 12/11/2026 à 17:54:37 UTC (« Oui » à « Je lance releve7 ? »), code 0 : Y1 à Y7 tenues ; extras existe
+#               dans vault 9.7, signé par la clé de Rocky, 58 paquets ; aucun croisement par nom (m2-releve7.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le

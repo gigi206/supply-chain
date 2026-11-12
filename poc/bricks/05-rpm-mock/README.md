@@ -329,3 +329,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - les croisements de ces paquets avec les noms de `chroot_setup_cmd` (par nom et par provides) et avec BaseOS, AppStream et CRB 9.7. Un croisement vide n'exclut pas une dépendance qu'`extras` serait seul à satisfaire.
 - Banc hors réseau, `gpg` réel et clés d'essai jetables : huit cas au code attendu ([journal](resultats/m2-releve7-essai-local.log)). Prédictions Y1 à Y7 ([détail](resultats/m2-predictions.md)).
 - Temps passé : 3,47 h à HEAD 7c8003a, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.
+
+**Passage de `releve7`, le 12/11/2026 à 17:54:37 UTC (« Oui » à « Je lance releve7 ? »)** : code 0 ([journal](resultats/m2-releve7.log)), Y1 à Y7 tenues ([détail](resultats/m2-predictions.md)).
+- Le mirrorlist d'`extras-9` sert 60 URL, toutes en `/9.8/extras/` : la construction de S1 voit l'`extras` de la version courante, qui bouge avec elle.
+- `vault/rocky/9.7/extras` existe, signé par la clé de Rocky : 58 paquets, dont 51 noms sur 57 sont des `*-release` de dépôts tiers ou de SIG. `pub/rocky/9/extras` en compte 59 (deux noms de plus) ; son identité avec ce que servent les miroirs n'est pas mesurée.
+- Par nom et par provides, aucun paquet de `chroot_setup_cmd` ne vient d'`extras`, et aucun nom d'`extras` n'est dans BaseOS, AppStream ou CRB 9.7. Une dépendance indirecte n'est pas exclue.
+- V1 reste de confiance moyenne. Que faire d'`extras` reste à décider avec toi, après S5b.
