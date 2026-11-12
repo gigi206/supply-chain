@@ -104,3 +104,24 @@ Décision du propriétaire : « Briques 05 et 06 : je recommande (a) pour D1 à 
 - **D4 (a)** : outillage sur Rocky 9.8 par digest (mock, podman, skopeo), cible en `vault/9.7`.
 
 **Aucun jalon n'est lancé.** S1 et chaque jalon suivant demandent un accord à part.
+
+## Additif du 12/11/2026, à partir de 14:12:09 UTC : S1 préparé à sec, NON LANCÉ
+
+Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme dans la 06. Rien n'a été lu ni écrit dans le cluster, Zot ou les VM, et aucune ressource réseau n'a été lue pour ce jalon.
+
+- **Script** : [`s1.sh`](s1.sh), étapes `prealables`, `amorce`, `racine`, `image` et `essais`.
+  - **Risque visé** : podman imbriqué dans un pod Kata privilégié (D1 a), puis `nspawn` contre `simple`.
+  - **Image** : outillage sur Rocky 9.8 par digest (D4 a), quatre paquets épinglés et contrôlés contre les primary vérifiés sur l'hôte.
+  - **mock** : vault 9.7 en `baseurl` fixes (D2 a), image de bootstrap 9.7 tirée de Zot par digest, macros d'OBS.
+  - Le build de sample-app n'y est pas hermétique : c'est l'objet de M2.
+- **Prédictions** P1 à P12 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md).
+- **Vérifié à sec** :
+  - `bash -n` passe ;
+  - shellcheck 0.11.0 ne relève aucun avertissement, et ses remarques de style sont des mêmes types que pour `s1.sh` de la 06 ;
+  - la spec de pod générée par jq est conforme : Kata, root, privilégié, label `prefetch-rpm` ;
+  - la configuration de mock passe à Python. Sur un modèle factice, elle remplace les trois `mirrorlist` de BaseOS, AppStream et CRB et laisse ceux de debug.
+- **Préalable du propriétaire** : une sortie réseau pour les pods rpm. Elle est proposée dans [`politiques/prefetch-rpm-sortie.yaml`](politiques/prefetch-rpm-sortie.yaml), sur le modèle de `prefetch-sortie` de la 08 :
+  - DNS, adresses publiques en 443, et Zot seul parmi les adresses privées ;
+  - plus `prefetch-rpm` dans le `NotIn` de `builds-sans-internet`, un fichier de la 08c rejoué par S5b.
+  - Rien n'est appliqué, et `s1.sh prealables` s'arrête en KO tant que la politique manque.
+- **Calendrier** : après S5b, qui efface Zot. Chaque étape demande un accord nommé.

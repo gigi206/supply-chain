@@ -1,0 +1,50 @@
+# Brique 05, S1 : sortie dédiée des pods rpm (label tekton.dev/task=prefetch-rpm). PROPOSITION, NON APPLIQUÉE (12/11/2026, 14:12 UTC).
+# Modèle : prefetch-sortie (08, prefetch-gomod) et prefetch-deb-sortie (08c). DNS, adresses publiques en 443 (dépôts de Rocky et
+# d'EPEL ; intégrité par repomd.xml signé et rpm signés, TLS en plus), et Zot seul parmi les adresses privées (image de bootstrap de
+# mock, tirée par podman par digest). Le port et l'accès à Zot sont des décisions du propriétaire.
+# Ne vaut qu'avec prefetch-rpm ajouté au NotIn de builds-sans-internet (08c) : sans cela, son egressDeny l'emporte sur toute
+# autorisation publique. Ordre d'application, comme pour le deb : cette politique d'abord, le NotIn ensuite ; retrait dans l'ordre
+# inverse. Après S5b seulement : builds-sans-internet est rejoué par S5b.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prefetch-rpm-sortie
+  namespace: builds
+spec:
+  description: "builds : prefetch-rpm, DNS, adresses publiques en 443 et Zot seulement"
+  endpointSelector:
+    matchLabels:
+      tekton.dev/task: prefetch-rpm
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress: []
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toCIDRSet:
+    - cidr: 0.0.0.0/0
+      except:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 169.254.0.0/16
+      - 127.0.0.0/8
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toCIDR:
+    - 192.168.161.13/32
+    toPorts:
+    - ports:
+      - port: "5000"
+        protocol: TCP
