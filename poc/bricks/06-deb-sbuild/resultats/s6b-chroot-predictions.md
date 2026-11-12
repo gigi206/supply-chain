@@ -62,3 +62,33 @@ L'étape tourne avec sudo dans la VM, lien ouvert. Elle n'écrit que sous `/home
 - Le transport de la fermeture deb `bb7599a2`, des sources et du packaging.
 - sbuild lien coupé, puis la comparaison du deb à `0b489d43`.
 - Le layout à `039949f9`, puis la VSA sur `454728c5` après le 12/11, 21:03:37 UTC.
+
+## Note datée du 12/11/2026 (rédigée à partir de 10:19:14 UTC, après relecture du conseiller), avant tout lancement
+
+Les prédictions ci-dessus ont été commitées dans `b8ae77e`, à 10:13:10 UTC. L'étape `chroot` est corrigée avant tout lancement ; `trousseau` est inchangée.
+
+1. **Diagnostic de C2 préparé.** Un écart de C2 aurait seulement dit « DIFFÉRENT ». L'étape tire maintenant sur l'hôte, de la copie du chroot de la plateforme, sa liste des noms et sa liste détaillée (`TZ=UTC tar --numeric-owner --full-time -tvf`), après en avoir revérifié le sha256. La VM calcule les mêmes listes sur son chroot, les compare, et les garde sous `/home/replay/s6b`. Les listes de référence restent sur l'hôte, sous `~/.cache/supply-chain-poc/06/s6b/ref`.
+2. **C3 exige l'égalité** avec les 122 paquets installés du chroot de la plateforme, et non plus la seule appartenance aux 199 de `builder/paquets.txt`.
+3. **C4** : le motif ne contient plus « keyring », que le chemin du témoin contient aussi. La fin du journal du témoin est toujours affichée.
+4. **Nettoyage** : le `rm -rf` du `trap` passe en `--one-file-system`, puisqu'il tourne en root sur un dossier où mmdebstrap monte `/proc` et `/sys`. Le nettoyage se fait aussi avant la ligne « gardés dans la VM ».
+5. **Dossier temporaire de mmdebstrap sous `/var/tmp/s6b-mm`.** Si `/home/replay` était en 0700, le compte `_apt` ne pourrait pas y descendre, et apt téléchargerait en root avec des avertissements. Les modes des dossiers sont journalisés. Le chroot final reste sous `/home/replay/s6b`.
+
+**Valeurs de référence**, calculées sur l'hôte avec GNU tar 1.35 et la commande même de l'étape :
+
+| Liste | Lignes | sha256 (début) |
+|---|---|---|
+| paquets installés | 122 | `0ba5075e…` |
+| noms | 12 515 | `49f3aa9a…` |
+| détail | 12 515 | `35fe9780…` |
+
+Les dates de l'archive ne sont pas toutes ramenées à `SOURCE_DATE_EPOCH` : 2 582 entrées sont du 29/08/2026, 2 421 du 30/08, 1 360 du 12/09.
+
+**Prédictions ajoutées ou révisées**
+- **Modes** : je ne les prédis pas. Avec le dossier temporaire sous `/var/tmp`, aucune ligne « unsandboxed » ou `_apt` dans le journal de mmdebstrap. Confiance moyenne.
+- **C2**, comparaison des listes : si les archives sont identiques, les deux listes le sont aussi. Si C2 diffère, je ne prédis pas laquelle des deux listes diffère.
+  - Le détail dépend de la version de tar de la VM : elle est journalisée, et une différence de version rendrait la comparaison du détail non concluante.
+  - **Révision de l'appui** : les deux chroots de S1 (`440ba93b`, 10/11 à 13:04 et 14:36 UTC) et les deux de S2 sont du même jour. Les deux exécutions de S4a sont du même soir. Aucune reproduction d'un jour à l'autre, ni d'un environnement à l'autre, n'est donc mesurée. C2 reste à confiance moyenne, avec cet appui plus faible.
+- **C3** : égalité avec la liste de la plateforme (`0ba5075e…`), et 122 paquets. Confiance haute.
+
+**Lancement** : en arrière-plan sur l'hôte, pour qu'une fin de délai de l'outil ne coupe pas ssh. Une coupure laisserait mmdebstrap tourner seul dans la VM, sans C1 à C4.
+

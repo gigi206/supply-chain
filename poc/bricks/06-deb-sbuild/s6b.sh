@@ -56,6 +56,8 @@
 #       C1  sha256 de chaque .deb du cache, au moment des crochets, présent dans builder/paquets.txt
 #       C2  taille et sha256 du chroot comparés à ceux de la plateforme (s4a-pipeline.log : 451786240 octets, aec1c7a9…)
 #       C3  paquets installés dans le chroot (var/lib/dpkg/status de l'archive) : nom et version présents dans builder/paquets.txt
+#       (corrigé avant lancement, après b8ae77e : C2 compare aussi les listes des noms et le détail de tar -tv à celles du chroot de
+#       la plateforme ; C3 exige l'égalité avec ses paquets installés ; voir le commentaire d'etape_chroot)
 #       C4  témoin négatif : mmdebstrap, variante essential, avec signed-by sur un trousseau qui ne porte pas les clés de trixie
 #           (clés retirées du paquet, sinon un fichier vide) : doit échouer, sur la signature
 #
@@ -363,27 +365,45 @@ EOS
 }
 
 etape_chroot() {
-  local shas nv
+  # corrigé avant tout lancement, après relecture du conseiller (12/11/2026, après b8ae77e) : listes de référence tirées sur
+  # l'hôte du chroot de la plateforme (copie de la comparaison de S4a, sha256 revérifié) pour diagnostiquer un écart de C2 ;
+  # C3 exige l'égalité avec ses paquets ; motif de C4 sans « keyring » et fin du journal du témoin toujours affichée ;
+  # rm du trap en --one-file-system ; dossier temporaire de mmdebstrap sous /var/tmp (traversable par _apt), modes journalisés
+  local shas nv ref=$HOME/.cache/supply-chain-poc/08/travail/s4a-06/comparaison/couche2/opt/sbuild/trixie-amd64.tar
   shas=$(awk '{print $4}' "$h06/builder/paquets.txt" | paste -sd,)
   nv=$(awk '{print $1 "=" $2}' "$h06/builder/paquets.txt" | paste -sd,)
   echo "## C0 à C4 : chroot par mmdebstrap dans sc-replay, depuis l'instantané (sudo, lien ouvert)"
+  echo "## référence, sur l'hôte : chroot de la plateforme (comparaison de S4a)"
+  mkdir -p "$T/ref"
+  attendu "sha256 de la copie du chroot de la plateforme" "$(sha256sum < "$ref" | cut -c1-64)" "$CHROOT_SHA"
+  tar -xOf "$ref" ./var/lib/dpkg/status | awk '/^Package: / {p = $2} /^Status: / {s = $0} /^Version: / {v = $2}
+    /^$/ {if (s == "Status: install ok installed") print p "=" v; p = v = s = ""} END {if (s == "Status: install ok installed") print p "=" v}' \
+    | sort > "$T/ref/installes.txt"
+  tar -tf "$ref" > "$T/ref/noms.txt"
+  TZ=UTC tar --numeric-owner --full-time -tvf "$ref" > "$T/ref/detail.txt"
+  local ri rn rd
+  ri=$(sha256sum < "$T/ref/installes.txt" | cut -c1-64); rn=$(sha256sum < "$T/ref/noms.txt" | cut -c1-64); rd=$(sha256sum < "$T/ref/detail.txt" | cut -c1-64)
+  echo "$(tar --version | head -1) ; installés : $(wc -l < "$T/ref/installes.txt"), sha256 $ri ; noms : $(wc -l < "$T/ref/noms.txt"), sha256 $rn ; détail : sha256 $rd"
   echo "builder/paquets.txt : $(wc -l < "$h06/builder/paquets.txt") paquets ; chroot de la plateforme : $CHROOT_TAILLE octets, sha256 $CHROOT_SHA"
-  sur sudo bash -s "$INSTANTANE" "$SDE" "$CHROOT_SHA" "$CHROOT_TAILLE" "$shas" "$nv" <<'EOS'
+  sur sudo bash -s "$INSTANTANE" "$SDE" "$CHROOT_SHA" "$CHROOT_TAILLE" "$shas" "$nv" "$ri" "$rn" "$rd" <<'EOS'
 set -euo pipefail
 export LC_ALL=C
 ko=0
-D=/home/replay/s6b; k=/usr/share/keyrings/debian-archive-keyring.gpg
+D=/home/replay/s6b; W=/var/tmp/s6b-mm; k=/usr/share/keyrings/debian-archive-keyring.gpg
 # chemins littéraux dans les rm : jamais une variable
-trap 'rm -rf -- /home/replay/s6b/tmp /home/replay/s6b/temoin.tar; chown -R replay:replay /home/replay/s6b' EXIT
-mkdir -p /home/replay/s6b/tmp
+nettoyer() { rm -rf --one-file-system -- /var/tmp/s6b-mm /home/replay/s6b/temoin.tar; }
+trap 'nettoyer; chown -R replay:replay /home/replay/s6b' EXIT
+nettoyer
+mkdir -p /home/replay/s6b /var/tmp/s6b-mm
 rm -f -- /home/replay/s6b/trixie-amd64.tar /home/replay/s6b/mm-chroot.log /home/replay/s6b/mm-temoin.log
+echo "modes : $(stat -c '%n %a %U' /home/replay /home/replay/s6b /var/tmp /var/tmp/s6b-mm | paste -sd';')"
 src="deb [check-valid-until=no signed-by=$k] $1 trixie main"
 finale="deb [check-valid-until=no] $1 trixie main"
 echo "## C0 : mmdebstrap"
-echo "$(mmdebstrap --version) ; SOURCE_DATE_EPOCH=$2 ; disque libre : $(df -BM --output=avail "$D" | tail -1)"
+echo "$(mmdebstrap --version) ; $(tar --version | head -1) ; SOURCE_DATE_EPOCH=$2 ; disque libre : $(df -BM --output=avail "$D" | tail -1)"
 echo "source : $src"
 t=$(date +%s); r=0
-SOURCE_DATE_EPOCH=$2 TMPDIR=$D/tmp mmdebstrap --mode=root --variant=buildd --format=tar \
+SOURCE_DATE_EPOCH=$2 TMPDIR=$W mmdebstrap --mode=root --variant=buildd --format=tar \
   --customize-hook='for f in "$1"/var/cache/apt/archives/*.deb; do echo "deb-cache ${f##*/} $(sha256sum < "$f" | cut -c1-64)"; done' \
   --customize-hook='echo sbuild > "$1/etc/hostname"' \
   --customize-hook=': > "$1/etc/resolv.conf"' \
@@ -403,33 +423,42 @@ echo "## C2 : archive comparée au chroot de la plateforme"
 z=$(stat -c %s "$D/trixie-amd64.tar"); c=$(sha256sum < "$D/trixie-amd64.tar" | cut -c1-64)
 echo "chroot : $z octets, sha256 $c"
 [ "$c" = "$3" ] && echo "OK   identique au chroot de la plateforme" || { echo "DIFFÉRENT du chroot de la plateforme ($4 octets, $3)"; ko=1; }
-echo "## C3 : paquets installés dans le chroot, comparés à builder/paquets.txt"
+tar -tf "$D/trixie-amd64.tar" > "$D/noms.txt"
+TZ=UTC tar --numeric-owner --full-time -tvf "$D/trixie-amd64.tar" > "$D/detail.txt"
+x=$(sha256sum < "$D/noms.txt" | cut -c1-64); y=$(sha256sum < "$D/detail.txt" | cut -c1-64)
+[ "$x" = "$8" ] && echo "OK   liste des noms : $(wc -l < "$D/noms.txt") entrées, identique" || echo "DIFFÉRENTE liste des noms : $(wc -l < "$D/noms.txt") entrées, sha256 $x"
+[ "$y" = "$9" ] && echo "OK   liste détaillée (modes, propriétaires, tailles, dates) identique" || echo "DIFFÉRENTE liste détaillée : sha256 $y"
+echo "## C3 : paquets installés dans le chroot, comparés au chroot de la plateforme et à builder/paquets.txt"
 declare -A nv; IFS=, read -ra l <<< "$6"; for x in "${l[@]}"; do nv[$x]=1; done
-tar -xOf "$D/trixie-amd64.tar" ./var/lib/dpkg/status > "$D/tmp/status"
-awk '/^Package: / {p = $2} /^Status: / {s = $0} /^Version: / {v = $2} /^$/ {if (s == "Status: install ok installed") print p "=" v; p = v = s = ""}
-     END {if (s == "Status: install ok installed") print p "=" v}' "$D/tmp/status" | sort > "$D/tmp/installes"
+tar -xOf "$D/trixie-amd64.tar" ./var/lib/dpkg/status | awk '/^Package: / {p = $2} /^Status: / {s = $0} /^Version: / {v = $2}
+  /^$/ {if (s == "Status: install ok installed") print p "=" v; p = v = s = ""} END {if (s == "Status: install ok installed") print p "=" v}' \
+  | sort > "$D/installes.txt"
 n=0; hors=0
-while read -r x; do n=$((n + 1)); [ -n "${nv[$x]:-}" ] || { echo "KO   hors de la liste : $x"; hors=$((hors + 1)); }; done < "$D/tmp/installes"
-[ $n -gt 0 ] && [ $hors = 0 ] && echo "OK   $n paquets installés, tous dans builder/paquets.txt (nom et version)" || { echo "KO   $n paquets, $hors hors de la liste"; ko=1; }
+while read -r x; do n=$((n + 1)); [ -n "${nv[$x]:-}" ] || { echo "KO   hors de builder/paquets.txt : $x"; hors=$((hors + 1)); }; done < "$D/installes.txt"
+[ $n -gt 0 ] && [ $hors = 0 ] && echo "OK   $n paquets installés, tous dans builder/paquets.txt" || { echo "KO   $n paquets, $hors hors de builder/paquets.txt"; ko=1; }
+x=$(sha256sum < "$D/installes.txt" | cut -c1-64)
+[ "$x" = "$7" ] && echo "OK   paquets installés identiques à ceux du chroot de la plateforme (noms et versions)" || { echo "KO   paquets installés différents de ceux de la plateforme (sha256 de la liste $x)"; ko=1; }
 echo "## C4 : témoin négatif (trousseau sans les clés de trixie)"
 m=""; for f in /usr/share/keyrings/debian-archive-removed-keys.gpg /usr/share/keyrings/debian-archive-removed-keys.pgp; do [ -s "$f" ] && { m=$f; break; }; done
-[ -n "$m" ] || { m=$D/tmp/vide.gpg; : > "$m"; }
+[ -n "$m" ] || { m=$W/vide.gpg; : > "$m"; }
 echo "trousseau du témoin : $m"
-r=0; SOURCE_DATE_EPOCH=$2 TMPDIR=$D/tmp mmdebstrap --mode=root --variant=essential --format=tar \
+r=0; SOURCE_DATE_EPOCH=$2 TMPDIR=$W mmdebstrap --mode=root --variant=essential --format=tar \
   trixie "$D/temoin.tar" "deb [check-valid-until=no signed-by=$m] $1 trixie main" > "$D/mm-temoin.log" 2>&1 < /dev/null || r=$?
-echo "mmdebstrap du témoin : code $r ; lignes d'erreur :"
-grep -iE '^(E:|W:)|NO_PUBKEY|not signed|signature|keyring|openpgp' "$D/mm-temoin.log" | head -20 | sed 's/^/  /' || true
-if [ $r != 0 ] && grep -qiE 'NO_PUBKEY|not signed|signature|keyring|openpgp' "$D/mm-temoin.log"; then
+echo "mmdebstrap du témoin : code $r ; fin de son journal :"
+tail -n 15 "$D/mm-temoin.log" | sed 's/^/  /'
+if [ $r != 0 ] && grep -qiE 'NO_PUBKEY|not signed|signature|openpgp' "$D/mm-temoin.log"; then
   echo "OK   témoin refusé, sur la signature"
 elif [ $r != 0 ]; then
   echo "NON CONCLUANT : refus sans message de signature"; ko=1
 else
   echo "KO   témoin ACCEPTÉ"; ko=1
 fi
+nettoyer
 chmod 0644 "$D/trixie-amd64.tar"
 echo "gardés dans la VM : $(ls "$D" | paste -sd' ') ; disque libre : $(df -BM --output=avail "$D" | tail -1)"
 [ $ko = 0 ] && echo "bilan : tout OK" || { echo "bilan : au moins un KO ou un écart"; exit 1; }
 EOS
+  echo "listes de référence gardées sur l'hôte : ${T/#$HOME/~}/ref"
 }
 
 case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1) ;; *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot" >&2; exit 2 ;; esac

@@ -1836,3 +1836,12 @@ Commandes, dans cet ordre :
 - `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh trousseau`
 - `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh chroot`
 
+**Note datée du 12/11/2026, 10:19 UTC** : l'étape `chroot` est corrigée avant tout lancement, après relecture du conseiller ([note](resultats/s6b-chroot-predictions.md)) :
+- un écart de C2 sera diagnostiqué par la liste des noms et le détail de l'archive, comparés à ceux du chroot de la plateforme ;
+- C3 exige l'égalité avec ses 122 paquets ;
+- le motif du témoin négatif est corrigé ;
+- le `rm` passe en `--one-file-system` ;
+- le dossier temporaire de mmdebstrap est sous `/var/tmp`.
+
+L'appui de C2 est plus faible que je ne l'avais écrit : aucune reproduction du chroot d'un jour à l'autre n'est mesurée. Les commandes ne changent pas.
+
