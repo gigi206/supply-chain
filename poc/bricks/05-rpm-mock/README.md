@@ -187,3 +187,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Elle lance `--calculate-build-dependencies` avec une configuration jumelle en `bootstrap_image_ready = True`, pour mesurer dès S1 si `rockylinux:9.7` brut convient au mode hermétique.
 - Le verrou est archivé, et rien n'est poussé.
 - Prédictions V1 à V5 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md).
+
+**Additif du 12/11/2026, à partir de 14:52:04 UTC : étape `releve2` ajoutée à `m2.sh` (après « continue »), NON LANCÉE.**
+- Hôte seul, sans réseau : elle relit l'archive de mock gardée par `releve`, sha256 contrôlé, et archive des plages entières de lignes.
+- Elle tranche les points que `releve` a laissés ouverts : options recopiées dans le verrou (macros d'OBS), champs par paquet, exigences d'une image de bootstrap prête, contrôles de signature de `mock-hermetic-repo` et du mode hermétique.
+- Prédictions N1r à N6r : [`resultats/m2-predictions.md`](resultats/m2-predictions.md). Elle attend un accord nommé.

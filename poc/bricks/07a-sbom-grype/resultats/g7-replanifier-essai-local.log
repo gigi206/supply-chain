@@ -1,0 +1,26 @@
+# essai hors cluster de g7-replanifier.sh releve (VM et Zot simulés, banc g7-replanifier-essai-local.sh), 2026-11-12T14:51:45Z
+5
+== essai 1 : vulndb/grype absent, deux blobs de scan
+## Zot sur sc-stockage
+zot.service démarré : Fri 2026-11-13 08:00:00 UTC
+démarrage en UTC : 2026-11-13T08:00:00Z
+## configuration de rétention et de gc, VM comparée au dépôt
+OK   configuration de rétention et de gc identique au dépôt : oui
+rootDirectory : $SP/g7-essai/racine ; delay : 336h ; gcInterval : 24h
+## blobs par dépôt (date de modification, UTC)
+ABSENT $SP/g7-essai/racine/vulndb/grype
+builds/scan/sample-app : 2 blob(s), plus ancien 2026-11-13T10:00:00Z, plus récent 2026-11-14T09:30:00Z
+plus ancien de builds/scan/** : 2026-11-13T10:00:00Z
+## calcul (pas une mesure ; un redémarrage de Zot le déplacerait)
+première suppression possible : 2026-11-27T10:00:00Z (plus ancien blob + 336h)
+premier balayage qui la suit : 2026-11-28T08:00:00Z (démarrage + 15 × 24h)
+heure proposée pour la tâche : 2026-11-28T08:45:00Z (balayage + 45 min)
+code 0
+== essai 2 : find en échec (dossier illisible simulé)
+find: '$SP/g7-essai/racine/vulndb/grype': Permission denied
+KO   find en échec sur $SP/g7-essai/racine/vulndb/grype
+KO   relevé des blobs en échec (motif ci-dessus)
+code 1
+== essai 3 : rootDirectory du dépôt différent de la VM
+KO   configuration de rétention et de gc identique au dépôt : non (attendu : oui)
+code 1

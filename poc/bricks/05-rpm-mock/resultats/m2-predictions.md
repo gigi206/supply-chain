@@ -81,3 +81,34 @@ Journal : [`m2-releve.log`](m2-releve.log). Code 0, 0 KO. Archive du tag : 460 1
 - **Configuration imposée en mode hermétique** : `hermetic-build.cfg` met `gpgcheck=0` sur le dépôt hors ligne. **La vérification des signatures des rpm (M2 du README) devra donc être faite par nous**, avec `rpm -K` sur le dépôt produit par `mock-hermetic-repo`, avant tout build.
 - **Macros d'OBS** : `-r` est refusé en mode hermétique. Les macros ne passeront que si le verrou les recopie dans `data["config"]` (`buildroot_lock.py:100`). C'est à vérifier dans un verrou réel en M2. Sinon, il faudra les porter par le spec ou par une autre voie, et la prédiction 1 du README est en jeu.
 - `config.py:862` porte le commentaire « With hermetic builds, we always assert that we are reproducing the build ». Sa portée n'est pas lue au-delà de cette ligne.
+
+## Additif du 12/11/2026, à partir de 14:52:04 UTC : étape `releve2` préparée à sec, NON LANCÉE
+
+Après « continue », sur recommandation du conseiller. `releve` a laissé des points ouverts, alors qu'ils pèsent sur deux décisions à venir (lecture de D3, image de bootstrap prête) et sur l'étape `verrou` de S1 (V1 à V5). `releve2` les lit avant S5b plutôt qu'après un passage dans le cluster.
+
+**Ce que fait l'étape** ([`m2.sh`](../m2.sh)) :
+- hôte seul, **sans réseau** : elle relit l'archive gardée par `releve`, après contrôle de son sha256 (`3c034916…3e4d88`) ;
+- sources extraites dans un dossier neuf, lues, jamais exécutées, puis effacées ;
+- plages entières de lignes au journal, et non plus des lignes isolées coupées à 170 caractères :
+  - `buildroot_lock.py` en entier (lignes 1 à 140) ;
+  - propriétés déclarées et exigées du schéma 1.1.0 (par jq) ;
+  - `buildroot.py` lignes 1150 à 1205, et les fonctions `inspect_hermetic_metadata` et `get_oci_digest` de `podman.py` ;
+  - `site-defaults.cfg` lignes 740 à 790 et `config.py` lignes 805 à 875 ;
+  - `mock-hermetic-repo.py` lignes 1 à 210 ;
+  - lignes de la documentation qui citent le bootstrap, les signatures ou les sommes.
+
+Une étape nouvelle : **accord nommé nécessaire avant de la lancer**. Les filtres awk et jq ont été essayés sur des entrées synthétiques ; `bash -n` passe, et shellcheck ne relève aucun avertissement.
+
+| # | Prédiction | Confiance | Si elle tombe |
+|---|---|---|---|
+| N1r | sha256 identique, étape de moins de 5 s, aucun accès réseau | Haute | Arrêt : archive changée sous `~/.cache` |
+| N2r | La liste des options recopiées dans `data["config"]` est une liste fixe du plugin. Elle contient `bootstrap_image` et `bootstrap_image_ready`, mais **pas** `macros` | Moyenne pour la liste fixe, faible pour `macros` | Si `macros` y est, les macros d'OBS passeraient par le verrou : V4 tombe, et la prédiction 1 du README n'est plus en jeu |
+| N3r | Chaque rpm du verrou porte au moins son nom, sa version, sa release, son arch et son URL de téléchargement ; une somme ou un `sigmd5` est présent | Faible | Sans somme, l'intégrité des rpm téléchargés ne reposerait que sur leur signature, contrôlée par nous (`rpm -K`) |
+| N4r | « Prête » veut dire que mock n'installe rien dans le bootstrap. Le code n'y vérifie pas d'outil : un manque (par exemple le greffon `builddep`) n'apparaît qu'à l'usage | Faible | Si le code exige un outil précis, V2 se précise et l'on saura avant S1 si `rockylinux:9.7` brut peut passer |
+| N5r | Le mode hermétique impose le bootstrap du verrou par son digest, le dépôt hors ligne monté en `/hermetic_repo`, et l'architecture du verrou. Il ne vérifie pas lui-même les signatures des rpm | Moyenne pour le montage (lu par `releve`, ligne 855), faible pour le reste | Si les signatures sont vérifiées par mock, notre `rpm -K` devient une seconde ligne, pas la seule |
+| N6r | `mock-hermetic-repo` télécharge chaque URL du verrou sans vérifier de signature GPG. Il contrôle au plus une somme, si le verrou en porte une | Faible | Si GPG est vérifié, la chaîne de M2 se raccourcit d'un contrôle |
+
+**Ce que les résultats changeraient, sans décision** :
+- **sur V1 et V2** : N4r dirait si `rockylinux:9.7` brut a une chance, ou s'il faut proposer tout de suite une image de bootstrap construite par notre chaîne (décision du propriétaire) ;
+- **sur V3 et V4** : N2r et N3r fixeraient la forme du verrou attendu ;
+- **sur la configuration de l'étape `essais`** : rien, tant que S1 reste en mode non hermétique.

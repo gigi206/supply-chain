@@ -8,14 +8,22 @@
 #               --hermetic-build (mock.py et page de manuel), arguments de mock-hermetic-repo, contenu de etc/mock/hermetic-build.cfg,
 #               clés écrites dans le verrou (plugin buildroot_lock), traitement de bootstrap_image_ready, documentation du mode
 #               hermétique (titres et lignes qui citent ces options) ; puis sources effacées
+#   releve2     hôte seul, sans réseau (ajouté à sec le 12/11/2026 à partir de 14:52:04 UTC, NON LANCÉ) : relit l'archive du tag
+#               gardée par releve, après contrôle de son sha256 ; archive au journal des plages entières de lignes, pour les points
+#               que releve a laissés ouverts : options recopiées dans le verrou et champs par paquet (buildroot_lock.py, schéma
+#               1.1.0), ce qu'exige une image de bootstrap « prête » (buildroot.py, podman.py), ce qu'impose le mode hermétique
+#               (config.py 805 à 875), téléchargement et contrôles de mock-hermetic-repo ; puis sources effacées.
+#               Prédictions : resultats/m2-predictions.md, section releve2.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
 set -euo pipefail
 export LC_ALL=C
 
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/../08-trust-plane/commun.sh"
 MOCK_TAG=mock-6.9-1
+ARCHIVE_SHA=3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88   # relevé le 12/11/2026 à 14:41:49 UTC (m2-releve.log)
 T=$HOME/.cache/supply-chain-poc/05/m2
 mkdir -p "$T"
 
@@ -54,6 +62,41 @@ etape_releve() {
   lignes "titres et options citées" '^#|calculate-build-dependencies|hermetic-build|mock-hermetic-repo|bootstrap_image_ready|--no-bootstrap' docs/feature-hermetic-builds.md docs/Feature-hermetic-builds.md
   rm -rf -- "${T:?}/mock-src"
   echo "sources effacées ; archive gardée sous ~/.cache (sha256 ci-dessus)"
+}
+
+plage() { # titre fichier première dernière : lignes numérotées d'une plage entière, coupées à 220 caractères
+  echo "### $1 ($2, lignes $3 à $4)"
+  [ -f "$T/mock-src/$2" ] || { echo "  fichier absent"; return 0; }
+  awk -v d="$3" -v f="$4" 'NR >= d && NR <= f { printf "  %d: %s\n", NR, $0 }' "$T/mock-src/$2" | cut -c1-220
+}
+
+etape_releve2() {
+  local a=$T/mock.tar.gz s
+  echo "## archive du tag $MOCK_TAG gardée par releve (aucun accès réseau)"
+  [ -f "$a" ] || { echo "KO   archive absente : $a (lancer releve d'abord)" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  rm -rf -- "${T:?}/mock-src"; mkdir "$T/mock-src"
+  tar -xzf "$a" -C "$T/mock-src" --strip-components=1
+  echo "## verrou : options recopiées et champs par paquet"
+  plage "plugin buildroot_lock" mock/py/mockbuild/plugins/buildroot_lock.py 1 140
+  echo "### schéma 1.1.0 : propriétés déclarées (chemins jq)"
+  jq -r 'paths | select(.[-2] == "properties") | map(tostring) | join(".")' "$T/mock-src/mock/docs/buildroot-lock-schema-1.1.0.json" | sed 's/^/  /'
+  echo "### schéma 1.1.0 : propriétés exigées"
+  jq -r '.. | objects | select(has("required")) | .required | join(", ")' "$T/mock-src/mock/docs/buildroot-lock-schema-1.1.0.json" | sed 's/^/  /'
+  echo "## image de bootstrap prête"
+  plage "buildroot.py autour de bootstrap_image_ready" mock/py/mockbuild/buildroot.py 1150 1205
+  echo "### podman.py : inspect_hermetic_metadata et get_oci_digest"
+  ( cd "$T/mock-src" && awk '/def (inspect_hermetic_metadata|get_oci_digest)/ { p = 1 } p && /^[[:space:]]*(def|class) / && !/def (inspect_hermetic_metadata|get_oci_digest)/ { p = 0 } p { printf "  %d: %s\n", FNR, $0 }' mock/py/mockbuild/podman.py ) | cut -c1-220
+  plage "site-defaults.cfg, options du mode hermétique" mock/docs/site-defaults.cfg 740 790
+  echo "## ce qu'impose le mode hermétique"
+  plage "config.py, process_hermetic_build_config" mock/py/mockbuild/config.py 805 875
+  echo "## mock-hermetic-repo : téléchargement et contrôles"
+  plage "mock-hermetic-repo.py" mock/py/mock-hermetic-repo.py 1 210
+  echo "## documentation : image de bootstrap et signatures"
+  ( cd "$T/mock-src" && grep -n -i -E 'bootstrap|ready|gpg|signat|checksum|sha256' docs/feature-hermetic-builds.md docs/Plugin-BuildrootLock.md 2>/dev/null ) | cut -c1-220 | sed 's/^/  /' || true
+  rm -rf -- "${T:?}/mock-src"
+  echo "sources effacées ; archive gardée sous ~/.cache"
 }
 
 lancer m2 "05 M2" "$@"

@@ -303,3 +303,5 @@ Mesure de la brique 06 (S6a, relevé 1, [résultats](../06-deb-sbuild/resultats/
   Il calculera ensuite la nouvelle heure de la tâche. Le calcul, rejoué sur les chiffres du 06/11, retrouve le plan d'alors (balayage le 21/11 à 15:14:56 UTC).
 - Procédure, prédictions G1 à G4 et brouillon de la consigne : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
 - La tâche planifiée n'est pas modifiée. Elle sera désactivée au lancement de S5b, sur le même accord.
+
+**Additif du 12/11/2026, à partir de 14:50:52 UTC : deux défauts de `g7-replanifier.sh` corrigés avant tout accord, NON LANCÉ.** Un dossier absent arrêtait l'étape sans message, et `/var/lib/zot` était écrit en dur. Essai hors cluster conforme, trois cas : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
