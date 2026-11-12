@@ -17,6 +17,9 @@
 #         s3-build-1.buildinfo) ; paquets.py stdlib exige la même version de Go dans le binaire et en amont du paquet, puis met le
 #         copyright DEP-5 de ce paquet en second composant du SBOM ; licences.py juge les deux composants ; témoin : le deb de
 #         l application donné à la place du paquet de Go, refus exigé. Le deb n est pas modifié (axes 1 et 2 après S5b).
+#         Traductions par nom (traductions-dep5.json, ajoutées le 12/11/2026) : un nom DEP-5 du copyright de Go n est traduit que si
+#         le texte de son paragraphe License autonome a le sha256 de la preuve ET si l entrée est revue par le propriétaire ;
+#         statut de chaque nom (SPDX, politique) journalisé.
 #   Hors de ces étapes : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
 # Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb       (journal : resultats/paquets-deb.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh modules   (journal : resultats/paquets-modules.log)
@@ -171,7 +174,9 @@ etape_stdlib() {
   if [ "$rc" = 1 ] && grep -q "^REFUS : .* n'est pas un paquet golang-X.Y-src" "$T/temoin.out"; then echo "OK   témoin refusé : $(grep -m1 '^REFUS' "$T/temoin.out")"
   else echo "KO   témoin : code $rc"; tail -3 "$T/temoin.out"; ko=1; fi
   echo "## deb et paquet de Go"
-  rc=0; python3 -I "$here/paquets.py" stdlib "$DEB" "$SRC" --sbom "$T/stdlib.sbom.json" || rc=$?
+  echo "traductions : $(sha256sum < "$here/traductions-dep5.json" | cut -c1-64) (traductions-dep5.json)"
+  rc=0; python3 -I "$here/paquets.py" stdlib "$DEB" "$SRC" --sbom "$T/stdlib.sbom.json" --traductions "$here/traductions-dep5.json" \
+    --spdx "$SPDX/licenses.json" --policy "$here/policy.json" || rc=$?
   [ "$rc" = 0 ] || { echo "KO   paquets.py stdlib : code $rc"; rm -rf -- "${T:?}"; exit 1; }
   echo "## verdict (licences.py, deux composants)"
   rc=0; juger "$T/stdlib.sbom.json" "$R/paquets-stdlib.licences.json" || rc=$?

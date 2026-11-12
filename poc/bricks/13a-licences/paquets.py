@@ -114,7 +114,12 @@ def expression_dep5(court):
     return expr, noms
 
 
-def analyser(texte, souple=False):
+def texte_licence(p):
+    """Forme canonique d'un paragraphe License autonome (preuve des traductions) : nom, puis lignes de continuation."""
+    return p["license"][0] + "\n" + "\n".join(p["license"][1])
+
+
+def analyser(texte, souple=False, trad=None):
     """(expression du paquet ou NOASSERTION, lignes de journal) ; Refus sur un DEP-5 mal formé.
 
     souple=False (modes deb et dep5, mesurés) : refus au premier défaut ; Files et Copyright exigés sur leur première ligne.
@@ -128,8 +133,25 @@ def analyser(texte, souple=False):
         j.append("format : absent ou autre que DEP-5 1.0 -> NOASSERTION")
         return "NOASSERTION", j
     j.append(f"format : DEP-5 1.0 ; paragraphes : {len(ps)}")
-    textes = {p["license"][0] for p in ps[1:] if "files" not in p and "license" in p and p["license"][1]}
+    autonomes = {p["license"][0]: p for p in ps[1:] if "files" not in p and "license" in p and p["license"][1]}
+    textes = set(autonomes)
     exprs = []
+    trad = trad or {}
+    appliquees = {}
+    for nom_t, e in trad.items():   # traductions par nom (mode souple seul) : texte égal à la preuve ET revue exigés
+        p_t = autonomes.get(nom_t)
+        h = hashlib.sha256(texte_licence(p_t).encode("utf-8")).hexdigest() if p_t else None
+        if not souple:
+            continue
+        if h is None:
+            j.append(f"traduction {nom_t} -> {e['expression']} : NON appliquée (pas de paragraphe License autonome)")
+        elif h != e["texte_sha256"]:
+            j.append(f"traduction {nom_t} -> {e['expression']} : NON appliquée (texte sha256 {h}, preuve {e['texte_sha256']})")
+        elif not e.get("revue"):
+            j.append(f"traduction {nom_t} -> {e['expression']} : NON appliquée (entrée non revue ; texte conforme à la preuve, sha256 {h})")
+        else:
+            appliquees[nom_t] = e["expression"]
+            j.append(f"traduction {nom_t} -> {e['expression']} : appliquée (texte sha256 {h} ; revue : {e['revue']})")
 
     def present(p, c):
         return c in p and bool(p[c][0] or (souple and c != "license" and any(p[c][1])))
@@ -151,6 +173,8 @@ def analyser(texte, souple=False):
             defauts.append(str(e))
             j.append(f"Files {' '.join([p['files'][0]] + p['files'][1])[:120]} : License « {p.get('license', ('', []))[0]} » -> DÉFAUT : {e}")
             continue
+        if appliquees:
+            expr = " ".join(f"({appliquees[m]})" if m in appliquees and " " in appliquees[m] else appliquees.get(m, m) for m in expr.split())
         fichiers = " ".join([p["files"][0]] + p["files"][1])
         j.append(f"Files {fichiers[:120] if souple else fichiers} : License « {p['license'][0]} » -> {expr}")
         exprs.append(f"({expr})" if " " in expr else expr)
@@ -275,7 +299,18 @@ def lire_deb(b):
     return {k: v[0] for k, v in ctl[0].items()}, ms
 
 
-def stdlib(deb, src):
+def statuts(expr, spdx, politique):
+    """Lignes de journal : pour chaque nom distinct de l'expression, identifiant SPDX ou non, classe dans la politique."""
+    ids = {l["licenseId"].lower(): l["licenseId"] for l in spdx["licenses"]}
+    out = []
+    for n in sorted({m.strip("()") for m in expr.split()} - {"AND", "OR", ""}, key=str.lower):
+        i = ids.get(n.lower())
+        cl = next((c for c in ("deny", "warn", "allow") if i and any(fnmatch.fnmatchcase(i, x) for x in politique.get(c, []))), None)
+        out.append(f"nom {n} : SPDX {i or 'non'} ; politique : {cl or ('absente' if i else '-')}")
+    return out
+
+
+def stdlib(deb, src, trad=None, spdx=None, politique=None):
     """Composants du SBOM (deb, puis paquet source de la bibliothèque standard) ; Refus sur toute incohérence."""
     ctl, ms = lire_deb(deb)
     nom = ctl["package"]
@@ -306,7 +341,8 @@ def stdlib(deb, src):
         cr = fichier_tar(membres[2][1], f"./usr/share/doc/{n}/copyright")
         print(f"## copyright de {n} : sha256 {hashlib.sha256(cr).hexdigest()} ({len(cr)} octets)")
         try:
-            expr, j = analyser(cr.decode("utf-8"), souple=(n != nom))
+            expr, j = analyser(cr.decode("utf-8"), souple=(n != nom),
+                               trad={e["nom"]: e for e in (trad or []) if e["paquet"] == n and e["version"] == v} if n != nom else None)
         except Refus as e:
             for l in getattr(e, "journal", []):
                 print(l)
@@ -315,6 +351,9 @@ def stdlib(deb, src):
             print(l)
         purl = f"pkg:deb/debian/{n}@{v}?arch={a}"
         print(f"{purl} : {expr}")
+        if spdx is not None and n != nom:
+            for l in statuts(expr, spdx, politique or {}):
+                print(l)
         comps += sbom(purl, n, v, expr)["components"]
     return {"bomFormat": "CycloneDX", "specVersion": "1.6", "components": comps}
 
@@ -333,6 +372,9 @@ def main(argv=None):
     p.add_argument("source", nargs="?", help="mode stdlib : deb de golang-X.Y-src")
     p.add_argument("--sbom")
     p.add_argument("--purl")
+    p.add_argument("--traductions", help="mode stdlib : traductions par nom, revues, liées au texte (JSON)")
+    p.add_argument("--spdx", help="mode stdlib : licenses.json, pour journaliser le statut de chaque nom")
+    p.add_argument("--policy", help="mode stdlib : politique, pour le même statut")
     a = p.parse_args(argv)
     try:
         b = open(a.fichier, "rb").read()
@@ -346,7 +388,10 @@ def main(argv=None):
                 raise Refus("deb de golang-X.Y-src exigé")
             src = open(a.source, "rb").read()
             print(f"sha256 du paquet de la bibliothèque standard : {hashlib.sha256(src).hexdigest()} ({len(src)} octets)")
-            json.dump(stdlib(b, src), open(a.sbom, "w"), indent=1)
+            trad = json.load(open(a.traductions, encoding="utf-8")) if a.traductions else None
+            spdx = json.load(open(a.spdx, encoding="utf-8")) if a.spdx else None
+            pol = json.load(open(a.policy, encoding="utf-8")) if a.policy else None
+            json.dump(stdlib(b, src, trad, spdx, pol), open(a.sbom, "w"), indent=1)
             return 0
         if a.mode == "deb":
             ms = membres_ar(b)

@@ -251,3 +251,41 @@ deux fichiers, après le lancement) :
 - Le composant du deb reste conforme (`ok`), comme dans `deb`.
 - La suite (curation revue au sens de 13a, restriction aux fichiers compilés, autre source de licence) est à décider avec le
   propriétaire ; rien n'est relancé.
+
+## Traduction du nom DEP-5 « Go » (préparée à sec le 12/11/2026 à partir de 20:07 UTC, « Oui, prépare-la »), NON APPLIQUÉE, NON LANCÉE
+
+**Écart avec le message précédent** : ce n'est pas « le mécanisme de curation existant de 13a ». Dans `licences.py`, une curation est
+indexée par purl et remplace **toute** l'expression d'un composant ; une curation du seul nom « Go » n'y entre pas (il faudrait aussi
+trancher `FreeBSD`, `MPEG`, `noderivs`, `BSD-3-clause-svgpan` et `X11`). Ce qui est préparé est une **traduction par nom**, dans
+`paquets.py`, réservée au mode souple (composant de la bibliothèque standard). `licences.py` et `policy.json` ne changent pas. Le README
+de 13a place les curations dans un dépôt `ort-config` ; ce fichier-ci, [`traductions-dep5.json`](../traductions-dep5.json), est dans la
+brique : écart nommé.
+
+**Règle** : un nom n'est traduit que si (1) l'entrée vise le même paquet et la même version, (2) le sha256 du paragraphe `License`
+autonome de ce nom, sous la forme de `texte_licence()` (nom, puis lignes de continuation telles que `paragraphes()` les rend), est égal
+à la preuve, et (3) l'entrée est revue (`revue` non vide). Sinon le nom reste tel quel et `licences.py` le refuse. L'étape journalise
+pour chaque nom de l'expression : identifiant SPDX ou non, classe dans la politique (le tableau fait à la main après `stdlib` devient
+une mesure archivée).
+
+**Lu pour la preuve** (copyright de `golang-1.24-src` 1.24.4-1, paquet au sha256 épinglé ; texte non reproduit ici) :
+- un seul paragraphe `License: Go` autonome, 42 lignes de continuation ; preuve `6ce83989…` (calculée par le code de l'étape) ;
+- comparaison de mots normalisés (minuscules, ponctuation retirée ; **pas** la correspondance de SPDX) avec `BSD-3-Clause` de la liste
+  3.27.0 : mêmes clauses ; écarts : la ligne de copyright, « Google Inc. » dans la clause 3, « OWNER » au lieu de « HOLDER » ; le
+  modèle SPDX les couvre (`organizationClause3`, motif lu en entier, 848 caractères, essayé sur la phrase de Go : accepté ;
+  `copyrightHolderLiability`, motif `.+`) ;
+- **en plus** : une concession de brevets de Google (131 mots), avec résiliation en cas de litige de brevets ; rédaction différente du
+  `PATENTS` du Go 1.24.7 de mise (202 mots, ratio de mots 0,72), même nature. Elle n'est pas dans `BSD-3-Clause`.
+
+**Entrée préparée** : `Go` -> `BSD-3-Clause`, `revue: null`. Traduire ainsi laisse la concession de brevets hors de l'expression :
+savoir si c'est acceptable est une lecture juridique, au propriétaire. Sa réponse sera la revue ; aucun relecteur n'est écrit avant.
+
+**Banc** ([journal](paquets-stdlib-essai-local.log)) : onze cas au code et au motif attendus, dont quatre de traduction : texte égal à
+la preuve et revue (appliquée, 0) ; un mot changé (non appliquée, 1) ; entrée non revue (non appliquée, 1) ; autre version du paquet
+(ignorée, 1). Bancs de `deb` (neuf cas) et `modules` (six debs) rejoués, tenus : modes `deb` et `dep5` inchangés.
+
+**Si la traduction est revue puis l'étape relancée** (prédictions, avant tout lancement) :
+| # | Prédiction | Confiance |
+|---|---|---|
+| T1 | `traduction Go -> BSD-3-Clause : appliquée`, texte au sha256 `6ce83989…` | Haute : calculée sur le même paquet |
+| T2 | Les sept paragraphes `Go` deviennent `BSD-3-Clause` ; les statuts journalisés : `FreeBSD`, `MPEG`, `noderivs`, `BSD-3-clause-svgpan` hors SPDX, `X11` hors politique, `Apache-2.0` et `BSD-3-Clause` autorisés | Haute : lecture du passage de 20:05:09 UTC |
+| T3 | `bilan : KO`, code 1 : `licences.py` s'arrête au premier nom invalide restant | Haute |

@@ -27,6 +27,9 @@ binp = sys.argv[5] if len(sys.argv) > 5 else None
 en = "Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n"
 if lic == "suite":    # Copyright et Files dont la valeur commence à la ligne suivante (DEP-5 valide)
     cr = en + "\nFiles:\n *\nCopyright:\n 2009 The Go Authors\nLicense: BSD-3-clause\n texte\n"
+elif lic in ("go-preuve", "go-change"):   # licence nommée Go, texte dans un paragraphe License autonome
+    t = "texte go" if lic == "go-preuve" else "texte go modifie"
+    cr = en + f"\nFiles: *\nCopyright: 2026 x\nLicense: Go\n\nLicense: Go\n {t}\n"
 elif lic == "deux":   # deux défauts distincts dans deux paragraphes
     cr = en + "\nFiles: *\nCopyright: 2026 x\nLicense: GPL-2+ with Autoconf exception\n\nFiles: a/*\nCopyright: 2026 y\nLicense: Inconnue\n"
 else:
@@ -48,22 +51,30 @@ open(out, "wb").write(o)
 EOP
 }
 fabriquer "$H/app.deb" essai 1.0-1 Apache-2.0 "$H/essai"
-essai() { # cas paquet version licence code-attendu motif-attendu
-  local cas=$1 src=$H/$1-src.deb s1 s2 rc
+essai() { # cas paquet version licence code-attendu motif-attendu [traductions : preuve|non-revue|autre-version]
+  local cas=$1 src=$H/$1-src.deb s1 s2 rc h
   fabriquer "$src" "$2" "$3" "$4"
+  h=$(printf 'Go\ntexte go' | sha256sum | cut -c1-64)
+  case "${7:-}" in
+    preuve) printf '[{"paquet": "%s", "version": "%s", "nom": "Go", "texte_sha256": "%s", "expression": "BSD-3-Clause", "raison": "banc", "revue": "banc"}]\n' "$2" "$3" "$h" ;;
+    non-revue) printf '[{"paquet": "%s", "version": "%s", "nom": "Go", "texte_sha256": "%s", "expression": "BSD-3-Clause", "raison": "banc", "revue": null}]\n' "$2" "$3" "$h" ;;
+    autre-version) printf '[{"paquet": "%s", "version": "0.0-1", "nom": "Go", "texte_sha256": "%s", "expression": "BSD-3-Clause", "raison": "banc", "revue": "banc"}]\n' "$2" "$h" ;;
+    *) echo '[]' ;;
+  esac > "$H/trad.json"
   s1=$(sha256sum < "$H/app.deb" | cut -c1-64); s2=$(sha256sum < "$src" | cut -c1-64)
   printf '%s %s all %s 1 pool/main/g/x/%s.deb\n' "$2" "$3" "$s2" "$2" > "$H/verrou.txt"
   printf 'Installed-Build-Depends:\n %s (= %s),\n' "$2" "$3" > "$H/bi.txt"
   sed -e "s#^DEB_SHA=.*#DEB_SHA=$s1#" -e "s#^SRC_SHA=[^ ]*#SRC_SHA=$s2#" -e "s#^SRC_BI=\"[^\"]*\"#SRC_BI=\"$2 (= $3)\"#" \
       -e "s#^R=\$here/resultats\$#R=$H/res#" -e "s#^here=.*#here=$B#" -e "s#^T=.*#T=$H/travail#" \
       -e "s#\"\$repo/poc/packaging/verrou-deb.txt\"#\"$H/verrou.txt\"#" \
-      -e "s#\"\$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo\"#\"$H/bi.txt\"#" "$B/paquets.sh" > "$H/paquets.sh"
-  [ "$(grep -c -e "^DEB_SHA=$s1" -e "^SRC_SHA=$s2 " -e "^SRC_BI=\"$2 (= $3)\"" -e "^R=$H/res" -e "^here=$B" -e "^T=$H/travail" -e "\"$H/verrou.txt\"" -e "\"$H/bi.txt\"" "$H/paquets.sh")" = 8 ] \
+      -e "s#\"\$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo\"#\"$H/bi.txt\"#" \
+      -e "s#\"\$here/traductions-dep5.json\"#\"$H/trad.json\"#g" "$B/paquets.sh" > "$H/paquets.sh"
+  [ "$(grep -c -e "^DEB_SHA=$s1" -e "^SRC_SHA=$s2 " -e "^SRC_BI=\"$2 (= $3)\"" -e "^R=$H/res" -e "^here=$B" -e "^T=$H/travail" -e "\"$H/verrou.txt\"" -e "\"$H/bi.txt\"" -e "\"$H/trad.json\"" "$H/paquets.sh")" = 10 ] \
     || { echo "KO   banc : substitutions ($cas)"; exit 1; }
   rc=0; DEB=$H/app.deb SRC=$src bash "$H/paquets.sh" stdlib > "$H/$cas.log" 2>&1 || rc=$?
   if [ "$rc" = "$5" ] && grep -qE -- "$6" "$H/$cas.log" && ! grep -q '^Traceback' "$H/$cas.log"; then echo "OK   $cas : code $rc, « $6 »"
   else echo "KO   $cas : code $rc (attendu $5), motif « $6 »"; fi
-  grep -E '^(OK|KO|REFUS|bilan|binaire|paquet de|pkg:|licences\.py|Files|format)|^ +(ok|error|warning) ' "$H/$cas.log" | sed "s#$H#<banc>#g; s/^/     /"
+  grep -E '^(OK|KO|REFUS|bilan|binaire|paquet de|pkg:|licences\.py|Files|format|traduction|nom )|^ +(ok|error|warning) ' "$H/$cas.log" | sed "s#$H#<banc>#g; s/^/     /"
 }
 essai s-nominal golang-1.24-src "$AM-1" BSD-3-clause 0 '^bilan : bibliothèque standard déclarée'
 essai s-epoque golang-1.24-src "2:$AM-1" BSD-3-clause 0 '^OK   go.* = version amont'
@@ -71,5 +82,9 @@ essai s-version golang-1.24-src 1.24.0-1 BSD-3-clause 1 '^REFUS : version amont 
 essai s-nom golang-src "$AM-1" BSD-3-clause 1 "^REFUS : golang-src n'est pas un paquet golang-X.Y-src"
 essai s-expat golang-1.24-src "$AM-1" Expat 1 '^KO   verdict non conforme'
 essai s-suite golang-1.24-src "$AM-1" suite 0 '^bilan : bibliothèque standard déclarée'
+essai t-preuve golang-1.24-src "$AM-1" go-preuve 0 '^traduction Go -> BSD-3-Clause : appliquée' preuve
+essai t-change golang-1.24-src "$AM-1" go-change 1 '^traduction Go -> BSD-3-Clause : NON appliquée \(texte sha256' preuve
+essai t-non-revue golang-1.24-src "$AM-1" go-preuve 1 '^traduction Go -> BSD-3-Clause : NON appliquée \(entrée non revue' non-revue
+essai t-autre-version golang-1.24-src "$AM-1" go-preuve 1 'identifiant SPDX inconnu : Go' autre-version
 essai s-deux golang-1.24-src "$AM-1" deux 1 '^REFUS : 2 défaut\(s\) : .*« with » non traité.*texte de licence absent pour Inconnue'
 echo "chrono.tsv du banc : $(wc -l < "$H/res/chrono.tsv") lignes ; fichiers de 13a touchés : $(git -C "$D" status --porcelain -- poc/bricks/13a-licences/resultats/chrono.tsv poc/bricks/13a-licences/resultats/paquets-stdlib.log poc/bricks/13a-licences/resultats/paquets-stdlib.licences.json | wc -l)"

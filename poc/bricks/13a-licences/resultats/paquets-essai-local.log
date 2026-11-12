@@ -1,4 +1,4 @@
-# banc paquets.sh deb, 2026-11-12T20:03:20Z, paquets.sh 2ef3a8b5d6c18faf16115419c431c74ece5aa9c31d9a8d0602651418a3881e7d, paquets.py 0541eaf76c47582704d4f0e084ad428bb9ed483089a7b70037a8d459b2ce296c
+# banc paquets.sh deb, 2026-11-12T20:10:52Z, paquets.sh 9f8d54aec70084d094f28f30eac1d78718d3fca7649f709b0cb9a28a9a451569, paquets.py a889f87b4394c7482c7e376f5b963235002bf1a6a9b1219d758fb5544a558ea8
 OK   nominal : code 0
      OK   sha256 du deb épinglé : 9e732af3faf99e00e931279f93be792b12111ea130076fa8b3f58f4e004525c0
      format : DEP-5 1.0 ; paragraphes : 6

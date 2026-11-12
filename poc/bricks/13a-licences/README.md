@@ -94,3 +94,8 @@ dans le paquet) : une seule révision du paquet, après S5b.
 ([journal](resultats/paquets-stdlib.log), [résultats](resultats/paquets-predictions.md)). Le copyright de Debian pour `golang-1.24-src` nomme la licence du
 projet « Go », hors SPDX, avec quatre autres noms hors SPDX et `X11` hors politique : la bibliothèque standard n'est pas déclarable telle quelle. Suite à
 décider ; le deb n'est pas modifié.
+
+**Traduction du nom « Go » préparée à sec, NON APPLIQUÉE** (« Oui, prépare-la ») : [`traductions-dep5.json`](traductions-dep5.json), traduction par nom
+dans `paquets.py` (pas une curation de `licences.py`, qui remplacerait toute l'expression), liée au sha256 du texte de la licence et appliquée seulement
+après revue du propriétaire. Le texte « Go » de Debian est celui de `BSD-3-Clause` plus une concession de brevets de Google, qui resterait hors de
+l'expression ([détail](resultats/paquets-predictions.md)).
