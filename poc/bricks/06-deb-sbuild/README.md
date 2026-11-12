@@ -1664,3 +1664,26 @@ Relevé sur l'hôte, hors réseau, de 08:54:30 à 08:54:37 UTC (troisième passa
 **Correction datée** : le titre de l'additif « 08:56 UTC : décisions sur S6 » et celui des prédictions donnent une heure que je n'avais pas relevée. L'heure vraie est celle du commit `d40dd3c`, 08:52:49 UTC, avant la mesure.
 
 **Suite** : préparer à sec le mode deb de `scanner.sh` et son pod d'essai (forme de l'extraction par busybox), puis les relevés de S6b (versions de mmdebstrap et de sbuild candidates dans `sc-replay`, place, `finishedOn`). Aucune écriture dans le cluster ni dans Zot avant S5b et le relevé du 21/11.
+
+## Additif du 12/11/2026, 09:14 UTC : mode deb du scanner et relevé 1 de S6b, préparés à sec, rien lancé
+
+Préparé sur « continue » (cadre : à sec). Rien n'a tourné : ni pod, ni SSH, ni lecture de Zot.
+
+**Mode deb du scanner (S6a, pas 2)**
+- Le changement est un correctif, [`s6a-scanner-deb.patch`](s6a-scanner-deb.patch), **non appliqué** à `politique/scanner.sh` de la 07a. `rejeu.sh` déploie ce script (ConfigMap `scan-config`), et S5b doit le déployer tel qu'il est commité. Le correctif s'appliquera après S5b, comme `g5-porte.patch` en G5.
+- Il ajoute :
+  - une variable `NATURE` (`image` par défaut, ou `deb`) ;
+  - l'extraction du `data.tar` du deb par busybox, en échec fermé ;
+  - un plancher : au moins une PURL versionnée dans le SBOM de l'artefact seul, pour les deux natures.
+- Il s'écarte sur deux points des conséquences écrites après le relevé 1 : le plancher est générique et non propre au Go, et il s'applique aussi à l'image. Le détail est dans les [prédictions de l'essai](resultats/s6a-essai-predictions.md).
+- **Pod d'essai** : étape `essai` de [`s6a.sh`](s6a.sh), sur une copie corrigée du script. Il compte cinq cas : le deb ; deux natures croisées, qui doivent être refusées ; l'image ; une nature inconnue. Une ConfigMap et un pod sont créés dans l'espace `scan`, puis supprimés. Rien n'est écrit dans Zot. **Il attend un accord nommé.**
+
+**Relevé 1 de S6b (contrôle 6)**
+- Script : [`s6b.sh`](s6b.sh), étape `releve`. [Prédictions](resultats/s6b-predictions.md).
+- Il relève :
+  - sur l'hôte : les provenances du deb (`finishedOn`, entrées), la reconstruction du layout `039949f9` à partir des seuls octets du deb, et la taille des entrées à transporter ;
+  - dans `sc-replay` : les ressources, les espaces de noms sans privilège, les candidats apt de mmdebstrap et de sbuild sans recommandés (`--assume-no`), et l'instantané Debian joint depuis la VM.
+- La seule écriture hors des dossiers de travail est `apt-get update` dans la VM. Aucun paquet n'est installé. **Il attend un accord nommé.**
+
+**Suite** : sur accord, l'essai puis le relevé. Viendront ensuite, chacune sous son accord nommé, la décision sur la source des paquets du chroot et l'installation dans `sc-replay`. Aucune écriture dans le cluster autre que l'essai, et rien dans Zot, avant S5b et le relevé du 21/11.
+
