@@ -1925,3 +1925,5 @@ Préparée après « Oui, prépare-la », sur le modèle de R5 de la brique 10 (
 3. un push ;
 4. `vsa`.
 
+**Décision du 12/11/2026, reçue avant 10:59 UTC (« Bit identique seul »)** : la VSA du deb ne revendique que `POC_REPLAY_BIT_IDENTIQUE`, et `rejeu/vsa_deb.py` est modifié en conséquence. Il reste ta relecture du projet de politique, avant le commit qui la fige.
+

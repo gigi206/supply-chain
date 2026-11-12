@@ -93,3 +93,5 @@ Ces notes s'ajoutent au projet commité dans `1b36f83`, à 10:50:25 UTC. Le comm
    - garder le niveau en citant une mesure ;
    - ne revendiquer que `POC_REPLAY_BIT_IDENTIQUE` pour le deb.
 
+**Décision du propriétaire, 12/11/2026, reçue avant 10:59:06 UTC (« Bit identique seul »)**, sur la note 3 : la VSA du deb ne revendique que `POC_REPLAY_BIT_IDENTIQUE`. Au moment de figer le texte, la section 5 dira donc : « `POC_REPLAY_BIT_IDENTIQUE` si le verdict est `PASSED`. `SLSA_BUILD_LEVEL_3` n'est pas revendiqué pour le deb : aucune mesure archivée ne le porte pour un build dans un pod Kata privilégié. » `rejeu/vsa_deb.py` est modifié en conséquence.
+

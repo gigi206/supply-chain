@@ -108,7 +108,9 @@ vsa = {
         "policy": {"uri": POLITIQUE_URI, "digest": {"sha256": sha256("politique-replay-deb.md")}},
         "inputAttestations": [{"uri": f"oci://{REG}/horodatage/bundles@{mb}", "digest": {"sha256": mb.split(":")[1]}}],
         "verificationResult": "PASSED",
-        "verifiedLevels": ["SLSA_BUILD_LEVEL_3", "POC_REPLAY_BIT_IDENTIQUE"],
+        # décision du propriétaire du 12/11/2026 (« Bit identique seul ») : aucune mesure archivée ne porte SLSA_BUILD_LEVEL_3
+        # pour un build dans un pod Kata privilégié ; le deb ne revendique que le niveau propre au PoC
+        "verifiedLevels": ["POC_REPLAY_BIT_IDENTIQUE"],
         "slsaVersion": "1.2",
     },
 }

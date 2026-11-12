@@ -99,3 +99,9 @@ Journal : `s6b-vsa_essai.log`. sha256 transportés, égaux côté hôte et côt�
 
 **Conséquence** : tout le chemin de `vsa_deb.py` a tourné dans la VM, hors réseau, sans rien écrire. Avec le résultat de `rebuild` lien coupé et après le délai, les trois conditions refusées ici doivent tenir. `vsa` n'aura plus qu'à signer.
 
+## Note datée du 12/11/2026 (à partir de 10:59:06 UTC) : décision « Bit identique seul »
+
+- **`rejeu/vsa_deb.py` est modifié** : `verifiedLevels` vaut `["POC_REPLAY_BIT_IDENTIQUE"]` seul. Son sha256 passe de `2b353a7c…` (celui de l'essai) à `34799510…`. Aucune autre ligne ne change.
+- **L'essai de 10:56:55 UTC portait sur la version précédente.** La différence n'est que la liste des niveaux, dans l'énoncé construit ; les contrôles ne changent pas. Le sha256 de `vsa_deb.py` entre dans `verifier.version`. `vsa` refuse un `vsa_deb.py` modifié hors commit, ou un HEAD non poussé : c'est donc la version commitée et poussée qui signera.
+- **Prédiction S1 révisée** : l'énoncé de `vsa` porte `"verifiedLevels": ["POC_REPLAY_BIT_IDENTIQUE"]`.
+
