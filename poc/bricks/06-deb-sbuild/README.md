@@ -1890,3 +1890,18 @@ Lancés sur ton accord « Oui, lance les trois » ([résultats](resultats/s6b-re
 
 **Reste pour le contrôle 6** : `rebuild`, lien coupé, à partir du 12/11/2026 à 21:03:37 UTC, sur ton accord. Puis la VSA, signée dans la VM et non poussée avant S5b.
 
+## Additif du 12/11/2026, 10:50 UTC : VSA du deb, préparée à sec, rien lancé ni signé
+
+Préparée après « Oui, prépare-la », sur le modèle de R5 de la brique 10 ([prédictions](resultats/s6b-vsa-predictions.md)).
+
+- **[`rejeu/politique-replay-deb.md`](rejeu/politique-replay-deb.md)** : un **projet de politique, à ta relecture**. Celle de la 10 est écrite pour l'image. La VSA citera celle-ci par URL, à un commit poussé, et par son sha256. Le projet propose de ranger la VSA dans `builds/vsa/sample-app-deb`.
+- **[`rejeu/vsa_deb.py`](rejeu/vsa_deb.py)** écrit l'énoncé seulement si tout tient. Par rapport à la 10, il exige en plus **la porteuse à 0 au départ et à la fin** : un résultat de répétition ne peut donc pas produire de VSA.
+- **`vsa_essai`** joue `vsa_deb.py` tout de suite sur la répétition, sans rien signer. Il doit refuser sur exactement trois conditions : lien établi au départ, lien établi à la fin, délai.
+- **`vsa`** signe dans la VM après `rebuild`. Il faut auparavant un commit qui fige la politique et un push.
+
+**Ce qui attend une décision de ta part** :
+- la relecture du projet de politique ;
+- le dépôt de rangement ;
+- le push des commits ;
+- puis les lancements, chacun sur accord nommé.
+

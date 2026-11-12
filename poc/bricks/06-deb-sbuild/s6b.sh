@@ -75,9 +75,16 @@
 #           (systemd-run --uid=replay), lien de la VM coupé aussitôt (virsh domif-setlink down), compteurs relus après la
 #           coupure et avant le rétablissement (ATTENTE_HORS_LIGNE s) ; résultat lu après le rétablissement, valable seulement
 #           s'il a fini avant.
+#   VSA du deb (préparée le 12/11/2026 à partir de 10:49:33 UTC, après « Oui, prépare-la » ; modèle : R5 de la brique 10) :
+#   vsa_essai  ACCORD NOMMÉ. Essai de rejeu/vsa_deb.py, RIEN SIGNÉ : politique de l'arbre (projet), résultat de la répétition ;
+#           attendu : refus sur exactement trois conditions (lien établi au départ et à la fin, délai), aucun énoncé.
+#   vsa     ACCORD NOMMÉ, après rebuild (lien coupé) et après le push d'un commit qui fige rejeu/politique-replay-deb.md
+#           (POLITIQUE_COMMIT) et porte vsa_deb.py à HEAD. Énoncé par vsa_deb.py puis signature par la clé du domaine,
+#           dans la VM sous unshare -rn ; énoncé et bundle archivés dans resultats/. Rien n'est poussé dans Zot.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh <étape>
-#   étapes : releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild (journal : resultats/s6b-<étape>.log)
+#   étapes : releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa
+#   (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 h06=$(cd "$(dirname "$0")" && pwd)
@@ -103,6 +110,8 @@ INVOCATION=454728c5-59a8-45e1-b972-549d343aadac      # décision 1 du propriéta
 URL_TSA=http://timestamp-authority.tsa.svc.cluster.local:3000/api/v1/timestamp   # identifiant de la TSA (replay.sh de la 10)
 R08=$h06/../08-trust-plane/resultats                  # clé publique de Chains et chaîne de la TSA (comme s4d2.sh)
 VM=sc-replay
+REG_NOM=sc-stockage.poc.test:5000                    # nom du registre dans la provenance (sujet), repris dans la VSA (replay.sh)
+TYPE_VSA=https://slsa.dev/verification_summary/v1
 ATTENTE_HORS_LIGNE=${ATTENTE_HORS_LIGNE:-1200}       # secondes lien coupé ; le rebuild doit finir avant le rétablissement
 EPINGLES="mmdebstrap=1.5.7-1+deb13u1 sbuild=0.89.3+deb13u4 libsbuild-perl=0.89.3+deb13u4 uidmap=1:4.17.4-2"   # V3 du relevé
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
@@ -609,8 +618,74 @@ etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas ava
   [ $ok = 0 ] && echo "bilan : PASSED, lien coupé, fini avant le rétablissement" || { echo "bilan : au moins un KO ou pas de PASSED"; exit 1; }
 }
 
-case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1) ;;
-  *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild" >&2; exit 2 ;; esac
+transporter_r5() { # politique (fichier $1) et vsa_deb.py copiés dans ~/s6b/r5 de la VM, vidé d'abord (~/s6b/r3 et r4 non touchés)
+  local x=${T:?}/r5
+  rm -rf -- "${x:?}" && mkdir -p "$x" && chmod 0700 "$x"
+  cp "$1" "$x/politique-replay-deb.md" && cp "$h06/rejeu/vsa_deb.py" "$x/"
+  ( cd "$x" && sha256sum politique-replay-deb.md vsa_deb.py && tar -cf r5.tar politique-replay-deb.md vsa_deb.py )
+  sur 'rm -rf -- /home/replay/s6b/r5 && mkdir -m 0700 /home/replay/s6b/r5'
+  scp -q "${SSH_OPTS[@]}" "$x/r5.tar" "replay@$VM_IP:/home/replay/s6b/r5/" < /dev/null
+  sur 'cd /home/replay/s6b/r5 && tar -xf r5.tar && rm r5.tar && sha256sum vsa_deb.py politique-replay-deb.md'
+  rm -rf -- "${x:?}"
+}
+
+etape_vsa_essai() { # essai de vsa_deb.py (levier e), RIEN SIGNÉ : politique de l'arbre de travail (projet, non figée), résultat de
+  # la répétition (lien établi). Attendu : refus, exactement sur les trois conditions que la répétition ne peut pas tenir (lien
+  # établi au départ et à la fin, délai de 24 h), et aucun énoncé écrit
+  local o
+  transporter_r5 "$h06/rejeu/politique-replay-deb.md"
+  echo "## vsa_deb.py (dans la VM, unshare -rn), sur le résultat de la répétition"
+  o=$(sur "cd /home/replay/s6b/r5 && unshare -rn python3 -I vsa_deb.py '$REG_NOM' '$DEB_SUJET' '$INVOCATION' 'essai-non-figee' '$URL_TSA'; echo \"code \$?\"; ls enonce.json 2>/dev/null || echo 'aucun énoncé'")
+  echo "$o"
+  local k; k=$(grep -c '^KO ' <<< "$o" || true)
+  if grep -qx 'code 1' <<< "$o" && grep -qx 'aucun énoncé' <<< "$o" && [ "$k" = 3 ] \
+     && grep -q '^KO   lien coupé au départ' <<< "$o" && grep -q '^KO   lien toujours coupé à la fin' <<< "$o" \
+     && grep -q '^KO   timeVerified .* au moins 24 h' <<< "$o"; then
+    echo "bilan : refus attendu (3 KO : lien établi au départ et à la fin, délai), aucun énoncé"
+  else
+    echo "bilan : écart à l'attendu ($k KO)"; exit 1
+  fi
+}
+
+etape_vsa() { # DANS LA VM, sous unshare -rn : rejeu/vsa_deb.py (énoncé), signé par la clé du domaine comme etape_vsa de la 10 ;
+  # énoncé et bundle archivés dans resultats/. POLITIQUE_COMMIT : commit qui fige rejeu/politique-replay-deb.md, déjà poussé ;
+  # vsa_deb.py doit être celui de HEAD, poussé (son sha256 entre dans verifier.version). Rien n'est poussé dans Zot ici.
+  local c=${POLITIQUE_COMMIT:?commit qui fige la politique du deb} f=poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md u x=${T:?}/politique
+  git -C "$h06" branch -r --contains "$c" | grep -q . || { echo "REFUS : $c absent des branches distantes"; exit 1; }
+  [ -z "$(git -C "$h06" status --porcelain -- rejeu/vsa_deb.py)" ] || { echo "REFUS : rejeu/vsa_deb.py modifié hors commit"; exit 1; }
+  git -C "$h06" branch -r --contains HEAD | grep -q . || { echo "REFUS : HEAD ($(git -C "$h06" rev-parse --short HEAD)) non poussé"; exit 1; }
+  grep -q '^OK   sortie de la VM inchangée' "$R/s6b-rebuild.log" && grep -q '^OK   rebuild terminé' "$R/s6b-rebuild.log" \
+    && grep -q '^bilan : PASSED' "$R/s6b-rebuild.log" || { echo "REFUS : rebuild non valable hors ligne (resultats/s6b-rebuild.log)"; exit 1; }
+  u=https://github.com/gigi206/supply-chain/blob/$c/$f
+  mkdir -p "$x" && git -C "$h06" show "$c:$f" > "$x/politique-replay-deb.md"
+  echo "politique : $u"
+  echo "vsa_deb.py de HEAD ($(git -C "$h06" rev-parse --short HEAD)) : $(git -C "$h06" show "HEAD:poc/bricks/06-deb-sbuild/rejeu/vsa_deb.py" | sha256sum | cut -c1-64)"
+  transporter_r5 "$x/politique-replay-deb.md"; rm -rf -- "${x:?}"
+  echo "## vsa_deb.py (dans la VM, unshare -rn)"
+  sur "cd /home/replay/s6b/r5 && unshare -rn python3 -I vsa_deb.py '$REG_NOM' '$DEB_SUJET' '$INVOCATION' '$u' '$URL_TSA'"
+  echo "## signature (dans la VM, unshare -rn ; clé du domaine de la 10)"
+  sur bash -s "${DEB_DIGEST#sha256:}" "$TYPE_VSA" <<'EOS'
+set -uo pipefail   # pas de -e : chaque code est lu et affiché (comme etape_vsa de la 10)
+cd /home/replay/s6b/r5
+rc=0; unshare -rn cosign signing-config create --out vide.json > sc.err 2>&1 || rc=$?
+echo "signing-config sans service : code $rc ; $(python3 -I -c 'import json; print(json.load(open("vide.json")))' 2>&1)"; [ "$rc" = 0 ] || { tail -3 sc.err; exit 1; }
+rc=0; COSIGN_PASSWORD=$(cat ~/vsa/mot-de-passe) unshare -rn cosign attest-blob --statement enonce.json --key ~/vsa/cosign.key \
+  --signing-config vide.json --bundle vsa.bundle.json --yes > ab.err 2>&1 || rc=$?
+echo "attest-blob : code $rc"; [ "$rc" = 0 ] || { tail -3 ab.err; exit 1; }
+rc=0; unshare -rn cosign verify-blob-attestation --bundle vsa.bundle.json --new-bundle-format --key ~/vsa/cosign.pub --insecure-ignore-tlog \
+  --type "$2" --digest "$1" --digestAlg sha256 > vb.err 2>&1 || rc=$?
+echo "verify-blob-attestation, clé du domaine : code $rc ; $(tail -1 vb.err)"; [ "$rc" = 0 ] || exit 1
+python3 -I -c 'import json, base64; b = json.load(open("vsa.bundle.json")); print("bundle :", b["mediaType"], "; tlog :", b["verificationMaterial"].get("tlogEntries"), "; horodatage :", b["verificationMaterial"].get("timestampVerificationData"), "; énoncé identique à enonce.json :", json.loads(base64.b64decode(b["dsseEnvelope"]["payload"])) == json.load(open("enonce.json")))'
+rm -f sc.err ab.err vb.err
+sha256sum enonce.json vsa.bundle.json
+EOS
+  sur 'cat /home/replay/s6b/r5/enonce.json' > "$R/s6b-vsa-enonce.json"
+  sur 'cat /home/replay/s6b/r5/vsa.bundle.json' > "$R/s6b-vsa.bundle.json"
+  echo "## copies archivées"; ( cd "$R" && sha256sum s6b-vsa-enonce.json s6b-vsa.bundle.json )
+}
+
+case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1|vsa_essai:1|vsa:1) ;;
+  *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa" >&2; exit 2 ;; esac
 chrono "S6b $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
 chrono "S6b $1 fait"
