@@ -1,0 +1,99 @@
+# paquets.sh noms, 2026-11-12T20:23:00Z
+paquets.py : f404db625bb8ed508d0fcbf5537cba862b845327a4da0e5135dae1ed2dc72bcc
+OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   sha256 du paquet de Go épinglé : c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1
+OK   verrou et buildinfo recoupés
+sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+binaire ./usr/bin/sample-app : go1.24.4
+OK   témoin runtime : 1909 occurrence(s) de « \0runtime. », présence attendue
+OK   témoin fmt : 72 occurrence(s) de « \0fmt. », présence attendue
+OK   témoin cmd/link/internal/ld : 0 occurrence(s) de « \0cmd/link/internal/ld. », absence attendue
+## paragraphes Files de golang-1.24-src 1.24.4-1
+paragraphe 2 (Go) : LIÉ ; 1 motif(s) : indéterminé
+  motif lié : * (indéterminé)
+paragraphe 3 (X11) : LIÉ ; 76 motif(s) : cmd ; runtime : 1909
+  motif lié : src/runtime/memclr_arm.s (runtime : 1909)
+  motif lié : src/runtime/memmove_386.s (runtime : 1909)
+  motif lié : src/runtime/memmove_amd64.s (runtime : 1909)
+  motif lié : src/runtime/memmove_arm.s (runtime : 1909)
+  motif lié : src/runtime/memmove_plan9_386.s (runtime : 1909)
+  motif lié : src/runtime/memmove_plan9_amd64.s (runtime : 1909)
+  motif lié : src/runtime/vlop_386.s (runtime : 1909)
+  motif lié : src/runtime/vlop_arm.s (runtime : 1909)
+  motif lié : src/runtime/vlrt.go (runtime : 1909)
+paragraphe 4 (Go) : non lié ; 2 motif(s) : testdata
+paragraphe 5 (Go) : non lié ; 3 motif(s) : testdata
+paragraphe 6 (Go) : non lié ; 3 motif(s) : testdata
+paragraphe 7 (FreeBSD) : non lié ; 2 motif(s) : cmd ; debug/elf : 0
+paragraphe 8 (Go) : LIÉ ; 12 motif(s) : math : 14 ; math/cmplx : 0
+  motif lié : src/math/atan.go (math : 14)
+  motif lié : src/math/gamma.go (math : 14)
+  motif lié : src/math/sin.go (math : 14)
+  motif lié : src/math/tan.go (math : 14)
+  motif lié : src/math/tanh.go (math : 14)
+paragraphe 9 (Go) : LIÉ ; 15 motif(s) : math : 14
+  motif lié : src/math/log1p.go (math : 14)
+  motif lié : src/math/acosh.go (math : 14)
+  motif lié : src/math/asinh.go (math : 14)
+  motif lié : src/math/atanh.go (math : 14)
+  motif lié : src/math/cbrt.go (math : 14)
+  motif lié : src/math/erf.go (math : 14)
+  motif lié : src/math/exp.go (math : 14)
+  motif lié : src/math/expm1.go (math : 14)
+  motif lié : src/math/j0.go (math : 14)
+  motif lié : src/math/j1.go (math : 14)
+  motif lié : src/math/jn.go (math : 14)
+  motif lié : src/math/lgamma.go (math : 14)
+  motif lié : src/math/log.go (math : 14)
+  motif lié : src/math/remainder.go (math : 14)
+  motif lié : src/math/sqrt.go (math : 14)
+paragraphe 10 (MPEG) : non lié ; 1 motif(s) : image/jpeg : 0
+paragraphe 11 (noderivs) : non lié ; 1 motif(s) : testdata
+paragraphe 12 (Apache-2.0) : non lié ; 1 motif(s) : cmd
+paragraphe 13 (BSD-3-clause-svgpan) : non lié ; 1 motif(s) : cmd
+paragraphe 14 (BSD-3-clause) : non lié ; 1 motif(s) : cmd
+paragraphe 15 (Go) : non lié ; 1 motif(s) : empaquetage
+## noms de licence
+nom Apache-2.0 : 0 paragraphe(s) lié(s) sur 1
+nom BSD-3-clause : 0 paragraphe(s) lié(s) sur 1
+nom BSD-3-clause-svgpan : 0 paragraphe(s) lié(s) sur 1
+nom FreeBSD : 0 paragraphe(s) lié(s) sur 1
+nom Go : 3 paragraphe(s) lié(s) sur 7
+nom MPEG : 0 paragraphe(s) lié(s) sur 1
+nom noderivs : 0 paragraphe(s) lié(s) sur 1
+nom X11 : 1 paragraphe(s) lié(s) sur 1
+## comparaison des textes (mots normalisés, pas la correspondance de SPDX)
+FreeBSD : 210 mots ; sha256 a03cf1714af3f433038b0bab63408e440a6efeebeecd57f1474a5c93a8e2069b
+  BSD-2-Clause-FreeBSD (déprécié) : 228 mots, ratio 0.849, 7 écart(s)
+    insert :  | the freebsd
+    delete : c 1996 1998 john d polstra all rights reserved | 
+    replace : c 2001 david e o brien portions copyright 2009 | 1992 2012
+    replace : go authors | freebsd project
+    replace : author and contributors | freebsd project
+    replace : author | freebsd project
+  BSD-2-Clause-Views : 227 mots, ratio 0.856, 4 écart(s)
+    replace : 1996 1998 john d polstra all rights reserved copyright c 2001 david e  | year owner
+    replace : author | copyright holders
+    replace : author | copyright holder
+    insert :  | the views and conclusions contained in the software and documentation 
+  BSD-2-Clause : 190 mots, ratio 0.920, 3 écart(s)
+    replace : 1996 1998 john d polstra all rights reserved copyright c 2001 david e  | year owner
+    replace : author | copyright holders
+    replace : author | copyright holder
+BSD-3-clause-svgpan : 246 mots ; sha256 5c16a2367c4117e848766e50b3a4c9f45f8408887a4b05131287db5a1db189ec
+  BSD-3-Clause : 221 mots, ratio 0.916, 5 écart(s)
+    insert :  | copyright c year owner
+    insert :  | the
+    insert :  | the
+    replace : holders | holder
+    delete : the views and conclusions contained in the software and documentation  | 
+X11 : 163 mots ; sha256 75fce6260547bc65c7e7004f8fc17e3ea80533ecf3051529a7c4d2c9ba34d97a
+  X11 : 217 mots, ratio 0.837, 3 écart(s)
+    insert :  | x11 license copyright c 1996 x consortium
+    replace : authors or copyright holders | x consortium
+    insert :  | except as contained in this notice the name of the x consortium shall 
+  MIT : 170 mots, ratio 0.979, 1 écart(s)
+    insert :  | mit license copyright c year copyright holders
+MPEG : 154 mots ; sha256 0decba045ca14137135e2c8e4d9f7435bcf7e944534d41a25d770db6f8db89a7
+noderivs : pas de paragraphe License autonome
+bilan : étude écrite (aucun verdict)

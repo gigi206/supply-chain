@@ -352,3 +352,30 @@ substitution au lieu d'un compte de lignes (l'étape `noms` en ajoutait deux).
 | N4 | Liés : `Files: *` (indéterminé) et le paragraphe `Go` de `math` ; `math/cmplx` non lié | Moyenne |
 | N5 | Donc aucun des cinq noms à trancher ne porte sur du code lié, si N2 et N3 tiennent | Moyenne |
 | N6 | `X11` : ratio proche de 1 avec le texte SPDX `X11` ; `FreeBSD` : ratio le plus haut avec `BSD-2-Clause-FreeBSD` ou `BSD-2-Clause-Views` ; `BSD-3-clause-svgpan` : proche de `BSD-3-Clause` | Faible : textes non lus |
+
+## Résultats de `noms` : 12/11/2026, 20:23:00 UTC, fin 20:23:02 UTC (`chrono.tsv`), code 0
+
+Accord : « Oui, lance noms » à « Je lance noms ? (paquets.sh, commit e259a05) » ; HEAD e259a05, arbre propre, contrôlés à 20:23:00 UTC.
+Journal : [`paquets-noms.log`](paquets-noms.log). Résultats écrits à partir de 20:23:33 UTC.
+
+| # | Résultat |
+|---|---|
+| N1 | **Tenue.** `runtime` 1 909, `fmt` 72, `cmd/link/internal/ld` 0 |
+| N2 | **Tenue, sauf `X11` : non tenue.** Non liés comme prédit : `Apache-2.0`, `BSD-3-clause-svgpan`, `BSD-3-clause` (`cmd`), `noderivs` et les trois `Go` de `testdata`, `Go` de `debian/*`. Mais le paragraphe `X11` compte **76 motifs**, dont des fichiers de `src/runtime/` (`memclr_arm.s`, `memmove_386.s`, `memmove_amd64.s`, `memmove_arm.s`, `memmove_plan9_*.s`, `vlop_*.s`, `vlrt.go`) : **LIÉ** (`runtime` présent) |
+| N3 | **Tenue.** `MPEG` (`image/jpeg` : 0) et `FreeBSD` (`debug/elf` : 0, et `cmd`) non liés |
+| N4 | **Tenue.** Liés : `Files: *` (indéterminé) et les deux paragraphes `Go` de `math` (`math` : 14) ; les motifs de `math/cmplx` sont à 0 mais leur paragraphe est lié par ses fichiers de `math` |
+| N5 | **Non tenue.** Un des cinq noms, `X11`, porte sur du code lié |
+| N6 | **Non tenue telle qu'écrite.** `X11` : ratio 0,837 avec `X11` de SPDX (le texte de Debian n'a pas la clause du X Consortium), **0,979 avec `MIT`** (seul écart : le titre et la ligne de copyright) ; `FreeBSD` : ratio le plus haut avec `BSD-2-Clause` (0,920 ; `-Views` 0,856, `-FreeBSD` 0,849) ; `BSD-3-clause-svgpan` : 0,916 avec `BSD-3-Clause`, plus la phrase « The views and conclusions… » ; `MPEG` : 154 mots, sans candidat ; `noderivs` : pas de paragraphe autonome |
+
+**Limite qui pèse ici** : « lié » se décide au niveau du paquet. Parmi les fichiers de `runtime` du paragraphe `X11`, la plupart sont
+propres à d'autres architectures (`_arm`, `_386`, `plan9`) et ne sont pas compilés pour amd64 ; `memmove_amd64.s` l'est sans doute
+(binaire amd64), mais ce n'est pas mesuré fichier par fichier.
+
+**Ce que cela dit, sans décision** : en ne gardant que les paragraphes liés, la bibliothèque standard porterait `Go` (traduit en
+`BSD-3-Clause` après revue) et `X11`. Le texte que Debian nomme `X11` est, en mots normalisés, celui de `MIT` (autorisée par la
+politique), pas celui de `X11` de SPDX. Deux décisions mèneraient à une expression jugeable : une traduction revue `X11` -> `MIT`
+(même règle que pour `Go`, preuve `75fce626…`), et une règle qui écarte les paragraphes non liés (à écrire, avec ses limites).
+
+*Note datée du 12/11/2026, écrite à 20:23:33 UTC* : les résultats de `stdlib` (premier passage et relance) disent « `X11` (fichiers de
+`src/cmd/internal/objabi/`) ». C'était la partie visible d'une liste coupée à 120 caractères au journal : le paragraphe `X11` couvre
+aussi des fichiers de `src/runtime/` (voir ci-dessus). Les textes commités ne sont pas réécrits.

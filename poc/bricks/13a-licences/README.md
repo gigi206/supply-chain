@@ -108,3 +108,8 @@ l'expression ([détail](resultats/paquets-predictions.md)).
 dans `sample-app` (noms de fonctions qualifiés cherchés dans le binaire ; `cmd`, `testdata` et `debian` classés par les règles de `go build`) et compare
 leurs textes aux textes SPDX candidats ; aucun verdict. Banc hors réseau tenu ([journal](resultats/paquets-noms-essai-local.log)) ; prédictions N1 à N6
 ([détail](resultats/paquets-predictions.md)).
+
+**Passage de `noms`, le 12/11/2026 de 20:23:00 à 20:23:02 UTC (« Oui, lance noms »)** : code 0 ([journal](resultats/paquets-noms.log), [résultats](resultats/paquets-predictions.md)).
+`FreeBSD`, `MPEG`, `noderivs` et `BSD-3-clause-svgpan` ne portent sur aucun code lié ; **`X11` si** : son paragraphe couvre aussi des fichiers de `src/runtime/`
+(N5 non tenue), et son texte est, en mots normalisés, celui de `MIT` (0,979), pas celui de `X11` de SPDX (0,837). Décisions possibles : traduction revue
+`X11` -> `MIT`, règle qui écarte les paragraphes non liés.
