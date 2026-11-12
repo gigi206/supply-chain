@@ -1,0 +1,176 @@
+# s6b.sh sqv, 2026-11-12T10:02:00Z
+## S1 à S3 : signature de l'InRelease par sqv, trousseau de sc-replay (sans sudo, rien d'installé)
+sqv 1.3.0 (sequoia-openpgp 2.0.0, using Nettle 3.10 (Cv448: true, OCB: true)) ; trousseau /usr/share/keyrings/debian-archive-keyring.pgp : sha256 506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017
+--- sqv --help
+  An OpenPGP signature verification tool
+  
+  sqv is a simple signature verification tool.  It checks that signatures are valid, and correctly
+  issued by one of the certificates in the specified keyring.
+  
+  sqv can verify detached signatures, inline-signed messages, and
+  messages using the Cleartext Signature Framework.
+  
+  To verify detached signatures, use the `--signature-file` argument
+  followed by the path to the detached signature file, and give the data
+  file as first positional argument:
+  
+    $ sqv --keyring=... --signature-file=image.iso.sig image.iso
+  
+  To verify an inline-signed message, use the `--message` argument, and
+  give the path to the inline-signed message as first positional
+  argument.  When verifying an inline-signed `--output` has to be given:
+  
+    $ sqv --keyring=... --output=authenticated.txt \
+          --message signed.pgp
+  
+  To verify a message using the Cleartext Signature Framework, use the
+  `--cleartext` argument, and give the path to the message as first
+  positional argument.  When verifying an inline-signed `--output` has
+  to be given:
+  
+    $ sqv --keyring=... --output=authenticated.txt \
+          --cleartext message.txt
+  
+  Finally, there is a legacy way to verify detached signatures, where
+  the path to the signature file and the path to the data file are given
+  as positional arguments.  This form is deprecated, prefer the explicit
+  `--signature-file` form.
+  
+  By default, one signature must be valid.  This can be changed using the `--signatures` arguments.
+  
+  A signature is valid if a signing-capable key can verify the signature.  The signing-capable key
+  must be correctly bound to a certificate in the keyring, and it must not be revoked, or expired. The
+  certificate must not be revoked or expired.  The signature, the signing-capable key and the
+  certificate must all be valid according to the cryptographic policy.
+  
+  By default, sqv configures the cryptographic policy using
+  </etc/crypto-policies/back-ends/sequoia.config>.  That can be overwritten by setting the
+  SEQUOIA_CRYPTO_POLICY environment variable to an alternate file.  The path must be absolute.  The
+  file's format is described here: <https://docs.rs/sequoia-policy-config/>.
+  
+  In some cases, the user expects signatures to be made within a certain temporal window.  This can be
+  enforced using the `--not-before` and `--not-after` arguments.  The TIMESTAMPs must be given in ISO
+  8601 format (e.g. `2017-03-04T13:25:35Z`, `2017-03-04T13:25`, `20170304T1325+0830`, `2017-03-04`,
+  `2017031`, etc.).  If no timezone is specified, UTC is assumed.
+  
+  Exits with a non-zero status if the specified number of signatures could not be verified.
+  
+  Usage: sqv [OPTIONS] --keyring <FILE> <FILE>
+  
+  Arguments:
+    <FILE>
+            The inline-signed message, message using the Cleartext Signature Framework, or data file
+  
+  Options:
+        --output <FILE>
+            Write to FILE or stdout if omitted
+  
+        --signature-file <SIG>
+            Verify a detached signature file
+  
+        --message
+            Verify an inline signed message
+  
+        --cleartext
+            Verify a cleartext-signed message
+  
+        --keyring <FILE>
+            A keyring
+  
+        --not-after <TIMESTAMP>
+            Consider signatures created after TIMESTAMP as invalid.
+            
+            If only a date is given, 23:59:59 is used for the time. [default: now]
+  
+        --not-before <TIMESTAMP>
+            Consider signatures created before TIMESTAMP as invalid.
+            
+            If only a date is given, 00:00:00 is used for the time. [default: no constraint]
+  
+    -n, --signatures <N>
+            The number of valid signatures to return success.
+            
+            Note: this counts the number of certificates, not signatures. Thus, if two signatures are
+            issued by the same certificate, they only count once.
+            
+            [default: 1]
+  
+    -v, --verbose
+            Be verbose
+  
+        --policy-as-of <TIMESTAMP>
+            Select the cryptographic policy as of the specified time
+            
+            The time is expressed as an ISO 8601 formatted timestamp.  The policy determines what
+            cryptographic constructs are allowed.
+            
+            If you are working with a message that sq rejects, because it is protected by
+            cryptographic constructs that are now considered broken, you can use this option to select
+            a different cryptographic policy.  If you are relying on the cryptography, e.g., you are
+            verifying a signature, then you should only do this if you are confident that the message
+            hasn't been tampered with.
+            
+            TIME is interpreted as an ISO 8601 timestamp.  To set the policy time to January 1, 2007
+            at midnight UTC, you can do:
+            
+            $ sqv --policy-as-of 20070101 --message msg.pgp
+            
+            Defaults to the current time.
+  
+    -h, --help
+            Print help (see a summary with '-h')
+  
+    -V, --version
+            Print version
+  
+  Examples:
+  
+  # Verify a detached signature.
+  $ sqv --keyring=trusted.certs --signature-file=document.sig \
+                                document.txt
+  
+  # Verify a detached signature, legacy interface.
+  $ sqv --keyring=trusted.certs document.sig document.txt
+  
+  # Verify a signed message.
+  $ sqv --keyring trusted.certs --message document.pgp
+  
+  # Verify a message using the Cleartext Signature Framework.
+  $ sqv --keyring trusted.certs --clearsign document.pgp
+---
+--cleartext présent dans sqv --help
+sources apt : /etc/apt/sources.list  /etc/apt/sources.list.d/: debian.sources
+  URIs: mirror+file:///etc/apt/mirrors/debian.list
+  Suites: trixie trixie-updates trixie-backports
+  Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+  URIs: mirror+file:///etc/apt/mirrors/debian-security.list
+  Suites: trixie-security
+  Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+apt-config (sqv, gpgv) :
+  aucune ligne
+## S1 : InRelease
+OK   sha256 identique à celui de S1
+## S2 : sqv --cleartext
+sqv -n 1 : code 0 ; sortie :
+  04B54C3CDCA79751B16BC6B5225629DF75B188BD
+  41587F7DB8C774BCCF131416762F67A0B2C39DE4
+  B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+OK   sqv -n 1 accepte l'InRelease
+sqv -n 3 : code 0 ; sortie :
+  04B54C3CDCA79751B16BC6B5225629DF75B188BD
+  41587F7DB8C774BCCF131416762F67A0B2C39DE4
+  B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+OK   sqv -n 3 accepte l'InRelease
+message extrait (-n 3) : 1453 lignes, 0 ligne(s) BEGIN PGP
+OK   Packages.xz du message extrait : sha256 de S1
+## S3 : témoin négatif (un chiffre de la ligne Date: changé)
+lignes différentes : 1 ; Date: Sat, 22 Sep 2026 07:55:41 UTC
+sqv -n 1 sur la copie altérée : code 1 ; sortie :
+  Verifying signature:
+             Message has been manipulated
+  Verifying signature:
+             Message has been manipulated
+  Verifying signature:
+             Message has been manipulated
+OK   copie altérée refusée, original accepté
+bilan : tout OK

@@ -1803,3 +1803,18 @@ Les commandes ne changent pas.
 
 **Note datée du 12/11/2026 (heure de la note précédente)** : « 09:54 UTC » n'a pas été relevée. Le `date -u` lancé juste avant la rédaction de la note précédente donnait 09:55:38, et son commit `8d538af` est de 09:55:39 UTC. Ces heures font foi ; le titre du commit `8d538af` porte la même erreur.
 
+## Additif du 12/11/2026, 10:03 UTC : témoin `sqv` et installation tenus
+
+Lancés sur ton accord « Oui, lance les deux » ([résultats](resultats/s6b-installation-predictions.md)).
+
+- **`sqv`** (10:02:00 UTC, code 0) : le trousseau de la VM vérifie l'InRelease de l'instantané, et ses signataires sont **exactement les trois de S1**. Une copie altérée est refusée (« Message has been manipulated »), et le message extrait porte le sha256 de Packages.xz de S1.
+- **`installer`** (10:02:07 à 10:02:45 UTC, code 0) :
+  - mmdebstrap, sbuild, libsbuild-perl et uidmap sont installés aux versions épinglées. Leurs sha256 étaient égaux à ceux de `builder/paquets.txt` avant l'installation.
+  - 44 paquets nouveaux, **tous à la version de la plateforme** (comparaison faite sur l'hôte) ; aucun service nouveau ; cache vidé.
+- **Écarts** :
+  - le compte de paquets (338 `ii`, non 339) vient de deux façons de compter ;
+  - `sbuild --version` n'a donné qu'un avis ;
+  - **apt nomme le trousseau `.gpg`, et le témoin a lu le `.pgp`** : leur identité reste à relever.
+
+**Suite** (à préparer à sec) : le relevé du `.gpg`, puis mmdebstrap depuis l'instantané dans `sc-replay`, avec la comparaison du chroot à `builder/paquets.txt`.
+

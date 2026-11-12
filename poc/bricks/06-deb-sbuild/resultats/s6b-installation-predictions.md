@@ -103,3 +103,43 @@ Le commit des prédictions ci-dessus, `a530dcb`, est de 09:52:13 UTC. Trois déf
 
 **Note datée du 12/11/2026 (heure de la note précédente)** : « 09:54 UTC » n'a pas été relevée. Le `date -u` lancé juste avant la rédaction de la note précédente donnait 09:55:38, et son commit `8d538af` est de 09:55:39 UTC. Ces heures font foi ; le titre du commit `8d538af` porte la même erreur.
 
+## Résultats (12/11/2026, accord « Oui, lance les deux »)
+
+### `sqv` : 10:02:00 UTC, code 0, `bilan : tout OK`
+
+Journal : `s6b-sqv.log`. Aucune ligne `jeton|token`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| S0 | **Tenue** | `sqv 1.3.0 (sequoia-openpgp 2.0.0, using Nettle 3.10 …)`. `--cleartext` est présent dans `--help`. La syntaxe de l'aide confirme celle du manuel, et son dernier exemple porte bien `--clearsign`. Le trousseau `.pgp` a le sha256 `506b815c…`. |
+| S1 | **Tenue** | sha256 identique à celui de S1 |
+| S2 | **Tenue** | `-n 1` et `-n 3` : code 0. **`sqv` écrit les empreintes des certificats signataires**, et ce sont exactement les trois de S1 (`04B54C3C…`, `41587F7D…`, `B8B80B5B…`). Le message extrait fait 1 453 lignes, sans ligne `BEGIN PGP`, et sa ligne Packages.xz porte `7778d3e3…`, le sha256 de S1. |
+| S3 | **Tenue** | La copie altérée (`Date: Sat, 22 Sep 2026…`, une ligne) est refusée : code 1, et trois fois « Message has been manipulated », une par signature. L'original était accepté. |
+
+**Sources d'apt** (non prédites) :
+- `debian.sources` couvre trixie, trixie-updates, trixie-backports et trixie-security, par `mirror+file:///etc/apt/mirrors/…`.
+- **`Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg`**.
+- `apt-config dump` n'a aucune ligne `sqv` ni `gpgv`.
+
+**Écart à suivre** : le témoin a utilisé le fichier `.pgp`, et apt nomme le fichier `.gpg`. Je n'ai pas mesuré si ce sont les mêmes octets ou un lien. Le relevé suivant donnera le sha256 et le type des deux fichiers. Que apt utilise `sqv` reste déduit : il n'y a pas de `gpgv` dans la VM, et aucune configuration ne désigne de vérificateur.
+
+### `installer` : 10:02:07 à 10:02:45 UTC, code 0, `bilan : tout OK`
+
+Journal : `s6b-installer.log`. Aucune ligne `jeton|token`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| I0 | **Réfutée sur le compte** | Avant : **338** paquets `ii` et 13 services actifs. Le relevé disait 339, mais il comptait toutes les entrées de `dpkg-query -W`, `un` comprises ; ici seules les `ii` sont comptées. Je n'ai pas relevé l'entrée qui fait l'écart. |
+| I1 | **Tenue** | « 44 newly installed », « Need to get 13.8 MB », 44 `.deb` dans le cache |
+| I2 | **Tenue** | Quatre `OK` : les sha256 de mmdebstrap, sbuild, libsbuild-perl et uidmap sont égaux à ceux de `builder/paquets.txt`. La comparaison a eu lieu avant toute installation. |
+| I3 | **Tenue** | « Need to get 0 B/13.8 MB », aucune ligne `W:` ni `E:` |
+| I4 | **Tenue, sauf le compte et la version de sbuild** | Quatre `OK` d'installation, aux versions épinglées. **382** paquets, soit 338 + 44 (prédit : 383, sur la base de 339) ; 0 disparu ou changé. Services : 13 avant, 13 après, aucun nouveau. `mmdebstrap 1.5.7`. `sbuild --version` affiche d'abord un avis (« The Debian buildds switched to the "unshare" backend… »), et `head -1` n'a gardé que lui : la version de sbuild ne vient que de dpkg (`ii 0.89.3+deb13u4`). `newuidmap` et `newgidmap` sont présents, setuid root. Cache vidé : 0 `.deb`. |
+| Effets | **Tenus** | Aucune écriture dans le cluster ni dans Zot ; 38 s |
+
+**Comparaison faite ensuite sur l'hôte, à partir du journal** : les 44 paquets nouveaux sont **tous dans `builder/paquets.txt`, à la même version**. Aucune version ne diffère, aucun paquet ne manque. Seuls les quatre épinglés ont été comparés par sha256 : le cache était vidé, et les 40 autres ont été vérifiés par apt.
+
+**Conséquences pour la reconstruction du chroot**
+- `sc-replay` a mmdebstrap et sbuild aux versions de l'image de build de la plateforme. Leurs 40 dépendances sont, elles aussi, aux versions de la plateforme.
+- L'InRelease de l'instantané est vérifié dans la VM par `sqv` et le trousseau de la VM, avec les trois signataires de S1.
+- Il reste à relever le fichier `.gpg` du trousseau, puis à préparer mmdebstrap depuis l'instantané et la comparaison du chroot à `builder/paquets.txt`.
+
