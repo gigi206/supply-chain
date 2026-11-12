@@ -1762,3 +1762,18 @@ L'additif précédent est de 09:42:08 UTC (commit `844bf9e`), et non de 09:41 : 
 
 **Défaut de `v4` corrigé avant tout lancement** ([note datée](resultats/s6b-predictions.md)) : les trois clés de S1 arrivaient en trois arguments par ssh, et V4c n'aurait comparé qu'une clé. `sqv` est ajouté à la liste de V1c.
 
+## Additif du 12/11/2026, 09:48 UTC : décisions 1 et 2 prises, V4 remesurée
+
+**Décisions du propriétaire** : « 1 ok / 2 ok / 3 ok », reçue avant le lancement de 09:47:50 UTC (heure exacte du message non relevée).
+1. **La VSA du deb désigne la provenance `454728c5`** (S4d3, la plus récente), celle que la porte juge. La reconstruction dans `sc-replay` doit finir après le 12/11/2026 à 21:03:37 UTC (délai de 24 h de `vsa.py`).
+2. **Les paquets du chroot viennent de l'instantané, lus par `sc-replay`** (voie A). apt les vérifie pendant mmdebstrap, avec le trousseau de la VM. Le chroot est construit lien ouvert, puis sbuild tourne lien coupé, et les paquets du chroot sont comparés à [`builder/paquets.txt`](builder/paquets.txt).
+3. Accord pour lancer `v4`.
+
+**V4 remesurée** (09:47:50 UTC, code 0, [résultats](resultats/s6b-predictions.md)) :
+- L'instantané est joignable depuis la VM. La redirection 302 mène au magasin de fichiers de snapshot, par empreinte, en http.
+- **L'InRelease lu par la VM est celui de S1** : sha256 `0584fba3…`.
+- **La signature n'est pas vérifiée** : `gpgv` n'est pas installé dans la VM. apt y utilise `sqv` (1.3.0), avec le trousseau `debian-archive-keyring` 2025.1 (`.pgp`). C'est donc `sqv`, par apt, qui vérifiera l'instantané pendant mmdebstrap. Un témoin préalable avec `sqv` reste à écrire, une fois sa syntaxe lue dans la VM.
+- L'état dpkg explique la ligne trompeuse : `libsbuild-perl` est connu de dpkg (`un`) sans être installé.
+
+**Reste avant la reconstruction** : préparer à sec l'installation dans `sc-replay` (les quatre versions épinglées, sans recommandés) et le témoin `sqv`. L'installation attend un accord nommé.
+

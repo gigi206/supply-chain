@@ -121,3 +121,19 @@ Commande, sur accord nommé (le script a changé) : `mise exec -- poc/bricks/06-
 - **`sqv` ajouté à V1c** : apt de trixie peut vérifier les signatures avec `sqv` plutôt qu'avec `gpgv`. Prédiction : je ne prédis pas lequel des deux est installé. Si `gpgv` manque, V4c ne vérifie rien et le dit, sans rien installer.
 - **L'heure du titre de la section précédente** : « 09:40 » vient de `date -u` (09:40:56) ; le commit `844bf9e` est de 09:42:08 UTC.
 
+## Résultats de `v4` (12/11/2026, 09:47:50 UTC, accord « 3 ok »), code 0
+
+Journal : `s6b-v4.log` (`chrono.tsv` : début et fin à la même seconde). Aucune ligne `jeton|token`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| V1c | **Tenue, sauf `gpgv` (réfuté)** | mmdebstrap, sbuild, uidmap et schroot inconnus de dpkg ; `libsbuild-perl` : `un`, ce qui explique la ligne « déjà là » du second passage. `debian-archive-keyring` `ii 2025.1`, `ca-certificates` `ii 20250419+deb13u1`. **`gpgv` : `un`, non installé ; `sqv` : `ii 1.3.0-3+b2`**. apt de la VM vérifie donc ses signatures avec `sqv`. |
+| V4a | **Réfutée sur la forme de la cible** | HTTP 302 vers `http://snapshot.debian.org/file/aa33cb317177428f33c9ff72fc3e9b634645f6ae/InRelease` : un chemin par empreinte du magasin de fichiers de snapshot, en http, sur le même hôte. Je prédisais un chemin par horodatage. |
+| V4b | **Tenue** | HTTP 200 après une redirection ; **sha256 `0584fba3…`, identique à celui de S1** ; `Date: Sat, 12 Sep 2026 07:55:41 UTC`. L'instantané est joignable depuis la VM. |
+| V4c | **Non mesurée** | Trousseau trouvé : `/usr/share/keyrings/debian-archive-keyring.pgp` (le suffixe `.pgp`, prévu par le script). `gpgv` absent : signature non vérifiée, rien installé, comme le script le prévoit. |
+| Effets | **Tenus** | Rien d'installé (sans sudo) ; aucune écriture dans le cluster ni dans Zot ; moins d'une seconde côté script. |
+
+**Conséquences**
+- L'empreinte suffit à l'identité : l'InRelease que la VM lit est celui que S1 a vérifié sur l'hôte avec les clés de ftp-master, octet pour octet.
+- La signature n'est pas encore vérifiée **par le trousseau de la VM**. Dans la voie A, c'est apt, pendant mmdebstrap, qui la vérifie, avec `sqv` et ce trousseau : un échec y arrêterait le chroot. Le témoin préalable V4c reste à faire, avec `sqv`, dont je n'ai pas relevé la syntaxe : à lire dans la VM (`sqv --help`) avant d'écrire la commande.
+
