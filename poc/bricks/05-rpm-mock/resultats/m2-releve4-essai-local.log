@@ -1,4 +1,4 @@
-# essai hors réseau de m2.sh releve4 (curl simulé, banc m2-releve4-essai-local.sh), 2026-11-12T16:18:01Z
+# essai hors réseau de m2.sh releve4 (curl simulé, banc m2-releve4-essai-local.sh), 2026-11-12T16:20:56Z
 source remplacée : 1
 == cas trouve
 ## createrepo_c, tag 0.20.1 (fichiers non signés)
@@ -9,15 +9,21 @@ lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20
 OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
 PRÉSENTE createrepo_c 0.20.1 : "compatibility"
   2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-### usages de compatibility dans createrepo_c.c et cmd_parser.c
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
   createrepo_c.c:1:    if (cmd_options->compatibility) { /* faux */ }
+  --
+  cmd_parser.c-1-  { "checksum", 's', 0, G_OPTION_ARG_STRING, &(_cmd_options.checksum), "Choose the checksum type", "CHECKSUM_TYPE" },
   cmd_parser.c:2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-## skopeo copy, tag v1.22.2 (fichier non signé)
+## skopeo copy, tag v1.22.2 (fichiers non signés)
 FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go
-lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (146 octets, sha256 3e86dad4a8a1317ac8373b5ef08f528e721263c0b7a6bd201a52e9d12058655b)
-OK   skopeo copy v1.22.2 : témoin "remove-signatures" présent dans copy.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (42 octets, sha256 5fd7ee5e02096e2677c16c0a790c508f5fb89eae857ecf46d2c505a0d7967e1d)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go (165 octets, sha256 cac42e8b34ab4c720377ab427fc5883b0b2e80d9c4cc89696e95cc8deb2b9d63)
+  copy.go:1:	copyFlags, copyOpts := sharedCopyFlags()
+  utils.go:1:func sharedCopyFlags() {
+OK   skopeo copy v1.22.2 : témoin "remove-signatures" présent dans utils.go
 PRÉSENTE skopeo copy v1.22.2 : "preserve-digests"
-  2:flags.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")
+  3:fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")
 fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus
 code 0
 dossier releve4 effacé
@@ -29,14 +35,18 @@ FAUX curl https://raw.githubusercontent.com/rpm-software-management/createrepo_c
 lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/createrepo_c.c (51 octets, sha256 4e083fe0349be5116ea23f17a7d1ccc5b3c06a793c1311efe867b04a9b3ffb8f)
 OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
 ABSENTE createrepo_c 0.20.1 : "compatibility" introuvable dans cmd_parser.c
-### usages de compatibility dans createrepo_c.c et cmd_parser.c
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
   createrepo_c.c:1:    if (cmd_options->compatibility) { /* faux */ }
-## skopeo copy, tag v1.22.2 (fichier non signé)
+## skopeo copy, tag v1.22.2 (fichiers non signés)
 FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go
-lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (146 octets, sha256 3e86dad4a8a1317ac8373b5ef08f528e721263c0b7a6bd201a52e9d12058655b)
-OK   skopeo copy v1.22.2 : témoin "remove-signatures" présent dans copy.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (42 octets, sha256 5fd7ee5e02096e2677c16c0a790c508f5fb89eae857ecf46d2c505a0d7967e1d)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go (165 octets, sha256 cac42e8b34ab4c720377ab427fc5883b0b2e80d9c4cc89696e95cc8deb2b9d63)
+  copy.go:1:	copyFlags, copyOpts := sharedCopyFlags()
+  utils.go:1:func sharedCopyFlags() {
+OK   skopeo copy v1.22.2 : témoin "remove-signatures" présent dans utils.go
 PRÉSENTE skopeo copy v1.22.2 : "preserve-digests"
-  2:flags.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")
+  3:fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")
 fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus
 code 0
 dossier releve4 effacé
@@ -49,12 +59,16 @@ lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20
 OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
 PRÉSENTE createrepo_c 0.20.1 : "compatibility"
   2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-### usages de compatibility dans createrepo_c.c et cmd_parser.c
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
   createrepo_c.c:1:    if (cmd_options->compatibility) { /* faux */ }
+  --
+  cmd_parser.c-1-  { "checksum", 's', 0, G_OPTION_ARG_STRING, &(_cmd_options.checksum), "Choose the checksum type", "CHECKSUM_TYPE" },
   cmd_parser.c:2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-## skopeo copy, tag v1.22.2 (fichier non signé)
+## skopeo copy, tag v1.22.2 (fichiers non signés)
 FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go
-KO   https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go : HTTP 404, fichier non lu
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (42 octets, sha256 5fd7ee5e02096e2677c16c0a790c508f5fb89eae857ecf46d2c505a0d7967e1d)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go
+KO   https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go : HTTP 404, fichier non lu
 code 1
 dossier releve4 resté (attendu après un KO)
 == cas temoin
@@ -66,12 +80,40 @@ lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20
 OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
 PRÉSENTE createrepo_c 0.20.1 : "compatibility"
   2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-### usages de compatibility dans createrepo_c.c et cmd_parser.c
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
   createrepo_c.c:1:    if (cmd_options->compatibility) { /* faux */ }
+  --
+  cmd_parser.c-1-  { "checksum", 's', 0, G_OPTION_ARG_STRING, &(_cmd_options.checksum), "Choose the checksum type", "CHECKSUM_TYPE" },
   cmd_parser.c:2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
-## skopeo copy, tag v1.22.2 (fichier non signé)
+## skopeo copy, tag v1.22.2 (fichiers non signés)
 FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go
-lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (72 octets, sha256 4c5cce6767ce2a7ef88da09dff9cb839a288688fc51fe351727d7fb83eb60046)
-KO   skopeo copy v1.22.2 : témoin "remove-signatures" absent de copy.go, ce n'est pas le bon fichier
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (42 octets, sha256 5fd7ee5e02096e2677c16c0a790c508f5fb89eae857ecf46d2c505a0d7967e1d)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go (94 octets, sha256 3596a9e58b971899c0273da6a154285ca6c8e835b71196b5758069f55e7d8147)
+  copy.go:1:	copyFlags, copyOpts := sharedCopyFlags()
+  utils.go:1:func sharedCopyFlags() {
+KO   skopeo copy v1.22.2 : témoin "remove-signatures" absent de utils.go, ce n'est pas le bon fichier
+code 1
+dossier releve4 resté (attendu après un KO)
+== cas appel
+## createrepo_c, tag 0.20.1 (fichiers non signés)
+FAUX curl https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/cmd_parser.c
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/cmd_parser.c (225 octets, sha256 76ef81a3cfd125253018604d1dee5fd3be8fc63c058ddcc4dd0064a88558ba74)
+FAUX curl https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/createrepo_c.c
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/createrepo_c.c (51 octets, sha256 4e083fe0349be5116ea23f17a7d1ccc5b3c06a793c1311efe867b04a9b3ffb8f)
+OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
+PRÉSENTE createrepo_c 0.20.1 : "compatibility"
+  2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
+  createrepo_c.c:1:    if (cmd_options->compatibility) { /* faux */ }
+  --
+  cmd_parser.c-1-  { "checksum", 's', 0, G_OPTION_ARG_STRING, &(_cmd_options.checksum), "Choose the checksum type", "CHECKSUM_TYPE" },
+  cmd_parser.c:2:  { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility), "Faux texte d essai", NULL },
+## skopeo copy, tag v1.22.2 (fichiers non signés)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (37 octets, sha256 880ffc4c638b05389f4c867c962dcce4fb51a023632167d14e0c190dfeed0365)
+FAUX curl https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go (165 octets, sha256 cac42e8b34ab4c720377ab427fc5883b0b2e80d9c4cc89696e95cc8deb2b9d63)
+KO   copy.go n'appelle pas sharedCopyFlags() : les options de copie ne sont pas celles de utils.go
 code 1
 dossier releve4 resté (attendu après un KO)

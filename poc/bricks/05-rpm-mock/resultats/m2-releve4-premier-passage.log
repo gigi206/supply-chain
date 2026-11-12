@@ -1,0 +1,19 @@
+# m2.sh releve4, 2026-11-12T16:19:59Z
+## createrepo_c, tag 0.20.1 (fichiers non signés)
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/cmd_parser.c (27971 octets, sha256 06b3c67adb4278cd08150654a375f1ca6173fce18b3c1c3759689a9f5015fcc6)
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/createrepo_c.c (91117 octets, sha256 d3e1caa1846de95333027720e2fda90e7ec024f7697e44d00b82b2b214d3e436)
+OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
+PRÉSENTE createrepo_c 0.20.1 : "compatibility"
+  177:    { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility),
+  178-      "Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).", NULL },
+  179-    { "retain-old-md-by-age", 0, 0, G_OPTION_ARG_STRING, &(_cmd_options.retain_old_md_by_age),
+  180-      "During --update, remove all files in repodata/ which are older "
+### usages de compatibility dans createrepo_c.c et cmd_parser.c
+  createrepo_c.c:1291:    if (cmd_options->compatibility && cmd_options->changelog_limit == DEFAULT_CHANGELOG_LIMIT ) {
+  createrepo_c.c:2087:    } else if (cmd_options->compatibility) {
+  cmd_parser.c:140:      "Use --compatibility flag to get the behavior of original createrepo: "
+  cmd_parser.c:177:    { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility),
+  cmd_parser.c:178:      "Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).", NULL },
+## skopeo copy, tag v1.22.2 (fichier non signé)
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (10166 octets, sha256 046cfe464cbe9e1a060a45357ae72d3a7de9eec93b6e8064514de16a62cc56f1)
+KO   skopeo copy v1.22.2 : témoin "remove-signatures" absent de copy.go, ce n'est pas le bon fichier

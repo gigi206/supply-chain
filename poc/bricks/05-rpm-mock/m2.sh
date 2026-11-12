@@ -27,6 +27,10 @@
 #               dans createrepo_c.c), --preserve-digests de skopeo copy 1.22.2 (copy.go). Une option témoin, sûrement présente,
 #               doit être trouvée dans le même fichier : sinon le fichier lu n'est pas le bon (KO). Option absente : résultat
 #               ABSENTE, code 0. Les correctifs des paquets de Rocky ne sont pas lus. Prédictions : resultats/m2-predictions.md.
+#               Corrigé à sec le 12/11/2026 à partir de 16:20:56 UTC, après le premier passage (16:19:59 UTC, KO attendu du témoin :
+#               copy.go ne déclare pas les options de copie, il appelle sharedCopyFlags()), NON RELANCÉ : copy.go doit appeler
+#               sharedCopyFlags(), et les options sont lues dans cmd/skopeo/utils.go, qui doit définir func sharedCopyFlags( ;
+#               usages de compatibility archivés avec 3 lignes avant et 5 après.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
@@ -166,11 +170,16 @@ etape_releve4() {
   lire_amont cmd_parser.c "$c/src/cmd_parser.c"
   lire_amont createrepo_c.c "$c/src/createrepo_c.c"
   option_lue "createrepo_c $CREATEREPO_TAG" cmd_parser.c compatibility checksum
-  echo "### usages de compatibility dans createrepo_c.c et cmd_parser.c"
-  ( cd "$T/releve4" && grep -n -F -- compatibility createrepo_c.c cmd_parser.c ) | cut -c1-220 | sed 's/^/  /' || true
-  echo "## skopeo copy, tag $SKOPEO_TAG (fichier non signé)"
+  echo "### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)"
+  ( cd "$T/releve4" && grep -n -F -B3 -A5 -- compatibility createrepo_c.c cmd_parser.c ) | cut -c1-220 | sed 's/^/  /' || true
+  echo "## skopeo copy, tag $SKOPEO_TAG (fichiers non signés)"
   lire_amont copy.go "$s/cmd/skopeo/copy.go"
-  option_lue "skopeo copy $SKOPEO_TAG" copy.go preserve-digests remove-signatures
+  lire_amont utils.go "$s/cmd/skopeo/utils.go"
+  grep -n -F -- 'sharedCopyFlags()' "$T/releve4/copy.go" | sed 's/^/  copy.go:/' \
+    || { echo "KO   copy.go n'appelle pas sharedCopyFlags() : les options de copie ne sont pas celles de utils.go" >&2; exit 1; }
+  grep -n -F -- 'func sharedCopyFlags(' "$T/releve4/utils.go" | sed 's/^/  utils.go:/' \
+    || { echo "KO   utils.go ne définit pas sharedCopyFlags : ce n'est pas le bon fichier" >&2; exit 1; }
+  option_lue "skopeo copy $SKOPEO_TAG" utils.go preserve-digests remove-signatures
   rm -rf -- "${T:?}/releve4"
   echo "fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus"
 }

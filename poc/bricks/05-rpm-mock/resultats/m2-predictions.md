@@ -307,3 +307,32 @@ Banc hors réseau ([script](m2-releve4-essai-local.sh), [journal](m2-releve4-ess
 `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`).
 
 **Limites.** Les tags amont ne sont pas les paquets de Rocky : les correctifs de `createrepo_c-0.20.1-4.el9` et de `skopeo-1.22.2-9.el9_8` ne sont pas lus. `createrepo_c --help` et `skopeo copy --help` dans l'image restent la mesure de M2. Le fichier de raw.githubusercontent.com n'est pas signé ; seul son sha256 est journalisé.
+
+## Premier passage de `releve4`, le 12/11/2026 à 16:19:59 UTC (« Oui, lance releve4 »), arrêté en KO, code 1
+
+[Journal archivé](m2-releve4-premier-passage.log). `chrono.tsv` porte le début (16:19:59 UTC) et pas de fin : l'étape s'est arrêtée sur le témoin de skopeo. Note écrite à partir de 16:21:19 UTC.
+
+| # | Résultat |
+|---|---|
+| L1 | **Tenue.** Les trois fichiers sont lus en HTTP 200 aux tags `0.20.1` et `v1.22.2` |
+| L2 | **Tenue.** `--compatibility` est déclarée dans `cmd_parser.c:177` de createrepo_c 0.20.1, témoin `"checksum"` trouvé. Texte d'aide : « Affects only: --retain-old-md » |
+| L3 | **Non tranchée, contredite en apparence.** Le journal montre `createrepo_c.c:1291` : `if (cmd_options->compatibility && cmd_options->changelog_limit == DEFAULT_CHANGELOG_LIMIT )`. L'option agit donc aussi sur la limite des changelogs, malgré son texte d'aide ; la ligne qui suit n'est pas au journal |
+| L4 | **Non tranchée.** Le témoin `"remove-signatures"` manque dans `copy.go` : KO, comme prévu par le risque de L4. Le garde a joué son rôle : pas de fausse absence |
+
+**Lu après le KO, non archivé.** Les trois fichiers sont restés sous `~/.cache/supply-chain-poc/05/m2/releve4`, avec les sha256 du journal. On y lit :
+- `copy.go:47` appelle `sharedCopyFlags()` : les options de copie sont déclarées ailleurs ;
+- `createrepo_c.c:1292` donne `user_data.changelog_limit = -1` dans ce cas ; le sens de -1 n'est pas lu.
+
+Le passage corrigé archivera ces lignes.
+
+**Correction à sec, à partir de 16:20:56 UTC, NON RELANCÉE** ([`m2.sh`](../m2.sh)) :
+- `copy.go` doit appeler `sharedCopyFlags()`, sinon KO ;
+- `cmd/skopeo/utils.go` est lu, doit définir `func sharedCopyFlags(`, et porte les deux options (témoin et `preserve-digests`) ;
+- les usages de `compatibility` sont archivés avec 3 lignes avant et 5 après.
+
+Banc rejoué ([journal](m2-releve4-essai-local.log)), cinq cas, codes attendus : trouvées (0), absente (0), HTTP 404 sur `utils.go` (1), témoin absent de `utils.go` (1), `copy.go` sans appel à `sharedCopyFlags()` (1). `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`).
+
+| # | Prédiction pour le passage corrigé | Confiance |
+|---|---|---|
+| L4b | `utils.go` de skopeo 1.22.2 définit `sharedCopyFlags` et déclare `--preserve-digests` et `--remove-signatures` | Moyenne : le nom de fichier est supposé, jamais lu |
+| L3b | Le contexte archivé montre que `--compatibility` fixe la limite des changelogs à -1 quand l'utilisateur n'en donne pas : le dépôt construit n'est pas le même qu'avec la valeur par défaut | Haute pour la ligne (lue dans le fichier resté) ; le sens de -1 restera à lire |

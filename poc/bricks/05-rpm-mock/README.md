@@ -287,3 +287,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Elle lit dans l'amont, aux tags des versions de Rocky 9.8, si `createrepo_c` 0.20.1 accepte `--compatibility` et si `skopeo copy` 1.22.2 accepte `--preserve-digests` (gestes 3 et 4 de la voie 2).
 - Hôte seul, réseau, ni cluster ni Zot ; un témoin par fichier distingue une option absente d'un mauvais fichier.
 - Banc hors réseau tenu ([journal](resultats/m2-releve4-essai-local.log)). Accord nommé attendu.
+
+**Premier passage de `releve4`, le 12/11/2026 à 16:19:59 UTC (« Oui, lance releve4 »)** : KO attendu sur le témoin de skopeo, code 1 ([journal](resultats/m2-releve4-premier-passage.log), [résultats](resultats/m2-predictions.md)).
+- L1 et L2 tenues : `--compatibility` existe dans createrepo_c 0.20.1 (`cmd_parser.c:177`).
+- L3 contredite en apparence : l'option agit aussi sur la limite des changelogs (`createrepo_c.c:1291`), malgré son texte d'aide.
+- L4 non tranchée : `copy.go` de skopeo ne déclare pas ses options de copie.
+- Corrigé à sec à partir de 16:20:56 UTC (lecture de `utils.go`, contexte des usages archivé), banc rejoué ; NON RELANCÉ, accord nommé attendu.
