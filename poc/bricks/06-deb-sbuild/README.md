@@ -1927,3 +1927,14 @@ Préparée après « Oui, prépare-la », sur le modèle de R5 de la brique 10 (
 
 **Décision du 12/11/2026, reçue avant 10:59 UTC (« Bit identique seul »)** : la VSA du deb ne revendique que `POC_REPLAY_BIT_IDENTIQUE`, et `rejeu/vsa_deb.py` est modifié en conséquence. Il reste ta relecture du projet de politique, avant le commit qui la fige.
 
+## Additif du 12/11/2026, 11:00 UTC : texte proposé pour figer la politique du deb, à ton approbation
+
+Préparé après « Oui, prépare-le ». [`rejeu/politique-replay-deb.md`](rejeu/politique-replay-deb.md) est réécrit : c'est un texte déjà commité, réécrit avec ton accord. Les trois notes de relecture et ta décision sont intégrées, puis les notes sont retirées. Les changements de fond :
+- **section 3** : ce qui lie le chroot, c'est l'égalité de sa couche avec celle de l'image de build déclarée. apt vérifie l'InRelease avec `sqv` et le trousseau de la VM ; la VSA exige la porteuse à 0 au départ et à la fin ;
+- **section 5** : seul `POC_REPLAY_BIT_IDENTIQUE` est revendiqué ;
+- **section 6** : le dépôt `builds/vsa/sample-app-deb` est celui que dérive la porte.
+
+Le texte ne porte plus aucune mention de projet, et la garde de `vsa` l'accepte. Son sha256 est `6cc94a50…`.
+
+**Ce commit n'est pas encore `POLITIQUE_COMMIT`.** Il le deviendra sur ton approbation ; si tu demandes des changements, ce sera le commit qui les porte. La VSA citera l'URL du fichier à ce commit, et son sha256.
+
