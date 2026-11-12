@@ -55,6 +55,21 @@
 #               Prédictions : resultats/m2-predictions.md, section releve6.
 #               Lancé le 12/11/2026 à 17:26:47 UTC (« Oui » à « Je lance releve6 ? »), code 0 : X1 à X6 tenues ; seul extras
 #               reste actif hors de vault 9.7, par mirrorlist (m2-releve6.log).
+#   releve7     hôte seul, réseau (ajouté à sec le 12/11/2026 à partir de 17:46:28 UTC, après « continue », sur relecture du
+#               conseiller, NON LANCÉ) : dépôt extras, resté actif par mirrorlist hors de vault 9.7 (releve6), pour la décision
+#               du propriétaire après S5b ; s1.sh lu, jamais modifié (VAULT97, CLE_ROCKY et FP_ROCKY, une ligne chacune, sinon KO).
+#               Clé de Rocky téléchargée, empreinte égale à FP_ROCKY exigée, trousseau temporaire ; chroot_setup_cmd relu dans
+#               le rocky-9.tpl de l'archive gardée (sha256 contrôlé) ; ce que sert le mirrorlist d'extras-9 : code HTTP, nombre
+#               d'URL, segments « /<version>/<dépôt>/ » des chemins (ni hôtes ni commentaires, qui situent le client) ; dossiers
+#               de vault/rocky/9.7 (liste HTML non signée) ; pour BaseOS, AppStream, CRB et extras de vault 9.7, et pour
+#               pub/rocky/9/extras (baseurl commentée du modèle) : repomd.xml signé par FP_ROCKY (gpgv, VALIDSIG ; témoin
+#               altéré refusé), primary égal à la somme de repomd.xml, paquets mis à plat ; extras absent (HTTP 404) : ABSENT,
+#               code 0 ; mirrorlist illisible : KO, la suite tourne, code 1 ; puis paquets d'extras listés et croisés avec les
+#               noms de chroot_setup_cmd (par nom et par provides) et avec les noms de BaseOS, AppStream et CRB 9.7. Un
+#               croisement vide n'exclut pas une dépendance que seul extras satisferait. Fichiers effacés à la fin, sauf
+#               après un KO qui arrête l'étape : ils restent alors sous ~/.cache jusqu'au passage suivant. Primary en .gz,
+#               .xz ou .bz2 (Rocky 9.8 : .gz, s1-hote.log ; vault 9.7 non lu), somme sha256 exigée.
+#               Prédictions : resultats/m2-predictions.md, section releve7. Banc hors réseau : resultats/m2-releve7-essai-local.sh.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -83,6 +98,7 @@
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve4  (journal : resultats/m2-releve4.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve5  (journal : resultats/m2-releve5.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve6  (journal : resultats/m2-releve6.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve7  (journal : resultats/m2-releve7.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -361,6 +377,191 @@ print(f"dépôts actifs ou sans enabled, hors des seules baseurl de vault 9.7 : 
 PY
   rm -rf -- "${T:?}/mock-src"
   echo "sources effacées ; archive gardée sous ~/.cache"
+}
+
+lire_r7() { # fichier URL : code HTTP sur la sortie (redirections en https seulement) ; curl en échec : KO
+  local h
+  h=$(curl -sS -L --proto =https --proto-redir =https --max-time 120 -o "$T/releve7/$1" -w '%{http_code}' "$2") \
+    || { echo "KO   $2 : curl en échec" >&2; exit 1; }
+  printf '%s' "$h"
+}
+
+depot_r7() { # étiquette URL-du-dépôt : repomd.xml signé par $fp, primary égal à sa somme, paquets et provides mis à plat
+             # (<étiquette>.paquets, <étiquette>.provides) ; HTTP 404 sur repomd.xml : ABSENT, retour 2 ; tout autre écart : KO
+  local l=$1 b=$2 d=$T/releve7 h s p x
+  h=$(lire_r7 "$l.repomd.xml" "$b/repodata/repomd.xml") || exit 1
+  if [ "$h" = 404 ]; then echo "ABSENT $l : HTTP 404 sur $b/repodata/repomd.xml"; return 2; fi
+  [ "$h" = 200 ] || { echo "KO   $l : HTTP $h sur $b/repodata/repomd.xml" >&2; exit 1; }
+  h=$(lire_r7 "$l.repomd.xml.asc" "$b/repodata/repomd.xml.asc") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $l : HTTP $h sur $b/repodata/repomd.xml.asc" >&2; exit 1; }
+  s=$(gpgv --keyring "$d/cles.gpg" --status-fd 1 "$d/$l.repomd.xml.asc" "$d/$l.repomd.xml" 2>/dev/null \
+    | awk '$2 == "VALIDSIG" {print $NF}' || true)
+  [ "$s" = "$fp" ] && echo "OK   $l : repomd.xml signé par $s" \
+    || { echo "KO   $l : signataire de repomd.xml « $s » (attendu : $fp)" >&2; exit 1; }
+  echo "$l : repomd.xml sha256 $(sha256sum < "$d/$l.repomd.xml" | cut -c1-64)"
+  p=$(python3 -I - "$d/$l.repomd.xml" <<'PY'
+import re, sys, xml.etree.ElementTree as E
+n = {'r': 'http://linux.duke.edu/metadata/repo'}
+d = [x for x in E.parse(sys.argv[1]).getroot().findall('r:data', n) if x.get('type') == 'primary']
+if len(d) != 1:
+    sys.exit(f"{len(d)} entrées primary dans repomd.xml (attendu : 1)")
+c, h = d[0].find('r:checksum', n), d[0].find('r:location', n)
+if c is None or h is None or c.get('type') != 'sha256' or not re.fullmatch(r'[0-9a-f]{64}', (c.text or '').strip()):
+    sys.exit("somme sha256 du primary absente ou mal formée")
+h = h.get('href') or ''
+if not re.fullmatch(r'repodata/[A-Za-z0-9._-]+\.xml\.(gz|xz|bz2)', h):
+    sys.exit(f"emplacement du primary refusé : {h}")
+print(c.text.strip(), h)
+PY
+  ) || { echo "KO   $l : entrée primary de repomd.xml refusée" >&2; exit 1; }
+  s=${p%% *}; p=${p#* }
+  x=${p##*.}
+  h=$(lire_r7 "$l.primary.xml.$x" "$b/$p") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $l : HTTP $h sur $b/$p" >&2; exit 1; }
+  [ "$(sha256sum < "$d/$l.primary.xml.$x" | cut -c1-64)" = "$s" ] \
+    && echo "OK   $l : primary ($x) conforme à repomd.xml ($(stat -c %s "$d/$l.primary.xml.$x") octets)" \
+    || { echo "KO   $l : sha256 du primary différent de repomd.xml ($s)" >&2; exit 1; }
+  python3 -I - "$l" "$d/$l.primary.xml.$x" "$d/$l.paquets" "$d/$l.provides" <<'PY' || { echo "KO   $l : primary illisible" >&2; exit 1; }
+import bz2, gzip, lzma, sys, xml.etree.ElementTree as E
+l, src, out, prov = sys.argv[1:5]
+ouvrir = {'gz': gzip.open, 'xz': lzma.open, 'bz2': bz2.open}[src.rsplit('.', 1)[1]]
+C = '{http://linux.duke.edu/metadata/common}'; R = '{http://linux.duke.edu/metadata/rpm}'
+n = 0
+with ouvrir(src) as f, open(out, 'w', encoding='utf-8') as o, open(prov, 'w', encoding='utf-8') as q:
+    for _, p in E.iterparse(f):
+        if p.tag != C + 'package':
+            continue
+        if p.get('type') == 'rpm':
+            v, nom = p.find(C + 'version'), p.findtext(C + 'name')
+            o.write(f"{nom}\t{v.get('epoch')}:{v.get('ver')}-{v.get('rel')}.{p.findtext(C + 'arch')}\n")
+            for e in p.findall(f'{C}format/{R}provides/{R}entry'):
+                q.write(f"{nom}\t{e.get('name')}\n")
+            n += 1
+        p.clear()
+print(f"{l} : {n} paquets dans le primary")
+PY
+}
+
+etape_releve7() {
+  local d=$T/releve7 a=$T/mock.tar.gz v cle fp s h x n u e=0 r1=0 r2=0
+  local -a l=()
+  echo "## épingles lues dans s1.sh (non modifié)"
+  v=$(sed -n 's|^VAULT97=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  cle=$(sed -n 's|^CLE_ROCKY=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  fp=$(sed -n 's/^FP_ROCKY=\([0-9A-F]\{40\}\)\([[:space:]].*\)\{0,1\}$/\1/p' "$here/s1.sh")
+  for x in "VAULT97:$v" "CLE_ROCKY:$cle" "FP_ROCKY:$fp"; do
+    n=$(printf '%s' "${x#*:}" | grep -c . || true)
+    [ "$n" = 1 ] && echo "OK   ${x%%:*} : ${x#*:}" \
+      || { echo "KO   ${x%%:*} : $n ligne(s) reconnue(s) dans s1.sh (attendu : 1)" >&2; exit 1; }
+  done
+  rm -rf -- "${d:?}"; mkdir -p "$d/src"; mkdir -m 700 "$d/gnupg"; export GNUPGHOME=$d/gnupg
+  echo "## clé de Rocky (trousseau temporaire)"
+  h=$(lire_r7 RPM-GPG-KEY-Rocky-9 "$cle") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $cle : HTTP $h" >&2; exit 1; }
+  s=$(gpg --batch --with-colons --show-keys "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null | awk -F: '$1 == "fpr" {print $10; exit}' || true)
+  [ "$s" = "$fp" ] && echo "OK   empreinte de la clé de Rocky : $s" \
+    || { echo "KO   empreinte de la clé de Rocky : « $s » (attendu : $fp)" >&2; exit 1; }
+  gpg --batch --quiet --no-default-keyring --keyring "$d/cles.gpg" --import "$d/RPM-GPG-KEY-Rocky-9" 2>/dev/null \
+    || { echo "KO   clé de Rocky non importée" >&2; exit 1; }
+  echo "## chroot_setup_cmd de rocky-9.tpl (archive du tag $MOCK_TAG gardée par releve, sans réseau)"
+  [ -f "$a" ] || { echo "KO   archive absente : $a (lancer releve d'abord)" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  tar -xzf "$a" -C "$d/src" --strip-components=1 --wildcards '*/templates/rocky-9.tpl'
+  x=$(cd "$d/src" && find . -path '*/templates/rocky-9.tpl' | sort); n=$(printf '%s' "$x" | grep -c . || true)
+  [ "$n" = 1 ] && echo "OK   rocky-9.tpl trouvés dans l'archive : $n" || { echo "KO   rocky-9.tpl trouvés dans l'archive : $n (attendu : 1)" >&2; exit 1; }
+  python3 -I - "$d/src/${x#./}" "$d/chroot.noms" <<'PY' || { echo "KO   chroot_setup_cmd non lu" >&2; exit 1; }
+import re, sys
+t = open(sys.argv[1], encoding='utf-8').read()
+m = re.findall(r"^config_opts\['chroot_setup_cmd'\]\s*=\s*'([^']*)'\s*$", t, re.M)
+if len(m) != 1:
+    sys.exit(f"{len(m)} affectations simples de chroot_setup_cmd (attendu : 1)")
+mots = m[0].split()
+if not mots or mots[0] != 'install':
+    sys.exit("chroot_setup_cmd ne commence pas par install")
+noms = [x for x in mots[1:] if re.fullmatch(r'[A-Za-z0-9._+-]+', x)]
+autres = [x for x in mots[1:] if x not in noms]
+with open(sys.argv[2], 'w', encoding='utf-8') as f:
+    f.write('\n'.join(noms) + '\n')
+print(f"chroot_setup_cmd : {len(noms)} noms : {' '.join(noms)}")
+print(f"mots écartés (groupe, modèle jinja) : {' '.join(autres) or 'aucun'}")
+PY
+  echo "## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)"
+  u='https://mirrors.rockylinux.org/mirrorlist?arch=x86_64&repo=extras-9'
+  h=$(lire_r7 mirrorlist.txt "$u") || exit 1
+  n=$(grep -s -c -E '^https?://' "$d/mirrorlist.txt" || true)
+  if [ "$h" = 200 ] && [ "$n" -gt 0 ]; then
+    echo "HTTP 200 ; $n URL ; $(grep -s -c -v -E '^https?://' "$d/mirrorlist.txt" || true) autre(s) ligne(s), non journalisée(s)"
+    echo "segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :"
+    { grep -E '^https?://' "$d/mirrorlist.txt" | sed -E 's#^https?://[^/]+##' | grep -oE '/[0-9][0-9.]*/[A-Za-z]+/' | sort | uniq -c | sed 's/^/  /'; } || true
+    echo "URL sans segment reconnu : $(grep -E '^https?://' "$d/mirrorlist.txt" | sed -E 's#^https?://[^/]+##' | grep -c -v -E '/[0-9][0-9.]*/[A-Za-z]+/' || true)"
+  else
+    echo "KO   mirrorlist d'extras : HTTP $h, $n URL ; la suite tourne, code final 1"; e=1
+  fi
+  echo "## dossiers de $v/ (liste HTML non signée : un index, pas une preuve)"
+  h=$(lire_r7 vault.html "$v/") || exit 1
+  [ "$h" = 200 ] || { echo "KO   $v/ : HTTP $h" >&2; exit 1; }
+  { grep -s -oE 'href="[A-Za-z0-9_.-]+/"' "$d/vault.html" | sed 's/^href="//; s/"$//' | sort -u > "$d/dossiers"; } || true
+  echo "$(grep -c . "$d/dossiers" || true) dossiers : $(tr '\n' ' ' < "$d/dossiers")"
+  x=$(grep -i -x -F 'extras/' "$d/dossiers" || true); n=$(printf '%s' "$x" | grep -c . || true)
+  case $n in
+    0) echo "aucun dossier extras/ (casse ignorée) ; repomd.xml cherché quand même sous extras/"; x=extras/ ;;
+    1) echo "dossier retenu : $x" ;;
+    *) echo "KO   $n dossiers extras/ à la casse près : $(tr '\n' ' ' <<<"$x")" >&2; exit 1 ;;
+  esac
+  echo "## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)"
+  for u in BaseOS AppStream CRB; do
+    depot_r7 "vault-$u" "$v/$u/x86_64/os" || { echo "KO   vault-$u absent" >&2; exit 1; }
+  done
+  cp "$d/vault-BaseOS.repomd.xml" "$d/temoin.xml"; echo x >> "$d/temoin.xml"
+  s=$(gpgv --keyring "$d/cles.gpg" --status-fd 1 "$d/vault-BaseOS.repomd.xml.asc" "$d/temoin.xml" 2>/dev/null | awk '$2 == "VALIDSIG"' || true)
+  [ -z "$s" ] && echo "OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé" \
+    || { echo "KO   témoin altéré accepté" >&2; exit 1; }
+  echo "## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)"
+  depot_r7 vault-extras "$v/${x%/}/x86_64/os" || r1=$?
+  [ "$r1" = 0 ] && l+=(vault-extras)
+  echo "## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)"
+  depot_r7 pub9-extras https://dl.rockylinux.org/pub/rocky/9/extras/x86_64/os || r2=$?
+  [ "$r2" = 0 ] && l+=(pub9-extras)
+  echo "## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)"
+  python3 -I - "$d" "${l[@]}" <<'PY' || { echo "KO   croisements non faits" >&2; exit 1; }
+import os, sys
+d, labs = sys.argv[1], sys.argv[2:]
+def lire(f):
+    with open(os.path.join(d, f), encoding='utf-8') as h:
+        return [x.rstrip('\n').split('\t') for x in h if x.strip()]
+with open(os.path.join(d, 'chroot.noms'), encoding='utf-8') as h:
+    ch = set(h.read().split())
+base = {}
+for b in ('vault-BaseOS', 'vault-AppStream', 'vault-CRB'):
+    for nom, evr in lire(b + '.paquets'):
+        base.setdefault(nom, set()).add(f"{b} {evr}")
+print(f"noms distincts dans BaseOS, AppStream et CRB 9.7 : {len(base)} ; noms de chroot_setup_cmd : {len(ch)}")
+noms = {}
+for lab in labs:
+    p, pr = lire(lab + '.paquets'), lire(lab + '.provides')
+    noms[lab] = {n for n, _ in p}
+    print(f"### {lab} : {len(p)} paquets")
+    for n, evr in sorted(p):
+        print(f"  {n} {evr}")
+    print(f"noms de chroot_setup_cmd qui sont des paquets de {lab} : {' '.join(sorted(noms[lab] & ch)) or 'aucun'}")
+    b = sorted({f"{x} (par {n})" for n, x in pr if x in ch})
+    print(f"noms de chroot_setup_cmd fournis (provides) par {lab} : {' ; '.join(b) or 'aucun'}")
+    c = sorted(noms[lab] & base.keys())
+    print(f"paquets de {lab} dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : {len(c)}")
+    for n in c:
+        print(f"  {n} : {lab} {' '.join(e for m, e in p if m == n)} ; {' ; '.join(sorted(base[n]))}")
+if len(labs) == 2:
+    x, y = (noms[k] for k in labs)
+    print(f"noms seulement dans {labs[0]} : {' '.join(sorted(x - y)) or 'aucun'}")
+    print(f"noms seulement dans {labs[1]} : {' '.join(sorted(y - x)) or 'aucun'}")
+if not labs:
+    print("aucun dépôt extras lu : pas de croisement")
+PY
+  gpgconf --kill all 2>/dev/null || true
+  rm -rf -- "${d:?}"
+  echo "fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache"
+  [ "$e" = 0 ] || { echo "KO   écart ci-dessus (mirrorlist) : code 1" >&2; exit 1; }
 }
 
 # Cœur de la voie 2, NON BRANCHÉ (voir l'en-tête) : ni étape, ni pod. Rien ici n'est appelé par lancer.

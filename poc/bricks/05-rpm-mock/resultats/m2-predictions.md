@@ -506,3 +506,46 @@ Résultats écrits à partir de 17:28:14 UTC. Journal : [m2-releve6.log](m2-rele
 - La construction de S1 voit `extras`, un dépôt non figé, servi par mirrorlist, hors de vault 9.7. D2 a (« Source des rpm » : `vault/rocky/9.7` en baseurl fixes, [README](../README.md) ligne 56) ne le nomme pas.
 - La sonde de S1 le listera (`s1.sh:384`) sans s'arrêter : son contrôle ne porte que sur BaseOS, AppStream et CRB (`s1.sh:385` à `:387`).
 - Que faire d'`extras` est à décider avec toi. Le `s1.sh` de la 05 ne change pas avant S5b.
+
+## Additif du 12/11/2026, à partir de 17:46:28 UTC : étape `releve7` ajoutée à `m2.sh`, NON LANCÉE
+
+Après « continue », sur relecture du conseiller. **Hôte seul, réseau, lecture seule** : ni cluster, ni Zot, ni `s1.sh` modifié. Elle demande ton accord nommé.
+
+**Pourquoi.** `releve6` a montré qu'`extras` reste actif, par mirrorlist, hors de vault 9.7. Que faire d'`extras` est ta décision, après S5b. Deux faits non mesurés la conditionnent : un `extras` 9.7 existe-t-il dans vault, signé par la clé de Rocky ? Un paquet du buildroot peut-il en venir ? `releve7` mesure le premier et approche le second par des croisements de noms.
+
+**Ce que fait l'étape** :
+- lit `VAULT97`, `CLE_ROCKY` et `FP_ROCKY` dans `s1.sh`, une ligne chacune, sinon KO ;
+- télécharge la clé de Rocky et exige l'empreinte `FP_ROCKY`, dans un trousseau temporaire ;
+- relit `chroot_setup_cmd` dans le `rocky-9.tpl` de l'archive gardée (sha256 contrôlé, sans réseau) ;
+- lit la réponse du mirrorlist d'`extras-9` (releasever 9, `rocky-9.tpl:3`). Elle journalise le code HTTP, le nombre d'URL et les segments « /<version>/<dépôt>/ » des chemins, hôte retiré. Les hôtes et les lignes de commentaire ne sont pas journalisés : ils situent le client. Un mirrorlist illisible donne un KO, la suite tourne et le code final est 1 ;
+- liste les dossiers de `vault/rocky/9.7/` (liste HTML, non signée : un index, pas une preuve). Deux dossiers `extras/` à la casse près donnent un KO. Aucun : `repomd.xml` est cherché quand même sous `extras/` ;
+- pour BaseOS, AppStream et CRB de vault 9.7, puis `extras` de vault 9.7, puis `pub/rocky/9/extras` (la baseurl commentée du modèle, `rocky-9.tpl:60`, avec releasever 9) : `repomd.xml` signé par `FP_ROCKY` (`gpgv`, ligne `VALIDSIG`, comme `s1.sh:185` à `:189`), `primary` égal à la somme de `repomd.xml`, paquets et provides mis à plat. Un `repomd.xml` d'`extras` en HTTP 404 donne ABSENT, code 0 ; pour BaseOS, AppStream ou CRB, un KO. Un témoin altéré (le `repomd.xml` de BaseOS plus une ligne) doit être refusé ;
+- liste les paquets de chaque `extras` lu, puis les croise avec les noms de `chroot_setup_cmd` (par nom de paquet et par provides) et avec les noms de BaseOS, AppStream et CRB 9.7. Si les deux `extras` sont lus, les noms propres à chacun ;
+- efface tout à la fin (clé, métadonnées, modèle extrait), sauf après un KO qui arrête l'étape : les fichiers restent alors sous `~/.cache` jusqu'au passage suivant, qui les efface en commençant. Le primary peut être en `.gz`, `.xz` ou `.bz2`, avec une somme sha256 exigée : Rocky 9.8 sert du `.gz` ([s1-hote.log](s1-hote.log)), vault 9.7 n'est pas lu. Les primary de BaseOS, AppStream et CRB sont téléchargés sous `~/.cache`, pas dans `/tmp` ; leur taille n'est pas connue avant le passage.
+
+`bash -n` passe, et shellcheck ne relève aucun avertissement (`-S warning`). Banc hors réseau : [m2-releve7-essai-local.sh](m2-releve7-essai-local.sh) ([journal](m2-releve7-essai-local.log)). `curl` y est simulé ; `gpg` et `gpgv` sont les vrais, avec deux clés d'essai jetables, créées puis effacées par le banc. Le primary de `pub/rocky/9/extras` y est en `.xz`, les autres en `.gz`. Non couverts : `curl` lui-même en échec, un code HTTP autre que 200 et 404 sur le `repomd.xml` d'un `extras`, BaseOS, AppStream ou CRB absent, un primary en `.bz2`, et le vrai `lancer` (sous-shell d'un tube, journal, `chrono.tsv`). Un premier lancement, à 17:48:50 UTC, a échoué dans le banc lui-même : avec le HOME isolé, le relais `python3` de mise ne trouvait plus sa configuration approuvée. Le banc lie désormais l'interpréteur réel dans son dossier `bin/` ; le relancement de 17:49:05 UTC rend les huit cas attendus. Après relecture du conseiller, le primary peut aussi être en `.xz` ou `.bz2`, et celui de `pub/rocky/9/extras` est en `.xz` dans le banc ; relancé à 17:53:28 UTC, le banc rend les mêmes huit codes :
+- nominal, code 0 ;
+- `extras` absent de vault : ABSENT, code 0 ;
+- signature d'`extras` fausse : KO, code 1 ;
+- `primary` différent de `repomd.xml` : KO, code 1 ;
+- croisement non vide (un nom de paquet commun avec BaseOS, un provides) : listé, code 0 ;
+- mirrorlist en HTTP 500 : KO, la suite tourne, code 1 ;
+- empreinte de clé différente : KO, code 1 ;
+- deux dossiers `extras/` à la casse près : KO, code 1.
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| Y1 | La clé téléchargée a l'empreinte `FP_ROCKY`, et les `repomd.xml` de BaseOS, AppStream et CRB 9.7 sont signés par elle | Haute : même clé et même contrôle que l'étape `hote` de `s1.sh` ([s1-hote.log](s1-hote.log)) | Non tenue : KO, rien d'autre n'est lu |
+| Y2 | Le mirrorlist d'`extras-9` répond HTTP 200, et ses chemins portent `/9.8/extras/` ou `/9/extras/`, jamais `/9.7/` | Moyenne : 9.8 est la version de pub que lit `s1.sh` ; le format de la réponse n'est pas lu | Tenue : la construction de S1 voit l'`extras` de la version courante, qui bouge avec elle, et non celui de 9.7 |
+| Y3 | `vault/rocky/9.7/` a un dossier `extras/`, en minuscules, et son `repomd.xml` est signé par la clé de Rocky | Moyenne : souvenir de la structure de vault, non lu | Tenue : un `extras` figé sur vault 9.7, comme les trois autres dépôts, est possible. Non tenue (ABSENT) : cette option tombe |
+| Y4 | L'`extras` de vault 9.7 compte moins de 100 paquets, surtout des paquets `*-release` de dépôts tiers ou de SIG | Faible : souvenir | Dit ce que la construction peut tirer d'`extras` |
+| Y5 | Aucun nom de `chroot_setup_cmd` n'est un paquet ni un provides d'un des deux `extras` | Moyenne | Non tenue : un paquet installé directement peut venir d'`extras`, et une URL de miroir dans le verrou devient probable |
+| Y6 | Aucun paquet d'`extras` n'a un nom présent dans BaseOS, AppStream ou CRB 9.7 | Faible | Non tenue : un même nom dans deux dépôts, où dnf peut prendre la version d'`extras` si elle est plus haute |
+| Y7 | `pub/rocky/9/extras` existe, signé par la clé de Rocky, et ses noms diffèrent de ceux de l'`extras` de vault 9.7 | Faible pour la différence | Mesure l'écart entre ce que voit S1 aujourd'hui et un `extras` figé |
+
+**Ce que `releve7` ne tranchera pas** :
+- **si un paquet du buildroot vient d'`extras`.** Les croisements sont par nom, sur les seuls noms de `chroot_setup_cmd` : un croisement vide n'exclut pas une dépendance qu'`extras` serait seul à satisfaire. Le premier verrou réel, ou le `root.log` de la construction, le mesurera ;
+- **le `$releasever` effectif de l'appel du verrou**, qui ne passe pas `--releasever` ([m2-releve6.log](m2-releve6.log)) : l'étape ne lit que `extras-9` ;
+- **les miroirs eux-mêmes.** Seule l'origine `dl.rockylinux.org` est lue ; un miroir peut être en retard ;
+- les groupes (comps) et les modules, non lus ;
+- que faire d'`extras` : la décision reste la tienne, après S5b. Cette étape ne la prépare par aucune recommandation.

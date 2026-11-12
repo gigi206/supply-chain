@@ -322,3 +322,10 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - `rocky-9.tpl` pose `reposdir=/dev/null` : au moment du verrou, c'est lui qui écarte les fichiers `.repo` de la racine, si dnf lit le `dnf.conf` de la racine. Après le remplacement de `s1.sh`, BaseOS, AppStream et CRB sont sur vault 9.7.
 - **`extras` reste actif, par mirrorlist, hors de vault 9.7.** La construction de S1 le voit ; la sonde de S1 le listera sans s'arrêter. Que faire d'`extras` est à décider avec toi ; `s1.sh` ne change pas avant S5b.
 - V1 reste de confiance moyenne : le comportement de dnf avec `--installroot` sans `--config` et le contenu d'`extras` ne sont pas lus. Une URL de miroir dans le verrou arrêterait `voie2_preparer` (KO, pas de faux OK).
+
+**Additif du 12/11/2026, à partir de 17:46:28 UTC : étape `releve7` ajoutée à [`m2.sh`](m2.sh), NON LANCÉE** (après « continue », sur relecture du conseiller). Hôte seul, réseau, lecture seule ; `s1.sh` lu, jamais modifié. Elle mesure, pour ta décision sur `extras` après S5b :
+- ce que sert le mirrorlist d'`extras-9` (versions lues dans les chemins ; ni hôtes ni commentaires journalisés) ;
+- si un `extras` existe dans vault 9.7, signé par la clé de Rocky, et ce qu'il contient, comme `pub/rocky/9/extras` ;
+- les croisements de ces paquets avec les noms de `chroot_setup_cmd` (par nom et par provides) et avec BaseOS, AppStream et CRB 9.7. Un croisement vide n'exclut pas une dépendance qu'`extras` serait seul à satisfaire.
+- Banc hors réseau, `gpg` réel et clés d'essai jetables : huit cas au code attendu ([journal](resultats/m2-releve7-essai-local.log)). Prédictions Y1 à Y7 ([détail](resultats/m2-predictions.md)).
+- Temps passé : 3,47 h à HEAD 7c8003a, même méthode ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées ; décision avec toi à 5 pw.

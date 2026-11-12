@@ -1,0 +1,346 @@
+clés d'essai : 2 empreintes de 40 caractères
+source remplacée : 1
+ARCHIVE_SHA d essai : 1
+FP_ROCKY d essai : 1
+== cas nominal
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+5 dossiers : AppStream/ BaseOS/ CRB/ devel/ extras/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 fb4683a0b135163ae05709cdacf27aa3a8400a85403d1de119730f0462ea0a33
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 22f2e6511647ab69db60bf0bf72dd53a69b5aec00a63a0c455a89e0af7e509f9
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 db2322fe3ce40ed1f6f902e83b9675bab0dea61a03ab1d47b24c9e444225e56c
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+OK   vault-extras : repomd.xml signé par <empreinte d essai>
+vault-extras : repomd.xml sha256 26338e76dcafb09aec21e560dda100b0e5b75dd4920869c24f0a18e9d648a81c
+OK   vault-extras : primary (gz) conforme à repomd.xml (259 octets)
+vault-extras : 2 paquets dans le primary
+## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)
+OK   pub9-extras : repomd.xml signé par <empreinte d essai>
+pub9-extras : repomd.xml sha256 86dca9f6c36ddd2dcdf8599b20c3e68f1f47790eec808aef193662ad2f683595
+OK   pub9-extras : primary (xz) conforme à repomd.xml (312 octets)
+pub9-extras : 2 paquets dans le primary
+## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)
+noms distincts dans BaseOS, AppStream et CRB 9.7 : 5 ; noms de chroot_setup_cmd : 3
+### vault-extras : 2 paquets
+  epel-release 0:9-10.el9.x86_64
+  rocky-release-kernel 0:9.7-1.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de vault-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par vault-extras : aucun
+paquets de vault-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+### pub9-extras : 2 paquets
+  elrepo-release 0:9.8-1.el9.x86_64
+  epel-release 0:9-10.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de pub9-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par pub9-extras : aucun
+paquets de pub9-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+noms seulement dans vault-extras : rocky-release-kernel
+noms seulement dans pub9-extras : elrepo-release
+fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache
+code 0
+== cas absent
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+4 dossiers : AppStream/ BaseOS/ CRB/ devel/ 
+aucun dossier extras/ (casse ignorée) ; repomd.xml cherché quand même sous extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 f4ec48fb4125b5dc085dc33185dbf552724f30c39dc3e0f8954bf6f6c4705472
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 2e3fed799607b254acd2e6d6a3019f85c4ef290358c259b216e5799aa0eb1a16
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 c9302af6d036c2b9298321b45fceb46a049965d7cf04d3f3e0d8f58146717393
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+ABSENT vault-extras : HTTP 404 sur https://dl.rockylinux.org/vault/rocky/9.7/extras/x86_64/os/repodata/repomd.xml
+## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)
+OK   pub9-extras : repomd.xml signé par <empreinte d essai>
+pub9-extras : repomd.xml sha256 86dca9f6c36ddd2dcdf8599b20c3e68f1f47790eec808aef193662ad2f683595
+OK   pub9-extras : primary (xz) conforme à repomd.xml (312 octets)
+pub9-extras : 2 paquets dans le primary
+## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)
+noms distincts dans BaseOS, AppStream et CRB 9.7 : 5 ; noms de chroot_setup_cmd : 3
+### pub9-extras : 2 paquets
+  elrepo-release 0:9.8-1.el9.x86_64
+  epel-release 0:9-10.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de pub9-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par pub9-extras : aucun
+paquets de pub9-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache
+code 0
+== cas signature
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+5 dossiers : AppStream/ BaseOS/ CRB/ devel/ extras/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 f4ec48fb4125b5dc085dc33185dbf552724f30c39dc3e0f8954bf6f6c4705472
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 2e3fed799607b254acd2e6d6a3019f85c4ef290358c259b216e5799aa0eb1a16
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 c9302af6d036c2b9298321b45fceb46a049965d7cf04d3f3e0d8f58146717393
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+KO   vault-extras : signataire de repomd.xml «  » (attendu : <empreinte d essai>)
+code 1
+== cas primary
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+5 dossiers : AppStream/ BaseOS/ CRB/ devel/ extras/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 765948f0fae406504b71527a33918aeed77005c7d7b4850bec3f2c2c3c3f0f69
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 e6f0eaf77dbd9051915d61555787e07db6f8f627bbab97d3497e43100868892b
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 47db28705f6aeaa014b0e889969a41c8fd042204e74498e43649bbafe623d822
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+OK   vault-extras : repomd.xml signé par <empreinte d essai>
+vault-extras : repomd.xml sha256 fcf0b88b98d2f2b4fd595e7a4f0eb1ffe82e3ae33493bac0b213dfcfde8b5f2b
+KO   vault-extras : sha256 du primary différent de repomd.xml (0000000000000000000000000000000000000000000000000000000000000000)
+code 1
+== cas croisement
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+5 dossiers : AppStream/ BaseOS/ CRB/ devel/ extras/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 765948f0fae406504b71527a33918aeed77005c7d7b4850bec3f2c2c3c3f0f69
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 845463d3e34570d38107b5d558256339b1c42af26ab1d12a4735e659f2cefe34
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 cb2acc03eab567323250a07846c5874463a345c8d52d8c453fe7e57ae3fae637
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+OK   vault-extras : repomd.xml signé par <empreinte d essai>
+vault-extras : repomd.xml sha256 dc7fc20d6ecff2adaa83550723fc41efb25aea3d8673984e7c7352f1235ccbaf
+OK   vault-extras : primary (gz) conforme à repomd.xml (281 octets)
+vault-extras : 3 paquets dans le primary
+## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)
+OK   pub9-extras : repomd.xml signé par <empreinte d essai>
+pub9-extras : repomd.xml sha256 86dca9f6c36ddd2dcdf8599b20c3e68f1f47790eec808aef193662ad2f683595
+OK   pub9-extras : primary (xz) conforme à repomd.xml (312 octets)
+pub9-extras : 2 paquets dans le primary
+## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)
+noms distincts dans BaseOS, AppStream et CRB 9.7 : 5 ; noms de chroot_setup_cmd : 3
+### vault-extras : 3 paquets
+  epel-release 0:9-10.el9.x86_64
+  faux-xz 0:1-1.el9.x86_64
+  which 0:2.21-30.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de vault-extras : which
+noms de chroot_setup_cmd fournis (provides) par vault-extras : which (par which) ; xz (par faux-xz)
+paquets de vault-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 1
+  which : vault-extras 0:2.21-30.el9.x86_64 ; vault-BaseOS 0:2.21-29.el9.x86_64
+### pub9-extras : 2 paquets
+  elrepo-release 0:9.8-1.el9.x86_64
+  epel-release 0:9-10.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de pub9-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par pub9-extras : aucun
+paquets de pub9-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+noms seulement dans vault-extras : faux-xz which
+noms seulement dans pub9-extras : elrepo-release
+fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache
+code 0
+== cas mirrorlist
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+KO   mirrorlist d'extras : HTTP 500, 0 URL ; la suite tourne, code final 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+5 dossiers : AppStream/ BaseOS/ CRB/ devel/ extras/ 
+dossier retenu : extras/
+## BaseOS, AppStream et CRB de vault 9.7, épinglés par s1.sh (référence des croisements)
+OK   vault-BaseOS : repomd.xml signé par <empreinte d essai>
+vault-BaseOS : repomd.xml sha256 1ea20b10c7c2ca5ae4ec523a34931006396cecfba416af28bc0af3f0d331f8b0
+OK   vault-BaseOS : primary (gz) conforme à repomd.xml (277 octets)
+vault-BaseOS : 3 paquets dans le primary
+OK   vault-AppStream : repomd.xml signé par <empreinte d essai>
+vault-AppStream : repomd.xml sha256 845463d3e34570d38107b5d558256339b1c42af26ab1d12a4735e659f2cefe34
+OK   vault-AppStream : primary (gz) conforme à repomd.xml (238 octets)
+vault-AppStream : 1 paquets dans le primary
+OK   vault-CRB : repomd.xml signé par <empreinte d essai>
+vault-CRB : repomd.xml sha256 cb2acc03eab567323250a07846c5874463a345c8d52d8c453fe7e57ae3fae637
+OK   vault-CRB : primary (gz) conforme à repomd.xml (231 octets)
+vault-CRB : 1 paquets dans le primary
+OK   témoin altéré (repomd.xml de vault-BaseOS plus une ligne) refusé
+## extras de vault 9.7 (ce qu'un remplacement donnerait, si le propriétaire le décide)
+OK   vault-extras : repomd.xml signé par <empreinte d essai>
+vault-extras : repomd.xml sha256 dba30c56c3ad49b7651df3110853670716c78f2506a799c87a3fd06d0f879e36
+OK   vault-extras : primary (gz) conforme à repomd.xml (259 octets)
+vault-extras : 2 paquets dans le primary
+## extras de pub/rocky/9 (baseurl commentée de rocky-9.tpl avec releasever 9 : l'origine des miroirs)
+OK   pub9-extras : repomd.xml signé par <empreinte d essai>
+pub9-extras : repomd.xml sha256 86dca9f6c36ddd2dcdf8599b20c3e68f1f47790eec808aef193662ad2f683595
+OK   pub9-extras : primary (xz) conforme à repomd.xml (312 octets)
+pub9-extras : 2 paquets dans le primary
+## croisements par nom (un croisement vide n'exclut pas une dépendance que seul extras satisferait)
+noms distincts dans BaseOS, AppStream et CRB 9.7 : 5 ; noms de chroot_setup_cmd : 3
+### vault-extras : 2 paquets
+  epel-release 0:9-10.el9.x86_64
+  rocky-release-kernel 0:9.7-1.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de vault-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par vault-extras : aucun
+paquets de vault-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+### pub9-extras : 2 paquets
+  elrepo-release 0:9.8-1.el9.x86_64
+  epel-release 0:9-10.el9.x86_64
+noms de chroot_setup_cmd qui sont des paquets de pub9-extras : aucun
+noms de chroot_setup_cmd fournis (provides) par pub9-extras : aucun
+paquets de pub9-extras dont le nom est aussi dans BaseOS, AppStream ou CRB 9.7 : 0
+noms seulement dans vault-extras : rocky-release-kernel
+noms seulement dans pub9-extras : elrepo-release
+fichiers effacés (clé, métadonnées, modèle extrait) ; archive gardée sous ~/.cache
+KO   écart ci-dessus (mirrorlist) : code 1
+code 1
+== cas cle
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+KO   empreinte de la clé de Rocky : « <autre empreinte> » (attendu : <empreinte d essai>)
+code 1
+== cas deux
+## épingles lues dans s1.sh (non modifié)
+OK   VAULT97 : https://dl.rockylinux.org/vault/rocky/9.7
+OK   CLE_ROCKY : https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-9
+OK   FP_ROCKY : <empreinte d essai>
+## clé de Rocky (trousseau temporaire)
+OK   empreinte de la clé de Rocky : <empreinte d essai>
+## chroot_setup_cmd de rocky-9.tpl (archive du tag mock-6.9-1 gardée par releve, sans réseau)
+OK   sha256 de l'archive : 88785756f0f36b4ab4de7ea5a0b4d9a4391a80b8a8df2f9aca17970bbe65e0e8
+OK   rocky-9.tpl trouvés dans l'archive : 1
+chroot_setup_cmd : 3 noms : bash which xz
+mots écartés (groupe, modèle jinja) : aucun
+## ce que sert le mirrorlist d'extras (releasever 9 de rocky-9.tpl, x86_64 ; ni hôtes ni commentaires journalisés)
+HTTP 200 ; 3 URL ; 1 autre(s) ligne(s), non journalisée(s)
+segments « /<version>/<dépôt>/ » des chemins, hôte retiré (nombre d'URL) :
+        2 /9.8/extras/
+URL sans segment reconnu : 1
+## dossiers de https://dl.rockylinux.org/vault/rocky/9.7/ (liste HTML non signée : un index, pas une preuve)
+6 dossiers : AppStream/ BaseOS/ CRB/ Extras/ devel/ extras/ 
+KO   2 dossiers extras/ à la casse près : Extras/ extras/ 
+code 1
