@@ -261,3 +261,10 @@ Code 0, 0 KO, [journal](m2-releve3.log) de 371 lignes. Résultat écrit à parti
 **Non prévu, lu** :
 - `pull_image` ajoute `--platform` si `oci_platform_map` connaît l'architecture visée (`podman.py:121` à `:125`). Avec un manifeste amd64 unique comme `ee90dc0e…`, sans effet attendu.
 - `podman_check_native_image_architecture` (`podman.py:62` à `:91`) compare l'architecture de l'image à celle de l'hôte.
+
+## Décision du 12/11/2026, notée à 15:42:38 UTC : embranchement 1 tranché
+
+Question posée : « Pour D3 (a), on retient la résolution dans un pod Kata lancé à la main ? » ; réponse du propriétaire : « Oui, Kata à la main ».
+- La lecture proposée à l'embranchement 1 est retenue : la résolution de M2 tourne dans un pod Kata lancé à la main, comme S1, puis dans Tekton en M4. Rien n'est installé sur l'hôte.
+- L'embranchement 4 s'applique tel quel : ce pod porte le label `prefetch-rpm-sortie`.
+- Les embranchements 2 (image prête) et 3 (reprise de S1) restent ouverts, de même que le choix de la voie pour la référence du bootstrap.

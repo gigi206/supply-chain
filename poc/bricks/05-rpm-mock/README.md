@@ -219,3 +219,10 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - **Défaut** : `--debug-config` écrit `config_opts['clé'] = valeur`, et seulement les clés qui diffèrent de leur défaut (`mock.py:605` à `:619`). L'ancien motif de la sonde n'aurait rien trouvé, sans le signaler.
 - **Ajout** : les quatre options `bootstrap_*` qui annulent « prête », et les messages de `bootstrap_image_is_ready` relevés dans tout `root.log` après chaque appel de mock.
 - Essayé hors cluster avec un faux `mock`. La modification de `s1.sh` attend un accord ; l'étape tournera après S5b.
+
+**Décision du 12/11/2026, notée à 15:42:38 UTC : lecture de D3 (a) tranchée.** Question posée : « Pour D3 (a), on retient la résolution dans un pod Kata lancé à la main ? » ; réponse du propriétaire : « Oui, Kata à la main ».
+- D3 (a) se lit « hors Tekton d'abord » : en M2, `--calculate-build-dependencies` tourne dans un pod Kata lancé à la main, comme S1, puis dans Tekton en M4.
+- Rien n'est installé sur l'hôte : ni mock ni dnf.
+- Le texte de D3 (a) du 10/11 n'est pas réécrit ; cette lecture le précise.
+- Restent à décider : la voie pour la référence du bootstrap, et l'image de bootstrap « prête », qui attend la mesure de l'étape `verrou`.
+- Rien n'est lancé. M2 s'écrira après S1, elle-même après S5b.
