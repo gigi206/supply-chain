@@ -19,6 +19,16 @@ Usage : paquets.py deb <fichier.deb> --sbom <sortie.json>
         paquets.py dep5 <fichier copyright> --sbom <sortie.json> --purl <purl>   (témoins, sans deb)
         paquets.py modules <fichier.deb>
         paquets.py stdlib <fichier.deb> <deb de golang-X.Y-src> --sbom <sortie.json>
+        paquets.py noms <fichier.deb> <deb de golang-X.Y-src> --spdx-details <dossier details de la liste SPDX>
+
+Mode noms (ajouté le 12/11/2026, étude, « Oui, prépare-la ») : pour chaque paragraphe Files du copyright du paquet de Go, chaque
+motif est classé : debian/ (empaquetage, hors binaire), src/cmd/ (outils de la chaîne, non importables hors de cmd), …/testdata/
+(ignoré par go build), sinon paquet de la bibliothèque standard, cherché dans le binaire du deb par ses noms de fonctions qualifiés
+(« \\0<paquet>. » : chaque nom de la table des fonctions, conservée malgré -s -w, suit un octet nul) ; un motif à joker dans le chemin du dossier est « indéterminé » et compte
+comme lié. Un paragraphe est « lié » si un de ses motifs l'est ; chaque motif lié est journalisé en entier. Limite : un paquet présent
+ne veut pas dire que ce fichier-là est compilé (contraintes d'architecture ou de système, fichiers _test). Puis, pour chaque nom de licence hors SPDX ou hors politique, son
+paragraphe License autonome est comparé, en mots normalisés (pas la correspondance de SPDX), aux textes SPDX candidats. Aucun SBOM,
+aucun verdict : une étude pour décision. Code 1 sur un refus.
 
 Mode stdlib (ajouté le 12/11/2026, décision « Axe 3, puis 1+2 ») : la version de Go lue dans chaque binaire de ./usr/bin du deb
 (une seule version exigée) doit être la version amont (sans époque ni révision Debian) du paquet golang-*-src donné ; le copyright
@@ -38,6 +48,7 @@ import fnmatch
 import hashlib
 import io
 import json
+import os
 import re
 import sys
 import tarfile
@@ -358,6 +369,95 @@ def stdlib(deb, src, trad=None, spdx=None, politique=None):
     return {"bomFormat": "CycloneDX", "specVersion": "1.6", "components": comps}
 
 
+CANDIDATS = {"FreeBSD": ["BSD-2-Clause-FreeBSD", "BSD-2-Clause-Views", "BSD-2-Clause"], "BSD-3-clause-svgpan": ["BSD-3-Clause"],
+             "X11": ["X11", "MIT"], "MPEG": [], "noderivs": []}
+
+
+def mots(x):
+    return re.sub(r"[^a-z0-9]+", " ", x.lower()).split()
+
+
+def etude_noms(deb, src, details):
+    """Lignes de journal de l'étude ; Refus sur une incohérence."""
+    import difflib
+    ctl, ms = lire_deb(deb)
+    bins = []
+    with tarfile.open(fileobj=io.BytesIO(ms[2][1]), mode="r:xz") as t:
+        for m in t.getmembers():
+            if m.name.startswith("./usr/bin/") and m.isfile():
+                f = t.extractfile(m)
+                if f is None:
+                    raise Refus(f"{m.name} : illisible")
+                bins.append((m.name, f.read()))
+    if len(bins) != 1:
+        raise Refus(f"{len(bins)} fichier(s) dans ./usr/bin, 1 attendu")
+    nb, b = bins[0]
+    print(f"binaire {nb} : {infos_build(b)[0]}")
+    for pq, attendu in (("runtime", True), ("fmt", True), ("cmd/link/internal/ld", False)):
+        n = b.count(b"\x00" + (pq + ".").encode())
+        ok = (n > 0) == attendu
+        print(f"{'OK  ' if ok else 'KO  '} témoin {pq} : {n} occurrence(s) de « \\0{pq}. », {'présence' if attendu else 'absence'} attendue")
+        if not ok:
+            raise Refus(f"témoin {pq} contredit la méthode")
+    sctl, sms = lire_deb(src)
+    if not re.fullmatch(r"golang-\d+\.\d+-src", sctl["package"]):
+        raise Refus(f"{sctl['package']} n'est pas un paquet golang-X.Y-src")
+    cr = fichier_tar(sms[2][1], f"./usr/share/doc/{sctl['package']}/copyright").decode("utf-8")
+    ps = paragraphes(cr)
+    autonomes = {p["license"][0]: p for p in ps[1:] if "files" not in p and "license" in p and p["license"][1]}
+    lies = {}
+    print(f"## paragraphes Files de {sctl['package']} {sctl['version']}")
+    for k, p in enumerate(ps[1:], 2):
+        if "files" not in p:
+            continue
+        lic = p.get("license", ("", []))[0]
+        classes = []
+        for x in " ".join([p["files"][0]] + p["files"][1]).split():
+            if x.startswith("debian/"):
+                classes.append((x, "empaquetage", False))
+            elif x.startswith("src/cmd/"):
+                classes.append((x, "cmd", False))
+            elif "/testdata/" in x:
+                classes.append((x, "testdata", False))
+            elif x == "*" or not x.startswith("src/") or "*" in x.rsplit("/", 1)[0]:
+                classes.append((x, "indéterminé", True))
+            else:
+                pq = x[4:].rsplit("/", 1)[0]
+                n = b.count(b"\x00" + (pq + ".").encode())
+                classes.append((x, f"{pq} : {n}", n > 0))
+        lie = any(c[2] for c in classes)
+        lies.setdefault(lic, []).append(lie)
+        resume = " ; ".join(sorted({c[1] if ":" not in c[1] else c[1] for c in classes}))
+        print(f"paragraphe {k} ({lic}) : {'LIÉ' if lie else 'non lié'} ; {len(classes)} motif(s) : {resume[:200]}")
+        for x, c, l in classes:   # motifs liés ou indéterminés, entiers : ce qui fait pencher le paragraphe
+            if l:
+                print(f"  motif lié : {x} ({c})")
+    print("## noms de licence")
+    for lic, l in sorted(lies.items(), key=lambda x: x[0].lower()):
+        print(f"nom {lic} : {sum(l)} paragraphe(s) lié(s) sur {len(l)}")
+    print("## comparaison des textes (mots normalisés, pas la correspondance de SPDX)")
+    for lic, cands in CANDIDATS.items():
+        p = autonomes.get(lic)
+        if p is None:
+            print(f"{lic} : pas de paragraphe License autonome")
+            continue
+        a = mots("\n".join(p["license"][1]))
+        print(f"{lic} : {len(a)} mots ; sha256 {hashlib.sha256(texte_licence(p).encode('utf-8')).hexdigest()}")
+        for c in cands:
+            f = f"{details}/{c}.json"
+            if not os.path.isfile(f):
+                print(f"  {c} : texte absent de la liste")
+                continue
+            d = json.load(open(f, encoding="utf-8"))
+            bb = mots(d.get("licenseText", ""))
+            sm = difflib.SequenceMatcher(a=a, b=bb, autojunk=False)
+            ecarts = [op for op in sm.get_opcodes() if op[0] != "equal"]
+            print(f"  {c}{' (déprécié)' if d.get('isDeprecatedLicenseId') else ''} : {len(bb)} mots, ratio {sm.ratio():.3f}, {len(ecarts)} écart(s)")
+            for op, i1, i2, j1, j2 in ecarts[:6]:
+                print(f"    {op} : {' '.join(a[i1:i2])[:70]} | {' '.join(bb[j1:j2])[:70]}")
+    return True
+
+
 def sbom(purl, nom, version, expr):
     comp = {"type": "application", "name": nom, "version": version, "purl": purl}
     if expr != "NOASSERTION":
@@ -367,7 +467,7 @@ def sbom(purl, nom, version, expr):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("mode", choices=["deb", "dep5", "modules", "stdlib"])
+    p.add_argument("mode", choices=["deb", "dep5", "modules", "stdlib", "noms"])
     p.add_argument("fichier")
     p.add_argument("source", nargs="?", help="mode stdlib : deb de golang-X.Y-src")
     p.add_argument("--sbom")
@@ -375,12 +475,17 @@ def main(argv=None):
     p.add_argument("--traductions", help="mode stdlib : traductions par nom, revues, liées au texte (JSON)")
     p.add_argument("--spdx", help="mode stdlib : licenses.json, pour journaliser le statut de chaque nom")
     p.add_argument("--policy", help="mode stdlib : politique, pour le même statut")
+    p.add_argument("--spdx-details", help="mode noms : dossier details de la liste SPDX")
     a = p.parse_args(argv)
     try:
         b = open(a.fichier, "rb").read()
         print(f"sha256 de l'entrée : {hashlib.sha256(b).hexdigest()} ({len(b)} octets)")
         if a.mode == "modules":
             return 0 if modules(b) else 1
+        if a.mode == "noms":
+            if not a.source or not a.spdx_details:
+                raise Refus("deb de golang-X.Y-src et --spdx-details exigés")
+            return 0 if etude_noms(b, open(a.source, "rb").read(), a.spdx_details) else 1
         if not a.sbom:
             raise Refus("--sbom exigé")
         if a.mode == "stdlib":

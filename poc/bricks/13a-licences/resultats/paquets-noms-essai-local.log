@@ -1,0 +1,54 @@
+# banc paquets.sh noms, 2026-11-12T20:21:08Z, paquets.sh 4131c5d172dda07ff9a1ac1a8c33993231e88c4e0f11b1a5d334503a9137776b, paquets.py f404db625bb8ed508d0fcbf5537cba862b845327a4da0e5135dae1ed2dc72bcc, go version go1.24.7 linux/amd64
+OK   n-nominal : code 0, « ^  motif lié : src/image/png/reader.go \(image/png : [1-9][0-9]*\)$ »
+     OK   sha256 du deb épinglé : 455328d043ed525b7b1bab224f28c5522dc4ed5ed1ca3f4fb8c231b7fb3449b3
+     OK   sha256 du paquet de Go épinglé : 9af85dc610af5770ca08a547571b77137fdbd1ff5fdf67ecfd54de103d3d2047
+     OK   verrou et buildinfo recoupés
+     sha256 de l'entrée : 455328d043ed525b7b1bab224f28c5522dc4ed5ed1ca3f4fb8c231b7fb3449b3 (579872 octets)
+     binaire ./usr/bin/essai : go1.24.7
+     OK   témoin runtime : 1850 occurrence(s) de « \0runtime. », présence attendue
+     OK   témoin fmt : 58 occurrence(s) de « \0fmt. », présence attendue
+     OK   témoin cmd/link/internal/ld : 0 occurrence(s) de « \0cmd/link/internal/ld. », absence attendue
+     paragraphe 2 (Go) : LIÉ ; 1 motif(s) : indéterminé
+       motif lié : * (indéterminé)
+     paragraphe 3 (MIT) : LIÉ ; 1 motif(s) : image/png : 24
+       motif lié : src/image/png/reader.go (image/png : 24)
+     paragraphe 4 (MPEG) : non lié ; 1 motif(s) : image/jpeg : 0
+     paragraphe 5 (X11) : non lié ; 1 motif(s) : cmd
+     paragraphe 6 (Go) : non lié ; 1 motif(s) : testdata
+     paragraphe 7 (Go) : non lié ; 1 motif(s) : empaquetage
+     nom Go : 1 paragraphe(s) lié(s) sur 3
+     nom MIT : 1 paragraphe(s) lié(s) sur 1
+     nom MPEG : 0 paragraphe(s) lié(s) sur 1
+     nom X11 : 0 paragraphe(s) lié(s) sur 1
+     FreeBSD : pas de paragraphe License autonome
+     BSD-3-clause-svgpan : pas de paragraphe License autonome
+     X11 : 217 mots ; sha256 092be66a6e1e91e3270cac3d1b67728874e8d5782113cead40ed1d60e7c8e3b4
+       X11 : 217 mots, ratio 1.000, 0 écart(s)
+       MIT : 170 mots, ratio 0.837, 4 écart(s)
+         replace : x11 | mit
+         replace : 1996 x consortium | year copyright holders
+         replace : x consortium | authors or copyright holders
+         delete : except as contained in this notice the name of the x consortium shall  | 
+     MPEG : 2 mots ; sha256 4cb4c92a67dca21f63ba6966c6011dc23f6574b734534b4f60caed4f8b22daa4
+     noderivs : pas de paragraphe License autonome
+     bilan : étude écrite (aucun verdict)
+OK   n-nominal : jpeg, cmd, testdata, debian non liés ; * lié ; X11 identique au texte SPDX
+OK   n-script : code 1, « REFUS : en-tête des informations de build|REFUS : 0 fichier »
+     OK   sha256 du deb épinglé : c371c331a4c3280e56464b370b4c13cd98eafd4bf72b1490fbd1e2cd885ea21c
+     OK   sha256 du paquet de Go épinglé : 9af85dc610af5770ca08a547571b77137fdbd1ff5fdf67ecfd54de103d3d2047
+     OK   verrou et buildinfo recoupés
+     sha256 de l'entrée : c371c331a4c3280e56464b370b4c13cd98eafd4bf72b1490fbd1e2cd885ea21c (1964 octets)
+     REFUS : en-tête des informations de build : 0 occurrence(s), 1 attendue
+     KO   paquets.py noms : code 1
+OK   n-temoin : code 1, « KO   témoin cmd/link/internal/ld : 1 occurrence »
+     OK   sha256 du deb épinglé : d1a4e2752613af922d1716a766d2c5a9a16567d0b6e7def2b717be0b0523f9c9
+     OK   sha256 du paquet de Go épinglé : 9af85dc610af5770ca08a547571b77137fdbd1ff5fdf67ecfd54de103d3d2047
+     OK   verrou et buildinfo recoupés
+     sha256 de l'entrée : d1a4e2752613af922d1716a766d2c5a9a16567d0b6e7def2b717be0b0523f9c9 (579772 octets)
+     binaire ./usr/bin/essai : go1.24.7
+     OK   témoin runtime : 1850 occurrence(s) de « \0runtime. », présence attendue
+     OK   témoin fmt : 58 occurrence(s) de « \0fmt. », présence attendue
+     KO   témoin cmd/link/internal/ld : 1 occurrence(s) de « \0cmd/link/internal/ld. », absence attendue
+     REFUS : témoin cmd/link/internal/ld contredit la méthode
+     KO   paquets.py noms : code 1
+chrono.tsv du banc : 4 lignes ; fichiers de 13a touchés : 0

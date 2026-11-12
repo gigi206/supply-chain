@@ -314,3 +314,41 @@ Résultats écrits à partir de 20:13:55 UTC.
 dont `src/debug/elf/elf.go`), `MPEG` (`src/image/jpeg/idct.go`), `noderivs` (données de test de `image/png`), `BSD-3-clause-svgpan`
 (un fichier de pprof sous `src/cmd`) : quatre noms hors SPDX ; `X11` (fichiers de `src/cmd/internal/objabi`) : absent de la politique.
 Plusieurs de ces fichiers ne sont sans doute pas compilés dans `sample-app` (données de test, outils de `src/cmd`) ; ce n'est pas mesuré.
+
+## Étape `noms` : étude des noms restants (préparée à sec le 12/11/2026 à partir de 20:15 UTC, « Oui, prépare-la »), NON LANCÉE
+
+**But** : donner au propriétaire, pour les noms qui empêchent de déclarer la bibliothèque standard (`FreeBSD`, `MPEG`, `noderivs`,
+`BSD-3-clause-svgpan` hors SPDX, `X11` hors politique), deux mesures : (1) les paragraphes qui les portent concernent-ils du code lié
+dans `sample-app` ? (2) leur texte correspond-il à un texte SPDX ? Aucun SBOM, aucun verdict ; l'étape ne change ni le deb ni
+`licences.py`, `policy.json` ou `traductions-dep5.json`.
+
+**Méthode** ([`paquets.sh`](../paquets.sh) `noms`, [`paquets.py`](../paquets.py) `noms`) : mêmes deb et paquet de Go, sha256 épinglés,
+verrou et buildinfo recoupés. Chaque motif d'un paragraphe `Files` est classé : `debian/` (empaquetage, hors binaire) ; `src/cmd/`
+(outils de la chaîne : un paquet sous `cmd/` n'est pas importable hors de `cmd`) ; `…/testdata/` (ignoré par `go build`) ; sinon le
+paquet de la bibliothèque standard, cherché dans le binaire du deb par « `\0<paquet>.` » (chaque nom de la table des fonctions suit un
+octet nul ; mesuré au banc : la table reste dans un binaire `-s -w`, `image/png` importé 24 occurrences, `image/jpeg` non importé 0 ;
+`debug/elf` à 0 vient d'un essai à la main, pas du banc archivé) ; un joker dans le chemin du dossier (dont `Files: *`) est « indéterminé » et compte comme lié. Témoins : `runtime` et
+`fmt` présents, `cmd/link/internal/ld` absent, sinon refus. Comparaison des textes : mots normalisés (pas la correspondance de SPDX)
+entre le paragraphe `License` autonome et les candidats `BSD-2-Clause-FreeBSD`, `BSD-2-Clause-Views`, `BSD-2-Clause` (pour `FreeBSD`),
+`BSD-3-Clause` (pour `BSD-3-clause-svgpan`), `X11` et `MIT` (pour `X11`) ; `MPEG` et `noderivs` sans candidat.
+
+**Limites** : un paquet présent ne veut pas dire que le fichier nommé par le motif est compilé (contraintes d'architecture ou de
+système, fichiers `_test`) ; chaque motif lié est donc journalisé en entier, pour que le propriétaire voie ce qui fait pencher un
+paragraphe (pas de classement par suffixe). Une fonction entièrement intégrée (inlined) peut ne pas laisser son nom ; un paquet lié seulement par ses types ou ses
+constantes peut n'avoir aucune fonction ; le classement `cmd` et `testdata` repose sur les règles de `go build`, pas sur une mesure.
+
+**Banc hors réseau** ([`paquets-noms-essai-local.sh`](paquets-noms-essai-local.sh), [journal](paquets-noms-essai-local.log)) :
+programme Go qui importe `image/png` et pas `image/jpeg` ; trois cas au code et au motif attendus (nominal 0 : `image/png` lié,
+`image/jpeg`, `cmd`, `testdata` et `debian` non liés, `*` lié, texte `X11` identique au texte SPDX ; binaire qui n'est pas du Go 1 ;
+témoin contredit 1 ; le cas nominal exige la ligne entière « motif lié : src/image/png/reader.go »). Défaut trouvé par le banc et corrigé avant tout commit : une variable locale `noms` de `main()` masquait la
+fonction (renommée `etude_noms`). Bancs de `deb`, `modules` et `stdlib` rejoués ; celui de `stdlib` vérifie désormais chaque
+substitution au lieu d'un compte de lignes (l'étape `noms` en ajoutait deux).
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| N1 | Témoins tenus : `runtime` et `fmt` présents, `cmd/link/internal/ld` absent | Haute |
+| N2 | Non liés : les paragraphes `BSD-3-clause-svgpan` et `Apache-2.0` (pprof, `cmd`), `BSD-3-clause` (`cmd/trace`), `noderivs` et les trois `Go` de `testdata`, `Go` de `debian/*` ; et `X11` | Haute, sauf `X11` : faible, sa liste de fichiers est coupée à 120 caractères au journal de `stdlib` (quatre fichiers vus, tous sous `src/cmd/internal/objabi/`) ; s'il en a hors de `src/cmd/`, il peut sortir lié |
+| N3 | `MPEG` (`image/jpeg`) et `FreeBSD` (`debug/elf` et `cmd/link`) non liés : 0 occurrence | Moyenne : `sample-app` est un serveur web, ces paquets ne sont pas importés à ma connaissance |
+| N4 | Liés : `Files: *` (indéterminé) et le paragraphe `Go` de `math` ; `math/cmplx` non lié | Moyenne |
+| N5 | Donc aucun des cinq noms à trancher ne porte sur du code lié, si N2 et N3 tiennent | Moyenne |
+| N6 | `X11` : ratio proche de 1 avec le texte SPDX `X11` ; `FreeBSD` : ratio le plus haut avec `BSD-2-Clause-FreeBSD` ou `BSD-2-Clause-Views` ; `BSD-3-clause-svgpan` : proche de `BSD-3-Clause` | Faible : textes non lus |

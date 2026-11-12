@@ -20,10 +20,16 @@
 #         Traductions par nom (traductions-dep5.json, ajoutées le 12/11/2026) : un nom DEP-5 du copyright de Go n est traduit que si
 #         le texte de son paragraphe License autonome a le sha256 de la preuve ET si l entrée est revue par le propriétaire ;
 #         statut de chaque nom (SPDX, politique) journalisé.
+#   noms     (ajoutée à sec le 12/11/2026, étude, « Oui, prépare-la », NON LANCÉE) hôte seul, sans réseau : mêmes deb et paquet de
+#         Go (sha256 épinglés, verrou et buildinfo recoupés) ; paquets.py noms classe chaque paragraphe Files du copyright de Go
+#         (empaquetage, cmd, testdata, ou paquet cherché dans le binaire par « \0<paquet>. ») et compare les textes des noms hors
+#         SPDX ou hors politique aux textes SPDX candidats ; témoins : runtime et fmt présents, cmd/link/internal/ld absent. Aucun
+#         SBOM ni verdict : une étude pour décision.
 #   Hors de ces étapes : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
 # Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb       (journal : resultats/paquets-deb.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh modules   (journal : resultats/paquets-modules.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh stdlib    (journal : resultats/paquets-stdlib.log)
+#         mise exec -- poc/bricks/13a-licences/paquets.sh noms      (journal : resultats/paquets-noms.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -187,7 +193,23 @@ etape_stdlib() {
   [ "$ko" = 0 ] && echo "bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé" || { echo "bilan : KO"; exit 1; }
 }
 
-[ $# -gt 0 ] || { echo "usage : $0 deb|modules|stdlib" >&2; exit 2; }
+etape_noms() {
+  local s rc
+  echo "paquets.py : $(sha256sum < "$here/paquets.py" | cut -c1-64)"
+  [ -f "$DEB" ] && [ -f "$SRC" ] || { echo "KO   deb ou paquet de Go absent"; exit 1; }
+  s=$(sha256sum < "$DEB" | cut -c1-64); [ "$s" = "$DEB_SHA" ] || { echo "KO   sha256 du deb : $s"; exit 1; }
+  echo "OK   sha256 du deb épinglé : $s"
+  s=$(sha256sum < "$SRC" | cut -c1-64); [ "$s" = "$SRC_SHA" ] || { echo "KO   sha256 du paquet de Go : $s, attendu $SRC_SHA"; exit 1; }
+  echo "OK   sha256 du paquet de Go épinglé : $s"
+  grep -q " $SRC_SHA " "$repo/poc/packaging/verrou-deb.txt" || { echo "KO   sha256 absent de poc/packaging/verrou-deb.txt"; exit 1; }
+  grep -qF "$SRC_BI" "$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo" || { echo "KO   « $SRC_BI » absent de s3-build-1.buildinfo"; exit 1; }
+  echo "OK   verrou et buildinfo recoupés"
+  rc=0; python3 -I "$here/paquets.py" noms "$DEB" "$SRC" --spdx-details "$SPDX/details" || rc=$?
+  [ "$rc" = 0 ] || { echo "KO   paquets.py noms : code $rc"; exit 1; }
+  echo "bilan : étude écrite (aucun verdict)"
+}
+
+[ $# -gt 0 ] || { echo "usage : $0 deb|modules|stdlib|noms" >&2; exit 2; }
 for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
 for e in "$@"; do
   chrono "13a paquets $e"

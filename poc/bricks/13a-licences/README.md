@@ -103,3 +103,8 @@ l'expression ([détail](resultats/paquets-predictions.md)).
 **Relance de `stdlib`, le 12/11/2026 à 20:13:36 UTC (« Oui, relance stdlib »)** : code 1, T1 à T3 tenues ([journal](resultats/paquets-stdlib.log), premier passage
 [conservé](resultats/paquets-stdlib-premier-passage.log)). « Go » traduit en `BSD-3-Clause` après revue ; restent quatre noms hors SPDX (`FreeBSD`, `MPEG`,
 `noderivs`, `BSD-3-clause-svgpan`) et `X11` hors politique. Suite à décider.
+
+**Étape `noms` ajoutée à sec, NON LANCÉE** (étude, « Oui, prépare-la ») : pour les cinq noms restants, dit si leurs paragraphes portent sur du code lié
+dans `sample-app` (noms de fonctions qualifiés cherchés dans le binaire ; `cmd`, `testdata` et `debian` classés par les règles de `go build`) et compare
+leurs textes aux textes SPDX candidats ; aucun verdict. Banc hors réseau tenu ([journal](resultats/paquets-noms-essai-local.log)) ; prédictions N1 à N6
+([détail](resultats/paquets-predictions.md)).

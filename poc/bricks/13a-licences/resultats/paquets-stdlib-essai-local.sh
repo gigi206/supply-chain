@@ -66,11 +66,15 @@ essai() { # cas paquet version licence code-attendu motif-attendu [traductions :
   printf 'Installed-Build-Depends:\n %s (= %s),\n' "$2" "$3" > "$H/bi.txt"
   sed -e "s#^DEB_SHA=.*#DEB_SHA=$s1#" -e "s#^SRC_SHA=[^ ]*#SRC_SHA=$s2#" -e "s#^SRC_BI=\"[^\"]*\"#SRC_BI=\"$2 (= $3)\"#" \
       -e "s#^R=\$here/resultats\$#R=$H/res#" -e "s#^here=.*#here=$B#" -e "s#^T=.*#T=$H/travail#" \
-      -e "s#\"\$repo/poc/packaging/verrou-deb.txt\"#\"$H/verrou.txt\"#" \
-      -e "s#\"\$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo\"#\"$H/bi.txt\"#" \
+      -e "s#\"\$repo/poc/packaging/verrou-deb.txt\"#\"$H/verrou.txt\"#g" \
+      -e "s#\"\$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo\"#\"$H/bi.txt\"#g" \
       -e "s#\"\$here/traductions-dep5.json\"#\"$H/trad.json\"#g" "$B/paquets.sh" > "$H/paquets.sh"
-  [ "$(grep -c -e "^DEB_SHA=$s1" -e "^SRC_SHA=$s2 " -e "^SRC_BI=\"$2 (= $3)\"" -e "^R=$H/res" -e "^here=$B" -e "^T=$H/travail" -e "\"$H/verrou.txt\"" -e "\"$H/bi.txt\"" -e "\"$H/trad.json\"" "$H/paquets.sh")" = 10 ] \
-    || { echo "KO   banc : substitutions ($cas)"; exit 1; }
+  local x   # chaque substitution présente au moins une fois, et aucun chemin réel restant (verrou, buildinfo, traductions)
+  for x in "^DEB_SHA=$s1\$" "^SRC_SHA=$s2 " "^SRC_BI=\"$2 (= $3)\"" "^R=$H/res\$" "^here=$B\$" "^T=$H/travail\$" "\"$H/verrou.txt\"" "\"$H/bi.txt\"" "\"$H/trad.json\""; do
+    grep -q -- "$x" "$H/paquets.sh" || { echo "KO   banc : substitution absente ($cas) : $x"; exit 1; }
+  done
+  ! grep -q -e '"\$repo/poc/packaging/verrou-deb.txt"' -e '"\$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo"' -e '"\$here/traductions-dep5.json"' "$H/paquets.sh" \
+    || { echo "KO   banc : chemin réel restant ($cas)"; exit 1; }
   rc=0; DEB=$H/app.deb SRC=$src bash "$H/paquets.sh" stdlib > "$H/$cas.log" 2>&1 || rc=$?
   if [ "$rc" = "$5" ] && grep -qE -- "$6" "$H/$cas.log" && ! grep -q '^Traceback' "$H/$cas.log"; then echo "OK   $cas : code $rc, « $6 »"
   else echo "KO   $cas : code $rc (attendu $5), motif « $6 »"; fi
