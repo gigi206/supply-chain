@@ -282,3 +282,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - **Constat** : les versions employées ne sont pas celles du projet audité. Rocky 9.8 livre `createrepo_c` 0.20.1, contre 1.2.6 en amont, et `rpm` 4.16.1.3, contre 6.1.0. Leur maintenance relève donc de Rocky (errata, dépôts signés), comme pour podman et skopeo.
 - **Limites** : les versions viennent d'une liste non signée, et la date de build n'est pas mesurée. Les avis publiés (0) ne couvrent que GitHub. L'épinglage passera par un primary vérifié en M2.
 - **Point ouvert pour M2** : l'option `--compatibility` de `createrepo_c`, écrite dans la décision « Voie 2 », vient du code de mock 6.9. Son existence en 0.20.1 n'est pas vérifiée ([note](resultats/m2-predictions.md)).
+
+**Additif du 12/11/2026, à partir de 16:17:36 UTC : étape `releve4` ajoutée à `m2.sh` (après « continue », sur relecture du conseiller), NON LANCÉE** ([détail et prédictions L1 à L4](resultats/m2-predictions.md)).
+- Elle lit dans l'amont, aux tags des versions de Rocky 9.8, si `createrepo_c` 0.20.1 accepte `--compatibility` et si `skopeo copy` 1.22.2 accepte `--preserve-digests` (gestes 3 et 4 de la voie 2).
+- Hôte seul, réseau, ni cluster ni Zot ; un témoin par fichier distingue une option absente d'un mauvais fichier.
+- Banc hors réseau tenu ([journal](resultats/m2-releve4-essai-local.log)). Accord nommé attendu.

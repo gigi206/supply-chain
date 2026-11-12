@@ -21,10 +21,17 @@
 #               Prédictions : resultats/m2-predictions.md, section releve3.
 #               Corrigé à sec le 12/11/2026 à partir de 15:14:13 UTC, NON LANCÉ, avant tout accord : options cherchées aussi sans
 #               leur préfixe bootstrap_ (mock.py:811 le retire), et 6 lignes de contexte après image_assert_digest.
+#   releve4     hôte seul, réseau (ajouté à sec le 12/11/2026 à partir de 16:17:36 UTC, NON LANCÉ) : options des gestes 3 et 4 de
+#               la voie 2, lues dans l'amont aux tags des versions de Rocky 9.8 (raw.githubusercontent.com, fichiers non signés,
+#               sha256 journalisé, HTTP 200 exigé) : --compatibility de createrepo_c 0.20.1 (cmd_parser.c, et ce qu'elle change
+#               dans createrepo_c.c), --preserve-digests de skopeo copy 1.22.2 (copy.go). Une option témoin, sûrement présente,
+#               doit être trouvée dans le même fichier : sinon le fichier lu n'est pas le bon (KO). Option absente : résultat
+#               ABSENTE, code 0. Les correctifs des paquets de Rocky ne sont pas lus. Prédictions : resultats/m2-predictions.md.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve3  (journal : resultats/m2-releve3.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve4  (journal : resultats/m2-releve4.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -32,6 +39,8 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/../08-trust-plane/commun.sh"
 MOCK_TAG=mock-6.9-1
 ARCHIVE_SHA=3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88   # relevé le 12/11/2026 à 14:41:49 UTC (m2-releve.log)
+CREATEREPO_TAG=0.20.1   # createrepo_c-0.20.1-4.el9 de pub/rocky/9.8/AppStream (sante-voie2.log)
+SKOPEO_TAG=v1.22.2      # skopeo-1.22.2-9.el9_8 épinglé par s1.sh (s1-hote.log)
 T=$HOME/.cache/supply-chain-poc/05/m2
 mkdir -p "$T"
 
@@ -128,6 +137,42 @@ etape_releve3() {
   lignes "hermetic_build et offline_local_repository" 'hermetic_build|offline_local_repository' mock/py
   rm -rf -- "${T:?}/mock-src"
   echo "sources effacées ; archive gardée sous ~/.cache"
+}
+
+lire_amont() { # nom-local URL : lecture HTTP sous $T/releve4, KO si le code n'est pas 200 ; taille et sha256 journalisés
+  local h
+  h=$(curl -sSL --max-time 60 -o "$T/releve4/$1" -w '%{http_code}' "$2") || { echo "KO   $2 : curl en échec" >&2; exit 1; }
+  [ "$h" = 200 ] || { echo "KO   $2 : HTTP $h, fichier non lu" >&2; exit 1; }
+  echo "lu : $2 ($(stat -c %s "$T/releve4/$1") octets, sha256 $(sha256sum < "$T/releve4/$1" | cut -c1-64))"
+}
+
+option_lue() { # titre fichier-local option témoin : lignes de l'option (et 3 suivantes), ou ABSENTE ; témoin absent : KO
+  local f=$T/releve4/$2
+  grep -q -F -- "\"$4\"" "$f" || { echo "KO   $1 : témoin \"$4\" absent de $2, ce n'est pas le bon fichier" >&2; exit 1; }
+  echo "OK   $1 : témoin \"$4\" présent dans $2"
+  if grep -q -F -- "\"$3\"" "$f"; then
+    echo "PRÉSENTE $1 : \"$3\""
+    grep -n -F -A3 -- "\"$3\"" "$f" | cut -c1-220 | sed 's/^/  /'
+  else
+    echo "ABSENTE $1 : \"$3\" introuvable dans $2"
+  fi
+}
+
+etape_releve4() {
+  local c=https://raw.githubusercontent.com/rpm-software-management/createrepo_c/$CREATEREPO_TAG
+  local s=https://raw.githubusercontent.com/containers/skopeo/$SKOPEO_TAG
+  rm -rf -- "${T:?}/releve4"; mkdir "$T/releve4"
+  echo "## createrepo_c, tag $CREATEREPO_TAG (fichiers non signés)"
+  lire_amont cmd_parser.c "$c/src/cmd_parser.c"
+  lire_amont createrepo_c.c "$c/src/createrepo_c.c"
+  option_lue "createrepo_c $CREATEREPO_TAG" cmd_parser.c compatibility checksum
+  echo "### usages de compatibility dans createrepo_c.c et cmd_parser.c"
+  ( cd "$T/releve4" && grep -n -F -- compatibility createrepo_c.c cmd_parser.c ) | cut -c1-220 | sed 's/^/  /' || true
+  echo "## skopeo copy, tag $SKOPEO_TAG (fichier non signé)"
+  lire_amont copy.go "$s/cmd/skopeo/copy.go"
+  option_lue "skopeo copy $SKOPEO_TAG" copy.go preserve-digests remove-signatures
+  rm -rf -- "${T:?}/releve4"
+  echo "fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus"
 }
 
 lancer m2 "05 M2" "$@"

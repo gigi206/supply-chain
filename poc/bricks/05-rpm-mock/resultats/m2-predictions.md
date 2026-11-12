@@ -278,3 +278,32 @@ Question posée : « Quelle voie pour la référence du bootstrap ? » ; répons
 - L'embranchement 2 (image prête) reste ouvert.
 
 **Note du 12/11/2026, écrite à partir de 16:07:55 UTC, après l'audit `voie2` de `sante.sh`** : l'image d'outillage sur Rocky 9.8 porterait `createrepo_c-0.20.1-4.el9` (liste non signée de `pub/rocky/9.8/AppStream`), et non la 1.2.6 de l'amont. Le geste 3 de la voie 2, `createrepo_c --compatibility`, reprend l'appel lu dans le code de mock 6.9. Que la 0.20.1 accepte cette option **n'est pas vérifié**. À contrôler en M2, par `createrepo_c --help` dans l'image, avant le premier dépôt construit. Rien n'est lancé.
+
+## Additif du 12/11/2026, à partir de 16:17:36 UTC : étape `releve4` préparée à sec (après « continue », sur relecture du conseiller), NON LANCÉE
+
+Objet : vérifier dans l'amont, avant M2, les options des gestes 3 et 4 de la voie 2, aux versions que porterait l'image d'outillage :
+- `createrepo_c --compatibility`, en 0.20.1 (`createrepo_c-0.20.1-4.el9`, [sante-voie2.log](sante-voie2.log)) ;
+- `skopeo copy --preserve-digests`, en 1.22.2 (`skopeo-1.22.2-9.el9_8`, épinglé par `s1.sh`, [s1-hote.log](s1-hote.log)).
+
+L'étape ([`m2.sh`](../m2.sh) `releve4`) tourne sur l'hôte seul, avec réseau, sans cluster ni Zot. Elle lit trois fichiers sur raw.githubusercontent.com, aux tags `0.20.1` et `v1.22.2` : `src/cmd_parser.c` et `src/createrepo_c.c` de createrepo_c, `cmd/skopeo/copy.go` de skopeo.
+- Fichiers non signés ; taille et sha256 journalisés ; tout code HTTP autre que 200 donne un KO.
+- Une option témoin, sûrement présente, doit être trouvée dans le même fichier (`"checksum"` pour createrepo_c, `"remove-signatures"` pour skopeo). Sinon, le fichier lu n'est pas celui où les options sont déclarées : KO, au lieu d'une fausse absence.
+- Une option introuvable, témoin présent, est un résultat (`ABSENTE`), avec le code 0.
+- Fichiers effacés à la fin.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| L1 | Les trois fichiers sont lus en HTTP 200 : les tags `0.20.1` et `v1.22.2` existent sous ces noms | Moyenne : tag sans préfixe pour createrepo_c, comme `1.2.6` ([sante-voie2.log](sante-voie2.log)) ; préfixe `v` pour skopeo, d'après la convention du projet, non vérifiée |
+| L2 | `--compatibility` est PRÉSENTE dans `cmd_parser.c` de createrepo_c 0.20.1, témoin trouvé | Moyenne : mock 6.9, construit par EPEL 9 pour el9, l'appelle (`mock-hermetic-repo.py:199`) ; jamais lu dans createrepo_c |
+| L3 | Son texte d'aide la limite à la conservation des anciennes métadonnées, sans effet sur un dépôt créé de zéro | Faible : souvenir, jamais lu |
+| L4 | `--preserve-digests` est PRÉSENTE dans `copy.go` de skopeo 1.22.2, témoin trouvé | Moyenne : `prepare_image` de mock l'emploie ; mais les options de copie ont pu être déplacées dans un autre fichier, et le témoin manquerait alors aussi (KO, autre fichier à lire) |
+
+Banc hors réseau ([script](m2-releve4-essai-local.sh), [journal](m2-releve4-essai-local.log)), curl simulé :
+- options trouvées : code 0, `PRÉSENTE` deux fois ;
+- option absente, témoin présent : code 0, `ABSENTE` ;
+- HTTP 404 sur `copy.go` : KO, fichier non lu, code 1 ;
+- témoin absent : KO, code 1.
+
+`bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`).
+
+**Limites.** Les tags amont ne sont pas les paquets de Rocky : les correctifs de `createrepo_c-0.20.1-4.el9` et de `skopeo-1.22.2-9.el9_8` ne sont pas lus. `createrepo_c --help` et `skopeo copy --help` dans l'image restent la mesure de M2. Le fichier de raw.githubusercontent.com n'est pas signé ; seul son sha256 est journalisé.
