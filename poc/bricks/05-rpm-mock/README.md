@@ -293,3 +293,5 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - L3 contredite en apparence : l'option agit aussi sur la limite des changelogs (`createrepo_c.c:1291`), malgré son texte d'aide.
 - L4 non tranchée : `copy.go` de skopeo ne déclare pas ses options de copie.
 - Corrigé à sec à partir de 16:20:56 UTC (lecture de `utils.go`, contexte des usages archivé), banc rejoué ; NON RELANCÉ, accord nommé attendu.
+
+**Note du 12/11/2026, écrite à partir de 16:23:16 UTC (relecture du conseiller)** : « KO attendu » ci-dessus se lit « KO prévu par le garde » ; L4 est non tenue telle qu'écrite ([détail](resultats/m2-predictions.md)). Seconde correction à sec à partir de 16:22:59 UTC : options de skopeo cherchées dans le corps de `sharedCopyFlags` seul ; banc rejoué, six cas. NON RELANCÉE, accord nommé attendu.

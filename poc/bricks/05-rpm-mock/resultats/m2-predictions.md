@@ -336,3 +336,10 @@ Banc rejoué ([journal](m2-releve4-essai-local.log)), cinq cas, codes attendus :
 |---|---|---|
 | L4b | `utils.go` de skopeo 1.22.2 définit `sharedCopyFlags` et déclare `--preserve-digests` et `--remove-signatures` | Moyenne : le nom de fichier est supposé, jamais lu |
 | L3b | Le contexte archivé montre que `--compatibility` fixe la limite des changelogs à -1 quand l'utilisateur n'en donne pas : le dépôt construit n'est pas le même qu'avec la valeur par défaut | Haute pour la ligne (lue dans le fichier resté) ; le sens de -1 restera à lire |
+
+**Note du 12/11/2026, écrite à partir de 16:23:16 UTC, sur relecture du conseiller (le texte ci-dessus n'est pas réécrit) :**
+- **L4 est non tenue telle qu'écrite** : elle prédisait l'option et le témoin dans `copy.go`, et le témoin y manque. Seule l'existence de `--preserve-digests` dans skopeo 1.22.2 reste non tranchée.
+- **« KO attendu »**, dans le README, `docs/03` et le message du commit 75bb8d2, se lit « KO prévu par le garde » : le déplacement des options était le risque noté de L4, pas sa prédiction.
+- **Seconde correction à sec, à partir de 16:22:59 UTC, NON RELANCÉE** : l'option et le témoin sont cherchés dans le corps de `sharedCopyFlags` seul, archivé au journal, et non plus dans tout `utils.go`. Sinon, une option déclarée par une autre fonction du même fichier aurait été comptée. Banc rejoué ([journal](m2-releve4-essai-local.log)) : cas 1 à 5 aux mêmes codes ; cas 6, option hors de la fonction, `ABSENTE` avec le code 0. `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`).
+- `utils.go` reste un nom supposé : un second KO est possible.
+- Aucune conclusion pour M2 n'est tirée de `createrepo_c.c:1291` avant que son contexte soit archivé.

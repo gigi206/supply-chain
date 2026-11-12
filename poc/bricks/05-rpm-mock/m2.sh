@@ -31,6 +31,9 @@
 #               copy.go ne déclare pas les options de copie, il appelle sharedCopyFlags()), NON RELANCÉ : copy.go doit appeler
 #               sharedCopyFlags(), et les options sont lues dans cmd/skopeo/utils.go, qui doit définir func sharedCopyFlags( ;
 #               usages de compatibility archivés avec 3 lignes avant et 5 après.
+#               Corrigé à sec le 12/11/2026 à partir de 16:22:59 UTC, sur relecture du conseiller, NON RELANCÉ : option et témoin
+#               cherchés dans le corps de sharedCopyFlags seul (de func sharedCopyFlags( au premier « } » en début de ligne),
+#               archivé au journal, et non plus dans tout utils.go.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
@@ -177,9 +180,12 @@ etape_releve4() {
   lire_amont utils.go "$s/cmd/skopeo/utils.go"
   grep -n -F -- 'sharedCopyFlags()' "$T/releve4/copy.go" | sed 's/^/  copy.go:/' \
     || { echo "KO   copy.go n'appelle pas sharedCopyFlags() : les options de copie ne sont pas celles de utils.go" >&2; exit 1; }
-  grep -n -F -- 'func sharedCopyFlags(' "$T/releve4/utils.go" | sed 's/^/  utils.go:/' \
-    || { echo "KO   utils.go ne définit pas sharedCopyFlags : ce n'est pas le bon fichier" >&2; exit 1; }
-  option_lue "skopeo copy $SKOPEO_TAG" utils.go preserve-digests remove-signatures
+  awk '/^func sharedCopyFlags\(/ { p = 1 } p { printf "%d: %s\n", FNR, $0 } p && /^}/ { exit }' "$T/releve4/utils.go" \
+    > "$T/releve4/sharedCopyFlags.go"
+  [ -s "$T/releve4/sharedCopyFlags.go" ] || { echo "KO   utils.go ne définit pas sharedCopyFlags : ce n'est pas le bon fichier" >&2; exit 1; }
+  echo "### corps de sharedCopyFlags (utils.go, lignes numérotées)"
+  cut -c1-220 "$T/releve4/sharedCopyFlags.go" | sed 's/^/  /'
+  option_lue "skopeo copy $SKOPEO_TAG" sharedCopyFlags.go preserve-digests remove-signatures
   rm -rf -- "${T:?}/releve4"
   echo "fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus"
 }

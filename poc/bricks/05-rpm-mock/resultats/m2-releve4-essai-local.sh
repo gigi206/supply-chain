@@ -4,6 +4,8 @@
 # 4. témoin absent (mauvais fichier).
 # Corrigé le 12/11/2026 à partir de 16:20:56 UTC, après le premier passage : options de skopeo lues dans utils.go (sharedCopyFlags) ;
 # cas 3 : HTTP 404 sur utils.go ; cas 4 : témoin absent de utils.go ; cas 5 : copy.go sans appel à sharedCopyFlags().
+# Corrigé le 12/11/2026 à partir de 16:22:59 UTC : options cherchées dans le corps de sharedCopyFlags seul ; cas 6 : option présente
+# dans utils.go mais hors de la fonction (ABSENTE attendue).
 # Non couvert : réponses réelles de raw.githubusercontent.com (redirections, délais, DNS), contenu réel des fichiers amont.
 set -u
 D=$1; H=$2   # D : racine du dépôt ; H : dossier d'essai (vidé)
@@ -22,6 +24,7 @@ case "$CAS:$u" in
   *:*/copy.go) b='	copyFlags, copyOpts := sharedCopyFlags()' ;;
   404:*/utils.go) c=404; b='404: Not Found "preserve-digests" "remove-signatures" func sharedCopyFlags(' ;;
   temoin:*/utils.go) b='func sharedCopyFlags() {'$'\n''fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")' ;;
+  dehors:*/utils.go) b='func sharedCopyFlags() {'$'\n''fs.BoolVar(&opts.removeSignatures, "remove-signatures", false, "faux")'$'\n''}'$'\n''func autre() {'$'\n''fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")'$'\n''}' ;;
   *:*/utils.go) b='func sharedCopyFlags() {'$'\n''fs.BoolVar(&opts.removeSignatures, "remove-signatures", false, "faux")'$'\n''fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "faux")' ;;
   *) c=500; b=inattendu ;;
 esac
@@ -33,7 +36,7 @@ chmod +x "$H/bin/curl"
 printf 'R=%s\nlancer() { etape_$3; }\n' "$H/b/resultats" > "$H/commun.sh"
 sed -e "s#^\. \"\$here/../08-trust-plane/commun.sh\"\$#. $H/commun.sh#" "$D/poc/bricks/05-rpm-mock/m2.sh" > "$H/b/m2.sh"
 grep -c "^\. $H/commun.sh\$" "$H/b/m2.sh" | sed 's/^/source remplacée : /'
-for c in trouve absente 404 temoin appel; do
+for c in trouve absente 404 temoin appel dehors; do
   echo "== cas $c"
   CAS=$c HOME=$H/home PATH=$H/bin:$PATH bash "$H/b/m2.sh" releve4 2>&1; echo "code $?"
   test -e "$H/home/.cache/supply-chain-poc/05/m2/releve4" && echo "dossier releve4 resté (attendu après un KO)" || echo "dossier releve4 effacé"
