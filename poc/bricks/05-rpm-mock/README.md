@@ -308,3 +308,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Temps passé : 2,38 h mesurées ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées.
 
 **Additif du 12/11/2026, à partir de 16:42:30 UTC : étape `releve5` ajoutée à [`m2.sh`](m2.sh), NON LANCÉE** (après « continue », sur relecture du conseiller). Hôte seul, sans réseau : elle relit l'archive de mock gardée, sha256 contrôlé, et archive au journal `installed_packages.py`, les verrous d'exemple des tests et de la documentation, et les mentions de `gpg-pubkey` et de sigmd5. Elle sert à étayer V1 à V3 avant le premier verrou réel. Prédictions W1 à W4 ([détail](resultats/m2-predictions.md)). Accord nommé attendu.
+
+**Passage de `releve5`, le 12/11/2026 à 16:47:23 UTC (« Oui, lance releve5 »)**, note précisée sur relecture du conseiller : code 0 ([journal](resultats/m2-releve5.log), [résultats](resultats/m2-predictions.md)). W1 à W4 tenues :
+- le sigmd5 du verrou est la sortie brute de `rpm -qa --qf "%{sigmd5}"`, en hexadécimal minuscule dans les quatre valeurs d'exemple ; le schéma n'en fixe que le type ;
+- les URL viennent de `dnf --installroot=<chroot> repoquery --location`, cherchées par nom, version, release et arch, pas par contenu ;
+- mock 6.9 écarte les entrées `gpg-pubkey` du verrou.
+- V2 monte à haute pour le code, V3 à moyenne ; V1 reste moyenne. Dans le code lu, la comparaison des en-têtes au verrou, dans le cœur, est le seul lien entre le fichier téléchargé et le paquet installé. Elle lit une étiquette sans la recalculer : que `rpm -K` revérifie le condensat MD5 n'est pas mesuré dans l'image (`rpm -Kv` attend le branchement).

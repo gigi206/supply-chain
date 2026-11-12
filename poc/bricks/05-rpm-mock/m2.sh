@@ -42,6 +42,7 @@
 #               url et signature dans le schéma 1.1.0, toutes les mentions de gpg-pubkey, SIGMD5 et sigmd5 dans le code Python,
 #               les tests et la documentation ; puis sources effacées.
 #               Prédictions : resultats/m2-predictions.md, section releve5.
+#               Lancé le 12/11/2026 à 16:47:23 UTC (« Oui, lance releve5 »), code 0 : W1 à W4 tenues (m2-releve5.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -61,6 +62,8 @@
 #               « : »>@<pull_digest> (config.py:846, Q4 de m2-predictions.md), sha256 du manifeste copié égal au pull_digest.
 #               Banc hors réseau : resultats/m2-voie2-essai-local.sh. La requête de mock pour sigmd5 (installed_packages.py)
 #               n'est pas lue : un format différent donnerait un KO, pas un faux OK.
+#               Note du 12/11/2026, à partir de 16:47:47 UTC : installed_packages.py est lu depuis par releve5 (rpm -qa
+#               --qf "%{sigmd5}", gpg-pubkey écartées, URL par dnf repoquery --location) ; la phrase ci-dessus n'est pas réécrite.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)

@@ -1,0 +1,411 @@
+# m2.sh releve5, 2026-11-12T16:47:23Z
+## archive du tag mock-6.9-1 gardée par releve (aucun accès réseau)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+## verrou : requête des champs et calcul des URL
+### taille de installed_packages.py : 151 lignes
+### installed_packages.py entier (mock/py/mockbuild/installed_packages.py, lignes 1 à 2000)
+  1: """
+  2: Helper methods for getting list of installed packages, and corresponding
+  3: packages' metadata
+  4: """
+  5: 
+  6: import os
+  7: import subprocess
+  8: import mockbuild.exception
+  9: 
+  10: 
+  11: def _subprocess_executor(command):
+  12:     """
+  13:     We use doOutChroot normally in query_packages* methods, this is a helper
+  14:     for testing purposes.
+  15:     """
+  16:     return subprocess.check_output(command, env={"LC_ALL": "C"}).decode("utf-8")
+  17: 
+  18: 
+  19: def query_packages(fields, chrootpath=None, executor=_subprocess_executor):
+  20:     """
+  21:     Query the list of installed packages, including FIELDS metadata, from
+  22:     CHROOTPATH.
+  23: 
+  24:     The FIELDS argument is an array of RPM tags from 'rpm --querytags', without
+  25:     the '%{}' syntax, for example ['name'] queries for %{name}'.  There's an
+  26:     additional non-standard "signature" field parsed from the standard
+  27:     "%{sigpgp:pgpsig}" field (the last 8 hex characters).
+  28: 
+  29:     CHROOTPATH is the chroot directory with RPM DB.  If CHROOTPATH is not
+  30:     specified, the method uses the rpmdb from host.
+  31: 
+  32:     EXECUTOR is a callback accepting a single argument - command that will be
+  33:     executed, and its standard output returned as unicode multiline string.
+  34: 
+  35:     The method returns a list of dictionaries (package metadata info) in a
+  36:     format documented on
+  37:         https://docs.pagure.org/koji/content_generator_metadata/#buildroots
+  38:     For example:
+  39: 
+  40:     [{
+  41:        "license": "LicenseRef-Fedora-Public-Domain",
+  42:        "name": "filesystem",
+  43:        "version": "3.18",
+  44:        "release": "23.fc41",
+  45:        "arch": "x86_64",
+  46:        "epoch": null,
+  47:        "sigmd5": "dc6edb2b7e390e5f0994267d22b9dc1a",
+  48:        "signature": null
+  49:     }]
+  50:     """
+  51:     package_list_cmd = ["rpm", "-qa"]
+  52:     if chrootpath:
+  53:         package_list_cmd += ["--root", chrootpath]
+  54:     package_list_cmd.append("--qf")
+  55: 
+  56:     # HACK: Zero-termination is not possible with 'rpm -q --qf QUERYSTRIG', so
+  57:     # this is a hack.  But how likely we can expect the following string in the
+  58:     # real packages' metadata?
+  59:     separator = '|/@'
+  60: 
+  61:     def _query_key(key):
+  62:         # The Koji Content Generator's "signature" field can be queried via %{sigpgp}
+  63:         if key == "signature":
+  64:             return "sigpgp:pgpsig"
+  65:         return key
+  66: 
+  67:     query_fields = [_query_key(f) for f in fields]
+  68:     package_list_cmd.append(separator.join(f"%{{{x}}}" for x in query_fields) + "\n")
+  69: 
+  70:     def _fixup(package):
+  71:         """ polish the package's metadata output """
+  72:         key = "signature"
+  73:         if key in package:
+  74:             if package[key] == "(none)":
+  75:                 package[key] = None
+  76:             else:
+  77:                 # RSA/SHA256, Mon Jul 29 10:12:32 2024, Key ID 2322d3d94bf0c9db
+  78:                 # Get just last 8 chars --->                           ^^^^^^^^
+  79:                 package[key] = package[key].split()[-1][-8:]
+  80:         key = "epoch"
+  81:         if package[key] == "(none)":
+  82:             package[key] = None
+  83:         return package
+  84: 
+  85:     return [_fixup(p) for p in [dict(zip(fields, line.split(separator))) for
+  86:                                 line in
+  87:                                 sorted(executor(package_list_cmd).splitlines())]
+  88:             if p["name"] != "gpg-pubkey"]
+  89: 
+  90: 
+  91: def query_packages_location(packages, chrootpath=None,
+  92:                             executor=_subprocess_executor, dnf_cmd="/bin/dnf"):
+  93:     """
+  94:     Detect the URLs of the PACKAGES - array of dictionaries (see the output
+  95:     from query_packages()) in available RPM repositories (/etc/yum.repos.d).
+  96:     This method modifies PACKAGES in-situ, it adds "url" field to every single
+  97:     dictionary in the PACKAGES array.
+  98: 
+  99:     CHROOTPATH is the chroot directory with RPM DB, if not specified, rpmdb
+  100:     from host is used.
+  101: 
+  102:     EXECUTOR is a callback accepting a single argument - command that will be
+  103:     executed, and its standard output returned as unicode multiline string.
+  104: 
+  105:     Example output:
+  106: 
+  107:     [{
+  108:        "name": "filesystem",
+  109:        "version": "3.18",
+  110:        ...
+  111:        "url": "https://example.com/fedora-repos-rawhide-42-0.1.noarch.rpm",
+  112:        ...
+  113:     }]
+  114:     """
+  115: 
+  116:     if 'yum' in dnf_cmd:
+  117:         # yum (yum-utils must be installed)
+  118:         query_locations_cmd = ['/usr/bin/repoquery']
+  119:     else:
+  120:         # dnf
+  121:         query_locations_cmd = [dnf_cmd]
+  122:         if chrootpath:
+  123:             query_locations_cmd += [f"--installroot={chrootpath}"]
+  124:         query_locations_cmd += ["repoquery"]
+  125:     # The -q is necessary because of and similar:
+  126:     # https://github.com/rpm-software-management/dnf5/issues/1361
+  127:     query_locations_cmd += ["-q", "--location"]
+  128:     query_locations_cmd += [
+  129:         f"{p['name']}-{p['version']}-{p['release']}.{p['arch']}"
+  130:         for p in packages
+  131:     ]
+  132:     location_map = {}
+  133:     for url in executor(query_locations_cmd).splitlines():
+  134:         basename = os.path.basename(url)
+  135:         # name-arch pair should be unique on the box for every installed package
+  136:         name, _, _ = basename.rsplit("-", 2)
+  137:         arch = basename.split(".")[-2]
+  138:         location_map[f"{name}.{arch}"] = url
+  139: 
+  140:     failed_packages = []
+  141:     for package in packages:
+  142:         name_arch = f"{package['name']}.{package['arch']}"
+  143:         try:
+  144:             package["url"] = location_map[name_arch]
+  145:         except KeyError:
+  146:             failed_packages.append(package)
+  147: 
+  148:     if failed_packages:
+  149:         failed_str = ", ".join([f"{p['name']}-{p['version']}-{p['release']}.{p['arch']}"
+  150:                                 for p in failed_packages])
+  151:         raise mockbuild.exception.Error(f"Can't get location for {failed_str}")
+## verrous d'exemple
+### taille de test_buildroot_lock.py : 163 lignes
+### test_buildroot_lock.py entier (mock/tests/test_buildroot_lock.py, lignes 1 à 2000)
+  1: """
+  2: Test the methods that generate buildroot_lock.json
+  3: """
+  4: 
+  5: import copy
+  6: import json
+  7: import os
+  8: import tempfile
+  9: from unittest import TestCase
+  10: from unittest.mock import MagicMock, patch
+  11: import jsonschema
+  12: 
+  13: from mockbuild.plugins.buildroot_lock import init
+  14: import mockbuild.exception
+  15: 
+  16: # gpg-pubkey packages stay ignored
+  17: # fedora-release is normal package with simple license
+  18: RPM_OUTPUT = """\
+  19: gpg-pubkey|/@(none)|/@pubkey|/@105ef944|/@65ca83d1|/@(none)|/@(none)|/@(none)
+  20: gpg-pubkey|/@(none)|/@pubkey|/@e99d6ad1|/@64d2612c|/@(none)|/@(none)|/@(none)
+  21: fedora-release|/@noarch|/@MIT|/@42|/@0.3|/@(none)|/@cf31d87e5e3eac97ff32a98e7e073f37|/@(none)
+  22: bash|/@x86_64|/@GPLv3+|/@5.1.8|/@9.el9|/@(none)|/@57e93b1739cc3512f9f29dcaa8a38055|/@RSA/SHA256, Sun Mar 31 12:41:20 2024, Key ID 199e2f91fd431d51
+  23: """  # noqa: E501
+  24: 
+  25: # cyrus-sasl-lib is not present in the REPOQUERY_OUTPUT
+  26: RPM_ONLY_RPM = """\
+  27: cyrus-sasl-lib|/@x86_64|/@BSD with advertising|/@2.1.27|/@21.el9|/@(none)|/@9e1caba09fac94568419b9dfd14fb4c5|/@RSA/SHA256, Mon Sep 12 23:24:22 2022, Key ID 199e2f91fd431d51
+  28: """  # noqa: E501
+  29: 
+  30: REPOQUERY_OUTPUT = """\
+  31: http://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/Packages/f/fedora-release-42-0.3.noarch.rpm
+  32: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/b/bash-5.1.8-9.el9.x86_64.rpm
+  33: """
+  34: 
+  35: EXPECTED_OUTPUT = {
+  36:     'version': '1.1.0',
+  37:     'buildroot': {
+  38:         'rpms': [{
+  39:             'arch': 'x86_64',
+  40:             'epoch': None,
+  41:             'license': 'GPLv3+',
+  42:             'name': 'bash',
+  43:             'release': '9.el9',
+  44:             'sigmd5': '57e93b1739cc3512f9f29dcaa8a38055',
+  45:             'signature': 'fd431d51',
+  46:             'url': 'https://cdn.redhat.com/content/dist/rhel9/9/x86_64'
+  47:                    '/baseos/os/Packages/b/bash-5.1.8-9.el9.x86_64.rpm',
+  48:             'version': '5.1.8'
+  49:         }, {
+  50:             'arch': 'noarch',
+  51:             'epoch': None,
+  52:             'license': 'MIT',
+  53:             'name': 'fedora-release',
+  54:             'release': '0.3',
+  55:             'sigmd5': 'cf31d87e5e3eac97ff32a98e7e073f37',
+  56:             'signature': None,
+  57:             'url': 'http://ftp.fi.muni.cz/pub/linux/fedora/linux'
+  58:                    '/development/rawhide/Everything/x86_64/os'
+  59:                    '/Packages/f/fedora-release-42-0.3.noarch.rpm',
+  60:             'version': '42',
+  61:         }]
+  62:     },
+  63:     "bootstrap": {
+  64:         "image_digest": "sha256:ba1067bef190fbe88f085bd019464a8c0803b7cd1e3f",
+  65:         "pull_digest": "sha256:1d9f0eaec60b59a669b285d1e775d970061b9694d4998b5bdb9626c9f33685cd",
+  66:         "id": "b222730c2ba32385173fe3351026c316c9a294fa8d8c3c0f80d8afdb1b1aeef7",
+  67:         "architecture": "amd64",
+  68:     },
+  69:     'config': {
+  70:         'bootstrap_image': 'foo',
+  71:         'bootstrap_image_ready': True,
+  72:         "legal_host_arches": ["x86_64"],
+  73:         "target_arch": "x86_64",
+  74:         "dist": ".f42",
+  75:     },
+  76: }
+  77: 
+  78: 
+  79: def _exp_output_bootstrap(exp_data):
+  80:     data = copy.deepcopy(exp_data["bootstrap"])
+  81:     del data["image_digest"]
+  82:     return data
+  83: 
+  84: 
+  85: def _mock_vars(rpm_out, repoquery_out):
+  86:     tc = TestCase()
+  87:     tc.maxDiff = None
+  88:     buildroot = MagicMock()
+  89:     buildroot.state = MagicMock()
+  90:     buildroot.uid_manager = MagicMock()
+  91:     buildroot.doOutChroot = MagicMock(
+  92:         side_effect=iter([
+  93:             (rpm_out, None),
+  94:             (repoquery_out, None),
+  95:         ])
+  96:     )
+  97:     buildroot.config = copy.copy(EXPECTED_OUTPUT['config'])
+  98:     buildroot.config["use_bootstrap_image"] = True
+  99:     buildroot.resultdir = tempfile.mkdtemp(prefix="mock-test-buildroot-lock")
+  100:     plugins = MagicMock()
+  101:     plugins.add_hook = MagicMock()
+  102:     return tc, buildroot, plugins
+  103: 
+  104: 
+  105: def _call_method(plugins, buildroot):
+  106:     # initialize the plugin
+  107:     init(plugins, {}, buildroot)
+  108:     # obtain the hook method, and call it
+  109:     plugins.add_hook.assert_called_once()
+  110:     _, method = plugins.add_hook.call_args[0]
+  111: 
+  112:     podman_obj = MagicMock()
+  113:     podman_obj.get_oci_digest.return_value = EXPECTED_OUTPUT["bootstrap"]["image_digest"]
+  114:     podman_obj.inspect_hermetic_metadata.return_value = _exp_output_bootstrap(EXPECTED_OUTPUT)
+  115:     podman_cls = MagicMock(return_value=podman_obj)
+  116:     with patch("mockbuild.plugins.buildroot_lock.Podman", side_effect=podman_cls):
+  117:         method()
+  118: 
+  119: 
+  120: def test_nonexisting_file_in_repo():
+  121:     """
+  122:     Test the situation when RPM is installed, and no longer available in
+  123:     repository.
+  124:     """
+  125:     _, buildroot, plugins = _mock_vars(
+  126:         RPM_OUTPUT + RPM_ONLY_RPM,
+  127:         REPOQUERY_OUTPUT,
+  128:     )
+  129:     raised = False
+  130:     try:
+  131:         _call_method(plugins, buildroot)
+  132:     except mockbuild.exception.Error as e:
+  133:         assert e.msg == "Can't get location for cyrus-sasl-lib-2.1.27-21.el9.x86_64"
+  134:         raised = True
+  135:     assert raised
+  136: 
+  137: 
+  138: def _get_json_schema():
+  139:     testdir = os.path.dirname(__file__)
+  140:     basename = "buildroot-lock-schema-" + EXPECTED_OUTPUT["version"] + ".json"
+  141:     with open(os.path.join(testdir, "..", "docs", basename),
+  142:               "r", encoding="utf-8") as fd:
+  143:         return json.load(fd)
+  144: 
+  145: 
+  146: def test_buildroot_lock_output():
+  147:     """ test the buildroot_lock.json file format """
+  148:     tc, buildroot, plugins = _mock_vars(RPM_OUTPUT, REPOQUERY_OUTPUT)
+  149:     _call_method(plugins, buildroot)
+  150:     with open(os.path.join(buildroot.resultdir, "buildroot_lock.json"), "r",
+  151:               encoding="utf-8") as fd:
+  152:         data = json.load(fd)
+  153:     tc.assertDictEqual(data, EXPECTED_OUTPUT)
+  154:     schema = _get_json_schema()
+  155:     jsonschema.validate(EXPECTED_OUTPUT, schema)
+  156: 
+  157: 
+  158: def test_json_schema_metadata():
+  159:     """ Test basic format of the json schema """
+  160:     schema = _get_json_schema()
+  161:     version = EXPECTED_OUTPUT["version"]
+  162:     assert "Version " + version + ";" in schema["description"]
+  163:     assert "schema-" + version + ".json" in schema["$id"]
+### taille de Plugin-BuildrootLock.md : 48 lignes
+### Plugin-BuildrootLock.md entier (docs/Plugin-BuildrootLock.md, lignes 1 à 2000)
+  1: ---
+  2: layout: default
+  3: title: Plugin buildroot_lock
+  4: ---
+  5: 
+  6: buildroot_lock Plugin
+  7: =====================
+  8: 
+  9: This plugin generates an additional build artifact—the buildroot *lockfile*
+  10: (`buildroot_lock.json` file in the result directory).
+  11: 
+  12: The *lockfile* describes both the list of buildroot sources (e.g., a list of
+  13: installed RPMs, bootstrap image info, etc.) and a set of Mock configuration
+  14: options.  Using this information, Mock can later reproduce the buildroot
+  15: preparation (see the [Hermetic Builds feature page](feature-hermetic-builds)).
+  16: 
+  17: This plugin is **disabled** by default but is automatically enabled with the
+  18: `--calculate-build-dependencies` option.  You can enable it (for all builds) by
+  19: this configuration snippet:
+  20: 
+  21: ```python
+  22: config_opts['plugin_conf']['buildroot_lock_enable'] = True
+  23: ```
+  24: 
+  25: **Note:** This plugin does not work with the `--offline` option.
+  26: 
+  27: 
+  28: Format of the *buildroot_lock.json* file
+  29: ----------------------------------------
+  30: 
+  31: The file `buildroot_lock.json` is a JSON file.  List of JSON Schema files is
+  32: installed together with the Mock RPM package:
+  33: 
+  34:     rpm -ql mock | grep schema
+  35:     /usr/share/doc/mock/buildroot-lock-schema-1.0.0.json
+  36:     /usr/share/doc/mock/buildroot-lock-schema-1.1.0.json
+  37: 
+  38: Currently, we do not provide a compatibility promise.  Only the exact same
+  39: version of Mock that produced the file is guaranteed to read and process it.
+  40: For more information, see [Hermetic Builds](feature-hermetic-builds).
+  41: 
+  42: Also, in the future we plan to switch to a standardized tooling so we operate
+  43: with a standardized format, too.  For more info see the [DNF5 feature
+  44: request][discussion], [rpm-lockfile-prototype][] and [libpkgmanifest][].
+  45: 
+  46: [discussion]: https://github.com/rpm-software-management/dnf5/issues/833
+  47: [rpm-lockfile-prototype]: https://github.com/konflux-ci/rpm-lockfile-prototype
+  48: [libpkgmanifest]: https://github.com/rpm-software-management/libpkgmanifest
+### schéma 1.1.0 : définitions de sigmd5, url et signature
+  {
+    "sigmd5": {
+      "description": "The SIGMD5 tag from the rpm header.",
+      "type": "string"
+    },
+    "url": {
+      "description": "Uniform Resource Locator that points to additional information on the packaged software",
+      "type": "string"
+    },
+    "signature": {
+      "description": "The signature used to sign the rpm (if any), last 8 characters from the \"rpm  -q --qf '%{sigpgp:pgpsig}\n'\" output",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+## mentions, dans tout le code Python, les tests et la documentation
+### gpg-pubkey
+  mock/py/mockbuild/installed_packages.py:88:            if p["name"] != "gpg-pubkey"]
+  mock/tests/test_buildroot_lock.py:16:# gpg-pubkey packages stay ignored
+  mock/tests/test_buildroot_lock.py:19:gpg-pubkey|/@(none)|/@pubkey|/@105ef944|/@65ca83d1|/@(none)|/@(none)|/@(none)
+  mock/tests/test_buildroot_lock.py:20:gpg-pubkey|/@(none)|/@pubkey|/@e99d6ad1|/@64d2612c|/@(none)|/@(none)|/@(none)
+  docs/Release-Notes-1.2.21.md:12:- Rename mageia pubkey to RPM-GPG-KEY-Mageia
+  docs/index.md:157:* [1.2.21](Release-Notes-1.2.21) (2016-09-12) - fix privilege escalation via mock-scm; rename of mageia pubkey
+### SIGMD5 et sigmd5
+  mock/py/mockbuild/installed_packages.py:47:       "sigmd5": "dc6edb2b7e390e5f0994267d22b9dc1a",
+  mock/py/mockbuild/plugins/buildroot_lock.py:52:                                "epoch", "sigmd5", "signature"]
+  mock/tests/test_buildroot_lock.py:44:            'sigmd5': '57e93b1739cc3512f9f29dcaa8a38055',
+  mock/tests/test_buildroot_lock.py:55:            'sigmd5': 'cf31d87e5e3eac97ff32a98e7e073f37',
+  mock/docs/buildroot-lock-schema-1.1.0.json:45:              "sigmd5": {
+  mock/docs/buildroot-lock-schema-1.1.0.json:46:                "description": "The SIGMD5 tag from the rpm header.",
+  mock/docs/buildroot-lock-schema-1.1.0.json:68:              "sigmd5",
+  mock/docs/buildroot-lock-schema-1.0.0.json:45:              "sigmd5": {
+  mock/docs/buildroot-lock-schema-1.0.0.json:46:                "description": "The SIGMD5 tag from the rpm header.",
+  mock/docs/buildroot-lock-schema-1.0.0.json:68:              "sigmd5",
+sources effacées ; archive gardée sous ~/.cache

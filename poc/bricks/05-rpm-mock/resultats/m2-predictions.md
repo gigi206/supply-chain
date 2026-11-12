@@ -426,3 +426,24 @@ Après « continue », sur relecture du conseiller. **Hôte seul, sans réseau, 
 - le contenu d'un verrou réel. V1 à V5 restent à mesurer au premier passage, après S1 et `verrou` ;
 - une ligne longue : `plage` coupe à 220 caractères et `lignes` à 170 (aides partagées avec `releve2` et `releve3`, non modifiées). Un verrou d'exemple écrit sur une seule ligne pourrait perdre son sigmd5 ou son URL au-delà de la coupe, et W4 resterait alors non tranchée ;
 - une définition absente du chemin lu : si le schéma passe par un `$ref`, `jq` rend `null` pour le champ, avec le code 0. Un `null` se lira « définition non trouvée à ce chemin », pas « aucune contrainte ».
+
+## Passage de `releve5`, le 12/11/2026 à 16:47:23 UTC (« Oui, lance releve5 »), code 0
+
+[Journal](m2-releve5.log). `chrono.tsv` porte le début et la fin dans la même seconde. Note écrite à partir de 16:47:47 UTC. Précisée avant le commit, sur relecture du conseiller. sha256 de l'archive contrôlé (celui de `releve`). Aucune ligne du journal n'est coupée : la plus longue fait 178 caractères, sous la coupe de 220 de `plage` ; les lignes de `lignes` restent sous 170. Les définitions du schéma sont trouvées au chemin lu (aucun `null`).
+
+| # | Résultat |
+|---|---|
+| W1 | **Tenue.** `query_packages` lance `rpm -qa --root <chroot> --qf`, avec un format construit des noms de champs : `%{name}`, …, `%{sigmd5}`, séparés par `\|/@` (`installed_packages.py:51` à `:68`). Le sigmd5 du verrou est la sortie brute de rpm. Seuls `signature` (`%{sigpgp:pgpsig}`, réduit aux 8 derniers caractères de l'identifiant de clé, `:77` à `:79`) et `epoch` (`(none)` devient `null`) sont retouchés |
+| W2 | **Tenue.** `query_packages_location` lance un seul `dnf --installroot=<chroot> repoquery -q --location`, avec en arguments le `<nom>-<version>-<release>.<arch>` de tous les paquets (`:116` à `:131`). Une URL manquante arrête mock (`Can't get location for …`, `:148` à `:151`, test `:120` à `:135`) |
+| W3 | **Tenue.** Les entrées `gpg-pubkey` sont écartées à la sortie de `query_packages` (`:88`), et le test l'affirme (« gpg-pubkey packages stay ignored », `test_buildroot_lock.py:16`, avec deux lignes `gpg-pubkey` en entrée, `:19` et `:20`) |
+| W4 | **Tenue.** Le journal porte quatre valeurs de sigmd5 distinctes, toutes de 32 caractères hexadécimaux minuscules (mesuré par `grep -owE '[0-9a-f]{32}'` sur le journal) : `installed_packages.py:47`, et les sorties de rpm simulées de `test_buildroot_lock.py:21`, `:22` et `:27`, dont `:44` et `:55` sont les valeurs attendues dans le verrou. Le schéma 1.1.0 ne déclare que `"type": "string"` et la description « The SIGMD5 tag from the rpm header » : aucun motif |
+
+**Conséquences pour les prédictions de la voie 2** (le tableau V1 à V5 n'est pas réécrit) :
+- **V1** reste de confiance moyenne. Les URL viennent bien des dépôts que voit `dnf --installroot` dans le chroot. Quels dépôts il voit (configuration de mock ou `/etc/yum.repos.d` du chroot, que cite la docstring `:95`) n'est pas lu.
+- **V2** monte à haute pour le code : mock 6.9 écarte `gpg-pubkey` avant d'écrire le verrou. Reste la mesure sur un verrou réel.
+- **V3** monte à moyenne : sigmd5 est la sortie de rpm pour l'étiquette SIGMD5, en hexadécimal minuscule dans les exemples. Le cœur la relit par `%{SIGMD5}`, en capitales, mock par `%{sigmd5}` : que rpm lise les deux de même n'est pas mesuré ici. Un écart donnerait un KO, pas un faux OK.
+
+**Ce que le relevé apprend en plus, sans décision :**
+- **L'URL est cherchée par nom, version, release et arch, pas par contenu.** Dans le code lu (`installed_packages.py`, `buildroot_lock.py`, `mock-hermetic-repo.py`, parties de `config.py`), rien ne lie le fichier pointé par l'URL au paquet installé. Notre comparaison des en-têtes au verrou (sigmd5 compris) est ce lien ; `mock-hermetic-repo` ne la fait pas (N6r). Elle a une limite : `rpm -qp --qf %{SIGMD5}` lit une étiquette de l'en-tête, il ne recalcule rien. Le contenu n'est lié à cette étiquette que si `rpm -K` revérifie le condensat MD5 de l'en-tête et de la charge ; ce n'est pas mesuré dans l'image. `rpm -Kv` sur un fichier, qui détaille chaque contrôle, rejoint la liste de ce qui attend le branchement.
+- **Une URL par `nom.arch`** : si `repoquery` rend deux lignes pour le même paquet (même NVRA dans deux dépôts), la dernière gagne (`:133` à `:138`). La comparaison du sigmd5 couvre ce cas.
+- **Le champ `signature`** porte les 8 derniers caractères hexadécimaux de l'identifiant de la clé, ou `null` pour un paquet non signé. Le cœur ne le lit pas : `rpm -K` avec la seule clé de Rocky fait le contrôle. Le comparer aussi à la clé de Rocky, sur l'hôte, serait un garde de plus ; ce n'est pas écrit.
