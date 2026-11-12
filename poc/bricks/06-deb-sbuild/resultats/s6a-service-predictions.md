@@ -214,3 +214,18 @@ C'est une question au propriétaire : faire ce témoin après S6a, ou garder le 
 
 **`rejeu.sh` et S6.** La décision ne bloque rien avant S5b, puisque les correctifs ne sont pas appliqués. Elle est à prendre avant le premier rejeu qui suit l'application des correctifs de S6a.
 
+## Résultats de `promtool` sur la copie détachée (12/11/2026, 13:25:27 à 13:25:36 UTC, accord « Oui, lance-le »), code 0
+
+Journal : [`s6a-promtool.log`](s6a-promtool.log). Copie détachée à `cecb367`, avec `s6a-alertes-deb.patch` appliqué dans la copie seulement. La copie est retirée (`git worktree list` ne montre plus que l'arbre principal).
+
+| N° | Prédiction | Mesure | Verdict |
+|---|---|---|---|
+| P1 | `promtool, version 3.13.5` | `promtool, version 3.13.5 (… revision: f497435984d1…)` | Tenue |
+| P2 | `SUCCESS: 14 rules found` | `SUCCESS: 15 rules found` | **Fausse** |
+| P3 | `test rules` : `SUCCESS`, y compris le groupe neuf | `SUCCESS` | Tenue |
+| P4 | Code 0, arbre principal inchangé hors le journal recopié | Code 0 ; `git status` : seul `s6a-promtool.log` est nouveau | Tenue |
+
+**Pourquoi P2 est fausse.** J'ai pris le nombre de règles dans `o3-regles.log` (06/11), au lieu de le compter dans l'arbre. L'arbre compte 15 `- alert:` à `cecb367`. La 15e vient du commit `5fbb0b5` (09/11, chantier des Events), postérieur à ce journal. Le correctif n'ajoute aucune règle (aucune ligne `+ - alert:`) : c'est la partie de P2 qui tient.
+
+**Conséquence.** Les règles corrigées passent `check rules`, et tous les tests passent, y compris celui où seul le dépôt du deb déclenche `ScanEnRetard`. Q7 est donc tenue sur une copie avant S5b ; elle reste à rejouer par `regles` dans l'arbre, une fois le correctif commité après S5b. Rien n'a été déployé.
+
