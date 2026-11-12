@@ -99,3 +99,7 @@ décider ; le deb n'est pas modifié.
 dans `paquets.py` (pas une curation de `licences.py`, qui remplacerait toute l'expression), liée au sha256 du texte de la licence et appliquée seulement
 après revue du propriétaire. Le texte « Go » de Debian est celui de `BSD-3-Clause` plus une concession de brevets de Google, qui resterait hors de
 l'expression ([détail](resultats/paquets-predictions.md)).
+
+**Relance de `stdlib`, le 12/11/2026 à 20:13:36 UTC (« Oui, relance stdlib »)** : code 1, T1 à T3 tenues ([journal](resultats/paquets-stdlib.log), premier passage
+[conservé](resultats/paquets-stdlib-premier-passage.log)). « Go » traduit en `BSD-3-Clause` après revue ; restent quatre noms hors SPDX (`FreeBSD`, `MPEG`,
+`noderivs`, `BSD-3-clause-svgpan`) et `X11` hors politique. Suite à décider.

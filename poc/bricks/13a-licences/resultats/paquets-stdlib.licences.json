@@ -16,9 +16,9 @@
       "purl": "pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all",
       "source": "sbom",
       "reasons": [
-        "expression invalide : identifiant SPDX inconnu : Go"
+        "expression invalide : identifiant SPDX inconnu : FreeBSD"
       ],
-      "expression": "Go AND X11 AND Go AND Go AND Go AND FreeBSD AND Go AND Go AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND Go",
+      "expression": "BSD-3-Clause AND X11 AND BSD-3-Clause AND BSD-3-Clause AND BSD-3-Clause AND FreeBSD AND BSD-3-Clause AND BSD-3-Clause AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND BSD-3-Clause",
       "invalid": true,
       "verdict": "error"
     },

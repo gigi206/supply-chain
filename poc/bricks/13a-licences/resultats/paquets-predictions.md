@@ -294,3 +294,23 @@ la preuve et revue (appliquée, 0) ; un mot changé (non appliquée, 1) ; entré
 BSD-3-Clause, brevets hors de l'expression ? » ; réponse du propriétaire : « Oui, je valide ». Inscrite dans `traductions-dep5.json`
 (champ `revue`), preuve inchangée (`6ce83989…`). L'étape `stdlib` n'est pas relancée : accord nommé attendu ; T1 à T3 tiennent lieu de
 prédictions.
+
+## Résultats de la relance de `stdlib` : 12/11/2026, 20:13:36 UTC, code 1 (`bilan : KO`, attendu par T3), sans ligne « fait »
+
+Accord : « Oui, relance stdlib » à « Je relance stdlib ? (paquets.sh, commit a69ab7a) » ; HEAD a69ab7a, arbre propre, contrôlés à
+20:13:36 UTC. Dernière ligne du journal à 20:13:38 UTC (`date -u` de la commande). Le premier passage (20:05:09 UTC) est conservé tel
+quel dans [`paquets-stdlib-premier-passage.log`](paquets-stdlib-premier-passage.log) et
+[`paquets-stdlib-premier-passage.licences.json`](paquets-stdlib-premier-passage.licences.json) (copies égales à celles de a69ab7a) ;
+[`paquets-stdlib.log`](paquets-stdlib.log) et [`paquets-stdlib.licences.json`](paquets-stdlib.licences.json) sont ceux de la relance.
+Résultats écrits à partir de 20:13:55 UTC.
+
+| # | Résultat |
+|---|---|
+| T1 | **Tenue.** `traduction Go -> BSD-3-Clause : appliquée`, texte au sha256 `6ce83989…`, revue citée au journal |
+| T2 | **Tenue.** Les sept paragraphes `Go` sont rendus en `BSD-3-Clause` ; statuts journalisés : `FreeBSD`, `MPEG`, `noderivs`, `BSD-3-clause-svgpan` hors SPDX ; `X11` SPDX, hors politique ; `Apache-2.0`, `BSD-3-Clause` (et `BSD-3-clause`) autorisés |
+| T3 | **Tenue.** `licences.py` code 1, une erreur : premier identifiant invalide restant, `FreeBSD` ; composant du deb toujours `ok` |
+
+**Ce qui reste pour déclarer la bibliothèque standard**, d'après les statuts archivés (sans décision) : `FreeBSD` (deux fichiers ELF,
+dont `src/debug/elf/elf.go`), `MPEG` (`src/image/jpeg/idct.go`), `noderivs` (données de test de `image/png`), `BSD-3-clause-svgpan`
+(un fichier de pprof sous `src/cmd`) : quatre noms hors SPDX ; `X11` (fichiers de `src/cmd/internal/objabi`) : absent de la politique.
+Plusieurs de ces fichiers ne sont sans doute pas compilés dans `sample-app` (données de test, outils de `src/cmd`) ; ce n'est pas mesuré.

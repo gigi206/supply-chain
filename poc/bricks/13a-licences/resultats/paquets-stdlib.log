@@ -1,5 +1,5 @@
-# paquets.sh stdlib, 2026-11-12T20:05:09Z
-paquets.py : 0541eaf76c47582704d4f0e084ad428bb9ed483089a7b70037a8d459b2ce296c ; licences.py : c708a5bce0b67ba04af9bf6f5039718fee7bb1d21a5be71568b359413e26319a ; politique : dc284d6739346df22552b7661531134ab68d01086f7a41d779c109d6ebb3dec2
+# paquets.sh stdlib, 2026-11-12T20:13:36Z
+paquets.py : a889f87b4394c7482c7e376f5b963235002bf1a6a9b1219d758fb5544a558ea8 ; licences.py : c708a5bce0b67ba04af9bf6f5039718fee7bb1d21a5be71568b359413e26319a ; politique : dc284d6739346df22552b7661531134ab68d01086f7a41d779c109d6ebb3dec2
 OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
 OK   sha256 du paquet de Go épinglé : c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1
 OK   même sha256 dans poc/packaging/verrou-deb.txt
@@ -7,6 +7,7 @@ OK   « golang-1.24-src (= 1.24.4-1) » dans s3-build-1.buildinfo
 ## témoin : le deb de l application à la place du paquet de Go (refus exigé ; avant l appel principal)
 OK   témoin refusé : REFUS : sample-app n'est pas un paquet golang-X.Y-src
 ## deb et paquet de Go
+traductions : 09bfdd0dc7b587e01fad777884a34bcdc0f0d34330bfe5b5441bafaa1dff81e7 (traductions-dep5.json)
 sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
 sha256 du paquet de la bibliothèque standard : c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1 (21182488 octets)
 binaire ./usr/bin/sample-app : go1.24.4
@@ -20,24 +21,33 @@ Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND 
 pkg:deb/debian/sample-app@1.0.0-1?arch=amd64 : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
 ## copyright de golang-1.24-src : sha256 a739b83e49889464462830f3c992b275f5acba9380d859f64bb75d71b18c1e03 (16932 octets)
 format : DEP-5 1.0 ; paragraphes : 22
-Files * : License « Go » -> Go
+traduction Go -> BSD-3-Clause : appliquée (texte sha256 6ce83989d586587de32b12605b0aef37a03c5c2bebb178edbca97a6235fe519f ; revue : propriétaire, 12/11/2026 (inscrite à 20:12:28 UTC) : « Oui, je valide » à « Tu valides « Go » → BSD-3-Clause, brevets hors de l'expression ? »)
+Files * : License « Go » -> BSD-3-Clause
 Files  src/cmd/internal/objabi/autotype.go src/cmd/internal/objabi/head.go src/cmd/internal/objabi/reloctype.go src/cmd/intern : License « X11 » -> X11
-Files src/debug/dwarf/testdata/typedef.macho src/debug/dwarf/testdata/typedef.elf : License « Go » -> Go
-Files  src/debug/macho/testdata/fat-gcc* src/debug/macho/testdata/clang* src/debug/macho/testdata/gcc* : License « Go » -> Go
-Files  src/debug/elf/testdata/*-exec src/debug/elf/testdata/*.obj src/debug/elf/testdata/hello-world-core.gz : License « Go » -> Go
+Files src/debug/dwarf/testdata/typedef.macho src/debug/dwarf/testdata/typedef.elf : License « Go » -> BSD-3-Clause
+Files  src/debug/macho/testdata/fat-gcc* src/debug/macho/testdata/clang* src/debug/macho/testdata/gcc* : License « Go » -> BSD-3-Clause
+Files  src/debug/elf/testdata/*-exec src/debug/elf/testdata/*.obj src/debug/elf/testdata/hello-world-core.gz : License « Go » -> BSD-3-Clause
 Files src/debug/elf/elf.go src/cmd/link/internal/ld/elf.go : License « FreeBSD » -> FreeBSD
-Files src/math/cmplx/asin.go src/math/cmplx/exp.go src/math/cmplx/log.go src/math/cmplx/pow.go src/math/cmplx/sin.go src/math/ : License « Go » -> Go
-Files src/math/log1p.go src/math/acosh.go src/math/asinh.go src/math/atanh.go src/math/cbrt.go src/math/erf.go src/math/exp.go : License « Go » -> Go
+Files src/math/cmplx/asin.go src/math/cmplx/exp.go src/math/cmplx/log.go src/math/cmplx/pow.go src/math/cmplx/sin.go src/math/ : License « Go » -> BSD-3-Clause
+Files src/math/log1p.go src/math/acosh.go src/math/asinh.go src/math/atanh.go src/math/cbrt.go src/math/erf.go src/math/exp.go : License « Go » -> BSD-3-Clause
 Files src/image/jpeg/idct.go : License « MPEG » -> MPEG
 Files src/image/png/testdata/pngsuite/* : License « noderivs » -> noderivs
 Files src/cmd/vendor/github.com/google/pprof/* : License « Apache-2.0 » -> Apache-2.0
 Files src/cmd/vendor/github.com/google/pprof/third_party/svgpan/svgpan.go : License « BSD-3-clause-svgpan » -> BSD-3-clause-svgpan
 Files src/cmd/trace/static/* : License « BSD-3-clause » -> BSD-3-clause
-Files debian/* : License « Go » -> Go
-pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : Go AND X11 AND Go AND Go AND Go AND FreeBSD AND Go AND Go AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND Go
+Files debian/* : License « Go » -> BSD-3-Clause
+pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND X11 AND BSD-3-Clause AND BSD-3-Clause AND BSD-3-Clause AND FreeBSD AND BSD-3-Clause AND BSD-3-Clause AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND BSD-3-Clause
+nom Apache-2.0 : SPDX Apache-2.0 ; politique : allow
+nom BSD-3-Clause : SPDX BSD-3-Clause ; politique : allow
+nom BSD-3-clause : SPDX BSD-3-Clause ; politique : allow
+nom BSD-3-clause-svgpan : SPDX non ; politique : -
+nom FreeBSD : SPDX non ; politique : -
+nom MPEG : SPDX non ; politique : -
+nom noderivs : SPDX non ; politique : -
+nom X11 : SPDX X11 ; politique : absente
 ## verdict (licences.py, deux composants)
 licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
-     error    pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : Go AND X11 AND Go AND Go AND Go AND FreeBSD AND Go AND Go AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND Go ; expression invalide : identifiant SPDX inconnu : Go
+     error    pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND X11 AND BSD-3-Clause AND BSD-3-Clause AND BSD-3-Clause AND FreeBSD AND BSD-3-Clause AND BSD-3-Clause AND MPEG AND noderivs AND Apache-2.0 AND BSD-3-clause-svgpan AND BSD-3-clause AND BSD-3-Clause ; expression invalide : identifiant SPDX inconnu : FreeBSD
      ok       pkg:deb/debian/sample-app@1.0.0-1?arch=amd64 : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
 KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-stdlib.licences.json)
 bilan : KO
