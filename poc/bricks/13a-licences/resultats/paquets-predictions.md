@@ -64,3 +64,23 @@ un champ `License` du paragraphe d'en-tête est ignoré.
 ## Estimation
 Premier pas (deb, hors cluster) : ~0,2 pw. Volet complet (rpm, referrers, tâche signée) : dans les ~7 pw de la phase Packaging
 (README, ligne 75 ; 05, 06, 09, 13a).
+
+## Résultats de `deb` : lancement le 12/11/2026 à 19:43:12 UTC, fin à 19:43:13 UTC (`chrono.tsv`), code 0
+
+Accord : « Oui, lance deb » à « Je lance deb ? (paquets.sh, commit c444a8b) » ; HEAD c444a8b, arbre propre, contrôlés à 19:43:10 UTC.
+Journal : [`paquets-deb.log`](paquets-deb.log) ; prédicat : [`paquets-deb.licences.json`](paquets-deb.licences.json). Résultats écrits à
+partir de 19:43:35 UTC.
+
+| # | Résultat |
+|---|---|
+| P1 | **Tenue.** sha256 du deb `0b489d438370ddb6…` égal à l'épinglé, 1 952 080 octets |
+| P2 | **Tenue.** `control` : `sample-app` `1.0.0-1` `amd64` ; membres ar dans l'ordre exigé (sinon `paquets.py` aurait refusé) |
+| P3 | **Tenue.** Copyright du deb : sha256 `20c9dd35…`, 3 333 octets, identique à `poc/packaging/debian/copyright` |
+| P4 | **Tenue.** DEP-5 1.0, 6 paragraphes, 3 paragraphes `Files` ; expression `Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)` ; `licences.py` code 0 : 0 erreur, 0 avertissement, 0 NOASSERTION, 0 invalide, liste SPDX 3.27.0 |
+| P5 | **Tenue.** Les quatre témoins sont refusés à l'étage et au motif attendus : `t-gpl` (deny), `t-sans-format` (NOASSERTION), `t-sans-license` (analyse : champ manquant), `t-expat` (identifiant SPDX inconnu) |
+
+- Le prédicat porte le sha256 de la politique calculé par `licences.py` sur son JSON trié (`b9f47d89…`) ; le journal donne celui du
+  fichier (`dc284d67…`) : deux calculs du même fichier, pas un écart.
+- Ce qui est établi : la licence **déclarée** du deb construit, lue dans le paquet lui-même, est conforme à la politique de 13a.
+  Rien n'établit que les trois paragraphes couvrent tous les fichiers du paquet (licences conclues : 13b).
+- Suite du volet : rpm après S1 de la 05 ; `.dsc` et SRPM en referrer après S5b (accord à part) ; tâche de confiance signée.

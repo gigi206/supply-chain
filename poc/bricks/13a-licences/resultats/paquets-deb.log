@@ -1,0 +1,25 @@
+# paquets.sh deb, 2026-11-12T19:43:12Z
+politique : dc284d6739346df22552b7661531134ab68d01086f7a41d779c109d6ebb3dec2 ; licences.py : c708a5bce0b67ba04af9bf6f5039718fee7bb1d21a5be71568b359413e26319a ; paquets.py : 93f54878582a3db7a3ba46a2ed19945fc9e0baf25648d33e0925197f7f9fa739
+liste SPDX : /nix/store/cv0fsvzbdjrbjn8j6i52lfg49shvf9bg-spdx-license-list-data-3.27.0-json/json
+## deb de S3 de la 06
+OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+paquet : sample-app 1.0.0-1 amd64
+copyright : sha256 20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2 (3333 octets)
+format : DEP-5 1.0 ; paragraphes : 6
+Files * : License « Apache-2.0 » -> Apache-2.0
+Files vendor/github.com/go-chi/chi/v5/* : License « MIT » -> MIT
+Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND BSD-3-Clause
+purl : pkg:deb/debian/sample-app@1.0.0-1?arch=amd64
+expression du paquet : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+OK   copyright du deb identique à poc/packaging/debian/copyright (20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2)
+## verdict (licences.py)
+licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     ok       pkg:deb/debian/sample-app@1.0.0-1?arch=amd64 : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+OK   deb : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-deb.licences.json)
+## témoins négatifs (copyright synthétiques ; chacun doit être refusé)
+OK   t-gpl : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : GPL-3.0-or-later ; deny : GPL-3.0-or-later)
+OK   t-sans-format : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : NOASSERTION ; NOASSERTION : curation nécessaire)
+OK   t-sans-license : refusé par l analyse (paragraphe 2 : champ(s) manquant(s) : license)
+OK   t-expat : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : Expat ; expression invalide : identifiant SPDX inconnu : Expat)
+bilan : deb jugé conforme, quatre témoins refusés

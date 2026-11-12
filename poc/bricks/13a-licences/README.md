@@ -70,3 +70,7 @@ copyright DEP-5 devient un SBOM CycloneDX jugé par `licences.py`, avec la même
 Banc hors réseau : neuf cas au code attendu ([journal](resultats/paquets-essai-local.log)). Protocole, prédictions P1 à P5 et limites :
 [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Le rpm (après S1 de la 05), le `.dsc` et le SRPM en referrer
 (après S5b) et la tâche signée suivent.
+
+**Premier passage de `deb`, le 12/11/2026 de 19:43:12 à 19:43:13 UTC (« Oui, lance deb »)** : code 0, P1 à P5 tenues ([journal](resultats/paquets-deb.log),
+[résultats](resultats/paquets-predictions.md)). Licence déclarée du deb de la 06 : `Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)`, 0 erreur,
+0 NOASSERTION, 0 invalide ; copyright du deb identique à celui du dépôt ; quatre témoins refusés au motif attendu.
