@@ -229,3 +229,15 @@ Journal : [`s6a-promtool.log`](s6a-promtool.log). Copie détachée à `cecb367`,
 
 **Conséquence.** Les règles corrigées passent `check rules`, et tous les tests passent, y compris celui où seul le dépôt du deb déclenche `ScanEnRetard`. Q7 est donc tenue sur une copie avant S5b ; elle reste à rejouer par `regles` dans l'arbre, une fois le correctif commité après S5b. Rien n'a été déployé.
 
+## Note datée du 12/11/2026 (à partir de 13:36:30 UTC) : décision du propriétaire, « Test de règle seul »
+
+**Le propriétaire a retenu le test de règle comme seul témoin d'un scan manquant pour le deb.** Aucun témoin sur le modèle de `g8_suspendre` et `g8_reprendre` ne sera fait. La question laissée ouverte dans la note de 13:22:55 UTC est donc close.
+
+Ce qui couvre le cas :
+- **La règle** : le test neuf de `alertes-tests.yml`, où seul le dépôt du deb déclenche `ScanEnRetard`, passe `promtool test rules` (mesure : [`s6a-promtool.log`](s6a-promtool.log), sur une copie). Il reste à rejouer par `regles` dans l'arbre après S5b (Q7).
+- **La chaîne réelle de cette règle** a été exercée pour l'image par le témoin G8 de la 07a. Le correctif n'ajoute qu'une branche `absent()` par dépôt. Une erreur d'étiquette dans la branche du deb ferait sonner l'alerte en permanence, ce qui se verrait.
+- **La porte** : d'après l'ADR 0000, un arrêt du CronJob se voit par le refus de la porte après 7 jours. Ce défaut bloque, même sans alerte.
+
+**Limite acceptée** : la détection en service d'un scan manquant du deb n'est pas mesurée de bout en bout. Le témoin aurait coûté une modification de `plateforme.sh` (filtre par `depot`, fenêtres du passage de 11:15 UTC) et au moins 26 h 15 min de retard sur la porte du deb.
+
+La décision sur `rejeu.sh` et S6 reste à prendre avant le premier rejeu qui suit l'application des correctifs de S6a.
