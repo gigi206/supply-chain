@@ -162,3 +162,15 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 **Additif du 12/11/2026, 14:34:14 à 14:34:15 UTC : `rpm_sec` et `deb_sec` tenus sur une copie détachée avec le correctif (« Oui, lance-les »), code 0, 0 KO.**
 - R1 et R2 sont tenues : les invariants passent avec les cinq politiques, et les deux contre-épreuves de chaque étape signalent exactement ce qui était attendu ([journaux et comparaison](resultats/s1-sortie-predictions.md)).
 - Rien n'a été lu ni écrit dans le cluster, et le correctif n'est pas appliqué au dépôt.
+
+**Additif du 12/11/2026, à partir de 14:37:18 UTC : M2 cadré à sec (« Oui, prépare M2 »), NON LANCÉ.**
+- M2 n'est pas un script fini. Ses étapes dans le cluster dépendent des mesures de S1, et la syntaxe du mode hermétique de mock n'est pas encore relevée.
+- [`m2.sh`](m2.sh) ne contient que l'étape `releve` : sources de mock au tag `mock-6.9-1`, lues sur l'hôte et jamais exécutées. `bash -n` passe, et shellcheck ne relève aucun avertissement.
+- Établi sans réseau, depuis le primary d'EPEL vérifié par `hote` :
+  - mock 6.9-1 livre `mock-hermetic-repo` et `hermetic-build.cfg` ;
+  - il exige systemd-container, createrepo_c et usermode ;
+  - podman et skopeo ne sont que recommandés.
+- Protocole, embranchements et prédictions M1r à M6r : [`resultats/m2-predictions.md`](resultats/m2-predictions.md).
+- Deux points sont à décider :
+  - la lecture de D3 (a), car l'hôte n'a ni mock ni dnf ;
+  - une éventuelle image de bootstrap « prête », construite par notre chaîne.
