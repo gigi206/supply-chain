@@ -115,3 +115,9 @@ Commande, sur accord nommé (le script a changé) : `mise exec -- poc/bricks/06-
 - **V4c.** Trousseau présent, `gpgv` présent, et les trois signataires de S1 (`04B54C3C…`, `41587F7D…`, `B8B80B5B…`). Confiance moyenne : si l'une de ces clés est plus récente que le trousseau de la VM, il en manquera une, et ce sera écrit tel quel.
 - **Effets.** Rien d'installé ; aucune écriture dans le cluster ni dans Zot ; moins de 90 s.
 
+### Note datée du 12/11/2026 (rédigée à partir de 09:44:18 UTC, après relecture du conseiller), avant tout lancement de `v4`
+
+- **Défaut corrigé dans `s6b.sh`** : `sur bash -s … "$CLES"` passait les trois clés en trois arguments, puisque ssh recolle les arguments et que le shell distant les redécoupe. `$3` ne contenait que la première clé, et V4c aurait conclu « DIFFÉRENTS » même avec les trois bons signataires. Les clés sont désormais jointes par des virgules. Reproduit sur l'hôte, hors réseau : 5 arguments avant, 3 après, et les trois clés retrouvées.
+- **`sqv` ajouté à V1c** : apt de trixie peut vérifier les signatures avec `sqv` plutôt qu'avec `gpgv`. Prédiction : je ne prédis pas lequel des deux est installé. Si `gpgv` manque, V4c ne vérifie rien et le dit, sans rien installer.
+- **L'heure du titre de la section précédente** : « 09:40 » vient de `date -u` (09:40:56) ; le commit `844bf9e` est de 09:42:08 UTC.
+

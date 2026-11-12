@@ -140,12 +140,14 @@ EOS
 
 etape_v4() {
   echo "## V4 : instantané Debian depuis sc-replay (sans sudo, rien d'installé)"
-  sur bash -s "$INSTANTANE" "$INRELEASE" "$CLES" <<'EOS'
+  # clés jointes par des virgules : ssh recolle les arguments et le shell distant les redécoupe (corrigé le 12/11/2026 après
+  # 844bf9e, avant tout lancement : « $CLES » arrivait en trois arguments, et $3 ne contenait que la première clé)
+  sur bash -s "$INSTANTANE" "$INRELEASE" "${CLES// /,}" <<'EOS'
 set -euo pipefail
 export LC_ALL=C
 d=$(mktemp -d); trap 'rm -rf -- "$d"' EXIT
 echo "## V1 corrigée : état dpkg (ii = installé ; un = connu, non installé)"
-for p in mmdebstrap sbuild libsbuild-perl uidmap schroot gpgv debian-archive-keyring ca-certificates; do
+for p in mmdebstrap sbuild libsbuild-perl uidmap schroot gpgv sqv debian-archive-keyring ca-certificates; do
   s=$(dpkg-query -W -f='${db:Status-Abbrev}${Version}' "$p" 2>/dev/null || true)
   echo "$p : ${s:-inconnu de dpkg}"
 done
@@ -165,7 +167,7 @@ k=$(dpkg -L debian-archive-keyring 2>/dev/null | grep -E '^/usr/share/keyrings/d
 echo "trousseau : ${k:-absent}"
 if [ -n "$k" ] && command -v gpgv > /dev/null; then
   v=$(gpgv --keyring "$k" --status-fd 1 "$d/InRelease" 2>/dev/null | awk '$2 == "VALIDSIG" {print $NF}' | sort | paste -sd' ' || true)
-  e=$(tr ' ' '\n' <<< "$3" | sort | paste -sd' ')
+  e=$(tr ',' '\n' <<< "$3" | sort | paste -sd' ')
   echo "signataires (clés primaires) : ${v:-aucun}"
   [ "$v" = "$e" ] && echo "OK   mêmes signataires qu'en S1" || echo "DIFFÉRENTS de ceux de S1 ($e)"
 else

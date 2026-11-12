@@ -1745,3 +1745,20 @@ Elle attend ton accord nommé : `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh v4
 
 Il n'y a rien d'autre à préparer avant tes réponses : l'installation dans `sc-replay` (4 versions épinglées) attendra un accord nommé, après V4 et ces deux décisions.
 
+## Note datée du 12/11/2026, 09:44 UTC : correction de l'additif précédent, après relecture du conseiller
+
+L'additif précédent est de 09:42:08 UTC (commit `844bf9e`), et non de 09:41 : l'heure était extrapolée d'un `date -u` de 09:40:56.
+
+**Décision 1 : ma prémisse était fausse.**
+- Selon l'ordre (c), la VSA du deb est **signée dans la VM avant S5b** et poussée seulement après. Elle revient par un bundle versionné re-poussé, avec un `inputAttestations` vers un bundle horodaté effacé (point 7 de la carte de S6), comme celle de sample-app.
+- Elle désigne donc **l'une des quatre provenances d'aujourd'hui**. Ma phrase « désignera une provenance nouvelle » et mon argument contre `b9d4881e` ne tiennent pas.
+- La question reste celle du relevé : `b9d4881e` (S4d1, la première) ou `454728c5` (S4d3, la plus récente). Je recommande toujours **`454728c5`**, parce que c'est la provenance que la porte juge : porte et VSA portent alors sur la même provenance.
+- **Délai de 24 h** : « passent ce délai depuis le 12/11, 21:03:37 UTC » était faux à cette heure. Aucune ne le passe encore : `b9d4881e` à partir du 12/11 à 19:48:48 UTC, `454728c5` à partir du 12/11 à 21:03:37 UTC. `vsa.py` compare `finishedOn` à la fin de la reconstruction (`timeVerified`) : la reconstruction dans la VM doit finir après cette heure.
+- Une VSA refaite après S5b, sur une provenance nouvelle, changerait l'ordre (c). Elle demanderait de rejouer le contrôle 6 et d'attendre 24 h après le nouveau `finishedOn`. Je ne la propose pas.
+
+**Décision 2 : la recommandation A est inchangée, mais deux précisions.**
+- Dans A, la vérification qui protège le chroot est celle d'apt, pendant mmdebstrap, avec le trousseau de la VM. V4c n'en est qu'un **témoin préalable**.
+- Les paquets du chroot reconstruit seront **comparés à [`builder/paquets.txt`](builder/paquets.txt)** (199 lignes : nom, version, sha256, taille), la liste épinglée de la plateforme. Sans cette comparaison, un chroot lu sur l'instantané pourrait différer de celui de la plateforme sans qu'on le voie.
+
+**Défaut de `v4` corrigé avant tout lancement** ([note datée](resultats/s6b-predictions.md)) : les trois clés de S1 arrivaient en trois arguments par ssh, et V4c n'aurait comparé qu'une clé. `sqv` est ajouté à la liste de V1c.
+
