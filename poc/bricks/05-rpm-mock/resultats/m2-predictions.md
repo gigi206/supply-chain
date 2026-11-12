@@ -240,3 +240,24 @@ Le texte au-dessus n'est pas réécrit.
 - **Q2 :** `pull_digest` ne sert pas qu'à nommer le dossier. `mock-hermetic-repo.py:141` et `:142` l'ajoutent aussi à la référence tirée : il choisit le manifeste copié. Pour la voie 2, la copie se ferait donc par le `pull_digest` du verrou, et s'arrêterait s'il diffère de `BOOT_DIGEST` (`s1.sh:46`).
 - **Q4 :** `config.py:845` ajoute `"@" + pull_digest`. Le dossier attendu s'écrit donc `<dépôt hors ligne>/sc-stockage.poc.test@<pull_digest>`. Que `pull_digest` porte le préfixe `sha256:` sera lu dans le verrou réel.
 - **`releve3` corrigée à sec** (même heure, en-tête daté dans `m2.sh`) : `mock.py:811` à `:819` retire le préfixe `bootstrap_` des options du bootstrap. Le code qui compare le digest ou décide du repli peut donc lire `image_assert_digest`, `image_fallback` et `image_skip_pull`. L'étape cherche maintenant ces formes sans préfixe, qui couvrent aussi les formes préfixées. Elle garde 6 lignes de contexte après chaque `image_assert_digest`, pour R4r. `bash -n` et shellcheck passent ; les filtres ont été réessayés sur une entrée synthétique sans préfixe.
+
+## Résultat de `releve3`, le 12/11/2026 à 15:14:59 UTC (chrono.tsv : début et fin dans la même seconde ; accord « Oui, lance releve3 »)
+
+Code 0, 0 KO, [journal](m2-releve3.log) de 371 lignes. Résultat écrit à partir de 15:15:26 UTC. **Tout est lu dans le code, rien n'est mesuré.**
+
+| # | Verdict |
+|---|---|
+| R1r | **Tenue** : sha256 identique, moins d'une seconde. L'étape ne contient aucune commande réseau. |
+| R2r | **Tenue en partie.** `podman_get_oci_digest` (`podman.py:21` à `:59`) prend la sortie de `podman image inspect`, n'en garde que les sections `RootFS` et `Config`, les sérialise en JSON à clés triées et en tire un sha256. Ce n'est donc pas « les couches seules », comme le dit son commentaire : la configuration de l'image (variables, commande, étiquettes…) y entre aussi. Une copie qui garde les couches non compressées et le blob de configuration reproduit `image_digest` ; la compression ou le manifeste n'y entrent pas. |
+| R3r | **Tenue, pour ce qui dépend de mock.** Une image `dir:` est chargée par le même `podman pull` que les autres (`podman.py:116` à `:144`), puis étiquetée `mock-bootstrap-<uuid>` (`:146` à `:161`) ; le digest est lu sur cette étiquette (`:207` à `:210`). Que le transport `dir:` de podman n'ouvre aucune connexion relève de podman, pas de mock : non lu ici. |
+| R4r | **Tenue.** `image_assert_digest` n'est comparé qu'à un seul endroit, `buildroot.py:289` à `:295`, et un écart lève `BootstrapError`. Le mode hermétique pose `bootstrap_image_fallback = False` (`config.py:868`), alors que la valeur par défaut est `True` (`config.py:110`). Le traitement de l'exception autour de `buildroot.py:268` n'est lu qu'à la ligne près : que l'erreur arrête bien le build sans repli reste à voir en M3. |
+| R5r | **Tenue, d'après les lignes seules.** Les trois autres `split(':')` du code Python (`util.py:1167`, `buildroot.py:660`, `config.py:586`) semblent porter, d'après leurs noms de variables, sur des lignes de fichier ou sur l'option `--plugin-option`, pas sur une référence d'image. Les deux coupures de référence restent `config.py:844` et `mock-hermetic-repo.py:138`. |
+
+**Conséquences pour la voie 2, sans décision** :
+- La copie de l'image doit garder à l'identique le blob de configuration et les couches. `skopeo copy --preserve-digests` par le `pull_digest` du verrou le fait par construction ; la mesure le confirmera, puisque mock arrête le build si le digest diffère.
+- Le contrôle du digest de l'image reste donc fait par mock en M3. Celui des rpm reste à notre charge (`rpm -K`).
+- Le calcul passe par la sortie JSON de `podman image inspect`. Le verrou et le build devraient donc tourner avec le même podman, ce que donnerait l'image de S1 si M3 la réutilise.
+
+**Non prévu, lu** :
+- `pull_image` ajoute `--platform` si `oci_platform_map` connaît l'architecture visée (`podman.py:121` à `:125`). Avec un manifeste amd64 unique comme `ee90dc0e…`, sans effet attendu.
+- `podman_check_native_image_architecture` (`podman.py:62` à `:91`) compare l'architecture de l'image à celle de l'hôte.

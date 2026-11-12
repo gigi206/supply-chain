@@ -1,0 +1,371 @@
+# m2.sh releve3, 2026-11-12T15:14:59Z
+## archive du tag mock-6.9-1 gardée par releve (aucun accès réseau)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+## image de bootstrap : digest affirmé et chargement d'un dossier dir:
+### taille de podman.py : 276 lignes
+### podman.py entier (mock/py/mockbuild/podman.py, lignes 1 à 2000)
+  1: # -*- coding: utf-8 -*-
+  2: # vim: noai:ts=4:sw=4:expandtab
+  3: 
+  4: import hashlib
+  5: import json
+  6: import os
+  7: import logging
+  8: import subprocess
+  9: from contextlib import contextmanager
+  10: 
+  11: import backoff
+  12: from mockbuild.trace_decorator import getLog, traceLog
+  13: 
+  14: 
+  15: class PodmanError(Exception):
+  16:     """
+  17:     Exception raised by mockbuild.podman.Podman
+  18:     """
+  19: 
+  20: 
+  21: def podman_get_oci_digest(image, logger=None, podman_binary=None):
+  22:     """
+  23:     Get sha256 digest of RootFS layers. This must be identical for
+  24:     all images containing same order of layers, thus it can be used
+  25:     as the check that we've loaded same image.
+  26:     """
+  27:     logger = logger or logging.getLogger()
+  28:     podman = podman_binary or "/usr/bin/podman"
+  29:     logger.info("Calculating %s image OCI digest", image)
+  30:     check = [podman, "image", "inspect", image]
+  31:     result = subprocess.run(check, stdout=subprocess.PIPE,
+  32:                             stderr=subprocess.PIPE, check=False,
+  33:                             encoding="utf8")
+  34:     if result.returncode:
+  35:         logger.error("Can't get %s podman image digest: %s", image, result.stderr)
+  36:         return None
+  37:     result = result.stdout.strip()
+  38: 
+  39:     try:
+  40:         data = json.loads(result)[0]
+  41:     except json.JSONDecodeError:
+  42:         logger.error("The manifest data of %s are not json-formatted.", image)
+  43:         return None
+  44: 
+  45:     if 'RootFS' not in data:
+  46:         logger.error("RootFS section of %s is missing.", image)
+  47:         return None
+  48:     if data['RootFS']['Type'] != 'layers':
+  49:         logger.error("Unexpected format for RootFS in %s.", image)
+  50:         return None
+  51: 
+  52:     # data which should be sufficient to confirm the image
+  53:     data = {
+  54:         'RootFS': data['RootFS'],
+  55:         'Config': data['Config'],
+  56:     }
+  57:     # convert to json string with ordered dicts and create hash
+  58:     data = json.dumps(data, sort_keys=True)
+  59:     return hashlib.sha256(data.encode()).hexdigest()
+  60: 
+  61: 
+  62: def podman_check_native_image_architecture(image, logger=None, podman_binary=None):
+  63:     """
+  64:     Return True if image's architecture is "native" for this host.
+  65:     Relates:
+  66:         https://github.com/containers/podman/issues/19717
+  67:         https://github.com/fedora-copr/copr/issues/2875
+  68:     """
+  69: 
+  70:     logger = logger or logging.getLogger()
+  71:     podman = podman_binary or "/usr/bin/podman"
+  72:     logger.info("Checking that %s image matches host's architecture", image)
+  73:     sys_check_cmd = [podman, "version", "--format", "{{.OsArch}}"]
+  74:     image_check_cmd = [podman, "image", "inspect",
+  75:                        "--format", "{{.Os}}/{{.Architecture}}", image]
+  76: 
+  77:     def _podman_query(cmd):
+  78:         return subprocess.check_output(cmd, encoding="utf8").strip()
+  79: 
+  80:     try:
+  81:         system_arch = _podman_query(sys_check_cmd)
+  82:         image_arch = _podman_query(image_check_cmd)
+  83:         if system_arch != image_arch:
+  84:             logger.error("Image architecture %s doesn't match system arch %s",
+  85:                          image_arch, system_arch)
+  86:             return False
+  87:     except subprocess.SubprocessError as exc:
+  88:         logger.error("Subprocess failed: %s", exc)
+  89:         return False
+  90: 
+  91:     return True
+  92: 
+  93: 
+  94: def pull_fail_handler(details):
+  95:     """
+  96:     Raise an error when image pull fails, because lambdas can't raise.
+  97:     """
+  98:     raise PodmanError("Image pull failed")
+  99: 
+  100: 
+  101: class Podman:
+  102:     """ interacts with podman to create build chroot """
+  103: 
+  104:     @traceLog()
+  105:     def __init__(self, buildroot, image):
+  106:         self.podman_binary = "/usr/bin/podman"
+  107:         if not os.path.exists(self.podman_binary):
+  108:             raise PodmanError(f"'{self.podman_binary}' not installed")
+  109: 
+  110:         self.buildroot = buildroot
+  111:         self.image = image
+  112:         self.image_id = None
+  113:         getLog().info("Using container image: %s", image)
+  114: 
+  115:     @traceLog()
+  116:     def pull_image(self, timeout=None):
+  117:         """Pull the latest image, return True if successful."""
+  118:         logger = getLog()
+  119:         logger.info("Pulling image: %s", self.image)
+  120:         cmd = [self.podman_binary, "pull"]
+  121:         # Temporary workaround, see oci_platform_map in config.py and PR #1733/#1783.
+  122:         target_arch = self.buildroot.config.get('target_arch', '')
+  123:         oci_platform = self.buildroot.config.get('oci_platform_map', {}).get(target_arch)
+  124:         if oci_platform:
+  125:             cmd += ["--platform", oci_platform]
+  126:         cmd.append(self.image)
+  127: 
+  128:         try:
+  129:             res = subprocess.run(cmd, env=self.buildroot.env,
+  130:                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+  131:                                  timeout=timeout, check=False)
+  132:         except subprocess.TimeoutExpired:
+  133:             logger.warning("Pulling image %s timed out after %s seconds",
+  134:                            self.image, timeout)
+  135:             return False
+  136: 
+  137:         if res.returncode != 0:
+  138:             logger.error("%s\n%s", res.stdout, res.stderr)
+  139:             return False
+  140: 
+  141:         # Record the image id for later use.  This is needed for the
+  142:         # oci-image:tarball images that not necessarily have tags/names.
+  143:         self.image_id = res.stdout.decode("utf-8").strip()
+  144:         return True
+  145: 
+  146:     @property
+  147:     def _tagged_id(self):
+  148:         uuid = self.buildroot.config["mock_run_uuid"]
+  149:         bootstrap = "-bootstrap" if self.buildroot.is_bootstrap else ""
+  150:         return f"mock{bootstrap}-{uuid}"
+  151: 
+  152:     def tag_image(self):
+  153:         """
+  154:         Tag the pulled image as mock-{uuid}, or mock-bootstrap-{uuid}.
+  155:         """
+  156:         if not self.image_id:
+  157:             raise PodmanError("No image to tag. Image pull failed or was not attempted")
+  158:         cmd = ["podman", "tag", self.image_id, self._tagged_id]
+  159:         getLog().info("Tagging container image as %s", self._tagged_id)
+  160:         subprocess.run(cmd, env=self.buildroot.env, stdout=subprocess.PIPE,
+  161:                        stderr=subprocess.PIPE, check=True)
+  162: 
+  163:     def retry_image_pull(self, max_time, timeout=None):
+  164:         """Try pulling the image multiple times."""
+  165:         @backoff.on_predicate(backoff.expo, lambda x: not x,
+  166:                               max_time=max_time, jitter=backoff.full_jitter,
+  167:                               on_giveup=pull_fail_handler)
+  168:         def _keep_trying():
+  169:             return self.pull_image(timeout=timeout)
+  170:         _keep_trying()
+  171: 
+  172:     @contextmanager
+  173:     def mounted_image(self):
+  174:         """
+  175:         Using the "podman image mount" command, mount the image as a temporary
+  176:         read-only directory so we can copy-paste the contents into the final
+  177:         chroot directory.
+  178:         """
+  179:         logger = getLog()
+  180:         cmd_mount = [self.podman_binary, "image", "mount", self.image_id]
+  181:         cmd_umount = [self.podman_binary, "image", "umount", self.image_id]
+  182:         result = subprocess.run(cmd_mount, stdout=subprocess.PIPE,
+  183:                                 stderr=subprocess.PIPE, check=False,
+  184:                                 encoding="utf8")
+  185:         if result.returncode:
+  186:             message = "Podman mount failed: " + result.stderr
+  187:             raise PodmanError(message)
+  188: 
+  189:         mountpoint = result.stdout.strip()
+  190:         logger.info("mounting %s with podman image mount", self.image_id)
+  191:         try:
+  192:             logger.info("image %s as %s", self.image_id, mountpoint)
+  193:             yield mountpoint
+  194:         finally:
+  195:             logger.info("umounting image %s (%s) with podman image umount",
+  196:                         self.image_id, mountpoint)
+  197:             subprocess.run(cmd_umount, stdout=subprocess.PIPE,
+  198:                            stderr=subprocess.PIPE, check=True)
+  199: 
+  200:     def get_oci_digest(self):
+  201:         """
+  202:         Get sha256 digest of RootFS layers. This must be identical for
+  203:         all images containing same order of layers, thus it can be used
+  204:         as the check that we've loaded same image.
+  205:         """
+  206:         the_image = self.image
+  207:         if the_image.startswith("oci-archive:") or the_image.startswith("dir:"):
+  208:             # We can't query digest from tarball directly, but note
+  209:             # the image needs to be tagged first!
+  210:             the_image = self._tagged_id
+  211:         digest = podman_get_oci_digest(the_image, logger=getLog())
+  212:         if digest is None:
+  213:             raise PodmanError(f"Getting OCI digest for image {self.image} failed")
+  214:         return digest
+  215: 
+  216:     def check_native_image_architecture(self):
+  217:         """
+  218:         Check that self.image has been generated for the current
+  219:         host's architecture.
+  220:         """
+  221:         return podman_check_native_image_architecture(self.image_id, getLog())
+  222: 
+  223:     @traceLog()
+  224:     def cp(self, destination, tar_cmd):
+  225:         """ copy content of container to destination directory """
+  226:         getLog().info("Copy content of container %s to %s", self.image_id, destination)
+  227: 
+  228:         with self.mounted_image() as mount_path:
+  229:             # pipe-out the temporary mountpoint with the help of tar utility
+  230:             cmd_podman = [tar_cmd, "-C", mount_path, "-c", "."]
+  231:             with subprocess.Popen(cmd_podman, stdout=subprocess.PIPE) as podman:
+  232:                 # read the tarball from stdin, and extract to the destination
+  233:                 # directory (chroot directory)
+  234:                 cmd_tar = [tar_cmd, "-xC", destination, "-f", "-"]
+  235:                 with subprocess.Popen(cmd_tar, stdin=podman.stdout) as tar:
+  236:                     tar.communicate()
+  237:                     podman.communicate()
+  238: 
+  239:     def untag(self):
+  240:         """
+  241:         Remove the additional image ID we created - which means the image itself
+  242:         is garbage-collected if there's no other tag.
+  243:         """
+  244:         cmd = ["podman", "rmi", self._tagged_id]
+  245:         getLog().info("Removing image %s", self._tagged_id)
+  246:         subprocess.run(cmd, env=self.buildroot.env, stdout=subprocess.PIPE,
+  247:                        stderr=subprocess.PIPE, check=True)
+  248: 
+  249:     def read_image_id(self):
+  250:         """
+  251:         Given self.image (name), get the image Id.
+  252:         """
+  253:         cmd = ["podman", "image", "inspect", self.image, "--format",
+  254:                "{{ .Id }}"]
+  255:         getLog().info("Reading image .ID from %s", self.image)
+  256:         res = subprocess.run(cmd, env=self.buildroot.env,
+  257:                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+  258:                              check=True)
+  259:         self.image_id = res.stdout.decode("utf-8").strip()
+  260: 
+  261: 
+  262:     def inspect_hermetic_metadata(self):
+  263:         """
+  264:         Get the image metadata needed for the subsequent hermetic build.
+  265:         """
+  266:         get_query = '{"pull_digest": "{{ .Digest }}", "id": "{{.Id}}", "architecture": "{{ .Architecture }}"}'
+  267:         getLog().info("Reading image %s from %s", get_query, self.image)
+  268:         cmd = ["podman", "image", "inspect", "--format", get_query, self.image]
+  269:         res = subprocess.run(cmd, env=self.buildroot.env,
+  270:                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+  271:                              check=True)
+  272:         return json.loads(res.stdout.decode("utf-8").strip())
+  273: 
+  274: 
+  275:     def __repr__(self):
+  276:         return "Podman({}({}))".format(self.image, self.image_id)
+### image_assert_digest, avec ou sans préfixe bootstrap_ (mock.py:811 le retire), et les 6 lignes qui suivent
+  mock/py/mockbuild/buildroot.py:118:        self.image_assert_digest = self.config.get(f"{image}_image_assert_digest", None)
+  mock/py/mockbuild/buildroot.py-119-        self.image_keep_getting = self.config[f"{image}_image_keep_getting"]
+  mock/py/mockbuild/buildroot.py-120-        self.image_pull_timeout = self.config[f"{image}_image_pull_timeout"]
+  mock/py/mockbuild/buildroot.py-121-
+  mock/py/mockbuild/buildroot.py-122-        self.pkg_manager = None
+  mock/py/mockbuild/buildroot.py-123-        self.mounts = mounts.Mounts(self)
+  mock/py/mockbuild/buildroot.py-124-
+  --
+  mock/py/mockbuild/buildroot.py:289:                digest_expected = self.config.get("image_assert_digest")
+  mock/py/mockbuild/buildroot.py-290-                if digest_expected:
+  mock/py/mockbuild/buildroot.py-291-                    getLog().info("Checking image digest: %s",
+  mock/py/mockbuild/buildroot.py-292-                                  digest_expected)
+  mock/py/mockbuild/buildroot.py-293-                    digest = podman.get_oci_digest()
+  mock/py/mockbuild/buildroot.py-294-                    if digest != digest_expected:
+  mock/py/mockbuild/buildroot.py-295-                        raise BootstrapError(
+  --
+  mock/py/mockbuild/config.py:113:    config_opts['bootstrap_image_assert_digest'] = None
+  mock/py/mockbuild/config.py-114-
+  mock/py/mockbuild/config.py-115-    config_opts['use_buildroot_image'] = False
+  mock/py/mockbuild/config.py-116-    config_opts['buildroot_image'] = None
+  mock/py/mockbuild/config.py-117-    config_opts['buildroot_image_skip_pull'] = False
+  mock/py/mockbuild/config.py-118-    config_opts['buildroot_image_ready'] = False
+  mock/py/mockbuild/config.py-119-    config_opts['buildroot_image_fallback'] = False
+  --
+  mock/py/mockbuild/config.py:122:    config_opts['buildroot_image_assert_digest'] = None
+  mock/py/mockbuild/config.py-123-
+  mock/py/mockbuild/config.py-124-    config_opts['internal_dev_setup'] = True
+  mock/py/mockbuild/config.py-125-
+  mock/py/mockbuild/config.py-126-    # cleanup_on_* only take effect for separate --resultdir
+  mock/py/mockbuild/config.py-127-    # config_opts provides fine-grained control. cmdline only has big hammer
+  mock/py/mockbuild/config.py-128-    config_opts['cleanup_on_success'] = True
+  --
+  mock/py/mockbuild/config.py:864:    config_opts["bootstrap_image_assert_digest"] = data["bootstrap"]["image_digest"]
+  mock/py/mockbuild/config.py-865-
+  mock/py/mockbuild/config.py-866-    # It doesn't make sense to fallback to `dnf install dnf --installroot ...`,
+  mock/py/mockbuild/config.py-867-    # we simply don't have DNF stack pre-downloaded in offline_local_repository.
+  mock/py/mockbuild/config.py-868-    config_opts["bootstrap_image_fallback"] = False
+  mock/py/mockbuild/config.py-869-
+  mock/py/mockbuild/config.py-870-
+### images dir: et oci-archive:, dans tout le code Python
+  mock/py/mock.py:697:    if options.configdir:
+  mock/py/mockbuild/file_downloader.py:35:        if cls.tmpdir:
+  mock/py/mockbuild/file_downloader.py:90:        if not cls.tmpdir:
+  mock/py/mockbuild/file_util.py:20:            getLog().debug("created dir: %s", dirName)
+  mock/py/mockbuild/scm.py:157:        if self.int_src_dir:
+  mock/py/mockbuild/plugins/export_buildroot_image.py:55:                 "oci-archive:" + tarball])
+  mock/py/mockbuild/buildroot.py:1032:        if self.tmpdir:
+  mock/py/mockbuild/backend.py:441:        log.info("results dir: %s", self.config['local_repo_dir'])
+  mock/py/mockbuild/podman.py:207:        if the_image.startswith("oci-archive:") or the_image.startswith("dir:"):
+  mock/py/mockbuild/config.py:557:    if options.resultdir:
+  mock/py/mockbuild/config.py:559:    if options.rootdir:
+  mock/py/mockbuild/config.py:650:    if options.mode in ("rebuild",) and len(args) > 1 and not options.resultdir:
+  mock/py/mockbuild/config.py:654:    if options.mode == "chain" and options.resultdir:
+  mock/py/mockbuild/config.py:733:                "oci-archive:" + os.path.realpath(options.buildroot_image)
+  mock/py/mockbuild/config.py:847:    config_opts["bootstrap_image"] = f"dir:{bootstrap_dir}"
+### image_fallback et image_skip_pull, avec ou sans préfixe bootstrap_
+  mock/py/mockbuild/buildroot.py:117:        self.image_skip_pull = self.config[f"{image}_image_skip_pull"]
+  mock/py/mockbuild/buildroot.py:268:                if not self.config["image_fallback"]:
+  mock/py/mockbuild/buildroot.py:280:                if not self.image_skip_pull:
+  mock/py/mockbuild/config.py:108:    config_opts['bootstrap_image_skip_pull'] = False
+  mock/py/mockbuild/config.py:110:    config_opts['bootstrap_image_fallback'] = True
+  mock/py/mockbuild/config.py:117:    config_opts['buildroot_image_skip_pull'] = False
+  mock/py/mockbuild/config.py:119:    config_opts['buildroot_image_fallback'] = False
+  mock/py/mockbuild/config.py:868:    config_opts["bootstrap_image_fallback"] = False
+## coupures de références d'image
+### split(':') et split(":"), dans tout le code Python
+  mock/py/mock-hermetic-repo.py:138:    image_specification = image_specification.split(':')[0]
+  mock/py/mockbuild/util.py:1167:            items = line.split(':')
+  mock/py/mockbuild/buildroot.py:660:            parts = l.strip().split(':')
+  mock/py/mockbuild/config.py:586:            p, kv = option.split(":", 1)
+  mock/py/mockbuild/config.py:844:    image_pullspec = data['config']['bootstrap_image'].split(':')[0]
+## mode hermétique : tous les usages
+### hermetic_build et offline_local_repository
+  mock/py/mock.py:436:    if options.hermetic_build and options.chroot != 'default':
+  mock/py/mock.py:442:    if options.hermetic_build and options.mode != "rebuild":
+  mock/py/mock.py:700:    if options.hermetic_build:
+  mock/py/mock.py:989:        if options.hermetic_build:
+  mock/py/mockbuild/plugins/buildroot_lock.py:79:                    # process_hermetic_build_config() method.
+  mock/py/mockbuild/plugins/buildroot_lock.py:92:                    # process_hermetic_build_config() method.
+  mock/py/mockbuild/config.py:453:    config_opts["hermetic_build"] = False
+  mock/py/mockbuild/config.py:471:    process_hermetic_build_config(options, config_opts)
+  mock/py/mockbuild/config.py:808:def process_hermetic_build_config(cmdline_opts, config_opts):
+  mock/py/mockbuild/config.py:815:    if not cmdline_opts.hermetic_build:
+  mock/py/mockbuild/config.py:818:    config_opts["hermetic_build"] = True
+  mock/py/mockbuild/config.py:820:    json_conf, repo_reference = cmdline_opts.hermetic_build
+  mock/py/mockbuild/config.py:849:    config_opts["offline_local_repository"] = final_offline_repo
+  mock/py/mockbuild/config.py:867:    # we simply don't have DNF stack pre-downloaded in offline_local_repository.
+sources effacées ; archive gardée sous ~/.cache

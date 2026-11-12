@@ -209,3 +209,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - `mock-hermetic-repo` construit le dépôt avant de copier l'image, puis échouerait sur notre référence : la voie 2 le remplacerait en entier (téléchargement, `rpm -K`, `createrepo_c`, `skopeo copy`).
 - `ee90dc0e…` est le manifeste amd64, pas un index : une copie par ce digest n'a pas besoin de `--override-arch`.
 - `releve3` lira, sans réseau, comment mock calcule le digest affirmé et charge une image `dir:`. Prédictions R1r à R5r ; elle attend un accord nommé.
+
+**Résultat de `releve3`, le 12/11/2026 à 15:14:59 UTC (« Oui, lance releve3 »)** : code 0, 0 KO, archive inchangée ([journal](resultats/m2-releve3.log), [résultats](resultats/m2-predictions.md)). Lu, non mesuré.
+- Le digest que vérifie le mode hermétique est un sha256 des sections `RootFS` et `Config` de `podman image inspect` : une copie fidèle des couches et de la configuration le reproduit, quelle que soit la compression. R2r n'est tenue qu'en partie : la configuration y entre aussi.
+- Un écart de ce digest lève `BootstrapError`, et le mode hermétique interdit le repli. Il n'y a pas d'autre coupure de référence d'image que les deux déjà vues.
+- Pour la voie 2 : la copie de l'image par `skopeo copy --preserve-digests` reste contrôlée par mock en M3 ; aucune voie n'est choisie.
