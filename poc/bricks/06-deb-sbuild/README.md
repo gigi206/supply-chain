@@ -1801,3 +1801,5 @@ Commandes, dans cet ordre :
 
 Les commandes ne changent pas.
 
+**Note datée du 12/11/2026 (heure de la note précédente)** : « 09:54 UTC » n'a pas été relevée. Le `date -u` lancé juste avant la rédaction de la note précédente donnait 09:55:38, et son commit `8d538af` est de 09:55:39 UTC. Ces heures font foi ; le titre du commit `8d538af` porte la même erreur.
+

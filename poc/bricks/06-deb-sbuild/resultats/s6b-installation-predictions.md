@@ -101,3 +101,5 @@ Le commit des prédictions ci-dessus, `a530dcb`, est de 09:52:13 UTC. Trois déf
 
 **Après `installer`**, les 44 lignes `+` d'I4 seront comparées sur l'hôte à `builder/paquets.txt`. Cela fera voir lesquelles des 40 dépendances s'écartent des versions de la plateforme, sans changer le script.
 
+**Note datée du 12/11/2026 (heure de la note précédente)** : « 09:54 UTC » n'a pas été relevée. Le `date -u` lancé juste avant la rédaction de la note précédente donnait 09:55:38, et son commit `8d538af` est de 09:55:39 UTC. Ces heures font foi ; le titre du commit `8d538af` porte la même erreur.
+
