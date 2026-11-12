@@ -1,0 +1,33 @@
+# s1.sh hote, 2026-11-12T14:23:42Z
+## sources de sample-app
+sample-app-1.0.0.tar.gz: OK
+sample-app.spec: OK
+## clés, vérifiées sur l'hôte
+RPM-GPG-KEY-Rocky-9 : sha256 3a66e521e7a4abac9768d889c7cd60a8250f59512b275cf576c8a10ff34624c1
+RPM-GPG-KEY-EPEL-9 : sha256 fcf0eab4f05a1c0de6363ac4b707600a27a9d774e9b491059e59e6921b255a84
+OK   empreinte de la clé de Rocky : 21CB256AE16FC54C6E652949702D426D350D275D
+empreinte de la clé d'EPEL 9 : FF8AD1344597106ECE813B918A3872BF3228467C
+OK   empreinte d'EPEL 9 présente sur https://fedoraproject.org/security/
+## dépôts, vérifiés sur l'hôte
+baseos98 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   baseos98 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+baseos98 : repomd.xml sha256 abac8b17ece74b6f242af937c8143f2e76537eb6a82bdc876682bac38b1af163
+OK   baseos98 : 793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3-primary.xml.gz contrôlé par repomd.xml : 793c43d3d0c90b65a09f916bea356d3d8451e8c4d07523305a8e4164352bdbc3
+appstream98 : repomd.xml signé, signataire 21CB256AE16FC54C6E652949702D426D350D275D
+OK   appstream98 : signataire de repomd.xml (clé primaire) : 21CB256AE16FC54C6E652949702D426D350D275D
+appstream98 : repomd.xml sha256 a3ca4230ce7eda565514f3ab084ce1811903c3eb6308a4c0e0cc7b8af819907b
+OK   appstream98 : 9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00-primary.xml.gz contrôlé par repomd.xml : 9b5505979705394a1cfd3acb6fe27f64fdd503a51d19612118cf7830fb588b00
+epel9 : repomd.xml.asc absent
+epel9 : repomd.xml sha256 454b0238b80cd4642e11cea6d44cadb369cff2bb9fa9595a60bd58d2255c2430
+OK   epel9 : 22a1bc17a993c0fa72252c7fe99c6d966847e7ec0634f81b511c0d4a9360a3e5-primary.xml.xz contrôlé par repomd.xml : 22a1bc17a993c0fa72252c7fe99c6d966847e7ec0634f81b511c0d4a9360a3e5
+OK   vault 9.7 BaseOS : signataire de repomd.xml : 21CB256AE16FC54C6E652949702D426D350D275D
+vault 9.7 BaseOS : repomd.xml sha256 fa6d50542ea30eff797235527b46f0d21b7ec4159980f64580b4797589055258
+OK   vault 9.7 AppStream : signataire de repomd.xml : 21CB256AE16FC54C6E652949702D426D350D275D
+vault 9.7 AppStream : repomd.xml sha256 06f01d405f2d4743dd3fea4a3bf4e2ffada91b652b94d9458468064db15287d6
+OK   vault 9.7 CRB : signataire de repomd.xml : 21CB256AE16FC54C6E652949702D426D350D275D
+vault 9.7 CRB : repomd.xml sha256 3936113ee8724d84af42f17f17ad50b67a1cb10e8db9bd246e8609deebdf134f
+## paquets épinglés
+OK   mock-0:6.9-1.el9.noarch dans epel9 : sha256 a5043350d6d3efd92340f6d6fb221d720f6029ee8a9a8d09210d58f17752ba1e (Packages/m/mock-6.9-1.el9.noarch.rpm)
+OK   mock-core-configs-0:45.2-1.el9.noarch dans epel9 : sha256 84f19c05198b84454bd8f82bf791b3f82c4a7a9c7c4e35a29b7556d50908ccf6 (Packages/m/mock-core-configs-45.2-1.el9.noarch.rpm)
+OK   podman-6:5.8.2-8.el9_8.x86_64 dans appstream98 : sha256 561d6e4d506fa31ba549257787da32ebe9fb37590ad69a7eb3f694556fde4382 (Packages/p/podman-5.8.2-8.el9_8.x86_64.rpm)
+OK   skopeo-2:1.22.2-9.el9_8.x86_64 dans appstream98 : sha256 c6cca7fea115d74cfa5c86fa63acae7a6840c5da77bc78a9fb9e4194b2052afd (Packages/s/skopeo-1.22.2-9.el9_8.x86_64.rpm)

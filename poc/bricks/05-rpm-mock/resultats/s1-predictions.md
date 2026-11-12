@@ -76,3 +76,23 @@ Le script est [`s1.sh`](../s1.sh). Le jalon S1 est le M1 du [README](../README.m
   - `builds-sans-internet.yaml`.
 
   Les invariants `SOUS_REFUS` et `EXCLUS_SANS_SORTIE` refuseraient la politique tant que le `NotIn` ne contient pas `prefetch-rpm`. Tous ces fichiers sont rejoués par S5b : rien n'est modifié avant lui.
+
+## Résultat de l'étape `hote`, le 12/11/2026 de 14:23:42 à 14:23:58 UTC (chrono.tsv), accord « Oui, lance hote »
+
+Le journal est [`s1-hote.log`](s1-hote.log) : 0 KO. Lectures publiques depuis l'hôte seulement, sans cluster ni Zot.
+
+- **P2 tenue.**
+  - La clé de Rocky a l'empreinte `21CB256A…350D275D`.
+  - Les cinq repomd sont signés par elle : 9.8 BaseOS et AppStream, 9.7 BaseOS, AppStream et CRB.
+  - Les repomd de vault 9.7 ont les mêmes sha256 que le 05/11 (`fa6d5054…`, `06f01d40…`, `3936113e…`) : le dépôt est bien figé.
+- **P3 tenue.**
+  - EPEL 9 ne publie pas de `repomd.xml.asc`.
+  - L'empreinte de sa clé, `FF8AD134…3228467C`, figure sur fedoraproject.org/security/.
+- **P4 : épinglages tenus, détail de compression faux.** Les quatre paquets ont chacun un seul candidat :
+  - `mock-0:6.9-1.el9.noarch` et `mock-core-configs-0:45.2-1.el9.noarch` (EPEL) ;
+  - `podman-6:5.8.2-8.el9_8.x86_64` et `skopeo-2:1.22.2-9.el9_8.x86_64` (AppStream 9.8).
+  - Le primary d'EPEL est en **xz**, pas en zstd comme prédit ; ceux de Rocky sont bien en gzip.
+  - Époques relevées : 6 pour podman, 2 pour skopeo.
+- Les sha256 des quatre rpm sont au journal. Pub/9.8 et EPEL bougent : l'étape sera rejouée avant `racine`.
+
+Rien d'autre n'a tourné. P1 et P5 à P12 attendent S5b et la décision sur la sortie réseau des pods rpm.

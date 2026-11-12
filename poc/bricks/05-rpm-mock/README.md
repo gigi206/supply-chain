@@ -143,3 +143,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
   - `builds-sans-internet.yaml`.
 
   Les invariants `SOUS_REFUS` et `EXCLUS_SANS_SORTIE` refuseraient la politique tant que le `NotIn` ne contient pas `prefetch-rpm`. Tous ces fichiers sont rejoués par S5b : rien n'est modifié avant lui.
+
+**Additif du 12/11/2026, 14:23:42 à 14:23:58 UTC : étape `hote` de S1 lancée (« Oui, lance hote »), 0 KO** ([journal](resultats/s1-hote.log), [comparaison aux prédictions](resultats/s1-predictions.md)).
+- P2 et P3 sont tenues : clés de Rocky et d'EPEL conformes aux empreintes publiées, cinq repomd de Rocky signés, vault 9.7 inchangé depuis le 05/11, EPEL sans repomd signé.
+- P4 est tenue pour les quatre épinglages, mais fausse sur un détail : le primary d'EPEL est en xz, pas en zstd.
+- Cluster et Zot non touchés.
