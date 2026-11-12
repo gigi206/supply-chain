@@ -293,3 +293,13 @@ Mesure de la brique 06 (S6a, relevé 1, [résultats](../06-deb-sbuild/resultats/
 - Pour le binaire Go qu'il contient, extrait de `data.tar`, `distro=` n'est pas nécessaire : 140 correspondances par `github:language:go`, `govulndb:language:go` et `nvd:cpe`.
 - **La question reste ouverte pour les paquets de distribution** (rpm de la 05, dépendances deb), ce relevé ne les couvre pas.
 - Mesuré aussi : `scan-outil fusion` écarte un PURL sans version, et un SBOM d'artefact vide passe sans erreur (code 0, rien sur la sortie d'erreur).
+
+**Additif du 12/11/2026, à partir de 14:45:38 UTC : replanification de G7 après S5b préparée à sec (« Oui, prépare-la »), NON LANCÉE.**
+- S5b, avancé au 13/11, recrée Zot : la tâche `supply-chain-g7-premiere-suppression` du 21/11 ne vaudra plus.
+- [`g7-replanifier.sh`](g7-replanifier.sh) relèvera après S5b, en lecture seule :
+  - le démarrage de Zot et sa configuration de rétention, comparée au dépôt ;
+  - les dates des blobs de `builds/scan/**` et de `vulndb/grype`.
+
+  Il calculera ensuite la nouvelle heure de la tâche. Le calcul, rejoué sur les chiffres du 06/11, retrouve le plan d'alors (balayage le 21/11 à 15:14:56 UTC).
+- Procédure, prédictions G1 à G4 et brouillon de la consigne : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
+- La tâche planifiée n'est pas modifiée. Elle sera désactivée au lancement de S5b, sur le même accord.
