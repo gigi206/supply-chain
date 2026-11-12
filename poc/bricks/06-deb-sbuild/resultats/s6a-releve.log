@@ -1,0 +1,192 @@
+# s6a.sh releve, 2026-11-12T08:54:30Z
+## entrées
+syft 1.38.0, grype 0.104.1
+OK   sha256 du deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   manifeste du layout de la base : sha256:c142f6bc0c6d8e5e4a3d31b941200a12502ad90bb5ce93b78c875c868905619d
+OK   17 blobs de la base revérifiés par leur sha256
+scan-outil (07a, hôte) : sha256 3d442df7c0fedb11f5d5d8680b97c6305547aadc58737a6fe5bcb0e5ee63f1b2
+## P1 : format du deb (ar t)
+debian-binary
+control.tar.xz
+data.tar.xz
+## P2 : applets de busybox dans les couches de l'image de base (noms seulement)
+15 couches, 1865 entrées
+ar        ./busybox/ar 
+tar       ./busybox/tar 
+xz        ./busybox/xz 
+unxz      ./busybox/unxz 
+zstd      
+unzstd    
+gunzip    ./busybox/gunzip 
+dpkg-deb  ./busybox/dpkg-deb 
+## P3 : catalogueurs de syft (nom, étiquettes)
+sélection par défaut : ["all"] []
+deb-archive-cataloger : deb,debian,declared,directory,linux,os,package
+dpkg-db-cataloger : debian,directory,dpkg,image,installed,linux,os,package
+go-module-binary-cataloger : binary,directory,go,golang,gomod,image,installed,language,package
+## P4 : SBOM de l'artefact seul (syft dir: sur data.tar extrait)
+control.tar.xz
+data.tar.xz
+debian-binary
+./usr/bin/sample-app
+./usr/share/doc/sample-app/changelog.Debian.gz
+./usr/share/doc/sample-app/copyright
+code 0, sortie d'erreur : 0 octets
+3 composant(s) avec PURL
+   pkg:golang/example.com/supply-chain/sample-app
+   pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+   pkg:golang/stdlib@1.24.4
+## P5 : le deb comme fichier (syft dir: sur un dossier qui ne contient que lui)
+code 0, sortie d'erreur : 0 octets
+1 composant(s) avec PURL
+   pkg:deb/sample-app@1.0.0-1?arch=amd64
+## P6 : grype sur le SBOM de P4 (base de G0, sans -q : avertissements gardés)
+code 0 ; avertissements : 0
+correspondances : 140 ; distro vue par grype : {"name": "", "version": "", "idLike": null}
+   github.com/go-chi/chi/v5 v5.2.3 GHSA-j6qf-3m9c-vwj3 Medium github:language:go - 5.4.0
+   github.com/go-chi/chi/v5 v5.2.3 GHSA-mqqf-5wvp-8fh8 Medium github:language:go - 5.2.4
+   github.com/go-chi/chi/v5 v5.2.3 GO-2026-5774 Unknown govulndb:language:go - 5.3.0
+   github.com/go-chi/chi/v5 v5.2.3 GO-2026-5775 Unknown govulndb:language:go - 5.3.0
+   github.com/go-chi/chi/v5 v5.2.3 GO-2026-5777 Unknown govulndb:language:go - 5.3.0
+   stdlib go1.24.4 CVE-2025-4674 High nvd:cpe - 1.23.11,1.24.5
+   stdlib go1.24.4 CVE-2025-47906 Medium nvd:cpe - 1.23.12,1.24.6
+   stdlib go1.24.4 CVE-2025-47907 High nvd:cpe - 1.23.12,1.24.6
+   stdlib go1.24.4 CVE-2025-47912 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-58183 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-58185 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-58186 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-58187 High nvd:cpe - 1.24.9,1.25.3
+   stdlib go1.24.4 CVE-2025-58188 High nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-58189 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-61723 High nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-61724 Medium nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-61725 High nvd:cpe - 1.24.8,1.25.2
+   stdlib go1.24.4 CVE-2025-61726 High nvd:cpe - 1.24.12,1.25.6
+   stdlib go1.24.4 CVE-2025-61727 Medium nvd:cpe - 1.24.11,1.25.5
+   stdlib go1.24.4 CVE-2025-61728 Medium nvd:cpe - 1.24.12,1.25.6
+   stdlib go1.24.4 CVE-2025-61729 High nvd:cpe - 1.24.11,1.25.5
+   stdlib go1.24.4 CVE-2025-61730 Medium nvd:cpe - 1.24.12,1.25.6
+   stdlib go1.24.4 CVE-2025-61731 High nvd:cpe - 1.24.12,1.25.6
+   stdlib go1.24.4 CVE-2025-61732 High nvd:cpe - 1.24.13,1.25.7
+   stdlib go1.24.4 CVE-2025-68121 Critical nvd:cpe - 1.24.13,1.25.7,1.26.0-rc.3
+   stdlib go1.24.4 CVE-2026-111943 Medium nvd:cpe - 1.26.10,1.27.3
+   stdlib go1.24.4 CVE-2026-25679 High nvd:cpe - 1.25.8,1.26.1
+   stdlib go1.24.4 CVE-2026-27139 Low nvd:cpe - 1.25.8,1.26.1
+   stdlib go1.24.4 CVE-2026-27140 High nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-27142 Medium nvd:cpe - 1.25.8,1.26.1
+   stdlib go1.24.4 CVE-2026-27143 Critical nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-27144 High nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-27145 High nvd:cpe - 1.25.11,1.26.4
+   stdlib go1.24.4 CVE-2026-32280 High nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-32281 High nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-32282 Medium nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-32283 High nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-32288 Medium nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-32289 Medium nvd:cpe - 1.25.9,1.26.2
+   stdlib go1.24.4 CVE-2026-33811 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-33814 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-33818 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-39817 Medium nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39819 Medium nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39820 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39822 High nvd:cpe - 1.25.12,1.26.5,1.27.0-rc.2
+   stdlib go1.24.4 CVE-2026-39823 Medium nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39825 Medium nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39826 Medium nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-39836 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-42499 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-42501 High nvd:cpe - 1.25.10,1.26.3
+   stdlib go1.24.4 CVE-2026-42504 High nvd:cpe - 1.25.11,1.26.4
+   stdlib go1.24.4 CVE-2026-42505 Medium nvd:cpe - 1.25.12,1.26.5,1.27.0-rc.2
+   stdlib go1.24.4 CVE-2026-42507 Medium nvd:cpe - 1.25.11,1.26.4
+   stdlib go1.24.4 CVE-2026-46600 High nvd:cpe - 1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56853 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56857 Critical nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-56858 Medium nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56859 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56860 Medium nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56862 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56864 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56865 High nvd:cpe - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 CVE-2026-56866 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-78659 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-78660 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-78663 Critical nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-78667 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-78669 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-94439 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-94440 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-94444 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-94447 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-94448 Medium nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-97030 Medium nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-97031 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 CVE-2026-97032 High nvd:cpe - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2025-3849 High govulndb:language:go - 1.23.12,1.24.6
+   stdlib go1.24.4 GO-2025-3956 Medium govulndb:language:go - 1.23.12,1.24.6
+   stdlib go1.24.4 GO-2025-4006 High govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4007 High govulndb:language:go - 1.24.9,1.25.3
+   stdlib go1.24.4 GO-2025-4008 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4009 High govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4010 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4011 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4012 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4013 High govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4014 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4015 Medium govulndb:language:go - 1.24.8,1.25.2
+   stdlib go1.24.4 GO-2025-4155 High govulndb:language:go - 1.24.11,1.25.5
+   stdlib go1.24.4 GO-2025-4175 Medium govulndb:language:go - 1.24.11,1.25.5
+   stdlib go1.24.4 GO-2026-4337 Critical govulndb:language:go - 1.24.13,1.25.7,1.26.0-rc.3
+   stdlib go1.24.4 GO-2026-4340 Medium govulndb:language:go - 1.24.12,1.25.6
+   stdlib go1.24.4 GO-2026-4341 High govulndb:language:go - 1.24.12,1.25.6
+   stdlib go1.24.4 GO-2026-4342 Medium govulndb:language:go - 1.24.12,1.25.6
+   stdlib go1.24.4 GO-2026-4601 High govulndb:language:go - 1.25.8,1.26.1
+   stdlib go1.24.4 GO-2026-4602 Low govulndb:language:go - 1.25.8,1.26.1
+   stdlib go1.24.4 GO-2026-4603 Medium govulndb:language:go - 1.25.8,1.26.1
+   stdlib go1.24.4 GO-2026-4864 Medium govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4865 Medium govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4869 Medium govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4870 High govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4918 High govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4946 High govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4947 High govulndb:language:go - 1.25.9,1.26.2
+   stdlib go1.24.4 GO-2026-4970 High govulndb:language:go - 1.25.12,1.26.5,1.27.0-rc.2
+   stdlib go1.24.4 GO-2026-4971 High govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4976 Medium govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4977 High govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4980 Medium govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4981 High govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4982 Medium govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-4986 High govulndb:language:go - 1.25.10,1.26.3
+   stdlib go1.24.4 GO-2026-5026 High govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-5037 High govulndb:language:go - 1.25.11,1.26.4
+   stdlib go1.24.4 GO-2026-5038 High govulndb:language:go - 1.25.11,1.26.4
+   stdlib go1.24.4 GO-2026-5039 Medium govulndb:language:go - 1.25.11,1.26.4
+   stdlib go1.24.4 GO-2026-5856 Medium govulndb:language:go - 1.25.12,1.26.5,1.27.0-rc.2
+   stdlib go1.24.4 GO-2026-5972 High govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6088 High govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6089 High govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6090 High govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6091 Medium govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6218 Medium govulndb:language:go - 1.25.13,1.26.6,1.27.0-rc.3
+   stdlib go1.24.4 GO-2026-6599 Medium govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6600 Medium govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6603 High govulndb:language:go - 1.26.9
+   stdlib go1.24.4 GO-2026-6604 Critical govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6605 High govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6607 High govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6608 High govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6609 High govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6610 High govulndb:language:go - 1.26.9
+   stdlib go1.24.4 GO-2026-6611 High govulndb:language:go - 1.26.9
+   stdlib go1.24.4 GO-2026-6612 Critical govulndb:language:go - 1.26.9
+   stdlib go1.24.4 GO-2026-6613 High govulndb:language:go - 1.26.9,1.27.2
+   stdlib go1.24.4 GO-2026-6617 High govulndb:language:go - 1.26.9
+   stdlib go1.24.4 GO-2026-6809 Medium govulndb:language:go - 1.26.10,1.27.3
+## P7 : dossier vide avec -q, puis fusion avec le SBOM de la source
+code 0, sortie d'erreur : 0 octets
+0 composant(s) avec PURL
+OK   arbre de poc/sample-app à HEAD : 30e808ffa327288c656ddda7b6fafe4005234b77
+source seule : 4 composant(s) avec PURL
+fusion source + vide : 3 composant(s) avec PURL
+fusion source + artefact : 4 composant(s) avec PURL

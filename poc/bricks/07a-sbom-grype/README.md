@@ -285,3 +285,11 @@ Restent hors de portée : aucune suppression réelle avant le 18 novembre, et `r
 - `scan-sample-app` est suspendu depuis le 10/11 à 12:46:40 UTC, en attendant la décision du propriétaire.
 
 **Additif du 10/11/2026, 12:49 UTC** : sur la décision du propriétaire (« Oui, reprends-le »), `scan-sample-app` a été repris à 12:49:35 UTC. Aucun passage n'a été manqué ; le prochain est attendu le 11/11 à 09:30 UTC ([détail](resultats/g8-predictions.md)).
+
+## Additif du 12/11/2026, 08:58 UTC : deb de la 06, réponse partielle à la question de `distro=`
+
+Mesure de la brique 06 (S6a, relevé 1, [résultats](../06-deb-sbuild/resultats/s6a-predictions.md)), sur l'hôte, hors réseau, avec syft 1.38.0 et grype 0.104.1, et la base de G0.
+- Sur le `.deb` isolé de sbuild, syft n'émet pas `distro=` : `pkg:deb/sample-app@1.0.0-1?arch=amd64`, sans espace de noms.
+- Pour le binaire Go qu'il contient, extrait de `data.tar`, `distro=` n'est pas nécessaire : 140 correspondances par `github:language:go`, `govulndb:language:go` et `nvd:cpe`.
+- **La question reste ouverte pour les paquets de distribution** (rpm de la 05, dépendances deb), ce relevé ne les couvre pas.
+- Mesuré aussi : `scan-outil fusion` écarte un PURL sans version, et un SBOM d'artefact vide passe sans erreur (code 0, rien sur la sortie d'erreur).

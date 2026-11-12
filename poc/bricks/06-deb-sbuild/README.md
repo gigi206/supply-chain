@@ -1651,3 +1651,16 @@ Rédigée sur « continue » (cadre : préparer sans rien lancer), après relect
 - le relevé 1 de S6a sur l'hôte, hors réseau.
 
 Ce n'est pas un accord pour l'installation dans `sc-replay`, ni pour une écriture dans le cluster ou dans Zot : chacune aura son accord nommé. [Prédictions du relevé 1](resultats/s6a-predictions.md), commitées avant toute mesure.
+
+## Additif du 12/11/2026, 08:58 UTC : relevé 1 de S6a tenu
+
+Relevé sur l'hôte, hors réseau, de 08:54:30 à 08:54:37 UTC (troisième passage complet ; les deux premiers se sont arrêtés sur deux erreurs de lecture dans mon script). [Résultats](resultats/s6a-predictions.md) : P1 à P5 et P7 tenues, P6 en partie réfutée.
+
+- Le deb est en xz, et busybox dans la base d'`outils-scan` a `ar`, `xz`, `unxz` et `tar` : **pas de nouvelle image d'outils**.
+- `syft dir:` sur `data.tar` extrait donne 3 PURL Go, dont `stdlib@1.24.4`, sans `distro=`, qui n'est pas nécessaire. Grype trouve 140 correspondances, dont 135 sur la stdlib et 5 sur chi v5.2.3 (prédit : aucune). Aucune n'est KEV ni `MAL-`.
+- **Le vide est masqué, mesuré** : un artefact vide donne code 0 et rien sur la sortie d'erreur, et la fusion avec la source garde 3 PURL sur 4. Le seul apport du deb, la stdlib, disparaîtrait sans erreur. Le mode deb aura donc un plancher sur l'artefact seul.
+- Constat : la porte admettrait le deb avec 7 vulnérabilités Critical, puisque le contrôle 7 ne juge que les KEV et les `MAL-` (ADR 0000 §4). L'exactitude des correspondances de la stdlib, face à d'éventuels rétroportages Debian, n'est pas mesurée.
+
+**Correction datée** : le titre de l'additif « 08:56 UTC : décisions sur S6 » et celui des prédictions donnent une heure que je n'avais pas relevée. L'heure vraie est celle du commit `d40dd3c`, 08:52:49 UTC, avant la mesure.
+
+**Suite** : préparer à sec le mode deb de `scanner.sh` et son pod d'essai (forme de l'extraction par busybox), puis les relevés de S6b (versions de mmdebstrap et de sbuild candidates dans `sc-replay`, place, `finishedOn`). Aucune écriture dans le cluster ni dans Zot avant S5b et le relevé du 21/11.
