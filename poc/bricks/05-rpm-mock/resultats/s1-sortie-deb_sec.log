@@ -1,0 +1,16 @@
+# copie détachée de 47154e8, correctif ../s1-sortie-rpm.patch appliqué ; journal deb_sec de 08c/sortie-builds.sh, archivé ici
+# sortie-builds.sh deb_sec, 2026-11-12T14:34:15Z
+## invariants sur les politiques du dépôt (aucune lecture du cluster)
+OK   politiques lues dans le dépôt (kind et namespace builds) : 5
+politiques de builds : NetworkPolicy construction-sans-sortie, CiliumNetworkPolicy prefetch-sortie, CiliumNetworkPolicy builds-sans-internet, CiliumNetworkPolicy prefetch-deb-sortie, CiliumNetworkPolicy prefetch-rpm-sortie
+OK   politiques qui sélectionnent un pod de prefetch-gomod : CiliumNetworkPolicy prefetch-sortie
+OK   politiques qui autorisent du trafic à un pod de construire-image : 
+OK   politiques à sortie CIDR dont les pods seraient aussi sous un refus : 
+OK   labels exclus d'un refus sans politique de sortie dédiée : 
+OK   politiques qui sélectionnent un pod de prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+OK   politiques qui sélectionnent un pod de builds sans label : CiliumNetworkPolicy builds-sans-internet
+## contre-épreuve : NotIn sans prefetch-deb, l'invariant de sortie CIDR doit signaler prefetch-deb-sortie
+OK   politiques à sortie CIDR sous un refus, NotIn sans prefetch-deb : CiliumNetworkPolicy prefetch-deb-sortie
+## contre-épreuve : builds-sans-internet du dépôt sans prefetch-deb-sortie, l'invariant des labels exclus doit signaler prefetch-deb
+OK   politiques lues dans le dépôt (kind et namespace builds) : 5
+OK   labels exclus d'un refus sans politique de sortie dédiée, sans prefetch-deb-sortie : tekton.dev/task=prefetch-deb

@@ -67,3 +67,17 @@ Ni `rpm_sec` ni aucune autre étape n'a tourné.
   - `construire-image` : tout refusé, DNS compris ;
   - `prefetch-deb` : snapshot.debian.org joint en 80, le reste refusé.
 - **Textes périmés** : l'en-tête de `politiques/prefetch-rpm-sortie.yaml` reçoit une ligne datée. Le message KO de `s1.sh prealables` (« à décider ») n'est pas modifié : ce serait une modification de script. Il ne gêne rien, puisque l'étape s'arrête au même endroit.
+
+## Résultat de `rpm_sec` et `deb_sec`, le 12/11/2026 de 14:34:14 à 14:34:15 UTC (accord « Oui, lance-les »)
+
+Les deux étapes ont tourné sur une copie détachée de `47154e8`, avec le correctif appliqué, puis la copie a été retirée. Elles n'ont lu que l'hôte, sans cluster. Code 0, 0 KO. Journaux : [`s1-sortie-rpm_sec.log`](s1-sortie-rpm_sec.log) et [`s1-sortie-deb_sec.log`](s1-sortie-deb_sec.log). Le `chrono.tsv` de la copie donne 14:34:14 à 14:34:15 UTC pour `rpm_sec`, et 14:34:15 UTC pour `deb_sec`.
+
+- **R1 tenue.**
+  - Les cinq politiques du dépôt sont lues et tous les invariants passent.
+  - `prefetch-rpm-sortie` est la seule politique à sélectionner les pods `prefetch-rpm`.
+  - Sans `prefetch-rpm` dans le `NotIn`, l'invariant signale exactement `CiliumNetworkPolicy prefetch-rpm-sortie`.
+  - Sans la politique, il signale `tekton.dev/task=prefetch-rpm`.
+- **R2 tenue.** `deb_sec` passe avec le correctif, y compris sa contre-épreuve modifiée (`NotIn` sans `prefetch-deb`) : `CiliumNetworkPolicy prefetch-deb-sortie` est signalée, et elle seule.
+- Ces journaux n'appartiennent pas à la 08c, puisque le correctif n'y est pas appliqué. Les fichiers de travail de `sortie-builds.sh` (`~/.cache/…/travail/sortie-builds`) ont été réécrits par ce passage, comme à chaque lancement.
+
+R3 à R6 attendent S5b et l'application du correctif.

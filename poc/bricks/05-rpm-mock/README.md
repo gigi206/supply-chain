@@ -158,3 +158,7 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - **Vérifié à sec** : `bash -n`, shellcheck sans avertissement, `git apply --check`.
 - **Prédictions** R1 à R6 : [`resultats/s1-sortie-predictions.md`](resultats/s1-sortie-predictions.md).
 - **Calendrier** : appliqué après S5b, qui rejoue ces fichiers, et chaque étape sur accord nommé.
+
+**Additif du 12/11/2026, 14:34:14 à 14:34:15 UTC : `rpm_sec` et `deb_sec` tenus sur une copie détachée avec le correctif (« Oui, lance-les »), code 0, 0 KO.**
+- R1 et R2 sont tenues : les invariants passent avec les cinq politiques, et les deux contre-épreuves de chaque étape signalent exactement ce qui était attendu ([journaux et comparaison](resultats/s1-sortie-predictions.md)).
+- Rien n'a été lu ni écrit dans le cluster, et le correctif n'est pas appliqué au dépôt.
