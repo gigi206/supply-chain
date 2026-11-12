@@ -1794,3 +1794,10 @@ Commandes, dans cet ordre :
 - `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh sqv`
 - `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh installer`
 
+**Note datée du 12/11/2026, 09:54 UTC** : trois défauts corrigés avant tout lancement, après relecture du conseiller ([note](resultats/s6b-installation-predictions.md)) :
+- le témoin négatif de `sqv` n'est jugé que si l'original est accepté ;
+- un `KO` donne le code 1 ;
+- les `apt-get` d'`installer` lisent `/dev/null`, et non le script.
+
+Les commandes ne changent pas.
+

@@ -78,3 +78,26 @@ Les épinglages ne portent que sur les quatre paquets demandés, comme en R2. Le
 - La fermeture deb `bb7599a2` transportée ; sbuild lien coupé ; la VSA sur `454728c5`.
 
 Ces étapes viennent ensuite, avec leurs propres prédictions et accords.
+
+## Note datée du 12/11/2026 (rédigée à partir de 09:54 UTC, après relecture du conseiller), avant tout lancement
+
+Le commit des prédictions ci-dessus, `a530dcb`, est de 09:52:13 UTC. Trois défauts de `s6b.sh` sont corrigés avant tout lancement :
+1. **`sqv` : le témoin négatif pouvait conclure à tort.** Si `--cleartext` était mal compris, `sqv` aurait tout refusé, et S3 aurait affiché « copie altérée refusée » sans rien prouver. S3 n'est désormais jugé que si `sqv -n 1` accepte l'original ; sinon il est déclaré « NON JUGÉ ». Deux autres changements :
+   - le script journalise la présence de `--cleartext` dans `sqv --help` ;
+   - si `-n 3` échoue alors que `-n 1` passe, Packages.xz est contrôlé sur le message extrait par `-n 1`.
+2. **Codes de sortie** : un `KO` des étapes `sqv` et `installer` laissait le code 0. Chaque étape finit maintenant par un bilan, et par le code 1 au moindre `KO` (après le nettoyage, pour `installer`).
+3. **`installer` : les `apt-get` lisent `/dev/null`.** `bash -s` lit le script sur l'entrée standard, dont dpkg et les scripts des paquets auraient hérité. Un script de paquet qui la lit aurait avalé la suite : I4 et le nettoyage auraient sauté, avec le code 0.
+
+**Simulation sur l'hôte**, hors réseau, sur la copie de S1 de l'InRelease, avec un faux `sqv` :
+- correct : tout `OK`, code 0 ;
+- qui refuse tout : S3 « NON JUGÉ », code 1 ;
+- qui accepte tout : « copie altérée ACCEPTÉE », code 1.
+
+`bash -n` et `shellcheck -S warning` ne signalent rien.
+
+**Deux précisions sur la portée**
+- Que apt utilise `sqv` avec ce trousseau est **déduit, pas mesuré**. L'étape `sqv` journalise maintenant les sources d'apt (`Signed-By`) et les lignes `sqv` et `gpgv` de `apt-config dump`. Ces lignes ne sont pas prédites.
+- apt peut appliquer à `sqv` sa propre politique cryptographique ; je ne l'ai pas vérifié. Le témoin vaut donc pour `sqv` seul. La vérification qui compte reste celle d'apt pendant mmdebstrap.
+
+**Après `installer`**, les 44 lignes `+` d'I4 seront comparées sur l'hôte à `builder/paquets.txt`. Cela fera voir lesquelles des 40 dépendances s'écartent des versions de la plateforme, sans changer le script.
+
