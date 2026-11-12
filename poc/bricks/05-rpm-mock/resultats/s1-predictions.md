@@ -161,3 +161,5 @@ Les dix passages donnent les lignes attendues. Le premier jet de la correction a
 Après `--calculate-build-dependencies`, l'accroissement du nombre n'est pas prédit : je n'ai pas lu si le bootstrap y est initialisé à nouveau.
 
 **La modification de `s1.sh` demande un accord avant que `verrou` ne tourne.**
+
+**Accord du 12/11/2026, noté à 15:32:22 UTC** : « Oui, valide-la ». La correction de la sonde de l'étape `verrou` et l'ajout joint (commit 870ba1d) sont validés. L'étape elle-même n'est pas lancée : elle tournera après S5b, sur accord nommé.
