@@ -127,3 +127,24 @@ Les lignes du job sont affichées sans celles qui contiennent `jeton` ou `token`
 - Aucun appel à Grafana, ni au cluster.
 
 **Limite.** Le contrôle des identifiants de `poc-scan` dans les réponses est fait sans tube. Sous `pipefail`, `cat … | grep -q` peut rendre faux quand `grep` trouve, à cause du SIGPIPE de `cat`. Le contrôle aurait alors conclu à l'absence d'une fuite présente. `g7_grafana` (07a) utilise ce tube : c'est consigné ici, sans correction, puisque la 07a est rejouée par S5b telle quelle.
+
+## Note datée du 12/11/2026 (corrigé avant tout lancement, après le commit `e237b3d` de 14:08:07 heure de Paris, 13:08:07 UTC)
+
+Relecture du conseiller, sur trois points :
+- **Lignes du job affichées.** L'étape affichait les lignes du job lues dans Grafana, sans celles qui contiennent `jeton` ou `token`, et elles entraient ainsi dans `resultats/s6a-grafana.log` avant le contrôle des identifiants. Elles sont désormais comptées, jamais affichées, comme dans `g7_grafana`. `periodique` archive déjà celles de `kubectl logs`.
+- **Phrase inexacte de l'additif.** « Aucune n'est archivée » ne vaut que pour les réponses de Grafana elles-mêmes. Les lignes du journal de `fraicheur-scan` sont toujours affichées, et donc archivées dans le journal de l'étape, comme dans `g8_grafana`. Ce sont des dates (`scan …, base …`) et les messages de systemd.
+- **Lecteurs à une seule série : la liste était incomplète.** Deux autres lectures prennent `.data.result[0]` de `scan_dernier_referrer_timestamp_seconds`, dans `preuves.sh` (08) :
+  - ligne 3289, dans `etape_scan_saut_suspendre` ;
+  - ligne 3321, dans `etape_scan_saut_reprendre`.
+
+  Avec deux séries, aucune de ces lectures n'échoue : elles prennent en silence la première série rendue, image ou deb. Il y a donc cinq lecteurs en tout, tous hors du rejeu sauf `g8_metriques`. Aucun n'est corrigé : la 07a, la 08 et la 08c sont rejouées ou relues telles quelles.
+
+**Contrôle à sec ajouté.** `etape_grafana`, `mesure`, `ecarts` et `grafana_lignes` ont été extraits tels quels des scripts, puis exécutés hors réseau (`unshare -rn`). `curl` et `kubectl` étaient simulés, `HOME` pointait vers le bloc-notes, et les deux mots de passe étaient factices. Quatre cas :
+- nominal : `bilan : tout OK`, code 0 ;
+- mot de passe factice de `poc-scan` dans la réponse de Zot : un `ÉCART`, code 1 ;
+- HTTP 500 sur la requête d'OpenBao : `KO` de `grafana_lignes`, un `ÉCART`, code 1 ;
+- passage planifié de `scan-sample-app` après `periodique` : refus avant toute lecture, code 1.
+
+Dans les quatre cas, le dossier de travail est effacé à la sortie. Cela couvre la reprise de `grafana_lignes` par `eval`, ainsi que la portée de `ko`, `P` et `S8`. Grafana et Loki, eux, n'ont pas été interrogés.
+
+L'étape corrigée demande le même accord nommé, puisqu'elle n'a jamais tourné.

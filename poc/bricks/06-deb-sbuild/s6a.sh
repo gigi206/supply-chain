@@ -490,8 +490,9 @@ etape_grafana() { # ACCORD NOMMÉ, après periodique et fraicheur : lectures seu
     grep -q '^PUBLIE|' "$T/job.txt" && grep -q 'jeton du rôle scanner révoqué' "$T/job.txt" && break
     sleep 2
   done
-  echo "$(wc -l < "$T/job.txt") ligne(s) après $i essai(s) ; $(grep -ciE 'jeton|token' "$T/job.txt" || true) filtrée(s) à l'affichage (jeton|token)"
-  grep -viE 'jeton|token' "$T/job.txt" | sed 's/^/  /' || true
+  # corrigé avant tout lancement, après e237b3d : lignes comptées, jamais affichées (comme g7_grafana) ; periodique archive déjà
+  # celles de kubectl logs
+  echo "$(wc -l < "$T/job.txt") ligne(s) après $i essai(s), non affichées"
   for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
     'jeton du rôle scanner révoqué'; do
     mesure "visible dans Grafana : ${m%%, sha256*}" "$(grep -q -- "$m" "$T/job.txt" && echo oui || echo non)" oui
