@@ -89,3 +89,8 @@ prédicat de licences, avec la licence que Debian déclare pour `golang-1.24-src
 recoupé avec le verrou et le buildinfo) ; le deb n'est pas modifié. Banc hors réseau tenu ([journal](resultats/paquets-stdlib-essai-local.log)).
 Prédictions S1 à S6 : [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Axes 1 et 2 (`Static-Built-Using`, notice de Go
 dans le paquet) : une seule révision du paquet, après S5b.
+
+**Passage de `stdlib`, le 12/11/2026 à 20:05:09 UTC (« Oui, lance stdlib »)** : code 1, `bilan : KO`, comme prédit (S1 à S4 et S6 tenues, S5 en partie)
+([journal](resultats/paquets-stdlib.log), [résultats](resultats/paquets-predictions.md)). Le copyright de Debian pour `golang-1.24-src` nomme la licence du
+projet « Go », hors SPDX, avec quatre autres noms hors SPDX et `X11` hors politique : la bibliothèque standard n'est pas déclarable telle quelle. Suite à
+décider ; le deb n'est pas modifié.

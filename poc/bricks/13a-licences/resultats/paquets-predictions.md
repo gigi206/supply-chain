@@ -217,3 +217,37 @@ sans changer le deb. Rien de ce que l'étape écrit n'est relancé sans nouvel a
 *Note datée du 12/11/2026, écrite à 20:03:49 UTC* : la limite écrite pour l'étape `deb` (« un DEP-5 valide dont `Files:` ou `Copyright:`
 commence par une ligne vide est refusé ») vaut toujours pour les modes `deb` et `dep5` ; elle ne vaut plus pour le composant de la
 bibliothèque standard de l'étape `stdlib`, analysé en mode souple (voir cette étape).
+
+## Résultats de `stdlib` : lancement le 12/11/2026 à 20:05:09 UTC, code 1 (`bilan : KO`, attendu par S5), sans ligne « fait »
+
+Accord : « Oui, lance stdlib » à « Je lance stdlib ? (paquets.sh, commit 7cffdb1) » ; HEAD 7cffdb1, arbre propre, contrôlés à
+20:05:09 UTC. Dernière ligne du journal à 20:05:11 UTC (`date -u` de la commande) ; `chrono.tsv` n'a pas « 13a paquets stdlib fait » :
+le lanceur s'arrête sur le code 1 (`set -euo pipefail`). Journal : [`paquets-stdlib.log`](paquets-stdlib.log) ; prédicat archivé tel
+quel : [`paquets-stdlib.licences.json`](paquets-stdlib.licences.json). Résultats écrits à partir de 20:05:55 UTC.
+
+| # | Résultat |
+|---|---|
+| S1 | **Tenue.** sha256 `c396bc2c…` (21 182 488 octets), présent dans `verrou-deb.txt` et dans `s3-build-1.buildinfo` |
+| S2 | **Tenue.** `golang-1.24-src` `1.24.4-1` `all` ; `go1.24.4` du binaire égal à la version amont |
+| S3 | **Tenue.** Copyright de `golang-1.24-src` : sha256 `a739b83e…`, 16 932 octets, DEP-5 1.0, 22 paragraphes, dont 14 `Files` |
+| S4 | **Tenue.** L'analyse souple l'accepte sans défaut ; trois paragraphes `Files` ont leur valeur à la ligne suivante : l'analyse stricte les aurait refusés (correctif du conseiller décisif) |
+| S5 | **Tenue en partie.** Verdict non conforme, `bilan : KO`, code 1 : tenu. « L'expression contient `BSD-3-Clause`, licence du projet Go » : **non tenue telle qu'écrite** ; Debian nomme la licence du projet « Go » (`Files: *` et 6 autres paragraphes) ; `BSD-3-clause` ne couvre que `src/cmd/trace/static/*` |
+| S6 | **Tenue.** Témoin refusé avant l'appel principal (« sample-app n'est pas un paquet golang-X.Y-src ») |
+
+**Noms de licence du copyright de Debian**, confrontés à la liste SPDX 3.27.0 et à la politique de 13a (lecture du journal et des
+deux fichiers, après le lancement) :
+- hors SPDX : `Go` (7 paragraphes, dont `Files: *` et `debian/*`), `FreeBSD` (`src/debug/elf/elf.go`, `src/cmd/link/internal/ld/elf.go`),
+  `MPEG` (`src/image/jpeg/idct.go`), `noderivs` (`src/image/png/testdata/pngsuite/*`), `BSD-3-clause-svgpan` (un fichier de pprof) ;
+- SPDX mais absent de la politique : `X11` (fichiers de `src/cmd/internal/objabi/`) ;
+- SPDX et autorisés : `Apache-2.0` (pprof vendorisé dans `src/cmd`), `BSD-3-clause`.
+`licences.py` ne signale que le premier identifiant invalide (`Go`) ; les autres viennent de cette lecture.
+
+**Ce que cela dit, sans décision** :
+- La bibliothèque standard n'est pas déclarable telle quelle par la chaîne de 13a : il faudrait, au moins, traduire `Go` (texte de la
+  licence non relu ici, à comparer à `BSD-3-Clause`), et traiter les autres noms ou les écarter.
+- Plusieurs paragraphes portent sur des fichiers qui ne sont sans doute pas compilés dans `sample-app` (données de test, outils de
+  `src/cmd`) : la borne haute surcharge l'expression ; restreindre aux paquets compilés demanderait la liste des paquets du binaire,
+  que les informations de build ne donnent pas.
+- Le composant du deb reste conforme (`ok`), comme dans `deb`.
+- La suite (curation revue au sens de 13a, restriction aux fichiers compilés, autre source de licence) est à décider avec le
+  propriétaire ; rien n'est relancé.
