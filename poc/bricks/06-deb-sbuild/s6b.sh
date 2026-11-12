@@ -17,8 +17,16 @@
 #       V3  apt-get update ; candidats de mmdebstrap, sbuild, libsbuild-perl, uidmap ; ce qu'apt installerait sans recommandés
 #           (apt-get install --assume-no : rien installé)
 #       V4  instantané 20261105T000000Z joignable depuis la VM ? sha256 de son InRelease comparé à celui de S1
+#   v4      ACCORD NOMMÉ DU PROPRIÉTAIRE. V4 remesurée (ajoutée le 12/11/2026 après le second passage de releve, où curl, sans -L,
+#           n'a pas suivi la redirection 302) ; et la ligne « déjà là » de V1 remplacée par l'état dpkg de chaque paquet.
+#           VM seule, sans sudo, sans apt-get update : rien d'installé ; seule écriture, un dossier temporaire supprimé à la fin.
+#       V4a cible de la redirection, sans la suivre
+#       V4b InRelease lu en suivant les redirections (http et https seulement, 5 au plus), comme s1.sh (curl -fsSL) ; URL finale ;
+#           sha256 comparé à celui de S1
+#       V4c signature de cet InRelease vérifiée par gpgv avec le trousseau debian-archive-keyring de la VM, indépendant de la
+#           plateforme et des clés de ftp-master lues par S1 ; signataires (clés primaires) comparés à ceux de S1
 #
-# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve   (journal : resultats/s6b-releve.log)
+# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4   (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 h06=$(cd "$(dirname "$0")" && pwd)
@@ -34,6 +42,7 @@ builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9
 entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51"   # s4d.sh
 INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z            # s4a.sh, s4b.sh
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675       # s1-prealables.log : signataires vérifiés
+CLES="B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4"  # s1.sh
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
 SSH_DIR=$HOME/.cache/supply-chain-poc/10/ssh
 # IdentitiesOnly : seule la clé du domaine est proposée (premier passage du 12/11/2026, 09:16 UTC : « Too many authentication
@@ -129,7 +138,43 @@ rm -f /tmp/s6b-inrelease
 EOS
 }
 
-[ "${1:-}" = releve ] && [ $# = 1 ] || { echo "usage : $0 releve" >&2; exit 2; }
-chrono "S6b releve"
-{ echo "# ${0##*/} releve, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; etape_releve; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-releve.log"
-chrono "S6b releve fait"
+etape_v4() {
+  echo "## V4 : instantané Debian depuis sc-replay (sans sudo, rien d'installé)"
+  sur bash -s "$INSTANTANE" "$INRELEASE" "$CLES" <<'EOS'
+set -euo pipefail
+export LC_ALL=C
+d=$(mktemp -d); trap 'rm -rf -- "$d"' EXIT
+echo "## V1 corrigée : état dpkg (ii = installé ; un = connu, non installé)"
+for p in mmdebstrap sbuild libsbuild-perl uidmap schroot gpgv debian-archive-keyring ca-certificates; do
+  s=$(dpkg-query -W -f='${db:Status-Abbrev}${Version}' "$p" 2>/dev/null || true)
+  echo "$p : ${s:-inconnu de dpkg}"
+done
+echo "## V4a : redirection, non suivie"
+r=0; curl -sS -o /dev/null --max-time 30 -w 'HTTP %{http_code} ; cible %{redirect_url}\n' "$1/dists/trixie/InRelease" || r=$?
+echo "curl : code $r"
+echo "## V4b : InRelease, redirections suivies (http et https, 5 au plus)"
+r=0; curl -fsSL --proto-redir =http,https --max-redirs 5 --max-time 60 -o "$d/InRelease" \
+  -w 'HTTP %{http_code} ; %{num_redirects} redirection(s) ; URL finale %{url_effective}\n' "$1/dists/trixie/InRelease" || r=$?
+echo "curl : code $r"
+[ $r = 0 ] || { echo "KO   InRelease non lu"; exit 1; }
+s=$(sha256sum < "$d/InRelease" | cut -c1-64)
+echo "InRelease : sha256 $s, $(sed -n 's/^Date: //p' "$d/InRelease")"
+[ "$s" = "$2" ] && echo "OK   sha256 identique à celui de S1" || echo "DIFFÉRENT de celui de S1 ($2)"
+echo "## V4c : signature, trousseau Debian de la VM"
+k=$(dpkg -L debian-archive-keyring 2>/dev/null | grep -E '^/usr/share/keyrings/debian-archive-keyring\.(gpg|pgp)$' | head -1 || true)
+echo "trousseau : ${k:-absent}"
+if [ -n "$k" ] && command -v gpgv > /dev/null; then
+  v=$(gpgv --keyring "$k" --status-fd 1 "$d/InRelease" 2>/dev/null | awk '$2 == "VALIDSIG" {print $NF}' | sort | paste -sd' ' || true)
+  e=$(tr ' ' '\n' <<< "$3" | sort | paste -sd' ')
+  echo "signataires (clés primaires) : ${v:-aucun}"
+  [ "$v" = "$e" ] && echo "OK   mêmes signataires qu'en S1" || echo "DIFFÉRENTS de ceux de S1 ($e)"
+else
+  echo "gpgv ou trousseau absent : signature non vérifiée (rien installé)"
+fi
+EOS
+}
+
+case "${1:-}:$#" in releve:1|v4:1) ;; *) echo "usage : $0 releve|v4" >&2; exit 2 ;; esac
+chrono "S6b $1"
+{ echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
+chrono "S6b $1 fait"

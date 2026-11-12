@@ -1719,3 +1719,29 @@ Le second passage a tourné de 09:23:13 à 09:23:15 UTC, sur ton accord « Oui, 
 
 **Questions ouvertes**, avant l'installation dans `sc-replay` : la provenance à retenir parmi les quatre, la source des paquets du chroot, et V4 à remesurer.
 
+## Additif du 12/11/2026, 09:41 UTC : V4 à remesurer et deux décisions, préparées à sec, rien lancé
+
+Préparé sur « continue » : aucune commande n'a été lancée vers la VM, le cluster ou Zot.
+
+**V4 à remesurer** : nouvelle étape `v4` de [`s6b.sh`](s6b.sh), avec ses [prédictions](resultats/s6b-predictions.md). Elle tourne dans la VM seule, sans sudo ni `apt-get update` :
+- la cible de la redirection 302 ;
+- l'InRelease lu en suivant la redirection, comme `s1.sh`, et son sha256 comparé à celui de S1 ;
+- sa signature, vérifiée par `gpgv` avec le trousseau Debian de la VM ;
+- l'état dpkg de chaque paquet visé, qui remplace la ligne trompeuse « déjà là : libsbuild-perl ».
+
+Elle attend ton accord nommé : `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh v4`.
+
+**Décision 1 : la provenance que la VSA désigne.**
+- `vsa.py` désigne une provenance par son `invocationId`. Il exige le bundle horodaté de cette invocation, et au moins 24 h entre `finishedOn` et la vérification. Les quatre provenances d'aujourd'hui passent ce délai depuis le 12/11, 21:03:37 UTC.
+- **S5b remet Zot à zéro** (point 7 de la carte de S6), et la plateforme doit y reconstruire le deb deux fois ([C6 de S5b](../08-trust-plane/resultats/s5b-predictions.md), confiance moyenne). Les quatre provenances et leurs bundles horodatés disparaissent. La VSA poussée après S5b (ordre c) désignera donc une provenance nouvelle, pas l'une des quatre.
+- **Ma recommandation : une règle plutôt qu'un identifiant.** La VSA désigne la provenance la plus récente du digest au moment du rejeu, celle que la porte juge (S4d3). Son `invocationId` est relevé et écrit au journal. Avant S5b, pour la VSA signée dans la VM et non poussée, la règle donne `454728c5`.
+- L'autre voie, la première exécution (`b9d4881e`), ne se transpose pas après S5b : rien ne dit quelle exécution S5b fera en premier.
+
+**Décision 2 : d'où viennent les paquets du chroot.**
+- **A, l'instantané lu par la VM.** `sc-replay` lit les paquets sur snapshot.debian.org. L'InRelease est contrôlé deux fois : par son sha256, fixé en S1, et par la signature, vérifiée avec le trousseau Debian de la VM (V4c). mmdebstrap tourne lien ouvert ; sbuild tourne ensuite lien coupé, comme R4 pour l'image. Les octets ne passent pas par la plateforme.
+- **B, le miroir de la plateforme transporté.** C'est le miroir partiel de `prefetch-deb`, que `construire-builder` lit dans un PVC. Je n'ai pas relevé s'il en existe une copie dans Zot. Transporté, il serait revérifié par le même InRelease. Le domaine n'aurait plus besoin d'accès extérieur, mais les octets viendraient de la plateforme.
+- **Ma recommandation : A**, si V4 est tenue. C'est la seule voie où le domaine ne reçoit de la plateforme que des empreintes. La fermeture deb `bb7599a2`, nommée dans la provenance, reste transportée, comme les entrées de l'image en R3.
+- Le volume du chroot à télécharger n'est pas mesuré ; S2 a mesuré 509 Mo pour le chroot construit.
+
+Il n'y a rien d'autre à préparer avant tes réponses : l'installation dans `sc-replay` (4 versions épinglées) attendra un accord nommé, après V4 et ces deux décisions.
+

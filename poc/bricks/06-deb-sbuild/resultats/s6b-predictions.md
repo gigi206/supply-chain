@@ -97,3 +97,21 @@ Journal : `s6b-releve.log`. H1 est identique au premier passage, ligne à ligne,
 - 55,3 Mo sur 13 306 Mo libres. Il reste à prévoir le chroot (509 Mo en S2), la fermeture (216 Mio), le build et ses copies : quelques Go au plus.
 - Les espaces de noms sans privilège et les subuid sont en place pour `sbuild --chroot-mode=unshare` sous le compte `replay`. Il n'y a rien à changer au système.
 
+## Étape `v4` préparée à sec (12/11/2026, rédigée à partir de 09:40 UTC, sur « continue »), NON LANCÉE
+
+V4 n'a pas été jugée au second passage : `curl` n'avait pas `-L`, alors que `s1.sh` lit le même InRelease avec `curl -fsSL`. Je ne rejoue pas tout le relevé, ce qui écraserait `s6b-releve.log` et referait `apt-get update`. J'ajoute une étape `v4` à [`s6b.sh`](../s6b.sh), qui ne joue que la VM :
+- **sans sudo** ni `apt-get update` : rien d'installé, et la seule écriture est un dossier temporaire, supprimé à la fin ;
+- **V1c** : l'état dpkg de chaque paquet visé (`ii` installé, `un` connu mais non installé). Il remplace la ligne trompeuse « déjà là : libsbuild-perl ». Le format est vérifié sur l'hôte, où `libsbuild-perl` donne aussi `un` ;
+- **V4a** : la cible de la redirection, sans la suivre ;
+- **V4b** : l'InRelease lu en suivant les redirections, en http et https seulement, 5 au plus ; l'URL finale ; le sha256 comparé à celui de S1 ;
+- **V4c** : la signature vérifiée par `gpgv` avec le trousseau `debian-archive-keyring` de la VM. Ce trousseau ne doit rien à la plateforme ni aux clés de ftp-master que S1 a lues sur l'hôte. Les signataires sont comparés à ceux de S1.
+
+Commande, sur accord nommé (le script a changé) : `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh v4`. Journal : `s6b-v4.log`. `bash -n` passe sur le script et sur la partie VM.
+
+**Prédictions**
+- **V1c.** `mmdebstrap`, `sbuild`, `uidmap` et `schroot` : inconnus de dpkg ou `un` ; `libsbuild-perl` : `un`. `debian-archive-keyring` : `ii`. `gpgv` : `ii`, confiance moyenne, puisqu'il ne figure pas parmi les 44 paquets qu'apt ajouterait avec gnupg. Je ne prédis pas `ca-certificates`.
+- **V4a.** HTTP 302, vers une URL de snapshot.debian.org sous `/archive/debian/<horodatage>/dists/trixie/InRelease`, avec un horodatage réel antérieur ou égal à `20261105T000000Z`. Confiance moyenne : la cible pourrait aussi être en https.
+- **V4b.** Code 0, HTTP 200 après une redirection, sha256 `0584fba3…`, celui de S1. Confiance haute pour le sha256 : S1 a lu la même URL en suivant la redirection, et un instantané ne change pas. Si la cible est en https et que `ca-certificates` manque, `curl` échoue (code 60) : ce serait une mesure, pas un faux succès.
+- **V4c.** Trousseau présent, `gpgv` présent, et les trois signataires de S1 (`04B54C3C…`, `41587F7D…`, `B8B80B5B…`). Confiance moyenne : si l'une de ces clés est plus récente que le trousseau de la VM, il en manquera une, et ce sera écrit tel quel.
+- **Effets.** Rien d'installé ; aucune écriture dans le cluster ni dans Zot ; moins de 90 s.
+
