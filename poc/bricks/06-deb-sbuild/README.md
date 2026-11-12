@@ -1905,3 +1905,10 @@ Préparée après « Oui, prépare-la », sur le modèle de R5 de la brique 10 (
 - le push des commits ;
 - puis les lancements, chacun sur accord nommé.
 
+**Note datée du 12/11/2026, 10:56 UTC**, après relecture du conseiller ([note](resultats/s6b-vsa-predictions.md)). Avant tout lancement :
+- **Ordre** : un seul push, après le commit des résultats de `rebuild`.
+- **`vsa_essai`** construit l'énoncé complet sans l'écrire, et vérifie la présence de la clé sans la lire.
+- **`vsa`** refuse une politique qui porte encore une mention de projet.
+- **Rangement** : la porte fixe déjà `builds/vsa/sample-app-deb`.
+- **Une question te revient** : faut-il revendiquer `SLSA_BUILD_LEVEL_3` pour un deb construit dans un pod Kata privilégié ([notes de relecture](rejeu/politique-replay-deb.md)) ?
+

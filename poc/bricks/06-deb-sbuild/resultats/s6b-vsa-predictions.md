@@ -56,3 +56,32 @@ Préparées après « Oui, prépare-la », sur le modèle de R5 de la brique 10.
   - `inputAttestations` (manifeste du bundle `bundle-21edfa0ca581bad6`) ;
   - `verifier.version` : sbuild `0.89.3+deb13u4`, mmdebstrap `1.5.7-1+deb13u1`, dpkg-dev `1.22.22`, `go1.26.10` et les trois sha256.
 - **S2.** Signature : `attest-blob` code 0, vérification par la clé du domaine code 0, sans tlog ni horodatage, énoncé identique.
+
+## Note datée du 12/11/2026 (rédigée à partir de 10:56:18 UTC, après relecture du conseiller), avant tout lancement
+
+Les prédictions ci-dessus ont été commitées dans `1b36f83`, à 10:50:25 UTC.
+
+**Ordre corrigé.** `vsa` exige que HEAD soit poussé. Un push fait avant `rebuild` serait dépassé par le commit des résultats de `rebuild`, et il faudrait un second « oui ». L'ordre devient :
+1. `vsa_essai` ;
+2. ta relecture de la politique et ta réponse sur `SLSA_BUILD_LEVEL_3`, puis le commit qui la fige ;
+3. `rebuild` ce soir ; je propose `ATTENTE_HORS_LIGNE=300`, puisque la répétition a duré 72 s ;
+4. le commit des résultats, puis **un seul push**, avec ton « oui » ;
+5. `POLITIQUE_COMMIT=<commit qui fige> mise exec -- poc/bricks/06-deb-sbuild/s6b.sh vsa`.
+
+**Corrections, avant tout lancement**
+- **`vsa_deb.py` construit l'énoncé avant le test des KO**, et ne l'écrit que sans KO. L'essai exerce ainsi toutes les lectures de l'énoncé : versions par `dpkg-query`, sha256 des trois outils, politique, `inputAttestations`.
+- **`vsa_essai` vérifie la présence des fichiers de la clé du domaine** : `cosign.key`, `cosign.pub` et `mot-de-passe`, par `test -s`, sans les lire.
+- **`vsa` refuse une politique qui porte encore une mention de projet** (« non figé », « projet du », « à décider », « question au propriétaire »).
+- **Rangement** : fixé par la porte (`builds/vsa/sample-app-deb`). Ce n'est pas une question.
+
+**Prédictions révisées de `vsa_essai`**
+- **E2 bis.** Le prédicat s'affiche avant le refus, avec :
+  - `"verificationResult": "PASSED"` ;
+  - `timeVerified` `2026-11-12T10:44:05Z` ;
+  - les versions sbuild `0.89.3+deb13u4`, mmdebstrap `1.5.7-1+deb13u1` et dpkg-dev `1.22.22`, et `go1.26.10` ;
+  - le sha256 de `rebuild_deb.sh`, qui est celui de la copie de répétition (`1422b13d…`) ;
+  - `policy.uri` `essai-non-figee` ;
+  - `inputAttestations` sur le manifeste de `bundle-21edfa0ca581bad6`.
+- **E4.** Les trois fichiers de la clé sont présents (`test -s`). Confiance haute : la VSA de l'image a été signée avec eux en R5.
+- **E3 révisée.** Bilan : « refus attendu (3 KO …), énoncé construit mais non écrit, clé présente ».
+

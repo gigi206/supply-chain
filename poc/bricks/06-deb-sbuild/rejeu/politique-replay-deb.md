@@ -82,3 +82,14 @@ Mêmes règles que dans la brique 10 : `SLSA_BUILD_LEVEL_3` si la section 1 tien
 - Les mêmes que la brique 10 : avec D1 (b) et D2 (a), le propriétaire, ou le root de l'hôte, peut forger à la fois la provenance et la VSA.
 - La provenance propre des deux fermetures et de l'artefact de packaging n'est pas vérifiée par le domaine. Seuls leurs digests déclarés le sont.
 - S5b remet Zot à zéro. `inputAttestations` désignera alors un bundle horodaté effacé, et la VSA ne reviendra que par un bundle versionné re-poussé, si `039949f9` se reproduit.
+
+## Notes de relecture, 12/11/2026 (à partir de 10:56:18 UTC, après relecture du conseiller) : à intégrer au texte au moment de le figer
+
+Ces notes s'ajoutent au projet commité dans `1b36f83`, à 10:50:25 UTC. Le commit qui figera la politique réécrira les passages concernés, avec ton accord, et le dira dans son message. `vsa` refuse une politique qui porte encore une mention de projet.
+
+1. **Section 3, InRelease** : l'égalité de son sha256 avec S1 est mesurée sur les lectures par curl des étapes `v4`, `sqv` et `trousseau`, et non sur la lecture d'apt pendant mmdebstrap. apt, lui, a vérifié la signature avec `sqv` ; le témoin négatif l'a mesuré. **Ce qui lie le chroot, c'est l'égalité de sa couche avec celle de l'image de build déclarée.** Le texte doit le dire ainsi.
+2. **Section 6, rangement** : ce n'est pas une décision. La porte de la 08 (`politique/porte/vsa.sh`) dérive le dépôt de la VSA du nom de l'artefact : `builds/<nom>` devient `builds/vsa/<nom>`. Pour le deb, c'est donc `builds/vsa/sample-app-deb`.
+3. **Section 5, `SLSA_BUILD_LEVEL_3` : question au propriétaire.** Pour l'image, la 10 s'appuie sur les mesures de la 08 : isolation, et clé hors des nœuds de build. Le deb est construit dans un pod Kata **privilégié**. Je n'ai pas relevé de mesure archivée qui porte ce niveau pour une tâche privilégiée sous Kata. Deux choix :
+   - garder le niveau en citant une mesure ;
+   - ne revendiquer que `POC_REPLAY_BIT_IDENTIQUE` pour le deb.
+

@@ -637,11 +637,15 @@ etape_vsa_essai() { # essai de vsa_deb.py (levier e), RIEN SIGNÉ : politique de
   echo "## vsa_deb.py (dans la VM, unshare -rn), sur le résultat de la répétition"
   o=$(sur "cd /home/replay/s6b/r5 && unshare -rn python3 -I vsa_deb.py '$REG_NOM' '$DEB_SUJET' '$INVOCATION' 'essai-non-figee' '$URL_TSA'; echo \"code \$?\"; ls enonce.json 2>/dev/null || echo 'aucun énoncé'")
   echo "$o"
+  # fichiers de la clé du domaine : présence seulement (test -s), jamais lus (corrigé avant tout lancement, après 1b36f83)
+  local cle; cle=$(sur 'for f in /home/replay/vsa/cosign.key /home/replay/vsa/cosign.pub /home/replay/vsa/mot-de-passe; do test -s "$f" && echo "présent, non lu : $f" || echo "ABSENT : $f"; done')
+  echo "$cle"
   local k; k=$(grep -c '^KO ' <<< "$o" || true)
-  if grep -qx 'code 1' <<< "$o" && grep -qx 'aucun énoncé' <<< "$o" && [ "$k" = 3 ] \
+  if grep -qx 'code 1' <<< "$o" && grep -qx 'aucun énoncé' <<< "$o" && [ "$k" = 3 ] && [ "$(grep -c '^présent, non lu' <<< "$cle")" = 3 ] \
+     && grep -q '"verificationResult": "PASSED"' <<< "$o" && grep -q '"vsa_deb.py": "[0-9a-f]\{64\}"' <<< "$o" \
      && grep -q '^KO   lien coupé au départ' <<< "$o" && grep -q '^KO   lien toujours coupé à la fin' <<< "$o" \
      && grep -q '^KO   timeVerified .* au moins 24 h' <<< "$o"; then
-    echo "bilan : refus attendu (3 KO : lien établi au départ et à la fin, délai), aucun énoncé"
+    echo "bilan : refus attendu (3 KO : lien établi au départ et à la fin, délai), énoncé construit mais non écrit, clé présente"
   else
     echo "bilan : écart à l'attendu ($k KO)"; exit 1
   fi
@@ -658,6 +662,8 @@ etape_vsa() { # DANS LA VM, sous unshare -rn : rejeu/vsa_deb.py (énoncé), sign
     && grep -q '^bilan : PASSED' "$R/s6b-rebuild.log" || { echo "REFUS : rebuild non valable hors ligne (resultats/s6b-rebuild.log)"; exit 1; }
   u=https://github.com/gigi206/supply-chain/blob/$c/$f
   mkdir -p "$x" && git -C "$h06" show "$c:$f" > "$x/politique-replay-deb.md"
+  ! grep -qiE 'non figé|projet du|à décider|question au propriétaire' "$x/politique-replay-deb.md" \
+    || { echo "REFUS : la politique de $c porte encore une mention de projet"; exit 1; }   # corrigé avant tout lancement, après 1b36f83
   echo "politique : $u"
   echo "vsa_deb.py de HEAD ($(git -C "$h06" rev-parse --short HEAD)) : $(git -C "$h06" show "HEAD:poc/bricks/06-deb-sbuild/rejeu/vsa_deb.py" | sha256sum | cut -c1-64)"
   transporter_r5 "$x/politique-replay-deb.md"; rm -rf -- "${x:?}"

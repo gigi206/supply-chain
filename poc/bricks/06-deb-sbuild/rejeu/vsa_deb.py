@@ -91,10 +91,8 @@ verifie = heure(r4["fin_deb"]) if r4.get("fin_deb") else None
 verdict(verifie is not None and verifie - fini >= datetime.timedelta(hours=24),
         f"timeVerified {r4.get('fin_deb')} au moins 24 h après finishedOn {p['runDetails']['metadata']['finishedOn']}")
 
-if ko:
-    print(f"REFUS : {len(ko)} condition(s) manquante(s), aucun énoncé écrit")
-    sys.exit(1)
-
+# énoncé construit avant le test des KO (corrigé avant tout lancement, après 1b36f83) : l'essai sur la répétition exerce aussi ces
+# lectures (versions, sha256 des outils, politique) ; le fichier n'est écrit que sans KO
 vsa = {
     "_type": "https://in-toto.io/Statement/v1",
     "subject": [{"name": f"{REG}/{DEPOT}", "digest": {"sha256": SUJET.split(":")[1]}}],
@@ -105,7 +103,7 @@ vsa = {
                                  "go": open("/usr/local/go/VERSION").readline().strip(),
                                  "verifier_deb.py": sha256(f"{R3}/verifier_deb.py"), "rebuild_deb.sh": sha256(f"{R4}/rebuild_deb.sh"),
                                  "vsa_deb.py": sha256("vsa_deb.py")}},
-        "timeVerified": r4["fin_deb"],
+        "timeVerified": r4.get("fin_deb"),
         "resourceUri": f"oci://{REG}/{SUJET_REF}",
         "policy": {"uri": POLITIQUE_URI, "digest": {"sha256": sha256("politique-replay-deb.md")}},
         "inputAttestations": [{"uri": f"oci://{REG}/horodatage/bundles@{mb}", "digest": {"sha256": mb.split(":")[1]}}],
@@ -114,5 +112,9 @@ vsa = {
         "slsaVersion": "1.2",
     },
 }
-json.dump(vsa, open("enonce.json", "w"), indent=1)
 print(json.dumps(vsa["predicate"], indent=1))
+if ko:
+    print(f"REFUS : {len(ko)} condition(s) manquante(s), aucun énoncé écrit")
+    sys.exit(1)
+json.dump(vsa, open("enonce.json", "w"), indent=1)
+print("énoncé écrit : enonce.json")
