@@ -1687,3 +1687,14 @@ Préparé sur « continue » (cadre : à sec). Rien n'a tourné : ni pod, ni SSH
 
 **Suite** : sur accord, l'essai puis le relevé. Viendront ensuite, chacune sous son accord nommé, la décision sur la source des paquets du chroot et l'installation dans `sc-replay`. Aucune écriture dans le cluster autre que l'essai, et rien dans Zot, avant S5b et le relevé du 21/11.
 
+## Additif du 12/11/2026, 09:18 UTC : premiers passages de l'essai et du relevé 1 de S6b
+
+Les deux étapes ont été lancées par toi depuis le terminal, à 09:16 UTC.
+
+- **Essai de S6a** : le pod a été refusé à l'admission par `limites-obligatoires` (08c, H5), faute de limite de CPU. C'était mon erreur. Rien n'a tourné. La limite est ajoutée ([note](resultats/s6a-essai-predictions.md)) et l'essai n'est pas rejoué.
+- **Relevé 1 de S6b** : H1 à H3 sont tenues ([résultats](resultats/s6b-predictions.md)).
+  - Le layout `039949f9` se reconstruit, octet à octet, à partir des seuls octets du deb.
+  - Le tag `.att` porte quatre provenances de pipeline aux mêmes entrées, la dernière finie le 11/11 à 21:03:37 UTC.
+  - Les entrées à transporter font 227 Mo.
+  - La partie dans la VM n'a pas tourné : SSH a été coupé avant l'authentification. `IdentitiesOnly=yes` est ajouté, et la partie n'est pas rejouée.
+

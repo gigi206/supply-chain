@@ -61,3 +61,23 @@ Ce sont des questions pour la suite, après le relevé.
    La création du chroot se ferait lien établi ; le rebuild, lien coupé, comme en R4.
 2. **Fermeture deb et sources.** Elles sont transportées comme en R3, sur un transport non fiable, puis revérifiées dans la VM contre la provenance vérifiée.
 3. **Comparaison du chroot.** L'archive du chroot reconstruit pourrait être comparée, par son sha256, à la couche `opt/sbuild/trixie-amd64.tar` de `749d746c`. Ce serait une mesure de plus, que le contrôle 6 n'exige pas.
+
+## Premier passage (12/11/2026, 09:16:23 UTC) : H1 à H3 mesurées, V1 à V4 non jouées
+
+Lancé par le propriétaire depuis le terminal. Journal : `s6b-releve-premier-passage.log`.
+
+**Arrêt.** La connexion SSH à `sc-replay` a été coupée avant l'authentification (« Too many authentication failures »). Rien n'a tourné dans la VM : ni `apt-get update`, ni aucune lecture. Ensuite, une connexion de diagnostic depuis ma session (`ssh -v … true`, entre 09:16:23 et 09:18 UTC ; heure exacte non relevée) a passé du premier coup avec la seule clé du domaine (« Server accepts key »). L'agent de ma session n'a qu'une clé.
+
+**Cause : non établie.** L'hypothèse la plus probable est que l'environnement du terminal proposait d'autres clés avant celle du domaine. Je ne l'ai pas vérifiée. La correction ne dépend pas de la cause : `-o IdentitiesOnly=yes` dans `s6b.sh`, pour que seule la clé du domaine soit proposée. Le script corrigé demande un nouvel accord.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| H1 | **Tenue**, avec un écart de forme | Tag `.att` : **8 couches**, toutes `https://slsa.dev/provenance/v1` de sujet `039949f9`. **Quatre PipelineRuns**, chacun donnant deux provenances : celle de la pipeline (11 entrées) et celle de la TaskRun `publier-image` (2 entrées : `publier-image` `d21931f3`, `outils-horodatage` `c7bebae2`). PipelineRuns : `b9d4881e` (19:41:24 à 19:48:48 UTC), `629b6bb1` (19:48:57 à 19:55:56), `b0e14893` (20:49:00 à 20:56:26), `454728c5` (20:56:35 à 21:03:37). Le dernier `finishedOn` est **21:03:37 UTC le 11/11**, dans la fenêtre prédite : le délai de 24 h est dépassé pour toutes à partir du 12/11, 21:03:37 UTC. Les 11 entrées comprennent les cinq prédites (`749d746c`, `bb7599a2`, `50dc73f7`, `c1719b13`, `construire-deb` `3726ff0b`), plus la pipeline `sample-app-deb` `82c8373d`, `preparer-deb` `588617b8`, `outils-prefetch` `68e0ae70`, `outils-horodatage`, `publier-image` et le commit `6391fd43`. Les quatre provenances de pipeline ont les mêmes entrées. |
+| H2 | **Tenue** | Couche reconstruite `12dd5c42…` (1 955 840 octets). **Manifeste identique, octet à octet, à celui de Zot ; digest `039949f9`.** Le layout se reconstruit donc à partir des seuls octets du deb, avec le tar de l'hôte. |
+| H3 | **Tenue** | Fermeture deb `bb7599a2` : 167 couches, 226 446 597 octets (216 Mio). Fermeture des sources `50dc73f7` : 8 couches, 220 881 octets. Packaging `c1719b13` : 6 couches, 29 805 octets. Total : environ 227 Mo, sous 1 Go. |
+| V1 à V4 | **Non mesurées** | Pas de connexion |
+
+**Conséquences pour S6b**
+- **Une provenance à retenir parmi quatre.** `vsa.py` en désigne une par son `invocationId`, comme `INVOCATION` pour l'image. Les quatre ont les mêmes entrées, donc la recette est la même. Le choix reste à faire avec toi. Le plus simple est la première, `b9d4881e` (S4d1), ou la dernière, `454728c5` (S4d3, rattrapage).
+- **Ce qu'il faut reproduire.** H2 montre que `PASSED` ne dépend plus que de la reproduction du deb `0b489d43` dans le domaine. Le layout s'en déduit.
+

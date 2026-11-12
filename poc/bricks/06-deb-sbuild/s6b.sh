@@ -36,7 +36,9 @@ INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z           
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675       # s1-prealables.log : signataires vérifiés
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
 SSH_DIR=$HOME/.cache/supply-chain-poc/10/ssh
-SSH_OPTS=(-i "$SSH_DIR/id_ed25519" -o UserKnownHostsFile="$SSH_DIR/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
+# IdentitiesOnly : seule la clé du domaine est proposée (premier passage du 12/11/2026, 09:16 UTC : « Too many authentication
+# failures », sans doute des clés d'un agent proposées avant elle)
+SSH_OPTS=(-i "$SSH_DIR/id_ed25519" -o IdentitiesOnly=yes -o UserKnownHostsFile="$SSH_DIR/known_hosts" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 sur() { ssh "${SSH_OPTS[@]}" "replay@$VM_IP" "$@"; }
 
 chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
