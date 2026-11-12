@@ -389,6 +389,8 @@ Après « continue », sur relecture du conseiller. **Ce n'est pas une étape** 
 
 **Ce que le banc ne prouve pas** : les sorties réelles de `rpm -K`, `rpm -qp`, `createrepo_c` et `skopeo` dans l'image ; le format réel de sigmd5 dans un verrou de mock ; le réseau, Zot et la sortie du pod ; l'absence d'un outil. Le script du pod a tourné sous dash sur l'hôte (`/bin/sh`), alors que le pod aura le `sh` de Rocky, non relevé dans l'image. `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`) sur `m2.sh` ni sur le banc.
 
+*Note du 12/11/2026, à partir de 18:01:55 UTC (après « continue », sur relecture du conseiller)* : l'absence d'un outil est couverte depuis. Trois cas pod (`sans_rpm`, `sans_createrepo_c`, `sans_skopeo`) retirent le faux outil le temps du cas ; l'hôte n'a aucun des trois, avec ou sans mise. Le banc relancé à 18:02:13 UTC rend 21 cas, dont ces trois refusés (code 1, « KO <outil> absent de l image ») ; les 18 autres donnent la même sortie qu'à 16:39:28 UTC (seule la ligne d'en-tête du journal change). Le paragraphe ci-dessus n'est pas réécrit.
+
 **Prédictions pour le premier passage réel**, après S1 et `verrou` :
 
 | # | Prédiction | Confiance | Si elle tombe |

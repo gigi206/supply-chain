@@ -1,4 +1,4 @@
-# essai hors réseau du cœur de la voie 2 de m2.sh (outils simulés, banc m2-voie2-essai-local.sh), 2026-11-12T16:39:28Z
+# essai hors réseau du cœur de la voie 2 de m2.sh (outils simulés, banc m2-voie2-essai-local.sh), 2026-11-12T18:02:13Z
 source remplacée : 1
 BOOT_DIGEST d essai : 1
 == cas hôte nominal
@@ -125,4 +125,13 @@ createrepo_c --compatibility : rc 0 en 0 s
 repomd.xml : sha256 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064
 skopeo copy --preserve-digests : rc 0 en 0 s
 KO   manifeste copié sha256:ac948da2e7a22124eccd4494e6d57616ae3e84ab3f0d54cf2ef4f7aa034f2ddc, attendu sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+code 1
+== cas pod sans_rpm
+KO   rpm absent de l image
+code 1
+== cas pod sans_createrepo_c
+KO   createrepo_c absent de l image
+code 1
+== cas pod sans_skopeo
+KO   skopeo absent de l image
 code 1

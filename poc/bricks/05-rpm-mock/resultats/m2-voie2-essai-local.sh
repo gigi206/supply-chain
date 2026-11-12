@@ -8,6 +8,9 @@
 # différent, createrepo_c en échec, manifeste différent.
 # Non couvert : sorties réelles de rpm -K, rpm -qp, createrepo_c et skopeo dans l'image ; format réel de sigmd5 dans un verrou
 # de mock ; réseau, Zot, sortie du pod ; absence d'un outil (command -v), puisque l'hôte n'a ni rpm, ni createrepo_c, ni skopeo.
+# Note du 12/11/2026, à partir de 18:01:55 UTC (après « continue », sur relecture du conseiller) : cas pod sans_rpm, sans_createrepo_c et
+# sans_skopeo ajoutés, le faux outil retiré de $H/bin le temps du cas ; l'hôte n'en a aucun des trois (command -v, avec et sans
+# mise), donc l'absence est réelle. La phrase « Non couvert » ci-dessus n'est pas réécrite : ce point est couvert depuis.
 set -u
 D=$1; H=$2   # D : racine du dépôt ; H : dossier d'essai (vidé)
 rm -rf -- "${H:?}"; mkdir -p "$H/bin" "$H/home" "$H/b/resultats" "$H/w/cles"
@@ -81,7 +84,9 @@ pod() { # cas : voie2_preparer nominal, puis VOIE2 dans le faux pod
   rm -rf -- "${H:?}/o" "${H:?}/w/voie2" "${H:?}/curl.urls"; mkdir -p "$H/w/voie2"
   HOME=$H/home bash "$H/b/m2.sh" voie2_preparer "$H/verrou.json" "$H/o" > /dev/null 2>&1 || { echo "préparation en échec"; return; }
   cp "$H/o/liste.tsv" "$H/w/voie2/liste.tsv"
+  case $1 in sans_*) mv "$H/bin/${1#sans_}" "$H/retire" ;; esac
   CAS=$1 VOIE2_RACINE=$H/w PATH=$H/bin:$PATH sh -s < "$H/o/voie2.sh" 2>&1 | sed "s#$H#<essai>#g"; echo "code ${PIPESTATUS[0]}"
+  case $1 in sans_*) mv "$H/retire" "$H/bin/${1#sans_}" ;; esac
 }
 
 hote nominal '.'
@@ -102,5 +107,5 @@ hote vide '.buildroot.rpms = []'
 pod nominal
 grep -c '%2B' "$H/curl.urls" | sed 's/^/URL avec « + » encodé (1 attendue) : /'
 sed "s#$H#<essai>#g" "$H/skopeo.args" | sed 's/^/appel de skopeo : /'
-for c in 404 compte signature entete createrepo manifeste; do pod $c; done
+for c in 404 compte signature entete createrepo manifeste sans_rpm sans_createrepo_c sans_skopeo; do pod $c; done
 rm -rf -- "${H:?}"
