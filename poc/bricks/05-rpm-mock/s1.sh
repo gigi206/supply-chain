@@ -24,6 +24,8 @@
 #   verrou      (ajoutée le 12/11/2026 après le relevé de M2) pod Kata privilégié, root, label prefetch-rpm, image d'essai :
 #               configuration jumelle avec bootstrap_image_ready=True ; mock --buildsrpm puis --calculate-build-dependencies,
 #               isolation ISOLATION (simple par défaut) ; verrou archivé (resultats/s1-verrou.json) et résumé ; rien poussé
+#               Corrigé à sec le 12/11/2026 à partir de 15:18:25 UTC, NON LANCÉ (relevé releve3 de M2) : le résumé affiche pull_digest et
+#               architecture en plus d'image_digest, qui est un sha256 de RootFS et Config et ne peut valoir le digest du registre.
 # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
 # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
 #
@@ -475,7 +477,10 @@ print('version du verrou :', d.get('version'))
 print('options de configuration recopiées :', ', '.join(sorted(c)))
 print('bootstrap_image_ready enregistré :', c.get('bootstrap_image_ready'))
 print('macros recopiées :', 'oui' if any('macro' in k for k in c) else 'non')
-print('digest du bootstrap :', d.get('bootstrap', {}).get('image_digest'))
+bs = d.get('bootstrap', {})
+print('bootstrap, pull_digest (digest du manifeste tiré) :', bs.get('pull_digest'))
+print('bootstrap, image_digest (sha256 de RootFS et Config, podman.py:21) :', bs.get('image_digest'))
+print('bootstrap, architecture :', bs.get('architecture'))
 b = d.get('buildroot', {}).get('rpms', [])
 print('rpm du buildroot :', len(b), '; champs :', ', '.join(sorted(b[0])) if b else '-')
 PY

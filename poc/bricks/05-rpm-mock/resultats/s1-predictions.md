@@ -118,3 +118,10 @@ Le relevé de M2 montre que `--hermetic-build` refuse un verrou calculé sans `b
 | V3 | `--calculate-build-dependencies` produit un seul fichier JSON dans le répertoire de résultat. Ce verrou est au format `1.1.0` et enregistre `bootstrap_image_ready: True` ainsi que le digest `ee90dc0e…` du bootstrap | Moyenne |
 | V4 | Les macros d'OBS ne sont **pas** recopiées dans `config` du verrou | Faible : la liste des options recopiées n'est pas lue |
 | V5 | Le verrou liste entre 150 et 400 rpm pour le buildroot de sample-app (golang, nodejs, `@buildsys-build`) | Faible |
+
+## Note du 12/11/2026, écrite à partir de 15:18:25 UTC : lecture de V3 après `releve3` de M2
+
+Le texte au-dessus n'est pas réécrit.
+- `releve3` a montré que `bootstrap.image_digest` est un sha256 des sections `RootFS` et `Config` de `podman image inspect` (`podman.py:21` à `:59`). Il ne peut donc pas valoir `ee90dc0e…`, qui est le digest du manifeste dans le registre.
+- La partie « digest `ee90dc0e…` » de V3 se lira sur `bootstrap.pull_digest`, le `.Digest` de `podman image inspect` (`podman.py:266`).
+- Le résumé de l'étape `verrou` n'affichait qu'`image_digest`. Il est corrigé à sec à la même heure pour afficher aussi `pull_digest` et `architecture`. Le verrou complet était déjà archivé. **La modification de `s1.sh` demande un accord avant que `verrou` ne tourne.**
