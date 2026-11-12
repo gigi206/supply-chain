@@ -34,6 +34,14 @@
 #               Corrigé à sec le 12/11/2026 à partir de 16:22:59 UTC, sur relecture du conseiller, NON RELANCÉ : option et témoin
 #               cherchés dans le corps de sharedCopyFlags seul (de func sharedCopyFlags( au premier « } » en début de ligne),
 #               archivé au journal, et non plus dans tout utils.go.
+#   releve5     hôte seul, sans réseau (ajouté à sec le 12/11/2026 à partir de 16:42:30 UTC, après « continue », sur relecture du
+#               conseiller, NON LANCÉ) :
+#               même archive que releve2 et releve3, sha256 contrôlé ; archive au journal ce que produit le verrou, pour V1 à V3
+#               de m2-predictions.md : installed_packages.py entier (requête des champs, dont sigmd5, et calcul des URL),
+#               test_buildroot_lock.py entier (verrous d'exemple), Plugin-BuildrootLock.md entier, définitions de sigmd5,
+#               url et signature dans le schéma 1.1.0, toutes les mentions de gpg-pubkey, SIGMD5 et sigmd5 dans le code Python,
+#               les tests et la documentation ; puis sources effacées.
+#               Prédictions : resultats/m2-predictions.md, section releve5.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -58,6 +66,7 @@
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve3  (journal : resultats/m2-releve3.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve4  (journal : resultats/m2-releve4.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve5  (journal : resultats/m2-releve5.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -207,6 +216,32 @@ etape_releve4() {
   option_lue "skopeo copy $SKOPEO_TAG" sharedCopyFlags.go preserve-digests remove-signatures
   rm -rf -- "${T:?}/releve4"
   echo "fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus"
+}
+
+etape_releve5() {
+  local a=$T/mock.tar.gz s
+  echo "## archive du tag $MOCK_TAG gardée par releve (aucun accès réseau)"
+  [ -f "$a" ] || { echo "KO   archive absente : $a (lancer releve d'abord)" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  rm -rf -- "${T:?}/mock-src"; mkdir "$T/mock-src"
+  tar -xzf "$a" -C "$T/mock-src" --strip-components=1
+  echo "## verrou : requête des champs et calcul des URL"
+  echo "### taille de installed_packages.py : $(wc -l < "$T/mock-src/mock/py/mockbuild/installed_packages.py") lignes"
+  plage "installed_packages.py entier" mock/py/mockbuild/installed_packages.py 1 2000
+  echo "## verrous d'exemple"
+  echo "### taille de test_buildroot_lock.py : $(wc -l < "$T/mock-src/mock/tests/test_buildroot_lock.py") lignes"
+  plage "test_buildroot_lock.py entier" mock/tests/test_buildroot_lock.py 1 2000
+  echo "### taille de Plugin-BuildrootLock.md : $(wc -l < "$T/mock-src/docs/Plugin-BuildrootLock.md") lignes"
+  plage "Plugin-BuildrootLock.md entier" docs/Plugin-BuildrootLock.md 1 2000
+  echo "### schéma 1.1.0 : définitions de sigmd5, url et signature"
+  jq '.properties.buildroot.properties.rpms.items.properties | {sigmd5, url, signature}' \
+    "$T/mock-src/mock/docs/buildroot-lock-schema-1.1.0.json" | sed 's/^/  /'
+  echo "## mentions, dans tout le code Python, les tests et la documentation"
+  lignes "gpg-pubkey" 'gpg-pubkey|gpg_pubkey|pubkey' mock/py mock/tests docs mock/docs
+  lignes "SIGMD5 et sigmd5" 'SIGMD5|sigmd5' mock/py mock/tests docs mock/docs
+  rm -rf -- "${T:?}/mock-src"
+  echo "sources effacées ; archive gardée sous ~/.cache"
 }
 
 # Cœur de la voie 2, NON BRANCHÉ (voir l'en-tête) : ni étape, ni pod. Rien ici n'est appelé par lancer.

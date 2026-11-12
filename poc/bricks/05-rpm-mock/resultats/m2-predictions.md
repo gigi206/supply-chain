@@ -404,3 +404,25 @@ Après « continue », sur relecture du conseiller. **Ce n'est pas une étape** 
 **Écart à noter pour le branchement** : `mock-hermetic-repo` reprend 5 fois un téléchargement en échec (`request_with_retry`, `:29` à `:46`). Notre cœur ne reprend pas : une erreur passagère arrête l'étape, et la relancer demande un nouvel accord.
 
 **Règle des 2×** : 2,38 h mesurées sur 32 commits ([temps-05-1211.log](temps-05-1211.log), écarts d'au plus 1 h entre commits, méthode de la 08c, mêmes limites), pour une estimation de 2,5 pw. La règle n'est pas atteinte.
+
+## Additif du 12/11/2026, à partir de 16:42:30 UTC : étape `releve5` ajoutée à `m2.sh`, NON LANCÉE
+
+Après « continue », sur relecture du conseiller. **Hôte seul, sans réseau, lecture seule** : l'étape relit l'archive du tag `mock-6.9-1` gardée par `releve`, après contrôle de son sha256, comme `releve2` et `releve3`.
+
+**Pourquoi.** V1 à V3 reposent sur du code de mock jamais lu : le calcul des URL (`query_packages_location`), la requête des champs dont sigmd5 (`query_packages`), et le sort des entrées `gpg-pubkey`. `query_packages` et `query_packages_location` viennent de `mockbuild/installed_packages.py` (`buildroot_lock.py:11`, [m2-releve2.log](m2-releve2.log)). Les lire avant le premier verrou réel dira si le cœur de la voie 2 attend le bon format, sans rien lancer dans le cluster.
+
+**Ce qui est archivé au journal** : `installed_packages.py` entier ; `mock/tests/test_buildroot_lock.py` entier, pour ses verrous d'exemple ; `docs/Plugin-BuildrootLock.md` entier ; les définitions de `sigmd5`, `url` et `signature` dans le schéma 1.1.0 ; toutes les lignes qui citent `gpg-pubkey`, `pubkey`, `SIGMD5` ou `sigmd5` dans `mock/py`, `mock/tests`, `docs` et `mock/docs`. Les sources sont ensuite effacées. Les noms de ces fichiers ont été pris dans la liste de l'archive (`tar -t`), sans en lire le contenu.
+
+`bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`). L'étape n'a pas de banc : elle ne fait que lire, avec le même contrôle d'archive que `releve2` et `releve3`. Accord nommé attendu.
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| W1 | `query_packages` lit les champs par `rpm -qa --qf`, avec un format construit à partir des noms de champs (`%{SIGMD5}` pour sigmd5) : le sigmd5 du verrou est la sortie brute de rpm | Moyenne : les noms de champs de `buildroot_lock.py:51` sont ceux des étiquettes de rpm | Tenue : V3 monte à moyenne, et la comparaison du cœur à `%{SIGMD5}` est la bonne |
+| W2 | `query_packages_location` calcule les URL par une requête de dnf (`repoquery --location` ou équivalent), donc depuis les baseurl des dépôts configurés | Moyenne : le paramètre `dnf_cmd` (`buildroot_lock.py:63`) | Tenue : V1 tient à `MOCK_CFG` seul. Sinon, la provenance des URL est à relire |
+| W3 | Les entrées `gpg-pubkey` sont écartées explicitement dans `installed_packages.py` | Faible : le plugin, archivé en entier par `releve2` (118 lignes), ne les cite pas, et aucun journal de M2 ne cite `pubkey` ; `installed_packages.py` n'est pas lu | Tenue : V2 monte. Non tenue : le verrou pourra en porter, sans URL, et `voie2_preparer` s'arrêtera (« champ manquant ») ; décision avec toi |
+| W4 | Un verrou d'exemple (test ou documentation) porte un sigmd5 de 32 caractères hexadécimaux minuscules | Faible : `releve2` n'a archivé que les chemins des propriétés du schéma, pas leur format (`m2-releve2.log`, lignes 124 à 146) | Indice seulement : un exemple n'est pas un verrou de Rocky 9.7 |
+
+**Ce que `releve5` ne tranchera pas** :
+- le contenu d'un verrou réel. V1 à V5 restent à mesurer au premier passage, après S1 et `verrou` ;
+- une ligne longue : `plage` coupe à 220 caractères et `lignes` à 170 (aides partagées avec `releve2` et `releve3`, non modifiées). Un verrou d'exemple écrit sur une seule ligne pourrait perdre son sigmd5 ou son URL au-delà de la coupe, et W4 resterait alors non tranchée ;
+- une définition absente du chemin lu : si le schéma passe par un `$ref`, `jq` rend `null` pour le champ, avec le code 0. Un `null` se lira « définition non trouvée à ce chemin », pas « aucune contrainte ».
