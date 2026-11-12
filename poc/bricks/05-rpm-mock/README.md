@@ -295,3 +295,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Corrigé à sec à partir de 16:20:56 UTC (lecture de `utils.go`, contexte des usages archivé), banc rejoué ; NON RELANCÉ, accord nommé attendu.
 
 **Note du 12/11/2026, écrite à partir de 16:23:16 UTC (relecture du conseiller)** : « KO attendu » ci-dessus se lit « KO prévu par le garde » ; L4 est non tenue telle qu'écrite ([détail](resultats/m2-predictions.md)). Seconde correction à sec à partir de 16:22:59 UTC : options de skopeo cherchées dans le corps de `sharedCopyFlags` seul ; banc rejoué, six cas. NON RELANCÉE, accord nommé attendu.
+
+**Second passage de `releve4`, le 12/11/2026 à 16:24:13 UTC (« Oui, relance releve4 »)** : code 0 ([journal](resultats/m2-releve4.log), [résultats](resultats/m2-predictions.md)).
+- `--compatibility` existe dans createrepo_c 0.20.1, mais elle fixe aussi la limite des changelogs à -1 quand aucune n'est donnée (`createrepo_c.c:1291`) : L3 non tenue. Le sens de -1 n'est pas lu.
+- `--preserve-digests` existe dans skopeo 1.22.2 : `sharedCopyFlags`, `utils.go:352`, appelée par `copy.go:47` (L4b tenue).
+- Lu dans l'amont aux tags, pas dans les paquets de Rocky : `--help` dans l'image reste la mesure de M2.

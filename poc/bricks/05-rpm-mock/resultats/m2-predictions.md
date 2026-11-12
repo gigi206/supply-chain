@@ -343,3 +343,20 @@ Banc rejoué ([journal](m2-releve4-essai-local.log)), cinq cas, codes attendus :
 - **Seconde correction à sec, à partir de 16:22:59 UTC, NON RELANCÉE** : l'option et le témoin sont cherchés dans le corps de `sharedCopyFlags` seul, archivé au journal, et non plus dans tout `utils.go`. Sinon, une option déclarée par une autre fonction du même fichier aurait été comptée. Banc rejoué ([journal](m2-releve4-essai-local.log)) : cas 1 à 5 aux mêmes codes ; cas 6, option hors de la fonction, `ABSENTE` avec le code 0. `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`).
 - `utils.go` reste un nom supposé : un second KO est possible.
 - Aucune conclusion pour M2 n'est tirée de `createrepo_c.c:1291` avant que son contexte soit archivé.
+
+## Second passage de `releve4`, le 12/11/2026 à 16:24:13 UTC (« Oui, relance releve4 »), code 0
+
+[Journal](m2-releve4.log). `chrono.tsv` porte le début et la fin dans la même seconde. Note écrite à partir de 16:24:37 UTC. Les sha256 de `cmd_parser.c`, `createrepo_c.c` et `copy.go` sont ceux du premier passage.
+
+| # | Résultat |
+|---|---|
+| L1 | **Tenue.** Quatre fichiers lus en HTTP 200, `utils.go` compris |
+| L2 | **Tenue.** `--compatibility` est déclarée dans `cmd_parser.c:177` de createrepo_c 0.20.1 |
+| L3 | **Non tenue.** `createrepo_c.c:1291` à `:1295` : avec `--compatibility` et sans `--changelog-limit` donné (valeur par défaut), `changelog_limit` passe à -1. L'option change donc le dépôt construit de zéro, malgré son texte d'aide (« Affects only: --retain-old-md »). Son autre usage, `:2087`, choisit la rétention des anciennes métadonnées (`CR_RETENTION_COMPATIBILITY`) |
+| L3b | **Tenue pour la ligne.** Le sens de -1 (sans limite, ou autre) n'est pas lu |
+| L4 | Non tenue telle qu'écrite (voir la note précédente) |
+| L4b | **Tenue.** `copy.go:47` appelle `sharedCopyFlags()`, et `utils.go:352`, dans le corps de `sharedCopyFlags` (lignes 342 à 354), déclare `--preserve-digests` : « Preserve digests of images and lists ». Le témoin `--remove-signatures` est à la ligne 345 |
+
+**Conséquences pour M2, sans décision :**
+- Les gestes 3 et 4 de la voie 2 sont possibles avec les versions de l'amont aux tags `0.20.1` et `v1.22.2`. Les paquets de Rocky ne sont pas lus : `--help` dans l'image reste la mesure.
+- `--compatibility` reprend l'appel de mock 6.9, et change la limite des changelogs du dépôt. L'effet sur la construction n'est pas mesuré : le dépôt est relu par mock en M3, qui dira si les métadonnées comptent. Garder l'option rend le dépôt identique à celui que construirait `mock-hermetic-repo`.

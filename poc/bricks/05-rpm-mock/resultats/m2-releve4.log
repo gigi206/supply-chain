@@ -1,0 +1,75 @@
+# m2.sh releve4, 2026-11-12T16:24:13Z
+## createrepo_c, tag 0.20.1 (fichiers non signés)
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/cmd_parser.c (27971 octets, sha256 06b3c67adb4278cd08150654a375f1ca6173fce18b3c1c3759689a9f5015fcc6)
+lu : https://raw.githubusercontent.com/rpm-software-management/createrepo_c/0.20.1/src/createrepo_c.c (91117 octets, sha256 d3e1caa1846de95333027720e2fda90e7ec024f7697e44d00b82b2b214d3e436)
+OK   createrepo_c 0.20.1 : témoin "checksum" présent dans cmd_parser.c
+PRÉSENTE createrepo_c 0.20.1 : "compatibility"
+  177:    { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility),
+  178-      "Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).", NULL },
+  179-    { "retain-old-md-by-age", 0, 0, G_OPTION_ARG_STRING, &(_cmd_options.retain_old_md_by_age),
+  180-      "During --update, remove all files in repodata/ which are older "
+### usages de compatibility dans createrepo_c.c et cmd_parser.c (3 lignes avant, 5 après)
+  createrepo_c.c-1288-    user_data.pri_zck           = pri_cr_zck;
+  createrepo_c.c-1289-    user_data.fil_zck           = fil_cr_zck;
+  createrepo_c.c-1290-    user_data.oth_zck           = oth_cr_zck;
+  createrepo_c.c:1291:    if (cmd_options->compatibility && cmd_options->changelog_limit == DEFAULT_CHANGELOG_LIMIT ) {
+  createrepo_c.c-1292-      user_data.changelog_limit   = -1;
+  createrepo_c.c-1293-    } else {
+  createrepo_c.c-1294-      user_data.changelog_limit   = cmd_options->changelog_limit;
+  createrepo_c.c-1295-    }
+  createrepo_c.c-1296-    user_data.location_base     = cmd_options->location_base;
+  --
+  createrepo_c.c-2084-    if (cmd_options->retain_old_md_by_age) {
+  createrepo_c.c-2085-        retentiontype = CR_RETENTION_BYAGE;
+  createrepo_c.c-2086-        retentionval = cmd_options->md_max_age;
+  createrepo_c.c:2087:    } else if (cmd_options->compatibility) {
+  createrepo_c.c-2088-        retentiontype = CR_RETENTION_COMPATIBILITY;
+  createrepo_c.c-2089-    }
+  createrepo_c.c-2090-
+  createrepo_c.c-2091-    ret = cr_old_metadata_retention(out_repo,
+  createrepo_c.c-2092-                                    tmp_out_repo,
+  --
+  cmd_parser.c-137-      "Do not include the file's checksum in the metadata filename.", NULL },
+  cmd_parser.c-138-    { "retain-old-md", 0, 0, G_OPTION_ARG_INT, &(_cmd_options.retain_old),
+  cmd_parser.c-139-      "Specify NUM to 0 to remove all repodata present in old repomd.xml or any other positive number to keep all old repodata. "
+  cmd_parser.c:140:      "Use --compatibility flag to get the behavior of original createrepo: "
+  cmd_parser.c-141-      "Keep around the latest (by timestamp) NUM copies of the old repodata (works only for primary, filelists, other and their DB variants).", "NUM" },
+  cmd_parser.c-142-    { "distro", 0, 0, G_OPTION_ARG_STRING_ARRAY, &(_cmd_options.distro_tags),
+  cmd_parser.c-143-      "Distro tag and optional cpeid: --distro'cpeid,textname'.", "DISTRO" },
+  cmd_parser.c-144-    { "content", 0, 0, G_OPTION_ARG_STRING_ARRAY, &(_cmd_options.content_tags),
+  cmd_parser.c-145-      "Tags for the content in the repository.", "CONTENT_TAGS" },
+  --
+  cmd_parser.c-174-    { "discard-additional-metadata", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.discard_additional_metadata),
+  cmd_parser.c-175-      "Discard all additional metadata (not primary, filelists and other xml or sqlite files, "
+  cmd_parser.c-176-      "nor their compressed variants) from source repository during update.", NULL },
+  cmd_parser.c:177:    { "compatibility", 0, 0, G_OPTION_ARG_NONE, &(_cmd_options.compatibility),
+  cmd_parser.c:178:      "Enforce maximal compatibility with classical createrepo (Affects only: --retain-old-md).", NULL },
+  cmd_parser.c-179-    { "retain-old-md-by-age", 0, 0, G_OPTION_ARG_STRING, &(_cmd_options.retain_old_md_by_age),
+  cmd_parser.c-180-      "During --update, remove all files in repodata/ which are older "
+  cmd_parser.c-181-      "then the specified period of time. (e.g. '2h', '30d', ...). "
+  cmd_parser.c-182-      "Available units (m - minutes, h - hours, d - days)", "AGE" },
+  cmd_parser.c-183-    { "cachedir", 'c', 0, G_OPTION_ARG_FILENAME, &(_cmd_options.cachedir),
+## skopeo copy, tag v1.22.2 (fichiers non signés)
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/copy.go (10166 octets, sha256 046cfe464cbe9e1a060a45357ae72d3a7de9eec93b6e8064514de16a62cc56f1)
+lu : https://raw.githubusercontent.com/containers/skopeo/v1.22.2/cmd/skopeo/utils.go (27500 octets, sha256 c68be206b5d3c9ad7ec232ab21989e9a437803c5162b1ce7520443cc3af9759c)
+  copy.go:47:	copyFlags, copyOpts := sharedCopyFlags()
+### corps de sharedCopyFlags (utils.go, lignes numérotées)
+  342: func sharedCopyFlags() (pflag.FlagSet, *sharedCopyOptions) {
+  343: 	opts := sharedCopyOptions{}
+  344: 	fs := pflag.FlagSet{}
+  345: 	fs.BoolVar(&opts.removeSignatures, "remove-signatures", false, "Do not copy signatures from source")
+  346: 	fs.StringVar(&opts.signByFingerprint, "sign-by", "", "Sign the image using a GPG key with the specified `FINGERPRINT`")
+  347: 	fs.StringVar(&opts.signBySequoiaFingerprint, "sign-by-sq-fingerprint", "", "Sign the image using a Sequoia-PGP key with the specified `FINGERPRINT`")
+  348: 	fs.StringVar(&opts.signBySigstoreParamFile, "sign-by-sigstore", "", "Sign the image using a sigstore parameter file at `PATH`")
+  349: 	fs.StringVar(&opts.signBySigstorePrivateKey, "sign-by-sigstore-private-key", "", "Sign the image using a sigstore private key at `PATH`")
+  350: 	fs.StringVar(&opts.signPassphraseFile, "sign-passphrase-file", "", "Read a passphrase for signing an image from `PATH`")
+  351: 	fs.VarP(commonFlag.NewOptionalStringValue(&opts.format), "format", "f", `MANIFEST TYPE (oci, v2s1, or v2s2) to use in the destination (default is manifest type of source, with fallbacks)`)
+  352: 	fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "Preserve digests of images and lists")
+  353: 	return fs, &opts
+  354: }
+OK   skopeo copy v1.22.2 : témoin "remove-signatures" présent dans sharedCopyFlags.go
+PRÉSENTE skopeo copy v1.22.2 : "preserve-digests"
+  11:352: 	fs.BoolVar(&opts.preserveDigests, "preserve-digests", false, "Preserve digests of images and lists")
+  12-353: 	return fs, &opts
+  13-354: }
+fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus
