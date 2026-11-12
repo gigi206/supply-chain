@@ -153,3 +153,19 @@ Accord : « Oui, lance modules » à « Je lance modules ? (paquets.sh, commit c
   paquet (ni copyright, ni `Built-Using`). Que faire (champ `Built-Using` ou `Static-Built-Using` dans `debian/control`, mention dans
   le copyright, ou rien) est à décider avec le propriétaire ; la convention de Debian n'est pas relue. `marked` (npm, dans
   `web/dist`) n'est pas vu par cette étape.
+
+**Note datée du 12/11/2026, écrite à 19:58:04 UTC : Décision du 12/11/2026 sur la bibliothèque standard de Go.** Elle complète, sans le réécrire, « la convention de Debian
+n'est pas relue » des résultats de `modules`.
+- **Lu ce soir** : Policy 4.7.4.1, §7.8 (`Built-Using` réservé aux licences qui imposent de garder les sources incorporées, pas au
+  suivi des reconstructions) ; §2.3 (notices des fichiers compilés dans le binaire à reprendre dans `copyright` quand la licence
+  l'exige) ; `deb-control(5)` de dpkg 1.22.22 (`Static-Built-Using`, depuis dpkg 1.21.3, pour les liaisons statiques dont Go) ; tag
+  lintian `missing-static-built-using-field-for-golang-package` (info) ; `debian/copyright` de hugo dans trixie, lu en partie, sans
+  mention de la bibliothèque standard. Clause de redistribution binaire de la LICENSE de Go lue dans le Go 1.24.7 de mise, pas dans
+  le `golang-1.24` 1.24.4-1 qui a compilé le deb. Aucune conclusion de conformité juridique : elle revient au propriétaire.
+- **Options proposées** : (1) `Static-Built-Using` dans `debian/control` ; (2) notice de Go dans le paquet ; (3) composant
+  « bibliothèque standard » dans le prédicat de licences de 13a, sans toucher au deb ; (4) ne rien faire.
+- **Question** : « Quel ordre retiens-tu pour la bibliothèque standard de Go ? » ; **réponse du propriétaire** : « Axe 3, puis 1+2 ».
+- **Conséquence** : l'axe 3 se prépare maintenant (prédictions, banc, accord nommé) ; les axes 1 et 2 iront ensemble dans une seule
+  révision du paquet, **après S5b** (`poc/packaging/` est lu par `s4c.sh` et comparé par `s4d.sh` ; le changer change le deb
+  `0b489d43…` et le sujet du rebuild, de la VSA et de S5b), avec les mesures de la 06 à refaire une fois ; le spec du rpm suivra la
+  même décision avant son premier build.
