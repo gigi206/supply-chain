@@ -6,6 +6,6 @@
   "texte_sha256": "6ce83989d586587de32b12605b0aef37a03c5c2bebb178edbca97a6235fe519f",
   "expression": "BSD-3-Clause",
   "raison": "paragraphe License: Go du copyright de Debian (forme de paquets.py texte_licence) : texte de BSD-3-Clause, différences couvertes par les variables organizationClause3 et copyrightHolderLiability du modèle SPDX 3.27.0 (comparaison de mots normalisés, pas la correspondance de SPDX), suivi d une concession de brevets de Google avec résiliation en cas de litige, qui n est pas dans BSD-3-Clause et reste hors de l expression",
-  "revue": null
+  "revue": "propriétaire, 12/11/2026 (inscrite à 20:12:28 UTC) : « Oui, je valide » à « Tu valides « Go » → BSD-3-Clause, brevets hors de l'expression ? »"
  }
 ]

@@ -289,3 +289,8 @@ la preuve et revue (appliquée, 0) ; un mot changé (non appliquée, 1) ; entré
 | T1 | `traduction Go -> BSD-3-Clause : appliquée`, texte au sha256 `6ce83989…` | Haute : calculée sur le même paquet |
 | T2 | Les sept paragraphes `Go` deviennent `BSD-3-Clause` ; les statuts journalisés : `FreeBSD`, `MPEG`, `noderivs`, `BSD-3-clause-svgpan` hors SPDX, `X11` hors politique, `Apache-2.0` et `BSD-3-Clause` autorisés | Haute : lecture du passage de 20:05:09 UTC |
 | T3 | `bilan : KO`, code 1 : `licences.py` s'arrête au premier nom invalide restant | Haute |
+
+*Note datée du 12/11/2026, écrite à 20:12:28 UTC* : **revue de la traduction « Go » -> `BSD-3-Clause`.** Question : « Tu valides « Go » →
+BSD-3-Clause, brevets hors de l'expression ? » ; réponse du propriétaire : « Oui, je valide ». Inscrite dans `traductions-dep5.json`
+(champ `revue`), preuve inchangée (`6ce83989…`). L'étape `stdlib` n'est pas relancée : accord nommé attendu ; T1 à T3 tiennent lieu de
+prédictions.
