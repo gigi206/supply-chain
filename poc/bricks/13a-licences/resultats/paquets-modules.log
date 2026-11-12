@@ -1,0 +1,24 @@
+# paquets.sh modules, 2026-11-12T19:53:09Z
+paquets.py : 18aca8d6364006fa543e3dcf9bd2b800315e7c5178624e1c525697733b14dac4
+OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+control : Built-Using absent
+## binaire ./usr/bin/sample-app : 5906320 octets, sha256 10d475d00dc2a14c09803ef861d8934312426fe2b3e723942b32486cc7b1c404
+go : go1.24.4
+path : example.com/supply-chain/sample-app
+mod : example.com/supply-chain/sample-app (devel) 
+dep : github.com/go-chi/chi/v5 v5.2.3 
+build : -buildmode=exe
+build : -compiler=gc
+build : -trimpath=true
+build : CGO_ENABLED=0
+build : GOARCH=amd64
+build : GOOS=linux
+build : GOAMD64=v1
+dépendances compilées : 1
+OK   dep github.com/go-chi/chi/v5 v5.2.3 : paragraphe Files vendor/github.com/go-chi/chi/v5/* (MIT)
+ÉCART bibliothèque standard de go1.24.4 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+## témoin : même deb, copyright sans le paragraphe de github.com/go-chi/chi/v5 (doit donner un KO sur cette dépendance)
+témoin écrit : paragraphe de github.com/go-chi/chi/v5 retiré 1 fois
+OK   témoin refusé : KO   dep github.com/go-chi/chi/v5 v5.2.3 : aucun paragraphe Files propre (couverte par « * » seul : True)
+bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé

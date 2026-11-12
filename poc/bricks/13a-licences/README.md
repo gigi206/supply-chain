@@ -79,3 +79,7 @@ Banc hors réseau : neuf cas au code attendu ([journal](resultats/paquets-essai-
 de build lues en mémoire, binaire jamais exécuté) des paragraphes `Files` du copyright ; bibliothèque standard de Go en écart ; témoin
 sans le paragraphe de `chi`. Banc hors réseau tenu, lecture identique à `go version -m` ([journal](resultats/paquets-modules-essai-local.log)).
 Prédictions M1 à M7 : [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md).
+
+**Passage de `modules`, le 12/11/2026 de 19:53:09 à 19:53:11 UTC (« Oui, lance modules »)** : code 0, M1 à M7 tenues ([journal](resultats/paquets-modules.log),
+[résultats](resultats/paquets-predictions.md)). Binaire compilé avec go1.24.4 ; seule dépendance, `chi` v5.2.3, couverte par son paragraphe MIT ;
+témoin refusé. Écart ouvert, à décider : la bibliothèque standard de Go est compilée sans être déclarée dans le paquet (`Built-Using` absent).

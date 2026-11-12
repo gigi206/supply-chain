@@ -132,3 +132,24 @@ fermé quand même).
 **Ce que l'étape ne mesure pas** : les paquets npm intégrés à `web/dist` (`marked`), invisibles dans les informations de build de Go ;
 la licence de la bibliothèque standard elle-même (seule sa présence est constatée) ; ce que Debian attend pour elle (`Built-Using`,
 `Static-Built-Using`), non relu.
+
+## Résultats de `modules` : lancement le 12/11/2026 à 19:53:09 UTC, fin à 19:53:11 UTC (`chrono.tsv`), code 0
+
+Accord : « Oui, lance modules » à « Je lance modules ? (paquets.sh, commit ce49cf0) » ; HEAD ce49cf0, arbre propre, contrôlés à
+19:53:09 UTC. Journal : [`paquets-modules.log`](paquets-modules.log). Résultats écrits à partir de 19:53:28 UTC.
+
+| # | Résultat |
+|---|---|
+| M1 | **Tenue.** Un seul fichier dans `./usr/bin` : `sample-app`, 5 906 320 octets, sha256 `10d475d0…` ; informations de build lues (en-tête unique, format de go1.18 et après) |
+| M2 | **Tenue.** `go1.24.4` |
+| M3 | **Tenue.** `path` `example.com/supply-chain/sample-app`, `mod` le même en `(devel)` ; une seule dépendance, `github.com/go-chi/chi/v5 v5.2.3` (sans somme : build en `-mod=vendor`) |
+| M4 | **Tenue.** `chi` couverte par `vendor/github.com/go-chi/chi/v5/*` (MIT) ; aucun paragraphe `vendor/` orphelin |
+| M5 | **Tenue.** ÉCART de la bibliothèque standard de go1.24.4, `Built-Using` absent du `control` |
+| M6 | **Tenue.** 7 réglages : `-buildmode=exe`, `-compiler=gc`, `-trimpath=true`, `CGO_ENABLED=0`, `GOARCH=amd64`, `GOOS=linux`, `GOAMD64=v1` ; pas de `-ldflags` |
+| M7 | **Tenue.** Témoin sans le paragraphe de `chi` (retiré une fois) : KO sur `chi`, couverte par `Files: *` seul |
+
+- Ce qui est établi : la seule dépendance Go compilée dans le deb a une licence déclarée qui lui est propre (MIT).
+- Reste ouvert, sans décision : la bibliothèque standard de Go est compilée dans le binaire sans être déclarée nulle part dans le
+  paquet (ni copyright, ni `Built-Using`). Que faire (champ `Built-Using` ou `Static-Built-Using` dans `debian/control`, mention dans
+  le copyright, ou rien) est à décider avec le propriétaire ; la convention de Debian n'est pas relue. `marked` (npm, dans
+  `web/dist`) n'est pas vu par cette étape.
