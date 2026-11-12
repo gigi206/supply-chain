@@ -9,6 +9,12 @@
 #               de Rocky 9.7 vérifié avec la clé de Rocky, dans un trousseau temporaire, avec un témoin altéré
 #   podman      toutes les occurrences de podman et skopeo sous mock/ au tag (sources lues, jamais exécutées) ; pour Rocky 9.7 (vault) et 9.8 (pub) : repomd.xml vérifié, other.xml.gz
 #               comparé à repomd.xml, changelog des paquets cherché pour les CVE des avis de podman de l'année
+#   voie2       ajoutée à sec le 12/11/2026 à partir de 15:59:51 UTC, NON LANCÉE : createrepo_c et rpm, que nos étapes de M2
+#               appellent directement depuis la voie 2 (décision « Voie 2 » du 12/11/2026) ; mêmes relevés que releves (Scorecard,
+#               release, commits sur 90 jours comptés à la date du lancement, auteurs, fusionneurs, SECURITY.md, avis de l'année) ;
+#               fichiers de createrepo_c et rpm listés dans pub/rocky/9.8 (BaseOS, AppStream), source de l'image d'outillage (D4 a).
+#               Liste de répertoire non signée : un indice de version, pas un épinglage (celui-ci passera par un primary vérifié, en M2).
+#               Les relevés par dépôt de releves sont mis en fonction (releve_depot), sans changement de commande ni de sortie.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/sante.sh <étape>…   (journal : resultats/sante-<étape>.log)
 set -uo pipefail
@@ -31,22 +37,27 @@ GH=$(command -v gh)
 gh() { env -u GITHUB_TOKEN "$GH" "$@"; }
 mkdir -p "$R" "$T"
 
+releve_depot() { # $1 = dépôt GitHub, $2 = début des commits comptés, $3 = début des avis comptés (AAAA-MM-JJ)
+  local r=$1 v
+  echo "## $r"
+  gh api "repos/$r" --jq '"nom final \(.full_name), archivé \(.archived), licence \(.license.spdx_id), dernier push \(.pushed_at[0:10])"'
+  v=$(gh api "repos/$r/releases/latest" --jq '"\(.tag_name) du \(.published_at[0:10])"' 2>/dev/null) || v=aucune
+  echo "dernière release : $v"
+  gh api "repos/$r/commits?since=$2&per_page=100" --paginate --jq '.[] | [(.author.login // "-"), (.commit.author.email | split("@")[1]), (.author.type // "-")] | @tsv' > "$T/commits.tsv"
+  echo "commits depuis $2 : $(wc -l < "$T/commits.tsv") ; auteurs humains les plus actifs (compte, domaine de l'adresse) :"
+  awk -F'\t' '$3 != "Bot" && $1 !~ /bot/ {print $1 "\t" $2}' "$T/commits.tsv" | sort | uniq -c | sort -rn | head -10 | sed 's/^/  /'
+  echo "fusionneurs des 100 dernières PR : $(gh pr list --repo "$r" --state merged --limit 100 --json mergedBy --jq '[.[] | .mergedBy.login] | group_by(.) | map("\(.[0]) \(length)") | join(", ")')"
+  echo "SECURITY.md : $(gh api "repos/$r/contents/SECURITY.md" --jq .name 2>/dev/null | grep -x SECURITY.md || echo absent)"
+  echo "avis publiés : $(gh api "repos/$r/security-advisories?per_page=100" --jq 'length') ; depuis un an : $(gh api "repos/$r/security-advisories?per_page=100" --jq '[.[] | select(.published_at > "'"$3"'")] | length')"
+  gh api "repos/$r/security-advisories?per_page=100" --jq '.[0:4][] | "  \(.ghsa_id) \(.published_at[0:10]) \(.severity) \(.summary)"'
+}
+
 etape_releves() {
-  local r v
+  local r
   printf 'podman\tcontainers/podman\tconstruction\toui\nskopeo\tcontainers/skopeo\tconstruction\toui\nmock\trpm-software-management/mock\tpackaging\toui\nimages Rocky\trocky-linux/sig-cloud-instance-images\timage de base\toui\nimages Debian\tdebuerreotype/docker-debian-artifacts\timage de base\toui\ndebuerreotype\tdebuerreotype/debuerreotype\timage de base\toui\n' > "$T/projets.tsv"
   "$repo/tools/health/scorecard.sh" "$T/projets.tsv"
   for r in containers/podman containers/skopeo rocky-linux/sig-cloud-instance-images debuerreotype/docker-debian-artifacts debuerreotype/debuerreotype; do
-    echo "## $r"
-    gh api "repos/$r" --jq '"nom final \(.full_name), archivé \(.archived), licence \(.license.spdx_id), dernier push \(.pushed_at[0:10])"'
-    v=$(gh api "repos/$r/releases/latest" --jq '"\(.tag_name) du \(.published_at[0:10])"' 2>/dev/null) || v=aucune
-    echo "dernière release : $v"
-    gh api "repos/$r/commits?since=$DEPUIS&per_page=100" --paginate --jq '.[] | [(.author.login // "-"), (.commit.author.email | split("@")[1]), (.author.type // "-")] | @tsv' > "$T/commits.tsv"
-    echo "commits depuis $DEPUIS : $(wc -l < "$T/commits.tsv") ; auteurs humains les plus actifs (compte, domaine de l'adresse) :"
-    awk -F'\t' '$3 != "Bot" && $1 !~ /bot/ {print $1 "\t" $2}' "$T/commits.tsv" | sort | uniq -c | sort -rn | head -10 | sed 's/^/  /'
-    echo "fusionneurs des 100 dernières PR : $(gh pr list --repo "$r" --state merged --limit 100 --json mergedBy --jq '[.[] | .mergedBy.login] | group_by(.) | map("\(.[0]) \(length)") | join(", ")')"
-    echo "SECURITY.md : $(gh api "repos/$r/contents/SECURITY.md" --jq .name 2>/dev/null | grep -x SECURITY.md || echo absent)"
-    echo "avis publiés : $(gh api "repos/$r/security-advisories?per_page=100" --jq 'length') ; depuis un an : $(gh api "repos/$r/security-advisories?per_page=100" --jq '[.[] | select(.published_at > "2025-11-05")] | length')"
-    gh api "repos/$r/security-advisories?per_page=100" --jq '.[0:4][] | "  \(.ghsa_id) \(.published_at[0:10]) \(.severity) \(.summary)"'
+    releve_depot "$r" "$DEPUIS" 2025-11-05
   done
   echo "## mock : dernière release"
   gh api repos/rpm-software-management/mock/releases/latest --jq '"\(.tag_name) du \(.published_at[0:10])"'
@@ -185,6 +196,25 @@ etape_podman() {
   changelogs vault-9.7 "$VAULT/AppStream/x86_64/os"
   changelogs pub-9.8 https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os
   rm -rf -- "${GNUPGHOME:?}" "${T:?}"/depot-*
+}
+
+etape_voie2() {
+  local d a r p x f
+  d=$(date -u -d '90 days ago' +%Y-%m-%dT00:00:00Z); a=$(date -u -d '1 year ago' +%Y-%m-%d)
+  echo "voie 2 de M2 : createrepo_c et rpm appelés par nos étapes ; commits depuis $d, avis depuis $a"
+  printf 'createrepo_c\trpm-software-management/createrepo_c\tpackaging\toui\nrpm\trpm-software-management/rpm\tpackaging\toui\n' > "$T/projets-voie2.tsv"
+  "$repo/tools/health/scorecard.sh" "$T/projets-voie2.tsv"
+  for r in rpm-software-management/createrepo_c rpm-software-management/rpm; do
+    releve_depot "$r" "$d" "$a"
+  done
+  echo "## fichiers dans pub/rocky/9.8 (image d'outillage, D4 a ; liste non signée, indice de version seulement)"
+  for x in BaseOS AppStream; do
+    for p in c:createrepo_c c:createrepo_c-libs r:rpm r:rpm-libs r:rpm-sign-libs; do
+      f=$(curl -sSL --max-time 60 "https://dl.rockylinux.org/pub/rocky/9.8/$x/x86_64/os/Packages/${p%%:*}/" \
+        | grep -oE "\"${p##*:}-[0-9][^\"]*\.x86_64\.rpm\"" | tr -d '"' | sort -uV | tail -2)
+      if [ -n "$f" ]; then sed "s/^/  $x : /" <<<"$f"; else echo "  $x : aucun fichier ${p##*:}-<version>.x86_64.rpm"; fi
+    done
+  done
 }
 
 for e in "$@"; do

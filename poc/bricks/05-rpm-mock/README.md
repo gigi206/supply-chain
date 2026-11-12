@@ -237,3 +237,25 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Le remplacement d'un outil de mock par nos étapes est un écart à documenter.
 - Tout est lu dans le code, rien n'est mesuré. Le chemin exact du dossier dépend du `pull_digest`, que seule l'étape `verrou` de S1 donnera.
 - Reste à décider : l'image de bootstrap « prête », qui attend la mesure de l'étape `verrou`. Rien n'est lancé.
+
+**Additif du 12/11/2026, à partir de 15:59:51 UTC : audit de `createrepo_c` et de `rpm` préparé à sec (après « continue », sur relecture du conseiller), NON LANCÉ.**
+- **Écart relevé** : la voie 2 nous fait appeler `createrepo_c` et `rpm -K` nous-mêmes, alors que le doc 04 n'a aucun verdict pour `createrepo_c` (recherche du jour, sans résultat), ni pour `rpm`. Jusqu'ici, `createrepo_c` n'était qu'une dépendance de mock. Règle du propriétaire : rien de « Risqué », selon les verdicts du doc 04. C'est donc un préalable de M2, au même titre que podman et skopeo le 05/11.
+- **Ajout** : étape `voie2` de [`sante.sh`](sante.sh), avec les mêmes relevés que `releves` :
+  - Scorecard, release, commits sur 90 jours comptés à la date du lancement, auteurs, fusionneurs, SECURITY.md et avis de l'année ;
+  - les fichiers de `createrepo_c` et `rpm` listés dans `pub/rocky/9.8`, d'où vient l'image d'outillage (D4 a). Cette liste n'est pas signée : elle donne un indice de version, pas un épinglage, qui passera par un primary vérifié en M2. Une liste vide est signalée.
+- Lectures réseau seules (API GitHub et Scorecard, `dl.rockylinux.org`) : rien n'est installé, téléchargé pour être exécuté, ni écrit hors de `resultats/` et du cache de la brique. **Accord nommé attendu.**
+- **Mise en fonction** : les relevés par dépôt de `releves` passent dans `releve_depot`, sans changement de commande.
+- **Vérifié à sec** ([banc](resultats/sante-voie2-essai-local.sh), [journal](resultats/sante-voie2-essai-local.log), `gh`, `curl` et Scorecard simulés, HOME isolé) :
+  - la sortie de `releves` est identique avant et après la mise en fonction (71 lignes, en-tête daté exclu) ;
+  - `voie2` interroge les bons dépôts avec les bonnes dates de début ;
+  - `-devel` et `rpmlint` sont écartés, et une liste vide est signalée.
+
+  Le banc ne couvre pas les réponses réelles des services.
+- **shellcheck** (`-S warning`) ne relève aucun avertissement, `bash -n` passe. Une remarque : l'alerte SC2034 d'avant, sur un `local f` inutilisé de `etape_podman`, n'apparaît plus, mais seulement parce que `f` est maintenant lu dans `voie2`. Ce `local` est inchangé.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| A1 | `createrepo_c` : non archivé, release et commits sur 90 jours, aucun critère « Risqué » atteint | Moyenne : jamais relevé |
+| A2 | `rpm` : non archivé, très actif, plusieurs auteurs, aucun critère « Risqué » | Haute |
+| A3 | Le critère des 2 employeurs n'est prouvé ni pour l'un ni pour l'autre (fusions surtout par Red Hat), comme pour podman et skopeo | Moyenne |
+| A4 | Dans `pub/rocky/9.8`, `createrepo_c` et `createrepo_c-libs` sont dans AppStream et absents de BaseOS ; `rpm`, `rpm-libs` et `rpm-sign-libs` sont dans BaseOS et absents d'AppStream | Moyenne : de mémoire, jamais relevé ici |

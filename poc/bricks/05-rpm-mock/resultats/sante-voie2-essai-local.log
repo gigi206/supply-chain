@@ -1,0 +1,51 @@
+# sante-voie2-essai-local.sh, 2026-11-12T16:01:26Z
+== essai 1 : releves avant et après
+lignes : 71 avant, 71 après
+OK   releves : sortie identique avant et après
+filtre des avis au 2025-11-05, occurrences : 5
+== essai 2 : voie2
+voie 2 de M2 : createrepo_c et rpm appelés par nos étapes ; commits depuis 2026-08-14T00:00:00Z, avis depuis 2025-11-12
+FAUX scorecard
+rpm-software-management/createrepo_c
+rpm-software-management/rpm
+## rpm-software-management/createrepo_c
+FAUX gh api repos/rpm-software-management/createrepo_c --jq "nom final \(.full_name), archivé \(.archived), licence \(.license.spdx_id), dernier push \(.pushed_at[0:10])"
+dernière release : FAUX gh api repos/rpm-software-management/createrepo_c/releases/latest --jq "\(.tag_name) du \(.published_at[0:10])"
+commits depuis 2026-08-14T00:00:00Z : 2 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        1 alice	exemple.org
+fusionneurs des 100 dernières PR : FAUX gh pr list --repo rpm-software-management/createrepo_c --state merged --limit 100 --json mergedBy --jq [.[] | .mergedBy.login] | group_by(.) | map("\(.[0]) \(length)") | join(", ")
+SECURITY.md : absent
+avis publiés : FAUX gh api repos/rpm-software-management/createrepo_c/security-advisories?per_page=100 --jq length ; depuis un an : FAUX gh api repos/rpm-software-management/createrepo_c/security-advisories?per_page=100 --jq [.[] | select(.published_at > "2025-11-12")] | length
+FAUX gh api repos/rpm-software-management/createrepo_c/security-advisories?per_page=100 --jq .[0:4][] | "  \(.ghsa_id) \(.published_at[0:10]) \(.severity) \(.summary)"
+## rpm-software-management/rpm
+FAUX gh api repos/rpm-software-management/rpm --jq "nom final \(.full_name), archivé \(.archived), licence \(.license.spdx_id), dernier push \(.pushed_at[0:10])"
+dernière release : FAUX gh api repos/rpm-software-management/rpm/releases/latest --jq "\(.tag_name) du \(.published_at[0:10])"
+commits depuis 2026-08-14T00:00:00Z : 2 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        1 alice	exemple.org
+fusionneurs des 100 dernières PR : FAUX gh pr list --repo rpm-software-management/rpm --state merged --limit 100 --json mergedBy --jq [.[] | .mergedBy.login] | group_by(.) | map("\(.[0]) \(length)") | join(", ")
+SECURITY.md : absent
+avis publiés : FAUX gh api repos/rpm-software-management/rpm/security-advisories?per_page=100 --jq length ; depuis un an : FAUX gh api repos/rpm-software-management/rpm/security-advisories?per_page=100 --jq [.[] | select(.published_at > "2025-11-12")] | length
+FAUX gh api repos/rpm-software-management/rpm/security-advisories?per_page=100 --jq .[0:4][] | "  \(.ghsa_id) \(.published_at[0:10]) \(.severity) \(.summary)"
+## fichiers dans pub/rocky/9.8 (image d'outillage, D4 a ; liste non signée, indice de version seulement)
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/Packages/c/
+  BaseOS : createrepo_c-9.9.8-1.faux.x86_64.rpm
+  BaseOS : createrepo_c-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/Packages/c/
+  BaseOS : createrepo_c-libs-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/Packages/r/
+  BaseOS : rpm-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/Packages/r/
+  BaseOS : rpm-libs-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/BaseOS/x86_64/os/Packages/r/
+  BaseOS : rpm-sign-libs-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/Packages/c/
+  AppStream : createrepo_c-9.9.8-1.faux.x86_64.rpm
+  AppStream : createrepo_c-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/Packages/c/
+  AppStream : createrepo_c-libs-9.9.9-1.faux.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/Packages/r/
+  AppStream : aucun fichier rpm-<version>.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/Packages/r/
+  AppStream : aucun fichier rpm-libs-<version>.x86_64.rpm
+FAUX curl https://dl.rockylinux.org/pub/rocky/9.8/AppStream/x86_64/os/Packages/r/
+  AppStream : aucun fichier rpm-sign-libs-<version>.x86_64.rpm
