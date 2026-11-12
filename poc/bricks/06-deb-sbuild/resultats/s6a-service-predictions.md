@@ -241,3 +241,43 @@ Ce qui couvre le cas :
 **Limite acceptée** : la détection en service d'un scan manquant du deb n'est pas mesurée de bout en bout. Le témoin aurait coûté une modification de `plateforme.sh` (filtre par `depot`, fenêtres du passage de 11:15 UTC) et au moins 26 h 15 min de retard sur la porte du deb.
 
 La décision sur `rejeu.sh` et S6 reste à prendre avant le premier rejeu qui suit l'application des correctifs de S6a.
+
+## Note datée du 12/11/2026 (à partir de 13:42:24 UTC, après « continue ») : intégration de S6 dans `rejeu.sh`, options préparées à sec
+
+**`rejeu.sh` n'est pas modifié** : S5b doit lancer le script approuvé tel quel. Les deux options ci-dessous le modifient, l'une par un commentaire, l'autre par des étapes. Dans les deux cas, rien n'y sera touché avant S5b, ni sans accord. Cette note prépare la décision laissée ouverte plus haut, à prendre avant le premier rejeu qui suit l'application des correctifs de S6a. Rien n'a été lancé.
+
+**Ce qui est vérifié dans le code (lecture seule)**
+- Les étapes de la 07a déjà dans le rejeu ne cassent pas avec les correctifs commités :
+  - `07a (G8)` : relevé de 13:14:56 UTC. Sans `SCANS`, `fraicheur-scan.py` corrigé n'écrit qu'une série et garde la ligne `scan <date>, base <date>` (docstring et `print` de `s6a-fraicheur-deb.patch`) ;
+  - `07a (G4)` et le passage périodique : le plancher de `s6a-scanner-deb.patch` touche aussi la voie image. Le cas D de l'essai (E4) le montre tenu sur sample-app, avec 2 PURL versionnées.
+- **Sans intégration**, `ScanEnRetard` reste active pour `builds/scan/sample-app-deb` dès O3, par la branche `absent()`, jusqu'à ce que `periodique` et `fraicheur` soient relancés à la main. Aucun lecteur d'alerte du rejeu ne la juge (relevé de 13:14:56 UTC). Sur le chemin k3s, où le bloc 06 n'est pas joué, elle resterait active en permanence, quelle que soit l'option.
+- **Les étapes de `s6a.sh` se rejouent sans réécriture** :
+  - `applique` exige seulement les correctifs appliqués et commités ;
+  - `periodique` supprime un job `s6a-manuel` terminé, et ne refuse que s'il est encore actif ;
+  - `grafana` relit `resultats/s6a-periodique.log` et `resultats/s6a-fraicheur.log`, réécrits par le même passage ;
+  - `porte` déduit la VSA attendue des referrers de `builds/vsa/sample-app-deb`, et lit `DISTRO`, que `rejeu.sh` exporte.
+- **`s6b.sh pousser_vsa`** lit le bundle et l'énoncé versionnés dans `resultats/` (`s6b-vsa.bundle.json`, `s6b-vsa-enonce.json`). Ils survivent à `detruire`, comme le bundle versionné de la 10. `lire_vsa` n'a pas besoin du bundle horodaté que désigne `inputAttestations`, effacé par tout rejeu. Son témoin, la provenance acceptée par la clé de Chains, lit `08-trust-plane/resultats/chains-cle-publique.pem`, que le rejeu réécrit (`openbao.sh:320`). `rebuild` et `vsa` ne se rejouent pas : 24 h après `finishedOn`, lien coupé, VM sc-replay.
+
+**Contraintes d'une intégration**
+1. **Ordre** : après `06 (S4d3)`. Son étape `porte` attend pour le deb une VSA et un scan **refusés** (`s4d3.sh:343-344`). Un scan ou une VSA du deb poussés avant elle la feraient échouer.
+2. **Fenêtre horaire** : `hors_fenetre` refuse `periodique` de 09:00 à 12:59 UTC. Sous `set -e`, ce refus arrête le rejeu avant `fuites` et le CIS. La reprise par `DEPUIS=` à cette étape devrait rester possible, puisqu'elle vient après le bloc 08c. C'est déduit du code, non mesuré. Il faut alors un autre libellé, car `tee` réécrit `rejeu-<libellé>.log` (`rejeu.sh:62`).
+3. **Digest en dur** : `s6a.sh` et `s6b.sh` désignent `039949f9`. Si le rejeu ne le reproduit pas, `present` refuse et le rejeu s'arrête à cette étape. C'est la limite déjà consignée pour S5b.
+4. **Une étape par appel** : `s6a.sh` et `s6b.sh` n'acceptent qu'un argument. Il faut une ligne `etape` par étape.
+5. **Durée** : `periodique` attend le job pendant au plus 380 tours de 5 s de sommeil (31 min 40 s), plus le temps des lectures.
+6. **Un second push sous `POUSSER_VSA=1`** : aujourd'hui, ce drapeau couvre le push de la VSA de sample-app (brique 10). Avec (b), il couvrirait aussi celui de la VSA du deb. La politique du replay du deb (section 6) soumet chaque push à ton accord : cet élargissement est à approuver en clair.
+7. **`applique` repose sur `git apply -R --check`** : un commit ultérieur qui toucherait `scanner.sh` ou `fraicheur-scan.py` près des blocs du correctif ferait refuser l'étape, et arrêterait le rejeu.
+8. **Journaux réécrits** : `s6a-*.log`, `s6a-periodique.bundle.json` et les journaux de `pousser_vsa` et de `lire_vsa` seraient réécrits à chaque rejeu. C'est la convention de `rejeu.sh` (lignes 118 et 119) ; l'historique git garde les précédents.
+
+**Options**
+- **(a) Pas d'intégration.** Un commentaire de `rejeu.sh` consigne la fenêtre `absent()` du deb, sur le modèle des lignes 146-147 pour l'image.
+  - Coût : après chaque rejeu, `ScanEnRetard` reste active pour le deb, et la porte du deb refuse le scan, jusqu'aux étapes de S6 relancées à la main, chacune sur accord.
+- **(b) Intégration des étapes durables**, dans le bloc RKE2 et Cilium, après `06 (S4d3)` :
+  - `06 (S6a, periodique)`, `06 (S6a, fraicheur)`, puis `06 (S6a, grafana)` ;
+  - avec `POUSSER_VSA=1` : `06 (S6b, pousser_vsa)` et `06 (S6b, lire_vsa)` ;
+  - enfin `06 (S6a, porte)`, dans les deux cas : VSA attendue `ok` après `pousser_vsa`, `refus` sans.
+  - Coût : les contraintes 2 à 8, et une modification de `rejeu.sh` à relire à sec et à faire approuver.
+
+**Ma recommandation : (b), après le premier passage réel des étapes de S6.**
+- Pour (b) : c'est le précédent constant. Les étapes de la 07a (G7, G8) et le bloc 06 de S5b ont tous été intégrés au rejeu. (a) laisserait après chaque rejeu une alerte active par construction, alors que cette alerte est le seul mécanisme en service retenu par la décision « Test de règle seul ».
+- La condition : n'écrire le diff de `rejeu.sh` qu'après le premier passage manuel des étapes de S6a et de `pousser_vsa`, donc après S5b. Ces étapes n'ont jamais tourné, et P2 vient de montrer qu'une prédiction peut tomber. Les intégrer avant reviendrait à empiler du non-mesuré.
+- La question ne porte donc que sur l'orientation, (a) ou (b). Elle ne bloque rien avant S5b.
