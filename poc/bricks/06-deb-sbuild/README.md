@@ -1938,3 +1938,10 @@ Le texte ne porte plus aucune mention de projet, et la garde de `vsa` l'accepte.
 
 **Ce commit n'est pas encore `POLITIQUE_COMMIT`.** Il le deviendra sur ton approbation ; si tu demandes des changements, ce sera le commit qui les porte. La VSA citera l'URL du fichier à ce commit, et son sha256.
 
+**Approbation du propriétaire, 12/11/2026, reçue avant 11:04 UTC (« Oui, je l'approuve »)** : la politique du deb est figée par **`POLITIQUE_COMMIT=97ae561de9e9eccb296fcba09fbbc351988ecf1b`** (`97ae561`). Le sha256 du fichier à ce commit, `6cc94a50…`, a été relu par `git show`. La VSA citera `https://github.com/gigi206/supply-chain/blob/97ae561de9e9eccb296fcba09fbbc351988ecf1b/poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md`. Il faut que ce commit soit poussé : `vsa` le vérifie.
+
+**Reste** :
+1. `rebuild`, à partir de 21:03:37 UTC (avec `ATTENTE_HORS_LIGNE=300`, si tu es d'accord) ;
+2. le commit de ses résultats, puis un seul push, avec ton « oui » ;
+3. `POLITIQUE_COMMIT=97ae561de9e9eccb296fcba09fbbc351988ecf1b mise exec -- poc/bricks/06-deb-sbuild/s6b.sh vsa`.
+

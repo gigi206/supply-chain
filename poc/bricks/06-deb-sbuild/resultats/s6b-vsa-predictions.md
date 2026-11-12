@@ -105,3 +105,9 @@ Journal : `s6b-vsa_essai.log`. sha256 transportés, égaux côté hôte et côt�
 - **L'essai de 10:56:55 UTC portait sur la version précédente.** La différence n'est que la liste des niveaux, dans l'énoncé construit ; les contrôles ne changent pas. Le sha256 de `vsa_deb.py` entre dans `verifier.version`. `vsa` refuse un `vsa_deb.py` modifié hors commit, ou un HEAD non poussé : c'est donc la version commitée et poussée qui signera.
 - **Prédiction S1 révisée** : l'énoncé de `vsa` porte `"verifiedLevels": ["POC_REPLAY_BIT_IDENTIQUE"]`.
 
+## Note datée du 12/11/2026 (à partir de 11:04:06 UTC) : politique approuvée
+
+`POLITIQUE_COMMIT=97ae561de9e9eccb296fcba09fbbc351988ecf1b`, d'après l'approbation du propriétaire (« Oui, je l'approuve »). Prédiction S1 précisée :
+- `policy.uri` vaut `https://github.com/gigi206/supply-chain/blob/97ae561de9e9eccb296fcba09fbbc351988ecf1b/poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md` ;
+- `policy.digest.sha256` vaut `6cc94a50ea8ca34c90485cc3eccb72e3484aeedd45e308bf1593ead0c547804b`.
+
