@@ -360,3 +360,5 @@ Banc rejoué ([journal](m2-releve4-essai-local.log)), cinq cas, codes attendus :
 **Conséquences pour M2, sans décision :**
 - Les gestes 3 et 4 de la voie 2 sont possibles avec les versions de l'amont aux tags `0.20.1` et `v1.22.2`. Les paquets de Rocky ne sont pas lus : `--help` dans l'image reste la mesure.
 - `--compatibility` reprend l'appel de mock 6.9, et change la limite des changelogs du dépôt. L'effet sur la construction n'est pas mesuré : le dépôt est relu par mock en M3, qui dira si les métadonnées comptent. Garder l'option rend le dépôt identique à celui que construirait `mock-hermetic-repo`.
+
+**Précision du 12/11/2026, écrite à partir de 16:24:50 UTC (le texte ci-dessus n'est pas réécrit)** : « rend le dépôt identique à celui que construirait `mock-hermetic-repo` » va trop loin. Ce qui est établi, c'est le même appel : `subprocess.check_call(["createrepo_c", "--compatibility", options.output_repo])` ([m2-releve2.log](m2-releve2.log), ligne 199 de `mock-hermetic-repo.py`). L'identité des dépôts n'est pas mesurée (horodatages, ordre des fichiers).
