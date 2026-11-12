@@ -81,9 +81,18 @@
 #   vsa     ACCORD NOMMÉ, après rebuild (lien coupé) et après le push d'un commit qui fige rejeu/politique-replay-deb.md
 #           (POLITIQUE_COMMIT) et porte vsa_deb.py à HEAD. Énoncé par vsa_deb.py puis signature par la clé du domaine,
 #           dans la VM sous unshare -rn ; énoncé et bundle archivés dans resultats/. Rien n'est poussé dans Zot.
+#   VSA du deb dans Zot (préparée à sec le 12/11/2026 à partir de 11:58:09 UTC, après « continue » ; modèle : pousser_vsa et
+#   lire_vsa de la brique 10 ; APRÈS S5b, ordre c, et après vsa) :
+#   pousser_vsa  ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH. SUR L'HÔTE, compte poc-replay (D5 : builds/** par digest seulement).
+#           Refus sans le bundle archivé par vsa, si la copie de la CA du PoC diffère de celle de la 08, ou si le layout du
+#           deb (039949f9) n'est pas dans Zot (après S5b : seulement si le build l'a reproduit). Bundle revérifié sur l'hôte
+#           par la clé de VSA ; manifeste fait main (subject = layout du deb) poussé par digest dans builds/vsa/sample-app-deb,
+#           le dépôt que dérive la porte ; aucun referrer ni tag ajouté à builds/sample-app-deb.
+#   lire_vsa  ACCORD NOMMÉ. Lecture anonyme : VSA par COSIGN_REPOSITORY (clé de VSA acceptée, clé de Chains refusée) ;
+#           provenance du tag .att (clé de Chains acceptée, clé de VSA refusée) ; connexions de cosign relevées par strace.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh <étape>
-#   étapes : releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa
+#   étapes : releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa|pousser_vsa|lire_vsa
 #   (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
@@ -690,8 +699,107 @@ EOS
   echo "## copies archivées"; ( cd "$R" && sha256sum s6b-vsa-enonce.json s6b-vsa.bundle.json )
 }
 
-case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1|vsa_essai:1|vsa:1) ;;
-  *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa" >&2; exit 2 ;; esac
+# ---- VSA du deb dans Zot (préparée à sec le 12/11/2026 à partir de 11:58:09 UTC ; après S5b et vsa) ----
+DEPOT_VSA=builds/vsa/sample-app-deb    # dérivé par la porte de la 08 (politique/porte/vsa.sh) : builds/<nom> -> builds/vsa/<nom>
+TYPE_BUNDLE=application/vnd.dev.sigstore.bundle.v0.3+json
+R10=$h06/../10-independent-replay/resultats    # vsa-cle-publique.pem : clé publique du domaine (étape cle_vsa de la 10)
+SECRETS10=$HOME/.cache/supply-chain-poc/10/secrets   # mot de passe de poc-replay (D5) ; jamais affiché
+
+hors_zot() { # trace strace (connect) : connexions vers autre chose que Zot, comptées par adresse (vide : aucune) ; reprise de la 10
+  grep -E '^[0-9]+ +connect\(' "$1" | grep -vF "sin_port=htons(${ZOT#*:}), sin_addr=inet_addr(\"${ZOT%:*}\")" \
+    | grep -oE 'sa_family=AF_[A-Z0-9]+(, sun_path="[^"]*"|, sin_port=htons\([0-9]+\), sin_addr=inet_addr\("[^"]*"\)|, sin6_port=htons\([0-9]+\)[^}]*inet_pton\(AF_INET6, "[^"]*")?' \
+    | sort | uniq -c | sed 's/^ *//' | paste -sd';' - || true
+}
+
+connexions() { # libellé trace : ligne OK/KO du contrôle des connexions d'une commande cosign
+  local h; h=$(hors_zot "$2")
+  [ -z "$h" ] && echo "OK   $1 : aucune connexion hors de Zot ($(grep -cE '^[0-9]+ +connect\(' "$2" || true) connect())" \
+    || echo "KO   $1 : connexions hors de Zot : $h"
+}
+
+anon() { curl -fsS --cacert "$CA" "$@"; }   # lecture anonyme de Zot
+
+etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH (modèle : etape_pousser_vsa de la 10)
+  local x=${T:?}/pousser s m a rc=0 ra ta
+  [ -s "$R/s6b-vsa.bundle.json" ] && [ -s "$R/s6b-vsa-enonce.json" ] || { echo "REFUS : bundle ou énoncé de la VSA absent de resultats/ (étape vsa d'abord)"; exit 1; }
+  cmp -s "$CA" "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" \
+    || { echo "REFUS : la copie de la CA du PoC ($CA) diffère de celle de la 08 (recréée par S5b ?)"; exit 1; }   # certificats publics, non affichés
+  test -s "$SECRETS10/zot-poc-replay.password" || { echo "REFUS : mot de passe de poc-replay absent (D5)"; exit 1; }
+  rm -rf -- "${x:?}" && (umask 077 && mkdir -p "$x")
+  trap 'rm -rf -- "${T:?}/pousser"' EXIT   # copie du mot de passe (auth.json) supprimée même en cas d'échec
+  echo "## bundle archivé, revérifié sur l'hôte"
+  strace -f -qq -e trace=connect -o "$x/trace" cosign verify-blob-attestation --bundle "$R/s6b-vsa.bundle.json" --new-bundle-format \
+    --key "$R10/vsa-cle-publique.pem" --insecure-ignore-tlog --type "$TYPE_VSA" --digest "${DEB_DIGEST#sha256:}" --digestAlg sha256 > "$x/v.err" 2>&1 || rc=$?
+  echo "verify-blob-attestation, clé de VSA (hôte) : code $rc ; $(tail -1 "$x/v.err")"; [ "$rc" = 0 ] || exit 1
+  connexions "verify-blob-attestation (hôte)" "$x/trace"
+  python3 -I - "$R/s6b-vsa.bundle.json" "$R/s6b-vsa-enonce.json" "${DEB_DIGEST#sha256:}" <<'EOP'
+import base64, json, sys
+e = json.loads(base64.b64decode(json.load(open(sys.argv[1]))["dsseEnvelope"]["payload"]))
+p = e["predicate"]
+ok = (e == json.load(open(sys.argv[2])) and [s["digest"]["sha256"] for s in e["subject"]] == [sys.argv[3]]
+      and p["verificationResult"] == "PASSED" and p["verifiedLevels"] == ["POC_REPLAY_BIT_IDENTIQUE"])
+print(("OK   " if ok else "KO   ") + f"énoncé du bundle identique à s6b-vsa-enonce.json ; sujet {e['subject'][0]['name']}@sha256:{e['subject'][0]['digest']['sha256'][:12]}… ; "
+      f"{p['verificationResult']} ; {p['verifiedLevels']} ; timeVerified {p['timeVerified']}")
+sys.exit(0 if ok else 1)
+EOP
+  echo "## sujet dans Zot (lecture anonyme)"
+  # descripteur du layout du deb ; absent après S5b si le build n'a pas reproduit 039949f9 : refus, rien poussé
+  s=$(anon -I -H 'Accept: application/vnd.oci.image.manifest.v1+json' "https://$ZOT/v2/${DEB_SUJET%@*}/manifests/$DEB_DIGEST" \
+    | tr -d '\r' | python3 -I -c 'import sys,json; h={l.split(": ",1)[0].lower(): l.split(": ",1)[1] for l in sys.stdin.read().splitlines() if ": " in l}; print(json.dumps({"mediaType": h["content-type"], "digest": h["docker-content-digest"], "size": int(h["content-length"])}))') \
+    || { echo "REFUS : $DEB_SUJET absent de Zot (S5b n'a pas reproduit 039949f9 ?)"; exit 1; }
+  echo "sujet : $s"
+  [ "$(python3 -I -c 'import json,sys; print(json.loads(sys.argv[1])["digest"])' "$s")" = "$DEB_DIGEST" ] || { echo "REFUS : digest du sujet différent"; exit 1; }
+  ra=$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')
+  ta=$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/tags/list")
+  echo "referrers du deb dans ${DEB_SUJET%@*}, avant : $ra"
+  echo "étiquettes de ${DEB_SUJET%@*}, avant : $ta"
+  printf '{"auths":{"%s":{"auth":"%s"}}}' "$ZOT" "$(printf 'poc-replay:%s' "$(cat "$SECRETS10/zot-poc-replay.password")" | base64 -w0)" > "$x/auth.json"
+  a=(--registry-config "$x/auth.json" --ca-file "$CA")
+  printf '{}' > "$x/config.json"
+  printf '{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json","artifactType":"%s","config":{"mediaType":"application/vnd.oci.empty.v1+json","digest":"sha256:%s","size":2},"layers":[{"mediaType":"%s","digest":"sha256:%s","size":%s}],"subject":%s,"annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"%s"}}' \
+    "$TYPE_BUNDLE" "$(sha256sum < "$x/config.json" | cut -c1-64)" "$TYPE_BUNDLE" "$(sha256sum < "$R/s6b-vsa.bundle.json" | cut -c1-64)" \
+    "$(wc -c < "$R/s6b-vsa.bundle.json")" "$s" "$TYPE_VSA" > "$x/manifeste.json"
+  m=sha256:$(sha256sum < "$x/manifeste.json" | cut -c1-64)
+  cp "$x/manifeste.json" "$R/s6b-vsa-manifeste.json"
+  echo "## push (poc-replay, par digest, dans $DEPOT_VSA)"
+  oras blob push "${a[@]}" "$ZOT/$DEPOT_VSA" "$R/s6b-vsa.bundle.json" > /dev/null && echo "blob du bundle poussé"
+  oras blob push "${a[@]}" "$ZOT/$DEPOT_VSA" "$x/config.json" > /dev/null && echo "config vide poussée"
+  oras manifest push "${a[@]}" "$ZOT/$DEPOT_VSA@$m" "$x/manifeste.json" 2>&1 | tail -1
+  rm -rf -- "${x:?}"
+  echo "## relecture anonyme"
+  echo "referrers du deb dans $DEPOT_VSA : $(anon "https://$ZOT/v2/$DEPOT_VSA/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print([(m.get("artifactType"), m["digest"]) for m in json.load(sys.stdin)["manifests"]])')"
+  echo "étiquettes de $DEPOT_VSA : $(curl -s --cacert "$CA" "https://$ZOT/v2/$DEPOT_VSA/tags/list")"
+  [ "$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')" = "$ra" ] \
+    && echo "OK   referrers du deb dans ${DEB_SUJET%@*} inchangés ($ra)" || echo "KO   referrers du deb dans ${DEB_SUJET%@*} changés"
+  [ "$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/tags/list")" = "$ta" ] \
+    && echo "OK   étiquettes de ${DEB_SUJET%@*} inchangées" || echo "KO   étiquettes de ${DEB_SUJET%@*} changées"
+  echo "manifeste poussé : $m (copie : resultats/s6b-vsa-manifeste.json)"
+}
+
+etape_lire_vsa() { # lecture anonyme, cosign sous strace (connect) ; clés croisées et témoins (modèle : etape_lire_vsa de la 10)
+  local i=$ZOT/$DEB_SUJET c=$R08/chains-cle-publique.pem k=$R10/vsa-cle-publique.pem ko=0
+  essai() { # libellé attendu(accepte|refus) commande… : verdict, puis contrôle des connexions
+    local l=$1 att=$2 r; shift 2
+    if strace -f -qq -e trace=connect -o "$T/lire.trace" "$@" > "$T/lire.out" 2> "$T/lire.err"; then r=accepte; else r=refus; fi
+    [ "$r" = "$att" ] && echo "OK   $l : $r ($(grep -c '^{' "$T/lire.out" || true) vérifiée(s) ; $(grep -m1 '^Error' "$T/lire.err" | cut -c1-140))" \
+      || { echo "KO   $l : $r (attendu $att) ; $(grep -m1 '^Error' "$T/lire.err" | cut -c1-140)"; ko=1; }
+    connexions "$l" "$T/lire.trace"
+  }
+  mkdir -p "$T"
+  essai "VSA par COSIGN_REPOSITORY, clé de VSA" accepte env COSIGN_REPOSITORY="$ZOT/$DEPOT_VSA" cosign verify-attestation \
+    --key "$k" --insecure-ignore-tlog --type "$TYPE_VSA" --registry-cacert "$CA" "$i"
+  essai "VSA par COSIGN_REPOSITORY, clé de Chains" refus env COSIGN_REPOSITORY="$ZOT/$DEPOT_VSA" cosign verify-attestation \
+    --key "$c" --insecure-ignore-tlog --type "$TYPE_VSA" --registry-cacert "$CA" "$i"
+  essai "provenance (tag .att), clé de VSA" refus cosign verify-attestation --key "$k" --insecure-ignore-tlog \
+    --type slsaprovenance1 --registry-cacert "$CA" "$i"
+  essai "témoin : provenance (tag .att), clé de Chains" accepte cosign verify-attestation --key "$c" --insecure-ignore-tlog \
+    --type slsaprovenance1 --registry-cacert "$CA" "$i"
+  rm -f "$T/lire.out" "$T/lire.err" "$T/lire.trace"
+  [ $ko = 0 ] && echo "bilan : tout OK" || { echo "bilan : au moins un KO"; exit 1; }
+}
+
+case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1|vsa_essai:1|vsa:1|pousser_vsa:1|lire_vsa:1) ;;
+  *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot|transporter|verifier|repetition|rebuild|vsa_essai|vsa|pousser_vsa|lire_vsa" >&2; exit 2 ;; esac
 chrono "S6b $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
 chrono "S6b $1 fait"

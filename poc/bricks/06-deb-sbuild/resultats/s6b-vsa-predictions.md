@@ -111,3 +111,12 @@ Journal : `s6b-vsa_essai.log`. sha256 transportés, égaux côté hôte et côt�
 - `policy.uri` vaut `https://github.com/gigi206/supply-chain/blob/97ae561de9e9eccb296fcba09fbbc351988ecf1b/poc/bricks/06-deb-sbuild/rejeu/politique-replay-deb.md` ;
 - `policy.digest.sha256` vaut `6cc94a50ea8ca34c90485cc3eccb72e3484aeedd45e308bf1593ead0c547804b`.
 
+
+## Note datée du 12/11/2026 (à partir de 11:58:09 UTC) : `verifier.version` attendu, et push préparé à sec
+
+**Prédiction S1 précisée.** Les sha256 de `verifier.version` sont ceux des fichiers de HEAD, lus par `git show` :
+- `verifier_deb.py` : `7498fdad…`, celui que `transporter` a copié dans la VM et que `verifier` a journalisé ;
+- `rebuild_deb.sh` : `55ebf681…`, le script entier que `rebuild` transportera, et non plus la copie de répétition (`1422b13d…`) ;
+- `vsa_deb.py` : `34799510…`, la version « Bit identique seul ».
+
+**Le push de la VSA dans Zot est préparé à sec** : étapes `pousser_vsa` et `lire_vsa` de `s6b.sh`, prédictions dans [`s6b-pousser-predictions.md`](s6b-pousser-predictions.md). Elles viennent après S5b. Les étapes `rebuild` et `vsa` ne changent pas : le diff de `s6b.sh` n'ajoute que deux fonctions, quatre constantes, trois fonctions d'appui (`hors_zot` et `connexions`, reprises de la 10, et `anon`, la lecture anonyme), l'en-tête et la ligne d'usage.

@@ -1945,3 +1945,9 @@ Le texte ne porte plus aucune mention de projet, et la garde de `vsa` l'accepte.
 2. le commit de ses résultats, puis un seul push, avec ton « oui » ;
 3. `POLITIQUE_COMMIT=97ae561de9e9eccb296fcba09fbbc351988ecf1b mise exec -- poc/bricks/06-deb-sbuild/s6b.sh vsa`.
 
+
+**Additif du 12/11/2026 (à partir de 11:58:09 UTC, après « continue ») : push de la VSA du deb préparé à sec, rien lancé.** `s6b.sh` gagne deux étapes, pour après S5b :
+- `pousser_vsa` pousse par digest, avec le compte `poc-replay`, la VSA archivée par `vsa` dans `builds/vsa/sample-app-deb`. Elle refuse si le layout `039949f9` n'est pas dans Zot, ce qui arrivera après S5b si le build ne le reproduit pas ;
+- `lire_vsa` relit la VSA et la provenance en anonyme, avec les clés croisées.
+
+Prédictions : [`resultats/s6b-pousser-predictions.md`](resultats/s6b-pousser-predictions.md). `rebuild` et `vsa` ne changent pas.
