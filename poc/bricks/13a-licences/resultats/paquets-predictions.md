@@ -84,3 +84,51 @@ partir de 19:43:35 UTC.
 - Ce qui est établi : la licence **déclarée** du deb construit, lue dans le paquet lui-même, est conforme à la politique de 13a.
   Rien n'établit que les trois paragraphes couvrent tous les fichiers du paquet (licences conclues : 13b).
 - Suite du volet : rpm après S1 de la 05 ; `.dsc` et SRPM en referrer après S5b (accord à part) ; tâche de confiance signée.
+
+## Étape `modules` (ajoutée à sec le 12/11/2026 après le passage de `deb`, sur « continue »), NON LANCÉE
+
+**Pourquoi.** `deb` établit la licence **déclarée** par le copyright. Le binaire Go dit lui-même ce qui y est compilé : ses
+informations de build (module principal, dépendances, version de Go, réglages) restent lisibles malgré `-s -w -trimpath`. Les
+rapprocher des paragraphes `Files` vérifie que chaque dépendance compilée a une licence déclarée qui lui est propre.
+
+**Ce que fait l'étape** ([`paquets.sh`](../paquets.sh) `modules`, [`paquets.py`](../paquets.py) `modules`) : hôte seul, sans réseau ;
+même deb, sha256 épinglé ; chaque fichier de `./usr/bin` est lu en mémoire, jamais exécuté ; en-tête `\xff Go buildinf:` exigé une
+seule fois, au format de go1.18 et après (sinon refus) ; pour chaque dépendance, le **dernier** paragraphe `Files` qui couvre
+`vendor/<module>/…` s'applique, comme en DEP-5 : KO s'il n'y en a pas, ou si seul `Files: *` la couvre (elle prendrait la licence du
+projet) ; un paragraphe `vendor/` sans module compilé est un ÉCART ; la bibliothèque standard de Go, compilée mais hors des sources
+donc hors du copyright, est toujours un ÉCART, avec le champ `Built-Using` du `control`. Témoin : le même deb, copyright privé du
+paragraphe de `chi`, réécrit dans le dossier de travail (0700, effacé à la fin) : il doit donner un KO sur `chi`.
+
+**Banc hors réseau** ([`paquets-modules-essai-local.sh`](paquets-modules-essai-local.sh), [journal](paquets-modules-essai-local.log)) :
+un programme Go à une dépendance vendorisée, compilé avec le Go 1.24.7 de mise (`GOPROXY=off`, options de `debian/rules`) ;
+`paquets.py` lit les mêmes path, mod, dep, version de Go et nombre de réglages que `go version -m` ; six debs synthétiques au code et
+au motif attendus : dépendance vendorisée sous le nom de `chi` avec le copyright du dépôt et `TEMOIN_DEP` d'origine (0 : `chi` couverte,
+témoin refusé ; c'est le texte réel sur lequel le témoin tournera, P3 l'ayant mesuré identique à celui du deb), nominal 0, sans
+paragraphe propre 1, paragraphe orphelin 0 avec ÉCART, script sans informations de build 1, en-tête en double 1 (cas `chi` ajouté sur
+relecture du conseiller). Le banc de `deb`, rejoué après ces changements, reste à neuf cas tenus ([journal](paquets-essai-local.log)).
+Non couverts : un remplacement de module (`=>`, refusé sans être essayé), le format d'avant go1.18, un binaire non Go dans `./usr/bin`
+d'un vrai paquet.
+
+**Lu avant de prédire** : `go.mod` de sample-app (`require github.com/go-chi/chi/v5 v5.2.3`, seule dépendance) ; `s3-build-1.buildinfo`
+de la 06 (`golang-1.24-go (= 1.24.4-1)`) ; `debian/control` du dépôt (pas de `Built-Using`) ; `debian/rules` (`-mod=vendor -trimpath`,
+`-ldflags "-s -w -buildid= -X main.Version=…"`). Le contenu de `./usr/bin` du vrai deb n'a été listé que par noms et tailles.
+Mesuré au banc, sur relecture du conseiller : avec `-trimpath`, Go 1.24.7 n'enregistre pas `-ldflags` ; les 7 réglages sont
+`-buildmode=exe`, `-compiler=gc`, `-trimpath=true`, `CGO_ENABLED=0`, `GOARCH=amd64`, `GOOS=linux`, `GOAMD64=v1`.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| M1 | Un seul fichier dans `./usr/bin` (`sample-app`), informations de build lisibles au format de go1.18 et après | Haute |
+| M2 | Version de Go `go1.24.4` (golang-1.24 de Debian 13 au build de S3) | Moyenne : la chaîne exacte n'est pas lue |
+| M3 | `path` et `mod` `example.com/supply-chain/sample-app` ; une seule dépendance, `github.com/go-chi/chi/v5 v5.2.3` | Haute : go.mod |
+| M4 | `chi` couverte par le paragraphe `vendor/github.com/go-chi/chi/v5/*` (MIT) : OK, aucun paragraphe orphelin | Haute |
+| M5 | ÉCART de la bibliothèque standard, `Built-Using` absent | Haute |
+| M6 | Les réglages de build portent `-trimpath=true` et `CGO_ENABLED=0`, et pas `-ldflags` (non enregistré avec `-trimpath`) | Moyenne : mesuré avec go1.24.7 au banc, pas avec go1.24.4 |
+| M7 | Le témoin sans paragraphe de `chi` donne un KO sur `chi` | Haute |
+
+**Limites de l'analyse** : un paragraphe large (`Files: vendor/*`, ou une liste qui contient `*` et d'autres motifs) compte comme
+propre pour toute dépendance qu'il couvre ; un `control` sans `Package` donne une trace Python au lieu d'un REFUS (code 1 : refus
+fermé quand même).
+
+**Ce que l'étape ne mesure pas** : les paquets npm intégrés à `web/dist` (`marked`), invisibles dans les informations de build de Go ;
+la licence de la bibliothèque standard elle-même (seule sa présence est constatée) ; ce que Debian attend pour elle (`Built-Using`,
+`Static-Built-Using`), non relu.

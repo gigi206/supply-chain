@@ -74,3 +74,8 @@ Banc hors réseau : neuf cas au code attendu ([journal](resultats/paquets-essai-
 **Premier passage de `deb`, le 12/11/2026 de 19:43:12 à 19:43:13 UTC (« Oui, lance deb »)** : code 0, P1 à P5 tenues ([journal](resultats/paquets-deb.log),
 [résultats](resultats/paquets-predictions.md)). Licence déclarée du deb de la 06 : `Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)`, 0 erreur,
 0 NOASSERTION, 0 invalide ; copyright du deb identique à celui du dépôt ; quatre témoins refusés au motif attendu.
+
+**Étape `modules` ajoutée à sec, NON LANCÉE** (après « continue ») : rapproche les dépendances compilées dans le binaire Go du deb (informations
+de build lues en mémoire, binaire jamais exécuté) des paragraphes `Files` du copyright ; bibliothèque standard de Go en écart ; témoin
+sans le paragraphe de `chi`. Banc hors réseau tenu, lecture identique à `go version -m` ([journal](resultats/paquets-modules-essai-local.log)).
+Prédictions M1 à M7 : [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md).

@@ -7,8 +7,14 @@
 #         poc/packaging/debian/copyright ; puis quatre témoins négatifs (copyright synthétiques, écrits par cette étape) qui
 #         doivent être refusés : GPL refusée par la politique, en-tête Format absent (NOASSERTION), paragraphe Files sans
 #         License (refus de l analyse), nom DEP-5 non SPDX (Expat : invalide, jamais traduit). Sortie : prédicat archivé.
-#   Hors de cette étape : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
-# Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb   (journal : resultats/paquets-deb.log)
+#   modules  (ajoutée à sec le 12/11/2026, après le premier passage de deb, NON LANCÉE) hôte seul, sans réseau : même deb, sha256
+#         épinglé ; paquets.py modules lit en mémoire les informations de build de Go de chaque fichier de ./usr/bin (jamais écrit
+#         sur disque ni exécuté) et rapproche chaque dépendance compilée des paragraphes Files du copyright ; bibliothèque
+#         standard de Go en ÉCART (hors des sources) ; témoin : le même deb avec un copyright privé du paragraphe de TEMOIN_DEP, réécrit
+#         en mémoire puis dans le dossier de travail (0700, effacé à la fin), doit donner un KO sur cette dépendance.
+#   Hors de ces étapes : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
+# Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb       (journal : resultats/paquets-deb.log)
+#         mise exec -- poc/bricks/13a-licences/paquets.sh modules   (journal : resultats/paquets-modules.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -16,6 +22,7 @@ repo=$(git -C "$here" rev-parse --show-toplevel)
 R=$here/resultats
 DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb}
 DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # deb des deux builds de S3 (06, s3-comparaison.log)
+TEMOIN_DEP=github.com/go-chi/chi/v5   # étape modules : dépendance dont le paragraphe Files est retiré du témoin
 SPDX=${SPDX:?liste SPDX (mise exec)}
 T=$HOME/.cache/supply-chain-poc/13a/paquets
 chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
@@ -90,7 +97,53 @@ EOT
   [ "$ko" = 0 ] && echo "bilan : deb jugé conforme, quatre témoins refusés" || { echo "bilan : KO"; exit 1; }
 }
 
-[ $# -gt 0 ] || { echo "usage : $0 deb" >&2; exit 2; }
+etape_modules() {
+  local s rc
+  rm -rf -- "${T:?}" && mkdir -p "$T" && chmod 0700 "$T"
+  echo "paquets.py : $(sha256sum < "$here/paquets.py" | cut -c1-64)"
+  [ -f "$DEB" ] || { echo "KO   deb absent : $DEB"; exit 1; }
+  s=$(sha256sum < "$DEB" | cut -c1-64)
+  [ "$s" = "$DEB_SHA" ] || { echo "KO   sha256 du deb : $s, attendu $DEB_SHA"; exit 1; }
+  echo "OK   sha256 du deb épinglé : $s"
+  rc=0; python3 -I "$here/paquets.py" modules "$DEB" || rc=$?
+  [ "$rc" = 0 ] || { echo "KO   paquets.py modules : code $rc"; exit 1; }
+  echo "## témoin : même deb, copyright sans le paragraphe de $TEMOIN_DEP (doit donner un KO sur cette dépendance)"
+  python3 -I - "$DEB" "$T/temoin.deb" "$TEMOIN_DEP" <<'EOP'
+import io, re, sys, tarfile
+b = open(sys.argv[1], "rb").read()
+ms, i = [], 8
+while i < len(b):
+    h = b[i:i + 60]; n = int(h[48:58]); ms.append([h[:16].decode().strip(), b[i + 60:i + 60 + n]]); i += 60 + n + (n & 1)
+src = tarfile.open(fileobj=io.BytesIO(ms[2][1]), mode="r:xz")
+out = io.BytesIO()
+dst = tarfile.open(fileobj=out, mode="w:xz")
+retire = 0
+for m in src.getmembers():
+    f = src.extractfile(m) if m.isfile() else None
+    data = f.read() if f else None
+    if m.name.endswith("/copyright") and data is not None:
+        t, retire = re.subn(r"\n\nFiles: vendor/" + re.escape(sys.argv[3]) + r"/\*\n(?:[^\n]+\n)+?(?=\n)", "\n", data.decode() + "\n")
+        t = t[:-1]
+        data = t.encode(); m.size = len(data)
+    dst.addfile(m, io.BytesIO(data) if data is not None else None)
+dst.close()
+assert retire == 1, f"paragraphe de {sys.argv[3]} retiré {retire} fois"
+ms[2][1] = out.getvalue()
+o = b"!<arch>\n"
+for n, d in ms:
+    o += f"{n:<16}{0:<12}{0:<6}{0:<6}{100644:<8}{len(d):<10}".encode() + b"`\n" + d + (b"\n" if len(d) & 1 else b"")
+open(sys.argv[2], "wb").write(o)
+print(f"témoin écrit : paragraphe de {sys.argv[3]} retiré 1 fois")
+EOP
+  rc=0; python3 -I "$here/paquets.py" modules "$T/temoin.deb" > "$T/temoin.out" 2>&1 || rc=$?
+  if [ "$rc" = 1 ] && grep -qF "KO   dep $TEMOIN_DEP " "$T/temoin.out" && ! grep -q '^Traceback' "$T/temoin.out"; then
+    echo "OK   témoin refusé : $(grep -m1 '^KO   dep ' "$T/temoin.out")"
+  else echo "KO   témoin : code $rc"; tail -3 "$T/temoin.out"; rm -rf -- "${T:?}"; exit 1; fi
+  rm -rf -- "${T:?}"
+  echo "bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé"
+}
+
+[ $# -gt 0 ] || { echo "usage : $0 deb|modules" >&2; exit 2; }
 for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
 for e in "$@"; do
   chrono "13a paquets $e"

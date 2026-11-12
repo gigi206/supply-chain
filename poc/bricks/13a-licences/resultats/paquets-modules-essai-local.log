@@ -1,0 +1,61 @@
+# banc paquets.sh modules, 2026-11-12T19:52:03Z, paquets.sh bc7aedcf8eb1dd2ae2da7b4a2a2586b28b310bf08a98bf3707b99f74aa9ed84e, paquets.py 18aca8d6364006fa543e3dcf9bd2b800315e7c5178624e1c525697733b14dac4, go version go1.24.7 linux/amd64
+## lecture des informations de build : paquets.py contre go version -m
+paquets.py modules (nominal) : code 0
+OK   path, mod et dep identiques à go version -m (3 lignes)
+OK   version de Go identique : go1.24.7
+OK   réglages de build : 7, comme go version -m
+## étape modules sur debs synthétiques
+OK   m-chi-depot : code 0, « ^OK   témoin refusé : KO   dep github.com/go-chi/chi/v5 v5.2.3 »
+     OK   sha256 du deb épinglé : 6e7998810eda709fc6ba775ff633e925ebf026acf05879510d81b0b185a847ba
+     control : Built-Using absent
+     go : go1.24.7
+     dep : github.com/go-chi/chi/v5 v5.2.3 
+     OK   dep github.com/go-chi/chi/v5 v5.2.3 : paragraphe Files vendor/github.com/go-chi/chi/v5/* (MIT)
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+     OK   témoin refusé : KO   dep github.com/go-chi/chi/v5 v5.2.3 : aucun paragraphe Files propre (couverte par « * » seul : True)
+     bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé
+     build : -buildmode=exe
+     build : -compiler=gc
+     build : -trimpath=true
+     build : CGO_ENABLED=0
+     build : GOARCH=amd64
+     build : GOOS=linux
+     build : GOAMD64=v1
+OK   m-nominal : code 0, « ^bilan : chaque dépendance compilée a son paragraphe Files »
+     OK   sha256 du deb épinglé : 313aa1043a856e1d3b66f7ea7fbff333e8e74996890f5dd3794449f2aa25b4c9
+     control : Built-Using absent
+     go : go1.24.7
+     dep : example.com/dep v1.0.0 
+     OK   dep example.com/dep v1.0.0 : paragraphe Files vendor/example.com/dep/* (MIT)
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+     OK   témoin refusé : KO   dep example.com/dep v1.0.0 : aucun paragraphe Files propre (couverte par « * » seul : True)
+     bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé
+OK   m-sans-dep : code 1, « ^KO   paquets.py modules »
+     OK   sha256 du deb épinglé : 9191233d0e0fdd8492db166f56dd9f3e60d0be1947d18c421046a376dbec7394
+     control : Built-Using absent
+     go : go1.24.7
+     dep : example.com/dep v1.0.0 
+     KO   dep example.com/dep v1.0.0 : aucun paragraphe Files propre (couverte par « * » seul : True)
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+     KO   paquets.py modules : code 1
+OK   m-orpheline : code 0, « ^ÉCART paragraphe Files vendor/example.org/orpheline »
+     OK   sha256 du deb épinglé : 56d6b72961f4bd9fbec8c8223fc73bb99864d3177b953ecce3b5ff81e942222e
+     control : Built-Using absent
+     go : go1.24.7
+     dep : example.com/dep v1.0.0 
+     OK   dep example.com/dep v1.0.0 : paragraphe Files vendor/example.com/dep/* (MIT)
+     ÉCART paragraphe Files vendor/example.org/orpheline/* (ISC) : aucun module compilé ne lui correspond
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+     OK   témoin refusé : KO   dep example.com/dep v1.0.0 : aucun paragraphe Files propre (couverte par « * » seul : True)
+     bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé
+OK   m-script : code 1, « REFUS : en-tête des informations de build : 0 occurrence »
+     OK   sha256 du deb épinglé : 688ab6e5ce153c13da33891f260456153a7403106ad597e273059fb7d7a22df1
+     control : Built-Using absent
+     REFUS : en-tête des informations de build : 0 occurrence(s), 1 attendue
+     KO   paquets.py modules : code 1
+OK   m-double : code 1, « REFUS : en-tête des informations de build : 2 occurrence »
+     OK   sha256 du deb épinglé : dabb3408d24869ca9dadaa463282314155760e8e5d9205603ac88cda3c4e432b
+     control : Built-Using absent
+     REFUS : en-tête des informations de build : 2 occurrence(s), 1 attendue
+     KO   paquets.py modules : code 1
+chrono.tsv du banc : 9 lignes ; fichiers de 13a touchés : 0
