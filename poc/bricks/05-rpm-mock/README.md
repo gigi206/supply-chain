@@ -226,3 +226,14 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Le texte de D3 (a) du 10/11 n'est pas réécrit ; cette lecture le précise.
 - Restent à décider : la voie pour la référence du bootstrap, et l'image de bootstrap « prête », qui attend la mesure de l'étape `verrou`.
 - Rien n'est lancé. M2 s'écrira après S1, elle-même après S5b.
+
+**Décision du 12/11/2026, notée à 15:48:34 UTC : voie 2 retenue pour la référence du bootstrap.** Question posée : « Quelle voie pour la référence du bootstrap ? » ; réponse du propriétaire : « Voie 2 ».
+- En M2, nos propres étapes remplacent `mock-hermetic-repo` en entier ([faisabilité lue](resultats/m2-predictions.md)) :
+  1. télécharger les rpm du verrou ;
+  2. `rpm -K` avec la clé Rocky, puis comparer les `sigmd5` au verrou ;
+  3. `createrepo_c --compatibility` ;
+  4. `skopeo copy --preserve-digests` de l'image, par le `pull_digest` du verrou, vers le dossier `dir:` qu'attend `config.py:846`.
+- mock reste le rpm signé d'EPEL, et rien de ce que S5b rejoue n'est touché.
+- Le remplacement d'un outil de mock par nos étapes est un écart à documenter.
+- Tout est lu dans le code, rien n'est mesuré. Le chemin exact du dossier dépend du `pull_digest`, que seule l'étape `verrou` de S1 donnera.
+- Reste à décider : l'image de bootstrap « prête », qui attend la mesure de l'étape `verrou`. Rien n'est lancé.

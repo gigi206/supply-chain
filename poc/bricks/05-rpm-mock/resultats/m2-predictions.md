@@ -268,3 +268,11 @@ Question posée : « Pour D3 (a), on retient la résolution dans un pod Kata lan
 - La lecture proposée à l'embranchement 1 est retenue : la résolution de M2 tourne dans un pod Kata lancé à la main, comme S1, puis dans Tekton en M4. Rien n'est installé sur l'hôte.
 - L'embranchement 4 s'applique tel quel : ce pod porte le label `prefetch-rpm-sortie`.
 - Les embranchements 2 (image prête) et 3 (reprise de S1) restent ouverts, de même que le choix de la voie pour la référence du bootstrap.
+
+## Décision du 12/11/2026, notée à 15:48:34 UTC : voie 2 retenue
+
+Question posée : « Quelle voie pour la référence du bootstrap ? » ; réponse du propriétaire : « Voie 2 ».
+- M2 suivra les quatre gestes de « Ce que la voie 2 demanderait », plus haut, à la place de `mock-hermetic-repo`. La copie de l'image se fera par le `pull_digest` du verrou, et s'arrêtera s'il diffère de `BOOT_DIGEST` (Q2 de la correction de `releve3`).
+- Les voies 1, 3 et 4 ne sont pas essayées.
+- Rien n'est mesuré : la tenue de la voie se verra en M3, où mock compare le digest de l'image (R4r).
+- L'embranchement 2 (image prête) reste ouvert.
