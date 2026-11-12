@@ -10,7 +10,8 @@ cp "$H/conf.json" "$H/depot.json"
 cat > "$H/stub.sh" <<EOF
 W=$H/w
 sur() { shift; case \$1 in
-  systemctl*) echo "Fri 2026-11-13 08:00:00 UTC" ;;
+  "systemctl show zot.service -p ActiveState --value") echo "\${ETAT_ZOT-active}" ;;
+  systemctl*) echo "\${DEMARRAGE_ZOT-Fri 2026-11-13 08:00:00 UTC}" ;;
   "sudo cat /etc/zot/config.json") cat "$H/conf.json" ;;
   *) bash -c "sudo() { \"\\\$@\"; }; \$1" ;; esac; }
 lancer() { etape_\$3; }
@@ -28,4 +29,9 @@ chmod 755 "$H/racine/vulndb/grype"
 echo "== essai 3 : rootDirectory du dépôt différent de la VM"
 jq '.storage.rootDirectory="/ailleurs"' "$H/conf.json" > "$H/depot.json"
 bash "$H/essai.sh" releve 2>&1 | tail -1; echo "code ${PIPESTATUS[0]}"
+cp "$H/conf.json" "$H/depot.json"
+echo "== essai 4 : ActiveEnterTimestamp vide (ajouté le 12/11/2026)"
+DEMARRAGE_ZOT='' bash "$H/essai.sh" releve 2>&1 | tail -1; echo "code ${PIPESTATUS[0]}"
+echo "== essai 5 : zot.service inactif (ajouté le 12/11/2026)"
+ETAT_ZOT=inactive bash "$H/essai.sh" releve 2>&1 | tail -1; echo "code ${PIPESTATUS[0]}"
 rm -rf -- "${H:?}"

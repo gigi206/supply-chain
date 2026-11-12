@@ -1,7 +1,8 @@
-# essai hors cluster de g7-replanifier.sh releve (VM et Zot simulés, banc g7-replanifier-essai-local.sh), 2026-11-12T14:51:45Z
+# essai hors cluster de g7-replanifier.sh releve (VM et Zot simulés, banc g7-replanifier-essai-local.sh), 2026-11-12T15:52:49Z
 5
 == essai 1 : vulndb/grype absent, deux blobs de scan
 ## Zot sur sc-stockage
+OK   zot.service actif : active
 zot.service démarré : Fri 2026-11-13 08:00:00 UTC
 démarrage en UTC : 2026-11-13T08:00:00Z
 ## configuration de rétention et de gc, VM comparée au dépôt
@@ -23,4 +24,10 @@ KO   relevé des blobs en échec (motif ci-dessus)
 code 1
 == essai 3 : rootDirectory du dépôt différent de la VM
 KO   configuration de rétention et de gc identique au dépôt : non (attendu : oui)
+code 1
+== essai 4 : ActiveEnterTimestamp vide (ajouté le 12/11/2026)
+KO   ActiveEnterTimestamp vide : pas de démarrage relevé, rien à calculer
+code 1
+== essai 5 : zot.service inactif (ajouté le 12/11/2026)
+KO   zot.service actif : inactive (attendu : active)
 code 1

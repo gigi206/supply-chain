@@ -4,6 +4,8 @@
 # NON LANCÉ. Lecture seule, à lancer après S5b, sur accord nommé. Prédictions et consigne de la tâche : resultats/g7-replanification.md.
 # Corrigé à sec le 12/11/2026 à partir de 14:50:52 UTC, NON LANCÉ, avant tout accord : dossier racine lu dans la configuration de la VM
 # (et comparé au dépôt) au lieu d'être écrit en dur ; dossier absent ou find en échec signalés par un KO, au lieu d'un arrêt muet.
+# Corrigé à sec le 12/11/2026 à partir de 15:52:35 UTC, NON LANCÉ, avant tout accord : zot.service doit être actif, et un
+# ActiveEnterTimestamp vide est refusé (date -u -d '' rend minuit du jour avec le code 0, donc un calcul faux sans message).
 #   releve   sc-stockage, lecture seule (ssh, sudo pour lire le rootDirectory de Zot) : démarrage de zot.service, configuration de rétention et de
 #            gc lue sur la VM et comparée au dépôt ; par dépôt de builds/scan/** et pour vulndb/grype : nombre de blobs, plus ancien et
 #            plus récent (date de modification) ; calcul, sans mesure, de la première suppression possible (plus ancien blob de
@@ -29,11 +31,14 @@ duree_s() { # 336h, 24h, 1h, 30m → secondes (formes employées par zot.json)
 }
 
 etape_releve() {
-  local z d g o k s b r
+  local z d g o k s b r e
   echo "## Zot sur sc-stockage"
+  e=$(sur sc-stockage 'systemctl show zot.service -p ActiveState --value' </dev/null)
+  attendu "zot.service actif" "$e" active
   z=$(sur sc-stockage 'systemctl show zot.service -p ActiveEnterTimestamp --value' </dev/null)
+  [ -n "$z" ] || { echo "KO   ActiveEnterTimestamp vide : pas de démarrage relevé, rien à calculer" >&2; exit 1; }
   echo "zot.service démarré : $z"
-  date -u -d "$z" +%s > "$T/demarrage.s"
+  date -u -d "$z" +%s > "$T/demarrage.s" || { echo "KO   date de démarrage illisible : $z" >&2; exit 1; }
   echo "démarrage en UTC : $(date -u -d "@$(cat "$T/demarrage.s")" +%Y-%m-%dT%H:%M:%SZ)"
   echo "## configuration de rétention et de gc, VM comparée au dépôt"
   sur sc-stockage 'sudo cat /etc/zot/config.json' </dev/null \
