@@ -182,3 +182,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
   - le verrou doit avoir été calculé avec `bootstrap_image_ready=True` ;
   - `hermetic-build.cfg` met `gpgcheck=0`, donc les signatures des rpm seront à vérifier par nous.
 - Le passage des macros d'OBS par le verrou est à vérifier en M2.
+
+**Additif du 12/11/2026, à partir de 14:43:15 UTC : étape `verrou` ajoutée à `s1.sh` (« Oui, ajoute-le »), NON LANCÉE.**
+- Elle lance `--calculate-build-dependencies` avec une configuration jumelle en `bootstrap_image_ready = True`, pour mesurer dès S1 si `rockylinux:9.7` brut convient au mode hermétique.
+- Le verrou est archivé, et rien n'est poussé.
+- Prédictions V1 à V5 : [`resultats/s1-predictions.md`](resultats/s1-predictions.md).

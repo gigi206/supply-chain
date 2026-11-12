@@ -21,6 +21,9 @@
 #   essais      pod Kata privilégié, root, label prefetch-rpm, image d'essai : sonde (capacités, montages, versions, clés,
 #               dépôts actifs de mock) ; podman pull de l'image de bootstrap par digest et image mount ; puis, pour nspawn puis
 #               simple : mock --buildsrpm et --rebuild de sample-app, sha256 du src.rpm et du rpm, place de /w, scrub
+#   verrou      (ajoutée le 12/11/2026 après le relevé de M2) pod Kata privilégié, root, label prefetch-rpm, image d'essai :
+#               configuration jumelle avec bootstrap_image_ready=True ; mock --buildsrpm puis --calculate-build-dependencies,
+#               isolation ISOLATION (simple par défaut) ; verrou archivé (resultats/s1-verrou.json) et résumé ; rien poussé
 # Les replis (stockage vfs, mock non root, bootstrap sans image) ne sont pas lancés ici : chacun demande sa prédiction et un accord.
 # Retrait : Zot n'autorise pas la suppression ; dépôts amont/rockylinux/rockylinux et essais-05/mock-rocky9 définitifs.
 #
@@ -52,6 +55,7 @@ LIMITES='{"cpu": "2", "memory": "6Gi"}'      # demandes = limites ; tmpfs /w com
 TMPFS=4Gi
 PRIVILEGIE='{"privileged": true, "allowPrivilegeEscalation": true}'
 CFG=poc-rocky-9.7-x86_64
+CFG_PRET=poc-rocky-9.7-pret-x86_64   # étape verrou : même configuration, bootstrap_image_ready=True
 T=$W/s1-05
 mkdir -p "$T"
 umask 022
@@ -346,6 +350,10 @@ etape_image() {
   [ -s "$T/racine.tar" ] || { echo "KO   lancer d'abord l'étape racine" >&2; exit 1; }
   rm -rf -- "${c:?}" && mkdir -p "$c/etc/mock" "$c/etc/containers"
   printf '%s' "$MOCK_CFG" > "$c/etc/mock/$CFG.cfg"
+  printf '%s' "$MOCK_CFG" | sed -e "s|'root'\] = '$CFG'|'root'] = '$CFG_PRET'|" \
+    -e "s|'bootstrap_image_ready'\] = False|'bootstrap_image_ready'] = True|" > "$c/etc/mock/$CFG_PRET.cfg"
+  attendu "configuration prête : racine et bootstrap_image_ready changés, rien d'autre" \
+    "$(diff "$c/etc/mock/$CFG.cfg" "$c/etc/mock/$CFG_PRET.cfg" | grep -c '^[<>]')" 4
   printf '%s' "$STOCKAGE" > "$c/etc/containers/storage.conf"
   echo "configuration de mock : sha256 $(sha256sum < "$c/etc/mock/$CFG.cfg" | cut -c1-64)"
   tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime --mtime=@0 \
@@ -418,6 +426,62 @@ etape_essais() {
   kubectl exec -n builds "$n" -- sh -c 'for f in /w/res-*/build.log /w/res-*/root.log; do [ -e "$f" ] && { echo "### $f"; tail -n 200 "$f"; }; done' \
     </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-essais-mock.log" || true
   echo "journaux de mock : $(wc -l < "$R/$PREFIXE-essais-mock.log") lignes, resultats/$PREFIXE-essais-mock.log"
+  pod_retirer "$n"
+}
+
+# Étape verrou (ajoutée à sec le 12/11/2026 à partir de 14:43:15 UTC, après le relevé de M2, NON LANCÉE) : --hermetic-build refuse
+# un verrou calculé sans bootstrap_image_ready=True (mock 6.9, config.py:824). Même configuration que $CFG, sauf la racine et
+# bootstrap_image_ready=True : rockylinux:9.7 brut est-il une image « prête » ? Isolation : celle que essais aura vue passer
+# (ISOLATION, simple par défaut, d'après P9). Le verrou produit est archivé (resultats/s1-verrou.json) ; rien n'est poussé.
+ISOLATION=${ISOLATION:-simple}
+SONDE_VERROU='set -u
+echo "isolation : @ISO@ ; configuration : @CFG_PRET@"
+cd /w/src && sha256sum -c SHA256SUMS.s1 > /w/c.log 2>&1; echo "sources livrées : rc $? $(paste -sd " " /w/c.log)"
+mock -r @CFG_PRET@ --debug-config 2>/dev/null | grep -o -E "bootstrap_image_ready.: (True|False)" | head -1 | sed "s/^/configuration : /"
+mkdir -p /w/res-verrou
+t=$(date +%s)
+mock -r @CFG_PRET@ --isolation=@ISO@ --resultdir=/w/res-verrou --buildsrpm --spec /w/src/sample-app.spec --sources /w/src > /w/verrou-srpm.log 2>&1
+r=$?; echo "mock --buildsrpm (image prête) : rc $r en $(($(date +%s) - t)) s"
+[ $r = 0 ] || { tail -n 25 /w/verrou-srpm.log; tail -n 25 /w/res-verrou/root.log 2>/dev/null; exit 0; }
+s=$(ls /w/res-verrou/*.src.rpm | head -1); echo "src.rpm : ${s##*/} $(sha256sum < $s | cut -c1-64)"
+t=$(date +%s)
+mock -r @CFG_PRET@ --isolation=@ISO@ --resultdir=/w/res-verrou --calculate-build-dependencies "$s" > /w/verrou-calc.log 2>&1
+r=$?; echo "mock --calculate-build-dependencies : rc $r en $(($(date +%s) - t)) s"
+[ $r = 0 ] || { tail -n 25 /w/verrou-calc.log; tail -n 25 /w/res-verrou/root.log 2>/dev/null; }
+ls -l /w/res-verrou | sed "s/^/résultat : /"
+for f in /w/res-verrou/*.json; do [ -e "$f" ] && echo "verrou : ${f##*/} $(stat -c %s "$f") octets, sha256 $(sha256sum < "$f" | cut -c1-64)"; done
+true'
+
+etape_verrou() {
+  local d img n=s1-05-verrou f
+  d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
+  img=$REG/$DEPOT_ESSAI@$d
+  echo "image : $img ; isolation : $ISOLATION"
+  pod_spec "$n" "$img"
+  pod_demarrer "$n"
+  livrer "$n" "/etc/containers/certs.d/$REG/ca.crt" "$P/ca-poc.crt"
+  livrer "$n" /w/src/sample-app-1.0.0.tar.gz "$PKG/sample-app-1.0.0.tar.gz"
+  livrer "$n" /w/src/sample-app.spec "$PKG/sample-app.spec"
+  livrer "$n" /w/src/SHA256SUMS.s1 "$T/SHA256SUMS.s1"
+  sed -e "s|@CFG_PRET@|$CFG_PRET|g" -e "s|@ISO@|$ISOLATION|g" <<<"$SONDE_VERROU" | dans "$n" verrou
+  f=$(kubectl exec -n builds "$n" -- sh -c 'ls /w/res-verrou/*.json 2>/dev/null | head -1' </dev/null || true)
+  if [ -n "$f" ]; then
+    kubectl exec -n builds "$n" -- cat "$f" </dev/null | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-verrou.json"
+    python3 -I - "$R/$PREFIXE-verrou.json" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding='utf-8'))
+c = d.get('config', {})
+print('version du verrou :', d.get('version'))
+print('options de configuration recopiées :', ', '.join(sorted(c)))
+print('bootstrap_image_ready enregistré :', c.get('bootstrap_image_ready'))
+print('macros recopiées :', 'oui' if any('macro' in k for k in c) else 'non')
+print('digest du bootstrap :', d.get('bootstrap', {}).get('image_digest'))
+b = d.get('buildroot', {}).get('rpms', [])
+print('rpm du buildroot :', len(b), '; champs :', ', '.join(sorted(b[0])) if b else '-')
+PY
+  else echo "aucun verrou produit"; fi
+  kubectl exec -n builds "$n" -- sh -c 'for f in /w/res-verrou/root.log /w/res-verrou/build.log; do [ -e "$f" ] && { echo "### $f"; tail -n 200 "$f"; }; done' \
+    </dev/null 2>&1 | grep -i -v -E 'jeton|token' > "$R/$PREFIXE-verrou-mock.log" || true
   pod_retirer "$n"
 }
 

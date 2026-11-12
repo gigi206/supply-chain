@@ -96,3 +96,25 @@ Le journal est [`s1-hote.log`](s1-hote.log) : 0 KO. Lectures publiques depuis l'
 - Les sha256 des quatre rpm sont au journal. Pub/9.8 et EPEL bougent : l'étape sera rejouée avant `racine`.
 
 Rien d'autre n'a tourné. P1 et P5 à P12 attendent S5b et la décision sur la sortie réseau des pods rpm.
+
+## Additif du 12/11/2026, à partir de 14:43:15 UTC : étape `verrou` ajoutée à sec (« Oui, ajoute-le »), NON LANCÉE
+
+Le relevé de M2 montre que `--hermetic-build` refuse un verrou calculé sans `bootstrap_image_ready=True` (mock 6.9, `config.py:824`). L'étape `verrou` de `s1.sh` mesure dès S1 si `rockylinux:9.7` brut suffit comme image « prête ».
+
+- **Image** : elle porte désormais deux configurations de mock. La seconde, `poc-rocky-9.7-pret-x86_64`, ne diffère de la première que par la racine et `bootstrap_image_ready = True`. L'étape `image` le contrôle (4 lignes de diff, ni plus ni moins).
+  - Ce contrôle a été vérifié sur l'hôte, sur la configuration rendue : 4 lignes, syntaxe Python valide.
+- **Déroulement** :
+  - pod Kata privilégié, root, label `prefetch-rpm` ;
+  - `mock --buildsrpm`, puis `mock --calculate-build-dependencies` sur le src.rpm, avec l'isolation `ISOLATION` (`simple` par défaut, d'après P9) ;
+  - le verrou produit est archivé dans `resultats/s1-verrou.json`, lignes `jeton|token` retirées, puis résumé. Rien n'est poussé dans Zot.
+- **Le résumé suppose des clés lues en partie** : `config` et `bootstrap.image_digest` viennent de `buildroot_lock.py:100-111`, mais `buildroot.rpms` est une hypothèse. Le JSON complet est archivé dans tous les cas.
+- **Ordre** : après `essais`, avec l'isolation que `essais` aura vue passer.
+- **Vérifié à sec** : `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| V1 | `--buildsrpm` passe avec `bootstrap_image_ready = True` et `rockylinux:9.7` brut | Faible : ce que mock exige d'une image prête n'est pas lu |
+| V2 | Si V1 échoue, c'est faute d'un outil dans l'image (dnf, `dnf-plugins-core` ou leurs équivalents), avec un message explicite de mock | Moyenne |
+| V3 | `--calculate-build-dependencies` produit un seul fichier JSON dans le répertoire de résultat. Ce verrou est au format `1.1.0` et enregistre `bootstrap_image_ready: True` ainsi que le digest `ee90dc0e…` du bootstrap | Moyenne |
+| V4 | Les macros d'OBS ne sont **pas** recopiées dans `config` du verrou | Faible : la liste des options recopiées n'est pas lue |
+| V5 | Le verrou liste entre 150 et 400 rpm pour le buildroot de sample-app (golang, nodejs, `@buildsys-build`) | Faible |
