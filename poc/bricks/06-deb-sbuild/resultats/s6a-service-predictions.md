@@ -281,3 +281,18 @@ La décision sur `rejeu.sh` et S6 reste à prendre avant le premier rejeu qui su
 - Pour (b) : c'est le précédent constant. Les étapes de la 07a (G7, G8) et le bloc 06 de S5b ont tous été intégrés au rejeu. (a) laisserait après chaque rejeu une alerte active par construction, alors que cette alerte est le seul mécanisme en service retenu par la décision « Test de règle seul ».
 - La condition : n'écrire le diff de `rejeu.sh` qu'après le premier passage manuel des étapes de S6a et de `pousser_vsa`, donc après S5b. Ces étapes n'ont jamais tourné, et P2 vient de montrer qu'une prédiction peut tomber. Les intégrer avant reviendrait à empiler du non-mesuré.
 - La question ne porte donc que sur l'orientation, (a) ou (b). Elle ne bloque rien avant S5b.
+
+## Note datée du 12/11/2026 (à partir de 13:46:54 UTC) : décision du propriétaire, « (b) intégrer après S6 »
+
+**Le propriétaire a retenu l'option (b), avec sa condition de calendrier.** Les étapes durables de S6 entreront dans `rejeu.sh`, dans le bloc RKE2 et Cilium, après `06 (S4d3)` :
+- `06 (S6a, periodique)`, `06 (S6a, fraicheur)`, puis `06 (S6a, grafana)` ;
+- avec `POUSSER_VSA=1` : `06 (S6b, pousser_vsa)` et `06 (S6b, lire_vsa)` ;
+- enfin `06 (S6a, porte)`, dans les deux cas.
+
+**Ce qui n'est pas décidé, et le sera sur le diff :**
+- l'élargissement de `POUSSER_VSA=1` au push de la VSA du deb (contrainte 6), à approuver en clair ;
+- le traitement de la fenêtre horaire de `hors_fenetre` (contrainte 2).
+
+**Calendrier.** Le diff de `rejeu.sh` ne sera écrit qu'après le premier passage manuel réel des étapes de S6a, de `pousser_vsa` et de `lire_vsa`, donc après S5b et le relevé du 21/11. Il sera préparé à sec, puis soumis à un accord nommé, avant le premier rejeu qui suit l'application des correctifs de S6a. Jusque-là, `rejeu.sh` reste celui que S5b lancera.
+
+Rien n'a été lancé. Aucun fichier n'est modifié, sauf celui-ci et `docs/03-validation-briques.md`.
