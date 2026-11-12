@@ -1,3 +1,6 @@
 # temps passé sur la brique 05 : écarts d'au plus 1 h entre commits successifs touchant poc/bricks/05-rpm-mock (méthode de la 08c), relevé 2026-11-12T16:36:35Z à HEAD 52f6fcf
 premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-12T16:24:51Z 52f6fcf
 32 commits ; 2.38 h (écarts <= 1 h)
+# nouveau relevé, même méthode, 2026-11-12T17:21:34Z à HEAD 2f0bc7b (avant le commit de releve6) ; le relevé ci-dessus n'est pas réécrit
+premier commit : 2026-11-05T22:24:04Z 196ee34 ; dernier : 2026-11-12T16:50:29Z 2f0bc7b
+35 commits ; 2.80 h (écarts <= 1 h)

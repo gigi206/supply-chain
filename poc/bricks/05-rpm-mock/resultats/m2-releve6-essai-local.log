@@ -1,0 +1,65 @@
+script Python extrait de m2.sh : 57 lignes
+== cas nominal
+ligne boucle du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne ancien texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne nouveau texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+affectations de config_opts['dnf.conf'] dans rocky-9.tpl : ['=']
+dnf.conf extrait : 28 lignes ; marqueurs jinja {{ : 0, {% : 0 ; barres obliques inverses : 0
+BaseOS : mirrorlist remplacé 1 fois
+AppStream : mirrorlist remplacé 1 fois
+CRB : mirrorlist remplacé 1 fois
+[main] : reposdir=/dev/null ; gpgcheck=1
+dépôt [baseos] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/
+dépôt [appstream] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/
+dépôt [crb] : enabled=0 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/
+dépôt [extras] : enabled=1 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever
+dépôt [plus] : enabled=(absent) ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=plus-$releasever
+dépôt [devel] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+dépôts actifs ou sans enabled, hors des seules baseurl de vault 9.7 : 2 ['extras', 'plus']
+code 0
+== cas s1.sh changé
+ligne boucle du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne ancien texte du remplacement trouvée telle quelle dans s1.sh : 0 (attendu : 1)
+KO   remplacement de s1.sh changé : releve6 à revoir
+code 1
+== cas ligne hors INI
+ligne boucle du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne ancien texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne nouveau texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+affectations de config_opts['dnf.conf'] dans rocky-9.tpl : ['=']
+dnf.conf extrait : 29 lignes ; marqueurs jinja {{ : 0, {% : 1 ; barres obliques inverses : 0
+BaseOS : mirrorlist remplacé 1 fois
+AppStream : mirrorlist remplacé 1 fois
+CRB : mirrorlist remplacé 1 fois
+configparser en échec (ParsingError : Source contains parsing errors: '<string>') : lecture ligne à ligne des sections et des clés enabled, baseurl, mirrorlist, metalink et reposdir (valeurs répétées mises bout à bout)
+[main] : reposdir=/dev/null
+dépôt [baseos] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/
+dépôt [appstream] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/
+dépôt [crb] : enabled=0 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/
+dépôt [extras] : enabled=1 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever
+dépôt [plus] : enabled=(absent) ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=plus-$releasever
+dépôt [devel] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+dépôts actifs ou sans enabled, hors des seules baseurl de vault 9.7 : 2 ['extras', 'plus']
+code 0
+== cas deux affectations
+ligne boucle du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne ancien texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne nouveau texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+affectations de config_opts['dnf.conf'] dans rocky-9.tpl : ['=', '+=']
+KO   dnf.conf du modèle non extrait (attendu : une seule affectation = """…""")
+code 1
+== cas fonction
+### essai (b.py, def doOutChroot)
+  6:     def doOutChroot(self, command, *args,
+  7:                     **kargs):
+  8:         """docstring"""
+  9: 
+  10:         if x:
+  11:             return 1
+  12:         return 2
+  13: 
+  (8 lignes)
+### essai (b.py, def absente)
+  def absente( absente
+### essai (c.py, def x)
+  fichier absent

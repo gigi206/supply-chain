@@ -43,6 +43,16 @@
 #               les tests et la documentation ; puis sources effacées.
 #               Prédictions : resultats/m2-predictions.md, section releve5.
 #               Lancé le 12/11/2026 à 16:47:23 UTC (« Oui, lance releve5 »), code 0 : W1 à W4 tenues (m2-releve5.log).
+#   releve6     hôte seul, sans réseau (ajouté à sec le 12/11/2026 à partir de 17:20:08 UTC, après « continue », sur relecture du
+#               conseiller, NON LANCÉ) :
+#               même archive, sha256 contrôlé ; archive au journal ce qui décide de quels dépôts dnf repoquery tire les URL du
+#               verrou (V1 de m2-predictions.md) : package_manager.py entier (appel normal de dnf, écriture de dnf.conf), options
+#               package_manager et releasever de config.py, doOutChroot de buildroot.py (où tourne la commande du verrou),
+#               rocky-9.tpl entier ; puis rejoue sur l'hôte, en Python et sans rien exécuter du modèle, le remplacement des
+#               mirrorlist de s1.sh (lignes de s1.sh exigées telles quelles, sinon KO) sur le dnf.conf du modèle et liste chaque
+#               dépôt (enabled, baseurl, mirrorlist, metalink) et la section [main], ligne à ligne si configparser échoue ;
+#               puis sources effacées.
+#               Prédictions : resultats/m2-predictions.md, section releve6.
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
@@ -70,6 +80,7 @@
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve3  (journal : resultats/m2-releve3.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve4  (journal : resultats/m2-releve4.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve5  (journal : resultats/m2-releve5.log)
+#                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve6  (journal : resultats/m2-releve6.log)
 set -euo pipefail
 export LC_ALL=C
 
@@ -243,6 +254,109 @@ etape_releve5() {
   echo "## mentions, dans tout le code Python, les tests et la documentation"
   lignes "gpg-pubkey" 'gpg-pubkey|gpg_pubkey|pubkey' mock/py mock/tests docs mock/docs
   lignes "SIGMD5 et sigmd5" 'SIGMD5|sigmd5' mock/py mock/tests docs mock/docs
+  rm -rf -- "${T:?}/mock-src"
+  echo "sources effacées ; archive gardée sous ~/.cache"
+}
+
+fonction() { # titre fichier nom : première définition Python « def nom( », entière (jusqu'à la première ligne non vide de
+             # retrait égal ou moindre), lignes numérotées coupées à 220 caractères, puis leur nombre
+  local s
+  echo "### $1 ($2, def $3)"
+  [ -f "$T/mock-src/$2" ] || { echo "  fichier absent"; return 0; }
+  s=$(awk -v n="$3" '
+    !on && match($0, "^ *def " n "\\(") { on = 1; r = RLENGTH - length("def " n "("); printf "  %d: %s\n", NR, $0; next }
+    on && /[^ ]/ { match($0, /^ */); if (RLENGTH <= r) exit }
+    on { printf "  %d: %s\n", NR, $0 }' "$T/mock-src/$2" | cut -c1-220)
+  if [ -n "$s" ]; then printf '%s\n' "$s"; echo "  ($(printf '%s\n' "$s" | wc -l) lignes)"; else echo "  def $3( absente"; fi
+}
+
+etape_releve6() {
+  local a=$T/mock.tar.gz s c v
+  echo "## archive du tag $MOCK_TAG gardée par releve (aucun accès réseau)"
+  [ -f "$a" ] || { echo "KO   archive absente : $a (lancer releve d'abord)" >&2; exit 1; }
+  s=$(sha256sum < "$a" | cut -c1-64)
+  [ "$s" = "$ARCHIVE_SHA" ] && echo "OK   sha256 de l'archive : $s" || { echo "KO   sha256 de l'archive : $s (attendu : $ARCHIVE_SHA)" >&2; exit 1; }
+  rm -rf -- "${T:?}/mock-src"; mkdir "$T/mock-src"
+  tar -xzf "$a" -C "$T/mock-src" --strip-components=1
+  echo "## appel normal de dnf par mock"
+  echo "### taille de package_manager.py : $(wc -l < "$T/mock-src/mock/py/mockbuild/package_manager.py") lignes"
+  plage "package_manager.py entier" mock/py/mockbuild/package_manager.py 1 3000
+  lignes "config.py : package_manager, releasever, commandes et options communes de dnf" \
+    "package_manager|'releasever'|dnf[0-9]*_command|dnf[0-9]*_common_opts|dnf_install_command|system_dnf_command|dnf_builddep_opts" \
+    mock/py/mockbuild/config.py
+  echo "## où tourne la commande du verrou"
+  fonction "doOutChroot" mock/py/mockbuild/buildroot.py doOutChroot
+  lignes "définitions et appels de doOutChroot" 'doOutChroot' mock/py
+  echo "## modèle rocky-9 et dépôts après le remplacement de s1.sh"
+  c=$(cd "$T/mock-src" && find . -path '*/templates/rocky-9.tpl' | sort)
+  s=$(printf '%s\n' "$c" | grep -c . || true)
+  [ "$s" = 1 ] && echo "OK   rocky-9.tpl trouvés dans l'archive : $s" || { echo "KO   rocky-9.tpl trouvés dans l'archive : $s (attendu : 1)" >&2; exit 1; }
+  c=${c#./}
+  echo "fichier : $c ; Version de mock-core-configs.spec : $(sed -n 's/^Version:[[:space:]]*//p' "$T/mock-src/mock-core-configs/mock-core-configs.spec" | head -1)"
+  echo "### taille de rocky-9.tpl : $(wc -l < "$T/mock-src/$c") lignes"
+  plage "rocky-9.tpl entier" "$c" 1 2000
+  v=$(sed -n 's|^VAULT97=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  [ -n "$v" ] || { echo "KO   VAULT97 introuvable dans s1.sh" >&2; exit 1; }
+  echo "### remplacement de s1.sh rejoué sur l'hôte (Python, str.replace, comme MOCK_CFG ; le modèle est lu, jamais exécuté)"
+  python3 -I -u - "$T/mock-src/$c" "$here/s1.sh" "$v" <<'PY' | cut -c1-220
+import configparser, re, sys
+tpl, s1, vault = sys.argv[1:4]
+lignes = open(s1, encoding="utf-8").read().splitlines()
+for titre, x in (("boucle", "for r in ('BaseOS', 'AppStream', 'CRB'):"),
+                 ("ancien texte", r"""        'mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=\$basearch&repo=%s-\$releasever\n' % r,"""),
+                 ("nouveau texte", r"""        'baseurl=$VAULT97/%s/x86_64/os/\n' % r)""")):
+    n = lignes.count(x)
+    print(f"ligne {titre} du remplacement trouvée telle quelle dans s1.sh : {n} (attendu : 1)")
+    if n != 1:
+        print("KO   remplacement de s1.sh changé : releve6 à revoir", file=sys.stderr)
+        sys.exit(1)
+txt = open(tpl, encoding="utf-8").read()
+ops = re.findall(r"config_opts\['dnf\.conf'\]\s*(\+?=)", txt)
+print(f"affectations de config_opts['dnf.conf'] dans rocky-9.tpl : {ops}")
+m = re.findall(r"config_opts\['dnf\.conf'\]\s*=\s*\"\"\"(.*?)\"\"\"", txt, re.S)
+if ops != ["="] or len(m) != 1:
+    print("KO   dnf.conf du modèle non extrait (attendu : une seule affectation = \"\"\"…\"\"\")", file=sys.stderr)
+    sys.exit(1)
+conf = m[0]
+print(f"dnf.conf extrait : {len(conf.splitlines())} lignes ; marqueurs jinja {{{{ : {conf.count('{{')}, {{% : {conf.count('{%')} ; barres obliques inverses : {conf.count(chr(92))}")
+for r in ("BaseOS", "AppStream", "CRB"):
+    old = "mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=%s-$releasever\n" % r
+    print(f"{r} : mirrorlist remplacé {conf.count(old)} fois")
+    conf = conf.replace(old, "baseurl=%s/%s/x86_64/os/\n" % (vault, r))
+try:
+    p = configparser.ConfigParser(interpolation=None, strict=False, default_section="\x00")
+    p.read_string(conf)
+    sec = {x: dict(p[x]) for x in p.sections()}
+except configparser.Error as e:
+    print(f"configparser en échec ({type(e).__name__} : {str(e).splitlines()[0]}) : lecture ligne à ligne des sections et des clés"
+          " enabled, baseurl, mirrorlist, metalink et reposdir (valeurs répétées mises bout à bout)")
+    sec, cur = {}, None
+    for x in conf.splitlines():
+        m = re.match(r"\s*\[([^\]]+)\]\s*$", x)
+        if m:
+            cur = m.group(1)
+            sec.setdefault(cur, {})
+            continue
+        m = re.match(r"\s*(enabled|baseurl|mirrorlist|metalink|reposdir)\s*=\s*(.*)$", x)
+        if m and cur is not None:
+            sec[cur][m.group(1)] = (sec[cur].get(m.group(1), "") + " " + m.group(2)).strip()
+if "main" in sec:
+    print("[main] : " + " ; ".join(f"{k}={v}" for k, v in sec["main"].items()))
+else:
+    print("[main] absente")
+hors = []
+for s, d in sec.items():
+    if s == "main":
+        continue
+    e = d.get("enabled", "(absent)")
+    u = [f"{k}={' '.join(d[k].split())}" for k in ("baseurl", "mirrorlist", "metalink") if k in d]
+    print(f"dépôt [{s}] : enabled={e} ; " + (" ; ".join(u) if u else "aucune URL"))
+    b = d.get("baseurl", "").split()
+    if e.strip().lower() not in ("0", "false", "no", "off") and not (b and "mirrorlist" not in d and "metalink" not in d
+                                                                      and all(x.startswith(vault + "/") for x in b)):
+        hors.append(s)
+print(f"dépôts actifs ou sans enabled, hors des seules baseurl de vault 9.7 : {len(hors)} {hors}")
+PY
   rm -rf -- "${T:?}/mock-src"
   echo "sources effacées ; archive gardée sous ~/.cache"
 }

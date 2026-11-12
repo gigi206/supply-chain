@@ -447,3 +447,38 @@ Après « continue », sur relecture du conseiller. **Hôte seul, sans réseau, 
 - **L'URL est cherchée par nom, version, release et arch, pas par contenu.** Dans le code lu (`installed_packages.py`, `buildroot_lock.py`, `mock-hermetic-repo.py`, parties de `config.py`), rien ne lie le fichier pointé par l'URL au paquet installé. Notre comparaison des en-têtes au verrou (sigmd5 compris) est ce lien ; `mock-hermetic-repo` ne la fait pas (N6r). Elle a une limite : `rpm -qp --qf %{SIGMD5}` lit une étiquette de l'en-tête, il ne recalcule rien. Le contenu n'est lié à cette étiquette que si `rpm -K` revérifie le condensat MD5 de l'en-tête et de la charge ; ce n'est pas mesuré dans l'image. `rpm -Kv` sur un fichier, qui détaille chaque contrôle, rejoint la liste de ce qui attend le branchement.
 - **Une URL par `nom.arch`** : si `repoquery` rend deux lignes pour le même paquet (même NVRA dans deux dépôts), la dernière gagne (`:133` à `:138`). La comparaison du sigmd5 couvre ce cas.
 - **Le champ `signature`** porte les 8 derniers caractères hexadécimaux de l'identifiant de la clé, ou `null` pour un paquet non signé. Le cœur ne le lit pas : `rpm -K` avec la seule clé de Rocky fait le contrôle. Le comparer aussi à la clé de Rocky, sur l'hôte, serait un garde de plus ; ce n'est pas écrit.
+
+## Additif du 12/11/2026, à partir de 17:20:08 UTC : étape `releve6` ajoutée à `m2.sh`, NON LANCÉE
+
+Après « continue », sur relecture du conseiller. **Hôte seul, sans réseau, lecture seule** : l'étape relit la même archive que `releve5`, après contrôle de son sha256.
+
+**Pourquoi.** V1 reste de confiance moyenne. Les URL du verrou viennent d'un `dnf --installroot=<chroot> repoquery -q --location` construit à la main, sans autre option (`installed_packages.py:116` à `:131`, [m2-releve5.log](m2-releve5.log)). Quels dépôts voit cet appel n'est pas lu. Deux choses en décident :
+- la configuration que mock écrit, et la façon dont il appelle dnf d'ordinaire ;
+- les dépôts que le modèle `rocky-9.tpl` laisse actifs après le remplacement des mirrorlist par `s1.sh`. Ce remplacement ne vise que BaseOS, AppStream et CRB (`s1.sh:338` à `:341`), et la sonde de S1 ne refuse que les mirrorlist restants de ces trois dépôts (`s1.sh:385` à `:387`).
+
+**Ce qui est archivé au journal** :
+- `package_manager.py` entier ;
+- les lignes de `config.py` qui citent `package_manager`, `releasever`, et les commandes ou options communes de dnf (`dnf[0-9]*_command` compris) ;
+- `doOutChroot` de `buildroot.py`, avec ses définitions et appels dans `mock/py` ;
+- `rocky-9.tpl` entier.
+
+Puis, sur l'hôte, un script Python rejoue le remplacement de `s1.sh` sur le `dnf.conf` du modèle, par `str.replace` comme `MOCK_CFG`. Le modèle est lu comme du texte, jamais exécuté. Le script liste la section `[main]` et chaque dépôt (enabled, baseurl, mirrorlist, metalink). Si `configparser` ne lit pas le `dnf.conf` (une ligne jinja, par exemple), l'erreur est journalisée et la lecture se fait ligne à ligne : en-têtes de section et clés `enabled`, `baseurl`, `mirrorlist`, `metalink` et `reposdir`. Il compte enfin les dépôts actifs, ou sans `enabled`, qui ne pointent pas que sur des baseurl de vault 9.7. Il s'arrête en KO dans deux cas : les trois lignes du remplacement ne sont plus telles quelles dans `s1.sh`, ou le `dnf.conf` du modèle n'est pas une seule affectation `= """…"""`. Les chemins des fichiers ont été pris dans la liste de l'archive (`tar -t`), sans en lire le contenu.
+
+`bash -n` passe, et shellcheck ne relève aucun avertissement (`-S warning`). Les deux pièces neuves ont un banc hors réseau, sur un modèle et un fichier Python synthétiques : [m2-releve6-essai-local.sh](m2-releve6-essai-local.sh) ([journal](m2-releve6-essai-local.log)). Ses sept cas rendent ce qui est attendu : pour le script Python, le cas nominal, `s1.sh` changé, une ligne hors INI (lue ligne à ligne, code 0) et deux affectations ; pour `fonction`, une définition trouvée, absente, et un fichier absent. Accord nommé attendu.
+
+| # | Prédiction | Confiance | Ce qu'elle change |
+|---|---|---|---|
+| X1 | L'appel ordinaire de dnf par mock ne passe ni `-c` ni `--config` : il compte sur le `dnf.conf` écrit dans la racine | Faible : souvenir, non lu | Tenue : l'appel du verrou et la construction lisent la même configuration, si dnf lit celle de la racine. Non tenue : l'appel du verrou, qui n'a pas `-c`, peut lire une autre configuration que la construction ; V1 baisse |
+| X2 | `package_manager.py` écrit `config_opts['dnf.conf']` en `etc/dnf/dnf.conf` sous la racine du buildroot | Moyenne : le verrou passe `make_chroot_path()` en `--installroot` (`buildroot_lock.py:43`, [m2-releve2.log](m2-releve2.log)) | Non tenue : la configuration de mock n'est pas là où `--installroot` la cherche ; V1 baisse |
+| X3 | Avec une image de bootstrap, `doOutChroot` lance la commande dans le chroot du bootstrap, pas dans le système de fichiers du pod | Moyenne : le nom de la fonction | Dit quelle configuration serait le repli de dnf hors de la racine : celle de l'image de bootstrap |
+| X4 | La section `[main]` du `dnf.conf` de `rocky-9.tpl` pose `reposdir=/dev/null` | Moyenne : souvenir des modèles de mock-core-configs | Non tenue : les fichiers `.repo` de la racine s'ajouteraient aux dépôts de mock ; V1 baisse, décision avec toi |
+| X5 | Le remplacement de `s1.sh` touche une fois chacun BaseOS, AppStream et CRB | Moyenne : la sonde de S1 le contrôle aussi, dans l'image, mais n'a jamais tourné | Non tenue : un dépôt visé garde son mirrorlist, et D2 a (`vault/rocky/9.7` en baseurl fixes, [README](../README.md) ligne 56) ne lui est pas appliquée ; `s1.sh` à corriger, sur accord, après S5b |
+| X6 | Au moins un autre dépôt reste actif avec un mirrorlist (extras, sans doute) | Faible : souvenir | Tenue : la construction de S1 voit un dépôt non figé, hors de vault 9.7, que D2 a ne nomme pas. Le verrou peut alors porter une URL de miroir, que `voie2_preparer` refuse (KO, pas de faux OK). Suite à décider avec toi, après S5b |
+
+**Ce que `releve6` ne tranchera pas** :
+- **le comportement de dnf lui-même** : lit-il le `dnf.conf` et le `reposdir` de la racine quand on lui passe `--installroot` sans `--config` ? Ce n'est pas dans l'archive de mock, et ce n'est pas écrit de mémoire. V1 peut monter au mieux « pour le code de mock » ; le premier verrou réel le mesurera ;
+- quel binaire de dnf tourne dans notre bootstrap, si `package_manager.py` le choisit selon ce qui existe à l'exécution ;
+- la valeur par défaut d'`enabled` quand un dépôt ne le pose pas, qui relève aussi de dnf. Un tel dépôt est compté avec les actifs, par prudence ;
+- le rendu jinja que mock applique à la configuration : seuls les marqueurs `{{` et `{%` sont comptés ;
+- la configuration effective dans l'image. Le remplacement est rejoué sur l'hôte, sur le texte du modèle extrait par une expression régulière ; la sonde de S1 (`mock --debug-config`) reste la mesure dans l'image ;
+- une fonction coupée trop tôt. `fonction` s'arrête à la première ligne non vide de retrait égal ou moindre que le `def` : une chaîne sur plusieurs lignes collée à la marge la couperait. Le nombre de lignes est journalisé. Le décorateur, au-dessus du `def`, n'est pas repris.
