@@ -1,0 +1,1125 @@
+# m2.sh releve6, 2026-11-12T17:26:47Z
+## archive du tag mock-6.9-1 gardée par releve (aucun accès réseau)
+OK   sha256 de l'archive : 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+## appel normal de dnf par mock
+### taille de package_manager.py : 770 lignes
+### package_manager.py entier (mock/py/mockbuild/package_manager.py, lignes 1 à 3000)
+  1: # -*- coding: utf-8 -*-
+  2: # vim: noai:ts=4:sw=4:expandtab
+  3: 
+  4: import copy
+  5: import glob
+  6: import os.path
+  7: import shutil
+  8: import sys
+  9: import time
+  10: import re
+  11: from urllib.parse import unquote
+  12: from textwrap import dedent
+  13: from configparser import ConfigParser
+  14: 
+  15: from . import file_util
+  16: from . import util
+  17: from .exception import BuildError, Error, YumError
+  18: from .trace_decorator import traceLog, getLog
+  19: from .mounts import BindMountPoint
+  20: 
+  21: fallbacks = {
+  22:     'dnf4': ['dnf4', 'dnf5', 'yum'],
+  23:     'yum': ['yum', 'dnf4', 'dnf5'],
+  24:     'microdnf': ['microdnf', 'dnf4', 'dnf5', 'yum'],
+  25:     'dnf5': ['dnf5', 'dnf4', 'yum'],
+  26: }
+  27: 
+  28: 
+  29: def _package_manager_from_string(name):
+  30:     if name == 'dnf5':
+  31:         return Dnf5
+  32:     if name == 'yum':
+  33:         return Yum
+  34:     if name in 'dnf4':
+  35:         return Dnf
+  36:     if name == 'microdnf':
+  37:         return MicroDnf
+  38:     raise RuntimeError(f'Unrecognized package manager "{name}"')
+  39: 
+  40: 
+  41: def _package_manager_exists(pm_class, config_opts, chroot=None):
+  42:     name = pm_class.name
+  43:     command = pm_class.get_command(config_opts)
+  44:     pathname = (chroot or "") + command
+  45:     if not os.path.isfile(pathname):
+  46:         return False
+  47:     # resolve symlinks, and detect that e.g. /bin/yum doesn't point to /bin/dnf
+  48:     real_pathname = os.path.realpath(pathname)
+  49:     if name == 'dnf4':
+  50:         # The DNF4 used to be /bin/dnf, not /bin/dnf4
+  51:         name = 'dnf'
+  52:     return name in real_pathname
+  53: 
+  54: 
+  55: def _package_manager_class_fallback(config_opts, buildroot, fallback):
+  56:     desired = config_opts['package_manager']
+  57: 
+  58:     if desired == 'dnf':  # backward compat
+  59:         desired = 'dnf4'
+  60: 
+  61:     if not fallback:
+  62:         return _package_manager_from_string(desired)
+  63: 
+  64:     getLog().debug("searching for '%s' package manager or alternatives", desired)
+  65:     if desired not in fallbacks:
+  66:         raise RuntimeError(f'Unexpected package manager "{desired}"')
+  67: 
+  68:     chroot_to_search_in = None  # by default we search for PMs on host
+  69:     if buildroot.uses_bootstrap_image:
+  70:         # alternatively in the (extracted) bootstrap image
+  71:         chroot_to_search_in = buildroot.make_chroot_path()
+  72: 
+  73:     bootstrap = buildroot.is_bootstrap
+  74: 
+  75:     for manager in fallbacks[desired]:
+  76:         pm_class = _package_manager_from_string(manager)
+  77:         if _package_manager_exists(pm_class, config_opts, chroot=chroot_to_search_in):
+  78:             if desired == manager:
+  79:                 return pm_class
+  80: 
+  81:             getLog().info("Using '%s' instead of '%s'%s", manager, desired,
+  82:                           " for bootstrap chroot" if bootstrap else "")
+  83: 
+  84:             if 'dnf_warning' in config_opts and not config_opts['dnf_warning']:
+  85:                 return pm_class
+  86: 
+  87:             if not bootstrap:
+  88:                 # pylint: disable=consider-using-f-string
+  89:                 print("""WARNING! WARNING! WARNING!
+  90: You are building package for distribution which uses {0}. However your system
+  91: does not support {0}. You can continue with {1}, which will likely succeed,
+  92: but the installed chroot may look a little different.
+  93:   1. Please consider --bootstrap-chroot option, or
+  94:   2. install {0} on your host system.
+  95: You can suppress this warning when you put
+  96:   config_opts['dnf_warning'] = False
+  97: in Mock config.""".format(desired.upper(), manager.upper()))
+  98:                 input("Press Enter to continue.")
+  99: 
+  100:             return pm_class
+  101: 
+  102:     raise RuntimeError(f"No package from {fallbacks[desired]} found, desired {desired}")
+  103: 
+  104: 
+  105: def package_manager(buildroot, bootstrap_buildroot, fallback):
+  106:     cls = _package_manager_class_fallback(buildroot.config, buildroot, fallback)
+  107:     return cls(buildroot.config, buildroot, buildroot.plugins,
+  108:                bootstrap_buildroot)
+  109: 
+  110: 
+  111: class _PackageManager(object):
+  112:     # pylint: disable=too-many-instance-attributes
+  113:     name = None
+  114:     command = None
+  115:     builddep_command = None
+  116:     resolvedep_command = None
+  117:     # When support_installroot is False then command is run in target chroot
+  118:     # you must ensure that `command` is available in the chroot
+  119:     support_installroot = True
+  120:     # We specify (historical reasons) opts before args for package managers.
+  121:     # But DNF5 requires the common opts (--allowerasing etc.) specified after
+  122:     # the sub-command (like 'install --allowerasing', instead of
+  123:     # '--allowerasing install').
+  124:     place_common_opts_after = False
+  125: 
+  126:     @classmethod
+  127:     def get_command(cls, config):
+  128:         command = config.get(f"{cls.name}_command")
+  129:         if config.get("use_bootstrap_image", True):
+  130:             return command
+  131:         if config.get("use_bootstrap", False):
+  132:             sys_command = config.get(f"{cls.name}_system_command")
+  133:             if sys_command:
+  134:                 return sys_command
+  135:         return command
+  136: 
+  137: 
+  138:     @traceLog()
+  139:     def __init__(self, config, buildroot, plugins, bootstrap_buildroot):
+  140:         self.config = config
+  141:         self.plugins = plugins
+  142:         # the buildroot we install into
+  143:         self.buildroot = buildroot
+  144:         self.init_install_output = ""
+  145:         self.bootstrap_buildroot = bootstrap_buildroot
+  146:         # self.buildroot generated from bootstrap image
+  147:         self.is_bootstrap_image = buildroot.uses_bootstrap_image
+  148:         self.pkg_manager_config = ""
+  149: 
+  150:         self.command = self.get_command(config)
+  151: 
+  152:         self.builddep_command = [self.command, 'builddep']
+  153:         builddep_override = config.get(f"{self.name}_builddep_command")
+  154:         if builddep_override:
+  155:             self.builddep_command = [builddep_override, "builddep"]
+  156: 
+  157:         self.common_opts = copy.copy(config.get(f'{self.name}_common_opts', []))
+  158: 
+  159:         disabled_plugins = self.config.get(f"{self.name}_disable_plugins", [])
+  160:         self.common_opts.extend([f"--disableplugin={x}" for x in
+  161:                                  disabled_plugins])
+  162: 
+  163:         if 'forcearch' in self.config and self.config['forcearch']:
+  164:             self.common_opts.extend(['--forcearch', self.config['forcearch']])
+  165: 
+  166:     def adjust_command_options(self, command, opts):
+  167:         """
+  168:         E.g. --allowerasing is supported by DNF5 in general, but is not
+  169:         supported by DNF5 builddep plugin (yet), therefore we can configure:
+  170:         config_opts["dnf5_avoid_opts"]["builddep"] = ["--allowerasing"]
+  171:         https://github.com/rpm-software-management/dnf5/issues/461
+  172:         """
+  173:         config = self.config.get(f"{self.name}_avoid_opts", {})
+  174:         if command in config:
+  175:             return [o for o in opts if o not in config[command]]
+  176:         return opts
+  177: 
+  178:     def log_package_management_packages(self):
+  179:         """
+  180:         Log out the versions of packages related to package management.
+  181:         """
+  182:         if self.buildroot.is_bootstrap:
+  183:             # no-op for the bootstrap chroot;  we don't care how this has been
+  184:             # installed
+  185:             return
+  186: 
+  187:         cmd = [
+  188:             "rpm", "-q",
+  189:             "rpm", "rpm-sequoia",
+  190:             "python3-dnf", "python3-dnf-plugins-core",
+  191:             "yum", "yum-utils",
+  192:             "dnf5", "dnf5-plugins",
+  193:         ]
+  194: 
+  195: 
+  196:         def _do(comment, *args, **kwargs):
+  197:             info = "Buildroot is handled by package management"
+  198:             output = util.do(*args, **kwargs, returnOutput=True,
+  199:                                   raiseExc=False).strip()
+  200:             output = "\n".join(["  " + line for line in output.split("\n")
+  201:                                 if "is not installed" not in line])
+  202:             getLog().info("%s %s:\n%s", info, comment, output)
+  203: 
+  204:         # We want to know the package versions in bootstrap
+  205:         if self.bootstrap_buildroot:
+  206:             if self.bootstrap_buildroot.use_chroot_image:
+  207:                 # rpm installed from the bootstrap image
+  208:                 _do("downloaded with a bootstrap image", cmd,
+  209:                     chrootPath=self.bootstrap_buildroot.make_chroot_path())
+  210:             else:
+  211:                 # rpm installed into bootstrap by host's package management
+  212:                 _do("installed into bootstrap", cmd + [
+  213:                     "--root", self.bootstrap_buildroot.make_chroot_path()
+  214:                 ])
+  215:         else:
+  216:             # Execute with installroot from host
+  217:             _do("from host and used with --installroot", cmd)
+  218: 
+  219:     @traceLog()
+  220:     def build_invocation(self, *args):
+  221:         invocation = []
+  222:         args = list(args)
+  223:         cmd = args[0]
+  224:         opts = self.adjust_command_options(cmd, copy.copy(self.common_opts))
+  225:         if cmd == 'builddep':
+  226:             args = args[1:]
+  227:             invocation += self.builddep_command
+  228:             opts += self.config.get(self.name + '_builddep_opts', [])
+  229:         elif cmd == 'resolvedep':
+  230:             if self.resolvedep_command:
+  231:                 args = args[1:]
+  232:                 invocation = self.resolvedep_command
+  233:             else:
+  234:                 invocation = [self.command]
+  235:         else:
+  236:             invocation = [self.command]
+  237:         if self.support_installroot and not self.is_bootstrap_image:
+  238:             invocation += ['--installroot', self.buildroot.make_chroot_path('')]
+  239:         if cmd in ['upgrade', 'update', 'module']:
+  240:             invocation += ['-y']
+  241:         releasever = self.config['releasever']
+  242:         if releasever:
+  243:             invocation += ['--releasever', str(releasever)]
+  244:         if not self.config['online']:
+  245:             invocation.append('-C')
+  246:         if self.config['enable_disable_repos']:
+  247:             invocation += self.config['enable_disable_repos']
+  248: 
+  249:         invocation += (args + opts) if self.place_common_opts_after else (opts + args)
+  250: 
+  251:         return invocation
+  252: 
+  253:     @traceLog()
+  254:     def get_pkg_manager_config(self):
+  255:         if 'dnf.conf' in self.config:
+  256:             return self.config['dnf.conf']
+  257:         else:
+  258:             return self.config['yum.conf']
+  259: 
+  260:     def execute(self, *args, **kwargs):
+  261:         """
+  262:         Execute package manger command (via self._execute_mounted where the
+  263:         args[] form the command, self.build_invocation).  Make sure the
+  264:         essential and the recursive buildroot-in-bootstrap mount points are
+  265:         (un)mounted correctly).
+  266:         """
+  267:         self.plugins.call_hooks("preyum")
+  268: 
+  269:         # systemd-nspawn v253.9 started to dislike our pre-created essential
+  270:         # mountpoints in `-D rootdir`.  Previous versions silently overmounted
+  271:         # them (Copr issue#2906).  Note that we still need essential mountpoints
+  272:         # if DNF is run with NSPAWN with --installroot (so we do this only if
+  273:         # is_bootstrap_image is True).
+  274:         skip_essential_mounts = util.USE_NSPAWN and self.is_bootstrap_image
+  275: 
+  276:         try:
+  277:             with self.buildroot.mounts.essential_mounted(noop=skip_essential_mounts):
+  278:                 with self.buildroot.mounts.buildroot_in_bootstrap_mounted():
+  279:                     return self._execute_mounted(*args, **kwargs)
+  280:         finally:
+  281:             self.plugins.call_hooks("postyum")
+  282: 
+  283: 
+  284:     @traceLog()
+  285:     def _execute_mounted(self, *args, **kwargs):
+  286: 
+  287:         # intentionally we do not call bootstrap hook here - it does not have sense
+  288:         env = self.config['environment'].copy()
+  289:         env.update(util.get_proxy_environment(self.config))
+  290:         # installation-time specific homedir
+  291:         env['HOME'] = self.buildroot.prepare_installation_time_homedir()
+  292:         env['LC_MESSAGES'] = 'C.UTF-8'
+  293:         if self.buildroot.nosync_path:
+  294:             env['LD_PRELOAD'] = self.buildroot.nosync_path
+  295:         invocation = self.build_invocation(*args)
+  296:         self.buildroot.root_log.debug(invocation)
+  297:         kwargs.setdefault("pivot_root_chroot", self.buildroot.config.get("pivot_root_chroot", False))
+  298:         kwargs['printOutput'] = kwargs.get('printOutput', True)
+  299:         if not self.config['print_main_output']:
+  300:             kwargs.pop('printOutput', None)
+  301:         else:
+  302:             kwargs.setdefault("pty", True)
+  303:         self.buildroot.nuke_rpm_db()
+  304: 
+  305:         error = None
+  306:         max_attempts = int(self.config['package_manager_max_attempts'])
+  307:         for attempt in range(max(max_attempts, 1)):
+  308:             if error:
+  309:                 sleep_seconds = int(self.config['package_manager_attempt_delay'])
+  310:                 self.buildroot.root_log.warning(
+  311:                         "%s command failed, retrying, attempt #%s, sleeping %ss",
+  312:                     self.name.upper(), attempt + 1, sleep_seconds)
+  313:                 time.sleep(sleep_seconds)
+  314: 
+  315:             try:
+  316:                 # either it does not support --installroot (microdnf) or
+  317:                 # it is bootstrap image made by container with incomaptible dnf/rpm
+  318:                 personality = kwargs.pop("personality", None)
+  319:                 if self.buildroot.is_bootstrap and not self.buildroot.config["forcearch"]:
+  320:                     personality = self.buildroot.config["repo_arch"]
+  321: 
+  322:                 if not self.support_installroot or self.is_bootstrap_image:
+  323:                     out = util.do(invocation, env=env,
+  324:                                   chrootPath=self.buildroot.make_chroot_path(),
+  325:                                   personality=personality, **kwargs)
+  326:                 elif self.bootstrap_buildroot is None:
+  327: 
+  328: 
+  329:                     out = util.do(invocation, env=env,
+  330:                                   personality=personality, **kwargs)
+  331:                 else:
+  332:                     out = util.do(invocation, env=env,
+  333:                                   chrootPath=self.bootstrap_buildroot.make_chroot_path(),
+  334:                                   nspawn_args=self.bootstrap_buildroot.config['nspawn_args'],
+  335:                                   personality=personality, **kwargs)
+  336:                 error = None
+  337:                 break
+  338:             except Error as e:
+  339:                 error = YumError(str(e))
+  340: 
+  341:         if error is not None:
+  342:             raise error
+  343: 
+  344:         # intentionally we do not call bootstrap hook here - it does not have sense
+  345:         return out
+  346: 
+  347:     @traceLog()
+  348:     # pylint: disable=unused-argument
+  349:     def install(self, *args, **kwargs):
+  350:         return self.execute('install', *args)
+  351: 
+  352:     # pylint: disable=unused-argument
+  353:     @traceLog()
+  354:     def remove(self, *args, **kwargs):
+  355:         return self.execute('remove', *args)
+  356: 
+  357:     # pylint: disable=unused-argument
+  358:     @traceLog()
+  359:     def update(self, *args, **kwargs):
+  360:         return self.execute('update', *args)
+  361: 
+  362:     # pylint: disable=unused-argument
+  363:     @traceLog()
+  364:     def builddep(self, *args, **kwargs):
+  365:         try:
+  366:             result = self.execute('builddep', returnOutput=1, *args)
+  367:         except (FileNotFoundError) as error:
+  368:             er = str(error)
+  369:             if "builddep" in er:
+  370:                 print(error)
+  371:                 print("""
+  372: Error:      Neither dnf-utils nor yum-utils are installed. Dnf-utils or yum-utils are needed to complete this action.
+  373:             To install dnf-utils use:
+  374:             $ dnf install dnf-utils
+  375:             or yum-utils:
+  376:             $ yum install yum-utils""")
+  377:                 sys.exit(120)
+  378:             else:
+  379:                 raise
+  380:         return result
+  381: 
+  382:     @traceLog()
+  383:     def copy_distribution_gpg_keys(self):
+  384:         # Copy the files from the host to avoid invoking package manager
+  385:         # or rebuilding the cached bootstrap chroot.
+  386:         keys_path = "/usr/share/distribution-gpg-keys"
+  387:         dest_path = os.path.dirname(keys_path)
+  388:         chroot_path = self.buildroot.make_chroot_path(dest_path)
+  389:         file_util.mkdirIfAbsent(chroot_path)
+  390:         self.buildroot.root_log.debug("Copying %s to the bootstrap chroot" % keys_path)
+  391:         cmd = ["cp", "-a", keys_path, chroot_path]
+  392:         util.do(cmd)
+  393: 
+  394:     @traceLog()
+  395:     def copy_gpg_keys(self):
+  396:         pki_dir = self.buildroot.make_chroot_path('etc', 'pki', 'mock')
+  397:         file_util.mkdirIfAbsent(pki_dir)
+  398:         for pki_file in glob.glob("/etc/pki/mock/RPM-GPG-KEY-*"):
+  399:             shutil.copy(pki_file, pki_dir)
+  400: 
+  401:     @traceLog()
+  402:     def copy_certs(self):
+  403:         copied_ca_cert_paths = self.config['ssl_copied_ca_trust_dirs']
+  404:         if copied_ca_cert_paths:
+  405:             for host_path, root_path in copied_ca_cert_paths:
+  406:                 self.buildroot.root_log.debug('copying CA trust dir into chroot: %s => %s', host_path, root_path)
+  407:                 dest_dir = self.buildroot.make_chroot_path(root_path)
+  408:                 file_util.update_tree(dest_dir, host_path)
+  409: 
+  410:         bundle_path = self.config['ssl_ca_bundle_path']
+  411:         if bundle_path:
+  412:             self.buildroot.root_log.debug('copying CA bundle into chroot')
+  413:             host_bundle = os.path.realpath('/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem')
+  414:             chroot_bundle_path = self.buildroot.make_chroot_path(bundle_path)
+  415:             chroot_bundle_dir = os.path.dirname(chroot_bundle_path)
+  416: 
+  417:             file_util.mkdirIfAbsent(chroot_bundle_dir)
+  418:             try:
+  419:                 shutil.copy(host_bundle, chroot_bundle_path)
+  420:             except FileNotFoundError:
+  421:                 # when mock is not run on Fedora or EL
+  422:                 self.buildroot.root_log.debug("ca bundle not found on host")
+  423: 
+  424:     @traceLog()
+  425:     def copy_extra_certs(self):
+  426:         extra_certs = self.config['ssl_extra_certs']
+  427:         if extra_certs:
+  428:             self.buildroot.root_log.debug('copying extra certificates into chroot')
+  429:             for cert_src, cert_dest in zip(extra_certs[::2], extra_certs[1::2]):
+  430:                 host_cert_src = os.path.realpath(cert_src)
+  431:                 chroot_cert_dest = self.buildroot.make_chroot_path(cert_dest)
+  432:                 chroot_cert_dir = os.path.dirname(chroot_cert_dest)
+  433:                 file_util.mkdirIfAbsent(chroot_cert_dir)
+  434:                 try:
+  435:                     shutil.copy(host_cert_src, chroot_cert_dest)
+  436:                 except FileNotFoundError:
+  437:                     # when mock is not run on Fedora or EL
+  438:                     self.buildroot.root_log.debug("extra certificates not found on host")
+  439: 
+  440: 
+  441:     def initialize(self):
+  442:         self.copy_gpg_keys()
+  443:         self.copy_certs()
+  444:         if self.buildroot.is_bootstrap:
+  445:             self.copy_distribution_gpg_keys()
+  446:             self.copy_extra_certs()
+  447:         self.initialize_config()
+  448: 
+  449:         try:
+  450:             self._bind_mount_repos_to_bootstrap()
+  451:         except Exception as e:
+  452:             getLog().warning(e)
+  453: 
+  454:     def expand_url_vars(self, string):
+  455:         """
+  456:         Expand DNF variables like $baseurl to proper values in string, and
+  457:         return it.
+  458:         """
+  459:         expand = {
+  460:             "basearch": self.config["target_arch"] or '<undef>',
+  461:             "releasever": self.config["releasever"] or '<undef>',
+  462:         }
+  463: 
+  464:         if 'dnf_vars' in self.config:
+  465:             for key in self.config['dnf_vars']:
+  466:                 expand[key] = self.config['dnf_vars'][key]
+  467: 
+  468:         for key, value in expand.items():
+  469:             # replace both $key and ${key}
+  470:             # dnf allows braced variables
+  471:             string = string.replace('$' + key, value)
+  472:             string = string.replace('${' + key + '}', value)
+  473: 
+  474:         return string
+  475: 
+  476:     def _bind_mount_repos_to_bootstrap(self):
+  477:         if not self.buildroot.is_bootstrap:
+  478:             return
+  479: 
+  480:         parse = {
+  481:             "baseurl": (True, re.compile("[ \t\n,]")),
+  482:             "mirrorlist": (False, None),
+  483:             "metalink": (False, None),
+  484:         }
+  485: 
+  486:         # in dnf, the last occurence of the same option beats the previous
+  487:         config = ConfigParser(strict=False, interpolation=None)
+  488:         config.read_string(self.pkg_manager_config)
+  489: 
+  490:         # don't bindmount the same paths multiple times
+  491:         tried = set()
+  492: 
+  493:         for section in config.sections():
+  494:             for option in parse:
+  495:                 directory, split_re = parse[option]
+  496: 
+  497:                 if option not in config[section]:
+  498:                     continue
+  499: 
+  500:                 raw = config[section][option]
+  501:                 items = split_re.split(raw) if split_re else [raw]
+  502: 
+  503:                 for value in items:
+  504:                     value = value.strip()
+  505:                     if not value:
+  506:                         continue
+  507: 
+  508:                     # triple slash, we only accept absolute pathnames
+  509:                     if value.startswith('file:///'):
+  510:                         srcpath = value[7:]
+  511:                     elif value.startswith('/'):
+  512:                         srcpath = value
+  513:                     else:
+  514:                         continue
+  515: 
+  516:                     srcpath = self.expand_url_vars(srcpath)
+  517:                     srcpath = unquote(srcpath)
+  518: 
+  519:                     if srcpath in tried:
+  520:                         continue
+  521: 
+  522:                     tried.add(srcpath)
+  523: 
+  524:                     if directory and not os.path.isdir(srcpath):
+  525:                         continue
+  526: 
+  527:                     if not os.path.exists(srcpath):
+  528:                         continue
+  529: 
+  530:                     bindpath = self.buildroot.make_chroot_path(srcpath)
+  531:                     bind_mount_point = BindMountPoint(srcpath=srcpath,
+  532:                                                       bindpath=bindpath)
+  533: 
+  534:                     # This is a very tricky hack.  Note we configure the
+  535:                     # package_manager for the "bootstrap" chroot here, but these
+  536:                     # "local repo" mountpoints are actually needed by both
+  537:                     # "bootstrap" and "build" chroots.  The "bootstrap" chroot
+  538:                     # needs this with the 'bootstrap_image' feature (we use
+  539:                     # package manager _in bootstrap_, not on host, to install
+  540:                     # into the bootstrap) and the "build" chroot package manager
+  541:                     # always needs this (but also mounted in bootstrap).  That's
+  542:                     # why we are not using "essential mounts"; these are only
+  543:                     # automatically mounted by the corresponding package manager
+  544:                     # (we wouldn't mount bootstrap's mountpoints when installing
+  545:                     # into the "build" chroot).
+  546:                     self.buildroot.mounts.add(bind_mount_point)
+  547: 
+  548:     def initialize_config(self):
+  549:         # there may be configs we get from container image
+  550:         file_util.rmtree(self.buildroot.make_chroot_path('etc', 'yum.repos.d'))
+  551: 
+  552:     def _check_command(self):
+  553:         """ Check if main command exists """
+  554: 
+  555:         command = self.command
+  556: 
+  557:         if self.bootstrap_buildroot:
+  558:             # the command in bootstrap may not exists yet
+  559:             return
+  560: 
+  561:         if self.is_bootstrap_image:
+  562:             # with bootstrap image, we don't work with the host's package
+  563:             # manager at all.
+  564:             command = self.buildroot.make_chroot_path(command)
+  565: 
+  566:         if not os.path.exists(command):
+  567:             raise Exception("""Command {0} is not available. Either install package containing this command
+  568: or run mock with --yum or --dnf to overwrite config value. However this may
+  569: lead to different dependency solving!""".format(command))
+  570: 
+  571: 
+  572: def check_yum_config(config, log):
+  573:     if '\nreposdir' not in config:
+  574:         log.warning(dedent("""\
+  575:                 reposdir option is not set in yum config. That means Yum/DNF
+  576:                 will use system-wide repos. To suppress that behavior, put
+  577:                 reposdir=/dev/null to your yum.conf in mock config.
+  578:                 """))
+  579: 
+  580: 
+  581: class Yum(_PackageManager):
+  582:     name = 'yum'
+  583:     support_installroot = True
+  584: 
+  585:     def __init__(self, config, buildroot, plugins, bootstrap_buildroot):
+  586:         super(Yum, self).__init__(config, buildroot, plugins, bootstrap_buildroot)
+  587:         self.builddep_command = [config['yum_builddep_command']]
+  588:         if bootstrap_buildroot is not None:
+  589:             # we are in bootstrap so use configured names
+  590:             yum_deprecated_path = config['yum_command']
+  591:             yum_builddep_deprecated_path = config['yum_builddep_command']
+  592:             yum_deprecated_path = bootstrap_buildroot.make_chroot_path(yum_deprecated_path)
+  593:             yum_builddep_deprecated_path = bootstrap_buildroot.make_chroot_path(yum_builddep_deprecated_path)
+  594:         else:
+  595:             # we are building bootstrap or do not use bootstrap at all
+  596:             yum_deprecated_path = '/usr/bin/yum-deprecated'
+  597:             yum_builddep_deprecated_path = '/usr/bin/yum-builddep-deprecated'
+  598:             if os.path.exists(yum_deprecated_path):
+  599:                 yum_repoquery_command = '/usr/bin/repoquery'
+  600:                 if os.path.exists(yum_repoquery_command + '-deprecated'):
+  601:                     yum_repoquery_command = yum_repoquery_command + '-deprecated'
+  602:                 self.command = '/usr/bin/yum-deprecated'
+  603:                 self.resolvedep_command = [
+  604:                     yum_repoquery_command, '--resolve', '--requires',
+  605:                     '--config', self.buildroot.make_chroot_path('etc', 'yum', 'yum.conf')]
+  606:             if os.path.exists(yum_builddep_deprecated_path):
+  607:                 self.builddep_command = ['/usr/bin/yum-builddep-deprecated']
+  608: 
+  609:         self._check_command()
+  610: 
+  611:     @traceLog()
+  612:     def _write_plugin_conf(self, name):
+  613:         """ Write 'name' file into pluginconf.d """
+  614:         conf_path = self.buildroot.make_chroot_path('etc', 'yum', 'pluginconf.d', name)
+  615:         with open(conf_path, 'w+') as conf_file:
+  616:             conf_file.write(self.config[name])
+  617: 
+  618:     @traceLog()
+  619:     def initialize_config(self):
+  620:         super(Yum, self).initialize_config()
+  621:         # use yum plugin conf from chroot as needed
+  622:         pluginconf_dir = self.buildroot.make_chroot_path('etc', 'yum', 'pluginconf.d')
+  623:         file_util.mkdirIfAbsent(pluginconf_dir)
+  624:         config_content = self.get_pkg_manager_config().replace(
+  625:             "plugins=1", dedent("""\
+  626:                            plugins=1
+  627:                            pluginconfpath={0}""".format(pluginconf_dir)))
+  628: 
+  629:         self.pkg_manager_config = config_content
+  630:         check_yum_config(config_content, self.buildroot.root_log)
+  631: 
+  632:         # write in yum.conf into chroot
+  633:         # always truncate and overwrite (w+)
+  634:         self.buildroot.root_log.debug('configure yum')
+  635:         yumconf_path = os.path.join('etc', 'yum', 'yum.conf')
+  636:         # we need dnf too in case that yum is not installed and /usr/bin/yum points in fact to dnf
+  637:         dnfconf_path = os.path.join('etc', 'dnf', 'dnf.conf')
+  638:         for conf_path in (yumconf_path, dnfconf_path):
+  639:             chroot_conf_path = self.buildroot.make_chroot_path(conf_path)
+  640:             file_util.write_if_changed(chroot_conf_path, config_content)
+  641:             if os.path.exists(conf_path):
+  642:                 shutil.copystat(conf_path, chroot_conf_path)
+  643: 
+  644:         # write in yum plugins into chroot
+  645:         self.buildroot.root_log.debug('configure yum priorities')
+  646:         self._write_plugin_conf('priorities.conf')
+  647:         self.buildroot.root_log.debug('configure yum rhnplugin')
+  648:         self._write_plugin_conf('rhnplugin.conf')
+  649:         if self.config['subscription-manager.conf']:
+  650:             self.buildroot.root_log.debug('configure RHSM rhnplugin')
+  651:             self._write_plugin_conf('subscription-manager.conf')
+  652:             pem_dir = self.buildroot.make_chroot_path('etc', 'pki', 'entitlement')
+  653:             file_util.mkdirIfAbsent(pem_dir)
+  654:             for pem_file in glob.glob("/etc/pki/entitlement/*.pem"):
+  655:                 shutil.copy(pem_file, pem_dir)
+  656:             consumer_dir = self.buildroot.make_chroot_path('etc', 'pki', 'consumer')
+  657:             file_util.mkdirIfAbsent(consumer_dir)
+  658:             for consumer_file in glob.glob("/etc/pki/consumer/*.pem"):
+  659:                 shutil.copy(consumer_file, consumer_dir)
+  660:             shutil.copy('/etc/rhsm/rhsm.conf',
+  661:                         self.buildroot.make_chroot_path('etc', 'rhsm'))
+  662:             self.execute('repolist')
+  663: 
+  664:     def install(self, *pkgs, **kwargs):
+  665:         check = kwargs.pop('check', False)
+  666:         if check:
+  667:             out = self.execute('resolvedep', *pkgs, returnOutput=True,
+  668:                                printOutput=False, pty=False)
+  669:             _check_missing(out)
+  670:         out = super(Yum, self).install(*pkgs, **kwargs)
+  671:         if check:
+  672:             _check_missing(out)
+  673: 
+  674: 
+  675: def _check_missing(output):
+  676:     for i, line in enumerate(output.split('\n')):
+  677:         for msg in ('no package found for', 'no packages found for',
+  678:                     'missing dependency', 'error:'):
+  679:             if msg in line.lower():
+  680:                 raise BuildError('\n'.join(output.split('\n')[i:]))
+  681: 
+  682: 
+  683: class Dnf(_PackageManager):
+  684:     name = 'dnf4'
+  685:     support_installroot = True
+  686: 
+  687:     def __init__(self, config, buildroot, plugins, bootstrap_buildroot):
+  688:         super(Dnf, self).__init__(config, buildroot, plugins, bootstrap_buildroot)
+  689:         self.resolvedep_command = [self.command, 'repoquery', '--resolve', '--requires']
+  690:         self._check_command()
+  691: 
+  692:     def initialize_vars(self):
+  693:         self.buildroot.root_log.debug('configure DNF vars')
+  694:         var_path = self.buildroot.make_chroot_path('etc/dnf/vars/')
+  695:         for key in self.config['dnf_vars'].keys():
+  696:             with open(os.path.join(var_path, key), 'w+') as conf_file:
+  697:                 conf_file.write(self.config['dnf_vars'][key])
+  698: 
+  699:     @traceLog()
+  700:     def initialize_config(self):
+  701:         super(Dnf, self).initialize_config()
+  702:         config_content = self.get_pkg_manager_config()
+  703:         self.pkg_manager_config = config_content
+  704:         check_yum_config(config_content, self.buildroot.root_log)
+  705:         file_util.mkdirIfAbsent(self.buildroot.make_chroot_path('etc', 'dnf'))
+  706:         dnfconf_path = self.buildroot.make_chroot_path('etc', 'dnf', 'dnf.conf')
+  707:         file_util.write_if_changed(dnfconf_path, config_content)
+  708:         self.initialize_vars()
+  709: 
+  710:     def builddep(self, *pkgs, **kwargs):
+  711:         try:
+  712:             super(Dnf, self).builddep(*pkgs, **kwargs)
+  713:         except Error as e:
+  714:             # pylint: disable=unused-variable
+  715:             for i, line in enumerate(e.msg.split('\n')):
+  716:                 if 'no such command: builddep' in line.lower():
+  717:                     raise BuildError("builddep command missing.\nPlease install package dnf-plugins-core.")
+  718:             raise
+  719: 
+  720: 
+  721: class MicroDnf(Dnf):
+  722:     name = 'microdnf'
+  723:     support_installroot = False
+  724: 
+  725:     def __init__(self, config, buildroot, plugins, bootstrap_buildroot):
+  726:         super(MicroDnf, self).__init__(config, buildroot, plugins, bootstrap_buildroot)
+  727:         self.saved_releasever = config['releasever']
+  728:         self.config['releasever'] = None
+  729: 
+  730:     def _check_command(self):
+  731:         """ Check if main command exists """
+  732:         super(MicroDnf, self)._check_command()
+  733:         if not os.path.exists(self.config['dnf_command']):
+  734:             raise Exception("""Command {0} is not available. Either install package containing this command
+  735: or run mock with --yum or --dnf to overwrite config value. However this may
+  736: lead to different dependency solving!""".format(self.config['dnf_command']))
+  737: 
+  738:     @traceLog()
+  739:     def execute(self, *args, **kwargs):
+  740:         args_copy = list(copy.copy(args))
+  741:         cmd = args_copy[0]
+  742:         if cmd not in ['update', 'remove', 'install']:
+  743:             self.command = self.config['dnf_command']
+  744:             self.support_installroot = True
+  745:             self.config['releasever'] = self.saved_releasever
+  746:         # else it is builddep or resolvedep and we keep command == config['microdnf_command']
+  747:         if cmd == "dnf-install":
+  748:             cmd = args_copy[0] = "install"
+  749:         result = super(MicroDnf, self).execute(*args_copy, **kwargs)
+  750:         # restore original value
+  751:         self.command = self.config['microdnf_command']
+  752:         self.support_installroot = False
+  753:         self.config['releasever'] = None
+  754:         return result
+  755: 
+  756: 
+  757: class Dnf5(Dnf):
+  758:     """
+  759:     DNF5 (c++) != DNF4 (python), it has been reimplemented from scratch.
+  760:     Some options can be missing or have a different semantics.
+  761:     """
+  762:     name = 'dnf5'
+  763:     place_common_opts_after = True
+  764: 
+  765:     def execute(self, *args, **kwargs):
+  766:         kwargs.setdefault("pty", False)
+  767:         return super(Dnf, self).execute(*args, **kwargs)
+  768: 
+  769:     def update(self, *args, **_kwargs):
+  770:         return self.execute('upgrade', *args)
+### config.py : package_manager, releasever, commandes et options communes de dnf
+  58:    for alt in ["dnf_command", "dnf_common_opts", "dnf_install_command",
+  59:                "dnf_disable_plugins", "dnf_avoid_opts", "dnf_builddep_opts"]:
+  65:    alt_opts["dnf4_system_command"].append("system_dnf_command")
+  320:    config_opts['releasever'] = None
+  356:    config_opts['package_manager'] = 'dnf'
+  357:    config_opts['package_manager_max_attempts'] = 1
+  358:    config_opts['package_manager_attempt_delay'] = 10
+  376:    config_opts['dnf4_command'] = '/usr/bin/dnf-3'
+  378:    config_opts['dnf4_common_opts'] = ['--setopt=deltarpm=False', '--setopt=allow_vendor_change=yes', '--allowerasing']
+  383:    config_opts['dnf5_command'] = '/usr/bin/dnf5'
+  385:    config_opts['dnf5_common_opts'] = ['--setopt=deltarpm=False', '--setopt=allow_vendor_change=yes', '--allowerasing']
+  400:    config_opts['microdnf_command'] = '/usr/bin/microdnf'
+  402:    config_opts['microdnf_install_command'] = \
+  405:    config_opts['microdnf_builddep_opts'] = []
+  406:    config_opts['microdnf_common_opts'] = []
+  679:        config_opts['package_manager'] = options.pkg_manager
+  681:        config_opts['package_manager'] = 'yum'
+  686:        if config_opts['package_manager'] not in ['dnf', 'dnf5']:
+  687:            config_opts['package_manager'] = 'dnf'
+## où tourne la commande du verrou
+### doOutChroot (mock/py/mockbuild/buildroot.py, def doOutChroot)
+  404:     def doOutChroot(self, command, *args, **kwargs):
+  405:         """
+  406:         Execute the command in bootstrap chroot (when bootstrap is enabled) or
+  407:         on host.  Return (output, exit_status) tuple.
+  408:         """
+  409: 
+  410:         # the chrootPath would imply running chroot within containers, as well
+  411:         # as on host (where we would have to setup nspawn_args, which is not
+  412:         # implemented).
+  413:         assert "chrootPath" not in kwargs
+  414: 
+  415:         # Set pivot_root_chroot before delegating to bootstrap
+  416:         kwargs.setdefault("pivot_root_chroot", self.config.get("pivot_root_chroot", False))
+  417: 
+  418:         if self.bootstrap_buildroot:
+  419:             with self.mounts.buildroot_in_bootstrap_mounted():
+  420:                 return self.bootstrap_buildroot.doChroot(
+  421:                     command, *args, **kwargs)
+  422: 
+  423:         return util.do_with_status(command, *args, **kwargs)
+  424: 
+  (21 lignes)
+### définitions et appels de doOutChroot
+  mock/py/mockbuild/installed_packages.py:13:    We use doOutChroot normally in query_packages* methods, this is a helper
+  mock/py/mockbuild/plugins/package_state.py:77:                output, _ = self.buildroot.doOutChroot(cmd, returnOutput=1, shell=True)
+  mock/py/mockbuild/plugins/buildroot_lock.py:56:                        out, _ = self.buildroot.doOutChroot(cmd,
+  mock/py/mockbuild/buildroot.py:404:    def doOutChroot(self, command, *args, **kwargs):
+  mock/py/mockbuild/buildroot.py:474:        out, _ = self.doOutChroot(command, returnOutput=True, printOutput=False,
+  mock/py/mockbuild/external.py:58:            self.buildroot.doOutChroot(command, shell=False, printOutput=True)
+  mock/py/mockbuild/external.py:72:            self.buildroot.doOutChroot(command, shell=False, printOutput=True)
+## modèle rocky-9 et dépôts après le remplacement de s1.sh
+OK   rocky-9.tpl trouvés dans l'archive : 1
+fichier : mock-core-configs/etc/mock/templates/rocky-9.tpl ; Version de mock-core-configs.spec : 45.2
+### taille de rocky-9.tpl : 255 lignes
+### rocky-9.tpl entier (mock-core-configs/etc/mock/templates/rocky-9.tpl, lignes 1 à 2000)
+  1: config_opts['chroot_setup_cmd'] = 'install bash bzip2 coreutils cpio diffutils redhat-release findutils gawk glibc-minimal-langpack grep gzip info patch redhat-rpm-config rpm-build sed tar unzip util-linux which xz'
+  2: config_opts['dist'] = 'el9'  # only useful for --resultdir variable subst
+  3: config_opts['releasever'] = '9'
+  4: config_opts['package_manager'] = 'dnf'
+  5: config_opts['extra_chroot_dirs'] = [ '/run/lock', ]
+  6: config_opts['bootstrap_image'] = 'quay.io/rockylinux/rockylinux:9'
+  7: 
+  8: 
+  9: config_opts['dnf.conf'] = """
+  10: [main]
+  11: keepcache=1
+  12: debuglevel=2
+  13: reposdir=/dev/null
+  14: logfile=/var/log/yum.log
+  15: retries=20
+  16: obsoletes=1
+  17: gpgcheck=0
+  18: assumeyes=1
+  19: syslog_ident=mock
+  20: syslog_device=
+  21: metadata_expire=0
+  22: mdpolicy=group:primary
+  23: best=1
+  24: install_weak_deps=0
+  25: protected_packages=
+  26: module_platform_id=platform:el9
+  27: user_agent={{ user_agent }}
+  28: 
+  29: 
+  30: [baseos]
+  31: name=Rocky Linux $releasever - BaseOS
+  32: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever
+  33: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/BaseOS/$basearch/os/
+  34: gpgcheck=1
+  35: enabled=1
+  36: metadata_expire=6h
+  37: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  38: 
+  39: [appstream]
+  40: name=Rocky Linux $releasever - AppStream
+  41: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-$releasever
+  42: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/AppStream/$basearch/os/
+  43: gpgcheck=1
+  44: enabled=1
+  45: metadata_expire=6h
+  46: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  47: 
+  48: [crb]
+  49: name=Rocky Linux $releasever - CRB
+  50: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-$releasever
+  51: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/CRB/$basearch/os/
+  52: gpgcheck=1
+  53: enabled=1
+  54: metadata_expire=6h
+  55: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  56: 
+  57: [extras]
+  58: name=Rocky Linux $releasever - Extras
+  59: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever
+  60: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/extras/$basearch/os/
+  61: gpgcheck=1
+  62: enabled=1
+  63: metadata_expire=6h
+  64: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  65: 
+  66: [devel]
+  67: name=Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT ONLY DO NOT LEAVE ENABLED
+  68: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+  69: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/devel/$basearch/os/
+  70: gpgcheck=1
+  71: enabled=0
+  72: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  73: 
+  74: [highavailability]
+  75: name=Rocky Linux $releasever - High Availability
+  76: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=HighAvailability-$releasever
+  77: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/$basearch/os/
+  78: gpgcheck=1
+  79: enabled=0
+  80: metadata_expire=6h
+  81: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  82: 
+  83: [resilientstorage]
+  84: name=Rocky Linux $releasever - Resilient Storage
+  85: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=ResilientStorage-$releasever
+  86: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/ResilientStorage/$basearch/os/
+  87: gpgcheck=1
+  88: enabled=0
+  89: metadata_expire=6h
+  90: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  91: 
+  92: [nfv]
+  93: name=Rocky Linux $releasever - NFV
+  94: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=NFV-$releasever
+  95: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/$basearch/os/
+  96: gpgcheck=1
+  97: enabled=0
+  98: metadata_expire=6h
+  99: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  100: 
+  101: [rt]
+  102: name=Rocky Linux $releasever - Realtime
+  103: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever
+  104: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/RT/$basearch/os/
+  105: gpgcheck=1
+  106: enabled=0
+  107: metadata_expire=6h
+  108: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  109: 
+  110: [baseos-debug]
+  111: name=Rocky Linux $releasever - BaseOS - Debug
+  112: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever-debug
+  113: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/BaseOS/$basearch/debug/tree/
+  114: gpgcheck=1
+  115: enabled=0
+  116: metadata_expire=6h
+  117: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  118: 
+  119: [baseos-source]
+  120: name=Rocky Linux $releasever - BaseOS - Source
+  121: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=BaseOS-$releasever-source
+  122: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/BaseOS/source/tree/
+  123: gpgcheck=1
+  124: enabled=0
+  125: metadata_expire=6h
+  126: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  127: 
+  128: [appstream-debug]
+  129: name=Rocky Linux $releasever - AppStream - Debug
+  130: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-$releasever-debug
+  131: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/AppStream/$basearch/debug/tree/
+  132: gpgcheck=1
+  133: enabled=0
+  134: metadata_expire=6h
+  135: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  136: 
+  137: [appstream-source]
+  138: name=Rocky Linux $releasever - AppStream - Source
+  139: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=AppStream-$releasever-source
+  140: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/AppStream/source/tree/
+  141: gpgcheck=1
+  142: enabled=0
+  143: metadata_expire=6h
+  144: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  145: 
+  146: [crb-debug]
+  147: name=Rocky Linux $releasever - CRB - Debug
+  148: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-$releasever-debug
+  149: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/CRB/$basearch/debug/tree/
+  150: gpgcheck=1
+  151: enabled=0
+  152: metadata_expire=6h
+  153: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  154: 
+  155: [crb-source]
+  156: name=Rocky Linux $releasever - CRB - Source
+  157: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=CRB-$releasever-source
+  158: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/CRB/source/tree/
+  159: gpgcheck=1
+  160: enabled=0
+  161: metadata_expire=6h
+  162: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  163: 
+  164: [extras-debug]
+  165: name=Rocky Linux $releasever - Extras Debug
+  166: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever-debug
+  167: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/extras/$basearch/debug/tree/
+  168: gpgcheck=1
+  169: enabled=0
+  170: metadata_expire=6h
+  171: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  172: 
+  173: [extras-source]
+  174: name=Rocky Linux $releasever - Extras Source
+  175: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever-source
+  176: #baseurl=http://dl.rockylinux.org/pub/rocky/$releasever/extras/source/tree/
+  177: gpgcheck=1
+  178: enabled=0
+  179: metadata_expire=6h
+  180: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  181: 
+  182: [highavailability-debug]
+  183: name=Rocky Linux $releasever - High Availability - Debug
+  184: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=HighAvailability-$releasever-debug$rltype
+  185: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/$basearch/debug/tree/
+  186: gpgcheck=1
+  187: enabled=0
+  188: metadata_expire=6h
+  189: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  190: 
+  191: [highavailability-source]
+  192: name=Rocky Linux $releasever - High Availability - Source
+  193: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=HighAvailability-$releasever-source$rltype
+  194: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/source/tree/
+  195: gpgcheck=1
+  196: enabled=0
+  197: metadata_expire=6h
+  198: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  199: 
+  200: [resilientstorage-debug]
+  201: name=Rocky Linux $releasever - Resilient Storage - Debug
+  202: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=ResilientStorage-$releasever-debug$rltype
+  203: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/ResilientStorage/$basearch/debug/tree/
+  204: gpgcheck=1
+  205: enabled=0
+  206: metadata_expire=6h
+  207: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  208: 
+  209: [resilientstorage-source]
+  210: name=Rocky Linux $releasever - Resilient Storage - Source
+  211: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=ResilientStorage-$releasever-source$rltype
+  212: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/ResilientStorage/source/tree/
+  213: gpgcheck=1
+  214: enabled=0
+  215: metadata_expire=6h
+  216: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  217: 
+  218: [nfv-debug]
+  219: name=Rocky Linux $releasever - NFV Debug
+  220: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-debug$rltype
+  221: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/$basearch/debug/tree/
+  222: gpgcheck=1
+  223: enabled=0
+  224: metadata_expire=6h
+  225: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  226: 
+  227: [nfv-source]
+  228: name=Rocky Linux $releasever - NFV Source
+  229: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-source$rltype
+  230: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/NFV/source/tree/
+  231: gpgcheck=1
+  232: enabled=0
+  233: metadata_expire=6h
+  234: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  235: 
+  236: [rt-debug]
+  237: name=Rocky Linux $releasever - Realtime Debug
+  238: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-debug$rltype
+  239: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/RT/$basearch/debug/tree/
+  240: gpgcheck=1
+  241: enabled=0
+  242: metadata_expire=6h
+  243: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  244: 
+  245: [rt-source]
+  246: name=Rocky Linux $releasever - Realtime Source
+  247: mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-source$rltype
+  248: #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/RT/source/tree/
+  249: gpgcheck=1
+  250: enabled=0
+  251: metadata_expire=6h
+  252: gpgkey=file:///usr/share/distribution-gpg-keys/rocky/RPM-GPG-KEY-Rocky-9
+  253: 
+  254: 
+  255: """
+### remplacement de s1.sh rejoué sur l'hôte (Python, str.replace, comme MOCK_CFG ; le modèle est lu, jamais exécuté)
+ligne boucle du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne ancien texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+ligne nouveau texte du remplacement trouvée telle quelle dans s1.sh : 1 (attendu : 1)
+affectations de config_opts['dnf.conf'] dans rocky-9.tpl : ['=']
+dnf.conf extrait : 246 lignes ; marqueurs jinja {{ : 1, {% : 0 ; barres obliques inverses : 0
+BaseOS : mirrorlist remplacé 1 fois
+AppStream : mirrorlist remplacé 1 fois
+CRB : mirrorlist remplacé 1 fois
+[main] : keepcache=1 ; debuglevel=2 ; reposdir=/dev/null ; logfile=/var/log/yum.log ; retries=20 ; obsoletes=1 ; gpgcheck=0 ; assumeyes=1 ; syslog_ident=mock ; syslog_device= ; metadata_expire=0 ; mdpolicy=group:primary 
+dépôt [baseos] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/
+dépôt [appstream] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/
+dépôt [crb] : enabled=1 ; baseurl=https://dl.rockylinux.org/vault/rocky/9.7/CRB/x86_64/os/
+dépôt [extras] : enabled=1 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever
+dépôt [devel] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+dépôt [highavailability] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=HighAvailability-$releasever
+dépôt [resilientstorage] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=ResilientStorage-$releasever
+dépôt [nfv] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=NFV-$releasever
+dépôt [rt] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever
+dépôt [baseos-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever-debug
+dépôt [baseos-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=BaseOS-$releasever-source
+dépôt [appstream-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-$releasever-debug
+dépôt [appstream-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=AppStream-$releasever-source
+dépôt [crb-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=CRB-$releasever-debug
+dépôt [crb-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=CRB-$releasever-source
+dépôt [extras-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever-debug
+dépôt [extras-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=extras-$releasever-source
+dépôt [highavailability-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=HighAvailability-$releasever-debug$rltype
+dépôt [highavailability-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=HighAvailability-$releasever-source$rltype
+dépôt [resilientstorage-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=ResilientStorage-$releasever-debug$rltype
+dépôt [resilientstorage-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=ResilientStorage-$releasever-source$rltype
+dépôt [nfv-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-debug$rltype
+dépôt [nfv-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-source$rltype
+dépôt [rt-debug] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-debug$rltype
+dépôt [rt-source] : enabled=0 ; mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=RT-$releasever-source$rltype
+dépôts actifs ou sans enabled, hors des seules baseurl de vault 9.7 : 1 ['extras']
+sources effacées ; archive gardée sous ~/.cache

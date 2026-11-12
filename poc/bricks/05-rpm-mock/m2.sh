@@ -53,6 +53,8 @@
 #               dépôt (enabled, baseurl, mirrorlist, metalink) et la section [main], ligne à ligne si configparser échoue ;
 #               puis sources effacées.
 #               Prédictions : resultats/m2-predictions.md, section releve6.
+#               Lancé le 12/11/2026 à 17:26:47 UTC (« Oui » à « Je lance releve6 ? »), code 0 : X1 à X6 tenues ; seul extras
+#               reste actif hors de vault 9.7, par mirrorlist (m2-releve6.log).
 # Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
 # BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
 # en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le

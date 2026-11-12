@@ -482,3 +482,27 @@ Puis, sur l'hôte, un script Python rejoue le remplacement de `s1.sh` sur le `dn
 - le rendu jinja que mock applique à la configuration : seuls les marqueurs `{{` et `{%` sont comptés ;
 - la configuration effective dans l'image. Le remplacement est rejoué sur l'hôte, sur le texte du modèle extrait par une expression régulière ; la sonde de S1 (`mock --debug-config`) reste la mesure dans l'image ;
 - une fonction coupée trop tôt. `fonction` s'arrête à la première ligne non vide de retrait égal ou moindre que le `def` : une chaîne sur plusieurs lignes collée à la marge la couperait. Le nombre de lignes est journalisé. Le décorateur, au-dessus du `def`, n'est pas repris.
+
+## Passage de `releve6`, le 12/11/2026 à 17:26:47 UTC (« Oui » à « Je lance releve6 ? »), code 0
+
+Résultats écrits à partir de 17:28:14 UTC. Journal : [m2-releve6.log](m2-releve6.log), 1125 lignes, sha256 de l'archive conforme. Deux lignes atteignent la coupe de 220 caractères : `rocky-9.tpl:1` (`chroot_setup_cmd`, dont la fin n'est pas lue) et le résumé `[main]` du script Python, que `rocky-9.tpl:10` à `:27` donne en entier.
+
+| # | Résultat |
+|---|---|
+| X1 | **Tenue.** `build_invocation` (`package_manager.py:220` à `:251`) construit `[commande, --installroot <racine>, --releasever <releasever>, -C hors ligne, enable_disable_repos, options communes]`, sans `-c` ni `--config`. Les options communes (`package_manager.py:157` à `:164`) sont `dnf4_common_opts` (`config.py:378` : deux `--setopt` et `--allowerasing`), des `--disableplugin=` et `--forcearch` ; le seul `--config` du fichier est celui de yum (`:605`). L'appel du verrou (`installed_packages.py:121` à `:127`) n'a ni `--releasever` (`rocky-9.tpl:3` pose `'9'`), ni ces options communes, ni `-C` |
+| X2 | **Tenue.** `Dnf.initialize_config` écrit `config_opts['dnf.conf']` en `<racine>/etc/dnf/dnf.conf` (`package_manager.py:700` à `:707`), après que la classe mère a effacé `<racine>/etc/yum.repos.d` (`:548` à `:550`, « configs we get from container image ») |
+| X3 | **Tenue.** Avec un bootstrap, `doOutChroot` lance la commande par `bootstrap_buildroot.doChroot`, le buildroot monté dans le bootstrap (`buildroot.py:418` à `:421`) ; sur l'hôte seulement sans bootstrap (`:423`). La commande est celle du gestionnaire choisi : `/usr/bin/dnf-3` pour dnf4 (`Dnf.name = 'dnf4'`, `package_manager.py:684` ; `config.py:376`). Le choix se fait à l'exécution, selon ce qui existe dans le bootstrap (`fallbacks['dnf4'] = ['dnf4', 'dnf5', 'yum']`, `:21` à `:22` et `:55` à `:102`) : quel binaire tourne n'est pas mesuré |
+| X4 | **Tenue.** `rocky-9.tpl:13` pose `reposdir=/dev/null` |
+| X5 | **Tenue.** Le remplacement de `s1.sh` touche une fois chacun BaseOS, AppStream et CRB, tous trois `enabled=1` |
+| X6 | **Tenue.** Seul `extras` reste actif hors de vault 9.7 : `mirrorlist=…repo=extras-$releasever`, `enabled=1`, `metadata_expire=6h` (`rocky-9.tpl:57` à `:64`). Le modèle compte 25 dépôts : 4 `enabled=1` (BaseOS, AppStream, CRB, `extras`) et 21 `enabled=0` (comptés au journal) |
+
+**Conséquences pour V1** (le tableau V1 à V5 n'est pas réécrit) :
+- **Dans le code de mock**, l'appel du verrou voit les dépôts du `dnf.conf` de mock, si dnf lit la configuration de la racine : BaseOS, AppStream et CRB sur vault 9.7, et `extras` par mirrorlist. Au moment du verrou, seul `reposdir=/dev/null` écarte les fichiers `.repo` de la racine, et seulement si dnf lit le `dnf.conf` de la racine. L'effacement de `yum.repos.d` (`package_manager.py:550`) a lieu à l'initialisation de la configuration ; quand, par rapport à `chroot_setup_cmd`, n'est pas lu, et ce dernier installe `redhat-release` (`rocky-9.tpl:1`), qui peut en reposer.
+- **Une URL de miroir dans le verrou** n'apparaît que si un paquet du buildroot a son NVRA dans `extras`. `query_packages_location` garde alors la dernière ligne par `nom.arch` (`installed_packages.py:133` à `:138`), et `voie2_preparer` s'arrête (URL hors de vault 9.7) : KO, pas de faux OK.
+- **V1 reste de confiance moyenne.** Deux inconnues restent : le comportement de dnf avec `--installroot` sans `--config` (non lu), et le contenu d'`extras`.
+- **Sans `--releasever`**, dnf résout seul le `$releasever` du mirrorlist d'`extras`. Les trois baseurl de vault 9.7 n'ont pas de variable. Non mesuré.
+
+**Pour S1, sans décision** :
+- La construction de S1 voit `extras`, un dépôt non figé, servi par mirrorlist, hors de vault 9.7. D2 a (« Source des rpm » : `vault/rocky/9.7` en baseurl fixes, [README](../README.md) ligne 56) ne le nomme pas.
+- La sonde de S1 le listera (`s1.sh:384`) sans s'arrêter : son contrôle ne porte que sur BaseOS, AppStream et CRB (`s1.sh:385` à `:387`).
+- Que faire d'`extras` est à décider avec toi. Le `s1.sh` de la 05 ne change pas avant S5b.
