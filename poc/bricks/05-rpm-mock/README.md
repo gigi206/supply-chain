@@ -174,3 +174,11 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Deux points sont à décider :
   - la lecture de D3 (a), car l'hôte n'a ni mock ni dnf ;
   - une éventuelle image de bootstrap « prête », construite par notre chaîne.
+
+**Additif du 12/11/2026, 14:41:49 UTC : relevé de M2 lancé (« Oui, lance releve »), 0 KO** ([journal](resultats/m2-releve.log), [comparaison](resultats/m2-predictions.md)).
+- M1r, M2r, M3r, M5r et M6r sont tenues ; M4r l'est en partie.
+- Trois contraintes nouvelles :
+  - `--hermetic-build` exige `--rebuild` et impose sa propre configuration, sans `-r` ;
+  - le verrou doit avoir été calculé avec `bootstrap_image_ready=True` ;
+  - `hermetic-build.cfg` met `gpgcheck=0`, donc les signatures des rpm seront à vérifier par nous.
+- Le passage des macros d'OBS par le verrou est à vérifier en M2.

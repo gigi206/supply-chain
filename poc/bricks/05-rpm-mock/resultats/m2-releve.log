@@ -1,0 +1,134 @@
+# m2.sh releve, 2026-11-12T14:41:49Z
+## sources de mock, tag mock-6.9-1 (codeload de GitHub, archive non signée)
+archive : 460102 octets, sha256 3c034916a721bb06b923399c856d5111fbf3d791804934dd6d909e3d292e4d88
+OK   Version de mock.spec : 6.9
+fichiers : 887 (sources lues, jamais exécutées)
+## options de mock
+### mock.py : options du mode hermétique
+  120:    parser.add_option("--calculate-build-dependencies", action="store_const",
+  421:    parser.add_option("--hermetic-build", nargs=2,
+  436:    if options.hermetic_build and options.chroot != 'default':
+  438:            "The --hermetic-build mode uses a special chroot configuration, "
+  442:    if options.hermetic_build and options.mode != "rebuild":
+  443:        raise mockbuild.exception.BadCmdline("--rebuild mode needed with --hermetic-build")
+  700:    if options.hermetic_build:
+  701:        options.chroot = "hermetic-build"
+  989:        if options.hermetic_build:
+### page de manuel
+  mock/docs/mock.1:176:\fIhttps://rpm-software-management.github.io/mock/feature-hermetic-builds\fR
+  mock/docs/site-defaults.cfg:762:# --hermetic-build options.  Please do not set these options in Mock
+## mock-hermetic-repo
+### arguments
+  90:    parser = argparse.ArgumentParser(
+  106:    parser.add_argument("--lockfile", required=True,
+  112:    parser.add_argument("--output-repo", required=True,
+  117:    parser.add_argument("--client-cert-for", dest="client_cert_for",
+### commandes lancées
+  16:import subprocess
+  97:            "  c) create a local RPM repository there (run createrepo), and\n"
+  115:                            "/bin/createrepo_c utility there to populate the "
+  135:    pull_cmd = ["skopeo", "sync", "--src", "docker", "--dest", "dir",
+  145:    subprocess.check_output(pull_cmd)
+  199:    subprocess.check_call(["createrepo_c", "--compatibility", options.output_repo])
+## etc/mock/hermetic-build.cfg
+fichier : mock/etc/mock/hermetic-build.cfg
+  # used by https://rpm-software-management.github.io/mock/feature-hermetic-builds
+  
+  config_opts['root'] = 'hermetic-build'
+  config_opts['description'] = 'Configuration file for Hermetic Builds'
+  
+  # Hermetic build configuration file is re-used for multiple chroot
+  # configurations (particular chroot used depends on the previous
+  # --calculate-build-dependencies run).  That's why Mock automatically runs
+  # --scrub=all with --hermetic-build.  It doesn't make sense to waste the time
+  # with creating caches.
+  config_opts['plugin_conf']['root_cache_enable'] = False
+  
+  config_opts['dnf.conf'] = """
+  [main]
+  keepcache=1
+  system_cachedir=/var/cache/dnf
+  debuglevel=2
+  reposdir=/dev/null
+  logfile=/var/log/yum.log
+  retries=20
+  obsoletes=1
+  gpgcheck=0
+  assumeyes=1
+  syslog_ident=mock
+  syslog_device=
+  install_weak_deps=0
+  metadata_expire=0
+  best=1
+  protected_packages=
+  
+  # repos
+  
+  [offline]
+  name=offline repo
+  baseurl=file://{{ offline_local_repository }}
+  enabled=True
+  skip_if_unavailable=False
+  """
+## verrou (plugin buildroot_lock)
+### clés écrites
+  51:                query_fields = ["name", "arch", "license", "version", "release",
+  72:                    "version": "1.1.0",
+  100:                        data["config"][cfg_option] = self.buildroot.config[cfg_option]
+  109:                                            data["config"]["bootstrap_image"])
+  110:                            data["bootstrap"] = podman.inspect_hermetic_metadata()
+  111:                            data["bootstrap"]["image_digest"] = podman.get_oci_digest()
+  113:                            data["bootstrap"] = {}
+### schémas du verrou
+  mock/docs/buildroot-lock-schema-1.1.0.json:2:  "$id": "https://raw.githubusercontent.com/rpm-software-management/mock/main/mock/docs/buildroot-lock-schema-1.1.0.json",
+  mock/docs/buildroot-lock-schema-1.1.0.json:10:      "description": "Version of the https://raw.githubusercontent.com/rpm-software-management/mock/main/mock/docs/buildroot
+  mock/docs/buildroot-lock-schema-1.0.0.json:2:  "$id": "https://raw.githubusercontent.com/rpm-software-management/mock/main/mock/docs/buildroot-lock-schema-1.0.0.json",
+  mock/docs/buildroot-lock-schema-1.0.0.json:10:      "description": "Version of the https://raw.githubusercontent.com/rpm-software-management/mock/main/mock/docs/buildroot
+  mock/py/mockbuild/plugins/buildroot_lock.py:2:Produce a lockfile for the prepared buildroot by Mock.  Once available, we
+  mock/py/mockbuild/plugins/buildroot_lock.py:28:        plugins.add_hook("postdeps", self.produce_lockfile)
+  mock/py/mockbuild/plugins/buildroot_lock.py:30:    def produce_lockfile(self):
+  mock/py/mockbuild/plugins/buildroot_lock.py:32:        Upon a request ('produce_lockfile' option set True), generate
+  mock/py/mockbuild/plugins/buildroot_lock.py:38:        statename = "Generating the buildroot lockfile: " + filename
+  mock/py/mockbuild/plugins/buildroot_lock.py:104:                # hermetic build using this lockfile.
+## image de bootstrap prête
+### bootstrap_image_ready et hermetic dans le code
+  mock/py/mockbuild/config.py:109:    config_opts['bootstrap_image_ready'] = False
+  mock/py/mockbuild/config.py:453:    config_opts["hermetic_build"] = False
+  mock/py/mockbuild/config.py:471:    process_hermetic_build_config(options, config_opts)
+  mock/py/mockbuild/config.py:808:def process_hermetic_build_config(cmdline_opts, config_opts):
+  mock/py/mockbuild/config.py:815:    if not cmdline_opts.hermetic_build:
+  mock/py/mockbuild/config.py:818:    config_opts["hermetic_build"] = True
+  mock/py/mockbuild/config.py:820:    json_conf, repo_reference = cmdline_opts.hermetic_build
+  mock/py/mockbuild/config.py:824:    if not data["config"].get("bootstrap_image_ready"):
+  mock/py/mockbuild/config.py:826:            f"The file {json_conf} did not record the bootstrap_image_ready=True "
+  mock/py/mockbuild/config.py:828:            "in a hermetic mode.")
+  mock/py/mockbuild/config.py:855:    config_opts['plugin_conf']['bind_mount_opts']['dirs'].append((final_offline_repo, '/hermetic_repo' ))
+  mock/py/mockbuild/config.py:862:    # With hermetic builds, we always assert that we are reproducing the build
+  mock/py/mockbuild/buildroot.py:512:          test suites (even in hermetic environments) to bind to localhost.
+  mock/py/mockbuild/buildroot.py:1163:        True if bootstrap image is in use, bootstrap_image_ready==True, and no
+  mock/py/mockbuild/buildroot.py:1194:                           "bootstrap_image_ready=True")
+## documentation du mode hermétique
+fichier : docs/Release-Notes-6.0.md
+fichier : docs/Release-Notes-6.4.md
+fichier : docs/Release-Notes-6.8.md
+fichier : docs/feature-isolated-builds.md
+fichier : docs/Release-Notes-6.7.md
+fichier : docs/Plugin-BuildrootLock.md
+fichier : docs/feature-hermetic-builds.md
+fichier : docs/Why-Mock.md
+fichier : docs/Release-Notes-5.7.md
+fichier : docs/index.md
+fichier : docs/Release-Notes-6.1.md
+fichier : mock/docs/mock.1
+fichier : mock/docs/site-defaults.cfg
+### titres et options citées
+  docs/feature-hermetic-builds.md:25:    mock --calculate-build-dependencies -r fedora-rawhide-x86_64 "$srpm"
+  docs/feature-hermetic-builds.md:31:    mock-hermetic-repo --lockfile "$lockfile" --output-repo "$repo"
+  docs/feature-hermetic-builds.md:34:    mock --hermetic-build "$lockfile" "$repo" "$srpm"
+  docs/feature-hermetic-builds.md:66:So, what does Mock `--hermetic-build` do if it doesn't isolate?  Essentially, it
+  docs/feature-hermetic-builds.md:73:--hermetic-build` call (within the properly *isolated* or *hermetic*
+  docs/feature-hermetic-builds.md:110:(`--calculate-build-dependencies`) and offline (`--hermetic-build`) tasks
+  docs/feature-hermetic-builds.md:130:   `mock-hermetic-repo(1)` utility.  This tool downloads all the referenced
+  docs/feature-hermetic-builds.md:144:   instruct Mock to restart the build using the `--hermetic-build
+  docs/feature-hermetic-builds.md:164:    mock --calculate-build-dependencies -r fedora-rawhide-x86_64 "$srpm"
+sources effacées ; archive gardée sous ~/.cache (sha256 ci-dessus)
