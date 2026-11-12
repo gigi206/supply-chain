@@ -184,11 +184,16 @@ for nom, motifs in MOTIFS.items():
 print("## version de Go de l'image outils-prefetch déclarée (vérifiée)")
 m, _ = manifeste("outils-prefetch")
 v = "?"
+# corrigé avant tout lancement, après b50b6ad : tout fichier VERSION dont la première ligne commence par « go1. », chemin journalisé
+# (le chemin d'installation de Go dans outils-prefetch n'est pas relevé)
 for c in json.loads(m)["layers"]:
     with tarfile.open(fileobj=io.BytesIO(blob(c["digest"]))) as tf:
         for x in tf.getmembers():
-            if x.isfile() and x.name.endswith("go/VERSION"):
-                v = tf.extractfile(x).read().decode().splitlines()[0]
+            if x.isfile() and x.name.rsplit("/", 1)[-1] == "VERSION" and x.size < 4096:
+                l = (tf.extractfile(x).read().decode(errors="replace").splitlines() or [""])[0]
+                if l.startswith("go1."):
+                    print(f"  {x.name} : {l}")
+                    v = l
 locale = sh("/usr/local/go/bin/go", "version").stdout.decode().split()[2]
 verdict(v == locale, f"{v} ; toolchain du domaine : {locale}")
 

@@ -1872,3 +1872,9 @@ Préparés après « Oui, prépare-les », sur le modèle de R3 et R4 de la briq
 - les lignes clés sur les tâches signées ;
 - le rangement du chroot sur la copie de la plateforme, qui redonne la couche `1029232e…`. Ce dernier contrôle a trouvé un défaut, corrigé avant tout lancement : les modes des répertoires dépendaient de l'umask.
 
+**Note datée du 12/11/2026, 10:40 UTC** : quatre défauts du lot précédent sont corrigés avant tout lancement, après relecture du conseiller ([note](resultats/s6b-rejeu-predictions.md)) :
+- nettoyage en root ;
+- arbre de travail sous `/var/tmp`, puisque sbuild en mode unshare doit le traverser avec un subuid (lu dans son code) ;
+- code 1 sans `PASSED` ;
+- recherche de la version de Go.
+

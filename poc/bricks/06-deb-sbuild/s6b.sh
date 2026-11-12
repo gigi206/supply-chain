@@ -541,7 +541,9 @@ etape_verifier() { # DANS LA VM (verifier_deb.py, transporté ; son sha256 est j
 }
 
 transporter_r4() { # rebuild_deb.sh (ou sa copie de répétition) copié dans ~/s6b/r4 de la VM, vidé d'abord
-  sur 'rm -rf -- /home/replay/s6b/r4 && mkdir -m 0700 /home/replay/s6b/r4'
+  # en root (corrigé avant tout lancement, après b50b6ad) : go mod vendor laisse des modules en lecture seule, et un sbuild
+  # interrompu des fichiers des subuid, que replay ne peut pas supprimer ; chemins littéraux
+  sur 'sudo rm -rf --one-file-system -- /home/replay/s6b/r4 /var/tmp/s6b-r4 && mkdir -m 0700 /home/replay/s6b/r4'
   scp -q "${SSH_OPTS[@]}" "$1" "replay@$VM_IP:/home/replay/s6b/r4/rebuild_deb.sh" < /dev/null
   echo "rebuild_deb.sh transporté : sha256 local $(sha256sum < "$1" | cut -c1-64) ; dans la VM $(sur 'sha256sum < /home/replay/s6b/r4/rebuild_deb.sh | cut -c1-64')"
 }
@@ -555,10 +557,12 @@ etape_repetition() { # lien ÉTABLI, non comptée (comme la répétition de R4) 
   sur 'sudo systemd-run --unit=s6b-repetition --collect --wait --property=Type=exec --uid=replay --gid=replay /bin/bash /home/replay/s6b/r4/rebuild_deb.sh' 2>&1 | tail -4 || true
   echo "## résultat (écrit dans la VM)"; sur 'cat /home/replay/s6b/r4/resultat.txt'
   echo "## journal (fin)"; sur 'tail -25 /home/replay/s6b/r4/rebuild.log'
+  # code 1 sauf verdict PASSED (corrigé avant tout lancement, après b50b6ad)
+  sur "grep -qx 'verdict=PASSED' /home/replay/s6b/r4/resultat.txt" && echo "bilan : PASSED (répétition, non comptée)" || { echo "bilan : pas de PASSED"; exit 1; }
 }
 
 etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas avant finishedOn + 24 h (vsa.py)
-  local iface s0 s1 s2 e1 e2 coupe retabli fin fo
+  local iface s0 s1 s2 e1 e2 coupe retabli fin fo ok=0
   fo=$(sur "sed -n 's/^finishedOn=//p' /home/replay/s6b/r3/verifie.txt")
   [ -n "$fo" ] || { echo "REFUS : finishedOn absent de verifie.txt (étape verifier)"; exit 1; }
   if [ "$(date -u +%s)" -lt $(( $(date -u -d "$fo" +%s) + 86400 )) ]; then
@@ -569,6 +573,7 @@ etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas ava
   iface=$(v domiflist "$VM" | awk '$3 == "supply-chain-replay" {print $1}')
   [ -n "$iface" ] || { echo "REFUS : interface de $VM sur supply-chain-replay introuvable"; exit 1; }
   echo "## interface de $VM côté hôte : $iface"
+  echo "en cas d'arrêt de ce script lien coupé : virsh -c qemu:///system domif-setlink $VM $iface up"
   st() { v domifstat "$VM" "$iface" | awk '{printf "%s=%s ", $2, $3}'; }
   sortie() { v domifstat "$VM" "$iface" | awk '$2 ~ /^tx_(bytes|packets)$/ {printf "%s=%s ", $2, $3}'; }
   s0=$(st)
@@ -584,7 +589,7 @@ etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas ava
   sleep "$ATTENTE_HORS_LIGNE"
   s2=$(st); e2=$(sortie)
   echo "compteurs juste avant le rétablissement ($ATTENTE_HORS_LIGNE s plus tard) : $s2"
-  [ "$e1" = "$e2" ] && echo "OK   sortie de la VM inchangée pendant la coupure ($e2)" || echo "KO   la VM a émis pendant la coupure : $e1 -> $e2"
+  [ "$e1" = "$e2" ] && echo "OK   sortie de la VM inchangée pendant la coupure ($e2)" || { echo "KO   la VM a émis pendant la coupure : $e1 -> $e2"; ok=1; }
   v domif-setlink "$VM" "$iface" up > /dev/null
   retabli=$(date -u +%FT%TZ)
   echo "lien rétabli à $retabli"
@@ -596,9 +601,12 @@ etape_rebuild() { # lien COUPÉ (modèle : etape_rebuild de la 10, R4) ; pas ava
   if [ -n "$fin" ] && [ "$(date -u -d "$fin" +%s)" -lt "$(date -u -d "$retabli" +%s)" ]; then
     echo "OK   rebuild terminé ($fin) avant le rétablissement du lien ($retabli)"
   else
-    echo "KO   rebuild non terminé avant le rétablissement du lien ($retabli) : résultat non valable hors ligne"
+    echo "KO   rebuild non terminé avant le rétablissement du lien ($retabli) : résultat non valable hors ligne"; ok=1
   fi
   echo "## journal (fin)"; sur 'tail -25 /home/replay/s6b/r4/rebuild.log'
+  # code 1 sauf PASSED et les deux contrôles de l'hôte (corrigé avant tout lancement, après b50b6ad)
+  sur "grep -qx 'verdict=PASSED' /home/replay/s6b/r4/resultat.txt" || ok=1
+  [ $ok = 0 ] && echo "bilan : PASSED, lien coupé, fini avant le rétablissement" || { echo "bilan : au moins un KO ou pas de PASSED"; exit 1; }
 }
 
 case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1|transporter:1|verifier:1|repetition:1|rebuild:1) ;;

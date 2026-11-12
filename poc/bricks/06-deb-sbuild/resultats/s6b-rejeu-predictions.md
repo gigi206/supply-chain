@@ -89,3 +89,24 @@ mise exec -- poc/bricks/06-deb-sbuild/s6b.sh rebuild
 ## Hors de ces étapes
 
 La VSA de `039949f9` sur `454728c5` (`vsa.py` adapté), signée dans la VM et non poussée avant S5b (ordre c).
+
+## Note datée du 12/11/2026 (rédigée à partir de 10:40:48 UTC, après relecture du conseiller), avant tout lancement
+
+Les prédictions ci-dessus ont été commitées dans `b50b6ad`, à 10:35:18 UTC. Quatre défauts sont corrigés avant tout lancement :
+1. **Nettoyage de `~/s6b/r4` en root.** `go mod vendor` laisse des modules en lecture seule, et un sbuild interrompu laisserait des fichiers des subuid. `replay` ne pourrait pas les supprimer, et le second passage, `rebuild` après `repetition`, aurait échoué avant même de couper le lien. `transporter_r4` vide donc `/home/replay/s6b/r4` et `/var/tmp/s6b-r4` avec `sudo rm -rf --one-file-system`, en chemins littéraux. `rebuild_deb.sh` refuse de démarrer si `/var/tmp/s6b-r4` existe encore.
+2. **Arbre de travail sous `/var/tmp/s6b-r4`** (0755), et non plus sous `/home/replay/s6b/r4`. Le code de sbuild 0.89.3 (`Sbuild/ChrootUnshare.pm`, lu dans la couche racine de l'image de build de S4a) le montre :
+   - le chroot est créé sous `$TMPDIR`, puis touché par le root de l'espace de noms, c'est-à-dire le premier subuid ; si le chemin n'est pas traversable, il y a refus (« unable to access ») ;
+   - `/home/replay` est en 700 (mesuré par l'étape `chroot`) ;
+   - l'archive du chroot, elle, est lue par le compte lui-même, et reste sous `/home/replay/s6b`.
+
+   Les modes de l'arbre sont journalisés (`arbre=`). Le journal et le résultat restent dans `~/s6b/r4`.
+3. **Codes de sortie** : `repetition` rend 1 sans `verdict=PASSED`. `rebuild` rend 1 sans `verdict=PASSED`, si la VM a émis pendant la coupure, ou si le rebuild n'a pas fini avant le rétablissement.
+4. **Version de Go d'`outils-prefetch`** : le vérificateur cherchait un chemin finissant par `go/VERSION`. Il accepte maintenant tout fichier `VERSION` dont la première ligne commence par `go1.`, et journalise son chemin. Un KO à cet endroit aurait fait refuser `rebuild_deb.sh` (`ko≠0`).
+
+`rebuild` journalise aussi, avant la coupure, la commande qui rétablit le lien si le script est arrêté : `virsh -c qemu:///system domif-setlink sc-replay <interface> up`.
+
+**Prédictions ajoutées**
+- **P0.** `arbre=` : `/var/tmp` 1777 root, `/var/tmp/s6b-r4` 755 replay, l'arbre 755 replay. Aucun « unable to access » dans le journal de sbuild.
+- **P5.** Le second passage, `rebuild` après `repetition`, ne bute pas sur le nettoyage. Le `sudo rm` de `transporter_r4` rend 0.
+- **V6 révisée.** Un fichier `VERSION` à `go1.26.10` dans `outils-prefetch` ; je ne prédis pas son chemin.
+

@@ -11,7 +11,10 @@
 set -euo pipefail
 export LC_ALL=C
 umask 022
-R3=/home/replay/s6b/r3 R4=/home/replay/s6b/r4 E=/home/replay/s6b/r4/e C=/home/replay/s6b/trixie-amd64.tar
+# arbre de travail sous /var/tmp/s6b-r4 (corrigé avant tout lancement, après b50b6ad) : sbuild en mode unshare crée son chroot sous
+# $TMPDIR et y accède en root de l'espace de noms (premier subuid), qui ne traverse pas /home/replay (700) ; l'archive du chroot
+# est lue par le compte lui-même (Sbuild/ChrootUnshare.pm de 0.89.3) et reste sous /home/replay/s6b
+R3=/home/replay/s6b/r3 R4=/home/replay/s6b/r4 E=/var/tmp/s6b-r4/e C=/home/replay/s6b/trixie-amd64.tar
 exec > "$R4/rebuild.log" 2>&1
 res() { echo "$1=$2" >> "$R4/resultat.txt"; echo "$1=$2"; }
 : > "$R4/resultat.txt"
@@ -45,7 +48,9 @@ grep -qE '=KO|^chroot=KO' "$R4/resultat.txt" && { res verdict "REFUS : entrées 
 
 # --- preparer-deb : sources du commit, trois artefacts, fermeture confrontée au verrou, vendor/, marked, debian/
 commit=$(sed -n 's/^commit=//p' "$R3/verifie.txt")
-rm -rf --one-file-system -- /home/replay/s6b/r4/e && mkdir -p "$E/entrees/src" "$E/tmp"   # chemin littéral
+[ ! -e /var/tmp/s6b-r4 ] || { res verdict "REFUS : /var/tmp/s6b-r4 existe (l'hôte le vide en root avant le lancement)"; exit 1; }
+mkdir -m 0755 /var/tmp/s6b-r4 && mkdir -p "$E/entrees/src" "$E/tmp"
+res arbre "$(stat -c '%n %a %U' /var/tmp /var/tmp/s6b-r4 "$E" | paste -sd';')"
 e=$E/entrees
 git -C "$R3/src" archive --format=tar "$commit" | tar -xf - -C "$e/src"
 oras pull --no-tty --oci-layout "$R3/layout:fermeture-deb" -o "$e/fermeture" > /dev/null
@@ -100,7 +105,7 @@ cp -r "$e/packaging/debian" "$e/debian"
 cp "$e/packaging/verrou-deb.txt" "$e/verrou-deb.txt"
 find "$e/debian" -type f -exec chmod 0644 {} \;
 chmod 0755 "$e/debian/rules"
-rm -rf -- /home/replay/s6b/r4/e/entrees/sources /home/replay/s6b/r4/e/entrees/packaging
+chmod -R u+w /var/tmp/s6b-r4/e/entrees/sources && rm -rf -- /var/tmp/s6b-r4/e/entrees/sources /var/tmp/s6b-r4/e/entrees/packaging
 res preparation "src $(find "$e/src" -type f | wc -l) fichiers, debian $(find "$e/debian" -type f | wc -l) fichiers"
 
 # --- construire-deb : fermeture recopiée à plat, paquet source, sbuild hors ligne, layout OCI fait main
