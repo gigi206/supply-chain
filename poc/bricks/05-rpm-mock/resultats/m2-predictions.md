@@ -362,3 +362,45 @@ Banc rejoué ([journal](m2-releve4-essai-local.log)), cinq cas, codes attendus :
 - `--compatibility` reprend l'appel de mock 6.9, et change la limite des changelogs du dépôt. L'effet sur la construction n'est pas mesuré : le dépôt est relu par mock en M3, qui dira si les métadonnées comptent. Garder l'option rend le dépôt identique à celui que construirait `mock-hermetic-repo`.
 
 **Précision du 12/11/2026, écrite à partir de 16:24:50 UTC (le texte ci-dessus n'est pas réécrit)** : « rend le dépôt identique à celui que construirait `mock-hermetic-repo` » va trop loin. Ce qui est établi, c'est le même appel : `subprocess.check_call(["createrepo_c", "--compatibility", options.output_repo])` ([m2-releve2.log](m2-releve2.log), ligne 199 de `mock-hermetic-repo.py`). L'identité des dépôts n'est pas mesurée (horodatages, ordre des fichiers).
+
+## Additif du 12/11/2026, à partir de 16:34:20 UTC : cœur de la voie 2 écrit à sec dans `m2.sh`, NON BRANCHÉ
+
+Après « continue », sur relecture du conseiller. **Ce n'est pas une étape** : aucune fonction `etape_` ne l'appelle, rien n'est lançable, aucun accord n'est demandé.
+
+**Pourquoi maintenant.** L'en-tête de `m2.sh` renvoie les étapes de M2 dans le cluster après S1, parce qu'elles dépendent de l'isolation, du stockage de podman et de mock en root. Les quatre gestes de la voie 2 n'en dépendent pas : ils sont écrits seuls. Le pod, l'image, le label, la clé livrée et l'étape qui les branche attendent S1, `verrou` et les embranchements 2 et 3. Les aides de pod de `s1.sh` ne sont ni copiées ni chargées.
+
+**Ce qui est écrit** ([`m2.sh`](../m2.sh), après `releve4`) :
+- `voie2_preparer`, sur l'hôte : le verrou est mis à plat par `jq` en `liste.tsv` (nom, version, release, arch, sigmd5, URL ; champs du schéma 1.1.0, [m2-releve2.log](m2-releve2.log), N3r). Il s'arrête en KO sur :
+  - une version de verrou autre que `1.1.0` ;
+  - un `pull_digest` différent de `BOOT_DIGEST`, ou un `bootstrap_image` différent de la référence de S1 (`BOOT_DIGEST`, `VAULT97` et `DEPOT_AMONT` sont lus dans `s1.sh`, pas recopiés) ;
+  - un champ manquant, un sigmd5 hors de 32 caractères hexadécimaux, une URL hors des baseurl fixes de vault 9.7 (BaseOS, AppStream, CRB), une URL avec un caractère hors de `[A-Za-z0-9:/._+-]` ou un segment « . » ou « .. » (curl les résout, ce qui sortirait du préfixe), un nom de fichier hors de `[A-Za-z0-9._+-]`, un doublon, un verrou vide.
+- `VOIE2`, le script du pod (sh) :
+  - vérifie que les outils sont présents ;
+  - télécharge chaque URL, HTTP 200 exigé, avec « + » encodé comme `mock-hermetic-repo.py:58` ;
+  - exige autant de fichiers que de paquets ;
+  - lance `rpm -K` dans une rpmdb vide où seule la clé de Rocky livrée est importée, et exige « digests signatures OK » pour chaque fichier : même motif que l'étape `racine` de `s1.sh`, qui le compte sans s'arrêter ;
+  - exige que nom, version, release, arch et `%{SIGMD5}` de chaque en-tête égalent le verrou ;
+  - lance `createrepo_c --compatibility`, l'appel de `mock-hermetic-repo.py:199` ;
+  - lance `skopeo copy --preserve-digests` vers `dir:<dépôt>/<référence coupée au premier « : »>@<pull_digest>` (Q4), et exige que le sha256 du manifeste copié égale le `pull_digest`.
+
+**Banc hors réseau** ([script](m2-voie2-essai-local.sh), [journal](m2-voie2-essai-local.log), 16:39:28 UTC) : curl, rpm, createrepo_c et skopeo simulés, `s1.sh` copié avec un `BOOT_DIGEST` d'essai, script du pod lu sur l'entrée standard (`sh -s`), comme le fera `kubectl exec`. Les 18 cas rendent le code attendu :
+- côté hôte : le nominal passe (code 0) ; version, `pull_digest`, `bootstrap_image`, champ manquant, sigmd5 mal formé, URL d'EPEL, nom `x;id.rpm`, remontée par « .. » sous le préfixe, doublon et verrou vide sont refusés (code 1) ;
+- côté pod : le nominal passe (code 0, une URL avec « %2B », appel de skopeo conforme) ; HTTP 404, fichier manquant, signature non OK, en-tête différent, createrepo_c en échec et manifeste différent sont refusés (code 1).
+
+**Ce que le banc ne prouve pas** : les sorties réelles de `rpm -K`, `rpm -qp`, `createrepo_c` et `skopeo` dans l'image ; le format réel de sigmd5 dans un verrou de mock ; le réseau, Zot et la sortie du pod ; l'absence d'un outil. Le script du pod a tourné sous dash sur l'hôte (`/bin/sh`), alors que le pod aura le `sh` de Rocky, non relevé dans l'image. `bash -n` passe, et shellcheck 0.11.0 ne relève aucun avertissement (`-S warning`) sur `m2.sh` ni sur le banc.
+
+**Prédictions pour le premier passage réel**, après S1 et `verrou` :
+
+| # | Prédiction | Confiance | Si elle tombe |
+|---|---|---|---|
+| V1 | Toutes les URL du verrou sont sous les baseurl fixes de vault 9.7 | Moyenne : `MOCK_CFG` les fixe ; `query_packages_location`, qui les produit, n'est pas lu | `voie2_preparer` s'arrête ; décision avec toi |
+| V2 | Le verrou n'a aucune entrée `gpg-pubkey` | Faible : `query_packages` n'est pas lu | Sans URL, elles arrêtent `voie2_preparer` (« champ manquant ») ; les écarter demandera une décision |
+| V3 | Le sigmd5 du verrou fait 32 caractères hexadécimaux minuscules, égaux à `%{SIGMD5}` de `rpm -qp` | Faible : la requête de mock (`installed_packages.py`) n'est pas lue | KO, pas de faux OK ; la comparaison sera à reprendre |
+| V4 | `rpm -K` rend « digests signatures OK » pour chaque rpm, avec la seule clé de Rocky | Moyenne : les dépôts de `MOCK_CFG` sont ceux de Rocky 9.7 seuls | KO ; la clé ou le dépôt fautif est à identifier |
+| V5 | Le manifeste copié a pour sha256 le `pull_digest` | Moyenne : copie par digest avec `--preserve-digests` ; jamais mesuré | KO avant M3 |
+
+**Ce qui attend toujours** : `createrepo_c --help` et `skopeo copy --help` dans l'image, et la mesure de L3 (dépôt construit avec et sans `--compatibility`, nombre d'entrées de changelog comparé). Ils viennent avec l'étape qui branchera ce cœur, prédictions écrites avant.
+
+**Écart à noter pour le branchement** : `mock-hermetic-repo` reprend 5 fois un téléchargement en échec (`request_with_retry`, `:29` à `:46`). Notre cœur ne reprend pas : une erreur passagère arrête l'étape, et la relancer demande un nouvel accord.
+
+**Règle des 2×** : 2,38 h mesurées sur 32 commits ([temps-05-1211.log](temps-05-1211.log), écarts d'au plus 1 h entre commits, méthode de la 08c, mêmes limites), pour une estimation de 2,5 pw. La règle n'est pas atteinte.

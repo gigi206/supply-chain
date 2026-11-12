@@ -34,6 +34,25 @@
 #               Corrigé à sec le 12/11/2026 à partir de 16:22:59 UTC, sur relecture du conseiller, NON RELANCÉ : option et témoin
 #               cherchés dans le corps de sharedCopyFlags seul (de func sharedCopyFlags( au premier « } » en début de ligne),
 #               archivé au journal, et non plus dans tout utils.go.
+# Cœur de la voie 2 (écrit à sec le 12/11/2026 à partir de 16:34:20 UTC, après « continue », sur relecture du conseiller), NON
+# BRANCHÉ : aucune étape ne l'appelle, rien n'est lançable. Il ne dépend ni de l'isolation, ni du stockage de podman, ni de mock
+# en root, que le haut de ce fichier attend de S1 ; le pod, l'image, le label et la clé livrée attendent S1, verrou et le
+# propriétaire (embranchements 2 et 3). Deux parties :
+#   voie2_preparer (hôte) : verrou de mock (schéma 1.1.0) mis à plat en liste.tsv (name, version, release, arch, sigmd5, url),
+#               KO sur tout écart : version du verrou, pull_digest différent de BOOT_DIGEST (lu dans s1.sh), bootstrap_image
+#               différent de la référence de S1, champ manquant, sigmd5 hors de 32 caractères hexadécimaux, URL hors des
+#               baseurl fixes de vault 9.7 (VAULT97 lu dans s1.sh), URL avec un caractère hors de [A-Za-z0-9:/._+-] ou un
+#               segment « . » ou « .. », nom de fichier hors de [A-Za-z0-9._+-], doublon ;
+#               puis voie2.sh, le cœur avec la référence et le dossier du bootstrap substitués
+#   VOIE2 (pod, sh) : les quatre gestes, KO sur tout écart : outils présents ; chaque URL téléchargée (HTTP 200 exigé, « + »
+#               encodé comme mock-hermetic-repo.py:58) ; autant de fichiers que de paquets ; rpm -K dans une rpmdb vide où seule
+#               la clé de Rocky livrée est importée, « digests signatures OK » exigé pour chaque fichier (même motif que l'étape
+#               racine de s1.sh, qui le compte sans s'arrêter) ; nom, version, release,
+#               arch et SIGMD5 de chaque en-tête égaux au verrou ; createrepo_c --compatibility (appel de
+#               mock-hermetic-repo.py:199) ; skopeo copy --preserve-digests vers dir:<dépôt>/<référence coupée au premier
+#               « : »>@<pull_digest> (config.py:846, Q4 de m2-predictions.md), sha256 du manifeste copié égal au pull_digest.
+#               Banc hors réseau : resultats/m2-voie2-essai-local.sh. La requête de mock pour sigmd5 (installed_packages.py)
+#               n'est pas lue : un format différent donnerait un KO, pas un faux OK.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
@@ -189,5 +208,78 @@ etape_releve4() {
   rm -rf -- "${T:?}/releve4"
   echo "fichiers effacés ; les correctifs des paquets de Rocky ne sont pas lus"
 }
+
+# Cœur de la voie 2, NON BRANCHÉ (voir l'en-tête) : ni étape, ni pod. Rien ici n'est appelé par lancer.
+attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }   # comme s1.sh
+voie2_preparer() { # verrou dossier : liste.tsv et voie2.sh écrits dans dossier ; KO sur tout écart du verrou
+  local v=$1 o=$2 b p a src dos
+  b=$(sed -n 's/^BOOT_DIGEST=\(sha256:[0-9a-f]\{64\}\)[[:space:]].*/\1/p' "$here/s1.sh")
+  p=$(sed -n 's|^VAULT97=\(https://[A-Za-z0-9./-]*\)$|\1|p' "$here/s1.sh")
+  a=$(sed -n 's|^DEPOT_AMONT=\([A-Za-z0-9/_.-]*\)$|\1|p' "$here/s1.sh")
+  [ -n "$b" ] && [ -n "$p" ] && [ -n "$a" ] || { echo "KO   BOOT_DIGEST, VAULT97 ou DEPOT_AMONT introuvable dans s1.sh" >&2; exit 1; }
+  mkdir -p "$o"
+  attendu "version du verrou" "$(jq -r '.version' "$v")" 1.1.0
+  attendu "pull_digest du verrou" "$(jq -r '.bootstrap.pull_digest // "absent"' "$v")" "$b"
+  src=$(jq -r '.config.bootstrap_image // "absent"' "$v")
+  attendu "bootstrap_image du verrou" "$src" "$REG/$a@$b"
+  dos=${src%%:*}@$b   # split(':')[0] de mock, puis @pull_digest (config.py:846)
+  jq -r '.buildroot.rpms[] | [.name, .version, .release, .arch, .sigmd5, .url] | map(if type == "string" then . else "" end) | @tsv' \
+    "$v" > "$o/liste.tsv"
+  awk -F '\t' -v p="$p" '
+    function ko(m) { print "KO   ligne " NR " du verrou : " m > "/dev/stderr"; e = 1 }
+    { n++; f = $6; sub(/.*\//, "", f) }
+    NF != 6 || $1 == "" || $2 == "" || $3 == "" || $4 == "" || $5 == "" || $6 == "" { ko("champ manquant"); next }
+    length($5) != 32 || $5 ~ /[^0-9a-f]/ { ko("sigmd5 inattendu : " $5) }
+    index($6, p "/BaseOS/x86_64/os/") != 1 && index($6, p "/AppStream/x86_64/os/") != 1 && index($6, p "/CRB/x86_64/os/") != 1 {
+      ko("URL hors des dépôts épinglés : " $6) }
+    $6 ~ /[^A-Za-z0-9:\/._+-]/ || index($6, "/../") || index($6, "/./") { ko("URL refusée (caractère ou segment . ou ..) : " $6) }
+    f !~ /^[A-Za-z0-9._+-]+\.rpm$/ { ko("nom de fichier refusé : " f) }
+    vu[f]++ { ko("nom de fichier en double : " f) }
+    END { if (!n) { print "KO   aucun paquet dans le verrou" > "/dev/stderr"; e = 1 }; exit e }' "$o/liste.tsv" \
+    || { echo "KO   verrou refusé (motifs ci-dessus)" >&2; exit 1; }
+  echo "OK   verrou : $(wc -l < "$o/liste.tsv") paquets, tous sous $p (BaseOS, AppStream, CRB)"
+  local x=${VOIE2//@SOURCE@/$src}; x=${x//@DOSSIER@/$dos}; printf '%s\n' "${x//@DIGEST@/$b}" > "$o/voie2.sh"
+  echo "bootstrap : docker://$src vers dir:<dépôt>/$dos"
+}
+
+VOIE2='set -u
+export LC_ALL=C
+R=${VOIE2_RACINE:-/w}; D=$R/voie2/depot; B=$R/voie2/rpmdb; L=$R/voie2/liste.tsv; T=$(printf "\t")
+ko() { echo "KO   $*"; exit 1; }
+for o in curl rpm createrepo_c skopeo sha256sum; do command -v $o >/dev/null 2>&1 || ko "$o absent de l image"; done
+rm -rf "${D:?}" "${B:?}"; mkdir -p "$D" "$B"
+n=$(wc -l < "$L"); echo "paquets du verrou : $n"
+t=$(date +%s)
+while IFS="$T" read -r nom ver rel arch md5 url; do
+  h=$(curl -sS --proto =https --max-time 120 -o "$D/${url##*/}" -w "%{http_code}" "$(printf %s "$url" | sed "s/+/%2B/g")") || ko "curl en échec : $url"
+  [ "$h" = 200 ] || ko "HTTP $h : $url"
+done < "$L"
+c=$(find "$D" -maxdepth 1 -type f -name "*.rpm" | wc -l)
+[ "$c" = "$n" ] || ko "$c fichiers téléchargés pour $n paquets"
+echo "téléchargement : $c fichiers en $(($(date +%s) - t)) s"
+rpm --dbpath "$B" --initdb </dev/null || ko "rpmdb vide non créée"
+rpm --dbpath "$B" --import "$R/cles/RPM-GPG-KEY-Rocky-9" </dev/null || ko "clé de Rocky non importée"
+rpm --dbpath "$B" -K "$D"/*.rpm > "$R/voie2/k.log" 2>&1 </dev/null; r=$?
+k=$(grep -c -E "digests signatures OK$" "$R/voie2/k.log")
+echo "rpm -K : rc $r, $k OK sur $n"
+grep -v -E "digests signatures OK$" "$R/voie2/k.log" | head -n 5
+[ "$r" = 0 ] && [ "$k" = "$n" ] || ko "signatures des rpm"
+while IFS="$T" read -r nom ver rel arch md5 url; do
+  q=$(rpm --dbpath "$B" -qp --qf "%{NAME}$T%{VERSION}$T%{RELEASE}$T%{ARCH}$T%{SIGMD5}" "$D/${url##*/}" 2>/dev/null </dev/null)
+  [ "$q" = "$nom$T$ver$T$rel$T$arch$T$md5" ] || ko "en-tête de ${url##*/} différent du verrou"
+done < "$L"
+echo "OK   nom, version, release, arch et sigmd5 des $n rpm égaux au verrou"
+t=$(date +%s); createrepo_c --compatibility "$D" > "$R/voie2/createrepo.log" 2>&1 </dev/null; r=$?
+echo "createrepo_c --compatibility : rc $r en $(($(date +%s) - t)) s"
+[ "$r" = 0 ] || { tail -n 5 "$R/voie2/createrepo.log"; ko "createrepo_c"; }
+[ -s "$D/repodata/repomd.xml" ] || ko "repodata/repomd.xml absent"
+echo "repomd.xml : sha256 $(sha256sum < "$D/repodata/repomd.xml" | cut -c1-64)"
+t=$(date +%s); skopeo copy --preserve-digests "docker://@SOURCE@" "dir:$D/@DOSSIER@" > "$R/voie2/skopeo.log" 2>&1 </dev/null; r=$?
+echo "skopeo copy --preserve-digests : rc $r en $(($(date +%s) - t)) s"
+[ "$r" = 0 ] || { tail -n 5 "$R/voie2/skopeo.log"; ko "skopeo copy"; }
+m=sha256:$(sha256sum < "$D/@DOSSIER@/manifest.json" | cut -c1-64)
+[ "$m" = "@DIGEST@" ] || ko "manifeste copié $m, attendu @DIGEST@"
+echo "OK   manifeste copié : $m"
+'
 
 lancer m2 "05 M2" "$@"

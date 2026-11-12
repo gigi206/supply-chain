@@ -300,3 +300,9 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - `--compatibility` existe dans createrepo_c 0.20.1, mais elle fixe aussi la limite des changelogs à -1 quand aucune n'est donnée (`createrepo_c.c:1291`) : L3 non tenue. Le sens de -1 n'est pas lu.
 - `--preserve-digests` existe dans skopeo 1.22.2 : `sharedCopyFlags`, `utils.go:352`, appelée par `copy.go:47` (L4b tenue).
 - Lu dans l'amont aux tags, pas dans les paquets de Rocky : `--help` dans l'image reste la mesure de M2.
+
+**Additif du 12/11/2026, à partir de 16:34:20 UTC : cœur de la voie 2 écrit à sec dans [`m2.sh`](m2.sh), NON BRANCHÉ** (après « continue », sur relecture du conseiller). Aucune étape ne l'appelle ; le pod, l'image et l'étape qui le branche attendent S1, `verrou` et les embranchements 2 et 3.
+- Sur l'hôte, `voie2_preparer` met le verrou à plat. Il le refuse sur version, `pull_digest`, `bootstrap_image`, champ manquant, sigmd5, URL hors de vault 9.7 ou avec « .. », nom de fichier ou doublon.
+- Dans le pod, `VOIE2` fait les quatre gestes, chacun gardé : HTTP 200, `rpm -K` avec la seule clé de Rocky, en-têtes égaux au verrou, `createrepo_c --compatibility`, puis `skopeo copy --preserve-digests` avec le sha256 du manifeste égal au `pull_digest`.
+- Banc hors réseau, outils simulés, script du pod lu par `sh -s` : 18 cas au code attendu ([journal](resultats/m2-voie2-essai-local.log)). Prédictions V1 à V5 pour le premier passage réel ([détail](resultats/m2-predictions.md)).
+- Temps passé : 2,38 h mesurées ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées.

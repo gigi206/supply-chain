@@ -1,0 +1,128 @@
+# essai hors réseau du cœur de la voie 2 de m2.sh (outils simulés, banc m2-voie2-essai-local.sh), 2026-11-12T16:39:28Z
+source remplacée : 1
+BOOT_DIGEST d essai : 1
+== cas hôte nominal
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   verrou : 2 paquets, tous sous https://dl.rockylinux.org/vault/rocky/9.7 (BaseOS, AppStream, CRB)
+bootstrap : docker://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f vers dir:<dépôt>/sc-stockage.poc.test@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+code 0
+bash	5.1.8	9.el9	x86_64	0123456789abcdef0123456789abcdef	https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/b/bash-5.1.8-9.el9.x86_64.rpm
+libstdc++	11.5.0	5.el9_5	x86_64	fedcba9876543210fedcba9876543210	https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/libstdc++-11.5.0-5.el9_5.x86_64.rpm
+ligne de skopeo avec la référence et le dossier substitués (1 attendue) : 1
+marqueurs restants (0 attendu) : 0
+== cas hôte version
+KO   version du verrou : 1.0.0 (attendu : 1.1.0)
+code 1
+== cas hôte pull_digest
+OK   version du verrou : 1.1.0
+KO   pull_digest du verrou : sha256:0000000000000000000000000000000000000000000000000000000000000000 (attendu : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f)
+code 1
+== cas hôte bootstrap_image
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   bootstrap_image du verrou : docker.io/library/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f (attendu : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f)
+code 1
+== cas hôte champ_manquant
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 1 du verrou : champ manquant
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte sigmd5
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 1 du verrou : sigmd5 inattendu : ABC
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte url
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 2 du verrou : URL hors des dépôts épinglés : https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/m/mock-6.9-1.el9.noarch.rpm
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte nom
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 2 du verrou : URL refusée (caractère ou segment . ou ..) : https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/Packages/x/x;id.rpm
+KO   ligne 2 du verrou : nom de fichier refusé : x;id.rpm
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte remontee
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 2 du verrou : URL refusée (caractère ou segment . ou ..) : https://dl.rockylinux.org/vault/rocky/9.7/BaseOS/x86_64/os/../../../../../pub/epel/x.rpm
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte doublon
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   ligne 2 du verrou : nom de fichier en double : bash-5.1.8-9.el9.x86_64.rpm
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas hôte vide
+OK   version du verrou : 1.1.0
+OK   pull_digest du verrou : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+OK   bootstrap_image du verrou : sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+KO   aucun paquet dans le verrou
+KO   verrou refusé (motifs ci-dessus)
+code 1
+== cas pod nominal
+paquets du verrou : 2
+téléchargement : 2 fichiers en 0 s
+rpm -K : rc 0, 2 OK sur 2
+OK   nom, version, release, arch et sigmd5 des 2 rpm égaux au verrou
+createrepo_c --compatibility : rc 0 en 0 s
+repomd.xml : sha256 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064
+skopeo copy --preserve-digests : rc 0 en 0 s
+OK   manifeste copié : sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+code 0
+URL avec « + » encodé (1 attendue) : 1
+appel de skopeo : copy --preserve-digests docker://sc-stockage.poc.test:5000/amont/rockylinux/rockylinux@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f dir:<essai>/w/voie2/depot/sc-stockage.poc.test@sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+== cas pod 404
+paquets du verrou : 2
+KO   HTTP 404 : https://dl.rockylinux.org/vault/rocky/9.7/AppStream/x86_64/os/Packages/l/libstdc++-11.5.0-5.el9_5.x86_64.rpm
+code 1
+== cas pod compte
+paquets du verrou : 2
+KO   1 fichiers téléchargés pour 2 paquets
+code 1
+== cas pod signature
+paquets du verrou : 2
+téléchargement : 2 fichiers en 0 s
+rpm -K : rc 1, 1 OK sur 2
+<essai>/w/voie2/depot/bash-5.1.8-9.el9.x86_64.rpm: digests SIGNATURES NOT OK
+KO   signatures des rpm
+code 1
+== cas pod entete
+paquets du verrou : 2
+téléchargement : 2 fichiers en 0 s
+rpm -K : rc 0, 2 OK sur 2
+KO   en-tête de bash-5.1.8-9.el9.x86_64.rpm différent du verrou
+code 1
+== cas pod createrepo
+paquets du verrou : 2
+téléchargement : 2 fichiers en 0 s
+rpm -K : rc 0, 2 OK sur 2
+OK   nom, version, release, arch et sigmd5 des 2 rpm égaux au verrou
+createrepo_c --compatibility : rc 1 en 0 s
+faux createrepo_c : échec d essai
+KO   createrepo_c
+code 1
+== cas pod manifeste
+paquets du verrou : 2
+téléchargement : 2 fichiers en 0 s
+rpm -K : rc 0, 2 OK sur 2
+OK   nom, version, release, arch et sigmd5 des 2 rpm égaux au verrou
+createrepo_c --compatibility : rc 0 en 0 s
+repomd.xml : sha256 92b1fc7b34b24722c692f6abacf2a0dfc7b7f1bda4ac31f36351f324e30c5064
+skopeo copy --preserve-digests : rc 0 en 0 s
+KO   manifeste copié sha256:ac948da2e7a22124eccd4494e6d57616ae3e84ab3f0d54cf2ef4f7aa034f2ddc, attendu sha256:0222f15bd6fba528a6360994b74a2f700c8698012c85a79c5210945b68d27a5f
+code 1
