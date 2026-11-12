@@ -42,8 +42,25 @@
 #       I3  installation depuis le cache (rien de plus à télécharger) ; avertissements et erreurs d'apt
 #       I4  versions installées égales aux épinglées ; paquets nouveaux (nom et version) ; nombre de paquets avant et après ;
 #           services actifs avant et après ; mmdebstrap --version, sbuild --version, newuidmap et newgidmap ; cache vidé
+#   trousseau  ACCORD NOMMÉ DU PROPRIÉTAIRE (ajoutée le 12/11/2026, préparée à partir de 10:08:24 UTC (date -u au début de la préparation), après « Oui, prépare-les »). VM
+#           seule, sans sudo, rien d'installé ; seule écriture, un dossier temporaire supprimé à la fin.
+#       K1  les fichiers du trousseau debian-archive-keyring (.gpg nommé par apt dans Signed-By, .pgp lu par l'étape sqv) : type,
+#           cible, taille, sha256 ; dpkg -V debian-archive-keyring (aucune ligne : fichiers conformes au paquet)
+#       K2  sqv -n 3 avec le .gpg sur l'InRelease : code et signataires, comparés à ceux de S1
+#   chroot  ACCORD NOMMÉ DU PROPRIÉTAIRE. Décision 2 du 12/11/2026 (voie A) : chroot reconstruit dans sc-replay depuis
+#           l'instantané, lien ouvert, avec les options du chroot de la plateforme (builder/construire-builder.yaml, fonction mm :
+#           --mode=root, variante buildd, SOURCE_DATE_EPOCH de s4a.sh, crochets hostname, resolv.conf et sources.list). Écarts
+#           voulus : source http de l'instantané au lieu du miroir file:// (ni crochet file-mirror-automount ni rmdir de son point
+#           de montage) ; signed-by explicite sur le trousseau .gpg de la VM ; un crochet qui ne fait que lire le cache d'apt
+#           (comme s2.sh). sudo dans la VM ; écritures sous /home/replay/s6b seulement (chemins littéraux dans les rm).
+#       C1  sha256 de chaque .deb du cache, au moment des crochets, présent dans builder/paquets.txt
+#       C2  taille et sha256 du chroot comparés à ceux de la plateforme (s4a-pipeline.log : 451786240 octets, aec1c7a9…)
+#       C3  paquets installés dans le chroot (var/lib/dpkg/status de l'archive) : nom et version présents dans builder/paquets.txt
+#       C4  témoin négatif : mmdebstrap, variante essential, avec signed-by sur un trousseau qui ne porte pas les clés de trixie
+#           (clés retirées du paquet, sinon un fichier vide) : doit échouer, sur la signature
 #
-# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4|sqv|installer   (journal : resultats/s6b-<étape>.log)
+# Usage (racine du dépôt) : mise exec -- poc/bricks/06-deb-sbuild/s6b.sh releve|v4|sqv|installer|trousseau|chroot
+#   (journal : resultats/s6b-<étape>.log)
 set -euo pipefail
 export LC_ALL=C
 h06=$(cd "$(dirname "$0")" && pwd)
@@ -61,6 +78,9 @@ INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z           
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675       # s1-prealables.log : signataires vérifiés
 CLES="B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4"  # s1.sh
 PACKAGES_XZ=7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498     # s1-prealables.log : Packages.xz contrôlé par InRelease
+SDE=1789199741                                                                  # s4a.sh : Date de l'InRelease
+CHROOT_SHA=aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086      # s4a-pipeline.log : chroot de 749d746c
+CHROOT_TAILLE=451786240
 EPINGLES="mmdebstrap=1.5.7-1+deb13u1 sbuild=0.89.3+deb13u4 libsbuild-perl=0.89.3+deb13u4 uidmap=1:4.17.4-2"   # V3 du relevé
 VM_IP=192.168.162.14                                                            # sc-replay (replay.sh de la 10)
 SSH_DIR=$HOME/.cache/supply-chain-poc/10/ssh
@@ -311,7 +331,108 @@ echo "cache vidé : $(ls /var/cache/apt/archives/*.deb 2>/dev/null | wc -l) .deb
 EOS
 }
 
-case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1) ;; *) echo "usage : $0 releve|v4|sqv|installer" >&2; exit 2 ;; esac
+etape_trousseau() {
+  echo "## K1 et K2 : trousseau Debian de sc-replay (sans sudo, rien d'installé)"
+  sur bash -s "$INSTANTANE" "$INRELEASE" "${CLES// /,}" <<'EOS'
+set -euo pipefail
+export LC_ALL=C
+d=$(mktemp -d); trap 'rm -rf -- "$d"' EXIT
+ko=0
+echo "## K1 : fichiers"
+echo "paquet : $(dpkg-query -W -f='${db:Status-Abbrev}${Version}' debian-archive-keyring)"
+dpkg -L debian-archive-keyring | grep '^/usr/share/keyrings/' | sed 's/^/  /'
+for f in /usr/share/keyrings/debian-archive-keyring.gpg /usr/share/keyrings/debian-archive-keyring.pgp; do
+  if [ -e "$f" ]; then
+    echo "$f : $(stat -c '%F, %s octets' "$f") ; cible $(readlink -f "$f") ; sha256 $(sha256sum < "$f" | cut -c1-64)"
+  else
+    echo "$f : absent"
+  fi
+done
+v=$(dpkg -V debian-archive-keyring 2>&1 || true)
+[ -z "$v" ] && echo "OK   dpkg -V debian-archive-keyring : aucune ligne" || { echo "KO   dpkg -V : $v"; ko=1; }
+echo "## K2 : sqv avec le .gpg"
+k=/usr/share/keyrings/debian-archive-keyring.gpg
+curl -fsSL --proto-redir =http,https --max-redirs 5 --max-time 60 -o "$d/InRelease" "$1/dists/trixie/InRelease" < /dev/null
+[ "$(sha256sum < "$d/InRelease" | cut -c1-64)" = "$2" ] && echo "OK   InRelease : sha256 de S1" || { echo "KO   InRelease : sha256 différent"; ko=1; }
+r=0; sqv --keyring "$k" --cleartext -n 3 --output "$d/message" "$d/InRelease" > "$d/sortie" 2>&1 < /dev/null || r=$?
+echo "sqv -n 3 (.gpg) : code $r ; sortie :"; sed 's/^/  /' "$d/sortie"
+e=$(tr ',' '\n' <<< "$3" | sort | paste -sd' '); g=$(grep -E '^[0-9A-F]{40}$' "$d/sortie" | sort | paste -sd' ' || true)
+[ $r = 0 ] && [ "$g" = "$e" ] && echo "OK   .gpg : les trois signataires de S1" || { echo "KO   .gpg : code $r, signataires ${g:-aucun} (attendus : $e)"; ko=1; }
+[ $ko = 0 ] && echo "bilan : tout OK" || { echo "bilan : au moins un KO"; exit 1; }
+EOS
+}
+
+etape_chroot() {
+  local shas nv
+  shas=$(awk '{print $4}' "$h06/builder/paquets.txt" | paste -sd,)
+  nv=$(awk '{print $1 "=" $2}' "$h06/builder/paquets.txt" | paste -sd,)
+  echo "## C0 à C4 : chroot par mmdebstrap dans sc-replay, depuis l'instantané (sudo, lien ouvert)"
+  echo "builder/paquets.txt : $(wc -l < "$h06/builder/paquets.txt") paquets ; chroot de la plateforme : $CHROOT_TAILLE octets, sha256 $CHROOT_SHA"
+  sur sudo bash -s "$INSTANTANE" "$SDE" "$CHROOT_SHA" "$CHROOT_TAILLE" "$shas" "$nv" <<'EOS'
+set -euo pipefail
+export LC_ALL=C
+ko=0
+D=/home/replay/s6b; k=/usr/share/keyrings/debian-archive-keyring.gpg
+# chemins littéraux dans les rm : jamais une variable
+trap 'rm -rf -- /home/replay/s6b/tmp /home/replay/s6b/temoin.tar; chown -R replay:replay /home/replay/s6b' EXIT
+mkdir -p /home/replay/s6b/tmp
+rm -f -- /home/replay/s6b/trixie-amd64.tar /home/replay/s6b/mm-chroot.log /home/replay/s6b/mm-temoin.log
+src="deb [check-valid-until=no signed-by=$k] $1 trixie main"
+finale="deb [check-valid-until=no] $1 trixie main"
+echo "## C0 : mmdebstrap"
+echo "$(mmdebstrap --version) ; SOURCE_DATE_EPOCH=$2 ; disque libre : $(df -BM --output=avail "$D" | tail -1)"
+echo "source : $src"
+t=$(date +%s); r=0
+SOURCE_DATE_EPOCH=$2 TMPDIR=$D/tmp mmdebstrap --mode=root --variant=buildd --format=tar \
+  --customize-hook='for f in "$1"/var/cache/apt/archives/*.deb; do echo "deb-cache ${f##*/} $(sha256sum < "$f" | cut -c1-64)"; done' \
+  --customize-hook='echo sbuild > "$1/etc/hostname"' \
+  --customize-hook=': > "$1/etc/resolv.conf"' \
+  --customize-hook="echo '$finale' > \"\$1/etc/apt/sources.list\"" \
+  trixie "$D/trixie-amd64.tar" "$src" > "$D/mm-chroot.log" 2>&1 < /dev/null || r=$?
+echo "mmdebstrap : code $r en $(($(date +%s) - t)) s ; journal de mmdebstrap ($(wc -l < "$D/mm-chroot.log") lignes) :"
+sed 's/^/  /' "$D/mm-chroot.log"
+[ $r = 0 ] || { echo "KO   mmdebstrap : code $r"; exit 1; }
+echo "## C1 : .deb du cache, comparés à builder/paquets.txt"
+declare -A connu; IFS=, read -ra l <<< "$5"; for h in "${l[@]}"; do connu[$h]=1; done
+n=0; hors=0
+while read -r _ f h; do
+  n=$((n + 1)); [ -n "${connu[$h]:-}" ] || { echo "KO   hors de la liste : $f $h"; hors=$((hors + 1)); }
+done < <(grep '^deb-cache ' "$D/mm-chroot.log" | grep -v '\*\.deb ' || true)
+[ $n -gt 0 ] && [ $hors = 0 ] && echo "OK   $n .deb, tous dans builder/paquets.txt" || { echo "KO   $n .deb, $hors hors de la liste"; ko=1; }
+echo "## C2 : archive comparée au chroot de la plateforme"
+z=$(stat -c %s "$D/trixie-amd64.tar"); c=$(sha256sum < "$D/trixie-amd64.tar" | cut -c1-64)
+echo "chroot : $z octets, sha256 $c"
+[ "$c" = "$3" ] && echo "OK   identique au chroot de la plateforme" || { echo "DIFFÉRENT du chroot de la plateforme ($4 octets, $3)"; ko=1; }
+echo "## C3 : paquets installés dans le chroot, comparés à builder/paquets.txt"
+declare -A nv; IFS=, read -ra l <<< "$6"; for x in "${l[@]}"; do nv[$x]=1; done
+tar -xOf "$D/trixie-amd64.tar" ./var/lib/dpkg/status > "$D/tmp/status"
+awk '/^Package: / {p = $2} /^Status: / {s = $0} /^Version: / {v = $2} /^$/ {if (s == "Status: install ok installed") print p "=" v; p = v = s = ""}
+     END {if (s == "Status: install ok installed") print p "=" v}' "$D/tmp/status" | sort > "$D/tmp/installes"
+n=0; hors=0
+while read -r x; do n=$((n + 1)); [ -n "${nv[$x]:-}" ] || { echo "KO   hors de la liste : $x"; hors=$((hors + 1)); }; done < "$D/tmp/installes"
+[ $n -gt 0 ] && [ $hors = 0 ] && echo "OK   $n paquets installés, tous dans builder/paquets.txt (nom et version)" || { echo "KO   $n paquets, $hors hors de la liste"; ko=1; }
+echo "## C4 : témoin négatif (trousseau sans les clés de trixie)"
+m=""; for f in /usr/share/keyrings/debian-archive-removed-keys.gpg /usr/share/keyrings/debian-archive-removed-keys.pgp; do [ -s "$f" ] && { m=$f; break; }; done
+[ -n "$m" ] || { m=$D/tmp/vide.gpg; : > "$m"; }
+echo "trousseau du témoin : $m"
+r=0; SOURCE_DATE_EPOCH=$2 TMPDIR=$D/tmp mmdebstrap --mode=root --variant=essential --format=tar \
+  trixie "$D/temoin.tar" "deb [check-valid-until=no signed-by=$m] $1 trixie main" > "$D/mm-temoin.log" 2>&1 < /dev/null || r=$?
+echo "mmdebstrap du témoin : code $r ; lignes d'erreur :"
+grep -iE '^(E:|W:)|NO_PUBKEY|not signed|signature|keyring|openpgp' "$D/mm-temoin.log" | head -20 | sed 's/^/  /' || true
+if [ $r != 0 ] && grep -qiE 'NO_PUBKEY|not signed|signature|keyring|openpgp' "$D/mm-temoin.log"; then
+  echo "OK   témoin refusé, sur la signature"
+elif [ $r != 0 ]; then
+  echo "NON CONCLUANT : refus sans message de signature"; ko=1
+else
+  echo "KO   témoin ACCEPTÉ"; ko=1
+fi
+chmod 0644 "$D/trixie-amd64.tar"
+echo "gardés dans la VM : $(ls "$D" | paste -sd' ') ; disque libre : $(df -BM --output=avail "$D" | tail -1)"
+[ $ko = 0 ] && echo "bilan : tout OK" || { echo "bilan : au moins un KO ou un écart"; exit 1; }
+EOS
+}
+
+case "${1:-}:$#" in releve:1|v4:1|sqv:1|installer:1|trousseau:1|chroot:1) ;; *) echo "usage : $0 releve|v4|sqv|installer|trousseau|chroot" >&2; exit 2 ;; esac
 chrono "S6b $1"
 { echo "# ${0##*/} $1, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$1"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/s6b-$1.log"
 chrono "S6b $1 fait"

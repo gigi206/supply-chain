@@ -1818,3 +1818,21 @@ Lancés sur ton accord « Oui, lance les deux » ([résultats](resultats/s6b-ins
 
 **Suite** (à préparer à sec) : le relevé du `.gpg`, puis mmdebstrap depuis l'instantané dans `sc-replay`, avec la comparaison du chroot à `builder/paquets.txt`.
 
+## Additif du 12/11/2026, 10:13 UTC : trousseau et chroot dans `sc-replay`, préparés à sec, rien lancé
+
+Préparés après « Oui, prépare-les » : deux étapes nouvelles de [`s6b.sh`](s6b.sh), avec leurs [prédictions](resultats/s6b-chroot-predictions.md). Chacune attend ton accord nommé.
+
+- **`trousseau`** relève le fichier `.gpg` qu'apt nomme. Elle compare son sha256 à celui du `.pgp` qu'a lu `sqv`, passe `dpkg -V` sur le paquet, puis lance `sqv -n 3` avec le `.gpg`. VM seule, sans sudo.
+- **`chroot`** lance mmdebstrap dans la VM, depuis l'instantané, avec les options du chroot de la plateforme (`--mode=root`, variante `buildd`, même `SOURCE_DATE_EPOCH`, mêmes crochets). `signed-by` est explicite sur le trousseau de la VM. Quatre contrôles suivent :
+  - chaque `.deb` téléchargé dans `builder/paquets.txt`, par son sha256 ;
+  - le chroot comparé à celui de la plateforme (`aec1c7a9…`, 451 786 240 octets) ;
+  - les paquets installés dans `builder/paquets.txt` ;
+  - un témoin négatif avec un trousseau sans les clés de trixie, qui doit échouer.
+
+  L'étape tourne avec sudo et lien ouvert, et n'écrit que sous `/home/replay/s6b`.
+- **Contrôle fait sur l'hôte**, sur la copie du chroot de la plateforme : la comparaison de l'étape y trouve 122 paquets, tous dans `builder/paquets.txt`.
+
+Commandes, dans cet ordre :
+- `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh trousseau`
+- `mise exec -- poc/bricks/06-deb-sbuild/s6b.sh chroot`
+
