@@ -1,0 +1,9 @@
+# s6a.sh essai, 2026-11-12T09:16:09Z
+## correctif, appliqué à une copie
+OK   git apply --check (arbre de travail non modifié)
+scanner.sh de l'arbre : sha256 e744344f68d5a19c65cdc2f511d7e2b4c9d379a4815d8e2e9cd4e3b49441e0f7
+scanner.sh corrigé    : sha256 88e7bfe80df12ae4dae3bdb643e53c510603682a0b5a335f935994771b0c03c6
+## espace scan avant l'essai
+OK   aucun pod actif dans scan
+## pod essai-s6a
+Error from server: error when creating "STDIN": admission webhook "vpol.validate.kyverno.svc-fail-b220f2cf" denied the request: Policy limites-obligatoires failed: durcissement : limites de mémoire et de CPU obligatoires

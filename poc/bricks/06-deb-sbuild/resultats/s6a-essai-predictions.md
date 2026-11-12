@@ -69,3 +69,13 @@ Ce qu'il change :
 - grype et la base dans le pod ; la fusion avec la source. Ils sont mesurés sur l'hôte en P6 et P7, et le job les ferait comme pour l'image.
 - La porte sur le deb (scan `ok` attendu).
 - Le traitement des chemins `..` ou absolus d'un `data.tar` hostile par le `tar` de busybox. Ce n'est pas mesuré : le deb vient de la chaîne, et la porte vérifie sa provenance séparément.
+
+## Note datée du 12/11/2026 (premier passage, 09:16:09 UTC)
+
+Lancé par le propriétaire depuis le terminal. Le passage s'est arrêté à la création du pod : la politique Kyverno `limites-obligatoires` (08c, H5) l'a refusé avec « limites de mémoire et de CPU obligatoires ». Rien n'a donc tourné dans le cluster, aucune prédiction n'est jugée, et le journal est gardé dans `s6a-essai-premier-passage.log`.
+
+- **Mon erreur** : j'ai repris les ressources du conteneur `analyser`, qui n'a pas de limite de CPU. La règle ne lit que les conteneurs principaux, pas ceux d'initialisation, et le pod d'essai n'a qu'un conteneur principal. J'ai aussi écrit plus haut « mêmes restrictions que les pods d'essai de la 07a », alors que ces pods sont antérieurs à H5 : la phrase ne vaut que pour le contexte de sécurité.
+- **Correction** : le conteneur demande 100 m de CPU et 512 Mi de mémoire, avec une limite de 1 CPU et 2 Gi. Le cas D, qui lit toute l'image, peut en être ralenti ; la prédiction de durée E6 garde son délai de 300 s.
+- **ConfigMap `essai-s6a`** : elle a été créée avant le refus. Le `trap` de sortie a dû la supprimer, mais je ne l'ai pas vérifié, puisque je ne lance `kubectl` qu'à travers les scripts. Le passage suivant la supprime d'abord, puis contrôle à la fin que le pod et la ConfigMap sont absents.
+- Le script corrigé demande un nouvel accord.
+

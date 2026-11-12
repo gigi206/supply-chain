@@ -182,7 +182,7 @@ spec:
     image: $OUTILS
     command: [sh, -c, $(python3 -I -c 'import json, sys; print(json.dumps(sys.stdin.read()))' <<<"$SCRIPT_POD")]
     env: [{name: HOME, value: /travail}, {name: TMPDIR, value: /travail}, {name: DEB, value: "$DEB_REF"}, {name: APP, value: "$APP_REF"}]
-    resources: {requests: {memory: 512Mi}, limits: {memory: 2Gi}}
+    resources: {requests: {cpu: 100m, memory: 512Mi}, limits: {cpu: "1", memory: 2Gi}}   # limites-obligatoires (08c, H5)
     securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
     volumeMounts: [{name: travail, mountPath: /travail}, {name: config, mountPath: /etc/scan, readOnly: true}]
   volumes: [{name: travail, emptyDir: {sizeLimit: 1Gi}}, {name: config, configMap: {name: essai-s6a}}]
