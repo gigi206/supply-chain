@@ -446,3 +446,22 @@ change pas), un motif dont le dernier élément contient `*` est gardé si « \0
 gardé ; paragraphe écarté et traduction appliquée ensemble, forme du vrai passage : code 0) ; les quatre autres bancs rejoués, mêmes
 lignes. **À dire au propriétaire** : le prédicat de `lies` porte, sous le purl du paquet entier, une expression filtrée ; rien dans le
 prédicat ne le marque (le journal seul le dit). La question nommée de `lies` citera le SHA final de `paquets.sh`.
+
+## Résultats de `lies` : 12/11/2026, 21:21:38 UTC, fin 21:21:42 UTC (`chrono.tsv`), code 0
+
+Accord : « Oui, lance lies » à « Je lance lies ? », après `vsa` (`3341a7f`). `paquets.sh` à `fa31c7c`, `paquets.py` à `a821111`.
+Journal : [`paquets-lies.log`](paquets-lies.log) ; prédicat : [`paquets-lies.licences.json`](paquets-lies.licences.json).
+
+| # | Résultat | Mesure |
+|---|---|---|
+| L1 | **Tenue** | `écartés : 10 sur 14 paragraphe(s) Files` : 4, 5, 6 (testdata), 7 (`FreeBSD` : `debug/elf : 0, absence probante` et cmd), 10 (`MPEG` : `image/jpeg : 0, absence probante`), 11 (testdata), 12, 13, 14 (cmd), 15 (empaquetage) ; gardés : 2 (joker), 3 (`X11` : 9 motifs de `src/runtime/` sur 76, runtime 1909), 8 et 9 (math 14) |
+| L2 | **Tenue** | `traduction Go -> BSD-3-Clause : appliquée` (`6ce83989…`) ; `traduction X11 -> MIT : appliquée` (`75fce626…`) |
+| L3 | **Tenue** | `pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause` |
+| L4 | **Tenue** | `licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0`, deux composants `ok` ; deb inchangé (`Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)`) ; témoin refusé ; code 0, ligne « fait » |
+| L5 | **Tenue** | `960 paquet(s) dans la source, 789 à absence probante possible` |
+
+**Conséquence** : la bibliothèque standard de go1.24.4 compilée dans `sample-app` est déclarable : `BSD-3-Clause AND MIT`, conforme à la
+politique, sous la règle des paragraphes non liés (lecture du binaire par le projet, pas une règle de Debian). **Restent au propriétaire** :
+le prédicat porte cette expression filtrée sous le purl du paquet entier sans le marquer (seul le journal le dit) ; le paragraphe `X11` est
+gardé par des fichiers de `src/runtime/` d'autres architectures (`memmove_386.s`…), car le lien se décide au paquet, pas au fichier.
+Suite prévue : axes 1 et 2 (Static-Built-Using, notice de Go), après S5b.

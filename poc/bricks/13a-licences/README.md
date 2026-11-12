@@ -123,3 +123,8 @@ chacun de ses motifs est probant contre (empaquetage, cmd, testdata, paquet abse
 lecture du binaire par le projet, pas une règle de Debian. Banc hors réseau : 8 cas, 8 OK ; autres bancs inchangés. Prédictions L1 à L5
 dans [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md) (10 paragraphes écartés sur 14, expression `BSD-3-Clause AND MIT AND
 BSD-3-Clause AND BSD-3-Clause`). Lancement sur accord nommé, après `vsa`.
+
+**Passage de `lies`, le 12/11/2026 de 21:21:38 à 21:21:42 UTC (« Oui, lance lies »)** : code 0, L1 à L5 tenues ([journal](resultats/paquets-lies.log),
+[résultats](resultats/paquets-predictions.md)). 10 paragraphes sur 14 écartés (dont `FreeBSD` et `MPEG`, absence probante de `debug/elf` et `image/jpeg`) ;
+bibliothèque standard déclarée `BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause`, deux composants conformes. Restent au propriétaire : expression
+filtrée sous le purl du paquet entier sans marque dans le prédicat ; `X11` gardé par des fichiers d'autres architectures.

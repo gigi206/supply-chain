@@ -1,0 +1,30 @@
+{
+  "policy": {
+    "version": "2026-10-28",
+    "sha256": "b9f47d89948edb1a1badd0f3d0dd1f64993556165fc0cf7476ce145dd0262592"
+  },
+  "spdxListVersion": "3.27.0",
+  "violations": {
+    "error": 0,
+    "warning": 0
+  },
+  "noassertion": 0,
+  "invalid": 0,
+  "sourceObligations": [],
+  "components": [
+    {
+      "purl": "pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all",
+      "source": "sbom",
+      "reasons": [],
+      "expression": "BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause",
+      "verdict": "ok"
+    },
+    {
+      "purl": "pkg:deb/debian/sample-app@1.0.0-1?arch=amd64",
+      "source": "sbom",
+      "reasons": [],
+      "expression": "Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)",
+      "verdict": "ok"
+    }
+  ]
+}

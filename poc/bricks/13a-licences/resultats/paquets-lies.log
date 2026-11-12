@@ -1,0 +1,110 @@
+# paquets.sh lies, 2026-11-12T21:21:38Z
+paquets.py : 8d4bb025b680a37c435d3fabb739a2171743fd46aec70d736b87a70d92916ba3 ; licences.py : c708a5bce0b67ba04af9bf6f5039718fee7bb1d21a5be71568b359413e26319a ; politique : dc284d6739346df22552b7661531134ab68d01086f7a41d779c109d6ebb3dec2
+OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+OK   sha256 du paquet de Go épinglé : c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1
+OK   même sha256 dans poc/packaging/verrou-deb.txt
+OK   « golang-1.24-src (= 1.24.4-1) » dans s3-build-1.buildinfo
+## témoin : le deb de l application à la place du paquet de Go (refus exigé ; avant l appel principal)
+OK   témoin refusé : REFUS : sample-app n'est pas un paquet golang-X.Y-src
+## deb et paquet de Go
+traductions : 573c545a72517a7a5e70027ee36db44041d35a61a06bad41a6cdd3e362d6045e (traductions-dep5.json)
+sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+sha256 du paquet de la bibliothèque standard : c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1 (21182488 octets)
+binaire ./usr/bin/sample-app : go1.24.4
+paquet de la bibliothèque standard : golang-1.24-src 1.24.4-1 all
+OK   go1.24.4 du binaire = version amont 1.24.4 de golang-1.24-src
+## règle des paragraphes non liés : 960 paquet(s) dans la source, 789 à absence probante possible
+gardé : paragraphe 2 (Go) ; 1 motif(s) qui le gardent sur 1
+  motif : * (indéterminé)
+gardé : paragraphe 3 (X11) ; 9 motif(s) qui le gardent sur 76
+  motif : src/runtime/memclr_arm.s (runtime : 1909)
+  motif : src/runtime/memmove_386.s (runtime : 1909)
+  motif : src/runtime/memmove_amd64.s (runtime : 1909)
+  motif : src/runtime/memmove_arm.s (runtime : 1909)
+  motif : src/runtime/memmove_plan9_386.s (runtime : 1909)
+  motif : src/runtime/memmove_plan9_amd64.s (runtime : 1909)
+  motif : src/runtime/vlop_386.s (runtime : 1909)
+  motif : src/runtime/vlop_arm.s (runtime : 1909)
+  motif : src/runtime/vlrt.go (runtime : 1909)
+écarté : paragraphe 4 (Go) ; 2 motif(s)
+  motif : src/debug/dwarf/testdata/typedef.macho (testdata)
+  motif : src/debug/dwarf/testdata/typedef.elf (testdata)
+écarté : paragraphe 5 (Go) ; 3 motif(s)
+  motif : src/debug/macho/testdata/fat-gcc* (testdata)
+  motif : src/debug/macho/testdata/clang* (testdata)
+  motif : src/debug/macho/testdata/gcc* (testdata)
+écarté : paragraphe 6 (Go) ; 3 motif(s)
+  motif : src/debug/elf/testdata/*-exec (testdata)
+  motif : src/debug/elf/testdata/*.obj (testdata)
+  motif : src/debug/elf/testdata/hello-world-core.gz (testdata)
+écarté : paragraphe 7 (FreeBSD) ; 2 motif(s)
+  motif : src/debug/elf/elf.go (debug/elf : 0, absence probante)
+  motif : src/cmd/link/internal/ld/elf.go (cmd)
+gardé : paragraphe 8 (Go) ; 5 motif(s) qui le gardent sur 12
+  motif : src/math/atan.go (math : 14)
+  motif : src/math/gamma.go (math : 14)
+  motif : src/math/sin.go (math : 14)
+  motif : src/math/tan.go (math : 14)
+  motif : src/math/tanh.go (math : 14)
+gardé : paragraphe 9 (Go) ; 15 motif(s) qui le gardent sur 15
+  motif : src/math/log1p.go (math : 14)
+  motif : src/math/acosh.go (math : 14)
+  motif : src/math/asinh.go (math : 14)
+  motif : src/math/atanh.go (math : 14)
+  motif : src/math/cbrt.go (math : 14)
+  motif : src/math/erf.go (math : 14)
+  motif : src/math/exp.go (math : 14)
+  motif : src/math/expm1.go (math : 14)
+  motif : src/math/j0.go (math : 14)
+  motif : src/math/j1.go (math : 14)
+  motif : src/math/jn.go (math : 14)
+  motif : src/math/lgamma.go (math : 14)
+  motif : src/math/log.go (math : 14)
+  motif : src/math/remainder.go (math : 14)
+  motif : src/math/sqrt.go (math : 14)
+écarté : paragraphe 10 (MPEG) ; 1 motif(s)
+  motif : src/image/jpeg/idct.go (image/jpeg : 0, absence probante)
+écarté : paragraphe 11 (noderivs) ; 1 motif(s)
+  motif : src/image/png/testdata/pngsuite/* (testdata)
+écarté : paragraphe 12 (Apache-2.0) ; 1 motif(s)
+  motif : src/cmd/vendor/github.com/google/pprof/* (cmd)
+écarté : paragraphe 13 (BSD-3-clause-svgpan) ; 1 motif(s)
+  motif : src/cmd/vendor/github.com/google/pprof/third_party/svgpan/svgpan.go (cmd)
+écarté : paragraphe 14 (BSD-3-clause) ; 1 motif(s)
+  motif : src/cmd/trace/static/* (cmd)
+écarté : paragraphe 15 (Go) ; 1 motif(s)
+  motif : debian/* (empaquetage)
+écartés : 10 sur 14 paragraphe(s) Files
+## copyright de sample-app : sha256 20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2 (3333 octets)
+format : DEP-5 1.0 ; paragraphes : 6
+Files * : License « Apache-2.0 » -> Apache-2.0
+Files vendor/github.com/go-chi/chi/v5/* : License « MIT » -> MIT
+Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND BSD-3-Clause
+pkg:deb/debian/sample-app@1.0.0-1?arch=amd64 : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+## copyright de golang-1.24-src : sha256 a739b83e49889464462830f3c992b275f5acba9380d859f64bb75d71b18c1e03 (16932 octets)
+format : DEP-5 1.0 ; paragraphes : 22
+traduction Go -> BSD-3-Clause : appliquée (texte sha256 6ce83989d586587de32b12605b0aef37a03c5c2bebb178edbca97a6235fe519f ; revue : propriétaire, 12/11/2026 (inscrite à 20:12:28 UTC) : « Oui, je valide » à « Tu valides « Go » → BSD-3-Clause, brevets hors de l'expression ? »)
+traduction X11 -> MIT : appliquée (texte sha256 75fce6260547bc65c7e7004f8fc17e3ea80533ecf3051529a7c4d2c9ba34d97a ; revue : propriétaire, 12/11/2026 (inscrite à 20:33:23 UTC) : « Oui, je valide » à « Tu valides « X11 » → MIT pour le copyright de golang-1.24-src ? »)
+Files * : License « Go » -> BSD-3-Clause
+Files  src/cmd/internal/objabi/autotype.go src/cmd/internal/objabi/head.go src/cmd/internal/objabi/reloctype.go src/cmd/intern : License « X11 » -> MIT
+Files src/debug/dwarf/testdata/typedef.macho src/debug/dwarf/testdata/typedef.elf : License « Go » -> BSD-3-Clause ÉCARTÉ (paragraphe 4 non lié)
+Files  src/debug/macho/testdata/fat-gcc* src/debug/macho/testdata/clang* src/debug/macho/testdata/gcc* : License « Go » -> BSD-3-Clause ÉCARTÉ (paragraphe 5 non lié)
+Files  src/debug/elf/testdata/*-exec src/debug/elf/testdata/*.obj src/debug/elf/testdata/hello-world-core.gz : License « Go » -> BSD-3-Clause ÉCARTÉ (paragraphe 6 non lié)
+Files src/debug/elf/elf.go src/cmd/link/internal/ld/elf.go : License « FreeBSD » -> FreeBSD ÉCARTÉ (paragraphe 7 non lié)
+Files src/math/cmplx/asin.go src/math/cmplx/exp.go src/math/cmplx/log.go src/math/cmplx/pow.go src/math/cmplx/sin.go src/math/ : License « Go » -> BSD-3-Clause
+Files src/math/log1p.go src/math/acosh.go src/math/asinh.go src/math/atanh.go src/math/cbrt.go src/math/erf.go src/math/exp.go : License « Go » -> BSD-3-Clause
+Files src/image/jpeg/idct.go : License « MPEG » -> MPEG ÉCARTÉ (paragraphe 10 non lié)
+Files src/image/png/testdata/pngsuite/* : License « noderivs » -> noderivs ÉCARTÉ (paragraphe 11 non lié)
+Files src/cmd/vendor/github.com/google/pprof/* : License « Apache-2.0 » -> Apache-2.0 ÉCARTÉ (paragraphe 12 non lié)
+Files src/cmd/vendor/github.com/google/pprof/third_party/svgpan/svgpan.go : License « BSD-3-clause-svgpan » -> BSD-3-clause-svgpan ÉCARTÉ (paragraphe 13 non lié)
+Files src/cmd/trace/static/* : License « BSD-3-clause » -> BSD-3-clause ÉCARTÉ (paragraphe 14 non lié)
+Files debian/* : License « Go » -> BSD-3-Clause ÉCARTÉ (paragraphe 15 non lié)
+pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause
+nom BSD-3-Clause : SPDX BSD-3-Clause ; politique : allow
+nom MIT : SPDX MIT ; politique : allow
+## verdict (licences.py, deux composants)
+licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     ok       pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all : BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause
+     ok       pkg:deb/debian/sample-app@1.0.0-1?arch=amd64 : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-lies.licences.json)
+bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
