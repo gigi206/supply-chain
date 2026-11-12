@@ -1,0 +1,36 @@
+# s6a.sh essai, 2026-11-12T09:19:10Z
+## correctif, appliqué à une copie
+OK   git apply --check (arbre de travail non modifié)
+scanner.sh de l'arbre : sha256 e744344f68d5a19c65cdc2f511d7e2b4c9d379a4815d8e2e9cd4e3b49441e0f7
+scanner.sh corrigé    : sha256 88e7bfe80df12ae4dae3bdb643e53c510603682a0b5a335f935994771b0c03c6
+## espace scan avant l'essai
+OK   aucun pod actif dans scan
+## pod essai-s6a
+phase Succeeded après 96 s
+0 ligne(s) filtrée(s) (jeton|token)
+busybox : BusyBox v1.37.0 (2024-09-26 21:31:42 UTC) multi-call binary.
+ar : /busybox/ar
+tar : /busybox/tar
+unxz : /busybox/unxz
+gunzip : /busybox/gunzip
+sha256sum : /busybox/sha256sum
+A|DEB|sample-app_1.0.0-1_amd64.deb, sha256 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5, 1952080 octets
+A|EXTRAIT|3 fichiers dans data.tar
+A|ARTEFACT|deb, 2 PURL versionnées dans l'artefact seul
+CAS|A|NATURE=deb|code 0
+B|deb : une couche attendue dans le manifeste
+CAS|B|NATURE=deb|code 1
+C|aucune PURL versionnée dans le SBOM de l'artefact seul (image) : extraction vide ou ratée
+CAS|C|NATURE=image|code 1
+D|ARTEFACT|image, 2 PURL versionnées dans l'artefact seul
+CAS|D|NATURE=image|code 0
+E|nature inconnue : autre
+CAS|E|NATURE=autre|code 2
+FIN
+OK   pod et ConfigMap essai-s6a supprimés
+## bilan
+CAS|A|NATURE=deb|code 0
+CAS|B|NATURE=deb|code 1
+CAS|C|NATURE=image|code 1
+CAS|D|NATURE=image|code 0
+CAS|E|NATURE=autre|code 2

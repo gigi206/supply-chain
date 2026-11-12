@@ -1698,3 +1698,14 @@ Les deux étapes ont été lancées par toi depuis le terminal, à 09:16 UTC.
   - Les entrées à transporter font 227 Mo.
   - La partie dans la VM n'a pas tourné : SSH a été coupé avant l'authentification. `IdentitiesOnly=yes` est ajouté, et la partie n'est pas rejouée.
 
+## Additif du 12/11/2026, 09:21 UTC : essai du mode deb tenu
+
+Le second passage, lancé à 09:19:10 UTC sur ton accord « Oui, relance-le », finit en code 0 après 96 s ([résultats](resultats/s6a-essai-predictions.md)). E0 à E6 sont tenues.
+
+- **Le mode deb fonctionne avec le busybox d'`outils-scan`** (1.37.0). Il retrouve le deb `0b489d43`, en extrait 3 fichiers et trouve 2 PURL versionnées.
+- **Les refus marchent** : deux natures croisées et une nature inconnue sont refusées. Le cas « voie image sur le deb » est arrêté par le plancher : c'est le vide masqué du constat 3 de la carte. La voie image de sample-app passe le plancher.
+- Pod et ConfigMap sont supprimés, et `scanner.sh` de l'arbre n'a pas changé.
+- Le correctif reste non appliqué jusqu'après S5b.
+
+Le relevé 1 de S6b, partie VM, attend toujours ton accord.
+

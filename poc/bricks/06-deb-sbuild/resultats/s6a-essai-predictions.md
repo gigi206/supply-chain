@@ -79,3 +79,28 @@ Lancé par le propriétaire depuis le terminal. Le passage s'est arrêté à la 
 - **ConfigMap `essai-s6a`** : elle a été créée avant le refus. Le `trap` de sortie a dû la supprimer, mais je ne l'ai pas vérifié, puisque je ne lance `kubectl` qu'à travers les scripts. Le passage suivant la supprime d'abord, puis contrôle à la fin que le pod et la ConfigMap sont absents.
 - Le script corrigé demande un nouvel accord.
 
+## Résultats (second passage, 12/11/2026, 09:19:10 UTC, accord « Oui, relance-le »)
+
+Journal : `s6a-essai.log`. Script : version avec la limite de CPU. Code 0 ; pod en `Succeeded` après 96 s.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| E0 | **Tenue** | BusyBox v1.37.0 ; `ar`, `tar`, `unxz`, `gunzip`, `sha256sum` sous `/busybox/` |
+| E1 | **Tenue** | `DEB|sample-app_1.0.0-1_amd64.deb, sha256 0b489d43…, 1952080 octets` ; `EXTRAIT|3 fichiers` ; `ARTEFACT|deb, 2 PURL versionnées` ; code 0. `ar -x`, les en-têtes pax de la couche et `unxz -c` passent avec busybox. |
+| E2 | **Tenue** | « deb : une couche attendue dans le manifeste », code 1 |
+| E3 | **Tenue** | « aucune PURL versionnée dans le SBOM de l'artefact seul (image) », code 1. syft n'a pas échoué avant le plancher. **Le vide masqué du constat 3 de la carte est arrêté par le plancher, sur un vrai artefact.** |
+| E4 | **Tenue** | `ARTEFACT|image, 2 PURL versionnées`, code 0 |
+| E5 | **Tenue** | « nature inconnue : autre », code 2 |
+| E6 | **Tenue** | Pod et ConfigMap absents à la fin, contrôlés. sha256 de `scanner.sh` de l'arbre inchangé (`e744344f…`). Durée : 96 s. Rien n'est écrit dans Zot : le pod n'avait aucun identifiant, mais je n'ai pas fait de relevé côté Zot. |
+
+**ConfigMap du premier passage** : le second passage commence par `nettoyer`, qui supprime une ConfigMap restante sans rien journaliser. Je ne sais donc pas si celle du premier passage était encore là. Elle est absente maintenant.
+
+**Pour la suite de S6a**, après S5b et le relevé du 21/11 (ordre c) :
+- appliquer le correctif à `scanner.sh` ;
+- passer `NATURE` dans `scan-job.yaml` et `rendre_scan` ;
+- créer le CronJob `scan-sample-app-deb` décalé ;
+- étendre le timer de fraîcheur à deux dépôts ;
+- vérifier la porte sur le deb, où un scan `ok` est attendu.
+
+Le plancher change aussi la voie image (écart 2) : E4 montre que sample-app le passe, avec 2 PURL versionnées.
+
