@@ -148,3 +148,27 @@ Relecture du conseiller, sur trois points :
 Dans les quatre cas, le dossier de travail est effacé à la sortie. Cela couvre la reprise de `grafana_lignes` par `eval`, ainsi que la portée de `ko`, `P` et `S8`. Grafana et Loki, eux, n'ont pas été interrogés.
 
 L'étape corrigée demande le même accord nommé, puisqu'elle n'a jamais tourné.
+
+## Note datée du 12/11/2026 (à partir de 13:14:56 UTC, après « continue ») : lecteurs à une seule série reclassés, aucun correctif
+
+Les deux notes précédentes, et mon message au propriétaire après `2c2a8ba`, disaient que les cinq lecteurs prendraient « en silence » la première série. C'est inexact pour trois d'entre eux. Relu dans le code, lecteur par lecteur :
+
+| Lecteur | Avec deux séries | Relancé avec deux séries ? |
+|---|---|---|
+| `g8_metriques` (07a, `plateforme.sh:1607-1612`) | Pas de `result[0]` : toutes les séries sont jointes et comparées à une chaîne exacte de deux entrées. Une troisième série donne un `KO` **bruyant** | Dans le rejeu, mais `sc-stockage` y est recréée sans le fichier complémentaire de S6a : sans `SCANS`, `fraicheur-scan.py` corrigé n'écrit qu'une série |
+| `g8_grafana` (07a, `:1625`) | La ligne à deux dépôts ne suit pas `^scan [0-9]*, base [0-9]*$` : `KO` **bruyant** | Non : hors du rejeu, mesure ponctuelle |
+| `scan-saut-resolution.sh:48` (08c) | `result[0]`, mais comparé ensuite à la date lue dans Zot pour l'image : une série du deb prise à sa place donne un `KO`, sauf dates égales | Non : relevé unique de `PLAN=2026-11-09T09:30:00Z`, et l'outil refuse dès que son journal existe (`resultats/scan-saut-w8_resolution.log` existe) |
+| `preuves.sh:3289` (08, `scan_saut_suspendre`) | `result[0]`, **silencieux**, mais seulement affiché (dates prévues) | Non : a tourné (`resultats/preuves-h5-scan_saut_suspendre.log`), hors du rejeu |
+| `preuves.sh:3321` (08, `scan_saut_reprendre`) | `result[0]`, **silencieux** : il choisit s'il faut juger `ScanEnRetard` | Non : a tourné (`resultats/preuves-h5-scan_saut_reprendre.log`), hors du rejeu |
+
+**Décision : aucun correctif.** Aucun de ces lecteurs ne tournera avec deux séries dans ce qui est prévu. Corriger des scripts qui ont déjà tourné détacherait aussi leurs journaux archivés du code qui les a produits. Si l'un d'eux doit être relancé après S6a, il faudra d'abord sélectionner `{depot="builds/scan/sample-app"}`. C'est le label que pose `serie()` de `fraicheur-scan.py`, et que lisent les tests de `alertes-tests.yml`.
+
+**Lecteurs d'alertes, ajoutés au relevé.** Ceux-là ne lisent pas la série, mais l'état de `ScanEnRetard` ou de `ScanBientotRefuse`, tous dépôts confondus. Avec `s6a-alertes-deb.patch`, un retard du deb seul les rendrait actives :
+- `alertes_scan` (07a, `:1666`, dans `g8_suspendre` et `g8_reprendre`), comparé à exactement `ScanEnRetard=firing`, puis à une chaîne vide : `KO` bruyant ; hors du rejeu ;
+- `ss_alerte` (08, `:3246`), l'état de la règle, et le `activeAt | first` de `preuves.sh:3326`, seulement affiché : les étapes `scan_saut_*`, qui ont déjà tourné ;
+- `regle` de `scan-saut-resolution.sh` : relevé unique, déjà fait ;
+- `etat_alerte` de l'étape `a7` de la 19 (`observabilite.sh:246`), qui exige l'alerte inactive au départ : hors du rejeu (O4 sauté, `rejeu.sh:126`).
+
+Aucun n'est dans le rejeu. Le seul effet sur un rejeu reste celui déjà consigné plus haut : une fois `s6a-alertes-deb.patch` commité, l'étape O3 du rejeu déploie des règles qui attendent la série du deb, et `ScanEnRetard` reste active par `absent()` pour ce dépôt. Cela relève de la décision à prendre sur l'intégration de S6 dans `rejeu.sh`.
+
+Rien n'a été lancé. Aucun fichier n'est modifié, sauf celui-ci.
