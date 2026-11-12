@@ -1878,3 +1878,15 @@ Préparés après « Oui, prépare-les », sur le modèle de R3 et R4 de la briq
 - code 1 sans `PASSED` ;
 - recherche de la version de Go.
 
+## Additif du 12/11/2026, 10:44 UTC : deb reconstruit dans `sc-replay`, identique, en répétition (lien établi)
+
+Lancés sur ton accord « Oui, lance les trois » ([résultats](resultats/s6b-rejeu-predictions.md)) :
+- **`transporter`** (10:42:31 UTC, code 0) : 8 bundles horodatés, 7 entrées et le manifeste de l'image de build, soit 402 Mo.
+- **`verifier`** (10:42:41 UTC, `0 KO`) :
+  - 8 bundles vérifiés sur 8 hors réseau, et la provenance `454728c5` extraite ;
+  - les 8 entrées, le commit, les 15 lignes clés des recettes et Go 1.26.10 conformes ;
+  - **le chroot reconstruit dans la VM, rangé comme dans l'image de build, donne la couche `1029232e…` de `749d746c`**.
+- **`repetition`** (10:42:53 à 10:44:05 UTC, lien établi, non comptée) : **deb `0b489d43…`, manifeste `039949f9…`, égal au sujet de la provenance : `PASSED`**. sbuild a tourné 68 s, sans aucune ligne apt en http(s). Le paquet source est identique à celui de la plateforme. Les compteurs d'émission de la VM n'ont pas bougé pendant la reconstruction.
+
+**Reste pour le contrôle 6** : `rebuild`, lien coupé, à partir du 12/11/2026 à 21:03:37 UTC, sur ton accord. Puis la VSA, signée dans la VM et non poussée avant S5b.
+

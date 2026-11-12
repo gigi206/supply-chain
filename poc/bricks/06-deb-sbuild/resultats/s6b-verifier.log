@@ -1,0 +1,71 @@
+# s6b.sh verifier, 2026-11-12T10:42:41Z
+7498fdaddefe4b210dfcf9040d76087986aa453716048c646b2aa9ac00b2a7a8  verifier_deb.py
+## ancres de confiance (copiées depuis le dépôt)
+  a7ca8ce8d133aa9b459e1c9e433f3e96d6b02e21331e38689dfa173cf5a6b75b  chains.pub
+  e18e1214b84ff6ecfd0be8558f3f70a101815683d9f22ee651a88d5e197c2739  tsa-chaine.pem
+OK   racine de confiance de la TSA construite dans la VM
+OK   digest du sujet transporté : 039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+## bundles horodatés : vérifiés hors réseau (clé de Chains, sujet, jeton de la TSA)
+OK   bundle-10f81cd1fa33cd55 : vérifié ; invocationId 629b6bb1-9a9f-45a6-a3bb-e4e9650f6a65 ; jeton de la TSA : Nov 11 19:56:11 2026 GMT
+OK   bundle-21edfa0ca581bad6 : vérifié ; invocationId 454728c5-59a8-45e1-b972-549d343aadac ; jeton de la TSA : Nov 11 21:04:09 2026 GMT
+OK   bundle-29612bcf84d86900 : vérifié ; invocationId ee1d3cca-91b0-4e52-9f9e-66bde8628360 ; jeton de la TSA : Nov 11 21:04:06 2026 GMT
+OK   bundle-31d2e1652060907f : vérifié ; invocationId 2507cd26-f5b8-487f-bb90-6fa4d5d4d3cf ; jeton de la TSA : Nov 11 19:56:08 2026 GMT
+OK   bundle-35931dd7890c261e : vérifié ; invocationId 9dbf4a16-1b78-4dfb-9533-cfd0e6324ee8 ; jeton de la TSA : Nov 11 20:57:07 2026 GMT
+OK   bundle-70e9dabe611cc28d : vérifié ; invocationId b0e14893-06a2-4ea4-8a1b-0e67e4d30fe6 ; jeton de la TSA : Nov 11 20:57:10 2026 GMT
+OK   bundle-7c72a3dc051f8eae : vérifié ; invocationId d6970f74-15f3-4414-a66b-03a134913601 ; jeton de la TSA : Nov 11 19:49:08 2026 GMT
+OK   bundle-e86a49476ed2a210 : vérifié ; invocationId b9d4881e-af56-4950-ac1a-9e85e774ead8 ; jeton de la TSA : Nov 11 19:49:11 2026 GMT
+bundles vérifiés : 8 sur 8
+OK   provenance 454728c5-59a8-45e1-b972-549d343aadac extraite d'un bundle vérifié
+## politique, section 1 (provenance vérifiée)
+OK   _type https://in-toto.io/Statement/v1
+OK   predicateType https://slsa.dev/provenance/v1
+OK   builder.id https://supply-chain.example/builders/tekton-chains@v1
+OK   buildType https://tekton.dev/chains/v2/slsa-tekton
+OK   sujet = layout du deb rejoué
+OK   entrée construire-deb déclarée : {'sha256': '3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a'}
+OK   entrée preparer-deb déclarée : {'sha256': '588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492'}
+OK   entrée sbuild-debian13 déclarée : {'sha256': '749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590'}
+OK   entrée outils-prefetch déclarée : {'sha256': '68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc'}
+OK   entrée fermeture-deb déclarée : {'sha256': 'bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290'}
+OK   entrée fermeture-sources déclarée : {'sha256': '50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21'}
+OK   entrée packaging déclarée : {'sha256': 'c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51'}
+OK   entrée sample-app.git déclarée : {'sha1': '6391fd437f26696847041be3226bbbf633f55a2f'}
+## digests des entrées transportées, recalculés
+OK   construire-deb : transporté 3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+OK   preparer-deb : transporté 588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+OK   outils-prefetch : transporté 68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   fermeture-deb : transporté bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
+OK   fermeture-sources : transporté 50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
+OK   packaging : transporté c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   sbuild-debian13 : manifeste transporté seul, 749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+## commit
+OK   bundle git cohérent (git bundle verify, dans le dépôt cloné)
+OK   commit déclaré présent dans le bundle : 6391fd437f26696847041be3226bbbf633f55a2f
+main du bundle : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   arbre de travail extrait au commit déclaré, propre
+## recette (bundles preparer-deb et construire-deb vérifiés)
+OK   recette preparer-deb, ligne clé 1 : git -C /tmp/depot archive --format=tar HEAD | tar -xf - -C "$e/src"
+OK   recette preparer-deb, ligne clé 2 : oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/fermeture" "$FERMETURE_DEB"
+OK   recette preparer-deb, ligne clé 3 : oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/sources" "$FERMETURE_SOURCES"
+OK   recette preparer-deb, ligne clé 4 : oras pull --no-tty --ca-file /etc/ca-poc/ca.crt -o "$e/packaging" "$PACKAGING"
+OK   recette preparer-deb, ligne clé 5 : export HOME=/tmp GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOFLAGS=-mod=mod GOMODCACHE=/tmp/gomod GOCACHE=/tmp
+OK   recette preparer-deb, ligne clé 6 : (cd "$e/src" && go mod vendor && go mod verify)
+OK   recette preparer-deb, ligne clé 7 : calc = 'sha512-' + base64.b64encode(hashlib.sha512(open(a, 'rb').read()).digest()).decode()
+OK   recette preparer-deb, ligne clé 8 : t.extractall(dst, members=m, filter='data')
+OK   recette preparer-deb, ligne clé 9 : cp -r "$e/packaging/debian" "$e/debian"
+OK   recette preparer-deb, ligne clé 10 : chmod 0755 "$e/debian/rules"
+OK   recette construire-deb, ligne clé 1 : tar -C /w/src --sort=name --mtime="@$sde" --owner=0 --group=0 --numeric-owner --mode=go-w,a+rX \ --format=gnu 
+OK   recette construire-deb, ligne clé 2 : (cd /w/src && SOURCE_DATE_EPOCH=$sde dpkg-source -q -b "$src-$amont" > /dev/null)
+OK   recette construire-deb, ligne clé 3 : sbuild --chroot-mode=unshare --chroot=/opt/sbuild/trixie-amd64.tar --dist=trixie --arch=amd64 --no-apt-update 
+OK   recette construire-deb, ligne clé 4 : tar --sort=name --format=posix --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime --mtime=@0 
+OK   recette construire-deb, ligne clé 5 : cfg=$(blob '{"architecture":"amd64","os":"linux","rootfs":{"type":"layers","diff_ids":["sha256:'"$l"'"]}}')
+## version de Go de l'image outils-prefetch déclarée (vérifiée)
+  usr/local/go/VERSION : go1.26.10
+OK   go1.26.10 ; toolchain du domaine : go1.26.10
+## chroot du domaine, rangé comme dans l'image de build déclarée (commande tar de construire-builder)
+image de build : 2 couches ; couche du chroot (2e) sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064 (451788800 octets)
+chroot du domaine : /home/replay/s6b/trixie-amd64.tar, sha256 aec1c7a98b80772e032da0d54a622f6b42728069bf4cc36292c346a1e078d086
+OK   couche du chroot du domaine : sha256:1029232ead0c2c3d09d3c3fa7caab99ac7907857a88dc73f78ed6ae385a9d064, égale à celle de l'image de build déclarée
+## heures du build
+finishedOn signé : 2026-11-11T21:03:37Z ; jeton de la TSA : Nov 11 21:04:09 2026 GMT
+## bilan : 0 KO

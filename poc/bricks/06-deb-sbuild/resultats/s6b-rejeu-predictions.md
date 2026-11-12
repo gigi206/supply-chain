@@ -110,3 +110,51 @@ Les prédictions ci-dessus ont été commitées dans `b50b6ad`, à 10:35:18 UTC.
 - **P5.** Le second passage, `rebuild` après `repetition`, ne bute pas sur le nettoyage. Le `sudo rm` de `transporter_r4` rend 0.
 - **V6 révisée.** Un fichier `VERSION` à `go1.26.10` dans `outils-prefetch` ; je ne prédis pas son chemin.
 
+## Résultats (12/11/2026, accord « Oui, lance les trois »)
+
+### `transporter` : 10:42:31 à 10:42:35 UTC, code 0
+
+Journal : `s6b-transporter.log`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| T1 | **Tenue** | 8 bundles horodatés pour `039949f9` |
+| T2 | **Tenue** | 7 entrées copiées (`preparer-deb`, `outils-prefetch`, `construire-deb`, deux fermetures, packaging), plus le manifeste seul de `749d746c` |
+| T3 | **Tenue** | Archive de 402 Mo, 402 Mo dans la VM. Le bundle git fait 8,0 Kio. |
+
+Le transport a pris 4 s : Zot est sur le réseau local.
+
+### `verifier` : 10:42:41 à 10:42:47 UTC, code 0, `bilan : 0 KO`
+
+Journal : `s6b-verifier.log`. sha256 de `verifier_deb.py` : `7498fdad…`.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| V1 | **Tenue** | Racine de la TSA construite ; sujet `039949f9` |
+| V2 | **Tenue** | **8 bundles vérifiés sur 8**, hors réseau, avec la clé de Chains de la 08 (`a7ca8ce8…`) et le jeton de la TSA. Les huit `invocationId` sont les quatre PipelineRuns et quatre TaskRuns `publier-image`. Provenance `454728c5` extraite ; son jeton de la TSA est du 11/11, 21:04:09 GMT. |
+| V3 | **Tenue** | Section 1 tenue ; 8 entrées déclarées, une fois chacune ; les 6 digests transportés et celui du manifeste de `749d746c` sont égaux à la provenance |
+| V4 | **Tenue** | Commit `6391fd43…` présent, et `main` le désigne ; arbre extrait, propre |
+| V5 | **Tenue** | Les 15 lignes clés sont trouvées dans les bundles vérifiés |
+| V6 | **Tenue** | `usr/local/go/VERSION` : `go1.26.10`, égal à la toolchain du domaine |
+| V7 | **Tenue** | **La couche du chroot du domaine est `1029232e…`, celle de l'image de build déclarée** (2 couches, 451 788 800 octets). Le chroot de la VM a le sha256 `aec1c7a9…`. |
+| V8 | **Tenue** | `finishedOn` `2026-11-11T21:03:37Z` |
+
+**Le chroot reconstruit dans le domaine est donc rattaché, par la provenance vérifiée, à l'image de build qui a construit le deb.**
+
+### `repetition` : 10:42:53 à 10:44:05 UTC, lien établi, non comptée ; code 0, `bilan : PASSED`
+
+Journal : `s6b-repetition.log`. Deux lignes retirées de la copie, comme prévu. sha256 de la copie transportée : `1422b13d…`, identique côté hôte et côté VM. L'unité systemd a tourné 1 min 11 s, pour 1 min 31 s de CPU.
+
+| # | Résultat | Mesure |
+|---|---|---|
+| P0 | **Tenue** | `arbre=/var/tmp 1777 root;/var/tmp/s6b-r4 755 replay;/var/tmp/s6b-r4/e 755 replay` ; aucun refus d'accès. Le compte est `replay`, **UID 1000, comme le compte constructeur du pod**. |
+| P1 | **Tenue** | 5 entrées et chroot `OK` ; commit `6391fd43` ; verrou : 162 paquets identiques, aucun autre fichier ; `vendor/` reconstitué par go1.26.10 (17 fichiers) ; marked 16.4.1, integrity conforme (12 membres) ; `src` 41 fichiers, `debian` 5 fichiers |
+| P2 | **Tenue** | sbuild : code 0 en **68 s**, **aucune ligne apt en http(s)** |
+| P3 | **Tenue** | **Deb `0b489d43…` (1 952 080 octets), couche `12dd5c42…` (1 955 840 octets), manifeste `039949f9…`, égal au sujet de la provenance : `verdict=PASSED`** |
+| P4 | Non prédite | Paquet source **identique à celui de la plateforme** : `.orig.tar.gz` `07521c1e…`, `.dsc` `7f9cf5d3…`, `.debian.tar.xz` `f0e5cfc8…`. Ce sont les mêmes valeurs que dans les journaux des PipelineRuns de S4d et de S3. |
+| P5 | **Tenue** | Le premier nettoyage en root de `transporter_r4` est passé. Le second passage le rejouera, à `rebuild`. |
+
+**Fait mesuré au passage** : bien que le lien soit établi, les compteurs d'émission de l'invité sont identiques au début et à la fin (`tx_packets=42054`, `tx_bytes=4482824`). **La VM n'a rien émis pendant la reconstruction.** Ce n'est pas une preuve hors ligne, puisque le lien était là : c'est le rôle de `rebuild`.
+
+**Conséquence** : la reconstruction indépendante du deb tient. Il reste `rebuild`, lien coupé, possible à partir du 12/11/2026 à 21:03:37 UTC, pour que le contrôle 6 soit valable hors ligne et que `vsa.py` accepte le délai.
+
