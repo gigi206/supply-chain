@@ -148,3 +148,13 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - P2 et P3 sont tenues : clés de Rocky et d'EPEL conformes aux empreintes publiées, cinq repomd de Rocky signés, vault 9.7 inchangé depuis le 05/11, EPEL sans repomd signé.
 - P4 est tenue pour les quatre épinglages, mais fausse sur un détail : le primary d'EPEL est en xz, pas en zstd.
 - Cluster et Zot non touchés.
+
+**Additif du 12/11/2026, à partir de 14:26:16 UTC : sortie réseau des pods rpm retenue et son intégration préparée à sec (« Oui, prépare-la »), NON APPLIQUÉE.**
+- **Choix** : DNS, adresses publiques en 443 et Zot ([`politiques/prefetch-rpm-sortie.yaml`](politiques/prefetch-rpm-sortie.yaml)).
+- **Correctif** : [`s1-sortie-rpm.patch`](s1-sortie-rpm.patch), sur `sortie-builds.sh` et `builds-sans-internet.yaml` de la 08c.
+  - Il ajoute `prefetch-rpm` au `NotIn` de `builds-sans-internet`, un invariant, et les étapes `rpm_sec`, `rpm_appliquer`, `rpm_temoins` et `rpm_retirer`.
+  - Il intègre la sortie rpm à l'étape `rejeu`, donc au rejeu de zéro.
+  - Il adapte la contre-épreuve de `deb_sec`.
+- **Vérifié à sec** : `bash -n`, shellcheck sans avertissement, `git apply --check`.
+- **Prédictions** R1 à R6 : [`resultats/s1-sortie-predictions.md`](resultats/s1-sortie-predictions.md).
+- **Calendrier** : appliqué après S5b, qui rejoue ces fichiers, et chaque étape sur accord nommé.
