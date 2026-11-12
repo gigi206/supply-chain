@@ -113,3 +113,6 @@ leurs textes aux textes SPDX candidats ; aucun verdict. Banc hors réseau tenu (
 `FreeBSD`, `MPEG`, `noderivs` et `BSD-3-clause-svgpan` ne portent sur aucun code lié ; **`X11` si** : son paragraphe couvre aussi des fichiers de `src/runtime/`
 (N5 non tenue), et son texte est, en mots normalisés, celui de `MIT` (0,979), pas celui de `X11` de SPDX (0,837). Décisions possibles : traduction revue
 `X11` -> `MIT`, règle qui écarte les paragraphes non liés.
+
+**Traduction `X11` -> `MIT` préparée, NON APPLIQUÉE** (« Oui, prépare-les ») : seconde entrée de [`traductions-dep5.json`](traductions-dep5.json), liée au texte
+(`75fce626…`), en attente de revue. La règle qui écarterait les paragraphes non liés n'est pas préparée ce soir.

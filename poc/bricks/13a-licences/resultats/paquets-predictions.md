@@ -379,3 +379,16 @@ politique), pas celui de `X11` de SPDX. Deux décisions mèneraient à une expre
 *Note datée du 12/11/2026, écrite à 20:23:33 UTC* : les résultats de `stdlib` (premier passage et relance) disent « `X11` (fichiers de
 `src/cmd/internal/objabi/`) ». C'était la partie visible d'une liste coupée à 120 caractères au journal : le paragraphe `X11` couvre
 aussi des fichiers de `src/runtime/` (voir ci-dessus). Les textes commités ne sont pas réécrits.
+
+## Traduction du nom DEP-5 « X11 » (préparée à sec le 12/11/2026, « Oui, prépare-les », écrit à 20:32:00 UTC), NON APPLIQUÉE
+
+Entrée ajoutée à [`traductions-dep5.json`](../traductions-dep5.json) : `X11` -> `MIT`, `revue: null`, preuve `75fce626…` (paragraphe
+`License: X11` autonome, 17 lignes, forme de `texte_licence()` ; même empreinte que dans [`paquets-noms.log`](paquets-noms.log)). Même règle
+que pour `Go` : appliquée seulement si paquet, version et texte concordent et si l'entrée est revue ; `paquets.py` ne change pas.
+Lu : modèle SPDX de `MIT` (liste 3.27.0), titre en `beginOptional` ; l'étude `noms` donne, en mots normalisés, un seul écart avec `MIT`
+(titre et ligne de copyright), et 0,837 avec `X11` de SPDX (clause du X Consortium absente). La revue du propriétaire décidera ; aucun
+relecteur n'est écrit avant.
+
+**Règle qui écarterait les paragraphes non liés : non préparée ce soir** (temps). Elle devra dire ce qu'est « lié » (au paquet, pas au
+fichier : limite mesurée par `noms`), ce qu'on fait d'un motif « indéterminé », et garder la trace des paragraphes écartés ; à préparer
+après `vsa`, avec ses prédictions et son banc.
