@@ -1641,3 +1641,13 @@ Rédigée sur « continue » (cadre : préparer sans rien lancer), après relect
 
    **Ma recommandation** : la reconstruction dans le domaine, seule à garder la même indépendance que le replay de la voie image.
 4. **Accord pour le relevé 1 de S6a**, sur l'hôte : hors réseau, lecture du deb local, écriture seulement sous `~/.cache/supply-chain-poc/06/s6a` et dans `resultats/`. Rien dans le cluster ni dans Zot.
+
+## Additif du 12/11/2026, 08:56 UTC : décisions sur S6
+
+**Décision du propriétaire** (12/11/2026, 08:50:32 UTC) : « 1 ok / 2 ok / 3 ok / 4 ok ». Les recommandations sont toutes retenues :
+- l'ordre (c) ;
+- le mode deb du scanner pour le contrôle 7 ;
+- le chroot reconstruit dans `sc-replay` pour le contrôle 6 ;
+- le relevé 1 de S6a sur l'hôte, hors réseau.
+
+Ce n'est pas un accord pour l'installation dans `sc-replay`, ni pour une écriture dans le cluster ou dans Zot : chacune aura son accord nommé. [Prédictions du relevé 1](resultats/s6a-predictions.md), commitées avant toute mesure.
