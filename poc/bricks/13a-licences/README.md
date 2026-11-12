@@ -83,3 +83,9 @@ Prédictions M1 à M7 : [`resultats/paquets-predictions.md`](resultats/paquets-p
 **Passage de `modules`, le 12/11/2026 de 19:53:09 à 19:53:11 UTC (« Oui, lance modules »)** : code 0, M1 à M7 tenues ([journal](resultats/paquets-modules.log),
 [résultats](resultats/paquets-predictions.md)). Binaire compilé avec go1.24.4 ; seule dépendance, `chi` v5.2.3, couverte par son paragraphe MIT ;
 témoin refusé. Écart ouvert, à décider : la bibliothèque standard de Go est compilée sans être déclarée dans le paquet (`Built-Using` absent).
+
+**Étape `stdlib` ajoutée à sec, NON LANCÉE** (décision « Axe 3, puis 1+2 ») : la bibliothèque standard de Go devient un second composant du
+prédicat de licences, avec la licence que Debian déclare pour `golang-1.24-src` 1.24.4-1 (paquet de la fermeture de S3 de la 06, sha256 épinglé,
+recoupé avec le verrou et le buildinfo) ; le deb n'est pas modifié. Banc hors réseau tenu ([journal](resultats/paquets-stdlib-essai-local.log)).
+Prédictions S1 à S6 : [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Axes 1 et 2 (`Static-Built-Using`, notice de Go
+dans le paquet) : une seule révision du paquet, après S5b.

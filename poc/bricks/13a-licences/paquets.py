@@ -18,6 +18,13 @@ Code 1 sur un refus (lignes « REFUS : … »), 0 sinon ; NOASSERTION n'est pas 
 Usage : paquets.py deb <fichier.deb> --sbom <sortie.json>
         paquets.py dep5 <fichier copyright> --sbom <sortie.json> --purl <purl>   (témoins, sans deb)
         paquets.py modules <fichier.deb>
+        paquets.py stdlib <fichier.deb> <deb de golang-X.Y-src> --sbom <sortie.json>
+
+Mode stdlib (ajouté le 12/11/2026, décision « Axe 3, puis 1+2 ») : la version de Go lue dans chaque binaire de ./usr/bin du deb
+(une seule version exigée) doit être la version amont (sans époque ni révision Debian) du paquet golang-*-src donné ; le copyright
+DEP-5 de ce paquet devient l'expression d'un second composant du SBOM, pkg:deb/debian/<paquet>@<version>?arch=<arch>, à côté du
+composant du deb lui-même (même expression qu'en mode deb). C'est la licence que Debian déclare pour tout le paquet source de la
+bibliothèque standard, fichiers non compilés compris : une borne haute, pas la licence des seuls fichiers compilés.
 
 Mode modules (ajouté le 12/11/2026) : pour chaque fichier ordinaire de ./usr/bin du deb, lu en mémoire, jamais écrit ni exécuté,
 les informations de build de Go (en-tête « \\xff Go buildinf: », format en ligne de go1.18 et après ; un format plus ancien est
@@ -39,7 +46,7 @@ FORMAT = re.compile(r"^https?://www\.debian\.org/doc/packaging-manuals/copyright
 
 
 class Refus(Exception):
-    pass
+    journal: list = []
 
 
 def membres_ar(b):
@@ -107,9 +114,15 @@ def expression_dep5(court):
     return expr, noms
 
 
-def analyser(texte):
-    """(expression du paquet ou NOASSERTION, lignes de journal) ; Refus sur un DEP-5 mal formé."""
-    j = []
+def analyser(texte, souple=False):
+    """(expression du paquet ou NOASSERTION, lignes de journal) ; Refus sur un DEP-5 mal formé.
+
+    souple=False (modes deb et dep5, mesurés) : refus au premier défaut ; Files et Copyright exigés sur leur première ligne.
+    souple=True (composant de la bibliothèque standard, copyright de Debian non écrit par nous) : Files et Copyright comptent
+    aussi quand leur valeur commence à la ligne suivante ; tous les paragraphes sont journalisés et tous les défauts listés,
+    puis un seul Refus en donne le nombre ; aucune expression n'est rendue s'il y en a un.
+    """
+    j, defauts = [], []
     ps = paragraphes(texte)
     if not ps or "format" not in ps[0] or not FORMAT.match(ps[0]["format"][0]):
         j.append("format : absent ou autre que DEP-5 1.0 -> NOASSERTION")
@@ -117,19 +130,34 @@ def analyser(texte):
     j.append(f"format : DEP-5 1.0 ; paragraphes : {len(ps)}")
     textes = {p["license"][0] for p in ps[1:] if "files" not in p and "license" in p and p["license"][1]}
     exprs = []
+
+    def present(p, c):
+        return c in p and bool(p[c][0] or (souple and c != "license" and any(p[c][1])))
+
     for k, p in enumerate(ps[1:], 2):
         if "files" not in p:
             continue
-        manque = [c for c in ("files", "copyright", "license") if c not in p or not p[c][0]]
-        if manque:
-            raise Refus(f"paragraphe {k} : champ(s) manquant(s) : {', '.join(manque)}")
-        expr, noms = expression_dep5(p["license"][0])
-        sans_texte = [n for n in noms if n not in textes and not (p["license"][1] and len(noms) == 1)]
-        if sans_texte:
-            raise Refus(f"paragraphe {k} : texte de licence absent pour {', '.join(sans_texte)}")
+        try:
+            manque = [c for c in ("files", "copyright", "license") if not present(p, c)]
+            if manque:
+                raise Refus(f"paragraphe {k} : champ(s) manquant(s) : {', '.join(manque)}")
+            expr, noms = expression_dep5(p["license"][0])
+            sans_texte = [n for n in noms if n not in textes and not (p["license"][1] and len(noms) == 1)]
+            if sans_texte:
+                raise Refus(f"paragraphe {k} : texte de licence absent pour {', '.join(sans_texte)}")
+        except Refus as e:
+            if not souple:
+                raise
+            defauts.append(str(e))
+            j.append(f"Files {' '.join([p['files'][0]] + p['files'][1])[:120]} : License « {p.get('license', ('', []))[0]} » -> DÉFAUT : {e}")
+            continue
         fichiers = " ".join([p["files"][0]] + p["files"][1])
-        j.append(f"Files {fichiers} : License « {p['license'][0]} » -> {expr}")
+        j.append(f"Files {fichiers[:120] if souple else fichiers} : License « {p['license'][0]} » -> {expr}")
         exprs.append(f"({expr})" if " " in expr else expr)
+    if defauts:
+        e = Refus(f"{len(defauts)} défaut(s) : " + " | ".join(defauts))
+        e.journal = j
+        raise e
     if not exprs:
         raise Refus("aucun paragraphe Files")
     return " AND ".join(exprs), j
@@ -236,6 +264,61 @@ def modules(deb):
     return ok
 
 
+def lire_deb(b):
+    """(champs du control, membres ar) d'un deb ; mêmes exigences qu'en mode deb."""
+    ms = membres_ar(b)
+    if [n for n, _ in ms] != ["debian-binary", "control.tar.xz", "data.tar.xz"] or ms[0][1] != b"2.0\n":
+        raise Refus(f"membres ar ou debian-binary inattendus : {[n for n, _ in ms]}")
+    ctl = paragraphes(fichier_tar(ms[1][1], "./control").decode("utf-8"))
+    if len(ctl) != 1 or any(c not in ctl[0] for c in ("package", "version", "architecture")):
+        raise Refus("control : Package, Version ou Architecture absent")
+    return {k: v[0] for k, v in ctl[0].items()}, ms
+
+
+def stdlib(deb, src):
+    """Composants du SBOM (deb, puis paquet source de la bibliothèque standard) ; Refus sur toute incohérence."""
+    ctl, ms = lire_deb(deb)
+    nom = ctl["package"]
+    versions = set()
+    with tarfile.open(fileobj=io.BytesIO(ms[2][1]), mode="r:xz") as t:
+        for m in t.getmembers():
+            if m.name.startswith("./usr/bin/") and m.isfile():
+                f = t.extractfile(m)
+                if f is None:
+                    raise Refus(f"{m.name} : illisible")
+                v, _ = infos_build(f.read())
+                print(f"binaire {m.name} : {v}")
+                versions.add(v)
+    if len(versions) != 1:
+        raise Refus(f"versions de Go dans ./usr/bin : {sorted(versions)}, une seule attendue")
+    go = versions.pop()
+    sctl, sms = lire_deb(src)
+    print(f"paquet de la bibliothèque standard : {sctl['package']} {sctl['version']} {sctl['architecture']}")
+    if not re.fullmatch(r"golang-\d+\.\d+-src", sctl["package"]):
+        raise Refus(f"{sctl['package']} n'est pas un paquet golang-X.Y-src")
+    amont = re.sub(r"^\d+:", "", sctl["version"]).rsplit("-", 1)[0]
+    if "go" + amont != go:
+        raise Refus(f"version amont {amont} du paquet, {go} dans le binaire")
+    print(f"OK   {go} du binaire = version amont {amont} de {sctl['package']}")
+    comps = []
+    for n, c, v, a, membres in ((nom, None, ctl["version"], ctl["architecture"], ms),
+                                (sctl["package"], None, sctl["version"], sctl["architecture"], sms)):
+        cr = fichier_tar(membres[2][1], f"./usr/share/doc/{n}/copyright")
+        print(f"## copyright de {n} : sha256 {hashlib.sha256(cr).hexdigest()} ({len(cr)} octets)")
+        try:
+            expr, j = analyser(cr.decode("utf-8"), souple=(n != nom))
+        except Refus as e:
+            for l in getattr(e, "journal", []):
+                print(l)
+            raise
+        for l in j:
+            print(l)
+        purl = f"pkg:deb/debian/{n}@{v}?arch={a}"
+        print(f"{purl} : {expr}")
+        comps += sbom(purl, n, v, expr)["components"]
+    return {"bomFormat": "CycloneDX", "specVersion": "1.6", "components": comps}
+
+
 def sbom(purl, nom, version, expr):
     comp = {"type": "application", "name": nom, "version": version, "purl": purl}
     if expr != "NOASSERTION":
@@ -245,8 +328,9 @@ def sbom(purl, nom, version, expr):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("mode", choices=["deb", "dep5", "modules"])
+    p.add_argument("mode", choices=["deb", "dep5", "modules", "stdlib"])
     p.add_argument("fichier")
+    p.add_argument("source", nargs="?", help="mode stdlib : deb de golang-X.Y-src")
     p.add_argument("--sbom")
     p.add_argument("--purl")
     a = p.parse_args(argv)
@@ -257,6 +341,13 @@ def main(argv=None):
             return 0 if modules(b) else 1
         if not a.sbom:
             raise Refus("--sbom exigé")
+        if a.mode == "stdlib":
+            if not a.source:
+                raise Refus("deb de golang-X.Y-src exigé")
+            src = open(a.source, "rb").read()
+            print(f"sha256 du paquet de la bibliothèque standard : {hashlib.sha256(src).hexdigest()} ({len(src)} octets)")
+            json.dump(stdlib(b, src), open(a.sbom, "w"), indent=1)
+            return 0
         if a.mode == "deb":
             ms = membres_ar(b)
             noms = [n for n, _ in ms]

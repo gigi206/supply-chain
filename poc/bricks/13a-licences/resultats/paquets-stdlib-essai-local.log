@@ -1,0 +1,120 @@
+# banc paquets.sh stdlib, 2026-11-12T20:03:30Z, paquets.sh 2ef3a8b5d6c18faf16115419c431c74ece5aa9c31d9a8d0602651418a3881e7d, paquets.py 0541eaf76c47582704d4f0e084ad428bb9ed483089a7b70037a8d459b2ce296c, go version go1.24.7 linux/amd64
+version de Go du binaire d essai : go1.24.7
+OK   s-nominal : code 0, « ^bilan : bibliothèque standard déclarée »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 3f386e80bf61eb05e23d9fa065dce9f55e28c31c3d26969f06f5ccdf6f51a207
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 1.24.7-1 all
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          ok       pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-Clause
+     OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-stdlib.licences.json)
+     bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
+OK   s-epoque : code 0, « ^OK   go.* = version amont »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : a54c84e09dad60f5e8f18d2da6572658db0cac9418aab9c40f1be2f132630f48
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 2:1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 2:1.24.7-1 all
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « BSD-3-clause » -> BSD-3-clause
+     pkg:deb/debian/golang-1.24-src@2:1.24.7-1?arch=all : BSD-3-clause
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          ok       pkg:deb/debian/golang-1.24-src@2:1.24.7-1?arch=all : BSD-3-Clause
+     OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-stdlib.licences.json)
+     bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
+OK   s-version : code 1, « ^REFUS : version amont 1.24.0 du paquet »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 507e6c9c8e175a9eae80bcd9ebea092eef7191a84dbb6dace87ad28b108c4fdb
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.0-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 1.24.0-1 all
+     REFUS : version amont 1.24.0 du paquet, go1.24.7 dans le binaire
+     KO   paquets.py stdlib : code 1
+OK   s-nom : code 1, « ^REFUS : golang-src n'est pas un paquet golang-X.Y-src »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 848d651a64a830c671c1831dc71618c15e06f8e26bf847e580cef4855c779729
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-src 1.24.7-1 all
+     REFUS : golang-src n'est pas un paquet golang-X.Y-src
+     KO   paquets.py stdlib : code 1
+OK   s-expat : code 1, « ^KO   verdict non conforme »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 0673d88a8fbe3184e4de140cb7dba9f8042b82984b38581a312ec53707db3b5e
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 1.24.7-1 all
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Expat » -> Expat
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : Expat
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          error    pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : Expat ; expression invalide : identifiant SPDX inconnu : Expat
+     KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-stdlib.licences.json)
+     bilan : KO
+OK   s-suite : code 0, « ^bilan : bibliothèque standard déclarée »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : 9a2f5ff4816e6b696de90c52c36f38f7d52eda11f55e5ad022c89c31fbe08b88
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 1.24.7-1 all
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files  * : License « BSD-3-clause » -> BSD-3-clause
+     pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-clause
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+          ok       pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+          ok       pkg:deb/debian/golang-1.24-src@1.24.7-1?arch=all : BSD-3-Clause
+     OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-stdlib.licences.json)
+     bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé
+OK   s-deux : code 1, « ^REFUS : 2 défaut\(s\) : .*« with » non traité.*texte de licence absent pour Inconnue »
+     OK   sha256 du deb épinglé : b392e2bbb1f6406c92d9a8c13f93e0f821fbc71e35c3a8ebf1c2757adec10fb1
+     OK   sha256 du paquet de Go épinglé : b97a7679767f09fac4f8931c294ce308fb5d2be7403c489f825375c8dade8adf
+     OK   même sha256 dans poc/packaging/verrou-deb.txt
+     OK   « golang-1.24-src (= 1.24.7-1) » dans s3-build-1.buildinfo
+     OK   témoin refusé : REFUS : essai n'est pas un paquet golang-X.Y-src
+     binaire ./usr/bin/essai : go1.24.7
+     paquet de la bibliothèque standard : golang-1.24-src 1.24.7-1 all
+     OK   go1.24.7 du binaire = version amont 1.24.7 de golang-1.24-src
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     pkg:deb/debian/essai@1.0-1?arch=amd64 : Apache-2.0
+     format : DEP-5 1.0 ; paragraphes : 3
+     Files * : License « GPL-2+ with Autoconf exception » -> DÉFAUT : « with » non traité : GPL-2+ with Autoconf exception
+     Files a/* : License « Inconnue » -> DÉFAUT : paragraphe 3 : texte de licence absent pour Inconnue
+     REFUS : 2 défaut(s) : « with » non traité : GPL-2+ with Autoconf exception | paragraphe 3 : texte de licence absent pour Inconnue
+     KO   paquets.py stdlib : code 1
+chrono.tsv du banc : 10 lignes ; fichiers de 13a touchés : 0

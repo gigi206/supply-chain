@@ -169,3 +169,51 @@ n'est pas relue » des résultats de `modules`.
   révision du paquet, **après S5b** (`poc/packaging/` est lu par `s4c.sh` et comparé par `s4d.sh` ; le changer change le deb
   `0b489d43…` et le sujet du rebuild, de la VSA et de S5b), avec les mesures de la 06 à refaire une fois ; le spec du rpm suivra la
   même décision avant son premier build.
+
+## Étape `stdlib` (axe 3, décision « Axe 3, puis 1+2 »), ajoutée à sec le 12/11/2026, NON LANCÉE
+
+**Ce que fait l'étape** ([`paquets.sh`](../paquets.sh) `stdlib`, [`paquets.py`](../paquets.py) `stdlib`) : hôte seul, sans réseau, le
+deb n'est pas modifié. Le paquet `golang-1.24-src_1.24.4-1_all.deb` de la fermeture restaurée de S3 de la 06 (build 1) a son sha256
+épinglé (`c396bc2c…`), recoupé avec `poc/packaging/verrou-deb.txt` et avec la ligne `golang-1.24-src (= 1.24.4-1)` de
+`s3-build-1.buildinfo`. `paquets.py stdlib` exige une seule version de Go dans `./usr/bin` du deb, égale à la version amont du
+paquet (époque et révision Debian retirées), puis met le copyright DEP-5 de ce paquet en second composant du SBOM
+(`pkg:deb/debian/golang-1.24-src@1.24.4-1?arch=all`), à côté du composant du deb. `licences.py` juge les deux. Témoin, joué **avant** l'appel principal : le
+deb de l'application à la place du paquet de Go, refus exigé. Un verdict non conforme donne `bilan : KO`, code 1, prédicat archivé tel
+quel.
+
+**Analyse souple pour le seul copyright de Debian** (sur relecture du conseiller, avant tout lancement) : pour ce composant, `Files` et
+`Copyright` comptent aussi quand leur valeur commence à la ligne suivante (DEP-5 valide), et l'analyse ne s'arrête plus au premier
+défaut : chaque paragraphe `Files` est journalisé avec son nom de licence, chaque défaut (« with », virgule, champ manquant, texte
+absent) est listé, puis un seul refus en donne le nombre, sans composant écrit. Les modes `deb` et `dep5`, déjà mesurés, gardent
+l'analyse stricte. Un seul lancement donne ainsi la liste complète de ce qu'il faudrait traduire ou curer.
+
+**Ce que vaut ce composant** : la licence que Debian déclare pour **tout** le paquet source de la bibliothèque standard, fichiers non
+compilés compris (tests, outils) : une borne haute, pas la licence des seuls fichiers compilés dans le binaire.
+
+**Banc hors réseau** ([`paquets-stdlib-essai-local.sh`](paquets-stdlib-essai-local.sh), [journal](paquets-stdlib-essai-local.log)) :
+programme Go compilé avec le Go 1.24.7 de mise, faux `golang-1.24-src` ; sept cas au code et au motif attendus : nominal 0 ; époque
+`2:` 0 ; version amont différente 1 (refus) ; paquet mal nommé 1 (refus) ; licence `Expat` 1 (verdict non conforme, prédicat archivé) ;
+`Files` et `Copyright` à la ligne suivante 0 ; deux défauts dans deux paragraphes 1, les deux listés et journalisés (deux derniers
+cas ajoutés sur relecture du conseiller).
+Les bancs de `deb` (neuf cas) et de `modules` (six debs) sont rejoués après ces changements, tenus. Non couverts : plusieurs versions
+de Go dans `./usr/bin` ; un purl avec époque garde le « : » non encodé (limite, sans effet sur 1.24.4-1).
+
+**Lu avant de prédire** : sha256 du paquet dans la fermeture (deux copies, `c396bc2c…`, 21 182 488 octets) ; membres ar ; noms des
+fichiers sous `doc/` : `./usr/share/doc/golang-1.24-src/copyright`, 16 932 octets, **contenu non lu** ; pas de `LICENSE` sous
+`./usr/share/go-1.24/` à ce niveau de l'arborescence (filtre de noms, non exhaustif).
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| S1 | Le paquet a le sha256 épinglé, présent dans le verrou et dans le buildinfo | Haute : relevé à sec |
+| S2 | `golang-1.24-src` `1.24.4-1` `all` ; `go1.24.4` du binaire égal à la version amont | Haute (M2) |
+| S3 | Le copyright de `golang-1.24-src` est au format DEP-5 1.0 | Moyenne : non lu |
+| S4 | L'analyse souple l'accepte (ni « with », ni virgule, texte présent pour chaque licence) ; sinon tous les défauts sont listés | Faible : 16 932 octets, plusieurs paragraphes probables |
+| S5 | Si S4 tient : l'expression contient `BSD-3-Clause` (licence du projet Go), et le verdict n'est pas conforme sur au moins un nom DEP-5 hors SPDX ou hors politique : `bilan : KO`, code 1 | Faible |
+| S6 | Le témoin est refusé (« n'est pas un paquet golang-X.Y-src ») | Haute |
+
+Un KO à S4 ou S5 est un résultat, pas une panne : il dirait ce qu'il faut traduire ou curer pour déclarer la bibliothèque standard,
+sans changer le deb. Rien de ce que l'étape écrit n'est relancé sans nouvel accord.
+
+*Note datée du 12/11/2026, écrite à 20:03:49 UTC* : la limite écrite pour l'étape `deb` (« un DEP-5 valide dont `Files:` ou `Copyright:`
+commence par une ligne vide est refusé ») vaut toujours pour les modes `deb` et `dep5` ; elle ne vaut plus pour le composant de la
+bibliothèque standard de l'étape `stdlib`, analysé en mode souple (voir cette étape).

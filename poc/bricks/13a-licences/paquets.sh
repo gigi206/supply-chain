@@ -12,9 +12,15 @@
 #         sur disque ni exécuté) et rapproche chaque dépendance compilée des paragraphes Files du copyright ; bibliothèque
 #         standard de Go en ÉCART (hors des sources) ; témoin : le même deb avec un copyright privé du paragraphe de TEMOIN_DEP, réécrit
 #         en mémoire puis dans le dossier de travail (0700, effacé à la fin), doit donner un KO sur cette dépendance.
+#   stdlib   (ajoutée à sec le 12/11/2026, décision « Axe 3, puis 1+2 », NON LANCÉE) hôte seul, sans réseau : même deb, et le paquet
+#         golang-1.24-src de la fermeture de S3 de la 06 (sha256 épinglé, recoupé avec poc/packaging/verrou-deb.txt et avec
+#         s3-build-1.buildinfo) ; paquets.py stdlib exige la même version de Go dans le binaire et en amont du paquet, puis met le
+#         copyright DEP-5 de ce paquet en second composant du SBOM ; licences.py juge les deux composants ; témoin : le deb de
+#         l application donné à la place du paquet de Go, refus exigé. Le deb n est pas modifié (axes 1 et 2 après S5b).
 #   Hors de ces étapes : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
 # Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb       (journal : resultats/paquets-deb.log)
 #         mise exec -- poc/bricks/13a-licences/paquets.sh modules   (journal : resultats/paquets-modules.log)
+#         mise exec -- poc/bricks/13a-licences/paquets.sh stdlib    (journal : resultats/paquets-stdlib.log)
 set -euo pipefail
 export LC_ALL=C
 here=$(cd "$(dirname "$0")" && pwd)
@@ -22,6 +28,9 @@ repo=$(git -C "$here" rev-parse --show-toplevel)
 R=$here/resultats
 DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb}
 DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # deb des deux builds de S3 (06, s3-comparaison.log)
+SRC=${SRC:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/restauree-1/golang-1.24-src_1.24.4-1_all.deb}
+SRC_SHA=c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1   # verrou-deb.txt (golang-1.24-src 1.24.4-1)
+SRC_BI="golang-1.24-src (= 1.24.4-1)"                                       # s3-build-1.buildinfo de la 06
 TEMOIN_DEP=github.com/go-chi/chi/v5   # étape modules : dépendance dont le paragraphe Files est retiré du témoin
 SPDX=${SPDX:?liste SPDX (mise exec)}
 T=$HOME/.cache/supply-chain-poc/13a/paquets
@@ -143,7 +152,37 @@ EOP
   echo "bilan : chaque dépendance compilée a son paragraphe Files ; témoin refusé"
 }
 
-[ $# -gt 0 ] || { echo "usage : $0 deb|modules" >&2; exit 2; }
+etape_stdlib() {
+  local s rc
+  rm -rf -- "${T:?}" && mkdir -p "$T" && chmod 0700 "$T"
+  echo "paquets.py : $(sha256sum < "$here/paquets.py" | cut -c1-64) ; licences.py : $(sha256sum < "$here/licences.py" | cut -c1-64) ; politique : $(sha256sum < "$here/policy.json" | cut -c1-64)"
+  [ -f "$DEB" ] && [ -f "$SRC" ] || { echo "KO   deb ou paquet de Go absent"; exit 1; }
+  s=$(sha256sum < "$DEB" | cut -c1-64); [ "$s" = "$DEB_SHA" ] || { echo "KO   sha256 du deb : $s"; exit 1; }
+  echo "OK   sha256 du deb épinglé : $s"
+  s=$(sha256sum < "$SRC" | cut -c1-64); [ "$s" = "$SRC_SHA" ] || { echo "KO   sha256 du paquet de Go : $s, attendu $SRC_SHA"; exit 1; }
+  echo "OK   sha256 du paquet de Go épinglé : $s"
+  if grep -q " $SRC_SHA " "$repo/poc/packaging/verrou-deb.txt"; then echo "OK   même sha256 dans poc/packaging/verrou-deb.txt"
+  else echo "KO   sha256 absent de poc/packaging/verrou-deb.txt"; exit 1; fi
+  if grep -qF "$SRC_BI" "$repo/poc/bricks/06-deb-sbuild/resultats/s3-build-1.buildinfo"; then echo "OK   « $SRC_BI » dans s3-build-1.buildinfo"
+  else echo "KO   « $SRC_BI » absent de s3-build-1.buildinfo"; exit 1; fi
+  local ko=0
+  echo "## témoin : le deb de l application à la place du paquet de Go (refus exigé ; avant l appel principal)"
+  rc=0; python3 -I "$here/paquets.py" stdlib "$DEB" "$DEB" --sbom "$T/temoin.json" > "$T/temoin.out" 2>&1 || rc=$?
+  if [ "$rc" = 1 ] && grep -q "^REFUS : .* n'est pas un paquet golang-X.Y-src" "$T/temoin.out"; then echo "OK   témoin refusé : $(grep -m1 '^REFUS' "$T/temoin.out")"
+  else echo "KO   témoin : code $rc"; tail -3 "$T/temoin.out"; ko=1; fi
+  echo "## deb et paquet de Go"
+  rc=0; python3 -I "$here/paquets.py" stdlib "$DEB" "$SRC" --sbom "$T/stdlib.sbom.json" || rc=$?
+  [ "$rc" = 0 ] || { echo "KO   paquets.py stdlib : code $rc"; rm -rf -- "${T:?}"; exit 1; }
+  echo "## verdict (licences.py, deux composants)"
+  rc=0; juger "$T/stdlib.sbom.json" "$R/paquets-stdlib.licences.json" || rc=$?
+  if [ "$rc" = 0 ] && python3 -I -c 'import json, sys; d = json.load(open(sys.argv[1])); sys.exit(0 if d["violations"]["error"] == 0 and d["noassertion"] == 0 and d["invalid"] == 0 and len(d["components"]) == 2 else 1)' "$R/paquets-stdlib.licences.json"; then
+    echo "OK   deux composants : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-stdlib.licences.json)"
+  else echo "KO   verdict non conforme (prédicat archivé tel quel : resultats/paquets-stdlib.licences.json)"; ko=1; fi
+  rm -rf -- "${T:?}"
+  [ "$ko" = 0 ] && echo "bilan : bibliothèque standard déclarée dans le prédicat, deux composants conformes ; témoin refusé" || { echo "bilan : KO"; exit 1; }
+}
+
+[ $# -gt 0 ] || { echo "usage : $0 deb|modules|stdlib" >&2; exit 2; }
 for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
 for e in "$@"; do
   chrono "13a paquets $e"
