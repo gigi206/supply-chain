@@ -306,6 +306,7 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Dans le pod, `VOIE2` fait les quatre gestes, chacun gardé : HTTP 200, `rpm -K` avec la seule clé de Rocky, en-têtes égaux au verrou, `createrepo_c --compatibility`, puis `skopeo copy --preserve-digests` avec le sha256 du manifeste égal au `pull_digest`.
 - Banc hors réseau, outils simulés, script du pod lu par `sh -s` : 18 cas au code attendu ([journal](resultats/m2-voie2-essai-local.log)). Prédictions V1 à V5 pour le premier passage réel ([détail](resultats/m2-predictions.md)).
 - Temps passé : 2,38 h mesurées ([relevé](resultats/temps-05-1211.log)), pour 2,5 pw estimées.
+- *Note du 12/11/2026, à partir de 18:01:55 UTC* : le banc compte depuis 21 cas, avec trois cas d'outil absent de l'image (`rpm`, `createrepo_c`, `skopeo`), refusés comme attendu ; les 18 cas ci-dessus ne changent pas ([détail](resultats/m2-predictions.md)).
 
 **Additif du 12/11/2026, à partir de 16:42:30 UTC : étape `releve5` ajoutée à [`m2.sh`](m2.sh), NON LANCÉE** (après « continue », sur relecture du conseiller). Hôte seul, sans réseau : elle relit l'archive de mock gardée, sha256 contrôlé, et archive au journal `installed_packages.py`, les verrous d'exemple des tests et de la documentation, et les mentions de `gpg-pubkey` et de sigmd5. Elle sert à étayer V1 à V3 avant le premier verrou réel. Prédictions W1 à W4 ([détail](resultats/m2-predictions.md)). Accord nommé attendu.
 
