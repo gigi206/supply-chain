@@ -276,3 +276,5 @@ Question posée : « Quelle voie pour la référence du bootstrap ? » ; répons
 - Les voies 1, 3 et 4 ne sont pas essayées.
 - Rien n'est mesuré : la tenue de la voie se verra en M3, où mock compare le digest de l'image (R4r).
 - L'embranchement 2 (image prête) reste ouvert.
+
+**Note du 12/11/2026, écrite à partir de 16:07:55 UTC, après l'audit `voie2` de `sante.sh`** : l'image d'outillage sur Rocky 9.8 porterait `createrepo_c-0.20.1-4.el9` (liste non signée de `pub/rocky/9.8/AppStream`), et non la 1.2.6 de l'amont. Le geste 3 de la voie 2, `createrepo_c --compatibility`, reprend l'appel lu dans le code de mock 6.9. Que la 0.20.1 accepte cette option **n'est pas vérifié**. À contrôler en M2, par `createrepo_c --help` dans l'image, avant le premier dépôt construit. Rien n'est lancé.

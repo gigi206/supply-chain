@@ -73,6 +73,8 @@ Vector	vectordotdev/vector	observabilité	non
 Fluent Bit	fluent/fluent-bit	observabilité	non
 podman	containers/podman	construction	oui
 skopeo	containers/skopeo	construction	oui
+createrepo_c	rpm-software-management/createrepo_c	packaging	oui
+rpm	rpm-software-management/rpm	packaging	oui
 images Rocky	rocky-linux/sig-cloud-instance-images	image de base	oui
 images Debian	debuerreotype/docker-debian-artifacts	image de base	oui
 debuerreotype	debuerreotype/debuerreotype	image de base	oui

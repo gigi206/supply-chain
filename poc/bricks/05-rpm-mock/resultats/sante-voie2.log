@@ -1,0 +1,47 @@
+# sante.sh voie2, 2026-11-12T16:05:42Z
+voie 2 de M2 : createrepo_c et rpm appelés par nos étapes ; commits depuis 2026-08-14T00:00:00Z, avis depuis 2025-11-12
+Relevé du 2026-11-12 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| createrepo_c | rpm-software-management/createrepo_c | packaging | oui | n/d | — | — | — | — | — |
+| rpm | rpm-software-management/rpm | packaging | oui | 3.8 | 2026-11-02 | 10 | 0 | 10 | ? |
+## rpm-software-management/createrepo_c
+nom final rpm-software-management/createrepo_c, archivé false, licence GPL-2.0, dernier push 2026-11-03
+dernière release : 1.2.6 du 2026-10-27
+commits depuis 2026-08-14T00:00:00Z : 14 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+        8 dralley	redhat.com
+        4 ppisar	redhat.com
+        1 prownd	kylinos.cn
+        1 fundawang	yeah.net
+fusionneurs des 100 dernières PR : Conan-Kudo 7, evan-goode 2, inknos 1, j-mracek 2, jan-kolarik 4, kontura 49, m-blaha 7, pkratoch 1, ppisar 27
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+## rpm-software-management/rpm
+nom final rpm-software-management/rpm, archivé false, licence NOASSERTION, dernier push 2026-11-11
+dernière release : rpm-6.1.0-release du 2026-08-20
+commits depuis 2026-08-14T00:00:00Z : 54 ; auteurs humains les plus actifs (compte, domaine de l'adresse) :
+       21 dmnks	redhat.com
+       20 pmatilai	redhat.com
+        3 daandemeyer	amutable.com
+        3 SleedSurfer	gmail.com
+        1 stevegrubb	gmail.com
+        1 sshedi	broadcom.com
+        1 glaubitz	physik.fu-berlin.de
+        1 generalmimon	seznam.cz
+        1 chrisburr	cern.ch
+        1 bluca	gmail.com
+fusionneurs des 100 dernières PR : dmnks 60, pmatilai 40
+SECURITY.md : absent
+avis publiés : 0 ; depuis un an : 0
+## fichiers dans pub/rocky/9.8 (image d'outillage, D4 a ; liste non signée, indice de version seulement)
+  BaseOS : aucun fichier createrepo_c-<version>.x86_64.rpm (liste lue, HTTP 200)
+  BaseOS : aucun fichier createrepo_c-libs-<version>.x86_64.rpm (liste lue, HTTP 200)
+  BaseOS : rpm-4.16.1.3-40.el9.x86_64.rpm
+  BaseOS : rpm-libs-4.16.1.3-40.el9.x86_64.rpm
+  BaseOS : rpm-sign-libs-4.16.1.3-40.el9.x86_64.rpm
+  AppStream : createrepo_c-0.20.1-4.el9.x86_64.rpm
+  AppStream : createrepo_c-libs-0.20.1-4.el9.x86_64.rpm
+  AppStream : aucun fichier rpm-<version>.x86_64.rpm (liste lue, HTTP 200)
+  AppStream : aucun fichier rpm-libs-<version>.x86_64.rpm (liste lue, HTTP 200)
+  AppStream : aucun fichier rpm-sign-libs-<version>.x86_64.rpm (liste lue, HTTP 200)

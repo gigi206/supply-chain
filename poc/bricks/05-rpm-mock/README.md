@@ -269,3 +269,16 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
   - une 404 donne un KO, et sa page, piégée avec un nom de fichier, n'est pas lue.
 
   Non simulé : l'échec de curl lui-même (délai, DNS). `bash -n` passe, et shellcheck ne relève aucun avertissement.
+
+**Résultat de `voie2`, le 12/11/2026 de 16:05:42 à 16:05:54 UTC (« Oui, lance voie2 »)** : code 0 ([journal](resultats/sante-voie2.log)). **Aucun verdict « Risqué »** : `createrepo_c` et `rpm` sont « À surveiller », chemin critique (doc 04, §3 et §6). Ils sont ajoutés à `tools/health/projects.tsv` pour le ré-audit du §7.
+
+| # | Résultat |
+|---|---|
+| A1 | **Tenue.** `createrepo_c` n'est pas archivé. Release 1.2.6 du 27/10/2026, 14 commits sur 90 jours, aucun critère « Risqué ». Manquent : Scorecard (« n/d », non mesurée), SECURITY.md (non bloquant, outil de distro) |
+| A2 | **Tenue.** `rpm` n'est pas archivé. 54 commits sur 90 jours, 10 auteurs, release rpm-6.1.0 du 20/08/2026, aucun critère « Risqué ». Non prédit : Scorecard 3,8, sous le seuil de 6 et sous mock (4,9) |
+| A3 | **Tenue.** Pour `rpm`, les deux seuls fusionneurs des 100 dernières PR (dmnks 60, pmatilai 40) ont des adresses redhat.com. Pour `createrepo_c`, « surtout Red Hat » n'est pas établi : son premier fusionneur, kontura (49), n'est pas parmi les auteurs des 90 jours, et son employeur n'est pas relevé. Le critère des 2 employeurs n'est donc prouvé pour aucun des deux |
+| A4 | **Tenue.** `createrepo_c-0.20.1-4.el9` et `createrepo_c-libs` sont dans AppStream seul, et `rpm`, `rpm-libs` et `rpm-sign-libs` (4.16.1.3-40.el9) dans BaseOS seul. Les quatre listes ont été lues en HTTP 200 |
+
+- **Constat** : les versions employées ne sont pas celles du projet audité. Rocky 9.8 livre `createrepo_c` 0.20.1, contre 1.2.6 en amont, et `rpm` 4.16.1.3, contre 6.1.0. Leur maintenance relève donc de Rocky (errata, dépôts signés), comme pour podman et skopeo.
+- **Limites** : les versions viennent d'une liste non signée, et la date de build n'est pas mesurée. Les avis publiés (0) ne couvrent que GitHub. L'épinglage passera par un primary vérifié en M2.
+- **Point ouvert pour M2** : l'option `--compatibility` de `createrepo_c`, écrite dans la décision « Voie 2 », vient du code de mock 6.9. Son existence en 0.20.1 n'est pas vérifiée ([note](resultats/m2-predictions.md)).
