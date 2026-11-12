@@ -1951,3 +1951,14 @@ Le texte ne porte plus aucune mention de projet, et la garde de `vsa` l'accepte.
 - `lire_vsa` relit la VSA et la provenance en anonyme, avec les clés croisées.
 
 Prédictions : [`resultats/s6b-pousser-predictions.md`](resultats/s6b-pousser-predictions.md). `rebuild` et `vsa` ne changent pas.
+
+**Additif du 12/11/2026 (à partir de 12:51:01 UTC, après « continue ») : contrôle 7 du deb en service (pas 3 et 4 de S6a) préparé à sec, rien lancé.** Pour après S5b et le relevé du 21/11, chaque étape sur accord nommé :
+- deux correctifs non appliqués :
+  - [`s6a-fraicheur-deb.patch`](s6a-fraicheur-deb.patch) fait écrire par `fraicheur-scan.py` (07a) une série par dépôt ;
+  - [`s6a-alertes-deb.patch`](s6a-alertes-deb.patch) donne à `ScanEnRetard` (19) un `absent()` par dépôt, et des tests en conséquence ;
+- trois étapes neuves de [`s6a.sh`](s6a.sh) :
+  - `periodique` crée le CronJob `scan-sample-app-deb` à 11:15 UTC et lance un passage depuis lui. Le CronJob doit égaler celui de l'image, hors image, nom, dépôt et `NATURE` ;
+  - `fraicheur` installe le script corrigé sur `sc-stockage` ;
+  - `porte` lance la porte sur le deb, avec un scan `ok` attendu.
+
+Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédictions et limites : [`resultats/s6a-service-predictions.md`](resultats/s6a-service-predictions.md). La principale limite est que `rejeu.sh` n'intègre pas S6.

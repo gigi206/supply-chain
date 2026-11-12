@@ -1,0 +1,97 @@
+diff -ruN a/poc/bricks/19-observabilite/config/regles/alertes-tests.yml b/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
+--- a/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
++++ b/poc/bricks/19-observabilite/config/regles/alertes-tests.yml
+@@ -201,6 +201,8 @@
+     input_series:
+       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+         values: '0x1810'
++      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
++        values: '0x1810'
+       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+         values: '0x1810'
+     alert_rule_test:
+@@ -214,6 +216,7 @@
+         alertname: ScanEnRetard
+         exp_alerts:
+           - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app, job: fichiers, instance: local}
++          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb, job: fichiers, instance: local}
+       - eval_time: 2879m   # 47 h 59
+         alertname: BaseGrypeVieillie
+         exp_alerts: []
+@@ -231,12 +234,15 @@
+         alertname: ScanBientotRefuse
+         exp_alerts:
+           - exp_labels: {alerte: scan, severite: critique, depot: builds/scan/sample-app, job: fichiers, instance: local}
++          - exp_labels: {alerte: scan, severite: critique, depot: builds/scan/sample-app-deb, job: fichiers, instance: local}
+ 
+   # G8 : passage suivant le plus tardif admis, 25 h 28 après le premier (date 91680 s) : ni retard, ni base vieillie à 26 h 06.
+   - interval: 4m
+     input_series:
+       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+         values: '0x382 91680x20'
++      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
++        values: '0x382 91680x20'
+       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+         values: '0x360 86400x40'
+     alert_rule_test:
+@@ -259,7 +265,8 @@
+       - eval_time: 6m
+         alertname: ScanEnRetard
+         exp_alerts:
+-          - exp_labels: {alerte: scan, severite: avertissement}
++          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app}
++          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb}
+       - eval_time: 4m
+         alertname: BaseGrypeVieillie
+         exp_alerts: []
+@@ -273,6 +280,8 @@
+     input_series:
+       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+         values: '0+60x4 stale stale 360+60x6'
++      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
++        values: '0+60x4 stale stale 360+60x6'
+       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+         values: '0+60x4 stale stale 360+60x6'
+     alert_rule_test:
+@@ -283,6 +292,25 @@
+         alertname: BaseGrypeVieillie
+         exp_alerts: []
+ 
++  # S6a (brique 06) : la série du deb manque, celle de l'image est fraîche ; seul le dépôt du deb déclenche, après le for: 5m.
++  - interval: 1m
++    input_series:
++      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
++        values: '0+60x10'
++      - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
++        values: '0+60x10'
++    alert_rule_test:
++      - eval_time: 4m
++        alertname: ScanEnRetard
++        exp_alerts: []
++      - eval_time: 6m
++        alertname: ScanEnRetard
++        exp_alerts:
++          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb}
++      - eval_time: 6m
++        alertname: BaseGrypeVieillie
++        exp_alerts: []
++
+   # A5 : refus anciens stables ; rafale de 20 refus vers 21 min ; nouvelle combinaison apparue à 7 vers 30 min.
+   - interval: 1m
+     input_series:
+diff -ruN a/poc/bricks/19-observabilite/config/regles/alertes.yml b/poc/bricks/19-observabilite/config/regles/alertes.yml
+--- a/poc/bricks/19-observabilite/config/regles/alertes.yml
++++ b/poc/bricks/19-observabilite/config/regles/alertes.yml
+@@ -75,8 +75,11 @@
+       # Scan en retard (brique 07a, G8) : Prometheus ne voit pas l'état des Jobs (pas de kube-state-metrics, non audité au doc 04),
+       # on mesure ce que la porte exige (fraicheur-scan.prom). 26 h : le passage le plus tardif admis finit à 11:00 UTC
+       # (09:30, plus startingDeadlineSeconds et activeDeadlineSeconds), 25 h 30 après le passage le plus tôt (09:32). for: 5m pour absent(), comme A4.
++      # Deux dépôts (brique 06, S6a) : le deb passe à 11:15 UTC, avec les mêmes écarts (fin au plus tard à 12:45). Un absent() par
++      # dépôt : sans sélecteur, absent() ne se déclencherait plus si une seule des deux séries disparaissait. Une seule ligne :
++      # observabilite.sh (regles) lit chaque expression par « expr: ».
+       - alert: ScanEnRetard
+-        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds)
++        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"}) or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb"})
+         for: 5m
+         labels:
+           alerte: scan

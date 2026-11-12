@@ -1,0 +1,63 @@
+diff -ruN a/poc/bricks/07a-sbom-grype/systemd/fraicheur-scan.py b/poc/bricks/07a-sbom-grype/systemd/fraicheur-scan.py
+--- a/poc/bricks/07a-sbom-grype/systemd/fraicheur-scan.py
++++ b/poc/bricks/07a-sbom-grype/systemd/fraicheur-scan.py
+@@ -5,7 +5,9 @@
+                                                elle n'est pas signée, la porte lit le scannedAt signé
+   base la plus récente de vulndb/grype       : tag daté choisi comme scanner.sh, org.opencontainers.image.created de son manifeste
+ Lecture impossible : code d'erreur, fichier inchangé, et l'âge continue de croître. Aucun referrer de scan, ou aucune base : la
+-série n'est pas écrite (absent() des règles). Le fichier est créé par plateforme.sh g8_metriques, seul chemin écrit ici."""
++série n'est pas écrite (absent() des règles). Le fichier est créé par plateforme.sh g8_metriques, seul chemin écrit ici.
++SCANS (brique 06, S6a, contrôle 7 du deb) : liste « dépôt@digest » séparée par des espaces, une série par dépôt ; sans SCANS,
++DEPOT_SCAN@DIGEST seul, comme avant, et la sortie reste « scan <date>, base <date> »."""
+ import datetime
+ import json
+ import os
+@@ -14,9 +16,8 @@
+ import urllib.request
+ 
+ REG = os.environ["REG"]
+-DEPOT_SCAN = os.environ["DEPOT_SCAN"]
++SCANS = [s.split("@", 1) for s in (os.environ.get("SCANS") or f'{os.environ["DEPOT_SCAN"]}@{os.environ["DIGEST"]}').split()]
+ DEPOT_BASE = os.environ["DEPOT_BASE"]
+-DIGEST = os.environ["DIGEST"]
+ SORTIE = os.environ.get("SORTIE", "/etc/fichiers-metriques/fraicheur-scan.prom")
+ PREDICAT = "https://supply-chain.example/scan/v1"
+ INDEX = "application/vnd.oci.image.index.v1+json"
+@@ -34,10 +35,10 @@
+     return int(datetime.datetime.fromisoformat(date).timestamp())
+ 
+ 
+-def dernier_scan():
++def dernier_scan(depot, digest):
+     dates = [
+         epoque(m["annotations"]["org.opencontainers.image.created"])
+-        for m in lire(f"{DEPOT_SCAN}/referrers/{DIGEST}", INDEX).get("manifests") or []
++        for m in lire(f"{depot}/referrers/{digest}", INDEX).get("manifests") or []
+         if m.get("annotations", {}).get("dev.sigstore.bundle.predicateType") == PREDICAT
+     ]
+     return max(dates, default=None)
+@@ -57,8 +58,10 @@
+ 
+ 
+ def main():
+-    scan, base = dernier_scan(), derniere_base()
+-    corps = serie("scan_dernier_referrer_timestamp_seconds", DEPOT_SCAN, scan)
++    # Tout est lu avant d'écrire : une lecture impossible laisse le fichier entier inchangé, pour chaque dépôt.
++    scans = [(depot, dernier_scan(depot, digest)) for depot, digest in SCANS]
++    base = derniere_base()
++    corps = "".join(serie("scan_dernier_referrer_timestamp_seconds", depot, scan) for depot, scan in scans)
+     corps += serie("base_grype_construite_timestamp_seconds", DEPOT_BASE, base)
+     # Réécrit sur place : écrire d'abord, couper ensuite. Jamais de fichier vide ; un fichier raccourci garde sa fin le temps d'un appel.
+     donnees = corps.encode()
+@@ -68,7 +71,10 @@
+         os.ftruncate(f, len(donnees))
+     finally:
+         os.close(f)
+-    print(f"scan {scan}, base {base}")
++    if len(scans) == 1:
++        print(f"scan {scans[0][1]}, base {base}")
++    else:
++        print(f"scan {' '.join(f'{depot}={scan}' for depot, scan in scans)}, base {base}")
+ 
+ 
+ main()
