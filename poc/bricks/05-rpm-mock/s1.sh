@@ -3,12 +3,13 @@
 # bootstrap de mock), puis l'isolation nspawn contre simple (prédictions 3 et 4 du README). Verrou et --hermetic-build : M2.
 # Prédictions : resultats/s1-predictions.md, écrites et commitées avant toute exécution. Préparé à sec le 12/11/2026 à partir de
 # 14:12:09 UTC, NON LANCÉ. À lancer après S5b (Zot est remis à zéro par le rejeu), chaque étape sur accord nommé.
-#   prealables  lecture seule et dry-run : politique de sortie rpm en place (prefetch-rpm-sortie, et prefetch-rpm dans le NotIn de
-#               builds-sans-internet : décision du propriétaire, appliquée hors de ce script) ; exemption Pod Security de kata ;
-#               specs admises en dry-run serveur ; sc-build ; place libre de Zot ; sources de sample-app ; sur l'hôte : clés de
-#               Rocky et d'EPEL comparées aux empreintes publiées, repomd.xml de Rocky 9.8 (BaseOS, AppStream) et 9.7 (BaseOS,
-#               AppStream, CRB) vérifiés par gpgv, repomd d'EPEL 9 (signature relevée), primary contrôlé par repomd, NEVRA et
-#               sha256 des quatre paquets épinglés
+#   hote        hôte seul, ni cluster ni Zot (peut tourner avant S5b ; à rejouer avant racine, pub/9.8 et EPEL bougent) : sources
+#               de sample-app ; clés de Rocky et d'EPEL comparées aux empreintes publiées ; repomd.xml de Rocky 9.8 (BaseOS,
+#               AppStream) et 9.7 (BaseOS, AppStream, CRB) vérifiés par gpgv ; repomd d'EPEL 9 (signature relevée) ; primary
+#               contrôlé par repomd ; NEVRA et sha256 des quatre paquets épinglés
+#   prealables  cluster et Zot, lecture seule et dry-run : politique de sortie rpm en place (prefetch-rpm-sortie, et prefetch-rpm
+#               dans le NotIn de builds-sans-internet : décision du propriétaire, appliquée hors de ce script) ; exemption Pod
+#               Security de kata ; spec admise en dry-run serveur ; sc-build ; place libre de Zot
 #   amorce      copie par digest de rockylinux 9.8 (outillage, D4 a) et 9.7 (bootstrap de mock, D2 a), amd64, dans Zot,
 #               amont/rockylinux/rockylinux
 #   racine      pod Kata privilégié, root, label prefetch-rpm, image 9.8 : dnf --installroot des quatre paquets épinglés avec les
@@ -75,7 +76,8 @@ pod_demarrer() { # nom : pod de $T/<nom>.json créé et prêt
   kubectl delete pod -n builds "$1" --ignore-not-found --wait=true </dev/null >/dev/null
   kubectl create -f "$T/$1.json" </dev/null >/dev/null
   kubectl wait -n builds "pod/$1" --for=condition=Ready --timeout=300s </dev/null >/dev/null \
-    || { kubectl describe pod -n builds "$1" </dev/null | tail -n 20 >&2; echo "KO   pod $1 non prêt" >&2; exit 1; }
+    || { kubectl get pod -n builds "$1" -o json </dev/null | jq -r '"phase \(.status.phase) ; \([.status.containerStatuses[]?.state
+           | to_entries[0] | "\(.key) \(.value.reason // "")"] | join(", "))"' >&2; echo "KO   pod $1 non prêt" >&2; exit 1; }   # raisons, jamais les messages
   echo "### $1 (kata, uid 0, privilégié, label tekton.dev/task=$LABEL) : prêt"
 }
 
@@ -126,8 +128,7 @@ PY
   decompresser "$d/$1.${p##*/}" > "$T/$1.primary.xml"
 }
 
-etape_prealables() {
-  local d n fp e
+etape_prealables() { # cluster et Zot, en lecture seule et dry-run
   echo "## politique de sortie rpm (décision du propriétaire, appliquée hors de ce script)"
   kubectl get cnp -n builds prefetch-rpm-sortie </dev/null >/dev/null 2>&1 \
     && echo "OK   CiliumNetworkPolicy prefetch-rpm-sortie présente" \
@@ -148,10 +149,14 @@ etape_prealables() {
     | jq -r '[.items[].spec.containers[].resources.requests.memory // empty] | "demandes de mémoire en cours : \(length) conteneur(s) : \(join(" "))"'
   echo "## place libre pour Zot"
   sur sc-stockage 'df -B1M --output=avail,target /var/lib/zot | tail -n 1' </dev/null | awk '{print "libre sous " $2 " : " $1 " Mo"}'
+}
+
+etape_hote() { # hôte seul, ni cluster ni Zot : peut tourner avant S5b ; à rejouer avant racine (pub/9.8 et EPEL bougent)
+  local d n fp e
   echo "## sources de sample-app"
   (cd "$PKG" && grep -E '  (sample-app-1\.0\.0\.tar\.gz|sample-app\.spec)$' SHA256SUMS | sha256sum -c -)
   echo "## clés, vérifiées sur l'hôte"
-  d=$T/hote; rm -rf "$d"; mkdir -p "$d"
+  d=$T/hote; rm -rf -- "${d:?}"; mkdir -p "$d"
   curl -fsSL --max-time 60 -o "$d/RPM-GPG-KEY-Rocky-9" "$CLE_ROCKY"
   curl -fsSL --max-time 60 -o "$d/RPM-GPG-KEY-EPEL-9" "$CLE_EPEL"
   for n in RPM-GPG-KEY-Rocky-9 RPM-GPG-KEY-EPEL-9; do
@@ -289,7 +294,7 @@ PY
 
 etape_racine() {
   local s r p=""
-  for r in baseos98 appstream98 epel9; do [ -s "$T/$r.repomd.sha256" ] && [ -s "$T/$r.primary.xml" ] || { echo "KO   lancer d'abord l'étape prealables" >&2; exit 1; }; done
+  for r in baseos98 appstream98 epel9; do [ -s "$T/$r.repomd.sha256" ] && [ -s "$T/$r.primary.xml" ] || { echo "KO   lancer d'abord l'étape hote" >&2; exit 1; }; done
   for r in "${EPINGLES[@]}"; do set -- $r; p="$p $1-$2"; done
   pod_spec s1-05-racine "$AMORCE"
   pod_demarrer s1-05-racine
@@ -339,7 +344,7 @@ runroot = "/w/run-containers"
 etape_image() {
   local d c=$T/couche-config
   [ -s "$T/racine.tar" ] || { echo "KO   lancer d'abord l'étape racine" >&2; exit 1; }
-  rm -rf "$c" && mkdir -p "$c/etc/mock" "$c/etc/containers"
+  rm -rf -- "${c:?}" && mkdir -p "$c/etc/mock" "$c/etc/containers"
   printf '%s' "$MOCK_CFG" > "$c/etc/mock/$CFG.cfg"
   printf '%s' "$STOCKAGE" > "$c/etc/containers/storage.conf"
   echo "configuration de mock : sha256 $(sha256sum < "$c/etc/mock/$CFG.cfg" | cut -c1-64)"

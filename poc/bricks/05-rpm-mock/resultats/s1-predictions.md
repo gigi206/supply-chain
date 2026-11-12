@@ -58,3 +58,21 @@ Le script est [`s1.sh`](../s1.sh). Le jalon S1 est le M1 du [README](../README.m
 - Le comportement de `dnf --installroot` avec `-c`, `cachedir` et `reposdir` (P6). Le script lit les deux emplacements possibles du cache.
 - La présence d'un `fedoraproject.org/security/` lisible sans JavaScript (P3). Si la page ne l'est pas, l'étape `prealables` s'arrête en KO, sans repli.
 - La clé que vise `gpgkey` dans `rocky-9.tpl` : la sonde affiche l'empreinte des clés `distribution-gpg-keys/rocky`, sans l'imposer.
+
+## Note du 12/11/2026, à partir de 14:20:06 UTC (relecture du conseiller, avant tout lancement)
+
+- **Correction** : « renommé comme dans la brique 06 » est inexact. Le tableau de la 06 nomme ses jalons S1 et S2 dès l'origine, alors que celui de la 05 les nomme M1 à M5. S1 désigne ici le M1 de la 05, pour suivre la numérotation de la 06.
+- **Nouvelle étape `hote`**, séparée de `prealables`. Elle reprend les sources, les clés, les repomd, les primary et les quatre paquets épinglés, sans cluster ni Zot.
+  - Elle peut tourner avant S5b, sur accord, et tranche alors P2 à P4.
+  - Elle sera rejouée avant `racine`, puisque pub/9.8 et EPEL bougent.
+  - `prealables` ne garde que le cluster et Zot, et P1 ne porte plus que sur elle.
+- **Deux règles en vigueur reprises** :
+  - un pod non prêt n'affiche plus ses Events : seulement sa phase et la raison de l'état de chaque conteneur ;
+  - les `rm -rf` de l'hôte passent par `${x:?}`.
+- **Coût de la règle de sortie rpm, lu dans `08c/sortie-builds.sh` et non préparé** : l'appliquer demande d'étendre ce script comme pour le deb :
+  - étapes `rpm_sec`, `rpm_appliquer`, `rpm_temoins` et `rpm_retirer` ;
+  - un invariant qui exige `prefetch-rpm-sortie` seule sur les pods `prefetch-rpm` ;
+  - le `NotIn` attendu par `appliquer`, `rejeu` et les contre-épreuves de `deb_sec` ;
+  - `builds-sans-internet.yaml`.
+
+  Les invariants `SOUS_REFUS` et `EXCLUS_SANS_SORTIE` refuseraient la politique tant que le `NotIn` ne contient pas `prefetch-rpm`. Tous ces fichiers sont rejoués par S5b : rien n'est modifié avant lui.
