@@ -232,3 +232,11 @@ Rien que S5b rejoue n'est touché, et mock reste le rpm signé d'EPEL. Le prix :
 | R3r | Une image `dir:` est chargée sans réseau, puis étiquetée | Moyenne | Si un accès réseau reste possible, la voie 2 doit le couper |
 | R4r | `bootstrap_image_assert_digest` n'est comparé qu'à un seul endroit, et un écart arrête le build | Haute | Si l'écart est seulement journalisé, le contrôle du digest passe à notre charge |
 | R5r | Aucune autre coupure `split(':')` d'une référence d'image que les deux déjà vues | Moyenne | Toute autre coupure sur le chemin de M3 s'ajoute aux obstacles de la voie 2 |
+
+### Correction du 12/11/2026, écrite à partir de 15:14:22 UTC, après relecture du conseiller, avant tout accord
+
+Le texte au-dessus n'est pas réécrit.
+
+- **Q2 :** `pull_digest` ne sert pas qu'à nommer le dossier. `mock-hermetic-repo.py:141` et `:142` l'ajoutent aussi à la référence tirée : il choisit le manifeste copié. Pour la voie 2, la copie se ferait donc par le `pull_digest` du verrou, et s'arrêterait s'il diffère de `BOOT_DIGEST` (`s1.sh:46`).
+- **Q4 :** `config.py:845` ajoute `"@" + pull_digest`. Le dossier attendu s'écrit donc `<dépôt hors ligne>/sc-stockage.poc.test@<pull_digest>`. Que `pull_digest` porte le préfixe `sha256:` sera lu dans le verrou réel.
+- **`releve3` corrigée à sec** (même heure, en-tête daté dans `m2.sh`) : `mock.py:811` à `:819` retire le préfixe `bootstrap_` des options du bootstrap. Le code qui compare le digest ou décide du repli peut donc lire `image_assert_digest`, `image_fallback` et `image_skip_pull`. L'étape cherche maintenant ces formes sans préfixe, qui couvrent aussi les formes préfixées. Elle garde 6 lignes de contexte après chaque `image_assert_digest`, pour R4r. `bash -n` et shellcheck passent ; les filtres ont été réessayés sur une entrée synthétique sans préfixe.

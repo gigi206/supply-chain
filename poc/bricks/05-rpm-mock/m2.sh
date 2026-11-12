@@ -19,6 +19,8 @@
 #               entier (calcul de image_digest, chargement d'une image dir:), usages de bootstrap_image_assert_digest et de dir:,
 #               toutes les coupures split(':') du code Python, usages de hermetic_build ; puis sources effacées.
 #               Prédictions : resultats/m2-predictions.md, section releve3.
+#               Corrigé à sec le 12/11/2026 à partir de 15:14:13 UTC, NON LANCÉ, avant tout accord : options cherchées aussi sans
+#               leur préfixe bootstrap_ (mock.py:811 le retire), et 6 lignes de contexte après image_assert_digest.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/m2.sh releve   (journal : resultats/m2-releve.log)
 #                          mise exec -- poc/bricks/05-rpm-mock/m2.sh releve2  (journal : resultats/m2-releve2.log)
@@ -116,9 +118,10 @@ etape_releve3() {
   echo "## image de bootstrap : digest affirmé et chargement d'un dossier dir:"
   echo "### taille de podman.py : $(wc -l < "$T/mock-src/mock/py/mockbuild/podman.py") lignes"
   plage "podman.py entier" mock/py/mockbuild/podman.py 1 2000
-  lignes "bootstrap_image_assert_digest, dans tout le code Python" 'bootstrap_image_assert_digest' mock/py
+  echo "### image_assert_digest, avec ou sans préfixe bootstrap_ (mock.py:811 le retire), et les 6 lignes qui suivent"
+  ( cd "$T/mock-src" && grep -rn -I -E -A6 -- 'image_assert_digest' mock/py 2>/dev/null ) | cut -c1-170 | sed 's/^/  /' || true
   lignes "images dir: et oci-archive:, dans tout le code Python" 'dir:|oci-archive' mock/py
-  lignes "bootstrap_image_fallback et bootstrap_image_skip_pull" 'bootstrap_image_(fallback|skip_pull)' mock/py
+  lignes "image_fallback et image_skip_pull, avec ou sans préfixe bootstrap_" 'image_(fallback|skip_pull)' mock/py
   echo "## coupures de références d'image"
   lignes "split(':') et split(\":\"), dans tout le code Python" "split\\(['\"]:['\"]" mock/py
   echo "## mode hermétique : tous les usages"
