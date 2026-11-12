@@ -1573,3 +1573,71 @@ Trois changements dans [`s4d3.sh`](s4d3.sh) :
 `s5.sh` garde ses valeurs en dur : il n'est pas dans le rejeu.
 
 Détail et prédictions : README de la [08](../08-trust-plane/README.md), section « Rejeu de zéro S5b ».
+
+## Additif du 12/11/2026, 08:39 UTC : carte de S6 (contrôles 6 et 7 du deb), à sec, rien lancé
+
+Rédigée sur « continue » (cadre : préparer sans rien lancer), après relecture de `scanner.sh` et `scan-verifier.sh` (07a), `vsa.sh` (08), `replay.sh` et `politique-replay.md` (10), `deb/construire-deb.yaml`, `rejeu.sh`, `s4d3.sh` et de la consigne de la tâche planifiée du 21/11 ; avis du conseiller. Aucune mesure, aucune écriture hors du dépôt. S6 est le « jalon séparé » décidé en S4d2 (« Oui, S4d2a »).
+
+**Constats, en lecture seule**
+1. **Conflit avec S5b.** La porte de [`s4d3.sh`](s4d3.sh) (lignes 343 et 344) et la prédiction C9 de S5b attendent VSA et scan **refusés** pour le deb ; `rejeu.sh` ne rejoue ni scan ni VSA du deb. Si S6 aboutit avant S5b dans le cluster, S5b casse : il faudrait modifier `rejeu.sh` et `s4d3.sh`, et dater une note sur C9.
+2. **Contrôle 7, cible unique en dur** :
+   - [`plateforme.sh`](../07a-sbom-grype/plateforme.sh), lignes 96 et 114 (`IMAGE`, `DEPOT_SCAN`) ;
+   - le CronJob `scan-sample-app` ;
+   - le timer de fraîcheur de G8 ([`fraicheur-scan.service`](../07a-sbom-grype/systemd/fraicheur-scan.service), ligne 11 : `DEPOT_SCAN=builds/scan/sample-app`).
+3. **Contrôle 7, la fusion masquerait un deb vide.**
+   - `analyser` fusionne `syft oci-dir:image` et `syft dir:source`.
+   - Sur le deb, syft 1.38 ne lance pas `deb-archive-cataloger` sur `oci-dir:` (relevé de S4d2). La moitié « artefact » serait vide ou presque, tandis que la moitié « source » remplirait le SBOM.
+   - Avec `-q` et le code 0, une extraction qui n'a rien lu passerait pour saine.
+   - Il faut donc un compte de PURL de l'artefact seul, avec un plancher strictement positif, et un témoin positif sur le modèle de G6.
+4. **Contrôle 7, non vérifié** :
+   - les catalogueurs actifs sur `dir:` (étiquettes de `syft cataloger list`) ;
+   - la compression de `data.tar` dans le vrai `.deb` ;
+   - la présence de `ar` et du décompresseur dans l'image `outils-scan`, sans quoi il faut reconstruire l'image, la réépingler et passer un pod d'essai ;
+   - le rôle de `distro=` pour un binaire Go (question ouverte, [README de la 07a](../07a-sbom-grype/README.md), ligne 278).
+5. **Contrôle 6, l'indépendance d'abord.** [`politique-replay.md`](../10-independent-replay/politique-replay.md) §3 interdit d'exécuter ou de réutiliser l'image de build déclarée : elle est reconstruite dans le domaine. Pour le deb :
+   - l'image de build `749d746c` porte sbuild et le chroot ;
+   - l'équivalent indépendant est mmdebstrap puis sbuild **dans `sc-replay`**, depuis le miroir de l'instantané et la fermeture deb `bb7599a2`, lien coupé.
+6. **Contrôle 6, le code du domaine est propre à la voie image** : `POLITIQUE_COMMIT`, `entrees.py`, `verifier_entrees.py`, `rebuild.sh`, `vsa.py` et `pousser_vsa` (`builds/vsa/sample-app`).
+   - La recette du deb viendrait du bundle `construire-deb` (`3726ff0b`).
+   - `PASSED` exige que le digest du layout fait main soit égal à `039949f9`. Ce layout est déterministe (`deb/construire-deb.yaml`, lignes 119 à 139 : `tar --mtime=@0`, configuration sans date), donc reconstructible à partir des seuls octets du deb.
+7. **Survie au rejeu.**
+   - `sc-replay` n'est pas touchée par `rejeu.sh` : elle n'y figure pas, et `virsh list` la montre en cours d'exécution.
+   - Zot est remis à zéro. Une VSA du deb faite avant S5b ne revient que par un bundle versionné re-poussé, et seulement si `039949f9` se reproduit (C6, confiance « Moyenne »).
+   - Son `inputAttestations` désignerait un bundle horodaté effacé, comme pour la VSA de sample-app : `vsa.sh` ne le lit pas.
+   - Le scan est refait par le CronJob.
+8. **Tâche planifiée du 21/11.** Elle prédit `builds/**` intacts, et des décisions de suppression seulement dans `builds/scan/sample-app` et `builds/scan/essai-scan`. Un dépôt `builds/scan/sample-app-deb` créé après le 12/11 aurait moins de 336 h le 21/11, donc aucune décision prédite, mais ce dépôt n'est pas prévu par sa consigne. Le plus simple est de n'écrire dans Zot qu'après ce relevé.
+9. **Place.** Le scan occupe 3,4 Go sur un nœud de 15 Go (07a). Un second CronJob ne doit pas chevaucher le premier et doit tenir dans les limites de `h5_limites` (08c).
+
+**Découpage proposé**
+- **S6a, contrôle 7** :
+  1. relevé sur l'hôte, hors réseau (`unshare -rn`), prédictions commitées d'abord : `ar` et compression de `data.tar` sur le vrai `.deb` de `$W/s3-06/build-1` ; `syft dir:` 1.38 sur `data.tar` extrait (nombre de PURL, types, `distro=`) ; grype 0.104.1 avec la base de G0 ; catalogueurs actifs ; outils présents dans `outils-scan` ;
+  2. mode deb de `scanner.sh` : extraction, compte de l'artefact seul, plancher ;
+  3. CronJob `scan-sample-app-deb` décalé, timer de fraîcheur sur deux dépôts, témoin positif ;
+  4. porte sur le deb : scan `ok` attendu.
+- **S6b, contrôle 6** :
+  1. relevé : versions de mmdebstrap et de sbuild candidates dans `sc-replay` ; place et mémoire de la VM (20 Go, 6 Gi) ; heure `finishedOn` de la provenance retenue (délai de 24 h) ;
+  2. installation dans `sc-replay`, sous accord nommé ;
+  3. code du domaine pour la voie deb, transport, rebuild lien coupé, VSA signée dans la VM ;
+  4. push de la VSA, avec un accord à chaque push.
+
+**Effort**
+- S6a : 0,5 à 1 jour (estimation de S4d2).
+- S6b : 2 à 3 jours, au-dessus des 1 à 2 jours de S4d2, puisqu'il faut reconstruire le chroot dans le domaine.
+- Total imputé à la 06 : 0,5 à 0,8 pw. Elle passerait d'environ 0,45 pw à 1 à 1,25 pw, sous l'estimation de 2 pw.
+- Si l'effort est imputé aux briques d'origine : la 10 est estimée à 2 pw, mais je n'ai pas relevé son consommé ; je n'ai trouvé aucune estimation dans le README de la 07a.
+
+**Questions au propriétaire**
+1. **Ordre par rapport à S5b.**
+   - (a) Tout S6 après S5b.
+   - (b) Tout S6 avant S5b, intégré au rejeu.
+   - (c) Avant S5b, ce qui survit au rejeu (relevés sur l'hôte, scripts, installation et rebuild dans `sc-replay`, VSA signée dans la VM) ; après S5b et après le relevé du 21/11, ce qui écrit dans le cluster ou dans Zot (CronJob du deb, push de la VSA).
+
+   **Ma recommandation : (c).** Elle utilise l'attente, laisse S5b et C9 tels que commités, et tient la tâche du 21/11 à l'écart. L'intégration de S6 à `rejeu.sh` vient ensuite, pour les rejeux suivants.
+2. **Contrôle 7 du deb.** Un mode deb du scanner (extraction de `data.tar`, `syft dir:`, plancher de l'artefact seul), ou un écart à l'ADR 0000 §4, qui est ton choix. **Ma recommandation** : le mode deb, sous réserve du relevé de S6a.
+3. **Contrôle 6 du deb.**
+   - Chroot reconstruit dans le domaine : mmdebstrap et sbuild installés dans `sc-replay` par apt, archive Debian signée, versions épinglées, sans recommandés, comme `busybox-static` en R2.
+   - Ou `749d746c` réutilisée, comme écart déclaré à `politique-replay.md` §3.
+   - Ou un écart à l'ADR.
+
+   **Ma recommandation** : la reconstruction dans le domaine, seule à garder la même indépendance que le replay de la voie image.
+4. **Accord pour le relevé 1 de S6a**, sur l'hôte : hors réseau, lecture du deb local, écriture seulement sous `~/.cache/supply-chain-poc/06/s6a` et dans `resultats/`. Rien dans le cluster ni dans Zot.
