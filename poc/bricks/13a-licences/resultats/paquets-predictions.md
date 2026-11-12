@@ -392,3 +392,8 @@ relecteur n'est écrit avant.
 **Règle qui écarterait les paragraphes non liés : non préparée ce soir** (temps). Elle devra dire ce qu'est « lié » (au paquet, pas au
 fichier : limite mesurée par `noms`), ce qu'on fait d'un motif « indéterminé », et garder la trace des paragraphes écartés ; à préparer
 après `vsa`, avec ses prédictions et son banc.
+
+*Note datée du 12/11/2026, écrite à 20:33:23 UTC* : **revue de la traduction « X11 » -> `MIT`.** Question : « Tu valides « X11 » → MIT pour le
+copyright de golang-1.24-src ? » ; réponse du propriétaire : « Oui, je valide ». Inscrite dans `traductions-dep5.json` (champ `revue`),
+preuve inchangée (`75fce626…`). `stdlib` n'est pas relancée : sans la règle des paragraphes non liés (à préparer après `vsa`), elle
+s'arrêterait encore sur `FreeBSD`.

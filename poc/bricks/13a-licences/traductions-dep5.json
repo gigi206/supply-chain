@@ -15,6 +15,6 @@
   "texte_sha256": "75fce6260547bc65c7e7004f8fc17e3ea80533ecf3051529a7c4d2c9ba34d97a",
   "expression": "MIT",
   "raison": "paragraphe License: X11 du copyright de Debian (forme de paquets.py texte_licence, 17 lignes) : en mots normalisés, texte de MIT de la liste SPDX 3.27.0 (ratio 0,979), seul écart le titre « MIT License » (facultatif dans le modèle SPDX) et la ligne de copyright ; ratio 0,837 avec X11 de SPDX, dont la clause du X Consortium manque ; comparaison de mots normalisés, pas la correspondance de SPDX ; étude noms du 12/11/2026 (paquets-noms.log)",
-  "revue": null
+  "revue": "propriétaire, 12/11/2026 (inscrite à 20:33:23 UTC) : « Oui, je valide » à « Tu valides « X11 » → MIT pour le copyright de golang-1.24-src ? »"
  }
 ]
