@@ -127,3 +127,37 @@ Le texte au-dessus n'est pas réécrit.
 - Le résumé de l'étape `verrou` n'affichait qu'`image_digest`. Il est corrigé à sec à la même heure pour afficher aussi `pull_digest` et `architecture`. Le verrou complet était déjà archivé. **La modification de `s1.sh` demande un accord avant que `verrou` ne tourne.**
 
 **Accord du 12/11/2026, noté à 15:19:53 UTC** : « Oui, valide-la ». La correction du résumé de l'étape `verrou` (commit c45d826) est validée. L'étape elle-même n'est pas lancée : elle tournera après S5b, sur accord nommé.
+
+## Note du 12/11/2026 : sonde de l'étape `verrou` corrigée à sec à partir de 15:23:35 UTC, note écrite à partir de 15:24:22 UTC, ajout proposé (après « continue »), NON LANCÉE
+
+Le texte au-dessus n'est pas réécrit. Lecture des sources de mock 6.9 en cache (archive `3c034916…3e4d88`, sha256 contrôlé), sans réseau. **Cette lecture n'est pas archivée**, contrairement à celles de `m2.sh` : les numéros de ligne cités ci-dessous se relisent dans cette archive.
+
+**Défaut de la sonde commitée.**
+- `mock --debug-config` écrit `config_opts['clé'] = valeur`, et seulement pour les clés qui diffèrent de leur valeur par défaut (`mock.py:605` à `:619`).
+- L'ancien motif `bootstrap_image_ready.: (True|False)` ne trouve rien sur ce format : essayé sur la ligne `config_opts['bootstrap_image_ready'] = True`, grep rend le code 1. La ligne « configuration : » serait sortie vide, sans le signaler.
+- La sonde garde maintenant la sortie entière dans le pod et relève la ligne `bootstrap_image_ready`. Si elle est absente, la sonde l'écrit : la valeur est alors celle par défaut, `False` (`config.py:109`). Si `--debug-config` échoue, la sonde l'écrit aussi, avec ses 5 dernières lignes, et ne conclut rien.
+- Les quatre options `bootstrap_*` reçoivent leur valeur par défaut, une liste vide, dans `setup_default_config_opts()` (`config.py:54`, puis `:347` à `:350`). `--debug-config` ne les écrit donc que si elles sont posées.
+
+**Ajout proposé après `releve2`, joint à la correction :**
+- le nombre de lignes de `--debug-config` pour les quatre options `bootstrap_*` qui annulent « prête » (`buildroot.py:1182` à `:1185`), puis ces lignes elles-mêmes ;
+- après `--buildsrpm`, puis après `--calculate-build-dependencies`, le nombre et le texte des lignes de tout `root.log` qui contiennent l'un des trois messages de `bootstrap_image_is_ready` (`buildroot.py:1176`, `:1188`, `:1193`). `root.log` est ouvert en ajout (`buildroot.py:699`) : le second relevé cumule les deux appels.
+
+**Essai hors cluster, journal non archivé**, refait après relecture du conseiller, entre 15:24:22 et 15:26:21 UTC (heures des deux écritures de cette note) : faux `mock` qui écrit le format lu. Cinq cas, sous `sh` puis sous `bash`, soit dix passages :
+- cas normal ;
+- `bootstrap_module_enable` posée ;
+- clé `bootstrap_image_ready` absente ;
+- `--debug-config` en échec ;
+- `--buildsrpm` en échec avant tout `root.log`.
+
+Les dix passages donnent les lignes attendues. Le premier jet de la correction avait un repli muet : le `|| echo` portait sur le code de `sed`, toujours 0. Il est corrigé avant ce commit. Le pod, mock et Zot réels ne sont pas touchés. `bash -n` passe, et shellcheck `-S warning` ne relève rien.
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| V6 | La sonde écrit `configuration : config_opts['bootstrap_image_ready'] = True` | Haute : la clé diffère de sa valeur par défaut, et `image` la pose par `sed` |
+| V7 | Aucune des quatre options `bootstrap_*` n'est posée (nombre 0) | Haute : ni `rocky-9.tpl` ni `rocky-9-x86_64.cfg` (mock-core-configs 45.2) ni `s1.sh` ne les posent ([complément](m2-releve2-complement.log)). Le `site-defaults.cfg` de mock-core-configs, dans la même archive, n'a aucune ligne active |
+| V8 | `root.log` ne contient ni « Package management in bootstrap » ni « Bootstrap image not marked ready » | Haute si V6 et V7 tiennent |
+| V9 | Après `--buildsrpm`, `root.log` contient au moins une ligne « Not updating bootstrap chroot, bootstrap_image_ready=True » | Moyenne : le message ne part que si l'initialisation du bootstrap appelle `_init_pkg_management` (`buildroot.py:356`, `:590`). Il faut aussi qu'il atteigne le `root.log` de `/w/res-verrou` par le journal `mockbuild` partagé (`buildroot.py:125`). L'ordre de ces étapes n'est pas lu |
+
+Après `--calculate-build-dependencies`, l'accroissement du nombre n'est pas prédit : je n'ai pas lu si le bootstrap y est initialisé à nouveau.
+
+**La modification de `s1.sh` demande un accord avant que `verrou` ne tourne.**

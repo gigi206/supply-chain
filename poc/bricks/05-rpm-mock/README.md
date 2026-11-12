@@ -214,3 +214,8 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 - Le digest que vérifie le mode hermétique est un sha256 des sections `RootFS` et `Config` de `podman image inspect` : une copie fidèle des couches et de la configuration le reproduit, quelle que soit la compression. R2r n'est tenue qu'en partie : la configuration y entre aussi.
 - Un écart de ce digest lève `BootstrapError`, et le mode hermétique interdit le repli. Il n'y a pas d'autre coupure de référence d'image que les deux déjà vues.
 - Pour la voie 2 : la copie de l'image par `skopeo copy --preserve-digests` reste contrôlée par mock en M3 ; aucune voie n'est choisie.
+
+**Additif du 12/11/2026, à partir de 15:23:35 UTC : sonde de l'étape `verrou` de S1 corrigée à sec, ajout proposé joint (après « continue »), NON LANCÉE** ([détail et prédictions V6 à V9](resultats/s1-predictions.md)).
+- **Défaut** : `--debug-config` écrit `config_opts['clé'] = valeur`, et seulement les clés qui diffèrent de leur défaut (`mock.py:605` à `:619`). L'ancien motif de la sonde n'aurait rien trouvé, sans le signaler.
+- **Ajout** : les quatre options `bootstrap_*` qui annulent « prête », et les messages de `bootstrap_image_is_ready` relevés dans tout `root.log` après chaque appel de mock.
+- Essayé hors cluster avec un faux `mock`. La modification de `s1.sh` attend un accord ; l'étape tournera après S5b.

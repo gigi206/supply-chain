@@ -435,20 +435,39 @@ etape_essais() {
 # un verrou calculé sans bootstrap_image_ready=True (mock 6.9, config.py:824). Même configuration que $CFG, sauf la racine et
 # bootstrap_image_ready=True : rockylinux:9.7 brut est-il une image « prête » ? Isolation : celle que essais aura vue passer
 # (ISOLATION, simple par défaut, d'après P9). Le verrou produit est archivé (resultats/s1-verrou.json) ; rien n'est poussé.
+# Corrigée à sec le 12/11/2026 à partir de 15:23:35 UTC, NON LANCÉE, sur accord à venir : --debug-config écrit
+# « config_opts['clé'] = valeur », et seulement les clés qui diffèrent du défaut (mock.py:605 à :619) ; l'ancien motif
+# « bootstrap_image_ready.: » n'aurait rien trouvé, sans le signaler. Ajout proposé après releve2 : les quatre options bootstrap_*
+# qui annulent « prête » (buildroot.py:1182 à :1185) et les messages de bootstrap_image_is_ready relevés dans tout root.log
+# après chaque appel de mock (root.log est ouvert en ajout, buildroot.py:699 : les nombres sont cumulés).
 ISOLATION=${ISOLATION:-simple}
 SONDE_VERROU='set -u
 echo "isolation : @ISO@ ; configuration : @CFG_PRET@"
 cd /w/src && sha256sum -c SHA256SUMS.s1 > /w/c.log 2>&1; echo "sources livrées : rc $? $(paste -sd " " /w/c.log)"
-mock -r @CFG_PRET@ --debug-config 2>/dev/null | grep -o -E "bootstrap_image_ready.: (True|False)" | head -1 | sed "s/^/configuration : /"
+mock -r @CFG_PRET@ --debug-config > /w/verrou-debug-config.log 2>&1; rd=$?; echo "mock --debug-config : rc $rd"
+if [ $rd != 0 ]; then echo "configuration : illisible, --debug-config en échec"; tail -n 5 /w/verrou-debug-config.log
+else
+  P="^config_opts\[.bootstrap_image_ready.\]"
+  if grep -q -E "$P" /w/verrou-debug-config.log; then grep -E "$P" /w/verrou-debug-config.log | sed "s/^/configuration : /"
+  else echo "configuration : bootstrap_image_ready absent de --debug-config, donc valeur par défaut (False)"; fi
+  O="^config_opts\[.bootstrap_(module_enable|module_install|module_setup_commands|chroot_additional_packages).\]"
+  echo "options bootstrap_* qui annulent « prête », posées : $(grep -c -E "$O" /w/verrou-debug-config.log) (absente = valeur par défaut, vide)"
+  grep -E "$O" /w/verrou-debug-config.log | sed "s/^/option posée : /"
+fi
+M="Not updating bootstrap chroot|Package management in bootstrap|Bootstrap image not marked ready"
+etat() { c=$(grep -c -E "$M" /w/res-verrou/root.log 2>/dev/null); echo "root.log, $1 : ${c:-root.log absent} ligne(s) sur le bootstrap prêt ou non, cumulées"
+  grep -E "$M" /w/res-verrou/root.log 2>/dev/null | sed "s/^/root.log, $1 : /"; }
 mkdir -p /w/res-verrou
 t=$(date +%s)
 mock -r @CFG_PRET@ --isolation=@ISO@ --resultdir=/w/res-verrou --buildsrpm --spec /w/src/sample-app.spec --sources /w/src > /w/verrou-srpm.log 2>&1
 r=$?; echo "mock --buildsrpm (image prête) : rc $r en $(($(date +%s) - t)) s"
+etat "après --buildsrpm"
 [ $r = 0 ] || { tail -n 25 /w/verrou-srpm.log; tail -n 25 /w/res-verrou/root.log 2>/dev/null; exit 0; }
 s=$(ls /w/res-verrou/*.src.rpm | head -1); echo "src.rpm : ${s##*/} $(sha256sum < $s | cut -c1-64)"
 t=$(date +%s)
 mock -r @CFG_PRET@ --isolation=@ISO@ --resultdir=/w/res-verrou --calculate-build-dependencies "$s" > /w/verrou-calc.log 2>&1
 r=$?; echo "mock --calculate-build-dependencies : rc $r en $(($(date +%s) - t)) s"
+etat "après --calculate-build-dependencies"
 [ $r = 0 ] || { tail -n 25 /w/verrou-calc.log; tail -n 25 /w/res-verrou/root.log 2>/dev/null; }
 ls -l /w/res-verrou | sed "s/^/résultat : /"
 for f in /w/res-verrou/*.json; do [ -e "$f" ] && echo "verrou : ${f##*/} $(stat -c %s "$f") octets, sha256 $(sha256sum < "$f" | cut -c1-64)"; done
