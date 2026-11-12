@@ -2,10 +2,12 @@
 # Essai hors réseau de sante.sh (12/11/2026, avant tout accord) : gh, curl et tools/health/scorecard.sh simulés, HOME isolé.
 # 1. releves, avant (HEAD) et après la mise en fonction de releve_depot : sorties comparées, en-tête daté exclu.
 # 2. voie2 : commandes émises (dépôts, dates de début, URL de pub/rocky/9.8), filtrage des listes de fichiers, liste vide
-#    signalée (AppStream, Packages/r/ simulé vide).
+#    lue et vide (AppStream, Packages/c/, HTTP 200) distinguée d'une erreur (AppStream, Packages/r/, HTTP 404, page piégée
+#    qui contient un nom de fichier). Non simulé : échec de curl lui-même (délai, DNS).
+# « avant » : sante.sh du parent de ec849eb (commit qui a ajouté voie2), passé en argument.
 # Non couvert : réponses réelles de GitHub, de Scorecard et de dl.rockylinux.org (format, pagination, erreurs réseau).
 set -u
-D=$1; H=$2; AVANT=$3   # D : racine du dépôt ; H : dossier d'essai (vidé) ; AVANT : sante.sh de HEAD
+D=$1; H=$2; AVANT=$3   # D : racine du dépôt ; H : dossier d'essai (vidé) ; AVANT : sante.sh de ec849eb^
 rm -rf -- "${H:?}"; mkdir -p "$H/bin"
 cat > "$H/bin/gh" <<'EOF2'
 #!/usr/bin/env bash
@@ -16,14 +18,18 @@ esac
 EOF2
 cat > "$H/bin/curl" <<'EOF2'
 #!/usr/bin/env bash
-u=${*: -1}
+o=/dev/stdout; w=; u=${*: -1}
+while [ $# -gt 0 ]; do case $1 in -o) o=$2; shift ;; -w) w=$2; shift ;; esac; shift; done
 case "$u" in
-  */Packages/c/) printf '<a href="createrepo_c-9.9.8-1.faux.x86_64.rpm">x</a> "createrepo_c-9.9.9-1.faux.x86_64.rpm" "createrepo_c-libs-9.9.9-1.faux.x86_64.rpm" "createrepo_c-devel-9.9.9-1.faux.x86_64.rpm"\n' ;;
-  */AppStream/*/Packages/r/) printf '<html>vide</html>\n' ;;
-  */Packages/r/) printf '"rpm-9.9.9-1.faux.x86_64.rpm" "rpm-libs-9.9.9-1.faux.x86_64.rpm" "rpm-sign-libs-9.9.9-1.faux.x86_64.rpm" "rpmlint-9.9.9-1.faux.noarch.rpm"\n' ;;
-  *commits*) printf '[{"commit":{"author":{"date":"2026-10-30T00:00:00Z","name":"Faux"}}}]\n' ;;
-  *) echo '{"archived":false,"default_branch":"r9","updated_at":"2026-10-30T00:00:00Z"}' ;;
+  */BaseOS/*/Packages/c/) c=200; b='<a href="createrepo_c-9.9.8-1.faux.x86_64.rpm">x</a> "createrepo_c-9.9.8-1.faux.x86_64.rpm" "createrepo_c-9.9.9-1.faux.x86_64.rpm" "createrepo_c-libs-9.9.9-1.faux.x86_64.rpm" "createrepo_c-devel-9.9.9-1.faux.x86_64.rpm"' ;;
+  */BaseOS/*/Packages/r/) c=200; b='"rpm-9.9.9-1.faux.x86_64.rpm" "rpm-libs-9.9.9-1.faux.x86_64.rpm" "rpm-sign-libs-9.9.9-1.faux.x86_64.rpm" "rpmlint-9.9.9-1.faux.noarch.rpm"' ;;
+  */AppStream/*/Packages/c/) c=200; b='<html>vide</html>' ;;
+  */AppStream/*/Packages/r/) c=404; b='<html>404 Not Found "rpm-9.9.9-1.faux.x86_64.rpm"</html>' ;;
+  *commits*) c=200; b='[{"commit":{"author":{"date":"2026-10-30T00:00:00Z","name":"Faux"}}}]' ;;
+  *) c=200; b='{"archived":false,"default_branch":"r9","updated_at":"2026-10-30T00:00:00Z"}' ;;
 esac
+echo "$b" > "$o"
+[ -n "$w" ] && printf '%s' "$c"
 echo "FAUX curl $u" >&2
 EOF2
 chmod +x "$H/bin/gh" "$H/bin/curl"

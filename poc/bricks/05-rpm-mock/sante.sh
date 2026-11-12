@@ -14,6 +14,8 @@
 #               release, commits sur 90 jours comptés à la date du lancement, auteurs, fusionneurs, SECURITY.md, avis de l'année) ;
 #               fichiers de createrepo_c et rpm listés dans pub/rocky/9.8 (BaseOS, AppStream), source de l'image d'outillage (D4 a).
 #               Liste de répertoire non signée : un indice de version, pas un épinglage (celui-ci passera par un primary vérifié, en M2).
+#               Corrigé à sec le 12/11/2026 (relecture du conseiller), NON LANCÉE : code HTTP relevé, une erreur donne un KO distinct
+#               d'une liste vide ; chaque répertoire n'est lu qu'une fois.
 #               Les relevés par dépôt de releves sont mis en fonction (releve_depot), sans changement de commande ni de sortie.
 #
 # Usage (racine du dépôt) : mise exec -- poc/bricks/05-rpm-mock/sante.sh <étape>…   (journal : resultats/sante-<étape>.log)
@@ -199,7 +201,7 @@ etape_podman() {
 }
 
 etape_voie2() {
-  local d a r p x f
+  local d a r p x f c h n
   d=$(date -u -d '90 days ago' +%Y-%m-%dT00:00:00Z); a=$(date -u -d '1 year ago' +%Y-%m-%d)
   echo "voie 2 de M2 : createrepo_c et rpm appelés par nos étapes ; commits depuis $d, avis depuis $a"
   printf 'createrepo_c\trpm-software-management/createrepo_c\tpackaging\toui\nrpm\trpm-software-management/rpm\tpackaging\toui\n' > "$T/projets-voie2.tsv"
@@ -209,12 +211,18 @@ etape_voie2() {
   done
   echo "## fichiers dans pub/rocky/9.8 (image d'outillage, D4 a ; liste non signée, indice de version seulement)"
   for x in BaseOS AppStream; do
-    for p in c:createrepo_c c:createrepo_c-libs r:rpm r:rpm-libs r:rpm-sign-libs; do
-      f=$(curl -sSL --max-time 60 "https://dl.rockylinux.org/pub/rocky/9.8/$x/x86_64/os/Packages/${p%%:*}/" \
-        | grep -oE "\"${p##*:}-[0-9][^\"]*\.x86_64\.rpm\"" | tr -d '"' | sort -uV | tail -2)
-      if [ -n "$f" ]; then sed "s/^/  $x : /" <<<"$f"; else echo "  $x : aucun fichier ${p##*:}-<version>.x86_64.rpm"; fi
+    for c in c r; do
+      h=$(curl -sSL --max-time 60 -o "$T/liste.html" -w '%{http_code}' "https://dl.rockylinux.org/pub/rocky/9.8/$x/x86_64/os/Packages/$c/") \
+        || h="$h, curl en échec"
+      if [ "$h" != 200 ]; then echo "KO   $x Packages/$c/ : HTTP $h, liste non lue"; continue; fi
+      case $c in c) p='createrepo_c createrepo_c-libs' ;; r) p='rpm rpm-libs rpm-sign-libs' ;; esac
+      for n in $p; do
+        f=$(grep -oE "\"$n-[0-9][^\"]*\.x86_64\.rpm\"" "$T/liste.html" | tr -d '"' | sort -uV | tail -2)
+        if [ -n "$f" ]; then sed "s/^/  $x : /" <<<"$f"; else echo "  $x : aucun fichier $n-<version>.x86_64.rpm (liste lue, HTTP 200)"; fi
+      done
     done
   done
+  rm -f -- "${T:?}/liste.html"
 }
 
 for e in "$@"; do

@@ -259,3 +259,13 @@ Sur « Oui, prépare-le ». S1 est le M1 du tableau des jalons, renommé comme d
 | A2 | `rpm` : non archivé, très actif, plusieurs auteurs, aucun critère « Risqué » | Haute |
 | A3 | Le critère des 2 employeurs n'est prouvé ni pour l'un ni pour l'autre (fusions surtout par Red Hat), comme pour podman et skopeo | Moyenne |
 | A4 | Dans `pub/rocky/9.8`, `createrepo_c` et `createrepo_c-libs` sont dans AppStream et absents de BaseOS ; `rpm`, `rpm-libs` et `rpm-sign-libs` sont dans BaseOS et absents d'AppStream | Moyenne : de mémoire, jamais relevé ici |
+
+**Corrigé à sec le 12/11/2026 à partir de 16:03:42 UTC, avant tout accord, sur relecture du conseiller.**
+- **Défaut** : `curl -sSL` sans `-f` rendait la page d'une erreur HTTP, et l'étape aurait écrit « aucun fichier ». A4 prédit justement des absences : une erreur l'aurait confirmée à tort. Le code HTTP est maintenant relevé, et une erreur donne `KO … liste non lue`, distinct d'une liste lue et vide. Chaque répertoire n'est plus lu qu'une fois.
+- **Vérifié** : l'absence de verdict pour `rpm` au doc 04 (recherche de `rpm-software-management/rpm`, d'une ligne `rpm` et de « RPM », et dans `tools/health/projects.tsv`, où seul mock figure). La règle du §1 sur les outils de distro ne porte que sur SECURITY.md, pas sur l'absence de verdict.
+- **Banc rejoué** ([journal](resultats/sante-voie2-essai-local.log)) : `releves` reste identique, 71 lignes, comparé à `sante.sh` du parent de ec849eb. Pour `voie2` :
+  - les fichiers sont trouvés sur une liste lue, en HTTP 200 ;
+  - « aucun fichier » est écrit sur une liste vide, en HTTP 200 ;
+  - une 404 donne un KO, et sa page, piégée avec un nom de fichier, n'est pas lue.
+
+  Non simulé : l'échec de curl lui-même (délai, DNS). `bash -n` passe, et shellcheck ne relève aucun avertissement.
