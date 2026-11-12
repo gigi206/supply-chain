@@ -61,3 +61,12 @@ Outils : Syft, reuse, Go ≥ 1.26.7, oras, crane. Aucun accès réseau.
 
 - **Laptop** : tâche Tekton de confiance, prédicat signé par une clé dédiée ; rpm/deb : licences des métadonnées de distro normalisées en SPDX (`fedora-license-data`, DEP-5) et bundle SRPM ou `.dsc` en referrer (briques 05, 06 et 09).
 - **2c** : ORT + ScanCode pour les licences « concluded » et la précision mesurée avec un référent juridique (brique 13b).
+
+## Volet rpm/deb, ouvert le 12/11/2026 (« Oui, ouvre-le », reçu après le `date -u` de 19:34:52 UTC)
+
+Premier pas préparé à sec, **NON LANCÉ** (accord nommé attendu) : étape `deb` de [`paquets.sh`](paquets.sh), sur l'hôte, sans réseau, ni
+cluster, ni Zot, ni VM. Le deb de S3 de la 06 (sha256 épinglé) est lu par [`paquets.py`](paquets.py) sans rien extraire ni exécuter ; son
+copyright DEP-5 devient un SBOM CycloneDX jugé par `licences.py`, avec la même politique ; quatre témoins négatifs doivent être refusés.
+Banc hors réseau : neuf cas au code attendu ([journal](resultats/paquets-essai-local.log)). Protocole, prédictions P1 à P5 et limites :
+[`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Le rpm (après S1 de la 05), le `.dsc` et le SRPM en referrer
+(après S5b) et la tâche signée suivent.

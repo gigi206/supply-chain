@@ -1,0 +1,79 @@
+# banc paquets.sh deb, 2026-11-12T19:41:34Z, paquets.sh a6c9c2729440a27e01c86df31d01a44eb3240ee3b77463da3b54956f333431d5, paquets.py 93f54878582a3db7a3ba46a2ed19945fc9e0baf25648d33e0925197f7f9fa739
+OK   nominal : code 0
+     OK   sha256 du deb épinglé : 9e732af3faf99e00e931279f93be792b12111ea130076fa8b3f58f4e004525c0
+     format : DEP-5 1.0 ; paragraphes : 6
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     Files vendor/github.com/go-chi/chi/v5/* : License « MIT » -> MIT
+     Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND BSD-3-Clause
+     expression du paquet : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+     OK   copyright du deb identique à poc/packaging/debian/copyright (20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2)
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     OK   deb : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-deb.licences.json)
+     OK   t-gpl : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : GPL-3.0-or-later ; deny : GPL-3.0-or-later)
+     OK   t-sans-format : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : NOASSERTION ; NOASSERTION : curation nécessaire)
+     OK   t-sans-license : refusé par l analyse (paragraphe 2 : champ(s) manquant(s) : license)
+     OK   t-expat : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : Expat ; expression invalide : identifiant SPDX inconnu : Expat)
+     bilan : deb jugé conforme, quatre témoins refusés
+OK   gpl : code 1
+     OK   sha256 du deb épinglé : ac8e3affdfa59ca542d1c714f6aa32d2234521e6390fdbbcfd3ce028519ea751
+     format : DEP-5 1.0 ; paragraphes : 2
+     Files * : License « GPL-3.0-or-later » -> GPL-3.0-or-later
+     expression du paquet : GPL-3.0-or-later
+     ÉCART copyright du deb 1c569187ef9877085a9a984af59468dce4665560bfc7b9f6cf7c6a60c5039cd0, poc/packaging/debian/copyright 20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 0
+     KO   deb : verdict non conforme
+     OK   t-gpl : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : GPL-3.0-or-later ; deny : GPL-3.0-or-later)
+     OK   t-sans-format : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : NOASSERTION ; NOASSERTION : curation nécessaire)
+     OK   t-sans-license : refusé par l analyse (paragraphe 2 : champ(s) manquant(s) : license)
+     OK   t-expat : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : Expat ; expression invalide : identifiant SPDX inconnu : Expat)
+     bilan : KO
+OK   lien : code 1
+     OK   sha256 du deb épinglé : 4580d1e89a5c04ad17100e784132a5677a5ba046652bdb61f94b5ac17f2974ce
+     REFUS : ./usr/share/doc/sample-app/copyright : pas un fichier ordinaire (type b'2')
+     KO   paquets.py : code 1
+OK   sans-copyright : code 1
+     OK   sha256 du deb épinglé : b5df38d2bfff7be1cfcf83c3756e6b3713d9cb0d02e22b578c53b252221c8c08
+     REFUS : ./usr/share/doc/sample-app/copyright : 0 entrée(s) dans l'archive, 1 attendue
+     KO   paquets.py : code 1
+OK   zst : code 1
+     OK   sha256 du deb épinglé : 28ff5a1c7c904306d7215ca0bb2dd2584d897b3b82c4f3614afb1e996f382ed0
+     REFUS : membres ar : ['debian-binary', 'control.tar.xz', 'data.tar.zst']
+     KO   paquets.py : code 1
+OK   membre-en-plus : code 1
+     OK   sha256 du deb épinglé : 5b2398192035dc7f99bc2c7d9305de97510954229db4e03ed806f006e99dfbdb
+     REFUS : membres ar : ['debian-binary', 'control.tar.xz', 'data.tar.xz', '_gpgbuilder']
+     KO   paquets.py : code 1
+OK   sha-faux : code 1
+     KO   sha256 du deb : 9e732af3faf99e00e931279f93be792b12111ea130076fa8b3f58f4e004525c0, attendu 0000000000000000000000000000000000000000000000000000000000000000
+OK   temoin-trace : code 1
+     OK   sha256 du deb épinglé : 9e732af3faf99e00e931279f93be792b12111ea130076fa8b3f58f4e004525c0
+     format : DEP-5 1.0 ; paragraphes : 6
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     Files vendor/github.com/go-chi/chi/v5/* : License « MIT » -> MIT
+     Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND BSD-3-Clause
+     expression du paquet : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+     OK   copyright du deb identique à poc/packaging/debian/copyright (20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2)
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     OK   deb : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-deb.licences.json)
+     KO   t-gpl : paquets.py code 1, attendu : politique, « deny : GPL-3.0-or-later »
+     KO   t-sans-format : paquets.py code 1, attendu : politique, « NOASSERTION : curation nécessaire »
+     KO   t-sans-license : paquets.py code 1, attendu : analyse, « champ(s) manquant(s) : license »
+     KO   t-expat : paquets.py code 1, attendu : politique, « identifiant SPDX inconnu : Expat »
+     bilan : KO
+OK   temoin-motif : code 1
+     OK   sha256 du deb épinglé : 9e732af3faf99e00e931279f93be792b12111ea130076fa8b3f58f4e004525c0
+     format : DEP-5 1.0 ; paragraphes : 6
+     Files * : License « Apache-2.0 » -> Apache-2.0
+     Files vendor/github.com/go-chi/chi/v5/* : License « MIT » -> MIT
+     Files web/node_modules/marked/* : License « MIT and BSD-3-Clause » -> MIT AND BSD-3-Clause
+     expression du paquet : Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)
+     OK   copyright du deb identique à poc/packaging/debian/copyright (20c9dd35d41970013b5122c3d4c3f2213561b26a93de3eaa78d37b5e5e2dfbd2)
+     licences.py : code 0 ; liste SPDX 3.27.0 ; erreurs 0, avertissements 0, NOASSERTION 0, invalides 0
+     OK   deb : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-deb.licences.json)
+     OK   t-gpl : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : GPL-3.0-or-later ; deny : GPL-3.0-or-later)
+     OK   t-sans-format : refusé par licences.py (error    pkg:deb/debian/temoin@1.0-1?arch=amd64 : NOASSERTION ; NOASSERTION : curation nécessaire)
+     OK   t-sans-license : refusé par l analyse (paragraphe 2 : champ(s) manquant(s) : license)
+     KO   t-expat : licences.py code 1, attendu : politique, « motif qui n existe pas »
+     licences.py : code 1 ; liste SPDX 3.27.0 ; erreurs 1, avertissements 0, NOASSERTION 0, invalides 1
+     bilan : KO
+chrono.tsv du banc : 10 lignes ; resultats/ de 13a : 0 fichier(s) touchés

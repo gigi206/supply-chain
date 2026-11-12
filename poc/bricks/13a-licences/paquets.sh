@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# Brique 13a, volet rpm/deb : licences déclarées des paquets construits (ouvert le 12/11/2026 sur « Oui, ouvre-le »). Préparé à
+# sec le 12/11/2026, NON LANCÉ. Protocole et prédictions : resultats/paquets-predictions.md.
+#   deb   hôte seul, sans réseau, ni cluster ni Zot ni VM : le deb de S3 de la brique 06 (sha256 épinglé, s3-comparaison.log)
+#         est lu par paquets.py sans rien extraire sur disque ni exécuter ; son copyright (DEP-5) devient un SBOM CycloneDX
+#         jugé par licences.py (politique de 13a, liste SPDX 3.27.0 du nixpkgs épinglé) ; comparaison avec
+#         poc/packaging/debian/copyright ; puis quatre témoins négatifs (copyright synthétiques, écrits par cette étape) qui
+#         doivent être refusés : GPL refusée par la politique, en-tête Format absent (NOASSERTION), paragraphe Files sans
+#         License (refus de l analyse), nom DEP-5 non SPDX (Expat : invalide, jamais traduit). Sortie : prédicat archivé.
+#   Hors de cette étape : rpm (après S1 de la 05), .dsc et SRPM en referrer dans Zot (après S5b, accord à part).
+# Usage : mise exec -- poc/bricks/13a-licences/paquets.sh deb   (journal : resultats/paquets-deb.log)
+set -euo pipefail
+export LC_ALL=C
+here=$(cd "$(dirname "$0")" && pwd)
+repo=$(git -C "$here" rev-parse --show-toplevel)
+R=$here/resultats
+DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb}
+DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # deb des deux builds de S3 (06, s3-comparaison.log)
+SPDX=${SPDX:?liste SPDX (mise exec)}
+T=$HOME/.cache/supply-chain-poc/13a/paquets
+chrono() { printf '%s\t%s\t%s\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${2:-}" >> "$R/chrono.tsv"; }
+
+juger() { # sbom sortie : licences.py ; une ligne de bilan ; code de licences.py
+  local rc=0
+  python3 -I "$here/licences.py" --sbom "$1" --policy "$here/policy.json" --spdx "$SPDX/licenses.json" \
+    --exceptions "$SPDX/exceptions.json" > "$2" || rc=$?
+  python3 -I - "$2" "$rc" <<'EOP'
+import json, sys
+d = json.load(open(sys.argv[1]))
+v = d["violations"]
+print(f"licences.py : code {sys.argv[2]} ; liste SPDX {d['spdxListVersion']} ; erreurs {v['error']}, avertissements {v['warning']}, NOASSERTION {d['noassertion']}, invalides {d['invalid']}")
+for i in d["components"]:
+    print(f"     {i['verdict']:8} {i['purl']} : {i['expression']}" + (" ; " + "; ".join(i["reasons"]) if i["reasons"] else ""))
+EOP
+  return "$rc"
+}
+
+etape_deb() {
+  local ko=0 s rc
+  rm -rf -- "${T:?}" && mkdir -p "$T" && chmod 0700 "$T"
+  echo "politique : $(sha256sum < "$here/policy.json" | cut -c1-64) ; licences.py : $(sha256sum < "$here/licences.py" | cut -c1-64) ; paquets.py : $(sha256sum < "$here/paquets.py" | cut -c1-64)"
+  echo "liste SPDX : $(readlink -f "$SPDX" | sed "s#$HOME#~#")"
+  echo "## deb de S3 de la 06"
+  [ -f "$DEB" ] || { echo "KO   deb absent : $DEB"; exit 1; }
+  s=$(sha256sum < "$DEB" | cut -c1-64)
+  [ "$s" = "$DEB_SHA" ] || { echo "KO   sha256 du deb : $s, attendu $DEB_SHA"; exit 1; }
+  echo "OK   sha256 du deb épinglé : $s"
+  rc=0; python3 -I "$here/paquets.py" deb "$DEB" --sbom "$T/deb.sbom.json" | tee "$T/deb.out" || rc=$?
+  [ "$rc" = 0 ] || { echo "KO   paquets.py : code $rc"; exit 1; }
+  local c d
+  c=$(sed -n 's/^copyright : sha256 \([0-9a-f]*\) .*/\1/p' "$T/deb.out")
+  d=$(sha256sum < "$repo/poc/packaging/debian/copyright" | cut -c1-64)
+  if [ "$c" = "$d" ]; then echo "OK   copyright du deb identique à poc/packaging/debian/copyright ($d)"
+  else echo "ÉCART copyright du deb $c, poc/packaging/debian/copyright $d"; fi
+  echo "## verdict (licences.py)"
+  rc=0; juger "$T/deb.sbom.json" "$R/paquets-deb.licences.json" || rc=$?
+  if [ "$rc" = 0 ] && python3 -I -c 'import json, sys; d = json.load(open(sys.argv[1])); sys.exit(0 if d["violations"]["error"] == 0 and d["noassertion"] == 0 and d["invalid"] == 0 and len(d["components"]) == 1 else 1)' "$R/paquets-deb.licences.json"; then
+    echo "OK   deb : 0 erreur, 0 NOASSERTION, 0 invalide (prédicat : resultats/paquets-deb.licences.json)"
+  else echo "KO   deb : verdict non conforme"; ko=1; fi
+  echo "## témoins négatifs (copyright synthétiques ; chacun doit être refusé)"
+  local en='Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: temoin
+'
+  printf '%s\nFiles: *\nCopyright: 2026 temoin\nLicense: GPL-3.0-or-later\n texte\n' "$en" > "$T/t-gpl"
+  printf 'Upstream-Name: temoin\n\nFiles: *\nCopyright: 2026 temoin\nLicense: MIT\n texte\n' > "$T/t-sans-format"
+  printf '%s\nFiles: *\nCopyright: 2026 temoin\n' "$en" > "$T/t-sans-license"
+  printf '%s\nFiles: *\nCopyright: 2026 temoin\nLicense: Expat\n texte\n' "$en" > "$T/t-expat"
+  # témoin, étage attendu du refus (analyse : paquets.py ; politique : licences.py), motif attendu ; tout autre échec est un KO
+  local t etage motif m
+  while IFS='|' read -r t etage motif; do
+    rc=0; python3 -I "$here/paquets.py" dep5 "$T/$t" --sbom "$T/$t.sbom.json" --purl "pkg:deb/debian/temoin@1.0-1?arch=amd64" > "$T/$t.out" 2>&1 || rc=$?
+    if [ "$rc" != 0 ]; then
+      m=$(awk '/^REFUS : / {sub("^REFUS : ", ""); print; exit}' "$T/$t.out")
+      if [ "$etage" = analyse ] && [ -n "$m" ] && grep -qF -- "$motif" <<< "$m"; then echo "OK   $t : refusé par l analyse ($m)"
+      else echo "KO   $t : paquets.py code $rc, attendu : $etage, « $motif »"; tail -3 "$T/$t.out"; ko=1; fi
+      continue
+    fi
+    rc=0; juger "$T/$t.sbom.json" "$T/$t.lic.json" > "$T/$t.juge" 2>&1 || rc=$?
+    m=$(awk 'NR == 2 {sub("^ +", ""); print}' "$T/$t.juge")
+    if [ "$rc" = 1 ] && [ "$etage" = politique ] && grep -q '^ *error ' <<< "$m" && grep -qF -- "$motif" <<< "$m"; then
+      echo "OK   $t : refusé par licences.py ($m)"
+    else echo "KO   $t : licences.py code $rc, attendu : $etage, « $motif »"; tail -3 "$T/$t.juge"; ko=1; fi
+  done <<'EOT'
+t-gpl|politique|deny : GPL-3.0-or-later
+t-sans-format|politique|NOASSERTION : curation nécessaire
+t-sans-license|analyse|champ(s) manquant(s) : license
+t-expat|politique|identifiant SPDX inconnu : Expat
+EOT
+  rm -rf -- "${T:?}"
+  [ "$ko" = 0 ] && echo "bilan : deb jugé conforme, quatre témoins refusés" || { echo "bilan : KO"; exit 1; }
+}
+
+[ $# -gt 0 ] || { echo "usage : $0 deb" >&2; exit 2; }
+for e in "$@"; do declare -F "etape_$e" >/dev/null || { echo "étape inconnue : $e" >&2; exit 2; }; done
+for e in "$@"; do
+  chrono "13a paquets $e"
+  { echo "# ${0##*/} $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e"; } 2>&1 | sed -u "s#$HOME#~#g" | tee "$R/paquets-$e.log"
+  chrono "13a paquets $e fait"
+done
