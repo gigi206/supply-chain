@@ -714,13 +714,13 @@ hors_zot() { # trace strace (connect) : connexions vers autre chose que Zot, com
 connexions() { # libellé trace : ligne OK/KO du contrôle des connexions d'une commande cosign
   local h; h=$(hors_zot "$2")
   [ -z "$h" ] && echo "OK   $1 : aucune connexion hors de Zot ($(grep -cE '^[0-9]+ +connect\(' "$2" || true) connect())" \
-    || echo "KO   $1 : connexions hors de Zot : $h"
+    || { echo "KO   $1 : connexions hors de Zot : $h"; ko=1; }   # ko : drapeau local de l'étape appelante
 }
 
 anon() { curl -fsS --cacert "$CA" "$@"; }   # lecture anonyme de Zot
 
 etape_pousser_vsa() { # SUR L'HÔTE, compte poc-replay (D5), ACCORD DU PROPRIÉTAIRE À CHAQUE PUSH (modèle : etape_pousser_vsa de la 10)
-  local x=${T:?}/pousser s m a rc=0 ra ta
+  local x=${T:?}/pousser s m a rc=0 ra ta ko=0
   [ -s "$R/s6b-vsa.bundle.json" ] && [ -s "$R/s6b-vsa-enonce.json" ] || { echo "REFUS : bundle ou énoncé de la VSA absent de resultats/ (étape vsa d'abord)"; exit 1; }
   cmp -s "$CA" "$HOME/.cache/supply-chain-poc/08/pki/ca-poc.crt" \
     || { echo "REFUS : la copie de la CA du PoC ($CA) diffère de celle de la 08 (recréée par S5b ?)"; exit 1; }   # certificats publics, non affichés
@@ -770,10 +770,12 @@ EOP
   echo "referrers du deb dans $DEPOT_VSA : $(anon "https://$ZOT/v2/$DEPOT_VSA/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print([(m.get("artifactType"), m["digest"]) for m in json.load(sys.stdin)["manifests"]])')"
   echo "étiquettes de $DEPOT_VSA : $(curl -s --cacert "$CA" "https://$ZOT/v2/$DEPOT_VSA/tags/list")"
   [ "$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/referrers/$DEB_DIGEST" | python3 -I -c 'import json,sys; print(len(json.load(sys.stdin)["manifests"]))')" = "$ra" ] \
-    && echo "OK   referrers du deb dans ${DEB_SUJET%@*} inchangés ($ra)" || echo "KO   referrers du deb dans ${DEB_SUJET%@*} changés"
+    && echo "OK   referrers du deb dans ${DEB_SUJET%@*} inchangés ($ra)" || { echo "KO   referrers du deb dans ${DEB_SUJET%@*} changés"; ko=1; }
   [ "$(anon "https://$ZOT/v2/${DEB_SUJET%@*}/tags/list")" = "$ta" ] \
-    && echo "OK   étiquettes de ${DEB_SUJET%@*} inchangées" || echo "KO   étiquettes de ${DEB_SUJET%@*} changées"
+    && echo "OK   étiquettes de ${DEB_SUJET%@*} inchangées" || { echo "KO   étiquettes de ${DEB_SUJET%@*} changées"; ko=1; }
   echo "manifeste poussé : $m (copie : resultats/s6b-vsa-manifeste.json)"
+  # code 1 sur tout KO, connexions comprises (corrigé avant tout lancement, après 9521f0c)
+  [ $ko = 0 ] && echo "bilan : tout OK" || { echo "bilan : au moins un KO"; exit 1; }
 }
 
 etape_lire_vsa() { # lecture anonyme, cosign sous strace (connect) ; clés croisées et témoins (modèle : etape_lire_vsa de la 10)

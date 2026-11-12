@@ -43,3 +43,7 @@ Confiance moyenne pour L1 à L4 : la 10 a fait ces lectures sur une image, jamai
 
 - **`inputAttestations` désignera un bundle horodaté effacé par S5b** (`horodatage/bundles@sha256:856a4270…`). La politique le dit déjà, section « Limites ». La VSA reste vérifiable par sa clé ; la provenance qu'elle juge, elle, ne sera plus dans Zot.
 - **La porte sur le deb n'est pas préparée ici.** Elle vient après S5b, avec le CronJob de scan du deb.
+
+## Note datée du 12/11/2026 (rédigée entre le commit 9521f0c, 12:02:59 UTC, et 12:04:45 UTC, après relecture du conseiller), avant tout lancement
+
+**Codes de sortie corrigés après `9521f0c`.** Un `KO` de `connexions`, ou des referrers ou étiquettes de `builds/sample-app-deb` changés après le push, laissaient le code à 0. `connexions` lève maintenant le drapeau `ko` de l'étape qui l'appelle, et `pousser_vsa` finit, comme `lire_vsa`, par une ligne `bilan` et le code 1 sur tout `KO`. Prédiction ajoutée : **P6.** `bilan : tout OK`, code 0 ; de même pour `lire_vsa`.
