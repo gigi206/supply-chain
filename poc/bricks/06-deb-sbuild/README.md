@@ -1974,3 +1974,15 @@ Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédic
 **Additif du 12/11/2026, 21:20 UTC : `vsa`, VSA du deb signée par la clé du domaine.** Lancée à 21:20:08 UTC (« Oui, lance vsa » à « Je lance vsa ? »), code 0 ([journal](resultats/s6b-vsa.log), [résultats](resultats/s6b-vsa-predictions.md)).
 - Énoncé `POC_REPLAY_BIT_IDENTIQUE` seul, `timeVerified` `2026-11-12T21:06:14Z`, politique au commit `97ae561` ; signé dans la VM, sous `unshare -rn`, sans tlog ni horodatage ; [énoncé](resultats/s6b-vsa-enonce.json) et bundle archivés. **Rien n'est poussé dans Zot.**
 - **Reste** : S5b le 13/11, sur accord ; puis `pousser_vsa` et `lire_vsa`, chacun sur accord.
+
+**Note du 13/11/2026 (2026-11-13T13:57:31Z) : règle des 2× avant la reprise du bloc 06** (estimation de la 06 : 2 pw, décision à 4 pw ; rien lancé).
+- Consommé haut de la 06 : 0,639 pw au 13/11 à 08:50:45 UTC (recompte hors dépôt du matin, `cascade_calc.py`) ; le rejeu S5b
+  d'aujourd'hui est compté à la 08.
+- Reprise du bloc 06 (entrées de `$W` effacées par `vm.sh detruire` au lancement de S5b, README de la 08) : S1, S2, S3, puis le
+  bloc 06 du rejeu (S1 amorce, S4c, S4a, S4b, S4d, S4d3). Enveloppe des lanceurs au premier passage de ces étapes, lue dans
+  `resultats/chrono.tsv` : **7:36:59, soit 0,190 pw** (S4a de 23:02:39 à 23:37:24 UTC le 10/11 ; les autres comme au recompte du
+  matin) ; mesure de lanceurs, pas de temps de personne.
+- Projection (estimation) : 0,639 + reprise (0,190 à 0,639) + cascade 1.0.0-2 (0,25 à 0,639) + lintian (0,05 à 0,1) =
+  **1,13 à 2,02 pw**. La borne haute (hypothèse : chaque passage coûte autant que tout le premier) dépasse l'estimation de 2 pw
+  sans atteindre le seuil de 4 pw : **aucune décision due**, dépassement possible de l'estimation signalé. Non compté : la
+  construction de `outils-prefetch` dans la chaîne (option E, brique 03), qui s'ajouterait à la reprise.
