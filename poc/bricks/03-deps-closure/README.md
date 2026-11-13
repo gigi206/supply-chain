@@ -515,3 +515,13 @@ Nix et j'instruis l'option Debian par un banc ? »).
 - **Prédiction R1**, pour le prochain F2 avec le `nix_chemin` corrigé : trois liens dans `03/f2/racines/` (python313, gitMinimal,
   cacert) vers `vm6nxpp9`, `2bjyma6x` et `mks1hnym` ; « clôture nix : 45 chemins », empreinte 66de99598aa176a1 ; image
   `68e0ae70`. Confiance haute (chemins mesurés à l'essai à sec).
+
+**Note du 13/11/2026 (2026-11-13T13:23:45Z) : relevé de santé de Nix lancé** (« Oui, lance-le » à « Je lance sante-nix.sh releves cache
+(lectures publiques) ? »), 13:21:51 à 13:22:29 UTC, code 0 : [relevés](resultats/sante-nix-releves.log),
+[confiance de l'hôte](resultats/sante-nix-cache.log) ; avis d'octobre de Nix face à l'hôte relus à 13:23:00 UTC
+([avis](resultats/sante-nix-avis.log)). Verdicts portés au doc 04 : Nix, nixpkgs et Hydra **« À surveiller, chemin critique »**.
+**Plan de sortie de Nix** au doc 04 (§6) : contenu Debian construit par la chaîne (option E), à mesurer par un banc.
+**Constat de sécurité** : la Nix de l'hôte (2.34.5, nix-daemon actif) est dans la plage vulnérable des cinq avis du 13/10/2026,
+dont CVE-2026-110450 (high : un client non privilégié du démon peut corrompre des chemins du store), corrigés en 2.34.9 ou 2.35.3 ;
+mise à jour = installation système, sur accord du propriétaire. Portée pour F2 : la clôture de l'image a été comparée ce jour au
+cache (9 chemins compilés ici égaux à Hydra, 36 signés) et l'image est égale à celle du 06/11.

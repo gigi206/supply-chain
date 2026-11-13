@@ -1,0 +1,18 @@
+# sante-nix.sh cache, 2026-11-13T13:22:28Z
+## configuration de Nix sur l'hôte (clés publiques et réglages, aucun secret)
+nix (Nix) 2.34.5
+require-sigs = true
+substituters = https://cache.nixos.org/
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+trusted-substituters = 
+## cache.nixos.org
+  StoreDir: /nix/store
+  WantMassQuery: 1
+  Priority: 40
+## verrou du flake du banc B
+type tarball, url https://releases.nixos.org/nixos/25.11/nixos-25.11.12484.b6018f87da91/nixexprs.tar.xz, narHash sha256-IWpaImuKa1YVOmnuPyyzbG6/Q6ZgKaOsP4sXmfTbkdQ=
+dernier commit de poc/benchmarks/nix : 0d896df 2026-10-29
+## canal publié (https://releases.nixos.org/nixos/25.11/nixos-25.11.12484.b6018f87da91)
+nixexprs.tar.xz.sha256 : HTTP 404 ; 404
+signature détachée cherchée (nixexprs.tar.xz.asc, .sig) : asc HTTP 404 ; sig HTTP 404 ; 
+git-revision : b6018f87da91d19d0ab4cf979885689b469cdd41

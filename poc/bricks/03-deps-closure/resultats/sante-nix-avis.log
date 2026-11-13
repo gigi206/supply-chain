@@ -1,0 +1,7 @@
+# avis de NixOS/nix d'octobre 2026 face à la Nix de l'hôte, 2026-11-13T13:23:00Z (gh api repos/NixOS/nix/security-advisories/<id>, lecture publique)
+GHSA-jwvx-xq5j-gc56 high CVE-2026-110450 2026-10-13 : nix-daemon: Unprivileged clients can corrupt store paths via repair flag in AddToStoreNar/AddMultipleToStore ; vulnérables : > 2.1, <2.35.3, <2.34.9, <2.31.6, <2.30.6, <2.28.8 ; corrigées : 2.35.3, 2.34.9, 2.31.6, 2.30.6, 2.28.8
+GHSA-hf6w-2rg9-v84g medium CVE-2026-110452 2026-10-13 : Bad store ownership in multi-user scripted installer ; vulnérables : >= 2.4, <2.35.3, <2.34.9, <2.31.6, <2.30.6, <2.28.8 ; corrigées : 2.35.3, 2.34.9, 2.31.6, 2.30.6, 2.28.8
+GHSA-92x5-h528-wrmw low CVE-2026-110453 2026-10-13 : Connections from build users group are not rejected by the daemon when using LOCAL_PEERCRED ; vulnérables : <2.35.3, <2.34.9, <2.31.6, <2.30.6, <2.28.8 ; corrigées : 2.35.3, 2.34.9, 2.31.6, 2.30.6, 2.28.8
+GHSA-25vp-6h23-hj3g medium CVE-2026-110449 2026-10-13 : libexpr `builtins.genList` overflow in list size calculation ; vulnérables : <2.35.3, <2.34.9, <2.31.6, <2.30.6, <2.28.8 ; corrigées : 2.35.3, 2.34.9, 2.31.6, 2.30.6, 2.28.8
+GHSA-m4vq-qf6v-82pj medium CVE-2026-110451 2026-10-13 : macOS seatbelt sandbox bypass via missing optional host dependencies ; vulnérables : < 2.35.3 ; corrigées : 2.35.3, 2.34.9, 2.31.6, 2.30.6, 2.28.8
+Nix de l'hôte : nix (Nix) 2.34.5 ; nix-daemon : active

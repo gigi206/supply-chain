@@ -1,0 +1,83 @@
+# sante-nix.sh releves, 2026-11-13T13:21:51Z
+Relevé du 2026-11-13 via https://api.securityscorecards.dev
+
+| Projet | Dépôt | Domaine | Chemin critique | Score | Date du relevé | Maintained | Signed-Releases | Code-Review | Vulnerabilities |
+|---|---|---|---|---|---|---|---|---|---|
+| Nix | NixOS/nix | construction | oui | 6.5 | 2026-11-09 | 10 | -1 | 10 | ? |
+| nixpkgs | NixOS/nixpkgs | construction | oui | 4 | 2026-11-09 | 10 | -1 | 1 | ? |
+| Hydra | NixOS/hydra | construction | oui | 6.8 | 2026-11-09 | 10 | -1 | 4 | ? |
+## NixOS/nix
+nom final NixOS/nix, archivé false, licence LGPL-2.1, dernier push 2026-11-13
+dernière release GitHub : aucune
+derniers tags : 2.35.6, 2.35.5, 2.35.4, 2.35.3, 2.35.2
+commits depuis 2026-08-15T00:00:00Z : 676
+auteurs humains les plus actifs (compte, domaine de l'adresse), sur ces commits :
+      343 xokdvium	zimmerman.foo
+       54 Ericson2314	JohnEricson.me
+       46 Ericson2314	Obsidian.Systems
+       31 edolstra	gmail.com
+       15 roberth	roberthensing.nl
+       14 Mic92	users.noreply.github.com
+       11 booxter	gmail.com
+       11 amaanq	amaanq.com
+       10 philiptaron	gmail.com
+       10 awsmadi	amazon.com
+auteurs humains distincts sur ces commits : 51
+fusionneurs des 100 dernières PR : Ericson2314 16, Mic92 6, app/internal-nix-ci 16, edolstra 5, philiptaron 1, roberth 1, xokdvium 55
+SECURITY.md : absent
+avis publiés (GitHub) : 16 ; depuis 2025-11-13 : 10
+  GHSA-m4vq-qf6v-82pj 2026-10-13 medium macOS seatbelt sandbox bypass via missing optional host dependencies
+  GHSA-hf6w-2rg9-v84g 2026-10-13 medium Bad store ownership in multi-user scripted installer
+  GHSA-92x5-h528-wrmw 2026-10-13 low Connections from build users group are not rejected by the daemon when using LOCAL_PEERCRED
+  GHSA-jwvx-xq5j-gc56 2026-10-13 high nix-daemon: Unprivileged clients can corrupt store paths via repair flag in AddToStoreNar/AddMultipleToStore
+  GHSA-25vp-6h23-hj3g 2026-10-13 medium libexpr `builtins.genList` overflow in list size calculation
+## NixOS/nixpkgs
+nom final NixOS/nixpkgs, archivé false, licence MIT, dernier push 2026-11-13
+dernière release GitHub : aucune
+derniers tags : v208, v206, v192, release-16.03-start, last-glibc-2.13
+commits depuis 2026-08-15T00:00:00Z : au moins 1000 (plafond de 10 pages atteint)
+auteurs humains les plus actifs (compte, domaine de l'adresse), sur ces commits :
+      182 SuperSandro2000	gmail.com
+      139 r-ryantm	ryantm.com
+       71 fabaff	fabian-affolter.ch
+       48 pbsds	hotmail.com
+       48 keenanweaver	protonmail.com
+       47 mdaniels5757	gmail.com
+       39 NickCao	nichi.co
+       29 GaetanLepage	glepage.com
+       18 iedame	ieda.me
+       17 guylamar2006	outlook.com
+auteurs humains distincts sur ces commits : 137
+fusionneurs des 100 dernières PR : GaetanLepage 5, K900 1, Mic92 1, NickCao 5, RossComputerGuy 1, RossSmyth 2, SuperSandro2000 2, adamcstephens 1, app/nixpkgs-ci 33, bachp 2, diogotcorreia 2, doronbehar 1, emilylange 2, fabaff 7, happysalada 3, herbetom 3, jopejoe1 6, keenanweaver 1, kirillrdy 1, matthiasbeyer 1, mdaniels5757 7, mweinelt 1, numinit 1, pbsds 3, vcunat 1, zowoq 7
+SECURITY.md : absent
+avis publiés (GitHub) : 10 ; depuis 2025-11-13 : 9
+  GHSA-w5j5-2jpq-3cv3 2026-11-06 medium QEMU-based `darwin.linux-builder` exposes its SSH port on all host IPv4 interfaces
+  GHSA-45qr-47fw-2p57 2026-11-06 high `darwin.linux-builder(-vz)` copies its SSH client private key into the world-readable Nix store
+  GHSA-p7v3-pr2c-8584 2026-10-13 high `makeBinaryWrapper`: empty PATH segments enable current-directory hijacking
+  GHSA-6qxx-6rg8-c4p8 2026-06-24 medium `services.mysql` is configured with insecure authentication by default when used with `mysql` or `percona-server`
+[ligne masquée : motif jeton|token]
+## NixOS/hydra
+nom final NixOS/hydra, archivé false, licence GPL-3.0, dernier push 2026-11-10
+dernière release GitHub : aucune
+derniers tags : 
+commits depuis 2026-08-15T00:00:00Z : 374
+auteurs humains les plus actifs (compte, domaine de l'adresse), sur ces commits :
+       83 Conni2461	outlook.de
+       54 Conni2461	helsinki-systems.de
+       49 Ericson2314	Obsidian.Systems
+       40 Ericson2314	JohnEricson.me
+       17 dasJ	users.noreply.github.com
+       16 dasJ	hess.ooo
+       15 Mic92	users.noreply.github.com
+        7 KJTsanaktsidis	kjtsanaktsidis.id.au
+        6 Mic92	thalheim.io
+        6 LeSuisse	gerbet.me
+auteurs humains distincts sur ces commits : 24
+fusionneurs des 100 dernières PR : Conni2461 75, Ericson2314 10, Mic92 12, dasJ 3
+SECURITY.md : absent
+avis publiés (GitHub) : 7 ; depuis 2025-11-13 : 2
+  GHSA-29gh-79jf-g8rh 2026-11-03 medium Stored XSS via the homepage links of projects/packages
+  GHSA-rqvm-hhh5-vrx7 2026-11-03 high Path traversal in `/log` endpoint: arbitrary file read under `$HYDRA_DATA`
+  GHSA-qpq3-646c-vgx9 2025-08-12 medium Missing authentication when triggering evaluations through GitHub and Gitea plugins
+  GHSA-7qwg-q53v-vh99 2025-08-12 high Persistent XSS in build metrics
+  GHSA-j7w7-965w-vjxw 2025-04-15 low No restricted eval after nix-eval-jobs migration
