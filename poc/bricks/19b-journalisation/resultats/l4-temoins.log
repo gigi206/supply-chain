@@ -1,13 +1,13 @@
-# journalisation.sh temoins, 2026-11-06T15:32:33Z
+# journalisation.sh temoins, 2026-11-13T12:38:40Z
 OK   contre-épreuve : marqueur jamais émis absent
-OK   J1 journal de sc-confiance : t4-journal-sc-confiance-1793979275554245478 lu par l'auditeur dans Grafana en 4 s
-OK   J1 journal de sc-build : t4-journal-sc-build-1793979279986399694 lu par l'auditeur dans Grafana en 4 s
-OK   J1 journal de sc-stockage : t4-journal-sc-stockage-1793979284297354006 lu par l'auditeur dans Grafana en 2 s
-OK   J2 pods de sc-confiance (openbao-0) : t4-pods-confiance-1793979286627788631 lu par l'auditeur dans Grafana en 2 s
-OK   J2 pods de sc-build (cilium-hfp4b) : t4-pods-build-1793979288929493208 lu par l'auditeur dans Grafana en 2 s
-OK   J3 audit de l'API : t4-audit-k8s-1793979291071183787 lu par l'auditeur dans Grafana en 2 s
-OK   J4 événements : t4-evenement-1793979293401911904 lu par l'auditeur dans Grafana en 2 s
-OK   J5 audit d'OpenBao (sortie du pod) : t4-openbao-1793979295542930987 lu par l'auditeur dans Grafana en 2 s
-OK   J6 audit de Zot (poc-ecriture, essais-19b/temoin) : t4-zot-1793979297780985698 lu par l'auditeur dans Grafana en 2 s
+OK   J1 journal de sc-confiance : t4-journal-sc-confiance-1794573642791820010 lu par l'auditeur dans Grafana en 4 s
+OK   J1 journal de sc-build : t4-journal-sc-build-1794573647202278760 lu par l'auditeur dans Grafana en 4 s
+OK   J1 journal de sc-stockage : t4-journal-sc-stockage-1794573651506833639 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-confiance (openbao-0) : t4-pods-confiance-1794573653815072173 lu par l'auditeur dans Grafana en 2 s
+OK   J2 pods de sc-build (cilium-jbq2t) : t4-pods-build-1794573656038493618 lu par l'auditeur dans Grafana en 4 s
+OK   J3 audit de l'API : t4-audit-k8s-1794573660204378088 lu par l'auditeur dans Grafana en 2 s
+OK   J4 événements : t4-evenement-1794573662723694964 lu par l'auditeur dans Grafana en 2 s
+OK   J5 audit d'OpenBao (sortie du pod) : t4-openbao-1794573664882169902 lu par l'auditeur dans Grafana en 2 s
+OK   J6 audit de Zot (poc-ecriture, essais-19b/temoin) : t4-zot-1794573667125090614 lu par l'auditeur dans Grafana en 2 s
 récepteur : HTTP 200
-OK   J8 récepteur d'alertes : t4-recepteur-1793979301577823812 lu par l'auditeur dans Grafana en 2 s
+OK   J8 récepteur d'alertes : t4-recepteur-1794573670933338392 lu par l'auditeur dans Grafana en 2 s

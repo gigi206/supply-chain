@@ -1,4 +1,4 @@
-# journalisation.sh evenements, 2026-11-06T15:30:55Z
+# journalisation.sh evenements, 2026-11-13T12:36:58Z
 serviceaccount/alloy-evenements serverside-applied
 secret/alloy-evenements-jeton serverside-applied
 clusterrole.rbac.authorization.k8s.io/lecture-evenements serverside-applied

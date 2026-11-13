@@ -1,24 +1,24 @@
-# plateforme.sh g1_essai, 2026-11-06T15:35:48Z
+# plateforme.sh g1_essai, 2026-11-13T12:42:06Z
 premier run : code 0 ; success 0
 ## journal du premier run
 Starting base-grype.service - Archivage de la base Grype du jour (brique 07a)...
-192.168.161.13:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd
+192.168.161.13:5000/vulndb/grype@sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec
 base-grype.service: Deactivated successfully.
 Finished base-grype.service - Archivage de la base Grype du jour (brique 07a).
-base-grype.service: Consumed 1.419s CPU time, 208.4M memory peak.
-vulndb/grype:2026-11-06 -> sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd (lecture anonyme)
+base-grype.service: Consumed 1.399s CPU time, 207.8M memory peak.
+vulndb/grype:2026-11-13 -> sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec (lecture anonyme)
 OK   artifactType : application/vnd.supply-chain.grype-db.v6
-OK   empreinte annoncée (annotation) : sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23
-OK   date de construction (annotation) : 2026-11-06T06:21:59Z
-OK   couche de l'archive = empreinte annoncée : sha256:fdc0c98e98e2c0599ae2909148a1d9002de603347726c09119a5c2458b178c23
+OK   empreinte annoncée (annotation) : sha256:7776d82a5be335571ee9aa77093375659ceaae3fe324b9ed4ba2ba94abbaa36e
+OK   date de construction (annotation) : 2026-11-13T06:20:21Z
+OK   couche de l'archive = empreinte annoncée : sha256:7776d82a5be335571ee9aa77093375659ceaae3fe324b9ed4ba2ba94abbaa36e
 OK   second run (code) : 0
 OK   second run : base déjà archivée : 1
 ## contre-épreuve : archive tronquée dans le répertoire de travail (sans identifiants)
-empreinte invalide : vulnerability-db_v6.1.10_2026-11-05T00:22:43Z_1793946119.tar.zst
+empreinte invalide : vulnerability-db_v6.1.10_2026-11-13T00:21:35Z_1794550821.tar.zst
 OK   archive tronquée refusée (code 1)
-OK   tags de vulndb/grype après la contre-épreuve : 2026-11-06
+OK   tags de vulndb/grype après la contre-épreuve : 2026-11-13
 OK   mot de passe de poc-vulndb absent du journal de l'unité
 Created symlink '/etc/systemd/system/timers.target.wants/base-grype.timer' -> '/etc/systemd/system/base-grype.timer'.
 NEXT                        LEFT LAST PASSED UNIT             ACTIVATES
-Sat 2026-11-07 08:06:43 UTC  16h -         - base-grype.timer base-grype.service
-# fin 2026-11-06T15:36:20Z, code 0
+Sat 2026-11-14 08:04:11 UTC  19h -         - base-grype.timer base-grype.service
+# fin 2026-11-13T12:42:26Z, code 0

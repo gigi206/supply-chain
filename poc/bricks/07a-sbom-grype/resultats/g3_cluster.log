@@ -1,4 +1,4 @@
-# plateforme.sh g3_cluster, 2026-11-06T15:36:34Z
+# plateforme.sh g3_cluster, 2026-11-13T12:42:41Z
 ## espace scan (politique/scan.yaml)
 namespace/scan serverside-applied
 serviceaccount/scanner serverside-applied
@@ -14,11 +14,11 @@ networkpolicy.networking.k8s.io/openbao serverside-applied
 {"kubernetes.io/metadata.name":"horodatage"} 
 {"kubernetes.io/metadata.name":"scan"} {"app":"scan"}
 OK   entrée de l'espace scan, pods app=scan seulement : scan
-OK   openbao-0 ni recréé ni redémarré (uid, redémarrages) : a0002f24-4034-4213-8c29-743d24ec7882 0
+OK   openbao-0 ni recréé ni redémarré (uid, redémarrages) : 131b622c-6be5-4826-9147-1c329f228236 0
 OK   OpenBao descellé : false
 ## règle zone-confiance de Kyverno (document de 08-trust-plane/politique/admission.yaml seul, appliqué comme charger de politique.sh)
 validatingpolicy.policies.kyverno.io/zone-confiance unchanged
 OK   scan dans les espaces de zone-confiance : true
 OK   pod de scan sans nodeSelector refusé par zone-confiance (1 essai(s))
 OK   contre-épreuve : même pod avec nodeSelector zone=confiance : pod/sonde-zone created (server dry run)
-# fin 2026-11-06T15:36:35Z, code 0
+# fin 2026-11-13T12:42:42Z, code 0

@@ -1,7 +1,7 @@
-# kata.sh temoin, 2026-11-10T11:25:08Z
+# kata.sh temoin, 2026-11-13T12:53:43Z
 OK   runtime kata chargé par containerd sur sc-build
 exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape exemption)
-### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 5 s après la création
+### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 4 s après la création
      noyau : 6.18.56
      vCPU : 1
      MemTotal:         196852 kB

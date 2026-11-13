@@ -1,6 +1,6 @@
-# plateforme.sh g6_temoins, 2026-11-06T15:47:06Z
+# plateforme.sh g6_temoins, 2026-11-13T12:48:42Z
 15 cas, 16 publications
-# preuves.sh temoins_scan, 2026-11-06T15:48:19Z
+# preuves.sh temoins_scan, 2026-11-13T12:49:55Z
 ConfigMap porte-temoin : copie de porte, clé publique jetable à la place de celle du scanner
 VERDICT|g6-propre|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/essai-scan
 OK   propre (porte-temoin) : ok, 1 énoncé(s)
@@ -34,7 +34,7 @@ VERDICT|g6-illisible|false|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.te
 OK   illisible (porte-temoin) : ok, 1 énoncé(s)
 ConfigMap porte-temoin retirée
 ## témoin : image réelle, ConfigMap porte
-VERDICT|g6-reelle|true||trusted_task.tagged|61|ok|6/6 enveloppe(s) couverte(s), 37 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+VERDICT|g6-reelle|true||trusted_task.tagged|1|ok|6/6 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
 OK   image réelle admise par les trois contrôles
 ## bilan : 0 écart(s) aux prédictions
-# fin 2026-11-06T15:58:46Z, code 0
+# fin 2026-11-13T12:51:43Z, code 0

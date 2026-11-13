@@ -1,33 +1,35 @@
-# plateforme.sh g4_verifier, 2026-11-06T15:39:07Z
+# plateforme.sh g4_verifier, 2026-11-13T12:45:17Z
 ## referrers de l'image dans builds/scan/sample-app, en lecture anonyme
-{"digest":"sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-06T15:39:00Z"}}
-OK   empreinte du manifeste : sha256:a66605b72d27984704dd2bfcf3e305a72a82cc22d2e8401840b910ae2408d2de
+{"digest":"sha256:9e2c8cf4d020f77ecaafa67cb18f78d5ada38a49d7ecb67ce81c626457ca10ce","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","annotations":{"dev.sigstore.bundle.content":"dsse-envelope","dev.sigstore.bundle.predicateType":"https://supply-chain.example/scan/v1","org.opencontainers.image.created":"2026-11-13T12:45:07Z"}}
+OK   empreinte du manifeste : sha256:9e2c8cf4d020f77ecaafa67cb18f78d5ada38a49d7ecb67ce81c626457ca10ce
 OK   sujet du manifeste : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
-OK   empreinte du bundle : sha256:02f71270253f532e23f6447b82ab8c60d2a6cbe0add6c1d7f00b58b4a4402292
+OK   empreinte du bundle : sha256:af3b5c4ddf602b9336464b971766e307870980088a4a1fb92d3414994185d75a
 ## bundle vérifié sur l'hôte
 OK   bundle vérifié : clé du scanner, sujet sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, prédicat https://supply-chain.example/scan/v1 (Verified OK)
 OK   contre-épreuve, autre digest refusé : provided artifact digest does not match any digest in statement
 OK   contre-épreuve, autre prédicat refusé : invalid predicate type
 OK   contre-épreuve, clé de Chains refusée : failed to verify signature: could not verify envelope: accepted signatures do not match threshold, Found: 0, E
 ## prédicat signé
-{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-06T06:21:59Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-06T15:38:55.193068299Z","malveillants":[]}
+{"sujet":[{"name":"sample-app","digest":{"sha256":"3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"}}],"predicat":"https://supply-chain.example/scan/v1","scanner":{"db":{"built":"2026-11-13T06:20:21Z","ref":"sc-stockage.poc.test:5000/vulndb/grype@sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec","schema":"v6.1.10"},"id":"grype","version":"0.104.1"},"scannedAt":"2026-11-13T12:45:02.197941275Z","malveillants":[]}
   GHSA-3fxj-6jh8-hvhx Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GHSA-j6qf-3m9c-vwj3 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GHSA-mqqf-5wvp-8fh8 Medium kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GO-2026-5775 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
   GO-2026-5777 Unknown kev=false pkg:golang/github.com/go-chi/chi@v5.2.3#v5
+  GO-2026-6859 Unknown kev=false pkg:golang/stdlib@1.26.10
 OK   sujet de l'énoncé : 3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
 OK   scanner : grype 0.104.1
 OK   base citée par digest : sc-stockage.poc.test:5000/vulndb/grype
 OK   KEV : 0
 OK   paquets malveillants : 0
-vulnérabilités : 5
+vulnérabilités : 6
 ## aucun Secret dans l'espace scan
 OK   Secrets de l'espace scan : 0
 ## audit d'OpenBao depuis le début du job
 {"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
 {"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
 {"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null} ×2
+{"chemin":"auth/token/renew-self","op":"update","role":"tsa","politiques":["tsa-signature"],"erreur":null}
 {"chemin":"auth/jwt/login","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
 {"chemin":"kv/scan/zot","op":"read","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
 {"chemin":"auth/token/revoke-self","op":"update","role":"scan-zot","politiques":["scan-zot"],"erreur":null}
@@ -35,4 +37,4 @@ OK   Secrets de l'espace scan : 0
 {"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"auth/token/revoke-self","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
-# fin 2026-11-06T15:39:07Z, code 0
+# fin 2026-11-13T12:45:17Z, code 0

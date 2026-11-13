@@ -131,3 +131,19 @@ Code 1 à 12:22:01 UTC ([journal](rejeu-s5b-plateforme-j8.log)).
 | # | Prédiction | Confiance |
 |---|---|---|
 | E6 | Avec le correctif `(.timestamp // .ts)`, « J8 (contrôleurs) » rend 0 refus pour Chains et une ligne « CONSTAT  écarté, kube-apiserver démarrant : 2026-11-13T09:40:32.442Z cannot watch resource "pipelineruns" … » | Haute : ligne et démarrage relevés à 12:29:29 UTC, filtre essayé à sec |
+
+## Note du 13/11/2026 (2026-11-13T12:59:26Z) : plateforme rebâtie jusqu'à « J8 (résolveurs) » (rien n'est réécrit)
+
+Code 0 à 12:58:19 UTC ([journal](rejeu-s5b-plateforme-ctl.log)), 441 OK, 0 KO.
+- **E6 tenue** : « CONSTAT  écarté, kube-apiserver démarrant : 2026-11-13T09:40:32.442Z cannot watch resource "pipelineruns"
+  … at the cluster scope », puis « tekton-chains-controller : refus des droits dans le journal : 0 ».
+- **E1 tenue** dans ce passage (« arrêt après J8 (résolveurs) (JUSQUA) », code 0) ; non tenue aux trois passages précédents.
+- **A1 tenue** : toutes les étapes à `kubectl exec` ou `kubectl logs` de la journée sont passées, sauf les deux KO d'instruments
+  corrigés. **A2 non tenue** sur l'ensemble (quatre arrêts, voir les notes précédentes). **A3 tenue** (note de F2).
+  **A4 tenue** (note de la reprise à J8). **A5 tenue** : contrôles 6 et 7 passés avec la VSA re-poussée.
+- **B2** : pare-feu d'hôte actif (mode audit coupé), SSH des trois VM et Zot joignables ; test 6 avec `T6_FERMES` non rejoué
+  après H4 : partiellement jugée. **B3 tenue** (chemins `kv/` identiques à la source, `zot-chains` absent). **B6 tenue**
+  (témoin « patched »). **B7 tenue** (NotIn `["prefetch-gomod","prefetch-deb"]`). **B8 tenue** (4 lecteurs de Secrets, sans
+  `cilium-operator`). **B1, B4, B5** : étapes passées sans KO, mais le 429, les 13 correctifs et les 4 règles en `Deny` ne sont
+  pas relevés dans le journal par cette note : non jugées.
+- C1 à C9, D1 à D3 : non jugées (bloc 06, `fuites` et CIS non lancés).

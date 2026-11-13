@@ -1,5 +1,5 @@
-# fuites.sh synchro-s3, 2026-11-06T15:28:27Z
-## sc-confiance : 136411 lignes de journaux
+# fuites.sh synchro-s3, 2026-11-13T12:34:26Z
+## sc-confiance : 184094 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key
@@ -46,7 +46,7 @@ témoin retrouvé (1)
 0    zot-poc-scan.password
 0    zot-poc-vulndb.password
 0    zot.key
-## sc-build : 34609 lignes de journaux
+## sc-build : 35867 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key
@@ -93,7 +93,7 @@ témoin retrouvé (1)
 0    zot-poc-scan.password
 0    zot-poc-vulndb.password
 0    zot.key
-## sc-stockage : 57597 lignes de journaux
+## sc-stockage : 70770 lignes de journaux
 témoin retrouvé (1)
 0    alloy-evenements.token
 0    alloy-sc-build.key

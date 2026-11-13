@@ -1,10 +1,10 @@
-# executeur.sh essai, 2026-11-06T15:26:01Z
+# executeur.sh essai, 2026-11-13T12:32:00Z
 systemctl start : code 0 ; résultat de l'unité : success 0
 OK   run réussi (code 0 ou 2, SuccessExitStatus)
-rapport 20261106T152601Z.json
+rapport 20261113T123201Z.json
 {"status":"ok","events":[],"bundle":null}
-sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1793978761
-sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1793978758
+sync_derniere_reussite_timestamp_seconds{projet="sample-app-sync"} 1794573121
+sync_derniere_reecriture_timestamp_seconds{projet="sample-app-sync"} 1794573118
 sync_dernier_run_statut{projet="sample-app-sync",statut="ok"} 1
 sync_dernier_run_statut{projet="sample-app-sync",statut="rewrite-detected"} 0
 sync_dernier_run_statut{projet="sample-app-sync",statut="error"} 0

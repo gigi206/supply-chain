@@ -1,10 +1,10 @@
 {
   "malicious": [],
-  "scannedAt": "2026-11-06T15:38:55.193068299Z",
+  "scannedAt": "2026-11-13T12:45:02.197941275Z",
   "scanner": {
     "db": {
-      "built": "2026-11-06T06:21:59Z",
-      "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:38834238c33a893eea4ce24dbed9c7bd5c7f7ff11a5c9a93a21912ffceadd0fd",
+      "built": "2026-11-13T06:20:21Z",
+      "ref": "sc-stockage.poc.test:5000/vulndb/grype@sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec",
       "schema": "v6.1.10"
     },
     "id": "grype",
@@ -77,6 +77,21 @@
       "kev": false,
       "kevCves": [],
       "package": "pkg:golang/github.com/go-chi/chi@v5.2.3#v5",
+      "severity": "Unknown"
+    },
+    {
+      "aliases": [
+        "CVE-2026-97054"
+      ],
+      "epss": 0.00171,
+      "fixedIn": [
+        "1.26.11",
+        "1.27.4"
+      ],
+      "id": "GO-2026-6859",
+      "kev": false,
+      "kevCves": [],
+      "package": "pkg:golang/stdlib@1.26.10",
       "severity": "Unknown"
     }
   ]

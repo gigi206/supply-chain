@@ -1,4 +1,4 @@
-# plateforme.sh g3_cosign, 2026-11-06T15:36:41Z
+# plateforme.sh g3_cosign, 2026-11-13T12:42:47Z
 ## pod scan-cosign (app=scan) : jeton du rôle scanner, cosign sign-blob --key hashivault://scanner, révocation
 jeton du rôle scanner obtenu (essai 1)
 JOINT|Zot|réponse 2xx
@@ -11,7 +11,7 @@ jeton du rôle scanner révoqué
 OK   pod scan-cosign : Succeeded
 OK   sondes du pod app=scan : JOINT|Zot JOINT|Forgejo INJOIGNABLE|Grafana INJOIGNABLE|Internet (1.1.1.1)
 ## bundle vérifié sur l'hôte
-OK   clé publique lue par cosign = clé exportée (SPKI sha256) : 1656a3fa3868d9f4fecc99231b204b1f4b2d47efd0a3b0cfbfe371a61b05c802
+OK   clé publique lue par cosign = clé exportée (SPKI sha256) : 4243213569a463eb973a23a2916a8660960df5c9acc142cfaa91a45ff77d833f
 {"mediaType":"application/vnd.dev.sigstore.bundle.v0.3+json","materiel":["publicKey"],"signature":["messageDigest","signature"],"condensat":"SHA2_256"}
 OK   bundle vérifié par cosign verify-blob avec resultats/scanner-cle-publique.pem (Verified OK)
 OK   contre-épreuve : contenu modifié refusé (invalid signature when validating ASN.1 encoded signature)
@@ -20,7 +20,8 @@ OK   contre-épreuve : clé publique de Chains refusée (invalid signature when 
 JOINT|Zot|réponse 2xx
 INJOIGNABLE|OpenBao|wget: download timed out
 OK   sondes du pod sans app=scan : JOINT|Zot INJOIGNABLE|OpenBao
-## audit d'OpenBao depuis 2026-11-06T15:36:41Z (chemins appelés par cosign)
+## audit d'OpenBao depuis 2026-11-13T12:42:47Z (chemins appelés par cosign)
+{"chemin":"auth/jwt/login","op":"update","role":null,"politiques":null,"erreur":"hmac-sha256:0c1029ad1b726f781199143689c300edec4141a3783187f03142df04e361e0e1"} ×4
 {"chemin":"auth/jwt/login","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
 {"chemin":"transit/keys/scanner","op":"read","role":"scanner","politiques":["scanner-signature"],"erreur":null} ×2
 {"chemin":"transit/sign/scanner/sha2-256","op":"update","role":"scanner","politiques":["scanner-signature"],"erreur":null}
@@ -28,4 +29,4 @@ OK   sondes du pod sans app=scan : JOINT|Zot INJOIGNABLE|OpenBao
 {"chemin":"auth/jwt/login","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
 {"chemin":"kv/horodatage/zot","op":"read","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
 {"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","politiques":["horodatage-zot"],"erreur":null}
-# fin 2026-11-06T15:37:06Z, code 0
+# fin 2026-11-13T12:43:11Z, code 0

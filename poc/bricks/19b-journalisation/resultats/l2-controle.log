@@ -1,13 +1,13 @@
-# journalisation.sh controle, 2026-11-06T15:30:50Z
+# journalisation.sh controle, 2026-11-13T12:36:53Z
 ## écoute sur sc-stockage
-192.168.161.13:3100 users:(("loki",pid=20218,fd=7))
-192.168.161.13:3001 users:(("grafana",pid=20266,fd=66))
-127.0.0.1:9096 users:(("loki",pid=20218,fd=8))
+192.168.161.13:3001 users:(("grafana",pid=21623,fd=66))
+127.0.0.1:9096 users:(("loki",pid=21573,fd=8))
+192.168.161.13:3100 users:(("loki",pid=21573,fd=7))
 ## Loki
 sans certificat client : HTTP 000 (curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0)
 OK   refusé à la poignée TLS
 avec le certificat controle : /ready HTTP 503
-écriture de la ligne témoin temoin-l2-1793979051061926702 : HTTP 204
+écriture de la ligne témoin temoin-l2-1794573413404945249 : HTTP 204
 OK   ligne témoin relue (HTTP 200)
 demande de suppression : HTTP 403 (deletion is not available for this tenant)
 OK   suppression refusée
@@ -32,12 +32,12 @@ redirection de / sans session : https://192.168.161.13:3001/login
 ## connexions sortantes de loki et grafana hors du réseau du PoC (après le démarrage)
   aucune
 ## mémoire
-Mem:            5931        1483         402           3        4342        4448
-loki : 53 Mi
-grafana : 319 Mi
-prometheus : 41 Mi
+Mem:            5931        1481         484           3        4264        4450
+loki : 49 Mi
+grafana : 310 Mi
+prometheus : 39 Mi
 ## mesure du disque
 # HELP disque_utilise_ratio Part utilisée du système de fichiers (df), entre 0 et 1.
 # TYPE disque_utilise_ratio gauge
-disque_utilise_ratio{point="/"} 0.4799
-Fri 2026-11-06 15:31:44 UTC  48s Fri 2026-11-06 15:30:44 UTC 11s ago disque-metriques.timer disque-metriques.service
+disque_utilise_ratio{point="/"} 0.4805
+Fri 2026-11-13 12:37:46 UTC  48s Fri 2026-11-13 12:36:46 UTC 11s ago disque-metriques.timer disque-metriques.service

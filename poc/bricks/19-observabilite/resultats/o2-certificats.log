@@ -1,9 +1,9 @@
-# observabilite.sh certificats, 2026-11-06T15:30:24Z
+# observabilite.sh certificats, 2026-11-13T12:36:26Z
   # HELP certificat_expiration_timestamp_seconds Fin de validité (notAfter) du certificat, PKI de la brique 08.
   # TYPE certificat_expiration_timestamp_seconds gauge
   certificat_expiration_timestamp_seconds{certificat="ca-poc"} 1824827948
   certificat_expiration_timestamp_seconds{certificat="zot"} 1808843955
   certificat_expiration_timestamp_seconds{certificat="forgejo"} 1808843955
   certificat_expiration_timestamp_seconds{certificat="openbao"} 1808848501
-  certificat_expiration_timestamp_seconds{certificat="tsa-feuille"} 1825508416
+  certificat_expiration_timestamp_seconds{certificat="tsa-feuille"} 1826097249
   certificat_expiration_timestamp_seconds{certificat="tsa-racine"} 2108664428

@@ -1,19 +1,19 @@
-# forgejo.sh traefik, 2026-11-06T15:29:03Z
+# forgejo.sh traefik, 2026-11-13T12:35:03Z
 ## espace avant
-/dev/vda1      20922114048 7708221440 12312694784  39% /
-39593	/var/lib/forgejo/data/repos/mirror
-68559	/var/lib/forgejo/data/repos/workspace
-premier run (sans fork) : code 0, 1793978995.7 s (journal de l'unité) ; {"status":"ok","evenements":{"branch-created":30,"tag-created":590},"bundle":{"fichier":"20261106T152903Z.bundle","refs":620,"prerequis":0}}
-  taille du bundle : 115102168 octets
+/dev/vda1      20922114048 7717793792 12303122432  39% /
+39597	/var/lib/forgejo/data/repos/mirror
+68566	/var/lib/forgejo/data/repos/workspace
+premier run (sans fork) : code 0, 1794573357.6 s (journal de l'unité) ; {"status":"ok","evenements":{"branch-created":30,"tag-created":596},"bundle":{"fichier":"20261113T123504Z.bundle","refs":626,"prerequis":0}}
+  taille du bundle : 116217960 octets
 OK   master de mirror/traefik = master de GitHub
 FORK=https://192.168.161.13:3000/workspace/traefik.git
-second run (avec fork, incrément depuis le premier) : code 0, 0.9 s (journal de l'unité) ; {"status":"ok","evenements":null,"bundle":null}
+second run (avec fork, incrément depuis le premier) : code 0, 0.8 s (journal de l'unité) ; {"status":"ok","evenements":null,"bundle":null}
 ## espace après
-/dev/vda1      20922114048 8082698240 11938217984  41% /
-118936982	/var/lib/synchro/traefik/miroir.git
-115102168	/var/lib/synchro/traefik/bundles
-118711735	/var/lib/forgejo/data/repos/mirror
-174261	/var/lib/forgejo/data/repos/workspace
+/dev/vda1      20922114048 8095899648 11925016576  41% /
+120065274	/var/lib/synchro/traefik/miroir.git
+116217960	/var/lib/synchro/traefik/bundles
+119837387	/var/lib/forgejo/data/repos/mirror
+174996	/var/lib/forgejo/data/repos/workspace
 Created symlink '/etc/systemd/system/timers.target.wants/synchro@traefik.timer' -> '/etc/systemd/system/synchro@.timer'.
 NEXT LEFT LAST                          PASSED UNIT                  ACTIVATES
--       - Fri 2026-11-06 15:30:24 UTC 20ms ago synchro@traefik.timer synchro@traefik.service
+-       - Fri 2026-11-13 12:36:26 UTC 11ms ago synchro@traefik.timer synchro@traefik.service

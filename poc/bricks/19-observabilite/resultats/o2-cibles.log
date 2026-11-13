@@ -1,4 +1,4 @@
-# observabilite.sh cibles, 2026-11-06T15:31:43Z
+# observabilite.sh cibles, 2026-11-13T12:37:50Z
 alertmanager	up	
 alloy	up	
 chains	up	
@@ -28,10 +28,6 @@ zot	up
   kyverno_http_requests_duration_seconds_count
   kyverno_http_requests_duration_seconds_sum
   kyverno_http_requests_total
-  kyverno_image_validating_policy_execution_duration_seconds_bucket
-  kyverno_image_validating_policy_execution_duration_seconds_count
-  kyverno_image_validating_policy_execution_duration_seconds_sum
-  kyverno_image_validating_policy_results_total
   kyverno_info
   kyverno_updaterequest_total
   kyverno_validating_policy_execution_duration_seconds_bucket
@@ -124,7 +120,6 @@ zot	up
   vault_core_mount_table_size
   vault_core_post_unseal
 ## zot : noms des métriques
-  zot_gc_deleted_total
   zot_gc_duration_seconds_count
   zot_gc_duration_seconds_sum
   zot_gc_runs_total

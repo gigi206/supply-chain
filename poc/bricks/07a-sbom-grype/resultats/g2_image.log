@@ -1,4 +1,4 @@
-# plateforme.sh g2_image, 2026-11-06T15:36:20Z
+# plateforme.sh g2_image, 2026-11-13T12:42:26Z
 oras_1.3.6_linux_amd64.tar.gz: OK
 grype_0.104.1_linux_amd64.tar.gz: OK
 syft_1.38.0_linux_amd64.tar.gz: OK
@@ -13,4 +13,4 @@ image d'outils du scanner : 192.168.161.13:5000/plateforme/outils-scan@sha256:7e
 OK   second assemblage (même digest) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
 OK   digest épinglé (G2 du 04/11/2026) : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
 OK   relue en lecture anonyme : sha256:7eb4f26e7148bd9d000fe9609f58ee6e2ba1fd180f38bd7345e029132eb3f83f
-# fin 2026-11-06T15:36:34Z, code 0
+# fin 2026-11-13T12:42:41Z, code 0

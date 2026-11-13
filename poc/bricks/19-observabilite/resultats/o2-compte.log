@@ -1,4 +1,4 @@
-# observabilite.sh compte, 2026-11-06T15:30:24Z
+# observabilite.sh compte, 2026-11-13T12:36:26Z
 namespace/observabilite serverside-applied
 serviceaccount/prometheus-lecture serverside-applied
 secret/prometheus-lecture-jeton serverside-applied

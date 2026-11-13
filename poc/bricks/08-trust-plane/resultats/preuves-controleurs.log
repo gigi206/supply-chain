@@ -1,4 +1,4 @@
-# preuves.sh controleurs, 2026-11-13T12:21:47Z
+# preuves.sh controleurs, 2026-11-13T12:31:26Z
 Prédiction (écrite le 01/11/2026 avant le premier passage ; règle tekton/controleurs-builds.yaml, décision du propriétaire) :
 - ValidatingAdmissionPolicy tekton-controleurs-builds et sa liaison (Deny) présentes, posées par tekton.sh installer (J4)
 - aucun des deux contrôleurs ne peut créer, modifier ou supprimer la règle ni sa liaison (can-i)
@@ -82,20 +82,28 @@ OK   replication-controller : pod default de kube-system admis (dry-run serveur)
 OK   statefulset-controller : pod default de kube-system admis (dry-run serveur)
 OK   comptes de service qui peuvent créer des pods dans kube-system : 6
 refus de la règle dans l'audit de l'API (namespace, compte usurpé par --as, verbe, ressource ; passages précédents compris) :
-      1   preuve-controleurs tekton-chains-controller create pods
-      1   preuve-controleurs tekton-pipelines-controller create pods
+      2   preuve-controleurs tekton-chains-controller create pods
+      2   preuve-controleurs tekton-pipelines-controller create pods
 OK   refus de la règle dans builds (audit) : 0
 OK   pods créés dans builds par le contrôleur de Pipelines depuis la pose de la règle (audit) : 47
 ## lectures de Secrets des deux contrôleurs dans l'audit de l'API (depuis l'installation de k3s ; sans --as)
      14   tekton-chains-controller get builds 200 ResponseComplete
-     26   tekton-pipelines-controller watch builds 200 ResponseComplete
-     28   tekton-pipelines-controller watch builds 200 ResponseStarted
+     28   tekton-pipelines-controller watch builds 200 ResponseComplete
+     30   tekton-pipelines-controller watch builds 200 ResponseStarted
 OK   lectures de Secrets du contrôleur de Pipelines dans builds (au moins une : informer) : true
 OK   lectures de Secrets hors de builds ou refusées (403), par l'un ou l'autre : 0
 ## journaux des contrôleurs (depuis leur démarrage)
 OK   tekton-pipelines-controller : redémarrages : 0
 OK   tekton-pipelines-controller : refus des droits dans le journal : 0
 OK   tekton-chains-controller : redémarrages : 0
-jq: error (at <stdin>:1): null (null) cannot be matched, as it is not a string
-jq: error (at <stdin>:1): null (null) cannot be matched, as it is not a string
-KO   tekton-chains-controller : refus des droits dans le journal :  (attendu : 0)
+CONSTAT  écarté, kube-apiserver démarrant : 2026-11-13T09:40:32.442Z cannot watch resource "pipelineruns" in API group "tekton.dev" at the cluster scope
+OK   tekton-chains-controller : refus des droits dans le journal : 0
+## information : comptes de service qui peuvent lister les Secrets de kube-system, et ceux de tout le cluster
+  kube-system:cilium-operator (tout le cluster : yes)
+  kube-system:generic-garbage-collector (tout le cluster : yes)
+  kube-system:namespace-controller (tout le cluster : yes)
+  kube-system:resourcequota-controller (tout le cluster : yes)
+  kube-system:token-cleaner (tout le cluster : no)
+  tekton-pipelines:tekton-triggers-core-interceptors (tout le cluster : yes)
+77 comptes de service examinés, 6 lecteurs des Secrets de kube-system
+OK   contrôleurs de Pipelines et de Chains parmi eux : 0

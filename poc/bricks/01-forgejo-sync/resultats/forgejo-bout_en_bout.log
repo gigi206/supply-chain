@@ -1,8 +1,8 @@
-# forgejo.sh bout_en_bout, 2026-11-06T15:25:57Z
+# forgejo.sh bout_en_bout, 2026-11-13T12:31:57Z
 OK   avance de main et branche custom/essai (collision) dans l'amont par poc-amont : accepté
-branch-created           heads/custom/essai  - -> d69dd3bdf0cc
-collision                heads/custom/essai  - -> d69dd3bdf0cc
-fast-forward             heads/main  1907c19815fd -> d69dd3bdf0cc
+branch-created           heads/custom/essai  - -> b0b8bdbfb6bd
+collision                heads/custom/essai  - -> b0b8bdbfb6bd
+fast-forward             heads/main  1907c19815fd -> b0b8bdbfb6bd
 sync.py : code 2
 {"status":"rewrite-detected","events":[{"type":"branch-created","ref":"heads/custom/essai"},{"type":"collision","ref":"heads/custom/essai"},{"type":"fast-forward","ref":"heads/main"}]}
 OK   collision : code 2
@@ -11,6 +11,11 @@ OK   custom/essai du fork intacte (poc-dev)
 OK   main du fork avancée
 OK   tag custom-1 du fork intact
 ## journal de Forgejo (pushes de ce run)
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /workspace/sample-app-sync.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /workspace/sample-app-sync.git/git-receive-pack, 200 OK
+router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK
+router: completed POST /mirror/sample-app.git/git-receive-pack, 200 OK
 router: completed GET /amont-essai/sample-app.git/info/refs?service=git-receive-pack, 200 OK
 router: completed POST /amont-essai/sample-app.git/git-receive-pack, 200 OK
 router: completed GET /mirror/sample-app.git/info/refs?service=git-receive-pack, 200 OK

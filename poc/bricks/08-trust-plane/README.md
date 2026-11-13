@@ -2488,3 +2488,18 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
   `def t` et dans la ligne CONSTAT de `refus_droits` (`preuves.sh` l. 2341, 2344, 2346). Essai sur deux lignes synthétiques
   (un watch refusé 1 s après le démarrage, un list refusé une heure plus tard) : avec `ts`, ancien filtre en erreur jq,
   nouveau filtre 1 ; avec `timestamp`, 1 avant comme après.
+
+### Additif du 13/11/2026 (note de 2026-11-13T12:59:26Z) : plateforme rebâtie jusqu'à « J8 (résolveurs) » (code 0), bloc 06 et `fuites` NON LANCÉS
+
+- **Accord** : « Oui, avec push » à « J'applique le correctif et je reprends à « J8 (contrôleurs) », push compris ? ».
+  Correctif de `refus_droits` commité avant (ef2d698). Lancé à 12:31:26 UTC (`DEPUIS='J8 (contrôleurs)'`,
+  `JUSQUA='J8 (résolveurs)'`, `POUSSER_VSA=1`), « arrêt après J8 (résolveurs) (JUSQUA) » à 12:58:19 UTC, code 0, 1613 s
+  ([journal](resultats/rejeu-s5b-plateforme-ctl.log)) ; 441 lignes OK, 0 KO.
+- **Passé** : J8 (contrôleurs : refus de Chains de 09:40:32.442Z écarté, 0 compté), 01 (S2 à S6), 19 (O2, O3), 19b (L2 à L6),
+  07a (G1 à G4, passage périodique, G8, G6), **VSA de la 10 poussée dans le nouveau Zot**, contrôles 6 et 7 de J8, bloc 08c
+  (H1, H4, S1, H5 limites, Deny, rôles, sortie des builds), « J8 (résolveurs) ».
+- **État** : plateforme RKE2 et Cilium rebâtie de zéro, 08c appliquée. Restent de S5b : bloc 06 (non jouable tel quel, entrées
+  de S1 à S4d effacées le matin), `fuites`, « 08b (CIS) ». Rien de tout cela n'est lancé.
+- **Bilan de la journée** : lancements de 08:54:01, 09:01:34, 11:23:37, 12:04:38 et 12:31:26 UTC ; quatre arrêts (effacement de
+  `$W` non prévu par la carte, store Nix vidé, collision d'adresse du test 6, clé de date du journal de Chains), dont trois
+  défauts d'instruments ou de carte et un d'état de l'hôte ; aucun écart de la plateforme mesuré.

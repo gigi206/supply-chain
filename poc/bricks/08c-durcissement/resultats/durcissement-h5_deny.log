@@ -1,4 +1,4 @@
-# durcissement.sh h5_deny, 2026-11-06T19:26:27Z, DISTRO=rke2
+# durcissement.sh h5_deny, 2026-11-13T12:57:11Z, DISTRO=rke2
 validatingpolicy.policies.kyverno.io/limites-obligatoires serverside-applied
 validatingpolicy.policies.kyverno.io/images-zot-par-digest serverside-applied
 validatingpolicy.policies.kyverno.io/espace-default-interdit serverside-applied
@@ -12,20 +12,20 @@ OK   espace-default : refusé espace-default : durcissement : aucun pod dans l'e
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
 OK   OpenBao descellé : false
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
-# openbao.sh controle, 2026-11-06T19:26:28Z
-OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
+# openbao.sh controle, 2026-11-13T12:57:12Z
+OK   clé publique identique (empreinte 1e7b2a03f9d5d289…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-11-06T19:26:29Z
+# tsa.sh temoin, 2026-11-13T12:57:13Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-06 19:26:30 +0000 UTC
+Artifact timestamped at 2026-11-13 12:57:14 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 6 19:26:30 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x0D85371AC76984C2220FFB858DC63FC0CA6FC837 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 13 12:57:14 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x01911615A52A033B2FA99E05F0E0F9B8F276A607 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)

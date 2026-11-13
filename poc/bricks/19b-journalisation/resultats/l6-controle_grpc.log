@@ -1,12 +1,12 @@
-# journalisation.sh controle_grpc, 2026-11-06T15:32:32Z
+# journalisation.sh controle_grpc, 2026-11-13T12:38:40Z
 ## ports en écoute de loki et d'alloy
-127.0.0.1:12345 users:(("alloy",pid=20662))
-127.0.0.1:3511 users:(("alloy",pid=20662))
-127.0.0.1:3512 users:(("alloy",pid=20662))
-127.0.0.1:9096 users:(("loki",pid=20218))
-192.168.161.13:3100 users:(("loki",pid=20218))
-192.168.161.13:3501 users:(("alloy",pid=20662))
-192.168.161.13:3502 users:(("alloy",pid=20662))
+127.0.0.1:12345 users:(("alloy",pid=22020))
+127.0.0.1:3511 users:(("alloy",pid=22020))
+127.0.0.1:3512 users:(("alloy",pid=22020))
+127.0.0.1:9096 users:(("loki",pid=21573))
+192.168.161.13:3100 users:(("loki",pid=21573))
+192.168.161.13:3501 users:(("alloy",pid=22020))
+192.168.161.13:3502 users:(("alloy",pid=22020))
 == 3511, httpgrpc en clair
 curl: (16) Error in the HTTP2 framing layer
 
@@ -34,7 +34,7 @@ curl: (56) OpenSSL SSL_read: OpenSSL/3.5.7: error:0A00045C:SSL routines::tlsv13 
 
 9096  controle             grpc-status: 0 ready
 
-9096  alloy-sc-confiance   curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+9096  alloy-sc-confiance   curl: (55) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
 9096  alloy-sc-build       curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
 3511  loki-interne         curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
 3511  controle             curl: (56) OpenSSL SSL_read: OpenSSL/4.1.0: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0

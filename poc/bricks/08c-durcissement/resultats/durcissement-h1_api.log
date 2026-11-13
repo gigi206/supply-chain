@@ -1,66 +1,71 @@
-# durcissement.sh h1_api, 2026-11-06T16:40:50Z, DISTRO=rke2
+# durcissement.sh h1_api, 2026-11-13T12:51:43Z, DISTRO=rke2
 ## état avant
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
 OK   OpenBao descellé : false
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
-# openbao.sh controle, 2026-11-06T16:40:50Z
-OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
+# openbao.sh controle, 2026-11-13T12:51:44Z
+OK   clé publique identique (empreinte 1e7b2a03f9d5d289…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-11-06T16:40:50Z
+# tsa.sh temoin, 2026-11-13T12:51:44Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-06 16:40:51 +0000 UTC
+Artifact timestamped at 2026-11-13 12:51:45 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 6 16:40:51 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x14B07DF086B3FEB01832B8BE74F253D09BF67C88 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 13 12:51:45 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x36DE3742202BCAAA6DE21764A2B96525D28C663C TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
-kube-apiserver démarré à 2026-11-06T14:09:30Z
-kube-apiserver relancé à 2026-11-06T16:41:14Z, API prête 22 s après le redémarrage
+kube-apiserver démarré à 2026-11-13T09:40:31Z
+kube-apiserver relancé à 2026-11-13T12:52:07Z, API prête 24 s après le redémarrage
 ## après
 --request-timeout=60s
 --service-account-lookup=true
-KO   plugins d'admission : --enable-admission-plugins=NodeRestriction
---enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit (attendu : --enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit)
+OK   plugins d'admission, dernier argument : --enable-admission-plugins=NodeRestriction,DenyServiceExternalIPs,EventRateLimit
 OK   fichier d'admission : --admission-control-config-file=/etc/rancher/rke2/pod-security.yaml
-KO   kubelet de sc-confiance : pids, seccomp, événements : [4096,false,5] (attendu : [4096,true,5])
-KO   kubelet de sc-build : pids, seccomp, événements : [4096,false,5] (attendu : [4096,true,5])
-KO   kubelet de sc-stockage : pids, seccomp, événements : [4096,false,5] (attendu : [4096,true,5])
+OK   externalIPs, à sec : 1
+OK   kubelet de sc-confiance : pids, événements : [4096,5]
+OK   kubelet de sc-confiance : --seccomp-default=true : 1
+OK   kubelet de sc-build : pids, événements : [4096,5]
+OK   kubelet de sc-build : --seccomp-default=true : 1
+OK   kubelet de sc-stockage : pids, événements : [4096,5]
+OK   kubelet de sc-stockage : --seccomp-default=true : 1
+OK   runc sans profil déclaré, Seccomp : 2
+OK   témoin, Unconfined déclaré, Seccomp : 0
 Error from server (TooManyRequests): error when creating "STDIN": Too many requests: limit reached on type User for key system:admin
-OK   EventRateLimit : 126 refus sur 200 événements
+OK   EventRateLimit : 125 refus sur 200 événements
 OK   Kyverno répond à l'admission (1 essai(s)) : pod sans nodeSelector refusé par zone-confiance
 OK   OpenBao descellé : false
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh controle
-# openbao.sh controle, 2026-11-06T16:42:43Z
-OK   clé publique identique (empreinte a7ca8ce8d133aa9b…)
+# openbao.sh controle, 2026-11-13T12:53:38Z
+OK   clé publique identique (empreinte 1e7b2a03f9d5d289…)
 OK   {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}
 OK   signature témoin d'avant le redémarrage vérifiée avec la clé relue après : même clé privée
 [confiance:tsa] $ poc/bricks/08-trust-plane/tsa.sh temoin
-# tsa.sh temoin, 2026-11-06T16:42:43Z
+# tsa.sh temoin, 2026-11-13T12:53:38Z
 ## jeton témoin, depuis l'espace horodatage
 JOINT|essai 1
 Generating a new signed timestamp
-Artifact timestamped at 2026-11-06 16:42:44 +0000 UTC
+Artifact timestamped at 2026-11-13 12:53:39 +0000 UTC
 Wrote timestamp response to temoin.tsr
 VERIFICATION_TIMESTAMP_CLI|Successfully verified timestamp temoin.tsr
 OK   chaîne servie par le TSA = chaîne émise (feuille de la clé Transit, racine TSA)
-Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 6 16:42:44 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x359D9C0F5AE2AF076E523D9A70E9056BAC65AEA9 TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
+Status: Granted. Policy OID: 1.3.6.1.4.1.57264.2 Hash Algorithm: sha256 Time stamp: Nov 13 12:53:39 2026 GMT Accuracy: 0x01 seconds, unspecified millis, unspecified micros Ordering: no Nonce: 0x54DB7E1F32D15D4E8CA97DED6BA871388B73390A TSA: DirName:/O=supply-chain PoC/CN=TSA du PoC
 OK   jeton vérifié sur l'hôte par openssl ts -verify (racine TSA, feuille de la clé Transit)
 OK   jeton confronté à un autre contenu (openssl) : refusé (message imprint mismatch)
 OK   jeton confronté à la CA TLS du PoC (openssl) : refusé (certificate verify error)
 [confiance:kata] $ poc/bricks/08-trust-plane/kata.sh temoin
-# kata.sh temoin, 2026-11-06T16:42:48Z
+# kata.sh temoin, 2026-11-13T12:53:43Z
 OK   runtime kata chargé par containerd sur sc-build
 exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape exemption)
 ### j7-kata (runtimeClassName kata, annotation -) : nœud sc-build, conteneur lancé 4 s après la création
      noyau : 6.18.56
      vCPU : 1
-     MemTotal:        1969780 kB
+     MemTotal:         196852 kB
      model name	: Intel Core Processor (Haswell, no TSX, IBRS)
        x86-64-v4
        x86-64-v3 (supported, searched)
@@ -70,4 +75,4 @@ exemption Pod Security de la RuntimeClass kata : lue par kube-apiserver (étape 
      NoNewPrivs:	1
      Seccomp:	0
 OK   pod Kata : noyau de l'invité 6.18.56
-KO   h1_api
+RÉSULTAT : conforme

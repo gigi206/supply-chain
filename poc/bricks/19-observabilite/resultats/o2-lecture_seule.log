@@ -1,11 +1,11 @@
-# observabilite.sh lecture_seule, 2026-11-06T15:32:19Z
+# observabilite.sh lecture_seule, 2026-11-13T12:38:26Z
 POST /api/v1/admin/tsdb/delete_series : HTTP 500
 POST /-/reload : HTTP 403
 POST /-/quit : HTTP 403
 POST /api/v1/write : HTTP 404
 ## écoute
-127.0.0.1:9101 users:(("python3",pid=19885,fd=3))
-127.0.0.1:9090 users:(("prometheus",pid=19982,fd=7))
-127.0.0.1:9093 users:(("alertmanager",pid=19930,fd=4))
-127.0.0.1:9095 users:(("python3",pid=19847,fd=3))
+127.0.0.1:9101 users:(("python3",pid=21244,fd=3))
+127.0.0.1:9090 users:(("prometheus",pid=21341,fd=7))
+127.0.0.1:9095 users:(("python3",pid=21206,fd=3))
+127.0.0.1:9093 users:(("alertmanager",pid=21288,fd=4))
 active

@@ -1,4 +1,4 @@
-# replay.sh pousser_vsa, 2026-11-06T15:41:15Z
+# replay.sh pousser_vsa, 2026-11-13T12:47:44Z
 bundle archivé, clé de VSA (hôte) : code 0 ; Verified OK
 OK   verify-blob-attestation (hôte) : aucune connexion hors de Zot (0 connect())
 referrers de l'image dans builds/sample-app, avant : 0

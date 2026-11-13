@@ -1,4 +1,4 @@
-# journalisation.sh alloy, 2026-11-06T15:31:00Z
+# journalisation.sh alloy, 2026-11-13T12:37:03Z
 ## sc-confiance : rôles commun noeud confiance
 alloy-linux-amd64.zip: OK
 alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
@@ -17,3 +17,4 @@ alloy, version v1.21.3 (branch: HEAD, revision: f2108cd)
 configuration valide
 Created symlink '/etc/systemd/system/multi-user.target.wants/alloy.service' -> '/etc/systemd/system/alloy.service'.
 active
+ts=2026-11-13T12:37:26.022173247Z level=error msg="final error sending batch, no retries left, dropping data" component_path=/ component_id=loki.write.sortie component=endpoint host=192.168.161.13:3100 status=400 tenant="" error="server ret
