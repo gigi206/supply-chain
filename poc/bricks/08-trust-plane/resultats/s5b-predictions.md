@@ -100,3 +100,8 @@ Code 1 à 11:38:52 UTC ([journal](rejeu-s5b-plateforme-reprise.log)).
 - **E3 tenue** : `68e0ae70` sur deux constructions, égale au digest épinglé ; **A3 complète** avec la note précédente.
 - **A4 non tenue** : `builds-sans-internet` vue absente (chemin d'origine suivi), mais contre-épreuve en KO (ajout d'adresse
   refusé dans le pod privilégié). **E1 non tenue.** A1, A2, A5, B1 à B8 : non jugées.
+
+## Note du 13/11/2026 (2026-11-13T11:42:58Z) : correction de la note précédente (rien n'est réécrit)
+
+A4 : le KO vient d'une collision d'adresse (IP du pod de la contre-épreuve = adresse usurpée 10.42.1.250), défaut de
+l'instrument ; **A4 n'est pas jugée** à ce passage (au lieu de « non tenue ») et reste à rejuger. Détail : README de la 08.

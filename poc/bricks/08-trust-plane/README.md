@@ -2438,3 +2438,18 @@ Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et repl
   configuration lue) ; noyau de l'invité 6.18.56, sc-build 6.12.113. **Cause non établie** ; aucune lecture du cluster faite.
 - Non lancés : le reste de J8 (tests après test6, bascule, contrôleurs), 01, 19, 19b, 07a, push de la VSA de la 10,
   contrôles 6 et 7, bloc 08c, « J8 (résolveurs) », `fuites`.
+
+### Note du 13/11/2026 (2026-11-13T11:42:58Z) : correction de l'additif précédent, le KO du test 6 est une collision d'adresse
+
+L'additif « reprise arrêtée au test 6 » dit « cause non établie » et parle d'un ajout refusé « dans le pod Kata privilégié » :
+c'est inexact. Lu sur l'hôte (`~/.cache/supply-chain-poc/08/travail/preuves/t6-contre-pod.json` et `t6-contre.log`) : le pod
+de la contre-épreuve, créé à 11:38:30 UTC, a reçu de Cilium **l'IP 10.42.1.250, celle-là même tirée comme adresse usurpée**
+(`status.podIP`, ligne `IP|10.42.1.250`, garde-fou « adresse de eth0 = IP du pod (10.42.1.250) »). L'ajout échoue parce que
+l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exacte n'est pas mesurée) ; `USURPEE|Zot` et
+`USURPEE|Forgejo` sont OUVERT parce que la source est légitime ; le retrait réussit parce que le pod retire sa propre adresse.
+- **Défaut du test, pas de la plateforme** : `adresse_libre` (`commun.sh` l. 258) prend la première adresse libre de .250 à
+  .200 au chargement de `preuves.sh` (l. 140), `t6_inutilisee` la recontrôle juste avant la création du TaskRun (l. 679),
+  mais rien n'empêche Cilium de la donner au pod créé ensuite, et aucun garde-fou ne vérifie « IP du pod ≠ adresse usurpée ».
+- Fréquence : d'après 23b4537 (06/11), Cilium tire les adresses au hasard (`ipam: mode: kubernetes`) ; ce tirage n'est pas
+  relu dans le code de Cilium et la fréquence d'une collision n'est pas mesurée. Aucune des IP de pod archivées pour la
+  contre-épreuve avant le 13/11 n'était 10.42.1.250.
