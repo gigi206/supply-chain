@@ -1999,3 +1999,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-13T15:03:01Z : reprise, étape 4 (rejeu jusqu'à « 06 (S4b) ») de 14:52:30 à 15:02:27 UTC, code 0 : amorce, `c1719b13`, image de build `749d746c` deux fois, fermetures `bb7599a2` et `50dc73f7` deux fois ; C1 à C5 tenues.
 - 2026-11-13T15:05:24Z : reprise, étape 5 (`s4d.sh prealables`) de 15:05:01 à 15:05:10 UTC, code 0 : `digest-attendu` = `039949f9` ; P7 tenue.
 - 2026-11-13T15:33:05Z : reprise, étape 6 en code 1 : S4d tenue (`039949f9` deux fois) ; S4d3 chemins : un pod sans label de tâche en plus au rattrapage, porte, `fuites` et CIS non lancés.
+- 2026-11-13T15:36:09Z : pod sans label de tâche relevé : assistant d'affinité de Tekton (README de la 08, l. 650), défaut du contrôle de `s4d3.sh` ; correctif préparé à sec, non appliqué ; prédiction P10.

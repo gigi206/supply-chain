@@ -1,0 +1,20 @@
+date : 2026-11-13T15:35:05Z
+## sample-app-deb-6391f3bb0e0b96b575eb164ec240698a728ac370a04f-pod
+  créé 2026-11-13T15:26:32Z ; phase Succeeded ; nœud sc-build ; runtime kata
+  propriétaires : TaskRun/sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire
+  labels : app.kubernetes.io/managed-by=tekton-pipelines poc.test/declencheur=rattrapage tekton.dev/memberOf=tasks tekton.dev/pipeline=sample-app-deb tekton.dev/pipelineRun=sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f tekton.dev/pipelineRunUID=d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6 tekton.dev/pipelineTask=construire tekton.dev/task=construire-deb tekton.dev/taskRun=sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire tekton.dev/taskRunUID=8ab14faf-5662-4067-8676-37a407bdf9e2
+  conteneurs : step-construire sc-stockage.poc.test:5000/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590
+## sample-app-deb-6391fd437f26870923333c03b9ff7e9a5c4406440ead-pod
+  créé 2026-11-13T15:31:55Z ; phase Succeeded ; nœud sc-build ; runtime -
+  propriétaires : TaskRun/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
+  labels : app.kubernetes.io/managed-by=tekton-pipelines poc.test/declencheur=rattrapage tekton.dev/memberOf=tasks tekton.dev/pipeline=sample-app-deb tekton.dev/pipelineRun=sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f tekton.dev/pipelineRunUID=d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6 tekton.dev/pipelineTask=publier tekton.dev/task=publier-image tekton.dev/taskRun=sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier tekton.dev/taskRunUID=d8da6ca1-28f7-4533-aa24-0b8b6240d345
+  conteneurs : step-publier sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+## sample-app-deb-6391fd43bb0e305b86b16ca23e61672b4e955e9c10a5-pod
+  créé 2026-11-13T15:26:19Z ; phase Succeeded ; nœud sc-build ; runtime -
+  propriétaires : TaskRun/sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer
+  labels : app.kubernetes.io/managed-by=tekton-pipelines poc.test/declencheur=rattrapage tekton.dev/memberOf=tasks tekton.dev/pipeline=sample-app-deb tekton.dev/pipelineRun=sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f tekton.dev/pipelineRunUID=d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6 tekton.dev/pipelineTask=preparer tekton.dev/task=preparer-deb tekton.dev/taskRun=sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer tekton.dev/taskRunUID=e9bb9b6e-17db-4c88-9cc8-c29573a909ec
+  conteneurs : step-sources sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc ; step-entrees sc-stockage.poc.test:5000/plateforme/outils-horodatage@sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0 ; step-assemblage sc-stockage.poc.test:5000/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+## TaskRuns du PipelineRun
+  sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire ; tâche construire ; pod sample-app-deb-6391f3bb0e0b96b575eb164ec240698a728ac370a04f-pod ; Succeeded ; essais 0
+  sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier ; tâche publier ; pod sample-app-deb-6391fd437f26870923333c03b9ff7e9a5c4406440ead-pod ; Succeeded ; essais 0
+  sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer ; tâche preparer ; pod sample-app-deb-6391fd43bb0e305b86b16ca23e61672b4e955e9c10a5-pod ; Succeeded ; essais 0

@@ -107,3 +107,17 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
   le label du PipelineRun sont quatre : `construire|sc-build|kata`, `preparer`, `publier` et un pod **sans label de tâche**
   (`null|sc-build|-`) ; au webhook, les trois attendus. Nature du pod non lue (lecture du cluster par script seulement).
 - Non lancés : la porte de S4d3 (C9), `fuites` et CIS. C7 (bundle de pipeline) et C8 : à relever dans le journal avec le relevé.
+
+## Note de 2026-11-13T15:36:09Z : pod sans label de tâche relevé (rien n'est réécrit)
+Relevé en lecture seule (« Oui, lance-le »), 15:35:05 UTC, code 0 ([relevé](s5b-releve-pod-null.log)) : il ne reste que les trois pods
+attendus (construire sous Kata, preparer, publier), chacun possédé par son TaskRun, 0 nouvel essai ; le quatrième pod a disparu.
+Lecture : c'est l'**assistant d'affinité de Tekton**, déjà décrit au README de la 08 (l. 650 : « pod null », StatefulSet qui porte
+les labels du PipelineRun sans label de tâche ; le pipeline a un workspace en `volumeClaimTemplate`) ; il est effacé à la fin du
+PipelineRun et n'était pas encore parti au contrôle du rattrapage (publier fini à 15:31:55 UTC). **Défaut du contrôle**, dépendant
+du moment, pas de la plateforme ; non vérifié sur le pod lui-même (il n'existait plus au relevé).
+Correctif préparé à sec, NON APPLIQUÉ : `s4d3.sh` l. 146, sélecteur `app.kubernetes.io/component!=affinity-assistant` en plus
+(label utilisé par `construction.sh` l. 364 pour trouver ce pod) ; shellcheck 3 avant comme après ; `bash -n` tenu.
+
+| # | Prédiction pour la reprise à « 06 (S4d3) » | Confiance |
+|---|---|---|
+| P10 | Avec le correctif, « pods (tâche\|nœud\|runtime) » rend les trois attendus sur les deux chemins ; C8 et C9 tenues ; `fuites` et CIS comme au passage de 13:00 | Moyenne : C9 dépend de l'âge de la base de grype |
