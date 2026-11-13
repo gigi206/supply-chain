@@ -61,3 +61,9 @@ Lancées sur « Oui, lance-les » à « Je lance banc-debian.sh lecture simulati
   (le fichier `ca-certificates.crt` est produit par un script de mainteneur, que `dpkg-deb -x` n'exécutera pas).
 - Questions ouvertes pour l'étape `image` : base-files absent, donc ni `/bin` ni `/lib64` fournis par un paquet de la fermeture
   (à vérifier sur les .deb par `dpkg-deb -c`) ; bundle de certificats à reconstituer ; écart avec E (S4a, mmdebstrap, scripts).
+
+## Note de 2026-11-13T13:53:16Z : correction des résultats (rien n'est réécrit)
+1. « environ 57 Mo installés à eux trois » est faux : perl, libperl5.40 et perl-modules-5.40 font 50 156 Kio installés, soit
+   **49,0 Mo** ; avec perl-base, 57 971 Kio, soit 56,6 Mo (Installed-Size du journal de simulation, en Kio).
+2. « le fichier `ca-certificates.crt` est produit par un script de mainteneur » n'est **pas vérifié** (écrit de mémoire) : à lire
+   dans le .deb de ca-certificates (scripts de contrôle) à l'étape `image`.
