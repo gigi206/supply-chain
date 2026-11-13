@@ -91,3 +91,8 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
 - **C4 tenue** : `builds/builders/sbuild-debian13@749d746c`, deux fois.
 - **C5 tenue** : fermetures `sample-app-deb@bb7599a2` et `sample-app-sources@50dc73f7`, deux fois chacune ; fichiers gomod égaux à
   ceux de F2 ; archive npm conforme à l'integrity du lockfile.
+
+## Résultat de l'étape 5 (note de 2026-11-13T15:05:24Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 5 : s4d.sh prealables (hôte seul) ? ». De 15:05:01 à 15:05:10 UTC, code 0, 46 OK, 0 KO.
+**P7 tenue** : `digest-attendu` = `sha256:039949f9…` (deb `0b489d43`, entrées fixées par digest, dont la fermeture `bb7599a2`) ;
+`entrees.tar` de 227 266 560 octets écrit pour le pod d'essai.
