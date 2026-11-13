@@ -49,7 +49,11 @@ TETE_J2=6391fd437f26696847041be3226bbbf633f55a2f   # construction.sh : commit de
 POLITIQUE=$here/politique/prefetch-sortie.yaml
 
 attendu() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "KO   $1 : $2 (attendu : $3)" >&2; exit 1; }; }
-nix_chemin() { nix build --no-link --print-out-paths --offline --inputs-from "$repo/poc/benchmarks/nix" "nixpkgs#$1"; }
+nix_chemin() { # paquet du nixpkgs du banc B ; racine dans $T/racines (13/11/2026 : --no-link laissait la clôture sans racine,
+  # le ramasse-miettes l'avait vidée avant le rejeu S5b) ; même chemin de sortie, donc même clôture et même image
+  mkdir -p "$T/racines"
+  nix build --out-link "$T/racines/$1" --print-out-paths --offline --inputs-from "$repo/poc/benchmarks/nix" "nixpkgs#$1"
+}
 contenu() { # répertoire : empreinte des seuls chemins et contenus des fichiers (hors bom.json)
   (cd "$1" && find . -type f ! -name bom.json -printf '%P\n' | sort | while read -r f; do echo "$f $(sha256sum < "$f" | cut -c1-64)"; done) | sha256sum | cut -c1-64
 }

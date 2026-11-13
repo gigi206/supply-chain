@@ -491,3 +491,13 @@ Il s'est déroulé de 20:31 à 22:42 UTC, en cinq parties ; le détail est dans 
 intact ; l'image `68e0ae70` du 06/11 est gardée intacte dans `~/.cache/supply-chain-poc/03/f2`. Le choix D4 (outils de Nix
 « déjà présents sur l'hôte ») n'avait été ni comparé ni soumis au propriétaire : décision ouverte le 13/11. Détail : README
 de la 08, additif du 13/11 (rebâti arrêté à F2).
+
+**Note du 13/11/2026 (2026-11-13T13:15:17Z) : régularisation de Nix et banc Debian, décision du propriétaire « Oui, les deux »** (à « Je régularise
+Nix et j'instruis l'option Debian par un banc ? »).
+- `prefetch.sh` : `nix_chemin` pose une racine par paquet dans `~/.cache/supply-chain-poc/03/f2/racines/` (`--out-link` au lieu de
+  `--no-link`), contre un nouveau ramasse-miettes. Essai à sec de la même commande : chemins de sortie inchangés (`vm6nxpp9`,
+  `2bjyma6x`, `mks1hnym`), donc même clôture et même image attendue ; shellcheck : 1 signalement avant comme après.
+- [`sante-nix.sh`](sante-nix.sh) préparé, NON LANCÉ (lectures réseau publiques ; accord nommé attendu) : Scorecard, dépôts NixOS/nix,
+  NixOS/nixpkgs et NixOS/hydra (release, commits sur 90 jours, auteurs, fusionneurs, SECURITY.md, avis), configuration de confiance
+  de l'hôte, cache.nixos.org, verrou du banc B, canal publié. Preuve du verdict à porter au doc 04, absent jusqu'ici.
+- Banc Debian (outils-prefetch à contenu Debian, hors cluster) : à concevoir ; `mmdebstrap` et `sbuild` sont absents de l'hôte.
