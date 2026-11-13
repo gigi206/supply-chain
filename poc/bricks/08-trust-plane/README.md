@@ -2422,3 +2422,19 @@ Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et repl
   publicsuffix-list) : leurs 9 empreintes NAR sont **égales** à celles des narinfo de cache.nixos.org.
 - **Contrôle d'hôte avant reprise** (chemins fixes de `~/.cache/supply-chain-poc` lus par les étapes restantes, recherche par
   motifs, non exhaustive) : tous présents, sauf `03/f2/fermeture-1.digest`, écrit par F2 elle-même (`rejeu.sh` l. 98).
+
+### Additif du 13/11/2026 (note de 2026-11-13T11:40:22Z) : reprise arrêtée au test 6 de J8 (code 1), RIEN D'AUTRE LANCÉ
+
+- **Accord** : « Oui, avec push » à « Je reprends le rebâti à F2, push de la VSA de la 10 compris ? ». Lancé à 11:23:37 UTC
+  (`DEPUIS='J7 (fermeture, F2 de la 03)'`, `JUSQUA='J8 (résolveurs)'`, `POUSSER_VSA=1`), code 1 à 11:38:52 UTC
+  ([journal](resultats/rejeu-s5b-plateforme-reprise.log)).
+- **Passé** : F2 (236 s : aucune construction Nix, aucune copie, « clôture nix : 45 chemins, 263 Mo ; empreinte
+  66de99598aa176a1 », image d'outils `68e0ae70` identique sur deux constructions, égale au digest épinglé, copiée dans Zot),
+  construction (166 s), réseau de Kata (382 s) ; 174 lignes OK.
+- **Arrêt** dans « J8 (tests) », test 6, contre-épreuve (pod Kata privilégié, uid 0, tâche `preuve-test6-temoin`) :
+  `ip addr add 10.42.1.250/32 dev eth0` refusé (« AJOUT|refusé », message masqué par `2>/dev/null`, `preuves.sh` l. 807),
+  retrait accepté ; `KO   contre : ajout refusé, retrait accepté` (l. 730). Aux passages archivés de la contre-épreuve
+  (dont le sixième passage RKE2 du 06/11), l'ajout était accepté. Kata identique au 06/11 (kata-deploy 4.3.1, même
+  configuration lue) ; noyau de l'invité 6.18.56, sc-build 6.12.113. **Cause non établie** ; aucune lecture du cluster faite.
+- Non lancés : le reste de J8 (tests après test6, bascule, contrôleurs), 01, 19, 19b, 07a, push de la VSA de la 10,
+  contrôles 6 et 7, bloc 08c, « J8 (résolveurs) », `fuites`.

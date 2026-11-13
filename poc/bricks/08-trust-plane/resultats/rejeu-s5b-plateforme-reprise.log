@@ -1,0 +1,986 @@
+# rejeu.sh s5b-plateforme-reprise, 2026-11-13T11:23:37Z
+réseau : cilium ; reprise à J7 (fermeture, F2 de la 03) ; arrêt après J8 (résolveurs)
+## démontage : sautée (reprise à J7 (fermeture, F2 de la 03))
+## VM : sautée (reprise à J7 (fermeture, F2 de la 03))
+## RKE2 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## Cilium : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J2 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J3 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J4 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J5 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J6 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## test 5 (J6) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J6 (suite) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (admission) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (BuildKit) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (voie D) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (voie A, sample-app) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (sans réseau) : sautée (reprise à J7 (fermeture, F2 de la 03))
+## J7 (construction, entrées) : sautée (reprise à J7 (fermeture, F2 de la 03))
+[fermetures:f2] $ poc/bricks/03-deps-closure/prefetch.sh image compte reseau taches prefetch provenance
+# prefetch.sh image, 2026-11-13T11:23:37Z
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+warning: Git tree '~/Documents/git/github/gigi206/supply-chain' is dirty
+## entrées
+OK   Hermeto 0.64.0 : commit du tag : 1f37e32dfdf28342b50c6f394c3e99914fdb24e9
+
+[notice] A new release of pip is available: 25.3 -> 26.3
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+roues (empreintes de requirements.txt contrôlées par pip) : 46
+
+[notice] A new release of pip is available: 25.3 -> 26.3
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+
+[notice] A new release of pip is available: 25.3 -> 26.3
+[notice] To update, run: ~/.cache/supply-chain-poc/outils/hermeto/bin/python -m pip install --upgrade pip
+OK   roue de Hermeto identique sur deux constructions : hermeto-0.64.0-py3-none-any.whl 15ca1dc592fe1c568ef37297c5973e1f2ec35eab99b3741f651c74b1aeec9a4a
+OK   toolchain golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64 : h1:5VAGHlY8yl8pTPVSNIez3SNMy6fWabs+QMR25f3oMT0= = sum.golang.org
+python /nix/store/vm6nxpp97fxgczw00bwkxdqdm2an3n95-python3-3.13.12 ; git /nix/store/2bjyma6xy55jnvh5jnvnli6g0vha01sv-git-minimal-2.51.2 ; cacert /nix/store/mks1hnym57qn8m5payqgqgz5qnhjcxpk-nss-cacert-3.123 ; busybox 49227c027f9b972f
+clôture nix : 45 chemins, 263 Mo ; empreinte 66de99598aa176a1
+## BuildKit rootless éphémère (nixpkgs du banc B), deux constructions sans cache
+a : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
+b : image sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc (198 Mo)
+essai hors réseau (cible essai) :
+     #10 6.750 Successfully installed hermeto-0.64.0
+     #17 1.712 hermeto 0.64.0
+     #17 1.793 git version 2.51.2
+     #17 1.795 go version go1.26.10 linux/amd64
+     #17 1.797 Python 3.13.12
+     #17 1.798 /etc/ssl/certs/ca-certificates.crt
+OK   image d'outils identique sur deux constructions : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+## copie dans Zot (poc-ecriture, par digest)
+OK   relue en lecture anonyme : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+{"couches":6,"octets":207092292}
+OK   image d'outils (digest épinglé) : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+# fin 2026-11-13T11:25:41Z
+# prefetch.sh compte, 2026-11-13T11:25:41Z
+[confiance:stockage] $ poc/bricks/08-trust-plane/stockage.sh zot
+# stockage.sh zot, 2026-11-13T11:25:41Z
+~/.local/share/mise/installs/aqua-project-zot-zot/2.1.22/zot: OK
+htpasswd : poc-ecriture, bcrypt, coût 12
+htpasswd : poc-build, bcrypt, coût 12
+htpasswd : poc-horodatage, bcrypt, coût 12
+htpasswd : poc-images, bcrypt, coût 12
+htpasswd : poc-metriques, bcrypt, coût 12
+htpasswd : poc-fermetures, bcrypt, coût 12
+htpasswd : poc-vulndb, bcrypt, coût 12
+htpasswd : poc-scan, bcrypt, coût 12
+htpasswd : poc-replay, bcrypt, coût 12 (hash fourni par la brique 10)
+zot: OK
+https://192.168.161.13:5000/v2/ (CA du PoC) : HTTP 200
+active
+{"time":"2026-11-13T11:25:46.848606828Z","level":"info","message":"version","distribution-spec":"1.1.1","commit":"v2.1.22-0-g6bbc7e5","binary-type":"-events-imagetrust-lint-metrics-mgmt-profile-scrub-search-sync-ui-userprefs","go version":"go1.27.1","caller":"zotregistry.dev/zot/v2/pkg/cli/server/root.go:261","func":"zotregistry.dev/zot/v2/pkg/cli/server.NewServerRootCmd.func1","goroutine":1}
+LISTEN 0      4096   192.168.161.13:5000       0.0.0.0:*    users:(("zot",pid=5585,fd=11))           
+drwxr-x---  3 root zot 4096 Nov 13 11:25 /etc/zot
+drwxr-x--- 14 zot  zot 4096 Nov 13 11:25 /var/lib/zot
+drwxr-x---  2 zot  zot 4096 Nov 13 09:05 /var/log/zot
+/etc/zot:
+total 16
+-rw-r----- 1 root zot 6432 Nov 13 11:25 config.json
+-rw-r----- 1 root zot  658 Nov 13 11:25 htpasswd
+drwxr-x--- 2 root zot 4096 Nov 13 11:25 tls
+
+/etc/zot/tls:
+total 8
+-rw-r--r-- 1 root root 778 Nov 13 11:25 zot.crt
+-rw-r----- 1 root zot  241 Nov 13 11:25 zot.key
+-> Overall exposure level for zot.service: 3.0 OK :-)
+## artefact d'essai (un fichier, layout OCI local)
+OK   poc-fermetures : push par digest n° 1 dans builds/fermetures/essai
+OK   poc-fermetures : push par digest n° 2 dans builds/fermetures/essai
+OK   poc-fermetures : tag refusé (403, motif de la condition)
+OK   poc-fermetures : autre dépôt de builds/ (builds/essai-fermetures) : 403
+OK   poc-fermetures : suppression : 403
+OK   poc-images dans builds/fermetures/ : refusé (denied)
+OK   poc-build (Chains) : tag écrit dans builds/fermetures/essai
+OK   lecture anonyme : sha256:8dc5282d1b517245ef59cb08b03d9f93943aed8199aeaccfc4fdeaaf444cc432
+## secret zot-fermetures de builds
+secret zot-fermetures : clés config.json
+# fin 2026-11-13T11:25:59Z
+# prefetch.sh reseau, 2026-11-13T11:25:59Z
+CiliumNetworkPolicy prefetch-sortie appliquée
+## invariant : politiques de builds qui sélectionneraient un pod au label tekton.dev/task=prefetch-gomod
+OK   politiques qui sélectionnent ces pods : CiliumNetworkPolicy prefetch-sortie
+## f2-sonde-avec (sc-build, 10.42.1.125)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : refusé (URLError : <urlopen error [Errno 101] Network is unreachable>)
+     API de k3s : refusé (URLError : <urlopen error timed out>)
+     Zot : refusé (URLError : <urlopen error timed out>)
+     Forgejo : joint (6391fd437f26)
+## f2-sonde-sans (sc-build, 10.42.1.169)
+     proxy.golang.org : joint (HTTP 200)
+     storage.googleapis.com : joint (HTTP 400)
+     sum.golang.org : joint (HTTP 200)
+     github.com : joint (HTTP 200)
+     proxy.golang.org en 80 : joint (HTTP 200)
+     API de k3s : joint (HTTP 401)
+     Zot : joint (HTTP 200)
+     Forgejo : joint (6391fd437f26)
+## Hubble : flux de f2-sonde-avec depuis 2026-11-13T11:26:08Z
+     36 FORWARDED 10.42.2.203:53 
+     28 FORWARDED 10.42.0.148:53 
+     14 DROPPED 192.168.161.13:5000 POLICY_DENIED
+     14 DROPPED 192.168.161.11:6443 POLICY_DENIED
+     14 DROPPED 142.251.22.141:80 POLICY_DENIED
+      8 FORWARDED 192.168.161.13:3000 
+      7 FORWARDED 74.161.79.192:443 
+      5 FORWARDED 142.251.97.207:443 
+      5 FORWARDED 142.251.97.141:443 
+      5 FORWARDED 142.251.22.141:443 
+# fin 2026-11-13T11:26:33Z
+# prefetch.sh taches, 2026-11-13T11:26:33Z
+## tâches (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   prefetch-gomod dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod@sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-fermeture : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-fermeture dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
+## pipeline prefetch-sample-app (signée à chaque passage)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app@sha256:555c7e37f0cd310508bcd2339356abc9acb31adc14b80428a177ab5ff6d86e39
+# fin 2026-11-13T11:26:38Z
+# prefetch.sh prefetch, 2026-11-13T11:26:38Z
+## f2-prefetch-1 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-1-prefetch (Succeeded), pod f2-prefetch-1-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     2026/11/13 11:26:43 Entrypoint initialization
+     2026/11/13 11:26:44 Decoded script /tekton/scripts/script-0-b9kf8
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-13 11:26:48,861 INFO Fetching the gomod dependencies at subpath .
+     2026-11-13 11:26:48,868 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-13 11:26:49,201 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+### TaskRun f2-prefetch-1-publier (Succeeded), pod f2-prefetch-1-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/13 11:26:50 Entrypoint initialization
+     2026/11/13 11:26:51 Decoded script /tekton/scripts/script-0-9rm2t
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : c77c3d5aa6f63191d1b5c27b14da89a926782a96a4653f281082e4c7c850424a
+OK   PipelineRun f2-prefetch-1 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-1 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-1-prefetch-pod (IP relevée dans le TaskRun) :
+          26 FORWARDED 10.42.0.148:53 
+          22 FORWARDED 10.42.2.203:53 
+          14 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 142.251.22.141:443 
+## f2-prefetch-2 créé (commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git)
+### TaskRun f2-prefetch-2-prefetch (Succeeded), pod f2-prefetch-2-prefetch-pod sur sc-build, tekton.dev/task prefetch-gomod
+     2026/11/13 11:27:14 Entrypoint initialization
+     2026/11/13 11:27:14 Decoded script /tekton/scripts/script-0-fhd92
+     hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f
+     2026-11-13 11:27:18,073 INFO Fetching the gomod dependencies at subpath .
+     2026-11-13 11:27:18,081 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-13 11:27:18,349 INFO All dependencies fetched successfully \o/
+     fermeture : 6 fichiers, 172 Kio
+### TaskRun f2-prefetch-2-publier (Succeeded), pod f2-prefetch-2-publier-pod sur sc-build, tekton.dev/task publier-fermeture
+     2026/11/13 11:27:19 Entrypoint initialization
+     2026/11/13 11:27:20 Decoded script /tekton/scripts/script-0-mjqgx
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd (7 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 0af23f531d075ef60306eabe3bac7a695b837e7659265279c413df08c4634fec
+OK   PipelineRun f2-prefetch-2 : True|Succeeded
+fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   PipelineRun f2-prefetch-2 signé par Chains : true
+Hubble, pod de prefetch f2-prefetch-2-prefetch-pod (IP relevée dans le TaskRun) :
+          28 FORWARDED 10.42.2.203:53 
+          20 FORWARDED 10.42.0.148:53 
+          14 FORWARDED 192.168.161.13:3000 
+           6 FORWARDED 142.251.22.141:443 
+## comparaisons
+fermeture 1 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture 2 : 7 fichiers, contenu 35b42fa951d251ee1eab32866a5a805142704897a6519990fcfc0a5f2e2a49bd
+fermeture de l'hôte (sha256:0ab5a507…) : 8 fichiers, contenu 1852dbbd7863300e7f85563de65273477fa66ee94b606f349bb7a18ad7f6dcd0
+     1c1
+     < f34e867c9aef391c129ab3292c4d24b1f6aa10a1998779fae6138437dce21f78  ./.build-config.json
+     ---
+     > d1bc34073c1487251bd7e8075e724fb0f95011a4ee4b65818ecb74f1dde8bd7f  ./.build-config.json
+     7a8
+     > 9144f0e2a4cea7837a698aaf84291cb89a796ef2495b28cb339c90ae78c48751  ./deps/npm/marked-16.4.1.tgz
+OK   deux prefetch du même commit : même fermeture
+# fin 2026-11-13T11:27:32Z
+# prefetch.sh provenance, 2026-11-13T11:27:32Z
+OK   cosign verify-attestation : 4 enveloppe(s) valide(s) sur la fermeture sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   enveloppes du PipelineRun f2-prefetch-1 : 1
+sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app sha256:555c7e37f0cd310508bcd2339356abc9acb31adc14b80428a177ab5ff6d86e39
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/prefetch-gomod sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-prefetch sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135 (contenu)
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   sujet : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   image d'outils du prefetch : sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc
+OK   tâche prefetch-gomod (bundle) : sha256:5e7e5662e6e9bdc306e30b41300f1253e52c3cc5f5323d61380d4d265111cd0c
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)
+# fin 2026-11-13T11:27:33Z
+## durée J7 (fermeture, F2 de la 03) : 236 s
+[confiance:construction] $ poc/bricks/08-trust-plane/construction.sh taches constat_cm construire provenance
+# construction.sh taches, 2026-11-13T11:27:33Z
+## tâches (tkn 0.46.2) ; Dockerfile de la brique 04 : d56985c19fe26f361b824ac7de71b88590310356fcbba0bc4842323c200b0619
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-entrees : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-entrees dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees@sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-image@sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   publier-image : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   publier-image dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+## pipeline sample-app (signée à chaque passage ; ses tâches et ses entrées hors dépôt sont épinglées par digest)
+fermeture de la plateforme (brique 03, F2, 2026-11-13T11:27:02Z) : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   fermeture épinglée dans la pipeline : sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:b7b99075901885083e66f3747eb707dc5a84b773f4ac39b79f6422d0701e11ab
+## témoin : première version de construire-image et sa pipeline, depuis l'historique git
+OK   bundle de l'ancienne construire-image (signature versionnée au commit b77ff6b) : sha256:c7e8b275c99e6a105acae4f1b76acee24034fca407229b7b63e620b26cd75906
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+ancienne pipeline (témoin) : sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:cb605a3bfc28f75bde3c59920b21bb6c0b4e6079bb7549aec4f25e09b21239d6
+# construction.sh constat_cm, 2026-11-13T11:27:41Z
+## prédiction (relevée sur le premier passage de construire, puis sur un essai exploratoire du 30/10/2026)
+pod Kata, conteneurs a et b montant la ConfigMap ca-poc et un emptyDir ; a lit la CA, écrit dans l'emptyDir, puis :
+  sort aussitôt : b, 15 s plus tard, lit l'emptyDir mais plus la CA (No such file or directory) ;
+  reste en vie (témoin) : b lit l'emptyDir et la CA
+### j7-cm-sort
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+### j7-cm-vivant
+     a : -----BEGIN CERTIFICATE-----
+     b : emptyDir : écrit
+     b : ca.crt : -----BEGIN CERTIFICATE-----
+ÉCART a sorti : b lit l'emptyDir, puis la CA : écrit / -----BEGIN CERTIFICATE----- (prédit : écrit / head: /etc/ca-poc/ca.crt: No such file or directory)
+OK   a en vie (témoin) : b lit l'emptyDir, puis la CA : écrit / -----BEGIN CERTIFICATE-----
+CONSTAT sous Kata 4.3.1 (runtime-rs), la copie d'une ConfigMap dans l'invité disparaît pour tout le pod dès qu'un conteneur
+        qui la monte se termine ; les étapes de Tekton se terminent l'une après l'autre : une ConfigMap ou un secret partagé
+        entre étapes n'est lisible que par la première. Non trouvé dans les issues de kata-containers (recherche du 30/10/2026)
+# construction.sh construire, 2026-11-13T11:28:28Z
+## prédiction (après buildkit.sh sans_reseau : image 3a7ca1b1 sans réseau, image de build en layout OCI)
+PipelineRun j7-sample-app (gabarit de declencheurs, commit 6391fd437f26696847041be3226bbbf633f55a2f) : réussi ; Trusted Resources vérifie la pipeline et les trois tâches
+  pod affinity assistant admis (contexte du gabarit, compte build sans jeton) ; PVC local-path sur sc-build
+  preparer : pod runc ; arbre 30e808ffa327288c656ddda7b6fafe4005234b77 ; fermeture, web/dist et image de build en layout OCI tirés dans le workspace
+  construire : pod Kata sur sc-build, label tekton.dev/task=construire-image (sélectionné par construction-sans-sortie),
+    QEMU -smp 3 -m 6176M ; layout contrôlé (3 blobs) ; aucune sortie réseau ; image sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; l'étape construire démarre
+    plusieurs secondes après le premier conteneur du pod (initialisation de Tekton), au-delà de la fenêtre de démarrage
+    mesurée (0,5 à 1,1 s, kata.sh reseau)
+  publier : pod runc conforme à restricted ; push par poc-images (HTTP 201 dans l'audit de Zot), .sig et .att par poc-build
+  Chains signe les trois TaskRuns et le PipelineRun
+label tekton.dev/task imposé à « autre » par le créateur (taskRunSpecs[construire].metadata) : le pod garde construire-image
+  (fixé par le contrôleur au nom de la tâche résolue, taskrun.go) ; un autre label du créateur y figure (témoin)
+ancienne pipeline (construire-image c7e8b275, qui tire ses entrées elle-même) : construire en échec à l'étape sources
+  (Forgejo injoignable : résolution refusée), publier jamais lancé, aucune écriture de poc-images
+même PipelineRun sans runtimeClassName : preparer réussi, construire refusé à la création du pod (Pod Security restricted :
+  privileged), publier jamais lancé, aucune écriture de poc-images
+observabilité (ajout du 07/11/2026, 18:03 UTC : constats du 06 et du 07/11, 08c-durcissement/resultats/chains-echec-signature.log) : les PipelineRuns sans Kata et à étiquette
+  (annulé), et leurs TaskRuns construire, font échouer Chains (payload_creation) : ChainsEchecSignature (A2, critique) en firing
+  jusqu'à environ 10 min après le dernier échec, firing puis resolved au récepteur local ;
+  si Prometheus ne collecte pas encore Chains (rejeu complet), l'alerte part à la première collecte (06/11 : 15:32 UTC) ; échec voulu, compteurs sans étiquette d'exécution
+## politique
+NetworkPolicy de builds : construction-sans-sortie
+OK   politiques qui sélectionnent les pods de construire-image, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic (règles ingress ou egress ; elles s'additionneraient) : 0
+OK   CiliumNetworkPolicy de builds qui sélectionnent les pods de construire-image et autorisent du trafic : 
+## j7-sample-app créé ([{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}],"runtimeClassName":"kata"}}])
+processus QEMU du sandbox de j7-sample-app-construire-pod : 1
+affinity assistant : affinity-assistant-474a2eef86-0 sur sc-build, phase Running
+### TaskRun j7-sample-app-construire (Succeeded, pod j7-sample-app-construire-pod)
+     step-construire : invité : 3 vCPU, 6119664 kB ; racine de BuildKit : tmpfs ; image de build sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67, 3 blobs conformes
+     step-construire : entrees : virtiofs ro,relatime ; écriture refusée
+     step-construire : time="2026-11-13T11:28:48Z" level=warning msg="failed check for fsverity support" error="mkdir /workspace/entrees/builder/.fsverity-check-4062376536: read-only file system" path=/workspace/entrees/builder
+     step-construire : #1 [internal] load build definition from Dockerfile
+     step-construire : #1 transferring dockerfile: 680B 0.0s done
+     step-construire : #1 DONE 0.0s
+     step-construire : 
+     step-construire : #2 [context deps] load .dockerignore
+     step-construire : #2 transferring deps: 2B done
+     step-construire : #2 DONE 0.0s
+     step-construire : 
+     step-construire : #3 [context builder] load metadata for docker.io/library/builder@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+     step-construire : #3 DONE 0.0s
+     step-construire : 
+     step-construire : #4 [internal] load .dockerignore
+     step-construire : #4 transferring context: 2B done
+     step-construire : #4 DONE 0.0s
+     step-construire : 
+     step-construire : #5 [context deps] load from client
+     step-construire : #5 transferring deps: 113.42kB 0.0s done
+     step-construire : #5 DONE 0.0s
+     step-construire : 
+     step-construire : #6 [internal] load build context
+     step-construire : #6 transferring context: 56.68kB 0.0s done
+     step-construire : #6 DONE 0.0s
+     step-construire : 
+     step-construire : #7 [context builder] OCI load from client
+     step-construire : #7 resolve docker.io/library/builder@sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67 done
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 11.37MB / 76.20MB 0.2s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 31.46MB / 76.20MB 0.3s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 48.23MB / 76.20MB 0.5s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 60.82MB / 76.20MB 0.6s
+     step-construire : #7 sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 76.20MB / 76.20MB 0.7s done
+     step-construire : #7 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc
+     step-construire : #7 extracting sha256:a395e9a54b38c5c27936ce0479915f00ecf16244c9ca6d9183560d08e4ba84fc 3.5s done
+     step-construire : #7 DONE 4.3s
+     step-construire : 
+     step-construire : #8 [build 1/4] WORKDIR /src
+     step-construire : #8 DONE 2.0s
+     step-construire : 
+     step-construire : #9 [build 2/4] COPY . .
+     step-construire : #9 DONE 2.3s
+     step-construire : 
+     step-construire : #10 [build 3/4] RUN --network=none --mount=type=bind,from=deps,target=/deps     GOPROXY=file:///deps/deps/gomod/pkg/mod/cache/download GOMODCACHE=/tmp/mod GOCACHE=/tmp/cache     go build -trimpath -buildvcs=false -ldflags "-s -w -buildid= -X main.Version=1.0.0" -o /out/sample-app .
+     step-construire : #10 2.728 go: downloading github.com/go-chi/chi/v5 v5.2.3
+     step-construire : #10 DONE 18.4s
+     step-construire : 
+     step-construire : #11 [stage-1 1/1] COPY --from=build /out/sample-app /sample-app
+     step-construire : #11 DONE 0.0s
+     step-construire : 
+     step-construire : #12 exporting to oci image format
+     step-construire : #12 exporting layers
+     step-construire : #12 exporting layers 0.2s done
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC)
+     step-construire : #12 rewriting layers with source-date-epoch 0 (1970-01-01 00:00:00 +0000 UTC) 0.2s done
+     step-construire : #12 exporting manifest sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 done
+     step-construire : #12 exporting config sha256:0672b88de1499ba30c9581ea2c388bad29d7f723eb4818c5776b709c2d79c0eb done
+     step-construire : #12 sending tarball 0.0s done
+     step-construire : #12 DONE 0.5s
+     step-construire : construction en 27 s : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; tmpfs de BuildKit 1123 Mo
+### TaskRun j7-sample-app-preparer (Succeeded, pod j7-sample-app-preparer-pod)
+     step-sources : git version 2.52.0 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     step-entrees : fermeture : 7 fichiers ; web/dist : 2 fichiers ; image de build en layout OCI : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+### TaskRun j7-sample-app-publier (Succeeded, pod j7-sample-app-publier-pod)
+     step-publier : publiée : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 (relue en lecture anonyme)
+## mesures
+OK   PipelineRun j7-sample-app : True|Succeeded
+OK   kata : QEMU : -smp 3 -m 6176M
+TaskRun construire : TrustedResourcesVerified=True, pod j7-sample-app-construire-pod
+TaskRun preparer : TrustedResourcesVerified=True, pod j7-sample-app-preparer-pod
+TaskRun publier : TrustedResourcesVerified=True, pod j7-sample-app-publier-pod
+PipelineRun : TrustedResourcesVerified=True ; résultats IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app, IMAGE_DIGEST=sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+pod construire : nœud sc-build, runtimeClassName kata, tekton.dev/task construire-image, étapes step-construire=privilégiée
+pod preparer : nœud sc-build, runtimeClassName -, tekton.dev/task preparer-entrees, étapes step-sources=uid 65532 step-entrees=uid 65532
+pod publier : nœud sc-build, runtimeClassName -, tekton.dev/task publier-image, étapes step-publier=uid pod
+OK   label tekton.dev/task du pod construire : construire-image
+CONSTAT  étape construire lancée 3 s après le premier conteneur du pod (fenêtre de démarrage mesurée : 0,5 à 1,1 s ; horodatages à la seconde)
+OK   image de sample-app construite dans le PipelineRun (voie A, sans sortie réseau, image de build en layout OCI) : sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   arbre du commit (dépôt Forgejo) : 30e808ffa327288c656ddda7b6fafe4005234b77
+## Chains
+TaskRun j7-sample-app-construire signé=true
+TaskRun j7-sample-app-preparer signé=true
+TaskRun j7-sample-app-publier signé=true
+OK   PipelineRun j7-sample-app signé par Chains : true
+## audit de Zot : écritures de manifestes de builds/sample-app depuis 2026-11-13T11:28:28Z
+{"t":"11:29:22","compte":"poc-images","action":"PUT","objet":"sha256…3a7ca1b14dbf","code":201}
+{"t":"11:29:26","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.att","code":201}
+{"t":"11:29:28","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.sig","code":201}
+{"t":"11:29:30","compte":"poc-build","action":"PUT","objet":"sha256…3a7ca1b14dbf.att","code":201}
+OK   image poussée par poc-images (1 écriture(s) par digest)
+## témoin : label tekton.dev/task imposé par le créateur (PipelineRun annulé une fois le pod lu)
+taskRunSpecs : {"labels":{"tekton.dev/task":"autre","essai":"etiquette"}}
+TaskRun j7-sample-app-etiquette-construire : tekton.dev/task=construire-image, essai=etiquette
+pod j7-sample-app-etiquette-construire-pod : tekton.dev/task=construire-image, essai=etiquette
+OK   label tekton.dev/task du pod, imposé à « autre » par le créateur : construire-image
+OK   autre label du créateur, transmis au pod (témoin) : etiquette
+PipelineRun j7-sample-app-etiquette annulé : False|Cancelled|PipelineRun "j7-sample-app-etiquette" was cancelled
+## témoin : ancienne pipeline (sc-stockage.poc.test:5000/tekton/pipelines/sample-app@sha256:cb605a3bfc28f75bde3c59920b21bb6c0b4e6079bb7549aec4f25e09b21239d6)
+### TaskRun j7-sample-app-ancienne-construire (StepFailed, pod j7-sample-app-ancienne-construire-pod)
+     step-sources : fatal: unable to access 'https://sc-stockage.poc.test:3000/workspace/sample-app.git/': Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+     step-entrees : 2026/11/13 11:30:07 Skipping step because a previous step failed
+     step-construire : 2026/11/13 11:30:07 Skipping step because a previous step failed
+PipelineRun j7-sample-app-ancienne : False|Failed|Tasks Completed: 1 (Failed: 1, Cancelled 0), Skipped: 1
+OK   ancienne construire-image en échec fermé : Could not resolve host: sc-stockage.poc.test (Timeout while contacting DNS servers)
+OK   TaskRun publier de l'ancienne pipeline : 0
+OK   écritures de poc-images depuis 2026-11-13T11:29:43Z : 0
+## même PipelineRun sans runtimeClassName
+PipelineRun j7-sample-app-sans-kata : False|Failed|Tasks Completed: 2 (Failed: 1, Cancelled 0), Skipped: 1
+TaskRun construire : PodAdmissionFailed : pods "j7-sample-app-sans-kata-construire-pod" is forbidden: violates PodSecurity "restricted:latest": privileged (container "step-construire" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "step-construire" must set securityContext.allowPrivilegeEscalatio
+TaskRun preparer : Succeeded : All Steps have completed executing
+OK   pod de construction refusé hors Kata (Pod Security restricted de builds)
+OK   TaskRun preparer du PipelineRun sans Kata : Succeeded
+OK   TaskRun publier du PipelineRun sans Kata : 0
+OK   écritures de poc-images depuis 2026-11-13T11:30:09Z : 0
+# construction.sh provenance, 2026-11-13T11:30:19Z
+## prédiction
+cosign (clé de Chains) : enveloppes valides sur sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, dont celle du PipelineRun j7-sample-app (invocationId a505ae0d-7c03-48eb-ae54-23eaf1c5a49b) ;
+  buildType slsa-tekton ; sujet sc-stockage.poc.test:5000/builds/sample-app ; resolvedDependencies : pipeline et trois tâches (bundles), images d'étape (BuildKit,
+  outils), git+https://…/workspace/sample-app.git@sha1:6391fd437f26696847041be3226bbbf633f55a2f, fermeture, web/dist et image de build par digest, déclarés désormais
+  par preparer-entrees ;
+  runtimeClassName kata dans les paramètres externes (taskRunSpecs) et dans le TaskRun construire ; autre clé refusée
+OK   cosign verify-attestation : 2 enveloppe(s) valide(s) sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   enveloppes du PipelineRun j7-sample-app : 1
+sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+buildType : https://tekton.dev/chains/v2/slsa-tekton
+builder : https://supply-chain.example/builders/tekton-chains@v1
+paramètres externes : commit=6391fd437f26696847041be3226bbbf633f55a2f, depot=https://sc-stockage.poc.test:3000/workspace/sample-app.git
+taskRunSpecs : [{"pipelineTaskName":"construire","podTemplate":{"nodeSelector":{"zone":"build"},"runtimeClassName":"kata","securityContext":{"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}},"tolerations":[{"effect":"NoSchedule","key":"zone","operator":"Equal","value":"build"}]}}]
+resolvedDependencies :
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app sha256:b7b99075901885083e66f3747eb707dc5a84b773f4ac39b79f6422d0701e11ab
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/preparer-entrees sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4 (contenu)
+  - oci://sc-stockage.poc.test:5000/amont/moby/buildkit sha256:ace6811c21334fa502644b9711e0ea48e8539c5c2a843c2325dfb7b987ab260b
+  - oci://sc-stockage.poc.test:5000/plateforme/outils-horodatage sha256:c7bebae2bd33e57792988b8ba215536dd9360a9871ec0bdf807ee94d4c1f4ca0
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/construire-image sha256:66a9f2980a45d2899c49612de926ab86c27a7e34a694fb9a3e5e3efb38411357 (contenu)
+  pipelineTask sc-stockage.poc.test:5000/tekton/tasks/publier-image sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b (contenu)
+  inputs/result git+https://sc-stockage.poc.test:3000/workspace/sample-app.git sha1:6391fd437f26696847041be3226bbbf633f55a2f
+  inputs/result oci://sc-stockage.poc.test:5000/plateforme/builder-go-voie-d sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+  inputs/result oci://sc-stockage.poc.test:5000/builds/fermetures/sample-app sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+  inputs/result oci://sc-stockage.poc.test:5000/entrees/sample-app/web-dist sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   sujet : sc-stockage.poc.test:5000/builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+OK   buildType : https://tekton.dev/chains/v2/slsa-tekton
+OK   source : sha1:6391fd437f26696847041be3226bbbf633f55a2f
+OK   fermeture : sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd
+OK   web/dist : sha256:47f72275aa786c3c2d4393d7601e118fb2b1a17d928dca477f6dac89eb852bcb
+OK   image de build : sha256:d50ae57551c381b591540643fdfee12dd251ae16675c3c69fde221f8e9c28b67
+OK   tâche preparer-entrees (bundle) dans resolvedDependencies : sha256:2070d601ae3c8df5f96500a3b05b1bdd8fb4441134cca31d20982a3fa098ebe4
+OK   runtimeClassName de construire (paramètres externes) : kata
+OK   runtimeClassName du TaskRun construire (contenu signé de resolvedDependencies) : kata
+OK   provenance vérifiée avec une autre clé : refusé (no matching attestations)
+## durée J7 (construction) : 166 s
+[confiance:kata] $ poc/bricks/08-trust-plane/kata.sh reseau
+# kata.sh reseau, 2026-11-13T11:30:19Z
+## prédiction (écrite le 30/10/2026, avant la mesure, sous Cilium 1.20.4 : routage natif, kube-proxy de k3s, L7 coupé)
+- la politique ne sélectionne que les pods de mesure (label app=sonde-reseau-j7) ;
+- fenêtre : aucune, sous runc comme sous Kata. Le plugin CNI demande une construction synchrone (SyncBuildEndpoint,
+  plugins/cilium-cni/cmd/cmd.go) ; l'agent résout les labels du pod puis attend la première régénération avant de rendre
+  la main (WaitForFirstRegeneration, pkg/endpoint/api/endpoint_api_manager.go, au tag v1.20.4) : Zot refusé dès la
+  première tentative ;
+- une fois la règle posée, sous runc comme sous Kata : Forgejo seul ouvert ; Zot, SSH de sc-stockage, API (nœud et
+  service), kubelet local et kubelet de sc-confiance fermés. Un refus de Cilium est une perte de paquet, pas un REJECT :
+  délai dépassé côté client ;
+- Hubble (agent de sc-build) : au moins un flux refusé par tentative vers Zot, avec l'IP du pod et un motif de politique,
+  pour le pod runc comme pour le pod Kata ; aucun plafond ;
+- usurpation, pod Kata privilégié (root, NET_ADMIN dans l'invité) : avec son IP, Zot refusé ; avec 10.42.1.250, tout refusé
+  (vérification de l'adresse source, documentée : annotations de pod), aucune réponse de Zot, flux de 10.42.1.250 refusés
+  dans Hubble avec un motif d'adresse source ;
+- témoins sans NET_ADMIN, pod Kata restreint et pod runc restreint : ajout et liaison de l'adresse refusés, comme sous
+  kube-router (indépendant du contrôleur réseau) ;
+- autres sources depuis le même pod privilégié (ajout écrit le 30/10/2026, après le premier passage sous Cilium) : IP d'un
+  pod témoin endormi de sc-build (label de la sonde : sortie vers Forgejo permise), adresse inutilisée du CIDR de
+  sc-confiance (10.42.0.250), adresse externe de documentation (203.0.113.10) : Zot et Forgejo refusés pour chacune, motif
+  INVALID_SOURCE_IP dans Hubble ; aucun paquet de 203.0.113.10 sur enp1s0 de sc-build (non masquée, elle y serait visible)
+## état de départ
+NetworkPolicy de builds : networkpolicy.networking.k8s.io/construction-sans-sortie 
+OK   pas de politique sonde-reseau-j7 résiduelle
+Cilium : OK ; enable-policy default ; routing-mode native
+NetworkPolicy sonde-reseau-j7 posée : sortie vers Forgejo (192.168.161.13:3000) seule, pour les pods app=sonde-reseau-j7
+## fenêtre de démarrage, trois essais alternés runc et Kata
+### j7-reseau-runc-1 : IP 10.42.1.194, nœud sc-build, conteneur lancé 1 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1510 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-1 : IP 10.42.1.52, nœud sc-build, conteneur lancé 5 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1560 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-1 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-runc-2 : IP 10.42.1.56, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1500 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-2 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-2 : IP 10.42.1.155, nœud sc-build, conteneur lancé 5 s après la création
+     10 ms : Zot FERME ; Forgejo OUVERT
+   1560 ms : Zot FERME ; Forgejo OUVERT
+   3090 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-2 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-runc-3 : IP 10.42.1.38, nœud sc-build, conteneur lancé 0 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1510 ms : Zot FERME ; Forgejo OUVERT
+   3010 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   runc-3 : une fois la règle posée, Forgejo seul ouvert
+### j7-reseau-kata-3 : IP 10.42.1.50, nœud sc-build, conteneur lancé 4 s après la création
+      0 ms : Zot FERME ; Forgejo OUVERT
+   1550 ms : Zot FERME ; Forgejo OUVERT
+   3080 ms : Zot FERME ; Forgejo OUVERT
+  Zot joignable 0 fois, la dernière à - ms du lancement ; puis 3 refus de suite
+  OUVERT Forgejo 192.168.161.13:3000
+  FERME Zot 192.168.161.13:5000
+  FERME SSH-stockage 192.168.161.13:22
+  FERME API-noeud 192.168.161.11:6443
+  FERME API-service 10.43.0.1:443
+  FERME kubelet-local 192.168.161.12:10250
+  FERME kubelet-confiance 192.168.161.11:10250
+OK   kata-3 : une fois la règle posée, Forgejo seul ouvert
+OK   runc : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+OK   kata : aucune fenêtre en 3 essais (Zot refusé dès la première tentative)
+## trace Hubble sur sc-build (agent Cilium du nœud)
+### j7-reseau-trace-runc : IP 10.42.1.190, nœud sc-build, conteneur lancé 0 s après la création
+  TRACE|1|FERME
+  TRACE|2|FERME
+  TRACE|3|FERME
+  Hubble : 11:33:10.843 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:10.843 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:12.846 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:12.846 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:14.849 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:14.849 10.42.1.190 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   runc (10.42.1.190) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+### j7-reseau-trace-kata : IP 10.42.1.217, nœud sc-build, conteneur lancé 4 s après la création
+  TRACE|1|FERME
+  TRACE|2|FERME
+  TRACE|3|FERME
+  Hubble : 11:33:15.048 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:15.048 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:17.071 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:17.071 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:19.090 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble : 11:33:19.090 10.42.1.217 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+OK   kata (10.42.1.217) : 3 connexions refusées, 6 flux refusés vers Zot dans Hubble (motif POLICY_DENIED)
+## usurpation d'adresse source : témoins sans NET_ADMIN (pods restreints, capacités retirées)
+### j7-reseau-temoin-runc : IP 10.42.1.206, nœud sc-build, conteneur lancé 0 s après la création
+  AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
+  LIAISON|refusée|nc: bind: Cannot assign requested address
+OK   runc restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
+### j7-reseau-temoin-kata : IP 10.42.1.219, nœud sc-build, conteneur lancé 4 s après la création
+  AJOUT|refusé|ip: RTNETLINK answers: Operation not permitted
+  LIAISON|refusée|nc: bind: Cannot assign requested address
+OK   kata restreint : ajout de 10.42.1.250 refusé, liaison de nc refusée
+## usurpation d'adresse source : pod Kata privilégié
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+### j7-reseau-usurpation : IP 10.42.1.246, nœud sc-build, conteneur lancé 4 s après la création
+  AVANT|Zot|FERME
+  AVANT|Forgejo|OUVERT
+  ADRESSES|10.42.1.246/32 10.42.1.250/32 
+  USURPEE|Zot|192.168.161.13:5000|FERME
+  USURPEE|SSH-stockage|192.168.161.13:22|FERME
+  USURPEE|API-noeud|192.168.161.11:6443|FERME
+  USURPEE|kubelet-local|192.168.161.12:10250|FERME
+  ECHANGE|Zot|
+  APRES|Zot|FERME
+  FIN
+  Hubble (IP du pod) : 11:34:01.511 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:01.511 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:02.512 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:02.512 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:03.536 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:03.536 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:19.661 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:19.661 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:20.688 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:20.688 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:21.712 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (IP du pod) : 11:34:21.712 10.42.1.246 > 192.168.161.13:5000 SYN POLICY_DENIED EGRESS
+  Hubble (10.42.1.250) : 11:34:04.589 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:05.616 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:06.640 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:07.600 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:08.624 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:09.648 10.42.1.250 > 192.168.161.13:22 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:10.610 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:11.632 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:12.656 10.42.1.250 > 192.168.161.11:6443 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:13.621 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:14.640 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:15.664 10.42.1.250 > 192.168.161.12:10250 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:16.644 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:17.648 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.250) : 11:34:18.672 10.42.1.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  tcpdump : 15 packets captured
+  tcpdump : 16 packets received by filter
+OK   témoin : avec l'IP du pod, Zot refusé (avant et après), Forgejo ouvert
+OK   Hubble : 12 flux refusés du pod (10.42.1.246) vers Zot, ceux du témoin
+OK   avec 10.42.1.250, tout refusé (Zot, SSH de sc-stockage, API, kubelet local)
+OK   avec 10.42.1.250, aucune réponse de Zot
+OK   Hubble : 15 flux de 10.42.1.250 refusés, motif(s) INVALID_SOURCE_IP
+  capture -i any sur sc-build : 2 SYN distinct(s) de 10.42.1.250 vers Zot, 0 ligne(s) SYN-ACK en retour
+## usurpation : autres sources (IP d'un pod témoin du nœud, CIDR d'un autre nœud, adresse externe)
+OK   pod témoin 10.42.1.166 sur sc-build ; 10.42.0.250 inutilisée
+### j7-reseau-sources : IP 10.42.1.190, nœud sc-build, conteneur lancé 4 s après la création
+  SOURCE|10.42.1.166|Zot|FERME
+  SOURCE|10.42.1.166|Forgejo|FERME
+  SOURCE|10.42.0.250|Zot|FERME
+  SOURCE|10.42.0.250|Forgejo|FERME
+  SOURCE|203.0.113.10|Zot|FERME
+  SOURCE|203.0.113.10|Forgejo|FERME
+  FIN
+  Hubble (10.42.1.166) : 11:35:05.598 10.42.1.166 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.166) : 11:35:06.607 10.42.1.166 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.166) : 11:35:07.631 10.42.1.166 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.1.166) : 11:35:08.609 10.42.1.166 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+OK   source 10.42.1.166 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
+  Hubble (10.42.0.250) : 11:35:11.636 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:35:12.655 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:35:13.679 10.42.0.250 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (10.42.0.250) : 11:35:14.646 10.42.0.250 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+OK   source 10.42.0.250 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
+  Hubble (203.0.113.10) : 11:35:17.677 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:35:18.703 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:35:19.727 203.0.113.10 > 192.168.161.13:5000 SYN INVALID_SOURCE_IP INGRESS
+  Hubble (203.0.113.10) : 11:35:20.687 203.0.113.10 > 192.168.161.13:3000 SYN INVALID_SOURCE_IP INGRESS
+OK   source 203.0.113.10 : Zot et Forgejo refusés, 6 flux INVALID_SOURCE_IP dans Hubble
+  tcpdump enp1s0 : 0 packets captured
+  tcpdump enp1s0 : 0 packets received by filter
+OK   aucun paquet de 203.0.113.10 sur enp1s0 de sc-build : rien ne sort du nœud
+## retrait
+OK   NetworkPolicy et pods de mesure retirés
+## durée J7 (réseau) : 382 s
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+[confiance:preuves] $ poc/bricks/08-trust-plane/preuves.sh test2 test4 test5 test3 test1 test6 reglec test7 attseule test8 enveloppes decision3
+# preuves.sh test2, 2026-11-13T11:36:41Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+## prédiction (écrite le 30/10/2026, corrigée après le premier passage, archivé : preuves-test2-premier-passage.log)
+- TaskRun à taskSpec en ligne créé par l'administrateur, et PipelineRun à pipelineSpec en ligne créé par el-forgejo :
+  refusés à l'admission par deux barrières indépendantes, le webhook de Tekton (disable-inline-spec) et la règle
+  tekton-references de Kyverno. La réponse de l'API ne nomme qu'un refus (au premier passage, celui de Tekton) ; celui de
+  Kyverno se lit dans son événement PolicyViolation (« fail (blocked) »), un par objet refusé. TaskRun en ligne créé par
+  el-forgejo : refusé par RBAC avant l'admission (el-forgejo ne crée que des PipelineRuns), donc sans événement de Kyverno ;
+  aucun objet créé
+- témoins : TaskRun du bundle signé (administrateur) et PipelineRun du bundle signé (el-forgejo) admis en dry-run serveur
+- trace : refus de l'API ; un événement PolicyViolation de tekton-references par refus de Kyverno ; chaque requête dans
+  l'audit de l'API, avec le compte (l'administrateur apparaît comme emprunteur de l'identité d'el-forgejo)
+## tentatives (créations réelles)
+OK   TaskRun en ligne, administrateur : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.taskSpec )
+OK   PipelineRun en ligne, el-forgejo : refusé à l'admission (admission webhook "validation.webhook.pipeline.tekton.dev" denied the request: validation failed: must not set the field(s): spec.pipelineSpec )
+OK   TaskRun en ligne, el-forgejo : refusé par RBAC (taskruns.tekton.dev is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot create resource "taskruns" in API group "tekton.dev" in the namespace "builds" )
+## témoins (dry-run serveur, mêmes comptes)
+OK   témoin TaskRun du bundle signé, administrateur : admis (taskrun.tekton.dev/preuve-t2-tr-bundle-signe created (server dry run) )
+OK   témoin PipelineRun du bundle signé, el-forgejo : admis (pipelinerun.tekton.dev/preuve-t2-pr-bundle-signe created (server dry run) )
+OK   aucun objet preuve-t2-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-13T11:36:41Z
+  ValidatingPolicy/tekton-references : TaskRun builds/preuve-t2-tr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+  ValidatingPolicy/tekton-references : PipelineRun builds/preuve-t2-pr-en-ligne: fail (blocked); test 2 : spec en ligne interdite (taskSpec, pipelineSpec)
+OK   Kyverno a bloqué preuve-t2-tr-en-ligne (événement de tekton-references)
+OK   Kyverno a bloqué preuve-t2-pr-en-ligne (événement de tekton-references)
+OK   aucun événement de Kyverno pour preuve-t2-tr-en-ligne-el : refusé par RBAC avant l'admission
+## trace : audit de l'API (requêtes preuve-t2-*, et créations de TaskRuns par el-forgejo : un refus de RBAC précède la
+## lecture du corps, la requête n'a donc pas de nom d'objet)
+  11:36:42 system:admin create taskruns/preuve-t2-tr-en-ligne : 400
+  11:36:42 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-en-ligne : 400
+  11:36:42 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create taskruns/- : 403
+  11:36:42 system:admin create taskruns/preuve-t2-tr-bundle-signe (dry-run) : 201
+  11:36:42 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) create pipelineruns/preuve-t2-pr-bundle-signe (dry-run) : 201
+OK   les 3 refus sont dans l'audit de l'API
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+# preuves.sh test4, 2026-11-13T11:36:45Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- tentatives au nom du contrôleur de Tekton, le compte qui crée les pods des TaskRuns dans builds (créations réelles) :
+  pod runc privilégié : refusé par Pod Security (restricted en enforce sur builds, HTTP 403). Pod Security est une extension
+  d'admission intégrée, appelée avant les webhooks, et le premier refus arrête l'admission : Kyverno n'est pas consulté, donc
+  aucun événement de pods-isolation pour ce pod (J6 a mesuré cette règle de Kyverno seule, dans bancc, sans Pod Security).
+  Pod Kata privilégié avec un volume hostPath, et pod Kata privilégié en hostNetwork : exemptés de Pod Security (RuntimeClass
+  kata, J7), refusés par la règle pods-isolation de Kyverno (HTTP 400), seule barrière ; un événement PolicyViolation par pod
+- témoins (même compte, dry-run serveur) : pod Kata privilégié sans hostPath ni hostNetwork, et pod runc restreint : admis
+- trace : refus de l'API ; événements de Kyverno ; audit de l'API, avec l'annotation de Pod Security : enforce-policy
+  restricted:latest pour les pods runc, exempt runtimeClass pour les pods Kata, y compris ceux que Kyverno refuse ensuite
+- hors de ce test, déjà mesurée : la voie d'un PipelineRun (podTemplate avec volume refusé par tekton-references, cas de J6 ;
+  construction sans runtimeClassName : pod refusé par Pod Security, construction-construire.log)
+## tentatives (créations réelles, au nom de system:serviceaccount:tekton-pipelines:tekton-pipelines-controller)
+OK   pod runc privilégié : refusé par Pod Security (pods "preuve-t4-runc-privilegie" is forbidden: violates PodSecurity "restricted:latest": privileged (container "app" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "app" must set securityContext.allowPrivilegeEscala)
+OK   pod Kata privilégié avec hostPath : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : volume hostPath interdit hors des espaces système )
+OK   pod Kata privilégié en hostNetwork : refusé par Kyverno (admission webhook "vpol.validate.kyverno.svc-fail-finegrained-pods-isolation" denied the request: Policy pods-isolation failed: test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système )
+## témoins (dry-run serveur, même compte)
+OK   témoin pod Kata privilégié : admis (pod/preuve-t4-kata-privilegie created (server dry run) )
+OK   témoin pod runc restreint : admis (pod/preuve-t4-runc-restreint created (server dry run) )
+OK   aucun pod preuve-t4-* dans builds
+## trace : événements PolicyViolation de Kyverno depuis 2026-11-13T11:36:45Z
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostpath: fail (blocked); test 4 : volume hostPath interdit hors des espaces système
+  ValidatingPolicy/pods-isolation : Pod builds/preuve-t4-kata-hostnetwork: fail (blocked); test 4 : hostNetwork, hostPID et hostIPC interdits hors des espaces système
+OK   Kyverno a bloqué preuve-t4-kata-hostpath (événement de pods-isolation)
+OK   Kyverno a bloqué preuve-t4-kata-hostnetwork (événement de pods-isolation)
+OK   aucun événement de Kyverno pour preuve-t4-runc-privilegie : refusé par Pod Security, Kyverno non consulté
+## trace : audit de l'API (créations de pods preuve-t4-*, annotation de Pod Security)
+  11:36:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+  11:36:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+  11:36:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+  11:36:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-kata-privilegie (dry-run) : 201 ; Pod Security : exempt runtimeClass
+  11:36:45 system:admin (pour system:serviceaccount:tekton-pipelines:tekton-pipelines-controller) create pods/preuve-t4-runc-restreint (dry-run) : 201 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-runc-privilegie : 403 ; Pod Security : enforce-policy restricted:latest
+OK   audit : preuve-t4-kata-hostpath : 400 ; Pod Security : exempt runtimeClass
+OK   audit : preuve-t4-kata-hostnetwork : 400 ; Pod Security : exempt runtimeClass
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+# preuves.sh test5, 2026-11-13T11:36:49Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- l'EventListener répond HTTP 202 à chaque livraison, avant les intercepteurs : l'émetteur n'apprend rien du refus
+- commit 1111111111111111111111111111111111111111 : livraison non signée, signée avec un autre secret, et corps modifié sous la signature valide d'un
+  autre corps : refusées par l'intercepteur github (FailedPrecondition : une fois « no X-Hub-Signature-256 header set », deux
+  fois « payload signature check failed ») ; aucun PipelineRun. L'EventListener ne journalise ces refus qu'au niveau debug
+  (« interceptor stopped trigger processing », pkg/sink/sink.go de Triggers v0.37.2), absent au niveau info en service : leur
+  trace est le journal des intercepteurs, pas celui de l'EventListener
+- témoin : livraison valide du commit d2a5926ec36681b02d85500436ad334fc5a33224 (propre à ce passage) : PipelineRun sample-app-<commit> créé par
+  l'EventListener, terminé, signé par Chains (TaskRun et PipelineRun)
+- rejeu à l'identique du témoin (même corps, même signature), et nouvelle livraison de Forgejo pour la tête de main (6391fd437f26696847041be3226bbbf633f55a2f,
+  dont le PipelineRun existe) : acceptés par les intercepteurs, puis refusés à la création (« already exists » dans le journal
+  de l'EventListener, avec l'eventID de la livraison rejouée) ; un seul PipelineRun par commit
+- limite connue, non éprouvée ici : l'anti-rejeu dure tant que le PipelineRun existe (J4)
+## livraisons refusées (commit 1111111111111111111111111111111111111111)
+non signée : HTTP 202 {"eventID":"0e0c75e8-1096-4fdf-acf0-b25e663e84c4"}
+autre secret : HTTP 202 {"eventID":"01c4f3c8-3318-442f-aa6e-785f339bc759"}
+corps modifié (signature valide du corps du témoin) : HTTP 202 {"eventID":"f30fd302-f209-4360-93ff-feb5238dae49"}
+## témoin : livraison valide (commit d2a5926ec36681b02d85500436ad334fc5a33224)
+valide : HTTP 202 {"eventID":"ff492cc3-7005-4d1a-baab-279a4dba532d"}
+OK   TaskRun sample-app-d2a5926ec36681b02d85500436ad334fc5a33224-publier créé par ce PipelineRun (propriétaire 0e2c3112-e428-4119-839b-546b07005800)
+OK   PipelineRun sample-app-d2a5926ec36681b02d85500436ad334fc5a33224 créé par l'EventListener, Succeeded
+OK   taskrun/sample-app-d2a5926ec36681b02d85500436ad334fc5a33224-publier signé par Chains
+OK   pipelinerun/sample-app-d2a5926ec36681b02d85500436ad334fc5a33224 signé par Chains
+## rejeux
+rejeu à l'identique du témoin : HTTP 202 {"eventID":"6d5001bf-9698-40cc-8dd0-13c387d4c6c0"}
+Forgejo, nouvelle livraison pour la tête de main : HTTP 204
+## bilan (PipelineRuns par commit)
+commit 1111111111111111111111111111111111111111 : 0 ; témoin d2a5926ec36681b02d85500436ad334fc5a33224 : 1 ; tête de main 6391fd437f26696847041be3226bbbf633f55a2f : 1
+OK   livraisons non signée, d'un autre secret, à corps modifié : aucun PipelineRun
+OK   rejeux sans effet : un seul PipelineRun par commit
+## trace : refus des intercepteurs (service tekton-triggers-core-interceptors) depuis 2026-11-13T11:36:49Z
+{"t":"11:36:49","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"11:36:49","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"11:36:49","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   livraison non signée refusée par l'intercepteur github
+OK   autre secret et corps modifié refusés par l'intercepteur github
+OK   3 refus des intercepteurs, aucun autre (rejeux acceptés par les intercepteurs)
+## trace : EventListener, créations refusées (already exists) depuis 2026-11-13T11:36:49Z
+{"t":"11:37:05","eventID":"6d5001bf-9698-40cc-8dd0-13c387d4c6c0","erreur":"pipelineruns.tekton.dev \"sample-app-d2a5926ec36681b02d85500436ad334fc5a33224\" already exists"}
+{"t":"11:37:06","eventID":"86b78a5c-8cd9-4abe-9a6d-d8b4c8a974a7","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu du témoin (eventID 6d5001bf-9698-40cc-8dd0-13c387d4c6c0) : PipelineRun sample-app-d2a5926ec36681b02d85500436ad334fc5a33224 déjà présent
+OK   nouvelle livraison de Forgejo : PipelineRun sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent
+OK   EventListener : aucune ligne « interceptor stopped trigger processing » (niveau debug, non journalisé en service)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+# preuves.sh test3, 2026-11-13T11:37:07Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage)
+- cible : le TaskRun publier d'un PipelineRun créé par une livraison valide (commit d3ca11efd97e628ac83f028891c73e42942d0bc9, propre au passage),
+  terminé et signé par Chains : 3 signatures par la clé Transit chains dans l'audit d'OpenBao (signature de l'image et
+  provenance du TaskRun, provenance du PipelineRun), comme au test 5
+- tentatives réelles, au nom du compte des TaskRuns (build), d'el-forgejo, des opérateurs et du rattrapage : écriture
+  du résultat IMAGE_DIGEST falsifié (PUT de la sous-ressource status), puis de l'objet sans l'annotation
+  chains.tekton.dev/signed (PUT de la ressource principale) : refusées par RBAC (403, verbe update), chaque requête dans
+  l'audit de l'API avec le nom de l'objet (présent dans l'URL). Corrigée après le premier passage (archivé) : kubectl patch
+  lisait d'abord l'objet, refus sur la lecture, que la politique d'audit ne journalise pas
+- témoin : la même écriture du statut par l'administrateur est acceptée ; le statut falsifié n'est pas réécrit par le
+  contrôleur de Pipelines (un TaskRun terminé n'est plus recalculé)
+- Chains ne re-signe pas : dans les 45 s qui suivent, annotation toujours true, aucune signature par la clé chains dans
+  l'audit d'OpenBao, même nombre d'enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, et la provenance de ce TaskRun (invocationId
+  = UID du TaskRun) garde son sujet d'origine, tiré du résultat IMAGE_DIGEST à la signature. Lu dans le code de Chains
+  v0.29.9 (annotations.go, Reconciled ; reconciler/taskrun/taskrun.go) : un TaskRun terminé dont l'annotation vaut true ou
+  failed est sauté
+- limite lue dans ce même code, non mesurée (elle laisserait dans Zot une attestation falsifiée validement signée, que
+  poc-ecriture ne peut pas supprimer) : sans l'annotation, Chains signerait le TaskRun tel qu'il est ; la retirer demande
+  un droit de modification des TaskRuns (administrateurs, contrôleurs de Pipelines et de Chains, droits de J6)
+- fin : PipelineRun purgé, pour ne laisser aucun statut falsifié dans builds
+## mise en place : livraison valide (commit d3ca11efd97e628ac83f028891c73e42942d0bc9)
+valide : HTTP 202 {"eventID":"fc0d8386-66f5-4a3c-8c9d-186c8156ecc0"}
+OK   TaskRun sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier créé par ce PipelineRun (propriétaire 0f7f0990-8123-4de9-97e1-cfc395c09ed3)
+OK   sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier terminé (Succeeded) et signé par Chains
+état avant : UID ae1d2cc1-98b8-4e14-acdf-72102e5cebb7, résultats [{"name":"IMAGE_DIGEST","type":"string","value":"sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"},{"name":"IMAGE_URL","type":"string","value":"sc-stockage.poc.test:5000/builds/essai-webhook"}], 26 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5
+## tentatives (écritures réelles : PUT du statut falsifié, PUT de l'objet sans l'annotation de Chains)
+OK   build : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier" is forbidden: User "system:serviceaccount:builds:build" cannot update resource "taskruns/status" in API group "tekton)
+OK   build : retrait de l'annotation de Chains refusé par RBAC
+OK   el : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier" is forbidden: User "system:serviceaccount:declencheurs:el-forgejo" cannot update resource "taskruns/status" in API gr)
+OK   el : retrait de l'annotation de Chains refusé par RBAC
+OK   operateur : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier" is forbidden: User "operateur" cannot update resource "taskruns/status" in API group "tekton.dev" in the namespace "b)
+OK   operateur : retrait de l'annotation de Chains refusé par RBAC
+OK   rattrapage : écriture du statut refusée par RBAC (Error from server (Forbidden): taskruns.tekton.dev "sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier" is forbidden: User "system:serviceaccount:declencheurs:rattrapage" cannot update resource "taskruns/status" in API gr)
+OK   rattrapage : retrait de l'annotation de Chains refusé par RBAC
+## témoin : même écriture du statut par l'administrateur
+OK   administrateur : statut écrit (IMAGE_DIGEST renvoyé par l'API : sha256:0000000000000000000000000000000000000000000000000000000000000000)
+## Chains ne re-signe pas (45 s d'attente après l'écriture, 2026-11-13T11:37:24Z)
+OK   statut falsifié conservé (IMAGE_DIGEST = sha256:0000000000000000000000000000000000000000000000000000000000000000) : le contrôleur de Pipelines ne le réécrit pas
+OK   annotation chains.tekton.dev/signed toujours true
+signatures par la clé chains depuis 2026-11-13T11:37:08Z (audit d'OpenBao) :
+  {"t":"2026-11-13T11:37:13","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-13T11:37:18","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+  {"t":"2026-11-13T11:37:18","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller"}
+OK   témoin : 3 signatures de Chains avant l'écriture, pour cette exécution
+OK   aucune signature de Chains depuis l'écriture
+OK   26 enveloppes sur builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5, comme avant l'écriture
+OK   une provenance pour ce TaskRun, sujet d'origine : ["sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5"]
+## trace : audit de l'API (écritures de l'administrateur, emprunts compris, sur sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier)
+  11:37:24 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier/status : 403
+  11:37:24 system:admin (pour system:serviceaccount:builds:build) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier : 403
+  11:37:24 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier/status : 403
+  11:37:24 system:admin (pour system:serviceaccount:declencheurs:el-forgejo) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier : 403
+  11:37:24 system:admin (pour operateur) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier/status : 403
+  11:37:24 system:admin (pour operateur) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier : 403
+  11:37:24 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier/status : 403
+  11:37:24 system:admin (pour system:serviceaccount:declencheurs:rattrapage) update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier : 403
+  11:37:24 system:admin update taskruns/sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9-publier/status : 200
+OK   4 écritures du statut refusées dans l'audit, avec le nom de l'objet
+OK   4 retraits d'annotation refusés dans l'audit
+OK   écriture de l'administrateur dans l'audit (200)
+## fin : PipelineRun sample-app-d3ca11efd97e628ac83f028891c73e42942d0bc9 purgé (aucun statut falsifié laissé dans builds ; ses enveloppes restent dans Zot)
+OK   PipelineRun et TaskRun de d3ca11efd97e628ac83f028891c73e42942d0bc9 supprimés
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+# preuves.sh test1, 2026-11-13T11:38:10Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière
+- véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais
+  inscrit dans la liste revue de la porte), exécutée par un TaskRun de builds (compte build, gabarit de la zone build) ;
+  elle vaut une étape de build dont le code est hostile. TaskRun terminé avec succès : l'étape journalise et sort en 0
+- 1. aucun jeton de compte de service dans le pod (compte build sans montage d'office ; zone-build interdit le jeton
+  projeté) : rien à présenter à l'authentification JWT d'OpenBao ; aucune variable d'environnement de secret (premier
+  passage archivé : la sonde comptait sa propre variable, OPENBAO_IP, renommée CIBLE)
+- 2. réseau : la NetworkPolicy d'OpenBao n'admet en entrée que tekton-chains et le TSA ; Cilium jette les SYN à l'entrée,
+  sur sc-confiance (POLICY_DENIED, INGRESS, dans Hubble de sc-confiance), par le service comme par l'IP du pod (10.42.0.10) :
+  délai du client dépassé (5 s), pas de refus ; rien chez l'agent de sc-build, aucune politique de sortie ne sélectionnant
+  ce pod
+- 3. OpenBao ne reçoit rien : aucune ligne de son audit avec l'adresse du pod. Témoin dans la même lecture : les requêtes de
+  Chains (connexion JWT et signature), qui signe ce même TaskRun
+- témoins : depuis la même étape, Zot et Forgejo joignables (le réseau du pod fonctionne) ; OpenBao descellé pendant l'essai
+- non exercées ici, mesurées en J3 (openbao-essais.log) : rôle JWT lié au seul compte de Chains (autre compte et autre
+  audience refusés), clé Transit non exportable (export et sauvegarde refusés, même au jeton root)
+- résidu : le bundle signé tekton/tasks/preuve-test1 reste dans Zot (poc-ecriture ne supprime pas) ; la porte le refuserait,
+  hors de la liste revue
+OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.10)
+## véhicule : tâche signée (tkn 0.46.2), bundle, TaskRun
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test1 : sha256:fe4565b226d689f3afbac5b0ef786e9b2af431706bd5348dce4108f476a21d4b
+OK   TaskRun preuve-test1 terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape (pod preuve-test1-pod, nœud sc-build)
+  IP|10.42.1.71
+  JETON|absent
+  SECRETS_MONTES|
+  VARIABLES|
+  DNS|10.43.88.126
+  OPENBAO_SERVICE|FERME|5 s
+  OPENBAO_POD|FERME|5 s
+  TEMOIN_ZOT|OUVERT|0 s
+  TEMOIN_FORGEJO|OUVERT|0 s
+OK   1. aucun jeton de compte de service dans le pod
+OK   1. aucune variable d'environnement de secret
+OK   2. OPENBAO_SERVICE : injoignable, délai du client dépassé (FERME|5 s)
+OK   2. OPENBAO_POD : injoignable, délai du client dépassé (FERME|5 s)
+OK   témoin TEMOIN_ZOT : joignable depuis la même étape (OUVERT|0 s)
+OK   témoin TEMOIN_FORGEJO : joignable depuis la même étape (OUVERT|0 s)
+## trace : Hubble depuis 2026-11-13T11:38:10Z, flux refusés depuis 10.42.1.71 vers le port 8200
+agent de sc-confiance : 20 flux
+  11:38:15.922 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:15.922 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:16.942 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:16.942 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:17.970 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:17.970 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:18.990 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:18.990 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:20.014 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:20.014 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:20.925 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:20.925 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:21.934 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:21.934 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:22.958 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:22.958 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:23.982 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:23.982 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:25.006 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  11:38:25.006 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+agent de sc-build : 0 flux
+OK   2. SYN vers OpenBao jetés à l'entrée par Cilium (sc-confiance, POLICY_DENIED)
+OK   2. aucun refus chez l'agent de sc-build (pas de politique de sortie sur ce pod)
+## trace : audit d'OpenBao depuis 2026-11-13T11:38:10Z
+réponses journalisées : 3 ; par adresse et compte :
+        3 10.42.0.196 jwt-system:serviceaccount:tekton-chains:tekton-chains-controller
+OK   3. aucune requête de 10.42.1.71 dans l'audit d'OpenBao
+OK   témoin : 1 signature(s) de Chains dans la même lecture (preuve-test1 signé : true)
+OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+# preuves.sh test6, 2026-11-13T11:38:27Z
+builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
+builds-sans-internet (08c) : absente : attentes d'origine
+## prédiction (écrite le 31/10/2026, avant le premier passage), contrôle par contrôle
+- objet : vérifier sur un TaskRun réel les deux contrôles réseau de la zone build, retenus par le propriétaire le
+  30/10/2026 : la NetworkPolicy construction-sans-sortie (aucune entrée ni sortie pour les pods qui portent
+  tekton.dev/task=construire-image) et la vérification d'adresse source de Cilium 1.20.4. Les mesures de kata.sh reseau
+  portaient sur des pods de mesure et une politique de mesure ; ici, la politique réelle et le label posé par Tekton
+- véhicule : tâche de vérification signée par la clé des tâches, du nom construire-image, publiée sous tekton/tasks/preuve-test6
+  (jamais dans la liste revue de la porte : la porte refuserait toute provenance qui la cite) ; étape construire, image
+  BuildKit de la construction réelle, privilégiée et root dans l'invité Kata, comme la vraie ; ni workspace, ni volume, ni
+  résultat : Chains ne rattache rien à une image ; gabarit de pod du PipelineRun réel (taskRunTemplate du TriggerTemplate,
+  plus runtimeClassName kata, comme taskRunSpecs). Elle modélise du code qui sortirait du bac à sable de BuildKit
+- garde-fous relevés sur le pod : label tekton.dev/task=construire-image posé par le contrôleur de Tekton pour un TaskRun
+  autonome (mesuré jusqu'ici pour un PipelineRun), pod sous Kata (noyau de l'invité différent de celui de sc-build), eth0
+  de l'invité à l'IP du pod, adresse 10.42.1.250 ajoutée puis retirée
+- 1. avec l'IP du pod : Zot, Forgejo, API du nœud, API par le service (10.43.0.1:443) et 203.0.113.10 injoignables ; chez
+  l'agent de sc-build, au moins un flux refusé par tentative, motif POLICY_DENIED, sens EGRESS (au test 1, le refus était
+  à l'entrée d'OpenBao, sur sc-confiance). Compte par tentative : flux de l'IP du pod dans les 4 s qui suivent l'heure de la
+  tentative, notée par l'étape. Corrigé après le premier passage (preuves-test6-premier-passage.log), qui attendait l'API par
+  le service sous 10.43.0.1:443 : Hubble la montre sous l'adresse traduite, l'extrémité du service kubernetes, comme la
+  mesure de Cilium de J7 l'avait établi (adresse de service traduite avant la politique ; README, « Mesure de Cilium »)
+- 2. avec 10.42.1.250 (adresse inutilisée du sous-réseau des pods de sc-build) : Zot et Forgejo injoignables ; au moins un flux
+  refusé par tentative, motif INVALID_SOURCE_IP (sens non exigé : INGRESS en J7) ; aucun paquet sur enp1s0
+- 3. rien ne sort du nœud : aucun paquet de ou vers 203.0.113.10 ni de 10.42.1.250 sur enp1s0 de sc-build pendant le passage
+- contre-épreuve, même YAML et même image, seul le nom de la tâche change (preuve-test6-temoin, label différent, que la
+  politique ne sélectionne pas) : Zot, Forgejo et les deux voies de l'API joignables, nc lié à l'IP du pod (-s) joignable,
+  SYN vers 203.0.113.10 vus sur enp1s0 (sortie masquée par le nœud) et aucun flux refusé de l'IP du pod ; avec 10.42.1.250, tout
+  refusé, INVALID_SOURCE_IP : le contrôle d'adresse source tient seul, sans la politique. Sans cette contre-épreuve, un
+  nc qui ne marcherait pas ferait passer le test à tort : elle conditionne la conclusion
+- passages en séquence (mémoire de sc-build) ; l'étape sort toujours en 0
+- résidus : bundles tekton/tasks/preuve-test6-test et preuve-test6-contre dans Zot (poc-ecriture ne supprime pas) ; deux
+  TaskRuns signés par Chains sans sujet image, dont un de tâche construire-image (contrôle exécutions/enveloppes)
+OK   interface enp1s0 présente sur sc-build (noyau 6.12.113+deb13-amd64)
+## contre-épreuve d'abord : tâche preuve-test6-temoin, non sélectionnée par construction-sans-sortie
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+bundle tekton/tasks/preuve-test6-contre : sha256:95528f31b5fa26e927883bdc357c4c47f9298a274a9a491b1ab9f3c660e316f3 (tâche preuve-test6-temoin)
+NetworkPolicy de builds au lancement : construction-sans-sortie (tekton.dev/task=construire-image)
+CiliumNetworkPolicy de builds au lancement : prefetch-sortie
+OK   10.42.1.250 inutilisée : portée ni par un pod ni par un endpoint de Cilium
+OK   TaskRun preuve-test6-contre terminé (Succeeded, TrustedResourcesVerified=True)
+## journal de l'étape construire (pod preuve-test6-contre-pod)
+  NOYAU|6.18.56
+  IP|10.42.1.250
+  NC|/bin/busybox
+  PROPRE|Zot|192.168.161.13:5000|11:38:38|OUVERT
+  PROPRE|Forgejo|192.168.161.13:3000|11:38:39|OUVERT
+  PROPRE|API-noeud|192.168.161.11:6443|11:38:40|OUVERT
+  PROPRE|API-service|10.43.0.1:443|11:38:41|OUVERT
+  PROPRE|Externe|203.0.113.10:443|11:38:42|FERME
+  PROPRE|Supervisor|192.168.161.11:9345|11:38:46|OUVERT
+  PROPRE|Etcd|192.168.161.11:2379|11:38:47|OUVERT
+  LIEE|Zot|192.168.161.13:5000|11:38:48|OUVERT
+  AJOUT|refusé
+  USURPEE|Zot|192.168.161.13:5000|11:38:48|OUVERT
+  USURPEE|Forgejo|192.168.161.13:3000|11:38:49|OUVERT
+  RETRAIT|accepté
+  FIN
+pod : nœud sc-build, runtimeClassName kata, IP 10.42.1.250, tekton.dev/task=preuve-test6-temoin, étape privileged=true uid 0
+Hubble de sc-build depuis 2026-11-13T11:38:30Z, flux refusés de l'IP du pod :
+Hubble de sc-build depuis 2026-11-13T11:38:30Z, flux refusés de 10.42.1.250 :
+  tcpdump enp1s0 : 57 packets captured
+  tcpdump enp1s0 : 57 packets received by filter
+## contre-épreuve : mesures
+OK   contre : label tekton.dev/task=preuve-test6-temoin sur le pod
+OK   contre : pod sous Kata, noyau de l'invité 6.18.56 (sc-build : 6.12.113+deb13-amd64)
+OK   contre : adresse de eth0 dans l'invité = IP du pod (10.42.1.250)
+KO   contre : ajout refusé, retrait accepté
+[confiance:preuves] ERROR task failed

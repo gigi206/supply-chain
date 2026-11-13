@@ -1,4 +1,4 @@
-# prefetch.sh taches, 2026-11-06T14:21:35Z
+# prefetch.sh taches, 2026-11-13T11:26:33Z
 ## tâches (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   prefetch-gomod : signature versionnée conforme au gabarit rendu, signature exceptée
@@ -8,5 +8,5 @@ OK   publier-fermeture : signature versionnée conforme au gabarit rendu, signat
 OK   publier-fermeture dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/publier-fermeture@sha256:7fa92ad3e4adb0d4b9bc4209ee04096d476dee5ffa173fc08b9cac0614e2b135
 ## pipeline prefetch-sample-app (signée à chaque passage)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app@sha256:22483a25ea18a8a0d628f1b14475a9614b4761118f1a0b3af580b95754fe4e71
-# fin 2026-11-06T14:21:39Z
+sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sample-app@sha256:555c7e37f0cd310508bcd2339356abc9acb31adc14b80428a177ab5ff6d86e39
+# fin 2026-11-13T11:26:38Z

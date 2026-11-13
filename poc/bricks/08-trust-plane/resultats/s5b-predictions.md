@@ -92,3 +92,11 @@ de la 03)' JUSQUA='J8 (résolveurs)' mise run confiance:rejeu -- s5b-plateforme-
 |---|---|---|
 | E2 | F2 ne construit rien avec Nix (aucune ligne `building '/nix/store/`), ligne « clôture nix : 45 chemins », empreinte 66de99598aa176a1 | Haute : clôture mesurée dans le store |
 | E3 | Image d'outils `68e0ae70` reconstruite deux fois (A3 complète) | Moyenne : roues de Hermeto, toolchain Go et sources amont relues au réseau |
+
+## Note du 13/11/2026 (2026-11-13T11:40:22Z) : reprise arrêtée au test 6 (rien n'est réécrit)
+
+Code 1 à 11:38:52 UTC ([journal](rejeu-s5b-plateforme-reprise.log)).
+- **E2 tenue** : aucune ligne `building '/nix/store/` ni `copying path`, clôture 66de99598aa176a1.
+- **E3 tenue** : `68e0ae70` sur deux constructions, égale au digest épinglé ; **A3 complète** avec la note précédente.
+- **A4 non tenue** : `builds-sans-internet` vue absente (chemin d'origine suivi), mais contre-épreuve en KO (ajout d'adresse
+  refusé dans le pod privilégié). **E1 non tenue.** A1, A2, A5, B1 à B8 : non jugées.
