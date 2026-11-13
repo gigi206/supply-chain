@@ -2503,3 +2503,14 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
 - **Bilan de la journée** : lancements de 08:54:01, 09:01:34, 11:23:37, 12:04:38 et 12:31:26 UTC ; quatre arrêts (effacement de
   `$W` non prévu par la carte, store Nix vidé, collision d'adresse du test 6, clé de date du journal de Chains), dont trois
   défauts d'instruments ou de carte et un d'état de l'hôte ; aucun écart de la plateforme mesuré.
+
+### Additif du 13/11/2026 (note de 2026-11-13T13:01:41Z) : fuites et CIS passés, bloc 06 NON LANCÉ
+
+- **Accord** : « Oui, lance-les » à « Je lance fuites et CIS (DEPUIS=fuites, sans le bloc 06) ? ». Lancé à 13:00:45 UTC
+  (`DISTRO=rke2 DEPUIS=fuites`), code 0 à 13:00:58 UTC ([journal](resultats/rejeu-s5b-fin.log)).
+- **`fuites`** ([journal](resultats/fuites-s5b-fin.log)) : 195 885, 38 157 et 102 340 lignes de journaux de sc-confiance,
+  sc-build et sc-stockage ; témoin retrouvé sur chacune ; « aucun secret dans les journaux des trois VM ».
+- **CIS** (profil rke2-cis-1.9, le plus proche de Kubernetes 1.35), [journal](../08b-rke2/resultats/rke2-cis.log) : total 20 PASS,
+  61 FAIL, 42 WARN, 7 INFO, contre 18, 61, 44 et 7 le 06/11 ; les lignes 4.2.12 et 4.2.13 (WARN sur deux nœuds le 06/11)
+  n'apparaissent plus ; cause non lue.
+- **Reste de S5b** : le bloc 06 seul (entrées de S1 à S4d de la 06 effacées le matin), décision à part.

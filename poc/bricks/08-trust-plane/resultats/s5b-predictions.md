@@ -153,3 +153,8 @@ Code 0 à 12:58:19 UTC ([journal](rejeu-s5b-plateforme-ctl.log)), 441 OK, 0 KO.
 Décision du propriétaire : « Oui, lance-les » à « Je lance fuites et CIS (DEPUIS=fuites, sans le bloc 06) ? ». Commande :
 `DISTRO=rke2 DEPUIS=fuites mise run confiance:rejeu -- s5b-fin` (bloc 06 sauté, rien poussé). Jugée : **D1** telle qu'écrite le
 11/11 (« `fuites` : aucun secret dans les journaux ; CIS sans attendu »).
+
+## Note du 13/11/2026 (2026-11-13T13:01:41Z) : fuites et CIS passés (rien n'est réécrit)
+
+**D1 tenue** : « aucun secret dans les journaux des trois VM », témoin retrouvé sur chacune ; CIS sans attendu (20 PASS,
+61 FAIL, 42 WARN, 7 INFO). D2 et D3 : non jugées (passage complet et bloc 06 non joués).
