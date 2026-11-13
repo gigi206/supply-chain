@@ -66,3 +66,11 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
   162 fichiers aux empreintes de la liste attendue ; paquets contrôlés : amorce 20, chroot-a 63, chroot-b 63, fermeture 162.
 - **P5 tenue** : `deps/sample-app/deb-buildinfo@3a0e54ae…`, même digest au second envoi ; 162 couches, chacune égale au SHA256 de
   Packages ; restauration par digest : 162 fichiers conformes.
+
+## Résultat de l'étape 3 (note de 2026-11-13T14:33:28Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 3 : s3.sh restauration builds comparaison ? ». De 14:32:46 à 14:32:47 UTC, **code 1**.
+- `restauration` passée : deux restaurations par digest de `3a0e54ae`, 162 fichiers conformes chacune.
+- `builds` arrêtée avant tout pod : `KO   sources de sample-app` ; `s3.sh` l. 208 lit `$W/s1-06/SHA256SUMS.s1`, absent. Ce fichier
+  est écrit au début de `s1.sh essais` (l. 261 : trois lignes extraites de `~/.cache/supply-chain-poc/packaging/SHA256SUMS`), étape
+  que la carte n'avait pas listée : **oubli de la carte**, qui ne relevait que les lectures du bloc 06 et de S3 restauration.
+- P6 et la suite : non jugées. Rien d'autre n'est lancé.

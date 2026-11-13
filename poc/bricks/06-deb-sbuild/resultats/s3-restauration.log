@@ -1,4 +1,4 @@
-# s3.sh restauration, 2026-11-10T16:49:42Z
+# s3.sh restauration, 2026-11-13T14:32:46Z
 restauration 1 depuis sc-stockage.poc.test:5000/deps/sample-app/deb-buildinfo@sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b
 OK   ~/.cache/supply-chain-poc/08/travail/s3-06/restauree-1 : 162 fichiers, empreintes identiques à la liste attendue
 restauration 2 depuis sc-stockage.poc.test:5000/deps/sample-app/deb-buildinfo@sha256:3a0e54aee9c2bd8967be496ae49af62ebf432046321f6dfa5acc00df53c3677b
