@@ -1,3 +1,5 @@
+2026/11/13 15:13:41 Entrypoint initialization
+2026/11/13 15:13:41 Decoded script /tekton/scripts/script-0-nxz4v
 invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 1000, gid 1000 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
 témoin DNS snapshot.debian.org : échec, code 124 (attendu)
 témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
@@ -5,7 +7,7 @@ témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
 témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
 fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
 paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
-sbuild : rc 0 en 339 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+sbuild : rc 0 en 306 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
 deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
 ----- sample-app_1.0.0-1_amd64.buildinfo -----
 Format: 1.0
@@ -21,7 +23,7 @@ Checksums-Sha256:
  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Wed, 11 Nov 2026 19:55:36 +0000
+Build-Date: Fri, 13 Nov 2026 15:19:26 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),
@@ -195,5 +197,3 @@ Environment:
 ----- fin du .buildinfo -----
 couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
 image.tar : 1966080 octets
-2026/11/11 19:49:17 Entrypoint initialization
-2026/11/11 19:49:18 Decoded script /tekton/scripts/script-0-rcjzp

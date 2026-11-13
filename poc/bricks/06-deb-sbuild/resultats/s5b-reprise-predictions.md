@@ -96,3 +96,14 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
 « Oui, lance-la » à « Je lance l'étape 5 : s4d.sh prealables (hôte seul) ? ». De 15:05:01 à 15:05:10 UTC, code 0, 46 OK, 0 KO.
 **P7 tenue** : `digest-attendu` = `sha256:039949f9…` (deb `0b489d43`, entrées fixées par digest, dont la fermeture `bb7599a2`) ;
 `entrees.tar` de 227 266 560 octets écrit pour le pod d'essai.
+
+## Résultat de l'étape 6 (note de 2026-11-13T15:33:05Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 6 : rejeu depuis « 06 (S4d) » avec POUSSER_VSA=1 ? ». De 15:06:53 à 15:32:11 UTC, **code 1**,
+107 OK, 1 KO ([journal](../../08-trust-plane/resultats/rejeu-s5b-06-b.log)).
+- **S4d** (778 s) : artefact `039949f9` sur les deux exécutions, égal à `digest-attendu` (**C6 tenue**) ; preparer-deb `588617b8` et
+  construire-deb `3726ff0b` dans la liste revue (**C3 tenue** pour ces tâches).
+- **S4d3 chemins** : webhook et rattrapage rendent tous deux `039949f9`, TaskRuns 3/3 réussis et signés, PipelineRun signé par
+  Chains, même spec par les deux chemins, rejeu de la livraison sans double création. **Un écart** : au rattrapage, les pods portant
+  le label du PipelineRun sont quatre : `construire|sc-build|kata`, `preparer`, `publier` et un pod **sans label de tâche**
+  (`null|sc-build|-`) ; au webhook, les trois attendus. Nature du pod non lue (lecture du cluster par script seulement).
+- Non lancés : la porte de S4d3 (C9), `fuites` et CIS. C7 (bundle de pipeline) et C8 : à relever dans le journal avec le relevé.

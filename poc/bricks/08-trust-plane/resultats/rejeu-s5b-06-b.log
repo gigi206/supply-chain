@@ -1,0 +1,360 @@
+# rejeu.sh s5b-06-b, 2026-11-13T15:06:53Z
+réseau : cilium ; reprise à 06 (S4d)
+## démontage : sautée (reprise à 06 (S4d))
+## VM : sautée (reprise à 06 (S4d))
+## RKE2 : sautée (reprise à 06 (S4d))
+## Cilium : sautée (reprise à 06 (S4d))
+## J2 : sautée (reprise à 06 (S4d))
+## J3 : sautée (reprise à 06 (S4d))
+## J4 : sautée (reprise à 06 (S4d))
+## J5 : sautée (reprise à 06 (S4d))
+## J6 : sautée (reprise à 06 (S4d))
+## test 5 (J6) : sautée (reprise à 06 (S4d))
+## J6 (suite) : sautée (reprise à 06 (S4d))
+## J7 : sautée (reprise à 06 (S4d))
+## J7 (admission) : sautée (reprise à 06 (S4d))
+## J7 (BuildKit) : sautée (reprise à 06 (S4d))
+## J7 (voie D) : sautée (reprise à 06 (S4d))
+## J7 (voie A, sample-app) : sautée (reprise à 06 (S4d))
+## J7 (sans réseau) : sautée (reprise à 06 (S4d))
+## J7 (construction, entrées) : sautée (reprise à 06 (S4d))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à 06 (S4d))
+## J7 (construction) : sautée (reprise à 06 (S4d))
+## J7 (réseau) : sautée (reprise à 06 (S4d))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à 06 (S4d))
+## J8 (bascule) : sautée (reprise à 06 (S4d))
+## J8 (helm-cilium) : sautée (reprise à 06 (S4d))
+## J8 (contrôleurs) : sautée (reprise à 06 (S4d))
+## 01 (S2, S4) : sautée (reprise à 06 (S4d))
+## 01 (S3) : sautée (reprise à 06 (S4d))
+## 01 (S4, négatifs) : sautée (reprise à 06 (S4d))
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+## 01 (S6) : sautée (reprise à 06 (S4d))
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+## 19 (O2) : sautée (reprise à 06 (S4d))
+## 19b (L2) : sautée (reprise à 06 (S4d))
+## 19b (L3) : sautée (reprise à 06 (S4d))
+## 19b (L5) : sautée (reprise à 06 (S4d))
+## 19 (O2, suite) : sautée (reprise à 06 (S4d))
+## 19 (O3) : sautée (reprise à 06 (S4d))
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+## 19b (L6, contrôle) : sautée (reprise à 06 (S4d))
+## 19b (L4) : sautée (reprise à 06 (S4d))
+## 07a (G1) : sautée (reprise à 06 (S4d))
+## 07a (G2) : sautée (reprise à 06 (S4d))
+## 07a (G3) : sautée (reprise à 06 (S4d))
+## 07a (G4) : sautée (reprise à 06 (S4d))
+## 07a (passage périodique) : sautée (reprise à 06 (S4d))
+## 07a (G8) : sautée (reprise à 06 (S4d))
+## 10 (VSA) : sautée (reprise à 06 (S4d))
+## J8 (contrôle 6) : sautée (reprise à 06 (S4d))
+## J8 (contrôle 7) : sautée (reprise à 06 (S4d))
+## 07a (G6) : sautée (reprise à 06 (S4d))
+## 08c (H1) : sautée (reprise à 06 (S4d))
+## 08c (H4) : sautée (reprise à 06 (S4d))
+## 08c (S1) : sautée (reprise à 06 (S4d))
+## 08c (H5, limites) : sautée (reprise à 06 (S4d))
+## 08c (H5, Deny) : sautée (reprise à 06 (S4d))
+## 08c (H5, rôles) : sautée (reprise à 06 (S4d))
+## 08c (sortie des builds) : sautée (reprise à 06 (S4d))
+## J8 (résolveurs) : sautée (reprise à 06 (S4d))
+## 06 (S1, amorce) : sautée (reprise à 06 (S4d))
+## 06 (S4c) : sautée (reprise à 06 (S4d))
+## 06 (S4a) : sautée (reprise à 06 (S4d))
+## 06 (S4b) : sautée (reprise à 06 (S4d))
+# s4d.sh reseau, 2026-11-13T15:06:53Z
+NetworkPolicy de builds : builder-sans-sortie, construction-deb-sans-sortie, construction-sans-sortie
+OK   politiques qui sélectionnent construire-deb, sans entrée ni sortie : 1
+OK   politiques de builds qui autorisent du trafic : 0
+OK   CiliumNetworkPolicy de builds qui sélectionnent construire-deb et autorisent du trafic : 
+# s4d.sh taches, 2026-11-13T15:06:53Z
+## tâches (tkn 0.46.2)
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   preparer-deb : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   preparer-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+OK   construire-deb : signature versionnée conforme au gabarit rendu, signature exceptée
+OK   construire-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+## pipeline sample-app-deb
+OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
+OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+*Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+# s4d.sh pipeline, 2026-11-13T15:06:58Z
+## s4d-deb-1 créé à 15:06:58 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f)
+### TaskRun s4d-deb-1-construire (Succeeded), pod s4d-deb-1-construire-pod sur sc-build, runtimeClassName « kata », tekton.dev/task construire-deb
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
+     paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e
+     sbuild : rc 0 en 288 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+     ----- sample-app_1.0.0-1_amd64.buildinfo -----
+     Format: 1.0
+     Source: sample-app
+     Binary: sample-app
+     Architecture: amd64
+     Version: 1.0.0-1
+     Checksums-Md5:
+     Checksums-Sha1:
+     Checksums-Sha256:
+     Build-Origin: Debian
+     Build-Architecture: amd64
+     Build-Date: Fri, 13 Nov 2026 15:12:56 +0000
+     Build-Path: /build/reproducible-path/sample-app-1.0.0
+     Environment:
+      DEB_BUILD_OPTIONS="parallel=3"
+      LANG="C.UTF-8"
+      LC_COLLATE="C.UTF-8"
+      LC_CTYPE="C.UTF-8"
+      SOURCE_DATE_EPOCH="1793229566"
+     ----- fin du .buildinfo -----
+     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b11
+     image.tar : 1966080 octets
+     2026/11/13 15:07:20 Entrypoint initialization
+     2026/11/13 15:07:21 Decoded script /tekton/scripts/script-0-xhqhn
+OK   s4d-deb-1-construire : runtimeClassName : kata
+OK   s4d-deb-1-construire : nœud : sc-build
+### TaskRun s4d-deb-1-preparer (Succeeded), pod s4d-deb-1-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+     2026/11/13 15:07:04 Entrypoint initialization
+     2026/11/13 15:07:04 Decoded script /tekton/scripts/script-0-k77xv
+     2026/11/13 15:07:04 Decoded script /tekton/scripts/script-1-4fkhx
+     2026/11/13 15:07:04 Decoded script /tekton/scripts/script-2-bcwbl
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+OK   s4d-deb-1-preparer : runtimeClassName : 
+OK   s4d-deb-1-preparer : nœud : sc-build
+### TaskRun s4d-deb-1-publier (Succeeded), pod s4d-deb-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-image
+     2026/11/13 15:13:07 Entrypoint initialization
+     2026/11/13 15:13:08 Decoded script /tekton/scripts/script-0-kx4f7
+     publiée : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e (relue en lecture anonyme)
+OK   s4d-deb-1-publier : runtimeClassName : 
+OK   s4d-deb-1-publier : nœud : sc-build
+OK   PipelineRun s4d-deb-1 : True|Succeeded
+artefact publié : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   PipelineRun s4d-deb-1 signé par Chains : true
+## s4d-deb-2 créé à 15:13:22 (sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f)
+### TaskRun s4d-deb-2-construire (Succeeded), pod s4d-deb-2-construire-pod sur sc-build, runtimeClassName « kata », tekton.dev/task construire-deb
+     témoin DNS snapshot.debian.org : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
+     témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
+     témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
+     fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
+     paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e
+     sbuild : rc 0 en 306 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+     deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
+     ----- sample-app_1.0.0-1_amd64.buildinfo -----
+     Format: 1.0
+     Source: sample-app
+     Binary: sample-app
+     Architecture: amd64
+     Version: 1.0.0-1
+     Checksums-Md5:
+     Checksums-Sha1:
+     Checksums-Sha256:
+     Build-Origin: Debian
+     Build-Architecture: amd64
+     Build-Date: Fri, 13 Nov 2026 15:19:26 +0000
+     Build-Path: /build/reproducible-path/sample-app-1.0.0
+     Environment:
+      DEB_BUILD_OPTIONS="parallel=3"
+      LANG="C.UTF-8"
+      LC_COLLATE="C.UTF-8"
+      LC_CTYPE="C.UTF-8"
+      SOURCE_DATE_EPOCH="1793229566"
+     ----- fin du .buildinfo -----
+     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b11
+     image.tar : 1966080 octets
+OK   s4d-deb-2-construire : runtimeClassName : kata
+OK   s4d-deb-2-construire : nœud : sc-build
+### TaskRun s4d-deb-2-preparer (Succeeded), pod s4d-deb-2-preparer-pod sur sc-build, runtimeClassName «  », tekton.dev/task preparer-deb
+     git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f, arbre 30e808ffa327288c656ddda7b6fafe4005234b77
+     fermeture deb : 167 fichiers ; fermeture applicative : 8 fichiers ; packaging : 6 fichiers
+     fermeture deb confrontée au verrou : 162 paquets, sha256, taille et chemin identiques, aucun autre fichier dans le pool
+     all modules verified
+     go version go1.26.10 linux/amd64 : vendor/ reconstitué, 17 fichiers
+     marked 16.4.1 : integrity conforme au lockfile, 12 membres extraits
+     entrées prêtes : src (41 fichiers), debian (5 fichiers), fermeture deb, verrou
+     2026/11/13 15:13:27 Entrypoint initialization
+     2026/11/13 15:13:27 Decoded script /tekton/scripts/script-0-xjlhl
+     2026/11/13 15:13:27 Decoded script /tekton/scripts/script-1-zrt92
+     2026/11/13 15:13:27 Decoded script /tekton/scripts/script-2-khbhd
+OK   s4d-deb-2-preparer : runtimeClassName : 
+OK   s4d-deb-2-preparer : nœud : sc-build
+### TaskRun s4d-deb-2-publier (Succeeded), pod s4d-deb-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-image
+     2026/11/13 15:19:39 Decoded script /tekton/scripts/script-0-z6hf4
+     publiée : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e (relue en lecture anonyme)
+     2026/11/13 15:19:38 Entrypoint initialization
+OK   s4d-deb-2-publier : runtimeClassName : 
+OK   s4d-deb-2-publier : nœud : sc-build
+OK   PipelineRun s4d-deb-2 : True|Succeeded
+artefact publié : sc-stockage.poc.test:5000/builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   PipelineRun s4d-deb-2 signé par Chains : true
+OK   deux exécutions, même artefact : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+OK   artefact égal au digest attendu (prealables) : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+écarts : 0
+## durée 06 (S4d) : 778 s
+# s4d3.sh retirer, 2026-11-13T15:19:51Z
+PipelineRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f : absent
+labelSelector laissé : {"matchLabels":{"poc.test/ecouteur":"forgejo"}} (aucun objet Trigger : 0)
+# s4d3.sh prealables, 2026-11-13T15:19:51Z
+## gabarit rendu
+OK   objets de declencheur.yaml : CronJob/rattrapage-deb Role/rattrapage-deb Role/rattrapage-deb-pipelineruns RoleBinding/rattrapage-deb RoleBinding/rattrapage-deb-pipelineruns ServiceAccount/rattrapage-deb Trigger/sample-app-deb-push TriggerTemplate/sample-app-deb
+## exigences de main.go sur le gabarit (paramètres commit et depot, une ressource, PipelineRun v1 de builds nommé <gabarit>-<commit>)
+OK   paramètres : commit,depot
+OK   ressources : 1
+OK   PipelineRun rendu (apiVersion kind espace/nom) : tekton.dev/v1 PipelineRun builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f
+## Trigger sample-app-deb-push contre le trigger en ligne en service (intercepteurs et liaisons)
+OK   intercepteurs et liaisons identiques
+OK   label du Trigger : {"poc.test/ecouteur":"forgejo"}
+## CronJob rattrapage-deb contre rattrapage en service (hors nom, compte, GABARIT et suspension)
+OK   CronJob identique hors nom, compte, GABARIT et suspension (image comprise)
+OK   compte, GABARIT, suspension : rattrapage-deb declencheurs/sample-app-deb true
+## EventListener du dépôt contre celui en service
+OK   identiques hors labelSelector
+OK   labelSelector du dépôt : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## dépendances de la 08 en service
+OK   ConfigMap declencheurs/rattrapage : configmap/rattrapage
+OK   secret declencheurs/forgejo-webhook (nom seul) : secret/forgejo-webhook
+OK   NetworkPolicy builds/construction-deb-sans-sortie : networkpolicy.networking.k8s.io/construction-deb-sans-sortie
+OK   objets Trigger de declencheurs : 0
+OK   TriggerTemplate sample-app-deb : absente
+## bundle de la pipeline deb
+OK   bundle dans Zot : sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   tâche preparer dans la liste revue : tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+OK   tâche construire dans la liste revue : tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+# s4d3.sh deployer, 2026-11-13T15:19:52Z
+## départ
+OK   objets Trigger de declencheurs : 0
+pod de l'EventListener : el-forgejo-76596b99b8-67g67
+## EventListener : labelSelector (document EventListener de declencheurs.yaml de la 08, seul)
+OK   labelSelector en service : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## declencheur.yaml
+triggertemplate.triggers.tekton.dev/sample-app-deb serverside-applied
+trigger.triggers.tekton.dev/sample-app-deb-push serverside-applied
+serviceaccount/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+cronjob.batch/rattrapage-deb serverside-applied
+OK   pod de l'EventListener inchangé (aucun redémarrage) : el-forgejo-76596b99b8-67g67
+OK   CronJob rattrapage-deb suspendu : true
+OK   CronJob rattrapage repris (inchangé) : false
+## droits (kubectl auth can-i)
+OK   rattrapage-deb : get triggertemplate sample-app-deb : yes
+OK   rattrapage-deb : get triggertemplate sample-app : no
+OK   rattrapage-deb : create pipelineruns dans builds : yes
+OK   rattrapage-deb : delete pipelineruns dans builds : no
+OK   rattrapage-deb : get secrets dans declencheurs : no
+OK   rattrapage : get triggertemplate sample-app-deb : no
+OK   el-forgejo : list triggers dans declencheurs : yes
+## PipelineRun du gabarit, à blanc
+OK   au nom de el-forgejo : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+OK   au nom de rattrapage-deb : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+## livraisons refusées (commit fictif 1111111111111111111111111111111111111111), adressées directement à l'EventListener
+non signée : HTTP 202 {"eventID":"5ca87d91-63a8-4f4a-bab3-df6bdd586d7a"}
+autre secret : HTTP 202 {"eventID":"e24980c2-a4a8-4f77-9864-7d28756ff589"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"7414ca0d-8199-4060-adb4-3da26b7e9dbc"}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   refus « no X-Hub-Signature-256 header set » (un par trigger) : 2
+OK   refus « payload signature check failed » (deux livraisons, deux triggers) : 4
+OK   refus des intercepteurs, en tout : 6
+OK   PipelineRuns du commit fictif : 0
+# s4d3.sh chemins, 2026-11-13T15:20:24Z
+## départ
+OK   sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f absent : absent
+OK   sample-app-6391fd437f26696847041be3226bbbf633f55a2f présent : pipelinerun.tekton.dev/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   CronJob rattrapage-deb suspendu : true
+OK   PipelineRuns en cours dans builds : 0
+enveloppes de Chains : builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e 4, builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 6
+## chemin 1 : livraison de Forgejo (tête de main)
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:20:25Z, UID e98e810b-df92-412f-9230-c673defbd2d2
+OK   webhook : origine (labels) : EventListener forgejo
+    1 declencheurs:el-forgejo 201
+OK   webhook : créations dans l'audit de l'API : 1 declencheurs:el-forgejo 201
+OK   webhook : PipelineRun : True|Succeeded
+OK   webhook : pipeline : sample-app-deb@sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   webhook : spec identique à celle de s4d-deb-1 (S4d1)
+     TaskRun construire|sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire|63|Succeeded
+     TaskRun preparer|sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer|63|Succeeded
+     TaskRun publier|sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier|63|Succeeded
+OK   webhook : TaskRuns réussis : 3/3
+OK   webhook : noms des TaskRuns de 63 caractères au plus : 0
+OK   webhook : TaskRun publier au nom non raccourci : sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
+OK   webhook : TaskRuns preparer et construire aux noms raccourcis par Tekton : 2
+     pod construire|sc-build|kata
+     pod preparer|sc-build|-
+     pod publier|sc-build|-
+OK   webhook : pods (tâche|nœud|runtime) : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-
+OK   webhook : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app-deb
+     TaskRun sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire signé=true
+     TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
+     TaskRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   webhook : PipelineRun signé par Chains : true
+{"t":"15:20:25","eventID":"05390f04-0fdd-47bf-8f2c-3459710fde04","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   trigger de l'image : sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent : 1
+OK   trigger du deb : aucun refus : 0
+## chemin 2 : rattrapage (sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f purgé, CronJob rattrapage-deb repris, aucune livraison)
+rattrapage-deb-29909726  JOINT|Forgejo et API, essai 1
+rattrapage-deb-29909726  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-deb-29909726  CREE|builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:26:19Z, UID d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6
+OK   rattrapage : origine (labels) : rattrapage
+    1 declencheurs:rattrapage-deb 201
+OK   rattrapage : créations dans l'audit de l'API : 1 declencheurs:rattrapage-deb 201
+OK   rattrapage : PipelineRun : True|Succeeded
+OK   rattrapage : pipeline : sample-app-deb@sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   rattrapage : spec identique à celle de s4d-deb-1 (S4d1)
+     TaskRun construire|sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire|63|Succeeded
+     TaskRun preparer|sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer|63|Succeeded
+     TaskRun publier|sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier|63|Succeeded
+OK   rattrapage : TaskRuns réussis : 3/3
+OK   rattrapage : noms des TaskRuns de 63 caractères au plus : 0
+OK   rattrapage : TaskRun publier au nom non raccourci : sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
+OK   rattrapage : TaskRuns preparer et construire aux noms raccourcis par Tekton : 2
+     pod construire|sc-build|kata
+     pod null|sc-build|-
+     pod preparer|sc-build|-
+     pod publier|sc-build|-
+ÉCART rattrapage : pods (tâche|nœud|runtime) : construire|sc-build|kata null|sc-build|- preparer|sc-build|- publier|sc-build|- (attendu : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-)
+OK   rattrapage : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app-deb
+     TaskRun sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire signé=true
+     TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
+     TaskRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   rattrapage : PipelineRun signé par Chains : true
+OK   créations de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f dans les passages de rattrapage-deb depuis la reprise : 1
+OK   UID différent de celui du chemin 1
+OK   spec identique par les deux chemins
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   rattrapage de l'image (rattrapage-29909730) : 1
+## rejeu de la livraison
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+{"t":"15:32:10","eventID":"3ea17365-3def-434b-a73f-643f4c53b1e4","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+{"t":"15:32:10","eventID":"3ea17365-3def-434b-a73f-643f4c53b1e4","erreur":"pipelineruns.tekton.dev \"sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu : sample-app-6391fd437f26696847041be3226bbbf633f55a2f et sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f déjà présents : 2
+OK   UID de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6
+## fin
+OK   enveloppes de Chains sur builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e : 4 → 8
+OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 → 6
+OK   CronJob rattrapage-deb repris : false
+KO   1 écart(s)

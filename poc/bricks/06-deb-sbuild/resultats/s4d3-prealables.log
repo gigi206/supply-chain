@@ -1,4 +1,4 @@
-# s4d3.sh prealables, 2026-11-11T20:44:19Z
+# s4d3.sh prealables, 2026-11-13T15:19:51Z
 ## gabarit rendu
 OK   objets de declencheur.yaml : CronJob/rattrapage-deb Role/rattrapage-deb Role/rattrapage-deb-pipelineruns RoleBinding/rattrapage-deb RoleBinding/rattrapage-deb-pipelineruns ServiceAccount/rattrapage-deb Trigger/sample-app-deb-push TriggerTemplate/sample-app-deb
 ## exigences de main.go sur le gabarit (paramètres commit et depot, une ressource, PipelineRun v1 de builds nommé <gabarit>-<commit>)
@@ -21,7 +21,7 @@ OK   NetworkPolicy builds/construction-deb-sans-sortie : networkpolicy.networkin
 OK   objets Trigger de declencheurs : 0
 OK   TriggerTemplate sample-app-deb : absente
 ## bundle de la pipeline deb
-OK   bundle dans Zot : sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5
+OK   bundle dans Zot : sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
 OK   tâche preparer dans la liste revue : tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
 OK   tâche construire dans la liste revue : tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
 OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
