@@ -112,3 +112,14 @@ Chacun **doit échouer** et produire une trace :
 - RHEL et Ubuntu Pro ne servent pas de dépendances redistribuées (licences).
 - arm64 hors périmètre initial (option O3).
 - Le « Build Environment track » (attestation matérielle) est encore en brouillon chez SLSA : il reste en veille.
+
+> **Note du 13/11/2026 (2026-11-13T16:03:17Z) : besoin exprimé, non décidé (rien n'est réécrit).** Le propriétaire veut, dans la future
+> interface web, « une vue avec des namespaces ? propre utilisateurs, groupes, admin du ns, droits, qui permettent de gérer leur
+> propre build ? et un admon global qui peut lire tous les ns ». Lecture : chaque namespace a ses utilisateurs, ses groupes, un
+> administrateur et des droits, et gère ses propres builds ; un administrateur global lit tous les namespaces.
+> - Ce besoin contredit l'hypothèse « Un seul tenant (l'organisation) » ci-dessus, qui reste en vigueur tant qu'aucune décision
+>   n'est prise. Le PoC n'a aujourd'hui qu'un espace de builds, `builds`.
+> - Repère mesuré : le banc Konflux ([résultats](../poc/benchmarks/konflux/resultats/README.md), tests 3 et 4) avait des
+>   tenants qui ne lançaient un build que par `.tekton/`, mais dont l'espace acceptait un pod privilégié et `hostPath`.
+> - À définir avec le propriétaire avant toute décision : modèle de droits écrit d'abord, droits appliqués par chaque stockage
+>   (Zot, Loki, Forgejo) et pas seulement par l'interface, outil existant audité au doc 04 avant un portail maison.
