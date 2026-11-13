@@ -1,10 +1,10 @@
-# s4c.sh verrou, 2026-11-11T16:25:30Z
+# s4c.sh verrou, 2026-11-13T14:52:32Z
 OK   C1 InRelease (sha256 de S1) : 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675
 OK   C1 Packages.xz conforme à l'InRelease (sha256 taille) : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498 9678380
 OK   C1 Packages égal à xz -dc Packages.xz : égal
 OK   C2 Installed-Build-Depends (nombre, distincts) : 162 162
 OK   C2 verrou rapproché de Packages : 162 paquets, 0 absent(s), 0 en double
-verrou écrit : poc/packaging/verrou-deb.txt
+OK   C2 verrou égal à celui du dépôt : égal
 OK   C3 verrou égal à la fermeture de S2 (fichier sha256 taille) : fd1c5fe7c7d0395d04113709ae565d870e2a33291c83f2f3d71f0511c84af468
 verrou : 162 paquets, 193978008 octets, sha256 89d648b50bcf3864102726bb0bf06713b3888566fa4313b5d0c85877695ce7ca
 artefact : debian/changelog debian/control debian/copyright debian/rules debian/source/format verrou-deb.txt

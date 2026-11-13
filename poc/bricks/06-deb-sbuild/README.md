@@ -1996,3 +1996,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-13T14:28:59Z : reprise, étape 2 (S2) de 14:23:57 à 14:28:33 UTC, code 0 : chroot `e0b1f37c` deux fois, fermeture `3a0e54ae` retrouvée dans le nouveau Zot ; P4 et P5 tenues.
 - 2026-11-13T14:33:28Z : reprise, étape 3 (S3) arrêtée en code 1 au début de `builds` : `SHA256SUMS.s1` absent (écrit par `s1.sh essais`, oublié par la carte) ; restauration passée.
 - 2026-11-13T14:51:53Z : reprise, étape 3 (S3) reprise après la ligne 261 de `s1.sh` rejouée seule (`SHA256SUMS.s1`) : builds de 14:38:15 à 14:51:07 UTC, code 0, deb `0b489d43` deux fois ; P6 tenue.
+- 2026-11-13T15:03:01Z : reprise, étape 4 (rejeu jusqu'à « 06 (S4b) ») de 14:52:30 à 15:02:27 UTC, code 0 : amorce, `c1719b13`, image de build `749d746c` deux fois, fermetures `bb7599a2` et `50dc73f7` deux fois ; C1 à C5 tenues.

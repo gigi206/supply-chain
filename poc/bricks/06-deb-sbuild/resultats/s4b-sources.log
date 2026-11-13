@@ -1,39 +1,39 @@
-# s4b.sh sources, 2026-11-11T17:34:36Z
-## s4b-sources-1 créé à 17:34:37 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:0ebd1cb86107f7933e1c8cefc186bfc4b85c2fc2b0f401bb831d93ca0eace546)
+# s4b.sh sources, 2026-11-13T15:01:20Z
+## s4b-sources-1 créé à 15:01:20 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:aa5f62c1b74d19f8684115179613ad5bbc25c72398d72fdbd1a1cda81551fb36)
 ### TaskRun s4b-sources-1-prefetch (Succeeded), pod s4b-sources-1-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-gomod
-     2026/11/11 17:34:42 Entrypoint initialization
-     2026/11/11 17:34:43 Decoded script /tekton/scripts/script-0-xbp66
+     2026/11/13 15:01:26 Entrypoint initialization
+     2026/11/13 15:01:27 Decoded script /tekton/scripts/script-0-zxbhg
      gomod . : admis
      npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
      hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f ; demande [{"type": "gomod"}, {"type": "npm", "path": "web"}]
-     2026-11-11 17:34:47,000 INFO Fetching the gomod dependencies at subpath .
-     2026-11-11 17:34:47,008 INFO Using registry proxy https://proxy.golang.org for registry dependencies
-     2026-11-11 17:34:50,259 INFO Verifying checksums of marked-16.4.1.tgz
-     2026-11-11 17:34:50,273 INFO All dependencies fetched successfully \o/
+     2026-11-13 15:01:31,726 INFO Fetching the gomod dependencies at subpath .
+     2026-11-13 15:01:31,732 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-13 15:01:32,255 INFO Verifying checksums of marked-16.4.1.tgz
+     2026-11-13 15:01:32,266 INFO All dependencies fetched successfully \o/
      fermeture : 7 fichiers, 284 Kio
 ### TaskRun s4b-sources-1-publier (Succeeded), pod s4b-sources-1-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
-     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 849f
-     2026/11/11 17:34:52 Entrypoint initialization
-     2026/11/11 17:34:52 Decoded script /tekton/scripts/script-0-56jt4
+     2026/11/13 15:01:34 Entrypoint initialization
+     2026/11/13 15:01:35 Decoded script /tekton/scripts/script-0-wzk78
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 6665
 OK   PipelineRun s4b-sources-1 : True|Succeeded
 fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
 OK   PipelineRun s4b-sources-1 signé par Chains : true
-## s4b-sources-2 créé à 17:35:06 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:0ebd1cb86107f7933e1c8cefc186bfc4b85c2fc2b0f401bb831d93ca0eace546)
+## s4b-sources-2 créé à 15:01:50 (sc-stockage.poc.test:5000/tekton/pipelines/prefetch-sources-sample-app@sha256:aa5f62c1b74d19f8684115179613ad5bbc25c72398d72fdbd1a1cda81551fb36)
 ### TaskRun s4b-sources-2-prefetch (Succeeded), pod s4b-sources-2-prefetch-pod sur sc-build, runtimeClassName «  », tekton.dev/task prefetch-gomod
-     2026/11/11 17:35:10 Entrypoint initialization
-     2026/11/11 17:35:11 Decoded script /tekton/scripts/script-0-dwt4c
      gomod . : admis
      npm web : package-lock.json, lockfileVersion 3, 1 paquet(s), tous de https://registry.npmjs.org/ avec integrity sha512
      hermeto 0.64.0 ; go version go1.26.10 linux/amd64 ; git version 2.51.2 ; commit 6391fd437f26696847041be3226bbbf633f55a2f ; demande [{"type": "gomod"}, {"type": "npm", "path": "web"}]
-     2026-11-11 17:35:15,849 INFO Fetching the gomod dependencies at subpath .
-     2026-11-11 17:35:15,857 INFO Using registry proxy https://proxy.golang.org for registry dependencies
-     2026-11-11 17:35:16,334 INFO Verifying checksums of marked-16.4.1.tgz
-     2026-11-11 17:35:16,344 INFO All dependencies fetched successfully \o/
+     2026-11-13 15:02:01,776 INFO Fetching the gomod dependencies at subpath .
+     2026-11-13 15:02:01,783 INFO Using registry proxy https://proxy.golang.org for registry dependencies
+     2026-11-13 15:02:12,887 INFO Verifying checksums of marked-16.4.1.tgz
+     2026-11-13 15:02:12,898 INFO All dependencies fetched successfully \o/
      fermeture : 7 fichiers, 284 Kio
+     2026/11/13 15:01:55 Entrypoint initialization
+     2026/11/13 15:01:56 Decoded script /tekton/scripts/script-0-w8z7p
 ### TaskRun s4b-sources-2-publier (Succeeded), pod s4b-sources-2-publier-pod sur sc-build, runtimeClassName «  », tekton.dev/task publier-fermeture
-     2026/11/11 17:35:18 Entrypoint initialization
-     2026/11/11 17:35:19 Decoded script /tekton/scripts/script-0-pfjx4
-     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 63e4
+     2026/11/13 15:02:14 Entrypoint initialization
+     2026/11/13 15:02:15 Decoded script /tekton/scripts/script-0-rsj5p
+     publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (8 couches, relue en lecture anonyme) ; SBOM de Hermeto non publié : 2ad2
 OK   PipelineRun s4b-sources-2 : True|Succeeded
 fermeture publiée : sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
 OK   PipelineRun s4b-sources-2 signé par Chains : true

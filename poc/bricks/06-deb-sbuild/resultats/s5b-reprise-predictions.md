@@ -82,3 +82,12 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
 - `s3.sh builds comparaison` de 14:38:15 à 14:51:07 UTC, code 0, 24 OK, 0 KO.
 - **P6 tenue** : deb `0b489d43…` sur les deux builds ; Installed-Build-Depends des deux égal à celui de S2 ; aucune ligne apt en
   http(s) ; neutralisation des sources de l'instantané faite ; installés par sbuild = simulés, 0 écart.
+
+## Résultat de l'étape 4 (note de 2026-11-13T15:03:01Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 4 : rejeu de « 06 (S1, amorce) » à « 06 (S4b) » ? ». De 14:52:30 à 15:02:27 UTC, arrêt voulu après « 06 (S4b) » (JUSQUA), code 0, 126 OK, 0 KO ([journal](../../08-trust-plane/resultats/rejeu-s5b-06-a.log)).
+- **C1 tenue** : amorce `7378260c`. **C2 tenue** : `packaging-deb@c1719b13`, deux poussées au même digest.
+- **C3 tenue pour les tâches de ce passage** : prefetch-deb `4dac0609`, construire-builder `746c2e11`, prefetch-gomod `170bef53`,
+  dans la liste revue ; aucune ligne de nouvelle signature ; preparer-deb et construire-deb viendront avec S4d.
+- **C4 tenue** : `builds/builders/sbuild-debian13@749d746c`, deux fois.
+- **C5 tenue** : fermetures `sample-app-deb@bb7599a2` et `sample-app-sources@50dc73f7`, deux fois chacune ; fichiers gomod égaux à
+  ceux de F2 ; archive npm conforme à l'integrity du lockfile.

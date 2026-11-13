@@ -1,4 +1,4 @@
-# s4a.sh taches, 2026-11-10T23:25:42Z
+# s4a.sh taches, 2026-11-13T14:52:38Z
 ## tâches (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   prefetch-deb : signature versionnée conforme au gabarit rendu, signature exceptée
@@ -7,4 +7,4 @@ OK   prefetch-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/p
 OK   construire-builder : signature versionnée conforme au gabarit rendu, signature exceptée
 OK   construire-builder dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-builder@sha256:746c2e11858d37ae9a449e22dbd085986ddcdba7c01f3b2708d9b6d70d1198ce
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b
+sc-stockage.poc.test:5000/tekton/pipelines/builder-sbuild@sha256:71f84839cf5781134d5461128e5e0676b4b5a1f7491ef3738bec0a9485dd0bd9

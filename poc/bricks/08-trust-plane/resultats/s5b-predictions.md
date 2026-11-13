@@ -158,3 +158,6 @@ Décision du propriétaire : « Oui, lance-les » à « Je lance fuites et CIS (
 
 **D1 tenue** : « aucun secret dans les journaux des trois VM », témoin retrouvé sur chacune ; CIS sans attendu (20 PASS,
 61 FAIL, 42 WARN, 7 INFO). D2 et D3 : non jugées (passage complet et bloc 06 non joués).
+
+## Note du 13/11/2026 (2026-11-13T15:03:01Z) : bloc 06, première moitié (rien n'est réécrit)
+C1, C2, C4 et C5 tenues ; C3 tenue pour prefetch-deb, construire-builder et prefetch-gomod (reprise du bloc 06, README de la 06 et `06-deb-sbuild/resultats/s5b-reprise-predictions.md`).
