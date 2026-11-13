@@ -1,0 +1,51 @@
+# Reprise du bloc 06 de S5b : carte et prédictions (13/11/2026, préparées à sec, avant toute exécution)
+
+Décisions du propriétaire : « Oui, arrête-le » (banc Debian arrêté, priorité à la reprise du bloc 06) puis « Oui, prépare-la ».
+Plateforme rebâtie le 13/11 jusqu'à « J8 (résolveurs) », `fuites` et CIS passés (README de la 08). Le bloc 06 n'est pas jouable
+tel quel : `vm.sh detruire` a effacé `$W` (`~/.cache/supply-chain-poc/08/travail`) au lancement de S5b, et Zot est neuf.
+
+## Ce que le bloc 06 lit et qui manque
+- `$W/s1-06` : `Packages`, `hote/` (S1 prealables), `racine.tar` (S1 racine) ; lus par S4a (l. 46-48, 89) et S4c (l. 30-31).
+- `$W/s2-06/chroot.tar` et la fermeture (S2 racine) ; lus par S4a (l. 48) et S3.
+- Dans Zot : l'image d'essai `essais-06/sbuild-debian13@d8041f9c` (S1 image, passage s1b), lue par S3 builds (`s3.sh` l. 39-40) ;
+  la fermeture de S2 `deps/sample-app/deb-buildinfo@3a0e54ae`, lue par S3 restauration.
+- `$W/s3-06/build-1/sample-app_1.0.0-1_amd64.deb` (S3 builds), lu par `s4d.sh prealables` (l. 239).
+- `$W/s4d-06/digest-attendu` (`s4d.sh prealables`, l. 257), exigé par S4d (l. 327) ; `prealables` lit aussi les copies de S4b
+  (`entrees_hote`), donc vient après S4b.
+
+## Séquence (chaque ligne : un accord nommé ; journaux sous un nouveau libellé quand le script le permet)
+1. `DISTRO=rke2 PREFIXE=s1r mise exec -- poc/bricks/06-deb-sbuild/s1.sh prealables amorce racine image` : `PREFIXE` autre que
+   `s1` ajoute iproute2, comme s1b et s1c ; `GARDER_CHROOT=0` (défaut) reconstruit aussi le chroot de S1. Pods `racine` sous le
+   label `prefetch-deb` (`s1.sh` l. 60-62, 98, 198), seule sortie permise par la 08c vers l'instantané (port 80).
+2. `DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s2.sh buildinfo racine fermeture restauration` (journaux `s2-*` réécrits :
+   le script n'a pas de préfixe ; les versions archivées restent dans git).
+3. `DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s3.sh restauration builds comparaison` (journaux `s3-*` réécrits).
+4. `DISTRO=rke2 DEPUIS='06 (S1, amorce)' JUSQUA='06 (S4b)' mise run confiance:rejeu -- s5b-06-a` (rien n'y pousse de VSA).
+5. `DISTRO=rke2 mise exec -- poc/bricks/06-deb-sbuild/s4d.sh prealables` (hôte seul).
+6. `DISTRO=rke2 POUSSER_VSA=1 DEPUIS='06 (S4d)' mise run confiance:rejeu -- s5b-06-b` : S4d, S4d3 avec la porte, puis `fuites` et
+   CIS.
+
+## Après la reprise (hors de cette carte, chacun sur accord)
+- `pousser_vsa` et `lire_vsa` de la 06 (S6b), qui exigent `builds/sample-app-deb@039949f9` dans Zot (`apres-s5b`, étape 2).
+- **Option E** (brique 03, jalon à écrire) : `outils-prefetch` construite dans la chaîne sur le modèle de S4a. Placée après la
+  reprise, pour ne pas changer `68e0ae70` pendant que C3 et C6 (mêmes bundles, même deb) se jugent ; son nouveau digest entrera
+  avec la cascade 1.0.0-2, qui re-signe déjà preparer-deb.
+
+## Prédictions de la reprise
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| P1 | S1 prealables : InRelease `0584fba3…` (égal au banc Debian du jour et à S1), versions épinglées présentes | Haute |
+| P2 | S1 racine : racine `f8f221ca…` et chroot de S1 `440ba93b…` | Moyenne : s1 et s1c égaux à 1 h 30 d'écart, jamais à 3 jours sur un cluster neuf |
+| P3 | S1 image : `essais-06/sbuild-debian13@d8041f9c…` | Moyenne : P2 et assemblage par crane, non rejoué |
+| P4 | S2 racine : chroot `e0b1f37c…` deux fois ; fermeture de 162 debs aux sha256 du verrou | Moyenne : même pod coup sur coup le 10/11 seulement |
+| P5 | S2 fermeture : `deps/sample-app/deb-buildinfo@3a0e54ae…` | Moyenne : dépend de P4 et du manifeste déterministe de closure.sh |
+| P6 | S3 : deb `0b489d43` deux fois | Moyenne |
+| P7 | `s4d.sh prealables` : même `digest-attendu` qu'au 11/11 (`039949f9`, manifeste) | Moyenne : dépend de P6 |
+| P8 | Bloc 06 : C1 à C9 de `s5b-predictions.md` (08), telles qu'écrites le 11/11 | (celles de C1 à C9) |
+| P9 | `fuites` : aucun secret ; CIS sans attendu | Haute |
+
+## Limites
+- Les journaux archivés de S2 et S3 seront réécrits (pas de préfixe dans ces scripts) ; ceux de S1 passent sous `s1r-*`.
+- Le temps réseau dépend de snapshot.debian.org (lent par moments) ; aucune durée n'est prédite.
+- Règle des 2× : README de la 06, note du 13/11 (projection de 1,13 à 2,02 pw, seuil de 4 pw non atteint).

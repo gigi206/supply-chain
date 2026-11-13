@@ -1986,3 +1986,9 @@ Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédic
   **1,13 à 2,02 pw**. La borne haute (hypothèse : chaque passage coûte autant que tout le premier) dépasse l'estimation de 2 pw
   sans atteindre le seuil de 4 pw : **aucune décision due**, dépassement possible de l'estimation signalé. Non compté : la
   construction de `outils-prefetch` dans la chaîne (option E, brique 03), qui s'ajouterait à la reprise.
+
+**Note du 13/11/2026 (2026-11-13T14:04:41Z) : carte de reprise du bloc 06 préparée à sec, RIEN LANCÉ** (« Oui, prépare-la ») :
+[carte et prédictions P1 à P9](resultats/s5b-reprise-predictions.md). Six lancements, chacun sur accord nommé : S1 (`PREFIXE=s1r`,
+prealables, amorce, racine, image), S2 (buildinfo, racine, fermeture, restauration), S3 (restauration, builds, comparaison), rejeu
+jusqu'à « 06 (S4b) », `s4d.sh prealables`, rejeu depuis « 06 (S4d) » jusqu'à `fuites` et CIS. L'option E (outils-prefetch dans la
+chaîne) vient après, avec la cascade 1.0.0-2.
