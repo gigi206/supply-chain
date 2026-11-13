@@ -2472,3 +2472,19 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
   la ligne. Relevé en lecture seule préparé à sec (script du scratchpad, shellcheck tenu), NON LANCÉ.
 - **Règle des 2×** : l'estimation de S5b (une journée) supposait au plus trois reprises de 30 min, dans les blocs neufs ; c'est
   le quatrième arrêt (de 08:54:01 à 12:22:01 UTC), avant ces blocs. Seuil de deux jours non franchi ; hypothèse dépassée.
+
+### Additif du 13/11/2026 (note de 2026-11-13T12:30:18Z) : refus de Chains relevé, correctif de `refus_droits` préparé à sec, NON APPLIQUÉ
+
+- **Accord** : « Oui, lance-le » à « Je lance le relevé en lecture seule du journal de Chains ? ». Lancé à 12:29:29 UTC, code 0,
+  lecture seule ([relevé](resultats/s5b-releve-refus-chains.log), script dans le scratchpad, hors dépôt).
+- **Mesuré** : kube-apiserver démarré à 09:40:31Z (`restartCount` 2 : redémarrage de l'exemption Pod Security de Kata en J7) ;
+  contrôleur de Chains démarré à 09:22:40Z, 0 redémarrage ; **une seule** ligne « is forbidden: User », niveau `error`, à
+  **09:40:32.442Z** : « cannot watch resource "pipelineruns" in API group "tekton.dev" at the cluster scope ». Clés de la ligne :
+  caller, commit, error, knative.dev/pod, level, logger, msg, reflector, stacktrace, **ts**, type : pas de `timestamp`.
+- **Lecture** : c'est le cas que `refus_droits` veut écarter (watch refusé dans la minute qui suit le démarrage de
+  kube-apiserver, 1 s après ici) ; le contrôle échoue parce qu'il ne connaît que `.timestamp`, la clé du contrôleur de
+  Pipelines, alors que Chains date ses lignes par `ts`. **Défaut de l'instrument**, la plateforme n'y est pour rien.
+- **Correctif préparé à sec, non appliqué** (accord nommé requis : script du dépôt modifié) : `(.timestamp // .ts)` aux deux
+  `def t` et dans la ligne CONSTAT de `refus_droits` (`preuves.sh` l. 2341, 2344, 2346). Essai sur deux lignes synthétiques
+  (un watch refusé 1 s après le démarrage, un list refusé une heure plus tard) : avec `ts`, ancien filtre en erreur jq,
+  nouveau filtre 1 ; avec `timestamp`, 1 avant comme après.

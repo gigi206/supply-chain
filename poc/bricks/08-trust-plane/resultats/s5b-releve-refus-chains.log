@@ -1,0 +1,5 @@
+date : 2026-11-13T12:29:29Z
+kube-apiserver : startedAt 2026-11-13T09:40:31Z ; restartCount 2
+tekton-chains-controller : startedAt 2026-11-13T09:22:40Z ; restartCount 0
+lignes « is forbidden: User » : 1
+clés caller,commit,error,knative.dev/pod,level,logger,msg,reflector,stacktrace,ts,type ; niveau error ; ts 2026-11-13T09:40:32.442Z ; timestamp - ; cannot watch resource "pipelineruns" in API group "tekton.dev" at the cluster scope

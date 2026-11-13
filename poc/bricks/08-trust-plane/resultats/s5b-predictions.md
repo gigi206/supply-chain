@@ -125,3 +125,9 @@ Code 1 à 12:22:01 UTC ([journal](rejeu-s5b-plateforme-j8.log)).
 - **E1 non tenue.** A5 partielle (contrôles 6 et 7 non atteints) ; push de la VSA non atteint ; B1 à B8 non jugées.
 - KO de « J8 (contrôleurs) » : au moins un refus de watch sans `.timestamp` dans le journal de Chains, décompte impossible ;
   pas de prédiction sur ce point.
+
+## Note du 13/11/2026 (2026-11-13T12:30:18Z), avant toute reprise : prédiction E6 (rien n'est réécrit)
+
+| # | Prédiction | Confiance |
+|---|---|---|
+| E6 | Avec le correctif `(.timestamp // .ts)`, « J8 (contrôleurs) » rend 0 refus pour Chains et une ligne « CONSTAT  écarté, kube-apiserver démarrant : 2026-11-13T09:40:32.442Z cannot watch resource "pipelineruns" … » | Haute : ligne et démarrage relevés à 12:29:29 UTC, filtre essayé à sec |
