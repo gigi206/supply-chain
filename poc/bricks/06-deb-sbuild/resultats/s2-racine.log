@@ -1,4 +1,4 @@
-# s2.sh racine, 2026-11-10T15:53:52Z
+# s2.sh racine, 2026-11-13T14:23:58Z
 ### s2-racine (runtimeClassName kata, uid 0, label prefetch-deb) : prêt
      invité : 6.18.56, 3 vCPU, 6119664 kB ; /w : tmpfs
      apt-get update : rc 0 en 4 s
@@ -87,7 +87,7 @@
      deb chroot-a rpcsvc-proto_1.4.3-1_amd64.deb 32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3
      deb chroot-a sqv_1.3.0-3+b2_amd64.deb 97760aa17acceee0cace13d9edbed781d891b43e0dec0d6ddc4bd5e4c3ac65aa
      deb chroot-a xz-utils_5.8.1-1+deb13u1_amd64.deb 9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217
-     mmdebstrap chroot-a : rc 0 en 54 s, 508546560 octets, sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+     mmdebstrap chroot-a : rc 0 en 56 s, 508546560 octets, sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
      deb chroot-b apt_3.0.3_amd64.deb 55e341fbe92d7502c98faf1b3c235393ea0744db119cf2173603e965b658aef4
      deb chroot-b binutils-common_2.44-3_amd64.deb 002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9
      deb chroot-b binutils-x86-64-linux-gnu_2.44-3_amd64.deb e6741ce95ff0f7a131c8d9faa3528ccbbc453078bbc62a97da81340ed7462c53
@@ -151,8 +151,8 @@
      deb chroot-b rpcsvc-proto_1.4.3-1_amd64.deb 32ac0692694f8a34cc90c895f4fc739680fb2ef0e2d4870a68833682bf1c81a3
      deb chroot-b sqv_1.3.0-3+b2_amd64.deb 97760aa17acceee0cace13d9edbed781d891b43e0dec0d6ddc4bd5e4c3ac65aa
      deb chroot-b xz-utils_5.8.1-1+deb13u1_amd64.deb 9e0a39d95373afdaad3c9dfaab3c8b0beb9a2c4654e6be10b4bcf458509a3217
-     mmdebstrap chroot-b : rc 0 en 52 s, 508546560 octets, sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
-     apt-get download : rc 0 en 19 s, 162 fichier(s), 193978008 octets
+     mmdebstrap chroot-b : rc 0 en 50 s, 508546560 octets, sha256 e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa
+     apt-get download : rc 0 en 17 s, 162 fichier(s), 193978008 octets
      W: Download is performed unsandboxed as root as file '/w/fermeture/libacl1_2.3.2-2+b1_amd64.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
      deb fermeture autoconf_2.72-3.1_all.deb 0de76b647b0afb6c7934999aaefeb463656c147672464a367df1019969e77af3
      deb fermeture automake_1%3a1.17-4_all.deb 8d4b172d4ff8070789c54b48a95585b53e4c65faeb07a2ae52da16cb364df635

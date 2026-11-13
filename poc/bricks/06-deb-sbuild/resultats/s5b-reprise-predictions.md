@@ -58,3 +58,11 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
   conformes au Packages vérifié (amorce 20, racine 107, chroot 111). Mêmes empreintes qu'au 10/11, trois jours plus tard, sur un
   cluster neuf.
 - **P3 tenue** : `essais-06/sbuild-debian13@d8041f9c…`.
+
+## Résultat de l'étape 2 (note de 2026-11-13T14:28:59Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 2 : s2.sh buildinfo racine fermeture restauration ? ». De 14:23:57 à 14:28:33 UTC, code 0,
+15 OK, 0 KO (journaux `s2-*` réécrits ; versions du 10/11 dans git).
+- **P4 tenue** : chroot-a et chroot-b `e0b1f37c…` (508 546 560 octets ; chroot-b en 50 s), rapatrié à l'identique ; fermeture de
+  162 fichiers aux empreintes de la liste attendue ; paquets contrôlés : amorce 20, chroot-a 63, chroot-b 63, fermeture 162.
+- **P5 tenue** : `deps/sample-app/deb-buildinfo@3a0e54ae…`, même digest au second envoi ; 162 couches, chacune égale au SHA256 de
+  Packages ; restauration par digest : 162 fichiers conformes.
