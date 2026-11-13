@@ -1,0 +1,208 @@
+# rejeu.sh s5b, 2026-11-13T08:54:01Z
+réseau : cilium
+[confiance:vm] $ poc/bricks/08-trust-plane/vm.sh detruire
+Domain 'sc-confiance' destroyed
+
+Domain 'sc-confiance' has been undefined
+
+Domain 'sc-build' destroyed
+
+Domain 'sc-build' has been undefined
+
+Domain 'sc-stockage' destroyed
+
+Domain 'sc-stockage' has been undefined
+
+Vol sc-confiance.qcow2 deleted
+
+Vol sc-confiance-graine.iso deleted
+
+Vol sc-build.qcow2 deleted
+
+Vol sc-build-graine.iso deleted
+
+Vol sc-stockage.qcow2 deleted
+
+Vol sc-stockage-graine.iso deleted
+
+Pool supply-chain-poc destroyed
+
+Pool supply-chain-poc deleted
+
+Pool supply-chain-poc has been undefined
+
+Network supply-chain-poc destroyed
+
+Network supply-chain-poc has been undefined
+
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/tree.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/CHANGELOG.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/mux_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/SECURITY.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/.gitignore': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/testdata/cert.pem': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/testdata/key.pem': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/LICENSE': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value_fallback.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/CONTRIBUTING.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/README.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/.github/FUNDING.yml': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/.github/workflows/ci.yml': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/chi.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/go.mod': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/chain.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/context_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/mux.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/Makefile': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/tree_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/context.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/chi.svg': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/todos.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/users.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/pathvalue/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/custom-handler/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/router-walk/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/hello-world/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/README.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/logging/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/limits/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/custom-method/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/fileserver/data/notes.txt': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/fileserver/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/graceful/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/path_rewrite.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/value.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/wrap_writer.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/get_head.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/compress_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/terminal.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/middleware.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_encoding_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/recoverer.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/get_head_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/url_format_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_type.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/realip_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_charset_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_type_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/nocache.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/url_format.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/profiler.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/strip_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/throttle.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/supress_notfound.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_size.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/heartbeat.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_encoding.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/compress.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/route_headers.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/realip.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/throttle_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/logger_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/logger.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/sunset.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/timeout.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_id_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/basic_auth.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/clean_path.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/strip.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/wrap_writer_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/page_route.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/recoverer_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/middleware_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/sunset_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_charset.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/maybe.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_id.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp-bb/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern_fallback.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/tree.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/CHANGELOG.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/mux_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/SECURITY.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/.gitignore': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/testdata/cert.pem': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/testdata/key.pem': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/LICENSE': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value_fallback.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/CONTRIBUTING.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/README.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/.github/FUNDING.yml': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/.github/workflows/ci.yml': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/chi.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/go.mod': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/chain.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/context_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/mux.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/path_value_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/Makefile': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/tree_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/context.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/chi.svg': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/todos.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/todos-resource/users.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/pathvalue/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/custom-handler/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/router-walk/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/hello-world/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/README.md': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/logging/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/limits/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/custom-method/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/fileserver/data/notes.txt': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/fileserver/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/_examples/graceful/main.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/path_rewrite.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/value.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/wrap_writer.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/get_head.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/compress_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/terminal.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/middleware.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_encoding_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/recoverer.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/get_head_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/url_format_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_type.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/realip_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_charset_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_type_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/nocache.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/url_format.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/profiler.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/strip_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/throttle.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/supress_notfound.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_size.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/heartbeat.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_encoding.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/compress.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/route_headers.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/realip.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/throttle_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/logger_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/logger.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/sunset.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/timeout.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_id_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/basic_auth.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/clean_path.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/strip.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/wrap_writer_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/page_route.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/recoverer_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/middleware_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/sunset_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/content_charset.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/maybe.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/middleware/request_id.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern_test.go': Permission denied
+rm: cannot remove '~/.cache/supply-chain-poc/08/travail/s4d-06/essais/tmp/gomod/github.com/go-chi/chi/v5@v5.2.3/pattern_fallback.go': Permission denied
+[confiance:vm] ERROR task failed

@@ -2355,3 +2355,30 @@ Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et repl
   3. prédiction réécrite et commitée avant la nouvelle date, en tenant compte de `builds/scan/sample-app-deb` si S6a l'a créé (point 8 de la carte de S6 de la 06) ;
   4. tâche replanifiée à la date calculée, avec cette prédiction.
 - Rien n'a été lancé ni modifié dans le cluster, Zot, les VM ou les tâches planifiées.
+
+### Additif du 13/11/2026 (note de 2026-11-13T08:59:45Z) : S5b lancé, arrêté à la première étape (code 1), RIEN D'AUTRE LANCÉ
+
+- **Accord** : « Oui, lance S5b » à « Je lance S5b ? (`DISTRO=rke2 POUSSER_VSA=1 mise run confiance:rejeu -- s5b`) ». Lancé à
+  08:54:01 UTC (arbre propre, HEAD = origin = cc66a2b), fin à 08:54:05 UTC, code 1 ([journal](resultats/rejeu-s5b.log)).
+- **Ce qui a tourné** : `vm.sh detruire` seul. `sc-confiance`, `sc-build` et `sc-stockage` détruites et retirées, leurs volumes,
+  le pool et le réseau supprimés ; `sc-replay` intacte (`virsh list --all`, 08:55:20 UTC). Puis `rm -rf -- "$W"` (`vm.sh`
+  l. 152) a échoué sur le cache de modules Go en lecture seule de `s4d-06/essais/tmp` et `tmp-bb` (dossiers en 555) : la tâche
+  mise échoue et `rejeu.sh` s'arrête. Le reste de `$W` (`~/.cache/supply-chain-poc/08/travail`) est effacé : il reste
+  217 entrées (1244 Ko), toutes sous `s4d-06/essais`.
+- **Écart à la carte** : `rejeu.sh` (l. 173-174) et la limite connue des prédictions (l. 54) disent gardés les fichiers de `$W`
+  de S1 à S4d ; `vm.sh detruire` les efface (l. 152). Défaut de la carte, non relevé à sec : ni la carte du 11/11 ni le contrôle
+  d'avant lancement du 13/11 n'ont confronté la première étape du rejeu à ce que le bloc 06 suppose gardé.
+- **Entrées du bloc 06 perdues**, sans copie trouvée sous `~/.cache/supply-chain-poc` : `s1-06` (`Packages`, `racine.tar`,
+  `hote/` ; lus par `s4a.sh` l. 46-47 et 89, `s4c.sh` l. 30-31), `s2-06` (`chroot.tar` e0b1f37c et la fermeture des 162 debs ;
+  `s4a.sh` l. 48), `s4d-06/digest-attendu` (`s4d.sh` l. 327). Le deb de `s3-06` (`s4d.sh` l. 61) a deux copies hors de `$W`,
+  sha256 0b489d43 : `06/s6a/fichier` et `06/s6b/cc`. Zot (`sc-stockage`) étant détruit, la fermeture de S2 n'y est plus.
+- **Régénération** (d'après les en-têtes, rien lancé) : `s1.sh racine` et `s2.sh racine` demandent un cluster, un pod Kata et
+  l'instantané (réseau) ; `s2.sh fermeture` et `s3.sh builds` demandent Zot ; `s4d.sh prealables` refait `digest-attendu`.
+  Le bloc 06 n'est donc pas jouable tel quel.
+- **Fait sur le même accord** : tâche `supply-chain-g7-premiere-suppression` désactivée (`enabled: false`, non supprimée).
+- **Non fait** : rien relancé ; reliquat non effacé ; `vm.sh` et `rejeu.sh` inchangés. Une relance sous le même libellé
+  réécrit le journal (`tee`, `rejeu.sh` l. 62) : copie gardée hors dépôt.
+- **Règle des 2×** : la régénération de S1 à S3 s'ajoute à la cascade de la 06 ; le « aucune décision due » du recompte du
+  13/11 au matin (hors dépôt) est à recompter, non chiffré ici.
+- **Écart de forme** : la question de lancement portait `POUSSER_VSA=1`, alors que le push de la VSA garde son propre accord
+  (additif du 12/11) ; sans effet, l'arrêt est venu avant. À la prochaine demande, les deux accords seront nommés à part.

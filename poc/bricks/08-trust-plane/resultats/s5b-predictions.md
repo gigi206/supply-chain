@@ -54,3 +54,9 @@ Commande prévue (racine du dépôt) : `DISTRO=rke2 POUSSER_VSA=1 mise run confi
 - Même hôte : PKI, `taches.key`, caches OCI et fichiers de `$W` (S1 à S4d) gardés. Le rejeu ne prouve pas la variante B, sur un hôte neuf.
 - `s4d prealables` n'est pas rejoué : `digest-attendu` est celui du 11/11.
 - La première suppression réelle de la rétention de Zot repart de zéro, 14 jours après le rejeu.
+
+## Note du 13/11/2026 (2026-11-13T08:59:45Z) : S5b arrêté à la première étape (rien n'est réécrit)
+
+Lancé à 08:54:01 UTC, code 1 à 08:54:05 UTC, pendant `vm.sh detruire` ([journal](rejeu-s5b.log)). La limite connue « fichiers
+de `$W` (S1 à S4d) gardés » est fausse : `vm.sh detruire` efface `$W` (l. 152). A1 à D3 ne sont pas mesurées. Détail : README
+de la 08, additif du 13/11/2026.
