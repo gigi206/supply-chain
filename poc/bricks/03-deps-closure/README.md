@@ -552,3 +552,5 @@ puis démarrer le socket (le service repart à la première connexion). Le socke
 fermeture par l'apt de l'hôte sur un état dpkg vide). Shellcheck tenu ; essai à sec de `simulation` sur un Packages synthétique :
 code 0, `lo` seule. [Prédictions](resultats/banc-debian-predictions.md) L1 à L4, S1 à S4, critères de confiance et recompte des 2×
 (de 0,094 à 0,163 pw consommés sur 1 pw ; aucune décision due).
+
+- 2026-11-13T13:53:02Z : banc Debian, `lecture` et `simulation` lancées (13:52:21 à 13:52:27 UTC, code 0) : InRelease égal à S1 de la 06 ; fermeture de 69 paquets, 183,7 Mo installés (clôture Nix : 263 Mo) ; L1 à L4, S1 à S3 tenues, S4 non tenue ([prédictions et résultats](resultats/banc-debian-predictions.md)).

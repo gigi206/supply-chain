@@ -1,0 +1,80 @@
+# banc-debian.sh simulation, 2026-11-13T13:52:24Z
+apt de l'hôte : apt 3.2.1 (amd64) (solveur de l'hôte, pas celui de trixie : limite du banc)
+interfaces : lo:
+fermeture : 69 paquets ; .deb 47.5 Mo ; Installed-Size 183.7 Mo
+paquets Essential dans la fermeture : 1 : perl-base
+base-files dans la fermeture : non
+git : Depends libc6 (>= 2.38), libcurl3t64-gnutls (>= 7.56.1), libexpat1 (>= 2.0.1), libpcre2-8-0 (>= 10.34), zlib1g (>= 1:1.2.2), perl, liberror-perl, git-man (>> 1:2.47.3), git-man (<< 1:2.47.3-.)
+python3.13-venv : Depends python3.13 (= 3.13.5-2+deb13u5), python3-pip-whl (>= 22.2), python3-setuptools-whl (>= 70.1)
+python3.13 : Depends python3.13-minimal (= 3.13.5-2+deb13u5), libpython3.13-stdlib (= 3.13.5-2+deb13u5), media-types | mime-support, tzdata
+ca-certificates : Depends openssl (>= 1.1.1), debconf (>= 0.5) | debconf-2.0
+busybox-static : Depends -
+  busybox-static 1:1.37.0-6+b9 2067
+  ca-certificates 20250419 390
+  debconf 1.5.91 497
+  gcc-14-base 14.2.0-19 112
+  git 1:2.47.3-0+deb13u1 49154
+  git-man 1:2.47.3-0+deb13u1 2251
+  libbrotli1 1.1.0-2+b7 870
+  libbz2-1.0 1.0.8-6 96
+  libc6 2.41-12+deb13u4 13226
+  libcom-err2 1.47.2-3+b12 64
+  libcrypt1 1:4.4.38-1 234
+  libcurl3t64-gnutls 8.14.1-2+deb13u5 997
+  libdb5.3t64 5.3.28+dfsg2-9 1854
+  liberror-perl 0.17030-1 71
+  libexpat1 2.8.3-1~deb13u1 424
+  libffi8 3.4.8-2 72
+  libgcc-s1 14.2.0-19 197
+  libgdbm-compat4t64 1.24-2 75
+  libgdbm6t64 1.24-2 138
+  libgmp10 2:6.3.0+dfsg-3 882
+  libgnutls30t64 3.8.9-3+deb13u4 3504
+  libgssapi-krb5-2 1.21.3-5+deb13u1 434
+  libhogweed6t64 3.10.1-1 483
+  libidn2-0 2.3.8-2 446
+  libk5crypto3 1.21.3-5+deb13u1 266
+  libkeyutils1 1.6.3-6 41
+  libkrb5-3 1.21.3-5+deb13u1 1074
+  libkrb5support0 1.21.3-5+deb13u1 137
+  libldap2 2.6.10+dfsg-1 576
+  liblzma5 5.8.1-1+deb13u1 435
+  libncursesw6 6.5+20250216-2 419
+  libnettle8t64 3.10.1-1 560
+  libnghttp2-14 1.64.0-1.1+deb13u1 229
+  libnghttp3-9 1.8.0-1 201
+  libngtcp2-16 1.11.0-1+deb13u1 335
+  libngtcp2-crypto-gnutls8 1.11.0-1+deb13u1 80
+  libp11-kit0 0.25.5-3 1882
+  libpcre2-8-0 10.46-1~deb13u2 774
+  libperl5.40 5.40.1-6+deb13u1 29322
+  libpsl5t64 0.21.2-1.1+b1 100
+  libpython3.13-minimal 3.13.5-2+deb13u5 5452
+  libpython3.13-stdlib 3.13.5-2+deb13u5 8898
+  libreadline8t64 8.2-6 485
+  librtmp1 2.4+20151223.gitfa8646d.1-2+b5 144
+  libsasl2-2 2.1.28+dfsg1-9 156
+  libsasl2-modules-db 2.1.28+dfsg1-9 70
+  libsqlite3-0 3.46.1-7+deb13u2 1834
+  libssh2-1t64 1.11.1-1+deb13u2 441
+  libssl3t64 3.5.7-1~deb13u2 8103
+  libtasn1-6 4.20.0-2+deb13u1 122
+  libtinfo6 6.5+20250216-2 569
+  libunistring5 1.3-2 2092
+  libuuid1 2.41.5-0+deb13u1 98
+  libzstd1 1.5.7+dfsg-1 847
+  media-types 13.0.0 98
+  netbase 6.5 35
+  openssl 3.5.7-1~deb13u2 2510
+  openssl-provider-legacy 3.5.7-1~deb13u2 424
+  perl 5.40.1-6+deb13u1 841
+  perl-base 5.40.1-6+deb13u1 7815
+  perl-modules-5.40 5.40.1-6+deb13u1 19993
+  python3-pip-whl 25.1.1+dfsg-1 1531
+  python3-setuptools-whl 78.1.1-0.1 1324
+  python3.13 3.13.5-2+deb13u5 830
+  python3.13-minimal 3.13.5-2+deb13u5 6768
+  python3.13-venv 3.13.5-2+deb13u5 27
+  readline-common 8.2-6 89
+  tzdata 2026c-0+deb13u1 1358
+  zlib1g 1:1.3.dfsg+really1.3.1-1+b1 173

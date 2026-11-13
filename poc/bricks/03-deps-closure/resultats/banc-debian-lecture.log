@@ -1,0 +1,10 @@
+# banc-debian.sh lecture, 2026-11-13T13:52:21Z
+OK   signataires d'InRelease (clés primaires) : 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4 B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8
+InRelease : sha256 0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675, Sat, 12 Sep 2026 07:55:41 UTC
+OK   Packages.xz contrôlé par InRelease : 7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498
+Packages : 68825 paragraphes
+candidat python3.13 : 3.13.5-2+deb13u5
+candidat python3.13-venv : 3.13.5-2+deb13u5
+candidat git : 1:2.47.3-0+deb13u1
+candidat ca-certificates : 20250419
+candidat busybox-static : 1:1.37.0-6+b9

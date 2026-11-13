@@ -46,3 +46,18 @@ Consommé recompté le 13/11 à 13:45:10 UTC (heures de git et `date -u`, 40 h p
 13/11 de 10:58:20 UTC (échec de F2) à 13:45:10 UTC, 0,070 pw, partagé avec S5b de la 08 : **de 0,094 à 0,163 pw**. Non relevé :
 les parties locales des briques 03 et 04 d'avant le protocole F. Projection du banc (estimation, non mesurée) : 0,2 à 0,5 pw,
 soit 0,36 à 0,66 pw au plus, sous l'estimation de 1 pw. Aucune décision due.
+
+## Résultats de lecture et simulation (note de 2026-11-13T13:53:02Z ; rien n'est réécrit)
+
+Lancées sur « Oui, lance-les » à « Je lance banc-debian.sh lecture simulation ? », de 13:52:21 à 13:52:27 UTC, code 0
+([lecture](banc-debian-lecture.log), [simulation](banc-debian-simulation.log)).
+- **L1 tenue** (trois signataires épinglés) ; InRelease `0584fba3…`, **égal à celui de S1 de la 06** (10/11) : instantané inchangé.
+- **L2 tenue** ; Packages : 68 825 paragraphes. **L3 tenue** (python3.13 `3.13.5-2+deb13u5`). **L4 tenue** : python3.13-venv
+  `3.13.5-2+deb13u5`, git `1:2.47.3-0+deb13u1`, ca-certificates `20250419`, busybox-static `1:1.37.0-6+b9`.
+- **S1 tenue** (code 0, `lo` seule). **S2 tenue** : un seul paquet Essential, perl-base, dépendance de perl ; base-files absent.
+  **S3 tenue** : git tire perl, libperl5.40 et perl-modules-5.40 (environ 57 Mo installés à eux trois). **S4 non tenue** :
+  fermeture de 69 paquets, 47,5 Mo de .deb, **183,7 Mo installés**, sous les 263 Mo de la clôture Nix.
+- Dépendances lues : python3.13-venv tire python3-pip-whl et python3-setuptools-whl ; ca-certificates tire openssl et debconf
+  (le fichier `ca-certificates.crt` est produit par un script de mainteneur, que `dpkg-deb -x` n'exécutera pas).
+- Questions ouvertes pour l'étape `image` : base-files absent, donc ni `/bin` ni `/lib64` fournis par un paquet de la fermeture
+  (à vérifier sur les .deb par `dpkg-deb -c`) ; bundle de certificats à reconstituer ; écart avec E (S4a, mmdebstrap, scripts).
