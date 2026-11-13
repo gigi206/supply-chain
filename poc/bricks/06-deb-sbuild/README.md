@@ -1995,3 +1995,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-13T14:22:31Z : reprise, étape 1 (S1, `PREFIXE=s1r`) de 14:17:00 à 14:22:09 UTC, code 0 : racine `f8f221ca`, chroot `440ba93b`, image `d8041f9c` retrouvés au bit près ; P1 à P3 tenues ([prédictions](resultats/s5b-reprise-predictions.md)).
 - 2026-11-13T14:28:59Z : reprise, étape 2 (S2) de 14:23:57 à 14:28:33 UTC, code 0 : chroot `e0b1f37c` deux fois, fermeture `3a0e54ae` retrouvée dans le nouveau Zot ; P4 et P5 tenues.
 - 2026-11-13T14:33:28Z : reprise, étape 3 (S3) arrêtée en code 1 au début de `builds` : `SHA256SUMS.s1` absent (écrit par `s1.sh essais`, oublié par la carte) ; restauration passée.
+- 2026-11-13T14:51:53Z : reprise, étape 3 (S3) reprise après la ligne 261 de `s1.sh` rejouée seule (`SHA256SUMS.s1`) : builds de 14:38:15 à 14:51:07 UTC, code 0, deb `0b489d43` deux fois ; P6 tenue.

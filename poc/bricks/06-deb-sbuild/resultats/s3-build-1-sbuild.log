@@ -1,7 +1,7 @@
 sbuild (Debian sbuild) 0.89.3+deb13u4 (28 December 2025) on s3-build-1
 
 +==============================================================================+
-| sample-app 1.0.0-1 (amd64)                   Tue, 10 Nov 2026 18:12:38 +0000 |
+| sample-app 1.0.0-1 (amd64)                   Fri, 13 Nov 2026 14:40:08 +0000 |
 +==============================================================================+
 
 Package: sample-app
@@ -14,7 +14,7 @@ Build Architecture: amd64
 Build Type: binary
 
 I: No tarballs found in /w/home/.cache/sbuild
-I: Unpacking /w/chroot.tar to /w/tmp.sbuild.3G193YaKpA...
+I: Unpacking /w/chroot.tar to /w/tmp.sbuild.rL0YLavcCN...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 I: Setting up the chroot...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -38,7 +38,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Chroot Setup Commands                        Tue, 10 Nov 2026 18:12:49 +0000 |
+| Chroot Setup Commands                        Fri, 13 Nov 2026 14:40:20 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -730,7 +730,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Fetch source files                           Tue, 10 Nov 2026 18:16:01 +0000 |
+| Fetch source files                           Fri, 13 Nov 2026 14:43:40 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -753,7 +753,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Install package build dependencies           Tue, 10 Nov 2026 18:16:06 +0000 |
+| Install package build dependencies           Fri, 13 Nov 2026 14:43:45 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -778,7 +778,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
-dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-Gwafnx/apt_archive/sbuild-build-depends-main-dummy.deb'.
+dpkg-deb: building package 'sbuild-build-depends-main-dummy' in '/build/reproducible-path/resolver-Aq1dGl/apt_archive/sbuild-build-depends-main-dummy.deb'.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -790,20 +790,20 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
-Ign:1 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ InRelease
-Get:2 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Release [609 B]
-Ign:3 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Release.gpg
-Get:4 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Sources [632 B]
-Get:5 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ Packages [671 B]
+Ign:1 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ InRelease
+Get:2 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ Release [609 B]
+Ign:3 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ Release.gpg
+Get:4 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ Sources [632 B]
+Get:5 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ Packages [671 B]
 Fetched 1912 B in 0s (0 B/s)
 Reading package lists...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
-Ign:1 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ InRelease
-Get:2 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release [612 B]
-Get:2 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release [612 B]
-Ign:3 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Release.gpg
-Get:4 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ Packages [174 kB]
+Ign:1 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ InRelease
+Get:2 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ Release [612 B]
+Get:2 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ Release [612 B]
+Ign:3 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ Release.gpg
+Get:4 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ Packages [174 kB]
 Reading package lists...
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -849,57 +849,57 @@ The following NEW packages will be installed:
 0 upgraded, 49 newly installed, 0 to remove and 0 not upgraded.
 Need to get 880 B/85.3 MB of archives.
 After this operation, 406 MB of additional disk space will be used.
-Get:1 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ sensible-utils 0.0.25 [25.0 kB]
-Get:2 copy:/build/reproducible-path/resolver-Gwafnx/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [880 B]
-Get:3 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libuchardet0 0.0.8-1+b2 [68.9 kB]
-Get:4 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ groff-base 1.23.0-9 [1187 kB]
-Get:5 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ bsdextrautils 2.41.5-0+deb13u1 [94.8 kB]
-Get:6 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libpipeline1 1.5.8-1 [42.0 kB]
-Get:7 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ man-db 2.13.1-1 [1469 kB]
-Get:8 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libmagic-mgc 1:5.46-5 [338 kB]
-Get:9 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libmagic1t64 1:5.46-5 [109 kB]
-Get:10 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ file 1:5.46-5 [43.6 kB]
-Get:11 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ gettext-base 0.23.1-2 [243 kB]
-Get:12 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ m4 1.4.19-8 [294 kB]
-Get:13 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autoconf 2.72-3.1 [494 kB]
-Get:14 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autotools-dev 20240727.1 [60.2 kB]
-Get:15 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ automake 1:1.17-4 [862 kB]
-Get:16 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ autopoint 0.23.1-2 [770 kB]
-Get:17 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libdebhelper-perl 13.24.2 [90.9 kB]
-Get:18 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libtool 2.5.4-4 [539 kB]
-Get:19 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dh-autoreconf 20 [17.1 kB]
-Get:20 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libarchive-zip-perl 1.68-1 [104 kB]
-Get:21 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libfile-stripnondeterminism-perl 1.14.1-2 [19.7 kB]
-Get:22 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dh-strip-nondeterminism 1.14.1-2 [8620 B]
-Get:23 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libelf1t64 0.192-4 [189 kB]
-Get:24 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ dwz 0.15-1+b1 [110 kB]
-Get:25 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libunistring5 1.3-2 [477 kB]
-Get:26 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libxml2 2.12.7+dfsg+really2.9.14-2.1+deb13u3 [700 kB]
-Get:27 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ gettext 0.23.1-2 [1680 kB]
-Get:28 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ intltool-debian 0.35.0+20060710.6 [22.9 kB]
-Get:29 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ po-debconf 1.0.21+nmu1 [248 kB]
-Get:30 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ debhelper 13.24.2 [919 kB]
-Get:31 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-1.24-src 1.24.4-1 [21.2 MB]
-Get:32 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-1.24-go 1.24.4-1 [28.7 MB]
-Get:33 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-src 2:1.24~2 [5136 B]
-Get:34 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ golang-go 2:1.24~2 [44.3 kB]
-Get:35 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libbrotli1 1.1.0-2+b7 [307 kB]
-Get:36 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libcares2 1.34.5-1+deb13u1 [98.3 kB]
-Get:37 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libicu76 76.1-4 [9722 kB]
-Get:38 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libnghttp2-14 1.64.0-1.1+deb13u1 [76.2 kB]
-Get:39 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libuv1t64 1.50.0-2 [154 kB]
-Get:40 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-xtend 4.0.2-3 [3932 B]
-Get:41 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-corepack 0.24.0-5 [712 kB]
-Get:42 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ nodejs 20.19.2+dfsg-1+deb13u2 [353 kB]
-Get:43 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-acorn 8.8.1+ds+~cs25.17.7-2 [128 kB]
-Get:44 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-cjs-module-lexer 1.2.3+dfsg-1 [30.6 kB]
-Get:45 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-balanced-match 2.0.0-1 [4872 B]
-Get:46 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-brace-expansion 2.0.1+~1.1.0-2 [8012 B]
-Get:47 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-minimatch 9.0.3-6 [76.8 kB]
-Get:48 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ node-undici 7.3.0+dfsg1+~cs24.12.11-1 [333 kB]
-Get:49 file:/build/reproducible-path/resolver-gUfb5p/apt_archive ./ libnode115 20.19.2+dfsg-1+deb13u2 [12.1 MB]
+Get:1 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ sensible-utils 0.0.25 [25.0 kB]
+Get:2 copy:/build/reproducible-path/resolver-Aq1dGl/apt_archive ./ sbuild-build-depends-main-dummy 0.invalid.0 [880 B]
+Get:3 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libuchardet0 0.0.8-1+b2 [68.9 kB]
+Get:4 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ groff-base 1.23.0-9 [1187 kB]
+Get:5 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ bsdextrautils 2.41.5-0+deb13u1 [94.8 kB]
+Get:6 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libpipeline1 1.5.8-1 [42.0 kB]
+Get:7 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ man-db 2.13.1-1 [1469 kB]
+Get:8 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libmagic-mgc 1:5.46-5 [338 kB]
+Get:9 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libmagic1t64 1:5.46-5 [109 kB]
+Get:10 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ file 1:5.46-5 [43.6 kB]
+Get:11 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ gettext-base 0.23.1-2 [243 kB]
+Get:12 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ m4 1.4.19-8 [294 kB]
+Get:13 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ autoconf 2.72-3.1 [494 kB]
+Get:14 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ autotools-dev 20240727.1 [60.2 kB]
+Get:15 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ automake 1:1.17-4 [862 kB]
+Get:16 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ autopoint 0.23.1-2 [770 kB]
+Get:17 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libdebhelper-perl 13.24.2 [90.9 kB]
+Get:18 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libtool 2.5.4-4 [539 kB]
+Get:19 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ dh-autoreconf 20 [17.1 kB]
+Get:20 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libarchive-zip-perl 1.68-1 [104 kB]
+Get:21 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libfile-stripnondeterminism-perl 1.14.1-2 [19.7 kB]
+Get:22 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ dh-strip-nondeterminism 1.14.1-2 [8620 B]
+Get:23 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libelf1t64 0.192-4 [189 kB]
+Get:24 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ dwz 0.15-1+b1 [110 kB]
+Get:25 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libunistring5 1.3-2 [477 kB]
+Get:26 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libxml2 2.12.7+dfsg+really2.9.14-2.1+deb13u3 [700 kB]
+Get:27 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ gettext 0.23.1-2 [1680 kB]
+Get:28 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ intltool-debian 0.35.0+20060710.6 [22.9 kB]
+Get:29 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ po-debconf 1.0.21+nmu1 [248 kB]
+Get:30 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ debhelper 13.24.2 [919 kB]
+Get:31 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ golang-1.24-src 1.24.4-1 [21.2 MB]
+Get:32 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ golang-1.24-go 1.24.4-1 [28.7 MB]
+Get:33 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ golang-src 2:1.24~2 [5136 B]
+Get:34 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ golang-go 2:1.24~2 [44.3 kB]
+Get:35 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libbrotli1 1.1.0-2+b7 [307 kB]
+Get:36 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libcares2 1.34.5-1+deb13u1 [98.3 kB]
+Get:37 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libicu76 76.1-4 [9722 kB]
+Get:38 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libnghttp2-14 1.64.0-1.1+deb13u1 [76.2 kB]
+Get:39 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libuv1t64 1.50.0-2 [154 kB]
+Get:40 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-xtend 4.0.2-3 [3932 B]
+Get:41 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-corepack 0.24.0-5 [712 kB]
+Get:42 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ nodejs 20.19.2+dfsg-1+deb13u2 [353 kB]
+Get:43 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-acorn 8.8.1+ds+~cs25.17.7-2 [128 kB]
+Get:44 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-cjs-module-lexer 1.2.3+dfsg-1 [30.6 kB]
+Get:45 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-balanced-match 2.0.0-1 [4872 B]
+Get:46 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-brace-expansion 2.0.1+~1.1.0-2 [8012 B]
+Get:47 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-minimatch 9.0.3-6 [76.8 kB]
+Get:48 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ node-undici 7.3.0+dfsg1+~cs24.12.11-1 [333 kB]
+Get:49 file:/build/reproducible-path/resolver-Kesfxp/apt_archive ./ libnode115 20.19.2+dfsg-1+deb13u2 [12.1 MB]
 Preconfiguring packages ...
-Fetched 880 B in 0s (2246 B/s)
+Fetched 880 B in 0s (2015 B/s)
 Selecting previously unselected package sensible-utils.
 (Reading database ... 11806 files and directories currently installed.)
 Preparing to unpack .../00-sensible-utils_0.0.25_all.deb ...
@@ -1103,7 +1103,7 @@ Setting up sbuild-build-depends-main-dummy (0.invalid.0) ...
 Processing triggers for libc-bin (2.41-12+deb13u4) ...
 
 +------------------------------------------------------------------------------+
-| Check architectures                          Tue, 10 Nov 2026 18:16:25 +0000 |
+| Check architectures                          Fri, 13 Nov 2026 14:44:07 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -1112,7 +1112,7 @@ Arch check ok (amd64 included in amd64)
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Build environment                            Tue, 10 Nov 2026 18:16:37 +0000 |
+| Build environment                            Fri, 13 Nov 2026 14:44:17 +0000 |
 +------------------------------------------------------------------------------+
 
 Kernel: Linux 6.18.56 #1 SMP Fri Oct 16 18:41:32 UTC 2026 amd64 (x86_64)
@@ -1120,7 +1120,7 @@ Toolchain package versions: binutils_2.44-3 dpkg-dev_1.22.22 g++-14_14.2.0-19 gc
 Package versions: apt_3.0.3 autoconf_2.72-3.1 automake_1:1.17-4 autopoint_0.23.1-2 autotools-dev_20240727.1 base-files_13.8+deb13u7 base-passwd_3.6.7 bash_5.2.37-2+b10 binutils_2.44-3 binutils-common_2.44-3 binutils-x86-64-linux-gnu_2.44-3 bsdextrautils_2.41.5-0+deb13u1 bsdutils_1:2.41.5-0+deb13u1 build-essential_12.12 bzip2_1.0.8-6 coreutils_9.7-3 cpp_4:14.2.0-1 cpp-14_14.2.0-19 cpp-14-x86-64-linux-gnu_14.2.0-19 cpp-x86-64-linux-gnu_4:14.2.0-1 dash_0.5.12-12 debconf_1.5.91 debhelper_13.24.2 debian-archive-keyring_2025.1 debianutils_5.23.2 dh-autoreconf_20 dh-strip-nondeterminism_1.14.1-2 diffutils_1:3.10-4 dpkg_1.22.22 dpkg-dev_1.22.22 dwz_0.15-1+b1 file_1:5.46-5 findutils_4.10.0-3 g++_4:14.2.0-1 g++-14_14.2.0-19 g++-14-x86-64-linux-gnu_14.2.0-19 g++-x86-64-linux-gnu_4:14.2.0-1 gcc_4:14.2.0-1 gcc-14_14.2.0-19 gcc-14-base_14.2.0-19 gcc-14-x86-64-linux-gnu_14.2.0-19 gcc-x86-64-linux-gnu_4:14.2.0-1 gettext_0.23.1-2 gettext-base_0.23.1-2 golang-1.24-go_1.24.4-1 golang-1.24-src_1.24.4-1 golang-go_2:1.24~2 golang-src_2:1.24~2 grep_3.11-4 groff-base_1.23.0-9 gzip_1.13-1+deb13u1 hostname_3.25 init-system-helpers_1.69~deb13u1 intltool-debian_0.35.0+20060710.6 libacl1_2.3.2-2+b1 libapt-pkg7.0_3.0.3 libarchive-zip-perl_1.68-1 libasan8_14.2.0-19 libatomic1_14.2.0-19 libattr1_1:2.5.2-3 libaudit-common_1:4.0.2-2+deb13u1 libaudit1_1:4.0.2-2+deb13u1 libbinutils_2.44-3 libblkid1_2.41.5-0+deb13u1 libbrotli1_1.1.0-2+b7 libbz2-1.0_1.0.8-6 libc-bin_2.41-12+deb13u4 libc-dev-bin_2.41-12+deb13u4 libc6_2.41-12+deb13u4 libc6-dev_2.41-12+deb13u4 libcap-ng0_0.8.5-4+b1 libcap2_1:2.75-10+deb13u1+b3 libcares2_1.34.5-1+deb13u1 libcc1-0_14.2.0-19 libcrypt-dev_1:4.4.38-1 libcrypt1_1:4.4.38-1 libctf-nobfd0_2.44-3 libctf0_2.44-3 libdb5.3t64_5.3.28+dfsg2-9 libdebconfclient0_0.280 libdebhelper-perl_13.24.2 libdpkg-perl_1.22.22 libelf1t64_0.192-4 libfile-stripnondeterminism-perl_1.14.1-2 libgcc-14-dev_14.2.0-19 libgcc-s1_14.2.0-19 libgdbm-compat4t64_1.24-2 libgdbm6t64_1.24-2 libgmp10_2:6.3.0+dfsg-3 libgomp1_14.2.0-19 libgprofng0_2.44-3 libhogweed6t64_3.10.1-1 libhwasan0_14.2.0-19 libicu76_76.1-4 libisl23_0.27-1 libitm1_14.2.0-19 libjansson4_2.14-2+b3 liblastlog2-2_2.41.5-0+deb13u1 liblsan0_14.2.0-19 liblz4-1_1.10.0-4 liblzma5_5.8.1-1+deb13u1 libmagic-mgc_1:5.46-5 libmagic1t64_1:5.46-5 libmd0_1.1.0-2+b1 libmount1_2.41.5-0+deb13u1 libmpc3_1.3.1-1+b3 libmpfr6_4.2.2-1 libnettle8t64_3.10.1-1 libnghttp2-14_1.64.0-1.1+deb13u1 libnode115_20.19.2+dfsg-1+deb13u2 libpam-modules_1.7.0-5 libpam-modules-bin_1.7.0-5 libpam-runtime_1.7.0-5 libpam0g_1.7.0-5 libpcre2-8-0_10.46-1~deb13u2 libperl5.40_5.40.1-6+deb13u1 libpipeline1_1.5.8-1 libquadmath0_14.2.0-19 libseccomp2_2.6.0-2 libselinux1_3.8.1-1 libsframe1_2.44-3 libsmartcols1_2.41.5-0+deb13u1 libsqlite3-0_3.46.1-7+deb13u2 libssl3t64_3.5.7-1~deb13u2 libstdc++-14-dev_14.2.0-19 libstdc++6_14.2.0-19 libsystemd0_257.13-1~deb13u1 libtinfo6_6.5+20250216-2 libtool_2.5.4-4 libtsan2_14.2.0-19 libubsan1_14.2.0-19 libuchardet0_0.0.8-1+b2 libudev1_257.13-1~deb13u1 libunistring5_1.3-2 libuuid1_2.41.5-0+deb13u1 libuv1t64_1.50.0-2 libxml2_2.12.7+dfsg+really2.9.14-2.1+deb13u3 libxxhash0_0.8.3-2 libzstd1_1.5.7+dfsg-1 linux-libc-dev_6.12.107-1 m4_1.4.19-8 make_4.4.1-2 man-db_2.13.1-1 mawk_1.3.4.20250131-1 ncurses-base_6.5+20250216-2 ncurses-bin_6.5+20250216-2 node-acorn_8.8.1+ds+~cs25.17.7-2 node-balanced-match_2.0.0-1 node-brace-expansion_2.0.1+~1.1.0-2 node-cjs-module-lexer_1.2.3+dfsg-1 node-corepack_0.24.0-5 node-minimatch_9.0.3-6 node-undici_7.3.0+dfsg1+~cs24.12.11-1 node-xtend_4.0.2-3 nodejs_20.19.2+dfsg-1+deb13u2 openssl-provider-legacy_3.5.7-1~deb13u2 patch_2.8-2 perl_5.40.1-6+deb13u1 perl-base_5.40.1-6+deb13u1 perl-modules-5.40_5.40.1-6+deb13u1 po-debconf_1.0.21+nmu1 rpcsvc-proto_1.4.3-1 sbuild-build-depends-main-dummy_0.invalid.0 sed_4.9-2+deb13u1 sensible-utils_0.0.25 sqv_1.3.0-3+b2 sysvinit-utils_3.14-4 tar_1.35+dfsg-3.1 util-linux_2.41.5-0+deb13u1 xz-utils_5.8.1-1+deb13u1 zlib1g_1:1.3.dfsg+really1.3.1-1+b1
 
 +------------------------------------------------------------------------------+
-| Build                                        Tue, 10 Nov 2026 18:16:37 +0000 |
+| Build                                        Fri, 13 Nov 2026 14:44:17 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -1238,7 +1238,7 @@ dpkg-genchanges: info: binary-only upload (no source code included)
  dpkg-source --after-build .
 dpkg-buildpackage: info: binary-only upload (no source included)
 --------------------------------------------------------------------------------
-Build finished at 2026-11-10T18:17:00Z
+Build finished at 2026-11-13T14:44:39Z
 
 Finished
 --------
@@ -1251,7 +1251,7 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Changes                                      Tue, 10 Nov 2026 18:17:02 +0000 |
+| Changes                                      Fri, 13 Nov 2026 14:44:41 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -1277,20 +1277,20 @@ Changes:
  .
    * Paquet du banc A2 (OBS) et des briques 05 et 06.
 Checksums-Sha1:
- 799f4b35047410e7a4a4a590a40d2197923ca95c 5415 sample-app_1.0.0-1_amd64.buildinfo
+ cfe77434bef3353dd1b716f59d9ef08699ea0642 5415 sample-app_1.0.0-1_amd64.buildinfo
  3b7226d9e53314d09fc6f626bbd25f0e24f920c9 1952080 sample-app_1.0.0-1_amd64.deb
 Checksums-Sha256:
- ccb924192f7a7b7d4aa4a25039792fb328d9260aa7a0f5335db9606e56aaf4bb 5415 sample-app_1.0.0-1_amd64.buildinfo
+ d5f26659dfe134bb731a64909cf4f9d11f4585e1156a73acf2e06346ff657358 5415 sample-app_1.0.0-1_amd64.buildinfo
  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
 Files:
- 57f5a8187b206a2d8a04d8f5ed26a485 5415 web optional sample-app_1.0.0-1_amd64.buildinfo
+ 4c3e4a864de4ba950ac09cd010dca572 5415 web optional sample-app_1.0.0-1_amd64.buildinfo
  7e578a62b1e949fab8445c62eb2b26de 1952080 web optional sample-app_1.0.0-1_amd64.deb
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Buildinfo                                    Tue, 10 Nov 2026 18:17:04 +0000 |
+| Buildinfo                                    Fri, 13 Nov 2026 14:44:43 +0000 |
 +------------------------------------------------------------------------------+
 
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
@@ -1307,7 +1307,7 @@ Checksums-Sha256:
  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Tue, 10 Nov 2026 18:16:59 +0000
+Build-Date: Fri, 13 Nov 2026 14:44:39 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),
@@ -1481,7 +1481,7 @@ Environment:
 
 
 +------------------------------------------------------------------------------+
-| Package contents                             Tue, 10 Nov 2026 18:17:04 +0000 |
+| Package contents                             Fri, 13 Nov 2026 14:44:44 +0000 |
 +------------------------------------------------------------------------------+
 
 
@@ -1522,12 +1522,12 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Post Build                                   Tue, 10 Nov 2026 18:17:06 +0000 |
+| Post Build                                   Fri, 13 Nov 2026 14:44:46 +0000 |
 +------------------------------------------------------------------------------+
 
 
 +------------------------------------------------------------------------------+
-| Cleanup                                      Tue, 10 Nov 2026 18:17:06 +0000 |
+| Cleanup                                      Fri, 13 Nov 2026 14:44:46 +0000 |
 +------------------------------------------------------------------------------+
 
 Purging /build/reproducible-path
@@ -1541,24 +1541,24 @@ cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/l
 cannot bind-mount /dev/console as it does not exist outside the chroot at /usr/libexec/sbuild-usernsexec line 438.
 
 +------------------------------------------------------------------------------+
-| Summary                                      Tue, 10 Nov 2026 18:17:09 +0000 |
+| Summary                                      Fri, 13 Nov 2026 14:44:49 +0000 |
 +------------------------------------------------------------------------------+
 
 Build Architecture: amd64
 Build Type: binary
 Build-Space: 102336
-Build-Time: 19
+Build-Time: 18
 Distribution: trixie
 Host Architecture: amd64
-Install-Time: 19
+Install-Time: 22
 Job: /w/src/sample-app_1.0.0-1.dsc
 Machine Architecture: amd64
 Package: sample-app
-Package-Time: 262
+Package-Time: 271
 Source-Version: 1.0.0-1
 Space: 102336
 Status: successful
 Version: 1.0.0-1
 --------------------------------------------------------------------------------
-Finished at 2026-11-10T18:17:00Z
-Build needed 00:04:22, 102336k disk space
+Finished at 2026-11-13T14:44:39Z
+Build needed 00:04:31, 102336k disk space

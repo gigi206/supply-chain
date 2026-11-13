@@ -74,3 +74,11 @@ code 0, 16 OK, 0 KO (journaux `s1r-*`).
   est écrit au début de `s1.sh essais` (l. 261 : trois lignes extraites de `~/.cache/supply-chain-poc/packaging/SHA256SUMS`), étape
   que la carte n'avait pas listée : **oubli de la carte**, qui ne relevait que les lectures du bloc 06 et de S3 restauration.
 - P6 et la suite : non jugées. Rien d'autre n'est lancé.
+
+## Résultat de l'étape 3, suite (note de 2026-11-13T14:51:53Z ; rien n'est réécrit)
+- **Action manuelle** (« Ligne 261 seule » à « Comment produire SHA256SUMS.s1 avant de relancer S3 ? ») : à 14:38:07 UTC, la seule
+  ligne 261 de `s1.sh` rejouée sur l'hôte (`SHA256SUMS` de packaging contrôlé d'abord) : `$W/s1-06/SHA256SUMS.s1`, 3 lignes, chacune
+  vérifiée (`orig.tar.gz`, `.dsc`, `debian.tar.xz` : OK), sha256 du fichier `3acfed27…` ; aucun pod lancé.
+- `s3.sh builds comparaison` de 14:38:15 à 14:51:07 UTC, code 0, 24 OK, 0 KO.
+- **P6 tenue** : deb `0b489d43…` sur les deux builds ; Installed-Build-Depends des deux égal à celui de S2 ; aucune ligne apt en
+  http(s) ; neutralisation des sources de l'instantané faite ; installés par sbuild = simulés, 0 écart.

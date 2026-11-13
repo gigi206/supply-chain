@@ -11,7 +11,7 @@ Checksums-Sha256:
  0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Tue, 10 Nov 2026 18:23:12 +0000
+Build-Date: Fri, 13 Nov 2026 14:50:56 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),
