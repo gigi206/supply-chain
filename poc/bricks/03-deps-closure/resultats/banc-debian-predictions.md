@@ -67,3 +67,6 @@ Lancées sur « Oui, lance-les » à « Je lance banc-debian.sh lecture simulati
    **49,0 Mo** ; avec perl-base, 57 971 Kio, soit 56,6 Mo (Installed-Size du journal de simulation, en Kio).
 2. « le fichier `ca-certificates.crt` est produit par un script de mainteneur » n'est **pas vérifié** (écrit de mémoire) : à lire
    dans le .deb de ca-certificates (scripts de contrôle) à l'étape `image`.
+
+## Note de 2026-11-13T13:56:57Z : banc arrêté à la simulation (décision du propriétaire « Oui, arrête-le » à « J'arrête le banc à la simulation et je priorise la reprise du bloc 06 ? », proposition d'une session latérale relayée à sa demande) : les étapes `image`, `essai` et `mesure` auraient mesuré une construction par `dpkg-deb -x` et l'apt de l'hôte, qui n'est pas l'option E ; l'option E se mesurera en construisant `outils-prefetch` dans la chaîne sur le modèle de S4a de la 06 (mmdebstrap, Kata, provenance par Chains), à la reprise du bloc 06, priorité pour terminer S5b.
+Prédictions des étapes non écrites : aucune. Acquis du banc : L1 à L4, S1 à S3 tenues, S4 non tenue.

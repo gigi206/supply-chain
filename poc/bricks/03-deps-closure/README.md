@@ -554,3 +554,5 @@ code 0, `lo` seule. [Prédictions](resultats/banc-debian-predictions.md) L1 à L
 (de 0,094 à 0,163 pw consommés sur 1 pw ; aucune décision due).
 
 - 2026-11-13T13:53:02Z : banc Debian, `lecture` et `simulation` lancées (13:52:21 à 13:52:27 UTC, code 0) : InRelease égal à S1 de la 06 ; fermeture de 69 paquets, 183,7 Mo installés (clôture Nix : 263 Mo) ; L1 à L4, S1 à S3 tenues, S4 non tenue ([prédictions et résultats](resultats/banc-debian-predictions.md)).
+
+- 2026-11-13T13:56:57Z : banc arrêté à la simulation (décision du propriétaire « Oui, arrête-le » à « J'arrête le banc à la simulation et je priorise la reprise du bloc 06 ? », proposition d'une session latérale relayée à sa demande) : les étapes `image`, `essai` et `mesure` auraient mesuré une construction par `dpkg-deb -x` et l'apt de l'hôte, qui n'est pas l'option E ; l'option E se mesurera en construisant `outils-prefetch` dans la chaîne sur le modèle de S4a de la 06 (mmdebstrap, Kata, provenance par Chains), à la reprise du bloc 06, priorité pour terminer S5b.
