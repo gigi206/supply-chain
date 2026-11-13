@@ -79,3 +79,11 @@ clôture de F2 : 66de99598aa176a1 (attendu 66de99598aa176a1)
   2026-11-13T14:31:37+01:00 xps15 systemd[1]: Stopped nix-daemon.service - Nix Daemon.
   2026-11-13T14:31:37+01:00 xps15 systemd[1]: Started nix-daemon.service - Nix Daemon.
   nix-daemon.socket : inactive (enabled) ; nix-daemon.service : active ; démon : Version: 2.34.9
+
+# ajout du 2026-11-13T13:36:51Z : correction appliquée par le propriétaire (systemctl stop nix-daemon.service, puis start nix-daemon.socket)
+  2026-11-13T14:36:28+01:00 xps15 systemd[1]: Stopping nix-daemon.service - Nix Daemon...
+  2026-11-13T14:36:28+01:00 xps15 systemd[1]: nix-daemon.service: Deactivated successfully.
+  2026-11-13T14:36:28+01:00 xps15 systemd[1]: Stopped nix-daemon.service - Nix Daemon.
+  2026-11-13T14:36:30+01:00 xps15 systemd[1]: Listening on nix-daemon.socket - Nix Daemon Socket.
+  2026-11-13T14:36:39+01:00 xps15 systemd[1]: Started nix-daemon.service - Nix Daemon.
+  nix-daemon.socket : active ; nix-daemon.service : active ; démon : Version: 2.34.9

@@ -545,3 +545,4 @@ Nix de l'hôte en 2.34.9 ? » ; commandes root lancées par le propriétaire ; [
 la procédure) a fermé le socket puis refusé de le rouvrir (« Socket service nix-daemon.service already active, refusing ») ; le
 service est reparti seul, en 2.34.9, et répond. Défaut de la procédure (ordre). Correction proposée, root : arrêter le service,
 puis démarrer le socket (le service repart à la première connexion). Le socket reste activé au démarrage de la machine.
+- 2026-11-13T13:36:51Z : socket de nix-daemon rétabli par le propriétaire (arrêt du service, puis démarrage du socket) ; socket actif, service relancé à la première connexion, démon 2.34.9 ; clôture de F2 inchangée (66de99598aa176a1).
