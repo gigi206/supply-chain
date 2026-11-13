@@ -546,3 +546,9 @@ la procédure) a fermé le socket puis refusé de le rouvrir (« Socket service 
 service est reparti seul, en 2.34.9, et répond. Défaut de la procédure (ordre). Correction proposée, root : arrêter le service,
 puis démarrer le socket (le service repart à la première connexion). Le socket reste activé au démarrage de la machine.
 - 2026-11-13T13:36:51Z : socket de nix-daemon rétabli par le propriétaire (arrêt du service, puis démarrage du socket) ; socket actif, service relancé à la première connexion, démon 2.34.9 ; clôture de F2 inchangée (66de99598aa176a1).
+
+**Note du 13/11/2026 (2026-11-13T13:48:46Z) : banc Debian préparé à sec, NON LANCÉ** (« Oui, prépare-le »). [`banc-debian.sh`](banc-debian.sh) :
+`lecture` (réseau : clés de ftp-master contre les empreintes de la 06, InRelease, Packages.xz) et `simulation` (hors réseau :
+fermeture par l'apt de l'hôte sur un état dpkg vide). Shellcheck tenu ; essai à sec de `simulation` sur un Packages synthétique :
+code 0, `lo` seule. [Prédictions](resultats/banc-debian-predictions.md) L1 à L4, S1 à S4, critères de confiance et recompte des 2×
+(de 0,094 à 0,163 pw consommés sur 1 pw ; aucune décision due).
