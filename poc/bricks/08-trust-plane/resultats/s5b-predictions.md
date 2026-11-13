@@ -147,3 +147,9 @@ Code 0 à 12:58:19 UTC ([journal](rejeu-s5b-plateforme-ctl.log)), 441 OK, 0 KO.
   `cilium-operator`). **B1, B4, B5** : étapes passées sans KO, mais le 429, les 13 correctifs et les 4 règles en `Deny` ne sont
   pas relevés dans le journal par cette note : non jugées.
 - C1 à C9, D1 à D3 : non jugées (bloc 06, `fuites` et CIS non lancés).
+
+## Note du 13/11/2026 (2026-11-13T13:00:39Z), avant lancement : passage fuites et CIS (rien n'est réécrit)
+
+Décision du propriétaire : « Oui, lance-les » à « Je lance fuites et CIS (DEPUIS=fuites, sans le bloc 06) ? ». Commande :
+`DISTRO=rke2 DEPUIS=fuites mise run confiance:rejeu -- s5b-fin` (bloc 06 sauté, rien poussé). Jugée : **D1** telle qu'écrite le
+11/11 (« `fuites` : aucun secret dans les journaux ; CIS sans attendu »).
