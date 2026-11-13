@@ -525,3 +525,17 @@ Nix et j'instruis l'option Debian par un banc ? »).
 dont CVE-2026-110450 (high : un client non privilégié du démon peut corrompre des chemins du store), corrigés en 2.34.9 ou 2.35.3 ;
 mise à jour = installation système, sur accord du propriétaire. Portée pour F2 : la clôture de l'image a été comparée ce jour au
 cache (9 chemins compilés ici égaux à Hydra, 36 signés) et l'image est égale à celle du 06/11.
+
+**Note du 13/11/2026 (2026-11-13T13:32:57Z) : Nix de l'hôte mise à jour en 2.34.9** (« Oui, prépare-la » à « Je prépare la mise à jour de la
+Nix de l'hôte en 2.34.9 ? » ; commandes root lancées par le propriétaire ; [contrôles](resultats/maj-nix-2.34.9.log)).
+- Préparation : liste de chemins publiée pour 2.34.9 (`releases.nixos.org/nix/nix-2.34.9/fallback-paths.nix`), au lieu de celle
+  de nixpkgs master (2.35.6) ; chemin `mw9ls4zx…-nix-2.34.9` signé `cache.nixos.org-1`, accepté seulement signé (`require-sigs`) ;
+  essai à blanc code 0. Premier essai du propriétaire en échec sans effet (« couldn't figure out how Nix is installed ») :
+  sans `--profile`, `upgrade-nix` cherche Nix dans le PATH, que sudo remplace ; commande corrigée avec `--profile`.
+- Mesuré après : client et démon en 2.34.9 (démon actif depuis 13:31:37 UTC, unité liée au nouveau paquet, aucun rechargement
+  en attente) ; clôture de 63 chemins, 10 signés, 53 sans signature posés par l'installeur le 24/04/2026, **tous égaux** aux
+  empreintes NAR de cache.nixos.org ; clôture de F2 inchangée (66de99598aa176a1).
+- **Changement de structure** : `profiles/default` pointait vers le profil de root (`per-user/root/profile`) ; il a maintenant ses
+  propres générations (`default-1-link`). L'ancien environnement (2.34.5) reste tenu par le profil de root. Le retour arrière
+  écrit dans la procédure (`nix-env --rollback` sur `default`) ne vaut plus : `default` n'a qu'une génération ; un retour
+  passerait par l'ancien environnement, commande non préparée.
