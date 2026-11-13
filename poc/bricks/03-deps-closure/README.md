@@ -486,3 +486,8 @@ Il s'est déroulé de 20:31 à 22:42 UTC, en cinq parties ; le détail est dans 
   - Les tests de J8 passent avec les mêmes nombres d'OK qu'avant D6.
   - La prédiction `D6_TEMOIN` (témoins à clé jetable) est vérifiée.
   - La bascule et le contrôle 6 sont conformes.
+
+**Note du 13/11/2026 (2026-11-13T11:03:08Z) : F2 en échec au rejeu `s5b-plateforme` de la 08.** `prefetch.sh image` (F2 de la 03) construit python313, gitMinimal et cacert par `nix build --no-link --offline --inputs-from poc/benchmarks/nix` (l. 52) ; le store de l'hôte n'avait plus `git-minimal-2.51.2` (`2bjyma6x`) ni `nss-cacert-3.123` (`mks1hnym`), chemins des rejeux du 03/11 et du 06/11 ; `--offline` interdit le cache binaire, Nix a donc entrepris de construire 423 dérivations depuis les sources amont, et la source de ncurses 6.5 (`invisible-island.net`) a répondu 403 quatre fois : « cannot download ncurses-6.5.tar.gz from any mirror ». Le verrou de nixpkgs est
+intact ; l'image `68e0ae70` du 06/11 est gardée intacte dans `~/.cache/supply-chain-poc/03/f2`. Le choix D4 (outils de Nix
+« déjà présents sur l'hôte ») n'avait été ni comparé ni soumis au propriétaire : décision ouverte le 13/11. Détail : README
+de la 08, additif du 13/11 (rebâti arrêté à F2).

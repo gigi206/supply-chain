@@ -1,15 +1,15 @@
-# politique.sh posture, 2026-11-06T14:07:16Z
+# politique.sh posture, 2026-11-13T09:38:17Z
 ## installation depuis le verrou (politique/posture/package-lock.json), hors du dépôt : .cache/supply-chain-poc/08/outils/tekton-lint
 node v22.22.0, npm 10.9.4
-added 89 packages in 546ms
+added 89 packages in 582ms
 OK   @ibm/tekton-lint 1.2.4 installé, intégrité sha512-7539FVmzcpqdA3r… (relevée le 29/10/2026)
   89 packages have verified registry signatures
   2 packages have verified attestations
 OK   signatures du registre npm vérifiées pour les 89 paquets installés, aucune invalide ni absente
 ## ressources en service : TriggerTemplate de declencheurs, pipeline et tâches lues dans leurs bundles de Zot
-  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:c51948595fc675ca5c1fae6a814faadca2d06663b49aba7cc202dcb30c8aca58
+  pipeline sc-stockage.poc.test:5000/tekton/pipelines/sample-app-essai@sha256:7ea09c6b341c6bbdf911fc2d3da112c43afb98c9422c58ee15a88480704df274
   tâche sc-stockage.poc.test:5000/tekton/tasks/publier-essai@sha256:836cd080991d54ef49c86f5ae8c61421c4fddf615e2e981049c4febb6cea5849
-  tâche d'essai sc-stockage.poc.test:5000/tekton/tasks/essai-confiance@sha256:d64672071e19ee2b7e0b3c2695382429692723bc43ca169d38391b89d8a55c01
+  tâche d'essai sc-stockage.poc.test:5000/tekton/tasks/essai-confiance@sha256:f01418fdb0fd9183364d31e86042d65b23bcadb0ac32905bbf20a4d2e9b18c56
 prédiction : aucune erreur, aucun avertissement (images par digest, scripts avec #!, paramètres déclarés et utilisés ;
 la tâche de la pipeline, référencée par bundle, échappe aux règles croisées ; no-missing-resource désactivée)
 OK   4 ressources en service : aucun signalement, comme prédit

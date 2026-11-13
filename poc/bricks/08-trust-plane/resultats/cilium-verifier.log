@@ -1,4 +1,4 @@
-# cilium.sh verifier, 2026-11-06T13:32:30Z
+# cilium.sh verifier, 2026-11-13T09:05:42Z
 ## prédiction (écrite le 30/10/2026, avant le premier démarrage de k3s avec Cilium)
 - trois nœuds prêts ; DaemonSet cilium prêt sur les trois (3/3), opérateur prêt (1/1) sur sc-confiance ; HelmChart installé
 - images des pods de Cilium : digests des manifestes amd64 (fa56fecd7795, 77a9b4371fae), importées
@@ -10,10 +10,10 @@
 - release Helm cilium deployed, installée depuis l'hôte ; ni HelmChart, ni compte de service helm-*, ni liaison helm-* ; la ligne
   « HelmChart installé » de la prédiction du 30/10/2026 ne s'applique plus
 ## nœuds
-NAME           STATUS   ROLES                AGE     VERSION          INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
-sc-build       Ready    <none>               65s     v1.35.9+rke2r1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
-sc-confiance   Ready    control-plane,etcd   3m13s   v1.35.9+rke2r1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
-sc-stockage    Ready    <none>               24s     v1.35.9+rke2r1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
+NAME           STATUS   ROLES                AGE    VERSION          INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION         CONTAINER-RUNTIME         ZONE
+sc-build       Ready    <none>               56s    v1.35.9+rke2r1   192.168.161.12   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   build
+sc-confiance   Ready    control-plane,etcd   3m1s   v1.35.9+rke2r1   192.168.161.11   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   confiance
+sc-stockage    Ready    <none>               18s    v1.35.9+rke2r1   192.168.161.13   <none>        Debian GNU/Linux 13 (trixie)   6.12.113+deb13-amd64   containerd://2.2.7-k3s1   stockage
 OK   nœuds prêts
 OK   release Helm cilium (depuis l'hôte) : deployed cilium-1.20.4
 OK   HelmCharts du cluster (CRD présente) : 0
@@ -22,27 +22,30 @@ OK   liaisons helm-* : 0
 OK   DaemonSet cilium prêt : 3/3
 OK   opérateur prêt, sur : true sc-confiance
 ## images
-cilium-hfp4b sur sc-build : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
-cilium-n8ng8 sur sc-stockage : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
-cilium-operator-5c896b4b74-9g7kt sur sc-confiance : cilium-operator sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
-cilium-phblv sur sc-confiance : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-4jcxf sur sc-stockage : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-7lvzg sur sc-confiance : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-jbq2t sur sc-build : cilium-agent sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
+cilium-operator-5c896b4b74-2544r sur sc-confiance : cilium-operator sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1
 OK   digests des images en cours : sha256:77a9b4371faed41dc9c2fb3942b6c02a581158be1d4aa46a0e62956ce2f55ff1,sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54
 Pulled : 22, Container image "quay.io/cilium/cilium:v1.20.4@sha256:fa56fecd779584642c7ec2da6872c03c45c1f1043da66665a73ed8c425584d54" 
-OK   événements Pulling des pods de Cilium : 0
+## événements Pulling des pods de Cilium : Loki (E1 (a)) depuis 2026-11-13T09:02:52Z, kubectl : 0, borné au même début : 0
+OK   événements Pulling des pods de Cilium (kubectl, Loki non jugé : démarrage d'Alloy illisible sur sc-stockage) : 0
 ## adresses
 OK   podCIDRs de sc-confiance (CiliumNode / k3s) : ["10.42.0.0/24"]
 OK   podCIDRs de sc-build (CiliumNode / k3s) : ["10.42.1.0/24"]
-OK   podCIDRs de sc-stockage (CiliumNode / k3s) : ["10.42.3.0/24"]
-kube-system/rke2-coredns-rke2-coredns-746f455775-qrhr8 sc-confiance 10.42.0.132
-kube-system/rke2-coredns-rke2-coredns-autoscaler-6f55765d86-fvdbh sc-confiance 10.42.0.8
-kube-system/rke2-metrics-server-64f78bff7d-wxdhq sc-confiance 10.42.0.179
-local-path-storage/local-path-provisioner-645d46d5df-s9s5c sc-confiance 10.42.0.201
+OK   podCIDRs de sc-stockage (CiliumNode / k3s) : ["10.42.2.0/24"]
+kube-system/rke2-coredns-rke2-coredns-746f455775-fflqb sc-confiance 10.42.0.148
+kube-system/rke2-coredns-rke2-coredns-autoscaler-6f55765d86-g8lqm sc-confiance 10.42.0.197
+kube-system/rke2-metrics-server-64f78bff7d-x7pql sc-confiance 10.42.0.170
+local-path-storage/local-path-provisioner-645d46d5df-8gktn sc-confiance 10.42.0.60
 ## agents
-cilium-hfp4b (sc-build) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-cilium-n8ng8 (sc-stockage) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-cilium-phblv (sc-confiance) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
-flux récents (hubble observe --last 3 dans cilium-hfp4b) :
-  Nov  6 13:32:32.448: 192.168.161.12:54566 (host) -> 192.168.161.11:9345 (ID:33554435) to-network FORWARDED (TCP Flags: ACK)
+cilium-4jcxf (sc-stockage) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+cilium-7lvzg (sc-confiance) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+cilium-jbq2t (sc-build) : cilium-dbg status --brief : OK ; hubble : hubble v1.20.4@HEAD-beb276d2 compiled with go1.26.10 on linux/amd64
+flux récents (hubble observe --last 3 dans cilium-4jcxf) :
+  Nov 13 09:05:48.300: 192.168.161.13:40165 (ID:16113) -> 192.168.161.1:53 (world) to-network FORWARDED (UDP)
+  Nov 13 09:05:48.315: fe80::9804:cff:fe78:600a (ID:16113) <> ff02::16 (unknown) Unsupported L3 protocol DROPPED (ICMPv6 143(0))
+  Nov 13 09:05:48.315: fe80::9804:cff:fe78:600a (ID:16113) <> ff02::2 (unknown) Unsupported L3 protocol DROPPED (ICMPv6 RouterSolicitation)
 sc-confiance : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 191 Mo
-sc-build : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 201 Mo
-sc-stockage : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 202 Mo
+sc-build : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 203 Mo
+sc-stockage : flannel.1 0, règles KUBE-ROUTER 0, RSS de cilium-agent 199 Mo

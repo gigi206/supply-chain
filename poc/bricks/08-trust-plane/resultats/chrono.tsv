@@ -3378,3 +3378,128 @@ J8 test6	2026-11-10T14:05:07Z
 J8 test6 fait	2026-11-10T14:06:43Z	
 J8 construction_durcie	2026-11-10T21:11:26Z	
 J8 construction_durcie fait	2026-11-10T21:13:30Z	
+VM, pool et réseau détruits	2026-11-13T09:01:34Z	
+J1 VM définies	2026-11-13T09:01:41Z	pool, réseau, 3 volumes et 3 graines
+J1 VM joignables en SSH	2026-11-13T09:01:50Z	
+J7 installer	2026-11-13T09:02:51Z	
+J7 installer fait	2026-11-13T09:03:08Z	
+J7 verifier	2026-11-13T09:05:42Z	
+J7 verifier fait	2026-11-13T09:05:49Z	
+J2 pki	2026-11-13T09:05:49Z	
+J2 pki fait	2026-11-13T09:05:49Z	
+J2 zot	2026-11-13T09:05:49Z	
+J2 zot fait	2026-11-13T09:05:55Z	
+J2 registre	2026-11-13T09:05:55Z	
+J2 registre fait	2026-11-13T09:06:10Z	
+J2 containerd	2026-11-13T09:06:10Z	
+J2 containerd fait	2026-11-13T09:07:21Z	
+J2 forgejo	2026-11-13T09:07:21Z	
+J2 forgejo fait	2026-11-13T09:08:02Z	
+J2 depot	2026-11-13T09:08:02Z	
+J2 depot fait	2026-11-13T09:08:04Z	
+J3 image	2026-11-13T09:08:05Z	
+J3 image fait	2026-11-13T09:08:40Z	
+J3 deployer	2026-11-13T09:08:40Z	
+J3 deployer fait	2026-11-13T09:08:49Z	
+J3 initialiser	2026-11-13T09:08:49Z	
+J3 initialiser fait	2026-11-13T09:09:02Z	
+J3 configurer	2026-11-13T09:09:02Z	
+J3 configurer fait	2026-11-13T09:09:04Z	
+J3 essais	2026-11-13T09:09:04Z	
+J3 essais fait	2026-11-13T09:10:03Z	
+J3 redemarrage	2026-11-13T09:10:03Z	
+J3 redemarrage fait	2026-11-13T09:10:18Z	
+J4 revue	2026-11-13T09:10:18Z	
+J4 revue fait	2026-11-13T09:10:36Z	
+J4 miroir	2026-11-13T09:10:36Z	
+J4 miroir fait	2026-11-13T09:11:17Z	
+J4 installer	2026-11-13T09:11:17Z	
+J4 installer fait	2026-11-13T09:11:52Z	
+J4 signature	2026-11-13T09:11:52Z	
+J4 signature fait	2026-11-13T09:12:04Z	
+J4 verifier	2026-11-13T09:12:04Z	
+J3 cle	2026-11-13T09:12:04Z	
+J3 cle fait	2026-11-13T09:12:05Z	
+J4 verifier fait	2026-11-13T09:12:05Z	
+J4 webhook	2026-11-13T09:12:05Z	
+J4 webhook fait	2026-11-13T09:12:47Z	
+J4 essais_webhook	2026-11-13T09:12:47Z	
+J4 essais_webhook fait	2026-11-13T09:13:22Z	
+J5 image	2026-11-13T09:13:22Z	
+J5 image fait	2026-11-13T09:14:08Z	
+J5 pki	2026-11-13T09:14:08Z	
+J5 pki fait	2026-11-13T09:14:08Z	
+J5 openbao	2026-11-13T09:14:08Z	
+J5 openbao fait	2026-11-13T09:14:09Z	
+J5 deployer	2026-11-13T09:14:09Z	
+J5 deployer fait	2026-11-13T09:14:13Z	
+J5 essais	2026-11-13T09:14:13Z	
+J5 essais fait	2026-11-13T09:15:20Z	
+J5 horodater	2026-11-13T09:15:20Z	
+J5 horodater fait	2026-11-13T09:15:57Z	
+J5 chemins	2026-11-13T09:15:57Z	
+J5 chemins fait	2026-11-13T09:16:16Z	
+J6 image	2026-11-13T09:16:16Z	
+J6 image fait	2026-11-13T09:17:32Z	
+J6 installer	2026-11-13T09:17:32Z	
+J6 installer fait	2026-11-13T09:17:51Z	
+J6 parite	2026-11-13T09:17:51Z	
+J6 parite fait	2026-11-13T09:21:39Z	
+J6 taches	2026-11-13T09:21:39Z	
+J6 taches fait	2026-11-13T09:22:10Z	
+J6 admission	2026-11-13T09:22:10Z	
+J6 admission fait	2026-11-13T09:22:40Z	
+J6 chains	2026-11-13T09:22:40Z	
+J6 chains fait	2026-11-13T09:22:41Z	
+J6 declencheurs	2026-11-13T09:22:41Z	
+J6 declencheurs fait	2026-11-13T09:23:07Z	
+J6 restreint	2026-11-13T09:23:07Z	
+J6 restreint fait	2026-11-13T09:24:02Z	
+J6 horodatage	2026-11-13T09:24:02Z	
+J6 horodatage fait	2026-11-13T09:27:08Z	
+J6 essais_webhook	2026-11-13T09:27:08Z	
+J6 essais_webhook fait	2026-11-13T09:27:45Z	
+J6 porte	2026-11-13T09:27:45Z	
+J6 porte fait	2026-11-13T09:29:55Z	
+J6 rattrapage	2026-11-13T09:29:55Z	
+J6 rattrapage fait	2026-11-13T09:38:05Z	
+J6 droits	2026-11-13T09:38:05Z	
+J6 droits fait	2026-11-13T09:38:17Z	
+J6 posture	2026-11-13T09:38:17Z	
+J6 posture fait	2026-11-13T09:38:22Z	
+J7 verifier	2026-11-13T09:38:22Z	
+J7 verifier fait	2026-11-13T09:39:08Z	
+J7 installer	2026-11-13T09:39:08Z	
+J7 installer fait	2026-11-13T09:39:37Z	
+J7 essais	2026-11-13T09:39:37Z	
+J7 essais fait	2026-11-13T09:40:11Z	
+J7 exemption	2026-11-13T09:40:11Z	
+J3 temoin	2026-11-13T09:40:12Z	
+J3 temoin fait	2026-11-13T09:40:12Z	
+J3 controle	2026-11-13T09:40:58Z	
+J3 controle fait	2026-11-13T09:40:58Z	
+J5 temoin	2026-11-13T09:40:58Z	
+J5 temoin fait	2026-11-13T09:41:07Z	
+J7 exemption fait	2026-11-13T09:41:19Z	
+J6 admission	2026-11-13T09:41:19Z	
+J6 admission fait	2026-11-13T09:41:49Z	
+J7 image	2026-11-13T09:41:49Z	
+J7 image fait	2026-11-13T09:42:28Z	
+J7 essais	2026-11-13T09:42:28Z	
+J7 essais fait	2026-11-13T09:43:03Z	
+J7 exempte	2026-11-13T09:43:03Z	
+J7 exempte fait	2026-11-13T09:44:48Z	
+J7 image	2026-11-13T09:44:48Z	
+J7 image fait	2026-11-13T09:45:29Z	
+J7 compiler	2026-11-13T09:45:29Z	
+J7 compiler fait	2026-11-13T09:46:09Z	
+J7 assembler	2026-11-13T09:46:09Z	
+J7 assembler fait	2026-11-13T09:46:16Z	
+J7 sample_app	2026-11-13T09:46:16Z	
+J7 sample_app fait	2026-11-13T09:47:12Z	
+J7 sans_reseau	2026-11-13T09:47:12Z	
+J7 sans_reseau fait	2026-11-13T09:49:29Z	
+J7 compte	2026-11-13T09:49:29Z	
+J7 compte fait	2026-11-13T09:49:39Z	
+J7 entrees	2026-11-13T09:49:39Z	
+J7 entrees fait	2026-11-13T09:49:47Z	

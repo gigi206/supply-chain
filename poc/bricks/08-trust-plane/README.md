@@ -2382,3 +2382,29 @@ Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et repl
   13/11 au matin (hors dépôt) est à recompter, non chiffré ici.
 - **Écart de forme** : la question de lancement portait `POUSSER_VSA=1`, alors que le push de la VSA garde son propre accord
   (additif du 12/11) ; sans effet, l'arrêt est venu avant. À la prochaine demande, les deux accords seront nommés à part.
+
+### Additif du 13/11/2026 (note de 2026-11-13T11:03:08Z) : rebâti de la plateforme seule, rebâti arrêté à F2 (code 1), RIEN D'AUTRE LANCÉ
+
+- **Accord** : « Oui, avec push » à « Je rebâtis la plateforme seule, jusqu'à « J8 (résolveurs) » ? ». Portée commitée avant
+  lancement (1d62777) ; reliquat de `$W` levé à 09:01:29 UTC. Lancé à 09:01:34 UTC
+  (`DISTRO=rke2 POUSSER_VSA=1 JUSQUA='J8 (résolveurs)' mise run confiance:rejeu -- s5b-plateforme`), code 1 à 10:58:20 UTC
+  ([journal](resultats/rejeu-s5b-plateforme.log)).
+- **Passé** : démontage, VM, RKE2, Cilium, J2 à J6, J7 (Kata, admission, BuildKit, voie D, voie A, sans réseau, construction,
+  entrées), 0 ligne KO. **Arrêt** à « J7 (fermeture, F2 de la 03) », avant toute écriture de cette étape dans Zot.
+- **Cause** : `prefetch.sh image` (F2 de la 03) construit python313, gitMinimal et cacert par `nix build --no-link --offline --inputs-from poc/benchmarks/nix` (l. 52) ; le store de l'hôte n'avait plus `git-minimal-2.51.2` (`2bjyma6x`) ni `nss-cacert-3.123` (`mks1hnym`), chemins des rejeux du 03/11 et du 06/11 ; `--offline` interdit le cache binaire, Nix a donc entrepris de construire 423 dérivations depuis les sources amont, et la source de ncurses 6.5 (`invisible-island.net`) a répondu 403 quatre fois : « cannot download ncurses-6.5.tar.gz from any mirror ».
+- **Store vidé, verrou intact** : `poc/benchmarks/nix` à HEAD égal à 0d896df (0 ligne de diff, aucun fichier modifié ; l'arbre
+  était « dirty » parce que le rejeu réécrit des journaux suivis) ; le chemin de sortie de git attendu est le même
+  (`2bjyma6x`). Le chemin python (`vm6nxpp9`), signé `cache.nixos.org-1`, a survécu : il est tenu par le lien
+  `~/.cache/supply-chain-poc/outils/reuse` de `outils:nix`. Les chemins de `--no-link`, sans racine, sont partis : ramasse-
+  miettes d'origine NON établie (aucune trace dans le journal de nix-daemon depuis le 06/11).
+- **Défaut de conception** : F2 dépend de l'état du store de l'hôte (`--no-link` et `--offline`) ; les binaires de l'image
+  `68e0ae70` venaient au moins en partie de cache.nixos.org (python signé `cache.nixos.org-1`).
+- **Image gardée** : le passage du 06/11 est intact dans `~/.cache/supply-chain-poc/03/f2` : `outils-a.tar` = `outils-b.tar`,
+  layout OCI d'index `68e0ae70`, 8 blobs dont le sha256 égale le nom, `cloture.txt` d'empreinte 66de99598aa176a1 (45 chemins).
+- **Non mesurés** (demandés par le propriétaire) : digest de l'image reconstruite (A3 pour `68e0ae70`) et ligne « clôture
+  nix » de ce passage : l'étape a échoué avant.
+- **`fuites` n'a pas tourné** ; `tools/secrets-depot.sh` lit les secrets de `08/secrets` (dont 8 fichiers du 13/11) et de
+  `10/secrets`.
+- **Règle des 2×** : S5b estimé à une journée ; deux arrêts ce matin ; à recompter avant la reprise.
+- **Décision Nix ouverte** (question du propriétaire du 13/11 : Nix n'a jamais été challengé pour les outils), présentée à
+  part ; aucune reprise sans accord.

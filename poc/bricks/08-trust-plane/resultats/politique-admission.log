@@ -1,4 +1,4 @@
-# politique.sh admission, 2026-11-06T14:10:13Z
+# politique.sh admission, 2026-11-13T09:41:19Z
 ## politiques chargées (5 ValidatingPolicy, 17 validations)
 prête : tekton-references
 prête : pods-isolation
@@ -54,11 +54,11 @@ conformes au résultat attendu : tous
   refus par Warning: would violate PodSecurity "restricted:latest": privileged (container "i" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "i" must set securityConte : 1 cas
   refus par Warning: would violate PodSecurity "restricted:latest": restricted volume types (volume "h" uses restricted volume type "hostPath") Error from server: error when creating "~/.cache/supply-cha : 1 cas
   refus par Warning: would violate PodSecurity "restricted:latest": unrestricted capabilities (container "app" must set securityContext.capabilities.drop=["ALL"]; container "app" must not include "SYS_ADMIN" in s : 1 cas
-  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 1 cas
+  refus par admission webhook "validation.webhook.pipeline.tekton.dev" : 2 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-0b39fdb9" : 3 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-3a646b95" : 6 cas
   refus par admission webhook "vpol.validate.kyverno.svc-fail-82b8df92" : 1 cas
-  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 13 cas
+  refus par admission webhook "vpol.validate.kyverno.svc-fail-finegrained-tekton-references" : 12 cas
 ## trace : événements PolicyViolation de Kyverno (émis aussi pour un refus en dry-run)
   7 événements, politique pods-isolation
   1 événements, politique stepactions-interdites

@@ -73,3 +73,12 @@ Commande : `DISTRO=rke2 POUSSER_VSA=1 JUSQUA='J8 (résolveurs)' mise run confian
   D3, qui viennent après le bloc 06, et D2 (durée du passage complet).
 - Prédiction ajoutée : E1, le passage s'arrête par « arrêt après J8 (résolveurs) (JUSQUA) » avec le code 0 ; confiance
   moyenne (A2 et B4 sont « Moyenne », la 08c n'a jamais tourné sur un cluster neuf).
+
+## Note du 13/11/2026 (2026-11-13T11:03:08Z) : rebâti arrêté à F2 (rien n'est réécrit)
+
+Code 1 à 10:58:20 UTC à « J7 (fermeture, F2 de la 03) » ([journal](rejeu-s5b-plateforme.log)) ; cause : README de la 08,
+additif du 13/11 (rebâti arrêté à F2).
+- **E1 non tenue** ; **A2 non tenue** (étape en échec, 0 ligne KO avant elle).
+- **A3** : lus dans le journal, `outils-horodatage@c7bebae2`, `3a7ca1b1` (16 lignes OK), `rattrapage@c3992728`,
+  `porte@e77994c2`, bundles `d21931f3` et `7fa92ad3` ; `outils-prefetch@68e0ae70` non mesuré (étape en échec).
+- A1, A4, A5 : non jugées (étapes de J8 et de la porte non atteintes). B1 à B8 : non jugées.

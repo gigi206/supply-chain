@@ -1,4 +1,4 @@
-# tsa.sh horodater, 2026-11-06T13:41:27Z
+# tsa.sh horodater, 2026-11-13T09:15:20Z
 Success! Enabled the kv secrets engine at: kv/
 Success! Data written to: kv/horodatage/zot
 Success! Uploaded policy: horodatage-zot
@@ -14,34 +14,34 @@ OK   secret zot-horodatage introuvable (NotFound) ; identifiants Zot du job dans
 ## builds/essai-signature (une exécution signée en J4)
   identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
 JOINT|Zot et TSA, essai 1
-HORODATEE|builds/essai-signature|1|signature fdb8c846409366c7|https://slsa.dev/provenance/v1|2026-11-06 13:41:32 +0000 UTC|referrer sha256:d0a59f0a43c98d83b2c0a1880395a8e884214a674e2ae6a80f8fedbcc73faa17
+HORODATEE|builds/essai-signature|1|signature 4bfb8e560d2743a7|https://slsa.dev/provenance/v1|2026-11-13 09:15:25 +0000 UTC|referrer sha256:8c4a774e5520acd07712b898dff2fe650c391573c097ac0b813b4991572c5b12
 FIN|1 image(s), 1 enveloppe(s) : 1 horodatée(s), 0 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 ## builds/essai-webhook (une enveloppe par exécution signée de l'essai du webhook)
   identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
 JOINT|Zot et TSA, essai 1
-HORODATEE|builds/essai-webhook|1|signature b04369d1faf2ad4b|https://slsa.dev/provenance/v1|2026-11-06 13:41:41 +0000 UTC|referrer sha256:0c0a89b22ec6f20eb5d734ec719e0700e60170e04d585ec75f614ca9578b545f
-HORODATEE|builds/essai-webhook|2|signature f8a8f7d3cd4329a4|https://slsa.dev/provenance/v1|2026-11-06 13:41:44 +0000 UTC|referrer sha256:a22fb2bd2dc460fdd15d2e4982abce1b90ef2360173efbf24817fad8468bdb9a
-HORODATEE|builds/essai-webhook|3|signature e6cfc02d1e4e2b0f|https://slsa.dev/provenance/v1|2026-11-06 13:41:47 +0000 UTC|referrer sha256:f9c885ae42a18017a2107f4015b8856fbf60d92a9f1cbc75d86393c3ac95a694
-HORODATEE|builds/essai-webhook|4|signature ea3127a04a620174|https://slsa.dev/provenance/v1|2026-11-06 13:41:49 +0000 UTC|referrer sha256:1a5b5affa546646613cc8bf0f7bca9fc23ddebf432c7bddadd605e44bc575708
+HORODATEE|builds/essai-webhook|1|signature bdf5d5b82a9458cc|https://slsa.dev/provenance/v1|2026-11-13 09:15:34 +0000 UTC|referrer sha256:538d6ebb7953bbfbee266935da7ac5f63d1b5e9c2753c4cffbbeaebc6a70222a
+HORODATEE|builds/essai-webhook|2|signature 4e406320f58d64d4|https://slsa.dev/provenance/v1|2026-11-13 09:15:37 +0000 UTC|referrer sha256:1d22c5eccd6b7245b057d0f2df6a5cce830bf23a6f70b3e9b77dc10086c0c5ab
+HORODATEE|builds/essai-webhook|3|signature 2bd88f240710dbca|https://slsa.dev/provenance/v1|2026-11-13 09:15:40 +0000 UTC|referrer sha256:8ff047b591f6354fae47c6d453d4e43211ca3fef8d5aaeff75622c5628d0ec3c
+HORODATEE|builds/essai-webhook|4|signature 7b294324745fe4ed|https://slsa.dev/provenance/v1|2026-11-13 09:15:42 +0000 UTC|referrer sha256:a4bcd728fa41afb3d5db082838aec5d8a0e88b75e5ecdada9195416afd3736ae
 FIN|1 image(s), 4 enveloppe(s) : 4 horodatée(s), 0 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-webhook@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 ## reprise : builds/essai-signature une seconde fois
   identifiants Zot lus dans OpenBao (rôle horodatage, essai 1) ; jeton révoqué
 JOINT|Zot et TSA, essai 1
-DEJA_HORODATEE|builds/essai-signature|1|signature fdb8c846409366c7|https://slsa.dev/provenance/v1
+DEJA_HORODATEE|builds/essai-signature|1|signature 4bfb8e560d2743a7|https://slsa.dev/provenance/v1
 FIN|1 image(s), 1 enveloppe(s) : 0 horodatée(s), 1 déjà, 0 refusée(s), 0 anomalie(s)|sc-stockage.poc.test:5000/builds/essai-signature@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 → sc-stockage.poc.test:5000/horodatage/bundles
 OK   reprise sans nouvel horodatage ni nouveau bundle
 ## referrers de sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 dans horodatage/bundles (aucun dans les dépôts des images)
-{"digest":"d0a59f0a43c9","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"0c0a89b22ec6","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"a22fb2bd2dc4","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"f9c885ae42a1","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
-{"digest":"1a5b5affa546","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8c4a774e5520","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"538d6ebb7953","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"1d22c5eccd6b","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"8ff047b591f6","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
+{"digest":"a4bcd728fa41","artifactType":"application/vnd.dev.sigstore.bundle.v0.3+json","predicateType":"https://slsa.dev/provenance/v1"}
 builds/essai-signature : 0 referrer(s)
 builds/essai-webhook : 0 referrer(s)
 OK   un bundle par enveloppe de Chains
 ## pods des jobs : jeton projeté dans le seul conteneur d'initialisation
-h-essai-signature-8vw57 : automount=false, jeton projeté monté par identifiants, volume zot Memory
-h-essai-webhook-fs5j8 : automount=false, jeton projeté monté par identifiants, volume zot Memory
+h-essai-signature-qpzfv : automount=false, jeton projeté monté par identifiants, volume zot Memory
+h-essai-webhook-2ff8n : automount=false, jeton projeté monté par identifiants, volume zot Memory
 OK   conteneur horodater sans jeton (ni de l'API, ni d'OpenBao)
 Prédiction (écrite le 02/11/2026 après un essai sur le cluster de J8, tsa-horodater-essai-openbao.log, avant le rejeu ;
 identifiants Zot dans OpenBao, décision du propriétaire du 01/11/2026) : jeton du rôle horodatage limité à horodatage-zot, lecture de kv/horodatage/zot acceptée ; clé tsa, écriture
@@ -62,7 +62,7 @@ tekton-chains:tekton-chains-controller : CONNEXION_REFUSEE|Code: 400. Errors: * 
 OK   rôle horodatage refusé aux autres comptes (bound_subject)
 ## jeton projeté d'audience openbao présenté à l'API de Kubernetes
 OK   refusé par l'API (HTTP 401) : jeton d'audience openbao, inutilisable contre Kubernetes
-## audit d'OpenBao depuis 2026-11-06T13:41:27Z : rôle horodatage (connexions, lectures, révocations)
+## audit d'OpenBao depuis 2026-11-13T09:15:20Z : rôle horodatage (connexions, lectures, révocations)
   4 {"chemin":"auth/jwt/login","op":"update","role":"horodatage","erreur":null}
   4 {"chemin":"auth/token/revoke-self","op":"update","role":"horodatage","erreur":null}
   1 {"chemin":"kv/horodatage/autre","op":"read","role":"horodatage","erreur":"1 error occurred:\n\t* permission denied\n\n"}

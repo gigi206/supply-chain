@@ -1,6 +1,6 @@
-# tekton.sh verifier, 2026-11-06T13:38:47Z
+# tekton.sh verifier, 2026-11-13T09:12:04Z
 [confiance:openbao] $ poc/bricks/08-trust-plane/openbao.sh cle
-clé publique chains : {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}, empreinte a7ca8ce8d133aa9b…
+clé publique chains : {"latest_version":1,"exportable":false,"allow_plaintext_backup":false}, empreinte 1e7b2a03f9d5d289…
 OK   signature de l'image vérifiée avec la clé Transit chains : [{"type":"cosign container image signature","digest":"3a7ca1b14dbf","ref":"sc-stockage.poc.test:5000/builds/essai-signature"}]
 OK   attestation SLSA v1 vérifiée (1 enveloppe(s))
 {
@@ -92,9 +92,9 @@ OK   attestation SLSA v1 vérifiée (1 enveloppe(s))
   "invocationId": null
 }
 OK   signature vérifiée avec une autre clé : refusé (no matching signatures)
-## audit d'OpenBao pendant l'essai (depuis 2026-11-06T13:38:36Z)
-{"time":"13:38:43","chemin":"auth/jwt/login","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"13:38:43","chemin":"transit/keys/chains","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"13:38:43","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"13:38:45","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
-{"time":"13:38:47","chemin":"transit/keys/chains","compte":"root","politiques":["root"],"erreur":null}
+## audit d'OpenBao pendant l'essai (depuis 2026-11-13T09:11:55Z)
+{"time":"09:12:00","chemin":"auth/jwt/login","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"09:12:00","chemin":"transit/keys/chains","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"09:12:00","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"09:12:02","chemin":"transit/sign/chains/sha2-256","compte":"jwt-system:serviceaccount:tekton-chains:tekton-chains-controller","politiques":["chains-signature"],"erreur":null}
+{"time":"09:12:05","chemin":"transit/keys/chains","compte":"root","politiques":["root"],"erreur":null}
