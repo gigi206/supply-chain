@@ -539,3 +539,9 @@ Nix de l'hôte en 2.34.9 ? » ; commandes root lancées par le propriétaire ; [
   propres générations (`default-1-link`). L'ancien environnement (2.34.5) reste tenu par le profil de root. Le retour arrière
   écrit dans la procédure (`nix-env --rollback` sur `default`) ne vaut plus : `default` n'a qu'une génération ; un retour
   passerait par l'ancien environnement, commande non préparée.
+
+**Note du 13/11/2026 (2026-11-13T13:33:53Z) : socket de nix-daemon inactif après le redémarrage** (journal système relu, ajouté aux
+[contrôles](resultats/maj-nix-2.34.9.log)). `systemctl restart nix-daemon.socket nix-daemon.service` (13:31:37 UTC, commande de
+la procédure) a fermé le socket puis refusé de le rouvrir (« Socket service nix-daemon.service already active, refusing ») ; le
+service est reparti seul, en 2.34.9, et répond. Défaut de la procédure (ordre). Correction proposée, root : arrêter le service,
+puis démarrer le socket (le service repart à la première connexion). Le socket reste activé au démarrage de la machine.

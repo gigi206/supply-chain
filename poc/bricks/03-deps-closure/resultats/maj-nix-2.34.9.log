@@ -64,3 +64,18 @@ clôture : total 63 signés 10 ; non signés comparés aux narinfo de cache.nixo
   ÉGAL lowdown-2.0.2-lib (enregistré 2026-04-24)
   ÉGAL bzip2-1.0.8 (enregistré 2026-04-24)
 clôture de F2 : 66de99598aa176a1 (attendu 66de99598aa176a1)
+
+# ajout du 2026-11-13T13:33:53Z : état des unités après le redémarrage (journal système relu)
+  2026-11-13T14:31:33+01:00 xps15 systemd[1]: Reload requested from client PID 589687 ('systemctl') (unit user@1000.service)...
+  2026-11-13T14:31:33+01:00 xps15 systemd[1]: Reloading...
+  2026-11-13T14:31:34+01:00 xps15 systemd[1]: Reloading finished in 551 ms.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: nix-daemon.socket: Deactivated successfully.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Closed nix-daemon.socket - Nix Daemon Socket.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Stopping nix-daemon.socket - Nix Daemon Socket...
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: nix-daemon.socket: Socket service nix-daemon.service already active, refusing.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Failed to listen on nix-daemon.socket - Nix Daemon Socket.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Stopping nix-daemon.service - Nix Daemon...
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: nix-daemon.service: Deactivated successfully.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Stopped nix-daemon.service - Nix Daemon.
+  2026-11-13T14:31:37+01:00 xps15 systemd[1]: Started nix-daemon.service - Nix Daemon.
+  nix-daemon.socket : inactive (enabled) ; nix-daemon.service : active ; démon : Version: 2.34.9
