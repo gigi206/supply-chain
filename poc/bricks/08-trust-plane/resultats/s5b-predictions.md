@@ -115,3 +115,13 @@ Jugées : A1, A2 (étapes de ce passage), A4, A5, B1 à B8, E1, et :
 |---|---|---|
 | E4 | Test 6 : IP du pod de la contre-épreuve différente de l'adresse usurpée tirée, « AJOUT|accepté », contre-épreuve OK | Moyenne : tirage de Cilium au hasard selon 23b4537, fréquence de collision non mesurée |
 | E5 | Les tests de J8 déjà passés (test2 à test5) repassent sur le même cluster | Moyenne : aucune reprise archivée à « J8 (tests) » |
+
+## Note du 13/11/2026 (2026-11-13T12:26:24Z) : reprise à « J8 (tests) » arrêtée à « J8 (contrôleurs) » (rien n'est réécrit)
+
+Code 1 à 12:22:01 UTC ([journal](rejeu-s5b-plateforme-j8.log)).
+- **E4 tenue** : adresse tirée 10.42.1.249, IP des pods 10.42.1.66 (contre) et 10.42.1.201 (test), ajout et retrait acceptés.
+- **E5 tenue** : « J8 (tests) » passée en entier sur le même cluster.
+- **A4 tenue** : `builds-sans-internet` absente, chemin d'origine, contre-épreuve et test OK.
+- **E1 non tenue.** A5 partielle (contrôles 6 et 7 non atteints) ; push de la VSA non atteint ; B1 à B8 non jugées.
+- KO de « J8 (contrôleurs) » : au moins un refus de watch sans `.timestamp` dans le journal de Chains, décompte impossible ;
+  pas de prédiction sur ce point.

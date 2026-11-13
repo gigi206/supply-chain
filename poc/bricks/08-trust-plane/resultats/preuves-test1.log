@@ -1,4 +1,4 @@
-# preuves.sh test1, 2026-11-13T11:38:10Z
+# preuves.sh test1, 2026-11-13T12:06:11Z
 builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 avant l'étape : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)
 ## prédiction (écrite le 30/10/2026, avant le premier passage), barrière par barrière
 - véhicule : tâche signée par la clé des tâches de la plateforme, propre à ce test (bundle tekton/tasks/preuve-test1, jamais
@@ -21,10 +21,10 @@ builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e71
 OK   témoin : OpenBao descellé avant l'essai (pod 10.42.0.10)
 ## véhicule : tâche signée (tkn 0.46.2), bundle, TaskRun
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-bundle tekton/tasks/preuve-test1 : sha256:fe4565b226d689f3afbac5b0ef786e9b2af431706bd5348dce4108f476a21d4b
+bundle tekton/tasks/preuve-test1 : sha256:942bce0470c2ba467a5d608e540a0fa209fc1841be7e3b0ece6c5c166b67fb77
 OK   TaskRun preuve-test1 terminé (Succeeded, TrustedResourcesVerified=True)
 ## journal de l'étape (pod preuve-test1-pod, nœud sc-build)
-  IP|10.42.1.71
+  IP|10.42.1.104
   JETON|absent
   SECRETS_MONTES|
   VARIABLES|
@@ -39,34 +39,34 @@ OK   2. OPENBAO_SERVICE : injoignable, délai du client dépassé (FERME|5 s)
 OK   2. OPENBAO_POD : injoignable, délai du client dépassé (FERME|5 s)
 OK   témoin TEMOIN_ZOT : joignable depuis la même étape (OUVERT|0 s)
 OK   témoin TEMOIN_FORGEJO : joignable depuis la même étape (OUVERT|0 s)
-## trace : Hubble depuis 2026-11-13T11:38:10Z, flux refusés depuis 10.42.1.71 vers le port 8200
+## trace : Hubble depuis 2026-11-13T12:06:11Z, flux refusés depuis 10.42.1.104 vers le port 8200
 agent de sc-confiance : 20 flux
-  11:38:15.922 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:15.922 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:16.942 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:16.942 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:17.970 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:17.970 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:18.990 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:18.990 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:20.014 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:20.014 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:20.925 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:20.925 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:21.934 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:21.934 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:22.958 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:22.958 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:23.982 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:23.982 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:25.006 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
-  11:38:25.006 10.42.1.71 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:17.959 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:17.959 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:18.991 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:18.991 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:20.015 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:20.015 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:21.039 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:21.039 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:22.063 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:22.063 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:22.963 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:22.963 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:23.983 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:23.983 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:25.007 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:25.007 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:26.031 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:26.031 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:27.055 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
+  12:06:27.055 10.42.1.104 > 10.42.0.10:8200 SYN POLICY_DENIED INGRESS
 agent de sc-build : 0 flux
 OK   2. SYN vers OpenBao jetés à l'entrée par Cilium (sc-confiance, POLICY_DENIED)
 OK   2. aucun refus chez l'agent de sc-build (pas de politique de sortie sur ce pod)
-## trace : audit d'OpenBao depuis 2026-11-13T11:38:10Z
+## trace : audit d'OpenBao depuis 2026-11-13T12:06:11Z
 réponses journalisées : 3 ; par adresse et compte :
         3 10.42.0.196 jwt-system:serviceaccount:tekton-chains:tekton-chains-controller
-OK   3. aucune requête de 10.42.1.71 dans l'audit d'OpenBao
+OK   3. aucune requête de 10.42.1.104 dans l'audit d'OpenBao
 OK   témoin : 1 signature(s) de Chains dans la même lecture (preuve-test1 signé : true)
 OK   builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 inchangée : 2 enveloppes, dernière provenance de PipelineRun : a505ae0d-7c03-48eb-ae54-23eaf1c5a49b (2026-11-13T11:29:24Z)

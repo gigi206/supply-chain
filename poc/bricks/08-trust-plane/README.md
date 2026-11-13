@@ -2453,3 +2453,22 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
 - Fréquence : d'après 23b4537 (06/11), Cilium tire les adresses au hasard (`ipam: mode: kubernetes`) ; ce tirage n'est pas
   relu dans le code de Cilium et la fréquence d'une collision n'est pas mesurée. Aucune des IP de pod archivées pour la
   contre-épreuve avant le 13/11 n'était 10.42.1.250.
+
+### Additif du 13/11/2026 (note de 2026-11-13T12:26:24Z) : reprise à « J8 (tests) » arrêtée à « J8 (contrôleurs) » (code 1), RIEN D'AUTRE LANCÉ
+
+- **Accord** : « Oui, tel quel » ; prédictions E4 et E5 commitées avant (b2f0c8f). Lancé à 12:04:38 UTC, code 1 à 12:22:01 UTC
+  ([journal](resultats/rejeu-s5b-plateforme-j8.log)).
+- **Passé** : « J8 (tests) » (770 s, test 6 compris : adresse tirée 10.42.1.249, pods en 10.42.1.66 et 10.42.1.201, ajout et
+  retrait acceptés, Zot et Forgejo injoignables depuis l'adresse usurpée avec 3 flux INVALID_SOURCE_IP chacun),
+  « J8 (bascule) » (238 s), « J8 (helm-cilium) » (21 s) ; 313 lignes OK.
+- **Arrêt** dans « J8 (contrôleurs) » : `KO   tekton-chains-controller : refus des droits dans le journal :  (attendu : 0)`,
+  décompte vide après deux erreurs de jq (« null (null) cannot be matched, as it is not a string »). Lecture du code de
+  `refus_droits` (`preuves.sh` l. 2334-2346, inchangé depuis d357f4d du 06/11) : `.error` est remplacé par "" s'il manque,
+  l'erreur vient donc de `.timestamp | sub(...)` ; `and` ne l'évalue que pour une ligne dont `.error` contient « cannot
+  watch ». **Au moins une ligne « is forbidden: User … cannot watch » sans `.timestamp` est dans le journal du contrôleur de
+  Chains** (0 redémarrage) : décompte impossible, nature et date non lues. Le seul refus écarté archivé (06/11, Pipelines)
+  portait `.timestamp`. L'extrait d'audit de l'étape (`ct-refus-audit.json`, 11 entrées) ne contient aucun refus de Chains.
+- Une reprise à « J8 (contrôleurs) » échouerait à l'identique (journal lu depuis le démarrage) ; redémarrer Chains effacerait
+  la ligne. Relevé en lecture seule préparé à sec (script du scratchpad, shellcheck tenu), NON LANCÉ.
+- **Règle des 2×** : l'estimation de S5b (une journée) supposait au plus trois reprises de 30 min, dans les blocs neufs ; c'est
+  le quatrième arrêt (de 08:54:01 à 12:22:01 UTC), avant ces blocs. Seuil de deux jours non franchi ; hypothèse dépassée.
