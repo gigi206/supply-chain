@@ -60,3 +60,16 @@ Commande prévue (racine du dépôt) : `DISTRO=rke2 POUSSER_VSA=1 mise run confi
 Lancé à 08:54:01 UTC, code 1 à 08:54:05 UTC, pendant `vm.sh detruire` ([journal](rejeu-s5b.log)). La limite connue « fichiers
 de `$W` (S1 à S4d) gardés » est fausse : `vm.sh detruire` efface `$W` (l. 152). A1 à D3 ne sont pas mesurées. Détail : README
 de la 08, additif du 13/11/2026.
+
+## Note du 13/11/2026 (2026-11-13T09:01:19Z), avant lancement : rebâti de la plateforme seule (rien n'est réécrit)
+
+Décision du propriétaire : « Oui, avec push » à « Je rebâtis la plateforme seule, jusqu'à « J8 (résolveurs) » ? » (push de
+la VSA de la brique 10 compris, par `POUSSER_VSA=1`). Avant le lancement, le reliquat en lecture seule de `$W`
+(`s4d-06/essais`) est levé (`chmod -R u+w` puis `rm -rf` sur ce seul dossier).
+Commande : `DISTRO=rke2 POUSSER_VSA=1 JUSQUA='J8 (résolveurs)' mise run confiance:rejeu -- s5b-plateforme`, journal
+`resultats/rejeu-s5b-plateforme.log`.
+- Jugées dans ce passage : A1 à A5 et B1 à B8, telles qu'écrites le 11/11.
+- NON jugées dans ce passage : C1 à C9 (bloc 06, non jouable tel quel : entrées de S1 à S4d effacées), D1 (`fuites`) et
+  D3, qui viennent après le bloc 06, et D2 (durée du passage complet).
+- Prédiction ajoutée : E1, le passage s'arrête par « arrêt après J8 (résolveurs) (JUSQUA) » avec le code 0 ; confiance
+  moyenne (A2 et B4 sont « Moyenne », la 08c n'a jamais tourné sur un cluster neuf).
