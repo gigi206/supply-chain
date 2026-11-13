@@ -143,7 +143,9 @@ chemin() { # libellé origine compte t0 : PipelineRun PR_DEB créé par ce chemi
   mesure "$l : TaskRun publier au nom non raccourci" "$(awk -F'|' '$1 == "publier" {print $2}' "$T/$l.taskruns")" "$PR_DEB-publier"
   n=$(awk -F'|' '$1 != "publier" && $2 !~ /^'"$PR_DEB"'-(preparer|construire)$/' "$T/$l.taskruns" | wc -l)
   mesure "$l : TaskRuns preparer et construire aux noms raccourcis par Tekton" "$n" 2
-  kubectl get pods -n builds -l "tekton.dev/pipelineRun=$PR_DEB" -o json \
+  # assistant d'affinité de Tekton (workspace en PVC) : labels du PipelineRun sans label de tâche, effacé à la fin du PipelineRun ;
+  # présent ou non selon le moment du contrôle (README de la 08, l. 650 ; écart du rejeu s5b-06-b, 13/11/2026) : exclu
+  kubectl get pods -n builds -l "tekton.dev/pipelineRun=$PR_DEB,app.kubernetes.io/component!=affinity-assistant" -o json \
     | jq -r '.items[] | "\(.metadata.labels["tekton.dev/pipelineTask"])|\(.spec.nodeName)|\(.spec.runtimeClassName // "-")"' | sort > "$T/$l.pods"
   sed 's/^/     pod /' "$T/$l.pods"
   mesure "$l : pods (tâche|nœud|runtime)" "$(paste -sd' ' "$T/$l.pods")" "construire|sc-build|kata preparer|sc-build|- publier|sc-build|-"
