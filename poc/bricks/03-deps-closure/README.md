@@ -501,3 +501,17 @@ Nix et j'instruis l'option Debian par un banc ? »).
   NixOS/nixpkgs et NixOS/hydra (release, commits sur 90 jours, auteurs, fusionneurs, SECURITY.md, avis), configuration de confiance
   de l'hôte, cache.nixos.org, verrou du banc B, canal publié. Preuve du verdict à porter au doc 04, absent jusqu'ici.
 - Banc Debian (outils-prefetch à contenu Debian, hors cluster) : à concevoir ; `mmdebstrap` et `sbuild` sont absents de l'hôte.
+
+**Note du 13/11/2026 (suite, 2026-11-13T13:19:38Z) : précisions sur la note précédente** (rien n'est réécrit).
+- **Racines** : aujourd'hui, git et cacert ne sont protégés que par les liens de `~/.cache/supply-chain-poc/03/f2-racines/`
+  (posés à 11:11 UTC, hors dépôt) ; `03/f2/racines/` n'existera qu'au prochain F2. Aucun des deux dossiers n'est à nettoyer avant.
+  Les liens d'essai posés dans le scratchpad pour l'essai à sec ont été retirés.
+- **`sante-nix.sh` corrigé avant tout lancement** : en-tête daté par `date -u` en tête de chaque journal ; les lignes qui portent
+  le motif jeton|token sont remplacées par un marqueur visible au lieu d'être supprimées. Essai local hors réseau (faux `gh`,
+  API Scorecard en fichiers) : code 0 ; plafond de pages signalé « au moins 1000 » ; dépôt sans release ni SECURITY.md lu
+  « aucune » et « absent » ; robots écartés ; marqueur visible.
+- **F2 repassée au rejeu S5b** (README de la 08, reprise du 13/11) : 236 s, aucune construction Nix, clôture 66de99598aa176a1,
+  image `68e0ae70` identique sur deux constructions et égale au digest épinglé.
+- **Prédiction R1**, pour le prochain F2 avec le `nix_chemin` corrigé : trois liens dans `03/f2/racines/` (python313, gitMinimal,
+  cacert) vers `vm6nxpp9`, `2bjyma6x` et `mks1hnym` ; « clôture nix : 45 chemins », empreinte 66de99598aa176a1 ; image
+  `68e0ae70`. Confiance haute (chemins mesurés à l'essai à sec).

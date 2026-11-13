@@ -73,7 +73,8 @@ etape_cache() {
 [ $# -gt 0 ] || { echo "usage : $0 releves|cache…" >&2; exit 2; }
 for e in "$@"; do
   case $e in
-    releves|cache) "etape_$e" 2>&1 | grep -v -i -E 'jeton|token' | tee "$R/sante-nix-$e.log" ;;
+    releves|cache) { echo "# sante-nix.sh $e, $(date -u +%Y-%m-%dT%H:%M:%SZ)"; "etape_$e" 2>&1; } \
+      | sed -E 's/.*([Jj][Ee][Tt][Oo][Nn]|[Tt][Oo][Kk][Ee][Nn]).*/[ligne masquée : motif jeton|token]/' | tee "$R/sante-nix-$e.log" ;;
     *) echo "étape inconnue : $e" >&2; exit 2 ;;
   esac
 done

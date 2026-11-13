@@ -2514,3 +2514,6 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
   61 FAIL, 42 WARN, 7 INFO, contre 18, 61, 44 et 7 le 06/11 ; les lignes 4.2.12 et 4.2.13 (WARN sur deux nœuds le 06/11)
   n'apparaissent plus ; cause non lue.
 - **Reste de S5b** : le bloc 06 seul (entrées de S1 à S4d de la 06 effacées le matin), décision à part.
+
+- 2026-11-13T13:19:38Z : racines de F2 : dossier `03/f2-racines/` (additif « store peuplé depuis le cache signé ») gardé tant que le prochain
+  F2 n'a pas posé `03/f2/racines/` (`prefetch.sh` modifié le 13/11, README de la 03).
