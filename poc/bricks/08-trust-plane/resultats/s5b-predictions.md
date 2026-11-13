@@ -82,3 +82,13 @@ additif du 13/11 (rebâti arrêté à F2).
 - **A3** : lus dans le journal, `outils-horodatage@c7bebae2`, `3a7ca1b1` (16 lignes OK), `rattrapage@c3992728`,
   `porte@e77994c2`, bundles `d21931f3` et `7fa92ad3` ; `outils-prefetch@68e0ae70` non mesuré (étape en échec).
 - A1, A4, A5 : non jugées (étapes de J8 et de la porte non atteintes). B1 à B8 : non jugées.
+
+## Note du 13/11/2026 (2026-11-13T11:12:29Z), avant reprise : prédictions ajoutées (rien n'est réécrit)
+
+Reprise prévue, sur accords nommés (rebâti et push de la VSA à part) : `DISTRO=rke2 POUSSER_VSA=1 DEPUIS='J7 (fermeture, F2
+de la 03)' JUSQUA='J8 (résolveurs)' mise run confiance:rejeu -- s5b-plateforme-reprise`. Jugées : A1 à A5, B1 à B8, E1
+(arrêt par JUSQUA, code 0), et :
+| # | Prédiction | Confiance |
+|---|---|---|
+| E2 | F2 ne construit rien avec Nix (aucune ligne `building '/nix/store/`), ligne « clôture nix : 45 chemins », empreinte 66de99598aa176a1 | Haute : clôture mesurée dans le store |
+| E3 | Image d'outils `68e0ae70` reconstruite deux fois (A3 complète) | Moyenne : roues de Hermeto, toolchain Go et sources amont relues au réseau |

@@ -2408,3 +2408,17 @@ Question posée : avancer S5b au 13/11, après la VSA du deb de ce soir, et repl
 - **Règle des 2×** : S5b estimé à une journée ; deux arrêts ce matin ; à recompter avant la reprise.
 - **Décision Nix ouverte** (question du propriétaire du 13/11 : Nix n'a jamais été challengé pour les outils), présentée à
   part ; aucune reprise sans accord.
+
+### Additif du 13/11/2026 (note de 2026-11-13T11:12:29Z) : store peuplé depuis le cache signé, RIEN D'AUTRE LANCÉ
+
+- **Accord** : « Cache signé Nix » à « Comment débloquer F2 ? ». Configuration lue : `require-sigs = true`, seul substitut
+  `https://cache.nixos.org/`, clé `cache.nixos.org-1`.
+- **Fait** de 11:10:59 à 11:11:01 UTC : `nix build --max-jobs 0` (aucune construction locale permise) de `gitMinimal`,
+  `cacert` et `python313` du nixpkgs du banc B, liens de racine dans `~/.cache/supply-chain-poc/03/f2-racines/` (contre un
+  prochain ramasse-miettes ; hors dépôt). Copiés depuis le cache : curl 8.20.0, git-minimal `2bjyma6x`, nss-cacert `mks1hnym`.
+- **Mesuré** : clôture de 45 chemins, empreinte **66de99598aa176a1**, égale octet pour octet au `cloture.txt` du 06/11 ;
+  `nix store verify` code 0. 36 chemins signés `cache.nixos.org-1`, 9 sans signature, compilés sur l'hôte entre 10:29 et
+  10:58 UTC pendant l'échec de F2 (attr, acl, coreutils, gmp-with-cxx, gnugrep, gnused, keyutils-lib, pcre2,
+  publicsuffix-list) : leurs 9 empreintes NAR sont **égales** à celles des narinfo de cache.nixos.org.
+- **Contrôle d'hôte avant reprise** (chemins fixes de `~/.cache/supply-chain-poc` lus par les étapes restantes, recherche par
+  motifs, non exhaustive) : tous présents, sauf `03/f2/fermeture-1.digest`, écrit par F2 elle-même (`rejeu.sh` l. 98).
