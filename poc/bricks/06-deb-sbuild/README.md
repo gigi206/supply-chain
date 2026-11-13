@@ -1992,3 +1992,4 @@ Aucun fichier rejoué par S5b n'est modifié, et `s6b.sh` ne change pas. Prédic
 prealables, amorce, racine, image), S2 (buildinfo, racine, fermeture, restauration), S3 (restauration, builds, comparaison), rejeu
 jusqu'à « 06 (S4b) », `s4d.sh prealables`, rejeu depuis « 06 (S4d) » jusqu'à `fuites` et CIS. L'option E (outils-prefetch dans la
 chaîne) vient après, avec la cascade 1.0.0-2.
+- 2026-11-13T14:22:31Z : reprise, étape 1 (S1, `PREFIXE=s1r`) de 14:17:00 à 14:22:09 UTC, code 0 : racine `f8f221ca`, chroot `440ba93b`, image `d8041f9c` retrouvés au bit près ; P1 à P3 tenues ([prédictions](resultats/s5b-reprise-predictions.md)).

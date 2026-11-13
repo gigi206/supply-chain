@@ -49,3 +49,12 @@ tel quel : `vm.sh detruire` a effacé `$W` (`~/.cache/supply-chain-poc/08/travai
 - Les journaux archivés de S2 et S3 seront réécrits (pas de préfixe dans ces scripts) ; ceux de S1 passent sous `s1r-*`.
 - Le temps réseau dépend de snapshot.debian.org (lent par moments) ; aucune durée n'est prédite.
 - Règle des 2× : README de la 06, note du 13/11 (projection de 1,13 à 2,02 pw, seuil de 4 pw non atteint).
+
+## Résultat de l'étape 1 (note de 2026-11-13T14:22:31Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance l'étape 1 : PREFIXE=s1r s1.sh prealables amorce racine image ? ». De 14:17:00 à 14:22:09 UTC,
+code 0, 16 OK, 0 KO (journaux `s1r-*`).
+- **P1 tenue** : InRelease `0584fba3…` sur l'hôte et lu par apt dans le pod.
+- **P2 tenue** : racine `f8f221ca…` et chroot de S1 `440ba93b…` (mmdebstrap : 66 s, 920 000 000 octets) ; 238 .deb sur 238
+  conformes au Packages vérifié (amorce 20, racine 107, chroot 111). Mêmes empreintes qu'au 10/11, trois jours plus tard, sur un
+  cluster neuf.
+- **P3 tenue** : `essais-06/sbuild-debian13@d8041f9c…`.
