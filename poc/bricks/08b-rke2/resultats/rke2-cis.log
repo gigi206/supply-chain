@@ -1,4 +1,4 @@
-# rke2.sh cis, 2026-11-13T13:00:53Z
+# rke2.sh cis, 2026-11-13T15:51:42Z
 OK   kube-bench_0.16.0_linux_amd64.tar.gz
 ## sc-confiance, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
 [WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)

@@ -121,3 +121,13 @@ Correctif préparé à sec, NON APPLIQUÉ : `s4d3.sh` l. 146, sélecteur `app.ku
 | # | Prédiction pour la reprise à « 06 (S4d3) » | Confiance |
 |---|---|---|
 | P10 | Avec le correctif, « pods (tâche\|nœud\|runtime) » rend les trois attendus sur les deux chemins ; C8 et C9 tenues ; `fuites` et CIS comme au passage de 13:00 | Moyenne : C9 dépend de l'âge de la base de grype |
+
+## Résultat de la reprise à « 06 (S4d3) » (note de 2026-11-13T15:52:32Z ; rien n'est réécrit)
+« Oui, avec push » à « J'applique le filtre et je reprends à « 06 (S4d3) » avec POUSSER_VSA=1 ? ». Filtre commité avant (b6d51f8).
+De 15:36:53 à 15:51:47 UTC, code 0, 95 OK, 0 KO, aucun écart ([journal](../../08-trust-plane/resultats/rejeu-s5b-06-c.log)).
+- **P10 tenue** : les deux chemins listent les trois pods attendus (construire sous Kata, preparer, publier).
+- **C7 tenue** : bundle de la pipeline `sample-app-deb@5b4bacb8…`, différent de `82c8373d`, lu dans `pipeline.ref` et utilisé par les
+  deux chemins. **C8 tenue** : les deux chemins rendent `039949f9`. **C9 tenue** : porte du deb en succès (règles du PoC parmi les
+  succès), VSA et scan du deb refusés ; sample-app `ok|ok` ; enveloppes de Chains sur le deb 8 → 12, sur sample-app 6 → 6.
+- **P9 tenue** : `fuites` : aucun secret dans les journaux des trois VM ; CIS : 20 PASS, 61 FAIL, 42 WARN, 7 INFO (comme à 13:00).
+- **P8** : C1 à C9 tenues sur l'ensemble de la reprise.

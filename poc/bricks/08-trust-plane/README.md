@@ -2517,3 +2517,14 @@ l'adresse est déjà sur eth0 (message masqué par `2>/dev/null` : la raison exa
 
 - 2026-11-13T13:19:38Z : racines de F2 : dossier `03/f2-racines/` (additif « store peuplé depuis le cache signé ») gardé tant que le prochain
   F2 n'a pas posé `03/f2/racines/` (`prefetch.sh` modifié le 13/11, README de la 03).
+
+### Additif du 13/11/2026 (note de 2026-11-13T15:52:32Z) : S5b terminé
+
+Plateforme rebâtie de zéro sous RKE2 et Cilium, 08c appliquée, bloc 06 rejoué : tous les jalons de S5b sont passés le 13/11/2026,
+en plusieurs passages (rejeux `s5b-plateforme`, `-reprise`, `-j8`, `-ctl`, `-fin`, `-06-a`, `-06-b`, `-06-c`, et S1 à S3 et
+`s4d prealables` de la 06 rejoués à la main). Arrêts : effacement de `$W` non prévu par la carte, store Nix vidé, collision
+d'adresse du test 6, clé de date du journal de Chains, `SHA256SUMS.s1` oublié par la carte de reprise, assistant d'affinité de
+Tekton dans un contrôle ; trois correctifs d'instruments (`preuves.sh`, `s4d3.sh`, racines de `prefetch.sh`) ; aucun écart de la
+plateforme mesuré. Digests retrouvés au bit près : `68e0ae70`, `3a7ca1b1`, `f8f221ca`, `440ba93b`, `d8041f9c`, `e0b1f37c`,
+`3a0e54ae`, `0b489d43`, `749d746c`, `bb7599a2`, `50dc73f7`, `039949f9`. Suite (`apres-s5b`) : `pousser_vsa` et `lire_vsa` de la
+06, relevé G7, option E (outils-prefetch dans la chaîne), cascade 1.0.0-2 ; chacun sur accord.

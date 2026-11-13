@@ -1,14 +1,14 @@
-# s4d3.sh chemins, 2026-11-13T15:20:24Z
+# s4d3.sh chemins, 2026-11-13T15:37:27Z
 ## départ
 OK   sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f absent : absent
 OK   sample-app-6391fd437f26696847041be3226bbbf633f55a2f présent : pipelinerun.tekton.dev/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
 OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f
 OK   CronJob rattrapage-deb suspendu : true
 OK   PipelineRuns en cours dans builds : 0
-enveloppes de Chains : builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e 4, builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 6
+enveloppes de Chains : builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e 8, builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 6
 ## chemin 1 : livraison de Forgejo (tête de main)
 OK   Forgejo, POST hooks/…/tests : HTTP 204
-sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:20:25Z, UID e98e810b-df92-412f-9230-c673defbd2d2
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:37:29Z, UID c049c574-debc-4f82-9dcf-c058136329f6
 OK   webhook : origine (labels) : EventListener forgejo
     1 declencheurs:el-forgejo 201
 OK   webhook : créations dans l'audit de l'API : 1 declencheurs:el-forgejo 201
@@ -31,14 +31,14 @@ OK   webhook : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa
      TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
      TaskRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
 OK   webhook : PipelineRun signé par Chains : true
-{"t":"15:20:25","eventID":"05390f04-0fdd-47bf-8f2c-3459710fde04","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+{"t":"15:37:29","eventID":"1a061555-cb5e-4b40-a295-54de1f34739a","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
 OK   trigger de l'image : sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent : 1
 OK   trigger du deb : aucun refus : 0
 ## chemin 2 : rattrapage (sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f purgé, CronJob rattrapage-deb repris, aucune livraison)
-rattrapage-deb-29909726  JOINT|Forgejo et API, essai 1
-rattrapage-deb-29909726  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
-rattrapage-deb-29909726  CREE|builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
-sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:26:19Z, UID d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6
+rattrapage-deb-29909743  JOINT|Forgejo et API, essai 1
+rattrapage-deb-29909743  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-deb-29909743  CREE|builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:43:49Z, UID 37a8e87a-d5b5-406c-970e-616739e0bea5
 OK   rattrapage : origine (labels) : rattrapage
     1 declencheurs:rattrapage-deb 201
 OK   rattrapage : créations dans l'audit de l'API : 1 declencheurs:rattrapage-deb 201
@@ -53,10 +53,9 @@ OK   rattrapage : noms des TaskRuns de 63 caractères au plus : 0
 OK   rattrapage : TaskRun publier au nom non raccourci : sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
 OK   rattrapage : TaskRuns preparer et construire aux noms raccourcis par Tekton : 2
      pod construire|sc-build|kata
-     pod null|sc-build|-
      pod preparer|sc-build|-
      pod publier|sc-build|-
-ÉCART rattrapage : pods (tâche|nœud|runtime) : construire|sc-build|kata null|sc-build|- preparer|sc-build|- publier|sc-build|- (attendu : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-)
+OK   rattrapage : pods (tâche|nœud|runtime) : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-
 OK   rattrapage : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app-deb
      TaskRun sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire signé=true
      TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
@@ -68,15 +67,14 @@ OK   spec identique par les deux chemins
   JOINT|Forgejo et API, essai 1
   TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
   PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
-OK   rattrapage de l'image (rattrapage-29909730) : 1
+OK   rattrapage de l'image (rattrapage-29909748) : 1
 ## rejeu de la livraison
 OK   Forgejo, POST hooks/…/tests : HTTP 204
-{"t":"15:32:10","eventID":"3ea17365-3def-434b-a73f-643f4c53b1e4","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
-{"t":"15:32:10","eventID":"3ea17365-3def-434b-a73f-643f4c53b1e4","erreur":"pipelineruns.tekton.dev \"sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+{"t":"15:50:11","eventID":"79d2ea84-dfce-47bc-90e5-6c6809073491","erreur":"pipelineruns.tekton.dev \"sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+{"t":"15:50:11","eventID":"79d2ea84-dfce-47bc-90e5-6c6809073491","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
 OK   rejeu : sample-app-6391fd437f26696847041be3226bbbf633f55a2f et sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f déjà présents : 2
-OK   UID de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : d3d1f7a2-6447-4cec-8fbe-2a2f96bba0a6
+OK   UID de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : 37a8e87a-d5b5-406c-970e-616739e0bea5
 ## fin
-OK   enveloppes de Chains sur builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e : 4 → 8
+OK   enveloppes de Chains sur builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e : 8 → 12
 OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 → 6
 OK   CronJob rattrapage-deb repris : false
-KO   1 écart(s)

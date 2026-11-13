@@ -1,4 +1,4 @@
-# s4d3.sh deployer, 2026-11-13T15:19:52Z
+# s4d3.sh deployer, 2026-11-13T15:36:55Z
 ## départ
 OK   objets Trigger de declencheurs : 0
 pod de l'EventListener : el-forgejo-76596b99b8-67g67
@@ -30,15 +30,15 @@ OK   spec admise identique à celle de s4d-deb-1
 OK   au nom de rattrapage-deb : admis à blanc
 OK   spec admise identique à celle de s4d-deb-1
 ## livraisons refusées (commit fictif 1111111111111111111111111111111111111111), adressées directement à l'EventListener
-non signée : HTTP 202 {"eventID":"5ca87d91-63a8-4f4a-bab3-df6bdd586d7a"}
-autre secret : HTTP 202 {"eventID":"e24980c2-a4a8-4f77-9864-7d28756ff589"}
-corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"7414ca0d-8199-4060-adb4-3da26b7e9dbc"}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
-{"t":"15:20:03","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+non signée : HTTP 202 {"eventID":"087ed564-2c7c-477b-9811-94df320eae6b"}
+autre secret : HTTP 202 {"eventID":"8cb162a1-bf18-453a-b194-42c734493860"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"1470a03b-df42-4085-8447-ad9a5e7d347b"}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
 OK   refus « no X-Hub-Signature-256 header set » (un par trigger) : 2
 OK   refus « payload signature check failed » (deux livraisons, deux triggers) : 4
 OK   refus des intercepteurs, en tout : 6

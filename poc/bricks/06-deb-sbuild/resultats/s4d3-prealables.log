@@ -1,4 +1,4 @@
-# s4d3.sh prealables, 2026-11-13T15:19:51Z
+# s4d3.sh prealables, 2026-11-13T15:36:54Z
 ## gabarit rendu
 OK   objets de declencheur.yaml : CronJob/rattrapage-deb Role/rattrapage-deb Role/rattrapage-deb-pipelineruns RoleBinding/rattrapage-deb RoleBinding/rattrapage-deb-pipelineruns ServiceAccount/rattrapage-deb Trigger/sample-app-deb-push TriggerTemplate/sample-app-deb
 ## exigences de main.go sur le gabarit (paramètres commit et depot, une ressource, PipelineRun v1 de builds nommé <gabarit>-<commit>)

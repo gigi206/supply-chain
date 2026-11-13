@@ -1,0 +1,607 @@
+# rejeu.sh s5b-06-c, 2026-11-13T15:36:53Z
+réseau : cilium ; reprise à 06 (S4d3)
+## démontage : sautée (reprise à 06 (S4d3))
+## VM : sautée (reprise à 06 (S4d3))
+## RKE2 : sautée (reprise à 06 (S4d3))
+## Cilium : sautée (reprise à 06 (S4d3))
+## J2 : sautée (reprise à 06 (S4d3))
+## J3 : sautée (reprise à 06 (S4d3))
+## J4 : sautée (reprise à 06 (S4d3))
+## J5 : sautée (reprise à 06 (S4d3))
+## J6 : sautée (reprise à 06 (S4d3))
+## test 5 (J6) : sautée (reprise à 06 (S4d3))
+## J6 (suite) : sautée (reprise à 06 (S4d3))
+## J7 : sautée (reprise à 06 (S4d3))
+## J7 (admission) : sautée (reprise à 06 (S4d3))
+## J7 (BuildKit) : sautée (reprise à 06 (S4d3))
+## J7 (voie D) : sautée (reprise à 06 (S4d3))
+## J7 (voie A, sample-app) : sautée (reprise à 06 (S4d3))
+## J7 (sans réseau) : sautée (reprise à 06 (S4d3))
+## J7 (construction, entrées) : sautée (reprise à 06 (S4d3))
+## J7 (fermeture, F2 de la 03) : sautée (reprise à 06 (S4d3))
+## J7 (construction) : sautée (reprise à 06 (S4d3))
+## J7 (réseau) : sautée (reprise à 06 (S4d3))
+## reserve_c : sautée (non rejouable : dépôts d'essai du test 8 du 01/11 nommés en dur ; mesure du 01/11 gardée, ADR 0000)
+## J8 (tests) : sautée (reprise à 06 (S4d3))
+## J8 (bascule) : sautée (reprise à 06 (S4d3))
+## J8 (helm-cilium) : sautée (reprise à 06 (S4d3))
+## J8 (contrôleurs) : sautée (reprise à 06 (S4d3))
+## 01 (S2, S4) : sautée (reprise à 06 (S4d3))
+## 01 (S3) : sautée (reprise à 06 (S4d3))
+## 01 (S4, négatifs) : sautée (reprise à 06 (S4d3))
+## 01 S5 : sautée (déduit du code, non mesuré : D6 refuserait l'image du fork, sans fermeture propre ; porte en dur sur 3a7ca1b1)
+## 01 reverification, retrait, refspec, niveaux : sautées (mesures ponctuelles du 02/11/2026)
+## 01 (S6) : sautée (reprise à 06 (S4d3))
+## 19 telecharger : sautée (archives en cache, sha256 revérifiés par installer) ; reference, O4 et correctifs : sautés (mesures)
+## 19 (O2) : sautée (reprise à 06 (S4d3))
+## 19b (L2) : sautée (reprise à 06 (S4d3))
+## 19b (L3) : sautée (reprise à 06 (S4d3))
+## 19b (L5) : sautée (reprise à 06 (S4d3))
+## 19 (O2, suite) : sautée (reprise à 06 (S4d3))
+## 19 (O3) : sautée (reprise à 06 (S4d3))
+## 19b L1, avant_grpc, grpc_tls, pertes_grpc : sautées (L2 et L3 posent déjà la configuration finale) ; muette, L7 : sautées
+## 19b (L6, contrôle) : sautée (reprise à 06 (S4d3))
+## 19b (L4) : sautée (reprise à 06 (S4d3))
+## 07a (G1) : sautée (reprise à 06 (S4d3))
+## 07a (G2) : sautée (reprise à 06 (S4d3))
+## 07a (G3) : sautée (reprise à 06 (S4d3))
+## 07a (G4) : sautée (reprise à 06 (S4d3))
+## 07a (passage périodique) : sautée (reprise à 06 (S4d3))
+## 07a (G8) : sautée (reprise à 06 (S4d3))
+## 10 (VSA) : sautée (reprise à 06 (S4d3))
+## J8 (contrôle 6) : sautée (reprise à 06 (S4d3))
+## J8 (contrôle 7) : sautée (reprise à 06 (S4d3))
+## 07a (G6) : sautée (reprise à 06 (S4d3))
+## 08c (H1) : sautée (reprise à 06 (S4d3))
+## 08c (H4) : sautée (reprise à 06 (S4d3))
+## 08c (S1) : sautée (reprise à 06 (S4d3))
+## 08c (H5, limites) : sautée (reprise à 06 (S4d3))
+## 08c (H5, Deny) : sautée (reprise à 06 (S4d3))
+## 08c (H5, rôles) : sautée (reprise à 06 (S4d3))
+## 08c (sortie des builds) : sautée (reprise à 06 (S4d3))
+## J8 (résolveurs) : sautée (reprise à 06 (S4d3))
+## 06 (S1, amorce) : sautée (reprise à 06 (S4d3))
+## 06 (S4c) : sautée (reprise à 06 (S4d3))
+## 06 (S4a) : sautée (reprise à 06 (S4d3))
+## 06 (S4b) : sautée (reprise à 06 (S4d3))
+## 06 (S4d) : sautée (reprise à 06 (S4d3))
+# s4d3.sh retirer, 2026-11-13T15:36:53Z
+triggertemplate.triggers.tekton.dev "sample-app-deb" deleted from declencheurs namespace
+trigger.triggers.tekton.dev "sample-app-deb-push" deleted from declencheurs namespace
+serviceaccount "rattrapage-deb" deleted from declencheurs namespace
+role.rbac.authorization.k8s.io "rattrapage-deb" deleted from declencheurs namespace
+rolebinding.rbac.authorization.k8s.io "rattrapage-deb" deleted from declencheurs namespace
+role.rbac.authorization.k8s.io "rattrapage-deb-pipelineruns" deleted from builds namespace
+rolebinding.rbac.authorization.k8s.io "rattrapage-deb-pipelineruns" deleted from builds namespace
+cronjob.batch "rattrapage-deb" deleted from declencheurs namespace
+PipelineRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f : absent
+labelSelector laissé : {"matchLabels":{"poc.test/ecouteur":"forgejo"}} (aucun objet Trigger : 0)
+# s4d3.sh prealables, 2026-11-13T15:36:54Z
+## gabarit rendu
+OK   objets de declencheur.yaml : CronJob/rattrapage-deb Role/rattrapage-deb Role/rattrapage-deb-pipelineruns RoleBinding/rattrapage-deb RoleBinding/rattrapage-deb-pipelineruns ServiceAccount/rattrapage-deb Trigger/sample-app-deb-push TriggerTemplate/sample-app-deb
+## exigences de main.go sur le gabarit (paramètres commit et depot, une ressource, PipelineRun v1 de builds nommé <gabarit>-<commit>)
+OK   paramètres : commit,depot
+OK   ressources : 1
+OK   PipelineRun rendu (apiVersion kind espace/nom) : tekton.dev/v1 PipelineRun builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f
+## Trigger sample-app-deb-push contre le trigger en ligne en service (intercepteurs et liaisons)
+OK   intercepteurs et liaisons identiques
+OK   label du Trigger : {"poc.test/ecouteur":"forgejo"}
+## CronJob rattrapage-deb contre rattrapage en service (hors nom, compte, GABARIT et suspension)
+OK   CronJob identique hors nom, compte, GABARIT et suspension (image comprise)
+OK   compte, GABARIT, suspension : rattrapage-deb declencheurs/sample-app-deb true
+## EventListener du dépôt contre celui en service
+OK   identiques hors labelSelector
+OK   labelSelector du dépôt : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## dépendances de la 08 en service
+OK   ConfigMap declencheurs/rattrapage : configmap/rattrapage
+OK   secret declencheurs/forgejo-webhook (nom seul) : secret/forgejo-webhook
+OK   NetworkPolicy builds/construction-deb-sans-sortie : networkpolicy.networking.k8s.io/construction-deb-sans-sortie
+OK   objets Trigger de declencheurs : 0
+OK   TriggerTemplate sample-app-deb : absente
+## bundle de la pipeline deb
+OK   bundle dans Zot : sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   tâche preparer dans la liste revue : tekton/tasks/preparer-deb@sha256:588617b8382513c3aa5b2d79de8f45324ab6cfdc2b6009664ab0a50e1123c492
+OK   tâche construire dans la liste revue : tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
+OK   tâche publier dans la liste revue : tekton/tasks/publier-image@sha256:d21931f3807b4306a55a20488c9c6db1ef33613fa3143207f95fd7428c16b36b
+# s4d3.sh deployer, 2026-11-13T15:36:55Z
+## départ
+OK   objets Trigger de declencheurs : 0
+pod de l'EventListener : el-forgejo-76596b99b8-67g67
+## EventListener : labelSelector (document EventListener de declencheurs.yaml de la 08, seul)
+OK   labelSelector en service : {"matchLabels":{"poc.test/ecouteur":"forgejo"}}
+## declencheur.yaml
+triggertemplate.triggers.tekton.dev/sample-app-deb serverside-applied
+trigger.triggers.tekton.dev/sample-app-deb-push serverside-applied
+serviceaccount/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb serverside-applied
+role.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+rolebinding.rbac.authorization.k8s.io/rattrapage-deb-pipelineruns serverside-applied
+cronjob.batch/rattrapage-deb serverside-applied
+OK   pod de l'EventListener inchangé (aucun redémarrage) : el-forgejo-76596b99b8-67g67
+OK   CronJob rattrapage-deb suspendu : true
+OK   CronJob rattrapage repris (inchangé) : false
+## droits (kubectl auth can-i)
+OK   rattrapage-deb : get triggertemplate sample-app-deb : yes
+OK   rattrapage-deb : get triggertemplate sample-app : no
+OK   rattrapage-deb : create pipelineruns dans builds : yes
+OK   rattrapage-deb : delete pipelineruns dans builds : no
+OK   rattrapage-deb : get secrets dans declencheurs : no
+OK   rattrapage : get triggertemplate sample-app-deb : no
+OK   el-forgejo : list triggers dans declencheurs : yes
+## PipelineRun du gabarit, à blanc
+OK   au nom de el-forgejo : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+OK   au nom de rattrapage-deb : admis à blanc
+OK   spec admise identique à celle de s4d-deb-1
+## livraisons refusées (commit fictif 1111111111111111111111111111111111111111), adressées directement à l'EventListener
+non signée : HTTP 202 {"eventID":"087ed564-2c7c-477b-9811-94df320eae6b"}
+autre secret : HTTP 202 {"eventID":"8cb162a1-bf18-453a-b194-42c734493860"}
+corps modifié (signature valide d'un autre corps) : HTTP 202 {"eventID":"1470a03b-df42-4085-8447-ad9a5e7d347b"}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"no X-Hub-Signature-256 header set"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+{"t":"15:37:06","refus":{"code":"FailedPrecondition","message":"payload signature check failed"}}
+OK   refus « no X-Hub-Signature-256 header set » (un par trigger) : 2
+OK   refus « payload signature check failed » (deux livraisons, deux triggers) : 4
+OK   refus des intercepteurs, en tout : 6
+OK   PipelineRuns du commit fictif : 0
+# s4d3.sh chemins, 2026-11-13T15:37:27Z
+## départ
+OK   sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f absent : absent
+OK   sample-app-6391fd437f26696847041be3226bbbf633f55a2f présent : pipelinerun.tekton.dev/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   tête de main dans Forgejo : 6391fd437f26696847041be3226bbbf633f55a2f
+OK   CronJob rattrapage-deb suspendu : true
+OK   PipelineRuns en cours dans builds : 0
+enveloppes de Chains : builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e 8, builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 6
+## chemin 1 : livraison de Forgejo (tête de main)
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:37:29Z, UID c049c574-debc-4f82-9dcf-c058136329f6
+OK   webhook : origine (labels) : EventListener forgejo
+    1 declencheurs:el-forgejo 201
+OK   webhook : créations dans l'audit de l'API : 1 declencheurs:el-forgejo 201
+OK   webhook : PipelineRun : True|Succeeded
+OK   webhook : pipeline : sample-app-deb@sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   webhook : spec identique à celle de s4d-deb-1 (S4d1)
+     TaskRun construire|sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire|63|Succeeded
+     TaskRun preparer|sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer|63|Succeeded
+     TaskRun publier|sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier|63|Succeeded
+OK   webhook : TaskRuns réussis : 3/3
+OK   webhook : noms des TaskRuns de 63 caractères au plus : 0
+OK   webhook : TaskRun publier au nom non raccourci : sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
+OK   webhook : TaskRuns preparer et construire aux noms raccourcis par Tekton : 2
+     pod construire|sc-build|kata
+     pod preparer|sc-build|-
+     pod publier|sc-build|-
+OK   webhook : pods (tâche|nœud|runtime) : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-
+OK   webhook : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app-deb
+     TaskRun sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire signé=true
+     TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
+     TaskRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   webhook : PipelineRun signé par Chains : true
+{"t":"15:37:29","eventID":"1a061555-cb5e-4b40-a295-54de1f34739a","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   trigger de l'image : sample-app-6391fd437f26696847041be3226bbbf633f55a2f déjà présent : 1
+OK   trigger du deb : aucun refus : 0
+## chemin 2 : rattrapage (sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f purgé, CronJob rattrapage-deb repris, aucune livraison)
+rattrapage-deb-29909743  JOINT|Forgejo et API, essai 1
+rattrapage-deb-29909743  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+rattrapage-deb-29909743  CREE|builds/sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f|commit 6391fd437f26696847041be3226bbbf633f55a2f|depot https://sc-stockage.poc.test:3000/workspace/sample-app.git
+sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f créé à 2026-11-13T15:43:49Z, UID 37a8e87a-d5b5-406c-970e-616739e0bea5
+OK   rattrapage : origine (labels) : rattrapage
+    1 declencheurs:rattrapage-deb 201
+OK   rattrapage : créations dans l'audit de l'API : 1 declencheurs:rattrapage-deb 201
+OK   rattrapage : PipelineRun : True|Succeeded
+OK   rattrapage : pipeline : sample-app-deb@sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+OK   rattrapage : spec identique à celle de s4d-deb-1 (S4d1)
+     TaskRun construire|sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire|63|Succeeded
+     TaskRun preparer|sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer|63|Succeeded
+     TaskRun publier|sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier|63|Succeeded
+OK   rattrapage : TaskRuns réussis : 3/3
+OK   rattrapage : noms des TaskRuns de 63 caractères au plus : 0
+OK   rattrapage : TaskRun publier au nom non raccourci : sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier
+OK   rattrapage : TaskRuns preparer et construire aux noms raccourcis par Tekton : 2
+     pod construire|sc-build|kata
+     pod preparer|sc-build|-
+     pod publier|sc-build|-
+OK   rattrapage : pods (tâche|nœud|runtime) : construire|sc-build|kata preparer|sc-build|- publier|sc-build|-
+OK   rattrapage : résultats : IMAGE_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e IMAGE_URL=sc-stockage.poc.test:5000/builds/sample-app-deb
+     TaskRun sample-app-deb-6391f3bb0e0b4486893c8c5caf5d6a1912fc8-construire signé=true
+     TaskRun sample-app-deb-6391fd43bb0e0b4486893c8c5caf5d6a1912fc8-preparer signé=true
+     TaskRun sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f-publier signé=true
+OK   rattrapage : PipelineRun signé par Chains : true
+OK   créations de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f dans les passages de rattrapage-deb depuis la reprise : 1
+OK   UID différent de celui du chemin 1
+OK   spec identique par les deux chemins
+  JOINT|Forgejo et API, essai 1
+  TETE|workspace/sample-app|main|6391fd437f26696847041be3226bbbf633f55a2f
+  PRESENT|builds/sample-app-6391fd437f26696847041be3226bbbf633f55a2f
+OK   rattrapage de l'image (rattrapage-29909748) : 1
+## rejeu de la livraison
+OK   Forgejo, POST hooks/…/tests : HTTP 204
+{"t":"15:50:11","eventID":"79d2ea84-dfce-47bc-90e5-6c6809073491","erreur":"pipelineruns.tekton.dev \"sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+{"t":"15:50:11","eventID":"79d2ea84-dfce-47bc-90e5-6c6809073491","erreur":"pipelineruns.tekton.dev \"sample-app-6391fd437f26696847041be3226bbbf633f55a2f\" already exists"}
+OK   rejeu : sample-app-6391fd437f26696847041be3226bbbf633f55a2f et sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f déjà présents : 2
+OK   UID de sample-app-deb-6391fd437f26696847041be3226bbbf633f55a2f après le rejeu : 37a8e87a-d5b5-406c-970e-616739e0bea5
+## fin
+OK   enveloppes de Chains sur builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e : 8 → 12
+OK   enveloppes de Chains sur builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 : 6 → 6
+OK   CronJob rattrapage-deb repris : false
+# s4d3.sh porte, 2026-11-13T15:50:11Z
+OK   PipelineRuns en cours dans builds : 0
+passage d'horodatage horodatage-29909751
+OK   provenance de PipelineRun la plus récente de builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e (seule jugée) : 37a8e87a-d5b5-406c-970e-616739e0bea5
+## deb (prédictions : ec en succès sans violation ; horodatage n/n ; VSA et scan refusés, Job en échec, comme décidé)
+VERDICT|s4d3-deb|true||trusted_task.tagged|1|ok|12/12 enveloppe(s) couverte(s), 12 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|refus|0/0 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb ; cosign : no matching attestations: |refus|scan.scan_present ; 0 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb ; cosign : no matching attestations: 
+OK   deb : succès de ec : true
+OK   deb : violations : 
+OK   deb : avertissements : trusted_task.tagged
+OK   deb : horodatage, enveloppes toutes couvertes (12/12) : ok|toutes
+OK   deb : VSA : refus
+OK   deb : scan : refus
+OK   deb : règles du PoC parmi les succès : porte.construction_kata,porte.fermeture_plateforme,porte.image_signature,porte.preparation_appariee,porte.taches_vues
+## image sample-app (non-régression ; prédiction : verdict de s4d2-reelle)
+VERDICT|s4d3-reelle|true||trusted_task.tagged|1|ok|6/6 enveloppe(s) couverte(s), 41 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app|ok|2 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app
+OK   sample-app : succès, violations, avertissements : true||trusted_task.tagged
+OK   sample-app : horodatage, enveloppes toutes couvertes (6/6) : ok|toutes
+OK   sample-app : VSA, scan : ok|ok
+## durée 06 (S4d3) : 875 s
+## 08d : rien à rejouer (relevés seuls, rien installé ; cert-manager lié à l'exposition de services, D7)
+[confiance:fuites] $ poc/bricks/08-trust-plane/fuites.sh s5b-06-c
+# fuites.sh s5b-06-c, 2026-11-13T15:51:28Z
+## sc-confiance : 315376 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+## sc-build : 57889 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+## sc-stockage : 155881 lignes de journaux
+témoin retrouvé (1)
+0    alloy-evenements.token
+0    alloy-sc-build.key
+0    alloy-sc-confiance.key
+0    alloy-stockage.key
+0    ca-poc.key
+0    ca-sc-build.key
+0    ca-sc-confiance.key
+0    controle.key
+0    forgejo-admin.password
+0    forgejo-admin.token
+0    forgejo-poc-amont.token
+0    forgejo-poc-dev.token
+0    forgejo-poc-sync.token
+0    forgejo-webhook-sync.secret
+0    forgejo-webhook.secret
+0    forgejo.key
+0    grafana-admin.password
+0    grafana-auditeur.password
+0    grafana-client.key
+0    grafana.key
+0    k3s-jeton-agent
+0    k3s-jeton-agent-securise
+0    k3s-jeton-serveur
+0    loki-interne.key
+0    loki.key
+0    openbao-descellement.b64
+0    openbao-descellement.hex
+0    openbao-root.token
+0    openbao.key
+0    prometheus-lecture.token
+0    relais.key
+0    rke2-jeton-agent
+0    rke2-jeton-agent-securise
+0    rke2-jeton-serveur
+0    taches.key
+0    tsa-racine.key
+0    zot-poc-build.password
+0    zot-poc-ecriture.password
+0    zot-poc-fermetures.password
+0    zot-poc-horodatage.password
+0    zot-poc-images.password
+0    zot-poc-metriques.password
+0    zot-poc-scan.password
+0    zot-poc-vulndb.password
+0    zot.key
+OK   aucun secret dans les journaux des trois VM
+## durée fuites : 14 s
+# rke2.sh cis, 2026-11-13T15:51:42Z
+OK   kube-bench_0.16.0_linux_amd64.tar.gz
+## sc-confiance, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+== Summary master ==
+54 checks PASS
+0 checks FAIL
+5 checks WARN
+0 checks INFO
+== Summary etcd ==
+7 checks PASS
+0 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+1 checks PASS
+0 checks FAIL
+4 checks WARN
+0 checks INFO
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+18 checks PASS
+1 checks FAIL
+0 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+80 checks PASS
+5 checks FAIL
+38 checks WARN
+7 checks INFO
+## sc-build, profil rke2-cis-1.9 (Kubernetes 1.35 : profil le plus proche, pas le sien)
+[FAIL] 1.1.1 Ensure that the API server pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.2 Ensure that the API server pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.3 Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root (Automated)
+[FAIL] 1.1.5 Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root (Automated)
+[WARN] 1.1.7 Ensure that the etcd pod specification file permissions are set to 600 or more restrictive (Manual)
+[WARN] 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root (Manual)
+[WARN] 1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive (Manual)
+[WARN] 1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd (Manual)
+[FAIL] 1.1.13 Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.14 Ensure that the admin.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.15 Ensure that the scheduler.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.16 Ensure that the scheduler.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.17 Ensure that the controller-manager.conf file permissions are set to 600 or more restrictive (Automated)
+[FAIL] 1.1.18 Ensure that the controller-manager.conf file ownership is set to root:root (Automated)
+[FAIL] 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)
+[WARN] 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)
+[FAIL] 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600 (Automated)
+[FAIL] 1.2.1 Ensure that the --anonymous-auth argument is set to false (Automated)
+[FAIL] 1.2.2 Ensure that the --token-auth-file parameter is not set (Automated)
+[WARN] 1.2.3 Ensure that the --DenyServiceExternalIPs is set (Manual)
+[FAIL] 1.2.4 Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate (Automated)
+[FAIL] 1.2.5 Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)
+[FAIL] 1.2.6 Ensure that the --authorization-mode argument is not set to AlwaysAllow (Automated)
+[FAIL] 1.2.7 Ensure that the --authorization-mode argument includes Node (Automated)
+[FAIL] 1.2.8 Ensure that the --authorization-mode argument includes RBAC (Automated)
+[WARN] 1.2.9 Ensure that the admission control plugin EventRateLimit is set (Manual)
+[FAIL] 1.2.10 Ensure that the admission control plugin AlwaysAdmit is not set (Automated)
+[WARN] 1.2.11 Ensure that the admission control plugin AlwaysPullImages is set (Manual)
+[FAIL] 1.2.12 Ensure that the admission control plugin ServiceAccount is set (Automated)
+[FAIL] 1.2.13 Ensure that the admission control plugin NamespaceLifecycle is set (Automated)
+[FAIL] 1.2.14 Ensure that the admission control plugin NodeRestriction is set (Automated)
+[FAIL] 1.2.15 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.2.16 Ensure that the --audit-log-path argument is set (Automated)
+[FAIL] 1.2.17 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)
+[FAIL] 1.2.18 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)
+[FAIL] 1.2.19 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)
+[FAIL] 1.2.20 Ensure that the --request-timeout argument is set as appropriate (Automated)
+[FAIL] 1.2.21 Ensure that the --service-account-lookup argument is set to true (Automated)
+[FAIL] 1.2.22 Ensure that the --service-account-key-file argument is set as appropriate (Automated)
+[FAIL] 1.2.23 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate (Automated)
+[FAIL] 1.2.24 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Automated)
+[FAIL] 1.2.25 Ensure that the --client-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.2.26 Ensure that the --etcd-cafile argument is set as appropriate (Automated)
+[FAIL] 1.2.27 Ensure that the --encryption-provider-config argument is set as appropriate (Automated)
+[FAIL] 1.2.28 Ensure that encryption providers are appropriately configured (Automated)
+[FAIL] 1.2.29 Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Automated)
+[WARN] 1.3.1 Ensure that the --terminated-pod-gc-threshold argument is set as appropriate (Manual)
+[FAIL] 1.3.2 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.3.3 Ensure that the --use-service-account-credentials argument is set to true (Automated)
+[FAIL] 1.3.4 Ensure that the --service-account-private-key-file argument is set as appropriate (Automated)
+[FAIL] 1.3.5 Ensure that the --root-ca-file argument is set as appropriate (Automated)
+[FAIL] 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)
+[FAIL] 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+[FAIL] 1.4.1 Ensure that the --profiling argument is set to false (Automated)
+[FAIL] 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)
+== Summary master ==
+2 checks PASS
+48 checks FAIL
+9 checks WARN
+0 checks INFO
+[FAIL] 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)
+[FAIL] 2.2 Ensure that the --client-cert-auth argument is set to true (Automated)
+[FAIL] 2.3 Ensure that the --auto-tls argument is not set to true (Automated)
+[FAIL] 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)
+[FAIL] 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Automated)
+[FAIL] 2.6 Ensure that the --peer-auto-tls argument is not set to true (Automated)
+[FAIL] 2.7 Ensure that a unique Certificate Authority is used for etcd (Automated)
+== Summary etcd ==
+0 checks PASS
+7 checks FAIL
+0 checks WARN
+0 checks INFO
+[WARN] 3.1.1 Client certificate authentication should not be used for users (Manual)
+[WARN] 3.1.2 Service account token authentication should not be used for users (Manual)
+[WARN] 3.1.3 Bootstrap token authentication should not be used for users (Manual)
+[FAIL] 3.2.1 Ensure that a minimal audit policy is created (Automated)
+[WARN] 3.2.2 Ensure that the audit policy covers key security concerns (Manual)
+== Summary controlplane ==
+0 checks PASS
+1 checks FAIL
+4 checks WARN
+0 checks INFO
+[FAIL] 4.3.1 Ensure that the kube-proxy metrics service is bound to localhost (Automated)
+== Summary node ==
+18 checks PASS
+1 checks FAIL
+0 checks WARN
+5 checks INFO
+[FAIL] 5.1.1 Ensure that the cluster-admin role is only used where required (Automated)
+[FAIL] 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Automated)
+[FAIL] 5.1.5 Ensure that default service accounts are not actively used. (Automated)
+[FAIL] 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Automated)
+[WARN] 5.1.7 Avoid use of system:masters group (Manual)
+[WARN] 5.1.8 Limit use of the Bind, Impersonate and Escalate permissions in the Kubernetes cluster (Manual)
+[WARN] 5.1.9 Minimize access to create persistent volumes (Manual)
+[WARN] 5.1.10 Minimize access to the proxy sub-resource of nodes (Manual)
+[WARN] 5.1.11 Minimize access to the approval sub-resource of certificatesigningrequests objects (Manual)
+[WARN] 5.1.12 Minimize access to webhook configuration objects (Manual)
+[WARN] 5.1.13 Minimize access to the service account token creation (Manual)
+[WARN] 5.2.1 Ensure that the cluster has at least one active policy control mechanism in place (Manual)
+[WARN] 5.2.2 Minimize the admission of privileged containers (Manual)
+[WARN] 5.2.3 Minimize the admission of containers wishing to share the host process ID namespace (Manual)
+[WARN] 5.2.4 Minimize the admission of containers wishing to share the host IPC namespace (Manual)
+[WARN] 5.2.5 Minimize the admission of containers wishing to share the host network namespace (Manual)
+[WARN] 5.2.6 Minimize the admission of containers with allowPrivilegeEscalation (Manual)
+[WARN] 5.2.7 Minimize the admission of root containers (Manual)
+[WARN] 5.2.8 Minimize the admission of containers with the NET_RAW capability (Manual)
+[WARN] 5.2.9 Minimize the admission of containers with added capabilities (Manual)
+[WARN] 5.2.10 Minimize the admission of containers with capabilities assigned (Manual)
+[WARN] 5.2.11 Minimize the admission of Windows HostProcess containers (Manual)
+[WARN] 5.2.12 Minimize the admission of HostPath volumes (Manual)
+[WARN] 5.2.13 Minimize the admission of containers which use HostPorts (Manual)
+[WARN] 5.3.1 Ensure that the CNI in use supports NetworkPolicies (Manual)
+[WARN] 5.3.2 Ensure that all Namespaces have NetworkPolicies defined (Manual)
+[WARN] 5.4.1 Prefer using Secrets as files over Secrets as environment variables (Manual)
+[WARN] 5.4.2 Consider external secret storage (Manual)
+[WARN] 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+[WARN] 5.7.1 Create administrative boundaries between resources using namespaces (Manual)
+[WARN] 5.7.2 Ensure that the seccomp profile is set to docker/default in your Pod definitions (Manual)
+[WARN] 5.7.3 Apply SecurityContext to your Pods and Containers (Manual)
+[WARN] 5.7.4 The default namespace should not be used (Manual)
+== Summary policies ==
+0 checks PASS
+4 checks FAIL
+29 checks WARN
+2 checks INFO
+== Summary total ==
+20 checks PASS
+61 checks FAIL
+42 checks WARN
+7 checks INFO
+## durée 08b (CIS) : 5 s
+## durée totale : 894 s
