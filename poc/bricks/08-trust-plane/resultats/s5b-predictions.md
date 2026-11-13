@@ -105,3 +105,13 @@ Code 1 à 11:38:52 UTC ([journal](rejeu-s5b-plateforme-reprise.log)).
 
 A4 : le KO vient d'une collision d'adresse (IP du pod de la contre-épreuve = adresse usurpée 10.42.1.250), défaut de
 l'instrument ; **A4 n'est pas jugée** à ce passage (au lieu de « non tenue ») et reste à rejuger. Détail : README de la 08.
+
+## Note du 13/11/2026 (2026-11-13T12:04:31Z), avant lancement : reprise à « J8 (tests) » (rien n'est réécrit)
+
+Décision du propriétaire : « Oui, tel quel » à « Je reprends à « J8 (tests) » tel quel, push compris ? ». Commande :
+`DISTRO=rke2 POUSSER_VSA=1 DEPUIS='J8 (tests)' JUSQUA='J8 (résolveurs)' mise run confiance:rejeu -- s5b-plateforme-j8`.
+Jugées : A1, A2 (étapes de ce passage), A4, A5, B1 à B8, E1, et :
+| # | Prédiction | Confiance |
+|---|---|---|
+| E4 | Test 6 : IP du pod de la contre-épreuve différente de l'adresse usurpée tirée, « AJOUT|accepté », contre-épreuve OK | Moyenne : tirage de Cilium au hasard selon 23b4537, fréquence de collision non mesurée |
+| E5 | Les tests de J8 déjà passés (test2 à test5) repassent sur le même cluster | Moyenne : aucune reprise archivée à « J8 (tests) » |
