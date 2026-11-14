@@ -375,3 +375,11 @@ seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-grafana.lo
   ni son encodage dans les réponses ; requêtes en HTTP 200. Réponses de Grafana effacées (dossier absent après l'étape).
 - **La ligne de journal de Q6, non mesurée par `fraicheur`, est vue ici** (par Loki), avec les mêmes valeurs que les séries.
 - Suite : point 5, `mise run observabilite -- regles` puis `deployer` (19), chacun sur accord ; puis la porte (point 6).
+
+## Note datée de 2026-11-14T21:05:23Z : point 5a fait, `regles` de la 19 (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance JALON=s6a mise run observabilite -- regles (promtool, rien de déployé) ? ». De 21:05:02 à
+21:05:12 UTC, code 0 ([journal](../../19-observabilite/resultats/s6a-regles.log), préfixe `s6a` pour ne pas réécrire `o3-regles.log`).
+- **Q7 tenue** : promtool 3.13.5 sur sc-stockage ; `check rules` : 15 règles, SUCCESS ; `test rules` sur `alertes-tests.yml`
+  corrigé (test neuf du deb compris) : SUCCESS. promtool n'affiche pas le détail par test.
+- Rien de déployé : copie dans `/tmp/regles-test` sur sc-stockage, effacée par l'étape.
