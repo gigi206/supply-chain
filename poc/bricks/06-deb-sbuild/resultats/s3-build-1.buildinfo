@@ -4,14 +4,14 @@ Binary: sample-app
 Architecture: amd64
 Version: 1.0.0-2
 Checksums-Md5:
- 1fb601757fdc67e2f61c8c2638f0f393 1953500 sample-app_1.0.0-2_amd64.deb
+ e4d372cb662f69441b79e6c3dfd66d2b 1953492 sample-app_1.0.0-2_amd64.deb
 Checksums-Sha1:
- b160324d7fb126f464e0e4c7ee1bee56c3004dcb 1953500 sample-app_1.0.0-2_amd64.deb
+ 437de9dbc6fec357e0a543bc896da018261a1c60 1953492 sample-app_1.0.0-2_amd64.deb
 Checksums-Sha256:
- 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa 1953500 sample-app_1.0.0-2_amd64.deb
+ f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b 1953492 sample-app_1.0.0-2_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Sat, 14 Nov 2026 22:06:54 +0000
+Build-Date: Sat, 14 Nov 2026 22:42:52 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),

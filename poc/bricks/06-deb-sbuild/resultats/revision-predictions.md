@@ -266,3 +266,18 @@ Prochaine ligne : l. 261 de `s1.sh` rejouée, sur accord nommé.
 « Oui, rejoue-la ». Sur l'hôte, à 22:35:34 UTC, code 0 ([journal](revision-sha256sums-s1-option1.log)) : `SHA256SUMS` du cache
 contrôlé (5 OK) ; `SHA256SUMS.s1` réécrit : orig 1591a05b, `.dsc` ee2a6b8e, `.debian.tar.xz` 0cc3d47e, trois lignes contrôlées ;
 l'ancien contenu est dans le journal. Prochaine ligne : S3 relancée (U16), sur accord nommé.
+
+## Option 1, ligne 3 rejouée : S3 (note de 2026-11-14T22:50:09Z ; rien n'est réécrit)
+« Oui, relance-la » à « Je relance S3 (restauration builds comparaison, U16) ? ». `s3.sh restauration builds comparaison` à ac44457,
+de 22:36:53 à 22:49:10 UTC, code 0 relevé juste après la commande, 26 OK, 0 KO ; journaux `s3-*` réécrits (passage précédent à e3227d1).
+- **U16 non tenue** : deb **N' = f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b** (1 953 492 octets) aux deux builds,
+  au lieu de 3c6e6a29 (1 953 500 octets). **Cause, lue dans les journaux de sbuild** (`dpkg-deb --contents`, version commitée à e3227d1
+  contre celle-ci) : une seule ligne diffère, la date de `./usr/share/doc/sample-app/copyright`, **2026-10-28 23:19** avant, **2026-11-14
+  21:55** maintenant. Le `debian/copyright` du paquet source portait la date du `SOURCE_DATE_EPOCH` de `dpkg-source` (commit, 28/10)
+  au premier passage ; il est copié dans le deb avec sa date, et `dpkg-deb` ne ramène à `SOURCE_DATE_EPOCH` (14/11) que les dates
+  plus récentes, pas les plus anciennes. Désormais tout le deb est daté du 14/11 21:55, comme le paquet source de la pipeline.
+  L'ancien deb n'est plus sur disque (réécrit par S3) ; la cause est établie par les deux journaux, pas par une comparaison des debs.
+- **U1 (part S3), U2, U4, U5, U6 tenues de nouveau** : `Installed-Build-Depends` égaux à S2 ; deux builds égaux ; `Static-Built-Using:
+  golang-1.24 (= 1.24.4-1)`, `Installed-Size` 5785 ; binaire 10d475d0 ; copyright égal au dépôt (`cmp`).
+- **Conséquence** (prévue par la note de décision) : correctif d'épinglage 1 à refaire (`DEB_SHA` = f66bbeb2, témoin N7 de `s5.sh`) et
+  13a à relancer ; S4c (f0ed7a71) et S4b (fermetures) ne dépendent pas du deb. Puis `prealables`.

@@ -1,7 +1,7 @@
-# s3.sh comparaison, 2026-11-14T22:13:25Z
-deb du build 1 : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
-deb du build 2 : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
-OK   deb identiques sur les deux builds : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
+# s3.sh comparaison, 2026-11-14T22:49:10Z
+deb du build 1 : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+deb du build 2 : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+OK   deb identiques sur les deux builds : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
 deb différent de celui de s1b et d'OBS (0b489d43…)
 OK   Installed-Build-Depends du build 1 identique à celui de S2 (s1b)
 OK   Installed-Build-Depends du build 2 identique à celui de S2 (s1b)
@@ -14,7 +14,7 @@ OK   neutralisation : sources.list vidé : 1
 OK   neutralisation : listes de l'instantané retirées : 1
 paquets installés par sbuild (hors paquet factice) : 48
 OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
-Build-Space: 102356 Build-Time: 19 Package-Time: 260 Status: successful
+Build-Space: 102356 Build-Time: 20 Package-Time: 262 Status: successful
 ## journal du build 2
 lignes Get : 55 ; méthodes : copy 4 file 51
 OK   lignes apt Get, Hit, Ign ou Err en http ou https : 0
@@ -22,5 +22,5 @@ OK   neutralisation : sources.list vidé : 1
 OK   neutralisation : listes de l'instantané retirées : 1
 paquets installés par sbuild (hors paquet factice) : 48
 OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
-Build-Space: 102356 Build-Time: 20 Package-Time: 261 Status: successful
+Build-Space: 102356 Build-Time: 19 Package-Time: 259 Status: successful
 écarts : 0
