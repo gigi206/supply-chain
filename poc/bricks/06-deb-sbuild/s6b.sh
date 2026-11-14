@@ -106,7 +106,7 @@ ZOT=192.168.161.13:5000                                                         
 CA=$HOME/.cache/supply-chain-poc/10/ca-poc.crt                                  # copie publique de la CA du PoC (brique 10)
 ENTREES="builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
 builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
-entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51"   # s4d.sh
+entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f"   # s4d.sh
 INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z            # s4a.sh, s4b.sh
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675       # s1-prealables.log : signataires vérifiés
 CLES="B8B80B5B623EAB6AD8775C45B7C5D7D6350947F8 04B54C3CDCA79751B16BC6B5225629DF75B188BD 41587F7DB8C774BCCF131416762F67A0B2C39DE4"  # s1.sh

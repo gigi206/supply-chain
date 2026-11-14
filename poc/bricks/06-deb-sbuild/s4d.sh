@@ -52,7 +52,7 @@ OUTILS_IMAGE=$REG/$OUTILS@$OUTILS_DIGEST
 BUILDER=$REG/builds/builders/sbuild-debian13@sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590   # S4a (A13)
 FERMETURE_DEB=$REG/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290       # S4b
 FERMETURE_SOURCES=$REG/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21   # S4b
-PACKAGING=$REG/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51   # S4c
+PACKAGING=$REG/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f   # S4c, révision 1.0.0-2 (14/11/2026)
 IMAGE=$REG/builds/sample-app-deb
 COMMIT=6391fd437f26696847041be3226bbbf633f55a2f   # construction.sh : main de workspace/sample-app (arbre 30e808ff = poc/sample-app)
 DEPOT_GIT=https://sc-stockage.poc.test:3000/workspace/sample-app.git

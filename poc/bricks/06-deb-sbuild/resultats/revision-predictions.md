@@ -171,3 +171,11 @@ Prochaine ligne : S4c `verrou publier` (écriture dans Zot), sur accord nommé.
   dans la liste du journal (changelog, control, copyright a3cbcf92, rules). C7 relevé comme au premier passage (`rules` tiré en 644).
   `entrees/sample-app/packaging-deb@f0ed7a71` est définitif dans Zot.
 Prochaine ligne : correctif d'épinglage 2 (`PACKAGING` = P dans `s4b.sh` l. 40, `s4d.sh` l. 55, `s6b.sh` l. 109), sur accord nommé.
+
+## Carte, correctif d'épinglage 2 (note de 2026-11-14T22:20:29Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif d'épinglage 2 (artefact f0ed7a71) ? ». P relu dans `s4c-publier.log`
+(`PACKAGING_DEB=…@sha256:f0ed7a71…`) ; [`../revision-epinglage-2.patch`](../revision-epinglage-2.patch) (sha256 050fea28…) généré
+depuis HEAD a43bcc2, `git apply --check` puis `git apply`, code 0 ; `bash -n` des trois scripts passé. `PACKAGING` = f0ed7a71 dans
+`s4b.sh` l. 40 et `s4d.sh` l. 55, entrée de `ENTREES` dans `s6b.sh` l. 109. Restent `c1719b13` : commentaire de `s6b.sh` l. 13 (H3,
+mesure passée) et fixture de `porte_test.rego` l. 279 (données de test, U12). Rien n'est lancé.
+Prochaine ligne : S4b (fermetures, U9), sur accord nommé.

@@ -37,7 +37,7 @@ umask 022
 
 INSTANTANE=http://snapshot.debian.org/archive/debian/20261105T000000Z
 INRELEASE=0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675   # s1-prealables.log : signataires vérifiés
-PACKAGING=$REG/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51   # S4c
+PACKAGING=$REG/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f   # S4c, révision 1.0.0-2 (14/11/2026)
 LAYOUT_S4C=$W/s4c-06/layout-1   # layout local de S4c, même digest (C4, C5)
 PREFETCH_IMAGE=$REG/plateforme/outils-prefetch@sha256:68e0ae705de5a8f993f168d8252b3218d7d3ed76e704cf24d4414006aea7b8cc   # prefetch.sh (03)
 PAQUETS='[{"type": "gomod"}, {"type": "npm", "path": "web"}]'
