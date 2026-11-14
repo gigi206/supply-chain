@@ -2528,3 +2528,7 @@ Tekton dans un contrôle ; trois correctifs d'instruments (`preuves.sh`, `s4d3.s
 plateforme mesuré. Digests retrouvés au bit près : `68e0ae70`, `3a7ca1b1`, `f8f221ca`, `440ba93b`, `d8041f9c`, `e0b1f37c`,
 `3a0e54ae`, `0b489d43`, `749d746c`, `bb7599a2`, `50dc73f7`, `039949f9`. Suite (`apres-s5b`) : `pousser_vsa` et `lire_vsa` de la
 06, relevé G7, option E (outils-prefetch dans la chaîne), cascade 1.0.0-2 ; chacun sur accord.
+
+### Additif du 14/11/2026 (note de 2026-11-14T21:14:38Z) : intégration de S6 de la 06 préparée à sec, NON APPLIQUÉE
+
+Correctif [`rejeu-s6.patch`](rejeu-s6.patch) : étapes S6a et S6b de la 06 après `06 (S4d3)`, porte du deb sous `POUSSER_VSA=1` seulement, attente jusqu'à 13:00 UTC dans la fenêtre des passages planifiés. Détail, trois décisions à prendre et prédictions R1 à R4 : `06-deb-sbuild/resultats/s6a-service-predictions.md`. `rejeu.sh` est inchangé.

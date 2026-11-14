@@ -416,3 +416,54 @@ PipelineRun le plus récent du deb (`37a8e87a…`, la même qu'à S4d3 le 13/11)
   tant que Zot garde ces referrers (contrainte 1 de l'intégration au rejeu, plus haut) ; un rejeu de zéro les efface.
 - Suite (décision « (b) intégrer après S6 » du 12/11) : préparer à sec le diff de `rejeu.sh`, puis le soumettre à un accord nommé,
   avec les deux points laissés ouverts (élargissement de `POUSSER_VSA=1` à la VSA du deb ; fenêtre de `hors_fenetre`).
+
+## Note datée de 2026-11-14T21:14:38Z : intégration de S6 à `rejeu.sh` préparée à sec, NON APPLIQUÉE (rien n'est réécrit)
+
+« Oui, prépare-la » à « Je prépare à sec l'intégration de S6 à rejeu.sh ? ». Correctif : [`rejeu-s6.patch`](../../08-trust-plane/rejeu-s6.patch)
+(46 lignes), **non appliqué** : `rejeu.sh` est inchangé. Relu par le conseiller avant le commit (deux corrections, ci-dessous).
+
+**Ce qu'il fait**, dans le bloc RKE2 et Cilium, juste après `06 (S4d3)` (contrainte 1) :
+- `06 (S6a, periodique)` : si l'heure UTC est 09, 10, 11 ou 12, attente jusqu'à 13:00 UTC, annoncée avec sa durée, **dans la même
+  étape** que `periodique`, pour qu'une reprise par `DEPUIS=` ne saute pas l'attente (contrainte 2) ;
+- `06 (S6a, fraicheur)`, `06 (S6a, grafana)`, une étape par appel (contrainte 4) ;
+- avec `POUSSER_VSA=1` : `06 (S6b, pousser_vsa)`, `06 (S6b, lire_vsa)`, puis `06 (S6a, porte)` ;
+- sans `POUSSER_VSA=1` : ces trois étapes sautées, avec une ligne qui le dit ;
+- un additif daté dans l'en-tête de `rejeu.sh`.
+
+**Pourquoi la porte du deb sous le drapeau seulement (écart à « dans les deux cas » de la décision du 12/11)** : la clé publique
+du scanner n'entre dans la ConfigMap `porte` que par `cm_porte`, appelée par `politique.sh porte` (J6), `preuves.sh test8` (J8),
+`controle6` et `controle7` (`preuves.sh`, l. 1406, 2850 et 2895). Seuls les deux derniers viennent après `g3_openbao`, qui crée la
+clé neuve, et ils ne tournent qu'avec `POUSSER_VSA=1`. Sans le drapeau, la porte du deb jugerait avec la clé d'avant, refuserait le
+scan, et l'étape finirait en KO, ce qui arrêterait le rejeu avant `fuites` et le CIS. **Déduit du code, non mesuré.** Variante :
+poser la clé avant (un `cm_porte` de plus, hors du drapeau), à décider.
+
+**Contrôles à sec faits** : `git apply --check` sur HEAD ; `bash -n` et shellcheck (`-S warning`) sur la copie corrigée, sans
+avertissement ; garde horaire essayée hors du rejeu, date simulée, `sleep` et `periodique` remplacés : 08:59:59 et 13:00:00 sans
+attente, 09:00:00 → 14 400 s, 12:59:59 → 1 s, `periodique` appelé dans tous les cas ; `date -u -d 'today 13:00'` lu en UTC même
+avec `TZ=Europe/Paris` (vérifié sur l'hôte). **Non fait** : aucun rejeu.
+
+**Décisions du propriétaire à prendre avant l'application** (un « oui » à l'application ne les vaut pas) :
+1. **`POUSSER_VSA=1` couvre-t-il aussi le push de la VSA du deb** (contrainte 6) ? Proposé : oui. Même nature que celui de la 10 :
+   bundle versionné, lié au seul digest `039949f9`, poussé par `poc-replay` par digest ; `pousser_vsa` refuse si le deb n'est pas
+   reproduit. La section 6 de `rejeu/politique-replay-deb.md` dit « chaque push est soumis à l'accord du propriétaire » : le
+   drapeau, donné au lancement, serait cet accord, comme pour la 10. Ce fichier est figé par `POLITIQUE_COMMIT` (la VSA le cite) :
+   il n'est pas modifié. Variante : un second drapeau (`POUSSER_VSA_DEB=1`).
+2. **Fenêtre de 09:00 à 12:59 UTC : attente jusqu'à 13:00** (au plus 4 h, comptées dans la durée du rejeu) ? Proposé : oui.
+   Variantes : laisser `periodique` refuser (arrêt avant `fuites` et le CIS, reprise par `DEPUIS=` sous un autre libellé) ; sauter
+   S6 avec une ligne (`ScanEnRetard` du deb active jusqu'à un passage manuel).
+3. **Porte du deb sans le drapeau** : sautée (proposé, ci-dessus) ou clé posée avant ?
+
+**Prédictions pour le prochain rejeu de zéro sous RKE2 et Cilium** (à reprendre dans sa carte) :
+| # | Prédiction | Confiance |
+|---|---|---|
+| R1 | Les étapes S6 jouées passent, code 0, `bilan : tout OK`, comme le 14/11 (Q1 à Q10) | Moyenne : jamais jouées dans un rejeu ; dépendent du deb `039949f9` reproduit |
+| R2 | Avec `POUSSER_VSA=1` : porte du deb `ok` partout, Job réussi | Moyenne |
+| R3 | `ScanEnRetard` active pour le deb de O3 à `fraicheur`, puis inactive (non mesuré par le rejeu) | Moyenne |
+| R4 | Durée ajoutée hors attente : environ 4 min (2 min 05 s, 27 s, quelques secondes, 1 min 14 s le 14/11) | Moyenne |
+
+**Limites** :
+- `s4d3.sh porte` rejouée seule après ces étapes échouerait (VSA et scan du deb présents) ; un rejeu de zéro remet Zot à vide, et
+  le correctif la place avant S6.
+- **Chemin k3s** : le bloc 06 n'y est pas joué ; `ScanEnRetard` du deb y reste active après chaque rejeu, puisque les règles de
+  O3 attendent sa série.
+- Sans `POUSSER_VSA=1`, la même alerte retombe après `fraicheur`, mais la porte du deb n'est pas jugée.
