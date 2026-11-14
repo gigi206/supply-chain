@@ -322,3 +322,12 @@ de G7, fait le 14/11 à 20:42 UTC (`07a-sbom-grype/resultats/g7-replanifier-rele
 lus par yq. `promtool` reste à l'étape `regles` de la 19 (point 6). **Rien n'est déployé** : ni `scan-config`, ni sc-stockage, ni
 Prometheus. Limite déjà consignée, désormais active : un rejeu de zéro lancé avant l'intégration de S6 à `rejeu.sh` déploierait
 des règles qui attendent la série du deb.
+
+## Note datée de 2026-11-14T20:58:56Z : point 2 fait, `periodique` à sec (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance s6a.sh periodique à sec (S6A_SEC=1, rien d'écrit) ? ». À 20:58:42 UTC, code 0, « rien d'écrit »
+([journal](s6a-periodique-sec.log), renommé depuis `s6a-periodique.log` pour que l'étape `grafana`, qui lit la date et le bilan de
+ce dernier, ne prenne pas un passage à sec pour le vrai).
+- **Q1 tenue** : gabarit du Job du deb égal à celui de `scan-sample-app` hors image, nom, dépôt et `NATURE` ; `NATURE=deb` ;
+  `15 11 * * * Etc/UTC Forbid` ; horaire de l'image inchangé (`30 9 * * *`). Limites de `revocation` tirées de `limites.tsv` :
+  requêtes 10m et 32Mi, limites 500m et 256Mi. Préalables : correctif appliqué et commité, deb `039949f9` présent dans Zot.

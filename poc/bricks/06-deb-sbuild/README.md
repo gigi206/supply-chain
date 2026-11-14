@@ -2004,3 +2004,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-14T20:31:22Z : S6b `pousser_vsa` (de 20:30:50 à 20:30:55 UTC, code 0) : VSA du deb poussée dans `builds/vsa/sample-app-deb`, manifeste `bd7c77ec` ; P1 à P6 tenues, P7 non mesurée directement ; `lire_vsa` à suivre, sur accord.
 - 2026-11-14T20:36:05Z : S6b `lire_vsa` (20:35:50 UTC, code 0) : L1 à L5 tenues (VSA acceptée par la clé du domaine seule, provenance par la clé de Chains seule, 12 vérifiées ; aucune connexion hors de Zot) ; **VSA du deb dans Zot terminée**.
 - 2026-11-14T20:57:35Z : S6a, point 1 : `s6a-scanner-deb.patch`, `s6a-fraicheur-deb.patch` et `s6a-alertes-deb.patch` appliqués (décision « a » sur l'ordre) ; contrôles de syntaxe passés ; rien de déployé.
+- 2026-11-14T20:58:56Z : S6a, point 2 : `periodique` à sec, code 0, Q1 tenue, rien d'écrit.

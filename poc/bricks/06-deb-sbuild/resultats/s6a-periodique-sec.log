@@ -1,0 +1,12 @@
+# s6a.sh periodique, 2026-11-14T20:58:42Z
+## préalables
+OK   s6a-scanner-deb.patch appliqué et commité
+OK   builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e présent dans Zot
+## rendu, dry-run serveur, comparaison au CronJob de l'image
+limites de revocation (limites.tsv) : requêtes 10m et 32Mi, limites 500m et 256Mi
+OK   gabarit du Job du deb égal à celui de scan-sample-app, hors image, nom, dépôt et NATURE
+OK   NATURE dans analyser : deb
+OK   horaire, fuseau, concurrence : 15 11 * * * Etc/UTC Forbid
+OK   horaire de scan-sample-app (inchangé) : 30 9 * * *
+bilan : tout OK
+S6A_SEC=1 : rien d'écrit
