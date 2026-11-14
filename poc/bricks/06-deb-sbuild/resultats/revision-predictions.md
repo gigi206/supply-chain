@@ -293,3 +293,13 @@ Rien n'est lancé. Prochaine ligne : 13a `paquets.sh deb modules` sur N', sur ac
 « Oui, lance-le » à « Je lance paquets.sh deb modules (13a) sur f66bbeb2 ? ». `paquets.sh deb modules` à c279dd2, de 22:52:47 à 22:52:50 UTC, code 0 relevé juste après la commande, sur le deb f66bbeb2.
 **U8, B2 et B3 tenues de nouveau** : journaux identiques à ceux de 3c6e6a29 hors des en-têtes, de l'empreinte et de la taille du deb
 (`git diff`) ; prédicat `paquets-deb.licences.json` inchangé. Prochaine ligne : `s4d.sh prealables` (U17), sur accord nommé.
+
+## Option 1, ligne 7 rejouée : `s4d.sh prealables` (note de 2026-11-14T22:54:59Z ; rien n'est réécrit)
+« Oui, relance-le » à « Je relance s4d.sh prealables (U17) ? ». À 7940c91, de 22:54:38 à 22:54:46 UTC, code 0 relevé juste après la
+commande, 46 OK, 0 KO ; « S4d1 prealables fait » dans `chrono.tsv` ; [journal](s4d-prealables.log) réécrit.
+- **U17 tenue** : orig 1591a05b égal des deux côtés (l. 229) ; `.debian.tar.xz` : mêmes membres, tailles et dates que celui de
+  `sources.sh`, groupe sans écriture (l. 233-235) ; côté pipeline, `.debian.tar.xz` 22cfff1d et `.dsc` b284bd60, comme le 14/11 à 22:26 ;
+  deb de S3 et deb de la couche = f66bbeb2.
+- **Digest attendu D = sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e** (`digest-attendu` réécrit) ; U3 (part D)
+  tenue : D ≠ 039949f9.
+Prochaine ligne : correctif d'épinglage 3 (D dans `s4d2.sh`, `s4d3.sh`, `s5.sh`, `s6a.sh`, `s6b.sh`), sur accord nommé.
