@@ -331,3 +331,20 @@ ce dernier, ne prenne pas un passage à sec pour le vrai).
 - **Q1 tenue** : gabarit du Job du deb égal à celui de `scan-sample-app` hors image, nom, dépôt et `NATURE` ; `NATURE=deb` ;
   `15 11 * * * Etc/UTC Forbid` ; horaire de l'image inchangé (`30 9 * * *`). Limites de `revocation` tirées de `limites.tsv` :
   requêtes 10m et 32Mi, limites 500m et 256Mi. Préalables : correctif appliqué et commité, deb `039949f9` présent dans Zot.
+
+## Note datée de 2026-11-14T21:02:27Z : point 3 fait, `periodique` (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance s6a.sh periodique (scan-config, CronJob du deb, premier scan) ? ». De 20:59:40 à 21:01:45 UTC,
+code 0, `bilan : tout OK` ([journal](s6a-periodique.log), [bundle](s6a-periodique.bundle.json)).
+- **Q2 tenue** : `scanner.sh` de `scan-config` égal à l'arbre (`88e7bfe8…`) ; CronJob `scan-sample-app-deb` admis ; job
+  `s6a-manuel` réussi en 125 s (échéance 1800 s) ; place libre la plus basse sur sc-confiance pendant le job : 8 845 Mo.
+- **Q3 tenue** : `DEB|sample-app_1.0.0-1_amd64.deb, sha256 0b489d43…, 1952080 octets` ; `ARTEFACT|deb, 2 PURL versionnées`.
+- **Q4 tenue** : referrers du deb dans `builds/scan/sample-app-deb` : 0 avant, 1 après
+  (`sha256:256c31902a4677cdb24b0629e1a1bac9b932d75357b81577344d050d9f3a573e`), sujet `039949f9`, bundle vérifié sur l'hôte par
+  la clé du scanner.
+- **Q5 tenue** : 67 vulnérabilités, 62 sur `pkg:golang/stdlib@1.24.4` et 5 sur `pkg:golang/github.com/go-chi/chi@v5.2.3#v5`
+  (lues dans le prédicat du bundle) ; **0 KEV** ; `malicious` vide. Base Grype du 14/11 (`2c0390b3…`, construite à 06:19:25 UTC),
+  grype 0.104.1.
+- Le journal compte six lignes contenant le motif jeton|token (lignes de l'étape sur le jeton du scanner) ; masquées à l'écran,
+  laissées dans le journal comme pour l'essai, contrôle des secrets passé avant le commit.
+- Suite : `fraicheur` (point 4), puis `grafana` **avant le scan planifié de l'image du 15/11 à 09:30 UTC**.

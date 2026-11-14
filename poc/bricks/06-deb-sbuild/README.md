@@ -2005,3 +2005,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-14T20:36:05Z : S6b `lire_vsa` (20:35:50 UTC, code 0) : L1 à L5 tenues (VSA acceptée par la clé du domaine seule, provenance par la clé de Chains seule, 12 vérifiées ; aucune connexion hors de Zot) ; **VSA du deb dans Zot terminée**.
 - 2026-11-14T20:57:35Z : S6a, point 1 : `s6a-scanner-deb.patch`, `s6a-fraicheur-deb.patch` et `s6a-alertes-deb.patch` appliqués (décision « a » sur l'ordre) ; contrôles de syntaxe passés ; rien de déployé.
 - 2026-11-14T20:58:56Z : S6a, point 2 : `periodique` à sec, code 0, Q1 tenue, rien d'écrit.
+- 2026-11-14T21:02:27Z : S6a, point 3 : `periodique` (20:59:40 à 21:01:45 UTC, code 0) : CronJob `scan-sample-app-deb` en service, premier scan du deb publié (`256c3190`, 67 vulnérabilités, 0 KEV) ; Q2 à Q5 tenues.
