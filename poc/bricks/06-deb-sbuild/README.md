@@ -2054,3 +2054,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
   correctifs d'épinglage), pas 13. Détail : [prédictions](resultats/revision-predictions.md), note du même nom.
 - 2026-11-14T21:55:49Z : révision 1.0.0-2, ligne 0 de la carte : correctif v2 appliqué, entrée du changelog datée 2026-11-14T21:55:32Z (epoch 1794693332) ; rien lancé ([prédictions](resultats/revision-predictions.md)).
 - 2026-11-14T21:57:39Z : révision 1.0.0-2, ligne 1 : `sources.sh` (21:57:18 à 21:57:19 UTC, code 0) : orig 07521c1e inchangé, **U7 tenue** ; `.dsc` 92335109, `.debian.tar.xz` 86e30d04.
+- 2026-11-14T22:00:00Z : révision 1.0.0-2, ligne 2 : `s1.sh` l. 261 rejouée seule (21:59:48 UTC, code 0) : `SHA256SUMS.s1` en 1.0.0-2, trois lignes contrôlées.

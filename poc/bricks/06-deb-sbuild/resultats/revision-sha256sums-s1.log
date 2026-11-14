@@ -1,0 +1,22 @@
+# s1.sh l. 261 rejouée seule (révision 1.0.0-2, ligne 2 de la carte), 2026-11-14T21:59:48Z, HEAD 15440e0, « Oui, rejoue-la »
+ligne 261 :   (cd "$PKG" && grep -E "  (sample-app_1.0.0.orig.tar.gz|sample-app_1.0.0-2.debian.tar.xz|$DSC)$" SHA256SUMS) > "$T/SHA256SUMS.s1"
+DSC (s1.sh l. 45) : sample-app_1.0.0-2.dsc
+## SHA256SUMS du cache de packaging
+sample-app-1.0.0.tar.gz: OK
+sample-app_1.0.0.orig.tar.gz: OK
+sample-app_1.0.0-2.dsc: OK
+sample-app_1.0.0-2.debian.tar.xz: OK
+sample-app.spec: OK
+## SHA256SUMS.s1 avant (reprise du 13/11)
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz
+9050679ed60032a2a3587b330c314717d1d781d46553363773f669951de9bef6  sample-app_1.0.0-1.dsc
+863cf4da65a7efa58dc7a9491c8754d0a3a3146145e8fd1945994ee9e2ed3f4f  sample-app_1.0.0-1.debian.tar.xz
+## SHA256SUMS.s1 après (3 lignes)
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz
+923351093d6253da417d99beb21847a697333ece2e27ad2d23b71c23fa2d5b04  sample-app_1.0.0-2.dsc
+86e30d04f138e7fbd5581ca4d21134d4c69b15e0e561f809d99d19bbce4b6aec  sample-app_1.0.0-2.debian.tar.xz
+## contrôle
+sample-app_1.0.0.orig.tar.gz: OK
+sample-app_1.0.0-2.dsc: OK
+sample-app_1.0.0-2.debian.tar.xz: OK
+# fin 2026-11-14T21:59:48Z, code 0

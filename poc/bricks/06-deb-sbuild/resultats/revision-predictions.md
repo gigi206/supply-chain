@@ -121,3 +121,9 @@ prochaine ligne : `sources.sh` (réseau), sur accord nommé.
   `debian/` extrait du `.debian.tar.xz` égal à `poc/packaging/debian/` (`diff -r`) ; `SHA256SUMS` du cache : 5 OK.
   Les fichiers 1.0.0-1 du cache sont effacés par `sources.sh` (l. 52) ; témoin gardé dans `13a-axes12-esquisse/temoin-1.0.0-1/`.
 Prochaine ligne : commande de `s1.sh` l. 261 rejouée seule (`SHA256SUMS.s1`), sur accord nommé.
+
+## Carte, ligne 2 : `s1.sh` l. 261 rejouée seule (note de 2026-11-14T22:00:00Z ; rien n'est réécrit)
+« Oui, rejoue-la ». Sur l'hôte, à 21:59:48 UTC, code 0 ([journal](revision-sha256sums-s1.log)) : texte de la l. 261 et `DSC` lus
+dans `s1.sh` à 15440e0 ; `SHA256SUMS` du cache contrôlé d'abord (5 OK) ; `$W/s1-06/SHA256SUMS.s1` réécrit : trois lignes (orig
+07521c1e, `.dsc` 92335109, `.debian.tar.xz` 86e30d04), contrôlées (3 OK) ; l'ancien contenu (1.0.0-1) est dans le journal.
+Prochaine ligne : S3 `restauration builds comparaison` (pods Kata), sur accord nommé ; prédictions U1 à U6 commitées.
