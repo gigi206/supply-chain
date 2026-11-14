@@ -42,6 +42,10 @@ refusé) : version de Go, module principal, dépendances, réglages de build. Ch
 du copyright (le DERNIER paragraphe qui correspond à vendor/<module>/… s'applique, comme en DEP-5) : KO si aucun paragraphe propre
 ne la couvre (couverte par « * » seul, elle prendrait la licence du projet). La bibliothèque standard de Go, compilée dans le
 binaire sans être dans vendor/ ni dans le copyright, est toujours signalée en ÉCART, avec le champ Built-Using du control. Code 1 sur un KO ou un refus.
+Bascule de M5 (préparée à sec le 14/11/2026, « Oui, prépare-la ») : si le control porte Static-Built-Using, il doit avoir
+exactement une entrée « golang-X.Y (= X.Y.Z-révision) » dont X.Y.Z est la version de Go des informations de build du binaire (paquet
+source et version amont ; la révision Debian n'est pas contrôlée), sinon KO ; l'ÉCART dit alors « hors des paragraphes Files du
+copyright » et si l'en-tête du copyright a un Comment (présence seule, contenu non contrôlé). Champ absent : sortie inchangée.
 """
 import argparse
 import fnmatch
@@ -254,7 +258,12 @@ def modules(deb):
     nom = ctl["package"][0]
     bu = " ".join([ctl["built-using"][0]] + ctl["built-using"][1]) if "built-using" in ctl else "absent"
     print(f"control : Built-Using {bu}")
-    stanzas = fichiers_dep5(fichier_tar(ms[2][1], f"./usr/share/doc/{nom}/copyright").decode("utf-8"))
+    sbu = " ".join([ctl["static-built-using"][0]] + ctl["static-built-using"][1]) if "static-built-using" in ctl else None
+    if sbu is not None:
+        print(f"control : Static-Built-Using {sbu}")
+    texte_cr = fichier_tar(ms[2][1], f"./usr/share/doc/{nom}/copyright").decode("utf-8")
+    stanzas = fichiers_dep5(texte_cr)
+    com = "présent" if "comment" in paragraphes(texte_cr)[0] else "absent"
     ok, binaires = True, []
     with tarfile.open(fileobj=io.BytesIO(ms[2][1]), mode="r:xz") as t:
         for m in t.getmembers():
@@ -269,6 +278,20 @@ def modules(deb):
         print(f"## binaire {chemin} : {len(b)} octets, sha256 {hashlib.sha256(b).hexdigest()}")
         version, lignes = infos_build(b)
         print(f"go : {version}")
+        if sbu is not None:
+            mv = re.fullmatch(r"go(\d+)\.(\d+)\.(\d+)", version)
+            mf = re.fullmatch(r"golang-(\d+\.\d+) \(= ((\d+\.\d+\.\d+)-[0-9A-Za-z.+~]+)\)", sbu)
+            if not mv:
+                print(f"KO   Static-Built-Using {sbu} : version du buildinfo {version} hors de la forme goX.Y.Z")
+                ok = False
+            elif not mf:
+                print(f"KO   Static-Built-Using {sbu} : forme attendue « golang-X.Y (= X.Y.Z-révision) », une seule entrée")
+                ok = False
+            elif mf.group(1) != f"{mv.group(1)}.{mv.group(2)}" or mf.group(3) != f"{mv.group(1)}.{mv.group(2)}.{mv.group(3)}":
+                print(f"KO   Static-Built-Using {sbu} : ne correspond pas à {version} du buildinfo")
+                ok = False
+            else:
+                print(f"OK   Static-Built-Using {sbu} : paquet source et version amont égaux à {version} du buildinfo")
         deps = []
         for l in lignes:
             c = l.split("\t")
@@ -298,7 +321,10 @@ def modules(deb):
                 if x.startswith("vendor/") and not any(fnmatch.fnmatchcase(f"vendor/{d}/fichier.go", x) for d, _ in deps):
                     print(f"ÉCART paragraphe Files {x} ({lic}) : aucun module compilé ne lui correspond")
         # le copyright décrit les sources du paquet ; la bibliothèque standard n'y est pas (constat, pas un KO)
-        print(f"ÉCART bibliothèque standard de {version} : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using {bu}")
+        if sbu is None:
+            print(f"ÉCART bibliothèque standard de {version} : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using {bu}")
+        else:
+            print(f"ÉCART bibliothèque standard de {version} : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête {com}, contenu non contrôlé ; Static-Built-Using {sbu}")
     return ok
 
 

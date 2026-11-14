@@ -471,3 +471,46 @@ doute […], mais ce n'est pas mesuré fichier par fichier » (l. 371) : **mesur
 du binaire ([journal](x11-fichiers.log), [script](x11-fichiers.sh) ; banc lancé le 14/11/2026 de 21:24:32 à 21:24:33 UTC (`chrono.tsv`), code 0, sur « Oui, dépose-la » à « Je dépose la note X11 de la 13a ? » ; décision « Après S5b » du 12/11/2026 (21:56:54 UTC)). « le paragraphe `X11` est gardé par des fichiers de
 `src/runtime/` d'autres architectures » (l. 466) : **inexact**, il est gardé par `memmove_amd64.s`, code amd64 lié ; les huit autres
 motifs sont absents du binaire, témoins tenus. Aucune prédiction L1 à L5 ne change.
+
+## Bascule de M5 : lecture de `Static-Built-Using` (préparée à sec le 14/11/2026, « Oui, prépare-la », écrit à 21:29:25 UTC), NON LANCÉE
+
+M5 (prédiction et résultat ci-dessus) ne se réécrit pas : la bascule prend le préfixe `B`, libre dans ce fichier (M, S, N, P, T, L
+pris). Brouillon du 12/11/2026 (hors dépôt, décision « Oui, je retiens » des axes 1 et 2, 21:43:45 UTC) déposé après S5b, comme prévu.
+
+**Changement de [`paquets.py`](../paquets.py)** (`modules`, sha256 `0e49bbf9…` ; le diff de 49 lignes du brouillon, appliqué au fichier
+de a821111 dont l'empreinte a été contrôlée, plus un paragraphe de description) : `modules` lit `Static-Built-Using` du `control`.
+Champ absent : sortie inchangée. Champ présent : il doit avoir exactement une entrée `golang-X.Y (= X.Y.Z-révision)` dont `X.Y` et
+`X.Y.Z` sont ceux de la version de Go lue dans les informations de build du binaire ; sinon KO, code 1. La ligne ÉCART de la
+bibliothèque standard reste un ÉCART (sa déclarabilité relève de `stdlib` et `lies`, pas de `modules`) ; avec le champ, elle dit
+« hors des paragraphes Files du copyright » et si l'en-tête du copyright porte un `Comment` (présence seule).
+
+**Banc hors réseau** ([`paquets-m5-essai-local.sh`](paquets-m5-essai-local.sh), NON LANCÉ) : programme Go sans dépendance compilé
+par le Go de mise (go1.24.7 relu à 21:29:25 UTC), debs synthétiques, vrais paquets non lus ; neuf contrôles : sans champ (code 0,
+ÉCART d'avant) et sortie identique à celle du `paquets.py` de a821111 ; champ juste avec `Comment` (OK, ÉCART « présent ») ; sans
+`Comment` (OK, « absent ») ; version amont fausse, autre paquet source, deux entrées, opérateur `>=` (KO, code 1) ; révision fausse
+(OK : la limite ci-dessous, rendue visible). Il remplace le banc du brouillon (12/11, 21:50:23 UTC), qui lisait le deb de S3 et un
+copyright du cache.
+
+| Id | Prédiction | Confiance |
+|---|---|---|
+| B1 | `paquets.sh modules` sur le vrai deb 1.0.0-1 (0b489d43, sans le champ) : code 0, `paquets-modules.log` identique à celui de git hors de la ligne d'en-tête (heure) et de la ligne `paquets.py : <sha256>` ; témoin toujours refusé | Haute : mesuré à sec le 12/11 à 22:06:34 UTC sur le vrai deb, copie basculée et dépôt, sorties identiques ; depuis, seule la description du fichier a changé |
+| B2 | Deb 1.0.0-2 de la cascade : `control : Static-Built-Using golang-1.24 (= 1.24.4-1)` et ligne OK « paquet source et version amont égaux à go1.24.4 du buildinfo », code 0 | Moyenne : banc E du 12/11 (deb rebâti hors sbuild dans le chroot de S2), pas le deb de la cascade ; **jugée à l'étape 5 (révision), pas par ce dépôt** |
+| B3 | Deb 1.0.0-2 de la cascade : ÉCART `… hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.4-1)` | Haute pour la forme (banc E) ; « présent » suppose la notice de Go en `Comment:` (décision 2) ; **jugée à l'étape 5** |
+| B4 | Banc : version amont fausse, autre paquet source, deux entrées, opérateur `>=` : KO, code 1, au motif attendu | Haute : banc du brouillon, quatre cas KO sur d'autres debs |
+| B5 | Banc : sans `Comment` d'en-tête : OK, ÉCART « Comment d'en-tête absent » ; champ juste avec `Comment` : OK, ÉCART « présent » | Haute : banc du brouillon |
+| B6 | Banc : sans champ, code 0, sortie identique au caractère près à celle du `paquets.py` de a821111 | Haute : le chemin sans champ ne change que par des lignes conditionnelles |
+| B7 | Banc : révision fausse (`= X.Y.Z-99`) : OK, code 0 (la limite, pas un défaut du banc) | Haute : l'expression ne compare que `X.Y` et `X.Y.Z` |
+| B8 | [`paquets-modules-essai-local.sh`](paquets-modules-essai-local.sh) rejoué : six cas tenus comme dans son journal | Haute : ses debs n'ont pas le champ |
+
+**Ce que la bascule ne mesure pas**
+- **La révision Debian** : seule la version amont est comparée aux informations de build ; `golang-1.24 (= 1.24.4-99)` sort OK (B7).
+  Une référence existe (`SRC_BI="golang-1.24-src (= 1.24.4-1)"` dans [`paquets.sh`](../paquets.sh), buildinfo de S3) ; un contrôle
+  dans `paquets.sh` ou `stdlib` n'est pas esquissé : décision du propriétaire.
+- **Le contenu du `Comment:`** : présence seule, pas les paragraphes 2, 3, 8 et 9 du copyright de golang-1.24-src.
+- **Le champ `Built-Using`** : toujours lu et dit « absent » ; non visé par la décision 1.
+
+**Ordre des lancements, chacun sur accord nommé** : le banc de la bascule (B4 à B7), puis le banc de `modules` rejoué (B8), puis
+`paquets.sh modules` sur le vrai deb (B1, qui réécrit `paquets-modules.log`). B2 et B3 attendent la révision 1.0.0-2.
+
+**Estimation** : comprise dans la projection d'`apres-s5b.md` (hors dépôt, 0,05 à 0,1 pw pour la note X11, la bascule et la part 13a
+de la révision) ; seuil de la 13a : 0,4 pw pour une estimation de 0,2 pw.

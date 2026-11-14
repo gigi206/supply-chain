@@ -139,3 +139,9 @@ est donc lié par du code linux/amd64 : son maintien par `lies` est juste, l'exp
 relancer. Le point passe de « reste au propriétaire » à « clos par mesure » (à confirmer par le propriétaire). Un critère par fichier
 dans `lies` serait une règle nouvelle, non prise. Reste au propriétaire : l'expression filtrée sous le purl du paquet entier sans marque
 dans le prédicat.
+
+*Additif du 14/11/2026, 21:29:25 UTC* : **bascule de M5 préparée à sec, NON LANCÉE** (« Oui, prépare-la ») : `paquets.py modules` lit
+`Static-Built-Using` (absent : sortie inchangée ; présent : une seule entrée `golang-X.Y (= X.Y.Z-révision)` égale, en version amont,
+à la version de Go du binaire, sinon KO). Banc hors réseau [`paquets-m5-essai-local.sh`](resultats/paquets-m5-essai-local.sh) ;
+prédictions B1 à B8 dans [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Lancements sur accord nommé ; B2 et B3
+attendent la révision 1.0.0-2.
