@@ -322,3 +322,14 @@ Prochaine ligne : S4d `reseau taches pipeline` (cluster et Zot, U10), sur accord
 - Bundle de pipeline neuf : `tekton/pipelines/sample-app-deb@d1fb3871` (au lieu de 5b4bacb8), qui porte l'artefact de packaging f0ed7a71.
   `builds/sample-app-deb@60f25f5c` est définitif dans Zot.
 Prochaine ligne : S4d2 et S4d3 (`retirer prealables deployer chemins porte`, U11 et U12), sur accord nommé.
+
+## Carte, ligne 8 : S4d2 `regle reel` (note de 2026-11-14T23:15:32Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s4d2.sh regle reel (U12, sans écriture) ? ». À beb39d7, du 14/11 23:14:56 au 14/11 23:15:11 UTC,
+code 0 relevé juste après la commande, 31 OK, 0 KO, 0 ÉCART ; lignes « fait » des deux étapes dans `chrono.tsv`. `s4d2-regle.log`
+archivé pour la première fois ; `s4d2-reel.log` réécrit (version du 11/11). Étape `porte` de S4d2 non lancée (ConfigMap en service).
+- **U12 tenue** : `ec opa test` 39/39 ; mutations conformes à l'annonce (0 écart sur 18).
+- Provenances réelles relues dans Zot (lecture anonyme, cosign, clé de Chains) : deb **60f25f5c**, 4 énoncés dont 2 de PipelineRun, le
+  plus récent du 14/11 à 23:10:54 UTC ; aucun code `porte.*` avec la clé de Chains, `porte.fermeture_plateforme` avec une autre clé ;
+  fermetures bb7599a2 et 50dc73f7 lues dans la provenance (8 provenances chacune, deux passages de S4b) ; les quatre témoins refusés
+  comme prévu ; sample-app sans code `porte.*`.
+Prochaine ligne : S4d3 `retirer prealables deployer chemins porte` (cluster, U11), sur accord nommé.

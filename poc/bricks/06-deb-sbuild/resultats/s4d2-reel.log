@@ -1,10 +1,10 @@
-# s4d2.sh reel, 2026-11-11T20:18:38Z
+# s4d2.sh reel, 2026-11-14T23:15:02Z
 ## provenances vérifiées par cosign (clé de Chains)
-deb : 4 énoncé(s), dont 2 de PipelineRun ; le plus récent : 629b6bb1-9a9f-45a6-a3bb-e4e9650f6a65 2026-11-11T19:55:56Z
-app : 28 énoncé(s), dont 14 de PipelineRun ; le plus récent : 35e2d798-0730-4744-b967-7ebd2c3264f6 2026-11-10T21:12:22Z
+deb : 4 énoncé(s), dont 2 de PipelineRun ; le plus récent : 36fbbebc-d459-4921-8e14-e07f11d67e0c 2026-11-14T23:10:54Z
+app : 6 énoncé(s), dont 3 de PipelineRun ; le plus récent : 14e757c8-d8c7-48c5-84ca-fd95157387c1 2026-11-13T12:20:12Z
 ## deb, clé de Chains (prédiction : aucun code porte.*)
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 4 provenance(s) vérifiée(s)
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 4 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 8 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 8 provenance(s) vérifiée(s)
 OK   deb, clé de Chains : 
   fermeture lue : FERMETURE_DEB_ARTIFACT_INPUTS deb sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290
   fermeture lue : FERMETURE_SOURCES_ARTIFACT_INPUTS gomod sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21
@@ -19,15 +19,15 @@ OK   deb, autre clé : porte.fermeture_plateforme
   sc-stockage.poc.test:5000/builds/fermetures/sample-app@sha256:74c265e703fb1ab823b64ac7d62c31c73b5e426895a15d54c57670bdfbffbcdd : 4 provenance(s) vérifiée(s)
 OK   sample-app, clé de Chains : 
 ## témoins : provenance la plus récente du deb modifiée
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 4 provenance(s) vérifiée(s)
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 4 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 8 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 8 provenance(s) vérifiée(s)
   porte.construction_kata : TaskRun s4d-deb-2-construire de construction : runtimeClassName "" dans la spec signée, kata exigé
 OK   deb hors Kata : porte.construction_kata
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 4 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 8 provenance(s) vérifiée(s)
   porte.fermeture_plateforme : préparation preparer-deb sans fermeture lisible dans le résultat FERMETURE_DEB_ARTIFACT_INPUTS
 OK   deb sans fermeture deb : porte.fermeture_plateforme
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 4 provenance(s) vérifiée(s)
-  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 4 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 : 8 provenance(s) vérifiée(s)
+  sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 : 8 provenance(s) vérifiée(s)
   porte.fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 (FERMETURE_SOURCES_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch gomod de la plat
   porte.fermeture_plateforme : fermeture sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 (FERMETURE_DEB_ARTIFACT_INPUTS) : aucune provenance de la pipeline de prefetch deb de la platef
 OK   deb, fermetures permutées : porte.fermeture_plateforme
