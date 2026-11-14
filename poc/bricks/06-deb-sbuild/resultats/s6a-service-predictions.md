@@ -383,3 +383,12 @@ seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-grafana.lo
 - **Q7 tenue** : promtool 3.13.5 sur sc-stockage ; `check rules` : 15 règles, SUCCESS ; `test rules` sur `alertes-tests.yml`
   corrigé (test neuf du deb compris) : SUCCESS. promtool n'affiche pas le détail par test.
 - Rien de déployé : copie dans `/tmp/regles-test` sur sc-stockage, effacée par l'étape.
+
+## Note datée de 2026-11-14T21:06:03Z : point 5b fait, `deployer` de la 19 (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance JALON=s6a mise run observabilite -- deployer (redémarre Prometheus) ? ». De 21:05:43 à 21:05:49 UTC,
+code 0 ([journal](../../19-observabilite/resultats/s6a-deployer.log)).
+- **Q8, première moitié tenue** : `alertes.yml` installé, Prometheus `active` après redémarrage, 15 règles chargées depuis
+  `/etc/prometheus/regles/alertes.yml`.
+- **Q8, seconde moitié non mesurée** : l'étape lit les règles 5 s après le redémarrage ; toutes sont encore `unknown` (pas encore
+  évaluées). L'état de `ScanEnRetard` (prédit inactif) demande une relecture de Prometheus, à faire sur accord.

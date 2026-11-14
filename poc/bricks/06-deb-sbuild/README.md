@@ -2009,3 +2009,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-14T21:03:36Z : S6a, point 4 : `fraicheur` (21:02:50 à 21:03:17 UTC, code 0) : trois séries dans Prometheus ; Q6 tenue pour les séries, ligne de journal non mesurée (instrument).
 - 2026-11-14T21:04:37Z : S6a, `grafana` (21:04:19 UTC, code 0) : Q10 tenue ; ligne de journal de `fraicheur-scan` vue par Loki.
 - 2026-11-14T21:05:23Z : S6a, point 5a : `regles` de la 19 (21:05:02 à 21:05:12 UTC, code 0) : promtool check et test passés ; Q7 tenue.
+- 2026-11-14T21:06:03Z : S6a, point 5b : `deployer` de la 19 (21:05:43 à 21:05:49 UTC, code 0) : 15 règles chargées ; état de `ScanEnRetard` non encore relu.
