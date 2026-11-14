@@ -42,7 +42,7 @@ RI=system:serviceaccount:declencheurs:rattrapage
 # S4d1 : $REG/tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5 (pipeline.ref du 11/11)
 PIPE_DEB=$(cat "$W/s4d-06/pipeline.ref" 2>/dev/null || true)
 [[ $PIPE_DEB =~ ^$REG/tekton/pipelines/sample-app-deb@sha256:[0-9a-f]{64}$ ]] || { echo "KO   pipeline.ref de s4d.sh taches absent ou invalide : $PIPE_DEB" >&2; exit 1; }
-DEB_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e                                     # S4d1
+DEB_DIGEST=sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e                                     # S4d1
 DEB=builds/sample-app-deb@$DEB_DIGEST
 APP=builds/sample-app@$APP_DIGEST
 PR_DEB=sample-app-deb-$TETE_J2   # 55 caractères

@@ -32,7 +32,7 @@ T=$W/s4d2-06
 mkdir -p "$T"
 CPOL=$O/telechargements/conforma-policy   # dépôt de la bibliothèque (politique.sh porte), commit CPOL_COMMIT
 
-DEB=builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e   # S4d1
+DEB=builds/sample-app-deb@sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e   # S4d1
 APP=builds/sample-app@$APP_DIGEST                                                                  # image réelle (preuves.sh)
 SRC=$(jq -nc --arg u "https://sc-stockage.poc.test:3000/$SAMPLE_APP.git" --arg r "$TETE_J2" '{git: {url: $u, revision: $r}}')
 CODES='porte.construction_kata porte.fermeture_plateforme porte.preparation_appariee porte.taches_vues'   # règles évaluées sur l'hôte

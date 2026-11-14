@@ -303,3 +303,12 @@ commande, 46 OK, 0 KO ; « S4d1 prealables fait » dans `chrono.tsv` ; [journal]
 - **Digest attendu D = sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e** (`digest-attendu` réécrit) ; U3 (part D)
   tenue : D ≠ 039949f9.
 Prochaine ligne : correctif d'épinglage 3 (D dans `s4d2.sh`, `s4d3.sh`, `s5.sh`, `s6a.sh`, `s6b.sh`), sur accord nommé.
+
+## Carte, correctif d'épinglage 3 (note de 2026-11-14T22:57:45Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif d'épinglage 3 (D 60f25f5c) ? ». D relu dans `digest-attendu` et dans
+`s4d-prealables.log` ; [`../revision-epinglage-3.patch`](../revision-epinglage-3.patch) (sha256 4f16d365…) généré depuis HEAD 2e2f0d8,
+`git apply --check` puis `git apply`, code 0 ; `bash -n` des cinq scripts passé. D = 60f25f5c dans `s4d2.sh` l. 35 (`DEB`), `s4d3.sh`
+l. 45, `s5.sh` l. 48, `s6b.sh` l. 104 (`DEB_DIGEST`), `s6a.sh` l. 54 (`DEB_REF`). Restent `039949f9` : commentaires d'en-tête de
+`s4d2.sh`, `s6a.sh`, `s6b.sh` (mesures passées), le texte du message de refus de `s6b.sh` l. 749 (« S5b n'a pas reproduit 039949f9 ? »,
+libellé seul : le contrôle porte sur `$DEB_SUJET`, dérivé de D), et les fixtures de `porte_test.rego` (U12). Rien n'est lancé.
+Prochaine ligne : S4d `reseau taches pipeline` (cluster et Zot, U10), sur accord nommé.
