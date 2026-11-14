@@ -288,3 +288,8 @@ de 22:36:53 à 22:49:10 UTC, code 0 relevé juste après la commande, 26 OK, 0 K
 archivé tel quel), `git apply --check` puis `git apply`, code 0 ; `bash -n` des cinq scripts passé. `DEB_SHA` = f66bbeb2 dans `s4d.sh`,
 `s6a.sh`, `s6b.sh`, 13a `paquets.sh` ; témoin N7 de `s5.sh` : `f66bbeb2`. Plus aucune occurrence de 3c6e6a29 dans les scripts.
 Rien n'est lancé. Prochaine ligne : 13a `paquets.sh deb modules` sur N', sur accord nommé.
+
+## Option 1, ligne 4 rejouée : 13a sur f66bbeb2 (note de 2026-11-14T22:53:08Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance paquets.sh deb modules (13a) sur f66bbeb2 ? ». `paquets.sh deb modules` à c279dd2, de 22:52:47 à 22:52:50 UTC, code 0 relevé juste après la commande, sur le deb f66bbeb2.
+**U8, B2 et B3 tenues de nouveau** : journaux identiques à ceux de 3c6e6a29 hors des en-têtes, de l'empreinte et de la taille du deb
+(`git diff`) ; prédicat `paquets-deb.licences.json` inchangé. Prochaine ligne : `s4d.sh prealables` (U17), sur accord nommé.

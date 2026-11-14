@@ -570,3 +570,6 @@ tenues.** Étape `deb` : expression inchangée, 0 erreur (U8 de la 06).
 *Note du 14/11/2026, 22:30:26 UTC* : le « code 0 » de la note de 22:16:59 (et du message de badc113) n'a pas été mesuré : erreur
 d'instrument de l'assistant (`$?` lu après une substitution `$(date …)`). Les deux étapes ont fini : lignes « 13a paquets deb fait » et
 « 13a paquets modules fait » de `chrono.tsv`, écrites par `paquets.sh` (l. 226) après une étape réussie. B2, B3 et U8 restent tenues.
+
+*Note du 14/11/2026, 22:53:08 UTC* : `paquets.sh deb modules` à c279dd2, de 22:52:47 à 22:52:50 UTC, code 0 relevé juste après la commande, sur le deb f66bbeb2 (option 1 de la 06 : seule la date du copyright dans le deb change) : B2 et B3 tenues de
+nouveau, journaux identiques hors des en-têtes, de l'empreinte et de la taille du deb.

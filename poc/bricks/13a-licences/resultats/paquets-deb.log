@@ -1,9 +1,9 @@
-# paquets.sh deb, 2026-11-14T22:16:56Z
+# paquets.sh deb, 2026-11-14T22:52:47Z
 politique : dc284d6739346df22552b7661531134ab68d01086f7a41d779c109d6ebb3dec2 ; licences.py : c708a5bce0b67ba04af9bf6f5039718fee7bb1d21a5be71568b359413e26319a ; paquets.py : 0e49bbf97d102ced3097c10e8ae34d6a95633b6da19d5002e221d3a59b65b24e
 liste SPDX : /nix/store/cv0fsvzbdjrbjn8j6i52lfg49shvf9bg-spdx-license-list-data-3.27.0-json/json
 ## deb de S3 de la 06
-OK   sha256 du deb épinglé : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
-sha256 de l'entrée : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa (1953500 octets)
+OK   sha256 du deb épinglé : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+sha256 de l'entrée : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
 paquet : sample-app 1.0.0-2 amd64
 copyright : sha256 a3cbcf92c9f7cbfae7f7d2482350e2c0406745ee4bedfba27edf5f711aaa2fb8 (8251 octets)
 format : DEP-5 1.0 ; paragraphes : 6

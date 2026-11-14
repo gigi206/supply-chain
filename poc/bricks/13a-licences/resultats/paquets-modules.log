@@ -1,7 +1,7 @@
-# paquets.sh modules, 2026-11-14T22:16:56Z
+# paquets.sh modules, 2026-11-14T22:52:48Z
 paquets.py : 0e49bbf97d102ced3097c10e8ae34d6a95633b6da19d5002e221d3a59b65b24e
-OK   sha256 du deb épinglé : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
-sha256 de l'entrée : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa (1953500 octets)
+OK   sha256 du deb épinglé : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b
+sha256 de l'entrée : f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
 control : Built-Using absent
 control : Static-Built-Using golang-1.24 (= 1.24.4-1)
 ## binaire ./usr/bin/sample-app : 5906320 octets, sha256 10d475d00dc2a14c09803ef861d8934312426fe2b3e723942b32486cc7b1c404
