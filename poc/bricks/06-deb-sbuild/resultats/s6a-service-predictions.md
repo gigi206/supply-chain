@@ -467,3 +467,12 @@ avec `TZ=Europe/Paris` (vérifié sur l'hôte). **Non fait** : aucun rejeu.
 - **Chemin k3s** : le bloc 06 n'y est pas joué ; `ScanEnRetard` du deb y reste active après chaque rejeu, puisque les règles de
   O3 attendent sa série.
 - Sans `POUSSER_VSA=1`, la même alerte retombe après `fraicheur`, mais la porte du deb n'est pas jugée.
+
+## Note datée de 2026-11-14T21:19:10Z : trois décisions du propriétaire sur l'intégration (rien n'est réécrit)
+
+Réponses aux trois questions de la note précédente, toutes conformes au correctif `rejeu-s6.patch` tel qu'il est commité :
+1. **« Oui, même drapeau »** : `POUSSER_VSA=1` au lancement vaut accord pour le push de la VSA de la 10 et pour celui du deb.
+2. **« Attendre 13:00 »** : attente annoncée, au plus 4 h, dans la même étape que `periodique`.
+3. **« Sauter sans drapeau »** : la porte du deb n'est jouée qu'avec `POUSSER_VSA=1`, comme celle de S4d3.
+
+Le correctif n'est pas appliqué : son application est un accord à part.
