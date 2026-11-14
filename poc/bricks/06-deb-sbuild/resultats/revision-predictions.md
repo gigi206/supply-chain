@@ -142,3 +142,12 @@ Fermeture `3a0e54ae` restaurée deux fois (162 fichiers), chroot de S2 `e0b1f37c
   - **U6 tenue** : copyright du deb égal à `poc/packaging/debian/copyright` (`cmp`).
   - `SOURCE_DATE_EPOCH="1794693332"` dans l'environnement des deux buildinfo (date de l'entrée 1.0.0-2).
 Prochaines lignes : correctif d'épinglage 1 (`DEB_SHA` = N, `s5.sh` l. 460), puis 13a ; chacun sur accord nommé.
+
+## Carte, correctif d'épinglage 1 (note de 2026-11-14T22:15:59Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif d'épinglage 1 (deb 3c6e6a29) ? ». N relu sur le deb du build 1 et dans
+`s3-comparaison.log` ; [`../revision-epinglage-1.patch`](../revision-epinglage-1.patch) (sha256 52d9c802…) généré depuis HEAD
+e3227d1, `git apply --check` puis `git apply`, code 0 ; `bash -n` des cinq scripts passé. `DEB_SHA` = 3c6e6a29… dans `s4d.sh` l. 62,
+`s6a.sh` l. 45, `s6b.sh` l. 103, 13a `paquets.sh` l. 45 ; `s5.sh` l. 460 : témoin N7 `3c6e6a29`, libellé « deb de S3 et S4d ».
+`0b489d43` ne reste, dans les scripts, que là où il désigne le passé : `DEB_S1` de `s2.sh` et `s3.sh` (deb de s1b), commentaires
+de `s4d.sh` l. 11 et de `taches.yml` l. 72, banc X11 de la 13a (`resultats/x11-fichiers.sh`, mesure du 14/11 sur 0b489d43).
+Rien n'est lancé. Prochaine ligne : 13a `paquets.sh` sur N (U8, B2, B3), sur accord nommé.

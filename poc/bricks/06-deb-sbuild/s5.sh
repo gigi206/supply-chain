@@ -457,7 +457,7 @@ etape_kata() {
   r=$(tr_lancer s5-n7-kata); tr_journal s5-n7-kata 8
   mesure "N7 témoin : TaskRun" "$r" "True|Succeeded"
   mesure "N7 témoin : pod (tekton.dev/task|nœud|runtime)" "$(tr_pod s5-n7-kata)" "construire-deb|sc-build|kata"
-  mesure "N7 témoin : deb de S1, S3 et S4d" "$(grep -o 'deb produit : [^ ]* [0-9a-f]*' "$T/s5-n7-kata.log" | awk '{print $4}' | cut -c1-8)" 0b489d43
+  mesure "N7 témoin : deb de S3 et S4d" "$(grep -o 'deb produit : [^ ]* [0-9a-f]*' "$T/s5-n7-kata.log" | awk '{print $4}' | cut -c1-8)" 3c6e6a29
   mesure "N7 témoin : DIGEST_CONSTRUIT" "$(tr_resultat s5-n7-kata DIGEST_CONSTRUIT)" "$DEB_DIGEST"
   for r in s5-n7-hors-kata s5-n7-kata; do echo "     $r : chains.tekton.dev/signed « $(tr_signe $r) »"; done
   ecarts
