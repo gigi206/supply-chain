@@ -1,5 +1,5 @@
-# paquets.sh modules, 2026-11-12T19:53:09Z
-paquets.py : 18aca8d6364006fa543e3dcf9bd2b800315e7c5178624e1c525697733b14dac4
+# paquets.sh modules, 2026-11-14T21:34:42Z
+paquets.py : 0e49bbf97d102ced3097c10e8ae34d6a95633b6da19d5002e221d3a59b65b24e
 OK   sha256 du deb épinglé : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
 sha256 de l'entrée : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
 control : Built-Using absent

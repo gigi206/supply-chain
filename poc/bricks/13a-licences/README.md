@@ -152,3 +152,6 @@ Restent B8 et B1 (accord nommé), B2 et B3 avec la révision 1.0.0-2.
 
 *Note du 14/11/2026, 21:33:54 UTC* : banc de `modules` rejoué avec la bascule (21:33:31 à 21:33:38 UTC, code 0) : **B8 tenue**, journal
 identique à celui du 12/11 hors de l'en-tête. Reste B1 sur le vrai deb.
+
+*Note du 14/11/2026, 21:35:00 UTC* : `paquets.sh modules` sur le vrai deb (21:34:42 à 21:34:44 UTC, code 0) : **B1 tenue**, journal
+identique hors de l'en-tête et de l'empreinte de `paquets.py`. **Bascule de M5 : B1 et B4 à B8 tenues** ; B2 et B3 avec la révision 1.0.0-2.

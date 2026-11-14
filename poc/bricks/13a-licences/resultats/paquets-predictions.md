@@ -550,3 +550,14 @@ en colonne 0 (six cas et trois concordances avec `go version -m`), aucune ligne 
 [`paquets-modules-essai-local.log`](paquets-modules-essai-local.log) est réécrit ; `git diff` contre 4a86777 : **une seule ligne
 change, l'en-tête** (heure et `paquets.py` `0e49bbf9…` au lieu de `8d4bb025…`) ; tout le reste est identique au passage du
 12/11/2026 (20:47:32 UTC), qui reste lisible dans git. Reste B1 (`paquets.sh modules` sur le vrai deb), sur accord nommé.
+
+## Résultat de B1 : `paquets.sh modules` sur le vrai deb, 14/11/2026, de 21:34:42 à 21:34:44 UTC (`chrono.tsv`), code 0 (écrit à 21:35:00 UTC)
+
+Accord : « Oui, lance-le » à « Je lance paquets.sh modules sur le vrai deb (B1) ? » ; HEAD = origin = dea7057. **B1 tenue** : deb
+`0b489d43…` épinglé et retrouvé ; [`paquets-modules.log`](paquets-modules.log) réécrit ; `git diff` contre dea7057 : **deux lignes
+changent, l'en-tête** (heure) **et `paquets.py :`** (`0e49bbf9…` au lieu de `18aca8d6…`, empreinte du passage du 12/11 à 19:53:09 UTC,
+antérieure aux étapes `stdlib`, `noms` et `lies`) ; tout le reste est identique, dont `control : Built-Using absent`, la ligne ÉCART
+de la bibliothèque standard et le témoin refusé. `chrono.tsv` : deux lignes ajoutées.
+
+**Bascule de M5 : B1 et B4 à B8 tenues** ; le deb 1.0.0-1, sans `Static-Built-Using`, sort comme avant. B2 et B3 se jugeront sur le deb
+de la révision 1.0.0-2 (étape 5 d'`apres-s5b.md`, après recompte du consommé de la 06 pour la règle des 2×).
