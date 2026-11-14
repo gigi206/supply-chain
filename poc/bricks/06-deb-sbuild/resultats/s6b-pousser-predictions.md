@@ -47,3 +47,21 @@ Confiance moyenne pour L1 à L4 : la 10 a fait ces lectures sur une image, jamai
 ## Note datée du 12/11/2026 (rédigée entre le commit 9521f0c, 12:02:59 UTC, et 12:04:45 UTC, après relecture du conseiller), avant tout lancement
 
 **Codes de sortie corrigés après `9521f0c`.** Un `KO` de `connexions`, ou des referrers ou étiquettes de `builds/sample-app-deb` changés après le push, laissaient le code à 0. `connexions` lève maintenant le drapeau `ko` de l'étape qui l'appelle, et `pousser_vsa` finit, comme `lire_vsa`, par une ligne `bilan` et le code 1 sur tout `KO`. Prédiction ajoutée : **P6.** `bilan : tout OK`, code 0 ; de même pour `lire_vsa`.
+
+## Note datée de 2026-11-14T20:30:05Z : état après S5b, avant le lancement (rien n'est réécrit)
+
+Relevés sans contact avec le cluster, sauf une ouverture TCP vers Zot (`192.168.161.13:5000`, joignable) :
+- **S5b terminé** (`2cec0df`) : le deb `039949f9` a été reproduit au bit près (C8 tenue). **P3 passe en confiance haute.**
+- **CA** : `~/.cache/supply-chain-poc/10/ca-poc.crt` et `08/pki/ca-poc.crt` identiques (`cmp`) ; le refus sur la CA n'est pas attendu.
+- **poc-replay** : mot de passe présent (`test -s`) ; le push de VSA de la 10 a réussi après S5b
+  (`08-trust-plane/resultats/rejeu-s5b-plateforme-ctl.log`, 12:47:44 UTC, manifeste `69a2b103…`) : droits et mot de passe valides.
+- **Clé de Chains changée par S5b** (`688af09`, `08-trust-plane/resultats/chains-cle-publique.pem`). `lire_vsa` lit la clé actuelle :
+  L2 et L4 portent sur elle. La provenance du deb dans Zot est celle des builds d'après S5b (C9 : 12 enveloppes de Chains sur le
+  deb). **L4 précisée** : acceptée, au moins une provenance vérifiée ; le nombre n'est pas prédit (confiance faible).
+- **Nouvelle limite** : la VSA a été émise le 12/11 sur une provenance signée par l'ancienne clé de Chains. Elle reste vérifiable
+  par la clé du domaine, et son sujet (le digest) est inchangé ; la provenance qu'elle juge n'est plus dans Zot (s'ajoute à la
+  limite sur `inputAttestations`).
+- **P7.** Avant le push, aucun referrer du deb dans `builds/vsa/sample-app-deb` (aucune VSA du deb poussée depuis S5b ; la porte
+  du deb refusait la VSA, C9). Les referrers de `builds/sample-app-deb` sont relevés avant le push et inchangés après (P5).
+
+Ordre : `pousser_vsa`, puis `lire_vsa`, chacun sur un accord nommé. Le push écrit dans le Zot du PoC (pas une action publique).
