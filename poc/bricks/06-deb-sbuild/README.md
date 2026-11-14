@@ -2062,3 +2062,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - 2026-11-14T22:20:29Z : révision 1.0.0-2, correctif d'épinglage 2 appliqué (`PACKAGING` = f0ed7a71 dans `s4b.sh`, `s4d.sh`, `s6b.sh`) ; rien lancé.
 - 2026-11-14T22:25:13Z : révision 1.0.0-2, ligne 6 : S4b (22:22:24 à 22:24:40 UTC, code 0, 65 OK) : fermetures bb7599a2 et 50dc73f7 inchangées, **U9 tenue**.
 - 2026-11-14T22:30:26Z : révision 1.0.0-2, ligne 7 : `s4d.sh prealables` **arrêtée en KO** (22:26:21 UTC) : l'orig refait par la pipeline (date du changelog, 1591a05b) diffère de celui de `sources.sh` (date du commit, 07521c1e). Décision du propriétaire attendue ; options et erreur d'instrument (« code 0 » non mesuré pour 13a et S4c) dans les [prédictions](resultats/revision-predictions.md).
+- 2026-11-14T22:31:45Z : révision 1.0.0-2 : décision « Option 1 » du propriétaire ; correctif `revision-sources-option1.patch` préparé, NON APPLIQUÉ ; prédictions U15 à U17.

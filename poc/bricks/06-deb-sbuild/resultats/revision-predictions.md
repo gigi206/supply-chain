@@ -225,3 +225,20 @@ Critères : tâche signée intacte ; date véridique ; artefact f0ed7a71 encore 
 2. Antidater l'entrée 1.0.0-2 au 28/10 23:19:26 : date fausse, artefact f0ed7a71 orphelin, six étapes à refaire.
 3. Assouplir `s4d.sh` l. 229 : perd l'égalité des paquets sources entre S3 et la pipeline.
 4. Modifier la tâche signée : nouvelle signature, liste revue de la 08, pod d'essai.
+
+## Décision du propriétaire : option 1 (note de 2026-11-14T22:31:45Z ; rien n'est réécrit)
+« Option 1 » à « Quelle option pour réaligner l'archive amont ? ». Correctif préparé à sec, **NON APPLIQUÉ** :
+[`../revision-sources-option1.patch`](../revision-sources-option1.patch) (sha256 df163ce5…, `git apply --check` à dca9fe5, `bash -n` et
+`shellcheck -S warning` passés sur la copie). `sources.sh` : `SDE_DEB` lu par `dpkg-parsechangelog -STimestamp` ; l'orig est fait par
+la même commande `tar` que l'archive complète, avec `--mtime=@$SDE_DEB` (au lieu d'une copie) ; `dpkg-source` sous
+`SOURCE_DATE_EPOCH=$SDE_DEB` ; l'archive complète (rpm, `s4d.sh` l. 192) reste datée du commit. Les options de `tar` et de `gzip`
+sont celles de `deb/construire-deb.yaml` l. 94-95 (comparées ligne à ligne).
+
+Suite de la carte (un accord nommé chacune) : 1b correctif appliqué ; 1 `sources.sh` relancé (réseau) ; 2 l. 261 rejouée ; 3 S3
+relancée ; 7 `s4d.sh prealables`. Les lignes 4 à 6 (13a, S4c, S4b) ne sont à refaire que si le deb change.
+| Id | Prédiction | Confiance |
+|---|---|---|
+| U15 | `sources.sh` corrigé : orig **1591a05b…**, `.dsc` **b284bd60…**, `.debian.tar.xz` **22cfff1d…** (valeurs de la pipeline, l. 55 de `s4d-prealables.log`) ; `sample-app-1.0.0.tar.gz` **07521c1e…** inchangé | Haute : même arbre, même commande, même date (l'arbre de la pipeline vient du même commit, vendor et marked contrôlés) |
+| U16 | S3 relancée sur ce paquet source : deb **3c6e6a29…** inchangé aux deux builds | Moyenne : seules les dates des fichiers de l'orig changent ; dpkg-deb borne les dates à SOURCE_DATE_EPOCH, inchangé ; non mesuré |
+| U17 | `s4d.sh prealables` : orig, `.dsc` et `.debian.tar.xz` égaux à ceux de `sources.sh` ; code 0 ; digest attendu D écrit, différent de 039949f9 | Haute si U15 tient |
+Si U16 ne tient pas : correctif d'épinglage 1, 13a, puis seulement `prealables` (S4c et S4b ne dépendent pas du deb).
