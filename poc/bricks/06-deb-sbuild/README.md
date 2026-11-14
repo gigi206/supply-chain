@@ -2001,3 +2001,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-13T15:33:05Z : reprise, étape 6 en code 1 : S4d tenue (`039949f9` deux fois) ; S4d3 chemins : un pod sans label de tâche en plus au rattrapage, porte, `fuites` et CIS non lancés.
 - 2026-11-13T15:36:09Z : pod sans label de tâche relevé : assistant d'affinité de Tekton (README de la 08, l. 650), défaut du contrôle de `s4d3.sh` ; correctif préparé à sec, non appliqué ; prédiction P10.
 - 2026-11-13T15:52:32Z : reprise, fin : bloc 06 passé (de 15:36:53 à 15:51:47 UTC, code 0, filtre de l'assistant d'affinité appliqué), C7 à C9 tenues, `fuites` sans secret, CIS inchangé ; **reprise du bloc 06 terminée, P1 à P10 tenues**.
+- 2026-11-14T20:31:22Z : S6b `pousser_vsa` (de 20:30:50 à 20:30:55 UTC, code 0) : VSA du deb poussée dans `builds/vsa/sample-app-deb`, manifeste `bd7c77ec` ; P1 à P6 tenues, P7 non mesurée directement ; `lire_vsa` à suivre, sur accord.

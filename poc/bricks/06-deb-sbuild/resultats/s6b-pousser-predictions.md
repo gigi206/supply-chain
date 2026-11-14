@@ -65,3 +65,17 @@ Relevés sans contact avec le cluster, sauf une ouverture TCP vers Zot (`192.168
   du deb refusait la VSA, C9). Les referrers de `builds/sample-app-deb` sont relevés avant le push et inchangés après (P5).
 
 Ordre : `pousser_vsa`, puis `lire_vsa`, chacun sur un accord nommé. Le push écrit dans le Zot du PoC (pas une action publique).
+
+## Résultat de `pousser_vsa` (note de 2026-11-14T20:31:22Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh pousser_vsa (push de la VSA du deb dans Zot) ? ». De 20:30:50 à 20:30:55 UTC, code 0
+([journal](s6b-pousser_vsa.log), [manifeste](s6b-vsa-manifeste.json)).
+- **P1 tenue** : `Verified OK`, 0 `connect()`.
+- **P2 tenue** : énoncé identique, sujet `039949f947f2…`, `PASSED`, `['POC_REPLAY_BIT_IDENTIQUE']`, `timeVerified`
+  2026-11-12T21:06:14Z, égal au `fin_deb` de `s6b-rebuild.log`.
+- **P3 tenue** : sujet `application/vnd.oci.image.manifest.v1+json`, `039949f9…`, 400 octets.
+- **P4 tenue** : bundle et config poussés, manifeste `sha256:bd7c77ec312ed48a9adf8c3e4f4c32b98f71b1980c032b4604a26d37156e004d`.
+- **P5 tenue** : un seul referrer du deb dans `builds/vsa/sample-app-deb`, de type `application/vnd.dev.sigstore.bundle.v0.3+json`,
+  au digest poussé ; aucune étiquette ; referrers (0) et étiquettes (`.att` et `.sig`) de `builds/sample-app-deb` inchangés.
+- **P6 tenue** : `bilan : tout OK`, code 0.
+- **P7 non mesurée directement** : l'étape ne relève pas les referrers de `builds/vsa/sample-app-deb` avant le push. Le referrer
+  unique relevé après est compatible avec P7, sans la prouver (un manifeste identique déjà présent donnerait le même relevé).
