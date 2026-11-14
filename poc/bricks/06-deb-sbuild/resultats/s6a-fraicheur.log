@@ -1,0 +1,22 @@
+# s6a.sh fraicheur, 2026-11-14T21:02:50Z
+## préalables
+OK   s6a-fraicheur-deb.patch appliqué et commité
+OK   builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e présent dans Zot
+OK   un referrer au moins dans chaque dépôt de scan
+# Brique 06, S6a : deux dépôts de scan (fraicheur-scan.py corrigé par s6a-fraicheur-deb.patch) ; SCANS remplace DEPOT_SCAN et DIGEST.
+[Service]
+Environment="SCANS=builds/scan/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 builds/scan/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e"
+## installation sur sc-stockage
+OK   fraicheur-scan.py installé identique : 6a08cc6e43221a56e4509575a96faa6956fa8fb7badb448b8b9d46468df95834
+success
+active
+/etc/systemd/system/fraicheur-scan.service.d/s6a-deb.conf
+fraicheur-scan.service: Deactivated successfully.
+Finished fraicheur-scan.service - Fraîcheur du scan et de la base Grype en métriques (brique 07a).
+scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"} 1794648711
+scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb"} 1794690095
+base_grype_construite_timestamp_seconds{depot="vulndb/grype"} 1794637165
+OK   résultat du service : success
+## lecture témoin depuis l'hôte, par un autre chemin que le script (comme g8_metriques)
+OK   séries lues dans Prometheus : base_grype_construite_timestamp_seconds{vulndb/grype}=1794637165 scan_dernier_referrer_timestamp_seconds{builds/scan/sample-app-deb}=1794690095 scan_dernier_referrer_timestamp_seconds{builds/scan/sample-app}=1794648711
+bilan : tout OK

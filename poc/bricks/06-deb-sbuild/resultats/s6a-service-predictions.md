@@ -348,3 +348,16 @@ code 0, `bilan : tout OK` ([journal](s6a-periodique.log), [bundle](s6a-periodiqu
 - Le journal compte six lignes contenant le motif jeton|token (lignes de l'étape sur le jeton du scanner) ; masquées à l'écran,
   laissées dans le journal comme pour l'essai, contrôle des secrets passé avant le commit.
 - Suite : `fraicheur` (point 4), puis `grafana` **avant le scan planifié de l'image du 15/11 à 09:30 UTC**.
+
+## Note datée de 2026-11-14T21:03:36Z : point 4 fait, `fraicheur` (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance s6a.sh fraicheur (sc-stockage, deux dépôts suivis) ? ». De 21:02:50 à 21:03:17 UTC, code 0,
+`bilan : tout OK` ([journal](s6a-fraicheur.log)).
+- **Q6 tenue pour les séries** : `Result` à `success` ; fichier complémentaire `fraicheur-scan.service.d/s6a-deb.conf` lu par
+  systemd (`DropInPaths`) ; `fraicheur-scan.py` installé identique (`6a08cc6e…`) ; trois séries dans Prometheus, égales au
+  fichier `.prom`, 27 s après le début de l'étape : `sample-app` 1794648711 (14/11, 09:31:51 UTC, scan planifié du jour),
+  `sample-app-deb` 1794690095 (14/11, 21:01:35 UTC, scan de `periodique`), base 1794637165 (14/11, 06:19:25 UTC).
+- **Q6, ligne de journal `scan … , base …` : non mesurée.** L'étape ne lit que les deux dernières lignes du journal de l'unité
+  (`journalctl -n 2`), qui sont celles de systemd. Défaut de l'instrument, pas de la plateforme ; l'étape `grafana` relit ce
+  journal par Loki.
+- Suite : `grafana` (lecture seule), avant le scan planifié de l'image du 15/11 à 09:30 UTC.
