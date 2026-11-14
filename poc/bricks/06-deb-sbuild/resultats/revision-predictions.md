@@ -190,3 +190,38 @@ Prochaine ligne : S4b (fermetures, U9), sur accord nommé.
   Constat, sans lien avec la révision : le bundle de `prefetch-sources-sample-app` change à chaque passage (0ebd1cb8 le 11/11,
   aa5f62c1 le 13/11, b0d37e59 le 14/11, d'après les journaux archivés) ; cause non relevée.
 Prochaine ligne : `s4d.sh prealables` (digest attendu D), sur accord nommé.
+
+## Carte, ligne 7 : `s4d.sh prealables` ARRÊTÉE en KO (note de 2026-11-14T22:30:26Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s4d.sh prealables (digest attendu) ? ». À 19b4cd8, début 22:26:21 UTC (`chrono.tsv` : « S4d1
+prealables » sans ligne « fait ») ; [journal](s4d-prealables.log) réécrit (version du 13/11 à 0907d5f). 37 OK, puis arrêt sur :
+`KO   sample-app_1.0.0.orig.tar.gz égal à celui de sources.sh : 1591a05b… (attendu : 07521c1e…)` (`s4d.sh` l. 229, `attendu`).
+`digest-attendu` n'est pas réécrit : il contient encore `039949f9` ; **aucune étape de S4d ne doit tourner avant un `prealables`
+réussi**. Rien n'est écrit dans Zot ni dans le cluster (étape de l'hôte).
+- **Cause (lue dans le code)** : la tâche signée `construire-deb` refait l'archive amont avec `--mtime` = date de `debian/changelog`
+  (`deb/construire-deb.yaml` l. 13-15 et 90-97, « égale au SOURCE_DATE_EPOCH de sources.sh »), comme `rejeu/rebuild_deb.sh` l. 122 ;
+  `sources.sh` la date au dernier commit de `poc/sample-app` (l. 29, `%ct`). Les deux dates étaient égales en 1.0.0-1 ; l'entrée
+  1.0.0-2 datée du 14/11 les sépare. Le préalable 6 du brouillon (12/11) avait vu l'égalité rompue pour `sources.sh`, pas son
+  consommateur dans la pipeline : **oubli de la préparation**, les relectures ayant tracé noms et digests, pas la date.
+- Valeurs côté pipeline (l. 55 du journal, outils de l'hôte, SOURCE_DATE_EPOCH 1794693332) : orig **1591a05b…**, `.dsc` **b284bd60…**,
+  `.debian.tar.xz` **22cfff1d…** (contre 07521c1e, 92335109 et 86e30d04 de `sources.sh`).
+- Autre consommateur de l'archive, relevé par `git grep` : `s4d.sh` l. 192 épingle `sample-app-1.0.0.tar.gz` (archive complète, rpm
+  compris) à 07521c1e. L'artefact de S4c (f0ed7a71) ne contient que `debian/` et le verrou : non concerné.
+- **U10 en suspens** ; S3, U1 à U9 restent valables pour ce qu'elles ont mesuré (S3 a construit depuis le paquet source de `sources.sh`).
+
+**Erreur d'instrument (lancements au premier plan de 13a, S4c et de celui-ci)** : la commande de l'assistant écrivait
+`echo "fin $(date -u …) code $?"` ; la substitution `$(date …)` remet `$?` à 0 avant sa lecture : **le « code 0 » de ces trois
+lancements n'a pas été mesuré**. Preuve de repli : `lancer` (`08-trust-plane/commun.sh` l. 334-336, `set -euo pipefail`) n'écrit
+« fait » qu'après une étape réussie ; « 13a paquets modules fait » (22:16:59) et « S4c publier fait » (22:18:43) sont présents,
+« S4d1 prealables fait » absent (témoin négatif). 13a et S4c ont donc fini leurs étapes ; leur code de sortie reste non mesuré.
+`sources.sh`, la l. 261, S3, S4b et les pushs relevaient le code correctement.
+
+### Options pour le propriétaire (aucune appliquée)
+Critères : tâche signée intacte ; date véridique ; artefact f0ed7a71 encore valable ; même paquet source pour S3 et la pipeline.
+1. **`sources.sh` : orig daté au changelog, archive complète au commit** (seule option qui passe les quatre critères) : l'orig Debian
+   prend la date de `dpkg-parsechangelog -STimestamp`, comme la tâche signée ; `sample-app-1.0.0.tar.gz` (rpm, `s4d.sh` l. 192) reste
+   au commit, 07521c1e. Prédictions en valeur absolue : orig 1591a05b, `.dsc` b284bd60, `.debian.tar.xz` 22cfff1d (l. 55).
+   À refaire : correctif de `sources.sh`, `sources.sh`, l. 261, S3 (deb 3c6e6a29 attendu inchangé, confiance moyenne : seules les
+   dates de l'orig changent), puis `prealables`. Si le deb change : correctif d'épinglage 1 et 13a à refaire.
+2. Antidater l'entrée 1.0.0-2 au 28/10 23:19:26 : date fausse, artefact f0ed7a71 orphelin, six étapes à refaire.
+3. Assouplir `s4d.sh` l. 229 : perd l'égalité des paquets sources entre S3 et la pipeline.
+4. Modifier la tâche signée : nouvelle signature, liste revue de la 08, pod d'essai.

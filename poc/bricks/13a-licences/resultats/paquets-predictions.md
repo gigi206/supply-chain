@@ -566,3 +566,7 @@ de la révision 1.0.0-2 (étape 5 d'`apres-s5b.md`, après recompte du consommé
 **B2 tenue** (`control : Static-Built-Using golang-1.24 (= 1.24.4-1)` et ligne OK du contrôle croisé, code 0) ; **B3 tenue** (ÉCART
 « … Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.4-1) »). **Bascule de M5 : B1 à B8
 tenues.** Étape `deb` : expression inchangée, 0 erreur (U8 de la 06).
+
+*Note du 14/11/2026, 22:30:26 UTC* : le « code 0 » de la note de 22:16:59 (et du message de badc113) n'a pas été mesuré : erreur
+d'instrument de l'assistant (`$?` lu après une substitution `$(date …)`). Les deux étapes ont fini : lignes « 13a paquets deb fait » et
+« 13a paquets modules fait » de `chrono.tsv`, écrites par `paquets.sh` (l. 226) après une étape réussie. B2, B3 et U8 restent tenues.

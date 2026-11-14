@@ -164,3 +164,6 @@ de l'étape 5 : la borne haute touche l'estimation du premier pas (~0,2 pw), sou
 *Note du 14/11/2026, 22:17:33 UTC* : `paquets.sh deb modules` sur le deb 1.0.0-2 de la 06 (3c6e6a29, 22:16:56 à 22:16:59 UTC, code 0) :
 **B2 et B3 tenues, bascule de M5 entièrement tenue (B1 à B8)** ; `Static-Built-Using` (axe 1) et notice de Go en `Comment:` (axe 2)
 présents dans le deb ; expression de licence inchangée, 0 erreur.
+
+*Note du 14/11/2026, 22:30:26 UTC* : correction de la note précédente : « code 0 » non mesuré (erreur d'instrument de l'assistant) ; fin
+des deux étapes établie par les lignes « fait » de `chrono.tsv`. B2 et B3 restent tenues.

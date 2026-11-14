@@ -1,7 +1,7 @@
-# s4d.sh prealables, 2026-11-13T15:05:01Z
+# s4d.sh prealables, 2026-11-14T22:26:21Z
 ## gabarits rendus (refs factices)
 OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
-OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 OK   preparer-deb : YAML lisible par yq, nom : preparer-deb
 OK   construire-deb : YAML lisible par yq, nom : construire-deb
 OK   sample-app-deb : YAML lisible par yq, nom : sample-app-deb
@@ -52,20 +52,5 @@ OK   entrees obtenues sous busybox et sous les outils de l'hôte : contenu : ég
 OK   entrees obtenues sous busybox et sous les outils de l'hôte : modes et types : égal
 ## construire-deb, sur l'hôte : paquet source (section du script, outils de l'hôte)
 OK   section du paquet source extraite (début, dpkg-source, fin) : 3
-     paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
-OK   sample-app_1.0.0.orig.tar.gz égal à celui de sources.sh : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb
-OK   sample-app_1.0.0-1.debian.tar.xz : mêmes membres, tailles et dates que celui de sources.sh, groupe sans écriture : 19413b89a108a050a312d34a07f231224023e84630b251da6b8145c642731211
-     (sur l'hôte : sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489, .dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sources.sh : sample-app_1.0.0-1.dsc 9050679ed60032a2 ; sample-app_1.0.0-1.debian.tar.xz 863cf4da65a7efa5 ; )
-## construire-deb, sur l'hôte : layout écrit avec le deb de S3 (section du script), lu comme publier-image
-OK   deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-OK   section du layout extraite (début, fin) : 2
-     couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
-     image.tar : 1966080 octets
-OK   index.json lu comme publier-image : une ligne, égale au résultat : 1 sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
-OK   chaque blob a pour nom son sha256 (3 blobs)
-OK   diff_ids égaux aux digests des couches : ["sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06"]
-OK   couche : le deb seul, en 0644, propriétaire 0 : -rw-r--r-- 0/0 sample-app_1.0.0-1_amd64.deb
-OK   deb de la couche égal au deb de S3 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-digest attendu de l'artefact, si le deb est 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 et le tar de l'image de build écrit la même couche : sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
-## entrées du pod d'essai
-entrees.tar : 227266560 octets, sha256 f95bc895efc652817e32ba4486e70892e9bfa546953963b90c69ea2322378c19
+     paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a31cda6ec4cef5d0074d0079e659d1 ; sample-app_1.0.0-2.debian.tar.xz 22cfff1d61bad913abb20670f90a7ef35e327e37fec0b78241822c893a76aeb6 ; 
+KO   sample-app_1.0.0.orig.tar.gz égal à celui de sources.sh : 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa (attendu : 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb)
