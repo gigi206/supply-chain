@@ -160,3 +160,14 @@ Rien n'est lancé. Prochaine ligne : 13a `paquets.sh` sur N (U8, B2, B3), sur ac
   source et version amont égaux à go1.24.4 du buildinfo » ; ÉCART « … Comment d'en-tête présent, contenu non contrôlé ;
   Static-Built-Using golang-1.24 (= 1.24.4-1) » ; témoin chi refusé. Journaux de la 13a réécrits (versions sur 0b489d43 à 5264a31).
 Prochaine ligne : S4c `verrou publier` (écriture dans Zot), sur accord nommé.
+
+## Carte, ligne 5 : S4c (note de 2026-11-14T22:19:04Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S4c (verrou publier, écriture dans Zot) ? ». `s4c.sh verrou publier` à badc113, de 22:18:38 à
+22:18:43 UTC (`date -u` autour du lanceur), code 0, 11 OK, 0 KO ; journaux `s4c-verrou.log` et `s4c-publier.log` réécrits.
+- **U1, part S4c tenue** : C2 « verrou égal à celui du dépôt », 162 paquets, sha256 **89d648b5…** ; C3 égal à la fermeture de S2.
+  **U1 tenue en entier** (S3 et S4c).
+- Artefact de packaging **P = sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f** : deux poussées locales et deux
+  poussées dans Zot, même digest (C4, C5) ; fichiers tirés égaux au dépôt (C6) ; seuls les quatre fichiers de `debian/` changent
+  dans la liste du journal (changelog, control, copyright a3cbcf92, rules). C7 relevé comme au premier passage (`rules` tiré en 644).
+  `entrees/sample-app/packaging-deb@f0ed7a71` est définitif dans Zot.
+Prochaine ligne : correctif d'épinglage 2 (`PACKAGING` = P dans `s4b.sh` l. 40, `s4d.sh` l. 55, `s6b.sh` l. 109), sur accord nommé.
