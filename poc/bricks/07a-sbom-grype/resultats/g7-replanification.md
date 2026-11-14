@@ -224,3 +224,5 @@ Préparation de la révision 1.0.0-2 de la 06 (lecture seule, aucune lecture de 
   rejeu-s5b-plateforme-ctl.log` l. 1461-1464, `LECTURE|2`) et porte de la reprise du bloc 06 à 15:50:11 UTC
   (`08-trust-plane/resultats/rejeu-s5b-06-c.log` l. 245, « 2 énoncé(s) vérifié(s) dans …/builds/scan/sample-app »). La porte de
   S6a du 14/11 ne juge que le deb (`06-deb-sbuild/resultats/s6a-porte.log` l. 9).
+- Note de 2026-11-14T21:53:55Z (rien n'est réécrit) : portée de la lecture de la note précédente : WebFetch au tag v2.1.22 (résumé et citations
+  courtes, pas les octets) et copie du cache sans version relevée (`grep -ci pull` : 0) ; `zot.json` : `builds/scan/**` sans `keepTags`.

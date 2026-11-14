@@ -2049,3 +2049,6 @@ Heures prises dans git (heure de commit) et dans les messages de commit ; base d
 (`debian/` des axes 1 et 2 de la 13a, `sources.sh` qui lit la révision dans le changelog, noms de fichiers des scripts de la 06 et
 de la 13a). Treize étapes, chacune sur accord nommé, dont trois correctifs d'épinglage écrits après mesure (deb de S3, artefact de
 packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bornée à 1.0.0-1 (banc supprimé le 29/10/2026).
+- Note de 2026-11-14T21:53:55Z (rien n'est réécrit) : le correctif de 9106ed3 avait un défaut (`BUILDINFO_S2` de `s3.sh` passé en 1.0.0-2 : U1 non
+  mesurée) ; **[`revision-1.0.0-2-v2.patch`](revision-1.0.0-2-v2.patch) le remplace**. La carte demande 16 accords (13 lignes et trois
+  correctifs d'épinglage), pas 13. Détail : [prédictions](resultats/revision-predictions.md), note du même nom.

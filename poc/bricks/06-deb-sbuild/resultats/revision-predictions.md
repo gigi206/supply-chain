@@ -82,3 +82,23 @@ et `scan-verifier.sh` vérifie TOUTES ses attestations (`cosign verify-attestati
 ## Coût
 Note du README du 14/11 (21:40:25Z) : consommé 0,696 à 0,701 pw ; projection avec la cascade et lintian 1,00 à 1,44 pw, sous 2 pw.
 Les trois correctifs d'épinglage et l'étape 2 s'ajoutent à la cascade comptée.
+
+## Note de 2026-11-14T21:53:55Z : correctif v2 et corrections, après relecture du conseiller (rien n'est réécrit)
+1. **Défaut du correctif de 9106ed3** : dans `s3.sh`, `BUILDINFO` (l. 42) nomme à la fois le buildinfo rapatrié des builds (l. 232)
+   et celui de S2 (l. 43, `BUILDINFO_S2=$R/s2-$BUILDINFO`). Passé en 1.0.0-2, il ferait chercher `s2-sample-app_1.0.0-2_amd64.buildinfo`,
+   qui n'existe pas ; le `|| true` du bloc Python de la comparaison (l. 251) pouvait masquer l'échec, et **U1 n'aurait pas été
+   mesurée**. **`../revision-1.0.0-2-v2.patch` remplace `revision-1.0.0-2.patch`, qui ne doit pas être appliqué** : seule
+   différence, `BUILDINFO_S2` épinglé à `s2-sample-app_1.0.0-1_amd64.buildinfo` (présent dans `resultats/`). `git apply --check`
+   et `bash -n` passés. Autres lignes remplacées, tracées par usage : `s1.sh` (`DSC` et noms des sources du cache, tous du paquet
+   courant), `s4d.sh` (`DEB_S3`, noms dans le pod et la couche), `s6a.sh` et `s6b.sh` (`DEB`, deb de S3) : aucun autre double usage.
+2. **Nombre d'accords** : la carte a 13 lignes (0 à 12) **plus** trois correctifs d'épinglage, soit **16 accords nommés** ; « treize
+   étapes, dont trois correctifs » (README et message de 9106ed3) est faux.
+3. **Heure** : « à partir de 21:49:01 UTC » est l'heure de rédaction de la carte ; le correctif a été généré avant (heure non relevée
+   par `date -u`).
+4. **Lecture de Zot** : la copie du cache `07a/zot-src/gc.go` n'a pas de version relevée (copiée le 05/11) ; `grep -ci pull` y rend 0.
+   La lecture au tag v2.1.22 est passée par WebFetch, qui rend un résumé et des citations courtes, pas les octets : `isBlobOlderThan`
+   (`StatBlob`, `modtime.Add(delay)`), les deux appels de `removeManifestIfOlderThan` dans `removeReferrer`, et l'absence de « pull »
+   dans le fichier, selon cet outil. `zot.json` (08) : `builds/scan/**` a `deleteReferrers: true`, `deleteUntagged: false`, sans
+   `keepTags`.
+5. **Regrep complété** (paquet source) : `9050679e` (`.dsc`), `863cf4da` (`.debian.tar.xz`), `20c9dd35` et `a3cbcf92` (copyright),
+   `1952080` (taille du deb) : aucune occurrence hors de `resultats/`, `docs/` et des `.md`. `docs/` ne cite pas `lastPullTimestamp`.

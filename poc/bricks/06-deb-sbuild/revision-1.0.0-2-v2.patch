@@ -1,0 +1,332 @@
+diff -ruN a/poc/bricks/06-deb-sbuild/s1.sh b/poc/bricks/06-deb-sbuild/s1.sh
+--- a/poc/bricks/06-deb-sbuild/s1.sh
++++ b/poc/bricks/06-deb-sbuild/s1.sh
+@@ -42,7 +42,7 @@
+ AMORCE=$REG/amont/library/debian@$AMORCE_DIGEST
+ DEPOT_ESSAI=essais-06/sbuild-debian13
+ PKG=${PACKAGING_DIR:-$HOME/.cache/supply-chain-poc/packaging}
+-DSC=sample-app_1.0.0-1.dsc
++DSC=sample-app_1.0.0-2.dsc
+ LIMITES='{"cpu": "2", "memory": "6Gi"}'      # demandes = limites ; tmpfs /w compté dans la mémoire du pod
+ TMPFS=4Gi
+ PRIVILEGIE='{"privileged": true, "allowPrivilegeEscalation": true}'
+@@ -258,12 +258,12 @@
+   d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
+   img=$REG/$DEPOT_ESSAI@$d
+   echo "image : $img"
+-  (cd "$PKG" && grep -E "  (sample-app_1.0.0.orig.tar.gz|sample-app_1.0.0-1.debian.tar.xz|$DSC)$" SHA256SUMS) > "$T/SHA256SUMS.s1"
++  (cd "$PKG" && grep -E "  (sample-app_1.0.0.orig.tar.gz|sample-app_1.0.0-2.debian.tar.xz|$DSC)$" SHA256SUMS) > "$T/SHA256SUMS.s1"
+   for p in "s1-kata-privilegie kata $PRIVILEGIE" "s1-kata-escalade kata $ESCALADE" "s1-runc-restreint - $RESTREINT"; do
+     n=${p%% *}; p=${p#* }
+     pod_spec "$n" "${p%% *}" "$img" 1000 "${p#* }"
+     pod_demarrer "$n"
+-    tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
++    tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC" \
+       | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
+     kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
+     sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" "$n"
+@@ -281,7 +281,7 @@
+   echo "image : $img"
+   pod_spec "$n" kata "$img" 1000 "$PRIVILEGIE"
+   pod_demarrer "$n"
+-  tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
++  tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC" \
+     | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
+   kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
+   sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" relance
+diff -ruN a/poc/bricks/06-deb-sbuild/s3.sh b/poc/bricks/06-deb-sbuild/s3.sh
+--- a/poc/bricks/06-deb-sbuild/s3.sh
++++ b/poc/bricks/06-deb-sbuild/s3.sh
+@@ -39,11 +39,11 @@
+ IMAGE_DIGEST=sha256:d8041f9cf7254a1e73523dc1b01e4065c0c9f9f4e7f8c9dc4e3c5fd656f495a1          # essais-06/sbuild-debian13:s1b
+ IMAGE=$REG/essais-06/sbuild-debian13@$IMAGE_DIGEST
+ DEB_S1=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
+-BUILDINFO=sample-app_1.0.0-1_amd64.buildinfo
+-BUILDINFO_S2=$R/s2-$BUILDINFO
++BUILDINFO=sample-app_1.0.0-2_amd64.buildinfo
++BUILDINFO_S2=$R/s2-sample-app_1.0.0-1_amd64.buildinfo   # S2 non rejouée : buildinfo de S1b (1.0.0-1), archivé
+ CLOSURE=$here/../03-deps-closure/closure.sh
+ PKG=${PACKAGING_DIR:-$HOME/.cache/supply-chain-poc/packaging}
+-DSC=sample-app_1.0.0-1.dsc
++DSC=sample-app_1.0.0-2.dsc
+ LISTES=/var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie   # listes de l'instantané dans le chroot
+ LIMITES='{"cpu": "2", "memory": "6Gi"}'
+ TMPFS=4Gi
+@@ -217,7 +217,7 @@
+     tar -C "$T/restauree-$n" -cf "$T/fermeture-$n.tar" .
+     copier "$p" "$T/fermeture-$n.tar" /w/fermeture.tar
+     copier "$p" "$T/fermeture.sha256" /w/fermeture.sha256
+-    tar -C "$PKG" -cf "$T/sources.tar" sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC"
++    tar -C "$PKG" -cf "$T/sources.tar" sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC"
+     copier "$p" "$T/sources.tar" /w/sources.tar
+     copier "$p" "$T1/SHA256SUMS.s1" /w/SHA256SUMS.s1
+     kubectl exec -n builds "$p" -- sh -c 'mkdir -p /w/fermeture /w/src && tar -xf /w/fermeture.tar -C /w/fermeture && tar -xf /w/sources.tar -C /w/src && mv /w/SHA256SUMS.s1 /w/src/ && rm /w/fermeture.tar /w/sources.tar' </dev/null \
+@@ -241,8 +241,8 @@
+ etape_comparaison() {
+   local n a b
+   for n in 1 2; do [ -s "$R/s3-build-$n.buildinfo" ] || { echo "KO   lancer d'abord l'étape builds" >&2; exit 1; }; done
+-  a=$(sha256sum < "$T/build-1/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)
+-  b=$(sha256sum < "$T/build-2/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)
++  a=$(sha256sum < "$T/build-1/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)
++  b=$(sha256sum < "$T/build-2/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)
+   echo "deb du build 1 : $a"
+   echo "deb du build 2 : $b"
+   mesure "deb identiques sur les deux builds" "$b" "$a"
+diff -ruN a/poc/bricks/06-deb-sbuild/s4d.sh b/poc/bricks/06-deb-sbuild/s4d.sh
+--- a/poc/bricks/06-deb-sbuild/s4d.sh
++++ b/poc/bricks/06-deb-sbuild/s4d.sh
+@@ -58,7 +58,7 @@
+ DEPOT_GIT=https://sc-stockage.poc.test:3000/workspace/sample-app.git
+ S4B=$W/s4b-06   # copies tirées par digest en S4b : comparaison/deb (fermeture deb), comparaison/sources (applicative), packaging
+ PKG=$HOME/.cache/supply-chain-poc/packaging   # archive de sources.sh (S1 à S3) : 07521c1e…
+-DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
++DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+ DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # OBS, S1, S3
+ GO=$HOME/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/bin   # même version que l'image de prefetch
+ LISTE_REVUE=$here/politique/porte/taches.yml
+@@ -230,10 +230,10 @@
+   # Constat du 11/11/2026 (premier passage de prealables, 18:03 UTC) : le .debian.tar.xz de sources.sh porte le umask de l'hôte
+   # (002 : 664 et 775, cp -r depuis l'arbre de travail), celui de la plateforme les modes de git (644 et 755). Seuls les modes
+   # doivent différer ; le .dsc diffère donc aussi. Le deb n'en dépend pas (dh_fixperms), ce que la pipeline mesurera.
+-  a=sample-app_1.0.0-1.debian.tar.xz
++  a=sample-app_1.0.0-2.debian.tar.xz
+   attendu "$a : mêmes membres, tailles et dates que celui de sources.sh, groupe sans écriture" \
+     "$(tar -tvJf "$x/w/src/$a" | sha256sum | cut -c1-64)" "$(tar -tvJf "$PKG/$a" | sed -E 's/^(.{5})w/\1-/' | sha256sum | cut -c1-64)"
+-  echo "     (sur l'hôte : $a $(sha256sum < "$x/w/src/$a" | cut -c1-64), .dsc $(sha256sum < "$x/w/src/sample-app_1.0.0-1.dsc" | cut -c1-64) ; sources.sh : $(awk '$2 ~ /debian.tar.xz|dsc$/ {printf "%s %s ; ", $2, substr($1, 1, 16)}' "$PKG/SHA256SUMS"))"
++  echo "     (sur l'hôte : $a $(sha256sum < "$x/w/src/$a" | cut -c1-64), .dsc $(sha256sum < "$x/w/src/sample-app_1.0.0-2.dsc" | cut -c1-64) ; sources.sh : $(awk '$2 ~ /debian.tar.xz|dsc$/ {printf "%s %s ; ", $2, substr($1, 1, 16)}' "$PKG/SHA256SUMS"))"
+ 
+   echo "## construire-deb, sur l'hôte : layout écrit avec le deb de S3 (section du script), lu comme publier-image"
+   attendu "deb de S3" "$(sha256sum < "$DEB_S3" | cut -c1-64)" "$DEB_SHA"
+@@ -551,9 +551,9 @@
+     m=$c/layout-$i/blobs/sha256/${d#sha256:}
+     attendu "artefact $i : manifeste relu au digest publié" "$(sha256sum < "$m" | cut -c1-64)" "${d#sha256:}"
+     l=$c/layout-$i/blobs/sha256/$(jq -r '.layers[0].digest' "$m" | cut -d: -f2)
+-    attendu "artefact $i : une couche, le deb seul" "$(jq '.layers | length' "$m") $(tar -tf "$l")" "1 sample-app_1.0.0-1_amd64.deb"
++    attendu "artefact $i : une couche, le deb seul" "$(jq '.layers | length' "$m") $(tar -tf "$l")" "1 sample-app_1.0.0-2_amd64.deb"
+     mkdir -p "$c/deb-$i"; tar -xf "$l" -C "$c/deb-$i"
+-    mesure "artefact $i : deb égal à celui d'OBS, S1 et S3" "$(sha256sum < "$c/deb-$i/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)" "$DEB_SHA"
++    mesure "artefact $i : deb égal à celui de S3" "$(sha256sum < "$c/deb-$i/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)" "$DEB_SHA"
+     # Installed-Build-Depends du .buildinfo (journal de construire) comparés au verrou, nom=version
+     sed -n '/^----- .*\.buildinfo -----$/,/^----- fin du .buildinfo -----$/p' "$R/s4d-pipeline-$i-construire.log" \
+       | awk '/^Installed-Build-Depends:/ {b = 1; next} b && /^[^ ]/ {b = 0} b' | sed -E 's/^ *([^ ]+) \(= ([^)]+)\),?$/\1=\2/' | sort > "$c/ibd-$i.v"
+diff -ruN a/poc/bricks/06-deb-sbuild/s6a.sh b/poc/bricks/06-deb-sbuild/s6a.sh
+--- a/poc/bricks/06-deb-sbuild/s6a.sh
++++ b/poc/bricks/06-deb-sbuild/s6a.sh
+@@ -41,7 +41,7 @@
+ racine=$(cd "$h06/../../.." && pwd)
+ R=$h06/resultats
+ T=$HOME/.cache/supply-chain-poc/06/s6a
+-DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
++DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+ DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5      # deb de builds/sample-app-deb@039949f9 (S4d1)
+ G0=$HOME/.cache/supply-chain-poc/07a/g0                                          # base grype du 04/11/2026 (G0 de la 07a)
+ SCAN_OUTIL=$HOME/.cache/supply-chain-poc/07a/outil/scan-outil                    # construit depuis 07a-sbom-grype/outil
+@@ -357,7 +357,7 @@
+     grep -viE 'jeton|token' "$T/$c.log" | sed 's/^/  /' || true
+   done
+   mesure "job" "${etat%%/*}" 1
+-  mesure "deb extrait dans analyser" "$(grep -c "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " "$T/analyser.log" || true)" 1
++  mesure "deb extrait dans analyser" "$(grep -c "^DEB|sample-app_1.0.0-2_amd64.deb, sha256 $DEB_SHA, " "$T/analyser.log" || true)" 1
+   n=$(sed -n 's/^ARTEFACT|deb, \([0-9]*\) PURL versionnées.*/\1/p' "$T/analyser.log")
+   mesure "plancher de l'artefact seul tenu (PURL versionnées > 0)" "$([ "${n:-0}" -gt 0 ] && echo oui || echo "non (${n:-absent})")" oui
+   apres=$(nb_referrers "$DEPOT_SCAN_DEB" "$d")
+@@ -493,7 +493,7 @@
+   # corrigé avant tout lancement, après e237b3d : lignes comptées, jamais affichées (comme g7_grafana) ; periodique archive déjà
+   # celles de kubectl logs
+   echo "$(wc -l < "$T/job.txt") ligne(s) après $i essai(s), non affichées"
+-  for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
++  for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-2_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
+     'jeton du rôle scanner révoqué'; do
+     mesure "visible dans Grafana : ${m%%, sha256*}" "$(grep -q -- "$m" "$T/job.txt" && echo oui || echo non)" oui
+   done
+diff -ruN a/poc/bricks/06-deb-sbuild/s6b.sh b/poc/bricks/06-deb-sbuild/s6b.sh
+--- a/poc/bricks/06-deb-sbuild/s6b.sh
++++ b/poc/bricks/06-deb-sbuild/s6b.sh
+@@ -99,7 +99,7 @@
+ h06=$(cd "$(dirname "$0")" && pwd)
+ R=$h06/resultats
+ T=$HOME/.cache/supply-chain-poc/06/s6b
+-DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
++DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+ DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5      # deb de builds/sample-app-deb@039949f9 (S4d1)
+ DEB_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+ ZOT=192.168.161.13:5000                                                         # Zot du PoC depuis l'hôte, lecture anonyme
+diff -ruN a/poc/bricks/13a-licences/paquets.sh b/poc/bricks/13a-licences/paquets.sh
+--- a/poc/bricks/13a-licences/paquets.sh
++++ b/poc/bricks/13a-licences/paquets.sh
+@@ -41,7 +41,7 @@
+ here=$(cd "$(dirname "$0")" && pwd)
+ repo=$(git -C "$here" rev-parse --show-toplevel)
+ R=$here/resultats
+-DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb}
++DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb}
+ DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # deb des deux builds de S3 (06, s3-comparaison.log)
+ SRC=${SRC:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/restauree-1/golang-1.24-src_1.24.4-1_all.deb}
+ SRC_SHA=c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1   # verrou-deb.txt (golang-1.24-src 1.24.4-1)
+diff -ruN a/poc/packaging/debian/control b/poc/packaging/debian/control
+--- a/poc/packaging/debian/control
++++ b/poc/packaging/debian/control
+@@ -10,6 +10,7 @@
+ Package: sample-app
+ Architecture: amd64
+ Depends: ${misc:Depends}
++Static-Built-Using: ${misc:Static-Built-Using}
+ Description: application de démonstration de la plateforme supply-chain
+  Binaire Go qui sert une interface web construite avec npm et embarquée à la
+  compilation.
+diff -ruN a/poc/packaging/debian/copyright b/poc/packaging/debian/copyright
+--- a/poc/packaging/debian/copyright
++++ b/poc/packaging/debian/copyright
+@@ -1,6 +1,97 @@
+ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+ Upstream-Name: sample-app
+ Source: https://github.com/gigi206/supply-chain
++Comment: Le binaire /usr/bin/sample-app contient, liée statiquement, la bibliothèque
++ standard de Go du paquet source golang-1.24, version 1.24.4-1 (voir
++ Static-Built-Using dans le control). Notices reprises telles que dans le
++ copyright de golang-1.24-src 1.24.4-1, pour les paragraphes Files gardés par
++ la règle des paragraphes non liés de la brique 13a (2, 3, 8 et 9) :
++ .
++ Paragraphe 2 du copyright de golang-1.24-src (License: Go) :
++ Copyright: © 2009, 2010, The Go Authors.  All rights reserved.
++ .
++ Paragraphe 3 du copyright de golang-1.24-src (License: X11) :
++ Copyright: © 1994-1999 Lucent Technologies Inc.  All rights reserved.
++ Portions © 1997-1999 Vita Nuova Limited
++ Portions © 2000-2007 Vita Nuova Holdings Limited (www.vitanuova.com)
++ Portions © 2001-2007 Russ Cox.  All rights reserved.
++ Portions © 2004,2006 Bruce Ellis
++ Portions © 1995-2007 C H Forsyth (forsyth@terzarima.net)
++ Revisions © 2000-2007 Lucent Technologies Inc. and others
++ Portions © 2009 The Go Authors.  All rights reserved.
++ .
++ Paragraphe 8 du copyright de golang-1.24-src (License: Go) :
++ Copyright: © 2009, 2011 The Go Authors. All rights reserved.
++ Based on code © 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
++ .
++ Paragraphe 9 du copyright de golang-1.24-src (License: Go) :
++ Copyright: © 2010 The Go Authors. All rights reserved.
++ Based on code © 1993 by Sun Microsystems, Inc. All rights reserved.
++ .
++ Texte de la licence Go :
++ .
++ Copyright © 2009 The Go Authors. All rights reserved.
++ .
++ Redistribution and use in source and binary forms, with or without
++ modification, are permitted provided that the following conditions are
++ met:
++ .
++    * Redistributions of source code must retain the above copyright
++ notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++ copyright notice, this list of conditions and the following disclaimer
++ in the documentation and/or other materials provided with the
++ distribution.
++    * Neither the name of Google Inc. nor the names of its
++ contributors may be used to endorse or promote products derived from
++ this software without specific prior written permission.
++ .
++ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ .
++ Subject to the terms and conditions of this License, Google hereby
++ grants to You a perpetual, worldwide, non-exclusive, no-charge,
++ royalty-free, irrevocable (except as stated in this section) patent
++ license to make, have made, use, offer to sell, sell, import, and
++ otherwise transfer this implementation of Go, where such license
++ applies only to those patent claims licensable by Google that are
++ necessarily infringed by use of this implementation of Go. If You
++ institute patent litigation against any entity (including a
++ cross-claim or counterclaim in a lawsuit) alleging that this
++ implementation of Go or a Contribution incorporated within this
++ implementation of Go constitutes direct or contributory patent
++ infringement, then any patent licenses granted to You under this
++ License for this implementation of Go shall terminate as of the date
++ such litigation is filed.
++ .
++ Texte de la licence X11 :
++ .
++ Permission is hereby granted, free of charge, to any person obtaining a copy
++ of this software and associated documentation files (the "Software"), to deal
++ in the Software without restriction, including without limitation the rights
++ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ copies of the Software, and to permit persons to whom the Software is
++ furnished to do so, subject to the following conditions:
++ .
++ The above copyright notice and this permission notice shall be included in
++ all copies or substantial portions of the Software.
++ .
++ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
++ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ THE SOFTWARE.
+ 
+ Files: *
+ Copyright: 2026 Contributeurs de gigi206/supply-chain
+diff -ruN a/poc/packaging/debian/rules b/poc/packaging/debian/rules
+--- a/poc/packaging/debian/rules
++++ b/poc/packaging/debian/rules
+@@ -25,3 +25,10 @@
+ override_dh_auto_test:
+ 
+ override_dh_dwz:
++
++# Axe 1 (13a) : Static-Built-Using, paquet source et version de la bibliothèque standard de Go compilée dans le binaire.
++# Variable misc:Static-Built-Using, celle de dh_golang et du tag lintian (compat 13) ; golang-1.24-src en dur : si la
++# version de Go change, dpkg-query échoue et le build aussi (voulu, le verrou épingle la fermeture).
++override_dh_gencontrol:
++	sbu=$$(dpkg-query -W -f='$${source:Package} (= $${source:Version})' golang-1.24-src) && test -n "$$sbu" \
++	  && dh_gencontrol -- "-Vmisc:Static-Built-Using=$$sbu"
+diff -ruN a/poc/packaging/sources.sh b/poc/packaging/sources.sh
+--- a/poc/packaging/sources.sh
++++ b/poc/packaging/sources.sh
+@@ -5,7 +5,8 @@
+ #                                    modules Go (vendor/, vérifiés par go.sum) et « marked »
+ #                                    (web/node_modules/marked, vérifié par l'intégrité sha512 du lockfile) ;
+ #   sample-app_1.0.0.orig.tar.gz     la même archive, nommée pour Debian ;
+-#   sample-app_1.0.0-1.dsc, sample-app_1.0.0-1.debian.tar.xz   paquet source Debian (dpkg-source) ;
++#   sample-app_<révision>.dsc, sample-app_<révision>.debian.tar.xz   paquet source Debian (dpkg-source), révision lue
++#                                    dans debian/changelog (1.0.0-2 depuis le 14/11/2026) ;
+ #   sample-app.spec                  copie du spec ;  SHA256SUMS.
+ # Le build lui-même se fait ensuite sans réseau (GOPROXY=off, aucun npm).
+ #
+@@ -17,13 +18,16 @@
+ racine=$(git -C "$here" rev-parse --show-toplevel)
+ NOM=sample-app
+ VERSION=1.0.0
++REV=$(dpkg-parsechangelog -l "$here/debian/changelog" -SVersion)   # révision Debian, ex. 1.0.0-2
++[[ $REV == "$VERSION"-* ]] || { echo "ÉCHEC : révision $REV hors de la version $VERSION"; exit 1; }
+ OUT=${PACKAGING_DIR:-$HOME/.cache/supply-chain-poc/packaging}
+ W=$(mktemp -d -p "${XDG_CACHE_HOME:-$HOME/.cache}")
+ trap 'chmod -R u+w "$W" 2>/dev/null; rm -rf -- "$W"' EXIT
+ PATH=$(tr : '\n' <<<"$PATH" | grep -v '/mise/shims$' | paste -sd:)   # go de mise.toml, pas de shim
+ 
+ commit=$(git -C "$racine" log -1 --format=%H -- poc/sample-app)
+-SDE=$(git -C "$racine" log -1 --format=%ct -- poc/sample-app)   # = date de debian/changelog et du %changelog
++SDE=$(git -C "$racine" log -1 --format=%ct -- poc/sample-app)   # date de l'archive amont ; égale à celle de debian/changelog
++#   jusqu'à la révision 1.0.0-1 seulement (l'entrée 1.0.0-2 est datée à son écriture) ; le build lit la sienne dans le changelog
+ echo "sample-app au commit $commit, SOURCE_DATE_EPOCH=$SDE ($(date -u -d "@$SDE" +%Y-%m-%dT%H:%M:%SZ))"
+ [[ -z $(git -C "$racine" status --porcelain -- poc/sample-app poc/packaging) ]] || echo "ATTENTION : modifications non commitées dans poc/sample-app ou poc/packaging"
+ 
+@@ -57,6 +61,6 @@
+ cp -r "$here/debian" "$S/"
+ cp "$OUT/${NOM}_$VERSION.orig.tar.gz" "$W/"   # dpkg-source cherche l'archive amont à côté du répertoire source
+ (cd "$W" && SOURCE_DATE_EPOCH=$SDE dpkg-source -q -b "$NOM-$VERSION" >/dev/null)
+-mv "$W/${NOM}_$VERSION-1.dsc" "$W/${NOM}_$VERSION-1.debian.tar.xz" "$OUT/"
+-(cd "$OUT" && sha256sum "$NOM-$VERSION.tar.gz" "${NOM}_$VERSION.orig.tar.gz" "${NOM}_$VERSION-1.dsc" \
+-   "${NOM}_$VERSION-1.debian.tar.xz" "$NOM.spec" | tee SHA256SUMS)
++mv "$W/${NOM}_$REV.dsc" "$W/${NOM}_$REV.debian.tar.xz" "$OUT/"
++(cd "$OUT" && sha256sum "$NOM-$VERSION.tar.gz" "${NOM}_$VERSION.orig.tar.gz" "${NOM}_$REV.dsc" \
++   "${NOM}_$REV.debian.tar.xz" "$NOM.spec" | tee SHA256SUMS)
