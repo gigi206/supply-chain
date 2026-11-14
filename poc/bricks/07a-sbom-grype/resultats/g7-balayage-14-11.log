@@ -1,0 +1,22 @@
+# Relevé en lecture seule du journal de zot.service (sc-stockage), 14/11/2026, lu à 20:48:36 UTC (« Oui, lis-le »)
+# Commande sur la VM : sudo journalctl -u zot.service --since '2026-11-13 12:00:00' -o cat | grep -iE 'gc|retention|garbage'
+# (416 lignes JSON rapatriées hors du dépôt, $W/g7-replanifier/zot-gc.txt) ; résumé par jq sur l'hôte :
+## lignes : 416
+## messages par tranche de 10 min (UTC)
+     57 2026-11-14T12:4
+    114 2026-11-14T12:5
+    102 2026-11-14T13:0
+    114 2026-11-14T13:1
+     29 2026-11-14T13:2
+## messages distincts (chemin du dépôt remplacé)
+    138 gc successfully completed for <dépôt>
+    138 garbage collected blobs
+    138 executing gc of orphaned blobs for <dépôt>
+      2 applied policy
+## dépôts passés au gc : 138
+## premier et dernier message
+2026-11-14T12:45:50.453708521Z
+2026-11-14T13:22:29.757088496Z
+## décisions de rétention
+{"time":"2026-11-14T13:22:15.206526304Z","decision":"keep","reason":"retained by mostRecentlyPushedCount:11 policy","repository":"vulndb/grype","tag":"2026-11-14","digest":"sha256:2c0390b3896c07a471151b2cfd3ae21df3a3c51f6ae6f176e18c36b20398a922","pushTimestamp":"2026-11-14 08:11:52.691534816 +0000 UTC","lastPullTimestamp":"2026-11-14 13:17:50.1957293 +0000 UTC","dry-run":false}
+{"time":"2026-11-14T13:22:15.206592262Z","decision":"keep","reason":"retained by mostRecentlyPushedCount:11 policy","repository":"vulndb/grype","tag":"2026-11-13","digest":"sha256:c35d469a442164d1d4688fd6cae6f4e5cf377bfe11928d7af8e64452ada151ec","pushTimestamp":"2026-11-13 12:42:16.694528811 +0000 UTC","lastPullTimestamp":"2026-11-14 08:02:47.365410768 +0000 UTC","dry-run":false}

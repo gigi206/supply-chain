@@ -173,3 +173,19 @@ Une lecture du journal de `zot.service` (lecture seule, accord nommé) la confir
 ### Point 4, à faire sur accord
 Remplacer la consigne de `supply-chain-g7-premiere-suppression` par celle ci-dessus, `fireAt` au **28/11/2026 à 13:02:25 UTC**,
 réactiver la tâche, puis relire la liste des tâches.
+
+## Balayage du 14/11 relu dans le journal de Zot (note de 2026-11-14T20:49:33Z ; rien n'est réécrit)
+« Oui, lis-le » à « Je lis le journal de zot.service pour vérifier le balayage du 14/11 ? ». Lecture seule à 20:48:36 UTC
+([résumé](g7-balayage-14-11.log) ; lignes brutes hors du dépôt).
+- **Hypothèse « démarrage + k × 24 h » réfutée pour l'heure de début.** Le premier balayage a commencé le 14/11 à **12:45:50 UTC**,
+  soit 24 h 28 min 25 s après le démarrage (12:17:25), et fini à **13:22:29 UTC** (36 min 39 s, 138 dépôts passés au gc).
+- **Conséquence** : la tâche proposée à 13:02:25 UTC tomberait **au milieu** d'un balayage de même horaire. Le `fireAt` du point 4
+  n'est plus valable.
+- **Loi de l'intervalle inconnue** : un seul point. Si l'intervalle court du début d'un balayage au suivant, le 28/11 commencerait
+  vers 12:46 ; s'il court de la fin, le décalage s'accumule (environ 37 min par jour, soit plusieurs heures au 28/11). Il faut un
+  second balayage (15/11) pour trancher.
+- **Décisions de rétention** : 2, toutes `keep` dans `vulndb/grype` (tags 2026-11-13 et 2026-11-14, « retained by
+  mostRecentlyPushedCount:11 »), `dry-run` faux. Aucune décision dans `builds/scan/**` (rien n'a 336 h).
+- **Non prévu** : chaque décision porte `pushTimestamp` et `lastPullTimestamp` (base de métadonnées de Zot), pas la date du blob.
+  Si `retention.delay` se mesure aussi depuis le dernier tirage, un scan relu (porte, `lire_vsa`, contrôles) verrait sa
+  suppression repoussée : **risque pour H1 et H2, non vérifié** (ni dans le code de Zot ni par une mesure).
