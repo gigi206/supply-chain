@@ -392,3 +392,12 @@ code 0 ([journal](../../19-observabilite/resultats/s6a-deployer.log)).
   `/etc/prometheus/regles/alertes.yml`.
 - **Q8, seconde moitié non mesurée** : l'étape lit les règles 5 s après le redémarrage ; toutes sont encore `unknown` (pas encore
   évaluées). L'état de `ScanEnRetard` (prédit inactif) demande une relecture de Prometheus, à faire sur accord.
+
+## Note datée de 2026-11-14T21:06:40Z : Q8 relue dans Prometheus (rien n'est réécrit)
+
+« Oui, relis-le » à « Je relis l'état des alertes dans Prometheus (lecture seule) ? ». Lecture à 21:06:29 UTC
+([journal](../../19-observabilite/resultats/s6a-etat-alertes.log)).
+- **Q8 tenue** : les 15 règles en santé `ok`, évaluées à 21:06:07 UTC, toutes `inactive`, **`ScanEnRetard` comprise** ; aucune
+  alerte dans Prometheus ni dans Alertmanager ; deux séries de scan présentes (`sample-app` 1794648711, `sample-app-deb`
+  1794690095).
+- Suite : la porte du deb (point 6, Q9), sur accord.

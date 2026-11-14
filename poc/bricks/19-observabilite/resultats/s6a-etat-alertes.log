@@ -1,0 +1,25 @@
+# relecture en lecture seule des règles et alertes de Prometheus (sc-stockage), 2026-11-14T21:06:29Z (« Oui, relis-le »)
+# commandes sur la VM : curl -s http://127.0.0.1:9090/api/v1/rules ; curl -s http://127.0.0.1:9090/api/v1/alerts ; curl -s http://127.0.0.1:9093/api/v2/alerts
+## règles : nom, santé, état, dernière évaluation
+  OpenBaoScelle	ok	inactive	2026-11-14T21:06:07.033207182Z
+  ChainsEchecSignature	ok	inactive	2026-11-14T21:06:07.033514202Z
+  ChainsMarqueSansSignature	ok	inactive	2026-11-14T21:06:07.03363201Z
+  ReplayNonBitIdentique	ok	inactive	2026-11-14T21:06:07.033742029Z
+  MiroirEnRetard	ok	inactive	2026-11-14T21:06:07.033766224Z
+  KyvernoRefusAnormaux	ok	inactive	2026-11-14T21:06:07.033814261Z
+  CertificatExpireBientot	ok	inactive	2026-11-14T21:06:07.033907045Z
+  ScanEnRetard	ok	inactive	2026-11-14T21:06:07.033966626Z
+  ScanBientotRefuse	ok	inactive	2026-11-14T21:06:07.034031282Z
+  BaseGrypeVieillie	ok	inactive	2026-11-14T21:06:07.034065838Z
+  DisqueStockagePlein	ok	inactive	2026-11-14T21:06:07.034118885Z
+  SourceMuette	ok	inactive	2026-11-14T21:06:07.034146441Z
+  EvenementsMuets	ok	inactive	2026-11-14T21:06:07.034344381Z
+  LokiInjoignable	ok	inactive	2026-11-14T21:06:07.034561699Z
+  CollecteEnPanne	ok	inactive	2026-11-14T21:06:07.034613178Z
+## alertes actives dans Prometheus (nom, état)
+  (aucune)
+## alertes dans Alertmanager (nom, état)
+  (aucune)
+## séries de scan
+  builds/scan/sample-app 1794648711
+  builds/scan/sample-app-deb 1794690095
