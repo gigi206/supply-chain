@@ -1,0 +1,14 @@
+# x11-fichiers.sh, 2026-11-14T21:24:33Z, x11-fichiers.py d460e3af95677b7a02026b355ded284c5e4c1c5d5a31adc497a2d0306a7185c3, 3.13.12
+binaire : 5906320 octets, sha256 10d475d00dc2a14c09803ef861d8934312426fe2b3e723942b32486cc7b1c404
+motif X11       memclr_arm.s           : absent  (forme runtime/memclr_arm.s) ; occurrences : aucune
+motif X11       memmove_386.s          : absent  (forme runtime/memmove_386.s) ; occurrences : aucune
+motif X11       memmove_amd64.s        : PRÉSENT (forme runtime/memmove_amd64.s) ; occurrences : ['runtime/memmove_amd64.s']
+motif X11       memmove_arm.s          : absent  (forme runtime/memmove_arm.s) ; occurrences : aucune
+motif X11       memmove_plan9_386.s    : absent  (forme runtime/memmove_plan9_386.s) ; occurrences : aucune
+motif X11       memmove_plan9_amd64.s  : absent  (forme runtime/memmove_plan9_amd64.s) ; occurrences : aucune
+motif X11       vlop_386.s             : absent  (forme runtime/vlop_386.s) ; occurrences : aucune
+motif X11       vlop_arm.s             : absent  (forme runtime/vlop_arm.s) ; occurrences : aucune
+motif X11       vlrt.go                : absent  (forme runtime/vlrt.go) ; occurrences : aucune
+témoin positif  asm_amd64.s            : PRÉSENT (forme runtime/asm_amd64.s) ; occurrences : ['crypto/internal/fips140/nistec/p256_asm_amd64.s', 'reflect/asm_amd64.s', 'runtime/asm_amd64.s']
+témoin négatif  asm_arm.s              : absent  (forme runtime/asm_arm.s) ; occurrences : aucune
+# code 0, fin 2026-11-14T21:24:33Z

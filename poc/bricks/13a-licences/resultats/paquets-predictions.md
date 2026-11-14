@@ -465,3 +465,9 @@ politique, sous la règle des paragraphes non liés (lecture du binaire par le p
 le prédicat porte cette expression filtrée sous le purl du paquet entier sans le marquer (seul le journal le dit) ; le paragraphe `X11` est
 gardé par des fichiers de `src/runtime/` d'autres architectures (`memmove_386.s`…), car le lien se décide au paquet, pas au fichier.
 Suite prévue : axes 1 et 2 (Static-Built-Using, notice de Go), après S5b.
+
+*Note du 14/11/2026, 21:24:55 UTC (rien n'est réécrit)* : deux phrases de ce fichier se précisent par mesure. « `memmove_amd64.s` l'est sans
+doute […], mais ce n'est pas mesuré fichier par fichier » (l. 371) : **mesuré**, `runtime/memmove_amd64.s` est dans la table des lignes
+du binaire ([journal](x11-fichiers.log), [script](x11-fichiers.sh) ; banc lancé le 14/11/2026 de 21:24:32 à 21:24:33 UTC (`chrono.tsv`), code 0, sur « Oui, dépose-la » à « Je dépose la note X11 de la 13a ? » ; décision « Après S5b » du 12/11/2026 (21:56:54 UTC)). « le paragraphe `X11` est gardé par des fichiers de
+`src/runtime/` d'autres architectures » (l. 466) : **inexact**, il est gardé par `memmove_amd64.s`, code amd64 lié ; les huit autres
+motifs sont absents du binaire, témoins tenus. Aucune prédiction L1 à L5 ne change.

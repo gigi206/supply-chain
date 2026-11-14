@@ -128,3 +128,14 @@ BSD-3-Clause AND BSD-3-Clause`). Lancement sur accord nommé, après `vsa`.
 [résultats](resultats/paquets-predictions.md)). 10 paragraphes sur 14 écartés (dont `FreeBSD` et `MPEG`, absence probante de `debug/elf` et `image/jpeg`) ;
 bibliothèque standard déclarée `BSD-3-Clause AND MIT AND BSD-3-Clause AND BSD-3-Clause`, deux composants conformes. Restent au propriétaire : expression
 filtrée sous le purl du paquet entier sans marque dans le prédicat ; `X11` gardé par des fichiers d'autres architectures.
+
+*Note du 14/11/2026, 21:24:55 UTC (rien n'est réécrit)* : le point « `X11` gardé par des fichiers d'autres architectures » ci-dessus est
+**inexact** pour un motif sur neuf. Mesure hors réseau ([script](resultats/x11-fichiers.sh), [journal](resultats/x11-fichiers.log) ;
+banc lancé le 14/11/2026 de 21:24:32 à 21:24:33 UTC (`chrono.tsv`), code 0, sur « Oui, dépose-la » à « Je dépose la note X11 de la 13a ? » ; décision « Après S5b » du 12/11/2026 (21:56:54 UTC)) : dans la table des lignes du binaire `sample-app` (deb 0b489d43, binaire `10d475d0…`, égal à la ligne 6 de
+[`paquets-modules.log`](resultats/paquets-modules.log), `-trimpath`), `runtime/memmove_amd64.s` est **présent** ; les huit autres motifs
+du paragraphe (`memclr_arm.s`, `memmove_386.s`, `memmove_arm.s`, `memmove_plan9_386.s`, `memmove_plan9_amd64.s`, `vlop_386.s`,
+`vlop_arm.s`, `vlrt.go`) sont absents ; témoins : `runtime/asm_amd64.s` présent, `runtime/asm_arm.s` absent. `X11` (traduit en `MIT`)
+est donc lié par du code linux/amd64 : son maintien par `lies` est juste, l'expression ne change pas, L1 à L5 restent tenues, rien à
+relancer. Le point passe de « reste au propriétaire » à « clos par mesure » (à confirmer par le propriétaire). Un critère par fichier
+dans `lies` serait une règle nouvelle, non prise. Reste au propriétaire : l'expression filtrée sous le purl du paquet entier sans marque
+dans le prédicat.
