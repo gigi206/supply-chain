@@ -155,3 +155,8 @@ identique à celui du 12/11 hors de l'en-tête. Reste B1 sur le vrai deb.
 
 *Note du 14/11/2026, 21:35:00 UTC* : `paquets.sh modules` sur le vrai deb (21:34:42 à 21:34:44 UTC, code 0) : **B1 tenue**, journal
 identique hors de l'en-tête et de l'empreinte de `paquets.py`. **Bascule de M5 : B1 et B4 à B8 tenues** ; B2 et B3 avec la révision 1.0.0-2.
+
+*Note du 14/11/2026, 21:40:25 UTC* : règle des 2×, volet rpm/deb : la note X11 et la bascule de M5 (étapes 3 et 4 d'après
+S5b) vont de a086e2e (21:19:49 UTC) à 5264a31 (21:35:01 UTC), heures de commit : 0:15:12, soit 0,006 pw. Le recompte hors dépôt
+du 13/11 (08:43:32Z) donnait 0,054 à 0,096 pw consommés et 0,10 à 0,20 pw avec la projection des étapes 3, 4 et de la part 13a
+de l'étape 5 : la borne haute touche l'estimation du premier pas (~0,2 pw), sous le seuil de 0,4 pw ; aucune décision due.

@@ -2012,3 +2012,31 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-14T21:06:03Z : S6a, point 5b : `deployer` de la 19 (21:05:43 à 21:05:49 UTC, code 0) : 15 règles chargées ; état de `ScanEnRetard` non encore relu.
 - 2026-11-14T21:06:40Z : S6a, Q8 relue : 15 règles `ok`, toutes inactives, `ScanEnRetard` comprise ; aucune alerte.
 - 2026-11-14T21:08:39Z : S6a, point 6 : porte du deb (21:07:02 à 21:08:16 UTC, code 0) : ec en succès, horodatage, VSA et scan `ok`, Job réussi ; **S6a terminé**, Q1 à Q10 tenues (ligne de journal de Q6 vue par Loki).
+
+**Note du 14/11/2026 (2026-11-14T21:40:25Z) : règle des 2× avant la révision 1.0.0-2** (estimation de la 06 : 2 pw, décision à 4 pw ; rien lancé).
+Heures prises dans git (heure de commit) et dans les messages de commit ; base de 40 h par pw, comme aux notes précédentes.
+- Base : 0,639 pw au 13/11 à 08:50:45 UTC (note du 13/11 à 13:57:31Z). De 08:50:45 à 13:57:32 le 13/11 : aucun commit ne touche
+  la 06 (`git log` par chemin) ; S5b reste compté à la 08.
+- Reprise du bloc 06 : de 2d91735 (13:57:32 UTC) à 2cec0df (15:52:33 UTC) : **1:55:01, soit 0,048 pw** (2cec0df clôt aussi S5b
+  de la 08 ; compté en entier ici). La projection de la note du 13/11 pour la reprise était de 0,190 à 0,639 pw.
+- S6 du 14/11 : S6b de 20:30:05 (heure citée par le message de c9d7469, origine non revérifiée) à e9ea002 (20:36:06 UTC),
+  0:06:01 ; S6a de ffb2064 (20:52:27 UTC) à 040a891 (21:08:39 UTC), 0:16:12 ; borne basse 0:22:13. Borne haute : plus
+  l'intégration de S6 à `rejeu.sh`, de 040a891 à a086e2e (21:19:49 UTC, commits titrés 08 et 06/08), 0:11:10. Le créneau G7
+  (20:36:06 à 20:52:27 UTC) revient à la 07a : hors compte. **NON mesuré** : le travail du 14/11 avant 20:30:05 (aucune heure de
+  `date -u`, de git ni de `chrono.tsv`) ; une heure entière y pèserait 0,025 pw.
+- **Consommé : 0,696 à 0,701 pw**, plus la part non mesurée ci-dessus.
+- Projection (estimations, non mesurées) : cascade 1.0.0-2 (0,25 à 0,639 pw, inchangée ; la reprise mesurée, 0,048 pw, rejouait
+  des scripts inchangés sans S5 ni S6 : elle ne projette pas la cascade) et lintian (0,05 à 0,1 pw) : **1,00 à 1,44 pw**, sous
+  l'estimation de 2 pw et loin du seuil de 4 pw : **aucune décision due**. Réserve inchangée : la base de 0,45 pw (README, l. 1554)
+  est un « environ » non recompté ; il faudrait qu'elle soit sous-estimée de plus de 0,56 pw pour que la borne haute atteigne 2 pw.
+- Inventaire de la cascade regrepé à 5264a31 (motifs 0b489d43, 039949f9, c1719b13, `1.0.0-1`, bd7c77ec, 256c3190, 5b4bacb8 ;
+  hors `resultats/`, `docs/` et `.md`), lecture seule :
+  1. Déjà présents à cc66a2b et absents de l'inventaire (troisième oubli) : `s6b.sh` l. 109 (manifeste de packaging `c1719b13`)
+     et `08-trust-plane/politique/porte/porte_test.rego` l. 279 (fixture `c1719b13`).
+  2. Nouveaux depuis cc66a2b : `rejeu.sh` rejoue S6 après « 06 (S4d3) » (a086e2e) ; le CronJob `scan-sample-app-deb` scanne
+     `DEB_REF`, épinglé à `039949f9` (`s6a.sh` l. 54, 203, 277) : il scannera l'ancien deb tant que `periodique` n'est pas refait.
+  3. `bd7c77ec`, `256c3190`, `5b4bacb8` : aucun épinglage hors de `resultats/` et des `.md`.
+- Point ouvert, avant le premier lancement de la cascade qui touche Zot : la cascade pousse un nouveau deb, ses scans et sa VSA,
+  et en relit (porte, `lire_vsa`) pendant la fenêtre de G7 (balayage du 28/11). Le recouvrement avec `lastPullTimestamp` des
+  referrers de `builds/scan/**` n'est pas vérifié (`07a-sbom-grype/resultats/g7-replanification.md`) ; à trancher dans la
+  préparation à sec.
