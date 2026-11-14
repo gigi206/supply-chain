@@ -189,3 +189,25 @@ réactiver la tâche, puis relire la liste des tâches.
 - **Non prévu** : chaque décision porte `pushTimestamp` et `lastPullTimestamp` (base de métadonnées de Zot), pas la date du blob.
   Si `retention.delay` se mesure aussi depuis le dernier tirage, un scan relu (porte, `lire_vsa`, contrôles) verrait sa
   suppression repoussée : **risque pour H1 et H2, non vérifié** (ni dans le code de Zot ni par une mesure).
+
+## Note de 2026-11-14T20:52:18Z : correction de H1, H2 et H5 par balayage, après relecture du conseiller (rien n'est réécrit)
+
+Lu dans les lignes brutes du 14/11 (hors du dépôt), sans nouvelle lecture de la VM :
+- **Aucune ligne de gc entre le démarrage (13/11, 12:17:25) et le 14/11 à 12:45:50 UTC** : pas de balayage au démarrage.
+- **Ordre dans le balayage** : `builds/scan/essai-07a` à 13:01:00, `builds/scan/essai-scan` à 13:01:24, `builds/scan/sample-app` à
+  13:01:31, `vulndb/grype` à 13:22:15 UTC, soit 15 à 37 min après le début (138 dépôts au total).
+- **Le premier balayage utile est celui du 27/11, pas du 28/11.** Le premier scan (13/11, 12:45:07) a 336 h le 27/11 à 12:45:07 ;
+  un balayage du 27/11 de même horaire commencerait à 12:45:50 et passerait sur les dépôts de scan vers 13:01, donc après les
+  dates d'éligibilité des scans du 13/11 (12:45 et 12:47) et des témoins (12:49:10 à 12:49:55). Si l'intervalle court de la fin
+  d'un balayage, le décalage repousse le balayage du 27/11 plus tard dans la journée : même répartition.
+- **Répartition corrigée** (le cumul après le balayage du 28/11 ne change pas) :
+  - **27/11** : `builds/scan/sample-app`, les 2 scans du 13/11 (H1) ; `builds/scan/essai-scan`, les 16 témoins (H2) ; `vulndb/grype`,
+    la base du 13/11 (sans tag depuis le 24/11, 336 h le 27/11 à 12:42:16) et le retrait d'un tag (16/11) (H5) ;
+  - **28/11** : le scan du 14/11 (09:31) et la base du 14/11 (08:11), et le retrait d'un tag (17/11).
+- **`g7-replanifier.sh`** : son modèle (balayage à démarrage + k × 24 h) est réfuté par la mesure du 14/11. Le script n'est pas
+  modifié (accord nommé requis) ; ses lignes « premier balayage » et « heure proposée » du 14/11 ne valent plus.
+- **`lastPullTimestamp`** : les deux décisions relevées portent sur des tags, pas sur des referrers. La mesure du 06/11 a été faite
+  sur une copie du stockage (`g7-predictions.md`, l. 3) et ne tranche pas. Risque laissé ouvert pour H1 et H2.
+- **Consigne du point 3, à compléter avant le point 4** : compter les décisions des balayages du 24/11, du 27/11 et du 28/11
+  séparément ; relever `pushTimestamp` et `lastPullTimestamp` de tout referrer de scan survivant de plus de 336 h ; `fireAt` après
+  la fin du balayage du 28/11, à fixer d'après un second balayage (15/11).

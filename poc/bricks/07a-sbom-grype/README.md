@@ -312,3 +312,5 @@ Mesure de la brique 06 (S6a, relevé 1, [résultats](../06-deb-sbuild/resultats/
 (calcul). G1 à G6 tenues. Relevé en passant : le push du blob vide `{}` par `pousser_vsa` de la 06 a changé sa date de modification
 dans tous les dépôts (mécanisme non vérifié). Détail : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
 Points 3 et 4 (prédiction, consigne et tâche replanifiée) : à faire, chacun sur accord.
+
+**Note du 14/11/2026 (2026-11-14T20:52:18Z), rien n'est réécrit :** l'heure « tâche proposée le 28/11/2026 à 13:02:25 UTC » de l'additif précédent ne vaut plus. Le balayage du 14/11 a commencé à 12:45:50 UTC et fini à 13:22:29 UTC (journal de Zot, [résumé](resultats/g7-balayage-14-11.log)) : le modèle « démarrage + k × 24 h » est réfuté, et les premières suppressions de scans sont attendues dès le balayage du 27/11. Heure de la tâche à fixer après un second balayage (15/11). Détail : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
