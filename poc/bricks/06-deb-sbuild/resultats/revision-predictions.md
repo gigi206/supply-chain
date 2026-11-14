@@ -247,3 +247,17 @@ Si U16 ne tient pas : correctif d'épinglage 1, 13a, puis seulement `prealables`
 « Oui, applique-le » à « J'applique le correctif de sources.sh (option 1) ? ». `git apply` de `revision-sources-option1.patch`
 (df163ce5…) sur 2216693, code 0 ; `bash -n` et `shellcheck -S warning` passés sur `poc/packaging/sources.sh` ; `SDE_DEB` lu dans le
 changelog : 1794693332. Rien n'est lancé. Prochaine ligne : `sources.sh` (réseau), U15, sur accord nommé.
+
+## Option 1, ligne 1 rejouée : `sources.sh` (note de 2026-11-14T22:34:43Z ; rien n'est réécrit)
+« Oui, relance-le » à « Je relance sources.sh (réseau, U15) ? ». `mise run packaging:sources` à b8eec63, à 22:34:07 UTC, code 0
+relevé juste après la commande ([journal](revision-sources-option1.log)) ; chi v5.2.3 vérifié par go.sum, marked conforme au lockfile.
+- **U15 en partie tenue** : orig **1591a05b…** égal à celui de la pipeline ; `sample-app-1.0.0.tar.gz` **07521c1e…** inchangé ; date
+  `SDE_DEB` 1794693332 lue et appliquée (membres du `.debian.tar.xz` datés du 14/11 à 21:55 UTC).
+- **U15 non tenue pour le `.dsc` (ee2a6b8e…) et le `.debian.tar.xz` (0cc3d47e…)**, prédits égaux à b284bd60 et 22cfff1d. **Erreur de
+  la prédiction, pas de la chaîne** : le `.debian.tar.xz` de `sources.sh` porte le umask de l'hôte (664 et 775, lus par `tar -tvJf`),
+  celui de la pipeline les modes de git (644 et 755) ; constat du 11/11/2026 écrit dans `s4d.sh` l. 230-232, que `prealables` traite
+  en comparant membres, tailles et dates seulement (l. 233-235). Ce que la l. 55 du journal du 14/11 donnait pour le `.dsc` et le
+  `.debian.tar.xz` n'était donc pas une valeur attendue de `sources.sh`. En 1.0.0-1 déjà, `.dsc` 7f9cf5d3 côté pipeline contre
+  9050679e côté `sources.sh` (`s4d-prealables.log` à 0907d5f, l. 55-58).
+- Effet attendu sur U17 : l'égalité de l'orig (l. 229) et celle des membres, tailles et dates (l. 233-235) doivent tenir.
+Prochaine ligne : l. 261 de `s1.sh` rejouée, sur accord nommé.

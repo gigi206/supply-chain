@@ -1,0 +1,19 @@
+# sources.sh (révision 1.0.0-2, option 1, ligne 1 rejouée), 2026-11-14T22:34:07Z, HEAD b8eec63, « Oui, relance-le »
+[packaging:sources] $ poc/packaging/sources.sh
+sample-app au commit 3da431dbdf327a05f0d7a7fecad860413578eafa, SOURCE_DATE_EPOCH=1793229566 (2026-10-28T23:19:26Z)
+debian/changelog 1.0.0-2, SOURCE_DATE_EPOCH=1794693332 (2026-11-14T21:55:32Z) : orig et paquet source Debian
+## Modules Go (vendor/)
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+all modules verified
+go : go version go1.24.7 linux/amd64
+  github.com/go-chi/chi/v5 v5.2.3
+  github.com/go-chi/chi/v5
+## marked (web/node_modules/marked)
+  https://registry.npmjs.org/marked/-/marked-16.4.1.tgz : intégrité conforme au lockfile
+## Archives
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app-1.0.0.tar.gz
+1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa  sample-app_1.0.0.orig.tar.gz
+ee2a6b8ef65f2464d4cae5ea7e79b3ec796c01f9efcc53c27bec128695221002  sample-app_1.0.0-2.dsc
+0cc3d47e9c283ff5cefa7c3dd247a9495e05faaee3aed4001159e81de08a4371  sample-app_1.0.0-2.debian.tar.xz
+e1281b3d796db7211865de8fe3602488bfefa7bb47b9bccbbd98d6ef058fcb80  sample-app.spec
+# fin 2026-11-14T22:34:07Z, code 0
