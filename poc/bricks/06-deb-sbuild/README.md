@@ -2002,3 +2002,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-13T15:36:09Z : pod sans label de tâche relevé : assistant d'affinité de Tekton (README de la 08, l. 650), défaut du contrôle de `s4d3.sh` ; correctif préparé à sec, non appliqué ; prédiction P10.
 - 2026-11-13T15:52:32Z : reprise, fin : bloc 06 passé (de 15:36:53 à 15:51:47 UTC, code 0, filtre de l'assistant d'affinité appliqué), C7 à C9 tenues, `fuites` sans secret, CIS inchangé ; **reprise du bloc 06 terminée, P1 à P10 tenues**.
 - 2026-11-14T20:31:22Z : S6b `pousser_vsa` (de 20:30:50 à 20:30:55 UTC, code 0) : VSA du deb poussée dans `builds/vsa/sample-app-deb`, manifeste `bd7c77ec` ; P1 à P6 tenues, P7 non mesurée directement ; `lire_vsa` à suivre, sur accord.
+- 2026-11-14T20:36:05Z : S6b `lire_vsa` (20:35:50 UTC, code 0) : L1 à L5 tenues (VSA acceptée par la clé du domaine seule, provenance par la clé de Chains seule, 12 vérifiées ; aucune connexion hors de Zot) ; **VSA du deb dans Zot terminée**.

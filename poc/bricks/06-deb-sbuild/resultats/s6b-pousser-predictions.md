@@ -79,3 +79,13 @@ Ordre : `pousser_vsa`, puis `lire_vsa`, chacun sur un accord nommé. Le push éc
 - **P6 tenue** : `bilan : tout OK`, code 0.
 - **P7 non mesurée directement** : l'étape ne relève pas les referrers de `builds/vsa/sample-app-deb` avant le push. Le referrer
   unique relevé après est compatible avec P7, sans la prouver (un manifeste identique déjà présent donnerait le même relevé).
+
+## Résultat de `lire_vsa` (note de 2026-11-14T20:36:05Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance s6b.sh lire_vsa (lecture anonyme, quatre essais de clés) ? ». Lancée à 20:35:50 UTC, finie dans la
+même seconde (`date -u` avant et après), code 0 ([journal](s6b-lire_vsa.log)).
+- **L1 tenue** : VSA par `COSIGN_REPOSITORY`, clé du domaine : acceptée, une VSA vérifiée.
+- **L2 tenue** : VSA par `COSIGN_REPOSITORY`, clé de Chains : refusée (« accepted signatures do not match threshold, Found: 0 »).
+- **L3 tenue** : provenance du tag `.att`, clé du domaine : refusée (même motif, « Expected 1 »).
+- **L4 tenue** (forme précisée le 14/11) : témoin, provenance du tag `.att`, clé de Chains actuelle : acceptée, **12 vérifiées**,
+  autant que les enveloppes de Chains relevées sur le deb par C9 de la reprise.
+- **L5 tenue** : chaque essai, un seul `connect()`, vers Zot. **P6 tenue** pour `lire_vsa` : `bilan : tout OK`, code 0.
