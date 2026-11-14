@@ -476,3 +476,9 @@ Réponses aux trois questions de la note précédente, toutes conformes au corre
 3. **« Sauter sans drapeau »** : la porte du deb n'est jouée qu'avec `POUSSER_VSA=1`, comme celle de S4d3.
 
 Le correctif n'est pas appliqué : son application est un accord à part.
+
+## Note datée de 2026-11-14T21:19:48Z : correctif d'intégration appliqué à `rejeu.sh` (rien n'est réécrit)
+
+« Oui, applique-le » à « J'applique rejeu-s6.patch à rejeu.sh et je commite ? ». `git apply` à 21:19:37 UTC ; `bash -n` et
+shellcheck (`-S warning`) sans avertissement ; réciproque applicable ; `rejeu.sh` identique, octet pour octet, à la copie vérifiée à
+sec. **Pas encore rejoué** : R1 à R4 seront jugées au prochain rejeu de zéro, sur accord nommé.

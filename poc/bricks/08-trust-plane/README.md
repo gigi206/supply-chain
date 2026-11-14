@@ -2532,3 +2532,5 @@ plateforme mesuré. Digests retrouvés au bit près : `68e0ae70`, `3a7ca1b1`, `f
 ### Additif du 14/11/2026 (note de 2026-11-14T21:14:38Z) : intégration de S6 de la 06 préparée à sec, NON APPLIQUÉE
 
 Correctif [`rejeu-s6.patch`](rejeu-s6.patch) : étapes S6a et S6b de la 06 après `06 (S4d3)`, porte du deb sous `POUSSER_VSA=1` seulement, attente jusqu'à 13:00 UTC dans la fenêtre des passages planifiés. Détail, trois décisions à prendre et prédictions R1 à R4 : `06-deb-sbuild/resultats/s6a-service-predictions.md`. `rejeu.sh` est inchangé.
+
+**Note du 14/11/2026 (2026-11-14T21:19:48Z) :** `rejeu-s6.patch` appliqué à `rejeu.sh` (« Oui, applique-le ») ; pas encore rejoué.

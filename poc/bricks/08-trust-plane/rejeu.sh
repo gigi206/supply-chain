@@ -40,6 +40,13 @@
 # DEPUIS= : une reprise à une étape antérieure au bloc 08c, la 08c une fois appliquée, casse (kata.sh exemption reposerait le
 # fichier Pod Security sans EventRateLimit, politique.sh chains refuserait le volume de S1, les limites de H5 seraient effacées) :
 # rejeu complet dans ce cas.
+# Additif du 14/11/2026 : S6 de la 06 (décision du propriétaire du 12/11/2026, « (b) intégrer après S6 », après le premier passage
+# manuel réel des étapes, le 14/11/2026), à sec, PAS ENCORE REJOUÉ. Après « 06 (S4d3) », dont la porte attend VSA et scan du deb
+# refusés : S6a periodique (précédée, dans la même étape, d'une attente jusqu'à 13:00 UTC si l'heure tombe dans la fenêtre des
+# passages planifiés, que hors_fenetre de s6a.sh refuse de 09:00 à 12:59 UTC), fraicheur, grafana ; avec POUSSER_VSA=1, S6b
+# pousser_vsa et lire_vsa, puis S6a porte. Sans POUSSER_VSA=1, la porte du deb est sautée comme celle de S4d3 : la clé du scanner
+# n'entre dans la ConfigMap porte que par cm_porte des contrôles 6 et 7 (déduit du code, non mesuré). Une étape par appel : s6a.sh
+# et s6b.sh n'acceptent qu'un argument.
 #
 # Usage (racine du dépôt) : [POUSSER_VSA=1] mise run confiance:rejeu [-- <libellé>]   (journal : resultats/rejeu-<libellé>.log)
 set -euo pipefail
@@ -183,6 +190,29 @@ if [ "$DISTRO" = rke2 ] && [ "$RESEAU" = cilium ]; then
   else
     etape "06 (S4d3)" mise exec -- "$b06/s4d3.sh" retirer prealables deployer chemins
     echo "## 06 s4d3 porte : sautée (POUSSER_VSA=1 absent : elle attend la VSA de sample-app à ok)"
+  fi
+  # S6 de la 06 (14/11/2026) : voir l'additif de l'en-tête. Sans intégration, ScanEnRetard resterait active pour le deb (absent()
+  # par dépôt, posé en O3) et la porte du deb refuserait le scan après chaque rejeu.
+  periodique_s6a() { # attente hors de la fenêtre de hors_fenetre (09:00 à 12:59 UTC), puis periodique : une seule étape, pour
+    local h a        # qu'une reprise par DEPUIS= ne saute pas l'attente
+    h=$(date -u +%H)
+    case $h in
+      09|10|11|12) a=$(( $(date -u -d 'today 13:00' +%s) - $(date +%s) ))
+        echo "## fenêtre des passages planifiés ($h h UTC) : attente de $a s, jusqu'à 13:00 UTC"
+        sleep "$a" ;;
+    esac
+    mise exec -- "$b06/s6a.sh" periodique
+  }
+  etape "06 (S6a, periodique)" periodique_s6a
+  etape "06 (S6a, fraicheur)" mise exec -- "$b06/s6a.sh" fraicheur
+  etape "06 (S6a, grafana)" mise exec -- "$b06/s6a.sh" grafana
+  if [ "${POUSSER_VSA:-}" = 1 ]; then
+    etape "06 (S6b, pousser_vsa)" mise exec -- "$b06/s6b.sh" pousser_vsa
+    etape "06 (S6b, lire_vsa)" mise exec -- "$b06/s6b.sh" lire_vsa
+    etape "06 (S6a, porte)" mise exec -- "$b06/s6a.sh" porte
+  else
+    echo "## 06 s6b pousser_vsa, lire_vsa et s6a porte : sautées (POUSSER_VSA=1 absent : accord du propriétaire à chaque push de"
+    echo "## VSA ; clé du scanner posée dans la ConfigMap porte par les contrôles 6 et 7 seulement)"
   fi
 else
   echo "## 08c, J8 (résolveurs) et 06 : sautés (DISTRO=$DISTRO, RESEAU=$RESEAU ; RKE2 et Cilium seulement)"
