@@ -2057,3 +2057,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - 2026-11-14T22:00:00Z : révision 1.0.0-2, ligne 2 : `s1.sh` l. 261 rejouée seule (21:59:48 UTC, code 0) : `SHA256SUMS.s1` en 1.0.0-2, trois lignes contrôlées.
 - 2026-11-14T22:13:58Z : révision 1.0.0-2, ligne 3 : S3 (22:00:52 à 22:13:25 UTC, code 0, 26 OK) : deb **3c6e6a29** deux fois ; U1 (part S3), U2 à U6 tenues (`Static-Built-Using` présent, binaire 10d475d0 inchangé).
 - 2026-11-14T22:15:59Z : révision 1.0.0-2, correctif d'épinglage 1 appliqué (`DEB_SHA` = 3c6e6a29 dans `s4d.sh`, `s6a.sh`, `s6b.sh`, 13a `paquets.sh` ; témoin N7 de `s5.sh`) ; rien lancé.
+- 2026-11-14T22:17:33Z : révision 1.0.0-2, ligne 4 : 13a `paquets.sh deb modules` sur 3c6e6a29 (22:16:56 à 22:16:59 UTC, code 0) : **U8 tenue**, B2 et B3 de la 13a tenues.

@@ -160,3 +160,7 @@ identique hors de l'en-tête et de l'empreinte de `paquets.py`. **Bascule de M5 
 S5b) vont de a086e2e (21:19:49 UTC) à 5264a31 (21:35:01 UTC), heures de commit : 0:15:12, soit 0,006 pw. Le recompte hors dépôt
 du 13/11 (08:43:32Z) donnait 0,054 à 0,096 pw consommés et 0,10 à 0,20 pw avec la projection des étapes 3, 4 et de la part 13a
 de l'étape 5 : la borne haute touche l'estimation du premier pas (~0,2 pw), sous le seuil de 0,4 pw ; aucune décision due.
+
+*Note du 14/11/2026, 22:17:33 UTC* : `paquets.sh deb modules` sur le deb 1.0.0-2 de la 06 (3c6e6a29, 22:16:56 à 22:16:59 UTC, code 0) :
+**B2 et B3 tenues, bascule de M5 entièrement tenue (B1 à B8)** ; `Static-Built-Using` (axe 1) et notice de Go en `Comment:` (axe 2)
+présents dans le deb ; expression de licence inchangée, 0 erreur.

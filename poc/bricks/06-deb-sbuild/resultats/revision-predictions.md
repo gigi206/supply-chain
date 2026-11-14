@@ -151,3 +151,12 @@ e3227d1, `git apply --check` puis `git apply`, code 0 ; `bash -n` des cinq scrip
 `0b489d43` ne reste, dans les scripts, que là où il désigne le passé : `DEB_S1` de `s2.sh` et `s3.sh` (deb de s1b), commentaires
 de `s4d.sh` l. 11 et de `taches.yml` l. 72, banc X11 de la 13a (`resultats/x11-fichiers.sh`, mesure du 14/11 sur 0b489d43).
 Rien n'est lancé. Prochaine ligne : 13a `paquets.sh` sur N (U8, B2, B3), sur accord nommé.
+
+## Carte, ligne 4 : 13a sur le deb 1.0.0-2 (note de 2026-11-14T22:17:33Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance paquets.sh deb modules (13a) sur le deb 3c6e6a29 ? ». `paquets.sh deb modules` à 408b226, de 22:16:56 à 22:16:59 UTC (`date -u` autour du lanceur), code 0, sur le deb 3c6e6a29 (sha256 épinglé, OK).
+- **U8 tenue** : copyright du deb égal à `debian/copyright` (a3cbcf92…), DEP-5 1.0, 6 paragraphes, expression
+  `Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)` ; `licences.py` : 0 erreur, 0 NOASSERTION, 0 invalide ; quatre témoins refusés.
+- **B2 et B3 de la bascule de M5 tenues** (`modules`) : `control : Static-Built-Using golang-1.24 (= 1.24.4-1)`, ligne OK « paquet
+  source et version amont égaux à go1.24.4 du buildinfo » ; ÉCART « … Comment d'en-tête présent, contenu non contrôlé ;
+  Static-Built-Using golang-1.24 (= 1.24.4-1) » ; témoin chi refusé. Journaux de la 13a réécrits (versions sur 0b489d43 à 5264a31).
+Prochaine ligne : S4c `verrou publier` (écriture dans Zot), sur accord nommé.

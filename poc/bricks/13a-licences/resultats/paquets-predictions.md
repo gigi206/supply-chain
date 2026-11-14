@@ -561,3 +561,8 @@ de la bibliothèque standard et le témoin refusé. `chrono.tsv` : deux lignes a
 
 **Bascule de M5 : B1 et B4 à B8 tenues** ; le deb 1.0.0-1, sans `Static-Built-Using`, sort comme avant. B2 et B3 se jugeront sur le deb
 de la révision 1.0.0-2 (étape 5 d'`apres-s5b.md`, après recompte du consommé de la 06 pour la règle des 2×).
+
+*Note du 14/11/2026, 22:17:33 UTC* : `paquets.sh deb modules` à 408b226, de 22:16:56 à 22:16:59 UTC (`date -u` autour du lanceur), code 0, sur le deb 3c6e6a29 (sha256 épinglé, OK), cascade de la révision 1.0.0-2 de la 06 :
+**B2 tenue** (`control : Static-Built-Using golang-1.24 (= 1.24.4-1)` et ligne OK du contrôle croisé, code 0) ; **B3 tenue** (ÉCART
+« … Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.4-1) »). **Bascule de M5 : B1 à B8
+tenues.** Étape `deb` : expression inchangée, 0 erreur (U8 de la 06).

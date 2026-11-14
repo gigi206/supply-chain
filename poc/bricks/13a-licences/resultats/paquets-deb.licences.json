@@ -13,7 +13,7 @@
   "sourceObligations": [],
   "components": [
     {
-      "purl": "pkg:deb/debian/sample-app@1.0.0-1?arch=amd64",
+      "purl": "pkg:deb/debian/sample-app@1.0.0-2?arch=amd64",
       "source": "sbom",
       "reasons": [],
       "expression": "Apache-2.0 AND MIT AND (MIT AND BSD-3-Clause)",
