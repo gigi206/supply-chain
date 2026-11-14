@@ -1,0 +1,16 @@
+# s6a.sh porte, 2026-11-14T21:07:02Z
+## préalables (lectures anonymes)
+OK   builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e présent dans Zot
+referrers du deb dans builds/vsa/sample-app-deb : 1, VSA attendue : ok
+## porte sur le deb (comme l'étape porte de s4d3.sh)
+OK   PipelineRuns en cours dans builds : 0
+passage d'horodatage horodatage-29911508
+provenance de PipelineRun la plus récente du deb (seule jugée) : 37a8e87a-d5b5-406c-970e-616739e0bea5
+VERDICT|s6a-deb|true||trusted_task.tagged|2|ok|12/12 enveloppe(s) couverte(s), 12 bundle(s) vérifié(s) dans sc-stockage.poc.test:5000/horodatage/bundles|ok|1/1 VSA retenue(s) dans sc-stockage.poc.test:5000/builds/vsa/sample-app-deb|ok|1 énoncé(s) vérifié(s) dans sc-stockage.poc.test:5000/builds/scan/sample-app-deb
+OK   deb : succès de ec : true
+OK   deb : violations : 
+OK   deb : horodatage : ok
+OK   deb : VSA : ok
+OK   deb : scan : ok
+OK   Job de la porte : 1/
+bilan : tout OK

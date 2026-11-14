@@ -401,3 +401,18 @@ code 0 ([journal](../../19-observabilite/resultats/s6a-deployer.log)).
   alerte dans Prometheus ni dans Alertmanager ; deux séries de scan présentes (`sample-app` 1794648711, `sample-app-deb`
   1794690095).
 - Suite : la porte du deb (point 6, Q9), sur accord.
+
+## Note datée de 2026-11-14T21:08:39Z : point 6 fait, porte du deb ; S6a terminé (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance DISTRO=rke2 s6a.sh porte (porte du deb, Job dans le cluster) ? ». De 21:07:02 à 21:08:16 UTC,
+code 0, `bilan : tout OK` ([journal](s6a-porte.log)). Passage d'horodatage `horodatage-29911508` ; provenance jugée : celle du
+PipelineRun le plus récent du deb (`37a8e87a…`, la même qu'à S4d3 le 13/11).
+- **Q9 tenue** : `success` de ec à `true`, aucune violation, avertissement `trusted_task.tagged` (comme à S4d3) ; horodatage `ok`
+  (12/12 enveloppes couvertes) ; **VSA `ok`** (1/1 VSA retenue dans `builds/vsa/sample-app-deb`) ; **scan `ok`** (1 énoncé
+  vérifié dans `builds/scan/sample-app-deb`, premier jugement de `scan.rego` sur un deb) ; **Job de la porte réussi** (`1/`).
+- **S6a terminé** : points 1 à 6 et étape `grafana` passés, Q1 à Q10 tenues, sauf la ligne de journal de Q6, non mesurée par
+  `fraicheur` mais vue par Loki dans `grafana`.
+- Effet attendu, désormais réel : un nouveau passage de `s4d3.sh porte`, qui attend VSA et scan du deb **refusés**, échouerait
+  tant que Zot garde ces referrers (contrainte 1 de l'intégration au rejeu, plus haut) ; un rejeu de zéro les efface.
+- Suite (décision « (b) intégrer après S6 » du 12/11) : préparer à sec le diff de `rejeu.sh`, puis le soumettre à un accord nommé,
+  avec les deux points laissés ouverts (élargissement de `POUSSER_VSA=1` à la VSA du deb ; fenêtre de `hors_fenetre`).
