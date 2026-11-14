@@ -74,3 +74,18 @@ Les champs entre chevrons viennent du relevé du point 2. Le reste reprend la co
 
 - Les dates viennent de la date de modification des blobs, comme pour le calcul du 06/11. La règle de Zot porte sur l'âge des manifestes : un écart entre les deux décalerait la première décision.
 - Les balayages sont supposés tomber à « démarrage de Zot + k × 24 h ». C'était l'hypothèse du 06/11 ; elle n'a jamais été mesurée.
+
+## Note datée de 2026-11-14T20:41:05Z : avant le relevé, après S5b (rien n'est réécrit)
+
+- **Point 1 fait** : la tâche `supply-chain-g7-premiere-suppression` est désactivée (`enabled: false`, relu ce jour dans la liste
+  des tâches planifiées), non supprimée.
+- **Condition du point 2 remplie** : S5b est terminé (13/11, 15:51:47 UTC, `2cec0df`) ; `periodique` de S6a n'a pas tourné, et
+  plus de 24 h ont passé. Le relevé peut donc se faire sans l'attendre.
+- **Prédictions ajoutées** (relues dans les journaux de S5b, pas dans Zot) :
+  - **G5.** `builds/scan/sample-app-deb` n'a aucun blob : S6a n'a pas tourné (le dépôt n'apparaît pas dans la liste par dépôt).
+    Confiance haute.
+  - **G6.** `builds/scan/essai-scan` a des blobs du 13/11, écrits par `g6_temoins` de la 07a pendant S5b, à partir de 12:48:42 UTC
+    (`08-trust-plane/resultats/rejeu-s5b-plateforme-ctl.log`). Confiance haute.
+  - **G3 précisée** : le plus récent blob de `builds/scan/sample-app` date du 14/11, vers 09:30 UTC (CronJob du jour). Confiance
+    moyenne : le passage du 14/11 n'a pas été relu.
+- Le relevé lit `/etc/zot/config.json` par sudo sur la VM et ne garde que les champs de rétention et de gc (sans secret).
