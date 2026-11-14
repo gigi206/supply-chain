@@ -2007,3 +2007,4 @@ chaîne) vient après, avec la cascade 1.0.0-2.
 - 2026-11-14T20:58:56Z : S6a, point 2 : `periodique` à sec, code 0, Q1 tenue, rien d'écrit.
 - 2026-11-14T21:02:27Z : S6a, point 3 : `periodique` (20:59:40 à 21:01:45 UTC, code 0) : CronJob `scan-sample-app-deb` en service, premier scan du deb publié (`256c3190`, 67 vulnérabilités, 0 KEV) ; Q2 à Q5 tenues.
 - 2026-11-14T21:03:36Z : S6a, point 4 : `fraicheur` (21:02:50 à 21:03:17 UTC, code 0) : trois séries dans Prometheus ; Q6 tenue pour les séries, ligne de journal non mesurée (instrument).
+- 2026-11-14T21:04:37Z : S6a, `grafana` (21:04:19 UTC, code 0) : Q10 tenue ; ligne de journal de `fraicheur-scan` vue par Loki.

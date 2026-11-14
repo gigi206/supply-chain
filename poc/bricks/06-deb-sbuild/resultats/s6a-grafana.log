@@ -1,0 +1,26 @@
+# s6a.sh grafana, 2026-11-14T21:04:19Z
+## préalables
+periodique à partir de 2026-11-14T20:59:40Z, fraicheur à partir de 2026-11-14T21:02:50Z
+OK   aucun passage planifié depuis periodique (scan-sample-app, scan-sample-app-deb)
+## journaux du passage s6a-manuel, lus par l'auditeur (Loki ingère avec quelques secondes de retard)
+14 ligne(s) après 1 essai(s), non affichées
+OK   visible dans Grafana : ^SOURCE| : oui
+OK   visible dans Grafana : ^BASE| : oui
+OK   visible dans Grafana : ^DEB|sample-app_1.0.0-1_amd64.deb : oui
+OK   visible dans Grafana : ^ARTEFACT|deb,  : oui
+OK   visible dans Grafana : ^SCAN| : oui
+OK   visible dans Grafana : ^ATTESTATION| : oui
+OK   visible dans Grafana : ^PUBLIE| : oui
+OK   visible dans Grafana : jeton du rôle scanner révoqué : oui
+OK   PUBLIE dans Grafana égal au journal de periodique : sc-stockage.poc.test:5000/builds/scan/sample-app-deb@sha256:256c31902a4677cdb24b0629e1a1bac9b932d75357b81577344d050d9f3a573e, referrer de sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+## audit d'OpenBao et de Zot, lus par l'auditeur
+OK   signature du scanner dans l'audit d'OpenBao, visible dans Grafana : oui
+  2 ligne(s) d'audit (non affichées)
+OK   poussage par poc-scan dans builds/scan/sample-app-deb, visible dans Grafana : oui
+## journal de fraicheur-scan, lu par l'auditeur
+  scan builds/scan/sample-app=1794648711 builds/scan/sample-app-deb=1794690095, base 1794637165
+OK   mesures des deux dépôts visibles dans Grafana : oui
+## identifiants de poc-scan absents des réponses
+OK   mot de passe de poc-scan ou son encodage docker dans les réponses de Grafana : non
+OK   requêtes de l'auditeur en HTTP 200 : oui
+bilan : tout OK

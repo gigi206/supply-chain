@@ -361,3 +361,17 @@ code 0, `bilan : tout OK` ([journal](s6a-periodique.log), [bundle](s6a-periodiqu
   (`journalctl -n 2`), qui sont celles de systemd. Défaut de l'instrument, pas de la plateforme ; l'étape `grafana` relit ce
   journal par Loki.
 - Suite : `grafana` (lecture seule), avant le scan planifié de l'image du 15/11 à 09:30 UTC.
+
+## Note datée de 2026-11-14T21:04:37Z : étape `grafana` faite (rien n'est réécrit)
+
+« Oui, lance-le » à « Je lance s6a.sh grafana (lectures seules par l'auditeur) ? ». À 21:04:19 UTC (début et fin dans la même
+seconde d'après `date -u`), code 0, `bilan : tout OK` ([journal](s6a-grafana.log)).
+- **Q10 tenue** : aucun passage planifié depuis `periodique` ; 14 lignes du job `s6a-manuel` lues par l'auditeur (non affichées),
+  `SOURCE|`, `BASE|`, `DEB|sample-app_1.0.0-1_amd64.deb`, `ARTEFACT|deb`, `SCAN|`, `ATTESTATION|`, `PUBLIE|` visibles ; une ligne
+  `OK` contenant le motif jeton|token (la révocation du jeton du scanner), masquée à l'écran, préfixe `OK` relu dans le journal ;
+  `PUBLIE|` égale à celle de `periodique` ; signature du scanner dans l'audit d'OpenBao (2 lignes, non affichées) ; poussage par
+  `poc-scan` dans `builds/scan/sample-app-deb` dans l'audit de Zot ; ligne de `fraicheur-scan`
+  `scan builds/scan/sample-app=1794648711 builds/scan/sample-app-deb=1794690095, base 1794637165` ; ni mot de passe de `poc-scan`
+  ni son encodage dans les réponses ; requêtes en HTTP 200. Réponses de Grafana effacées (dossier absent après l'étape).
+- **La ligne de journal de Q6, non mesurée par `fraicheur`, est vue ici** (par Loki), avec les mêmes valeurs que les séries.
+- Suite : point 5, `mise run observabilite -- regles` puis `deployer` (19), chacun sur accord ; puis la porte (point 6).
