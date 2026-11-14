@@ -111,3 +111,13 @@ Les trois correctifs d'épinglage et l'étape 2 s'ajoutent à la cascade compté
 (`cmp`) ; `bash -n` des sept scripts touchés ; `1.0.0-1` ne reste, hors textes, que là où la carte le garde (`s2.sh` l. 39,
 `s3.sh` l. 43, `s4c.sh` l. 32, banc OBS, spec, ancienne entrée du changelog, commentaire de `sources.sh`). Rien n'est lancé ;
 prochaine ligne : `sources.sh` (réseau), sur accord nommé.
+
+## Carte, ligne 1 : `sources.sh` (note de 2026-11-14T21:57:39Z ; rien n'est réécrit)
+« Oui, lance-le » à « Je lance sources.sh (réseau) ? ». `mise run packaging:sources` de 21:57:18 à 21:57:19 UTC, code 0, à 593cee4
+([journal](revision-sources.log)) ; témoin 1.0.0-1 du cache contrôlé avant (`sha256sum -c`, 5 OK).
+- **U7 tenue** : chi v5.2.3 téléchargé, `go mod verify` « all modules verified » (go 1.24.7) ; marked 16.4.1 conforme à l'intégrité
+  du lockfile ; orig **07521c1e…** (140 171 octets), inchangé ; spec e1281b3d inchangé.
+- Paquet source 1.0.0-2 : `.dsc` **92335109…**, `.debian.tar.xz` **86e30d04…** (4 196 octets) ; le `.dsc` référence l'orig 07521c1e ;
+  `debian/` extrait du `.debian.tar.xz` égal à `poc/packaging/debian/` (`diff -r`) ; `SHA256SUMS` du cache : 5 OK.
+  Les fichiers 1.0.0-1 du cache sont effacés par `sources.sh` (l. 52) ; témoin gardé dans `13a-axes12-esquisse/temoin-1.0.0-1/`.
+Prochaine ligne : commande de `s1.sh` l. 261 rejouée seule (`SHA256SUMS.s1`), sur accord nommé.

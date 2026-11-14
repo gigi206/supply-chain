@@ -1,0 +1,18 @@
+# sources.sh (révision 1.0.0-2, ligne 1 de la carte), 2026-11-14T21:57:18Z, HEAD 593cee4, « Oui, lance-le »
+[packaging:sources] $ poc/packaging/sources.sh
+sample-app au commit 3da431dbdf327a05f0d7a7fecad860413578eafa, SOURCE_DATE_EPOCH=1793229566 (2026-10-28T23:19:26Z)
+## Modules Go (vendor/)
+go: downloading github.com/go-chi/chi/v5 v5.2.3
+all modules verified
+go : go version go1.24.7 linux/amd64
+  github.com/go-chi/chi/v5 v5.2.3
+  github.com/go-chi/chi/v5
+## marked (web/node_modules/marked)
+  https://registry.npmjs.org/marked/-/marked-16.4.1.tgz : intégrité conforme au lockfile
+## Archives
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app-1.0.0.tar.gz
+07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb  sample-app_1.0.0.orig.tar.gz
+923351093d6253da417d99beb21847a697333ece2e27ad2d23b71c23fa2d5b04  sample-app_1.0.0-2.dsc
+86e30d04f138e7fbd5581ca4d21134d4c69b15e0e561f809d99d19bbce4b6aec  sample-app_1.0.0-2.debian.tar.xz
+e1281b3d796db7211865de8fe3602488bfefa7bb47b9bccbbd98d6ef058fcb80  sample-app.spec
+# fin 2026-11-14T21:57:19Z, code 0
