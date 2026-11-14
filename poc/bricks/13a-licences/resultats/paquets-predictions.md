@@ -542,3 +542,11 @@ Accord : « Oui, lance-le » à « Je lance le banc de la bascule M5 ? » ; HEAD
 
 Restent : B8 (banc de `modules` rejoué), B1 (`paquets.sh modules` sur le vrai deb), chacun sur accord nommé ; B2 et B3 avec la
 révision 1.0.0-2. Ce banc porte sur go1.24.7 de mise, pas sur le go1.24.4 du deb.
+
+## Résultat de B8 : banc de `modules` rejoué le 14/11/2026, de 21:33:31 à 21:33:38 UTC (`date -u`), code 0 (écrit à 21:33:54 UTC)
+
+Accord : « Oui, lance-le » à « Je lance le banc de modules rejoué (B8) ? » ; HEAD = origin = 4a86777. **B8 tenue** : neuf lignes `OK`
+en colonne 0 (six cas et trois concordances avec `go version -m`), aucune ligne `KO` en colonne 0. Le journal
+[`paquets-modules-essai-local.log`](paquets-modules-essai-local.log) est réécrit ; `git diff` contre 4a86777 : **une seule ligne
+change, l'en-tête** (heure et `paquets.py` `0e49bbf9…` au lieu de `8d4bb025…`) ; tout le reste est identique au passage du
+12/11/2026 (20:47:32 UTC), qui reste lisible dans git. Reste B1 (`paquets.sh modules` sur le vrai deb), sur accord nommé.

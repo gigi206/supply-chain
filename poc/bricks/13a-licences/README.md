@@ -149,3 +149,6 @@ attendent la révision 1.0.0-2.
 *Note du 14/11/2026, 21:32:46 UTC* : banc de la bascule de M5 lancé de 21:32:22 à 21:32:28 UTC (« Oui, lance-le »), code 0, dix `OK`, aucun
 `KO` ([journal](resultats/paquets-m5-essai-local.log)) : **B4 à B7 tenues** ; sans le champ, sortie identique à celle d'avant la bascule.
 Restent B8 et B1 (accord nommé), B2 et B3 avec la révision 1.0.0-2.
+
+*Note du 14/11/2026, 21:33:54 UTC* : banc de `modules` rejoué avec la bascule (21:33:31 à 21:33:38 UTC, code 0) : **B8 tenue**, journal
+identique à celui du 12/11 hors de l'en-tête. Reste B1 sur le vrai deb.
