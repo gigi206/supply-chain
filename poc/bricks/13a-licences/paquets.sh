@@ -42,7 +42,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 repo=$(git -C "$here" rev-parse --show-toplevel)
 R=$here/resultats
 DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb}
-DEB_SHA=3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa   # deb des deux builds de S3 (06, s3-comparaison.log)
+DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b   # deb des deux builds de S3 (06, s3-comparaison.log)
 SRC=${SRC:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/restauree-1/golang-1.24-src_1.24.4-1_all.deb}
 SRC_SHA=c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1   # verrou-deb.txt (golang-1.24-src 1.24.4-1)
 SRC_BI="golang-1.24-src (= 1.24.4-1)"                                       # s3-build-1.buildinfo de la 06

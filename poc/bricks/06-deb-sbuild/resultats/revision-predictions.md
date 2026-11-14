@@ -281,3 +281,10 @@ de 22:36:53 à 22:49:10 UTC, code 0 relevé juste après la commande, 26 OK, 0 K
   golang-1.24 (= 1.24.4-1)`, `Installed-Size` 5785 ; binaire 10d475d0 ; copyright égal au dépôt (`cmp`).
 - **Conséquence** (prévue par la note de décision) : correctif d'épinglage 1 à refaire (`DEB_SHA` = f66bbeb2, témoin N7 de `s5.sh`) et
   13a à relancer ; S4c (f0ed7a71) et S4b (fermetures) ne dépendent pas du deb. Puis `prealables`.
+
+## Option 1, correctif d'épinglage 1 bis (note de 2026-11-14T22:51:45Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique l'épinglage 1 bis (deb f66bbeb2) ? ». N' relu sur le deb du build 1 et dans `s3-comparaison.log` ;
+[`../revision-epinglage-1b.patch`](../revision-epinglage-1b.patch) (sha256 77e61498…) généré depuis HEAD 7f552a5 (le correctif 1 reste
+archivé tel quel), `git apply --check` puis `git apply`, code 0 ; `bash -n` des cinq scripts passé. `DEB_SHA` = f66bbeb2 dans `s4d.sh`,
+`s6a.sh`, `s6b.sh`, 13a `paquets.sh` ; témoin N7 de `s5.sh` : `f66bbeb2`. Plus aucune occurrence de 3c6e6a29 dans les scripts.
+Rien n'est lancé. Prochaine ligne : 13a `paquets.sh deb modules` sur N', sur accord nommé.

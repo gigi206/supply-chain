@@ -1,0 +1,60 @@
+diff -ruN a/poc/bricks/06-deb-sbuild/s4d.sh b/poc/bricks/06-deb-sbuild/s4d.sh
+--- a/poc/bricks/06-deb-sbuild/s4d.sh
++++ b/poc/bricks/06-deb-sbuild/s4d.sh
+@@ -59,7 +59,7 @@
+ S4B=$W/s4b-06   # copies tirées par digest en S4b : comparaison/deb (fermeture deb), comparaison/sources (applicative), packaging
+ PKG=$HOME/.cache/supply-chain-poc/packaging   # archive de sources.sh (S1 à S3) : 07521c1e…
+ DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+-DEB_SHA=3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa   # S3, révision 1.0.0-2 (14/11/2026)
++DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b   # S3, révision 1.0.0-2 (14/11/2026)
+ GO=$HOME/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/bin   # même version que l'image de prefetch
+ LISTE_REVUE=$here/politique/porte/taches.yml
+ LAYOUT_PREFETCH=$HOME/.cache/supply-chain-poc/03/f2/layout   # layout de l'image de prefetch (prefetch.sh image, brique 03), 68e0ae70
+diff -ruN a/poc/bricks/06-deb-sbuild/s5.sh b/poc/bricks/06-deb-sbuild/s5.sh
+--- a/poc/bricks/06-deb-sbuild/s5.sh
++++ b/poc/bricks/06-deb-sbuild/s5.sh
+@@ -457,7 +457,7 @@
+   r=$(tr_lancer s5-n7-kata); tr_journal s5-n7-kata 8
+   mesure "N7 témoin : TaskRun" "$r" "True|Succeeded"
+   mesure "N7 témoin : pod (tekton.dev/task|nœud|runtime)" "$(tr_pod s5-n7-kata)" "construire-deb|sc-build|kata"
+-  mesure "N7 témoin : deb de S3 et S4d" "$(grep -o 'deb produit : [^ ]* [0-9a-f]*' "$T/s5-n7-kata.log" | awk '{print $4}' | cut -c1-8)" 3c6e6a29
++  mesure "N7 témoin : deb de S3 et S4d" "$(grep -o 'deb produit : [^ ]* [0-9a-f]*' "$T/s5-n7-kata.log" | awk '{print $4}' | cut -c1-8)" f66bbeb2
+   mesure "N7 témoin : DIGEST_CONSTRUIT" "$(tr_resultat s5-n7-kata DIGEST_CONSTRUIT)" "$DEB_DIGEST"
+   for r in s5-n7-hors-kata s5-n7-kata; do echo "     $r : chains.tekton.dev/signed « $(tr_signe $r) »"; done
+   ecarts
+diff -ruN a/poc/bricks/06-deb-sbuild/s6a.sh b/poc/bricks/06-deb-sbuild/s6a.sh
+--- a/poc/bricks/06-deb-sbuild/s6a.sh
++++ b/poc/bricks/06-deb-sbuild/s6a.sh
+@@ -42,7 +42,7 @@
+ R=$h06/resultats
+ T=$HOME/.cache/supply-chain-poc/06/s6a
+ DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+-DEB_SHA=3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa      # deb de S3, révision 1.0.0-2 (14/11/2026)
++DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b      # deb de S3, révision 1.0.0-2 (14/11/2026)
+ G0=$HOME/.cache/supply-chain-poc/07a/g0                                          # base grype du 04/11/2026 (G0 de la 07a)
+ SCAN_OUTIL=$HOME/.cache/supply-chain-poc/07a/outil/scan-outil                    # construit depuis 07a-sbom-grype/outil
+ BASE=$HOME/.cache/supply-chain-poc/08/telechargements/oci/amont/sigstore/cosign/cosign
+diff -ruN a/poc/bricks/06-deb-sbuild/s6b.sh b/poc/bricks/06-deb-sbuild/s6b.sh
+--- a/poc/bricks/06-deb-sbuild/s6b.sh
++++ b/poc/bricks/06-deb-sbuild/s6b.sh
+@@ -100,7 +100,7 @@
+ R=$h06/resultats
+ T=$HOME/.cache/supply-chain-poc/06/s6b
+ DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
+-DEB_SHA=3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa      # deb de S3, révision 1.0.0-2 (14/11/2026)
++DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b      # deb de S3, révision 1.0.0-2 (14/11/2026)
+ DEB_DIGEST=sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+ ZOT=192.168.161.13:5000                                                         # Zot du PoC depuis l'hôte, lecture anonyme
+ CA=$HOME/.cache/supply-chain-poc/10/ca-poc.crt                                  # copie publique de la CA du PoC (brique 10)
+diff -ruN a/poc/bricks/13a-licences/paquets.sh b/poc/bricks/13a-licences/paquets.sh
+--- a/poc/bricks/13a-licences/paquets.sh
++++ b/poc/bricks/13a-licences/paquets.sh
+@@ -42,7 +42,7 @@
+ repo=$(git -C "$here" rev-parse --show-toplevel)
+ R=$here/resultats
+ DEB=${DEB:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb}
+-DEB_SHA=3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa   # deb des deux builds de S3 (06, s3-comparaison.log)
++DEB_SHA=f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b   # deb des deux builds de S3 (06, s3-comparaison.log)
+ SRC=${SRC:-$HOME/.cache/supply-chain-poc/08/travail/s3-06/restauree-1/golang-1.24-src_1.24.4-1_all.deb}
+ SRC_SHA=c396bc2c2e94606e0a060cff52b9bbbf1d7cefacb040eb3c40a55604111e66e1   # verrou-deb.txt (golang-1.24-src 1.24.4-1)
+ SRC_BI="golang-1.24-src (= 1.24.4-1)"                                       # s3-build-1.buildinfo de la 06

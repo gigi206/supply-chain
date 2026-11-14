@@ -2067,3 +2067,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - 2026-11-14T22:34:43Z : révision 1.0.0-2, option 1 : `sources.sh` relancé (22:34:07 UTC, code 0) : orig **1591a05b** égal à celui de la pipeline, archive complète 07521c1e inchangée ; `.dsc` et `.debian.tar.xz` différents par les modes, comme en 1.0.0-1 (prédiction U15 trop large, corrigée par note).
 - 2026-11-14T22:35:45Z : révision 1.0.0-2, option 1 : `s1.sh` l. 261 rejouée (22:35:34 UTC, code 0) : `SHA256SUMS.s1` sur l'orig 1591a05b.
 - 2026-11-14T22:50:09Z : révision 1.0.0-2, option 1 : S3 relancée (22:36:53 à 22:49:10 UTC, code 0, 26 OK) : deb **f66bbeb2** deux fois, **U16 non tenue** (date du copyright dans le deb : 28/10 avant, 14/11 maintenant) ; épinglage 1 et 13a à refaire.
+- 2026-11-14T22:51:45Z : révision 1.0.0-2, option 1 : correctif d'épinglage 1 bis appliqué (`DEB_SHA` = f66bbeb2) ; rien lancé.
