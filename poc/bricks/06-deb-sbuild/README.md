@@ -2040,3 +2040,12 @@ Heures prises dans git (heure de commit) et dans les messages de commit ; base d
   et en relit (porte, `lire_vsa`) pendant la fenêtre de G7 (balayage du 28/11). Le recouvrement avec `lastPullTimestamp` des
   referrers de `builds/scan/**` n'est pas vérifié (`07a-sbom-grype/resultats/g7-replanification.md`) ; à trancher dans la
   préparation à sec.
+- Note de 2026-11-14T21:50:27Z (rien n'est réécrit) : le point ouvert ci-dessus est **clos par lecture du code de Zot v2.1.22** : le retrait d'un
+  referrer de scan se juge sur la date de modification du blob, pas sur `lastPullTimestamp` (note du même jour dans
+  `07a-sbom-grype/resultats/g7-replanification.md`). Aucun verrou G7 sur la cascade.
+
+**Note du 14/11/2026 (2026-11-14T21:50:27Z) : révision 1.0.0-2 préparée à sec, NON APPLIQUÉE, RIEN LANCÉ** (« Oui, prépare-la ») :
+[carte et prédictions U1 à U14](resultats/revision-predictions.md), correctif [`revision-1.0.0-2.patch`](revision-1.0.0-2.patch)
+(`debian/` des axes 1 et 2 de la 13a, `sources.sh` qui lit la révision dans le changelog, noms de fichiers des scripts de la 06 et
+de la 13a). Treize étapes, chacune sur accord nommé, dont trois correctifs d'épinglage écrits après mesure (deb de S3, artefact de
+packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bornée à 1.0.0-1 (banc supprimé le 29/10/2026).

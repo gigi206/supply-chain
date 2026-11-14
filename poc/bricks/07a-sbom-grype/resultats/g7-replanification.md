@@ -211,3 +211,16 @@ Lu dans les lignes brutes du 14/11 (hors du dépôt), sans nouvelle lecture de l
 - **Consigne du point 3, à compléter avant le point 4** : compter les décisions des balayages du 24/11, du 27/11 et du 28/11
   séparément ; relever `pushTimestamp` et `lastPullTimestamp` de tout referrer de scan survivant de plus de 336 h ; `fireAt` après
   la fin du balayage du 28/11, à fixer d'après un second balayage (15/11).
+
+## Note de 2026-11-14T21:50:27Z : `lastPullTimestamp` lu dans le code de Zot, et lectures déjà faites (rien n'est réécrit)
+Préparation de la révision 1.0.0-2 de la 06 (lecture seule, aucune lecture de la VM).
+- **Code de Zot v2.1.22** (`pkg/storage/gc/gc.go` au tag v2.1.22, et copie du cache `07a/zot-src/gc.go`, même logique) : un
+  referrer dont le sujet n'est pas dans son dépôt (cas de `builds/scan/**`, R5) est retiré par `removeReferrer`, puis
+  `removeManifestIfOlderThan`, puis `isBlobOlderThan`, qui compare la **date de modification du blob** (`StatBlob`) à `retention.delay`.
+  Le mot « pull » n'apparaît pas dans `gc.go`. D'après le code, un tirage ne repousse donc pas H1 ni H2 ; `lastPullTimestamp`
+  sert aux règles de rétention des tags (`retention.go`, `pulledWithin`, `mostRecentlyPulledCount`), que la configuration
+  n'utilise pas pour les scans. **Risque de la note de 20:52:18Z clos par lecture du code, à confirmer par la mesure du 27/11.**
+- **Lectures déjà faites des scans du 13/11** (journaux archivés) : contrôle 7 de S5b à 12:48:15 UTC (`08-trust-plane/resultats/
+  rejeu-s5b-plateforme-ctl.log` l. 1461-1464, `LECTURE|2`) et porte de la reprise du bloc 06 à 15:50:11 UTC
+  (`08-trust-plane/resultats/rejeu-s5b-06-c.log` l. 245, « 2 énoncé(s) vérifié(s) dans …/builds/scan/sample-app »). La porte de
+  S6a du 14/11 ne juge que le deb (`06-deb-sbuild/resultats/s6a-porte.log` l. 9).
