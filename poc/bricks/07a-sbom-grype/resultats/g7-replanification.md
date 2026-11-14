@@ -111,3 +111,65 @@ Les champs entre chevrons viennent du relevé du point 2. Le reste reprend la co
   ici (le plus ancien blob, `7af558b5…`, n'est pas `{}`), mais un « plus récent » lu de cette façon peut être faux.
 - Suite (points 3 et 4) : prédiction et consigne de la tâche réécrites d'après ce relevé, puis tâche replanifiée et réactivée, chacun
   sur accord.
+
+## Point 3 : prédiction et consigne réécrites d'après le relevé (note de 2026-11-14T20:45:57Z, « Oui, prépare-la » ; rien n'est réécrit au-dessus)
+
+**Rien n'est modifié dans la tâche planifiée** : elle reste désactivée, avec l'ancienne consigne, jusqu'au point 4 (accord à part).
+
+### Origine de `builds/scan/essai-07a`, relue
+`plateforme.sh g1_droits` de la 07a (journal `08-trust-plane/resultats/rejeu-s5b-plateforme-ctl.log`, l. 990) : `oras push` d'un
+artefact d'essai **sans sujet**, poussé par digest, **sans tag**, par `poc-scan`. Ce n'est pas un referrer, et la règle de
+`builds/scan/**` ne supprime que les referrers (`deleteUntagged: false`). **Aucune décision attendue pour lui** (confiance moyenne :
+lecture du script, pas de la VM). Il fixe le « plus ancien blob » du relevé sans être supprimable.
+**Correction du raisonnement, pas de la date** : le plus ancien *referrer* est le premier scan de `builds/scan/sample-app`
+(13/11, 12:45:07 UTC). Première décision possible **pour un referrer de `builds/scan/**`** le 27/11 à 12:45:07 UTC, au lieu de 12:41:47 ; **même
+balayage** (28/11, 12:17:25 UTC) et **même heure proposée** (28/11/2026, 13:02:25 UTC).
+
+### `vulndb/grype` décide avant le 28/11 (relu avant le commit, sur relecture du conseiller)
+Le retrait d'un tag se fait au compte (11 les plus récents), sans attendre `retention.delay` (`g7-predictions.md`, l. 14, et sa
+mesure du 06/11, l. 39 et 60 : tag retiré alors que la base était plus jeune que le délai). Avec une base et un tag par jour
+depuis le 13/11, le 12ᵉ tag arrive le 24/11 vers 08:11 UTC : le balayage du 24/11 vers 12:17 UTC retire le tag du 13/11, puis
+un tag par balayage. **Les premières décisions réelles du nouveau Zot sont donc attendues le 24/11, dans `vulndb/grype`** ; le
+28/11 reste la date des premières suppressions de referrers de scan (G7 proprement dite) et des premières bases effacées.
+
+### Prédictions du balayage du 28/11 (vers 12:17 UTC), dépôt par dépôt
+Hypothèses, jamais mesurées : balayages à démarrage de Zot + k × 24 h ; âge d'un manifeste lu sur la date de son blob, comme le
+06/11 (`g7-predictions.md`, l. 12) ; Zot non redémarré d'ici là ; CronJob de scan et timer de la base quotidiens jusqu'au 28/11.
+
+| # | Dépôt | Prédit | Confiance |
+|---|---|---|---|
+| H1 | `builds/scan/sample-app` | **3 referrers supprimés** : les scans du 13/11 (12:45 et 12:47 UTC, rejeu) et du 14/11 (09:31 UTC) ; ceux du 15/11 au 28/11 restent | Moyenne : une paire de blobs par scan (manifeste et bundle) lue dans le relevé |
+| H2 | `builds/scan/essai-scan` | Tous ses referrers supprimés (témoins de G6 du 13/11, 12:49 UTC) : **16**, d'après 32 blobs hors `{}` lus par paires comme en H1 (même nombre que le 06/11) | Moyenne |
+| H3 | `builds/scan/essai-07a` | Aucune décision (artefact sans sujet ni tag) | Moyenne |
+| H4 | `builds/scan/sample-app-deb` | Absent, ou aucune décision (tout scan du deb sera postérieur au 14/11, 12:17:25 UTC) | Haute |
+| H5 | `vulndb/grype` | **Cumul au 28/11** : 11 tags ; 5 tags retirés, un par balayage du 24/11 au 28/11 (13/11 au 17/11). **Balayage du 28/11 seul** : 1 tag retiré (17/11) ; bases du 13/11 et du 14/11 effacées (plus de 336 h) ; bases du 15/11 au 17/11 lisibles par digest | Moyenne : suppose une base et un tag par jour, comme le 06/11 (`g7-predictions.md`, l. 39) |
+| H6 | `builds/vsa/**`, `builds/**` hors scan, `amont/**`, `horodatage/**`, `vulndb/essai-07a` | Aucune décision | Haute : règle `**` sans suppression |
+| H7 | Blob vide `sha256:44136fa3…` | Toujours lisible après le gc dans `builds/vsa/sample-app`, `builds/vsa/sample-app-deb` et `builds/scan/sample-app` | Moyenne : la déduplication et le gc n'ont jamais été observés ensemble sur un blob partagé |
+
+### Consigne réécrite de la tâche (à poser au point 4, telle quelle)
+
+> Réponds en français. Dépôt : /home/gigi/Documents/git/github/gigi206/supply-chain, branche claude/focused-fermi-ul5y20. Contexte : brique 07a du PoC supply-chain, G7, décision D7 (b). Cluster sous RKE2, rebâti par S5b le 13/11/2026. Lis d'abord poc/bricks/07a-sbom-grype/resultats/g7-replanification.md (sections « Résultat du relevé (point 2) » et « Point 3 »), puis g7-predictions.md.
+>
+> Tout est EN LECTURE SEULE : ne modifie ni Zot, ni le cluster, ni les VM, ne pousse rien, n'installe rien, ne committe rien. Tu peux seulement écrire poc/bricks/07a-sbom-grype/resultats/g7-premiere-suppression.log. N'y archive aucune réponse de Grafana : seulement des comptes. Remplace toute ligne contenant « jeton » ou « token » par un marqueur visible « [ligne masquée : motif jeton|token] ». Si quelque chose échoue, dis-le, ne corrige rien.
+>
+> Contexte chiffré, relevé le 14/11/2026 à 20:42 UTC : Zot a démarré le 13/11/2026 à 12:17:25 UTC ; `gcInterval` vaut 24 h, `retention.delay` 336 h. Le plus ancien referrer de builds/scan/** date du 13/11 à 12:45:07 UTC (builds/scan/sample-app) ; builds/scan/essai-07a, plus ancien (12:41:47 UTC), n'est pas un referrer. La première suppression possible d'un referrer de scan tombe donc au premier balayage après le 27/11 à 12:45:07 UTC, attendu le 28/11 vers 12:17:25 UTC si Zot n'a pas redémarré. Ce calcul n'a jamais été mesuré. Vérifie d'abord cette hypothèse (`systemctl show zot.service -p ActiveEnterTimestamp`). Si le balayage n'a pas encore eu lieu, dis-le et arrête-toi là. Dans vulndb/grype, des tags ont dû être retirés dès le balayage du 24/11 (retrait au compte, sans délai) : compte les décisions balayage par balayage depuis le démarrage de Zot.
+>
+> Accès : Zot https://192.168.161.13:5000/v2 en anonyme, CA ~/.cache/supply-chain-poc/08/pki/ca-poc.crt. SSH : `ssh -i ~/.cache/supply-chain-poc/08/ssh/id_ed25519 -o UserKnownHostsFile=$HOME/.cache/supply-chain-poc/08/ssh/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10 poc@192.168.161.13 ...`, sudo disponible. Journal : `sudo journalctl -u zot.service --since '2026-11-13 12:00:00' -o cat` (toute la vie de ce Zot, pour compter par balayage). Audit : /var/log/zot/audit.log. Image réelle : builds/sample-app@sha256:3a7ca1b14dbf13c6655c500fee01460937c2bee4473e32073459e713707923b5 ; deb : builds/sample-app-deb@sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e. Grafana : https://192.168.161.13:3001/api/ds/query, compte auditeur, mot de passe dans ~/.cache/supply-chain-poc/08/secrets/grafana-auditeur (jamais affiché).
+>
+> À vérifier, en comparant à H1 à H7 de g7-replanification.md :
+> 1. Image réelle et deb, avec leurs .sig et .att, lisibles (HEAD avec Accept: application/vnd.oci.image.manifest.v1+json, 200 attendu) ; VSA de builds/vsa/sample-app et builds/vsa/sample-app-deb lisibles (referrers).
+> 2. Décisions de suppression, comptées par balayage, par dépôt et par raison, comparées à H1 à H6 (H5 : cumul du 24/11 au 28/11 et balayage du 28/11 séparés).
+> 3. Aucun blob manquant : sur les manifestes qui restent de builds/scan/sample-app, sur la base la plus récente de vulndb/grype, et blob sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a lisible dans builds/vsa/sample-app, builds/vsa/sample-app-deb et builds/scan/sample-app (H7).
+> 4. Les décisions de suppression lisibles par l'auditeur dans Grafana (comptes seulement).
+> 5. La porte n'est pas à relancer : ne crée aucun Job. Relève seulement que le CronJob scan-sample-app réussit toujours et le nombre de referrers (KUBECONFIG=$HOME/.kube/supply-chain-poc.yaml).
+> 6. Place libre sur sc-stockage et sc-confiance.
+>
+> Archive les résultats dans g7-premiere-suppression.log. Rapport court au propriétaire : résultat d'abord, écarts à la prédiction nommés, ce qui reste non vérifié. Toute correction demande son accord.
+
+### Question ouverte avant le point 4
+L'hypothèse « balayage à démarrage + k × 24 h » est mesurable dès maintenant : un balayage a dû passer le 14/11 vers 12:17 UTC.
+Une lecture du journal de `zot.service` (lecture seule, accord nommé) la confirmerait ou la réfuterait avant de fixer `fireAt`.
+
+### Point 4, à faire sur accord
+Remplacer la consigne de `supply-chain-g7-premiere-suppression` par celle ci-dessus, `fireAt` au **28/11/2026 à 13:02:25 UTC**,
+réactiver la tâche, puis relire la liste des tâches.
