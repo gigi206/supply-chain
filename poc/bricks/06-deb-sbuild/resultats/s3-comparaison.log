@@ -1,12 +1,12 @@
-# s3.sh comparaison, 2026-11-13T14:51:07Z
-deb du build 1 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-deb du build 2 : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-OK   deb identiques sur les deux builds : 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-deb égal à celui de s1b et d'OBS (0b489d43…)
+# s3.sh comparaison, 2026-11-14T22:13:25Z
+deb du build 1 : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
+deb du build 2 : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
+OK   deb identiques sur les deux builds : 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa
+deb différent de celui de s1b et d'OBS (0b489d43…)
 OK   Installed-Build-Depends du build 1 identique à celui de S2 (s1b)
 OK   Installed-Build-Depends du build 2 identique à celui de S2 (s1b)
 champs différents entre build 1 et build 2 : Build-Date
-champs différents entre S2 (s1b) et build 1 : Build-Date
+champs différents entre S2 (s1b) et build 1 : Build-Date, Checksums-Md5, Checksums-Sha1, Checksums-Sha256, Environment, Version
 ## journal du build 1
 lignes Get : 55 ; méthodes : copy 4 file 51
 OK   lignes apt Get, Hit, Ign ou Err en http ou https : 0
@@ -14,7 +14,7 @@ OK   neutralisation : sources.list vidé : 1
 OK   neutralisation : listes de l'instantané retirées : 1
 paquets installés par sbuild (hors paquet factice) : 48
 OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
-Build-Space: 102336 Build-Time: 18 Package-Time: 271 Status: successful
+Build-Space: 102356 Build-Time: 19 Package-Time: 260 Status: successful
 ## journal du build 2
 lignes Get : 55 ; méthodes : copy 4 file 51
 OK   lignes apt Get, Hit, Ign ou Err en http ou https : 0
@@ -22,5 +22,5 @@ OK   neutralisation : sources.list vidé : 1
 OK   neutralisation : listes de l'instantané retirées : 1
 paquets installés par sbuild (hors paquet factice) : 48
 OK   installés par sbuild = simulés (nom=version), lignes d'écart : 0
-Build-Space: 102336 Build-Time: 24 Package-Time: 267 Status: successful
+Build-Space: 102356 Build-Time: 20 Package-Time: 261 Status: successful
 écarts : 0

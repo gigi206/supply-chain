@@ -127,3 +127,18 @@ Prochaine ligne : commande de `s1.sh` l. 261 rejouée seule (`SHA256SUMS.s1`), s
 dans `s1.sh` à 15440e0 ; `SHA256SUMS` du cache contrôlé d'abord (5 OK) ; `$W/s1-06/SHA256SUMS.s1` réécrit : trois lignes (orig
 07521c1e, `.dsc` 92335109, `.debian.tar.xz` 86e30d04), contrôlées (3 OK) ; l'ancien contenu (1.0.0-1) est dans le journal.
 Prochaine ligne : S3 `restauration builds comparaison` (pods Kata), sur accord nommé ; prédictions U1 à U6 commitées.
+
+## Carte, ligne 3 : S3 (note de 2026-11-14T22:13:58Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S3 (restauration builds comparaison) ? ». `s3.sh restauration builds comparaison` à 94b770f, de
+22:00:52 à 22:13:25 UTC (`date -u` autour du lanceur), code 0, 26 OK, 0 KO ; journaux `s3-*` réécrits (versions 1.0.0-1 à 636b190).
+Fermeture `3a0e54ae` restaurée deux fois (162 fichiers), chroot de S2 `e0b1f37c`, `SHA256SUMS.s1` 1.0.0-2 livré aux deux pods.
+- **U1, part S3 tenue** : `Installed-Build-Depends` des deux buildinfo identiques à celui de S2 (comparaison de `s3.sh`, sur
+  `BUILDINFO_S2` épinglé par le correctif v2). La part S4c (verrou 89d648b5) reste à la ligne 5.
+- **U2 tenue** : deb **N = 3c6e6a290fed15f9b41f0b442f5946008ff075790af0c247da8f00428d5a48aa** (1 953 500 octets) aux deux builds.
+- **U3 tenue (part deb)** : N ≠ 0b489d43 (« deb différent de celui de s1b et d'OBS », sortie attendue). D reste à la ligne 7.
+- Lectures sur le deb du build 1, à 22:13:40 UTC (hôte, dpkg-deb 1.23.7) :
+  - **U4 tenue** : `Static-Built-Using: golang-1.24 (= 1.24.4-1)`, pas de `Built-Using` ; `Version` 1.0.0-2, `Installed-Size` 5785.
+  - **U5 tenue** : `./usr/bin/sample-app` = **10d475d0…** (inchangé).
+  - **U6 tenue** : copyright du deb égal à `poc/packaging/debian/copyright` (`cmp`).
+  - `SOURCE_DATE_EPOCH="1794693332"` dans l'environnement des deux buildinfo (date de l'entrée 1.0.0-2).
+Prochaines lignes : correctif d'épinglage 1 (`DEB_SHA` = N, `s5.sh` l. 460), puis 13a ; chacun sur accord nommé.
