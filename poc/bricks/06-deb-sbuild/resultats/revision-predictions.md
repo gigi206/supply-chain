@@ -261,3 +261,8 @@ relevé juste après la commande ([journal](revision-sources-option1.log)) ; chi
   9050679e côté `sources.sh` (`s4d-prealables.log` à 0907d5f, l. 55-58).
 - Effet attendu sur U17 : l'égalité de l'orig (l. 229) et celle des membres, tailles et dates (l. 233-235) doivent tenir.
 Prochaine ligne : l. 261 de `s1.sh` rejouée, sur accord nommé.
+
+## Option 1, ligne 2 rejouée : `s1.sh` l. 261 (note de 2026-11-14T22:35:45Z ; rien n'est réécrit)
+« Oui, rejoue-la ». Sur l'hôte, à 22:35:34 UTC, code 0 ([journal](revision-sha256sums-s1-option1.log)) : `SHA256SUMS` du cache
+contrôlé (5 OK) ; `SHA256SUMS.s1` réécrit : orig 1591a05b, `.dsc` ee2a6b8e, `.debian.tar.xz` 0cc3d47e, trois lignes contrôlées ;
+l'ancien contenu est dans le journal. Prochaine ligne : S3 relancée (U16), sur accord nommé.
