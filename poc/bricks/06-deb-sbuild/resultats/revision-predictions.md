@@ -242,3 +242,8 @@ relancée ; 7 `s4d.sh prealables`. Les lignes 4 à 6 (13a, S4c, S4b) ne sont à 
 | U16 | S3 relancée sur ce paquet source : deb **3c6e6a29…** inchangé aux deux builds | Moyenne : seules les dates des fichiers de l'orig changent ; dpkg-deb borne les dates à SOURCE_DATE_EPOCH, inchangé ; non mesuré |
 | U17 | `s4d.sh prealables` : orig, `.dsc` et `.debian.tar.xz` égaux à ceux de `sources.sh` ; code 0 ; digest attendu D écrit, différent de 039949f9 | Haute si U15 tient |
 Si U16 ne tient pas : correctif d'épinglage 1, 13a, puis seulement `prealables` (S4c et S4b ne dépendent pas du deb).
+
+## Option 1, ligne 1b : correctif de `sources.sh` appliqué (note de 2026-11-14T22:33:11Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif de sources.sh (option 1) ? ». `git apply` de `revision-sources-option1.patch`
+(df163ce5…) sur 2216693, code 0 ; `bash -n` et `shellcheck -S warning` passés sur `poc/packaging/sources.sh` ; `SDE_DEB` lu dans le
+changelog : 1794693332. Rien n'est lancé. Prochaine ligne : `sources.sh` (réseau), U15, sur accord nommé.

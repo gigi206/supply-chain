@@ -4,7 +4,8 @@
 #   sample-app-1.0.0.tar.gz          archive complète : sources (git archive de poc/sample-app),
 #                                    modules Go (vendor/, vérifiés par go.sum) et « marked »
 #                                    (web/node_modules/marked, vérifié par l'intégrité sha512 du lockfile) ;
-#   sample-app_1.0.0.orig.tar.gz     la même archive, nommée pour Debian ;
+#   sample-app_1.0.0.orig.tar.gz     le même arbre pour Debian, daté de debian/changelog (option 1 du propriétaire,
+#                                    14/11/2026) : même date que la tâche construire-deb de la 06 et rejeu/rebuild_deb.sh ;
 #   sample-app_<révision>.dsc, sample-app_<révision>.debian.tar.xz   paquet source Debian (dpkg-source), révision lue
 #                                    dans debian/changelog (1.0.0-2 depuis le 14/11/2026) ;
 #   sample-app.spec                  copie du spec ;  SHA256SUMS.
@@ -26,9 +27,11 @@ trap 'chmod -R u+w "$W" 2>/dev/null; rm -rf -- "$W"' EXIT
 PATH=$(tr : '\n' <<<"$PATH" | grep -v '/mise/shims$' | paste -sd:)   # go de mise.toml, pas de shim
 
 commit=$(git -C "$racine" log -1 --format=%H -- poc/sample-app)
-SDE=$(git -C "$racine" log -1 --format=%ct -- poc/sample-app)   # date de l'archive amont ; égale à celle de debian/changelog
-#   jusqu'à la révision 1.0.0-1 seulement (l'entrée 1.0.0-2 est datée à son écriture) ; le build lit la sienne dans le changelog
+SDE=$(git -C "$racine" log -1 --format=%ct -- poc/sample-app)   # date de l'archive complète (rpm) : dernier commit de poc/sample-app
+SDE_DEB=$(dpkg-parsechangelog -l "$here/debian/changelog" -STimestamp)   # date de l'orig et du paquet source Debian, celle que
+#   lisent deb/construire-deb.yaml (l. 90-97) et rejeu/rebuild_deb.sh de la 06 ; égale à SDE jusqu'à la révision 1.0.0-1 seulement
 echo "sample-app au commit $commit, SOURCE_DATE_EPOCH=$SDE ($(date -u -d "@$SDE" +%Y-%m-%dT%H:%M:%SZ))"
+echo "debian/changelog $REV, SOURCE_DATE_EPOCH=$SDE_DEB ($(date -u -d "@$SDE_DEB" +%Y-%m-%dT%H:%M:%SZ)) : orig et paquet source Debian"
 [[ -z $(git -C "$racine" status --porcelain -- poc/sample-app poc/packaging) ]] || echo "ATTENTION : modifications non commitées dans poc/sample-app ou poc/packaging"
 
 S=$W/$NOM-$VERSION
@@ -56,11 +59,12 @@ mkdir -p "$OUT"
 rm -f "$OUT"/"$NOM"[-_]*
 tar -C "$W" --sort=name --mtime="@$SDE" --owner=0 --group=0 --numeric-owner --mode=go-w,a+rX \
     --format=gnu -cf - "$NOM-$VERSION" | gzip -n -9 > "$OUT/$NOM-$VERSION.tar.gz"
-cp "$OUT/$NOM-$VERSION.tar.gz" "$OUT/${NOM}_$VERSION.orig.tar.gz"
+tar -C "$W" --sort=name --mtime="@$SDE_DEB" --owner=0 --group=0 --numeric-owner --mode=go-w,a+rX \
+    --format=gnu -cf - "$NOM-$VERSION" | gzip -n -9 > "$OUT/${NOM}_$VERSION.orig.tar.gz"
 cp "$here/$NOM.spec" "$OUT/"
 cp -r "$here/debian" "$S/"
 cp "$OUT/${NOM}_$VERSION.orig.tar.gz" "$W/"   # dpkg-source cherche l'archive amont à côté du répertoire source
-(cd "$W" && SOURCE_DATE_EPOCH=$SDE dpkg-source -q -b "$NOM-$VERSION" >/dev/null)
+(cd "$W" && SOURCE_DATE_EPOCH=$SDE_DEB dpkg-source -q -b "$NOM-$VERSION" >/dev/null)
 mv "$W/${NOM}_$REV.dsc" "$W/${NOM}_$REV.debian.tar.xz" "$OUT/"
 (cd "$OUT" && sha256sum "$NOM-$VERSION.tar.gz" "${NOM}_$VERSION.orig.tar.gz" "${NOM}_$REV.dsc" \
    "${NOM}_$REV.debian.tar.xz" "$NOM.spec" | tee SHA256SUMS)
