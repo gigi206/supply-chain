@@ -514,3 +514,15 @@ copyright du cache.
 
 **Estimation** : comprise dans la projection d'`apres-s5b.md` (hors dépôt, 0,05 à 0,1 pw pour la note X11, la bascule et la part 13a
 de la révision) ; seuil de la 13a : 0,4 pw pour une estimation de 0,2 pw.
+
+*Note du 14/11/2026, 21:31:25 UTC (relecture du conseiller ; rien n'est réécrit, NON LANCÉE)* :
+1. **Dix contrôles, pas neuf** (section ci-dessus et message de 0c1c88c) : huit appels `essai`, la comparaison avec le `paquets.py`
+   de a821111 et la ligne ÉCART « présent » du cas `juste`. **Critère de jugement du banc** : dix lignes `OK` en colonne 0 et aucune
+   ligne `KO` en colonne 0 ; les `KO` indentés des cas négatifs sont attendus ; le script finit en code 0 quoi qu'il arrive, son code
+   ne juge rien.
+2. **B8** : le journal de `paquets-modules-essai-local.sh` compte six cas (`m-chi-depot`, `m-nominal`, `m-sans-dep`, `m-orpheline`,
+   `m-script`, `m-double`) et trois concordances avec `go version -m` : neuf lignes `OK`, toutes attendues de nouveau.
+3. **« go1.24.7 relu à 21:29:25 UTC »** mêle deux commandes : `go version` a été lu par une commande antérieure, sans heure relevée ;
+   21:29:25 est l'heure de la commande d'écriture. L'en-tête du banc fera foi au lancement.
+4. **Consommateurs** : `git grep` de `paquets.py`, `paquets.sh` et de l'ancienne empreinte `8d4bb025` hors de la 13a (hors `.md` et
+   `.log`) : aucun résultat ; aucun épinglage de `paquets.py` dans la 06, la 08, `rejeu.sh` ni les politiques.
