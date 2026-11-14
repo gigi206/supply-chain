@@ -312,3 +312,13 @@ l. 45, `s5.sh` l. 48, `s6b.sh` l. 104 (`DEB_DIGEST`), `s6a.sh` l. 54 (`DEB_REF`)
 `s4d2.sh`, `s6a.sh`, `s6b.sh` (mesures passées), le texte du message de refus de `s6b.sh` l. 749 (« S5b n'a pas reproduit 039949f9 ? »,
 libellé seul : le contrôle porte sur `$DEB_SUJET`, dérivé de D), et les fixtures de `porte_test.rego` (U12). Rien n'est lancé.
 Prochaine ligne : S4d `reseau taches pipeline` (cluster et Zot, U10), sur accord nommé.
+
+## Carte, ligne 8 : S4d (note de 2026-11-14T23:11:25Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S4d (reseau taches pipeline, U10) ? ». `s4d.sh reseau taches pipeline` à 78cb12f, du 14/11 22:58:40 au
+14/11 23:11:01 UTC, code 0 relevé juste après la commande, 27 OK, 0 KO, 0 ÉCART ; « S4d1 pipeline fait » dans `chrono.tsv` ; journaux
+`s4d-reseau`, `s4d-taches`, `s4d-pipeline*` réécrits (version du 13/11 à 2cec0df).
+- **U10 tenue** : deux PipelineRuns, deb produit sous Kata **f66bbeb2…** (1 953 492 octets, égal à S3) aux deux ; artefact publié
+  **builds/sample-app-deb@sha256:60f25f5c…** deux fois, égal au digest attendu de `prealables`, relu en lecture anonyme.
+- Bundle de pipeline neuf : `tekton/pipelines/sample-app-deb@d1fb3871` (au lieu de 5b4bacb8), qui porte l'artefact de packaging f0ed7a71.
+  `builds/sample-app-deb@60f25f5c` est définitif dans Zot.
+Prochaine ligne : S4d2 et S4d3 (`retirer prealables deployer chemins porte`, U11 et U12), sur accord nommé.

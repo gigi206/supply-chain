@@ -1,4 +1,4 @@
-# s4d.sh taches, 2026-11-13T15:06:53Z
+# s4d.sh taches, 2026-11-14T22:58:40Z
 ## tâches (tkn 0.46.2)
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
 OK   preparer-deb : signature versionnée conforme au gabarit rendu, signature exceptée
@@ -8,6 +8,6 @@ OK   construire-deb : signature versionnée conforme au gabarit rendu, signature
 OK   construire-deb dans la liste revue : sc-stockage.poc.test:5000/tekton/tasks/construire-deb@sha256:3726ff0b116cb6f4e13a44de69ca7a9be84061f4f70585783932f2685c79d10a
 ## pipeline sample-app-deb
 OK   pipeline : subPath des workspaces (preparer, construire, publier) : [null,"entrees","image","image"]
-OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:c1719b133236f49c7e2492f4b608a8dc421bf812d7f7e438d879a871f61c2e51
+OK   pipeline : entrées fixées par digest : sc-stockage.poc.test:5000/builds/fermetures/sample-app-deb@sha256:bb7599a2e1cde30770fdb4405a5f9cce94de5ea5b12c358e512dfbe7d5b9f290 sc-stockage.poc.test:5000/builds/fermetures/sample-app-sources@sha256:50dc73f72d04be852a04f5de86683f4afee9ffdc78144124cbfbb7dbf454bd21 sc-stockage.poc.test:5000/entrees/sample-app/packaging-deb@sha256:f0ed7a71cfcc72e15f2c91d0ec6d81f4452bf6627d3dec40a5a7ceac6dcfe88f
 *Warning*: This is an experimental command, its usage and behavior can change in the next release(s)
-sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:5b4bacb826bb98210675060543604110bbe91a2f4c91c95937795b88b33c620f
+sc-stockage.poc.test:5000/tekton/pipelines/sample-app-deb@sha256:d1fb3871ec550f0fb49bc81b7fe6be932417ddd76297d5698e61d20e5ad7df26

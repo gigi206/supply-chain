@@ -1,29 +1,29 @@
-2026/11/13 15:13:41 Entrypoint initialization
-2026/11/13 15:13:41 Decoded script /tekton/scripts/script-0-nxz4v
+2026/11/14 23:05:13 Entrypoint initialization
+2026/11/14 23:05:14 Decoded script /tekton/scripts/script-0-x97xs
 invité : 6.18.56, 3 vCPU, 6119664 kB ; uid 1000, gid 1000 ; /w : tmpfs ; entrees : virtiofs ro,relatime, écriture refusée
 témoin DNS snapshot.debian.org : échec, code 124 (attendu)
 témoin TCP 192.168.161.13/5000 : échec, code 124 (attendu)
 témoin TCP 192.168.161.13/3000 : échec, code 124 (attendu)
 témoin TCP 199.232.170.132/80 : échec, code 124 (attendu)
 fermeture revérifiée contre le verrou : 162 paquets, copiés dans /w/fermeture
-paquet source sample-app 1.0.0-1 (SOURCE_DATE_EPOCH 1793229566) : sample-app_1.0.0.orig.tar.gz 07521c1e60cdbed8a29912ad775e52201daf95003f7f54ccee76b3270742d9bb ; sample-app_1.0.0-1.dsc 7f9cf5d36e9016d5609f9f1c9ddcc63c94e9486e1141a529890ff3f6c34b7b59 ; sample-app_1.0.0-1.debian.tar.xz f0e5cfc8d9e5626e15bfed8b217bcd9203ec7aea839f2dfc38ecfe3c14053489 ; 
-sbuild : rc 0 en 306 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
-deb produit : sample-app_1.0.0-1_amd64.deb 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 (1952080 octets)
------ sample-app_1.0.0-1_amd64.buildinfo -----
+paquet source sample-app 1.0.0-2 (SOURCE_DATE_EPOCH 1794693332) : sample-app_1.0.0.orig.tar.gz 1591a05bd1d42241ec4ad501e0c01af61368c4de0e3e374c8df0a7e7ad5b2ffa ; sample-app_1.0.0-2.dsc b284bd608b53295ed49890374ff5c165d0a31cda6ec4cef5d0074d0079e659d1 ; sample-app_1.0.0-2.debian.tar.xz 22cfff1d61bad913abb20670f90a7ef35e327e37fec0b78241822c893a76aeb6 ; 
+sbuild : rc 0 en 282 s ; lignes apt Get, Hit, Ign ou Err en http(s) : 0
+deb produit : sample-app_1.0.0-2_amd64.deb f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b (1953492 octets)
+----- sample-app_1.0.0-2_amd64.buildinfo -----
 Format: 1.0
 Source: sample-app
 Binary: sample-app
 Architecture: amd64
-Version: 1.0.0-1
+Version: 1.0.0-2
 Checksums-Md5:
- 7e578a62b1e949fab8445c62eb2b26de 1952080 sample-app_1.0.0-1_amd64.deb
+ e4d372cb662f69441b79e6c3dfd66d2b 1953492 sample-app_1.0.0-2_amd64.deb
 Checksums-Sha1:
- 3b7226d9e53314d09fc6f626bbd25f0e24f920c9 1952080 sample-app_1.0.0-1_amd64.deb
+ 437de9dbc6fec357e0a543bc896da018261a1c60 1953492 sample-app_1.0.0-2_amd64.deb
 Checksums-Sha256:
- 0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5 1952080 sample-app_1.0.0-1_amd64.deb
+ f66bbeb2aba31e5220b332ff3941697dce7660259aa182047a58e77f4f51892b 1953492 sample-app_1.0.0-2_amd64.deb
 Build-Origin: Debian
 Build-Architecture: amd64
-Build-Date: Fri, 13 Nov 2026 15:19:26 +0000
+Build-Date: Sat, 14 Nov 2026 23:10:37 +0000
 Build-Path: /build/reproducible-path/sample-app-1.0.0
 Installed-Build-Depends:
  autoconf (= 2.72-3.1),
@@ -193,7 +193,7 @@ Environment:
  LANG="C.UTF-8"
  LC_COLLATE="C.UTF-8"
  LC_CTYPE="C.UTF-8"
- SOURCE_DATE_EPOCH="1793229566"
+ SOURCE_DATE_EPOCH="1794693332"
 ----- fin du .buildinfo -----
-couche sha256:12dd5c429c2344fdec727f67f5ce5a6bceb3e7f7632c71131aca10b32eeb0c06 (1955840 octets) ; configuration sha256:0acef68d38c0155be3a6fe2002abf8add0e059677c606e3d23c05751929edaec ; manifeste sha256:039949f947f218b115829aad487da7fa62a9b5c0a4c7410d107dc5d2a698492e
+couche sha256:d8f9685c8962286e3fdeba09788df7396dd62dc05ed166868778694a1e065637 (1955840 octets) ; configuration sha256:344f9108f2ded783de0d471bfbb8f61ca2b255972ae8e7963677ccb0819fbe45 ; manifeste sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e
 image.tar : 1966080 octets
