@@ -179,3 +179,14 @@ depuis HEAD a43bcc2, `git apply --check` puis `git apply`, code 0 ; `bash -n` de
 `s4b.sh` l. 40 et `s4d.sh` l. 55, entrée de `ENTREES` dans `s6b.sh` l. 109. Restent `c1719b13` : commentaire de `s6b.sh` l. 13 (H3,
 mesure passée) et fixture de `porte_test.rego` l. 279 (données de test, U12). Rien n'est lancé.
 Prochaine ligne : S4b (fermetures, U9), sur accord nommé.
+
+## Carte, ligne 6 : S4b (note de 2026-11-14T22:25:13Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S4b (prealables taches_deb taches_sources deb sources comparaison) ? ». `s4b.sh` à 7cdfb33, de
+22:22:24 à 22:24:40 UTC (`date -u` autour du lanceur), code 0, 65 OK, 0 KO ; journaux `s4b-*` réécrits (versions du 13/11 à 774471f).
+- **U9 tenue** : deux PipelineRuns par fermeture, mêmes digests : deb **bb7599a2…** (167 couches), sources **50dc73f7…** (8 couches) ;
+  les épinglages de `s4d.sh` l. 53-54, `s5.sh` l. 49 et `s6b.sh` l. 107-108 restent valables.
+- Artefact de packaging relu dans Zot : f0ed7a71 (épinglage 2). Bundles de pipeline neufs : `prefetch-deb-sample-app@206a539e`
+  (au lieu de 880bcf58 : porte le nouvel artefact en paramètre) et `prefetch-sources-sample-app@b0d37e59` (au lieu de aa5f62c1).
+  Constat, sans lien avec la révision : le bundle de `prefetch-sources-sample-app` change à chaque passage (0ebd1cb8 le 11/11,
+  aa5f62c1 le 13/11, b0d37e59 le 14/11, d'après les journaux archivés) ; cause non relevée.
+Prochaine ligne : `s4d.sh prealables` (digest attendu D), sur accord nommé.
