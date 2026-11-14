@@ -58,7 +58,7 @@ COMMIT=6391fd437f26696847041be3226bbbf633f55a2f   # construction.sh : main de wo
 DEPOT_GIT=https://sc-stockage.poc.test:3000/workspace/sample-app.git
 S4B=$W/s4b-06   # copies tirées par digest en S4b : comparaison/deb (fermeture deb), comparaison/sources (applicative), packaging
 PKG=$HOME/.cache/supply-chain-poc/packaging   # archive de sources.sh (S1 à S3) : 07521c1e…
-DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
+DEB_S3=$W/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
 DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5   # OBS, S1, S3
 GO=$HOME/.cache/supply-chain-poc/outils/gomodcache/golang.org/toolchain@v0.0.1-go1.26.10.linux-amd64/bin   # même version que l'image de prefetch
 LISTE_REVUE=$here/politique/porte/taches.yml
@@ -230,10 +230,10 @@ etape_prealables() {
   # Constat du 11/11/2026 (premier passage de prealables, 18:03 UTC) : le .debian.tar.xz de sources.sh porte le umask de l'hôte
   # (002 : 664 et 775, cp -r depuis l'arbre de travail), celui de la plateforme les modes de git (644 et 755). Seuls les modes
   # doivent différer ; le .dsc diffère donc aussi. Le deb n'en dépend pas (dh_fixperms), ce que la pipeline mesurera.
-  a=sample-app_1.0.0-1.debian.tar.xz
+  a=sample-app_1.0.0-2.debian.tar.xz
   attendu "$a : mêmes membres, tailles et dates que celui de sources.sh, groupe sans écriture" \
     "$(tar -tvJf "$x/w/src/$a" | sha256sum | cut -c1-64)" "$(tar -tvJf "$PKG/$a" | sed -E 's/^(.{5})w/\1-/' | sha256sum | cut -c1-64)"
-  echo "     (sur l'hôte : $a $(sha256sum < "$x/w/src/$a" | cut -c1-64), .dsc $(sha256sum < "$x/w/src/sample-app_1.0.0-1.dsc" | cut -c1-64) ; sources.sh : $(awk '$2 ~ /debian.tar.xz|dsc$/ {printf "%s %s ; ", $2, substr($1, 1, 16)}' "$PKG/SHA256SUMS"))"
+  echo "     (sur l'hôte : $a $(sha256sum < "$x/w/src/$a" | cut -c1-64), .dsc $(sha256sum < "$x/w/src/sample-app_1.0.0-2.dsc" | cut -c1-64) ; sources.sh : $(awk '$2 ~ /debian.tar.xz|dsc$/ {printf "%s %s ; ", $2, substr($1, 1, 16)}' "$PKG/SHA256SUMS"))"
 
   echo "## construire-deb, sur l'hôte : layout écrit avec le deb de S3 (section du script), lu comme publier-image"
   attendu "deb de S3" "$(sha256sum < "$DEB_S3" | cut -c1-64)" "$DEB_SHA"
@@ -551,9 +551,9 @@ etape_comparaison() {
     m=$c/layout-$i/blobs/sha256/${d#sha256:}
     attendu "artefact $i : manifeste relu au digest publié" "$(sha256sum < "$m" | cut -c1-64)" "${d#sha256:}"
     l=$c/layout-$i/blobs/sha256/$(jq -r '.layers[0].digest' "$m" | cut -d: -f2)
-    attendu "artefact $i : une couche, le deb seul" "$(jq '.layers | length' "$m") $(tar -tf "$l")" "1 sample-app_1.0.0-1_amd64.deb"
+    attendu "artefact $i : une couche, le deb seul" "$(jq '.layers | length' "$m") $(tar -tf "$l")" "1 sample-app_1.0.0-2_amd64.deb"
     mkdir -p "$c/deb-$i"; tar -xf "$l" -C "$c/deb-$i"
-    mesure "artefact $i : deb égal à celui d'OBS, S1 et S3" "$(sha256sum < "$c/deb-$i/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)" "$DEB_SHA"
+    mesure "artefact $i : deb égal à celui de S3" "$(sha256sum < "$c/deb-$i/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)" "$DEB_SHA"
     # Installed-Build-Depends du .buildinfo (journal de construire) comparés au verrou, nom=version
     sed -n '/^----- .*\.buildinfo -----$/,/^----- fin du .buildinfo -----$/p' "$R/s4d-pipeline-$i-construire.log" \
       | awk '/^Installed-Build-Depends:/ {b = 1; next} b && /^[^ ]/ {b = 0} b' | sed -E 's/^ *([^ ]+) \(= ([^)]+)\),?$/\1=\2/' | sort > "$c/ibd-$i.v"

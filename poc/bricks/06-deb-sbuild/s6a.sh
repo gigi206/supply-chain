@@ -41,7 +41,7 @@ h06=$(cd "$(dirname "$0")" && pwd)
 racine=$(cd "$h06/../../.." && pwd)
 R=$h06/resultats
 T=$HOME/.cache/supply-chain-poc/06/s6a
-DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-1_amd64.deb
+DEB=$HOME/.cache/supply-chain-poc/08/travail/s3-06/build-1/sample-app_1.0.0-2_amd64.deb
 DEB_SHA=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5      # deb de builds/sample-app-deb@039949f9 (S4d1)
 G0=$HOME/.cache/supply-chain-poc/07a/g0                                          # base grype du 04/11/2026 (G0 de la 07a)
 SCAN_OUTIL=$HOME/.cache/supply-chain-poc/07a/outil/scan-outil                    # construit depuis 07a-sbom-grype/outil
@@ -357,7 +357,7 @@ etape_periodique() { # ACCORD NOMMÉ, après S5b et le relevé du 21/11 : écrit
     grep -viE 'jeton|token' "$T/$c.log" | sed 's/^/  /' || true
   done
   mesure "job" "${etat%%/*}" 1
-  mesure "deb extrait dans analyser" "$(grep -c "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " "$T/analyser.log" || true)" 1
+  mesure "deb extrait dans analyser" "$(grep -c "^DEB|sample-app_1.0.0-2_amd64.deb, sha256 $DEB_SHA, " "$T/analyser.log" || true)" 1
   n=$(sed -n 's/^ARTEFACT|deb, \([0-9]*\) PURL versionnées.*/\1/p' "$T/analyser.log")
   mesure "plancher de l'artefact seul tenu (PURL versionnées > 0)" "$([ "${n:-0}" -gt 0 ] && echo oui || echo "non (${n:-absent})")" oui
   apres=$(nb_referrers "$DEPOT_SCAN_DEB" "$d")
@@ -493,7 +493,7 @@ etape_grafana() { # ACCORD NOMMÉ, après periodique et fraicheur : lectures seu
   # corrigé avant tout lancement, après e237b3d : lignes comptées, jamais affichées (comme g7_grafana) ; periodique archive déjà
   # celles de kubectl logs
   echo "$(wc -l < "$T/job.txt") ligne(s) après $i essai(s), non affichées"
-  for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-1_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
+  for m in '^SOURCE|' '^BASE|' "^DEB|sample-app_1.0.0-2_amd64.deb, sha256 $DEB_SHA, " '^ARTEFACT|deb, ' '^SCAN|' '^ATTESTATION|' '^PUBLIE|' \
     'jeton du rôle scanner révoqué'; do
     mesure "visible dans Grafana : ${m%%, sha256*}" "$(grep -q -- "$m" "$T/job.txt" && echo oui || echo non)" oui
   done

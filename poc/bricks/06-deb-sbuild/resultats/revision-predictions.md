@@ -102,3 +102,12 @@ Les trois correctifs d'épinglage et l'étape 2 s'ajoutent à la cascade compté
    `keepTags`.
 5. **Regrep complété** (paquet source) : `9050679e` (`.dsc`), `863cf4da` (`.debian.tar.xz`), `20c9dd35` et `a3cbcf92` (copyright),
    `1952080` (taille du deb) : aucune occurrence hors de `resultats/`, `docs/` et des `.md`. `docs/` ne cite pas `lastPullTimestamp`.
+
+## Carte, ligne 0 : correctif v2 appliqué (note de 2026-11-14T21:55:49Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif v2 avec l'entrée de changelog datée ? ». `git apply` de
+`revision-1.0.0-2-v2.patch` (sha256 c8563413…), code 0, sur 09bff27. Entrée `sample-app (1.0.0-2)` datée **Sat, 14 Nov 2026 21:55:32
++0000** (`date -u`, epoch **1794693332** : le `SOURCE_DATE_EPOCH` du build 1.0.0-2) ; `dpkg-parsechangelog` 1.23.7 de l'hôte :
+`Version` 1.0.0-2, `Timestamp` 1794693332, deux entrées lisibles. Contrôles : `control`, `rules`, `copyright` égaux à `paquet2/`
+(`cmp`) ; `bash -n` des sept scripts touchés ; `1.0.0-1` ne reste, hors textes, que là où la carte le garde (`s2.sh` l. 39,
+`s3.sh` l. 43, `s4c.sh` l. 32, banc OBS, spec, ancienne entrée du changelog, commentaire de `sources.sh`). Rien n'est lancé ;
+prochaine ligne : `sources.sh` (réseau), sur accord nommé.

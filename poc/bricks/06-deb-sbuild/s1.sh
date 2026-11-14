@@ -42,7 +42,7 @@ AMORCE_DIGEST=sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756b
 AMORCE=$REG/amont/library/debian@$AMORCE_DIGEST
 DEPOT_ESSAI=essais-06/sbuild-debian13
 PKG=${PACKAGING_DIR:-$HOME/.cache/supply-chain-poc/packaging}
-DSC=sample-app_1.0.0-1.dsc
+DSC=sample-app_1.0.0-2.dsc
 LIMITES='{"cpu": "2", "memory": "6Gi"}'      # demandes = limites ; tmpfs /w compté dans la mémoire du pod
 TMPFS=4Gi
 PRIVILEGIE='{"privileged": true, "allowPrivilegeEscalation": true}'
@@ -258,12 +258,12 @@ etape_essais() {
   d=$(cat "$T/image.digest" 2>/dev/null) || { echo "KO   lancer d'abord l'étape image" >&2; exit 1; }
   img=$REG/$DEPOT_ESSAI@$d
   echo "image : $img"
-  (cd "$PKG" && grep -E "  (sample-app_1.0.0.orig.tar.gz|sample-app_1.0.0-1.debian.tar.xz|$DSC)$" SHA256SUMS) > "$T/SHA256SUMS.s1"
+  (cd "$PKG" && grep -E "  (sample-app_1.0.0.orig.tar.gz|sample-app_1.0.0-2.debian.tar.xz|$DSC)$" SHA256SUMS) > "$T/SHA256SUMS.s1"
   for p in "s1-kata-privilegie kata $PRIVILEGIE" "s1-kata-escalade kata $ESCALADE" "s1-runc-restreint - $RESTREINT"; do
     n=${p%% *}; p=${p#* }
     pod_spec "$n" "${p%% *}" "$img" 1000 "${p#* }"
     pod_demarrer "$n"
-    tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
+    tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC" \
       | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
     kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
     sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" "$n"
@@ -281,7 +281,7 @@ etape_relance() {
   echo "image : $img"
   pod_spec "$n" kata "$img" 1000 "$PRIVILEGIE"
   pod_demarrer "$n"
-  tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC" \
+  tar -C "$PKG" -cf - sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC" \
     | kubectl exec -i -n builds "$n" -- sh -c 'mkdir -p /w/src && tar -xf - -C /w/src'
   kubectl exec -i -n builds "$n" -- sh -c 'cat > /w/src/SHA256SUMS.s1' < "$T/SHA256SUMS.s1"
   sed "s|@DSC@|$DSC|g" <<<"$SONDE" | dans "$n" relance

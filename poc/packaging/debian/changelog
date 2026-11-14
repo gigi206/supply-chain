@@ -1,3 +1,12 @@
+sample-app (1.0.0-2) trixie; urgency=medium
+
+  * Static-Built-Using : paquet source et version de la bibliothèque standard
+    de Go liée dans le binaire (golang-1.24-src, lu par dpkg-query).
+  * debian/copyright : notices de golang-1.24-src en Comment d'en-tête
+    (brique 13a, axes 1 et 2, décision du 12/11/2026).
+
+ -- Contributeurs de gigi206/supply-chain <poc@supply-chain.invalid>  Sat, 14 Nov 2026 21:55:32 +0000
+
 sample-app (1.0.0-1) trixie; urgency=medium
 
   * Paquet du banc A2 (OBS) et des briques 05 et 06.

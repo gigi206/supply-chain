@@ -39,11 +39,11 @@ CHROOT_S2=e0b1f37ce1e7e46a98d020fd4c4f6ee85e65f6f5518232534dad02772cca23fa      
 IMAGE_DIGEST=sha256:d8041f9cf7254a1e73523dc1b01e4065c0c9f9f4e7f8c9dc4e3c5fd656f495a1          # essais-06/sbuild-debian13:s1b
 IMAGE=$REG/essais-06/sbuild-debian13@$IMAGE_DIGEST
 DEB_S1=0b489d438370ddb6b55d541829a3ffd480642fea524db6a3defcf802097551e5
-BUILDINFO=sample-app_1.0.0-1_amd64.buildinfo
-BUILDINFO_S2=$R/s2-$BUILDINFO
+BUILDINFO=sample-app_1.0.0-2_amd64.buildinfo
+BUILDINFO_S2=$R/s2-sample-app_1.0.0-1_amd64.buildinfo   # S2 non rejouée : buildinfo de S1b (1.0.0-1), archivé
 CLOSURE=$here/../03-deps-closure/closure.sh
 PKG=${PACKAGING_DIR:-$HOME/.cache/supply-chain-poc/packaging}
-DSC=sample-app_1.0.0-1.dsc
+DSC=sample-app_1.0.0-2.dsc
 LISTES=/var/lib/apt/lists/snapshot.debian.org_archive_debian_20261105T000000Z_dists_trixie   # listes de l'instantané dans le chroot
 LIMITES='{"cpu": "2", "memory": "6Gi"}'
 TMPFS=4Gi
@@ -217,7 +217,7 @@ etape_builds() {
     tar -C "$T/restauree-$n" -cf "$T/fermeture-$n.tar" .
     copier "$p" "$T/fermeture-$n.tar" /w/fermeture.tar
     copier "$p" "$T/fermeture.sha256" /w/fermeture.sha256
-    tar -C "$PKG" -cf "$T/sources.tar" sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-1.debian.tar.xz "$DSC"
+    tar -C "$PKG" -cf "$T/sources.tar" sample-app_1.0.0.orig.tar.gz sample-app_1.0.0-2.debian.tar.xz "$DSC"
     copier "$p" "$T/sources.tar" /w/sources.tar
     copier "$p" "$T1/SHA256SUMS.s1" /w/SHA256SUMS.s1
     kubectl exec -n builds "$p" -- sh -c 'mkdir -p /w/fermeture /w/src && tar -xf /w/fermeture.tar -C /w/fermeture && tar -xf /w/sources.tar -C /w/src && mv /w/SHA256SUMS.s1 /w/src/ && rm /w/fermeture.tar /w/sources.tar' </dev/null \
@@ -241,8 +241,8 @@ mesure() { [ "$2" = "$3" ] && echo "OK   $1 : $2" || { echo "ÉCART $1 : $2 (att
 etape_comparaison() {
   local n a b
   for n in 1 2; do [ -s "$R/s3-build-$n.buildinfo" ] || { echo "KO   lancer d'abord l'étape builds" >&2; exit 1; }; done
-  a=$(sha256sum < "$T/build-1/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)
-  b=$(sha256sum < "$T/build-2/sample-app_1.0.0-1_amd64.deb" | cut -c1-64)
+  a=$(sha256sum < "$T/build-1/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)
+  b=$(sha256sum < "$T/build-2/sample-app_1.0.0-2_amd64.deb" | cut -c1-64)
   echo "deb du build 1 : $a"
   echo "deb du build 2 : $b"
   mesure "deb identiques sur les deux builds" "$b" "$a"

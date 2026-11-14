@@ -25,3 +25,10 @@ override_dh_auto_clean:
 override_dh_auto_test:
 
 override_dh_dwz:
+
+# Axe 1 (13a) : Static-Built-Using, paquet source et version de la bibliothèque standard de Go compilée dans le binaire.
+# Variable misc:Static-Built-Using, celle de dh_golang et du tag lintian (compat 13) ; golang-1.24-src en dur : si la
+# version de Go change, dpkg-query échoue et le build aussi (voulu, le verrou épingle la fermeture).
+override_dh_gencontrol:
+	sbu=$$(dpkg-query -W -f='$${source:Package} (= $${source:Version})' golang-1.24-src) && test -n "$$sbu" \
+	  && dh_gencontrol -- "-Vmisc:Static-Built-Using=$$sbu"

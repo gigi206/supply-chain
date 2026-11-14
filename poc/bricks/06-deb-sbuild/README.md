@@ -2052,3 +2052,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - Note de 2026-11-14T21:53:55Z (rien n'est réécrit) : le correctif de 9106ed3 avait un défaut (`BUILDINFO_S2` de `s3.sh` passé en 1.0.0-2 : U1 non
   mesurée) ; **[`revision-1.0.0-2-v2.patch`](revision-1.0.0-2-v2.patch) le remplace**. La carte demande 16 accords (13 lignes et trois
   correctifs d'épinglage), pas 13. Détail : [prédictions](resultats/revision-predictions.md), note du même nom.
+- 2026-11-14T21:55:49Z : révision 1.0.0-2, ligne 0 de la carte : correctif v2 appliqué, entrée du changelog datée 2026-11-14T21:55:32Z (epoch 1794693332) ; rien lancé ([prédictions](resultats/revision-predictions.md)).

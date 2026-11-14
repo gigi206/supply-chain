@@ -10,6 +10,7 @@ Homepage: https://github.com/gigi206/supply-chain
 Package: sample-app
 Architecture: amd64
 Depends: ${misc:Depends}
+Static-Built-Using: ${misc:Static-Built-Using}
 Description: application de démonstration de la plateforme supply-chain
  Binaire Go qui sert une interface web construite avec npm et embarquée à la
  compilation.
