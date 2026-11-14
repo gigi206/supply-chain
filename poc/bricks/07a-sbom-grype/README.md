@@ -305,3 +305,10 @@ Mesure de la brique 06 (S6a, relevé 1, [résultats](../06-deb-sbuild/resultats/
 - La tâche planifiée n'est pas modifiée. Elle sera désactivée au lancement de S5b, sur le même accord.
 
 **Additif du 12/11/2026, à partir de 14:50:52 UTC : deux défauts de `g7-replanifier.sh` corrigés avant tout accord, NON LANCÉ.** Un dossier absent arrêtait l'étape sans message, et `/var/lib/zot` était écrit en dur. Essai hors cluster conforme, trois cas : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
+
+**Additif du 14/11/2026 (note de 2026-11-14T20:43:27Z) : relevé de replanification lancé (point 2), code 0.** « Oui, lance-le », de 20:42:30 à
+20:42:31 UTC ([journal](resultats/g7-replanifier-releve.log)). Zot démarré le 13/11 à 12:17:25 UTC ; plus ancien blob de
+`builds/scan/**` le 13/11 à 12:41:47 UTC (`builds/scan/essai-07a`, dépôt non prédit) ; **tâche proposée le 28/11/2026 à 13:02:25 UTC**
+(calcul). G1 à G6 tenues. Relevé en passant : le push du blob vide `{}` par `pousser_vsa` de la 06 a changé sa date de modification
+dans tous les dépôts (mécanisme non vérifié). Détail : [`resultats/g7-replanification.md`](resultats/g7-replanification.md).
+Points 3 et 4 (prédiction, consigne et tâche replanifiée) : à faire, chacun sur accord.

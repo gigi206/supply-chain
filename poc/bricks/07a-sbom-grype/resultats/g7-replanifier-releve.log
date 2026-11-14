@@ -1,0 +1,18 @@
+# g7-replanifier.sh releve, 2026-11-14T20:42:30Z
+## Zot sur sc-stockage
+OK   zot.service actif : active
+zot.service démarré : Fri 2026-11-13 12:17:25 UTC
+démarrage en UTC : 2026-11-13T12:17:25Z
+## configuration de rétention et de gc, VM comparée au dépôt
+OK   configuration de rétention et de gc identique au dépôt : oui
+rootDirectory : /var/lib/zot ; delay : 336h ; gcInterval : 24h
+## blobs par dépôt (date de modification, UTC)
+builds/scan/essai-07a : 3 blob(s), plus ancien 2026-11-13T12:41:47Z, plus récent 2026-11-14T20:30:53Z
+builds/scan/essai-scan : 33 blob(s), plus ancien 2026-11-13T12:49:10Z, plus récent 2026-11-14T20:30:53Z
+builds/scan/sample-app : 7 blob(s), plus ancien 2026-11-13T12:45:07Z, plus récent 2026-11-14T20:30:53Z
+vulndb/grype : 7 blob(s), plus ancien 2026-11-13T12:42:15Z, plus récent 2026-11-14T20:30:53Z
+plus ancien de builds/scan/** : 2026-11-13T12:41:47Z
+## calcul (pas une mesure ; un redémarrage de Zot le déplacerait)
+première suppression possible : 2026-11-27T12:41:47Z (plus ancien blob + 336h)
+premier balayage qui la suit : 2026-11-28T12:17:25Z (démarrage + 15 × 24h)
+heure proposée pour la tâche : 2026-11-28T13:02:25Z (balayage + 45 min)
