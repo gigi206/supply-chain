@@ -526,3 +526,19 @@ de la révision) ; seuil de la 13a : 0,4 pw pour une estimation de 0,2 pw.
    21:29:25 est l'heure de la commande d'écriture. L'en-tête du banc fera foi au lancement.
 4. **Consommateurs** : `git grep` de `paquets.py`, `paquets.sh` et de l'ancienne empreinte `8d4bb025` hors de la 13a (hors `.md` et
    `.log`) : aucun résultat ; aucun épinglage de `paquets.py` dans la 06, la 08, `rejeu.sh` ni les politiques.
+
+## Résultats du banc de la bascule de M5 : 14/11/2026, de 21:32:22 à 21:32:28 UTC (`date -u`), code 0 (écrit à 21:32:46 UTC)
+
+Accord : « Oui, lance-le » à « Je lance le banc de la bascule M5 ? » ; HEAD = origin = 0445a55. Journal :
+[`paquets-m5-essai-local.log`](paquets-m5-essai-local.log) (en-tête : `paquets.py` `0e49bbf9…`, celui d'avant `8d4bb025…`, go1.24.7).
+**Critère tenu : dix lignes `OK` en colonne 0, aucune ligne `KO` en colonne 0** ; aucun fichier de la 13a touché ; dossier de travail effacé.
+
+| Id | Résultat |
+|---|---|
+| B4 | **Tenue.** Version amont fausse (`golang-1.24 (= 1.24.8-1)`) et autre paquet source (`golang-1.25 (= 1.24.7-1)`) : KO « ne correspond pas à go1.24.7 du buildinfo », code 1 ; deux entrées et opérateur `>=` : KO « forme attendue », code 1 |
+| B5 | **Tenue.** Champ juste avec `Comment` : OK, ÉCART « Comment d'en-tête présent » ; sans `Comment` : OK, ÉCART « Comment d'en-tête absent » |
+| B6 | **Tenue.** Sans champ : code 0, ÉCART d'avant (« hors du copyright ; Built-Using absent ») ; sortie identique à celle du `paquets.py` de a821111 (`cmp`) |
+| B7 | **Tenue.** Révision fausse (`= 1.24.7-99`) : OK, code 0 : la limite est visible |
+
+Restent : B8 (banc de `modules` rejoué), B1 (`paquets.sh modules` sur le vrai deb), chacun sur accord nommé ; B2 et B3 avec la
+révision 1.0.0-2. Ce banc porte sur go1.24.7 de mise, pas sur le go1.24.4 du deb.

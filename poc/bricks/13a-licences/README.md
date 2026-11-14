@@ -145,3 +145,7 @@ dans le prédicat.
 à la version de Go du binaire, sinon KO). Banc hors réseau [`paquets-m5-essai-local.sh`](resultats/paquets-m5-essai-local.sh) ;
 prédictions B1 à B8 dans [`resultats/paquets-predictions.md`](resultats/paquets-predictions.md). Lancements sur accord nommé ; B2 et B3
 attendent la révision 1.0.0-2.
+
+*Note du 14/11/2026, 21:32:46 UTC* : banc de la bascule de M5 lancé de 21:32:22 à 21:32:28 UTC (« Oui, lance-le »), code 0, dix `OK`, aucun
+`KO` ([journal](resultats/paquets-m5-essai-local.log)) : **B4 à B7 tenues** ; sans le champ, sortie identique à celle d'avant la bascule.
+Restent B8 et B1 (accord nommé), B2 et B3 avec la révision 1.0.0-2.

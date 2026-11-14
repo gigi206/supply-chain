@@ -1,0 +1,43 @@
+# banc bascule M5, 2026-11-14T21:32:22Z, paquets.py 0e49bbf97d102ced3097c10e8ae34d6a95633b6da19d5002e221d3a59b65b24e, avant (a821111) 8d4bb025b680a37c435d3fabb739a2171743fd46aec70d736b87a70d92916ba3, go version go1.24.7 linux/amd64
+version de Go du binaire d essai : go1.24.7
+OK   sans-champ : code 0, « ^ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent$ »
+     control : Built-Using absent
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors du copyright ; Built-Using absent
+OK   sans-champ : sortie identique à celle de paquets.py a821111 (code 0)
+OK   juste : code 0, « ^OK   Static-Built-Using golang-1.24 \(= 1.24.7-1\) : paquet source et version amont égaux à go1.24.7 du buildinfo$ »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (= 1.24.7-1)
+     OK   Static-Built-Using golang-1.24 (= 1.24.7-1) : paquet source et version amont égaux à go1.24.7 du buildinfo
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.7-1)
+OK   juste : ÉCART avec Comment présent
+OK   sans-comment : code 0, « Comment d'en-tête absent, contenu non contrôlé »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (= 1.24.7-1)
+     OK   Static-Built-Using golang-1.24 (= 1.24.7-1) : paquet source et version amont égaux à go1.24.7 du buildinfo
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête absent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.7-1)
+OK   version-fausse : code 1, « ^KO   Static-Built-Using .* : ne correspond pas à go1.24.7 du buildinfo$ »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (= 1.24.8-1)
+     KO   Static-Built-Using golang-1.24 (= 1.24.8-1) : ne correspond pas à go1.24.7 du buildinfo
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.8-1)
+OK   autre-source : code 1, « ^KO   Static-Built-Using .* : ne correspond pas à go1.24.7 du buildinfo$ »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.25 (= 1.24.7-1)
+     KO   Static-Built-Using golang-1.25 (= 1.24.7-1) : ne correspond pas à go1.24.7 du buildinfo
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.25 (= 1.24.7-1)
+OK   deux-entrees : code 1, « ^KO   Static-Built-Using .* : forme attendue »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (= 1.24.7-1), libfoo (= 1.0-1)
+     KO   Static-Built-Using golang-1.24 (= 1.24.7-1), libfoo (= 1.0-1) : forme attendue « golang-X.Y (= X.Y.Z-révision) », une seule entrée
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.7-1), libfoo (= 1.0-1)
+OK   operateur : code 1, « ^KO   Static-Built-Using .* : forme attendue »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (>= 1.24.7-1)
+     KO   Static-Built-Using golang-1.24 (>= 1.24.7-1) : forme attendue « golang-X.Y (= X.Y.Z-révision) », une seule entrée
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (>= 1.24.7-1)
+OK   limite-revision : code 0, « ^OK   Static-Built-Using golang-1.24 \(= 1.24.7-99\) : paquet source et version amont »
+     control : Built-Using absent
+     control : Static-Built-Using golang-1.24 (= 1.24.7-99)
+     OK   Static-Built-Using golang-1.24 (= 1.24.7-99) : paquet source et version amont égaux à go1.24.7 du buildinfo
+     ÉCART bibliothèque standard de go1.24.7 : compilée dans le binaire, hors des sources, donc hors des paragraphes Files du copyright ; Comment d'en-tête présent, contenu non contrôlé ; Static-Built-Using golang-1.24 (= 1.24.7-99)
+fichiers de 13a touchés par le banc : 0
