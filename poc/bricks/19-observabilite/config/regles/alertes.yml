@@ -75,8 +75,11 @@ groups:
       # Scan en retard (brique 07a, G8) : Prometheus ne voit pas l'état des Jobs (pas de kube-state-metrics, non audité au doc 04),
       # on mesure ce que la porte exige (fraicheur-scan.prom). 26 h : le passage le plus tardif admis finit à 11:00 UTC
       # (09:30, plus startingDeadlineSeconds et activeDeadlineSeconds), 25 h 30 après le passage le plus tôt (09:32). for: 5m pour absent(), comme A4.
+      # Deux dépôts (brique 06, S6a) : le deb passe à 11:15 UTC, avec les mêmes écarts (fin au plus tard à 12:45). Un absent() par
+      # dépôt : sans sélecteur, absent() ne se déclencherait plus si une seule des deux séries disparaissait. Une seule ligne :
+      # observabilite.sh (regles) lit chaque expression par « expr: ».
       - alert: ScanEnRetard
-        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds)
+        expr: time() - scan_dernier_referrer_timestamp_seconds > 26 * 3600 or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app"}) or absent(scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb"})
         for: 5m
         labels:
           alerte: scan

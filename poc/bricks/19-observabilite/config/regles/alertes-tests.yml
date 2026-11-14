@@ -201,6 +201,8 @@ tests:
     input_series:
       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
         values: '0x1810'
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
+        values: '0x1810'
       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
         values: '0x1810'
     alert_rule_test:
@@ -214,6 +216,7 @@ tests:
         alertname: ScanEnRetard
         exp_alerts:
           - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app, job: fichiers, instance: local}
+          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb, job: fichiers, instance: local}
       - eval_time: 2879m   # 47 h 59
         alertname: BaseGrypeVieillie
         exp_alerts: []
@@ -231,11 +234,14 @@ tests:
         alertname: ScanBientotRefuse
         exp_alerts:
           - exp_labels: {alerte: scan, severite: critique, depot: builds/scan/sample-app, job: fichiers, instance: local}
+          - exp_labels: {alerte: scan, severite: critique, depot: builds/scan/sample-app-deb, job: fichiers, instance: local}
 
   # G8 : passage suivant le plus tardif admis, 25 h 28 après le premier (date 91680 s) : ni retard, ni base vieillie à 26 h 06.
   - interval: 4m
     input_series:
       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+        values: '0x382 91680x20'
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
         values: '0x382 91680x20'
       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
         values: '0x360 86400x40'
@@ -259,7 +265,8 @@ tests:
       - eval_time: 6m
         alertname: ScanEnRetard
         exp_alerts:
-          - exp_labels: {alerte: scan, severite: avertissement}
+          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app}
+          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb}
       - eval_time: 4m
         alertname: BaseGrypeVieillie
         exp_alerts: []
@@ -273,6 +280,8 @@ tests:
     input_series:
       - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
         values: '0+60x4 stale stale 360+60x6'
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app-deb", job="fichiers", instance="local"}'
+        values: '0+60x4 stale stale 360+60x6'
       - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
         values: '0+60x4 stale stale 360+60x6'
     alert_rule_test:
@@ -280,6 +289,25 @@ tests:
         alertname: ScanEnRetard
         exp_alerts: []
       - eval_time: 12m
+        alertname: BaseGrypeVieillie
+        exp_alerts: []
+
+  # S6a (brique 06) : la série du deb manque, celle de l'image est fraîche ; seul le dépôt du deb déclenche, après le for: 5m.
+  - interval: 1m
+    input_series:
+      - series: 'scan_dernier_referrer_timestamp_seconds{depot="builds/scan/sample-app", job="fichiers", instance="local"}'
+        values: '0+60x10'
+      - series: 'base_grype_construite_timestamp_seconds{depot="vulndb/grype", job="fichiers", instance="local"}'
+        values: '0+60x10'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: ScanEnRetard
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: ScanEnRetard
+        exp_alerts:
+          - exp_labels: {alerte: scan, severite: avertissement, depot: builds/scan/sample-app-deb}
+      - eval_time: 6m
         alertname: BaseGrypeVieillie
         exp_alerts: []
 

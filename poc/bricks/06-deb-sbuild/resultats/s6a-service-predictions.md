@@ -313,3 +313,12 @@ de G7, fait le 14/11 à 20:42 UTC (`07a-sbom-grype/resultats/g7-replanifier-rele
 - `periodique` refuse de 09:00 à 12:59 UTC (`hors_fenetre`), et `grafana` doit passer avant le scan planifié de 09:30 UTC qui suit.
 - Effet déjà consigné : une fois `s6a-scanner-deb.patch` réappliqué dans `scan-config`, le scan de `sample-app` de 09:30 UTC passe
   aussi par le plancher (E4 de l'essai).
+
+## Note datée de 2026-11-14T20:57:35Z : point 1 fait, trois correctifs appliqués à l'arbre (rien n'est réécrit)
+
+« Oui, applique-les » à « J'applique et je commite les trois correctifs de S6a (point 1) ? ». `git apply` des trois correctifs à
+20:57:17 UTC, sur l'arbre de `6eb43b7`. Contrôles : réciproque de chacun applicable (`git apply -R --check`, ce que vérifie
+`applique` de `s6a.sh`) ; `sh -n` de `scanner.sh` ; `fraicheur-scan.py` analysé par `ast` ; `alertes.yml` et `alertes-tests.yml`
+lus par yq. `promtool` reste à l'étape `regles` de la 19 (point 6). **Rien n'est déployé** : ni `scan-config`, ni sc-stockage, ni
+Prometheus. Limite déjà consignée, désormais active : un rejeu de zéro lancé avant l'intégration de S6 à `rejeu.sh` déploierait
+des règles qui attendent la série du deb.

@@ -4,6 +4,11 @@
 #   analyser    (outils-scan) base la plus récente de vulndb/grype, résolue en digest et vérifiée par son empreinte, importée
 #               hors de tout service Anchore ; image lue par digest ; SBOM de l'image et de la source fusionnés ; scan ; prédicat.
 #               Ni identifiant ni jeton dans ce conteneur : Zot et Forgejo sont lus en anonyme.
+#   artefact    (outils-scan) la partie « artefact » d'analyser seule, sans base ni scan : mode du pod d'essai de S6a (brique 06).
+#               NATURE=image (défaut) : syft oci-dir: sur l'image. NATURE=deb (S6a de la 06, décision du 12/11/2026, 08:50:32 UTC) :
+#               layout du deb (une couche tar qui contient le .deb seul), data.tar extrait par busybox (ar, unxz ou gunzip, tar),
+#               syft dir: sur le contenu extrait. Dans les deux cas, plancher : au moins une PURL versionnée dans le SBOM de
+#               l'artefact seul, sans quoi refus (relevé 1 de S6a : un artefact vide passe sans erreur, et la fusion le masque).
 #   jetons      (openbao) rôle scan-zot : identifiants de poc-scan lus, jeton révoqué ; puis rôle scanner : jeton de 5 min, pris
 #               juste avant la signature (D9 a), après le scan
 #   attester    (outils-scan) cosign attest-blob --key hashivault://scanner, sans service Sigstore, sujet = digest de l'image ;
@@ -44,6 +49,44 @@ source_commit() {
   rm -rf depot .gitconfig
 }
 
+extraire_deb() { # layout du deb (deb/construire-deb.yaml de la 06) : data.tar extrait dans artefact/ ; busybox n'a pas zstd
+  couches=$(sed -n 's/.*"layers":\[\([^]]*\)\].*/\1/p' "image/blobs/sha256/${IMAGE##*@sha256:}")
+  [ "$(printf '%s' "$couches" | grep -o '"digest"' | wc -l)" = 1 ] || { echo "deb : une couche attendue dans le manifeste" >&2; exit 1; }
+  case $couches in *'"mediaType":"application/vnd.oci.image.layer.v1.tar"'*) ;; *) echo "deb : couche tar non compressée attendue" >&2; exit 1 ;; esac
+  l=$(printf '%s' "$couches" | sed -n 's/.*"digest":"sha256:\([0-9a-f]\{64\}\)".*/\1/p')
+  mkdir couche artefact
+  tar -xf "image/blobs/sha256/$l" -C couche
+  set -- couche/*
+  [ "$(ls -A couche | wc -l)" = 1 ] && [ -f "$1" ] && [ "${1%.deb}" != "$1" ] || { echo "deb : la couche doit contenir un .deb seul" >&2; exit 1; }
+  echo "DEB|${1##*/}, sha256 $(sha256sum < "$1" | cut -c1-64), $(wc -c < "$1") octets"
+  (cd couche && ar -x "${1##*/}")
+  set -- couche/data.tar*
+  [ $# = 1 ] && [ -f "$1" ] || { echo "deb : un data.tar attendu" >&2; exit 1; }
+  case $1 in
+    *.tar.xz) unxz -c "$1" > couche/data.tar ;;
+    *.tar.gz) gunzip -c "$1" > couche/data.tar ;;
+    *.tar) ;;
+    *) echo "deb : compression de data.tar non prise en charge : ${1##*/}" >&2; exit 1 ;;
+  esac
+  tar -xf couche/data.tar -C artefact
+  rm -rf couche
+  echo "EXTRAIT|$(find artefact -type f | wc -l) fichiers dans data.tar"
+}
+
+artefact() { # image lue par digest ; SBOM de l'artefact seul dans sbom-image.json ; plancher
+  oras cp --no-tty --from-ca-file "$CA" "$IMAGE" --to-oci-layout image:scan > /dev/null
+  grep -q "\"digest\":\"${IMAGE##*@}\"" image/index.json || { echo "digest de l'image lue différent de $IMAGE" >&2; exit 1; }
+  case ${NATURE:-image} in
+    image) syft scan oci-dir:image -o cyclonedx-json=sbom-image.json -q ;;
+    deb) extraire_deb; syft scan dir:artefact -o cyclonedx-json=sbom-image.json -q ;;
+    *) echo "nature inconnue : $NATURE" >&2; exit 2 ;;
+  esac
+  # syft écrit le JSON sur une ligne : compter les occurrences, pas les lignes
+  n=$(grep -oE '"purl": *"pkg:[^"@]+@[^"]*"' sbom-image.json | wc -l)
+  [ "$n" -gt 0 ] || { echo "aucune PURL versionnée dans le SBOM de l'artefact seul (${NATURE:-image}) : extraction vide ou ratée" >&2; exit 1; }
+  echo "ARTEFACT|${NATURE:-image}, $n PURL versionnées dans l'artefact seul"
+}
+
 analyser() {
   debut=$(date +%s)
   export GRYPE_DB_CACHE_DIR=$TRAVAIL/dbcache GRYPE_DB_AUTO_UPDATE=false GRYPE_DB_VALIDATE_AGE=false GRYPE_CHECK_FOR_APP_UPDATE=false \
@@ -65,9 +108,7 @@ analyser() {
   rm -rf base import.out
 
   t=$(date +%s)
-  oras cp --no-tty --from-ca-file "$CA" "$IMAGE" --to-oci-layout image:scan > /dev/null
-  grep -q "\"digest\":\"${IMAGE##*@}\"" image/index.json || { echo "digest de l'image lue différent de $IMAGE" >&2; exit 1; }
-  syft scan oci-dir:image -o cyclonedx-json=sbom-image.json -q
+  artefact
   syft scan dir:source -o cyclonedx-json=sbom-source.json -q
   scan-outil fusion sbom-source.json sbom-image.json source image > sbom.json
   echo "SBOM|$(grep -c '"purl"' sbom.json) composants avec PURL (D1 a), $(( $(date +%s) - t )) s"
@@ -75,7 +116,7 @@ analyser() {
   grype sbom:sbom.json -o json --file grype.json -q
   scan-outil predicat grype.json "$ref" > scan.json
   echo "SCAN|$IMAGE, $(grep -c '"kev":' scan.json) vulnérabilités, $(grep -c '"kev": true' scan.json) KEV, $(( $(date +%s) - t )) s"
-  rm -rf dbcache image source sbom-image.json sbom-source.json sbom.json grype.json .cache
+  rm -rf dbcache image artefact source sbom-image.json sbom-source.json sbom.json grype.json .cache
   echo "PREDICAT|sha256 $(sha256sum < scan.json | cut -c1-64), $(( $(date +%s) - debut )) s en tout"
 }
 
@@ -137,6 +178,7 @@ revocation() {
 case $MODE in
   source) source_commit ;;
   analyser) analyser ;;
+  artefact) artefact ;;
   jetons) jetons ;;
   attester) attester ;;
   publier) publier ;;
