@@ -296,3 +296,20 @@ La décision sur `rejeu.sh` et S6 reste à prendre avant le premier rejeu qui su
 **Calendrier.** Le diff de `rejeu.sh` ne sera écrit qu'après le premier passage manuel réel des étapes de S6a, de `pousser_vsa` et de `lire_vsa`, donc après S5b et le relevé du 21/11. Il sera préparé à sec, puis soumis à un accord nommé, avant le premier rejeu qui suit l'application des correctifs de S6a. Jusque-là, `rejeu.sh` reste celui que S5b lancera.
 
 Rien n'a été lancé. Aucun fichier n'est modifié, sauf celui-ci et `docs/03-validation-briques.md`.
+
+## Note datée de 2026-11-14T20:56:39Z : décision du propriétaire « a » sur l'ordre (rien n'est réécrit)
+
+Question posée : depuis que S5b a décalé la mesure G7, « après le relevé du 21/11 » veut-il dire (a) le relevé de replanification
+de G7, fait le 14/11 à 20:42 UTC (`07a-sbom-grype/resultats/g7-replanifier-releve.log`), ou (b) la mesure G7 elle-même (27/11 et
+28/11) ? Réponse : **« a »**. S6a peut donc commencer, chaque étape sur accord nommé, dans l'ordre ci-dessus (points 1 à 6, et
+`grafana` entre 4 et 5).
+
+État au moment de la décision, relu sans lancer d'étape :
+- les trois correctifs s'appliquent toujours à l'arbre (`git apply --check`, chacun seul) et ne sont pas appliqués ;
+- **VSA du deb poussée** (`s6b.sh pousser_vsa`, 14/11 à 20:30 UTC, manifeste `bd7c77ec`) : pour Q9, VSA attendue `ok`, et le Job
+  de la porte réussi si le scan est `ok` ;
+- un scan du deb poussé à partir d'aujourd'hui aura moins de 336 h au balayage du 28/11 : aucune décision de rétention attendue
+  pour `builds/scan/sample-app-deb` (H4 de `g7-replanification.md`) ;
+- `periodique` refuse de 09:00 à 12:59 UTC (`hors_fenetre`), et `grafana` doit passer avant le scan planifié de 09:30 UTC qui suit.
+- Effet déjà consigné : une fois `s6a-scanner-deb.patch` réappliqué dans `scan-config`, le scan de `sample-app` de 09:30 UTC passe
+  aussi par le plancher (E4 de l'essai).
