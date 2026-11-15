@@ -2134,6 +2134,15 @@ Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correc
   - une PR ouverte trop tôt risque l'avertissement à 7 jours puis la fermeture à 14 (cas de #17648 et de #16084).
 - **Recommandation, relue par le conseiller** : une question d'abord, par une réponse courte sur l'issue, rédigée ici, relue par le conseiller et validée par le propriétaire. Rien de préparé n'est perdu : il suffira de relire `main` avant le push.
 
+**Additif du 15/11/2026, 21:49 UTC : décision « Question d'abord ».** Le propriétaire a répondu « Question d'abord » à « On pose d'abord une question sur l'issue, ou PR directe quand même ? ». Brouillon de la réponse sur l'issue, relu par le conseiller et resserré : [`commentaire-issue-v1.md`](kyverno-correctif/pr/commentaire-issue-v1.md). Rien n'est publié.
+- Restent au propriétaire :
+  - garder ou non le paragraphe sur #18533, qui crée une référence visible sur cette PR ;
+  - mentionner ou non un mainteneur par `@`, et lequel ;
+  - « The fix is ready » l'engage, au titre de la règle 3 de la politique IA : relire `v3/v3-code.diff` ;
+  - poster lui-même par le web, ou le faire faire par `gh` sur accord nommé ;
+  - quoi faire, et à quelle date, faute de réponse.
+- Juste avant de poster : relire en lecture publique les étiquettes et les commentaires de l'issue, `main` et la tête de #18533. Après publication : comparer le texte publié au texte validé, et l'archiver.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
