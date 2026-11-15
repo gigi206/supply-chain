@@ -2065,6 +2065,19 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 - Notre correctif ne s'applique pas tel quel (contexte de `verifier.go`), mais s'applique en fusion à trois voies sans conflit. Les deux ensemble : reproducteur `PASS`, 6/6 tests de la PR et 9/9 des nôtres, 9 paquets de régression `ok`.
 - Arbre `pr-18533` laissé dans le cache avec les deux correctifs, rien commité dedans.
 
+**Additif du 15/11/2026, 21:04 UTC : conventions de PR de Kyverno lues, précédents relevés.** Sur « Oui, lis-les » (recommandation du conseiller). Lectures locales dans l'arbre `main-b2e65e2` et lectures publiques, de 21:03:41 à 21:03:44 UTC pour le journal : [`kyverno-pr-conventions-1511.log`](resultats/kyverno-pr-conventions-1511.log). Rien publié ; rien lu ni écrit dans le cluster, Zot ou les VM.
+- **Nuance à l'additif de 20:12, qui n'est pas réécrit** : `triage` n'a pas été retirée de notre issue par une décision individuelle. Les 40 issues relevées qui portent `triage:critical-review` l'ont toutes reçue de `JimBugwadia` le 14/11 entre 00:00 et 00:59 UTC : c'est un réétiquetage en masse. Et kyverno/kyverno#18565 n'est pas un précédent pour la règle 4 : sa PR #18566 date du 10/11, avant ce réétiquetage, et ses commits ne portent aucune ligne de divulgation d'IA.
+- **Précédent plus proche** : kyverno/kyverno#18533 (`Fixes #17562`) porte 4 lignes `Co-Authored-By: Claude …` et elle est `ready-for-review`, alors que #17562 porte `triage:needs-repro` (posée en masse le 14/11 à 00:15:09 UTC) et n'a jamais porté `triage`. Elle n'est pas fusionnée.
+- **Politique IA** (`c0ee0857b`, lue en entier) : règle 2, 8 PR ouvertes au plus (0 pour `gigi206`) ; règle 4, la seule étiquette citée est `triage` ; règle 5, divulgation par une ligne finale de commit, `Assisted-by: Claude <noreply@anthropic.com>` accepté. Les mainteneurs sont exemptés.
+- **Conventions du dépôt** :
+  - DCO obligatoire, contrôlé par la CI : `Signed-off-by` égal à l'auteur de chaque commit (`REVIEW.md`, `AGENTS.md`). L'adresse sera publique.
+  - Titre conventionnel (`fix(…)`, `semantic.yml`).
+  - Avant le commit : `make imports fmt`, puis `make imports-check fmt-check`. Avant la PR : `make verify-codegen` et `golangci-lint run` (v2.14.0 dans le `Makefile`).
+  - `.golangci.yml` exclut les fichiers `_test.go` des linters et des formateurs : `paralleltest` ne vise que `opts.go` et `verifier.go`.
+  - Les correctifs de bug sont exemptés de documentation (`pr_documentation.md`). Les « Proof Manifests » sont demandés « for anything user-facing » (`REVIEW.md`) ; le modèle de PR les présente comme obligatoires pour un comportement nouveau ou modifié. À trancher au moment du texte : un manifeste de CLI qui reproduit notre cas est faisable.
+  - `pkg/image/AGENTS.md` : la vérification échoue fermée, et `skipSigstoreInfra` est la seule exception, déclarée par l'auteur de la politique. Notre correctif garde cette propriété : il ajoute une erreur explicite quand la racine de la TSA manque.
+- **Lecture pour la décision du propriétaire** (PR directe ou question d'abord) : à la lettre, la règle 4 est remplie, et une PR assistée par IA sur une issue `triage:*` est déjà en revue. Aucune acceptation explicite n'a été donnée par un mainteneur sur notre issue.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).

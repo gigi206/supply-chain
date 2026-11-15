@@ -1,0 +1,77 @@
+# Conventions de PR de Kyverno et précédents d'étiquetage, sur « Oui, lis-les » du propriétaire (15/11/2026)
+# Lectures locales dans l'arbre main-b2e65e2 (b2e65e2fa88f) et lectures publiques ; rien publié ; rien lu ni écrit dans le cluster, Zot ou les VM
+# début : 2026-11-15T21:03:08Z
+## fichiers locaux lus (sha256, lignes)
+CONTRIBUTING.md 86e25925254b0644 32
+REVIEW.md 33da812c734e2b79 119
+AGENTS.md 8fdfa1e9c0f45f3a 276
+pkg/image/AGENTS.md 54894c1b4fbc811a 48
+.github/PULL_REQUEST_TEMPLATE.md 36a431ac32664ad8 116
+.github/pr_documentation.md 78444a2a40cd9dc9 171
+.github/pr-management.json e10db3b65f71663c 14
+.github/copilot-instructions.md 1bf1a9ea86cd0304 64
+.golangci.yml 0612e18ae952e619 91
+Makefile 1dd92831ace852e6 1279
+## extraits retenus
+63:GOLANGCI_LINT_VERSION              ?= v2.14.0
+130:	@GOBIN=$(TOOLS_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+20:- **DCO**: every commit needs a `Signed-off-by` trailer matching its own author, not just *a* trailer somewhere in
+21:  the range. `git log --format='%h %s%n%b' origin/main..HEAD | grep -n "Signed-off-by"` (from `AGENTS.md`'s own
+27:    git log -1 --format=%B "$c" | grep -qF "Signed-off-by: $author" \
+115:## AI-assisted PRs
+116-
+117-The org's [`AI_USAGE_POLICY.md`](https://github.com/kyverno/community/blob/main/AI_USAGE_POLICY.md) applies. AI
+118-assistance should be disclosed via a `Co-authored-by`/`Assisted-by` commit trailer, per the PR template checklist —
+112:- Proof manifests in the PR description, per the PR template and
+13:* Bug fixes
+104:- Run `make imports fmt` before committing.
+109:- Run `make codegen-all-code` then `make verify-codegen`.
+110:- Run `./.tools/golangci-lint run` (install first with `make install-tools` if needed).
+140:| `make verify-codegen` | Verify generated code is up to date (CI check) |
+234:- Run `make verify-codegen` to ensure generated code is up to date before submitting
+240:1. **Always sign commits (DCO)**
+249:   - Run `make verify-codegen` and ensure it exits cleanly with no git diff.
+252:   - `make imports fmt`
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - .+\.generated.go
+      - .+_test.go
+      - .+_test_.+.go
+## politique IA (kyverno/community, AI_USAGE_POLICY.md), dernier commit et règles 2, 4, 5
+{"date":"2026-02-15T21:06:27Z","sha":"c0ee0857b06642f047d85af2204d3b8726e4da1c"}
+11:2. To avoid maintainer overload, contributors are limited to 8 open PRs at any given time across all repositories. Contributors are required to address all open PR comments and merge all open PRs, before creating additional PRs.
+25:4. Pull Requests that include AI generated code can only be for issues that are accepted i.e., not labeled as “triage”.
+27:5. Contributors SHOULD disclose any substantial use of AI. Disclosure SHOULD take the form of a trailer line within the commit attributing the AI tool used. Acceptable formats include:
+29:   * Assisted-by: Claude \<noreply@anthropic.com\>
+31:   * Co-authored-by: Claude \<noreply@anthropic.com\>
+33:   * Generated-by: Claude \<[noreply@anthropic.com](mailto:noreply@anthropic.com)\>
+35:   Many AI coding tools automatically add `Co-authored-by` trailers—this is acceptable and need not be changed to `Assisted-by`.
+37:[Kyverno Maintainers](https://github.com/kyverno/community/blob/main/MAINTAINERS.md) are exempt from these rules and may use AI tools at their discretion; they've proven themselves trustworthy to apply good judgment.
+45:2. Contributors must ensure they have the right to use and publish any AI-generated media and cite AI usage
+49:4. AI-generated images should support the content and should never be used to replace thoughtful writing.
+## réétiquetage du 14/11 : première pose de triage:critical-review sur 40 issues qui la portent (heure tronquée à l'heure)
+     40 2026-11-14T00 JimBugwadia
+## issue 17562 (liée à la PR 18533)
+{"labels":["area/image-verify","triage:needs-repro"],"state":"open"}
+{"actor":"JimBugwadia","created_at":"2026-11-14T00:15:09Z","event":"labeled","label":"area/image-verify"}
+{"actor":"JimBugwadia","created_at":"2026-11-14T00:15:09Z","event":"labeled","label":"triage:needs-repro"}
+## PR 18533 : issue liée, trailers d'IA des commits (adresses masquées)
+46:Fixes #17562
+      4 Co-Authored-By: Claude Opus 5 <…>
+{"draft":false,"labels":["kind/tests","area/cosign","area/image-verify","ready-for-review"],"state":"open"}
+## 18565 et sa PR 18566
+{"closed_at":"2026-11-14T14:51:16Z","labels":["bug","area/generation","triage:critical-review"],"state":"closed","state_reason":"completed"}
+{"author_association":"CONTRIBUTOR","created_at":"2026-11-10T16:39:26Z","merged_at":"2026-11-14T14:51:14Z","user":"anushkagupta200615-jpg"}
+trailers d'IA dans les commits de 18566 : 0
+## 16084 et 16054
+{"closed_at":"2026-10-22T15:56:16Z","labels":["stale","size:L","merge-conflicts","kind/tests","needs-author-action"],"merged":false,"state":"closed"}
+{"closed_at":"2026-07-28T13:55:18Z","labels":["bug","imageVerify","triage"],"state":"closed","state_reason":"completed"}
+## PR ouvertes de gigi206 chez kyverno/kyverno
+0
+# fin : 2026-11-15T21:03:44Z
