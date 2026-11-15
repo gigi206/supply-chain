@@ -1,0 +1,5 @@
+== L0 départ, 21:15:45 UTC
+golangci-lint d8b665fe720d18e7 : golangci-lint has version 2.14.0 built with go1.27.3 from (unknown, modified: ?, mod sum: "h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=") on (unknown)
+OK   tête b2e65e2fa88f8ff8bfb0a6351712433d6b14796d
+OK   v3 en place, identique à correctif-v3.patch
+.golangci.yml 0612e18ae952e619

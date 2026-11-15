@@ -30,3 +30,20 @@ Durée attendue : quelques minutes (premier chargement du cache d'analyse).
 ## Ce que le lint ne prouvera pas
 
 - `make lint` sur tout `./...` ; `make verify-codegen` (aucun fichier généré n'est touché) ; le DCO, le fork et la PR.
+
+## Résultat du 15/11/2026, 21:16 UTC : L0 à L4 tenues, L5 affichée
+
+Lancé sur « Oui, lance-le », de 21:15:45 à 21:15:51 UTC (heures de la commande), code 0. Journaux : [`lint/`](../kyverno-correctif/lint/).
+
+| N° | Mesure | Verdict |
+|---|---|---|
+| L0 | Tête `b2e65e2` ; arbre identique à `correctif-v3.patch` ; `.golangci.yml` `0612e18a…`. | tenue |
+| L1 | « 0 issues. », code 0. | tenue |
+| L2 | « 0 issues. », code 0. | tenue |
+| L3 | Code 0, diff de 0 ligne. | tenue |
+| L4 | Code 0, diff de 0 ligne. | tenue |
+| L5 | Code 0, diff de 0 ligne (affiché). | — |
+
+Les `--diff` n'ont pas modifié l'arbre (status inchangé, relevé à la fin de L5).
+
+**Limite** : aucun témoin positif. Rien ne montre ici que ce lint, avec cette configuration, signale un défaut volontaire dans ce paquet : « 0 issues » prouve l'absence de signalement, pas que les linters ont analysé les fichiers. L2 a duré moins d'une seconde après L1 (cache d'analyse).

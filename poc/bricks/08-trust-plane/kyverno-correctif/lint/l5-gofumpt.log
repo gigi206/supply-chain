@@ -1,0 +1,4 @@
+== L5 gofumpt sur le fichier de tests (affiché, exclu par .golangci.yml), 21:15:50 UTC
+code 0 ; lignes de diff : 0
+arbre inchangé par --diff : M  pkg/image/verifiers/ivpol/cosign/opts.go A  pkg/image/verifiers/ivpol/cosign/tsa_cert_chain_test.go M  pkg/image/verifiers/ivpol/cosign/verifier.go 
+== fin, 21:15:50 UTC
