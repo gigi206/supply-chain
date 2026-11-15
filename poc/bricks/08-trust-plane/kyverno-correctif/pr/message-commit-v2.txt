@@ -1,0 +1,26 @@
+fix(ivpol): verify TSA timestamps for key/cert attestors ignoring tlog
+
+Key and certificate attestors with ctlog.insecureIgnoreTlog take the
+skipSigstoreInfra path in checkOptions, which leaves CheckOpts.TrustedMaterial
+nil. When ctlog.tsaCertChain is set, UseSignedTimestamps is enabled, but the
+TSA only lands in the legacy TSA* fields, which cosign does not use for
+Sigstore bundles. As soon as a bundle carries an RFC 3161 timestamp,
+sigstore-go dereferences the nil TrustedMaterial and the evaluation panics
+(nil pointer dereference), so a genuine timestamp can never be verified.
+
+For Sigstore bundles with signed timestamps and no trusted material, build
+one holding only the configured TSA (one entry per root of the chain), as
+cosign's CLI requires with --trusted-root. v2 signatures keep using the TSA*
+fields. A chain without its root CA now returns an explicit error instead of
+panicking. The existing wrapping of the trusted material in checkOptions
+moves to a shared helper, without behaviour change.
+
+Tests cover key attestors (genuine, tampered, foreign-TSA and missing
+timestamps, for v2 signatures and Sigstore bundles) and certificate attestors
+(genuine timestamps on Sigstore bundles).
+
+Fixes #18525
+
+Signed-off-by: Ghislain LE MEUR <13576579+gigi206@users.noreply.github.com>
+Assisted-by: Claude <noreply@anthropic.com>
+

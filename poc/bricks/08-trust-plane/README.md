@@ -2089,6 +2089,11 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 - Contrôle DCO de `REVIEW.md` : OK. Une ligne `Signed-off-by` égale à l'auteur, une ligne `Assisted-by: Claude <noreply@anthropic.com>`, aucune `Co-authored-by`.
 - Le brouillon disait que les tests couvraient aussi les horodatages altérés et étrangers pour les attesteurs à certificat. C'était faux : seuls des horodatages authentiques y sont testés. Corrigé par `--amend` avant toute publication.
 - Message et patch archivés : [`pr/`](kyverno-correctif/pr/). Le texte attend la validation du propriétaire avant le fork et le push.
+  - *Additif de 21:26 UTC, après relecture du conseiller demandée par le propriétaire.* Deux écarts corrigés par `--amend` (commit `1851634f9aff`, contenu toujours identique au v3) :
+    - le titre ne nommait que les attesteurs à clé ; il devient « fix(ivpol): verify TSA timestamps for key/cert attestors ignoring tlog » ;
+    - « the keyless wrapping » était faux : le bloc déplacé (`opts.go` l. 196-197) sert tout chemin où `TrustedMaterial` est déjà rempli, donc aussi clé ou certificat sans `insecureIgnoreTlog`. Le texte dit désormais « the existing wrapping ».
+  - La v1 reste archivée telle quelle ; la v2 est à côté : `message-commit-v2.txt`, `0001-commit-pr-v2.patch`. Aucune occurrence de `poc.test`, `/home/`, `192.168`, d'adresse gmail ni de `supply-chain` dans le patch v2.
+  - **Trace publique relevée chez Kyverno** : nos messages de commit poussés citent `kyverno/kyverno#…`. GitHub en a fait des événements `referenced` visibles dans la chronologie de ces issues : sur #18533, `c1ef224` et `3a0ed35` (push de 20:56:46 UTC) ; sur #18525, `a2fedc2` (push de 20:23:50 UTC), en plus de `b84261b` (08/11) et `aa9a9a9` (09/11). Cet effet n'avait pas été annoncé avant ces pushes. Rien n'est réécrit ; le choix revient au propriétaire. Désormais, aucun message de commit du dépôt ne cite `owner/repo#N` chez un tiers. « Fixes #18525 » créera aussi une référence sur l'issue dès le push vers le fork : la première action publique sera ce push.
 
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
