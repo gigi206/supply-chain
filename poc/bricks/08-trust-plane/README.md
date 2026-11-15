@@ -2123,6 +2123,17 @@ Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correc
   - règle 3 (relecture par le contributeur) : elle revient au propriétaire.
 - **Ce qui n'est pas appliqué de `CONTRIBUTING.md`.** Le point 3 demande de tester avec le CLI de Kyverno et de fournir un manifeste de test ; pour un changement testable par l'utilisateur, il demande des tests chainsaw. Aucun des deux n'est fait : il faudrait un registre contenant un bundle horodaté. Le point 1 (proof manifests) n'est pas fait non plus ; le texte de la PR en donne la raison.
 
+**Additif du 15/11/2026, 21:46 UTC : la décision « PR directe » est rouverte par le propriétaire (« on a quand meme encore un tag triage:critical-review »).** La décision n'est pas réécrite. Relectures faites ensuite, sans rien publier :
+- **Arbre local `b2e65e2`** : `.github/labels.yml` ne définit aucune étiquette `triage:*`, et ni `.github/` ni `hack/` ne les utilisent. Les modèles d'issue posent `triage`. La nouvelle famille n'est documentée nulle part dans le dépôt.
+- **Événements publics du dépôt** (10 pages de l'API `issues/events`, qui remontent jusqu'au 14/11 à 06:29:47 UTC) : aucune pose ni aucun retrait de `triage:*` après le réétiquetage en masse. Aucun mainteneur n'a encore fait passer une issue de cette famille à un autre état.
+- **`nishant-devv`** est absent de `MAINTAINERS.md` (`kyverno/community`) : l'additif de 20:12 (« pas mainteneur listé ») est confirmé.
+- **Critère abandonné** : #18533 n'est pas un précédent d'acceptation. Son `ready-for-review` a été posé par `github-actions` les 09/11 et 11/11, avant le réétiquetage, et aucun mainteneur ne l'a revue.
+- **Lecture** : `triage:critical-review` est une étape de tri, et `triage:decision` (« accept with owner and criteria… ») n'est pas posée. L'acceptation au sens de la règle 4 n'est pas acquise, même si sa lettre est remplie.
+- **Autres faits** :
+  - le propriétaire a écrit publiquement le 10/11 qu'il attendait le retour des mainteneurs, et aucun n'a écrit depuis ;
+  - une PR ouverte trop tôt risque l'avertissement à 7 jours puis la fermeture à 14 (cas de #17648 et de #16084).
+- **Recommandation, relue par le conseiller** : une question d'abord, par une réponse courte sur l'issue, rédigée ici, relue par le conseiller et validée par le propriétaire. Rien de préparé n'est perdu : il suffira de relire `main` avant le push.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
