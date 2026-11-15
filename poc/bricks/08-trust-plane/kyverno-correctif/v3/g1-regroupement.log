@@ -1,0 +1,4 @@
+== G1 regroupement, 21:08:31 UTC
+tsa_cert_chain_test.go écrit : 554 lignes, 33 imports (15 standard), 18 déclarations, 9 tests
+regrouper-tests.py : code 0
+./pkg/image/verifiers/ivpol/cosign//tsa_cert_chain_test.go

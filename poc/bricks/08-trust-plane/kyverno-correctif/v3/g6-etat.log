@@ -1,0 +1,9 @@
+== G6 modules et arbres, 21:11:30 UTC
+/home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/main-b2e65e2 : GOPROXY=off ; go.mod et go.sum modifiés : 0
+M  pkg/image/verifiers/ivpol/cosign/opts.go
+A  pkg/image/verifiers/ivpol/cosign/tsa_cert_chain_test.go
+M  pkg/image/verifiers/ivpol/cosign/verifier.go
+/home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/pr-18533-v3 : GOPROXY=off ; go.mod et go.sum modifiés : 0
+M  pkg/image/verifiers/ivpol/cosign/opts.go
+A  pkg/image/verifiers/ivpol/cosign/tsa_cert_chain_test.go
+M  pkg/image/verifiers/ivpol/cosign/verifier.go

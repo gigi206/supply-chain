@@ -1,0 +1,6 @@
+== G3 correctif v3 (diff contre b2e65e2fa88f), 21:08:38 UTC
+correctif v3 : 8c9fce3fa9ebfb62, 3 fichiers
+diff --git a/pkg/image/verifiers/ivpol/cosign/opts.go b/pkg/image/verifiers/ivpol/cosign/opts.go
+diff --git a/pkg/image/verifiers/ivpol/cosign/tsa_cert_chain_test.go b/pkg/image/verifiers/ivpol/cosign/tsa_cert_chain_test.go
+diff --git a/pkg/image/verifiers/ivpol/cosign/verifier.go b/pkg/image/verifiers/ivpol/cosign/verifier.go
+OK   opts.go et verifier.go identiques à v2

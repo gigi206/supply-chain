@@ -2081,6 +2081,8 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 **Additif du 15/11/2026, 21:08 UTC : décision « PR directe », correctif v3 préparé à sec.** Le propriétaire a répondu « PR directe » à « Pour notre correctif, PR directe ou question à un mainteneur d'abord ? ». La PR citera l'issue et déclarera l'aide de l'IA (`Assisted-by`). Avant toute action publique : regroupement des tests (v3), lint, DCO, fork, texte exact, chacun sur accord. Le v3 regroupe les deux fichiers de tests en un seul, sans changer le code ni la logique des tests : générateur, script et prédictions G0 à G6 dans [kyverno-correctif-v3-predictions.md](resultats/kyverno-correctif-v3-predictions.md). Rien lancé. L'estimation de 4 h pour préparer la PR reste à accorder.
 
+**Additif du 15/11/2026, 21:11 UTC : correctif v3 mesuré, G0 à G6 tenues.** Sur « Oui, lance-le », de 21:08:31 à 21:11:30 UTC, code 0, local, `GOPROXY=off`. Les tests du correctif tiennent dans un seul fichier, `tsa_cert_chain_test.go` (`gofmt` propre, `go vet` code 0). Code identique au v2. Sur main et sur la PR 18533, le paquet est `ok`, avec les mêmes 21 PASS de nos tests et sous-tests que la référence ; les 6 tests de la PR passent aussi. Détail : [kyverno-correctif-v3-predictions.md](resultats/kyverno-correctif-v3-predictions.md). Restent : lint, DCO, fork, texte exact, chacun avec son accord.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).

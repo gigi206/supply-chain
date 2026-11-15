@@ -1,0 +1,13 @@
+== G5 PR 18533 + v3 (arbre pr-18533-v3, fusion à trois voies), 21:10:00 UTC
+worktree add : code 0
+Applied patch to 'pkg/image/verifiers/ivpol/cosign/opts.go' cleanly.
+Falling back to direct application...
+Applied patch to 'pkg/image/verifiers/ivpol/cosign/verifier.go' cleanly.
+git apply --3way : code 0
+fichiers en conflit : 0
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	84.503s
+code 0
+--- FAIL : 0
+tests de la PR passés : 6/6
+OK   PASS de nos tests identiques à la référence (21)
+== fin, 21:11:30 UTC

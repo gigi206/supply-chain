@@ -1,0 +1,8 @@
+== G0 départ : arbre main-b2e65e2 à b2e65e2fa88f avec le correctif v2, 21:08:31 UTC
+OK   tête b2e65e2fa88f8ff8bfb0a6351712433d6b14796d
+correctif v2 présent (applicable à l'envers) : code 0
+ M pkg/image/verifiers/ivpol/cosign/opts.go
+ M pkg/image/verifiers/ivpol/cosign/verifier.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+référence : 21 PASS de nos tests dans m5-paquet-detail.log

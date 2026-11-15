@@ -1,0 +1,69 @@
+diff --git a/pkg/image/verifiers/ivpol/cosign/opts.go b/pkg/image/verifiers/ivpol/cosign/opts.go
+index c750133e..0b41ebe6 100644
+--- a/pkg/image/verifiers/ivpol/cosign/opts.go
++++ b/pkg/image/verifiers/ivpol/cosign/opts.go
+@@ -76,6 +76,21 @@ func (t tsaTrustedMaterial) TimestampingAuthorities() []root.TimestampingAuthori
+ 	return []root.TimestampingAuthority{t.timestampingAuthority}
+ }
+ 
++// tsaTrustedMaterials returns one trusted material per TSA root, each holding
++// only that timestamp authority.
++func tsaTrustedMaterials(roots, intermediates []*x509.Certificate, leaf *x509.Certificate) []root.TrustedMaterial {
++	materials := make([]root.TrustedMaterial, 0, len(roots))
++	for _, tsaRoot := range roots {
++		tsa := &root.SigstoreTimestampingAuthority{
++			Root:          tsaRoot,
++			Intermediates: intermediates,
++			Leaf:          leaf,
++		}
++		materials = append(materials, tsaTrustedMaterial{BaseTrustedMaterial: &root.BaseTrustedMaterial{}, timestampingAuthority: tsa})
++	}
++	return materials
++}
++
+ // countPEMCertBlocks returns the number of CERTIFICATE PEM blocks in the input
+ // using a cheap byte scan, so we can reject oversized chains before doing the
+ // expensive PEM/ASN.1 parsing work.
+@@ -179,16 +194,7 @@ func checkOptions(ctx context.Context, att *v1beta1.Cosign, baseROpts []remote.O
+ 			opts.TSARootCertificates = roots
+ 			opts.UseSignedTimestamps = true
+ 			if opts.TrustedMaterial != nil && len(roots) > 0 {
+-				trustedMaterials := root.TrustedMaterialCollection{opts.TrustedMaterial}
+-				for _, tsaRoot := range roots {
+-					tsa := &root.SigstoreTimestampingAuthority{
+-						Root:          tsaRoot,
+-						Intermediates: intermediates,
+-						Leaf:          opts.TSACertificate,
+-					}
+-					trustedMaterials = append(trustedMaterials, tsaTrustedMaterial{BaseTrustedMaterial: &root.BaseTrustedMaterial{}, timestampingAuthority: tsa})
+-				}
+-				opts.TrustedMaterial = trustedMaterials
++				opts.TrustedMaterial = append(root.TrustedMaterialCollection{opts.TrustedMaterial}, tsaTrustedMaterials(roots, intermediates, opts.TSACertificate)...)
+ 			}
+ 		}
+ 	}
+diff --git a/pkg/image/verifiers/ivpol/cosign/verifier.go b/pkg/image/verifiers/ivpol/cosign/verifier.go
+index aab58bae..47656b6c 100644
+--- a/pkg/image/verifiers/ivpol/cosign/verifier.go
++++ b/pkg/image/verifiers/ivpol/cosign/verifier.go
+@@ -139,6 +139,20 @@ func (v *Verifier) buildCheckOptsWithBundleDetection(ctx context.Context, attest
+ 	if cOpts.NewBundleFormat && shouldUseSignedTimestamps(cOpts.IgnoreTlog, cOpts.UseSignedTimestamps, cOpts.TrustedMaterial) {
+ 		cOpts.UseSignedTimestamps = true
+ 	}
++	if cOpts.NewBundleFormat && cOpts.UseSignedTimestamps && cOpts.TrustedMaterial == nil {
++		// Key and certificate attestors that ignore the transparency log skip
++		// the Sigstore infrastructure: checkOptions leaves TrustedMaterial nil
++		// and keeps ctlog.tsaCertChain in the TSA* fields. cosign verifies
++		// Sigstore bundles against TrustedMaterial only, and sigstore-go
++		// dereferences it for every RFC 3161 timestamp a bundle carries. Give
++		// bundles a trusted material holding only the configured TSA, as
++		// cosign's CLI requires (--trusted-root); v2 signatures keep using the
++		// TSA* fields.
++		if len(cOpts.TSARootCertificates) == 0 {
++			return nil, nil, nil, fmt.Errorf("verifying Sigstore bundles with signed timestamps requires the TSA root CA certificate in ctlog.tsaCertChain")
++		}
++		cOpts.TrustedMaterial = root.TrustedMaterialCollection(tsaTrustedMaterials(cOpts.TSARootCertificates, cOpts.TSAIntermediateCertificates, cOpts.TSACertificate))
++	}
+ 
+ 	return cOpts, bundles, hash, nil
+ }

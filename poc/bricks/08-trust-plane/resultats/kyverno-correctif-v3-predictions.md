@@ -31,3 +31,19 @@ Durée attendue : moins de 6 minutes (deux passages du paquet d'environ 80 s).
 - `goimports`, `gofumpt` et golangci-lint : non installés ; `.golangci.yml` exclut de toute façon les `_test.go` des linters et des formateurs.
 - La régression large (`./pkg/image/...`) : seul le paquet modifié est rejoué, le code étant celui du v2 (rejeu et mesure du 15/11).
 - Rien n'est commité dans les arbres de Kyverno ; le DCO, le fork et le texte de la PR restent à faire, chacun avec son accord.
+
+## Résultat du 15/11/2026, 21:11 UTC : G0 à G6 tenues
+
+Lancé sur « Oui, lance-le », de 21:08:31 à 21:11:30 UTC (heures de la commande), code 0. Journaux : [`v3/`](../kyverno-correctif/v3/). Correctif v3 : [`correctif-v3.patch`](../kyverno-correctif/v3/correctif-v3.patch) (sha256 `8c9fce3fa9ebfb62…`).
+
+| N° | Mesure | Verdict |
+|---|---|---|
+| G0 | Tête `b2e65e2`, v2 présent (code 0) ; 21 PASS de nos tests et sous-tests dans la référence. | tenue |
+| G1 | Code 0 ; 554 lignes, 33 imports (15 standard), 18 déclarations, 9 tests ; seul `tsa_cert_chain_test.go` reste. | tenue |
+| G2 | `gofmt -l` vide ; `go vet` code 0. | tenue |
+| G3 | 3 fichiers (`opts.go`, `tsa_cert_chain_test.go`, `verifier.go`) ; diff d'`opts.go` et `verifier.go` identique au v2 (`cmp`). | tenue |
+| G4 | main + v3 : `ok` en 77,694 s, code 0, 0 `--- FAIL` ; 21 PASS identiques à la référence. | tenue |
+| G5 | PR 18533 + v3 : `--3way` code 0, 0 conflit ; `ok` en 84,503 s, code 0 ; 6/6 tests de la PR ; 21 PASS identiques à la référence. | tenue |
+| G6 | `go.mod` et `go.sum` non modifiés dans les deux arbres. | tenue |
+
+Les arbres `main-b2e65e2` et `pr-18533-v3` gardent le v3 en zone d'index (`git add`), rien n'est commité dedans.

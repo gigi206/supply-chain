@@ -1,0 +1,6 @@
+== G4 paquet ivpol/cosign sur main + v3 (verbeux), 21:08:38 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	77.694s
+code 0
+--- FAIL : 0
+OK   PASS de nos tests identiques à la référence (21)
+== fin, 21:10:00 UTC
