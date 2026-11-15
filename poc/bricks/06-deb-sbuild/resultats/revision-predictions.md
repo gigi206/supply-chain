@@ -374,3 +374,9 @@ trouvé deux valeurs périmées. Cet accord ne vaut plus : il portait sur un scr
   témoin N7 → `f66bbeb2`, porte → verdicts de S4d3 du 15/11) seront commitées avant tout lancement, en additif à
   `s5-predictions.md`. Non relevé : pourquoi la reprise du bloc 06 du 13/11 n'a pas rejoué S5.
 Prochaine ligne : correctif d'épinglage 4, sur accord nommé ; puis S5 `prealables`, sur accord nommé.
+
+## Correctif d'épinglage 4 appliqué (note de 2026-11-15T20:45:27Z ; rien n'est réécrit)
+« Oui, applique-le » à « J'applique le correctif d'épinglage 4 ? ». `revision-epinglage-4.patch` appliqué tel quel à `s5.sh`
+(`git apply --check` puis `git apply`, code 0) : `PIPE_DEB` → `d1fb3871…` (l. 45), porte sample-app → `ok|6/6` (l. 565). Plus aucune
+occurrence de `82c8373d` ni de `28/28` dans `s5.sh`. Rien lancé.
+Prochaine ligne : additif de prédictions de S5 (nouvelles valeurs), puis S5 `prealables`, sur accord nommé.
