@@ -1,0 +1,7 @@
+== V2 témoin positif du lint (arbre jetable temoin-lint au commit 1851634f9aff22aa92cbab5a834103dbfba3a81d, défauts volontaires dans opts.go), 21:32:18 UTC
+worktree add : code 0
+lint : code 1
+misspell : 2 ; unconvert : 2
+fmt : code 0 ; lignes de diff : 0
+défauts retirés : 0 ligne(s) de status
+== fin, 21:32:20 UTC

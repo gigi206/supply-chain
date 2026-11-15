@@ -2097,6 +2097,13 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 **Additif du 15/11/2026, 21:29 UTC : message de commit v2 validé ; contrôles d'avant push préparés à sec.** Le propriétaire a répondu « Oui, je valide » à « Tu valides ce message de commit (v2) ? » (commit `1851634f9aff`, [`message-commit-v2.txt`](kyverno-correctif/pr/message-commit-v2.txt)). Avant le push, trois contrôles demandés par le conseiller sont préparés à sec, rien n'est lancé : détecteur de courses, témoin positif du lint, relecture de `main`. Prédictions V0 à V3 : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correctif-avant-push-predictions.md).
 
+**Additif du 15/11/2026, 21:32 UTC : contrôles d'avant push passés.** De 21:29:37 à 21:32:20 UTC, code 0, sur « Oui, lance-le ».
+- Avec `-race -covermode atomic`, comme `make test-unit` : paquet `ok`, 0 course détectée.
+- Le témoin du lint signale bien les deux défauts volontaires (`misspell`, `unconvert`), puis l'arbre jetable est remis en état.
+- `main` est toujours à `b2e65e2` à 21:32:20 UTC : aucun rebase à faire.
+
+Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correctif-avant-push-predictions.md). Reste le texte de la PR (relu par le conseiller, puis validé par le propriétaire), puis le fork, le push et l'ouverture, chacun avec son accord.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).

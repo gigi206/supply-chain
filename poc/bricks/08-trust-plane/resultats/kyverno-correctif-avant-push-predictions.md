@@ -27,3 +27,16 @@ Durée attendue : 3 à 10 minutes (le détecteur de courses ralentit les tests).
 ## Ce que ces contrôles ne prouveront pas
 
 Toute la suite `make test-unit` (`./...`), les tests de CLI, `verify-codegen`, la CI de Kyverno.
+
+## Résultat du 15/11/2026, 21:32 UTC : V0 à V2 tenues, V3 non tenue (dans le bon sens)
+
+Lancé sur « Oui, lance-le », de 21:29:37 à 21:32:20 UTC (heures de la commande), code 0. Journaux : [`avant-push/`](../kyverno-correctif/avant-push/).
+
+| N° | Mesure | Verdict |
+|---|---|---|
+| V0 | Commit `1851634f`, arbre propre ; gcc 15.2.0. | tenue |
+| V1 | `-race -covermode atomic` : `ok` en 103,005 s, couverture 78,9 % du paquet, code 0, 0 « WARNING: DATA RACE ». | tenue |
+| V2 | Lint code 1 : `opts.go:719:4` « `occured` is a misspelling of `occurred` (misspell) » et `opts.go:720:40` « unnecessary conversion (unconvert) », soit 1 signalement de chaque (« 2 issues ») ; les compteurs du journal (2 et 2) comptent aussi la ligne de résumé. Défauts retirés : 0 ligne de status. Formateurs : diff vide (affiché ; ces défauts ne sont pas de forme). | tenue |
+| V3 | `main` distant = `b2e65e2fa88f…` à 21:32:20 UTC : inchangé, pas de rebase à faire. | non tenue (prédit : a bougé) |
+
+Le témoin V2 lève la limite notée pour le lint : les linters de la configuration analysent bien `opts.go`. Le formateur reste sans témoin positif.

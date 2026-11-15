@@ -1,0 +1,9 @@
+pkg/image/verifiers/ivpol/cosign/opts.go:719:4: `occured` is a misspelling of `occurred` (misspell)
+// occured once
+   ^
+pkg/image/verifiers/ivpol/cosign/opts.go:720:40: unnecessary conversion (unconvert)
+func temoinLint(x int) int { return int(x) }
+                                       ^
+2 issues:
+* misspell: 1
+* unconvert: 1

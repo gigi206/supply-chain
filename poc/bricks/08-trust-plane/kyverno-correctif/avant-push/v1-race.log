@@ -1,0 +1,5 @@
+== V1 paquet ivpol/cosign avec les drapeaux de make test-unit (-race -covermode atomic), 21:29:37 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	103.005s	coverage: 78.9% of statements
+code 0
+WARNING: DATA RACE : 0
+== fin, 21:32:18 UTC
