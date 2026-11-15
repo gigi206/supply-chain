@@ -2104,6 +2104,17 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correctif-avant-push-predictions.md). Reste le texte de la PR (relu par le conseiller, puis validé par le propriétaire), puis le fork, le push et l'ouverture, chacun avec son accord.
 
+**Additif du 15/11/2026, 21:37 UTC : texte de la PR rédigé, relu par le conseiller, corrigé ; à valider par le propriétaire.** Titre : [`titre-pr.txt`](kyverno-correctif/pr/titre-pr.txt). Corps : [`texte-pr.md`](kyverno-correctif/pr/texte-pr.md). Rien n'est publié.
+- **Corrections après relecture** :
+  - les cases de la liste de contrôle (« I have read… ») et la phrase « I reviewed and tested them » engagent le propriétaire : cases décochées, phrase retirée, à lui de les remettre ;
+  - le refus des horodatages altérés ou étrangers est limité aux attesteurs à clé ;
+  - le lint ne porte que sur le paquet modifié ;
+  - le « proof manifest » demande un bundle horodaté et la `tsaCertChain` correspondante, et non « une TSA que l'on contrôle » ;
+  - la phrase sur l'ordre de fusion avec #18533 est retirée : elle parlait pour la PR d'un autre.
+- **Deux cas ajoutés au texte, avec leur verdict** : avec `tsaCertChain`, un bundle sans horodatage est refusé (« threshold not met for verified signed timestamps ») ; sans `tsaCertChain`, un bundle horodaté reste accepté. Leurs tests passaient déjà sans le correctif : `i1-sans-correctif-main.log`, l. 948-949, sur `2be1bc3`.
+- **Trace publique confirmée sans jeton** : le dépôt `gigi206/supply-chain` est public. Une lecture anonyme de l'API montre les événements `referenced` de 20:56:46 UTC sur #18533 et de 20:23:50 UTC sur #18525. Les 10 commits non poussés ne contiennent ni `owner/repo#N` ni URL `github.com/` (le `#18565` d'un corps de commit renvoie au dépôt lui-même).
+- **Pour l'ouverture** : `gigi206/kyverno` n'existe pas (404). Branches de release : `release-1.19` à `bfa7febf7b31` ; rien n'est affirmé sur sa tête, la mesure du 08/11 portait sur le tag v1.19.2. La case cherry-pick, la relecture du diff, les cases de la liste de contrôle et qui ouvre la PR (le propriétaire par le web, comme pour l'issue, ou par `gh`) sont à décider par le propriétaire. `pr-management.json` avertit au bout de 7 jours sans activité et ferme au bout de 14.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
