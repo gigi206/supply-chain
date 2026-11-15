@@ -2143,6 +2143,13 @@ Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correc
   - quoi faire, et à quelle date, faute de réponse.
 - Juste avant de poster : relire en lecture publique les étiquettes et les commentaires de l'issue, `main` et la tête de #18533. Après publication : comparer le texte publié au texte validé, et l'archiver.
 
+**Additif du 15/11/2026, 21:50 UTC : commentaire validé tel quel, relecture d'avant publication.** Le propriétaire a répondu « Oui, je valide » à « Tu valides ce commentaire pour l'issue ? ». Le texte est donc `commentaire-issue-v1.md` tel quel : paragraphe sur #18533 gardé, aucune mention `@`, « The fix is ready » assumé par le propriétaire. Restent ouverts : qui poste, et que faire faute de réponse. Relecture publique à 21:50:42 UTC :
+- issue ouverte, 3 commentaires, étiquettes inchangées (`bug`, `type:cli`, `area/cli`, `triage:critical-review`), dernier commentaire de `nishant-devv` du 14/11 à 07:55:41 UTC ;
+- `main` toujours à `b2e65e2fa88f` ;
+- #18533 ouverte, non fusionnée, tête `04385c77`.
+
+Rien n'a bougé : le texte reste valable.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
