@@ -333,3 +333,15 @@ archivé pour la première fois ; `s4d2-reel.log` réécrit (version du 11/11). 
   fermetures bb7599a2 et 50dc73f7 lues dans la provenance (8 provenances chacune, deux passages de S4b) ; les quatre témoins refusés
   comme prévu ; sample-app sans code `porte.*`.
 Prochaine ligne : S4d3 `retirer prealables deployer chemins porte` (cluster, U11), sur accord nommé.
+
+## Carte, ligne 8 : S4d3 `retirer prealables deployer chemins porte` (note de 2026-11-15T20:40:05Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S4d3 (retirer prealables deployer chemins porte, U11) ? ». À 6ca290e, du 15/11 20:24:36 au
+15/11 20:39:34 UTC, code 0 relevé juste après la commande, 93 OK, 0 KO, 0 ÉCART ; lignes « fait » des quatre étapes lancées après
+`retirer` dans `chrono.tsv`. Journaux `s4d3-{retirer,prealables,deployer,chemins,porte}.log` réécrits (versions du 11/11).
+- **U11 tenue** : deb **60f25f5c** (provenance de PipelineRun c3d27e05…, seule jugée) : `ec` en succès, sans violation, avertissement
+  `trusted_task.tagged` ; horodatage 8/8 ; **VSA refusée** (0/0 retenue) et **scan refusé** ; règles `porte.*` du PoC parmi les succès.
+  sample-app : `true`, horodatage 6/6, VSA et scan **`ok|ok`**.
+- Chemins : webhook de Forgejo et rattrapage (CronJob `rattrapage-deb` repris), chacun un PipelineRun réussi (3/3 TaskRuns,
+  construction sous Kata) sur le bundle `d1fb3871`, signé par Chains, **IMAGE_DIGEST 60f25f5c** les deux fois ; UID différents, spec
+  identique.
+Prochaine ligne : S5 (U13 : ScanEnRetard), sur accord nommé.

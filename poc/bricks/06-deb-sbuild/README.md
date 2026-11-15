@@ -2073,3 +2073,4 @@ packaging de S4c, digest attendu de S4d). L'égalité avec le deb d'OBS reste bo
 - 2026-11-14T22:57:45Z : révision 1.0.0-2, correctif d'épinglage 3 appliqué (D = 60f25f5c dans `s4d2.sh`, `s4d3.sh`, `s5.sh`, `s6a.sh`, `s6b.sh`) ; rien lancé.
 - 2026-11-14T23:11:25Z : révision 1.0.0-2, ligne 8 : S4d (14/11, 22:58:40 à 23:11:01 UTC, code 0, 27 OK) : deb f66bbeb2 sous Kata deux fois, artefact **60f25f5c** publié, égal au digest attendu : **U10 tenue**.
 - 2026-11-14T23:15:32Z : révision 1.0.0-2, ligne 8 : `s4d2.sh regle reel` (14/11, 23:14:56 à 23:15:11 UTC, code 0, 31 OK) : **U12 tenue** (39/39), provenances du deb 60f25f5c vérifiées.
+- 2026-11-15T20:40:05Z : révision 1.0.0-2, ligne 8 : S4d3 `retirer prealables deployer chemins porte` (15/11, 20:24:36 à 20:39:34 UTC, code 0, 93 OK) : webhook et rattrapage publient **60f25f5c** ; porte : deb VSA et scan refusés, sample-app `ok|ok` : **U11 tenue**.
