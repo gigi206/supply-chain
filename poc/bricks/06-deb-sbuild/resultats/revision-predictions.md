@@ -345,3 +345,32 @@ Prochaine ligne : S4d3 `retirer prealables deployer chemins porte` (cluster, U11
   construction sous Kata) sur le bundle `d1fb3871`, signé par Chains, **IMAGE_DIGEST 60f25f5c** les deux fois ; UID différents, spec
   identique.
 Prochaine ligne : S5 (U13 : ScanEnRetard), sur accord nommé.
+
+## Carte, ligne 9 : S5 non lancée, deux valeurs périmées dans `s5.sh` (note de 2026-11-15T20:44:46Z ; rien n'est réécrit)
+« Oui, lance-la » à « Je lance S5 (U13 : ScanEnRetard) ? » (15/11). **S5 n'a pas été lancée** : la relecture d'avant lancement a
+trouvé deux valeurs périmées. Cet accord ne vaut plus : il portait sur un script qui va changer, et sans liste d'étapes.
+- **Erreur de la carte** : la ligne 9 dit que S5 ne lit que D. Elle lit aussi le bundle de pipeline deb (`s5.sh` l. 45, `PIPE_DEB`),
+  dont `prealables` exporte les paramètres des tâches. `figer` ne remplace que `commit` et `depot` et exige 0 variable restante :
+  `packaging` est donc en dur dans le bundle. `PIPE_DEB` épingle encore `82c8373d` (S4d1, 11/11), qui porte l'ancien packaging ;
+  le bundle en vigueur est `d1fb3871` (S4d3). `apres-s5b.md` et la carte avaient manqué cette ligne : ils cherchaient des valeurs
+  connues (deb, manifeste), pas tous les épinglages. **Non mesuré** : si `82c8373d` existe encore dans Zot après S5b ; le mode
+  d'échec (arrêt à l'export ou écart au témoin N7) n'est donc pas annoncé.
+- **Deuxième valeur** : la porte de S5 (l. 565) attend `ok|28/28` enveloppes pour sample-app ; la porte de S4d3 du 15/11 en a
+  mesuré `6/6` (`s4d3-porte.log` l. 17). Le deb attend `8/8`, égal à S4d3.
+- **Relevé complet** des empreintes de `s5.sh`, `s6a.sh` et `s6b.sh` contre les valeurs en vigueur : seules ces deux lignes sont
+  périmées. Restent valables : S4a (`a9d48331`, `749d746c`, chroot `aec1c7a9`), amorce `7378260c`, D `60f25f5c`, fermetures
+  `bb7599a2` et `50dc73f7`, P `f0ed7a71`, témoin N7 `f66bbeb2`, outils `7eb4f26e`, sample-app `3a7ca1b1`. `039949f9`, `c1719b13`,
+  `454728c5` ne sont que dans des commentaires d'en-tête. Les comptes en dur de `prealables`, `fermeture` et `kata` (162 paquets du
+  verrou, 167 fichiers de la copie, 163 fichiers du pool altéré) ne dépendent pas de la révision (verrou inchangé, U1).
+- **Correctif d'épinglage 4**, préparé et archivé, **non appliqué** : [`revision-epinglage-4.patch`](../revision-epinglage-4.patch)
+  (`PIPE_DEB` → `d1fb3871…`, porte sample-app → `ok|6/6`).
+- **Correction de ma question** : S5 ne juge pas U13. `ScanEnRetard` n'apparaît ni dans `s5.sh` ni dans `s6a.sh` ; la règle est
+  relevée dans la 08c (`scan-saut-*`). Où et comment U13 sera lue reste à préciser avant la ligne 10. La fenêtre « étapes 8 à 10 »
+  court depuis la fin de S4d3 (15/11, 20:39:34 UTC) et s'allonge pendant ce détour.
+- **Étapes de S5, à décider sur mesure** : S5a n'a pas tourné depuis le 11/11 (`chrono.tsv`), S5b est passée depuis, et le
+  répertoire de travail `s5-06` n'existe plus. `fermeture` s'arrête si les fermetures altérées manquent sous
+  `entrees/sample-app-deb/fermeture-alteree`, et `zot` écrit dans Zot (accord à part). Proposé : `prealables` seule d'abord
+  (lecture et admission à blanc), puis la liste d'étapes. Les prédictions de S5 avec les nouvelles valeurs (P1 → `d1fb3871`,
+  témoin N7 → `f66bbeb2`, porte → verdicts de S4d3 du 15/11) seront commitées avant tout lancement, en additif à
+  `s5-predictions.md`. Non relevé : pourquoi la reprise du bloc 06 du 13/11 n'a pas rejoué S5.
+Prochaine ligne : correctif d'épinglage 4, sur accord nommé ; puis S5 `prealables`, sur accord nommé.

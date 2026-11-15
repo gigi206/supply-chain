@@ -1,0 +1,20 @@
+--- a/poc/bricks/06-deb-sbuild/s5.sh
++++ b/poc/bricks/06-deb-sbuild/s5.sh
+@@ -42,7 +42,7 @@
+ umask 022
+ 
+ PIPE_BUILDER=$REG/tekton/pipelines/builder-sbuild@sha256:a9d48331da1290b06e7ead017c5536161bb0a8a515d39e61f99c8f752dfdc88b   # S4a
+-PIPE_DEB=$REG/tekton/pipelines/sample-app-deb@sha256:82c8373d725941bf65d6530e0c88904bb291e5f8b5c18c2209919a6d355f54a5     # S4d1
++PIPE_DEB=$REG/tekton/pipelines/sample-app-deb@sha256:d1fb3871ec550f0fb49bc81b7fe6be932417ddd76297d5698e61d20e5ad7df26     # S4d3, révision 1.0.0-2 (15/11/2026)
+ BUILDER_DIGEST=sha256:749d746cc9e1a9cfa8c80feac8ff68eae96bd6752c73ae9e46b304c38ad0c590   # S4a (A13)
+ BUILDER=$REG/builds/builders/sbuild-debian13@$BUILDER_DIGEST
+ DEB_DIGEST=sha256:60f25f5c3fb58b7c4be625c4e20222aeef35b1490f18af4f58cadc1e27f8279e        # S4d1
+@@ -562,7 +562,7 @@
+   echo "## image sample-app (verdict de S4d3)"
+   v=$(juger s5-reelle "$REG/$APP" policy.yaml porte "$SRC" "$REG/$DEPOT_BUNDLES"); echo "$v"
+   mesure "sample-app : succès, violations, avertissements" "$(champ "$v" 3)|$(champ "$v" 4)|$(champ "$v" 5)" "true||trusted_task.tagged"
+-  mesure "sample-app : horodatage" "$(champ "$v" 7)|$(champ "$v" 8 | cut -d' ' -f1)" "ok|28/28"
++  mesure "sample-app : horodatage" "$(champ "$v" 7)|$(champ "$v" 8 | cut -d' ' -f1)" "ok|6/6"   # porte de S4d3 du 15/11/2026
+   mesure "sample-app : VSA, scan" "$(champ "$v" 9)|$(champ "$v" 11)" "ok|ok"
+   ecarts
+ }
