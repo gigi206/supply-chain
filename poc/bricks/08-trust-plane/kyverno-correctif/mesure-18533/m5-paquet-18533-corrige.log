@@ -1,0 +1,7 @@
+== M5 paquet ivpol/cosign, PR 18533 + correctif v2 (tests des deux), 20:51:52 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	78.699s
+code 0
+tests de la PR passés : 6/6
+tests du correctif passés : 9/9
+--- FAIL : 0
+== fin, 20:53:15 UTC

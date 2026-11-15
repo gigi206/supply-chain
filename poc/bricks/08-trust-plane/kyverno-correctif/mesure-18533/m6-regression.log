@@ -1,0 +1,12 @@
+== M6 régression ./pkg/image/... et ./pkg/cel/policies/ivpol/..., PR 18533 + correctif v2, 20:53:15 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verification/cache	0.037s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/credentials	0.013s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/evaluator	8.013s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/variables	0.017s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers	0.060s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	83.697s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/notary	17.818s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/autogen	0.005s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/engine	2.585s
+code 0
+== fin, 20:54:48 UTC

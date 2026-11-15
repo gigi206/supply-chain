@@ -1,0 +1,16 @@
+== M3 application du correctif v2 final sur la PR 18533, 20:51:48 UTC
+error: patch failed: pkg/image/verifiers/ivpol/cosign/verifier.go:139
+error: pkg/image/verifiers/ivpol/cosign/verifier.go: patch does not apply
+git apply --check : code 1
+Applied patch to 'pkg/image/verifiers/ivpol/cosign/opts.go' cleanly.
+Falling back to direct application...
+Falling back to direct application...
+Applied patch to 'pkg/image/verifiers/ivpol/cosign/verifier.go' cleanly.
+git apply --3way : code 0
+fichiers en conflit : 0
+marqueurs de conflit : 0
+M  pkg/image/verifiers/ivpol/cosign/opts.go
+A  pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go
+A  pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+M  pkg/image/verifiers/ivpol/cosign/verifier.go
+diff contre la tête de la PR : 30d4f0736f35a267

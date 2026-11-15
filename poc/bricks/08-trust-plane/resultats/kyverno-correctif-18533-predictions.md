@@ -35,3 +35,22 @@ Si M3 échoue en `--3way`, M4 à M6 sont mesurées sur un arbre sans le correcti
 - Le comportement d'un `trustedRoot` en ligne avec la PR (contournement possible de notre cas, non essayé ici).
 - golangci-lint, la CI de Kyverno, le DCO ; l'admission ; l'ordre dans lequel les mainteneurs fusionneraient les deux PR.
 - `correctif-v2-sur-18533.patch` (diff produit par M3) n'est ni proposé ni publié : c'est une pièce de travail.
+
+## Résultat du 15/11/2026, 20:55 UTC : M0 à M7 tenues
+
+Lancé sur « Oui, mesure-le », de 20:50:23 à 20:54:48 UTC (heures de la commande), code 0. Journaux : [`mesure-18533/`](../kyverno-correctif/mesure-18533/) (`m0` à `m7`, détail du paquet dans `m5-paquet-detail.log`).
+
+| N° | Mesure | Verdict |
+|---|---|---|
+| M0 | Arbre `pr-18533` créé (code 0) à `04385c77…`, propre ; base commune `2be1bc3`. | tenue |
+| M1 | PR seule : `--- FAIL`, « panic: runtime error: invalid memory address or nil pointer dereference », code 1 (`m1`, l. 37-38, 74). **La PR 18533 ne corrige pas notre cas.** | tenue |
+| M2 | PR seule : paquet `ok` en 75,619 s, code 0. | tenue |
+| M3 | `git apply --check` : code 1, « patch failed: …/verifier.go:139 ». `git apply --3way` : code 0, `opts.go` et `verifier.go` appliqués proprement, 0 fichier en conflit, 0 marqueur. Diff obtenu archivé : [`correctif-v2-sur-18533.patch`](../kyverno-correctif/mesure-18533/correctif-v2-sur-18533.patch) (sha256 `30d4f0736f35a267…`). | tenue |
+| M4 | PR + correctif : `--- PASS`, code 0, 0 « nil pointer ». | tenue |
+| M5 | PR + correctif : paquet `ok` en 78,699 s, code 0 ; 6/6 tests de la PR, 9/9 tests du correctif (dont TSA étrangère, jeton altéré, jeton sur une autre signature : refusés comme attendu), 0 `--- FAIL`. | tenue |
+| M6 | 9 paquets `ok`, code 0. | tenue |
+| M7 | `GOPROXY=off` ; `go.mod` et `go.sum` non modifiés. | tenue |
+
+Constat d'instrument, sans effet sur les verdicts : le résumé final du script relit aussi `m5-paquet-detail.log`, dont toutes les lignes `=== RUN` sortent dans la sortie de la commande (motif `^==`). Les journaux `m*` ne sont pas touchés.
+
+**Lecture** : les deux correctifs sont complémentaires. La PR 18533 laisse notre cas paniquer ; notre correctif s'applique par-dessus en fusion à trois voies sans conflit, et les tests des deux passent ensemble. Notre PR devra être rebasée si 18533 est fusionnée avant : seul le contexte de `verifier.go` change.

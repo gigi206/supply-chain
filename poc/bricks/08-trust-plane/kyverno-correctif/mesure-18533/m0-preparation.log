@@ -1,0 +1,6 @@
+== préparation : arbre de travail détaché à 04385c77395d (tête de la PR 18533), go version go1.27.3 linux/amd64, 20:50:23 UTC
+correctif 5b8ae9b4a023f8ca, reproducteur 0fc91917b65857b0
+worktree add : code 0
+OK   tête 04385c77395d3aea22bc1fd11e5e31cf049b00ca
+base commune avec 2be1bc3 : 2be1bc3fe3b4150501caac2c95ee58039824cdce
+arbre propre : 0 ligne(s) de status

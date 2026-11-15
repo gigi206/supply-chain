@@ -2060,6 +2060,11 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 - Sur `b2e65e2fa88f`, de 20:18:48 à 20:22:20 UTC, code 0 : le correctif s'applique (code 0), le reproducteur panique sans lui (nil pointer) et passe avec lui, le paquet `ivpol/cosign` et les 9 paquets de régression sont `ok`.
 - L'arbre de travail corrigé reste dans le cache (`~/.cache/supply-chain-poc/08/kyverno-correctif/main-b2e65e2`), rien commité dedans. Restent dus pour la PR : regrouper les tests, golangci-lint, DCO, fork, texte exact (mention de #18533), chacun avec l'accord du propriétaire.
 
+**Additif du 15/11/2026, 20:55 UTC : mesure contre la PR kyverno/kyverno#18533, M0 à M7 tenues.** Sur « Oui, mesure-le ». Local, `GOPROXY=off`, de 20:50:23 à 20:54:48 UTC, code 0 : rien publié, rien lu ni écrit dans le cluster, Zot ou les VM. Script [`mesure-18533.sh`](kyverno-correctif/mesure-18533.sh), prédictions et résultat : [kyverno-correctif-18533-predictions.md](resultats/kyverno-correctif-18533-predictions.md).
+- Sur la tête de la PR (`04385c77`), le reproducteur **panique toujours** (nil pointer) : elle ne corrige pas notre cas.
+- Notre correctif ne s'applique pas tel quel (contexte de `verifier.go`), mais s'applique en fusion à trois voies sans conflit. Les deux ensemble : reproducteur `PASS`, 6/6 tests de la PR et 9/9 des nôtres, 9 paquets de régression `ok`.
+- Arbre `pr-18533` laissé dans le cache avec les deux correctifs, rien commité dedans.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
