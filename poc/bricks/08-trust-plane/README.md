@@ -2150,6 +2150,11 @@ Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correc
 
 Rien n'a bougé : le texte reste valable.
 
+**Additif du 15/11/2026, 21:54 UTC : commentaire publié par le propriétaire.** Le propriétaire l'a posté lui-même par le web (« C'est posté »). Commentaire `6901968487` de `gigi206`, créé à 21:53:34 UTC, non modifié depuis (https://github.com/kyverno/kyverno/issues/18525#issuecomment-6901968487).
+- Texte publié archivé : [`commentaire-issue-publie.md`](kyverno-correctif/pr/commentaire-issue-publie.md). Il est identique à l'octet au texte validé, `commentaire-issue-v1.md`.
+- Relevé à 21:54:35 UTC : 4 commentaires, étiquettes inchangées.
+- La PR attend maintenant la réponse d'un mainteneur. La conduite à tenir faute de réponse reste à fixer par le propriétaire.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
