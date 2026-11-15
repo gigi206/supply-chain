@@ -2083,6 +2083,13 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 
 **Additif du 15/11/2026, 21:11 UTC : correctif v3 mesuré, G0 à G6 tenues.** Sur « Oui, lance-le », de 21:08:31 à 21:11:30 UTC, code 0, local, `GOPROXY=off`. Les tests du correctif tiennent dans un seul fichier, `tsa_cert_chain_test.go` (`gofmt` propre, `go vet` code 0). Code identique au v2. Sur main et sur la PR 18533, le paquet est `ok`, avec les mêmes 21 PASS de nos tests et sous-tests que la référence ; les 6 tests de la PR passent aussi. Détail : [kyverno-correctif-v3-predictions.md](resultats/kyverno-correctif-v3-predictions.md). Restent : lint, DCO, fork, texte exact, chacun avec son accord.
 
+**Additif du 15/11/2026, 21:23 UTC : commit de la PR préparé en local, signé DCO, non publié.** Identité choisie par le propriétaire (« ok » à la proposition) : `Ghislain LE MEUR <13576579+gigi206@users.noreply.github.com>`, comme sur tektoncd/chains#2112. Le compte `gigi206` porte bien l'identifiant 13576579, et GitHub y a rattaché le commit de cette PR. Le lint du v3 (21:15:45 à 21:15:51 UTC, code 0) ne signale rien, sans témoin positif : [kyverno-correctif-lint-predictions.md](resultats/kyverno-correctif-lint-predictions.md).
+- Commit `920794af82b6` sur la branche `fix/ivpol-tsa-key-attestor` de l'arbre `main-b2e65e2`, base `b2e65e2`. Contenu identique à `correctif-v3.patch`.
+- L'identité est passée par `git -c` : rien n'est écrit dans la configuration git.
+- Contrôle DCO de `REVIEW.md` : OK. Une ligne `Signed-off-by` égale à l'auteur, une ligne `Assisted-by: Claude <noreply@anthropic.com>`, aucune `Co-authored-by`.
+- Le brouillon disait que les tests couvraient aussi les horodatages altérés et étrangers pour les attesteurs à certificat. C'était faux : seuls des horodatages authentiques y sont testés. Corrigé par `--amend` avant toute publication.
+- Message et patch archivés : [`pr/`](kyverno-correctif/pr/). Le texte attend la validation du propriétaire avant le fork et le push.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
