@@ -1,0 +1,41 @@
+== R3 reproducteur, main b2e65e2fa88f + correctif v2, 20:18:56 UTC
+=== RUN   TestRepro_KeyAttestor_TSACertChain_TimestampedBundle
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 HEAD /v2/test/img/manifests/subject 404 NAME_UNKNOWN Unknown name
+2026/11/15 21:19:00 HEAD /v2/test/img/blobs/sha256:9cb22a72c1afbd2efb1c0058dcffc5fd24fb97e828ef826e37fd0219ee99cf1e 404 BLOB_UNKNOWN Unknown blob
+2026/11/15 21:19:00 HEAD /v2/test/img/blobs/sha256:c42517f8a460139802054d082a7e54237bda7be7834902318de6134e89f2b7db 404 BLOB_UNKNOWN Unknown blob
+2026/11/15 21:19:00 POST /v2/test/img/blobs/uploads/
+2026/11/15 21:19:00 POST /v2/test/img/blobs/uploads/
+2026/11/15 21:19:00 PATCH /v2/test/img/blobs/uploads/449321406556236968
+2026/11/15 21:19:00 PATCH /v2/test/img/blobs/uploads/2248814194171092884
+2026/11/15 21:19:00 PUT /v2/test/img/blobs/uploads/449321406556236968?digest=sha256%3A9cb22a72c1afbd2efb1c0058dcffc5fd24fb97e828ef826e37fd0219ee99cf1e
+2026/11/15 21:19:00 PUT /v2/test/img/blobs/uploads/2248814194171092884?digest=sha256%3Ac42517f8a460139802054d082a7e54237bda7be7834902318de6134e89f2b7db
+2026/11/15 21:19:00 PUT /v2/test/img/manifests/subject
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 GET /v2/test/img/manifests/subject
+2026/11/15 21:19:00 GET /v2/test/img/blobs/sha256:9cb22a72c1afbd2efb1c0058dcffc5fd24fb97e828ef826e37fd0219ee99cf1e
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 HEAD /v2/test/img/blobs/sha256:141545d9bedd1e9557948040b5d1e414edf75d4cf79b84b9922ce8d24950c3b9 404 BLOB_UNKNOWN Unknown blob
+2026/11/15 21:19:00 POST /v2/test/img/blobs/uploads/
+2026/11/15 21:19:00 PATCH /v2/test/img/blobs/uploads/5841087985947325329
+2026/11/15 21:19:00 PUT /v2/test/img/blobs/uploads/5841087985947325329?digest=sha256%3A141545d9bedd1e9557948040b5d1e414edf75d4cf79b84b9922ce8d24950c3b9
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 HEAD /v2/test/img/blobs/sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a 404 BLOB_UNKNOWN Unknown blob
+2026/11/15 21:19:00 POST /v2/test/img/blobs/uploads/
+2026/11/15 21:19:00 PATCH /v2/test/img/blobs/uploads/6924239184875746902
+2026/11/15 21:19:00 PUT /v2/test/img/blobs/uploads/6924239184875746902?digest=sha256%3A44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 PUT /v2/test/img/manifests/sha256:c84a7f009ac16abfecd42fa44e24b45d33fc0945fc2e40580e9640e83ec1627b
+2026/11/15 21:19:00 GET /v2/test/img/referrers/sha256:8c3dea0d7d26e4e2e61a55e3c27e10fcf20b33af160508745549c86f08c6a3c1
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 GET /v2/test/img/manifests/subject
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 GET /v2/test/img/referrers/sha256:8c3dea0d7d26e4e2e61a55e3c27e10fcf20b33af160508745549c86f08c6a3c1
+2026/11/15 21:19:00 GET /v2/
+2026/11/15 21:19:00 GET /v2/test/img/manifests/sha256:c84a7f009ac16abfecd42fa44e24b45d33fc0945fc2e40580e9640e83ec1627b
+2026/11/15 21:19:00 GET /v2/test/img/blobs/sha256:141545d9bedd1e9557948040b5d1e414edf75d4cf79b84b9922ce8d24950c3b9
+--- PASS: TestRepro_KeyAttestor_TSACertChain_TimestampedBundle (0.01s)
+PASS
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	0.031s
+code 0
+== fin, 20:19:00 UTC

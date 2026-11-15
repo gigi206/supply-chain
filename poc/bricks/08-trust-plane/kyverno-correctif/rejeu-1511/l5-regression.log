@@ -1,0 +1,12 @@
+== R5 régression ./pkg/image/... et ./pkg/cel/policies/ivpol/..., correctif v2, 20:20:29 UTC
+ok  	github.com/kyverno/kyverno/pkg/image/verification/cache	0.186s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/credentials	0.111s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/evaluator	7.674s
+ok  	github.com/kyverno/kyverno/pkg/image/verification/variables	0.014s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers	0.070s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/cosign	83.221s
+ok  	github.com/kyverno/kyverno/pkg/image/verifiers/ivpol/notary	15.925s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/autogen	0.004s
+ok  	github.com/kyverno/kyverno/pkg/cel/policies/ivpol/engine	2.868s
+code 0
+== fin, 20:22:20 UTC

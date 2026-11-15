@@ -1,0 +1,7 @@
+== R6 modules et arbre, 20:22:20 UTC
+GOPROXY=off ; go.mod et go.sum modifiés : 0
+ M pkg/image/verifiers/ivpol/cosign/opts.go
+ M pkg/image/verifiers/ivpol/cosign/verifier.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go
+worktree laissé en place : /home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/main-b2e65e2 (pour la PR)

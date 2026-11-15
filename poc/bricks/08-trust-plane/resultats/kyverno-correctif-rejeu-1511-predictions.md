@@ -37,3 +37,18 @@ Durée attendue : moins de 10 minutes (le 08/11 : environ 100 s pour le paquet, 
 - **Cause** : le répertoire des journaux était passé en chemin relatif, puis le script se place dans l'arbre de travail. Toutes les redirections ont échoué (« No such file or directory »), donc aucun bloc après la préparation n'a été exécuté : ni reproducteur, ni `git apply`, ni tests. Le code 2 est celui du `grep` final, pas d'un test.
 - **Fait** : l'arbre de travail `main-b2e65e2` a été créé (`worktree add` code 0, tête `b2e65e2…`). Relevé à 20:18:02 UTC : à `b2e65e2`, 0 ligne de status, pas de `repro_tsa_test.go`.
 - **Correction** : chemin des journaux rendu absolu ; un arbre de travail existant n'est repris que s'il est à `b2e65e2` et propre (sinon KO). R1 à R6 sont inchangées et restent à juger. Le relancement attend l'accord du propriétaire (script modifié).
+
+## Résultat du 15/11/2026, 20:22 UTC : rejeu passé, R1 à R6 tenues
+
+Relancé sur « Oui, relance-le » du propriétaire, de 20:18:48 à 20:22:20 UTC (heures de la commande), code 0. Journaux : [`rejeu-1511/`](../kyverno-correctif/rejeu-1511/) (`l0` à `l6`). L'arbre de travail laissé par la v1 a été repris : à `b2e65e2`, propre.
+
+| N° | Mesure | Verdict |
+|---|---|---|
+| R1 | `git apply --check`, `git apply` et `git apply -R --check` : code 0 chacun ; 2 fichiers modifiés, 2 fichiers de tests ajoutés. Les décalages ne sont pas affichés sans `-v` : « sans décalage » n'est pas mesuré. | tenue (sauf la mention de décalage, non mesurée) |
+| R2 | `--- FAIL`, « panic: runtime error: invalid memory address or nil pointer dereference », code 1 (`l1`, l. 36-37, 73). | tenue |
+| R3 | `--- PASS`, code 0 (`l3`). | tenue |
+| R4 | `ok` en 84,604 s, code 0 (`l4`). | tenue |
+| R5 | 9 paquets `ok`, aucun `FAIL`, code 0 (`l5`) ; mêmes 9 paquets que le 08/11. | tenue |
+| R6 | `GOPROXY=off` du début à la fin ; `go.mod` et `go.sum` non modifiés (`l6`). | tenue |
+
+Toujours non prouvé : golangci-lint, CI de Kyverno, DCO, compatibilité avec kyverno/kyverno#18533, admission sur ce `main`.

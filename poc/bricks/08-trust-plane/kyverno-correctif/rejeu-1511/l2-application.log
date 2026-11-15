@@ -1,0 +1,8 @@
+== R1 application du correctif v2 final, 20:18:56 UTC
+git apply --check : code 0
+git apply : code 0
+git apply -R --check : code 0
+ M pkg/image/verifiers/ivpol/cosign/opts.go
+ M pkg/image/verifiers/ivpol/cosign/verifier.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_extra_test.go
+?? pkg/image/verifiers/ivpol/cosign/tsa_key_attestor_test.go

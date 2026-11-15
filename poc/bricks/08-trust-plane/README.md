@@ -2056,6 +2056,10 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
   - [kyverno/kyverno#16048](https://github.com/kyverno/kyverno/pull/16048) (`jimgus`, brouillon depuis mai, `merge-conflicts`) : fusionne la chaîne TSA dans `TrustedMaterial` quand celui-ci vient de TUF (chemin keyless). Elle ne couvre pas le chemin rapide.
 - **Pour la PR** : aucune action publique faite. Restent dus, chacun avec l'accord du propriétaire : rejouer le correctif sur `b2e65e2fa88f` (application, reproducteur, tests), regrouper les tests, golangci-lint (téléchargement), identité DCO, fork `gigi206/kyverno`, texte exact de la PR (mention de #18533) avec `Assisted-by`, sans `Co-Authored-By`.
 
+**Additif du 15/11/2026, 20:22 UTC : correctif v2 rejoué sur le `main` du 14/11, tout tenu.** Sur « Oui, rejoue-le », puis « Oui, relance-le » après une v1 arrêtée au départ (chemin relatif des journaux, rien exécuté ni jugé). Local seulement, `GOPROXY=off` : rien publié, rien lu ni écrit dans le cluster, Zot ou les VM. Script [`rejeu-main.sh`](kyverno-correctif/rejeu-main.sh), prédictions et résultat : [kyverno-correctif-rejeu-1511-predictions.md](resultats/kyverno-correctif-rejeu-1511-predictions.md).
+- Sur `b2e65e2fa88f`, de 20:18:48 à 20:22:20 UTC, code 0 : le correctif s'applique (code 0), le reproducteur panique sans lui (nil pointer) et passe avec lui, le paquet `ivpol/cosign` et les 9 paquets de régression sont `ok`.
+- L'arbre de travail corrigé reste dans le cache (`~/.cache/supply-chain-poc/08/kyverno-correctif/main-b2e65e2`), rien commité dedans. Restent dus pour la PR : regrouper les tests, golangci-lint, DCO, fork, texte exact (mention de #18533), chacun avec l'accord du propriétaire.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).

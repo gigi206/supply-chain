@@ -1,0 +1,5 @@
+== préparation : arbre de travail détaché à b2e65e2fa88f, go version go1.27.3 linux/amd64, 20:18:48 UTC
+correctif 5b8ae9b4a023f8ca, reproducteur 0fc91917b65857b0
+arbre de travail existant repris : à b2e65e2fa88f, propre
+OK   tête b2e65e2fa88f8ff8bfb0a6351712433d6b14796d
+arbre propre : 0 ligne(s) de status
