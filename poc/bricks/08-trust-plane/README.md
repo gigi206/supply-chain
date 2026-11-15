@@ -2079,6 +2079,8 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
 - **Lecture pour la décision du propriétaire** (PR directe ou question d'abord) : à la lettre, la règle 4 est remplie, et une PR assistée par IA sur une issue `triage:*` est déjà en revue. Aucune acceptation explicite n'a été donnée par un mainteneur sur notre issue.
   - *Corrigé à 21:04 UTC, avant tout push* : le journal court de 21:03:08 à 21:03:44 UTC (lignes `# début` et `# fin`), et non à partir de 21:03:41 comme écrit plus haut : cette heure n'était tirée d'aucune mesure.
 
+**Additif du 15/11/2026, 21:08 UTC : décision « PR directe », correctif v3 préparé à sec.** Le propriétaire a répondu « PR directe » à « Pour notre correctif, PR directe ou question à un mainteneur d'abord ? ». La PR citera l'issue et déclarera l'aide de l'IA (`Assisted-by`). Avant toute action publique : regroupement des tests (v3), lint, DCO, fork, texte exact, chacun sur accord. Le v3 regroupe les deux fichiers de tests en un seul, sans changer le code ni la logique des tests : générateur, script et prédictions G0 à G6 dans [kyverno-correctif-v3-predictions.md](resultats/kyverno-correctif-v3-predictions.md). Rien lancé. L'estimation de 4 h pour préparer la PR reste à accorder.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
