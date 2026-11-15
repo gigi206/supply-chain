@@ -2077,6 +2077,7 @@ Publiée par le propriétaire lui-même, depuis le compte `gigi206`, par le form
   - Les correctifs de bug sont exemptés de documentation (`pr_documentation.md`). Les « Proof Manifests » sont demandés « for anything user-facing » (`REVIEW.md`) ; le modèle de PR les présente comme obligatoires pour un comportement nouveau ou modifié. À trancher au moment du texte : un manifeste de CLI qui reproduit notre cas est faisable.
   - `pkg/image/AGENTS.md` : la vérification échoue fermée, et `skipSigstoreInfra` est la seule exception, déclarée par l'auteur de la politique. Notre correctif garde cette propriété : il ajoute une erreur explicite quand la racine de la TSA manque.
 - **Lecture pour la décision du propriétaire** (PR directe ou question d'abord) : à la lettre, la règle 4 est remplie, et une PR assistée par IA sur une issue `triage:*` est déjà en revue. Aucune acceptation explicite n'a été donnée par un mainteneur sur notre issue.
+  - *Corrigé à 21:04 UTC, avant tout push* : le journal court de 21:03:08 à 21:03:44 UTC (lignes `# début` et `# fin`), et non à partir de 21:03:41 comme écrit plus haut : cette heure n'était tirée d'aucune mesure.
 
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
