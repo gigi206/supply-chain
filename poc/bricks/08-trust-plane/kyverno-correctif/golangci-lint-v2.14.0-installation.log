@@ -1,0 +1,15 @@
+== installation golangci-lint v2.14.0, 2026-11-15T21:13:43Z, go version go1.27.3 linux/amd64
+go install : code 0 à 2026-11-15T21:14:01Z
+-rwxrwxr-x 1 gigi gigi 57715702 Nov 15 22:14 /home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/outils/bin/golangci-lint
+sha256 d8b665fe720d18e7711046a92648cf55ec4f8c60f3d08db92450998812192535
+golangci-lint has version 2.14.0 built with go1.27.3 from (unknown, modified: ?, mod sum: "h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=") on (unknown)
+/home/gigi/.cache/supply-chain-poc/08/kyverno-correctif/outils/bin/golangci-lint: go1.27.3
+	path	github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+	mod	github.com/golangci/golangci-lint/v2	v2.14.0	h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=
+	dep	4d63.com/gocheckcompilerdirectives	v1.4.0	h1:ZLq62rbGWVmQhiZ8kuNVIT/M09xCSTdJz9K3xOdT/CY=
+go.sum du module (sumdb) :
+h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=
+modules téléchargés : 211
+## recoupement sum.golang.org (lookup, lecture publique, 2026-11-15T21:14:46Z)
+github.com/golangci/golangci-lint/v2 v2.14.0 h1:ot8QffRa4LzAAEgtvNYrVs9esxQ7xoTwoAv6uhp4ngA=
+github.com/golangci/golangci-lint/v2 v2.14.0/go.mod h1:amHimCzNDP1GfVno3hIiNssjvqXmuW+CPZAHOdR4cIc=
