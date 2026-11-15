@@ -2115,6 +2115,14 @@ Détail : [kyverno-correctif-avant-push-predictions.md](resultats/kyverno-correc
 - **Trace publique confirmée sans jeton** : le dépôt `gigi206/supply-chain` est public. Une lecture anonyme de l'API montre les événements `referenced` de 20:56:46 UTC sur #18533 et de 20:23:50 UTC sur #18525. Les 10 commits non poussés ne contiennent ni `owner/repo#N` ni URL `github.com/` (le `#18565` d'un corps de commit renvoie au dépôt lui-même).
 - **Pour l'ouverture** : `gigi206/kyverno` n'existe pas (404). Branches de release : `release-1.19` à `bfa7febf7b31` ; rien n'est affirmé sur sa tête, la mesure du 08/11 portait sur le tag v1.19.2. La case cherry-pick, la relecture du diff, les cases de la liste de contrôle et qui ouvre la PR (le propriétaire par le web, comme pour l'issue, ou par `gh`) sont à décider par le propriétaire. `pr-management.json` avertit au bout de 7 jours sans activité et ferme au bout de 14.
 
+**Additif du 15/11/2026, 21:40 UTC : cases de la liste de contrôle.** Le propriétaire a répondu « oui et que tu les ai lu aussi et que tu les a appliquer ». Version v2 du corps, la v1 reste telle quelle : [`texte-pr-v2.md`](kyverno-correctif/pr/texte-pr-v2.md). Trois cases sont cochées : `CONTRIBUTING.md` lu, politique IA lue et IA déclarée, correctif de bug avec tests unitaires. Le guide de documentation, qui demande des proof manifests, reste non coché.
+- **Ce que l'assistant a lu et appliqué.** Lus en entier dans cette session : `CONTRIBUTING.md` et `AI_USAGE_POLICY.md` (`c0ee0857b`). Politique IA appliquée :
+  - règle 2 : 0 PR ouverte ;
+  - règle 4 : `triage` absente ;
+  - règle 5 : `Assisted-by` ;
+  - règle 3 (relecture par le contributeur) : elle revient au propriétaire.
+- **Ce qui n'est pas appliqué de `CONTRIBUTING.md`.** Le point 3 demande de tester avec le CLI de Kyverno et de fournir un manifeste de test ; pour un changement testable par l'utilisateur, il demande des tests chainsaw. Aucun des deux n'est fait : il faudrait un registre contenant un bundle horodaté. Le point 1 (proof manifests) n'est pas fait non plus ; le texte de la PR en donne la raison.
+
 ### Correctif Kyverno, étape C : protocole et prédictions à sec (09/11/2026, 11:07 UTC)
 
 Sur « traite tout, non ? », compris comme les trois travaux proposés, à sec. Rien n'est construit, téléchargé, poussé dans Zot ni appliqué au cluster. Protocole et prédictions C1 à C6 : [kyverno-correctif-c-predictions.md](resultats/kyverno-correctif-c-predictions.md).
