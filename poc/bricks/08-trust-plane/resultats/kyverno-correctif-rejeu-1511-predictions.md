@@ -30,3 +30,10 @@ Durée attendue : moins de 10 minutes (le 08/11 : environ 100 s pour le paquet, 
 - La compatibilité avec kyverno/kyverno#18533, ouverte sur les mêmes fichiers : conflit textuel probable, non mesuré ici.
 - L'admission : l'étape C du 09/11 a été faite sur v1.19.2 corrigée, pas sur ce `main`.
 - L'arbre de travail `main-b2e65e2` est laissé en place pour préparer la PR ; rien n'y est commité.
+
+## Additif du 15/11/2026, 20:18 UTC : v1 du rejeu arrêtée au départ, erreur d'instrument, script corrigé, rien jugé
+
+- **Lancement** de 20:17:46 à 20:17:46 UTC (heures de la commande), code 2. Sortie et journal de préparation archivés : [`v1-echec-chemin.log`](../kyverno-correctif/rejeu-1511/v1-echec-chemin.log).
+- **Cause** : le répertoire des journaux était passé en chemin relatif, puis le script se place dans l'arbre de travail. Toutes les redirections ont échoué (« No such file or directory »), donc aucun bloc après la préparation n'a été exécuté : ni reproducteur, ni `git apply`, ni tests. Le code 2 est celui du `grep` final, pas d'un test.
+- **Fait** : l'arbre de travail `main-b2e65e2` a été créé (`worktree add` code 0, tête `b2e65e2…`). Relevé à 20:18:02 UTC : à `b2e65e2`, 0 ligne de status, pas de `repro_tsa_test.go`.
+- **Correction** : chemin des journaux rendu absolu ; un arbre de travail existant n'est repris que s'il est à `b2e65e2` et propre (sinon KO). R1 à R6 sont inchangées et restent à juger. Le relancement attend l'accord du propriétaire (script modifié).

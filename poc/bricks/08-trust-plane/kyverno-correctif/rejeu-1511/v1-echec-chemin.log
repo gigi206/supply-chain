@@ -1,0 +1,20 @@
+# v1 du rejeu, 15/11/2026 : sortie de la commande (tâche de fond) puis l0-preparation.log ; journal relatif cassé par le cd dans l'arbre de travail
+## sortie
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 39: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l1-repro-intact.log: No such file or directory
+grep: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l1-repro-intact.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 40: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l1-repro-intact.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 46: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l2-application.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 52: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l3-repro-corrige.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 55: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l4-paquet-cosign.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 58: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l5-regression.log: No such file or directory
+poc/bricks/08-trust-plane/kyverno-correctif/rejeu-main.sh: line 63: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l6-etat.log: No such file or directory
+grep: poc/bricks/08-trust-plane/kyverno-correctif/rejeu-1511/l*.log: No such file or directory
+début 2026-11-15T20:17:46Z fin 2026-11-15T20:17:46Z code 2
+
+[exited with code 0]
+## l0-preparation.log
+== préparation : arbre de travail détaché à b2e65e2fa88f, go version go1.27.3 linux/amd64, 20:17:46 UTC
+correctif 5b8ae9b4a023f8ca, reproducteur 0fc91917b65857b0
+worktree add : code 0
+OK   tête b2e65e2fa88f8ff8bfb0a6351712433d6b14796d
+arbre propre : 0 ligne(s) de status

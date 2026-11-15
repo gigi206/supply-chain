@@ -11,7 +11,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 PATCH=$here/correctif-v2-final.patch
 REPRO=$here/repro_tsa_test.go.txt
 J=${1:?répertoire des journaux}
-mkdir -p "$J"
+mkdir -p "$J" && J=$(cd "$J" && pwd) || exit 1   # absolu : le script se place ensuite dans l'arbre de travail (v1 : chemin relatif, 15/11 20:17:46 UTC)
 K=$HOME/.cache/supply-chain-poc/08/kyverno-correctif
 WT=$K/main-b2e65e2
 PKG=./pkg/image/verifiers/ivpol/cosign/
@@ -23,9 +23,13 @@ h() { echo "== $1, $(date -u +%T) UTC"; }
 {
 h "préparation : arbre de travail détaché à ${N:0:12}, $(go version)"
 echo "correctif $(sha256sum < "$PATCH" | cut -c1-16), reproducteur $(sha256sum < "$REPRO" | cut -c1-16)"
-if [ -e "$WT" ]; then echo "KO   $WT existe déjà"; exit 1; fi
-git -C "$K/main" worktree add -q --detach "$WT" "$N" </dev/null; rc=$?
-echo "worktree add : code $rc"; [ "$rc" = 0 ] || exit 1
+if [ -e "$WT" ]; then   # laissé par la v1 : repris seulement s'il est à $N et propre
+  [ "$(git -C "$WT" rev-parse HEAD)" = "$N" ] && [ -z "$(git -C "$WT" status --porcelain)" ] && echo "arbre de travail existant repris : à ${N:0:12}, propre" \
+    || { echo "KO   $WT existe et n'est pas à $N ou pas propre"; exit 1; }
+else
+  git -C "$K/main" worktree add -q --detach "$WT" "$N" </dev/null; rc=$?
+  echo "worktree add : code $rc"; [ "$rc" = 0 ] || exit 1
+fi
 cd "$WT" || exit 1
 [ "$(git rev-parse HEAD)" = "$N" ] && echo "OK   tête $N" || { echo "KO   tête $(git rev-parse HEAD)"; exit 1; }
 echo "arbre propre : $(git status --porcelain | wc -l) ligne(s) de status"
