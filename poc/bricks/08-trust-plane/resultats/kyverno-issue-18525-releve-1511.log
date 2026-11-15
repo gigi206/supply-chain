@@ -1,0 +1,103 @@
+# Relevé en lecture publique de kyverno/kyverno#18525 et des PR voisines, sur « on a eu une réponse pour notre ticket » du propriétaire (15/11/2026)
+# Rien publié ; rien lu ni écrit dans le cluster, Zot ou les VM. v2 : la v1 (20:11:13 à 20:11:16 UTC) passait « --jq -c », refusé par gh ; écrasée avant tout commit
+# début : 2026-11-15T20:11:37Z
+## issue
+{"assignees":[],"comments":3,"labels":["bug","type:cli","area/cli","triage:critical-review"],"milestone":null,"state":"open","state_reason":null,"updated_at":"2026-11-14T07:57:16Z"}
+## chronologie
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"bug","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"type:cli","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:20:57Z","event":"labeled","label":"triage","source":null}
+{"actor":"gigi206","created_at":"2026-11-08T17:22:49Z","event":"referenced","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-09T12:12:04Z","event":"referenced","label":null,"source":null}
+{"actor":"urvish408","created_at":"2026-11-10T13:08:57Z","event":"commented","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-10T13:08:58Z","event":"mentioned","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-10T13:08:59Z","event":"subscribed","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-10T13:12:34Z","event":"commented","label":null,"source":null}
+{"actor":"urvish408","created_at":"2026-11-10T13:12:36Z","event":"mentioned","label":null,"source":null}
+{"actor":"urvish408","created_at":"2026-11-10T13:12:37Z","event":"subscribed","label":null,"source":null}
+{"actor":"JimBugwadia","created_at":"2026-11-14T00:09:32Z","event":"labeled","label":"area/cli","source":null}
+{"actor":"JimBugwadia","created_at":"2026-11-14T00:09:32Z","event":"labeled","label":"triage:critical-review","source":null}
+{"actor":"JimBugwadia","created_at":"2026-11-14T00:09:33Z","event":"unlabeled","label":"triage","source":null}
+{"actor":"nishant-devv","created_at":"2026-11-14T07:55:41Z","event":"commented","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-14T07:55:42Z","event":"mentioned","label":null,"source":null}
+{"actor":"gigi206","created_at":"2026-11-14T07:55:42Z","event":"subscribed","label":null,"source":null}
+## commentaires (auteur, association, date, longueur ; texte du commentaire de confirmation ci-dessous)
+{"author_association":"NONE","created_at":"2026-11-10T13:08:57Z","id":6768165207,"longueur":57,"user":"urvish408"}
+{"author_association":"NONE","created_at":"2026-11-10T13:12:34Z","id":6768241182,"longueur":147,"user":"gigi206"}
+{"author_association":"CONTRIBUTOR","created_at":"2026-11-14T07:55:41Z","id":6874161554,"longueur":1019,"user":"nishant-devv"}
+## commentaire 6874161554 (texte)
+Confirmed on current `main`.
+
+In `pkg/image/verifiers/ivpol/cosign/opts.go#L93`, air-gapped key/cert verification with `insecureIgnoreTlog: true` skips Sigstore infrastructure, leaving `opts.TrustedMaterial` nil. 
+
+When `ctlog.tsaCertChain` is provided:
+- Line 180 sets `opts.UseSignedTimestamps = true`.
+- line 181 guards `opts.TrustedMaterial` construction with `if opts.TrustedMaterial != nil`. Because it is nil, the TSA authority is never wrapped into `opts.TrustedMaterial`.
+
+When `cosign.VerifyNewBundle` later delegates to `sigstore-go`, calling `trustedMaterial.TimestampingAuthorities()` panics with a nil pointer dereference.
+
+Regarding severity: at admission time with `validationActions: [Deny]`, evaluation errors fail-closed and deny the request, so unauthorized images are not admitted; however, signed RFC 3161 timestamps cannot be verified in air-gapped / private-TSA key attestor setups.
+
+Confirmed reproducible bug on `main`. @gigi206 please go ahead and open your PR with the fix and unit tests.
+
+
+
+
+## étiquettes triage* (description)
+{"description":"Default label assigned to all new issues indicating label curation is needed to fully organize.","name":"triage"}
+{"description":"Assess reported security, enforcement, availability or data-loss risk; not a confirmed severity.","name":"triage:critical-review"}
+{"description":"Decide: accept with owner and criteria, consolidate, defer or decline.","name":"triage:decision"}
+{"description":"Confirm current/supported-release reproduction, actual impact and shared-versus-legacy scope.","name":"triage:needs-repro"}
+{"description":"Correct API scope, component ownership or repository placement; preserve current requirements.","name":"triage:scope-review"}
+{"description":"Verify original requirements, released fixes/backports or canonical coverage before closing.","name":"triage:verify-closure"}
+## politique IA (kyverno/community, AI_USAGE_POLICY.md)
+{"date":"2026-02-15T21:06:27Z","sha":"c0ee0857b06642f047d85af2204d3b8726e4da1c"}
+25:4. Pull Requests that include AI generated code can only be for issues that are accepted i.e., not labeled as “triage”.
+## JimBugwadia dans kyverno/community MAINTAINERS.md (titres de section et lignes)
+5:## Kyverno maintainers
+11:| Jim Bugwadia             | [@JimBugwadia](https://github.com/JimBugwadia)         | Nirmata                   |
+28:## Kyverno For Kubernetes Maintainers
+34:| Jim Bugwadia             | [@JimBugwadia](https://github.com/JimBugwadia)         | Nirmata                   |
+--
+75:## Kyverno Website Maintainers
+81:| Jim Bugwadia             | [@JimBugwadia](https://github.com/JimBugwadia)         | Nirmata                   |
+89:## Kyverno Sample Policies Repository Maintainers
+96:| Jim Bugwadia             | [@JimBugwadia](https://github.com/JimBugwadia)         | Nirmata                   |
+## main de kyverno/kyverno
+{"date":"2026-11-14T15:26:00Z","sha":"b2e65e2fa88f8ff8bfb0a6351712433d6b14796d"}
+## commits sur pkg/image/verifiers/ivpol/cosign depuis le 08/11
+## PR de gigi206 chez kyverno/kyverno (nombre)
+0
+## PR ouvertes voisines (recherches tsaCertChain, TSA)
+{"created_at":"2026-05-08T08:54:44Z","number":16048,"title":"fix(ivpol): merge user-provided TSA chain into TrustedMaterial for bundle verification","user":"jimgus"}
+{"created_at":"2026-10-08T15:14:43Z","number":17920,"title":"[release-1.19] fix: restrict legacy workload-image registry egress","user":"sagark-nirmata"}
+{"created_at":"2026-10-16T18:47:53Z","number":18052,"title":"fix(ivpol): do not initialise TUF when an inline trustedRoot is set","user":"emmettownsend"}
+{"created_at":"2026-10-28T14:40:36Z","number":18340,"title":"test(image): migrate 19 legacy verify-images scenarios to CEL","user":"e-esakman"}
+{"created_at":"2026-10-30T14:01:03Z","number":18372,"title":"fix: validate registry request destinations at the fetch site","user":"sagark-nirmata"}
+{"created_at":"2026-11-09T03:52:46Z","number":18533,"title":"fix(ivpol): honor inline trustedRoot when the transparency log is ignored","user":"pgmpofu"}
+## PR 16048
+{"author_association":"NONE","base":"main","created_at":"2026-05-08T08:54:44Z","draft":true,"head":"54cdfc2dfdd54602e2970fdfbae360e26667bb26","labels":["merge-conflicts","kind/tests"],"mergeable_state":"dirty","number":16048,"state":"open","updated_at":"2026-07-28T15:11:31Z","user":"jimgus"}
+{"additions":4,"deletions":1,"filename":"pkg/image/verifiers/ivpol/cosign/opts.go","status":"modified"}
+{"additions":64,"deletions":0,"filename":"pkg/image/verifiers/ivpol/cosign/tsa_trusted_material.go","status":"added"}
+{"additions":203,"deletions":0,"filename":"pkg/image/verifiers/ivpol/cosign/tsa_trusted_material_test.go","status":"added"}
+## PR 18533
+{"author_association":"CONTRIBUTOR","base":"main","created_at":"2026-11-09T03:52:46Z","draft":false,"head":"04385c77395d3aea22bc1fd11e5e31cf049b00ca","labels":["kind/tests","area/cosign","area/image-verify","ready-for-review"],"mergeable_state":"clean","number":18533,"state":"open","updated_at":"2026-11-13T08:10:48Z","user":"pgmpofu"}
+{"additions":35,"deletions":5,"filename":"pkg/image/verifiers/ivpol/cosign/opts.go","status":"modified"}
+{"additions":236,"deletions":0,"filename":"pkg/image/verifiers/ivpol/cosign/opts_test.go","status":"modified"}
+{"additions":18,"deletions":8,"filename":"pkg/image/verifiers/ivpol/cosign/verifier.go","status":"modified"}
+{"additions":26,"deletions":2,"filename":"pkg/image/verifiers/ivpol/cosign/verifier_test.go","status":"modified"}
+## PR 18533 : lignes d'opts.go sur la résolution de TrustedMaterial (extrait du diff)
+7:-		trustedMaterial, err := resolveTrustedMaterial(att, trust.trustedRoot)
+11:-		opts.TrustedMaterial = trustedMaterial
+16:+	var tufTrustedRoot *root.TrustedRoot
+18:+		tufTrustedRoot = trust.trustedRoot
+20:+	trustedMaterial, err := resolveTrustedMaterial(att, tufTrustedRoot)
+24:+	opts.TrustedMaterial = trustedMaterial
+52:@@ -707,5 +732,10 @@ func resolveTrustedMaterial(att *v1beta1.Cosign, defaultTrustedRoot *root.Truste
+56:+	if defaultTrustedRoot == nil {
+59:+		return nil, nil
+## opts.go sur main : garde du bloc TSA
+93:	skipSigstoreInfra := keyOrCert && ignoreTlog
+180:			opts.UseSignedTimestamps = true
+181:			if opts.TrustedMaterial != nil && len(roots) > 0 {
+# fin : 2026-11-15T20:11:47Z
